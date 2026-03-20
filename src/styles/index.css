@@ -1,0 +1,112 @@
+/* KaTeX — must come before @tailwind directives */
+@import "katex/dist/katex.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sidebar-width: 280px;
+    --topbar-height: 60px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-slate-800 dark:text-slate-200 antialiased;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+  }
+}
+
+@layer components {
+  /* Math display */
+  .math-display {
+    @apply overflow-x-auto py-4 px-2;
+  }
+
+  /* Callout boxes */
+  .callout {
+    @apply rounded-lg p-4 my-4 border-l-4;
+  }
+  .callout-definition {
+    @apply bg-blue-50 dark:bg-blue-950/40 border-blue-500 text-blue-900 dark:text-blue-200;
+  }
+  .callout-theorem {
+    @apply bg-purple-50 dark:bg-purple-950/40 border-purple-500 text-purple-900 dark:text-purple-200;
+  }
+  .callout-tip {
+    @apply bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-200;
+  }
+  .callout-warning {
+    @apply bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-900 dark:text-amber-200;
+  }
+  .callout-intuition {
+    @apply bg-orange-50 dark:bg-orange-950/40 border-orange-400 text-orange-900 dark:text-orange-200;
+  }
+
+  /* Example / step table */
+  .step-row {
+    @apply flex items-start gap-4 py-3 border-b border-slate-100 dark:border-slate-800 last:border-0;
+  }
+  .step-number {
+    @apply flex-shrink-0 w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/40
+           text-brand-700 dark:text-brand-300 text-xs font-bold
+           flex items-center justify-center mt-1;
+  }
+
+  /* Viz frame */
+  .viz-frame {
+    @apply rounded-xl border border-slate-200 dark:border-slate-700
+           bg-slate-50 dark:bg-slate-900/50 p-4 my-6 shadow-sm;
+  }
+
+  /* Tab button */
+  .tab-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors;
+  }
+  .tab-btn-active {
+    @apply border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900;
+  }
+  .tab-btn-inactive {
+    @apply border-transparent text-slate-500 dark:text-slate-400
+           hover:text-slate-700 dark:hover:text-slate-200
+           hover:border-slate-300 dark:hover:border-slate-600;
+  }
+
+  /* Prose section */
+  .prose-content p {
+    @apply mb-4 leading-relaxed;
+  }
+  .prose-content p:last-child {
+    @apply mb-0;
+  }
+}
+
+/* KaTeX overrides for dark mode */
+.dark .katex {
+  color: inherit;
+}
+.dark .katex .mord,
+.dark .katex .minner {
+  color: inherit;
+}
+
+/* Sidebar active link */
+.sidebar-link-active {
+  @apply bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300
+         font-medium border-r-2 border-brand-500;
+}

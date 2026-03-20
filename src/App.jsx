@@ -1,0 +1,41 @@
+import { HashRouter, Routes, Route } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { ProgressProvider } from './context/ProgressContext.jsx'
+import { SearchProvider } from './context/SearchContext.jsx'
+import AppShell from './components/layout/AppShell.jsx'
+import LoadingSpinner from './components/ui/LoadingSpinner.jsx'
+
+const HomePage    = lazy(() => import('./pages/HomePage.jsx'))
+const ChapterPage = lazy(() => import('./pages/ChapterPage.jsx'))
+const LessonPage  = lazy(() => import('./pages/LessonPage.jsx'))
+const SearchPage  = lazy(() => import('./pages/SearchPage.jsx'))
+const AboutPage   = lazy(() => import('./pages/AboutPage.jsx'))
+
+const Fallback = () => (
+  <div className="flex items-center justify-center h-64">
+    <LoadingSpinner size="lg" />
+  </div>
+)
+
+export default function App() {
+  return (
+    <ProgressProvider>
+      <SearchProvider>
+        <HashRouter>
+          <AppShell>
+            <Suspense fallback={<Fallback />}>
+              <Routes>
+                <Route index element={<HomePage />} />
+                <Route path="chapter/:chapterId" element={<ChapterPage />} />
+                <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
+                <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
+                <Route path="search" element={<SearchPage />} />
+                <Route path="about" element={<AboutPage />} />
+              </Routes>
+            </Suspense>
+          </AppShell>
+        </HashRouter>
+      </SearchProvider>
+    </ProgressProvider>
+  )
+}

@@ -1,0 +1,13 @@
+import introLimits from './00-intro-limits.js'
+import limitLaws from './01-limit-laws.js'
+import continuity from './02-continuity.js'
+
+export default {
+  id: 'chapter-1',
+  number: 1,
+  title: 'Limits & Continuity',
+  slug: 'limits',
+  description: 'The foundation of calculus. Limits describe how functions behave near a point, enabling the precise definition of derivatives and integrals.',
+  color: 'blue',
+  lessons: [introLimits, limitLaws, continuity],
+}
