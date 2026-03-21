@@ -22,6 +22,10 @@ const CONCEPT_ALIASES = {
   exponential: ['growth', 'decay', 'e^x', 'logarithm', 'ln'],
   parametric: ['parametric equations', 'x(t)', 'y(t)', 'parameterized curve'],
   polar: ['r(theta)', 'polar coordinates', 'rose curve', 'cardioid'],
+  proof: ['rigor', 'formal proof', 'show that', 'theorem proof', 'geometric proof', 'visual proof'],
+  application: ['real world', 'engineering', 'physics', 'economics', 'biology', 'computer science'],
+  series: ['sequence', 'convergence', 'power series', 'taylor', 'maclaurin'],
+  vectors: ['vector-valued', 'velocity', 'acceleration', 'trajectory'],
 }
 
 const ASSIGNMENT_TERMS = [

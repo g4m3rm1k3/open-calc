@@ -19,6 +19,16 @@ const QUERY_SYNONYMS = {
   polar: ['r(theta)', 'polar coordinates', 'cardioid', 'rose curve'],
   assignment: ['homework', 'quiz', 'exam', 'practice problems'],
   homework: ['assignment', 'practice problems'],
+  proof: ['rigor', 'theorem', 'formal proof', 'show that'],
+  'visual proof': ['geometric proof', 'diagram proof', 'proof by picture'],
+  application: ['real world', 'engineering', 'physics', 'economics', 'biology', 'computer science'],
+  'computer science': ['algorithm', 'numerical method', 'optimization', 'gradient'],
+  biology: ['population growth', 'pharmacokinetics', 'logistic model', 'diffusion'],
+  economics: ['marginal cost', 'consumer surplus', 'producer surplus', 'optimization'],
+  engineering: ['work', 'signal', 'control', 'rate of change'],
+  physics: ['velocity', 'acceleration', 'energy', 'motion', 'force'],
+  exam: ['midterm', 'final', 'test prep', 'practice'],
+  'step by step': ['worked example', 'walkthrough', 'show steps'],
 }
 
 function expandQuery(rawQuery) {
@@ -43,6 +53,15 @@ function expandQuery(rawQuery) {
   if (compact.includes('u-sub') || compact.includes('u substitution')) {
     terms.add('substitution')
     terms.add('integral')
+  }
+
+  if (compact.includes('calc 2') || compact.includes('calculus 2')) {
+    terms.add('series')
+    terms.add('convergence')
+    terms.add('power series')
+    terms.add('taylor')
+    terms.add('polar')
+    terms.add('parametric')
   }
 
   return Array.from(terms).join(' ')
