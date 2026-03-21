@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 const VIZ_REGISTRY = {
   NumberLine:               lazy(() => import('./d3/NumberLine.jsx')),
@@ -74,6 +75,8 @@ const VIZ_REGISTRY = {
   // Chapter 5 — Sequences & Series
   TaylorApproximation:           lazy(() => import('./d3/TaylorApproximation.jsx')),
   ConvergenceViz:                lazy(() => import('./d3/ConvergenceViz.jsx')),
+  // Chapter 2 — Additions
+  DualGraphSync:                 lazy(() => import('./react/DualGraphSync.jsx')),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution:           lazy(() => import('./d3/VolumesOfRevolution.jsx')),
   // Chapter 6 — Polar & Parametric
@@ -110,7 +113,7 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   )
 
   if (isExpanded) {
-    return (
+    return createPortal(
       <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
          <div className="w-full max-w-[95vw] sm:max-w-[90vw] h-[95vh] sm:max-h-[85vh] flex flex-col bg-white dark:bg-[#0f172a] shadow-2xl rounded-2xl overflow-hidden relative border border-slate-700">
             {/* Header / Nav inside bounded container */}
@@ -126,19 +129,20 @@ export default function VizFrame({ id, initialProps = {}, title }) {
             
             {/* Scrollable Content Area */}
             <div className="flex-1 overflow-auto p-4 sm:p-6 w-full flex items-center justify-center">
-               <div className="w-full max-w-5xl">
+               <div className="w-full max-w-5xl bg-white dark:bg-[#0f172a] rounded-xl">
                    {content}
                </div>
             </div>
          </div>
-      </div>
+      </div>,
+      document.body
     )
   }
 
   return (
-    <div className="viz-frame relative group w-full max-w-full overflow-x-auto">
+    <div className="viz-frame relative group w-full max-w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl">
       {title && (
-        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3">{title}</p>
+        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3 px-2 pt-2">{title}</p>
       )}
       <button 
          onClick={() => setIsExpanded(true)}
@@ -147,7 +151,9 @@ export default function VizFrame({ id, initialProps = {}, title }) {
       >
         <span>⛶</span> Expand
       </button>
-      {content}
+      <div className="p-2">
+        {content}
+      </div>
     </div>
   )
 }

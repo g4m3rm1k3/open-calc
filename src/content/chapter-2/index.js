@@ -1,6 +1,7 @@
 import tangentProblem from './00-tangent-problem.js'
 import differentiationRules from './01-differentiation-rules.js'
 import chainRule from './02-chain-rule.js'
+import derivativesOfInverseFunctions from './02-derivatives-of-inverse-functions.js'
 import trigDerivatives from './03-trig-derivatives.js'
 import expLogDerivatives from './04-exp-log-derivatives.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
@@ -17,6 +18,7 @@ export default {
     tangentProblem,
     differentiationRules,
     chainRule,
+    derivativesOfInverseFunctions,
     trigDerivatives,
     expLogDerivatives,
     implicitDifferentiation,

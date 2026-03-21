@@ -3,6 +3,7 @@ import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import KatexInline from '../math/KatexInline.jsx'
 import AlgebraMicroLesson from './AlgebraMicroLesson.jsx'
+import StepThrough from './StepThrough.jsx'
 
 function isLikelyInlineMath(expr) {
   const t = expr.trim()
@@ -126,6 +127,7 @@ function SectionContent({ data }) {
           )
         }
         if (block.type === 'callout') return <Callout key={i} {...block} />
+        if (block.type === 'stepthrough') return <StepThrough key={i} {...block} />
         return null
       })}
     </div>
