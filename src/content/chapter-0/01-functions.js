@@ -36,6 +36,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'prior-knowledge',
+        title: 'You Use Functions Every Day',
+        body: 'Spreadsheet formulas (=SUM(A1:A5)), Google Maps routes (distance is a function of route), vending machines (press B3, get a snack) — these are all functions. You put something in, you get exactly one thing out. The math definition is the same idea, just more precise.',
+      },
+      {
         type: 'intuition',
         title: 'The Machine Metaphor',
         body: 'Input x → ⎡ f ⎤ → Output f(x). One input, one output. f(x) is a value, not a product.',
@@ -44,6 +49,11 @@ export default {
         type: 'warning',
         title: 'Common notation confusion',
         body: 'f(x) does NOT mean "f times x." The parentheses denote function application. Similarly, f(x+1) means "evaluate f at the input x+1" — do NOT simplify as f(x) + f(1) unless f is linear.',
+      },
+      {
+        type: 'misconception',
+        title: 'f(a + b) ≠ f(a) + f(b) in general',
+        body: "This property (called additivity) is only true for LINEAR functions. For example, (a+b)² ≠ a² + b², and sin(a+b) ≠ sin(a) + sin(b). Don't distribute functions like they're multiplication!",
       },
     ],
     visualizationId: 'FunctionMachine',

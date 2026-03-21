@@ -2,6 +2,7 @@ import { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import KatexBlock from '../math/KatexBlock.jsx'
+import KatexInline from '../math/KatexInline.jsx'
 
 const TABS = [
   { id: 'intuition', label: '🧠 Intuition', description: 'Build the concept from first principles' },
@@ -9,13 +10,43 @@ const TABS = [
   { id: 'rigor', label: '∴ Rigor', description: 'Proofs and epsilon-delta' },
 ]
 
-function ProseParagraph({ text }) {
-  // Detect inline LaTeX: text between $ ... $
-  if (!text.includes('\\') && !text.includes('$')) {
-    return <p className="mb-4 leading-relaxed last:mb-0">{text}</p>
+/**
+ * Parse prose text into an array of React elements, rendering:
+ *  - Inline LaTeX:  $...$  via KaTeX
+ *  - Bold text:     **...**  via <strong>
+ */
+function parseProse(text) {
+  // Match $...$ (non-greedy) or **...** (non-greedy)
+  const regex = /\$([^$]+?)\$|\*\*(.+?)\*\*/g
+  const parts = []
+  let lastIndex = 0
+  let match
+
+  while ((match = regex.exec(text)) !== null) {
+    // Push any plain text before this match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    if (match[1] !== undefined) {
+      // Inline LaTeX: $...$
+      parts.push(<KatexInline key={`k${match.index}`} expr={match[1]} />)
+    } else if (match[2] !== undefined) {
+      // Bold: **...**
+      parts.push(<strong key={`b${match.index}`}>{match[2]}</strong>)
+    }
+    lastIndex = match.index + match[0].length
   }
-  // Simple rendering: just show as text (inline LaTeX is already embedded in content as plain text)
-  return <p className="mb-4 leading-relaxed last:mb-0">{text}</p>
+
+  // Push any remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts.length > 0 ? parts : [text]
+}
+
+function ProseParagraph({ text }) {
+  return <p className="mb-4 leading-relaxed last:mb-0">{parseProse(text)}</p>
 }
 
 function SectionContent({ data }) {

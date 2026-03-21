@@ -9,6 +9,13 @@ const ICONS = {
   'prior-knowledge': '📚',
   'real-world': '🌍',
   'geometric': '🔷',
+  'mnemonic': '🎵',
+  'procedure': '📋',
+  'insight': '✨',
+  'proof': '🔑',
+  'example': '📝',
+  'misconception': '🚫',
+  'history': '📜',
 }
 
 const LABELS = {
@@ -20,6 +27,13 @@ const LABELS = {
   'prior-knowledge': 'You may have been taught',
   'real-world': 'Real World Connection',
   'geometric': 'Geometric Insight',
+  'mnemonic': 'Memory Aid',
+  'procedure': 'Step-by-Step',
+  'insight': 'Key Insight',
+  'proof': 'Proof',
+  'example': 'Quick Example',
+  'misconception': 'Common Mistake',
+  'history': 'Historical Note',
 }
 
 export default function Callout({ type = 'tip', title, body }) {

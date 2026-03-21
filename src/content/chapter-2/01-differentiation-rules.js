@@ -48,9 +48,19 @@ export default {
         caption: 'Adjust n to see how f(x) = xⁿ and its derivative nxⁿ⁻¹ relate. Notice the degree drops by exactly 1 each time.',
       },
       {
+        id: 'ProductRuleRectangle',
+        title: 'Why the Product Rule Works — The Rectangle Proof',
+        caption: 'f(x)·g(x) is the area of a rectangle. When x changes, the area grows by f·Δg + g·Δf + a tiny corner (Δf·Δg). As Δx→0, the corner vanishes, giving (fg)\' = f\'g + fg\'.',
+      },
+      {
         id: 'ProjectileMotion',
         title: 'Projectile Motion — Derivatives in Physics',
         caption: 'Adjust the launch angle and speed. The height function h(t) = v·sin(θ)·t − ½gt² is a polynomial — differentiate it to find max height and landing time.',
+      },
+      {
+        id: 'SlopeField',
+        title: 'Slope Field — The Derivative as a Function',
+        caption: 'The derivative is not just a number at one point — it defines a slope at EVERY point. This slope field shows tiny line segments colored by the derivative value.',
       },
     ],
   },

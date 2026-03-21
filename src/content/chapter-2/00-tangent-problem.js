@@ -50,6 +50,16 @@ export default {
         title: 'Five Equivalent Notations',
         body: "f'(x) = \\frac{dy}{dx} = \\frac{d}{dx}[f(x)] = Df(x) = \\dot{y}",
       },
+      {
+        type: 'misconception',
+        title: 'dy/dx is NOT a Fraction',
+        body: "Leibniz notation dy/dx LOOKS like a fraction and often BEHAVES like one (especially in the chain rule), but it is defined as a LIMIT, not a ratio. You cannot, in general, 'cancel' the dx. The notation is brilliantly suggestive, but it is notation — not algebra.",
+      },
+      {
+        type: 'history',
+        title: 'Newton vs. Leibniz: The Calculus Priority Dispute',
+        body: "Newton developed calculus in the 1660s using 'fluxions' (rates of change). Leibniz independently developed it in the 1670s-80s using infinitesimals. The resulting priority dispute was one of the bitterest in the history of science. Today, we use Leibniz's notation (dy/dx) because it is more versatile, but Newton's dot notation (ẏ) survives in physics.",
+      },
     ],
     visualizations: [
       {

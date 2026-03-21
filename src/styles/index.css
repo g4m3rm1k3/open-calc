@@ -57,6 +57,36 @@
   .callout-intuition {
     @apply bg-orange-50 dark:bg-orange-950/40 border-orange-400 text-orange-900 dark:text-orange-200;
   }
+  .callout-prior-knowledge {
+    @apply bg-sky-50 dark:bg-sky-950/40 border-sky-400 text-sky-900 dark:text-sky-200;
+  }
+  .callout-real-world {
+    @apply bg-teal-50 dark:bg-teal-950/40 border-teal-500 text-teal-900 dark:text-teal-200;
+  }
+  .callout-geometric {
+    @apply bg-indigo-50 dark:bg-indigo-950/40 border-indigo-400 text-indigo-900 dark:text-indigo-200;
+  }
+  .callout-mnemonic {
+    @apply bg-pink-50 dark:bg-pink-950/40 border-pink-400 text-pink-900 dark:text-pink-200;
+  }
+  .callout-procedure {
+    @apply bg-slate-50 dark:bg-slate-800/60 border-slate-400 text-slate-900 dark:text-slate-200;
+  }
+  .callout-insight {
+    @apply bg-yellow-50 dark:bg-yellow-950/40 border-yellow-500 text-yellow-900 dark:text-yellow-200;
+  }
+  .callout-proof {
+    @apply bg-violet-50 dark:bg-violet-950/40 border-violet-500 text-violet-900 dark:text-violet-200;
+  }
+  .callout-example {
+    @apply bg-cyan-50 dark:bg-cyan-950/40 border-cyan-400 text-cyan-900 dark:text-cyan-200;
+  }
+  .callout-misconception {
+    @apply bg-red-50 dark:bg-red-950/40 border-red-500 text-red-900 dark:text-red-200;
+  }
+  .callout-history {
+    @apply bg-amber-50 dark:bg-amber-950/40 border-amber-600 text-amber-900 dark:text-amber-200;
+  }
 
   /* Example / step table */
   .step-row {

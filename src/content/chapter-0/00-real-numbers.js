@@ -40,6 +40,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'prior-knowledge',
+        title: 'You Already Know These Numbers',
+        body: 'You count with natural numbers (1, 2, 3…), use negative numbers for temperatures and debts, use fractions for recipes and measurements, and use decimals for money. Real numbers are simply ALL of these — plus the "weird" ones like √2 and π — unified on a single, gapless number line.',
+      },
+      {
         type: 'intuition',
         title: 'The nesting hierarchy',
         body: 'ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ — each set is a proper subset of the next. Integers include naturals, rationals include integers, reals include everything.',
@@ -48,6 +53,11 @@ export default {
         type: 'tip',
         title: 'How to test if a decimal is rational',
         body: 'Terminating: 0.75 = 3/4. Repeating: 0.̄3 = 1/3. Neither (irrational): 0.10100100010000… (no pattern). If you cannot write it as p/q for integers p, q, it is irrational.',
+      },
+      {
+        type: 'misconception',
+        title: '√2 is NOT "approximately 1.414"',
+        body: '√2 is an exact number — it is the precise length of the diagonal of a unit square. Writing 1.414 is an approximation. The real number √2 has infinitely many non-repeating decimals, but it is just as "real" as the number 3.',
       },
     ],
     visualizationId: 'NumberLine',

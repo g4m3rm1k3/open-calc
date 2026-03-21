@@ -23,6 +23,12 @@ const VIZ_REGISTRY = {
   ProjectileMotion:             lazy(() => import('./d3/ProjectileMotion.jsx')),
   PositionVelocityAcceleration: lazy(() => import('./d3/PositionVelocityAcceleration.jsx')),
   LimitRacingCar:               lazy(() => import('./d3/LimitRacingCar.jsx')),
+  DifferentiationRulesDemo:     lazy(() => import('./d3/DifferentiationRulesDemo.jsx')),
+  TangentLineConstructor:       lazy(() => import('./d3/TangentLineConstructor.jsx')),
+  TangentToImplicitCurve:       lazy(() => import('./d3/TangentToImplicitCurve.jsx')),
+  SineUnwrap:                   lazy(() => import('./d3/SineUnwrap.jsx')),
+  ProductRuleRectangle:         lazy(() => import('./d3/ProductRuleRectangle.jsx')),
+  SlopeField:                   lazy(() => import('./d3/SlopeField.jsx')),
   TangentPlane3D:               lazy(() => import('./three/TangentPlane3D.jsx')),
   ParametricCurve3D:            lazy(() => import('./three/ParametricCurve3D.jsx')),
 }

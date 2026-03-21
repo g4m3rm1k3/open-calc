@@ -50,9 +50,15 @@ export default {
         title: 'Key Values to Memorize',
         body: 'sin(0)=0, sin(π/6)=1/2, sin(π/4)=√2/2, sin(π/3)=√3/2, sin(π/2)=1',
       },
+      {
+        type: 'misconception',
+        title: 'sin(a + b) ≠ sin(a) + sin(b)',
+        body: "This is one of the most common algebra errors in calculus. sin(30° + 60°) = sin(90°) = 1, but sin(30°) + sin(60°) = 0.5 + 0.866 = 1.366. The correct expansion is sin(a+b) = sin(a)cos(b) + cos(a)sin(b).",
+      },
     ],
     visualizations: [
       { id: 'UnitCircle', props: { animate: false }, title: 'Interactive Unit Circle', caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.' },
+      { id: 'SineUnwrap', title: 'The Unit Circle Unwraps into the Sine Wave', caption: 'THIS is why sine is a wave: the vertical height of the point on the unit circle, plotted against the angle, traces the sine curve. Toggle auto-animate to watch it unfold.' },
       { id: 'TriangleAreaProof', title: 'Why Triangle Area = ½ × base × height', caption: 'Every trig formula for triangle area (½ab sin C) comes from this. Watch how two triangles tile a parallelogram.' },
     ],
   },

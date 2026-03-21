@@ -51,6 +51,11 @@ export default {
         title: 'Indeterminate Forms',
         body: '0/0, ∞/∞, 0·∞, ∞−∞ are called "indeterminate forms." They do NOT mean the limit is 0 or undefined — they mean we need more work. (x²−4)/(x−2) → 0/0 at x=2, but the limit is 4.',
       },
+      {
+        type: 'misconception',
+        title: 'The Limit is NOT the Function Value',
+        body: "lim(x→c) f(x) can exist even when f(c) doesn't. And even when f(c) does exist, the limit can be a DIFFERENT number. The limit only cares about what happens NEAR c, not AT c.",
+      },
     ],
     visualizations: [
       {
