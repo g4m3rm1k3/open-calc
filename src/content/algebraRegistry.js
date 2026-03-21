@@ -61,5 +61,12 @@ export const ALGEBRA_REGISTRY = {
     example: '(x+1)^{3/2} - (x+1)^{1/2} = (x+1)^{1/2}[(x+1) - 1]',
     description: 'When an expression contains multiple fractional powers of the same base, always factor out the term with the smallest (or most negative) exponent to simplify.',
     chapterZeroSlug: 'algebraic-techniques',
+  },
+  'solve-simple-quadratic': {
+    name: 'Solving Simple Quadratics',
+    formula: 'x^2 = k \\implies x = \\pm \\sqrt{k}',
+    example: 'x^2 = 5 \\implies x = \\sqrt{5} \\text{ or } -\\sqrt{5}',
+    description: 'When isolating x in an equation like x² = k, remember that there are always TWO solutions (positive and negative). You must take the square root of both sides. In geometry problems, you manually pick the positive or negative root based on which side of the axis you are on.',
+    chapterZeroSlug: 'algebraic-techniques',
   }
 };

@@ -46,6 +46,7 @@ const VIZ_REGISTRY = {
   TwoSidedLimit:                lazy(() => import('./d3/TwoSidedLimit.jsx')),
   HoleVsValue:                  lazy(() => import('./d3/HoleVsValue.jsx')),
   OscillationViz:               lazy(() => import('./d3/OscillationViz.jsx')),
+  DeltaMinSelector:             lazy(() => import('./d3/DeltaMinSelector.jsx')),
   // Chapter 2 — Derivatives additions
   DerivativeBuilder:            lazy(() => import('./d3/DerivativeBuilder.jsx')),
   // Chapter 4 — Integration

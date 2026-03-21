@@ -79,6 +79,21 @@ export default {
         title: 'Interactive Epsilon-Delta Strip Finder',
         caption: 'Drag ε to adjust the tolerance band. Watch where the curve exits. The x-distances become δ candidates.',
       },
+      {
+        id: 'DeltaMinSelector',
+        title: 'The Minimum Selection Rule',
+        caption: 'For f(x) = x², the distance to the upper boundary is 0.236, but to the lower boundary is 0.268. Which one should you choose for δ to trap the function?',
+      },
+      {
+        id: 'EpsilonDelta',
+        title: 'When Limits Fail: Jump Discontinuity',
+        caption: 'Try to find a δ box that traps the function inside the yellow band. Notice how the left piece always escapes, no matter how small δ gets!',
+        props: {
+           fn: '(x < 2 ? 2*x + 1 : x*x - 1)',
+           c: 2,
+           L: 3
+        }
+      }
     ],
   },
 
@@ -157,6 +172,7 @@ export default {
         fn: 'Math.sqrt(x+1)',
         c: 3,
         L: 2,
+        targetEpsilon: 0.5,
         getDelta: 'Math.min(3 - (Math.pow(2-e, 2) - 1), (Math.pow(2+e, 2) - 1) - 3)'
       },
       visualizations: [
@@ -195,6 +211,7 @@ export default {
         fn: '2*x - 1',
         c: 3,
         L: 5,
+        targetEpsilon: 0.4,
         getDelta: 'e / 2'
       },
       visualizations: [
@@ -232,6 +249,7 @@ export default {
         fn: 'x*x',
         c: 2,
         L: 4,
+        targetEpsilon: 1.0,
         getDelta: 'Math.min(2 - Math.sqrt(Math.max(0, 4 - e)), Math.sqrt(4 + e) - 2)'
       },
       visualizations: [
@@ -251,7 +269,7 @@ export default {
       steps: [
         { expression: 'a = 2, \\quad L = 4, \\quad \\varepsilon = 1', annotation: 'Parameters.' },
         { expression: 'y = 3 \\text{ and } y = 5 \\text{ (tolerance band)}', annotation: 'Horizontal lines.' },
-        { expression: 'x^2 = 5 \\Rightarrow x = \\pm\\sqrt{5} \\approx \\pm 2.236', annotation: 'Upper intersections.' },
+        { expression: 'x^2 = 5 \\Rightarrow x = \\pm\\sqrt{5} \\approx \\pm 2.236', annotation: 'Upper intersections. {{algebra:solve-simple-quadratic|Solve the quadratic by taking the square root.}}' },
         { expression: 'x^2 = 3 \\Rightarrow x = \\pm\\sqrt{3} \\approx \\pm 1.732', annotation: 'Lower intersections.' },
         { expression: '\\text{Relevant intersection near } a = 2: x = \\sqrt{5} \\approx 2.236 \\text{ (right) and } \\sqrt{3} \\approx 1.732 \\text{ (left)}', annotation: 'Choose crossings nearest to a.' },
         { expression: '\\delta_{\\text{left}} = 2 - 1.732 = 0.268', annotation: 'Distance to left.' },
@@ -270,6 +288,7 @@ export default {
         fn: '(x < 2 ? 2*x + 1 : x*x - 1)',
         c: 2,
         L: 3,
+        targetEpsilon: 0.5,
         getDelta: '0.12'
       },
       visualizations: [
@@ -307,6 +326,7 @@ export default {
         fn: 'Math.sin(1/x)',
         c: 0,
         L: 0,
+        targetEpsilon: 0.5,
         getDelta: '0.5'
       },
       visualizations: [
