@@ -7,6 +7,7 @@ export default {
   title: 'Trigonometric Integrals',
   subtitle: 'Systematic strategies for integrating powers and products of sine, cosine, tangent, and secant',
   tags: ['trig integrals', 'sin cos powers', 'half-angle', 'Wallis', 'reduction', 'trigonometric', 'sin squared', 'cos squared'],
+  aliases: ['how to integrate sin^m cos^n', 'trig power integrals', 'half angle integration strategy'],
 
   hook: {
     question: 'How do you integrate sin²(x)? The power rule does not apply (sin²(x) is not x^n), and u-sub fails (the derivative of sin x is cos x, but there is no cos x factor). The key is a trig identity: sin²(x) = (1 − cos 2x)/2. This converts the integral to a basic form. Trig integrals are all about choosing the right identity to simplify the integrand — and this lesson gives you a complete decision flowchart.',
@@ -52,6 +53,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Toggle trig-pattern signals to decide when to use odd/even power identities versus other major integration techniques.',
+      },
       {
         id: 'UnitCircle',
         title: 'Powers of Sine and Cosine on the Unit Circle',

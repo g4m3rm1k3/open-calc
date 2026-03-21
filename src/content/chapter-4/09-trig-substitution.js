@@ -7,6 +7,7 @@ export default {
   title: 'Trigonometric Substitution',
   subtitle: 'Eliminating radicals by substituting x = a·sin θ, a·tan θ, or a·sec θ',
   tags: ['trig substitution', 'radical', 'square root', 'reference triangle', 'sin substitution', 'tan substitution', 'sec substitution'],
+  aliases: ['radical integrals strategy', 'when to use trig substitution', 'sqrt a2 minus x2 integral'],
 
   hook: {
     question: 'How do you integrate √(4 − x²)? No algebraic trick or u-substitution removes the square root. But if you let x = 2 sin θ, then √(4 − x²) = √(4 − 4sin²θ) = 2cos θ — the radical vanishes! The integral becomes a trig integral, which you already know how to solve. Trigonometric substitution is a technique that uses the Pythagorean identity to eliminate radicals.',
@@ -47,6 +48,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Mark radical patterns like a^2-x^2 or a^2+x^2 and compare trig substitution against competing techniques.',
+      },
       {
         id: 'FunctionPlotter',
         title: 'Trig Substitution Reference Triangles',

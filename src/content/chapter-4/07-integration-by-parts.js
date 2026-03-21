@@ -7,6 +7,7 @@ export default {
   title: 'Integration by Parts',
   subtitle: 'The product rule in reverse — trading one integral for an easier one',
   tags: ['integration by parts', 'LIATE', 'tabular method', 'product rule', 'reduction formula', 'uv formula'],
+  aliases: ['when to use integration by parts', 'liate rule', 'product integral strategy'],
 
   hook: {
     question: 'How do you integrate x·eˣ? There is no substitution that works — the x factor is not the derivative of the exponent, and the exponent is not the derivative of x. Yet d/dx[x·eˣ] = eˣ + x·eˣ by the product rule, so x·eˣ = d/dx[x·eˣ] − eˣ. Integrating both sides: ∫x·eˣ dx = x·eˣ − eˣ + C. Integration by parts formalizes this trick for any product.',
@@ -47,6 +48,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Try product-style integrands and see why by-parts ranks above substitution when no inner derivative is available.',
+      },
       {
         id: 'FunctionPlotter',
         title: 'Integration by Parts: Trading Integrals',

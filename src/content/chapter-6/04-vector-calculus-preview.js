@@ -6,6 +6,7 @@ export default {
   title: 'Vector-Valued Functions Preview',
   subtitle: 'Motion, geometry, and modeling in 2D/3D before multivariable calculus',
   tags: ['vectors', 'parametric', 'velocity', 'acceleration', 'speed', 'arc length', 'curvature', 'physics', 'robotics'],
+  aliases: 'vector valued function r t velocity vector acceleration vector tangent vector curvature normal acceleration',
 
   hook: {
     question: 'How do engineers elegantly encapsulate motion through 3D space with one mathematical object instead of juggling three disconnected coordinate functions?',
@@ -42,6 +43,11 @@ export default {
         id: 'ParametricCurve3D',
         title: '3D Trajectory Orbit View',
         caption: 'See dynamically how strategically adjusting the base coordinate parametric functions instantly resculpts global trajectory geometry and internal scalar speed profiles.',
+      },
+      {
+        id: 'VectorKinematicsLab',
+        title: 'Kinematics Decomposition Lab',
+        caption: 'Inspect how tangent velocity and acceleration evolve along trajectories before formalizing curvature and normal components.',
       },
       {
         id: 'GradientDescentLoss',

@@ -223,7 +223,7 @@ export default {
     { lessonSlug: 'volumes-disk-washer', label: 'Disk and Washer Methods', context: 'The y-moment formula Mₓ = (1/2)∫[f²−g²]dx mirrors the washer integrand. Pappus\'s theorem directly connects the centroid to the volume of revolution.' },
     { lessonSlug: 'volumes-shell', label: 'Shell Method', context: 'The x-moment Mᵧ = ∫x[f(x)−g(x)]dx is identical to the shell method integrand (divided by 2π). The shell method volume is just 2π·Mᵧ = 2π·x̄·A — Pappus\'s theorem in disguise.' },
     { lessonSlug: 'work-and-force', label: 'Work and Force', context: 'For uniform chains and cables, total lifting work equals (weight) × (distance center of mass travels). The center of mass integral underpins this shortcut.' },
-    { lessonSlug: 'area-between-curves', label: 'Area Between Curves', context: 'The mass m of a lamina equals the area between the bounding curves. Setting up the centroid calculation begins with the same bounds and functions used for area.' },
+    { lessonSlug: 'applications', label: 'Applications of Integration', context: 'The mass m of a lamina equals the area between the bounding curves. Setting up the centroid calculation begins with the same bounds and functions used for area.' },
   ],
 
   checkpoints: [

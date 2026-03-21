@@ -7,6 +7,7 @@ export default {
   title: 'Parametric Equations',
   subtitle: 'When a single variable cannot capture the path — let time drive both x and y independently',
   tags: ['parametric', 'parameter', 'curve', 'cycloid', 'Lissajous', 'parametric derivative', 'eliminate parameter'],
+  aliases: 'trajectory equations x(t) y(t) tangent vector velocity from parametric equations dy dx from dt',
 
   hook: {
     question: 'A point traces a circle at constant speed. You know it starts at (1, 0) and sweeps counterclockwise. Can you describe its position at every instant with a single equation y = f(x)? Why does that fail, and what replaces it?',
@@ -53,6 +54,7 @@ export default {
     ],
     visualizations: [
       { id: 'ParametricCurve3D', title: 'Parametric Curve Explorer', caption: 'Adjust the parametric equations and watch the curve trace out in real time. Observe how changing the parameter range and speed affects the path.' },
+      { id: 'VectorKinematicsLab', title: 'Motion Vectors on Parametric Paths', caption: 'Track r(t), v(t), and a(t) on the same curve to connect geometric tracing with derivative vectors and speed.' },
     ],
   },
 

@@ -6,6 +6,7 @@ export default {
   title: 'Polar Area and Arc Length',
   subtitle: 'Integrate sectors and curved motion directly in theta-space',
   tags: ['polar', 'area', 'arc length', 'sector method', 'cardioid', 'rose curve', 'integration applications'],
+  aliases: 'polar area formula one half integral r squared polar arc length formula region between polar curves',
 
   hook: {
     question: 'How do you reliably calculate enclosed areas when a curve is defined as r = f(θ) instead of y = f(x)?',

@@ -63,6 +63,11 @@ export default {
         title: 'Arc Length Approximation with Line Segments',
         caption: 'Increase n to see how the sum of chord lengths converges to the true arc length. Each chord is the hypotenuse √(Δx²+Δy²) of a tiny right triangle under the curve.',
       },
+      {
+        id: 'VectorKinematicsLab',
+        title: 'Speed as Arc-Length Integrand',
+        caption: 'See that arc length accumulates from speed: for parametric motion, ds = |r\'(t)| dt gives the same geometric idea as chord-sum limits.'
+      },
     ],
   },
 
@@ -215,7 +220,7 @@ export default {
   crossRefs: [
     { lessonSlug: 'u-substitution', label: 'U-Substitution', context: 'Most arc length integrals require substitution after computing 1+(f\'(x))². Recognizing the right substitution is the main skill in evaluating arc length integrals.' },
     { lessonSlug: 'volumes-disk-washer', label: 'Disk Method', context: 'Surface area of revolution uses the same setup philosophy as the disk method — integrate an area element over the curve, with the arc length factor ds replacing dx.' },
-    { lessonSlug: 'parametric-curves', label: 'Parametric Curves', context: 'Parametric arc length L = ∫√((x\'(t))²+(y\'(t))²)dt is the most general form and applies to all smooth curves, including those that cross themselves.' },
+    { lessonSlug: 'parametric-equations', label: 'Parametric Curves', context: 'Parametric arc length L = ∫√((x\'(t))²+(y\'(t))²)dt is the most general form and applies to all smooth curves, including those that cross themselves.' },
     { lessonSlug: 'trig-derivatives', label: 'Trig and Hyperbolic Derivatives', context: 'Many arc length and surface area integrals simplify using trigonometric or hyperbolic identities — the catenary catharsis being the classic example.' },
   ],
 

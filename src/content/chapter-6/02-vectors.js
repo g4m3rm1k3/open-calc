@@ -7,6 +7,7 @@ export default {
   title: 'Vectors in 2D and 3D',
   subtitle: 'Quantities with magnitude and direction — the language of physics and multivariable calculus',
   tags: ['vector', 'dot product', 'cross product', 'magnitude', 'unit vector', 'component', 'projection', 'angle', 'physics', '3D'],
+  aliases: 'resultant force vector components unit vector projection work force dot product cross product right hand rule',
 
   hook: {
     question: 'An airplane flies at 400 km/h heading northeast, while a wind blows at 80 km/h due east. What is the plane\'s actual velocity? You need vectors — quantities with both magnitude and direction — and their addition.',
@@ -61,6 +62,11 @@ export default {
         id: 'FunctionPlotter',
         title: 'Vector Addition and Dot Product',
         caption: 'Visualize two vectors, their sum, and compute the dot product to see the angle between them.',
+      },
+      {
+        id: 'VectorKinematicsLab',
+        title: 'Position Velocity Acceleration Vector Lab',
+        caption: 'Use this to connect vector operations with motion: position vector, tangent velocity vector, and turning acceleration vector.'
       },
     ],
   },

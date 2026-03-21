@@ -94,6 +94,11 @@ export default {
   rigor: {
     prose: [
       'The Cauchy criterion for series: $\\sum a_n$ converges if and only if for every $\\varepsilon > 0$ there exists $N$ such that $|a_{m+1} + a_{m+2} + \\cdots + a_n| < \\varepsilon$ for all $n > m > N$. This is the Cauchy criterion for the sequence of partial sums. It is useful because it does not require knowing the limit $S$.',
+      {
+        id: 'SeriesConvergenceLab',
+        title: 'Series Convergence Lab',
+        caption: 'Switch between geometric, harmonic, p-series, and alternating harmonic models. Track partial sums, exact targets (when known), and live truncation/error behavior.',
+      },
       'Rearrangement theorem (Riemann): if $\\sum a_n$ is conditionally convergent (converges but $\\sum |a_n|$ diverges), then for any real number $L$ (or $\\pm\\infty$), there exists a rearrangement of the series that converges to $L$. This shocking result means that the sum of a conditionally convergent series depends on the order of summation. Only absolutely convergent series can be freely rearranged.',
       'Convergence of $\\sum a_n$ implies $a_n \\to 0$ (nth Term Test). Proof: $a_n = S_n - S_{n-1}$. If $S_n \\to S$, then $a_n = S_n - S_{n-1} \\to S - S = 0$. The converse fails because $a_n \\to 0$ does not control the rate of decay. The harmonic series shows that $O(1/n)$ decay is not fast enough; $O(1/n^p)$ for $p > 1$ is sufficient (p-series test, next lesson).',
     ],

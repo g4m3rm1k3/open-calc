@@ -60,6 +60,11 @@ export default {
         title: 'Integral Test: Comparing Series to Integrals',
         caption: 'The rectangles (heights $a_n = f(n)$) are compared to the area under $f(x)$. Left sum overestimates the integral; right sum underestimates. The series and integral converge or diverge together.',
       },
+      {
+        id: 'SeriesConvergenceLab',
+        title: 'Convergence Test Sandbox',
+        caption: 'Use this as a pre-test classifier: observe partial-sum behavior, then justify it formally with ratio, comparison, integral, or alternating tests.',
+      },
     ],
   },
 

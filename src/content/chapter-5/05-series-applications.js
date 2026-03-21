@@ -55,6 +55,11 @@ export default {
         caption: 'See the approximation improve as the degree increases, and compare the actual error against the theoretical predicted error bound.',
       },
       {
+        id: 'SeriesConvergenceLab',
+        title: 'Approximation Control Workbench',
+        caption: 'Practice the real workflow: choose N, inspect partial sums, and tie numerical behavior to rigorous truncation guarantees.',
+      },
+      {
         id: 'FourierSeries',
         title: 'Fourier Series and Data Compression',
         caption: 'Computer Scientists compress signals (like JPEG/MP3 data) by storing only the lowest-frequency terms. See how truncating the series creates an error ripple (Gibbs phenomenon).',

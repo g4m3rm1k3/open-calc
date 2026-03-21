@@ -54,6 +54,11 @@ export default {
         title: 'Partial Sums of a Power Series Approaching the Function',
         caption: 'Watch the polynomial partial sums $S_N(x) = \\sum_{n=0}^{N}a_n x^n$ approach $f(x) = 1/(1-x)$ as $N$ increases. Inside the radius of convergence ($|x|<1$), the fit improves everywhere. Outside ($|x|>1$), the partial sums diverge wildly.',
       },
+      {
+        id: 'SeriesConvergenceLab',
+        title: 'Endpoint Behavior and Partial Sums',
+        caption: 'Use p-series and alternating modes to build endpoint-testing intuition: same radius-style setup can converge at one endpoint and diverge at the other.',
+      },
     ],
   },
 

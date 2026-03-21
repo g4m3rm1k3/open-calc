@@ -220,7 +220,7 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'volumes-disk-washer', label: 'Disk and Washer Methods', context: 'The disk method is the alternative approach to volumes of revolution — slicing perpendicular to the axis. The two methods always give the same answer; choice depends on which integral is simpler.' },
-    { lessonSlug: 'area-between-curves', label: 'Area Between Curves', context: 'When rotating the region between two curves, the shell height is the area-between-curves integrand f(x)−g(x). The same setup skills apply.' },
+    { lessonSlug: 'applications', label: 'Applications of Integration', context: 'When rotating the region between two curves, the shell height is the area-between-curves integrand f(x)−g(x). The same setup skills apply.' },
     { lessonSlug: 'u-substitution', label: 'U-Substitution', context: 'Some shell integrals require substitution after the 2πr·h setup — especially when the height involves composites or trigonometric expressions.' },
     { lessonSlug: 'centers-of-mass', label: 'Centers of Mass', context: 'The moment integral M_y = ∫x·f(x)dx used in computing centroids is identical in structure to the shell formula V = 2π∫x·f(x)dx — the same integrand gives both volume and moment.' },
   ],

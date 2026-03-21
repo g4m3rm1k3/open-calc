@@ -7,6 +7,7 @@ export default {
   title: 'Partial Fraction Decomposition',
   subtitle: 'Breaking rational functions into simple pieces for integration',
   tags: ['partial fractions', 'rational functions', 'Heaviside', 'cover-up', 'decomposition', 'linear factors', 'integration technique'],
+  aliases: ['rational integral decomposition', 'when to use partial fractions', 'heaviside cover up method'],
 
   hook: {
     question: 'How do you integrate 1/((x−1)(x+2))? Neither u-sub nor by-parts helps. But if you write 1/((x−1)(x+2)) = A/(x−1) + B/(x+2) for suitable constants A and B, each piece integrates to a logarithm. Partial fraction decomposition breaks any rational function into a sum of simple fractions, each of which has a known antiderivative. It is the algebraic key to integrating all rational functions.',
@@ -52,6 +53,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Switch on the rational/factorable trait and verify when partial fractions should be your first move.',
+      },
       {
         id: 'FunctionPlotter',
         title: 'Decomposing a Rational Function',

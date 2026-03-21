@@ -7,6 +7,7 @@ export default {
   title: 'Polar Coordinates',
   subtitle: 'A new coordinate system where distance and angle replace x and y — unlocking curves that Cartesian coordinates make awkward',
   tags: ['polar', 'coordinates', 'cardioid', 'rose curve', 'limaçon', 'spiral', 'lemniscate', 'r theta', 'conversion'],
+  aliases: 'r theta graphing polar graph cardioid rose limacon spiral convert to cartesian convert from cartesian',
 
   hook: {
     question: 'How would you describe the shape of a seashell, a spiral galaxy, or the petals of a flower using y = f(x)? Why does a different coordinate system make these shapes almost trivially simple?',

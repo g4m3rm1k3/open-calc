@@ -7,6 +7,7 @@ export default {
   title: 'U-Substitution',
   subtitle: 'The chain rule in reverse — the most important integration technique',
   tags: ['u-substitution', 'substitution', 'chain rule', 'antiderivative', 'change of variable', 'definite integral', 'technique'],
+  aliases: ['integration method choice', 'when to use u substitution', 'reverse chain rule integral'],
 
   hook: {
     question: 'How do you integrate ∫ 2x·cos(x²) dx? Direct formulas fail — but if you let u = x², something magical happens.',
@@ -65,6 +66,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'IntegrationMethodLab',
+        title: 'Method Selection Trainer',
+        caption: 'Use the checklist to decide whether this integrand family is a substitution, by-parts, trig-sub, trig-identity, or partial-fractions problem.',
+      },
       {
         id: 'AreaAccumulator',
         title: 'Area Under a Composite Function',

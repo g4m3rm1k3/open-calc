@@ -223,7 +223,7 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'volumes-shell', label: 'Cylindrical Shell Method', context: 'The shell method is an alternative that avoids inverting y=f(x) when rotating around the y-axis — often simpler for the same problem.' },
-    { lessonSlug: 'area-between-curves', label: 'Area Between Curves', context: 'The washer method extends area-between-curves logic into 3D: the region between two curves becomes the cross-section of a solid.' },
+    { lessonSlug: 'applications', label: 'Applications of Integration', context: 'The washer method extends area-between-curves logic into 3D: the region between two curves becomes the cross-section of a solid.' },
     { lessonSlug: 'definite-integral', label: 'The Definite Integral', context: 'All volume integrals are definite integrals of cross-sectional area — review Riemann sums to understand why the disk method works.' },
     { lessonSlug: 'centers-of-mass', label: 'Centers of Mass and Pappus\'s Theorem', context: 'Pappus\'s theorem gives volume of revolution directly from the centroid — a shortcut that connects geometry and integration.' },
   ],

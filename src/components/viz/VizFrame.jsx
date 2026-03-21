@@ -56,6 +56,7 @@ const VIZ_REGISTRY = {
   WaterTank:                    lazy(() => import('./d3/WaterTank.jsx')),
   SignedArea:                   lazy(() => import('./d3/SignedArea.jsx')),
   AreaBetweenCurves:            lazy(() => import('./d3/AreaBetweenCurves.jsx')),
+  IntegrationMethodLab:         lazy(() => import('./d3/IntegrationMethodLab.jsx')),
   // Chapter 3 — Applications of Derivatives
   NewtonsMethod:                lazy(() => import('./d3/NewtonsMethod.jsx')),
   SpringOscillation:            lazy(() => import('./d3/SpringOscillation.jsx')),
@@ -75,12 +76,14 @@ const VIZ_REGISTRY = {
   // Chapter 5 — Sequences & Series
   TaylorApproximation:           lazy(() => import('./d3/TaylorApproximation.jsx')),
   ConvergenceViz:                lazy(() => import('./d3/ConvergenceViz.jsx')),
+  SeriesConvergenceLab:          lazy(() => import('./d3/SeriesConvergenceLab.jsx')),
   // Chapter 2 — Additions
   DualGraphSync:                 lazy(() => import('./react/DualGraphSync.jsx')),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution:           lazy(() => import('./d3/VolumesOfRevolution.jsx')),
   // Chapter 6 — Polar & Parametric
   PolarCurve:                    lazy(() => import('./d3/PolarCurve.jsx')),
+  VectorKinematicsLab:           lazy(() => import('./d3/VectorKinematicsLab.jsx')),
   FourierSeries:                 lazy(() => import('./d3/FourierSeries.jsx')),
   GradientDescentLoss:           lazy(() => import('./d3/GradientDescentLoss.jsx')),
   PoiseuilleBloodFlow:           lazy(() => import('./d3/PoiseuilleBloodFlow.jsx')),
