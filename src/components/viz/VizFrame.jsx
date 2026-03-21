@@ -110,6 +110,7 @@ const VIZ_REGISTRY = {
   GraphNetwork3D:                lazy(() => import('./three/GraphNetwork3D.jsx')),
   TruthCube3D:                   lazy(() => import('./react/TruthCube3D.jsx')),
   LogicGateSim:                  lazy(() => import('./react/LogicGateSim.jsx')),
+  VennDiagram:                   lazy(() => import('./react/VennDiagram.jsx')),
 }
 
 function VizSkeleton() {

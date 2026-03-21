@@ -75,6 +75,23 @@ export default function TruthTableLab() {
     setStatements(statements.filter(s => s.id !== id));
   };
 
+  const getStatementStrength = (text) => {
+    if (!text || !text.trim()) return null;
+    let tCount = 0, fCount = 0, valid = 0;
+    for (const row of rows) {
+      const val = evaluateExpression(text, row);
+      if (val === 'T') { tCount++; valid++; }
+      else if (val === 'F') { fCount++; valid++; }
+      else if (val === 'Err') return { label: 'Syntax Error', pct: 0, color: 'bg-slate-500' };
+    }
+    if (valid === 0) return null;
+    
+    const pct = Math.round((tCount / valid) * 100);
+    if (pct === 100) return { label: 'Tautology', pct, color: 'bg-yellow-500' };
+    if (pct === 0) return { label: 'Contradiction', pct, color: 'bg-red-500' };
+    return { label: 'Contingency', pct, color: 'bg-blue-500' };
+  };
+
   return (
     <div className="flex flex-col w-full p-4 sm:p-6 text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
       
@@ -112,25 +129,42 @@ export default function TruthTableLab() {
       </div>
 
       {/* Expressions Map */}
-      <div className="grid gap-2 mb-6">
-        {statements.map((s, idx) => (
-          <div key={s.id} className="flex items-center gap-2">
-            <span className="w-8 text-center text-xs font-bold text-slate-400 dark:text-slate-500">S{idx + 1}</span>
-            <input 
-              type="text" 
-              value={s.text}
-              onChange={(e) => updateStatement(s.id, e.target.value)}
-              placeholder="(P or Q) -> R"
-              className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-3 py-1.5 text-sm font-mono focus:outline-none focus:border-brand-500"
-            />
-            <button 
-              onClick={() => removeStatement(s.id)}
-              className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-        ))}
+      <div className="grid gap-4 mb-6">
+        {statements.map((s, idx) => {
+          const strength = getStatementStrength(s.text);
+          return (
+            <div key={s.id} className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="w-8 text-center text-xs font-bold text-slate-400 dark:text-slate-500">S{idx + 1}</span>
+                <input 
+                  type="text" 
+                  value={s.text}
+                  onChange={(e) => updateStatement(s.id, e.target.value)}
+                  placeholder="(P or Q) -> R"
+                  className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-3 py-1.5 text-sm font-mono focus:outline-none focus:border-brand-500"
+                />
+                
+                <button 
+                  onClick={() => removeStatement(s.id)}
+                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              
+              {/* Logic Strength Meter */}
+              {strength && (
+                <div className="flex items-center gap-3 pl-10 pr-8">
+                  <span className="text-xs font-bold w-24 truncate text-right text-slate-500">{strength.label}</span>
+                  <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                     <div className={`h-full transition-all duration-500 ${strength.color}`} style={{ width: `${strength.pct}%` }}></div>
+                  </div>
+                  <span className="text-xs font-mono font-bold w-10 text-slate-500">{strength.pct}%</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* The Actual Truth Table */}
