@@ -5,21 +5,21 @@ export default {
   chapter: 2,
   order: 4,
   title: 'Derivatives of Exponential and Logarithmic Functions',
-  subtitle: 'The function that equals its own derivative GÇö and the logarithm that unlocks it',
+  subtitle: 'The function that equals its own derivative Gï¿½ï¿½ and the logarithm that unlocks it',
   tags: ['exponential derivative', 'logarithm derivative', 'natural log', 'e^x', 'ln x', 'logarithmic differentiation', 'a^x'],
   aliases: 'section 3.9 derivative exponential function derivative logarithmic function formal proof e^x ln x logarithmic differentiation',
 
   hook: {
     question: 'Bacteria in a culture double every hour. A radioactive isotope loses half its mass every 5,730 years. A savings account grows at 5% per year compounded continuously. Why do all three follow the same mathematical pattern, and what does calculus tell us is special about them?',
-    realWorldContext: 'Population growth, radioactive decay, cooling and heating, compound interest, the spread of disease, the absorption of drugs in the bloodstream GÇö all of these phenomena share one defining property: the rate of change is proportional to the current value. If you have more money, you earn more interest. If you have more bacteria, more bacteria are multiplying. If you have more radioactive atoms, more are decaying. This proportionality law leads directly to exponential functions, and the magical number e = 2.71828... is the one base for which the function literally equals its own derivative. This lesson explores why that is true and how to differentiate every exponential and logarithmic function.',
+    realWorldContext: 'Population growth, radioactive decay, cooling and heating, compound interest, the spread of disease, the absorption of drugs in the bloodstream Gï¿½ï¿½ all of these phenomena share one defining property: the rate of change is proportional to the current value. If you have more money, you earn more interest. If you have more bacteria, more bacteria are multiplying. If you have more radioactive atoms, more are decaying. This proportionality law leads directly to exponential functions, and the magical number e = 2.71828... is the one base for which the function literally equals its own derivative. This lesson explores why that is true and how to differentiate every exponential and logarithmic function.',
     previewVisualizationId: 'ExponentialSlopeAtZero',
   },
 
   intuition: {
     prose: [
       'Let\'s understand e by starting from scratch. Consider the function b^x for different bases b. At x = 0, every such function equals 1 (since b\u2070 = 1). But what is the SLOPE of b^x at x = 0? For b = 2, the slope at 0 is approximately 0.693. For b = 3, the slope at 0 is approximately 1.099. As b increases from 2 to 3, the slope at x = 0 increases from 0.693 to 1.099. Somewhere between 2 and 3, the slope at x = 0 must equal exactly 1. That special base is called e. Numerically, e \u2248 2.71828...',
-      'This definition GÇö e is the base for which the slope of b^x at x = 0 is exactly 1 GÇö has a stunning consequence. It means that for the function e^x, the derivative at x = 0 is exactly 1. But now we can use the law of exponents to compute the derivative at any other point x. We will see that d/dx[e^x] = e^x: the function e^x equals its own derivative everywhere, not just at x = 0.',
-      'Why is this remarkable? It means that at every point, the slope of e^x equals its own height. The taller the curve is, the steeper it rises. The curve catches up to its own slope, then the increased slope makes it grow even faster, creating an accelerating feedback loop. This is why exponential growth "explodes" GÇö it grows proportional to itself.',
+      'This definition Gï¿½ï¿½ e is the base for which the slope of b^x at x = 0 is exactly 1 Gï¿½ï¿½ has a stunning consequence. It means that for the function e^x, the derivative at x = 0 is exactly 1. But now we can use the law of exponents to compute the derivative at any other point x. We will see that d/dx[e^x] = e^x: the function e^x equals its own derivative everywhere, not just at x = 0.',
+      'Why is this remarkable? It means that at every point, the slope of e^x equals its own height. The taller the curve is, the steeper it rises. The curve catches up to its own slope, then the increased slope makes it grow even faster, creating an accelerating feedback loop. This is why exponential growth "explodes" Gï¿½ï¿½ it grows proportional to itself.',
       'Now for the natural logarithm. The natural log ln(x) is defined as the inverse of e^x: if e^y = x, then y = ln(x). Since e^x has derivative e^x, and ln(x) is its inverse function, we can find the derivative of ln(x) using implicit differentiation. Starting from e^y = x, differentiate both sides with respect to x: the right side gives 1, and the left side gives e^y \u00b7 dy/dx (by the chain rule, since y is a function of x). So e^y \u00b7 dy/dx = 1, giving dy/dx = 1/e^y = 1/x (since e^y = x). The derivative of ln(x) is 1/x.',
       'For other bases: if we want to differentiate a^x for any positive base a \u2260 1, we use the conversion a^x = e^(x ln a). This rewrites any exponential in base e, allowing us to use the chain rule: d/dx[e^(x ln a)] = e^(x ln a) \u00b7 ln(a) = a^x \u00b7 ln(a). The natural log of the base appears as a multiplicative factor.',
       'Logarithmic differentiation is a powerful technique that uses logarithms to convert hard differentiation problems into easier ones. The key idea: if y = f(x), take ln of both sides to get ln(y) = ln(f(x)), then differentiate implicitly. This works because the chain rule on the left gives (1/y)\u00b7(dy/dx), and we can solve for dy/dx = y\u00b7(d/dx)[ln(f(x))]. This technique is especially useful for (1) functions where the variable appears in both the base and exponent, like y = x^x, and (2) products of many functions, where logarithms convert multiplication into addition.',
@@ -164,7 +164,7 @@ export default {
           annotation: 'Chain rule: (1/u) evaluated at u=x\u00b2+1 gives 1/(x\u00b2+1), times the inner derivative 2x. This is the "u-prime over u" pattern.',
         },
       ],
-      conclusion: 'f\'(x) = 2x/(x\u00b2+1). The chain rule result for ln(g(x)) is always g\'(x)/g(x) GÇö this is sometimes called the "logarithmic derivative."',
+      conclusion: 'f\'(x) = 2x/(x\u00b2+1). The chain rule result for ln(g(x)) is always g\'(x)/g(x) Gï¿½ï¿½ this is sometimes called the "logarithmic derivative."',
     },
     {
       id: 'ch2-004-ex4',
@@ -220,7 +220,7 @@ export default {
       problem: "f(x) = 5^{2x}. \\text{ Find } f'(x).",
       steps: [
         {
-          expression: "f(x) = 5^{2x} = (5^2)^x? \\quad \\text{No GÇö use chain rule.}",
+          expression: "f(x) = 5^{2x} = (5^2)^x? \\quad \\text{No Gï¿½ï¿½ use chain rule.}",
           annotation: 'Do not confuse 5^(2x) with (5\u00b2)^x = 25^x. While equal in value, the chain rule approach is cleaner: treat 5^u with u = 2x.',
         },
         {
@@ -383,7 +383,7 @@ export default {
       walkthrough: [
         {
           expression: "y = \\frac{(x+1)^2(x^2+1)^3}{(x-1)^4}",
-          annotation: 'Set y equal to the expression. This has products and powers GÇö perfect for logarithmic differentiation.',
+          annotation: 'Set y equal to the expression. This has products and powers Gï¿½ï¿½ perfect for logarithmic differentiation.',
         },
         {
           expression: "\\ln y = 2\\ln(x+1) + 3\\ln(x^2+1) - 4\\ln(x-1)",
