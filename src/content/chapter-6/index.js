@@ -9,5 +9,4 @@ export default {
   description: 'Beyond Cartesian: parametric curves and polar coordinates. This chapter will continue expanding toward vectors and multivariable prep.',
   color: 'rose',
   lessons: [parametricEquations, polarCoordinates],
-  comingSoon: true,
 }

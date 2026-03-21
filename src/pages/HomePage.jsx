@@ -9,6 +9,7 @@ const CHAPTER_GRADIENTS = {
   3: 'from-purple-500 to-purple-700',
   4: 'from-orange-500 to-orange-700',
   5: 'from-rose-500 to-rose-700',
+  6: 'from-cyan-500 to-cyan-700',
 }
 
 export default function HomePage() {

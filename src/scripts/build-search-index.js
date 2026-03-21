@@ -10,6 +10,30 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '../..')
 
+const CONCEPT_ALIASES = {
+  limits: ['approach', 'approaching value', 'as x approaches', 'end behavior'],
+  continuity: ['continuous', 'discontinuous', 'jump discontinuity', 'removable discontinuity'],
+  derivative: ['instantaneous rate of change', 'slope', 'dy/dx', 'velocity', 'marginal change'],
+  integral: ['antiderivative', 'accumulation', 'area under curve', 'net area', 'total change'],
+  optimization: ['maximize', 'minimize', 'maxima', 'minima', 'best value'],
+  related: ['related rates', 'word problem', 'changing over time'],
+  epsilon: ['epsilon-delta', 'formal limit proof', 'proof of limit'],
+  trigonometric: ['trig', 'sine', 'cosine', 'tangent', 'unit circle'],
+  exponential: ['growth', 'decay', 'e^x', 'logarithm', 'ln'],
+  parametric: ['parametric equations', 'x(t)', 'y(t)', 'parameterized curve'],
+  polar: ['r(theta)', 'polar coordinates', 'rose curve', 'cardioid'],
+}
+
+const ASSIGNMENT_TERMS = [
+  'assignment',
+  'homework',
+  'quiz',
+  'exam',
+  'practice problems',
+  'worked example',
+  'step by step',
+]
+
 function toText(value) {
   if (value === null || value === undefined) return ''
   if (typeof value === 'string') return value
@@ -35,28 +59,61 @@ function flattenStepLikeItems(items = []) {
   })
 }
 
+function inferAliasTerms(lesson, chapter) {
+  const haystack = [
+    toText(chapter.title),
+    toText(lesson.title),
+    toText(lesson.subtitle),
+    ...(lesson.tags ?? []),
+    ...(lesson.searchKeywords ?? []),
+  ]
+    .join(' ')
+    .toLowerCase()
+
+  return Object.entries(CONCEPT_ALIASES)
+    .filter(([key]) => haystack.includes(key))
+    .flatMap(([, aliases]) => aliases)
+}
+
 // Dynamically import content
 async function buildIndex() {
   const { CURRICULUM } = await import('../content/index.js')
 
   const documents = CURRICULUM.flatMap((chapter) =>
     chapter.lessons.map((lesson) => {
+      const proofsText = [
+        ...(lesson.rigor?.prose ?? []),
+        ...(lesson.rigor?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
+      ]
+
+      const applicationsText = [
+        toText(lesson.hook?.realWorldContext),
+        ...(lesson.intuition?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
+      ]
+
+      const assignmentText = [
+        ...flattenStepLikeItems(lesson.examples),
+        ...flattenStepLikeItems(lesson.challenges),
+      ]
+
+      const aliasTerms = inferAliasTerms(lesson, chapter)
+
       const searchableText = [
         toText(lesson.hook?.question),
         toText(lesson.hook?.realWorldContext),
         ...(lesson.intuition?.prose ?? []),
         ...(lesson.math?.prose ?? []),
-        ...(lesson.rigor?.prose ?? []),
+        ...proofsText,
         ...(lesson.intuition?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
         ...(lesson.math?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
-        ...(lesson.rigor?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
         ...(lesson.intuition?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
         ...(lesson.math?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
         ...(lesson.rigor?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
-        ...flattenStepLikeItems(lesson.examples),
-        ...flattenStepLikeItems(lesson.challenges),
+        ...assignmentText,
         ...(lesson.crossRefs ?? []).flatMap((ref) => [toText(ref.label), toText(ref.context)]),
         ...(lesson.searchKeywords ?? []),
+        ...ASSIGNMENT_TERMS,
+        ...aliasTerms,
       ]
 
       const content = searchableText
@@ -71,6 +128,10 @@ async function buildIndex() {
         title: lesson.title,
         subtitle: lesson.subtitle,
         tags: (lesson.tags ?? []).join(' '),
+        aliases: aliasTerms.join(' '),
+        assignment: assignmentText.join(' '),
+        proofs: proofsText.join(' '),
+        applications: applicationsText.join(' '),
         content,
       }
     })

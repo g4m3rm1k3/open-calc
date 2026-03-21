@@ -2,6 +2,29 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 
+function getMatchLabel(key) {
+  if (key === 'assignment') return 'Practice'
+  if (key === 'proofs') return 'Proof'
+  if (key === 'applications') return 'Application'
+  if (key === 'aliases' || key === 'tags') return 'Concept'
+  return 'Lesson'
+}
+
+function getSnippet(result) {
+  const match = result.matches?.find((m) => typeof m.key === 'string' && typeof m.value === 'string' && m.value.length > 0)
+  if (!match) return ''
+
+  const [start, end] = match.indices?.[0] ?? [0, 0]
+  const raw = match.value
+  const left = Math.max(0, start - 45)
+  const right = Math.min(raw.length, end + 65)
+  const prefix = left > 0 ? '...' : ''
+  const suffix = right < raw.length ? '...' : ''
+  const slice = raw.slice(left, right).replace(/\s+/g, ' ').trim()
+
+  return slice ? `${prefix}${slice}${suffix}` : ''
+}
+
 export default function SearchModal() {
   const { isOpen, openSearch, closeSearch, query, setQuery, results, isReady } = useSearchContext()
   const inputRef = useRef(null)
@@ -84,6 +107,14 @@ export default function SearchModal() {
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-slate-900 dark:text-slate-100 text-sm">{result.item.title}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{result.item.subtitle}</p>
+                {result.matches?.[0]?.key && (
+                  <p className="mt-1 text-[11px] uppercase tracking-wide text-brand-700 dark:text-brand-300">
+                    {getMatchLabel(result.matches[0].key)} match
+                  </p>
+                )}
+                {getSnippet(result) && (
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{getSnippet(result)}</p>
+                )}
               </div>
               <span className="text-slate-300 dark:text-slate-600 text-sm">→</span>
             </button>
