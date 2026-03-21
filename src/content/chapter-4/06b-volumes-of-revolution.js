@@ -60,6 +60,11 @@ export default {
         title: '3D Solid of Revolution — Interactive',
         caption: 'Rotate the plane region around the axis and see the 3D solid form. Toggle between disk, washer, and shell representations. Drag n to see how more slices approximate the volume better.',
       },
+      {
+        id: 'PoiseuilleBloodFlow',
+        title: 'Biology: Integrating Laminar Blood Flow',
+        caption: 'The Washer Method describes more than physical geometry—it describes total accumulation of concentric rings. In medicine, Poiseuilles Law integrates the velocity of blood layers across an artery to find total flow Q.',
+      },
     ],
   },
 

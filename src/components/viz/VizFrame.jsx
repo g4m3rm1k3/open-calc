@@ -70,6 +70,9 @@ const VIZ_REGISTRY = {
   VolumesOfRevolution:           lazy(() => import('./d3/VolumesOfRevolution.jsx')),
   // Chapter 6 — Polar & Parametric
   PolarCurve:                    lazy(() => import('./d3/PolarCurve.jsx')),
+  FourierSeries:                 lazy(() => import('./d3/FourierSeries.jsx')),
+  GradientDescentLoss:           lazy(() => import('./d3/GradientDescentLoss.jsx')),
+  PoiseuilleBloodFlow:           lazy(() => import('./d3/PoiseuilleBloodFlow.jsx')),
 }
 
 function VizSkeleton() {
