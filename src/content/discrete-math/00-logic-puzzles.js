@@ -1,0 +1,133 @@
+export default {
+  id: 'discrete-1-00',
+  slug: 'pigeonhole-principle',
+  chapter: 'discrete-1',
+  order: 0,
+  title: 'The Pigeonhole Principle',
+  subtitle: 'The undeniable power of pure counting',
+  tags: ['logic', 'discrete', 'pigeonhole', 'proofs', 'puzzles', 'compression limit'],
+
+  hook: {
+    question: "Imagine you are blindfolded in a room. In a drawer, there are 10 black socks and 10 white socks completely mixed together. How many socks must you pull out to **guarantee** you have a matching pair?",
+    realWorldContext: "This sounds like a riddler's game, but it is the absolute foundation of Discrete Mathematics. It is the mathematical proof behind why lossless data compression (like `.zip` files) cannot mathematically compress every single file indefinitely, and why there **must** exist at least two people in London right now with the exact same number of hairs on their head.",
+    previewVisualizationId: 'PigeonholeViz',
+  },
+
+  intuition: {
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          "Most people guess they need to pull out 11 socks to guarantee a pair. But think about it very carefully:",
+          "You pull out one sock. It's black. You pull out a second sock. It's white.",
+          "You are now holding one black sock and one white sock. What happens when you pull out the **third** sock?",
+          "It MUST be either black or white! Whichever color it is, it will form a matching pair with one of the two you are already holding. You only need to pull out 3 socks to guarantee a pair."
+        ]
+      },
+      {
+        type: 'callout',
+        title: 'Boxes and Pigeons',
+        body: "Instead of socks, think of \"Colors\" as \"Boxes\". There are only 2 boxes (Black and White). The socks you draw are \"Pigeons\". If you put 3 Pigeons into 2 Boxes, one box is absolutely forced to hold more than 1 pigeon.",
+        type: 'insight'
+      }
+    ],
+    visualizations: [
+      {
+        id: 'PigeonholeViz',
+        title: 'The Inevitability Engine',
+        caption: 'Try to place more items than there are holes. No matter how you distribute them, the universe forces a collision. Math prevents you from finding a loophole.',
+      }
+    ]
+  },
+
+  math: {
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          "Calculus relies on infinity, fractions, and smooth slopes. Discrete math relies on things that **cannot be divided**: integers, networks, and logic gates.",
+          "Mathematical puzzles train your brain to write rigorous proofs by forcing you to identify the abstract 'Pigeonholes' in a seemingly chaotic scenario."
+        ]
+      },
+      {
+        type: 'callout',
+        title: 'The Pigeonhole Principle (Formal)',
+        body: "If $k$ items are put into $n$ containers, and $k > n$, then at least one container must contain strictly more than one item.",
+        type: 'theorem'
+      },
+      {
+        type: 'callout',
+        title: 'The Generalized (Strong) Pigeonhole Principle',
+        body: "If $k$ items are put into $n$ containers, then at least one container must contain at least $\\lceil k / n \\rceil$ items. *(The ceiling bracket $\\lceil \\dots \\rceil$ means \"round up to the nearest whole number\").*",
+        type: 'theorem'
+      }
+    ]
+  },
+
+  rigor: {
+    blocks: [
+      {
+        type: 'stepthrough',
+        title: 'Proof by Contradiction',
+        steps: [
+          { expression: "\\text{Assume } k > n \\text{ items are placed in } n \\text{ containers.}", annotation: "Step 1: Set up the premise." },
+          { expression: "\\text{Suppose for contradiction: NO container has more than } 1 \\text{ item.}", annotation: "Step 2: We pretend the principle is false to see if math breaks. This means every container has 0 or 1 items." },
+          { expression: "\\text{Max total items} = n \\times 1 = n", annotation: "Step 3: If 1 is the absolute maximum per container, the most items we could possibly have across all containers is n." },
+          { expression: "k \\le n", annotation: "Step 4: Therefore, the total items k must be less than or equal to n." },
+          { expression: "k \\le n \\quad \\text{CONTRADICTS} \\quad k > n", annotation: "Step 5: But our very first rule was that k > n! The universe has crashed. The math is broken." },
+          { expression: "\\therefore \\text{Our supposition was false.}", annotation: "Conclusion: It is utterly impossible for all containers to have 1 or 0 items. At least one MUST have 2 or more." }
+        ]
+      }
+    ]
+  },
+
+  examples: [
+    {
+      id: 'discrete-1-00-ex1',
+      title: 'Hairs in London',
+      problem: "\\text{Prove that there must be at least two people in London with the EXACT same number of hairs on their head.}",
+      steps: [
+        { expression: "\\text{Max hairs on a human head} \\approx 300,000", annotation: "Scientific upper limit of hair follicles for a human being." },
+        { expression: "\\text{Number of 'Holes' } (n) = 300,000", annotation: "Think of every possible hair count (0, 1, 2... 300k) as a distinct box." },
+        { expression: "\\text{Population of London} = 9,000,000", annotation: "The total number of people ('Pigeons')." },
+        { expression: "\\text{Number of 'Pigeons' } (k) = 9,000,000", annotation: "We are stuffing 9 million people into 300k distinct hair-count boxes." },
+        { expression: "9,000,000 > 300,000 \\implies k > n", annotation: "Since Pigeons > Holes, at least one box is forced to have multiple people in it!" }
+      ],
+      conclusion: 'Without checking a single head in London, mathematics guarantees absolutely that at least two people have identical hair counts. In fact, by the Generalized Principle, at least 30 people share the exact same count! (9,000,000 / 300,000 = 30).'
+    },
+    {
+      id: 'discrete-1-00-ex2',
+      title: 'The Birthday Guarantee (Absolute)',
+      problem: "\\text{How many people must you invite to a party to GUARANTEE that two people share the same birthday?}",
+      steps: [
+        { expression: "\\text{Possible Birthdays } = 366 \\text{ (including Feb 29)}", annotation: "These are the 'Holes'. There are 366 distinct boxes." },
+        { expression: "\\text{We need } k > n \\implies k > 366", annotation: "To force a collision, we simply need one more pigeon than holes." },
+        { expression: "k = 367", annotation: "If you have 367 people, it is mathematically impossible for all of them to have a unique birthday." }
+      ],
+      conclusion: 'Notice the difference between Discrete Math and Probability. In probability, you only need 23 people for a 50% *chance* of a shared birthday. But in Discrete Math proofs, we deal with 100% absolutes. 367 people GUARANTEES it.'
+    },
+    {
+      id: 'discrete-1-00-ex3',
+      title: 'The Inevitable Friendship',
+      problem: "\\text{Show that at any party with 2 or more people, there are ALWAYS two people with the exact same number of friends at that party.}",
+      steps: [
+        { expression: "\\text{Let } P \\text{ be the number of people at the party.}", annotation: "Assume friendship is mutual (if I am your friend, you are mine)." },
+        { expression: "\\text{Possible friend counts for one person} = {0, 1, 2, \\dots, P-1}", annotation: "A person can be friends with nobody (0), or everybody else (P-1)." },
+        { expression: "\\text{Wait... can a person have 0 friends AND another have } P-1 \\text{ friends?}", annotation: "If someone is friends with EVERYONE (P-1), then nobody can have 0 friends! Because the popular person is friends with them." },
+        { expression: "\\text{Therefore, 0 and P-1 cannot be options at the SAME time.}", annotation: "This means the available options for friend counts is actually only (P-1) options!" },
+        { expression: "\\text{Holes } (n) = P - 1", annotation: "The number of distinct friend-counts available is strictly P-1." },
+        { expression: "\\text{Pigeons } (k) = P", annotation: "Since there are P people, and only P-1 possible counts... a collision is inevitable." }
+      ],
+      conclusion: 'By looking deeply at the boundaries (0 and P-1 cannot coexist), we reduced the number of "Holes" to be less than the number of "Pigeons". A brilliant abstract application!'
+    }
+  ],
+
+  checkpoints: [
+    'read-intuition',
+    'read-math',
+    'read-rigor',
+    'completed-example-1',
+    'completed-example-2',
+    'completed-example-3',
+  ],
+};

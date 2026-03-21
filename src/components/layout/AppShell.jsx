@@ -28,9 +28,24 @@ function TopBar({ onMenuToggle }) {
       </button>
 
       {/* Brand (mobile) */}
-      <span className="lg:hidden font-bold text-brand-600 dark:text-brand-400 text-lg">∂ OpenCalc</span>
+      <span className="lg:hidden font-bold text-brand-600 dark:text-brand-400 text-lg">∂ OpenMath</span>
 
-      <div className="flex-1" />
+      {/* Desktop Navigation */}
+      <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
+        <a href="#/" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Calculus</a>
+        <a href="#/chapter/discrete-1" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Discrete Math</a>
+        
+        <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
+           <span className="text-sm font-bold text-slate-500">DSA</span>
+           <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
+        </div>
+        <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
+           <span className="text-sm font-bold text-slate-500">Linear Algebra</span>
+           <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
+        </div>
+      </nav>
+
+      <div className="flex-1 lg:hidden" />
 
       {/* Search button */}
       <button

@@ -97,6 +97,8 @@ const VIZ_REGISTRY = {
   ArcLengthViz:                  lazy(() => import('./d3/ArcLengthViz.jsx')),
   CentroidViz:                   lazy(() => import('./d3/CentroidViz.jsx')),
   SequenceViz:                   lazy(() => import('./d3/SequenceViz.jsx')),
+  // Course: Discrete Math
+  PigeonholeViz:                 lazy(() => import('./react/PigeonholeViz.jsx')),
 }
 
 function VizSkeleton() {
