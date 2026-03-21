@@ -1,6 +1,28 @@
 import KatexBlock from '../math/KatexBlock.jsx'
+import KatexInline from '../math/KatexInline.jsx'
 import MathStep from '../math/MathStep.jsx'
 import Spoiler from '../ui/Spoiler.jsx'
+
+// Render text that might be mixed prose + $inline LaTeX$ + \\display LaTeX
+function ProblemText({ text }) {
+  if (!text) return null
+  // Pure display LaTeX: starts with \ or contains no spaces and has LaTeX commands
+  const isPureLatex = text.trim().startsWith('\\') || (!/\s/.test(text.trim()) && /[\\^_{}]/.test(text))
+  if (isPureLatex) return <KatexBlock expr={text} />
+
+  // Mixed prose: parse $...$ inline LaTeX and **bold**
+  const regex = /\$([^$]+?)\$|\*\*(.+?)\*\*/g
+  const parts = []
+  let lastIndex = 0, match
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    if (match[1] !== undefined) parts.push(<KatexInline key={match.index} expr={match[1]} />)
+    else if (match[2] !== undefined) parts.push(<strong key={match.index}>{match[2]}</strong>)
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{parts}</p>
+}
 
 const DIFFICULTY_COLORS = {
   easy: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
@@ -24,7 +46,7 @@ export default function ChallengeBlock({ challenge, number }) {
 
       {/* Problem */}
       <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 mb-4">
-        <KatexBlock expr={challenge.problem} />
+        <ProblemText text={challenge.problem} />
       </div>
 
       {/* Hint */}

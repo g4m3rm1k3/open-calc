@@ -31,6 +31,13 @@ const VIZ_REGISTRY = {
   SlopeField:                   lazy(() => import('./d3/SlopeField.jsx')),
   TangentPlane3D:               lazy(() => import('./three/TangentPlane3D.jsx')),
   ParametricCurve3D:            lazy(() => import('./three/ParametricCurve3D.jsx')),
+  // Chapter 3 — Applications of Derivatives
+  RelatedRatesLadder:           lazy(() => import('./d3/RelatedRatesLadder.jsx')),
+  LinearApproximation:          lazy(() => import('./d3/LinearApproximation.jsx')),
+  MVTViz:                       lazy(() => import('./d3/MVTViz.jsx')),
+  CurveSketchingBoard:          lazy(() => import('./d3/CurveSketchingBoard.jsx')),
+  OptimizationViz:              lazy(() => import('./d3/OptimizationViz.jsx')),
+  LHopitalViz:                  lazy(() => import('./d3/LHopitalViz.jsx')),
 }
 
 function VizSkeleton() {
