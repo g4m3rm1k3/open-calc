@@ -8,9 +8,9 @@ import taylorMaclaurin from './04-taylor-maclaurin.js'
 export default {
   id: 'chapter-5',
   number: 5,
-  title: 'Calc 2 Bridge',
+  title: 'Calc 2 Bridge: Sequences, Series & Beyond',
   slug: 'calc-2-bridge',
-  description: 'A full bridge from Calc 1 to rigorous Calc 2: master review, sequences, series, convergence tests, power series, and Taylor/Maclaurin methods.',
+  description: 'Your complete bridge from Calc 1 to rigorous Calc 2. Starts with an algebra and geometry master review, then builds systematically: sequences, series, convergence tests, power series, and Taylor/Maclaurin — everything you need to ace the hardest Calc 2 course.',
   color: 'stone',
   lessons: [
     algebraGeometryMasterReview,

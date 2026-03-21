@@ -1,12 +1,13 @@
 import parametricEquations from './00-parametric-equations.js'
 import polarCoordinates from './01-polar-coordinates.js'
+import vectors from './02-vectors.js'
 
 export default {
   id: 'chapter-6',
   number: 6,
   title: 'Parametric, Polar & Vectors',
   slug: 'parametric-polar-vectors',
-  description: 'Beyond Cartesian: parametric curves and polar coordinates. This chapter will continue expanding toward vectors and multivariable prep.',
+  description: 'Beyond Cartesian coordinates: parametric curves, polar coordinates, and vectors in 2D and 3D. These tools are the bridge to multivariable calculus, physics, and engineering applications — essential for any Calc 2 course and for understanding the geometry of space.',
   color: 'rose',
-  lessons: [parametricEquations, polarCoordinates],
+  lessons: [parametricEquations, polarCoordinates, vectors],
 }
