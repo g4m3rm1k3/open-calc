@@ -121,6 +121,9 @@ const VIZ_REGISTRY = {
   PowerSetTreeLab:               lazy(() => import('./react/PowerSetTreeLab.jsx')),
   CartesianGridLab:              lazy(() => import('./react/CartesianGridLab.jsx')),
   FunctionCompositionLab:        lazy(() => import('./react/FunctionCompositionLab.jsx')),
+  SetBuilderDecoderLab:          lazy(() => import('./react/SetBuilderDecoderLab.jsx')),
+  HorizontalLineTestLab:         lazy(() => import('./react/HorizontalLineTestLab.jsx')),
+  SetProofVisualizer:            lazy(() => import('./react/SetProofVisualizer.jsx')),
 }
 
 function VizSkeleton() {

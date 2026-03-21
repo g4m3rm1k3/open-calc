@@ -38,6 +38,11 @@ export default {
     callouts: [
       {
         type: 'definition',
+        title: 'The Domain Cheat Sheet',
+        body: '**The Domain Cheat Sheet:**\nBecause logic frequently evaluates number systems, you should memorize these Universe symbols before we continue:\n| Symbol | Name | What it means |\n|---|---|---|\n| ∈ | "In" | Means "is an element of" (e.g., x ∈ ℤ means x lives in the Integers). |\n| ℕ | Naturals | The counting numbers: 0, 1, 2, 3... |\n| ℤ | Integers | All whole numbers, including negatives: ...-2, -1, 0, 1, 2... |\n| ℚ | Rationals | Any number that can perfectly be expressed as a fraction. |\n| ℝ | Reals | Absolutely every number on the continuous number line, including decimals. |'
+      },
+      {
+        type: 'definition',
         title: 'Proper Subset (⊂) vs Subset (⊆)',
         body: 'The difference perfectly mirrors "strictly less than" (<) versus "less than or equal to" (≤).\n\n| Symbol | Name | Meaning |\n|---|---|---|\n| ⊆ | Subset | A is contained in B, but they might theoretically be the exact same set. (A ≤ B) |\n| ⊂ | Proper Subset | A is completely swallowed by B, but B is strictly larger. (A < B) |\n\nYou are a proper subset of your family, but mathematically, you are a regular subset of yourself!'
       },
@@ -52,6 +57,11 @@ export default {
         id: 'SetExplorer',
         title: 'Set Algebra Interactive Filter',
         caption: 'Click through the strict mathematical filters to see exactly what combinations of data survive the operation.'
+      },
+      {
+        id: 'SetBuilderDecoderLab',
+        title: 'Set-Builder Notation Syntax Decoder',
+        caption: 'Hover over the symbols to instantly translate the dense mathematical grammar into plain English filter logic.'
       }
     ]
   },
@@ -86,7 +96,12 @@ export default {
       {
         id: 'CartesianGridLab',
         title: 'The Cartesian Space',
-        caption: 'Watch how pairing completely independent variables builds an entire geometry.'
+        caption: 'Watch how pairing completely independent variables builds an entire combinatorial geometry.'
+      },
+      {
+        id: 'SetProofVisualizer',
+        title: 'The Distributive Law Geometric Proof',
+        caption: 'Toggle the algebraic equations algebraically. Notice how both logic flows physically mask the exact identical overlapping pixels.'
       }
     ]
   },
@@ -96,9 +111,9 @@ export default {
       '### 8. Classifying the Machine (Injective, Surjective, Bijective)',
       'Programmers and mathematicians categorize functions based on how aggressively they attack the Codomain (the target Y outputs).',
       '• **Domain vs Range vs Codomain:** This is the biggest point of confusion for beginners! The Codomain is the entire theoretical **Goalie Net** where the ball *could* go. The Range (or Image) is only the specific spots inside the net where the ball *actually* hit. A function is ONLY Surjective if the Range perfectly covers the entire Codomain net.',
-      '• **Injective (1-to-1):** Think: **Unique Database Hashing**. Every single input gets a completely unique ID output. If two users get the same exact output hash (a collision), the system breaks. No two arrows hit the same target.',
+      '• **Injective (1-to-1):** Think: **Unique Database Hashing**. Every single input gets a completely unique ID output. If two users get the same exact output hash (a collision), the system breaks. Visually, this fails the horizontal line test! No two generic arrows arrive at identical targets.',
       '• **Surjective (Onto):** Think: **Resource CPU Allocation**. You have 5 tasks and 4 worker cores. The function is strictly Surjective if every single worker core (the target) receives at least one task. No idle workers are allowed!',
-      '• **Bijective (Perfect Invertibility):** If a function is BOTH Injective and Surjective, it is Bijective. This creates a flawless 1:1 paired dance between Set X and Set Y. Because it is flawless, you can hit the "Reverse" button on the machine and run it backwards without any mathematical errors!',
+      '• **Bijective (Perfect Invertibility):** If a function is BOTH Injective and Surjective, it is Bijective. This creates a flawless 1:1 paired dance between Set X and Set Y. Because it is flawless, you can literally physically press the "Reverse" button on the machine and it will unwind backwards without throwing errors!',
       '### 9. Composition and Identity (The Assembly Line)',
       'Functions drastically scale in computational complexity because they can be mechanically chained perfectly together: **g ∘ f**.',
       'Think of an industrial Assembly Line. Function **f** builds the plastic toy. Function **g** paints the toy metallic blue.',
@@ -115,13 +130,23 @@ export default {
         type: 'warning',
         title: '⚠️ The Absolute Beginner Pitfalls',
         body: '• **{1, 2} ≠ (1, 2)**: A set { } is an unordered bag. A coordinate ( ) is an ordered pair. They are completely different species!\n• **0 ≠ ∅**: Zero is a mathematical number. The empty set is an actual physical container that happens to be empty.\n• **Range ⊆ Codomain**: Always remember that your function\'s Range can be smaller than the Codomain (Goalie net), but it can mathematically NEVER be larger!'
+      },
+      {
+        type: 'insight',
+        title: 'Looking Ahead: Hilbert\'s Hotel & Infinity',
+        body: 'Here is a brain-teaser to prepare you for Countability later in Discrete Math:\n**Are there technically more Integers than Even Integers?**\n\nThe answer is shockingly NO! Because we can physically map $f(n) = 2n$ to permanently create a flawless Bijective bridge linking every single Integer 1:1 to every Even Integer, mathematicians correctly conclude that the two infinite sets are actually the exact identically same immense size ($\\aleph_0$)! Infinity acts deeply strange.'
       }
     ],
     visualizations: [
       {
+        id: 'HorizontalLineTestLab',
+        title: 'Horizontal Line Test Visualizer',
+        caption: 'Slide the continuous horizontal sweeper up the axis to physically prove how the geometric coordinate grid traps non-injective function collisions.'
+      },
+      {
         id: 'FunctionMappingLab',
         title: 'The Mapping Matchmaker Mini-Game',
-        caption: 'MISSION: The Boss wants a function that is strictly Surjective, but specifically NOT Injective! Can you wire the inputs to make that happen without breaking the core Function rule?'
+        caption: 'MISSION: The Boss wants a function that is strictly Surjective, but specifically NOT Injective! Try to trigger the Reverse gear and watch why the broken inversion algorithm explodes.'
       },
       {
         id: 'FunctionCompositionLab',

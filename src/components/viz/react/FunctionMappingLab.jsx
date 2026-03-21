@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 export default function FunctionMappingLab() {
   const [sizeX, setSizeX] = useState(3);
   const [sizeY, setSizeY] = useState(3);
+  const [runReverse, setRunReverse] = useState(false);
   
   // Mapping state: mapping[x_index] = y_index OR null
-  // We'll init with 0->0, 1->1, 2->2
   const [mapping, setMapping] = useState([0, 1, 2, null, null, null]);
 
   const updateMapping = (xIdx, yIdx) => {
     const next = [...mapping];
     next[xIdx] = Number(yIdx);
     setMapping(next);
+    setRunReverse(false); // Reset explosion state on change
   };
 
   const domain = Array.from({length: sizeX}, (_, i) => i);
@@ -63,13 +64,14 @@ export default function FunctionMappingLab() {
            <h4 className="text-white font-bold text-sm mb-4 border-b border-slate-700 pb-2">Wire The Machine</h4>
            <div className="grid grid-cols-2 gap-4">
              {domain.map(x => (
-               <div key={`map-${x}`} className="flex items-center gap-2">
+               <div key={`map-${x}`} className={`flex items-center gap-2 transition-all duration-300 ${runReverse && isFunction && !isBijective ? 'opacity-20 ' : ''}`}>
                  <span className="w-10 text-center font-bold text-brand-400 bg-slate-900 rounded border border-brand-900 py-1">x{x+1}</span>
                  <span className="text-slate-500">→</span>
                  <select 
                     value={mapping[x] !== null && mapping[x] < sizeY ? mapping[x] : ""}
                     onChange={(e) => updateMapping(x, e.target.value)}
                     className="flex-1 bg-slate-900 text-purple-400 font-bold px-2 py-1 rounded border border-slate-600 focus:border-purple-500 outline-none"
+                    disabled={runReverse}
                  >
                     <option value="" disabled>Pick y...</option>
                     {codomain.map(y => (
@@ -81,6 +83,23 @@ export default function FunctionMappingLab() {
            </div>
         </div>
 
+      </div>
+
+      {/* REVERSE ENGINE PANEL */}
+      <div className="w-full bg-slate-950 rounded-xl border-t-4 border-amber-500 mb-8 p-4 text-center overflow-hidden relative">
+         <button 
+            onClick={() => setRunReverse(!runReverse)}
+            className={`px-6 py-2 rounded-full font-bold uppercase tracking-widest text-sm transition-all duration-300 shadow-md transform hover:scale-105 active:scale-95 ${runReverse ? 'bg-slate-700 text-white' : 'bg-amber-500 text-amber-950 hover:bg-amber-400'}`}
+         >
+            {runReverse ? 'Reset Timeline' : 'Test: Run Machine Backwards'}
+         </button>
+         
+         <div className={`mt-4 transition-all duration-500 ${runReverse ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'} flex justify-center`}>
+            {!isFunction && <div className="text-red-400 font-bold border-2 border-red-500 bg-red-900/30 px-4 py-2 rounded">FATAL: Main logic core isn't even a valid function!</div>}
+            {isFunction && isBijective && <div className="text-emerald-400 font-bold border-2 border-emerald-500 bg-emerald-900/30 px-6 py-3 rounded shadow-[0_0_15px_#10b981] animate-pulse">SUCCESS! Perfect 1:1 Inversion Achieved. Y mapped directly back to X cleanly.</div>}
+            {isFunction && !isBijective && !isInjective && <div className="text-red-400 font-bold border-2 border-red-500 bg-red-900/30 px-4 py-2 rounded">EXPLOSION OVERHEAT! Machine exploded trying to shoot ONE input (Y) back to TWO distinct targets (X)! Not Injective.</div>}
+            {isFunction && !isBijective && isInjective && !isSurjective && <div className="text-amber-400 font-bold border-2 border-amber-500 bg-amber-900/30 px-4 py-2 rounded">CRITICAL JAM! Dead targets in Codomain caused the reverse machine gears to hit total emptiness. Not Surjective.</div>}
+         </div>
       </div>
 
       {/* Validation Dashboard */}
