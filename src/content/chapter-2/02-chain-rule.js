@@ -370,7 +370,7 @@ export default {
         },
         {
           expression: "= \\frac{(x^2+1)^{1/2}\\left[3x(x+1) - (x^2+1)\\right]}{(x+1)^2}",
-          annotation: 'Factor out (x\u00b2+1)^(1/2) from both terms in the numerator, since both contain this common factor and the exponents differ by 1.',
+          annotation: '{{algebra:factoring-fractional-powers|Factor out the lowest exponent (1/2)}} from both terms in the numerator.',
         },
         {
           expression: "= \\frac{(x^2+1)^{1/2}(3x^2 + 3x - x^2 - 1)}{(x+1)^2}",

@@ -45,6 +45,9 @@ export default {
     ],
     visualizations: [
       {
+        id: 'PolarCoordinateMorph',
+      },
+      {
         id: 'PolarCurve',
         title: 'Polar Region Builder',
         caption: 'Track how intelligently adjusting the $\\theta$ bounds accurately changes the evaluated enclosed area.',

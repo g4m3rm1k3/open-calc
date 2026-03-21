@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import KatexBlock from '../math/KatexBlock.jsx';
 import KatexInline from '../math/KatexInline.jsx';
+import KatexBlock from '../math/KatexBlock.jsx';
+import { parseProse } from './IntegratedLesson.jsx';
 
 export default function ScrubbableExample({ example, number }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -31,9 +32,9 @@ export default function ScrubbableExample({ example, number }) {
              <div className="text-2xl font-bold mb-4">
                  <KatexBlock expr={steps[currentStep].expression} />
              </div>
-             <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto italic">
-                 {steps[currentStep].annotation}
-             </p>
+             <div className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto italic prose-content">
+                 {parseProse(steps[currentStep].annotation)}
+             </div>
           </div>
         </div>
 

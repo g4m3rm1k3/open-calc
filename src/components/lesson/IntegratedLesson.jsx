@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import KatexInline from '../math/KatexInline.jsx'
+import AlgebraMicroLesson from './AlgebraMicroLesson.jsx'
 
 function isLikelyInlineMath(expr) {
   const t = expr.trim()
@@ -11,7 +12,7 @@ function isLikelyInlineMath(expr) {
   return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
 }
 
-function parseProse(text) {
+export function parseProse(text) {
   const parts = []
   let i = 0
   let keyIdx = 0;
@@ -46,9 +47,29 @@ function parseProse(text) {
       continue
     }
 
+    if (text[i] === '{' && text[i+1] === '{' && text.startsWith('algebra:', i + 2)) {
+      const end = text.indexOf('}}', i + 2);
+      if (end !== -1) {
+        const content = text.slice(i + 10, end); // past `{{algebra:`
+        const pipeIdx = content.indexOf('|');
+        if (pipeIdx !== -1) {
+          const topicId = content.substring(0, pipeIdx);
+          const linkText = content.substring(pipeIdx + 1);
+          parts.push(
+            <AlgebraMicroLesson key={`alg${keyIdx++}`} topicId={topicId}>
+              <KatexInline expr={linkText} />
+            </AlgebraMicroLesson>
+          );
+          i = end + 2;
+          continue;
+        }
+      }
+    }
+
     const nextBold = text.indexOf('**', i)
     const nextDollar = text.indexOf('$', i)
-    const next = [nextBold, nextDollar].filter((v) => v !== -1)
+    const nextAlg = text.indexOf('{{algebra:', i)
+    const next = [nextBold, nextDollar, nextAlg].filter((v) => v !== -1)
     const stop = next.length ? Math.min(...next) : text.length
     if (stop > i) {
       parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)

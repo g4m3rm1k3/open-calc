@@ -63,6 +63,7 @@ const VIZ_REGISTRY = {
   SignChartBuilder:             lazy(() => import('./d3/SignChartBuilder.jsx')),
   ChainRulePeeler:              lazy(() => import('./react/ChainRulePeeler.jsx')),
   PolynomialScrubber:           lazy(() => import('./d3/PolynomialScrubber.jsx')),
+  PolarCoordinateMorph:         lazy(() => import('./d3/PolarCoordinateMorph.jsx')),
   ChainRuleMicroscope:          lazy(() => import('./d3/ChainRuleMicroscope.jsx')),
   TrigDerivativeSync:           lazy(() => import('./d3/TrigDerivativeSync.jsx')),
   TriangleInequalityViz:        lazy(() => import('./d3/TriangleInequalityViz.jsx')),
