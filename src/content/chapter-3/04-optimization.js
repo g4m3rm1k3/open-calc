@@ -45,6 +45,16 @@ export default {
         title: 'Verify That Your Critical Point Is the Optimizer',
         body: 'Finding a critical point is only part of the problem. You must verify it gives a maximum (or minimum), not a saddle point. Use the second derivative test (f\'\'> 0 → min, f\'\'< 0 → max) or the closed-interval method (compare all candidates). Do not assume "there is only one critical point, so it must be the answer" without verifying the boundary behavior.',
       },
+      {
+        type: 'misconception',
+        title: "f'(c) = 0 Does NOT Mean c Is an Extremum",
+        body: "The converse of Fermat's Theorem is FALSE. f'(c) = 0 only means c is a CANDIDATE for an extremum. Consider f(x) = x³: f'(0) = 0 but x = 0 is neither a max nor a min (it's an inflection point). You MUST use the second derivative test or inspect the sign of f' to determine the nature of each critical point.",
+      },
+      {
+        type: 'history',
+        title: "Fermat's Principle of Least Time (1662)",
+        body: "Pierre de Fermat proved that light travels between two points along the path of minimum time. This gave the first physical derivation of Snell's Law of refraction. Fermat's principle was later generalized to the Principle of Least Action (Maupertuis, Euler, Hamilton), which underlies ALL of classical mechanics, quantum mechanics, and general relativity. Every optimization problem in physics traces back to Fermat.",
+      },
     ],
     visualizations: [
       {

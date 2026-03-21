@@ -44,6 +44,16 @@ export default {
         title: 'Only Works Near the Base Point a',
         body: 'The approximation f(x) ≈ f(a) + f\'(a)(x - a) is excellent for x near a and degrades rapidly as x moves away from a. For example, sin(x) ≈ x is accurate to 1% for |x| < 0.24 radians (≈14°) but has 50% error at x = π/2. Never use a linear approximation far from its base point without checking the error bound from Taylor\'s theorem.',
       },
+      {
+        type: 'misconception',
+        title: 'dy ≠ Δy — The Differential Is an Approximation',
+        body: "The differential dy = f'(x)·dx gives the change along the TANGENT LINE, not the actual change in f. The actual change Δy = f(x+dx) - f(x) differs from dy by approximately f''(x)(dx)²/2. For small dx this difference is negligible, but for large dx it can be enormous. Never confuse the differential (linear approximation) with the true change.",
+      },
+      {
+        type: 'history',
+        title: 'Napier and the Age of Computation',
+        body: "Before calculators, navigators and astronomers needed to compute sin, cos, √, and log to many decimal places. John Napier (1614) invented logarithms partly to turn multiplication into addition. But for other functions, linearization was the primary tool: sin(31°) = sin(30° + 1°) ≈ sin(30°) + cos(30°)·(π/180). These calculations guided ships across oceans.",
+      },
     ],
     visualizations: [
       {

@@ -22,10 +22,13 @@ export default {
       'A function is **continuous at a point c** if three things are all true: ' +
       '(1) f(c) is defined, (2) the limit exists at c, and (3) the limit equals f(c).',
       'Intuitively: no holes, no jumps, no vertical asymptotes at x = c.',
+      'Continuity is local: a function can be continuous at one point and discontinuous at another. Always ask: continuous where?',
       'There are three types of discontinuity:',
       '**Removable discontinuity** (hole): the limit exists, but either f(c) is undefined or f(c) ≠ limit. Example: f(x) = (x²−1)/(x−1) has a hole at x = 1. Fixable by redefining f(1) = 2.',
       '**Jump discontinuity**: the left and right limits both exist but are different. The function "jumps." Example: the floor function ⌊x⌋ at every integer.',
       '**Infinite discontinuity**: the function blows up (goes to ±∞). Example: 1/x at x = 0.',
+      'A fourth common behavior to watch: oscillatory non-limit behavior, such as sin(1/x) near x = 0. The function keeps oscillating and never settles, so continuity fails because the limit does not exist.',
+      'Continuity does not mean smoothness. The function |x| is continuous at 0 but has a sharp corner, so it is not differentiable there. Differentiability is a stronger condition than continuity.',
       'A function is **continuous on an interval** if it\'s continuous at every point of that interval. ' +
       'Polynomials, trig functions, and exponentials are continuous everywhere on their domains.',
     ],
@@ -34,6 +37,16 @@ export default {
         type: 'intuition',
         title: 'Pencil Test',
         body: 'A function is continuous on [a,b] if and only if you can draw its graph from (a, f(a)) to (b, f(b)) without lifting your pencil.',
+      },
+      {
+        type: 'misconception',
+        title: 'Continuous Does Not Mean Differentiable',
+        body: 'f(x)=|x| is continuous at x=0 because both sides approach 0 and f(0)=0. But it is not differentiable there because the left and right slopes are -1 and +1. Continuity allows corners; differentiability does not.',
+      },
+      {
+        type: 'history',
+        title: 'Bolzano\'s 1817 Breakthrough',
+        body: 'Bernard Bolzano gave one of the first rigorous statements of continuity and the intermediate value principle in 1817, years before Cauchy\'s textbook formalization. His work helped shift calculus from geometric intuition to arithmetic rigor.',
       },
     ],
     visualizationId: 'ContinuityViz',
@@ -117,6 +130,18 @@ export default {
         { expression: '3k = 5 \\implies k = \\frac{5}{3}', annotation: 'Solve for k.' },
       ],
       conclusion: 'k = 5/3 makes the function continuous at x = 2. Check: left limit = 4(5/3)−3 = 20/3−9/3 = 11/3. Right limit = 2 + 5/3 = 11/3. ✓',
+    },
+    {
+      id: 'ex-parachute-velocity',
+      title: 'Physics: Is There a Jump in Velocity When a Parachute Opens?',
+      problem: 'A skydiver\'s vertical velocity is modeled by v(t)= -50 + 4t for t<8 (free fall before chute deployment) and v(t)= -18 - 2e^{-0.7(t-8)} for t>=8 (after deployment). Is v(t) continuous at t=8?',
+      steps: [
+        { expression: 'v(8^-) = -50 + 4(8) = -18', annotation: 'Compute the left-hand limit from the pre-deployment model.' },
+        { expression: 'v(8^+) = -18 - 2e^{-0.7(0)} = -18 - 2 = -20', annotation: 'Compute the right-hand limit from the post-deployment model.' },
+        { expression: 'v(8^-) = -18 \neq -20 = v(8^+)', annotation: 'Left and right limits disagree, so the two-sided limit does not exist.' },
+        { expression: '\\therefore v(t) \\text{ is not continuous at } t=8', annotation: 'The model predicts a jump in velocity at deployment.' },
+      ],
+      conclusion: 'In this model the velocity has a jump discontinuity at deployment time. Real systems usually smooth this transition over a short interval, but piecewise models often include intentional jumps to represent abrupt regime changes.',
     },
   ],
 

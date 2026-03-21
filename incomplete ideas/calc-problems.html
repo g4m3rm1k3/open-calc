@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculus — How to Actually Solve These Problems</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #f7f4ef;
+  --bg2:     #efeae2;
+  --bg3:     #e5dfd6;
+  --card:    #ffffff;
+  --border:  #d4cfc6;
+  --ink:     #1a1714;
+  --ink2:    #4a4540;
+  --ink3:    #8a8178;
+  --red:     #c0392b;
+  --blue:    #1a5fa8;
+  --green:   #1a7a4a;
+  --amber:   #b8600a;
+  --purple:  #6b2fa0;
+  --teal:    #0e7490;
+  --serif:   'Lora', Georgia, serif;
+  --sans:    'Outfit', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* ── LAYOUT ── */
+.page { display: flex; }
+nav {
+  width: 240px; min-width: 240px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto; padding: 28px 0;
+  flex-shrink: 0;
+}
+.nav-title {
+  padding: 0 24px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.nav-title h1 { font-family: var(--serif); font-size: 17px; color: var(--ink); line-height: 1.3; }
+.nav-title p  { font-size: 11px; color: var(--ink3); margin-top: 4px; letter-spacing:.04em; text-transform:uppercase; }
+.nav-group { padding: 2px 24px; font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing:.1em; margin: 14px 0 3px; }
+nav a {
+  display: block; padding: 6px 24px; font-size: 13px; color: var(--ink2);
+  text-decoration: none; border-left: 2px solid transparent; transition: all .15s;
+}
+nav a:hover  { color: var(--ink); background: var(--bg); }
+nav a.active { color: var(--blue); border-left-color: var(--blue); background: #eef4ff; font-weight:500; }
+
+main { flex:1; max-width: 860px; padding: 48px 52px 120px; }
+
+/* ── CHAPTER HEADERS ── */
+.chapter { margin-bottom: 64px; }
+.ch-label { font-size: 11px; text-transform:uppercase; letter-spacing:.1em; color: var(--ink3); margin-bottom: 6px; }
+.ch-title  { font-family: var(--serif); font-size: 30px; color: var(--ink); margin-bottom: 6px; }
+.ch-title em { color: var(--blue); font-style:italic; }
+.ch-sub    { font-size: 15px; color: var(--ink2); max-width: 600px; margin-bottom: 28px; line-height:1.6; }
+.ch-divider { border:none; border-top: 2px solid var(--ink); margin-bottom: 28px; opacity:.1; }
+
+.sec-title { font-family: var(--serif); font-size: 20px; color: var(--ink); margin: 36px 0 10px; font-style:italic; }
+p { color: var(--ink2); margin-bottom: 12px; }
+p strong { color: var(--ink); }
+
+/* ── CONCEPT BOXES ── */
+.concept {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 18px 0;
+}
+.concept-label { font-size: 10px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink3); margin-bottom: 8px; }
+.concept-body  { font-family: var(--serif); font-size: 15px; color: var(--ink); line-height:1.8; }
+
+/* ── WORKED PROBLEMS ── */
+.problem {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 24px 0;
+  overflow: hidden;
+}
+.problem-header {
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 22px;
+  display: flex; align-items: center; gap: 14px;
+}
+.problem-tag  { font-size: 10px; text-transform:uppercase; letter-spacing:.1em; opacity:.6; }
+.problem-text { font-family: var(--serif); font-size: 15px; font-style:italic; flex:1; }
+.problem-body { padding: 22px 24px; }
+
+.step {
+  display: flex; gap: 18px; margin-bottom: 20px; align-items: flex-start;
+}
+.step-num {
+  min-width: 28px; height: 28px;
+  background: var(--ink); color:#fff;
+  border-radius: 50%; display:flex; align-items:center; justify-content:center;
+  font-size: 12px; font-weight:600; flex-shrink:0; margin-top:2px;
+}
+.step-content { flex:1; }
+.step-title { font-weight:600; font-size:14px; color:var(--ink); margin-bottom:4px; }
+.step-body  { font-size:14px; color:var(--ink2); line-height:1.7; }
+.step-math  {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--mono); font-size: 13px; color: var(--ink);
+  margin: 8px 0; line-height:2;
+}
+.step-math .hl-red    { color: var(--red); font-weight:500; }
+.step-math .hl-blue   { color: var(--blue); font-weight:500; }
+.step-math .hl-green  { color: var(--green); font-weight:500; }
+.step-math .hl-amber  { color: var(--amber); font-weight:500; }
+.step-math .hl-purple { color: var(--purple); font-weight:500; }
+
+.verdict {
+  border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-top: 8px;
+  font-weight:500;
+}
+.verdict.yes { background: #edfbf3; border:1px solid #86efac; color: var(--green); }
+.verdict.no  { background: #fef2f2; border:1px solid #fca5a5; color: var(--red); }
+.verdict.note{ background: #fffbeb; border:1px solid #fcd34d; color: var(--amber); }
+
+/* ── INTERACTIVE CANVAS WIDGETS ── */
+.widget {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.widget-label { font-size: 10px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink3); margin-bottom:14px; }
+.widget canvas { display:block; width:100%; border-radius:6px; background:var(--bg); }
+.controls { display:flex; flex-wrap:wrap; gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); align-items:flex-start; }
+.cg { display:flex; flex-direction:column; gap:4px; flex:1; min-width:130px; }
+.cg label { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink3); }
+.cg .cv   { font-family:var(--mono); font-size:13px; color:var(--blue); font-weight:500; }
+input[type=range] {
+  -webkit-appearance:none; width:100%; height:3px;
+  background:var(--border); border-radius:2px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:14px; height:14px;
+  border-radius:50%; background:var(--ink); cursor:pointer;
+}
+select {
+  background:var(--bg); color:var(--ink); border:1px solid var(--border);
+  padding:5px 8px; border-radius:6px; font-family:var(--mono); font-size:12px;
+}
+.readout {
+  background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+  padding:12px 16px; font-family:var(--mono); font-size:12px; color:var(--ink);
+  line-height:2; flex:1; min-width:200px;
+}
+.r-label  { color:var(--ink3); }
+.r-red    { color:var(--red); font-weight:500; }
+.r-blue   { color:var(--blue); font-weight:500; }
+.r-green  { color:var(--green); font-weight:500; }
+.r-amber  { color:var(--amber); font-weight:500; }
+.r-purple { color:var(--purple); font-weight:500; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius:8px; padding:14px 18px; margin:16px 0; font-size:14px; }
+.callout.tip    { background:#f0f9ff; border:1px solid #bae6fd; }
+.callout.tip p  { color:var(--teal); margin:0; }
+.callout.warn   { background:#fffbeb; border:1px solid #fcd34d; }
+.callout.warn p { color:var(--amber); margin:0; }
+.callout.key    { background:#fdf4ff; border:1px solid #e9d5ff; }
+.callout.key p  { color:var(--purple); margin:0; }
+
+/* ── FORMULA DISPLAY ── */
+.formula {
+  background:var(--bg2); border:1px solid var(--border);
+  border-left:3px solid var(--blue);
+  border-radius:0 8px 8px 0; padding:14px 20px;
+  font-family:var(--mono); font-size:13.5px; color:var(--ink);
+  margin:14px 0; line-height:2.1;
+}
+.formula .lhs { color:var(--blue); }
+.formula .rhs { color:var(--green); }
+.formula .note{ font-family:var(--sans); font-size:11px; color:var(--ink3); display:block; margin-top:2px; }
+
+/* ── TABS ── */
+.tab-bar { display:flex; border-bottom:2px solid var(--border); margin-bottom:20px; }
+.tab-btn {
+  padding:9px 18px; background:none; border:none; cursor:pointer;
+  font-family:var(--sans); font-size:13px; color:var(--ink3);
+  border-bottom:2px solid transparent; margin-bottom:-2px;
+  font-weight:500; transition:all .15s; text-transform:uppercase; letter-spacing:.04em;
+}
+.tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
+
+/* ── METHOD TOGGLE ── */
+.method-btn {
+  display:inline-block; padding:7px 14px; border:1px solid var(--border);
+  border-radius:6px; background:var(--bg2); color:var(--ink2); cursor:pointer;
+  font-size:13px; font-family:var(--sans); margin:4px; transition:all .15s;
+}
+.method-btn:hover  { border-color:var(--blue); color:var(--blue); }
+.method-btn.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+/* ── SANDBOX ── */
+.sandbox {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:10px; padding:18px 20px; margin:18px 0;
+}
+.sandbox-title { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--ink3); margin-bottom:12px; }
+.sandbox-input {
+  width:100%; background:var(--card); border:1px solid var(--border);
+  border-radius:6px; padding:10px 14px; font-family:var(--mono); font-size:14px;
+  color:var(--ink); outline:none; transition:border-color .15s;
+}
+.sandbox-input:focus { border-color:var(--blue); }
+.sandbox-result { margin-top:12px; font-family:var(--mono); font-size:13px; line-height:2; min-height:40px; }
+
+/* ── PIECEWISE GRID ── */
+.pw-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+.pw-case {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px;
+}
+.pw-case-label { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink3); margin-bottom:6px; }
+.pw-case-math  { font-family:var(--mono); font-size:14px; color:var(--ink); }
+.pw-case-note  { font-size:12px; color:var(--ink3); margin-top:6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<nav id="nav">
+  <div class="nav-title">
+    <h1>Solving Calculus Problems</h1>
+    <p>Step-by-step methods</p>
+  </div>
+  <div class="nav-group">Limits</div>
+  <a href="#epsdelta">ε–δ from a Graph</a>
+  <a href="#epsdelta-algebra">ε–δ Algebraically</a>
+  <div class="nav-group">Continuity</div>
+  <a href="#proving-cts">Proving Continuity</a>
+  <a href="#piecewise">Piecewise Functions</a>
+  <a href="#composition">Composition of Functions</a>
+  <div class="nav-group">Differentiability</div>
+  <a href="#newtons-quotient">Newton's Quotient</a>
+  <a href="#diff-piecewise">Piecewise Differentiability</a>
+  <div class="nav-group">Try It Yourself</div>
+  <a href="#practice">Practice Problems</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  CHAPTER 1 — ε–δ FROM A GRAPH                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="chapter" id="epsdelta">
+  <div class="ch-label">Chapter 1 — Epsilon–Delta</div>
+  <h2 class="ch-title">Reading ε–δ <em>from a graph</em></h2>
+  <p class="ch-sub">When a problem says "use the graph to find δ for the given ε", here is the exact procedure — every time.</p>
+  <hr class="ch-divider">
+
+  <div class="concept">
+    <div class="concept-label">The method in plain English</div>
+    <div class="concept-body">
+      You're given: a graph, a limit point <em>a</em>, the limit value <em>L</em>, and a value of ε.<br>
+      You need to find: a δ such that the "ε–δ box" centered at (a, L) traps the function.<br><br>
+      <strong>Procedure:</strong> Draw horizontal lines at L+ε and L−ε. Find where the graph <em>exits</em> those lines. The x-distances from a to those exit points give candidate δ values. Take the <em>smaller</em> one.
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 1.1</div>
+        <div class="problem-text">From the graph of f(x) = √(x+1), find δ such that |f(x) − 2| &lt; 0.5 whenever |x − 3| &lt; δ</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Identify what you're given</div>
+          <div class="step-body">
+            a = 3 &nbsp;(the x-value the limit is approaching)<br>
+            L = f(3) = √(3+1) = √4 = <strong>2</strong> &nbsp;(the limit value)<br>
+            ε = <strong>0.5</strong> &nbsp;(the y-tolerance demanded)
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Draw the horizontal ε-strips: y = L ± ε</div>
+          <div class="step-math">
+            Upper: y = L + ε = 2 + 0.5 = <span class="hl-red">2.5</span><br>
+            Lower: y = L − ε = 2 − 0.5 = <span class="hl-red">1.5</span>
+          </div>
+          <div class="step-body">On the graph, draw horizontal dashed lines at y = 2.5 and y = 1.5.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Find where the function hits those lines — solve for x</div>
+          <div class="step-math">
+            √(x+1) = <span class="hl-red">2.5</span>  →  x+1 = 6.25  →  x = <span class="hl-blue">5.25</span><br>
+            √(x+1) = <span class="hl-red">1.5</span>  →  x+1 = 2.25  →  x = <span class="hl-blue">1.25</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Measure the distance from a to each exit point</div>
+          <div class="step-math">
+            Right distance: |5.25 − 3| = <span class="hl-green">2.25</span><br>
+            Left distance:  |1.25 − 3| = <span class="hl-amber">1.75</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Take the SMALLER distance as δ</div>
+          <div class="step-math">
+            δ = min(<span class="hl-green">2.25</span>, <span class="hl-amber">1.75</span>) = <span class="hl-purple">1.75</span>
+          </div>
+          <div class="step-body">We take the smaller side because δ must work in <em>both</em> directions from a. If we used 2.25, the left side (at x = 3 − 2.25 = 0.75) would escape the ε band.</div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ Answer: δ = 1.75. For any x with |x − 3| &lt; 1.75, we guarantee |f(x) − 2| &lt; 0.5.</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-label">Interactive — try it on different functions</div>
+    <canvas id="epsCanvas" height="320"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Function</label>
+        <select id="eps-fn" onchange="drawEps()">
+          <option value="sqrt">f(x) = √(x+1)</option>
+          <option value="sq">f(x) = x²</option>
+          <option value="lin">f(x) = 2x − 1</option>
+          <option value="cube">f(x) = x³ − 2</option>
+        </select>
+      </div>
+      <div class="cg">
+        <label>Point a</label>
+        <span class="cv" id="eps-a-v">3.00</span>
+        <input type="range" id="eps-a" min="0.5" max="4" step="0.1" value="3" oninput="drawEps()">
+      </div>
+      <div class="cg">
+        <label>ε (y-tolerance)</label>
+        <span class="cv" id="eps-e-v">0.50</span>
+        <input type="range" id="eps-e" min="0.05" max="2" step="0.05" value="0.5" oninput="drawEps()">
+      </div>
+      <div class="readout" id="eps-out"></div>
+    </div>
+  </div>
+
+  <div id="epsdelta-algebra" style="padding-top:8px">
+  <div class="sec-title">ε–δ Algebraically — the scratch-work method</div>
+  <p>For algebraic proofs you do two passes: <strong>scratch work</strong> (find what δ to use) and then a clean <strong>formal proof</strong> (verify it works). This is always the structure.</p>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 1.2</div>
+        <div class="problem-text">Prove using ε–δ that lim<sub>x→3</sub> (2x − 1) = 5</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">S</div>
+        <div class="step-content">
+          <div class="step-title">SCRATCH WORK — work backwards from what we need</div>
+          <div class="step-body">We need: |f(x) − L| &lt; ε, i.e. |(2x−1) − 5| &lt; ε. Simplify the left side:</div>
+          <div class="step-math">
+            |(2x − 1) − 5| = |2x − 6| = <span class="hl-blue">2|x − 3|</span>
+          </div>
+          <div class="step-body">We need 2|x−3| &lt; ε, so |x−3| &lt; ε/2. So we choose <strong>δ = ε/2</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">P</div>
+        <div class="step-content">
+          <div class="step-title">FORMAL PROOF — now write it cleanly forward</div>
+          <div class="step-math">
+            <span class="hl-amber">Given:</span> Let ε &gt; 0. Choose δ = ε/2.<br>
+            <span class="hl-amber">Assume:</span> 0 &lt; |x − 3| &lt; δ = ε/2<br>
+            <span class="hl-amber">Then:</span><br>
+            &nbsp;&nbsp;|(2x − 1) − 5|<br>
+            &nbsp;&nbsp;&nbsp;= |2x − 6|<br>
+            &nbsp;&nbsp;&nbsp;= 2|x − 3|<br>
+            &nbsp;&nbsp;&nbsp;&lt; 2 · (ε/2)<br>
+            &nbsp;&nbsp;&nbsp;= <span class="hl-green">ε  ✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ Done. The chain ends with &lt; ε. That's all the proof needs.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 1.3 — harder</div>
+        <div class="problem-text">Prove lim<sub>x→2</sub> x² = 4</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">S</div>
+        <div class="step-content">
+          <div class="step-title">Scratch work — simplify |f(x) − L|</div>
+          <div class="step-math">
+            |x² − 4| = |(x−2)(x+2)| = <span class="hl-blue">|x−2| · |x+2|</span>
+          </div>
+          <div class="step-body">We need this &lt; ε. We control |x−2| (it's &lt; δ). But what about |x+2|? We need to <strong>bound it</strong>. Assume δ ≤ 1 first — this is standard.</div>
+          <div class="step-math">
+            If |x − 2| &lt; 1, then  1 &lt; x &lt; 3<br>
+            So  3 &lt; x + 2 &lt; 5  →  |x + 2| &lt; <span class="hl-amber">5</span>
+          </div>
+          <div class="step-body">Now we have: |x² − 4| = |x−2|·|x+2| &lt; δ · 5. We need δ · 5 &lt; ε, so δ &lt; ε/5. Choosing δ = min(1, ε/5) satisfies both constraints.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">P</div>
+        <div class="step-content">
+          <div class="step-title">Formal proof</div>
+          <div class="step-math">
+            <span class="hl-amber">Given:</span> Let ε &gt; 0. Choose δ = min(1, ε/5).<br>
+            <span class="hl-amber">Assume:</span> 0 &lt; |x − 2| &lt; δ<br>
+            <span class="hl-amber">Then:</span>  |x − 2| &lt; 1  →  |x + 2| &lt; 5<br>
+            &nbsp;&nbsp;|x² − 4|<br>
+            &nbsp;&nbsp;&nbsp;= |x−2| · |x+2|<br>
+            &nbsp;&nbsp;&nbsp;&lt; δ · 5<br>
+            &nbsp;&nbsp;&nbsp;≤ (ε/5) · 5<br>
+            &nbsp;&nbsp;&nbsp;= <span class="hl-green">ε  ✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="callout warn">
+        <p><strong>The min(1, ε/5) trick</strong> appears in almost every quadratic or higher-degree ε–δ proof. You pick 1 (or any convenient number) to bound the variable factor, then set δ small enough to also give you ε/bound. Always take the min of the two.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  CHAPTER 2 — PROVING CONTINUITY                           -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="chapter" id="proving-cts">
+  <div class="ch-label">Chapter 2 — Continuity</div>
+  <h2 class="ch-title">Proving a Function is <em>Continuous</em></h2>
+  <p class="ch-sub">There's a three-part checklist. Miss any one and the function fails. Here's how to apply it systematically.</p>
+  <hr class="ch-divider">
+
+  <div class="concept">
+    <div class="concept-label">The 3-part test for continuity at x = a</div>
+    <div class="concept-body">
+      <strong>1.</strong> f(a) is defined (no division by zero, no square root of negative, etc.)<br>
+      <strong>2.</strong> lim<sub>x→a</sub> f(x) exists (left limit = right limit)<br>
+      <strong>3.</strong> lim<sub>x→a</sub> f(x) = f(a) (the limit equals the actual value)<br><br>
+      For piecewise: check each piece on its open interval (easy, just algebra), then <em>carefully test the join points</em>.
+    </div>
+  </div>
+
+  <!-- PIECEWISE -->
+  <div id="piecewise" style="padding-top:8px">
+  <div class="sec-title">Piecewise Functions — the join point is everything</div>
+
+  <p>For a piecewise function, the interior of each piece is almost never the problem — polynomials and standard functions are continuous on their domains. The <strong>only place you need to check is where the pieces meet.</strong></p>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 2.1</div>
+        <div class="problem-text">Is f continuous at x = 2?&nbsp;&nbsp; f(x) = { x² − 1 &nbsp;if x &lt; 2 &nbsp;|&nbsp; 3 &nbsp;if x = 2 &nbsp;|&nbsp; 2x − 1 &nbsp;if x &gt; 2 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Check f(a) exists</div>
+          <div class="step-math">f(2) = <span class="hl-green">3</span> &nbsp;✓ &nbsp;(explicitly defined)</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Compute the LEFT limit (x → 2⁻, use the x &lt; 2 piece)</div>
+          <div class="step-math">
+            lim<sub>x→2⁻</sub> f(x) = lim<sub>x→2⁻</sub> (x² − 1) = (2)² − 1 = <span class="hl-blue">3</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Compute the RIGHT limit (x → 2⁺, use the x &gt; 2 piece)</div>
+          <div class="step-math">
+            lim<sub>x→2⁺</sub> f(x) = lim<sub>x→2⁺</sub> (2x − 1) = 2(2) − 1 = <span class="hl-blue">3</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Does the two-sided limit exist? Does it equal f(2)?</div>
+          <div class="step-math">
+            Left = Right = <span class="hl-blue">3</span>  →  lim<sub>x→2</sub> f(x) = 3<br>
+            f(2) = <span class="hl-green">3</span>  =  limit  <span class="hl-green">✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ f is continuous at x = 2. All three conditions hold.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 2.2 — fails</div>
+        <div class="problem-text">Is g continuous at x = 1?&nbsp;&nbsp; g(x) = { x + 1 &nbsp;if x ≤ 1 &nbsp;|&nbsp; x² + 1 &nbsp;if x &gt; 1 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">f(a): g(1) = 1 + 1 = 2 ✓</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Left limit (x ≤ 1 piece)</div>
+          <div class="step-math">lim<sub>x→1⁻</sub> (x + 1) = <span class="hl-blue">2</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Right limit (x &gt; 1 piece)</div>
+          <div class="step-math">lim<sub>x→1⁺</sub> (x² + 1) = 1 + 1 = <span class="hl-red">2</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Check: Left = Right?</div>
+          <div class="step-math">Left = <span class="hl-blue">2</span>, Right = <span class="hl-red">2</span> &nbsp;→ <span class="hl-green"> equal!</span><br>
+          So lim = 2 = f(1) = 2 &nbsp;<span class="hl-green">✓</span></div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ g IS continuous at x = 1 — both pieces approach 2.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 2.3 — genuinely fails</div>
+        <div class="problem-text">Is h continuous at x = 0?&nbsp;&nbsp; h(x) = { x² &nbsp;if x &lt; 0 &nbsp;|&nbsp; x + 1 &nbsp;if x ≥ 0 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">h(0) = 0 + 1 = 1 ✓</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Left limit</div>
+          <div class="step-math">lim<sub>x→0⁻</sub> x² = <span class="hl-blue">0</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Right limit</div>
+          <div class="step-math">lim<sub>x→0⁺</sub> (x + 1) = <span class="hl-red">1</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Left ≠ Right → limit does not exist</div>
+          <div class="step-math"><span class="hl-blue">0</span> ≠ <span class="hl-red">1</span> &nbsp;→ &nbsp;lim<sub>x→0</sub> h(x) does <span class="hl-red">not exist</span></div>
+        </div>
+      </div>
+      <div class="verdict no">✗ h is NOT continuous at x = 0. It has a jump discontinuity.</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-label">Piecewise continuity explorer</div>
+    <canvas id="pwCanvas" height="300"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Left piece (x &lt; a): type</label>
+        <select id="pw-left" onchange="drawPW()">
+          <option value="quad">x²</option>
+          <option value="lin">2x − 1</option>
+          <option value="const">2</option>
+          <option value="sin">sin(x)</option>
+        </select>
+      </div>
+      <div class="cg">
+        <label>Right piece (x ≥ a): type</label>
+        <select id="pw-right" onchange="drawPW()">
+          <option value="lin2">2x − 1</option>
+          <option value="quad">x²</option>
+          <option value="const2">3</option>
+          <option value="sqrt">√(x+1)</option>
+        </select>
+      </div>
+      <div class="cg">
+        <label>Join point a</label>
+        <span class="cv" id="pw-a-v">1.00</span>
+        <input type="range" id="pw-a" min="-2" max="2" step="0.1" value="1" oninput="drawPW()">
+      </div>
+      <div class="readout" id="pw-out"></div>
+    </div>
+  </div>
+  </div>
+
+  <!-- COMPOSITION -->
+  <div id="composition" style="padding-top:8px">
+  <div class="sec-title">Composition of Functions — the theorem you're thinking of</div>
+
+  <p>You're thinking of this theorem: if g is continuous at a, and f is continuous at g(a), then <strong>f ∘ g is continuous at a</strong>. It lets you build continuity from pieces.</p>
+
+  <div class="callout key">
+    <p><strong>The key insight you described:</strong> "left + left = right + right" — this is the squeeze on the join point. For a piecewise to be continuous, as you approach the join from the left, the left formula must give the same value as the right formula gives as you approach from the right. If they match, you can "join" them — the function is locally a single thing, and composition theorems apply on either side.</p>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 2.4 — composition</div>
+        <div class="problem-text">Find values of c making f continuous everywhere: f(x) = { cx² + 1 &nbsp;if x ≤ 2 &nbsp;|&nbsp; x + c &nbsp;if x &gt; 2 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Each piece is a polynomial — continuous on its domain automatically</div>
+          <div class="step-body">We only need to worry about the join at x = 2.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Compute left and right limits in terms of c</div>
+          <div class="step-math">
+            lim<sub>x→2⁻</sub> f(x) = c(2²) + 1 = <span class="hl-blue">4c + 1</span><br>
+            lim<sub>x→2⁺</sub> f(x) = 2 + c = <span class="hl-red">c + 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Set left = right and solve for c</div>
+          <div class="step-math">
+            <span class="hl-blue">4c + 1</span> = <span class="hl-red">c + 2</span><br>
+            3c = 1<br>
+            c = <span class="hl-green">1/3</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Verify: also check f(2) = left limit</div>
+          <div class="step-math">
+            f(2) = c(4) + 1 = 4/3 + 1 = 7/3<br>
+            lim = 4(1/3) + 1 = 7/3 &nbsp;<span class="hl-green">✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ c = 1/3 makes f continuous everywhere.</div>
+
+      <div class="callout tip">
+        <p><strong>This is the general method for "find c."</strong> Set left-limit = right-limit (which also = f(a) once c is chosen). You get one equation, solve for c. If you have two join points, you get a system of two equations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-label">Composition — find c to make it continuous</div>
+    <canvas id="compCanvas" height="280"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Value of c</label>
+        <span class="cv" id="comp-c-v">1.00</span>
+        <input type="range" id="comp-c" min="-2" max="3" step="0.05" value="1" oninput="drawComp()">
+      </div>
+      <div class="readout" id="comp-out"></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  CHAPTER 3 — DIFFERENTIABILITY                            -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="chapter" id="newtons-quotient">
+  <div class="ch-label">Chapter 3 — Differentiability</div>
+  <h2 class="ch-title">Newton's Quotient and <em>When it Fails</em></h2>
+  <p class="ch-sub">Differentiability is defined through Newton's quotient (the difference quotient). The derivative exists at a point if and only if this limit exists — and we can check it by comparing left and right limits.</p>
+  <hr class="ch-divider">
+
+  <div class="concept">
+    <div class="concept-label">Newton's Quotient / The Difference Quotient</div>
+    <div class="concept-body">
+      f′(a) = lim<sub>h→0</sub> [f(a+h) − f(a)] / h<br><br>
+      Equivalently: f′(a) = lim<sub>x→a</sub> [f(x) − f(a)] / (x − a)<br><br>
+      <strong>Both forms appear in problems. Know which to use based on what's cleaner.</strong>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 3.1</div>
+        <div class="problem-text">Find f′(x) from the definition for f(x) = x²</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Write the quotient</div>
+          <div class="step-math">
+            [f(x+h) − f(x)] / h = [(x+h)² − x²] / h
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Expand the numerator</div>
+          <div class="step-math">
+            [(x² + 2xh + h²) − x²] / h<br>
+            = [<span class="hl-blue">2xh + h²</span>] / h
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Cancel h (valid because h ≠ 0 in the limit)</div>
+          <div class="step-math">
+            = <span class="hl-blue">2x + h</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Take the limit as h → 0</div>
+          <div class="step-math">
+            lim<sub>h→0</sub> (2x + h) = <span class="hl-green">2x</span>
+          </div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ f′(x) = 2x for all x.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 3.2</div>
+        <div class="problem-text">Is f(x) = |x| differentiable at x = 0?</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Write the difference quotient at a = 0</div>
+          <div class="step-math">
+            [f(0+h) − f(0)] / h = [|h| − 0] / h = |h| / h
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Evaluate left and right limits separately</div>
+          <div class="step-math">
+            As h → 0⁺: |h|/h = h/h = <span class="hl-blue">+1</span><br>
+            As h → 0⁻: |h|/h = −h/h = <span class="hl-red">−1</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Left limit ≠ Right limit → no derivative</div>
+          <div class="step-math">
+            <span class="hl-blue">+1</span> ≠ <span class="hl-red">−1</span>  →  limit does not exist
+          </div>
+        </div>
+      </div>
+      <div class="verdict no">✗ f is continuous at 0 but NOT differentiable — the corner prevents a unique tangent slope.</div>
+    </div>
+  </div>
+
+  <div id="diff-piecewise" style="padding-top:8px">
+  <div class="sec-title">Piecewise Differentiability — two conditions needed</div>
+
+  <div class="callout warn">
+    <p><strong>Order of operations:</strong> To prove differentiability at a join point, you must FIRST verify continuity (differentiability implies continuity, so if it's not continuous it can't be differentiable). Then check that the derivatives from each side match.</p>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 3.3</div>
+        <div class="problem-text">Is f differentiable at x = 1?&nbsp; f(x) = { x² &nbsp;if x ≤ 1 &nbsp;|&nbsp; 2x − 1 &nbsp;if x &gt; 1 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Step 0: Check continuity first</div>
+          <div class="step-math">
+            f(1) = 1² = 1<br>
+            lim<sub>x→1⁻</sub> x² = 1 &nbsp;&nbsp; lim<sub>x→1⁺</sub> (2x−1) = 1<br>
+            All equal → <span class="hl-green">continuous ✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Left derivative: differentiate left piece, evaluate at join</div>
+          <div class="step-math">
+            (x²)′ = 2x &nbsp;→&nbsp; at x=1: <span class="hl-blue">f′⁻(1) = 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Right derivative: differentiate right piece, evaluate at join</div>
+          <div class="step-math">
+            (2x−1)′ = 2 &nbsp;→&nbsp; at x=1: <span class="hl-red">f′⁺(1) = 2</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Left derivative = Right derivative?</div>
+          <div class="step-math"><span class="hl-blue">2</span> = <span class="hl-red">2</span> &nbsp;<span class="hl-green">✓</span></div>
+        </div>
+      </div>
+      <div class="verdict yes">✓ f is differentiable at x = 1, with f′(1) = 2.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="problem-header">
+      <div>
+        <div class="problem-tag">Worked Example 3.4 — fails differentiability</div>
+        <div class="problem-text">Is g differentiable at x = 0?&nbsp; g(x) = { x² &nbsp;if x ≤ 0 &nbsp;|&nbsp; x &nbsp;if x &gt; 0 }</div>
+      </div>
+    </div>
+    <div class="problem-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Continuity at x = 0</div>
+          <div class="step-math">
+            g(0) = 0, &nbsp;lim<sub>x→0⁻</sub> x² = 0, &nbsp;lim<sub>x→0⁺</sub> x = 0 &nbsp;<span class="hl-green">✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Left derivative at x = 0</div>
+          <div class="step-math">(x²)′ = 2x &nbsp;→&nbsp; at x=0: <span class="hl-blue">g′⁻(0) = 0</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Right derivative at x = 0</div>
+          <div class="step-math">(x)′ = 1 &nbsp;→&nbsp; at x=0: <span class="hl-red">g′⁺(0) = 1</span></div>
+        </div>
+      </div>
+      <div class="verdict no">✗ g is continuous but NOT differentiable at x = 0. Left slope = 0 (flat parabola), right slope = 1 (linear). Corner exists.</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-label">Differentiability at a piecewise join — Newton's quotient visualized</div>
+    <canvas id="diffCanvas" height="320"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Left piece</label>
+        <select id="d-left" onchange="drawDiff()">
+          <option value="quad">x²</option>
+          <option value="lin">2x</option>
+          <option value="cube">x³</option>
+        </select>
+      </div>
+      <div class="cg">
+        <label>Right piece</label>
+        <select id="d-right" onchange="drawDiff()">
+          <option value="lin2">2x − 1</option>
+          <option value="lin3">x + 1</option>
+          <option value="quad2">x²</option>
+        </select>
+      </div>
+      <div class="cg">
+        <label>h (quotient step)</label>
+        <span class="cv" id="d-h-v">0.50</span>
+        <input type="range" id="d-h" min="0.02" max="1.5" step="0.02" value="0.5" oninput="drawDiff()">
+      </div>
+      <div class="readout" id="d-out"></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  CHAPTER 4 — PRACTICE                                     -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="chapter" id="practice">
+  <div class="ch-label">Chapter 4 — Practice</div>
+  <h2 class="ch-title">Try It <em>Yourself</em></h2>
+  <p class="ch-sub">Apply the methods from the worked examples. Expand each problem to see a full worked solution.</p>
+  <hr class="ch-divider">
+
+  <div id="quiz-container"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CANVAS UTILITIES
+// ══════════════════════════════════════════
+const INK='#1a1714', INK2='#4a4540', INK3='#8a8178';
+const BG='#f7f4ef', BG2='#efeae2', BORDER='#d4cfc6';
+const RED='#c0392b', BLUE='#1a5fa8', GREEN='#1a7a4a', AMBER='#b8600a', PURPLE='#6b2fa0', TEAL='#0e7490';
+
+function setupC(id) {
+  const c = document.getElementById(id);
+  const w = Math.min(c.parentElement.getBoundingClientRect().width - 40, 760);
+  c.width = w; return [c, c.getContext('2d'), w, c.height];
+}
+function mX(x,x0,x1,w,p=40){ return p+(x-x0)/(x1-x0)*(w-2*p); }
+function mY(y,y0,y1,h,p=32){ return h-p-(y-y0)/(y1-y0)*(h-2*p); }
+
+function axes(ctx,w,h,x0,x1,y0,y1,p=40,yp=32) {
+  ctx.strokeStyle=BORDER; ctx.lineWidth=0.5;
+  for(let x=Math.ceil(x0);x<=Math.floor(x1);x++){
+    const px=mX(x,x0,x1,w,p);
+    ctx.beginPath();ctx.moveTo(px,yp);ctx.lineTo(px,h-yp);ctx.stroke();
+  }
+  for(let y=Math.ceil(y0);y<=Math.floor(y1);y++){
+    const py=mY(y,y0,y1,h,yp);
+    ctx.beginPath();ctx.moveTo(p,py);ctx.lineTo(w-p,py);ctx.stroke();
+  }
+  ctx.strokeStyle=INK3; ctx.lineWidth=1;
+  if(y0<=0&&y1>=0){const ay=mY(0,y0,y1,h,yp);ctx.beginPath();ctx.moveTo(p,ay);ctx.lineTo(w-p,ay);ctx.stroke();}
+  if(x0<=0&&x1>=0){const ax=mX(0,x0,x1,w,p);ctx.beginPath();ctx.moveTo(ax,yp);ctx.lineTo(ax,h-yp);ctx.stroke();}
+  ctx.fillStyle=INK3;ctx.font='10px "JetBrains Mono"';
+  for(let x=Math.ceil(x0);x<=Math.floor(x1);x++){
+    if(x===0)continue;
+    const px=mX(x,x0,x1,w,p);
+    const ay=y0<=0&&y1>=0?mY(0,y0,y1,h,yp):h-yp+2;
+    ctx.textAlign='center';ctx.fillText(x,px,ay+12);
+  }
+  for(let y=Math.ceil(y0);y<=Math.floor(y1);y++){
+    if(y===0)continue;
+    const py=mY(y,y0,y1,h,yp);
+    const ax=x0<=0&&x1>=0?mX(0,x0,x1,w,p):p;
+    ctx.textAlign='right';ctx.fillText(y,ax-5,py+3);
+  }
+}
+
+function plot(ctx,fn,x0,x1,y0,y1,w,h,col,lw=2,p=40,yp=32,dash=[]) {
+  ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash);
+  let first=true;
+  for(let i=0;i<=800;i++){
+    const x=x0+i/800*(x1-x0),y=fn(x);
+    if(!isFinite(y)||y<y0-3||y>y1+3){first=true;continue;}
+    const px=mX(x,x0,x1,w,p),py=mY(y,y0,y1,h,yp);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();ctx.setLineDash([]);
+}
+
+function dot(ctx,x,y,col,r=5){
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+}
+function openDot(ctx,x,y,col,bg,r=5){
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=bg;ctx.fill();
+}
+
+// ══════════════════════════════════════════
+//  EPS–DELTA GRAPH
+// ══════════════════════════════════════════
+function drawEps() {
+  const [c,ctx,w,h]=setupC('epsCanvas');
+  const a=+document.getElementById('eps-a').value;
+  const eps=+document.getElementById('eps-e').value;
+  const fnKey=document.getElementById('eps-fn').value;
+  document.getElementById('eps-a-v').textContent=a.toFixed(2);
+  document.getElementById('eps-e-v').textContent=eps.toFixed(2);
+
+  let fn,dfn,L,fnStr;
+  if(fnKey==='sqrt'){fn=x=>Math.sqrt(x+1);dfn=x=>1/(2*Math.sqrt(x+1));fnStr='√(x+1)';}
+  else if(fnKey==='sq'){fn=x=>x*x;dfn=x=>2*x;fnStr='x²';}
+  else if(fnKey==='lin'){fn=x=>2*x-1;dfn=x=>2;fnStr='2x−1';}
+  else{fn=x=>x*x*x-2;dfn=x=>3*x*x;fnStr='x³−2';}
+  L=fn(a);
+
+  const y0=Math.min(L-eps*2.5,-1),y1=Math.max(L+eps*2.5,L+2);
+  const x0=Math.max(0.01,a-3),x1=a+3;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,w,h);
+  axes(ctx,w,h,x0,x1,y0,y1);
+
+  // Eps band
+  const yHi=mY(L+eps,y0,y1,h),yLo=mY(L-eps,y0,y1,h);
+  ctx.fillStyle='rgba(26,95,168,0.08)';
+  ctx.fillRect(40,yHi,w-80,yLo-yHi);
+  ctx.strokeStyle=BLUE;ctx.lineWidth=1;ctx.setLineDash([6,3]);
+  ctx.beginPath();ctx.moveTo(40,yHi);ctx.lineTo(w-40,yHi);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(40,yLo);ctx.lineTo(w-40,yLo);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Solve for x where fn = L±eps
+  let xRight=a,xLeft=a;
+  const steps=10000;
+  for(let i=1;i<=steps;i++){
+    const x=a+i/steps*2.5;
+    if(Math.abs(fn(x)-(L+eps))<0.01*eps){xRight=x;break;}
+    if(fn(x)>L+eps){xRight=x;break;}
+  }
+  for(let i=1;i<=steps;i++){
+    const x=a-i/steps*2.5;
+    if(x<x0+0.05)break;
+    if(Math.abs(fn(x)-(L-eps))<0.01*eps){xLeft=x;break;}
+    if(fn(x)<L-eps){xLeft=x;break;}
+  }
+  const dRight=Math.abs(xRight-a),dLeft=Math.abs(xLeft-a);
+  const delta=Math.min(dRight,dLeft)*0.95;
+
+  // Delta band
+  const xLo=mX(a-delta,x0,x1,w),xHi=mX(a+delta,x0,x1,w);
+  ctx.fillStyle='rgba(184,96,10,0.08)';
+  ctx.fillRect(xLo,32,xHi-xLo,h-64);
+  ctx.strokeStyle=AMBER;ctx.lineWidth=1;ctx.setLineDash([6,3]);
+  ctx.beginPath();ctx.moveTo(xLo,32);ctx.lineTo(xLo,h-32);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(xHi,32);ctx.lineTo(xHi,h-32);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Function
+  plot(ctx,fn,x0,x1,y0,y1,w,h,INK,2);
+
+  // Center dot
+  dot(ctx,mX(a,x0,x1,w),mY(L,y0,y1,h),GREEN);
+
+  // Labels
+  ctx.font='11px "JetBrains Mono"';
+  ctx.fillStyle=BLUE;ctx.textAlign='left';
+  ctx.fillText('L+ε='+(L+eps).toFixed(2),w-40,yHi-5);
+  ctx.fillText('L−ε='+(L-eps).toFixed(2),w-40,yLo+13);
+  ctx.fillStyle=AMBER;ctx.textAlign='center';
+  ctx.fillText('a−δ',xLo,h-18);ctx.fillText('a+δ',xHi,h-18);
+
+  document.getElementById('eps-out').innerHTML=
+    `<span class="r-label">f(x) = </span>${fnStr}  <span class="r-label">a = </span><span class="r-blue">${a.toFixed(2)}</span><br>
+     <span class="r-label">L = f(a) = </span><span class="r-green">${L.toFixed(3)}</span>  <span class="r-label">ε = </span><span class="r-blue">${eps.toFixed(2)}</span><br>
+     <span class="r-label">Right exit at x = </span>${xRight.toFixed(3)}  → dist = <span class="r-amber">${dRight.toFixed(3)}</span><br>
+     <span class="r-label">Left exit at x = </span>${xLeft.toFixed(3)}   → dist = <span class="r-amber">${dLeft.toFixed(3)}</span><br>
+     <span class="r-label">δ = min of both = </span><span class="r-green">${delta.toFixed(3)}</span>`;
+}
+
+// ══════════════════════════════════════════
+//  PIECEWISE CONTINUITY
+// ══════════════════════════════════════════
+function drawPW() {
+  const [c,ctx,w,h]=setupC('pwCanvas');
+  const a=+document.getElementById('pw-a').value;
+  document.getElementById('pw-a-v').textContent=a.toFixed(2);
+  const lKey=document.getElementById('pw-left').value;
+  const rKey=document.getElementById('pw-right').value;
+
+  let lfn,rfn,lstr,rstr;
+  if(lKey==='quad'){lfn=x=>x*x;lstr='x²';}
+  else if(lKey==='lin'){lfn=x=>2*x-1;lstr='2x−1';}
+  else if(lKey==='const'){lfn=x=>2;lstr='2';}
+  else{lfn=x=>Math.sin(x);lstr='sin(x)';}
+  if(rKey==='lin2'){rfn=x=>2*x-1;rstr='2x−1';}
+  else if(rKey==='quad'){rfn=x=>x*x;rstr='x²';}
+  else if(rKey==='const2'){rfn=x=>3;rstr='3';}
+  else{rfn=x=>Math.sqrt(Math.abs(x)+1);rstr='√(|x|+1)';}
+
+  const lLim=lfn(a),rLim=rfn(a);
+  const fa=lfn(a);
+  const cts=Math.abs(lLim-rLim)<0.001;
+
+  const x0=a-3,x1=a+3;
+  const allY=[lfn(x0+0.1),lfn(x1-0.1),rfn(x0+0.1),rfn(x1-0.1),lLim,rLim];
+  const y0=Math.min(...allY)-1,y1=Math.max(...allY)+1;
+
+  ctx.fillStyle=BG;ctx.fillRect(0,0,w,h);
+  axes(ctx,w,h,x0,x1,y0,y1);
+
+  // Left piece
+  ctx.beginPath();ctx.strokeStyle=BLUE;ctx.lineWidth=2.5;
+  let first=true;
+  for(let i=0;i<=500;i++){
+    const x=x0+i/500*(a-x0-0.01);
+    const y=lfn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // Right piece
+  ctx.beginPath();ctx.strokeStyle=RED;ctx.lineWidth=2.5;
+  first=true;
+  for(let i=0;i<=500;i++){
+    const x=a+0.01+i/500*(x1-a-0.01);
+    const y=rfn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // End points at join
+  const ax=mX(a,x0,x1,w);
+  const lpy=mY(lLim,y0,y1,h),rpy=mY(rLim,y0,y1,h);
+  openDot(ctx,ax,lpy,BLUE,BG);
+  dot(ctx,ax,rpy,RED);
+
+  // Vertical join line
+  ctx.strokeStyle=BORDER;ctx.lineWidth=0.8;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(ax,32);ctx.lineTo(ax,h-32);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=INK3;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('x='+a.toFixed(1),ax,22);
+
+  // Labels
+  ctx.fillStyle=BLUE;ctx.textAlign='left';
+  ctx.fillText('left piece: '+lstr,48,20);
+  ctx.fillStyle=RED;
+  ctx.fillText('right piece: '+rstr,48,34);
+
+  const gap=Math.abs(lLim-rLim);
+  document.getElementById('pw-out').innerHTML=
+    `<span class="r-label">Join at x = </span><span class="r-blue">${a.toFixed(2)}</span><br>
+     <span class="r-label">lim from left  = </span><span class="r-blue">${lLim.toFixed(4)}</span><br>
+     <span class="r-label">lim from right = </span><span class="r-red">${rLim.toFixed(4)}</span><br>
+     <span class="r-label">Gap = </span>${gap.toFixed(4)}  →  ${cts?'<span class="r-green">CONTINUOUS ✓</span>':'<span class="r-red">JUMP — not continuous ✗</span>'}`;
+}
+
+// ══════════════════════════════════════════
+//  COMPOSITION — FIND C
+// ══════════════════════════════════════════
+function drawComp() {
+  const [c,ctx,w,h]=setupC('compCanvas');
+  const cv=+document.getElementById('comp-c').value;
+  document.getElementById('comp-c-v').textContent=cv.toFixed(2);
+
+  // f(x) = { cx² + 1 if x≤2 | x + c if x>2 }
+  const lFn=x=>cv*x*x+1;
+  const rFn=x=>x+cv;
+  const lLim=lFn(2),rLim=rFn(2);
+  const cts=Math.abs(lLim-rLim)<0.01;
+
+  const x0=-1,x1=5;
+  const ys=[lFn(-1),lFn(2),rFn(2),rFn(5)];
+  const y0=Math.min(...ys)-2,y1=Math.max(...ys)+2;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,w,h);
+  axes(ctx,w,h,x0,x1,y0,y1);
+
+  ctx.beginPath();ctx.strokeStyle=BLUE;ctx.lineWidth=2.5;
+  let first=true;
+  for(let i=0;i<=400;i++){
+    const x=x0+i/400*(2-x0-0.01);
+    const y=lFn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  ctx.beginPath();ctx.strokeStyle=RED;ctx.lineWidth=2.5;
+  first=true;
+  for(let i=0;i<=400;i++){
+    const x=2.01+i/400*(x1-2.01);
+    const y=rFn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  const ax=mX(2,x0,x1,w);
+  openDot(ctx,ax,mY(lLim,y0,y1,h),BLUE,BG);
+  dot(ctx,ax,mY(rLim,y0,y1,h),RED);
+
+  ctx.strokeStyle=BORDER;ctx.lineWidth=0.8;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(ax,32);ctx.lineTo(ax,h-32);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Target line: show where match would be
+  if(cts){
+    ctx.strokeStyle=GREEN;ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    const ty=mY(lLim,y0,y1,h);
+    ctx.beginPath();ctx.moveTo(40,ty);ctx.lineTo(w-40,ty);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  const cSolve=1/3;
+  document.getElementById('comp-out').innerHTML=
+    `<span class="r-label">f(x) = cx²+1 (x≤2) | x+c (x>2)</span><br>
+     <span class="r-label">Left lim at 2: 4c+1 = </span><span class="r-blue">${lLim.toFixed(3)}</span><br>
+     <span class="r-label">Right lim at 2: 2+c = </span><span class="r-red">${rLim.toFixed(3)}</span><br>
+     <span class="r-label">Gap = </span>${Math.abs(lLim-rLim).toFixed(3)}  →  
+     ${cts?'<span class="r-green">Continuous! ✓</span>':'<span class="r-red">Not continuous. Set 4c+1 = c+2 → c = 1/3</span>'}<br>
+     <span class="r-label">Target c = </span><span class="r-green">${cSolve.toFixed(4)}</span>  <span class="r-label">(drag slider to find it)</span>`;
+}
+
+// ══════════════════════════════════════════
+//  DIFFERENTIABILITY CANVAS
+// ══════════════════════════════════════════
+function drawDiff() {
+  const [c,ctx,w,h]=setupC('diffCanvas');
+  const hv=+document.getElementById('d-h').value;
+  const lKey=document.getElementById('d-left').value;
+  const rKey=document.getElementById('d-right').value;
+  document.getElementById('d-h-v').textContent=hv.toFixed(2);
+
+  let lfn,ldfn,rfn,rdfn,lstr,rstr;
+  if(lKey==='quad'){lfn=x=>x*x;ldfn=x=>2*x;lstr='x²';}
+  else if(lKey==='lin'){lfn=x=>2*x;ldfn=x=>2;lstr='2x';}
+  else{lfn=x=>x*x*x;ldfn=x=>3*x*x;lstr='x³';}
+  if(rKey==='lin2'){rfn=x=>2*x-1;rdfn=x=>2;rstr='2x−1';}
+  else if(rKey==='lin3'){rfn=x=>x+1;rdfn=x=>1;rstr='x+1';}
+  else{rfn=x=>x*x;rdfn=x=>2*x;rstr='x²';}
+
+  // Join at x=0 always
+  const a=0;
+  const lLim=lfn(a),rLim=rfn(a);
+  const cts=Math.abs(lLim-rLim)<0.001;
+  const lSlope=ldfn(a),rSlope=rdfn(a);
+  const diff=cts&&Math.abs(lSlope-rSlope)<0.001;
+
+  const x0=-2.5,x1=2.5,y0=-3,y1=7;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,w,h);
+  axes(ctx,w,h,x0,x1,y0,y1);
+
+  ctx.beginPath();ctx.strokeStyle=BLUE;ctx.lineWidth=2.5;
+  let first=true;
+  for(let i=0;i<=400;i++){
+    const x=x0+i/400*(a-x0-0.01);
+    const y=lfn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.beginPath();ctx.strokeStyle=RED;ctx.lineWidth=2.5;
+  first=true;
+  for(let i=0;i<=400;i++){
+    const x=a+0.01+i/400*(x1-a-0.01);
+    const y=rfn(x);
+    if(!isFinite(y)||y<y0-2||y>y1+2){first=true;continue;}
+    const px=mX(x,x0,x1,w),py=mY(y,y0,y1,h);
+    first?(ctx.moveTo(px,py),first=false):ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  // Newton's quotient visualization
+  // Left side: from a-h to a
+  const ax=mX(a,x0,x1,w),ay=mY(lfn(a),y0,y1,h);
+  const lhx=mX(a-hv,x0,x1,w),lhy=mY(lfn(a-hv),y0,y1,h);
+  ctx.strokeStyle='rgba(26,95,168,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(lhx,lhy);ctx.lineTo(ax,ay);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Right side: from a to a+h
+  const rhx=mX(a+hv,x0,x1,w),rhy=mY(rfn(a+hv),y0,y1,h);
+  ctx.strokeStyle='rgba(192,57,43,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(rhx,rhy);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Secant slopes as tangent lines through a
+  const lSec=(lfn(a)-lfn(a-hv))/hv;
+  const rSec=(rfn(a+hv)-rfn(a))/hv;
+  const len=1.2;
+  ctx.strokeStyle='rgba(26,95,168,0.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(mX(a-len,x0,x1,w),mY(lfn(a)+lSec*(-len),y0,y1,h));
+  ctx.lineTo(mX(a+len,x0,x1,w),mY(lfn(a)+lSec*len,y0,y1,h));
+  ctx.stroke();
+  ctx.strokeStyle='rgba(192,57,43,0.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(mX(a-len,x0,x1,w),mY(rfn(a)+rSec*(-len),y0,y1,h));
+  ctx.lineTo(mX(a+len,x0,x1,w),mY(rfn(a)+rSec*len,y0,y1,h));
+  ctx.stroke();
+
+  openDot(ctx,ax,mY(lfn(a),y0,y1,h),BLUE,BG);
+  dot(ctx,ax,mY(rfn(a),y0,y1,h),RED);
+  dot(ctx,lhx,lhy,BLUE);dot(ctx,rhx,rhy,RED);
+
+  ctx.fillStyle=INK;ctx.font='11px "JetBrains Mono"';ctx.textAlign='left';
+  ctx.fillText('Join at x=0',48,20);
+
+  document.getElementById('d-out').innerHTML=
+    `<span class="r-label">Continuity: left lim = </span><span class="r-blue">${lLim.toFixed(3)}</span>  right lim = <span class="r-red">${rLim.toFixed(3)}</span>  → ${cts?'<span class="r-green">✓</span>':'<span class="r-red">fails ✗</span>'}<br>
+     <span class="r-label">Left secant slope (h=${hv.toFixed(2)}): </span><span class="r-blue">${lSec.toFixed(3)}</span>  → true: <span class="r-blue">${lSlope.toFixed(3)}</span><br>
+     <span class="r-label">Right secant slope (h=${hv.toFixed(2)}): </span><span class="r-red">${rSec.toFixed(3)}</span>  → true: <span class="r-red">${rSlope.toFixed(3)}</span><br>
+     <span class="r-label">Differentiable: </span>${diff?'<span class="r-green">YES — slopes match ✓</span>':'<span class="r-red">NO — slope mismatch ✗</span>'}`;
+}
+
+// ══════════════════════════════════════════
+//  PRACTICE PROBLEMS
+// ══════════════════════════════════════════
+const problems=[
+  {
+    q:'Is f(x) = { 3x + 1 if x < 1 | x² + 3 if x ≥ 1 } continuous at x = 1?',
+    type:'Continuity — piecewise',
+    steps:[
+      {t:'Check f(1)',m:'f(1) = 1² + 3 = 4  ✓  (uses x≥1 piece)'},
+      {t:'Left limit (x < 1 piece)',m:'lim<sub>x→1⁻</sub> (3x+1) = 3(1)+1 = 4'},
+      {t:'Right limit (x ≥ 1 piece)',m:'lim<sub>x→1⁺</sub> (x²+3) = 1+3 = 4'},
+      {t:'All three equal?',m:'f(1) = 4 = lim = 4  ✓'},
+    ],
+    verdict:'yes',answer:'Continuous at x = 1.'
+  },
+  {
+    q:'Find c so that f(x) = { 2x + c if x ≤ 3 | cx − 1 if x > 3 } is continuous.',
+    type:'Continuity — find constant',
+    steps:[
+      {t:'Left limit at x = 3',m:'lim<sub>x→3⁻</sub> (2x+c) = 6+c'},
+      {t:'Right limit at x = 3',m:'lim<sub>x→3⁺</sub> (cx−1) = 3c−1'},
+      {t:'Set equal and solve',m:'6+c = 3c−1  →  7 = 2c  →  c = 7/2 = 3.5'},
+      {t:'Verify f(3)',m:'f(3) = 2(3)+3.5 = 9.5; limit = 6+3.5 = 9.5  ✓'},
+    ],
+    verdict:'yes',answer:'c = 3.5'
+  },
+  {
+    q:'Is f(x) = |x − 2| differentiable at x = 2?',
+    type:'Differentiability — corner',
+    steps:[
+      {t:'Rewrite as piecewise',m:'f(x) = x−2 if x≥2 | −(x−2) if x<2'},
+      {t:'Continuity check',m:'lim<sub>x→2⁻</sub> = 0 = lim<sub>x→2⁺</sub> = f(2) = 0  ✓'},
+      {t:'Left derivative',m:'(−(x−2))′ = −1  →  f′⁻(2) = −1'},
+      {t:'Right derivative',m:'(x−2)′ = 1  →  f′⁺(2) = +1'},
+      {t:'Compare',m:'−1 ≠ +1  →  limit of quotient does not exist'},
+    ],
+    verdict:'no',answer:'NOT differentiable at x = 2. The corner gives slope −1 from the left and +1 from the right.'
+  },
+  {
+    q:'Prove using ε–δ that lim<sub>x→1</sub> (4x − 1) = 3.',
+    type:'ε–δ formal proof',
+    steps:[
+      {t:'Scratch: simplify |f(x)−L|',m:'|(4x−1)−3| = |4x−4| = 4|x−1|'},
+      {t:'Need 4|x−1| < ε, so |x−1| < ε/4',m:'Choose δ = ε/4'},
+      {t:'Formal proof',m:'Given ε>0, choose δ=ε/4. If |x−1|<δ then |(4x−1)−3| = 4|x−1| < 4·(ε/4) = ε ✓'},
+    ],
+    verdict:'yes',answer:'δ = ε/4 works.'
+  },
+  {
+    q:'Is g(x) = { x³ if x ≤ 0 | x² if x > 0 } differentiable at x = 0?',
+    type:'Differentiability — piecewise',
+    steps:[
+      {t:'Continuity: left limit = right limit = g(0)?',m:'0³=0, 0²=0, g(0)=0  ✓ continuous'},
+      {t:'Left derivative of x³ at x=0',m:'(x³)′=3x²  →  3(0)²=0'},
+      {t:'Right derivative of x² at x=0',m:'(x²)′=2x  →  2(0)=0'},
+      {t:'Compare',m:'0 = 0  ✓'},
+    ],
+    verdict:'yes',answer:'Differentiable at x=0 with g′(0)=0. Both pieces are flat at the join.'
+  },
+];
+
+function buildQuiz() {
+  const container=document.getElementById('quiz-container');
+  problems.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='problem';
+    div.style.marginBottom='24px';
+    div.innerHTML=`
+      <div class="problem-header" style="cursor:pointer" onclick="toggleSoln(${i})">
+        <div style="flex:1">
+          <div class="problem-tag">${p.type}</div>
+          <div class="problem-text">${p.q}</div>
+        </div>
+        <div id="toggle-${i}" style="font-size:12px;opacity:.6;margin-left:12px">Show solution ▼</div>
+      </div>
+      <div id="soln-${i}" style="display:none">
+        <div class="problem-body">
+          ${p.steps.map((s,j)=>`
+            <div class="step">
+              <div class="step-num">${j+1}</div>
+              <div class="step-content">
+                <div class="step-title">${s.t}</div>
+                <div class="step-math">${s.m}</div>
+              </div>
+            </div>
+          `).join('')}
+          <div class="verdict ${p.verdict}">${p.verdict==='yes'?'✓':'✗'} ${p.answer}</div>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function toggleSoln(i) {
+  const s=document.getElementById('soln-'+i);
+  const t=document.getElementById('toggle-'+i);
+  const open=s.style.display==='none';
+  s.style.display=open?'block':'none';
+  t.textContent=open?'Hide solution ▲':'Show solution ▼';
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+function drawAll(){drawEps();drawPW();drawComp();drawDiff();}
+drawAll();
+buildQuiz();
+window.addEventListener('resize',drawAll);
+
+// Nav active state
+const navLinks=document.querySelectorAll('nav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  navLinks.forEach(l=>{
+    const id=l.getAttribute('href').slice(1);
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=140)cur=id;
+  });
+  navLinks.forEach(l=>l.classList.toggle('active',l.getAttribute('href').slice(1)===cur));
+},{passive:true});
+</script>
+</body>
+</html>

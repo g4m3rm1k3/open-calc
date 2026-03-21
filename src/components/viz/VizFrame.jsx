@@ -45,6 +45,12 @@ const VIZ_REGISTRY = {
   OscillationViz:               lazy(() => import('./d3/OscillationViz.jsx')),
   // Chapter 2 — Derivatives additions
   DerivativeBuilder:            lazy(() => import('./d3/DerivativeBuilder.jsx')),
+  // Chapter 4 — Integration
+  AreaAccumulator:              lazy(() => import('./d3/AreaAccumulator.jsx')),
+  FTCLink:                      lazy(() => import('./d3/FTCLink.jsx')),
+  WaterTank:                    lazy(() => import('./d3/WaterTank.jsx')),
+  SignedArea:                   lazy(() => import('./d3/SignedArea.jsx')),
+  AreaBetweenCurves:            lazy(() => import('./d3/AreaBetweenCurves.jsx')),
   // Chapter 3 — Applications of Derivatives
   NewtonsMethod:                lazy(() => import('./d3/NewtonsMethod.jsx')),
   SpringOscillation:            lazy(() => import('./d3/SpringOscillation.jsx')),

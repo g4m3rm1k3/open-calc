@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absolute Value — The Distance Picture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:   #faf7f2;
+  --paper2:  #f2ede4;
+  --paper3:  #e8e0d4;
+  --ink:     #1c1814;
+  --ink2:    #4a4238;
+  --ink3:    #8a7e70;
+  --rule:    #d4c8b8;
+  --red:     #b83232;
+  --blue:    #1e4fa8;
+  --green:   #1a6b3a;
+  --amber:   #a05c10;
+  --purple:  #5a2888;
+  --teal:    #0e6b7a;
+  --serif:   'Source Serif 4', Georgia, serif;
+  --display: 'Playfair Display', Georgia, serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:16px;
+  line-height:1.8;
+}
+
+/* PAGE LAYOUT */
+.page{display:flex;}
+nav{
+  width:230px;min-width:230px;
+  background:var(--paper2);
+  border-right:1px solid var(--rule);
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;padding:28px 0;
+  flex-shrink:0;
+}
+.nav-title{padding:0 22px 18px;border-bottom:1px solid var(--rule);margin-bottom:10px;}
+.nav-title h1{font-family:var(--display);font-size:16px;color:var(--ink);line-height:1.3;}
+.nav-title p{font-size:10px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;}
+.nav-sec{padding:2px 22px;font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.12em;margin:12px 0 3px;}
+nav a{display:block;padding:6px 22px;font-size:13px;color:var(--ink2);text-decoration:none;border-left:2px solid transparent;font-family:var(--serif);transition:all .15s;}
+nav a:hover{color:var(--ink);background:var(--paper3);}
+nav a.active{color:var(--blue);border-left-color:var(--blue);background:#eef2fb;}
+
+main{flex:1;max-width:820px;padding:52px 56px 140px;}
+
+/* TYPOGRAPHY */
+.ch-num{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:5px;font-family:var(--mono);}
+.ch-title{font-family:var(--display);font-size:32px;color:var(--ink);line-height:1.2;margin-bottom:8px;}
+.ch-title em{color:var(--blue);font-style:italic;}
+.ch-lead{font-size:16px;color:var(--ink2);max-width:580px;margin-bottom:30px;font-weight:300;line-height:1.7;}
+.chapter{margin-bottom:72px;}
+hr.ch{border:none;border-top:1px solid var(--rule);margin-bottom:30px;}
+
+.sec{font-family:var(--display);font-size:21px;color:var(--ink);margin:38px 0 12px;font-style:italic;}
+p{color:var(--ink2);margin-bottom:14px;font-weight:300;}
+p strong{color:var(--ink);font-weight:600;}
+
+/* THE KEY INSIGHT BOX */
+.insight{
+  background:var(--paper2);
+  border:1px solid var(--rule);
+  border-left:4px solid var(--blue);
+  border-radius:0 10px 10px 0;
+  padding:18px 22px;
+  margin:20px 0;
+}
+.insight-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);font-family:var(--mono);margin-bottom:6px;}
+.insight-body{font-family:var(--display);font-size:15px;color:var(--ink);line-height:1.8;}
+
+/* WORKED PROBLEMS */
+.problem{background:#fff;border:1px solid var(--rule);border-radius:12px;margin:24px 0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.prob-head{background:var(--ink);color:#fff;padding:14px 22px;display:flex;align-items:flex-start;gap:14px;}
+.prob-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;opacity:.5;font-family:var(--mono);margin-bottom:3px;}
+.prob-q{font-family:var(--display);font-size:15px;font-style:italic;}
+.prob-body{padding:22px 24px;}
+
+.step{display:flex;gap:16px;margin-bottom:22px;align-items:flex-start;}
+.sn{min-width:26px;height:26px;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);font-weight:500;flex-shrink:0;margin-top:3px;}
+.sc{flex:1;}
+.st{font-weight:600;font-size:14px;color:var(--ink);margin-bottom:4px;font-family:var(--serif);}
+.sb{font-size:14px;color:var(--ink2);line-height:1.7;font-weight:300;}
+.sm{background:var(--paper2);border:1px solid var(--rule);border-radius:8px;padding:11px 16px;font-family:var(--mono);font-size:13px;color:var(--ink);margin:8px 0;line-height:2.1;}
+.sm .r{color:var(--red);font-weight:500;}
+.sm .b{color:var(--blue);font-weight:500;}
+.sm .g{color:var(--green);font-weight:500;}
+.sm .a{color:var(--amber);font-weight:500;}
+.sm .p{color:var(--purple);font-weight:500;}
+.sm .t{color:var(--teal);font-weight:500;}
+
+.verdict{border-radius:8px;padding:12px 16px;font-size:14px;margin-top:6px;font-weight:500;font-family:var(--serif);}
+.v-yes{background:#f0faf4;border:1px solid #86efac;color:var(--green);}
+.v-no {background:#fef4f4;border:1px solid #fca5a5;color:var(--red);}
+.v-note{background:#fffbeb;border:1px solid #fcd34d;color:var(--amber);}
+
+/* CALLOUTS */
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:14px;font-weight:300;}
+.callout p{margin:0;color:inherit;}
+.c-tip{background:#f0f6ff;border:1px solid #bfdbfe;color:var(--blue);}
+.c-warn{background:#fffbeb;border:1px solid #fde68a;color:var(--amber);}
+.c-key{background:#fdf4ff;border:1px solid #e9d5ff;color:var(--purple);}
+.c-geo{background:#f0faf4;border:1px solid #86efac;color:var(--green);}
+
+/* INTERACTIVE WIDGETS */
+.widget{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:20px;margin:22px 0;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.wlabel{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);font-family:var(--mono);margin-bottom:14px;}
+.widget canvas{display:block;width:100%;border-radius:6px;background:var(--paper);}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid var(--rule);align-items:flex-start;}
+.cg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px;}
+.cg label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-family:var(--mono);}
+.cv{font-family:var(--mono);font-size:14px;color:var(--blue);font-weight:500;}
+input[type=range]{-webkit-appearance:none;width:100%;height:2px;background:var(--rule);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--ink);cursor:pointer;}
+select{background:var(--paper2);color:var(--ink);border:1px solid var(--rule);padding:5px 8px;border-radius:6px;font-family:var(--mono);font-size:12px;}
+.readout{background:var(--paper2);border:1px solid var(--rule);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:12px;color:var(--ink);line-height:2.1;flex:1;min-width:180px;}
+.rl{color:var(--ink3);}
+.rr{color:var(--red);font-weight:500;}
+.rb{color:var(--blue);font-weight:500;}
+.rg{color:var(--green);font-weight:500;}
+.ra{color:var(--amber);font-weight:500;}
+.rp{color:var(--purple);font-weight:500;}
+
+/* FORMULA LINE */
+.fml{background:var(--paper2);border:1px solid var(--rule);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:13px 18px;font-family:var(--mono);font-size:13.5px;color:var(--ink);margin:14px 0;line-height:2.2;}
+.fml .lhs{color:var(--blue);}
+.fml .rhs{color:var(--green);}
+.fml .note{font-family:var(--serif);font-size:11px;color:var(--ink3);display:block;margin-top:2px;font-weight:300;}
+
+/* NUMBER LINE CANVAS SHARED */
+.nl-wrap{position:relative;}
+
+/* PRACTICE TOGGLE */
+.prac{background:#fff;border:1px solid var(--rule);border-radius:12px;margin:20px 0;overflow:hidden;}
+.prac-head{padding:14px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:background .15s;}
+.prac-head:hover{background:var(--paper2);}
+.prac-q{font-family:var(--display);font-size:15px;font-style:italic;color:var(--ink);}
+.prac-tag{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:3px;}
+.prac-toggle{font-size:11px;color:var(--ink3);font-family:var(--mono);white-space:nowrap;margin-left:12px;}
+.prac-body{display:none;padding:20px 22px;border-top:1px solid var(--rule);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<nav id="nav">
+  <div class="nav-title">
+    <h1>Absolute Value as Distance</h1>
+    <p>From picture to proof</p>
+  </div>
+  <div class="nav-sec">Foundation</div>
+  <a href="#distance">|x| is a distance</a>
+  <a href="#centre">|x − a| means centre</a>
+  <a href="#simple">Simple inequalities</a>
+  <div class="nav-sec">Algebra rules</div>
+  <a href="#factor">Factoring out constants</a>
+  <a href="#sign">The sign-flip rule</a>
+  <a href="#split">Splitting into cases</a>
+  <div class="nav-sec">Calculus applications</div>
+  <a href="#epsilon">ε–δ manipulations</a>
+  <a href="#triangle">Triangle inequality</a>
+  <a href="#chain">Chaining inequalities</a>
+  <div class="nav-sec">Practice</div>
+  <a href="#practice">Problems</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  CHAPTER 1 — THE DISTANCE PICTURE              -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="chapter" id="distance">
+  <div class="ch-num">Chapter 1 — The Foundation</div>
+  <h1 class="ch-title">|x| is a <em>distance</em>,<br>not an operation</h1>
+  <p class="ch-lead">Every rule about absolute values follows immediately from one geometric fact. Once you see it, you never need to memorise a rule again.</p>
+  <hr class="ch">
+
+  <div class="insight">
+    <div class="insight-label">The only thing you need to know</div>
+    <div class="insight-body">|x| is the distance from x to 0 on the number line.<br>|x − a| is the distance from x to a on the number line.<br><br>That is the complete definition. Everything else is a consequence.</div>
+  </div>
+
+  <p>The notation |x| looks like it means "remove the minus sign if there is one." That's a valid procedure but it's the wrong way to think about it. The moment you think of it as removing signs, you're in symbol-manipulation mode and you lose the picture.</p>
+
+  <p>Think of the number line as a ruler. |x| is how far x is from the zero mark — in either direction. Distance is always positive. Distance from 3 to 0 is 3. Distance from −3 to 0 is also 3. That's why |3| = |−3| = 3.</p>
+
+  <div class="widget">
+    <div class="wlabel">|x| as distance from zero — drag x</div>
+    <canvas id="c1" height="120"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>x</label>
+        <span class="cv" id="c1v">-3.0</span>
+        <input type="range" id="c1s" min="-6" max="6" step="0.1" value="-3" oninput="draw1()">
+      </div>
+      <div class="readout" id="c1r"></div>
+    </div>
+  </div>
+
+  <div id="centre" style="padding-top:4px">
+  <div class="sec">|x − a| means "distance from x to a"</div>
+
+  <p>Now shift your zero point. Instead of measuring from 0, measure from some point a. The distance from x to a is |x − a|. This is the key to everything that follows.</p>
+
+  <p>|x − 2| is the distance from x to 2. That's it. When x = 5, the distance to 2 is 3, so |5 − 2| = 3. When x = −1, the distance to 2 is 3, so |−1 − 2| = |−3| = 3. Both points are the same distance from 2, just in opposite directions.</p>
+
+  <div class="widget">
+    <div class="wlabel">|x − a| as distance from x to a — drag both</div>
+    <canvas id="c2" height="140"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>x (the point)</label>
+        <span class="cv" id="c2xv">5.0</span>
+        <input type="range" id="c2xs" min="-6" max="6" step="0.1" value="5" oninput="draw2()">
+      </div>
+      <div class="cg">
+        <label>a (the centre)</label>
+        <span class="cv" id="c2av">2.0</span>
+        <input type="range" id="c2as" min="-5" max="5" step="0.1" value="2" oninput="draw2()">
+      </div>
+      <div class="readout" id="c2r"></div>
+    </div>
+  </div>
+  </div>
+
+  <div id="simple" style="padding-top:4px">
+  <div class="sec">Simple inequalities — no rules needed</div>
+
+  <p>Now watch what happens to inequalities. <strong>|x − 2| &lt; 3</strong> in algebra says "the absolute value of x minus 2 is less than 3." In geometry it says something you can just see: <strong>"x is within distance 3 of 2."</strong></p>
+
+  <p>All points within distance 3 of 2 live in the interval from 2−3 to 2+3, which is −1 to 5. You don't apply a rule. You draw a circle of radius 3 centered at 2 on the number line and read off the endpoints.</p>
+
+  <div class="fml">
+    <span class="lhs">|x − a| &lt; r</span>  means  <span class="rhs">a − r &lt; x &lt; a + r</span>
+    <span class="note">"x is within distance r of a" — an interval centered at a with radius r</span>
+  </div>
+  <div class="fml">
+    <span class="lhs">|x − a| &gt; r</span>  means  <span class="rhs">x &lt; a − r  OR  x &gt; a + r</span>
+    <span class="note">"x is more than distance r from a" — everything outside that interval</span>
+  </div>
+
+  <div class="widget">
+    <div class="wlabel">|x − a| &lt; r — the interval picture</div>
+    <canvas id="c3" height="160"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Centre a</label>
+        <span class="cv" id="c3av">2.0</span>
+        <input type="range" id="c3as" min="-4" max="4" step="0.1" value="2" oninput="draw3()">
+      </div>
+      <div class="cg">
+        <label>Radius r</label>
+        <span class="cv" id="c3rv">3.0</span>
+        <input type="range" id="c3rs" min="0.2" max="5" step="0.1" value="3" oninput="draw3()">
+      </div>
+      <div class="cg">
+        <label>Test point x</label>
+        <span class="cv" id="c3xv">4.0</span>
+        <input type="range" id="c3xs" min="-8" max="8" step="0.1" value="4" oninput="draw3()">
+      </div>
+      <div class="readout" id="c3r"></div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 1.1 — solve the inequality</div>
+        <div class="prob-q">Solve |x − 3| &lt; 5. Write the answer as an interval.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">G</div>
+        <div class="sc">
+          <div class="st">Translate to geometry</div>
+          <div class="sb">|x − 3| &lt; 5 means: x is within distance 5 of 3.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Centre = 3, radius = 5. Find the endpoints.</div>
+          <div class="sm">Left endpoint:  3 − 5 = <span class="r">−2</span><br>Right endpoint: 3 + 5 = <span class="b">8</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Write as inequality and interval</div>
+          <div class="sm"><span class="r">−2</span> &lt; x &lt; <span class="b">8</span>  →  interval: (<span class="r">−2</span>, <span class="b">8</span>)</div>
+        </div>
+      </div>
+      <div class="verdict v-yes">Done. No rule applied. Centre ± radius.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 1.2 — greater than</div>
+        <div class="prob-q">Solve |x + 1| &gt; 4.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">G</div>
+        <div class="sc">
+          <div class="st">Rewrite to see the centre</div>
+          <div class="sm">|x + 1| = |x − (−1)|  →  distance from x to <span class="b">−1</span></div>
+          <div class="sb">The centre is −1 (not +1). This trips people up. |x + 1| = |x − (−1)|.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">"Greater than 4" means outside the interval</div>
+          <div class="sm">x &lt; −1 − 4 = <span class="r">−5</span>  OR  x &gt; −1 + 4 = <span class="b">3</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">x ∈ (−∞, −5) ∪ (3, ∞). Everything more than distance 4 from −1.</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  CHAPTER 2 — ALGEBRA RULES FROM THE PICTURE   -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="chapter" id="factor">
+  <div class="ch-num">Chapter 2 — The Algebra Rules</div>
+  <h1 class="ch-title">Why the rules are <em>obvious</em><br>from the picture</h1>
+  <p class="ch-lead">Every algebraic rule for absolute values is a geometric fact in disguise. Here is where each one comes from.</p>
+  <hr class="ch">
+
+  <div class="sec">Factoring out constants — |ca| = |c||a|</div>
+
+  <p>Your specific question: why does |2x − 4| = 2|x − 2|? And why don't you flip anything?</p>
+
+  <p><strong>The geometric answer:</strong> |2x − 4| = |2(x − 2)| = |2| · |x − 2| = 2|x − 2|. Multiplying by 2 stretches all distances by a factor of 2. If x is distance d from 2, then 2x is distance 2d from 4. The factor comes out as its absolute value because distances are always positive — if you multiplied by −2, distances still scale by 2 (the negative just reflects, it doesn't shrink).</p>
+
+  <div class="insight">
+    <div class="insight-label">Why |−2| = 2, not −2</div>
+    <div class="insight-body">Multiplying by −2 reflects the number line and stretches it by 2. The stretch factor is 2. The reflection doesn't change distances, it just flips direction. So |−2x| = 2|x|, not −2|x|. A distance can never be negative.</div>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 2.1 — your exact question</div>
+        <div class="prob-q">Simplify |2x − 4|. Then solve |2x − 4| &lt; 6.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Factor out the constant from inside</div>
+          <div class="sm">|2x − 4| = |<span class="b">2</span>(x − 2)| = |<span class="b">2</span>| · |x − 2| = <span class="b">2</span>|x − 2|</div>
+          <div class="sb">We factored 2 from both terms: 2x−4 = 2(x−2). Then |2|·|x−2| = 2|x−2|.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Substitute back into the inequality</div>
+          <div class="sm"><span class="b">2</span>|x − 2| &lt; 6</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="sc">
+          <div class="st">Divide both sides by 2 — no sign flip because 2 is positive</div>
+          <div class="sm">|x − 2| &lt; <span class="g">3</span></div>
+          <div class="sb">Dividing by a positive number never changes the direction of an inequality. 2 is positive. No flip.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">4</div>
+        <div class="sc">
+          <div class="st">Now it's the simple form: x within distance 3 of 2</div>
+          <div class="sm">2 − 3 &lt; x &lt; 2 + 3  →  <span class="r">−1</span> &lt; x &lt; <span class="b">5</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">x ∈ (−1, 5). Geometrically: all points within distance 3 of 2.</div>
+    </div>
+  </div>
+
+  <div id="sign" style="padding-top:4px">
+  <div class="sec">The sign-flip rule — when and exactly why</div>
+
+  <p>The sign flips when you <strong>divide or multiply both sides of an inequality by a negative number</strong>. This has nothing to do with absolute values specifically — it's a general inequality rule. But it's worth understanding from the picture so you never misapply it.</p>
+
+  <div class="insight">
+    <div class="insight-label">Why dividing by a negative flips the inequality</div>
+    <div class="insight-body">On the number line, multiplying by −1 reflects everything through zero. 3 &gt; 1, but after reflecting: −3 &lt; −1. The larger number becomes the smaller one because it ends up further left. So &gt; becomes &lt; and vice versa. This always happens with negative multipliers.</div>
+  </div>
+
+  <div class="widget">
+    <div class="wlabel">Inequality flip — multiply by negative and watch what happens</div>
+    <canvas id="c4" height="180"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>Multiplier k</label>
+        <span class="cv" id="c4v">-2.0</span>
+        <input type="range" id="c4s" min="-4" max="4" step="0.1" value="-2" oninput="draw4()">
+      </div>
+      <div class="readout" id="c4r"></div>
+    </div>
+  </div>
+
+  <div class="callout c-warn">
+    <p><strong>The rule in absolute value problems:</strong> You will rarely need to flip a sign when working with |x − a| &lt; r, because you reduce everything to that form first. The flip happens earlier — when you divide out a negative coefficient to get to the standard form. Example: |−3x + 6| = 3|x − 2|. No flip needed inside the absolute value. Once it's |x − 2| &lt; something, you just do centre ± radius.</p>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 2.2 — negative coefficient</div>
+        <div class="prob-q">Solve |−3x + 6| &lt; 9.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Factor out the coefficient</div>
+          <div class="sm">|−3x + 6| = |<span class="r">−3</span>(x − 2)| = |<span class="r">−3</span>| · |x − 2| = <span class="b">3</span>|x − 2|</div>
+          <div class="sb">|−3| = 3, not −3. The absolute value makes it positive. No sign flip here.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Divide both sides by 3 (positive — no flip)</div>
+          <div class="sm">3|x − 2| &lt; 9  →  |x − 2| &lt; <span class="g">3</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="sc">
+          <div class="st">Centre ± radius</div>
+          <div class="sm">2 − 3 &lt; x &lt; 2 + 3  →  <span class="r">−1</span> &lt; x &lt; <span class="b">5</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">Same answer as before — |2x−4| and |−3x+6| produce the same interval here because both reduce to |x−2|.</div>
+    </div>
+  </div>
+  </div>
+
+  <div id="split" style="padding-top:4px">
+  <div class="sec">Splitting into cases — when the centre isn't obvious</div>
+
+  <p>Sometimes you can't factor cleanly, or the expression inside isn't linear. Then you split into cases based on whether the inside is positive or negative. This is just saying: a distance equals d means you went d to the right OR d to the left.</p>
+
+  <div class="fml">
+    <span class="lhs">|f(x)| = d</span>  means  <span class="rhs">f(x) = d  OR  f(x) = −d</span>
+    <span class="note">Two cases: the inside was positive (you just remove the bars) or negative (you flip the sign)</span>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 2.3 — splitting cases</div>
+        <div class="prob-q">Solve |x² − 4| &lt; 5.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Write as a double inequality (the standard form for &lt;)</div>
+          <div class="sm">−5 &lt; x² − 4 &lt; 5</div>
+          <div class="sb">|something| &lt; 5 means that something lives in (−5, 5). Split into two inequalities.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Add 4 to all three parts</div>
+          <div class="sm">−1 &lt; x² &lt; 9</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="sc">
+          <div class="st">Left side: x² &gt; −1 is always true (squares are never negative)</div>
+          <div class="sm">x² &gt; −1  →  <span class="g">always satisfied, ignore</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">4</div>
+        <div class="sc">
+          <div class="st">Right side: x² &lt; 9 means |x| &lt; 3</div>
+          <div class="sm">x² &lt; 9  →  |x| &lt; 3  →  <span class="r">−3</span> &lt; x &lt; <span class="b">3</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">x ∈ (−3, 3).</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  CHAPTER 3 — CALCULUS APPLICATIONS            -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="chapter" id="epsilon">
+  <div class="ch-num">Chapter 3 — Calculus Applications</div>
+  <h1 class="ch-title">The inequalities <em>calculus actually needs</em></h1>
+  <p class="ch-lead">Every ε–δ proof is a chain of absolute value manipulations. Here is every move you will need, with the geometric picture for each one.</p>
+  <hr class="ch">
+
+  <div class="sec">The ε–δ manipulations</div>
+
+  <p>When you write a limit proof, you are doing one thing: starting from <strong>|x − a| &lt; δ</strong> (you're close to a on the x-axis) and ending with <strong>|f(x) − L| &lt; ε</strong> (therefore you're close to L on the y-axis). Every step in between is an inequality manipulation.</p>
+
+  <p>The manipulations you actually need, in order of how often they appear:</p>
+
+  <div class="fml">
+    <span class="lhs">1. Factoring:</span>  |cx − ca| = |c| · |x − a|
+    <span class="note">Factor the constant out, absolute value makes it positive</span>
+  </div>
+  <div class="fml">
+    <span class="lhs">2. Dividing:</span>  if |x−a| &lt; δ and δ = ε/c, then c|x−a| &lt; ε
+    <span class="note">Multiply both sides by c (positive) — no flip</span>
+  </div>
+  <div class="fml">
+    <span class="lhs">3. Bounding:</span>  if |x−a| &lt; 1, then we can bound |x+a| ≤ M
+    <span class="note">Assume δ ≤ 1 first to get a handle on variable factors</span>
+  </div>
+  <div class="fml">
+    <span class="lhs">4. Triangle ineq:</span>  |A + B| ≤ |A| + |B|
+    <span class="note">The length of a sum ≤ sum of lengths — splitting complex expressions</span>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 3.1 — the full chain for a linear function</div>
+        <div class="prob-q">Prove lim<sub>x→3</sub> (5x − 2) = 13. Show every inequality step explicitly.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">S</div>
+        <div class="sc">
+          <div class="st">Scratch: what do we need to manipulate?</div>
+          <div class="sm">|f(x) − L| = |(5x − 2) − 13| = |5x − 15| = |<span class="b">5</span>(x − 3)| = <span class="b">5</span>|x − 3|</div>
+          <div class="sb">We need 5|x−3| &lt; ε. We control |x−3| &lt; δ. So 5|x−3| &lt; 5δ. Need 5δ ≤ ε → choose δ = ε/5.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Formal proof — start from assumption</div>
+          <div class="sm">Given ε &gt; 0. Choose δ = <span class="a">ε/5</span>.<br>Assume 0 &lt; |x − 3| &lt; δ.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Chain of inequalities</div>
+          <div class="sm">|(5x − 2) − 13|<br>= |5x − 15|<br>= |5| · |x − 3|       <span class="rl">&nbsp;&nbsp;← factor out 5</span><br>= 5|x − 3|<br>&lt; 5 · δ                <span class="rl">&nbsp;&nbsp;← use |x−3| &lt; δ</span><br>= 5 · (ε/5)<br>= <span class="g">ε  ✓</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">Every line is one move: factor, substitute the bound, simplify. That is all ε–δ proofs are.</div>
+    </div>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 3.2 — quadratic, needs bounding</div>
+        <div class="prob-q">Prove lim<sub>x→1</sub> x² = 1. Why do we need the min(1, ε/3) trick?</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">S</div>
+        <div class="sc">
+          <div class="st">Scratch: factor |x² − 1|</div>
+          <div class="sm">|x² − 1| = |(x−1)(x+1)| = |x−1| · |x+1|</div>
+          <div class="sb">We control |x−1| (it's less than δ). But |x+1| contains x, which we don't fully control. We need to bound it.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Assume δ ≤ 1 to cage x near 1</div>
+          <div class="sm">If |x − 1| &lt; 1, then  0 &lt; x &lt; 2<br>So  1 &lt; x + 1 &lt; 3<br>Therefore  |x + 1| &lt; <span class="a">3</span></div>
+          <div class="sb">We picked 1 as a convenient cage. Could pick any number; 1 is clean.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Now chain the inequalities</div>
+          <div class="sm">|x² − 1| = |x−1| · |x+1| &lt; δ · <span class="a">3</span> = 3δ</div>
+          <div class="sb">We need 3δ &lt; ε, so δ &lt; ε/3.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">3</div>
+        <div class="sc">
+          <div class="st">Choose δ satisfying BOTH constraints: δ ≤ 1 AND δ ≤ ε/3</div>
+          <div class="sm">δ = min(1, ε/3)</div>
+          <div class="sb">The min ensures both conditions hold simultaneously. If ε is large (say ε=100), then ε/3=33 but δ=1 keeps us caged. If ε is tiny (say ε=0.01), then ε/3=0.003 is the binding constraint.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">4</div>
+        <div class="sc">
+          <div class="st">Formal proof chain</div>
+          <div class="sm">|x² − 1| = |x−1|·|x+1| &lt; δ · 3 ≤ (ε/3) · 3 = <span class="g">ε  ✓</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">The min(1, ε/M) pattern appears in every quadratic or higher-degree ε–δ proof. Recognise it as "I need δ small enough to both cage the variable factor AND produce ε."</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="wlabel">The bounding step visualized — |x−1| &lt; δ constrains |x+1|</div>
+    <canvas id="c5" height="200"></canvas>
+    <div class="controls">
+      <div class="cg">
+        <label>δ (control radius)</label>
+        <span class="cv" id="c5v">0.50</span>
+        <input type="range" id="c5s" min="0.05" max="2" step="0.05" value="0.5" oninput="draw5()">
+      </div>
+      <div class="readout" id="c5r"></div>
+    </div>
+  </div>
+
+  <div id="triangle" style="padding-top:4px">
+  <div class="sec">The triangle inequality — why it's called that</div>
+
+  <p>The triangle inequality says <strong>|A + B| ≤ |A| + |B|</strong>. The name comes from geometry: in any triangle, one side is always shorter than the sum of the other two. On the number line, the distance from 0 to A+B is at most the distance from 0 to A plus the distance from 0 to B, because going via the middle is never shorter than going direct.</p>
+
+  <div class="insight">
+    <div class="insight-label">When you use it in calculus</div>
+    <div class="insight-body">When you have |f(x) − L| and you need to split it into manageable pieces. You write f(x) − L = (f(x) − f(a)) + (f(a) − L) and then use the triangle inequality to bound each piece separately. It lets you break hard problems into two easier ones.</div>
+  </div>
+
+  <div class="fml">
+    <span class="lhs">|A + B| ≤ |A| + |B|</span>  (triangle inequality)<br>
+    <span class="lhs">||A| − |B|| ≤ |A − B|</span>  (reverse triangle inequality)
+    <span class="note">The reverse form says the difference of distances ≤ the distance between points</span>
+  </div>
+  </div>
+
+  <div id="chain" style="padding-top:4px">
+  <div class="sec">Chaining inequalities — the full pattern</div>
+
+  <p>Most ε–δ proofs and most inequality problems in calculus involve a chain: you start with something and bound it step by step until you reach ε. Every link in the chain is one of three moves:</p>
+
+  <div class="callout c-tip">
+    <p><strong>Move 1 — Algebra:</strong> Factor, expand, simplify. |5x − 15| = 5|x − 3|.<br>
+    <strong>Move 2 — Substitute a bound:</strong> If |x−3| &lt; δ, replace it: 5|x−3| &lt; 5δ.<br>
+    <strong>Move 3 — Choose δ to finish:</strong> Set 5δ = ε, so δ = ε/5.</p>
+  </div>
+
+  <div class="problem">
+    <div class="prob-head">
+      <div>
+        <div class="prob-tag">Worked example 3.3 — full chain, harder case</div>
+        <div class="prob-q">In a proof that lim<sub>x→2</sub> (x² + 3x) = 10, show the complete chain once δ = min(1, ε/8) is chosen.</div>
+      </div>
+    </div>
+    <div class="prob-body">
+      <div class="step">
+        <div class="sn">S</div>
+        <div class="sc">
+          <div class="st">Scratch: factor |(x²+3x) − 10|</div>
+          <div class="sm">|(x²+3x) − 10| = |x² + 3x − 10| = |(x−2)(x+5)| = |x−2|·|x+5|</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">1</div>
+        <div class="sc">
+          <div class="st">Bound |x+5| using |x−2| &lt; 1</div>
+          <div class="sm">|x−2| &lt; 1  →  1 &lt; x &lt; 3  →  6 &lt; x+5 &lt; 8  →  |x+5| &lt; <span class="a">8</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="sn">2</div>
+        <div class="sc">
+          <div class="st">Choose δ = min(1, ε/8) and write the chain</div>
+          <div class="sm">|(x²+3x)−10|<br>= |x−2| · |x+5|<br>&lt; δ · 8                <span class="rl">&nbsp;&nbsp;← |x−2|&lt;δ, |x+5|&lt;8</span><br>≤ (ε/8) · 8          <span class="rl">&nbsp;&nbsp;← δ ≤ ε/8</span><br>= <span class="g">ε  ✓</span></div>
+        </div>
+      </div>
+      <div class="verdict v-yes">The pattern is always: factor → bound the variable part → choose δ → chain to ε.</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  CHAPTER 4 — PRACTICE                         -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="chapter" id="practice">
+  <div class="ch-num">Chapter 4 — Practice</div>
+  <h1 class="ch-title">Problems to <em>work through</em></h1>
+  <p class="ch-lead">Each one uses a specific move from the chapters above. Try it yourself first — the solution is hidden until you click.</p>
+  <hr class="ch">
+  <div id="prac-container"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  CANVAS UTILITIES
+// ══════════════════════════════════════
+const PAPER='#faf7f2',PAPER2='#f2ede4',RULE='#d4c8b8';
+const INK='#1c1814',INK2='#4a4238',INK3='#8a7e70';
+const RED='#b83232',BLUE='#1e4fa8',GREEN='#1a6b3a',AMBER='#a05c10',PURPLE='#5a2888',TEAL='#0e6b7a';
+
+function sc(id){
+  const c=document.getElementById(id);
+  const w=Math.min(c.parentElement.getBoundingClientRect().width-40,740);
+  c.width=w; return [c,c.getContext('2d'),w,c.height];
+}
+
+// Draw a number line
+function numberLine(ctx,w,y,x0,x1,p=40){
+  ctx.strokeStyle=INK3;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke();
+  // ticks and labels
+  ctx.fillStyle=INK3;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  for(let x=Math.ceil(x0);x<=Math.floor(x1);x++){
+    const px=nlX(x,x0,x1,w,p);
+    ctx.beginPath();ctx.moveTo(px,y-4);ctx.lineTo(px,y+4);ctx.strokeStyle=RULE;ctx.lineWidth=0.5;ctx.stroke();
+    ctx.fillText(x,px,y+16);
+  }
+  // arrowheads
+  ctx.strokeStyle=INK3;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(w-p,y);ctx.lineTo(w-p-8,y-4);ctx.moveTo(w-p,y);ctx.lineTo(w-p-8,y+4);ctx.stroke();
+}
+function nlX(x,x0,x1,w,p=40){return p+(x-x0)/(x1-x0)*(w-2*p);}
+
+function dot(ctx,x,y,col,r=6){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();}
+function odot(ctx,x,y,col,bg,r=6){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=bg;ctx.fill();}
+
+// ══════════════════════════════════════
+//  CANVAS 1 — |x| from zero
+// ══════════════════════════════════════
+function draw1(){
+  const [c,ctx,w,h]=sc('c1');
+  const xv=+document.getElementById('c1s').value;
+  document.getElementById('c1v').textContent=xv.toFixed(1);
+  ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+
+  const x0=-7,x1=7,ly=55,p=40;
+  numberLine(ctx,w,ly,x0,x1,p);
+
+  // distance arc
+  const ox=nlX(0,x0,x1,w,p),px=nlX(xv,x0,x1,w,p);
+  ctx.strokeStyle=BLUE;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(ox,ly);ctx.lineTo(px,ly);ctx.stroke();
+
+  // Arrow for distance
+  const mid=(ox+px)/2;
+  ctx.fillStyle=BLUE;ctx.font='12px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('|x| = '+Math.abs(xv).toFixed(1),mid,ly-18);
+  ctx.beginPath();ctx.setLineDash([3,3]);ctx.moveTo(mid,ly-14);ctx.lineTo(mid,ly-4);ctx.stroke();ctx.setLineDash([]);
+
+  dot(ctx,ox,ly,'#fff',5);ctx.strokeStyle=INK3;ctx.lineWidth=1;ctx.beginPath();ctx.arc(ox,ly,5,0,Math.PI*2);ctx.stroke();
+  dot(ctx,px,ly,RED);
+
+  ctx.fillStyle=RED;ctx.font='12px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('x = '+xv.toFixed(1),px,ly+28);
+  ctx.fillStyle=INK3;ctx.fillText('0',ox,ly+28);
+
+  document.getElementById('c1r').innerHTML=
+    `<span class="rl">x = </span><span class="rr">${xv.toFixed(1)}</span><br>
+     <span class="rl">|x| = distance from x to 0 = </span><span class="rb">${Math.abs(xv).toFixed(1)}</span><br>
+     <span class="rl">Both +${Math.abs(xv).toFixed(1)} and −${Math.abs(xv).toFixed(1)} are the same distance from 0.</span>`;
+}
+
+// ══════════════════════════════════════
+//  CANVAS 2 — |x - a|
+// ══════════════════════════════════════
+function draw2(){
+  const [c,ctx,w,h]=sc('c2');
+  const xv=+document.getElementById('c2xs').value;
+  const av=+document.getElementById('c2as').value;
+  document.getElementById('c2xv').textContent=xv.toFixed(1);
+  document.getElementById('c2av').textContent=av.toFixed(1);
+  ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+
+  const x0=-7,x1=7,ly=60,p=40;
+  numberLine(ctx,w,ly,x0,x1,p);
+
+  const ax=nlX(av,x0,x1,w,p),px=nlX(xv,x0,x1,w,p);
+  const dist=Math.abs(xv-av);
+
+  // Distance segment
+  const lo=Math.min(ax,px),hi=Math.max(ax,px);
+  ctx.fillStyle='rgba(30,79,168,0.12)';
+  ctx.fillRect(lo,ly-8,hi-lo,16);
+  ctx.strokeStyle=BLUE;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(lo,ly);ctx.lineTo(hi,ly);ctx.stroke();
+
+  dot(ctx,ax,ly,GREEN);
+  dot(ctx,px,ly,RED);
+
+  ctx.fillStyle=GREEN;ctx.font='12px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('a='+av.toFixed(1),ax,ly+26);
+  ctx.fillStyle=RED;ctx.fillText('x='+xv.toFixed(1),px,ly+26);
+
+  // Label distance
+  const mid=(ax+px)/2;
+  ctx.fillStyle=BLUE;ctx.font='12px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('|x−a| = '+dist.toFixed(2),mid,ly-20);
+
+  // Second point equidistant
+  const mirror=av-(xv-av);
+  if(mirror>=x0&&mirror<=x1){
+    const mx=nlX(mirror,x0,x1,w,p);
+    odot(ctx,mx,ly,PURPLE,PAPER);
+    ctx.fillStyle=PURPLE;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+    ctx.fillText('mirror: '+(mirror).toFixed(1),mx,ly+40);
+    ctx.fillText('same distance!',mx,ly+54);
+  }
+
+  document.getElementById('c2r').innerHTML=
+    `<span class="rl">x = </span><span class="rr">${xv.toFixed(2)}</span>  <span class="rl">a = </span><span class="rg">${av.toFixed(2)}</span><br>
+     <span class="rl">|x − a| = </span><span class="rb">${dist.toFixed(4)}</span><br>
+     <span class="rl">Mirror point = </span><span class="rp">${mirror.toFixed(2)}</span>  <span class="rl">(same distance, opposite side)</span>`;
+}
+
+// ══════════════════════════════════════
+//  CANVAS 3 — inequality interval
+// ══════════════════════════════════════
+function draw3(){
+  const [c,ctx,w,h]=sc('c3');
+  const av=+document.getElementById('c3as').value;
+  const rv=+document.getElementById('c3rs').value;
+  const xv=+document.getElementById('c3xs').value;
+  document.getElementById('c3av').textContent=av.toFixed(1);
+  document.getElementById('c3rv').textContent=rv.toFixed(1);
+  document.getElementById('c3xv').textContent=xv.toFixed(1);
+  ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+
+  const x0=-9,x1=9,ly=70,p=40;
+  numberLine(ctx,w,ly,x0,x1,p);
+
+  const ax=nlX(av,x0,x1,w,p);
+  const lx=nlX(av-rv,x0,x1,w,p);
+  const rx=nlX(av+rv,x0,x1,w,p);
+  const px=nlX(xv,x0,x1,w,p);
+  const inside=Math.abs(xv-av)<rv;
+
+  // Interval fill
+  ctx.fillStyle='rgba(30,79,168,0.12)';
+  ctx.fillRect(lx,ly-14,rx-lx,28);
+  ctx.strokeStyle=BLUE;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(rx,ly);ctx.stroke();
+
+  // Radius arrows
+  ctx.strokeStyle=BLUE;ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(ax,ly-24);ctx.lineTo(rx,ly-24);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ax,ly-24);ctx.lineTo(lx,ly-24);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=BLUE;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('r',ax,ly-32);
+  ctx.fillText('r',ax,ly-32);
+  ctx.fillText('←  r = '+rv.toFixed(1)+'  →',ax,ly-32);
+
+  // Endpoints
+  odot(ctx,lx,ly,BLUE,PAPER);odot(ctx,rx,ly,BLUE,PAPER);
+  ctx.fillStyle=INK3;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText((av-rv).toFixed(1),lx,ly+20);
+  ctx.fillText((av+rv).toFixed(1),rx,ly+20);
+
+  // Centre
+  dot(ctx,ax,ly,GREEN,4);
+  ctx.fillStyle=GREEN;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('a='+av.toFixed(1),ax,ly+34);
+
+  // Test point
+  dot(ctx,px,ly,inside?RED:AMBER);
+  ctx.fillStyle=inside?RED:AMBER;ctx.font='12px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('x='+xv.toFixed(1),px,ly+50);
+
+  const dist=Math.abs(xv-av);
+  document.getElementById('c3r').innerHTML=
+    `<span class="rl">|x − a| = |${xv.toFixed(2)} − ${av.toFixed(2)}| = </span><span class="rb">${dist.toFixed(3)}</span><br>
+     <span class="rl">r = </span><span class="rb">${rv.toFixed(2)}</span>  →  ${inside?`<span class="rg">inside: ${dist.toFixed(3)} &lt; ${rv.toFixed(2)} ✓</span>`:`<span class="ra">outside: ${dist.toFixed(3)} ≥ ${rv.toFixed(2)}</span>`}<br>
+     <span class="rl">Interval: (${(av-rv).toFixed(2)}, ${(av+rv).toFixed(2)})</span>`;
+}
+
+// ══════════════════════════════════════
+//  CANVAS 4 — sign flip
+// ══════════════════════════════════════
+function draw4(){
+  const [c,ctx,w,h]=sc('c4');
+  const k=+document.getElementById('c4s').value;
+  document.getElementById('c4v').textContent=k.toFixed(1);
+  ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+
+  const x0=-8,x1=8,ly1=55,ly2=130,p=40;
+  // Original line
+  ctx.fillStyle=INK3;ctx.font='11px "JetBrains Mono"';ctx.textAlign='left';
+  ctx.fillText('original:',p,ly1-22);
+  numberLine(ctx,w,ly1,x0,x1,p);
+  // Points A=1, B=3 (A < B)
+  const A=1,B=3;
+  dot(ctx,nlX(A,x0,x1,w,p),ly1,BLUE);
+  dot(ctx,nlX(B,x0,x1,w,p),ly1,RED);
+  ctx.fillStyle=BLUE;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('A=1',nlX(A,x0,x1,w,p),ly1+18);
+  ctx.fillStyle=RED;ctx.fillText('B=3',nlX(B,x0,x1,w,p),ly1+18);
+  ctx.fillStyle=INK2;ctx.textAlign='center';
+  ctx.fillText('A < B',w/2,ly1-20);
+
+  // Multiplied line
+  ctx.fillStyle=INK3;ctx.textAlign='left';
+  ctx.fillText('after ×('+k.toFixed(1)+'):',p,ly2-22);
+  numberLine(ctx,w,ly2,x0,x1,p);
+  const kA=k*A,kB=k*B;
+  dot(ctx,nlX(kA,x0,x1,w,p),ly2,BLUE);
+  dot(ctx,nlX(kB,x0,x1,w,p),ly2,RED);
+  ctx.fillStyle=BLUE;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('kA='+(kA).toFixed(1),nlX(Math.max(x0+0.5,Math.min(x1-0.5,kA)),x0,x1,w,p),ly2+18);
+  ctx.fillStyle=RED;
+  ctx.fillText('kB='+(kB).toFixed(1),nlX(Math.max(x0+0.5,Math.min(x1-0.5,kB)),x0,x1,w,p),ly2+18);
+  const rel=kA<kB?'kA < kB (same order, no flip)':'kA > kB (ORDER REVERSED — flip!)';
+  const relCol=k>0?GREEN:RED;
+  ctx.fillStyle=relCol;ctx.textAlign='center';
+  ctx.fillText(rel,w/2,ly2-20);
+
+  document.getElementById('c4r').innerHTML=
+    `<span class="rl">A=1, B=3, k=${k.toFixed(1)}</span><br>
+     <span class="rl">A < B originally.</span><br>
+     ${k>0?`<span class="rg">k > 0: kA=${kA.toFixed(1)} < kB=${kB.toFixed(1)} — direction preserved</span>`:`<span class="rr">k < 0: kA=${kA.toFixed(1)} > kB=${kB.toFixed(1)} — direction FLIPPED</span>`}`;
+}
+
+// ══════════════════════════════════════
+//  CANVAS 5 — bounding |x+1| from |x−1|<δ
+// ══════════════════════════════════════
+function draw5(){
+  const [c,ctx,w,h]=sc('c5');
+  const dv=+document.getElementById('c5s').value;
+  document.getElementById('c5v').textContent=dv.toFixed(2);
+  ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+
+  const x0=-3,x1=5,ly=85,p=40;
+  numberLine(ctx,w,ly,x0,x1,p);
+
+  // δ band around a=1
+  const a=1;
+  const ax=nlX(a,x0,x1,w,p);
+  const lx=nlX(a-dv,x0,x1,w,p);
+  const rx=nlX(a+dv,x0,x1,w,p);
+
+  ctx.fillStyle='rgba(30,79,168,0.12)';ctx.fillRect(lx,ly-12,rx-lx,24);
+  ctx.strokeStyle=BLUE;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(rx,ly);ctx.stroke();
+  ctx.fillStyle=BLUE;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('|x−1| < δ = '+dv.toFixed(2),(lx+rx)/2,ly-20);
+  ctx.fillText(''+(a-dv).toFixed(2),lx,ly+18);
+  ctx.fillText(''+(a+dv).toFixed(2),rx,ly+18);
+  odot(ctx,lx,ly,BLUE,PAPER);odot(ctx,rx,ly,BLUE,PAPER);
+  dot(ctx,ax,ly,BLUE,4);
+
+  // |x+1| range
+  const xLo=a-dv, xHi=a+dv;
+  const xp1Lo=xLo+1, xp1Hi=xHi+1;
+  const xlx=nlX(xp1Lo,x0,x1,w,p),xrx=nlX(xp1Hi,x0,x1,w,p);
+
+  ctx.fillStyle='rgba(26,107,58,0.12)';ctx.fillRect(xlx,ly+50-12,xrx-xlx,24);
+  ctx.strokeStyle=GREEN;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(xlx,ly+50);ctx.lineTo(xrx,ly+50);ctx.stroke();
+  ctx.fillStyle=GREEN;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  ctx.fillText('|x+1| range: ('+xp1Lo.toFixed(2)+', '+xp1Hi.toFixed(2)+')',(xlx+xrx)/2,ly+50-20);
+  ctx.fillText('max |x+1| = '+xp1Hi.toFixed(2),(xlx+xrx)/2,ly+50+22);
+  odot(ctx,xlx,ly+50,GREEN,PAPER);odot(ctx,xrx,ly+50,GREEN,PAPER);
+
+  // Constraint note
+  ctx.fillStyle=AMBER;ctx.font='11px "JetBrains Mono"';ctx.textAlign='center';
+  if(dv<=1){ctx.fillText('δ ≤ 1 ✓  →  |x+1| < '+(1+1+Math.min(dv,1)).toFixed(2),w/2,h-14);}
+  else{ctx.fillText('δ > 1: |x+1| could be > 3. Need δ ≤ 1 first.',w/2,h-14);}
+
+  document.getElementById('c5r').innerHTML=
+    `<span class="rl">a = 1,  δ = </span><span class="rb">${dv.toFixed(2)}</span><br>
+     <span class="rl">x ∈ (${(a-dv).toFixed(2)}, ${(a+dv).toFixed(2)})</span><br>
+     <span class="rl">x+1 ∈ (${xp1Lo.toFixed(2)}, ${xp1Hi.toFixed(2)})</span><br>
+     <span class="rl">So |x+1| &lt; </span><span class="rg">${xp1Hi.toFixed(2)}</span>  ${dv<=1?'<span class="rg">← this is the bound M</span>':'<span class="ra">← pick δ ≤ 1 to cage this at 3</span>'}`;
+}
+
+// ══════════════════════════════════════
+//  PRACTICE PROBLEMS
+// ══════════════════════════════════════
+const probs=[
+  {
+    tag:'Translate to geometry',
+    q:'What does |x − 5| < 2 mean geometrically? Write the solution interval without using any rules.',
+    steps:[
+      {t:'Read as distance',b:'x is within distance 2 of 5.'},
+      {t:'Draw the interval',m:'Centre = 5, radius = 2  →  5−2 < x < 5+2'},
+      {t:'Answer',m:'3 < x < 7  →  x ∈ (3, 7)'},
+    ],v:'yes',a:'(3, 7). No rule needed — just centre ± radius.'
+  },
+  {
+    tag:'Factoring',
+    q:'Simplify |3x − 12|. Then solve |3x − 12| < 6.',
+    steps:[
+      {t:'Factor',m:'|3x − 12| = |3(x − 4)| = |3|·|x − 4| = 3|x − 4|'},
+      {t:'Substitute',m:'3|x − 4| < 6  →  |x − 4| < 2  (divide by 3, positive, no flip)'},
+      {t:'Geometry',m:'x within distance 2 of 4  →  2 < x < 6'},
+    ],v:'yes',a:'x ∈ (2, 6).'
+  },
+  {
+    tag:'Negative coefficient',
+    q:'Solve |−4x + 8| ≤ 12.',
+    steps:[
+      {t:'Factor',m:'|−4(x − 2)| = |−4|·|x − 2| = 4|x − 2|'},
+      {t:'Divide by 4 (positive)',m:'4|x − 2| ≤ 12  →  |x − 2| ≤ 3  (no flip — 4 is positive)'},
+      {t:'Geometry',m:'x within distance 3 of 2  →  −1 ≤ x ≤ 5'},
+    ],v:'yes',a:'x ∈ [−1, 5]. The negative sign inside was absorbed by |−4| = 4.'
+  },
+  {
+    tag:'Identify the centre',
+    q:'Solve |2x + 6| < 4. (Careful — where is the centre?)',
+    steps:[
+      {t:'Factor to reveal centre',m:'|2x + 6| = |2(x + 3)| = 2|x + 3| = 2|x − (−3)|'},
+      {t:'Centre is −3, not +3',m:'2|x − (−3)| < 4  →  |x − (−3)| < 2'},
+      {t:'Geometry: within distance 2 of −3',m:'−3 − 2 < x < −3 + 2  →  −5 < x < −1'},
+    ],v:'yes',a:'x ∈ (−5, −1). The centre is −3 because |x + 3| = |x − (−3)|.'
+  },
+  {
+    tag:'ε–δ scratch work',
+    q:'Find δ in terms of ε for the limit lim<sub>x→4</sub> (3x + 1) = 13.',
+    steps:[
+      {t:'Compute |f(x) − L|',m:'|(3x+1) − 13| = |3x − 12| = |3(x−4)| = 3|x−4|'},
+      {t:'Need 3|x−4| < ε',m:'|x − 4| < ε/3'},
+      {t:'Choose δ',m:'δ = ε/3'},
+      {t:'Verify the chain',m:'|(3x+1)−13| = 3|x−4| < 3·δ = 3·(ε/3) = ε ✓'},
+    ],v:'yes',a:'δ = ε/3. The chain: factor out 3, bound using |x−4| < δ, set 3δ = ε.'
+  },
+  {
+    tag:'ε–δ with bounding',
+    q:'For lim<sub>x→2</sub> x² = 4, why is δ = min(1, ε/5) sufficient? What does the 5 come from?',
+    steps:[
+      {t:'Factor',m:'|x²−4| = |x−2|·|x+2|'},
+      {t:'Assume δ ≤ 1 to bound |x+2|',m:'|x−2| < 1  →  1 < x < 3  →  3 < x+2 < 5  →  |x+2| < 5'},
+      {t:'The 5 is the bound on |x+2|',m:'|x²−4| < δ · 5  ≤ (ε/5) · 5 = ε'},
+      {t:'δ = min(1, ε/5)',m:'min ensures both: |x+2| is caged (δ≤1) and 5δ ≤ ε (δ≤ε/5)'},
+    ],v:'yes',a:'The 5 comes from bounding |x+2| < 5 when |x−2| < 1. Always comes from the variable factor.'
+  },
+];
+
+function buildPractice(){
+  const ct=document.getElementById('prac-container');
+  probs.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='prac';
+    d.innerHTML=`
+      <div class="prac-head" onclick="toggleP(${i})">
+        <div>
+          <div class="prac-tag">${p.tag}</div>
+          <div class="prac-q">${p.q}</div>
+        </div>
+        <div class="prac-toggle" id="pt${i}">Show solution ▼</div>
+      </div>
+      <div class="prac-body" id="pb${i}">
+        ${p.steps.map((s,j)=>`
+          <div class="step">
+            <div class="sn">${j+1}</div>
+            <div class="sc">
+              <div class="st">${s.t}</div>
+              ${s.m?`<div class="sm">${s.m}</div>`:''}
+              ${s.b?`<div class="sb">${s.b}</div>`:''}
+            </div>
+          </div>`).join('')}
+        <div class="verdict ${p.v==='yes'?'v-yes':'v-no'}">${p.v==='yes'?'✓':'✗'} ${p.a}</div>
+      </div>`;
+    ct.appendChild(d);
+  });
+}
+function toggleP(i){
+  const b=document.getElementById('pb'+i);
+  const t=document.getElementById('pt'+i);
+  const open=b.style.display==='none'||b.style.display==='';
+  b.style.display=open?'block':'none';
+  t.textContent=open?'Hide solution ▲':'Show solution ▼';
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+function drawAll(){draw1();draw2();draw3();draw4();draw5();}
+drawAll();
+buildPractice();
+window.addEventListener('resize',drawAll);
+
+// Nav highlight
+const navLinks=document.querySelectorAll('nav a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  navLinks.forEach(l=>{
+    const id=l.getAttribute('href').slice(1);
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=150)cur=id;
+  });
+  navLinks.forEach(l=>l.classList.toggle('active',l.getAttribute('href').slice(1)===cur));
+},{passive:true});
+</script>
+</body>
+</html>

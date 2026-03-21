@@ -430,7 +430,7 @@ export default {
       id: 'ch2-000-ex8',
       title: 'Galileo\'s Falling Ball: Derivative from First Principles (Physics)',
       problem: 'Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s². Use the limit definition to find the velocity $v(t) = y\'(t)$, then evaluate at $t = 3$ s. Interpret the result.',
-      visualizationId: 'ShrinkingInterval',
+      visualizationId: 'ProjectileMotion',
       steps: [
         { expression: "v(t) = \\lim_{h \\to 0} \\frac{y(t+h) - y(t)}{h}", annotation: 'The velocity at time t is the derivative of position — defined as the limit of average velocities.' },
         { expression: "y(t+h) = \\frac{1}{2}g(t+h)^2 = \\frac{g}{2}(t^2 + 2th + h^2)", annotation: 'Expand (t+h)².' },

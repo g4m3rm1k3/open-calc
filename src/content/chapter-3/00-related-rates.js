@@ -44,6 +44,16 @@ export default {
         title: 'The Sliding Ladder Geometry',
         body: 'The ladder, wall, and ground always form a right triangle with hypotenuse L (fixed). As x increases from 0 to L, y decreases from L to 0. The rate equation dy/dt = -(x/y)·(dx/dt) shows: when x/y is small (nearly vertical ladder), the top slides slowly. When x/y is large (nearly horizontal ladder), the top plummets. The singularity at y = 0 is a genuine physical phenomenon — the top accelerates without bound as it approaches the floor.',
       },
+      {
+        type: 'misconception',
+        title: 'Differentiating x² Does NOT Give 2x in Related Rates',
+        body: "In related rates, d/dt[x²] = 2x·(dx/dt), NOT just 2x. Every variable depends on t, so every differentiation must include the chain rule factor. Forgetting dx/dt turns a rate equation into a position equation — completely wrong. If you see 2x without a (dx/dt) factor, you forgot the chain rule.",
+      },
+      {
+        type: 'history',
+        title: 'Archimedes and the Sand Reckoner',
+        body: "Archimedes (287–212 BC) computed rates of change for geometric quantities — the area of a growing circle, the volume of a filling sphere — using arguments remarkably similar to modern related rates. His 'method of exhaustion' anticipated calculus by 2000 years. The formalized chain rule came from Leibniz in the 1680s.",
+      },
     ],
   },
 
@@ -186,6 +196,7 @@ export default {
       id: 'ch3-000-ex7',
       title: 'Spreading Circular Oil Slick',
       problem: '\\text{A circular oil slick grows at } dA/dt = 50 \\text{ m}^2/\\text{hr. Find } dr/dt \\text{ when } r = 10 \\text{ m.}',
+      visualizationId: 'RelatedRatesLadder',
       steps: [
         { expression: 'A = \\pi r^2', annotation: 'Area of a circle. Both A and r depend on t.' },
         { expression: '\\frac{dA}{dt} = 2\\pi r\\,\\frac{dr}{dt}', annotation: 'Differentiate both sides with respect to t. d/dt[πr²] = 2πr·(dr/dt).' },
