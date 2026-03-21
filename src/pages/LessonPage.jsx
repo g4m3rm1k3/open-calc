@@ -2,9 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { LESSON_MAP, ALL_LESSONS } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
-import IntegratedLesson from '../components/lesson/IntegratedLesson.jsx'
-import ScrubbableExample from '../components/lesson/ScrubbableExample.jsx'
-import ChallengeBlock from '../components/lesson/ChallengeBlock.jsx'
+import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
@@ -48,7 +46,7 @@ export default function LessonPage() {
   const nextLesson = lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null
 
   return (
-    <article>
+    <article className="max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5 flex-wrap">
         <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">Home</Link>
@@ -96,41 +94,10 @@ export default function LessonPage() {
         </div>
       )}
 
-      {/* Integrated Lesson Flow */}
+      {/* Micro-Cycle Lesson Flow */}
       <section className="mb-10 w-full">
-        <IntegratedLesson lesson={lesson} />
+        <MicroCycleLesson lesson={lesson} />
       </section>
-
-      {/* Examples */}
-      {lesson.examples?.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-5 flex items-center gap-2">
-            <span className="text-2xl">📝</span> Worked Examples
-          </h2>
-          {lesson.examples.map((ex, i) => (
-            <ScrubbableExample
-              key={ex.id}
-              example={ex}
-              number={i + 1}
-            />
-          ))}
-        </section>
-      )}
-
-      {/* Challenges */}
-      {lesson.challenges?.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
-            <span className="text-2xl">🎯</span> Challenge Problems
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-5 italic">
-            Try each problem before revealing the walkthrough. The struggle is where learning happens.
-          </p>
-          {lesson.challenges.map((ch, i) => (
-            <ChallengeBlock key={ch.id} challenge={ch} number={i + 1} />
-          ))}
-        </section>
-      )}
 
       {/* Cross references */}
       {lesson.crossRefs?.length > 0 && (
