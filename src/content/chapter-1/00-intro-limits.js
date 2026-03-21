@@ -270,6 +270,23 @@ export default {
       ],
       conclusion: 'The scratchwork shows you what δ to choose. The formal proof then chains the inequalities to verify the choice works. For any tolerance ε in the output, choosing δ = ε/5 guarantees f(x) lands within ε of 8.',
     },
+    {
+      id: 'ex-avg-to-instant-velocity',
+      title: 'Average Velocity → Instantaneous Velocity (Physics)',
+      problem: 'A ball is dropped from rest at a height of 80 ft. Its height (in feet) is $h(t) = 80 - 16t^2$ where $t$ is in seconds. (a) Compute the average velocity over $[1,\\; 1+\\Delta t]$ for $\\Delta t = 1, 0.5, 0.1, 0.01$. (b) What value does the average velocity approach as $\\Delta t \\to 0$? (c) Compute the limit directly.',
+      visualizationId: 'ShrinkingInterval',
+      steps: [
+        { expression: '\\text{Avg velocity} = \\frac{h(1 + \\Delta t) - h(1)}{\\Delta t}', annotation: 'Average velocity = change in height ÷ change in time. This is the difference quotient — the slope of the secant line.' },
+        { expression: 'h(1) = 80 - 16(1)^2 = 64 \\text{ ft}', annotation: 'Height at t=1 second.' },
+        { expression: 'h(1 + \\Delta t) = 80 - 16(1+\\Delta t)^2 = 80 - 16(1 + 2\\Delta t + \\Delta t^2)', annotation: 'Expand (1+Δt)².' },
+        { expression: '= 64 - 32\\Delta t - 16\\Delta t^2', annotation: 'Distribute and simplify: 80 - 16 = 64.' },
+        { expression: '\\frac{h(1+\\Delta t)-h(1)}{\\Delta t} = \\frac{(64-32\\Delta t - 16\\Delta t^2) - 64}{\\Delta t} = \\frac{-32\\Delta t - 16\\Delta t^2}{\\Delta t}', annotation: 'Subtract h(1)=64 and form the quotient.' },
+        { expression: '= \\frac{\\Delta t(-32 - 16\\Delta t)}{\\Delta t} = -32 - 16\\Delta t', annotation: 'Factor Δt from numerator and cancel (valid for Δt ≠ 0).' },
+        { expression: '\\lim_{\\Delta t \\to 0}(-32 - 16\\Delta t) = -32 \\text{ ft/s}', annotation: 'As Δt → 0, the term −16Δt → 0. The instantaneous velocity at t=1 is exactly −32 ft/s.' },
+        { expression: '\\Delta t=1:\\;-48,\\quad \\Delta t=0.5:\\;-40,\\quad \\Delta t=0.1:\\;-33.6,\\quad \\Delta t=0.01:\\;-32.16', annotation: 'Numerical check: the average velocities converge to −32 ft/s from above.' },
+      ],
+      conclusion: 'The instantaneous velocity at t=1 is −32 ft/s (the ball is falling at 32 ft/s). The negative sign means the height is decreasing — the ball is moving downward. This is precisely the derivative h\'(1) = −32t|_{t=1} = −32, which we\'ll compute using rules in Chapter 2. The limit is the engine that converts "average over an interval" into "instantaneous at a point."',
+    },
   ],
 
   challenges: [

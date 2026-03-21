@@ -215,6 +215,22 @@ export default {
       ],
       conclusion: 'f(x) = 2x³ - 3x² - 12x + 4 has a local maximum at (-1, 11) and a local minimum at (2, -16). The function rises on (-∞,-1), falls on (-1,2), and rises on (2,∞). The inflection point is where f\'\' = 0: 12x - 6 = 0, x = 1/2, f(1/2) = 2(1/8) - 3(1/4) - 6 + 4 = 1/4 - 3/4 - 2 = -5/2. Inflection at (1/2, -5/2).',
     },
+    {
+      id: 'ch3-003-ex8',
+      title: 'Maximum Height of a Thrown Ball (Physics)',
+      problem: 'A ball is thrown vertically upward from ground level with initial velocity $v_0 = 64$ ft/s. Its height is $h(t) = 64t - 16t^2$ feet. (a) Find the maximum height and when it occurs. (b) Interpret $h\'(t)$ and $h\'\'(t)$ physically. (c) Sketch $h(t)$, $h\'(t)$, $h\'\'(t)$ and identify all key features.',
+      visualizationId: 'VerticalThrow',
+      steps: [
+        { expression: "h'(t) = 64 - 32t", annotation: 'Velocity: power rule gives d/dt[64t]=64 and d/dt[-16t²]=-32t. This is v(t) = 64 - 32t, which decreases linearly — the ball slows as it rises.' },
+        { expression: "h'(t) = 0 \\Rightarrow 64 - 32t = 0 \\Rightarrow t = 2 \\text{ s}", annotation: 'Maximum height when velocity = 0. The ball momentarily stops at t=2 s — this is the critical point. Set h\'=0 and solve.' },
+        { expression: "h''(t) = -32 \\text{ ft/s}^2", annotation: 'Acceleration is constant at -32 ft/s² — this is gravitational deceleration (g ≈ 32 ft/s² downward). h\'\'< 0 everywhere confirms every critical point is a maximum.' },
+        { expression: "h(2) = 64(2) - 16(4) = 128 - 64 = 64 \\text{ ft}", annotation: 'Maximum height: substitute t=2 into h(t). The ball reaches 64 feet — same as the initial velocity numerically (not a coincidence: h_max = v₀²/64).' },
+        { expression: "h(t) = 0 \\Rightarrow 16t(4 - t) = 0 \\Rightarrow t = 0 \\text{ and } t = 4 \\text{ s}", annotation: 'Ball returns to ground at t=4 s. Total airtime = 4 s = 2 × (time to peak), as expected by symmetry.' },
+        { expression: "\\text{Sign chart: } h'(t) > 0 \\text{ on } (0,2), \\quad h'(t) < 0 \\text{ on } (2,4)", annotation: 'Ball rises for t∈(0,2) and falls for t∈(2,4). The maximum at t=2 is confirmed by the sign change + to -.' },
+        { expression: "h''(t) = -32 < 0 \\text{ for all } t", annotation: 'h\'\'< 0 everywhere: h is concave down for its entire domain. This means h\'(t) is always decreasing — the ball continuously decelerates under gravity.' },
+      ],
+      conclusion: 'Maximum height of 64 ft at t=2 s, confirmed by three methods: (1) h\'(2)=0 is a critical point, (2) h\'\'=-32<0 confirms local max, (3) sign chart shows h\' changes + to -. The constant h\'\'=-32 means gravity pulls the ball down with constant acceleration throughout. The graph of h(t) is a downward parabola — symmetric about its peak. The graph of h\'(t)=64-32t is a line crossing zero at t=2. The graph of h\'\'(t)=-32 is a horizontal line below the axis.',
+    },
   ],
 
   challenges: [

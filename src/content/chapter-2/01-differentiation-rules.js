@@ -428,6 +428,22 @@ export default {
       ],
       conclusion: 'Both methods agree: f\'(x) = 4x\u00b3 + 4x = 4x(x\u00b2+1). Note that 2u\u00b7u\' = 2(x\u00b2+1)\u00b72x is actually a preview of the chain rule result d/dx[u\u207f] = nu\u207f\u207b\u00b9u\'.',
     },
+    {
+      id: 'ch2-001-ex9',
+      title: 'Complete Kinematics: Position, Velocity, Acceleration (Physics)',
+      problem: 'A particle moves along a line with position $x(t) = 2t^3 - 9t^2 + 12t$ metres, $t \\geq 0$. (a) Find velocity $v(t) = x\'(t)$ and acceleration $a(t) = x\'\'(t)$. (b) When is the particle at rest? (c) When is it moving right vs left? (d) When is it speeding up vs slowing down?',
+      visualizationId: 'PositionVelocityAcceleration',
+      steps: [
+        { expression: "v(t) = x'(t) = 6t^2 - 18t + 12", annotation: 'Power rule: d/dt[2t\u00b3]=6t\u00b2, d/dt[-9t\u00b2]=-18t, d/dt[12t]=12.' },
+        { expression: "a(t) = v'(t) = x''(t) = 12t - 18", annotation: 'Differentiate v(t) again: d/dt[6t\u00b2]=12t, d/dt[-18t]=-18.' },
+        { expression: "v(t) = 0: \\quad 6(t^2 - 3t + 2) = 6(t-1)(t-2) = 0", annotation: 'Factor to find when velocity is zero. Set v=0 and factor the quadratic.' },
+        { expression: "t = 1 \\text{ s and } t = 2 \\text{ s}", annotation: 'The particle momentarily stops at t=1 and t=2 — the turning points in its motion.' },
+        { expression: "v > 0 \\text{ on } (0,1) \\cup (2,\\infty); \\quad v < 0 \\text{ on } (1,2)", annotation: 'Sign chart: v = 6(t-1)(t-2) is positive when both factors agree in sign. Moving right for t<1 and t>2; moving left for 1<t<2.' },
+        { expression: "a(t) = 0 \\Rightarrow t = 1.5 \\text{ s}", annotation: 'Acceleration changes sign at t=1.5 s. This is the inflection point of the position curve.' },
+        { expression: "\\text{Speeding up: } v \\text{ and } a \\text{ same sign} \\Rightarrow t \\in (1, 1.5) \\cup (2, \\infty)", annotation: 'On (1,1.5): v<0 and a<0 (both negative \u2192 speeding up leftward). On (2,\u221e): v>0 and a>0 \u2192 speeding up rightward. On (0,1) and (1.5,2): v and a have opposite signs \u2192 slowing down.' },
+      ],
+      conclusion: 'The particle moves right on (0,1), reverses at t=1, moves left on (1,2), reverses again at t=2, then moves right forever. The acceleration changes sign at t=1.5 s (inflection point). This example demonstrates the full kinematic stack: differentiation once gives velocity, twice gives acceleration. The physics tells you what the math means: where f\'=0 is a physical rest; where f\' and f\'\' agree in sign is where the object speeds up.',
+    },
   ],
 
   challenges: [

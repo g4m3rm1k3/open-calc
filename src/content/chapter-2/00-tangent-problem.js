@@ -426,6 +426,22 @@ export default {
       ],
       conclusion: 'The instantaneous velocity at t = 2 is 19 m/s. The general velocity function v(t) = 8t + 3 shows that the particle is accelerating — its speed increases linearly with time. For comparison, the average velocity over [1, 3] would be [s(3)-s(1)]/(3-1) = [45 - 7]/2 = 19 m/s. This agreement is not a coincidence — the midpoint of [1, 3] is t = 2, and for a quadratic position function (uniform acceleration), the average velocity over any interval equals the instantaneous velocity at the midpoint.',
     },
+    {
+      id: 'ch2-000-ex8',
+      title: 'Galileo\'s Falling Ball: Derivative from First Principles (Physics)',
+      problem: 'Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s². Use the limit definition to find the velocity $v(t) = y\'(t)$, then evaluate at $t = 3$ s. Interpret the result.',
+      visualizationId: 'ShrinkingInterval',
+      steps: [
+        { expression: "v(t) = \\lim_{h \\to 0} \\frac{y(t+h) - y(t)}{h}", annotation: 'The velocity at time t is the derivative of position — defined as the limit of average velocities.' },
+        { expression: "y(t+h) = \\frac{1}{2}g(t+h)^2 = \\frac{g}{2}(t^2 + 2th + h^2)", annotation: 'Expand (t+h)².' },
+        { expression: "y(t+h) - y(t) = \\frac{g}{2}(t^2 + 2th + h^2) - \\frac{g}{2}t^2 = \\frac{g}{2}(2th + h^2)", annotation: 'Subtract y(t). The t² terms cancel.' },
+        { expression: "\\frac{y(t+h)-y(t)}{h} = \\frac{\\frac{g}{2}h(2t+h)}{h} = \\frac{g}{2}(2t+h)", annotation: 'Divide by h (cancel for h ≠ 0).' },
+        { expression: "v(t) = \\lim_{h \\to 0} \\frac{g}{2}(2t + h) = \\frac{g}{2}(2t) = gt", annotation: 'Take the limit: h → 0 eliminates the h term.' },
+        { expression: "v(t) = gt", annotation: 'The velocity increases linearly with time — uniform acceleration.' },
+        { expression: "v(3) = 9.8 \\times 3 = 29.4 \\text{ m/s}", annotation: 'At t=3 s, the ball is falling at 29.4 m/s ≈ 106 km/h.' },
+      ],
+      conclusion: 'The velocity v(t) = gt says: velocity grows linearly with time, at rate g = 9.8 m/s per second. This is uniform (constant) acceleration. In the limit definition, the key step is canceling h to remove the 0/0 indeterminate form — identical algebra to the tangent line problem. Galileo discovered this law experimentally in 1604; Newton\'s calculus gave it a mathematical foundation 60 years later.',
+    },
   ],
 
   challenges: [

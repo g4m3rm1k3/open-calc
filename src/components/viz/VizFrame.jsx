@@ -32,8 +32,13 @@ const VIZ_REGISTRY = {
   TangentPlane3D:               lazy(() => import('./three/TangentPlane3D.jsx')),
   ParametricCurve3D:            lazy(() => import('./three/ParametricCurve3D.jsx')),
   // Chapter 0 — Pre-Calc additions
+  MotionTracer:                 lazy(() => import('./d3/MotionTracer.jsx')),
   TransformationExplorer:       lazy(() => import('./d3/TransformationExplorer.jsx')),
   GraphMorph:                   lazy(() => import('./d3/GraphMorph.jsx')),
+  // Chapter 1 — Physics examples
+  ShrinkingInterval:            lazy(() => import('./d3/ShrinkingInterval.jsx')),
+  // Chapter 2 — Physics examples
+  VerticalThrow:                lazy(() => import('./d3/VerticalThrow.jsx')),
   // Chapter 1 — Limits additions
   TwoSidedLimit:                lazy(() => import('./d3/TwoSidedLimit.jsx')),
   HoleVsValue:                  lazy(() => import('./d3/HoleVsValue.jsx')),

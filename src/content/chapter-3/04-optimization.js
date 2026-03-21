@@ -204,6 +204,23 @@ export default {
       ],
       conclusion: 'The maximum area Norman window with perimeter 10 m has r ≈ 1.40 m and h ≈ 1.40 m. At the optimum, h = r: the rectangle height equals the semicircle radius. This is a general result for Norman windows — the optimal shape always satisfies h = r.',
     },
+    {
+      id: 'ch3-004-ex8',
+      title: 'Optimal Launch Angle for Maximum Range (Physics)',
+      problem: 'A projectile is launched from ground level at speed $v_0 = 30$ m/s and angle $\\theta \\in (0°, 90°)$. The horizontal range is $R(\\theta) = \\frac{v_0^2 \\sin(2\\theta)}{g} = \\frac{900 \\sin(2\\theta)}{9.8}$ metres. Find the launch angle that maximises range.',
+      visualizationId: 'ProjectileMotion',
+      steps: [
+        { expression: "R(\\theta) = \\frac{900}{9.8}\\sin(2\\theta) \\approx 91.8 \\sin(2\\theta)", annotation: 'The range formula from projectile kinematics. Note R depends only on sin(2θ) — all the physics is packed into this trig function.' },
+        { expression: "R'(\\theta) = 91.8 \\cdot 2\\cos(2\\theta) = 183.6 \\cos(2\\theta)", annotation: 'Differentiate with respect to θ. d/dθ[sin(2θ)] = 2cos(2θ) by the chain rule.' },
+        { expression: "R'(\\theta) = 0 \\Rightarrow \\cos(2\\theta) = 0 \\Rightarrow 2\\theta = \\frac{\\pi}{2}", annotation: 'Set derivative = 0. cos(2θ)=0 when 2θ=π/2 (in the interval 0 < 2θ < π).' },
+        { expression: "\\theta^* = \\frac{\\pi}{4} = 45°", annotation: '45° maximises range. This is the famous result — every cannon ever built was aimed at 45° for maximum distance (ignoring air resistance).' },
+        { expression: "R''(\\theta) = -183.6 \\cdot 2\\sin(2\\theta)", annotation: 'Second derivative for verification.' },
+        { expression: "R''(45°) = -367.2 \\sin(90°) = -367.2 < 0", annotation: 'R\'\'(45°) < 0 confirms this is a maximum, not a minimum.' },
+        { expression: "R_{\\max} = 91.8 \\sin(90°) = 91.8 \\text{ m}", annotation: 'Maximum range ≈ 91.8 m. This equals v₀²/g = 900/9.8 — the range formula\'s prefactor.' },
+        { expression: "R(0°) = 91.8\\sin(0°) = 0, \\quad R(90°) = 91.8\\sin(180°) = 0", annotation: 'Boundary check: R=0 at both endpoints. Launching horizontally (0°) or straight up (90°) gives zero range — physically correct!' },
+      ],
+      conclusion: '45° gives maximum range of v₀²/g ≈ 91.8 m. The elegant result θ*=45° emerges because we are maximising sin(2θ), which peaks when 2θ=90°. Notice the symmetry: R(θ) = R(90°-θ), so 30° and 60° give the same range — the physics is symmetric about 45°. In reality, air resistance shifts the optimum below 45° (typically 30°-38° for bullets and baseballs), which requires a more complex model.',
+    },
   ],
 
   challenges: [

@@ -265,6 +265,22 @@ export default {
       ],
       conclusion: 'f⁻¹(x) = (3x+1)/(x−2), domain all x ≠ 2. The verification confirms the algebra is correct.',
     },
+    {
+      id: 'ex-position-function',
+      title: 'Position as a Function of Time (Physics)',
+      problem: 'A car moves along a straight road. Its position (in metres from a reference point) is $x(t) = t^3 - 3t$ where $t$ is in seconds, $t \\in [0, 2.5]$. (a) Find $x(0)$, $x(1)$, $x(\\sqrt{3})$, $x(2)$. (b) When does the car return to the reference point ($x = 0$)? (c) Interpret the graph: when is the car moving away from the reference point vs returning?',
+      visualizationId: 'MotionTracer',
+      steps: [
+        { expression: 'x(0) = 0^3 - 3(0) = 0', annotation: 'At t=0, the car is AT the reference point.' },
+        { expression: 'x(1) = 1 - 3 = -2 \\text{ m}', annotation: 'At t=1, the car is 2 metres BEHIND the reference point (negative = behind).' },
+        { expression: 'x(\\sqrt{3}) = (\\sqrt{3})^3 - 3\\sqrt{3} = 3\\sqrt{3} - 3\\sqrt{3} = 0', annotation: 'At t = √3 ≈ 1.73 s, the car is back at the reference point.' },
+        { expression: 'x(2) = 8 - 6 = 2 \\text{ m}', annotation: 'At t=2, the car is 2 metres AHEAD of the reference point.' },
+        { expression: 'x(t) = 0 \\Rightarrow t^3 - 3t = 0 \\Rightarrow t(t^2 - 3) = 0', annotation: 'Factor to find when the car is at the origin. Set x=0 and factor.' },
+        { expression: 't = 0 \\text{ or } t = \\sqrt{3} \\approx 1.73 \\text{ s}', annotation: 'Two times when the car passes the reference point. (t = -√3 is excluded since t ≥ 0.)' },
+        { expression: '\\text{For } t \\in (0, 1): \\; x(0.5) = 0.125 - 1.5 = -1.375 < 0', annotation: 'Between t=0 and t=√3, x is negative — the car is behind the reference. Between t=√3 and t=2.5, x is positive — the car is ahead.' },
+      ],
+      conclusion: 'The graph of x(t) = t³ − 3t records the car\'s complete history. The height gives position, the slope gives velocity (which we\'ll compute in Chapter 2 as x\'(t) = 3t²−3). The car starts at the origin, moves backward to x = −2 at t=1, reverses, and passes the origin again at t=√3. The slope of x(t) is zero at t=1 (the turning point) — this will be the derivative equal to zero.',
+    },
   ],
 
   challenges: [

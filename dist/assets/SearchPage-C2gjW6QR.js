@@ -1,0 +1,1 @@
+import{a as r,j as e}from"./index-BENVN0IY.js";import{r as a}from"./react-vendor-Bbrk0Oov.js";function n(){const{openSearch:t}=r();return a.useEffect(()=>{t()},[]),e.jsx("div",{className:"text-center py-20 text-slate-500 dark:text-slate-400",children:e.jsx("p",{children:"Opening search…"})})}export{n as default};
