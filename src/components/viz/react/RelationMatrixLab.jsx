@@ -1,202 +1,153 @@
-import { useMemo, useState } from 'react'
+import React, { useState, useEffect } from 'react';
 
-const NODES = ['a', 'b', 'c']
+export default function RelationMatrixLab() {
+  // A 4x4 relation matrix for a set {A, B, C, D}
+  const size = 4;
+  const labels = ['A', 'B', 'C', 'D'];
+  const [matrix, setMatrix] = useState(() => 
+    Array(size).fill(false).map(() => Array(size).fill(false))
+  );
 
-function makeEmptyMatrix(size) {
-  return Array.from({ length: size }, () => Array.from({ length: size }, () => false))
-}
+  const toggleCell = (r, c) => {
+    const newMat = matrix.map((row, i) => 
+       row.map((val, j) => (i === r && j === c ? !val : val))
+    );
+    setMatrix(newMat);
+  };
 
-function cloneMatrix(matrix) {
-  return matrix.map((row) => [...row])
-}
-
-function matrixFromPreset(name) {
-  const m = makeEmptyMatrix(3)
-
-  if (name === 'identity') {
-    for (let i = 0; i < 3; i += 1) m[i][i] = true
-    return m
+  const clearAll = () => setMatrix(Array(size).fill(false).map(() => Array(size).fill(false)));
+  const setEquivalence = () => {
+    const newMat = Array(size).fill(false).map(() => Array(size).fill(false));
+    // Let's make an equivalence relation with two classes: {A, B} and {C, D}
+    newMat[0][0] = true; newMat[0][1] = true; newMat[1][0] = true; newMat[1][1] = true;
+    newMat[2][2] = true; newMat[2][3] = true; newMat[3][2] = true; newMat[3][3] = true;
+    setMatrix(newMat);
   }
 
-  if (name === 'equivalenceTwoClasses') {
-    m[0][0] = true
-    m[1][1] = true
-    m[2][2] = true
-    m[0][1] = true
-    m[1][0] = true
-    return m
-  }
+  // Properties validation
+  // Reflexive: All main diagonal elements are true
+  let isReflexive = true;
+  for (let i = 0; i < size; i++) if (!matrix[i][i]) isReflexive = false;
 
-  if (name === 'partialOrder') {
-    for (let i = 0; i < 3; i += 1) m[i][i] = true
-    m[0][1] = true
-    m[0][2] = true
-    m[1][2] = true
-    return m
-  }
-
-  return m
-}
-
-function isReflexive(matrix) {
-  for (let i = 0; i < matrix.length; i += 1) {
-    if (!matrix[i][i]) return false
-  }
-  return true
-}
-
-function isSymmetric(matrix) {
-  for (let i = 0; i < matrix.length; i += 1) {
-    for (let j = 0; j < matrix.length; j += 1) {
-      if (matrix[i][j] !== matrix[j][i]) return false
+  // Symmetric: matrix[i][j] === matrix[j][i]
+  let isSymmetric = true;
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      if (matrix[i][j] && !matrix[j][i]) isSymmetric = false;
     }
   }
-  return true
-}
 
-function isAntisymmetric(matrix) {
-  for (let i = 0; i < matrix.length; i += 1) {
-    for (let j = 0; j < matrix.length; j += 1) {
-      if (i !== j && matrix[i][j] && matrix[j][i]) return false
+  // Antisymmetric: if aRb and bRa, then a = b.
+  // Meaning if i !== j, you cannot have both matrix[i][j] and matrix[j][i]
+  let isAntisymmetric = true;
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      if (i !== j && matrix[i][j] && matrix[j][i]) isAntisymmetric = false;
     }
   }
-  return true
-}
 
-function isTransitive(matrix) {
-  for (let i = 0; i < matrix.length; i += 1) {
-    for (let j = 0; j < matrix.length; j += 1) {
-      if (!matrix[i][j]) continue
-      for (let k = 0; k < matrix.length; k += 1) {
-        if (matrix[j][k] && !matrix[i][k]) return false
+  // Transitive: if aRb and bRc, then aRc
+  let isTransitive = true;
+  let counterExample = null;
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      for (let k = 0; k < size; k++) {
+        if (matrix[i][j] && matrix[j][k] && !matrix[i][k]) {
+          isTransitive = false;
+          counterExample = `(${labels[i]}, ${labels[j]}) and (${labels[j]}, ${labels[k]}) exist, but missing (${labels[i]}, ${labels[k]})!`;
+        }
       }
     }
   }
-  return true
-}
 
-export default function RelationMatrixLab() {
-  const [matrix, setMatrix] = useState(() => matrixFromPreset('identity'))
-
-  const properties = useMemo(() => {
-    const reflexive = isReflexive(matrix)
-    const symmetric = isSymmetric(matrix)
-    const antisymmetric = isAntisymmetric(matrix)
-    const transitive = isTransitive(matrix)
-
-    return {
-      reflexive,
-      symmetric,
-      antisymmetric,
-      transitive,
-      equivalenceRelation: reflexive && symmetric && transitive,
-      partialOrder: reflexive && antisymmetric && transitive,
-    }
-  }, [matrix])
-
-  const toggle = (row, col) => {
-    setMatrix((prev) => {
-      const next = cloneMatrix(prev)
-      next[row][col] = !next[row][col]
-      return next
-    })
-  }
-
-  const applyPreset = (name) => {
-    setMatrix(matrixFromPreset(name))
-  }
+  const isEquivalence = isReflexive && isSymmetric && isTransitive;
+  const isPoset = isReflexive && isAntisymmetric && isTransitive;
 
   return (
-    <div className="p-4 sm:p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-      <h3 className="text-lg font-semibold mb-2">Relation Matrix Lab</h3>
-      <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-        Build a relation on {'{a,b,c}'} and see whether it is reflexive, symmetric, antisymmetric, transitive,
-        an equivalence relation, or a partial order.
-      </p>
+    <div className="w-full bg-slate-900 rounded-xl border border-slate-700 shadow-md p-6 flex flex-col md:flex-row gap-8 items-start">
+      
+      {/* Left Axis: The Matrix */}
+      <div className="flex flex-col items-center w-full md:w-auto shrink-0">
+         <h4 className="text-white font-bold mb-4 border-b border-slate-700 pb-2 w-full text-center">Set Relation Matrix</h4>
+         
+         <div className="flex flex-col gap-1">
+            {/* Header Row */}
+            <div className="flex gap-1 mb-1">
+               <div className="w-8 h-8"></div>
+               {labels.map(l => <div key={`col-${l}`} className="w-10 h-8 flex items-center justify-center font-bold text-slate-400">{l}</div>)}
+            </div>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={() => applyPreset('identity')}
-          className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm font-medium"
-        >
-          Identity
-        </button>
-        <button
-          onClick={() => applyPreset('equivalenceTwoClasses')}
-          className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm font-medium"
-        >
-          Equivalence Example
-        </button>
-        <button
-          onClick={() => applyPreset('partialOrder')}
-          className="px-3 py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-sm font-medium"
-        >
-          Partial Order Example
-        </button>
-        <button
-          onClick={() => setMatrix(makeEmptyMatrix(3))}
-          className="px-3 py-1.5 rounded bg-rose-100 dark:bg-rose-900/30 text-sm font-medium"
-        >
-          Clear
-        </button>
-      </div>
-
-      <div className="overflow-x-auto mb-4">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr>
-              <th className="p-2 border border-slate-300 dark:border-slate-700"></th>
-              {NODES.map((node) => (
-                <th key={`head-${node}`} className="p-2 border border-slate-300 dark:border-slate-700">
-                  {node}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {NODES.map((rowNode, r) => (
-              <tr key={`row-${rowNode}`}>
-                <th className="p-2 border border-slate-300 dark:border-slate-700">{rowNode}</th>
-                {NODES.map((colNode, c) => (
-                  <td key={`${rowNode}-${colNode}`} className="p-2 border border-slate-300 dark:border-slate-700 text-center">
-                    <button
-                      onClick={() => toggle(r, c)}
-                      className={`px-2 py-1 rounded font-semibold ${
-                        matrix[r][c]
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
-                      }`}
-                    >
-                      {matrix[r][c] ? '1' : '0'}
-                    </button>
-                  </td>
-                ))}
-              </tr>
+            {/* Grid Rows */}
+            {matrix.map((row, i) => (
+              <div key={`row-${i}`} className="flex gap-1 items-center">
+                 <div className="w-8 font-bold text-slate-400 flex justify-end pr-2">{labels[i]}</div>
+                 {row.map((val, j) => {
+                   const isDiagonal = i === j;
+                   return (
+                     <button 
+                       key={`cell-${i}-${j}`}
+                       onClick={() => toggleCell(i, j)}
+                       className={`w-10 h-10 rounded border transition-all duration-300 transform active:scale-90 ${val ? (isDiagonal ? 'bg-amber-500 border-amber-400 shadow-[0_0_10px_#fbbf24]' : 'bg-brand-500 border-brand-400 shadow-[0_0_10px_#38bdf8]') : 'bg-slate-800 border-slate-600 hover:bg-slate-700'}`}
+                     >
+                       {val && <span className="text-white font-bold opacity-80 pl-0.5">1</span>}
+                     </button>
+                   );
+                 })}
+              </div>
             ))}
-          </tbody>
-        </table>
+         </div>
+
+         <div className="flex w-full gap-2 mt-6">
+            <button onClick={clearAll} className="flex-1 text-xs py-2 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold transition">Clear</button>
+            <button onClick={setEquivalence} className="flex-1 text-xs py-2 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold transition">Load Perfect Class</button>
+         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-        <p className={properties.reflexive ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}>
-          Reflexive: {String(properties.reflexive)}
-        </p>
-        <p className={properties.symmetric ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}>
-          Symmetric: {String(properties.symmetric)}
-        </p>
-        <p className={properties.antisymmetric ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}>
-          Antisymmetric: {String(properties.antisymmetric)}
-        </p>
-        <p className={properties.transitive ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}>
-          Transitive: {String(properties.transitive)}
-        </p>
-        <p className={properties.equivalenceRelation ? 'text-emerald-600 font-semibold' : 'text-slate-700 dark:text-slate-200'}>
-          Equivalence relation: {String(properties.equivalenceRelation)}
-        </p>
-        <p className={properties.partialOrder ? 'text-emerald-600 font-semibold' : 'text-slate-700 dark:text-slate-200'}>
-          Partial order: {String(properties.partialOrder)}
-        </p>
+      {/* Right Axis: Validations */}
+      <div className="flex-1 w-full bg-slate-800 p-5 rounded-lg border border-slate-600">
+         <h4 className="text-white font-bold mb-4 border-b border-slate-700 pb-2">Live Structural Analysis</h4>
+         
+         <div className="space-y-3">
+             <div className={`p-3 rounded border flex justify-between items-center transition-colors ${isReflexive ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-slate-900 border-slate-700 text-slate-500'}`}>
+                <span className="font-bold text-sm">Reflexive</span>
+                <span className="text-xs uppercase">{isReflexive ? 'TRUE' : 'Missing Diagonal Elements'}</span>
+             </div>
+
+             <div className={`p-3 rounded border flex justify-between items-center transition-colors ${isSymmetric ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-slate-900 border-slate-700 text-slate-500'}`}>
+                <span className="font-bold text-sm">Symmetric</span>
+                <span className="text-xs uppercase">{isSymmetric ? 'TRUE' : 'Matrix is not perfectly mirrored'}</span>
+             </div>
+
+             <div className={`p-3 rounded border flex justify-between items-center transition-colors ${isAntisymmetric ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-slate-900 border-slate-700 text-slate-500'}`}>
+                <span className="font-bold text-sm">Antisymmetric</span>
+                <span className="text-xs uppercase">{isAntisymmetric ? 'TRUE' : 'Mutual loops point both ways!'}</span>
+             </div>
+
+             <div className={`p-3 rounded border flex flex-col justify-center transition-colors ${isTransitive ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-red-900/30 border-red-500 text-red-400'}`}>
+                <div className="flex justify-between items-center w-full">
+                   <span className="font-bold text-sm">Transitive</span>
+                   <span className="text-xs uppercase">{isTransitive ? 'TRUE' : 'Chain Broken!'}</span>
+                </div>
+                {!isTransitive && counterExample && <div className="mt-2 text-[10px] text-red-300">{counterExample}</div>}
+             </div>
+         </div>
+
+         {/* Grand Structures */}
+         <div className="mt-6 space-y-2">
+            {isEquivalence && (
+              <div className="p-3 bg-amber-500 text-amber-950 font-bold rounded shadow-[0_0_20px_#fbbf24] animate-pulse text-center">
+                 🌟 EQUIVALENCE RELATION ACHIEVED!
+              </div>
+            )}
+            {isPoset && !isEquivalence && (
+              <div className="p-3 bg-purple-500 text-white font-bold rounded shadow-[0_0_20px_#a855f7] animate-pulse text-center">
+                 📈 PARTIAL ORDER (POSET) ACHIEVED!
+              </div>
+            )}
+         </div>
+
       </div>
+
     </div>
-  )
+  );
 }

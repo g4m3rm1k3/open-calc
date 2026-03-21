@@ -124,6 +124,8 @@ const VIZ_REGISTRY = {
   SetBuilderDecoderLab:          lazy(() => import('./react/SetBuilderDecoderLab.jsx')),
   HorizontalLineTestLab:         lazy(() => import('./react/HorizontalLineTestLab.jsx')),
   SetProofVisualizer:            lazy(() => import('./react/SetProofVisualizer.jsx')),
+  RelationMatrixLab:             lazy(() => import('./react/RelationMatrixLab.jsx')),
+  ModuloPartitionLab:            lazy(() => import('./react/ModuloPartitionLab.jsx')),
 }
 
 function VizSkeleton() {
