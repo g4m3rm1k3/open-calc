@@ -84,7 +84,7 @@ export default {
     prose: [
       'Each limit law is a provable theorem. The proofs all follow the same template: assume the limits of f and g exist, invoke the definitions to get δ₁ and δ₂ for each, then combine them (usually taking δ = min(δ₁, δ₂)).',
 
-      'The proof of the Sum Law (given below) uses the **triangle inequality** |a + b| ≤ |a| + |b|. This is the fundamental tool in analysis — it lets you break one error estimate into the sum of two smaller ones.',
+      'The proof of the Sum Law (given below) uses the **triangle inequality** |a + b| ≤ |a| + |b| (play with the interactive geometric proof of this below, or check the Prerequisites inequalities lesson). This is the fundamental tool in analysis — it lets you break one error estimate into the sum of two smaller ones.',
 
       'The Squeeze Theorem proof is especially clean: if g(x) ≤ f(x) ≤ h(x) and both g and h are within ε of L, then g(x) > L − ε and h(x) < L + ε, which forces L − ε < f(x) < L + ε, i.e., |f(x) − L| < ε.',
 
@@ -97,7 +97,7 @@ export default {
         body: '\\text{Given } \\varepsilon > 0. \\text{ Choose } \\delta_1: |x-c|<\\delta_1 \\Rightarrow |f-L|<\\varepsilon/2. \\\\ \\text{Choose } \\delta_2: |x-c|<\\delta_2 \\Rightarrow |g-M|<\\varepsilon/2. \\\\ \\text{Let } \\delta = \\min(\\delta_1,\\delta_2). \\text{ Then:} \\\\ |(f+g)-(L+M)| \\leq |f-L|+|g-M| < \\tfrac{\\varepsilon}{2}+\\tfrac{\\varepsilon}{2} = \\varepsilon \\;\\blacksquare',
       },
     ],
-    visualizationId: null,
+    visualizationId: 'TriangleInequalityViz',
   },
 
   examples: [
@@ -204,6 +204,7 @@ export default {
   ],
 
   crossRefs: [
+    { lessonSlug: 'inequalities', label: 'Prerequisite: Inequalities', context: 'Understanding the Triangle Inequality is strictly required to prove the limit laws.' },
     { lessonSlug: 'introduction', label: 'Previous: Introduction to Limits', context: 'Informal concept and ε-δ definition.' },
     { lessonSlug: 'continuity', label: 'Next: Continuity', context: 'A function is continuous if its limit equals its value.' },
   ],

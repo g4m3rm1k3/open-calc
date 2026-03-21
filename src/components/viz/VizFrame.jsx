@@ -61,6 +61,8 @@ const VIZ_REGISTRY = {
   MVTViz:                       lazy(() => import('./d3/MVTViz.jsx')),
   CurveSketchingBoard:          lazy(() => import('./d3/CurveSketchingBoard.jsx')),
   SignChartBuilder:             lazy(() => import('./d3/SignChartBuilder.jsx')),
+  TrigDerivativeSync:           lazy(() => import('./d3/TrigDerivativeSync.jsx')),
+  TriangleInequalityViz:        lazy(() => import('./d3/TriangleInequalityViz.jsx')),
   OptimizationViz:              lazy(() => import('./d3/OptimizationViz.jsx')),
   LHopitalViz:                  lazy(() => import('./d3/LHopitalViz.jsx')),
   // Chapter 5 — Sequences & Series

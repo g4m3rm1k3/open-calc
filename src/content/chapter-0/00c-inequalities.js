@@ -89,7 +89,13 @@ export default {
         body: '\\text{If } 0 < a < b, \\text{ then } \\frac{1}{b} < \\frac{1}{a}. \\\\ \\text{Taking reciprocals of positive numbers reverses the inequality.}',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'TriangleInequalityViz',
+        title: 'The Triangle Inequality in 1D',
+        caption: 'Play with this geometric proof to see why adding numbers before absolute value is always less than or equal to adding them after.',
+      },
+    ],
   },
 
   rigor: {

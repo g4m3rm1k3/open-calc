@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(\u03b8). When \u03b8 = 0, the point is at (1, 0) and is moving straight upward — the y-coordinate is increasing as fast as it can. When \u03b8 = \u03c0/2, the point is at (0, 1), at the very top, momentarily moving horizontally — the y-coordinate is not changing at all. When \u03b8 = \u03c0, the point is at (-1, 0) and is moving straight downward. These rates of change — 1, 0, and -1 — are exactly the values of cos(0), cos(\u03c0/2), and cos(\u03c0). Is it a coincidence that the rate of change of sine is cosine?',
     realWorldContext: 'Periodic phenomena dominate science and engineering: alternating current in electrical circuits, vibrations in mechanical systems, sound waves, ocean tides, the positions of planets. All of these are modeled using sine and cosine. To analyze how these quantities change — how quickly a current switches direction, how rapidly a spring approaches equilibrium, how fast a tide is rising — we need derivatives of trigonometric functions. The fact that d/dx[sin x] = cos x is not just elegant mathematics; it is the foundation of all oscillation and wave analysis.',
-    previewVisualizationId: 'SineCosineSlope',
+    previewVisualizationId: 'TrigDerivativeSync',
   },
 
   intuition: {
@@ -40,10 +40,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'SineCosineSlope',
-        props: { showUnitCircle: true, showSineGraph: true, showSlopeTracer: true, animateAngle: true },
-        title: 'Sine Slope = Cosine',
-        caption: 'The red dot on the unit circle drives the sine curve. The amber tangent slope traces out cos(x). Watch the slope graph — it IS the cosine curve.',
+        id: 'TrigDerivativeSync',
+        title: 'The "Moving Point" Deep Sync',
+        caption: 'Watch the velocity vector on the circle. When θ=0, the ball is traveling 100% vertically (arrow points straight up, vertical velocity = 1). Because vertical velocity is 1, the slope of the Sine curve is 1, and the value of the Cosine curve is 1. All three panels confirm the exact same truth.',
       },
       {
         id: 'SpringOscillation',
@@ -87,11 +86,8 @@ export default {
         body: "\\frac{d}{dx}\\left[\\frac{\\cos x}{\\sin x}\\right] = \\frac{-\\sin x \\cdot \\sin x - \\cos x \\cdot \\cos x}{\\sin^2 x} = \\frac{-(\\sin^2 x + \\cos^2 x)}{\\sin^2 x} = \\frac{-1}{\\sin^2 x} = -\\csc^2 x",
       },
     ],
-    visualizationId: 'SineCosineSlope',
-    visualizationProps: {
-      showAllSix: true,
-      showQuotientRuleSteps: false,
-    },
+    visualizationId: 'TrigDerivativeSync',
+    visualizationProps: {},
   },
 
   rigor: {

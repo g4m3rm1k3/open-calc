@@ -145,7 +145,7 @@ export default {
       'Let δ = min(δ₁, δ₂). Then 0 < |x−c| < δ implies BOTH conditions hold simultaneously:',
       '|(f+g) − (L+M)| ≤ |f−L| + |g−M| < ε/2 + ε/2 = ε. ∎',
 
-      'This proof illustrates several key techniques: (1) the **triangle inequality** |a+b| ≤ |a|+|b| to split the error; (2) the **ε/2 trick** — budget half the tolerance for each term; (3) **taking the minimum** of multiple δ values so all conditions hold simultaneously. These three tools appear in nearly every ε-δ proof.',
+      'This proof illustrates several key techniques: (1) the **triangle inequality** |a+b| ≤ |a|+|b| to safely split error accumulation (see the interactive visual proof below or jump to the Inequalities prerequisite chapter); (2) the **ε/2 trick** — budget half the absolute tolerance for each term; (3) **taking the minimum** of multiple δ values so all local conditions explicitly hold simultaneously. These three tools govern nearly every ε-δ proof.',
 
       'Historically, this level of rigor was developed because of actual mathematical crises. In the 1800s, mathematicians discovered continuous functions that are nowhere differentiable (Weierstrass, 1872), convergent series of continuous functions with discontinuous limits (Cauchy got this wrong!), and space-filling curves (Peano, 1890). These "pathological" examples showed that geometric intuition could not be trusted — only rigorous definitions could prevent errors.',
     ],
@@ -167,6 +167,11 @@ export default {
         props: { fn: '(x*x - 1)/(x - 1)', c: 1, L: 2 },
         title: 'ε-δ at a Removable Discontinuity',
         caption: 'f(x) = (x²−1)/(x−1) = x+1 for x ≠ 1. The function has a hole at x=1, but the ε-δ definition only checks x ≠ c. The limit is 2 — verified by the ε-δ condition.',
+      },
+      {
+        id: 'TriangleInequalityViz',
+        title: 'Geometric Proof: The Triangle Inequality',
+        caption: 'Play with values a and b to dynamically prove why |a + b| ≤ |a| + |b|. This simple 1D collapse is the exact mechanism preventing error accumulation in Calculus.',
       },
     ],
   },
@@ -329,6 +334,7 @@ export default {
   ],
 
   crossRefs: [
+    { lessonSlug: 'inequalities', label: 'Prerequisite: Properties of Inequalities', context: 'Epsilon-Delta proofs rely entirely on chaining inequalities safely, especially utilizing the Triangle Inequality.' },
     { lessonSlug: 'introduction', label: 'Previous: Intro to Limits', context: 'The informal definition of a limit — the ε-δ definition makes it rigorous.' },
     { lessonSlug: 'continuity', label: 'See Also: Continuity', context: 'Continuity at c means lim f(x) = f(c) — which is an ε-δ statement.' },
     { lessonSlug: 'squeeze-theorem', label: 'Next: Squeeze Theorem', context: 'The Squeeze Theorem is proved using ε-δ — it is a consequence of this definition.' },
