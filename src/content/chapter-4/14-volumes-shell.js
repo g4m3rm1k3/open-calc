@@ -54,6 +54,8 @@ export default {
         body: 'Shell volume = 2π∫r·h dx, NOT π∫r·h dx. The factor 2π comes from the full circumference of the shell (2πr), not πr². Missing the 2π is the most common shell-method error. Memorize: disks have π (from πr²), shells have 2π (from circumference 2πr times thickness).',
       },
     ],
+    visualizationId: 'ShellMethod',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'VolumesOfRevolution',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import KatexBlock from '../math/KatexBlock.jsx';
-import { parseProse } from './IntegratedLesson.jsx';
+import { parseProse } from '../math/parseProse.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
 
 export default function ScrubbableExample({ example, number }) {
@@ -21,9 +21,11 @@ export default function ScrubbableExample({ example, number }) {
       </div>
 
       <div className="p-6">
-        {/* The Problem Statement */}
+        {/* The Problem Statement — auto-detects pure LaTeX vs mixed prose */}
         <div className="mb-6 p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-100 rounded-lg border border-brand-100 dark:border-brand-800 font-medium">
-          <span className="leading-relaxed">{parseProse(example.problem)}</span>
+          {example.problem?.includes('$')
+            ? <span className="leading-relaxed">{parseProse(example.problem)}</span>
+            : <KatexBlock expr={example.problem} />}
         </div>
 
         {/* The Scrubbable Content Area */}

@@ -55,6 +55,8 @@ export default {
         body: 'The y-moment formula Mₓ = (1/2)∫[f(x)²−g(x)²]dx catches students off guard — the integrand is quadratic in f and g, not linear. This comes from the centroid of each vertical strip being at its midpoint. A common error: writing Mₓ = ∫f(x)dx (just the area integral). Remember: x̄ uses x·(strip area), while ȳ uses (1/2)·(strip area difference of squares).',
       },
     ],
+    visualizationId: 'CentroidViz',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'AreaAccumulator',

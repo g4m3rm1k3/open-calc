@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'You know that $1 + x + x^2 + x^3 + \\cdots = 1/(1-x)$ for $|x| < 1$. What if you differentiate both sides? You get $1 + 2x + 3x^2 + \\cdots = 1/(1-x)^2$. Integrate both sides? $x + x^2/2 + x^3/3 + \\cdots = -\\ln(1-x)$. Is this legitimate — can you really differentiate and integrate infinite series term by term? And for which values of $x$ does this work?',
     realWorldContext: 'Power series are the bridge between abstract functions and computation. When your calculator evaluates $\\sin(0.5)$, it computes a polynomial approximation derived from a power series. Physics uses power series to solve differential equations that have no closed-form solution (Bessel functions, Airy functions, Legendre polynomials). In signal processing, the Z-transform represents discrete signals as power series, enabling filter design. Machine learning uses Taylor expansions to linearize loss functions for optimization.',
-    previewVisualizationId: null,
+    previewVisualizationId: 'TaylorApproximation',
   },
 
   intuition: {
@@ -46,6 +46,8 @@ export default {
         body: 'The Ratio/Root Test is inconclusive at $|x-c| = R$ (gives $L = 1$). You must substitute each endpoint into the series and test convergence with other methods (p-series, AST, nth term, etc.). The two endpoints can behave differently.',
       },
     ],
+    visualizationId: 'TaylorApproximation',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'GraphMorph',

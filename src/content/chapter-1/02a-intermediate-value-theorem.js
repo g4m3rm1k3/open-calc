@@ -21,7 +21,7 @@ export default {
       'every equation f(x) = 0 where f is continuous and changes sign must have a solution, ' +
       'and every physical system that changes continuously between two states must pass through every intermediate state. ' +
       'This is the Intermediate Value Theorem — one of the most useful existence theorems in all of mathematics.',
-    previewVisualizationId: 'ContinuityViz',
+    previewVisualizationId: 'BisectionMethod',
   },
 
   intuition: {
@@ -72,6 +72,8 @@ export default {
         body: 'In game theory, the minimax theorem (guaranteeing optimal strategies in two-player games) relies on IVT-like arguments. The Nash equilibrium proof uses Brouwer\'s Fixed Point Theorem, which is a generalization of IVT. These are the mathematical foundations of economics and AI game playing.',
       },
     ],
+    visualizationId: 'BisectionMethod',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'ContinuityViz',

@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'You face $\\sum_{n=1}^{\\infty} \\frac{n^2}{3^n}$ on an exam. The terms go to $0$, so the nth term test is useless. It is not geometric, not telescoping, and you cannot compute the partial sums. How do you decide? You need a convergence test — a theorem that compares your series to something simpler. By the end of this lesson, you will have eight tests and a strategy for choosing the right one every time.',
     realWorldContext: 'Convergence tests are the central computational skill of Calc 2 and appear on every exam. In applied mathematics, they determine whether numerical approximations are reliable: does a Fourier series converge to the function it represents? Does a perturbation expansion in quantum mechanics converge? In numerical computing, the ratio test determines how fast a power series converges, which dictates how many terms a computer needs for a given accuracy. The comparison tests are used in probability theory to determine whether expected values exist.',
-    previewVisualizationId: null,
+    previewVisualizationId: 'ConvergenceViz',
   },
 
   intuition: {
@@ -52,6 +52,8 @@ export default {
         body: 'If $\\sum (-1)^{n+1}b_n$ satisfies the AST conditions, the error from using the $N$-term partial sum is $|S - S_N| \\le b_{N+1}$. The first omitted term bounds the error. This makes alternating series easy to approximate numerically.',
       },
     ],
+    visualizationId: 'ConvergenceViz',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'FunctionPlotter',

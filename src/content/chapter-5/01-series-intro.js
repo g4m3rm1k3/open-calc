@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'You stand 1 meter from a wall. You step halfway (1/2 m), then half of the remaining distance (1/4 m), then half again (1/8 m), and so on forever. Do you ever reach the wall? Mathematically: does $1/2 + 1/4 + 1/8 + \\cdots = 1$? Can adding infinitely many positive numbers give a finite answer?',
     realWorldContext: 'Infinite series are everywhere in applied mathematics. The present value of a perpetual bond paying $\\$C$ per year at interest rate $r$ is the geometric series $C/r$. Signal processing decomposes sounds into Fourier series — infinite sums of sines and cosines. Every decimal expansion is a series: $\\pi = 3 + 1/10 + 4/100 + 1/1000 + \\cdots$. Computer graphics engines sum power series to compute trigonometric functions millions of times per second. Understanding which sums converge — and to what — is the gateway to all of Calc 2.',
-    previewVisualizationId: null,
+    previewVisualizationId: 'ConvergenceViz',
   },
 
   intuition: {
@@ -51,6 +51,8 @@ export default {
         body: 'Zeno of Elea argued that motion is impossible: to walk from A to B, you must first cover half the distance, then half the remainder, then half again — infinitely many steps. The resolution: $\\sum_{n=1}^{\\infty} (1/2)^n = 1$. The infinite sum is finite. Zeno\'s paradox anticipated the need for a rigorous theory of infinite series by over 2000 years.',
       },
     ],
+    visualizationId: 'ConvergenceViz',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'FunctionPlotter',

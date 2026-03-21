@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'Start with any number $x_0 > 0$. Repeatedly apply the rule $x_{n+1} = \\frac{1}{2}(x_n + 2/x_n)$. What happens? Try $x_0 = 1$: you get $1, 1.5, 1.4167, 1.4142, \\ldots$ — the sequence is racing toward $\\sqrt{2}$. How does it know where to go, and how can we prove it gets there?',
     realWorldContext: 'Sequences are the computational backbone of modern technology. Every time your phone computes a square root, evaluates $\\sin(x)$, or renders a curve, it uses a convergent sequence of approximations. GPS satellites solve positioning equations via Newton\'s method — a recursive sequence. Financial models price options using sequences of discrete approximations converging to the Black-Scholes formula. Machine learning trains neural networks by gradient descent: a sequence $\\theta_0, \\theta_1, \\theta_2, \\ldots$ of parameter vectors converging (hopefully) to an optimum.',
-    previewVisualizationId: null,
+    previewVisualizationId: 'ConvergenceViz',
   },
 
   intuition: {
@@ -51,6 +51,8 @@ export default {
         body: 'A sequence $\\{a_n\\}$ is really a function $a: \\mathbb{N} \\to \\mathbb{R}$. This lets you use L\'Hopital\'s rule, the Squeeze Theorem, and other limit tools from Calc 1 by extending $a_n = f(n)$ to a continuous function $f(x)$ and studying $\\lim_{x\\to\\infty} f(x)$.',
       },
     ],
+    visualizationId: 'SequenceViz',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'FunctionPlotter',

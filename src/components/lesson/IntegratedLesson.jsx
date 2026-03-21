@@ -1,85 +1,9 @@
 import React, { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
-import KatexInline from '../math/KatexInline.jsx'
-import AlgebraMicroLesson from './AlgebraMicroLesson.jsx'
 import StepThrough from './StepThrough.jsx'
-
-function isLikelyInlineMath(expr) {
-  const t = expr.trim()
-  if (!t) return false
-  if (/^\d+(?:[.,]\d+)?$/.test(t)) return false
-  if (/^[\d,]+(?:\.\d+)?$/.test(t)) return false
-  return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
-}
-
-export function parseProse(text) {
-  const parts = []
-  let i = 0
-  let keyIdx = 0;
-
-  while (i < text.length) {
-    if (text.startsWith('**', i)) {
-      const end = text.indexOf('**', i + 2)
-      if (end !== -1) {
-        const boldText = text.slice(i + 2, end)
-        parts.push(<strong key={`b${keyIdx++}`}>{boldText}</strong>)
-        i = end + 2
-        continue
-      }
-    }
-
-    if (text[i] === '$') {
-      const end = text.indexOf('$', i + 1)
-      if (end !== -1) {
-        const candidate = text.slice(i + 1, end)
-        if (isLikelyInlineMath(candidate)) {
-          parts.push(
-            <span key={`k${keyIdx++}`} className="math-hover-trigger inline-block transition-colors hover:text-brand-600 cursor-default">
-              <KatexInline expr={candidate} />
-            </span>
-          )
-          i = end + 1
-          continue
-        }
-      }
-      parts.push('$')
-      i += 1
-      continue
-    }
-
-    if (text[i] === '{' && text[i+1] === '{' && text.startsWith('algebra:', i + 2)) {
-      const end = text.indexOf('}}', i + 2);
-      if (end !== -1) {
-        const content = text.slice(i + 10, end); // past `{{algebra:`
-        const pipeIdx = content.indexOf('|');
-        if (pipeIdx !== -1) {
-          const topicId = content.substring(0, pipeIdx);
-          const linkText = content.substring(pipeIdx + 1);
-          parts.push(
-            <AlgebraMicroLesson key={`alg${keyIdx++}`} topicId={topicId}>
-              <KatexInline expr={linkText} />
-            </AlgebraMicroLesson>
-          );
-          i = end + 2;
-          continue;
-        }
-      }
-    }
-
-    const nextBold = text.indexOf('**', i)
-    const nextDollar = text.indexOf('$', i)
-    const nextAlg = text.indexOf('{{algebra:', i)
-    const next = [nextBold, nextDollar, nextAlg].filter((v) => v !== -1)
-    const stop = next.length ? Math.min(...next) : text.length
-    if (stop > i) {
-      parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)
-    }
-    i = stop
-  }
-
-  return parts.length > 0 ? parts : [text]
-}
+export { parseProse } from '../math/parseProse.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 
 function ProseParagraph({ text }) {
   return <p className="mb-4 leading-relaxed last:mb-0">{parseProse(text)}</p>
@@ -134,16 +58,24 @@ function SectionContent({ data }) {
   )
 }
 
+// Normalize a visualization entry — supports both {id:...} and legacy {vizId:...} keys
+function normalizeViz(v) {
+  if (!v) return null
+  const id = v.id ?? v.vizId
+  if (!id) return null
+  return { id, props: v.props ?? v.visualizationProps ?? {}, title: v.title, caption: v.caption }
+}
+
 function extractVizzes(lesson) {
   const vizzes = [];
-  // Function to safely extract from a section
   const extractFromSection = (section) => {
     if (!section) return;
     if (section.visualizationId) {
        vizzes.push({ id: section.visualizationId, props: section.visualizationProps ?? {} });
     }
-    if (section.visualizations) {
-       vizzes.push(...section.visualizations);
+    for (const v of section.visualizations ?? []) {
+      const norm = normalizeViz(v)
+      if (norm) vizzes.push(norm)
     }
   };
 

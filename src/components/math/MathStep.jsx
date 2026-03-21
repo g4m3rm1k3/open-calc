@@ -1,5 +1,5 @@
 import KatexBlock from './KatexBlock.jsx'
-import { parseProse } from '../lesson/IntegratedLesson.jsx'
+import { parseProse } from './parseProse.jsx'
 
 export default function MathStep({ step, stepNumber }) {
   if (!step.expression) {

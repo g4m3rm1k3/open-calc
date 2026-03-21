@@ -2,6 +2,7 @@ import KatexBlock from '../math/KatexBlock.jsx'
 import KatexInline from '../math/KatexInline.jsx'
 import MathStep from '../math/MathStep.jsx'
 import Spoiler from '../ui/Spoiler.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 
 function isLikelyInlineMath(expr) {
   const t = expr.trim()
@@ -89,7 +90,7 @@ export default function ChallengeBlock({ challenge, number }) {
       {/* Hint */}
       {challenge.hint && (
         <Spoiler label="Show hint">
-          <p className="text-sm text-slate-600 dark:text-slate-400 italic">{challenge.hint}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 italic leading-relaxed">{parseProse(challenge.hint)}</p>
         </Spoiler>
       )}
 
@@ -101,8 +102,8 @@ export default function ChallengeBlock({ challenge, number }) {
           ))}
         </div>
         <div className="bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 rounded-lg p-3">
-          <p className="text-sm font-semibold text-brand-700 dark:text-brand-300">
-            Answer: {challenge.answer}
+          <p className="text-sm font-semibold text-brand-700 dark:text-brand-300 leading-relaxed">
+            Answer: {parseProse(String(challenge.answer ?? ''))}
           </p>
         </div>
       </Spoiler>

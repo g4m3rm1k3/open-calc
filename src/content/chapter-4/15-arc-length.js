@@ -55,6 +55,8 @@ export default {
         body: 'Area = ∫f(x)dx. Arc length = ∫√(1+[f\'(x)]²)dx. These are completely different integrals of the same function. The arc length integrand always involves f\'(x) — the derivative of f, not f itself. A parabola that is "wider" (larger area) does not necessarily have a longer arc — arc length measures the curve\'s path, not the area underneath it.',
       },
     ],
+    visualizationId: 'ArcLengthViz',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'FunctionPlotter',

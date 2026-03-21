@@ -2,7 +2,7 @@ import { useState } from 'react'
 import KatexBlock from '../math/KatexBlock.jsx'
 import MathStep from '../math/MathStep.jsx'
 import VizFrame from '../viz/VizFrame.jsx'
-import { parseProse } from './IntegratedLesson.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 
 function buildVisualizations(example) {
   const items = []
@@ -59,11 +59,13 @@ export default function ExampleBlock({ example, number }) {
 
       {expanded && (
         <div className="p-5">
-          {/* Problem */}
+          {/* Problem — auto-detects pure LaTeX vs mixed prose */}
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Problem</p>
-            <div className="bg-brand-50 dark:bg-brand-950/30 rounded-lg p-3">
-              <KatexBlock expr={example.problem} />
+            <div className="bg-brand-50 dark:bg-brand-950/30 rounded-lg p-3 overflow-x-auto">
+              {example.problem?.includes('$')
+                ? <p className="leading-relaxed font-medium">{parseProse(example.problem)}</p>
+                : <KatexBlock expr={example.problem} />}
             </div>
           </div>
 

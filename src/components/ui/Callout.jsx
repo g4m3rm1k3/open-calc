@@ -1,4 +1,5 @@
 import KatexBlock from '../math/KatexBlock.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 
 const ICONS = {
   definition: '📐',
@@ -16,6 +17,8 @@ const ICONS = {
   'example': '📝',
   'misconception': '🚫',
   'history': '📜',
+  'strategy': '🎯',
+  'application': '🔬',
 }
 
 const LABELS = {
@@ -34,14 +37,23 @@ const LABELS = {
   'example': 'Quick Example',
   'misconception': 'Common Mistake',
   'history': 'Historical Note',
+  'strategy': 'Strategy',
+  'application': 'Application',
+}
+
+function renderBody(body) {
+  if (!body) return null
+  // Pure display LaTeX: starts with a backslash and has no dollar signs (no mixed prose)
+  if (!body.includes('$') && /^\\/.test(body.trim())) {
+    return <KatexBlock expr={body} />
+  }
+  // Mixed or plain prose — parseProse handles $...$ inline math and **bold**
+  return <p className="text-sm leading-relaxed">{parseProse(body)}</p>
 }
 
 export default function Callout({ type = 'tip', title, body }) {
   const icon = ICONS[type] ?? '•'
   const label = LABELS[type] ?? type
-
-  // Detect if body looks like LaTeX (contains \, ^, {, etc.)
-  const isLatex = /[\\^_{}]/.test(body ?? '')
 
   return (
     <div className={`callout callout-${type} my-4`}>
@@ -50,11 +62,7 @@ export default function Callout({ type = 'tip', title, body }) {
         <span className="text-xs font-bold uppercase tracking-wider opacity-70">{label}</span>
         {title && <span className="text-sm font-semibold">— {title}</span>}
       </div>
-      {isLatex ? (
-        <KatexBlock expr={body} />
-      ) : (
-        <p className="text-sm leading-relaxed">{body}</p>
-      )}
+      {renderBody(body)}
     </div>
   )
 }

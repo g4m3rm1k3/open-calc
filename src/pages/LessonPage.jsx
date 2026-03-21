@@ -7,6 +7,7 @@ import ScrubbableExample from '../components/lesson/ScrubbableExample.jsx'
 import ChallengeBlock from '../components/lesson/ChallengeBlock.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
+import { parseProse } from '../components/math/parseProse.jsx'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
@@ -76,8 +77,8 @@ export default function LessonPage() {
       {lesson.hook && (
         <section className="mb-10 bg-gradient-to-br from-brand-50 to-slate-50 dark:from-brand-950/30 dark:to-slate-900/30 rounded-2xl p-6 border border-brand-100 dark:border-brand-900/30">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-500 dark:text-brand-400 mb-2">Why This Matters</p>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3">{lesson.hook.question}</h2>
-          <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{lesson.hook.realWorldContext}</p>
+          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3 leading-relaxed">{parseProse(lesson.hook.question)}</h2>
+          <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{parseProse(lesson.hook.realWorldContext)}</p>
           {lesson.hook.previewVisualizationId && (
             <VizFrame id={lesson.hook.previewVisualizationId} initialProps={lesson.hook.previewVisualizationProps ?? {}} />
           )}

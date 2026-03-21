@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'Near $x = 0$, the function $\\sin(x)$ looks almost linear: $\\sin(x) \\approx x$. But how good is this approximation? Can we do better? What if we use $\\sin(x) \\approx x - x^3/6$? Or $x - x^3/6 + x^5/120$? Each polynomial is a better fit. Is there a systematic way to build the "best" polynomial approximation of any degree, for any function?',
     realWorldContext: 'Taylor series are arguably the most important computational tool in applied mathematics. Engineers approximate solutions to differential equations using Taylor expansions. Physicists linearize complex systems by keeping the first few Taylor terms (small-angle approximation $\\sin\\theta \\approx \\theta$, relativistic corrections as Taylor series in $v/c$). Computer chips evaluate transcendental functions ($\\sin$, $\\cos$, $\\exp$, $\\ln$) by computing Taylor polynomials. Modern machine learning uses Taylor-like expansions to analyze neural network behavior.',
-    previewVisualizationId: 'GraphMorph',
+    previewVisualizationId: 'TaylorApproximation',
   },
 
   intuition: {
@@ -51,6 +51,8 @@ export default {
         body: 'The approximation $\\sin(x) \\approx x$ is excellent for small $x$ but terrible for $x = 10$. Taylor polynomials are local approximations; accuracy degrades as you move away from $c$. Higher-degree polynomials extend the range of good approximation but never make it global (unless $R = \\infty$, as with $e^x$, $\\sin$, $\\cos$).',
       },
     ],
+    visualizationId: 'TaylorApproximation',
+    visualizationProps: {},
     visualizations: [
       {
         id: 'GraphMorph',

@@ -1,70 +1,13 @@
 import { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
-import KatexBlock from '../math/KatexBlock.jsx'
-import KatexInline from '../math/KatexInline.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 
 const TABS = [
   { id: 'intuition', label: '🧠 Intuition', description: 'Build the concept from first principles' },
   { id: 'math', label: '📐 Mathematics', description: 'Formal notation and theorems' },
   { id: 'rigor', label: '∴ Rigor', description: 'Proofs and epsilon-delta' },
 ]
-
-/**
- * Parse prose text into an array of React elements, rendering:
- *  - Inline LaTeX:  $...$  via KaTeX
- *  - Bold text:     **...**  via <strong>
- */
-function isLikelyInlineMath(expr) {
-  const t = expr.trim()
-  if (!t) return false
-  if (/^\d+(?:[.,]\d+)?$/.test(t)) return false
-  if (/^[\d,]+(?:\.\d+)?$/.test(t)) return false
-  return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
-}
-
-function parseProse(text) {
-  const parts = []
-  let i = 0
-
-  while (i < text.length) {
-    if (text.startsWith('**', i)) {
-      const end = text.indexOf('**', i + 2)
-      if (end !== -1) {
-        const boldText = text.slice(i + 2, end)
-        parts.push(<strong key={`b${i}`}>{boldText}</strong>)
-        i = end + 2
-        continue
-      }
-    }
-
-    if (text[i] === '$') {
-      const end = text.indexOf('$', i + 1)
-      if (end !== -1) {
-        const candidate = text.slice(i + 1, end)
-        if (isLikelyInlineMath(candidate)) {
-          parts.push(<KatexInline key={`k${i}`} expr={candidate} />)
-          i = end + 1
-          continue
-        }
-      }
-      parts.push('$')
-      i += 1
-      continue
-    }
-
-    const nextBold = text.indexOf('**', i)
-    const nextDollar = text.indexOf('$', i)
-    const next = [nextBold, nextDollar].filter((v) => v !== -1)
-    const stop = next.length ? Math.min(...next) : text.length
-    if (stop > i) {
-      parts.push(text.slice(i, stop))
-    }
-    i = stop
-  }
-
-  return parts.length > 0 ? parts : [text]
-}
 
 function ProseParagraph({ text }) {
   return <p className="mb-4 leading-relaxed last:mb-0">{parseProse(text)}</p>
@@ -138,8 +81,11 @@ function buildBlocks(data) {
   for (const c of data.callouts ?? []) blocks.push({ type: 'callout', ...c })
   // Single legacy visualizationId
   if (data.visualizationId) blocks.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })
-  // New visualizations array: [{id, props, title, caption}]
-  for (const v of data.visualizations ?? []) blocks.push({ type: 'viz', ...v })
+  // Visualizations array — normalize both {id:...} and legacy {vizId:...} field names
+  for (const v of data.visualizations ?? []) {
+    const id = v.id ?? v.vizId
+    if (id) blocks.push({ type: 'viz', ...v, id })
+  }
   return blocks
 }
 

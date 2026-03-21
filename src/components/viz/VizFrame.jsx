@@ -84,6 +84,12 @@ const VIZ_REGISTRY = {
   FourierSeries:                 lazy(() => import('./d3/FourierSeries.jsx')),
   GradientDescentLoss:           lazy(() => import('./d3/GradientDescentLoss.jsx')),
   PoiseuilleBloodFlow:           lazy(() => import('./d3/PoiseuilleBloodFlow.jsx')),
+  // Chapter 5 — New additions
+  BisectionMethod:               lazy(() => import('./d3/BisectionMethod.jsx')),
+  ShellMethod:                   lazy(() => import('./d3/ShellMethod.jsx')),
+  ArcLengthViz:                  lazy(() => import('./d3/ArcLengthViz.jsx')),
+  CentroidViz:                   lazy(() => import('./d3/CentroidViz.jsx')),
+  SequenceViz:                   lazy(() => import('./d3/SequenceViz.jsx')),
 }
 
 function VizSkeleton() {
