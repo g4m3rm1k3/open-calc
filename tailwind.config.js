@@ -21,10 +21,10 @@ export default {
           900: '#323481',
           950: '#1e1f4c',
         },
-        surface: {
-          DEFAULT: '#ffffff',
-          dark: '#0f1117',
-        }
+        // Semantic tokens backed by CSS variables — auto dark-mode aware
+        surface:    'var(--color-surface)',
+        border:     'var(--color-border)',
+        'text-muted': 'var(--color-text-muted)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -43,12 +43,13 @@ const LABELS = {
 
 function renderBody(body) {
   if (!body) return null
-  // Pure display LaTeX: starts with a backslash and has no dollar signs (no mixed prose)
-  if (!body.includes('$') && /^\\/.test(body.trim())) {
+  // Pure LaTeX expression (no text, no \[...\] wrappers, no $ markers)
+  // e.g. "\frac{d}{dx}[\sin x] = \cos x" — send straight to KatexBlock
+  if (!body.includes('$') && !body.includes('\\[') && !body.includes('\\(') && /^\\/.test(body.trim())) {
     return <KatexBlock expr={body} />
   }
-  // Mixed or plain prose — parseProse handles $...$ inline math and **bold**
-  return <p className="text-sm leading-relaxed">{parseProse(body)}</p>
+  // Everything else — parseProse handles $...$, \[...\], \(...\), **bold**, and plain text
+  return <div className="text-sm leading-relaxed">{parseProse(body)}</div>
 }
 
 export default function Callout({ type = 'tip', title, body }) {

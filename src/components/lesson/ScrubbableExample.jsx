@@ -23,9 +23,11 @@ export default function ScrubbableExample({ example, number }) {
       <div className="p-6">
         {/* The Problem Statement — auto-detects pure LaTeX vs mixed prose */}
         <div className="mb-6 p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-100 rounded-lg border border-brand-100 dark:border-brand-800 font-medium">
-          {example.problem?.includes('$')
-            ? <span className="leading-relaxed">{parseProse(example.problem)}</span>
-            : <KatexBlock expr={example.problem} />}
+          {/* Pure LaTeX (starts with \, no prose prefix): KatexBlock for display rendering */}
+        {/* Mixed text+math (starts with words, or uses $ / \[ delimiters): parseProse */}
+        {/^\\[a-zA-Z[(]/.test(example.problem?.trimStart() ?? '') && !example.problem?.includes('$')
+            ? <KatexBlock expr={example.problem} />
+            : <span className="leading-relaxed">{parseProse(example.problem)}</span>}
         </div>
 
         {/* The Scrubbable Content Area */}
@@ -66,13 +68,13 @@ export default function ScrubbableExample({ example, number }) {
                max={maxStep}
                value={currentStep}
                onChange={(e) => setCurrentStep(parseInt(e.target.value))}
-               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500 hover:accent-brand-600 transition-colors"
+               className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-500 hover:accent-brand-600 transition-colors"
             />
             <div className="flex gap-4 mt-4">
                 <button 
                   disabled={currentStep === 0}
                   onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                  className="px-4 py-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 transition-colors font-medium text-sm"
+                  className="px-4 py-1.5 rounded bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 disabled:opacity-30 transition-colors font-medium text-sm"
                 >
                     ← Prev Step
                 </button>

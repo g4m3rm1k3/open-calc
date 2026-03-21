@@ -9,6 +9,16 @@
   :root {
     --sidebar-width: 280px;
     --topbar-height: 60px;
+    /* Semantic color tokens */
+    --color-surface:    #ffffff;
+    --color-border:     #e2e8f0;   /* slate-200 */
+    --color-text-muted: #64748b;   /* slate-500 */
+  }
+
+  .dark {
+    --color-surface:    #0f172a;   /* slate-900 */
+    --color-border:     #334155;   /* slate-700 */
+    --color-text-muted: #94a3b8;   /* slate-400 */
   }
 
   html {
