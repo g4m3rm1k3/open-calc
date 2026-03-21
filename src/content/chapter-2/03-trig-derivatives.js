@@ -49,6 +49,16 @@ export default {
         title: 'Simple Harmonic Motion — Derivatives in Action',
         caption: 'Position x(t)=A·cos(ωt), velocity v(t)=−Aω·sin(ωt), acceleration a(t)=−Aω²·cos(ωt). Each graph is the derivative of the one above. This is why sin and cos are their own derivatives (up to sign).',
       },
+      {
+        id: 'DerivativeCycleClock',
+        title: 'The Higher-Order Derivative Clock',
+        caption: 'Click "d/dx →" to take successive derivatives. Every 4 steps returns to sin(x). Use the Instant Calculator to find the 43rd — or 1000th — derivative in one step.',
+      },
+      {
+        id: 'TangentExplosion',
+        title: 'Why tan(x) Explodes — Quotient Rule Intuition',
+        caption: 'Drag the slider toward x = π/2. Watch the red cos(x) shrink toward zero while the blue sin(x) stays near 1. The purple tan(x) must explode because you\'re dividing by nearly nothing.',
+      },
     ],
   },
 

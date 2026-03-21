@@ -1,5 +1,5 @@
 export default {
-  id: 'ch2-002',
+  id: 'ch2-002b',
   slug: 'derivatives-of-inverse-functions',
   chapter: 2,
   order: 2,
