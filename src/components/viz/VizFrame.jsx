@@ -116,6 +116,11 @@ const VIZ_REGISTRY = {
   QuantifierGridLab:             lazy(() => import('./react/QuantifierGridLab.jsx')),
   BipartiteQuantifierViz:        lazy(() => import('./react/BipartiteQuantifierViz.jsx')),
   DomainExplorerLab:             lazy(() => import('./react/DomainExplorerLab.jsx')),
+  FunctionMappingLab:            lazy(() => import('./react/FunctionMappingLab.jsx')),
+  SetExplorer:                   lazy(() => import('./react/SetExplorer.jsx')),
+  PowerSetTreeLab:               lazy(() => import('./react/PowerSetTreeLab.jsx')),
+  CartesianGridLab:              lazy(() => import('./react/CartesianGridLab.jsx')),
+  FunctionCompositionLab:        lazy(() => import('./react/FunctionCompositionLab.jsx')),
 }
 
 function VizSkeleton() {

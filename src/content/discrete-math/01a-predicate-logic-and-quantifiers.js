@@ -17,16 +17,22 @@ export default {
   intuition: {
     prose: [
       '### 1. Foundations: Predicates and Domains',
-      'A **Predicate** P(x) is essentially a function that returns True or False. It is a "statement template" that is incomplete until you plug a specific object into the variable x.',
-      '• **Example:** Let P(x) be "x is an even number".',
-      'If you plug in x=4, P(4) becomes "4 is an even number" (True). If x=5, P(5) evaluates to False. Until x is defined, P(x) has no truth value!',
+      'A **Predicate** P(x) is essentially a function that returns True or False. Think of it exactly like a **Mad Libs blank form**.',
+      '• **The Template:** "______ is a tall person."',
+      'It has no truth value until you write a name in the blank! If you plug in x="Shaquille O\'Neal", P(Shaquille) evaluates to True. If you plug in x="Kevin Hart", P(Kevin) evaluates to False. Until x is dropped into the machine, P(x) is just a suspended potential reality.',
       'The **Domain of Discourse** (or Universe) is the specific set of all possible values that x is allowed to be. If your Domain is "All positive integers", playing x=−5 is an illegal move that mathematically crashes the system. Always look for the Domain first.',
+      '**The Domain Cheat Sheet:**\nBecause logic frequently evaluates number systems, you should memorize these Universe symbols before we continue:\n| Symbol | Name | What it means |\n|---|---|---|\n| ∈ | "In" | Means "is an element of" (e.g., x ∈ ℤ means x lives in the Integers). |\n| ℕ | Naturals | The counting numbers: 0, 1, 2, 3... |\n| ℤ | Integers | All whole numbers, including negatives: ...-2, -1, 0, 1, 2... |\n| ℝ | Reals | Absolutely every number on the continuous number line, including decimals. |',
       '### 2. The Quantifiers (∀ and ∃)',
       'To turn a floating Predicate P(x) into a hard mathematical proposition, we attach a **Quantifier** to bind the variable. There are exactly two rulers of the logical universe:',
       '• **The Universal Quantifier (∀):** "For All". Evaluates as True ONLY if P(x) is True for every single item in the entire Domain. It is the equivalent of a massive chained AND statement: P(1) ∧ P(2) ∧ P(3)...',
       '• **The Existential Quantifier (∃):** "There Exists". Evaluates as True if P(x) is True for *at least one* item in the Domain. It is the equivalent of a massive chained OR statement: P(1) ∨ P(2) ∨ P(3)...'
     ],
     callouts: [
+      {
+        type: 'definition',
+        title: 'The Counterexample',
+        body: 'To utterly destroy a ∀ (Universal) statement, you only need exactly one weapon: a **Counterexample**. If someone claims "Every prime number is odd," you only need to provide the single number 2. The statement is instantly dead.'
+      },
       {
         type: 'definition',
         title: 'The Sledgehammer vs. The Sniper',
@@ -49,11 +55,11 @@ export default {
 
   math: {
     prose: [
-      '### 3. Nested Quantifiers (The Order Dictates Reality)',
-      'When you have multiple variables (like an x and a y), adding multiple quantifiers creates a nested scope. **The order in which you read them completely changes the meaning of the universe!**',
-      'Let the Domain be "All people". Let Loves(x, y) mean "Person x loves Person y".',
-      '• **∀x ∃y Loves(x, y)** translates left-to-right as: "For every person x, there exists some person y, such that x loves y." (Everyone loves *somebody*. A completely normal world.)',
-      '• **∃y ∀x Loves(x, y)** translates exactly as: "There exists some specific person y, such that for every person x, x loves y." (There is ONE specific mega-celebrity that *everyone* secretly loves. A completely different world!)',
+      '### 3. Nested Quantifiers (The Turn-Based Game of Choice)',
+      'When you have multiple variables (like an x and a y), adding multiple quantifiers creates a nested scope. **The order in which you read them completely dictates the rules of the game!**',
+      'Think of it as a game played against Nature.',
+      '• **∀x ∃y (Nature goes first):** Nature picks absolutely any x it wants to challenge you. You get to wait, look at what Nature picked, and *then* you respond by choosing a y that perfectly counters it. (Highly flexible).',
+      '• **∃y ∀x (You go first):** You are forced to pick a y first, and you must lock it in permanently. Then Nature tries to find ANY x in the entire universe that ruins your choice! (Incredibly rigid).',
       'Always read nested statements strictly outward-in, matching the algebraic variables physically left-to-right.'
     ],
     callouts: [
@@ -90,6 +96,11 @@ export default {
         type: 'theorem',
         title: 'De Morgan\'s Laws for Quantifiers',
         body: 'When dragging a negation operator (¬) past a quantifier, you must exactly FLIP the quantifier, and then apply the negation directly to the inner Predicate.\n\n• ¬(∀x P(x)) ≡ ∃x (¬P(x))\n• ¬(∃x P(x)) ≡ ∀x (¬P(x))\n\nRemember: Because ∀ is just an infinite AND, and ∃ is just an infinite OR, this perfectly mirrors standard De Morgan\'s Law!'
+      },
+      {
+        type: 'insight',
+        title: 'Vacuously True (Innocent Until Proven Guilty)',
+        body: 'What happens if the Domain is completely empty? If I claim: "All my pet dragons breathe fire." Am I a liar?\n\nIn pure logic, you are mathematically **Innocent Until Proven Guilty**. Because there is no Counterexample (I have zero dragons to prove me wrong), the Universal statement ∀x Fire(x) defaults to strictly **True**!'
       }
     ],
     visualizations: []
