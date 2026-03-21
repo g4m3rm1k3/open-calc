@@ -100,7 +100,10 @@ const VIZ_REGISTRY = {
   // Course: Discrete Math
   PigeonholeViz:                 lazy(() => import('./react/PigeonholeViz.jsx')),
   TruthTableLab:                 lazy(() => import('./react/TruthTableLab.jsx')),
+  DiscreteDependencyMap:         lazy(() => import('./react/DiscreteDependencyMap.jsx')),
   RelationMatrixLab:             lazy(() => import('./react/RelationMatrixLab.jsx')),
+  ModClockViz:                   lazy(() => import('./react/ModClockViz.jsx')),
+  CardDiceLab:                   lazy(() => import('./react/CardDiceLab.jsx')),
   RecurrenceExplorer:            lazy(() => import('./d3/RecurrenceExplorer.jsx')),
   CountingTreeLab:               lazy(() => import('./d3/CountingTreeLab.jsx')),
   BayesGridLab:                  lazy(() => import('./d3/BayesGridLab.jsx')),

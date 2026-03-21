@@ -94,6 +94,10 @@ export default {
       id: 'discrete-1-04-ch1',
       difficulty: 'easy',
       problem: 'Can a graph have exactly one vertex of odd degree?',
+      walkthrough: [
+        { expression: '\sum_v deg(v)=2|E|', annotation: 'Handshaking lemma makes total degree even.' },
+        { expression: 'Sum of odd-count terms is odd only if odd-count is odd', annotation: 'Parity contradiction with even total.' },
+      ],
       answer: 'No, odd-degree vertices must come in even count.',
     },
     {
@@ -101,6 +105,11 @@ export default {
       difficulty: 'medium',
       problem: 'A connected graph has n vertices and n edges. Prove it has a cycle.',
       hint: 'Contrapositive via tree edge bound.',
+      walkthrough: [
+        { expression: 'Assume no cycle', annotation: 'Then graph is acyclic and connected.' },
+        { expression: 'Connected + acyclic => tree => |E|=|V|-1', annotation: 'Tree characterization.' },
+        { expression: 'But |E|=|V| is given', annotation: 'Contradiction, so at least one cycle exists.' },
+      ],
       answer: 'If acyclic and connected then tree with n-1 edges; contradiction.',
     },
   ],

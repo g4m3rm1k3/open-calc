@@ -113,6 +113,11 @@ export default {
       difficulty: 'easy',
       problem: 'Prove by induction: 2^n >= n+1 for n>=0.',
       hint: 'Use 2^{k+1}=2*2^k and induction hypothesis.',
+      walkthrough: [
+        { expression: 'Base n=0: 2^0=1\ge1', annotation: 'Base case holds.' },
+        { expression: 'Assume 2^k\ge k+1', annotation: 'Induction hypothesis.' },
+        { expression: '2^{k+1}=2\cdot2^k\ge2(k+1)\ge k+2', annotation: 'Complete step for k+1.' },
+      ],
       answer: 'True for all n>=0.',
     },
     {
@@ -120,6 +125,11 @@ export default {
       difficulty: 'medium',
       problem: 'Given a_1=1, a_{n+1}=a_n+2n+1, guess and prove closed form.',
       hint: 'Compute first few terms; try n^2.',
+      walkthrough: [
+        { expression: 'a_1=1,a_2=4,a_3=9,a_4=16', annotation: 'Pattern suggests n^2.' },
+        { expression: 'Assume a_k=k^2', annotation: 'Induction hypothesis.' },
+        { expression: 'a_{k+1}=a_k+2k+1=k^2+2k+1=(k+1)^2', annotation: 'Step closes immediately.' },
+      ],
       answer: 'a_n=n^2.',
     },
   ],

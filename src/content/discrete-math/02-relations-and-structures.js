@@ -113,6 +113,11 @@ export default {
       difficulty: 'easy',
       problem: 'On real numbers define aRb iff a-b is rational. Is R an equivalence relation?',
       hint: 'Use closure of rationals under subtraction.',
+      walkthrough: [
+        { expression: 'Reflexive: a-a=0\in\mathbb{Q}', annotation: 'Every element is related to itself.' },
+        { expression: 'Symmetric: a-b\in\mathbb{Q} => b-a=-(a-b)\in\mathbb{Q}', annotation: 'Rationals are closed under negation.' },
+        { expression: 'Transitive: (a-b),(b-c)\in\mathbb{Q} => a-c=(a-b)+(b-c)\in\mathbb{Q}', annotation: 'Rationals are closed under addition.' },
+      ],
       answer: 'Yes, it is reflexive, symmetric, and transitive.',
     },
     {
@@ -120,6 +125,11 @@ export default {
       difficulty: 'medium',
       problem: 'Give a relation on {1,2,3} that is reflexive and symmetric but not transitive.',
       hint: 'Try including (1,2) and (2,3) but excluding (1,3).',
+      walkthrough: [
+        { expression: 'Include all (i,i)', annotation: 'Needed for reflexive property.' },
+        { expression: 'Include (1,2),(2,1),(2,3),(3,2)', annotation: 'Keeps symmetry.' },
+        { expression: '(1,2) and (2,3) are in R but (1,3) is not', annotation: 'Transitivity fails by explicit counterexample.' },
+      ],
       answer: 'Example: {(1,1),(2,2),(3,3),(1,2),(2,1),(2,3),(3,2)}.',
     },
   ],

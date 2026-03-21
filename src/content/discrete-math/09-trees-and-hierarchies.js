@@ -76,6 +76,10 @@ export default {
       id: 'discrete-1-09-ch1',
       difficulty: 'easy',
       problem: 'Can a tree on 8 vertices have 8 edges?',
+      walkthrough: [
+        { expression: 'Tree invariant: |E|=|V|-1', annotation: 'Always true for finite trees.' },
+        { expression: 'If |V|=8, then |E|=7', annotation: 'Direct substitution.' },
+      ],
       answer: 'No. A tree on n vertices has n-1 edges, so 7 edges.',
     },
     {
@@ -83,6 +87,11 @@ export default {
       difficulty: 'medium',
       problem: 'Prove every tree has at least two leaves when it has at least two vertices.',
       hint: 'Use a longest simple path argument.',
+      walkthrough: [
+        { expression: 'Take a longest simple path v_1...v_k', annotation: 'This path exists in finite tree.' },
+        { expression: 'If v_1 had extra neighbor outside path, path could be extended', annotation: 'Contradicts maximality.' },
+        { expression: 'So v_1 and v_k each have degree 1', annotation: 'Both endpoints are leaves.' },
+      ],
       answer: 'Endpoints of a longest path must be leaves; otherwise path can be extended.',
     },
   ],

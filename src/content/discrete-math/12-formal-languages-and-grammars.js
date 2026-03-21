@@ -76,12 +76,20 @@ export default {
       id: 'discrete-1-12-ch1',
       difficulty: 'easy',
       problem: 'Give a grammar for strings over {a,b} with exactly one b.',
+      walkthrough: [
+        { expression: 'Need any number of a before b and after b', annotation: 'That shape is a^* b a^*.' },
+        { expression: 'Use S->A b A and A->aA|epsilon', annotation: 'A generates arbitrary-length a block.' },
+      ],
       answer: 'S -> A b A and A -> aA | epsilon.',
     },
     {
       id: 'discrete-1-12-ch2',
       difficulty: 'medium',
       problem: 'Show language {a^n b^n : n>=0} is not regular but is context-free.',
+      walkthrough: [
+        { expression: 'Not regular: pumping lemma contradiction', annotation: 'Pumping breaks equal counts of a and b.' },
+        { expression: 'Context-free: S->aSb|epsilon', annotation: 'Each recursive step adds one a and one b.' },
+      ],
       answer: 'Use pumping lemma for non-regularity and CFG S->aSb|epsilon for context-free generation.',
     },
   ],

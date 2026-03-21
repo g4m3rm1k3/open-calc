@@ -82,12 +82,21 @@ export default {
       id: 'discrete-1-11-ch1',
       difficulty: 'easy',
       problem: 'Build a DFA for strings over {a,b} ending in ab.',
+      walkthrough: [
+        { expression: 'Track suffix progress: none, seen a, seen ab', annotation: 'State meaning should encode progress toward target ending.' },
+        { expression: 'Accept only seen ab state', annotation: 'Acceptance condition matches ending constraint.' },
+      ],
       answer: 'Use three progress states tracking suffix match; accept only final matched state.',
     },
     {
       id: 'discrete-1-11-ch2',
       difficulty: 'medium',
       problem: 'Give an NFA for language of strings containing 00 as a substring.',
+      walkthrough: [
+        { expression: 'q0 loops on 0/1 and may jump to q1 on 0', annotation: 'Nondeterministically guess start of substring.' },
+        { expression: 'q1 on 0 goes to accepting q2', annotation: 'Second zero confirms target substring.' },
+        { expression: 'q2 loops on 0/1', annotation: 'Once found, remain accepting.' },
+      ],
       answer: 'States q0(start), q1(seen one 0), q2(accept seen 00); nondeterministically track candidate 00 start.',
     },
   ],

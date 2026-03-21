@@ -88,6 +88,10 @@ export default {
       id: 'discrete-1-10-ch1',
       difficulty: 'easy',
       problem: 'Is XOR associative?',
+      walkthrough: [
+        { expression: '(P xor Q) xor R = P xor (Q xor R)', annotation: 'Check via truth table or parity interpretation.' },
+        { expression: 'Both sides are true when odd number of inputs are true', annotation: 'Parity view gives immediate proof.' },
+      ],
       answer: 'Yes.',
     },
     {
@@ -95,6 +99,11 @@ export default {
       difficulty: 'medium',
       problem: 'Show NAND is functionally complete by constructing NOT and AND from NAND.',
       hint: 'Use x NAND x to build negation first.',
+      walkthrough: [
+        { expression: 'NOT x = x NAND x', annotation: 'First derive negation gate.' },
+        { expression: 'x AND y = NOT(x NAND y)', annotation: 'Compose NAND with derived NOT.' },
+        { expression: 'OR follows by De Morgan', annotation: 'With NOT and AND, full expressiveness follows.' },
+      ],
       answer: 'NOT x = x NAND x, then x AND y = NOT(x NAND y).',
     },
   ],

@@ -96,12 +96,21 @@ export default {
       id: 'discrete-1-05-ch1',
       difficulty: 'easy',
       problem: 'For independent A,B with P(A)=0.4, P(B)=0.5, find P(A intersection B).',
+      walkthrough: [
+        { expression: 'Independence => P(A\cap B)=P(A)P(B)', annotation: 'Use independence definition directly.' },
+        { expression: '0.4*0.5=0.2', annotation: 'Multiply marginals.' },
+      ],
       answer: '0.2',
     },
     {
       id: 'discrete-1-05-ch2',
       difficulty: 'medium',
       problem: 'If X takes values 0,1,2 with probs 0.2,0.5,0.3, compute E[X] and Var(X).',
+      walkthrough: [
+        { expression: 'E[X]=0(0.2)+1(0.5)+2(0.3)=1.1', annotation: 'Weighted average definition.' },
+        { expression: 'E[X^2]=0^2(0.2)+1^2(0.5)+2^2(0.3)=1.7', annotation: 'Compute second moment.' },
+        { expression: 'Var(X)=E[X^2]-E[X]^2=1.7-1.21=0.49', annotation: 'Variance identity.' },
+      ],
       answer: 'E[X]=1.1, Var(X)=0.49',
     },
   ],

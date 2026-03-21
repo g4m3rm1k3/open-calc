@@ -91,6 +91,10 @@ export default {
       id: 'discrete-1-02a-ch1',
       difficulty: 'easy',
       problem: 'Is f(n)=n^2 from integers to integers injective?',
+      walkthrough: [
+        { expression: 'Injective means: f(x_1)=f(x_2) => x_1=x_2', annotation: 'Write the definition first.' },
+        { expression: 'f(1)=1, f(-1)=1', annotation: 'Find two distinct inputs with equal output.' },
+      ],
       answer: 'No, because f(1)=f(-1).',
     },
     {
@@ -98,6 +102,11 @@ export default {
       difficulty: 'medium',
       problem: 'Prove A intersection (B union C) = (A intersection B) union (A intersection C).',
       hint: 'Use double inclusion.',
+      walkthrough: [
+        { expression: 'x\in A\cap(B\cup C) => x\in A and (x\in B or x\in C)', annotation: 'Unpack left side definition.' },
+        { expression: '=> (x\in A\cap B) or (x\in A\cap C)', annotation: 'Distribute conjunction over disjunction.' },
+        { expression: '=> x\in (A\cap B)\cup(A\cap C)', annotation: 'Pack right side definition; reverse direction similarly.' },
+      ],
       answer: 'True by element-wise logic and double-inclusion proof.',
     },
   ],

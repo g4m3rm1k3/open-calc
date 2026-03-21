@@ -13,7 +13,7 @@ export default {
       'Why does modern encryption depend on arithmetic that looks like high-school remainders?',
     realWorldContext:
       'Public-key cryptography, hashing, checksums, and many randomized data structures rely on modular arithmetic and divisibility properties. Number theory is not optional if you want to understand secure systems.',
-    previewVisualizationId: 'PascalsTriangle',
+    previewVisualizationId: 'ModClockViz',
   },
 
   intuition: {
@@ -35,6 +35,18 @@ export default {
         type: 'theorem',
         title: 'Bézout Identity',
         body: 'For integers a,b not both 0, there exist integers x,y with ax+by=gcd(a,b).',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'ModClockViz',
+        title: 'Modular Clock Explorer',
+        caption: 'Watch integers collapse into congruence classes and verify modular operations visually.',
+      },
+      {
+        id: 'PascalsTriangle',
+        title: 'Pascal Patterns',
+        caption: 'Spot modular arithmetic regularities in binomial coefficients.',
       },
     ],
   },
@@ -99,6 +111,11 @@ export default {
       id: 'discrete-1-05-ch1',
       difficulty: 'easy',
       problem: 'Compute gcd(84,30).',
+      walkthrough: [
+        { expression: '84=30*2+24', annotation: 'First Euclidean step.' },
+        { expression: '30=24*1+6', annotation: 'Second step.' },
+        { expression: '24=6*4+0', annotation: 'Stop at remainder zero; last nonzero remainder is gcd.' },
+      ],
       answer: '6',
     },
     {
@@ -106,6 +123,10 @@ export default {
       difficulty: 'medium',
       problem: 'Does 14 have a multiplicative inverse modulo 35?',
       hint: 'Check gcd(14,35).',
+      walkthrough: [
+        { expression: 'Inverse exists iff gcd(a,n)=1', annotation: 'Use modular inverse criterion.' },
+        { expression: 'gcd(14,35)=7', annotation: 'Compute quickly by common factor.' },
+      ],
       answer: 'No, gcd(14,35)=7 so inverse does not exist.',
     },
   ],

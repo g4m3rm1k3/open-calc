@@ -37,6 +37,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'DiscreteDependencyMap',
+        title: 'Discrete Toolchain Map',
+        caption: 'See how logic and proof ideas unlock later topics; revisit this map as you progress.',
+      },
+      {
         id: 'TruthTableLab',
         title: 'Truth Table Studio',
         caption: 'Toggle formulas and watch equivalent statements match row-by-row.',
@@ -106,6 +111,10 @@ export default {
       difficulty: 'easy',
       problem: 'Prove or disprove: (P => Q) and (Q => P) imply P <=> Q.',
       hint: 'Use biconditional definition.',
+      walkthrough: [
+        { expression: 'P <=> Q \equiv (P=>Q) \wedge (Q=>P)', annotation: 'Start from the formal definition of biconditional.' },
+        { expression: '(P=>Q) \wedge (Q=>P)', annotation: 'This exact conjunction is given in the hypothesis.' },
+      ],
       answer: 'True; biconditional is exactly conjunction of both implications.',
     },
     {
@@ -113,6 +122,11 @@ export default {
       difficulty: 'medium',
       problem: 'Negate: For every graph G, there exists a vertex v of even degree.',
       hint: 'Flip quantifiers and negate predicate.',
+      walkthrough: [
+        { expression: '\neg(\forall G\,\exists v\,EvenDegree(v))', annotation: 'Wrap the whole statement in one negation first.' },
+        { expression: '\exists G\,\forall v\,\neg EvenDegree(v)', annotation: 'Flip quantifiers in order and negate predicate.' },
+        { expression: '\exists G\,\forall v\,OddDegree(v)', annotation: 'For integer degree parity, not-even means odd.' },
+      ],
       answer: 'There exists a graph G such that every vertex v has odd degree.',
     },
   ],

@@ -95,12 +95,20 @@ export default {
       id: 'discrete-1-06-ch1',
       difficulty: 'easy',
       problem: 'Is n log n in O(n^2)?',
+      walkthrough: [
+        { expression: '\log n \le n for n\ge2', annotation: 'Standard growth comparison.' },
+        { expression: 'n\log n \le n*n=n^2', annotation: 'Multiply both sides by n>0.' },
+      ],
       answer: 'Yes.',
     },
     {
       id: 'discrete-1-06-ch2',
       difficulty: 'medium',
       problem: 'Give c and n0 to show 3n+7 <= c n for n>=n0.',
+      walkthrough: [
+        { expression: 'Need 3n+7\le cn => 7\le (c-3)n', annotation: 'Rearrange target inequality.' },
+        { expression: 'Choose c=4 so 7\le n', annotation: 'Then n0=7 works.' },
+      ],
       answer: 'One choice: c=4, n0=7.',
     },
   ],

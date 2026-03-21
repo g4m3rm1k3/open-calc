@@ -85,12 +85,20 @@ export default {
       id: 'discrete-1-01a-ch1',
       difficulty: 'easy',
       problem: 'Translate into symbols: Every student has at least one course.',
+      walkthrough: [
+        { expression: '"Every student" -> \forall s\in Students', annotation: 'Universal quantifier for the word every.' },
+        { expression: '"has at least one course" -> \exists c\in Courses\,Enrolled(s,c)', annotation: 'Existential quantifier for at least one.' },
+      ],
       answer: 'forall s in Students exists c in Courses Enrolled(s,c).',
     },
     {
       id: 'discrete-1-01a-ch2',
       difficulty: 'medium',
       problem: 'Negate: exists x forall y P(x,y).',
+      walkthrough: [
+        { expression: '\neg(\exists x\,\forall y\,P(x,y))', annotation: 'Begin with one outer negation.' },
+        { expression: '\forall x\,\exists y\,\neg P(x,y)', annotation: 'Flip each quantifier and negate predicate.' },
+      ],
       answer: 'forall x exists y NOT P(x,y).',
     },
   ],

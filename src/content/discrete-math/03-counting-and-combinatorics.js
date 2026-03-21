@@ -105,6 +105,10 @@ export default {
       id: 'discrete-1-03-ch1',
       difficulty: 'easy',
       problem: 'Compute C(12,2).',
+      walkthrough: [
+        { expression: 'C(12,2)=12!/(2!10!)', annotation: 'Apply combination formula.' },
+        { expression: '=12*11/2=66', annotation: 'Cancel factorial tail and simplify.' },
+      ],
       answer: '66',
     },
     {
@@ -112,6 +116,10 @@ export default {
       difficulty: 'medium',
       problem: 'How many 5-bit strings contain exactly two 1s?',
       hint: 'Choose positions of 1s.',
+      walkthrough: [
+        { expression: 'Pick 2 positions from 5 for ones', annotation: 'Order of chosen positions does not matter.' },
+        { expression: 'C(5,2)=10', annotation: 'Remaining positions are automatically zeros.' },
+      ],
       answer: 'C(5,2)=10',
     },
   ],

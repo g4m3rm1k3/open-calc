@@ -92,6 +92,10 @@ export default {
       id: 'discrete-1-07-ch1',
       difficulty: 'easy',
       problem: 'Given b_0=2 and b_n=3b_{n-1}, find b_n.',
+      walkthrough: [
+        { expression: 'b_1=6, b_2=18, b_3=54', annotation: 'Compute first few terms to detect pattern.' },
+        { expression: 'Each step multiplies by 3', annotation: 'So after n steps, factor is 3^n.' },
+      ],
       answer: 'b_n = 2*3^n',
     },
     {
@@ -99,6 +103,11 @@ export default {
       difficulty: 'medium',
       problem: 'Guess and prove closed form for c_1=1, c_n=c_{n-1}+2n-1.',
       hint: 'Compute first terms and test n^2.',
+      walkthrough: [
+        { expression: 'c_1=1, c_2=4, c_3=9, c_4=16', annotation: 'Pattern suggests c_n=n^2.' },
+        { expression: 'Assume c_k=k^2, then c_{k+1}=c_k+2(k+1)-1', annotation: 'Induction step setup.' },
+        { expression: '=k^2+2k+1=(k+1)^2', annotation: 'Induction closes.' },
+      ],
       answer: 'c_n=n^2.',
     },
   ],
