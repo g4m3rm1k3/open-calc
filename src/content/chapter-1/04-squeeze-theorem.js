@@ -265,6 +265,7 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'epsilon-delta', label: 'Previous: ε-δ Definition', context: 'The Squeeze Theorem is proved using the ε-δ definition.' },
+    { lessonSlug: 'fundamental-trig-limits', label: 'Deep Dive: Fundamental Trig Limits', context: 'Use the dedicated lesson for a slower, pattern-first study track of the two trig pillars.' },
     { lessonSlug: 'limit-laws', label: 'See Also: Limit Laws', context: 'The Squeeze Theorem is used alongside the limit laws for computation.' },
     { lessonSlug: 'limits-at-infinity', label: 'Next: Limits at Infinity', context: 'The Squeeze Theorem also applies to limits as x → ∞.' },
     { lessonSlug: 'trig-derivatives', label: 'Essential For: Trig Derivatives', context: 'The proof that d/dx[sin x] = cos x uses lim sin(x)/x = 1.' },

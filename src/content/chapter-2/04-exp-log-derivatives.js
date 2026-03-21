@@ -7,6 +7,7 @@ export default {
   title: 'Derivatives of Exponential and Logarithmic Functions',
   subtitle: 'The function that equals its own derivative — and the logarithm that unlocks it',
   tags: ['exponential derivative', 'logarithm derivative', 'natural log', 'e^x', 'ln x', 'logarithmic differentiation', 'a^x'],
+  aliases: 'section 3.9 derivative exponential function derivative logarithmic function formal proof e^x ln x logarithmic differentiation',
 
   hook: {
     question: 'Bacteria in a culture double every hour. A radioactive isotope loses half its mass every 5,730 years. A savings account grows at 5% per year compounded continuously. Why do all three follow the same mathematical pattern, and what does calculus tell us is special about them?',

@@ -7,6 +7,7 @@ export default {
   title: 'The Chain Rule — Differentiating Compositions',
   subtitle: 'How to differentiate a function inside another function — the most widely used rule in all of calculus',
   tags: ['chain rule', 'composite functions', 'composition', 'outside-inside', 'Leibniz form', 'triple composition'],
+  aliases: 'section 3.6 chain rule derivation formal proof leibniz notation dy du times du dx chain and power product quotient composite three layers',
 
   hook: {
     question: 'A balloon is being inflated so that its radius grows at a rate of 2 centimeters per second (r(t) = 2t). The volume of a sphere is V = (4/3)\u03c0r\u00b3. At the moment when t = 3 seconds, how fast is the volume increasing? Volume depends on radius, radius depends on time — so how do we find dV/dt?',

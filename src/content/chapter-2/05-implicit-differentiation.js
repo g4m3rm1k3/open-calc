@@ -7,6 +7,7 @@ export default {
   title: 'Implicit Differentiation',
   subtitle: 'Finding dy/dx when y cannot be (or is not) solved for explicitly — the chain rule in disguise',
   tags: ['implicit differentiation', 'implicit function', 'dy/dx', 'circle', 'folium of Descartes', 'chain rule', 'tangent line to curve'],
+  aliases: 'section 3.8 implicit differentiation techniques tangent lines implicitly implicit slope',
 
   hook: {
     question: 'The equation x\u00b2 + y\u00b2 = 25 describes a circle of radius 5. If you try to solve for y, you get y = \u00b1\u221a(25 - x\u00b2) — two separate functions, neither of which describes the whole circle. Now suppose you want the slope of the circle at the point (3, 4). Can you find dy/dx without splitting the circle into two halves?',

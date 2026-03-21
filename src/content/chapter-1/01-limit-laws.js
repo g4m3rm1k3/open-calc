@@ -205,6 +205,7 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'inequalities', label: 'Prerequisite: Inequalities', context: 'Understanding the Triangle Inequality is strictly required to prove the limit laws.' },
+    { lessonSlug: 'fundamental-trig-limits', label: 'Deep Dive: Fundamental Trig Limits', context: 'If sin(x)/x and (1-cos x)/x feel shaky, use the focused lesson for slower proofs and pattern drills.' },
     { lessonSlug: 'introduction', label: 'Previous: Introduction to Limits', context: 'Informal concept and ε-δ definition.' },
     { lessonSlug: 'continuity', label: 'Next: Continuity', context: 'A function is continuous if its limit equals its value.' },
   ],

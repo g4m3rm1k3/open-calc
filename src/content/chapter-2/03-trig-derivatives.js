@@ -7,6 +7,7 @@ export default {
   title: 'Derivatives of Trigonometric Functions',
   subtitle: 'Why the slope of the sine curve is cosine — and deriving all six trig derivatives',
   tags: ['sine derivative', 'cosine derivative', 'tangent derivative', 'trigonometric functions', 'trig limits', 'chain rule with trig'],
+  aliases: 'section 3.5 derivatives trig functions formal proof sin cos tan cot sec csc limit definition derivative',
 
   hook: {
     question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(\u03b8). When \u03b8 = 0, the point is at (1, 0) and is moving straight upward — the y-coordinate is increasing as fast as it can. When \u03b8 = \u03c0/2, the point is at (0, 1), at the very top, momentarily moving horizontally — the y-coordinate is not changing at all. When \u03b8 = \u03c0, the point is at (-1, 0) and is moving straight downward. These rates of change — 1, 0, and -1 — are exactly the values of cos(0), cos(\u03c0/2), and cos(\u03c0). Is it a coincidence that the rate of change of sine is cosine?',
