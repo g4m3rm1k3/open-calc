@@ -200,9 +200,9 @@ export default {
   ],
 
   crossRefs: [
-    { lessonId: 'ch5-000', text: 'Sequences — the building blocks of series' },
-    { lessonId: 'ch5-002', text: 'Convergence tests — systematic methods for deciding if a series converges' },
-    { lessonId: 'ch5-003', text: 'Power series — series whose terms involve powers of $x$' },
+    { lessonSlug: 'sequences', label: 'Sequences', context: 'Series are limits of partial sums built from sequence terms.' },
+    { lessonSlug: 'convergence-tests', label: 'Convergence Tests', context: 'Use formal tests when geometric or telescoping structure is not obvious.' },
+    { lessonSlug: 'power-series', label: 'Power Series', context: 'Power series are infinite sums with variable terms and a convergence interval.' },
   ],
 
   checkpoints: [

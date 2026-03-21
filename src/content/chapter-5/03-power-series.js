@@ -181,9 +181,9 @@ export default {
   ],
 
   crossRefs: [
-    { lessonId: 'ch5-002', text: 'Convergence tests — used to find the radius and check endpoints' },
-    { lessonId: 'ch5-004', text: 'Taylor and Maclaurin series — the connection between power series and derivatives' },
-    { lessonId: 'ch5-001', text: 'Geometric series — the foundation from which many power series are built' },
+    { lessonSlug: 'convergence-tests', label: 'Convergence Tests', context: 'Use ratio/root and endpoint tests to determine interval of convergence.' },
+    { lessonSlug: 'taylor-maclaurin', label: 'Taylor and Maclaurin Series', context: 'Taylor series are the canonical power-series representation of analytic functions.' },
+    { lessonSlug: 'series-intro', label: 'Infinite Series', context: 'Geometric series identities power most algebraic manipulations in this lesson.' },
   ],
 
   checkpoints: [

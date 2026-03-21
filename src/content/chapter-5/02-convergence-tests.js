@@ -213,9 +213,9 @@ export default {
   ],
 
   crossRefs: [
-    { lessonId: 'ch5-001', text: 'Series fundamentals — geometric, telescoping, nth term test' },
-    { lessonId: 'ch5-003', text: 'Power series — convergence tests determine the radius of convergence' },
-    { lessonId: 'ch4-005', text: 'Improper integrals — the integral test connects series to integrals' },
+    { lessonSlug: 'series-intro', label: 'Infinite Series', context: 'Use this as your first pass for geometric, telescoping, and nth-term logic.' },
+    { lessonSlug: 'power-series', label: 'Power Series', context: 'Convergence tests determine radii and endpoint behavior for series in x.' },
+    { lessonSlug: 'applications', label: 'Applications of Integration', context: 'The integral test bridges series behavior to improper integral behavior.' },
   ],
 
   checkpoints: [

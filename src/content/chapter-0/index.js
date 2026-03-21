@@ -1,6 +1,7 @@
 import realNumbers from './00-real-numbers.js'
 import setsAndLogic from './00a-sets-and-logic.js'
 import geometryReview from './00b-geometry-review.js'
+import conicSections from './00d-conic-sections.js'
 import inequalities from './00c-inequalities.js'
 import absoluteValue from './01a-absolute-value.js'
 import algebraicTechniques from './01b-algebraic-techniques.js'
@@ -24,6 +25,7 @@ export default {
     realNumbers,
     setsAndLogic,
     geometryReview,
+    conicSections,
     inequalities,
     absoluteValue,
     algebraicTechniques,

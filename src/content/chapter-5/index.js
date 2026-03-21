@@ -4,6 +4,7 @@ import seriesIntro from './01-series-intro.js'
 import convergenceTests from './02-convergence-tests.js'
 import powerSeries from './03-power-series.js'
 import taylorMaclaurin from './04-taylor-maclaurin.js'
+import seriesApplications from './05-series-applications.js'
 
 export default {
   id: 'chapter-5',
@@ -19,5 +20,6 @@ export default {
     convergenceTests,
     powerSeries,
     taylorMaclaurin,
+    seriesApplications,
   ],
 }

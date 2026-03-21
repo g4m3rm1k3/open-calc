@@ -10,6 +10,7 @@ const ChapterPage = lazy(() => import('./pages/ChapterPage.jsx'))
 const LessonPage  = lazy(() => import('./pages/LessonPage.jsx'))
 const SearchPage  = lazy(() => import('./pages/SearchPage.jsx'))
 const AboutPage   = lazy(() => import('./pages/AboutPage.jsx'))
+const LearningPathsPage = lazy(() => import('./pages/LearningPathsPage.jsx'))
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -30,6 +31,7 @@ export default function App() {
                 <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
                 <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
                 <Route path="search" element={<SearchPage />} />
+                <Route path="paths" element={<LearningPathsPage />} />
                 <Route path="about" element={<AboutPage />} />
               </Routes>
             </Suspense>

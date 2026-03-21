@@ -44,13 +44,12 @@ export default function AboutPage() {
 
         <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 pt-4">Roadmap</h2>
         <ul className="list-disc pl-6 space-y-1 text-sm">
-          <li>✅ Chapter 0: Prerequisites (Real Numbers, Functions, Trig, Exponentials)</li>
-          <li>✅ Chapter 1: Limits & Continuity</li>
-          <li>🚧 Chapter 2: Derivatives</li>
-          <li>📅 Chapter 3: Applications of Derivatives</li>
-          <li>📅 Chapter 4: Integration</li>
-          <li>📅 Chapter 5: Applications of Integration + FTC</li>
-          <li>📅 Future: Calc 2, Linear Algebra, Statistics, Physics</li>
+          <li>✅ Full Calc 1 flow: prerequisites, limits, derivatives, applications, and integration</li>
+          <li>✅ Calc 2 bridge: sequences, series, convergence, power series, and Taylor/Maclaurin</li>
+          <li>✅ Parametric, polar, and vectors for multivariable readiness</li>
+          <li>✅ Multi-style learning pathways: intuition-first, assignment-first, proof-first, and career-first</li>
+          <li>🚧 Ongoing quality pass: tighter proof polish, richer worked examples, and broader domain applications</li>
+          <li>📅 Future tracks: differential equations, linear algebra, probability/statistics, and physics modeling</li>
         </ul>
       </div>
 

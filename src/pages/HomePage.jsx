@@ -60,6 +60,17 @@ export default function HomePage() {
         ))}
       </section>
 
+      <section className="mb-12 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 bg-gradient-to-r from-slate-50 to-brand-50/40 dark:from-slate-900/40 dark:to-brand-950/20">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Choose How You Learn</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 max-w-3xl">
+          Not everyone learns calculus the same way. Pick a route for exam prep, intuition, proofs, or career applications, then jump between paths whenever needed.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/paths" className="px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm hover:bg-brand-700 transition-colors">Open learning paths</Link>
+          <Link to="/chapter/0/05-assignment-playbook" className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-sm text-slate-700 dark:text-slate-200 hover:border-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors">Start with assignment playbook</Link>
+        </div>
+      </section>
+
       {/* Curriculum */}
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Curriculum</h2>

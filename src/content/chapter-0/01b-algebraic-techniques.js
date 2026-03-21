@@ -289,7 +289,7 @@ export default {
   ],
 
   crossRefs: [
-    { lessonSlug: 'intro-limits', label: 'Limits Introduction', context: 'These algebraic moves are essential for resolving 0/0 indeterminate forms.' },
+    { lessonSlug: 'introduction', label: 'Limits Introduction', context: 'These algebraic moves are essential for resolving 0/0 indeterminate forms.' },
     { lessonSlug: 'differentiation-rules', label: 'Differentiation Rules', context: 'The product rule, quotient rule, and chain rule proofs use these same algebraic techniques.' },
   ],
 

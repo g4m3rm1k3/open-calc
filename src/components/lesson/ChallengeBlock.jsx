@@ -63,6 +63,11 @@ const DIFFICULTY_COLORS = {
 }
 
 export default function ChallengeBlock({ challenge, number }) {
+  const normalizedWalkthrough = (challenge.walkthrough ?? []).map((step) => {
+    if (typeof step === 'string') return { annotation: step }
+    return step
+  })
+
   return (
     <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-5 mb-5">
       {/* Header */}
@@ -91,7 +96,7 @@ export default function ChallengeBlock({ challenge, number }) {
       {/* Full walkthrough */}
       <Spoiler label="Show full walkthrough">
         <div className="divide-y divide-slate-100 dark:divide-slate-800 mb-3">
-          {challenge.walkthrough.map((step, i) => (
+          {normalizedWalkthrough.map((step, i) => (
             <MathStep key={i} step={step} stepNumber={step.expression ? i + 1 : undefined} />
           ))}
         </div>

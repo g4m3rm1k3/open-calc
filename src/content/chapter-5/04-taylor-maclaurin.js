@@ -212,10 +212,10 @@ export default {
   ],
 
   crossRefs: [
-    { lessonId: 'ch5-003', text: 'Power series — Taylor series are the canonical power series for a function' },
-    { lessonId: 'ch5-005', text: 'Applications of series — using Taylor series for integrals, Euler\'s formula, and more' },
-    { lessonId: 'ch2-000', text: 'The tangent line problem — the Taylor polynomial of degree 1 is the tangent line' },
-    { lessonId: 'ch3-003', text: 'Linear approximation — the $T_1$ Taylor polynomial' },
+    { lessonSlug: 'power-series', label: 'Power Series', context: 'Taylor series are power series with coefficients from derivatives.' },
+    { lessonSlug: 'series-applications', label: 'Series Applications', context: 'Use Taylor tools in physics, computing, probability, and differential equations.' },
+    { lessonSlug: 'tangent-problem', label: 'The Tangent Problem', context: 'The degree-1 Taylor polynomial is exactly the tangent-line approximation.' },
+    { lessonSlug: 'linear-approximation', label: 'Linear Approximation', context: 'Linearization is the first truncation of the Taylor expansion.' },
   ],
 
   checkpoints: [
