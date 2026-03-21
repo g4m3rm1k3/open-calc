@@ -16,13 +16,29 @@ export default function RelationMatrixLab() {
   };
 
   const clearAll = () => setMatrix(Array(size).fill(false).map(() => Array(size).fill(false)));
+  
   const setEquivalence = () => {
     const newMat = Array(size).fill(false).map(() => Array(size).fill(false));
-    // Let's make an equivalence relation with two classes: {A, B} and {C, D}
     newMat[0][0] = true; newMat[0][1] = true; newMat[1][0] = true; newMat[1][1] = true;
     newMat[2][2] = true; newMat[2][3] = true; newMat[3][2] = true; newMat[3][3] = true;
     setMatrix(newMat);
-  }
+  };
+
+  const setIdentity = () => {
+    const newMat = Array(size).fill(false).map(() => Array(size).fill(false));
+    for (let i = 0; i < size; i++) newMat[i][i] = true;
+    setMatrix(newMat);
+  };
+
+  const flipInverse = () => {
+    const newMat = Array(size).fill(false).map(() => Array(size).fill(false));
+    for (let i = 0; i < size; i++) {
+       for (let j = 0; j < size; j++) {
+          newMat[i][j] = matrix[j][i];
+       }
+    }
+    setMatrix(newMat);
+  };
 
   // Properties validation
   // Reflexive: All main diagonal elements are true
@@ -58,6 +74,20 @@ export default function RelationMatrixLab() {
         }
       }
     }
+  }
+
+  // Is Function: A relation where EVERY input has EXACTLY ONE output arrow.
+  let isFunction = true;
+  let functionError = null;
+  for (let i = 0; i < size; i++) {
+     const arrowCount = matrix[i].filter(Boolean).length;
+     if (arrowCount !== 1) {
+         isFunction = false;
+         functionError = arrowCount > 1 
+           ? `Node ${labels[i]} is "cheating" by pointing to ${arrowCount} things at once!` 
+           : `Node ${labels[i]} has zero outputs!`;
+         break;
+     }
   }
 
   const isEquivalence = isReflexive && isSymmetric && isTransitive;
@@ -97,9 +127,13 @@ export default function RelationMatrixLab() {
             ))}
          </div>
 
-         <div className="flex w-full gap-2 mt-6">
-            <button onClick={clearAll} className="flex-1 text-xs py-2 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold transition">Clear</button>
-            <button onClick={setEquivalence} className="flex-1 text-xs py-2 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold transition">Load Perfect Class</button>
+         <div className="flex w-full gap-2 mt-6 flex-wrap">
+            <button onClick={clearAll} className="flex-1 text-[10px] py-2 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold transition whitespace-nowrap px-2">Clear</button>
+            <button onClick={setIdentity} className="flex-1 text-[10px] py-2 rounded bg-sky-700 hover:bg-sky-600 text-white font-bold transition whitespace-nowrap px-2">Identity R</button>
+            <button onClick={flipInverse} className="flex-1 text-[10px] py-2 rounded bg-purple-700 hover:bg-purple-600 text-white font-bold transition whitespace-nowrap px-2">Inverse Flip R⁻¹</button>
+         </div>
+         <div className="flex w-full gap-2 mt-2">
+            <button onClick={setEquivalence} className="w-full text-[10px] py-2 rounded bg-amber-600 hover:bg-amber-500 text-white font-bold transition uppercase tracking-wider">Load Perfect Class</button>
          </div>
       </div>
 
@@ -134,6 +168,14 @@ export default function RelationMatrixLab() {
 
          {/* Grand Structures */}
          <div className="mt-6 space-y-2">
+             <div className={`p-3 rounded border flex flex-col justify-center transition-colors ${isFunction ? 'bg-sky-900/30 border-sky-500 text-sky-400' : 'bg-red-900/30 border-red-500 text-red-500'}`}>
+                <div className="flex justify-between items-center w-full">
+                   <span className="font-bold text-sm tracking-widest uppercase text-white">Loyal Function?</span>
+                   <span className="text-xs font-bold uppercase">{isFunction ? 'YES' : 'NO'}</span>
+                </div>
+                {!isFunction && functionError && <div className="mt-2 text-[10.5px] font-bold text-red-300">Warning: This is incredibly wild! {functionError}</div>}
+             </div>
+
             {isEquivalence && (
               <div className="p-3 bg-amber-500 text-amber-950 font-bold rounded shadow-[0_0_20px_#fbbf24] animate-pulse text-center">
                  🌟 EQUIVALENCE RELATION ACHIEVED!

@@ -126,6 +126,13 @@ const VIZ_REGISTRY = {
   SetProofVisualizer:            lazy(() => import('./react/SetProofVisualizer.jsx')),
   RelationMatrixLab:             lazy(() => import('./react/RelationMatrixLab.jsx')),
   ModuloPartitionLab:            lazy(() => import('./react/ModuloPartitionLab.jsx')),
+  HasseTransformerLab:           lazy(() => import('./react/HasseTransformerLab.jsx')),
+  EquivalenceDecoderLab:         lazy(() => import('./react/EquivalenceDecoderLab.jsx')),
+  DominoInductionLab:            lazy(() => import('./react/DominoInductionLab.jsx')),
+  RecursiveStackLab:             lazy(() => import('./react/RecursiveStackLab.jsx')),
+  InductionAlgebraDecoderLab:    lazy(() => import('./react/InductionAlgebraDecoderLab.jsx')),
+  SigmaDecoderLab:               lazy(() => import('./react/SigmaDecoderLab.jsx')),
+  StrongInductionWallLab:        lazy(() => import('./react/StrongInductionWallLab.jsx')),
 }
 
 function VizSkeleton() {
