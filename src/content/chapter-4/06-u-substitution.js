@@ -172,7 +172,7 @@ export default {
     },
     {
       id: 'ch4-006-ex4',
-      title: 'Trigonometric Substitution — ∫sin(3x+2) dx',
+      title: 'U-Sub with Trig — ∫sin(3x+2) dx',
       problem: '\\text{Evaluate } \\displaystyle\\int \\sin(3x+2)\\,dx.',
       steps: [
         { expression: 'u = 3x+2, \\quad du = 3\\,dx \\implies dx = \\frac{du}{3}', annotation: 'The argument of sine is the natural u. Its derivative is 3 (a constant).' },
@@ -216,7 +216,7 @@ export default {
         { expression: '\\int_0^1 2x e^{-x^2}\\,dx = \\int_0^{-1} e^u \\cdot (-du) = \\int_{-1}^0 e^u\\,du', annotation: 'Substitute: e^(−x²) = eᵘ, 2x dx = −du. Flip limits (negating the integral) to get ∫_{−1}^{0}.' },
         { expression: '= [e^u]_{-1}^0 = e^0 - e^{-1} = 1 - \\frac{1}{e}', annotation: 'Evaluate. e⁰ = 1, e⁻¹ = 1/e.' },
       ],
-      conclusion: 'Answer: 1 − 1/e ≈ 0.6321. This integral represents the probability that a standard normal variable falls within [0,1] — one of the most important quantities in statistics. The full error function erf(x) = (2/√π)∫₀ˣ e^(−t²) dt generalizes this.',
+      conclusion: 'Answer: 1 − 1/e ≈ 0.6321. Note: the integrand 2xe^(−x²) is the Rayleigh distribution\'s PDF — it gives the probability that a Rayleigh-distributed distance (arising in 2D random walks and wireless signal strength) falls in [0,1]. The related error function erf(x) = (2/√π)∫₀ˣ e^(−t²) dt generalizes the idea to Gaussian integrals; both require substitution as their first step.',
     },
   ],
 
