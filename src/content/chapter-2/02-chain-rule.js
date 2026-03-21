@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'A balloon is being inflated so that its radius grows at a rate of 2 centimeters per second (r(t) = 2t). The volume of a sphere is V = (4/3)\u03c0r\u00b3. At the moment when t = 3 seconds, how fast is the volume increasing? Volume depends on radius, radius depends on time — so how do we find dV/dt?',
     realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
-    previewVisualizationId: 'CompositionVisualization',
+    previewVisualizationId: 'ChainRuleMicroscope',
   },
 
   intuition: {
@@ -53,11 +53,13 @@ export default {
         body: '\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial a_2}\\cdot\\frac{\\partial a_2}{\\partial z_2}\\cdot\\frac{\\partial z_2}{\\partial a_1}\\cdot\\frac{\\partial a_1}{\\partial z_1}\\cdot\\frac{\\partial z_1}{\\partial w_1}\\;\\;\\text{(one weight in a deep net)}',
       },
     ],
-    visualizationId: 'CompositionVisualization',
-    visualizationProps: {
-      showGearAnalogy: true,
-      showLayerPeeling: true,
-    },
+    visualizations: [
+      {
+        id: 'ChainRulePeeler',
+        title: 'Peel the Onion',
+        caption: 'The chain rule differentiates strictly from the outside in. Click the outer layers to peel them away and automatically multiply by the inner derivatives.',
+      },
+    ],
   },
 
   math: {
@@ -90,11 +92,13 @@ export default {
         body: "\\frac{d}{dx}[f(g(h(x)))] = f'(g(h(x))) \\cdot g'(h(x)) \\cdot h'(x)",
       },
     ],
-    visualizationId: 'CompositionVisualization',
-    visualizationProps: {
-      showOuterInnerLabels: true,
-      animateLayerByLayer: true,
-    },
+    visualizations: [
+      {
+        id: 'ChainRuleMicroscope',
+        title: 'Microscope Mode: The Visual Derivation',
+        caption: 'As you zoom in on any differentiable curve, it becomes perfectly straight. The chain rule simply proves that feeding one line into another multiplies their slopes: m_total = m1 × m2.',
+      },
+    ],
   },
 
   rigor: {
