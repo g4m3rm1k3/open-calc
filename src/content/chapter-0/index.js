@@ -8,6 +8,7 @@ import algebraicTechniques from './01b-algebraic-techniques.js'
 import polynomialDivision from './01c-polynomial-division.js'
 import completingTheSquare from './01d-completing-the-square.js'
 import partialFractionsIntro from './01e-partial-fractions-intro.js'
+import binomialTheorem from './01f-binomial-theorem.js'
 import functions from './01-functions.js'
 import trigReview from './02-trig-review.js'
 import exponentials from './03-exponentials.js'
@@ -33,6 +34,7 @@ export default {
     polynomialDivision,
     completingTheSquare,
     partialFractionsIntro,
+    binomialTheorem,
     functions,
     trigReview,
     exponentials,

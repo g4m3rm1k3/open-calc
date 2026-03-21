@@ -79,6 +79,7 @@ const VIZ_REGISTRY = {
   SeriesConvergenceLab:          lazy(() => import('./d3/SeriesConvergenceLab.jsx')),
   // Chapter 2 — Additions
   DualGraphSync:                 lazy(() => import('./react/DualGraphSync.jsx')),
+  PascalsTriangle:               lazy(() => import('./react/PascalsTriangle.jsx')),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution:           lazy(() => import('./d3/VolumesOfRevolution.jsx')),
   // Chapter 6 — Polar & Parametric
