@@ -70,6 +70,11 @@ export default {
         body: "\\text{If } F(x,y)=0 \\text{ and } F_y(a,b) \\neq 0, \\text{ then near } (a,b): \\frac{dy}{dx} = -\\frac{F_x(x,y)}{F_y(x,y)}",
       },
       {
+        type: 'theorem',
+        title: 'Second Implicit Derivative Formula',
+        body: "\\text{For }F(x,y)=0,\\; y'=-\\frac{F_x}{F_y},\\; y''=-\\frac{F_{xx}+2F_{xy}y'+F_{yy}(y')^2}{F_y}\\quad(F_y\\neq 0)",
+      },
+      {
         type: 'definition',
         title: 'Tangent and Normal Lines at (x\u2080, y\u2080)',
         body: "\\text{Tangent: } y - y_0 = \\left.\\frac{dy}{dx}\\right|_{(x_0,y_0)}(x - x_0) \\qquad \\text{Normal: slope} = -\\left(\\left.\\frac{dy}{dx}\\right|_{(x_0,y_0)}\\right)^{-1}",
@@ -369,6 +374,30 @@ export default {
       ],
       conclusion: 'Tangent line: y = -(4/7)x + 15/7. Normal line: y = (7/4)x - 5/2. The two lines are perpendicular at (2, 1), as required.',
     },
+    {
+      id: 'ch2-005-ex8',
+      title: 'Implicit Related Rates on a Circle',
+      problem: 'A point moves on x^2+y^2=25 with dx/dt=2 at the instant (x,y)=(3,4). Find dy/dt.',
+      steps: [
+        {
+          expression: "x^2+y^2=25",
+          annotation: 'Differentiate the geometric constraint with respect to time t.',
+        },
+        {
+          expression: "2x\\frac{dx}{dt}+2y\\frac{dy}{dt}=0",
+          annotation: 'Chain rule on each squared term.',
+        },
+        {
+          expression: "\\frac{dy}{dt}=-\\frac{x}{y}\\frac{dx}{dt}",
+          annotation: 'Solve algebraically for dy/dt.',
+        },
+        {
+          expression: "\\left.\\frac{dy}{dt}\\right|_{(3,4)}=-\\frac{3}{4}(2)=-\\frac{3}{2}",
+          annotation: 'Substitute x=3, y=4, and dx/dt=2.',
+        },
+      ],
+      conclusion: 'At that instant the y-coordinate is decreasing at 3/2 units per unit time.',
+    },
   ],
 
   challenges: [
@@ -514,6 +543,7 @@ export default {
     'completed-example-5',
     'completed-example-6',
     'completed-example-7',
+    'completed-example-8',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',

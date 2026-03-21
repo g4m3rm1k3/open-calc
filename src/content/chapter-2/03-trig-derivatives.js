@@ -5,13 +5,13 @@ export default {
   chapter: 2,
   order: 3,
   title: 'Derivatives of Trigonometric Functions',
-  subtitle: 'Why the slope of the sine curve is cosine â€” and deriving all six trig derivatives',
+  subtitle: 'Why the slope of the sine curve is cosine GÇö and deriving all six trig derivatives',
   tags: ['sine derivative', 'cosine derivative', 'tangent derivative', 'trigonometric functions', 'trig limits', 'chain rule with trig'],
   aliases: 'section 3.5 derivatives trig functions formal proof sin cos tan cot sec csc limit definition derivative',
 
   hook: {
-    question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(\u03b8). When \u03b8 = 0, the point is at (1, 0) and is moving straight upward â€” the y-coordinate is increasing as fast as it can. When \u03b8 = \u03c0/2, the point is at (0, 1), at the very top, momentarily moving horizontally â€” the y-coordinate is not changing at all. When \u03b8 = \u03c0, the point is at (-1, 0) and is moving straight downward. These rates of change â€” 1, 0, and -1 â€” are exactly the values of cos(0), cos(\u03c0/2), and cos(\u03c0). Is it a coincidence that the rate of change of sine is cosine?',
-    realWorldContext: 'Periodic phenomena dominate science and engineering: alternating current in electrical circuits, vibrations in mechanical systems, sound waves, ocean tides, the positions of planets. All of these are modeled using sine and cosine. To analyze how these quantities change â€” how quickly a current switches direction, how rapidly a spring approaches equilibrium, how fast a tide is rising â€” we need derivatives of trigonometric functions. The fact that d/dx[sin x] = cos x is not just elegant mathematics; it is the foundation of all oscillation and wave analysis.',
+    question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(\u03b8). When \u03b8 = 0, the point is at (1, 0) and is moving straight upward GÇö the y-coordinate is increasing as fast as it can. When \u03b8 = \u03c0/2, the point is at (0, 1), at the very top, momentarily moving horizontally GÇö the y-coordinate is not changing at all. When \u03b8 = \u03c0, the point is at (-1, 0) and is moving straight downward. These rates of change GÇö 1, 0, and -1 GÇö are exactly the values of cos(0), cos(\u03c0/2), and cos(\u03c0). Is it a coincidence that the rate of change of sine is cosine?',
+    realWorldContext: 'Periodic phenomena dominate science and engineering: alternating current in electrical circuits, vibrations in mechanical systems, sound waves, ocean tides, the positions of planets. All of these are modeled using sine and cosine. To analyze how these quantities change GÇö how quickly a current switches direction, how rapidly a spring approaches equilibrium, how fast a tide is rising GÇö we need derivatives of trigonometric functions. The fact that d/dx[sin x] = cos x is not just elegant mathematics; it is the foundation of all oscillation and wave analysis.',
     previewVisualizationId: 'TrigDerivativeSync',
   },
 
@@ -19,12 +19,12 @@ export default {
     prose: [
       'Imagine tracing around the unit circle as the angle \u03b8 increases from 0. The y-coordinate follows the sine function. Let\'s watch what happens to the SLOPE of the sine curve as \u03b8 varies.',
       'At \u03b8 = 0: the point (1, 0) is moving straight upward (tangent to the circle is vertical here). The y-coordinate is increasing at maximum rate. The slope of sin(\u03b8) at this point is 1. And cos(0) = 1. They agree.',
-      'At \u03b8 = \u03c0/2: the point (0, 1) is at the very top of the circle, moving horizontally (leftward). The y-coordinate has just reached its peak and is about to decrease â€” its rate of change is 0. The slope of sin(\u03b8) is 0. And cos(\u03c0/2) = 0. They agree.',
+      'At \u03b8 = \u03c0/2: the point (0, 1) is at the very top of the circle, moving horizontally (leftward). The y-coordinate has just reached its peak and is about to decrease GÇö its rate of change is 0. The slope of sin(\u03b8) is 0. And cos(\u03c0/2) = 0. They agree.',
       'At \u03b8 = \u03c0: the point (-1, 0) is moving straight downward. The y-coordinate is decreasing at maximum rate. The slope is -1. And cos(\u03c0) = -1. They agree.',
-      'At \u03b8 = 3\u03c0/2: the point (0, -1) is at the bottom of the circle, momentarily moving horizontally (rightward). The y-coordinate is at its minimum and about to increase â€” rate of change is 0. And cos(3\u03c0/2) = 0. They agree.',
-      'The pattern is unmistakable: the rate of change of the sine function at every angle equals the value of the cosine function at that angle. This is not a coincidence â€” it is a theorem. The derivative of sin(\u03b8) is cos(\u03b8).',
+      'At \u03b8 = 3\u03c0/2: the point (0, -1) is at the bottom of the circle, momentarily moving horizontally (rightward). The y-coordinate is at its minimum and about to increase GÇö rate of change is 0. And cos(3\u03c0/2) = 0. They agree.',
+      'The pattern is unmistakable: the rate of change of the sine function at every angle equals the value of the cosine function at that angle. This is not a coincidence GÇö it is a theorem. The derivative of sin(\u03b8) is cos(\u03b8).',
       'There is also a beautiful geometric argument using the tangent to the unit circle. At the point (cos\u03b8, sin\u03b8) on the unit circle, the radius vector points in the direction (cos\u03b8, sin\u03b8). The tangent to the circle at this point is perpendicular to the radius, so it points in the direction (-sin\u03b8, cos\u03b8). This tangent direction has a "slope" component in the y-direction equal to cos\u03b8, confirming that dy/d\u03b8 = cos\u03b8.',
-      'Now why does d/dx[cos x] = -sin x have a minus sign? At x = 0, cosine is at its maximum (value 1) and is about to decrease â€” its rate of change is negative. Specifically, cos(0) = 1 is decreasing and -sin(0) = 0... wait, that\'s 0, not negative. But at x = \u03c0/4, the cosine is decreasing. Let\'s check: the slope of cos(x) at x = \u03c0/4 should be negative, and indeed -sin(\u03c0/4) = -\u221a2/2 < 0. More precisely: at x = 0, the cosine reaches its maximum, so its derivative is 0 there. For x slightly positive, cosine begins to decrease, so d/dx[cos x] should be negative. And -sin(x) is negative for x \u2208 (0, \u03c0), which matches.',
+      'Now why does d/dx[cos x] = -sin x have a minus sign? At x = 0, cosine is at its maximum (value 1) and is about to decrease GÇö its rate of change is negative. Specifically, cos(0) = 1 is decreasing and -sin(0) = 0... wait, that\'s 0, not negative. But at x = \u03c0/4, the cosine is decreasing. Let\'s check: the slope of cos(x) at x = \u03c0/4 should be negative, and indeed -sin(\u03c0/4) = -\u221a2/2 < 0. More precisely: at x = 0, the cosine reaches its maximum, so its derivative is 0 there. For x slightly positive, cosine begins to decrease, so d/dx[cos x] should be negative. And -sin(x) is negative for x \u2208 (0, \u03c0), which matches.',
       'The minus sign in d/dx[cos x] = -sin x reflects the fact that cosine is always decreasing when sine is positive (between 0 and \u03c0) and increasing when sine is negative (between \u03c0 and 2\u03c0).',
     ],
     callouts: [
@@ -43,22 +43,22 @@ export default {
       {
         id: 'TrigDerivativeSync',
         title: 'The "Moving Point" Deep Sync',
-        caption: 'Watch the velocity vector on the circle. When Î¸=0, the ball is traveling 100% vertically (arrow points straight up, vertical velocity = 1). Because vertical velocity is 1, the slope of the Sine curve is 1, and the value of the Cosine curve is 1. All three panels confirm the exact same truth.',
+        caption: 'Watch the velocity vector on the circle. When ++=0, the ball is traveling 100% vertically (arrow points straight up, vertical velocity = 1). Because vertical velocity is 1, the slope of the Sine curve is 1, and the value of the Cosine curve is 1. All three panels confirm the exact same truth.',
       },
       {
         id: 'SpringOscillation',
-        title: 'Simple Harmonic Motion â€” Derivatives in Action',
-        caption: 'Position x(t)=AÂ·cos(Ï‰t), velocity v(t)=âˆ’AÏ‰Â·sin(Ï‰t), acceleration a(t)=âˆ’AÏ‰Â²Â·cos(Ï‰t). Each graph is the derivative of the one above. This is why sin and cos are their own derivatives (up to sign).',
+        title: 'Simple Harmonic Motion GÇö Derivatives in Action',
+        caption: 'Position x(t)=A-+cos(-ët), velocity v(t)=GêÆA-ë-+sin(-ët), acceleration a(t)=GêÆA-ë-¦-+cos(-ët). Each graph is the derivative of the one above. This is why sin and cos are their own derivatives (up to sign).',
       },
       {
         id: 'DerivativeCycleClock',
         title: 'The Higher-Order Derivative Clock',
-        caption: 'Click "d/dx â†’" to take successive derivatives. Every 4 steps returns to sin(x). Use the Instant Calculator to find the 43rd â€” or 1000th â€” derivative in one step.',
+        caption: 'Click "d/dx GåÆ" to take successive derivatives. Every 4 steps returns to sin(x). Use the Instant Calculator to find the 43rd GÇö or 1000th GÇö derivative in one step.',
       },
       {
         id: 'TangentExplosion',
-        title: 'Why tan(x) Explodes â€” Quotient Rule Intuition',
-        caption: 'Drag the slider toward x = Ï€/2. Watch the red cos(x) shrink toward zero while the blue sin(x) stays near 1. The purple tan(x) must explode because you\'re dividing by nearly nothing.',
+        title: 'Why tan(x) Explodes GÇö Quotient Rule Intuition',
+        caption: 'Drag the slider toward x = -Ç/2. Watch the red cos(x) shrink toward zero while the blue sin(x) stays near 1. The purple tan(x) must explode because you\'re dividing by nearly nothing.',
       },
     ],
   },
@@ -143,7 +143,7 @@ export default {
           annotation: 'Apply chain rule: outer derivative (cosine, evaluated at inner) times inner derivative (3). The argument of cosine is the same as the original argument of sine.',
         },
       ],
-      conclusion: 'f\'(x) = 3cos(3x). The chain rule "multiplies in" the factor of 3 from the inner function. Without the chain rule, the answer would be cos(3x) â€” missing the crucial factor of 3.',
+      conclusion: 'f\'(x) = 3cos(3x). The chain rule "multiplies in" the factor of 3 from the inner function. Without the chain rule, the answer would be cos(3x) GÇö missing the crucial factor of 3.',
     },
     {
       id: 'ch2-003-ex2',
@@ -195,7 +195,7 @@ export default {
     },
     {
       id: 'ch2-003-ex4',
-      title: 'Power of Sine â€” Chain Rule',
+      title: 'Power of Sine GÇö Chain Rule',
       problem: "f(x) = \\sin^2(x). \\text{ Find } f'(x).",
       steps: [
         {
@@ -239,7 +239,7 @@ export default {
           annotation: 'Apply chain rule: outer derivative -sin(u) evaluated at u = sin x gives -sin(sin x), times the inner derivative cos x.',
         },
       ],
-      conclusion: 'f\'(x) = -cos(x) sin(sin x). Note that the argument of the outermost sine is sin(x), not x â€” we evaluate the outer derivative at the inner function, preserving the inner function completely.',
+      conclusion: 'f\'(x) = -cos(x) sin(sin x). Note that the argument of the outermost sine is sin(x), not x GÇö we evaluate the outer derivative at the inner function, preserving the inner function completely.',
     },
     {
       id: 'ch2-003-ex6',
@@ -312,7 +312,7 @@ export default {
       steps: [
         {
           expression: "f'(x) = \\cos x",
-          annotation: 'The derivative of sin x is cos x â€” no chain rule needed since the argument is just x.',
+          annotation: 'The derivative of sin x is cos x GÇö no chain rule needed since the argument is just x.',
         },
         {
           expression: "f'(\\pi/3) = \\cos(\\pi/3) = \\frac{1}{2}",
@@ -331,7 +331,7 @@ export default {
           annotation: 'Distribute 1/2 across (x - \u03c0/3) = x - \u03c0/3, giving (1/2)x - \u03c0/6, then add \u221a3/2.',
         },
       ],
-      conclusion: 'The tangent line is y = (1/2)x + (\u221a3/2 - \u03c0/6). At x = \u03c0/3 \u2248 1.047, the sine curve has slope exactly 1/2 â€” the curve is rising gently as it approaches its peak at x = \u03c0/2.',
+      conclusion: 'The tangent line is y = (1/2)x + (\u221a3/2 - \u03c0/6). At x = \u03c0/3 \u2248 1.047, the sine curve has slope exactly 1/2 GÇö the curve is rising gently as it approaches its peak at x = \u03c0/2.',
     },
   ],
 
@@ -418,7 +418,7 @@ export default {
         },
         {
           expression: "(2\\cos x + 1)(\\cos x - 1) = 0",
-          annotation: 'Factor the quadratic: check that (2u+1)(u-1) = 2u\u00b2-u-1. âœ“',
+          annotation: 'Factor the quadratic: check that (2u+1)(u-1) = 2u\u00b2-u-1. G£ô',
         },
         {
           expression: "\\cos x = -\\frac{1}{2} \\quad \\text{or} \\quad \\cos x = 1",

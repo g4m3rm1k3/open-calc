@@ -119,6 +119,11 @@ export default {
         title: 'Correct Proof Sketch',
         body: "\\Phi(k) = \\begin{cases} \\dfrac{f(g(x)+k)-f(g(x))}{k} & k\\neq 0 \\\\ f'(g(x)) & k=0 \\end{cases} \\implies (f\\circ g)'(x) = \\lim_{h\\to 0} \\Phi(g(x+h)-g(x))\\cdot\\frac{g(x+h)-g(x)}{h} = f'(g(x))\\cdot g'(x)",
       },
+      {
+        type: 'insight',
+        title: 'Leibniz Form in Related Rates',
+        body: "\\frac{dV}{dt} = \\frac{dV}{dr}\\cdot\\frac{dr}{dt}, \\quad \\frac{dA}{dt} = \\frac{dA}{d\\theta}\\cdot\\frac{d\\theta}{dt}. \\text{ Intermediate-rate factors multiply along dependency chains.}",
+      },
     ],
     visualizationId: null,
   },
@@ -385,7 +390,7 @@ export default {
       conclusion: 'f\'(x) = \u221a(x\u00b2+1) \u00b7 (2x\u00b2+3x-1) / (x+1)\u00b2. Factoring out the common (x\u00b2+1)^(1/2) factor from the quotient rule numerator is a key simplification technique.',
     },
     {
-      id: 'ch2-002-ex6',
+      id: 'ch2-002-ex9',
       title: 'Mini Backprop Chain (Single Neuron)',
       problem: 'Let y = \\sigma(z), z = wx+b, L = \\tfrac12(y-t)^2. Find dL/dw.',
       steps: [
@@ -407,6 +412,34 @@ export default {
         },
       ],
       conclusion: 'This local product is exactly the pattern repeated layer-by-layer in deep learning backpropagation.',
+    },
+    {
+      id: 'ch2-002-ex10',
+      title: 'Hook Problem: Balloon Volume Rate',
+      problem: 'A sphere has radius r(t)=2t. With V=\\frac{4}{3}\\pi r^3, find dV/dt at t=3.',
+      steps: [
+        {
+          expression: "V=\\frac{4}{3}\\pi r^3,\\quad r=2t",
+          annotation: 'Volume depends on radius, and radius depends on time.',
+        },
+        {
+          expression: "\\frac{dV}{dr}=4\\pi r^2,\\quad \\frac{dr}{dt}=2",
+          annotation: 'Differentiate each stage with respect to its own variable.',
+        },
+        {
+          expression: "\\frac{dV}{dt}=\\frac{dV}{dr}\\cdot\\frac{dr}{dt}=4\\pi r^2\\cdot 2=8\\pi r^2",
+          annotation: 'Apply Leibniz chain form for related rates.',
+        },
+        {
+          expression: "t=3 \\Rightarrow r=2(3)=6",
+          annotation: 'Evaluate the intermediate quantity first.',
+        },
+        {
+          expression: "\\left.\\frac{dV}{dt}\\right|_{t=3}=8\\pi(6)^2=288\\pi",
+          annotation: 'Substitute r=6 into the rate formula.',
+        },
+      ],
+      conclusion: 'At t=3, volume is increasing at 288\\pi cubic units per time unit.',
     },
   ],
 
@@ -518,6 +551,8 @@ export default {
     'completed-example-6',
     'completed-example-7',
     'completed-example-8',
+    'completed-example-9',
+    'completed-example-10',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',
