@@ -78,7 +78,13 @@ export default {
         body: 'c is an inflection point of f if f is continuous at c AND f\'\' changes sign at c (from + to -, or - to +). It is NOT sufficient for f\'\'(c) = 0 alone.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'NewtonsMethod',
+        title: "Newton's Method — Finding Roots via Tangent Lines",
+        caption: "Each step follows the tangent line to its x-intercept, giving the next guess. Convergence is quadratic — the number of correct decimal places doubles every step. This is how your calculator computes √2.",
+      },
+    ],
   },
 
   rigor: {

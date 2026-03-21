@@ -31,7 +31,18 @@ const VIZ_REGISTRY = {
   SlopeField:                   lazy(() => import('./d3/SlopeField.jsx')),
   TangentPlane3D:               lazy(() => import('./three/TangentPlane3D.jsx')),
   ParametricCurve3D:            lazy(() => import('./three/ParametricCurve3D.jsx')),
+  // Chapter 0 — Pre-Calc additions
+  TransformationExplorer:       lazy(() => import('./d3/TransformationExplorer.jsx')),
+  GraphMorph:                   lazy(() => import('./d3/GraphMorph.jsx')),
+  // Chapter 1 — Limits additions
+  TwoSidedLimit:                lazy(() => import('./d3/TwoSidedLimit.jsx')),
+  HoleVsValue:                  lazy(() => import('./d3/HoleVsValue.jsx')),
+  OscillationViz:               lazy(() => import('./d3/OscillationViz.jsx')),
+  // Chapter 2 — Derivatives additions
+  DerivativeBuilder:            lazy(() => import('./d3/DerivativeBuilder.jsx')),
   // Chapter 3 — Applications of Derivatives
+  NewtonsMethod:                lazy(() => import('./d3/NewtonsMethod.jsx')),
+  SpringOscillation:            lazy(() => import('./d3/SpringOscillation.jsx')),
   RelatedRatesLadder:           lazy(() => import('./d3/RelatedRatesLadder.jsx')),
   LinearApproximation:          lazy(() => import('./d3/LinearApproximation.jsx')),
   MVTViz:                       lazy(() => import('./d3/MVTViz.jsx')),

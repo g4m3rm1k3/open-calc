@@ -112,11 +112,19 @@ export default {
         body: "f'_-(a) = \\lim_{h \\to 0^-} \\frac{f(a+h)-f(a)}{h}, \\quad f'_+(a) = \\lim_{h \\to 0^+} \\frac{f(a+h)-f(a)}{h}",
       },
     ],
-    visualizationId: 'TangentLineConstructor',
-    visualizationProps: {
-      showPointSlope: true,
-      showDifferenceQuotientLabels: true,
-    },
+    visualizations: [
+      {
+        id: 'TangentLineConstructor',
+        props: { showPointSlope: true, showDifferenceQuotientLabels: true },
+        title: 'Secant → Tangent: Limit of Difference Quotient',
+        caption: 'Drag h toward 0. The secant line approaches the tangent line — and the slope approaches the derivative.',
+      },
+      {
+        id: 'DerivativeBuilder',
+        title: 'Build the Derivative Graph',
+        caption: 'Drag the slider across f(x). The green dots you leave behind trace out f\'(x). Toggle "Show f\'(x)" to check your work. This is what the derivative function really means.',
+      },
+    ],
   },
 
   rigor: {

@@ -38,13 +38,19 @@ export default {
         body: "\\frac{d}{dx}[\\cos x] = -\\sin x, \\quad \\frac{d}{dx}[\\csc x] = -\\csc x\\cot x, \\quad \\frac{d}{dx}[\\cot x] = -\\csc^2 x",
       },
     ],
-    visualizationId: 'SineCosineSlope',
-    visualizationProps: {
-      showUnitCircle: true,
-      showSineGraph: true,
-      showSlopeTracer: true,
-      animateAngle: true,
-    },
+    visualizations: [
+      {
+        id: 'SineCosineSlope',
+        props: { showUnitCircle: true, showSineGraph: true, showSlopeTracer: true, animateAngle: true },
+        title: 'Sine Slope = Cosine',
+        caption: 'The red dot on the unit circle drives the sine curve. The amber tangent slope traces out cos(x). Watch the slope graph — it IS the cosine curve.',
+      },
+      {
+        id: 'SpringOscillation',
+        title: 'Simple Harmonic Motion — Derivatives in Action',
+        caption: 'Position x(t)=A·cos(ωt), velocity v(t)=−Aω·sin(ωt), acceleration a(t)=−Aω²·cos(ωt). Each graph is the derivative of the one above. This is why sin and cos are their own derivatives (up to sign).',
+      },
+    ],
   },
 
   math: {

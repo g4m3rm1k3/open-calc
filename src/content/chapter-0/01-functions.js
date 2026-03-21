@@ -56,8 +56,18 @@ export default {
         body: "This property (called additivity) is only true for LINEAR functions. For example, (a+b)² ≠ a² + b², and sin(a+b) ≠ sin(a) + sin(b). Don't distribute functions like they're multiplication!",
       },
     ],
-    visualizationId: 'FunctionMachine',
-    visualizationProps: {},
+    visualizations: [
+      {
+        id: 'FunctionMachine',
+        title: 'The Function Machine',
+        caption: 'Numbers go in, exactly one number comes out. Swap the rule to see how different functions behave.',
+      },
+      {
+        id: 'GraphMorph',
+        title: 'Function Families — Morphing',
+        caption: 'Watch how the graph changes shape as you move between linear, quadratic, cubic, exponential, and sine. Each family has a distinct global personality.',
+      },
+    ],
   },
 
   math: {
@@ -100,8 +110,19 @@ export default {
         body: 'f^{-1} \\text{ exists iff } f \\text{ is one-to-one.} \\\\ f^{-1}(f(x)) = x \\text{ for all } x \\in \\text{dom}(f) \\\\ f(f^{-1}(y)) = y \\text{ for all } y \\in \\text{range}(f)',
       },
     ],
-    visualizationId: 'FunctionPlotter',
-    visualizationProps: { fn: 'x^2', xRange: [-3, 3], showGrid: true },
+    visualizations: [
+      {
+        id: 'FunctionPlotter',
+        props: { fn: 'x^2', xRange: [-3, 3], showGrid: true },
+        title: 'Function Plotter',
+        caption: 'Plot any function and explore its graph.',
+      },
+      {
+        id: 'TransformationExplorer',
+        title: 'Transformation Explorer — y = a·f(b(x−c)) + d',
+        caption: 'Every slider controls one transformation. Notice how b affects width (not shift!), and c shifts the input (not output). Start with a=1, b=1, c=0, d=0 — that is the identity transformation.',
+      },
+    ],
   },
 
   rigor: {

@@ -69,6 +69,11 @@ export default {
         title: 'Racing Car Approaching a Hole',
         caption: 'A car drives along the function curve toward the hole at x=2. It gets arbitrarily close but never arrives — yet the limit is clear.',
       },
+      {
+        id: 'TwoSidedLimit',
+        title: 'Left-Hand and Right-Hand Limits',
+        caption: 'Two particles approach from opposite sides. When they meet at the same value, the limit exists. When they land at different values — or one diverges — the limit does not exist.',
+      },
     ],
   },
 
@@ -109,8 +114,19 @@ export default {
         body: 'If f is a polynomial, rational function (with nonzero denominator at c), or built from trig/exp/log functions: just substitute x = c. Direct substitution works when the function is continuous at c.',
       },
     ],
-    visualizationId: 'LimitApproach',
-    visualizationProps: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4, showTable: true },
+    visualizations: [
+      {
+        id: 'LimitApproach',
+        props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4, showTable: true },
+        title: 'Limit vs. Function Value',
+        caption: 'The table updates in sync with the graph: both sides approach 4, even though f(2) is undefined.',
+      },
+      {
+        id: 'HoleVsValue',
+        title: 'Hole vs. Function Value — Three Cases',
+        caption: 'Switch between three scenarios: undefined (hole), redefined (value ≠ limit), and continuous (value = limit). This is the core distinction calculus builds on.',
+      },
+    ],
   },
 
   rigor: {
@@ -139,8 +155,19 @@ export default {
         body: '"For EVERY ε > 0 (no matter how tiny the demanded accuracy), there EXISTS a δ > 0 (some input radius) such that: for ALL x within δ of c (but x ≠ c), f(x) is within ε of L."',
       },
     ],
-    visualizationId: 'EpsilonDelta',
-    visualizationProps: { fn: '2*x + 1', c: 2, L: 5 },
+    visualizations: [
+      {
+        id: 'EpsilonDelta',
+        props: { fn: '2*x + 1', c: 2, L: 5 },
+        title: 'Epsilon-Delta in Action',
+        caption: 'Drag ε to set the output tolerance. Watch the required δ adjust to guarantee the condition. This is what "the limit is 5" means formally.',
+      },
+      {
+        id: 'OscillationViz',
+        title: 'When the Limit Does NOT Exist — sin(1/x) near 0',
+        caption: 'Zoom in toward x=0: no matter how close you get, the function keeps oscillating between -1 and 1. No single value L can satisfy the epsilon-delta definition — the limit does not exist.',
+      },
+    ],
   },
 
   examples: [
