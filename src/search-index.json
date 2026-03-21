@@ -1,0 +1,605 @@
+[
+  {
+    "id": "ch0-real-numbers",
+    "chapter": 0,
+    "slug": "real-numbers",
+    "title": "Real Numbers & the Number Line",
+    "subtitle": "The universe calculus lives in",
+    "tags": ["real numbers", "number line", "integers", "rationals", "irrationals", "inequalities", "absolute value", "intervals"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-sets-and-logic",
+    "chapter": 0,
+    "slug": "sets-and-logic",
+    "title": "Sets & the Language of Logic",
+    "subtitle": "The vocabulary every proof is written in",
+    "tags": ["sets", "logic", "quantifiers", "for all", "there exists", "set-builder notation", "union", "intersection", "complement", "subset", "element", "empty set", "Venn diagram", "connectives", "and", "or", "not", "implies", "if and only if", "iff", "proof", "foundations"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-geometry-review",
+    "chapter": 0,
+    "slug": "geometry-review",
+    "title": "Coordinate Geometry Review",
+    "subtitle": "Lines, triangles, circles, and the coordinate plane",
+    "tags": ["geometry", "coordinate plane", "distance formula", "midpoint", "slope", "parallel", "perpendicular", "equation of a line", "circle", "triangle", "area", "Pythagorean theorem", "similar triangles", "point-slope form", "slope-intercept", "standard form"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-conic-sections",
+    "chapter": 0,
+    "slug": "conic-sections",
+    "title": "Conic Sections Foundations",
+    "subtitle": "Quadratic geometry for algebra fluency and calculus readiness",
+    "tags": ["conics", "parabola", "ellipse", "hyperbola", "circle", "focus-directrix", "completing the square", "quadratic forms"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-inequalities",
+    "chapter": 0,
+    "slug": "inequalities",
+    "title": "Inequalities & Interval Notation",
+    "subtitle": "The toolkit for epsilon-delta and optimization",
+    "tags": ["inequalities", "linear inequalities", "polynomial inequalities", "rational inequalities", "sign chart", "sign analysis", "absolute value", "interval notation", "number line", "critical points", "test points", "epsilon-delta", "quadratic inequalities"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-absolute-value",
+    "chapter": 0,
+    "slug": "absolute-value",
+    "title": "Absolute Value as Distance",
+    "subtitle": "The geometry behind |x|, |x − a|, and inequalities",
+    "tags": ["absolute value", "distance", "number line", "inequalities", "geometry"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-algebraic-techniques",
+    "chapter": 0,
+    "slug": "algebraic-techniques",
+    "title": "Algebraic Techniques for Limits",
+    "subtitle": "Factoring, conjugates, and completing the square — the moves that solve indeterminate forms",
+    "tags": ["algebra", "factoring", "conjugate", "completing the square", "limits"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-polynomial-division",
+    "chapter": 0,
+    "slug": "polynomial-division",
+    "title": "Polynomial Division",
+    "subtitle": "Long division, synthetic division, and the theorems that connect them",
+    "tags": ["polynomial division", "long division", "synthetic division", "remainder theorem", "factor theorem", "rational root theorem", "polynomials", "factoring", "roots", "zeros", "partial fractions", "algebra", "division algorithm"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-completing-the-square",
+    "chapter": 0,
+    "slug": "completing-the-square",
+    "title": "Completing the Square",
+    "subtitle": "The technique that unlocks quadratics, circles, and integration",
+    "tags": ["completing the square", "quadratic formula", "vertex form", "parabola", "vertex", "conic sections", "integration", "trig substitution", "algebra", "quadratic", "perfect square trinomial", "discriminant"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-partial-fractions-intro",
+    "chapter": 0,
+    "slug": "partial-fractions-intro",
+    "title": "Partial Fraction Decomposition",
+    "subtitle": "Breaking complex fractions into simple pieces",
+    "tags": ["partial fractions", "decomposition", "linear factors", "repeated factors", "irreducible quadratic", "integration", "rational expressions", "algebra", "Heaviside", "cover-up method", "long division", "proper fraction", "improper fraction"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-functions",
+    "chapter": 0,
+    "slug": "functions",
+    "title": "Functions",
+    "subtitle": "Machines that take inputs and produce exactly one output",
+    "tags": ["functions", "domain", "range", "composition", "inverse", "graphs", "transformations", "piecewise", "even", "odd"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-trig",
+    "chapter": 0,
+    "slug": "trig-review",
+    "title": "Trigonometry",
+    "subtitle": "Circles, angles, and the most important functions in calculus",
+    "tags": ["trigonometry", "sine", "cosine", "tangent", "unit circle", "radians", "identities", "inverse trig"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-exponentials",
+    "chapter": 0,
+    "slug": "exponentials",
+    "title": "Exponentials & Logarithms",
+    "subtitle": "Functions that grow (and shrink) at rates proportional to their size",
+    "tags": ["exponentials", "logarithms", "natural log", "e", "base", "growth", "decay", "inverse", "compound interest"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-integrated-review",
+    "chapter": 0,
+    "slug": "integrated-review",
+    "title": "Integrated Review: Prealgebra to Precalc",
+    "subtitle": "A visual systems review connecting algebra, trig, and rates to real-world modeling",
+    "tags": ["review", "prealgebra", "precalc", "visual learning", "physics", "finance", "engineering", "modeling"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch0-assignment-playbook",
+    "chapter": 0,
+    "slug": "assignment-playbook",
+    "title": "Assignment Playbook",
+    "subtitle": "A fast map from problem type to the exact calculus workflow",
+    "tags": ["calc 1 workflow", "homework strategy", "assignment help", "problem types", "derivative checklist", "integral checklist", "related rates setup", "optimization setup", "implicit differentiation setup", "chain rule", "product rule", "quotient rule", "u-substitution", "net change"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch5-precalc-review",
+    "chapter": 0,
+    "slug": "algebra-geometry-master-review",
+    "title": "Algebra and Geometry Master Review",
+    "subtitle": "Comprehensive toolbox review for limits, derivatives, and related rates",
+    "tags": ["algebra", "geometry", "review", "factoring", "absolute value", "similar triangles", "radians"],
+    "chapterTitle": "Prerequisites"
+  },
+  {
+    "id": "ch1-limits-intro",
+    "chapter": 1,
+    "slug": "introduction",
+    "title": "Introduction to Limits",
+    "subtitle": "Getting arbitrarily close without arriving",
+    "tags": ["limits", "approaching", "informal", "one-sided", "two-sided", "DNE", "indeterminate form", "0/0"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-limit-laws",
+    "chapter": 1,
+    "slug": "limit-laws",
+    "title": "Limit Laws",
+    "subtitle": "Algebraic rules so you don't need tables every time",
+    "tags": ["limit laws", "sum rule", "product rule", "quotient rule", "squeeze theorem", "sandwich theorem", "direct substitution", "sin(x)/x"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-continuity",
+    "chapter": 1,
+    "slug": "continuity",
+    "title": "Continuity",
+    "subtitle": "Functions you can draw without lifting your pencil",
+    "tags": ["continuity", "continuous", "discontinuity", "removable", "jump", "infinite", "IVT", "intermediate value theorem"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-ivt",
+    "chapter": 1,
+    "slug": "intermediate-value-theorem",
+    "title": "The Intermediate Value Theorem",
+    "subtitle": "You cannot jump over a value without passing through it",
+    "tags": ["IVT", "intermediate value theorem", "existence theorem", "root finding", "bisection method", "continuous function", "zeros", "Bolzano", "fixed point", "connectedness", "existence proof", "polynomial roots"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-discontinuities",
+    "chapter": 1,
+    "slug": "types-of-discontinuities",
+    "title": "Types of Discontinuities",
+    "subtitle": "The four ways a function can fail to be continuous — and why each is different",
+    "tags": ["discontinuity", "removable discontinuity", "jump discontinuity", "infinite discontinuity", "oscillating discontinuity", "hole", "vertical asymptote", "piecewise function", "classification", "continuity", "essential discontinuity", "types"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-epsilon-delta",
+    "chapter": 1,
+    "slug": "epsilon-delta",
+    "title": "The Epsilon-Delta Definition",
+    "subtitle": "Making \"close to\" mathematically airtight",
+    "tags": ["epsilon-delta", "ε-δ", "formal definition", "proof technique", "Cauchy", "Weierstrass", "rigor"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-visual-epsilon-delta",
+    "chapter": 1,
+    "slug": "visual-epsilon-delta",
+    "title": "Visualizing ε–δ: Reading from Graphs",
+    "subtitle": "A systematic graphical method for finding δ given ε — geometry before algebra",
+    "tags": ["epsilon-delta", "limits", "graphical method", "neighborhoods", "strip method", "visualization"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-squeeze-theorem",
+    "chapter": 1,
+    "slug": "squeeze-theorem",
+    "title": "The Squeeze Theorem",
+    "subtitle": "Trapping a wild function between two tame ones",
+    "tags": ["squeeze theorem", "sandwich theorem", "pinching theorem", "sin(x)/x", "bounded oscillation", "comparison"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch1-limits-at-infinity",
+    "chapter": 1,
+    "slug": "limits-at-infinity",
+    "title": "Limits at Infinity",
+    "subtitle": "End behavior, asymptotes, and growth-rate dominance",
+    "tags": ["limits at infinity", "horizontal asymptote", "oblique asymptote", "end behavior", "epsilon-N", "growth rates"],
+    "chapterTitle": "Limits & Continuity"
+  },
+  {
+    "id": "ch2-000",
+    "chapter": 2,
+    "slug": "tangent-problem",
+    "title": "The Derivative — From Average to Instantaneous Change",
+    "subtitle": "How a single limiting process unlocks the instantaneous rate of change of any function",
+    "tags": ["derivative", "limit definition", "difference quotient", "tangent line", "instantaneous rate of change", "differentiability", "notation"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-001",
+    "chapter": 2,
+    "slug": "differentiation-rules",
+    "title": "Differentiation Rules — Power, Product, Quotient",
+    "subtitle": "Shortcuts that transform hours of limit-computing into seconds of pattern-matching",
+    "tags": ["power rule", "product rule", "quotient rule", "differentiation rules", "constant rule", "sum rule", "polynomial derivatives"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-002",
+    "chapter": 2,
+    "slug": "chain-rule",
+    "title": "The Chain Rule — Differentiating Compositions",
+    "subtitle": "How to differentiate a function inside another function — the most widely used rule in all of calculus",
+    "tags": ["chain rule", "composite functions", "composition", "outside-inside", "Leibniz form", "triple composition"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-002",
+    "chapter": 2,
+    "slug": "derivatives-of-inverse-functions",
+    "title": "Derivatives of Inverse Functions",
+    "subtitle": "The Geometry of Reversing Time — and Unlocking Inverse Trig",
+    "tags": ["inverse functions", "geometry", "derivative of inverse", "arcsin", "arccos", "arctan"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-003",
+    "chapter": 2,
+    "slug": "trig-derivatives",
+    "title": "Derivatives of Trigonometric Functions",
+    "subtitle": "Why the slope of the sine curve is cosine — and deriving all six trig derivatives",
+    "tags": ["sine derivative", "cosine derivative", "tangent derivative", "trigonometric functions", "trig limits", "chain rule with trig"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-004",
+    "chapter": 2,
+    "slug": "exp-log-derivatives",
+    "title": "Derivatives of Exponential and Logarithmic Functions",
+    "subtitle": "The function that equals its own derivative — and the logarithm that unlocks it",
+    "tags": ["exponential derivative", "logarithm derivative", "natural log", "e^x", "ln x", "logarithmic differentiation", "a^x"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-005",
+    "chapter": 2,
+    "slug": "implicit-differentiation",
+    "title": "Implicit Differentiation",
+    "subtitle": "Finding dy/dx when y cannot be (or is not) solved for explicitly — the chain rule in disguise",
+    "tags": ["implicit differentiation", "implicit function", "dy/dx", "circle", "folium of Descartes", "chain rule", "tangent line to curve"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch2-reading-derivatives",
+    "chapter": 2,
+    "slug": "reading-derivatives",
+    "title": "Reading Derivatives from Graphs",
+    "subtitle": "The visual language of f, f', f'', and f''' — what graphs reveal about motion and change",
+    "tags": ["derivatives", "second derivative", "third derivative", "concavity", "acceleration", "motion", "graph interpretation", "jerk"],
+    "chapterTitle": "Derivatives"
+  },
+  {
+    "id": "ch3-000",
+    "chapter": 3,
+    "slug": "related-rates",
+    "title": "Related Rates",
+    "subtitle": "When two quantities are geometrically linked, their rates of change are linked too — by the chain rule",
+    "tags": ["related rates", "chain rule", "implicit differentiation", "Pythagorean theorem", "geometry", "time derivatives", "optimization preview"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-001",
+    "chapter": 3,
+    "slug": "linear-approximation",
+    "title": "Linear Approximation & Differentials",
+    "subtitle": "Zoom in on any smooth curve far enough and it becomes a straight line — and that line is enormously useful",
+    "tags": ["linear approximation", "linearization", "differentials", "tangent line", "error analysis", "Taylor polynomial", "sensitivity"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-002",
+    "chapter": 3,
+    "slug": "mean-value-theorem",
+    "title": "The Mean Value Theorem",
+    "subtitle": "If your average speed was 75 mph, then at some moment your instantaneous speed was exactly 75 mph — and the proof uses only derivatives",
+    "tags": ["mean value theorem", "Rolle's theorem", "average rate", "instantaneous rate", "increasing functions", "antiderivatives", "Cauchy MVT", "L'Hôpital preview"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-025",
+    "chapter": 3,
+    "slug": "rolles-theorem",
+    "title": "Rolle's Theorem",
+    "subtitle": "If you start and end at the same height, there must be a horizontal tangent somewhere in between",
+    "tags": ["Rolle theorem", "horizontal tangent", "critical point", "existence theorem", "mean value theorem"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-003",
+    "chapter": 3,
+    "slug": "curve-sketching",
+    "title": "Curve Sketching",
+    "subtitle": "From formula to complete graph: critical points, inflection points, concavity, and asymptotes — all from derivatives alone",
+    "tags": ["curve sketching", "critical points", "local extrema", "concavity", "inflection points", "first derivative test", "second derivative test", "asymptotes", "sign chart"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-004",
+    "chapter": 3,
+    "slug": "optimization",
+    "title": "Optimization",
+    "subtitle": "Finding the best — maximum area, minimum cost, optimal angle — using critical points and the Extreme Value Theorem",
+    "tags": ["optimization", "extreme value theorem", "Fermat's theorem", "closed interval method", "objective function", "constraint", "global extrema", "applications"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-005",
+    "chapter": 3,
+    "slug": "lhopital",
+    "title": "L'Hôpital's Rule",
+    "subtitle": "When limits produce 0/0 or ∞/∞, differentiate numerator and denominator separately — a consequence of the MVT",
+    "tags": ["l'hopital", "l'hopital's rule", "indeterminate forms", "limits", "0/0", "infinity over infinity", "Cauchy MVT", "indeterminate powers", "sinc function"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-060",
+    "chapter": 3,
+    "slug": "newtons-method",
+    "title": "Newton's Method",
+    "subtitle": "Use tangent lines to hunt down roots with extraordinary speed — each step roughly doubles the number of correct digits",
+    "tags": ["Newton method", "root finding", "iteration", "numerical methods", "convergence", "tangent line", "approximation"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch3-070",
+    "chapter": 3,
+    "slug": "differentials",
+    "title": "Differentials",
+    "subtitle": "The notation dy = f'(x)dx is not just shorthand — it is a precise tool for estimating errors and bridging derivatives to integrals",
+    "tags": ["differentials", "dx", "dy", "error estimation", "propagation", "relative error", "linear approximation", "uncertainty"],
+    "chapterTitle": "Applications of Derivatives"
+  },
+  {
+    "id": "ch4-000",
+    "chapter": 4,
+    "slug": "area-accumulation",
+    "title": "Area and Accumulation",
+    "subtitle": "The area under a rate curve equals the total accumulated quantity — the founding idea of integral calculus",
+    "tags": ["accumulation", "area under curve", "rate functions", "signed area", "integral notation", "velocity", "displacement", "net change"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-001",
+    "chapter": 4,
+    "slug": "riemann-sums",
+    "title": "Riemann Sums",
+    "subtitle": "Approximating area with rectangles — and taking the limit to get the exact integral",
+    "tags": ["Riemann sums", "left sum", "right sum", "midpoint rule", "trapezoidal rule", "partition", "limit of sums", "definite integral definition", "numerical integration"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-002",
+    "chapter": 4,
+    "slug": "definite-integral",
+    "title": "The Definite Integral",
+    "subtitle": "A single number encoding signed area — properties, geometry, and the average value of a function",
+    "tags": ["definite integral", "signed area", "properties of integrals", "average value", "mean value theorem for integrals", "linearity", "additivity", "odd functions", "even functions"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-003",
+    "chapter": 4,
+    "slug": "fundamental-theorem",
+    "title": "The Fundamental Theorem of Calculus",
+    "subtitle": "Differentiation and integration are inverse operations — the deepest result in elementary mathematics",
+    "tags": ["fundamental theorem of calculus", "FTC Part 1", "FTC Part 2", "antiderivative", "accumulation function", "Newton-Leibniz", "inverse operations", "evaluation theorem"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-004",
+    "chapter": 4,
+    "slug": "indefinite-integrals",
+    "title": "Indefinite Integrals",
+    "subtitle": "Building the antiderivative toolkit — the power rule reversed, and the essential +C",
+    "tags": ["indefinite integrals", "antiderivatives", "power rule", "integration rules", "initial value problems", "+C constant", "trig integrals", "exponential integral", "differential equations"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-005",
+    "chapter": 4,
+    "slug": "applications",
+    "title": "Applications of Integration",
+    "subtitle": "Net change, area between curves, average value, work — the integral as a universal measuring tool",
+    "tags": ["net change theorem", "area between curves", "average value", "displacement vs distance", "work", "consumer surplus", "applications", "definite integral applications"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-006",
+    "chapter": 4,
+    "slug": "u-substitution",
+    "title": "U-Substitution",
+    "subtitle": "The chain rule in reverse — the most important integration technique",
+    "tags": ["u-substitution", "substitution", "chain rule", "antiderivative", "change of variable", "definite integral", "technique"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-006b",
+    "chapter": 4,
+    "slug": "volumes-of-revolution",
+    "title": "Volumes of Revolution",
+    "subtitle": "Rotating curves around axes generates 3D solids — Disk, Washer, and Shell methods",
+    "tags": ["volume", "disk method", "washer method", "shell method", "solid of revolution", "Pappus", "rotation", "definite integral", "3D"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-007",
+    "chapter": 4,
+    "slug": "integration-by-parts",
+    "title": "Integration by Parts",
+    "subtitle": "The product rule in reverse — trading one integral for an easier one",
+    "tags": ["integration by parts", "LIATE", "tabular method", "product rule", "reduction formula", "uv formula"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-008",
+    "chapter": 4,
+    "slug": "trig-integrals",
+    "title": "Trigonometric Integrals",
+    "subtitle": "Systematic strategies for integrating powers and products of sine, cosine, tangent, and secant",
+    "tags": ["trig integrals", "sin cos powers", "half-angle", "Wallis", "reduction", "trigonometric", "sin squared", "cos squared"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-009",
+    "chapter": 4,
+    "slug": "trig-substitution",
+    "title": "Trigonometric Substitution",
+    "subtitle": "Eliminating radicals by substituting x = a·sin θ, a·tan θ, or a·sec θ",
+    "tags": ["trig substitution", "radical", "square root", "reference triangle", "sin substitution", "tan substitution", "sec substitution"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-010",
+    "chapter": 4,
+    "slug": "partial-fractions-integration",
+    "title": "Partial Fraction Decomposition",
+    "subtitle": "Breaking rational functions into simple pieces for integration",
+    "tags": ["partial fractions", "rational functions", "Heaviside", "cover-up", "decomposition", "linear factors", "integration technique"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-011",
+    "chapter": 4,
+    "slug": "improper-integrals",
+    "title": "Improper Integrals",
+    "subtitle": "Extending integration to infinite intervals and unbounded functions — convergence, divergence, and surprising finite answers",
+    "tags": ["improper integral", "convergence", "divergence", "infinite limits", "p-integral", "comparison test", "Gabriel horn"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch4-012",
+    "chapter": 4,
+    "slug": "numerical-integration",
+    "title": "Numerical Integration",
+    "subtitle": "Approximating definite integrals when antiderivatives do not exist — midpoint, trapezoidal, and Simpson's rules",
+    "tags": ["numerical integration", "trapezoid", "Simpson", "midpoint", "error bounds", "approximation", "quadrature"],
+    "chapterTitle": "Integration"
+  },
+  {
+    "id": "ch5-sequences",
+    "chapter": 5,
+    "slug": "sequences",
+    "title": "Sequences",
+    "subtitle": "Ordered lists of numbers approaching a destination — the foundation of everything in Calc 2",
+    "tags": ["sequence", "convergence", "divergence", "bounded", "monotone", "limit", "recursive"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch5-001",
+    "chapter": 5,
+    "slug": "series-intro",
+    "title": "Infinite Series",
+    "subtitle": "Adding infinitely many numbers — when it makes sense and when it does not",
+    "tags": ["series", "infinite series", "geometric", "harmonic", "partial sums", "telescoping", "nth term test", "Zeno"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch5-002",
+    "chapter": 5,
+    "slug": "convergence-tests",
+    "title": "Convergence Tests",
+    "subtitle": "The complete toolkit for deciding whether an infinite series converges — the #1 Calc 2 exam topic",
+    "tags": ["convergence test", "integral test", "p-series", "comparison", "limit comparison", "alternating", "ratio test", "root test", "absolute convergence"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch5-003",
+    "chapter": 5,
+    "slug": "power-series",
+    "title": "Power Series",
+    "subtitle": "Infinite polynomials that represent functions — the key to Taylor series and beyond",
+    "tags": ["power series", "radius of convergence", "interval of convergence", "term by term", "representation"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch5-004",
+    "chapter": 5,
+    "slug": "taylor-maclaurin",
+    "title": "Taylor and Maclaurin Series",
+    "subtitle": "The best polynomial approximations to any smooth function — derived from derivatives alone",
+    "tags": ["Taylor series", "Maclaurin", "Taylor polynomial", "remainder", "Lagrange", "e^x series", "sin series", "approximation", "binomial series"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch5-series-applications",
+    "chapter": 5,
+    "slug": "series-applications",
+    "title": "Series Applications",
+    "subtitle": "From formulas to decisions: approximation, guarantees, and domain modeling",
+    "tags": ["series", "taylor", "approximation", "error bounds", "alternating series", "numerical methods", "applications"],
+    "chapterTitle": "Calc 2 Bridge: Sequences, Series & Beyond"
+  },
+  {
+    "id": "ch6-parametric",
+    "chapter": 6,
+    "slug": "parametric-equations",
+    "title": "Parametric Equations",
+    "subtitle": "When a single variable cannot capture the path — let time drive both x and y independently",
+    "tags": ["parametric", "parameter", "curve", "cycloid", "Lissajous", "parametric derivative", "eliminate parameter"],
+    "chapterTitle": "Parametric, Polar & Vectors"
+  },
+  {
+    "id": "ch6-polar",
+    "chapter": 6,
+    "slug": "polar-coordinates",
+    "title": "Polar Coordinates",
+    "subtitle": "A new coordinate system where distance and angle replace x and y — unlocking curves that Cartesian coordinates make awkward",
+    "tags": ["polar", "coordinates", "cardioid", "rose curve", "limaçon", "spiral", "lemniscate", "r theta", "conversion"],
+    "chapterTitle": "Parametric, Polar & Vectors"
+  },
+  {
+    "id": "ch6-vectors",
+    "chapter": 6,
+    "slug": "vectors",
+    "title": "Vectors in 2D and 3D",
+    "subtitle": "Quantities with magnitude and direction — the language of physics and multivariable calculus",
+    "tags": ["vector", "dot product", "cross product", "magnitude", "unit vector", "component", "projection", "angle", "physics", "3D"],
+    "chapterTitle": "Parametric, Polar & Vectors"
+  },
+  {
+    "id": "ch6-polar-area-length",
+    "chapter": 6,
+    "slug": "polar-area-length",
+    "title": "Polar Area and Arc Length",
+    "subtitle": "Integrate sectors and curved motion directly in theta-space",
+    "tags": ["polar", "area", "arc length", "sector method", "cardioid", "rose curve", "integration applications"],
+    "chapterTitle": "Parametric, Polar & Vectors"
+  },
+  {
+    "id": "ch6-vector-preview",
+    "chapter": 6,
+    "slug": "vector-calculus-preview",
+    "title": "Vector-Valued Functions Preview",
+    "subtitle": "Motion, geometry, and modeling in 2D/3D before multivariable calculus",
+    "tags": ["vectors", "parametric", "velocity", "acceleration", "speed", "arc length", "curvature", "physics", "robotics"],
+    "chapterTitle": "Parametric, Polar & Vectors"
+  }
+]

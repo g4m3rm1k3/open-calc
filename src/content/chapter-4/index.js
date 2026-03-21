@@ -12,6 +12,11 @@ import trigSubstitution from './09-trig-substitution.js'
 import partialFractionsIntegration from './10-partial-fractions-integration.js'
 import improperIntegrals from './11-improper-integrals.js'
 import numericalIntegration from './12-numerical-integration.js'
+import volumesDiskWasher from './13-volumes-disk-washer.js'
+import volumesShell from './14-volumes-shell.js'
+import arcLength from './15-arc-length.js'
+import workAndForce from './16-work-and-force.js'
+import centersOfMass from './17-centers-of-mass.js'
 
 export default {
   id: 'chapter-4',
@@ -35,5 +40,10 @@ export default {
     partialFractionsIntegration,
     improperIntegrals,
     numericalIntegration,
+    volumesDiskWasher,
+    volumesShell,
+    arcLength,
+    workAndForce,
+    centersOfMass,
   ],
 }

@@ -5,7 +5,9 @@
       "Bash(grep -n \"visualizationProps\" src/content/chapter-1/*.js)",
       "Bash(grep -n \"visualizations\" src/content/chapter-1/*.js -A 5)",
       "Bash(grep -n \"Math.sin\" src/content/chapter-1/*.js)",
-      "Bash(find src/content -name \"*.js\" -exec grep -l \"Math\\\\.\\\\|fn:\" {})"
+      "Bash(find src/content -name \"*.js\" -exec grep -l \"Math\\\\.\\\\|fn:\" {})",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }
