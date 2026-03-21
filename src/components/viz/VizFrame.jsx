@@ -113,6 +113,9 @@ const VIZ_REGISTRY = {
   TruthCube3D:                   lazy(() => import('./react/TruthCube3D.jsx')),
   LogicGateSim:                  lazy(() => import('./react/LogicGateSim.jsx')),
   VennDiagram:                   lazy(() => import('./react/VennDiagram.jsx')),
+  QuantifierGridLab:             lazy(() => import('./react/QuantifierGridLab.jsx')),
+  BipartiteQuantifierViz:        lazy(() => import('./react/BipartiteQuantifierViz.jsx')),
+  DomainExplorerLab:             lazy(() => import('./react/DomainExplorerLab.jsx')),
 }
 
 function VizSkeleton() {

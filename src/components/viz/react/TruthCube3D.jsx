@@ -19,8 +19,7 @@ export default function TruthCube3D() {
     camera.lookAt(0, 0, 0);
 
     // Setup Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     mountRef.current.appendChild(renderer.domElement);
 
@@ -98,17 +97,20 @@ export default function TruthCube3D() {
     };
     animate();
 
-    // Handle Resize
-    const handleResize = () => {
-      if(!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-    window.addEventListener('resize', handleResize);
+    // Handle Resize Automatically
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width === 0 || height === 0) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+    });
+    resizeObserver.observe(mountRef.current);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
       if(mountRef.current && renderer.domElement) {
          mountRef.current.removeChild(renderer.domElement);

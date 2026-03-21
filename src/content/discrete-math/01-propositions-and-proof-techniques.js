@@ -30,7 +30,7 @@ export default {
       {
         type: 'definition',
         title: 'The Logic Dictionary',
-        body: "We use symbols to connect propositions. Think of these as the \"math operators\" of language.\n\n| Symbol | Name | English Equivalent | Quick Rule |\n|---|---|---|---|\n| $\\\\neg$ or $\\\\sim$ | Negation | \"Not p\" | Opposite of the original value. |\n| $\\\\wedge$ | Conjunction | \"p AND q\" | Only True if both are True. |\n| $\\\\vee$ | Disjunction | \"p OR q\" | True if at least one is True. |\n| $\\\\rightarrow$ | Conditional | \"If p, then q\" | Only False if p is True and q is False. |\n| $\\\\leftrightarrow$ | Biconditional | \"p iff q\" | True only if both match. |",
+        body: "We use symbols to connect propositions. Think of these as the \"math operators\" of language.\n\n| Symbol | Name | English Equivalent | Quick Rule |\n|---|---|---|---|\n| ¬ or ~ | Negation | \"Not p\" | Opposite of the original value. |\n| ∧ | Conjunction | \"p AND q\" | Only True if both are True. |\n| ∨ | Disjunction | \"p OR q\" | True if at least one is True. |\n| → | Conditional | \"If p, then q\" | Only False if p is True and q is False. |\n| ↔ | Biconditional | \"p iff q\" | True only if both match. |",
       }
     ],
     visualizations: [

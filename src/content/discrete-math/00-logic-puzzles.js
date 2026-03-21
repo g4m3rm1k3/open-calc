@@ -52,13 +52,13 @@ export default {
       {
         type: 'callout',
         title: 'The Pigeonhole Principle (Formal)',
-        body: "If $k$ items are put into $n$ containers, and $k > n$, then at least one container must contain strictly more than one item.",
+        body: "If k items are put into n containers, and k > n, then at least one container must contain strictly more than one item.",
         type: 'theorem'
       },
       {
         type: 'callout',
         title: 'The Generalized (Strong) Pigeonhole Principle',
-        body: "If $k$ items are put into $n$ containers, then at least one container must contain at least $\\lceil k / n \\rceil$ items. *(The ceiling bracket $\\lceil \\dots \\rceil$ means \"round up to the nearest whole number\").*",
+        body: "If k items are put into n containers, then at least one container must contain at least $\\lceil k / n \\rceil$ items. *(The ceiling bracket $\\lceil \\dots \\rceil$ means \"round up to the nearest whole number\").*",
         type: 'theorem'
       }
     ]
