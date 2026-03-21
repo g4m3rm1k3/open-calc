@@ -14,7 +14,7 @@ export default {
       'Because every trig derivative proof rests on them. Without lim(x->0) sin(x)/x = 1 and lim(x->0) (1-cos x)/x = 0, ' +
       'you cannot rigorously derive d/dx[sin x] = cos x or d/dx[cos x] = -sin x from first principles. ' +
       'In physics, they justify the small-angle model sin(theta) approx theta used in pendulums, waves, robotics, and control systems.',
-    previewVisualizationId: 'ArcChordLimit',
+    previewVisualizationId: 'RadianDegreeLimitLab',
   },
 
   intuition: {
@@ -54,6 +54,16 @@ export default {
     ],
     visualizations: [
       {
+        id: 'RadianDegreeLimitLab',
+        title: 'Radians vs Degrees Toggle',
+        caption: 'Switch units and watch lim sin(x)/x change from 1 (radians) to pi/180 (degrees).',
+      },
+      {
+        id: 'AreaSqueezeLab',
+        title: 'Three-Shape Area Squeeze',
+        caption: 'Drag theta and watch inner triangle <= sector <= outer triangle lock the proof visually.',
+      },
+      {
         id: 'ArcChordLimit',
         title: 'Arc-Chord Comparison Near 0',
         caption: 'As angle x shrinks, arc length and chord-based trig expressions collapse together, explaining why sin(x)/x tends to 1.',
@@ -62,6 +72,11 @@ export default {
         id: 'SqueezeTheorem',
         title: 'Squeeze Mechanism',
         caption: 'See how trapping sin(x)/x between cos(x) and 1 forces the limit to be 1.',
+      },
+      {
+        id: 'SmallAnglePendulumLab',
+        title: 'Small-Angle Pendulum Simulator',
+        caption: 'Compare exact timing vs sin(theta) ~ theta approximation at small and large angles.',
       },
     ],
   },
@@ -118,6 +133,11 @@ export default {
         props: { fn: '(1-Math.cos(x))/x', targetX: 0, limitVal: 0, showTable: true },
         title: 'Numerical Convergence of (1-cos x)/x',
         caption: 'Values collapse to 0 near x=0 after pattern simplification logic.',
+      },
+      {
+        id: 'CosGapVisualizer',
+        title: 'Unit-Circle Gap Visualizer for 1-cos(x)',
+        caption: 'See the horizontal gap 1-cos(x) collapse faster than x as x approaches 0.',
       },
     ],
   },

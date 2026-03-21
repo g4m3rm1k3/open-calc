@@ -136,6 +136,10 @@ const VIZ_REGISTRY = {
   CountingTreeLab:               lazy(() => import('./react/CountingTreeLab.jsx')),
   PascalsTriangleLab:            lazy(() => import('./react/PascalsTriangleLab.jsx')),
   StarsAndBarsLab:               lazy(() => import('./react/StarsAndBarsLab.jsx')),
+  RadianDegreeLimitLab:          lazy(() => import('./react/RadianDegreeLimitLab.jsx')),
+  AreaSqueezeLab:                lazy(() => import('./react/AreaSqueezeLab.jsx')),
+  SmallAnglePendulumLab:         lazy(() => import('./react/SmallAnglePendulumLab.jsx')),
+  CosGapVisualizer:              lazy(() => import('./react/CosGapVisualizer.jsx')),
 }
 
 function VizSkeleton() {
