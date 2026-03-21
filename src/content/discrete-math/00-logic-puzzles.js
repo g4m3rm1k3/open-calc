@@ -122,6 +122,53 @@ export default {
     }
   ],
 
+  challenges: [
+    {
+      id: 'discrete-1-00-ch1',
+      difficulty: 'easy',
+      problem: 'You have 13 pairs of socks (26 socks total), all mixed in a dark drawer. How many socks guarantee at least one matching pair?',
+      walkthrough: [
+        { expression: 'Holes = 13 possible sock types (each pair type)', annotation: 'Model each type as a hole.' },
+        { expression: 'To avoid a match as long as possible, draw one from each type => 13 socks', annotation: 'Worst-case no-match scenario.' },
+        { expression: 'One more draw forces a collision by pigeonhole', annotation: 'k=n+1 guarantees repeat.' },
+      ],
+      answer: '14 socks',
+    },
+    {
+      id: 'discrete-1-00-ch2',
+      difficulty: 'medium',
+      problem: 'Show that in any set of 6 integers, two have the same remainder mod 5.',
+      walkthrough: [
+        { expression: 'Remainders mod 5 are only {0,1,2,3,4}', annotation: 'Exactly 5 remainder classes.' },
+        { expression: 'Choose 6 integers as pigeons into 5 remainder holes', annotation: 'Setup for direct pigeonhole.' },
+        { expression: 'Since 6>5, at least one remainder class has at least 2 integers', annotation: 'Collision gives equal remainder.' },
+      ],
+      answer: 'Guaranteed by pigeonhole with 6 pigeons and 5 remainder classes.',
+    },
+    {
+      id: 'discrete-1-00-ch3',
+      difficulty: 'hard',
+      problem: 'In any group of 9 people, prove that at least 5 were born in the same half of the year (Jan-Jun or Jul-Dec).',
+      walkthrough: [
+        { expression: 'Holes = 2 halves of the year', annotation: 'Jan-Jun and Jul-Dec.' },
+        { expression: 'Generalized pigeonhole: at least ceil(9/2)=5 in one hole', annotation: 'Strong form with ceilings.' },
+        { expression: 'Therefore one half-year contains at least 5 birthdays', annotation: 'Direct consequence.' },
+      ],
+      answer: 'At least 5 by the generalized pigeonhole principle.',
+    },
+    {
+      id: 'discrete-1-00-ch4',
+      difficulty: 'hard',
+      problem: 'Puzzle: You hash 1,001 keys into 1,000 buckets. Explain what collision guarantee you get and why this matters for DSA hash tables.',
+      walkthrough: [
+        { expression: 'Buckets are holes (n=1000), keys are pigeons (k=1001)', annotation: 'Model hash insertions.' },
+        { expression: 'Since k>n, at least one bucket has at least 2 keys', annotation: 'Collision is mathematically unavoidable.' },
+        { expression: 'This is why hash-table design focuses on collision handling, not collision elimination', annotation: 'DSA consequence.' },
+      ],
+      answer: 'At least one collision is guaranteed.',
+    },
+  ],
+
   checkpoints: [
     'read-intuition',
     'read-math',
@@ -129,5 +176,8 @@ export default {
     'completed-example-1',
     'completed-example-2',
     'completed-example-3',
+    'attempted-challenge-easy',
+    'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 };

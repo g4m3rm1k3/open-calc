@@ -104,6 +104,16 @@ export default {
       ],
       conclusion: '7*(-11) === 1 (mod 26), so inverse is 15.',
     },
+    {
+      id: 'discrete-1-05-ex3',
+      title: 'Clock Arithmetic Warmup',
+      problem: 'What time is it on a 12-hour clock after adding 29 hours to 8 o\'clock?',
+      steps: [
+        { expression: '8+29=37', annotation: 'Add in ordinary integers first.' },
+        { expression: '37 mod 12 = 1', annotation: 'Wrap around the 12-hour cycle.' },
+      ],
+      conclusion: 'The clock reads 1 o\'clock. Modular arithmetic is controlled wrap-around.',
+    },
   ],
 
   challenges: [
@@ -129,6 +139,29 @@ export default {
       ],
       answer: 'No, gcd(14,35)=7 so inverse does not exist.',
     },
+    {
+      id: 'discrete-1-05-ch3',
+      difficulty: 'hard',
+      problem: 'Find the smallest nonnegative x such that x === 5 (mod 7) and x === 2 (mod 9).',
+      walkthrough: [
+        { expression: 'Write x=5+7k', annotation: 'Encode first congruence.' },
+        { expression: '5+7k === 2 (mod 9) => 7k === -3 === 6 (mod 9)', annotation: 'Substitute into second congruence.' },
+        { expression: '7 inverse mod 9 is 4, so k === 4*6 === 24 === 6 (mod 9)', annotation: 'Solve linear congruence.' },
+        { expression: 'k=6 gives x=5+7*6=47', annotation: 'Smallest nonnegative solution.' },
+      ],
+      answer: '47',
+    },
+    {
+      id: 'discrete-1-05-ch4',
+      difficulty: 'hard',
+      problem: 'On a 24-hour clock, you run a job every 17 hours starting at 03:00. After how many runs do you return to 03:00, and why?',
+      walkthrough: [
+        { expression: 'Times visited are 3+17k (mod 24)', annotation: 'Arithmetic progression modulo 24.' },
+        { expression: 'Return when 17k === 0 (mod 24)', annotation: 'Need full cycle back to starting residue.' },
+        { expression: 'Since gcd(17,24)=1, smallest k is 24', annotation: 'Coprime step size visits every residue once.' },
+      ],
+      answer: '24 runs; coprime step size with modulus creates a full cycle.',
+    },
   ],
 
   crossRefs: [
@@ -143,7 +176,9 @@ export default {
     'read-rigor',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 }

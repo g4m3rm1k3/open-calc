@@ -98,6 +98,28 @@ export default {
       ],
       conclusion: 'Repeated symbols reduce naive permutation counts dramatically.',
     },
+    {
+      id: 'discrete-1-03-ex3',
+      title: 'Five-Card Hands from a Deck',
+      problem: 'How many 5-card hands can be dealt from a 52-card deck?',
+      steps: [
+        { expression: 'Order does not matter in a hand', annotation: 'A hand is a set, not a sequence.' },
+        { expression: 'Count = C(52,5)=52!/(5!47!)', annotation: 'Combination model.' },
+        { expression: '=2,598,960', annotation: 'Canonical poker denominator.' },
+      ],
+      conclusion: 'Many card probabilities reduce to favorable hands divided by this total.',
+    },
+    {
+      id: 'discrete-1-03-ex4',
+      title: 'Dice Strings with Constraints',
+      problem: 'How many length-4 sequences of die rolls contain exactly two 6s?',
+      steps: [
+        { expression: 'Choose positions of the two 6s: C(4,2)=6', annotation: 'Placement step.' },
+        { expression: 'Each remaining position has 5 choices (1-5): 5^2=25', annotation: 'Independent non-6 choices.' },
+        { expression: 'Total = 6*25=150', annotation: 'Multiplication principle.' },
+      ],
+      conclusion: 'Structured decomposition avoids overcounting and missed cases.',
+    },
   ],
 
   challenges: [
@@ -122,6 +144,40 @@ export default {
       ],
       answer: 'C(5,2)=10',
     },
+    {
+      id: 'discrete-1-03-ch3',
+      difficulty: 'hard',
+      problem: 'A 4-digit lock code uses digits 0-9, no repetition, and must start with a nonzero digit. How many valid codes are possible?',
+      walkthrough: [
+        { expression: 'First digit: 9 choices (1-9)', annotation: 'Leading zero forbidden.' },
+        { expression: 'Second digit: 9 choices', annotation: 'One digit used; zero now allowed if unused.' },
+        { expression: 'Third digit: 8 choices, fourth: 7 choices', annotation: 'No repetition.' },
+        { expression: 'Total = 9*9*8*7=4536', annotation: 'Multiply independent stages.' },
+      ],
+      answer: '4536',
+    },
+    {
+      id: 'discrete-1-03-ch4',
+      difficulty: 'hard',
+      problem: 'How many 5-card poker hands contain exactly two aces?',
+      walkthrough: [
+        { expression: 'Choose 2 aces from 4: C(4,2)', annotation: 'Exactly two aces required.' },
+        { expression: 'Choose remaining 3 cards from 48 non-aces: C(48,3)', annotation: 'Exclude all other aces.' },
+        { expression: 'Total = C(4,2)C(48,3)=103,776', annotation: 'Multiply independent selections.' },
+      ],
+      answer: '103,776',
+    },
+    {
+      id: 'discrete-1-03-ch5',
+      difficulty: 'hard',
+      problem: 'Seven people sit around a circular table. How many distinct seatings are possible (rotations considered the same)?',
+      walkthrough: [
+        { expression: 'Fix one person to break rotational symmetry', annotation: 'Standard circular-count trick.' },
+        { expression: 'Arrange remaining 6 people linearly: 6!', annotation: 'Now no overcount by rotation.' },
+        { expression: '6!=720', annotation: 'Compute final count.' },
+      ],
+      answer: '720',
+    },
   ],
 
   crossRefs: [
@@ -135,7 +191,10 @@ export default {
     'read-math',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 }
