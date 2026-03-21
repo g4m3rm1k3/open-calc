@@ -101,6 +101,16 @@ export default {
         title: 'The min(1, ...) Trick',
         body: 'For nonlinear functions, |f(x)−L| often factors into |x−c| · g(x), where g(x) varies with x. To bound g(x), restrict δ ≤ 1 first (so x stays in a small interval around c). Within that interval, find an upper bound M for |g(x)|. Then set δ = min(1, ε/M). This two-step strategy handles every polynomial and rational function limit.',
       },
+      {
+        type: 'definition',
+        title: 'Absolute Value as an Interval',
+        body: '|x-a| < \delta \iff a-\delta < x < a+\delta. This translation is often the fastest way to bound expressions in ε-δ proofs.',
+      },
+      {
+        type: 'technique',
+        title: 'Inequality Chain Checklist',
+        body: 'In proofs, justify each inequality step: factor, apply |uv|=|u||v|, bound variable factors on a local interval, then choose \delta from the final bound.',
+      },
     ],
     visualizations: [
       {
@@ -236,6 +246,38 @@ export default {
         { expression: '\\delta = \\min(1, 4.55) = 1 \\text{ mV}', annotation: 'The restriction δ ≤ 1 is the binding constraint.' },
       ],
       conclusion: 'The voltage must be controlled within ±1 mV of 10 mV to guarantee the temperature reading is within ±0.5°C. This is a real engineering ε-δ problem: given an output tolerance, find the required input precision. Every calibration procedure in science and manufacturing follows this pattern.',
+    },
+    {
+      id: 'ex-ed-graph-delta',
+      title: 'Graph-First ε-δ Extraction (From the Calc Problem Lab)',
+      problem: 'For f(x)=\\sqrt{x+1} at a=3 and L=2, find a valid δ when ε=0.5 using the graph-box method.',
+      visualizationId: 'EpsilonDelta',
+      params: {
+        fn: 'Math.sqrt(x+1)',
+        c: 3,
+        L: 2,
+        getDelta: 'Math.min(3 - (Math.pow(2-e, 2) - 1), (Math.pow(2+e, 2) - 1) - 3)',
+      },
+      steps: [
+        { expression: 'L\\pm\\varepsilon: \\ y=2\\pm0.5 \\Rightarrow y=2.5,\\ 1.5', annotation: 'Draw horizontal bounds of the epsilon-strip.' },
+        { expression: '\\sqrt{x+1}=2.5 \\Rightarrow x=5.25, \\quad \\sqrt{x+1}=1.5 \\Rightarrow x=1.25', annotation: 'Read/solve x exit points where graph meets strip boundaries.' },
+        { expression: '|5.25-3|=2.25,\\quad |1.25-3|=1.75', annotation: 'Measure both horizontal distances from a.' },
+        { expression: '\\delta=\\min(2.25,1.75)=1.75', annotation: 'Take the smaller side so both directions stay in-band.' },
+      ],
+      conclusion: 'The graph method and formal definition agree: choosing δ=1.75 guarantees |f(x)-2|<0.5 whenever 0<|x-3|<δ.',
+    },
+    {
+      id: 'ex-ed-proof-workflow',
+      title: 'Scratch-Then-Formal Workflow (From the Calc Problem Lab)',
+      problem: 'Prove with full workflow that lim_{x->2} x^2 = 4.',
+      steps: [
+        { expression: '\\textbf{Scratch: } |x^2-4|=|x-2||x+2|', annotation: 'Start by isolating the controllable factor |x-2|.' },
+        { expression: '|x-2|<1 \\Rightarrow 1<x<3 \\Rightarrow |x+2|<5', annotation: 'Local cage to bound the uncontrolled factor.' },
+        { expression: '|x^2-4|<5|x-2|', annotation: 'Now only one controllable factor remains.' },
+        { expression: '\\delta=\\min(1,\\varepsilon/5)', annotation: 'One part keeps the cage valid, one part hits epsilon.' },
+        { expression: '0<|x-2|<\\delta \\Rightarrow |x^2-4|<5\\delta\\le 5(\\varepsilon/5)=\\varepsilon', annotation: 'Formal proof chain.' },
+      ],
+      conclusion: 'This two-phase pattern is the stable template for nearly every nonlinear ε-δ proof.',
     },
   ],
 

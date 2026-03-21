@@ -96,6 +96,8 @@ export default {
       id: 'ex-check-continuity',
       title: 'Checking Continuity at a Point',
       problem: 'Is f(x) = \\dfrac{x^2 - 4}{x - 2} continuous at x = 2? If not, what type of discontinuity?',
+      visualizationId: 'ContinuityViz',
+      params: { variant: 'Removable (hole)', hideSelector: true },
       steps: [
         { expression: '\\text{Check (1): Is } f(2) \\text{ defined?}', annotation: 'Substitute x = 2: (4−4)/(2−2) = 0/0. Undefined. ✗' },
         { expression: '\\text{Check (2): Does } \\lim_{x \\to 2} f(x) \\text{ exist?}', annotation: 'Factor and cancel: (x²−4)/(x−2) = (x+2)(x−2)/(x−2) = x+2 for x ≠ 2.' },
@@ -143,6 +145,46 @@ export default {
       ],
       conclusion: 'In this model the velocity has a jump discontinuity at deployment time. Real systems usually smooth this transition over a short interval, but piecewise models often include intentional jumps to represent abrupt regime changes.',
     },
+    {
+      id: 'ex-piecewise-checklist-pass',
+      title: 'Piecewise Continuity Checklist — Pass Case',
+      problem: 'Check continuity at x=2 for f(x)=x^2-1 (x<2), f(2)=3, f(x)=2x-1 (x>2).',
+      visualizationId: 'ContinuityViz',
+      params: { variant: 'Continuous', hideSelector: true },
+      steps: [
+        { expression: 'f(2)=3', annotation: 'Condition 1: value exists.' },
+        { expression: '\\lim_{x\\to2^-}(x^2-1)=3', annotation: 'Condition 2a: left limit.' },
+        { expression: '\\lim_{x\\to2^+}(2x-1)=3', annotation: 'Condition 2b: right limit.' },
+        { expression: '\\lim_{x\\to2}f(x)=3=f(2)', annotation: 'Condition 3: limit equals value.' },
+      ],
+      conclusion: 'All three conditions pass, so f is continuous at x=2.',
+    },
+    {
+      id: 'ex-piecewise-checklist-fail',
+      title: 'Piecewise Continuity Checklist — Fail Case',
+      problem: 'Check continuity at x=0 for h(x)=x^2 (x<0), h(x)=x+1 (x>=0).',
+      visualizationId: 'ContinuityViz',
+      params: { variant: 'Jump', hideSelector: true },
+      steps: [
+        { expression: 'h(0)=1', annotation: 'Value exists.' },
+        { expression: '\\lim_{x\\to0^-}x^2=0', annotation: 'Left limit.' },
+        { expression: '\\lim_{x\\to0^+}(x+1)=1', annotation: 'Right limit.' },
+        { expression: '0\\neq 1 \\Rightarrow \\lim_{x\\to0}h(x)\\text{ does not exist}', annotation: 'Left and right disagree.' },
+      ],
+      conclusion: 'h is not continuous at x=0 because the two-sided limit fails.',
+    },
+    {
+      id: 'ex-piecewise-parameter-c',
+      title: 'Solve Parameter c for Continuity at a Join',
+      problem: 'Find c so f is continuous at x=2: f(x)=cx^2+1 (x<=2), f(x)=x+c (x>2).',
+      visualizationId: 'CompositionVisualization',
+      steps: [
+        { expression: '\\lim_{x\\to2^-}f(x)=4c+1', annotation: 'Left-branch value at the join.' },
+        { expression: '\\lim_{x\\to2^+}f(x)=2+c', annotation: 'Right-branch value at the join.' },
+        { expression: '4c+1=2+c \\Rightarrow 3c=1 \\Rightarrow c=1/3', annotation: 'Set equal to enforce continuity.' },
+      ],
+      conclusion: 'c=1/3 is the unique value that removes the join discontinuity.',
+    },
   ],
 
   challenges: [
@@ -166,7 +208,7 @@ export default {
   crossRefs: [
     { lessonSlug: 'limit-laws', label: 'Previous: Limit Laws', context: 'Continuity is defined using limits.' },
     { lessonSlug: 'epsilon-delta', label: 'Next: Epsilon-Delta', context: 'Make the definition of limit rigorous.' },
-    { lessonSlug: 'derivatives/introduction', label: 'Coming: Derivatives', context: 'Differentiability implies continuity.' },
+    { lessonSlug: 'tangent-problem', label: 'Coming: Derivatives', context: 'Differentiability implies continuity.' },
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-1', 'completed-example-2', 'solved-challenge'],

@@ -2,7 +2,7 @@ export default {
   id: 'ch1-limits-at-infinity',
   slug: 'limits-at-infinity',
   chapter: 1,
-  order: 5,
+  order: 6,
   title: 'Limits at Infinity',
   subtitle: 'End behavior, asymptotes, and growth-rate dominance',
   tags: ['limits at infinity', 'horizontal asymptote', 'oblique asymptote', 'end behavior', 'epsilon-N', 'growth rates'],

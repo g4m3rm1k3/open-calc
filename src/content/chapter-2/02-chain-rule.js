@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      'Sequencing map: first derivatives are built from limits, then power/product/quotient rules are proved, and only then does the chain rule appear. The chain rule is layered on those earlier results.',
       'Let\'s build intuition for composition before worrying about differentiation. The expression f(g(x)) means: first apply g to x, get an intermediate result, then apply f to that intermediate result. For example, if g(x) = x\u00b2 + 1 and f(u) = \u221au, then f(g(x)) = \u221a(x\u00b2+1). The function g acts "on the inside" and f acts "on the outside." To evaluate at x = 3: first g(3) = 10, then f(10) = \u221a10. This two-step process is composition.',
       'Now think about rates. If u = g(x) changes by a certain rate as x changes, and y = f(u) changes at a certain rate as u changes, then what is the rate of change of y with respect to x? The answer is found by multiplying the rates: if u increases 3 times as fast as x, and y increases 4 times as fast as u, then y increases 12 times as fast as x. Rates along a chain multiply.',
       'The gear analogy makes this precise. Suppose gear A meshes with gear B, and gear B meshes with gear C. If gear A turns 3 times for every revolution of gear B (dA/dB = 3), and gear B turns 2 times for every revolution of gear C (dB/dC = 2), then gear A turns 6 times for every revolution of gear C: dA/dC = (dA/dB)\u00b7(dB/dC) = 3\u00b72 = 6. The rates multiply along the chain. This is the chain rule in its essence.',
@@ -26,6 +27,11 @@ export default {
       'The chain rule extends to triple and longer compositions. For y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). Differentiate the outermost layer first, then the next, and so on, each time multiplying by the derivative of the layer below. This is like peeling an onion, one layer at a time.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Prerequisite Reminder',
+        body: 'Product and quotient rules are proved in the previous lesson. This lesson builds on those results and shows how composition adds the extra inner-derivative factor.',
+      },
       {
         type: 'insight',
         title: 'The Outside-Inside Method',
@@ -52,6 +58,7 @@ export default {
   math: {
     prose: [
       'There are two equivalent forms of the chain rule. The Lagrange/function-composition form names the outer and inner functions explicitly and is cleaner for algebraic manipulation. The Leibniz form uses dy/du and du/dx and is more intuitive for applied problems involving rates.',
+      'An approachable derivation idea: if \u0394u \approx g\'(x)\u0394x and \u0394y \approx f\'(u)\u0394u, then \u0394y \approx f\'(u)g\'(x)\u0394x. Dividing by \u0394x and taking the limiting view gives dy/dx = f\'(g(x))g\'(x).',
       'The chain rule combined with the power rule gives one of the most common differentiation formulas in all of calculus: d/dx[u\u207f] = nu\u207f\u207b\u00b9\u00b7u\', where u = g(x) is any differentiable function. This formula applies whenever you have "something to a power" — the power rule applies to the outer function, and the chain rule contributes the u\' factor.',
       'The extended chain rule for triple compositions states that for y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). The pattern is clear: differentiate each layer from outside to inside, evaluate each outer derivative at everything inside it, and multiply all the factors together.',
       'Identifying the outer and inner functions correctly is a skill that develops with practice. The best approach is to always ask: "What is the last thing done to x if I evaluate this at a number?" That last operation is the outer function. Everything that comes before is the inner function.',
@@ -78,7 +85,7 @@ export default {
         body: "\\frac{d}{dx}[f(g(h(x)))] = f'(g(h(x))) \\cdot g'(h(x)) \\cdot h'(x)",
       },
     ],
-    visualizationId: 'ChainRuleDecomposer',
+    visualizationId: 'CompositionVisualization',
     visualizationProps: {
       showOuterInnerLabels: true,
       animateLayerByLayer: true,
@@ -107,6 +114,34 @@ export default {
   },
 
   examples: [
+    {
+      id: 'ch2-002-ex0',
+      title: 'Why Chain Rule Works (Check by Expansion)',
+      problem: 'Differentiate f(x) = (x^2+1)^3 two ways: (1) expand first, (2) use chain rule. Verify both match.',
+      steps: [
+        {
+          expression: '(x^2+1)^3 = x^6 + 3x^4 + 3x^2 + 1',
+          annotation: 'Method 1: expand using the binomial identity.',
+        },
+        {
+          expression: 'f\'(x)=6x^5+12x^3+6x',
+          annotation: 'Differentiate the expanded polynomial term by term.',
+        },
+        {
+          expression: '\\text{Method 2: let } u=x^2+1,\\;f=u^3',
+          annotation: 'Set up outer and inner layers for chain rule.',
+        },
+        {
+          expression: 'f\'(x)=3u^2\\cdot u\'=3(x^2+1)^2\\cdot2x=6x(x^2+1)^2',
+          annotation: 'Apply outer derivative times inner derivative.',
+        },
+        {
+          expression: '6x(x^2+1)^2=6x(x^4+2x^2+1)=6x^5+12x^3+6x',
+          annotation: 'Expand to confirm exact agreement with Method 1.',
+        },
+      ],
+      conclusion: 'Both methods agree exactly. Chain rule is the compact form of algebra you would otherwise repeatedly expand.',
+    },
     {
       id: 'ch2-002-ex1',
       title: 'Chain Rule with Power Function',

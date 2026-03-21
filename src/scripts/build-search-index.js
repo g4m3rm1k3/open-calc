@@ -10,24 +10,58 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '../..')
 
+function toText(value) {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return ''
+}
+
+function flattenStepLikeItems(items = []) {
+  return items.flatMap((item) => {
+    if (!item || typeof item !== 'object') return []
+
+    return [
+      toText(item.title),
+      toText(item.problem),
+      toText(item.hint),
+      toText(item.answer),
+      toText(item.conclusion),
+      ...(item.steps ?? []).flatMap((step) => [toText(step.expression), toText(step.annotation)]),
+      ...(item.walkthrough ?? []).flatMap((step) => [toText(step.expression), toText(step.annotation)]),
+      ...(item.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
+      ...(item.searchKeywords ?? []),
+    ]
+  })
+}
+
 // Dynamically import content
 async function buildIndex() {
   const { CURRICULUM } = await import('../content/index.js')
 
   const documents = CURRICULUM.flatMap((chapter) =>
     chapter.lessons.map((lesson) => {
-      // Flatten all prose text from all three layers
-      const allProse = [
+      const searchableText = [
+        toText(lesson.hook?.question),
+        toText(lesson.hook?.realWorldContext),
         ...(lesson.intuition?.prose ?? []),
         ...(lesson.math?.prose ?? []),
         ...(lesson.rigor?.prose ?? []),
-        ...(lesson.examples ?? []).flatMap((e) => [
-          e.title,
-          e.conclusion ?? '',
-          ...(e.steps ?? []).map((s) => s.annotation ?? ''),
-        ]),
-        ...(lesson.challenges ?? []).map((c) => c.problem ?? ''),
-      ].join(' ')
+        ...(lesson.intuition?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
+        ...(lesson.math?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
+        ...(lesson.rigor?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
+        ...(lesson.intuition?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
+        ...(lesson.math?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
+        ...(lesson.rigor?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
+        ...flattenStepLikeItems(lesson.examples),
+        ...flattenStepLikeItems(lesson.challenges),
+        ...(lesson.crossRefs ?? []).flatMap((ref) => [toText(ref.label), toText(ref.context)]),
+        ...(lesson.searchKeywords ?? []),
+      ]
+
+      const content = searchableText
+        .filter((part) => typeof part === 'string' && part.trim().length > 0)
+        .join(' ')
 
       return {
         id: lesson.id,
@@ -37,7 +71,7 @@ async function buildIndex() {
         title: lesson.title,
         subtitle: lesson.subtitle,
         tags: (lesson.tags ?? []).join(' '),
-        content: allProse,
+        content,
       }
     })
   )

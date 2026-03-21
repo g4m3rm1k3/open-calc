@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 
 export default function SearchModal() {
-  const { isOpen, closeSearch, query, setQuery, results, isReady } = useSearchContext()
+  const { isOpen, openSearch, closeSearch, query, setQuery, results, isReady } = useSearchContext()
   const inputRef = useRef(null)
   const navigate = useNavigate()
 
@@ -17,13 +17,13 @@ export default function SearchModal() {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        isOpen ? closeSearch() : useSearchContext
+        isOpen ? closeSearch() : openSearch()
       }
       if (e.key === 'Escape' && isOpen) closeSearch()
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, closeSearch])
+  }, [isOpen, openSearch, closeSearch])
 
   if (!isOpen) return null
 

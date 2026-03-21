@@ -15,31 +15,52 @@ const TABS = [
  *  - Inline LaTeX:  $...$  via KaTeX
  *  - Bold text:     **...**  via <strong>
  */
+function isLikelyInlineMath(expr) {
+  const t = expr.trim()
+  if (!t) return false
+  if (/^\d+(?:[.,]\d+)?$/.test(t)) return false
+  if (/^[\d,]+(?:\.\d+)?$/.test(t)) return false
+  return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
+}
+
 function parseProse(text) {
-  // Match $...$ (non-greedy) or **...** (non-greedy)
-  const regex = /\$([^$]+?)\$|\*\*(.+?)\*\*/g
   const parts = []
-  let lastIndex = 0
-  let match
+  let i = 0
 
-  while ((match = regex.exec(text)) !== null) {
-    // Push any plain text before this match
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
+  while (i < text.length) {
+    if (text.startsWith('**', i)) {
+      const end = text.indexOf('**', i + 2)
+      if (end !== -1) {
+        const boldText = text.slice(i + 2, end)
+        parts.push(<strong key={`b${i}`}>{boldText}</strong>)
+        i = end + 2
+        continue
+      }
     }
-    if (match[1] !== undefined) {
-      // Inline LaTeX: $...$
-      parts.push(<KatexInline key={`k${match.index}`} expr={match[1]} />)
-    } else if (match[2] !== undefined) {
-      // Bold: **...**
-      parts.push(<strong key={`b${match.index}`}>{match[2]}</strong>)
-    }
-    lastIndex = match.index + match[0].length
-  }
 
-  // Push any remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex))
+    if (text[i] === '$') {
+      const end = text.indexOf('$', i + 1)
+      if (end !== -1) {
+        const candidate = text.slice(i + 1, end)
+        if (isLikelyInlineMath(candidate)) {
+          parts.push(<KatexInline key={`k${i}`} expr={candidate} />)
+          i = end + 1
+          continue
+        }
+      }
+      parts.push('$')
+      i += 1
+      continue
+    }
+
+    const nextBold = text.indexOf('**', i)
+    const nextDollar = text.indexOf('$', i)
+    const next = [nextBold, nextDollar].filter((v) => v !== -1)
+    const stop = next.length ? Math.min(...next) : text.length
+    if (stop > i) {
+      parts.push(text.slice(i, stop))
+    }
+    i = stop
   }
 
   return parts.length > 0 ? parts : [text]
@@ -47,6 +68,29 @@ function parseProse(text) {
 
 function ProseParagraph({ text }) {
   return <p className="mb-4 leading-relaxed last:mb-0">{parseProse(text)}</p>
+}
+
+function normalizeProseParagraphs(paragraphs = []) {
+  const merged = []
+
+  for (const raw of paragraphs) {
+    const current = String(raw ?? '').trim()
+    if (!current) continue
+
+    const isListLike = /^(?:\d+\.|[•*-])\s/.test(current)
+    const isHeadingLike = current.startsWith('**')
+    const words = current.split(/\s+/).filter(Boolean)
+    const isTinyFragment = words.length <= 2 && current.length <= 18
+
+    if (!isListLike && !isHeadingLike && isTinyFragment && merged.length > 0) {
+      merged[merged.length - 1] = `${merged[merged.length - 1]} ${current}`
+      continue
+    }
+
+    merged.push(current)
+  }
+
+  return merged
 }
 
 function SectionContent({ data }) {
@@ -60,9 +104,10 @@ function SectionContent({ data }) {
     <div className="space-y-4">
       {blocks.map((block, i) => {
         if (block.type === 'prose') {
+          const normalized = normalizeProseParagraphs(block.paragraphs)
           return (
             <div key={i} className="prose-content text-slate-700 dark:text-slate-300">
-              {block.paragraphs.map((p, j) => <ProseParagraph key={j} text={p} />)}
+              {normalized.map((p, j) => <ProseParagraph key={j} text={p} />)}
             </div>
           )
         }
@@ -89,7 +134,7 @@ function SectionContent({ data }) {
 // Legacy: convert old-style {prose, callouts, visualizationId, visualizations} to blocks
 function buildBlocks(data) {
   const blocks = []
-  if (data.prose?.length) blocks.push({ type: 'prose', paragraphs: data.prose })
+  if (data.prose?.length) blocks.push({ type: 'prose', paragraphs: normalizeProseParagraphs(data.prose) })
   for (const c of data.callouts ?? []) blocks.push({ type: 'callout', ...c })
   // Single legacy visualizationId
   if (data.visualizationId) blocks.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })

@@ -40,6 +40,11 @@ export default {
         body: 'This is the most common error in related rates. If the base is at 6 ft at the specific instant you care about, you might be tempted to write x = 6 in the equation x² + y² = 100 immediately, getting y = 8, and then wonder what to differentiate. But you must write the equation with variables x and y, differentiate to get 2x(dx/dt) + 2y(dy/dt) = 0, and THEN substitute x = 6, y = 8. Substituting first replaces the variables with constants, eliminating the rates entirely.',
       },
       {
+        type: 'tip',
+        title: 'Geometry First, Differentiate Second',
+        body: 'Draw and label the full geometry before writing derivatives. Most related-rates errors are diagram/setup errors, not differentiation errors.',
+      },
+      {
         type: 'geometric',
         title: 'The Sliding Ladder Geometry',
         body: 'The ladder, wall, and ground always form a right triangle with hypotenuse L (fixed). As x increases from 0 to L, y decreases from L to 0. The rate equation dy/dt = -(x/y)·(dx/dt) shows: when x/y is small (nearly vertical ladder), the top slides slowly. When x/y is large (nearly horizontal ladder), the top plummets. The singularity at y = 0 is a genuine physical phenomenon — the top accelerates without bound as it approaches the floor.',

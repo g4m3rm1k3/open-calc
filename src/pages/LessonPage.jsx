@@ -79,7 +79,7 @@ export default function LessonPage() {
           <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3">{lesson.hook.question}</h2>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{lesson.hook.realWorldContext}</p>
           {lesson.hook.previewVisualizationId && (
-            <VizFrame id={lesson.hook.previewVisualizationId} initialProps={{}} />
+            <VizFrame id={lesson.hook.previewVisualizationId} initialProps={lesson.hook.previewVisualizationProps ?? {}} />
           )}
         </section>
       )}

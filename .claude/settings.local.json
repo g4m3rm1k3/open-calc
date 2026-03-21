@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"visualizationProps\" \"/c/Users/g4m3r/Documents/testing tutorials/open-calc/src/content/chapter-1\"/*.js)",
+      "Bash(grep -n \"visualizationProps\" src/content/chapter-1/*.js)",
+      "Bash(grep -n \"visualizations\" src/content/chapter-1/*.js -A 5)",
+      "Bash(grep -n \"Math.sin\" src/content/chapter-1/*.js)",
+      "Bash(find src/content -name \"*.js\" -exec grep -l \"Math\\\\.\\\\|fn:\" {})"
+    ]
+  }
+}

@@ -2,7 +2,7 @@ export default {
   id: 'ch1-squeeze-theorem',
   slug: 'squeeze-theorem',
   chapter: 1,
-  order: 4,
+  order: 5,
   title: 'The Squeeze Theorem',
   subtitle: 'Trapping a wild function between two tame ones',
   tags: ['squeeze theorem', 'sandwich theorem', 'pinching theorem', 'sin(x)/x', 'bounded oscillation', 'comparison'],

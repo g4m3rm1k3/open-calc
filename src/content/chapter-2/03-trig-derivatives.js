@@ -87,7 +87,7 @@ export default {
         body: "\\frac{d}{dx}\\left[\\frac{\\cos x}{\\sin x}\\right] = \\frac{-\\sin x \\cdot \\sin x - \\cos x \\cdot \\cos x}{\\sin^2 x} = \\frac{-(\\sin^2 x + \\cos^2 x)}{\\sin^2 x} = \\frac{-1}{\\sin^2 x} = -\\csc^2 x",
       },
     ],
-    visualizationId: 'TrigDerivativesGraph',
+    visualizationId: 'SineCosineSlope',
     visualizationProps: {
       showAllSix: true,
       showQuotientRuleSteps: false,

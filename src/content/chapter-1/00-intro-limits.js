@@ -53,6 +53,16 @@ export default {
       },
       {
         type: 'misconception',
+        title: 'Cancel Factors, Not Terms',
+        body: 'You may cancel only common factors, never added/subtracted terms. Example: (x^2-1)/(x-1) simplifies after factoring, but (x+1)/(x-1) does not let you cancel x.',
+      },
+      {
+        type: 'technique',
+        title: '0/0 Triage',
+        body: 'When substitution gives 0/0, try this order: (1) factor and cancel, (2) multiply by a conjugate, (3) combine to a common denominator, then re-evaluate.',
+      },
+      {
+        type: 'misconception',
         title: 'The Limit is NOT the Function Value',
         body: "lim(x→c) f(x) can exist even when f(c) doesn't. And even when f(c) does exist, the limit can be a DIFFERENT number. The limit only cares about what happens NEAR c, not AT c.",
       },

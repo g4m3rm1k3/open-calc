@@ -1,0 +1,242 @@
+// FILE: src/content/chapter-4/10-partial-fractions-integration.js
+export default {
+  id: 'ch4-010',
+  slug: 'partial-fractions-integration',
+  chapter: 4,
+  order: 10,
+  title: 'Partial Fraction Decomposition',
+  subtitle: 'Breaking rational functions into simple pieces for integration',
+  tags: ['partial fractions', 'rational functions', 'Heaviside', 'cover-up', 'decomposition', 'linear factors', 'integration technique'],
+
+  hook: {
+    question: 'How do you integrate 1/((x−1)(x+2))? Neither u-sub nor by-parts helps. But if you write 1/((x−1)(x+2)) = A/(x−1) + B/(x+2) for suitable constants A and B, each piece integrates to a logarithm. Partial fraction decomposition breaks any rational function into a sum of simple fractions, each of which has a known antiderivative. It is the algebraic key to integrating all rational functions.',
+    realWorldContext: 'Partial fractions are essential in engineering. In control theory, the transfer function of a system H(s) = P(s)/Q(s) is decomposed into partial fractions to find the inverse Laplace transform — this is how engineers determine the time-domain response of circuits, mechanical systems, and feedback controllers. In signal processing, partial fractions decompose frequency-domain filters into first-order components. In pharmacokinetics, drug concentration models with multiple compartments produce rational functions of the Laplace variable, and partial fractions give the time-domain solution. The technique also appears in probability (generating functions) and number theory (formal power series).',
+    previewVisualizationId: 'FunctionPlotter',
+  },
+
+  intuition: {
+    prose: [
+      'You already know how to add fractions: $1/(x-1) + 1/(x+2) = ((x+2)+(x-1))/((x-1)(x+2)) = (2x+1)/((x-1)(x+2))$. Partial fraction decomposition is this process in REVERSE. Given a complicated fraction like $(2x+1)/((x-1)(x+2))$, we break it back into $A/(x-1) + B/(x+2)$. Each simple fraction is easy to integrate: $\\int A/(x-1)\\,dx = A\\ln|x-1| + C$.',
+      'The method works because rational functions (polynomial over polynomial) can always be decomposed into a polynomial part (if the degree of the numerator is $\\geq$ the degree of the denominator) plus a sum of "partial fractions" — terms of the form $A/(x-a)^k$ for real roots and $(Bx+C)/(x^2+bx+c)^k$ for irreducible quadratic factors. Each type has a known antiderivative.',
+      'The first step is always: check degrees. If the numerator degree $\\geq$ denominator degree, perform polynomial long division first to get a polynomial plus a proper fraction (numerator degree $<$ denominator degree). Only proper fractions get decomposed. For example, $\\int (x^3+2)/(x^2-1)\\,dx$: divide to get $x + (x+2)/(x^2-1)$, then decompose the proper fraction.',
+      'For distinct linear factors, the decomposition is straightforward. Factor the denominator completely: $Q(x) = (x-r_1)(x-r_2)\\cdots(x-r_n)$. Write $P(x)/Q(x) = A_1/(x-r_1) + A_2/(x-r_2) + \\cdots + A_n/(x-r_n)$. Find $A_1, A_2, \\ldots, A_n$ by multiplying both sides by $Q(x)$ and substituting the roots, or by comparing coefficients.',
+      'The Heaviside cover-up method is a fast shortcut for distinct linear factors. To find the coefficient $A_k$ of $1/(x-r_k)$: "cover up" the factor $(x-r_k)$ in the denominator and evaluate the rest at $x = r_k$. Formally, $A_k = P(r_k)/\\prod_{j \\neq k}(r_k - r_j)$. This avoids setting up a system of equations and is extremely efficient for denominators with 3 or more distinct factors.',
+      'For repeated linear factors like $(x-r)^m$, you need $m$ terms: $A_1/(x-r) + A_2/(x-r)^2 + \\cdots + A_m/(x-r)^m$. The Heaviside method gives $A_m$ directly (plug in $x = r$), but the other coefficients require either comparing coefficients or differentiating the cover-up equation. Each term $A_k/(x-r)^k$ integrates as $A_k(x-r)^{1-k}/(1-k)$ for $k \\geq 2$, or $A_1 \\ln|x-r|$ for $k = 1$.',
+      'For irreducible quadratic factors $(x^2+bx+c)$ (where $b^2-4c < 0$), the partial fraction has the form $(Bx+C)/(x^2+bx+c)$. To integrate: complete the square in the denominator, then split into two integrals — one giving a logarithm (via u-sub) and one giving an arctangent. For repeated quadratics $(x^2+bx+c)^k$, you need terms $(B_j x + C_j)/(x^2+bx+c)^j$ for $j = 1, 2, \\ldots, k$.',
+    ],
+    callouts: [
+      {
+        type: 'strategy',
+        title: 'When to Use Partial Fractions',
+        body: 'Use partial fractions when the integrand is a rational function P(x)/Q(x) (polynomial over polynomial) and Q(x) can be factored. If the degree of P ≥ degree of Q, do long division first. This technique works for ALL rational functions — it is a complete method.',
+      },
+      {
+        type: 'prior-knowledge',
+        title: 'Polynomial Long Division',
+        body: 'If deg(P) ≥ deg(Q), divide P by Q first. Example: (x³+2)/(x²−1) = x + remainder (x+2)/(x²−1). Only the proper fraction (x+2)/(x²−1) needs partial fraction decomposition. The polynomial part integrates directly.',
+      },
+      {
+        type: 'warning',
+        title: 'Factor Completely Before Decomposing',
+        body: 'Partial fractions require a fully factored denominator. x⁴−1 = (x²+1)(x−1)(x+1), not just (x²−1)(x²+1). If you miss a factorization, you will set up the wrong form and get stuck. Always check: can any quadratic factor be factored further? (Test discriminant: b²−4c < 0 means irreducible.)',
+      },
+      {
+        type: 'real-world',
+        title: 'Laplace Transforms and Circuit Analysis',
+        body: 'In electrical engineering, the response of an RLC circuit to a step input is found by (1) writing the transfer function H(s) = 1/(s²+s+1), (2) decomposing into partial fractions (with complex or irreducible quadratic terms), and (3) inverse-transforming each piece. Partial fractions convert one hard transform into several easy ones.',
+      },
+      {
+        type: 'misconception',
+        title: 'Repeated Factors Need Multiple Terms',
+        body: 'For (x−1)³ in the denominator, you need THREE terms: A/(x−1) + B/(x−1)² + C/(x−1)³. A common error is writing only A/(x−1)³. This gives too few unknowns and the decomposition fails.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'FunctionPlotter',
+        title: 'Decomposing a Rational Function',
+        caption: 'The original rational function (dark curve) equals the sum of its partial fractions (lighter curves). Each simple fraction has a vertical asymptote at a root of the denominator. The decomposition separates the behavior near each asymptote into independent, integrable pieces.',
+      },
+    ],
+  },
+
+  math: {
+    prose: [
+      'Setup for partial fractions. Let $P(x)/Q(x)$ be a proper rational function (deg $P$ < deg $Q$). Factor $Q(x)$ into linear and irreducible quadratic factors over $\\mathbb{R}$: $Q(x) = (x-r_1)^{m_1}\\cdots(x-r_p)^{m_p}(x^2+b_1x+c_1)^{n_1}\\cdots(x^2+b_qx+c_q)^{n_q}$.',
+      'The partial fraction decomposition is: $\\frac{P(x)}{Q(x)} = \\sum_{i=1}^{p}\\sum_{j=1}^{m_i}\\frac{A_{ij}}{(x-r_i)^j} + \\sum_{i=1}^{q}\\sum_{j=1}^{n_i}\\frac{B_{ij}x+C_{ij}}{(x^2+b_ix+c_i)^j}$. The constants $A_{ij}$, $B_{ij}$, $C_{ij}$ are uniquely determined.',
+      'Finding coefficients — three methods: (1) Multiply both sides by $Q(x)$ and substitute the roots $x = r_i$ to find some constants (Heaviside). (2) Compare coefficients of like powers of $x$ on both sides. (3) Substitute convenient non-root values of $x$ (e.g., $x = 0$) to generate additional equations. In practice, a mix of all three is fastest.',
+      'Integration of each type: $\\int A/(x-r)\\,dx = A\\ln|x-r|+C$. $\\int A/(x-r)^k\\,dx = A(x-r)^{1-k}/(1-k)+C$ for $k \\geq 2$. $\\int (Bx+C)/(x^2+bx+c)\\,dx$: complete the square, split into $\\int (\\text{du/u}) + \\int (\\text{d}\\theta/(1+\\theta^2))$, giving a $\\ln$ and an $\\arctan$.',
+      'Integration of the quadratic type in detail: let $x^2+bx+c = (x+b/2)^2 + (c-b^2/4) = (x+b/2)^2+d^2$ where $d = \\sqrt{c-b^2/4}$. Split $Bx+C = B(x+b/2) + (C-Bb/2)$. Then: $\\int \\frac{B(x+b/2)}{(x+b/2)^2+d^2}dx = \\frac{B}{2}\\ln[(x+b/2)^2+d^2]+C_1$ (u-sub with $u = (x+b/2)^2+d^2$). And: $\\int \\frac{C-Bb/2}{(x+b/2)^2+d^2}dx = \\frac{C-Bb/2}{d}\\arctan\\frac{x+b/2}{d}+C_2$.',
+    ],
+    callouts: [
+      {
+        type: 'definition',
+        title: 'Partial Fraction Forms',
+        body: 'Distinct linear \\((x-r)\\): \\(\\frac{A}{x-r}\\)\nRepeated linear \\((x-r)^m\\): \\(\\frac{A_1}{x-r}+\\frac{A_2}{(x-r)^2}+\\cdots+\\frac{A_m}{(x-r)^m}\\)\nIrreducible quadratic \\((x^2+bx+c)\\): \\(\\frac{Bx+C}{x^2+bx+c}\\)\nRepeated quadratic: similar pattern with increasing powers.',
+      },
+      {
+        type: 'strategy',
+        title: 'Heaviside Cover-Up Method',
+        body: 'For distinct linear factors: to find the coefficient of \\(1/(x-r_k)\\), cover up \\((x-r_k)\\) in the original fraction and evaluate at \\(x = r_k\\).\nExample: \\(\\frac{5}{(x-1)(x+3)}\\): coefficient of \\(1/(x-1)\\) is \\(5/(1+3) = 5/4\\). Coefficient of \\(1/(x+3)\\) is \\(5/(-3-1) = -5/4\\).',
+      },
+      {
+        type: 'theorem',
+        title: 'Every Rational Function Is Integrable',
+        body: 'Since every polynomial factors over \\(\\mathbb{R}\\) into linear and irreducible quadratic factors, and each partial fraction type has a known antiderivative (ln, power, arctan), every rational function has an elementary antiderivative. This is one of the great computational triumphs of calculus.',
+      },
+    ],
+    visualizations: [],
+  },
+
+  rigor: {
+    prose: [
+      'The existence and uniqueness of partial fraction decomposition is guaranteed by algebra. Over a field $F$, the ring of polynomials $F[x]$ is a principal ideal domain, and partial fraction decomposition follows from the Chinese Remainder Theorem for $F[x]$-modules. In concrete terms: if $Q(x) = Q_1(x)Q_2(x)$ with $\\gcd(Q_1, Q_2) = 1$, then for any $P$ with $\\deg P < \\deg Q$, there exist unique $P_1, P_2$ with $\\deg P_i < \\deg Q_i$ such that $P/Q = P_1/Q_1 + P_2/Q_2$.',
+      'The proof of the Heaviside cover-up formula: $A_k = \\lim_{x \\to r_k}(x-r_k)\\cdot P(x)/Q(x)$. Since $Q(x)$ has a simple root at $r_k$, write $Q(x) = (x-r_k)\\tilde{Q}(x)$ where $\\tilde{Q}(r_k) \\neq 0$. Then $(x-r_k)P(x)/Q(x) = P(x)/\\tilde{Q}(x) \\to P(r_k)/\\tilde{Q}(r_k)$ as $x \\to r_k$. This equals the residue of $P/Q$ at $r_k$ — the same concept used in complex analysis for contour integrals.',
+      'For repeated roots, the generalization uses derivatives: if $Q(x) = (x-r)^m \\tilde{Q}(x)$, define $\\phi(x) = (x-r)^m P(x)/Q(x) = P(x)/\\tilde{Q}(x)$. Then $A_m = \\phi(r)$, $A_{m-1} = \\phi\'(r)/1!$, $A_{m-2} = \\phi\'\'(r)/2!$, and in general $A_{m-j} = \\phi^{(j)}(r)/j!$. This is the Taylor expansion of $\\phi$ at $r$.',
+      'The fact that every real polynomial factors into linear and irreducible quadratic factors follows from the Fundamental Theorem of Algebra (every polynomial of degree $n$ has exactly $n$ complex roots, counted with multiplicity). Complex roots of a real polynomial come in conjugate pairs $\\alpha \\pm \\beta i$. Each pair gives a real quadratic factor $(x-\\alpha)^2+\\beta^2 = x^2-2\\alpha x+\\alpha^2+\\beta^2$, which is irreducible over $\\mathbb{R}$ (its discriminant $4\\alpha^2-4(\\alpha^2+\\beta^2) = -4\\beta^2 < 0$).',
+    ],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Existence and Uniqueness',
+        body: 'For any proper rational function \\(P(x)/Q(x)\\), the partial fraction decomposition exists and is unique. This follows from the Chinese Remainder Theorem in the polynomial ring \\(\\mathbb{R}[x]\\).',
+      },
+    ],
+    visualizations: [],
+  },
+
+  examples: [
+    {
+      id: 'ch4-010-ex1',
+      title: 'Distinct Linear: ∫(2x+1)/((x−1)(x+2)) dx',
+      problem: '\\text{Find } \\int \\frac{2x+1}{(x-1)(x+2)}\\,dx.',
+      steps: [
+        { expression: '\\frac{2x+1}{(x-1)(x+2)} = \\frac{A}{x-1} + \\frac{B}{x+2}', annotation: 'Set up the partial fraction form: distinct linear factors.' },
+        { expression: '\\text{Heaviside: } A = \\frac{2(1)+1}{1+2} = \\frac{3}{3} = 1', annotation: 'Cover up (x−1), evaluate at x = 1.' },
+        { expression: 'B = \\frac{2(-2)+1}{-2-1} = \\frac{-3}{-3} = 1', annotation: 'Cover up (x+2), evaluate at x = −2.' },
+        { expression: '\\int \\frac{2x+1}{(x-1)(x+2)}\\,dx = \\int\\frac{1}{x-1}dx + \\int\\frac{1}{x+2}dx', annotation: 'Both coefficients are 1.' },
+        { expression: '= \\ln|x-1| + \\ln|x+2| + C = \\ln|(x-1)(x+2)| + C', annotation: 'Each integrates to a logarithm. Combine using ln a + ln b = ln(ab).' },
+      ],
+      conclusion: '∫(2x+1)/((x−1)(x+2)) dx = ln|(x−1)(x+2)| + C. Heaviside cover-up makes finding A and B almost instant.',
+    },
+    {
+      id: 'ch4-010-ex2',
+      title: 'Repeated Factor: ∫x/((x−1)²(x+1)) dx',
+      problem: '\\text{Find } \\int \\frac{x}{(x-1)^2(x+1)}\\,dx.',
+      steps: [
+        { expression: '\\frac{x}{(x-1)^2(x+1)} = \\frac{A}{x-1} + \\frac{B}{(x-1)^2} + \\frac{C}{x+1}', annotation: 'Repeated factor (x−1)² requires TWO terms.' },
+        { expression: '\\text{Heaviside for } B: \\text{cover } (x-1)^2, \\text{ eval at } x=1: \\; B = \\frac{1}{1+1} = \\frac{1}{2}', annotation: 'B is found directly.' },
+        { expression: '\\text{Heaviside for } C: \\text{cover } (x+1), \\text{ eval at } x=-1: \\; C = \\frac{-1}{(-1-1)^2} = \\frac{-1}{4}', annotation: 'C is found directly.' },
+        { expression: '\\text{For } A: \\text{multiply out and compare. Set } x=0: \\; \\frac{0}{(−1)^2(1)} = A(−1)(1)+B(1)+C(−1)^2', annotation: 'Substitute a convenient value x = 0.' },
+        { expression: '0 = -A + \\frac{1}{2} + \\frac{-1}{4} = -A + \\frac{1}{4} \\Rightarrow A = \\frac{1}{4}', annotation: 'Solve for A.' },
+        { expression: '\\int \\frac{x}{(x-1)^2(x+1)}dx = \\frac{1}{4}\\ln|x-1| - \\frac{1}{2(x-1)} - \\frac{1}{4}\\ln|x+1| + C', annotation: '∫A/(x−1) = A ln|x−1|; ∫B/(x−1)² = −B/(x−1); ∫C/(x+1) = C ln|x+1|.' },
+        { expression: '= \\frac{1}{4}\\ln\\left|\\frac{x-1}{x+1}\\right| - \\frac{1}{2(x-1)} + C', annotation: 'Combine logarithms.' },
+      ],
+      conclusion: '∫x/((x−1)²(x+1)) dx = (1/4)ln|(x−1)/(x+1)| − 1/(2(x−1)) + C.',
+    },
+    {
+      id: 'ch4-010-ex3',
+      title: 'Irreducible Quadratic: ∫(x²+1)/(x³+x) dx',
+      problem: '\\text{Find } \\int \\frac{x^2+1}{x^3+x}\\,dx.',
+      steps: [
+        { expression: 'x^3+x = x(x^2+1)', annotation: 'Factor the denominator. x²+1 is irreducible (discriminant = −4 < 0).' },
+        { expression: '\\frac{x^2+1}{x(x^2+1)} = \\frac{1}{x}', annotation: 'Wait — x²+1 cancels! The fraction simplifies before decomposition.' },
+        { expression: '\\int \\frac{x^2+1}{x^3+x}\\,dx = \\int \\frac{1}{x}\\,dx = \\ln|x| + C', annotation: 'Always simplify first.' },
+      ],
+      conclusion: '∫(x²+1)/(x³+x) dx = ln|x| + C. Lesson: always check for cancellation before setting up partial fractions.',
+    },
+    {
+      id: 'ch4-010-ex4',
+      title: 'True Quadratic: ∫(3x+5)/(x²+2x+5) dx',
+      problem: '\\text{Find } \\int \\frac{3x+5}{x^2+2x+5}\\,dx.',
+      steps: [
+        { expression: 'x^2+2x+5 = (x+1)^2+4', annotation: 'Complete the square. Discriminant = 4−20 < 0, so irreducible.' },
+        { expression: '3x+5 = 3(x+1)+2', annotation: 'Rewrite numerator in terms of (x+1) to match the completed square.' },
+        { expression: '\\int \\frac{3(x+1)}{(x+1)^2+4}dx + \\int \\frac{2}{(x+1)^2+4}dx', annotation: 'Split into two integrals.' },
+        { expression: '\\text{First: } u=(x+1)^2+4,\\; du=2(x+1)dx: \\; \\frac{3}{2}\\ln[(x+1)^2+4]', annotation: 'U-sub gives a logarithm.' },
+        { expression: '\\text{Second: } \\frac{2}{4}\\cdot\\frac{1}{1}\\arctan\\frac{x+1}{2} = \\arctan\\frac{x+1}{2}', annotation: '∫du/(u²+a²) = (1/a)arctan(u/a). Here a = 2: 2·(1/2)arctan((x+1)/2).' },
+        { expression: '= \\frac{3}{2}\\ln(x^2+2x+5) + \\arctan\\frac{x+1}{2} + C', annotation: 'Combine. Note: (x+1)²+4 = x²+2x+5 is always positive, no absolute value needed.' },
+      ],
+      conclusion: '∫(3x+5)/(x²+2x+5) dx = (3/2)ln(x²+2x+5) + arctan((x+1)/2) + C. The split into "derivative of denominator" and "constant over denominator" is the standard technique for irreducible quadratics.',
+    },
+    {
+      id: 'ch4-010-ex5',
+      title: 'Long Division First: ∫(x³−2x+3)/(x²−1) dx',
+      problem: '\\text{Find } \\int \\frac{x^3-2x+3}{x^2-1}\\,dx.',
+      steps: [
+        { expression: '\\frac{x^3-2x+3}{x^2-1} = x + \\frac{-x+3}{x^2-1}', annotation: 'Degree of numerator (3) ≥ degree of denominator (2). Long divide: x³ ÷ (x²−1) = x remainder −x+3.' },
+        { expression: '\\frac{-x+3}{(x-1)(x+1)} = \\frac{A}{x-1}+\\frac{B}{x+1}', annotation: 'Factor x²−1 and decompose the proper fraction.' },
+        { expression: 'A = \\frac{-1+3}{1+1} = 1, \\quad B = \\frac{1+3}{-1-1} = -2', annotation: 'Heaviside cover-up.' },
+        { expression: '\\int\\left(x + \\frac{1}{x-1} - \\frac{2}{x+1}\\right)dx', annotation: 'Three simple integrals.' },
+        { expression: '= \\frac{x^2}{2} + \\ln|x-1| - 2\\ln|x+1| + C', annotation: 'Integrate each term.' },
+      ],
+      conclusion: '∫(x³−2x+3)/(x²−1) dx = x²/2 + ln|x−1| − 2ln|x+1| + C. Always do long division when the numerator degree ≥ denominator degree.',
+    },
+  ],
+
+  challenges: [
+    {
+      id: 'ch4-010-ch1',
+      difficulty: 'easy',
+      problem: 'Find ∫dx/((x+1)(x+3)) using the Heaviside cover-up method.',
+      hint: 'A = 1/(1+3−1+1)... actually: cover (x+1), eval at x = −1: A = 1/(−1+3) = 1/2. Cover (x+3), eval at x = −3: B = 1/(−3+1) = −1/2.',
+      walkthrough: [
+        { expression: '\\frac{1}{(x+1)(x+3)} = \\frac{A}{x+1}+\\frac{B}{x+3}', annotation: 'Standard form for distinct linear factors.' },
+        { expression: 'A = \\frac{1}{-1+3} = \\frac{1}{2}, \\quad B = \\frac{1}{-3+1} = -\\frac{1}{2}', annotation: 'Cover-up method.' },
+        { expression: '\\int \\frac{dx}{(x+1)(x+3)} = \\frac{1}{2}\\ln|x+1|-\\frac{1}{2}\\ln|x+3|+C = \\frac{1}{2}\\ln\\left|\\frac{x+1}{x+3}\\right|+C', annotation: 'Integrate and combine logs.' },
+      ],
+      answer: '\\frac{1}{2}\\ln\\left|\\frac{x+1}{x+3}\\right|+C',
+    },
+    {
+      id: 'ch4-010-ch2',
+      difficulty: 'medium',
+      problem: 'Find ∫(2x²+3x+1)/(x³+x²) dx.',
+      hint: 'Factor: x³+x² = x²(x+1). Repeated factor x² needs terms A/x + B/x² + C/(x+1).',
+      walkthrough: [
+        { expression: '\\frac{2x^2+3x+1}{x^2(x+1)} = \\frac{A}{x}+\\frac{B}{x^2}+\\frac{C}{x+1}', annotation: 'Set up with repeated linear factor x².' },
+        { expression: 'B:\\text{ cover } x^2, x=0: B = \\frac{1}{0+1} = 1. \\quad C:\\text{ cover } (x+1), x=-1: C = \\frac{2-3+1}{(-1)^2} = 0', annotation: 'Heaviside for B and C.' },
+        { expression: '\\text{For } A: \\text{multiply by } x^2(x+1): 2x^2+3x+1 = Ax(x+1)+1\\cdot(x+1)+0\\cdot x^2', annotation: 'Substitute known B=1, C=0.' },
+        { expression: '\\text{Compare } x^2: 2 = A. \\text{ Check } x^1: 3 = A+1 = 3.\\checkmark', annotation: 'A = 2 confirmed.' },
+        { expression: '\\int\\left(\\frac{2}{x}+\\frac{1}{x^2}\\right)dx = 2\\ln|x|-\\frac{1}{x}+C', annotation: 'Integrate (C=0 term vanishes).' },
+      ],
+      answer: '2\\ln|x|-\\frac{1}{x}+C',
+    },
+    {
+      id: 'ch4-010-ch3',
+      difficulty: 'hard',
+      problem: 'Find ∫(x²+2)/((x−1)(x²+x+1)) dx. Note that x³−1 = (x−1)(x²+x+1).',
+      hint: 'Decompose into A/(x−1) + (Bx+C)/(x²+x+1). For the quadratic integral, complete the square: x²+x+1 = (x+1/2)² + 3/4.',
+      walkthrough: [
+        { expression: '\\frac{x^2+2}{(x-1)(x^2+x+1)} = \\frac{A}{x-1}+\\frac{Bx+C}{x^2+x+1}', annotation: 'x²+x+1 is irreducible (discriminant = 1−4 = −3 < 0).' },
+        { expression: 'A = \\frac{1+2}{1+1+1} = 1', annotation: 'Cover up (x−1), evaluate at x = 1.' },
+        { expression: '\\text{Multiply out: } x^2+2 = 1\\cdot(x^2+x+1)+(Bx+C)(x-1)', annotation: 'Expand right side.' },
+        { expression: 'x^2+2 = x^2+x+1+Bx^2-Bx+Cx-C = (1+B)x^2+(1-B+C)x+(1-C)', annotation: 'Collect terms.' },
+        { expression: 'x^2: 1=1+B \\Rightarrow B=0. \\quad x^0: 2=1-C \\Rightarrow C=-1. \\quad \\text{Check } x^1: 0=1-0-1=0.\\checkmark', annotation: 'Compare coefficients.' },
+        { expression: '\\int\\frac{1}{x-1}dx + \\int\\frac{-1}{x^2+x+1}dx = \\ln|x-1| - \\int\\frac{dx}{(x+1/2)^2+3/4}', annotation: 'Complete the square: x²+x+1 = (x+1/2)² + 3/4.' },
+        { expression: '= \\ln|x-1| - \\frac{1}{\\sqrt{3}/2}\\arctan\\frac{x+1/2}{\\sqrt{3}/2} + C = \\ln|x-1|-\\frac{2}{\\sqrt{3}}\\arctan\\frac{2x+1}{\\sqrt{3}}+C', annotation: 'Apply ∫du/(u²+a²) = (1/a)arctan(u/a).' },
+      ],
+      answer: '\\ln|x-1|-\\frac{2\\sqrt{3}}{3}\\arctan\\frac{2x+1}{\\sqrt{3}}+C',
+    },
+  ],
+
+  crossRefs: [
+    { lessonSlug: 'u-substitution', label: 'U-Substitution', context: 'Partial fractions reduce rational integrals to simple forms, some of which need u-sub (e.g., ∫x/(x²+1) dx).' },
+    { lessonSlug: 'indefinite-integrals', label: 'Indefinite Integrals', context: 'The antiderivative table entries ln|x|, arctan x, and power rules are the building blocks for partial fraction integration.' },
+    { lessonSlug: 'improper-integrals', label: 'Improper Integrals', context: 'Partial fractions help evaluate improper integrals of rational functions by splitting them into convergent pieces.' },
+    { lessonSlug: 'integration-by-parts', label: 'Integration by Parts', context: 'Irreducible quadratic terms with higher powers may require by-parts in addition to partial fractions.' },
+  ],
+
+  checkpoints: [
+    'read-intuition',
+    'read-math',
+    'read-rigor',
+    'completed-example-1',
+    'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
+    'completed-example-5',
+    'attempted-challenge-easy',
+    'attempted-challenge-medium',
+    'attempted-challenge-hard',
+  ],
+}

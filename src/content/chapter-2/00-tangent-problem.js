@@ -567,9 +567,9 @@ export default {
   ],
 
   crossRefs: [
-    { lessonSlug: 'limits-and-continuity', label: 'Limits and Continuity', context: 'The derivative is defined as a limit; the limit laws and squeeze theorem are essential tools.' },
+    { lessonSlug: 'continuity', label: 'Limits and Continuity', context: 'The derivative is defined as a limit; the limit laws and squeeze theorem are essential tools.' },
     { lessonSlug: 'differentiation-rules', label: 'Differentiation Rules', context: 'The limit definition motivates and proves the power rule and other shortcuts.' },
-    { lessonSlug: 'tangent-lines-and-linear-approximation', label: 'Linear Approximation', context: 'The tangent line at a point is the best linear approximation to the function near that point.' },
+    { lessonSlug: 'linear-approximation', label: 'Linear Approximation', context: 'The tangent line at a point is the best linear approximation to the function near that point.' },
   ],
 
   checkpoints: [

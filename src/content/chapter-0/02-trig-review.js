@@ -55,6 +55,11 @@ export default {
         title: 'sin(a + b) ≠ sin(a) + sin(b)',
         body: "This is one of the most common algebra errors in calculus. sin(30° + 60°) = sin(90°) = 1, but sin(30°) + sin(60°) = 0.5 + 0.866 = 1.366. The correct expansion is sin(a+b) = sin(a)cos(b) + cos(a)sin(b).",
       },
+      {
+        type: 'geometric',
+        title: 'Similar Triangles Explain Trig Ratios',
+        body: 'sin, cos, and tan are shape invariants: all right triangles with the same angle are similar, so opposite/hypotenuse and opposite/adjacent stay constant across scale.',
+      },
     ],
     visualizations: [
       { id: 'UnitCircle', props: { animate: false }, title: 'Interactive Unit Circle', caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.' },
@@ -224,7 +229,7 @@ export default {
   crossRefs: [
     { lessonSlug: 'functions', label: 'Previous: Functions', context: 'Trig functions are specific examples of functions.' },
     { lessonSlug: 'exponentials', label: 'Next: Exponentials & Logs', context: 'The other essential family of functions for calculus.' },
-    { lessonSlug: 'derivatives/trig-derivatives', label: 'Future: Derivatives of Trig Functions', context: 'Chapter 2 — we will differentiate sin and cos.' },
+    { lessonSlug: 'trig-derivatives', label: 'Future: Derivatives of Trig Functions', context: 'Chapter 2 — we will differentiate sin and cos.' },
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-1', 'completed-example-2', 'solved-challenge'],

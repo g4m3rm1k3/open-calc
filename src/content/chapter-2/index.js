@@ -4,6 +4,7 @@ import chainRule from './02-chain-rule.js'
 import trigDerivatives from './03-trig-derivatives.js'
 import expLogDerivatives from './04-exp-log-derivatives.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
+import readingDerivatives from './06-reading-derivatives.js'
 
 export default {
   id: 'chapter-2',
@@ -19,5 +20,6 @@ export default {
     trigDerivatives,
     expLogDerivatives,
     implicitDifferentiation,
+    readingDerivatives,
   ],
 }

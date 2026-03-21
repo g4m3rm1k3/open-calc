@@ -71,7 +71,7 @@ export default {
         body: "y = f(x) \\implies \\ln y = \\ln f(x) \\implies \\frac{1}{y}\\frac{dy}{dx} = \\frac{d}{dx}[\\ln f(x)] \\implies \\frac{dy}{dx} = y \\cdot \\frac{d}{dx}[\\ln f(x)]",
       },
     ],
-    visualizationId: 'ExpLogDerivativesGraph',
+    visualizationId: 'ExponentialSlopeAtZero',
     visualizationProps: {
       showBothFunctions: true,
       showSlopeComparison: true,

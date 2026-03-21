@@ -34,9 +34,16 @@ const DISCONTINUITIES = [
 
 export default function ContinuityViz({ params }) {
   const svgRef = useRef(null)
-  const [idx, setIdx] = useState(0)
-  const { showIVT } = params ?? {}
+  const variant = params?.variant
+  const variantIndex = Number.isInteger(params?.variantIndex) ? params.variantIndex : null
+  const initialIdx = variantIndex ?? Math.max(0, DISCONTINUITIES.findIndex((d) => d.label === variant))
+  const [idx, setIdx] = useState(initialIdx)
+  const { showIVT, hideSelector = false } = params ?? {}
   const disc = DISCONTINUITIES[idx]
+
+  useEffect(() => {
+    setIdx(initialIdx)
+  }, [initialIdx])
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)
@@ -96,21 +103,23 @@ export default function ContinuityViz({ params }) {
 
   return (
     <div>
-      <div className="flex gap-2 flex-wrap mb-3">
-        {DISCONTINUITIES.map((d, i) => (
-          <button
-            key={i}
-            onClick={() => setIdx(i)}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-              i === idx
-                ? 'bg-brand-500 text-white border-brand-500'
-                : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-brand-400'
-            }`}
-          >
-            {d.label}
-          </button>
-        ))}
-      </div>
+      {!hideSelector && (
+        <div className="flex gap-2 flex-wrap mb-3">
+          {DISCONTINUITIES.map((d, i) => (
+            <button
+              key={i}
+              onClick={() => setIdx(i)}
+              className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                i === idx
+                  ? 'bg-brand-500 text-white border-brand-500'
+                  : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-brand-400'
+              }`}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+      )}
       <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
       <p className="text-sm text-center text-slate-600 dark:text-slate-400 mt-2 italic">{disc.description}</p>
     </div>

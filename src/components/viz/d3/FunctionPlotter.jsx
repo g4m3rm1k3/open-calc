@@ -1,6 +1,5 @@
 import * as d3 from 'd3'
 import { useRef, useEffect, useState } from 'react'
-import SliderControl from '../SliderControl.jsx'
 
 const W = 600, H = 380
 const MARGIN = { top: 20, right: 20, bottom: 40, left: 50 }
@@ -14,17 +13,43 @@ const PRESETS = [
   { label: 'ln(x)', fn: (x) => x > 0 ? Math.log(x) : null, domain: [0.01, 8] },
 ]
 
+function makeFn(expr) {
+  try {
+    // eslint-disable-next-line no-new-func
+    const compiled = new Function('x', `"use strict"; return (${expr})`)
+    return (x) => {
+      try {
+        const y = compiled(x)
+        return Number.isFinite(y) ? y : null
+      } catch {
+        return null
+      }
+    }
+  } catch {
+    return () => null
+  }
+}
+
 export default function FunctionPlotter({ params }) {
   const svgRef = useRef(null)
   const [presetIdx, setPresetIdx] = useState(0)
 
+  const hasCustom = !!params?.fn
   const preset = PRESETS[presetIdx]
+
+  const active = hasCustom
+    ? {
+        label: params?.label ?? `f(x) = ${params.fn}`,
+        fn: typeof params.fn === 'function' ? params.fn : makeFn(params.fn),
+        domain: [params?.xMin ?? -5, params?.xMax ?? 5],
+      }
+    : preset
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
 
-    const [xMin, xMax] = preset.domain
+    const [xMin, xMax] = active.domain
     const xSc = d3.scaleLinear().domain([xMin, xMax]).range([MARGIN.left, W - MARGIN.right])
 
     // Sample y values
@@ -32,8 +57,19 @@ export default function FunctionPlotter({ params }) {
     const steps = 500
     for (let i = 0; i <= steps; i++) {
       const x = xMin + (i / steps) * (xMax - xMin)
-      const y = preset.fn(x)
+      const y = active.fn(x)
       if (y !== null && isFinite(y)) pts.push([x, y])
+    }
+
+    if (!pts.length) {
+      svg.append('text')
+        .attr('x', W / 2)
+        .attr('y', H / 2)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', 12)
+        .attr('fill', '#64748b')
+        .text('No valid points for this function/domain')
+      return
     }
 
     const yVals = pts.map((p) => p[1])
@@ -87,25 +123,35 @@ export default function FunctionPlotter({ params }) {
         .attr('d', line)
     })
 
-  }, [presetIdx])
+    svg.append('text')
+      .attr('x', W / 2)
+      .attr('y', MARGIN.top - 6)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', 11)
+      .attr('fill', '#475569')
+      .text(active.label)
+
+  }, [presetIdx, hasCustom, params])
 
   return (
     <div>
-      <div className="flex gap-2 flex-wrap mb-3">
-        {PRESETS.map((p, i) => (
-          <button
-            key={i}
-            onClick={() => setPresetIdx(i)}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-              i === presetIdx
-                ? 'bg-brand-500 text-white border-brand-500'
-                : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-brand-400'
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      {!hasCustom && (
+        <div className="flex gap-2 flex-wrap mb-3">
+          {PRESETS.map((p, i) => (
+            <button
+              key={i}
+              onClick={() => setPresetIdx(i)}
+              className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                i === presetIdx
+                  ? 'bg-brand-500 text-white border-brand-500'
+                  : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-brand-400'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
       <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
     </div>
   )

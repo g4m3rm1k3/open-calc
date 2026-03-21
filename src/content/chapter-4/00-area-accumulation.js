@@ -30,6 +30,11 @@ export default {
         body: 'You can already compute the area under many rate functions using geometry: rectangles (constant rate), triangles (linearly growing rate), trapezoids (linearly changing rate between two values), and semicircles (r(t) = √(R² − t²)). Integration generalizes this to any curve. When the rate function is a straight line or constant, you should always use the geometric formula — it\'s faster and more elegant than any algebraic method.',
       },
       {
+        type: 'geometric',
+        title: 'Circle Area as Unwrapped Rings',
+        body: 'If you cut a circle into many thin rings and unwrap them, they approximate a triangle with base 2πr and height r, giving area (1/2)(2πr)r = πr². This is integration by geometry.',
+      },
+      {
         type: 'real-world',
         title: 'Every Energy Bill Is an Integral',
         body: 'Your household power consumption P(t) in watts varies minute by minute — it spikes when the kettle switches on and drops when appliances turn off. The total energy consumed in a month (measured in kilowatt-hours and billed accordingly) is ∫₀ᵀ P(t) dt / 1000, where T is the number of hours in the month. Your electricity meter is a hardware integrator, continuously summing P(t) dt and displaying the running total. The same principle underlies data usage meters (integrating bytes/second), water meters (litres/second), and gas meters (cubic feet/second).',

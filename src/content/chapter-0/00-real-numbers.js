@@ -18,6 +18,7 @@ export default {
       'Today we know the irrational numbers are everywhere on the number line — in fact, in a precise sense, there are ' +
       'infinitely more irrational numbers than rational ones. Calculus lives in this complete, gapless world of real numbers.',
     previewVisualizationId: 'NumberLine',
+    previewVisualizationProps: { showSets: true },
   },
 
   intuition: {

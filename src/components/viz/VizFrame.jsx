@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 
 const VIZ_REGISTRY = {
   NumberLine:               lazy(() => import('./d3/NumberLine.jsx')),
@@ -9,6 +9,7 @@ const VIZ_REGISTRY = {
   LimitApproach:            lazy(() => import('./d3/LimitApproach.jsx')),
   SecantToTangent:          lazy(() => import('./d3/SecantToTangent.jsx')),
   EpsilonDelta:             lazy(() => import('./d3/EpsilonDelta.jsx')),
+  GraphicalEpsilonDelta:    lazy(() => import('./d3/EpsilonDelta.jsx')),
   SqueezeTheorem:           lazy(() => import('./d3/SqueezeTheorem.jsx')),
   ContinuityViz:            lazy(() => import('./d3/ContinuityViz.jsx')),
   RiemannSum:               lazy(() => import('./d3/RiemannSum.jsx')),
@@ -60,6 +61,13 @@ const VIZ_REGISTRY = {
   CurveSketchingBoard:          lazy(() => import('./d3/CurveSketchingBoard.jsx')),
   OptimizationViz:              lazy(() => import('./d3/OptimizationViz.jsx')),
   LHopitalViz:                  lazy(() => import('./d3/LHopitalViz.jsx')),
+  // Chapter 5 — Sequences & Series
+  TaylorApproximation:           lazy(() => import('./d3/TaylorApproximation.jsx')),
+  ConvergenceViz:                lazy(() => import('./d3/ConvergenceViz.jsx')),
+  // Chapter 4 — Volumes of Revolution
+  VolumesOfRevolution:           lazy(() => import('./d3/VolumesOfRevolution.jsx')),
+  // Chapter 6 — Polar & Parametric
+  PolarCurve:                    lazy(() => import('./d3/PolarCurve.jsx')),
 }
 
 function VizSkeleton() {
@@ -73,6 +81,11 @@ function VizSkeleton() {
 export default function VizFrame({ id, initialProps = {}, title }) {
   const [params, setParams] = useState(initialProps)
   const VizComponent = VIZ_REGISTRY[id]
+  const initialPropsKey = useMemo(() => JSON.stringify(initialProps ?? {}), [initialProps])
+
+  useEffect(() => {
+    setParams(initialProps ?? {})
+  }, [id, initialPropsKey])
 
   if (!VizComponent) return null
 

@@ -78,6 +78,11 @@ export default {
     ],
     callouts: [
       {
+        type: 'proof-map',
+        title: 'Where These Rules Come From',
+        body: 'Power rule comes from expanding the limit definition. Product rule comes from adding/subtracting a strategic middle term in the difference quotient. Quotient rule comes from product rule on f(x)\\cdot(1/g(x)).',
+      },
+      {
         type: 'theorem',
         title: 'Constant Rule',
         body: '\\frac{d}{dx}[c] = 0',
@@ -433,6 +438,13 @@ export default {
       title: 'Complete Kinematics: Position, Velocity, Acceleration (Physics)',
       problem: 'A particle moves along a line with position $x(t) = 2t^3 - 9t^2 + 12t$ metres, $t \\geq 0$. (a) Find velocity $v(t) = x\'(t)$ and acceleration $a(t) = x\'\'(t)$. (b) When is the particle at rest? (c) When is it moving right vs left? (d) When is it speeding up vs slowing down?',
       visualizationId: 'PositionVelocityAcceleration',
+      params: {
+        label: 'x(t) = 2t^3 - 9t^2 + 12t',
+        tMax: 4,
+        s: '2*t*t*t - 9*t*t + 12*t',
+        v: '6*t*t - 18*t + 12',
+        a: '12*t - 18',
+      },
       steps: [
         { expression: "v(t) = x'(t) = 6t^2 - 18t + 12", annotation: 'Power rule: d/dt[2t\u00b3]=6t\u00b2, d/dt[-9t\u00b2]=-18t, d/dt[12t]=12.' },
         { expression: "a(t) = v'(t) = x''(t) = 12t - 18", annotation: 'Differentiate v(t) again: d/dt[6t\u00b2]=12t, d/dt[-18t]=-18.' },

@@ -3,6 +3,14 @@ import KatexInline from '../math/KatexInline.jsx'
 import MathStep from '../math/MathStep.jsx'
 import Spoiler from '../ui/Spoiler.jsx'
 
+function isLikelyInlineMath(expr) {
+  const t = expr.trim()
+  if (!t) return false
+  if (/^\d+(?:[.,]\d+)?$/.test(t)) return false
+  if (/^[\d,]+(?:\.\d+)?$/.test(t)) return false
+  return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
+}
+
 // Render text that might be mixed prose + $inline LaTeX$ + \\display LaTeX
 function ProblemText({ text }) {
   if (!text) return null
@@ -11,16 +19,40 @@ function ProblemText({ text }) {
   if (isPureLatex) return <KatexBlock expr={text} />
 
   // Mixed prose: parse $...$ inline LaTeX and **bold**
-  const regex = /\$([^$]+?)\$|\*\*(.+?)\*\*/g
   const parts = []
-  let lastIndex = 0, match
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
-    if (match[1] !== undefined) parts.push(<KatexInline key={match.index} expr={match[1]} />)
-    else if (match[2] !== undefined) parts.push(<strong key={match.index}>{match[2]}</strong>)
-    lastIndex = match.index + match[0].length
+  let i = 0
+  while (i < text.length) {
+    if (text.startsWith('**', i)) {
+      const end = text.indexOf('**', i + 2)
+      if (end !== -1) {
+        parts.push(<strong key={`b${i}`}>{text.slice(i + 2, end)}</strong>)
+        i = end + 2
+        continue
+      }
+    }
+
+    if (text[i] === '$') {
+      const end = text.indexOf('$', i + 1)
+      if (end !== -1) {
+        const candidate = text.slice(i + 1, end)
+        if (isLikelyInlineMath(candidate)) {
+          parts.push(<KatexInline key={`k${i}`} expr={candidate} />)
+          i = end + 1
+          continue
+        }
+      }
+      parts.push('$')
+      i += 1
+      continue
+    }
+
+    const nextBold = text.indexOf('**', i)
+    const nextDollar = text.indexOf('$', i)
+    const next = [nextBold, nextDollar].filter((v) => v !== -1)
+    const stop = next.length ? Math.min(...next) : text.length
+    if (stop > i) parts.push(text.slice(i, stop))
+    i = stop
   }
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
   return <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{parts}</p>
 }
 

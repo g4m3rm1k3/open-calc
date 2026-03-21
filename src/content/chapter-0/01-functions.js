@@ -336,7 +336,7 @@ export default {
   crossRefs: [
     { lessonSlug: 'real-numbers', label: 'Previous: Real Numbers', context: 'Functions map real numbers to real numbers.' },
     { lessonSlug: 'trig-review', label: 'Next: Trigonometry', context: 'The sine and cosine are the most important functions in calculus.' },
-    { lessonSlug: 'limits/introduction', label: 'See Also: Limits', context: 'Limits describe how functions behave near a point.' },
+    { lessonSlug: 'introduction', label: 'See Also: Limits', context: 'Limits describe how functions behave near a point.' },
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],

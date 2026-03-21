@@ -269,8 +269,8 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'trig-review', label: 'Previous: Trigonometry', context: 'The other essential function family.' },
-    { lessonSlug: 'limits/introduction', label: 'Next: Limits', context: 'Chapter 1 begins — the core concept of calculus.' },
-    { lessonSlug: 'derivatives/exp-derivatives', label: 'Future: Derivatives of e^x and ln x', context: 'Why e^x is so special in calculus.' },
+    { lessonSlug: 'introduction', label: 'Next: Limits', context: 'Chapter 1 begins — the core concept of calculus.' },
+    { lessonSlug: 'exp-log-derivatives', label: 'Future: Derivatives of e^x and ln x', context: 'Why e^x is so special in calculus.' },
   ],
 
   checkpoints: [

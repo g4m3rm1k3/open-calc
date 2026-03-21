@@ -7,11 +7,17 @@ const M = { top: 30, right: 30, bottom: 40, left: 55 }
 
 export default function EpsilonDelta({ params }) {
   const svgRef = useRef(null)
-  const { fn = '2*x + 1', c = 2, L = 5 } = params ?? {}
+  const { 
+    fn = '2*x + 1', 
+    c = 2, 
+    L = 5,
+    getDelta = (e) => e / 2 // Default delta for 2x+1
+  } = params ?? {}
   const [epsilon, setEpsilon] = useState(1.0)
 
-  // For f(x) = 2x+1, we need delta = epsilon/2
-  const delta = epsilon / 2  // generalized: would compute from fn
+  const delta = typeof getDelta === 'string' 
+    ? (new Function('e', `"use strict"; return ${getDelta}`))(epsilon)
+    : getDelta(epsilon)
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)

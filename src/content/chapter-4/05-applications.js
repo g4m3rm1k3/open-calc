@@ -141,12 +141,27 @@ export default {
       id: 'ch4-005-ex3',
       title: 'Displacement vs. Distance: v(t) = t² − 4t',
       problem: '\\text{For } v(t) = t^2-4t \\text{ m/s on } [0,5], \\text{ find (a) displacement and (b) total distance traveled.}',
+      visualizationId: 'PositionVelocityAcceleration',
+      params: {
+        label: 'v(t) = t^2 - 4t (integral gives position change)',
+        tMax: 5,
+        s: '(t*t*t)/3 - 2*t*t',
+        v: 't*t - 4*t',
+        a: '2*t - 4'
+      },
+      visualizations: [
+        {
+          id: 'AreaAccumulator',
+          title: 'Signed Area as Net Change',
+          caption: 'Positive and negative contributions can cancel in displacement while distance uses absolute area.'
+        }
+      ],
       steps: [
         { expression: 'v(t) = t(t-4): \\text{ zero at } t=0,4. \\; v < 0 \\text{ on } (0,4), \\; v > 0 \\text{ on } (4,5).', annotation: 'Factor v. The particle moves in the negative direction until t=4, then reverses.' },
         { expression: '\\text{(a) Displacement} = \\int_0^5(t^2-4t)\\,dt = \\left[\\frac{t^3}{3}-2t^2\\right]_0^5', annotation: 'Displacement = signed integral over [0,5].' },
         { expression: '= \\left(\\frac{125}{3}-50\\right) - 0 = \\frac{125-150}{3} = -\\frac{25}{3} \\approx -8.33 \\text{ m}', annotation: 'F(5)=125/3−50=(125−150)/3=−25/3. Displacement is negative: net movement in the negative direction.' },
         { expression: '\\text{(b) } \\int_0^4(t^2-4t)\\,dt = \\left[\\frac{t^3}{3}-2t^2\\right]_0^4 = \\frac{64}{3}-32 = \\frac{64-96}{3} = -\\frac{32}{3}', annotation: 'Piece on [0,4]: v ≤ 0. Integral = −32/3 (negative, as expected for backward motion).' },
-        { expression: '\\int_4^5(t^2-4t)\\,dt = \\left[\\frac{t^3}{3}-2t^2\\right]_4^5 = \\left(\\frac{125}{3}-50\\right)-\\left(\\frac{64}{3}-32\\right) = -\\frac{25}{3}+\\frac{32}{3}\\cdot(-1+1) = \\frac{7}{3}', annotation: 'Piece on [4,5]: v ≥ 0. Integral = [−25/3] − [−32/3] = (−25+32)/3 = 7/3.' },
+        { expression: '\\int_4^5(t^2-4t)\\,dt = \\left[\\frac{t^3}{3}-2t^2\\right]_4^5 = \\left(\\frac{125}{3}-50\\right)-\\left(\\frac{64}{3}-32\\right) = -\\frac{25}{3}-\\left(-\\frac{32}{3}\\right) = \\frac{7}{3}', annotation: 'Piece on [4,5]: v ≥ 0. Integral = [−25/3] − [−32/3] = (−25+32)/3 = 7/3.' },
         { expression: '\\text{Distance} = |{-32/3}| + |7/3| = \\frac{32}{3}+\\frac{7}{3} = \\frac{39}{3} = 13 \\text{ m}', annotation: 'Total distance = |backward| + |forward| = 32/3 + 7/3 = 39/3 = 13 m.' },
       ],
       conclusion: 'Displacement = −25/3 ≈ −8.33 m (net movement in the negative direction). Total distance = 13 m (32/3 m backward + 7/3 m forward). The particle ends 8.33 m behind its starting point.',
@@ -168,6 +183,19 @@ export default {
       title: 'Work Against Gravity: Lifting an Object',
       problem: '\\text{Find the work done lifting a 5 kg object 10 m against gravity (} g = 9.8 \\text{ m/s}^2).',
       visualizationId: 'FunctionPlotter',
+      params: {
+        fn: '49',
+        xMin: 0,
+        xMax: 10,
+        label: 'F(x) = 49 N (constant force)'
+      },
+      visualizations: [
+        {
+          id: 'AreaAccumulator',
+          title: 'Work = Area Under Force Curve',
+          caption: 'For constant force, the work integral is a rectangle: force times displacement.'
+        }
+      ],
       steps: [
         { expression: 'F(x) = mg = 5 \\times 9.8 = 49 \\text{ N (constant force)}', annotation: 'Near Earth\'s surface, gravity is approximately constant. Force = weight = 49 Newtons.' },
         { expression: 'W = \\int_0^{10} F(x)\\,dx = \\int_0^{10} 49\\,dx', annotation: 'Work = ∫ F(x) dx. With constant force, this is just the rectangle under the force function.' },
@@ -181,6 +209,19 @@ export default {
       title: 'Spring Work (Hooke\'s Law)',
       problem: '\\text{A spring has constant } k = 120 \\text{ N/m}. \\text{Find the work required to stretch it from } x=0 \\text{ to } x=0.25 \\text{ m}.',
       visualizationId: 'SpringOscillation',
+      visualizations: [
+        {
+          id: 'FunctionPlotter',
+          title: 'Hooke Force Curve',
+          caption: 'The linear force law F(x)=kx makes work the triangular area under a line.',
+          props: {
+            fn: '120*x',
+            xMin: 0,
+            xMax: 0.25,
+            label: 'F(x)=120x'
+          }
+        }
+      ],
       steps: [
         { expression: 'F(x) = kx = 120x', annotation: 'Hooke\'s law: force grows linearly with displacement.' },
         { expression: 'W = \\int_0^{0.25} F(x)\\,dx = \\int_0^{0.25} 120x\\,dx', annotation: 'Work is the integral of variable force over displacement.' },
@@ -216,6 +257,36 @@ export default {
         { expression: '\\text{Geometric check: the area is a triangle with base 30 and height } D(0)-P^* = 100-40 = 60.', annotation: 'Area of triangle = ½ × 30 × 60 = 900. ✓ Confirms the calculation.' },
       ],
       conclusion: 'Consumer surplus = $900. The demand function is linear, so the surplus region is a triangle with area ½ × base × height = ½ × 30 × 60 = $900. For a nonlinear demand function, the geometric area is not a simple shape, and the integral is essential.',
+    },
+    {
+      id: 'ch4-005-ex9',
+      title: 'Tank Filling and Draining (Net Change Model)',
+      problem: '\\text{A tank starts with } 12\\text{ L. Its net flow rate is } r(t)=6\\sin(\\pi t/6) \\text{ L/min for } 0\\le t\\le 12.\\text{ Find the final volume and the time of maximum volume.}',
+      visualizationId: 'WaterTank',
+      visualizations: [
+        {
+          id: 'FunctionPlotter',
+          title: 'Rate Function View',
+          caption: 'The sign of r(t) controls fill (positive) versus drain (negative).',
+          props: {
+            fn: '6*Math.sin(Math.PI*x/6)',
+            xMin: 0,
+            xMax: 12,
+            label: 'r(t)=6 sin(pi t/6)'
+          }
+        }
+      ],
+      steps: [
+        { expression: 'V(t)=V(0)+\\int_0^t r(s)\\,ds=12+\\int_0^t 6\\sin(\\pi s/6)\\,ds', annotation: 'Net change theorem: integrate rate to recover quantity.' },
+        { expression: 'V(12)=12+\\int_0^{12}6\\sin(\\pi s/6)\\,ds', annotation: 'Compute final volume by integrating over the full interval.' },
+        { expression: '\\int 6\\sin(\\pi s/6)\\,ds = -\\frac{36}{\\pi}\\cos(\\pi s/6)', annotation: 'Antiderivative by u-substitution with u=pi s/6.' },
+        { expression: '\\int_0^{12}6\\sin(\\pi s/6)\\,ds = -\\frac{36}{\\pi}[\\cos(2\\pi)-\\cos(0)] = 0', annotation: 'One full sine period gives zero net area.' },
+        { expression: 'V(12)=12+0=12\\text{ L}', annotation: 'Final volume equals initial volume.' },
+        { expression: 'V\'(t)=r(t)=6\\sin(\\pi t/6)=0 \\Rightarrow t=0,6,12', annotation: 'Critical times of volume occur when flow rate is zero.' },
+        { expression: 'r(t)>0\\text{ on }(0,6),\\; r(t)<0\\text{ on }(6,12)', annotation: 'Volume increases first, then decreases after t=6.' },
+        { expression: 'V_{\\max}=V(6)=12+\\int_0^6 6\\sin(\\pi s/6)\\,ds = 12+\\frac{72}{\\pi}\\approx 34.92\\text{ L}', annotation: 'Maximum occurs at t=6 when accumulated positive area is largest.' },
+      ],
+      conclusion: 'The tank returns to 12 L after 12 minutes (zero net change over a full cycle), but reaches a peak of 12+72/pi ≈ 34.92 L at t=6 minutes. This is the core modeling idea: rate sign determines whether quantity rises or falls, and the integral tracks accumulation.',
     },
   ],
 
@@ -297,6 +368,7 @@ export default {
     'completed-example-6',
     'completed-example-7',
     'completed-example-8',
+    'completed-example-9',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard-1',

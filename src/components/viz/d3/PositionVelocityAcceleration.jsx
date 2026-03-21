@@ -34,22 +34,30 @@ const PRESETS = [
 
 const COLORS = { s: '#6470f1', v: '#10b981', a: '#f59e0b' }
 
-export default function PositionVelocityAcceleration() {
+export default function PositionVelocityAcceleration({ params }) {
   const svgRef = useRef(null)
   const intervalRef = useRef(null)
+
+  // New: Handle params for custom functions
+  const hasParams = params && params.s && params.v && params.a
+  const customPreset = hasParams ? {
+    label: params.label || 'Custom',
+    tMax: params.tMax || 5,
+    s: typeof params.s === 'string' ? new Function('t', `"use strict"; return ${params.s}`) : params.s,
+    v: typeof params.v === 'string' ? new Function('t', `"use strict"; return ${params.v}`) : params.v,
+    a: typeof params.a === 'string' ? new Function('t', `"use strict"; return ${params.a}`) : params.a
+  } : null
+
   const [preset, setPreset] = useState(0)
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)
 
-  const fn = PRESETS[preset]
+  const fn = customPreset || PRESETS[preset]
   const { tMax, s, v, a } = fn
   const N = 300
   const ts = d3.range(0, tMax + tMax / N, tMax / N)
 
-  const sVals = ts.map(s)
-  const vVals = ts.map(v)
-  const aVals = ts.map(a)
-
+  const sVals = ts.map(s), vVals = ts.map(v), aVals = ts.map(a)
   const sMin = d3.min(sVals), sMax = d3.max(sVals)
   const vMin = d3.min(vVals), vMax = d3.max(vVals)
   const aMin = d3.min(aVals), aMax = d3.max(aVals)
@@ -216,7 +224,7 @@ export default function PositionVelocityAcceleration() {
       .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#64748b')
       .text(`t = ${tC.toFixed(2)} / ${tMax.toFixed(2)} s`)
 
-  }, [t, preset])
+  }, [t, preset, hasParams, tMax, s, v, a, sVals, vVals, aVals, sMin, sMax, vMin, vMax, aMin, aMax])
 
   // Timer
   useEffect(() => {
@@ -243,7 +251,7 @@ export default function PositionVelocityAcceleration() {
     <div>
       <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${TOTAL_H}`} className="overflow-visible" />
       <div className="flex flex-wrap items-center justify-center gap-2 mt-3 px-4">
-        {PRESETS.map((p, i) => (
+        {!hasParams && PRESETS.map((p, i) => (
           <button
             key={i}
             onClick={() => { setPreset(i); reset() }}

@@ -135,6 +135,12 @@
   color: inherit;
 }
 
+.katex-inline {
+  display: inline-block;
+  margin: 0 0.15em;
+  vertical-align: baseline;
+}
+
 /* Sidebar active link */
 .sidebar-link-active {
   @apply bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300
