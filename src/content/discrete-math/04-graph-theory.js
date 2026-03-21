@@ -13,7 +13,7 @@ export default {
       'Can you traverse a city map without retracing streets? Can a network stay connected after failures?',
     realWorldContext:
       'Graph theory began with Euler\'s 1736 Konigsberg bridges problem and now powers routing, social-network analysis, recommendation systems, and infrastructure resilience.',
-    previewVisualizationId: 'GraphNetwork3D',
+    previewVisualizationId: 'GraphTraversalGame',
   },
 
   intuition: {
@@ -39,6 +39,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'GraphTraversalGame',
+        title: 'Traversal Strategy Game',
+        caption: 'Play BFS and DFS step-by-step and compare exploration order from the same start node.',
+      },
+      {
         id: 'GraphNetwork3D',
         title: '3D Network Explorer',
         caption: 'Rotate random, cycle, and complete graphs; inspect degree spread and connectivity dynamics.',
@@ -50,6 +55,8 @@ export default {
     prose: [
       'Connectedness, components, and spanning trees are central to robust network design.',
       'Breadth-first search computes shortest path lengths in unweighted graphs.',
+      'Depth-first search is often simpler to implement recursively and is the workhorse behind cycle detection and topological sort routines.',
+      'Graph representations matter for performance: adjacency list is usually O(V+E) friendly for sparse graphs, while adjacency matrix gives O(1) edge lookup at O(V^2) space.',
     ],
     callouts: [
       {
@@ -87,6 +94,28 @@ export default {
       ],
       conclusion: 'Yes, it is necessarily a tree.',
     },
+    {
+      id: 'discrete-1-04-ex3',
+      title: 'BFS Distance Layers',
+      problem: 'In an unweighted graph, why does BFS from source s compute shortest path length to every reachable vertex?',
+      steps: [
+        { expression: 'BFS explores by layers of edge count: 0,1,2,...', annotation: 'Queue order forces nondecreasing distance discovery.' },
+        { expression: 'First time a vertex v is dequeued, all shorter paths would have been discovered earlier', annotation: 'Contradiction argument if a shorter path existed.' },
+        { expression: 'Therefore recorded layer index equals shortest-path distance', annotation: 'Core correctness invariant.' },
+      ],
+      conclusion: 'BFS is the canonical shortest-path algorithm for unweighted graphs.',
+    },
+    {
+      id: 'discrete-1-04-ex4',
+      title: 'Representation Tradeoff',
+      problem: 'For V=1,000 and E=4,000, compare adjacency list vs matrix space and traversal complexity.',
+      steps: [
+        { expression: 'Adjacency list space: O(V+E) ~ 5,000 units', annotation: 'Sparse graph, compact structure.' },
+        { expression: 'Adjacency matrix space: O(V^2)=1,000,000 units', annotation: 'Dense-capable but expensive for sparse graphs.' },
+        { expression: 'BFS/DFS with list: O(V+E)=5,000', annotation: 'Efficient edge iteration.' },
+      ],
+      conclusion: 'For sparse graphs, adjacency lists dominate in both memory and traversal performance.',
+    },
   ],
 
   challenges: [
@@ -112,6 +141,28 @@ export default {
       ],
       answer: 'If acyclic and connected then tree with n-1 edges; contradiction.',
     },
+    {
+      id: 'discrete-1-04-ch3',
+      difficulty: 'hard',
+      problem: 'Puzzle: You are given an unweighted maze graph. Explain, with proof sketch, why BFS guarantees the fewest moves to exit while DFS does not.',
+      walkthrough: [
+        { expression: 'BFS explores all vertices at distance d before distance d+1', annotation: 'Layer invariant from queue discipline.' },
+        { expression: 'First exit reached by BFS has minimal edge count', annotation: 'Any shorter path would be in an earlier layer.' },
+        { expression: 'DFS may follow one long branch before checking nearby exits', annotation: 'Depth-first policy ignores global distance order.' },
+      ],
+      answer: 'BFS is shortest-path optimal in unweighted graphs; DFS is not distance-optimal.',
+    },
+    {
+      id: 'discrete-1-04-ch4',
+      difficulty: 'hard',
+      problem: 'A network has 12 vertices and 15 edges and is acyclic. Is that possible? Justify using a counting invariant.',
+      walkthrough: [
+        { expression: 'Any acyclic graph (forest) satisfies |E|<=|V|-1', annotation: 'Component-wise tree bound.' },
+        { expression: 'Here |E|=15 and |V|-1=11', annotation: 'Given edge count exceeds acyclic upper bound.' },
+        { expression: 'Contradiction, so at least one cycle must exist', annotation: 'Counting invariant detects impossibility fast.' },
+      ],
+      answer: 'Not possible; edge count forces a cycle.',
+    },
   ],
 
   crossRefs: [
@@ -125,7 +176,10 @@ export default {
     'read-math',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 }

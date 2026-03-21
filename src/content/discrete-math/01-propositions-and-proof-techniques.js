@@ -53,7 +53,7 @@ export default {
       "Logic is the art of translating ambiguous human English into perfectly mapped symbols. To avoid fatal errors, we must map our vocabulary rigidly to the 5 symbols above.",
       "**The 'If-Then' (p → q) Variations**\nThe Conditional is highly confusing because humans use \"If-Then\" loosely. The mathematical p → q covers ALL of these English variations:\n• **The Standard:** \"If p, then q.\"\n• **The 'Only If':** \"p only if q.\" (Be careful! This is NOT the same as \"If q, then p\").\n• **The Requirement:** \"q is necessary for p.\"\n• **The Trigger:** \"p is sufficient for q.\"\n• **The Converse Trap:** p → q does NOT guarantee q → p. (If I am a dog, I am an animal... does not mean If I am an animal, I am a dog!).",
       "**The Biconditional ($\\leftrightarrow$) Two-Way Contract**\nThe Conditional is barely half the story. The Biconditional (p ↔ q) is a strict **Two-Way Contract**: \"I will go to the party IF AND ONLY IF you go.\"\n• If we both go, the statement is True.\n• If neither of us goes, the statement is STILL True (the contract wasn't broken).\n• If one goes without the other, the contract is broken (False).",
-      "**The 'Hidden' Connectives**\n• **The 'But' Clause:** \"It is sunny but cold\" uses contrast in English, but mathematically it is a Conjunction: S ∧ C. \n• **The 'Inclusive Or' Trap:** If I ask \"Do you want cake or pie?\", human English implies you only get one. Mathematical p ∨ q guarantees you can have *both* simultaneously. If you want exclusivity, you explicitly invoke Exclusve Or (XOR: $\\oplus$).",
+      "**The 'Hidden' Connectives**\n• **The 'But' Clause:** \"It is sunny but cold\" uses contrast in English, but mathematically it is a Conjunction: S ∧ C. \n• **The 'Inclusive Or' Trap:** If I ask \"Do you want cake or pie?\", human English implies you only get one. Mathematical p ∨ q guarantees you can have *both* simultaneously. If you want exclusivity, you explicitly invoke Exclusive Or (XOR: $\\oplus$).",
       "**De Morgan's Laws (The 'Sign Flip')**\nHow do you negatively flip an entire sentence like \"I will study Algebra OR Geometry\"? You don't just negate the verbs! By expanding the negation over the parentheses, De Morgan's Law states you must FLIP the operator: $\\neg(p \\wedge q) \\equiv \\neg p \\vee \\neg q$, and similarly $\\neg(p \\vee q) \\equiv \\neg p \\wedge \\neg q$. \nSo denying \"Algebra OR Geometry\" actually translates correctly to: \"I will NOT study Algebra AND I will NOT study Geometry.\"",
       "### 3. Circuit Intuition: Logic in Hardware",
       "Logic isn't just a word game—it is a physical mechanism. Computer Science translates p and q directly into electrical voltage (True = High Voltage, False = Ground). By wiring millions of these logic gates together, you build the processors powering your device right now.",
@@ -197,6 +197,23 @@ export default {
       ],
       answer: 'I will not study Algebra AND I will not study Geometry.',
     },
+    {
+      id: 'discrete-1-01-ch3',
+      difficulty: 'hard',
+      problem: 'Puzzle: In a system, p = "request is authenticated" and q = "request can access admin route". Translate and assess whether each policy is safe: (1) p -> q, (2) q -> p, (3) p <-> q.',
+      walkthrough: [
+        { expression: 'p -> q means authentication is sufficient for admin access', annotation: 'Usually unsafe if authorization roles are missing.' },
+        { expression: 'q -> p means admin access requires authentication', annotation: 'Necessary security requirement.' },
+        { expression: 'p <-> q forces both directions', annotation: 'Equivalent classes: only authenticated users get admin, and all authenticated users get admin (often too broad).' },
+      ],
+      answer: 'Policy (2) is the core minimum safety rule; (1) and especially (3) are typically over-permissive without role constraints.',
+    },
+  ],
+
+  crossRefs: [
+    { lessonSlug: 'predicate-logic-and-quantifiers', label: 'Predicate Logic and Quantifiers', context: 'Propositional logic is the base layer before quantified statements.' },
+    { lessonSlug: 'relations-and-structures', label: 'Relations and Structures', context: 'Logical predicates define many relation properties.' },
+    { lessonSlug: 'boolean-algebra-and-circuits', label: 'Boolean Algebra and Circuits', context: 'Truth-functional logic becomes gate simplification and hardware design.' },
   ],
 
   checkpoints: [
@@ -205,7 +222,10 @@ export default {
     'read-rigor',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 }
