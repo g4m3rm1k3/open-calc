@@ -10,7 +10,7 @@ export default {
 
   hook: {
     question: 'How do you compute ∫₀¹ e^(−x²) dx? This function has no elementary antiderivative — no combination of polynomials, trig functions, exponentials, and logarithms will give you an answer. Yet the integral exists (it is about 0.7468). Numerical integration provides systematic methods to approximate any definite integral to arbitrary precision, complete with guaranteed error bounds.',
-    realWorldContext: 'Numerical integration is one of the most widely used computational techniques in science and engineering. Weather prediction models integrate atmospheric equations at millions of grid points. Finite element analysis (used in bridge design, aircraft engineering, and crash simulations) is fundamentally numerical integration over complex domains. Monte Carlo integration computes high-dimensional integrals in finance (option pricing), physics (particle scattering), and machine learning (Bayesian inference). GPS satellites compute orbital integrals numerically. Every spreadsheet "SUM" over a column of measured data is a crude numerical integral.',
+    realWorldContext: 'Numerical integration is one of the most widely used computational techniques in science and engineering. Weather prediction models integrate atmospheric equations at millions of grid points. Finite element analysis (used in bridge design, aircraft engineering, and crash simulations) is fundamentally numerical integration over complex domains. Monte Carlo integration computes high-dimensional integrals in finance (option pricing), physics (particle scattering), and machine learning (Bayesian inference). Modern graphics/path tracing evaluates the rendering equation by sampling and averaging illumination integrals over light directions. GPS satellites compute orbital integrals numerically. Every spreadsheet "SUM" over a column of measured data is a crude numerical integral.',
     previewVisualizationId: 'RiemannSum',
   },
 
@@ -44,6 +44,11 @@ export default {
         type: 'real-world',
         title: 'Numerical Integration in Engineering Software',
         body: 'MATLAB\'s "integral" function, Python\'s scipy.integrate.quad, and Wolfram Alpha all use adaptive numerical integration internally. They start with a coarse grid, estimate the error, and refine only where needed. The underlying method is usually Gauss-Kronrod quadrature — a sophisticated descendant of Simpson\'s rule that achieves machine precision (15-16 digits) in milliseconds.',
+      },
+      {
+        type: 'real-world',
+        title: 'Path Tracing = Monte Carlo Integration',
+        body: 'Photorealistic rendering evaluates integrals of incoming light over a hemisphere. More samples reduce variance like 1/sqrt(N), so numerical integration quality directly controls image noise and render time.',
       },
       {
         type: 'misconception',

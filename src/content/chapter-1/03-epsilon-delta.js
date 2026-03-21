@@ -111,6 +111,11 @@ export default {
         title: 'Inequality Chain Checklist',
         body: 'In proofs, justify each inequality step: factor, apply |uv|=|u||v|, bound variable factors on a local interval, then choose \delta from the final bound.',
       },
+      {
+        type: 'technique',
+        title: 'Reverse-Engineer Delta from Epsilon',
+        body: 'Start from the target |f(x)-L|<\\varepsilon and work backward to a condition of the form |x-c|<(...). Then in the forward proof, define \\delta as that expression (often with min(1,...)) and replay the chain in the correct direction.',
+      },
     ],
     visualizations: [
       {

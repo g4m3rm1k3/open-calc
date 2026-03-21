@@ -11,7 +11,7 @@ export default {
     question: 'How many terms do you actually need to approximate a function to exam-level accuracy?',
     realWorldContext:
       'Scientific computing, embedded systems, and simulation software approximate non-polynomial functions with finite truncations and strict error controls. ' +
-      'In medicine, dose-response models are linearized near operating points; in finance, local volatility approximations rely on expansion terms; in physics, small-angle and perturbation approximations turn impossible equations into solvable ones.',
+      'In deep learning, higher-order local models explain optimizer behavior and curvature corrections. In rendering and signal processing, Fourier/Taylor truncations determine quality-vs-cost tradeoffs (JPEG, MP3, denoising filters). In game and robotics simulation, local series models and time-stepping error bounds control stability. In medicine, dose-response models are linearized near operating points; in finance, local volatility approximations rely on expansion terms; in physics, small-angle and perturbation approximations turn impossible equations into solvable ones.',
     previewVisualizationId: 'TaylorApproximation',
   },
 
@@ -23,6 +23,8 @@ export default {
       'Practical workflow: choose tolerance, choose approximation family, derive an error inequality, solve for smallest n, then compute approximation with that n. This is exactly how numerical libraries choose internal truncation levels.',
       'In exams, students often compute a polynomial correctly but cannot justify accuracy. In applied settings, that missing justification is the difference between a useful result and an unverifiable guess.',
       'A powerful bridge to life applications: local linearization and low-order Taylor models explain why complex systems are often controlled around operating points. Engineers and scientists rarely use full exact models in real-time control loops.',
+      'Fourier-series truncation is the sibling idea in frequency space: keep the dominant low-frequency coefficients and drop high-frequency terms to compress or denoise. JPEG and MP3 are practical versions of "finite series with controlled error".',
+      'In physically based graphics, illumination integrals are approximated numerically, but many kernels are expanded into low-order basis/series forms first. The workflow is still identical: truncate, bound, validate.',
     ],
     callouts: [
       {
@@ -34,6 +36,16 @@ export default {
         type: 'warning',
         title: 'Approximation Without a Bound Is Incomplete',
         body: 'A decimal answer alone is not enough in rigorous math, engineering, or science. State why your truncation error is small enough.',
+      },
+      {
+        type: 'real-world',
+        title: 'Compression Is Series Truncation',
+        body: 'Signals are projected onto basis functions. Keeping low-order/high-energy coefficients and discarding the rest is exactly a finite-series approximation with a distortion budget.',
+      },
+      {
+        type: 'real-world',
+        title: 'Simulation Uses Local Series Every Step',
+        body: 'Time stepping methods (Euler, RK, multistep) are derived from Taylor expansions. Stability and accuracy are controlled by truncation error terms.',
       },
     ],
     visualizations: [
@@ -124,6 +136,28 @@ export default {
         { expression: '|error| <= 0.12^5/120 < 2.5\\times10^{-7}', annotation: 'First omitted term bound for alternating decreasing terms.' },
       ],
       conclusion: 'The small-angle approximation is excellent here and now quantitatively justified.',
+    },
+    {
+      id: 'ch5-series-app-ex5',
+      title: 'Backprop Curvature Intuition via 2nd-Order Expansion',
+      problem: 'Near a current parameter value w0, approximate a loss L(w) using a second-order Taylor model and interpret the update step.',
+      steps: [
+        { expression: 'L(w) \approx L(w_0) + L^{\\prime}(w_0)(w-w_0) + \\frac12 L^{\\prime\\prime}(w_0)(w-w_0)^2', annotation: 'Second-order local model around w0.' },
+        { expression: '\\text{Minimizer of model: } w^* = w_0 - \\frac{L^{\\prime}(w_0)}{L^{\\prime\\prime}(w_0)}', annotation: 'Set derivative of quadratic model to zero.' },
+        { expression: '\\text{If } L^{\\prime\\prime}(w_0) \\text{ is large, step is small; if small, step is larger}', annotation: 'Curvature rescales gradient steps.' },
+      ],
+      conclusion: 'Gradient descent is first-order. Newton-style updates are second-order Taylor minimizers. Both are series-approximation decisions.',
+    },
+    {
+      id: 'ch5-series-app-ex6',
+      title: 'Fourier Truncation and Compression Error',
+      problem: 'A signal f is represented by f(x)=\\sum_{n=1}^{\\infty} c_n\\phi_n(x). If you keep only n<=N terms, what controls error?',
+      steps: [
+        { expression: 'f_N(x)=\\sum_{n=1}^{N} c_n\\phi_n(x)', annotation: 'Compressed representation (finite series).' },
+        { expression: '\\|f-f_N\\|_2^2 = \\sum_{n>N} |c_n|^2', annotation: 'Energy of discarded coefficients (Parseval framework).' },
+        { expression: '\\text{If high-frequency } |c_n| \\text{ are tiny, truncation error is tiny}', annotation: 'Why natural images/audio compress well.' },
+      ],
+      conclusion: 'JPEG/MP3 quality tuning is mathematically a choice of N (or threshold) in a convergent basis expansion.',
     },
   ],
 

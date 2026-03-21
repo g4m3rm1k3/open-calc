@@ -79,6 +79,11 @@ export default {
         body: 'Mark all critical points (where f\' = 0) and inflection points (where f\'\' = 0) on a number line. In each region between these points, determine the sign of f\' and f\'\' by testing a point. Build the full picture systematically.',
       },
       {
+        type: 'warning',
+        title: 'Not Every Point Has a Derivative',
+        body: 'Corners, cusps, vertical tangents, and fast oscillation can make f\' undefined. In graph-reading problems, these are still critical structural points and must be included in sign-chart boundaries.',
+      },
+      {
         type: 'real-world',
         title: 'Applications: From Graphs to Reality',
         body: 'Position graph → read velocity and acceleration. Force graph → read power (f\' of work). Population graph → read growth rate and whether growth is accelerating. Stock price → read momentum and whether momentum is changing.',
@@ -89,6 +94,11 @@ export default {
         id: 'PositionVelocityAcceleration',
         title: 'Position, Velocity, and Acceleration Graphs',
         caption: 'Interactive: change the position curve and watch how f\', f\'\', and f\'\'\' respond in real time.',
+      },
+      {
+        id: 'SignChartBuilder',
+        title: 'Sign Chart Builder (f\' and f\'\')',
+        caption: 'Use this to practice interval-sign reasoning before doing full symbolic curve sketching.',
       },
     ],
   },

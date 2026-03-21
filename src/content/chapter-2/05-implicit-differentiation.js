@@ -10,7 +10,7 @@ export default {
 
   hook: {
     question: 'The equation x\u00b2 + y\u00b2 = 25 describes a circle of radius 5. If you try to solve for y, you get y = \u00b1\u221a(25 - x\u00b2) — two separate functions, neither of which describes the whole circle. Now suppose you want the slope of the circle at the point (3, 4). Can you find dy/dx without splitting the circle into two halves?',
-    realWorldContext: 'Most interesting curves in mathematics and applications are defined implicitly — the relationship between x and y is given by an equation F(x, y) = 0, not by a formula y = f(x). The unit circle, ellipses, hyperbolas, the folium of Descartes (x\u00b3+y\u00b3=6xy), level curves in economics and thermodynamics, and constraint curves in optimization are all defined implicitly. Explicit formulas y = f(x) are the exception, not the rule. Implicit differentiation gives us a systematic method to find slopes and rates of change on any such curve, even when an explicit formula cannot be found.',
+    realWorldContext: 'Most interesting curves in mathematics and applications are defined implicitly — the relationship between x and y is given by an equation F(x, y) = 0, not by a formula y = f(x). The unit circle, ellipses, hyperbolas, the folium of Descartes (x\u00b3+y\u00b3=6xy), level curves in economics and thermodynamics, and constraint curves in optimization are all defined implicitly. In machine learning and control, many feasible sets and level sets are implicit surfaces; local sensitivities on those sets are computed with the same derivative logic. Explicit formulas y = f(x) are the exception, not the rule. Implicit differentiation gives us a systematic method to find slopes and rates of change on any such curve, even when an explicit formula cannot be found.',
     previewVisualizationId: 'ImplicitCurveExplorer',
   },
 
@@ -38,6 +38,11 @@ export default {
         type: 'example',
         title: 'Quick Example: d/dx[y\u00b3]',
         body: "\\frac{d}{dx}[y^3] = 3y^2 \\cdot \\frac{dy}{dx} \\quad \\text{(chain rule: outer } u^3 \\text{, inner } y(x)\\text{)}",
+      },
+      {
+        type: 'real-world',
+        title: 'Constraint Sensitivity Formula',
+        body: 'For F(x,y)=0, implicit differentiation gives dy/dx = -F_x/F_y. This local slope is the sensitivity relation used in constrained optimization and gradient-based modeling.',
       },
     ],
     visualizations: [

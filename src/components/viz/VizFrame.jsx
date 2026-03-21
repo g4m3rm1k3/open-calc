@@ -28,6 +28,7 @@ const VIZ_REGISTRY = {
   TangentLineConstructor:       lazy(() => import('./d3/TangentLineConstructor.jsx')),
   TangentToImplicitCurve:       lazy(() => import('./d3/TangentToImplicitCurve.jsx')),
   SineUnwrap:                   lazy(() => import('./d3/SineUnwrap.jsx')),
+  ArcChordLimit:                lazy(() => import('./d3/ArcChordLimit.jsx')),
   ProductRuleRectangle:         lazy(() => import('./d3/ProductRuleRectangle.jsx')),
   SlopeField:                   lazy(() => import('./d3/SlopeField.jsx')),
   TangentPlane3D:               lazy(() => import('./three/TangentPlane3D.jsx')),
@@ -59,6 +60,7 @@ const VIZ_REGISTRY = {
   LinearApproximation:          lazy(() => import('./d3/LinearApproximation.jsx')),
   MVTViz:                       lazy(() => import('./d3/MVTViz.jsx')),
   CurveSketchingBoard:          lazy(() => import('./d3/CurveSketchingBoard.jsx')),
+  SignChartBuilder:             lazy(() => import('./d3/SignChartBuilder.jsx')),
   OptimizationViz:              lazy(() => import('./d3/OptimizationViz.jsx')),
   LHopitalViz:                  lazy(() => import('./d3/LHopitalViz.jsx')),
   // Chapter 5 — Sequences & Series

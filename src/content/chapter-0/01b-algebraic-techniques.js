@@ -41,6 +41,9 @@ export default {
       'When you see √A − √B, multiply top and bottom by √A + √B. ' +
       'The product (√A − √B)(√A + √B) = A − B, clearing the radicals and often creating a factorable form. ' +
       'This is pure pattern recognition: √A − √B signals "use the conjugate."',
+      '**Technique 2b: Cube-Root Conjugate Pattern**  ' +
+      'When you see ∛A − ∛B, the matching factor is (∛A² + ∛(AB) + ∛B²) because ' +
+      '(u-v)(u²+uv+v²)=u³-v³. This is the cube-root analog of the square-root conjugate and appears in harder limit problems.',
 
       '**Technique 3: Find a Common Denominator**  ' +
       'Expressions like (1/(x + h) − 1/x) have fractions in the numerator. ' +
@@ -67,6 +70,11 @@ export default {
         type: 'technique',
         title: 'The Conjugate Signal',
         body: 'If you see √A ± √B in numerator or denominator, immediately think: multiply by the conjugate. Example: (√(x+1) − 2)/(x − 3) → multiply by (√(x+1) + 2)/(√(x+1) + 2).',
+      },
+      {
+        type: 'technique',
+        title: 'Cube-Root Conjugate Signal',
+        body: 'For ∛A − ∛B use u=∛A, v=∛B, then multiply by (u²+uv+v²). This converts cube roots to A−B so common factors can cancel.',
       },
       {
         type: 'technique',
@@ -254,6 +262,19 @@ export default {
         xMax: 5,
         label: 'f(x) = (x^3 - 8)/(x^2 - 4)',
       },
+    },
+    {
+      id: 'ch0-alg-ex6',
+      title: 'Cube-Root Conjugate Limit',
+      problem: 'Compute \\lim_{x \\to 8} \\frac{\\sqrt[3]{x} - 2}{x - 8}.',
+      steps: [
+        { expression: '\\frac{\\sqrt[3]{x} - 2}{x - 8}', annotation: 'Direct substitution gives 0/0.' },
+        { expression: '\\frac{\\sqrt[3]{x} - 2}{x - 8} \\cdot \\frac{(\\sqrt[3]{x})^2 + 2\\sqrt[3]{x} + 4}{(\\sqrt[3]{x})^2 + 2\\sqrt[3]{x} + 4}', annotation: 'Use (u-v)(u²+uv+v²)=u³-v³ with u=∛x, v=2.' },
+        { expression: '= \\frac{x - 8}{(x-8)\\left((\\sqrt[3]{x})^2 + 2\\sqrt[3]{x} + 4\\right)}', annotation: 'Numerator collapses to u³-v³ = x-8.' },
+        { expression: '= \\frac{1}{(\\sqrt[3]{x})^2 + 2\\sqrt[3]{x} + 4}', annotation: 'Cancel x-8 for x ≠ 8.' },
+        { expression: '\\lim_{x \\to 8} = \\frac{1}{4 + 4 + 4} = \\frac{1}{12}', annotation: 'Now substitute x=8, so ∛x=2.' },
+      ],
+      conclusion: 'The limit is 1/12. This is the exact cube-root analog of the square-root conjugate trick.',
     },
   ],
 

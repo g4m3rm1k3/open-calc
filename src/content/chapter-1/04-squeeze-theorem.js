@@ -53,6 +53,11 @@ export default {
         body: 'The Squeeze Theorem requires lim g = lim h = L (the SAME value). If the lower bound → 2 and the upper bound → 5, you know f\'s limit is between 2 and 5, but you can\'t determine it exactly. The squeezing only works when the bounds converge to a single point.',
       },
       {
+        type: 'geometric',
+        title: 'Arc-Chord Squeeze Behind sin(x)/x',
+        body: 'For small central angle x, the chord length and arc length become nearly equal. Combined with unit-circle area inequalities, this geometric squeeze drives cos(x) ≤ sin(x)/x ≤ 1 and therefore lim sin(x)/x = 1.',
+      },
+      {
         type: 'real-world',
         title: 'GPS Accuracy: Squeezing Position',
         body: 'A GPS receiver computes position from satellite signals. Each satellite gives a range estimate with error bounds: you\'re between 100.2 km and 100.8 km from satellite A. With more satellites, the bounds tighten: 100.45 to 100.55, then 100.49 to 100.51. As the upper and lower bounds converge, your position is squeezed to a point. This is triangulation viewed as a Squeeze Theorem application.',
@@ -112,6 +117,11 @@ export default {
         props: { showTrigProof: true },
         title: 'The sin(x)/x Geometric Proof',
         caption: 'Drag the angle x on the unit circle. The inscribed triangle (area = sin x/2), the sector (area = x/2), and the circumscribed triangle (area = tan x/2) establish: cos x ≤ sin(x)/x ≤ 1. As x → 0, both bounds → 1.',
+      },
+      {
+        id: 'ArcChordLimit',
+        title: 'Micro-Geometry View: Arc vs Chord',
+        caption: 'This zoomed view complements the area proof: as x → 0, chord/arc → 1, reinforcing why small-angle trig ratios settle to 1.',
       },
     ],
   },

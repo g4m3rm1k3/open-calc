@@ -44,12 +44,22 @@ export default {
         title: 'f\'\'(c) = 0 Does NOT Guarantee an Inflection Point',
         body: 'The counterexample: f(x) = x⁴. Here f\'\'(0) = 0, but f is concave up everywhere — there is no inflection point at 0. The sign chart for f\'\': f\'\'(x) = 12x², which is ≥ 0 everywhere and does NOT change sign at 0. An inflection point requires both f\'\'(c) = 0 AND a sign change in f\'\'.',
       },
+      {
+        type: 'warning',
+        title: 'Differentiability Failure Cases Matter',
+        body: 'Corners (|x|), cusps (x^{2/3}), vertical tangents (x^{1/3}), and wild oscillation (x^2 sin(1/x^2) near 0) break naive derivative assumptions. Always check where f\' is undefined before building sign charts.',
+      },
     ],
     visualizations: [
       {
         id: 'CurveSketchingBoard',
         title: 'Full Curve Analysis — Annotated',
         caption: 'Select a function from the menu. See f, f\', and f\'\' plotted together, with local extrema, inflection points, and concavity regions all labeled.',
+      },
+      {
+        id: 'SignChartBuilder',
+        title: 'Interactive Sign Chart Builder',
+        caption: 'Adjust polynomial coefficients and watch f\' and f\'\' sign charts update instantly. This makes first/second derivative tests procedural and visual.',
       },
     ],
   },

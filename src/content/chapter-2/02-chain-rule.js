@@ -10,7 +10,7 @@ export default {
 
   hook: {
     question: 'A balloon is being inflated so that its radius grows at a rate of 2 centimeters per second (r(t) = 2t). The volume of a sphere is V = (4/3)\u03c0r\u00b3. At the moment when t = 3 seconds, how fast is the volume increasing? Volume depends on radius, radius depends on time — so how do we find dV/dt?',
-    realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
+    realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
     previewVisualizationId: 'CompositionVisualization',
   },
 
@@ -46,6 +46,11 @@ export default {
         type: 'example',
         title: 'Balloon Volume Example',
         body: 'V = \\tfrac{4}{3}\\pi r^3,\\; r = 2t \\implies \\frac{dV}{dt} = \\frac{dV}{dr}\\cdot\\frac{dr}{dt} = 4\\pi r^2 \\cdot 2 = 8\\pi r^2 = 8\\pi(2t)^2 = 32\\pi t^2',
+      },
+      {
+        type: 'real-world',
+        title: 'Backpropagation Is Chain Rule at Scale',
+        body: '\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial a_2}\\cdot\\frac{\\partial a_2}{\\partial z_2}\\cdot\\frac{\\partial z_2}{\\partial a_1}\\cdot\\frac{\\partial a_1}{\\partial z_1}\\cdot\\frac{\\partial z_1}{\\partial w_1}\\;\\;\\text{(one weight in a deep net)}',
       },
     ],
     visualizationId: 'CompositionVisualization',
@@ -373,6 +378,30 @@ export default {
         },
       ],
       conclusion: 'f\'(x) = \u221a(x\u00b2+1) \u00b7 (2x\u00b2+3x-1) / (x+1)\u00b2. Factoring out the common (x\u00b2+1)^(1/2) factor from the quotient rule numerator is a key simplification technique.',
+    },
+    {
+      id: 'ch2-002-ex6',
+      title: 'Mini Backprop Chain (Single Neuron)',
+      problem: 'Let y = \\sigma(z), z = wx+b, L = \\tfrac12(y-t)^2. Find dL/dw.',
+      steps: [
+        {
+          expression: '\\frac{dL}{dy} = y-t',
+          annotation: 'Differentiate the squared loss with respect to output y.',
+        },
+        {
+          expression: '\\frac{dy}{dz} = \\sigma(z)(1-\\sigma(z)) = y(1-y)',
+          annotation: 'Derivative of sigmoid activation.',
+        },
+        {
+          expression: '\\frac{dz}{dw} = x',
+          annotation: 'For z = wx+b, derivative with respect to w is x.',
+        },
+        {
+          expression: '\\frac{dL}{dw} = \\frac{dL}{dy}\\cdot\\frac{dy}{dz}\\cdot\\frac{dz}{dw} = (y-t)\\,y(1-y)\\,x',
+          annotation: 'Multiply local derivatives along the computation graph.',
+        },
+      ],
+      conclusion: 'This local product is exactly the pattern repeated layer-by-layer in deep learning backpropagation.',
     },
   ],
 

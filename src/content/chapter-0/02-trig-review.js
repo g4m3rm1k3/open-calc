@@ -29,7 +29,10 @@ export default {
       'sin θ starts at 0, rises to 1 at π/2, returns to 0 at π, dips to −1 at 3π/2, and comes back to 0 at 2π.',
       'Angles in calculus are measured in **radians**, not degrees. ' +
       '2π radians = 360°. One radian is the angle that cuts off an arc equal to the radius. ' +
-      'Radians make calculus formulas clean (derivatives of sin and cos have no ugly conversion factors).',
+      'Radians make calculus formulas clean (derivatives of sin and cos have no ugly conversion factors). ' +
+      'Even deeper: radian measure is literally a length ratio, $\theta = s/r$. It is geometry and analysis fused together.',
+      'Arc-vs-chord intuition that feeds directly into limits: for small angles, the arc length and chord length become almost identical. ' +
+      'That geometric squeeze is one of the hidden engines behind why $\sin(x)/x \to 1$ as $x \to 0$.',
       'The Pythagorean theorem — a² + b² = c² — underpins all of trigonometry. ' +
       'The unit circle equation is x² + y² = 1, which is just Pythagoras applied to a right triangle with hypotenuse 1. ' +
       'From this, sin²θ + cos²θ = 1 follows immediately. That one identity generates all others.',
@@ -60,10 +63,16 @@ export default {
         title: 'Similar Triangles Explain Trig Ratios',
         body: 'sin, cos, and tan are shape invariants: all right triangles with the same angle are similar, so opposite/hypotenuse and opposite/adjacent stay constant across scale.',
       },
+      {
+        type: 'geometric',
+        title: 'Inscribed Angle Theorem (Circle Geometry Core)',
+        body: 'An inscribed angle subtending an arc has half the measure of the central angle subtending the same arc. This theorem is a backbone fact for circle proofs and later appears in geometric derivations of trig limits and periodic phenomena.',
+      },
     ],
     visualizations: [
       { id: 'UnitCircle', props: { animate: false }, title: 'Interactive Unit Circle', caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.' },
       { id: 'SineUnwrap', title: 'The Unit Circle Unwraps into the Sine Wave', caption: 'THIS is why sine is a wave: the vertical height of the point on the unit circle, plotted against the angle, traces the sine curve. Toggle auto-animate to watch it unfold.' },
+      { id: 'ArcChordLimit', title: 'Arc vs Chord for Tiny Angles', caption: 'As θ shrinks, arc and chord lengths converge. This geometry is the visual bridge to key trig limits used in derivative proofs.' },
       { id: 'TriangleAreaProof', title: 'Why Triangle Area = ½ × base × height', caption: 'Every trig formula for triangle area (½ab sin C) comes from this. Watch how two triangles tile a parallelogram.' },
     ],
   },
