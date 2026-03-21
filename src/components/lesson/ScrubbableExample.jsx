@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import KatexInline from '../math/KatexInline.jsx';
 import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from './IntegratedLesson.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
@@ -24,7 +23,7 @@ export default function ScrubbableExample({ example, number }) {
       <div className="p-6">
         {/* The Problem Statement */}
         <div className="mb-6 p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-100 rounded-lg border border-brand-100 dark:border-brand-800 font-medium">
-          <KatexInline expr={example.problem} />
+          <span className="leading-relaxed">{parseProse(example.problem)}</span>
         </div>
 
         {/* The Scrubbable Content Area */}
@@ -88,7 +87,7 @@ export default function ScrubbableExample({ example, number }) {
         {/* Conclusion visible only at end */}
         <div className={`mt-8 overflow-hidden transition-all duration-500 ${currentStep === maxStep ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
             <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg text-green-900 dark:text-green-100">
-                <strong>Conclusion:</strong> <KatexInline expr={example.conclusion} />
+                <strong>Conclusion:</strong> <span className="leading-relaxed">{parseProse(example.conclusion)}</span>
             </div>
         </div>
 

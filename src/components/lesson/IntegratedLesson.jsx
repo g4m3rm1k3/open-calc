@@ -229,7 +229,7 @@ export default function IntegratedLesson({ lesson }) {
       </div>
 
       {/* Right Column: Sticky Anchor Interactives */}
-      <div className="w-full lg:w-1/2 order-1 lg:order-2 lg:sticky lg:top-8 flex flex-col gap-8">
+      <div className="w-full lg:w-1/2 order-1 lg:order-2 lg:sticky lg:top-8 flex flex-col gap-8 min-w-0">
         {allVizzes.length === 0 ? (
            <div className="p-8 border-2 border-dashed border-border rounded-xl text-center text-text-muted italic">
              No interactive visualizer available for this lesson.
@@ -242,7 +242,7 @@ export default function IntegratedLesson({ lesson }) {
                   {viz.title}
                 </div>
               )}
-              <div className="border border-border rounded-xl overflow-hidden bg-surface shadow-md">
+              <div className="border border-border rounded-xl overflow-x-auto bg-surface shadow-md w-full">
                  <VizFrame id={viz.id} initialProps={viz.props ?? {}} />
               </div>
               {viz.caption && (

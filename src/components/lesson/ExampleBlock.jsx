@@ -2,6 +2,7 @@ import { useState } from 'react'
 import KatexBlock from '../math/KatexBlock.jsx'
 import MathStep from '../math/MathStep.jsx'
 import VizFrame from '../viz/VizFrame.jsx'
+import { parseProse } from './IntegratedLesson.jsx'
 
 function buildVisualizations(example) {
   const items = []
@@ -69,7 +70,7 @@ export default function ExampleBlock({ example, number }) {
           {/* Solution steps */}
           <div className="mb-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Solution</p>
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 overflow-x-auto">
               {example.steps.map((step, i) => (
                 <MathStep
                   key={i}
@@ -106,7 +107,7 @@ export default function ExampleBlock({ example, number }) {
           {example.conclusion && (
             <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
               <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Takeaway</p>
-              <p className="text-sm text-emerald-800 dark:text-emerald-200">{example.conclusion}</p>
+              <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">{parseProse(example.conclusion)}</p>
             </div>
           )}
         </div>
