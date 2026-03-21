@@ -110,19 +110,24 @@ export default function VizFrame({ id, initialProps = {}, title }) {
 
   if (isExpanded) {
     return (
-      <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
-         <div className="absolute top-6 right-6 z-50">
-            <button 
-               onClick={() => setIsExpanded(false)}
-               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-transform hover:scale-105"
-            >
-              Close Fullscreen
-            </button>
-         </div>
-         <div className="w-full max-w-[90vw] h-full max-h-[90vh] flex flex-col items-center justify-center bg-white dark:bg-[#0f172a] border-4 border-slate-700 shadow-2xl rounded-2xl p-6 overflow-y-auto relative">
-            {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
-            <div className="w-full max-w-5xl">
-               {content}
+      <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+         <div className="w-full max-w-[95vw] sm:max-w-[90vw] h-[95vh] sm:max-h-[85vh] flex flex-col bg-white dark:bg-[#0f172a] shadow-2xl rounded-2xl overflow-hidden relative border border-slate-700">
+            {/* Header / Nav inside bounded container */}
+            <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+               <h2 className="text-xl font-bold truncate pr-4">{title || 'Interactive Visualizer'}</h2>
+               <button 
+                  onClick={() => setIsExpanded(false)}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1.5 px-4 rounded shadow transition-colors flex-shrink-0"
+               >
+                 Close
+               </button>
+            </div>
+            
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-auto p-4 sm:p-6 w-full flex items-center justify-center">
+               <div className="w-full max-w-5xl">
+                   {content}
+               </div>
             </div>
          </div>
       </div>
@@ -130,7 +135,7 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   }
 
   return (
-    <div className="viz-frame relative group">
+    <div className="viz-frame relative group w-full max-w-full overflow-x-auto">
       {title && (
         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3">{title}</p>
       )}

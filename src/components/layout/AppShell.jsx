@@ -15,7 +15,7 @@ function TopBar({ onMenuToggle }) {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+    <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
       {/* Mobile menu */}
       <button
         onClick={onMenuToggle}
@@ -93,7 +93,7 @@ export default function AppShell({ children }) {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-[60px] left-0 bottom-0 z-30 w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed top-[60px] left-0 bottom-0 z-50 w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <Sidebar onNavigate={() => setSidebarOpen(false)} />
       </aside>
 

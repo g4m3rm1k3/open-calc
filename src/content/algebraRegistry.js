@@ -38,7 +38,7 @@ export const ALGEBRA_REGISTRY = {
     name: 'Triangle Inequality',
     formula: '|a + b| \\leq |a| + |b|',
     example: '|(-3) + 4| \\leq |-3| + |4| \\implies |1| \\leq 3 + 4',
-    description: 'The length of the sum of two vectors is never greater than the sum of their individual lengths. Opposite directions cancel.',
+    description: 'The Triangle Inequality represents moving in 1D or 2D: if you walk 5 steps forward (a) then 3 forward (b), you are 8 steps from home. If you walk 5 forward and 3 backward, you are only 2 steps from home. Your final distance |a+b| is never greater than the individual steps |a| + |b| added together. It "bottles up" combined errors.',
     chapterZeroSlug: 'inequalities',
   },
   'conjugate-multiplication': {

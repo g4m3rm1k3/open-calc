@@ -145,7 +145,7 @@ export default {
       'Let δ = min(δ₁, δ₂). Then 0 < |x−c| < δ implies BOTH conditions hold simultaneously:',
       '|(f+g) − (L+M)| ≤ |f−L| + |g−M| < ε/2 + ε/2 = ε. ∎',
 
-      'This proof illustrates several key techniques: (1) the **triangle inequality** |a+b| ≤ |a|+|b| to safely split error accumulation (see the interactive visual proof below or jump to the Inequalities prerequisite chapter); (2) the **ε/2 trick** — budget half the absolute tolerance for each term; (3) **taking the minimum** of multiple δ values so all local conditions explicitly hold simultaneously. These three tools govern nearly every ε-δ proof.',
+      'This proof illustrates several key techniques: (1) the {{algebra:triangle-inequality|triangle inequality}} |a+b| ≤ |a|+|b| to safely split error accumulation; (2) the **ε/2 trick** — budget half the absolute tolerance for each term; (3) **taking the minimum** of multiple δ values so all local conditions explicitly hold simultaneously. These three tools govern nearly every ε-δ proof.',
 
       'Historically, this level of rigor was developed because of actual mathematical crises. In the 1800s, mathematicians discovered continuous functions that are nowhere differentiable (Weierstrass, 1872), convergent series of continuous functions with discontinuous limits (Cauchy got this wrong!), and space-filling curves (Peano, 1890). These "pathological" examples showed that geometric intuition could not be trusted — only rigorous definitions could prevent errors.',
     ],

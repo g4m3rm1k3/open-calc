@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import KatexInline from '../math/KatexInline.jsx';
 import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from './IntegratedLesson.jsx';
+import VizFrame from '../viz/VizFrame.jsx';
 
 export default function ScrubbableExample({ example, number }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -26,16 +27,29 @@ export default function ScrubbableExample({ example, number }) {
           <KatexInline expr={example.problem} />
         </div>
 
-        {/* The Scrubbable Viewer */}
-        <div className="relative min-h-[160px] flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 bg-white dark:bg-[#0f172a] mb-6">
-          <div className="w-full text-center transition-all duration-300">
-             <div className="text-2xl font-bold mb-4">
-                 <KatexBlock expr={steps[currentStep].expression} />
+        {/* The Scrubbable Content Area */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-6">
+           {/* Left/Main: Math Viewer */}
+           <div className={`relative min-h-[160px] flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 bg-white dark:bg-[#0f172a] ${example.visualizationId ? 'lg:w-[55%]' : 'w-full'}`}>
+             <div className="w-full text-center transition-all duration-300">
+                <div className="text-2xl font-bold mb-4">
+                    <KatexBlock expr={steps[currentStep].expression} />
+                </div>
+                <div className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto italic prose-content px-2">
+                    {parseProse(steps[currentStep].annotation)}
+                </div>
              </div>
-             <div className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto italic prose-content">
-                 {parseProse(steps[currentStep].annotation)}
-             </div>
-          </div>
+           </div>
+
+           {/* Right: Synced Interactive System */}
+           {example.visualizationId && (
+              <div className="lg:w-[45%] border-2 border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-[#1e293b] p-2 relative flex items-center justify-center min-h-[250px] overflow-hidden">
+                 <div className="absolute top-2 left-2 bg-brand-100 text-brand-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded shadow-sm opacity-80 z-10">Synced Graphic</div>
+                 <div className="w-full zoom-in-95 pointer-events-none">
+                     <VizFrame id={example.visualizationId} initialProps={{...example.params, currentStep}} title={null} />
+                 </div>
+              </div>
+           )}
         </div>
 
         {/* Scrub Bar Control */}
