@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { parseProse } from '../../math/parseProse.jsx';
 
 export default function SigmaDecoderLab() {
   const [activePart, setActivePart] = useState(null);
@@ -26,36 +27,36 @@ export default function SigmaDecoderLab() {
             <div className="flex items-center text-white font-serif text-5xl cursor-pointer">
                <div className="flex flex-col items-center justify-center mr-2">
                   <div 
-                    className={`text-xl mb-1 px-2 rounded transition-colors duration-300 ${activePart === 'top' ? 'bg-brand-500 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
+                    className={`text-xl mb-1 px-2 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'top' ? 'bg-brand-500 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
                     onMouseEnter={() => setActivePart('top')}
                     onMouseLeave={() => setActivePart(null)}
                   >
-                     $n$
+                     {parseProse("$n$")}
                   </div>
                   
                   <div 
-                    className={`text-6xl px-2 rounded transition-colors duration-300 ${activePart === 'sigma' ? 'bg-amber-500 text-amber-950 font-bold pt-1 pb-2' : 'hover:bg-slate-800'}`}
+                    className={`text-6xl px-2 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'sigma' ? 'bg-amber-500 text-amber-950 font-bold pt-1 pb-2' : 'hover:bg-slate-800'}`}
                     onMouseEnter={() => setActivePart('sigma')}
                     onMouseLeave={() => setActivePart(null)}
                   >
-                     $\sum$
+                     {parseProse("$\\sum$")}
                   </div>
                   
                   <div 
-                    className={`text-lg mt-1 px-2 rounded transition-colors duration-300 ${activePart === 'bottom' ? 'bg-emerald-500 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
+                    className={`text-lg mt-1 px-2 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'bottom' ? 'bg-emerald-500 text-slate-950 font-bold' : 'hover:bg-slate-800'}`}
                     onMouseEnter={() => setActivePart('bottom')}
                     onMouseLeave={() => setActivePart(null)}
                   >
-                     $i=1$
+                     {parseProse("$i=1$")}
                   </div>
                </div>
                
                <div 
-                 className={`ml-2 px-3 py-4 rounded transition-colors duration-300 ${activePart === 'body' ? 'bg-purple-500 text-purple-950 font-bold' : 'hover:bg-slate-800'}`}
+                 className={`ml-2 px-3 py-4 rounded transition-colors duration-300 flex items-center justify-center ${activePart === 'body' ? 'bg-purple-500 text-purple-950 font-bold' : 'hover:bg-slate-800'}`}
                  onMouseEnter={() => setActivePart('body')}
                  onMouseLeave={() => setActivePart(null)}
                >
-                  $i$
+                  {parseProse("$i$")}
                </div>
             </div>
          </div>

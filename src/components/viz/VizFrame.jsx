@@ -100,13 +100,11 @@ const VIZ_REGISTRY = {
   PigeonholeViz:                 lazy(() => import('./react/PigeonholeViz.jsx')),
   TruthTableLab:                 lazy(() => import('./react/TruthTableLab.jsx')),
   DiscreteDependencyMap:         lazy(() => import('./react/DiscreteDependencyMap.jsx')),
-  RelationMatrixLab:             lazy(() => import('./react/RelationMatrixLab.jsx')),
   ModClockViz:                   lazy(() => import('./react/ModClockViz.jsx')),
   CardDiceLab:                   lazy(() => import('./react/CardDiceLab.jsx')),
   GraphTraversalGame:            lazy(() => import('./react/GraphTraversalGame.jsx')),
   DFAChallengeGame:              lazy(() => import('./react/DFAChallengeGame.jsx')),
   RecurrenceExplorer:            lazy(() => import('./d3/RecurrenceExplorer.jsx')),
-  CountingTreeLab:               lazy(() => import('./d3/CountingTreeLab.jsx')),
   BayesGridLab:                  lazy(() => import('./d3/BayesGridLab.jsx')),
   ComplexityLab:                 lazy(() => import('./d3/ComplexityLab.jsx')),
   GraphNetwork3D:                lazy(() => import('./three/GraphNetwork3D.jsx')),
@@ -133,6 +131,10 @@ const VIZ_REGISTRY = {
   InductionAlgebraDecoderLab:    lazy(() => import('./react/InductionAlgebraDecoderLab.jsx')),
   SigmaDecoderLab:               lazy(() => import('./react/SigmaDecoderLab.jsx')),
   StrongInductionWallLab:        lazy(() => import('./react/StrongInductionWallLab.jsx')),
+  CombinationVsPermutationLab:   lazy(() => import('./react/CombinationVsPermutationLab.jsx')),
+  CountingTreeLab:               lazy(() => import('./react/CountingTreeLab.jsx')),
+  PascalsTriangleLab:            lazy(() => import('./react/PascalsTriangleLab.jsx')),
+  StarsAndBarsLab:               lazy(() => import('./react/StarsAndBarsLab.jsx')),
 }
 
 function VizSkeleton() {

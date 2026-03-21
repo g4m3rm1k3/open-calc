@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { parseProse } from '../../math/parseProse.jsx';
 
 export default function StrongInductionWallLab() {
   const [trigger, setTrigger] = useState(false);
@@ -23,7 +24,7 @@ export default function StrongInductionWallLab() {
       
       <div className="text-center mb-6">
         <h3 className="text-white font-bold text-xl mb-1 mt-0">The Heavy Mass of Strong Induction</h3>
-        <p className="text-slate-400 text-sm">Visually proving why a single point of failure $P(k)$ cannot push over massive algebraic structures.</p>
+        <p className="text-slate-400 text-sm">Visually proving why a single point of failure <strong className="text-brand-400 font-serif text-lg">{parseProse("$P(k)$")}</strong> cannot push over massive algebraic structures.</p>
       </div>
 
       <div className="flex justify-center gap-4 mb-8">
@@ -47,11 +48,11 @@ export default function StrongInductionWallLab() {
       <div className="relative w-full h-48 bg-slate-950 border-b-8 border-slate-800 flex items-end justify-center px-4 rounded shadow-inner">
          
          {/* The Target k+1 (Massive Block) */}
-         <div className={`absolute bottom-0 transition-transform duration-700 ease-in flex items-center justify-center text-4xl font-bold bg-slate-700 border-4 border-slate-500 shadow-2xl z-20 
+         <div className={`absolute bottom-0 transition-transform duration-700 ease-in flex items-center justify-center text-4xl font-bold bg-slate-700 border-4 border-slate-500 shadow-2xl z-20 font-serif
              w-24 h-32 ml-48
              ${stage === 3 ? 'rotate-[75deg] translate-x-12 translate-y-6 bg-emerald-700 border-emerald-500 shadow-[0_0_30px_#10b981]' : ''}
          `} style={{ transformOrigin: 'bottom right' }}>
-            <span className="text-slate-300 -mt-8">$k+1$</span>
+            <span className="text-slate-300 -mt-8">{parseProse("$k+1$")}</span>
          </div>
 
          {/* Weak Induction (Single Domino k) */}
@@ -76,8 +77,8 @@ export default function StrongInductionWallLab() {
 
          {/* Weak Result Banner */}
          {stage === 1 && (
-            <div className="absolute top-4 bg-red-900/80 border border-red-500 text-red-300 font-bold py-1 px-4 rounded text-sm animate-fade-in shadow-lg">
-               ❌ Weak Induction Fails! Domino $k$ bounces off the massive block.
+            <div className="absolute top-4 bg-red-900/80 border border-red-500 text-red-300 font-bold py-1 px-4 rounded text-sm animate-fade-in shadow-lg flex items-center gap-1">
+               ❌ Weak Induction Fails! Domino <span className="text-white">{parseProse("$k$")}</span> bounces off the massive block.
             </div>
          )}
          

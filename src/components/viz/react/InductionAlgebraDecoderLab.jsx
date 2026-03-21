@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { parseProse } from '../../math/parseProse.jsx';
 
 export default function InductionAlgebraDecoderLab() {
   const [substituted, setSubstituted] = useState(false);
@@ -8,7 +9,7 @@ export default function InductionAlgebraDecoderLab() {
       
       <div className="text-center mb-8">
         <h3 className="text-white font-bold text-xl mb-1 mt-0">The Core "Aha!" Mechanical Substitution</h3>
-        <p className="text-slate-400 text-sm">Watch the exact moment the <strong className="text-amber-400">Inductive Hypothesis $P(k)$</strong> is strictly injected into the algebra of $P(k+1)$ to physically force the gap closed.</p>
+        <p className="text-slate-400 text-sm flex items-center justify-center gap-1">Watch the exact moment the <strong className="text-amber-400 flex items-center gap-1">Inductive Hypothesis {parseProse("$P(k)$")}</strong> is strictly injected into the algebra of {parseProse("$P(k+1)$")} to physically force the gap closed.</p>
       </div>
 
       <div className="flex flex-col items-center justify-center p-6 bg-slate-950 rounded-lg border-2 border-slate-800 relative min-h-[160px]">
@@ -32,23 +33,24 @@ export default function InductionAlgebraDecoderLab() {
                {/* The Math */}
                <div className="relative w-full h-8 flex items-center justify-center">
                   <span className={`absolute transition-all duration-700 transform ${substituted ? 'opacity-0 scale-50 -translate-y-4' : 'opacity-100 scale-100 translate-y-0'}`}>
-                     {"$1 + 2 + \\dots + k$"}
+                     {parseProse("$1 + 2 + \\dots + k$")}
                   </span>
                   <span className={`absolute transition-all duration-700 transform ${substituted ? 'opacity-100 scale-100 translate-y-0 text-emerald-400 font-bold' : 'opacity-0 scale-150 translate-y-4 text-transparent'}`}>
-                     {"$\\frac{k(k+1)}{2}$"}
+                     {parseProse("$\\frac{k(k+1)}{2}$")}
                   </span>
                </div>
             </div>
 
-            <span className="text-brand-400">
-               {"+ (k+1)"}
+            <span className="text-brand-400 ml-2">
+               {parseProse("$+ (k+1)$")}
             </span>
             
          </div>
 
          {/* Explainer tooltip that appears after substitution */}
-         <div className={`mt-8 text-sm font-medium transition-all duration-700 max-w-lg text-center ${substituted ? 'opacity-100 translate-y-0 text-emerald-300' : 'opacity-0 translate-y-4 text-transparent'}`}>
-            <strong>Boom. The Gap is Closed!</strong> We brilliantly mathematically swapped out the massive infinite sequence for the exact tight fraction we already assumed was historically true ($P(k)$). Now, the entire problem is just basic elementary algebra!
+         <div className={`mt-8 text-sm font-medium transition-all duration-700 max-w-lg text-center flex flex-col items-center justify-center gap-1 ${substituted ? 'opacity-100 translate-y-0 text-emerald-300' : 'opacity-0 translate-y-4 text-transparent'}`}>
+            <strong>Boom. The Gap is Closed!</strong> 
+            <span>We swapped out the massive infinite sequence for the exact fraction we already assumed was true <strong className="text-white ml-1">{parseProse("$P(k)$")}</strong>. Now, the problem is incredibly basic elementary algebra!</span>
          </div>
 
       </div>

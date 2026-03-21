@@ -19,7 +19,11 @@ function isLikelyInlineMath(expr) {
   if (!t) return false
   if (/^\d+(?:[.,]\d+)?$/.test(t)) return false
   if (/^[\d,]+(?:\.\d+)?$/.test(t)) return false
-  return /[\\^_{}=<>+\-*/()|]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
+  
+  // If the expression has absolutely no spaces, it's highly likely a continuous math token (e.g. n, P(k), n!, n,k)
+  if (!t.includes(' ')) return true
+  
+  return /[\\^_{}=<>+\-*/()|!\[\]]|\b(?:lim|sin|cos|tan|log|ln|sqrt|frac|Delta|varepsilon|theta|pi|int|sum|prod)\b/i.test(t)
 }
 
 /**
