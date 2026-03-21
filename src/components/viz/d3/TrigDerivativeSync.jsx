@@ -80,17 +80,18 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
     // ==========================================
     const gCircle = svg.append('g').attr('transform', `translate(${circleCenter.x}, ${circleCenter.y})`);
 
-    // Axes
-    gCircle.append('line').attr('x1', scaleC(-1.5)).attr('y1', 0).attr('x2', scaleC(1.5)).attr('y2', 0).attr('stroke', 'var(--border)');
-    gCircle.append('line').attr('x1', 0).attr('y1', scaleC(-1.5)).attr('x2', 0).attr('y2', scaleC(1.5)).attr('stroke', 'var(--border)');
-
-    // The circle
+    // The circle (track) behind axes
     gCircle.append('circle')
       .attr('cx', 0).attr('cy', 0)
       .attr('r', scaleC(1) - scaleC(0))
       .attr('fill', 'none')
-      .attr('stroke', 'var(--text-muted)')
-      .attr('stroke-width', 2);
+      .attr('stroke', 'currentColor')
+      .attr('stroke-width', 2)
+      .attr('opacity', 0.2);
+
+    // Axes
+    gCircle.append('line').attr('x1', scaleC(-1.5)).attr('y1', 0).attr('x2', scaleC(1.5)).attr('y2', 0).attr('stroke', 'currentColor').attr('opacity', 0.2);
+    gCircle.append('line').attr('x1', 0).attr('y1', scaleC(-1.5)).attr('x2', 0).attr('y2', scaleC(1.5)).attr('stroke', 'currentColor').attr('opacity', 0.2);
 
     // Current point
     const pX = Math.cos(theta);
