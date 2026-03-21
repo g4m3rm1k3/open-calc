@@ -99,6 +99,13 @@ const VIZ_REGISTRY = {
   SequenceViz:                   lazy(() => import('./d3/SequenceViz.jsx')),
   // Course: Discrete Math
   PigeonholeViz:                 lazy(() => import('./react/PigeonholeViz.jsx')),
+  TruthTableLab:                 lazy(() => import('./react/TruthTableLab.jsx')),
+  RelationMatrixLab:             lazy(() => import('./react/RelationMatrixLab.jsx')),
+  RecurrenceExplorer:            lazy(() => import('./d3/RecurrenceExplorer.jsx')),
+  CountingTreeLab:               lazy(() => import('./d3/CountingTreeLab.jsx')),
+  BayesGridLab:                  lazy(() => import('./d3/BayesGridLab.jsx')),
+  ComplexityLab:                 lazy(() => import('./d3/ComplexityLab.jsx')),
+  GraphNetwork3D:                lazy(() => import('./three/GraphNetwork3D.jsx')),
 }
 
 function VizSkeleton() {
