@@ -132,6 +132,7 @@ const VIZ_REGISTRY = {
   SigmaDecoderLab:               lazy(() => import('./react/SigmaDecoderLab.jsx')),
   StrongInductionWallLab:        lazy(() => import('./react/StrongInductionWallLab.jsx')),
   CombinationVsPermutationLab:   lazy(() => import('./react/CombinationVsPermutationLab.jsx')),
+  HandshakeCliqueLab:            lazy(() => import('./react/HandshakeCliqueLab.jsx')),
   CountingTreeLab:               lazy(() => import('./react/CountingTreeLab.jsx')),
   PascalsTriangleLab:            lazy(() => import('./react/PascalsTriangleLab.jsx')),
   StarsAndBarsLab:               lazy(() => import('./react/StarsAndBarsLab.jsx')),

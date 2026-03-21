@@ -78,6 +78,11 @@ export default {
         body: 'Use this as your first decision table before touching formulas:\n\nOrder Matters + No Repetition: $P(n,k)=\\frac{n!}{(n-k)!}$\n\nOrder Matters + Repetition Allowed: $n^k$ (PINs, passwords)\n\nOrder Does Not Matter + No Repetition: $\\binom{n}{k}$\n\nOrder Does Not Matter + Repetition Allowed: $\\binom{n+k-1}{k-1}$ (Stars and Bars)'
       },
       {
+        type: 'tip',
+        title: 'The Secret Question (Choice vs Arrangement)',
+        body: 'Before touching a formula, ask: "If I swap two selected items, does the outcome change?"\n\nIf NO: it is a choice problem (Combination).\n\nIf YES: it is an arrangement/role problem (Permutation).\n\nCommittee of 2 people: swap does not matter => Combination.\n\nPresident and VP: swap changes roles => Permutation.'
+      },
+      {
         type: 'insight',
         title: 'Handshake Intuition for n Choose 2',
         body: 'If $n$ people all shake hands once, each handshake is a pair of distinct people. Counting pairs gives $\\binom{n}{2}=\\frac{n(n-1)}{2}$. The divide-by-2 appears because (A,B) and (B,A) are physically the same handshake.'
@@ -108,6 +113,11 @@ export default {
         id: 'CombinationVsPermutationLab',
         title: 'The Overcount Compression Engine',
         caption: 'Watch the geometric difference as Combinations physically crush 6 distinct Permutations down into 1 single block.'
+      },
+      {
+        id: 'HandshakeCliqueLab',
+        title: 'Handshake Network Builder',
+        caption: 'Increase people count and watch pair-lines fill the graph; each line is one unique handshake.',
       },
       {
         id: 'VennDiagram',
@@ -163,6 +173,7 @@ export default {
       problem: 'A hacker is generating 5-letter passwords using fully lowercase alphabet letters. How many totally unique 5-letter passwords contain **at least one** vowel?',
       steps: [
         { expression: '\\text{Direct Counting is a Nightmare: }', annotation: 'You would have to explicitly calculate EXACTLY 1 vowel, + EXACTLY 2 vowels, + EXACTLY 3 vowels... the math is incredibly tedious.' },
+        { expression: '\\text{Shortcut Trigger: "At least one"} \\Rightarrow \\text{Total minus None}', annotation: 'This pattern saves time and avoids case-splitting errors.' },
         { expression: '\\text{Total Universal State Space: } 26^5', annotation: 'Ignore the vowels entirely. A completely unrestricted 5-letter password simply branches geometrically 26 x 26 x 26 x 26 x 26.' },
         { expression: '\\text{The "Garbage" State Space: } 21^5', annotation: 'Calculate the absolute opposite of what you want: Passwords with ZERO vowels (strictly only the 21 consonants).' },
         { expression: '\\text{Total} - \\text{Garbage} = 26^5 - 21^5 = 11,881,376 - 4,084,101', annotation: 'Subtract the raw garbage strictly from the Universal Space. What mathematically remains is perfectly what you desire.' }
@@ -186,6 +197,7 @@ export default {
       problem: 'How many ways can you buy exactly 12 donuts from 5 varieties if any variety can repeat?',
       steps: [
         { expression: 'Model as 12 identical stars and 4 bars', annotation: '5 bins need 4 separators.' },
+        { expression: '\\texttt{***|*****|**|*|*}', annotation: 'Visual intuition: stars are donuts, bars are separators between flavor bins.' },
         { expression: 'Total slots = 12 + 4 = 16', annotation: 'Stars and bars share one line.' },
         { expression: 'Choose bar positions: \\binom{16}{4}=1820', annotation: 'Equivalent to choosing star positions.' },
       ],

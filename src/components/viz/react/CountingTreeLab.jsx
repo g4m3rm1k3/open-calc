@@ -12,13 +12,19 @@ export default function CountingTreeLab() {
   const [stage1Label, setStage1Label] = useState('Shirts');
   const [stage2Label, setStage2Label] = useState('Pants');
   const [stage3Label, setStage3Label] = useState('Shoes');
+  const [stage4Label, setStage4Label] = useState('Hats');
   const [stage1Count, setStage1Count] = useState(3);
   const [stage2Count, setStage2Count] = useState(2);
   const [stage3Count, setStage3Count] = useState(2);
-  const [useStage3, setUseStage3] = useState(false);
+  const [stage4Count, setStage4Count] = useState(2);
+  const [stageCount, setStageCount] = useState(2);
   const [guessRate, setGuessRate] = useState(1000000000);
 
-  const total = useStage3 ? stage1Count * stage2Count * stage3Count : stage1Count * stage2Count;
+  const total = stageCount === 2
+    ? stage1Count * stage2Count
+    : stageCount === 3
+      ? stage1Count * stage2Count * stage3Count
+      : stage1Count * stage2Count * stage3Count * stage4Count;
 
   const timeToCrack = useMemo(() => {
     const seconds = total / Math.max(1, guessRate);
@@ -45,14 +51,18 @@ export default function CountingTreeLab() {
 
       <div className="flex flex-col items-center justify-center p-6 bg-slate-950 rounded-lg border-2 border-slate-800 relative mb-6">
          <div className="flex items-center justify-center gap-2 mb-5 w-full">
-            <label className="text-slate-300 text-sm flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={useStage3}
-                onChange={(e) => setUseStage3(e.target.checked)}
-              />
-              Enable Stage 3
-            </label>
+            <label className="text-slate-300 text-sm font-semibold mr-2">Stages</label>
+            <div className="inline-flex rounded border border-slate-700 overflow-hidden">
+              {[2, 3, 4].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setStageCount(n)}
+                  className={`px-3 py-1 text-sm ${stageCount === n ? 'bg-brand-500 text-white' : 'bg-slate-800 text-slate-300'}`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
          </div>
 
          <div className="flex flex-wrap justify-center gap-8 w-full mb-8">
@@ -82,7 +92,7 @@ export default function CountingTreeLab() {
                </div>
             </div>
 
-            {useStage3 && (
+            {stageCount >= 3 && (
               <div className="flex flex-col items-center text-center">
                 <input
                   value={stage3Label}
@@ -96,16 +106,37 @@ export default function CountingTreeLab() {
                 </div>
               </div>
             )}
+
+            {stageCount >= 4 && (
+              <div className="flex flex-col items-center text-center">
+                <input
+                  value={stage4Label}
+                  onChange={(e) => setStage4Label(e.target.value)}
+                  className="mb-2 px-2 py-1 text-xs rounded bg-slate-800 border border-slate-700 text-slate-100 text-center w-28"
+                />
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setStage4Count(Math.max(1, stage4Count - 1))} className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold hover:bg-slate-700">-</button>
+                  <span className="text-cyan-400 font-bold text-3xl font-serif">{stage4Count}</span>
+                  <button onClick={() => setStage4Count(Math.min(20, stage4Count + 1))} className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold hover:bg-slate-700">+</button>
+                </div>
+              </div>
+            )}
          </div>
 
          <div className="text-center mb-8 font-serif text-2xl text-white min-h-[40px] flex items-center justify-center gap-4 bg-slate-900 px-6 py-3 rounded-full border border-slate-700 shadow-inner">
             <span className="text-brand-400 font-bold">{stage1Count} {stage1Label}</span>
             <span className="text-white">x</span>
             <span className="text-amber-400 font-bold">{stage2Count} {stage2Label}</span>
-            {useStage3 && (
+            {stageCount >= 3 && (
               <>
                 <span className="text-white">x</span>
                 <span className="text-emerald-400 font-bold">{stage3Count} {stage3Label}</span>
+              </>
+            )}
+            {stageCount >= 4 && (
+              <>
+                <span className="text-white">x</span>
+                <span className="text-cyan-400 font-bold">{stage4Count} {stage4Label}</span>
               </>
             )}
             <span className="text-white">=</span>
