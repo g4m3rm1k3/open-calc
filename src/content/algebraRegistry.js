@@ -6,6 +6,13 @@ export const ALGEBRA_REGISTRY = {
     description: 'A binomial that is the difference of two perfect squares can be factored into the product of the sum and difference of the squared terms.',
     chapterZeroSlug: 'algebraic-techniques',
   },
+  'difference-of-cubes': {
+    name: 'Difference of Cubes',
+    formula: 'a^3 - b^3 = (a - b)(a^2 + ab + b^2)',
+    example: 'x^3 - 8 = x^3 - 2^3 = (x - 2)(x^2 + 2x + 4)',
+    description: 'A binomial that is the difference of two perfect cubes can be factored into a binomial and a trinomial. The signs of the terms follow SOAP: Same, Opposite, Always Positive.',
+    chapterZeroSlug: 'algebraic-techniques',
+  },
   'exponent-rules-multiply': {
     name: 'Multiplying Exponents',
     formula: 'x^a \\cdot x^b = x^{a+b}',

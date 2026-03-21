@@ -42,6 +42,7 @@ const VIZ_REGISTRY = {
   // Chapter 2 — Physics examples
   VerticalThrow:                lazy(() => import('./d3/VerticalThrow.jsx')),
   // Chapter 1 — Limits additions
+  ZenoParadoxViz:               lazy(() => import('./d3/ZenoParadoxViz.jsx')),
   TwoSidedLimit:                lazy(() => import('./d3/TwoSidedLimit.jsx')),
   HoleVsValue:                  lazy(() => import('./d3/HoleVsValue.jsx')),
   OscillationViz:               lazy(() => import('./d3/OscillationViz.jsx')),
@@ -91,6 +92,7 @@ function VizSkeleton() {
 
 export default function VizFrame({ id, initialProps = {}, title }) {
   const [params, setParams] = useState(initialProps)
+  const [isExpanded, setIsExpanded] = useState(false)
   const VizComponent = VIZ_REGISTRY[id]
   const initialPropsKey = useMemo(() => JSON.stringify(initialProps ?? {}), [initialProps])
 
@@ -100,14 +102,46 @@ export default function VizFrame({ id, initialProps = {}, title }) {
 
   if (!VizComponent) return null
 
+  const content = (
+    <Suspense fallback={<VizSkeleton />}>
+      <VizComponent params={params} onParamChange={setParams} />
+    </Suspense>
+  )
+
+  if (isExpanded) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+         <div className="absolute top-6 right-6 z-50">
+            <button 
+               onClick={() => setIsExpanded(false)}
+               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-transform hover:scale-105"
+            >
+              Close Fullscreen
+            </button>
+         </div>
+         <div className="w-full max-w-[90vw] h-full max-h-[90vh] flex flex-col items-center justify-center bg-white dark:bg-[#0f172a] border-4 border-slate-700 shadow-2xl rounded-2xl p-6 overflow-y-auto relative">
+            {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
+            <div className="w-full max-w-5xl">
+               {content}
+            </div>
+         </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="viz-frame">
+    <div className="viz-frame relative group">
       {title && (
         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3">{title}</p>
       )}
-      <Suspense fallback={<VizSkeleton />}>
-        <VizComponent params={params} onParamChange={setParams} />
-      </Suspense>
+      <button 
+         onClick={() => setIsExpanded(true)}
+         title="Expand to Full Width"
+         className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
+      >
+        <span>⛶</span> Expand
+      </button>
+      {content}
     </div>
   )
 }

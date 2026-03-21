@@ -69,6 +69,9 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ZenoParadoxViz',
+      },
+      {
         id: 'LimitApproach',
         props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4 },
         title: 'Approaching the Limit',

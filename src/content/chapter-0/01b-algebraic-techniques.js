@@ -163,7 +163,7 @@ export default {
       problem: 'Compute \\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}.',
       steps: [
         { expression: '\\frac{x^2 - 4}{x - 2}', annotation: 'Direct substitution: 0/0. Not helpful.' },
-        { expression: '\\frac{(x-2)(x+2)}{x - 2}', annotation: 'Factor numerator using a² − b² = (a − b)(a + b).' },
+        { expression: '\\frac{(x-2)(x+2)}{x - 2}', annotation: 'Factor numerator using {{algebra:difference-of-squares|difference of squares}}.' },
         { expression: 'x + 2 \\quad (x \\neq 2)', annotation: 'Cancel (x − 2). The functions are equal everywhere except at x = 2.' },
         { expression: '\\lim_{x \\to 2} (x + 2) = 4', annotation: 'The simplified function has no obstacle at x = 2. Direct substitution works.' },
       ],
@@ -247,7 +247,7 @@ export default {
       title: 'Factor Cubic Using Difference of Cubes',
       problem: 'Factor x³ − 8, then compute \\lim_{x \\to 2} \\frac{x^3 - 8}{x^2 - 4}.',
       steps: [
-        { expression: 'x^3 - 8 = x^3 - 2^3', annotation: 'Recognize as a difference of cubes.' },
+        { expression: 'x^3 - 8 = x^3 - 2^3', annotation: 'Recognize as a {{algebra:difference-of-cubes|difference of cubes}}.' },
         { expression: '= (x - 2)(x^2 + 2x + 4)', annotation: 'Apply a³ − b³ = (a − b)(a² + ab + b²).' },
         { expression: 'x^2 - 4 = (x - 2)(x + 2)', annotation: 'Factor the denominator as difference of squares.' },
         { expression: '\\frac{(x-2)(x^2+2x+4)}{(x-2)(x+2)}', annotation: 'Rewrite the original fraction.' },
