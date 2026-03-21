@@ -8,13 +8,11 @@ export default {
   tags: ['polynomial division', 'long division', 'synthetic division', 'remainder theorem', 'factor theorem', 'rational root theorem', 'polynomials', 'factoring', 'roots', 'zeros', 'partial fractions', 'algebra', 'division algorithm'],
 
   hook: {
-    question: 'You know that 17 ÷ 5 = 3 remainder 2 — but what does it mean to divide x³ + 2x − 7 by x − 3?',
+    question: 'You need to integrate $\\frac{x^2}{x+1}$. It\'s currently impossible in this purely rational form. How do you "break" it into pieces you can actually handle?',
     realWorldContext:
-      'Polynomial division is the engine behind partial fraction decomposition, which you will use extensively in integration. ' +
-      'It also powers the Rational Root Theorem used by engineers to find exact solutions of polynomial equations. ' +
-      'Computer algebra systems use synthetic division internally to evaluate polynomials efficiently (Horner\'s method), ' +
-      'which is critical in signal processing, control theory, and computer graphics.',
-    previewVisualizationId: null,
+      'Active Problem Priming: Polynomial division is your sledgehammer. Whenever you have a top-heavy fraction, you divide first. This transforms $\\frac{x^2}{x+1}$ into $(x - 1) + \\frac{1}{x+1}$, which you can immediately integrate using basic rules and logarithms. ' +
+      '\\n\\n**Future Self Alert:** You will absolutely need this in **Chapter 4 (Integration)** when we tackle Partial Fraction Decomposition. If you cannot synthetically divide, you will not be able to evaluate those integrals. Let\'s master it now.',
+    previewVisualizationId: 'PolynomialScrubber',
   },
 
   intuition: {
@@ -55,7 +53,13 @@ export default {
         body: 'List all candidates ±p/q from the Rational Root Theorem. Test them using synthetic division (not by plugging in — synthetic division simultaneously tests and performs the division). Once you find one root, the quotient is a lower-degree polynomial to continue factoring.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PolynomialScrubber',
+        title: 'Polynomial Division Scrubber',
+        caption: 'Drag the divisor c. The algebraic synthetic division dynamically evaluates the polynomial visually.',
+      },
+    ],
   },
 
   math: {

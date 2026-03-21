@@ -2,8 +2,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { LESSON_MAP, ALL_LESSONS } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
-import LayeredTabs from '../components/lesson/LayeredTabs.jsx'
-import ExampleBlock from '../components/lesson/ExampleBlock.jsx'
+import IntegratedLesson from '../components/lesson/IntegratedLesson.jsx'
+import ScrubbableExample from '../components/lesson/ScrubbableExample.jsx'
 import ChallengeBlock from '../components/lesson/ChallengeBlock.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
@@ -95,13 +95,9 @@ export default function LessonPage() {
         </div>
       )}
 
-      {/* Layered Tabs: Intuition / Math / Rigor */}
-      <section className="mb-10">
-        <LayeredTabs
-          lesson={lesson}
-          activeTab={activeTab}
-          onTabChange={(tab) => setActiveTab(lesson.id, tab)}
-        />
+      {/* Integrated Lesson Flow */}
+      <section className="mb-10 w-full">
+        <IntegratedLesson lesson={lesson} />
       </section>
 
       {/* Examples */}
@@ -111,7 +107,7 @@ export default function LessonPage() {
             <span className="text-2xl">📝</span> Worked Examples
           </h2>
           {lesson.examples.map((ex, i) => (
-            <ExampleBlock
+            <ScrubbableExample
               key={ex.id}
               example={ex}
               number={i + 1}
