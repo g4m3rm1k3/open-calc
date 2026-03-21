@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-
 const VIZ_REGISTRY = {
   NumberLine:               lazy(() => import('./d3/NumberLine.jsx')),
   FunctionMachine:          lazy(() => import('./d3/FunctionMachine.jsx')),
@@ -109,6 +108,8 @@ const VIZ_REGISTRY = {
   BayesGridLab:                  lazy(() => import('./d3/BayesGridLab.jsx')),
   ComplexityLab:                 lazy(() => import('./d3/ComplexityLab.jsx')),
   GraphNetwork3D:                lazy(() => import('./three/GraphNetwork3D.jsx')),
+  TruthCube3D:                   lazy(() => import('./react/TruthCube3D.jsx')),
+  LogicGateSim:                  lazy(() => import('./react/LogicGateSim.jsx')),
 }
 
 function VizSkeleton() {
