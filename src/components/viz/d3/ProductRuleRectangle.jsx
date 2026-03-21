@@ -112,7 +112,7 @@ export default function ProductRuleRectangle({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label="x" min={0.5} max={4} step={0.1} value={x} onChange={setX} />
         <SliderControl label="Δx (change in x)" min={0.05} max={1.5} step={0.05} value={dx} onChange={setDx} />

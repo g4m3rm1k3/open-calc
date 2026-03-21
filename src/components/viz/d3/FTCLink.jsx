@@ -244,7 +244,7 @@ export default function FTCLink() {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-1 space-y-3">
         <SliderControl
           label="x"

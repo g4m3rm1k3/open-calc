@@ -305,7 +305,7 @@ export default function AreaBetweenCurves() {
       <svg
         ref={svgRef}
         width="100%"
-        viewBox={`0 0 ${W} ${H}`}
+        viewBox={"0 0 " + W + " " + H}
         className="overflow-visible cursor-crosshair"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}

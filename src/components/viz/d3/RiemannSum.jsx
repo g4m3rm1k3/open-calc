@@ -66,7 +66,7 @@ export default function RiemannSum() {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label="Rectangles n" min={1} max={50} step={1} value={n} onChange={setN} format={(v) => v} />
         <div className="flex gap-2">

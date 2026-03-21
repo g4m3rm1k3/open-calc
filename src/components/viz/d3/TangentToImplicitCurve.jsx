@@ -109,7 +109,7 @@ export default function TangentToImplicitCurve({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <div className="flex gap-2 flex-wrap">
           {Object.entries(CURVES).map(([key, c]) => (

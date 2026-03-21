@@ -105,7 +105,7 @@ export default function SignChartBuilder() {
 
   return (
     <div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
+      <svg width="100%" viewBox={"0 0 " + W + " " + H}>
         <line x1={sx(X_MIN)} y1={sy(0, data.yMin, data.yMax)} x2={sx(X_MAX)} y2={sy(0, data.yMin, data.yMax)} stroke="#94a3b8" />
         <line x1={sx(0)} y1={sy(data.yMin, data.yMin, data.yMax)} x2={sx(0)} y2={sy(data.yMax, data.yMin, data.yMax)} stroke="#94a3b8" />
         <path d={path} fill="none" stroke="#2563eb" strokeWidth="2.2" />

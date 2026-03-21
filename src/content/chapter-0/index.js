@@ -13,6 +13,7 @@ import trigReview from './02-trig-review.js'
 import exponentials from './03-exponentials.js'
 import integratedReview from './04-integrated-review.js'
 import assignmentPlaybook from './05-assignment-playbook.js'
+import algebraGeometryMasterReview from './06-algebra-geometry-master-review.js'
 
 export default {
   id: 'chapter-0',
@@ -37,5 +38,6 @@ export default {
     exponentials,
     integratedReview,
     assignmentPlaybook,
+    algebraGeometryMasterReview,
   ],
 }

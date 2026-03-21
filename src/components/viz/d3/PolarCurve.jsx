@@ -120,7 +120,7 @@ export default function PolarCurve({ params }) {
           >{CURVES[k].label}</button>
         ))}
       </div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2">
         <SliderControl
           label={`θ max: ${(thetaMax / Math.PI).toFixed(1)}π`}

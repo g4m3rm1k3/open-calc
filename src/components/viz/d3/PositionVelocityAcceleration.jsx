@@ -249,7 +249,7 @@ export default function PositionVelocityAcceleration({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${TOTAL_H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + TOTAL_H} className="overflow-visible" />
       <div className="flex flex-wrap items-center justify-center gap-2 mt-3 px-4">
         {!hasParams && PRESETS.map((p, i) => (
           <button

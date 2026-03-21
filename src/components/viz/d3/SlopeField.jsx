@@ -41,9 +41,15 @@ export default function SlopeField({ params }) {
     for (let xi = -3; xi <= 3; xi += step) {
       for (let yi = -3; yi <= 3; yi += step) {
         const slope = deriv(xi)
-        const angle = Math.atan(slope)
-        const dx = segLen * Math.cos(angle) / 2
-        const dy = segLen * Math.sin(angle) / 2
+        
+        // Map true mathematical slope to screen angle correctly using aspect ratio
+        const pixelsPerX = (W - M.left - M.right) / 6
+        const pixelsPerY = (H - M.top - M.bottom) / 6
+        const screenSlope = -slope * (pixelsPerY / pixelsPerX) // Negative because Y points down in SVG
+        const screenAngle = Math.atan(screenSlope)
+        
+        const dx = (segLen / 2) * Math.cos(screenAngle)
+        const dy = (segLen / 2) * Math.sin(screenAngle)
 
         // Color by slope magnitude
         const absSl = Math.min(Math.abs(slope), 5)
@@ -52,8 +58,8 @@ export default function SlopeField({ params }) {
         svg.append('line')
           .attr('x1', xSc(xi) - dx)
           .attr('x2', xSc(xi) + dx)
-          .attr('y1', ySc(yi) + dy * (xSc(1) - xSc(0)) / (ySc(0) - ySc(1)))
-          .attr('y2', ySc(yi) - dy * (xSc(1) - xSc(0)) / (ySc(0) - ySc(1)))
+          .attr('y1', ySc(yi) - dy)
+          .attr('y2', ySc(yi) + dy)
           .attr('stroke', color).attr('stroke-width', 1.5).attr('opacity', 0.7)
       }
     }
@@ -73,7 +79,7 @@ export default function SlopeField({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <div className="flex gap-2 flex-wrap">
           {FUNCTIONS.map((f, i) => (

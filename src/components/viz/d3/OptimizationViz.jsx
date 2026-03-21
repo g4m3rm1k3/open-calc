@@ -169,8 +169,8 @@ export default function OptimizationViz() {
 
   return (
     <div>
-      <svg ref={boxRef} width="100%" viewBox={`0 0 ${W} ${BOX_H}`} className="overflow-visible" />
-      <svg ref={graphRef} width="100%" viewBox={`0 0 ${W} ${GRAPH_H}`} className="overflow-visible border-t border-slate-200 dark:border-slate-700" />
+      <svg ref={boxRef} width="100%" viewBox={"0 0 " + W + " " + BOX_H} className="overflow-visible" />
+      <svg ref={graphRef} width="100%" viewBox={"0 0 " + W + " " + GRAPH_H} className="overflow-visible border-t border-slate-200 dark:border-slate-700" />
       <div className="px-4 mt-2">
         <SliderControl
           label="Cut size x"

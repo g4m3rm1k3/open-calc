@@ -156,7 +156,7 @@ export default function ConvergenceViz({ params }) {
           </button>
         ))}
       </div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2">
         <SliderControl label={`Number of terms: ${numTerms}`} min={3} max={50} step={1} value={numTerms} onChange={setNumTerms} />
       </div>

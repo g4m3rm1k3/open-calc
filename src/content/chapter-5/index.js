@@ -1,4 +1,3 @@
-import algebraGeometryMasterReview from './00-algebra-geometry-master-review.js'
 import sequences from './00-sequences.js'
 import seriesIntro from './01-series-intro.js'
 import convergenceTests from './02-convergence-tests.js'
@@ -14,7 +13,6 @@ export default {
   description: 'Your complete bridge from Calc 1 to rigorous Calc 2. Starts with an algebra and geometry master review, then builds systematically: sequences, series, convergence tests, power series, and Taylor/Maclaurin — everything you need to ace the hardest Calc 2 course.',
   color: 'stone',
   lessons: [
-    algebraGeometryMasterReview,
     sequences,
     seriesIntro,
     convergenceTests,

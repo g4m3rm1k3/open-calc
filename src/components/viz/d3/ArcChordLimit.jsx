@@ -27,7 +27,7 @@ export default function ArcChordLimit() {
 
   return (
     <div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible">
+      <svg width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible">
         <circle cx={CX} cy={CY} r={R} fill="none" stroke="#cbd5e1" strokeWidth="2" />
         <line x1={CX} y1={CY} x2={CX + R} y2={CY} stroke="#94a3b8" strokeWidth="1.5" />
         <line x1={CX} y1={CY} x2={data.px} y2={data.py} stroke="#6470f1" strokeWidth="2" />

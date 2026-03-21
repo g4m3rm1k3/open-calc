@@ -120,7 +120,7 @@ export default function ContinuityViz({ params }) {
           ))}
         </div>
       )}
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <p className="text-sm text-center text-slate-600 dark:text-slate-400 mt-2 italic">{disc.description}</p>
     </div>
   )

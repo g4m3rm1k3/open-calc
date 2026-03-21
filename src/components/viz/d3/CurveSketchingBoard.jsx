@@ -231,8 +231,8 @@ export default function CurveSketchingBoard() {
 
   return (
     <div>
-      <svg ref={topRef} width="100%" viewBox={`0 0 ${W} ${TOP_H}`} className="overflow-visible" />
-      <svg ref={botRef} width="100%" viewBox={`0 0 ${W} ${BOT_H}`} className="overflow-visible border-t border-slate-200 dark:border-slate-700" />
+      <svg ref={topRef} width="100%" viewBox={"0 0 " + W + " " + TOP_H} className="overflow-visible" />
+      <svg ref={botRef} width="100%" viewBox={"0 0 " + W + " " + BOT_H} className="overflow-visible border-t border-slate-200 dark:border-slate-700" />
       <div className="px-4 mt-2 flex gap-2 flex-wrap">
         {PRESETS.map((p, i) => (
           <button

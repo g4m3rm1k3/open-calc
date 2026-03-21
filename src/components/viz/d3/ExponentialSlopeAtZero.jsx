@@ -75,7 +75,7 @@ export default function ExponentialSlopeAtZero({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label={`Base a = ${Math.abs(base - Math.E) < 0.02 ? 'e ≈ 2.718' : base.toFixed(2)}`} min={1.1} max={5} step={0.05} value={base} onChange={setBase} />
         <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">

@@ -204,7 +204,7 @@ export default function ProjectileMotion() {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label="Launch angle (°)" min={5} max={85} step={1} value={angle} onChange={v => { setAngle(v); reset() }} format={v => `${v}°`} />
         <SliderControl label="Initial speed (m/s)" min={5} max={20} step={0.5} value={speed} onChange={v => { setSpeed(v); reset() }} />

@@ -116,7 +116,7 @@ export default function EpsilonDelta({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       {!isStepMode && (
          <div className="px-4 mt-2">
            <SliderControl label="ε (epsilon)" min={0.05} max={2} step={0.05} value={interactiveEpsilon} onChange={setInteractiveEpsilon} />

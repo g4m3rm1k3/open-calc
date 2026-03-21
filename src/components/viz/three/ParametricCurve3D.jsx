@@ -71,7 +71,8 @@ export default function ParametricCurve3D() {
     sceneRef.current = scene
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100)
-    camera.position.set(5, 3, 5)
+    camera.up.set(0, 0, 1)
+    camera.position.set(5, 5, 4)
     camera.lookAt(0, 0, 0)
     cameraRef.current = camera
 

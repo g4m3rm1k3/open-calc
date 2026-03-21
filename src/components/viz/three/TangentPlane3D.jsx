@@ -32,7 +32,8 @@ export default function TangentPlane3D() {
     sceneRef.current = scene
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100)
-    camera.position.set(6, 5, 6)
+    camera.up.set(0, 0, 1)
+    camera.position.set(6, 6, 5)
     camera.lookAt(0, 0, 0)
 
     const controls = new OrbitControls(camera, renderer.domElement)

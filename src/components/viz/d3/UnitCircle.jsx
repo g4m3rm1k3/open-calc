@@ -88,7 +88,7 @@ export default function UnitCircle({ params }) {
   return (
     <div>
       <div className="flex justify-center">
-        <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: W }} />
+        <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} style={{ maxWidth: W }} />
       </div>
       <div className="mt-2 px-4">
         <SliderControl

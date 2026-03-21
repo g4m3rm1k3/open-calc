@@ -121,7 +121,7 @@ export default function DeltaMinSelector() {
 
   return (
     <div className="flex flex-col items-center">
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible mb-4" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible mb-4" />
       
       <div className="w-full bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
          <p className="text-center font-bold text-slate-700 dark:text-slate-300 mb-3">Which Delta should you choose to satisfy ε = 1.0?</p>

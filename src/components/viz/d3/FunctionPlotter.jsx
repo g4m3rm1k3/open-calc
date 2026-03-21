@@ -152,7 +152,7 @@ export default function FunctionPlotter({ params }) {
           ))}
         </div>
       )}
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
     </div>
   )
 }

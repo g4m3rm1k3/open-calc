@@ -157,6 +157,6 @@ export default function NumberLine({ params }) {
   }, [showSets, showIntervals, xMin, xMax, tickStep, interval, points, rays])
 
   return (
-    <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+    <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
   )
 }

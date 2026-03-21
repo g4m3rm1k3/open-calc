@@ -175,8 +175,8 @@ export default function LHopitalViz() {
   return (
     <div>
       <div className="flex gap-1">
-        <svg ref={leftRef} width="50%" viewBox={`0 0 ${HALF_W} ${H}`} className="overflow-visible" />
-        <svg ref={rightRef} width="50%" viewBox={`0 0 ${HALF_W} ${H}`} className="overflow-visible" />
+        <svg ref={leftRef} width="50%" viewBox={"0 0 " + HALF_W + " " + H} className="overflow-visible" />
+        <svg ref={rightRef} width="50%" viewBox={"0 0 " + HALF_W + " " + H} className="overflow-visible" />
       </div>
       <div className="px-4 mt-2 space-y-2">
         <div className="flex gap-2 flex-wrap">

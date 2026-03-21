@@ -137,7 +137,7 @@ export default function SineUnwrap({ params }) {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label="Angle θ" min={0} max={6.28} step={0.02} value={theta} onChange={(v) => { setAnimate(false); setTheta(v) }} />
         <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">

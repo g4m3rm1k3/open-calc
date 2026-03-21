@@ -199,7 +199,7 @@ export default function TriangleAreaProof() {
 
   return (
     <div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl label="base b" min={1} max={8} step={0.5} value={b} onChange={setB} />
         <SliderControl label="height h" min={1} max={6} step={0.5} value={h} onChange={setH} />

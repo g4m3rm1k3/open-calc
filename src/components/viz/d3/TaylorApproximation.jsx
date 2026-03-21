@@ -154,7 +154,7 @@ export default function TaylorApproximation({ params }) {
           </button>
         ))}
       </div>
-      <svg ref={svgRef} width="100%" viewBox={`0 0 ${W} ${H}`} className="overflow-visible" />
+      <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2">
         <SliderControl label={`Taylor degree: ${degree}`} min={0} max={15} step={1} value={degree} onChange={setDegree} />
       </div>
