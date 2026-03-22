@@ -52,6 +52,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.2.1 Rolle's Theorem",
+        props: { url: "https://www.youtube.com/embed/xG7V6x8HSXg" }
+      },
     {
         id: 'VideoEmbed',
         title: "Application of Rolle's Theorem with Intermediate Value Theorem Calculus 1 AB",

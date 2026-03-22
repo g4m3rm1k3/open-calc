@@ -57,6 +57,31 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I Final Exam Review",
+        props: { url: "https://www.youtube.com/embed/5Z7uZ4t_5dQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.7.2 Optimization Practice",
+        props: { url: "https://www.youtube.com/embed/bwLD4nEPN_8" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.7.1 Optimization",
+        props: { url: "https://www.youtube.com/embed/W6FYEfsShm0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
+        props: { url: "https://www.youtube.com/embed/kjunIwj2sv0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
+        props: { url: "https://www.youtube.com/embed/BfJauiDEc_M" }
+      },
     {
         id: 'VideoEmbed',
         title: "Area Between 2 Curves Vertical and Horizontal Representative Rectangles Calculus 1 AB",

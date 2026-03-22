@@ -1,5 +1,5 @@
-export default function VideoEmbed({ params }) {
-  const { embedCode, title, url } = params || {};
+export default function VideoEmbed({ params, url: rootUrl, title: rootTitle, embedCode: rootEmbedCode }) {
+  const embedCode = rootEmbedCode || params?.embedCode; const title = rootTitle || params?.title; const url = rootUrl || params?.url;
   // If url is provided directly, use it, otherwise extract from embedCode
   let src = url;
   if (!src && embedCode) {
@@ -19,7 +19,7 @@ export default function VideoEmbed({ params }) {
           title={title || "Video player"}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+          allowFullScreen loading="lazy"
         ></iframe>
       </div>
     </div>

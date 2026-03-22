@@ -44,6 +44,61 @@ export default {
         mathBridge: 'Drag a point in either system and see the other coordinates update. Watch how polar curves trace out as $\\theta$ sweeps from $0$ to $2\\pi$.',
         caption: 'Neither system is "right" — each makes different shapes simple.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Understanding Polar Coordinates',
+        props: { url: 'https://www.youtube.com/embed/tKi05dfUhAA' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Converting Coordinates between Polar and Rectangular Form',
+        props: { url: 'https://www.youtube.com/embed/YodvraMFQEs' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Converting Equations Between Polar & Rectangular Form',
+        props: { url: 'https://www.youtube.com/embed/t2SvNC-3Q5Y' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Polar Equations, Test for Symmetry & 4 Examples Corrected',
+        props: { url: 'https://www.youtube.com/embed/qEOsR1G57So' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Introduction to Vectors',
+        props: { url: 'https://www.youtube.com/embed/0uAJpsanhl0' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Writing Vector in terms of Magnitude & Direction Example',
+        props: { url: 'https://www.youtube.com/embed/i1D_jXC5FRU' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Vector Application Examples',
+        props: { url: 'https://www.youtube.com/embed/3f8ng0vUkDE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Dot Product & Angle Between Vectors',
+        props: { url: 'https://www.youtube.com/embed/p8BZTFNSKIw' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Projection of a Vector onto another Vector',
+        props: { url: 'https://www.youtube.com/embed/aTlAsi4t4NI' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Introduction to Parametric Equations',
+        props: { url: 'https://www.youtube.com/embed/3jLQH7u0BAA' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Parametric Equations Eliminating Parameter T',
+        props: { url: 'https://www.youtube.com/embed/NbvuOQju7Pk' },
+      },
     ],
   },
 

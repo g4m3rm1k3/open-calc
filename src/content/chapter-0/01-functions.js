@@ -58,6 +58,31 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.3.1 The Inverse of a Function",
+        props: { url: "https://www.youtube.com/embed/YN8WzBCFLgQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.3 Functions and Their Graphs",
+        props: { url: "https://www.youtube.com/embed/DKLYIiqjKEc" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.2 Linear Models and Rates of Change",
+        props: { url: "https://www.youtube.com/embed/AnJlHSVOXTk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.1 Graphs",
+        props: { url: "https://www.youtube.com/embed/LWuN4IX9dEE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.0 Review of Factoring",
+        props: { url: "https://www.youtube.com/embed/LmFz8H6FrD0" }
+      },
+      {
         id: 'FunctionMachine',
         title: 'The Function Machine',
         mathBridge: 'A function $f$ is a rule: for every input $x$ in the domain, it produces exactly one output $f(x)$. The machine enforces the one-output rule — if you could get two different outputs from the same input, it would fail the vertical line test and not be a function.',

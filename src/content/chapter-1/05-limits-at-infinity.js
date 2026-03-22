@@ -37,6 +37,26 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 3.5.2 Horizontal Asymptotes and Computational Techniques",
+        props: { url: "https://www.youtube.com/embed/km6-zDe0zJY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.5.1 Limits at Infinity",
+        props: { url: "https://www.youtube.com/embed/NLYMsgDykOk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.5.2 Vertical Asymptotes",
+        props: { url: "https://www.youtube.com/embed/btWKhXFTcPQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.5.1 Infinite Limits and Their Properties",
+        props: { url: "https://www.youtube.com/embed/tcgRbvChHPw" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Limits \"at\" infinity",
         props: { url: "https://www.youtube.com/embed/yHtIxYKVKUs" }
       },

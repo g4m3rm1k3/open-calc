@@ -38,6 +38,81 @@ export default {
         mathBridge: 'See multiplicity 1, 2, and 3 roots side by side. Change the multiplicity and watch the crossing behaviour change.',
         caption: 'Odd multiplicity: sign change (crossing). Even multiplicity: no sign change (bounce).',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Polynomial Graphs Part 1',
+        props: { url: 'https://www.youtube.com/embed/of2OG5NNNIo' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Polynomial Graphs Part 2',
+        props: { url: 'https://www.youtube.com/embed/qi9ZlTiHIwY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Synthetic Division & Remainder Theorem',
+        props: { url: 'https://www.youtube.com/embed/u0ep4v_bweQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Long Division of Polynomials',
+        props: { url: 'https://www.youtube.com/embed/znsUfxzpiGE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Finding polynomials using the Linear Factorization Theorem',
+        props: { url: 'https://www.youtube.com/embed/vTJX40V4QIA' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Higher Order Polynomials Pt 1 Rational Zeros Descartes Rule',
+        props: { url: 'https://www.youtube.com/embed/hvjASm98Plk' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Higher Order Polynomials Pt 2 Rational Zeros Descartes Rule',
+        props: { url: 'https://www.youtube.com/embed/WLy5Mae_Z50' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Rational Functions Part 1',
+        props: { url: 'https://www.youtube.com/embed/LFjf22W9RBo' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Rational Functions Part 2',
+        props: { url: 'https://www.youtube.com/embed/K6YcEAMs_eU' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Composition of Functions',
+        props: { url: 'https://www.youtube.com/embed/T6-Zdr5w_bE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Inverse Functions',
+        props: { url: 'https://www.youtube.com/embed/5CPhScuRt_Y' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Combination of Functions Analytical & Graphical',
+        props: { url: 'https://www.youtube.com/embed/KcSqGToYsaA' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Modeling with Functions Part 1',
+        props: { url: 'https://www.youtube.com/embed/R0ccRWPMXtY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Modeling with Functions Part 2',
+        props: { url: 'https://www.youtube.com/embed/6J03bXYWyuY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Modeling with Functions Part 3',
+        props: { url: 'https://www.youtube.com/embed/s1eEpnOn3DU' },
+      },
     ],
   },
 

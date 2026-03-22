@@ -84,6 +84,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.0 Review of Factoring",
+        props: { url: "https://www.youtube.com/embed/LmFz8H6FrD0" }
+      },
+      {
         id: 'FunctionPlotter',
         title: 'Removable-Hole Visualization',
         caption: 'A graph of (x^2-4)/(x-2) shows the hole at x=2 that algebraic cancellation removes for limit evaluation.',

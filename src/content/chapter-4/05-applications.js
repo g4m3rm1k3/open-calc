@@ -56,6 +56,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I Final Exam Review",
+        props: { url: "https://www.youtube.com/embed/5Z7uZ4t_5dQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
+        props: { url: "https://www.youtube.com/embed/PqLgoyzgi40" }
+      },
     {
         id: 'VideoEmbed',
         title: "Hyperbolic Functions Derivative & Integrals 5 Examples Calculus 1",

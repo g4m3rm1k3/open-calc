@@ -85,6 +85,21 @@ export default {
       visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 1.2.2 Limits That Fail to Exist",
+        props: { url: "https://www.youtube.com/embed/HVHDuFSy7TQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
+        props: { url: "https://www.youtube.com/embed/tQCtDc3D0Ls" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.1.1 A Preview of Calculus",
+        props: { url: "https://www.youtube.com/embed/2-eZ6wkZrh8" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 6: Limits",
         props: { url: "https://www.youtube.com/embed/kfF40MiS7zA" }
       },

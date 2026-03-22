@@ -68,6 +68,26 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 5.2.2 Natural Logarithmic Integration: Difficult Examples",
+        props: { url: "https://www.youtube.com/embed/6ctiDVmcEWo" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
+        props: { url: "https://www.youtube.com/embed/Bh1nhf4a04o" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.5.2 Integration by Substitution: Definite Integrals",
+        props: { url: "https://www.youtube.com/embed/lBMJdzRMgu4" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.5.1 Integration by Substitution: Indefinite Integrals",
+        props: { url: "https://www.youtube.com/embed/4bflZuXoQ0s" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Intro to Substitution - Undoing the Chain Rule",
         props: { url: "https://www.youtube.com/embed/QcgacM1LSpA" }
       },

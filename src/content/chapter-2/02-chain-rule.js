@@ -74,6 +74,21 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 5.3.2 The Derivative of The Inverse of a Function",
+        props: { url: "https://www.youtube.com/embed/xZ6YgEZufLQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.4.2 Differentiation Strategies and Practice",
+        props: { url: "https://www.youtube.com/embed/IOOuXYCoQ4I" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.4.1 The Chain Rule and General Power Rule",
+        props: { url: "https://www.youtube.com/embed/Ptz1fa8lLyg" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
         props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
       },

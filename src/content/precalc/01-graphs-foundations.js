@@ -44,6 +44,36 @@ export default {
         mathBridge: 'Click anywhere on the plane to place a point and see its coordinates. Notice how the two numbers uniquely identify every location.',
         caption: 'The coordinate plane is a universal addressing system for the infinite flat plane.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Function vs Relation',
+        props: { url: 'https://www.youtube.com/embed/oFwRPH0JrFY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Visually identifying key characteristics of graphs.',
+        props: { url: 'https://www.youtube.com/embed/GALfCd-2XRQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Identifying Domain and Range from a Graph',
+        props: { url: 'https://www.youtube.com/embed/1UAKQ_2yfxI' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Equations of Lines and Graphing',
+        props: { url: 'https://www.youtube.com/embed/Wmi1EysOHUQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Lines in Slope Intercept Form y=mx+b',
+        props: { url: 'https://www.youtube.com/embed/5N3d1RdbADQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Equation of Parallel & Perpendicular Lines given Point & Line',
+        props: { url: 'https://www.youtube.com/embed/tYVWG8_inA4' },
+      },
     ],
   },
 

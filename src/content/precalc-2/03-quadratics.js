@@ -43,6 +43,26 @@ export default {
         mathBridge: 'See how $x^2 + bx$ becomes a perfect square. The missing corner has area $(b/2)^2$. Drag $b$ to change the shape.',
         caption: 'Adding and subtracting $(b/2)^2$ is adding zero in disguise — it changes the form but not the value.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Parabolas w/ vertex & intercepts',
+        props: { url: 'https://www.youtube.com/embed/eFZOnAcuVLM' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Parabola Applications Maximizing Minimizing Reflectors, etc',
+        props: { url: 'https://www.youtube.com/embed/ka2DpW7A9iQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Complex (imaginary) Numbers Part 1',
+        props: { url: 'https://www.youtube.com/embed/2LgMw_LgTe4' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Complex Solutions (imaginary) Part 2 of Parabola Quadratic Equation',
+        props: { url: 'https://www.youtube.com/embed/eliOsy3LzAs' },
+      },
     ],
   },
 

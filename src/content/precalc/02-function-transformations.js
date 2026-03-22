@@ -44,6 +44,26 @@ export default {
         caption: 'Every parameter has a single, predictable effect. Build the intuition by isolating one at a time.',
         props: { baseFunction: 'quadratic' },
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Transformation of Functions',
+        props: { url: 'https://www.youtube.com/embed/Ccq1aQDCfVE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Piecewise Functions Evaluating & Graphing',
+        props: { url: 'https://www.youtube.com/embed/JrM8cCH3Ips' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Average Rate of Change',
+        props: { url: 'https://www.youtube.com/embed/Xk99AGZ1Vy8' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Difference Quotient',
+        props: { url: 'https://www.youtube.com/embed/1mlkc3Pfxu4' },
+      },
     ],
   },
 

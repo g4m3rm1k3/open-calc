@@ -37,6 +37,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.3.2 The Derivative of The Inverse of a Function",
+        props: { url: "https://www.youtube.com/embed/xZ6YgEZufLQ" }
+      },
     {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Function",
@@ -57,6 +62,16 @@ export default {
         id: 'DualGraphSync',
         title: 'Reflection and Reciprocal Slopes (Symbolic View)',
         caption: 'As a point moves on f, the reflected point on f^(-1) shows reciprocal tangent slope at matching coordinates.',
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Evaluating Inverse Trigonometric Functions',
+        props: { url: 'https://www.youtube.com/embed/7t_pZGGxMdE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Evaluating Inverse Trigonometric Functions Full Length',
+        props: { url: 'https://www.youtube.com/embed/hxjmtDXXCzU' },
       },
     ],
   },

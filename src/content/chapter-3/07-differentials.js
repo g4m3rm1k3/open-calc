@@ -52,6 +52,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus - 3.9.2 Propagated and Relative Error in Differentials",
+        props: { url: "https://www.youtube.com/embed/FuX0i5dGmzI" }
+      },
     {
         id: 'VideoEmbed',
         title: "Introduction to Separable Differential Equations (7 Examples)",

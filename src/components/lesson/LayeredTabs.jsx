@@ -41,7 +41,7 @@ function SectionContent({ data }) {
 
   // Build an ordered list of content blocks: prose paragraphs, then callouts, then vizzes.
   // If data.blocks is provided, use that ordering directly. Otherwise use legacy fields.
-  const blocks = data.blocks ?? buildBlocks(data)
+  const blocks = data.blocks ?? buildBlocks(data); console.log("RENDERED BLOCKS:", blocks);
 
   return (
     <div className="space-y-4">
@@ -77,15 +77,46 @@ function SectionContent({ data }) {
 // Legacy: convert old-style {prose, callouts, visualizationId, visualizations} to blocks
 function buildBlocks(data) {
   const blocks = []
-  if (data.prose?.length) blocks.push({ type: 'prose', paragraphs: normalizeProseParagraphs(data.prose) })
-  for (const c of data.callouts ?? []) blocks.push({ type: 'callout', ...c })
-  // Single legacy visualizationId
-  if (data.visualizationId) blocks.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })
-  // Visualizations array — normalize both {id:...} and legacy {vizId:...} field names
-  for (const v of data.visualizations ?? []) {
-    const id = v.id ?? v.vizId
-    if (id) blocks.push({ type: 'viz', ...v, id })
+
+  const paragraphs = data.prose ? normalizeProseParagraphs(data.prose) : []
+  const callouts = data.callouts ? [...data.callouts] : []
+  const vizzes = []
+
+  if (data.visualizationId) {
+    vizzes.push({ type: "viz", id: data.visualizationId, props: data.visualizationProps ?? {} })
   }
+
+  if (data.visualizations) {
+    for (const v of data.visualizations) {
+      const id = v.id ?? v.vizId
+      if (id) vizzes.push({ type: "viz", ...v, id })
+    }
+  }
+
+  // Interleave logic
+  const totalItems = paragraphs.length
+  let pIndex = 0
+
+  while (pIndex < totalItems || vizzes.length > 0 || callouts.length > 0) {
+    // Add 1 or 2 paragraphs
+    const chunk = []
+    if (pIndex < totalItems) chunk.push(paragraphs[pIndex++])
+    if (pIndex < totalItems && Math.random() > 0.5) chunk.push(paragraphs[pIndex++])
+    
+    if (chunk.length > 0) {
+      blocks.push({ type: "prose", paragraphs: chunk })
+    }
+
+    // Now weave in a visualization or a callout to make them inline with content
+    if (vizzes.length > 0) {
+      blocks.push(vizzes.shift())
+    } else if (callouts.length > 0) {
+      blocks.push({ type: "callout", ...callouts.shift() })
+    } else if (chunk.length === 0) {
+      break; 
+    }
+  }
+
   return blocks
 }
 

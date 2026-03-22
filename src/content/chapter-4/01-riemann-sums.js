@@ -53,6 +53,21 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 4.2.3 Find the Area Under a Curve Using the Limit Definition",
+        props: { url: "https://www.youtube.com/embed/m-6psP0zwzw" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.2.2 Approximating the Area Under a Curve",
+        props: { url: "https://www.youtube.com/embed/yaSOGR0xb90" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.2.1 Sigma Notation and Summation Formulas",
+        props: { url: "https://www.youtube.com/embed/hWZp1ld9184" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 8: What does area have to do with slope?",
         props: { url: "https://www.youtube.com/embed/FnJqaIESC2s" }
       },

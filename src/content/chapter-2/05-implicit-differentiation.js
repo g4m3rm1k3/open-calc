@@ -49,6 +49,11 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 2.5.1 Implicit Differentiation",
+        props: { url: "https://www.youtube.com/embed/0BmSo_M3iKo" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 5: Implicit differentiation, what's going on here?",
         props: { url: "https://www.youtube.com/embed/qb40J4N1fa4" }
       },

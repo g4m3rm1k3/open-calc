@@ -75,6 +75,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.1.2 The Derivative Using the Definition of a Derivative",
+        props: { url: "https://www.youtube.com/embed/tyoukQr2_ck" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.1.1 The Slope of the Tangent Line Using the Definition of Slope",
+        props: { url: "https://www.youtube.com/embed/foJyD3g8mLw" }
+      },
     {
         id: 'VideoEmbed',
         title: "Graphical Comparison Function to its 1st and 2nd Derivative Calculus 1 AB",

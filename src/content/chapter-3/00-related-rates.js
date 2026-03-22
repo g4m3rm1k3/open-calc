@@ -62,6 +62,16 @@ export default {
     ],
   
       visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.6.2 Related Rates - Modeling with Triangles",
+        props: { url: "https://www.youtube.com/embed/EqVOHGAXnpY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.6.1 Related Rates - Modeling with Circles",
+        props: { url: "https://www.youtube.com/embed/2s7SOe3tSKI" }
+      },
     {
         id: 'VideoEmbed',
         title: "Calculus Related Rates Example Volume of Cone Calculus 1 AB",

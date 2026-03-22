@@ -223,6 +223,21 @@ const VIZ_REGISTRY = {
   TriangleAreaViz:               lazy(() => import('./d3/TriangleAreaProof.jsx')),
   AlgebraSquareViz:              lazy(() => import('./d3/PythagoreanProof.jsx')),
   TruthTableViz:                 lazy(() => import('./react/TruthTableLab.jsx')),
+  // Precalc 3 — Trig identities
+  UnitCircleIdentityViz:         lazy(() => import('./d3/UnitCircleIdentityViz.jsx')),
+  DoubleAngleViz:                lazy(() => import('./d3/DoubleAngleViz.jsx')),
+  AngleAdditionProofViz:         lazy(() => import('./d3/AngleAdditionProofViz.jsx')),
+  PowerReductionViz:             lazy(() => import('./d3/PowerReductionViz.jsx')),
+  // Precalc 3 — Trig in calculus
+  TrigSubstitutionViz:           lazy(() => import('./d3/TrigSubstitutionViz.jsx')),
+  TrigIntegrationStrategyViz:    lazy(() => import('./react/TrigIntegrationStrategyViz.jsx')),
+  // Precalc 3 — Logarithms
+  LogAsAreaViz:                  lazy(() => import('./d3/LogAsAreaViz.jsx')),
+  LogLawsViz:                    lazy(() => import('./d3/LogLawsViz.jsx')),
+  // Precalc 3 — Inverse trig
+  InverseTrigViz:                lazy(() => import('./d3/InverseTrigViz.jsx')),
+  // Precalc 3 — Applications
+  SinusoidalModelViz:            lazy(() => import('./d3/SinusoidalModelViz.jsx')),
 }
 
 function VizSkeleton() {

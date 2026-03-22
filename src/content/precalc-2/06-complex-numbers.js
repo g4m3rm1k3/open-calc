@@ -43,6 +43,26 @@ export default {
         mathBridge: 'Place two complex numbers. Multiply them. Watch the moduli multiply and the angles add. Drag one to animate.',
         caption: 'Multiplying by $e^{i\\theta}$ is a pure rotation by $\\theta$ — no scaling. This is the geometric heart of Euler\'s formula.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Complex Numbers in Polar Form',
+        props: { url: 'https://www.youtube.com/embed/wed_lYcslRM' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Product & Quotient of Polar Complex Numbers',
+        props: { url: 'https://www.youtube.com/embed/htSPzT5izaE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: "De Moivre's Theorem powers of Polar Complex Numbers",
+        props: { url: 'https://www.youtube.com/embed/l5CQGJQs6BQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: "De Moivre's Theorem Roots of Polar Complex Numbers",
+        props: { url: 'https://www.youtube.com/embed/xPn8pHCZL18' },
+      },
     ],
   },
 

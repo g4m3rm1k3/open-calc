@@ -53,6 +53,46 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 3.6.2 Curve Sketching Using Derivatives",
+        props: { url: "https://www.youtube.com/embed/uMdP-VTEC38" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.6.1 Curve Sketching Using Graph Attributes",
+        props: { url: "https://www.youtube.com/embed/F8aXjLq4nuA" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.4.2 The Second Derivative Test",
+        props: { url: "https://www.youtube.com/embed/q5DlN-7dppY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.4.1 Intervals of Concavity and Points of Inflection",
+        props: { url: "https://www.youtube.com/embed/B9xZ8len2gQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.3.2 The First Derivative Test",
+        props: { url: "https://www.youtube.com/embed/ySpumpFbVlU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.3.1 Increasing and Decreasing Functions",
+        props: { url: "https://www.youtube.com/embed/0JlO_zHCajM" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
+        props: { url: "https://www.youtube.com/embed/kjunIwj2sv0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
+        props: { url: "https://www.youtube.com/embed/BfJauiDEc_M" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 9: Higher order derivatives",
         props: { url: "https://www.youtube.com/embed/blcC0sBnmUE" }
       },

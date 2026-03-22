@@ -49,6 +49,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.7.2 Inverse Trigonometric Functions: Differentiation",
+        props: { url: "https://www.youtube.com/embed/xoBwEFKVHKE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.3.2 Trigonometric and Higher-Order Derivatives",
+        props: { url: "https://www.youtube.com/embed/cHaZmLIyWjg" }
+      },
     {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Trigonometric Functions",
@@ -130,6 +140,31 @@ export default {
         title: 'Inverse Bridge: From sin to arcsin',
         mathBridge: 'If $y = \\arcsin x$, then $\\sin y = x$. Implicit differentiation gives $\\cos y \\cdot \\frac{dy}{dx} = 1$, so $\\frac{dy}{dx} = \\frac{1}{\\cos y}$. Since $\\sin y = x$, a right triangle gives $\\cos y = \\sqrt{1-x^2}$. Therefore $\\frac{d}{dx}[\\arcsin x] = \\frac{1}{\\sqrt{1-x^2}}$. The triangle converts the trig back to algebra.',
         caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/√(1−x²).',
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Setting up the Unit Circle Part 1 and Reference Angle',
+        props: { url: 'https://www.youtube.com/embed/j5SoWzBSUmY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Fundamental Trigonometric Identities Intro & Proofs',
+        props: { url: 'https://www.youtube.com/embed/W6GbAtk08Vo' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Intro to Fundamental Trig Identities',
+        props: { url: 'https://www.youtube.com/embed/zHswnV-Na40' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Understanding Basic Sine & Cosine Graphs',
+        props: { url: 'https://www.youtube.com/embed/qQOKUIrcuRs' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Evaluating Trig Functions w/ Unit Circle Degrees & Radians',
+        props: { url: 'https://www.youtube.com/embed/NO4H4YROdqk' },
       },
     ],
   },

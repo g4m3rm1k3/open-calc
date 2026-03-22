@@ -52,6 +52,26 @@ export default {
     visualizationId: 'ContinuityViz',
     visualizationProps: {},
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.4.3 The Intermediate Value Theorem",
+        props: { url: "https://www.youtube.com/embed/U4ybtvvZKS0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.4.2 Properties of Continuity",
+        props: { url: "https://www.youtube.com/embed/3j3439F_yIY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.4.1 Continuity",
+        props: { url: "https://www.youtube.com/embed/j8bdlwYNwe8" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.2.2 Limits That Fail to Exist",
+        props: { url: "https://www.youtube.com/embed/HVHDuFSy7TQ" }
+      },
     {
         id: 'VideoEmbed',
         title: "Intermediate Value Theorem Calculus 1 AB PreCalculus",

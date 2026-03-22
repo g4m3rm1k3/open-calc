@@ -43,6 +43,21 @@ export default {
     visualizationId: 'SqueezeTheorem',
     visualizationProps: {},
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.3.2 Finding Limits of Indeterminant Form Functions",
+        props: { url: "https://www.youtube.com/embed/gaSwzp7qp5k" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.3.1 Properties of Limits",
+        props: { url: "https://www.youtube.com/embed/98gn6FBSHAk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
+        props: { url: "https://www.youtube.com/embed/tQCtDc3D0Ls" }
+      },
     {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Trigonometric Functions Examples Calculus 1 AB",

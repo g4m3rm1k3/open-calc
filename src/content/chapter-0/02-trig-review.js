@@ -72,6 +72,26 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 5.7.1 Review: Inverse Trigonometric Functions",
+        props: { url: "https://www.youtube.com/embed/OMOBHc7Ct_Y" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.4.3 Graphs of Trigonometric Functions",
+        props: { url: "https://www.youtube.com/embed/dJ2dl9KQ-B0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.4.2 Solving Trigonometric Equations",
+        props: { url: "https://www.youtube.com/embed/SSsu_24dss4" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 0.4.1 Review of Trigonometric Functions",
+        props: { url: "https://www.youtube.com/embed/wwykal6Ms_g" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "TR-44: Trig Graph Variations 3",
         props: { url: "https://www.youtube.com/embed/LESdCLdTHVg" }
       },
@@ -343,6 +363,56 @@ export default {
         title: 'Why the Area of a Circle is πr²',
         mathBridge: 'Slice the circle into $n$ equal sectors and rearrange them alternating up/down into a near-rectangle. As $n\\to\\infty$: the width approaches half the circumference $= \\pi r$, the height approaches the radius $r$. Area of rectangle $= \\pi r \\cdot r = \\pi r^2$. This is a discrete approximation becoming exact in the limit — precisely the idea behind Riemann sums and integration that appears in Chapter 4.',
         caption: 'Cut the circle into sectors and rearrange them. As the number of sectors → ∞, the shape becomes a rectangle with area πr².',
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Setting up the Unit Circle Part 1 and Reference Angle',
+        props: { url: 'https://www.youtube.com/embed/j5SoWzBSUmY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Setting Up the Unit Circle Part 2',
+        props: { url: 'https://www.youtube.com/embed/FaZ7frx8nd8' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Fundamental Trigonometric Identities Intro & Proofs',
+        props: { url: 'https://www.youtube.com/embed/W6GbAtk08Vo' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Sum & Difference Identities Intro (5 Examples)',
+        props: { url: 'https://www.youtube.com/embed/YHgjEac9nl4' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Double & Half Angle Identities (9 Examples)',
+        props: { url: 'https://www.youtube.com/embed/4FELR35CovM' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Verifying Trigonometric Identities Intro (4 Examples)',
+        props: { url: 'https://www.youtube.com/embed/dGe7_FnI3e0' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Trigonometric Equations (5 Examples)',
+        props: { url: 'https://www.youtube.com/embed/9206OVkXH50' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Oblique Triangles Law of Sines',
+        props: { url: 'https://www.youtube.com/embed/FtYbQ8X7U_w' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Law of Cosines',
+        props: { url: 'https://www.youtube.com/embed/07w-wk8kRRE' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Evaluating Inverse Trigonometric Functions',
+        props: { url: 'https://www.youtube.com/embed/7t_pZGGxMdE' },
       },
     ],
   },

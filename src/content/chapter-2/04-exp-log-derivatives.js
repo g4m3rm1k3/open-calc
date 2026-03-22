@@ -49,6 +49,21 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I - 5.5.1 Logarithmic and Exponential Functions: Derivatives and Integrals (Base not e)",
+        props: { url: "https://www.youtube.com/embed/j5Y8b-f9B28" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
+        props: { url: "https://www.youtube.com/embed/ZeG2pTnj06M" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.1.2 The Natural Logarithmic Function: Differentiation",
+        props: { url: "https://www.youtube.com/embed/A0fzikOCTi8" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 4: What's so special about Euler's number e?",
         props: { url: "https://www.youtube.com/embed/m2MIpDrF7Es" }
       },
@@ -77,6 +92,31 @@ export default {
         title: 'Exponential/Log Bridge Lab',
         mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes.',
         caption: 'Switch between eˣ and ln(x) to connect growth intuition with the derivative formulas.',
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Logarithm Introduction',
+        props: { url: 'https://www.youtube.com/embed/UpUjJQGSlDY' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Using Properties of Logarithms to Expand Logs',
+        props: { url: 'https://www.youtube.com/embed/e4NAYp1EvzU' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Using Properties of Logarithms to Condense Logs',
+        props: { url: 'https://www.youtube.com/embed/EmYqoq0-1H0' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Change of Base Formula Logarithms',
+        props: { url: 'https://www.youtube.com/embed/-YdDWWokOqQ' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
+        props: { url: 'https://www.youtube.com/embed/Hm2DV0iruJk' },
       },
     ],
   },

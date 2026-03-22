@@ -53,6 +53,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.8.1 Inverse Trigonometric Functions: Integration",
+        props: { url: "https://www.youtube.com/embed/Fd7incsGR74" }
+      },
     {
         id: 'VideoEmbed',
         title: "Integration involving Natural Logarithm Function (5 Examples)",

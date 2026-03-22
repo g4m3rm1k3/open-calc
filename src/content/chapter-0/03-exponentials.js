@@ -52,6 +52,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.1.1 Review: Logarithmic and Exponential Functions",
+        props: { url: "https://www.youtube.com/embed/rFhfPzdo_2A" }
+      },
+      {
         id: 'ExponentialGrowth',
         props: { base: Math.E },
         title: 'Exponential Growth: Adjust the Base',
@@ -63,6 +68,16 @@ export default {
         title: 'Why e? The Slope at x = 0',
         mathBridge: 'The derivative of $b^x$ is $b^x\\ln b$. At $x=0$: slope $= b^0\\cdot\\ln b = \\ln b$. So the slope of $b^x$ at $x=0$ equals $\\ln b$. For $b=e$: $\\ln e = 1$, so $f\'(0)=1=f(0)$. This is the defining property of $e$ — the unique base where the slope at the origin equals the function value. For any other base, you get an extra factor of $\\ln b$ in every derivative, making the calculus more complicated.',
         caption: 'For f(x) = bˣ, slope at x = 0 equals ln(b). Only when b = e does slope = value = 1.',
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Graphing Exponential Functions w/ t-table or Transformations',
+        props: { url: 'https://www.youtube.com/embed/C5jnasB2x5Y' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Compound Interest Problems',
+        props: { url: 'https://www.youtube.com/embed/4EpI7UbQvUI' },
       },
     ],
   },

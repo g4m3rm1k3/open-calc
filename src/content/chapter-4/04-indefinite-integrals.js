@@ -51,6 +51,26 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
+        props: { url: "https://www.youtube.com/embed/ZeG2pTnj06M" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
+        props: { url: "https://www.youtube.com/embed/Bh1nhf4a04o" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.1.2 Initial Conditions and the Particular Solution to a Differential Equation",
+        props: { url: "https://www.youtube.com/embed/HHYVGhHiiu0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.1.1 Antiderivatives and the General Solution to a Differential Equation",
+        props: { url: "https://www.youtube.com/embed/1e4KTBlQ-Yc" }
+      },
     {
         id: 'VideoEmbed',
         title: "Integration Techniques Reviewed (5 Examples)",

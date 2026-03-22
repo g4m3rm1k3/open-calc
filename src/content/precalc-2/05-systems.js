@@ -43,6 +43,51 @@ export default {
         mathBridge: 'Drag the slope and intercept of each line. Watch the solution point move. Push the lines parallel to see "no solution." Overlap them for infinite solutions.',
         caption: 'The algebra finds a number; the geometry explains what that number means.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving Linear Systems with Substitution and Linear Combination (Simultaneous Equations)',
+        props: { url: 'https://www.youtube.com/embed/_4HoIwY2iJc' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Solving 3 Variable Linear Systems Substitution / Gaussian Elimination',
+        props: { url: 'https://www.youtube.com/embed/xkwSSOzuf3g' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: '3 Variable Systems: Parabola Equation Given 3 Points, Investment Word Problem',
+        props: { url: 'https://www.youtube.com/embed/myBAIjMIXK8' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Non-Square 3 Variable Linear Systems',
+        props: { url: 'https://www.youtube.com/embed/CkSx0nBzPrc' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: '2 Variable Non Linear Systems Substitution Method',
+        props: { url: 'https://www.youtube.com/embed/YmehUdNeQOc' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: '2 Variable Non Linear Systems Addition/Elimination Method',
+        props: { url: 'https://www.youtube.com/embed/HzCfZqcumQo' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Matrices and Gaussian-Jordan Elimination',
+        props: { url: 'https://www.youtube.com/embed/ybQbWYBEZzc' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Determinant of Square Matrices',
+        props: { url: 'https://www.youtube.com/embed/BXzYYfYqeYM' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Cramer's Rule Solving Systems of Equations",
+        props: { url: 'https://www.youtube.com/embed/MM5L3a1xjTg' },
+      },
     ],
   },
 

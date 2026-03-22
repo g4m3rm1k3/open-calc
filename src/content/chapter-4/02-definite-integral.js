@@ -56,6 +56,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.3.2 Evaluating Definite Integrals Without the FTC",
+        props: { url: "https://www.youtube.com/embed/yx0xTkdrYK8" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.3.1 Riemann Sums and Definite Integrals Defined",
+        props: { url: "https://www.youtube.com/embed/8W3gEuaj_0s" }
+      },
     {
         id: 'VideoEmbed',
         title: "Integration involving Inverse Trig Functions",

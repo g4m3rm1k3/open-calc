@@ -46,6 +46,21 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.4.3 The Second Fundamental Theorem of Calculus",
+        props: { url: "https://www.youtube.com/embed/ovAzNQs-GEE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
+        props: { url: "https://www.youtube.com/embed/PqLgoyzgi40" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 4.4.1 The Fundamental Theorem of Calculus",
+        props: { url: "https://www.youtube.com/embed/yfi5HUf9154" }
+      },
     {
         id: 'VideoEmbed',
         title: "Integrating Natural Logarithm Function Calculus 1 AB",

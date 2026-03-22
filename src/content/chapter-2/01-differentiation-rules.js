@@ -44,6 +44,21 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
+        title: "Calculus I -2.3.1 The Product and Quotient Rules for Derivatives",
+        props: { url: "https://www.youtube.com/embed/L66FBwEF8vc" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.2.2 Applying the Derivative to the Position Function",
+        props: { url: "https://www.youtube.com/embed/fZj7VhywNmE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Calculus I - 2.2.1 Basic Differentiation Rules",
+        props: { url: "https://www.youtube.com/embed/Vx_81lSo6Pk" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 2: Derivative formulas through geometry",
         props: { url: "https://www.youtube.com/embed/S0_qX4VJhMQ" }
       },

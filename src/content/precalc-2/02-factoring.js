@@ -43,6 +43,16 @@ export default {
         mathBridge: 'Drag tiles to rearrange the area model. Factoring means finding the dimensions of the rectangle that gives the target polynomial area.',
         caption: 'Each cell of the grid is one term from the multiplication. Factoring recovers the dimensions.',
       },
+      {
+        id: 'VideoEmbed',
+        title: 'Factoring Overview',
+        props: { url: 'https://www.youtube.com/embed/rL2MCdPy1cA' },
+      },
+      {
+        id: 'VideoEmbed',
+        title: 'Factoring Polynomials by Grouping',
+        props: { url: 'https://www.youtube.com/embed/9hSZEzBmG6M' },
+      },
     ],
   },
 
