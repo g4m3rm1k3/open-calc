@@ -60,6 +60,16 @@ export default {
         title: 'Backpropagation Is Chain Rule at Scale',
         body: '\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial a_2}\\cdot\\frac{\\partial a_2}{\\partial z_2}\\cdot\\frac{\\partial z_2}{\\partial a_1}\\cdot\\frac{\\partial a_1}{\\partial z_1}\\cdot\\frac{\\partial z_1}{\\partial w_1}\\;\\;\\text{(one weight in a deep net)}',
       },
+      {
+        type: 'warning',
+        title: 'Identify the Outermost Operation First',
+        body: '\\text{Before applying any rule, ask: "What is the LAST operation done?"} \\\\ f(x) = x^3\\sqrt{4x-1}: \\text{ last op is } \\times \\;\\Rightarrow\\; \\text{Product Rule is the outer rule.} \\\\ \\text{Chain Rule only fires inside } \\sqrt{4x-1}. \\text{ Skipping this check is the \\#1 exam error.}',
+      },
+      {
+        type: 'strategy',
+        title: 'Abstract Function Trap — Tables and Graphs',
+        body: "h'(a) = f'\\!\\left(\\underbrace{g(a)}_{\\text{Step 1: look up}}\\right) \\cdot g'(a) \\\\ \\text{Step 1: find } g(a) \\text{ from the table or graph.} \\\\ \\text{Step 2: evaluate } f' \\text{ at } g(a) \\text{, NOT at } a. \\\\ \\text{Writing } f'(a)\\cdot g'(a) \\text{ is the classic exam mistake.}",
+      },
     ],
     visualizations: [
       {
@@ -85,6 +95,18 @@ export default {
         title: 'Peel the Onion',
         mathBridge: 'For nested compositions like $f(g(h(x)))$, the extended chain rule gives $f\'(g(h(x)))\\cdot g\'(h(x))\\cdot h\'(x)$ — one derivative factor per layer. Each click peels one layer: differentiate the current outer function (keeping everything inside intact), then multiply by the derivative of the remaining inside. Stopping early or differentiating the inside prematurely are the two most common mistakes the peeler prevents.',
         caption: 'Differentiate from the outside in. Each peel produces one factor in the chain-rule product.',
+      },
+      {
+        id: 'BlindChainRuleLab',
+        title: 'Blindfolded Chain Rule — Table Version',
+        mathBridge: "When $h(x) = f(g(x))$, the formula $h'(a) = f'(g(a))\\cdot g'(a)$ is a two-step table lookup: (1) find $g(a)$ — your intermediate value; (2) look up $f'$ evaluated at $g(a)$, not at $a$. The most common exam error is reading $f'(a)$ directly, skipping the inner function evaluation entirely. This lab strips away all algebra to train pure Chain Rule grammar.",
+        caption: "Select the correct table cells to assemble h'(a). The grammar doesn't change when the functions have no formulas.",
+      },
+      {
+        id: 'NestedTrigMachine',
+        title: 'Trig Trap: sin(x²) vs sin²(x)',
+        mathBridge: 'Two expressions that look similar but are completely different compositions: $\\sin(x^2)$ has outer $\\sin$ and inner $x^2$ — derivative is $\\cos(x^2)\\cdot 2x$. But $\\sin^2(x)$ has outer $u^2$ and inner $\\sin x$ — derivative is $2\\sin(x)\\cos(x)$. The position of the exponent changes which function is outer and which is inner. This is the most common Chain Rule mistake on trig exams.',
+        caption: 'Toggle between sin(x²) and sin²(x) to see how the layer swap changes the derivative completely.',
       },
     ],
   },
@@ -117,6 +139,11 @@ export default {
         type: 'theorem',
         title: 'Triple Composition (Extended Chain Rule)',
         body: "\\frac{d}{dx}[f(g(h(x)))] = f'(g(h(x))) \\cdot g'(h(x)) \\cdot h'(x)",
+      },
+      {
+        type: 'strategy',
+        title: 'Combo Rule Decision Tree',
+        body: '\\text{Identify the outermost operation before choosing a rule:} \\\\ \\text{1. Outermost is } {\\times} \\text{ or } {\\div} \\;\\Rightarrow\\; \\text{Product / Quotient Rule. Chain Rule fires inside.} \\\\ \\text{2. Outermost is composition } f(g(x)) \\;\\Rightarrow\\; \\text{Chain Rule.} \\\\ \\text{3. Outermost is } {+} \\text{ or } {-} \\;\\Rightarrow\\; \\text{Split and differentiate term-by-term.}',
       },
     ],
     visualizations: [
@@ -530,6 +557,76 @@ export default {
       ],
       conclusion: 'At t=3, volume is increasing at 288\\pi cubic units per time unit.',
     },
+    {
+      id: 'ch2-002-ex11',
+      title: 'Abstract Function Trap — Reading a Table',
+      problem: '\\begin{array}{l} \\text{Let } h(x) = f(g(x)). \\text{ The table gives values at selected points:} \\\\[6pt] \\begin{array}{c|cccc} x & f(x) & g(x) & f\'(x) & g\'(x) \\\\\\hline 1 & 4 & 3 & 2 & -1 \\\\ 2 & 1 & 1 & 5 & 3 \\\\ 3 & 7 & 2 & -2 & 4 \\end{array} \\\\[6pt] \\text{Find } h\'(2) \\text{ and } h\'(3). \\end{array}',
+      steps: [
+        {
+          expression: "h'(x) = f'(g(x)) \\cdot g'(x)",
+          annotation: 'Write the Chain Rule formula. This holds for any differentiable f and g — no explicit formula needed.',
+        },
+        {
+          expression: "h'(2) = f'\\!\\left(\\underbrace{g(2)}_{?}\\right) \\cdot g'(2)",
+          annotation: "To compute h'(2): we need f' evaluated at g(2), not at 2. Look up g(2) from the table first.",
+          strategyTitle: 'Two-Step Table Lookup',
+          strategy: 'Step 1: find the inner value g(a). Step 2: look up f\' at that result — never at a itself.',
+          checkpoint: "Why is f'(g(2)) different from f'(2)? What table row do you look at for each?",
+        },
+        {
+          expression: "g(2) = 1, \\quad g'(2) = 3 \\quad \\text{(row } x=2\\text{)}",
+          annotation: "From the x=2 row: g(2)=1 and g'(2)=3.",
+        },
+        {
+          expression: "h'(2) = f'(\\underbrace{1}_{g(2)}) \\cdot 3",
+          annotation: "Substitute g(2)=1. We now need f'(1) — read from the x=1 row, not the x=2 row.",
+        },
+        {
+          expression: "f'(1) = 2 \\implies h'(2) = 2 \\cdot 3 = 6",
+          annotation: "From the x=1 row: f'(1)=2. Final answer: 2·3=6.",
+        },
+        {
+          expression: "h'(3) = f'(g(3)) \\cdot g'(3) = f'(2) \\cdot 4 = 5 \\cdot 4 = 20",
+          annotation: "For h'(3): g(3)=2 (row x=3), g'(3)=4 (row x=3). Then f'(g(3))=f'(2)=5 (row x=2). Result: 5·4=20.",
+        },
+      ],
+      conclusion: "h'(2)=6 and h'(3)=20. The two-step rule: evaluate the inner function first, then look up the outer derivative at that value. On exams, reading f'(a) instead of f'(g(a)) is by far the most common Chain Rule error with tables.",
+    },
+    {
+      id: 'ch2-002-ex12',
+      title: 'Combo Rule Boss Fight — Product Rule + Chain Rule',
+      problem: "f(x) = x^3\\sqrt{4x-1}. \\text{ Find } f'(x).",
+      steps: [
+        {
+          expression: "f(x) = \\underbrace{x^3}_{A(x)} \\cdot \\underbrace{\\sqrt{4x-1}}_{B(x)}",
+          strategyTitle: 'Find the Outermost Operation',
+          strategy: 'Ask: what is the LAST operation when evaluating at a number? Multiply two results together — so Product Rule is the outer rule.',
+          checkpoint: 'What would the very last step be if you plugged in x=5 and evaluated by hand?',
+          annotation: "The outermost operation is multiplication of x³ and √(4x-1). Product Rule is the outer rule. Chain Rule will appear only when differentiating B(x).",
+        },
+        {
+          expression: "A(x) = x^3 \\implies A'(x) = 3x^2",
+          annotation: 'Differentiate A = x³ by the power rule.',
+        },
+        {
+          expression: "B(x) = (4x-1)^{1/2} \\implies B'(x) = \\tfrac{1}{2}(4x-1)^{-1/2}\\cdot 4 = \\frac{2}{\\sqrt{4x-1}}",
+          annotation: 'Differentiate B = (4x-1)^(1/2) by Chain Rule: outer gives (1/2)u^(-1/2), inner gives 4. Simplify: (1/2)·4 = 2.',
+        },
+        {
+          expression: "f'(x) = A'B + AB' = 3x^2\\sqrt{4x-1} + x^3 \\cdot \\frac{2}{\\sqrt{4x-1}}",
+          annotation: 'Apply Product Rule: d/dx[AB] = A\'B + AB\'.',
+        },
+        {
+          expression: "= \\frac{3x^2(4x-1) + 2x^3}{\\sqrt{4x-1}}",
+          annotation: 'Write over common denominator √(4x-1). Multiply the first term top and bottom by √(4x-1).',
+        },
+        {
+          expression: "= \\frac{x^2(12x - 3 + 2x)}{\\sqrt{4x-1}} = \\frac{x^2(14x-3)}{\\sqrt{4x-1}}",
+          annotation: 'Factor out x² from the numerator: 3x²(4x-1)+2x³ = 12x³-3x²+2x³ = 14x³-3x² = x²(14x-3).',
+        },
+      ],
+      conclusion: "f'(x) = x²(14x-3)/√(4x-1). The outer rule was Product Rule; Chain Rule fired inside √(4x-1). The #1 mistake is reaching for Chain Rule first on a product — always identify the outermost operation before picking a rule.",
+    },
   ],
 
   challenges: [
@@ -620,11 +717,65 @@ export default {
       ],
       answer: "g'(x) = 4x\\,f(x^2+1)\\,f'(x^2+1)",
     },
+    {
+      id: 'ch2-002-ch4',
+      difficulty: 'medium',
+      problem: "\\text{Given: } g(4)=2,\\; g'(4)=-3,\\; f(2)=7,\\; f'(2)=5. \\text{ Let } h(x)=f(g(x)). \\text{ Find } h'(4).",
+      hint: "Apply h'(a) = f'(g(a))·g'(a). Read g(4) first, then look up f' at that value — not at 4.",
+      walkthrough: [
+        {
+          expression: "h'(4) = f'(g(4)) \\cdot g'(4)",
+          annotation: 'Write the Chain Rule formula for h = f∘g.',
+        },
+        {
+          expression: "g(4) = 2, \\quad g'(4) = -3",
+          annotation: 'Read the given values: the inner function value is 2 and its rate of change is −3.',
+        },
+        {
+          expression: "f'(g(4)) = f'(2) = 5",
+          annotation: "Evaluate f' at g(4)=2, not at 4. The given data says f'(2)=5.",
+        },
+        {
+          expression: "h'(4) = 5 \\cdot (-3) = -15",
+          annotation: "Multiply the two factors: f'(g(4))·g'(4) = 5·(−3) = −15.",
+        },
+      ],
+      answer: "h'(4) = -15",
+    },
+    {
+      id: 'ch2-002-ch5',
+      difficulty: 'hard',
+      problem: "\\text{Differentiate } f(x) = \\sin^2(x) \\cdot e^{3x}.",
+      hint: 'Outermost operation is multiplication (two factors) — Product Rule is outer. Each factor requires its own Chain Rule: d/dx[sin²x] and d/dx[e^(3x)].',
+      walkthrough: [
+        {
+          expression: "f(x) = \\underbrace{\\sin^2(x)}_{A} \\cdot \\underbrace{e^{3x}}_{B}",
+          annotation: 'Outermost operation is multiplication — Product Rule governs the structure.',
+        },
+        {
+          expression: "A'(x) = 2\\sin(x)\\cos(x)",
+          annotation: 'Differentiate A = (sin x)² by Chain Rule: outer is u², inner is sin x. Result: 2sin(x)·cos(x).',
+        },
+        {
+          expression: "B'(x) = 3e^{3x}",
+          annotation: 'Differentiate B = e^(3x) by Chain Rule: outer is e^u, inner is 3x. Result: e^(3x)·3.',
+        },
+        {
+          expression: "f'(x) = 2\\sin(x)\\cos(x)\\cdot e^{3x} + \\sin^2(x)\\cdot 3e^{3x}",
+          annotation: "Apply Product Rule: A'B + AB'.",
+        },
+        {
+          expression: "= e^{3x}\\sin(x)\\bigl[2\\cos(x) + 3\\sin(x)\\bigr]",
+          annotation: 'Factor out e^(3x) and sin(x) from both terms to reach the fully simplified form.',
+        },
+      ],
+      answer: "f'(x) = e^{3x}\\sin(x)\\bigl[2\\cos(x) + 3\\sin(x)\\bigr]",
+    },
   ],
 
   crossRefs: [
-    { lessonSlug: 'differentiation-rules', label: 'Power, Product, Quotient Rules', context: 'The chain rule is combined with these rules constantly. The generalized power rule is chain rule plus power rule.' },
-    { lessonSlug: 'trig-derivatives', label: 'Trig Derivatives', context: 'All trig derivative formulas extend to compositions via the chain rule: d/dx[sin(u)] = cos(u)u\'.' },
+    { lessonSlug: 'differentiation-rules', label: 'Power, Product, Quotient Rules', context: 'The chain rule is combined with these rules constantly. The generalized power rule is chain rule plus power rule. The Combo Rule Boss Fight (Example 12) shows how to identify which outer rule applies.' },
+    { lessonSlug: 'trig-derivatives', label: 'Trig Derivatives — sin(x²) vs sin²(x)', context: 'The most common Chain Rule mistake in trig: sin²(x) has outer u² and inner sin x, while sin(x²) has outer sin and inner x². The NestedTrigMachine visualization on the Trig Derivatives page shows this side-by-side.' },
     { lessonSlug: 'implicit-differentiation', label: 'Implicit Differentiation', context: 'Implicit differentiation is the chain rule applied to expressions in y where y = y(x).' },
   ],
 
@@ -642,8 +793,12 @@ export default {
     'completed-example-8',
     'completed-example-9',
     'completed-example-10',
+    'completed-example-11',
+    'completed-example-12',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',
+    'attempted-challenge-table',
+    'attempted-challenge-combo',
   ],
 };

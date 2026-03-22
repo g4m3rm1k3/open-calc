@@ -11,7 +11,11 @@
       "Bash(node --input-type=module:*)",
       "Bash(node -e \"import\\(''''./src/content/physics-1/chapter-0/index.js''''\\).catch\\(e => console.error\\(e.message\\)\\)\")",
       "Bash(node -e \"import\\(''mathjs''\\).then\\(m=>console.log\\(''mathjs version:'', m.version\\)\\).catch\\(e=>console.log\\(''not found:'', e.code\\)\\)\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep -E \"\\\\[a-z]{3,}\")",
+      "Bash(find src/content -name \"*.js\" -exec grep -l \"body:\\\\|problem:\\\\|answer:\" {})",
+      "Bash(grep -E \"\\\\\\\\\\(dfrac|frac|text|begin|displaystyle\\)\")",
+      "Bash(grep '\"\"katex\"\"' package.json)"
     ]
   }
 }
