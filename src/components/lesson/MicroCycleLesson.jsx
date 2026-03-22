@@ -63,7 +63,7 @@ function normalizeViz(v) {
   if (!v) return null
   const id = v.id ?? v.vizId
   if (!id) return null
-  return { id, props: v.props ?? v.visualizationProps ?? {}, title: v.title, caption: v.caption }
+  return { id, props: v.props ?? v.visualizationProps ?? {}, title: v.title, caption: v.caption, mathBridge: v.mathBridge }
 }
 
 function getSectionVizzes(section) {
@@ -113,6 +113,11 @@ function VizCard({ viz, borderColor = 'border-slate-200 dark:border-slate-700' }
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{viz.title}</p>
         </div>
       )}
+      {viz.mathBridge && (
+        <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50">
+          <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">{parseProse(viz.mathBridge)}</p>
+        </div>
+      )}
       <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
       {viz.caption && (
         <p className="text-xs text-slate-400 dark:text-slate-500 px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-100 dark:border-slate-800">
@@ -126,21 +131,42 @@ function VizCard({ viz, borderColor = 'border-slate-200 dark:border-slate-700' }
 // ─── 🧠 Intuition block ────────────────────────────────────────────────────
 
 function IntuitionBlock({ data }) {
-  const vizzes = getSectionVizzes(data)
-  const hasProse = data?.prose?.length > 0
-  const hasCallouts = data?.callouts?.length > 0
-  if (!hasProse && !hasCallouts && !vizzes.length) return null
+  const hasAlternate = data?.alternate?.prose?.length > 0
+    || data?.alternate?.callouts?.length > 0
+    || data?.alternate?.visualizations?.length > 0
+
+  const primaryVizzes = getSectionVizzes(data)
+  const hasPrimary = data?.prose?.length > 0 || data?.callouts?.length > 0 || primaryVizzes.length > 0
+  const alternateVizzes = hasAlternate ? getSectionVizzes(data.alternate) : []
+  if (!hasPrimary && !hasAlternate) return null
 
   return (
     <div className="mb-10">
       <SectionDivider icon="🧠" label="Intuition" color="slate" />
       <SectionContent data={data} />
-      {vizzes.length > 0 && (
+      {primaryVizzes.length > 0 && (
         <div className="mt-6 space-y-4">
-          {vizzes.map((viz, i) => (
+          {primaryVizzes.map((viz, i) => (
             <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-slate-200 dark:border-slate-700" />
           ))}
         </div>
+      )}
+      {hasAlternate && (
+        <>
+          <div className="my-8 flex items-center gap-3 text-slate-400 dark:text-slate-600">
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+            <span className="text-xs font-semibold uppercase tracking-widest">Another way to see it</span>
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+          </div>
+          <SectionContent data={data.alternate} />
+          {alternateVizzes.length > 0 && (
+            <div className="mt-6 space-y-4">
+              {alternateVizzes.map((viz, i) => (
+                <VizCard key={`alt-${viz.id}-${i}`} viz={viz} borderColor="border-slate-200 dark:border-slate-700" />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

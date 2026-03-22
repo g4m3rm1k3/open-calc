@@ -60,11 +60,13 @@ export default {
       {
         id: 'FunctionMachine',
         title: 'The Function Machine',
+        mathBridge: 'A function $f$ is a rule: for every input $x$ in the domain, it produces exactly one output $f(x)$. The machine enforces the one-output rule — if you could get two different outputs from the same input, it would fail the vertical line test and not be a function.',
         caption: 'Numbers go in, exactly one number comes out. Swap the rule to see how different functions behave.',
       },
       {
         id: 'GraphMorph',
         title: 'Function Families — Morphing',
+        mathBridge: 'Each function family has a characteristic shape determined by its formula: linear $f(x)=mx+b$ (straight lines), quadratic $f(x)=ax^2$ (parabolas), cubic $f(x)=ax^3$ (S-curves), exponential $f(x)=a^x$ (explosive growth), sine (smooth oscillation). Recognizing a function\'s family from its graph is the first step in understanding its calculus.',
         caption: 'Watch how the graph changes shape as you move between linear, quadratic, cubic, exponential, and sine. Each family has a distinct global personality.',
       },
     ],

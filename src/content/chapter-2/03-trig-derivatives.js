@@ -50,64 +50,76 @@ export default {
     ],
     visualizations: [
       {
-        id: 'TrigMotionBridgeLab',
-        title: 'Trig Motion Bridge Lab',
-        caption: 'Predict derivative signs from unit-circle motion and verify them instantly with the cosine readout.',
+        id: 'TrigDerivativeSync',
+        title: 'The "Moving Point" Deep Sync',
+        mathBridge: 'This shows three views of the same fact: $\\frac{d}{d\\theta}[\\sin\\theta] = \\cos\\theta$. The unit-circle panel shows where the point is. The middle panel shows the slope of the sine curve there. The right panel shows the cosine value. All three update together because slope of sine = cosine — every single angle.',
+        caption: 'Watch one angle drive three views at once: motion on the circle, slope of sine, and value of cosine. They stay synchronized because the sine slope is exactly cosine.',
       },
       {
         id: 'VelocityVectorProofLab',
         title: 'Velocity Vector Lab (Zero Algebra Proof)',
+        mathBridge: 'A point at angle $\\theta$ on the unit circle has position $\\vec{r} = (\\cos\\theta, \\sin\\theta)$. Its velocity vector is perpendicular to the radius: $\\vec{r}\' = (-\\sin\\theta, \\cos\\theta)$. The $y$-component of velocity is the rate of change of $y = \\sin\\theta$, and that component is $\\cos\\theta$. So $\\frac{d}{d\\theta}[\\sin\\theta] = \\cos\\theta$ — no limit algebra required.',
         caption: 'Drag theta and verify: radius is (cos(theta), sin(theta)) while velocity is (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), so d/dtheta[sin(theta)] = cos(theta).',
       },
       {
-        id: 'TrigDerivativeSync',
-        title: 'The "Moving Point" Deep Sync',
-        caption: 'Watch one angle drive three views at once: motion on the circle, slope of sine, and value of cosine. They stay synchronized because the sine slope is exactly cosine.',
+        id: 'TrigMotionBridgeLab',
+        title: 'Trig Motion Bridge Lab',
+        mathBridge: 'The sign of $\\frac{d}{d\\theta}[\\sin\\theta]$ tells you whether $\\sin\\theta$ is increasing or decreasing. When the point moves upward (first quadrant), $\\sin$ increases so the derivative is positive. At the top ($\\theta = \\pi/2$), motion is horizontal so $\\frac{d}{d\\theta}[\\sin(\\pi/2)] = \\cos(\\pi/2) = 0$. Motion direction determines derivative sign.',
+        caption: 'Predict derivative signs from unit-circle motion and verify them instantly with the cosine readout.',
       },
       {
         id: 'CoDirectionCompass',
         title: 'Why the Minus Sign? Co-Direction Compass',
+        mathBridge: 'As $\\theta$ increases, the point moves counterclockwise. The $x$-coordinate ($\\cos\\theta$) moves left in the first and second quadrants — a decrease — so its rate of change is negative. That is why $\\frac{d}{dx}[\\cos x] = -\\sin x$. The minus sign is not arbitrary; it reflects which direction the horizontal component moves.',
         caption: 'Track vertical and horizontal motion signs as theta increases. This turns d/dx[cos x] = -sin x into directional geometry.',
-      },
-      {
-        id: 'NestedTrigMachine',
-        title: 'Nested Machine: sin(x^2) vs sin^2(x)',
-        caption: 'Swap machine order to fix the most common chain-rule mistake. Square-then-sine and sine-then-square produce different derivatives.',
-      },
-      {
-        id: 'ChainRuleOnionLab',
-        title: 'Peel-the-Onion Chain Rule Lab',
-        caption: 'Practice peeling compositions in order. The outside changes first, the inside stays intact, then multiply by the core derivative.',
-      },
-      {
-        id: 'SpringOscillation',
-        title: 'Simple Harmonic Motion - Derivatives in Action',
-        caption: 'Position x(t)=A cos(t), velocity v(t)=-A sin(t), acceleration a(t)=-A cos(t). Each graph is the derivative of the one above.',
       },
       {
         id: 'DerivativeCycleClock',
         title: 'The Higher-Order Derivative Clock',
+        mathBridge: 'Each derivative shifts the trig wave by a quarter period: $\\sin x \\xrightarrow{d/dx} \\cos x \\xrightarrow{d/dx} -\\sin x \\xrightarrow{d/dx} -\\cos x \\xrightarrow{d/dx} \\sin x$. After 4 derivatives you return to the original — so $\\frac{d^4}{dx^4}[\\sin x] = \\sin x$. To find the $n$th derivative, use $n \\bmod 4$.',
         caption: 'Click d/dx to take successive derivatives. Every 4 steps returns to sin(x). Think of each derivative as a 90-degree phase rotation.',
       },
       {
+        id: 'SpringOscillation',
+        title: 'Simple Harmonic Motion — Derivatives in Action',
+        mathBridge: "Hooke's Law gives acceleration $a = -kx$, so the position satisfies $x''(t) = -\\omega^2 x(t)$. The solution is $x(t) = A\\cos(\\omega t)$. Its derivatives are $v(t) = x'(t) = -A\\omega\\sin(\\omega t)$ and $a(t) = x''(t) = -A\\omega^2\\cos(\\omega t)$. The spring obeys the same derivative cycle as the clock: each level is the derivative of the one above it.",
+        caption: 'Position x(t)=A cos(t), velocity v(t)=-A sin(t), acceleration a(t)=-A cos(t). Each graph is the derivative of the one above.',
+      },
+      {
         id: 'TangentExplosion',
-        title: 'Why tan(x) Explodes - Quotient Rule Intuition',
+        title: 'Why tan(x) Explodes — Quotient Rule Intuition',
+        mathBridge: '$\\tan x = \\frac{\\sin x}{\\cos x}$. Near $x = \\pi/2$: $\\sin(\\pi/2) = 1$ while $\\cos(\\pi/2) = 0$, so the fraction $\\frac{1}{0}$ has a vertical asymptote. The derivative is $\\frac{d}{dx}[\\tan x] = \\sec^2 x = \\frac{1}{\\cos^2 x}$, which also blows up at $x = \\pi/2$ for the same reason — the denominator goes to zero.',
         caption: 'Drag toward x = pi/2. cos(x) shrinks toward 0 while sin(x) stays near 1, so tan(x)=sin(x)/cos(x) explodes.',
       },
       {
         id: 'QuotientRuleTanBuilder',
         title: 'Interactive Quotient Rule Builder for tan(x)',
-        caption: 'Step through low d high minus high d low and watch cos^2(x)+sin^2(x) collapse to 1.',
+        mathBridge: 'Applying the quotient rule $\\frac{d}{dx}\\left[\\frac{f}{g}\\right] = \\frac{f\'g - fg\'}{g^2}$ to $\\tan x = \\frac{\\sin x}{\\cos x}$ gives $\\frac{\\cos x \\cdot \\cos x - \\sin x \\cdot (-\\sin x)}{\\cos^2 x} = \\frac{\\cos^2 x + \\sin^2 x}{\\cos^2 x} = \\frac{1}{\\cos^2 x} = \\sec^2 x$. The Pythagorean identity is the key simplification.',
+        caption: 'Step through "low d high minus high d low" and watch cos²(x)+sin²(x) collapse to 1.',
+      },
+      {
+        id: 'NestedTrigMachine',
+        title: 'Nested Machine: sin(x²) vs sin²(x)',
+        mathBridge: 'Composition order matters: $\\sin(x^2)$ means square first, then sine, giving $\\frac{d}{dx}[\\sin(x^2)] = \\cos(x^2) \\cdot 2x$. But $\\sin^2(x) = (\\sin x)^2$ means sine first, then square, giving $\\frac{d}{dx}[(\\sin x)^2] = 2\\sin x \\cos x$. The chain rule multiplies by the inner derivative — which is completely different in each case.',
+        caption: 'Swap machine order to fix the most common chain-rule mistake. Square-then-sine and sine-then-square produce different derivatives.',
+      },
+      {
+        id: 'ChainRuleOnionLab',
+        title: 'Peel-the-Onion Chain Rule Lab',
+        mathBridge: 'For a composition $h(x) = f(g(x))$: the chain rule says $h\'(x) = f\'(g(x)) \\cdot g\'(x)$. Peel the outermost layer, differentiate it (keeping the inside unchanged), then multiply by the derivative of the inside. Each peel corresponds to one multiplication in the chain.',
+        caption: 'Practice peeling compositions in order. The outside changes first, the inside stays intact, then multiply by the core derivative.',
       },
       {
         id: 'SineAdditionProofBuilder',
         title: 'Sine-of-a-Sum Proof Builder',
+        mathBridge: 'The limit proof of $\\frac{d}{dx}[\\sin x] = \\cos x$ uses two key trig limits: $\\lim_{h \\to 0} \\frac{\\sin h}{h} = 1$ and $\\lim_{h \\to 0} \\frac{\\cos h - 1}{h} = 0$. After expanding $\\sin(x+h)$ using the angle addition formula, these two limits turn the messy difference quotient into $\\cos x$.',
         caption: 'Follow the formal proof with strategy tags. The colored limit blobs show exactly where the final cosine comes from.',
       },
       {
         id: 'InverseBridgeTriangleLab',
         title: 'Inverse Bridge: From sin to arcsin',
-        caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/sqrt(1-x^2).',
+        mathBridge: 'If $y = \\arcsin x$, then $\\sin y = x$. Implicit differentiation gives $\\cos y \\cdot \\frac{dy}{dx} = 1$, so $\\frac{dy}{dx} = \\frac{1}{\\cos y}$. Since $\\sin y = x$, a right triangle gives $\\cos y = \\sqrt{1-x^2}$. Therefore $\\frac{d}{dx}[\\arcsin x] = \\frac{1}{\\sqrt{1-x^2}}$. The triangle converts the trig back to algebra.',
+        caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/√(1−x²).',
       },
     ],
   },
@@ -156,6 +168,31 @@ export default {
   },
 
   rigor: {
+    // Geometric proof steps — synced with SinDerivativeGeometric visualization
+    proofSteps: [
+      {
+        expression: 'P = (\\cos x,\\, \\sin x) \\text{ on the unit circle}',
+        annotation: 'Place a point P on the unit circle at angle x. Its y-coordinate is sin(x) — the value we want to differentiate.',
+      },
+      {
+        expression: '\\vec{OP} = (\\cos x,\\, \\sin x)',
+        annotation: 'The radius vector from the origin to P points in the direction (cos x, sin x). Its length is 1.',
+      },
+      {
+        expression: '\\vec{v} \\perp \\vec{OP} \\implies \\vec{v} = (-\\sin x,\\, \\cos x)',
+        annotation: 'As x increases, P moves around the circle. The velocity vector is tangent — perpendicular to the radius. The unique unit vector perpendicular to (cos x, sin x) is (−sin x, cos x).',
+      },
+      {
+        expression: 'v_x = -\\sin x \\quad v_y = +\\cos x',
+        annotation: 'Decompose the velocity: the x-component is −sin x and the y-component is cos x. These dashed arrows show how the full velocity splits.',
+      },
+      {
+        expression: '\\frac{d}{dx}[\\sin x] = v_y = \\cos x \\checkmark',
+        annotation: 'The y-coordinate of P is sin(x). Its rate of change (the y-component of velocity) is cos x. Therefore d/dx[sin x] = cos x. The geometry proves it without any algebra.',
+      },
+    ],
+    visualizationId: 'SinDerivativeGeometric',
+
     prose: [
       'We now prove d/dx[sin x] = cos x rigorously from the limit definition. This proof depends on two fundamental trigonometric limits, which we state but do not re-derive here (they were established in the limits chapter): lim(h\u21920) sin(h)/h = 1 and lim(h\u21920) (1 - cos h)/h = 0.',
       'PROOF that d/dx[sin x] = cos x: Using the limit definition, d/dx[sin x] = lim(h\u21920) [sin(x+h) - sin(x)] / h. Apply the sine addition formula: sin(x+h) = sin(x)cos(h) + cos(x)sin(h). So the numerator becomes: sin(x)cos(h) + cos(x)sin(h) - sin(x) = sin(x)[cos(h) - 1] + cos(x)sin(h). Dividing by h: sin(x) \u00b7 [cos(h)-1]/h + cos(x) \u00b7 sin(h)/h.',

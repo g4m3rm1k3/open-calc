@@ -67,29 +67,60 @@ export default {
         body: "lim(x→c) f(x) can exist even when f(c) doesn't. And even when f(c) does exist, the limit can be a DIFFERENT number. The limit only cares about what happens NEAR c, not AT c.",
       },
     ],
+    // Alternative explanation — physical/number-line angle
+    alternate: {
+      prose: [
+        'Think of a limit as a **shadow**. Stand at x = 2 and shine a light along the curve from both directions. The shadow the curve casts on the y-axis is the limit — even if the curve has a hole exactly at x = 2 and casts no shadow there.',
+        'Another way: imagine a **GPS tracker** on a car driving along the curve y = (x²−4)/(x−2). At x = 1.9, the car is at height 3.9. At x = 1.99, it is at 3.99. At x = 1.999, it is at 3.999. The car\'s GPS predicts it will be at height exactly **4** when it reaches x = 2 — even though there\'s a pothole (hole in the road) at x = 2 and the car briefly loses ground contact.',
+        'The limit IS the GPS prediction. It\'s what any reasonable extrapolation of the function\'s behavior tells you the value "should be" near that point.',
+        '**Why does this matter?** Because almost every formula in calculus involves a 0/0 or ∞−∞ form at exactly the point we care about. The derivative f\'(a) = lim(h→0) [f(a+h)−f(a)]/h gives 0/0 when h = 0. The limit sidesteps that problem — we ask where the expression is heading, not where it lands.',
+      ],
+      callouts: [
+        {
+          type: 'mnemonic',
+          title: 'GPS Prediction Rule',
+          body: 'The limit is the GPS prediction. The function value is ground truth. A pothole (undefined point or redefined value) does not change the prediction — it just means the car briefly leaves the road.',
+        },
+      ],
+      visualizations: [
+        {
+          id: 'LimitGeometric',
+          title: 'Visual: Both Sides Converge',
+          caption: 'Step through the animation. Red approaches from the left, blue from the right — both heading for the same target at y = 4, even though the function is undefined there.',
+        },
+      ],
+    },
+
     visualizations: [
       {
         id: 'LimitBridgeLab',
         title: 'Limit Bridge Lab — Intuition to Rigor',
+        mathBridge: 'This lab makes the limit definition concrete: $\\lim_{x \\to c} f(x) = L$ means you can get $f(x)$ as close to $L$ as you want by keeping $x$ close enough to $c$. The slider controls how close — shrinking $h$ on both sides toward the same target $L$ is exactly what the formal definition requires.',
         caption: 'Control the approach distance h, watch both sides close on the same target, then test your own limit estimate in game mode.',
       },
       {
         id: 'ZenoParadoxViz',
+        title: "Zeno's Paradox — Infinite Steps, Finite Sum",
+        mathBridge: 'Zeno argued that infinite steps must take infinite time — but calculus says otherwise. Each step here is half the previous: $\\frac{1}{2} + \\frac{1}{4} + \\frac{1}{8} + \\cdots$. The limit of this infinite sum is exactly 1. This is the same idea behind every limit: infinitely many approximations converging to one finite value.',
+        caption: 'Each bar is half the previous. The total approaches 1 — an infinite process with a finite result. This is a limit.',
       },
       {
         id: 'LimitApproach',
         props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4 },
         title: 'Approaching the Limit',
+        mathBridge: 'The function $f(x) = \\frac{x^2-4}{x-2}$ is undefined at $x=2$ (division by zero). But algebraically, $x^2-4 = (x+2)(x-2)$, so for $x \\neq 2$ we get $f(x) = x+2$. The limit as $x \\to 2$ is therefore $2+2 = 4$ — the value the function is "heading toward," even though it never arrives.',
         caption: 'Watch f(x) = (x²−4)/(x−2) as x approaches 2 from both sides. The hole at x=2 is real, but the limit is 4.',
       },
       {
         id: 'LimitRacingCar',
         title: 'Racing Car Approaching a Hole',
+        mathBridge: 'The car represents an input $x$ moving along the number line toward $c = 2$. Its height on the curve is $f(x)$. Even though $f(2)$ is undefined — a pothole — the car\'s trajectory makes clear that $f(x)$ is converging to 4. The limit only depends on the path, not whether the destination exists.',
         caption: 'A car drives along the function curve toward the hole at x=2. It gets arbitrarily close but never arrives — yet the limit is clear.',
       },
       {
         id: 'TwoSidedLimit',
         title: 'Left-Hand and Right-Hand Limits',
+        mathBridge: 'A two-sided limit $\\lim_{x \\to c} f(x) = L$ requires both one-sided limits to agree: $\\lim_{x \\to c^-} f(x) = L$ and $\\lim_{x \\to c^+} f(x) = L$. When the particles land at different values, the one-sided limits are unequal and the two-sided limit Does Not Exist (DNE). A jump discontinuity is the most common way this happens.',
         caption: 'Two particles approach from opposite sides. When they meet at the same value, the limit exists. When they land at different values — or one diverges — the limit does not exist.',
       },
     ],
@@ -137,17 +168,44 @@ export default {
         id: 'LimitApproach',
         props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4, showTable: true },
         title: 'Limit vs. Function Value',
+        mathBridge: 'The table shows numerical evidence for $\\lim_{x \\to 2} \\frac{x^2-4}{x-2} = 4$. Each row is a closer approximation — $x = 1.9, 1.99, 1.999, \\ldots$ from the left and $x = 2.1, 2.01, 2.001, \\ldots$ from the right. Both columns converge to 4. The graph and table tell the same story: the limit is a single agreed-upon value approached from both directions.',
         caption: 'The table updates in sync with the graph: both sides approach 4, even though f(2) is undefined.',
       },
       {
         id: 'HoleVsValue',
         title: 'Hole vs. Function Value — Three Cases',
+        mathBridge: 'The limit $\\lim_{x \\to c} f(x)$ and the function value $f(c)$ are independent. Three cases: (1) $f(c)$ undefined — the limit can still exist. (2) $f(c)$ defined but $f(c) \\neq L$ — the limit exists but disagrees with the value. (3) $f(c) = L$ — this is continuity. Only case 3 lets you evaluate a limit by substitution.',
         caption: 'Switch between three scenarios: undefined (hole), redefined (value ≠ limit), and continuous (value = limit). This is the core distinction calculus builds on.',
       },
     ],
   },
 
   rigor: {
+    // Geometric proof steps — synced with LimitGeometric visualization
+    proofSteps: [
+      {
+        expression: 'f(x) = \\frac{x^2 - 4}{x - 2}, \\quad f(2) = \\frac{0}{0} \\text{ (undefined)}',
+        annotation: 'The function has a hole at x = 2. We cannot simply plug in x = 2. The graph shows the line y = x + 2 with an open circle (hole) at (2, 4).',
+      },
+      {
+        expression: 'x \\to 2^- \\colon\\; f(x) \\to 4',
+        annotation: 'Approach from the LEFT: x = 1.9 → f = 3.9, x = 1.99 → f = 3.99, x = 1.999 → f = 3.999. The red dot slides toward (2, 4).',
+      },
+      {
+        expression: 'x \\to 2^+ \\colon\\; f(x) \\to 4',
+        annotation: 'Approach from the RIGHT: x = 2.1 → f = 4.1, x = 2.01 → f = 4.01, x = 2.001 → f = 4.001. The blue dot slides toward (2, 4).',
+      },
+      {
+        expression: '\\lim_{x \\to 2^-} f(x) = 4 = \\lim_{x \\to 2^+} f(x)',
+        annotation: 'Both sides converge to the SAME value: 4. When left-hand and right-hand limits agree, the two-sided limit exists. The box around the hole marks the limit value.',
+      },
+      {
+        expression: '\\therefore\\; \\lim_{x \\to 2} f(x) = 4, \\text{ even though } f(2) \\text{ is undefined}',
+        annotation: 'The limit is 4. The function value at x = 2 does not exist — but the limit does not care. It only asks what value the function APPROACHES, not what it equals AT the point.',
+      },
+    ],
+    visualizationId: 'LimitGeometric',
+
     prose: [
       'The informal idea "f(x) gets close to L as x gets close to c" is made mathematically precise by the **epsilon-delta definition**, developed by Augustin-Louis Cauchy and Karl Weierstrass in the 19th century. Before this definition, calculus was powerful but logically shaky — mathematicians could compute correctly but couldn\'t fully justify why.',
 

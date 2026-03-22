@@ -257,9 +257,7 @@ export default {
       answer: '\\text{The boat approaches the dock at } 5 \\text{ ft/s.}',
     },
   ],
-      answer: '\\text{The boat approaches the dock at } 5 \\text{ ft/s.}',
-    },
-  ],
+
 
   crossRefs: [
     { lessonSlug: 'implicit-differentiation', label: 'Implicit Differentiation', context: 'Related rates is implicit differentiation with t as the independent variable. Review Chapter 2\'s implicit differentiation lesson.' },

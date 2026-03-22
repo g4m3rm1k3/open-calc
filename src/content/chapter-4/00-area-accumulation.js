@@ -64,6 +64,7 @@ export default {
       {
         id: 'WaterTank',
         title: 'Variable Flow Rate → Water Accumulation',
+        mathBridge: 'The accumulated volume at time $t$ is $V(t) = \\int_0^t r(s)\\,ds$ — the signed area under the rate curve from $0$ to $t$. When $r(t) > 0$ (rate is positive), $V$ increases. When $r(t) < 0$ (water flowing out), $V$ decreases. This is the integral as a running total: $V\'(t) = r(t)$, which is the Fundamental Theorem of Calculus in action.',
         caption: 'The left panel shows the flow rate r(t) over time. The right panel shows the total water volume accumulated. As the rate dips below zero (water flowing out), the total decreases. The accumulated total at any time t is the signed area under the rate curve from 0 to t.',
       },
     ],

@@ -68,6 +68,7 @@ export default {
         id: 'SqueezeTheorem',
         props: {},
         title: 'The Squeeze in Action',
+        mathBridge: 'Here $f(x) = x\\sin(1/x)$. Since $|\\sin(\\theta)| \\leq 1$ for all $\\theta$, we have $-|x| \\leq x\\sin(1/x) \\leq |x|$. Both bounds $g(x)=-|x|$ and $h(x)=|x|$ satisfy $\\lim_{x\\to 0}g(x)=0$ and $\\lim_{x\\to 0}h(x)=0$. By the Squeeze Theorem: $\\lim_{x\\to 0} x\\sin(1/x)=0$, even though $\\sin(1/x)$ has no limit at all.',
         caption: 'The red function oscillates wildly, but it\'s trapped between the green upper and blue lower bounds. As x → 0, both bounds → 0, so the red function must also → 0. Watch the ε-band narrow to nothing.',
       },
     ],

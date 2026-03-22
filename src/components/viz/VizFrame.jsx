@@ -90,6 +90,8 @@ const VIZ_REGISTRY = {
   // Chapter 2 — Higher-order derivatives & trig intuition
   DerivativeCycleClock:          lazy(() => import('./d3/DerivativeCycleClock.jsx')),
   TangentExplosion:              lazy(() => import('./d3/TangentExplosion.jsx')),
+  SinDerivativeGeometric:        lazy(() => import('./d3/SinDerivativeGeometric.jsx')),
+  LimitGeometric:                lazy(() => import('./d3/LimitGeometric.jsx')),
   // Chapter 5 — New additions
   BisectionMethod:               lazy(() => import('./d3/BisectionMethod.jsx')),
   ShellMethod:                   lazy(() => import('./d3/ShellMethod.jsx')),
@@ -192,26 +194,23 @@ export default function VizFrame({ id, initialProps = {}, title }) {
 
   if (isExpanded) {
     return createPortal(
-      <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
-         <div className="w-full max-w-[95vw] sm:max-w-[90vw] h-[95vh] sm:max-h-[85vh] flex flex-col bg-white dark:bg-[#0f172a] shadow-2xl rounded-2xl overflow-hidden relative border border-slate-700">
-            {/* Header / Nav inside bounded container */}
-            <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-               <h2 className="text-xl font-bold truncate pr-4">{title || 'Interactive Visualizer'}</h2>
-               <button 
-                  onClick={() => setIsExpanded(false)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-1.5 px-4 rounded shadow transition-colors flex-shrink-0"
-               >
-                 Close
-               </button>
-            </div>
-            
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-auto p-4 sm:p-6 w-full flex items-center justify-center">
-               <div className="w-full max-w-5xl bg-white dark:bg-[#0f172a] rounded-xl">
-                   {content}
-               </div>
-            </div>
-         </div>
+      <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex flex-col">
+        {/* Header */}
+        <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 bg-slate-900 border-b border-slate-700">
+          <h2 className="text-sm font-bold text-white truncate">{title || 'Interactive Visualizer'}</h2>
+          <button
+            onClick={() => setIsExpanded(false)}
+            className="ml-4 flex-shrink-0 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold transition-colors"
+          >
+            ✕ Close
+          </button>
+        </div>
+        {/* Content — fills remaining height, scrolls if needed */}
+        <div className="flex-1 overflow-auto bg-white dark:bg-slate-950 p-4 sm:p-6">
+          <div className="w-full max-w-5xl mx-auto">
+            {content}
+          </div>
+        </div>
       </div>,
       document.body
     )
