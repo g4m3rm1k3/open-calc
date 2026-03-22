@@ -15,132 +15,57 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'A logarithm answers the question: what exponent do I need? $\\log_b(x) = y$ means $b^y = x$. But this framing hides why logarithms are useful in calculus.',
-      'The deeper view: $\\ln(x)$ is defined as the area under the curve $y = 1/t$ from $t=1$ to $t=x$. This is not a coincidence of notation — it is the actual definition that makes $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ obvious rather than mysterious.',
-      'This area definition also makes the log laws geometric. $\\ln(ab) = \\ln(a) + \\ln(b)$ because the area from 1 to $ab$ equals the area from 1 to $a$ plus a scaled copy of the area from 1 to $b$.',
-    ],
-    callouts: [
-      {
-        type: 'definition',
-        title: 'The area definition of $\\ln$',
-        body: '\\ln(x) \\overset{\\text{def}}{=} \\int_1^x \\frac{1}{t}\\,dt \\qquad (x > 0)',
-      },
-      {
-        type: 'insight',
-        title: 'Why this immediately gives us the derivative',
-        body: '\\frac{d}{dx}\\ln(x) = \\frac{d}{dx}\\int_1^x \\frac{1}{t}\\,dt = \\frac{1}{x} \\qquad \\text{(Fundamental Theorem of Calculus)}',
-      },
-      {
-        type: 'insight',
-        title: 'Why $e$ is the natural base',
-        body: 'e \\text{ is defined as the unique number where } \\int_1^e \\frac{1}{t}\\,dt = 1. \\text{ In other words, the area from 1 to } e \\text{ under } 1/t \\text{ is exactly 1.}',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LogAsAreaViz',
-        title: '$\\ln(x)$ as Area Under $1/t$',
+    blocks: [
+      { type: 'prose', paragraphs: ['A logarithm answers the question: what exponent do I need? $\\log_b(x) = y$ means $b^y = x$. But this framing hides why logarithms are useful in calculus.'] },
+      { type: 'viz', id: 'VideoEmbed', title: 'Logarithm Introduction', props: { url: 'https://www.youtube.com/embed/UpUjJQGSlDY' } },
+      { type: 'prose', paragraphs: ['The deeper view: $\\ln(x)$ is defined as the area under the curve $y = 1/t$ from $t=1$ to $t=x$. This is not a coincidence of notation — it is the actual definition that makes $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ obvious rather than mysterious.'] },
+      { type: 'callout', callout: { type: 'definition', title: 'The area definition of $\\ln$', body: '\\ln(x) \\overset{\\text{def}}{=} \\int_1^x \\frac{1}{t}\\,dt \\qquad (x > 0)' } },
+      { type: 'callout', callout: { type: 'insight', title: 'Why $e$ is the natural base', body: 'e \\text{ is defined as the unique number where } \\int_1^e \\frac{1}{t}\\,dt = 1. \\text{ In other words, the area from 1 to } e \\text{ under } 1/t \\text{ is exactly 1.}' } },
+      { type: 'viz', id: 'LogAsAreaViz', title: '$\\ln(x)$ as Area Under $1/t$',
         mathBridge: 'Drag $x$ and watch the shaded area change. The area equals $\\ln(x)$ exactly — this is the definition, not a fact to memorize.',
-        caption: 'When $x = e \\approx 2.718$, the area is exactly 1. That\'s what makes $e$ special.',
+        caption: "When $x = e \\approx 2.718$, the area is exactly 1. That's what makes $e$ special.",
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Logarithm Introduction',
-        props: { url: 'https://www.youtube.com/embed/UpUjJQGSlDY' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Logarithms',
-        props: { url: 'https://www.youtube.com/embed/GT6AYjgoFco' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Logarithmic Functions with Transformations 3 Examples',
-        props: { url: 'https://www.youtube.com/embed/Y-yonLqEdzU' },
+      { type: 'callout', callout: { type: 'insight', title: 'Why this immediately gives us the derivative', body: '\\frac{d}{dx}\\ln(x) = \\frac{d}{dx}\\int_1^x \\frac{1}{t}\\,dt = \\frac{1}{x} \\qquad \\text{(Fundamental Theorem of Calculus)}' } },
+      { type: 'prose', paragraphs: ['This area definition also makes the log laws geometric. $\\ln(ab) = \\ln(a) + \\ln(b)$ because the area from 1 to $ab$ equals the area from 1 to $a$ plus a scaled copy of the area from 1 to $b$.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Graphing Logarithms',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/GT6AYjgoFco', title: 'Graphing Logarithms' },
+          { url: 'https://www.youtube.com/embed/Y-yonLqEdzU', title: 'Graphing Log Functions with Transformations' },
+        ]},
       },
     ],
   },
 
   math: {
-    prose: [
-      'The log laws are not rules to memorize separately — they follow from the exponent laws applied to $b^{\\log_b x} = x$. If you know why $b^m \\cdot b^n = b^{m+n}$, you know why $\\log(ab) = \\log a + \\log b$.',
-      'In calculus, the chain rule version of $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ is the one you actually use: $\\frac{d}{dx}\\ln(f(x)) = \\frac{f\'(x)}{f(x)}$. This is called logarithmic differentiation and it\'s powerful.',
-      'The integral $\\int \\frac{1}{x}\\,dx = \\ln|x| + C$ is the most important antiderivative after the power rule — but it\'s also the one that has an exception the power rule can\'t handle: $\\int x^n\\,dx = \\frac{x^{n+1}}{n+1}$ breaks at $n = -1$. The natural log fills exactly that gap.',
-    ],
-    callouts: [
-      {
-        type: 'theorem',
-        title: 'Log Laws — derived, not memorized',
-        body: '\\ln(ab) = \\ln a + \\ln b \\qquad \\ln\\frac{a}{b} = \\ln a - \\ln b \\qquad \\ln(a^r) = r\\ln a',
-      },
-      {
-        type: 'theorem',
-        title: 'Change of Base',
-        body: '\\log_b(x) = \\frac{\\ln x}{\\ln b} \\qquad \\text{All logs are just scaled versions of } \\ln.',
-      },
-      {
-        type: 'theorem',
-        title: 'Calculus with $\\ln$ and $e^x$',
-        body: '\\frac{d}{dx}\\ln x = \\frac{1}{x} \\qquad \\frac{d}{dx}\\ln(f(x)) = \\frac{f\'(x)}{f(x)} \\qquad \\frac{d}{dx}e^x = e^x \\qquad \\int \\frac{1}{x}\\,dx = \\ln|x| + C',
-      },
-      {
-        type: 'warning',
-        title: 'The absolute value matters',
-        body: '\\int \\frac{1}{x}\\,dx = \\ln|x| + C, \\text{ not } \\ln(x) + C. \\text{ The domain of } \\ln \\text{ is } x > 0, \\text{ but } 1/x \\text{ is defined for } x < 0 \\text{ too.}',
-      },
-      {
-        type: 'insight',
-        title: 'The $n = -1$ gap in the power rule',
-        body: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\text{ for } n \\neq -1. \\quad \\text{When } n = -1\\text{: } \\int x^{-1}\\,dx = \\ln|x| + C.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LogLawsViz',
-        title: 'Log Laws as Area Addition',
+    blocks: [
+      { type: 'prose', paragraphs: ['The log laws are not rules to memorize separately — they follow from the exponent laws applied to $b^{\\log_b x} = x$. If you know why $b^m \\cdot b^n = b^{m+n}$, you know why $\\log(ab) = \\log a + \\log b$.'] },
+      { type: 'callout', callout: { type: 'theorem', title: 'Log Laws — derived, not memorized', body: '\\ln(ab) = \\ln a + \\ln b \\qquad \\ln\\frac{a}{b} = \\ln a - \\ln b \\qquad \\ln(a^r) = r\\ln a' } },
+      { type: 'viz', id: 'LogLawsViz', title: 'Log Laws as Area Addition',
         mathBridge: 'See why $\\ln(ab) = \\ln(a) + \\ln(b)$ is an area decomposition, not an algebraic coincidence.',
         caption: 'The area from 1 to $ab$ splits cleanly into two pieces corresponding to $\\ln a$ and $\\ln b$.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Change of Base Formula Logarithms',
-        props: { url: 'https://www.youtube.com/embed/-YdDWWokOqQ' },
+      { type: 'viz', id: 'VideoCarousel', title: 'Log Laws: Expand, Condense & Change of Base',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/e4NAYp1EvzU', title: 'Expanding Logarithms' },
+          { url: 'https://www.youtube.com/embed/EmYqoq0-1H0', title: 'Condensing Logarithms' },
+          { url: 'https://www.youtube.com/embed/-YdDWWokOqQ', title: 'Change of Base Formula' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Using Properties of Logarithms to Expand Logs',
-        props: { url: 'https://www.youtube.com/embed/e4NAYp1EvzU' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Using Properties of Logarithms to Condense Logs',
-        props: { url: 'https://www.youtube.com/embed/EmYqoq0-1H0' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Equations with Logarithms Pt 1',
-        props: { url: 'https://www.youtube.com/embed/fO06womr41k' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Equations with Logarithms Pt 2',
-        props: { url: 'https://www.youtube.com/embed/NRjfc_u-vyQ' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Equations with Logarithms Pt 3',
-        props: { url: 'https://www.youtube.com/embed/UZS2__IgFuw' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Logarithm Equations with Different Bases',
-        props: { url: 'https://www.youtube.com/embed/KNS75J5XpnE' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
-        props: { url: 'https://www.youtube.com/embed/Hm2DV0iruJk' },
+      { type: 'callout', callout: { type: 'theorem', title: 'Change of Base', body: '\\log_b(x) = \\frac{\\ln x}{\\ln b} \\qquad \\text{All logs are just scaled versions of } \\ln.' } },
+      { type: 'prose', paragraphs: ['In calculus, the chain rule version of $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ is the one you actually use: $\\frac{d}{dx}\\ln(f(x)) = \\frac{f\'(x)}{f(x)}$. This is called logarithmic differentiation and it\'s powerful.'] },
+      { type: 'callout', callout: { type: 'theorem', title: 'Calculus with $\\ln$ and $e^x$', body: '\\frac{d}{dx}\\ln x = \\frac{1}{x} \\qquad \\frac{d}{dx}\\ln(f(x)) = \\frac{f\'(x)}{f(x)} \\qquad \\frac{d}{dx}e^x = e^x \\qquad \\int \\frac{1}{x}\\,dx = \\ln|x| + C' } },
+      { type: 'prose', paragraphs: ['The integral $\\int \\frac{1}{x}\\,dx = \\ln|x| + C$ is the most important antiderivative after the power rule — but it\'s also the one that has an exception the power rule can\'t handle: $\\int x^n\\,dx = \\frac{x^{n+1}}{n+1}$ breaks at $n = -1$. The natural log fills exactly that gap.'] },
+      { type: 'callout', callout: { type: 'warning', title: 'The absolute value matters', body: '\\int \\frac{1}{x}\\,dx = \\ln|x| + C, \\text{ not } \\ln(x) + C. \\text{ The domain of } \\ln \\text{ is } x > 0, \\text{ but } 1/x \\text{ is defined for } x < 0 \\text{ too.}' } },
+      { type: 'callout', callout: { type: 'insight', title: 'The $n = -1$ gap in the power rule', body: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\text{ for } n \\neq -1. \\quad \\text{When } n = -1\\text{: } \\int x^{-1}\\,dx = \\ln|x| + C.' } },
+      { type: 'prose', paragraphs: ['Solving logarithmic and exponential equations: isolate the log or exponential, apply the inverse operation, and check for extraneous solutions (log requires positive argument).'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Solving Logarithmic Equations',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/fO06womr41k', title: 'Solving Log Equations Pt 1' },
+          { url: 'https://www.youtube.com/embed/NRjfc_u-vyQ', title: 'Solving Log Equations Pt 2' },
+          { url: 'https://www.youtube.com/embed/UZS2__IgFuw', title: 'Solving Log Equations Pt 3' },
+          { url: 'https://www.youtube.com/embed/KNS75J5XpnE', title: 'Log Equations with Different Bases' },
+          { url: 'https://www.youtube.com/embed/Hm2DV0iruJk', title: 'Solving Natural Exponential Equations' },
+        ]},
       },
     ],
   },

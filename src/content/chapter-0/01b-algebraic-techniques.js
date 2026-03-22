@@ -24,81 +24,20 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'When you substitute x = 2 into (x² − 4)/(x − 2), you get 0/0, which is undefined. ' +
-      'But this does not mean the limit does not exist—it means the limit is hiding behind a common factor that cancels away.',
-
-      'The intuition is always the same: **find and remove the obstacle (the common factor) that makes direct substitution fail.** ' +
-      'Once the obstacle is gone, you can substitute and compute the limit.',
-
-      'There are four main obstacle-removal techniques:',
-
-      '**Technique 1: Factor and Cancel**  ' +
-      'If both numerator and denominator have a common factor (like (x − 2)), factor it out and cancel. ' +
-      'Example: (x² − 4)/(x − 2) = (x − 2)(x + 2)/(x − 2) = x + 2 (for x ≠ 2). Now substitute.',
-
-      '**Technique 2: Multiply by a Conjugate**  ' +
-      'When you see √A − √B, multiply top and bottom by √A + √B. ' +
-      'The product (√A − √B)(√A + √B) = A − B, clearing the radicals and often creating a factorable form. ' +
-      'This is pure pattern recognition: √A − √B signals "use the conjugate."',
-      '**Technique 2b: Cube-Root Conjugate Pattern**  ' +
-      'When you see ∛A − ∛B, the matching factor is (∛A² + ∛(AB) + ∛B²) because ' +
-      '(u-v)(u²+uv+v²)=u³-v³. This is the cube-root analog of the square-root conjugate and appears in harder limit problems.',
-
-      '**Technique 3: Find a Common Denominator**  ' +
-      'Expressions like (1/(x + h) − 1/x) have fractions in the numerator. ' +
-      'Combine them over a common denominator, simplify, and the result often factors.',
-
-      '**Technique 4: Complete the Square**  ' +
-      'For quadratic expressions, completing the square converts x² + bx + c into (x + b/2)² − (b/2)² + c, ' +
-      'making the structure visible and sometimes allowing factorization or substitution.',
-
-      'The key insight: **none of these techniques is magic.** Each one transforms the expression into a form where the common obstacle (the removable singularity) is visible and can be cancelled.',
-    ],
-    callouts: [
-      {
-        type: 'insight',
-        title: 'Indeterminate 0/0 Signals a Common Factor',
-        body: 'If lim(x → a) f(x)/g(x) gives 0/0, then (x − a) divides both f(x) and g(x). Find the factorization and cancel (x − a). The limit is then lim(x → a) [remainder after cancelling].',
-      },
-      {
-        type: 'tip',
-        title: 'Recognize the Pattern',
-        body: 'x² − a² = (x − a)(x + a). x³ − a³ = (x − a)(x² + ax + a²). These appear constantly. Memorize difference of squares, sum/difference of cubes, and perfect square trinomials.',
-      },
-      {
-        type: 'technique',
-        title: 'The Conjugate Signal',
-        body: 'If you see √A ± √B in numerator or denominator, immediately think: multiply by the conjugate. Example: (√(x+1) − 2)/(x − 3) → multiply by (√(x+1) + 2)/(√(x+1) + 2).',
-      },
-      {
-        type: 'technique',
-        title: 'Cube-Root Conjugate Signal',
-        body: 'For ∛A − ∛B use u=∛A, v=∛B, then multiply by (u²+uv+v²). This converts cube roots to A−B so common factors can cancel.',
-      },
-      {
-        type: 'technique',
-        title: 'Decision Tree for 0/0 Forms',
-        body: 'Polynomial form? Factor. Has √ or ∛? Conjugate or special identity. Has 1/(x+h) form? Common denominator. Quadratic expression hidden? Complete the square.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 0.0 Review of Factoring",
-        props: { url: "https://www.youtube.com/embed/LmFz8H6FrD0" }
-      },
-      {
-        id: 'FunctionPlotter',
-        title: 'Removable-Hole Visualization',
+    blocks: [
+      { type: 'prose', paragraphs: ['When you substitute x = 2 into (x² − 4)/(x − 2), you get 0/0, which is undefined. But this does not mean the limit does not exist—it means the limit is hiding behind a common factor that cancels away.', 'The intuition is always the same: **find and remove the obstacle (the common factor) that makes direct substitution fail.** Once the obstacle is gone, you can substitute and compute the limit.'] },
+      { type: 'callout', callout: { type: 'insight', title: 'Indeterminate 0/0 Signals a Common Factor', body: 'If lim(x → a) f(x)/g(x) gives 0/0, then (x − a) divides both f(x) and g(x). Find the factorization and cancel (x − a). The limit is then lim(x → a) [remainder after cancelling].' } },
+      { type: 'prose', paragraphs: ['**Technique 1: Factor and Cancel** — If both numerator and denominator have a common factor (like (x − 2)), factor it out and cancel. Example: (x² − 4)/(x − 2) = (x − 2)(x + 2)/(x − 2) = x + 2 (for x ≠ 2). Now substitute.'] },
+      { type: 'callout', callout: { type: 'tip', title: 'Recognize the Pattern', body: 'x² − a² = (x − a)(x + a). x³ − a³ = (x − a)(x² + ax + a²). These appear constantly. Memorize difference of squares, sum/difference of cubes, and perfect square trinomials.' } },
+      { type: 'viz', id: 'VideoEmbed', title: 'Calc I 0.0 — Review of Factoring', props: { url: 'https://www.youtube.com/embed/LmFz8H6FrD0' } },
+      { type: 'viz', id: 'FunctionPlotter', title: 'Removable-Hole Visualization',
         caption: 'A graph of (x^2-4)/(x-2) shows the hole at x=2 that algebraic cancellation removes for limit evaluation.',
-        props: {
-          fn: '(x*x - 4)/(x - 2)',
-          xMin: -1,
-          xMax: 5,
-          label: 'f(x) = (x^2 - 4)/(x - 2)',
-        },
+        props: { fn: '(x*x - 4)/(x - 2)', xMin: -1, xMax: 5, label: 'f(x) = (x^2 - 4)/(x - 2)' },
       },
+      { type: 'prose', paragraphs: ['**Technique 2: Multiply by a Conjugate** — When you see √A − √B, multiply top and bottom by √A + √B. The product (√A − √B)(√A + √B) = A − B, clearing the radicals and often creating a factorable form. This is pure pattern recognition: √A − √B signals "use the conjugate."', '**Technique 2b: Cube-Root Conjugate** — When you see ∛A − ∛B, the matching factor is (∛A² + ∛(AB) + ∛B²) because (u-v)(u²+uv+v²)=u³-v³. This is the cube-root analog and appears in harder limit problems.'] },
+      { type: 'callout', callout: { type: 'technique', title: 'The Conjugate Signal', body: 'If you see √A ± √B in numerator or denominator, immediately think: multiply by the conjugate. Example: (√(x+1) − 2)/(x − 3) → multiply by (√(x+1) + 2)/(√(x+1) + 2).' } },
+      { type: 'prose', paragraphs: ['**Technique 3: Find a Common Denominator** — Expressions like (1/(x + h) − 1/x) have fractions in the numerator. Combine them over a common denominator, simplify, and the result often factors.', '**Technique 4: Complete the Square** — For quadratic expressions, completing the square converts x² + bx + c into (x + b/2)² − (b/2)² + c, making the structure visible and sometimes allowing factorization or substitution.'] },
+      { type: 'callout', callout: { type: 'technique', title: 'Decision Tree for 0/0 Forms', body: 'Polynomial form? Factor. Has √ or ∛? Conjugate or special identity. Has 1/(x+h) form? Common denominator. Quadratic expression hidden? Complete the square.' } },
     ],
   },
 

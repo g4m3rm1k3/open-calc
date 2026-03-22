@@ -15,193 +15,92 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'The general sinusoidal function $f(t) = A\\sin(Bt - C) + D$ has four parameters, each with a clear geometric meaning. $A$ is the amplitude — the maximum deviation from the midline, always positive. $B$ controls the period: period $= 2\\pi/|B|$. $C/B$ is the phase shift — how far the graph slides horizontally. $D$ is the vertical shift — the midline of the oscillation.',
-      'Reading these from a graph: the amplitude is half the distance from maximum to minimum. The period is the horizontal distance for one complete cycle. The midline is $D = (\\max + \\min)/2$. The phase shift is where the first peak or zero crossing occurs.',
-      'Solving trig equations requires finding all angles, not just one. $\\sin\\theta = 1/2$ has two solutions in $[0, 2\\pi)$: $\\pi/6$ and $5\\pi/6$. The general solution adds all multiples of the period: $\\pi/6 + 2k\\pi$ and $5\\pi/6 + 2k\\pi$ for any integer $k$. Forgetting the general solution is the most common error.',
-    ],
-    callouts: [
-      {
-        type: 'definition',
-        title: 'The four parameters of $A\\sin(Bt - C) + D$',
-        body: 'A: \\text{amplitude (half the peak-to-trough distance, always} > 0\\text{)} \\\\ \\frac{2\\pi}{|B|}: \\text{period (length of one complete cycle)} \\\\ \\frac{C}{B}: \\text{phase shift (positive = right, negative = left)} \\\\ D: \\text{vertical shift (midline of oscillation)}',
-      },
-      {
-        type: 'proof-map',
-        title: 'Strategy for solving $\\sin(\\theta) = k$',
-        body: '1.\\; \\text{Find the reference angle: } \\alpha = \\arcsin|k| \\\\ 2.\\; \\text{Identify quadrants where sin has the sign of } k \\\\ 3.\\; \\text{Write the two solutions in } [0, 2\\pi) \\\\ 4.\\; \\text{Add } + 2k\\pi \\text{ to each for the general solution}',
-      },
-      {
-        type: 'warning',
-        title: 'Phase shift sign convention',
-        body: 'A\\sin(B(t - h)) + D \\Rightarrow \\text{shift RIGHT by } h \\\\ A\\sin(Bt - C) + D \\Rightarrow \\text{shift right by } C/B \\\\ \\text{Factor B out of the argument before reading the phase shift.}',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'SinusoidalModelViz',
-        title: 'Sinusoidal Model — Live Parameter Control',
+    blocks: [
+      { type: 'prose', paragraphs: ['The general sinusoidal function $f(t) = A\\sin(Bt - C) + D$ has four parameters, each with a clear geometric meaning. $A$ is the amplitude — the maximum deviation from the midline, always positive. $B$ controls the period: period $= 2\\pi/|B|$. $C/B$ is the phase shift — how far the graph slides horizontally. $D$ is the vertical shift — the midline of the oscillation.'] },
+      { type: 'callout', callout: { type: 'definition', title: 'The four parameters of $A\\sin(Bt - C) + D$', body: 'A: \\text{amplitude (half the peak-to-trough distance, always} > 0\\text{)} \\\\ \\frac{2\\pi}{|B|}: \\text{period (length of one complete cycle)} \\\\ \\frac{C}{B}: \\text{phase shift (positive = right, negative = left)} \\\\ D: \\text{vertical shift (midline of oscillation)}' } },
+      { type: 'callout', callout: { type: 'warning', title: 'Phase shift sign convention', body: 'A\\sin(B(t - h)) + D \\Rightarrow \\text{shift RIGHT by } h \\\\ A\\sin(Bt - C) + D \\Rightarrow \\text{shift right by } C/B \\\\ \\text{Factor B out of the argument before reading the phase shift.}' } },
+      { type: 'viz', id: 'SinusoidalModelViz', title: 'Sinusoidal Model — Live Parameter Control',
         mathBridge: 'Adjust A, B, C, D with sliders. See how each one changes the graph and the equation simultaneously.',
         caption: 'Every periodic real-world phenomenon fits this template. Reading the parameters is the first step in modelling.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Standard Position Angles & Radians Part 1',
-        props: { url: 'https://www.youtube.com/embed/ABDKOmamIwo' },
+      { type: 'prose', paragraphs: ['Angles in standard position and the relationship between degrees and radians are fundamental. Linear speed $v = r\\omega$ where $\\omega$ is angular speed in rad/s — this connects circular motion to the sinusoidal model.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Standard Position & Angle Measures',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/ABDKOmamIwo', title: 'Standard Position Angles & Radians Pt 1' },
+          { url: 'https://www.youtube.com/embed/d0mmCN6rOXM', title: 'Standard Position Angles Pt 2' },
+          { url: 'https://www.youtube.com/embed/CMWK3ErKAhc', title: 'Angle Measures in Degrees, Minutes & Seconds' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Standard Position Angles Pt2 Converting Degrees and Radians',
-        props: { url: 'https://www.youtube.com/embed/d0mmCN6rOXM' },
+      { type: 'viz', id: 'VideoCarousel', title: 'Linear & Angular Speed',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/76Zh40KPQoY', title: 'Linear & Angular Speed Pt 1' },
+          { url: 'https://www.youtube.com/embed/iMgckNT8K6s', title: 'Linear & Angular Speed Pt 2' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Angle Measures in Degrees Minutes & Seconds DMS',
-        props: { url: 'https://www.youtube.com/embed/CMWK3ErKAhc' },
+      { type: 'prose', paragraphs: ['Reading these from a graph: the amplitude is half the distance from maximum to minimum. The period is the horizontal distance for one complete cycle. The midline is $D = (\\max + \\min)/2$. The phase shift is where the first peak or zero crossing occurs.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Graphing Sine & Cosine',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/qQOKUIrcuRs', title: 'Understanding Basic Sine & Cosine Graphs' },
+          { url: 'https://www.youtube.com/embed/yR7y8hyOpDU', title: 'Graphing Sine & Cosine Without a Calculator Pt 1' },
+          { url: 'https://www.youtube.com/embed/c1VD_LEs5ZY', title: 'Graphing Sine & Cosine Without a Calculator Pt 2' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Linear & Angular Speed Part 1',
-        props: { url: 'https://www.youtube.com/embed/76Zh40KPQoY' },
+      { type: 'viz', id: 'VideoEmbed', title: 'Finding the Equation of Sine/Cosine from a Graph', props: { url: 'https://www.youtube.com/embed/tZ-25bp24pE' } },
+      { type: 'viz', id: 'VideoEmbed', title: 'Water Depth Word Problem — Sinusoidal Model', props: { url: 'https://www.youtube.com/embed/Do0eJ-pRVT8' } },
+      { type: 'prose', paragraphs: ['Tangent and cotangent have period π and vertical asymptotes; secant and cosecant are reciprocals of cosine and sine with period 2π. Graph transformations apply the same A, B, C, D parameters.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Graphing Tan, Cot, Sec & Csc with Transformations',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/kMPtrgBO7ME', title: 'Intro to Tangent & Cotangent Graphs' },
+          { url: 'https://www.youtube.com/embed/qKa8HL_oHf0', title: 'Tangent & Cotangent Graphs with Transformations' },
+          { url: 'https://www.youtube.com/embed/EAyDXQnkPmY', title: 'Graphing Secant & Cosecant' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Linear & Angular Speed Part 2',
-        props: { url: 'https://www.youtube.com/embed/iMgckNT8K6s' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Understanding Basic Sine & Cosine Graphs',
-        props: { url: 'https://www.youtube.com/embed/qQOKUIrcuRs' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Sine & Cosine w/out a Calculator Pt1',
-        props: { url: 'https://www.youtube.com/embed/yR7y8hyOpDU' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Sine & Cosine w/out a Calculator Pt 2',
-        props: { url: 'https://www.youtube.com/embed/c1VD_LEs5ZY' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Equation of Sine and Cosine from a Graph',
-        props: { url: 'https://www.youtube.com/embed/tZ-25bp24pE' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Water Depth Word Problem Modeled with Cosine Sine Function',
-        props: { url: 'https://www.youtube.com/embed/Do0eJ-pRVT8' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Intro Tangent & Cotangent Graphs',
-        props: { url: 'https://www.youtube.com/embed/kMPtrgBO7ME' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Tangent & Cotangent Graphs w/ Transformations',
-        props: { url: 'https://www.youtube.com/embed/qKa8HL_oHf0' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Secant & Cosecant w/ t-table',
-        props: { url: 'https://www.youtube.com/embed/EAyDXQnkPmY' },
-      },
+      { type: 'prose', paragraphs: ['Solving trig equations requires finding all angles, not just one. $\\sin\\theta = 1/2$ has two solutions in $[0, 2\\pi)$: $\\pi/6$ and $5\\pi/6$. The general solution adds all multiples of the period: $\\pi/6 + 2k\\pi$ and $5\\pi/6 + 2k\\pi$ for any integer $k$. Forgetting the general solution is the most common error.'] },
+      { type: 'callout', callout: { type: 'proof-map', title: 'Strategy for solving $\\sin(\\theta) = k$', body: '1.\\; \\text{Find the reference angle: } \\alpha = \\arcsin|k| \\\\ 2.\\; \\text{Identify quadrants where sin has the sign of } k \\\\ 3.\\; \\text{Write the two solutions in } [0, 2\\pi) \\\\ 4.\\; \\text{Add } + 2k\\pi \\text{ to each for the general solution}' } },
     ],
   },
 
   math: {
-    prose: [
-      'For equations of the form $\\sin(f(x)) = k$, first solve $f(x) = \\arcsin k$ (and $f(x) = \\pi - \\arcsin k$ if sin), then solve the resulting equation for $x$. The period of $\\sin(Bx)$ is $2\\pi/|B|$, so the general solution repeats with that period.',
-      'Trig identities appear in solving equations: if you see $\\sin^2 x = 3/4$, the Pythagorean identity is irrelevant — just take square roots: $\\sin x = \\pm\\sqrt{3}/2$, giving four solutions in $[0, 2\\pi)$. If you see $2\\sin x\\cos x = 1$, recognise the double angle: $\\sin 2x = 1$, giving $2x = \\pi/2 + 2k\\pi$, so $x = \\pi/4 + k\\pi$.',
-      'The calculus connection: for a sinusoidal function $f(t) = A\\sin(Bt + C) + D$, the derivative is $f\'(t) = AB\\cos(Bt + C)$. The amplitude of the derivative is $|AB|$ — it is scaled by the frequency. Fast oscillations ($B$ large) have large derivatives. This is why high-frequency signals have large rates of change — a central fact in signal processing.',
-    ],
-    callouts: [
-      {
-        type: 'theorem',
-        title: 'General solutions for trig equations',
-        body: '\\sin\\theta = k \\Rightarrow \\theta = \\arcsin k + 2k\\pi \\text{ or } \\theta = \\pi - \\arcsin k + 2k\\pi \\\\ \\cos\\theta = k \\Rightarrow \\theta = \\pm\\arccos k + 2k\\pi \\\\ \\tan\\theta = k \\Rightarrow \\theta = \\arctan k + k\\pi \\quad (\\text{period is } \\pi)',
+    blocks: [
+      { type: 'prose', paragraphs: ['For equations of the form $\\sin(f(x)) = k$, first solve $f(x) = \\arcsin k$ (and $f(x) = \\pi - \\arcsin k$ if sin), then solve the resulting equation for $x$. The period of $\\sin(Bx)$ is $2\\pi/|B|$, so the general solution repeats with that period.'] },
+      { type: 'callout', callout: { type: 'theorem', title: 'General solutions for trig equations', body: '\\sin\\theta = k \\Rightarrow \\theta = \\arcsin k + 2k\\pi \\text{ or } \\theta = \\pi - \\arcsin k + 2k\\pi \\\\ \\cos\\theta = k \\Rightarrow \\theta = \\pm\\arccos k + 2k\\pi \\\\ \\tan\\theta = k \\Rightarrow \\theta = \\arctan k + k\\pi \\quad (\\text{period is } \\pi)' } },
+      { type: 'viz', id: 'VideoCarousel', title: 'Solving Trigonometric Equations',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/9206OVkXH50', title: 'Solving Trig Equations (5 Examples)' },
+          { url: 'https://www.youtube.com/embed/iZihVtFaAko', title: 'Single Angle Equations 0 to 2π' },
+          { url: 'https://www.youtube.com/embed/FcrXDkwPspU', title: 'Single Angle Equations All Solutions' },
+          { url: 'https://www.youtube.com/embed/wvwCwUxxIkE', title: 'Multiple Angle Equations 0 to 2π' },
+          { url: 'https://www.youtube.com/embed/u8kif93O1lY', title: 'Multiple Angle Equations All Solutions' },
+        ]},
       },
-      {
-        type: 'theorem',
-        title: 'Derivative of a sinusoidal model',
-        body: '\\frac{d}{dt}\\bigl[A\\sin(Bt+C)+D\\bigr] = AB\\cos(Bt+C) \\\\ \\text{Amplitude multiplied by frequency. Sine becomes cosine (phase shift of } \\pi/2\\text{).}',
+      { type: 'prose', paragraphs: ['Trig identities appear in solving equations: if you see $\\sin^2 x = 3/4$, the Pythagorean identity is irrelevant — just take square roots: $\\sin x = \\pm\\sqrt{3}/2$, giving four solutions in $[0, 2\\pi)$. If you see $2\\sin x\\cos x = 1$, recognise the double angle: $\\sin 2x = 1$, giving $2x = \\pi/2 + 2k\\pi$, so $x = \\pi/4 + k\\pi$.'] },
+      { type: 'prose', paragraphs: ['The **Law of Sines and Cosines** are required for solving oblique (non-right) triangles. The ambiguous case (SSA) may yield 0, 1, or 2 valid triangles — always check.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Law of Sines — Applications',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/FtYbQ8X7U_w', title: 'Oblique Triangles — Law of Sines' },
+          { url: 'https://www.youtube.com/embed/57nlvT_o8uw', title: 'Ambiguous Case for Law of Sines' },
+        ]},
       },
-      {
-        type: 'insight',
-        title: 'Reading a sinusoidal model from data',
-        body: '\\text{Given: max}=M, \\text{min}=m, \\text{period}=T, \\text{phase shift}=\\phi: \\\\ A = \\frac{M-m}{2}, \\quad D = \\frac{M+m}{2}, \\quad B = \\frac{2\\pi}{T}, \\quad C = B\\phi',
+      { type: 'viz', id: 'VideoCarousel', title: "Law of Cosines & Heron's Formula",
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/BINTSm6lTWE', title: "Law of Cosines & Heron's Area" },
+          { url: 'https://www.youtube.com/embed/07w-wk8kRRE', title: 'Law of Cosines' },
+          { url: 'https://www.youtube.com/embed/pyftYzmOwr4', title: "Oblique Triangle Area & Heron's Formula" },
+        ]},
       },
-    ],
-    visualizations: [
-      {
-        id: 'SinusoidalModelViz',
-        title: 'Reading Parameters from a Graph',
+      { type: 'viz', id: 'SinusoidalModelViz', title: 'Reading Parameters from a Graph',
         mathBridge: 'Given a graph, identify max, min, period, and phase — then recover A, B, C, D.',
         caption: 'The model-fitting procedure is systematic: amplitude first, then period, then midline, then phase.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Oblique Triangles Law of Sines',
-        props: { url: 'https://www.youtube.com/embed/FtYbQ8X7U_w' },
+      { type: 'callout', callout: { type: 'insight', title: 'Reading a sinusoidal model from data', body: '\\text{Given: max}=M, \\text{min}=m, \\text{period}=T, \\text{phase shift}=\\phi: \\\\ A = \\frac{M-m}{2}, \\quad D = \\frac{M+m}{2}, \\quad B = \\frac{2\\pi}{T}, \\quad C = B\\phi' } },
+      { type: 'viz', id: 'VideoCarousel', title: 'Applications — Navigation & Bearings',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/qMS0yOoF2c4', title: 'Applications of Law of Sines & Cosines' },
+          { url: 'https://www.youtube.com/embed/qYKsli4L3RM', title: 'Bearing Problems — Navigation (4 Examples)' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Ambiguous Case for Law of Sines',
-        props: { url: 'https://www.youtube.com/embed/57nlvT_o8uw' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Law of Cosine & Heron\'s Area of Triangle',
-        props: { url: 'https://www.youtube.com/embed/BINTSm6lTWE' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Law of Cosines',
-        props: { url: 'https://www.youtube.com/embed/07w-wk8kRRE' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Area of oblique triangles SAS SSS Heron\'s Formula',
-        props: { url: 'https://www.youtube.com/embed/pyftYzmOwr4' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Applications of Law of Sines and Cosines',
-        props: { url: 'https://www.youtube.com/embed/qMS0yOoF2c4' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometry Bearing Problems Navigation 4 Examples',
-        props: { url: 'https://www.youtube.com/embed/qYKsli4L3RM' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Trigonometric Equations (5 Examples)',
-        props: { url: 'https://www.youtube.com/embed/9206OVkXH50' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometric Equations Single Angle 0 to 2pi Restriction 5 Examples',
-        props: { url: 'https://www.youtube.com/embed/iZihVtFaAko' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Single Angle Trigonometric Equations All Solutions',
-        props: { url: 'https://www.youtube.com/embed/FcrXDkwPspU' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometric Equations Multiple Angles 0 to 2pi Restriction',
-        props: { url: 'https://www.youtube.com/embed/wvwCwUxxIkE' },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometric Equations Multiple Angles All Solutions',
-        props: { url: 'https://www.youtube.com/embed/u8kif93O1lY' },
-      },
+      { type: 'prose', paragraphs: ['The calculus connection: for a sinusoidal function $f(t) = A\\sin(Bt + C) + D$, the derivative is $f\'(t) = AB\\cos(Bt + C)$. The amplitude of the derivative is $|AB|$ — it is scaled by the frequency. Fast oscillations ($B$ large) have large derivatives.'] },
+      { type: 'callout', callout: { type: 'theorem', title: 'Derivative of a sinusoidal model', body: '\\frac{d}{dt}\\bigl[A\\sin(Bt+C)+D\\bigr] = AB\\cos(Bt+C) \\\\ \\text{Amplitude multiplied by frequency. Sine becomes cosine (phase shift of } \\pi/2\\text{).}' } },
     ],
   },
 

@@ -27,15 +27,12 @@ export default {
         title: 'Symmetry of Powers',
         body: "Look closely at the formula in the interactive below. If $n=4$, the terms are $x^4$, then $x^3h$, then $x^2h^2$, then $xh^3$, and finally $h^4$. The total power in each individual chunk always sums exactly to $n$.",
         type: 'tip'
-      }
-    ],
-    visualizations: [
-      {
-        id: 'PascalsTriangle',
-        title: 'The Blueprint for Polynomials',
+      },
+      { type: 'viz', id: 'PascalsTriangle', title: 'The Blueprint for Polynomials',
         caption: 'Drag the slider to build larger polynomials. Pay extremely close attention to the second block of the output. The coefficient is ALWAYS exactly the power $n$.',
-      }
-    ]
+      },
+      { type: 'viz', id: 'VideoEmbed', title: 'Binomial Theorem Introduction', props: { url: 'https://www.youtube.com/embed/G8dHmjgzVFM' } },
+    ],
   },
 
   math: {

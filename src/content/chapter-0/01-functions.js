@@ -18,137 +18,63 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'Think of a function as a machine with a single input slot and a single output slot. You feed in an input, and the machine reliably spits out exactly one output. Same input → same output, every time. No randomness, no ambiguity, no "it depends."',
-
-      'The crucial word is **exactly one**. A machine that sometimes gives two different outputs for the same input is not a function. This is why a circle is not a function of x: for x = 0, a circle of radius 1 gives both y = 1 and y = −1.',
-
-      'The **vertical line test** for graphs: draw every possible vertical line. If any vertical line intersects the graph at more than one point, the graph does not represent a function (because that x-value maps to multiple y-values).',
-
-      'The set of all allowed inputs is called the **domain**. The set of all actual outputs is called the **range** (or image). These might be smaller than you expect: the function f(x) = x² has domain ℝ, but its range is [0, ∞) — you can never get a negative output by squaring a real number.',
-
-      'We write **f : A → B** to say "f is a function from domain A to codomain B." We write **f(x) = [rule]** to specify the rule. The notation f(x) is read "f of x" — it means the output of the function f when given input x. It does NOT mean f times x.',
-
-      'When no domain is stated, we use the **natural domain**: the largest set of real numbers for which the formula produces a well-defined real output. Three things can go wrong:',
-      '1. **Division by zero**: exclude x values making the denominator zero.',
-      '2. **Even roots of negatives**: the expression under √ (or ⁴√, ⁶√, etc.) must be ≥ 0.',
-      '3. **Logarithm of a non-positive number**: log requires a strictly positive argument.',
-    ],
-    callouts: [
-      {
-        type: 'prior-knowledge',
-        title: 'You Use Functions Every Day',
-        body: 'Spreadsheet formulas (=SUM(A1:A5)), Google Maps routes (distance is a function of route), vending machines (press B3, get a snack) — these are all functions. You put something in, you get exactly one thing out. The math definition is the same idea, just more precise.',
-      },
-      {
-        type: 'intuition',
-        title: 'The Machine Metaphor',
-        body: 'Input x → ⎡ f ⎤ → Output f(x). One input, one output. f(x) is a value, not a product.',
-      },
-      {
-        type: 'warning',
-        title: 'Common notation confusion',
-        body: 'f(x) does NOT mean "f times x." The parentheses denote function application. Similarly, f(x+1) means "evaluate f at the input x+1" — do NOT simplify as f(x) + f(1) unless f is linear.',
-      },
-      {
-        type: 'misconception',
-        title: 'f(a + b) ≠ f(a) + f(b) in general',
-        body: "This property (called additivity) is only true for LINEAR functions. For example, (a+b)² ≠ a² + b², and sin(a+b) ≠ sin(a) + sin(b). Don't distribute functions like they're multiplication!",
-      },
-    ],
-    visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.3.1 The Inverse of a Function",
-        props: { url: "https://www.youtube.com/embed/YN8WzBCFLgQ" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 0.3 Functions and Their Graphs",
-        props: { url: "https://www.youtube.com/embed/DKLYIiqjKEc" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 0.2 Linear Models and Rates of Change",
-        props: { url: "https://www.youtube.com/embed/AnJlHSVOXTk" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 0.1 Graphs",
-        props: { url: "https://www.youtube.com/embed/LWuN4IX9dEE" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 0.0 Review of Factoring",
-        props: { url: "https://www.youtube.com/embed/LmFz8H6FrD0" }
-      },
-      {
-        id: 'FunctionMachine',
-        title: 'The Function Machine',
+    blocks: [
+      { type: 'prose', paragraphs: ['Think of a function as a machine with a single input slot and a single output slot. You feed in an input, and the machine reliably spits out exactly one output. Same input → same output, every time. No randomness, no ambiguity, no "it depends."'] },
+      { type: 'callout', callout: { type: 'prior-knowledge', title: 'You Use Functions Every Day', body: 'Spreadsheet formulas (=SUM(A1:A5)), Google Maps routes (distance is a function of route), vending machines (press B3, get a snack) — these are all functions. You put something in, you get exactly one thing out. The math definition is the same idea, just more precise.' } },
+      { type: 'callout', callout: { type: 'intuition', title: 'The Machine Metaphor', body: 'Input x → ⎡ f ⎤ → Output f(x). One input, one output. f(x) is a value, not a product.' } },
+      { type: 'viz', id: 'FunctionMachine', title: 'The Function Machine',
         mathBridge: 'A function $f$ is a rule: for every input $x$ in the domain, it produces exactly one output $f(x)$. The machine enforces the one-output rule — if you could get two different outputs from the same input, it would fail the vertical line test and not be a function.',
         caption: 'Numbers go in, exactly one number comes out. Swap the rule to see how different functions behave.',
       },
-      {
-        id: 'GraphMorph',
-        title: 'Function Families — Morphing',
-        mathBridge: 'Each function family has a characteristic shape determined by its formula: linear $f(x)=mx+b$ (straight lines), quadratic $f(x)=ax^2$ (parabolas), cubic $f(x)=ax^3$ (S-curves), exponential $f(x)=a^x$ (explosive growth), sine (smooth oscillation). Recognizing a function\'s family from its graph is the first step in understanding its calculus.',
+      { type: 'viz', id: 'VideoCarousel', title: 'Functions and Their Graphs',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/DKLYIiqjKEc', title: 'Calc I 0.3 — Functions & Their Graphs' },
+          { url: 'https://www.youtube.com/embed/oFwRPH0JrFY', title: 'Function vs Relation — Kim' },
+        ]},
+      },
+      { type: 'prose', paragraphs: ['The crucial word is **exactly one**. A machine that sometimes gives two different outputs for the same input is not a function. This is why a circle is not a function of x: for x = 0, a circle of radius 1 gives both y = 1 and y = −1.'] },
+      { type: 'callout', callout: { type: 'warning', title: 'Common notation confusion', body: 'f(x) does NOT mean "f times x." The parentheses denote function application. Similarly, f(x+1) means "evaluate f at the input x+1" — do NOT simplify as f(x) + f(1) unless f is linear.' } },
+      { type: 'prose', paragraphs: ['The **vertical line test** for graphs: draw every possible vertical line. If any vertical line intersects the graph at more than one point, the graph does not represent a function (because that x-value maps to multiple y-values).'] },
+      { type: 'prose', paragraphs: ['The set of all allowed inputs is called the **domain**. The set of all actual outputs is called the **range** (or image). These might be smaller than you expect: the function f(x) = x² has domain ℝ, but its range is [0, ∞) — you can never get a negative output by squaring a real number.'] },
+      { type: 'viz', id: 'VideoCarousel', title: 'Graphs, Domain & Range',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/LWuN4IX9dEE', title: 'Calc I 0.1 — Graphs' },
+          { url: 'https://www.youtube.com/embed/1UAKQ_2yfxI', title: 'Domain & Range — Kim' },
+        ]},
+      },
+      { type: 'prose', paragraphs: ['We write **f : A → B** to say "f is a function from domain A to codomain B." We write **f(x) = [rule]** to specify the rule. The notation f(x) is read "f of x" — it means the output of the function f when given input x. It does NOT mean f times x.'] },
+      { type: 'callout', callout: { type: 'misconception', title: 'f(a + b) ≠ f(a) + f(b) in general', body: "This property (called additivity) is only true for LINEAR functions. For example, (a+b)² ≠ a² + b², and sin(a+b) ≠ sin(a) + sin(b). Don't distribute functions like they're multiplication!" } },
+      { type: 'prose', paragraphs: ['When no domain is stated, we use the **natural domain**: the largest set of real numbers for which the formula produces a well-defined real output. Three things can go wrong:', '1. **Division by zero**: exclude x values making the denominator zero.', '2. **Even roots of negatives**: the expression under √ (or ⁴√, ⁶√, etc.) must be ≥ 0.', '3. **Logarithm of a non-positive number**: log requires a strictly positive argument.'] },
+      { type: 'viz', id: 'GraphMorph', title: 'Function Families — Morphing',
+        mathBridge: "Each function family has a characteristic shape determined by its formula: linear $f(x)=mx+b$ (straight lines), quadratic $f(x)=ax^2$ (parabolas), cubic $f(x)=ax^3$ (S-curves), exponential $f(x)=a^x$ (explosive growth), sine (smooth oscillation). Recognizing a function's family from its graph is the first step in understanding its calculus.",
         caption: 'Watch how the graph changes shape as you move between linear, quadratic, cubic, exponential, and sine. Each family has a distinct global personality.',
       },
     ],
   },
 
   math: {
-    prose: [
-      'Given a function, the first questions to ask are: what is its domain? What is its range? How does its graph look?',
-
-      '**Finding the natural domain**: set up inequalities to avoid all problems. If there is both a square root AND a denominator, both conditions must hold simultaneously (intersection of the constraint sets).',
-
-      '**Even and odd functions** — these symmetries simplify calculus significantly:',
-      '• A function is **even** if f(−x) = f(x) for all x in the domain. The graph is symmetric about the y-axis. Examples: f(x) = x², f(x) = cos x, f(x) = |x|.',
-      '• A function is **odd** if f(−x) = −f(x) for all x in the domain. The graph is symmetric about the origin (180° rotational symmetry). Examples: f(x) = x³, f(x) = sin x, f(x) = x.',
-      '• Most functions are neither even nor odd.',
-
-      '**Composition** f ∘ g means "apply g first, then apply f to the result": (f ∘ g)(x) = f(g(x)). The output of g becomes the input to f. Composition is generally not commutative: f ∘ g ≠ g ∘ f.',
-
-      '**Inverse functions**: f has an inverse f⁻¹ if and only if f is **one-to-one** (injective) — distinct inputs always produce distinct outputs. Graphically: the graph passes the horizontal line test. The inverse satisfies f⁻¹(f(x)) = x and f(f⁻¹(y)) = y. Geometrically, the graph of f⁻¹ is the reflection of the graph of f across the line y = x.',
-
-      '**Graph transformations** — understanding these lets you graph complicated functions from simple ones:',
-      '• y = f(x) + k: vertical shift UP by k',
-      '• y = f(x) − k: vertical shift DOWN by k',
-      '• y = f(x + h): horizontal shift LEFT by h (counterintuitive!)',
-      '• y = f(x − h): horizontal shift RIGHT by h',
-      '• y = af(x): vertical stretch by factor |a|; reflects over x-axis if a < 0',
-      '• y = f(bx): horizontal compression by factor |b|; reflects over y-axis if b < 0',
-    ],
-    callouts: [
-      {
-        type: 'definition',
-        title: 'Function (Formal)',
-        body: 'A function f: A \\to B assigns to each x \\in A exactly one element f(x) \\in B. \\\\ \\text{Domain} = A, \\quad \\text{Range} = \\{f(x) : x \\in A\\} \\subseteq B',
+    blocks: [
+      { type: 'prose', paragraphs: ['Given a function, the first questions to ask are: what is its domain? What is its range? How does its graph look?'] },
+      { type: 'prose', paragraphs: ['**Finding the natural domain**: set up inequalities to avoid all problems. If there is both a square root AND a denominator, both conditions must hold simultaneously (intersection of the constraint sets).'] },
+      { type: 'callout', callout: { type: 'definition', title: 'Function (Formal)', body: 'A function f: A \\to B assigns to each x \\in A exactly one element f(x) \\in B. \\\\ \\text{Domain} = A, \\quad \\text{Range} = \\{f(x) : x \\in A\\} \\subseteq B' } },
+      { type: 'viz', id: 'FunctionPlotter', props: { fn: 'x^2', xRange: [-3, 3], showGrid: true }, title: 'Function Plotter', caption: 'Plot any function and explore its graph.' },
+      { type: 'prose', paragraphs: ['**Even and odd functions** — these symmetries simplify calculus significantly:', '• A function is **even** if f(−x) = f(x) for all x in the domain. The graph is symmetric about the y-axis. Examples: f(x) = x², f(x) = cos x, f(x) = |x|.', '• A function is **odd** if f(−x) = −f(x) for all x in the domain. The graph is symmetric about the origin (180° rotational symmetry). Examples: f(x) = x³, f(x) = sin x, f(x) = x.', '• Most functions are neither even nor odd.'] },
+      { type: 'callout', callout: { type: 'definition', title: 'Even and Odd', body: '\\text{Even: } f(-x) = f(x) \\text{ for all } x \\in \\text{dom}(f) \\\\ \\text{Odd: } f(-x) = -f(x) \\text{ for all } x \\in \\text{dom}(f)' } },
+      { type: 'viz', id: 'VideoEmbed', title: 'Even & Odd Functions', props: { url: 'https://www.youtube.com/embed/WJvwUaRQdiY' } },
+      { type: 'prose', paragraphs: ['**Composition** f ∘ g means "apply g first, then apply f to the result": (f ∘ g)(x) = f(g(x)). The output of g becomes the input to f. Composition is generally not commutative: f ∘ g ≠ g ∘ f.'] },
+      { type: 'viz', id: 'VideoEmbed', title: 'Function Composition', props: { url: 'https://www.youtube.com/embed/T6-Zdr5w_bE' } },
+      { type: 'prose', paragraphs: ['**Inverse functions**: f has an inverse f⁻¹ if and only if f is **one-to-one** (injective) — distinct inputs always produce distinct outputs. Graphically: the graph passes the horizontal line test. The inverse satisfies f⁻¹(f(x)) = x and f(f⁻¹(y)) = y. Geometrically, the graph of f⁻¹ is the reflection of the graph of f across the line y = x.'] },
+      { type: 'callout', callout: { type: 'definition', title: 'Inverse Function', body: 'f^{-1} \\text{ exists iff } f \\text{ is one-to-one.} \\\\ f^{-1}(f(x)) = x \\text{ for all } x \\in \\text{dom}(f) \\\\ f(f^{-1}(y)) = y \\text{ for all } y \\in \\text{range}(f)' } },
+      { type: 'viz', id: 'VideoCarousel', title: 'Inverse Functions',
+        props: { videos: [
+          { url: 'https://www.youtube.com/embed/YN8WzBCFLgQ', title: 'Calc I 5.3.1 — Inverse Functions' },
+          { url: 'https://www.youtube.com/embed/5CPhScuRt_Y', title: 'Inverse Functions — Kim' },
+        ]},
       },
-      {
-        type: 'definition',
-        title: 'Even and Odd',
-        body: '\\text{Even: } f(-x) = f(x) \\text{ for all } x \\in \\text{dom}(f) \\\\ \\text{Odd: } f(-x) = -f(x) \\text{ for all } x \\in \\text{dom}(f)',
-      },
-      {
-        type: 'definition',
-        title: 'Inverse Function',
-        body: 'f^{-1} \\text{ exists iff } f \\text{ is one-to-one.} \\\\ f^{-1}(f(x)) = x \\text{ for all } x \\in \\text{dom}(f) \\\\ f(f^{-1}(y)) = y \\text{ for all } y \\in \\text{range}(f)',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'FunctionPlotter',
-        props: { fn: 'x^2', xRange: [-3, 3], showGrid: true },
-        title: 'Function Plotter',
-        caption: 'Plot any function and explore its graph.',
-      },
-      {
-        id: 'TransformationExplorer',
-        title: 'Transformation Explorer — y = a·f(b(x−c)) + d',
-        caption: 'Every slider controls one transformation. Notice how b affects width (not shift!), and c shifts the input (not output). Start with a=1, b=1, c=0, d=0 — that is the identity transformation.',
-      },
+      { type: 'prose', paragraphs: ['**Graph transformations** — understanding these lets you graph complicated functions from simple ones:', '• y = f(x) + k: vertical shift UP by k', '• y = f(x) − k: vertical shift DOWN by k', '• y = f(x + h): horizontal shift LEFT by h (counterintuitive!)', '• y = f(x − h): horizontal shift RIGHT by h', '• y = af(x): vertical stretch by factor |a|; reflects over x-axis if a < 0', '• y = f(bx): horizontal compression by factor |b|; reflects over y-axis if b < 0'] },
+      { type: 'viz', id: 'VideoEmbed', title: 'Graph Transformations', props: { url: 'https://www.youtube.com/embed/Ccq1aQDCfVE' } },
+      { type: 'viz', id: 'TransformationExplorer', title: 'Transformation Explorer — y = a·f(b(x−c)) + d', caption: 'Every slider controls one transformation. Notice how b affects width (not shift!), and c shifts the input (not output). Start with a=1, b=1, c=0, d=0 — that is the identity transformation.' },
+      { type: 'viz', id: 'VideoEmbed', title: 'Piecewise Functions', props: { url: 'https://www.youtube.com/embed/JrM8cCH3Ips' } },
     ],
   },
 
