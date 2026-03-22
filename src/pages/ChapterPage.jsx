@@ -4,7 +4,7 @@ import { useProgress } from '../hooks/useProgress.js'
 
 export default function ChapterPage() {
   const { chapterId } = useParams()
-  const chapter = CURRICULUM.find((c) => c.number === parseInt(chapterId))
+  const chapter = CURRICULUM.find((c) => String(c.number) === chapterId)
   const { getLessonStatus } = useProgress()
 
   if (!chapter) {

@@ -34,6 +34,7 @@ function TopBar({ onMenuToggle, onGraphToggle }) {
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
+        <a href="#/chapter/precalc-1" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Pre-Calc</a>
         <a href="#/" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Calculus</a>
         <a href="#/chapter/discrete-1" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Discrete Math</a>
         

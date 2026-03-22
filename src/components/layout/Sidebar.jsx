@@ -26,12 +26,14 @@ export default function Sidebar({ onNavigate }) {
     const chObj = CURRICULUM.find(c => String(c.number) === activeChapter)
     if (chObj) activeCourse = chObj.course
   } else if (location.pathname.includes('/discrete-1')) {
-     activeCourse = 'discrete'
+    activeCourse = 'discrete'
+  } else if (location.pathname.includes('/precalc-')) {
+    activeCourse = 'precalc'
   }
 
   const visibleChapters = CURRICULUM.filter(c => c.course === activeCourse)
-  const courseName = activeCourse === 'calc' ? 'OpenCalc' : activeCourse === 'discrete' ? 'Discrete Math' : 'OpenMath'
-  const courseDesc = activeCourse === 'calc' ? 'Interactive Calculus' : 'Logic & Puzzles'
+  const courseName = activeCourse === 'calc' ? 'OpenCalc' : activeCourse === 'discrete' ? 'Discrete Math' : activeCourse === 'precalc' ? 'Pre-Calculus' : 'OpenMath'
+  const courseDesc = activeCourse === 'calc' ? 'Interactive Calculus' : activeCourse === 'discrete' ? 'Logic & Puzzles' : activeCourse === 'precalc' ? 'Functions & Graphs' : ''
 
   return (
     <nav className="h-full overflow-y-auto py-4">

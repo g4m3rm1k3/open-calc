@@ -176,6 +176,19 @@ const VIZ_REGISTRY = {
   AbsoluteValueDiffViz:          lazy(() => import('./react/AbsoluteValueDiffViz.jsx')),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame:          lazy(() => import('./react/SketchDerivativeGame.jsx')),
+  // Precalc — Functions & Graphs (contributed components)
+  CartesianFoundationsViz:       lazy(() => import('./d3/CartesianFoundationsViz.jsx')),
+  TransformationBuilderViz:      lazy(() => import('./d3/TransformationBuilderViz.jsx')),
+  RootMultiplicityViz:           lazy(() => import('./d3/RootMultiplicityViz.jsx')),
+  FunctionBehaviourViz:          lazy(() => import('./d3/FunctionBehaviourViz.jsx')),
+  PolarCartesianViz:             lazy(() => import('./d3/PolarCartesianViz.jsx')),
+  // Precalc — stub aliases (same-topic components until dedicated viz are built)
+  ZerosAndInterceptsViz:         lazy(() => import('./d3/CartesianFoundationsViz.jsx')),
+  EvenOddSymmetryViz:            lazy(() => import('./d3/TransformationBuilderViz.jsx')),
+  InverseFunctionViz:            lazy(() => import('./d3/TransformationBuilderViz.jsx')),
+  AsymptoteTypesViz:             lazy(() => import('./d3/FunctionBehaviourViz.jsx')),
+  RationalSketchViz:             lazy(() => import('./d3/FunctionBehaviourViz.jsx')),
+  Vectors3DViz:                  lazy(() => import('./d3/PolarCartesianViz.jsx')),
   // Contribution files — new viz components
   TangentLineViz:                lazy(() => import('./d3/TangentLineViz.jsx')),
   PythagoreanViz:                lazy(() => import('./d3/PythagoreanViz.jsx')),
