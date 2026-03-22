@@ -111,13 +111,27 @@ export default {
         body: "\\text{If } F_y(a,b) = 0 \\text{, the tangent is vertical and } y \\text{ may not be a function of } x \\text{ near } (a,b).",
       },
     ],
-    visualizationId: null,
+    visualizations: [
+      {
+        id: 'ImplicitTangentPlayground',
+        title: 'Implicit Function Theorem — Live Verification',
+        mathBridge: 'The Implicit Function Theorem guarantees that $y$ is locally a function of $x$ whenever $F_y \\neq 0$. On the circle $x^2+y^2=r^2$, we have $F_y=2y$, so the theorem fails only at $(\\pm r, 0)$ — the two points where the tangent is vertical and the circle folds back on itself. Drag around the circle: $dy/dx=-x/y$ is well-defined everywhere except those two points.',
+        caption: 'Drag the point to the left/right extremes and watch dy/dx blow up — confirming the theorem\'s condition F_y≠0.',
+      },
+    ],
   },
 
   examples: [
     {
       id: 'ch2-005-ex1',
       title: 'Circle: dy/dx and Tangent Line',
+      visualizations: [
+        {
+          id: 'ImplicitTangentPlayground',
+          title: 'Circle Tangent — dy/dx = −x/y',
+          caption: 'Drag the point to (3, 4): the tangent has slope −3/4. The radius to that point has slope +4/3 — negative reciprocals, confirming the tangent is perpendicular to the radius.',
+        },
+      ],
       problem: "\\text{Find } dy/dx \\text{ for } x^2+y^2=25. \\text{ Then find the tangent line at } (3,4).",
       steps: [
         {
@@ -154,6 +168,13 @@ export default {
     {
       id: 'ch2-005-ex2',
       title: 'Folium of Descartes',
+      visualizations: [
+        {
+          id: 'ImplicitCurveExplorer',
+          title: 'Implicit Curves and Tangents',
+          caption: 'The folium x³+y³=6xy has a double point at the origin where the curve crosses itself — the Implicit Function Theorem breaks down there (both F_x and F_y are 0). Drag along the rest of the curve to see well-defined tangents.',
+        },
+      ],
       problem: "\\text{Find } dy/dx \\text{ for the folium of Descartes: } x^3 + y^3 = 6xy.",
       steps: [
         {
@@ -190,6 +211,13 @@ export default {
     {
       id: 'ch2-005-ex3',
       title: 'Implicit Differentiation with Sine and Product',
+      visualizations: [
+        {
+          id: 'TangentToImplicitCurve',
+          title: 'Tangent to an Implicit Curve',
+          caption: 'The curve sin(xy)=x is defined implicitly. The tangent slope dy/dx=(1−y·cos(xy))/(x·cos(xy)) involves both x and y — because you need both coordinates to know where you are on the curve.',
+        },
+      ],
       problem: "\\text{Find } dy/dx \\text{ for } \\sin(xy) = x.",
       steps: [
         {
@@ -226,6 +254,13 @@ export default {
     {
       id: 'ch2-005-ex4',
       title: 'Implicit Differentiation with Exponential',
+      visualizations: [
+        {
+          id: 'TangentToImplicitCurve',
+          title: 'Implicit Curve with Exponential',
+          caption: 'The chain rule on eʸ gives eʸ·(dy/dx) because y is a function of x. The presence of eʸ in the denominator of dy/dx=−y/(eʸ+x) reflects how rapidly eʸ bends the curve.',
+        },
+      ],
       problem: "\\text{Find } dy/dx \\text{ for } e^y + xy = 3.",
       steps: [
         {
@@ -254,6 +289,13 @@ export default {
     {
       id: 'ch2-005-ex5',
       title: 'Second Implicit Derivative',
+      visualizations: [
+        {
+          id: 'ImplicitTangentPlayground',
+          title: 'Concavity on the Circle',
+          caption: 'The second derivative d²y/dx²=−r²/y³ is negative in the upper half (y>0, concave down) and positive in the lower half (y<0, concave up) — the circle always curves toward the center.',
+        },
+      ],
       problem: "\\text{Find } d^2y/dx^2 \\text{ for } x^2+y^2=r^2.",
       steps: [
         {
@@ -294,6 +336,13 @@ export default {
     {
       id: 'ch2-005-ex6',
       title: 'y = x^x via Implicit Differentiation',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'ln Converts the Problem',
+          caption: 'Taking ln of y=x^x gives ln(y)=x·ln(x). The implicit differentiation chain rule on ln(y) gives (1/y)·(dy/dx) — solving for dy/dx then just requires multiplying back by y=x^x.',
+        },
+      ],
       problem: "\\text{Use implicit differentiation (logarithmic differentiation) to find } dy/dx \\text{ for } y = x^x, \\text{ and verify it agrees with Example 7 in the previous lesson.}",
       steps: [
         {
@@ -330,6 +379,13 @@ export default {
     {
       id: 'ch2-005-ex7',
       title: 'Tangent and Normal to an Implicit Curve',
+      visualizations: [
+        {
+          id: 'TangentToImplicitCurve',
+          title: 'Tangent and Normal Lines',
+          caption: 'At (2,1) on x²y+y³=5: tangent slope is −4/7, normal slope is +7/4 (negative reciprocal). The normal line points directly toward the curve\'s center of curvature.',
+        },
+      ],
       problem: "\\text{Find the tangent and normal lines to } x^2 y + y^3 = 5 \\text{ at the point } (2, 1).",
       steps: [
         {
@@ -382,6 +438,13 @@ export default {
     {
       id: 'ch2-005-ex8',
       title: 'Implicit Related Rates on a Circle',
+      visualizations: [
+        {
+          id: 'ImplicitTangentPlayground',
+          title: 'Circle — Related Rates',
+          caption: 'A point on x²+y²=25 moving with dx/dt=2: differentiating the constraint gives 2x(dx/dt)+2y(dy/dt)=0, so dy/dt=−(x/y)·(dx/dt). At (3,4) that is −(3/4)·2=−3/2.',
+        },
+      ],
       problem: 'A point moves on x^2+y^2=25 with dx/dt=2 at the instant (x,y)=(3,4). Find dy/dt.',
       steps: [
         {

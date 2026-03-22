@@ -169,6 +169,12 @@ const VIZ_REGISTRY = {
   TrigMotionBridgeLab:           lazy(() => import('./react/TrigMotionBridgeLab.jsx')),
   ExpLogBridgeLab:               lazy(() => import('./react/ExpLogBridgeLab.jsx')),
   DerivativeRuleArenaGame:       lazy(() => import('./react/DerivativeRuleArenaGame.jsx')),
+  // Chapter 2 — Inverse functions & differentiability
+  InverseSlopeReflectionLab:     lazy(() => import('./react/InverseSlopeReflectionLab.jsx')),
+  ArcTanDerivationLab:           lazy(() => import('./react/ArcTanDerivationLab.jsx')),
+  AbsoluteValueDiffViz:          lazy(() => import('./react/AbsoluteValueDiffViz.jsx')),
+  // Chapter 2 — Reading derivatives game
+  SketchDerivativeGame:          lazy(() => import('./react/SketchDerivativeGame.jsx')),
 }
 
 function VizSkeleton() {

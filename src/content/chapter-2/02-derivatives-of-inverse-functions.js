@@ -38,8 +38,14 @@ export default {
     ],
     visualizations: [
       {
+        id: 'InverseSlopeReflectionLab',
+        title: 'Slope Reciprocity via Reflection',
+        mathBridge: 'Reflection across $y = x$ swaps every $(a, b)$ to $(b, a)$. Because the axes are swapped, every rise becomes a run and vice versa — so the slope $\\frac{\\Delta y}{\\Delta x}$ at $(a, b)$ becomes $\\frac{\\Delta x}{\\Delta y} = \\frac{1}{\\text{slope}}$ at $(b, a)$. That is the entire geometric content of $(f^{-1})\'(b) = 1/f\'(a)$. Drag the point to verify the product of slopes is always 1.',
+        caption: 'Drag the point on f(x) = x². The mirrored green point on f⁻¹(x) = √x always carries the reciprocal slope. Their product is always 1.',
+      },
+      {
         id: 'DualGraphSync',
-        title: 'Reflection and Reciprocal Slopes',
+        title: 'Reflection and Reciprocal Slopes (Symbolic View)',
         caption: 'As a point moves on f, the reflected point on f^(-1) shows reciprocal tangent slope at matching coordinates.',
       },
     ],
@@ -69,6 +75,14 @@ export default {
         body: "\\frac{d}{dx}[\\arcsin x]=\\frac{1}{\\sqrt{1-x^2}},\\;\\frac{d}{dx}[\\arccos x]=-\\frac{1}{\\sqrt{1-x^2}},\\;\\frac{d}{dx}[\\arctan x]=\\frac{1}{1+x^2}",
       },
     ],
+    visualizations: [
+      {
+        id: 'InverseSlopeReflectionLab',
+        title: 'The Rule in Action: f(x) = x²',
+        mathBridge: 'The theorem says $(f^{-1})\'(x) = 1/f\'(f^{-1}(x))$. Here $f(x) = x^2$, so $f^{-1}(x) = \\sqrt{x}$ and $f\'(x) = 2x$. Therefore $(f^{-1})\'(x) = 1/(2\\sqrt{x})$ — exactly the derivative of $\\sqrt{x}$ by the power rule. The graph makes this formula geometric: reflection swaps axes, and swapping axes flips the fraction $\\Delta y / \\Delta x$ to $\\Delta x / \\Delta y$.',
+        caption: 'Verify the formula numerically: move to any a, read f\'(a) = 2a, then check that (f⁻¹)\'(a²) = 1/(2a). Product is always 1.',
+      },
+    ],
   },
 
   rigor: {
@@ -90,6 +104,14 @@ export default {
         body: 'f(f^(-1)(x))=x => f\'(f^(-1)(x))*(f^(-1))\'(x)=1 => (f^(-1))\'(x)=1/f\'(f^(-1)(x)).',
       },
     ],
+    visualizations: [
+      {
+        id: 'ArcTanDerivationLab',
+        title: 'arctan Derivative: Full Geometric Proof',
+        mathBridge: 'The proof has three moves: (1) rewrite $y = \\arctan x$ as $\\tan y = x$; (2) differentiate implicitly to get $\\sec^2(y)\\cdot dy/dx = 1$; (3) read $\\sec^2(y) = 1 + \\tan^2(y) = 1 + x^2$ from the right triangle. The triangle in the visualization makes step (3) concrete — you can see the hypotenuse $\\sqrt{1+x^2}$ growing as $x$ grows, and $\\cos^2(y) = 1/(1+x^2)$ directly from the adjacent/hypotenuse ratio.',
+        caption: 'Drag x and watch the triangle update. Each proof step stays fixed — only the live numerical values change. This is implicit differentiation made visual.',
+      },
+    ],
   },
 
   examples: [
@@ -105,6 +127,14 @@ export default {
         { expression: '(f^{-1})\'(2) = \\frac{1}{4}', annotation: 'Substitute the given slope f\'(5) = 4.' },
       ],
       conclusion: 'The slope at y=2 on the original function translates to 1/4 at x=2 on the inverse.',
+      visualizations: [
+        {
+          id: 'InverseSlopeReflectionLab',
+          title: 'Why the Slope Becomes 1/4',
+          mathBridge: 'In the example, $f\'(5) = 4$ and we need $(f^{-1})\'(2)$. The point $(5, 2)$ on $f$ maps to $(2, 5)$ on $f^{-1}$ by reflection across $y = x$. At $(5, 2)$ the slope is 4 (rise 1 per run 0.25). At the reflected point $(2, 5)$ the axes are swapped, so slope = $1/4$. The lab shows the same thing for $f(x) = x^2$: move to $a = \\sqrt{5} \\approx 2.24$ to see slopes 4 and 0.25.',
+          caption: 'Set a ≈ 2.24. The blue slope will be ≈ 4.47 (= 2a) and the green slope will be ≈ 0.224 (= 1/(2a)). This is the same reciprocal relationship as in the example.',
+        },
+      ],
     },
     {
       id: 'ch2-002-ex2',
@@ -117,6 +147,14 @@ export default {
         { expression: "y' = \\frac{e^x}{1+e^{2x}}", annotation: 'Simplify the power using (e^x)^2 = e^{2x}.' },
       ],
       conclusion: 'The Chain Rule works seamlessly with inverse trig functions.',
+      visualizations: [
+        {
+          id: 'ArcTanDerivationLab',
+          title: 'Where 1/(1+u²) Comes From',
+          mathBridge: 'The formula $\\frac{d}{dx}[\\arctan u] = \\frac{1}{1+u^2}$ is proved in the lab: implicit differentiation of $\\tan y = u$ gives $\\sec^2(y)\\cdot dy/du = 1$, then the triangle shows $\\sec^2 y = 1 + u^2$. In this example $u = e^x$, so the $1+u^2$ term becomes $1 + e^{2x}$. Set $x \\approx 0$ in the lab (so $u = e^0 = 1$, $x_{\\text{lab}} = 1$) to verify $1/(1+1^2) = 0.5$ for the base arctan derivative before the chain rule multiplies by $u\' = e^x$.',
+          caption: 'Drag x in the lab to see how the triangle and the result 1/(1+x²) vary. For ex. 2, substitute u = eˣ into this result and multiply by (eˣ)\'.',
+        },
+      ],
     },
     {
       id: 'ch2-002-ex3',
@@ -129,6 +167,14 @@ export default {
         { expression: "y' = \\frac{1}{2\\sqrt{x}\\sqrt{1-x}}", annotation: 'Simplify (sqrt(x))^2 = x.' },
       ],
       conclusion: "y' = 1/(2sqrt(x)sqrt(1-x)), valid for 0 < x < 1.",
+      visualizations: [
+        {
+          id: 'ArcTanDerivationLab',
+          title: 'The arcsin Triangle (same proof structure)',
+          mathBridge: 'The arcsin proof is structurally identical to arctan: let $y = \\arcsin x$, so $\\sin y = x$. Implicit differentiation gives $\\cos y \\cdot dy/dx = 1$, hence $dy/dx = 1/\\cos y$. From a unit-circle right triangle with $\\sin y = x$: $\\cos y = \\sqrt{1-x^2}$, giving $dy/dx = 1/\\sqrt{1-x^2}$. The ArcTan lab uses $\\tan y = x$, so the hypotenuse is $\\sqrt{1+x^2}$; for arcsin, the hypotenuse is 1 (unit circle) and the adjacent is $\\sqrt{1-x^2}$ — same two-step logic, different triangle.',
+          caption: 'Compare the arctan triangle here with the arcsin triangle: the role of hypotenuse and adjacent swap. Both proofs use the same implicit differentiation + triangle reading strategy.',
+        },
+      ],
     },
     {
       id: 'ch2-002-ex4',
@@ -140,6 +186,14 @@ export default {
         { expression: "y' = -\\frac{3}{\\sqrt{1-9x^2}}", annotation: 'Substitute and simplify.' },
       ],
       conclusion: "y' = -3/sqrt(1-9x^2), valid for |x| < 1/3.",
+      visualizations: [
+        {
+          id: 'ArcTanDerivationLab',
+          title: 'Why the Chain Rule Multiplies in a Factor of 3',
+          mathBridge: 'The base formula $\\frac{d}{dx}[\\arccos u] = -1/\\sqrt{1-u^2}$ has $u\' = 3$ here (since $u = 3x$). The chain rule says multiply the outer derivative by $u\'$: $-1/\\sqrt{1-9x^2} \\cdot 3 = -3/\\sqrt{1-9x^2}$. The ArcTan lab shows the same chain-rule structure for arctan — the inner function derivative multiplies the outer. Note also the minus sign: arccos and arcsin are complementary ($\\arcsin x + \\arccos x = \\pi/2$), so their derivatives are negatives of each other.',
+          caption: 'The proof structure (implicit diff → triangle reading) is the same for arccos as for arctan. The only differences are which leg is which in the triangle and the sign.',
+        },
+      ],
     },
   ],
 

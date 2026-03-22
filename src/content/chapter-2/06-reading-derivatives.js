@@ -157,7 +157,14 @@ export default {
         body: '(1) Find critical points (f\'=0). (2) Find inflection points (f\'\'=0). (3) Determine signs of f\' and f\'\' in each region. (4) Compute f and f\' at critical/inflection points and endpoints. (5) Plot and connect, respecting concavity.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SketchDerivativeGame',
+        title: 'Sketch f′ from f — Try It',
+        mathBridge: 'This game operationalizes the core reading rules in the math section. Peaks and valleys of $f$ (marked orange, where $f\'(x) = 0$) must be zero crossings of your $f\'$ sketch. Where $f$ rises steeply, your $f\'$ handle must be large and positive. Where $f$ falls, $f\'$ must be negative. The score measures how well your seven slope guesses match the actual $f\'(x) = 3x^2 - 3$. Hitting the reveal button shows how $f\'$ is a parabola — every feature of that parabola corresponds to a visible feature of the cubic $f$.',
+        caption: 'Drag the handles to build your f′ sketch, then Reveal to see how close you are and why. The orange "f′=0" markers on f tell you exactly where f′ must cross zero.',
+      },
+    ],
   },
 
   rigor: {
@@ -171,7 +178,14 @@ export default {
       'Always verify critical and inflection points algebraically.',
     ],
     callouts: [],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'SketchDerivativeGame',
+        title: 'Connect Visual Intuition to Algebra',
+        mathBridge: 'After sketching, click Reveal to compare your intuition against the algebraic truth $f\'(x) = 3x^2 - 3$. The parabola $f\'$ achieves its minimum $-3$ at $x = 0$ (the inflection point of $f$) and crosses zero at $x = \\pm 1$ (the critical points of $f$). These correspondences are exact: every feature of the $f\'$ graph is forced by the geometry of $f$. That is Fermat\'s theorem made visual.',
+        caption: 'After a round, read the feedback panel: it names the algebraic rules that explain each feature of f′ you just sketched by feel.',
+      },
+    ],
   },
 
   examples: [
@@ -328,10 +342,16 @@ export default {
       },
       visualizations: [
         {
+          id: 'SketchDerivativeGame',
+          title: 'Do It Yourself: Sketch f′ for f(x) = x³ − 3x',
+          mathBridge: 'This is exactly the exercise described in the problem. The cubic $f(x) = x^3 - 3x$ has a peak at $x = -1$ and a valley at $x = 1$ (both orange marked). Your sketch should cross zero at both those x-values, be positive outside them, and be negative in between. After revealing, compare the exact parabola $f\'(x) = 3x^2 - 3$ to your intuitive sketch.',
+          caption: 'Work through the steps in the example first, then use this game to verify your mental picture of what f′ should look like.',
+        },
+        {
           id: 'DerivativeBuilder',
-          title: 'Construct f\' from Tangent Slopes',
-          caption: 'This directly builds the same positive-zero-negative-zero-positive pattern described in the steps.'
-        }
+          title: 'Tangent Slope Tracer (Continuous View)',
+          caption: 'This traces the slope continuously as you drag — complementing the game\'s discrete 7-point sketch.',
+        },
       ],
       interactive: true,
       steps: [

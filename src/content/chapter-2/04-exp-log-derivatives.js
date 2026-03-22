@@ -142,6 +142,13 @@ export default {
     {
       id: 'ch2-004-ex1',
       title: 'Exponential with Chain Rule',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'eˣ and Its Derivative',
+          caption: 'Move the slider: at every x, the slope of eˣ equals its own height. The chain rule multiplies this self-referential slope by the inner derivative (6x here), giving 6x·e^(3x²).',
+        },
+      ],
       problem: "f(x) = e^{3x^2}. \\text{ Find } f'(x).",
       steps: [
         {
@@ -162,6 +169,13 @@ export default {
     {
       id: 'ch2-004-ex2',
       title: 'Product Rule with e^x',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'eˣ in Product Rule',
+          caption: 'The derivative of x²eˣ requires knowing d/dx[eˣ]=eˣ. Here eˣ acts as one factor whose own derivative equals itself — the product rule then combines this with the polynomial factor.',
+        },
+      ],
       problem: "f(x) = x^2 e^x. \\text{ Find } f'(x).",
       steps: [
         {
@@ -186,6 +200,13 @@ export default {
     {
       id: 'ch2-004-ex3',
       title: 'Natural Log with Chain Rule',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'ln(x) and Its Derivative',
+          caption: 'Switch to ln(x): its slope at any point x is exactly 1/x. The chain rule pattern g′/g for ln(g(x)) is visible here — 2x/(x²+1) is the "rate of change of the inside" divided by the inside value.',
+        },
+      ],
       problem: "f(x) = \\ln(x^2+1). \\text{ Find } f'(x).",
       steps: [
         {
@@ -206,6 +227,13 @@ export default {
     {
       id: 'ch2-004-ex4',
       title: 'Quotient Rule with e^x',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'eˣ Growth vs Polynomial Decay',
+          caption: 'eˣ/x³: the exponential eventually dominates. The critical point at x=3 is where eˣ growth (slope = eˣ) exactly balances the x³ decay — setting f′=0 captures this equilibrium.',
+        },
+      ],
       problem: "f(x) = \\frac{e^x}{x^3}. \\text{ Find } f'(x).",
       steps: [
         {
@@ -234,6 +262,13 @@ export default {
     {
       id: 'ch2-004-ex5',
       title: 'Log of a Trig Function',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'The Logarithmic Derivative Pattern',
+          caption: 'The chain rule on ln(u) always gives u′/u. Here u=sin(x), so the derivative is cos(x)/sin(x)=cot(x). The lab shows how the log "flattens" its input — its derivative is the relative rate of change.',
+        },
+      ],
       problem: "f(x) = \\ln(\\sin x). \\text{ Find } f'(x).",
       steps: [
         {
@@ -254,6 +289,13 @@ export default {
     {
       id: 'ch2-004-ex6',
       title: 'Exponential with a Different Base',
+      visualizations: [
+        {
+          id: 'ExponentialSlopeAtZero',
+          title: 'Slope at x=0 for Different Bases',
+          caption: 'Slide the base to 5: the slope of 5^x at x=0 is ln(5)≈1.609, not 1. For base e, ln(e)=1 exactly — this is what makes e special. For 5^(2x), the chain rule multiplies by 2.',
+        },
+      ],
       problem: "f(x) = 5^{2x}. \\text{ Find } f'(x).",
       steps: [
         {
@@ -278,6 +320,13 @@ export default {
     {
       id: 'ch2-004-ex7',
       title: 'Logarithmic Differentiation: x^x',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'Logarithms Convert Exponents to Products',
+          caption: 'Taking ln of both sides converts x^x into x·ln(x) — a product the product rule can handle. The lab shows how the log and exponential functions invert each other, which is the algebraic step that makes this trick work.',
+        },
+      ],
       problem: "y = x^x \\text{ for } x > 0. \\text{ Find } \\frac{dy}{dx} \\text{ using logarithmic differentiation.}",
       steps: [
         {
@@ -314,6 +363,13 @@ export default {
     {
       id: 'ch2-004-ex8',
       title: 'Logarithmic Differentiation: Variable Base and Exponent',
+      visualizations: [
+        {
+          id: 'ExpLogBridgeLab',
+          title: 'ln Converts the Problem',
+          caption: 'ln((x²+1)^(sin x)) = sin(x)·ln(x²+1) by the log power rule. The lab shows this conversion: the log turns a tower of functions into a product — then the product rule and chain rule finish the job.',
+        },
+      ],
       problem: "y = (x^2+1)^{\\sin x}. \\text{ Find } \\frac{dy}{dx} \\text{ using logarithmic differentiation.}",
       steps: [
         {

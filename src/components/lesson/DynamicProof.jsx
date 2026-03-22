@@ -62,9 +62,9 @@ export default function DynamicProof({ steps = [], visualizationId, visualizatio
         </div>
       )}
 
-      <div className={`flex flex-col ${visualizationId ? 'lg:flex-row' : ''}`}>
+      <div className="flex flex-col">
         {/* Algebra / proof step */}
-        <div className={`${visualizationId ? 'lg:w-1/2' : 'w-full'} p-5 flex flex-col justify-center min-h-[160px] bg-white dark:bg-[#0f172a]`}>
+        <div className="w-full p-5 flex flex-col justify-center min-h-[120px] bg-white dark:bg-[#0f172a]">
           {/* Step counter badge */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs font-bold text-purple-400 dark:text-purple-500 uppercase tracking-widest">
@@ -92,7 +92,7 @@ export default function DynamicProof({ steps = [], visualizationId, visualizatio
 
         {/* Synced interactive visual */}
         {visualizationId && (
-          <div className="lg:w-1/2 border-t lg:border-t-0 lg:border-l border-purple-100 dark:border-purple-800 overflow-hidden bg-slate-50 dark:bg-slate-900">
+          <div className="w-full border-t border-purple-100 dark:border-purple-800 overflow-hidden bg-slate-50 dark:bg-slate-900">
             <VizFrame
               id={visualizationId}
               initialProps={{ ...visualizationProps, currentStep: current }}

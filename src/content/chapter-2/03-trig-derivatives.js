@@ -200,7 +200,7 @@ export default {
       },
     ],
     visualizationId: 'TrigDerivativeGeometric',
-    visualizationProps: { showAllProofs: true },
+    visualizationProps: {},
 
     prose: [
       'We now prove d/dx[sin x] = cos x rigorously from the limit definition. This proof depends on two fundamental trigonometric limits, which we state but do not re-derive here (they were established in the limits chapter): lim(h\u21920) sin(h)/h = 1 and lim(h\u21920) (1 - cos h)/h = 0.',
@@ -227,8 +227,14 @@ export default {
         body: "\\frac{d}{dx}[\\sin x] = \\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h} = \\lim_{h\\to 0}\\left[\\sin x\\cdot\\frac{\\cos h - 1}{h} + \\cos x \\cdot\\frac{\\sin h}{h}\\right] = \\sin x\\cdot 0 + \\cos x\\cdot 1 = \\cos x",
       },
     ],
-    visualizationId: 'ProofCircleLinkLab',
-    visualizationProps: {},
+    visualizations: [
+      {
+        id: 'ProofCircleLinkLab',
+        title: 'Live-Link: Proof Terms ↔ Circle Geometry',
+        mathBridge: 'The two proof terms $\\sin x \\cdot \\frac{\\cos h - 1}{h}$ and $\\cos x \\cdot \\frac{\\sin h}{h}$ each correspond to visible geometry on the circle. Hover either term to highlight it. As $h \\to 0$, the horizontal correction (amber, vanishing) shrinks away and only the vertical velocity component (red, surviving) remains — giving $\\cos x$.',
+        caption: 'Hover the proof terms to light up the matching geometry. Use the theta and h sliders to verify at any angle.',
+      },
+    ],
   },
 
   examples: [

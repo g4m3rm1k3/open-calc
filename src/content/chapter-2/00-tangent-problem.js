@@ -164,7 +164,14 @@ export default {
         body: '\\text{(1) Corner: } f\'_-(a) \\neq f\'_+(a) \\\\ \\text{(2) Cusp: one-sided derivatives are } \\pm\\infty \\\\ \\text{(3) Vertical tangent: } \\left|\\frac{f(a+h)-f(a)}{h}\\right| \\to \\infty',
       },
     ],
-    visualizationId: null,
+    visualizations: [
+      {
+        id: 'AbsoluteValueDiffViz',
+        title: 'The Corner: Why |x| Fails at x = 0',
+        mathBridge: 'The rigor section proves this algebraically: $(|0+h| - 0)/h = |h|/h$, which equals $+1$ when $h > 0$ and $-1$ when $h < 0$. The visualization makes the algebra geometric — both secant lines are shown simultaneously. No matter how small $h$ gets, the green (right) secant locks at slope $+1$ and the red (left) at slope $-1$. That immovable mismatch is exactly what the limit calculation says. Compare this to the smooth $x^2$ example where both secants converge to the same slope as $h \\to 0$.',
+        caption: 'Slide h all the way to 0 — the slopes never converge. The corner means two incompatible tangent slopes fight for the same point.',
+      },
+    ],
   },
 
   examples: [
@@ -387,6 +394,14 @@ export default {
         },
       ],
       conclusion: 'f(x) = |x| is NOT differentiable at x = 0. The graph has a sharp corner there — the slope jumps from -1 (for x < 0) to +1 (for x > 0) with no smooth transition. There is no single well-defined tangent line at the origin. This is the canonical example of a function that is continuous but not differentiable.',
+      visualizations: [
+        {
+          id: 'AbsoluteValueDiffViz',
+          title: 'See the Calculation on the Graph',
+          mathBridge: 'Each step in the worked example corresponds to something visible here. Step 1–2: the green secant from $(0,0)$ to $(+h, h)$ — its slope $h/h = 1$ is the right-hand derivative. Step 3–4: the red secant to $(-h, h)$ — its slope $-h/(-h)$ ... wait, we divide by $h$ (not $-h$): $|-h|/(-h) = h/(-h) = -1$. That is the left-hand difference quotient with $h < 0$. Slide $h$ all the way down to confirm both secants are frozen at their respective slopes regardless of how close $h$ gets to 0.',
+          caption: 'The two secants never converge — they are locked at +1 and −1 forever. That is why the limit does not exist and f is not differentiable at 0.',
+        },
+      ],
     },
     {
       id: 'ch2-000-ex7',

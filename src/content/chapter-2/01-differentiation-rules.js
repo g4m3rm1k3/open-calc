@@ -150,13 +150,27 @@ export default {
         body: '\\frac{f(x+h)g(x+h) - f(x)g(x)}{h} = f(x+h)\\cdot\\frac{g(x+h)-g(x)}{h} + g(x)\\cdot\\frac{f(x+h)-f(x)}{h}',
       },
     ],
-    visualizationId: null,
+    visualizations: [
+      {
+        id: 'ProductRuleRectangle',
+        title: 'Product Rule — The Rectangle Proof',
+        mathBridge: 'The product rule proof adds and subtracts $f(x+h)g(x)$ inside the difference quotient, splitting the change in $fg$ into two strips: one measuring $f\\cdot\\Delta g$ and one measuring $g\\cdot\\Delta f$. The key algebraic trick is that the change in the big rectangle (area $fg$) equals two border strips minus a tiny corner $\\Delta f\\cdot\\Delta g$ — that corner vanishes as $h\\to 0$, leaving exactly $(fg)\'=f\'g+fg\'$.',
+        caption: 'Drag the corner: the product rule becomes the statement that total area change equals the sum of the two border strips.',
+      },
+    ],
   },
 
   examples: [
     {
       id: 'ch2-001-ex1',
       title: 'Differentiating a Polynomial',
+      visualizations: [
+        {
+          id: 'PowerRulePattern',
+          title: 'Power Rule Pattern',
+          caption: 'Adjust n to watch the exponent drop by 1: f(x)=xⁿ and its derivative nxⁿ⁻¹ side by side — the same pattern used for every term above.',
+        },
+      ],
       problem: '\\text{Find } f\'(x) \\text{ for } f(x) = 5x^4 - 3x^3 + 7x^2 - 2x + 9.',
       steps: [
         {
@@ -181,6 +195,13 @@ export default {
     {
       id: 'ch2-001-ex2',
       title: 'Negative and Fractional Exponents',
+      visualizations: [
+        {
+          id: 'PowerRulePattern',
+          title: 'Power Rule — All Exponents',
+          caption: 'Set n to a negative or fractional value. The rule d/dx[xⁿ]=nxⁿ⁻¹ still holds — watch how the exponent shifts even for n=−3 or n=½.',
+        },
+      ],
       problem: '\\text{Find } f\'(x) \\text{ for } f(x) = x^{-3} + x^{1/2} + x^{3/2}.',
       steps: [
         {
@@ -217,6 +238,13 @@ export default {
     {
       id: 'ch2-001-ex3',
       title: 'Product Rule: Two Methods',
+      visualizations: [
+        {
+          id: 'ProductRuleRectangle',
+          title: 'Why the Product Rule Works',
+          caption: 'Drag the corner: the change in f·g equals the two border strips (f·Δg and g·Δf). The tiny corner Δf·Δg vanishes as h→0 — this is exactly what the proof above formalizes.',
+        },
+      ],
       problem: '\\text{Find } g\'(x) \\text{ for } g(x) = (x^2+3)(2x^4-x+5). \\text{ Use both the product rule and by expanding first, then verify both methods give the same answer.}',
       steps: [
         {
@@ -273,6 +301,13 @@ export default {
     {
       id: 'ch2-001-ex4',
       title: 'Quotient Rule',
+      visualizations: [
+        {
+          id: 'DifferentiationRulesDemo',
+          title: 'Differentiation Rules Demo',
+          caption: 'Switch to Quotient Rule mode. The denominator squared appears because the denominator\'s rate of change reduces the ratio — the rule captures this exactly.',
+        },
+      ],
       problem: '\\text{Find } h\'(x) \\text{ for } h(x) = \\dfrac{x^2+1}{x-3}.',
       steps: [
         {
@@ -305,6 +340,13 @@ export default {
     {
       id: 'ch2-001-ex5',
       title: 'Finding Horizontal Tangent Lines',
+      visualizations: [
+        {
+          id: 'TangentLineConstructor',
+          title: 'Tangent Line Constructor',
+          caption: 'Drag the point along f(x)=x³−3x. The tangent line goes horizontal (slope=0) exactly at x=±1, confirming where f\'(x)=3x²−3 equals zero.',
+        },
+      ],
       problem: '\\text{Find all values of } x \\text{ where } f(x) = x^3 - 3x \\text{ has a horizontal tangent line.}',
       steps: [
         {
@@ -337,6 +379,13 @@ export default {
     {
       id: 'ch2-001-ex6',
       title: 'Higher-Order Derivatives',
+      visualizations: [
+        {
+          id: 'DerivativeBuilder',
+          title: 'Derivative Builder — f, f′, f′′',
+          caption: 'See f(x)=x⁴−6x²+1 alongside f′ and f″. Where f″>0 the curve bends upward (concave up); where f″<0 it bends downward — exactly what the sign of 12x²−12 tells you.',
+        },
+      ],
       problem: '\\text{For } f(x) = x^4 - 6x^2 + 1, \\text{ find } f\'\'(x) \\text{ and } f\'\'\'(x).',
       steps: [
         {
@@ -361,6 +410,13 @@ export default {
     {
       id: 'ch2-001-ex7',
       title: 'Tangent Line Using Quotient Rule',
+      visualizations: [
+        {
+          id: 'TangentLineConstructor',
+          title: 'Tangent Line at x=1',
+          caption: 'Confirms the tangent at x=1: the line y=(16/9)x−10/9 just touches the curve with slope 16/9 at the point (1, 2/3).',
+        },
+      ],
       problem: '\\text{Find the equation of the tangent line to } y = \\dfrac{3x^2-1}{x+2} \\text{ at } x = 1.',
       steps: [
         {
@@ -401,6 +457,13 @@ export default {
     {
       id: 'ch2-001-ex8',
       title: 'Product Rule on a Square',
+      visualizations: [
+        {
+          id: 'ProductRuleRectangle',
+          title: 'Product Rule on a Square',
+          caption: 'When both factors are identical (u=x²+1), the two border strips are equal — the rectangle proof gives 2u·u′, which is the chain rule d/dx[u²]=2u·u′ in disguise.',
+        },
+      ],
       problem: '\\text{Differentiate } f(x) = (x^2+1)^2 \\text{ using the product rule (treat as } (x^2+1)(x^2+1)\\text{), then verify by expanding first.}',
       steps: [
         {

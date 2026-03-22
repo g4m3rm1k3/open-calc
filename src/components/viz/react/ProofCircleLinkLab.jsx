@@ -102,7 +102,7 @@ export default function ProofCircleLinkLab() {
         <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Formal proof split</p>
           <p className="text-sm mb-3 break-words">
-            <KatexInline expr="\frac{d}{dx}[\sin x] = \lim_{h\to 0}\left[" />
+            <KatexInline expr="\frac{d}{dx}[\sin x] = \lim_{h\to 0}\bigl[" />
             <span
               className="px-1 rounded cursor-pointer transition-colors"
               onMouseEnter={() => setFocus('horizontal')}
@@ -126,7 +126,7 @@ export default function ProofCircleLinkLab() {
             >
               <KatexInline expr="\cos x\cdot\frac{\sin h}{h}" />
             </span>
-            <KatexInline expr="\right]" />
+            <KatexInline expr="\bigr]" />
           </p>
 
           <div className="space-y-2 text-sm">
