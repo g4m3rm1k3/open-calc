@@ -6,16 +6,42 @@ import { useLocalStorage } from '../../hooks/useLocalStorage'
 const COLORS = ['#6366f1', '#ec4899', '#facc15', '#22c55e', '#ef4444', '#a855f7', '#06b6d4', '#f97316']
 
 const FUNC_TYPES = [
-  { id: 'explicit',    label: 'Explicit y=f(x)',      short: 'Ex' },
-  { id: 'implicit',    label: 'Implicit f(x,y)=0',    short: 'Im' },
-  { id: 'polar',       label: 'Polar r=f(θ)',          short: 'Po' },
-  { id: 'parametric',  label: 'Parametric x(t), y(t)', short: 'Pa' },
+  { id: 'explicit',   label: 'Explicit y=f(x)',       short: 'Ex' },
+  { id: 'implicit',   label: 'Implicit f(x,y)=0',     short: 'Im' },
+  { id: 'polar',      label: 'Polar r=f(θ)',           short: 'Po' },
+  { id: 'parametric', label: 'Parametric x(t), y(t)', short: 'Pa' },
 ]
 
+const PI = Math.PI
+
+// π-fraction tick formatter for trig mode
+const piFormat = (n) => {
+  if (Math.abs(n) < 1e-9) return '0'
+  const candidates = [
+    [2, 1], [3, 2], [1, 1], [2, 3], [3, 4], [4, 5], [5, 6],
+    [1, 2], [1, 3], [1, 4], [1, 6], [1, 8], [1, 12],
+  ]
+  for (const [num, den] of candidates) {
+    const val = (num / den) * PI
+    for (const sign of [1, -1]) {
+      if (Math.abs(n - sign * val) < 1e-6) {
+        const prefix = sign < 0 ? '-' : ''
+        if (num === 1 && den === 1) return `${prefix}π`
+        if (den === 1) return `${prefix}${num}π`
+        if (num === 1) return `${prefix}π/${den}`
+        return `${prefix}${num}π/${den}`
+      }
+    }
+  }
+  return n.toFixed(2)
+}
+
 const PRESETS = {
-  linear:      { xMin: -10, xMax: 10,    yMin: -10,  yMax: 10,  xStep: 1,       yStep: 1   },
-  trig:        { xMin: -6.2832, xMax: 6.2832, yMin: -2, yMax: 2, xStep: 1.5708, yStep: 0.5 },
-  exponential: { xMin: -2,  xMax: 5,     yMin: -1,   yMax: 20,  xStep: 1,       yStep: 2   },
+  linear:      { xMin: -10,          xMax: 10,          yMin: -10, yMax: 10,  xStep: 1,          yStep: 1,   piMode: false },
+  trig:        { xMin: -2 * PI,      xMax: 2 * PI,      yMin: -2,  yMax: 2,   xStep: PI / 2,     yStep: 0.5, piMode: true  },
+  'trig-4':    { xMin: -2 * PI,      xMax: 2 * PI,      yMin: -2,  yMax: 2,   xStep: PI / 4,     yStep: 0.5, piMode: true  },
+  'trig-6':    { xMin: -2 * PI,      xMax: 2 * PI,      yMin: -2,  yMax: 2,   xStep: PI / 6,     yStep: 0.5, piMode: true  },
+  exponential: { xMin: -2,           xMax: 5,            yMin: -1,  yMax: 20,  xStep: 1,          yStep: 2,   piMode: false },
 }
 
 const makeFunc = (id, color) => ({
@@ -29,6 +55,30 @@ function cleanExpr(s = '') {
     .replace(/sin\^2/g, '(sin(x))^2')
     .replace(/cos\^2/g, '(cos(x))^2')
     .replace(/\^/g, '**')
+}
+
+// Apply dark-mode styling to the function-plot SVG
+function applyDarkMode(container, dark) {
+  if (!container) return
+  const svg = container.querySelector('svg')
+  if (!svg) return
+  if (!dark) {
+    svg.style.background = ''
+    container.querySelectorAll('.domain, .tick line').forEach(el => el.style.stroke = '')
+    container.querySelectorAll('.tick text').forEach(el => el.style.fill = '')
+    container.querySelectorAll('.grid line').forEach(el => { el.style.stroke = ''; el.style.strokeOpacity = '' })
+    return
+  }
+  svg.style.background = 'transparent'
+  container.querySelectorAll('.domain').forEach(el => { el.style.stroke = '#475569' })
+  container.querySelectorAll('.tick line').forEach(el => { el.style.stroke = '#475569' })
+  container.querySelectorAll('.tick text').forEach(el => { el.style.fill = '#94a3b8'; el.style.fontSize = '10px' })
+  container.querySelectorAll('.grid line').forEach(el => {
+    el.style.stroke = '#1e293b'
+    el.style.strokeOpacity = '1'
+  })
+  // Arrow tips / axis lines
+  container.querySelectorAll('path.domain').forEach(el => { el.style.stroke = '#334155' })
 }
 
 const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
@@ -59,7 +109,7 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
     containerRef.current.innerHTML = ''
 
     try {
-      const { xMin, xMax, yMin, yMax, xStep, yStep } = settings
+      const { xMin, xMax, yMin, yMax, xStep, yStep, piMode } = settings
       const xCount = xStep > 0 ? Math.max(2, Math.round((xMax - xMin) / xStep)) : undefined
       const yCount = yStep > 0 ? Math.max(2, Math.round((yMax - yMin) / yStep)) : undefined
 
@@ -86,15 +136,23 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
             return [{
               fnType: 'parametric',
               x, y,
-              range: [isNaN(t0) ? -Math.PI : t0, isNaN(t1) ? Math.PI : t1],
+              range: [isNaN(t0) ? -PI : t0, isNaN(t1) ? PI : t1],
               graphType: 'polyline',
               color,
             }]
           }
 
-          // explicit (default)
           return [{ fn: cleanExpr(f.latex), graphType: 'polyline', color }]
         })
+
+      const xAxisOpts = {
+        domain: [xMin, xMax],
+        ...(xCount ? { tick: { count: xCount, ...(piMode ? { format: piFormat } : {}) } } : {}),
+      }
+      const yAxisOpts = {
+        domain: [yMin, yMax],
+        ...(yCount ? { tick: { count: yCount } } : {}),
+      }
 
       functionPlot({
         target: containerRef.current,
@@ -105,11 +163,14 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
           yLine: true,
           renderer: (x, y) => `(${x.toFixed(3)}, ${y.toFixed(3)})`,
         },
-        xAxis: { domain: [xMin, xMax], ...(xCount ? { tick: { count: xCount } } : {}) },
-        yAxis: { domain: [yMin, yMax], ...(yCount ? { tick: { count: yCount } } : {}) },
+        xAxis: xAxisOpts,
+        yAxis: yAxisOpts,
         grid: true,
         data: data.length ? data : [],
       })
+
+      // Apply dark mode after render
+      applyDarkMode(containerRef.current, isDark)
 
       setError(null)
     } catch (err) {
@@ -134,7 +195,6 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
         : prev.filter(f => f.id !== id)
     )
 
-  // Settings helpers
   const updateSetting = (key, val) =>
     setSettings(prev => ({ ...prev, [key]: val }))
 
@@ -153,6 +213,10 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
   }
 
   if (!isOpen) return null
+
+  const presetLabels = {
+    linear: 'Linear', trig: 'Trig π/2', 'trig-4': 'Trig π/4', 'trig-6': 'Trig π/6', exponential: 'Exp',
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-hidden mt-16 sm:mt-0">
@@ -175,7 +239,7 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
                 </button>
               )}
               {onSwitchToJSX && (
-                <button onClick={onSwitchToJSX} title="JSXGraph"
+                <button onClick={onSwitchToJSX} title="Pro (JSXGraph)"
                   className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg text-emerald-600 dark:text-emerald-400 transition-all">
                   <Settings2 className="w-4 h-4" />
                 </button>
@@ -195,7 +259,6 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
                 <div key={func.id}
                   className="flex flex-col gap-1.5 p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700/50 transition-all">
 
-                  {/* Controls row */}
                   <div className="flex items-center gap-1.5">
                     {/* Color picker */}
                     <label className="relative cursor-pointer flex-shrink-0" title="Pick color">
@@ -288,15 +351,15 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
             {/* Presets */}
             <div>
               <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">Preset</p>
-              <div className="flex gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {Object.keys(PRESETS).map(p => (
                   <button key={p} onClick={() => applyPreset(p)}
-                    className={`flex-1 py-0.5 text-[9px] font-bold rounded border transition-all ${
+                    className={`px-2 py-0.5 text-[9px] font-bold rounded border transition-all ${
                       settings.preset === p
                         ? 'bg-indigo-600 border-indigo-600 text-white'
                         : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}>
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                    {presetLabels[p] || p}
                   </button>
                 ))}
               </div>
@@ -337,7 +400,7 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
           {/* Syntax help */}
           <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 border-t border-indigo-100/50 dark:border-indigo-900/30">
             <p className="text-[9px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-              <Info className="w-3 h-3" /> Syntax  <span className="normal-case font-normal text-indigo-400">(mathjs, not LaTeX)</span>
+              <Info className="w-3 h-3" /> Syntax  <span className="normal-case font-normal text-indigo-400">(mathjs)</span>
             </p>
             <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400">
               <span>x^2</span>       <span className="font-sans text-slate-400">Power</span>
