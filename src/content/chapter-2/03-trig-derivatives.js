@@ -17,48 +17,77 @@ export default {
 
   intuition: {
     prose: [
-      'Imagine tracing around the unit circle as the angle \u03b8 increases from 0. The y-coordinate follows the sine function. Let\'s watch what happens to the SLOPE of the sine curve as \u03b8 varies.',
-      'At \u03b8 = 0: the point (1, 0) is moving straight upward (tangent to the circle is vertical here). The y-coordinate is increasing at maximum rate. The slope of sin(\u03b8) at this point is 1. And cos(0) = 1. They agree.',
-      'At \u03b8 = \u03c0/2: the point (0, 1) is at the very top of the circle, moving horizontally (leftward). The y-coordinate has just reached its peak and is about to decrease — its rate of change is 0. The slope of sin(\u03b8) is 0. And cos(\u03c0/2) = 0. They agree.',
-      'At \u03b8 = \u03c0: the point (-1, 0) is moving straight downward. The y-coordinate is decreasing at maximum rate. The slope is -1. And cos(\u03c0) = -1. They agree.',
-      'At \u03b8 = 3\u03c0/2: the point (0, -1) is at the bottom of the circle, momentarily moving horizontally (rightward). The y-coordinate is at its minimum and about to increase — rate of change is 0. And cos(3\u03c0/2) = 0. They agree.',
-      'The pattern is unmistakable: the rate of change of the sine function at every angle equals the value of the cosine function at that angle. This is not a coincidence — it is a theorem. The derivative of sin(\u03b8) is cos(\u03b8).',
-      'There is also a beautiful geometric argument using the tangent to the unit circle. At the point (cos\u03b8, sin\u03b8) on the unit circle, the radius vector points in the direction (cos\u03b8, sin\u03b8). The tangent to the circle at this point is perpendicular to the radius, so it points in the direction (-sin\u03b8, cos\u03b8). This tangent direction has a "slope" component in the y-direction equal to cos\u03b8, confirming that dy/d\u03b8 = cos\u03b8.',
-      'Now why does d/dx[cos x] = -sin x have a minus sign? At x = 0, cosine is at its maximum (value 1) and is about to decrease — its rate of change is negative. Specifically, cos(0) = 1 is decreasing and -sin(0) = 0... wait, that\'s 0, not negative. But at x = \u03c0/4, the cosine is decreasing. Let\'s check: the slope of cos(x) at x = \u03c0/4 should be negative, and indeed -sin(\u03c0/4) = -\u221a2/2 < 0. More precisely: at x = 0, the cosine reaches its maximum, so its derivative is 0 there. For x slightly positive, cosine begins to decrease, so d/dx[cos x] should be negative. And -sin(x) is negative for x \u2208 (0, \u03c0), which matches.',
-      'The minus sign in d/dx[cos x] = -sin x reflects the fact that cosine is always decreasing when sine is positive (between 0 and \u03c0) and increasing when sine is negative (between \u03c0 and 2\u03c0).',
+      'Imagine tracing around the unit circle as the angle theta increases from 0. The y-coordinate follows the sine function. Let\'s watch what happens to the slope of the sine curve as theta varies.',
+      'At theta = 0: the point (1, 0) is moving straight upward. The y-coordinate is increasing at maximum rate. The slope of sin(theta) is 1, and cos(0) = 1.',
+      'At theta = pi/2: the point (0, 1) is moving horizontally. The y-coordinate is at a local maximum, so its instantaneous rate is 0. The slope is 0, and cos(pi/2) = 0.',
+      'At theta = pi: the point (-1, 0) is moving straight downward. The y-coordinate decreases at maximum rate. The slope is -1, and cos(pi) = -1.',
+      'This pattern is a theorem, not a coincidence: d/dtheta[sin(theta)] = cos(theta).',
+      'Geometric proof bridge: position is (cos(theta), sin(theta)) and velocity is perpendicular to radius, so velocity has direction (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), and that y-component is exactly d/dtheta[sin(theta)].',
+      'Why the minus sign for cosine? As theta increases through the first quadrant, cosine tracks horizontal position moving left, so its rate of change is negative. That directional fact is d/dx[cos x] = -sin x.',
+      'Expert intuition: each derivative is a 90-degree phase rotation of the trig wave. sin -> cos -> -sin -> -cos -> sin.',
     ],
     callouts: [
       {
         type: 'insight',
         title: 'Geometric Intuition: Unit Circle',
-        body: '\\text{At } \\theta: \\text{ slope of } \\sin\\theta = \\cos\\theta \\text{ (rate of rise = cosine component of velocity)}',
+        body: '\\text{At } \\theta: \\text{slope of } \\sin\\theta = \\cos\\theta',
+      },
+      {
+        type: 'insight',
+        title: 'Velocity-Vector Proof in One Line',
+        body: "\\vec r(\\theta)=(\\cos\\theta,\\sin\\theta),\\;\\vec r'(\\theta)=(-\\sin\\theta,\\cos\\theta)\\Rightarrow\\frac{d}{d\\theta}[\\sin\\theta]=\\cos\\theta",
       },
       {
         type: 'insight',
         title: 'The "co-" Functions All Have Minus Signs',
         body: "\\frac{d}{dx}[\\cos x] = -\\sin x, \\quad \\frac{d}{dx}[\\csc x] = -\\csc x\\cot x, \\quad \\frac{d}{dx}[\\cot x] = -\\csc^2 x",
       },
+      {
+        type: 'warning',
+        title: 'Chain Rule Trap: sin(x^2) vs sin^2(x)',
+        body: "\\sin(x^2) \\neq (\\sin x)^2.\\; \\frac{d}{dx}[\\sin(x^2)] = 2x\\cos(x^2),\\; \\frac{d}{dx}[(\\sin x)^2] = 2\\sin x\\cos x",
+      },
     ],
     visualizations: [
       {
+        id: 'VelocityVectorProofLab',
+        title: 'Velocity Vector Lab (Zero Algebra Proof)',
+        caption: 'Drag theta and verify: radius is (cos(theta), sin(theta)) while velocity is (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), so d/dtheta[sin(theta)] = cos(theta).',
+      },
+      {
         id: 'TrigDerivativeSync',
         title: 'The "Moving Point" Deep Sync',
-        caption: 'Watch the velocity vector on the circle. When ++=0, the ball is traveling 100% vertically (arrow points straight up, vertical velocity = 1). Because vertical velocity is 1, the slope of the Sine curve is 1, and the value of the Cosine curve is 1. All three panels confirm the exact same truth.',
+        caption: 'Watch one angle drive three views at once: motion on the circle, slope of sine, and value of cosine. They stay synchronized because the sine slope is exactly cosine.',
+      },
+      {
+        id: 'CoDirectionCompass',
+        title: 'Why the Minus Sign? Co-Direction Compass',
+        caption: 'Track vertical and horizontal motion signs as theta increases. This turns d/dx[cos x] = -sin x into directional geometry.',
+      },
+      {
+        id: 'NestedTrigMachine',
+        title: 'Nested Machine: sin(x^2) vs sin^2(x)',
+        caption: 'Swap machine order to fix the most common chain-rule mistake. Square-then-sine and sine-then-square produce different derivatives.',
       },
       {
         id: 'SpringOscillation',
-        title: 'Simple Harmonic Motion — Derivatives in Action',
-        caption: 'Position x(t)=A-+cos(t), velocity v(t)=—A-+sin(t), acceleration a(t)=—A-+cos(t). Each graph is the derivative of the one above. This is why sin and cos are their own derivatives (up to sign).',
+        title: 'Simple Harmonic Motion - Derivatives in Action',
+        caption: 'Position x(t)=A cos(t), velocity v(t)=-A sin(t), acceleration a(t)=-A cos(t). Each graph is the derivative of the one above.',
       },
       {
         id: 'DerivativeCycleClock',
         title: 'The Higher-Order Derivative Clock',
-        caption: 'Click "d/dx —" to take successive derivatives. Every 4 steps returns to sin(x). Use the Instant Calculator to find the 43rd — or 1000th — derivative in one step.',
+        caption: 'Click d/dx to take successive derivatives. Every 4 steps returns to sin(x). Think of each derivative as a 90-degree phase rotation.',
       },
       {
         id: 'TangentExplosion',
-        title: 'Why tan(x) Explodes — Quotient Rule Intuition',
-        caption: 'Drag the slider toward x = /2. Watch the red cos(x) shrink toward zero while the blue sin(x) stays near 1. The purple tan(x) must explode because you\'re dividing by nearly nothing.',
+        title: 'Why tan(x) Explodes - Quotient Rule Intuition',
+        caption: 'Drag toward x = pi/2. cos(x) shrinks toward 0 while sin(x) stays near 1, so tan(x)=sin(x)/cos(x) explodes.',
+      },
+      {
+        id: 'QuotientRuleTanBuilder',
+        title: 'Interactive Quotient Rule Builder for tan(x)',
+        caption: 'Step through low d high minus high d low and watch cos^2(x)+sin^2(x) collapse to 1.',
       },
     ],
   },
@@ -85,6 +114,11 @@ export default {
         type: 'derivation',
         title: 'Deriving d/dx[tan x] via Quotient Rule',
         body: "\\frac{d}{dx}\\left[\\frac{\\sin x}{\\cos x}\\right] = \\frac{\\cos x \\cdot \\cos x - \\sin x \\cdot (-\\sin x)}{\\cos^2 x} = \\frac{\\cos^2 x + \\sin^2 x}{\\cos^2 x} = \\frac{1}{\\cos^2 x} = \\sec^2 x",
+      },
+      {
+        type: 'insight',
+        title: 'Derivative as 90-Degree Phase Shift',
+        body: "\\frac{d}{dx}[\\sin x]=\\cos x=\\sin\\left(x+\\frac{\\pi}{2}\\right),\\quad \\frac{d}{dx}[\\cos x]=-\\sin x=\\cos\\left(x+\\frac{\\pi}{2}\\right)",
       },
       {
         type: 'derivation',

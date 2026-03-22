@@ -142,6 +142,10 @@ const VIZ_REGISTRY = {
   ConjugateVisualizer:           lazy(() => import('./react/ConjugateVisualizer.jsx')),
   SmallAnglePendulumLab:         lazy(() => import('./react/SmallAnglePendulumLab.jsx')),
   CosGapVisualizer:              lazy(() => import('./react/CosGapVisualizer.jsx')),
+  VelocityVectorProofLab:        lazy(() => import('./react/VelocityVectorProofLab.jsx')),
+  CoDirectionCompass:            lazy(() => import('./react/CoDirectionCompass.jsx')),
+  NestedTrigMachine:             lazy(() => import('./react/NestedTrigMachine.jsx')),
+  QuotientRuleTanBuilder:        lazy(() => import('./react/QuotientRuleTanBuilder.jsx')),
 }
 
 function VizSkeleton() {
