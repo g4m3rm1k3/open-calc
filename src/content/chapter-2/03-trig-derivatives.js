@@ -10,7 +10,7 @@ export default {
   aliases: 'section 3.5 derivatives trig functions formal proof sin cos tan cot sec csc limit definition derivative',
 
   hook: {
-    question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(\u03b8). When \u03b8 = 0, the point is at (1, 0) and is moving straight upward — the y-coordinate is increasing as fast as it can. When \u03b8 = \u03c0/2, the point is at (0, 1), at the very top, momentarily moving horizontally — the y-coordinate is not changing at all. When \u03b8 = \u03c0, the point is at (-1, 0) and is moving straight downward. These rates of change — 1, 0, and -1 — are exactly the values of cos(0), cos(\u03c0/2), and cos(\u03c0). Is it a coincidence that the rate of change of sine is cosine?',
+    question: 'A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(theta). When theta = 0, the point is at (1, 0) and is moving straight upward, so height increases as fast as possible. When theta = pi/2, the point is at (0, 1) moving sideways, so height is not changing at all. When theta = pi, the point is at (-1, 0) moving downward, so height decreases at maximum rate. These rates, 1, 0, and -1, are exactly cos(0), cos(pi/2), and cos(pi). Why does this happen for every angle?',
     realWorldContext: 'Periodic phenomena dominate science and engineering: alternating current in electrical circuits, vibrations in mechanical systems, sound waves, ocean tides, the positions of planets. All of these are modeled using sine and cosine. To analyze how these quantities change — how quickly a current switches direction, how rapidly a spring approaches equilibrium, how fast a tide is rising — we need derivatives of trigonometric functions. The fact that d/dx[sin x] = cos x is not just elegant mathematics; it is the foundation of all oscillation and wave analysis.',
     previewVisualizationId: 'TrigDerivativeSync',
   },
@@ -70,6 +70,11 @@ export default {
         caption: 'Swap machine order to fix the most common chain-rule mistake. Square-then-sine and sine-then-square produce different derivatives.',
       },
       {
+        id: 'ChainRuleOnionLab',
+        title: 'Peel-the-Onion Chain Rule Lab',
+        caption: 'Practice peeling compositions in order. The outside changes first, the inside stays intact, then multiply by the core derivative.',
+      },
+      {
         id: 'SpringOscillation',
         title: 'Simple Harmonic Motion - Derivatives in Action',
         caption: 'Position x(t)=A cos(t), velocity v(t)=-A sin(t), acceleration a(t)=-A cos(t). Each graph is the derivative of the one above.',
@@ -88,6 +93,16 @@ export default {
         id: 'QuotientRuleTanBuilder',
         title: 'Interactive Quotient Rule Builder for tan(x)',
         caption: 'Step through low d high minus high d low and watch cos^2(x)+sin^2(x) collapse to 1.',
+      },
+      {
+        id: 'SineAdditionProofBuilder',
+        title: 'Sine-of-a-Sum Proof Builder',
+        caption: 'Follow the formal proof with strategy tags. The colored limit blobs show exactly where the final cosine comes from.',
+      },
+      {
+        id: 'InverseBridgeTriangleLab',
+        title: 'Inverse Bridge: From sin to arcsin',
+        caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/sqrt(1-x^2).',
       },
     ],
   },
@@ -139,6 +154,7 @@ export default {
     prose: [
       'We now prove d/dx[sin x] = cos x rigorously from the limit definition. This proof depends on two fundamental trigonometric limits, which we state but do not re-derive here (they were established in the limits chapter): lim(h\u21920) sin(h)/h = 1 and lim(h\u21920) (1 - cos h)/h = 0.',
       'PROOF that d/dx[sin x] = cos x: Using the limit definition, d/dx[sin x] = lim(h\u21920) [sin(x+h) - sin(x)] / h. Apply the sine addition formula: sin(x+h) = sin(x)cos(h) + cos(x)sin(h). So the numerator becomes: sin(x)cos(h) + cos(x)sin(h) - sin(x) = sin(x)[cos(h) - 1] + cos(x)sin(h). Dividing by h: sin(x) \u00b7 [cos(h)-1]/h + cos(x) \u00b7 sin(h)/h.',
+      'Use the live-link panel below while reading this line: hover cos(x)\u00b7sin(h)/h to glow the vertical velocity arrow, and hover sin(x)\u00b7(cos(h)-1)/h to blink the horizontal correction that vanishes as h approaches 0.',
       'As h \u2192 0: the first term has sin(x) (a constant with respect to h) times [cos(h)-1]/h. Rearranging, [cos(h)-1]/h = -(1-cos h)/h \u2192 -0 = 0. The second term has cos(x) (constant) times sin(h)/h \u2192 1. Therefore the entire expression approaches sin(x)\u00b70 + cos(x)\u00b71 = cos(x). This completes the proof.',
       'PROOF that d/dx[cos x] = -sin x: Using the limit definition with the cosine addition formula cos(x+h) = cos(x)cos(h) - sin(x)sin(h): [cos(x+h)-cos(x)]/h = cos(x)\u00b7[cos(h)-1]/h - sin(x)\u00b7sin(h)/h. As h\u21920, the first term approaches cos(x)\u00b70 = 0 and the second approaches sin(x)\u00b71 = sin(x). So d/dx[cos x] = -sin(x). The minus sign comes from the minus sign in the cosine addition formula.',
       'The two key limits sin(h)/h \u2192 1 and (1-cos h)/h \u2192 0 as h \u2192 0 are the real engine of these proofs. The first was established geometrically by the squeeze theorem (the arc length h is squeezed between sin h and tan h for small h > 0). The second follows from the first via the identity (1-cos h)/h = sin\u00b2(h) / [h(1+cos h)] = [sin(h)/h] \u00b7 [sin(h)/(1+cos h)] \u2192 1\u00b70/2 = 0.',
@@ -150,12 +166,18 @@ export default {
         body: '\\lim_{h\\to 0}\\frac{\\sin h}{h} = 1 \\qquad \\lim_{h\\to 0}\\frac{1-\\cos h}{h} = 0',
       },
       {
+        type: 'insight',
+        title: 'Proof Strategy Tags',
+        body: '\\text{Isolation: expand }\\sin(x+h).\\;\\text{Hunting: group }\\frac{\\sin h}{h}\\text{ and }\\frac{\\cos h-1}{h}.\\;\\text{Survival: cosine term times 1 remains.}',
+      },
+      {
         type: 'proof',
         title: 'Proof: d/dx[sin x] = cos x',
         body: "\\frac{d}{dx}[\\sin x] = \\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h} = \\lim_{h\\to 0}\\left[\\sin x\\cdot\\frac{\\cos h - 1}{h} + \\cos x \\cdot\\frac{\\sin h}{h}\\right] = \\sin x\\cdot 0 + \\cos x\\cdot 1 = \\cos x",
       },
     ],
-    visualizationId: null,
+    visualizationId: 'ProofCircleLinkLab',
+    visualizationProps: {},
   },
 
   examples: [
@@ -234,7 +256,7 @@ export default {
       steps: [
         {
           expression: "f(x) = (\\sin x)^2",
-          annotation: 'Rewrite sin\u00b2(x) explicitly as (sin x)\u00b2 to make the composition structure clear. The outer function is squaring; the inner is sine.',
+          annotation: 'Logic narrator: this is a power-rule shell first, not a trig-first move. See a square around something, peel the square before touching the sine.',
         },
         {
           expression: "\\text{Outer: } F(u) = u^2, \\quad \\text{Inner: } u = \\sin x",
@@ -322,7 +344,7 @@ export default {
         },
         {
           expression: "f'(x) = \\frac{N'D - ND'}{D^2} = \\frac{\\cos x(1-\\sin x) - (1+\\sin x)(-\\cos x)}{(1-\\sin x)^2}",
-          annotation: 'Apply the quotient rule.',
+          annotation: 'Logic narrator: run quotient rule cleanly, then hunt for identity-style collapse opportunities in the numerator to escape complexity.',
         },
         {
           expression: "= \\frac{\\cos x(1-\\sin x) + \\cos x(1+\\sin x)}{(1-\\sin x)^2}",
@@ -350,7 +372,7 @@ export default {
         },
         {
           expression: "f'(\\pi/3) = \\cos(\\pi/3) = \\frac{1}{2}",
-          annotation: 'Evaluate the derivative at x = \u03c0/3. From the unit circle, cos(\u03c0/3) = 1/2.',
+          annotation: 'Logic narrator: this derivative value is the steerable slope. Plugging x = pi/3 locks the steering wheel to one tangent line.',
         },
         {
           expression: "f(\\pi/3) = \\sin(\\pi/3) = \\frac{\\sqrt{3}}{2}",

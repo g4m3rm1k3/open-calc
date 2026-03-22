@@ -1,6 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
+const TAU = 2 * Math.PI;
+
+function normTheta(theta) {
+  const wrapped = theta % TAU;
+  return wrapped < 0 ? wrapped + TAU : wrapped;
+}
+
+function getLiveLogic(theta) {
+  const t = normTheta(theta);
+  const near = (target, eps = 0.16) => Math.abs(t - target) < eps || Math.abs(t - target + TAU) < eps || Math.abs(t - target - TAU) < eps;
+
+  if (near(0)) {
+    return 'At theta = 0, the point moves straight up. Height changes at full speed, so the sine slope is 1 and cosine is 1.';
+  }
+  if (near(Math.PI / 2)) {
+    return 'At theta = pi/2, the point moves sideways at the top. Height is not changing in that instant, so the derivative is 0.';
+  }
+  if (near(Math.PI)) {
+    return 'At theta = pi, the point moves straight down. Height decreases fastest, so the sine slope is -1 and cosine is -1.';
+  }
+  if (near((3 * Math.PI) / 2)) {
+    return 'At theta = 3pi/2, motion is sideways again at the bottom. Vertical change is 0, so the derivative is 0.';
+  }
+  return 'Watch the dashed ghost link: tangent slope on sine maps to the red point on cosine. The derivative is being painted in real time.';
+}
+
 const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
   const svgRef = useRef(null);
   const [theta, setTheta] = useState(0);
@@ -12,7 +38,7 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
       const animate = () => {
         setTheta((prev) => {
           let next = prev + 0.02;
-          if (next > 2 * Math.PI) next -= 2 * Math.PI;
+          if (next > TAU) next -= TAU;
           return next;
         });
         animationFrame = requestAnimationFrame(animate);
@@ -46,7 +72,7 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
     const scaleC = d3.scaleLinear().domain([-1.5, 1.5]).range([-circleRadius * 1.5, circleRadius * 1.5]);
     
     // Graph scales
-    const scaleTheta = d3.scaleLinear().domain([0, 2 * Math.PI]).range([0, graphW]);
+    const scaleTheta = d3.scaleLinear().domain([0, TAU]).range([0, graphW]);
     const scaleSineY = d3.scaleLinear().domain([-1.5, 1.5]).range([graphH, 0]);
     const scaleCosY = d3.scaleLinear().domain([-1.5, 1.5]).range([graphH, 0]);
 
@@ -165,8 +191,8 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
     gSine.append('line').attr('x1', 0).attr('y1', scaleSineY(-1.5)).attr('x2', 0).attr('y2', scaleSineY(1.5)).attr('stroke', 'var(--border)');
 
     // Curve
-    const lineRes = 100;
-    const sineData = d3.range(0, 2 * Math.PI + 0.1, (2 * Math.PI) / lineRes).map(t => ({ t, y: Math.sin(t) }));
+    const lineRes = 160;
+    const sineData = d3.range(0, TAU + 0.0001, TAU / lineRes).map(t => ({ t, y: Math.sin(t) }));
     const sinePath = d3.line().x(d => scaleTheta(d.t)).y(d => scaleSineY(d.y));
 
     gSine.append('path')
@@ -180,7 +206,7 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
     const slope = Math.cos(theta); // the derivative
     const intercept = pY - slope * theta;
     const tLineLeft = Math.max(0, theta - 1);
-    const tLineRight = Math.min(2 * Math.PI, theta + 1);
+    const tLineRight = Math.min(TAU, theta + 1);
     
     gSine.append('line')
       .attr('x1', scaleTheta(tLineLeft))
@@ -221,14 +247,28 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
     gCos.append('line').attr('x1', 0).attr('y1', scaleCosY(-1.5)).attr('x2', 0).attr('y2', scaleCosY(1.5)).attr('stroke', 'var(--border)');
 
     // Curve
-    const cosData = d3.range(0, 2 * Math.PI + 0.1, (2 * Math.PI) / lineRes).map(t => ({ t, y: Math.cos(t) }));
+    const cosData = d3.range(0, TAU + 0.0001, TAU / lineRes).map(t => ({ t, y: Math.cos(t) }));
     const cosPath = d3.line().x(d => scaleTheta(d.t)).y(d => scaleCosY(d.y));
 
     gCos.append('path')
       .datum(cosData)
       .attr('fill', 'none')
       .attr('stroke', '#ef4444')
+      .attr('stroke-opacity', 0.25)
       .attr('stroke-width', 2)
+      .attr('d', cosPath);
+
+    // Paint trail: only the derivative values visited so far.
+    const paintData = d3
+      .range(0, Math.max(0.0001, theta), Math.max(0.02, theta / 120))
+      .concat([theta])
+      .map((t) => ({ t, y: Math.cos(t) }));
+
+    gCos.append('path')
+      .datum(paintData)
+      .attr('fill', 'none')
+      .attr('stroke', '#ef4444')
+      .attr('stroke-width', 3.5)
       .attr('d', cosPath);
 
     // Current point
@@ -253,10 +293,29 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
       .attr('fill', '#ef4444')
       .attr('font-weight', 'bold');
 
+    // Ghost tracer connection: slope on sine panel to value on cosine panel.
+    svg.append('line')
+      .attr('x1', sineX + scaleTheta(theta))
+      .attr('y1', sineY + scaleSineY(pY))
+      .attr('x2', cosX + scaleTheta(theta))
+      .attr('y2', cosY + scaleCosY(cosVal))
+      .attr('stroke', '#f59e0b')
+      .attr('stroke-width', 2)
+      .attr('stroke-dasharray', '5,5')
+      .attr('opacity', 0.8);
+
+    svg.append('text')
+      .attr('x', cosX + scaleTheta(theta) + 8)
+      .attr('y', cosY + scaleCosY(cosVal) - 8)
+      .text('slope pen')
+      .attr('fill', '#f59e0b')
+      .attr('font-size', '11px')
+      .attr('font-weight', 'bold');
+
     // ==========================================
     // SYNTHESIS HIGHLIGHTS (When Theta is near 0)
     // ==========================================
-    if (theta < 0.2 || theta > 2 * Math.PI - 0.2) {
+    if (theta < 0.2 || theta > TAU - 0.2) {
       // Highlight correlation
       gCircle.append('circle')
         .attr('cx', scaleC(1)).attr('cy', scaleC(0))
@@ -279,11 +338,13 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
 
   }, [theta, width, height]);
 
+  const liveLogic = getLiveLogic(theta);
+
   return (
     <div className="viz-container bg-surface rounded-lg border border-border p-4 my-6 flex flex-col items-center">
       <h3 className="text-xl font-bold mb-2 text-center text-text">The "Moving Point" Deep Sync: Sine & Cosine</h3>
       <p className="text-sm text-text-muted mb-4 max-w-3xl text-center">
-        Set θ = 0. Notice the yellow velocity vector is pointing strictly upwards (vertical length = 1). Because the ball's momentum is 100% vertical, its height (Sine curve) is increasing at its maximum possible speed. Hence, the slope of Sine is 1, and the value of Cosine is 1. They are telling the exact same story from three perspectives.
+        Graph painter mode: the sine tangent is the "ghost," and the lower panel paints the derivative values it reports. Move theta and watch cosine be drawn by slope alone.
       </p>
       
       <div className="w-full relative" style={{ height: height + 'px' }}>
@@ -313,13 +374,18 @@ const TrigDerivativeSync = ({ width = 900, height = 500 }) => {
           <input
             type="range"
             min="0"
-            max={2 * Math.PI}
+            max={TAU}
             step="0.01"
             value={theta}
             onChange={(e) => { setIsPlaying(false); setTheta(parseFloat(e.target.value)); }}
             className="w-full accent-text-accent"
           />
         </div>
+      </div>
+
+      <div className="mt-4 w-full max-w-2xl rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 p-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300 mb-1">Live Logic</p>
+        <p className="text-sm text-slate-700 dark:text-slate-200">{liveLogic}</p>
       </div>
     </div>
   );

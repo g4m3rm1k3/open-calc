@@ -146,6 +146,10 @@ const VIZ_REGISTRY = {
   CoDirectionCompass:            lazy(() => import('./react/CoDirectionCompass.jsx')),
   NestedTrigMachine:             lazy(() => import('./react/NestedTrigMachine.jsx')),
   QuotientRuleTanBuilder:        lazy(() => import('./react/QuotientRuleTanBuilder.jsx')),
+  SineAdditionProofBuilder:      lazy(() => import('./react/SineAdditionProofBuilder.jsx')),
+  InverseBridgeTriangleLab:      lazy(() => import('./react/InverseBridgeTriangleLab.jsx')),
+  ChainRuleOnionLab:             lazy(() => import('./react/ChainRuleOnionLab.jsx')),
+  ProofCircleLinkLab:            lazy(() => import('./react/ProofCircleLinkLab.jsx')),
 }
 
 function VizSkeleton() {
