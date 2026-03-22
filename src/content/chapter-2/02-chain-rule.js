@@ -340,18 +340,30 @@ export default {
       steps: [
         {
           expression: "f(x) = [\\sin(x^2)]^4",
+          strategyTitle: 'Scan the Layers',
+          strategy: 'Before any derivative, identify outside -> middle -> inside. This prevents mixing sin(x^2) with (sin x)^2.',
+          checkpoint: 'Which operation is performed last when evaluating this function?',
           annotation: 'Rewrite explicitly to show the structure: we are raising sin(x\u00b2) to the fourth power. This is a triple composition: the outermost is u\u2074, the middle is sin, the innermost is x\u00b2.',
         },
         {
           expression: "\\text{Layer 1 (outermost): } F(u) = u^4",
+          strategyTitle: 'Peel Layer 1',
+          strategy: 'Differentiate only the shell and keep the inside block frozen.',
+          checkpoint: 'What exact expression is being protected unchanged here?',
           annotation: 'Peel layer 1: apply the power rule outside and keep sin(x²) completely untouched inside the brackets.',
         },
         {
           expression: "\\text{Layer 2 (middle): } G(v) = \\sin(v)",
+          strategyTitle: 'Peel Layer 2',
+          strategy: 'Now differentiate the trig wrapper while still preserving the innermost polynomial.',
+          checkpoint: 'What still remains un-differentiated after this layer?',
           annotation: 'Peel layer 2: now derive sine, again keeping its inner argument x² exactly as-is.',
         },
         {
           expression: "\\text{Layer 3 (innermost): } H(x) = x^2",
+          strategyTitle: 'Core Layer',
+          strategy: 'Only after outer wrappers are handled do we differentiate the core x^2.',
+          checkpoint: 'Why is this derivative intentionally delayed until now?',
           annotation: 'The innermost function is x\u00b2.',
         },
         {
@@ -380,18 +392,30 @@ export default {
       steps: [
         {
           expression: "\\frac{dy}{du} = 5u^4",
+          strategyTitle: 'Scan the Chain',
+          strategy: 'Name the current variable first: y depends on u here, so take the derivative with respect to u before touching x.',
+          checkpoint: 'Which variable are you differentiating with respect to in this line?',
           annotation: 'Differentiate y = u\u2075 with respect to u, treating u as the independent variable.',
         },
         {
           expression: "\\frac{du}{dx} = 6x",
+          strategyTitle: 'Differentiate the Inner Link',
+          strategy: 'Now move one layer inward and compute how u changes when x changes.',
+          checkpoint: 'What role does this factor play in the final rate multiplication?',
           annotation: 'Differentiate u = 3x\u00b2 - 1 with respect to x.',
         },
         {
           expression: "\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx} = 5u^4 \\cdot 6x",
+          strategyTitle: 'Multiply Local Rates',
+          strategy: 'Connect the gears: output-per-u times u-per-x gives output-per-x.',
+          checkpoint: 'What units or variables cancel conceptually in this product?',
           annotation: 'Multiply the two rates together per the chain rule in Leibniz form. The du "terms" appear to cancel like fractions, though this is a notational convenience, not literal cancellation.',
         },
         {
           expression: "= 30x \\cdot u^4 = 30x(3x^2-1)^4",
+          strategyTitle: 'Return to Original Variable',
+          strategy: 'Always finish in x unless the problem explicitly asks for u-form. Replace intermediate variables at the end.',
+          checkpoint: 'Why must the final answer be expressed in x?',
           annotation: 'Substitute back u = 3x\u00b2-1 to express everything in terms of x. The final answer must be in terms of the original variable x.',
         },
       ],
