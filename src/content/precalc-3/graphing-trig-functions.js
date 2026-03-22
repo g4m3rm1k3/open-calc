@@ -2,7 +2,7 @@ export default {
   id: 'ch3-trig-005',
   slug: 'graphing-trig-functions',
   chapter: 'precalc-3',
-  order: 5,
+  order: 4,
   title: 'Graphing All Six Trig Functions',
   subtitle: 'Period, amplitude, asymptotes, domain and range — and why the graphs look exactly the way they do',
   tags: ['graphing', 'sine', 'cosine', 'tangent', 'cotangent', 'secant', 'cosecant', 'period', 'asymptotes', 'domain', 'range'],

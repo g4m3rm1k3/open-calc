@@ -1,6 +1,6 @@
 export default {
   id: 'precalc3-solving-triangles',
-  slug: 'solving-triangles',
+  slug: 'solving-triangles-series',
   chapter: 'precalc-3',
   order: 6,
   title: "Solving Triangles",

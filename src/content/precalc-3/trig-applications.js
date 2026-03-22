@@ -2,7 +2,7 @@ export default {
   id: 'ch3-005',
   slug: 'trig-applications',
   chapter: 'precalc-3',
-  order: 4,
+  order: 8,
   title: 'Trig in the Real World: Periodic Models & Solving Equations',
   subtitle: 'Sinusoidal models, solving trig equations completely, and why periodicity matters in calculus',
   tags: ['trig applications', 'sinusoidal model', 'periodic', 'solving trig equations', 'amplitude', 'phase shift', 'period'],

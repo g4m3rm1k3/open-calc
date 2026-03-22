@@ -2,7 +2,7 @@ export default {
   id: 'ch3-002',
   slug: 'trig-in-calculus',
   chapter: 'precalc-3',
-  order: 1,
+  order: 9,
   title: 'Trig in Calculus: Knowing Which Identity to Reach For',
   subtitle: 'The pattern-matching layer between trig identities and calculus problems',
   tags: ['trig substitution', 'chain rule', 'integration', 'trig derivatives', 'strategy'],

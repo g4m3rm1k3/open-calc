@@ -2,7 +2,7 @@ export default {
   id: 'ch3-001',
   slug: 'trig-identities-deep-dive',
   chapter: 'precalc-3',
-  order: 0,
+  order: 7,
   title: 'Trig Identities: Where They Come From',
   subtitle: 'From the unit circle to the identities you actually use in calculus',
   tags: ['trigonometry', 'identities', 'unit circle', 'pythagorean identity', 'angle addition'],

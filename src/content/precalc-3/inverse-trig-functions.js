@@ -2,7 +2,7 @@ export default {
   id: 'ch3-004',
   slug: 'inverse-trig-functions',
   chapter: 'precalc-3',
-  order: 3,
+  order: 6,
   title: 'Inverse Trig Functions: Undoing the Circle',
   subtitle: 'Why domain restriction is not a technicality — it is the only way inverse trig can exist',
   tags: ['inverse trig', 'arcsin', 'arccos', 'arctan', 'domain restriction', 'principal value', 'inverse functions'],

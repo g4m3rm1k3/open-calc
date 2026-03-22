@@ -46,14 +46,40 @@ function normalizeProse(paragraphs = []) {
 
 function SectionContent({ data }) {
   if (!data) return null
+
+  // Blocks format — render all block types in natural order
+  const rawBlocks = data.blocks ?? []
+  const contentBlocks = rawBlocks.filter(b => b.type !== 'callout' || true) // include all types
+  if (contentBlocks.length > 0) {
+    return (
+      <div className="space-y-4">
+        {contentBlocks.map((block, i) => {
+          if (block.type === 'prose') {
+            return (
+              <div key={i} className="prose-content text-slate-700 dark:text-slate-300">
+                {normalizeProse(block.paragraphs ?? []).map((p, j) => <ProseParagraph key={j} text={p} />)}
+              </div>
+            )
+          }
+          if (block.type === 'callout') return <Callout key={i} {...block} />
+          if (block.type === 'stepthrough') return <StepThrough key={i} {...block} />
+          if (block.type === 'viz') {
+            const norm = normalizeViz(block)
+            return norm ? <VizCard key={i} viz={norm} /> : null
+          }
+          return null
+        })}
+        {(data.callouts ?? []).map((c, i) => <Callout key={`extra-${i}`} {...c} />)}
+      </div>
+    )
+  }
+
+  // Legacy format (prose + callouts arrays, no blocks)
   const prose = normalizeProse(data.prose)
   return (
     <div className="space-y-4">
       {prose.map((p, i) => <ProseParagraph key={i} text={p} />)}
       {(data.callouts ?? []).map((c, i) => <Callout key={i} {...c} />)}
-      {(data.blocks ?? []).filter(b => b.type === 'stepthrough').map((b, i) => (
-        <StepThrough key={i} {...b} />
-      ))}
     </div>
   )
 }
@@ -136,8 +162,9 @@ function IntuitionBlock({ data }) {
     || data?.alternate?.callouts?.length > 0
     || data?.alternate?.visualizations?.length > 0
 
-  const primaryVizzes = getSectionVizzes(data)
-  const hasPrimary = data?.prose?.length > 0 || data?.callouts?.length > 0 || primaryVizzes.length > 0
+  const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
+  const primaryVizzes = isBlocksFormat ? [] : getSectionVizzes(data)
+  const hasPrimary = data?.prose?.length > 0 || data?.callouts?.length > 0 || primaryVizzes.length > 0 || isBlocksFormat
   const alternateVizzes = hasAlternate ? getSectionVizzes(data.alternate) : []
   if (!hasPrimary && !hasAlternate) return null
 
@@ -177,8 +204,9 @@ function IntuitionBlock({ data }) {
 
 function MathBlock({ data }) {
   const [open, setOpen] = useState(true)
-  const vizzes = getSectionVizzes(data)
-  const hasProse = data?.prose?.length > 0
+  const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
+  const vizzes = isBlocksFormat ? [] : getSectionVizzes(data)
+  const hasProse = data?.prose?.length > 0 || isBlocksFormat
   const hasCallouts = data?.callouts?.length > 0
   if (!hasProse && !hasCallouts && !vizzes.length) return null
 
@@ -213,8 +241,9 @@ function MathBlock({ data }) {
 
 function RigorBlock({ data }) {
   const [open, setOpen] = useState(false)
-  const vizzes = getSectionVizzes(data)
-  const hasProse = data?.prose?.length > 0
+  const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
+  const vizzes = isBlocksFormat ? [] : getSectionVizzes(data)
+  const hasProse = data?.prose?.length > 0 || isBlocksFormat
   const hasCallouts = data?.callouts?.length > 0
   const hasProofSteps = data?.proofSteps?.length > 0
   if (!hasProse && !hasCallouts && !vizzes.length && !hasProofSteps) return null

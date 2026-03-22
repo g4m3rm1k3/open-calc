@@ -2,7 +2,7 @@ export default {
   id: 'ch3-003',
   slug: 'logarithm-relationships',
   chapter: 'precalc-3',
-  order: 2,
+  order: 10,
   title: 'Logarithms: Why $\\ln$ Is Everywhere in Calculus',
   subtitle: 'Log laws from geometry, the natural log as an area, and why $e$ is the right base',
   tags: ['logarithms', 'natural log', 'ln', 'exponentials', 'log laws', 'integration'],

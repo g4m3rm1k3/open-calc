@@ -2,7 +2,7 @@ export default {
   id: 'ch3-trig-000',
   slug: 'angles-foundations',
   chapter: 'precalc-3',
-  order: 0,
+  order: 1,
   title: 'Angles: The Foundation of Trigonometry',
   subtitle: 'What an angle actually is, how we measure it two different ways, and why radians are the natural choice for calculus',
   tags: ['angles', 'degrees', 'radians', 'complementary', 'supplementary', 'acute', 'obtuse', 'reflex', 'angle measurement'],

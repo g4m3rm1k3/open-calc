@@ -2,7 +2,7 @@ export default {
   id: 'ch3-trig-006',
   slug: 'solving-triangles',
   chapter: 'precalc-3',
-  order: 6,
+  order: 5,
   title: 'Solving Triangles: Law of Sines, Law of Cosines, and the Ambiguous Case',
   subtitle: 'Every triangle can be solved — if you know which law to use and when',
   tags: ['law of sines', 'law of cosines', 'solving triangles', 'SSA', 'ambiguous case', 'AAS', 'ASA', 'SAS', 'SSS', 'oblique triangles'],
