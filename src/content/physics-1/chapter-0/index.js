@@ -256,7 +256,7 @@ export const CH0_LESSONS = [
     hook: {
       question: 'Why is average speed not enough for real-time control?',
       realWorldContext: 'Braking systems, autonomous driving, and robotics need instantaneous change, not delayed averages.',
-      previewVisualizationId: 'SecantToTangent',
+      previewVisualizationId: 'MasterLimitGraph',
     },
     intuition: {
       prose: [
@@ -264,46 +264,156 @@ export const CH0_LESSONS = [
         'For safety systems and control loops, that blur is often too slow. They require local, immediate change information.',
         'When we zoom into a tiny interval, curved motion starts to look linear. This local linearity motivates instantaneous velocity.',
         'Calculus enters exactly here: it formalizes the zoom process instead of treating it as a hand-wave.',
+        'Car analogy: your trip average speed can be 60 km/h while your speedometer is reading 15 km/h in traffic or 95 km/h on a clear stretch. Average and instantaneous values answer different questions.',
+        'Failure case: two motions can have the same average velocity over 0 to 10 s but one can reverse direction midway. The average hides that sign change unless you inspect local slope.',
+        'Flashbulb analogy: average velocity is like a long-exposure blur across a whole interval, while instantaneous velocity is like a high-speed flash frame that freezes one exact moment.',
+        'Try-at-home experiment: walk toward a wall slowly for 3 seconds, then speed up in the final second. Your average speed for the full walk is moderate, but your instantaneous speed near the wall is much higher.',
+      ],
+      callouts: [
+        {
+          type: 'insight',
+          title: 'Pre-Flight Prediction',
+          body: 'Before touching any slider: if $\\Delta t$ gets smaller, do you expect average velocity to move closer to or farther from the speedometer-style instantaneous velocity?',
+        },
+        {
+          type: 'insight',
+          title: 'Instantaneous = Local Linear Approximation',
+          body: 'At sufficiently small time scales, smooth motion behaves like a line segment, and slope becomes locally stable.',
+        },
+        {
+          type: 'warning',
+          title: 'Average Velocity Can Hide Direction Changes',
+          body: 'A near-zero average over a long interval can still include fast forward and backward motion inside the interval.',
+        },
+        {
+          type: 'definition',
+          title: 'Average vs Instantaneous Definitions',
+          body: 'Average: $v_{avg}=\\Delta x/\\Delta t$ over a finite interval. Instantaneous: $v=\\lim_{\\Delta t\\to 0}\\Delta x/\\Delta t$ at a point.',
+        },
+        {
+          type: 'proof-map',
+          title: 'Limit Process Map',
+          body: 'Secant slope on interval -> shrink interval -> limit exists -> tangent slope (derivative).',
+        },
+        {
+          type: 'definition',
+          title: 'Symbol Decoder (Plain English)',
+          body: '$\\Delta$ means "change in", $x$ means position, and $t$ means time. So $\\Delta x/\\Delta t$ literally means "how much position changed per time changed."',
+        },
+        {
+          type: 'insight',
+          title: 'Analogy: Average Mood vs Instant Mood',
+          body: 'You can have a good average mood this month but feel frustrated right now after dropping your phone. Same logic: interval average and moment value are different quantities.',
+        },
+        {
+          type: 'warning',
+          title: 'Safety Stakes',
+          body: 'If a self-driving car brakes using a long average instead of local instantaneous data, it can react late and crash.',
+        },
       ],
       visualizations: [
         {
-          id: 'SecantToTangent',
-          title: 'Secant to Tangent',
-          mathBridge: 'Shrinking $\\Delta t$ moves secant slope toward tangent slope.',
-          caption: 'Limit process made visual.',
-          props: { functionType: 'parabola' },
+          id: 'MasterLimitGraph',
+          title: 'Master Graph: Algebra -> Limit -> Calculus',
+          mathBridge: 'Single evolving graph: finite secant, shrinking interval, then local tangent behavior with snap feedback.',
+          caption: 'One visual backbone instead of repeated coordinate planes.',
+        },
+        {
+          id: 'SplitScreenLimitSync',
+          title: 'Dual-Track Sync: Algebra -> Calculus',
+          mathBridge: 'Left side keeps finite $\\Delta$ brackets, right side shows the same process refining into differential notation via the limit.',
+          caption: 'The two tracks are one process at different scales.',
+        },
+        {
+          id: 'SpaceTimeRibbon',
+          title: '3D Space-Time Ribbon',
+          mathBridge: 'Average velocity is the straight pole between two points on the trajectory; instantaneous velocity is the local direction pointer.',
+          caption: 'From 2D slope to 3D motion intuition.',
+        },
+        {
+          id: 'BrakeOrCrashSim',
+          title: 'Brake or Crash: Stale vs Instant Data',
+          mathBridge: 'Average telemetry is delayed history; instantaneous telemetry is local state needed for control.',
+          caption: 'Safety stakes become visceral through interaction.',
         },
       ],
     },
     math: {
       prose: [
+        'Plain-English bridge before symbols: we are measuring "steepness of the motion story" on a graph. Average steepness uses a whole chunk; instantaneous steepness uses one location via a limit process.',
         'Average velocity: $v_{avg}=\\frac{\\Delta x}{\\Delta t}$ with units m/s over a finite interval.',
         'Instantaneous velocity: $v=\\lim_{\\Delta t\\to 0}\\frac{\\Delta x}{\\Delta t}$. As the time window shrinks, the estimate approaches local slope.',
         'Interpretation: if instantaneous velocity changes sign, direction changes; if magnitude grows, motion becomes faster at that instant.',
+        'Why plugging in a single point fails: slope needs two points. The limit process supplies that by using two nearby points and then collapsing the gap.',
+        'Equation depth check: $x$ is position (m), $t$ is time (s), $\\Delta x$ is displacement (m), and $\\Delta t$ is elapsed time (s), so both average and instantaneous velocity have units m/s.',
+        'Graph interpretation: secant slope is interval behavior, tangent slope is local behavior. Physical interpretation: secant is trip report, tangent is speedometer reading now.',
       ],
       callouts: [
+        {
+          type: 'definition',
+          title: 'Dual-Track Rigor Toggle',
+          body: 'Algebra track: secant slope over a finite gap. Calculus track: the same secant process with gap size driven to zero by a limit.',
+        },
         {
           type: 'definition',
           title: 'Interpretation',
           body: '$v>0$ means position increases; larger magnitude means faster position change per second.',
         },
+        {
+          type: 'warning',
+          title: 'Edge Case: Dt = 0 is Undefined',
+          body: 'The ratio $\\Delta x/\\Delta t$ is undefined at exactly $\\Delta t=0$. Instantaneous velocity is defined by a limit, not direct substitution.',
+        },
+        {
+          type: 'warning',
+          title: 'Edge Case: Non-Smooth Motion',
+          body: 'At corners, cusps, or jumps, left and right slopes can disagree, so the derivative may fail to exist.',
+        },
+        {
+          type: 'insight',
+          title: 'Misconception Check',
+          body: 'Instantaneous velocity is not zero just because the interval is tiny; it is the limiting slope value, which can be nonzero.',
+        },
+        {
+          type: 'warning',
+          title: 'Misconception: Average Always Equals Instantaneous',
+          body: 'Average approaches instantaneous only as interval width shrinks. For finite intervals they can differ significantly.',
+        },
+        {
+          type: 'proof-map',
+          title: 'Algebra-to-Calculus Bridge',
+          body: 'Calculus is not a separate idea here; it is repeated algebraic secant estimation with shrinking intervals until a stable local value emerges.',
+        },
+        {
+          type: 'insight',
+          title: 'Unity Principle',
+          body: 'Calculus is algebra under a magnifying glass: the same ratio, evaluated on smaller and smaller neighborhoods.',
+        },
       ],
     },
     rigor: {
       title: 'From Slope Definition to Instantaneous Velocity',
-      visualizationId: 'SecantToTangent',
+      visualizationId: 'MasterLimitGraph',
       proofSteps: [
         {
-          expression: 'v_{avg}=\\frac{\\Delta x}{\\Delta t}',
-          annotation: 'Start with average change over finite interval.',
+          expression: 'm_{sec}=\\frac{x(t+\\Delta t)-x(t)}{\\Delta t}',
+          annotation: 'Define secant slope across two nearby times; physically this is finite-interval average velocity.',
+        },
+        {
+          expression: '\\Delta t \\to 0',
+          annotation: 'Shrink the time interval so both points collapse to one instant while preserving the slope trend.',
         },
         {
           expression: 'v=\\lim_{\\Delta t\\to 0}\\frac{\\Delta x}{\\Delta t}',
-          annotation: 'Shrink interval to approach local slope.',
+          annotation: 'Introduce limit notation to define local slope rigorously at a single time point.',
         },
         {
           expression: 'v=\\frac{dx}{dt}',
-          annotation: 'Derivative notation for instantaneous velocity.',
+          annotation: 'Name the limiting slope as derivative; physically this is speedometer-like local velocity.',
+        },
+        {
+          expression: '\\text{if }x(t)=t^2,\\ v(t)=2t',
+          annotation: 'Concrete check: derivative gives time-varying local velocity that average values only approximate on intervals.',
         },
       ],
     },
@@ -324,21 +434,94 @@ export const CH0_LESSONS = [
         ],
         conclusion: 'Instantaneous velocity at a specific time may differ from the interval average.',
       },
+      {
+        id: 'p0-004-ex2',
+        title: 'Curved Motion and Local Velocity',
+        problem: '\\text{For } x(t)=t^2, \\text{ compare } v_{avg} \\text{ on } [2,3] \\text{ with } v(2).',
+        steps: [
+          {
+            expression: 'v_{avg}=\\frac{x(3)-x(2)}{3-2}=\\frac{9-4}{1}=5',
+            annotation: 'Finite interval average gives 5 m/s.',
+          },
+          {
+            expression: 'v(t)=\\frac{dx}{dt}=2t \\Rightarrow v(2)=4',
+            annotation: 'Instantaneous velocity at t=2 is 4 m/s.',
+          },
+          {
+            expression: '5 \\neq 4',
+            annotation: 'Different values confirm average over an interval is not identical to point velocity.',
+          },
+        ],
+        conclusion: 'Curvature causes average and instantaneous values to diverge over finite windows.',
+      },
     ],
     challenges: [
       {
         id: 'p0-004-ch1',
         difficulty: 'easy',
-        problem: '\\text{What does shrinking } \\Delta t \\text{ represent physically?}',
-        hint: 'Think about zooming in time.',
-        answer: 'Looking at motion over smaller and smaller time windows around one instant.',
+        problem: '\\text{Compute } v_{avg} \\text{ for } x(t)=3t+1 \\text{ on } [1,5].',
+        hint: 'Find endpoint positions and divide by total time.',
+        walkthrough: [
+          {
+            expression: '\\text{If stuck, revisit: Symbol Decoder and Average Definition}',
+            annotation: 'Re-read the Symbol Decoder callout and the first two math paragraphs before computing.',
+          },
+          {
+            expression: 'v_{avg}=\\frac{x(5)-x(1)}{5-1}',
+            annotation: 'Use endpoint displacement over total elapsed time.',
+          },
+          {
+            expression: 'x(5)=16,\\ x(1)=4 \\Rightarrow v_{avg}=\\frac{12}{4}=3',
+            annotation: 'Compute values and simplify to 3 m/s.',
+          },
+        ],
+        answer: '3 m/s.',
       },
       {
         id: 'p0-004-ch2',
         difficulty: 'medium',
-        problem: '\\text{For } x(t)=t^2, \\text{ estimate } v(2) \\text{ using } \\Delta t=0.1.',
-        hint: 'Compute $[x(2.1)-x(2)]/0.1$.',
-        answer: 'Approximately 4.1 m/s (close to exact value 4 m/s).',
+        problem: '\\text{From the graph of } x(t)=t^2, \\text{ estimate } v(2) \\text{ using secant points } t=1.9,2.1.',
+        hint: 'Use central secant: $[x(2.1)-x(1.9)]/0.2$.',
+        walkthrough: [
+          {
+            expression: '\\text{If stuck, revisit: Secant-to-Tangent and Local Zoom visuals}',
+            annotation: 'Those visuals show why a narrow secant is an estimate for instantaneous slope.',
+          },
+          {
+            expression: 'v(2)\\approx\\frac{x(2.1)-x(1.9)}{0.2}=\\frac{4.41-3.61}{0.2}',
+            annotation: 'Apply central secant around t=2.',
+          },
+          {
+            expression: 'v(2)\\approx 4.0',
+            annotation: 'Estimated instantaneous velocity is about 4 m/s.',
+          },
+        ],
+        answer: 'Approximately 4.0 m/s.',
+      },
+      {
+        id: 'p0-004-ch3',
+        difficulty: 'hard',
+        problem: '\\text{Explain why derivative fails for } x(t)=|t| \\text{ at } t=0.',
+        hint: 'Compare left-hand and right-hand slope limits.',
+        walkthrough: [
+          {
+            expression: '\\text{If stuck, revisit: Edge Case Non-Smooth Motion}',
+            annotation: 'That callout explains derivative failure at corners/cusps.',
+          },
+          {
+            expression: 'm_{left}=\\lim_{h\\to0^-}\\frac{|h|-|0|}{h}=\\lim_{h\\to0^-}\\frac{-h}{h}=-1',
+            annotation: 'Compute left-hand slope.',
+          },
+          {
+            expression: 'm_{right}=\\lim_{h\\to0^+}\\frac{|h|-|0|}{h}=\\lim_{h\\to0^+}\\frac{h}{h}=+1',
+            annotation: 'Compute right-hand slope.',
+          },
+          {
+            expression: '-1\\neq +1 \\Rightarrow \\frac{dx}{dt}\\text{ does not exist at }t=0',
+            annotation: 'Left and right limits disagree, so derivative fails at the corner.',
+          },
+        ],
+        answer: 'Left slope is -1 and right slope is +1, so the limit slopes disagree; derivative does not exist at the corner.',
       },
     ],
   },

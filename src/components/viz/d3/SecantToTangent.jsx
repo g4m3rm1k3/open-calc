@@ -12,8 +12,9 @@ const fPrime = (x) => 2 * x
 export default function SecantToTangent({ params }) {
   const svgRef = useRef(null)
   const [h, setH] = useState(1.5)
-  const [x0] = useState(1.5)
+  const [x0, setX0] = useState(1.5)
   const [showTangent, setShowTangent] = useState(false)
+  const snapZone = h <= 0.12
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)
@@ -45,7 +46,7 @@ export default function SecantToTangent({ params }) {
     // Draw secant line
     const secLine = (x) => y0 + secSlope * (x - x0)
     const secPts = [[-0.5, secLine(-0.5)], [4, secLine(4)]]
-    svg.append('path').datum(secPts).attr('fill', 'none').attr('stroke', '#f59e0b').attr('stroke-width', 2).attr('stroke-dasharray', h < 0.2 ? '5,3' : 'none').attr('d', line)
+    svg.append('path').datum(secPts).attr('fill', 'none').attr('stroke', snapZone ? '#10b981' : '#f59e0b').attr('stroke-width', snapZone ? 2.8 : 2).attr('stroke-dasharray', h < 0.2 ? '5,3' : 'none').attr('d', line)
     svg.append('text').attr('x', xSc(3.5)).attr('y', ySc(secLine(3.5)) - 10).attr('font-size', 11).attr('fill', '#f59e0b').text(`secant slope = ${secSlope.toFixed(3)}`)
 
     // h label
@@ -53,7 +54,7 @@ export default function SecantToTangent({ params }) {
     svg.append('text').attr('x', xSc((x0 + x1) / 2)).attr('y', ySc(y0) + 35).attr('text-anchor', 'middle').attr('font-size', 12).attr('fill', '#94a3b8').text(`h = ${h.toFixed(2)}`)
 
     // Tangent line
-    if (showTangent) {
+    if (showTangent || snapZone) {
       const tanSlope = fPrime(x0)
       const tanLine = (x) => y0 + tanSlope * (x - x0)
       const tanPts = [[-0.5, tanLine(-0.5)], [4, tanLine(4)]]
@@ -71,14 +72,30 @@ export default function SecantToTangent({ params }) {
     // Title
     svg.append('text').attr('x', W / 2).attr('y', 15).attr('text-anchor', 'middle').attr('font-size', 12).attr('fill', '#64748b').text('f(x) = x²')
 
-  }, [h, x0, showTangent])
+    if (snapZone) {
+      svg.append('text')
+        .attr('x', W / 2)
+        .attr('y', H - 12)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', 12)
+        .attr('font-weight', 700)
+        .attr('fill', '#10b981')
+        .text('SNAP: secant has converged to local tangent behavior')
+    }
+
+  }, [h, x0, showTangent, snapZone])
 
   return (
     <div>
       <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + H} className="overflow-visible" />
       <div className="px-4 mt-2 space-y-2">
         <SliderControl
-          label="h (step size)"
+          label="Focus point x0"
+          min={0.5} max={3} step={0.05}
+          value={x0} onChange={setX0}
+        />
+        <SliderControl
+          label="Scrub the limit: h (interval width)"
           min={0.05} max={2.5} step={0.05}
           value={h} onChange={setH}
         />
@@ -88,7 +105,7 @@ export default function SecantToTangent({ params }) {
         </label>
       </div>
       <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-2 italic">
-        As h → 0, the secant line (orange) converges to the tangent line (green). The secant slope → {(2 * 1.5).toFixed(1)} = f′({1.5}).
+        Drag h toward 0 and watch the snap zone: secant (interval) converges to tangent (instantaneous). For this x0, target slope is {(2 * x0).toFixed(2)}.
       </p>
     </div>
   )

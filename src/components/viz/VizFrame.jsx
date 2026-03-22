@@ -105,6 +105,12 @@ const VIZ_REGISTRY = {
   VectorBuilder:                 lazy(() => import('./react/VectorBuilder.jsx')),
   FrameSwitcher:                 lazy(() => import('./react/FrameSwitcher.jsx')),
   DiscreteVsContinuous:          lazy(() => import('./react/DiscreteVsContinuous.jsx')),
+  VelocityComparison:            lazy(() => import('./react/VelocityComparison.jsx')),
+  LocalLinearityZoom:            lazy(() => import('./react/LocalLinearityZoom.jsx')),
+  SplitScreenLimitSync:          lazy(() => import('./react/SplitScreenLimitSync.jsx')),
+  SpaceTimeRibbon:               lazy(() => import('./react/SpaceTimeRibbon.jsx')),
+  BrakeOrCrashSim:               lazy(() => import('./react/BrakeOrCrashSim.jsx')),
+  MasterLimitGraph:              lazy(() => import('./react/MasterLimitGraph.jsx')),
   // Chapter 5 — New additions
   BisectionMethod:               lazy(() => import('./d3/BisectionMethod.jsx')),
   ShellMethod:                   lazy(() => import('./d3/ShellMethod.jsx')),
