@@ -57,85 +57,55 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integration involving Inverse Trig Functions",
-        url: "https://www.youtube.com/embed/dcGZJojjM-o"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/dcGZJojjM-o" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Base a Derivative & Integration (13 Examples)",
-        url: "https://www.youtube.com/embed/XL1SNbJlCfY"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/XL1SNbJlCfY" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Review of Basic Integration Rules Calculus 1 AB - 6 Examples",
-        url: "https://www.youtube.com/embed/prMmH2aRcKY"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/prMmH2aRcKY" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integration Involving Inverse Trigonometric Functions Calculus 1 AB 6 Examples",
-        url: "https://www.youtube.com/embed/0aDW2wz0G7o"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/0aDW2wz0G7o" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definite Integration with U Substitution Calculus 1 AB",
-        url: "https://www.youtube.com/embed/qd3qmJ421Tk"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/qd3qmJ421Tk" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Indefinite Integration by U Substitution Calculus 1 AB",
-        url: "https://www.youtube.com/embed/y_ZsPjUdols"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/y_ZsPjUdols" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definite Integration & Displacement and Total Distance of Linear Motion Calculus 1 AB",
-        url: "https://www.youtube.com/embed/hQo4hvJbezc"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/hQo4hvJbezc" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Antiderivative & Indefinite Integration 11 Examples Calculus 1 AB",
-        url: "https://www.youtube.com/embed/0rDbACz81A8"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/0rDbACz81A8" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative Rules of Trigonometric Functions Calculus 1 AB",
-        url: "https://www.youtube.com/embed/xVdArj43X4o"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/xVdArj43X4o" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Deriving Derivative Rules for Trigonometric Functions Tan, Cot, Sec, Csc Calculus 1 AB",
-        url: "https://www.youtube.com/embed/qJ-6EQiWA_w"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/qJ-6EQiWA_w" }
+      },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part III: Evaluating From The Definition",

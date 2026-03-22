@@ -71,13 +71,10 @@ export default {
   
       visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Continuity On an Interval Open & Closed Intervals & 1 Sided Limits Calculus 1 AB",
-        url: "https://www.youtube.com/embed/v5XuzQdYeHg"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/v5XuzQdYeHg" }
+      },
       {
         id: 'VideoEmbed',
         title: "CALCULUS SPEEDRUN || Limits || Episode 1",

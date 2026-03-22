@@ -47,38 +47,31 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 5: Implicit differentiation, what's going on here?",
+        props: { url: "https://www.youtube.com/embed/qb40J4N1fa4" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Implicit Differentiation Product Rule Normal Line",
-        url: "https://www.youtube.com/embed/d1ZCAoKPYQE"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/d1ZCAoKPYQE" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Second Derivative Implicitly Calculus 1 AB",
-        url: "https://www.youtube.com/embed/W2UII4CyMPI"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/W2UII4CyMPI" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Implicit Differentiation 3  Examples Calculus 1 AB",
-        url: "https://www.youtube.com/embed/Sd9wClEaaAM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Sd9wClEaaAM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Introduction to Implicit Differentiation Calculus 1 AB",
-        url: "https://www.youtube.com/embed/Uq32D9elScM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Uq32D9elScM" }
+      },
       {
         id: 'VideoEmbed',
         title: "Implicit Differentiation |  Differentiation when you only have an equation, not an explicit function",

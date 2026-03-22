@@ -71,6 +71,161 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "TR-44: Trig Graph Variations 3",
+        props: { url: "https://www.youtube.com/embed/LESdCLdTHVg" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-43: Trig Graph Variations 2 (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/RdIiaGH-KtQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-42: Trig Graph Variations (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/mFmPAL_5I4E" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-41: Half Angle Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/Hxox4DpW4wc" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-40: Double Angle Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/DCr6yqJfYiY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-39: Using Sum and Diff Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/Xoen_m4KUgs" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-38: Angle Sum and Difference Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/lw7UJRNJIzc" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-37: More Trig Reflections (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/RgusdNG5Luo" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-36 - Even and Odd Trig Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/q5tuzPASVaY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-35: Using Conjugate Identities in Trig Proofs (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/db0GxUtyqjA" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-34:  Using Pythagorean Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/B3JOQxj_MGs" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-33Z: All Trig Functions on the Unit Circle (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/LNBZ0bP4SHk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-33: Pythagorean Trig Identities (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/N-LP9O81yn4" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-32: Intro to Identities and Proofs (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/8F3zdi_a-PM" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-25: Inverse Trig Functions on a Calculator (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/em9vMyfBMzU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-24: Other Inverse Trig Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/h8QTK6u86EQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-23X: Inverse Sine and Cosine Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/GzfoE-u5BsU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-23: Inverse Sine and Cosine Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/qNhoMj8DYaU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-22: Algebra Review of Inverse Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/0xFUn0Dpu9M" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-21: Domain and Range of Trig Functions (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/NEoG0esRWFo" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-20: Graphing Secant and Cosecant (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/UZA34UL_mUE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-19: Graphing Tangent and Cotangent (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/p14y-9xPVgk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-18: Graphing Sine and Cosine (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/f99P31SAsek" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-17: Most Common Use of Trigonometry (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/Z3PB_l2PRjc" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-16: Trig Functions on a Calculator (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/-kXIfRLNlUw" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-15Z: Proof of the Common Sine and Cosine Values",
+        props: { url: "https://www.youtube.com/embed/i9ahDcV-bVg" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-15: Sine and Cosine of Common Angles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/4TFLcKKmfao" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-14: The Unit Circle (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/oJgBJfstOOU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-13Z: How the Co- Trig Functions got their Names",
+        props: { url: "https://www.youtube.com/embed/J5KWXgKx0MM" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-13: The Trigonometric Ratios (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/LvMScE93T6I" }
+      },
+                                                                                                                                                                    {
+        id: 'VideoEmbed',
+        title: "TR 10: Pythagorean Triples (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/ZG2p4jx-i-Q" }
+      },
+                                                          {
         id: 'UnitCircle',
         props: { animate: false },
         title: 'Basic Definitions: Sine & Cosine',

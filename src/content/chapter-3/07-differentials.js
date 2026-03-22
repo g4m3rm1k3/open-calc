@@ -53,69 +53,45 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Introduction to Separable Differential Equations (7 Examples)",
-        url: "https://www.youtube.com/embed/5sbRTJtMqx4"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/5sbRTJtMqx4" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Homogeneous Differential Equations First Order3 Examples",
-        url: "https://www.youtube.com/embed/SAdSMu3QNbo"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/SAdSMu3QNbo" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Solving First Order Linear Differential Equations 3 Examples",
-        url: "https://www.youtube.com/embed/Y0Yd2gBCNv0"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Y0Yd2gBCNv0" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "More Solving Separable Differential Equations Calculus 1 AB",
-        url: "https://www.youtube.com/embed/ylORzbeOH0E"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/ylORzbeOH0E" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Separable Differential Equations & Growth and Decay Model Calculus 1 AB",
-        url: "https://www.youtube.com/embed/QNrS74TchSM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/QNrS74TchSM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Intro to Solving Separable Differential Equation Calculus 1 AB",
-        url: "https://www.youtube.com/embed/HTjPPDZqL4E"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/HTjPPDZqL4E" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Verifying Particular Solutions to Differential Equations Calculus 1 AB",
-        url: "https://www.youtube.com/embed/zDyriegHHmo"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/zDyriegHHmo" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Differentials Tangent Line Approximation Propagated Error Linearization",
-        url: "https://www.youtube.com/embed/L3hY5QoZxFs"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/L3hY5QoZxFs" }
+      },
       { vizId: 'LinearApproximation', caption: 'Compare $\\Delta y$ (change along the curve) with $dy$ (change along the tangent line). For small $dx$, they are nearly equal.' },
     ],
   },

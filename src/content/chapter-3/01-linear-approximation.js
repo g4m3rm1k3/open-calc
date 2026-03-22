@@ -57,13 +57,10 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Area Between Curves (8 Examples)",
-        url: "https://www.youtube.com/embed/Y4Q0w812lh8"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Y4Q0w812lh8" }
+      },
       {
         id: 'VideoEmbed',
         title: "Linear Approximations | Using Tangent Lines to Approximate Functions",

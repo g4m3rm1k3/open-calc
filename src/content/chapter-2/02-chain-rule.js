@@ -72,62 +72,46 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
+        props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Natural Exponential Function e^x Calculus 1 AB",
-        url: "https://www.youtube.com/embed/-oLrRuZ9zgM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/-oLrRuZ9zgM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Natural Exponential Function (5 Examples)",
-        url: "https://www.youtube.com/embed/0cwDYHep0AQ"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/0cwDYHep0AQ" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Chain Rule with Trig Functions Harder Examples Calculus 1 AB",
-        url: "https://www.youtube.com/embed/gLYNlCarAmU"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/gLYNlCarAmU" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Chain Rule Harder Algebraic Examples Calculus 1 AB",
-        url: "https://www.youtube.com/embed/MvQkDW7aHV0"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/MvQkDW7aHV0" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Chain Rule Part 2 Trig Derivatives 3 Examples  4K",
-        url: "https://www.youtube.com/embed/P4e-DWNxZMM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/P4e-DWNxZMM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative using Chain Rule 3 Algebraic Examples 4K",
-        url: "https://www.youtube.com/embed/WygqeCwjn_s"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/WygqeCwjn_s" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivatives with Sine and Cosine Calculus 1 AB",
-        url: "https://www.youtube.com/embed/SRj8DGWo_ik"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/SRj8DGWo_ik" }
+      },
       {
         id: 'VideoEmbed',
         title: "Chain Rule: the Derivative of a Composition",

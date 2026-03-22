@@ -51,62 +51,46 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 8: What does area have to do with slope?",
+        props: { url: "https://www.youtube.com/embed/FnJqaIESC2s" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definite Integrals Defined w. Riemann Limit of Sums Example Calculus 1 AB",
-        url: "https://www.youtube.com/embed/TmYELyzIMxg"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/TmYELyzIMxg" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Riemann Sum Defined w/ 2 Limit of Sums Examples Calculus 1",
-        url: "https://www.youtube.com/embed/F6XC5_qbXls"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/F6XC5_qbXls" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Estimating Area with Rectangles & Riemann Limit of Sums Definition of Area Calculus 1 AB",
-        url: "https://www.youtube.com/embed/7FTtayaQKqY"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/7FTtayaQKqY" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definition of Area Riemann Sum Limit of Sums Part 2 of 2 Calculus 1",
-        url: "https://www.youtube.com/embed/DchlORZxHSU"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/DchlORZxHSU" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Estimating Area with Riemann Sums Finite Rectangles Calculus 1 AB",
-        url: "https://www.youtube.com/embed/KHECo7XsrOk"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/KHECo7XsrOk" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Riemann Sum and Definite Integral Introduction",
-        url: "https://www.youtube.com/embed/9elpcdrdYtI"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/9elpcdrdYtI" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Summation Notation (Sigma)",
-        url: "https://www.youtube.com/embed/WVfiBnzM3vQ"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/WVfiBnzM3vQ" }
+      },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part I: Approximating Areas with rectangles",

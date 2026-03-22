@@ -42,14 +42,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 2: Derivative formulas through geometry",
+        props: { url: "https://www.youtube.com/embed/S0_qX4VJhMQ" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Logarithmic Differentiation Derivative of a Fraction",
-        url: "https://www.youtube.com/embed/-DHel_4-NdE"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/-DHel_4-NdE" }
+      },
       {
         id: 'VideoEmbed',
         title: "Derivative Rules:  Power Rule, Additivity, and Scalar Multiplication",

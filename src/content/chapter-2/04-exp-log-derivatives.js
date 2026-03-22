@@ -47,30 +47,26 @@ export default {
       highlightBaseE: true,
     },
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 4: What's so special about Euler's number e?",
+        props: { url: "https://www.youtube.com/embed/m2MIpDrF7Es" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Logarithms Base a Calculus 1 AB",
-        url: "https://www.youtube.com/embed/D6BL-HZiYCs"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/D6BL-HZiYCs" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Exponential Functions Base a Calculus 1 AB",
-        url: "https://www.youtube.com/embed/usc7MDoymgQ"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/usc7MDoymgQ" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Natural Logarithm Functions Calculus 1 AB",
-        url: "https://www.youtube.com/embed/gOLl4DoJsrU"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/gOLl4DoJsrU" }
+      },
       {
         id: 'VideoEmbed',
         title: "The derivative of e^x.",

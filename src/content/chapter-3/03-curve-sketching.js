@@ -51,38 +51,31 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 9: Higher order derivatives",
+        props: { url: "https://www.youtube.com/embed/blcC0sBnmUE" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definite Integral as a Function of X Calculus 1 AB",
-        url: "https://www.youtube.com/embed/0s4qX1wBuJw"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/0s4qX1wBuJw" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Summary of Curve Sketching Rational Exponent Odd Function Calculus 1 AB",
-        url: "https://www.youtube.com/embed/2W58muXRV6g"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/2W58muXRV6g" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Summary of Curve Sketching Rational Function with Slant Asymptote Calculus 1 AB",
-        url: "https://www.youtube.com/embed/pIUHXjIcRGI"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/pIUHXjIcRGI" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "First Derivative Test Intervals of Increasing Decreasing & Relative Extrema Calculus 1 AB",
-        url: "https://www.youtube.com/embed/PBKnttVMbV4"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/PBKnttVMbV4" }
+      },
       {
         id: 'VideoEmbed',
         title: "Relative and Absolute Maximums and Minimums | Part I",

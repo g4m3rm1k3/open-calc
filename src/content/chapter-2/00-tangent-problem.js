@@ -76,117 +76,75 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Graphical Comparison Function to its 1st and 2nd Derivative Calculus 1 AB",
-        url: "https://www.youtube.com/embed/QpIBzZe3Tts"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/QpIBzZe3Tts" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Horizontal Tangent Lines and Differentiation Calculus 1 AB",
-        url: "https://www.youtube.com/embed/KFD7aei4bSg"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/KFD7aei4bSg" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Tangent Line of Curve Parallel to A Line Calculus 1 AB",
-        url: "https://www.youtube.com/embed/5PZH6YdERVM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/5PZH6YdERVM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Tangent Line Through Point not on Curve   4K",
-        url: "https://www.youtube.com/embed/s_aPRYImcng"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/s_aPRYImcng" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Tangent Line Parallel to a Given Line Calculus Derivative 4K",
-        url: "https://www.youtube.com/embed/P4aNHLfpPyQ"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/P4aNHLfpPyQ" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Tangent Line and Normal Line in Calculus   4K",
-        url: "https://www.youtube.com/embed/tQStuKWRkSs"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/tQStuKWRkSs" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Instantaneous Velocity and Speed of Linear Motion Calculus 1 AB",
-        url: "https://www.youtube.com/embed/moAkbw2lGYc"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/moAkbw2lGYc" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Basic Differentiation Rules Calculus 1 AB",
-        url: "https://www.youtube.com/embed/Jnqe2_jt8Ac"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Jnqe2_jt8Ac" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Graphical Comparison of Function vs Derivative Graphs Calculus 1 AB",
-        url: "https://www.youtube.com/embed/vZ73BtywN3c"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/vZ73BtywN3c" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Why there is no Derivative at a Sharp Bend 4k",
-        url: "https://www.youtube.com/embed/jXRgZUQN1l8"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/jXRgZUQN1l8" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definition of Derivative and Vertical Tangent Line Calculus 1 AB",
-        url: "https://www.youtube.com/embed/GRPEi9WBo9k"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/GRPEi9WBo9k" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        url: "https://www.youtube.com/embed/MNk7RnyU0mk"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/MNk7RnyU0mk" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definition of a Derivative & Alternative Form at a Point 4k",
-        url: "https://www.youtube.com/embed/_peU024gicM"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/_peU024gicM" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Definition of Derivative & Tangent Line Problems Calculus 1 AB",
-        url: "https://www.youtube.com/embed/eWxo7O506G8"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/eWxo7O506G8" }
+      },
       {
         id: 'VideoEmbed',
         title: "Definition of the Derivative  | Part I",

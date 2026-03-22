@@ -50,13 +50,10 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Derivative of Inverse Trigonometric Functions",
-        url: "https://www.youtube.com/embed/SOYcqhFw5vo"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/SOYcqhFw5vo" }
+      },
       {
         id: 'VideoEmbed',
         title: "The derivative of Trigonometric Functions",

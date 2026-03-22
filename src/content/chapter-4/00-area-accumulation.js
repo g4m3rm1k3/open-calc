@@ -61,70 +61,51 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Essence of Calculus, Chapter 7: Integration and the fundamental theorem of calculus",
+        props: { url: "https://www.youtube.com/embed/rfG8ce4nNh0" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Area Under a Curve & Definite Integrals with TI NSPIRE Calculus 1 AB",
-        url: "https://www.youtube.com/embed/_iHjvdyv7kU"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/_iHjvdyv7kU" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Inverse Hyperbolic Functions Derivative and Integral Calculus 1",
-        url: "https://www.youtube.com/embed/sXF57VBR5go"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/sXF57VBR5go" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integrating Exponential Functions Base a Calculus 1 AB",
-        url: "https://www.youtube.com/embed/6ofyePCNB54"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/6ofyePCNB54" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Maximum Error in Trapezoidal Rule & Simpson's Rule Calculus 1 AB READ DESCRIPTION",
-        url: "https://www.youtube.com/embed/YsFebPl_RKo"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/YsFebPl_RKo" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Trapezoidal Rule & Simpson's Rule Estimating Definite Integrals Calculus 1 AB READ DESCRIPTION",
-        url: "https://www.youtube.com/embed/TH06N7Q7FJw"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/TH06N7Q7FJw" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Accumulation Function Definite Integral",
-        url: "https://www.youtube.com/embed/idifpe52eQ4"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/idifpe52eQ4" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Properties of Definite Integrals Calculus 1 AB",
-        url: "https://www.youtube.com/embed/wycadSRDID4"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/wycadSRDID4" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Estimating Area with Rectangles Part 1 of 2 Calculus 1 AB",
-        url: "https://www.youtube.com/embed/4u0z-KNu34o"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/4u0z-KNu34o" }
+      },
       {
         id: 'WaterTank',
         title: 'Variable Flow Rate → Water Accumulation',

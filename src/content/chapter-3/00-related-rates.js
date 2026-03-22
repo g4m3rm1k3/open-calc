@@ -63,45 +63,30 @@ export default {
   
       visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Calculus Related Rates Example Volume of Cone Calculus 1 AB",
-        url: "https://www.youtube.com/embed/FoB4qIKQxZ0"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/FoB4qIKQxZ0" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Related Rates Similar Triangles   4K",
-        url: "https://www.youtube.com/embed/I5u0g7QCdMI"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/I5u0g7QCdMI" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Related Rates Right Triangles 2 Examples 4K",
-        url: "https://www.youtube.com/embed/Z2yQYPPTU2M"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/Z2yQYPPTU2M" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Related Rates Part 2 Linear vs Angular Speed Calculus 1 AB",
-        url: "https://www.youtube.com/embed/JBHQYQSdmJQ"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/JBHQYQSdmJQ" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Related Rates Introduction Area & Volume 4K",
-        url: "https://www.youtube.com/embed/DQ5T3ht5ahs"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/DQ5T3ht5ahs" }
+      },
       {
         id: 'VideoEmbed',
         title: "Intro to Related Rates",

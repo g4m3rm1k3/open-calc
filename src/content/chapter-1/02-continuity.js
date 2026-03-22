@@ -53,13 +53,10 @@ export default {
     visualizationProps: {},
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Intermediate Value Theorem Calculus 1 AB PreCalculus",
-        url: "https://www.youtube.com/embed/j3tPwgqS4ns"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/j3tPwgqS4ns" }
+      },
       {
         id: 'VideoEmbed',
         title: "Limits are simple for continuous functions",

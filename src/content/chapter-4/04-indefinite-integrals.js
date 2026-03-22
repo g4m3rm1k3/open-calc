@@ -52,45 +52,30 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integration Techniques Reviewed (5 Examples)",
-        url: "https://www.youtube.com/embed/7EGsIRyDh0Q"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/7EGsIRyDh0Q" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integration of Natural Exponential Functions Calculus 1 AB",
-        url: "https://www.youtube.com/embed/N0c83zV0CBg"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/N0c83zV0CBg" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Integration of Natural Exponential Function e^x (4 Examples)",
-        url: "https://www.youtube.com/embed/j36ENn33NJ4"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/j36ENn33NJ4" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Indefinite Integration Word Problems Calculus 1 AB",
-        url: "https://www.youtube.com/embed/gWAgwiY2_0c"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/gWAgwiY2_0c" }
+      },
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Initial Condition Particular Solution for Antiderivative Calculus 1 AB",
-        url: "https://www.youtube.com/embed/6h7Mt_XE7xc"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/6h7Mt_XE7xc" }
+      },
       {
         id: 'VideoEmbed',
         title: "What's an anti-derivative?",

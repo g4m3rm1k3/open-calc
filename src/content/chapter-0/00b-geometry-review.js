@@ -56,6 +56,111 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "TR-31: Solving SSA Triangles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/NQSPgObl80M" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-30: SSA Triangles Overview (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/o_t0qqzqqZ4" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-29: The Law of Cosines (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/4yo5nlTtjB8" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-28: The Law of Sines (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/TzsKsxLuwgo" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-27: Triangle Types to Solve (Trigonometry Series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/kuEr6xq7c1A" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-26: Solving Right Triangles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/CE_7EZNcG2s" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-12: Distance Between Points in Space (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/7br1PvhFedQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-11: Distance Between Points in a Plane (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/Cy90jWCrPfo" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-09Z: Proof of Pythagorean Theorem (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/0M2aTzmhjXM" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-09: The Pythagorean Theorem (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/4A9iNamXuZk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-08: Similar and Congruent Triangles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/lNd-ubyTkg4" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-07Z: First Proof Thales' Theorem (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/hfr2Sp8W1uU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-07: Geometry Review of Triangles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/mRqMtR1D4KE" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-06: Angle Measurement in Radians (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/pQya8y6YC0U" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-05: Introduction to Radians (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/oJ-BbwvwQg0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-04Z: Degrees Minutes and Seconds (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/eR_KZQtMvx0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-04: Angle Measurement in Degrees (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/gYKig6D3_Ck" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-03: Angle Relationships (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/ZjAWq2AnZkQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-02: Types of Angles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/fqm95DcmJaQ" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-01: Introduction to Angles (Trigonometry series by Dennis F. Davis)",
+        props: { url: "https://www.youtube.com/embed/OFK1SRVbkaA" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "TR-00: Introduction to Trigonometry Series by Dennis F. Davis",
+        props: { url: "https://www.youtube.com/embed/U23JMdBIJ0M" }
+      },
       { id: 'PythagoreanProof', title: 'Visual Proof of the Pythagorean Theorem', caption: 'Watch the squares rearrange to prove a² + b² = c².' },
     ],
   },

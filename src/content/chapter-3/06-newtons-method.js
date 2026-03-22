@@ -58,13 +58,10 @@ export default {
     ],
     visualizations: [
     {
-      type: "react",
-      component: "VideoEmbed",
-      params: {
+        id: 'VideoEmbed',
         title: "Newton's Method Linear Approximation Estimating a Zero of a Function Calculus 1 AB",
-        url: "https://www.youtube.com/embed/eY-0uuo8nNY"
-      }
-    },
+        props: { url: "https://www.youtube.com/embed/eY-0uuo8nNY" }
+      },
       { vizId: 'NewtonsMethod', caption: "Watch Newton's Method in action: each tangent line takes you closer to the root." },
     ],
   },
