@@ -8,6 +8,19 @@ export default {
   subtitle: 'How a single limiting process unlocks the instantaneous rate of change of any function',
   tags: ['derivative', 'limit definition', 'difference quotient', 'tangent line', 'instantaneous rate of change', 'differentiability', 'notation'],
 
+  grapher: {
+    mode: 'pro',
+    label: 'Explore the Derivative',
+    functions: [
+      { expr: 'x^2', type: 'explicit', color: '#6366f1', label: 'f(x) = x²' },
+      { expr: '2*x', type: 'explicit', color: '#ec4899', label: "f'(x) = 2x" },
+    ],
+    sliders: [
+      { name: 'a', min: -3, max: 3, value: 1 },
+    ],
+    replace: true,
+  },
+
   hook: {
     question: 'Your GPS app tells you that your current speed is 62 mph. But speed is distance divided by time — if the measurement takes zero time, you travel zero distance. Zero divided by zero is undefined. So how can your speed be anything at all at a single instant?',
     realWorldContext: 'Every speedometer, every radar gun, every GPS velocity readout faces this paradox. We want to know how fast something is changing right now, not averaged over an interval. Yet the very formula for rate of change — distance over time — seems to require an interval of nonzero length. The derivative is the mathematical resolution of this paradox. It is the tool that makes instantaneous change not only meaningful but computable, and it is arguably the central idea of all of calculus.',

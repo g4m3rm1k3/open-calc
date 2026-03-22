@@ -1,11 +1,34 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import JXG from 'jsxgraph'
 import {
   X, Box, Activity, Trash2, Plus, Info, Settings2,
   Eye, EyeOff, RotateCcw, ZoomIn, ZoomOut, Minus,
   ChevronDown, ChevronUp, GitBranch, Sliders, TrendingUp,
+  FlaskConical, Copy, Check, ArrowRight,
 } from 'lucide-react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
+
+// ─── CAS helpers (mathjs — loaded lazily) ────────────────────────────────────
+
+let _math = null
+async function getMath() {
+  if (_math) return _math
+  try { _math = await import('mathjs'); return _math } catch { return null }
+}
+
+function casDerivative(expr, variable = 'x') {
+  try {
+    if (!_math) return null
+    return _math.derivative(_math.parse(expr), variable).toString()
+  } catch (e) { return `Error: ${e.message}` }
+}
+
+function casSimplify(expr) {
+  try {
+    if (!_math) return null
+    return _math.simplify(expr).toString()
+  } catch (e) { return `Error: ${e.message}` }
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -144,7 +167,7 @@ function colorWithOpacity(hex, alpha) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D }) => {
+const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchConfig }) => {
   const domRef        = useRef(null)
   const curvesRef     = useRef({})    // funcId → array of JSXGraph objects
   const slidersJSXRef = useRef({})    // sliderId → JSXGraph slider object
@@ -166,6 +189,13 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D }) => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [tab, setTab]                   = useState('functions')
 
+  // CAS state
+  const [casExpr,    setCasExpr]    = useState('')
+  const [casResult,  setCasResult]  = useState(null)   // { op, input, output }
+  const [casCopied,  setCasCopied]  = useState(false)
+  const [casReady,   setCasReady]   = useState(false)
+  const lastLaunchRef = useRef(null)                    // avoid re-applying same config
+
   // ── Dark mode observer ──────────────────────────────────────────────────────
   useEffect(() => {
     const obs = new MutationObserver(() => {
@@ -176,6 +206,45 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D }) => {
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
     return () => obs.disconnect()
   }, [])
+
+  // ── Load mathjs once ───────────────────────────────────────────────────────
+  useEffect(() => {
+    getMath().then(m => setCasReady(!!m))
+  }, [])
+
+  // ── Apply launchConfig when grapher opens from a lesson ────────────────────
+  useEffect(() => {
+    if (!isOpen || !launchConfig) return
+    if (launchConfig === lastLaunchRef.current) return   // already applied
+    lastLaunchRef.current = launchConfig
+
+    const { functions: fns, sliders: sls, replace = true } = launchConfig
+
+    if (fns?.length) {
+      const mapped = fns.map((f, i) => ({
+        ...makeFunc(Date.now() + i, f.color ?? COLORS[i % COLORS.length]),
+        expr:      f.expr       ?? f.latex ?? '',
+        type:      f.type       ?? 'explicit',
+        exprY:     f.exprY      ?? 'sin(t)',
+        lineWidth: f.lineWidth  ?? 2.5,
+        dashed:    f.dashed     ?? false,
+        showTangent:    f.showTangent    ?? false,
+        showDerivative: f.showDerivative ?? false,
+      }))
+      if (replace) setFunctions(mapped)
+      else         setFunctions(prev => [...prev, ...mapped])
+    }
+
+    if (sls?.length) {
+      const mapped = sls.map((s, i) => ({
+        ...makeSlider(Date.now() + i, s.name ?? 'a'),
+        min: s.min ?? -5, max: s.max ?? 5, value: s.value ?? 1, step: s.step ?? 0.01,
+      }))
+      if (replace) setSliders(mapped)
+      else         setSliders(prev => [...prev, ...mapped])
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, launchConfig])
 
   const getBoard = () => JXG.boards?.[BOARD_ID] ?? null
 
@@ -550,9 +619,10 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D }) => {
           {/* Tabs */}
           <div className="flex border-b border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40">
             {[
-              { id: 'functions', icon: <GitBranch className="w-3 h-3" />, label: 'Functions' },
-              { id: 'sliders',   icon: <Sliders   className="w-3 h-3" />, label: 'Sliders',
+              { id: 'functions', icon: <GitBranch    className="w-3 h-3" />, label: 'Functions' },
+              { id: 'sliders',   icon: <Sliders      className="w-3 h-3" />, label: 'Sliders',
                 badge: sliders.length || null },
+              { id: 'cas',       icon: <FlaskConical className="w-3 h-3" />, label: 'CAS' },
             ].map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 ${
@@ -803,6 +873,119 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D }) => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* ── CAS tab ──────────────────────────────────────────────────── */}
+          {tab === 'cas' && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              {!casReady && (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded-xl p-3 border border-amber-200 dark:border-amber-800/50">
+                  Loading CAS engine…
+                </p>
+              )}
+
+              {/* Input */}
+              <div className="space-y-1.5">
+                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Expression</p>
+                <input
+                  value={casExpr}
+                  onChange={e => { setCasExpr(e.target.value); setCasResult(null) }}
+                  placeholder="e.g.  x^3 * sin(x)"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 font-mono text-xs text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 outline-none"
+                />
+              </div>
+
+              {/* Operation buttons */}
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { label: "d/dx (deriv.)",  op: 'deriv',    fn: () => casDerivative(casExpr, 'x') },
+                  { label: "d/dt (deriv.)",  op: 'deriv-t',  fn: () => casDerivative(casExpr, 't') },
+                  { label: "Simplify",       op: 'simplify', fn: () => casSimplify(casExpr) },
+                  { label: "2nd derivative", op: 'deriv2',   fn: () => {
+                    const d1 = casDerivative(casExpr, 'x')
+                    return d1 ? casDerivative(d1, 'x') : null
+                  }},
+                ].map(({ label, op, fn }) => (
+                  <button key={op}
+                    disabled={!casReady || !casExpr.trim()}
+                    onClick={() => {
+                      const out = fn()
+                      setCasResult(out ? { op, input: casExpr, output: out } : null)
+                    }}
+                    className="px-2 py-1.5 text-[9px] font-bold rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Result */}
+              {casResult && (
+                <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/60 dark:bg-emerald-950/30 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Result</p>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard?.writeText(casResult.output)
+                          setCasCopied(true)
+                          setTimeout(() => setCasCopied(false), 1500)
+                        }}
+                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 transition-colors"
+                        title="Copy">
+                        {casCopied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Input → Output display */}
+                  <div className="flex items-center gap-2 text-[10px] font-mono">
+                    <span className="text-slate-500 truncate max-w-[40%]">{casResult.input}</span>
+                    <ArrowRight className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                    <span className="text-emerald-700 dark:text-emerald-300 font-semibold break-all">{casResult.output}</span>
+                  </div>
+
+                  {/* Plot result button */}
+                  <button
+                    onClick={() => {
+                      const color = COLORS[functions.length % COLORS.length]
+                      setFunctions(prev => [
+                        ...prev,
+                        { ...makeFunc(Date.now(), color), expr: casResult.output },
+                      ])
+                      setTab('functions')
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition-all">
+                    <TrendingUp className="w-3 h-3" /> Plot this
+                  </button>
+
+                  {/* Use as new expression */}
+                  <button
+                    onClick={() => { setCasExpr(casResult.output); setCasResult(null) }}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-bold rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                    <ArrowRight className="w-3 h-3" /> Use as input (chain operations)
+                  </button>
+                </div>
+              )}
+
+              {/* Quick reference */}
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-2.5 space-y-1">
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Examples</p>
+                {[
+                  ['x^3 - 3*x', '→ derivative → 3*x^2 - 3'],
+                  ['sin(x)^2 + cos(x)^2', '→ simplify → 1'],
+                  ['x^2 * exp(x)', '→ 2nd deriv → (x^2+4x+2)*exp(x)'],
+                ].map(([ex, hint]) => (
+                  <div key={ex} className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setCasExpr(ex); setCasResult(null) }}
+                      className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline text-left">
+                      {ex}
+                    </button>
+                    <span className="text-[9px] text-slate-400 truncate">{hint}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

@@ -7,6 +7,7 @@ import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
 import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLessonEnhancer.js'
+import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
@@ -70,6 +71,11 @@ export default function LessonPage() {
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{lesson.title}</h1>
         {lesson.subtitle && (
           <p className="text-lg text-slate-500 dark:text-slate-400 italic">{lesson.subtitle}</p>
+        )}
+        {lesson.grapher && (
+          <div className="mt-4">
+            <OpenInGrapher config={lesson.grapher} />
+          </div>
         )}
       </header>
 

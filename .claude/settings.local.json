@@ -9,7 +9,9 @@
       "Bash(npm run:*)",
       "Bash(npx vite:*)",
       "Bash(node --input-type=module:*)",
-      "Bash(node -e \"import\\(''''./src/content/physics-1/chapter-0/index.js''''\\).catch\\(e => console.error\\(e.message\\)\\)\")"
+      "Bash(node -e \"import\\(''''./src/content/physics-1/chapter-0/index.js''''\\).catch\\(e => console.error\\(e.message\\)\\)\")",
+      "Bash(node -e \"import\\(''mathjs''\\).then\\(m=>console.log\\(''mathjs version:'', m.version\\)\\).catch\\(e=>console.log\\(''not found:'', e.code\\)\\)\")",
+      "Bash(npm install:*)"
     ]
   }
 }

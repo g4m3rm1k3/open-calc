@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
@@ -6,6 +6,7 @@ import GlobalGrapher from '../ui/GlobalGrapher.jsx'
 import GlobalGrapher3D from '../ui/GlobalGrapher3D.jsx'
 import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
+import GrapherContext from '../../context/GrapherContext.jsx'
 import { Activity, Box, Settings2 } from 'lucide-react'
 
 function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle }) {
@@ -120,7 +121,20 @@ export default function AppShell({ children }) {
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
+  const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
+
+  // openGrapher — called by any lesson/component via GrapherContext
+  const openGrapher = useCallback((config) => {
+    const mode = config?.mode ?? 'pro'
+    setGrapherLaunchConfig(config)
+    setGraphOpen(false)
+    setGraph3DOpen(false)
+    setGraphJSXOpen(false)
+    if (mode === '2d')       setGraphOpen(true)
+    else if (mode === '3d')  setGraph3DOpen(true)
+    else                     setGraphJSXOpen(true)   // 'pro' default
+  }, [])
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -157,6 +171,7 @@ export default function AppShell({ children }) {
   }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen])
 
   return (
+    <GrapherContext.Provider value={{ openGrapher }}>
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <TopBar 
         onMenuToggle={() => setSidebarOpen((o) => !o)} 
@@ -191,42 +206,28 @@ export default function AppShell({ children }) {
       </main>
 
       <SearchModal />
-      <GlobalGrapher 
-        isOpen={graphOpen} 
-        onClose={() => setGraphOpen(false)} 
-        onSwitchTo3D={() => {
-          setGraphOpen(false)
-          setGraph3DOpen(true)
-        }}
-        onSwitchToJSX={() => {
-          setGraphOpen(false)
-          setGraphJSXOpen(true)
-        }}
+      <GlobalGrapher
+        isOpen={graphOpen}
+        launchConfig={graphOpen ? grapherLaunchConfig : null}
+        onClose={() => { setGraphOpen(false); setGrapherLaunchConfig(null) }}
+        onSwitchTo3D={() => { setGraphOpen(false); setGraph3DOpen(true) }}
+        onSwitchToJSX={() => { setGraphOpen(false); setGraphJSXOpen(true) }}
       />
-      <GlobalGrapher3D 
-        isOpen={graph3DOpen} 
-        onClose={() => setGraph3DOpen(false)} 
-        onSwitchTo2D={() => {
-          setGraph3DOpen(false)
-          setGraphOpen(true)
-        }}
-        onSwitchToJSX={() => {
-          setGraph3DOpen(false)
-          setGraphJSXOpen(true)
-        }}
+      <GlobalGrapher3D
+        isOpen={graph3DOpen}
+        launchConfig={graph3DOpen ? grapherLaunchConfig : null}
+        onClose={() => { setGraph3DOpen(false); setGrapherLaunchConfig(null) }}
+        onSwitchTo2D={() => { setGraph3DOpen(false); setGraphOpen(true) }}
+        onSwitchToJSX={() => { setGraph3DOpen(false); setGraphJSXOpen(true) }}
       />
       <GlobalGrapherJSX
         isOpen={graphJSXOpen}
-        onClose={() => setGraphJSXOpen(false)}
-        onSwitchTo2D={() => {
-          setGraphJSXOpen(false)
-          setGraphOpen(true)
-        }}
-        onSwitchTo3D={() => {
-          setGraphJSXOpen(false)
-          setGraph3DOpen(true)
-        }}
+        launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
+        onClose={() => { setGraphJSXOpen(false); setGrapherLaunchConfig(null) }}
+        onSwitchTo2D={() => { setGraphJSXOpen(false); setGraphOpen(true) }}
+        onSwitchTo3D={() => { setGraphJSXOpen(false); setGraph3DOpen(true) }}
       />
     </div>
+    </GrapherContext.Provider>
   )
 }
