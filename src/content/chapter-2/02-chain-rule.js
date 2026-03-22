@@ -10,7 +10,7 @@ export default {
   aliases: 'section 3.6 chain rule derivation formal proof leibniz notation dy du times du dx chain and power product quotient composite three layers',
 
   hook: {
-    question: 'A balloon is being inflated so that its radius grows at a rate of 2 centimeters per second (r(t) = 2t). The volume of a sphere is V = (4/3)\u03c0r\u00b3. At the moment when t = 3 seconds, how fast is the volume increasing? Volume depends on radius, radius depends on time — so how do we find dV/dt?',
+          annotation: 'Structural view: rewrite first so the power is visibly the outer skin. This makes the onion explicit before any derivative work.',
     realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
     previewVisualizationId: 'ChainRuleMicroscope',
   },
@@ -25,6 +25,8 @@ export default {
       'There is a beautifully practical way to execute the chain rule called the "outside-inside" method. To differentiate f(g(x)): (1) Differentiate the outside function f, evaluated at the inside g(x), leaving the inside completely unchanged. (2) Multiply by the derivative of the inside g\'(x). In symbols: d/dx[f(g(x))] = f\'(g(x)) \u00b7 g\'(x). The key is to NOT differentiate the inside first — leave it intact and only differentiate the outer wrapper.',
       'Let\'s see this with a concrete example: d/dx[(3x\u00b2-1)\u2075]. The outside function is u\u2075 (raise to the fifth), and the inside is u = 3x\u00b2-1. Differentiate the outside: the derivative of u\u2075 is 5u\u2074, evaluated at u = 3x\u00b2-1, giving 5(3x\u00b2-1)\u2074. Multiply by the derivative of the inside: d/dx[3x\u00b2-1] = 6x. Final answer: 5(3x\u00b2-1)\u2074 \u00b7 6x = 30x(3x\u00b2-1)\u2074. This two-step process — differentiate outer (keep inner), multiply by derivative of inner — is all there is to the chain rule.',
       'A note on identifying the outer and inner functions: look for the "last operation" that would be performed if you were evaluating the function at a specific number. For \u221a(x\u00b2+1), the last operation is taking a square root, so the outer function is u^(1/2) and the inner is x\u00b2+1. For sin(5x\u00b3), the last operation is taking the sine, so outer is sin(u) and inner is 5x\u00b3.',
+      'Beginner survival skill: before differentiating, run a layer scan. For tan^3(4x), the outermost skin is (... )^3, the middle layer is tan(...), and the inner core is 4x. If you can label layers correctly, peeling becomes automatic.',
+      'Pipeline view: composition is a relay race, not one giant jump. x flows through g to become u, then u flows through f to become y. If the first machine doubles speed and the second triples speed, output speed is six times faster. This is exactly dy/dx = (dy/du)(du/dx).',
       'The chain rule extends to triple and longer compositions. For y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). Differentiate the outermost layer first, then the next, and so on, each time multiplying by the derivative of the layer below. This is like peeling an onion, one layer at a time.',
     ],
     callouts: [
@@ -44,6 +46,11 @@ export default {
         body: "\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}",
       },
       {
+        type: 'insight',
+        title: 'Leibniz Unit Check',
+        body: "\\frac{\\text{cm}^3}{\\text{cm}}\\cdot\\frac{\\text{cm}}{\\text{s}}=\\frac{\\text{cm}^3}{\\text{s}}",
+      },
+      {
         type: 'example',
         title: 'Balloon Volume Example',
         body: 'V = \\tfrac{4}{3}\\pi r^3,\\; r = 2t \\implies \\frac{dV}{dt} = \\frac{dV}{dr}\\cdot\\frac{dr}{dt} = 4\\pi r^2 \\cdot 2 = 8\\pi r^2 = 8\\pi(2t)^2 = 32\\pi t^2',
@@ -55,6 +62,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'LayerScanGame',
+        title: 'Layer Identification Mini-Game',
+        caption: 'Practice reading nested structure before computing derivatives. If you can label outer, middle, and inner correctly, peeling becomes automatic.',
+      },
+      {
+        id: 'ChainRulePipelineLab',
+        title: 'Function Pipeline Relay',
+        caption: 'Watch stage speeds multiply in real time: inner machine speed times outer machine speed equals final output speed.',
+      },
       {
         id: 'ChainRulePeeler',
         title: 'Peel the Onion',
@@ -99,6 +116,11 @@ export default {
         title: 'Microscope Mode: The Visual Derivation',
         caption: 'As you zoom in on any differentiable curve, it becomes perfectly straight. The chain rule simply proves that feeding one line into another multiplies their slopes: m_total = m1 × m2.',
       },
+      {
+        id: 'LeibnizUnitTrackerLab',
+        title: 'Leibniz Unit Tracker',
+        caption: 'Hover the unit equation and verify physical cancellation. The chain rule is required for units and physics to remain consistent.',
+      },
     ],
   },
 
@@ -107,6 +129,8 @@ export default {
       'The most natural "proof" of the chain rule goes like this: form the difference quotient for (f\u2218g) at x, multiply top and bottom by g(x+h) - g(x), and "cancel" to get [f(g(x+h)) - f(g(x))] / [g(x+h)-g(x)] times [g(x+h)-g(x)] / h. As h \u2192 0, the first factor approaches f\'(g(x)) and the second approaches g\'(x), giving the product f\'(g(x))\u00b7g\'(x). This argument has a fatal flaw: we divided by g(x+h) - g(x), but this quantity might equal zero for infinitely many values of h near 0 (even if g\'(x) \u2260 0), making the division illegal.',
       'A simple example of this flaw: take g(x) = x\u00b2sin(1/x) for x \u2260 0 and g(0) = 0. Then g\'(0) = 0, but g(h) = 0 for h = 1/(n\u03c0) for any integer n \u2260 0, which are values of h arbitrarily close to 0 where g(h) - g(0) = 0. If we divide by g(x+h) - g(x) in the naive proof at x = 0, we are dividing by zero for these special values of h.',
       'The correct proof uses the following approach. Define an auxiliary function \u03a6(k) = [f(g(x)+k) - f(g(x))] / k for k \u2260 0, and \u03a6(0) = f\'(g(x)). Because f is differentiable at g(x), we have lim(k\u21920) \u03a6(k) = f\'(g(x)) = \u03a6(0), so \u03a6 is continuous at 0. Now write: f(g(x+h)) - f(g(x)) = \u03a6(g(x+h)-g(x)) \u00b7 [g(x+h)-g(x)]. This is valid because when g(x+h)-g(x) \u2260 0, it follows the definition of \u03a6 with k = g(x+h)-g(x), and when g(x+h)-g(x) = 0, both sides are 0. Dividing by h: [f(g(x+h))-f(g(x))]/h = \u03a6(g(x+h)-g(x)) \u00b7 [g(x+h)-g(x)]/h. As h\u21920: \u03a6(g(x+h)-g(x)) \u2192 \u03a6(0) = f\'(g(x)) (because g is continuous, g(x+h)-g(x)\u21920, and \u03a6 is continuous at 0); [g(x+h)-g(x)]/h \u2192 g\'(x). The product of the limits is f\'(g(x))\u00b7g\'(x). This completes the rigorous proof.',
+      'Safety-slope bridge to microscope mode: zooming says the curve locally looks linear with a local slope. \u03a6(k) is the rigorous patch that keeps this local-slope story valid even when the inner change g(x+h)-g(x) is exactly zero, so no illegal division occurs.',
+      'Expert trap: if one link is not differentiable at the evaluation point, chain rule cannot be applied there. Example y=|sin x| at x=0: inner sin x is smooth, but outer |u| has a corner at u=0, so the chain snaps at that point.',
     ],
     callouts: [
       {
@@ -123,6 +147,23 @@ export default {
         type: 'insight',
         title: 'Leibniz Form in Related Rates',
         body: "\\frac{dV}{dt} = \\frac{dV}{dr}\\cdot\\frac{dr}{dt}, \\quad \\frac{dA}{dt} = \\frac{dA}{d\\theta}\\cdot\\frac{d\\theta}{dt}. \\text{ Intermediate-rate factors multiply along dependency chains.}",
+      },
+      {
+        type: 'warning',
+        title: 'Broken Chain Condition',
+        body: "\\text{Chain rule needs every link differentiable at the point. } y=|\\sin x| \\text{ fails at } x=0 \\text{ because } |u| \\text{ is not differentiable at } u=0.",
+      },
+    ],
+    visualizations: [
+      {
+        id: 'ChainRuleMicroscope',
+        title: 'Microscope and Safety Slope',
+        caption: 'Microscope intuition gives local slope; \u03a6(k) is the rigorous safety slope that keeps the proof valid even when the inner change is zero.',
+      },
+      {
+        id: 'BrokenChainTrapLab',
+        title: 'Non-Differentiable Trap',
+        caption: 'Test y=|sin x| near 0 and compare one-sided slopes. A single non-differentiable link breaks the chain at that point.',
       },
     ],
     visualizationId: null,
@@ -292,11 +333,11 @@ export default {
         },
         {
           expression: "\\text{Layer 1 (outermost): } F(u) = u^4",
-          annotation: 'The outermost function is the fourth power.',
+          annotation: 'Peel layer 1: apply the power rule outside and keep sin(x²) completely untouched inside the brackets.',
         },
         {
           expression: "\\text{Layer 2 (middle): } G(v) = \\sin(v)",
-          annotation: 'The middle function is the sine function.',
+          annotation: 'Peel layer 2: now derive sine, again keeping its inner argument x² exactly as-is.',
         },
         {
           expression: "\\text{Layer 3 (innermost): } H(x) = x^2",
@@ -304,7 +345,7 @@ export default {
         },
         {
           expression: "F'(u) = 4u^3, \\quad G'(v) = \\cos(v), \\quad H'(x) = 2x",
-          annotation: 'Differentiate each layer independently.',
+          annotation: 'Core layer: derive x² last to get 2x, then multiply by everything collected from outer and middle layers.',
         },
         {
           expression: "f'(x) = F'(G(H(x))) \\cdot G'(H(x)) \\cdot H'(x)",
@@ -428,7 +469,7 @@ export default {
         },
         {
           expression: "\\frac{dV}{dt}=\\frac{dV}{dr}\\cdot\\frac{dr}{dt}=4\\pi r^2\\cdot 2=8\\pi r^2",
-          annotation: 'Apply Leibniz chain form for related rates.',
+          annotation: 'Apply Leibniz chain form for related rates. Unit tracker: (cm^3/cm)*(cm/s)=cm^3/s, so multiplication is physically required.',
         },
         {
           expression: "t=3 \\Rightarrow r=2(3)=6",

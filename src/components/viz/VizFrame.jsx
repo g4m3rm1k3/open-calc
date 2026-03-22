@@ -150,6 +150,10 @@ const VIZ_REGISTRY = {
   InverseBridgeTriangleLab:      lazy(() => import('./react/InverseBridgeTriangleLab.jsx')),
   ChainRuleOnionLab:             lazy(() => import('./react/ChainRuleOnionLab.jsx')),
   ProofCircleLinkLab:            lazy(() => import('./react/ProofCircleLinkLab.jsx')),
+  LayerScanGame:                 lazy(() => import('./react/LayerScanGame.jsx')),
+  ChainRulePipelineLab:          lazy(() => import('./react/ChainRulePipelineLab.jsx')),
+  LeibnizUnitTrackerLab:         lazy(() => import('./react/LeibnizUnitTrackerLab.jsx')),
+  BrokenChainTrapLab:            lazy(() => import('./react/BrokenChainTrapLab.jsx')),
 }
 
 function VizSkeleton() {
