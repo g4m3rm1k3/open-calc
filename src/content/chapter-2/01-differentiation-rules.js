@@ -43,6 +43,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'DerivativeRuleArenaGame',
+        title: 'Derivative Rule Arena',
+        caption: 'Train fast rule recognition before symbolic computation: pick the right opening rule under pressure.',
+      },
+      {
         id: 'PowerRulePattern',
         title: 'Power Rule Pattern',
         caption: 'Adjust n to see how f(x) = xⁿ and its derivative nxⁿ⁻¹ relate. Notice the degree drops by exactly 1 each time.',

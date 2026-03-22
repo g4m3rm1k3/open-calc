@@ -155,6 +155,13 @@ const VIZ_REGISTRY = {
   LeibnizUnitTrackerLab:         lazy(() => import('./react/LeibnizUnitTrackerLab.jsx')),
   ChainRuleProofMapLab:          lazy(() => import('./react/ChainRuleProofMapLab.jsx')),
   BrokenChainTrapLab:            lazy(() => import('./react/BrokenChainTrapLab.jsx')),
+  LimitBridgeLab:                lazy(() => import('./react/LimitBridgeLab.jsx')),
+  ContinuityRepairGame:          lazy(() => import('./react/ContinuityRepairGame.jsx')),
+  ChainRuleAssemblerGame:        lazy(() => import('./react/ChainRuleAssemblerGame.jsx')),
+  ImplicitTangentPlayground:     lazy(() => import('./react/ImplicitTangentPlayground.jsx')),
+  TrigMotionBridgeLab:           lazy(() => import('./react/TrigMotionBridgeLab.jsx')),
+  ExpLogBridgeLab:               lazy(() => import('./react/ExpLogBridgeLab.jsx')),
+  DerivativeRuleArenaGame:       lazy(() => import('./react/DerivativeRuleArenaGame.jsx')),
 }
 
 function VizSkeleton() {

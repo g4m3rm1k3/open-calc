@@ -63,6 +63,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'LimitBridgeLab',
+        title: 'Instantaneous Change Bridge Lab',
+        caption: 'Practice shrinking a two-point measurement into a single-point slope using an interactive approach slider.',
+      },
+      {
         id: 'PositionVelocityAcceleration',
         title: 'Position, Velocity, and Acceleration — Live',
         caption: 'Watch the car move and see all three graphs update in real time. Velocity is the derivative of position; acceleration is the derivative of velocity.',

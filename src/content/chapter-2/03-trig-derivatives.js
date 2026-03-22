@@ -50,6 +50,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'TrigMotionBridgeLab',
+        title: 'Trig Motion Bridge Lab',
+        caption: 'Predict derivative signs from unit-circle motion and verify them instantly with the cosine readout.',
+      },
+      {
         id: 'VelocityVectorProofLab',
         title: 'Velocity Vector Lab (Zero Algebra Proof)',
         caption: 'Drag theta and verify: radius is (cos(theta), sin(theta)) while velocity is (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), so d/dtheta[sin(theta)] = cos(theta).',

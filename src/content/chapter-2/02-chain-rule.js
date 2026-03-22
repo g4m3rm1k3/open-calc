@@ -63,6 +63,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ChainRuleAssemblerGame',
+        title: 'Chain Rule Assembler Game',
+        caption: 'Build derivatives by selecting outside and inside gears, then verify the full assembled result.',
+      },
+      {
         id: 'LayerScanGame',
         title: 'Layer Identification Mini-Game',
         caption: 'Practice reading nested structure before computing derivatives. If you can label outer, middle, and inner correctly, peeling becomes automatic.',

@@ -48,6 +48,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ImplicitTangentPlayground',
+        title: 'Implicit Tangent Playground',
+        caption: 'Move along the circle and watch dy/dx = -x/y drive the tangent line in real time.',
+      },
+      {
         id: 'ImplicitCurveExplorer',
         props: { showCircle: true, showFolium: true, showTangentAtPoint: true },
         title: 'Implicit Curves and Their Tangent Lines',

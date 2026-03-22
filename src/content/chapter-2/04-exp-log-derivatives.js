@@ -46,6 +46,13 @@ export default {
       showSlopeAtZeroForVariousBases: true,
       highlightBaseE: true,
     },
+    visualizations: [
+      {
+        id: 'ExpLogBridgeLab',
+        title: 'Exponential/Log Bridge Lab',
+        caption: 'Switch between e^x and ln(x) to connect growth intuition with exact derivative formulas.',
+      },
+    ],
   },
 
   math: {
@@ -77,6 +84,13 @@ export default {
       showBothFunctions: true,
       showSlopeComparison: true,
     },
+    visualizations: [
+      {
+        id: 'ExpLogBridgeLab',
+        title: 'Derivative Formula Bridge Lab',
+        caption: 'Use one slider to see function value and derivative value update together under both exponential and logarithmic rules.',
+      },
+    ],
   },
 
   rigor: {

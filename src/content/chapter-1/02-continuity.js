@@ -51,6 +51,13 @@ export default {
     ],
     visualizationId: 'ContinuityViz',
     visualizationProps: {},
+    visualizations: [
+      {
+        id: 'ContinuityRepairGame',
+        title: 'Continuity Repair Game',
+        caption: 'Drag the broken point to match the limit and repair continuity in real time.',
+      },
+    ],
   },
 
   math: {

@@ -69,6 +69,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'LimitBridgeLab',
+        title: 'Limit Bridge Lab — Intuition to Rigor',
+        caption: 'Control the approach distance h, watch both sides close on the same target, then test your own limit estimate in game mode.',
+      },
+      {
         id: 'ZenoParadoxViz',
       },
       {

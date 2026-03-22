@@ -42,6 +42,13 @@ export default {
     ],
     visualizationId: 'SqueezeTheorem',
     visualizationProps: {},
+    visualizations: [
+      {
+        id: 'LimitBridgeLab',
+        title: 'Limit Law Bridge Lab',
+        caption: 'Use two-sided approach controls to verify when decomposition rules are safe and when naive substitution fails.',
+      },
+    ],
   },
 
   math: {
