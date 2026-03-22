@@ -98,6 +98,13 @@ const VIZ_REGISTRY = {
   TangentExplosion:              lazy(() => import('./d3/TangentExplosion.jsx')),
   SinDerivativeGeometric:        lazy(() => import('./d3/SinDerivativeGeometric.jsx')),
   LimitGeometric:                lazy(() => import('./d3/LimitGeometric.jsx')),
+  // Physics p0 - Orientation
+  ModelVsReality:                lazy(() => import('./react/ModelVsReality.jsx')),
+  UnitValidator:                 lazy(() => import('./react/UnitValidator.jsx')),
+  GraphInterpreter:              lazy(() => import('./react/GraphInterpreter.jsx')),
+  VectorBuilder:                 lazy(() => import('./react/VectorBuilder.jsx')),
+  FrameSwitcher:                 lazy(() => import('./react/FrameSwitcher.jsx')),
+  DiscreteVsContinuous:          lazy(() => import('./react/DiscreteVsContinuous.jsx')),
   // Chapter 5 — New additions
   BisectionMethod:               lazy(() => import('./d3/BisectionMethod.jsx')),
   ShellMethod:                   lazy(() => import('./d3/ShellMethod.jsx')),
@@ -168,7 +175,6 @@ const VIZ_REGISTRY = {
   ChainRuleAssemblerGame:        lazy(() => import('./react/ChainRuleAssemblerGame.jsx')),
   ImplicitTangentPlayground:     lazy(() => import('./react/ImplicitTangentPlayground.jsx')),
   TrigMotionBridgeLab:           lazy(() => import('./react/TrigMotionBridgeLab.jsx')),
-  ExpLogBridgeLab:               lazy(() => import('./react/ExpLogBridgeLab.jsx')),
   DerivativeRuleArenaGame:       lazy(() => import('./react/DerivativeRuleArenaGame.jsx')),
   // Chapter 2 — Inverse functions & differentiability
   InverseSlopeReflectionLab:     lazy(() => import('./react/InverseSlopeReflectionLab.jsx')),

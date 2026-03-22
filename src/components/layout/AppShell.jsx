@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
@@ -36,9 +36,10 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
-        <a href="#/chapter/precalc-1" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Pre-Calc</a>
-        <a href="#/" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Calculus</a>
-        <a href="#/chapter/discrete-1" className="text-sm font-bold text-slate-800 dark:text-slate-100 hover:text-brand-600 transition-colors">Discrete Math</a>
+        <NavLink to="/chapter/precalc-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Pre-Calc</NavLink>
+        <NavLink to="/chapter/0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Calculus</NavLink>
+        <NavLink to="/chapter/p0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Physics</NavLink>
+        <NavLink to="/chapter/discrete-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Discrete Math</NavLink>
         
         <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
            <span className="text-sm font-bold text-slate-500">DSA</span>

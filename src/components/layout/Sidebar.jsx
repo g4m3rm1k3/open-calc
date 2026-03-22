@@ -9,7 +9,14 @@ const CHAPTER_COLORS = {
   2: 'text-green-600 dark:text-green-400',
   3: 'text-purple-600 dark:text-purple-400',
   4: 'text-orange-600 dark:text-orange-400',
-  5: 'text-rose-600 dark:text-rose-400',
+  7: 'text-amber-600 dark:text-amber-400',
+  p0: 'text-orange-600 dark:text-orange-400',
+  p1: 'text-red-600 dark:text-red-400',
+  p2: 'text-orange-500 dark:text-orange-300',
+  p3: 'text-yellow-600 dark:text-yellow-400',
+  p4: 'text-teal-600 dark:text-teal-400',
+  p5: 'text-indigo-600 dark:text-indigo-400',
+  p6: 'text-fuchsia-600 dark:text-fuchsia-400',
 }
 
 export default function Sidebar({ onNavigate }) {
@@ -19,27 +26,41 @@ export default function Sidebar({ onNavigate }) {
 
   const activeChapter = params.chapterId ? String(params.chapterId) : null
   const activeSlug = params.lessonSlug ?? params['*']
+  const chapterMatch = location.pathname.match(/\/chapter\/([^/]+)/)
+  const chapterFromPath = chapterMatch?.[1] ?? null
+  const chapterCandidate = activeChapter ?? chapterFromPath
 
   // Determine which course we are in based on active chapter or URL
   let activeCourse = 'calc'
-  if (activeChapter) {
-    const chObj = CURRICULUM.find(c => String(c.number) === activeChapter)
+  if (chapterCandidate) {
+    const chObj = CURRICULUM.find(c => String(c.number) === chapterCandidate)
     if (chObj) activeCourse = chObj.course
   } else if (location.pathname.includes('/discrete-1')) {
     activeCourse = 'discrete'
   } else if (location.pathname.includes('/precalc-')) {
     activeCourse = 'precalc'
+  } else if (/\/chapter\/p\d+/.test(location.pathname)) {
+    activeCourse = 'physics-1'
   }
 
   const visibleChapters = CURRICULUM.filter(c => c.course === activeCourse)
-  const courseName = activeCourse === 'calc' ? 'OpenCalc' : activeCourse === 'discrete' ? 'Discrete Math' : activeCourse === 'precalc' ? 'Pre-Calculus' : 'OpenMath'
-  const courseDesc = activeCourse === 'calc' ? 'Interactive Calculus' : activeCourse === 'discrete' ? 'Logic & Puzzles' : activeCourse === 'precalc' ? 'Functions & Graphs' : ''
+  const courseName = activeCourse === 'calc' ? 'OpenCalc' : activeCourse === 'discrete' ? 'Discrete Math' : activeCourse === 'precalc' ? 'Pre-Calculus' : activeCourse === 'physics-1' ? 'OpenPhysics' : 'OpenMath'
+  const courseDesc = activeCourse === 'calc' ? 'Interactive Calculus' : activeCourse === 'discrete' ? 'Logic & Puzzles' : activeCourse === 'precalc' ? 'Functions & Graphs' : activeCourse === 'physics-1' ? 'Mechanics & Waves' : ''
+  const courseHomePath = activeCourse === 'calc'
+    ? '/chapter/0'
+    : activeCourse === 'discrete'
+      ? '/chapter/discrete-1'
+      : activeCourse === 'precalc'
+        ? '/chapter/precalc-1'
+        : activeCourse === 'physics-1'
+          ? '/chapter/p0'
+          : '/'
 
   return (
     <nav className="h-full overflow-y-auto py-4">
-      {/* Logo / home */}
+      {/* Logo / course home */}
       <Link
-        to="/"
+        to={courseHomePath}
         onClick={onNavigate}
         className="flex items-center gap-2 px-5 pb-4 mb-2 border-b border-slate-200 dark:border-slate-700"
       >
