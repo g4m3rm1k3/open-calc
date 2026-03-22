@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react'
 import functionPlot from 'function-plot'
 import * as d3 from 'd3'
-import { X, Trash2, Plus, Play, Info } from 'lucide-react'
+import { X, Trash2, Plus, Play, Info, Layers, Box } from 'lucide-react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 
-const GlobalGrapher = ({ isOpen, onClose }) => {
+const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D }) => {
   const containerRef = useRef(null)
   const [functions, setFunctions] = useLocalStorage('global-grapher-funcs', [
     { id: 1, latex: 'x^2', color: '#6366f1', visible: true }
@@ -144,16 +144,25 @@ const GlobalGrapher = ({ isOpen, onClose }) => {
         {/* Sidebar: Controls */}
         <div className="w-full md:w-80 bg-slate-50 dark:bg-slate-950/50 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-y-auto">
           <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10 transition-colors">
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <Play className="w-4 h-4 text-indigo-600 dark:text-indigo-400 fill-indigo-600/20" />
-              Expressions
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 uppercase tracking-tighter text-sm">
+              <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              2D Plotter
             </h3>
-            <button 
-              onClick={addFunction} 
-              className="p-1.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-lg text-indigo-600 dark:text-indigo-400 transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={onSwitchTo3D}
+                title="Switch to 3D Plotter (3)"
+                className="p-1.5 hover:bg-amber-50 dark:hover:bg-amber-900/40 rounded-lg text-amber-600 dark:text-amber-400 transition-all border border-transparent hover:border-amber-100 dark:hover:border-amber-800"
+              >
+                <Box className="w-5 h-5 transition-transform hover:scale-110" />
+              </button>
+              <button 
+                onClick={addFunction} 
+                className="p-1.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-lg text-indigo-600 dark:text-indigo-400 transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           <div className="p-4 space-y-3 flex-1 overflow-y-auto">
