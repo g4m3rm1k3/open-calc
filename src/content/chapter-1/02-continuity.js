@@ -55,6 +55,7 @@ export default {
       {
         id: 'ContinuityRepairGame',
         title: 'Continuity Repair Game',
+        mathBridge: 'A function $f$ is continuous at $c$ iff all three conditions hold: (1) $f(c)$ is defined, (2) $\\lim_{x\\to c}f(x)$ exists, and (3) $\\lim_{x\\to c}f(x) = f(c)$. In this game, the limit already exists (the left and right sides agree) but $f(c)$ is placed at the wrong height — violating condition 3. Dragging the point to match the limit value restores condition 3 and makes the function continuous. This is a removable discontinuity: it can be "repaired" by redefining exactly one point.',
         caption: 'Drag the broken point to match the limit and repair continuity in real time.',
       },
     ],

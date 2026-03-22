@@ -171,27 +171,36 @@ export default {
     // Geometric proof steps — synced with SinDerivativeGeometric visualization
     proofSteps: [
       {
-        expression: 'P = (\\cos x,\\, \\sin x) \\text{ on the unit circle}',
-        annotation: 'Place a point P on the unit circle at angle x. Its y-coordinate is sin(x) — the value we want to differentiate.',
+        expression: 'P = (\\cos x,\\, \\sin x)',
+        annotation: 'Position vector on the unit circle at angle x.',
       },
       {
-        expression: '\\vec{OP} = (\\cos x,\\, \\sin x)',
-        annotation: 'The radius vector from the origin to P points in the direction (cos x, sin x). Its length is 1.',
+        expression: '\\vec{v} = (-\\sin x,\\, \\cos x)',
+        annotation: 'The velocity vector is perpendicular to the radius. For unit speed, this is the derivative of position.',
       },
       {
-        expression: '\\vec{v} \\perp \\vec{OP} \\implies \\vec{v} = (-\\sin x,\\, \\cos x)',
-        annotation: 'As x increases, P moves around the circle. The velocity vector is tangent — perpendicular to the radius. The unique unit vector perpendicular to (cos x, sin x) is (−sin x, cos x).',
+        expression: '\\frac{d}{dx}[\\sin x] = v_y = \\cos x',
+        annotation: 'The vertical rate of change of the point is the y-component of its velocity. This matches the height of the cosine graph at that angle.',
       },
       {
-        expression: 'v_x = -\\sin x \\quad v_y = +\\cos x',
-        annotation: 'Decompose the velocity: the x-component is −sin x and the y-component is cos x. These dashed arrows show how the full velocity splits.',
+        expression: '\\frac{d}{dx}[\\cos x] = v_x = -\\sin x',
+        annotation: 'The horizontal rate of change is the x-component of velocity. Notice it points left (negative) for positive sine heights. This is why d/dx[cos x] = -sin x.',
       },
       {
-        expression: '\\frac{d}{dx}[\\sin x] = v_y = \\cos x \\checkmark',
-        annotation: 'The y-coordinate of P is sin(x). Its rate of change (the y-component of velocity) is cos x. Therefore d/dx[sin x] = cos x. The geometry proves it without any algebra.',
+        expression: '\\text{Tangent Geometry: } \\tan x',
+        annotation: 'Extend the radius to the line x=1. The height of this segment is tan(x).',
+      },
+      {
+        expression: '\\text{Arc } dx \\xrightarrow{\\text{sec } x} \\text{Vertical } dy',
+        annotation: 'As the angle increases by dx, the tip of the tangent segment moves vertically. Because the segment is at distance 1, this change is amplified by sec^2 x.',
+      },
+      {
+        expression: '\\frac{d}{dx}[\\tan x] = \\sec^2 x',
+        annotation: 'The geometric growth rate of the tangent segment is secant squared. No algebra, just projection geometry.',
       },
     ],
-    visualizationId: 'SinDerivativeGeometric',
+    visualizationId: 'TrigDerivativeGeometric',
+    visualizationProps: { showAllProofs: true },
 
     prose: [
       'We now prove d/dx[sin x] = cos x rigorously from the limit definition. This proof depends on two fundamental trigonometric limits, which we state but do not re-derive here (they were established in the limits chapter): lim(h\u21920) sin(h)/h = 1 and lim(h\u21920) (1 - cos h)/h = 0.',

@@ -185,7 +185,7 @@ export default {
       id: 'ch3-005-ch1',
       difficulty: 'hard',
       problem: "Prove that lim(x→0) (1-cos(x))/x² = 1/2 in three ways: (a) geometric, (b) L'Hôpital, (c) power series.",
-      hint: "(a) Use the identity 1-cos(x) = 2sin²(x/2) and the known limit sin(θ)/θ → 1. (b) Apply L'Hôpital twice. (c) Use cos(x) = 1 - x²/2 + x⁴/24 - ...",
+      hint: 'The power of multiple perspectives! L\'Hopital is systematic, but the identity 1-cos(x) = 2sin²(x/2) shows the "hidden" square that balances the x² in the denominator. The series method is the ultimate "cheat code"—it literally shows you the result in the first term.',
       walkthrough: [
         { expression: '\\text{(a) Geometric / Trigonometric Identity:}', annotation: 'Method (a).' },
         { expression: '\\frac{1-\\cos(x)}{x^2} = \\frac{2\\sin^2(x/2)}{x^2} = \\frac{2\\sin^2(x/2)}{4(x/2)^2} = \\frac{1}{2}\\left(\\frac{\\sin(x/2)}{x/2}\\right)^2', annotation: 'Use the half-angle identity 1-cos(x) = 2sin²(x/2). Rewrite x² = 4(x/2)².' },
@@ -203,7 +203,7 @@ export default {
       id: 'ch3-005-ch2',
       difficulty: 'medium',
       problem: 'Find lim(x→0⁺) (sin(x))^{tan(x)}. This is a 0^0 form.',
-      hint: 'Take logarithm: L = lim tan(x)·ln(sin(x)). This is 0·(-∞) → convert to -∞/∞ form and apply L\'Hôpital.',
+      hint: 'The logarithmic "unfolding" is key. Any time the variable is in both the base and the exponent, take the ln. This converts a "vertical growth" problem into a "horizontal product" problem.',
       walkthrough: [
         { expression: 'L = \\lim_{x \\to 0^+} (\\sin x)^{\\tan x}', annotation: 'As x → 0⁺: sin(x) → 0 and tan(x) → 0, giving 0^0 form.' },
         { expression: '\\ln L = \\lim_{x \\to 0^+} \\tan(x) \\cdot \\ln(\\sin x)', annotation: 'Take logarithm.' },
@@ -218,7 +218,7 @@ export default {
       id: 'ch3-005-ch3',
       difficulty: 'hard',
       problem: "Show that L'Hôpital's Rule fails for lim(x→∞) (x + sin(x))/x even though the limit exists. Explain WHY it fails.",
-      hint: "Differentiate numerator and denominator once: the quotient becomes 1 + cos(x). Because that new limit oscillates, L'Hôpital's hypothesis fails. Finish the original limit by splitting the fraction into 1 + sin(x)/x and bounding the second term.",
+      hint: 'The rule is a "bridge" that only works if the other side of the bridge is stable. If the derivative oscillates, the bridge collapses, and you must find another way to cross (like the Squeeze Theorem).',
       walkthrough: [
         { expression: '\\lim_{x \\to \\infty} \\frac{x + \\sin(x)}{x} = \\frac{\\infty}{\\infty} \\text{ form}', annotation: 'Both x + sin(x) → ∞ and x → ∞, so this appears to be ∞/∞.' },
         { expression: "\\text{Attempt L'Hôpital: } \\lim_{x \\to \\infty} \\frac{(x+\\sin x)\'}{x\'} = \\lim_{x\\to\\infty} \\frac{1 + \\cos x}{1}", annotation: "Apply L'Hôpital." },

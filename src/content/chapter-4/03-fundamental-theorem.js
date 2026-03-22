@@ -82,11 +82,34 @@ export default {
   },
 
   rigor: {
+    title: 'Formal Proof: The Moving Boundary',
+    visualizationId: 'FTCGeometricProof',
+    proofSteps: [
+      {
+        expression: 'A(x) = \\int_a^x f(t) \\, dt',
+        annotation: 'Define "Area so far" as a function of its upper boundary x.',
+      },
+      {
+        expression: '\\Delta A = A(x+h) - A(x)',
+        annotation: 'The change in area when we move the boundary by a small step h.',
+      },
+      {
+        expression: '\\Delta A = \\int_x^{x+h} f(t) \\, dt',
+        annotation: 'This is the area of a vertical sliver of width h.',
+      },
+      {
+        expression: 'm \\cdot h \\leq \\int_x^{x+h} f(t) \\, dt \\leq M \\cdot h',
+        annotation: 'Squeeze Theorem: the sliver is bounded by rectangles using the min (m) and max (M) of f on [x, x+h].',
+      },
+      {
+        expression: 'A\'(x) = \\lim_{h \\to 0} \\frac{1}{h} \\int_x^{x+h} f(t) \\, dt = f(x)',
+        annotation: 'As h vanishes, the min and max both crush into f(x). The derivative of area is height.',
+      }
+    ],
     prose: [
       'The proof of FTC Part 1 relies critically on two ingredients: the continuity of f (used in the MVT for integrals and in the passage to the limit f(c_h) → f(x)) and the fact that A(x) = ∫ₐˣ f(t) dt is well-defined, which requires f to be integrable on [a, x] for each x ∈ [a, b]. Both conditions are guaranteed by f being continuous on [a, b]. If f is merely integrable but not continuous, A is still defined and still satisfies A(x₀)→A(x) as x₀→x (A is continuous), but A may fail to be differentiable at points where f is discontinuous. The derivative A\'(x) = f(x) holds at every point of continuity of f.',
       'The key step in the proof — that (1/h)∫ₓˣ⁺ʰ f(t) dt → f(x) — deserves a fully explicit argument. For any ε > 0, by continuity of f at x, there exists δ > 0 such that |f(t) − f(x)| < ε whenever |t − x| < δ. For |h| < δ, every t ∈ [x, x+h] satisfies |t − x| ≤ |h| < δ, so |f(t) − f(x)| < ε. Therefore |(1/h)∫ₓˣ⁺ʰ f(t) dt − f(x)| = |(1/h)∫ₓˣ⁺ʰ [f(t)−f(x)] dt| ≤ (1/|h|)∫ₓˣ⁺ʰ ε|dt| = ε. Since ε was arbitrary, the limit equals f(x). This argument works for both positive and negative h.',
-      'FTC Part 2 is sometimes stated with the weaker hypothesis that F is continuous on [a, b] and F\' = f everywhere on (a, b) (with the derivative at the endpoints one-sided). This covers cases where F has corners at the endpoints. The proof is identical: (A − F)\' = 0 on (a, b); by the MVT for derivatives, A − F is constant on [a, b] (applying the MVT on any subinterval [a+ε, b−ε] and letting ε → 0 using continuity of A − F); the rest is unchanged. This slight weakening of hypotheses is rarely needed in practice but is theoretically important for piecewise-defined functions.',
-      'A subtle issue: the statement "any two antiderivatives differ by a constant" requires a domain assumption. On a connected domain, if H\' = 0 then H is constant (by the MVT). But on a disconnected domain like (−1, 0) ∪ (0, 1), the function H(x) = 1 on (−1, 0) and H(x) = 0 on (0, 1) satisfies H\' = 0 everywhere but is not constant. This is not a pathology — it matters for the antiderivative of 1/x: ∫(1/x) dx = ln|x| + C is slightly misleading, because C can be different on (−∞, 0) and (0, ∞). The full answer is F(x) = ln|x| + C₁ for x > 0 and F(x) = ln|x| + C₂ for x < 0, with possibly different constants C₁ and C₂.',
+      'FTC Part 2 follows immediately from Part 1 and the Mean Value Theorem. Since A\'(x) = f(x) and F\'(x) = f(x), the function (A - F) has a zero derivative and must be a constant C. By checking the boundary at x=a, where A(a) = 0, we find C = -F(a). Thus A(b) = F(b) - F(a), which is the evaluation formula we use every day.',
     ],
     callouts: [
       {

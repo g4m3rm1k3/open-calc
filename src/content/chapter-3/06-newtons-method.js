@@ -193,7 +193,7 @@ export default {
       id: 'ch3-060-ch1',
       difficulty: 'hard',
       problem: "Use Newton's Method to find all real roots of $x^3 - 6x^2 + 11x - 5 = 0$ to 4 decimal places. You will need to choose different starting points for different roots.",
-      hint: 'Before iterating, factor the cubic or at least test nearby integers to locate the three basins of attraction. One root is near x = 1, and the other two are on either side of x = 3; choose starting points in those three regions so each Newton sequence lands on a different root.',
+      hint: 'The signs of the function at integer points are your "treasure map." Before you fire the Newton laser, walk the x-axis to find where the function flips from positive to negative. Each flip is a target for a new Newton sequence.',
       walkthrough: [
         { expression: "f(x) = x^3 - 6x^2 + 11x - 5, \\quad f'(x) = 3x^2 - 12x + 11", annotation: 'Set up the iteration.' },
         { expression: 'f(0) = -5 < 0, \\; f(1) = 1 > 0, \\; f(2) = -1 < 0, \\; f(3) = -2 < 0, \\; f(5) = 10 > 0', annotation: 'Sign changes suggest roots near $x \\approx 0.6$, $x \\approx 1.3$, and $x \\approx 4.1$.' },
@@ -207,7 +207,7 @@ export default {
       id: 'ch3-060-ch2',
       difficulty: 'medium',
       problem: "Apply Newton's Method to $f(x) = x^2 - a$ (where $a > 0$) to derive the Babylonian formula for $\\sqrt{a}$. Then use it to compute $\\sqrt{5}$ to 6 decimal places.",
-      hint: "Substitute f(x) = x^2 - a into x_{n+1} = x_n - f(x_n)/f'(x_n). After canceling the x_n terms, the iterate becomes the average of x_n and a/x_n, which is the Babylonian square-root formula.",
+      hint: 'The Babylonian "average" is actually the secret origin of Newton\'s Method. If your guess is too high, its reciprocal is too low—so their average is almost perfect. This symmetry is why it converges so fast.',
       walkthrough: [
         { expression: "f(x) = x^2 - a, \\quad f'(x) = 2x", annotation: 'Set up for finding $\\sqrt{a}$.' },
         { expression: 'x_{n+1} = x_n - \\frac{x_n^2 - a}{2x_n} = \\frac{2x_n^2 - x_n^2 + a}{2x_n} = \\frac{x_n + a/x_n}{2}', annotation: 'Simplify: the Newton iterate is the average of $x_n$ and $a/x_n$. This is the Babylonian formula.' },
@@ -221,7 +221,7 @@ export default {
       id: 'ch3-060-ch3',
       difficulty: 'medium',
       problem: "Show that Newton's Method applied to $f(x) = x^2$ (which has a double root at $x = 0$) converges only linearly, not quadratically. Compute 5 iterations starting from $x_0 = 1$.",
-      hint: "Compute the Newton update for f(x) = x^2 directly; every step should halve the current iterate. Once you see x_{n+1} = x_n/2, the convergence rate is linear with ratio 1/2, which is slower than the quadratic case covered earlier.",
+      hint: 'The "Newton Engine" slows down at double roots. Because the tangent line becomes so flat, it doesn\'t point toward the root as aggressively. Watch how each step only kills half the error—like a bisection that never stops.',
       walkthrough: [
         { expression: "f(x) = x^2, \\quad f'(x) = 2x", annotation: 'The root $r = 0$ has multiplicity 2.' },
         { expression: 'x_{n+1} = x_n - \\frac{x_n^2}{2x_n} = x_n - \\frac{x_n}{2} = \\frac{x_n}{2}', annotation: 'The iteration simply halves the current value each step.' },

@@ -70,10 +70,31 @@ export default {
       },
     ],
     visualizations: [
-      { id: 'UnitCircle', props: { animate: false }, title: 'Interactive Unit Circle', caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.' },
-      { id: 'SineUnwrap', title: 'The Unit Circle Unwraps into the Sine Wave', caption: 'THIS is why sine is a wave: the vertical height of the point on the unit circle, plotted against the angle, traces the sine curve. Toggle auto-animate to watch it unfold.' },
-      { id: 'ArcChordLimit', title: 'Arc vs Chord for Tiny Angles', caption: 'As θ shrinks, arc and chord lengths converge. This geometry is the visual bridge to key trig limits used in derivative proofs.' },
-      { id: 'TriangleAreaProof', title: 'Why Triangle Area = ½ × base × height', caption: 'Every trig formula for triangle area (½ab sin C) comes from this. Watch how two triangles tile a parallelogram.' },
+      {
+        id: 'UnitCircle',
+        props: { animate: false },
+        title: 'Interactive Unit Circle',
+        mathBridge: 'The unit circle defines sine and cosine for every angle: the point at angle $\\theta$ has coordinates $(\\cos\\theta, \\sin\\theta)$. This is not a formula to memorize — it is the definition. The Pythagorean identity $\\sin^2\\theta + \\cos^2\\theta = 1$ follows immediately from $x^2 + y^2 = 1$ (the unit circle equation). Every trig identity can be derived from this single picture.',
+        caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.',
+      },
+      {
+        id: 'SineUnwrap',
+        title: 'The Unit Circle Unwraps into the Sine Wave',
+        mathBridge: 'As angle $\\theta$ increases, the $y$-coordinate of the unit-circle point traces $\\sin\\theta$. Plotting that $y$-value against $\\theta$ "unwraps" the circular motion into a wave. This is the geometric reason sine is periodic with period $2\\pi$: one full revolution of the circle ($\\theta$ increases by $2\\pi$) returns the point to its starting position, so $\\sin(\\theta + 2\\pi) = \\sin\\theta$ for all $\\theta$.',
+        caption: 'The vertical height of the point on the unit circle, plotted against angle, traces the sine curve.',
+      },
+      {
+        id: 'ArcChordLimit',
+        title: 'Arc vs Chord for Tiny Angles',
+        mathBridge: 'Arc length $= r\\theta$ (radian definition). Chord length $= 2r\\sin(\\theta/2)$. Their ratio: $\\frac{\\text{chord}}{\\text{arc}} = \\frac{2\\sin(\\theta/2)}{\\theta} = \\frac{\\sin(\\theta/2)}{\\theta/2}$. As $\\theta\\to 0$ this ratio $\\to 1$, the same fact as $\\lim_{u\\to 0}\\frac{\\sin u}{u}=1$. At small angles, arc and chord are interchangeable — this geometric fact reappears every time you prove a trig limit or derive a trig derivative.',
+        caption: 'As θ shrinks, arc and chord lengths converge — the geometry behind sin(x)/x → 1.',
+      },
+      {
+        id: 'TriangleAreaProof',
+        title: 'Why Triangle Area = ½ab sin C',
+        mathBridge: 'For a triangle with sides $a$, $b$ and included angle $C$: the height from one vertex to the opposite side is $h = b\\sin C$. Area $= \\frac{1}{2}\\cdot\\text{base}\\cdot\\text{height} = \\frac{1}{2}a\\cdot b\\sin C$. This formula connects triangle geometry directly to sine, and it is the starting point for the Law of Sines ($\\frac{a}{\\sin A}=\\frac{b}{\\sin B}=\\frac{c}{\\sin C}$) and the trig area integral $\\int_0^{2\\pi}\\frac{1}{2}r^2\\,d\\theta$.',
+        caption: 'Watch how two copies of the triangle tile a parallelogram, proving Area = ½ab sin C.',
+      },
     ],
   },
 
@@ -148,12 +169,14 @@ export default {
       {
         id: 'PythagoreanProof',
         title: 'Animated Pythagorean Theorem Proof',
-        caption: 'Step through the rearrangement proof. Drag the sliders to change a and b and watch the proof still work.',
+        mathBridge: 'The rearrangement proof: place four identical right triangles (legs $a$, $b$; hypotenuse $c$) inside a square of side $a+b$. Arrangement 1 leaves a tilted square of area $c^2$ in the center. Arrangement 2 leaves two squares of area $a^2$ and $b^2$. Both arrangements have the same four triangles removed from the same total area, so $c^2 = a^2 + b^2$. Applied to the unit circle ($c=1$): $\\cos^2\\theta + \\sin^2\\theta = 1$ — the Pythagorean identity.',
+        caption: 'Step through the rearrangement proof. Change a and b and watch the proof still hold.',
       },
       {
         id: 'CircleAreaProof',
         title: 'Why the Area of a Circle is πr²',
-        caption: 'Cut the circle into sectors and rearrange them into a rectangle. As the number of sectors grows, the rectangle becomes exact.',
+        mathBridge: 'Slice the circle into $n$ equal sectors and rearrange them alternating up/down into a near-rectangle. As $n\\to\\infty$: the width approaches half the circumference $= \\pi r$, the height approaches the radius $r$. Area of rectangle $= \\pi r \\cdot r = \\pi r^2$. This is a discrete approximation becoming exact in the limit — precisely the idea behind Riemann sums and integration that appears in Chapter 4.',
+        caption: 'Cut the circle into sectors and rearrange them. As the number of sectors → ∞, the shape becomes a rectangle with area πr².',
       },
     ],
   },

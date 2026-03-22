@@ -61,32 +61,38 @@ export default {
       {
         id: 'RadianDegreeLimitLab',
         title: 'Radians vs Degrees Toggle',
-        caption: 'Switch units and watch lim sin(x)/x change from 1 (radians) to pi/180 (degrees).',
+        mathBridge: 'The limit $\\lim_{x\\to 0}\\frac{\\sin x}{x}=1$ holds only when $x$ is in radians. In degrees, $\\sin(x°) = \\sin(x\\cdot\\frac{\\pi}{180})$, so the limit becomes $\\frac{\\pi}{180}\\approx 0.01745$ — not 1. This is why every calculus derivative formula for trig assumes radians: the "1-to-1" scaling between arc length and angle ($s = r\\theta$) only works in radians.',
+        caption: 'Switch units and watch lim sin(x)/x change from 1 (radians) to π/180 (degrees).',
       },
       {
         id: 'AreaSqueezeLab',
         title: 'Three-Shape Area Squeeze',
-        caption: 'Drag theta and watch inner triangle <= sector <= outer triangle lock the proof visually.',
+        mathBridge: 'For $0 < \\theta < \\frac{\\pi}{2}$, compare three areas on the unit circle: the inner triangle (area $= \\frac{1}{2}\\sin\\theta\\cos\\theta$), the circular sector (area $= \\frac{1}{2}\\theta$), and the outer tangent triangle (area $= \\frac{1}{2}\\tan\\theta$). Since inner $\\leq$ sector $\\leq$ outer: $\\cos\\theta \\leq \\frac{\\sin\\theta}{\\theta} \\leq 1$. As $\\theta\\to 0$, both bounds $\\to 1$, so $\\frac{\\sin\\theta}{\\theta}\\to 1$ by the Squeeze Theorem.',
+        caption: 'Drag theta and watch inner triangle ≤ sector ≤ outer triangle lock the proof visually.',
       },
       {
         id: 'AlgebraicSqueezeWalkthrough',
         title: 'Guided Algebraic Squeeze',
-        caption: 'Apply one algebra move at a time to see exactly how geometric inequalities become sin(theta)/theta bounds.',
+        mathBridge: 'This steps through the algebra that converts the geometric inequality $\\sin\\theta\\cos\\theta < \\theta < \\tan\\theta$ into the usable form $\\cos\\theta < \\frac{\\sin\\theta}{\\theta} < 1$. Each move is one legal operation: multiply both sides by $2$, divide by $\\sin\\theta$ (positive for small $\\theta > 0$), take reciprocals (which flips inequalities). Following each step shows exactly why the Squeeze Theorem applies and why no step is skipped.',
+        caption: 'Apply one algebra move at a time to see exactly how geometric inequalities become sin(θ)/θ bounds.',
       },
       {
         id: 'ArcChordLimit',
         title: 'Arc-Chord Comparison Near 0',
-        caption: 'As angle x shrinks, arc length and chord-based trig expressions collapse together, explaining why sin(x)/x tends to 1.',
+        mathBridge: 'The arc length subtended by angle $\\theta$ on a unit circle is $\\theta$ (by definition of radians). The chord length is $2\\sin(\\theta/2)$. Their ratio is $\\frac{2\\sin(\\theta/2)}{\\theta}$. As $\\theta\\to 0$ this ratio approaches 1 — the same fact as $\\lim_{u\\to 0}\\frac{\\sin u}{u}=1$ with $u=\\theta/2$. Arc and chord become indistinguishable at small scales, which is the geometric heart of why the limit equals 1.',
+        caption: 'As angle x shrinks, arc length and chord length converge — the geometry behind sin(x)/x → 1.',
       },
       {
         id: 'SqueezeTheorem',
         title: 'Squeeze Mechanism',
+        mathBridge: 'The completed squeeze: $\\cos x \\leq \\frac{\\sin x}{x} \\leq 1$ for $0 < x < \\frac{\\pi}{2}$. Since $\\lim_{x\\to 0}\\cos x = 1$ and $\\lim_{x\\to 0} 1 = 1$, the Squeeze Theorem forces $\\lim_{x\\to 0}\\frac{\\sin x}{x} = 1$. This visualization shows the three-band narrowing: as the horizontal $\\varepsilon$-band tightens, $\\frac{\\sin x}{x}$ has nowhere to go except 1.',
         caption: 'See how trapping sin(x)/x between cos(x) and 1 forces the limit to be 1.',
       },
       {
         id: 'SmallAnglePendulumLab',
         title: 'Small-Angle Pendulum Simulator',
-        caption: 'Compare exact timing vs sin(theta) ~ theta approximation at small and large angles.',
+        mathBridge: "A pendulum's equation of motion is $\\ddot{\\theta} = -\\frac{g}{L}\\sin\\theta$. This is hard to solve exactly because of the $\\sin\\theta$. But when $\\theta$ is small, the limit $\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$ tells us $\\sin\\theta \\approx \\theta$, turning the equation into $\\ddot{\\theta} = -\\frac{g}{L}\\theta$ — a simple oscillator with period $T = 2\\pi\\sqrt{L/g}$. This simulator shows the error that accumulates when you use the approximation at large angles: small angles ($<15°$) match almost perfectly; large angles diverge because $\\sin\\theta$ is no longer close enough to $\\theta$.",
+        caption: 'Compare exact timing vs sin(theta) ≈ theta approximation at small and large angles. The limit lim sin(x)/x = 1 is what makes the small-angle approximation valid.',
       },
     ],
   },
@@ -141,41 +147,65 @@ export default {
         id: 'LimitApproach',
         props: { fn: 'Math.sin(x)/x', targetX: 0, limitVal: 1, showTable: true },
         title: 'Numerical Convergence of sin(x)/x',
-        caption: 'Both one-sided approaches lock onto 1 near x=0.',
+        mathBridge: 'The table provides numerical evidence for $\\lim_{x\\to 0}\\frac{\\sin x}{x}=1$. At $x=0.1$: $\\frac{\\sin(0.1)}{0.1}=0.9983$. At $x=0.01$: $0.999983$. The values approach 1 from both sides. This numerical pattern matches the geometric proof — it does not replace it, but confirms the result and builds intuition for how fast $\\sin x$ "catches up" to $x$ near zero.',
+        caption: 'Both one-sided approaches lock onto 1 near x = 0.',
       },
       {
         id: 'LimitApproach',
         props: { fn: '(1-Math.cos(x))/x', targetX: 0, limitVal: 0, showTable: true },
         title: 'Numerical Convergence of (1-cos x)/x',
-        caption: 'Values collapse to 0 near x=0 after pattern simplification logic.',
+        mathBridge: 'The second pillar: $\\lim_{x\\to 0}\\frac{1-\\cos x}{x}=0$. Proved by multiplying by $\\frac{1+\\cos x}{1+\\cos x}$: $\\frac{1-\\cos x}{x}=\\frac{\\sin^2 x}{x(1+\\cos x)}=\\frac{\\sin x}{x}\\cdot\\frac{\\sin x}{1+\\cos x}$. As $x\\to 0$: first factor $\\to 1$, second factor $\\to\\frac{0}{2}=0$. So the product $\\to 0$. The table shows $1-\\cos x$ goes to 0 faster than $x$ itself does.',
+        caption: 'Values collapse to 0 near x = 0. The second pillar is proved using the conjugate trick and the first pillar.',
       },
       {
         id: 'CosGapVisualizer',
-        title: 'Unit-Circle Gap Visualizer for 1-cos(x)',
-        caption: 'See the horizontal gap 1-cos(x) collapse faster than x as x approaches 0.',
+        title: 'Unit-Circle Gap Visualizer for 1−cos(x)',
+        mathBridge: 'On the unit circle, $1-\\cos\\theta$ is the horizontal distance from the point $(\\cos\\theta, \\sin\\theta)$ to the right edge $(1, 0)$. For small $\\theta$, this gap is tiny compared to the arc length $\\theta$. Geometrically: $1-\\cos\\theta \\approx \\theta^2/2$ for small $\\theta$ (from the Taylor series). So $(1-\\cos\\theta)/\\theta \\approx \\theta/2 \\to 0$. The gap shrinks quadratically — much faster than $\\theta$ shrinks linearly.',
+        caption: 'Watch the horizontal gap 1−cos(x) collapse faster than x as the angle shrinks.',
       },
       {
         id: 'ConjugateVisualizer',
         title: 'Conjugate Trick Visualizer',
-        caption: 'Watch (1-cos x) pair with (1+cos x) to become sin^2(x), then split into known limit factors.',
+        mathBridge: 'The conjugate trick is the algebraic engine of the second pillar proof. Multiply $\\frac{1-\\cos x}{x}$ by $\\frac{1+\\cos x}{1+\\cos x}$ (equals 1, so value unchanged): $\\frac{(1-\\cos x)(1+\\cos x)}{x(1+\\cos x)} = \\frac{1-\\cos^2 x}{x(1+\\cos x)} = \\frac{\\sin^2 x}{x(1+\\cos x)}$. Now split: $\\frac{\\sin x}{x}\\cdot\\frac{\\sin x}{1+\\cos x}$. Each factor has a known limit. The visualization shows each algebraic step and what it does geometrically.',
+        caption: 'Watch (1−cos x)(1+cos x) = sin²(x) emerge, then split into the two known limit factors.',
       },
     ],
   },
 
   rigor: {
+    title: 'Formal Proof: The Area Squeeze',
+    visualizationId: 'SqueezeTrigGeometric',
+    proofSteps: [
+      {
+        expression: '\\frac{1}{2}\\sin x \\cos x < \\frac{1}{2}x < \\frac{1}{2}\\tan x',
+        annotation: 'Compare areas: Inner Triangle < Circular Sector < Outer Tangent Triangle.',
+      },
+      {
+        expression: '\\sin x \\cos x < x < \\frac{\\sin x}{\\cos x}',
+        annotation: 'Simplify by multiplying by 2 and writing tan x as sin x / cos x.',
+      },
+      {
+        expression: '\\cos x < \\frac{x}{\\sin x} < \\frac{1}{\\cos x}',
+        annotation: 'Divide everything by sin x (which is positive for small x > 0).',
+      },
+      {
+        expression: '\\cos x < \\frac{\\sin x}{x} < 1',
+        annotation: 'Take reciprocals (flipping the inequalities) and use cos x < 1.',
+      },
+      {
+        expression: '\\lim_{x \\to 0} \\cos x = 1 \\text{ and } \\lim_{x \\to 0} 1 = 1',
+        annotation: 'Both boundaries approach 1 as the angle vanishes.',
+      },
+      {
+        expression: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1',
+        annotation: 'By the Squeeze Theorem, the ratio is forced to 1. This is why radians (area = x/2) are essential.',
+      }
+    ],
     prose: [
       'Why radians are mandatory:',
       'If theta is measured in degrees, then sin(theta deg) = sin(theta*pi/180) in radian form. So',
       'lim(theta->0) sin(theta deg)/theta = lim(theta->0) sin(theta*pi/180)/(theta*pi/180) * (pi/180) = pi/180, not 1.',
-
-      'This is why calculus defines trig derivatives in radian measure. Radians make the geometry-to-limit normalization exact.',
-
-      'Small-angle asymptotics (optional but powerful):',
-      'sin x = x - x^3/6 + O(x^5),',
-      'cos x = 1 - x^2/2 + O(x^4).',
-      'From these, sin x / x = 1 - x^2/6 + O(x^4) and (1-cos x)/x = x/2 + O(x^3) -> 0.',
-
-      'These expansions are not required to prove the pillars, but they explain error size and why approximations work so well in engineering.',
+      'The geometric proof above relied on the area of a circular sector being precisely x/2. This only holds if x is measured in radians. If we used degrees, the sector area would be (x/360) * pi * r^2, and the limit would pick up a factor of pi/180. Calculus requires radians so that the "scaling" between linear and circular motion is exactly 1-to-1.',
     ],
     callouts: [
       {
@@ -189,7 +219,6 @@ export default {
         body: 'Near 0, replacing sin x by x has relative error about x^2/6, while replacing 1-cos x by x^2/2 has next error scale about x^4/24.',
       },
     ],
-    visualizations: [],
   },
 
   examples: [

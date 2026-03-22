@@ -238,7 +238,7 @@ export default {
       id: 'ch3-004-ch1',
       difficulty: 'hard',
       problem: 'Prove: (1) Among all rectangles with fixed perimeter P, the square has maximum area. (2) Among all rectangles with fixed area A, the square has minimum perimeter.',
-      hint: 'For (1), write the rectangle as y = P/2 - x and maximize A(x) = x(P/2 - x). For (2), write y = A/x and minimize P(x) = 2x + 2A/x. In both cases, the critical point lands where x = y.',
+      hint: 'Think of "breaking the symmetry." If x and y differ, you can always nudge them closer together to improve the objective function while keeping the constraint. The calculus confirms that the perfect balance point (x=y) is the only critical point.',
       walkthrough: [
         { expression: '\\text{Part (1): Fix perimeter } 2x+2y = P, \\text{ maximize } A = xy.', annotation: 'Set up as in the fencing problem.' },
         { expression: 'y = P/2 - x, \\; A = x(P/2-x), \\; A\'=P/2 - 2x = 0 \\Rightarrow x = P/4 = y', annotation: 'Critical point: x = y = P/4 (square). A\'\'= -2 < 0: maximum.' },
@@ -271,7 +271,7 @@ export default {
       id: 'ch3-004-ch3',
       difficulty: 'medium',
       problem: 'A Norman window (rectangle + semicircle on top) has perimeter 10 m. Show the optimal height-to-radius ratio is h = r, where h is the rectangle height and r is the semicircle radius.',
-      hint: 'From Example 7, first use A\'(r) = 0 to get r* = 10/(4 + π). Then substitute that value into the expression for h and simplify until every term is written with the same denominator; the difference collapses to zero, so h = r*.',
+      hint: 'This "h = r" result is a beautiful symmetry. Try writing the area as a function of r, then find the critical radius r*. When you plug r* back into the height equation, the complicated-looking pi terms will perfectly cancel out.',
       walkthrough: [
         { expression: 'A(r) = 10r - 2r^2 - \\frac{\\pi r^2}{2}, \\quad A\'(r) = 10 - 4r - \\pi r = 0', annotation: 'From Example 7, the critical point condition.' },
         { expression: 'r^* = \\frac{10}{4+\\pi}', annotation: 'Optimal radius.' },

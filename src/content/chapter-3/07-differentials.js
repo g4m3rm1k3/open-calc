@@ -185,7 +185,7 @@ export default {
       id: 'ch3-070-ch1',
       difficulty: 'hard',
       problem: "The resistance of a wire is $R = \\rho L / A$ where $\\rho$ is resistivity (exact), $L = 2.00 \\pm 0.02$ m (length), and $A = 0.50 \\pm 0.01$ mm$^2$ (cross-section area). Find the maximum relative error in $R$.",
-      hint: 'Use $dR = \\frac{\\partial R}{\\partial L}dL + \\frac{\\partial R}{\\partial A}dA$. Or use logarithmic differentiation: $\\ln R = \\ln \\rho + \\ln L - \\ln A$.',
+      hint: 'The "Logarithmic Differentiation" trick is the fastest way here. It turns a product/quotient problem into a sum/difference problem, which is exactly how relative errors combine. Just remember to use absolute values for the worst-case scenario.',
       walkthrough: [
         { expression: '\\ln R = \\ln \\rho + \\ln L - \\ln A', annotation: 'Take the log of $R = \\rho L / A$.' },
         { expression: '\\frac{dR}{R} = \\frac{dL}{L} - \\frac{dA}{A}', annotation: 'Differentiate. Since $\\rho$ is exact, $d(\\ln \\rho) = 0$.' },
@@ -212,7 +212,7 @@ export default {
       id: 'ch3-070-ch3',
       difficulty: 'medium',
       problem: "A cube's edge is measured as $s = 5.00 \\pm 0.03$ cm. Find the absolute and relative errors in the surface area $A = 6s^2$ and volume $V = s^3$.",
-      hint: 'Compute $dA = 12s\\,ds$ and $dV = 3s^2\\,ds$. For relative errors, use the power rule: $n$ times the relative error in $s$.',
+      hint: 'The power rule is your "magnifying glass." If the quantity depends on s^n, any small error in s is magnified by the factor n. For a cube, the area (s²) magnifies error by 2, and the volume (s³) magnifies it by 3.',
       walkthrough: [
         { expression: 'dA = 12s\\,ds = 12(5)(\\pm 0.03) = \\pm 1.8 \\text{ cm}^2', annotation: 'Absolute error in surface area. $A = 6(25) = 150$ cm$^2$.' },
         { expression: '\\frac{|dA|}{A} = 2 \\cdot \\frac{|ds|}{s} = 2 \\cdot \\frac{0.03}{5} = 1.2\\%', annotation: 'Relative error in area: 2 times the relative error in $s$ (since $A \\propto s^2$).' },

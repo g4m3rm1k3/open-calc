@@ -50,7 +50,8 @@ export default {
       {
         id: 'ExpLogBridgeLab',
         title: 'Exponential/Log Bridge Lab',
-        caption: 'Switch between e^x and ln(x) to connect growth intuition with exact derivative formulas.',
+        mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes.',
+        caption: 'Switch between eˣ and ln(x) to connect growth intuition with the derivative formulas.',
       },
     ],
   },
@@ -88,17 +89,40 @@ export default {
       {
         id: 'ExpLogBridgeLab',
         title: 'Derivative Formula Bridge Lab',
-        caption: 'Use one slider to see function value and derivative value update together under both exponential and logarithmic rules.',
+        mathBridge: 'The four formulas in one view: $\\frac{d}{dx}[e^x]=e^x$, $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$, $\\frac{d}{dx}[a^x]=a^x\\ln a$, $\\frac{d}{dx}[\\log_a x]=\\frac{1}{x\\ln a}$. At any $x$-value, the slider shows the function value and its derivative side by side. Notice: for $e^x$ they are always equal; for $\\ln x$ the derivative $\\frac{1}{x}$ is always less than the function value (for $x>1$); for $a^x$ with $a\\neq e$ there is an extra factor of $\\ln a$.',
+        caption: 'Move the slider to see function value and derivative value update together for all four formulas.',
       },
     ],
   },
 
   rigor: {
+    title: 'Geometric Rigor: Slope & Area',
+    visualizationId: 'ExpLogGeometricProof',
+    proofSteps: [
+      {
+        expression: 'f(x) = e^x \\implies f\'(x) = e^x',
+        annotation: 'The defining property: at every point, the slope of the tangent equals the height of the curve.',
+      },
+      {
+        expression: '\\text{Slope at } 0 = \\lim_{h \\to 0} \\frac{e^h - 1}{h} = 1',
+        annotation: 'This is the geometric definition of e... the base that makes the unit cross at 45 degrees.',
+      },
+      {
+        expression: 'e^{x+h} = e^x \\cdot e^h',
+        annotation: 'Algebraic self-similarity: zooming in at any point x looks exactly like zooming in at 0, just scaled by e^x.',
+      },
+      {
+        expression: '\\ln x = \\int_1^x \\frac{1}{t} \\, dt',
+        annotation: 'The accumulation definition: the natural log is the area under the hyperbola 1/t.',
+      },
+      {
+        expression: '\\frac{d}{dx} \\left[ \\int_1^x \\frac{1}{t} \\, dt \\right] = \\frac{1}{x}',
+        annotation: 'Fundamental Theorem: the rate at which area accumulates is the height of the boundary... which is 1/x.',
+      }
+    ],
     prose: [
-      'PROOF that d/dx[e^x] = e^x: By the limit definition, d/dx[e^x] = lim(h\u21920) [e^(x+h) - e^x] / h. Using the exponent law e^(x+h) = e^x \u00b7 e^h, factor out e^x: = lim(h\u21920) e^x \u00b7 [e^h - 1] / h = e^x \u00b7 lim(h\u21920) (e^h - 1)/h. By the defining property of e (or equivalently, by the definition of e as lim(n\u2192\u221e)(1+1/n)\u207f), the limit lim(h\u21920) (e^h - 1)/h = 1. Therefore d/dx[e^x] = e^x \u00b7 1 = e^x.',
-      'PROOF that d/dx[ln x] = 1/x using implicit differentiation: Let y = ln x. By definition of the natural log, this means e^y = x. Differentiate both sides with respect to x: d/dx[e^y] = d/dx[x]. The left side requires the chain rule since y depends on x: d/dx[e^y] = e^y \u00b7 dy/dx. The right side is just 1. So e^y \u00b7 dy/dx = 1, giving dy/dx = 1/e^y. Since e^y = x, this simplifies to dy/dx = 1/x. Therefore d/dx[ln x] = 1/x.',
-      'For x < 0, we have d/dx[ln|x|] = 1/x as well (the absolute value does not change the derivative for negative x, since ln|x| = ln(-x) for x < 0, and d/dx[ln(-x)] = (1/(-x))\u00b7(-1) = 1/x).',
-      'WHY LOGARITHMIC DIFFERENTIATION WORKS: If y = f(x) and f(x) > 0, then ln(y) = ln(f(x)). Differentiating both sides with respect to x and applying the chain rule on the left: d/dx[ln y] = (1/y)\u00b7(dy/dx) and d/dx[ln(f(x))] = f\'(x)/f(x). Setting equal: (1/y)(dy/dx) = f\'(x)/f(x), so dy/dx = y\u00b7f\'(x)/f(x) = f(x)\u00b7f\'(x)/f(x) = f\'(x). This is consistent but doesn\'t help for simple cases. The technique\'s power comes when f(x) involves products, quotients, and powers, because ln converts these into sums, differences, and multiples, which are much easier to differentiate.',
+      'The derivative of e^x is the most "natural" fact in calculus. If we define e as the base such that the slope at x=0 is exactly 1, then the derivative at any other point x is just that slope scaled by the function value itself. Because e^(x+h) = e^x \u00b7 e^h, the difference quotient e^x(e^h-1)/h simply inherits the slope 1 from the origin, multiplied by e^x. Thus, the slope is always equal to the height.',
+      'For the logarithm, we can view the derivative geometrically through accumulation. If we define ln(x) as the area under the curve y=1/t from t=1 to t=x, then by the Fundamental Theorem of Calculus, the rate of change of this area as we move the boundary x is simply the height of the curve at that boundary. Since the height is 1/x, the derivative of the area ln(x) must be 1/x.',
     ],
     callouts: [
       {
@@ -108,11 +132,10 @@ export default {
       },
       {
         type: 'proof',
-        title: 'Proof: d/dx[ln x] = 1/x via Implicit Differentiation',
-        body: "y = \\ln x \\implies e^y = x \\implies e^y \\frac{dy}{dx} = 1 \\implies \\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}",
+        title: 'Proof: d/dx[ln x] = 1/x via FTC',
+        body: "\\ln x = \\int_1^x \\frac{1}{t}dt \\implies \\frac{d}{dx}[\\ln x] = \\frac{d}{dx}\\int_1^x \\frac{1}{t}dt = \\frac{1}{x}",
       },
     ],
-    visualizationId: null,
   },
 
   examples: [
