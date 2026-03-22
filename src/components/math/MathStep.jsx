@@ -19,9 +19,12 @@ export default function MathStep({ step, stepNumber }) {
       <div className="flex-1 min-w-0 overflow-x-auto">
         <KatexBlock expr={step.expression} className="!py-1" />
         {step.annotation && (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 italic leading-snug">
-            {parseProse(step.annotation)}
-          </p>
+          <div className="mt-1 rounded-md bg-slate-100 dark:bg-slate-800/70 px-2 py-1.5">
+            <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Why this move?</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-snug">
+              {parseProse(step.annotation)}
+            </p>
+          </div>
         )}
       </div>
     </div>

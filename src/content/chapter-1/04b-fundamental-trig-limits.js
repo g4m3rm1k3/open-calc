@@ -51,6 +51,11 @@ export default {
         title: 'Do Not Plug 0 Immediately',
         body: 'For forms like sin(ax)/x or (1-cos x)/x, direct substitution gives 0/0. You must convert to a known pattern before evaluating.',
       },
+      {
+        type: 'warning',
+        title: 'Limit Blindness Trap',
+        body: 'Do not apply sin(x)/x=1 unless x -> 0. Example: lim(x->pi) sin(x)/x = 0/pi = 0, not 1.',
+      },
     ],
     visualizations: [
       {
@@ -62,6 +67,11 @@ export default {
         id: 'AreaSqueezeLab',
         title: 'Three-Shape Area Squeeze',
         caption: 'Drag theta and watch inner triangle <= sector <= outer triangle lock the proof visually.',
+      },
+      {
+        id: 'AlgebraicSqueezeWalkthrough',
+        title: 'Guided Algebraic Squeeze',
+        caption: 'Apply one algebra move at a time to see exactly how geometric inequalities become sin(theta)/theta bounds.',
       },
       {
         id: 'ArcChordLimit',
@@ -112,6 +122,11 @@ export default {
       },
       {
         type: 'theorem',
+        title: 'Automatic Third Pillar',
+        body: '\\lim_{x\\to0} \\frac{\\tan x}{x}=1 \\quad \\text{because} \\quad \\frac{\\tan x}{x}=\\frac{\\sin x}{x}\\cdot\\frac{1}{\\cos x}, \\; \\cos(0)=1.',
+      },
+      {
+        type: 'theorem',
         title: 'Most Useful Derived Limit',
         body: '\\lim_{x \\to 0} \\frac{1-\\cos x}{x^2} = \\frac{1}{2}',
       },
@@ -138,6 +153,11 @@ export default {
         id: 'CosGapVisualizer',
         title: 'Unit-Circle Gap Visualizer for 1-cos(x)',
         caption: 'See the horizontal gap 1-cos(x) collapse faster than x as x approaches 0.',
+      },
+      {
+        id: 'ConjugateVisualizer',
+        title: 'Conjugate Trick Visualizer',
+        caption: 'Watch (1-cos x) pair with (1+cos x) to become sin^2(x), then split into known limit factors.',
       },
     ],
   },
@@ -178,8 +198,8 @@ export default {
       title: 'Direct Pattern Scaling',
       problem: 'Evaluate lim(x->0) sin(7x)/(3x).',
       steps: [
-        { expression: '\\frac{\\sin(7x)}{3x} = \\frac{7}{3} \\cdot \\frac{\\sin(7x)}{7x}', annotation: 'Create sin(u)/u exactly.' },
-        { expression: '\\lim_{x\\to0} \\frac{\\sin(7x)}{3x} = \\frac{7}{3} \\cdot 1', annotation: 'Use lim sin(u)/u = 1.' },
+        { expression: '\\frac{\\sin(7x)}{3x} = \\frac{7}{3} \\cdot \\frac{\\sin(7x)}{7x}', annotation: 'Multiply by 7/7 style scaling so denominator matches the sine input (7x), unlocking pillar form.' },
+        { expression: '\\lim_{x\\to0} \\frac{\\sin(7x)}{3x} = \\frac{7}{3} \\cdot 1', annotation: 'Now the first factor is constant and second is exact pillar lim sin(u)/u.' },
         { expression: '= \\frac{7}{3}', annotation: '' },
       ],
       conclusion: 'Answer: 7/3.',
@@ -189,8 +209,9 @@ export default {
       title: 'Second Pillar Usage',
       problem: 'Evaluate lim(x->0) (1-cos(5x))/x.',
       steps: [
-        { expression: '\\frac{1-\\cos(5x)}{x} = 5 \\cdot \\frac{1-\\cos(5x)}{5x}', annotation: 'Match the (1-cos u)/u pattern.' },
-        { expression: '\\lim_{x\\to0} \\frac{1-\\cos(5x)}{x} = 5 \\cdot 0', annotation: 'Use second pillar.' },
+        { expression: '\\text{Strategy trigger: at least one recognizable pillar pattern first}', annotation: 'When you see 0/0, do not substitute; first rewrite into known limit blueprints.' },
+        { expression: '\\frac{1-\\cos(5x)}{x} = 5 \\cdot \\frac{1-\\cos(5x)}{5x}', annotation: 'Dress denominator as 5x so second pillar applies directly.' },
+        { expression: '\\lim_{x\\to0} \\frac{1-\\cos(5x)}{x} = 5 \\cdot 0', annotation: 'Apply second pillar with u=5x.' },
         { expression: '= 0', annotation: '' },
       ],
       conclusion: 'Answer: 0.',
@@ -211,9 +232,11 @@ export default {
       title: 'Mixed Identity Build',
       problem: 'Evaluate lim(x->0) (tan x - sin x)/x^3.',
       steps: [
-        { expression: '\\tan x - \\sin x = \\sin x(1/\\cos x - 1) = \\sin x(1-\\cos x)/\\cos x', annotation: 'Factor and rewrite.' },
-        { expression: '\\frac{\\tan x-\\sin x}{x^3} = \\frac{\\sin x}{x} \\cdot \\frac{1-\\cos x}{x^2} \\cdot \\frac{1}{\\cos x}', annotation: 'Split into three limits.' },
-        { expression: '\\to 1 \\cdot \\frac{1}{2} \\cdot 1 = \\frac{1}{2}', annotation: 'Apply pillar + derived limit + continuity of cos.' },
+        { expression: '\\tan x - \\sin x = \\frac{\\sin x}{\\cos x} - \\sin x', annotation: 'Translate to basics: tan is too opaque; rewrite in sin/cos form first.' },
+        { expression: '= \\sin x\\left(\\frac{1}{\\cos x}-1\\right)', annotation: 'Factoring trick exposes a shared sin(x) factor.' },
+        { expression: '= \\sin x\\cdot\\frac{1-\\cos x}{\\cos x}', annotation: 'Common denominator creates the 1-cos(x) blueprint needed for the second pillar chain.' },
+        { expression: '\\frac{\\tan x-\\sin x}{x^3}=\\frac{\\sin x}{x}\\cdot\\frac{1-\\cos x}{x^2}\\cdot\\frac{1}{\\cos x}', annotation: 'Split x^3 as x*x^2 so each factor becomes a known limit component.' },
+        { expression: '\\to 1\\cdot\\frac{1}{2}\\cdot 1=\\frac{1}{2}', annotation: 'First pillar, derived second-pillar limit, then cos continuity at 0.' },
       ],
       conclusion: 'Answer: 1/2.',
     },

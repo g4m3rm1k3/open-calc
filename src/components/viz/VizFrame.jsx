@@ -138,6 +138,8 @@ const VIZ_REGISTRY = {
   StarsAndBarsLab:               lazy(() => import('./react/StarsAndBarsLab.jsx')),
   RadianDegreeLimitLab:          lazy(() => import('./react/RadianDegreeLimitLab.jsx')),
   AreaSqueezeLab:                lazy(() => import('./react/AreaSqueezeLab.jsx')),
+  AlgebraicSqueezeWalkthrough:   lazy(() => import('./react/AlgebraicSqueezeWalkthrough.jsx')),
+  ConjugateVisualizer:           lazy(() => import('./react/ConjugateVisualizer.jsx')),
   SmallAnglePendulumLab:         lazy(() => import('./react/SmallAnglePendulumLab.jsx')),
   CosGapVisualizer:              lazy(() => import('./react/CosGapVisualizer.jsx')),
 }
