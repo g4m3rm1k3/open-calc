@@ -4,10 +4,11 @@ import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
 import GlobalGrapher3D from '../ui/GlobalGrapher3D.jsx'
+import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
-import { Activity, Box } from 'lucide-react'
+import { Activity, Box, Settings2 } from 'lucide-react'
 
-function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle }) {
+function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -82,6 +83,15 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle }) {
           <Box className="w-4 h-4" />
           <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">3D</span>
         </button>
+
+        <button
+          onClick={onGraphJSXToggle}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800/50"
+          title="Open JSXGraph Pro (X)"
+        >
+          <Settings2 className="w-4 h-4" />
+          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Pro</span>
+        </button>
       </div>
 
       {/* Dark mode toggle */}
@@ -108,6 +118,7 @@ export default function AppShell({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
+  const [graphJSXOpen, setGraphJSXOpen] = useState(false)
   const { openSearch } = useSearchContext()
 
   // Global keyboard shortcuts
@@ -121,20 +132,28 @@ export default function AppShell({ children }) {
       // 'g' key for graph (if not in an input)
       if (e.key.toLowerCase() === 'g' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         setGraphOpen(prev => !prev)
+        if (!graphOpen) { setGraph3DOpen(false); setGraphJSXOpen(false); }
       }
       // '3' key for 3D plotter
       if (e.key === '3' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         setGraph3DOpen(prev => !prev)
+        if (!graph3DOpen) { setGraphOpen(false); setGraphJSXOpen(false); }
+      }
+      // 'x' key for JSXGraph Pro
+      if (e.key.toLowerCase() === 'x' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        setGraphJSXOpen(prev => !prev)
+        if (!graphJSXOpen) { setGraphOpen(false); setGraph3DOpen(false); }
       }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
         setGraph3DOpen(false)
+        setGraphJSXOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [openSearch])
+  }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen])
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -142,16 +161,18 @@ export default function AppShell({ children }) {
         onMenuToggle={() => setSidebarOpen((o) => !o)} 
         onGraphToggle={() => setGraphOpen(prev => !prev)}
         onGraph3DToggle={() => setGraph3DOpen(prev => !prev)}
+        onGraphJSXToggle={() => setGraphJSXOpen(prev => !prev)}
       />
 
       {/* Mobile sidebar backdrop */}
-      {(sidebarOpen || graphOpen || graph3DOpen) && (
+      {(sidebarOpen || graphOpen || graph3DOpen || graphJSXOpen) && (
         <div
           className="fixed inset-0 z-[45] bg-black/30 backdrop-blur-sm"
           onClick={() => {
             setSidebarOpen(false)
             setGraphOpen(false)
             setGraph3DOpen(false)
+            setGraphJSXOpen(false)
           }}
         />
       )}
@@ -176,6 +197,10 @@ export default function AppShell({ children }) {
           setGraphOpen(false)
           setGraph3DOpen(true)
         }}
+        onSwitchToJSX={() => {
+          setGraphOpen(false)
+          setGraphJSXOpen(true)
+        }}
       />
       <GlobalGrapher3D 
         isOpen={graph3DOpen} 
@@ -183,6 +208,22 @@ export default function AppShell({ children }) {
         onSwitchTo2D={() => {
           setGraph3DOpen(false)
           setGraphOpen(true)
+        }}
+        onSwitchToJSX={() => {
+          setGraph3DOpen(false)
+          setGraphJSXOpen(true)
+        }}
+      />
+      <GlobalGrapherJSX
+        isOpen={graphJSXOpen}
+        onClose={() => setGraphJSXOpen(false)}
+        onSwitchTo2D={() => {
+          setGraphJSXOpen(false)
+          setGraphOpen(true)
+        }}
+        onSwitchTo3D={() => {
+          setGraphJSXOpen(false)
+          setGraph3DOpen(true)
         }}
       />
     </div>

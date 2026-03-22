@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 import { X, Trash2, Plus, Play, Info, Layers, Box } from 'lucide-react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 
-const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D }) => {
+const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D, onSwitchToJSX }) => {
   const containerRef = useRef(null)
   const [functions, setFunctions] = useLocalStorage('global-grapher-funcs', [
     { id: 1, latex: 'x^2', color: '#6366f1', visible: true }
@@ -155,6 +155,13 @@ const GlobalGrapher = ({ isOpen, onClose, onSwitchTo3D }) => {
                 className="p-1.5 hover:bg-amber-50 dark:hover:bg-amber-900/40 rounded-lg text-amber-600 dark:text-amber-400 transition-all border border-transparent hover:border-amber-100 dark:hover:border-amber-800"
               >
                 <Box className="w-5 h-5 transition-transform hover:scale-110" />
+              </button>
+              <button 
+                onClick={onSwitchToJSX}
+                title="Switch to JSXGraph Pro (X)"
+                className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg text-emerald-600 dark:text-emerald-400 transition-all border border-transparent hover:border-emerald-100 dark:hover:border-emerald-800"
+              >
+                <Settings2 className="w-5 h-5 transition-transform hover:scale-110" />
               </button>
               <button 
                 onClick={addFunction} 
