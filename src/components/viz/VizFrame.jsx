@@ -176,6 +176,15 @@ const VIZ_REGISTRY = {
   AbsoluteValueDiffViz:          lazy(() => import('./react/AbsoluteValueDiffViz.jsx')),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame:          lazy(() => import('./react/SketchDerivativeGame.jsx')),
+  // Precalc — Algebra (contributed components)
+  FactoringAreaViz:      lazy(() => import('./d3/FactoringAreaViz.jsx')),
+  CompleteSquareViz:     lazy(() => import('./d3/CompleteSquareViz.jsx')),
+  ComplexPlaneViz:       lazy(() => import('./d3/ComplexPlaneViz.jsx')),
+  PartialFractionViz:    lazy(() => import('./d3/PartialFractionViz.jsx')),
+  SignChartViz:          lazy(() => import('./d3/SignChartAndSystemsViz.jsx').then(m => ({ default: m.SignChartViz }))),
+  SystemsGeometryViz:    lazy(() => import('./d3/SignChartAndSystemsViz.jsx').then(m => ({ default: m.SystemsGeometryViz }))),
+  // Alias: NumberLine already exists, expose as NumberLineViz for algebra lessons
+  NumberLineViz:         lazy(() => import('./d3/NumberLine.jsx')),
   // Precalc — Functions & Graphs (contributed components)
   CartesianFoundationsViz:       lazy(() => import('./d3/CartesianFoundationsViz.jsx')),
   TransformationBuilderViz:      lazy(() => import('./d3/TransformationBuilderViz.jsx')),
