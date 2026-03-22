@@ -15,6 +15,8 @@ import exponentials from './03-exponentials.js'
 import integratedReview from './04-integrated-review.js'
 import assignmentPlaybook from './05-assignment-playbook.js'
 import algebraGeometryMasterReview from './06-algebra-geometry-master-review.js'
+import algebraTrickyParts from './07-algebra-tricky-parts.js'
+import geometryVisualProofs from './08-geometry-visual-proofs.js'
 
 export default {
   id: 'chapter-0',
@@ -41,5 +43,7 @@ export default {
     integratedReview,
     assignmentPlaybook,
     algebraGeometryMasterReview,
+    algebraTrickyParts,
+    geometryVisualProofs,
   ],
 }

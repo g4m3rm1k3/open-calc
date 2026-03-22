@@ -5,6 +5,7 @@ const VIZ_REGISTRY = {
   FunctionMachine:          lazy(() => import('./d3/FunctionMachine.jsx')),
   FunctionPlotter:          lazy(() => import('./d3/FunctionPlotter.jsx')),
   UnitCircle:               lazy(() => import('./d3/UnitCircle.jsx')),
+  UnitCircleMirror:         lazy(() => import('./d3/UnitCircleMirror.jsx')),
   ExponentialGrowth:        lazy(() => import('./d3/ExponentialGrowth.jsx')),
   LimitApproach:            lazy(() => import('./d3/LimitApproach.jsx')),
   SecantToTangent:          lazy(() => import('./d3/SecantToTangent.jsx')),
@@ -175,6 +176,18 @@ const VIZ_REGISTRY = {
   AbsoluteValueDiffViz:          lazy(() => import('./react/AbsoluteValueDiffViz.jsx')),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame:          lazy(() => import('./react/SketchDerivativeGame.jsx')),
+  // Contribution files — new viz components
+  TangentLineViz:                lazy(() => import('./d3/TangentLineViz.jsx')),
+  PythagoreanViz:                lazy(() => import('./d3/PythagoreanViz.jsx')),
+  GraphExplorerViz:              lazy(() => import('./d3/GraphExplorerViz.jsx')),
+  // Contribution files — aliases to closest existing components
+  LimitApproachViz:              lazy(() => import('./d3/LimitApproach.jsx')),
+  EpsilonDeltaViz:               lazy(() => import('./d3/EpsilonDelta.jsx')),
+  DerivativeFromFirstPrinciplesViz: lazy(() => import('./d3/TangentLineConstructor.jsx')),
+  CircleUnrollViz:               lazy(() => import('./d3/CircleAreaProof.jsx')),
+  TriangleAreaViz:               lazy(() => import('./d3/TriangleAreaProof.jsx')),
+  AlgebraSquareViz:              lazy(() => import('./d3/PythagoreanProof.jsx')),
+  TruthTableViz:                 lazy(() => import('./react/TruthTableLab.jsx')),
 }
 
 function VizSkeleton() {

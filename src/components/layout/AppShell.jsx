@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
+import GlobalGrapher from '../ui/GlobalGrapher.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
+import { Activity } from 'lucide-react'
 
-function TopBar({ onMenuToggle }) {
+function TopBar({ onMenuToggle, onGraphToggle }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -59,6 +61,16 @@ function TopBar({ onMenuToggle }) {
         <kbd className="hidden sm:inline font-mono text-xs bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600">⌘K</kbd>
       </button>
 
+      {/* Graph Utility button */}
+      <button
+        onClick={onGraphToggle}
+        className="flex items-center gap-2 px-3 py-1.5 text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800/50"
+        title="Open Graphing Utility (G)"
+      >
+        <Activity className="w-4 h-4" />
+        <span className="hidden sm:inline font-medium">Graph</span>
+      </button>
+
       {/* Dark mode toggle */}
       <button
         onClick={toggleDark}
@@ -81,14 +93,24 @@ function TopBar({ onMenuToggle }) {
 
 export default function AppShell({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [graphOpen, setGraphOpen] = useState(false)
   const { openSearch } = useSearchContext()
 
-  // Global keyboard shortcut for search
+  // Global keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
+      // CMD/CTRL + K for search
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         openSearch()
+      }
+      // 'g' key for graph (if not in an input)
+      if (e.key.toLowerCase() === 'g' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        setGraphOpen(prev => !prev)
+      }
+      // 'Escape' to close modals
+      if (e.key === 'Escape') {
+        setGraphOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -97,13 +119,19 @@ export default function AppShell({ children }) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <TopBar onMenuToggle={() => setSidebarOpen((o) => !o)} />
+      <TopBar 
+        onMenuToggle={() => setSidebarOpen((o) => !o)} 
+        onGraphToggle={() => setGraphOpen(prev => !prev)}
+      />
 
       {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
+      {(sidebarOpen || graphOpen) && (
         <div
-          className="fixed inset-0 z-30 bg-black/30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-[45] bg-black/30"
+          onClick={() => {
+            setSidebarOpen(false)
+            setGraphOpen(false)
+          }}
         />
       )}
 
@@ -120,6 +148,7 @@ export default function AppShell({ children }) {
       </main>
 
       <SearchModal />
+      <GlobalGrapher isOpen={graphOpen} onClose={() => setGraphOpen(false)} />
     </div>
   )
 }

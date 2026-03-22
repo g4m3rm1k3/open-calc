@@ -73,9 +73,15 @@ export default {
       {
         id: 'UnitCircle',
         props: { animate: false },
-        title: 'Interactive Unit Circle',
-        mathBridge: 'The unit circle defines sine and cosine for every angle: the point at angle $\\theta$ has coordinates $(\\cos\\theta, \\sin\\theta)$. This is not a formula to memorize — it is the definition. The Pythagorean identity $\\sin^2\\theta + \\cos^2\\theta = 1$ follows immediately from $x^2 + y^2 = 1$ (the unit circle equation). Every trig identity can be derived from this single picture.',
+        title: 'Basic Definitions: Sine & Cosine',
+        mathBridge: 'The unit circle defines sine and cosine for every angle: the point at angle $\\theta$ has coordinates $(\\cos\\theta, \\sin\\theta)$. This is not a formula to memorize — it is the definition. The Pythagorean identity $\\sin^2\\theta + \\cos^2\\theta = 1$ follows immediately from $x^2 + y^2 = 1$.',
         caption: 'Drag the angle slider to watch sin(θ) and cos(θ) trace out as the point moves around the circle.',
+      },
+      {
+        id: 'UnitCircleMirror',
+        title: 'The "Mirror Mode" Unit Circle: Exact Values',
+        mathBridge: 'Stop memorizing 16 separate coordinates. Memorize only the First Quadrant (the "Big Three" families). Angles in other quadrants are just reflections—only the plus/minus signs change based on position.',
+        caption: 'Toggle Mirror Mode to see how every angle in the circle is just an $x$ or $y$ reflection of a Q1 angle.',
       },
       {
         id: 'SineUnwrap',

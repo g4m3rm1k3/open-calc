@@ -6,6 +6,7 @@ import trigDerivatives from './03-trig-derivatives.js'
 import expLogDerivatives from './04-exp-log-derivatives.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
 import readingDerivatives from './06-reading-derivatives.js'
+import derivativesIntroduction from './10-derivatives-introduction.js'
 
 export default {
   id: 'chapter-2',
@@ -23,5 +24,6 @@ export default {
     expLogDerivatives,
     implicitDifferentiation,
     readingDerivatives,
+    derivativesIntroduction,
   ],
 }

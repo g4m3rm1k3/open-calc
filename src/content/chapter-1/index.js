@@ -8,6 +8,7 @@ import visualEpsilonDelta from './04a-visual-epsilon-delta.js'
 import squeezeTheorem from './04-squeeze-theorem.js'
 import fundamentalTrigLimits from './04b-fundamental-trig-limits.js'
 import limitsAtInfinity from './05-limits-at-infinity.js'
+import limitsAndContinuity from './10-limits-and-continuity.js'
 
 export default {
   id: 'chapter-1',
@@ -27,5 +28,6 @@ export default {
     squeezeTheorem,
     fundamentalTrigLimits,
     limitsAtInfinity,
+    limitsAndContinuity,
   ],
 }
