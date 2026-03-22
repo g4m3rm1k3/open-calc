@@ -6,12 +6,14 @@ import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
+import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLessonEnhancer.js'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
   const slug = lessonSlug + (rest ? `/${rest}` : '')
   const key = `${chapterId}/${slug}`
-  const lesson = LESSON_MAP[key]
+  const rawLesson = LESSON_MAP[key]
+  const lesson = rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null
   const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus } = useProgress()
   const navigate = useNavigate()
 

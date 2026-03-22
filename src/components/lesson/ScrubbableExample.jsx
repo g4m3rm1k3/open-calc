@@ -51,6 +51,7 @@ export default function ScrubbableExample({ example, number }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [showIntentCoach, setShowIntentCoach] = useState(false);
 
   const steps = example.steps || [];
   const maxStep = steps.length - 1;
@@ -99,14 +100,27 @@ export default function ScrubbableExample({ example, number }) {
         {/* Unified Layer: math move + strategy intent + optional synced visuals */}
         <div className="flex flex-col lg:flex-row gap-6 mb-6">
           <div className={`relative border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-6 bg-white dark:bg-[#0f172a] ${visualizations.length > 0 ? 'lg:w-[55%]' : 'w-full'}`}>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+            <div className={`grid gap-4 items-start ${showIntentCoach ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1'}`}>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
                 <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 dark:text-slate-400 mb-2">Math Step</p>
                 <div className="text-xl font-bold">
                   <KatexBlock expr={step.expression} />
                 </div>
+                <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {showIntentCoach ? 'Intent coach is visible.' : 'Focus mode: only math is visible.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowIntentCoach((v) => !v)}
+                    className="px-2.5 py-1 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 text-xs font-semibold transition-colors"
+                  >
+                    {showIntentCoach ? 'Hide Intent Coach' : 'Show Intent Coach'}
+                  </button>
+                </div>
               </div>
 
+              {showIntentCoach && (
               <div className="rounded-lg border border-brand-200 dark:border-brand-900 bg-brand-50/70 dark:bg-brand-950/20 p-3">
                 <p className="text-[11px] uppercase tracking-wide font-semibold text-brand-600 dark:text-brand-300 mb-1">{stepIntentTitle}</p>
                 <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed italic">{parseProse(stepIntent)}</p>
@@ -129,6 +143,7 @@ export default function ScrubbableExample({ example, number }) {
                   </button>
                 </div>
               </div>
+              )}
             </div>
           </div>
 

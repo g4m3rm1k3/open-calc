@@ -14,6 +14,7 @@ import StepThrough from './StepThrough.jsx'
 import DynamicProof from './DynamicProof.jsx'
 import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
+import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
@@ -275,6 +276,7 @@ export default function MicroCycleLesson({ lesson }) {
       <IntuitionBlock data={lesson.intuition} />
       <MathBlock data={lesson.math} />
       <RigorBlock data={lesson.rigor} />
+      <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} />
     </div>
   )
