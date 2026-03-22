@@ -153,6 +153,7 @@ const VIZ_REGISTRY = {
   LayerScanGame:                 lazy(() => import('./react/LayerScanGame.jsx')),
   ChainRulePipelineLab:          lazy(() => import('./react/ChainRulePipelineLab.jsx')),
   LeibnizUnitTrackerLab:         lazy(() => import('./react/LeibnizUnitTrackerLab.jsx')),
+  ChainRuleProofMapLab:          lazy(() => import('./react/ChainRuleProofMapLab.jsx')),
   BrokenChainTrapLab:            lazy(() => import('./react/BrokenChainTrapLab.jsx')),
 }
 

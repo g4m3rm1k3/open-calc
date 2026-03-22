@@ -12,7 +12,7 @@ export default {
   hook: {
           annotation: 'Structural view: rewrite first so the power is visibly the outer skin. This makes the onion explicit before any derivative work.',
     realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
-    previewVisualizationId: 'ChainRuleMicroscope',
+    previewVisualizationId: 'LeibnizUnitTrackerLab',
   },
 
   intuition: {
@@ -47,7 +47,7 @@ export default {
       },
       {
         type: 'insight',
-        title: 'Leibniz Unit Check',
+        title: 'Physics Hover: Unit Pipeline',
         body: "\\frac{\\text{cm}^3}{\\text{cm}}\\cdot\\frac{\\text{cm}}{\\text{s}}=\\frac{\\text{cm}^3}{\\text{s}}",
       },
       {
@@ -130,6 +130,7 @@ export default {
       'A simple example of this flaw: take g(x) = x\u00b2sin(1/x) for x \u2260 0 and g(0) = 0. Then g\'(0) = 0, but g(h) = 0 for h = 1/(n\u03c0) for any integer n \u2260 0, which are values of h arbitrarily close to 0 where g(h) - g(0) = 0. If we divide by g(x+h) - g(x) in the naive proof at x = 0, we are dividing by zero for these special values of h.',
       'The correct proof uses the following approach. Define an auxiliary function \u03a6(k) = [f(g(x)+k) - f(g(x))] / k for k \u2260 0, and \u03a6(0) = f\'(g(x)). Because f is differentiable at g(x), we have lim(k\u21920) \u03a6(k) = f\'(g(x)) = \u03a6(0), so \u03a6 is continuous at 0. Now write: f(g(x+h)) - f(g(x)) = \u03a6(g(x+h)-g(x)) \u00b7 [g(x+h)-g(x)]. This is valid because when g(x+h)-g(x) \u2260 0, it follows the definition of \u03a6 with k = g(x+h)-g(x), and when g(x+h)-g(x) = 0, both sides are 0. Dividing by h: [f(g(x+h))-f(g(x))]/h = \u03a6(g(x+h)-g(x)) \u00b7 [g(x+h)-g(x)]/h. As h\u21920: \u03a6(g(x+h)-g(x)) \u2192 \u03a6(0) = f\'(g(x)) (because g is continuous, g(x+h)-g(x)\u21920, and \u03a6 is continuous at 0); [g(x+h)-g(x)]/h \u2192 g\'(x). The product of the limits is f\'(g(x))\u00b7g\'(x). This completes the rigorous proof.',
       'Safety-slope bridge to microscope mode: zooming says the curve locally looks linear with a local slope. \u03a6(k) is the rigorous patch that keeps this local-slope story valid even when the inner change g(x+h)-g(x) is exactly zero, so no illegal division occurs.',
+      'Use the annotated proof map as a translation layer: hover the algebra term \u03a6(g(x+h)-g(x)) and watch microscope mode light up. This is where symbol and geometry become the same idea.',
       'Expert trap: if one link is not differentiable at the evaluation point, chain rule cannot be applied there. Example y=|sin x| at x=0: inner sin x is smooth, but outer |u| has a corner at u=0, so the chain snaps at that point.',
     ],
     callouts: [
@@ -145,6 +146,11 @@ export default {
       },
       {
         type: 'insight',
+        title: 'Annotated Proof Hover',
+        body: "\\text{Hover } \\Phi(g(x+h)-g(x)) \\text{ in the proof map to see microscope mode highlight the safety patch idea.}",
+      },
+      {
+        type: 'insight',
         title: 'Leibniz Form in Related Rates',
         body: "\\frac{dV}{dt} = \\frac{dV}{dr}\\cdot\\frac{dr}{dt}, \\quad \\frac{dA}{dt} = \\frac{dA}{d\\theta}\\cdot\\frac{d\\theta}{dt}. \\text{ Intermediate-rate factors multiply along dependency chains.}",
       },
@@ -155,6 +161,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'ChainRuleProofMapLab',
+        title: 'Annotated Proof Map',
+        caption: 'Hover proof terms to sync algebra with microscope intuition. The \u03a6 term is shown as the safety patch that prevents illegal division when inner change is zero.',
+      },
       {
         id: 'ChainRuleMicroscope',
         title: 'Microscope and Safety Slope',
