@@ -85,7 +85,6 @@ function buildBlocks(data) {
   if (data.visualizationId) {
     vizzes.push({ type: "viz", id: data.visualizationId, props: data.visualizationProps ?? {} })
   }
-
   if (data.visualizations) {
     for (const v of data.visualizations) {
       const id = v.id ?? v.vizId
@@ -93,27 +92,41 @@ function buildBlocks(data) {
     }
   }
 
-  // Interleave logic
-  const totalItems = paragraphs.length
-  let pIndex = 0
-
-  while (pIndex < totalItems || vizzes.length > 0 || callouts.length > 0) {
-    // Add 1 or 2 paragraphs
-    const chunk = []
-    if (pIndex < totalItems) chunk.push(paragraphs[pIndex++])
-    if (pIndex < totalItems && Math.random() > 0.5) chunk.push(paragraphs[pIndex++])
-    
-    if (chunk.length > 0) {
-      blocks.push({ type: "prose", paragraphs: chunk })
+  // Build an ordered content list: 1 paragraph, then a callout every ~2 paragraphs
+  const contentItems = []
+  let cIdx = 0
+  for (let i = 0; i < paragraphs.length; i++) {
+    contentItems.push({ type: 'prose', text: paragraphs[i] })
+    if ((i + 1) % 2 === 0 && cIdx < callouts.length) {
+      contentItems.push({ type: 'callout', data: callouts[cIdx++] })
     }
+  }
+  while (cIdx < callouts.length) {
+    contentItems.push({ type: 'callout', data: callouts[cIdx++] })
+  }
 
-    // Now weave in a visualization or a callout to make them inline with content
-    if (vizzes.length > 0) {
+  // How many vizzes to place after each content item — spread evenly, max 2 per slot
+  const slots = Math.max(contentItems.length, 1)
+  const vizPerSlot = Math.min(2, Math.ceil(vizzes.length / slots))
+
+  for (const item of contentItems) {
+    if (item.type === 'prose') {
+      blocks.push({ type: 'prose', paragraphs: [item.text] })
+    } else {
+      blocks.push({ type: 'callout', ...item.data })
+    }
+    for (let i = 0; i < vizPerSlot && vizzes.length > 0; i++) {
       blocks.push(vizzes.shift())
-    } else if (callouts.length > 0) {
-      blocks.push({ type: "callout", ...callouts.shift() })
-    } else if (chunk.length === 0) {
-      break; 
+    }
+  }
+
+  // Any remaining vizzes (when vizzes >> content): add in pairs so max 2 consecutive
+  while (vizzes.length > 0) {
+    blocks.push(vizzes.shift())
+    if (vizzes.length > 0) blocks.push(vizzes.shift())
+    // Insert a spacer prose block between pairs if more remain
+    if (vizzes.length > 0 && blocks.length > 0) {
+      blocks.push({ type: 'prose', paragraphs: [''] })
     }
   }
 
