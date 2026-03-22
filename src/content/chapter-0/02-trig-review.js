@@ -129,6 +129,11 @@ export default {
         title: 'Double Angle (from addition with A = B)',
         body: '\\sin(2\\theta) = 2\\sin\\theta\\cos\\theta \\\\ \\cos(2\\theta) = \\cos^2\\theta - \\sin^2\\theta = 1 - 2\\sin^2\\theta = 2\\cos^2\\theta - 1',
       },
+      {
+        type: 'insight',
+        title: 'Where These Identities Show Up in Calculus',
+        body: '\\textbf{Pythagorean: } \\sin^2+\\cos^2=1 \\text{ — simplifies } \\sec^2x \\text{ derivatives and } \\int\\!\\sin^2 x\\,dx. \\\\ \\textbf{Angle addition: } \\sin(x+h) \\text{ — essential for the limit proof of } \\tfrac{d}{dx}[\\sin x]. \\\\ \\textbf{Double angle: } \\cos^2\\theta = \\tfrac{1+\\cos 2\\theta}{2} \\text{ — power-reducing form used in } \\int\\!\\cos^2 x\\,dx. \\\\ \\textbf{Even/odd: } \\cos(-\\theta)=\\cos\\theta \\text{ — decides sign in definite integrals over symmetric intervals.}',
+      },
     ],
     visualizationId: 'UnitCircle',
     visualizationProps: { showTable: true },

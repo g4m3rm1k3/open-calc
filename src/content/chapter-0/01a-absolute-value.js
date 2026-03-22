@@ -108,6 +108,11 @@ export default {
         title: 'Solving |expression| > bound',
         body: '(1) Split into two cases: expression < −bound OR expression > bound. (2) Solve each separately. (3) Combine with OR.',
       },
+      {
+        type: 'theorem',
+        title: 'Reverse Triangle Inequality',
+        body: '||a| - |b|| \\leq |a - b|. \\text{ The difference of distances is at most the distance between points.} \\\\ \\text{Useful in ε–δ proofs when you need a lower bound on } |f(x) - L|.',
+      },
     ],
     visualizations: [],
   },
@@ -229,6 +234,31 @@ export default {
         interval: { a: 49.8, b: 50.2, leftClosed: true, rightClosed: true, label: '[49.8, 50.2]' },
         points: [{ value: 50, label: 'target 50' }],
       },
+    },
+
+    {
+      id: 'ch0-abs-ex6',
+      title: 'Nonlinear: |x² − 4| < 5',
+      problem: 'Solve $|x^2 - 4| < 5$.',
+      steps: [
+        {
+          expression: '-5 < x^2 - 4 < 5',
+          annotation: '$|A| < 5$ means $-5 < A < 5$. Rewrite as a compound double inequality.',
+        },
+        {
+          expression: '-1 < x^2 < 9',
+          annotation: 'Add 4 to all three parts.',
+        },
+        {
+          expression: 'x^2 > -1 \\;\\Rightarrow\\; \\text{always true (squares are non-negative)}',
+          annotation: 'Left inequality: ignore it — x² is never negative.',
+        },
+        {
+          expression: 'x^2 < 9 \\;\\Rightarrow\\; |x| < 3 \\;\\Rightarrow\\; -3 < x < 3',
+          annotation: 'Right inequality: x² < 9 means |x| < 3.',
+        },
+      ],
+      conclusion: 'The solution is $(-3, 3)$. The nonlinear case still reduces to center ± radius once the compound inequality is unpacked.',
     },
   ],
 

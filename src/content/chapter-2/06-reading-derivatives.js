@@ -79,6 +79,11 @@ export default {
         body: 'Mark all critical points (where f\' = 0) and inflection points (where f\'\' = 0) on a number line. In each region between these points, determine the sign of f\' and f\'\' by testing a point. Build the full picture systematically.',
       },
       {
+        type: 'visual-rule',
+        title: 'Four-Level Reading Checklist',
+        body: '\\textbf{f (orange):} Sign = above/below axis. Zero = root. Rising/falling = positive/negative f\'.\\\\ \\textbf{f\' (blue):} Sign = f increasing/decreasing. Zero = f has flat tangent (peak, valley, or saddle). Large positive = f steeply rising.\\\\ \\textbf{f\'\' (purple):} Sign = f concave up (∪)/down (∩). Zero = f has inflection point. Tells you whether a critical point of f is a max (f\'\'<0) or min (f\'\'>0).\\\\ \\textbf{f\'\'\'(green):} Sign = f\'\' increasing/decreasing. Zero = inflection in f\'\'. Physical meaning: jerk — how fast acceleration changes.',
+      },
+      {
         type: 'warning',
         title: 'Not Every Point Has a Derivative',
         body: 'Corners, cusps, vertical tangents, and fast oscillation can make f\' undefined. In graph-reading problems, these are still critical structural points and must be included in sign-chart boundaries.',

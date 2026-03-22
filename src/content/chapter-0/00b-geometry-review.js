@@ -112,6 +112,11 @@ export default {
         title: 'Perpendicularity Condition',
         body: '\\text{Non-vertical lines with slopes } m_1, m_2 \\text{ are perpendicular} \\\\ \\iff m_1 \\cdot m_2 = -1 \\\\ \\text{Proof: } (1, m_1) \\cdot (1, m_2) = 1 + m_1 m_2 = 0',
       },
+      {
+        type: 'theorem',
+        title: 'Small-Angle Approximations',
+        body: '\\text{For small } \\theta \\text{ (in radians):} \\\\ \\sin\\theta \\approx \\theta, \\quad \\cos\\theta \\approx 1, \\quad \\tan\\theta \\approx \\theta \\\\ \\text{Geometric reason: the arc length } s = r\\theta \\text{ and the chord length approach each other as } \\theta \\to 0. \\\\ \\text{These approximations power the proofs of } \\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1 \\text{ and } \\frac{d}{dx}[\\sin x]=\\cos x.',
+      },
     ],
     visualizations: [
       { id: 'TriangleAreaProof', title: 'Triangle Area Proof', caption: 'Visual proof that the area of a triangle is half base times height.' },
@@ -210,6 +215,19 @@ export default {
         { expression: '(x-3)^2 + (y-4)^2 = 25', annotation: 'The circle equation.' },
       ],
       answer: '$(x-3)^2 + (y-4)^2 = 25$. Center $(3,4)$, radius 5.',
+    },
+    {
+      id: 'ch0-geo-c4',
+      difficulty: 'medium',
+      problem: 'Explain geometrically why $\\sin\\theta \\approx \\theta$ for small positive $\\theta$ (in radians). What property of arc length makes this work?',
+      hint: 'The arc of the unit circle subtended by angle θ has length θ (since arc = rθ = 1·θ). For small θ, the arc length and the vertical chord (sin θ) are nearly equal.',
+      walkthrough: [
+        { expression: '\\text{On the unit circle: arc length} = r\\theta = \\theta', annotation: 'For a unit circle (r=1), arc length equals the angle in radians.' },
+        { expression: '\\sin\\theta = \\text{vertical distance from axis to point}', annotation: 'This is the chord (straight-line) distance, always ≤ the arc.' },
+        { expression: '\\theta \\geq \\sin\\theta \\geq \\theta\\cos\\theta \\quad \\text{for } \\theta \\in [0, \\pi/2]', annotation: 'The arc is longer than the chord; the chord is at least θ·cosθ by similar-triangle geometry.' },
+        { expression: '\\text{As } \\theta \\to 0: \\cos\\theta \\to 1 \\Rightarrow \\frac{\\sin\\theta}{\\theta} \\to 1', annotation: 'Squeeze Theorem: the ratio is squeezed between cosθ and 1, both approaching 1.' },
+      ],
+      answer: '$\\sin\\theta \\approx \\theta$ because arc length $= \\theta$ and the chord (sin θ) becomes indistinguishable from the arc for small θ. This is the geometric engine behind $\\lim_{\\theta\\to 0}\\sin\\theta/\\theta = 1$.',
     },
   ],
 

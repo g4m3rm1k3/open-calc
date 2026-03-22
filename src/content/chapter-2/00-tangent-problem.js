@@ -589,6 +589,20 @@ export default {
       ],
       answer: "f(x) = x\\sin(1/x) \\text{ is NOT differentiable at } 0. \\text{ The correct differentiable version is } g(x) = x^2\\sin(1/x),\\text{ for which } g'(0) = 0 \\text{ by the Squeeze Theorem.}",
     },
+    {
+      id: 'ch2-000-ch4',
+      difficulty: 'hard',
+      problem: 'Let $f(x) = \\begin{cases} x^2 & x \\leq 1 \\\\ 2x - 1 & x > 1 \\end{cases}$. Is $f$ differentiable at $x = 1$? Compute both one-sided difference quotients.',
+      hint: 'Compute the left-hand and right-hand limits of [f(1+h)−f(1)]/h separately. For h<0, use the x² branch; for h>0, use the 2x−1 branch. Check if they agree.',
+      walkthrough: [
+        { expression: 'f(1) = 1^2 = 1', annotation: 'At x=1 we use the left branch: f(1)=1.' },
+        { expression: 'f\'_-(1) = \\lim_{h \\to 0^-}\\frac{(1+h)^2 - 1}{h} = \\lim_{h \\to 0^-}\\frac{1+2h+h^2-1}{h} = \\lim_{h \\to 0^-}(2+h) = 2', annotation: 'For h<0, 1+h<1 so use the x² branch. Factor and cancel h.' },
+        { expression: 'f\'_+(1) = \\lim_{h \\to 0^+}\\frac{[2(1+h)-1] - 1}{h} = \\lim_{h \\to 0^+}\\frac{2h}{h} = 2', annotation: 'For h>0, 1+h>1 so use the 2x−1 branch. f(1+h)=2(1+h)−1=1+2h.' },
+        { expression: 'f\'_-(1) = 2 = f\'_+(1)', annotation: 'Both one-sided derivatives agree.' },
+        { expression: 'f\'(1) = 2', annotation: 'Since the one-sided limits match, f is differentiable at x=1 with derivative 2.' },
+      ],
+      answer: "f is differentiable at x=1 with f'(1)=2. Both pieces meet smoothly: the parabola's slope at x=1 is 2x|_{x=1}=2, which matches the linear piece's slope of 2.",
+    },
   ],
 
   crossRefs: [

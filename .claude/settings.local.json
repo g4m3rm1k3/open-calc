@@ -7,7 +7,8 @@
       "Bash(grep -n \"Math.sin\" src/content/chapter-1/*.js)",
       "Bash(find src/content -name \"*.js\" -exec grep -l \"Math\\\\.\\\\|fn:\" {})",
       "Bash(npm run:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(node --input-type=module:*)"
     ]
   }
 }

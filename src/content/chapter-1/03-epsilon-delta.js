@@ -333,6 +333,19 @@ export default {
       ],
       answer: 'δ = 2ε',
     },
+    {
+      id: 'ch1-ed-c4',
+      difficulty: 'hard',
+      problem: 'Prove $\\displaystyle\\lim_{x \\to 2}(x^2 + 3x) = 10$ using ε–δ.',
+      hint: 'Factor: $|x^2+3x-10| = |(x-2)(x+5)|$. Restrict $\\delta \\leq 1$ so that $x \\in (1,3)$ and $|x+5| < 8$.',
+      walkthrough: [
+        { expression: '|x^2 + 3x - 10| = |(x-2)(x+5)| = |x-2|\\cdot|x+5|', annotation: 'Factor the output error.' },
+        { expression: '\\delta \\leq 1 \\Rightarrow 1 < x < 3 \\Rightarrow 6 < x+5 < 8 \\Rightarrow |x+5| < 8', annotation: 'Cage x near 2 to bound the variable factor.' },
+        { expression: '|(x^2+3x)-10| < 8|x-2|. \\text{ Need: } 8|x-2| < \\varepsilon \\Rightarrow |x-2| < \\varepsilon/8', annotation: '' },
+        { expression: '\\delta = \\min(1,\\, \\varepsilon/8). \\quad |x^2+3x-10| < 8\\delta \\leq 8 \\cdot \\frac{\\varepsilon}{8} = \\varepsilon.\\;\\blacksquare', annotation: 'Both the cage (δ≤1) and the bound (δ≤ε/8) are satisfied simultaneously.' },
+      ],
+      answer: 'δ = min(1, ε/8)',
+    },
   ],
 
   crossRefs: [
