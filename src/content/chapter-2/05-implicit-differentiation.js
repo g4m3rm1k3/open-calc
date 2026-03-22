@@ -48,6 +48,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Implicit Differentiation |  Differentiation when you only have an equation, not an explicit function",
+        props: { url: "https://www.youtube.com/embed/sjcoTb3cMRY" }
+      },
+      {
         id: 'ImplicitTangentPlayground',
         title: 'Implicit Tangent Playground',
         caption: 'Move along the circle and watch dy/dx = -x/y drive the tangent line in real time.',

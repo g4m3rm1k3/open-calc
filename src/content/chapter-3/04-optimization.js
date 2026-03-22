@@ -58,6 +58,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Ex: Optimizing the Volume of a Box With  Fixed Surface Area",
+        props: { url: "https://www.youtube.com/embed/Hk5sXplIBqU" }
+      },
+      {
         id: 'OptimizationViz',
         title: 'Open Box Optimization — Interactive',
         caption: 'Drag the cut-size slider. The 3D box updates in real time and the volume graph shows the optimal cut size. Maximum volume occurs at x ≈ 1.54 inches.',
@@ -89,7 +94,12 @@ export default {
         body: 'For continuous f on [a,b]: (1) Find all c ∈ (a,b) with f\'(c)=0 or f\' undefined. (2) Evaluate f at c and at a, b. (3) Largest = global max; smallest = global min.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Folding a wire into the largest rectangle | Optimization example",
+        props: { url: "https://www.youtube.com/embed/7lCm84AnfEw" }
+      },],
   },
 
   rigor: {
@@ -106,7 +116,12 @@ export default {
         body: 'f(x) = x on (0,1): no max or min (open interval). f(x) = 1/x on [-1,1]: unbounded, no min (discontinuous). f(x) = tan(x) on [-π/2, π/2]: blows up at endpoints (not bounded on closed interval). All three conditions — continuous, closed, bounded — are necessary for the EVT.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Optimization Example: Minimizing Surface Area Given a Fixed Volume",
+        props: { url: "https://www.youtube.com/embed/6zqrFILyVbI" }
+      },],
   },
 
   examples: [

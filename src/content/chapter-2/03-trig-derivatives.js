@@ -50,6 +50,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The derivative of Trigonometric Functions",
+        props: { url: "https://www.youtube.com/embed/QDKj-E-ICPo" }
+      },
+      {
         id: 'TrigDerivativeSync',
         title: 'The "Moving Point" Deep Sync',
         mathBridge: 'This shows three views of the same fact: $\\frac{d}{d\\theta}[\\sin\\theta] = \\cos\\theta$. The unit-circle panel shows where the point is. The middle panel shows the slope of the sine curve there. The right panel shows the cosine value. All three update together because slope of sine = cosine — every single angle.',

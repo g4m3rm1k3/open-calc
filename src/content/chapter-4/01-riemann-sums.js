@@ -52,6 +52,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The Definite Integral Part I: Approximating Areas with rectangles",
+        props: { url: "https://www.youtube.com/embed/kS4DSZqH9Fk" }
+      },
+      {
         id: 'RiemannSum',
         title: 'Left, Right, and Midpoint Riemann Sums',
         caption: 'Drag the slider to increase n, the number of rectangles. Observe how the left sum (red, underestimating), right sum (blue, overestimating), and midpoint sum (green, most accurate) all converge to the true area as n → ∞. Toggle between sum types to compare their accuracy.',
@@ -83,7 +88,12 @@ export default {
         body: '\\[T_n = \\frac{L_n + R_n}{2} = \\frac{\\Delta x}{2}\\bigl[f(x_0) + 2f(x_1) + 2f(x_2) + \\cdots + 2f(x_{n-1}) + f(x_n)\\bigr].\\]\nFor \\(f\\) with \\(|f\'\'| \\leq M\\): error \\(\\leq M(b-a)^3/(12n^2)\\).',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The Definite Integral Part II: Using Summation Notation to Define the Definite Integral",
+        props: { url: "https://www.youtube.com/embed/_q7Rx_Xa0ig" }
+      },],
   },
 
   rigor: {

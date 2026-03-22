@@ -52,6 +52,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "What's an anti-derivative?",
+        props: { url: "https://www.youtube.com/embed/ksCcKnHNJPM" }
+      },
+      {
         id: 'FunctionPlotter',
         title: 'Family of Antiderivatives',
         caption: 'The graph shows f(x) = x² (bottom) and several members of the antiderivative family F(x) = x³/3 + C for various values of C. Each curve has the same slope at every x-value (equal to x²), but different vertical positions. The initial condition x(0) = k selects the unique member with F(0) = k.',
@@ -83,7 +88,12 @@ export default {
         body: '\\(\\int e^x\\,dx = e^x + C\\)\n\\(\\int \\sin x\\,dx = -\\cos x + C\\)\n\\(\\int \\cos x\\,dx = \\sin x + C\\)\n\\(\\int \\sec^2 x\\,dx = \\tan x + C\\)\n\\(\\int \\frac{1}{1+x^2}\\,dx = \\arctan x + C\\)\n\\(\\int \\frac{1}{\\sqrt{1-x^2}}\\,dx = \\arcsin x + C\\)',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Solving for the constant in the general anti-derivative",
+        props: { url: "https://www.youtube.com/embed/0oOQOQSZMKk" }
+      },],
   },
 
   rigor: {

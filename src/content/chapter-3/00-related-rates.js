@@ -60,7 +60,15 @@ export default {
         body: "Archimedes (287–212 BC) computed rates of change for geometric quantities — the area of a growing circle, the volume of a filling sphere — using arguments remarkably similar to modern related rates. His 'method of exhaustion' anticipated calculus by 2000 years. The formalized chain rule came from Leibniz in the 1680s.",
       },
     ],
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Intro to Related Rates",
+        props: { url: "https://www.youtube.com/embed/3e27UqwPtMw" }
+      },
+      ],
+    },
 
   math: {
     prose: [

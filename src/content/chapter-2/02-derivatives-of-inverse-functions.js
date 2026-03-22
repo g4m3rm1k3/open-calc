@@ -38,6 +38,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Derivative of Inverse Trig Functions via Implicit Differentiation",
+        props: { url: "https://www.youtube.com/embed/fnVMT08u6fU" }
+      },
+      {
         id: 'InverseSlopeReflectionLab',
         title: 'Slope Reciprocity via Reflection',
         mathBridge: 'Reflection across $y = x$ swaps every $(a, b)$ to $(b, a)$. Because the axes are swapped, every rise becomes a run and vice versa — so the slope $\\frac{\\Delta y}{\\Delta x}$ at $(a, b)$ becomes $\\frac{\\Delta x}{\\Delta y} = \\frac{1}{\\text{slope}}$ at $(b, a)$. That is the entire geometric content of $(f^{-1})\'(b) = 1/f\'(a)$. Drag the point to verify the product of slopes is always 1.',

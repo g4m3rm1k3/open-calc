@@ -59,6 +59,11 @@ export default {
     visualizationProps: {},
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "♥♥♥ Thank you Calc Students♥♥♥   Some final thoughts.",
+        props: { url: "https://www.youtube.com/embed/STVJ_-T_YDY" }
+      },
+      {
         id: 'AreaAccumulator',
         title: 'Centroid of a Region — Interactive',
         caption: 'The balance point (centroid) is displayed as the region is built up. Notice how adding area far from the current centroid pulls the balance point toward the new area — reflecting the weighted average nature of x̄ and ȳ.',

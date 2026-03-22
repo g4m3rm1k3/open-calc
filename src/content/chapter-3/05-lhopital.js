@@ -47,6 +47,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Using L'Hopital's Rule to show that exponentials dominate polynomials",
+        props: { url: "https://www.youtube.com/embed/INoXqqmNRJQ" }
+      },
+      {
         id: 'LHopitalViz',
         title: "L'Hôpital's Rule — Side-by-Side",
         caption: "Left: f(x)/g(x) with a hole at the limit point. Right: f'(x)/g'(x), which is defined at the limit point. Both values converge to the same limit L.",
@@ -75,7 +80,12 @@ export default {
         body: '0 \\cdot \\infty \\to \\frac{0}{1/\\infty} = \\frac{0}{0} \\quad \\text{or} \\quad \\frac{\\infty}{1/0} = \\frac{\\infty}{\\infty}\\\\ f^g \\to e^{g \\ln f}: \\text{ apply L\'Hôpital to } g \\ln f',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Applying L'Hopital's Rule to Exponential Indeterminate Forms",
+        props: { url: "https://www.youtube.com/embed/jzhn9Xg5iAQ" }
+      },],
   },
 
   rigor: {

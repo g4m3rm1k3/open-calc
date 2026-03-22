@@ -52,6 +52,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The MEAN Value Theorem is Actually Very Nice",
+        props: { url: "https://www.youtube.com/embed/a2GpXyPWx68" }
+      },
+      {
         id: 'MVTViz',
         title: 'Mean Value Theorem — Interactive',
         caption: 'Drag the interval endpoints a and b. The green tangent line at c is always parallel to the amber secant. There is always at least one such c.',

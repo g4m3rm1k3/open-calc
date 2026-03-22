@@ -47,6 +47,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Fundamental Theorem of Calculus 1  |  Geometric Idea + Chain Rule Example",
+        props: { url: "https://www.youtube.com/embed/hAfpl8jLFOs" }
+      },
+      {
         id: 'FTCLink',
         title: 'The Accumulation Function A(x) and its Derivative',
         caption: 'The left panel shows f(t) with the accumulated area A(x) = ∫₀ˣ f(t) dt shaded. The right panel shows A(x) as a function of x. Drag the slider to change x and observe: A increases when f > 0, decreases when f < 0, and has a horizontal tangent when f = 0. The slope of A(x) at each x is exactly f(x) — FTC Part 1.',
@@ -78,7 +83,12 @@ export default {
         body: 'If \\(f\\) is continuous and \\(g\\) is differentiable:\n\\[\\frac{d}{dx}\\int_a^{g(x)} f(t)\\,dt = f(g(x))\\cdot g\'(x).\\]\nMore generally:\n\\[\\frac{d}{dx}\\int_{h(x)}^{g(x)} f(t)\\,dt = f(g(x))\\,g\'(x) - f(h(x))\\,h\'(x).\\]',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Fundamental Theorem of Calculus II",
+        props: { url: "https://www.youtube.com/embed/sRDf3WozXHc" }
+      },],
   },
 
   rigor: {

@@ -52,6 +52,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Relative and Absolute Maximums and Minimums | Part I",
+        props: { url: "https://www.youtube.com/embed/wHDxo5hPA-k" }
+      },
+      {
         id: 'CurveSketchingBoard',
         title: 'Full Curve Analysis — Annotated',
         caption: 'Select a function from the menu. See f, f\', and f\'\' plotted together, with local extrema, inflection points, and concavity regions all labeled.',
@@ -90,6 +95,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Relative and Absolute Maximums and Minimums | Part II",
+        props: { url: "https://www.youtube.com/embed/Q1raJeFtF_U" }
+      },
+      {
         id: 'NewtonsMethod',
         title: "Newton's Method — Finding Roots via Tangent Lines",
         caption: "Each step follows the tangent line to its x-intercept, giving the next guess. Convergence is quadratic — the number of correct decimal places doubles every step. This is how your calculator computes √2.",
@@ -110,7 +120,12 @@ export default {
         body: 'The second derivative test ultimately reduces to the first derivative test. If f\'\'(c) > 0, then by continuity, f\'\'> 0 near c, making f\' increasing near c. Since f\'(c) = 0, f\' goes from negative (left of c) to positive (right of c) — exactly the first derivative test for a local minimum. The second derivative test is a shortcut that avoids computing the full sign chart.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Concavity and the 2nd Derivative Test",
+        props: { url: "https://www.youtube.com/embed/FAj9w06OhH0" }
+      },],
   },
 
   examples: [

@@ -36,6 +36,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Limits \"at\" infinity",
+        props: { url: "https://www.youtube.com/embed/yHtIxYKVKUs" }
+      },
+      {
         id: 'LimitApproach',
         props: { fn: '(3*x*x - 2*x + 1)/(5*x*x + 4*x - 7)', targetX: 200, limitVal: 0.6 },
         title: 'Rational End Behavior',
@@ -67,6 +72,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Computing Limits at Infinity for Rational Functions",
+        props: { url: "https://www.youtube.com/embed/QkfT-VSy5t8" }
+      },
+      {
         id: 'LimitApproach',
         props: { fn: '(2*x*x + 3)/(x*x - 1)', targetX: 120, limitVal: 2, showTable: true },
         title: 'Equal-Degree Ratio Rule',
@@ -88,7 +98,15 @@ export default {
       },
     ],
     visualizationId: null,
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Infinite Limit vs Limits at Infinity of a Composite Function",
+        props: { url: "https://www.youtube.com/embed/1b6CrN5U6Mc" }
+      },
+      ],
+    },
 
   examples: [
     {

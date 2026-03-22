@@ -48,7 +48,12 @@ export default {
         body: 'Students often compute first and interpret last. Reverse that: interpret first, compute second.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Tips for Success in Flipped Classrooms + OMG BABY!!!",
+        props: { url: "https://www.youtube.com/embed/AlYlAUdvqic" }
+      },],
   },
 
   math: {

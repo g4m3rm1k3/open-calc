@@ -57,6 +57,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Linear Approximations | Using Tangent Lines to Approximate Functions",
+        props: { url: "https://www.youtube.com/embed/AorDyDOZNMA" }
+      },
+      {
         id: 'LinearApproximation',
         title: 'Zoom In Until the Curve Becomes a Line',
         caption: 'Increase the zoom level to see the curve and its tangent line converge. At high zoom, they are indistinguishable — that is what differentiability means geometrically.',

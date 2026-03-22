@@ -68,7 +68,15 @@ export default {
       { name: 'Squeeze Theorem', formula: 'g(x) \\leq f(x) \\leq h(x) \\text{ and } \\lim g = \\lim h = L \\Rightarrow \\lim f = L' },
     ],
     continuityDefinition: `f is continuous at a if: (1) f(a) is defined, (2) lim_{x→a} f(x) exists, (3) they're equal.`,
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "CALCULUS SPEEDRUN || Limits || Episode 1",
+        props: { url: "https://www.youtube.com/embed/nVU9Lgq_nho" }
+      },
+      ],
+    },
 
   rigor: {
     visualizationId: 'EpsilonDeltaViz',

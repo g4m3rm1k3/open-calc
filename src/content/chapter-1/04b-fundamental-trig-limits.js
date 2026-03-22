@@ -59,6 +59,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The most important limit in Calculus // Geometric Proof & Applications",
+        props: { url: "https://www.youtube.com/embed/f2PRu5QPa3o" }
+      },
+      {
         id: 'RadianDegreeLimitLab',
         title: 'Radians vs Degrees Toggle',
         mathBridge: 'The limit $\\lim_{x\\to 0}\\frac{\\sin x}{x}=1$ holds only when $x$ is in radians. In degrees, $\\sin(x°) = \\sin(x\\cdot\\frac{\\pi}{180})$, so the limit becomes $\\frac{\\pi}{180}\\approx 0.01745$ — not 1. This is why every calculus derivative formula for trig assumes radians: the "1-to-1" scaling between arc length and angle ($s = r\\theta$) only works in radians.',

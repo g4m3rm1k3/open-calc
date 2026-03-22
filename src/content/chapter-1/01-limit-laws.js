@@ -44,6 +44,11 @@ export default {
     visualizationProps: {},
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Limit Laws | Breaking Up Complicated Limits Into Simpler Ones",
+        props: { url: "https://www.youtube.com/embed/dY5T7BcQ2Nc" }
+      },
+      {
         id: 'LimitBridgeLab',
         title: 'Limit Law Bridge Lab',
         caption: 'Use two-sided approach controls to verify when decomposition rules are safe and when naive substitution fails.',
@@ -85,7 +90,15 @@ export default {
     ],
     visualizationId: 'LimitApproach',
     visualizationProps: { fn: 'Math.sin(x)/x', targetX: 0, limitVal: 1, showTable: true },
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Building up to computing limits of rational functions",
+        props: { url: "https://www.youtube.com/embed/XDcy_wqWQVs" }
+      },
+      ],
+    },
 
   rigor: {
     prose: [

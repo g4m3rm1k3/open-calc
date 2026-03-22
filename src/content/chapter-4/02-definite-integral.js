@@ -57,6 +57,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The Definite Integral Part III: Evaluating From The Definition",
+        props: { url: "https://www.youtube.com/embed/3FmnyO28XXw" }
+      },
+      {
         id: 'SignedArea',
         title: 'Signed Area: Positive and Negative Regions',
         caption: 'The shaded area above the x-axis is positive (green) and below is negative (red). The definite integral is the net signed area. Drag the endpoints to explore how the integral changes when more positive or negative region is included.',
@@ -93,7 +98,12 @@ export default {
         body: 'If \\(f\\) is odd \\((f(-x) = -f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 0.\\]\nIf \\(f\\) is even \\((f(-x) = f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 2\\int_0^a f(x)\\,dx.\\]',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "\"Reverse\" Riemann Sums | Finding the Definite Integral Given a Sum",
+        props: { url: "https://www.youtube.com/embed/4vMJwKHMRx0" }
+      },],
   },
 
   rigor: {

@@ -83,6 +83,16 @@ export default {
         },
       ],
       visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The Velocity Problem | Part II: Graphically",
+        props: { url: "https://www.youtube.com/embed/fzh-jmeDOvw" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "The Velocity Problem | Part I: Numerically",
+        props: { url: "https://www.youtube.com/embed/LWPzHlSBlxI" }
+      },
         {
           id: 'LimitGeometric',
           title: 'Visual: Both Sides Converge',
@@ -165,6 +175,16 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "A Tale of Three Functions | Intro to Limits Part II",
+        props: { url: "https://www.youtube.com/embed/PllF7oQg8Og" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "A Tale of Three Functions | Intro to Limits Part I",
+        props: { url: "https://www.youtube.com/embed/Qspc6uBMdEY" }
+      },
+      {
         id: 'LimitApproach',
         props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4, showTable: true },
         title: 'Limit vs. Function Value',
@@ -232,6 +252,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "A Limit Example Combining Multiple Algebraic Tricks",
+        props: { url: "https://www.youtube.com/embed/tWoYGRy8eQg" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Top 4 Algebraic Tricks for Computing Limits",
+        props: { url: "https://www.youtube.com/embed/zswMgrZqj4E" }
+      },
       {
         id: 'EpsilonDelta',
         props: { fn: '2*x + 1', c: 2, L: 5 },

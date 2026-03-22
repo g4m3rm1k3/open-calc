@@ -73,6 +73,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Chain Rule: the Derivative of a Composition",
+        props: { url: "https://www.youtube.com/embed/CPnrs2Yl-rY" }
+      },
+      {
         id: 'ChainRuleAssemblerGame',
         title: 'Chain Rule Assembler Game',
         mathBridge: 'The chain rule formula is $\\frac{d}{dx}[f(g(x))] = f\'(g(x))\\cdot g\'(x)$. "Assembling" means: identify the outer function $f$ and inner function $g$, differentiate $f$ (evaluated at $g(x)$, not at $x$), then multiply by $g\'(x)$. This game makes the two-part structure explicit — outer derivative times inner derivative — before you try to execute it on paper.',
@@ -148,6 +153,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Interpreting the Chain Rule Graphically",
+        props: { url: "https://www.youtube.com/embed/o-6GzqChpJs" }
+      },
+      {
         id: 'ChainRuleMicroscope',
         title: 'Microscope Mode: The Visual Derivation',
         mathBridge: 'Every differentiable function looks linear when you zoom in far enough — its graph becomes indistinguishable from its tangent line. If the inner function $g$ has local slope $m_1$ and the outer function $f$ has local slope $m_2$, then feeding a line of slope $m_1$ into a line of slope $m_2$ gives a composed line of slope $m_1\\cdot m_2$. The chain rule $(f\\circ g)\'(x) = f\'(g(x))\\cdot g\'(x)$ is just this slope-multiplication fact, made rigorous via limits.',
@@ -199,6 +209,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The Chain Rule using Leibniz notation",
+        props: { url: "https://www.youtube.com/embed/NA-Ri4LJPaY" }
+      },
       {
         id: 'ChainRuleProofMapLab',
         title: 'Annotated Proof Map',

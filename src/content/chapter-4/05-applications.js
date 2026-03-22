@@ -57,6 +57,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Average Value of a Continuous Function on an Interval",
+        props: { url: "https://www.youtube.com/embed/NKf2waIGl7I" }
+      },
+      {
         id: 'AreaBetweenCurves',
         title: 'Area Between Two Curves',
         caption: 'The shaded region shows the area between the upper curve f(x) and the lower curve g(x). Drag the endpoints to change the interval. The integral ∫ₐᵇ [f(x)−g(x)] dx is computed in real time. Notice how the area is always positive (upper minus lower), even when both curves are below the x-axis.',
@@ -110,7 +115,12 @@ export default {
         body: 'If you compute ∫ₐᵇ [f(x)−g(x)] dx without checking for crossings inside (a,b), you may get cancellation and a result smaller than the true area. The formula gives SIGNED area (net), not geometric area (total). For geometric area, always integrate |f(x)−g(x)| or split at every crossing.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Exam Walkthrough | Calc 1, Test 3 | Integration, FTC I/II, Optimization, u-subs, Graphing",
+        props: { url: "https://www.youtube.com/embed/6hacyAipdEA" }
+      },],
   },
 
   examples: [

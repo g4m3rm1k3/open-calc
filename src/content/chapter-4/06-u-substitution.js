@@ -67,6 +67,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Intro to Substitution - Undoing the Chain Rule",
+        props: { url: "https://www.youtube.com/embed/QcgacM1LSpA" }
+      },
+      {
         id: 'IntegrationMethodLab',
         title: 'Method Selection Trainer',
         caption: 'Use the checklist to decide whether this integrand family is a substitution, by-parts, trig-sub, trig-identity, or partial-fractions problem.',
@@ -108,6 +113,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Adjusting the Constant in Integration by Substitution",
+        props: { url: "https://www.youtube.com/embed/RdeTrQKz3fk" }
+      },
+      {
         id: 'FunctionPlotter',
         props: { fn: 'x * Math.exp(x * x)', xMin: -2, xMax: 2 },
         title: 'Integrand: x·e^(x²)',
@@ -133,7 +143,17 @@ export default {
         body: '\\text{Let } F\'=f. \\text{ By the chain rule: } \\frac{d}{dx}[F(g(x))] = f(g(x))g\'(x)\\\\\n\\text{By FTC Part 2: } \\int_a^b f(g(x))g\'(x)\\,dx = F(g(b)) - F(g(a))\\\\\n= \\left[F(u)\\right]_{g(a)}^{g(b)} = \\int_{g(a)}^{g(b)} f(u)\\,du \\quad \\blacksquare',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Back Substitution - When a u-sub doesn't match cleanly!",
+        props: { url: "https://www.youtube.com/embed/k08ce4fEA3k" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Substitution Method for Definite Integrals **careful!**",
+        props: { url: "https://www.youtube.com/embed/iLh6cYGCogk" }
+      },],
   },
 
   examples: [

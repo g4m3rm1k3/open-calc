@@ -65,6 +65,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Limits of Oscillating Functions and the Squeeze Theorem",
+        props: { url: "https://www.youtube.com/embed/vIRvEvjKM58" }
+      },
+      {
         id: 'SqueezeTheorem',
         props: {},
         title: 'The Squeeze in Action',

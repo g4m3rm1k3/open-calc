@@ -76,6 +76,11 @@ export default {
     visualizationProps: {},
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Were you ever exactly 3 feet tall? The Intermediate Value Theorem",
+        props: { url: "https://www.youtube.com/embed/n3G1L3yqPI0" }
+      },
+      {
         id: 'ContinuityViz',
         title: 'Continuity and the Intermediate Value Theorem',
         caption: 'A continuous function cannot jump over a horizontal line. Drag the target value $N$ and watch the theorem in action.',

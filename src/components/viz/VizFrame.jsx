@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 const VIZ_REGISTRY = {
+  VideoEmbed:               lazy(() => import('./react/VideoEmbed.jsx')),
   NumberLine:               lazy(() => import('./d3/NumberLine.jsx')),
   FunctionMachine:          lazy(() => import('./d3/FunctionMachine.jsx')),
   FunctionPlotter:          lazy(() => import('./d3/FunctionPlotter.jsx')),

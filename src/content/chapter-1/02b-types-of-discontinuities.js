@@ -70,6 +70,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "What is an infinite limit?",
+        props: { url: "https://www.youtube.com/embed/5hfHbOCeFoU" }
+      },
+      {
         id: 'HoleVsValue',
         title: 'Removable Discontinuity: Hole vs. Redefined Value',
         caption: 'Compare three scenarios: the function has a hole (undefined), the hole is filled at the wrong height (still discontinuous), and the hole is filled correctly (continuous). Only the last is continuous.',

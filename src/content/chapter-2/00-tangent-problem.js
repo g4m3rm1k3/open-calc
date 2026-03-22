@@ -76,6 +76,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Definition of the Derivative  | Part I",
+        props: { url: "https://www.youtube.com/embed/hp046sLvQpM" }
+      },
+      {
         id: 'SecantToTangent',
         title: 'Secant Line → Tangent Line',
         mathBridge: 'The secant line through $(a, f(a))$ and $(a+h, f(a+h))$ has slope $\\frac{f(a+h)-f(a)}{h}$ — the difference quotient. As $h \\to 0$, the second point slides toward the first and the secant rotates into the tangent line. The derivative $f\'(a)$ is the limiting slope of that rotation.',
@@ -135,6 +140,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Applying the Definition of the Derivative to 1/x",
+        props: { url: "https://www.youtube.com/embed/JgVUjIt5Fa0" }
+      },
+      {
         id: 'TangentLineConstructor',
         props: { showPointSlope: true, showDifferenceQuotientLabels: true },
         title: 'Secant → Tangent: Limit of Difference Quotient',
@@ -178,6 +188,16 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The derivative of a constant and of x^2  from the definition",
+        props: { url: "https://www.youtube.com/embed/cvP_t27nUMY" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Definition of Derivative Example: f(x) = x + 1/(x+1)",
+        props: { url: "https://www.youtube.com/embed/pi5VtjU0B3s" }
+      },
       {
         id: 'AbsoluteValueDiffViz',
         title: 'The Corner: Why |x| Fails at x = 0',

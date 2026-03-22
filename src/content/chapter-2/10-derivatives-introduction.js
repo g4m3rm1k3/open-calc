@@ -142,4 +142,12 @@ export default {
       answer: 't = 2 seconds; maximum height = 64 feet',
     },
   ],
-}
+
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "5 counterexamples every calculus student should know",
+        props: { url: "https://www.youtube.com/embed/4-M3Yc5NYMA" }
+      },
+      ],
+    }

@@ -43,6 +43,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "Derivative Rules:  Power Rule, Additivity, and Scalar Multiplication",
+        props: { url: "https://www.youtube.com/embed/0y9ZAS5_U68" }
+      },
+      {
         id: 'DerivativeRuleArenaGame',
         title: 'Derivative Rule Arena',
         caption: 'Train fast rule recognition before symbolic computation: pick the right opening rule under pressure.',
@@ -128,7 +133,15 @@ export default {
       showAllRules: true,
       interactiveRule: 'power',
     },
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "How to Find the Equation of a Tangent Line",
+        props: { url: "https://www.youtube.com/embed/KL3oJjkFsqQ" }
+      },
+      ],
+    },
 
   rigor: {
     prose: [
@@ -151,6 +164,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The product and quotient rules",
+        props: { url: "https://www.youtube.com/embed/O6m9rtIGxUM" }
+      },
       {
         id: 'ProductRuleRectangle',
         title: 'Product Rule — The Rectangle Proof',

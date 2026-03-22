@@ -48,6 +48,11 @@ export default {
     },
     visualizations: [
       {
+        id: 'VideoEmbed',
+        title: "The derivative of e^x.",
+        props: { url: "https://www.youtube.com/embed/ZMP6xIdim24" }
+      },
+      {
         id: 'ExpLogBridgeLab',
         title: 'Exponential/Log Bridge Lab',
         mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes.',
@@ -86,6 +91,11 @@ export default {
       showSlopeComparison: true,
     },
     visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "The Derivative of ln(x) via Implicit Differentiation",
+        props: { url: "https://www.youtube.com/embed/DTOefLm7zfU" }
+      },
       {
         id: 'ExpLogBridgeLab',
         title: 'Derivative Formula Bridge Lab',
@@ -136,7 +146,15 @@ export default {
         body: "\\ln x = \\int_1^x \\frac{1}{t}dt \\implies \\frac{d}{dx}[\\ln x] = \\frac{d}{dx}\\int_1^x \\frac{1}{t}dt = \\frac{1}{x}",
       },
     ],
-  },
+  
+      visualizations: [
+      {
+        id: 'VideoEmbed',
+        title: "Logarithmic Differentiation |  Example: x^sinx",
+        props: { url: "https://www.youtube.com/embed/VgurXuuIBbQ" }
+      },
+      ],
+    },
 
   examples: [
     {
