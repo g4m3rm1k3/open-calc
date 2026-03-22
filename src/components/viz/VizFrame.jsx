@@ -239,6 +239,15 @@ const VIZ_REGISTRY = {
   InverseTrigViz:                lazy(() => import('./d3/InverseTrigViz.jsx')),
   // Precalc 3 — Applications
   SinusoidalModelViz:            lazy(() => import('./d3/SinusoidalModelViz.jsx')),
+
+  // Precalc 3 — Trig foundations (angles, triangles, ratios, graphs, solving)
+  AngleMeasurementViz:   lazy(() => import('./d3/AngleMeasurementViz.jsx')),
+  TriangleGeometryViz:   lazy(() => import('./d3/TriangleGeometryViz.jsx')),
+  TrigRatiosViz:         lazy(() => import('./d3/TrigRatiosViz.jsx')),
+  UnitCircleFullViz:     lazy(() => import('./d3/UnitCircleFullViz.jsx')),
+  SixTrigGraphsViz:      lazy(() => import('./d3/SixTrigGraphsViz.jsx')),
+  LawOfSinesViz:         lazy(() => import('./d3/TriangleSolvingViz.jsx').then(m => ({ default: m.LawOfSinesViz }))),
+  SSAAmbiguousViz:       lazy(() => import('./d3/TriangleSolvingViz.jsx').then(m => ({ default: m.SSAAmbiguousViz }))),
 }
 
 function VizSkeleton() {
