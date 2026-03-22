@@ -1,16 +1,28 @@
 import React, { useMemo, useState } from 'react';
 
+const X_MIN = 0;
+const X_MAX = 4;
+const Y_MIN = 2;
+const Y_MAX = 6;
+const PLOT_LEFT = 24;
+const PLOT_TOP = 24;
+const PLOT_W = 312;
+const PLOT_H = 162;
+const SCALE = Math.min(PLOT_W / (X_MAX - X_MIN), PLOT_H / (Y_MAX - Y_MIN)); // Equal x/y units.
+const X_OFFSET = PLOT_LEFT + (PLOT_W - (X_MAX - X_MIN) * SCALE) / 2;
+const Y_OFFSET = PLOT_TOP + (PLOT_H - (Y_MAX - Y_MIN) * SCALE) / 2;
+
 function f(x) {
   if (Math.abs(x - 2) < 1e-8) return Number.NaN;
   return (x * x - 4) / (x - 2);
 }
 
 function mapX(x) {
-  return 24 + ((x + 1) / 6) * 312;
+  return X_OFFSET + (x - X_MIN) * SCALE;
 }
 
 function mapY(y) {
-  return 180 - ((y - 1) / 6) * 156;
+  return Y_OFFSET + (Y_MAX - y) * SCALE;
 }
 
 export default function LimitBridgeLab() {
@@ -27,14 +39,36 @@ export default function LimitBridgeLab() {
     const avgY = (leftY + rightY) / 2;
     const target = 4;
     const error = Math.abs(avgY - target);
+    const leftError = Math.abs(leftY - target);
+    const rightError = Math.abs(rightY - target);
 
-    const pathPoints = [];
-    for (let x = -1; x <= 5; x += 0.1) {
+    const leftPathPoints = [];
+    const rightPathPoints = [];
+
+    for (let x = X_MIN; x < 2; x += 0.05) {
       const y = f(x);
-      pathPoints.push(`${mapX(x)},${mapY(y)}`);
+      leftPathPoints.push(`${mapX(x)},${mapY(y)}`);
     }
 
-    return { c, leftX, rightX, leftY, rightY, avgY, target, error, path: pathPoints.join(' ') };
+    for (let x = 2.05; x <= X_MAX; x += 0.05) {
+      const y = f(x);
+      rightPathPoints.push(`${mapX(x)},${mapY(y)}`);
+    }
+
+    return {
+      c,
+      leftX,
+      rightX,
+      leftY,
+      rightY,
+      avgY,
+      target,
+      error,
+      leftError,
+      rightError,
+      leftPath: leftPathPoints.join(' '),
+      rightPath: rightPathPoints.join(' '),
+    };
   }, [h]);
 
   function checkGuess() {
@@ -56,13 +90,16 @@ export default function LimitBridgeLab() {
         Shrink h to bring two points toward x = 2 from opposite sides. This converts visual intuition into the limit statement.
       </p>
 
-      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 mb-4 overflow-x-auto">
-        <svg viewBox="0 0 360 210" className="w-full min-w-[320px]">
-          <line x1="24" y1="180" x2="336" y2="180" stroke="currentColor" opacity="0.35" />
-          <line x1={mapX(2)} y1="24" x2={mapX(2)} y2="186" stroke="currentColor" opacity="0.2" strokeDasharray="4 4" />
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-3 mb-4">
+        <svg viewBox="0 0 360 210" className="w-full">
+          <rect x="24" y="24" width="312" height="162" fill="none" stroke="currentColor" opacity="0.15" />
+          <line x1={mapX(2)} y1="24" x2={mapX(2)} y2="186" stroke="currentColor" opacity="0.25" strokeDasharray="4 4" />
           <line x1="24" y1={mapY(4)} x2="336" y2={mapY(4)} stroke="#f59e0b" opacity="0.35" strokeDasharray="4 4" />
+          <text x={mapX(2) + 6} y="36" fill="currentColor" opacity="0.7" fontSize="10">x = 2</text>
+          <text x="28" y={mapY(4) - 6} fill="#f59e0b" opacity="0.9" fontSize="10">L = 4</text>
 
-          <polyline fill="none" stroke="#38bdf8" strokeWidth="2.5" points={state.path} />
+          <polyline fill="none" stroke="#38bdf8" strokeWidth="2.5" points={state.leftPath} />
+          <polyline fill="none" stroke="#38bdf8" strokeWidth="2.5" points={state.rightPath} />
 
           <circle cx={mapX(2)} cy={mapY(4)} r="5" fill="white" stroke="#ef4444" strokeWidth="2" />
 
@@ -84,8 +121,10 @@ export default function LimitBridgeLab() {
         <div className="rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 p-3">
           <p className="font-semibold">Rigor</p>
           <p className="font-mono mt-1">h = {h.toFixed(3)}</p>
-          <p className="font-mono">|avg - 4| = {state.error.toFixed(5)}</p>
-          <p className="text-xs mt-1">As h -> 0, error -> 0.</p>
+          <p className="font-mono">Target limit L = {state.target.toFixed(2)}</p>
+          <p className="font-mono">|left - L| = {state.leftError.toFixed(5)}</p>
+          <p className="font-mono">|right - L| = {state.rightError.toFixed(5)}</p>
+          <p className="text-xs mt-1">As h -> 0, both distances -> 0, so values approach 4.</p>
         </div>
       </div>
 
