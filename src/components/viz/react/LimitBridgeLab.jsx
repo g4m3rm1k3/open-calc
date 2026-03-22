@@ -124,7 +124,7 @@ export default function LimitBridgeLab() {
           <p className="font-mono">Target limit L = {state.target.toFixed(2)}</p>
           <p className="font-mono">|left - L| = {state.leftError.toFixed(5)}</p>
           <p className="font-mono">|right - L| = {state.rightError.toFixed(5)}</p>
-          <p className="text-xs mt-1">As h -> 0, both distances -> 0, so values approach 4.</p>
+          <p className="text-xs mt-1">As h approaches 0, both distances approach 0, so values approach 4.</p>
         </div>
       </div>
 

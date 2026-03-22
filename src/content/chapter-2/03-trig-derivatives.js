@@ -401,7 +401,7 @@ export default {
       id: 'ch2-003-ch1',
       difficulty: 'easy',
       problem: '\\text{Differentiate } f(x) = 3\\cos x - 4\\sin x.',
-      hint: 'Apply the derivative rules for sine and cosine term by term. Use the constant multiple rule.',
+      hint: 'Differentiate each trig term separately: d/dx[cos x] = -sin x and d/dx[sin x] = cos x, then keep the constants 3 and -4 attached.',
       walkthrough: [
         {
           expression: "f'(x) = 3 \\cdot \\frac{d}{dx}[\\cos x] - 4 \\cdot \\frac{d}{dx}[\\sin x]",

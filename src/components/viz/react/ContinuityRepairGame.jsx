@@ -66,7 +66,7 @@ export default function ContinuityRepairGame() {
         </div>
         <div className="rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-3">
           <p className="font-semibold">Math</p>
-          <p className="font-mono">lim(x->2) (x+2) = 4</p>
+          <p className="font-mono">lim(x→2) (x+2) = 4</p>
           <p className="font-mono">Current f(2) = {dotY.toFixed(2)}</p>
         </div>
         <div className="rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 p-3">

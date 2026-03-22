@@ -238,7 +238,7 @@ export default {
       id: 'ch3-004-ch1',
       difficulty: 'hard',
       problem: 'Prove: (1) Among all rectangles with fixed perimeter P, the square has maximum area. (2) Among all rectangles with fixed area A, the square has minimum perimeter.',
-      hint: 'For (1): use AM-GM or calculus. For (2): set up area as constraint, perimeter as objective. Both should give the same conclusion from different directions.',
+      hint: 'For (1), write the rectangle as y = P/2 - x and maximize A(x) = x(P/2 - x). For (2), write y = A/x and minimize P(x) = 2x + 2A/x. In both cases, the critical point lands where x = y.',
       walkthrough: [
         { expression: '\\text{Part (1): Fix perimeter } 2x+2y = P, \\text{ maximize } A = xy.', annotation: 'Set up as in the fencing problem.' },
         { expression: 'y = P/2 - x, \\; A = x(P/2-x), \\; A\'=P/2 - 2x = 0 \\Rightarrow x = P/4 = y', annotation: 'Critical point: x = y = P/4 (square). A\'\'= -2 < 0: maximum.' },
@@ -255,7 +255,7 @@ export default {
       id: 'ch3-004-ch2',
       difficulty: 'hard',
       problem: 'Find the cylinder of maximum volume that can be inscribed in a sphere of radius R.',
-      hint: 'Let r be the cylinder radius and h be the half-height. They satisfy r² + h² = R². Volume V = πr²(2h). Substitute r² = R² - h² and maximize over h.',
+      hint: 'Use the sphere constraint r² + h² = R², where h is the half-height. Substitute r² = R² - h² into V = 2πh r², then differentiate the resulting one-variable function in h.',
       walkthrough: [
         { expression: 'r^2 + h^2 = R^2 \\text{ (constraint, where } h \\text{ is half the cylinder height)}', annotation: 'The cylinder fits inside the sphere: the top edge of the cylinder is at (r, h) on the sphere surface.' },
         { expression: 'V = \\pi r^2 \\cdot 2h = 2\\pi h(R^2 - h^2)', annotation: 'Volume = π r² × height = π(R² - h²)(2h). Substitute r² = R² - h².' },
@@ -271,7 +271,7 @@ export default {
       id: 'ch3-004-ch3',
       difficulty: 'medium',
       problem: 'A Norman window (rectangle + semicircle on top) has perimeter 10 m. Show the optimal height-to-radius ratio is h = r, where h is the rectangle height and r is the semicircle radius.',
-      hint: 'This is already worked out in Example 7. The challenge is to prove h = r algebraically, not just numerically. Use the first-order condition.',
+      hint: 'From Example 7, first use A\'(r) = 0 to get r* = 10/(4 + π). Then substitute that value into the expression for h and simplify until every term is written with the same denominator; the difference collapses to zero, so h = r*.',
       walkthrough: [
         { expression: 'A(r) = 10r - 2r^2 - \\frac{\\pi r^2}{2}, \\quad A\'(r) = 10 - 4r - \\pi r = 0', annotation: 'From Example 7, the critical point condition.' },
         { expression: 'r^* = \\frac{10}{4+\\pi}', annotation: 'Optimal radius.' },

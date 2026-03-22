@@ -74,7 +74,7 @@ export function useSearch() {
   const docsRef = useRef([])
 
   useEffect(() => {
-    fetch('/search-index.json')
+    fetch(`${import.meta.env.BASE_URL}search-index.json`)
       .then((r) => r.json())
       .then((data) => {
         docsRef.current = data.documents

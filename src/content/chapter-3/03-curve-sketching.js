@@ -248,7 +248,7 @@ export default {
       id: 'ch3-003-ch1',
       difficulty: 'medium',
       problem: 'Find constants a and b such that f(x) = ax³ + bx² has a local maximum at x = -1 with f(-1) = 4, and an inflection point at x = 1.',
-      hint: 'Use f\'(-1) = 0 (critical point), f\'\'(1) = 0 (inflection), and f(-1) = 4 (value). Set up a system of equations.',
+      hint: 'Start with f\'(-1) = 0 and f\'\'(1) = 0 to relate a and b, then use f(-1) = 4 to pin down the scale. Afterward, check whether the resulting cubic really has an inflection at x = 1; if not, the conditions are inconsistent.',
       walkthrough: [
         { expression: "f'(x) = 3ax^2 + 2bx, \\quad f''(x) = 6ax + 2b", annotation: 'Compute derivatives.' },
         { expression: "f'(-1) = 0: \\quad 3a(-1)^2 + 2b(-1) = 3a - 2b = 0", annotation: 'Critical point condition at x = -1.' },

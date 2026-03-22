@@ -529,7 +529,7 @@ export default {
       id: 'ch2-002-ch1',
       difficulty: 'easy',
       problem: '\\text{Differentiate } f(x) = (2x+1)^{10}.',
-      hint: 'Identify the outer function as u^10 and the inner function as 2x+1.',
+      hint: 'Treat (2x+1)^10 as a composition: outer function u^10, inner function 2x+1, and inner derivative 2.',
       walkthrough: [
         {
           expression: "\\text{Outer: } F(u) = u^{10},\\quad \\text{Inner: } u = 2x+1",

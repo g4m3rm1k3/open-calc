@@ -218,7 +218,7 @@ export default {
       id: 'ch3-005-ch3',
       difficulty: 'hard',
       problem: "Show that L'Hôpital's Rule fails for lim(x→∞) (x + sin(x))/x even though the limit exists. Explain WHY it fails.",
-      hint: "Apply the rule and observe that the resulting limit doesn't exist. Then compute the original limit by elementary means. Explain what condition of L'Hôpital's Rule is violated.",
+      hint: "Differentiate numerator and denominator once: the quotient becomes 1 + cos(x). Because that new limit oscillates, L'Hôpital's hypothesis fails. Finish the original limit by splitting the fraction into 1 + sin(x)/x and bounding the second term.",
       walkthrough: [
         { expression: '\\lim_{x \\to \\infty} \\frac{x + \\sin(x)}{x} = \\frac{\\infty}{\\infty} \\text{ form}', annotation: 'Both x + sin(x) → ∞ and x → ∞, so this appears to be ∞/∞.' },
         { expression: "\\text{Attempt L'Hôpital: } \\lim_{x \\to \\infty} \\frac{(x+\\sin x)\'}{x\'} = \\lim_{x\\to\\infty} \\frac{1 + \\cos x}{1}", annotation: "Apply L'Hôpital." },
