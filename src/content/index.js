@@ -8,11 +8,12 @@ import ch6 from './chapter-6/index.js'
 import discrete1 from './discrete-math/index.js'
 import precalc1 from './precalc/index.js'
 import precalc2 from './precalc-2/index.js'
+import precalc3 from './precalc-3/index.js'
 import physics1Chapters from './physics-1/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
 const DISCRETE_CURRICULUM = [discrete1].map(ch => ({ ...ch, course: 'discrete' }))
-const PRECALC_CURRICULUM = [precalc1, precalc2].map(ch => ({ ...ch, course: 'precalc' }))
+const PRECALC_CURRICULUM = [precalc1, precalc2, precalc3].map(ch => ({ ...ch, course: 'precalc' }))
 const PHYSICS_CURRICULUM = physics1Chapters.map(ch => ({ ...ch, course: 'physics-1' }))
 
 export const CURRICULUM = [...PRECALC_CURRICULUM, ...CALC_CURRICULUM, ...DISCRETE_CURRICULUM, ...PHYSICS_CURRICULUM]
