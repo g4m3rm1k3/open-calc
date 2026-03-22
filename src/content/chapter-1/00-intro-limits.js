@@ -205,8 +205,28 @@ export default {
       },
     {
         id: 'VideoEmbed',
+        title: "Why Limits are Important in Calculus",
+        props: { url: "https://www.youtube.com/embed/xFu7xdXFfBs" }
+      },
+    {
+        id: 'VideoEmbed',
         title: "Finding Real limits Graphical & Numerical Approach Calculus 1 AB",
         props: { url: "https://www.youtube.com/embed/IEfoQeWm8Fc" }
+      },
+    {
+        id: 'VideoEmbed',
+        title: "Finding Limits with Properties includes Quotient Rule Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/-vFRc_2HCbQ" }
+      },
+    {
+        id: 'VideoEmbed',
+        title: "Limits & Continuity",
+        props: { url: "https://www.youtube.com/embed/YFi5XzewhME" }
+      },
+    {
+        id: 'VideoEmbed',
+        title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/MNk7RnyU0mk" }
       },
     {
         id: 'VideoEmbed',

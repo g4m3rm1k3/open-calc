@@ -35,7 +35,12 @@ export default {
         body: 'Parabolic mirrors send rays from a focus into near-parallel beams. This drives headlight and dish design.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      { id: 'VideoEmbed', title: "Graphing Ellipses & Circles", props: { url: "https://www.youtube.com/embed/Ux8gEMccP9w" } },
+      { id: 'VideoEmbed', title: "Graphing Hyperbolas in Standard Form", props: { url: "https://www.youtube.com/embed/dn1o6lpu_Sk" } },
+      { id: 'VideoEmbed', title: "Graphing Parabolas in Standard Form", props: { url: "https://www.youtube.com/embed/icfex6aaWVk" } },
+      { id: 'VideoEmbed', title: "Finding Equations of Conics from Given Conditions", props: { url: "https://www.youtube.com/embed/aPo_Hakv36o" } },
+    ],
   },
 
   math: {
@@ -59,7 +64,11 @@ export default {
         body: 'x^2+bx = (x+b/2)^2 - (b/2)^2. Apply separately in x and y groups.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      { id: 'VideoEmbed', title: "Application of Ellipses", props: { url: "https://www.youtube.com/embed/1Ve7MTeniYs" } },
+      { id: 'VideoEmbed', title: "Application of Hyperbolas", props: { url: "https://www.youtube.com/embed/XACQ95mTll0" } },
+      { id: 'VideoEmbed', title: "Applications of Parabolas in Standard Form", props: { url: "https://www.youtube.com/embed/tZbrlvcd94E" } },
+    ],
   },
 
   rigor: {
@@ -69,7 +78,9 @@ export default {
       'Focus-directrix definitions can be converted to algebraic forms by equating distances and squaring carefully, giving geometric proofs of standard equations.',
     ],
     callouts: [],
-    visualizations: [],
+    visualizations: [
+      { id: 'VideoEmbed', title: "Rotated Conic Section Identifying & Graphing 4 Examples", props: { url: "https://www.youtube.com/embed/hFtNJQIi--k" } },
+    ],
   },
 
   examples: [

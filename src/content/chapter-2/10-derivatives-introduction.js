@@ -149,5 +149,15 @@ export default {
         title: "5 counterexamples every calculus student should know",
         props: { url: "https://www.youtube.com/embed/4-M3Yc5NYMA" }
       },
+      {
+        id: 'VideoEmbed',
+        title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/MNk7RnyU0mk" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Finding Derivative with Definition of Derivative Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/z_cMiuEITbg" }
+      },
       ],
     }

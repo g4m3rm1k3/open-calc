@@ -76,11 +76,12 @@ function getSectionVizzes(section) {
     const norm = normalizeViz(v)
     if (norm) vizzes.push(norm)
   }
-  // De-duplicate
+  // De-duplicate by ID + props (allows multiple VideoEmbed with different URLs)
   const seen = new Set()
   return vizzes.filter(v => {
-    if (seen.has(v.id)) return false
-    seen.add(v.id)
+    const key = `${v.id}:${JSON.stringify(v.props ?? {})}`
+    if (seen.has(key)) return false
+    seen.add(key)
     return true
   })
 }

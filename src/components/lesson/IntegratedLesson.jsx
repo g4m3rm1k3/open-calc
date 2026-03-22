@@ -84,13 +84,14 @@ function extractVizzes(lesson) {
   extractFromSection(lesson.math);
   extractFromSection(lesson.rigor);
 
-  // De-duplicate by ID
+  // De-duplicate by ID + props (allows multiple VideoEmbed with different URLs)
   const unique = [];
-  const ids = new Set();
+  const seen = new Set();
   for (const v of vizzes) {
-    if (!ids.has(v.id)) {
+    const key = `${v.id}:${JSON.stringify(v.props ?? {})}`;
+    if (!seen.has(key)) {
       unique.push(v);
-      ids.add(v.id);
+      seen.add(key);
     }
   }
   return unique;
