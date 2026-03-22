@@ -42,6 +42,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Logarithmic Differentiation Derivative of a Fraction",
+        url: "https://www.youtube.com/embed/-DHel_4-NdE"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Derivative Rules:  Power Rule, Additivity, and Scalar Multiplication",

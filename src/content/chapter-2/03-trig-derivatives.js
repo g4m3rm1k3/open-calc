@@ -49,6 +49,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Inverse Trigonometric Functions",
+        url: "https://www.youtube.com/embed/SOYcqhFw5vo"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "The derivative of Trigonometric Functions",

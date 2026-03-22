@@ -95,6 +95,30 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Concavity Inflection Second Derivative Test 4 Examples Calculus 1 AB",
+        url: "https://www.youtube.com/embed/_3Bb3nJEXXk"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Sketching Derivatives from Graphs of Functions 5 Examples Calculus 1 AB",
+        url: "https://www.youtube.com/embed/7B1IUn9QCoo"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Extrema on an Interval",
+        url: "https://www.youtube.com/embed/gJj8VS2axhM"
+      }
+    },
       {
         id: 'PositionVelocityAcceleration',
         title: 'Position, Velocity, and Acceleration Graphs',

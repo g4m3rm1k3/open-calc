@@ -57,6 +57,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Definition of a Limit Epsilon Delta Proof 3 Examples Calculus 1",
+        url: "https://www.youtube.com/embed/dHDhHtw5B-A"
+      }
+    },
       {
         id: 'EpsilonDelta',
         props: { fn: '2*x + 1', c: 3, L: 7 },

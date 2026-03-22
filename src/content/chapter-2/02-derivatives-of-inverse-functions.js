@@ -37,6 +37,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Inverse Function",
+        url: "https://www.youtube.com/embed/kPmIYqxhm78"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Trig Functions via Implicit Differentiation",

@@ -46,6 +46,22 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Integrating Natural Logarithm Function Calculus 1 AB",
+        url: "https://www.youtube.com/embed/ZI34e6qOjic"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Definite Integrals Common Geometric Area Calculus 1 AB",
+        url: "https://www.youtube.com/embed/_knXDFGctoc"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Fundamental Theorem of Calculus 1  |  Geometric Idea + Chain Rule Example",

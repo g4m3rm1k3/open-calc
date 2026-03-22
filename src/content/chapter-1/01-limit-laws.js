@@ -43,6 +43,54 @@ export default {
     visualizationId: 'SqueezeTheorem',
     visualizationProps: {},
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Inverse Trigonometric Functions Examples Calculus 1 AB",
+        url: "https://www.youtube.com/embed/5lhvYhd-9uM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative Rules for Inverse Trigonometric Functions Derived Calculus 1 AB",
+        url: "https://www.youtube.com/embed/zKYsFuKjtyo"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "First Fundamental Theorem of Calculus Calculus 1 AB",
+        url: "https://www.youtube.com/embed/YWv5v8PppzU"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Squeeze Theorem for Sequences Sandwich Theorem Calculus 1",
+        url: "https://www.youtube.com/embed/M1Yv1f8sAw0"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Limits of Trig Functions Special Ratios 3 Examples 4k",
+        url: "https://www.youtube.com/embed/Q5WixlWNlTQ"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Why Limits are Important in Calculus",
+        url: "https://www.youtube.com/embed/xFu7xdXFfBs"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Limit Laws | Breaking Up Complicated Limits Into Simpler Ones",

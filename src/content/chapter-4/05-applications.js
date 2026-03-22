@@ -56,6 +56,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Hyperbolic Functions Derivative & Integrals 5 Examples Calculus 1",
+        url: "https://www.youtube.com/embed/UWue-vI0Tk8"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Average Value of a Continuous Function on an Interval",

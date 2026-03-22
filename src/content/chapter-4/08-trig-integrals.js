@@ -53,6 +53,14 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Integration involving Natural Logarithm Function (5 Examples)",
+        url: "https://www.youtube.com/embed/oxlpfPrK-Pg"
+      }
+    },
       {
         id: 'IntegrationMethodLab',
         title: 'Method Selection Trainer',

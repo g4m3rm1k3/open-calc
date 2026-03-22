@@ -57,6 +57,38 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Area Between 2 Curves Vertical and Horizontal Representative Rectangles Calculus 1 AB",
+        url: "https://www.youtube.com/embed/I3bxriE3XbM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Optimization Cylinder in Sphere with Radius r",
+        url: "https://www.youtube.com/embed/cdQ6BSUEtxY"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Optimization Calculus Problems Volume Calculus 1 AB",
+        url: "https://www.youtube.com/embed/_boUEAuCKsM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Optimization Calculus Problems Minimizing Lengths Calculus 1 AB READ DESCRIPTION",
+        url: "https://www.youtube.com/embed/tDoW2euBcfk"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Ex: Optimizing the Volume of a Box With  Fixed Surface Area",

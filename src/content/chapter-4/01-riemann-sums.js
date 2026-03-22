@@ -51,6 +51,62 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Definite Integrals Defined w. Riemann Limit of Sums Example Calculus 1 AB",
+        url: "https://www.youtube.com/embed/TmYELyzIMxg"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Riemann Sum Defined w/ 2 Limit of Sums Examples Calculus 1",
+        url: "https://www.youtube.com/embed/F6XC5_qbXls"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Estimating Area with Rectangles & Riemann Limit of Sums Definition of Area Calculus 1 AB",
+        url: "https://www.youtube.com/embed/7FTtayaQKqY"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Definition of Area Riemann Sum Limit of Sums Part 2 of 2 Calculus 1",
+        url: "https://www.youtube.com/embed/DchlORZxHSU"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Estimating Area with Riemann Sums Finite Rectangles Calculus 1 AB",
+        url: "https://www.youtube.com/embed/KHECo7XsrOk"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Riemann Sum and Definite Integral Introduction",
+        url: "https://www.youtube.com/embed/9elpcdrdYtI"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Summation Notation (Sigma)",
+        url: "https://www.youtube.com/embed/WVfiBnzM3vQ"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part I: Approximating Areas with rectangles",

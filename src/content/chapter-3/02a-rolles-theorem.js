@@ -52,6 +52,22 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Application of Rolle's Theorem with Intermediate Value Theorem Calculus 1 AB",
+        url: "https://www.youtube.com/embed/S20fX79pdiE"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Rolle's Theorem Calculus 1 AB",
+        url: "https://www.youtube.com/embed/fBJvXs4qLIQ"
+      }
+    },
       { vizId: 'MVTViz', caption: "Rolle's Theorem: when $f(a) = f(b)$, the MVT guarantees a horizontal tangent between $a$ and $b$." },
     ],
   },

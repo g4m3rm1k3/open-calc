@@ -69,6 +69,22 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Arc Length of a Curve ( Smooth Curve ) Calculus 1 BC 5 Examples",
+        url: "https://www.youtube.com/embed/ReewypjBiVQ"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Second Fundamental Theorem Calculus 1 AB",
+        url: "https://www.youtube.com/embed/Ku2d2dPGg2g"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "What is an infinite limit?",

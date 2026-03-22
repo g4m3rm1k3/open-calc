@@ -72,6 +72,62 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Natural Exponential Function e^x Calculus 1 AB",
+        url: "https://www.youtube.com/embed/-oLrRuZ9zgM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Natural Exponential Function (5 Examples)",
+        url: "https://www.youtube.com/embed/0cwDYHep0AQ"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Chain Rule with Trig Functions Harder Examples Calculus 1 AB",
+        url: "https://www.youtube.com/embed/gLYNlCarAmU"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Chain Rule Harder Algebraic Examples Calculus 1 AB",
+        url: "https://www.youtube.com/embed/MvQkDW7aHV0"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Chain Rule Part 2 Trig Derivatives 3 Examples  4K",
+        url: "https://www.youtube.com/embed/P4e-DWNxZMM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative using Chain Rule 3 Algebraic Examples 4K",
+        url: "https://www.youtube.com/embed/WygqeCwjn_s"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivatives with Sine and Cosine Calculus 1 AB",
+        url: "https://www.youtube.com/embed/SRj8DGWo_ik"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Chain Rule: the Derivative of a Composition",

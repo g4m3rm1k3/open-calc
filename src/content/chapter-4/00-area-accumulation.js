@@ -61,6 +61,70 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Area Under a Curve & Definite Integrals with TI NSPIRE Calculus 1 AB",
+        url: "https://www.youtube.com/embed/_iHjvdyv7kU"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Inverse Hyperbolic Functions Derivative and Integral Calculus 1",
+        url: "https://www.youtube.com/embed/sXF57VBR5go"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Integrating Exponential Functions Base a Calculus 1 AB",
+        url: "https://www.youtube.com/embed/6ofyePCNB54"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Maximum Error in Trapezoidal Rule & Simpson's Rule Calculus 1 AB READ DESCRIPTION",
+        url: "https://www.youtube.com/embed/YsFebPl_RKo"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Trapezoidal Rule & Simpson's Rule Estimating Definite Integrals Calculus 1 AB READ DESCRIPTION",
+        url: "https://www.youtube.com/embed/TH06N7Q7FJw"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Accumulation Function Definite Integral",
+        url: "https://www.youtube.com/embed/idifpe52eQ4"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Properties of Definite Integrals Calculus 1 AB",
+        url: "https://www.youtube.com/embed/wycadSRDID4"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Estimating Area with Rectangles Part 1 of 2 Calculus 1 AB",
+        url: "https://www.youtube.com/embed/4u0z-KNu34o"
+      }
+    },
       {
         id: 'WaterTank',
         title: 'Variable Flow Rate → Water Accumulation',

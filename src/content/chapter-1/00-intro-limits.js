@@ -83,6 +83,174 @@ export default {
         },
       ],
       visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "L'Hopital's Rule Lesson Calculus 1 AB with 8 Examples",
+        url: "https://www.youtube.com/embed/z1DQQE8iC9k"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Hyperbolic Functions Introduction 6 Ex Calculus 1 PLEASE READ DESCRIPTION",
+        url: "https://www.youtube.com/embed/TEdED74yWPY"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Area  Against y Axis Riemman Limit of Sums Calculus 1",
+        url: "https://www.youtube.com/embed/TF3MSpWs0rE"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Sigma Notation & Infinite Sums with Limits Calculus 1 AB",
+        url: "https://www.youtube.com/embed/yPK6pK4BJW8"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Even and Odd Functions Many Examples",
+        url: "https://www.youtube.com/embed/WJvwUaRQdiY"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Horizontal Asymptotes of Irrational Functions",
+        url: "https://www.youtube.com/embed/8aWFSNbl2Ho"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Limits at Infinity Rational, Irrational, and Trig Functions Calculus 1 AB READ DESCRIPTION",
+        url: "https://www.youtube.com/embed/3ORqMWsAMk8"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Absolute Value Functions Calculus 1 AB",
+        url: "https://www.youtube.com/embed/4j2ZLtGoiLE"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Higher Order Derivative Introduction Calculus 1 AB",
+        url: "https://www.youtube.com/embed/4uzZlXLbtvk"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative Using Quotient Rule 3 Examples   4K",
+        url: "https://www.youtube.com/embed/H3sVKCJnGko"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative Using Product Rule 3 Examples 4K",
+        url: "https://www.youtube.com/embed/zE_rmL-mE08"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Finding Derivative with Definition of Derivative Calculus 1 AB",
+        url: "https://www.youtube.com/embed/z_cMiuEITbg"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Curve Sketching with Limits Calculus 1 AB",
+        url: "https://www.youtube.com/embed/ykL41inivmI"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Infinite Limits & Vertical Asymptotes Calculus 1 AB",
+        url: "https://www.youtube.com/embed/C-4MKM4KXvg"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Limits Involving Absolute Value Functions Calculus 1 AB",
+        url: "https://www.youtube.com/embed/dyyFz6HlExE"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Evaluating a Limit Rationalizing the Numerator 4k",
+        url: "https://www.youtube.com/embed/TXnvtZ7V6n0"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Limits of Piecewise Function Calculus 1 AB",
+        url: "https://www.youtube.com/embed/duGU_Imgiug"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Limits of Rational Functions 3 Examples 4k",
+        url: "https://www.youtube.com/embed/XC9cBw2VsIw"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Properties of Limits Calculus 1 AB",
+        url: "https://www.youtube.com/embed/UnUiydqnhwM"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Finding Real limits Graphical & Numerical Approach Calculus 1 AB",
+        url: "https://www.youtube.com/embed/IEfoQeWm8Fc"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Function vs Limit Value 3 Examples Graphing Review 4k",
+        url: "https://www.youtube.com/embed/FxEZZ-idun0"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "The Velocity Problem | Part II: Graphically",

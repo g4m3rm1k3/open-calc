@@ -51,6 +51,22 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Mean Value & Average Value Theorem of Integration Calculus 1 AB",
+        url: "https://www.youtube.com/embed/sSmuslvjuyQ"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Mean Value Theorem for Derivatives Calculus 1 AB",
+        url: "https://www.youtube.com/embed/q_-yujW7XDg"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "The MEAN Value Theorem is Actually Very Nice",

@@ -47,6 +47,30 @@ export default {
       highlightBaseE: true,
     },
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Logarithms Base a Calculus 1 AB",
+        url: "https://www.youtube.com/embed/D6BL-HZiYCs"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Exponential Functions Base a Calculus 1 AB",
+        url: "https://www.youtube.com/embed/usc7MDoymgQ"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Derivative of Natural Logarithm Functions Calculus 1 AB",
+        url: "https://www.youtube.com/embed/gOLl4DoJsrU"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "The derivative of e^x.",

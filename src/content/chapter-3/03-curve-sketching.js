@@ -51,6 +51,38 @@ export default {
       },
     ],
     visualizations: [
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Definite Integral as a Function of X Calculus 1 AB",
+        url: "https://www.youtube.com/embed/0s4qX1wBuJw"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Summary of Curve Sketching Rational Exponent Odd Function Calculus 1 AB",
+        url: "https://www.youtube.com/embed/2W58muXRV6g"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "Summary of Curve Sketching Rational Function with Slant Asymptote Calculus 1 AB",
+        url: "https://www.youtube.com/embed/pIUHXjIcRGI"
+      }
+    },
+    {
+      type: "react",
+      component: "VideoEmbed",
+      params: {
+        title: "First Derivative Test Intervals of Increasing Decreasing & Relative Extrema Calculus 1 AB",
+        url: "https://www.youtube.com/embed/PBKnttVMbV4"
+      }
+    },
       {
         id: 'VideoEmbed',
         title: "Relative and Absolute Maximums and Minimums | Part I",
