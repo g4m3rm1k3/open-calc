@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import KatexInline from '../../math/KatexInline.jsx';
 
 const TAU = 2 * Math.PI;
 
@@ -11,6 +12,7 @@ export default function ProofCircleLinkLab() {
   const [theta, setTheta] = useState(Math.PI / 6);
   const [h, setH] = useState(0.45);
   const [focus, setFocus] = useState(null);
+  const lineRefs = useRef({});
 
   const model = useMemo(() => {
     const x = Math.cos(theta);
@@ -36,6 +38,15 @@ export default function ProofCircleLinkLab() {
   const showVerticalGlow = focus === 'vertical';
   const showGapBlink = focus === 'horizontal';
 
+  useEffect(() => {
+    const key = focus === 'vertical' ? 'verticalLine' : focus === 'horizontal' ? 'horizontalLine' : null;
+    if (!key) return;
+    const node = lineRefs.current[key];
+    if (node && typeof node.scrollIntoView === 'function') {
+      node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [focus]);
+
   return (
     <div className="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
       <style>{`
@@ -51,11 +62,47 @@ export default function ProofCircleLinkLab() {
         Hover the proof terms. The matching geometry on the circle lights up so the algebra reads like a high-definition script of motion.
       </p>
 
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-4 mb-4 max-h-44 overflow-auto">
+        <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Linked proof lines</p>
+        <div className="space-y-2 text-sm leading-relaxed">
+          <p>
+            <KatexInline expr="\frac{d}{dx}[\sin x] = \lim_{h\to 0}\frac{\sin(x+h)-\sin x}{h}" />
+          </p>
+          <p
+            ref={(el) => {
+              lineRefs.current.horizontalLine = el;
+            }}
+            onMouseEnter={() => setFocus('horizontal')}
+            onMouseLeave={() => setFocus(null)}
+            className={`rounded px-2 py-1 transition-colors ${
+              showGapBlink ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-transparent'
+            }`}
+          >
+            <KatexInline expr="\cdots + \sin x\cdot\frac{\cos h - 1}{h} + \cdots" />
+          </p>
+          <p
+            ref={(el) => {
+              lineRefs.current.verticalLine = el;
+            }}
+            onMouseEnter={() => setFocus('vertical')}
+            onMouseLeave={() => setFocus(null)}
+            className={`rounded px-2 py-1 transition-colors ${
+              showVerticalGlow ? 'bg-rose-100 dark:bg-rose-900/30' : 'bg-transparent'
+            }`}
+          >
+            <KatexInline expr="\cdots + \cos x\cdot\frac{\sin h}{h}" />
+          </p>
+          <p>
+            <KatexInline expr="h\to 0:\ \frac{\cos h - 1}{h}\to 0,\ \frac{\sin h}{h}\to 1,\ \text{so only cosine survives.}" />
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
         <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Formal proof split</p>
-          <p className="font-mono text-sm mb-3 break-words">
-            d/dx[sin x] = lim h-&gt;0 [
+          <p className="text-sm mb-3 break-words">
+            <KatexInline expr="\frac{d}{dx}[\sin x] = \lim_{h\to 0}\left[" />
             <span
               className="px-1 rounded cursor-pointer transition-colors"
               onMouseEnter={() => setFocus('horizontal')}
@@ -65,9 +112,9 @@ export default function ProofCircleLinkLab() {
               tabIndex={0}
               style={{ backgroundColor: showGapBlink ? 'rgba(245, 158, 11, 0.25)' : 'transparent' }}
             >
-              sin x * (cos h - 1)/h
+              <KatexInline expr="\sin x\cdot\frac{\cos h - 1}{h}" />
             </span>
-            {' + '}
+            <span className="mx-1"><KatexInline expr="+" /></span>
             <span
               className="px-1 rounded cursor-pointer transition-colors"
               onMouseEnter={() => setFocus('vertical')}
@@ -77,9 +124,9 @@ export default function ProofCircleLinkLab() {
               tabIndex={0}
               style={{ backgroundColor: showVerticalGlow ? 'rgba(239, 68, 68, 0.25)' : 'transparent' }}
             >
-              cos x * sin h/h
+              <KatexInline expr="\cos x\cdot\frac{\sin h}{h}" />
             </span>
-            ]
+            <KatexInline expr="\right]" />
           </p>
 
           <div className="space-y-2 text-sm">
