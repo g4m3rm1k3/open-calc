@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { parse, derivative, evaluate } from 'mathjs'
 import KatexBlock from '../math/KatexBlock.jsx'
 import OpenInGrapher from '../lesson/OpenInGrapher.jsx'
@@ -94,6 +94,52 @@ const RULE_LIBRARY = {
       explanation: 'It comes from product rule plus reciprocal derivative: f/g = f * g^{-1}.',
     },
   },
+}
+
+const LOCAL_SNAPSHOT_STORE_KEY = 'universal-calc-snapshots-v1'
+
+function loadLocalSnapshotStore() {
+  try {
+    const raw = localStorage.getItem(LOCAL_SNAPSHOT_STORE_KEY)
+    const parsed = raw ? JSON.parse(raw) : {}
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveLocalSnapshotStore(store) {
+  localStorage.setItem(LOCAL_SNAPSHOT_STORE_KEY, JSON.stringify(store))
+}
+
+function isDegenerateSnapshot(snapshot) {
+  if (!snapshot || !Array.isArray(snapshot.steps) || !snapshot.steps.length) return false
+
+  const normalizeSavedLine = (line) => {
+    const text = String(line || '').trim().replace(/^f'\(x\)\s*=\s*/i, '')
+    return compactLatex(text)
+  }
+
+  const appliedNorm = snapshot.steps.map((s) => normalizeSavedLine(s?.applied))
+  const outcomeNorm = snapshot.steps.map((s) => normalizeSavedLine(s?.outcome))
+
+  const appliedSet = new Set(appliedNorm)
+  const outcomeSet = new Set(outcomeNorm)
+  const unchangedPairs = snapshot.steps.reduce((count, s) => {
+    const a = normalizeSavedLine(s?.applied)
+    const o = normalizeSavedLine(s?.outcome)
+    return count + (a === o ? 1 : 0)
+  }, 0)
+
+  // Treat snapshots as degenerate if they carry almost no progression signal.
+  if (appliedSet.size <= 1 && outcomeSet.size <= 1) return true
+  if (snapshot.steps.length >= 2 && unchangedPairs === snapshot.steps.length) return true
+  return false
+}
+
+function hasAnyCommentary(snapshot) {
+  if (!snapshot || !Array.isArray(snapshot.steps)) return false
+  return snapshot.steps.some((s) => String(s?.commentary || '').trim().length > 0)
 }
 
 function toLatex(node) {
@@ -1039,6 +1085,16 @@ function WhyPanel({ why, depth = 0 }) {
 export default function UniversalCalcExplainer() {
   const [input, setInput] = useState('sin(x^3) * (x^2 + 1)')
   const [submitted, setSubmitted] = useState('sin(x^3) * (x^2 + 1)')
+  const [currentFunctionKey, setCurrentFunctionKey] = useState(() => preprocessFriendlyInput('sin(x^3) * (x^2 + 1)'))
+  const [savedSnapshots, setSavedSnapshots] = useState(() => loadLocalSnapshotStore())
+  const [tutorialSnapshot, setTutorialSnapshot] = useState({
+    equation: '',
+    isAuthoringMode: false,
+    steps: [],
+  })
+  const [isImportedSnapshot, setIsImportedSnapshot] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [toast, setToast] = useState('')
   const [recentInputs, setRecentInputs] = useState(() => {
     try {
       const raw = localStorage.getItem('universal-calc-recent-inputs')
@@ -1060,8 +1116,234 @@ export default function UniversalCalcExplainer() {
     }
   }, [submitted])
 
+  const dynamicSnapshot = useMemo(() => {
+    if (!explanation) return null
+
+    const filtered = explanation.steps.filter((step) => {
+      const tag = String(step.tag || '').toLowerCase()
+      if (tag.includes('identify')) return false
+      if (tag.includes('numeric')) return false
+      if (tag.includes('common pitfall')) return false
+      if (tag.includes('simplify')) return false
+      return true
+    })
+
+    let rollingExpr = `\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`
+    const steps = filtered.map((step) => {
+      const primaryRule = step.ruleCodes?.[0]
+      const ruleUsed = primaryRule && RULE_LIBRARY[primaryRule]
+        ? RULE_LIBRARY[primaryRule].label
+        : (step.tag || 'Custom Step')
+
+      let beforeExpr = step.globalBefore || rollingExpr
+      let outcomeExpr = step.globalAfter || rollingExpr
+
+      // If global replacement failed for a step, fallback to local equation sides
+      // so each line still reflects a real transformation.
+      if (compactLatex(beforeExpr) === compactLatex(outcomeExpr)) {
+        const localEq = extractPrimaryEquality(step.math)
+        if (localEq.before && localEq.after && compactLatex(localEq.before) !== compactLatex(localEq.after)) {
+          beforeExpr = tidyDisplayLatex(localEq.before)
+          outcomeExpr = tidyDisplayLatex(localEq.after)
+        }
+      }
+
+      rollingExpr = outcomeExpr
+
+      return {
+        ruleUsed,
+        applied: `f'(x)=${beforeExpr}`,
+        outcome: `f'(x)=${outcomeExpr}`,
+        commentary: '',
+        note: step.note || '',
+        why: step.why || null,
+      }
+    })
+
+    return {
+      equation: `f(x) = ${explanation.inputLatex}`,
+      steps,
+      finalLatex: explanation.finalLatex,
+      inputExpr: explanation.inputExpr,
+      finalExpr: explanation.finalExpr,
+      derivativeStart: `f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`,
+    }
+  }, [explanation])
+
+  useEffect(() => {
+    if (isImportedSnapshot || !dynamicSnapshot) return
+
+    const saved = loadLocalSnapshotStore()[currentFunctionKey]
+    if (saved && Array.isArray(saved.steps) && saved.steps.length) {
+      // Ignore and purge obviously broken snapshots (all steps identical).
+      if (isDegenerateSnapshot(saved)) {
+        setSavedSnapshots((prev) => {
+          const next = { ...prev }
+          delete next[currentFunctionKey]
+          saveLocalSnapshotStore(next)
+          return next
+        })
+        setToast('Corrupted saved snapshot was reset to fresh dynamic steps.')
+      } else {
+      setTutorialSnapshot((prev) => ({
+        equation: String(saved.equation || dynamicSnapshot.equation),
+        isAuthoringMode: prev.isAuthoringMode,
+        steps: saved.steps.map((step) => ({
+          ruleUsed: String(step?.ruleUsed || 'Custom Step'),
+          applied: String(step?.applied || ''),
+          outcome: String(step?.outcome || ''),
+          commentary: String(step?.commentary || ''),
+          note: '',
+          why: null,
+        })),
+      }))
+      return
+      }
+    }
+
+    setTutorialSnapshot((prev) => {
+      const mergedSteps = dynamicSnapshot.steps.map((step, idx) => ({
+        ...step,
+        commentary: prev.steps?.[idx]?.commentary || '',
+      }))
+
+      return {
+        equation: dynamicSnapshot.equation,
+        isAuthoringMode: prev.isAuthoringMode,
+        steps: mergedSteps,
+      }
+    })
+  }, [dynamicSnapshot, isImportedSnapshot, currentFunctionKey])
+
+  useEffect(() => {
+    if (!currentFunctionKey) return
+    if (!tutorialSnapshot.equation || !Array.isArray(tutorialSnapshot.steps) || !tutorialSnapshot.steps.length) return
+
+    // Persist authored/imported/tutorial commentary snapshots, but avoid saving
+    // passive unedited dynamic renders that can overwrite good stored content.
+    const shouldPersist = tutorialSnapshot.isAuthoringMode || isImportedSnapshot || hasAnyCommentary(tutorialSnapshot)
+    if (!shouldPersist) return
+
+    const persisted = {
+      equation: tutorialSnapshot.equation,
+      steps: tutorialSnapshot.steps.map((step) => ({
+        ruleUsed: String(step.ruleUsed || 'Custom Step'),
+        applied: String(step.applied || ''),
+        outcome: String(step.outcome || ''),
+        commentary: String(step.commentary || ''),
+      })),
+      updatedAt: Date.now(),
+    }
+
+    setSavedSnapshots((prev) => {
+      const next = { ...prev, [currentFunctionKey]: persisted }
+      saveLocalSnapshotStore(next)
+      return next
+    })
+  }, [tutorialSnapshot, currentFunctionKey, isImportedSnapshot])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(''), 1800)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  const displayedSteps = tutorialSnapshot.steps
+  const derivativeStartExpr = displayedSteps[0]?.applied || dynamicSnapshot?.derivativeStart || ''
+
+  function updateStep(index, patch) {
+    setTutorialSnapshot((prev) => ({
+      ...prev,
+      steps: prev.steps.map((step, i) => (i === index ? { ...step, ...patch } : step)),
+    }))
+  }
+
+  function deleteStep(index) {
+    setTutorialSnapshot((prev) => ({
+      ...prev,
+      steps: prev.steps.filter((_, i) => i !== index),
+    }))
+  }
+
+  function deleteSavedForCurrentFunction() {
+    if (!currentFunctionKey) return
+
+    setSavedSnapshots((prev) => {
+      if (!prev[currentFunctionKey]) return prev
+      const next = { ...prev }
+      delete next[currentFunctionKey]
+      saveLocalSnapshotStore(next)
+      return next
+    })
+
+    setIsImportedSnapshot(false)
+
+    // Rebuild from current dynamic explanation immediately when available.
+    if (dynamicSnapshot) {
+      setTutorialSnapshot((prev) => ({
+        equation: dynamicSnapshot.equation,
+        isAuthoringMode: prev.isAuthoringMode,
+        steps: dynamicSnapshot.steps.map((step) => ({ ...step, commentary: '' })),
+      }))
+    }
+
+    setToast('Saved version deleted. Showing fresh steps.')
+  }
+
+  async function handleExportTutorial() {
+    const payload = {
+      equation: tutorialSnapshot.equation,
+      steps: tutorialSnapshot.steps.map((step) => ({
+        ruleUsed: step.ruleUsed || 'Custom Step',
+        applied: String(step.applied || ''),
+        outcome: String(step.outcome || ''),
+        commentary: String(step.commentary || ''),
+      })),
+    }
+    const text = JSON.stringify(payload, null, 2)
+
+    try {
+      await navigator.clipboard.writeText(text)
+      setToast('Copied!')
+    } catch {
+      setImportText(text)
+      setToast('Clipboard blocked: JSON placed in import box.')
+    }
+  }
+
+  function handleImportTutorial() {
+    try {
+      const parsed = JSON.parse(importText)
+      if (!parsed || !Array.isArray(parsed.steps)) {
+        throw new Error('Invalid snapshot')
+      }
+
+      const normalized = {
+        equation: String(parsed.equation || ''),
+        isAuthoringMode: false,
+        steps: parsed.steps.map((step) => ({
+          ruleUsed: String(step?.ruleUsed || 'Custom Step'),
+          applied: String(step?.applied || ''),
+          outcome: String(step?.outcome || ''),
+          commentary: String(step?.commentary || ''),
+          note: '',
+          why: null,
+        })),
+      }
+
+      setTutorialSnapshot(normalized)
+      setCurrentFunctionKey(preprocessFriendlyInput(normalizeInput(input)))
+      setIsImportedSnapshot(true)
+      setToast('Tutorial loaded.')
+    } catch {
+      setToast('Invalid JSON.')
+    }
+  }
+
   function handleExplain() {
     const normalized = normalizeInput(input)
+    setCurrentFunctionKey(preprocessFriendlyInput(normalized))
+    setIsImportedSnapshot(false)
     setSubmitted(normalized)
     const nextRecent = [normalized, ...recentInputs.filter((e) => e !== normalized)].slice(0, 5)
     setRecentInputs(nextRecent)
@@ -1113,19 +1395,68 @@ export default function UniversalCalcExplainer() {
           </button>
           <p className="text-xs text-slate-500 dark:text-slate-400">Supported: +, -, *, /, ^, sin, cos, tan, exp, log (variable x)</p>
         </div>
+
+        <div className="mt-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 p-3 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setTutorialSnapshot((prev) => ({ ...prev, isAuthoringMode: !prev.isAuthoringMode }))}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${tutorialSnapshot.isAuthoringMode
+                ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-700'
+                : 'bg-white text-slate-700 border-slate-300 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700'}`}
+            >
+              {tutorialSnapshot.isAuthoringMode ? 'Authoring: ON' : 'Authoring: OFF'}
+            </button>
+
+            <button
+              onClick={handleExportTutorial}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Export Tutorial
+            </button>
+
+            <button
+              onClick={deleteSavedForCurrentFunction}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              Delete Saved For This Function
+            </button>
+
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Saved functions: {Object.keys(savedSnapshots).length}
+            </span>
+
+            {toast && <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{toast}</span>}
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Import Tutorial JSON</p>
+            <textarea
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              className="w-full min-h-[110px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 font-mono text-xs text-slate-700 dark:text-slate-200"
+              placeholder='{"equation":"f(x)=...","steps":[...]}'
+            />
+            <button
+              onClick={handleImportTutorial}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              Load Imported Tutorial
+            </button>
+          </div>
+        </div>
       </div>
 
-      {error && (
+      {error && !isImportedSnapshot && (
         <div className="mb-4 rounded-xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm">
           {error}
         </div>
       )}
 
-      {explanation && (
+      {(displayedSteps.length > 0 || dynamicSnapshot) && (
         <>
           <div className="mb-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <p className="text-xs uppercase tracking-wide font-bold text-slate-500 dark:text-slate-400 mb-2">Problem</p>
-            <KatexBlock expr={`f(x) = ${explanation.inputLatex}`} className="text-slate-900 dark:text-slate-100" />
+            <KatexBlock expr={tutorialSnapshot.equation || dynamicSnapshot?.equation || ''} className="text-slate-900 dark:text-slate-100" />
           </div>
 
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-6">
@@ -1138,70 +1469,96 @@ export default function UniversalCalcExplainer() {
               <div className="border-b border-slate-100 dark:border-slate-800 pb-5">
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-2">Problem</p>
                 <div className="overflow-x-auto max-w-full">
-                  <KatexBlock expr={`f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`} className="text-[0.92rem] lg:text-[1rem] text-slate-900 dark:text-slate-100" />
+                  <KatexBlock expr={derivativeStartExpr} className="text-[0.92rem] lg:text-[1rem] text-slate-900 dark:text-slate-100" />
                 </div>
               </div>
 
-              {(() => {
-                const filtered = explanation.steps.filter((step) => {
-                  const tag = String(step.tag || '').toLowerCase()
-                  if (tag.includes('identify')) return false
-                  if (tag.includes('numeric')) return false
-                  if (tag.includes('common pitfall')) return false
-                  if (tag.includes('simplify')) return false
-                  return true
-                })
+              {displayedSteps.map((step, i) => {
+                const ruleLabel = step.ruleUsed || 'Custom Step'
 
-                let rollingExpr = `\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`
-
-                return filtered.map((step, i) => {
-                  const primaryRule = step.ruleCodes?.[0]
-                  const ruleLabel = primaryRule && RULE_LIBRARY[primaryRule]
-                    ? RULE_LIBRARY[primaryRule].label
-                    : step.tag
-
-                  const beforeExpr = step.globalBefore || rollingExpr
-                  const outcomeExpr = step.globalAfter || rollingExpr
-                  rollingExpr = outcomeExpr
-
-                  return (
-                    <div key={step.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
+                return (
+                  <div key={`${ruleLabel}-${i}`} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
                       <div className="min-w-0 space-y-3">
                         <div>
                           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Applied</p>
                           <p className="text-base text-slate-700 dark:text-slate-300 mb-2">Apply {ruleLabel.toLowerCase()}.</p>
-                          <div className="overflow-x-auto max-w-full">
-                            <KatexBlock expr={`f'(x)=${beforeExpr}`} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
-                          </div>
-                          <div className="overflow-x-auto max-w-full mt-2">
-                            <KatexBlock expr={step.math} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
-                          </div>
+
+                          {tutorialSnapshot.isAuthoringMode ? (
+                            <textarea
+                              value={step.applied || ''}
+                              onChange={(e) => updateStep(i, { applied: e.target.value })}
+                              className="w-full min-h-[80px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-2 font-mono text-xs text-slate-700 dark:text-slate-200"
+                            />
+                          ) : (
+                            <div className="overflow-x-auto max-w-full">
+                              <KatexBlock expr={step.applied || ''} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
+                            </div>
+                          )}
                         </div>
 
                         <div>
                           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Outcome</p>
-                          <div className="overflow-x-auto max-w-full">
-                            <KatexBlock expr={`f'(x)=${outcomeExpr}`} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
-                          </div>
+
+                          {tutorialSnapshot.isAuthoringMode ? (
+                            <textarea
+                              value={step.outcome || ''}
+                              onChange={(e) => updateStep(i, { outcome: e.target.value })}
+                              className="w-full min-h-[80px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-2 font-mono text-xs text-slate-700 dark:text-slate-200"
+                            />
+                          ) : (
+                            <div className="overflow-x-auto max-w-full">
+                              <KatexBlock expr={step.outcome || ''} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
+                            </div>
+                          )}
                         </div>
 
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{step.note}</p>
-                        {step.why && <WhyPanel why={step.why} depth={0} />}
+                        {tutorialSnapshot.isAuthoringMode ? (
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Commentary</p>
+                            <textarea
+                              value={step.commentary || ''}
+                              onChange={(e) => updateStep(i, { commentary: e.target.value })}
+                              className="w-full min-h-[90px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 p-2 text-sm text-slate-700 dark:text-slate-200"
+                              placeholder="Author commentary for this step..."
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            {step.note ? <p className="text-sm text-slate-500 dark:text-slate-400">{step.note}</p> : null}
+                            {step.commentary?.trim() ? (
+                              <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-900/20 p-3">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mb-1">Director&apos;s Commentary</p>
+                                <p className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed">{step.commentary}</p>
+                              </div>
+                            ) : null}
+                            {step.why ? <WhyPanel why={step.why} depth={0} /> : null}
+                          </>
+                        )}
                       </div>
 
-                      <div className="text-sm font-semibold text-slate-500 dark:text-slate-400">Step {i + 1}</div>
+                      <div className="flex flex-col items-end gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                        <span>Step {i + 1}</span>
+                        {tutorialSnapshot.isAuthoringMode && (
+                          <button
+                            onClick={() => deleteStep(i)}
+                            className="px-2 py-1 rounded-lg border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 text-xs"
+                          >
+                            Delete Step
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  )
-                })
-              })()}
+                )
+              })}
             </div>
           </div>
 
+          {!isImportedSnapshot && dynamicSnapshot && (
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
             <div>
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Simplified / factored</p>
-              <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+              <KatexBlock expr={`f'(x) = ${dynamicSnapshot.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
             </div>
             <div className="mt-4">
               <OpenInGrapher
@@ -1211,8 +1568,8 @@ export default function UniversalCalcExplainer() {
                   mode: 'pro',
                   replace: true,
                   functions: [
-                    { expr: explanation.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
-                    { expr: explanation.finalExpr, type: 'explicit', color: '#ec4899', label: "f'(x)" },
+                    { expr: dynamicSnapshot.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
+                    { expr: dynamicSnapshot.finalExpr, type: 'explicit', color: '#ec4899', label: "f'(x)" },
                   ],
                 }}
               />
@@ -1221,6 +1578,7 @@ export default function UniversalCalcExplainer() {
               </p>
             </div>
           </div>
+          )}
         </>
       )}
 
