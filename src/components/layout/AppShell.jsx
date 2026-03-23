@@ -78,6 +78,7 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
         <NavLink to="/chapter/p0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Physics</NavLink>
         <NavLink to="/chapter/discrete-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Discrete Math</NavLink>
         <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
+        <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
         
         <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
            <span className="text-sm font-bold text-slate-500">DSA</span>

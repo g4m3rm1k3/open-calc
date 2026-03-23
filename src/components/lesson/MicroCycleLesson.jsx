@@ -334,6 +334,14 @@ export default function MicroCycleLesson({ lesson }) {
       <RigorBlock data={lesson.rigor} />
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} />
+      {lesson.supplementalVisualizations?.length > 0 && (
+        <div className="mt-12 space-y-8">
+          <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />
+          {lesson.supplementalVisualizations.map((v, i) => (
+            <VizCard key={i} viz={v} borderColor="border-brand-200 dark:border-brand-900/60" />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

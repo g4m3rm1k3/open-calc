@@ -248,8 +248,8 @@ export default function ScrubbableExample({ example, number }) {
         </div>
 
         {/* Unified Layer: math move + strategy intent + optional synced visuals */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-6">
-          <div className={`relative border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-6 bg-white dark:bg-[#0f172a] ${visualizations.length > 0 ? 'lg:w-[55%]' : 'w-full'}`}>
+        <div className="flex flex-col gap-6 mb-6">
+          <div className={`relative border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-6 bg-white dark:bg-[#0f172a] w-full`}>
             <div className="grid gap-4 items-start grid-cols-1">
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
                 <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 dark:text-slate-400 mb-2">Math Step</p>
@@ -316,7 +316,7 @@ export default function ScrubbableExample({ example, number }) {
           </div>
 
           {visualizations.length > 0 && (
-            <div className="lg:w-[45%] border-2 border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-[#1e293b] p-2 relative min-h-[250px] overflow-hidden space-y-3">
+            <div className="w-full border-2 border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-[#1e293b] p-2 relative min-h-[250px] overflow-hidden space-y-3">
               <div className="absolute top-2 left-2 bg-brand-100 text-brand-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded shadow-sm opacity-90 z-10">Synced Graphic</div>
               <div className="pt-6 space-y-3">
                 {visualizations.map((viz, idx) => (

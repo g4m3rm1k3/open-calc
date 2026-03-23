@@ -712,6 +712,38 @@ export default {
       ],
       conclusion: "f'(x) = x²(14x-3)/√(4x-1). The outer rule was Product Rule; Chain Rule fired inside √(4x-1). The #1 mistake is reaching for Chain Rule first on a product — always identify the outermost operation before picking a rule.",
     },
+    {
+      id: 'ch2-002-ex13',
+      title: 'The Ultimate Chain Rule Boss Fight',
+      problem: "h(x) = (2x + 1)^5 (3x - 2)^7. \\; \\text{Find } h'(x).",
+      steps: [
+        {
+          expression: "h(x) = f(x)g(x) \\implies h'(x) = f'(x)g(x) + f(x)g'(x)",
+          annotation: 'This is first and foremost a Product Rule problem because two distinct blocks are being multiplied.',
+        },
+        {
+          expression: "f(x) = (2x+1)^5 \\implies f'(x) = 10(2x+1)^4",
+          annotation: 'Differentiate the first factor using the Chain Rule (outer power 5, inner deriv 2).',
+        },
+        {
+          expression: "g(x) = (3x-2)^7 \\implies g'(x) = 21(3x-2)^6",
+          annotation: 'Differentiate the second factor using the Chain Rule (outer power 7, inner deriv 3).',
+        },
+        {
+          expression: "h'(x) = 10(2x+1)^4(3x-2)^7 + 21(2x+1)^5(3x-2)^6",
+          annotation: 'Substitute derivatives into the Product Rule formula.',
+        },
+        {
+          expression: "h'(x) = (2x+1)^4(3x-2)^6 \\left[ 10(3x-2) + 21(2x+1) \\right]",
+          annotation: 'Factor out the common terms: the lowest powers (4 and 6) of each block.',
+        },
+        {
+          expression: "= (2x+1)^4(3x-2)^6 (72x + 1)",
+          annotation: 'Expand and simplify inside the square brackets: 30x - 20 + 42x + 21 = 72x + 1.',
+        },
+      ],
+      conclusion: "h'(x) = (2x + 1)\u2074(3x - 2)\u2076(72x + 1). This is the 'Ultimate Boss' check: Product Rule on the outside, two Chain Rules on the inside, and a sophisticated factoring finale.",
+    },
   ],
 
   challenges: [
@@ -880,10 +912,19 @@ export default {
     'completed-example-10',
     'completed-example-11',
     'completed-example-12',
+    'completed-example-13',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',
     'attempted-challenge-table',
     'attempted-challenge-combo',
+  ],
+  supplementalVisualizations: [
+    {
+      id: 'ProductPowerChainRuleViz',
+      title: 'Problem 3 Solution Walkthrough',
+      mathBridge: 'Most textbooks skip the intermediate algebra for this problem. This interactive peeler reveals every "hidden" factoring step and provides live numeric proof for every deduction.',
+      caption: 'Detailed step-by-step solution for h(x) = (2x + 1)⁵(3x - 2)⁷',
+    }
   ],
 };
