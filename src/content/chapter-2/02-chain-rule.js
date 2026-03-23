@@ -78,6 +78,11 @@ export default {
         props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
       },
       {
+        id: "DeepProofSolver",
+        props:{},
+        title:"Dependency Hierarchy Proof: H(x) = sin(x^3)"
+      },
+      {
         id: 'VideoEmbed',
         title: "Chain Rule: the Derivative of a Composition",
         props: { url: "https://www.youtube.com/embed/CPnrs2Yl-rY" }
@@ -86,6 +91,11 @@ export default {
         id: 'VideoEmbed',
         title: "Calculus I - 2.4.1 The Chain Rule and General Power Rule",
         props: { url: "https://www.youtube.com/embed/Ptz1fa8lLyg" }
+      },
+            {
+        id: "RecursiveProofStepper",
+        props:{},
+        title:"Dependency Hierarchy Proof: H(x) = sin(x^3)"
       },
       {
         id: 'VideoEmbed',
