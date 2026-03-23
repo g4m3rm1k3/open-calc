@@ -14,6 +14,14 @@ const DEPTH_STYLES = [
 const DEPTH_BTN_LABELS = ['Why?', 'But why?', 'Prove it', 'From scratch', 'Axioms']
 
 const RULE_LIBRARY = {
+  constant: {
+    label: 'Constant Rule',
+    formula: "\\frac{d}{dx}c=0",
+    why: {
+      tag: 'Why constant rule?',
+      explanation: 'A constant does not vary with x, so its rate of change is zero.',
+    },
+  },
   product: {
     label: 'Product Rule',
     formula: "\\frac{d}{dx}(fg)=f'g+fg'",
@@ -54,12 +62,36 @@ const RULE_LIBRARY = {
       explanation: 'These come from angle-addition identities and fundamental trig limits.',
     },
   },
+  log: {
+    label: 'Log Derivative',
+    formula: "(\\ln x)'=\\frac{1}{x}",
+    why: {
+      tag: 'Why log derivative?',
+      explanation: 'It follows from the inverse relationship between exp and ln, plus the chain rule for nested inputs.',
+    },
+  },
+  exp: {
+    label: 'Exponential Derivative',
+    formula: "(e^x)'=e^x",
+    why: {
+      tag: 'Why exponential derivative?',
+      explanation: 'The exponential is its own derivative, and with nested input we multiply by the inner derivative.',
+    },
+  },
   sum: {
     label: 'Sum Rule',
     formula: "\\frac{d}{dx}(f+g)=f'+g'",
     why: {
       tag: 'Why Sum Rule?',
       explanation: 'Differentiation is linear when limits exist, so derivatives distribute over addition.',
+    },
+  },
+  quotient: {
+    label: 'Quotient Rule',
+    formula: "\\frac{d}{dx}\\left(\\frac{f}{g}\\right)=\\frac{f'g-fg'}{g^2}",
+    why: {
+      tag: 'Why quotient rule?',
+      explanation: 'It comes from product rule plus reciprocal derivative: f/g = f * g^{-1}.',
     },
   },
 }
@@ -109,6 +141,8 @@ function detectRules(node) {
     if (n.isFunctionNode) {
       const name = n.fn?.name
       if (['sin', 'cos', 'tan'].includes(name)) rules.push('trig')
+      if (name === 'exp') rules.push('exp')
+      if (name === 'log' || name === 'ln') rules.push('log')
       const arg = n.args?.[0]
       if (arg && nodeHasX(arg) && !(arg.isSymbolNode && arg.name === 'x')) rules.push('chain')
     }
@@ -182,6 +216,33 @@ function validateDerivativeOnlyInput(raw) {
   return ''
 }
 
+function preprocessFriendlyInput(raw) {
+  let text = normalizeInput(raw)
+    .replace(/\*\*/g, '^')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  text = text
+    .replace(/\b(sin|cos|tan|exp|log|sqrt|abs)\s+([a-zA-Z0-9_\.]+)/g, '$1($2)')
+    .replace(/(\d)([a-zA-Z(])/g, '$1*$2')
+    .replace(/([a-zA-Z)])(\d)/g, '$1*$2')
+    .replace(/(\))(\()/g, '$1*$2')
+    .replace(/(\))([a-zA-Z])/g, '$1*$2')
+
+  return text
+}
+
+function friendlyParse(raw) {
+  const text = preprocessFriendlyInput(raw)
+  try {
+    return parse(text)
+  } catch {
+    throw new Error(
+      `Cannot parse "${raw}". Common fixes: use * for multiplication (2*x), use ^ for powers (x^2), and write trig as sin(x).`
+    )
+  }
+}
+
 function findNumericCheck(exprText, derivText) {
   const candidates = [1, 2, 0.5, -1, 3]
   const h = 1e-5
@@ -202,12 +263,313 @@ function findNumericCheck(exprText, derivText) {
   return null
 }
 
+function makeDifferentiator(varName = 'x') {
+  let seq = 0
+  const nextId = (prefix) => `${prefix}-${++seq}`
+
+  function safeTex(node) {
+    return toLatex(node)
+  }
+
+  function isIndependentOfVar(node) {
+    return !nodeHasX(node)
+  }
+
+  function trace(node, path = 'root') {
+    const steps = []
+
+    if (node.isConstantNode || (node.isSymbolNode && node.name !== varName)) {
+      steps.push({
+        id: nextId(`${path}-const`),
+        tag: 'Constant Rule',
+        title: 'Derivative of a constant is zero',
+        math: `\\frac{d}{d${varName}} ${safeTex(node)} = 0`,
+        note: 'No change occurs when x varies.',
+        ruleCodes: ['constant'],
+        why: RULE_LIBRARY.constant.why,
+      })
+      return { derivativeNode: parse('0'), steps }
+    }
+
+    if (node.isSymbolNode && node.name === varName) {
+      steps.push({
+        id: nextId(`${path}-x`),
+        tag: 'Power Rule (n=1)',
+        title: 'Derivative of x is 1',
+        math: `\\frac{d}{d${varName}} ${varName} = 1`,
+        note: 'x^1 differentiates to 1*x^0 = 1.',
+        ruleCodes: ['power'],
+        why: RULE_LIBRARY.power.why,
+      })
+      return { derivativeNode: parse('1'), steps }
+    }
+
+    if (node.isOperatorNode && (node.op === '+' || node.op === '-') && node.args.length === 2) {
+      const [left, right] = node.args
+      const leftRes = trace(left, `${path}-sum-left`)
+      const rightRes = trace(right, `${path}-sum-right`)
+      const derivativeNode = parse(`(${wrapIfNeeded(leftRes.derivativeNode)}) ${node.op} (${wrapIfNeeded(rightRes.derivativeNode)})`)
+
+      steps.push({
+        id: nextId(`${path}-sum-rule`),
+        tag: 'Sum/Difference Rule',
+        title: `Apply ${node.op === '+' ? 'sum' : 'difference'} rule`,
+        math: `\\frac{d}{d${varName}}(${safeTex(left)} ${node.op} ${safeTex(right)}) = \\frac{d}{d${varName}}(${safeTex(left)}) ${node.op} \\frac{d}{d${varName}}(${safeTex(right)})`,
+        note: 'Linearity lets us differentiate each term separately.',
+        ruleCodes: ['sum'],
+        why: RULE_LIBRARY.sum.why,
+      })
+      steps.push(...leftRes.steps)
+      steps.push(...rightRes.steps)
+      steps.push({
+        id: nextId(`${path}-sum-merge`),
+        tag: 'Combine terms',
+        title: 'Unsimplified sum result',
+        math: `f'(x) = ${safeTex(derivativeNode)}`,
+        note: 'Keep this form before algebraic simplification.',
+        ruleCodes: ['sum'],
+      })
+
+      return { derivativeNode, steps }
+    }
+
+    if (node.isOperatorNode && node.op === '*' && node.args.length === 2) {
+      const [left, right] = node.args
+      const leftDependsOnX = nodeHasX(left)
+      const rightDependsOnX = nodeHasX(right)
+
+      if (isIndependentOfVar(left) && rightDependsOnX) {
+        const rightRes = trace(right, `${path}-constmul-right`)
+        const derivativeNode = parse(`(${wrapIfNeeded(left)}) * (${wrapIfNeeded(rightRes.derivativeNode)})`)
+
+        steps.push({
+          id: nextId(`${path}-constmul-rule`),
+          tag: 'Constant Multiple Rule',
+          title: 'Pull constant factor through derivative',
+          math: `\\frac{d}{d${varName}}(${safeTex(left)}\\cdot ${safeTex(right)}) = ${safeTex(left)}\\cdot\\frac{d}{d${varName}}(${safeTex(right)})`,
+          note: 'Constant factor is unchanged.',
+          ruleCodes: ['constant'],
+          why: {
+            tag: 'Why constant multiple?',
+            explanation: 'Scaling a function by a constant scales its slope by that same constant.',
+            why: RULE_LIBRARY.sum.why,
+          },
+        })
+        steps.push(...rightRes.steps)
+        steps.push({
+          id: nextId(`${path}-constmul-merge`),
+          tag: 'Combine terms',
+          title: 'Unsimplified result',
+          math: `f'(x) = ${safeTex(derivativeNode)}`,
+          note: 'Constant stays in front.',
+          ruleCodes: ['constant'],
+        })
+        return { derivativeNode, steps }
+      }
+
+      if (leftDependsOnX && isIndependentOfVar(right)) {
+        const leftRes = trace(left, `${path}-constmul-left`)
+        const derivativeNode = parse(`(${wrapIfNeeded(leftRes.derivativeNode)}) * (${wrapIfNeeded(right)})`)
+
+        steps.push({
+          id: nextId(`${path}-constmul-rule`),
+          tag: 'Constant Multiple Rule',
+          title: 'Pull constant factor through derivative',
+          math: `\\frac{d}{d${varName}}(${safeTex(left)}\\cdot ${safeTex(right)}) = \\frac{d}{d${varName}}(${safeTex(left)})\\cdot ${safeTex(right)}`,
+          note: 'Constant factor is unchanged.',
+          ruleCodes: ['constant'],
+          why: {
+            tag: 'Why constant multiple?',
+            explanation: 'Scaling a function by a constant scales its slope by that same constant.',
+            why: RULE_LIBRARY.sum.why,
+          },
+        })
+        steps.push(...leftRes.steps)
+        steps.push({
+          id: nextId(`${path}-constmul-merge`),
+          tag: 'Combine terms',
+          title: 'Unsimplified result',
+          math: `f'(x) = ${safeTex(derivativeNode)}`,
+          note: 'Constant stays in front.',
+          ruleCodes: ['constant'],
+        })
+        return { derivativeNode, steps }
+      }
+
+      const leftTrace = trace(left, `${path}-prod-left`)
+      const rightTrace = trace(right, `${path}-prod-right`)
+      const term1 = parse(`(${wrapIfNeeded(leftTrace.derivativeNode)}) * (${wrapIfNeeded(right)})`)
+      const term2 = parse(`(${wrapIfNeeded(left)}) * (${wrapIfNeeded(rightTrace.derivativeNode)})`)
+      const derivativeNode = parse(`(${wrapIfNeeded(term1)}) + (${wrapIfNeeded(term2)})`)
+
+      steps.push({
+        id: nextId(`${path}-prod-rule`),
+        tag: 'Product Rule',
+        title: 'Apply product rule',
+        math: `\\frac{d}{d${varName}}(${safeTex(left)}\\cdot ${safeTex(right)}) = \\frac{d}{d${varName}}(${safeTex(left)})\\cdot ${safeTex(right)} + ${safeTex(left)}\\cdot\\frac{d}{d${varName}}(${safeTex(right)})`,
+        note: 'One term per changing factor.',
+        ruleCodes: ['product'],
+        why: RULE_LIBRARY.product.why,
+      })
+      steps.push(...leftTrace.steps)
+      steps.push(...rightTrace.steps)
+      steps.push({
+        id: nextId(`${path}-prod-merge`),
+        tag: 'Combine product terms',
+        title: 'Unsimplified product result',
+        math: `f'(x) = ${safeTex(derivativeNode)}`,
+        note: 'Unsimplified form preserves full rule trace.',
+        ruleCodes: ['sum'],
+      })
+
+      return { derivativeNode, steps }
+    }
+
+    if (node.isOperatorNode && node.op === '/' && node.args.length === 2) {
+      const numerator = node.args[0]
+      const denominator = node.args[1]
+      const numTrace = trace(numerator, `${path}-quo-num`)
+      const denTrace = trace(denominator, `${path}-quo-den`)
+      const termNum = parse(`((${wrapIfNeeded(numTrace.derivativeNode)}) * (${wrapIfNeeded(denominator)})) - ((${wrapIfNeeded(numerator)}) * (${wrapIfNeeded(denTrace.derivativeNode)}))`)
+      const derivativeNode = parse(`(${wrapIfNeeded(termNum)}) / ((${wrapIfNeeded(denominator)})^2)`)
+
+      steps.push({
+        id: nextId(`${path}-quo-rule`),
+        tag: 'Quotient Rule',
+        title: 'Apply quotient rule',
+        math: `\\frac{d}{d${varName}}\\left(\\frac{${safeTex(numerator)}}{${safeTex(denominator)}}\\right)=\\frac{\\frac{d}{d${varName}}(${safeTex(numerator)})\\cdot ${safeTex(denominator)}-${safeTex(numerator)}\\cdot\\frac{d}{d${varName}}(${safeTex(denominator)})}{(${safeTex(denominator)})^2}`,
+        note: 'Low times derivative of high minus high times derivative of low, over low squared.',
+        ruleCodes: ['quotient', 'product', 'sum', 'power'],
+        why: RULE_LIBRARY.quotient.why,
+      })
+      steps.push(...numTrace.steps)
+      steps.push(...denTrace.steps)
+      steps.push({
+        id: nextId(`${path}-quo-merge`),
+        tag: 'Combine terms',
+        title: 'Write combined unsimplified derivative',
+        math: `f'(x) = ${safeTex(derivativeNode)}`,
+        note: 'Maintain full numerator grouping before simplification.',
+        ruleCodes: ['sum'],
+      })
+
+      return { derivativeNode, steps }
+    }
+
+    if (node.isOperatorNode && node.op === '^' && node.args.length === 2) {
+      const base = node.args[0]
+      const exp = node.args[1]
+
+      if (exp.isConstantNode) {
+        const n = Number(exp.value)
+        if (Number.isFinite(n) && n !== 0) {
+          const baseTrace = trace(base, `${path}-pow-base`)
+          const outer = parse(`${n} * (${wrapIfNeeded(base)})^(${n - 1})`)
+          const derivativeNode = parse(`(${wrapIfNeeded(outer)}) * (${wrapIfNeeded(baseTrace.derivativeNode)})`)
+
+          steps.push({
+            id: nextId(`${path}-pow-rule`),
+            tag: 'Power Rule + Chain Rule',
+            title: 'Apply power rule to u^n',
+            math: `\\frac{d}{d${varName}} [u^{${n}}] = ${n} u^{${n - 1}} \\cdot \\frac{du}{d${varName}}`,
+            note: `u = ${safeTex(base)}.`,
+            ruleCodes: ['power', 'chain'],
+            why: {
+              tag: 'Power + Chain',
+              explanation: 'Power rule needs chain rule whenever the base depends on x.',
+              why: RULE_LIBRARY.power.why,
+            },
+          })
+          steps.push(...baseTrace.steps)
+          steps.push({
+            id: nextId(`${path}-pow-merge`),
+            tag: 'Combine terms',
+            title: 'Write combined unsimplified derivative',
+            math: `f'(x) = ${safeTex(derivativeNode)}`,
+            note: 'Keep chain factor explicit before simplification.',
+            ruleCodes: ['sum'],
+          })
+
+          return { derivativeNode, steps }
+        }
+      }
+    }
+
+    if (node.isFunctionNode && node.args.length === 1) {
+      const name = node.fn?.name?.toLowerCase()
+      const arg = node.args[0]
+      const argTrace = trace(arg, `${path}-fn-arg`)
+
+      let outer = null
+      if (name === 'sin') outer = parse(`cos(${wrapIfNeeded(arg)})`)
+      else if (name === 'cos') outer = parse(`-sin(${wrapIfNeeded(arg)})`)
+      else if (name === 'tan') outer = parse(`1 / (cos(${wrapIfNeeded(arg)})^2)`)
+      else if (name === 'exp') outer = parse(`exp(${wrapIfNeeded(arg)})`)
+      else if (name === 'log' || name === 'ln') outer = parse(`1 / (${wrapIfNeeded(arg)})`)
+
+      if (outer) {
+        const derivativeNode = parse(`(${wrapIfNeeded(outer)}) * (${wrapIfNeeded(argTrace.derivativeNode)})`)
+        const baseRule =
+          name === 'exp' ? 'exp' :
+          (name === 'log' || name === 'ln') ? 'log' :
+          'trig'
+
+        steps.push({
+          id: nextId(`${path}-fn-rule`),
+          tag: `${name.toUpperCase()} Rule + Chain`,
+          title: `Differentiate ${name}(u)`,
+          math: `\\frac{d}{d${varName}} ${name}(u) = ${safeTex(outer)} \\cdot \\frac{du}{d${varName}}`,
+          note: `u = ${safeTex(arg)}.`,
+          ruleCodes: [baseRule, 'chain'],
+          why: name === 'log' || name === 'ln'
+            ? {
+                tag: 'Why log + chain?',
+                explanation: 'The derivative of ln(u) is 1/u, then multiply by du/dx.',
+                why: RULE_LIBRARY.log.why,
+              }
+            : name === 'exp'
+              ? {
+                  tag: 'Why exp + chain?',
+                  explanation: 'exp(u) differentiates to exp(u), then chain rule multiplies by du/dx.',
+                  why: RULE_LIBRARY.exp.why,
+                }
+            : buildWhyFromRules(['trig', 'chain']),
+        })
+        steps.push(...argTrace.steps)
+        steps.push({
+          id: nextId(`${path}-fn-merge`),
+          tag: 'Combine terms',
+          title: 'Write combined unsimplified derivative',
+          math: `f'(x) = ${safeTex(derivativeNode)}`,
+          note: 'Outer derivative times inner derivative.',
+          ruleCodes: ['sum'],
+        })
+        return { derivativeNode, steps }
+      }
+    }
+
+    const derivativeNode = derivative(node, varName)
+    steps.push({
+      id: nextId(`${path}-fallback`),
+      tag: 'Fallback full derivative',
+      title: 'Computed directly (complex structure)',
+      math: `f'(x) = ${safeTex(derivativeNode)}`,
+      note: 'This form uses rules not yet split into atomic teaching steps.',
+      ruleCodes: detectRules(node),
+      why: buildWhyFromRules(detectRules(node)),
+    })
+    return { derivativeNode, steps }
+  }
+
+  return { trace }
+}
+
 function buildExplanation(input) {
-  const normalized = normalizeInput(input)
+  const normalized = preprocessFriendlyInput(input)
   const derivativeOnlyError = validateDerivativeOnlyInput(normalized)
   if (derivativeOnlyError) throw new Error(derivativeOnlyError)
 
-  const exprNode = parse(normalized)
+  const exprNode = friendlyParse(normalized)
   const steps = []
 
   steps.push({
@@ -223,67 +585,23 @@ function buildExplanation(input) {
     },
   })
 
-  let rawNode
-  if (exprNode.isOperatorNode && exprNode.op === '*' && exprNode.args.length === 2) {
-    const left = exprNode.args[0]
-    const right = exprNode.args[1]
-    const dLeft = derivative(left, 'x')
-    const dRight = derivative(right, 'x')
+  const differentiator = makeDifferentiator('x')
+  const { derivativeNode: rawNode, steps: diffSteps } = differentiator.trace(exprNode, 'root')
+  steps.push(...diffSteps)
 
+  const topRules = detectRules(exprNode)
+  if (topRules.includes('product') && topRules.includes('chain')) {
     steps.push({
-      id: 'differentiate-framework',
-      tag: 'Differentiate 3.1',
-      title: 'Setup Product Rule framework with deferred execution',
-      math: `f'(x)=\\left[\\frac{d}{dx}${toLatex(left)}\\right]\\cdot ${toLatex(right)} + ${toLatex(left)}\\cdot\\left[\\frac{d}{dx}${toLatex(right)}\\right]`,
-      note: 'We scaffold first before evaluating each derivative chunk.',
-      ruleCodes: ['product'],
-      why: RULE_LIBRARY.product.why,
-    })
-
-    steps.push({
-      id: 'differentiate-left',
-      tag: 'Differentiate 3.2',
-      title: 'Evaluate the first chunk',
-      math: `\\frac{d}{dx}${toLatex(left)} = ${toLatex(dLeft)}`,
-      note: 'This chunk typically uses chain/trig/power logic depending on the left factor.',
-      ruleCodes: detectRules(left),
-      why: buildWhyFromRules(detectRules(left)),
-    })
-
-    steps.push({
-      id: 'differentiate-right',
-      tag: 'Differentiate 3.3',
-      title: 'Evaluate the second chunk',
-      math: `\\frac{d}{dx}${toLatex(right)} = ${toLatex(dRight)}`,
-      note: 'This chunk isolates derivative rules for the right factor.',
-      ruleCodes: detectRules(right),
-      why: buildWhyFromRules(detectRules(right)),
-    })
-
-    rawNode = parse(`(${wrapIfNeeded(dLeft)})*(${wrapIfNeeded(right)}) + (${wrapIfNeeded(left)})*(${wrapIfNeeded(dRight)})`)
-
-    steps.push({
-      id: 'differentiate-merge',
-      tag: 'Differentiate 3.4',
-      title: 'Merge the evaluated chunks (unsimplified)',
-      math: `f'(x) = ${toLatex(rawNode)}`,
-      note: 'This is the unsimplified result after local derivatives are substituted.',
-      ruleCodes: ['product'],
+      id: 'common-mistake',
+      tag: 'Common Pitfall',
+      title: 'Do not forget chain rule inside product terms',
+      math: `\\text{Incorrect: }\\cos(x^3)\\cdot x^2 + \\sin(x^3)\\cdot 2x \\quad \\text{(missing }3x^2\\text{)}`,
+      note: 'When a product factor is itself composite, differentiate it with chain rule before combining product terms.',
+      ruleCodes: ['product', 'chain'],
       why: {
-        tag: 'Why merge now?',
-        explanation: 'Combining chunks preserves proof traceability. Simplification is deferred to the next stage.',
+        tag: 'Why this mistake happens',
+        explanation: 'Students apply product rule scaffold correctly but treat sin(x^3) as if it were sin(x). The inner x^3 derivative is required.',
       },
-    })
-  } else {
-    rawNode = derivative(exprNode, 'x')
-    steps.push({
-      id: 'differentiate-generic',
-      tag: 'Differentiate 3.x',
-      title: 'Apply derivative rules directly',
-      math: `f'(x) = ${toLatex(rawNode)}`,
-      note: 'This expression is not a two-factor top-level product, so one direct differentiation step is used.',
-      ruleCodes: detectRules(exprNode),
-      why: buildWhyFromRules(detectRules(exprNode)),
     })
   }
 
@@ -309,12 +627,14 @@ function buildExplanation(input) {
 
   const check = findNumericCheck(normalized, simplifiedNode.toString())
   if (check) {
+    const absErr = Math.abs(check.slope - check.exact)
+    const relErr = Math.abs(check.exact) > 1e-8 ? absErr / Math.abs(check.exact) : null
     steps.push({
       id: 'numeric-check',
       tag: 'Numeric check',
       title: 'Cross-check symbolic derivative with finite difference',
       math: `x_0=${check.x0},\\quad f'(x_0)\\approx ${check.slope.toFixed(6)},\\quad \\text{symbolic }f'(x_0)=${check.exact.toFixed(6)}`,
-      note: `Absolute error: ${Math.abs(check.slope - check.exact).toExponential(2)}.`,
+      note: `Absolute error: ${absErr.toExponential(2)}${relErr !== null ? ` (relative ≈ ${relErr.toFixed(4)})` : ' (relative error unstable near zero exact value)'}.`,
       ruleCodes: [],
       why: {
         tag: 'Why numeric validation?',
@@ -326,6 +646,8 @@ function buildExplanation(input) {
   return {
     inputLatex: toLatex(exprNode),
     inputExpr: exprNode.toString(),
+    rawLatex: toLatex(rawNode),
+    rawExpr: rawNode.toString(),
     steps,
     finalLatex: toLatex(simplifiedNode),
     finalExpr: simplifiedNode.toString(),
@@ -583,7 +905,16 @@ export default function UniversalCalcExplainer() {
 
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
-            <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Unsimplified (direct application)</p>
+                <KatexBlock expr={`f'(x) = ${explanation.rawLatex || explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Simplified / factored</p>
+                <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+              </div>
+            </div>
             <div className="mt-4">
               <OpenInGrapher
                 variant="button"
