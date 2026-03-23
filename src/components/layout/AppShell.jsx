@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link, NavLink, Outlet, useParams } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
 import { LESSON_MAP, CURRICULUM } from '../../content/index.js'
 import PinsPanel from '../ui/PinsPanel.jsx'
 import Sidebar from './Sidebar.jsx'
@@ -191,6 +191,8 @@ function WelcomeModal() {
 }
 
 export default function AppShell({ children }) {
+  const location = useLocation()
+  const isUniversalCalcRoute = location.pathname.startsWith('/universal-calc')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
@@ -274,7 +276,9 @@ export default function AppShell({ children }) {
 
       {/* Main content */}
       <main className="lg:pl-[280px] pt-[60px] min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className={isUniversalCalcRoute
+          ? 'max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8'
+          : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
           {children ?? <Outlet />}
         </div>
       </main>
