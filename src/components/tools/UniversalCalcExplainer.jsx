@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { parse, derivative, evaluate } from 'mathjs'
 import KatexBlock from '../math/KatexBlock.jsx'
+import OpenInGrapher from '../lesson/OpenInGrapher.jsx'
 
 const DEPTH_STYLES = [
   { border: '#6366f1', tagBg: '#eef2ff', tagText: '#4338ca', panelBg: 'var(--color-background-secondary)' },
@@ -162,8 +163,23 @@ function buildWhyFromRules(rules) {
   return {
     tag: 'Rules used in this step',
     explanation: 'This step combines multiple derivative rules in sequence.',
-    steps: metas.map((m) => ({ text: `${m.label}: ${m.formula}` })),
+    steps: metas.map((m) => ({ text: m.label, math: m.formula })),
   }
+}
+
+function normalizeInput(raw) {
+  return raw.trim().replace(/^\s*[a-zA-Z]+\(x\)\s*=\s*/, '')
+}
+
+function validateDerivativeOnlyInput(raw) {
+  const text = raw.toLowerCase()
+  if (text.includes('lim') || text.includes('limit')) {
+    return 'This tool is currently derivative-only. Please remove limit notation and enter just f(x).'
+  }
+  if (text.includes('int') || text.includes('integral') || text.includes('∫')) {
+    return 'This tool is currently derivative-only. Please remove integral notation and enter just f(x).'
+  }
+  return ''
 }
 
 function findNumericCheck(exprText, derivText) {
@@ -187,7 +203,11 @@ function findNumericCheck(exprText, derivText) {
 }
 
 function buildExplanation(input) {
-  const exprNode = parse(input)
+  const normalized = normalizeInput(input)
+  const derivativeOnlyError = validateDerivativeOnlyInput(normalized)
+  if (derivativeOnlyError) throw new Error(derivativeOnlyError)
+
+  const exprNode = parse(normalized)
   const steps = []
 
   steps.push({
@@ -287,7 +307,7 @@ function buildExplanation(input) {
     },
   })
 
-  const check = findNumericCheck(input, simplifiedNode.toString())
+  const check = findNumericCheck(normalized, simplifiedNode.toString())
   if (check) {
     steps.push({
       id: 'numeric-check',
@@ -305,8 +325,10 @@ function buildExplanation(input) {
 
   return {
     inputLatex: toLatex(exprNode),
+    inputExpr: exprNode.toString(),
     steps,
     finalLatex: toLatex(simplifiedNode),
+    finalExpr: simplifiedNode.toString(),
   }
 }
 
@@ -419,20 +441,33 @@ export default function UniversalCalcExplainer() {
   const [input, setInput] = useState('sin(x^3) * (x^2 + 1)')
   const [submitted, setSubmitted] = useState('sin(x^3) * (x^2 + 1)')
   const [activeStep, setActiveStep] = useState(0)
+  const [recentInputs, setRecentInputs] = useState(() => {
+    try {
+      const raw = localStorage.getItem('universal-calc-recent-inputs')
+      const parsed = raw ? JSON.parse(raw) : []
+      return Array.isArray(parsed) ? parsed.slice(0, 5) : []
+    } catch {
+      return []
+    }
+  })
 
   const { explanation, error } = useMemo(() => {
     try {
       return { explanation: buildExplanation(submitted), error: '' }
-    } catch {
+    } catch (e) {
       return {
         explanation: null,
-        error: 'Could not parse expression. Use mathjs style, e.g. sin(x^3) * (x^2 + 1).',
+        error: e?.message || 'Could not parse expression. Use mathjs style, e.g. sin(x^3) * (x^2 + 1).',
       }
     }
   }, [submitted])
 
   function handleExplain() {
-    setSubmitted(input)
+    const normalized = normalizeInput(input)
+    setSubmitted(normalized)
+    const nextRecent = [normalized, ...recentInputs.filter((e) => e !== normalized)].slice(0, 5)
+    setRecentInputs(nextRecent)
+    localStorage.setItem('universal-calc-recent-inputs', JSON.stringify(nextRecent))
     setActiveStep(0)
   }
 
@@ -450,6 +485,27 @@ export default function UniversalCalcExplainer() {
           className="w-full min-h-[86px] rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 font-mono text-sm text-slate-800 dark:text-slate-100"
           placeholder="Examples: sin(x^3), (2*x+1)^5*(3*x-2)^7, exp(x^2)/x"
         />
+
+        {recentInputs.length > 0 && (
+          <div className="mt-3">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">
+              Recent Equations
+            </label>
+            <select
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-slate-700 dark:text-slate-200"
+              defaultValue=""
+              onChange={(e) => {
+                if (!e.target.value) return
+                setInput(e.target.value)
+              }}
+            >
+              <option value="">Select one of your last 5</option>
+              {recentInputs.map((expr, i) => (
+                <option key={`${expr}-${i}`} value={expr}>{expr}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="mt-3 flex items-center gap-3">
           <button
@@ -528,6 +584,23 @@ export default function UniversalCalcExplainer() {
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
             <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+            <div className="mt-4">
+              <OpenInGrapher
+                variant="button"
+                label="Open f(x) and f'(x) in Grapher"
+                config={{
+                  mode: 'pro',
+                  replace: true,
+                  functions: [
+                    { expr: explanation.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
+                    { expr: explanation.finalExpr, type: 'explicit', color: '#ec4899', label: "f'(x)" },
+                  ],
+                }}
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Grapher opens with a snapshot of the current function pair. Click Explain again after edits to refresh the plotted derivative.
+              </p>
+            </div>
           </div>
         </>
       )}

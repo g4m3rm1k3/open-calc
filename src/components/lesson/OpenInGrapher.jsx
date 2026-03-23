@@ -25,6 +25,15 @@ import { Calculator } from 'lucide-react'
 
 const COLORS = ['#6366f1','#ec4899','#facc15','#22c55e','#ef4444','#a855f7','#06b6d4','#f97316']
 
+function cloneConfig(cfg) {
+  if (!cfg) return cfg
+  return {
+    ...cfg,
+    functions: cfg.functions ? cfg.functions.map((f) => ({ ...f })) : cfg.functions,
+    sliders: cfg.sliders ? cfg.sliders.map((s) => ({ ...s })) : cfg.sliders,
+  }
+}
+
 export default function OpenInGrapher({
   // Either pass a full config object…
   config,
@@ -42,7 +51,7 @@ export default function OpenInGrapher({
   const { openGrapher } = useGrapher()
 
   const buildConfig = () => {
-    if (config) return config
+    if (config) return cloneConfig(config)
 
     // Build from shorthand props
     const allExprs = exprs ?? (expr ? [expr] : [])
