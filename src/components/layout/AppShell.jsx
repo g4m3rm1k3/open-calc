@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, NavLink, Outlet, useParams } from 'react-router-dom'
 import { LESSON_MAP, CURRICULUM } from '../../content/index.js'
+import PinsPanel from '../ui/PinsPanel.jsx'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
@@ -76,6 +77,7 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
         <NavLink to="/chapter/0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Calculus</NavLink>
         <NavLink to="/chapter/p0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Physics</NavLink>
         <NavLink to="/chapter/discrete-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Discrete Math</NavLink>
+        <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
         
         <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
            <span className="text-sm font-bold text-slate-500">DSA</span>
@@ -276,6 +278,7 @@ export default function AppShell({ children }) {
         </div>
       </main>
 
+      <PinsPanel />
       <WelcomeModal />
       <SearchModal />
       <GlobalGrapher

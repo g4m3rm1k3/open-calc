@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useLocation } from 'react-router-dom'
+import { usePins } from '../../context/PinsContext.jsx'
 const VIZ_REGISTRY = {
   VideoEmbed:               lazy(() => import('./react/VideoEmbed.jsx')),
   VideoCarousel:            lazy(() => import('./react/VideoCarousel.jsx')),
@@ -383,6 +385,10 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const VizComponent = VIZ_REGISTRY[id]
   const initialPropsKey = useMemo(() => JSON.stringify(initialProps ?? {}), [initialProps])
+  const location = useLocation()
+  const { isPinned, addPin, removePin } = usePins()
+  const pinId = `${id}::${location.pathname}`
+  const pinned = isPinned(pinId)
 
   useEffect(() => {
     setParams(initialProps ?? {})
@@ -420,18 +426,36 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     )
   }
 
+  function togglePin() {
+    if (pinned) {
+      removePin(pinId)
+    } else {
+      addPin({ id: pinId, title: title || id, subtitle: location.pathname.replace('/chapter/', 'Ch. ').replace('/', ' › '), path: location.pathname, elementId: `viz-${id}` })
+    }
+  }
+
   return (
-    <div className="viz-frame relative group w-full max-w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl">
+    <div id={`viz-${id}`} className="viz-frame relative group w-full max-w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl">
       {title && (
         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3 px-2 pt-2">{title}</p>
       )}
-      <button 
-         onClick={() => setIsExpanded(true)}
-         title="Expand to Full Width"
-         className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
-      >
-        <span>⛶</span> Expand
-      </button>
+      <div className="absolute top-2 right-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Pin button — desktop only */}
+        <button
+          onClick={togglePin}
+          title={pinned ? 'Unpin' : 'Pin this visualization'}
+          className={`hidden lg:flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? 'bg-amber-500 border-amber-400 text-white' : 'bg-slate-800 border-slate-600 text-white hover:bg-amber-500 hover:border-amber-400'}`}
+        >
+          📌
+        </button>
+        <button
+          onClick={() => setIsExpanded(true)}
+          title="Expand to Full Width"
+          className="bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
+        >
+          <span>⛶</span> Expand
+        </button>
+      </div>
       <div className="p-2">
         {content}
       </div>
