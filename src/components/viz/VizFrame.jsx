@@ -287,6 +287,35 @@ const VIZ_REGISTRY = {
   // ComponentPatternSpotter:    lazy(() => import('./react/ComponentPatternSpotter.jsx')),
   ComponentConversionExplorer: lazy(() => import('./react/ComponentConversionExplorer.jsx')),
   // ComponentFormRecogniser:    lazy(() => import('./react/ComponentFormRecogniser.jsx')),
+
+  // Physics Chapter 1 — Addition (New)
+  ParallelogramIntuition:      lazy(() => import('./react/ParallelogramIntuition.jsx')),
+  ParallelogramAngleExplorer:  lazy(() => import('./react/ParallelogramAngleExplorer.jsx')),
+  ParallelogramProof:          lazy(() => import('./react/ParallelogramProof.jsx')),
+  ParallelogramPatternSpotter: lazy(() => import('./react/ParallelogramPatternSpotter.jsx')),
+  ParallelogramFormRecogniser: lazy(() => import('./react/ParallelogramFormRecogniser.jsx')),
+
+  TipToToeIntuition:           lazy(() => import('./react/TipToToeIntuition.jsx')),
+  TipToToeProof:               lazy(() => import('./react/TipToToeProof.jsx')),
+  TipToToeOrderProof:          lazy(() => import('./react/TipToToeOrderProof.jsx')),
+  TipToToePatternSpotter:      lazy(() => import('./react/TipToToePatternSpotter.jsx')),
+  TipToToeFormRecogniser:      lazy(() => import('./react/TipToToeFormRecogniser.jsx')),
+
+  NumericalAdditionWalkthrough: lazy(() => import('./react/NumericalAdditionWalkthrough.jsx')),
+  NumericalAdditionTable:       lazy(() => import('./react/NumericalAdditionTable.jsx')),
+  NumericalMethodProof:         lazy(() => import('./react/NumericalMethodProof.jsx')),
+  NumericalPatternSpotter:      lazy(() => import('./react/NumericalPatternSpotter.jsx')),
+  NumericalFormRecogniser:      lazy(() => import('./react/NumericalFormRecogniser.jsx')),
+
+  // Lesson 7: Subtraction (Missing files)
+  // SubtractionIntuition:       lazy(() => import('./react/SubtractionIntuition.jsx')),
+  // SubtractionDeltaV:          lazy(() => import('./react/SubtractionDeltaV.jsx')),
+  // SubtractionProof:           lazy(() => import('./react/SubtractionProof.jsx')),
+
+  // Lesson 8: Numerical Subtraction (Missing files)
+  // NumericalSubtractionWalkthrough: lazy(() => import('./react/NumericalSubtractionWalkthrough.jsx')),
+  // SubtractionComponentTable:       lazy(() => import('./react/SubtractionComponentTable.jsx')),
+  // SubtractionNumericalProof:       lazy(() => import('./react/SubtractionNumericalProof.jsx')),
 }
 
 function VizSkeleton() {
