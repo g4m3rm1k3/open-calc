@@ -263,6 +263,8 @@ const VIZ_REGISTRY = {
   ChainRuleRatesViz:        lazy(() => import('./d3/ChainRuleRatesViz.jsx')),
   ChainRuleLimitBridgeViz:  lazy(() => import('./react/ChainRuleLimitBridgeViz.jsx')),
   ChainRulePracticeViz:     lazy(() => import('./react/ChainRulePracticeViz.jsx')),
+  ChainRuleLimitBridgeViz2: lazy(() => import('./react/ChainRuleLimitBridgeViz2.jsx')),
+  ChainRulePracticeViz2:    lazy(() => import('./react/ChainRulePracticeViz2.jsx')),
   // Precalc-5 — polar, complex, vectors
   PolarConversionViz:       lazy(() => import('./d3/PolarConversionViz.jsx')),
   ComplexPolarViz:          lazy(() => import('./d3/ComplexPolarViz.jsx')),

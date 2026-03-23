@@ -109,7 +109,13 @@ export default {
         body: "The trap. You assume the very thing you are trying to prove is actually FALSE. You then relentlessly trace the logic from this fake premise until reality explicitly breaks (e.g., finding a statement that evaluates as a Contradiction). Because reality cannot break, your assumption must have been wrong, meaning your original statement MUST be true.",
       }
     ],
-    visualizations: []
+    visualizations: [
+      {
+        id: 'DominoInductionLab',
+        title: 'Looking Ahead: Mathematical Induction',
+        caption: 'A preview of how we prove infinitely scaling statements using a formal domino-based chain reaction.',
+      }
+    ]
   },
 
   examples: [

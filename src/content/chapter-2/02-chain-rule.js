@@ -153,6 +153,18 @@ export default {
         mathBridge: 'Two expressions that look similar but are completely different compositions: $\\sin(x^2)$ has outer $\\sin$ and inner $x^2$ — derivative is $\\cos(x^2)\\cdot 2x$. But $\\sin^2(x)$ has outer $u^2$ and inner $\\sin x$ — derivative is $2\\sin(x)\\cos(x)$. The position of the exponent changes which function is outer and which is inner. This is the most common Chain Rule mistake on trig exams.',
         caption: 'Toggle between sin(x²) and sin²(x) to see how the layer swap changes the derivative completely.',
       },
+      {
+        id: 'ChainRulePracticeViz',
+        title: 'Chain Rule Category Drill (Standard)',
+        mathBridge: 'Apply the "Outside-Inside" method to 10 distinct forms, from trig-of-polynomial to log-of-linear. Each drill identifies outer/inner functions, reveals steps one-by-one, and checks the results numerically.',
+        caption: 'Master the 10 most common composition forms found in calculus exams.',
+      },
+      {
+        id: 'ChainRulePracticeViz2',
+        title: 'Chain Rule Category Drill (Interactive)',
+        mathBridge: 'This version of the Drill features a different UI with color-coded containers and interactive step reveals.',
+        caption: 'An alternative view of the 10 most common composition forms.',
+      },
     ],
   },
 
@@ -276,6 +288,18 @@ export default {
         title: 'Non-Differentiable Trap',
         mathBridge: 'The chain rule requires every function in the chain to be differentiable at the relevant point. For $y = |\\sin x|$ at $x=0$: the inner function $\\sin x$ is differentiable there, but the outer function $|u|$ has a corner at $u=0$ — its left derivative is $-1$ and right derivative is $+1$. Since $\\sin(0)=0$ puts us exactly at that corner, the chain snaps. The one-sided slopes of $|\\sin x|$ at $x=0$ are $\\pm 1$, confirming no derivative exists.',
         caption: 'Test y = |sin x| near 0 — a single non-differentiable link breaks the entire chain.',
+      },
+      {
+        id: 'ChainRuleLimitBridgeViz',
+        title: 'Annotated Proof: d/dx[sin(x³)] (Basic)',
+        mathBridge: 'How do you prove the chain rule rigorously from the limit definition? The key is multiplying by $(x^3-a^3)/(x^3-a^3)$ which splits the hard limit into two separate, recognisable derivatives. Every abstract algebraic move is verified numerically before you are asked to believe it.',
+        caption: 'Step through every algebraic reduction in the rigorous limit-based proof.',
+      },
+      {
+        id: 'ChainRuleLimitBridgeViz2',
+        title: 'Annotated Proof: d/dx[sin(x³)] (Detailed)',
+        mathBridge: 'This version of the proof features the "Infinite Nesting" WhyPanel system, allowing you to dive deeper into every sub-axiom of the proof.',
+        caption: 'A more detailed version of the rigorous limit-based proof.',
       },
     ],
     visualizationId: null,

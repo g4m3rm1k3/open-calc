@@ -24,6 +24,18 @@ export default {
       'Expression trees make algebra executable: evaluating or differentiating an expression is a traversal problem over a rooted structure.',
       'Binary trees are common but not universal. Many real systems use variable-arity trees.',
     ],
+    visualizations: [
+      {
+        id: 'CountingTreeLab',
+        title: 'Branching and Choice Trees',
+        caption: 'See how each node in a tree represents a brand new set of choices, leading to geometric growth.',
+      },
+      {
+        id: 'StrongInductionWallLab',
+        title: 'Structural Induction Foundation',
+        caption: 'Tree proofs often require the combined weight of ALL descendant nodes (Strong Induction) to prove a property holds for the parent.',
+      }
+    ],
     callouts: [
       {
         type: 'theorem',
