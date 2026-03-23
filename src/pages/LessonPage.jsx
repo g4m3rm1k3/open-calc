@@ -25,6 +25,14 @@ export default function LessonPage() {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [lesson?.id])
 
+  // Update browser tab title so multiple tabs are identifiable
+  useEffect(() => {
+    if (lesson) {
+      document.title = `${lesson.title} — OpenCalc`
+    }
+    return () => { document.title = 'OpenCalc' }
+  }, [lesson?.id])
+
   // Mark progress checkpoint when tab is read (no scroll)
   useEffect(() => {
     if (lesson) {

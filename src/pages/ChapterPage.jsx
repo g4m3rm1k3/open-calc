@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
+import { useEffect } from 'react'
 import { CURRICULUM } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
 
@@ -6,6 +7,13 @@ export default function ChapterPage() {
   const { chapterId } = useParams()
   const chapter = CURRICULUM.find((c) => String(c.number) === chapterId)
   const { getLessonStatus } = useProgress()
+
+  useEffect(() => {
+    if (chapter) {
+      document.title = `${chapter.title} — OpenCalc`
+    }
+    return () => { document.title = 'OpenCalc' }
+  }, [chapter?.id])
 
   if (!chapter) {
     return (

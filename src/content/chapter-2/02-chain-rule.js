@@ -74,13 +74,13 @@ export default {
     visualizations: [
       {
         id: 'VideoEmbed',
-        title: "Calculus I - 5.3.2 The Derivative of The Inverse of a Function",
-        props: { url: "https://www.youtube.com/embed/xZ6YgEZufLQ" }
+        title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
+        props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
       },
       {
         id: 'VideoEmbed',
-        title: "Calculus I - 2.4.2 Differentiation Strategies and Practice",
-        props: { url: "https://www.youtube.com/embed/IOOuXYCoQ4I" }
+        title: "Chain Rule: the Derivative of a Composition",
+        props: { url: "https://www.youtube.com/embed/CPnrs2Yl-rY" }
       },
       {
         id: 'VideoEmbed',
@@ -89,48 +89,23 @@ export default {
       },
       {
         id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
-        props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Natural Exponential Function e^x Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/-oLrRuZ9zgM" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Natural Exponential Function (5 Examples)",
-        props: { url: "https://www.youtube.com/embed/0cwDYHep0AQ" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Chain Rule with Trig Functions Harder Examples Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/gLYNlCarAmU" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Chain Rule Harder Algebraic Examples Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/MvQkDW7aHV0" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Chain Rule Part 2 Trig Derivatives 3 Examples  4K",
-        props: { url: "https://www.youtube.com/embed/P4e-DWNxZMM" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative using Chain Rule 3 Algebraic Examples 4K",
-        props: { url: "https://www.youtube.com/embed/WygqeCwjn_s" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivatives with Sine and Cosine Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/SRj8DGWo_ik" }
+        title: "Calculus I - 2.4.2 Differentiation Strategies and Practice",
+        props: { url: "https://www.youtube.com/embed/IOOuXYCoQ4I" }
       },
       {
         id: 'VideoEmbed',
-        title: "Chain Rule: the Derivative of a Composition",
-        props: { url: "https://www.youtube.com/embed/CPnrs2Yl-rY" }
+        title: "Chain Rule with Trig Functions — Harder Examples",
+        props: { url: "https://www.youtube.com/embed/gLYNlCarAmU" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Chain Rule — Harder Algebraic Examples",
+        props: { url: "https://www.youtube.com/embed/MvQkDW7aHV0" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Chain Rule — 3 Algebraic Examples",
+        props: { url: "https://www.youtube.com/embed/WygqeCwjn_s" }
       },
       {
         id: 'ChainRuleAssemblerGame',
