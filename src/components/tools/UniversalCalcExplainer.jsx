@@ -332,6 +332,13 @@ function cleanupLatexExpression(exprLatex) {
   return s.replace(/\s+/g, ' ').trim()
 }
 
+function tidyDisplayLatex(exprLatex) {
+  return String(exprLatex || '')
+    .replace(/\\cdot(?=(?:x|y|z|\\left\(|\\sin|\\cos|\\tan|\\exp|\\log|\\ln|\\frac|\\sqrt))/g, '\\cdot ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function describeFocusFromStepId(id) {
   const labelMap = {
     root: 'whole expression',
@@ -847,7 +854,7 @@ function buildExplanation(input) {
   }
 
   let rollingPreview = ''
-  let globalEquation = compactLatex(`\\frac{d}{dx}\\left(${toLatex(exprNode)}\\right)`)
+  let globalEquation = `\\frac{d}{dx}\\left(${toLatex(exprNode)}\\right)`
   const stepsWithContext = steps.map((s) => {
     const prevPreview = rollingPreview || '0'
     const inlinePreview = extractDerivativePreviewFromMath(s.math)
@@ -856,8 +863,8 @@ function buildExplanation(input) {
 
     const beforeGlobal = globalEquation
     const eq = extractPrimaryEquality(s.math)
-    const beforeEq = compactLatex(eq.before)
-    const afterEq = compactLatex(eq.after)
+    const beforeEq = String(eq.before || '').trim()
+    const afterEq = String(eq.after || '').trim()
 
     if (afterEq) {
       let replaced = false
@@ -902,8 +909,8 @@ function buildExplanation(input) {
       activeSubExpr: s.activeExpr || '',
       prevDerivativePreview: prevPreview,
       currentDerivativePreview: nextPreview,
-      globalBefore: beforeGlobal,
-      globalAfter: afterGlobal,
+      globalBefore: tidyDisplayLatex(beforeGlobal),
+      globalAfter: tidyDisplayLatex(afterGlobal),
     }
   })
 
@@ -1056,7 +1063,7 @@ export default function UniversalCalcExplainer() {
   }
 
   return (
-    <section className="max-w-4xl mx-auto">
+    <section className="max-w-[1800px] mx-auto px-2 sm:px-4 lg:px-6">
       <div className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Universal Calc Explainer (Beta)</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
