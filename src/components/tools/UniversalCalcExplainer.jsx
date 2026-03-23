@@ -324,6 +324,11 @@ function cleanupLatexExpression(exprLatex) {
   s = s.replace(/\)\s*\\cdot\s*(\\left\()/g, ')$1')
   s = s.replace(/(x(?:\^\{[^}]+\}|\^\d+)?)\s*\\cdot\s*(\\(?:sin|cos|tan|exp|log|ln))/g, '$1$2')
 
+  // Keep \cdot only between two raw numbers; remove all other dots.
+  s = s.replace(/(\d)\s*\\cdot\s*(\d)/g, '$1@@NUMDOT@@$2')
+  s = s.replace(/\\cdot/g, ' ')
+  s = s.replace(/@@NUMDOT@@/g, ' \\cdot ')
+
   return s.replace(/\s+/g, ' ').trim()
 }
 
@@ -1181,15 +1186,9 @@ export default function UniversalCalcExplainer() {
 
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Unsimplified (direct application)</p>
-                <KatexBlock expr={`f'(x) = ${explanation.rawLatex || explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Simplified / factored</p>
-                <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
-              </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Simplified / factored</p>
+              <KatexBlock expr={`f'(x) = ${explanation.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
             </div>
             <div className="mt-4">
               <OpenInGrapher
