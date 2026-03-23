@@ -184,6 +184,10 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchC
     bbox: DEFAULT_BBOX,
   })
 
+  // Keep live refs so async board init always uses the newest state.
+  const functionsRef = useRef(functions)
+  const slidersRef = useRef(sliders)
+
   const [errors, setErrors]             = useState({})
   const [isDark, setIsDark]             = useState(() => darkRef.current)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -211,6 +215,9 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchC
   useEffect(() => {
     getMath().then(m => setCasReady(!!m))
   }, [])
+
+  useEffect(() => { functionsRef.current = functions }, [functions])
+  useEffect(() => { slidersRef.current = sliders }, [sliders])
 
   // ── Apply launchConfig when grapher opens from a lesson ────────────────────
   useEffect(() => {
@@ -288,9 +295,11 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchC
         },
       })
 
-      sliders.forEach(s => { sliderValsRef.current[s.name] = s.value })
-      createBoardSliders(b, sliders)
-      renderAll(b, functions, sliders)
+      const liveSliders = slidersRef.current
+      const liveFunctions = functionsRef.current
+      liveSliders.forEach(s => { sliderValsRef.current[s.name] = s.value })
+      createBoardSliders(b, liveSliders)
+      renderAll(b, liveFunctions, liveSliders)
     }, 80)
 
     return () => clearTimeout(timer)
