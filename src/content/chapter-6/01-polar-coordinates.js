@@ -92,7 +92,13 @@ export default {
         body: 'If $f(\\theta_0) = 0$ and $f\'(\\theta_0) \\neq 0$, the tangent line to $r = f(\\theta)$ at the origin is the line $\\theta = \\theta_0$ (i.e., $y = x\\tan\\theta_0$).',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        caption: 'In polar coordinates r² = x² + y² is the fundamental conversion. This proof shows what happens when you differentiate that circle implicitly — the slope dy/dx = −x/y is perpendicular to the radius, a fact that polar geometry makes obvious.',
+      },
+    ],
   },
 
   rigor: {

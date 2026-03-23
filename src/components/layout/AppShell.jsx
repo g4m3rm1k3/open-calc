@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useParams } from 'react-router-dom'
+import { LESSON_MAP, CURRICULUM } from '../../content/index.js'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
@@ -8,6 +9,37 @@ import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import GrapherContext from '../../context/GrapherContext.jsx'
 import { Activity, Box, Settings2 } from 'lucide-react'
+
+function MobileLocationBadge() {
+  const { chapterId, lessonSlug } = useParams()
+  if (!chapterId) return null
+
+  const lesson = lessonSlug ? LESSON_MAP[`${chapterId}/${lessonSlug}`] : null
+  const chapter = CURRICULUM.find(c => String(c.number) === String(chapterId))
+
+  const label = lesson
+    ? lesson.title
+    : chapter
+      ? chapter.title
+      : null
+
+  if (!label) return null
+
+  const chapterLabel = chapter ? `Ch. ${chapter.number}` : null
+
+  return (
+    <div className="lg:hidden flex items-center gap-1.5 min-w-0 max-w-[160px]">
+      {chapterLabel && (
+        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+          {chapterLabel}
+        </span>
+      )}
+      <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
+        {label}
+      </span>
+    </div>
+  )
+}
 
 function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle }) {
   const { openSearch } = useSearchContext()
@@ -32,8 +64,11 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
         </svg>
       </button>
 
-      {/* Brand (mobile) */}
-      <span className="lg:hidden font-bold text-brand-600 dark:text-brand-400 text-lg">∂ OpenMath</span>
+      {/* Brand + location (mobile) */}
+      <div className="lg:hidden flex items-center gap-2 min-w-0">
+        <span className="font-bold text-brand-600 dark:text-brand-400 text-lg shrink-0">∂</span>
+        <MobileLocationBadge />
+      </div>
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">

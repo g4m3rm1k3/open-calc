@@ -135,6 +135,12 @@ export default {
         caption: 'The double angle formula is the angle addition formula applied to itself.',
       },
       {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        mathBridge: 'The Pythagorean identity $\\sin^2\\theta + \\cos^2\\theta = 1$ comes from $x^2 + y^2 = 1$ on the unit circle. When you later learn calculus, this same equation can be differentiated implicitly to find the slope at every point on the circle — a preview of what these identities make possible.',
+        caption: 'See what happens when calculus meets the Pythagorean identity: implicit differentiation of x² + y² = r².',
+      },
+      {
         id: 'VideoEmbed',
         title: 'Sum & Difference Identities Intro (5 Examples)',
         props: { url: 'https://www.youtube.com/embed/YHgjEac9nl4' },

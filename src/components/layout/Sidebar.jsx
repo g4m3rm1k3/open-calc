@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { CURRICULUM } from '../../content/index.js'
 import { useProgress } from '../../hooks/useProgress.js'
@@ -23,6 +24,10 @@ export default function Sidebar({ onNavigate }) {
   const params = useParams()
   const location = useLocation()
   const { getLessonStatus } = useProgress()
+
+  const navRef = useRef(null)
+  const activeLinkRef = useRef(null)
+  const [hovered, setHovered] = useState(false)
 
   const activeChapter = params.chapterId ? String(params.chapterId) : null
   const activeSlug = params.lessonSlug ?? params['*']
@@ -57,14 +62,28 @@ export default function Sidebar({ onNavigate }) {
           : '/'
 
   const COURSES = [
-    { key: 'precalc',   label: 'Pre-Calc',     path: '/chapter/precalc-1' },
-    { key: 'calc',      label: 'Calculus',      path: '/chapter/0' },
-    { key: 'physics-1', label: 'Physics',       path: '/chapter/p0' },
-    { key: 'discrete',  label: 'Discrete',      path: '/chapter/discrete-1' },
+    { key: 'precalc',   label: 'Pre-Calc',  path: '/chapter/precalc-1' },
+    { key: 'calc',      label: 'Calculus',   path: '/chapter/0' },
+    { key: 'physics-1', label: 'Physics',    path: '/chapter/p0' },
+    { key: 'discrete',  label: 'Discrete',   path: '/chapter/discrete-1' },
   ]
 
+  // Auto-scroll to active lesson when not hovering
+  useEffect(() => {
+    if (hovered) return
+    const id = setTimeout(() => {
+      activeLinkRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 50)
+    return () => clearTimeout(id)
+  }, [activeChapter, activeSlug, hovered])
+
   return (
-    <nav className="h-full overflow-y-auto py-4">
+    <nav
+      ref={navRef}
+      className="h-full overflow-y-auto py-4"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {/* Course switcher — mobile only (desktop uses TopBar nav) */}
       <div className="lg:hidden px-3 mb-3 pb-3 border-b border-slate-200 dark:border-slate-700">
         <div className="grid grid-cols-2 gap-1.5">
@@ -99,15 +118,16 @@ export default function Sidebar({ onNavigate }) {
       </Link>
 
       {visibleChapters.map((chapter) => {
+        const isActiveChapter = activeChapter === String(chapter.number)
         return (
           <div key={chapter.id} className="mb-1">
             {/* Chapter heading */}
             <Link
               to={`/chapter/${chapter.number}`}
               onClick={onNavigate}
-              className={`flex items-center justify-between px-5 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:text-slate-900 dark:hover:text-slate-100 ${CHAPTER_COLORS[chapter.number] ?? CHAPTER_COLORS[0]}`}
+              className={`flex items-center justify-between px-5 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:text-slate-900 dark:hover:text-slate-100 ${isActiveChapter ? 'sidebar-chapter-active' : (CHAPTER_COLORS[chapter.number] ?? CHAPTER_COLORS[0])}`}
             >
-              <span>{activeCourse === 'discrete' ? 'Ch. ' : 'Ch. '}{chapter.number} — {chapter.title}</span>
+              <span>Ch. {chapter.number} — {chapter.title}</span>
               {chapter.comingSoon && (
                 <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded text-xs font-normal normal-case">soon</span>
               )}
@@ -121,6 +141,7 @@ export default function Sidebar({ onNavigate }) {
               return (
                 <Link
                   key={lesson.id}
+                  ref={el => { if (isActive) activeLinkRef.current = el }}
                   to={`/chapter/${chapter.number}/${lesson.slug}`}
                   onClick={onNavigate}
                   className={`flex items-center gap-2.5 px-5 pl-8 py-2 text-sm transition-colors ${

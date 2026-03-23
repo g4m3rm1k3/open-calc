@@ -61,6 +61,12 @@ export default {
         ]},
       },
       { id: 'VideoEmbed', title: 'TR-10: Pythagorean Triples', props: { url: 'https://www.youtube.com/embed/ZG2p4jx-i-Q' } },
+      {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        mathBridge: 'The circle $x^2 + y^2 = r^2$ is the Pythagorean theorem applied to every point on the circle. When calculus arrives, differentiating this equation implicitly reveals that the tangent at any point is perpendicular to the radius — a fact that geometry predicts and calculus confirms.',
+        caption: 'A calculus preview: see how the Pythagorean circle equation yields the slope formula dy/dx = −x/y.',
+      },
       { id: 'VideoCarousel', title: 'Distance Between Points', props: { videos: [
           { url: 'https://www.youtube.com/embed/Cy90jWCrPfo', title: 'TR-11 — Distance in a Plane' },
           { url: 'https://www.youtube.com/embed/7br1PvhFedQ', title: 'TR-12 — Distance in Space' },

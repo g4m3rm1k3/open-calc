@@ -93,6 +93,11 @@ export default {
         title: 'Implicit Curves and Their Tangent Lines',
         caption: 'Drag the point around the curve to see the tangent computed by implicit differentiation.',
       },
+      {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        caption: 'Step through the complete proof from first principles. Every algebra step goes back to a numerical example, and every rule links to its own proof.',
+      },
     ],
   },
 

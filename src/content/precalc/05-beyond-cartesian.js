@@ -138,6 +138,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        mathBridge: 'In Cartesian coordinates a circle is $x^2 + y^2 = r^2$. In polar it collapses to $r = \\text{const}$. But the Cartesian form carries calculus inside it: differentiating implicitly gives the slope $dy/dx = -x/y$ at every point — a preview of what makes the circle equation so central to calculus.',
+        caption: 'The circle equation x² + y² = r² connects geometry, polar coordinates, and calculus. See the full proof.',
+      },
+      {
         id: 'Vectors3DViz',
         title: 'Vectors, Dot Product, and Cross Product',
         mathBridge: 'Adjust two vectors and see the dot product (scalar) and cross product (perpendicular vector) computed live. Watch how the angle between vectors affects both products.',

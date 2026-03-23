@@ -175,6 +175,10 @@ export default {
         mathBridge: 'The rearrangement proof: place four identical right triangles inside a square of side $a+b$. Arrangement 1 leaves a tilted square of area $c^2$ in the center. Arrangement 2 leaves two squares of area $a^2$ and $b^2$. Same four triangles removed ⟹ $c^2 = a^2 + b^2$. Applied to the unit circle ($c=1$): $\\cos^2\\theta + \\sin^2\\theta = 1$.',
         caption: 'Step through the rearrangement proof. Change a and b and watch the proof still hold.',
       },
+      { type: 'viz', id: 'ImplicitDiffProof', title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        mathBridge: 'The unit circle $x^2 + y^2 = 1$ is the geometric definition of $\\sin\\theta$ and $\\cos\\theta$. When calculus arrives, implicit differentiation of $x^2 + y^2 = r^2$ gives $dy/dx = -x/y$ — the slope of the circle at every point, perpendicular to the radius.',
+        caption: 'Step through the full implicit differentiation proof. Every step is justified from first principles.',
+      },
       // Solving trig equations + inverse trig — both covered in this lesson
       { type: 'viz', id: 'VideoCarousel', title: 'Solving Trig Equations & Inverse Trig Functions',
         props: { videos: [

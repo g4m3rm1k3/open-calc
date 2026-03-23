@@ -130,7 +130,13 @@ export default {
         body: 'If x is in feet and t is in seconds, then dx/dt is in feet per second. Volume in cubic feet gives dV/dt in cubic feet per second. If different units appear (meters and centimeters, seconds and minutes), convert everything to a single system before computing.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'ImplicitDiffProof',
+        title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
+        caption: 'Related rates differentiates x² + y² = L² with respect to t. This proof shows the same equation differentiated with respect to x — the technique is identical, only the independent variable changes.',
+      },
+    ],
   },
 
   rigor: {

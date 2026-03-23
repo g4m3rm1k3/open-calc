@@ -179,6 +179,7 @@ const VIZ_REGISTRY = {
   LeibnizUnitTrackerLab:         lazy(() => import('./react/LeibnizUnitTrackerLab.jsx')),
   ChainRuleProofMapLab:          lazy(() => import('./react/ChainRuleProofMapLab.jsx')),
   DeepProofSolver:               lazy(() => import('./react/DeepProofSolver.jsx')),
+  ImplicitDiffProof:             lazy(() => import('./react/ImplicitDiffProof.jsx')),
   RecursiveProofStepper:         lazy(() => import('./react/RecursiveProofStepper.jsx')),
   BrokenChainTrapLab:            lazy(() => import('./react/BrokenChainTrapLab.jsx')),
   LimitBridgeLab:                lazy(() => import('./react/LimitBridgeLab.jsx')),
