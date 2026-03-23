@@ -56,8 +56,35 @@ export default function Sidebar({ onNavigate }) {
           ? '/chapter/p0'
           : '/'
 
+  const COURSES = [
+    { key: 'precalc',   label: 'Pre-Calc',     path: '/chapter/precalc-1' },
+    { key: 'calc',      label: 'Calculus',      path: '/chapter/0' },
+    { key: 'physics-1', label: 'Physics',       path: '/chapter/p0' },
+    { key: 'discrete',  label: 'Discrete',      path: '/chapter/discrete-1' },
+  ]
+
   return (
     <nav className="h-full overflow-y-auto py-4">
+      {/* Course switcher — mobile only (desktop uses TopBar nav) */}
+      <div className="lg:hidden px-3 mb-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+        <div className="grid grid-cols-2 gap-1.5">
+          {COURSES.map(c => (
+            <Link
+              key={c.key}
+              to={c.path}
+              onClick={onNavigate}
+              className={`text-center text-xs font-semibold py-2 px-3 rounded-lg transition-colors ${
+                activeCourse === c.key
+                  ? 'bg-brand-600 text-white dark:bg-brand-500'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* Logo / course home */}
       <Link
         to={courseHomePath}
@@ -72,7 +99,6 @@ export default function Sidebar({ onNavigate }) {
       </Link>
 
       {visibleChapters.map((chapter) => {
-        const isExpanded = activeChapter === String(chapter.number) || chapter.lessons.length === 0
         return (
           <div key={chapter.id} className="mb-1">
             {/* Chapter heading */}
