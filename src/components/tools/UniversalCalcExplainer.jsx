@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { parse, derivative, evaluate } from 'mathjs'
 import KatexBlock from '../math/KatexBlock.jsx'
+import { parseProse } from '../math/parseProse.jsx'
 import OpenInGrapher from '../lesson/OpenInGrapher.jsx'
 
 const DEPTH_STYLES = [
@@ -112,6 +113,14 @@ function saveLocalSnapshotStore(store) {
   localStorage.setItem(LOCAL_SNAPSHOT_STORE_KEY, JSON.stringify(store))
 }
 
+function getSnapshotDisplayName(functionKey, snapshot) {
+  const equation = String(snapshot?.equation || '').trim()
+  if (!equation) return functionKey
+  const idx = equation.indexOf('=')
+  const rhs = idx === -1 ? equation : equation.slice(idx + 1).trim()
+  return rhs || functionKey
+}
+
 function isDegenerateSnapshot(snapshot) {
   if (!snapshot || !Array.isArray(snapshot.steps) || !snapshot.steps.length) return false
 
@@ -140,6 +149,57 @@ function isDegenerateSnapshot(snapshot) {
 function hasAnyCommentary(snapshot) {
   if (!snapshot || !Array.isArray(snapshot.steps)) return false
   return snapshot.steps.some((s) => String(s?.commentary || '').trim().length > 0)
+}
+
+function stripDerivativePrefix(text) {
+  return String(text || '').replace(/^f'\(x\)\s*=\s*/i, '').trim()
+}
+
+function previewExpr(text, maxLen = 110) {
+  const compact = String(text || '').replace(/\s+/g, ' ').trim()
+  if (compact.length <= maxLen) return compact
+  return `${compact.slice(0, maxLen)}...`
+}
+
+function inferOperationFamily(ruleUsed) {
+  const rule = String(ruleUsed || '').toLowerCase()
+  if (rule.includes('product')) return 'product'
+  if (rule.includes('quotient')) return 'quotient'
+  if (rule.includes('chain')) return 'chain'
+  if (rule.includes('power')) return 'power'
+  if (rule.includes('sum') || rule.includes('difference')) return 'sum'
+  if (rule.includes('constant multiple')) return 'constant-multiple'
+  if (rule.includes('constant')) return 'constant'
+  if (rule.includes('combine')) return 'combine'
+  if (rule.includes('trig') || rule.includes('sin') || rule.includes('cos') || rule.includes('tan')) return 'trig'
+  if (rule.includes('log') || rule.includes('ln')) return 'log'
+  if (rule.includes('exp')) return 'exp'
+  return 'generic'
+}
+
+function buildDefaultCommentary(step) {
+  if (!step) return ''
+
+  const operation = inferOperationFamily(step.ruleUsed)
+  const appliedCore = previewExpr(stripDerivativePrefix(step.applied))
+  const outcomeCore = previewExpr(stripDerivativePrefix(step.outcome))
+
+  const templates = {
+    product: `Product rule splits the derivative into two contributions: first-diff times second, plus first times second-diff. Here we transform ${appliedCore} into ${outcomeCore}.`,
+    quotient: `Quotient rule tracks competing rates in numerator and denominator using (low·d(high) - high·d(low))/low^2. This step rewrites ${appliedCore} into ${outcomeCore}.`,
+    chain: `Chain rule handles composition: differentiate the outer form first, then multiply by the inner derivative. This maps ${appliedCore} to ${outcomeCore}.`,
+    power: `Power behavior comes from reducing the exponent by one and scaling by the original exponent (with chain behavior if the base is composite). Here ${appliedCore} becomes ${outcomeCore}.`,
+    sum: `Linearity lets us differentiate each term independently and preserve the plus/minus structure. This step carries ${appliedCore} into ${outcomeCore}.`,
+    'constant-multiple': `A constant factor only scales slope, so it stays outside while the variable-dependent part is differentiated. This turns ${appliedCore} into ${outcomeCore}.`,
+    constant: `Constants do not vary with x, so their derivative contribution is zero. This simplifies ${appliedCore} into ${outcomeCore}.`,
+    combine: `This is a recombination step: earlier local derivatives are assembled into a single global expression. We move from ${appliedCore} to ${outcomeCore}.`,
+    trig: `Trig derivatives follow base identities (like sin -> cos and cos -> -sin), then chain behavior if the angle is composite. This updates ${appliedCore} into ${outcomeCore}.`,
+    log: `Log derivative structure is 1/u times u', so inner-rate information is preserved explicitly. This takes ${appliedCore} to ${outcomeCore}.`,
+    exp: `Exponential derivatives preserve the exponential form and multiply by the inner derivative when composed. Here ${appliedCore} becomes ${outcomeCore}.`,
+    generic: `This step applies ${step.ruleUsed || 'the current rule'} to move from ${appliedCore} to ${outcomeCore}, while preserving derivative equivalence.`,
+  }
+
+  return templates[operation] || templates.generic
 }
 
 function toLatex(node) {
@@ -1086,6 +1146,8 @@ export default function UniversalCalcExplainer() {
   const [input, setInput] = useState('sin(x^3) * (x^2 + 1)')
   const [submitted, setSubmitted] = useState('sin(x^3) * (x^2 + 1)')
   const [currentFunctionKey, setCurrentFunctionKey] = useState(() => preprocessFriendlyInput('sin(x^3) * (x^2 + 1)'))
+  const [loadedSnapshotKey, setLoadedSnapshotKey] = useState('')
+  const [snapshotOwnerKey, setSnapshotOwnerKey] = useState(() => preprocessFriendlyInput('sin(x^3) * (x^2 + 1)'))
   const [savedSnapshots, setSavedSnapshots] = useState(() => loadLocalSnapshotStore())
   const [tutorialSnapshot, setTutorialSnapshot] = useState({
     equation: '',
@@ -1170,54 +1232,36 @@ export default function UniversalCalcExplainer() {
     }
   }, [explanation])
 
+  const savedFunctionEntries = useMemo(
+    () => Object.entries(savedSnapshots).sort((a, b) => (Number(b?.[1]?.updatedAt) || 0) - (Number(a?.[1]?.updatedAt) || 0)),
+    [savedSnapshots]
+  )
+
   useEffect(() => {
     if (isImportedSnapshot || !dynamicSnapshot) return
 
-    const saved = loadLocalSnapshotStore()[currentFunctionKey]
-    if (saved && Array.isArray(saved.steps) && saved.steps.length) {
-      // Ignore and purge obviously broken snapshots (all steps identical).
-      if (isDegenerateSnapshot(saved)) {
-        setSavedSnapshots((prev) => {
-          const next = { ...prev }
-          delete next[currentFunctionKey]
-          saveLocalSnapshotStore(next)
-          return next
-        })
-        setToast('Corrupted saved snapshot was reset to fresh dynamic steps.')
-      } else {
-      setTutorialSnapshot((prev) => ({
-        equation: String(saved.equation || dynamicSnapshot.equation),
-        isAuthoringMode: prev.isAuthoringMode,
-        steps: saved.steps.map((step) => ({
-          ruleUsed: String(step?.ruleUsed || 'Custom Step'),
-          applied: String(step?.applied || ''),
-          outcome: String(step?.outcome || ''),
-          commentary: String(step?.commentary || ''),
-          note: '',
-          why: null,
-        })),
-      }))
-      return
-      }
-    }
-
     setTutorialSnapshot((prev) => {
-      const mergedSteps = dynamicSnapshot.steps.map((step, idx) => ({
+      const freshSteps = dynamicSnapshot.steps.map((step) => ({
         ...step,
-        commentary: prev.steps?.[idx]?.commentary || '',
+        commentary: '',
       }))
 
       return {
         equation: dynamicSnapshot.equation,
         isAuthoringMode: prev.isAuthoringMode,
-        steps: mergedSteps,
+        steps: freshSteps,
       }
     })
-  }, [dynamicSnapshot, isImportedSnapshot, currentFunctionKey])
+    setSnapshotOwnerKey(currentFunctionKey)
+  }, [dynamicSnapshot, isImportedSnapshot, currentFunctionKey, loadedSnapshotKey])
 
   useEffect(() => {
     if (!currentFunctionKey) return
     if (!tutorialSnapshot.equation || !Array.isArray(tutorialSnapshot.steps) || !tutorialSnapshot.steps.length) return
+
+    // Never persist if this snapshot belongs to a different function key.
+    // This prevents cross-function commentary leaks during key-switch races.
+    if (!snapshotOwnerKey || snapshotOwnerKey !== currentFunctionKey) return
 
     // Persist authored/imported/tutorial commentary snapshots, but avoid saving
     // passive unedited dynamic renders that can overwrite good stored content.
@@ -1240,7 +1284,7 @@ export default function UniversalCalcExplainer() {
       saveLocalSnapshotStore(next)
       return next
     })
-  }, [tutorialSnapshot, currentFunctionKey, isImportedSnapshot])
+  }, [tutorialSnapshot, currentFunctionKey, isImportedSnapshot, snapshotOwnerKey])
 
   useEffect(() => {
     if (!toast) return
@@ -1277,6 +1321,9 @@ export default function UniversalCalcExplainer() {
     })
 
     setIsImportedSnapshot(false)
+    if (loadedSnapshotKey === currentFunctionKey) {
+      setLoadedSnapshotKey('')
+    }
 
     // Rebuild from current dynamic explanation immediately when available.
     if (dynamicSnapshot) {
@@ -1285,9 +1332,64 @@ export default function UniversalCalcExplainer() {
         isAuthoringMode: prev.isAuthoringMode,
         steps: dynamicSnapshot.steps.map((step) => ({ ...step, commentary: '' })),
       }))
+      setSnapshotOwnerKey(currentFunctionKey)
     }
 
     setToast('Saved version deleted. Showing fresh steps.')
+  }
+
+  function deleteSavedByKey(functionKey) {
+    setSavedSnapshots((prev) => {
+      if (!prev[functionKey]) return prev
+      const next = { ...prev }
+      delete next[functionKey]
+      saveLocalSnapshotStore(next)
+      return next
+    })
+
+    if (loadedSnapshotKey === functionKey) {
+      setLoadedSnapshotKey('')
+      setIsImportedSnapshot(false)
+      setToast('Saved tutorial removed.')
+      return
+    }
+
+    setToast('Saved tutorial removed.')
+  }
+
+  function loadSavedFunction(functionKey) {
+    const saved = savedSnapshots[functionKey]
+    if (!saved || !Array.isArray(saved.steps) || !saved.steps.length) {
+      setToast('No saved tutorial found for that function.')
+      return
+    }
+
+    if (isDegenerateSnapshot(saved)) {
+      deleteSavedByKey(functionKey)
+      setToast('That saved tutorial was corrupted and has been deleted.')
+      return
+    }
+
+    setTutorialSnapshot((prev) => ({
+      equation: String(saved.equation || ''),
+      isAuthoringMode: prev.isAuthoringMode,
+      steps: saved.steps.map((step) => ({
+        ruleUsed: String(step?.ruleUsed || 'Custom Step'),
+        applied: String(step?.applied || ''),
+        outcome: String(step?.outcome || ''),
+        commentary: String(step?.commentary || ''),
+        note: '',
+        why: null,
+      })),
+    }))
+
+    setInput(functionKey)
+    setSubmitted(functionKey)
+    setCurrentFunctionKey(functionKey)
+    setSnapshotOwnerKey(functionKey)
+    setLoadedSnapshotKey(functionKey)
+    setIsImportedSnapshot(true)
+    setToast('Loaded saved tutorial.')
   }
 
   async function handleExportTutorial() {
@@ -1332,7 +1434,10 @@ export default function UniversalCalcExplainer() {
       }
 
       setTutorialSnapshot(normalized)
-      setCurrentFunctionKey(preprocessFriendlyInput(normalizeInput(input)))
+      const importKey = preprocessFriendlyInput(normalizeInput(input))
+      setCurrentFunctionKey(importKey)
+      setSnapshotOwnerKey(importKey)
+      setLoadedSnapshotKey('')
       setIsImportedSnapshot(true)
       setToast('Tutorial loaded.')
     } catch {
@@ -1342,7 +1447,18 @@ export default function UniversalCalcExplainer() {
 
   function handleExplain() {
     const normalized = normalizeInput(input)
-    setCurrentFunctionKey(preprocessFriendlyInput(normalized))
+    const nextKey = preprocessFriendlyInput(normalized)
+
+    // Clear previous loaded/imported snapshot immediately to avoid stale render/save races.
+    setTutorialSnapshot((prev) => ({
+      equation: '',
+      isAuthoringMode: prev.isAuthoringMode,
+      steps: [],
+    }))
+    setSnapshotOwnerKey('')
+
+    setCurrentFunctionKey(nextKey)
+    setLoadedSnapshotKey('')
     setIsImportedSnapshot(false)
     setSubmitted(normalized)
     const nextRecent = [normalized, ...recentInputs.filter((e) => e !== normalized)].slice(0, 5)
@@ -1443,6 +1559,52 @@ export default function UniversalCalcExplainer() {
               Load Imported Tutorial
             </button>
           </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Saved Edited / Commentary Functions</p>
+            <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
+              {savedFunctionEntries.length === 0 ? (
+                <div className="px-3 py-3 text-xs text-slate-500 dark:text-slate-400">
+                  No saved authored/commentary functions yet.
+                </div>
+              ) : (
+                savedFunctionEntries.map(([functionKey, snapshot]) => {
+                  const displayName = getSnapshotDisplayName(functionKey, snapshot)
+                  const stepCount = Array.isArray(snapshot?.steps) ? snapshot.steps.length : 0
+                  const updatedAt = Number(snapshot?.updatedAt) || 0
+
+                  return (
+                    <div key={functionKey} className="px-3 py-2 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{displayName}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{functionKey}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {stepCount} steps {updatedAt ? `| ${new Date(updatedAt).toLocaleString()}` : ''}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => loadSavedFunction(functionKey)}
+                          className={`px-2 py-1 rounded text-[11px] font-semibold ${loadedSnapshotKey === functionKey
+                            ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'}`}
+                        >
+                          Load
+                        </button>
+                        <button
+                          onClick={() => deleteSavedByKey(functionKey)}
+                          className="px-2 py-1 rounded text-[11px] font-semibold bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1475,6 +1637,10 @@ export default function UniversalCalcExplainer() {
 
               {displayedSteps.map((step, i) => {
                 const ruleLabel = step.ruleUsed || 'Custom Step'
+                const customCommentary = String(step.commentary || '').trim()
+                const defaultCommentary = buildDefaultCommentary(step)
+                const effectiveCommentary = customCommentary || defaultCommentary
+                const isDefaultCommentary = !customCommentary
 
                 return (
                   <div key={`${ruleLabel}-${i}`} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
@@ -1525,10 +1691,20 @@ export default function UniversalCalcExplainer() {
                         ) : (
                           <>
                             {step.note ? <p className="text-sm text-slate-500 dark:text-slate-400">{step.note}</p> : null}
-                            {step.commentary?.trim() ? (
-                              <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-900/20 p-3">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 mb-1">Director&apos;s Commentary</p>
-                                <p className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed">{step.commentary}</p>
+                            {effectiveCommentary ? (
+                              <div className={`rounded-xl p-3 ${isDefaultCommentary
+                                ? 'border border-sky-200 dark:border-sky-800 bg-sky-50/70 dark:bg-sky-900/20'
+                                : 'border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-900/20'}`}>
+                                <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${isDefaultCommentary
+                                  ? 'text-sky-700 dark:text-sky-300'
+                                  : 'text-amber-700 dark:text-amber-300'}`}>
+                                  {isDefaultCommentary ? 'Auto Commentary' : 'Director\'s Commentary'}
+                                </p>
+                                <div className={`text-sm leading-relaxed ${isDefaultCommentary
+                                  ? 'text-sky-900 dark:text-sky-100'
+                                  : 'text-amber-900 dark:text-amber-100'}`}>
+                                  {parseProse(effectiveCommentary)}
+                                </div>
                               </div>
                             ) : null}
                             {step.why ? <WhyPanel why={step.why} depth={0} /> : null}
