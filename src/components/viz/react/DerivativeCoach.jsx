@@ -934,13 +934,26 @@ export default function DerivativeCoach({ params = {} }) {
 
   const card = { background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 12, padding: "16px 18px", marginBottom: 10 };
   const secCard = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "10px 14px", marginBottom: 8, border: "0.5px solid var(--color-border-tertiary)" };
+  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+
+  const tone = {
+    correct: isDark
+      ? { bg: "rgba(16,185,129,0.16)", border: "#34d399", label: "#a7f3d0", text: "#d1fae5" }
+      : { bg: "#E1F5EE", border: "#1D9E75", label: "#085041", text: "#0b3e33" },
+    hint: isDark
+      ? { bg: "rgba(245,158,11,0.16)", border: "#f59e0b", label: "#fde68a", text: "#fef3c7" }
+      : { bg: "#FAEEDA", border: "#BA7517", label: "#412402", text: "#4a2d08" },
+    explain: isDark
+      ? { bg: "rgba(244,63,94,0.16)", border: "#fb7185", label: "#fecdd3", text: "#ffe4e6" }
+      : { bg: "#FCEBEB", border: "#A32D2D", label: "#501313", text: "#5a1515" },
+  };
 
   if (showSummary) {
     const topErrors = Object.entries(sessionErrors).sort((a, b) => b[1] - a[1]).slice(0, 4);
     return (
       <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
-        <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 500, color: "#085041" }}>Session complete — {PROBLEMS.length} problems</div>
+        <div style={{ ...card, borderLeft: `3px solid ${tone.correct.border}`, borderRadius: 0, background: tone.correct.bg, marginBottom: 16 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label }}>Session complete — {PROBLEMS.length} problems</div>
         </div>
         {topErrors.length > 0 && (
           <div style={{ ...card }}>
@@ -951,7 +964,7 @@ export default function DerivativeCoach({ params = {} }) {
                   <div style={{ fontSize: 13, color: "var(--color-text-primary)" }}>{concept}</div>
                   {REVIEW_LINKS[concept] && <div style={{ fontSize: 11, color: "var(--color-text-info)" }}>Suggested review: {REVIEW_LINKS[concept]}</div>}
                 </div>
-                <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 10, background: "#FCEBEB", color: "#791F1F" }}>{count} error{count > 1 ? "s" : ""}</span>
+                <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 10, background: tone.explain.bg, color: tone.explain.label, border: `0.5px solid ${tone.explain.border}` }}>{count} error{count > 1 ? "s" : ""}</span>
               </div>
             ))}
           </div>
@@ -1001,9 +1014,9 @@ export default function DerivativeCoach({ params = {} }) {
             const isWrong = isChosen && mcResult && mcResult.verdict !== "correct";
             const isPartial = isChosen && mcResult?.verdict === "partial";
             let bg = "var(--color-background-primary)", border = "var(--color-border-secondary)", color = "var(--color-text-primary)";
-            if (isCorrect) { bg = "#E1F5EE"; border = "#1D9E75"; color = "#085041"; }
-            else if (isPartial) { bg = "#FAEEDA"; border = "#BA7517"; color = "#412402"; }
-            else if (isWrong) { bg = "#FCEBEB"; border = "#A32D2D"; color = "#501313"; }
+            if (isCorrect) { bg = tone.correct.bg; border = tone.correct.border; color = tone.correct.text; }
+            else if (isPartial) { bg = tone.hint.bg; border = tone.hint.border; color = tone.hint.text; }
+            else if (isWrong) { bg = tone.explain.bg; border = tone.explain.border; color = tone.explain.text; }
             return (
               <button key={opt.id} onClick={() => handleMcChoice(opt.id)} disabled={mcResult?.verdict === "correct"} style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 14px", marginBottom: 6, borderRadius: 8, border: `0.5px solid ${border}`, background: bg, color, cursor: mcResult?.verdict === "correct" ? "default" : "pointer", fontSize: 13, lineHeight: 1.5, transition: "all .15s" }}>
                 <span style={{ fontWeight: 600, marginRight: 8 }}>{opt.id}.</span>{opt.label}
@@ -1012,15 +1025,33 @@ export default function DerivativeCoach({ params = {} }) {
           })}
 
           {mcResult && (
-            <div style={{ padding: "12px 14px", borderLeft: `3px solid ${mcResult.verdict === "correct" ? "#1D9E75" : mcResult.verdict === "partial" ? "#BA7517" : "#A32D2D"}`, borderRadius: "0 8px 8px 0", background: mcResult.verdict === "correct" ? "#E1F5EE" : mcResult.verdict === "partial" ? "#FAEEDA" : "#FCEBEB", marginTop: 8, animation: "sd .18s ease-out" }}>
-              <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6, color: mcResult.verdict === "correct" ? "#085041" : mcResult.verdict === "partial" ? "#412402" : "#501313" }}>
+            <div
+              style={{
+                padding: "12px 14px",
+                borderLeft: `3px solid ${mcResult.verdict === "correct" ? tone.correct.border : mcResult.verdict === "partial" ? tone.hint.border : tone.explain.border}`,
+                borderRadius: "0 8px 8px 0",
+                background: mcResult.verdict === "correct" ? tone.correct.bg : mcResult.verdict === "partial" ? tone.hint.bg : tone.explain.bg,
+                marginTop: 8,
+                animation: "sd .18s ease-out",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: ".06em",
+                  marginBottom: 6,
+                  color: mcResult.verdict === "correct" ? tone.correct.label : mcResult.verdict === "partial" ? tone.hint.label : tone.explain.label,
+                }}
+              >
                 {mcResult.verdict === "correct" ? "Correct" : mcResult.verdict === "partial" ? "Partially right — but read carefully" : "Not quite"}
               </div>
-              <p style={{ fontSize: 13, lineHeight: 1.7, color: "var(--color-text-primary)", marginBottom: mcResult.reviewConcept ? 8 : 0 }}>{mcResult.message}</p>
+              <p style={{ fontSize: 13, lineHeight: 1.7, color: mcResult.verdict === "correct" ? tone.correct.text : mcResult.verdict === "partial" ? tone.hint.text : tone.explain.text, marginBottom: mcResult.reviewConcept ? 8 : 0 }}>{mcResult.message}</p>
               {mcResult.reviewConcept && (
-                <div style={{ fontSize: 12, color: "var(--color-text-info)" }}>
+                <div style={{ fontSize: 12, color: mcResult.verdict === "correct" ? tone.correct.label : mcResult.verdict === "partial" ? tone.hint.label : tone.explain.label }}>
                   Review: <strong>{mcResult.reviewConcept}</strong>
-                  {mcResult.reviewTip && <span style={{ color: "var(--color-text-secondary)" }}> — {mcResult.reviewTip}</span>}
+                  {mcResult.reviewTip && <span style={{ color: mcResult.verdict === "correct" ? tone.correct.text : mcResult.verdict === "partial" ? tone.hint.text : tone.explain.text }}> — {mcResult.reviewTip}</span>}
                 </div>
               )}
               {mcResult.verdict === "correct" && (
@@ -1062,8 +1093,8 @@ export default function DerivativeCoach({ params = {} }) {
           </div>
 
           {blankResult === "correct" && (
-            <div style={{ padding: "12px 14px", borderLeft: "3px solid #1D9E75", borderRadius: "0 8px 8px 0", background: "#E1F5EE", animation: "sd .18s ease-out", marginBottom: 8 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#085041", marginBottom: 4 }}>Correct</div>
+            <div style={{ padding: "12px 14px", borderLeft: `3px solid ${tone.correct.border}`, borderRadius: "0 8px 8px 0", background: tone.correct.bg, animation: "sd .18s ease-out", marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: tone.correct.label, marginBottom: 4 }}>Correct</div>
               <M t={blank.prefix + blank.answer + blank.suffix} display ready={ready} />
               <button onClick={advanceBlank} style={{ marginTop: 10, padding: "7px 18px", borderRadius: 8, border: "0.5px solid #1D9E75", background: "#1D9E75", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
                 {blankIdx + 1 < (prob.blanks?.length || 0) ? "Next blank →" : "Complete problem →"}
@@ -1072,20 +1103,20 @@ export default function DerivativeCoach({ params = {} }) {
           )}
 
           {blankResult === "hint" && (
-            <div style={{ padding: "12px 14px", borderLeft: "3px solid #BA7517", borderRadius: "0 8px 8px 0", background: "#FAEEDA", animation: "sd .18s ease-out", marginBottom: 8 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#412402", marginBottom: 4 }}>Hint</div>
-              <p style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.6 }}>{blank.hint}</p>
-              <div style={{ fontSize: 11, color: "#633806", marginTop: 6 }}>Review: <strong>{blank.reviewConcept}</strong></div>
+            <div style={{ padding: "12px 14px", borderLeft: `3px solid ${tone.hint.border}`, borderRadius: "0 8px 8px 0", background: tone.hint.bg, animation: "sd .18s ease-out", marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: tone.hint.label, marginBottom: 4 }}>Hint</div>
+              <p style={{ fontSize: 13, color: tone.hint.text, lineHeight: 1.6 }}>{blank.hint}</p>
+              <div style={{ fontSize: 11, color: tone.hint.label, marginTop: 6 }}>Review: <strong>{blank.reviewConcept}</strong></div>
             </div>
           )}
 
           {blankResult === "explain" && (
-            <div style={{ padding: "12px 14px", borderLeft: "3px solid #A32D2D", borderRadius: "0 8px 8px 0", background: "#FCEBEB", animation: "sd .18s ease-out", marginBottom: 8 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#501313", marginBottom: 4 }}>Full explanation</div>
-              <p style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.6, marginBottom: 8 }}>{blank.explanation}</p>
-              <div style={{ fontSize: 13, fontWeight: 500, color: "#0C447C", marginBottom: 6 }}>Answer:</div>
+            <div style={{ padding: "12px 14px", borderLeft: `3px solid ${tone.explain.border}`, borderRadius: "0 8px 8px 0", background: tone.explain.bg, animation: "sd .18s ease-out", marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: tone.explain.label, marginBottom: 4 }}>Full explanation</div>
+              <p style={{ fontSize: 13, color: tone.explain.text, lineHeight: 1.6, marginBottom: 8 }}>{blank.explanation}</p>
+              <div style={{ fontSize: 13, fontWeight: 500, color: tone.explain.label, marginBottom: 6 }}>Answer:</div>
               <M t={blank.prefix + blank.answer + blank.suffix} display ready={ready} />
-              <button onClick={advanceBlank} style={{ marginTop: 10, padding: "7px 18px", borderRadius: 8, border: "0.5px solid #A32D2D", background: "#FCEBEB", color: "#791F1F", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+              <button onClick={advanceBlank} style={{ marginTop: 10, padding: "7px 18px", borderRadius: 8, border: `0.5px solid ${tone.explain.border}`, background: isDark ? "rgba(244,63,94,0.22)" : "#FCEBEB", color: tone.explain.label, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
                 {blankIdx + 1 < (prob.blanks?.length || 0) ? "See next blank →" : "See next problem →"}
               </button>
             </div>
@@ -1096,14 +1127,14 @@ export default function DerivativeCoach({ params = {} }) {
       {/* PHASE: DONE */}
       {phase === "done" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE" }}>
-            <div style={{ fontSize: 15, fontWeight: 500, color: "#085041", marginBottom: 6 }}>Problem complete</div>
-            <div style={{ fontSize: 13, color: "#0F6E56", marginBottom: 10 }}>Full answer:</div>
-            <div style={{ background: "#fff", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto" }}>
+          <div style={{ ...card, borderLeft: `3px solid ${tone.correct.border}`, borderRadius: 0, background: tone.correct.bg }}>
+            <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label, marginBottom: 6 }}>Problem complete</div>
+            <div style={{ fontSize: 13, color: tone.correct.text, marginBottom: 10 }}>Full answer:</div>
+            <div style={{ background: isDark ? "rgba(15,23,42,0.75)" : "#fff", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", border: isDark ? "0.5px solid #334155" : "0.5px solid #e2e8f0", color: "var(--color-text-primary)" }}>
               <M t={"\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right]"} display ready={ready} />
             </div>
           </div>
-          <button onClick={nextProblem} style={{ marginTop: 10, padding: "9px 20px", borderRadius: 8, border: "0.5px solid #7F77DD", background: "#EEEDFE", color: "#3C3489", cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
+          <button onClick={nextProblem} style={{ marginTop: 10, padding: "9px 20px", borderRadius: 8, border: isDark ? "0.5px solid #818cf8" : "0.5px solid #7F77DD", background: isDark ? "rgba(99,102,241,0.2)" : "#EEEDFE", color: isDark ? "#c7d2fe" : "#3C3489", cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
             {probIdx + 1 < PROBLEMS.length ? `Next problem (${probIdx + 2}/${PROBLEMS.length}) →` : "See session summary →"}
           </button>
         </div>
