@@ -251,8 +251,13 @@ function replaceFirstExact(text, search, replacement) {
 
 function normalizeForMatch(text) {
   return String(text || '')
-    .replace(/\s+/g, '')
     .replace(/\\left|\\right/g, '')
+    // Normalize d/dx(...) and d/dx ... variants to the same form.
+    .replace(/\\frac\{d\}\{d([a-zA-Z])\}\(([a-zA-Z])\)/g, '\\frac{d}{d$1}$2')
+    .replace(/\\frac\{d\}\{d([a-zA-Z])\}\s+/g, '\\frac{d}{d$1}')
+    // Ignore parentheses that only wrap a single variable.
+    .replace(/\(([a-zA-Z])\)/g, '$1')
+    .replace(/\s+/g, '')
     .replace(/[{}]/g, '')
     .replace(/\\cdot/g, '*')
 }
@@ -868,9 +873,10 @@ function buildExplanation(input) {
 
     if (afterEq) {
       let replaced = false
-      const noDerivativeBlocksLeft = !beforeGlobal.includes('\\frac{d}{dx}')
 
-      if (s.id === 'simplify' || noDerivativeBlocksLeft) {
+      // Only simplify is allowed to replace the full displayed equation directly.
+      // If local replacement fails on a leaf node, we preserve the existing global string.
+      if (s.id === 'simplify') {
         globalEquation = afterEq
         replaced = true
       }
@@ -1063,7 +1069,7 @@ export default function UniversalCalcExplainer() {
   }
 
   return (
-    <section className="max-w-[1800px] mx-auto px-2 sm:px-4 lg:px-6">
+    <section className="max-w-[2200px] mx-auto px-2 sm:px-4 lg:px-8">
       <div className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Universal Calc Explainer (Beta)</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
@@ -1131,8 +1137,8 @@ export default function UniversalCalcExplainer() {
             <div className="space-y-5">
               <div className="border-b border-slate-100 dark:border-slate-800 pb-5">
                 <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-2">Problem</p>
-                <div className="overflow-x-auto">
-                  <KatexBlock expr={`f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`} className="text-slate-900 dark:text-slate-100" />
+                <div className="overflow-x-auto max-w-full">
+                  <KatexBlock expr={`f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`} className="text-[0.92rem] lg:text-[1rem] text-slate-900 dark:text-slate-100" />
                 </div>
               </div>
 
@@ -1159,23 +1165,23 @@ export default function UniversalCalcExplainer() {
                   rollingExpr = outcomeExpr
 
                   return (
-                    <div key={step.id} className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
-                      <div className="space-y-3">
+                    <div key={step.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
+                      <div className="min-w-0 space-y-3">
                         <div>
                           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Applied</p>
                           <p className="text-base text-slate-700 dark:text-slate-300 mb-2">Apply {ruleLabel.toLowerCase()}.</p>
-                          <div className="overflow-x-auto">
-                            <KatexBlock expr={`f'(x)=${beforeExpr}`} className="text-slate-900 dark:text-slate-100" />
+                          <div className="overflow-x-auto max-w-full">
+                            <KatexBlock expr={`f'(x)=${beforeExpr}`} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
                           </div>
-                          <div className="overflow-x-auto mt-2">
-                            <KatexBlock expr={step.math} className="text-slate-900 dark:text-slate-100" />
+                          <div className="overflow-x-auto max-w-full mt-2">
+                            <KatexBlock expr={step.math} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
                           </div>
                         </div>
 
                         <div>
                           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Outcome</p>
-                          <div className="overflow-x-auto">
-                            <KatexBlock expr={`f'(x)=${outcomeExpr}`} className="text-slate-900 dark:text-slate-100" />
+                          <div className="overflow-x-auto max-w-full">
+                            <KatexBlock expr={`f'(x)=${outcomeExpr}`} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
                           </div>
                         </div>
 
