@@ -37,6 +37,122 @@ function normalizeProseParagraphs(paragraphs = []) {
   return merged
 }
 
+function normalizeVideoTopic(title = '') {
+  return String(title)
+    .toLowerCase()
+    .replace(/\btr-?\d+[a-z]?\b/g, ' ')
+    .replace(/\b(calculus\s*i|kimberly|kim|dennis\s*f\.?\s*davis|3blue1brown|3b1b)\b/g, ' ')
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function collectLegacyVizBlocks(data) {
+  const visualizations = []
+
+  if (data.visualizationId && !data.proofSteps?.length) {
+    visualizations.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })
+  }
+
+  for (const v of data.visualizations ?? []) {
+    const id = v.id ?? v.vizId
+    if (!id) continue
+    visualizations.push({ type: 'viz', ...v, id })
+  }
+
+  const grouped = []
+  const topicBuckets = new Map()
+
+  for (const v of visualizations) {
+    if (v.id !== 'VideoEmbed') {
+      grouped.push(v)
+      continue
+    }
+
+    const title = v.title ?? 'Video'
+    const url = v?.props?.url
+    if (!url) {
+      grouped.push(v)
+      continue
+    }
+
+    const key = normalizeVideoTopic(title) || title.toLowerCase()
+    if (!topicBuckets.has(key)) {
+      topicBuckets.set(key, {
+        title,
+        caption: v.caption,
+        mathBridge: v.mathBridge,
+        videos: [],
+      })
+    }
+
+    topicBuckets.get(key).videos.push({ title, url })
+  }
+
+  for (const bucket of topicBuckets.values()) {
+    if (bucket.videos.length === 1) {
+      grouped.push({
+        type: 'viz',
+        id: 'VideoEmbed',
+        title: bucket.videos[0].title,
+        props: { url: bucket.videos[0].url },
+        caption: bucket.caption,
+        mathBridge: bucket.mathBridge,
+      })
+      continue
+    }
+
+    grouped.push({
+      type: 'viz',
+      id: 'VideoCarousel',
+      title: bucket.title,
+      props: { videos: bucket.videos },
+      caption: bucket.caption,
+      mathBridge: bucket.mathBridge,
+    })
+  }
+
+  return grouped
+}
+
+function buildLegacyFlowBlocks(data) {
+  const paragraphs = normalizeProseParagraphs(data.prose ?? [])
+  const callouts = [...(data.callouts ?? [])]
+  const visualizations = collectLegacyVizBlocks(data)
+  const blocks = []
+
+  const slotCount = Math.max(paragraphs.length, 1)
+  const vizBuckets = Array.from({ length: slotCount }, () => [])
+  visualizations.forEach((viz, index) => {
+    vizBuckets[index % slotCount].push(viz)
+  })
+
+  paragraphs.forEach((paragraph, idx) => {
+    blocks.push({ type: 'prose', paragraphs: [paragraph] })
+
+    if ((idx + 1) % 2 === 0 && callouts.length > 0) {
+      blocks.push({ type: 'callout', ...callouts.shift() })
+    }
+
+    if (vizBuckets[idx]?.length) {
+      blocks.push(vizBuckets[idx].shift())
+    }
+  })
+
+  while (callouts.length > 0) {
+    blocks.push({ type: 'callout', ...callouts.shift() })
+  }
+
+  for (const bucket of vizBuckets) {
+    while (bucket.length > 0) {
+      blocks.push(bucket.shift())
+    }
+  }
+
+  return blocks
+}
+
 function SectionContent({ data }) {
   if (!data) return null
 
@@ -101,22 +217,8 @@ function buildBlocks(data) {
     })
   }
 
-  if (data.prose?.length) {
-    blocks.push({ type: 'prose', paragraphs: normalizeProseParagraphs(data.prose) })
-  }
-
-  for (const c of data.callouts ?? []) {
-    blocks.push({ type: 'callout', ...c })
-  }
-
-  if (data.visualizationId && !data.proofSteps?.length) {
-    blocks.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })
-  }
-
-  for (const v of data.visualizations ?? []) {
-    const id = v.id ?? v.vizId
-    if (id) blocks.push({ type: 'viz', ...v, id })
-  }
+  const legacyFlowBlocks = buildLegacyFlowBlocks(data)
+  blocks.push(...legacyFlowBlocks)
 
   return blocks
 }

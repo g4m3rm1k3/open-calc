@@ -49,6 +49,16 @@ export default {
       },
       {
         id: 'VideoEmbed',
+        title: "Derivative of Inverse Trigonometric Functions Examples Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/5lhvYhd-9uM" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Derivative Rules for Inverse Trigonometric Functions Derived Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/zKYsFuKjtyo" }
+      },
+      {
+        id: 'VideoEmbed',
         title: "Derivative of Inverse Trig Functions via Implicit Differentiation",
         props: { url: "https://www.youtube.com/embed/fnVMT08u6fU" }
       },

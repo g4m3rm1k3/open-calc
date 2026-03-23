@@ -59,6 +59,16 @@ export default {
         title: "Calculus I - 2.3.2 Trigonometric and Higher-Order Derivatives",
         props: { url: "https://www.youtube.com/embed/cHaZmLIyWjg" }
       },
+      {
+        id: 'VideoEmbed',
+        title: "Derivative Rules of Trigonometric Functions Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/xVdArj43X4o" }
+      },
+      {
+        id: 'VideoEmbed',
+        title: "Deriving Derivative Rules for Trigonometric Functions Tan, Cot, Sec, Csc Calculus 1 AB",
+        props: { url: "https://www.youtube.com/embed/qJ-6EQiWA_w" }
+      },
     {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Trigonometric Functions",

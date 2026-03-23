@@ -106,16 +106,6 @@ export default {
         title: "Antiderivative & Indefinite Integration 11 Examples Calculus 1 AB",
         props: { url: "https://www.youtube.com/embed/0rDbACz81A8" }
       },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative Rules of Trigonometric Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/xVdArj43X4o" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Deriving Derivative Rules for Trigonometric Functions Tan, Cot, Sec, Csc Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/qJ-6EQiWA_w" }
-      },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part III: Evaluating From The Definition",

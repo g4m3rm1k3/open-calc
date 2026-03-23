@@ -60,16 +60,6 @@ export default {
       },
     {
         id: 'VideoEmbed',
-        title: "Derivative of Inverse Trigonometric Functions Examples Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/5lhvYhd-9uM" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative Rules for Inverse Trigonometric Functions Derived Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/zKYsFuKjtyo" }
-      },
-    {
-        id: 'VideoEmbed',
         title: "First Fundamental Theorem of Calculus Calculus 1 AB",
         props: { url: "https://www.youtube.com/embed/YWv5v8PppzU" }
       },
