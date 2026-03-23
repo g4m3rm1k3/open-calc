@@ -213,6 +213,12 @@ export default {
         props: { url: "https://www.youtube.com/embed/o-6GzqChpJs" }
       },
       {
+        id: 'InterlockingGearsViz',
+        title: 'Interlocking Gears — Rates Multiply',
+        mathBridge: 'Set gear ratios dA/dB and dB/dC with the sliders, then spin. Gear A\'s speed is exactly dA/dB × dB/dC times the base speed — the intermediate Gear B cancels out, just like du cancels in dy/dx = (dy/du)·(du/dx).',
+        caption: 'The chain rule is not symbolic manipulation — it is rates multiplying through a mechanical chain.',
+      },
+      {
         id: 'ChainRuleMicroscope',
         title: 'Microscope Mode: The Visual Derivation',
         mathBridge: 'Every differentiable function looks linear when you zoom in far enough — its graph becomes indistinguishable from its tangent line. If the inner function $g$ has local slope $m_1$ and the outer function $f$ has local slope $m_2$, then feeding a line of slope $m_1$ into a line of slope $m_2$ gives a composed line of slope $m_1\\cdot m_2$. The chain rule $(f\\circ g)\'(x) = f\'(g(x))\\cdot g\'(x)$ is just this slope-multiplication fact, made rigorous via limits.',

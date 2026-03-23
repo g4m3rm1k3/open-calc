@@ -116,6 +116,42 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
   )
 }
 
+function WelcomeModal() {
+  const [visible, setVisible] = useState(() => !localStorage.getItem('oc-welcome-seen'))
+
+  if (!visible) return null
+
+  const dismiss = () => {
+    localStorage.setItem('oc-welcome-seen', '1')
+    setVisible(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={dismiss}>
+      <div
+        className="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-8"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-3xl font-bold text-brand-600 dark:text-brand-400">∂</span>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Welcome to OpenCalc!</h2>
+        </div>
+        <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+          Concepts here are taught in multiple ways — visually, algebraically, and conceptually.
+          If a specific interactive or explanation doesn't click for you right away, don't worry!
+          Keep scrolling. You will likely find an analogy or visual that perfectly matches how your brain works.
+        </p>
+        <button
+          onClick={dismiss}
+          className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-colors"
+        >
+          Start Exploring
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function AppShell({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [graphOpen, setGraphOpen] = useState(false)
@@ -205,6 +241,7 @@ export default function AppShell({ children }) {
         </div>
       </main>
 
+      <WelcomeModal />
       <SearchModal />
       <GlobalGrapher
         isOpen={graphOpen}

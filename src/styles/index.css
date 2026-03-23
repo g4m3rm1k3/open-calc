@@ -153,6 +153,6 @@
 
 /* Sidebar active link */
 .sidebar-link-active {
-  @apply bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300
-         font-medium border-r-2 border-brand-500;
+  @apply bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300
+         font-semibold border-l-[3px] border-brand-500 dark:border-brand-400;
 }

@@ -171,6 +171,7 @@ const VIZ_REGISTRY = {
   QuotientRuleTanBuilder:        lazy(() => import('./react/QuotientRuleTanBuilder.jsx')),
   SineAdditionProofBuilder:      lazy(() => import('./react/SineAdditionProofBuilder.jsx')),
   InverseBridgeTriangleLab:      lazy(() => import('./react/InverseBridgeTriangleLab.jsx')),
+  InterlockingGearsViz:          lazy(() => import('./react/InterlockingGearsViz.jsx')),
   ChainRuleOnionLab:             lazy(() => import('./react/ChainRuleOnionLab.jsx')),
   ProofCircleLinkLab:            lazy(() => import('./react/ProofCircleLinkLab.jsx')),
   LayerScanGame:                 lazy(() => import('./react/LayerScanGame.jsx')),
