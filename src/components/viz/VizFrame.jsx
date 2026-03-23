@@ -253,6 +253,23 @@ const VIZ_REGISTRY = {
   SixTrigGraphsViz:      lazy(() => import('./d3/SixTrigGraphsViz.jsx')),
   LawOfSinesViz:         lazy(() => import('./d3/LawOfSinesViz.jsx')),
   SSAAmbiguousViz:       lazy(() => import('./d3/SSAAmbiguousViz.jsx')),
+  // Chain Rule vizzes
+  ChainRuleCompositionViz:  lazy(() => import('./d3/ChainRuleCompositionViz.jsx')),
+  ChainRuleZoomViz:         lazy(() => import('./d3/ChainRuleZoomViz.jsx')),
+  ChainRuleRatesViz:        lazy(() => import('./d3/ChainRuleRatesViz.jsx')),
+  ChainRuleLimitBridgeViz:  lazy(() => import('./react/ChainRuleLimitBridgeViz.jsx')),
+  ChainRulePracticeViz:     lazy(() => import('./react/ChainRulePracticeViz.jsx')),
+  // Precalc-5 — polar, complex, vectors
+  PolarConversionViz:       lazy(() => import('./d3/PolarConversionViz.jsx')),
+  ComplexPolarViz:          lazy(() => import('./d3/ComplexPolarViz.jsx')),
+  VectorOperationsViz:      lazy(() => import('./d3/VectorVizzes.jsx').then(m => ({ default: m.VectorOperationsViz }))),
+  DotProductViz:            lazy(() => import('./d3/VectorVizzes.jsx').then(m => ({ default: m.DotProductViz }))),
+  // Precalc-4 — exponential & log vizzes
+  ExponentialGraphViz:   lazy(() => import('./d3/ExponentialGraphViz.jsx')),
+  GrowthDecayViz:        lazy(() => import('./d3/GrowthDecayViz.jsx')),
+  LogGraphViz:           lazy(() => import('./d3/LogGraphViz.jsx')),
+  LogPropertiesViz:      lazy(() => import('./d3/LogPropertiesViz.jsx')),
+  ExpLogSolverViz:       lazy(() => import('./d3/ExpLogSolverViz.jsx')),
 }
 
 function VizSkeleton() {

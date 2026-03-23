@@ -65,6 +65,21 @@ export default {
         title: 'Right Triangle Trigonometry Part 2: Solving for Acute Angles',
         props: { url: 'https://www.youtube.com/embed/VmtcrpTRUyI' },
       },
+      {
+        id: 'ChainRuleCompositionViz',
+        title: 'Two Function Machines — Inner and Outer',
+        mathBridge: 'Pick any composition. See x flow through inner g then outer f. The chain rule assembles from the two derivatives.',
+      },
+      {
+        id: 'ChainRuleZoomViz',
+        title: 'Shrinking Δx — Why Derivatives Multiply',
+        mathBridge: 'Shrink Δx to zero. Watch Δy/Δx converge to f\'(g(x))·g\'(x). The proof without a single limit symbol.',
+      },
+      {
+        id: 'ChainRuleRatesViz',
+        title: 'Rates Multiplying — Leibniz Notation',
+        mathBridge: 'Two analogies: unit conversion chain and gear train. Both show why dy/dx = (dy/du)·(du/dx).',
+      },
     ],
   },
 
@@ -102,6 +117,16 @@ export default {
         title: 'Integration Strategy Decision Tree',
         mathBridge: 'Interactive flowchart: enter what your integrand looks like, see which strategy applies and why.',
         caption: 'The strategy is determined by the structure of the integrand, not the specific numbers.',
+      },
+      {
+        id: 'ChainRuleLimitBridgeViz',
+        title: 'The sin(x³) Proof — Step by Step',
+        mathBridge: 'Walks through the exact textbook proof. Each step explained in plain English. Prerequisite drawers for every concept used.',
+      },
+      {
+        id: 'ChainRulePracticeViz',
+        title: 'Practice — 10 Forms of the Chain Rule',
+        mathBridge: '10 different compositions covering every form you will encounter. Reveal steps one at a time.',
       },
     ],
   },

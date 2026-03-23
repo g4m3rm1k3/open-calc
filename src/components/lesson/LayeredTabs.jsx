@@ -48,6 +48,32 @@ function normalizeVideoTopic(title = '') {
     .trim()
 }
 
+function keywordSet(text = '') {
+  const stopwords = new Set([
+    'the', 'and', 'for', 'with', 'from', 'that', 'this', 'into', 'over', 'under', 'then', 'than',
+    'video', 'lesson', 'part', 'review', 'example', 'examples', 'intro', 'introduction', 'full',
+    'length', 'series', 'chapter', 'section', 'calc', 'calculus', 'functions',
+  ])
+
+  return new Set(
+    String(text)
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((w) => w.length > 2)
+      .filter((w) => !stopwords.has(w))
+  )
+}
+
+function overlapScore(a, b) {
+  let score = 0
+  for (const token of a) {
+    if (b.has(token)) score += 1
+  }
+  return score
+}
+
 function collectLegacyVizBlocks(data) {
   const visualizations = []
 
@@ -124,19 +150,50 @@ function buildLegacyFlowBlocks(data) {
 
   const slotCount = Math.max(paragraphs.length, 1)
   const vizBuckets = Array.from({ length: slotCount }, () => [])
-  visualizations.forEach((viz, index) => {
+
+  const paragraphKeywords = paragraphs.map((p) => keywordSet(p))
+  const unassigned = []
+
+  for (const viz of visualizations) {
+    if (!paragraphs.length) {
+      unassigned.push(viz)
+      continue
+    }
+
+    const topic = normalizeVideoTopic(viz.title ?? '')
+    const topicKeywords = keywordSet(topic)
+
+    let bestIndex = -1
+    let bestScore = 0
+
+    paragraphKeywords.forEach((pkw, idx) => {
+      const score = overlapScore(topicKeywords, pkw)
+      if (score > bestScore) {
+        bestScore = score
+        bestIndex = idx
+      }
+    })
+
+    if (bestIndex >= 0 && bestScore > 0) {
+      vizBuckets[bestIndex].push(viz)
+    } else {
+      unassigned.push(viz)
+    }
+  }
+
+  unassigned.forEach((viz, index) => {
     vizBuckets[index % slotCount].push(viz)
   })
 
   paragraphs.forEach((paragraph, idx) => {
     blocks.push({ type: 'prose', paragraphs: [paragraph] })
 
-    if ((idx + 1) % 2 === 0 && callouts.length > 0) {
-      blocks.push({ type: 'callout', ...callouts.shift() })
+    while (vizBuckets[idx]?.length) {
+      blocks.push(vizBuckets[idx].shift())
     }
 
-    if (vizBuckets[idx]?.length) {
-      blocks.push(vizBuckets[idx].shift())
+    if ((idx + 1) % 2 === 0 && callouts.length > 0) {
+      blocks.push({ type: 'callout', ...callouts.shift() })
     }
   })
 

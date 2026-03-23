@@ -66,11 +66,6 @@ export default {
       },
       {
         id: 'VideoEmbed',
-        title: 'Fundamental Trigonometric Identities Intro & Proofs',
-        props: { url: 'https://www.youtube.com/embed/W6GbAtk08Vo' },
-      },
-      {
-        id: 'VideoEmbed',
         title: 'Intro to Fundamental Trig Identities',
         props: { url: 'https://www.youtube.com/embed/zHswnV-Na40' },
       },
@@ -94,16 +89,13 @@ export default {
       { id: 'VideoCarousel', title: 'Sum & Difference Identities', props: { videos: [
           { url: 'https://www.youtube.com/embed/lw7UJRNJIzc', title: 'TR-38 — Angle Sum & Difference' },
           { url: 'https://www.youtube.com/embed/Xoen_m4KUgs', title: 'TR-39 — Using Sum/Diff Identities' },
-          { url: 'https://www.youtube.com/embed/YHgjEac9nl4', title: 'Sum & Difference — Kim (5 examples)' },
         ]},
       },
       { id: 'VideoCarousel', title: 'Double & Half Angle Identities', props: { videos: [
           { url: 'https://www.youtube.com/embed/DCr6yqJfYiY', title: 'TR-40 — Double Angle Identities' },
           { url: 'https://www.youtube.com/embed/Hxox4DpW4wc', title: 'TR-41 — Half Angle Identities' },
-          { url: 'https://www.youtube.com/embed/4FELR35CovM', title: 'Double & Half Angle — Kim (9 examples)' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'Verifying Trigonometric Identities (4 Examples)', props: { url: 'https://www.youtube.com/embed/dGe7_FnI3e0' } },
     ],
   },
 
