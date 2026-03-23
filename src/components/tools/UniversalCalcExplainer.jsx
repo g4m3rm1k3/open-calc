@@ -1725,7 +1725,7 @@ export default function UniversalCalcExplainer() {
             </div>
           </div>
 
-          {!isImportedSnapshot && dynamicSnapshot && (
+          {dynamicSnapshot && (
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
             <div>

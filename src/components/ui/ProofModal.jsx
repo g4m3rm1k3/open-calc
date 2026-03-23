@@ -54,16 +54,28 @@ export default function ProofModal({ entry, proof, onClose }) {
 
   const modal = (
     <div
-      className="fixed inset-0 z-[300] flex items-stretch justify-center"
-      style={{ backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)' }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 300,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 'clamp(0px, 2vw, 24px)',
+        backdropFilter: 'blur(4px)', background: 'rgba(0,0,0,0.55)',
+      }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="relative flex flex-col w-full max-w-3xl mx-auto my-4 bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div
+        className="bg-white dark:bg-slate-950 shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+        style={{
+          position: 'relative', display: 'flex', flexDirection: 'column',
+          width: '100%', height: '100%',
+          maxWidth: '48rem',
+          borderRadius: 'clamp(0px, 2vw, 16px)',
+        }}
+      >
         {/* Modal header */}
         <div className={`flex-shrink-0 px-6 py-4 border-b ${c.border} ${c.bg} flex items-start gap-4`}>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${c.badge}`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0 rounded-full ${c.badge}`}>
                 {entry.categoryLabel}
               </span>
               <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">
@@ -74,7 +86,7 @@ export default function ProofModal({ entry, proof, onClose }) {
               {entry.name}
             </h2>
             <div
-              className="mt-2 text-slate-800 dark:text-slate-200 overflow-x-auto"
+              className="mt-0 text-slate-800 dark:text-slate-200 overflow-x-auto"
               dangerouslySetInnerHTML={{ __html: formulaHtml }}
             />
           </div>
@@ -90,7 +102,7 @@ export default function ProofModal({ entry, proof, onClose }) {
         </div>
 
         {/* Scrollable proof body */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 pt-2 pb-4">
           <ProofViewer proof={proof} />
         </div>
       </div>

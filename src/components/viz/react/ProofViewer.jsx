@@ -214,14 +214,14 @@ export default function ProofViewer({ proof }) {
   )
 
   return (
-    <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
+    <div style={{ fontFamily: "var(--font-sans)", padding: "0", maxWidth: 740 }}>
       <style>{`@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
       {/* Header */}
       <div style={{
         background: "var(--color-background-secondary)",
         border: "0.5px solid var(--color-border-tertiary)",
-        borderRadius: 12, padding: "18px 22px", marginBottom: 20,
+        borderRadius: 12, padding: "8px 22px", marginBottom: 20,
       }}>
         {proof.category && (
           <div style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".1em", color: "var(--color-text-tertiary)", marginBottom: 4 }}>
