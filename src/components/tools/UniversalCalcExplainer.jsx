@@ -155,12 +155,6 @@ function stripDerivativePrefix(text) {
   return String(text || '').replace(/^f'\(x\)\s*=\s*/i, '').trim()
 }
 
-function previewExpr(text, maxLen = 110) {
-  const compact = String(text || '').replace(/\s+/g, ' ').trim()
-  if (compact.length <= maxLen) return compact
-  return `${compact.slice(0, maxLen)}...`
-}
-
 function inferOperationFamily(ruleUsed) {
   const rule = String(ruleUsed || '').toLowerCase()
   if (rule.includes('product')) return 'product'
@@ -181,22 +175,24 @@ function buildDefaultCommentary(step) {
   if (!step) return ''
 
   const operation = inferOperationFamily(step.ruleUsed)
-  const appliedCore = previewExpr(stripDerivativePrefix(step.applied))
-  const outcomeCore = previewExpr(stripDerivativePrefix(step.outcome))
+  const appliedCore = stripDerivativePrefix(step.applied)
+  const outcomeCore = stripDerivativePrefix(step.outcome)
+  const appliedMath = appliedCore ? `\\(${appliedCore}\\)` : 'the current derivative form'
+  const outcomeMath = outcomeCore ? `\\(${outcomeCore}\\)` : 'the transformed derivative form'
 
   const templates = {
-    product: `Product rule splits the derivative into two contributions: first-diff times second, plus first times second-diff. Here we transform ${appliedCore} into ${outcomeCore}.`,
-    quotient: `Quotient rule tracks competing rates in numerator and denominator using (low·d(high) - high·d(low))/low^2. This step rewrites ${appliedCore} into ${outcomeCore}.`,
-    chain: `Chain rule handles composition: differentiate the outer form first, then multiply by the inner derivative. This maps ${appliedCore} to ${outcomeCore}.`,
-    power: `Power behavior comes from reducing the exponent by one and scaling by the original exponent (with chain behavior if the base is composite). Here ${appliedCore} becomes ${outcomeCore}.`,
-    sum: `Linearity lets us differentiate each term independently and preserve the plus/minus structure. This step carries ${appliedCore} into ${outcomeCore}.`,
-    'constant-multiple': `A constant factor only scales slope, so it stays outside while the variable-dependent part is differentiated. This turns ${appliedCore} into ${outcomeCore}.`,
-    constant: `Constants do not vary with x, so their derivative contribution is zero. This simplifies ${appliedCore} into ${outcomeCore}.`,
-    combine: `This is a recombination step: earlier local derivatives are assembled into a single global expression. We move from ${appliedCore} to ${outcomeCore}.`,
-    trig: `Trig derivatives follow base identities (like sin -> cos and cos -> -sin), then chain behavior if the angle is composite. This updates ${appliedCore} into ${outcomeCore}.`,
-    log: `Log derivative structure is 1/u times u', so inner-rate information is preserved explicitly. This takes ${appliedCore} to ${outcomeCore}.`,
-    exp: `Exponential derivatives preserve the exponential form and multiply by the inner derivative when composed. Here ${appliedCore} becomes ${outcomeCore}.`,
-    generic: `This step applies ${step.ruleUsed || 'the current rule'} to move from ${appliedCore} to ${outcomeCore}, while preserving derivative equivalence.`,
+    product: `Product rule splits the derivative into two contributions: first-diff times second, plus first times second-diff. Here we transform ${appliedMath} into ${outcomeMath}.`,
+    quotient: `Quotient rule tracks competing rates in numerator and denominator using $(low\\cdot d(high)-high\\cdot d(low))/low^2$. This step rewrites ${appliedMath} into ${outcomeMath}.`,
+    chain: `Chain rule handles composition: differentiate the outer form first, then multiply by the inner derivative. This maps ${appliedMath} to ${outcomeMath}.`,
+    power: `Power behavior comes from reducing the exponent by one and scaling by the original exponent (with chain behavior if the base is composite). Here ${appliedMath} becomes ${outcomeMath}.`,
+    sum: `Linearity lets us differentiate each term independently and preserve the plus/minus structure. This step carries ${appliedMath} into ${outcomeMath}.`,
+    'constant-multiple': `A constant factor only scales slope, so it stays outside while the variable-dependent part is differentiated. This turns ${appliedMath} into ${outcomeMath}.`,
+    constant: `Constants do not vary with $x$, so their derivative contribution is zero. This simplifies ${appliedMath} into ${outcomeMath}.`,
+    combine: `This is a recombination step: earlier local derivatives are assembled into a single global expression. We move from ${appliedMath} to ${outcomeMath}.`,
+    trig: `Trig derivatives follow base identities (like $\\sin\\to\\cos$ and $\\cos\\to-\\sin$), then chain behavior if the angle is composite. This updates ${appliedMath} into ${outcomeMath}.`,
+    log: `Log derivative structure is $1/u$ times $u'$, so inner-rate information is preserved explicitly. This takes ${appliedMath} to ${outcomeMath}.`,
+    exp: `Exponential derivatives preserve the exponential form and multiply by the inner derivative when composed. Here ${appliedMath} becomes ${outcomeMath}.`,
+    generic: `This step applies ${step.ruleUsed || 'the current rule'} to move from ${appliedMath} to ${outcomeMath}, while preserving derivative equivalence.`,
   }
 
   return templates[operation] || templates.generic
