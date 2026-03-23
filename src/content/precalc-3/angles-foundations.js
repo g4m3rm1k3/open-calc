@@ -50,6 +50,23 @@ export default {
         mathBridge: 'Drag the angle. Watch degrees and radians update simultaneously. See the arc length change as you move — the radian is literally defined by that arc.',
         caption: 'One radian is the angle where the arc length equals the radius. Drag to feel it.',
       },
+      { id: 'VideoEmbed', title: 'TR-00: Introduction to the Trigonometry Series', props: { url: 'https://www.youtube.com/embed/U23JMdBIJ0M' } },
+      { id: 'VideoCarousel', title: 'Introduction to Angles', props: { videos: [
+          { url: 'https://www.youtube.com/embed/OFK1SRVbkaA', title: 'TR-01 — Introduction to Angles' },
+          { url: 'https://www.youtube.com/embed/fqm95DcmJaQ', title: 'TR-02 — Types of Angles' },
+          { url: 'https://www.youtube.com/embed/ZjAWq2AnZkQ', title: 'TR-03 — Angle Relationships' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'Angle Measurement in Degrees', props: { videos: [
+          { url: 'https://www.youtube.com/embed/gYKig6D3_Ck', title: 'TR-04 — Angle Measurement in Degrees' },
+          { url: 'https://www.youtube.com/embed/eR_KZQtMvx0', title: 'TR-04Z — Degrees, Minutes & Seconds' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'Introduction to Radians', props: { videos: [
+          { url: 'https://www.youtube.com/embed/oJ-BbwvwQg0', title: 'TR-05 — Introduction to Radians' },
+          { url: 'https://www.youtube.com/embed/pQya8y6YC0U', title: 'TR-06 — Angle Measurement in Radians' },
+        ]},
+      },
     ],
   },
 

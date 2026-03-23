@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
+import DynamicProof from './DynamicProof.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 
 const TABS = [
@@ -41,7 +42,7 @@ function SectionContent({ data }) {
 
   // Build an ordered list of content blocks: prose paragraphs, then callouts, then vizzes.
   // If data.blocks is provided, use that ordering directly. Otherwise use legacy fields.
-  const blocks = data.blocks ?? buildBlocks(data); console.log("RENDERED BLOCKS:", blocks);
+  const blocks = data.blocks ?? buildBlocks(data)
 
   return (
     <div className="space-y-4">
@@ -55,6 +56,18 @@ function SectionContent({ data }) {
           )
         }
         if (block.type === 'callout') return <Callout key={i} {...block} />
+        if (block.type === 'proof') {
+          return (
+            <div key={i} className="my-6">
+              <DynamicProof
+                steps={block.steps ?? []}
+                visualizationId={block.visualizationId}
+                visualizationProps={block.visualizationProps ?? {}}
+                title={block.title}
+              />
+            </div>
+          )
+        }
         if (block.type === 'viz') {
           return (
             <div key={i} className="my-6">
@@ -78,59 +91,45 @@ function SectionContent({ data }) {
 function buildBlocks(data) {
   const blocks = []
 
-  const paragraphs = data.prose ? normalizeProseParagraphs(data.prose) : []
-  const callouts = data.callouts ? [...data.callouts] : []
-  const vizzes = []
-
-  if (data.visualizationId) {
-    vizzes.push({ type: "viz", id: data.visualizationId, props: data.visualizationProps ?? {} })
-  }
-  if (data.visualizations) {
-    for (const v of data.visualizations) {
-      const id = v.id ?? v.vizId
-      if (id) vizzes.push({ type: "viz", ...v, id })
-    }
+  if (data.proofSteps?.length) {
+    blocks.push({
+      type: 'proof',
+      title: data.title,
+      steps: data.proofSteps,
+      visualizationId: data.visualizationId,
+      visualizationProps: data.visualizationProps ?? {},
+    })
   }
 
-  // Build an ordered content list: 1 paragraph, then a callout every ~2 paragraphs
-  const contentItems = []
-  let cIdx = 0
-  for (let i = 0; i < paragraphs.length; i++) {
-    contentItems.push({ type: 'prose', text: paragraphs[i] })
-    if ((i + 1) % 2 === 0 && cIdx < callouts.length) {
-      contentItems.push({ type: 'callout', data: callouts[cIdx++] })
-    }
-  }
-  while (cIdx < callouts.length) {
-    contentItems.push({ type: 'callout', data: callouts[cIdx++] })
+  if (data.prose?.length) {
+    blocks.push({ type: 'prose', paragraphs: normalizeProseParagraphs(data.prose) })
   }
 
-  // How many vizzes to place after each content item — spread evenly, max 2 per slot
-  const slots = Math.max(contentItems.length, 1)
-  const vizPerSlot = Math.min(2, Math.ceil(vizzes.length / slots))
-
-  for (const item of contentItems) {
-    if (item.type === 'prose') {
-      blocks.push({ type: 'prose', paragraphs: [item.text] })
-    } else {
-      blocks.push({ type: 'callout', ...item.data })
-    }
-    for (let i = 0; i < vizPerSlot && vizzes.length > 0; i++) {
-      blocks.push(vizzes.shift())
-    }
+  for (const c of data.callouts ?? []) {
+    blocks.push({ type: 'callout', ...c })
   }
 
-  // Any remaining vizzes (when vizzes >> content): add in pairs so max 2 consecutive
-  while (vizzes.length > 0) {
-    blocks.push(vizzes.shift())
-    if (vizzes.length > 0) blocks.push(vizzes.shift())
-    // Insert a spacer prose block between pairs if more remain
-    if (vizzes.length > 0 && blocks.length > 0) {
-      blocks.push({ type: 'prose', paragraphs: [''] })
-    }
+  if (data.visualizationId && !data.proofSteps?.length) {
+    blocks.push({ type: 'viz', id: data.visualizationId, props: data.visualizationProps ?? {} })
+  }
+
+  for (const v of data.visualizations ?? []) {
+    const id = v.id ?? v.vizId
+    if (id) blocks.push({ type: 'viz', ...v, id })
   }
 
   return blocks
+}
+
+function hasTabContent(section) {
+  if (!section) return false
+  if (Array.isArray(section.blocks) && section.blocks.length > 0) return true
+  if (Array.isArray(section.proofSteps) && section.proofSteps.length > 0) return true
+  if (Array.isArray(section.prose) && section.prose.length > 0) return true
+  if (Array.isArray(section.callouts) && section.callouts.length > 0) return true
+  if (Array.isArray(section.visualizations) && section.visualizations.length > 0) return true
+  if (section.visualizationId) return true
+  return false
 }
 
 export default function LayeredTabs({ lesson, activeTab, onTabChange }) {
@@ -141,7 +140,7 @@ export default function LayeredTabs({ lesson, activeTab, onTabChange }) {
       {/* Tab buttons */}
       <div className="flex border-b border-slate-200 dark:border-slate-700 mb-6 overflow-x-auto">
         {TABS.map((tab) => {
-          const hasContent = lesson[tab.id]?.prose?.length > 0
+          const hasContent = hasTabContent(lesson[tab.id])
           if (!hasContent) return null
           return (
             <button

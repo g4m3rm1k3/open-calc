@@ -16,6 +16,12 @@ export default {
       { type: 'viz', id: 'VideoEmbed', title: 'TR-26: Solving Right Triangles', props: { url: 'https://www.youtube.com/embed/CE_7EZNcG2s' } },
       { type: 'viz', id: 'VideoEmbed', title: 'TR-27: Triangle Types to Solve', props: { url: 'https://www.youtube.com/embed/kuEr6xq7c1A' } },
       { type: 'prose', paragraphs: ['The Law of Sines: a/sin A = b/sin B = c/sin C. Use when you know AAS, ASA, or SSA (watch for the ambiguous case).'] },
+      {
+        type: 'viz',
+        id: 'LawOfSinesViz',
+        title: 'Law of Sines - Draggable Triangle',
+        caption: 'Drag any vertex: the three ratios stay equal, and each equals the circumcircle diameter 2R.',
+      },
       // TR-28 + Kim law of sines — same topic
       { type: 'viz', id: 'VideoCarousel', title: 'The Law of Sines',
         props: { videos: [
@@ -41,5 +47,32 @@ export default {
   },
   math: {
     prose: ['Review the mathematical derivations covered in the video series.'],
+  },
+
+  rigor: {
+    title: 'Proof of the Law of Cosines',
+    visualizationId: 'LawOfSinesViz',
+    proofSteps: [
+      {
+        expression: '\\text{Place triangle with } C \\text{ at origin, } B \\text{ at } (a, 0), \\text{ and } A \\text{ at } (b\\cos C, b\\sin C).',
+        annotation: 'Coordinate setup: side a = BC, side b = CA, and angle C at the origin.',
+      },
+      {
+        expression: 'c^2 = |AB|^2 = (b\\cos C - a)^2 + (b\\sin C)^2',
+        annotation: 'Distance formula for side c = AB.',
+      },
+      {
+        expression: '= b^2\\cos^2 C - 2ab\\cos C + a^2 + b^2\\sin^2 C',
+        annotation: 'Expand both squares.',
+      },
+      {
+        expression: '= b^2(\\cos^2 C + \\sin^2 C) + a^2 - 2ab\\cos C',
+        annotation: 'Group the b^2 terms and apply the Pythagorean identity.',
+      },
+      {
+        expression: 'c^2 = a^2 + b^2 - 2ab\\cos C \\qquad \\blacksquare',
+        annotation: 'This is the Law of Cosines. If C = 90 degrees, cos C = 0 and it reduces to the Pythagorean theorem.',
+      },
+    ],
   },
 }

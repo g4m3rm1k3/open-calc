@@ -44,15 +44,18 @@ export default {
         mathBridge: 'Toggle between sin, cos, tan. See the restriction highlighted, then the inverse function as a reflection over y = x.',
         caption: 'The inverse function is the reflection of the restricted portion — not the whole periodic curve.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Inverse Trigonometric Functions',
-        props: { url: 'https://www.youtube.com/embed/7t_pZGGxMdE' },
+      { id: 'VideoEmbed', title: 'TR-22: Algebra Review of Inverse Functions', props: { url: 'https://www.youtube.com/embed/0xFUn0Dpu9M' } },
+      { id: 'VideoCarousel', title: 'Inverse Sine & Cosine Functions', props: { videos: [
+          { url: 'https://www.youtube.com/embed/qNhoMj8DYaU', title: 'TR-23 — Dennis F. Davis' },
+          { url: 'https://www.youtube.com/embed/GzfoE-u5BsU', title: 'TR-23X — Extended version' },
+        ]},
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Inverse Trigonometric Functions Full Length',
-        props: { url: 'https://www.youtube.com/embed/hxjmtDXXCzU' },
+      { id: 'VideoEmbed', title: 'TR-24: Other Inverse Trig Functions', props: { url: 'https://www.youtube.com/embed/h8QTK6u86EQ' } },
+      { id: 'VideoCarousel', title: 'Evaluating Inverse Trig Functions', props: { videos: [
+          { url: 'https://www.youtube.com/embed/em9vMyfBMzU', title: 'TR-25 — Calculator Methods' },
+          { url: 'https://www.youtube.com/embed/7t_pZGGxMdE', title: 'Evaluating Inverse Trig — Kim' },
+          { url: 'https://www.youtube.com/embed/hxjmtDXXCzU', title: 'Evaluating Inverse Trig — Kim (Extended)' },
+        ]},
       },
     ],
   },

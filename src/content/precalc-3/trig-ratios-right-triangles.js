@@ -44,6 +44,17 @@ export default {
         mathBridge: 'Drag the angle slider. All six trig ratios update. Watch how the ratio stays constant when you scale the triangle — proving similar triangles underlie everything.',
         caption: 'The ratio is the number. The triangle size is irrelevant.',
       },
+      { id: 'VideoCarousel', title: 'Trigonometric Ratios', props: { videos: [
+          { url: 'https://www.youtube.com/embed/LvMScE93T6I', title: 'TR-13 — The Trigonometric Ratios' },
+          { url: 'https://www.youtube.com/embed/J5KWXgKx0MM', title: 'TR-13Z — How the Co- Functions Got Their Names' },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'TR-14: The Unit Circle', props: { url: 'https://www.youtube.com/embed/oJgBJfstOOU' } },
+      { id: 'VideoCarousel', title: 'Sine & Cosine of Common Angles', props: { videos: [
+          { url: 'https://www.youtube.com/embed/4TFLcKKmfao', title: 'TR-15 — Sine & Cosine of Common Angles' },
+          { url: 'https://www.youtube.com/embed/i9ahDcV-bVg', title: 'TR-15Z — Proof of Common Values' },
+        ]},
+      },
     ],
   },
 

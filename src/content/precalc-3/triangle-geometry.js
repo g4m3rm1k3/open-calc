@@ -49,6 +49,23 @@ export default {
         mathBridge: 'Drag vertices to reshape the triangle. See the angle sum stay at 180°. Switch modes to see Thales and the Pythagorean visual proof.',
         caption: 'Every trig ratio is secretly a similar-triangle relationship.',
       },
+      { id: 'VideoCarousel', title: "Triangle Geometry & Thales' Theorem", props: { videos: [
+          { url: 'https://www.youtube.com/embed/mRqMtR1D4KE', title: 'TR-07 — Geometry Review of Triangles' },
+          { url: 'https://www.youtube.com/embed/hfr2Sp8W1uU', title: "TR-07Z — Thales' Theorem Proof" },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'TR-08: Similar and Congruent Triangles', props: { url: 'https://www.youtube.com/embed/lNd-ubyTkg4' } },
+      { id: 'VideoCarousel', title: 'The Pythagorean Theorem', props: { videos: [
+          { url: 'https://www.youtube.com/embed/4A9iNamXuZk', title: 'TR-09 — The Pythagorean Theorem' },
+          { url: 'https://www.youtube.com/embed/0M2aTzmhjXM', title: 'TR-09Z — Proof of Pythagorean Theorem' },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'TR-10: Pythagorean Triples', props: { url: 'https://www.youtube.com/embed/ZG2p4jx-i-Q' } },
+      { id: 'VideoCarousel', title: 'Distance Between Points', props: { videos: [
+          { url: 'https://www.youtube.com/embed/Cy90jWCrPfo', title: 'TR-11 — Distance in a Plane' },
+          { url: 'https://www.youtube.com/embed/7br1PvhFedQ', title: 'TR-12 — Distance in Space' },
+        ]},
+      },
     ],
   },
 

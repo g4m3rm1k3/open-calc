@@ -74,6 +74,36 @@ export default {
         title: 'Intro to Fundamental Trig Identities',
         props: { url: 'https://www.youtube.com/embed/zHswnV-Na40' },
       },
+      { id: 'VideoCarousel', title: 'Intro to Trig Identities & Proofs', props: { videos: [
+          { url: 'https://www.youtube.com/embed/8F3zdi_a-PM', title: 'TR-32 — Dennis F. Davis' },
+          { url: 'https://www.youtube.com/embed/W6GbAtk08Vo', title: 'Fundamental Identities — Kim' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'Pythagorean Trig Identities', props: { videos: [
+          { url: 'https://www.youtube.com/embed/N-LP9O81yn4', title: 'TR-33 — Pythagorean Identities' },
+          { url: 'https://www.youtube.com/embed/LNBZ0bP4SHk', title: 'TR-33Z — All 6 Functions on the Unit Circle' },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'TR-34: Using Pythagorean Identities', props: { url: 'https://www.youtube.com/embed/B3JOQxj_MGs' } },
+      { id: 'VideoCarousel', title: 'Symmetry, Conjugates & Reflections', props: { videos: [
+          { url: 'https://www.youtube.com/embed/db0GxUtyqjA', title: 'TR-35 — Conjugate Identities' },
+          { url: 'https://www.youtube.com/embed/q5tuzPASVaY', title: 'TR-36 — Even & Odd Trig Functions' },
+          { url: 'https://www.youtube.com/embed/RgusdNG5Luo', title: 'TR-37 — More Trig Reflections' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'Sum & Difference Identities', props: { videos: [
+          { url: 'https://www.youtube.com/embed/lw7UJRNJIzc', title: 'TR-38 — Angle Sum & Difference' },
+          { url: 'https://www.youtube.com/embed/Xoen_m4KUgs', title: 'TR-39 — Using Sum/Diff Identities' },
+          { url: 'https://www.youtube.com/embed/YHgjEac9nl4', title: 'Sum & Difference — Kim (5 examples)' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'Double & Half Angle Identities', props: { videos: [
+          { url: 'https://www.youtube.com/embed/DCr6yqJfYiY', title: 'TR-40 — Double Angle Identities' },
+          { url: 'https://www.youtube.com/embed/Hxox4DpW4wc', title: 'TR-41 — Half Angle Identities' },
+          { url: 'https://www.youtube.com/embed/4FELR35CovM', title: 'Double & Half Angle — Kim (9 examples)' },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'Verifying Trigonometric Identities (4 Examples)', props: { url: 'https://www.youtube.com/embed/dGe7_FnI3e0' } },
     ],
   },
 

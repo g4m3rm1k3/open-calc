@@ -44,6 +44,22 @@ export default {
         mathBridge: 'Drag any vertex. All three ratios $a/\\sin A$, $b/\\sin B$, $c/\\sin C$ update and stay equal. Watch how they all equal $2R$.',
         caption: 'The constant ratio is the diameter of the circumscribed circle — true for every triangle.',
       },
+      { id: 'VideoEmbed', title: 'TR-26: Solving Right Triangles', props: { url: 'https://www.youtube.com/embed/CE_7EZNcG2s' } },
+      { id: 'VideoEmbed', title: 'TR-27: Triangle Types to Solve', props: { url: 'https://www.youtube.com/embed/kuEr6xq7c1A' } },
+      { id: 'VideoCarousel', title: 'The Law of Sines', props: { videos: [
+          { url: 'https://www.youtube.com/embed/TzsKsxLuwgo', title: 'TR-28 — Dennis F. Davis' },
+          { url: 'https://www.youtube.com/embed/FtYbQ8X7U_w', title: 'Oblique Triangles — Kim' },
+        ]},
+      },
+      { id: 'VideoCarousel', title: 'The Law of Cosines', props: { videos: [
+          { url: 'https://www.youtube.com/embed/4yo5nlTtjB8', title: 'TR-29 — Dennis F. Davis' },
+          { url: 'https://www.youtube.com/embed/tlmH_kY9DHg', title: 'TR-29Z — Proof of Law of Cosines' },
+          { url: 'https://www.youtube.com/embed/07w-wk8kRRE', title: 'Law of Cosines — Kim' },
+        ]},
+      },
+      { id: 'VideoEmbed', title: 'TR-30: SSA Triangles Overview', props: { url: 'https://www.youtube.com/embed/o_t0qqzqqZ4' } },
+      { id: 'VideoEmbed', title: 'TR-31: Solving SSA Triangles', props: { url: 'https://www.youtube.com/embed/NQSPgObl80M' } },
+      { id: 'VideoEmbed', title: 'Solving Trigonometric Equations (5 Examples)', props: { url: 'https://www.youtube.com/embed/9206OVkXH50' } },
     ],
   },
 

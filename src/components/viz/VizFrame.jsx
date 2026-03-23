@@ -195,8 +195,13 @@ const VIZ_REGISTRY = {
   CompleteSquareViz:     lazy(() => import('./d3/CompleteSquareViz.jsx')),
   ComplexPlaneViz:       lazy(() => import('./d3/ComplexPlaneViz.jsx')),
   PartialFractionViz:    lazy(() => import('./d3/PartialFractionViz.jsx')),
-  SignChartViz:          lazy(() => import('./d3/SignChartAndSystemsViz.jsx').then(m => ({ default: m.SignChartViz }))),
-  SystemsGeometryViz:    lazy(() => import('./d3/SignChartAndSystemsViz.jsx').then(m => ({ default: m.SystemsGeometryViz }))),
+  SignChartViz:          lazy(() => import('./d3/SignChartViz.jsx')),
+  SystemsGeometryViz:    lazy(() => import('./d3/SystemsGeometryViz.jsx')),
+  // Chapter 1 — Rate of change & modeling
+  RateOfChangeViz:       lazy(() => import('./d3/RateOfChangeViz.jsx')),
+  FunctionModelingViz:   lazy(() => import('./d3/FunctionModelingViz.jsx')),
+  // Chapter 2 — Polynomial division
+  PolynomialDivisionViz: lazy(() => import('./react/PolynomialDivisionViz.jsx')),
   // Alias: NumberLine already exists, expose as NumberLineViz for algebra lessons
   NumberLineViz:         lazy(() => import('./d3/NumberLine.jsx')),
   // Precalc — Functions & Graphs (contributed components)
@@ -246,8 +251,8 @@ const VIZ_REGISTRY = {
   TrigRatiosViz:         lazy(() => import('./d3/TrigRatiosViz.jsx')),
   UnitCircleFullViz:     lazy(() => import('./d3/UnitCircleFullViz.jsx')),
   SixTrigGraphsViz:      lazy(() => import('./d3/SixTrigGraphsViz.jsx')),
-  LawOfSinesViz:         lazy(() => import('./d3/TriangleSolvingViz.jsx').then(m => ({ default: m.LawOfSinesViz }))),
-  SSAAmbiguousViz:       lazy(() => import('./d3/TriangleSolvingViz.jsx').then(m => ({ default: m.SSAAmbiguousViz }))),
+  LawOfSinesViz:         lazy(() => import('./d3/LawOfSinesViz.jsx')),
+  SSAAmbiguousViz:       lazy(() => import('./d3/SSAAmbiguousViz.jsx')),
 }
 
 function VizSkeleton() {

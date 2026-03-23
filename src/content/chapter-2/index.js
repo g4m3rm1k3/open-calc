@@ -7,6 +7,8 @@ import expLogDerivatives from './04-exp-log-derivatives.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
 import readingDerivatives from './06-reading-derivatives.js'
 import derivativesIntroduction from './10-derivatives-introduction.js'
+import polynomialDivisionRoots from './polynomial-division-roots.js'
+import absoluteValueRadicals from './absolute-value-radicals.js'
 
 export default {
   id: 'chapter-2',
@@ -25,5 +27,7 @@ export default {
     implicitDifferentiation,
     readingDerivatives,
     derivativesIntroduction,
+    polynomialDivisionRoots,
+    absoluteValueRadicals,
   ],
 }

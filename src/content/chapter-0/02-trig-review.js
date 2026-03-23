@@ -281,3 +281,5 @@ export default {
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
 }
+
+
