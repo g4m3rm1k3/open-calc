@@ -16,8 +16,9 @@ export default function TriangleGeometryViz({ params = {} }) {
   const vRef = useRef({ ax: 180, ay: 60, bx: 80, by: 220, cx: 310, cy: 220 })
 
   useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark')
+
     const draw = () => {
-      const isDark = document.documentElement.classList.contains('dark')
       const C = {
         bg:      isDark ? '#0f172a' : '#f8fafc',
         panel:   isDark ? '#1e293b' : '#ffffff',
@@ -184,7 +185,7 @@ export default function TriangleGeometryViz({ params = {} }) {
   }, [mode, params.currentStep])
 
   const btnBase = { padding: '5px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', border: '0.5px solid var(--color-border-secondary)', fontWeight: 500 }
-  const active = { ...btnBase, background: 'var(--color-background-info)', color: 'var(--color-text-info)', borderColor: 'var(--color-border-info)' }
+  const active = { ...btnBase, background: 'var(--color-background-info)', color: 'var(--color-text-info)', border: '0.5px solid var(--color-border-info)' }
   const inactive = { ...btnBase, background: 'transparent', color: 'var(--color-text-secondary)' }
 
   return (
