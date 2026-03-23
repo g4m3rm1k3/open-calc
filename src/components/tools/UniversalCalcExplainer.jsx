@@ -275,6 +275,16 @@ function makeDifferentiator(varName = 'x') {
     return !nodeHasX(node)
   }
 
+  function getNumericConstantValue(node) {
+    if (!isIndependentOfVar(node)) return null
+    try {
+      const value = evaluate(node.toString())
+      return Number.isFinite(value) ? value : null
+    } catch {
+      return null
+    }
+  }
+
   function trace(node, path = 'root') {
     const steps = []
 
@@ -460,38 +470,36 @@ function makeDifferentiator(varName = 'x') {
       const base = node.args[0]
       const exp = node.args[1]
 
-      if (exp.isConstantNode) {
-        const n = Number(exp.value)
-        if (Number.isFinite(n) && n !== 0) {
-          const baseTrace = trace(base, `${path}-pow-base`)
-          const outer = parse(`${n} * (${wrapIfNeeded(base)})^(${n - 1})`)
-          const derivativeNode = parse(`(${wrapIfNeeded(outer)}) * (${wrapIfNeeded(baseTrace.derivativeNode)})`)
+      const n = getNumericConstantValue(exp)
+      if (n !== null && n !== 0) {
+        const baseTrace = trace(base, `${path}-pow-base`)
+        const outer = parse(`${n} * (${wrapIfNeeded(base)})^(${n - 1})`)
+        const derivativeNode = parse(`(${wrapIfNeeded(outer)}) * (${wrapIfNeeded(baseTrace.derivativeNode)})`)
 
-          steps.push({
-            id: nextId(`${path}-pow-rule`),
-            tag: 'Power Rule + Chain Rule',
-            title: 'Apply power rule to u^n',
-            math: `\\frac{d}{d${varName}} [u^{${n}}] = ${n} u^{${n - 1}} \\cdot \\frac{du}{d${varName}}`,
-            note: `u = ${safeTex(base)}.`,
-            ruleCodes: ['power', 'chain'],
-            why: {
-              tag: 'Power + Chain',
-              explanation: 'Power rule needs chain rule whenever the base depends on x.',
-              why: RULE_LIBRARY.power.why,
-            },
-          })
-          steps.push(...baseTrace.steps)
-          steps.push({
-            id: nextId(`${path}-pow-merge`),
-            tag: 'Combine terms',
-            title: 'Write combined unsimplified derivative',
-            math: `f'(x) = ${safeTex(derivativeNode)}`,
-            note: 'Keep chain factor explicit before simplification.',
-            ruleCodes: ['sum'],
-          })
+        steps.push({
+          id: nextId(`${path}-pow-rule`),
+          tag: 'Power Rule + Chain Rule',
+          title: 'Apply power rule to u^n',
+          math: `\\frac{d}{d${varName}} [u^{${toLatex(exp)}}] = ${toLatex(exp)} u^{${toLatex(parse(String(n - 1)))}} \\cdot \\frac{du}{d${varName}}`,
+          note: `u = ${safeTex(base)}.`,
+          ruleCodes: ['power', 'chain'],
+          why: {
+            tag: 'Power + Chain',
+            explanation: 'Power rule needs chain rule whenever the base depends on x.',
+            why: RULE_LIBRARY.power.why,
+          },
+        })
+        steps.push(...baseTrace.steps)
+        steps.push({
+          id: nextId(`${path}-pow-merge`),
+          tag: 'Combine terms',
+          title: 'Write combined unsimplified derivative',
+          math: `f'(x) = ${safeTex(derivativeNode)}`,
+          note: 'Keep chain factor explicit before simplification.',
+          ruleCodes: ['sum'],
+        })
 
-          return { derivativeNode, steps }
-        }
+        return { derivativeNode, steps }
       }
     }
 
