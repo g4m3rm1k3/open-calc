@@ -1,0 +1,67 @@
+export default {
+  id: 'ch1-011', slug: 'dot-product-arithmetic', chapter: 1, order: 11,
+  title: 'Dot Product — Arithmetic Calculation',
+  subtitle: 'Multiply vectors by component: $A_xB_x + A_yB_y + A_zB_z$.',
+  tags: ['dot product', 'scalar product', 'vector multiplication', 'arithmetic', 'component-wise multiplication'],
+  aliases: 'dot-product-arithmetic',
+  hook: {
+    question: 'How do you find the dot product if you only have the components $(A_x, A_y)$ and $(B_x, B_y)$?',
+    realWorldContext: 'Computer graphics, physics engines, and data analysis all rely on the component form of the dot product because it requires no trigonometry — just simple multiplication and addition.',
+    previewVisualizationId: 'DotProductExampleIntuition',
+  },
+  videos: [{
+    title: 'Physics 1 – Vectors (13 of 21) Dot Product (Scalar Product) of Vectors: Component and Algebraic Form',
+    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/LbaT06YlJSA" frameborder="0" allowfullscreen></iframe>',
+    placement: 'intuition',
+  }],
+  intuition: {
+    prose: [
+      'The component-wise definition of the dot product is exactly the same as the geometric one: $\\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y + A_zB_z$.',
+      'It works because the basis vectors $\\hat{i}, \\hat{j}, \\hat{k}$ are perpendicular. Since $\\hat{i} \\cdot \\hat{j} = 0$ and $\\hat{i} \\cdot \\hat{i} = 1$, the cross-terms vanish during expansion.',
+      'This calculation is fast, precise, and scales easily to 3D and beyond.',
+    ],
+    callouts: [
+      { type: 'definition', title: 'Component-wise Dot Product', body: '\\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y + A_zB_z' },
+      { type: 'insight', title: 'Scalar result', body: 'The sum of scalars is a scalar. Every time you "dot" two vectors, the "vec-ness" is lost into a single number.' },
+    ],
+    visualizations: [{ id: 'DotProductExampleIntuition', title: 'Step-by-Step Dot Product Arithmetic', mathBridge: 'Watch each component pair multiply and add together in a live calculation.', caption: 'Arithmetic is the bridge to automation.' }],
+  },
+  math: {
+    prose: [
+      'The dot product can also be written in matrix notation as $A^TB$ (the transpose of $A$ multiplied by $B$).',
+      'This component form is why we say the dot product "sums the contributions" from each shared axis.',
+    ],
+    callouts: [
+      { type: 'theorem', title: 'Dot product and magnitude', body: '\\vec{A} \\cdot \\vec{A} = |\\vec{A}|^2 \\implies |\\vec{A}| = \\sqrt{\\vec{A} \\cdot \\vec{A}}' },
+    ],
+    visualizations: [{ id: 'DotProductCalculator', title: 'Component/Mag-Angle Calculator', mathBridge: 'Switch between 2D and 3D modes. Set components or magnitudes/angles and see all values update.', caption: 'The ultimate vector scratchpad.' }],
+  },
+  rigor: {
+    prose: ['We can derive the distributive property using this component form.'],
+    callouts: [
+      { type: 'theorem', title: 'Distributive property', body: '\\vec{A} \\cdot (\\vec{B} + \\vec{C}) = \\vec{A} \\cdot \\vec{B} + \\vec{A} \\cdot \\vec{C}' },
+    ],
+    visualizationId: 'DotProductProof',
+    proofSteps: [
+      { expression: '\\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y', annotation: 'Start with the 2D component form.' },
+      { expression: '= (A_cB_x + A_dB_y)', annotation: 'This mirrors the multiplication of each corresponding axis.' },
+      { expression: '= \\sum_{i=1}^n A_iB_i', annotation: 'This generalizes to any number of dimensions.' },
+    ],
+    title: 'Formal Derivation of Component Addition',
+    visualizations: [{ id: 'DotProductPatternSpotter', title: 'Pattern Recognition Quiz', mathBridge: 'Identify the correct component multiplication pattern for the dot product.', caption: 'Precision requires practice.' }],
+  },
+  examples: [
+    {
+      id: 'ch1-011-ex1', title: '2D Calculation',
+      problem: '\\vec{A} = (3, 4), \\vec{B} = (2, -1). \\text{ Find } \\vec{A} \\cdot \\vec{B}.',
+      steps: [
+        { expression: '\\vec{A} \\cdot \\vec{B} = (3)(2) + (4)(-1)', annotation: 'Multiply x components and y components.' },
+        { expression: '\\vec{A} \\cdot \\vec{B} = 6 - 4 = 2', annotation: 'Sum the results.' },
+      ],
+      conclusion: 'The dot product is 2.',
+    },
+  ],
+  challenges: [
+    { id: 'ch1-011-ch1', difficulty: 'easy', problem: '\\text{Find } \\vec{A} \\cdot \\vec{B} \\text{ for } \\vec{A} = (5, 0, 2) \\text{ and } \\vec{B} = (1, 3, -4).', hint: 'Add up three component pairs.', walkthrough: [{ expression: '5(1) + 0(3) + 2(-4) = 5 + 0 - 8 = -3', annotation: 'Apply definition.' }], answer: '-3' },
+  ],
+}

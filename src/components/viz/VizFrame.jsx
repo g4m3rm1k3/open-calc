@@ -273,51 +273,98 @@ const VIZ_REGISTRY = {
   LogGraphViz:           lazy(() => import('./d3/LogGraphViz.jsx')),
   LogPropertiesViz:      lazy(() => import('./d3/LogPropertiesViz.jsx')),
   ExpLogSolverViz:       lazy(() => import('./d3/ExpLogSolverViz.jsx')),
-  // Physics Chapter 1 — Vectors
-  VectorArrowIntuition:   lazy(() => import('./react/VectorArrowIntuition.jsx')),
-  // VectorEqualityProof:    lazy(() => import('./react/VectorEqualityProof.jsx')),
-  // VectorPatternSpotter:   lazy(() => import('./react/VectorPatternSpotter.jsx')),
-  VectorComponentDecomposer: lazy(() => import('./react/VectorComponentDecomposer.jsx')),
-  // VectorFormRecogniser:   lazy(() => import('./react/VectorFormRecogniser.jsx')),
-  // NotationGallery:        lazy(() => import('./react/NotationGallery.jsx')),
-  // BasisVectorProof:       lazy(() => import('./react/BasisVectorProof.jsx')),
-  // NotationPatternSpotter: lazy(() => import('./react/NotationPatternSpotter.jsx')),
-  // UnitVectorBuilder:      lazy(() => import('./react/UnitVectorBuilder.jsx')),
-  // NotationFormRecogniser: lazy(() => import('./react/NotationFormRecogniser.jsx')),
-  ComponentDecomposerLive:    lazy(() => import('./react/ComponentDecomposerLive.jsx')),
-  // ComponentDerivationProof:   lazy(() => import('./react/ComponentDerivationProof.jsx')),
-  // ComponentPatternSpotter:    lazy(() => import('./react/ComponentPatternSpotter.jsx')),
-  ComponentConversionExplorer: lazy(() => import('./react/ComponentConversionExplorer.jsx')),
-  // ComponentFormRecogniser:    lazy(() => import('./react/ComponentFormRecogniser.jsx')),
+  // ─── Physics Chapter 1: Vectors ─────────────────────────────────────────────
+  // Lesson 1: What Is a Vector? (P1-P5)
+  VectorArrowIntuition:        lazy(() => import('./react/VectorArrowIntuition.jsx')),
+  VectorEqualityProof:         lazy(() => import('./react/VectorEqualityProof.jsx')),
+  VectorPatternSpotter:        lazy(() => import('./react/VectorPatternSpotter.jsx')),
+  VectorComponentDecomposer:   lazy(() => import('./react/VectorComponentDecomposer.jsx')),
+  VectorFormRecogniser:        lazy(() => import('./react/VectorFormRecogniser.jsx')),
 
-  // Physics Chapter 1 — Addition (New)
+  // Lesson 2: Vector Notation (P1-P5)
+  NotationGallery:             lazy(() => import('./react/NotationGallery.jsx')),
+  BasisVectorProof:            lazy(() => import('./react/BasisVectorProof.jsx')),
+  NotationPatternSpotter:      lazy(() => import('./react/NotationPatternSpotter.jsx')),
+  UnitVectorBuilder:           lazy(() => import('./react/UnitVectorBuilder.jsx')),
+  NotationFormRecogniser:      lazy(() => import('./react/NotationFormRecogniser.jsx')),
+
+  // Lesson 3: Components and Magnitudes (P1-P5)
+  ComponentDecomposerLive:     lazy(() => import('./react/ComponentDecomposerLive.jsx')),
+  ComponentDerivationProof:    lazy(() => import('./react/ComponentDerivationProof.jsx')),
+  ComponentPatternSpotter:     lazy(() => import('./react/ComponentPatternSpotter.jsx')),
+  ComponentConversionExplorer: lazy(() => import('./react/ComponentConversionExplorer.jsx')),
+  ComponentFormRecogniser:     lazy(() => import('./react/ComponentFormRecogniser.jsx')),
+
+  // Lesson 4: Adding Vectors — Parallelogram (P1-P5)
   ParallelogramIntuition:      lazy(() => import('./react/ParallelogramIntuition.jsx')),
-  ParallelogramAngleExplorer:  lazy(() => import('./react/ParallelogramAngleExplorer.jsx')),
   ParallelogramProof:          lazy(() => import('./react/ParallelogramProof.jsx')),
   ParallelogramPatternSpotter: lazy(() => import('./react/ParallelogramPatternSpotter.jsx')),
+  ParallelogramAngleExplorer:  lazy(() => import('./react/ParallelogramAngleExplorer.jsx')),
   ParallelogramFormRecogniser: lazy(() => import('./react/ParallelogramFormRecogniser.jsx')),
 
+  // Lesson 5: Adding Vectors — Tip-to-Toe (P1-P5)
   TipToToeIntuition:           lazy(() => import('./react/TipToToeIntuition.jsx')),
   TipToToeProof:               lazy(() => import('./react/TipToToeProof.jsx')),
-  TipToToeOrderProof:          lazy(() => import('./react/TipToToeOrderProof.jsx')),
   TipToToePatternSpotter:      lazy(() => import('./react/TipToToePatternSpotter.jsx')),
+  TipToToeOrderProof:          lazy(() => import('./react/TipToToeOrderProof.jsx')),
   TipToToeFormRecogniser:      lazy(() => import('./react/TipToToeFormRecogniser.jsx')),
 
+  // Lesson 6: Adding Vectors Numerically (P1-P5)
   NumericalAdditionWalkthrough: lazy(() => import('./react/NumericalAdditionWalkthrough.jsx')),
-  NumericalAdditionTable:       lazy(() => import('./react/NumericalAdditionTable.jsx')),
   NumericalMethodProof:         lazy(() => import('./react/NumericalMethodProof.jsx')),
   NumericalPatternSpotter:      lazy(() => import('./react/NumericalPatternSpotter.jsx')),
+  NumericalAdditionTable:       lazy(() => import('./react/NumericalAdditionTable.jsx')),
   NumericalFormRecogniser:      lazy(() => import('./react/NumericalFormRecogniser.jsx')),
 
-  // Lesson 7: Subtraction (Missing files)
-  // SubtractionIntuition:       lazy(() => import('./react/SubtractionIntuition.jsx')),
-  // SubtractionDeltaV:          lazy(() => import('./react/SubtractionDeltaV.jsx')),
-  // SubtractionProof:           lazy(() => import('./react/SubtractionProof.jsx')),
+  // Lesson 7: Subtracting Vectors Graphically (P1-P5)
+  SubtractionIntuition:        lazy(() => import('./react/SubtractionIntuition.jsx')),
+  SubtractionProof:            lazy(() => import('./react/SubtractionProof.jsx')),
+  SubtractionPatternSpotter:   lazy(() => import('./react/SubtractionPatternSpotter.jsx')),
+  SubtractionDeltaV:           lazy(() => import('./react/SubtractionDeltaV.jsx')),
+  SubtractionFormRecogniser:   lazy(() => import('./react/SubtractionFormRecogniser.jsx')),
 
-  // Lesson 8: Numerical Subtraction (Missing files)
-  // NumericalSubtractionWalkthrough: lazy(() => import('./react/NumericalSubtractionWalkthrough.jsx')),
-  // SubtractionComponentTable:       lazy(() => import('./react/SubtractionComponentTable.jsx')),
-  // SubtractionNumericalProof:       lazy(() => import('./react/SubtractionNumericalProof.jsx')),
+  // Lesson 8: Subtracting Vectors Numerically (P1-P5)
+  NumericalSubtractionWalkthrough: lazy(() => import('./react/NumericalSubtractionWalkthrough.jsx')),
+  SubtractionNumericalProof:       lazy(() => import('./react/SubtractionNumericalProof.jsx')),
+  SubtractionNumericalPatternSpotter: lazy(() => import('./react/SubtractionNumericalPatternSpotter.jsx')),
+  SubtractionComponentTable:       lazy(() => import('./react/SubtractionComponentTable.jsx')),
+  SubtractionNumericalFormRecogniser: lazy(() => import('./react/SubtractionNumericalFormRecogniser.jsx')),
+
+  // Lesson 9: Adding Force Vectors (P1-P5)
+  ForceVectorIntuition:        lazy(() => import('./react/ForceVectorIntuition.jsx')),
+  ForceProof:                  lazy(() => import('./react/ForceProof.jsx')),
+  ForcePatternSpotter:         lazy(() => import('./react/ForcePatternSpotter.jsx')),
+  ForceComponentTable:         lazy(() => import('./react/ForceComponentTable.jsx')),
+  ForceFormRecogniser:         lazy(() => import('./react/ForceFormRecogniser.jsx')),
+
+  // Lessons 10–13: Dot Product
+  DotProductIntuition:         lazy(() => import('./react/DotProductIntuition.jsx')),
+  DotProductExampleIntuition:  lazy(() => import('./react/DotProductExampleIntuition.jsx')),
+  OrthogonalityIntuition:      lazy(() => import('./react/OrthogonalityIntuition.jsx')),
+  AngleBetweenIntuition:       lazy(() => import('./react/AngleBetweenIntuition.jsx')),
+  DotProductProof:             lazy(() => import('./react/DotProductProof.jsx')),
+  DotProductPatternSpotter:    lazy(() => import('./react/DotProductPatternSpotter.jsx')),
+  OrthogonalityPatternSpotter: lazy(() => import('./react/OrthogonalityPatternSpotter.jsx')),
+  AngleBetweenPatternSpotter:  lazy(() => import('./react/AngleBetweenPatternSpotter.jsx')),
+  DotProductCalculator:        lazy(() => import('./react/DotProductCalculator.jsx')),
+  DotProductExplorer:          lazy(() => import('./react/DotProductExplorer.jsx')),
+  AngleBetweenExplorer:        lazy(() => import('./react/AngleBetweenExplorer.jsx')),
+  DotProductFormRecogniser:    lazy(() => import('./react/DotProductFormRecogniser.jsx')),
+
+  // Lessons 14–16: Cross Product
+  CrossProductIntuition:       lazy(() => import('./react/CrossProductIntuition.jsx')),
+  CrossProductProof:           lazy(() => import('./react/CrossProductProof.jsx')),
+  CrossProductPatternSpotter:  lazy(() => import('./react/CrossProductPatternSpotter.jsx')),
+  CrossProductCalculator:      lazy(() => import('./react/CrossProductCalculator.jsx')),
+  CrossProductExplorer:        lazy(() => import('./react/CrossProductExplorer.jsx')),
+  CrossProductFormRecogniser:  lazy(() => import('./react/CrossProductFormRecogniser.jsx')),
+
+  // Lesson 17: Direction Cosines
+  DirectionCosineIntuition:    lazy(() => import('./react/DirectionCosineIntuition.jsx')),
+  DirectionCosineProof:        lazy(() => import('./react/DirectionCosineProof.jsx')),
+  DirectionCosinePatternSpotter: lazy(() => import('./react/DirectionCosinePatternSpotter.jsx')),
+  DirectionCosineExplorer:     lazy(() => import('./react/DirectionCosineExplorer.jsx')),
+  DirectionCosineFormRecogniser: lazy(() => import('./react/DirectionCosineFormRecogniser.jsx')),
 }
 
 function VizSkeleton() {
