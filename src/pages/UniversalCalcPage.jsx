@@ -20,15 +20,28 @@ export default function UniversalCalcPage() {
         >
           Combined Rules Solver
         </button>
+        <button
+          onClick={() => setActiveTab('coach')}
+          className={`pb-2 px-1 text-sm font-semibold transition-colors ${activeTab === 'coach' ? 'text-brand-600 border-b-2 border-brand-600' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Derivative Coach
+        </button>
       </div>
 
       {activeTab === 'explainer' ? (
         <UniversalCalcExplainer />
-      ) : (
+      ) : activeTab === 'solver' ? (
         <div className="space-y-8">
           <VizFrame 
             id="CombinedDerivativeSolver" 
             title="The PEMDAS of Differentiation"
+          />
+        </div>
+      ) : (
+        <div className="space-y-8">
+          <VizFrame
+            id="DerivativeCoach"
+            title="Derivative Coach"
           />
         </div>
       )}

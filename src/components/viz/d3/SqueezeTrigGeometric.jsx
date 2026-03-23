@@ -22,12 +22,12 @@ export default function SqueezeTrigGeometric({ params = {} }) {
       const svg = d3.select(svgEl).attr('width', W).attr('height', H)
       svg.selectAll('*').remove()
 
-      const R = Math.min(W, H) * 0.4
-      const cx = margin + 10 // Need room for tan(x) triangle
-      const cy = H - margin - 20
       const margin = 40
+      const originX = margin
+      const originY = H - 20
+      const R = Math.min(W, H) * 0.4
 
-      const g = svg.append('g').attr('transform', `translate(${20}, ${H - 20})`)
+      const g = svg.append('g').attr('transform', `translate(${originX}, ${originY})`)
       
       const px = R * Math.cos(X_ANGLE)
       const py = -R * Math.sin(X_ANGLE)

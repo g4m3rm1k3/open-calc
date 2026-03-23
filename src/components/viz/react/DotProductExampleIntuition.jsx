@@ -26,7 +26,7 @@ export default function DotProductExampleIntuition({ params = {} }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{inp(Bx, setBx, "Bₓ")}{inp(By, setBy, "Bᵧ")}</div>
         </div>
       </div>
-      <div style={{ padding: "0 20px", background: "#1e293b", margin: "0 20px", borderRadius: 10, padding: "14px 16px", fontFamily: "'Fira Code',monospace", fontSize: 13, color: "#94a3b8", lineHeight: 1.9 }}>
+      <div style={{ background: "#1e293b", margin: "0 20px", borderRadius: 10, padding: "14px 16px", fontFamily: "'Fira Code',monospace", fontSize: 13, color: "#94a3b8", lineHeight: 1.9 }}>
         <div>A⃗·B⃗ = Aₓ×Bₓ + Aᵧ×Bᵧ</div>
         <div style={{ color: "#e2e8f0" }}>= {Ax}×{Bx} + {Ay}×{By}</div>
         <div style={{ color: "#e2e8f0" }}>= {Ax * Bx} + {Ay * By}</div>
