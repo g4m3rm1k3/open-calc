@@ -371,6 +371,12 @@ const VIZ_REGISTRY = {
   DirectionCosinePatternSpotter: lazy(() => import('./react/DirectionCosinePatternSpotter.jsx')),
   DirectionCosineExplorer:     lazy(() => import('./react/DirectionCosineExplorer.jsx')),
   DirectionCosineFormRecogniser: lazy(() => import('./react/DirectionCosineFormRecogniser.jsx')),
+  // Standard Calculus Proofs (moved from incomplete ideas)
+  FundamentalTheoremProof:      lazy(() => import('./react/FundamentalTheoremProof.jsx')),
+  LHopitalProof:                lazy(() => import('./react/LHopitalProof.jsx')),
+  ProductRuleProof:             lazy(() => import('./react/ProductRuleProof.jsx')),
+  RelatedRatesProof:             lazy(() => import('./react/RelatedRatesProof.jsx')),
+  TaylorSeriesProof:            lazy(() => import('./react/TaylorSeriesProof.jsx')),
 }
 
 function VizSkeleton() {

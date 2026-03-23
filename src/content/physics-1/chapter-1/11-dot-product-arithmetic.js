@@ -43,9 +43,31 @@ export default {
     ],
     visualizationId: 'DotProductProof',
     proofSteps: [
-      { expression: '\\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y', annotation: 'Start with the 2D component form.' },
-      { expression: '= (A_cB_x + A_dB_y)', annotation: 'This mirrors the multiplication of each corresponding axis.' },
-      { expression: '= \\sum_{i=1}^n A_iB_i', annotation: 'This generalizes to any number of dimensions.' },
+      {
+        title: "Define dot product (geometric)",
+        expression: "\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi",
+        annotation: "The geometric definition involves projecting one vector onto the other. We'll show this is identical to the component sum.",
+      },
+      {
+        title: "Expand with unit vectors",
+        expression: "\\vec{A} \\cdot \\vec{B} = (A_x\\hat{i} + A_y\\hat{j}) \\cdot (B_x\\hat{i} + B_y\\hat{j})",
+        annotation: "Replace each vector with its unit-vector expansion. We can now apply the dot product definition term-by-term.",
+      },
+      {
+        title: "Distribute over addition",
+        expression: "= A_xB_x(\\hat{i} \\cdot \\hat{i}) + A_xB_y(\\hat{i} \\cdot \\hat{j}) + A_yB_x(\\hat{j} \\cdot \\hat{i}) + A_yB_y(\\hat{j} \\cdot \\hat{j})",
+        annotation: "The dot product distributes like FOIL. Four cross-terms appear.",
+      },
+      {
+        title: "Apply orthonormality",
+        expression: "\\hat{i} \\cdot \\hat{i} = \\hat{j} \\cdot \\hat{j} = 1, \\quad \\hat{i} \\cdot \\hat{j} = \\hat{j} \\cdot \\hat{i} = 0",
+        annotation: "The basis vectors are perpendicular (dot product 0) and have magnitude 1 (dot product 1). The cross-terms vanish.",
+      },
+      {
+        title: "Conclusion",
+        expression: "\\therefore \\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y",
+        annotation: "The component formula is proven. Both formulas — geometric and algebraic — are interchangeable.",
+      },
     ],
     title: 'Formal Derivation of Component Addition',
     visualizations: [{ id: 'DotProductPatternSpotter', title: 'Pattern Recognition Quiz', mathBridge: 'Identify the correct component multiplication pattern for the dot product.', caption: 'Precision requires practice.' }],

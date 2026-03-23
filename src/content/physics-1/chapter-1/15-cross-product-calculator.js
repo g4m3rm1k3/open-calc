@@ -43,8 +43,31 @@ export default {
     ],
     visualizationId: 'CrossProductProof',
     proofSteps: [
-      { expression: '\\vec{A} \\times \\vec{B} = (A_yB_z - A_zB_y)\\hat{i} - (A_xB_z - A_zB_x)\\hat{j} + (A_xB_y - A_yB_x)\\hat{k}', annotation: 'Apply the cofactor expansion of the $3\\times3$ determinant.' },
-      { expression: '= (R_x, R_y, R_z)', annotation: 'This produces the final 3D vector result.' },
+      {
+        title: "Define via determinant",
+        expression: "\\vec{A} \\times \\vec{B} = \\text{det}\\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ A_x & A_y & A_z \\\\ B_x & B_y & B_z \\end{vmatrix}",
+        annotation: "The 3×3 determinant is the systematic way to remember all six component-pair products.",
+      },
+      {
+        title: "Magnitude formula",
+        expression: "|\\vec{A} \\times \\vec{B}| = |\\vec{A}||\\vec{B}|\\sin\\phi",
+        annotation: "$\\sin\\phi = 0$ when parallel (0° or 180°). Maximum when perpendicular (90°). Opposite of the dot product pattern.",
+      },
+      {
+        title: "Direction: right-hand rule",
+        expression: "\\text{Curl A to B } \\implies \\text{Thumb points to } \\vec{A} \\times \\vec{B}",
+        annotation: "The cross product is always perpendicular to BOTH input vectors. It cannot have any component along A or B.",
+      },
+      {
+        title: "Anti-commutativity",
+        expression: "\\vec{A} \\times \\vec{B} = -(\\vec{B} \\times \\vec{A})",
+        annotation: "Swapping the order flips the sign — opposite direction. Unlike the dot product, order matters critically here.",
+      },
+      {
+        title: "Parallel vectors give zero",
+        expression: "\\vec{A} \\parallel \\vec{B} \\implies \\vec{A} \\times \\vec{B} = \\vec{0}",
+        annotation: "No perpendicular component exists when vectors are parallel. The cross product collapses to the zero vector.",
+      },
     ],
     title: 'Formal Derivation of Component Form',
     visualizations: [{ id: 'CrossProductPatternSpotter', title: 'Pattern Recognition Quiz', mathBridge: 'Identify the correct component multiplication pattern for the cross product.', caption: 'Train your brain for determinant expansion.' }],

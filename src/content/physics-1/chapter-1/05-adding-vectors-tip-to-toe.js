@@ -124,10 +124,22 @@ export default {
     ],
     visualizationId: 'TipToToeProof',
     proofSteps: [
-      { expression: '\\vec{A}+\\vec{B} = (A_x+B_x,\\;A_y+B_y)', annotation: 'Component definition of addition.' },
-      { expression: '\\vec{B}+\\vec{A} = (B_x+A_x,\\;B_y+A_y)', annotation: 'Apply the same definition with A and B swapped.' },
-      { expression: 'A_x+B_x = B_x+A_x\\text{ and }A_y+B_y = B_y+A_y', annotation: 'Real-number addition is commutative. Each component satisfies this independently.' },
-      { expression: '\\therefore\\;\\vec{A}+\\vec{B} = \\vec{B}+\\vec{A}\\;\\checkmark', annotation: 'Commutativity follows from the commutativity of real-number addition applied to each component.' },
+      {
+        expression: '\\vec{A} + \\vec{B} = (A_x+B_x,\\;A_y+B_y)',
+        annotation: 'Component addition is the fundamental definition. We will show that swapping the order results in the same vector.',
+      },
+      {
+        expression: '\\vec{B} + \\vec{A} = (B_x+A_x,\\;B_y+A_y)',
+        annotation: 'Applying the same definition with A and B exchanged. The chain on the right diagram follows the B then A path.',
+      },
+      {
+        expression: 'A_x+B_x = B_x+A_x \\quad \\text{and} \\quad A_y+B_y = B_y+A_y',
+        annotation: 'Ordinary real-number addition is commutative. Each component satisfy this property independently.',
+      },
+      {
+        expression: '\\therefore \\vec{A} + \\vec{B} = \\vec{B} + \\vec{A}',
+        annotation: 'Vector addition is commutative because it reduces to adding real numbers component-by-component, which is itself commutative. Both paths end at the same point.',
+      },
     ],
     title: 'Proof: vector addition is commutative',
     visualizations: [

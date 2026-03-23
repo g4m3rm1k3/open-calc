@@ -29,7 +29,31 @@ export default {
     callouts: [{ type: 'definition', title: 'Formal definition', body: '\cos\alpha=\frac{A_x}{|\vec{A}|},\;\cos\beta=\frac{A_y}{|\vec{A}|},\;\cos\gamma=\frac{A_z}{|\vec{A}|},\;\cos^2\alpha+\cos^2\beta+\cos^2\gamma=1' }],
     visualizationId: 'DirectionCosineProof',
     proofSteps: [
-      { expression: '\cos\alpha=\frac{A_x}{|\vec{A}|},\;\cos\beta=\frac{A_y}{|\vec{A}|},\;\cos\gamma=\frac{A_z}{|\vec{A}|},\;\cos^2\alpha+\cos^2\beta+\cos^2\gamma=1', annotation: 'This is the result we want to establish.' },
+      {
+        title: "Define direction cosines",
+        expression: "\\cos\\alpha = \\frac{A_x}{|\\vec{A}|}, \\quad \\cos\\beta = \\frac{A_y}{|\\vec{A}|}, \\quad \\cos\\gamma = \\frac{A_z}{|\\vec{A}|}",
+        annotation: "Each direction cosine is the component along that axis divided by the magnitude. Each one equals cosine of the angle to that axis.",
+      },
+      {
+        title: "Square all three",
+        expression: "\\cos^2\\alpha = \\frac{A_x^2}{|\\vec{A}|^2}, \\quad \\cos^2\\beta = \\frac{A_y^2}{|\\vec{A}|^2}, \\quad \\cos^2\\gamma = \\frac{A_z^2}{|\\vec{A}|^2}",
+        annotation: "Squaring each cosine gives the squared component over the squared magnitude.",
+      },
+      {
+        title: "Sum them",
+        expression: "\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = \\frac{A_x^2 + A_y^2 + A_z^2}{|\\vec{A}|^2}",
+        annotation: "The numerators combine into the sum of squared components.",
+      },
+      {
+        title: "Recognise the numerator",
+        expression: "A_x^2 + A_y^2 + A_z^2 = |\\vec{A}|^2",
+        annotation: "The 3D Pythagorean theorem: the squared magnitude equals the sum of squared components. This is the key step.",
+      },
+      {
+        title: "Identity proven",
+        expression: "\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = \\frac{|\\vec{A}|^2}{|\\vec{A}|^2} = 1",
+        annotation: "The numerator and denominator cancel. The identity is proven. This is the 3D version of $\\cos^2\\theta + \\sin^2\\theta = 1$.",
+      },
     ],
     title: 'Direction Cosines — derivation',
     visualizations: [{ id: 'DirectionCosineProof', title: 'Proof steps', mathBridge: 'Each step builds on the previous.' }],

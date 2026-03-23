@@ -132,23 +132,23 @@ export default {
     proofSteps: [
       {
         expression: '\\vec{R} = \\vec{A} + \\vec{B}',
-        annotation: 'Define the resultant as the vector sum.',
+        annotation: 'The resultant is defined as the vector sum. We want to understand why this equals the parallelogram diagonal.',
       },
       {
-        expression: '\\vec{R} = (A_x\\hat{i}+A_y\\hat{j}) + (B_x\\hat{i}+B_y\\hat{j})',
-        annotation: 'Expand each vector into unit-vector form.',
+        expression: '\\vec{R} = (A_x\\hat{i} + A_y\\hat{j}) + (B_x\\hat{i} + B_y\\hat{j})',
+        annotation: 'Replace each vector with its unit-vector expansion. Now the addition is fully explicit.',
       },
       {
         expression: '\\vec{R} = (A_x+B_x)\\hat{i} + (A_y+B_y)\\hat{j}',
-        annotation: 'Collect î and ĵ terms. This is component-wise addition.',
+        annotation: 'Collect î and ĵ terms. Addition is done axis by axis — ordinary arithmetic.',
       },
       {
-        expression: 'R_x = A_x + B_x,\\quad R_y = A_y + B_y',
-        annotation: 'Each component of the resultant is just the sum of the matching components.',
+        expression: 'R_x = A_x+B_x, \\qquad R_y = A_y+B_y',
+        annotation: 'The resultant components are the sums of the individual components. This is the computation step.',
       },
       {
-        expression: '\\text{Geometrically: } \\vec{A}+\\vec{B} \\text{ is the diagonal of the parallelogram with sides } \\vec{A},\\vec{B}',
-        annotation: 'The four corners are 0, A⃗, B⃗, and A⃗+B⃗. The diagonal from 0 to A⃗+B⃗ is exactly R⃗.',
+        expression: '\\text{Corners: } 0, A, B, A+B \\implies \\text{Parallelogram}',
+        annotation: 'The four corners of the parallelogram are exactly those four points. The diagonal from origin to $A+B$ is $\\vec{R}$. Geometry and algebra agree.',
       },
     ],
     title: 'Proof: parallelogram diagonal equals component sum',

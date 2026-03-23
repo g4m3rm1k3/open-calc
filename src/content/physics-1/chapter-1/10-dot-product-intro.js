@@ -43,9 +43,31 @@ export default {
     ],
     visualizationId: 'DotProductProof',
     proofSteps: [
-      { expression: '\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi', annotation: 'Start with the geometric definition.' },
-      { expression: '\\text{If } \\phi = 0, \\vec{A} \\cdot \\vec{B} = |A||B|', annotation: 'Parallel vectors give maximum product.' },
-      { expression: '\\text{If } \\phi = 90^\\circ, \\vec{A} \\cdot \\vec{B} = 0', annotation: 'Perpendicular vectors have zero projection.' },
+      {
+        title: "Define dot product (geometric)",
+        expression: "\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi",
+        annotation: "The geometric definition: project one vector onto the other, multiply by the other's magnitude. $\\phi$ is the angle between them.",
+      },
+      {
+        title: "Expand with unit vectors",
+        expression: "\\vec{A} \\cdot \\vec{B} = (A_x\\hat{i}+A_y\\hat{j}) \\cdot (B_x\\hat{i}+B_y\\hat{j})",
+        annotation: "Expand both vectors into unit-vector form so we can apply the definition term by term.",
+      },
+      {
+        title: "Distribute",
+        expression: " = A_xB_x(\\hat{i}\\cdot\\hat{i}) + A_xB_y(\\hat{i}\\cdot\\hat{j}) + A_yB_x(\\hat{j}\\cdot\\hat{i}) + A_yB_y(\\hat{j}\\cdot\\hat{j})",
+        annotation: "Dot product distributes over addition. Four cross-terms appear.",
+      },
+      {
+        title: "Apply orthonormality",
+        expression: "\\hat{i}\\cdot\\hat{i} = \\hat{j}\\cdot\\hat{j} = 1, \\quad \\hat{i}\\cdot\\hat{j} = \\hat{j}\\cdot\\hat{i} = 0",
+        annotation: "Basis vectors are orthonormal: parallel ones give 1, perpendicular ones give 0. The cross-terms vanish.",
+      },
+      {
+        title: "Result",
+        expression: "\\therefore \\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y",
+        annotation: "The component formula follows directly. Both formulas — geometric and algebraic — are equal and interchangeable.",
+      },
     ],
     title: 'Defining the Scalar Product',
     visualizations: [{ id: 'DotProductFormRecogniser', title: 'Notation Drill', mathBridge: 'Identify valid vs invalid dot product expressions.', caption: 'Rigor starts with notation.' }],

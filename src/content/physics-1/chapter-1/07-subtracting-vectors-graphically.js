@@ -126,11 +126,31 @@ export default {
     ],
     visualizationId: 'SubtractionProof',
     proofSteps: [
-      { expression: '\\vec{A} - \\vec{B} = \\vec{A} + (-\\vec{B})', annotation: 'Define subtraction as addition of the additive inverse.' },
-      { expression: '-\\vec{B} = (-B_x,\\,-B_y)', annotation: 'The additive inverse negates every component.' },
-      { expression: '\\vec{A}+(-\\vec{B}) = (A_x+(-B_x),\\;A_y+(-B_y))', annotation: 'Apply component addition.' },
-      { expression: '= (A_x - B_x,\\;A_y - B_y)', annotation: 'Simplify. Vector subtraction is component-wise scalar subtraction.' },
-      { expression: '\\text{Tail-to-tail: place tails at } \\mathbf{0}. \\text{ Then } \\vec{A}-\\vec{B} \\text{ goes from tip}(\\vec{B}) \\text{ to tip}(\\vec{A})', annotation: 'The geometric shortcut follows directly: tip(B⃗) = (Bₓ,Bᵧ), tip(A⃗) = (Aₓ,Aᵧ), difference arrow = (Aₓ−Bₓ, Aᵧ−Bᵧ).' },
+      {
+        title: "Define subtraction",
+        expression: "\\vec{A} - \\vec{B} = \\vec{A} + (-\\vec{B})",
+        annotation: "Subtraction is not a new operation. It's addition of the additive inverse. Everything we know about addition applies.",
+      },
+      {
+        title: "Negate B⃗ component-wise",
+        expression: "-\\vec{B} = (-B_x, -B_y)",
+        annotation: "Flipping all signs gives a vector of the same length pointing in the opposite direction.",
+      },
+      {
+        title: "Apply component addition",
+        expression: "\\vec{A} + (-\\vec{B}) = (A_x+(-B_x), A_y+(-B_y))",
+        annotation: "Component-wise. This is the definition of addition, applied to A and -B.",
+      },
+      {
+        title: "Simplify",
+        expression: "= (A_x-B_x, A_y-B_y)",
+        annotation: "Vector subtraction reduces to scalar subtraction on each component axis. Clean and exact.",
+      },
+      {
+        title: "Tail-to-tail geometric shortcut",
+        expression: "\\text{Place tails at } \\mathbf{0} \\implies \\vec{A}-\\vec{B} \\text{ goes from } \\text{tip}(B) \\text{ to } \\text{tip}(A)",
+        annotation: "The geometric shortcut follows directly: the arrow from tip of B to tip of A has exactly the components $(A_x-B_x, A_y-B_y)$.",
+      },
     ],
     title: 'Proof: subtraction by component and by the tail-to-tail shortcut',
     visualizations: [

@@ -162,29 +162,24 @@ export default {
     visualizationId: 'ComponentDerivationProof',
     proofSteps: [
       {
-        expression: '\\vec{A} = |\\vec{A}|\\,\\hat{A}',
-        annotation: 'Any vector equals its magnitude times its unit vector (direction).',
+        expression: '\\vec{A} = (\\text{cos}\\theta, \\text{sin}\\theta) \\quad \\text{where } |\\vec{A}|=1',
+        annotation: 'Place a unit vector at angle $\\theta$. Its tip lands on the unit circle at $(\\cos\\theta, \\sin\\theta)$.',
       },
       {
         expression: '\\hat{A} = (\\cos\\theta,\\;\\sin\\theta)',
-        annotation:
-          'By the unit-circle definition of sine and cosine, a unit vector at angle $\\theta$ ' +
-          'has components $\\cos\\theta$ (horizontal) and $\\sin\\theta$ (vertical).',
+        annotation: 'This is the unit-circle definition of sine and cosine: x-reach is $\\cos\\theta$, y-reach is $\\sin\\theta$.',
       },
       {
-        expression: '\\vec{A} = |\\vec{A}|(\\cos\\theta,\\;\\sin\\theta)',
-        annotation: 'Substitute the unit vector.',
+        expression: '\\vec{A} = |\\vec{A}|\\hat{A} = |\\vec{A}|(\\cos\\theta,\\;\\sin\\theta)',
+        annotation: 'Any vector equals its magnitude times its unit vector. Multiply the unit vector by $|\\vec{A}|$.',
       },
       {
         expression: 'A_x = |\\vec{A}|\\cos\\theta, \\qquad A_y = |\\vec{A}|\\sin\\theta',
-        annotation: 'Read off the components. These are the formulas — derived, not memorised.',
+        annotation: 'Read off the components. These are the fundamental conversion formulas — derived, not memorised.',
       },
       {
-        expression:
-          '|\\vec{A}|^2 = A_x^2 + A_y^2 = |\\vec{A}|^2\\cos^2\\theta + |\\vec{A}|^2\\sin^2\\theta = |\\vec{A}|^2(\\cos^2\\theta+\\sin^2\\theta) = |\\vec{A}|^2',
-        annotation:
-          'Verify consistency using the Pythagorean identity $\\cos^2\\theta + \\sin^2\\theta = 1$. ' +
-          'This also proves the inverse formula $|\\vec{A}| = \\sqrt{A_x^2+A_y^2}$.',
+        expression: 'A_x^2 + A_y^2 = |\\vec{A}|^2\\cos^2\\theta + |\\vec{A}|^2\\sin^2\\theta = |\\vec{A}|^2(\\cos^2\\theta+\\sin^2\\theta) = |\\vec{A}|^2',
+        annotation: 'The Pythagorean identity $\\cos^2\\theta + \\sin^2\\theta = 1$ confirms the magnitude is consistent. This also proves $|\\vec{A}| = \\sqrt{A_x^2+A_y^2}$.',
       },
     ],
     title: 'Derivation: component formulas from the unit circle',

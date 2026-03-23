@@ -43,10 +43,31 @@ export default {
     ],
     visualizationId: 'ForceProof',
     proofSteps: [
-      { expression: '\\vec{F}_{net} = \\sum_i \\vec{F}_i', annotation: 'Net force is the vector sum of all individual forces.' },
-      { expression: '= \\sum_i (F_{ix}\\hat{i} + F_{iy}\\hat{j})', annotation: 'Expand each force into components.' },
-      { expression: '= \\left(\\sum_i F_{ix}\\right)\\hat{i} + \\left(\\sum_i F_{iy}\\right)\\hat{j}', annotation: 'Collect î and ĵ terms separately.' },
-      { expression: '\\therefore\\; F_{net,x} = \\sum_i F_{ix},\\quad F_{net,y} = \\sum_i F_{iy}', annotation: 'Each component of the net force is the sum of that component across all forces. The axes are independent.' },
+      {
+        title: "Net force is a vector sum",
+        expression: "\\vec{F}_{\\text{net}} = \\sum_i \\vec{F}_i",
+        annotation: "Every force is a vector. The net force is their vector sum — not the simple sum of their magnitudes.",
+      },
+      {
+        title: "Expand into components",
+        expression: "= \\sum_i (F_{ix} \\hat{i} + F_{iy} \\hat{j})",
+        annotation: "Replace each force with its component form. We now have a sum of scalars times the basis vectors.",
+      },
+      {
+        title: "Collect by axis",
+        expression: "= (\\sum F_{ix}) \\hat{i} + (\\sum F_{iy}) \\hat{j}",
+        annotation: "Group the i-terms together and the j-terms together. Each axis becomes its own independent sum.",
+      },
+      {
+        title: "Newton's 2nd law per axis",
+        expression: "\\sum F_x = ma_x \\quad \\text{and} \\quad \\sum F_y = ma_y",
+        annotation: "The x and y equations can be solved independently. A net force in the x-direction affects only x-acceleration.",
+      },
+      {
+        title: "Equilibrium condition",
+        expression: "\\vec{a} = 0 \\iff \\sum F_x = 0 \\text{ AND } \\sum F_y = 0",
+        annotation: "Zero net force requires every component to be zero simultaneously. One non-zero component is enough to cause acceleration.",
+      },
     ],
     title: 'Why net force = sum of components',
     visualizations: [{ id: 'ForceProof', title: 'Force components combine independently', mathBridge: 'Each step highlights one axis of the force diagram.' }],

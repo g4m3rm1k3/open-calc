@@ -118,11 +118,31 @@ export default {
     ],
     visualizationId: 'SubtractionNumericalProof',
     proofSteps: [
-      { expression: '\\vec{A}-\\vec{B} = (A_x-B_x,\\;A_y-B_y)', annotation: 'Component subtraction is defined this way.' },
-      { expression: '|\\vec{A}-\\vec{B}|^2 = (A_x-B_x)^2+(A_y-B_y)^2', annotation: 'Square the magnitude.' },
-      { expression: '= A_x^2-2A_xB_x+B_x^2+A_y^2-2A_yB_y+B_y^2', annotation: 'Expand.' },
-      { expression: '= |\\vec{A}|^2+|\\vec{B}|^2-2(A_xB_x+A_yB_y)', annotation: 'Regroup into magnitudes and dot product.' },
-      { expression: '= |\\vec{A}|^2+|\\vec{B}|^2-2|\\vec{A}||\\vec{B}|\\cos\\phi', annotation: 'Recognise the dot product formula: A⃗·B⃗ = |A⃗||B⃗|cosφ. This is the law of cosines for the difference.' },
+      {
+        title: "Component subtraction",
+        expression: "\\vec{A} - \\vec{B} = (A_x - B_x, A_y - B_y)",
+        annotation: "This is the fundamental definition. We'll use it to derive the Law of Cosines for vectors.",
+      },
+      {
+        title: "Square the magnitude",
+        expression: "|\\vec{A} - \\vec{B}|^2 = (A_x - B_x)^2 + (A_y - B_y)^2",
+        annotation: "Squaring the magnitude is applying the Pythagorean theorem to the resultant components.",
+      },
+      {
+        title: "Expand and regroup",
+        expression: "= (A_x^2 + A_y^2) + (B_x^2 + B_y^2) - 2(A_xB_x + A_yB_y)",
+        annotation: "Expand the squares and collect terms. We recognize the squared magnitudes of A and B.",
+      },
+      {
+        title: "Recognize the dot product",
+        expression: "= |\\vec{A}|^2 + |\\vec{B}|^2 - 2(\\vec{A} \\cdot \\vec{B})",
+        annotation: "The sum of component products is the definition of the dot product.",
+      },
+      {
+        title: "Law of Cosines",
+        expression: "= |\\vec{A}|^2 + |\\vec{B}|^2 - 2|\\vec{A}||\\vec{B}|\\cos\\phi",
+        annotation: "Substituting the geometric dot product gives the final Law of Cosines for vector differences.",
+      },
     ],
     title: 'Derivation: law of cosines for |A⃗ − B⃗|',
     visualizations: [

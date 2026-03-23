@@ -185,30 +185,34 @@ export default {
     visualizationId: 'VectorEqualityProof',
     proofSteps: [
       {
-        expression: '\\vec{A} = (A_x,\\, A_y),\\quad \\vec{B} = (B_x,\\, B_y)',
-        annotation: 'Write both vectors in component form.',
+        title: "Define both vectors",
+        expression: "\\vec{A} = (A_x, A_y), \\quad \\vec{B} = (B_x, B_y)",
+        annotation: "Write each vector as an ordered pair of components. Position on the page is irrelevant.",
       },
       {
-        expression: '\\vec{A} = \\vec{B}',
-        annotation: 'Assert that the two vectors are equal.',
+        title: "Assert equality",
+        expression: "\\vec{A} = \\vec{B}",
+        annotation: "We want to know what 'equal' actually means. Start by assuming it and unpacking the consequences.",
       },
       {
-        expression: 'A_x\\,\\hat{i} + A_y\\,\\hat{j} = B_x\\,\\hat{i} + B_y\\,\\hat{j}',
-        annotation: 'Expand using the unit vector basis $\\hat{i}$, $\\hat{j}$.',
+        title: "Expand in basis vectors",
+        expression: "A_x\\hat{i} + A_y\\hat{j} = B_x\\hat{i} + B_y\\hat{j}",
+        annotation: "Replace each vector with its unit-vector expansion. î and ĵ are the x- and y-direction basis vectors.",
       },
       {
-        expression: '(A_x - B_x)\\,\\hat{i} + (A_y - B_y)\\,\\hat{j} = \\vec{0}',
-        annotation: 'Subtract the right side; collect terms.',
+        title: "Collect to zero",
+        expression: "(A_x - B_x)\\hat{i} + (A_y - B_y)\\hat{j} = \\vec{0}",
+        annotation: "Subtract one side from the other. If the sum is zero, each coefficient must be zero independently.",
       },
       {
-        expression: 'A_x - B_x = 0 \\quad \\text{and} \\quad A_y - B_y = 0',
-        annotation:
-          '$\\hat{i}$ and $\\hat{j}$ are linearly independent, so each coefficient must be zero independently.',
+        title: "Linear independence",
+        expression: "A_x - B_x = 0 \\quad \\text{and} \\quad A_y - B_y = 0",
+        annotation: "Because î and ĵ are linearly independent, each coefficient must vanish independently.",
       },
       {
-        expression: '\\therefore\\quad A_x = B_x \\quad \\text{and} \\quad A_y = B_y',
-        annotation:
-          'Two vectors are equal if and only if every component matches — regardless of where the arrows are drawn.',
+        title: "Conclusion",
+        expression: "\\therefore A_x = B_x \\quad \\text{and} \\quad A_y = B_y",
+        annotation: "Two vectors are equal if and only if every component matches — regardless of where the arrows are drawn.",
       },
     ],
     title: 'Proof: vector equality is component-by-component',

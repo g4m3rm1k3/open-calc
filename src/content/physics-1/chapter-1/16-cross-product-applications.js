@@ -43,8 +43,31 @@ export default {
     ],
     visualizationId: 'CrossProductProof',
     proofSteps: [
-      { expression: '|\\vec{A} \\times \\vec{B}| = |A||B|\\sin\\phi', annotation: 'This is the geometric magnitude definition.' },
-      { expression: '\\vec{R} \\perp \\text{ plane of } A, B', annotation: 'This is the property confirmed by dot product results.' },
+      {
+        title: "Define via determinant",
+        expression: "\\vec{A} \\times \\vec{B} = \\text{det}\\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ A_x & A_y & A_z \\\\ B_x & B_y & B_z \\end{vmatrix}",
+        annotation: "The 3×3 determinant is the systematic way to remember all six component-pair products.",
+      },
+      {
+        title: "Magnitude formula",
+        expression: "|\\vec{A} \\times \\vec{B}| = |\\vec{A}||\\vec{B}|\\sin\\phi",
+        annotation: "$\\sin\\phi = 0$ when parallel (0° or 180°). Maximum when perpendicular (90°). Opposite of the dot product pattern.",
+      },
+      {
+        title: "Direction: right-hand rule",
+        expression: "\\text{Curl A to B } \\implies \\text{Thumb points to } \\vec{A} \\times \\vec{B}",
+        annotation: "The cross product is always perpendicular to BOTH input vectors. It cannot have any component along A or B.",
+      },
+      {
+        title: "Anti-commutativity",
+        expression: "\\vec{A} \\times \\vec{B} = -(\\vec{B} \\times \\vec{A})",
+        annotation: "Swapping the order flips the sign — opposite direction. Unlike the dot product, order matters critically here.",
+      },
+      {
+        title: "Parallel vectors give zero",
+        expression: "\\vec{A} \\parallel \\vec{B} \\implies \\vec{A} \\times \\vec{B} = \\vec{0}",
+        annotation: "No perpendicular component exists when vectors are parallel. The cross product collapses to the zero vector.",
+      },
     ],
     title: 'Formal Condition for Cross Products',
     visualizations: [{ id: 'CrossProductFormRecogniser', title: 'Notation Recall', mathBridge: 'Identify valid vs invalid cross product expressions.', caption: 'Precision requires practice.' }],

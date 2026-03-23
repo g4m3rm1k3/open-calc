@@ -43,9 +43,31 @@ export default {
     ],
     visualizationId: 'DotProductProof',
     proofSteps: [
-      { expression: '\\vec{A} \\cdot \\vec{B} = 0', annotation: 'This is the condition we start with.' },
-      { expression: '|A||B|\\cos\\phi = 0', annotation: 'Expand using the geometric definition.' },
-      { expression: '\\cos\\phi = 0 \\implies \\phi = 90^\\circ', annotation: 'If A and B are non-zero, the angle must be exactly 90 degrees.' },
+      {
+        title: "Define dot product (geometric)",
+        expression: "\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi",
+        annotation: "The geometric definition involves projecting one vector onto the other. We'll show this is identical to the component sum.",
+      },
+      {
+        title: "Expand with unit vectors",
+        expression: "\\vec{A} \\cdot \\vec{B} = (A_x\\hat{i} + A_y\\hat{j}) \\cdot (B_x\\hat{i} + B_y\\hat{j})",
+        annotation: "Replace each vector with its unit-vector expansion. We can now apply the dot product definition term-by-term.",
+      },
+      {
+        title: "Distribute over addition",
+        expression: "= A_xB_x(\\hat{i} \\cdot \\hat{i}) + A_xB_y(\\hat{i} \\cdot \\hat{j}) + A_yB_x(\\hat{j} \\cdot \\hat{i}) + A_yB_y(\\hat{j} \\cdot \\hat{j})",
+        annotation: "The dot product distributes like FOIL. Four cross-terms appear.",
+      },
+      {
+        title: "Apply orthonormality",
+        expression: "\\hat{i} \\cdot \\hat{i} = \\hat{j} \\cdot \\hat{j} = 1, \\quad \\hat{i} \\cdot \\hat{j} = \\hat{j} \\cdot \\hat{i} = 0",
+        annotation: "The basis vectors are perpendicular (dot product 0) and have magnitude 1 (dot product 1). The cross-terms vanish.",
+      },
+      {
+        title: "Result: Zero dot product",
+        expression: "\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0",
+        annotation: "If the dot product is zero, the angle must be exactly 90 degrees. Both geometric and algebraic definitions agree.",
+      },
     ],
     title: 'Formal Condition for Orthogonality',
     visualizations: [{ id: 'OrthogonalityPatternSpotter', title: 'Orthogonality Detection Quiz', mathBridge: 'Quick-fire quiz: identify which vector pairs are orthogonal by sight and by component calculation.', caption: 'Test your "perpendicularity intuition."' }],

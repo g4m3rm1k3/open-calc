@@ -170,35 +170,49 @@ export default {
 
   rigor: {
     prose: [
-      'We prove three of the six rules rigorously from the limit definition. The others follow as corollaries.',
-      'PROOF OF THE POWER RULE (for positive integers n): We use the algebraic factoring identity: a\u207f - b\u207f = (a - b)(a\u207f\u207b\u00b9 + a\u207f\u207b\u00b2b + a\u207f\u207b\u00b3b\u00b2 + ... + b\u207f\u207b\u00b9), which has n terms in the second factor. Using the alternative form of the derivative definition with x approaching a: d/dx[x\u207f] = lim(x\u2192a) [x\u207f - a\u207f]/(x - a). By the factoring identity, (x\u207f - a\u207f)/(x - a) = x\u207f\u207b\u00b9 + x\u207f\u207b\u00b2a + x\u207f\u207b\u00b3a\u00b2 + ... + a\u207f\u207b\u00b9. This sum has exactly n terms. As x \u2192 a, each term approaches a\u207f\u207b\u00b9. There are n such terms, so the total limit is n\u00b7a\u207f\u207b\u00b9. Replacing a with x gives d/dx[x\u207f] = nx\u207f\u207b\u00b9.',
-      'Alternatively, using the binomial theorem: (x+h)\u207f = x\u207f + nx\u207f\u207b\u00b9h + C(n,2)x\u207f\u207b\u00b2h\u00b2 + ... + h\u207f. When we form the difference quotient [(x+h)\u207f - x\u207f]/h, the x\u207f terms cancel, and every remaining term in the numerator has at least one factor of h. After dividing by h, every term still has at least one factor of h EXCEPT the first term, which gives nx\u207f\u207b\u00b9. All higher-order terms vanish as h \u2192 0.',
-      'PROOF OF THE PRODUCT RULE: Let p(x) = f(x)\u00b7g(x). The difference quotient for p is [f(x+h)g(x+h) - f(x)g(x)] / h. This is not yet in a usable form. The key algebraic trick is to add and subtract f(x+h)g(x) in the numerator: [f(x+h)g(x+h) - f(x+h)g(x) + f(x+h)g(x) - f(x)g(x)] / h. Regroup: f(x+h)\u00b7[g(x+h)-g(x)]/h + g(x)\u00b7[f(x+h)-f(x)]/h. As h \u2192 0: the first factor f(x+h) approaches f(x) (because f is differentiable, hence continuous); [g(x+h)-g(x)]/h approaches g\'(x); g(x) is constant with respect to h; [f(x+h)-f(x)]/h approaches f\'(x). By the product limit law, the result is f(x)\u00b7g\'(x) + g(x)\u00b7f\'(x). This is the product rule.',
-      'PROOF OF THE QUOTIENT RULE: Write f/g = f\u00b7(1/g) and apply the product rule. We need d/dx[1/g(x)]. By the chain rule (or directly from the definition): d/dx[1/g] = -g\'(x)/[g(x)]\u00b2. Then d/dx[f/g] = f\u00b7(-g\'/g\u00b2) + (1/g)\u00b7f\' = -fg\'/g\u00b2 + f\'g/g\u00b2 = (f\'g - fg\')/g\u00b2. This is the quotient rule. (Note: the chain rule is introduced in the next lesson; one can also prove the quotient rule directly from the definition using the algebraic trick of combining fractions, similar to the 1/x derivative in the previous lesson.)',
+      'Every shortcut in calculus is a theorem derived from the limit definition. Here, we move from pattern-matching to formal proof.',
     ],
-    callouts: [
+    visualizationId: 'ProductRuleProof',
+    proofSteps: [
       {
-        type: 'proof',
-        title: 'Power Rule via Binomial Theorem',
-        body: "\\frac{(x+h)^n - x^n}{h} = \\frac{nx^{n-1}h + \\binom{n}{2}x^{n-2}h^2 + \\cdots + h^n}{h} = nx^{n-1} + \\binom{n}{2}x^{n-2}h + \\cdots \\xrightarrow{h\\to 0} nx^{n-1}",
+        tag: "Guess Check",
+        instruction: "Differentiate x²·x³ manually vs the naive guess (2x·3x²).",
+        math: "\\frac{d}{dx}[x^2 \\cdot x^3] \\neq 2x \\cdot 3x^2",
       },
       {
-        type: 'proof',
-        title: 'Product Rule — The Key Trick',
-        body: '\\frac{f(x+h)g(x+h) - f(x)g(x)}{h} = f(x+h)\\cdot\\frac{g(x+h)-g(x)}{h} + g(x)\\cdot\\frac{f(x+h)-f(x)}{h}',
+        tag: "Definition",
+        instruction: "Write the derivative of a product using the limit definition.",
+        math: "h'(x) = \\lim_{\\Delta x \\to 0} \\frac{f(x+\\Delta x)g(x+\\Delta x) - f(x)g(x)}{\\Delta x}",
+      },
+      {
+        tag: "Clever Zero",
+        instruction: "Add and subtract f(x+Δx)g(x) in the numerator.",
+        math: "\\dots \\text{add/subtract } f(x+\\Delta x)g(x) \\dots",
+      },
+      {
+        tag: "Grouping",
+        instruction: "Factor the expression into two recognizable fragments.",
+        math: "= \\lim [ f(x+\\Delta x) \\cdot \\frac{\\Delta g}{\\Delta x} + g(x) \\cdot \\frac{\\Delta f}{\\Delta x} ]",
+      },
+      {
+        tag: "Conclusion",
+        instruction: "Take the limit: Δx → 0. Δg/Δx → g' and Δf/Δx → f'.",
+        math: "(fg)' = f'g + fg'",
       },
     ],
+    title: 'Formal Proof: The Product Rule',
     visualizations: [
       {
-        id: 'VideoEmbed',
-        title: "The product and quotient rules",
-        props: { url: "https://www.youtube.com/embed/O6m9rtIGxUM" }
+        id: 'ProductRuleProof',
+        title: 'Step-by-step Product Rule Derivation',
+        mathBridge: 'Observe the "add zero" trick and how it allows the fraction to split into two independent derivatives.',
+        caption: 'The foundation of all derivative shortcuts.',
       },
       {
         id: 'ProductRuleRectangle',
-        title: 'Product Rule — The Rectangle Proof',
-        mathBridge: 'The product rule proof adds and subtracts $f(x+h)g(x)$ inside the difference quotient, splitting the change in $fg$ into two strips: one measuring $f\\cdot\\Delta g$ and one measuring $g\\cdot\\Delta f$. The key algebraic trick is that the change in the big rectangle (area $fg$) equals two border strips minus a tiny corner $\\Delta f\\cdot\\Delta g$ — that corner vanishes as $h\\to 0$, leaving exactly $(fg)\'=f\'g+fg\'$.',
-        caption: 'Drag the corner: the product rule becomes the statement that total area change equals the sum of the two border strips.',
+        title: 'Geometric Verification',
+        mathBridge: 'Compare the algebraic strips in the proof to the visual growth of the rectangle.',
+        caption: 'Geometry and algebra tell the same story.',
       },
     ],
   },

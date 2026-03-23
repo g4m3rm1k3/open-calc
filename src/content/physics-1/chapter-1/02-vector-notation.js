@@ -166,25 +166,24 @@ export default {
     visualizationId: 'BasisVectorProof',
     proofSteps: [
       {
-        expression: '\\vec{A} = A_x\\hat{i} + A_y\\hat{j}',
-        annotation: 'Express $\\vec{A}$ as a linear combination of the basis vectors.',
+        expression: '\\vec{A} = A_x \\hat{i} + A_y \\hat{j}',
+        annotation: 'We start with a vector in its standard unit-vector expansion. We want to find its unit vector Â.',
       },
       {
         expression: '\\hat{A} = \\frac{\\vec{A}}{|\\vec{A}|}',
-        annotation: 'Define the unit vector by dividing by the magnitude.',
+        annotation: 'The definition of a unit vector: divide the vector by its own magnitude to keep the direction but set length to 1.',
       },
       {
-        expression:
-          '\\bigl|\\hat{A}\\bigr| = \\left|\\frac{\\vec{A}}{|\\vec{A}|}\\right| = ' +
-          '\\frac{|\\vec{A}|}{|\\vec{A}|} = 1',
-        annotation:
-          'Scaling a vector divides its magnitude by the same factor. ' +
-          'Dividing $\\vec{A}$ by $|\\vec{A}|$ yields a vector of magnitude 1.',
+        expression: '|\\vec{A}| = \\sqrt{A_x^2 + A_y^2}',
+        annotation: 'Calculate the magnitude using the Pythagorean theorem on the components.',
       },
       {
-        expression:
-          '\\hat{A} = \\frac{A_x}{|\\vec{A}|}\\hat{i} + \\frac{A_y}{|\\vec{A}|}\\hat{j}',
-        annotation: 'Distribute the scalar division to each component.',
+        expression: '\\hat{A} = \\left(\\frac{A_x}{|\\vec{A}|}\\right) \\hat{i} + \\left(\\frac{A_y}{|\\vec{A}|}\\right) \\hat{j}',
+        annotation: 'Divide each component by the magnitude. The arrow shrinks to unit length on the diagram.',
+      },
+      {
+        expression: '|\\hat{A}|^2 = \\left(\\frac{A_x}{|\\vec{A}|}\\right)^2 + \\left(\\frac{A_y}{|\\vec{A}|}\\right)^2 = \\frac{A_x^2+A_y^2}{|\\vec{A}|^2} = 1',
+        annotation: 'The Pythagorean identity confirms the resulting magnitude is exactly 1. Â is now a valid unit vector.',
       },
     ],
     title: 'Proof: dividing by magnitude gives a unit vector',

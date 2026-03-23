@@ -128,12 +128,36 @@ export default {
     ],
     visualizationId: 'NumericalMethodProof',
     proofSteps: [
-      { expression: '\\text{Given: }\\vec{A}=(|\\vec{A}|,\\theta_A),\\;\\vec{B}=(|\\vec{B}|,\\theta_B)', annotation: 'Start with magnitude-angle form (as problems typically give).' },
-      { expression: 'A_x=|\\vec{A}|\\cos\\theta_A,\\;A_y=|\\vec{A}|\\sin\\theta_A', annotation: 'Step 1a: decompose A⃗.' },
-      { expression: 'B_x=|\\vec{B}|\\cos\\theta_B,\\;B_y=|\\vec{B}|\\sin\\theta_B', annotation: 'Step 1b: decompose B⃗.' },
-      { expression: 'R_x=A_x+B_x,\\;R_y=A_y+B_y', annotation: 'Step 2: sum components. This IS vector addition by definition.' },
-      { expression: '|\\vec{R}|=\\sqrt{R_x^2+R_y^2}', annotation: 'Step 3: recover magnitude.' },
-      { expression: '\\theta_R=\\operatorname{atan2}(R_y,R_x)', annotation: 'Step 4: recover direction. atan2 handles all quadrants.' },
+      {
+        title: "Input: magnitude-angle form",
+        expression: "\\vec{A} = (|\\vec{A}|, \\theta_A), \\quad \\vec{B} = (|\\vec{B}|, \\theta_B)",
+        annotation: "Problems often give magnitude and angle. We need to convert to component form to perform the addition.",
+      },
+      {
+        title: "Step 1 — Decompose A⃗",
+        expression: "A_x = |\\vec{A}|\\cos\\theta_A, \\quad A_y = |\\vec{A}|\\sin\\theta_A",
+        annotation: "Apply the component formulas to vector A. Watch for signs: e.g., an angle of 145° gives a negative x-component.",
+      },
+      {
+        title: "Step 1 — Decompose B⃗",
+        expression: "B_x = |\\vec{B}|\\cos\\theta_B, \\quad B_y = |\\vec{B}|\\sin\\theta_B",
+        annotation: "Same formulas for vector B. Each component is an independent scalar calculation.",
+      },
+      {
+        title: "Step 2 — Sum components",
+        expression: "R_x = A_x+B_x, \\quad R_y = A_y+B_y",
+        annotation: "This is vector addition by definition. The two component numbers combine to give the resultant's components.",
+      },
+      {
+        title: "Step 3 — Magnitude",
+        expression: "|\\vec{R}| = \\sqrt{R_x^2 + R_y^2}",
+        annotation: "Apply the Pythagorean theorem to the resultant components. This always gives the magnitude regardless of the quadrant.",
+      },
+      {
+        title: "Step 4 — Direction",
+        expression: "\\theta_R = \\text{atan2}(R_y, R_x)",
+        annotation: "The atan2 function returns the correct quadrant. Plain arctan would require a manual quadrant check if Rx < 0.",
+      },
     ],
     title: 'The four-step method — every step justified',
     visualizations: [

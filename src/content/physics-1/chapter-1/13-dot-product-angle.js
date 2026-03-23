@@ -43,8 +43,31 @@ export default {
     ],
     visualizationId: 'DotProductProof',
     proofSteps: [
-      { expression: '\\cos\\phi = \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}||\\vec{B}|}', annotation: 'Equate the component and geometric dot product forms.' },
-      { expression: '\\phi = \\arccos\\left(\\frac{A_xB_x + A_yB_y + A_zB_z}{\\sqrt{A_x^2+A_y^2+A_z^2}\\sqrt{B_x^2+B_y^2+B_z^2}}\\right)', annotation: 'This is the most general 3D form of the angle formula.' },
+      {
+        title: "Define dot product (geometric)",
+        expression: "\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi",
+        annotation: "The geometric definition involves projecting one vector onto the other. We'll show this is identical to the component sum.",
+      },
+      {
+        title: "Expand with unit vectors",
+        expression: "\\vec{A} \\cdot \\vec{B} = (A_x\\hat{i} + A_y\\hat{j}) \\cdot (B_x\\hat{i} + B_y\\hat{j})",
+        annotation: "Replace each vector with its unit-vector expansion. We can now apply the dot product definition term-by-term.",
+      },
+      {
+        title: "Distribute over addition",
+        expression: "= A_xB_x(\\hat{i} \\cdot \\hat{i}) + A_xB_y(\\hat{i} \\cdot \\hat{j}) + A_yB_x(\\hat{j} \\cdot \\hat{i}) + A_yB_y(\\hat{j} \\cdot \\hat{j})",
+        annotation: "The dot product distributes like FOIL. Four cross-terms appear.",
+      },
+      {
+        title: "Apply orthonormality",
+        expression: "\\hat{i} \\cdot \\hat{i} = \\hat{j} \\cdot \\hat{j} = 1, \\quad \\hat{i} \\cdot \\hat{j} = \\hat{j} \\cdot \\hat{i} = 0",
+        annotation: "The basis vectors are perpendicular (dot product 0) and have magnitude 1 (dot product 1). The cross-terms vanish.",
+      },
+      {
+        title: "Combine and solve for angle",
+        expression: "\\cos\\phi = \\frac{A_xB_x + A_yB_y}{|\\vec{A}||\\vec{B}|}",
+        annotation: "Equate the geometric and component forms. Now we can solve for the geometric angle using only algebraic components.",
+      },
     ],
     title: 'Solving for the Angle Between Vectors',
     visualizations: [{ id: 'AngleBetweenPatternSpotter', title: 'Angle Estimation Pattern Spotter', mathBridge: 'Visual quiz: estimate the angle between vector pairs by looking at their dot product signs and component ratios.', caption: 'Train your brain for visual estimation.' }],
