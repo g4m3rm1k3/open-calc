@@ -270,6 +270,22 @@ const VIZ_REGISTRY = {
   LogGraphViz:           lazy(() => import('./d3/LogGraphViz.jsx')),
   LogPropertiesViz:      lazy(() => import('./d3/LogPropertiesViz.jsx')),
   ExpLogSolverViz:       lazy(() => import('./d3/ExpLogSolverViz.jsx')),
+  // Physics Chapter 1 — Vectors
+  VectorArrowIntuition:   lazy(() => import('./react/VectorArrowIntuition.jsx')),
+  // VectorEqualityProof:    lazy(() => import('./react/VectorEqualityProof.jsx')),
+  // VectorPatternSpotter:   lazy(() => import('./react/VectorPatternSpotter.jsx')),
+  VectorComponentDecomposer: lazy(() => import('./react/VectorComponentDecomposer.jsx')),
+  // VectorFormRecogniser:   lazy(() => import('./react/VectorFormRecogniser.jsx')),
+  // NotationGallery:        lazy(() => import('./react/NotationGallery.jsx')),
+  // BasisVectorProof:       lazy(() => import('./react/BasisVectorProof.jsx')),
+  // NotationPatternSpotter: lazy(() => import('./react/NotationPatternSpotter.jsx')),
+  // UnitVectorBuilder:      lazy(() => import('./react/UnitVectorBuilder.jsx')),
+  // NotationFormRecogniser: lazy(() => import('./react/NotationFormRecogniser.jsx')),
+  ComponentDecomposerLive:    lazy(() => import('./react/ComponentDecomposerLive.jsx')),
+  // ComponentDerivationProof:   lazy(() => import('./react/ComponentDerivationProof.jsx')),
+  // ComponentPatternSpotter:    lazy(() => import('./react/ComponentPatternSpotter.jsx')),
+  ComponentConversionExplorer: lazy(() => import('./react/ComponentConversionExplorer.jsx')),
+  // ComponentFormRecogniser:    lazy(() => import('./react/ComponentFormRecogniser.jsx')),
 }
 
 function VizSkeleton() {

@@ -1,9 +1,11 @@
 import CH0 from './chapter-0/index.js'
+import CH1 from './chapter-1/index.js'
+
 
 // Kinematics
-const CH1 = {
+const CH2 = {
   title: 'Kinematics: Motion without Forces',
-  number: 'p1',
+  number: 'p2',
   slug: 'kinematics',
   lessons: [
     { title: 'Position & Trajectory', slug: 'position-displacement' },
@@ -15,9 +17,9 @@ const CH1 = {
 }
 
 // Newtonian Mechanics
-const CH2 = {
+const CH3 = {
   title: 'Newtonian Mechanics',
-  number: 'p2',
+  number: 'p3',
   slug: 'mechanics',
   lessons: [
     { title: 'Newton\'s Laws', slug: 'newtons-laws' },
@@ -28,9 +30,9 @@ const CH2 = {
 }
 
 // Work & Energy
-const CH3 = {
+const CH4 = {
   title: 'Work & Energy',
-  number: 'p3',
+  number: 'p4',
   slug: 'energy',
   lessons: [
     { title: 'Work In Context', slug: 'work-definition' },
@@ -42,9 +44,9 @@ const CH3 = {
 }
 
 // Momentum & Collisions
-const CH4 = {
+const CH5 = {
   title: 'Momentum & Collisions',
-  number: 'p4',
+  number: 'p5',
   slug: 'momentum',
   lessons: [
     { title: 'Momentum (p = mv)', slug: 'momentum-definition' },
@@ -54,9 +56,9 @@ const CH4 = {
 }
 
 // Rotational Motion
-const CH5 = {
+const CH6 = {
   title: 'Rotational Motion',
-  number: 'p5',
+  number: 'p6',
   slug: 'rotation',
   lessons: [
     { title: 'Angular Kinematics', slug: 'angular-kinematics' },
@@ -67,9 +69,9 @@ const CH5 = {
 }
 
 // Oscillations & Waves
-const CH6 = {
+const CH7 = {
   title: 'Oscillations & Waves',
-  number: 'p6',
+  number: 'p7',
   slug: 'oscillations-waves',
   lessons: [
     { title: 'Hooke\'s Law', slug: 'hookes-law' },
@@ -79,4 +81,4 @@ const CH6 = {
   ],
 }
 
-export default [CH0, CH1, CH2, CH3, CH4, CH5, CH6]
+export default [CH0, CH1, CH2, CH3, CH4, CH5, CH6, CH7]
