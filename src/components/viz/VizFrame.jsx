@@ -256,6 +256,7 @@ const VIZ_REGISTRY = {
     () => import("./react/RecursiveProofStepper.jsx"),
   ),
   BrokenChainTrapLab: lazy(() => import("./react/BrokenChainTrapLab.jsx")),
+  ProductRuleChainTrap: lazy(() => import("./react/ProductRuleChainTrap.jsx")),
   LimitBridgeLab: lazy(() => import("./react/LimitBridgeLab.jsx")),
   ContinuityRepairGame: lazy(() => import("./react/ContinuityRepairGame.jsx")),
   ChainRuleAssemblerGame: lazy(

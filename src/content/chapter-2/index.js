@@ -4,6 +4,7 @@ import chainRule from './02-chain-rule.js'
 import derivativesOfInverseFunctions from './02-derivatives-of-inverse-functions.js'
 import trigDerivatives from './03-trig-derivatives.js'
 import expLogDerivatives from './04-exp-log-derivatives.js'
+import productRuleChainTrap from './04b-product-rule-chain-trap.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
 import readingDerivatives from './06-reading-derivatives.js'
 import derivativesIntroduction from './10-derivatives-introduction.js'
@@ -24,6 +25,7 @@ export default {
     derivativesOfInverseFunctions,
     trigDerivatives,
     expLogDerivatives,
+    productRuleChainTrap,
     implicitDifferentiation,
     readingDerivatives,
     derivativesIntroduction,
