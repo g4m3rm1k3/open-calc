@@ -705,6 +705,39 @@ function describeFocusFromStepId(id) {
   return normalized.join(' -> ')
 }
 
+function getRootBranchKeyFromStepId(id) {
+  const key = String(id || '').replace(/-\d+$/, '')
+  if (!key) return 'root'
+
+  const branchMatchers = [
+    { re: /-(?:prod|sum|constmul)-left(?:-|$)/, key: 'left' },
+    { re: /-(?:prod|sum|constmul)-right(?:-|$)/, key: 'right' },
+    { re: /-quo-num(?:-|$)/, key: 'num' },
+    { re: /-quo-den(?:-|$)/, key: 'den' },
+    { re: /-fn-arg(?:-|$)/, key: 'arg' },
+    { re: /-pow-base(?:-|$)/, key: 'base' },
+  ]
+
+  for (const m of branchMatchers) {
+    if (m.re.test(key)) return m.key
+  }
+
+  return 'root'
+}
+
+function getRootBranchLabel(branchKey) {
+  const labels = {
+    root: 'whole expression',
+    left: 'left branch',
+    right: 'right branch',
+    num: 'numerator branch',
+    den: 'denominator branch',
+    arg: 'argument branch',
+    base: 'base branch',
+  }
+  return labels[branchKey] || String(branchKey || 'branch')
+}
+
 function normalizeInput(raw) {
   return raw.trim().replace(/^\s*[a-zA-Z]+\(x\)\s*=\s*/, '')
 }
@@ -1478,7 +1511,9 @@ export default function UniversalCalcExplainer() {
     })
 
     let rollingExpr = `\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`
+    const rootByBranch = new Map()
     const steps = filtered.map((step) => {
+      const stepId = String(step.id || '')
       const primaryRule = step.ruleCodes?.[0]
       const ruleUsed = primaryRule && RULE_LIBRARY[primaryRule]
         ? RULE_LIBRARY[primaryRule].label
@@ -1506,12 +1541,25 @@ export default function UniversalCalcExplainer() {
 
       rollingExpr = outcomeExpr
 
+      const branchKey = getRootBranchKeyFromStepId(stepId)
+      const activeSubExpr = tidyDisplayLatex(step.activeSubExpr || '')
+      if (activeSubExpr && !rootByBranch.has(branchKey)) {
+        rootByBranch.set(branchKey, activeSubExpr)
+      }
+      const rootSubExpr = rootByBranch.get(branchKey)
+        || activeSubExpr
+        || tidyDisplayLatex(explanation.inputLatex)
+
       return {
         ruleUsed,
+        stepId,
         applied: `f'(x)=${beforeExpr}`,
         outcome: `f'(x)=${outcomeExpr}`,
         fallbackApplied: fallbackApplied ? `f'(x)=${fallbackApplied}` : '',
         fallbackOutcome: fallbackOutcome ? `f'(x)=${fallbackOutcome}` : '',
+        rootBranchKey: branchKey,
+        rootBranchLabel: getRootBranchLabel(branchKey),
+        rootSubExpr,
         commentary: '',
         note: step.note || '',
         why: step.why || null,
@@ -1984,7 +2032,18 @@ export default function UniversalCalcExplainer() {
                 const isDefaultCommentary = !customCommentary
 
                 return (
-                  <div key={`${ruleLabel}-${i}`} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
+                  <div key={`${ruleLabel}-${i}`} className="relative grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-0 last:pb-0">
+                      {!tutorialSnapshot.isAuthoringMode && step.rootSubExpr ? (
+                        <div className="pointer-events-none absolute right-10 top-1 max-w-[58%] text-right">
+                          <p className="text-[10px] italic font-semibold uppercase tracking-wide text-slate-500/80 dark:text-slate-400/80">
+                            Root focus: {step.rootBranchLabel}
+                          </p>
+                          <div className="overflow-x-auto max-w-full">
+                            <KatexBlock expr={step.rootSubExpr} className="text-[0.78rem] lg:text-[0.86rem] italic text-slate-500 dark:text-slate-400" />
+                          </div>
+                        </div>
+                      ) : null}
+
                       <div className="min-w-0 space-y-3">
                         <div>
                           <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Applied</p>
