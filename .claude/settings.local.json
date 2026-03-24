@@ -16,7 +16,8 @@
       "Bash(find src/content -name \"*.js\" -exec grep -l \"body:\\\\|problem:\\\\|answer:\" {})",
       "Bash(grep -E \"\\\\\\\\\\(dfrac|frac|text|begin|displaystyle\\)\")",
       "Bash(grep '\"\"katex\"\"' package.json)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \"require\\(''react-konva''\\)\")"
     ]
   }
 }

@@ -7,9 +7,10 @@ import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
 import GlobalGrapher3D from '../ui/GlobalGrapher3D.jsx'
 import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
+import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import GrapherContext from '../../context/GrapherContext.jsx'
-import { Activity, Box, Settings2 } from 'lucide-react'
+import { Activity, Box, Settings2, PenLine } from 'lucide-react'
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams()
@@ -42,7 +43,7 @@ function MobileLocationBadge() {
   )
 }
 
-function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle }) {
+function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -132,6 +133,19 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
           <Settings2 className="w-4 h-4" />
           <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Pro</span>
         </button>
+
+        <button
+          onClick={onScratchToggle}
+          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
+            scratchOpen
+              ? 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/40 border-rose-200 dark:border-rose-800/50'
+              : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 border-rose-100 dark:border-rose-800/50'
+          }`}
+          title="Scratchpad (S)"
+        >
+          <PenLine className="w-4 h-4" />
+          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Notes</span>
+        </button>
       </div>
 
       {/* Dark mode toggle */}
@@ -197,6 +211,7 @@ export default function AppShell({ children }) {
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
+  const [scratchOpen, setScratchOpen] = useState(false)
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
 
@@ -235,11 +250,16 @@ export default function AppShell({ children }) {
         setGraphJSXOpen(prev => !prev)
         if (!graphJSXOpen) { setGraphOpen(false); setGraph3DOpen(false); }
       }
+      // 's' key for scratchpad
+      if (e.key.toLowerCase() === 's' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        setScratchOpen(prev => !prev)
+      }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
         setGraph3DOpen(false)
         setGraphJSXOpen(false)
+        setScratchOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -254,6 +274,8 @@ export default function AppShell({ children }) {
         onGraphToggle={() => setGraphOpen(prev => !prev)}
         onGraph3DToggle={() => setGraph3DOpen(prev => !prev)}
         onGraphJSXToggle={() => setGraphJSXOpen(prev => !prev)}
+        onScratchToggle={() => setScratchOpen(prev => !prev)}
+        scratchOpen={scratchOpen}
       />
 
       {/* Mobile sidebar backdrop */}
@@ -307,6 +329,7 @@ export default function AppShell({ children }) {
         onSwitchTo2D={() => { setGraphJSXOpen(false); setGraphOpen(true) }}
         onSwitchTo3D={() => { setGraphJSXOpen(false); setGraph3DOpen(true) }}
       />
+      <ScratchPad isOpen={scratchOpen} onClose={() => setScratchOpen(false)} />
     </div>
     </GrapherContext.Provider>
   )
