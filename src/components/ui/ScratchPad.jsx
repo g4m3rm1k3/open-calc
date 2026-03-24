@@ -3,7 +3,7 @@ import { Stage, Layer, Line, Circle as KonvaCircle, Arc, Text as KonvaText, Grou
 import {
   X, Trash2, Undo2, Pencil, Eraser, Sun, Moon, Minus, Plus,
   Check, MousePointer2, Triangle, Square, Circle, Hexagon,
-  Grid3x3, Magnet,
+  Grid3x3, Magnet, Crosshair, Ruler,
 } from 'lucide-react'
 
 // ─── Constants ─────────────────────────────────────────────────────────────
@@ -229,10 +229,13 @@ function getHandles(shape) {
         {x:rx,    y:ry+rh, fn:(nx,ny)=>[nx,ry,rx+rw,ny]},
       ]}
     case 'circle':{
-      const [cx,cy,rx,ry]=p, dx=rx-cx, dy=ry-cy
+      const [cx,cy,rx,ry]=p, r=dist(cx,cy,rx,ry), dx=rx-cx, dy=ry-cy
       return [
-        {x:cx,y:cy,fn:(nx,ny)=>[nx,ny,nx+dx,ny+dy]},
-        {x:rx,y:ry,fn:(nx,ny)=>[cx,cy,nx,ny]},
+        {x:cx,  y:cy,   fn:(nx,ny)=>[nx,ny,nx+dx,ny+dy]},
+        {x:cx+r,y:cy,   fn:(nx,ny)=>{const nr=dist(cx,cy,nx,ny);return [cx,cy,cx+nr,cy]}},
+        {x:cx-r,y:cy,   fn:(nx,ny)=>{const nr=dist(cx,cy,nx,ny);return [cx,cy,cx+nr,cy]}},
+        {x:cx,  y:cy+r, fn:(nx,ny)=>{const nr=dist(cx,cy,nx,ny);return [cx,cy,cx+nr,cy]}},
+        {x:cx,  y:cy-r, fn:(nx,ny)=>{const nr=dist(cx,cy,nx,ny);return [cx,cy,cx+nr,cy]}},
       ]}
     case 'triangle':
     case 'polygon':{
@@ -263,13 +266,14 @@ function AngleArc({ax,ay,vx,vy,bx,by,color}) {
     rotation={startDeg} angle={sweep} stroke={color} strokeWidth={1} fill={color+'22'} listening={false}/>
 }
 
-function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable}) {
+function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,selectable,showDims}) {
   const lc=darkCanvas?'#e2e8f0':'#1e293b'
   const sc=selected?'#f97316':shape.color
-  const selProps={
+  // Only attach click/tap handlers when the select tool is active
+  const selProps=selectable?{
     onClick:e=>{e.cancelBubble=true;onSelect(shape.id)},
     onTap:  e=>{e.cancelBubble=true;onSelect(shape.id)},
-  }
+  }:{}
   const dragProps=draggable?{
     draggable:true,
     onDragEnd:e=>{
@@ -277,20 +281,18 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable}) 
       e.target.x(0);e.target.y(0)
       onDragEnd(shape.id,dx,dy)
     },
-    // show selected on drag start too
     onDragStart:e=>{e.cancelBubble=true;onSelect(shape.id)},
   }:{}
-
-  const groupProps={...selProps,...dragProps}
+  const gp={...selProps,...dragProps}
 
   if(shape.type==='segment') {
     const [x1,y1,x2,y2]=shape.points
     const len=dist(x1,y1,x2,y2)
-    return <Group {...groupProps}>
+    return <Group {...gp}>
       <Line points={shape.points} stroke={sc} strokeWidth={shape.sw} lineCap="round" hitStrokeWidth={12}/>
       <KonvaCircle x={x1} y={y1} radius={4} fill={sc} listening={false}/>
       <KonvaCircle x={x2} y={y2} radius={4} fill={sc} listening={false}/>
-      <KonvaText x={(x1+x2)/2+6} y={(y1+y2)/2-10} text={`${fmt(len)} u`} {...TS} fill={lc}/>
+      {showDims&&<KonvaText x={(x1+x2)/2+6} y={(y1+y2)/2-10} text={`${fmt(len)} u`} {...TS} fill={lc}/>}
     </Group>
   }
 
@@ -299,23 +301,27 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable}) 
     const w=Math.abs(x2-x1),h=Math.abs(y2-y1)
     const rx=Math.min(x1,x2),ry=Math.min(y1,y2)
     const pts=[rx,ry,rx+w,ry,rx+w,ry+h,rx,ry+h]
-    return <Group {...groupProps}>
+    return <Group {...gp}>
       <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
-      <KonvaText x={rx+w/2-20} y={ry+h+5}   text={`${fmt(w)} u`}       {...TS} fill={lc}/>
-      <KonvaText x={rx+w+5}    y={ry+h/2-6}  text={`${fmt(h)} u`}       {...TS} fill={lc}/>
-      <KonvaText x={rx+w/2-34} y={ry+h/2-6}  text={`A≈${fmt(w*h)} u²`} {...TS} fill={lc}/>
+      {showDims&&<>
+        <KonvaText x={rx+w/2-20} y={ry+h+5}   text={`${fmt(w)} u`}       {...TS} fill={lc}/>
+        <KonvaText x={rx+w+5}    y={ry+h/2-6}  text={`${fmt(h)} u`}       {...TS} fill={lc}/>
+        <KonvaText x={rx+w/2-34} y={ry+h/2-6}  text={`A≈${fmt(w*h)} u²`} {...TS} fill={lc}/>
+      </>}
     </Group>
   }
 
   if(shape.type==='circle') {
     const [cx,cy,rx,ry]=shape.points
     const r=dist(cx,cy,rx,ry)
-    return <Group {...groupProps}>
+    return <Group {...gp}>
       <KonvaCircle x={cx} y={cy} radius={r} stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
-      <Line points={[cx,cy,rx,ry]} stroke={sc} strokeWidth={1} dash={[4,3]} listening={false}/>
-      <KonvaCircle x={cx} y={cy} radius={3} fill={sc} listening={false}/>
-      <KonvaText x={(cx+rx)/2+4} y={(cy+ry)/2-12} text={`r=${fmt(r)} u`}             {...TS} fill={lc}/>
-      <KonvaText x={cx-32}       y={cy+6}          text={`A≈${fmt(Math.PI*r*r)} u²`} {...TS} fill={lc}/>
+      {showDims&&<>
+        <Line points={[cx,cy,rx,ry]} stroke={sc} strokeWidth={1} dash={[4,3]} listening={false}/>
+        <KonvaCircle x={cx} y={cy} radius={3} fill={sc} listening={false}/>
+        <KonvaText x={(cx+rx)/2+4} y={(cy+ry)/2-12} text={`r=${fmt(r)} u`}             {...TS} fill={lc}/>
+        <KonvaText x={cx-32}       y={cy+6}          text={`A≈${fmt(Math.PI*r*r)} u²`} {...TS} fill={lc}/>
+      </>}
     </Group>
   }
 
@@ -328,21 +334,25 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable}) 
     const next=[[x2,y2],[x3,y3],[x1,y1]]
     const sides=[dist(x1,y1,x2,y2),dist(x2,y2,x3,y3),dist(x3,y3,x1,y1)]
     const angles=[angleBetween(x3,y3,x1,y1,x2,y2),angleBetween(x1,y1,x2,y2,x3,y3),angleBetween(x2,y2,x3,y3,x1,y1)]
-    return <Group {...groupProps}>
+    return <Group {...gp}>
       <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
-      {verts.map(([vx,vy],i)=><AngleArc key={i} ax={prev[i][0]} ay={prev[i][1]} vx={vx} vy={vy} bx={next[i][0]} by={next[i][1]} color={sc}/>)}
-      {verts.map(([vx,vy],i)=>{const ox=(gcx-vx)*0.3,oy=(gcy-vy)*0.3;return <KonvaText key={i} x={vx+ox-16} y={vy+oy-7} text={`${fmt(angles[i])}°`} {...TS} fill={lc}/>})}
-      {verts.map(([vx,vy],i)=>{const [nx,ny]=next[i];const mx=(vx+nx)/2,my=(vy+ny)/2;const ox=(mx-gcx)*0.2,oy=(my-gcy)*0.2;return <KonvaText key={i} x={mx+ox-16} y={my+oy-7} text={`${fmt(sides[i])} u`} {...TS} fill={lc}/>})}
+      {showDims&&<>
+        {verts.map(([vx,vy],i)=><AngleArc key={i} ax={prev[i][0]} ay={prev[i][1]} vx={vx} vy={vy} bx={next[i][0]} by={next[i][1]} color={sc}/>)}
+        {verts.map(([vx,vy],i)=>{const ox=(gcx-vx)*0.3,oy=(gcy-vy)*0.3;return <KonvaText key={i} x={vx+ox-16} y={vy+oy-7} text={`${fmt(angles[i])}°`} {...TS} fill={lc}/>})}
+        {verts.map(([vx,vy],i)=>{const [nx,ny]=next[i];const mx=(vx+nx)/2,my2=(vy+ny)/2;const ox=(mx-gcx)*0.2,oy=(my2-gcy)*0.2;return <KonvaText key={i} x={mx+ox-16} y={my2+oy-7} text={`${fmt(sides[i])} u`} {...TS} fill={lc}/>})}
+      </>}
     </Group>
   }
 
   if(shape.type==='polygon') {
     const pts=shape.points
     const [gcx,gcy]=centroidOf(pts)
-    return <Group {...groupProps}>
+    return <Group {...gp}>
       <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
-      <KonvaText x={gcx-36} y={gcy-8} text={`P=${fmt(perimeterOf(pts))} u`} {...TS} fill={lc}/>
-      <KonvaText x={gcx-36} y={gcy+6} text={`A=${fmt(shoelaceArea(pts))} u²`} {...TS} fill={lc}/>
+      {showDims&&<>
+        <KonvaText x={gcx-36} y={gcy-8} text={`P=${fmt(perimeterOf(pts))} u`} {...TS} fill={lc}/>
+        <KonvaText x={gcx-36} y={gcy+6} text={`A=${fmt(shoelaceArea(pts))} u²`} {...TS} fill={lc}/>
+      </>}
     </Group>
   }
 
@@ -589,10 +599,12 @@ export default function ScratchPad({isOpen,onClose}) {
   const [darkCanvas,setDarkCanvas]=useState(()=>document.documentElement.classList.contains('dark'))
 
   // ── grid
-  const savedGrid=load(GRID_KEY,{show:false,step:50,snap:false})
-  const [showGrid,   setShowGrid]   = useState(savedGrid.show)
-  const [gridStep,   setGridStep]   = useState(savedGrid.step)
-  const [snapToGrid, setSnapToGrid] = useState(savedGrid.snap)
+  const savedGrid=load(GRID_KEY,{show:false,step:50,snap:false,osnap:true,allDims:false})
+  const [showGrid,    setShowGrid]    = useState(savedGrid.show)
+  const [gridStep,    setGridStep]    = useState(savedGrid.step)
+  const [snapToGrid,  setSnapToGrid]  = useState(savedGrid.snap)
+  const [osnapOn,     setOsnapOn]     = useState(savedGrid.osnap??true)
+  const [showAllDims, setShowAllDims] = useState(savedGrid.allDims??false)
 
   const saved=load(SIZE_KEY,null)
   const [panelW,setPanelW]=useState(saved?.w??DEFAULT_W)
@@ -622,7 +634,7 @@ export default function ScratchPad({isOpen,onClose}) {
   useEffect(()=>{save(LINES_KEY,lines)},[lines])
   useEffect(()=>{save(SHAPES_KEY,shapes)},[shapes])
   useEffect(()=>{if(!isMobile)save(SIZE_KEY,{w:panelW,h:panelH})},[panelW,panelH,isMobile])
-  useEffect(()=>{save(GRID_KEY,{show:showGrid,step:gridStep,snap:snapToGrid})},[showGrid,gridStep,snapToGrid])
+  useEffect(()=>{save(GRID_KEY,{show:showGrid,step:gridStep,snap:snapToGrid,osnap:osnapOn,allDims:showAllDims})},[showGrid,gridStep,snapToGrid,osnapOn,showAllDims])
 
   // Sync form ↔ selected shape
   useEffect(()=>{
@@ -670,8 +682,18 @@ export default function ScratchPad({isOpen,onClose}) {
     const pos=getPos(e)
     // OSNAP: compute nearest snap candidate for geo mode hover/preview
     if(mode==='geo'&&!isDrawing.current){
-      const allPts=getSnapPoints(shapes)
-      const snap=findNearestSnap(pos.x,pos.y,allPts,shapes)
+      let snap=null
+      // Object snap (endpoints, midpoints, centers, quadrants, tangents)
+      if(osnapOn){
+        const allPts=getSnapPoints(shapes)
+        snap=findNearestSnap(pos.x,pos.y,allPts,shapes)
+      }
+      // Grid snap as snap candidate (only if no object snap won)
+      if(!snap&&showGrid&&snapToGrid&&gridStep>=1){
+        const s=gridStep
+        const gx=Math.round(pos.x/s)*s, gy=Math.round(pos.y/s)*s
+        if(dist(pos.x,pos.y,gx,gy)<OSNAP_THRESH) snap={x:gx,y:gy,type:'grid'}
+      }
       setSnapCandidate(snap)
       setMousePos(snap??pos)
     } else {
@@ -687,7 +709,7 @@ export default function ScratchPad({isOpen,onClose}) {
       upd[upd.length-1]=last
       return upd
     })
-  },[mode])
+  },[mode,osnapOn,showGrid,snapToGrid,gridStep,shapes])
 
   const handleDrawUp=useCallback(()=>{
     if(mode!=='draw') return
@@ -813,7 +835,7 @@ export default function ScratchPad({isOpen,onClose}) {
 
   // Grid controls — reused in both mobile and desktop toolbars
   const gridControls = <>
-    <IBtn onClick={()=>setShowGrid(v=>!v)} color={showGrid?'#6366f1':ic} title="Toggle grid (G)">
+    <IBtn onClick={()=>setShowGrid(v=>!v)} color={showGrid?'#6366f1':ic} title="Toggle grid">
       <Grid3x3 size={15}/>
     </IBtn>
     {showGrid&&<>
@@ -825,6 +847,14 @@ export default function ScratchPad({isOpen,onClose}) {
       />
       <IBtn onClick={()=>setSnapToGrid(v=>!v)} color={snapToGrid?'#22c55e':ic} title="Snap to grid">
         <Magnet size={15}/>
+      </IBtn>
+    </>}
+    {mode==='geo'&&<>
+      <IBtn onClick={()=>setOsnapOn(v=>!v)} color={osnapOn?'#06b6d4':ic} title="Object snap (EP/MID/CTR/QD/TAN)">
+        <Crosshair size={15}/>
+      </IBtn>
+      <IBtn onClick={()=>setShowAllDims(v=>!v)} color={showAllDims?'#f97316':ic} title="Show all dimensions">
+        <Ruler size={15}/>
       </IBtn>
     </>}
   </>
@@ -957,6 +987,8 @@ export default function ScratchPad({isOpen,onClose}) {
                   selected={shape.id===selectedId}
                   darkCanvas={darkCanvas}
                   draggable={isDraggable}
+                  selectable={geoTool==='select'}
+                  showDims={showAllDims||shape.id===selectedId}
                   onSelect={id=>setSelectedId(prev=>prev===id?null:id)}
                   onDragEnd={handleShapeDragEnd}
                 />
