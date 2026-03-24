@@ -24,61 +24,85 @@ export default {
     },
   ],
   intuition: {
-    prose: ["See the visualisation and key formula below."],
+    prose: [
+      "Free fall means gravity is the only significant force (air resistance neglected).",
+      "Near Earth's surface, acceleration is approximately constant and downward with magnitude g≈9.8 m/s².",
+      "Mass does not appear in the kinematic equations for ideal free fall, so all objects share the same acceleration in this model.",
+    ],
     callouts: [
       {
-        type: "theorem",
-        title: "Core formula",
-        body: "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
+        type: "definition",
+        title: "Free-fall acceleration",
+        body: "a=-g\approx-9.8\,\\text{m/s}^2\quad(\\text{up-positive convention})",
+      },
+      {
+        type: "warning",
+        title: "Convention first",
+        body: "If you choose down-positive, then use a=+g consistently everywhere.",
       },
     ],
     visualizations: [
       {
         id: "FreeFallIntuition",
-        title: "Free Fall — Basics — intuition",
-        mathBridge: "Interactive exploration.",
-        caption: "Drag and explore.",
+        title: "Free-fall motion intuition",
+        mathBridge:
+          "Launch from different heights/velocities and observe how velocity changes linearly while position changes quadratically.",
+        caption: "Same acceleration law, many scenarios.",
       },
     ],
   },
   math: {
-    prose: ["Apply the formula to solve problems systematically."],
+    prose: [
+      "Use the standard constant-acceleration equations with a replaced by ±g according to your axis choice.",
+      "A reliable workflow is: choose convention, write knowns with sign, choose equation by unknowns, then check physical reasonableness.",
+    ],
     callouts: [
       {
         type: "insight",
-        title: "Key formula",
-        body: "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
+        title: "Core free-fall set (up-positive)",
+        body: "v=v_0-gt,\\quad y=y_0+v_0t-\\frac12gt^2,\\quad v^2=v_0^2-2g(y-y_0)",
       },
     ],
     visualizations: [
       {
         id: "FreeFallExplorer",
-        title: "Free Fall — Basics — explorer",
-        mathBridge: "Adjust inputs and see outputs.",
-        caption: "Every case covered.",
+        title: "Sign-convention explorer",
+        mathBridge:
+          "Toggle up-positive/down-positive and verify that physical predictions are identical when signs are applied consistently.",
+        caption: "Notation changes, physics does not.",
       },
     ],
   },
   rigor: {
     prose: [
-      "The result follows from the definitions of velocity and acceleration.",
+      "From Newtonian mechanics near Earth, gravitational force gives approximately constant acceleration over moderate height changes.",
+      "With a(t)=constant, free-fall kinematics is a direct specialization of the constant-acceleration calculus derivation.",
     ],
     callouts: [
       {
         type: "definition",
-        title: "Formal statement",
-        body: "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
+        title: "Model statement",
+        body: "a(t)=\\text{constant}=-g\;(\\text{or }+g\\text{ by axis choice})",
       },
     ],
     visualizationId: "KinematicProof",
     proofSteps: [
       {
+        expression: "a=-g",
+        annotation:
+          "Assume constant acceleration due to gravity in chosen axis.",
+      },
+      {
+        expression: "v=v_0+at\\Rightarrow v=v_0-gt",
+        annotation: "Integrate acceleration once.",
+      },
+      {
         expression:
-          "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
-        annotation: "Core result to be established.",
+          "y=y_0+v_0t+\\frac12at^2\\Rightarrow y=y_0+v_0t-\\frac12gt^2",
+        annotation: "Integrate velocity to position.",
       },
     ],
-    title: "Free Fall — Basics — derivation",
+    title: "Deriving the basic free-fall equations",
     visualizations: [
       {
         id: "KinematicProof",
@@ -90,32 +114,38 @@ export default {
   examples: [
     {
       id: "ch2-012-ex1",
-      title: "Core application",
-      problem: "Apply the formula to a standard Free Fall — Basics problem.",
+      title: "Dropped from rest",
+      problem:
+        "\\text{An object is dropped from rest. Find }v\\text{ and }\\Delta y\\text{ after }3\\text{ s (up-positive).}",
       steps: [
         {
+          expression: "v=v_0-gt=0-9.8(3)=-29.4\\,\\text{m/s}",
+          annotation: "Velocity is downward (negative in up-positive axis).",
+        },
+        {
           expression:
-            "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
-          annotation: "Direct application.",
+            "\\Delta y=v_0t-\\frac12gt^2=0-\\frac12(9.8)(9)=-44.1\\,\\text{m}",
+          annotation: "Object is 44.1 m below release point.",
         },
       ],
-      conclusion: "Use systematic sign discipline.",
+      conclusion: "After 3 s: v=-29.4 m/s and Δy=-44.1 m.",
     },
   ],
   challenges: [
     {
       id: "ch2-012-ch1",
       difficulty: "medium",
-      problem: "Apply Free Fall — Basics to a multi-step scenario.",
-      hint: "Identify known/unknown quantities first.",
+      problem:
+        "\\text{Thrown upward at }19.6\\,\\text{m/s},\\text{ find max height (up-positive).}",
+      hint: "At max height, v=0.",
       walkthrough: [
         {
           expression:
-            "a = -g = -9.8\,\text{m/s}^2 \quad (\text{taking up as positive})",
-          annotation: "Apply systematically.",
+            "0=v_0^2-2g\\Delta y\\Rightarrow \\Delta y=\\frac{v_0^2}{2g}=\\frac{(19.6)^2}{19.6}=19.6\\,\\text{m}",
+          annotation: "Use no-time equation with apex condition.",
         },
       ],
-      answer: "See worked solution.",
+      answer: "Maximum height is 19.6 m above launch point.",
     },
   ],
 };
