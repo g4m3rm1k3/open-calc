@@ -266,16 +266,15 @@ function RigorBlock({ data }) {
       </button>
       {open && (
         <div className="px-6 py-5 bg-purple-50/20 dark:bg-purple-950/10 space-y-4">
+          {hasProse || hasCallouts || isBlocksFormat ? <SectionContent data={data} /> : null}
           {hasProofSteps ? (
             <DynamicProof
               steps={data.proofSteps}
               visualizationId={data.visualizationId}
               visualizationProps={data.visualizationProps ?? {}}
             />
-          ) : (
-            <SectionContent data={data} />
-          )}
-          {!hasProofSteps && vizzes.length > 0 && (
+          ) : null}
+          {vizzes.length > 0 && (
             <div className="mt-4 space-y-4">
               {vizzes.map((viz, i) => (
                 <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-purple-100 dark:border-purple-900" />

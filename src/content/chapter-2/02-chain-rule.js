@@ -302,7 +302,16 @@ export default {
         caption: 'A more detailed version of the rigorous limit-based proof.',
       },
     ],
-    visualizationId: null,
+    visualizationId: 'DerivativeMotionLabPro',
+    proofSteps: [
+      { expression: 's(t)=\\sin(kt)', annotation: 'Start with position as a sinusoidal motion model.' },
+      { expression: 'v(t)=\\frac{ds}{dt}', annotation: 'Velocity is the slope of the position curve at each time.' },
+      { expression: 'v(t)=k\\cos(kt)', annotation: 'Apply chain rule: derivative of sin(kt) is cos(kt) times k.' },
+      { expression: 'a(t)=\\frac{d^2s}{dt^2}=\\frac{dv}{dt}', annotation: 'Acceleration is the derivative of velocity, i.e., second derivative of position.' },
+      { expression: 'a(t)=-k^2\\sin(kt)', annotation: 'Differentiate again: another chain-rule factor k appears, giving k^2.' },
+      { expression: 'j(t)=\\frac{d^3s}{dt^3}=\\frac{da}{dt}=-k^3\\cos(kt)', annotation: 'Third derivative (jerk) adds one more chain factor, so magnitude scales with k^3.' },
+      { expression: '\\text{Complete motion chain: } s \\to v \\to a \\to j', annotation: 'Position, velocity, acceleration, and jerk now appear as one linked derivative pipeline.' },
+    ],
   },
 
   examples: [

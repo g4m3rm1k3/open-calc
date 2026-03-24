@@ -366,6 +366,9 @@ const VIZ_REGISTRY = {
   ChainRuleCompositionViz: lazy(
     () => import("./d3/ChainRuleCompositionViz.jsx"),
   ),
+  DerivativeMotionLabPro: lazy(
+    () => import("./react/DerivativeMotionLabPro.jsx"),
+  ),
   ChainRuleZoomViz: lazy(() => import("./d3/ChainRuleZoomViz.jsx")),
   ChainRuleRatesViz: lazy(() => import("./d3/ChainRuleRatesViz.jsx")),
   ChainRuleLimitBridgeViz: lazy(
