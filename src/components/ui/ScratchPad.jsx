@@ -143,6 +143,108 @@ function translatePts(pts,dx,dy) {
   return pts.map((v,i)=>i%2===0?v+dx:v+dy)
 }
 
+// ─── OSNAP — object snap ────────────────────────────────────────────────────
+
+const OSNAP_THRESH = 18
+
+/** Precompute all discrete snap points for a shape set */
+function getSnapPoints(shapes) {
+  const pts = []
+  for (const s of shapes) {
+    const p = s.points
+    if (s.type === 'segment') {
+      pts.push({x:p[0],y:p[1],type:'endpoint',sid:s.id})
+      pts.push({x:p[2],y:p[3],type:'endpoint',sid:s.id})
+      pts.push({x:(p[0]+p[2])/2,y:(p[1]+p[3])/2,type:'midpoint',sid:s.id})
+    } else if (s.type === 'rect') {
+      const rx=Math.min(p[0],p[2]),ry=Math.min(p[1],p[3])
+      const rw=Math.abs(p[2]-p[0]),rh=Math.abs(p[3]-p[1])
+      pts.push({x:rx,     y:ry,      type:'endpoint',sid:s.id})
+      pts.push({x:rx+rw,  y:ry,      type:'endpoint',sid:s.id})
+      pts.push({x:rx+rw,  y:ry+rh,   type:'endpoint',sid:s.id})
+      pts.push({x:rx,     y:ry+rh,   type:'endpoint',sid:s.id})
+      pts.push({x:rx+rw/2,y:ry,      type:'midpoint',sid:s.id})
+      pts.push({x:rx+rw,  y:ry+rh/2, type:'midpoint',sid:s.id})
+      pts.push({x:rx+rw/2,y:ry+rh,   type:'midpoint',sid:s.id})
+      pts.push({x:rx,     y:ry+rh/2, type:'midpoint',sid:s.id})
+      pts.push({x:rx+rw/2,y:ry+rh/2, type:'center',  sid:s.id})
+    } else if (s.type === 'circle') {
+      const [cx,cy,rx,ry]=p, r=dist(cx,cy,rx,ry)
+      pts.push({x:cx,   y:cy,   type:'center',   sid:s.id})
+      pts.push({x:cx+r, y:cy,   type:'quadrant', sid:s.id})
+      pts.push({x:cx-r, y:cy,   type:'quadrant', sid:s.id})
+      pts.push({x:cx,   y:cy+r, type:'quadrant', sid:s.id})
+      pts.push({x:cx,   y:cy-r, type:'quadrant', sid:s.id})
+    } else if (s.type==='triangle'||s.type==='polygon') {
+      const n=p.length/2
+      for(let i=0;i<n;i++){
+        pts.push({x:p[i*2],y:p[i*2+1],type:'endpoint',sid:s.id})
+        const j=(i+1)%n
+        pts.push({x:(p[i*2]+p[j*2])/2,y:(p[i*2+1]+p[j*2+1])/2,type:'midpoint',sid:s.id})
+      }
+      const [gcx,gcy]=centroidOf(p)
+      pts.push({x:gcx,y:gcy,type:'center',sid:s.id})
+    }
+  }
+  return pts
+}
+
+/** Find nearest snap — checks precomputed points + nearest-on-circle circumference */
+function findNearestSnap(mx, my, snapPts, shapes, thresh=OSNAP_THRESH) {
+  let best=null, bd=thresh
+  for(const pt of snapPts){
+    const d=dist(pt.x,pt.y,mx,my)
+    if(d<bd){bd=d;best=pt}
+  }
+  // nearest on circle circumference (tangent snap)
+  for(const s of shapes){
+    if(s.type!=='circle') continue
+    const [cx,cy,rx,ry]=s.points, r=dist(cx,cy,rx,ry)
+    const dEdge=Math.abs(dist(mx,my,cx,cy)-r)
+    if(dEdge<bd){
+      const a=Math.atan2(my-cy,mx-cx)
+      bd=dEdge
+      best={x:cx+r*Math.cos(a),y:cy+r*Math.sin(a),type:'tangent',sid:s.id}
+    }
+  }
+  return best
+}
+
+/** Draggable handles for a selected shape's vertices */
+function getHandles(shape) {
+  const p=shape.points
+  switch(shape.type){
+    case 'segment':
+      return [
+        {x:p[0],y:p[1],fn:(nx,ny)=>{const n=[...p];n[0]=nx;n[1]=ny;return n}},
+        {x:p[2],y:p[3],fn:(nx,ny)=>{const n=[...p];n[2]=nx;n[3]=ny;return n}},
+      ]
+    case 'rect':{
+      const rx=Math.min(p[0],p[2]),ry=Math.min(p[1],p[3])
+      const rw=Math.abs(p[2]-p[0]),rh=Math.abs(p[3]-p[1])
+      return [
+        {x:rx,    y:ry,    fn:(nx,ny)=>[nx,ny,rx+rw,ry+rh]},
+        {x:rx+rw, y:ry,    fn:(nx,ny)=>[rx,ny,nx,ry+rh]},
+        {x:rx+rw, y:ry+rh, fn:(nx,ny)=>[rx,ry,nx,ny]},
+        {x:rx,    y:ry+rh, fn:(nx,ny)=>[nx,ry,rx+rw,ny]},
+      ]}
+    case 'circle':{
+      const [cx,cy,rx,ry]=p, dx=rx-cx, dy=ry-cy
+      return [
+        {x:cx,y:cy,fn:(nx,ny)=>[nx,ny,nx+dx,ny+dy]},
+        {x:rx,y:ry,fn:(nx,ny)=>[cx,cy,nx,ny]},
+      ]}
+    case 'triangle':
+    case 'polygon':{
+      const n=p.length/2
+      return Array.from({length:n},(_,i)=>({
+        x:p[i*2],y:p[i*2+1],
+        fn:(nx,ny)=>{const q=[...p];q[i*2]=nx;q[i*2+1]=ny;return q}
+      }))}
+    default: return []
+  }
+}
+
 // ─── Storage ────────────────────────────────────────────────────────────────
 
 const load=(k,fb)=>{try{return JSON.parse(localStorage.getItem(k)??'null')??fb}catch{return fb}}
@@ -275,6 +377,70 @@ function ShapePreview({inProg,mx,my,color,sw}) {
     </Group>
   }
   return null
+}
+
+// ─── Snap indicator ─────────────────────────────────────────────────────────
+
+const SNAP_COLORS = {endpoint:'#f97316',midpoint:'#22c55e',center:'#06b6d4',quadrant:'#a855f7',tangent:'#ec4899',grid:'#94a3b8'}
+const SNAP_LABELS = {endpoint:'EP',midpoint:'MID',center:'CTR',quadrant:'QD',tangent:'TAN',grid:'GRID'}
+
+function SnapIndicator({snap}) {
+  if(!snap) return null
+  const {x,y,type}=snap
+  const c=SNAP_COLORS[type]??'#f97316'
+  const s=7
+  const marker=()=>{
+    if(type==='endpoint')
+      return <Line points={[x-s,y-s,x+s,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={1.5} listening={false}/>
+    if(type==='midpoint')
+      return <Line points={[x,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={1.5} listening={false}/>
+    if(type==='center')
+      return <Group listening={false}>
+        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5}/>
+        <Line points={[x-s-3,y,x+s+3,y]} stroke={c} strokeWidth={1}/>
+        <Line points={[x,y-s-3,x,y+s+3]} stroke={c} strokeWidth={1}/>
+      </Group>
+    if(type==='quadrant')
+      return <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5} listening={false}/>
+    if(type==='tangent')
+      return <Group listening={false}>
+        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5}/>
+        <Line points={[x-s-2,y-s-2,x+s+2,y-s-2]} stroke={c} strokeWidth={1}/>
+      </Group>
+    return <Line points={[x-s,y,x+s,y,x,y,x,y-s,x,y+s]} stroke={c} strokeWidth={1} listening={false}/>
+  }
+  return <Group listening={false}>
+    {marker()}
+    <KonvaText x={x+10} y={y-9} text={SNAP_LABELS[type]??type} fontSize={9} fontFamily="monospace" fill={c}/>
+  </Group>
+}
+
+// ─── Vertex handles ──────────────────────────────────────────────────────────
+
+function VertexHandles({shape, snapPts, shapes, onUpdate, onSnapChange, darkCanvas}) {
+  const handles=getHandles(shape)
+  const hFill=darkCanvas?'#0f172a':'#fff'
+  return <Group>
+    {handles.map((h,i)=>(
+      <KonvaCircle key={i} x={h.x} y={h.y} radius={6}
+        fill={hFill} stroke="#f97316" strokeWidth={2}
+        draggable hitStrokeWidth={14}
+        onMouseEnter={e=>{e.target.getStage().container().style.cursor='crosshair'}}
+        onMouseLeave={e=>{e.target.getStage().container().style.cursor='default'}}
+        onDragMove={e=>{
+          const pos=e.target.getStage().getPointerPosition()
+          const snap=findNearestSnap(pos.x,pos.y,snapPts,shapes)
+          onSnapChange(snap)
+          if(snap) e.target.setAbsolutePosition({x:snap.x,y:snap.y})
+        }}
+        onDragEnd={e=>{
+          const {x:nx,y:ny}=e.target.position()
+          onSnapChange(null)
+          onUpdate(shape.id,h.fn(nx,ny))
+        }}
+      />
+    ))}
+  </Group>
 }
 
 // ─── Grid layer ─────────────────────────────────────────────────────────────
@@ -411,9 +577,10 @@ export default function ScratchPad({isOpen,onClose}) {
   const [mode,       setMode]       = useState('draw')
   const [geoTool,    setGeoTool]    = useState('segment')
   const [shapes,     setShapes]     = useState(()=>load(SHAPES_KEY,[]))
-  const [inProg,     setInProg]     = useState(null)
-  const [mousePos,   setMousePos]   = useState({x:0,y:0})
-  const [selectedId, setSelectedId] = useState(null)
+  const [inProg,       setInProg]       = useState(null)
+  const [mousePos,     setMousePos]     = useState({x:0,y:0})
+  const [selectedId,   setSelectedId]   = useState(null)
+  const [snapCandidate,setSnapCandidate]= useState(null)
 
   // ── shape input panel
   const [form, setForm] = useState(DEFAULTS.segment)
@@ -501,7 +668,16 @@ export default function ScratchPad({isOpen,onClose}) {
 
   const handleDrawMove=useCallback(e=>{
     const pos=getPos(e)
-    setMousePos(pos)
+    // OSNAP: compute nearest snap candidate for geo mode hover/preview
+    if(mode==='geo'&&!isDrawing.current){
+      const allPts=getSnapPoints(shapes)
+      const snap=findNearestSnap(pos.x,pos.y,allPts,shapes)
+      setSnapCandidate(snap)
+      setMousePos(snap??pos)
+    } else {
+      setSnapCandidate(null)
+      setMousePos(pos)
+    }
     if(mode!=='draw'||!isDrawing.current) return
     e.evt.preventDefault()
     setLines(prev=>{
@@ -543,7 +719,8 @@ export default function ScratchPad({isOpen,onClose}) {
     if(e.target!==e.target.getStage()) return
     if(geoTool==='select') { setSelectedId(null); return }
     const raw=getPos(e)
-    const {x,y}=snapPt(raw.x,raw.y)
+    // OSNAP takes priority over grid snap
+    const {x,y}=snapCandidate??snapPt(raw.x,raw.y)
     const NEEDS={segment:2,rect:2,circle:2,triangle:3}
     if(!inProg) { setInProg({type:geoTool,points:[x,y],color,sw}); return }
     const newPts=[...inProg.points,x,y]
@@ -555,7 +732,16 @@ export default function ScratchPad({isOpen,onClose}) {
     }
     if(nPts>=NEEDS[geoTool]) { addShape({...inProg,points:newPts}); setInProg(null) }
     else setInProg({...inProg,points:newPts})
-  },[mode,geoTool,inProg,color,sw,addShape,snapPt])
+  },[mode,geoTool,inProg,color,sw,addShape,snapPt,snapCandidate])
+
+  const handleVertexUpdate=useCallback((shapeId,newPts)=>{
+    setShapes(prev=>prev.map(s=>{
+      if(s.id!==shapeId) return s
+      const updated={...s,points:newPts}
+      if(shapeId===selectedId) setForm(shapeToForm(updated))
+      return updated
+    }))
+  },[selectedId])
 
   const finishPolygon=()=>{
     if(inProg?.type==='polygon'&&inProg.points.length>=6){ addShape(inProg); setInProg(null) }
@@ -779,6 +965,23 @@ export default function ScratchPad({isOpen,onClose}) {
               {inProg?.points&&Array.from({length:inProg.points.length/2},(_,i)=>(
                 <KonvaCircle key={i} x={inProg.points[i*2]} y={inProg.points[i*2+1]} radius={4} fill={color} listening={false}/>
               ))}
+            </Layer>
+            {/* Layer 3: vertex handles + snap indicator (always on top) */}
+            <Layer>
+              {isDraggable&&selectedId&&(()=>{
+                const sel=shapes.find(s=>s.id===selectedId)
+                if(!sel) return null
+                const snapPts=getSnapPoints(shapes.filter(s=>s.id!==selectedId))
+                return <VertexHandles
+                  shape={sel}
+                  snapPts={snapPts}
+                  shapes={shapes.filter(s=>s.id!==selectedId)}
+                  onUpdate={handleVertexUpdate}
+                  onSnapChange={setSnapCandidate}
+                  darkCanvas={darkCanvas}
+                />
+              })()}
+              {mode==='geo'&&<SnapIndicator snap={snapCandidate}/>}
             </Layer>
           </Stage>
         )}
