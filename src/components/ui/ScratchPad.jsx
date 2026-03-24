@@ -592,7 +592,7 @@ export default function ScratchPad({isOpen,onClose}) {
     if(!shape) return
     const pts=formToPoints(shape.type,form)
     if(!pts.length) return
-    setShapes(prev=>prev.map(s=>s.id===selectedId?{...s,points:pts}:s))
+    setShapes(prev=>prev.map(s=>s.id===selectedId?{...s,points:pts,color}:s))
   }
 
   // ── Undo / clear
