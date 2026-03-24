@@ -159,6 +159,35 @@
   vertical-align: baseline;
 }
 
+/* Inline glossary tooltips in lesson prose */
+.tooltip {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  white-space: normal;
+  min-width: 220px;
+  max-width: 340px;
+  line-height: 1.35;
+  z-index: 40;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
 /* Sidebar active link */
 .sidebar-link-active {
   @apply bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400

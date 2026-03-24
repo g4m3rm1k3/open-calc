@@ -86,6 +86,28 @@ export function parseProse(text) {
   let keyIdx = 0
 
   while (i < text.length) {
+    // <span class="tooltip" data-tooltip="...">label</span>
+    if (text.startsWith('<span class="tooltip" data-tooltip="', i)) {
+      const attrStart = i + '<span class="tooltip" data-tooltip="'.length
+      const attrEnd = text.indexOf('">', attrStart)
+      if (attrEnd !== -1) {
+        const tooltip = text.slice(attrStart, attrEnd)
+        const labelStart = attrEnd + 2
+        const closeTag = '</span>'
+        const labelEnd = text.indexOf(closeTag, labelStart)
+        if (labelEnd !== -1) {
+          const label = text.slice(labelStart, labelEnd)
+          parts.push(
+            <span key={`tt${keyIdx++}`} className="tooltip" data-tooltip={tooltip}>
+              {label}
+            </span>
+          )
+          i = labelEnd + closeTag.length
+          continue
+        }
+      }
+    }
+
     // **bold**
     if (text.startsWith('**', i)) {
       const end = text.indexOf('**', i + 2)
@@ -194,7 +216,8 @@ export function parseProse(text) {
     const nextDisplay   = text.indexOf('\\[', i)
     const nextInline    = text.indexOf('\\(', i)
     const nextBackslash = text.indexOf('\\', i)
-    const candidates = [nextBold, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash].filter(v => v !== -1)
+    const nextTooltip   = text.indexOf('<span class="tooltip" data-tooltip="', i)
+    const candidates = [nextBold, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash, nextTooltip].filter(v => v !== -1)
     const stop = candidates.length ? Math.min(...candidates) : text.length
     if (stop > i) {
       parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)

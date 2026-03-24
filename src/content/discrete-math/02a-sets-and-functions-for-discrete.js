@@ -33,7 +33,8 @@ export default {
       'Beginners can easily handle reading {1, 2, 3}, but they instantly freeze when they see the algebraic: {x ∈ ℤ | x² < 10}.',
       'Think of it strictly as a **Filter Recipe**: ',
       '1. **The Ingredients:** The first part (x ∈ ℤ) tells you exactly what Universe of items you are allowed to test (Integers).',
-      '2. **The Sieve:** The second part (x² < 10) is the strict conditional rule. Any integer whose square is less than 10 survives the filter and drops into the final Set bag!'
+      '2. **The Sieve:** The second part (x² < 10) is the strict conditional rule. Any integer whose square is less than 10 survives the filter and drops into the final Set bag!',
+      'Quick precision pass: A <span class="tooltip" data-tooltip="A set is an unordered collection of distinct elements.">set</span> has <span class="tooltip" data-tooltip="Elements are members of a set. We write x ∈ S.">elements</span>, and a <span class="tooltip" data-tooltip="A function maps each input in the domain to exactly one output in the codomain.">function</span> classifies as <span class="tooltip" data-tooltip="Injective: distinct inputs map to distinct outputs.">injective</span>, <span class="tooltip" data-tooltip="Surjective: every codomain element is hit by at least one input.">surjective</span>, or <span class="tooltip" data-tooltip="Bijective: both injective and surjective.">bijective</span>.'
     ],
     callouts: [
       {
@@ -50,6 +51,11 @@ export default {
         type: 'definition',
         title: 'Cardinality |A|',
         body: 'Cardinality is just the "Size" or "Length" of a Set (how many distinct items are inside the bag). If A = {x, y, z}, then |A| = 3. The cardinality of the Empty Set |∅| is simply 0.'
+      },
+      {
+        type: 'insight',
+        title: 'Use the Guided Explorer as a Mini-Lesson',
+        body: 'The added SetsAndFunctionsExplorer below is intentionally a second perspective. Use Set mode first, then Function mode. Try to create injective-only, surjective-only, and bijective mappings, then compare with the formal definitions in Rigor.'
       }
     ],
     visualizations: [
@@ -62,6 +68,13 @@ export default {
         id: 'SetBuilderDecoderLab',
         title: 'Set-Builder Notation Syntax Decoder',
         caption: 'Hover over the symbols to instantly translate the dense mathematical grammar into plain English filter logic.'
+      },
+      {
+        id: 'SetsAndFunctionsExplorer',
+        title: 'Interactive Sets and Functions Lesson',
+        caption: 'Second perspective: build sets and mapping arrows, then verify injective/surjective/bijective behavior live.',
+        mathBridge: 'The interaction is designed to map directly onto the rigor definitions.',
+        props: { guided: true, initialMode: 'sets' }
       }
     ]
   },
@@ -78,7 +91,8 @@ export default {
       'This is incredibly important because every "Relation" and "Function" you will ever construct mathematically lives perfectly as a subset hiding inside this massive combinatorial Grid!',
       '### 7. The Function Machine (f: X → Y)',
       'A Function is an industrial machine that eats an input from Domain X, grinds it up, and spits out an output into Codomain Y.',
-      'It has only **ONE STRICT RULE**: The machine cannot be broken. If you pump the number 5 into the machine, it must spit out a single specific answer (e.g., 25). It cannot spit out 25 sometimes and -25 other times. That breaks functional predictability!'
+      'It has only **ONE STRICT RULE**: The machine cannot be broken. If you pump the number 5 into the machine, it must spit out a single specific answer (e.g., 25). It cannot spit out 25 sometimes and -25 other times. That breaks functional predictability!',
+      'Vocabulary bridge: <span class="tooltip" data-tooltip="Cardinality |S| is the number of elements in a finite set.">cardinality</span> measures set size. The <span class="tooltip" data-tooltip="Image f(A) is the set of outputs actually produced.">image</span> is what the function actually hits, while the <span class="tooltip" data-tooltip="Preimage of b is the set of all inputs that map to b.">preimage</span> tracks which inputs produce a chosen output.'
     ],
     callouts: [
       {

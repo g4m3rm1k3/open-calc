@@ -191,6 +191,9 @@ const VIZ_REGISTRY = {
   ),
   DomainExplorerLab: lazy(() => import("./react/DomainExplorerLab.jsx")),
   FunctionMappingLab: lazy(() => import("./react/FunctionMappingLab.jsx")),
+  SetsAndFunctionsExplorer: lazy(
+    () => import("./react/SetsAndFunctionsExplorer.jsx"),
+  ),
   SetExplorer: lazy(() => import("./react/SetExplorer.jsx")),
   PowerSetTreeLab: lazy(() => import("./react/PowerSetTreeLab.jsx")),
   CartesianGridLab: lazy(() => import("./react/CartesianGridLab.jsx")),
