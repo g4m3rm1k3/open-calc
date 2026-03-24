@@ -857,6 +857,7 @@ export default function DerivativeCoach({ params = {} }) {
   const [blankResult, setBlankResult] = useState(null); // null | "correct" | "hint" | "explain"
   const [sessionErrors, setSessionErrors] = useState({}); // concept → count
   const [problemStats, setProblemStats] = useState({}); // probId -> { correct, incorrect }
+  const [currentProblemMistakes, setCurrentProblemMistakes] = useState(0);
   const [selectedConcepts, setSelectedConcepts] = useState([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
@@ -939,7 +940,52 @@ export default function DerivativeCoach({ params = {} }) {
     setBlankInput("");
     setBlankAttempts(0);
     setBlankResult(null);
+    setCurrentProblemMistakes(0);
     setShowSummary(false);
+  };
+
+  const getConceptLens = (tag) => {
+    const t = String(tag || "").toLowerCase();
+    if (t.includes("product")) {
+      return {
+        title: "Structure lens: product",
+        tip: "Identify each factor first, then write one term per factor derivative while freezing the others."
+      };
+    }
+    if (t.includes("quotient")) {
+      return {
+        title: "Structure lens: quotient",
+        tip: "Use f'g - fg' over g^2 and protect signs. Expand only after the quotient scaffold is correct."
+      };
+    }
+    if (t.includes("chain") || t.includes("layer")) {
+      return {
+        title: "Structure lens: chain",
+        tip: "Peel outside to inside. Keep the inner expression unchanged until its own derivative step."
+      };
+    }
+    if (t.includes("log")) {
+      return {
+        title: "Structure lens: logarithmic",
+        tip: "Check if log differentiation simplifies structure; after taking ln, use product/chain carefully."
+      };
+    }
+    if (t.includes("inverse trig")) {
+      return {
+        title: "Structure lens: inverse trig",
+        tip: "Recall the base inverse-trig formula first, then multiply by the inner derivative."
+      };
+    }
+    if (t.includes("simplification")) {
+      return {
+        title: "Structure lens: simplify-first",
+        tip: "Before differentiating, reduce the algebra/trig form. The derivative is often easier and cleaner."
+      };
+    }
+    return {
+      title: "Structure lens: identify outer rule",
+      tip: "Find the last operation done to the expression, choose that rule, then recurse inward."
+    };
   };
 
   const toggleFilter = (state, setter, value) => {
@@ -965,6 +1011,7 @@ export default function DerivativeCoach({ params = {} }) {
       const fb = mcStep.feedback[optId];
       setMcResult({ verdict: fb.verdict, message: fb.message, reviewConcept: fb.reviewConcept, reviewTip: fb.reviewTip });
       updateProblemScore(prob.id, { incorrect: 1 });
+      setCurrentProblemMistakes((n) => n + 1);
       if (fb.reviewConcept) {
         setSessionErrors(e => ({ ...e, [fb.reviewConcept]: (e[fb.reviewConcept] || 0) + 1 }));
       }
@@ -1000,6 +1047,7 @@ export default function DerivativeCoach({ params = {} }) {
       const newAttempts = blankAttempts + 1;
       setBlankAttempts(newAttempts);
       updateProblemScore(prob.id, { incorrect: 1 });
+      setCurrentProblemMistakes((n) => n + 1);
       if (newAttempts === 1) {
         setBlankResult("hint");
         setSessionErrors(e => ({ ...e, [blank.conceptTested]: (e[blank.conceptTested] || 0) + 1 }));
@@ -1032,6 +1080,8 @@ export default function DerivativeCoach({ params = {} }) {
   const card = { background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 12, padding: "16px 18px", marginBottom: 10 };
   const secCard = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "10px 14px", marginBottom: 8, border: "0.5px solid var(--color-border-tertiary)" };
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  const conceptLens = getConceptLens(prob?.conceptTag);
+  const canRevealFinalAnswer = currentProblemMistakes === 0;
 
   const tone = {
     correct: isDark
@@ -1066,7 +1116,7 @@ export default function DerivativeCoach({ params = {} }) {
             ))}
           </div>
         )}
-        <button onClick={() => { setProbIdx(0); setPhase("mc"); setMcIdx(0); setMcChosen(null); setMcResult(null); setBlankIdx(0); setBlankInput(""); setBlankAttempts(0); setBlankResult(null); setShowSummary(false); }} style={{ padding: "8px 18px", borderRadius: 8, border: "0.5px solid var(--color-border-info)", background: "var(--color-background-info)", color: "var(--color-text-info)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+        <button onClick={() => { setProbIdx(0); setPhase("mc"); setMcIdx(0); setMcChosen(null); setMcResult(null); setBlankIdx(0); setBlankInput(""); setBlankAttempts(0); setBlankResult(null); setCurrentProblemMistakes(0); setShowSummary(false); }} style={{ padding: "8px 18px", borderRadius: 8, border: "0.5px solid var(--color-border-info)", background: "var(--color-background-info)", color: "var(--color-text-info)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
           Start over
         </button>
       </div>
@@ -1179,6 +1229,15 @@ export default function DerivativeCoach({ params = {} }) {
       {/* Expression */}
       <div style={{ ...card, textAlign: "center", fontSize: 22, marginBottom: 14 }}>
         <M t={"\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right] = \\;?"} display ready={ready} />
+      </div>
+
+      <div style={{ ...secCard, borderLeft: `3px solid ${tone.hint.border}`, marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: tone.hint.label, marginBottom: 6 }}>
+          {conceptLens.title}
+        </div>
+        <p style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.6 }}>
+          {conceptLens.tip}
+        </p>
       </div>
 
       {/* PHASE: MULTIPLE CHOICE */}
@@ -1313,17 +1372,31 @@ export default function DerivativeCoach({ params = {} }) {
         <div style={{ animation: "sd .2s ease-out" }}>
           <div style={{ ...card, borderLeft: `3px solid ${tone.correct.border}`, borderRadius: 0, background: tone.correct.bg }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label, marginBottom: 6 }}>Problem complete</div>
-            <div style={{ fontSize: 13, color: tone.correct.text, marginBottom: 10 }}>Full answer:</div>
-            <div style={{ background: isDark ? "rgba(15,23,42,0.75)" : "#fff", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", border: isDark ? "0.5px solid #334155" : "0.5px solid #e2e8f0", color: "var(--color-text-primary)" }}>
-              <M
-                t={
-                  "\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right] = " +
-                  (prob.finalAnswer || LEGACY_FINAL_ANSWERS[prob.id] || "\\text{Use worked steps above}")
-                }
-                display
-                ready={ready}
-              />
-            </div>
+            {canRevealFinalAnswer ? (
+              <>
+                <div style={{ fontSize: 13, color: tone.correct.text, marginBottom: 10 }}>Perfect run. Final answer unlocked:</div>
+                <div style={{ background: isDark ? "rgba(15,23,42,0.75)" : "#fff", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", border: isDark ? "0.5px solid #334155" : "0.5px solid #e2e8f0", color: "var(--color-text-primary)" }}>
+                  <M
+                    t={
+                      "\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right] = " +
+                      (prob.finalAnswer || LEGACY_FINAL_ANSWERS[prob.id] || "\\text{Use worked steps above}")
+                    }
+                    display
+                    ready={ready}
+                  />
+                </div>
+              </>
+            ) : (
+              <div style={{ background: isDark ? "rgba(245,158,11,0.16)" : "#FFFBEB", borderRadius: 8, padding: "12px", border: `0.5px solid ${tone.hint.border}` }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: tone.hint.label, marginBottom: 6 }}>Final answer locked for this attempt</div>
+                <p style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: 6 }}>
+                  You made {currentProblemMistakes} mistake{currentProblemMistakes > 1 ? "s" : ""}. Re-run this problem for a clean pass to unlock the final line.
+                </p>
+                <p style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+                  Hint for this problem type: {conceptLens.tip}
+                </p>
+              </div>
+            )}
           </div>
           <button onClick={nextProblem} style={{ marginTop: 10, padding: "9px 20px", borderRadius: 8, border: isDark ? "0.5px solid #818cf8" : "0.5px solid #7F77DD", background: isDark ? "rgba(99,102,241,0.2)" : "#EEEDFE", color: isDark ? "#c7d2fe" : "#3C3489", cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
             {(() => {
