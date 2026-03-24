@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { parse, derivative, evaluate } from 'mathjs'
+import { parse, derivative, evaluate, simplify } from 'mathjs'
 import KatexBlock from '../math/KatexBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 import OpenInGrapher from '../lesson/OpenInGrapher.jsx'
@@ -338,6 +338,14 @@ function canonicalizeDerivative(node) {
   const orderedTerms = terms.map(canonicalizeTermFactors)
   const joined = orderedTerms.map((t) => wrapIfNeeded(t)).join(' + ')
   return parse(joined)
+}
+
+function algebraicSimplify(node) {
+  try {
+    return simplify(node)
+  } catch {
+    return node
+  }
 }
 
 function buildWhyFromRules(rules) {
@@ -956,14 +964,14 @@ function buildExplanation(input) {
     })
   }
 
-  const simplifiedNode = canonicalizeDerivative(rawNode)
-  const simplifiedLatex = cleanupLatexExpression(toLatex(simplifiedNode))
+  const reorderedNode = canonicalizeDerivative(rawNode)
+  const reorderedLatex = cleanupLatexExpression(toLatex(reorderedNode))
   steps.push({
-    id: 'simplify',
+    id: 'simplify-reorder',
     tag: 'Simplify',
     title: 'Reorder terms for pedagogy-safe readability',
-    math: `f'(x) = ${simplifiedLatex}`,
-    currentDerivativePreview: simplifiedLatex,
+    math: `f'(x) = ${reorderedLatex}`,
+    currentDerivativePreview: reorderedLatex,
     note: 'AST reorder rule: coefficients and x-polynomials are pulled before trig terms to reduce angle confusion.',
     ruleCodes: [],
     why: {
@@ -977,6 +985,25 @@ function buildExplanation(input) {
       ],
     },
   })
+
+  const simplifiedNode = algebraicSimplify(reorderedNode)
+  const simplifiedLatex = cleanupLatexExpression(toLatex(simplifiedNode))
+
+  if (compactLatex(simplifiedLatex) !== compactLatex(reorderedLatex)) {
+    steps.push({
+      id: 'simplify-final',
+      tag: 'Simplify',
+      title: 'Evaluate constants and collapse equivalent factors',
+      math: `f'(x) = ${simplifiedLatex}`,
+      currentDerivativePreview: simplifiedLatex,
+      note: 'Now apply algebraic simplification so equivalent constants and factors are collapsed.',
+      ruleCodes: [],
+      why: {
+        tag: 'Why this final pass?',
+        explanation: 'Rule tracing is easier in expanded form, but final answers should collapse constant arithmetic and obvious factor identities.',
+      },
+    })
+  }
 
   const check = findNumericCheck(normalized, simplifiedNode.toString())
   if (check) {
@@ -1189,6 +1216,7 @@ export default function UniversalCalcExplainer() {
   const [isImportedSnapshot, setIsImportedSnapshot] = useState(false)
   const [importText, setImportText] = useState('')
   const [toast, setToast] = useState('')
+  const [showSimplificationPath, setShowSimplificationPath] = useState(true)
   const [recentInputs, setRecentInputs] = useState(() => {
     try {
       const raw = localStorage.getItem('universal-calc-recent-inputs')
@@ -1271,6 +1299,45 @@ export default function UniversalCalcExplainer() {
       finalExpr: explanation.finalExpr,
       derivativeStart: `f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`,
     }
+  }, [explanation])
+
+  const simplificationPath = useMemo(() => {
+    if (!explanation) return []
+
+    const rows = []
+    const seen = new Set()
+
+    const pushRow = (label, exprLatex, note = '', why = null) => {
+      const cleaned = tidyDisplayLatex(exprLatex)
+      if (!cleaned) return
+      const key = compactLatex(cleaned)
+      if (!key || seen.has(key)) return
+      seen.add(key)
+      rows.push({
+        label,
+        expr: `f'(x)=${cleaned}`,
+        note,
+        why,
+      })
+    }
+
+    pushRow(
+      'Unsimplified combined derivative',
+      explanation.rawLatex,
+      'Direct result after rule application, before algebraic cleanup.'
+    )
+
+    explanation.steps
+      .filter((step) => String(step?.tag || '').toLowerCase().includes('simplify') || step?.id === 'simplify')
+      .forEach((step) => {
+        const eq = extractPrimaryEquality(step?.math || '')
+        const candidate = eq.after || step.currentDerivativePreview || explanation.finalLatex
+        pushRow(step.title || 'Simplify', candidate, step.note || '', step.why || null)
+      })
+
+    pushRow('Final simplified / factored derivative', explanation.finalLatex)
+
+    return rows
   }, [explanation])
 
   const savedFunctionEntries = useMemo(
@@ -1775,6 +1842,39 @@ export default function UniversalCalcExplainer() {
               })}
             </div>
           </div>
+
+          {dynamicSnapshot && simplificationPath.length > 1 && (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Simplification path</h2>
+                <button
+                  onClick={() => setShowSimplificationPath((v) => !v)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900"
+                >
+                  {showSimplificationPath ? 'Hide simplification steps' : 'Show simplification steps'}
+                </button>
+              </div>
+
+              {showSimplificationPath ? (
+                <div className="space-y-4">
+                  {simplificationPath.map((entry, idx) => (
+                    <div key={`${entry.label}-${idx}`} className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
+                        {idx + 1}. {entry.label}
+                      </p>
+                      <div className="overflow-x-auto max-w-full">
+                        <KatexBlock expr={entry.expr} className="text-[0.92rem] lg:text-[1rem] text-slate-900 dark:text-slate-100" />
+                      </div>
+                      {entry.note ? <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">{entry.note}</p> : null}
+                      {entry.why ? <div className="mt-2"><WhyPanel why={entry.why} depth={0} /></div> : null}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 dark:text-slate-400">Simplification details are hidden. Toggle to inspect how the unsimplified derivative becomes the final form.</p>
+              )}
+            </div>
+          )}
 
           {dynamicSnapshot && (
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
