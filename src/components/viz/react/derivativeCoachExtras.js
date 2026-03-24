@@ -478,5 +478,310 @@ export const EXTRA_PROBLEMS = [
         reviewConcept: "Product + Chain"
       }
     ]
+  },
+  {
+    id: 101,
+    expression: "\\sqrt{1 - \\sin^2(x)}",
+    difficulty: "medium",
+    conceptTag: "Chain + simplification",
+    preview: "sqrt(1 - sin^2(x))",
+    finalAnswer: "-\\sin(x)",
+    mcSteps: [
+      {
+        id: "mc1",
+        question: "What is the BEST first step?",
+        options: [
+          { id: "A", label: "Apply chain rule directly" },
+          { id: "B", label: "Rewrite using trig identity" },
+          { id: "C", label: "Expand the square root" },
+          { id: "D", label: "Convert to exponential form" }
+        ],
+        correct: "B",
+        feedback: {
+          A: {
+            verdict: "partial",
+            message: "You can chain it, but you're missing a major simplification that makes this trivial.",
+            reviewConcept: "Trig identities",
+            reviewTip: "Always look for identities before differentiating"
+          },
+          C: {
+            verdict: "wrong",
+            message: "Square roots don't expand like polynomials.",
+            reviewConcept: "Algebra rules"
+          },
+          D: {
+            verdict: "wrong",
+            message: "No exponentials are present here.",
+            reviewConcept: "Function recognition"
+          }
+        },
+        correctFeedback: "1 - sin^2(x) = cos^2(x), so this becomes sqrt(cos^2(x))."
+      }
+    ],
+    blanks: [
+      {
+        id: "b1",
+        conceptTested: "Trig identity simplification",
+        prefix: "\\sqrt{1 - \\sin^2(x)} = ",
+        suffix: "",
+        answer: "\\cos(x)",
+        acceptedForms: ["cos(x)", "cosx"],
+        hint: "Recall the Pythagorean identity.",
+        explanation: "1 - sin^2(x) = cos^2(x), so sqrt(cos^2(x)) = cos(x) (ignoring absolute value for now).",
+        reviewConcept: "Trig identities"
+      },
+      {
+        id: "b2",
+        conceptTested: "Derivative of cosine",
+        prefix: "\\frac{d}{dx}[\\cos(x)] = ",
+        suffix: "",
+        answer: "-\\sin(x)",
+        acceptedForms: ["-sin(x)", "-sinx"],
+        hint: "Derivative of cos is negative sin.",
+        explanation: "Once simplified, this is a basic derivative.",
+        reviewConcept: "Basic trig derivatives"
+      }
+    ]
+  },
+  {
+    id: 102,
+    expression: "x^x",
+    difficulty: "hard",
+    conceptTag: "Log differentiation",
+    preview: "x^x",
+    finalAnswer: "x^x(\\ln(x)+1)",
+    mcSteps: [
+      {
+        id: "mc1",
+        question: "Why can't we use the standard power rule?",
+        options: [
+          { id: "A", label: "Because the exponent is not constant" },
+          { id: "B", label: "Because x is negative" },
+          { id: "C", label: "Because it's exponential" },
+          { id: "D", label: "Because the base is constant" }
+        ],
+        correct: "A",
+        feedback: {
+          B: {
+            verdict: "wrong",
+            message: "No restriction like that is given here.",
+            reviewConcept: "Function domain"
+          },
+          C: {
+            verdict: "partial",
+            message: "Close, but the key issue is the variable exponent.",
+            reviewConcept: "Exponential vs power"
+          },
+          D: {
+            verdict: "wrong",
+            message: "The base is not constant.",
+            reviewConcept: "Power rule"
+          }
+        },
+        correctFeedback: "Power rule only works when exponent is constant. Use log differentiation."
+      }
+    ],
+    blanks: [
+      {
+        id: "b1",
+        conceptTested: "Log step",
+        prefix: "\\ln(y) = ",
+        suffix: "",
+        answer: "x\\ln(x)",
+        acceptedForms: ["x ln(x)", "xln(x)", "x*ln(x)"],
+        hint: "Take ln of both sides.",
+        explanation: "ln(x^x) = x ln(x).",
+        reviewConcept: "Log properties"
+      },
+      {
+        id: "b2",
+        conceptTested: "Product rule",
+        prefix: "\\frac{d}{dx}[x\\ln(x)] = ",
+        suffix: "",
+        answer: "\\ln(x) + 1",
+        acceptedForms: ["ln(x)+1", "1+ln(x)"],
+        hint: "Product rule: derivative of x is 1.",
+        explanation: "Derivative = 1*ln(x) + x*(1/x).",
+        reviewConcept: "Product rule"
+      }
+    ]
+  },
+  {
+    id: 103,
+    expression: "x e^x \\sin(x)",
+    difficulty: "hard",
+    conceptTag: "Product + Chain",
+    preview: "x * e^x * sin(x)",
+    finalAnswer: "e^x\\sin(x) + x e^x\\sin(x) + x e^x\\cos(x)",
+    mcSteps: [
+      {
+        id: "mc1",
+        question: "How many terms will the derivative have?",
+        options: [
+          { id: "A", label: "2" },
+          { id: "B", label: "3" },
+          { id: "C", label: "1" },
+          { id: "D", label: "4" }
+        ],
+        correct: "B",
+        feedback: {
+          A: {
+            verdict: "wrong",
+            message: "That's for a two-factor product.",
+            reviewConcept: "Product rule"
+          },
+          C: {
+            verdict: "wrong",
+            message: "This is not a simple function.",
+            reviewConcept: "Function structure"
+          },
+          D: {
+            verdict: "wrong",
+            message: "Each factor contributes exactly once.",
+            reviewConcept: "Product rule"
+          }
+        },
+        correctFeedback: "Three factors produce three terms."
+      }
+    ],
+    blanks: [
+      {
+        id: "b1",
+        conceptTested: "Structure recognition",
+        prefix: "\\frac{d}{dx}[x e^x \\sin(x)] = ",
+        suffix: "",
+        answer: "e^x\\sin(x) + x e^x\\sin(x) + x e^x\\cos(x)",
+        acceptedForms: ["e^x sin(x) + x e^x sin(x) + x e^x cos(x)", "e^xsinx+xe^xsinx+xe^xcosx"],
+        hint: "Differentiate one factor at a time.",
+        explanation: "Each term is derivative of one factor times the other two unchanged.",
+        reviewConcept: "Product rule"
+      }
+    ]
+  },
+  {
+    id: 104,
+    expression: "\\arcsin(\\cos(x))",
+    difficulty: "hard",
+    conceptTag: "Chain × 3 layers",
+    preview: "arcsin(cos(x))",
+    finalAnswer: "\\frac{-\\sin(x)}{\\sqrt{1-\\cos^2(x)}}",
+    mcSteps: [
+      {
+        id: "mc1",
+        question: "What is the OUTER function?",
+        options: [
+          { id: "A", label: "cos(x)" },
+          { id: "B", label: "arcsin" },
+          { id: "C", label: "x" },
+          { id: "D", label: "sin(x)" }
+        ],
+        correct: "B",
+        feedback: {
+          A: {
+            verdict: "wrong",
+            message: "That's the inner function.",
+            reviewConcept: "Chain rule"
+          },
+          C: {
+            verdict: "wrong",
+            message: "x is deeply inside.",
+            reviewConcept: "Function layers"
+          },
+          D: {
+            verdict: "wrong",
+            message: "Not present.",
+            reviewConcept: "Function recognition"
+          }
+        },
+        correctFeedback: "Start from the outside, then peel inward."
+      }
+    ],
+    blanks: [
+      {
+        id: "b1",
+        conceptTested: "Derivative of arcsin",
+        prefix: "\\frac{d}{dx}[\\arcsin(u)] = ",
+        suffix: "",
+        answer: "\\frac{1}{\\sqrt{1-u^2}}",
+        acceptedForms: ["1/sqrt(1-u^2)", "1/\\sqrt(1-u^2)"],
+        hint: "Use the standard inverse trig derivative.",
+        explanation: "(arcsin u)' = 1/sqrt(1-u^2).",
+        reviewConcept: "Inverse trig derivatives"
+      },
+      {
+        id: "b2",
+        conceptTested: "Chain completion",
+        prefix: "\\frac{d}{dx}[\\arcsin(\\cos(x))] = ",
+        suffix: "",
+        answer: "\\frac{-\\sin(x)}{\\sqrt{1-\\cos^2(x)}}",
+        acceptedForms: ["-sin(x)/sqrt(1-cos^2(x))", "(-sinx)/sqrt(1-cos^2x)"],
+        hint: "Multiply outer derivative by derivative of cos(x).",
+        explanation: "Outer derivative at cos(x), then multiply by -sin(x).",
+        reviewConcept: "Chain rule"
+      }
+    ]
+  },
+  {
+    id: 105,
+    expression: "\\frac{x^2 + x}{x}",
+    difficulty: "medium",
+    conceptTag: "Chain + simplification",
+    preview: "(x^2 + x)/x",
+    finalAnswer: "1",
+    mcSteps: [
+      {
+        id: "mc1",
+        question: "What is the BEST strategy?",
+        options: [
+          { id: "A", label: "Use quotient rule" },
+          { id: "B", label: "Simplify first" },
+          { id: "C", label: "Use product rule" },
+          { id: "D", label: "Use chain rule" }
+        ],
+        correct: "B",
+        feedback: {
+          A: {
+            verdict: "partial",
+            message: "You can, but it's inefficient compared to simplifying first.",
+            reviewConcept: "Strategy"
+          },
+          C: {
+            verdict: "wrong",
+            message: "Not in product form yet.",
+            reviewConcept: "Function form"
+          },
+          D: {
+            verdict: "wrong",
+            message: "No composition here.",
+            reviewConcept: "Chain rule"
+          }
+        },
+        correctFeedback: "Always simplify before applying heavy rules when possible."
+      }
+    ],
+    blanks: [
+      {
+        id: "b1",
+        conceptTested: "Simplification",
+        prefix: "\\frac{x^2 + x}{x} = ",
+        suffix: "",
+        answer: "x + 1",
+        acceptedForms: ["x+1"],
+        hint: "Divide each term by x.",
+        explanation: "x^2/x + x/x = x + 1.",
+        reviewConcept: "Algebra"
+      },
+      {
+        id: "b2",
+        conceptTested: "Final derivative",
+        prefix: "\\frac{d}{dx}[x+1] = ",
+        suffix: "",
+        answer: "1",
+        acceptedForms: ["1"],
+        hint: "Derivative of x is 1.",
+        explanation: "Constant term disappears.",
+        reviewConcept: "Basic derivatives"
+      }
+    ]
   }
 ]
