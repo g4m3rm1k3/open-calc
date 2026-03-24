@@ -236,6 +236,12 @@ const VIZ_REGISTRY = {
   DerivativeRuleArenaGame: lazy(
     () => import("./react/DerivativeRuleArenaGame.jsx"),
   ),
+  Ch1_BrokenFitting: lazy(() => import("./react/Ch1_BrokenFitting.jsx")),
+  Ch2_RopeBridge: lazy(() => import("./react/Ch2_RopeBridge.jsx")),
+  Ch3_MissingAngle: lazy(() => import("./react/Ch3_MissingAngle.jsx")),
+  Ch4_RampSlope: lazy(() => import("./react/Ch4_RampSlope.jsx")),
+  Ch5_QuadraticShadow: lazy(() => import("./react/Ch5_QuadraticShadow.jsx")),
+  Ch6_TwoTanks: lazy(() => import("./react/Ch6_TwoTanks.jsx")),
   // Chapter 2 — Inverse functions & differentiability
   InverseSlopeReflectionLab: lazy(
     () => import("./react/InverseSlopeReflectionLab.jsx"),
@@ -243,10 +249,10 @@ const VIZ_REGISTRY = {
   ArcTanDerivationLab: lazy(() => import("./react/ArcTanDerivationLab.jsx")),
   AbsoluteValueDiffViz: lazy(() => import("./react/AbsoluteValueDiffViz.jsx")),
   UniversalInverseLab: lazy(() => import("./d3/UniversalInverseLab.jsx")),
-  InverseFunctionExplorer: lazy(() => import("./d3/InverseFunctionExplorer.jsx")),
-  PythagoreanSlopeEngine: lazy(
-    () => import("./d3/PythagoreanSlopeEngine.jsx"),
+  InverseFunctionExplorer: lazy(
+    () => import("./d3/InverseFunctionExplorer.jsx"),
   ),
+  PythagoreanSlopeEngine: lazy(() => import("./d3/PythagoreanSlopeEngine.jsx")),
   LogExpReciprocalViz: lazy(() => import("./d3/LogExpReciprocalViz.jsx")),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame: lazy(() => import("./react/SketchDerivativeGame.jsx")),
