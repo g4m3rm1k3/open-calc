@@ -36,6 +36,11 @@ export default {
         id: 'PigeonholeViz',
         title: 'The Inevitability Engine',
         caption: 'Try to place more items than there are holes. No matter how you distribute them, the universe forces a collision. Math prevents you from finding a loophole.',
+      },
+      {
+        id: 'PigeonHoleDemo',
+        title: 'Pigeonhole Sandbox (Second Perspective)',
+        caption: 'A second perspective: toggle presets, drop pigeons, and watch collisions emerge from counting constraints in real time.',
       }
     ]
   },

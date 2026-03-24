@@ -163,7 +163,7 @@ function IntuitionBlock({ data }) {
     || data?.alternate?.visualizations?.length > 0
 
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
-  const primaryVizzes = isBlocksFormat ? [] : getSectionVizzes(data)
+  const primaryVizzes = getSectionVizzes(data)
   const hasPrimary = data?.prose?.length > 0 || data?.callouts?.length > 0 || primaryVizzes.length > 0 || isBlocksFormat
   const alternateVizzes = hasAlternate ? getSectionVizzes(data.alternate) : []
   if (!hasPrimary && !hasAlternate) return null

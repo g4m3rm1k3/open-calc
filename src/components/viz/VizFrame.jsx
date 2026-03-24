@@ -163,6 +163,7 @@ const VIZ_REGISTRY = {
   SequenceViz: lazy(() => import("./d3/SequenceViz.jsx")),
   // Course: Discrete Math
   PigeonholeViz: lazy(() => import("./react/PigeonholeViz.jsx")),
+  PigeonHoleDemo: lazy(() => import("./react/PigeonHoleDemo.jsx")),
   TruthTableLab: lazy(() => import("./react/TruthTableLab.jsx")),
   DiscreteDependencyMap: lazy(
     () => import("./react/DiscreteDependencyMap.jsx"),
