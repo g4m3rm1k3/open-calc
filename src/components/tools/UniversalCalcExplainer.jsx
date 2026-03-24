@@ -507,6 +507,28 @@ function factorSharedProductTerms(node) {
   }
 }
 
+function distributeAndCombine(node) {
+  try {
+    const source = String(node?.toString?.() || '')
+    if (!source) return node
+
+    // Guardrail against combinatorial blow-up on very large expressions.
+    if (source.length > 260) return node
+
+    const distributiveRules = [
+      'n1*(n2+n3) -> n1*n2 + n1*n3',
+      '(n1+n2)*n3 -> n1*n3 + n2*n3',
+      'n1*(n2-n3) -> n1*n2 - n1*n3',
+      '(n1-n2)*n3 -> n1*n3 - n2*n3',
+    ]
+
+    const distributed = simplify(node, distributiveRules)
+    return simplify(distributed)
+  } catch {
+    return node
+  }
+}
+
 function buildWhyFromRules(rules) {
   const metas = rules.map((r) => RULE_LIBRARY[r]).filter((m) => !!m)
   if (!metas.length) return null
@@ -618,11 +640,11 @@ function cleanupLatexExpression(exprLatex) {
 
   // Remove multiplicative identity factors.
   s = s.replace(/\\cdot\s*1(?!\d)/g, '')
-  s = s.replace(/1\s*\\cdot\s*/g, '')
+  s = s.replace(/(^|[^\d])1\s*\\cdot\s*/g, '$1')
 
   // Remove additive zero terms.
   s = s.replace(/\+\s*0(?!\d)/g, '')
-  s = s.replace(/0\s*\+\s*/g, '')
+  s = s.replace(/(^|[^\d])0\s*\+\s*/g, '$1')
 
   // x^1 or x^{1} -> x
   s = s.replace(/x\^\{1\}/g, 'x')
@@ -1186,7 +1208,31 @@ function buildExplanation(input) {
   const finalNode = compactLatex(factoredLatex) !== compactLatex(simplifiedLatex) ? factoredNode : simplifiedNode
   const finalLatex = compactLatex(factoredLatex) !== compactLatex(simplifiedLatex) ? factoredLatex : simplifiedLatex
 
-  const check = findNumericCheck(normalized, finalNode.toString())
+  const expandedCombinedNode = distributeAndCombine(finalNode)
+  const expandedCombinedLatex = cleanupLatexExpression(toLatex(expandedCombinedNode))
+
+  if (compactLatex(expandedCombinedLatex) !== compactLatex(finalLatex)) {
+    steps.push({
+      id: 'expand-combine-final',
+      tag: 'Simplify',
+      title: 'Distribute and combine equivalent terms',
+      math: `f'(x) = ${expandedCombinedLatex}`,
+      currentDerivativePreview: expandedCombinedLatex,
+      note: 'Optional canonicalization pass: expand distributed products and combine constants/like pieces.',
+      ruleCodes: [],
+      why: {
+        tag: 'Why include this pass?',
+        explanation: 'Some textbooks prefer expanded-combined form over factored form. This keeps both representations algorithmic and equivalent.',
+      },
+    })
+  }
+
+  const chooseExpanded = compactLatex(expandedCombinedLatex).length > 0
+    && compactLatex(expandedCombinedLatex).length < compactLatex(finalLatex).length
+  const chosenFinalNode = chooseExpanded ? expandedCombinedNode : finalNode
+  const chosenFinalLatex = chooseExpanded ? expandedCombinedLatex : finalLatex
+
+  const check = findNumericCheck(normalized, chosenFinalNode.toString())
   if (check) {
     const absErr = Math.abs(check.slope - check.exact)
     const relErr = Math.abs(check.exact) > 1e-8 ? absErr / Math.abs(check.exact) : null
@@ -1222,7 +1268,7 @@ function buildExplanation(input) {
 
       // Only simplify is allowed to replace the full displayed equation directly.
       // If local replacement fails on a leaf node, we preserve the existing global string.
-      if (s.id === 'simplify-reorder' || s.id === 'simplify-final' || s.id === 'factor-final') {
+      if (s.id === 'simplify-reorder' || s.id === 'simplify-final' || s.id === 'factor-final' || s.id === 'expand-combine-final') {
         globalEquation = afterEq
         replaced = true
       }
@@ -1272,8 +1318,8 @@ function buildExplanation(input) {
     rawLatex: toLatex(rawNode),
     rawExpr: rawNode.toString(),
     steps: stepsWithContext,
-    finalLatex,
-    finalExpr: finalNode.toString(),
+    finalLatex: chosenFinalLatex,
+    finalExpr: chosenFinalNode.toString(),
   }
 }
 
