@@ -243,6 +243,7 @@ const VIZ_REGISTRY = {
   ArcTanDerivationLab: lazy(() => import("./react/ArcTanDerivationLab.jsx")),
   AbsoluteValueDiffViz: lazy(() => import("./react/AbsoluteValueDiffViz.jsx")),
   UniversalInverseLab: lazy(() => import("./d3/UniversalInverseLab.jsx")),
+  InverseFunctionExplorer: lazy(() => import("./d3/InverseFunctionExplorer.jsx")),
   PythagoreanSlopeEngine: lazy(
     () => import("./d3/PythagoreanSlopeEngine.jsx"),
   ),

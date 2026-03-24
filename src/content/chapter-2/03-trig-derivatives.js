@@ -50,6 +50,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'InverseFunctionExplorer',
+        title: 'Inverse Function Explorer: Global vs Local Inverse',
+        mathBridge: 'Start here to connect inverse ideas to derivatives: explore $f$, $f^{-1}$, domain restrictions, and slope reciprocity $\\left(f^{-1}\\right)\'\\big(f(x)\\big)=1/f\'(x)$ with clear global-vs-local branch behavior.',
+        caption: 'Use the solver-style panel to inspect derivative, inverse behavior, and inverse-derivative logic before the rest of trig derivative content.',
+      },
+      {
         id: 'VideoEmbed',
         title: "Calculus I - 5.7.2 Inverse Trigonometric Functions: Differentiation",
         props: { url: "https://www.youtube.com/embed/xoBwEFKVHKE" }
