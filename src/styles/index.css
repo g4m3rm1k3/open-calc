@@ -167,7 +167,8 @@
   text-underline-offset: 2px;
 }
 
-.tooltip:hover::after {
+.tooltip:hover::after,
+.tooltip:focus::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 6px);

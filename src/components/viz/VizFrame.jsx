@@ -206,6 +206,7 @@ const VIZ_REGISTRY = {
   ),
   SetProofVisualizer: lazy(() => import("./react/SetProofVisualizer.jsx")),
   RelationMatrixLab: lazy(() => import("./react/RelationMatrixLab.jsx")),
+  RelationsExplorer: lazy(() => import("./react/RelationsExplorer.jsx")),
   ModuloPartitionLab: lazy(() => import("./react/ModuloPartitionLab.jsx")),
   HasseTransformerLab: lazy(() => import("./react/HasseTransformerLab.jsx")),
   EquivalenceDecoderLab: lazy(

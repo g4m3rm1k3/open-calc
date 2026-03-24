@@ -98,7 +98,7 @@ export function parseProse(text) {
         if (labelEnd !== -1) {
           const label = text.slice(labelStart, labelEnd)
           parts.push(
-            <span key={`tt${keyIdx++}`} className="tooltip" data-tooltip={tooltip}>
+            <span key={`tt${keyIdx++}`} className="tooltip" data-tooltip={tooltip} title={tooltip} tabIndex={0}>
               {label}
             </span>
           )
