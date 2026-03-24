@@ -155,6 +155,38 @@ function stripDerivativePrefix(text) {
   return String(text || '').replace(/^f'\(x\)\s*=\s*/i, '').trim()
 }
 
+function isRenderableLatexCandidate(expr) {
+  const s = String(expr || '')
+  if (!s.trim()) return false
+
+  // Imported JSON can accidentally decode some LaTeX commands as control chars.
+  if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(s)) return false
+
+  let depth = 0
+  for (const ch of s) {
+    if (ch === '{') depth += 1
+    if (ch === '}') {
+      depth -= 1
+      if (depth < 0) return false
+    }
+  }
+  if (depth !== 0) return false
+
+  const leftCount = (s.match(/\\left/g) || []).length
+  const rightCount = (s.match(/\\right/g) || []).length
+  if (leftCount !== rightCount) return false
+
+  return true
+}
+
+function pickRenderableLatex(primary, fallback = '') {
+  const p = String(primary || '').trim()
+  const f = String(fallback || '').trim()
+  if (isRenderableLatexCandidate(p)) return p
+  if (isRenderableLatexCandidate(f)) return f
+  return p || f
+}
+
 function inferOperationFamily(ruleUsed) {
   const rule = String(ruleUsed || '').toLowerCase()
   if (rule.includes('product')) return 'product'
@@ -175,8 +207,12 @@ function buildDefaultCommentary(step) {
   if (!step) return ''
 
   const operation = inferOperationFamily(step.ruleUsed)
-  const appliedCore = stripDerivativePrefix(step.applied)
-  const outcomeCore = stripDerivativePrefix(step.outcome)
+  const appliedCore = stripDerivativePrefix(
+    pickRenderableLatex(step.applied, step.fallbackApplied)
+  )
+  const outcomeCore = stripDerivativePrefix(
+    pickRenderableLatex(step.outcome, step.fallbackOutcome)
+  )
   const appliedMath = appliedCore ? `\\(${appliedCore}\\)` : 'the current derivative form'
   const outcomeMath = outcomeCore ? `\\(${outcomeCore}\\)` : 'the transformed derivative form'
 
@@ -1193,18 +1229,25 @@ export default function UniversalCalcExplainer() {
         ? RULE_LIBRARY[primaryRule].label
         : (step.tag || 'Custom Step')
 
+      const localEq = extractPrimaryEquality(step.math)
+      const fallbackApplied = tidyDisplayLatex(localEq.before)
+      const fallbackOutcome = tidyDisplayLatex(localEq.after)
+
       let beforeExpr = step.globalBefore || rollingExpr
       let outcomeExpr = step.globalAfter || rollingExpr
 
       // If global replacement failed for a step, fallback to local equation sides
       // so each line still reflects a real transformation.
       if (compactLatex(beforeExpr) === compactLatex(outcomeExpr)) {
-        const localEq = extractPrimaryEquality(step.math)
         if (localEq.before && localEq.after && compactLatex(localEq.before) !== compactLatex(localEq.after)) {
           beforeExpr = tidyDisplayLatex(localEq.before)
           outcomeExpr = tidyDisplayLatex(localEq.after)
         }
       }
+
+      // If the global stitched expression becomes malformed, fall back to local step equality.
+      beforeExpr = pickRenderableLatex(beforeExpr, fallbackApplied)
+      outcomeExpr = pickRenderableLatex(outcomeExpr, fallbackOutcome)
 
       rollingExpr = outcomeExpr
 
@@ -1212,6 +1255,8 @@ export default function UniversalCalcExplainer() {
         ruleUsed,
         applied: `f'(x)=${beforeExpr}`,
         outcome: `f'(x)=${outcomeExpr}`,
+        fallbackApplied: fallbackApplied ? `f'(x)=${fallbackApplied}` : '',
+        fallbackOutcome: fallbackOutcome ? `f'(x)=${fallbackOutcome}` : '',
         commentary: '',
         note: step.note || '',
         why: step.why || null,
@@ -1373,6 +1418,8 @@ export default function UniversalCalcExplainer() {
         ruleUsed: String(step?.ruleUsed || 'Custom Step'),
         applied: String(step?.applied || ''),
         outcome: String(step?.outcome || ''),
+        fallbackApplied: String(step?.fallbackApplied || ''),
+        fallbackOutcome: String(step?.fallbackOutcome || ''),
         commentary: String(step?.commentary || ''),
         note: '',
         why: null,
@@ -1395,6 +1442,8 @@ export default function UniversalCalcExplainer() {
         ruleUsed: step.ruleUsed || 'Custom Step',
         applied: String(step.applied || ''),
         outcome: String(step.outcome || ''),
+        fallbackApplied: String(step.fallbackApplied || ''),
+        fallbackOutcome: String(step.fallbackOutcome || ''),
         commentary: String(step.commentary || ''),
       })),
     }
@@ -1423,6 +1472,8 @@ export default function UniversalCalcExplainer() {
           ruleUsed: String(step?.ruleUsed || 'Custom Step'),
           applied: String(step?.applied || ''),
           outcome: String(step?.outcome || ''),
+          fallbackApplied: String(step?.fallbackApplied || ''),
+          fallbackOutcome: String(step?.fallbackOutcome || ''),
           commentary: String(step?.commentary || ''),
           note: '',
           why: null,
@@ -1653,7 +1704,7 @@ export default function UniversalCalcExplainer() {
                             />
                           ) : (
                             <div className="overflow-x-auto max-w-full">
-                              <KatexBlock expr={step.applied || ''} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
+                              <KatexBlock expr={pickRenderableLatex(step.applied, step.fallbackApplied)} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
                             </div>
                           )}
                         </div>
@@ -1669,7 +1720,7 @@ export default function UniversalCalcExplainer() {
                             />
                           ) : (
                             <div className="overflow-x-auto max-w-full">
-                              <KatexBlock expr={step.outcome || ''} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
+                              <KatexBlock expr={pickRenderableLatex(step.outcome, step.fallbackOutcome)} className="text-[0.9rem] lg:text-[0.98rem] text-slate-900 dark:text-slate-100" />
                             </div>
                           )}
                         </div>
