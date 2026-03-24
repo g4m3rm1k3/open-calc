@@ -857,6 +857,11 @@ export default function DerivativeCoach({ params = {} }) {
   const [blankResult, setBlankResult] = useState(null); // null | "correct" | "hint" | "explain"
   const [sessionErrors, setSessionErrors] = useState({}); // concept → count
   const [problemStats, setProblemStats] = useState({}); // probId -> { correct, incorrect }
+  const [questionMastery, setQuestionMastery] = useState({}); // qKey -> true if answered correctly at least once
+  const [completedProblems, setCompletedProblems] = useState({}); // problemId -> true once completion bonus awarded
+  const [totalScore, setTotalScore] = useState(0);
+  const [lastCompletionBonus, setLastCompletionBonus] = useState(0);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
   const [currentProblemMistakes, setCurrentProblemMistakes] = useState(0);
   const [selectedConcepts, setSelectedConcepts] = useState([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState([]);
@@ -885,7 +890,7 @@ export default function DerivativeCoach({ params = {} }) {
       [options[i], options[j]] = [options[j], options[i]];
     }
     return options;
-  }, [prob?.id, mcIdx]);
+  }, [prob?.id, mcIdx, shuffleSeed]);
 
   useEffect(() => {
     if (eligibleProblemIndices.length === 0) return;
@@ -899,6 +904,9 @@ export default function DerivativeCoach({ params = {} }) {
       setBlankInput("");
       setBlankAttempts(0);
       setBlankResult(null);
+      setCurrentProblemMistakes(0);
+      setLastCompletionBonus(0);
+      setShuffleSeed((s) => s + 1);
       setShowSummary(false);
     }
   }, [eligibleProblemIndices, probIdx]);
@@ -939,6 +947,27 @@ export default function DerivativeCoach({ params = {} }) {
     });
   };
 
+  const applyQuestionScore = (questionKey, wasCorrect) => {
+    const alreadyMastered = !!questionMastery[questionKey];
+    const delta = wasCorrect
+      ? (alreadyMastered ? 3 : 10)
+      : (alreadyMastered ? -1 : -5);
+
+    setTotalScore((s) => s + delta);
+
+    if (wasCorrect && !alreadyMastered) {
+      setQuestionMastery((prev) => ({ ...prev, [questionKey]: true }));
+    }
+  };
+
+  const completionBonusForDifficulty = (difficulty) => {
+    const d = String(difficulty || "").toLowerCase();
+    if (d.includes("very hard")) return 20;
+    if (d.includes("hard")) return 14;
+    if (d.includes("medium")) return 8;
+    return 5;
+  };
+
   const jumpToProblem = (index) => {
     setProbIdx(index);
     setPhase("mc");
@@ -950,6 +979,8 @@ export default function DerivativeCoach({ params = {} }) {
     setBlankAttempts(0);
     setBlankResult(null);
     setCurrentProblemMistakes(0);
+    setLastCompletionBonus(0);
+    setShuffleSeed((s) => s + 1);
     setShowSummary(false);
   };
 
@@ -1013,13 +1044,16 @@ export default function DerivativeCoach({ params = {} }) {
   const handleMcChoice = (optId) => {
     if (mcResult?.verdict === "correct") return;
     setMcChosen(optId);
+    const questionKey = `${prob.id}::mc::${mcStep.id}`;
     if (optId === mcStep.correct) {
       setMcResult({ verdict: "correct", message: mcStep.correctFeedback });
       updateProblemScore(prob.id, { correct: 1 });
+      applyQuestionScore(questionKey, true);
     } else {
       const fb = mcStep.feedback[optId];
       setMcResult({ verdict: fb.verdict, message: fb.message, reviewConcept: fb.reviewConcept, reviewTip: fb.reviewTip });
       updateProblemScore(prob.id, { incorrect: 1 });
+      applyQuestionScore(questionKey, false);
       setCurrentProblemMistakes((n) => n + 1);
       if (fb.reviewConcept) {
         setSessionErrors(e => ({ ...e, [fb.reviewConcept]: (e[fb.reviewConcept] || 0) + 1 }));
@@ -1032,6 +1066,7 @@ export default function DerivativeCoach({ params = {} }) {
     setMcResult(null);
     if (mcIdx + 1 < prob.mcSteps.length) {
       setMcIdx(mcIdx + 1);
+      setShuffleSeed((s) => s + 1);
     } else {
       setPhase("blanks");
       setBlankIdx(0);
@@ -1048,14 +1083,17 @@ export default function DerivativeCoach({ params = {} }) {
     const correct = normalize(blank.answer);
     const accepted = (blank.acceptedForms || []).map(normalize);
     const isCorrect = norm === correct || accepted.includes(norm);
+    const questionKey = `${prob.id}::blank::${blank.id}`;
 
     if (isCorrect) {
       setBlankResult("correct");
       updateProblemScore(prob.id, { correct: 1 });
+      applyQuestionScore(questionKey, true);
     } else {
       const newAttempts = blankAttempts + 1;
       setBlankAttempts(newAttempts);
       updateProblemScore(prob.id, { incorrect: 1 });
+      applyQuestionScore(questionKey, false);
       setCurrentProblemMistakes((n) => n + 1);
       if (newAttempts === 1) {
         setBlankResult("hint");
@@ -1073,6 +1111,14 @@ export default function DerivativeCoach({ params = {} }) {
     if (blankIdx + 1 < (prob.blanks?.length || 0)) {
       setBlankIdx(blankIdx + 1);
     } else {
+      if (!completedProblems[prob.id]) {
+        const bonus = completionBonusForDifficulty(prob.difficulty);
+        setTotalScore((s) => s + bonus);
+        setLastCompletionBonus(bonus);
+        setCompletedProblems((prev) => ({ ...prev, [prob.id]: true }));
+      } else {
+        setLastCompletionBonus(0);
+      }
       setPhase("done");
     }
   };
@@ -1125,7 +1171,7 @@ export default function DerivativeCoach({ params = {} }) {
             ))}
           </div>
         )}
-        <button onClick={() => { setProbIdx(0); setPhase("mc"); setMcIdx(0); setMcChosen(null); setMcResult(null); setBlankIdx(0); setBlankInput(""); setBlankAttempts(0); setBlankResult(null); setCurrentProblemMistakes(0); setShowSummary(false); }} style={{ padding: "8px 18px", borderRadius: 8, border: "0.5px solid var(--color-border-info)", background: "var(--color-background-info)", color: "var(--color-text-info)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+        <button onClick={() => { setProbIdx(0); setPhase("mc"); setMcIdx(0); setMcChosen(null); setMcResult(null); setBlankIdx(0); setBlankInput(""); setBlankAttempts(0); setBlankResult(null); setCurrentProblemMistakes(0); setSessionErrors({}); setProblemStats({}); setQuestionMastery({}); setCompletedProblems({}); setTotalScore(0); setLastCompletionBonus(0); setShuffleSeed((s) => s + 1); setShowSummary(false); }} style={{ padding: "8px 18px", borderRadius: 8, border: "0.5px solid var(--color-border-info)", background: "var(--color-background-info)", color: "var(--color-text-info)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
           Start over
         </button>
       </div>
@@ -1141,6 +1187,9 @@ export default function DerivativeCoach({ params = {} }) {
         <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Problem {Math.max(eligibleProblemIndices.indexOf(safeProbIdx) + 1, 1)} / {Math.max(eligibleProblemIndices.length, 1)}</span>
         <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: "var(--color-background-secondary)", color: "var(--color-text-secondary)", border: "0.5px solid var(--color-border-secondary)" }}>{prob.difficulty}</span>
         <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: "#E6F1FB", color: "#0C447C" }}>{prob.conceptTag}</span>
+        <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: isDark ? "rgba(16,185,129,0.2)" : "#E1F5EE", color: isDark ? "#bbf7d0" : "#065f46", border: `0.5px solid ${isDark ? "#34d399" : "#86efac"}` }}>
+          Score: {totalScore}
+        </span>
         <div style={{ display: "flex", gap: 3, marginLeft: "auto" }}>
           {eligibleProblemIndices.map((idx, i) => (
             <div key={idx} style={{ width: 20, height: 4, borderRadius: 2, background: i < Math.max(eligibleProblemIndices.indexOf(safeProbIdx), 0) ? "#1D9E75" : idx === safeProbIdx ? "#7F77DD" : "var(--color-border-tertiary)" }} />
@@ -1404,6 +1453,11 @@ export default function DerivativeCoach({ params = {} }) {
                 <p style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
                   Hint for this problem type: {conceptLens.tip}
                 </p>
+              </div>
+            )}
+            {lastCompletionBonus > 0 && (
+              <div style={{ marginTop: 10, fontSize: 12, color: tone.correct.label }}>
+                Completion bonus: +{lastCompletionBonus} ({String(prob.difficulty || "").toLowerCase()})
               </div>
             )}
           </div>
