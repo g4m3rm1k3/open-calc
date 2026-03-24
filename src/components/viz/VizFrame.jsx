@@ -242,6 +242,11 @@ const VIZ_REGISTRY = {
   ),
   ArcTanDerivationLab: lazy(() => import("./react/ArcTanDerivationLab.jsx")),
   AbsoluteValueDiffViz: lazy(() => import("./react/AbsoluteValueDiffViz.jsx")),
+  UniversalInverseLab: lazy(() => import("./d3/UniversalInverseLab.jsx")),
+  PythagoreanSlopeEngine: lazy(
+    () => import("./d3/PythagoreanSlopeEngine.jsx"),
+  ),
+  LogExpReciprocalViz: lazy(() => import("./d3/LogExpReciprocalViz.jsx")),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame: lazy(() => import("./react/SketchDerivativeGame.jsx")),
   // Precalc — Algebra (contributed components)

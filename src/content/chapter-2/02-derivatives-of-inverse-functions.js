@@ -69,6 +69,12 @@ export default {
         caption: 'Drag the point on f(x) = x². The mirrored green point on f⁻¹(x) = √x always carries the reciprocal slope. Their product is always 1.',
       },
       {
+        id: 'UniversalInverseLab',
+        title: 'Universal Inverse Lab: Try More Than x²',
+        mathBridge: 'The reciprocal-slope rule is not specific to one function. Pick linear, cubic, or exponential presets and track corresponding points on $f$ and $f^{-1}$. At each matched pair, the tangent slopes still multiply to 1 as long as $f\'(a) \neq 0$.',
+        caption: 'Switch families and move the point. The geometry changes, but slope reciprocity at reflected points does not.',
+      },
+      {
         id: 'DualGraphSync',
         title: 'Reflection and Reciprocal Slopes (Symbolic View)',
         caption: 'As a point moves on f, the reflected point on f^(-1) shows reciprocal tangent slope at matching coordinates.',
@@ -116,6 +122,12 @@ export default {
         title: 'The Rule in Action: f(x) = x²',
         mathBridge: 'The theorem says $(f^{-1})\'(x) = 1/f\'(f^{-1}(x))$. Here $f(x) = x^2$, so $f^{-1}(x) = \\sqrt{x}$ and $f\'(x) = 2x$. Therefore $(f^{-1})\'(x) = 1/(2\\sqrt{x})$ — exactly the derivative of $\\sqrt{x}$ by the power rule. The graph makes this formula geometric: reflection swaps axes, and swapping axes flips the fraction $\\Delta y / \\Delta x$ to $\\Delta x / \\Delta y$.',
         caption: 'Verify the formula numerically: move to any a, read f\'(a) = 2a, then check that (f⁻¹)\'(a²) = 1/(2a). Product is always 1.',
+      },
+      {
+        id: 'PythagoreanSlopeEngine',
+        title: 'Inverse Trig Denominators from Geometry',
+        mathBridge: 'For inverse trig, implicit differentiation creates triangle-based denominators: $\\sqrt{1-x^2}$ for $\\arcsin x$ and $1+x^2$ for $\\arctan x$. This engine visualizes exactly where those terms come from instead of treating them as memorized formulas.',
+        caption: 'Toggle arcsin/arctan mode and watch the geometric denominator update live with x.',
       },
     ],
   },

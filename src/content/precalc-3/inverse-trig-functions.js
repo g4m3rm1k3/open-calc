@@ -44,6 +44,18 @@ export default {
         mathBridge: 'Toggle between sin, cos, tan. See the restriction highlighted, then the inverse function as a reflection over y = x.',
         caption: 'The inverse function is the reflection of the restricted portion — not the whole periodic curve.',
       },
+      {
+        id: 'UniversalInverseLab',
+        title: 'Universal Mirror Sandbox — Any Function',
+        mathBridge: 'Pick any function preset. Drag the amber point along f(x). The pink point mirrors on f^-1(x). The HUD shows m1 * m2 = 1.',
+        caption: 'Rise becomes run. The slope of f^-1 is always the reciprocal of the slope of f.',
+      },
+      {
+        id: 'LogExpReciprocalViz',
+        title: 'e^x and ln(x) — Slope Reciprocity',
+        mathBridge: 'The slope of e^x at any point equals its y-value. Drag the amber point to see how this flips to give ln(x) a slope of 1/x.',
+        caption: 'The most famous inverse pair shows slope reciprocity most clearly.',
+      },
       { id: 'VideoEmbed', title: 'TR-22: Algebra Review of Inverse Functions', props: { url: 'https://www.youtube.com/embed/0xFUn0Dpu9M' } },
       { id: 'VideoCarousel', title: 'Inverse Sine & Cosine Functions', props: { videos: [
           { url: 'https://www.youtube.com/embed/qNhoMj8DYaU', title: 'TR-23 — Dennis F. Davis' },
@@ -65,6 +77,14 @@ export default {
       'The derivatives of the inverse trig functions are algebraic — no trig appears in them. This is surprising until you see how they are derived: using implicit differentiation on $y = \\arcsin x$ means differentiating $\\sin y = x$, giving $\\cos y \\cdot y\' = 1$, so $y\' = 1/\\cos y$. Then using the Pythagorean identity $\\cos y = \\sqrt{1 - \\sin^2 y} = \\sqrt{1 - x^2}$, the final result is $\\frac{1}{\\sqrt{1-x^2}}$ — no trig at all.',
       'The key derivatives to know: $\\frac{d}{dx}\\arcsin x = \\frac{1}{\\sqrt{1-x^2}}$, $\\frac{d}{dx}\\arctan x = \\frac{1}{1+x^2}$. These also give the two most important inverse trig antiderivatives, which appear constantly in calculus.',
       'The identity $\\arcsin x + \\arccos x = \\pi/2$ holds for all $x \\in [-1,1]$. Geometrically: in a right triangle, the two acute angles sum to $\\pi/2$, and if one is $\\arcsin x$, the other is $\\arccos x$. This means you only really need to remember $\\arcsin$ and $\\arctan$ — the others follow from complementary angle relationships.',
+    ],
+    visualizations: [
+      {
+        id: 'PythagoreanSlopeEngine',
+        title: 'The Triangle Behind the Denominator',
+        mathBridge: 'Switch between arcsin and arctan. Drag x. The highlighted triangle leg is the denominator in the derivative formula.',
+        caption: 'The denominator comes from Pythagorean structure, not a memorized trick.',
+      },
     ],
     callouts: [
       {

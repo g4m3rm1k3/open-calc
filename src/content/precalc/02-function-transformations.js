@@ -114,6 +114,12 @@ export default {
         mathBridge: 'Every point $(a,b)$ on $f$ maps to $(b,a)$ on $f^{-1}$. That swap is reflection over $y=x$.',
         caption: 'A function and its inverse are mirror images across the diagonal line.',
       },
+      {
+        id: 'UniversalInverseLab',
+        title: 'Inverse Reflection Across Function Families',
+        mathBridge: 'Try several one-to-one functions and see the same coordinate swap $(a,b)\leftrightarrow(b,a)$ each time. This generalizes inverse reflection beyond one canned graph.',
+        caption: 'Switch presets to see inverse reflection as a universal rule, not a one-example trick.',
+      },
     ],
   },
 

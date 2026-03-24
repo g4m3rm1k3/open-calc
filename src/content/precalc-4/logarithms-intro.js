@@ -59,6 +59,12 @@ export default {
         mathBridge: 'Toggle the exponential and its reflection. Watch how the domain and range swap perfectly. Drag the base slider to see growth vs decay logs.',
         caption: 'Every feature of the log graph is a mirror image of the exponential — once you see this, you never need to memorise log properties separately.',
       },
+      {
+        id: 'LogExpReciprocalViz',
+        title: 'Exponential and Log as Inverse Partners',
+        mathBridge: 'Match points on $y=e^x$ and $y=\ln x$ to see inverse reflection in action. Even before derivatives, this builds intuition that these two functions are locked together geometrically.',
+        caption: 'Track mirrored points across y=x to reinforce why logs answer "what exponent?"',
+      },
     ],
   },
 
@@ -109,6 +115,12 @@ export default {
         title: 'Log Transformations — All Four Parameters Live',
         mathBridge: 'Switch to transformation mode. Adjust $a$, $h$, $k$ and watch the asymptote move, domain shift, and graph reshape. The domain boundary tracks the asymptote exactly.',
         caption: 'The domain is always everything to the right of the vertical asymptote (or left, if $a < 0$ causes reflection issues).',
+      },
+      {
+        id: 'LogExpReciprocalViz',
+        title: 'Why Inverse Reflection Matters for Calculus Later',
+        mathBridge: 'This preview connects precalc graph intuition to upcoming calculus: inverse graphs reflect across $y=x$, and that same pairing later becomes reciprocal tangent slopes.',
+        caption: 'Use this now for inverse-graph intuition; revisit in derivatives for slope reciprocity.',
       },
     ],
   },

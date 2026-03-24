@@ -94,6 +94,12 @@ export default {
         caption: 'Switch between eˣ and ln(x) to connect growth intuition with the derivative formulas.',
       },
       {
+        id: 'LogExpReciprocalViz',
+        title: 'Reciprocal Slopes on Inverse Curves',
+        mathBridge: 'At paired points on $e^x$ and $\\ln x$, inverse-function geometry enforces reciprocal tangent slopes. This is the visual reason both formulas are true together: $\\frac{d}{dx}[e^x]=e^x$ and $\\frac{d}{dx}[\\ln x]=1/x$.',
+        caption: 'Move along either curve and compare the mirrored point, tangent lines, and slope product.',
+      },
+      {
         id: 'VideoEmbed',
         title: 'Logarithm Introduction',
         props: { url: 'https://www.youtube.com/embed/UpUjJQGSlDY' },
@@ -161,6 +167,12 @@ export default {
         title: 'Derivative Formula Bridge Lab',
         mathBridge: 'The four formulas in one view: $\\frac{d}{dx}[e^x]=e^x$, $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$, $\\frac{d}{dx}[a^x]=a^x\\ln a$, $\\frac{d}{dx}[\\log_a x]=\\frac{1}{x\\ln a}$. At any $x$-value, the slider shows the function value and its derivative side by side. Notice: for $e^x$ they are always equal; for $\\ln x$ the derivative $\\frac{1}{x}$ is always less than the function value (for $x>1$); for $a^x$ with $a\\neq e$ there is an extra factor of $\\ln a$.',
         caption: 'Move the slider to see function value and derivative value update together for all four formulas.',
+      },
+      {
+        id: 'LogExpReciprocalViz',
+        title: 'e^x vs ln(x): Inverse-Derivative Reciprocity',
+        mathBridge: 'Because $\\ln x$ is the inverse of $e^x$, derivatives at corresponding reflected points satisfy $f\'(a)\\,(f^{-1})\'(f(a))=1$. This visualization ties the inverse-function theorem directly to exp/log derivative rules.',
+        caption: 'Use mirrored points to verify the reciprocal slope relationship numerically.',
       },
     ],
   },
