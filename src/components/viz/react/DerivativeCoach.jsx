@@ -16,7 +16,8 @@
  * and push it into the PROBLEMS array. No other code changes needed.
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { EXTRA_PROBLEMS } from "./derivativeCoachExtras.js";
 
 function useMath() {
   const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
@@ -822,6 +823,23 @@ const REVIEW_LINKS = {
   "Pythagorean Identity": "UnitCircleIdentityViz",
 };
 
+const LEGACY_FINAL_ANSWERS = {
+  1: "3x^2\\sin x + x^3\\cos x",
+  2: "3x^2\\cos(x^3)",
+  3: "\\frac{e^x(\\cos x + \\sin x)}{\\cos^2 x}",
+  4: "2x\\cos(x^2) - 2x^3\\sin(x^2)",
+  5: "-\\frac{1}{1+x^2}",
+  6: "2x\\cos(x^2)e^{\\sin(x^2)}",
+  7: "\\frac{1}{1+\\cos x}",
+  8: "\\arcsin(x) + \\frac{x}{\\sqrt{1-x^2}}",
+  9: "\\frac{2x}{x^2+1}",
+  10: "\\frac{\\cos x}{2\\sqrt{\\sin x}}e^{x^2} + 2x\\sqrt{\\sin x}e^{x^2}",
+  11: "\\frac{1-2x\\arctan(x)}{(x^2+1)^2}",
+  12: "-3\\sin^2(\\cos x)\\cos(\\cos x)\\sin x",
+};
+
+const PROBLEM_BANK = [...PROBLEMS, ...EXTRA_PROBLEMS];
+
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
@@ -838,27 +856,115 @@ export default function DerivativeCoach({ params = {} }) {
   const [blankAttempts, setBlankAttempts] = useState(0); // 0,1,2
   const [blankResult, setBlankResult] = useState(null); // null | "correct" | "hint" | "explain"
   const [sessionErrors, setSessionErrors] = useState({}); // concept → count
-  const [problemResults, setProblemResults] = useState({}); // probId → {mc: attempts, blanks: hintCount}
+  const [problemStats, setProblemStats] = useState({}); // probId -> { correct, incorrect }
+  const [selectedConcepts, setSelectedConcepts] = useState([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
 
-  const prob = PROBLEMS[probIdx];
+  const conceptOptions = useMemo(() => [...new Set(PROBLEM_BANK.map((p) => p.conceptTag))], []);
+  const difficultyOptions = useMemo(() => [...new Set(PROBLEM_BANK.map((p) => p.difficulty))], []);
+
+  const eligibleProblemIndices = useMemo(() => {
+    return PROBLEM_BANK.map((p, idx) => ({ p, idx }))
+      .filter(({ p }) => (selectedConcepts.length === 0 || selectedConcepts.includes(p.conceptTag)))
+      .filter(({ p }) => (selectedDifficulties.length === 0 || selectedDifficulties.includes(p.difficulty)))
+      .map(({ idx }) => idx);
+  }, [selectedConcepts, selectedDifficulties]);
+
+  const fallbackIndex = eligibleProblemIndices[0] ?? 0;
+  const safeProbIdx = eligibleProblemIndices.includes(probIdx) ? probIdx : fallbackIndex;
+  const prob = PROBLEM_BANK[safeProbIdx];
   const mcStep = prob.mcSteps[mcIdx];
   const blank = prob.blanks?.[blankIdx];
 
-  const normalize = (s) => s.toLowerCase().replace(/\s+/g, "").replace(/\^{([^}]+)}/g, "^$1").replace(/\\([a-zA-Z]+)/g, "$1").replace(/[{}]/g, "");
+  useEffect(() => {
+    if (eligibleProblemIndices.length === 0) return;
+    if (!eligibleProblemIndices.includes(probIdx)) {
+      setProbIdx(eligibleProblemIndices[0]);
+      setPhase("mc");
+      setMcIdx(0);
+      setMcChosen(null);
+      setMcResult(null);
+      setBlankIdx(0);
+      setBlankInput("");
+      setBlankAttempts(0);
+      setBlankResult(null);
+      setShowSummary(false);
+    }
+  }, [eligibleProblemIndices, probIdx]);
+
+  const normalize = (value) => String(value ?? "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/\\left|\\right/g, "")
+    .replace(/\\,/g, "")
+    .replace(/[\u00a0\s]+/g, "")
+    .replace(/[{}\[\]()]/g, "")
+    .replace(/[−–—]/g, "-")
+    .replace(/[×·⋅]/g, "*")
+    .replace(/\\cdot/g, "*")
+    .replace(/[⁰]/g, "^0")
+    .replace(/[¹]/g, "^1")
+    .replace(/[²]/g, "^2")
+    .replace(/[³]/g, "^3")
+    .replace(/[⁴]/g, "^4")
+    .replace(/[⁵]/g, "^5")
+    .replace(/[⁶]/g, "^6")
+    .replace(/[⁷]/g, "^7")
+    .replace(/[⁸]/g, "^8")
+    .replace(/[⁹]/g, "^9")
+    .replace(/\^{([^}]+)}/g, "^$1")
+    .replace(/\\([a-zA-Z]+)/g, "$1");
+
+  const updateProblemScore = (problemId, { correct = 0, incorrect = 0 }) => {
+    setProblemStats((prev) => {
+      const entry = prev[problemId] || { correct: 0, incorrect: 0 };
+      return {
+        ...prev,
+        [problemId]: {
+          correct: entry.correct + correct,
+          incorrect: entry.incorrect + incorrect,
+        },
+      };
+    });
+  };
+
+  const jumpToProblem = (index) => {
+    setProbIdx(index);
+    setPhase("mc");
+    setMcIdx(0);
+    setMcChosen(null);
+    setMcResult(null);
+    setBlankIdx(0);
+    setBlankInput("");
+    setBlankAttempts(0);
+    setBlankResult(null);
+    setShowSummary(false);
+  };
+
+  const toggleFilter = (state, setter, value) => {
+    setter(state.includes(value) ? state.filter((v) => v !== value) : [...state, value]);
+  };
+
+  const getScoreTone = (problemId) => {
+    const s = problemStats[problemId] || { correct: 0, incorrect: 0 };
+    const attempts = s.correct + s.incorrect;
+    if (attempts === 0) return { bg: "var(--color-background-secondary)", border: "var(--color-border-secondary)", text: "var(--color-text-secondary)" };
+    if (s.correct === 0) return { bg: isDark ? "rgba(244,63,94,0.2)" : "#FCEBEB", border: isDark ? "#fb7185" : "#fda4af", text: isDark ? "#fecdd3" : "#7f1d1d" };
+    if (s.incorrect === 0) return { bg: isDark ? "rgba(16,185,129,0.2)" : "#E1F5EE", border: isDark ? "#34d399" : "#86efac", text: isDark ? "#bbf7d0" : "#065f46" };
+    return { bg: isDark ? "rgba(245,158,11,0.2)" : "#FAEEDA", border: isDark ? "#f59e0b" : "#fcd34d", text: isDark ? "#fde68a" : "#78350f" };
+  };
 
   const handleMcChoice = (optId) => {
     if (mcResult?.verdict === "correct") return;
     setMcChosen(optId);
     if (optId === mcStep.correct) {
       setMcResult({ verdict: "correct", message: mcStep.correctFeedback });
-      const pr = { ...problemResults };
-      if (!pr[prob.id]) pr[prob.id] = { mcAttempts: 0, hintCount: 0 };
-      pr[prob.id].mcAttempts++;
-      setProblemResults(pr);
+      updateProblemScore(prob.id, { correct: 1 });
     } else {
       const fb = mcStep.feedback[optId];
       setMcResult({ verdict: fb.verdict, message: fb.message, reviewConcept: fb.reviewConcept, reviewTip: fb.reviewTip });
+      updateProblemScore(prob.id, { incorrect: 1 });
       if (fb.reviewConcept) {
         setSessionErrors(e => ({ ...e, [fb.reviewConcept]: (e[fb.reviewConcept] || 0) + 1 }));
       }
@@ -889,16 +995,14 @@ export default function DerivativeCoach({ params = {} }) {
 
     if (isCorrect) {
       setBlankResult("correct");
+      updateProblemScore(prob.id, { correct: 1 });
     } else {
       const newAttempts = blankAttempts + 1;
       setBlankAttempts(newAttempts);
+      updateProblemScore(prob.id, { incorrect: 1 });
       if (newAttempts === 1) {
         setBlankResult("hint");
         setSessionErrors(e => ({ ...e, [blank.conceptTested]: (e[blank.conceptTested] || 0) + 1 }));
-        const pr = { ...problemResults };
-        if (!pr[prob.id]) pr[prob.id] = { mcAttempts: 0, hintCount: 0 };
-        pr[prob.id].hintCount++;
-        setProblemResults(pr);
       } else {
         setBlankResult("explain");
       }
@@ -917,16 +1021,9 @@ export default function DerivativeCoach({ params = {} }) {
   };
 
   const nextProblem = () => {
-    if (probIdx + 1 < PROBLEMS.length) {
-      setProbIdx(probIdx + 1);
-      setPhase("mc");
-      setMcIdx(0);
-      setMcChosen(null);
-      setMcResult(null);
-      setBlankIdx(0);
-      setBlankInput("");
-      setBlankAttempts(0);
-      setBlankResult(null);
+    const pos = eligibleProblemIndices.indexOf(safeProbIdx);
+    if (pos !== -1 && pos + 1 < eligibleProblemIndices.length) {
+      jumpToProblem(eligibleProblemIndices[pos + 1]);
     } else {
       setShowSummary(true);
     }
@@ -953,7 +1050,7 @@ export default function DerivativeCoach({ params = {} }) {
     return (
       <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
         <div style={{ ...card, borderLeft: `3px solid ${tone.correct.border}`, borderRadius: 0, background: tone.correct.bg, marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label }}>Session complete — {PROBLEMS.length} problems</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label }}>Session complete — {eligibleProblemIndices.length} selected problems</div>
         </div>
         {topErrors.length > 0 && (
           <div style={{ ...card }}>
@@ -982,13 +1079,100 @@ export default function DerivativeCoach({ params = {} }) {
 
       {/* Problem header */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 14, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Problem {probIdx + 1} / {PROBLEMS.length}</span>
+        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>Problem {Math.max(eligibleProblemIndices.indexOf(safeProbIdx) + 1, 1)} / {Math.max(eligibleProblemIndices.length, 1)}</span>
         <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: "var(--color-background-secondary)", color: "var(--color-text-secondary)", border: "0.5px solid var(--color-border-secondary)" }}>{prob.difficulty}</span>
         <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: "#E6F1FB", color: "#0C447C" }}>{prob.conceptTag}</span>
         <div style={{ display: "flex", gap: 3, marginLeft: "auto" }}>
-          {PROBLEMS.map((_, i) => (
-            <div key={i} style={{ width: 20, height: 4, borderRadius: 2, background: i < probIdx ? "#1D9E75" : i === probIdx ? "#7F77DD" : "var(--color-border-tertiary)" }} />
+          {eligibleProblemIndices.map((idx, i) => (
+            <div key={idx} style={{ width: 20, height: 4, borderRadius: 2, background: i < Math.max(eligibleProblemIndices.indexOf(safeProbIdx), 0) ? "#1D9E75" : idx === safeProbIdx ? "#7F77DD" : "var(--color-border-tertiary)" }} />
           ))}
+        </div>
+      </div>
+
+      <div style={{ ...card, marginBottom: 12 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--color-text-tertiary)", marginBottom: 8 }}>Practice filters</div>
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>Problem type</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {conceptOptions.map((tag) => {
+              const active = selectedConcepts.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => toggleFilter(selectedConcepts, setSelectedConcepts, tag)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 999,
+                    border: active ? "0.5px solid #818cf8" : "0.5px solid var(--color-border-secondary)",
+                    background: active ? (isDark ? "rgba(99,102,241,0.2)" : "#EEEDFE") : "var(--color-background-secondary)",
+                    color: active ? (isDark ? "#c7d2fe" : "#3C3489") : "var(--color-text-secondary)",
+                    fontSize: 11,
+                    cursor: "pointer",
+                  }}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>Difficulty</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {difficultyOptions.map((level) => {
+              const active = selectedDifficulties.includes(level);
+              return (
+                <button
+                  key={level}
+                  onClick={() => toggleFilter(selectedDifficulties, setSelectedDifficulties, level)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 999,
+                    border: active ? "0.5px solid #22c55e" : "0.5px solid var(--color-border-secondary)",
+                    background: active ? (isDark ? "rgba(34,197,94,0.2)" : "#E1F5EE") : "var(--color-background-secondary)",
+                    color: active ? (isDark ? "#bbf7d0" : "#065f46") : "var(--color-text-secondary)",
+                    fontSize: 11,
+                    cursor: "pointer",
+                  }}
+                >
+                  {level}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ ...card, marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--color-text-tertiary)", marginBottom: 8 }}>Problem selector (scroll + color score)</div>
+        <div style={{ maxHeight: 170, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 8 }}>
+          {eligibleProblemIndices.map((idx) => {
+            const p = PROBLEM_BANK[idx];
+            const toneBtn = getScoreTone(p.id);
+            const stat = problemStats[p.id] || { correct: 0, incorrect: 0 };
+            return (
+              <button
+                key={p.id}
+                onClick={() => jumpToProblem(idx)}
+                style={{
+                  textAlign: "left",
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  border: `0.5px solid ${idx === safeProbIdx ? "#818cf8" : toneBtn.border}`,
+                  background: toneBtn.bg,
+                  color: toneBtn.text,
+                  cursor: "pointer",
+                }}
+              >
+                <div style={{ fontSize: 11, fontWeight: 600 }}>#{p.id} · {p.conceptTag}</div>
+                <div style={{ fontSize: 12, marginTop: 2 }}>{p.preview}</div>
+                <div style={{ fontSize: 10, opacity: 0.9, marginTop: 4 }}>C:{stat.correct} / I:{stat.incorrect}</div>
+              </button>
+            );
+          })}
+          {eligibleProblemIndices.length === 0 && (
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>No problems match current filters. Clear one filter to continue.</div>
+          )}
         </div>
       </div>
 
@@ -1131,11 +1315,23 @@ export default function DerivativeCoach({ params = {} }) {
             <div style={{ fontSize: 15, fontWeight: 500, color: tone.correct.label, marginBottom: 6 }}>Problem complete</div>
             <div style={{ fontSize: 13, color: tone.correct.text, marginBottom: 10 }}>Full answer:</div>
             <div style={{ background: isDark ? "rgba(15,23,42,0.75)" : "#fff", borderRadius: 8, padding: "12px", textAlign: "center", overflowX: "auto", border: isDark ? "0.5px solid #334155" : "0.5px solid #e2e8f0", color: "var(--color-text-primary)" }}>
-              <M t={"\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right]"} display ready={ready} />
+              <M
+                t={
+                  "\\displaystyle\\frac{d}{dx}\\left[" + prob.expression + "\\right] = " +
+                  (prob.finalAnswer || LEGACY_FINAL_ANSWERS[prob.id] || "\\text{Use worked steps above}")
+                }
+                display
+                ready={ready}
+              />
             </div>
           </div>
           <button onClick={nextProblem} style={{ marginTop: 10, padding: "9px 20px", borderRadius: 8, border: isDark ? "0.5px solid #818cf8" : "0.5px solid #7F77DD", background: isDark ? "rgba(99,102,241,0.2)" : "#EEEDFE", color: isDark ? "#c7d2fe" : "#3C3489", cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
-            {probIdx + 1 < PROBLEMS.length ? `Next problem (${probIdx + 2}/${PROBLEMS.length}) →` : "See session summary →"}
+            {(() => {
+              const pos = eligibleProblemIndices.indexOf(safeProbIdx);
+              return pos !== -1 && pos + 1 < eligibleProblemIndices.length
+                ? `Next problem (${pos + 2}/${eligibleProblemIndices.length}) →`
+                : "See session summary →";
+            })()}
           </button>
         </div>
       )}
