@@ -50,6 +50,13 @@ export default {
           "Switch acceleration presets and observe how integrating a(t) reshapes v(t), then how integrating v(t) reshapes x(t).",
         caption: "The shape of a(t) controls everything downstream.",
       },
+      {
+        id: "CircularMotionIntuition",
+        title: "Direction-changing acceleration",
+        mathBridge:
+          "See how acceleration can remain nonzero even at constant speed when velocity direction changes continuously.",
+        caption: "Acceleration is about vector change, not just speed change.",
+      },
     ],
   },
   math: {
@@ -71,6 +78,13 @@ export default {
         mathBridge:
           "Compare exact integration to Euler approximation and inspect error as timestep changes.",
         caption: "Numerics converge to analytic solution with finer steps.",
+      },
+      {
+        id: "CentripetaAccelProof",
+        title: "Centripetal-acceleration derivation",
+        mathBridge:
+          "Connect geometric vector-change arguments to acceleration magnitude and direction in circular motion.",
+        caption: "A canonical example of acceleration from changing direction.",
       },
     ],
   },

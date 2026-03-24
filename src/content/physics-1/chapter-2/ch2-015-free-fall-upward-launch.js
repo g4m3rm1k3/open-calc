@@ -32,6 +32,14 @@ export default {
         mathBridge: "Compute max height, time to apex, and round-trip time.",
         caption: "Link animation and equations.",
       },
+      {
+        id: "AngledLaunchIntuition",
+        title: "Angled launch decomposition",
+        mathBridge:
+          "Connect vertical-launch ideas to full projectile decomposition into horizontal and vertical components.",
+        caption:
+          "Upward-launch logic is the y-component of general projectile motion.",
+      },
     ],
   },
   math: {
@@ -43,6 +51,13 @@ export default {
         mathBridge:
           "Pick unknowns (height/time/velocity) and see best-fit equation.",
         caption: "Efficient selection for launch problems.",
+      },
+      {
+        id: "ProjectileProof",
+        title: "Projectile derivation map",
+        mathBridge:
+          "Follow the full two-axis derivation and identify where upward-launch equations appear as a special case.",
+        caption: "Formal bridge from 1D free-fall to 2D projectile equations.",
       },
     ],
   },

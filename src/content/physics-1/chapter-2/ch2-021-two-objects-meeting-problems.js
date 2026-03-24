@@ -32,6 +32,13 @@ export default {
           "Solve chase, head-on, and same-direction problems with displayed algebra.",
         caption: "One framework, many contexts.",
       },
+      {
+        id: "SlopeLandingIntuition",
+        title: "Trajectory-slope intersection",
+        mathBridge:
+          "Model landing on an incline by equating trajectory and slope equations to find their meeting point.",
+        caption: "Same meeting principle, now between two curves.",
+      },
     ],
   },
   math: {

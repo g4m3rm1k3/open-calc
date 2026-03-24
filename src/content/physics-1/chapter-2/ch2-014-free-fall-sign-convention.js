@@ -54,6 +54,13 @@ export default {
           "Practice selecting formulas and assigning signs under both conventions.",
         caption: "Form + sign = correct model.",
       },
+      {
+        id: "ProjectileFormRecogniser",
+        title: "Projectile form recogniser",
+        mathBridge:
+          "Reinforce correct formula-form and sign usage across horizontal and vertical projectile components.",
+        caption: "Consistent signs make multi-axis problems reliable.",
+      },
     ],
   },
   rigor: {

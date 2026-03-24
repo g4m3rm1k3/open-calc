@@ -33,6 +33,13 @@ export default {
           "Set height and v0 to solve landing time and velocity with clear sign control.",
         caption: "A practical impact estimator.",
       },
+      {
+        id: "CliffLaunchIntuition",
+        title: "Elevated launch and landing",
+        mathBridge:
+          "Extend downward-throw analysis to elevated launch scenarios solved by quadratic landing-time roots.",
+        caption: "Same gravity model, richer initial geometry.",
+      },
     ],
   },
   math: {

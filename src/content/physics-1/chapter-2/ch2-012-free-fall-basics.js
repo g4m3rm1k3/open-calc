@@ -49,6 +49,14 @@ export default {
           "Launch from different heights/velocities and observe how velocity changes linearly while position changes quadratically.",
         caption: "Same acceleration law, many scenarios.",
       },
+      {
+        id: "IndependentMotionIntuition",
+        title: "Horizontal vs vertical independence",
+        mathBridge:
+          "Compare a dropped object with a horizontally launched object to see identical fall-time under the same vertical conditions.",
+        caption:
+          "Vertical gravity dynamics are independent of horizontal motion.",
+      },
     ],
   },
   math: {

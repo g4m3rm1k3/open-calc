@@ -33,6 +33,20 @@ export default {
           "Test your classification by running the corresponding simulation case.",
         caption: "Instant feedback loop.",
       },
+      {
+        id: "ProjectilePatternSpotter",
+        title: "Projectile pattern spotter",
+        mathBridge:
+          "Generalize free-fall pattern recognition to full 2D projectile scenarios.",
+        caption: "Pattern literacy transfers directly to projectile questions.",
+      },
+      {
+        id: "RangePatternSpotter",
+        title: "Range-pattern spotter",
+        mathBridge:
+          "Practice identifying symmetric-angle and range-scaling patterns quickly.",
+        caption: "Fast pattern recognition improves setup speed.",
+      },
     ],
   },
   math: {

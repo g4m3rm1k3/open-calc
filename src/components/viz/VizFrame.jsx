@@ -59,6 +59,38 @@ const VIZ_REGISTRY = {
   ShrinkingInterval: lazy(() => import("./d3/ShrinkingInterval.jsx")),
   // Chapter 2 — Physics examples
   VerticalThrow: lazy(() => import("./d3/VerticalThrow.jsx")),
+  // PhysicsNext — Projectile & circular motion
+  AngledLaunchIntuition: lazy(
+    () => import("./react/AngledLaunchIntuition.jsx"),
+  ),
+  CentripetaAccelProof: lazy(() => import("./react/CentripetaAccelProof.jsx")),
+  CircularMotionIntuition: lazy(
+    () => import("./react/CircularMotionIntuition.jsx"),
+  ),
+  CliffLaunchIntuition: lazy(() => import("./react/CliffLaunchIntuition.jsx")),
+  HorizontalLaunchIntuition: lazy(
+    () => import("./react/HorizontalLaunchIntuition.jsx"),
+  ),
+  IndependentMotionIntuition: lazy(
+    () => import("./react/IndependentMotionIntuition.jsx"),
+  ),
+  ProjectileExplorer: lazy(() => import("./react/ProjectileExplorer.jsx")),
+  ProjectileFormRecogniser: lazy(
+    () => import("./react/ProjectileFormRecogniser.jsx"),
+  ),
+  ProjectilePatternSpotter: lazy(
+    () => import("./react/ProjectilePatternSpotter.jsx"),
+  ),
+  ProjectileProof: lazy(() => import("./react/ProjectileProof.jsx")),
+  RangeExplorer: lazy(() => import("./react/RangeExplorer.jsx")),
+  RangeIntuition: lazy(() => import("./react/RangeIntuition.jsx")),
+  RangePatternSpotter: lazy(() => import("./react/RangePatternSpotter.jsx")),
+  SlopeLandingIntuition: lazy(
+    () => import("./react/SlopeLandingIntuition.jsx"),
+  ),
+  WallClearanceIntuition: lazy(
+    () => import("./react/WallClearanceIntuition.jsx"),
+  ),
   // Chapter 1 — Limits additions
   ZenoParadoxViz: lazy(() => import("./d3/ZenoParadoxViz.jsx")),
   TwoSidedLimit: lazy(() => import("./d3/TwoSidedLimit.jsx")),

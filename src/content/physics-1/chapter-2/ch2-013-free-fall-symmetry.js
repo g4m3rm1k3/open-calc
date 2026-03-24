@@ -34,6 +34,14 @@ export default {
           "Animate launch speed and observe symmetric timing around the peak.",
         caption: "Apex is the turning point where v=0.",
       },
+      {
+        id: "RangeIntuition",
+        title: "Complementary-angle symmetry",
+        mathBridge:
+          "Explore how angle pairs θ and 90°−θ produce equal range under ideal projectile assumptions.",
+        caption:
+          "Symmetry extends from vertical motion to full projectile geometry.",
+      },
     ],
   },
   math: {

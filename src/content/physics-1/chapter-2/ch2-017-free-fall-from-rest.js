@@ -33,6 +33,14 @@ export default {
           "Identify which graph/equation matches drop-from-rest behavior.",
         caption: "Reinforce qualitative recognition.",
       },
+      {
+        id: "HorizontalLaunchIntuition",
+        title: "Horizontal launch from rest vertically",
+        mathBridge:
+          "Compare pure drop and horizontal launch to isolate unchanged vertical free-fall dynamics.",
+        caption:
+          "Horizontal speed changes range, not fall-time under ideal assumptions.",
+      },
     ],
   },
   math: {

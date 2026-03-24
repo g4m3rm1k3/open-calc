@@ -35,6 +35,20 @@ export default {
           "After selecting method, execute with consistent variables and signs.",
         caption: "Convert strategy to answer.",
       },
+      {
+        id: "ProjectileExplorer",
+        title: "Projectile case solver",
+        mathBridge:
+          "Blend kinematics method selection with horizontal, level-ground, and elevated projectile solve modes.",
+        caption: "A unified solver workflow across motion families.",
+      },
+      {
+        id: "RangeExplorer",
+        title: "Range step-through",
+        mathBridge:
+          "Walk through decomposition, flight-time, and range formulas in an explicit multi-step chain.",
+        caption: "Method transparency reduces setup errors.",
+      },
     ],
   },
   math: {

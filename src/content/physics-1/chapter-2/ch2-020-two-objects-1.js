@@ -45,6 +45,13 @@ export default {
           "Observe both x(t) curves and identify the intersection as the meeting event.",
         caption: "Intersection in x–t space equals same place at same time.",
       },
+      {
+        id: "WallClearanceIntuition",
+        title: "Trajectory-wall intersection",
+        mathBridge:
+          "Treat clearance as a position-matching event at a fixed x-location, then compare y-positions.",
+        caption: "Meeting logic extends to obstacle-clearance constraints.",
+      },
     ],
   },
   math: {
