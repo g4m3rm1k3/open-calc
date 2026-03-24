@@ -878,6 +878,15 @@ export default function DerivativeCoach({ params = {} }) {
   const mcStep = prob.mcSteps[mcIdx];
   const blank = prob.blanks?.[blankIdx];
 
+  const shuffledMcOptions = useMemo(() => {
+    const options = [...(mcStep?.options || [])];
+    for (let i = options.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    return options;
+  }, [prob?.id, mcIdx]);
+
   useEffect(() => {
     if (eligibleProblemIndices.length === 0) return;
     if (!eligibleProblemIndices.includes(probIdx)) {
@@ -1251,7 +1260,7 @@ export default function DerivativeCoach({ params = {} }) {
             <p style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.6 }}>{mcStep.question}</p>
           </div>
 
-          {mcStep.options.map((opt) => {
+          {shuffledMcOptions.map((opt) => {
             const isChosen = mcChosen === opt.id;
             const isCorrect = mcResult?.verdict === "correct" && isChosen;
             const isWrong = isChosen && mcResult && mcResult.verdict !== "correct";
