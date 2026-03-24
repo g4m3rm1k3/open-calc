@@ -1,0 +1,30 @@
+// KinematicsDefinitionPatternSpotter.jsx — Ch2 L1 Pillar 3
+import { useState } from "react";
+const ROUNDS = [
+  { q: "A runner goes 300m east then 100m west. What is the displacement?", opts: ["400m east","200m east","300m east","100m east"], correct: "200m east", why: "Δx = 300−100 = 200m east. Displacement is the net change — east cancels west." },
+  { q: "Same runner. What is the total distance?", opts: ["200m","300m","400m","100m"], correct: "400m", why: "Distance = 300 + 100 = 400m. Distance sums all path lengths regardless of direction." },
+  { q: "Object moves from x = −5m to x = +8m. What is Δx?", opts: ["−13m","+3m","+13m","−3m"], correct: "+13m", why: "Δx = x_f − x_i = 8−(−5) = 13m. Subtracting a negative adds." },
+  { q: "Average velocity = 0. What does that tell you?", opts: ["Object was stationary","Object returned to start","Object moved slowly","Object accelerated"], correct: "Object returned to start", why: "v̄ = Δx/Δt = 0 means Δx = 0 — the object started and ended at the same position, even if it moved in between." },
+  { q: "Can average speed be less than |average velocity|?", opts: ["Yes","No — speed ≥ |velocity| always","Only if moving in a circle","Only in 2D"], correct: "No — speed ≥ |velocity| always", why: "Distance ≥ |displacement| always, so average speed = distance/Δt ≥ |Δx|/Δt = |v̄|." },
+  { q: "Instantaneous velocity is the _____ of the x–t graph.", opts: ["area under","slope of tangent to","y-intercept of","curvature of"], correct: "slope of tangent to", why: "v = dx/dt is the derivative — geometrically, the slope of the tangent line at that instant." },
+];
+export default function KinematicsDefinitionPatternSpotter({ params = {} }) {
+  const [r, setR] = useState(0); const [chosen, setChosen] = useState(null); const [revealed, setRevealed] = useState(false);
+  const [score, setScore] = useState(0); const [done, setDone] = useState(false); const [history, setHistory] = useState([]);
+  const q = ROUNDS[r]; const C = "#6366f1";
+  function choose(opt) { if (revealed) return; setChosen(opt); setRevealed(true); const ok = opt === q.correct; if (ok) setScore(s => s + 1); setHistory(h => [...h, { q: q.q, correct: ok, answer: q.correct }]); }
+  function next() { if (r + 1 >= ROUNDS.length) setDone(true); else { setR(n => n + 1); setChosen(null); setRevealed(false); } }
+  function reset() { setR(0); setChosen(null); setRevealed(false); setScore(0); setDone(false); setHistory([]); }
+  if (done) return (<div style={{ fontFamily: "'DM Sans',system-ui,sans-serif", background: "#0f172a", borderRadius: 16, padding: 24 }}><div style={{ fontSize: 13, color: C, fontWeight: 700, marginBottom: 12 }}>PILLAR 3 · KINEMATICS DEFINITIONS</div><div style={{ fontSize: 32, fontWeight: 900, color: "#e2e8f0", marginBottom: 16 }}>{score}/{ROUNDS.length}</div><div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>{history.map((h, i) => <div key={i} style={{ background: h.correct ? "#0d2a1e" : "#2a0d0d", borderRadius: 8, padding: "8px 14px", borderLeft: `2px solid ${h.correct ? "#10b981" : "#f43f5e"}` }}><div style={{ fontSize: 12, color: "#64748b" }}>{h.q.substring(0, 55)}</div><div style={{ fontSize: 12, fontWeight: 700, color: h.correct ? "#34d399" : "#f87171" }}>{h.answer}</div></div>)}</div><button onClick={reset} style={{ width: "100%", background: C, color: "#fff", border: "none", borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 800, cursor: "pointer" }}>Try Again</button></div>);
+  return (<div style={{ fontFamily: "'DM Sans',system-ui,sans-serif", background: "#0f172a", borderRadius: 16, overflow: "hidden" }}>
+    <div style={{ padding: "14px 20px", background: "#0c1122", display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ fontSize: 13, color: C, fontWeight: 700, letterSpacing: "0.08em" }}>PILLAR 3 · KINEMATICS PATTERNS</span><div style={{ display: "flex", gap: 5 }}>{ROUNDS.map((_, i) => <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: i < r ? "#10b981" : i === r ? C : "#1e293b" }} />)}</div></div>
+    <div style={{ height: 3, background: "#1e293b" }}><div style={{ height: "100%", width: `${(r / ROUNDS.length) * 100}%`, background: C, transition: "width 0.3s" }} /></div>
+    <div style={{ padding: "18px 20px 0" }}>
+      <div style={{ background: "#1e293b", borderRadius: 12, padding: "18px", marginBottom: 14, border: revealed ? `2px solid ${chosen === q.correct ? "#10b981" : "#f43f5e"}` : "2px solid #334155" }}><div style={{ fontSize: 12, color: "#64748b", marginBottom: 5 }}>Round {r + 1}/{ROUNDS.length}</div><div style={{ fontSize: 15, fontWeight: 700, color: "#e2e8f0" }}>{q.q}</div></div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
+        {q.opts.map(opt => { const isC = opt === q.correct, isCh = opt === chosen; let bg = "#1e293b", border = "#334155", tc = "#94a3b8"; if (revealed) { if (isC) { bg = "#0d2a1e"; border = "#10b981"; tc = "#34d399"; } else if (isCh) { bg = "#2a0d0d"; border = "#f43f5e"; tc = "#f87171"; } } return <button key={opt} onClick={() => choose(opt)} style={{ background: bg, border: `2px solid ${border}`, borderRadius: 10, padding: "11px", fontSize: 12, fontWeight: 700, color: tc, cursor: revealed ? "default" : "pointer" }}>{opt}</button>; })}
+      </div>
+      {revealed && <><div style={{ background: chosen === q.correct ? "#0d2a1e" : "#2a0d0d", borderRadius: 10, padding: "12px 16px", borderLeft: `3px solid ${chosen === q.correct ? "#10b981" : "#f43f5e"}`, marginBottom: 12 }}><div style={{ fontSize: 13, fontWeight: 700, color: chosen === q.correct ? "#34d399" : "#f87171", marginBottom: 4 }}>{chosen === q.correct ? "✓ Correct" : "✗ " + q.correct}</div><div style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>{q.why}</div></div><button onClick={next} style={{ width: "100%", background: C, color: "#fff", border: "none", borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 800, cursor: "pointer", marginBottom: 20 }}>{r + 1 >= ROUNDS.length ? "Results →" : "Next →"}</button></>}
+    </div>
+  </div>);
+}
