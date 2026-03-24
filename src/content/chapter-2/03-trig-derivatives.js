@@ -152,6 +152,12 @@ export default {
         caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/√(1−x²).',
       },
       {
+        id: 'UniversalInverseLab',
+        title: 'Inverse Reflection + Reciprocal Slopes (Calc Bridge)',
+        mathBridge: 'Before inverse trig formulas, lock in the general theorem: if points correspond by inverse reflection, tangent slopes are reciprocals at matched points. This is the geometric engine behind $\\frac{d}{dx}[f^{-1}(x)] = 1/f\'(f^{-1}(x))$.',
+        caption: 'Try multiple invertible families and verify slope reciprocity at reflected points.',
+      },
+      {
         id: 'VideoEmbed',
         title: 'Setting up the Unit Circle Part 1 and Reference Angle',
         props: { url: 'https://www.youtube.com/embed/j5SoWzBSUmY' },
