@@ -18,6 +18,23 @@ export default {
   },
 
   intuition: {
+    prose: [
+      `Logic gives us a precise language for making and checking arguments.
+      Proof techniques are tools for building airtight logical arguments — each suited
+      to different types of claims.`,
+    ],
+    visualizations: [
+      {
+        id: 'TruthTableViz',
+        title: 'Truth Table Visualizer',
+        caption: 'The original perspective: inspect logic outcomes across all assignments.',
+      },
+      {
+        id: 'TruthTableBuilderDemo',
+        title: 'Truth Table Builder (Second Perspective)',
+        caption: 'Build from an expression and watch truth rows update instantly.',
+      },
+    ],
     summary: `Logic gives us a precise language for making and checking arguments.
       Proof techniques are tools for building airtight logical arguments — each suited
       to different types of claims.`,
@@ -32,6 +49,15 @@ export default {
           IMPLIES (→): P→Q. "If it rains, I take an umbrella." FALSE only when P is true but Q is false.
           IFF (↔): Both directions. "I pass iff I study."`,
         visualizationId: 'TruthTableViz',
+      },
+      {
+        style: 'builder-perspective',
+        title: 'Truth Table Builder (Second Perspective)',
+        explanation: `
+          Instead of reading a pre-built table, build one from an expression and watch rows update.
+          This perspective helps beginners connect symbols to outcomes by immediate feedback.
+          Keep the original visual and use this as a complementary sandbox.`,
+        visualizationId: 'TruthTableBuilderDemo',
       },
       {
         style: 'CS-perspective',
@@ -82,7 +108,7 @@ export default {
   },
 
   rigor: {
-    visualizationId: 'TruthTableViz',
+    visualizationId: null,
     title: 'Proof by Strong Induction',
     proofSteps: [
       { expression: '\\text{Claim: Every integer } n \\geq 2 \\text{ has a prime factorization}', annotation: 'We\'ll prove this by strong induction.' },

@@ -243,6 +243,13 @@ function RigorBlock({ data }) {
   const [open, setOpen] = useState(false)
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
   const vizzes = isBlocksFormat ? [] : getSectionVizzes(data)
+  const proofVizId = data?.visualizationId
+  const proofVizPropsKey = JSON.stringify(data?.visualizationProps ?? {})
+  const extraVizzes = vizzes.filter((viz) => {
+    if (!proofVizId) return true
+    if (viz.id !== proofVizId) return true
+    return JSON.stringify(viz.props ?? {}) !== proofVizPropsKey
+  })
   const hasProse = data?.prose?.length > 0 || isBlocksFormat
   const hasCallouts = data?.callouts?.length > 0
   const hasProofSteps = data?.proofSteps?.length > 0
@@ -274,9 +281,9 @@ function RigorBlock({ data }) {
               visualizationProps={data.visualizationProps ?? {}}
             />
           ) : null}
-          {vizzes.length > 0 && (
+          {extraVizzes.length > 0 && (
             <div className="mt-4 space-y-4">
-              {vizzes.map((viz, i) => (
+              {extraVizzes.map((viz, i) => (
                 <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-purple-100 dark:border-purple-900" />
               ))}
             </div>

@@ -165,6 +165,9 @@ const VIZ_REGISTRY = {
   PigeonholeViz: lazy(() => import("./react/PigeonholeViz.jsx")),
   PigeonHoleDemo: lazy(() => import("./react/PigeonHoleDemo.jsx")),
   TruthTableLab: lazy(() => import("./react/TruthTableLab.jsx")),
+  TruthTableBuilderDemo: lazy(
+    () => import("./react/TruthTableBuilderDemo.jsx"),
+  ),
   DiscreteDependencyMap: lazy(
     () => import("./react/DiscreteDependencyMap.jsx"),
   ),
