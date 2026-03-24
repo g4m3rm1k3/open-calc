@@ -348,6 +348,165 @@ function algebraicSimplify(node) {
   }
 }
 
+function factorSharedProductTerms(node) {
+  try {
+    const terms = flattenByOperator(node, '+')
+    if (terms.length < 2) return node
+
+    const factorLists = terms.map((term) => flattenByOperator(term, '*'))
+
+    const asPositiveInt = (n) => {
+      if (!Number.isFinite(n)) return null
+      if (!Number.isInteger(n)) return null
+      if (n <= 0) return null
+      return n
+    }
+
+    const getPowParts = (factor) => {
+      if (factor?.isOperatorNode && factor.op === '^' && factor.args?.length === 2) {
+        const base = factor.args[0]
+        const expNode = factor.args[1]
+        const expNum = asPositiveInt(Number(expNode?.value))
+        if (base && expNum !== null) {
+          return { baseKey: base.toString(), exp: expNum }
+        }
+      }
+      if (factor?.isConstantNode) return null
+      return { baseKey: factor.toString(), exp: 1 }
+    }
+
+    // Phase 1: exact shared factors (same full factor text in every term).
+    const termCountMaps = factorLists.map((factors) => {
+      const m = new Map()
+      factors.forEach((factor) => {
+        const key = factor.toString()
+        m.set(key, (m.get(key) || 0) + 1)
+      })
+      return m
+    })
+
+    const commonCounts = new Map(termCountMaps[0])
+    for (let i = 1; i < termCountMaps.length; i += 1) {
+      for (const [key, count] of commonCounts.entries()) {
+        const nextCount = termCountMaps[i].get(key) || 0
+        if (nextCount <= 0) {
+          commonCounts.delete(key)
+        } else {
+          commonCounts.set(key, Math.min(count, nextCount))
+        }
+      }
+    }
+
+    const commonFactorEntries = [...commonCounts.entries()].filter(([, count]) => count > 0)
+
+    let reducedFactorLists = factorLists.map((factors) => [...factors])
+    const commonFactorTexts = []
+
+    if (commonFactorEntries.length) {
+      commonFactorEntries.forEach(([key, count]) => {
+        for (let i = 0; i < count; i += 1) commonFactorTexts.push(key)
+      })
+
+      reducedFactorLists = reducedFactorLists.map((factors) => {
+        const localRemove = new Map(commonFactorEntries)
+        const remaining = []
+
+        factors.forEach((factor) => {
+          const key = factor.toString()
+          const left = localRemove.get(key) || 0
+          if (left > 0) {
+            localRemove.set(key, left - 1)
+          } else {
+            remaining.push(factor)
+          }
+        })
+
+        return remaining
+      })
+    }
+
+    // Phase 2: shared symbolic bases across different exponents.
+    // Example: a^4 + a^5 shares a^4.
+    const baseExponentMaps = reducedFactorLists.map((factors) => {
+      const m = new Map()
+      factors.forEach((factor) => {
+        const parts = getPowParts(factor)
+        if (!parts) return
+        m.set(parts.baseKey, (m.get(parts.baseKey) || 0) + parts.exp)
+      })
+      return m
+    })
+
+    const sharedBaseMinExp = new Map(baseExponentMaps[0] || [])
+    for (let i = 1; i < baseExponentMaps.length; i += 1) {
+      for (const [baseKey, exp] of sharedBaseMinExp.entries()) {
+        const next = baseExponentMaps[i].get(baseKey) || 0
+        if (next <= 0) {
+          sharedBaseMinExp.delete(baseKey)
+        } else {
+          sharedBaseMinExp.set(baseKey, Math.min(exp, next))
+        }
+      }
+    }
+
+    const powerFactorEntries = [...sharedBaseMinExp.entries()].filter(([, exp]) => exp > 0)
+    if (powerFactorEntries.length) {
+      powerFactorEntries.forEach(([baseKey, exp]) => {
+        commonFactorTexts.push(exp === 1 ? baseKey : `(${baseKey})^${exp}`)
+      })
+
+      reducedFactorLists = reducedFactorLists.map((factors) => {
+        const remainingNeeds = new Map(powerFactorEntries)
+        const rebuilt = []
+
+        factors.forEach((factor) => {
+          const parts = getPowParts(factor)
+          if (!parts) {
+            rebuilt.push(factor)
+            return
+          }
+
+          const need = remainingNeeds.get(parts.baseKey) || 0
+          if (need <= 0) {
+            rebuilt.push(factor)
+            return
+          }
+
+          const consume = Math.min(need, parts.exp)
+          remainingNeeds.set(parts.baseKey, need - consume)
+          const leftover = parts.exp - consume
+
+          if (leftover > 0) {
+            const leftoverText = leftover === 1 ? parts.baseKey : `(${parts.baseKey})^${leftover}`
+            rebuilt.push(parse(leftoverText))
+          }
+        })
+
+        return rebuilt
+      })
+    }
+
+    if (!commonFactorTexts.length) return node
+
+    const reducedTerms = reducedFactorLists.map((factors) => {
+      if (!factors.length) return '1'
+      return factors.map((f) => wrapIfNeeded(f)).join(' * ')
+    })
+
+    const commonExpr = commonFactorTexts.map((text) => {
+      const parsed = parse(text)
+      return wrapIfNeeded(parsed)
+    }).join(' * ')
+
+    if (!commonExpr) return node
+
+    const insideExpr = reducedTerms.map((t) => `(${t})`).join(' + ')
+    return parse(`${commonExpr} * (${insideExpr})`)
+  } catch {
+    return node
+  }
+}
+
 function buildWhyFromRules(rules) {
   const metas = rules.map((r) => RULE_LIBRARY[r]).filter((m) => !!m)
   if (!metas.length) return null
@@ -1005,7 +1164,29 @@ function buildExplanation(input) {
     })
   }
 
-  const check = findNumericCheck(normalized, simplifiedNode.toString())
+  const factoredNode = factorSharedProductTerms(simplifiedNode)
+  const factoredLatex = cleanupLatexExpression(toLatex(factoredNode))
+
+  if (compactLatex(factoredLatex) !== compactLatex(simplifiedLatex)) {
+    steps.push({
+      id: 'factor-final',
+      tag: 'Simplify',
+      title: 'Factor common structure',
+      math: `f'(x) = ${factoredLatex}`,
+      currentDerivativePreview: factoredLatex,
+      note: 'Extract shared factors so the derivative matches textbook-style compact factoring.',
+      ruleCodes: [],
+      why: {
+        tag: 'Why factor at the end?',
+        explanation: 'Factoring is easiest after constants and powers are cleaned up; this makes shared subexpressions explicit and shorter.',
+      },
+    })
+  }
+
+  const finalNode = compactLatex(factoredLatex) !== compactLatex(simplifiedLatex) ? factoredNode : simplifiedNode
+  const finalLatex = compactLatex(factoredLatex) !== compactLatex(simplifiedLatex) ? factoredLatex : simplifiedLatex
+
+  const check = findNumericCheck(normalized, finalNode.toString())
   if (check) {
     const absErr = Math.abs(check.slope - check.exact)
     const relErr = Math.abs(check.exact) > 1e-8 ? absErr / Math.abs(check.exact) : null
@@ -1041,7 +1222,7 @@ function buildExplanation(input) {
 
       // Only simplify is allowed to replace the full displayed equation directly.
       // If local replacement fails on a leaf node, we preserve the existing global string.
-      if (s.id === 'simplify') {
+      if (s.id === 'simplify-reorder' || s.id === 'simplify-final' || s.id === 'factor-final') {
         globalEquation = afterEq
         replaced = true
       }
@@ -1091,8 +1272,8 @@ function buildExplanation(input) {
     rawLatex: toLatex(rawNode),
     rawExpr: rawNode.toString(),
     steps: stepsWithContext,
-    finalLatex: simplifiedLatex,
-    finalExpr: simplifiedNode.toString(),
+    finalLatex,
+    finalExpr: finalNode.toString(),
   }
 }
 
