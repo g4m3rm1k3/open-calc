@@ -77,7 +77,7 @@ export default function TruthTableBuilder({ params = {} }) {
           👩‍🏫 How to Use This Explorer
         </h4>
         <ol className="text-sm space-y-2 list-decimal pl-5 text-slate-700 dark:text-slate-200">
-          <li>Click one of the preset buttons below or type your own expression (use → or -> for implication, ∧ or && for and, ¬ or ! for not).</li>
+          <li>Click one of the preset buttons below or type your own expression (use → or -&gt; for implication, ∧ or && for and, ¬ or ! for not).</li>
           <li>Watch the truth table update instantly for every possible combination of truth values.</li>
           <li>Green rows = the whole statement is true. Red rows = false.</li>
           <li>Pay special attention to the highlighted insight box that appears when something important happens.</li>

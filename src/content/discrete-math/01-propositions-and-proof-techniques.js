@@ -43,6 +43,11 @@ export default {
          id: 'TruthCube3D',
          title: 'The Truth Cube (The Multiverse Map)',
          caption: 'Every variable doubles the number of possible universes. See Logical Density in 3D: "AND" is restrictive, "OR" is permissive.',
+       },
+       {
+         id: 'LogicalOperatorsExplorer',
+         title: 'Logical Operators Explorer',
+         caption: 'Build and toggle propositions live to see NOT/AND/OR/IF-THEN/IFF behavior update in real time.',
        }
     ]
   },
