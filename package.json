@@ -10,6 +10,8 @@
     "index": "node src/scripts/build-search-index.js"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.1.1",
+    "@fontsource/jetbrains-mono": "^5.1.1",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
     "d3": "^7.9.0",
