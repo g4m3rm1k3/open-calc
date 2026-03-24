@@ -142,7 +142,7 @@ export default function Sidebar({ onNavigate }) {
       {visibleChapters.map((chapter) => {
         const isActiveChapter = activeChapter === String(chapter.number)
         return (
-          <div key={chapter.id} className="mb-1">
+          <div key={`chapter-${chapter.number}-${chapter.id || chapter.title}`} className="mb-1">
             {/* Chapter heading */}
             <Link
               to={`/chapter/${chapter.number}`}
@@ -162,7 +162,7 @@ export default function Sidebar({ onNavigate }) {
 
               return (
                 <Link
-                  key={lesson.id}
+                  key={`lesson-${chapter.number}-${lesson.slug}-${lesson.id || lesson.title}`}
                   ref={el => { if (isActive) activeLinkRef.current = el }}
                   to={`/chapter/${chapter.number}/${lesson.slug}`}
                   onClick={onNavigate}

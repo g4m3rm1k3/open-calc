@@ -26,7 +26,7 @@ export default function App() {
     <ProgressProvider>
       <SearchProvider>
         <PinsProvider>
-        <HashRouter>
+        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AppShell>
             <Suspense fallback={<Fallback />}>
               <Routes>

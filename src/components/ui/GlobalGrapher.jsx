@@ -51,10 +51,18 @@ const makeFunc = (id, color) => ({
 })
 
 function cleanExpr(s = '') {
-  return s
+  return String(s)
+    .replace(/[−–—]/g, '-')
+    .replace(/π/g, 'pi')
     .replace(/sin\^2/g, '(sin(x))^2')
     .replace(/cos\^2/g, '(cos(x))^2')
-    .replace(/\^/g, '**')
+    // function-plot parser uses ^, not JS **
+    .replace(/\*\*/g, '^')
+    // Add explicit multiplication where users commonly omit it.
+    .replace(/(\d)([a-zA-Z(])/g, '$1*$2')
+    .replace(/([a-zA-Z)])(\d)/g, '$1*$2')
+    .replace(/\)([a-zA-Z(])/g, ')*$1')
+    .trim()
 }
 
 // Apply dark-mode styling to the function-plot SVG
