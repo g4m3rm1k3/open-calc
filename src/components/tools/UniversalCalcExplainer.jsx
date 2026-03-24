@@ -759,12 +759,17 @@ function preprocessFriendlyInput(raw) {
     .replace(/\s+/g, ' ')
     .trim()
 
+  const knownFns = '(sin|cos|tan|exp|log|ln|sqrt|abs)'
+
   text = text
-    .replace(/\b(sin|cos|tan|exp|log|sqrt|abs)\s+([a-zA-Z0-9_\.]+)/g, '$1($2)')
+    .replace(new RegExp(`\\b${knownFns}\\s+([a-zA-Z0-9_\\.]+)`, 'g'), '$1($2)')
     .replace(/(\d)([a-zA-Z(])/g, '$1*$2')
     .replace(/([a-zA-Z)])(\d)/g, '$1*$2')
+    .replace(/([a-zA-Z0-9_)])(\()/g, '$1*$2')
     .replace(/(\))(\()/g, '$1*$2')
     .replace(/(\))([a-zA-Z])/g, '$1*$2')
+    // Revert accidental insertion for known function calls (sin*(x) -> sin(x)).
+    .replace(new RegExp(`\\b${knownFns}\\*\\(`, 'g'), '$1(')
 
   return text
 }
@@ -814,6 +819,7 @@ function makeDifferentiator(varName = 'x') {
 
   function trace(node, path = 'root') {
     const steps = []
+    try {
 
     // Parentheses are grouping only; unwrap to keep rule-splitting consistent.
     if (node?.isParenthesisNode && node.content) {
@@ -1130,6 +1136,21 @@ function makeDifferentiator(varName = 'x') {
       why: buildWhyFromRules(detectRules(node)),
     })
     return { derivativeNode, steps }
+    } catch (err) {
+      const derivativeNode = derivative(node, varName)
+      steps.push({
+        id: nextId(`${path}-recovery-fallback`),
+        tag: 'Recovery fallback',
+        title: 'Recovered from deep-nesting step split error',
+        math: `\\frac{d}{d${varName}}(${safeTex(node)}) = ${safeTex(derivativeNode)}`,
+        activeExpr: safeTex(node),
+        note: `Step-level recursion failed on this subtree, so a direct derivative was used to preserve continuity.${err?.message ? ` (${String(err.message)})` : ''}`,
+        currentDerivativePreview: safeTex(derivativeNode),
+        ruleCodes: detectRules(node),
+        why: buildWhyFromRules(detectRules(node)),
+      })
+      return { derivativeNode, steps }
+    }
   }
 
   return { trace }
