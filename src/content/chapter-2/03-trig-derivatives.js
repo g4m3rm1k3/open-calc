@@ -52,7 +52,7 @@ export default {
       {
         id: 'InverseFunctionExplorer',
         title: 'Inverse Function Explorer: Global vs Local Inverse',
-        mathBridge: 'Start here to connect inverse ideas to derivatives: explore $f$, $f^{-1}$, domain restrictions, and slope reciprocity $\\left(f^{-1}\\right)\'\\big(f(x)\\big)=1/f\'(x)$ with clear global-vs-local branch behavior.',
+        mathBridge: 'Notice how geometry, slope data, and theorem language agree at the same time: reflected points encode inverse pairing, tangent slopes encode reciprocal rates, and the rigorous identity $\\left(f^{-1}\\right)\'\\big(f(x_0)\\big)=1/f\'(x_0)$ explains why that reciprocity is not visual coincidence. Use global vs local branch behavior to connect intuition (shape) to rigor (conditions for inverse differentiability).',
         caption: 'Use the solver-style panel to inspect derivative, inverse behavior, and inverse-derivative logic before the rest of trig derivative content.',
       },
       {
