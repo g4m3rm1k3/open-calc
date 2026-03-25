@@ -12,11 +12,30 @@ export const VIDEO_PLACEMENT_MAP = {
   'ch0-functions': {
     intuition: ["oct-even-odd-functions-examples","oct-function-composition","graph-transformations","oct-piecewise-functions-intro"],
   },
-  'ch0-algebraic-techniques': {
-    intuition: ["calc-i-0-0-review-of-factoring"],
+  'ch0-absolute-value': {
+    intuition: ["oct-absolute-value-equations","oct-absolute-value-inequality-graphs","derivative-of-absolute-value-functions-calculus-1-ab","limits-involving-absolute-value-functions-calculus-1-ab"],
+  },
+  'ch0-polynomial-division': {
+    intuition: ["oct-polynomial-long-division","oct-synthetic-division"],
+  },
+  'ch0-completing-the-square': {
+    intuition: ["oct-completing-the-square-intro","oct-quadratic-formula-derivation"],
+  },
+  'ch0-partial-fractions': {
+    intuition: ["oct-partial-fraction-decomposition-pt1","oct-partial-fraction-decomposition-pt2"],
   },
   'ch0-01f': {
-    intuition: ["binomial-theorem-introduction"],
+    intuition: ["binomial-theorem-introduction","ka-binomial-coefficient-intuition"],
+  },
+  'ch0-trig': {
+    intuition: [
+      "tr-00-introduction-to-the-trigonometry-series", "tr-08-similar-and-congruent-triangles", 
+      "tr-10-pythagorean-triples", "tr-14-the-unit-circle", "tr-18-graphing-sine-and-cosine", 
+      "tr-21-domain-and-range-of-trig-functions", "tr-22-algebra-review-of-inverse-functions", 
+      "tr-24-other-inverse-trig-functions", "tr-34-using-pythagorean-identities", 
+      "setting-up-the-unit-circle-part-2", "right-triangle-trigonometry-part-1-finding-missing-sides", 
+      "right-triangle-trigonometry-part-2-solving-for-acute-angles", "solving-trigonometric-equations-5-examples"
+    ],
   },
   'ch0-exponentials': {
     intuition: ["calculus-i-5-1-1-review-logarithmic-and-exponential-functions","graphing-exponential-functions-w-t-table-or-transformations","solving-compound-interest-problems"],

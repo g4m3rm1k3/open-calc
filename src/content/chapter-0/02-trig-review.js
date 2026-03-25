@@ -56,19 +56,19 @@ export default {
         props: {
           videos: [
             {
-              url: "",
+              url: "https://www.youtube.com/embed/S263O-YJ0yU",
               title: "Calc I — 0.4.1 Review of Trig Functions",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/yv_Y71lW5-s",
               title: "TR-13 — The Trigonometric Ratios",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/oJgBJfstOOU",
               title: "TR-14 — The Unit Circle",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/SOf-o9T_Q8Q",
               title: "TR-15 — Common Angle Values",
             },
           ],
@@ -130,19 +130,19 @@ export default {
         props: {
           videos: [
             {
-              url: "",
+              url: "https://www.youtube.com/embed/pCndfXjCidM",
               title: "Calc I — 0.4.3 Graphs of Trig Functions",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/f99P31SAsek",
               title: "TR-18 — Graphing Sine & Cosine",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/kYj2u0i7H4Y",
               title: "TR-19 — Graphing Tangent & Cotangent",
             },
             {
-              url: "",
+              url: "https://www.youtube.com/embed/Vv88YvMh8Bw",
               title: "TR-20 — Graphing Secant & Cosecant",
             },
           ],

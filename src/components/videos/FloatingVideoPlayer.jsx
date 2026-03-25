@@ -44,6 +44,23 @@ export default function FloatingVideoPlayer() {
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
+  const [videoProgress, setVideoProgress] = useState(() => {
+    try {
+      const saved = localStorage.getItem('open-calc-video-progress');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) { return {}; }
+  });
+
+  const updateProgress = (vidId, percent) => {
+    if (!vidId) return;
+    setVideoProgress(prev => {
+      // Don't downgrade progress (e.g. if they rewind)
+      if (prev[vidId] && prev[vidId] >= percent && percent < 95) return prev;
+      const next = { ...prev, [vidId]: Math.min(100, Math.max(prev[vidId] || 0, percent)) };
+      localStorage.setItem('open-calc-video-progress', JSON.stringify(next));
+      return next;
+    });
+  };
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
   const [isLauncher, setIsLauncher] = useState(false);
@@ -418,6 +435,7 @@ export default function FloatingVideoPlayer() {
                           key={vid.id} 
                           video={vid} 
                           active={vid.id === currentVideo?.id} 
+                          progress={videoProgress[vid.id] || 0}
                           onClick={() => handleSearchSelect(vid)} 
                           onPin={() => togglePin(vid.id)}
                           isPinned={pinnedVideos.includes(vid.id)}
@@ -565,7 +583,7 @@ export default function FloatingVideoPlayer() {
   );
 }
 
-function VideoRow({ video, active, onClick, isPinned, onPin }) {
+function VideoRow({ video, active, onClick, isPinned, onPin, progress }) {
   return (
     <div className="group/row relative">
       <button 
@@ -576,8 +594,42 @@ function VideoRow({ video, active, onClick, isPinned, onPin }) {
             : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
         }`}
       >
-        <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${active ? 'bg-brand-100 dark:bg-brand-900 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-          {active ? <Play size={12} fill="currentColor" /> : <Video size={12} />}
+        <div className={`mt-0.5 flex-shrink-0 w-12 h-9 rounded-lg overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 relative ${active ? 'ring-2 ring-brand-400' : ''}`}>
+          {(() => {
+            const videoId = video.url.match(/(?:embed\/|v=)([^&?/\s]+)/)?.[1];
+            if (videoId) {
+              return (
+                <div className="relative w-full h-full">
+                  <img 
+                    src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                  {active && (
+                    <div className="absolute inset-0 bg-brand-500/20 flex items-center justify-center">
+                      <Play size={10} fill="currentColor" className="text-white" />
+                    </div>
+                  )}
+                  {/* Progress Indicator */}
+                  {progress > 0 && (
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-black/30 backdrop-blur-sm">
+                      <div 
+                        className={`h-full transition-all duration-300 ${progress >= 95 ? 'bg-emerald-500' : 'bg-orange-500'}`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  )}
+                  {/* Completion Checkmark */}
+                  {progress >= 95 && (
+                    <div className="absolute top-1 right-1 bg-emerald-500 text-white p-0.5 rounded-full shadow-lg">
+                      <ChevronRight size={8} strokeWidth={4} />
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return active ? <Play size={12} fill="currentColor" /> : <Video size={12} />;
+          })()}
         </div>
         
         <div className="flex-1 text-left min-w-0 pr-6">

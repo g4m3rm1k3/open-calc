@@ -2406,4 +2406,23 @@ export const VIDEO_DATABASE = {
     'vb-cons-energy-10': { title: 'Physics 9 Conservation of Energy (10 of 11) Skiing Down A Hill', url: 'https://www.youtube.com/embed/dLRxj4-5_2g', source: 'Michel van Biezen' },
 
     'vb-fbd-incline-ex1': { title: 'Physics 4.8 Free Body Diagrams (9 of 10) Mass on Inclined Plane: Ex.1', url: 'https://www.youtube.com/embed/7w3RCHHrllI', source: 'Michel van Biezen' },
+
+    // OCT — Absolute Value
+    'oct-absolute-value-equations': { title: 'Absolute Value Equations', url: 'https://www.youtube.com/embed/fD_MbnXbTls', source: 'The Organic Chemistry Tutor' },
+    'oct-absolute-value-inequality-graphs': { title: 'Absolute Value Inequalities on the Number Line', url: 'https://www.youtube.com/embed/KIsun0vK_1s', source: 'The Organic Chemistry Tutor' },
+    
+    // OCT — Polynomials & Factoring
+    'oct-polynomial-long-division': { title: 'Polynomial Long Division', url: 'https://www.youtube.com/embed/RPXMBIFG_W4', source: 'The Organic Chemistry Tutor' },
+    'oct-synthetic-division': { title: 'Synthetic Division', url: 'https://www.youtube.com/embed/Y0f_jF_fUAc', source: 'The Organic Chemistry Tutor' },
+    'oct-completing-the-square-intro': { title: 'Completing the Square Intro', url: 'https://www.youtube.com/embed/N6B_p-450iY', source: 'The Organic Chemistry Tutor' },
+    'oct-quadratic-formula-derivation': { title: 'Deriving the Quadratic Formula', url: 'https://www.youtube.com/embed/v9YmXqjB2Rk', source: 'The Organic Chemistry Tutor' },
+    
+    // OCT — Partial Fractions
+    'oct-partial-fraction-decomposition-pt1': { title: 'Partial Fraction Decomposition Part 1', url: 'https://www.youtube.com/embed/7V2XNoYly6s', source: 'The Organic Chemistry Tutor' },
+    'oct-partial-fraction-decomposition-pt2': { title: 'Partial Fraction Decomposition Part 2', url: 'https://www.youtube.com/embed/SYeBT1xjTa8', source: 'The Organic Chemistry Tutor' },
+    
+    // Khan Academy
+    'ka-binomial-coefficient-intuition': { title: 'Binomial Coefficient Intuition', url: 'https://www.youtube.com/embed/veXf1B5z-mE', source: 'Khan Academy' },
+    'ka-sandwich-theorem': { title: 'Squeeze theorem (sandwich theorem)', url: 'https://www.youtube.com/embed/igJdDN-DPgA', source: 'Khan Academy' },
+    'ka-trig-limit-proof': { title: 'Proof: lim (sin x)/x', url: 'https://www.youtube.com/embed/Ve99biD1KtA', source: 'Khan Academy' },
 };
