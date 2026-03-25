@@ -68,12 +68,21 @@ export default function FloatingVideoPlayer() {
 
   const currentLessonVideos = useMemo(() => getCategorizedVideos(lessonId), [lessonId, customVideos]);
 
-  const courses = [
-    { id: 'precalc', title: 'Pre-Calculus', icon: '📐' },
-    { id: 'calc', title: 'Calculus', icon: '∂' },
-    { id: 'discrete', title: 'Discrete Math', icon: '∴' },
-    { id: 'physics-1', title: 'Physics', icon: '🚀' },
-  ];
+  const courseMetadata = {
+    'precalc': { title: 'Pre-Calculus', icon: '📐' },
+    'calc': { title: 'Calculus', icon: '∂' },
+    'discrete': { title: 'Discrete Math', icon: '∴' },
+    'physics-1': { title: 'Physics', icon: '🚀' },
+  };
+
+  const dynamicCourses = useMemo(() => {
+    const ids = Array.from(new Set(CURRICULUM.map(c => c.course)));
+    return ids.map(id => ({
+      id,
+      title: courseMetadata[id]?.title || id.charAt(0).toUpperCase() + id.slice(1),
+      icon: courseMetadata[id]?.icon || '📚'
+    }));
+  }, []);
 
   const pushNav = (view, data = {}) => {
     if (view === 'chapters') setSelectedCourse(data.courseId);
@@ -183,15 +192,15 @@ export default function FloatingVideoPlayer() {
            dragConstraints={{ 
              left: 10, 
              top: 10, 
-             right: windowDimensions.w - width - 10, 
-             bottom: windowDimensions.h - height - 10 
+             right: (windowDimensions?.w || 1024) - width - 10, 
+             bottom: (windowDimensions?.h || 768) - height - 10 
            }}
            dragElastic={0}
            initial={isMobile ? { opacity: 0, y: 100 } : { 
              opacity: 0, 
              scale: 0.9, 
-             x: windowDimensions.w - width - 40, 
-             y: windowDimensions.h - height - 40 
+             x: (windowDimensions?.w || 1024) - width - 40, 
+             y: (windowDimensions?.h || 768) - height - 40 
            }}
            animate={{ opacity: 1, scale: 1 }}
            exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
@@ -394,7 +403,7 @@ export default function FloatingVideoPlayer() {
                     )}
                     {currentView === 'courses' && (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="courses" className="space-y-1">
-                         {courses.map(course => (
+                         {dynamicCourses.map(course => (
                            <button onClick={() => pushNav('chapters', { courseId: course.id })} key={course.id} className="w-full flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl">
                              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg">{course.icon}</div>
                              <div className="text-left"><p className="text-xs font-bold text-slate-700 dark:text-slate-200">{course.title}</p></div>
