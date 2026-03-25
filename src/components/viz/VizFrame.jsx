@@ -687,6 +687,7 @@ const VIZ_REGISTRY = {
   MonotoneSignChart: lazy(() => import("./react/MonotoneSignChart.jsx")),
   SlopeReciprocalViz: lazy(() => import("./react/SlopeReciprocalViz.jsx")),
   InverseDerivativeTriangle: lazy(() => import("./react/InverseDerivativeTriangle.jsx")),
+  VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
 };
 
 function VizSkeleton() {

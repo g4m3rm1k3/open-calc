@@ -4,6 +4,8 @@ import { ProgressProvider } from './context/ProgressContext.jsx'
 import { SearchProvider } from './context/SearchContext.jsx'
 import { PinsProvider } from './context/PinsContext.jsx'
 import AppShell from './components/layout/AppShell.jsx'
+import { VideoPlayerProvider } from './context/VideoPlayerContext.jsx'
+import FloatingVideoPlayer from './components/videos/FloatingVideoPlayer.jsx'
 import LoadingSpinner from './components/ui/LoadingSpinner.jsx'
 
 const HomePage    = lazy(() => import('./pages/HomePage.jsx'))
@@ -26,23 +28,26 @@ export default function App() {
     <ProgressProvider>
       <SearchProvider>
         <PinsProvider>
-        <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <AppShell>
-            <Suspense fallback={<Fallback />}>
-              <Routes>
-                <Route index element={<HomePage />} />
-                <Route path="chapter/:chapterId" element={<ChapterPage />} />
-                <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
-                <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
-                <Route path="search" element={<SearchPage />} />
-                <Route path="paths" element={<LearningPathsPage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="reference" element={<ReferencePage />} />
-                <Route path="universal-calc" element={<UniversalCalcPage />} />
-              </Routes>
-            </Suspense>
-          </AppShell>
-        </HashRouter>
+          <VideoPlayerProvider>
+            <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <FloatingVideoPlayer />
+              <AppShell>
+                <Suspense fallback={<Fallback />}>
+                  <Routes>
+                    <Route index element={<HomePage />} />
+                    <Route path="chapter/:chapterId" element={<ChapterPage />} />
+                    <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
+                    <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />
+                    <Route path="search" element={<SearchPage />} />
+                    <Route path="paths" element={<LearningPathsPage />} />
+                    <Route path="about" element={<AboutPage />} />
+                    <Route path="reference" element={<ReferencePage />} />
+                    <Route path="universal-calc" element={<UniversalCalcPage />} />
+                  </Routes>
+                </Suspense>
+              </AppShell>
+            </HashRouter>
+          </VideoPlayerProvider>
         </PinsProvider>
       </SearchProvider>
     </ProgressProvider>

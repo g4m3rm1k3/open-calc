@@ -8,6 +8,7 @@ import VizFrame from '../components/viz/VizFrame.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
 import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLessonEnhancer.js'
 import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
+import { useVideoPlayer } from '../context/VideoPlayerContext.jsx'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
@@ -16,14 +17,16 @@ export default function LessonPage() {
   const rawLesson = LESSON_MAP[key]
   const lesson = rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null
   const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus } = useProgress()
-  const navigate = useNavigate()
-
+  const { setLessonId } = useVideoPlayer()
   const activeTab = getActiveTab(lesson?.id ?? '')
 
   // Scroll to top only when navigating to a different lesson
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [lesson?.id])
+    if (lesson?.id) {
+       setLessonId(lesson.id)
+    }
+  }, [lesson?.id, setLessonId])
 
   // Update browser tab title so multiple tabs are identifiable
   useEffect(() => {
@@ -96,6 +99,11 @@ export default function LessonPage() {
           {lesson.hook.previewVisualizationId && (
             <VizFrame id={lesson.hook.previewVisualizationId} initialProps={lesson.hook.previewVisualizationProps ?? {}} />
           )}
+          {lesson.hook.visualizations?.map((viz, i) => (
+            <div key={i} className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+               <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
+            </div>
+          ))}
         </section>
       )}
 

@@ -1,4 +1,5 @@
 import { pickTopicMissionPack } from './topicMissionPlaybook.js';
+import { getVideosForLesson, formatAsVisualization } from '../videos/VideoProvider.js';
 
 const REAL_WORLD_LIBRARY = {
   limits: 'In control systems and robotics, limits model what happens as sensor lag shrinks toward zero so engineers can stabilize feedback loops.',
@@ -84,14 +85,28 @@ function ensureHook(lesson, topicMessage) {
   return hook;
 }
 
-function enhanceExamples(examples) {
+export function enhanceExamples(examples, lessonId) {
   const safeExamples = ensureArray(examples);
   return safeExamples.map((example) => {
     const steps = ensureArray(example.steps);
-    if (steps.length === 0) return example;
+    
+    // Inject Videos into Example
+    const videos = getVideosForLesson(lessonId, 'examples', example.id);
+    const viz = formatAsVisualization(videos, lessonId);
+    const visualizations = ensureArray(example.visualizations);
+    if (viz) {
+      visualizations.unshift(viz);
+    }
+
+    const enhancedExample = {
+      ...example,
+      visualizations,
+    };
+
+    if (steps.length === 0) return enhancedExample;
 
     return {
-      ...example,
+      ...enhancedExample,
       steps: steps.map((step) => {
         if (!step?.expression) return step;
         if (step.strategy || step.strategyTitle || step.checkpoint) return step;
@@ -116,16 +131,30 @@ export function enhanceLessonForUnifiedLearning(lesson) {
   const intuition = ensureSection(lesson.intuition);
   const math = ensureSection(lesson.math);
   const rigor = ensureSection(lesson.rigor);
+  const hook = ensureHook(lesson, topicMessage);
+
+  // Inject Videos
+  const sections = ['hook', 'intuition', 'math', 'rigor'];
+  const dataMap = { hook, intuition, math, rigor };
+
+  sections.forEach((s) => {
+    const videos = getVideosForLesson(lesson.id, s);
+    const viz = formatAsVisualization(videos, lesson.id);
+    if (viz) {
+      if (!dataMap[s].visualizations) dataMap[s].visualizations = [];
+      dataMap[s].visualizations.unshift(viz); // Add to the front
+    }
+  });
 
   addConnectorCallouts(intuition, math, rigor, topicMessage);
 
   return {
     ...lesson,
-    hook: ensureHook(lesson, topicMessage),
+    hook,
     intuition,
     math,
     rigor,
-    examples: enhanceExamples(lesson.examples),
+    examples: enhanceExamples(lesson.examples, lesson.id),
     unifiedMissionPack: {
       ...missionPack,
       realWorldExample: missionPack.realWorldExample ?? topicMessage,
