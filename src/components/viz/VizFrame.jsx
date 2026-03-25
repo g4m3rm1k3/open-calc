@@ -214,6 +214,9 @@ const VIZ_REGISTRY = {
   ),
   DominoInductionLab: lazy(() => import("./react/DominoInductionLab.jsx")),
   RecursiveStackLab: lazy(() => import("./react/RecursiveStackLab.jsx")),
+  InductionGrowthExplorer: lazy(
+    () => import("./react/InductionGrowthExplorer.jsx"),
+  ),
   InductionAlgebraDecoderLab: lazy(
     () => import("./react/InductionAlgebraDecoderLab.jsx"),
   ),

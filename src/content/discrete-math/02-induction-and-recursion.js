@@ -51,6 +51,13 @@ export default {
         id: 'DominoInductionLab',
         title: 'The Mechanical Engine of Proofs',
         caption: 'Adjust the logic parameters to successfully trigger an infinitely cascading chain of unassailable mathematical truth.'
+      },
+      {
+        id: 'InductionGrowthExplorer',
+        title: 'Recursive Growth Explorer',
+        caption: 'A second perspective: visualize induction as layered recursive growth from a base seed.',
+        mathBridge: 'Complements domino induction by showing how each verified step supports a larger recursive structure.',
+        props: { guided: true }
       }
     ]
   },
