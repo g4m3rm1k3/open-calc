@@ -10,7 +10,7 @@ import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import GrapherContext from '../../context/GrapherContext.jsx'
-import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass } from 'lucide-react'
+import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import MobileBottomNav from './MobileBottomNav.jsx'
 
@@ -57,9 +57,16 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
-      {/* Mobile brand (replaces burger) */}
-      <div className="lg:hidden flex items-center gap-2">
-        <Link to="/" className="p-2 rounded-lg text-brand-600 dark:text-brand-400 font-bold text-xl">
+      {/* Mobile Menu & Brand */}
+      <div className="lg:hidden flex items-center gap-1">
+        <button
+          onClick={onMenuToggle}
+          className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+        <Link to="/" className="p-2 -ml-1 rounded-lg text-brand-600 dark:text-brand-400 font-bold text-xl">
           ∂
         </Link>
       </div>
@@ -322,6 +329,7 @@ export default function AppShell({ children }) {
           isPinned={sidebarPinned}
           togglePin={() => setSidebarPinned(!sidebarPinned)}
           isCollapsed={!isSidebarExpanded && !sidebarOpen}
+          onSearchOpen={openSearch}
         />
         
         {/* Hover trigger - Zen Mode Desktop ONLY */}
@@ -417,11 +425,6 @@ export default function AppShell({ children }) {
         )}
       </AnimatePresence>
 
-      <MobileBottomNav 
-        onMenuToggle={() => setSidebarOpen(prev => !prev)}
-        onSearchOpen={openSearch}
-        onToolsToggle={() => setMobileToolsOpen(prev => !prev)}
-      />
 
       <PinsPanel />
       <WelcomeModal />

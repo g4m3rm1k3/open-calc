@@ -27,7 +27,7 @@ const CHAPTER_COLORS = {
   'geometry-6': 'text-rose-600 dark:text-rose-400',
 }
 
-export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed }) {
+export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, onSearchOpen }) {
   const params = useParams()
   const location = useLocation()
   const { getLessonStatus } = useProgress()
@@ -116,6 +116,13 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed }
               >
                 Universal Calc
               </Link>
+              <button
+                onClick={() => { onNavigate(); onSearchOpen?.(); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                Search
+              </button>
             </div>
           </div>
         </div>
