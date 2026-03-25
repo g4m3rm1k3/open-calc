@@ -212,6 +212,17 @@ export default function AppShell({ children }) {
   const location = useLocation()
   const isUniversalCalcRoute = location.pathname.startsWith('/universal-calc')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarPinned, setSidebarPinned] = useState(() => {
+    const saved = localStorage.getItem('oc-sidebar-pinned')
+    return saved !== null ? saved === 'true' : true
+  })
+  const [sidebarHovered, setSidebarHovered] = useState(false)
+  
+  const isSidebarExpanded = sidebarPinned || (sidebarHovered && !sidebarOpen)
+
+  useEffect(() => {
+    localStorage.setItem('oc-sidebar-pinned', sidebarPinned)
+  }, [sidebarPinned])
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
@@ -295,16 +306,33 @@ export default function AppShell({ children }) {
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={`fixed top-[60px] left-0 bottom-0 z-50 w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar onNavigate={() => setSidebarOpen(false)} />
+      {/* Sidebar - Desktop logic for pin/hover, Mobile logic for toggle */}
+      <aside 
+        onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
+        onMouseLeave={() => setSidebarHovered(false)}
+        className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0 w-[280px]' : (isSidebarExpanded ? 'translate-x-0 w-[280px]' : '-translate-x-[276px] w-[280px] lg:translate-x-[-276px]')}
+          ${!sidebarPinned && isSidebarExpanded ? 'shadow-2xl ring-1 ring-black/5 dark:ring-white/5' : ''}
+        `}
+      >
+        <Sidebar 
+          onNavigate={() => setSidebarOpen(false)} 
+          isPinned={sidebarPinned}
+          togglePin={() => setSidebarPinned(!sidebarPinned)}
+          isCollapsed={!isSidebarExpanded && !sidebarOpen}
+        />
+        
+        {/* Hover trigger - a thin visible strip when collapsed to show where the menu is */}
+        {!sidebarPinned && !isSidebarExpanded && !sidebarOpen && (
+          <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-brand-500/10 dark:bg-brand-400/5 hover:bg-brand-500/20 transition-colors cursor-pointer" />
+        )}
       </aside>
 
       {/* Main content */}
-      <main className="lg:pl-[280px] pt-[60px] min-h-screen">
+      <main className={`transition-all duration-300 ease-in-out pt-[60px] min-h-screen ${sidebarPinned ? 'lg:pl-[280px]' : 'lg:pl-3'}`}>
         <div className={isUniversalCalcRoute
           ? 'max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8'
-          : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
+          : `${sidebarPinned ? 'max-w-4xl' : 'max-w-6xl'} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`}>
           {children ?? <Outlet />}
         </div>
       </main>
