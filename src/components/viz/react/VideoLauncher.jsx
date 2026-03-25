@@ -1,4 +1,4 @@
-import { Play, Video, ExternalLink, Library } from 'lucide-react';
+import { Play, Video, ExternalLink, Library, Layout } from 'lucide-react';
 import { useVideoPlayer } from '../../../context/VideoPlayerContext.jsx';
 
 export default function VideoLauncher({ params }) {
