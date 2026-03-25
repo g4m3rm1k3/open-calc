@@ -126,7 +126,15 @@ export default function FloatingVideoPlayer() {
       // Only show courses that have at least one video in the registry
       const courseChapters = CURRICULUM.filter(ch => ch.course === course.id);
       return courseChapters.some(ch => 
-        ch.lessons.some(l => VIDEO_PLACEMENT_MAP[l.id])
+        ch.lessons.some(l => {
+          const placement = VIDEO_PLACEMENT_MAP[l.id];
+          if (!placement) return false;
+          // Check if any standard section has a non-empty ID array
+          const hasRegularVids = ['hook', 'intuition', 'math', 'rigor'].some(s => placement[s]?.length > 0);
+          // Check if examples section has any nested IDs
+          const hasExampleVids = placement.examples && Object.values(placement.examples).some(exList => exList?.length > 0);
+          return hasRegularVids || hasExampleVids;
+        })
       );
     });
   }, []);
