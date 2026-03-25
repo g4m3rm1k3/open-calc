@@ -5,7 +5,7 @@ export default {
   order: 2,
   title: 'Derivatives of Inverse Functions',
   subtitle: 'General inverse-derivative rule, formal proof, and inverse trig formulas',
-  tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation',    'inverse functions',
+  tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'inverse functions',
     'domain restriction',
     'monotone',
     'one-to-one',
@@ -32,13 +32,13 @@ export default {
       'On a graph, f and f^(-1) are reflections across y = x. Reflection swaps x and y coordinates, so tangent rise/run becomes run/rise. That is why inverse slopes are reciprocals.',
       'The most common mistake is evaluating at the wrong point. If f(a) = b, then the reciprocal slope relation is between f\'(a) and (f^(-1))\'(b), not at the same x-value.',
       'This general rule plus implicit differentiation gives the inverse trig derivatives cleanly, with domain restrictions built in.',
-            'Think of a function as a machine. You put in $x$, it produces $y = f(x)$. An inverse function is a second machine that takes the output $y$ and hands back the original input $x$. We write it $f^{-1}(y) = x$, or equivalently $f^{-1}(f(x)) = x$ for every $x$ in the domain.',
+      'Think of a function as a machine. You put in $x$, it produces $y = f(x)$. An inverse function is a second machine that takes the output $y$ and hands back the original input $x$. We write it $f^{-1}(y) = x$, or equivalently $f^{-1}(f(x)) = x$ for every $x$ in the domain.',
       'Here is the single most important visual fact: the graph of $f^{-1}$ is the graph of $f$ reflected across the line $y = x$. Every point $(a, b)$ on $f$ becomes the point $(b, a)$ on $f^{-1}$. That reflection is not a trick — it is the geometric meaning of swapping input and output.',
       'But there is an immediate problem. If $f$ ever produces the same output from two different inputs — say $f(2) = 9$ and $f(-2) = 9$ — then the "undo" machine is confused: given output $9$, does it return $2$ or $-2$? It cannot do both and still be a function. This is why we need the function to be one-to-one: each output must come from exactly one input.',
       'The quick visual check is the horizontal line test. Draw any horizontal line across the graph of $f$. If any horizontal line hits the graph more than once, $f$ is not one-to-one and has no inverse on that full domain.',
     ],
     callouts: [
-            {
+      {
         type: 'definition',
         title: 'Inverse Function',
         body:
@@ -68,31 +68,6 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.3.2 The Derivative of The Inverse of a Function",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Inverse Function",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Derivative of Inverse Trigonometric Functions Examples Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Derivative Rules for Inverse Trigonometric Functions Derived Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Derivative of Inverse Trig Functions via Implicit Differentiation",
-        props: { url: "" }
-      },
       {
         id: 'InverseSlopeReflectionLab',
         title: 'Slope Reciprocity via Reflection',
@@ -161,7 +136,7 @@ export default {
         title: 'Inverse Trig Derivatives',
         body: "\\frac{d}{dx}[\\arcsin x]=\\frac{1}{\\sqrt{1-x^2}},\\;\\frac{d}{dx}[\\arccos x]=-\\frac{1}{\\sqrt{1-x^2}},\\;\\frac{d}{dx}[\\arctan x]=\\frac{1}{1+x^2}",
       },
-            {
+      {
         type: 'theorem',
         title: 'Monotone Inverse Theorem',
         body:
@@ -218,10 +193,10 @@ export default {
       'Start from the defining equation $f(f^{-1}(x)) = x$. Differentiate both sides with respect to $x$ using the chain rule on the left: \\[ f\'(f^{-1}(x)) \\cdot (f^{-1})\'(x) = 1 \\] Divide both sides by $f\'(f^{-1}(x))$ (assuming it is nonzero): \\[ (f^{-1})\'(x) = \\frac{1}{f\'(f^{-1}(x))} \\] That is the formula. In words: the derivative of the inverse at $x$ equals one over the derivative of the original function evaluated at $f^{-1}(x)$.',
       'The geometry makes this obvious. Recall that the graph of $f^{-1}$ is the graph of $f$ reflected across $y = x$. A slope of $m$ on $f$ becomes a slope of $1/m$ on $f^{-1}$. Reflection across $y = x$ swaps rise and run, turning rise/run into run/rise $= 1/(\\text{rise/run})$.',
       'The formula requires $f\'(f^{-1}(x)) \\neq 0$. If $f$ has a horizontal tangent at the point being reflected, $f^{-1}$ would need a vertical tangent there — undefined slope. This is why we can only apply the formula at points where $f$ is not flat.',
-        'Practical note: you rarely need an explicit formula for $f^{-1}(x)$ to compute $(f^{-1})\'(a)$. Solve $f(c)=a$ for the input $c$, compute $f\'(c)$, and take the reciprocal: $(f^{-1})\'(a)=1/f\'(c)$. This saves algebra and is especially useful when $f^{-1}$ has no simple closed form.',
-        'Edge cases: the formula fails if $f$ is not differentiable at $c$ or if $f\'(c)=0$ (vertical tangent for the inverse). Also ensure $f$ is one-to-one on a neighborhood of $c$ so a local inverse exists. If any of these fail, the inverse may exist but not be differentiable there.',
-        'Common student mistakes: (1) evaluating $f\'$ at the wrong point (plug into $f\'$ the input $c$, not the output $a$), (2) confusing $f^{-1}(x)$ with $1/f(x)$, and (3) forgetting to check that $f$ is one-to-one near the point of interest.',
-        'Quick checklist before applying the inverse-derivative formula: (i) find $c$ with $f(c)=a$, (ii) verify $f$ is one-to-one near $c$, (iii) check $f\'(c)$ exists and $\\neq 0$, (iv) compute $(f^{-1})\'(a)=1/f\'(c)$.',
+      'Practical note: you rarely need an explicit formula for $f^{-1}(x)$ to compute $(f^{-1})\'(a)$. Solve $f(c)=a$ for the input $c$, compute $f\'(c)$, and take the reciprocal: $(f^{-1})\'(a)=1/f\'(c)$. This saves algebra and is especially useful when $f^{-1}$ has no simple closed form.',
+      'Edge cases: the formula fails if $f$ is not differentiable at $c$ or if $f\'(c)=0$ (vertical tangent for the inverse). Also ensure $f$ is one-to-one on a neighborhood of $c$ so a local inverse exists. If any of these fail, the inverse may exist but not be differentiable there.',
+      'Common student mistakes: (1) evaluating $f\'$ at the wrong point (plug into $f\'$ the input $c$, not the output $a$), (2) confusing $f^{-1}(x)$ with $1/f(x)$, and (3) forgetting to check that $f$ is one-to-one near the point of interest.',
+      'Quick checklist before applying the inverse-derivative formula: (i) find $c$ with $f(c)=a$, (ii) verify $f$ is one-to-one near $c$, (iii) check $f\'(c)$ exists and $\\neq 0$, (iv) compute $(f^{-1})\'(a)=1/f\'(c)$.',
       'Formal derivation of arcsin: let y = arcsin x so sin y = x. Differentiate: cos y * dy/dx = 1, hence dy/dx = 1/cos y. From sin y = x and principal range y in [-pi/2, pi/2], cos y = sqrt(1-x^2), giving dy/dx = 1/sqrt(1-x^2).',
       'For arccos: let y = arccos x so cos y = x. Differentiate: -sin y * dy/dx = 1, so dy/dx = -1/sin y = -1/sqrt(1-x^2).',
       'For arctan: let y = arctan x so tan y = x. Differentiate: sec^2 y * dy/dx = 1, so dy/dx = 1/sec^2 y = 1/(1+tan^2 y) = 1/(1+x^2).',
@@ -249,7 +224,7 @@ export default {
   },
 
   examples: [
-    
+
     {
       id: 'ch2-002-ex1',
       title: 'Finding the Derivative of an Inverse from a Table',
@@ -330,7 +305,7 @@ export default {
         },
       ],
     },
-      {
+    {
       id: 'ch3-008-ex1',
       title: 'Finding an Inverse Algebraically',
       problem:
@@ -571,7 +546,7 @@ export default {
       ],
       answer: '-1/3',
     },
-      {
+    {
       id: 'ch3-008-ch1',
       difficulty: 'easy',
       problem: "\\text{Find } f^{-1}(x) \\text{ for } f(x) = \\frac{x+1}{2}.",

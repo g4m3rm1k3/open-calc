@@ -56,36 +56,6 @@ export default {
         caption: 'Use the solver-style panel to inspect derivative, inverse behavior, and inverse-derivative logic before the rest of trig derivative content.',
       },
       {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.7.2 Inverse Trigonometric Functions: Differentiation",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.3.2 Trigonometric and Higher-Order Derivatives",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Derivative Rules of Trigonometric Functions Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Deriving Derivative Rules for Trigonometric Functions Tan, Cot, Sec, Csc Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Inverse Trigonometric Functions",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The derivative of Trigonometric Functions",
-        props: { url: "" }
-      },
-      {
         id: 'TrigDerivativeSync',
         title: 'The "Moving Point" Deep Sync',
         mathBridge: 'This shows three views of the same fact: $\\frac{d}{d\\theta}[\\sin\\theta] = \\cos\\theta$. The unit-circle panel shows where the point is. The middle panel shows the slope of the sine curve there. The right panel shows the cosine value. All three update together because slope of sine = cosine — every single angle.',
@@ -235,31 +205,31 @@ export default {
         title: 'Deriving d/dx[cot x] via Quotient Rule',
         body: "\\frac{d}{dx}\\left[\\frac{\\cos x}{\\sin x}\\right] = \\frac{-\\sin x \\cdot \\sin x - \\cos x \\cdot \\cos x}{\\sin^2 x} = \\frac{-(\\sin^2 x + \\cos^2 x)}{\\sin^2 x} = \\frac{-1}{\\sin^2 x} = -\\csc^2 x",
       },
-{
-  type: 'derivation',
-  title: 'Deriving cos(arcsin x)',
-  body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\cos(\\arcsin x) = \\frac{\\text{adj}}{\\text{hyp}} = \\sqrt{1 - x^2}."
-},
-{
-  type: 'derivation',
-  title: 'Deriving sin(arccos x)',
-  body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\sin(\\arccos x) = \\frac{\\text{opp}}{\\text{hyp}} = \\sqrt{1 - x^2}."
-},
-{
-  type: 'derivation',
-  title: 'Deriving tan(arcsin x)',
-  body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arcsin x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{\\sqrt{1 - x^2}}."
-},
-{
-  type: 'derivation',
-  title: 'Deriving tan(arccos x)',
-  body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arccos x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{\\sqrt{1 - x^2}}{x}."
-},
-{
-  type: 'derivation',
-  title: 'Deriving sec(arctan x)',
-  body: "\\theta = \\arctan x \\Rightarrow \\tan\\theta = x = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{hyp} = \\sqrt{1 + x^2}.\\\\ \\sec(\\arctan x) = \\frac{\\text{hyp}}{\\text{adj}} = \\sqrt{1 + x^2}."
-},
+      {
+        type: 'derivation',
+        title: 'Deriving cos(arcsin x)',
+        body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\cos(\\arcsin x) = \\frac{\\text{adj}}{\\text{hyp}} = \\sqrt{1 - x^2}."
+      },
+      {
+        type: 'derivation',
+        title: 'Deriving sin(arccos x)',
+        body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\sin(\\arccos x) = \\frac{\\text{opp}}{\\text{hyp}} = \\sqrt{1 - x^2}."
+      },
+      {
+        type: 'derivation',
+        title: 'Deriving tan(arcsin x)',
+        body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arcsin x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{\\sqrt{1 - x^2}}."
+      },
+      {
+        type: 'derivation',
+        title: 'Deriving tan(arccos x)',
+        body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arccos x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{\\sqrt{1 - x^2}}{x}."
+      },
+      {
+        type: 'derivation',
+        title: 'Deriving sec(arctan x)',
+        body: "\\theta = \\arctan x \\Rightarrow \\tan\\theta = x = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{hyp} = \\sqrt{1 + x^2}.\\\\ \\sec(\\arctan x) = \\frac{\\text{hyp}}{\\text{adj}} = \\sqrt{1 + x^2}."
+      },
 
 
     ],

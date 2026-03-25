@@ -83,166 +83,6 @@ export default {
         },
       ],
       visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 1.2.2 Limits That Fail to Exist",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 1.1.1 A Preview of Calculus",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 6: Limits",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 1: The Paradox of the Derivative",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "L'Hopital's Rule Lesson Calculus 1 AB with 8 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Hyperbolic Functions Introduction 6 Ex Calculus 1 PLEASE READ DESCRIPTION",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Area  Against y Axis Riemman Limit of Sums Calculus 1",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Sigma Notation & Infinite Sums with Limits Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Even and Odd Functions Many Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Horizontal Asymptotes of Irrational Functions",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Limits at Infinity Rational, Irrational, and Trig Functions Calculus 1 AB READ DESCRIPTION",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Absolute Value Functions Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Higher Order Derivative Introduction Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative Using Quotient Rule 3 Examples   4K",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative Using Product Rule 3 Examples 4K",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Finding Derivative with Definition of Derivative Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Curve Sketching with Limits Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Infinite Limits & Vertical Asymptotes Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Limits Involving Absolute Value Functions Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Evaluating a Limit Rationalizing the Numerator 4k",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Limits of Piecewise Function Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Limits of Rational Functions 3 Examples 4k",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Properties of Limits Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Why Limits are Important in Calculus",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Finding Real limits Graphical & Numerical Approach Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Finding Limits with Properties includes Quotient Rule Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Limits & Continuity",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Function vs Limit Value 3 Examples Graphing Review 4k",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The Velocity Problem | Part II: Graphically",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The Velocity Problem | Part I: Numerically",
-        props: { url: "" }
-      },
         {
           id: 'LimitGeometric',
           title: 'Visual: Both Sides Converge',
@@ -324,16 +164,6 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "A Tale of Three Functions | Intro to Limits Part II",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "A Tale of Three Functions | Intro to Limits Part I",
-        props: { url: "" }
-      },
       {
         id: 'LimitApproach',
         props: { fn: '(x*x - 4)/(x - 2)', targetX: 2, limitVal: 4, showTable: true },
@@ -532,14 +362,14 @@ export default {
       problem: 'A ball is dropped from rest at a height of 80 ft. Its height (in feet) is $h(t) = 80 - 16t^2$ where $t$ is in seconds. (a) Compute the average velocity over $[1,\\; 1+\\Delta t]$ for $\\Delta t = 1, 0.5, 0.1, 0.01$. (b) What value does the average velocity approach as $\\Delta t \\to 0$? (c) Compute the limit directly.',
       visualizationId: 'ShrinkingInterval',
       steps: [
-            { expression: '\\text{Avg velocity} = \\frac{h(1 + \\Delta t) - h(1)}{\\Delta t}', annotation: 'Average velocity = change in height ÷ change in time. This is the difference quotient — the slope of the secant line.', hints: ['Use change in height divided by change in time.', 'This is the secant-line slope over the interval [1, 1 + Δt].'] },
-            { expression: 'h(1) = 80 - 16(1)^2 = 64 \\text{ ft}', annotation: 'Height at t=1 second.', hints: ['Substitute t = 1 into h(t).', 'The ball is at 64 ft after 1 second.'] },
-            { expression: 'h(1 + \\Delta t) = 80 - 16(1+\\Delta t)^2 = 80 - 16(1 + 2\\Delta t + \\Delta t^2)', annotation: 'Expand (1+Δt)².', hints: ['Expand the square (1 + Δt)^2.', 'Use the binomial expansion 1 + 2Δt + Δt².'] },
-            { expression: '= 64 - 32\\Delta t - 16\\Delta t^2', annotation: 'Distribute and simplify: 80 - 16 = 64.', hints: ['Distribute -16 across the parentheses.', 'Combine 80 - 16 to get 64.'] },
-            { expression: '\\frac{h(1+\Delta t)-h(1)}{\\Delta t} = \\frac{(64-32\\Delta t - 16\\Delta t^2) - 64}{\\Delta t} = \\frac{-32\\Delta t - 16\\Delta t^2}{\\Delta t}', annotation: 'Subtract h(1)=64 and form the quotient.', hints: ['Subtract the earlier height h(1) from the later height.', 'Put the difference over Δt to form the average velocity.'] },
-            { expression: '= \\frac{\\Delta t(-32 - 16\\Delta t)}{\\Delta t} = -32 - 16\\Delta t', annotation: 'Factor Δt from numerator and cancel (valid for Δt ≠ 0).', hints: ['Factor out Δt from the numerator.', 'Cancel Δt because average velocity uses Δt ≠ 0.'] },
-            { expression: '\\lim_{\\Delta t \\to 0}(-32 - 16\\Delta t) = -32 \\text{ ft/s}', annotation: 'As Δt → 0, the term −16Δt → 0. The instantaneous velocity at t=1 is exactly −32 ft/s.', hints: ['Let Δt go to 0 so the correction term disappears.', 'The remaining constant is -32 ft/s.'] },
-            { expression: '\\Delta t=1:\\;-48,\\quad \\Delta t=0.5:\\;-40,\\quad \\Delta t=0.1:\\;-33.6,\\quad \\Delta t=0.01:\\;-32.16', annotation: 'Numerical check: the average velocities converge to −32 ft/s from above.', hints: ['Plug in several shrinking Δt values to see the trend.', 'The values get closer to -32 as Δt shrinks.'] },
+        { expression: '\\text{Avg velocity} = \\frac{h(1 + \\Delta t) - h(1)}{\\Delta t}', annotation: 'Average velocity = change in height ÷ change in time. This is the difference quotient — the slope of the secant line.', hints: ['Use change in height divided by change in time.', 'This is the secant-line slope over the interval [1, 1 + Δt].'] },
+        { expression: 'h(1) = 80 - 16(1)^2 = 64 \\text{ ft}', annotation: 'Height at t=1 second.', hints: ['Substitute t = 1 into h(t).', 'The ball is at 64 ft after 1 second.'] },
+        { expression: 'h(1 + \\Delta t) = 80 - 16(1+\\Delta t)^2 = 80 - 16(1 + 2\\Delta t + \\Delta t^2)', annotation: 'Expand (1+Δt)².', hints: ['Expand the square (1 + Δt)^2.', 'Use the binomial expansion 1 + 2Δt + Δt².'] },
+        { expression: '= 64 - 32\\Delta t - 16\\Delta t^2', annotation: 'Distribute and simplify: 80 - 16 = 64.', hints: ['Distribute -16 across the parentheses.', 'Combine 80 - 16 to get 64.'] },
+        { expression: '\\frac{h(1+\Delta t)-h(1)}{\\Delta t} = \\frac{(64-32\\Delta t - 16\\Delta t^2) - 64}{\\Delta t} = \\frac{-32\\Delta t - 16\\Delta t^2}{\\Delta t}', annotation: 'Subtract h(1)=64 and form the quotient.', hints: ['Subtract the earlier height h(1) from the later height.', 'Put the difference over Δt to form the average velocity.'] },
+        { expression: '= \\frac{\\Delta t(-32 - 16\\Delta t)}{\\Delta t} = -32 - 16\\Delta t', annotation: 'Factor Δt from numerator and cancel (valid for Δt ≠ 0).', hints: ['Factor out Δt from the numerator.', 'Cancel Δt because average velocity uses Δt ≠ 0.'] },
+        { expression: '\\lim_{\\Delta t \\to 0}(-32 - 16\\Delta t) = -32 \\text{ ft/s}', annotation: 'As Δt → 0, the term −16Δt → 0. The instantaneous velocity at t=1 is exactly −32 ft/s.', hints: ['Let Δt go to 0 so the correction term disappears.', 'The remaining constant is -32 ft/s.'] },
+        { expression: '\\Delta t=1:\\;-48,\\quad \\Delta t=0.5:\\;-40,\\quad \\Delta t=0.1:\\;-33.6,\\quad \\Delta t=0.01:\\;-32.16', annotation: 'Numerical check: the average velocities converge to −32 ft/s from above.', hints: ['Plug in several shrinking Δt values to see the trend.', 'The values get closer to -32 as Δt shrinks.'] },
       ],
       conclusion: 'The instantaneous velocity at t=1 is −32 ft/s (the ball is falling at 32 ft/s). The negative sign means the height is decreasing — the ball is moving downward. This is precisely the derivative h\'(1) = −32t|_{t=1} = −32, which we\'ll compute using rules in Chapter 2. The limit is the engine that converts "average over an interval" into "instantaneous at a point."',
     },
