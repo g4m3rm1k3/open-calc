@@ -680,6 +680,7 @@ const VIZ_REGISTRY = {
   ProductRuleProof: lazy(() => import("./react/ProductRuleProof.jsx")),
   RelatedRatesProof: lazy(() => import("./react/RelatedRatesProof.jsx")),
   TaylorSeriesProof: lazy(() => import("./react/TaylorSeriesProof.jsx")),
+  ProofEngineViz: lazy(() => import("./react/ProofEngineViz.jsx")),
 };
 
 function VizSkeleton() {

@@ -116,6 +116,15 @@ export default {
         title: 'The Proof Scaffolding Template (The Ritual)',
         body: 'Induction is a rigorous ritual. Beginners often know the math but functionally freeze because they don\'t know the absolute "magic words" to write down on the blank page. Use this guaranteed Fill-in-the-Blanks Template:\n\n**1. Base Case:** "We prove the formula works for the very first step. Let $n = [1, or\\; 0]$. [Show the math equals perfectly]. Thus, the base case holds."\n**2. Inductive Hypothesis:** "Assume the formula definitively works for some arbitrary step $k \\ge 1$. That is, assume [Write the exact formula here, swapping $n$ for $k$]."\n**3. Inductive Step:** "We use our assumption to firmly prove it MUST work for step $k+1$. That is, we must formally prove [Write the formula swapping $n$ for $k+1$]." \n*(Execute algebra, forcefully substitute IH, and physically reduce!)* \n**4. The Conclusion:** "Therefore, by the Strict Principle of Mathematical Induction, the proposition $P(n)$ holds $\\forall n \\ge 1$."'
       }
+    ],
+    visualizations: [
+      {
+        id: 'ProofEngineViz',
+        title: 'Rigorous Proof Engine',
+        caption: 'Transition from geometric intuition to Formal Invariants. Watch the system verify the truth of the state at every step.',
+        mathBridge: 'Enforces the connection between Algebra (the sum) and Invariants (the row properties) to create an unassailable proof.',
+        props: { guided: true }
+      }
     ]
   },
 
