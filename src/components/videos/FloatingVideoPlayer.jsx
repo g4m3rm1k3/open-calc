@@ -1,18 +1,28 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon } from 'lucide-react';
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
 import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
 import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
 import { CURRICULUM, ALL_LESSONS } from '../../content/index.js';
 
+import { useNavigate } from 'react-router-dom';
+
 export default function FloatingVideoPlayer() {
+  const navigate = useNavigate();
+  const dragControls = useDragControls();
+  const constraintsRef = useRef(null);
   const { 
     isOpen, isMinimized, currentVideo, lessonId, 
     searchQuery, setSearchQuery, 
     closePlayer, toggleMinimize, selectVideo,
-    customVideos, addCustomVideo, setLessonId
+    customVideos, addCustomVideo, setLessonId,
+    pinnedVideos, togglePin
   } = useVideoPlayer();
+
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customTitle, setCustomTitle] = useState('');
+  const [customUrl, setCustomUrl] = useState('');
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [navStack, setNavStack] = useState(['playlist']);
@@ -22,10 +32,17 @@ export default function FloatingVideoPlayer() {
   
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
+  const [windowDimensions, setWindowDimensions] = useState({ 
+    w: window.innerWidth, 
+    h: window.innerHeight 
+  });
 
-  // Sync Mobile Check
+  // Sync Mobile & Viewport Check
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setWindowDimensions({ w: window.innerWidth, h: window.innerHeight });
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -109,58 +126,105 @@ export default function FloatingVideoPlayer() {
     setSearchQuery('');
   };
 
+  const handlePinnedSelect = (vidId) => {
+    const vid = VIDEO_DATABASE[vidId];
+    if (vid) {
+      selectVideo({ ...vid, id: vidId });
+      const info = getLessonInfo(vidId);
+      if (info) {
+        setLessonId(info.id);
+        setNavStack(['playlist']);
+      }
+    }
+  };
+
+  const handleCustomSubmit = (e) => {
+    e.preventDefault();
+    if (!customUrl) return;
+    addCustomVideo(customUrl, customTitle);
+    setCustomUrl('');
+    setCustomTitle('');
+    setIsAddingCustom(false);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {/* Minimized Dock Bar */}
-      {isMinimized && (
-        <motion.div
-          initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
-          className={`fixed bottom-0 z-[9999] bg-slate-900 border-x border-t border-slate-700 rounded-t-xl px-5 py-4 shadow-2xl flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all border-b-4 border-b-brand-500 ${
-            isMobile ? 'left-0 right-0 rounded-none w-full' : 'right-8 min-w-[320px]'
-          }`}
-          onClick={toggleMinimize}
-        >
-          <div className="flex items-center gap-4 truncate">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Play size={20} fill="currentColor" /></div>
-            <div className="truncate">
-              <p className="text-[10px] font-bold text-brand-400 uppercase tracking-[0.2em] leading-none mb-1.5">Tutorial Hub</p>
-              <h4 className="text-sm font-bold text-white leading-none tracking-tight truncate">{currentVideo?.title || 'Videos & Tutorials'}</h4>
-            </div>
-          </div>
-          <Maximize2 size={18} className="text-slate-500 flex-shrink-0 ml-4" />
-        </motion.div>
-      )}
+    <>
+      {/* Invisible constraint layer to keep player in viewport */}
+      <div ref={constraintsRef} className="fixed inset-0 pointer-events-none z-[9997]" />
 
-      {/* Main Player Window */}
-      {!isMinimized && (
-        <motion.div
-          layoutId="video-player"
-          initial={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
-          drag={!isMobile} 
-          dragMomentum={false} 
-          style={isMobile ? { width: '100%', height: '100%', top: 0, right: 0, left: 0, bottom: 0 } : { width, height }}
-          className={`fixed z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col ${
-            isMobile ? 'rounded-none' : 'top-20 right-8 rounded-2xl border border-slate-200 dark:border-slate-800 resize'
-          }`}
+      <AnimatePresence mode="wait">
+        {isMinimized ? (
+          <motion.div
+            key="minimized-dock"
+            initial={{ y: 100, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-0 right-8 z-[9999] bg-slate-900 border-x border-t border-slate-700 rounded-t-2xl px-5 py-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all border-b-4 border-b-brand-500 min-w-[340px]"
+            onClick={toggleMinimize}
+          >
+            <div className="flex items-center gap-4 truncate">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Play size={20} fill="currentColor" /></div>
+              <div className="truncate">
+                <p className="text-[10px] font-bold text-brand-400 uppercase tracking-[0.2em] leading-none mb-1.5">Tutorial Hub</p>
+                <h4 className="text-sm font-bold text-white leading-none tracking-tight truncate">{currentVideo?.title || 'Videos & Tutorials'}</h4>
+              </div>
+            </div>
+            <Maximize2 size={18} className="text-slate-500 flex-shrink-0 ml-4" />
+          </motion.div>
+        ) : (
+          <motion.div
+             key="expanded-player"
+             drag={!isMobile} 
+           dragControls={dragControls}
+           dragListener={false}
+           dragMomentum={false}
+           dragConstraints={{ 
+             left: 10, 
+             top: 10, 
+             right: windowDimensions.w - width - 10, 
+             bottom: windowDimensions.h - height - 10 
+           }}
+           dragElastic={0}
+           initial={isMobile ? { opacity: 0, y: 100 } : { 
+             opacity: 0, 
+             scale: 0.9, 
+             x: windowDimensions.w - width - 40, 
+             y: windowDimensions.h - height - 40 
+           }}
+           animate={{ opacity: 1, scale: 1 }}
+           exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
+           style={isMobile ? { width: '100%', height: '100%', top: 0, left: 0 } : { width, height }}
+           className={`fixed top-0 left-0 z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col ${
+             isMobile ? 'rounded-none' : 'rounded-2xl border border-slate-200 dark:border-slate-800'
+           }`}
         >
-          {/* Header */}
-          <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 cursor-move">
-            <div className="flex items-center gap-2 truncate">
-              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white"><Video size={16} /></div>
-              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate max-w-[80vw]">{currentVideo?.title || 'Video Library'}</h3>
+          {/* Header - now the ONLY draggable area */}
+          <div 
+            onPointerDown={(e) => dragControls.start(e)}
+            className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none"
+          >
+            <div className="flex items-center gap-3 truncate">
+              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Video size={16} /></div>
+              <div className="truncate">
+                <h3 className="text-xs font-bold text-white truncate leading-none mb-1">{currentVideo?.title || 'Tutorial Hub'}</h3>
+                {lessonId && (
+                  <p className="text-[9px] font-bold text-brand-400 uppercase tracking-widest leading-none opacity-80">
+                    {ALL_LESSONS.find(l => l.id === lessonId)?.title || 'Curriculum'}
+                  </p>
+                )}
+              </div>
             </div>
             
             <div className="flex-shrink-0 flex items-center gap-1">
-              <button onClick={toggleMinimize} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-500 dark:text-slate-400" title="Minimize">
-                {isMobile ? <ChevronLeft size={20} /> : <Minus size={18} />}
+              <button onClick={toggleMinimize} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Minimize">
+                <Minus size={18} />
               </button>
               <button 
-                onClick={toggleMinimize}
-                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 rounded-lg text-slate-500 dark:text-slate-400"
+                onClick={closePlayer}
+                className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors"
+                title="Close"
               >
                 <X size={18} />
               </button>
@@ -185,8 +249,12 @@ export default function FloatingVideoPlayer() {
 
                {/* Mobile sidebar toggle Overlay button */}
                {!isMobile && (
-                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-4 h-20 bg-slate-800/80 text-white rounded-r-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ChevronRight size={14} className={sidebarOpen ? 'rotate-180' : ''} />
+                 <button 
+                  onClick={() => setSidebarOpen(!sidebarOpen)} 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-4 h-20 bg-slate-800/80 text-white rounded-l-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-brand-500 transition-all shadow-xl"
+                  title={sidebarOpen ? "Hide Library" : "Show Library"}
+                 >
+                    <ChevronRight size={14} className={sidebarOpen ? '' : 'rotate-180'} />
                  </button>
                )}
             </div>
@@ -205,14 +273,20 @@ export default function FloatingVideoPlayer() {
                  ) : (
                    <button onClick={() => pushNav('courses')} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"><Compass size={16} /></button>
                  )}
-                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate flex-1">
+                 <button 
+                  onClick={() => {
+                    const l = ALL_LESSONS.find(l => l.id === lessonId);
+                    if (l) navigate(`/chapter/${l.chapterNumber}/${l.slug}`);
+                  }}
+                  className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-500 truncate flex-1 text-left transition-colors"
+                 >
                     {currentView === 'playlist' && lessonId ? (
                       (() => {
                         const l = ALL_LESSONS.find(l => l.id === lessonId);
                         return l ? `Ch ${l.chapterNumber} › ${l.title}` : 'Playlist';
                       })()
                     ) : currentView}
-                 </span>
+                 </button>
               </div>
 
               <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
@@ -235,9 +309,10 @@ export default function FloatingVideoPlayer() {
                         <VideoRow 
                           key={vid.id} 
                           video={vid} 
-                          breadcrumb={lessonInfo ? `Ch ${lessonInfo.chapter} › ${lessonInfo.title}` : null}
                           active={vid.id === currentVideo?.id} 
                           onClick={() => handleSearchSelect(vid)} 
+                          onPin={() => togglePin(vid.id)}
+                          isPinned={pinnedVideos.includes(vid.id)}
                         />
                       );
                     })}
@@ -246,10 +321,72 @@ export default function FloatingVideoPlayer() {
                   <AnimatePresence mode="wait">
                     {currentView === 'playlist' && (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="playlist">
+                        {/* Pinned Section */}
+                        {pinnedVideos.length > 0 && (
+                           <div className="mb-6">
+                              <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-2 flex items-center gap-2">
+                                <Plus size={10} className="rotate-45" /> Quick Access
+                              </p>
+                              <div className="space-y-1">
+                                {pinnedVideos.map(vidId => {
+                                   const vid = VIDEO_DATABASE[vidId];
+                                   if (!vid) return null;
+                                   return (
+                                     <VideoRow 
+                                       key={vidId} 
+                                       video={{ ...vid, id: vidId }} 
+                                       active={vidId === currentVideo?.id} 
+                                       onClick={() => handlePinnedSelect(vidId)} 
+                                       onPin={() => togglePin(vidId)}
+                                       isPinned={true}
+                                     />
+                                   );
+                                })}
+                              </div>
+                           </div>
+                        )}
+
+                        {/* Custom Video Form */}
+                        <div className="mb-6 px-2">
+                           <button 
+                             onClick={() => setIsAddingCustom(!isAddingCustom)}
+                             className="w-full py-2 px-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:text-brand-500 transition-all"
+                           >
+                              <span>{isAddingCustom ? 'Cancel' : 'Add Custom Tutorial'}</span>
+                              <Plus size={12} className={isAddingCustom ? 'rotate-45 transition-transform' : 'transition-transform'} />
+                           </button>
+                           
+                           {isAddingCustom && (
+                             <motion.form 
+                               initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                               onSubmit={handleCustomSubmit} className="mt-3 space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
+                             >
+                                <input 
+                                  type="text" placeholder="Tutorial Title..." value={customTitle} onChange={e => setCustomTitle(e.target.value)}
+                                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                                />
+                                <input 
+                                  type="text" placeholder="YouTube URL..." value={customUrl} onChange={e => setCustomUrl(e.target.value)}
+                                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                                />
+                                <button type="submit" className="w-full py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20">Save Tutorial</button>
+                             </motion.form>
+                           )}
+                        </div>
+
                         {currentLessonVideos ? Object.entries(currentLessonVideos).map(([section, vids]) => (
                           <div key={section} className="mb-4">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-1">{section}</p>
-                            {vids.map(vid => <VideoRow key={vid.id} video={vid} active={vid.id === currentVideo?.id} onClick={() => selectVideo(vid)} />)}
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
+                            {vids.map(vid => (
+                               <VideoRow 
+                                 key={vid.id} 
+                                 video={vid} 
+                                 active={vid.id === currentVideo?.id} 
+                                 onClick={() => selectVideo(vid)} 
+                                 onPin={() => togglePin(vid.id)}
+                                 isPinned={pinnedVideos.includes(vid.id)}
+                               />
+                            ))}
                           </div>
                         )) : <div className="text-center py-6 text-xs text-slate-500">Browse courses for topics.</div>}
                          <button onClick={() => pushNav('courses')} className="w-full mt-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center justify-center gap-2 border border-dashed border-slate-300 rounded-lg"><Compass size={12} /> Explore More Courses</button>
@@ -292,22 +429,45 @@ export default function FloatingVideoPlayer() {
             </div>
           </div>
         </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
-function VideoRow({ video, active, onClick, breadcrumb }) {
+function VideoRow({ video, active, onClick, isPinned, onPin }) {
   return (
-    <button onClick={onClick} className={`w-full flex items-start gap-3 p-2 rounded-xl transition-all ${active ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 ring-1 ring-brand-200 shadow-sm' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
-      <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${active ? 'bg-brand-100 dark:bg-brand-900 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{active ? <Play size={12} fill="currentColor" /> : <Video size={12} />}</div>
-      <div className="flex-1 text-left min-w-0">
-        {breadcrumb && (
-          <p className="text-[8px] font-bold text-brand-500 uppercase tracking-wider mb-0.5 opacity-80">{breadcrumb}</p>
-        )}
-        <p className="text-[11px] font-semibold leading-tight mb-0.5 truncate">{video.title}</p>
-        <p className="text-[8px] text-slate-400 uppercase">{video.source}</p>
-      </div>
-    </button>
+    <div className="group/row relative">
+      <button 
+        onClick={onClick} 
+        className={`w-full flex items-start gap-3 p-2 rounded-xl transition-all ${
+          active 
+            ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 ring-1 ring-brand-200 shadow-sm' 
+            : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+        }`}
+      >
+        <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${active ? 'bg-brand-100 dark:bg-brand-900 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+          {active ? <Play size={12} fill="currentColor" /> : <Video size={12} />}
+        </div>
+        
+        <div className="flex-1 text-left min-w-0 pr-6">
+          <p className="text-[11px] font-semibold leading-tight mb-0.5 truncate">{video.title}</p>
+          <p className="text-[8px] text-slate-400 uppercase">{video.source}</p>
+        </div>
+      </button>
+
+      {/* Pin Toggle */}
+      <button 
+        onClick={(e) => { e.stopPropagation(); onPin?.(); }}
+        className={`absolute right-2 top-3 p-1.5 rounded-lg transition-all ${
+          isPinned 
+            ? 'text-brand-500 opacity-100' 
+            : 'text-slate-300 opacity-0 group-hover/row:opacity-100 hover:text-brand-400'
+        }`}
+        title={isPinned ? 'Remove Pin' : 'Pin Tutorial'}
+      >
+        <Plus size={14} className={isPinned ? 'rotate-45' : ''} />
+      </button>
+    </div>
   );
 }

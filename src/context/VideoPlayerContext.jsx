@@ -10,6 +10,10 @@ export function VideoPlayerProvider({ children }) {
   const [currentVideo, setCurrentVideo] = useState(null);
   const [lessonId, setLessonId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [pinnedVideos, setPinnedVideos] = useState(() => {
+    const saved = localStorage.getItem('open-calc-pinned-videos');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [customVideos, setCustomVideos] = useState(() => {
     const saved = localStorage.getItem('open-calc-custom-videos');
     return saved ? JSON.parse(saved) : {};
@@ -34,6 +38,19 @@ export function VideoPlayerProvider({ children }) {
   const selectVideo = useCallback((videoData) => {
     setCurrentVideo(videoData);
     setIsMinimized(false);
+  }, []);
+
+  const togglePin = useCallback((vidId) => {
+    setPinnedVideos(prev => {
+      let updated;
+      if (prev.includes(vidId)) {
+        updated = prev.filter(id => id !== vidId);
+      } else {
+        updated = [vidId, ...prev];
+      }
+      localStorage.setItem('open-calc-pinned-videos', JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   const addCustomVideo = useCallback((url, title) => {
@@ -109,6 +126,8 @@ export function VideoPlayerProvider({ children }) {
         toggleMinimize,
         selectVideo,
         setLessonId,
+        togglePin,
+        pinnedVideos,
         addCustomVideo,
       }}
     >
