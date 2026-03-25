@@ -158,6 +158,12 @@ export default {
         caption: 'Use a right triangle plus implicit differentiation to derive d/dx[arcsin x] = 1/√(1−x²).',
       },
       {
+        id: 'ArcSinTriangleDerivationLab',
+        title: 'arcsin Derivative: Triangle + Meaning of Every Symbol',
+        mathBridge: 'We define y = arcsin(x), which means sin(y) = x. This converts an inverse trig function into a standard trig equation. Differentiating gives cos(y) * dy/dx = 1, so dy/dx = 1 / cos(y). A right triangle lets us rewrite cos(y) in terms of x: cos(y) = sqrt(1 - x^2). This yields dy/dx = 1 / sqrt(1 - x^2).',
+        caption: 'Every symbol is mapped: x is a ratio, arcsin returns an angle, the triangle converts angle back into algebra. The square root appears from geometry, not memorization. Domain restriction ensures the square root stays positive.',
+      },
+      {
         id: 'UniversalInverseLab',
         title: 'Inverse Reflection + Reciprocal Slopes (Calc Bridge)',
         mathBridge: 'Before inverse trig formulas, lock in the general theorem: if points correspond by inverse reflection, tangent slopes are reciprocals at matched points. This is the geometric engine behind $\\frac{d}{dx}[f^{-1}(x)] = 1/f\'(f^{-1}(x))$.',

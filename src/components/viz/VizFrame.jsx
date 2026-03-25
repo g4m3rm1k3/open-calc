@@ -256,6 +256,9 @@ const VIZ_REGISTRY = {
   InverseBridgeTriangleLab: lazy(
     () => import("./react/InverseBridgeTriangleLab.jsx"),
   ),
+  ArcSinTriangleDerivationLab: lazy(
+    () => import("./react/ArcSinTriangleDerivationLab.jsx"),
+  ),
   InterlockingGearsViz: lazy(() => import("./react/InterlockingGearsViz.jsx")),
   ChainRuleOnionLab: lazy(() => import("./react/ChainRuleOnionLab.jsx")),
   ProofCircleLinkLab: lazy(() => import("./react/ProofCircleLinkLab.jsx")),
