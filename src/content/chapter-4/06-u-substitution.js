@@ -69,27 +69,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.2.2 Natural Logarithmic Integration: Difficult Examples",
-        props: { url: "https://www.youtube.com/embed/6ctiDVmcEWo" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
-        props: { url: "https://www.youtube.com/embed/Bh1nhf4a04o" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.5.2 Integration by Substitution: Definite Integrals",
-        props: { url: "https://www.youtube.com/embed/lBMJdzRMgu4" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.5.1 Integration by Substitution: Indefinite Integrals",
-        props: { url: "https://www.youtube.com/embed/4bflZuXoQ0s" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Intro to Substitution - Undoing the Chain Rule",
-        props: { url: "https://www.youtube.com/embed/QcgacM1LSpA" }
+        props: { url: "" }
       },
       {
         id: 'IntegrationMethodLab',
@@ -135,7 +135,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Adjusting the Constant in Integration by Substitution",
-        props: { url: "https://www.youtube.com/embed/RdeTrQKz3fk" }
+        props: { url: "" }
       },
       {
         id: 'FunctionPlotter',
@@ -167,12 +167,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Back Substitution - When a u-sub doesn't match cleanly!",
-        props: { url: "https://www.youtube.com/embed/k08ce4fEA3k" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Substitution Method for Definite Integrals **careful!**",
-        props: { url: "https://www.youtube.com/embed/iLh6cYGCogk" }
+        props: { url: "" }
       },],
   },
 

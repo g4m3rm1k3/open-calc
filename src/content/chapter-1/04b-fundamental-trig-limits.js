@@ -61,7 +61,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "The most important limit in Calculus // Geometric Proof & Applications",
-        props: { url: "https://www.youtube.com/embed/f2PRu5QPa3o" }
+        props: { url: "" }
       },
       {
         id: 'RadianDegreeLimitLab',

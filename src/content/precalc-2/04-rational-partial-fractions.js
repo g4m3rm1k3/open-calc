@@ -46,12 +46,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Partial Fraction Decomposition Part 1',
-        props: { url: 'https://www.youtube.com/embed/q9nZeNKpm3o' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Partial Fractions Decomposition Part 2',
-        props: { url: 'https://www.youtube.com/embed/3qo527nyiaY' },
+        props: { url: "" },
       },
     ],
   },

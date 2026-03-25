@@ -38,27 +38,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.5.2 Horizontal Asymptotes and Computational Techniques",
-        props: { url: "https://www.youtube.com/embed/km6-zDe0zJY" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.5.1 Limits at Infinity",
-        props: { url: "https://www.youtube.com/embed/NLYMsgDykOk" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.5.2 Vertical Asymptotes",
-        props: { url: "https://www.youtube.com/embed/btWKhXFTcPQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.5.1 Infinite Limits and Their Properties",
-        props: { url: "https://www.youtube.com/embed/tcgRbvChHPw" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Limits \"at\" infinity",
-        props: { url: "https://www.youtube.com/embed/yHtIxYKVKUs" }
+        props: { url: "" }
       },
       {
         id: 'LimitApproach',
@@ -94,7 +94,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Computing Limits at Infinity for Rational Functions",
-        props: { url: "https://www.youtube.com/embed/QkfT-VSy5t8" }
+        props: { url: "" }
       },
       {
         id: 'LimitApproach',
@@ -123,7 +123,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Infinite Limit vs Limits at Infinity of a Composite Function",
-        props: { url: "https://www.youtube.com/embed/1b6CrN5U6Mc" }
+        props: { url: "" }
       },
       ],
     },

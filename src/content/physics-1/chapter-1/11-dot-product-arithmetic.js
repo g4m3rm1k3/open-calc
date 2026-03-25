@@ -11,7 +11,7 @@ export default {
   },
   videos: [{
     title: 'Physics 1 – Vectors (13 of 21) Dot Product (Scalar Product) of Vectors: Component and Algebraic Form',
-    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/LbaT06YlJSA" frameborder="0" allowfullscreen></iframe>',
+    embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
     placement: 'intuition',
   }],
   intuition: {

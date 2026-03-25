@@ -58,37 +58,37 @@ export default {
     {
         id: 'VideoEmbed',
         title: "Volume of Solids with Cross Sections",
-        props: { url: "https://www.youtube.com/embed/pvRgJXjzeqQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Intro to Volumes of Solids Geometry vs Calculus",
-        props: { url: "https://www.youtube.com/embed/UazrA9buhxQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Area of a Surface of Revolution Calculus 1",
-        props: { url: "https://www.youtube.com/embed/1T5O_5TmSZs" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Volume of Solid of Revolution Shell Method Calculus 1 AB 3 Examples",
-        props: { url: "https://www.youtube.com/embed/wdr2Kx6tdd8" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Volumes of Solids with Known Cross Sections Calculus 1 AB 3 Examples",
-        props: { url: "https://www.youtube.com/embed/6-yKu-bsN7I" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Volume of Solid of Revolution Disk Method and Washer Method Calculus 1 AB (Read Description)",
-        props: { url: "https://www.youtube.com/embed/qzj17dEMkyg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Application of Definite Integration Volume & Rate of Flow Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/c79_AoQx08w" }
+        props: { url: "" }
       },
       {
         id: 'VolumesOfRevolution',

@@ -49,32 +49,32 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.4.3 The Second Fundamental Theorem of Calculus",
-        props: { url: "https://www.youtube.com/embed/ovAzNQs-GEE" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
-        props: { url: "https://www.youtube.com/embed/PqLgoyzgi40" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.4.1 The Fundamental Theorem of Calculus",
-        props: { url: "https://www.youtube.com/embed/yfi5HUf9154" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integrating Natural Logarithm Function Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/ZI34e6qOjic" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definite Integrals Common Geometric Area Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/_knXDFGctoc" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Fundamental Theorem of Calculus 1  |  Geometric Idea + Chain Rule Example",
-        props: { url: "https://www.youtube.com/embed/hAfpl8jLFOs" }
+        props: { url: "" }
       },
       {
         id: 'FTCLink',
@@ -112,7 +112,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Fundamental Theorem of Calculus II",
-        props: { url: "https://www.youtube.com/embed/sRDf3WozXHc" }
+        props: { url: "" }
       },],
   },
 

@@ -76,42 +76,42 @@ export default {
       {
         id: "VideoEmbed",
         title: "Calculus I - 2.6.2 Related Rates - Modeling with Triangles",
-        props: { url: "https://www.youtube.com/embed/EqVOHGAXnpY" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus I - 2.6.1 Related Rates - Modeling with Circles",
-        props: { url: "https://www.youtube.com/embed/2s7SOe3tSKI" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus Related Rates Example Volume of Cone Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/FoB4qIKQxZ0" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Related Rates Similar Triangles   4K",
-        props: { url: "https://www.youtube.com/embed/I5u0g7QCdMI" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Related Rates Right Triangles 2 Examples 4K",
-        props: { url: "https://www.youtube.com/embed/Z2yQYPPTU2M" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Related Rates Part 2 Linear vs Angular Speed Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/JBHQYQSdmJQ" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Related Rates Introduction Area & Volume 4K",
-        props: { url: "https://www.youtube.com/embed/DQ5T3ht5ahs" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Intro to Related Rates",
-        props: { url: "https://www.youtube.com/embed/3e27UqwPtMw" },
+        props: { url: "" },
       },
       {
         id: "Ch6_TwoTanks",

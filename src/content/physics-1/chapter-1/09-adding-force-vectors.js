@@ -11,7 +11,7 @@ export default {
   },
   videos: [{
     title: 'Physics 1 – Vectors (11 of 21) Adding Force Vectors Numerically',
-    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/LbaT06YlJSA" frameborder="0" allowfullscreen></iframe>',
+    embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
     placement: 'intuition',
   }],
   intuition: {

@@ -16,12 +16,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "TR-45: Polar Coordinates",
-        props: { url: "https://www.youtube.com/embed/KecTlKRK0HQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "TR-46: Polar Equations",
-        props: { url: "https://www.youtube.com/embed/B1z8pcyGkIQ" }
+        props: { url: "" }
       }
     ]
   },

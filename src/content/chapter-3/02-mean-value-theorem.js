@@ -54,27 +54,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.2.2 The Mean Value Theorem",
-        props: { url: "https://www.youtube.com/embed/dg4SuoKxk3g" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.2.1 Rolle's Theorem",
-        props: { url: "https://www.youtube.com/embed/xG7V6x8HSXg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Mean Value & Average Value Theorem of Integration Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/sSmuslvjuyQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Mean Value Theorem for Derivatives Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/q_-yujW7XDg" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The MEAN Value Theorem is Actually Very Nice",
-        props: { url: "https://www.youtube.com/embed/a2GpXyPWx68" }
+        props: { url: "" }
       },
       {
         id: 'MVTViz',

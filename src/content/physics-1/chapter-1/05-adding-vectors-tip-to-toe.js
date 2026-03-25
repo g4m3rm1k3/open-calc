@@ -20,7 +20,7 @@ export default {
   videos: [
     {
       title: 'Physics 1 – Vectors (6 of 21) Adding Vectors Graphically — Tip-to-Toe Method',
-      embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/_LrDgGhCTJU" frameborder="0" allowfullscreen></iframe>',
+      embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition',
     },
   ],

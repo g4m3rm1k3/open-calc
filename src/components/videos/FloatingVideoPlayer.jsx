@@ -4,7 +4,7 @@ import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, P
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
 import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
 import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
-import { CURRICULUM } from '../../content/index.js';
+import { CURRICULUM, ALL_LESSONS } from '../../content/index.js';
 
 export default function FloatingVideoPlayer() {
   const { 
@@ -83,10 +83,29 @@ export default function FloatingVideoPlayer() {
     );
   }, [searchQuery, customVideos]);
 
+  const getLessonInfo = (vidId) => {
+    const lessonId = Object.entries(VIDEO_PLACEMENT_MAP).find(([lId, sections]) => {
+      return Object.entries(sections).some(([sectionKey, content]) => {
+        if (sectionKey === 'examples') {
+          return Object.values(content).flat().includes(vidId);
+        }
+        return Array.isArray(content) && content.includes(vidId);
+      });
+    })?.[0];
+
+    if (!lessonId) return null;
+    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+    if (!lesson) return null;
+    return { id: lessonId, title: lesson.title, chapter: lesson.chapterNumber };
+  };
+
   const handleSearchSelect = (vid) => {
-    const targetLessonId = Object.entries(VIDEO_PLACEMENT_MAP).find(([lId, sections]) => Object.values(sections).flat().includes(vid.id))?.[0];
+    const info = getLessonInfo(vid.id);
     selectVideo(vid);
-    if (targetLessonId) { setLessonId(targetLessonId); setNavStack(['playlist']); }
+    if (info) { 
+      setLessonId(info.id); 
+      setNavStack(['playlist']); 
+    }
     setSearchQuery('');
   };
 
@@ -186,7 +205,14 @@ export default function FloatingVideoPlayer() {
                  ) : (
                    <button onClick={() => pushNav('courses')} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"><Compass size={16} /></button>
                  )}
-                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate flex-1">{currentView}</span>
+                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate flex-1">
+                    {currentView === 'playlist' && lessonId ? (
+                      (() => {
+                        const l = ALL_LESSONS.find(l => l.id === lessonId);
+                        return l ? `Ch ${l.chapterNumber} › ${l.title}` : 'Playlist';
+                      })()
+                    ) : currentView}
+                 </span>
               </div>
 
               <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
@@ -203,9 +229,18 @@ export default function FloatingVideoPlayer() {
               <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
                 {searchQuery ? (
                   <div className="space-y-1">
-                    {allFilteredVideos.map(vid => (
-                      <VideoRow key={vid.id} video={vid} active={vid.id === currentVideo?.id} onClick={() => handleSearchSelect(vid)} />
-                    ))}
+                    {allFilteredVideos.map(vid => {
+                      const lessonInfo = getLessonInfo(vid.id);
+                      return (
+                        <VideoRow 
+                          key={vid.id} 
+                          video={vid} 
+                          breadcrumb={lessonInfo ? `Ch ${lessonInfo.chapter} › ${lessonInfo.title}` : null}
+                          active={vid.id === currentVideo?.id} 
+                          onClick={() => handleSearchSelect(vid)} 
+                        />
+                      );
+                    })}
                   </div>
                 ) : (
                   <AnimatePresence mode="wait">
@@ -262,11 +297,17 @@ export default function FloatingVideoPlayer() {
   );
 }
 
-function VideoRow({ video, active, onClick }) {
+function VideoRow({ video, active, onClick, breadcrumb }) {
   return (
-    <button onClick={onClick} className={`w-full flex items-start gap-3 p-2 rounded-xl transition-all ${active ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 ring-1 ring-brand-200' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
+    <button onClick={onClick} className={`w-full flex items-start gap-3 p-2 rounded-xl transition-all ${active ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 ring-1 ring-brand-200 shadow-sm' : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
       <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${active ? 'bg-brand-100 dark:bg-brand-900 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{active ? <Play size={12} fill="currentColor" /> : <Video size={12} />}</div>
-      <div className="flex-1 text-left min-w-0"><p className="text-[11px] font-semibold leading-tight mb-0.5 truncate">{video.title}</p><p className="text-[8px] text-slate-400 uppercase">{video.source}</p></div>
+      <div className="flex-1 text-left min-w-0">
+        {breadcrumb && (
+          <p className="text-[8px] font-bold text-brand-500 uppercase tracking-wider mb-0.5 opacity-80">{breadcrumb}</p>
+        )}
+        <p className="text-[11px] font-semibold leading-tight mb-0.5 truncate">{video.title}</p>
+        <p className="text-[8px] text-slate-400 uppercase">{video.source}</p>
+      </div>
     </button>
   );
 }

@@ -54,72 +54,72 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.6.2 Curve Sketching Using Derivatives",
-        props: { url: "https://www.youtube.com/embed/uMdP-VTEC38" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.6.1 Curve Sketching Using Graph Attributes",
-        props: { url: "https://www.youtube.com/embed/F8aXjLq4nuA" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.4.2 The Second Derivative Test",
-        props: { url: "https://www.youtube.com/embed/q5DlN-7dppY" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.4.1 Intervals of Concavity and Points of Inflection",
-        props: { url: "https://www.youtube.com/embed/B9xZ8len2gQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.3.2 The First Derivative Test",
-        props: { url: "https://www.youtube.com/embed/ySpumpFbVlU" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.3.1 Increasing and Decreasing Functions",
-        props: { url: "https://www.youtube.com/embed/0JlO_zHCajM" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
-        props: { url: "https://www.youtube.com/embed/kjunIwj2sv0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
-        props: { url: "https://www.youtube.com/embed/BfJauiDEc_M" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 9: Higher order derivatives",
-        props: { url: "https://www.youtube.com/embed/blcC0sBnmUE" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definite Integral as a Function of X Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/0s4qX1wBuJw" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Summary of Curve Sketching Rational Exponent Odd Function Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/2W58muXRV6g" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Summary of Curve Sketching Rational Function with Slant Asymptote Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/pIUHXjIcRGI" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "First Derivative Test Intervals of Increasing Decreasing & Relative Extrema Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/PBKnttVMbV4" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Relative and Absolute Maximums and Minimums | Part I",
-        props: { url: "https://www.youtube.com/embed/wHDxo5hPA-k" }
+        props: { url: "" }
       },
       {
         id: 'CurveSketchingBoard',
@@ -162,7 +162,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Relative and Absolute Maximums and Minimums | Part II",
-        props: { url: "https://www.youtube.com/embed/Q1raJeFtF_U" }
+        props: { url: "" }
       },
       {
         id: 'NewtonsMethod',
@@ -189,7 +189,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Concavity and the 2nd Derivative Test",
-        props: { url: "https://www.youtube.com/embed/FAj9w06OhH0" }
+        props: { url: "" }
       },],
   },
 

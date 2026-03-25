@@ -46,22 +46,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Graphing Parabolas w/ vertex & intercepts',
-        props: { url: 'https://www.youtube.com/embed/eFZOnAcuVLM' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Parabola Applications Maximizing Minimizing Reflectors, etc',
-        props: { url: 'https://www.youtube.com/embed/ka2DpW7A9iQ' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Complex (imaginary) Numbers Part 1',
-        props: { url: 'https://www.youtube.com/embed/2LgMw_LgTe4' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Complex Solutions (imaginary) Part 2 of Parabola Quadratic Equation',
-        props: { url: 'https://www.youtube.com/embed/eliOsy3LzAs' },
+        props: { url: "" },
       },
     ],
   },

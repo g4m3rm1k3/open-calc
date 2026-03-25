@@ -72,54 +72,54 @@ export default {
       {
         id: "VideoEmbed",
         title: "Calculus I Final Exam Review",
-        props: { url: "https://www.youtube.com/embed/5Z7uZ4t_5dQ" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus I - 3.7.2 Optimization Practice",
-        props: { url: "https://www.youtube.com/embed/bwLD4nEPN_8" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus I - 3.7.1 Optimization",
-        props: { url: "https://www.youtube.com/embed/W6FYEfsShm0" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
-        props: { url: "https://www.youtube.com/embed/kjunIwj2sv0" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
-        props: { url: "https://www.youtube.com/embed/BfJauiDEc_M" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title:
           "Area Between 2 Curves Vertical and Horizontal Representative Rectangles Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/I3bxriE3XbM" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Optimization Cylinder in Sphere with Radius r",
-        props: { url: "https://www.youtube.com/embed/cdQ6BSUEtxY" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Optimization Calculus Problems Volume Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/_boUEAuCKsM" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title:
           "Optimization Calculus Problems Minimizing Lengths Calculus 1 AB READ DESCRIPTION",
-        props: { url: "https://www.youtube.com/embed/tDoW2euBcfk" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title: "Ex: Optimizing the Volume of a Box With  Fixed Surface Area",
-        props: { url: "https://www.youtube.com/embed/Hk5sXplIBqU" },
+        props: { url: "" },
       },
       {
         id: "Ch5_QuadraticShadow",
@@ -167,7 +167,7 @@ export default {
         id: "VideoEmbed",
         title:
           "Folding a wire into the largest rectangle | Optimization example",
-        props: { url: "https://www.youtube.com/embed/7lCm84AnfEw" },
+        props: { url: "" },
       },
     ],
   },
@@ -191,7 +191,7 @@ export default {
         id: "VideoEmbed",
         title:
           "Optimization Example: Minimizing Surface Area Given a Fixed Volume",
-        props: { url: "https://www.youtube.com/embed/6zqrFILyVbI" },
+        props: { url: "" },
       },
     ],
   },

@@ -28,13 +28,13 @@ export default {
     {
       title: 'Physics 1 – Vectors (3 of 21) Components and Magnitudes of a Vector',
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/f5Mj3_qjyg0" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition',
     },
     {
       title: 'Physics 1 – Vectors (4 of 21) Finding the Components of a Vector',
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/oFi6aUAxdMo" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'math',
     },
   ],

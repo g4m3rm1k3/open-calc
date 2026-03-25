@@ -52,7 +52,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Tips for Success in Flipped Classrooms + OMG BABY!!!",
-        props: { url: "https://www.youtube.com/embed/AlYlAUdvqic" }
+        props: { url: "" }
       },],
   },
 

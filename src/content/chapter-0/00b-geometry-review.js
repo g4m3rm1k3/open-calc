@@ -79,19 +79,19 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/4A9iNamXuZk",
+              url: "",
               title: "TR-09 — The Pythagorean Theorem",
             },
             {
-              url: "https://www.youtube.com/embed/0M2aTzmhjXM",
+              url: "",
               title: "TR-09Z — Proof of Pythagorean Theorem",
             },
             {
-              url: "https://www.youtube.com/embed/Cy90jWCrPfo",
+              url: "",
               title: "TR-11 — Distance in a Plane",
             },
             {
-              url: "https://www.youtube.com/embed/7br1PvhFedQ",
+              url: "",
               title: "TR-12 — Distance in Space",
             },
           ],
@@ -138,19 +138,19 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/AnJlHSVOXTk",
+              url: "",
               title: "Calc I 0.2 — Linear Models & Rates of Change",
             },
             {
-              url: "https://www.youtube.com/embed/Wmi1EysOHUQ",
+              url: "",
               title: "Equations of Lines",
             },
             {
-              url: "https://www.youtube.com/embed/5N3d1RdbADQ",
+              url: "",
               title: "Graphing Lines",
             },
             {
-              url: "https://www.youtube.com/embed/tYVWG8_inA4",
+              url: "",
               title: "Parallel & Perpendicular Lines",
             },
           ],
@@ -183,15 +183,15 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/mRqMtR1D4KE",
+              url: "",
               title: "TR-07 — Geometry Review of Triangles",
             },
             {
-              url: "https://www.youtube.com/embed/hfr2Sp8W1uU",
+              url: "",
               title: "TR-07Z — Thales' Theorem Proof",
             },
             {
-              url: "https://www.youtube.com/embed/lNd-ubyTkg4",
+              url: "",
               title: "TR-08 — Similar & Congruent Triangles",
             },
           ],

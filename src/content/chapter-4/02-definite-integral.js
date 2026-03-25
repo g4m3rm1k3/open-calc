@@ -59,57 +59,57 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.3.2 Evaluating Definite Integrals Without the FTC",
-        props: { url: "https://www.youtube.com/embed/yx0xTkdrYK8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.3.1 Riemann Sums and Definite Integrals Defined",
-        props: { url: "https://www.youtube.com/embed/8W3gEuaj_0s" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration involving Inverse Trig Functions",
-        props: { url: "https://www.youtube.com/embed/dcGZJojjM-o" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Base a Derivative & Integration (13 Examples)",
-        props: { url: "https://www.youtube.com/embed/XL1SNbJlCfY" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Review of Basic Integration Rules Calculus 1 AB - 6 Examples",
-        props: { url: "https://www.youtube.com/embed/prMmH2aRcKY" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration Involving Inverse Trigonometric Functions Calculus 1 AB 6 Examples",
-        props: { url: "https://www.youtube.com/embed/0aDW2wz0G7o" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definite Integration with U Substitution Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/qd3qmJ421Tk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Indefinite Integration by U Substitution Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/y_ZsPjUdols" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definite Integration & Displacement and Total Distance of Linear Motion Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/hQo4hvJbezc" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Antiderivative & Indefinite Integration 11 Examples Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/0rDbACz81A8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part III: Evaluating From The Definition",
-        props: { url: "https://www.youtube.com/embed/3FmnyO28XXw" }
+        props: { url: "" }
       },
       {
         id: 'SignedArea',
@@ -152,7 +152,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "\"Reverse\" Riemann Sums | Finding the Definite Integral Given a Sum",
-        props: { url: "https://www.youtube.com/embed/4vMJwKHMRx0" }
+        props: { url: "" }
       },],
   },
 

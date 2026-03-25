@@ -47,22 +47,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Transformation of Functions',
-        props: { url: 'https://www.youtube.com/embed/Ccq1aQDCfVE' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Piecewise Functions Evaluating & Graphing',
-        props: { url: 'https://www.youtube.com/embed/JrM8cCH3Ips' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Average Rate of Change',
-        props: { url: 'https://www.youtube.com/embed/Xk99AGZ1Vy8' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Difference Quotient',
-        props: { url: 'https://www.youtube.com/embed/1mlkc3Pfxu4' },
+        props: { url: "" },
       },
     ],
   },

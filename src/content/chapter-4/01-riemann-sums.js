@@ -54,62 +54,62 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.2.3 Find the Area Under a Curve Using the Limit Definition",
-        props: { url: "https://www.youtube.com/embed/m-6psP0zwzw" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.2.2 Approximating the Area Under a Curve",
-        props: { url: "https://www.youtube.com/embed/yaSOGR0xb90" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.2.1 Sigma Notation and Summation Formulas",
-        props: { url: "https://www.youtube.com/embed/hWZp1ld9184" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 8: What does area have to do with slope?",
-        props: { url: "https://www.youtube.com/embed/FnJqaIESC2s" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definite Integrals Defined w. Riemann Limit of Sums Example Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/TmYELyzIMxg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Riemann Sum Defined w/ 2 Limit of Sums Examples Calculus 1",
-        props: { url: "https://www.youtube.com/embed/F6XC5_qbXls" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Estimating Area with Rectangles & Riemann Limit of Sums Definition of Area Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/7FTtayaQKqY" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definition of Area Riemann Sum Limit of Sums Part 2 of 2 Calculus 1",
-        props: { url: "https://www.youtube.com/embed/DchlORZxHSU" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Estimating Area with Riemann Sums Finite Rectangles Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/KHECo7XsrOk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Riemann Sum and Definite Integral Introduction",
-        props: { url: "https://www.youtube.com/embed/9elpcdrdYtI" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Summation Notation (Sigma)",
-        props: { url: "https://www.youtube.com/embed/WVfiBnzM3vQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part I: Approximating Areas with rectangles",
-        props: { url: "https://www.youtube.com/embed/kS4DSZqH9Fk" }
+        props: { url: "" }
       },
       {
         id: 'RiemannSum',
@@ -147,7 +147,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "The Definite Integral Part II: Using Summation Notation to Define the Definite Integral",
-        props: { url: "https://www.youtube.com/embed/_q7Rx_Xa0ig" }
+        props: { url: "" }
       },],
   },
 

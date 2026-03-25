@@ -50,42 +50,42 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.5.1 Logarithmic and Exponential Functions: Derivatives and Integrals (Base not e)",
-        props: { url: "https://www.youtube.com/embed/j5Y8b-f9B28" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
-        props: { url: "https://www.youtube.com/embed/ZeG2pTnj06M" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.1.2 The Natural Logarithmic Function: Differentiation",
-        props: { url: "https://www.youtube.com/embed/A0fzikOCTi8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 4: What's so special about Euler's number e?",
-        props: { url: "https://www.youtube.com/embed/m2MIpDrF7Es" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative of Logarithms Base a Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/D6BL-HZiYCs" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative of Exponential Functions Base a Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/usc7MDoymgQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative of Natural Logarithm Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/gOLl4DoJsrU" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The derivative of e^x.",
-        props: { url: "https://www.youtube.com/embed/ZMP6xIdim24" }
+        props: { url: "" }
       },
       {
         id: 'ExpLogBridgeLab',
@@ -102,27 +102,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Logarithm Introduction',
-        props: { url: 'https://www.youtube.com/embed/UpUjJQGSlDY' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Using Properties of Logarithms to Expand Logs',
-        props: { url: 'https://www.youtube.com/embed/e4NAYp1EvzU' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Using Properties of Logarithms to Condense Logs',
-        props: { url: 'https://www.youtube.com/embed/EmYqoq0-1H0' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Change of Base Formula Logarithms',
-        props: { url: 'https://www.youtube.com/embed/-YdDWWokOqQ' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
-        props: { url: 'https://www.youtube.com/embed/Hm2DV0iruJk' },
+        props: { url: "" },
       },
     ],
   },
@@ -160,7 +160,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "The Derivative of ln(x) via Implicit Differentiation",
-        props: { url: "https://www.youtube.com/embed/DTOefLm7zfU" }
+        props: { url: "" }
       },
       {
         id: 'ExpLogBridgeLab',
@@ -223,7 +223,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Logarithmic Differentiation |  Example: x^sinx",
-        props: { url: "https://www.youtube.com/embed/VgurXuuIBbQ" }
+        props: { url: "" }
       },
       ],
     },

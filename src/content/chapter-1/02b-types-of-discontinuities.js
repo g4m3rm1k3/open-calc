@@ -72,17 +72,17 @@ export default {
     {
         id: 'VideoEmbed',
         title: "Arc Length of a Curve ( Smooth Curve ) Calculus 1 BC 5 Examples",
-        props: { url: "https://www.youtube.com/embed/ReewypjBiVQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Second Fundamental Theorem Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/Ku2d2dPGg2g" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "What is an infinite limit?",
-        props: { url: "https://www.youtube.com/embed/5hfHbOCeFoU" }
+        props: { url: "" }
       },
       {
         id: 'HoleVsValue',

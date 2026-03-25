@@ -31,6 +31,31 @@ function ensureArray(value) {
   return Array.isArray(value) ? [...value] : [];
 }
 
+/**
+ * Filter out legacy VideoEmbed and VideoCarousel objects from the content blocks.
+ * This is a safety measure to ensure only the Unified Player (Tutorial Hub) is used.
+ */
+function filterLegacyVideos(data) {
+  if (Array.isArray(data)) {
+    return data
+      .filter((item) => {
+        if (item && typeof item === 'object') {
+          const id = item.id || (item.props && item.props.id);
+          if (id === 'VideoEmbed' || id === 'VideoCarousel') return false;
+        }
+        return true;
+      })
+      .map(filterLegacyVideos);
+  } else if (data !== null && typeof data === 'object') {
+    const newData = {};
+    for (const key in data) {
+      newData[key] = filterLegacyVideos(data[key]);
+    }
+    return newData;
+  }
+  return data;
+}
+
 function ensureSection(section) {
   if (!section) return { prose: [], callouts: [] };
   return {
@@ -148,7 +173,7 @@ export function enhanceLessonForUnifiedLearning(lesson) {
 
   addConnectorCallouts(intuition, math, rigor, topicMessage);
 
-  return {
+  return filterLegacyVideos({
     ...lesson,
     hook,
     intuition,
@@ -159,5 +184,5 @@ export function enhanceLessonForUnifiedLearning(lesson) {
       ...missionPack,
       realWorldExample: missionPack.realWorldExample ?? topicMessage,
     },
-  };
+  });
 }

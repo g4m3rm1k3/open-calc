@@ -19,7 +19,7 @@ export default {
   videos: [
     {
       title: 'Physics 2 – Motion in One Dimension (1 of 22) Definition',
-      embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/ARzuEKUTx7Y" frameborder="0" allowfullscreen></iframe>',
+      embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition',
     },
   ],

@@ -59,22 +59,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus - 3.9.2 Propagated and Relative Error in Differentials",
-        props: { url: "https://www.youtube.com/embed/FuX0i5dGmzI" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus - 3.9.1 Tangent Line Approximation and Differentials",
-        props: { url: "https://www.youtube.com/embed/lUs7DlfTpgM" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Area Between Curves (8 Examples)",
-        props: { url: "https://www.youtube.com/embed/Y4Q0w812lh8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Linear Approximations | Using Tangent Lines to Approximate Functions",
-        props: { url: "https://www.youtube.com/embed/AorDyDOZNMA" }
+        props: { url: "" }
       },
       {
         id: 'LinearApproximation',

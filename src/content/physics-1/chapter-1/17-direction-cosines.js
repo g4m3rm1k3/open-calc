@@ -11,7 +11,7 @@ export default {
   },
   videos: [{
     title: 'Physics 1 – Vectors (19 of 21) Finding the Direction Cosine',
-    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/AKjmeZWy034" frameborder="0" allowfullscreen></iframe>',
+    embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
     placement: 'intuition',
   }],
   intuition: {

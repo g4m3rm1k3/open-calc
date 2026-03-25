@@ -75,7 +75,7 @@ export default {
         type: "viz",
         id: "VideoEmbed",
         title: "Calc I 0.0 — Review of Factoring",
-        props: { url: "https://www.youtube.com/embed/LmFz8H6FrD0" },
+        props: { url: "" },
       },
       {
         type: "viz",

@@ -20,7 +20,7 @@ export default {
       title:
         "Physics 2 – Motion in One Dimension (7 of 22) Definition of dx/dt",
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/R50pjSK4yZg" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: "intuition",
     },
   ],

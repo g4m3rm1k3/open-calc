@@ -59,22 +59,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I Final Exam Review",
-        props: { url: "https://www.youtube.com/embed/5Z7uZ4t_5dQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
-        props: { url: "https://www.youtube.com/embed/PqLgoyzgi40" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Hyperbolic Functions Derivative & Integrals 5 Examples Calculus 1",
-        props: { url: "https://www.youtube.com/embed/UWue-vI0Tk8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Average Value of a Continuous Function on an Interval",
-        props: { url: "https://www.youtube.com/embed/NKf2waIGl7I" }
+        props: { url: "" }
       },
       {
         id: 'AreaBetweenCurves',
@@ -134,7 +134,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Exam Walkthrough | Calc 1, Test 3 | Integration, FTC I/II, Optimization, u-subs, Graphing",
-        props: { url: "https://www.youtube.com/embed/6hacyAipdEA" }
+        props: { url: "" }
       },],
   },
 

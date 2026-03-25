@@ -20,7 +20,7 @@ export default {
   videos: [
     {
       title: 'Physics 1 – Vectors (5 of 21) Adding Vectors Graphically — Parallelogram Method',
-      embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/8kEy929zHgY" frameborder="0" allowfullscreen></iframe>',
+      embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition',
     },
   ],

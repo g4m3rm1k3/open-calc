@@ -55,32 +55,32 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.4.3 The Intermediate Value Theorem",
-        props: { url: "https://www.youtube.com/embed/U4ybtvvZKS0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.4.2 Properties of Continuity",
-        props: { url: "https://www.youtube.com/embed/3j3439F_yIY" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.4.1 Continuity",
-        props: { url: "https://www.youtube.com/embed/j8bdlwYNwe8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.2.2 Limits That Fail to Exist",
-        props: { url: "https://www.youtube.com/embed/HVHDuFSy7TQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Intermediate Value Theorem Calculus 1 AB PreCalculus",
-        props: { url: "https://www.youtube.com/embed/j3tPwgqS4ns" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Limits are simple for continuous functions",
-        props: { url: "https://www.youtube.com/embed/0S01H4S8djs" }
+        props: { url: "" }
       },
       {
         id: 'ContinuityRepairGame',
@@ -116,7 +116,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Example: When is a Piecewise Function Continuous?",
-        props: { url: "https://www.youtube.com/embed/nzYxGpnllHA" }
+        props: { url: "" }
       },
       ],
     },

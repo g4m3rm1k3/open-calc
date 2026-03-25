@@ -73,12 +73,12 @@ export default {
     {
         id: 'VideoEmbed',
         title: "Continuity On an Interval Open & Closed Intervals & 1 Sided Limits Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/v5XuzQdYeHg" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "CALCULUS SPEEDRUN || Limits || Episode 1",
-        props: { url: "https://www.youtube.com/embed/nVU9Lgq_nho" }
+        props: { url: "" }
       },
       ],
     },

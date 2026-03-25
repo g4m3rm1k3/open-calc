@@ -20,12 +20,12 @@ export default {
   videos: [
     {
       title: 'Physics 1 – Vectors (7 of 21) Adding Vectors Numerically: Example 1',
-      embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/WsV3Qx8KP08" frameborder="0" allowfullscreen></iframe>',
+      embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition',
     },
     {
       title: 'Physics 1 – Vectors (8 of 21) Adding Vectors Numerically: Example 2',
-      embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/Rai_yHeByk0" frameborder="0" allowfullscreen></iframe>',
+      embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'examples',
     },
   ],

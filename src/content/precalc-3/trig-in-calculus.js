@@ -43,27 +43,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Trigonometric Cofunctions',
-        props: { url: 'https://www.youtube.com/embed/ajOhvRHcry8' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Trig Expressions & Finding Trig Functions Given another Trig Ratio',
-        props: { url: 'https://www.youtube.com/embed/SvzAtriI_zo' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Trigonometric Functions of Any Angle',
-        props: { url: 'https://www.youtube.com/embed/cNjzynK5QqE' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Right Triangle Trigonometry Part 1: Finding Missing Sides',
-        props: { url: 'https://www.youtube.com/embed/pkjuVZUdcvo' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Right Triangle Trigonometry Part 2: Solving for Acute Angles',
-        props: { url: 'https://www.youtube.com/embed/VmtcrpTRUyI' },
+        props: { url: "" },
       },
       {
         id: 'ChainRuleCompositionViz',

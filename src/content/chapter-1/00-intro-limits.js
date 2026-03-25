@@ -86,162 +86,162 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.2.2 Limits That Fail to Exist",
-        props: { url: "https://www.youtube.com/embed/HVHDuFSy7TQ" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
-        props: { url: "https://www.youtube.com/embed/tQCtDc3D0Ls" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.1.1 A Preview of Calculus",
-        props: { url: "https://www.youtube.com/embed/2-eZ6wkZrh8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 6: Limits",
-        props: { url: "https://www.youtube.com/embed/kfF40MiS7zA" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 1: The Paradox of the Derivative",
-        props: { url: "https://www.youtube.com/embed/9vKqVkMQHKk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "L'Hopital's Rule Lesson Calculus 1 AB with 8 Examples",
-        props: { url: "https://www.youtube.com/embed/z1DQQE8iC9k" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Hyperbolic Functions Introduction 6 Ex Calculus 1 PLEASE READ DESCRIPTION",
-        props: { url: "https://www.youtube.com/embed/TEdED74yWPY" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Area  Against y Axis Riemman Limit of Sums Calculus 1",
-        props: { url: "https://www.youtube.com/embed/TF3MSpWs0rE" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Sigma Notation & Infinite Sums with Limits Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/yPK6pK4BJW8" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Even and Odd Functions Many Examples",
-        props: { url: "https://www.youtube.com/embed/WJvwUaRQdiY" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Horizontal Asymptotes of Irrational Functions",
-        props: { url: "https://www.youtube.com/embed/8aWFSNbl2Ho" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits at Infinity Rational, Irrational, and Trig Functions Calculus 1 AB READ DESCRIPTION",
-        props: { url: "https://www.youtube.com/embed/3ORqMWsAMk8" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative of Absolute Value Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/4j2ZLtGoiLE" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Higher Order Derivative Introduction Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/4uzZlXLbtvk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative Using Quotient Rule 3 Examples   4K",
-        props: { url: "https://www.youtube.com/embed/H3sVKCJnGko" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative Using Product Rule 3 Examples 4K",
-        props: { url: "https://www.youtube.com/embed/zE_rmL-mE08" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Finding Derivative with Definition of Derivative Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/z_cMiuEITbg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Curve Sketching with Limits Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/ykL41inivmI" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Infinite Limits & Vertical Asymptotes Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/C-4MKM4KXvg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits Involving Absolute Value Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/dyyFz6HlExE" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Evaluating a Limit Rationalizing the Numerator 4k",
-        props: { url: "https://www.youtube.com/embed/TXnvtZ7V6n0" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits of Piecewise Function Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/duGU_Imgiug" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits of Rational Functions 3 Examples 4k",
-        props: { url: "https://www.youtube.com/embed/XC9cBw2VsIw" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Properties of Limits Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/UnUiydqnhwM" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Why Limits are Important in Calculus",
-        props: { url: "https://www.youtube.com/embed/xFu7xdXFfBs" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Finding Real limits Graphical & Numerical Approach Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/IEfoQeWm8Fc" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Finding Limits with Properties includes Quotient Rule Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/-vFRc_2HCbQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits & Continuity",
-        props: { url: "https://www.youtube.com/embed/YFi5XzewhME" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/MNk7RnyU0mk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Function vs Limit Value 3 Examples Graphing Review 4k",
-        props: { url: "https://www.youtube.com/embed/FxEZZ-idun0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The Velocity Problem | Part II: Graphically",
-        props: { url: "https://www.youtube.com/embed/fzh-jmeDOvw" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The Velocity Problem | Part I: Numerically",
-        props: { url: "https://www.youtube.com/embed/LWPzHlSBlxI" }
+        props: { url: "" }
       },
         {
           id: 'LimitGeometric',
@@ -327,12 +327,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "A Tale of Three Functions | Intro to Limits Part II",
-        props: { url: "https://www.youtube.com/embed/PllF7oQg8Og" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "A Tale of Three Functions | Intro to Limits Part I",
-        props: { url: "https://www.youtube.com/embed/Qspc6uBMdEY" }
+        props: { url: "" }
       },
       {
         id: 'LimitApproach',
@@ -405,12 +405,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "A Limit Example Combining Multiple Algebraic Tricks",
-        props: { url: "https://www.youtube.com/embed/tWoYGRy8eQg" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Top 4 Algebraic Tricks for Computing Limits",
-        props: { url: "https://www.youtube.com/embed/zswMgrZqj4E" }
+        props: { url: "" }
       },
       {
         id: 'EpsilonDelta',

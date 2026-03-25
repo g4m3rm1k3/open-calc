@@ -51,7 +51,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.8.1 Inverse Trigonometric Functions: Integration",
-        props: { url: "https://www.youtube.com/embed/Fd7incsGR74" }
+        props: { url: "" }
       },
       {
         id: 'IntegrationMethodLab',

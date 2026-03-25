@@ -31,7 +31,7 @@ export default {
       { type: 'viz', id: 'PascalsTriangle', title: 'The Blueprint for Polynomials',
         caption: 'Drag the slider to build larger polynomials. Pay extremely close attention to the second block of the output. The coefficient is ALWAYS exactly the power $n$.',
       },
-      { type: 'viz', id: 'VideoEmbed', title: 'Binomial Theorem Introduction', props: { url: 'https://www.youtube.com/embed/G8dHmjgzVFM' } },
+      { type: 'viz', id: 'VideoEmbed', title: 'Binomial Theorem Introduction', props: { url: "" } },
     ],
   },
 

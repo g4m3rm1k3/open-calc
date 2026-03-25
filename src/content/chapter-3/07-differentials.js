@@ -55,47 +55,47 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus - 3.9.2 Propagated and Relative Error in Differentials",
-        props: { url: "https://www.youtube.com/embed/FuX0i5dGmzI" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Introduction to Separable Differential Equations (7 Examples)",
-        props: { url: "https://www.youtube.com/embed/5sbRTJtMqx4" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Homogeneous Differential Equations First Order3 Examples",
-        props: { url: "https://www.youtube.com/embed/SAdSMu3QNbo" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Solving First Order Linear Differential Equations 3 Examples",
-        props: { url: "https://www.youtube.com/embed/Y0Yd2gBCNv0" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "More Solving Separable Differential Equations Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/ylORzbeOH0E" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Separable Differential Equations & Growth and Decay Model Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/QNrS74TchSM" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Intro to Solving Separable Differential Equation Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/HTjPPDZqL4E" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Verifying Particular Solutions to Differential Equations Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/zDyriegHHmo" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Differentials Tangent Line Approximation Propagated Error Linearization",
-        props: { url: "https://www.youtube.com/embed/L3hY5QoZxFs" }
+        props: { url: "" }
       },
       { vizId: 'LinearApproximation', caption: 'Compare $\\Delta y$ (change along the curve) with $dy$ (change along the tangent line). For small $dx$, they are nearly equal.' },
     ],

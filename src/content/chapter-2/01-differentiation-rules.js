@@ -45,32 +45,32 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I -2.3.1 The Product and Quotient Rules for Derivatives",
-        props: { url: "https://www.youtube.com/embed/L66FBwEF8vc" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.2.2 Applying the Derivative to the Position Function",
-        props: { url: "https://www.youtube.com/embed/fZj7VhywNmE" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.2.1 Basic Differentiation Rules",
-        props: { url: "https://www.youtube.com/embed/Vx_81lSo6Pk" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 2: Derivative formulas through geometry",
-        props: { url: "https://www.youtube.com/embed/S0_qX4VJhMQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Logarithmic Differentiation Derivative of a Fraction",
-        props: { url: "https://www.youtube.com/embed/-DHel_4-NdE" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Derivative Rules:  Power Rule, Additivity, and Scalar Multiplication",
-        props: { url: "https://www.youtube.com/embed/0y9ZAS5_U68" }
+        props: { url: "" }
       },
       {
         id: 'DerivativeRuleArenaGame',
@@ -163,7 +163,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "How to Find the Equation of a Tangent Line",
-        props: { url: "https://www.youtube.com/embed/KL3oJjkFsqQ" }
+        props: { url: "" }
       },
       ],
     },

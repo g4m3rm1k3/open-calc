@@ -12,7 +12,7 @@ export const ch2_002 = {
   },
   videos: [{
     title: 'Physics 2 – Motion in One Dimension (2 of 22) Equations in Kinematics',
-    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/_HgRZNlI5-8" frameborder="0" allowfullscreen></iframe>',
+    embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
     placement: 'intuition',
   }],
   intuition: {

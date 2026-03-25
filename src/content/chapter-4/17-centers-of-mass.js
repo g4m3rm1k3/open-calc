@@ -61,7 +61,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "♥♥♥ Thank you Calc Students♥♥♥   Some final thoughts.",
-        props: { url: "https://www.youtube.com/embed/STVJ_-T_YDY" }
+        props: { url: "" }
       },
       {
         id: 'AreaAccumulator',

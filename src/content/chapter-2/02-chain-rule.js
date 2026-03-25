@@ -75,7 +75,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
-        props: { url: "https://www.youtube.com/embed/YG15m2VwSjA" }
+        props: { url: "" }
       },
       {
         id: "DeepProofSolver",
@@ -85,12 +85,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Chain Rule: the Derivative of a Composition",
-        props: { url: "https://www.youtube.com/embed/CPnrs2Yl-rY" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.4.1 The Chain Rule and General Power Rule",
-        props: { url: "https://www.youtube.com/embed/Ptz1fa8lLyg" }
+        props: { url: "" }
       },
             {
         id: "RecursiveProofStepper",
@@ -100,22 +100,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.4.2 Differentiation Strategies and Practice",
-        props: { url: "https://www.youtube.com/embed/IOOuXYCoQ4I" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Chain Rule with Trig Functions — Harder Examples",
-        props: { url: "https://www.youtube.com/embed/gLYNlCarAmU" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Chain Rule — Harder Algebraic Examples",
-        props: { url: "https://www.youtube.com/embed/MvQkDW7aHV0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Chain Rule — 3 Algebraic Examples",
-        props: { url: "https://www.youtube.com/embed/WygqeCwjn_s" }
+        props: { url: "" }
       },
       {
         id: 'ChainRuleAssemblerGame',
@@ -207,7 +207,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Interpreting the Chain Rule Graphically",
-        props: { url: "https://www.youtube.com/embed/o-6GzqChpJs" }
+        props: { url: "" }
       },
       {
         id: 'InterlockingGearsViz',
@@ -270,7 +270,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "The Chain Rule using Leibniz notation",
-        props: { url: "https://www.youtube.com/embed/NA-Ri4LJPaY" }
+        props: { url: "" }
       },
       {
         id: 'ChainRuleProofMapLab',

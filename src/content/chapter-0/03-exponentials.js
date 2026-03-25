@@ -54,7 +54,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.1.1 Review: Logarithmic and Exponential Functions",
-        props: { url: "https://www.youtube.com/embed/rFhfPzdo_2A" }
+        props: { url: "" }
       },
       {
         id: 'ExponentialGrowth',
@@ -72,12 +72,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Graphing Exponential Functions w/ t-table or Transformations',
-        props: { url: 'https://www.youtube.com/embed/C5jnasB2x5Y' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Solving Compound Interest Problems',
-        props: { url: 'https://www.youtube.com/embed/4EpI7UbQvUI' },
+        props: { url: "" },
       },
     ],
   },

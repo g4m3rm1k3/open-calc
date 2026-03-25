@@ -78,12 +78,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.4.3 The Intermediate Value Theorem",
-        props: { url: "https://www.youtube.com/embed/U4ybtvvZKS0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Were you ever exactly 3 feet tall? The Intermediate Value Theorem",
-        props: { url: "https://www.youtube.com/embed/n3G1L3yqPI0" }
+        props: { url: "" }
       },
       {
         id: 'ContinuityViz',

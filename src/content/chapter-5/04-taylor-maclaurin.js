@@ -57,7 +57,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Essence of Calculus, Chapter 10: Taylor series",
-        props: { url: "https://www.youtube.com/embed/3d6DsjIBzJ4" }
+        props: { url: "" }
       },
       {
         id: 'GraphMorph',

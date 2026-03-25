@@ -58,32 +58,32 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.7.2 Inverse Trigonometric Functions: Differentiation",
-        props: { url: "https://www.youtube.com/embed/xoBwEFKVHKE" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.3.2 Trigonometric and Higher-Order Derivatives",
-        props: { url: "https://www.youtube.com/embed/cHaZmLIyWjg" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Derivative Rules of Trigonometric Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/xVdArj43X4o" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Deriving Derivative Rules for Trigonometric Functions Tan, Cot, Sec, Csc Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/qJ-6EQiWA_w" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Derivative of Inverse Trigonometric Functions",
-        props: { url: "https://www.youtube.com/embed/SOYcqhFw5vo" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "The derivative of Trigonometric Functions",
-        props: { url: "https://www.youtube.com/embed/QDKj-E-ICPo" }
+        props: { url: "" }
       },
       {
         id: 'TrigDerivativeSync',
@@ -166,27 +166,27 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Setting up the Unit Circle Part 1 and Reference Angle',
-        props: { url: 'https://www.youtube.com/embed/j5SoWzBSUmY' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Fundamental Trigonometric Identities Intro & Proofs',
-        props: { url: 'https://www.youtube.com/embed/W6GbAtk08Vo' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Intro to Fundamental Trig Identities',
-        props: { url: 'https://www.youtube.com/embed/zHswnV-Na40' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Understanding Basic Sine & Cosine Graphs',
-        props: { url: 'https://www.youtube.com/embed/qQOKUIrcuRs' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Evaluating Trig Functions w/ Unit Circle Degrees & Radians',
-        props: { url: 'https://www.youtube.com/embed/NO4H4YROdqk' },
+        props: { url: "" },
       },
     ],
   },

@@ -54,52 +54,52 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
-        props: { url: "https://www.youtube.com/embed/ZeG2pTnj06M" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
-        props: { url: "https://www.youtube.com/embed/Bh1nhf4a04o" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.1.2 Initial Conditions and the Particular Solution to a Differential Equation",
-        props: { url: "https://www.youtube.com/embed/HHYVGhHiiu0" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 4.1.1 Antiderivatives and the General Solution to a Differential Equation",
-        props: { url: "https://www.youtube.com/embed/1e4KTBlQ-Yc" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration Techniques Reviewed (5 Examples)",
-        props: { url: "https://www.youtube.com/embed/7EGsIRyDh0Q" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration of Natural Exponential Functions Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/N0c83zV0CBg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration of Natural Exponential Function e^x (4 Examples)",
-        props: { url: "https://www.youtube.com/embed/j36ENn33NJ4" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Indefinite Integration Word Problems Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/gWAgwiY2_0c" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Initial Condition Particular Solution for Antiderivative Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/6h7Mt_XE7xc" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "What's an anti-derivative?",
-        props: { url: "https://www.youtube.com/embed/ksCcKnHNJPM" }
+        props: { url: "" }
       },
       {
         id: 'FunctionPlotter',
@@ -137,7 +137,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Solving for the constant in the general anti-derivative",
-        props: { url: "https://www.youtube.com/embed/0oOQOQSZMKk" }
+        props: { url: "" }
       },],
   },
 

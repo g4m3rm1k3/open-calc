@@ -56,19 +56,19 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/wwykal6Ms_g",
+              url: "",
               title: "Calc I — 0.4.1 Review of Trig Functions",
             },
             {
-              url: "https://www.youtube.com/embed/LvMScE93T6I",
+              url: "",
               title: "TR-13 — The Trigonometric Ratios",
             },
             {
-              url: "https://www.youtube.com/embed/oJgBJfstOOU",
+              url: "",
               title: "TR-14 — The Unit Circle",
             },
             {
-              url: "https://www.youtube.com/embed/4TFLcKKmfao",
+              url: "",
               title: "TR-15 — Common Angle Values",
             },
           ],
@@ -130,19 +130,19 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/dJ2dl9KQ-B0",
+              url: "",
               title: "Calc I — 0.4.3 Graphs of Trig Functions",
             },
             {
-              url: "https://www.youtube.com/embed/f99P31SAsek",
+              url: "",
               title: "TR-18 — Graphing Sine & Cosine",
             },
             {
-              url: "https://www.youtube.com/embed/p14y-9xPVgk",
+              url: "",
               title: "TR-19 — Graphing Tangent & Cotangent",
             },
             {
-              url: "https://www.youtube.com/embed/UZA34UL_mUE",
+              url: "",
               title: "TR-20 — Graphing Secant & Cosecant",
             },
           ],
@@ -222,15 +222,15 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/j5SoWzBSUmY",
+              url: "",
               title: "Unit Circle Part 1 — Reference Angles",
             },
             {
-              url: "https://www.youtube.com/embed/FaZ7frx8nd8",
+              url: "",
               title: "Unit Circle Part 2 — Exact Values",
             },
             {
-              url: "https://www.youtube.com/embed/LNBZ0bP4SHk",
+              url: "",
               title: "TR-33Z — All 6 Trig Functions on the Unit Circle",
             },
           ],
@@ -264,15 +264,15 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/W6GbAtk08Vo",
+              url: "",
               title: "Fundamental Trig Identities — Kim",
             },
             {
-              url: "https://www.youtube.com/embed/N-LP9O81yn4",
+              url: "",
               title: "TR-33 — Pythagorean Trig Identities",
             },
             {
-              url: "https://www.youtube.com/embed/B3JOQxj_MGs",
+              url: "",
               title: "TR-34 — Using Pythagorean Identities",
             },
           ],
@@ -305,19 +305,19 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/lw7UJRNJIzc",
+              url: "",
               title: "TR-38 — Angle Sum & Difference",
             },
             {
-              url: "https://www.youtube.com/embed/YHgjEac9nl4",
+              url: "",
               title: "Sum & Difference — Kim (5 examples)",
             },
             {
-              url: "https://www.youtube.com/embed/DCr6yqJfYiY",
+              url: "",
               title: "TR-40 — Double Angle Identities",
             },
             {
-              url: "https://www.youtube.com/embed/4FELR35CovM",
+              url: "",
               title: "Double & Half Angle — Kim (9 examples)",
             },
           ],
@@ -385,15 +385,15 @@ export default {
         props: {
           videos: [
             {
-              url: "https://www.youtube.com/embed/SSsu_24dss4",
+              url: "",
               title: "Calc I — 0.4.2 Solving Trig Equations",
             },
             {
-              url: "https://www.youtube.com/embed/OMOBHc7Ct_Y",
+              url: "",
               title: "Calc I — 5.7.1 Inverse Trig Functions",
             },
             {
-              url: "https://www.youtube.com/embed/NEoG0esRWFo",
+              url: "",
               title: "TR-21 — Domain & Range of Trig Functions",
             },
           ],

@@ -78,87 +78,87 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.1.2 The Derivative Using the Definition of a Derivative",
-        props: { url: "https://www.youtube.com/embed/tyoukQr2_ck" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 2.1.1 The Slope of the Tangent Line Using the Definition of Slope",
-        props: { url: "https://www.youtube.com/embed/foJyD3g8mLw" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Graphical Comparison Function to its 1st and 2nd Derivative Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/QpIBzZe3Tts" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Horizontal Tangent Lines and Differentiation Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/KFD7aei4bSg" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Tangent Line of Curve Parallel to A Line Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/5PZH6YdERVM" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Tangent Line Through Point not on Curve   4K",
-        props: { url: "https://www.youtube.com/embed/s_aPRYImcng" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Tangent Line Parallel to a Given Line Calculus Derivative 4K",
-        props: { url: "https://www.youtube.com/embed/P4aNHLfpPyQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Tangent Line and Normal Line in Calculus   4K",
-        props: { url: "https://www.youtube.com/embed/tQStuKWRkSs" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Instantaneous Velocity and Speed of Linear Motion Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/moAkbw2lGYc" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Basic Differentiation Rules Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/Jnqe2_jt8Ac" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Graphical Comparison of Function vs Derivative Graphs Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/vZ73BtywN3c" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Why there is no Derivative at a Sharp Bend 4k",
-        props: { url: "https://www.youtube.com/embed/jXRgZUQN1l8" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definition of Derivative and Vertical Tangent Line Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/GRPEi9WBo9k" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/MNk7RnyU0mk" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definition of a Derivative & Alternative Form at a Point 4k",
-        props: { url: "https://www.youtube.com/embed/_peU024gicM" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Definition of Derivative & Tangent Line Problems Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/eWxo7O506G8" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Definition of the Derivative  | Part I",
-        props: { url: "https://www.youtube.com/embed/hp046sLvQpM" }
+        props: { url: "" }
       },
       {
         id: 'SecantToTangent',
@@ -222,7 +222,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Applying the Definition of the Derivative to 1/x",
-        props: { url: "https://www.youtube.com/embed/JgVUjIt5Fa0" }
+        props: { url: "" }
       },
       {
         id: 'TangentLineConstructor',
@@ -271,12 +271,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "The derivative of a constant and of x^2  from the definition",
-        props: { url: "https://www.youtube.com/embed/cvP_t27nUMY" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Definition of Derivative Example: f(x) = x + 1/(x+1)",
-        props: { url: "https://www.youtube.com/embed/pi5VtjU0B3s" }
+        props: { url: "" }
       },
       {
         id: 'AbsoluteValueDiffViz',

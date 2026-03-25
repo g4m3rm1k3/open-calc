@@ -19,7 +19,7 @@ export default {
     {
       title: "Physics 2 – Motion in One Dimension (12 of 22) Free Fall: Basics",
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/JXphzQd_f9U" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: "intuition",
     },
   ],

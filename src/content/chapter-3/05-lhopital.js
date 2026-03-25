@@ -49,12 +49,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.6.1 Indeterminant Forms and L’Hopital’s Rule",
-        props: { url: "https://www.youtube.com/embed/nspCbwCFZaI" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Using L'Hopital's Rule to show that exponentials dominate polynomials",
-        props: { url: "https://www.youtube.com/embed/INoXqqmNRJQ" }
+        props: { url: "" }
       },
       {
         id: 'LHopitalViz',
@@ -89,7 +89,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Applying L'Hopital's Rule to Exponential Indeterminate Forms",
-        props: { url: "https://www.youtube.com/embed/jzhn9Xg5iAQ" }
+        props: { url: "" }
       },],
   },
 

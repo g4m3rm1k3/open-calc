@@ -56,22 +56,22 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 5.8.1 Inverse Trigonometric Functions: Integration",
-        props: { url: "https://www.youtube.com/embed/Fd7incsGR74" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Integration involving Inverse Trig Functions",
-        props: { url: "https://www.youtube.com/embed/dcGZJojjM-o" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Integration Involving Inverse Trigonometric Functions Calculus 1 AB 6 Examples",
-        props: { url: "https://www.youtube.com/embed/0aDW2wz0G7o" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Integration involving Natural Logarithm Function (5 Examples)",
-        props: { url: "https://www.youtube.com/embed/oxlpfPrK-Pg" }
+        props: { url: "" }
       },
       {
         id: 'IntegrationMethodLab',

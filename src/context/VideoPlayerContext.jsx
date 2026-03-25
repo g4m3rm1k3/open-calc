@@ -68,12 +68,13 @@ export function VideoPlayerProvider({ children }) {
     setIsMinimized(false);
   }, [lessonId]);
 
-  // Sync current video from map if just opening a lesson
+  // Sync current video from map when lessonId changes
   useEffect(() => {
-    if (lessonId && !currentVideo) {
+    if (lessonId) {
       const placement = VIDEO_PLACEMENT_MAP[lessonId];
       const custom = customVideos[lessonId] || [];
       
+      // If we have custom videos for this specific lesson, show them first
       if (custom.length > 0) {
         setCurrentVideo(custom[0]);
       } else if (placement) {
@@ -81,11 +82,17 @@ export function VideoPlayerProvider({ children }) {
         const firstSec = ['hook', 'intuition', 'math', 'rigor'].find(s => placement[s]?.length > 0);
         if (firstSec) {
           const vidId = placement[firstSec][0];
-          setCurrentVideo(VIDEO_DATABASE[vidId]);
+          const video = VIDEO_DATABASE[vidId];
+          if (video) {
+            setCurrentVideo(video);
+          }
         }
+      } else {
+        // If no videos for this lesson, reset current video so player doesn't show old lesson's video
+        setCurrentVideo(null);
       }
     }
-  }, [lessonId, currentVideo, customVideos]);
+  }, [lessonId, customVideos]);
 
   return (
     <VideoPlayerContext.Provider

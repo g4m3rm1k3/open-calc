@@ -69,13 +69,13 @@ export default {
       {
         id: "VideoEmbed",
         title: "Calculus I - 1.2.3 The Epsilon-Delta Limit Definition",
-        props: { url: "https://www.youtube.com/embed/x0Jx5IC-IRI" },
+        props: { url: "" },
       },
       {
         id: "VideoEmbed",
         title:
           "Definition of a Limit Epsilon Delta Proof 3 Examples Calculus 1",
-        props: { url: "https://www.youtube.com/embed/dHDhHtw5B-A" },
+        props: { url: "" },
       },
       {
         id: "EpsilonDelta",

@@ -11,7 +11,7 @@ export default {
   },
   videos: [{
     title: 'Physics 1 – Vectors (17 of 21) Product of Vectors: Cross Product: Vector Product — Determinant Form',
-    embedCode: '<iframe width="560" height="315" src="https://www.youtube.com/embed/C2nHuDNUW5o" frameborder="0" allowfullscreen></iframe>',
+    embedCode: '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
     placement: 'intuition',
   }],
   intuition: {

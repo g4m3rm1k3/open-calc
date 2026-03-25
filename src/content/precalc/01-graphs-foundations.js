@@ -47,32 +47,32 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Function vs Relation',
-        props: { url: 'https://www.youtube.com/embed/oFwRPH0JrFY' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Visually identifying key characteristics of graphs.',
-        props: { url: 'https://www.youtube.com/embed/GALfCd-2XRQ' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Identifying Domain and Range from a Graph',
-        props: { url: 'https://www.youtube.com/embed/1UAKQ_2yfxI' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Equations of Lines and Graphing',
-        props: { url: 'https://www.youtube.com/embed/Wmi1EysOHUQ' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Graphing Lines in Slope Intercept Form y=mx+b',
-        props: { url: 'https://www.youtube.com/embed/5N3d1RdbADQ' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Equation of Parallel & Perpendicular Lines given Point & Line',
-        props: { url: 'https://www.youtube.com/embed/tYVWG8_inA4' },
+        props: { url: "" },
       },
     ],
   },

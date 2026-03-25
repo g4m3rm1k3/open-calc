@@ -36,10 +36,10 @@ export default {
       },
     ],
     visualizations: [
-      { id: 'VideoEmbed', title: "Graphing Ellipses & Circles", props: { url: "https://www.youtube.com/embed/Ux8gEMccP9w" } },
-      { id: 'VideoEmbed', title: "Graphing Hyperbolas in Standard Form", props: { url: "https://www.youtube.com/embed/dn1o6lpu_Sk" } },
-      { id: 'VideoEmbed', title: "Graphing Parabolas in Standard Form", props: { url: "https://www.youtube.com/embed/icfex6aaWVk" } },
-      { id: 'VideoEmbed', title: "Finding Equations of Conics from Given Conditions", props: { url: "https://www.youtube.com/embed/aPo_Hakv36o" } },
+      { id: 'VideoEmbed', title: "Graphing Ellipses & Circles", props: { url: "" } },
+      { id: 'VideoEmbed', title: "Graphing Hyperbolas in Standard Form", props: { url: "" } },
+      { id: 'VideoEmbed', title: "Graphing Parabolas in Standard Form", props: { url: "" } },
+      { id: 'VideoEmbed', title: "Finding Equations of Conics from Given Conditions", props: { url: "" } },
     ],
   },
 
@@ -65,9 +65,9 @@ export default {
       },
     ],
     visualizations: [
-      { id: 'VideoEmbed', title: "Application of Ellipses", props: { url: "https://www.youtube.com/embed/1Ve7MTeniYs" } },
-      { id: 'VideoEmbed', title: "Application of Hyperbolas", props: { url: "https://www.youtube.com/embed/XACQ95mTll0" } },
-      { id: 'VideoEmbed', title: "Applications of Parabolas in Standard Form", props: { url: "https://www.youtube.com/embed/tZbrlvcd94E" } },
+      { id: 'VideoEmbed', title: "Application of Ellipses", props: { url: "" } },
+      { id: 'VideoEmbed', title: "Application of Hyperbolas", props: { url: "" } },
+      { id: 'VideoEmbed', title: "Applications of Parabolas in Standard Form", props: { url: "" } },
     ],
   },
 
@@ -79,7 +79,7 @@ export default {
     ],
     callouts: [],
     visualizations: [
-      { id: 'VideoEmbed', title: "Rotated Conic Section Identifying & Graphing 4 Examples", props: { url: "https://www.youtube.com/embed/hFtNJQIi--k" } },
+      { id: 'VideoEmbed', title: "Rotated Conic Section Identifying & Graphing 4 Examples", props: { url: "" } },
     ],
   },
 

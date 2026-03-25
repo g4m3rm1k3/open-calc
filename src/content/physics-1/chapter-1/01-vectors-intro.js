@@ -26,13 +26,13 @@ export default {
     {
       title: 'Physics 1 – Vectors (1 of 21) What Is A Vector?',
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/FkO6vyMqo8E" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'intuition', // render alongside the intuition section
     },
     {
       title: 'Physics 1 – Vectors (2 of 21) Vector Notation',
       embedCode:
-        '<iframe width="560" height="315" src="https://www.youtube.com/embed/iG-UyKjSaMI" frameborder="0" allowfullscreen></iframe>',
+        '<iframe width="560" height="315" src="" frameborder="0" allowfullscreen></iframe>',
       placement: 'math',
     },
   ],

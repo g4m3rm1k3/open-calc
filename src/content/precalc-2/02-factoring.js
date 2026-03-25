@@ -46,12 +46,12 @@ export default {
       {
         id: 'VideoEmbed',
         title: 'Factoring Overview',
-        props: { url: 'https://www.youtube.com/embed/rL2MCdPy1cA' },
+        props: { url: "" },
       },
       {
         id: 'VideoEmbed',
         title: 'Factoring Polynomials by Grouping',
-        props: { url: 'https://www.youtube.com/embed/9hSZEzBmG6M' },
+        props: { url: "" },
       },
     ],
   },

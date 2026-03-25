@@ -46,42 +46,42 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.3.2 Finding Limits of Indeterminant Form Functions",
-        props: { url: "https://www.youtube.com/embed/gaSwzp7qp5k" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.3.1 Properties of Limits",
-        props: { url: "https://www.youtube.com/embed/98gn6FBSHAk" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
-        props: { url: "https://www.youtube.com/embed/tQCtDc3D0Ls" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "First Fundamental Theorem of Calculus Calculus 1 AB",
-        props: { url: "https://www.youtube.com/embed/YWv5v8PppzU" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Squeeze Theorem for Sequences Sandwich Theorem Calculus 1",
-        props: { url: "https://www.youtube.com/embed/M1Yv1f8sAw0" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Limits of Trig Functions Special Ratios 3 Examples 4k",
-        props: { url: "https://www.youtube.com/embed/Q5WixlWNlTQ" }
+        props: { url: "" }
       },
     {
         id: 'VideoEmbed',
         title: "Why Limits are Important in Calculus",
-        props: { url: "https://www.youtube.com/embed/xFu7xdXFfBs" }
+        props: { url: "" }
       },
       {
         id: 'VideoEmbed',
         title: "Limit Laws | Breaking Up Complicated Limits Into Simpler Ones",
-        props: { url: "https://www.youtube.com/embed/dY5T7BcQ2Nc" }
+        props: { url: "" }
       },
       {
         id: 'LimitBridgeLab',
@@ -130,7 +130,7 @@ export default {
       {
         id: 'VideoEmbed',
         title: "Building up to computing limits of rational functions",
-        props: { url: "https://www.youtube.com/embed/XDcy_wqWQVs" }
+        props: { url: "" }
       },
       ],
     },
