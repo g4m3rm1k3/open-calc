@@ -369,4 +369,34 @@ export const VIDEO_PLACEMENT_MAP = {
   'vectors-2d': ['pre-6-3', 'pre-6-4'],
   'polar-coordinates-deep': ['pre-6-5'],
   'complex-polar-demoivre': ['pre-6-6'],
+
+  // Geometry 1 - Foundations
+  'geo-1-1': ['geo-3', 'geo-7', 'geo-11'],
+  'geo-1-2': ['geo-15', 'geo-219', 'geo-215'],
+  'geo-1-3': ['geo-19', 'geo-31', 'geo-51', 'geo-55'],
+
+  // Geometry 2 - Logic & Proofs
+  'geo-2-1': ['geo-35', 'geo-59', 'geo-63', 'geo-67'],
+  'geo-2-2': ['geo-79', 'geo-83', 'geo-147'],
+  'geo-2-3': ['geo-75', 'geo-151'],
+
+  // Geometry 3 - Triangles
+  'geo-3-1': ['geo-87', 'geo-91', 'geo-115', 'geo-119'],
+  'geo-3-2': ['geo-95', 'geo-99', 'geo-103', 'geo-135', 'geo-139'],
+  'geo-3-3': ['geo-107', 'geo-111'],
+
+  // Geometry 4 - Polygons
+  'geo-4-1': ['geo-163', 'geo-167', 'geo-227'],
+  'geo-4-2': ['geo-171', 'geo-183', 'geo-191'],
+  'geo-4-3': ['geo-175', 'geo-179', 'geo-187', 'geo-195'],
+
+  // Geometry 5 - Similarity & Right Triangles
+  'geo-5-1': ['geo-231', 'geo-235', 'geo-239', 'geo-243', 'geo-247', 'geo-251'],
+  'geo-5-2': ['geo-255', 'geo-259', 'geo-263', 'geo-267'],
+  'geo-5-3': ['geo-271', 'geo-275'],
+
+  // Geometry 6 - Area, Volume & Circles
+  'geo-6-1': ['geo-299', 'geo-303', 'geo-307', 'geo-311', 'geo-315', 'geo-319', 'geo-323', 'geo-327', 'geo-331', 'geo-335', 'geo-339', 'geo-343', 'geo-347', 'geo-351', 'geo-355'],
+  'geo-6-2': ['geo-359', 'geo-363', 'geo-455', 'geo-459', 'geo-463', 'geo-467', 'geo-471', 'geo-479', 'geo-483', 'geo-487', 'geo-491'],
+  'geo-6-3': ['geo-375', 'geo-379', 'geo-383', 'geo-387', 'geo-391', 'geo-395', 'geo-399', 'geo-403', 'geo-407', 'geo-411', 'geo-415', 'geo-419', 'geo-423', 'geo-427', 'geo-431', 'geo-435', 'geo-439', 'geo-443', 'geo-447', 'geo-451'],
 };
