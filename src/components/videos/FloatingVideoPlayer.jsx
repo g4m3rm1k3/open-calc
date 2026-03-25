@@ -8,6 +8,20 @@ import { CURRICULUM, ALL_LESSONS } from '../../content/index.js';
 
 import { useNavigate } from 'react-router-dom';
 
+const courseTitles = {
+  'precalc': 'Pre-Calculus',
+  'calc': 'Calculus',
+  'discrete': 'Discrete Math',
+  'physics-1': 'Physics',
+};
+
+const courseIcons = {
+  'precalc': '📐',
+  'calc': '∂',
+  'discrete': '∴',
+  'physics-1': '🚀',
+};
+
 export default function FloatingVideoPlayer() {
   const navigate = useNavigate();
   const dragControls = useDragControls();
@@ -32,6 +46,7 @@ export default function FloatingVideoPlayer() {
   
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
+  const [isLauncher, setIsLauncher] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({ 
     w: window.innerWidth, 
     h: window.innerHeight 
@@ -68,21 +83,32 @@ export default function FloatingVideoPlayer() {
 
   const currentLessonVideos = useMemo(() => getCategorizedVideos(lessonId), [lessonId, customVideos]);
 
-  const courseMetadata = {
-    'precalc': { title: 'Pre-Calculus', icon: '📐' },
-    'calc': { title: 'Calculus', icon: '∂' },
-    'discrete': { title: 'Discrete Math', icon: '∴' },
-    'physics-1': { title: 'Physics', icon: '🚀' },
-  };
-
   const dynamicCourses = useMemo(() => {
     const ids = Array.from(new Set(CURRICULUM.map(c => c.course)));
     return ids.map(id => ({
       id,
-      title: courseMetadata[id]?.title || id.charAt(0).toUpperCase() + id.slice(1),
-      icon: courseMetadata[id]?.icon || '📚'
-    }));
+      title: courseTitles[id] || id.charAt(0).toUpperCase() + id.slice(1),
+      icon: courseIcons[id] || '📚'
+    })).filter(course => {
+      // Only show courses that have at least one video in the registry
+      const courseChapters = CURRICULUM.filter(ch => ch.course === course.id);
+      return courseChapters.some(ch => 
+        ch.lessons.some(l => VIDEO_PLACEMENT_MAP[l.id])
+      );
+    });
   }, []);
+
+  // Sync to active course/lesson if open and nothing selected
+  useEffect(() => {
+    if (lessonId && navStack[navStack.length-1] === 'playlist' && !selectedCourse) {
+      const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+      const ch = CURRICULUM.find(c => c.number === lesson?.chapterNumber);
+      if (ch) {
+        setSelectedCourse(ch.course);
+        setSelectedChapter(ch);
+      }
+    }
+  }, [lessonId, navStack]);
 
   const pushNav = (view, data = {}) => {
     if (view === 'chapters') setSelectedCourse(data.courseId);
@@ -156,7 +182,19 @@ export default function FloatingVideoPlayer() {
     setIsAddingCustom(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    if (!isLauncher) return null;
+    return (
+      <motion.div 
+        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        onClick={() => { setIsLauncher(false); openPlayer(); }}
+        className="fixed bottom-10 right-10 z-[10000] w-14 h-14 bg-brand-500 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer hover:scale-110 transition-transform active:scale-95 group"
+      >
+         <Play size={24} fill="currentColor" />
+         <div className="absolute right-16 px-3 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl border border-slate-700">Open Tutorial Hub</div>
+      </motion.div>
+    );
+  }
 
   return (
     <>
@@ -230,13 +268,9 @@ export default function FloatingVideoPlayer() {
               <button onClick={toggleMinimize} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Minimize">
                 <Minus size={18} />
               </button>
-              <button 
-                onClick={closePlayer}
-                className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors"
-                title="Close"
-              >
-                <X size={18} />
-              </button>
+                <button onClick={() => { setIsLauncher(true); closePlayer(); }} className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors" title="Close Hub">
+                  <X size={18} />
+                </button>
             </div>
           </div>
 
@@ -276,11 +310,25 @@ export default function FloatingVideoPlayer() {
                   : `border-r h-full overflow-hidden ${sidebarOpen ? 'w-72' : 'w-0'}`
               }`}
             >
+              <div className="flex-shrink-0 px-3 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-wrap items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                 <button onClick={() => setNavStack(['courses'])} className="hover:text-brand-500 flex items-center transition-colors">LIBRARY</button>
+                 {selectedCourse && (
+                   <>
+                      <ChevronRight size={10} className="text-slate-600" />
+                      <button onClick={() => setNavStack(['courses', 'chapters'])} className="hover:text-brand-500 transition-colors uppercase">{selectedCourse}</button>
+                   </>
+                 )}
+                 {selectedChapter && navStack.includes('lessons') && (
+                   <>
+                      <ChevronRight size={10} className="text-slate-600" />
+                      <button onClick={() => setNavStack(['courses', 'chapters', 'lessons'])} className="hover:text-brand-500 transition-colors">CH {selectedChapter.number}</button>
+                   </>
+                 )}
+              </div>
+
               <div className="flex-shrink-0 px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2">
-                 {navStack.length > 1 ? (
+                 {navStack.length > 1 && (
                    <button onClick={popNav} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"><ChevronLeft size={16} /></button>
-                 ) : (
-                   <button onClick={() => pushNav('courses')} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500"><Compass size={16} /></button>
                  )}
                  <button 
                   onClick={() => {
@@ -292,9 +340,9 @@ export default function FloatingVideoPlayer() {
                     {currentView === 'playlist' && lessonId ? (
                       (() => {
                         const l = ALL_LESSONS.find(l => l.id === lessonId);
-                        return l ? `Ch ${l.chapterNumber} › ${l.title}` : 'Playlist';
+                        return l ? l.title : 'Playlist';
                       })()
-                    ) : currentView}
+                    ) : currentView === 'courses' ? 'Subjects' : currentView}
                  </button>
               </div>
 
@@ -329,89 +377,99 @@ export default function FloatingVideoPlayer() {
                 ) : (
                   <AnimatePresence mode="wait">
                     {currentView === 'playlist' && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="playlist">
-                        {/* Pinned Section */}
-                        {pinnedVideos.length > 0 && (
-                           <div className="mb-6">
-                              <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-2 flex items-center gap-2">
-                                <Plus size={10} className="rotate-45" /> Quick Access
-                              </p>
-                              <div className="space-y-1">
-                                {pinnedVideos.map(vidId => {
-                                   const vid = VIDEO_DATABASE[vidId];
-                                   if (!vid) return null;
-                                   return (
-                                     <VideoRow 
-                                       key={vidId} 
-                                       video={{ ...vid, id: vidId }} 
-                                       active={vidId === currentVideo?.id} 
-                                       onClick={() => handlePinnedSelect(vidId)} 
-                                       onPin={() => togglePin(vidId)}
-                                       isPinned={true}
-                                     />
-                                   );
-                                })}
-                              </div>
-                           </div>
-                        )}
-
-                        {/* Custom Video Form */}
-                        <div className="mb-6 px-2">
-                           <button 
-                             onClick={() => setIsAddingCustom(!isAddingCustom)}
-                             className="w-full py-2 px-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:text-brand-500 transition-all"
-                           >
-                              <span>{isAddingCustom ? 'Cancel' : 'Add Custom Tutorial'}</span>
-                              <Plus size={12} className={isAddingCustom ? 'rotate-45 transition-transform' : 'transition-transform'} />
-                           </button>
-                           
-                           {isAddingCustom && (
-                             <motion.form 
-                               initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                               onSubmit={handleCustomSubmit} className="mt-3 space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="playlist">
+                          {/* Custom Video Form */}
+                          <div className="mb-6 px-2">
+                             <button 
+                               onClick={() => setIsAddingCustom(!isAddingCustom)}
+                               className="w-full py-2 px-3 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 hover:text-brand-500 transition-all"
                              >
-                                <input 
-                                  type="text" placeholder="Tutorial Title..." value={customTitle} onChange={e => setCustomTitle(e.target.value)}
-                                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
-                                />
-                                <input 
-                                  type="text" placeholder="YouTube URL..." value={customUrl} onChange={e => setCustomUrl(e.target.value)}
-                                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
-                                />
-                                <button type="submit" className="w-full py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20">Save Tutorial</button>
-                             </motion.form>
-                           )}
-                        </div>
-
-                        {currentLessonVideos ? Object.entries(currentLessonVideos).map(([section, vids]) => (
-                          <div key={section} className="mb-4">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
-                            {vids.map(vid => (
-                               <VideoRow 
-                                 key={vid.id} 
-                                 video={vid} 
-                                 active={vid.id === currentVideo?.id} 
-                                 onClick={() => selectVideo(vid)} 
-                                 onPin={() => togglePin(vid.id)}
-                                 isPinned={pinnedVideos.includes(vid.id)}
-                               />
-                            ))}
+                                <span>{isAddingCustom ? 'Cancel' : 'Add Custom Tutorial'}</span>
+                                <Plus size={12} className={isAddingCustom ? 'rotate-45 transition-transform' : 'transition-transform'} />
+                             </button>
+                             
+                             {isAddingCustom && (
+                               <motion.form 
+                                 initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                                 onSubmit={handleCustomSubmit} className="mt-3 space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
+                               >
+                                  <input 
+                                    type="text" placeholder="Tutorial Title..." value={customTitle} onChange={e => setCustomTitle(e.target.value)}
+                                    className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                                  />
+                                  <input 
+                                    type="text" placeholder="YouTube URL..." value={customUrl} onChange={e => setCustomUrl(e.target.value)}
+                                    className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none"
+                                  />
+                                  <button type="submit" className="w-full py-2 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20">Save Tutorial</button>
+                               </motion.form>
+                             )}
                           </div>
-                        )) : <div className="text-center py-6 text-xs text-slate-500">Browse courses for topics.</div>}
-                         <button onClick={() => pushNav('courses')} className="w-full mt-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center justify-center gap-2 border border-dashed border-slate-300 rounded-lg"><Compass size={12} /> Explore More Courses</button>
-                      </motion.div>
-                    )}
-                    {currentView === 'courses' && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="courses" className="space-y-1">
-                         {dynamicCourses.map(course => (
-                           <button onClick={() => pushNav('chapters', { courseId: course.id })} key={course.id} className="w-full flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl">
-                             <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg">{course.icon}</div>
-                             <div className="text-left"><p className="text-xs font-bold text-slate-700 dark:text-slate-200">{course.title}</p></div>
-                             <ChevronRight size={14} className="ml-auto text-slate-300" />
-                           </button>
-                         ))}
-                      </motion.div>
-                    )}
+
+                          {currentLessonVideos ? Object.entries(currentLessonVideos).map(([section, vids]) => (
+                            <div key={section} className="mb-4">
+                              <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
+                              {vids.map(vid => (
+                                 <VideoRow 
+                                   key={vid.id} 
+                                   video={vid} 
+                                   active={vid.id === currentVideo?.id} 
+                                   onClick={() => selectVideo(vid)} 
+                                   onPin={() => togglePin(vid.id)}
+                                   isPinned={pinnedVideos.includes(vid.id)}
+                                 />
+                              ))}
+                            </div>
+                          )) : (
+                            <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+                              <Compass size={32} className="text-slate-300 mb-3" />
+                              <p className="text-xs text-slate-500 leading-relaxed font-medium">Select a lesson from the curriculum or browse subjects above to see tutorials.</p>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                      
+                      {currentView === 'courses' && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="courses" className="space-y-1 pb-10">
+                           {/* Quick Access Pinned Hub */}
+                           {pinnedVideos.length > 0 && (
+                             <div className="mb-8 p-1">
+                               <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500 px-2 mb-3 flex items-center gap-2">
+                                 <Plus size={10} className="rotate-45" /> Quick Access
+                               </p>
+                               <div className="space-y-1">
+                                 {pinnedVideos.map(vidId => {
+                                    const vid = VIDEO_DATABASE[vidId];
+                                    if (!vid) return null;
+                                    return (
+                                      <VideoRow 
+                                        key={vidId} 
+                                        video={{ ...vid, id: vidId }} 
+                                        active={vidId === currentVideo?.id} 
+                                        onClick={() => { handlePinnedSelect(vidId); setNavStack(['playlist']); }} 
+                                        onPin={() => togglePin(vidId)}
+                                        isPinned={true}
+                                      />
+                                    );
+                                 })}
+                               </div>
+                               <div className="mt-4 border-t border-slate-100 dark:border-slate-800/50 mx-2"></div>
+                             </div>
+                           )}
+
+                           <div className="px-2 mb-3">
+                             <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Available Subjects</p>
+                           </div>
+
+                           {dynamicCourses.map(course => (
+                             <button onClick={() => pushNav('chapters', { courseId: course.id })} key={course.id} className="w-full flex items-center gap-3 p-3 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all hover:translate-x-1 group">
+                               <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg shadow-sm group-hover:bg-brand-50 dark:group-hover:bg-brand-900 group-hover:text-brand-600 transition-colors">{course.icon}</div>
+                               <div className="text-left"><p className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-brand-500 transition-colors">{course.title}</p></div>
+                               <ChevronRight size={14} className="ml-auto text-slate-300 group-hover:text-brand-500 group-hover:translate-x-1 transition-all" />
+                             </button>
+                           ))}
+                        </motion.div>
+                      )}
                     {currentView === 'chapters' && (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="chapters" className="space-y-1">
                         {filteredChapters.map(ch => (
