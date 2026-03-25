@@ -139,6 +139,8 @@ Contributions are welcome — new lessons, new visualizations, bug fixes, and ma
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete guide including the content format, visualization API, dark mode requirements, and common pitfalls.
 
+For a full manual workflow (add lesson, add viz, register IDs, wire proof sync, tooltip/LaTeX gotchas, and GitHub visibility), use the Manual Build Playbook section in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 ## License

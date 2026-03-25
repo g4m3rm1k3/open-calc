@@ -217,6 +217,7 @@ const VIZ_REGISTRY = {
   InductionGrowthExplorer: lazy(
     () => import("./react/InductionGrowthExplorer.jsx"),
   ),
+  InductionStairCase: lazy(() => import("./react/InductionStairCase.jsx")),
   InductionAlgebraDecoderLab: lazy(
     () => import("./react/InductionAlgebraDecoderLab.jsx"),
   ),

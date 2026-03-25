@@ -295,3 +295,268 @@ Without `ResizeObserver`, a D3 visualization freezes at its initial size and bre
 - Follow the existing file organization and naming conventions.
 - Avoid unrelated refactors in feature PRs — one concern per PR.
 - Keep changes focused and reviewable.
+
+---
+
+## 6. Manual Build Playbook (End-to-End)
+
+This section is a practical, copyable checklist for contributors who want to manually build lessons and visualizations from scratch.
+
+Use this when you need to:
+
+- add a new lesson
+- add a new visualization
+- register a visualization
+- attach visualizations to lesson sections
+- enable tooltips in lesson prose
+- connect proof steps to a step-aware visualization
+- validate everything before opening a PR
+
+### Phase A — Before writing code
+
+1. Decide whether this is a content-only change, a visualization-only change, or both.
+2. Find the target lesson file and neighboring lessons to match tone and notation.
+3. Choose your visualization ID up front (example: `InductionStairCase`).
+4. Confirm the visualization does not already exist in `src/components/viz/VizFrame.jsx`.
+5. Decide where the visualization should appear:
+  - `hook.previewVisualizationId` (chapter card preview)
+  - `intuition.visualizations` (concept-first)
+  - `math.visualizations` (formalized intuition)
+  - `rigor.visualizationId` (proof-synced)
+  - `rigor.visualizations` (extra non-synced cards)
+
+### Phase B — Add a new lesson (or update one)
+
+1. Create or open a lesson file under the appropriate content folder.
+  - Discrete math lessons live in `src/content/discrete-math/`
+  - Calculus and other tracks use their own content folders
+2. Fill or update these major blocks in order:
+  - `id`, `slug`, `chapter`, `order`, `title`, `subtitle`
+  - `hook`
+  - `intuition`
+  - `math`
+  - `rigor`
+  - `examples`
+  - `challenges`
+3. Keep additions additive unless replacement is explicitly requested.
+4. Keep IDs unique across examples/challenges.
+
+### Phase C — Add a new visualization component
+
+1. Choose a location by tech:
+  - React: `src/components/viz/react/`
+  - D3: `src/components/viz/d3/`
+  - Three.js: `src/components/viz/three/`
+2. Create the component file with a default export.
+3. Accept `params = {}` so content can pass props.
+4. For proof-aware visuals, read `params.currentStep` to sync with `DynamicProof`.
+5. If D3-based, include responsive redraw logic and dark-mode-aware color tokens.
+
+### Phase D — Register visualization in the registry
+
+1. Open `src/components/viz/VizFrame.jsx`.
+2. Add a lazy registry entry in `VIZ_REGISTRY`:
+
+```javascript
+MyVizId: lazy(() => import("./react/MyVizId.jsx")),
+```
+
+3. Ensure the key string exactly matches the content-side visualization ID.
+
+### Phase E — Attach visualization to lesson content
+
+1. For a normal card in a section, add inside `visualizations`:
+
+```javascript
+{
+  id: 'MyVizId',
+  title: 'Card Title',
+  caption: 'Short caption',
+  mathBridge: 'Optional bridge text',
+  props: { guided: true }
+}
+```
+
+2. For proof-synced visuals, use in `rigor`:
+
+```javascript
+visualizationId: 'MyVizId',
+visualizationProps: {},
+proofSteps: [ ... ]
+```
+
+3. If you need extra visuals below the proof, keep them in `rigor.visualizations`.
+
+### Phase F — Add tooltips in lesson prose
+
+Use this exact HTML pattern inside prose strings:
+
+```javascript
+'A <span class="tooltip" data-tooltip="Definition text">term</span> is ...'
+```
+
+Important:
+
+1. Keep double quotes exactly as shown for parser compatibility.
+2. Tooltip rendering depends on both parser + CSS:
+  - Parser: `src/components/math/parseProse.jsx`
+  - Styles: `src/styles/index.css`
+3. Current fallback behavior also sets `title` and keyboard focus support.
+
+### Phase G — Add examples and challenges correctly
+
+1. Every example must have a unique `id`.
+2. Use `steps` with `expression` and `annotation`.
+3. Every challenge should include:
+  - `id`, `difficulty`, `problem`, `hint`, `walkthrough`, `answer`
+4. Keep challenge answer format consistent with nearby lessons.
+
+### Phase H — Build and verify
+
+Run:
+
+```bash
+npm run build
+```
+
+A successful build validates:
+
+1. lesson content is parseable
+2. search index generation succeeded
+3. visualization imports resolve
+4. no compile-time JSX/content errors
+
+Then verify in app:
+
+1. lesson appears in chapter flow
+2. visualization cards render in intended sections
+3. proof controls update proof-synced visualization
+4. tooltip text appears on hover/focus
+5. no duplicate visualization cards unless intentional
+
+### Phase I — Troubleshooting map
+
+If a visualization does not appear:
+
+1. ID mismatch between content and `VIZ_REGISTRY`
+2. component file path mismatch
+3. section not rendered due to wrong structure (`blocks` vs prose/callouts/visualizations)
+
+If tooltips do not appear:
+
+1. prose uses wrong span pattern (quote style/order mismatch)
+2. parser is missing tooltip branch in `parseProse`
+3. CSS `.tooltip` rules missing or overridden
+
+If proof visualization appears twice:
+
+1. same ID is in `rigor.visualizationId` and also duplicated in `rigor.visualizations` with same props
+
+If build fails after content edits:
+
+1. malformed object boundaries in lesson arrays
+2. unescaped backslashes in LaTeX strings
+3. duplicate keys in object literals
+
+### Phase J — Minimal add-only workflow (fast path)
+
+When asked to add without replacing, use this sequence:
+
+1. Add new visualization file
+2. Register in `VizFrame.jsx`
+3. Append one new item to target lesson `visualizations` array
+4. Add optional bridge prose/callout lines only (do not delete existing prose)
+5. Build and verify
+
+### Phase K — Handoff notes for manual contributors
+
+Before handing off your changes, include:
+
+1. files touched
+2. visualization IDs added
+3. lesson sections modified
+4. whether content was additive vs replacement
+5. build status and any remaining non-blocking warnings
+
+This keeps future contributors from redoing integration work or accidentally replacing existing lesson content.
+
+### Phase L — Make This Visible on GitHub
+
+If you want this guide to be easy for contributors to find on GitHub, do all three:
+
+1. Keep this file named exactly `CONTRIBUTING.md` at repo root.
+2. Keep a clear link in `README.md` to this guide.
+3. In pull requests, reference `CONTRIBUTING.md` when review comments involve lesson or visualization workflow.
+
+How GitHub surfaces this file:
+
+1. GitHub automatically recognizes root `CONTRIBUTING.md` as contribution instructions.
+2. Many GitHub views show a "Contributing" hint/link that points here.
+3. Contributors still discover it fastest when README also links directly.
+
+### Phase M — How to Modify This Guide Safely
+
+When updating this guide itself:
+
+1. Additive edits are preferred; avoid removing existing instructions unless they are wrong.
+2. Keep section headings stable (`Phase A`, `Phase B`, etc.) so external references do not break.
+3. Include concrete file paths and minimal copy-paste snippets.
+4. After doc edits, run `npm run build` to confirm no accidental code/content breakage happened in the same branch.
+5. In PR description, summarize doc deltas as:
+  - Added
+  - Clarified
+  - Deprecated
+
+### Phase N — LaTeX, Tooltip, and Content Edge Cases
+
+Use this checklist before merging content-heavy lessons.
+
+#### LaTeX in JS strings
+
+1. Escape backslashes in JS strings: `\\frac`, `\\sum`, `\\forall`.
+2. Keep `\left` and `\right` paired in the same expression string.
+3. Prefer plain ASCII in prose around LaTeX when possible to reduce parser surprises.
+4. If using apostrophes inside single-quoted JS strings, escape as `\'` or switch quoting strategy.
+
+#### parseProse behavior constraints
+
+1. Inline math: `$...$`
+2. Block math: `\\[ ... \\]`
+3. Tooltip span pattern must be exact:
+
+```html
+<span class="tooltip" data-tooltip="Definition">term</span>
+```
+
+4. Do not reorder attributes in tooltip spans unless parser is updated too.
+5. Tooltip fallback currently uses `title` and keyboard focus in addition to CSS hover.
+
+#### Unicode and typography
+
+1. Unicode math symbols (`∀`, `∈`, `⇒`, `≤`) are allowed in content strings.
+2. If a symbol causes rendering issues, switch to LaTeX equivalent inside math expressions.
+3. Keep wording consistent between prose and formula symbols.
+
+#### Proof sync gotchas
+
+1. `rigor.visualizationId` is the proof-synced visualization.
+2. Extra visuals should go in `rigor.visualizations`, not as duplicate `visualizationId` keys.
+3. If a proof-synced visualization appears twice, remove duplicate ID+props pair from extras.
+
+#### Content indexing gotchas
+
+1. Missing commas or object boundaries can break search-index generation with opaque parse errors.
+2. Keep `id` fields unique across lessons/examples/challenges.
+3. Prefer small, validated edits for long content arrays.
+
+### Phase O — GitHub Pages and Docs Surface (Project-Level)
+
+For repository maintainers:
+
+1. Keep GitHub Pages source as **GitHub Actions**.
+2. Ensure `README.md` includes links to:
+  - `CONTRIBUTING.md`
+  - any contributor playbook section anchors
+3. If creating additional docs (for example under `docs/`), keep `CONTRIBUTING.md` as canonical and link outward, not vice versa.
+
+This avoids split-brain documentation where instructions drift between multiple files.

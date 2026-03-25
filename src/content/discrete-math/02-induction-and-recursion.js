@@ -58,6 +58,13 @@ export default {
         caption: 'A second perspective: visualize induction as layered recursive growth from a base seed.',
         mathBridge: 'Complements domino induction by showing how each verified step supports a larger recursive structure.',
         props: { guided: true }
+      },
+      {
+        id: 'InductionStairCase',
+        title: 'Induction Staircase Explorer',
+        caption: 'Geometric proof perspective: duplicate and flip a staircase to see the rectangle argument for sums.',
+        mathBridge: 'Shows why 1 + 2 + ... + n = n(n+1)/2 through geometry and links directly to the inductive step.',
+        props: { guided: true }
       }
     ]
   },
