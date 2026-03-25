@@ -1,6 +1,6 @@
 // ch2-002-kinematic-equations.js
 export const ch2_002 = {
-  id: 'ch2-002', slug: 'kinematic-equations', chapter: 2, order: 2,
+  id: 'p1-ch2-002', slug: 'kinematic-equations', chapter: 2, order: 2,
   title: 'Kinematic Equations',
   subtitle: 'The five equations that solve every constant-acceleration problem.',
   tags: ['kinematic equations','SUVAT','constant acceleration','equations of motion'],

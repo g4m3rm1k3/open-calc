@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon } from 'lucide-react';
+import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical } from 'lucide-react';
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
 import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
 import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
@@ -291,7 +291,11 @@ export default function FloatingVideoPlayer() {
           {/* Header - now the ONLY draggable area - hides until hover if playing */}
           <div 
             onPointerDown={(e) => dragControls.start(e)}
-            className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none opacity-0 group-hover/player:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover/player:translate-y-0"
+            className={`flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none transition-all duration-500 transform ${
+              currentVideo 
+                ? 'opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0' 
+                : 'opacity-100 translate-y-0'
+            }`}
           >
             <div className="flex items-center gap-3 truncate">
               <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Video size={16} /></div>
@@ -359,10 +363,16 @@ export default function FloatingVideoPlayer() {
                       <button onClick={() => setNavStack(['courses', 'chapters'])} className="hover:text-brand-500 transition-colors uppercase">{selectedCourse}</button>
                    </>
                  )}
-                 {selectedChapter && navStack.includes('lessons') && (
+                 {selectedChapter && (navStack.includes('lessons') || navStack.includes('playlist')) && (
                    <>
                       <ChevronRight size={10} className="text-slate-600" />
                       <button onClick={() => setNavStack(['courses', 'chapters', 'lessons'])} className="hover:text-brand-500 transition-colors">CH {selectedChapter.number}</button>
+                   </>
+                 )}
+                 {navStack.includes('playlist') && (
+                   <>
+                      <ChevronRight size={10} className="text-slate-600" />
+                      <span className="text-brand-500">PLAYLIST</span>
                    </>
                  )}
               </div>
@@ -541,12 +551,11 @@ export default function FloatingVideoPlayer() {
           {!isMobile && (
             <div 
               onMouseDown={startResizing}
-              className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize z-[10001] flex items-center justify-center group-hover/player:opacity-100 opacity-20 transition-opacity"
+              className="absolute bottom-0 right-0 w-10 h-10 cursor-nwse-resize z-[10001] flex items-end justify-end p-1.5 group-hover/player:opacity-100 opacity-20 hover:opacity-100 transition-opacity"
             >
-               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 mb-1 ml-1" />
-               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-1 right-1" />
-               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-2.5 right-1" />
-               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-1 right-2.5" />
+               <div className="bg-slate-800/80 backdrop-blur-md rounded-tl-xl p-1 border-t border-l border-slate-700 shadow-xl group/handle hover:bg-brand-500 transition-colors">
+                 <GripVertical size={14} className="text-slate-400 group-hover/handle:text-white rotate-[135deg]" />
+               </div>
             </div>
           )}
         </motion.div>

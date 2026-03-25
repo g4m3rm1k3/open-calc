@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-017', slug: 'direction-cosines', chapter: 1, order: 17,
+  id: 'p1-ch1-017', slug: 'direction-cosines', chapter: 1, order: 17,
   title: 'Direction Cosines',
   subtitle: 'Three angles that uniquely specify any direction in 3D space.',
   tags: ['direction cosines', '3D direction', 'unit vector', 'alpha beta gamma'],

@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-005',
+  id: 'p1-ch1-005',
   slug: 'adding-vectors-graphically-tip-to-toe',
   chapter: 1,
   order: 5,

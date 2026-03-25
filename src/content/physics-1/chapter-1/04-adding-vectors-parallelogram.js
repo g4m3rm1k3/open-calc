@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-004',
+  id: 'p1-ch1-004',
   slug: 'adding-vectors-graphically-parallelogram',
   chapter: 1,
   order: 4,

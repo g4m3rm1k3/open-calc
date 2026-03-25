@@ -594,14 +594,24 @@ Use this checklist before merging content-heavy lessons.
 The Tutorial Hub uses a two-tier registry to decouple video metadata from lesson content.
 
 1. **Register the video:** Add the video metadata to `src/content/videos/videoDatabase.js`.
+   > [!IMPORTANT]
+   > Use a descriptive prefix to ensure ID uniqueness and distinguish between different content providers. This prevents namespace collisions as the database grows.
+   
+   **Standard Prefixes:**
+   - `ka-` : Khan Academy (e.g., `ka-EKvHQc3QEow`)
+   - `vb-` : Michel van Biezen Physics (e.g., `vb-vectors-1`)
+   - `3b1b-` : 3Blue1Brown Essence of Calculus
+   - `prof-leonard-` : Professor Leonard
+   - `oct-` : The Organic Chemistry Tutor
+
    ```javascript
-   'my-video-id': { 
-     title: 'Video Title', 
-     url: 'https://www.youtube.com/embed/VIDEO_ID', 
-     source: 'Channel Name' 
+   'ka-EKvHQc3QEow': { 
+     title: 'Newton, Leibniz, and Usain Bolt', 
+     url: 'https://www.youtube.com/embed/EKvHQc3QEow', 
+     source: 'Khan Academy' 
    },
    ```
-2. **Map to a lesson:** Link the video ID to a lesson ID in `src/content/videos/videoPlacementMap.js`.
+2. **Map to a lesson:** Link the video ID to a lesson ID in `src/content/videos/videoPlacementMap.js`. Ensure you are using the correct lesson ID prefix (`p1-` for Physics).
    ```javascript
    'ch1-001': { 
      intuition: ['my-video-id'],

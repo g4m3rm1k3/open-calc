@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-016', slug: 'cross-product-applications', chapter: 1, order: 16,
+  id: 'p1-ch1-016', slug: 'cross-product-applications', chapter: 1, order: 16,
   title: 'Cross Product — Applications: Area and Torque',
   subtitle: 'Find the area of a parallelogram and the torque vector in physics.',
   tags: ['cross product', 'vector product', 'area', 'torque', 'application'],

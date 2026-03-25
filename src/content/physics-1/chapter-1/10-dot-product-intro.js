@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-010', slug: 'dot-product-intro', chapter: 1, order: 10,
+  id: 'p1-ch1-010', slug: 'dot-product-intro', chapter: 1, order: 10,
   title: 'Dot Product — Scalar Product',
   subtitle: 'Multiply two vectors and get a single number that measures their alignment.',
   tags: ['dot product', 'scalar product', 'vector multiplication', 'projection'],

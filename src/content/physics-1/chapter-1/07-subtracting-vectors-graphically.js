@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-007',
+  id: 'p1-ch1-007',
   slug: 'subtracting-vectors-graphically',
   chapter: 1,
   order: 7,

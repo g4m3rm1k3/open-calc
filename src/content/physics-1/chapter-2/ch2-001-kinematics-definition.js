@@ -1,5 +1,5 @@
 export default {
-  id: 'ch2-001',
+  id: 'p1-ch2-001',
   slug: 'kinematics-definition',
   chapter: 2,
   order: 1,

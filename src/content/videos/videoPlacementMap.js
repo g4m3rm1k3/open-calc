@@ -4,13 +4,13 @@
  */
 export const VIDEO_PLACEMENT_MAP = {
   'ch0-inequalities': {
-    intuition: ["polynomial-inequalities","rational-inequalities"],
+    intuition: ["oct-polynomial-inequalities","oct-rational-inequalities"],
   },
   'ch0-conic-sections': {
     intuition: ["graphing-ellipses-circles","graphing-hyperbolas-in-standard-form","graphing-parabolas-in-standard-form","finding-equations-of-conics-from-given-conditions","application-of-ellipses","application-of-hyperbolas","applications-of-parabolas-in-standard-form","rotated-conic-section-identifying-graphing-4-examples"],
   },
   'ch0-functions': {
-    intuition: ["even-odd-functions","function-composition","graph-transformations","piecewise-functions"],
+    intuition: ["oct-even-odd-functions-examples","oct-function-composition","graph-transformations","oct-piecewise-functions-intro"],
   },
   'ch0-algebraic-techniques': {
     intuition: ["calc-i-0-0-review-of-factoring"],
@@ -25,7 +25,7 @@ export const VIDEO_PLACEMENT_MAP = {
     intuition: ["tips-for-success-in-flipped-classrooms-omg-baby"],
   },
   'ch1-limits-intro': {
-    intuition: ["calculus-i-1-2-2-limits-that-fail-to-exist","calculus-i-1-2-1-finding-limits-numerically-and-graphically","calculus-i-1-1-1-a-preview-of-calculus","essence-of-calculus-chapter-6-limits","essence-of-calculus-chapter-1-the-paradox-of-the-derivative","hyperbolic-functions-introduction-6-ex-calculus-1-please-read-description","area-against-y-axis-riemman-limit-of-sums-calculus-1","sigma-notation-infinite-sums-with-limits-calculus-1-ab","even-and-odd-functions-many-examples","horizontal-asymptotes-of-irrational-functions","limits-at-infinity-rational-irrational-and-trig-functions-calculus-1-ab-read-description","derivative-of-absolute-value-functions-calculus-1-ab","higher-order-derivative-introduction-calculus-1-ab","derivative-using-quotient-rule-3-examples-4k","derivative-using-product-rule-3-examples-4k","finding-derivative-with-definition-of-derivative-calculus-1-ab","curve-sketching-with-limits-calculus-1-ab","infinite-limits-vertical-asymptotes-calculus-1-ab","limits-involving-absolute-value-functions-calculus-1-ab","evaluating-a-limit-rationalizing-the-numerator-4k","limits-of-piecewise-function-calculus-1-ab","limits-of-rational-functions-3-examples-4k","properties-of-limits-calculus-1-ab","why-limits-are-important-in-calculus","finding-real-limits-graphical-numerical-approach-calculus-1-ab","finding-limits-with-properties-includes-quotient-rule-calculus-1-ab","limits-continuity","slope-of-tangent-line-derivative-at-a-point-calculus-1-ab","function-vs-limit-value-3-examples-graphing-review-4k","the-velocity-problem-part-ii-graphically","the-velocity-problem-part-i-numerically","a-tale-of-three-functions-intro-to-limits-part-ii","a-tale-of-three-functions-intro-to-limits-part-i","a-limit-example-combining-multiple-algebraic-tricks","top-4-algebraic-tricks-for-computing-limits"],
+    intuition: ["ka-EKvHQc3QEow","ka-riXcZT2ICjA","ka-W0VWO4asgmk","calculus-i-1-2-2-limits-that-fail-to-exist","calculus-i-1-2-1-finding-limits-numerically-and-graphically","calculus-i-1-1-1-a-preview-of-calculus","essence-of-calculus-chapter-6-limits","essence-of-calculus-chapter-1-the-paradox-of-the-derivative","hyperbolic-functions-introduction-6-ex-calculus-1-please-read-description","area-against-y-axis-riemman-limit-of-sums-calculus-1","sigma-notation-infinite-sums-with-limits-calculus-1-ab","oct-even-odd-functions-examples","horizontal-asymptotes-of-irrational-functions","limits-at-infinity-rational-irrational-and-trig-functions-calculus-1-ab-read-description","derivative-of-absolute-value-functions-calculus-1-ab","higher-order-derivative-introduction-calculus-1-ab","derivative-using-quotient-rule-3-examples-4k","derivative-using-product-rule-3-examples-4k","finding-derivative-with-definition-of-derivative-calculus-1-ab","curve-sketching-with-limits-calculus-1-ab","infinite-limits-vertical-asymptotes-calculus-1-ab","limits-involving-absolute-value-functions-calculus-1-ab","evaluating-a-limit-rationalizing-the-numerator-4k","limits-of-piecewise-function-calculus-1-ab","limits-of-rational-functions-3-examples-4k","properties-of-limits-calculus-1-ab","why-limits-are-important-in-calculus","finding-real-limits-graphical-numerical-approach-calculus-1-ab","finding-limits-with-properties-includes-quotient-rule-calculus-1-ab","limits-continuity","slope-of-tangent-line-derivative-at-a-point-calculus-1-ab","function-vs-limit-value-3-examples-graphing-review-4k","the-velocity-problem-part-ii-graphically","the-velocity-problem-part-i-numerically","a-tale-of-three-functions-intro-to-limits-part-ii","a-tale-of-three-functions-intro-to-limits-part-i","a-limit-example-combining-multiple-algebraic-tricks","top-4-algebraic-tricks-for-computing-limits"],
   },
   'ch1-limit-laws': {
     intuition: ["calculus-i-1-3-2-finding-limits-of-indeterminant-form-functions","calculus-i-1-3-1-properties-of-limits","calculus-i-1-2-1-finding-limits-numerically-and-graphically","first-fundamental-theorem-of-calculus-calculus-1-ab","squeeze-theorem-for-sequences-sandwich-theorem-calculus-1","limits-of-trig-functions-special-ratios-3-examples-4k","why-limits-are-important-in-calculus","limit-laws-breaking-up-complicated-limits-into-simpler-ones","building-up-to-computing-limits-of-rational-functions"],
@@ -40,10 +40,10 @@ export const VIDEO_PLACEMENT_MAP = {
     intuition: ["arc-length-of-a-curve-smooth-curve-calculus-1-bc-5-examples","second-fundamental-theorem-calculus-1-ab","what-is-an-infinite-limit"],
   },
   'ch1-epsilon-delta': {
-    intuition: ["calculus-i-1-2-3-the-epsilon-delta-limit-definition","definition-of-a-limit-epsilon-delta-proof-3-examples-calculus-1"],
+    intuition: ["ka--ejyeII0i5c","ka-Fdu5-aNJTzU","calculus-i-1-2-3-the-epsilon-delta-limit-definition","definition-of-a-limit-epsilon-delta-proof-3-examples-calculus-1"],
   },
   'ch1-squeeze-theorem': {
-    intuition: ["limits-of-oscillating-functions-and-the-squeeze-theorem"],
+    intuition: ["ka-igJdDN-DPgA","ka-Ve99biD1KtA","limits-of-oscillating-functions-and-the-squeeze-theorem"],
   },
   'ch1-fundamental-trig-limits': {
     intuition: ["the-most-important-limit-in-calculus-geometric-proof-applications"],
@@ -58,10 +58,10 @@ export const VIDEO_PLACEMENT_MAP = {
     intuition: ["calculus-i-2-1-2-the-derivative-using-the-definition-of-a-derivative","calculus-i-2-1-1-the-slope-of-the-tangent-line-using-the-definition-of-slope","graphical-comparison-function-to-its-1st-and-2nd-derivative-calculus-1-ab","horizontal-tangent-lines-and-differentiation-calculus-1-ab","tangent-line-of-curve-parallel-to-a-line-calculus-1-ab","tangent-line-through-point-not-on-curve-4k","tangent-line-parallel-to-a-given-line-calculus-derivative-4k","tangent-line-and-normal-line-in-calculus-4k","instantaneous-velocity-and-speed-of-linear-motion-calculus-1-ab","basic-differentiation-rules-calculus-1-ab","graphical-comparison-of-function-vs-derivative-graphs-calculus-1-ab","why-there-is-no-derivative-at-a-sharp-bend-4k","definition-of-derivative-and-vertical-tangent-line-calculus-1-ab","slope-of-tangent-line-derivative-at-a-point-calculus-1-ab","definition-of-a-derivative-alternative-form-at-a-point-4k","definition-of-derivative-tangent-line-problems-calculus-1-ab","definition-of-the-derivative-part-i","applying-the-definition-of-the-derivative-to-1-x","the-derivative-of-a-constant-and-of-x-2-from-the-definition","definition-of-derivative-example-f-x-x-1-x-1"],
   },
   'ch2-001': {
-    intuition: ["calculus-i-2-3-1-the-product-and-quotient-rules-for-derivatives","calculus-i-2-2-2-applying-the-derivative-to-the-position-function","calculus-i-2-2-1-basic-differentiation-rules","essence-of-calculus-chapter-2-derivative-formulas-through-geometry","logarithmic-differentiation-derivative-of-a-fraction","derivative-rules-power-rule-additivity-and-scalar-multiplication","how-to-find-the-equation-of-a-tangent-line"],
+    intuition: ["ka-h78GdGiRmpM","ka-E_1gEtiGPNI","ka-dZnc3PtNaN4","calculus-i-2-3-1-the-product-and-quotient-rules-for-derivatives","calculus-i-2-2-2-applying-the-derivative-to-the-position-function","calculus-i-2-2-1-basic-differentiation-rules","essence-of-calculus-chapter-2-derivative-formulas-through-geometry","logarithmic-differentiation-derivative-of-a-fraction","derivative-rules-power-rule-additivity-and-scalar-multiplication","how-to-find-the-equation-of-a-tangent-line"],
   },
   'ch2-002': {
-    intuition: ["essence-of-calculus-chapter-3-visualizing-the-chain-rule-and-product-rule","chain-rule-the-derivative-of-a-composition","calculus-i-2-4-1-the-chain-rule-and-general-power-rule","calculus-i-2-4-2-differentiation-strategies-and-practice","chain-rule-with-trig-functions-harder-examples","chain-rule-harder-algebraic-examples","chain-rule-3-algebraic-examples","interpreting-the-chain-rule-graphically","the-chain-rule-using-leibniz-notation"],
+    intuition: ["ka-XIQ-KnsAsbg","ka-6_lmiPDedsY","essence-of-calculus-chapter-3-visualizing-the-chain-rule-and-product-rule","chain-rule-the-derivative-of-a-composition","calculus-i-2-4-1-the-chain-rule-and-general-power-rule","calculus-i-2-4-2-differentiation-strategies-and-practice","chain-rule-with-trig-functions-harder-examples","chain-rule-harder-algebraic-examples","chain-rule-3-algebraic-examples","interpreting-the-chain-rule-graphically","the-chain-rule-using-leibniz-notation"],
   },
   'ch2-002b': {
     intuition: ["calculus-i-5-3-2-the-derivative-of-the-inverse-of-a-function","derivative-of-inverse-function","derivative-of-inverse-trigonometric-functions-examples-calculus-1-ab","derivative-rules-for-inverse-trigonometric-functions-derived-calculus-1-ab","derivative-of-inverse-trig-functions-via-implicit-differentiation","evaluating-inverse-trigonometric-functions","evaluating-inverse-trigonometric-functions-full-length"],
@@ -73,7 +73,7 @@ export const VIDEO_PLACEMENT_MAP = {
     intuition: ["calculus-i-5-5-1-logarithmic-and-exponential-functions-derivatives-and-integrals-base-not-e","calculus-i-5-4-1-derivatives-and-integrals-of-the-natural-exponential-function","calculus-i-5-1-2-the-natural-logarithmic-function-differentiation","derivative-of-logarithms-base-a-calculus-1-ab","derivative-of-exponential-functions-base-a-calculus-1-ab","derivative-of-natural-logarithm-functions-calculus-1-ab","the-derivative-of-e-x","logarithm-introduction","using-properties-of-logarithms-to-expand-logs","using-properties-of-logarithms-to-condense-logs","change-of-base-formula-logarithms","solving-natural-exponential-functions-3-examples-with-natural-logarithms","the-derivative-of-ln-x-via-implicit-differentiation","logarithmic-differentiation-example-x-sinx"],
   },
   'ch2-005': {
-    intuition: ["calculus-i-2-5-1-implicit-differentiation","implicit-differentiation-product-rule-normal-line","second-derivative-implicitly-calculus-1-ab","implicit-differentiation-3-examples-calculus-1-ab","introduction-to-implicit-differentiation-calculus-1-ab","implicit-differentiation-differentiation-when-you-only-have-an-equation-not-an-explicit-function"],
+    intuition: ["ka-sL6MC-lKOrw","ka-PUsMyhds5S4","calculus-i-2-5-1-implicit-differentiation","implicit-differentiation-product-rule-normal-line","second-derivative-implicitly-calculus-1-ab","implicit-differentiation-3-examples-calculus-1-ab","introduction-to-implicit-differentiation-calculus-1-ab","implicit-differentiation-differentiation-when-you-only-have-an-equation-not-an-explicit-function"],
   },
   'ch2-reading-derivatives': {
     intuition: ["concavity-inflection-second-derivative-test-4-examples-calculus-1-ab","sketching-derivatives-from-graphs-of-functions-5-examples-calculus-1-ab","extrema-on-an-interval"],
@@ -236,72 +236,81 @@ export const VIDEO_PLACEMENT_MAP = {
     intuition: ["recursive-sequences", "fibonacci-sequence"],
   },
 
+  // Physics Chapter 0: Introduction
+  'p0-001': { intuition: ['vb-motion-1d-1'] },
+  'p0-003': { intuition: ['vb-motion-1d-2'] },
+  'p0-004': { intuition: ['vb-motion-1d-7'] },
+  'p0-005': { intuition: ['vb-motion-1d-3', 'vb-motion-1d-4', 'vb-motion-1d-5'] },
+  'p0-006': { intuition: ['vb-vectors-1'] },
+  'p0-007': { intuition: ['vb-relative-1'] },
+  'p0-008': { intuition: ['ka-EKvHQc3QEow'] },
+
   // Physics Chapter 1: Vectors
-  'ch1-001': { intuition: ['vb-vectors-1'] },
-  'ch1-002': { intuition: ['vb-vectors-2'] },
-  'ch1-003': { intuition: ['vb-vectors-3', 'vb-vectors-4'] },
-  'ch1-004': { intuition: ['vb-vectors-5'] },
-  'ch1-005': { intuition: ['vb-vectors-6'] },
-  'ch1-006': { intuition: ['vb-vectors-7', 'vb-vectors-8'] },
-  'ch1-007': { intuition: ['vb-vectors-9'] },
-  'ch1-008': { intuition: ['vb-vectors-10'] },
-  'ch1-009': { intuition: ['vb-vectors-11'] },
-  'ch1-010': { intuition: ['vb-vectors-12'] },
-  'ch1-011': { intuition: ['vb-vectors-13', 'vb-vectors-14'] },
-  'ch1-012': { intuition: ['vb-vectors-12'] }, // Shared dot product concept
-  'ch1-013': { intuition: ['vb-vectors-15', 'vb-vectors-20'] },
-  'ch1-014': { intuition: ['vb-vectors-16'] },
-  'ch1-015': { intuition: ['vb-vectors-17', 'vb-vectors-18'] },
-  'ch1-016': { intuition: ['vb-vectors-16'] },
-  'ch1-017': { intuition: ['vb-vectors-19'] },
+  'p1-ch1-001': { intuition: ['vb-vectors-1'] },
+  'p1-ch1-002': { intuition: ['vb-vectors-2'] },
+  'p1-ch1-003': { intuition: ['vb-vectors-3', 'vb-vectors-4'] },
+  'p1-ch1-004': { intuition: ['vb-vectors-5'] },
+  'p1-ch1-005': { intuition: ['vb-vectors-6'] },
+  'p1-ch1-006': { intuition: ['vb-vectors-7', 'vb-vectors-8'] },
+  'p1-ch1-007': { intuition: ['vb-vectors-9'] },
+  'p1-ch1-008': { intuition: ['vb-vectors-10'] },
+  'p1-ch1-009': { intuition: ['vb-vectors-11'] },
+  'p1-ch1-010': { intuition: ['vb-vectors-12'] },
+  'p1-ch1-011': { intuition: ['vb-vectors-13', 'vb-vectors-14'] },
+  'p1-ch1-012': { intuition: ['vb-vectors-12'] }, // Shared dot product concept
+  'p1-ch1-013': { intuition: ['vb-vectors-15', 'vb-vectors-20'] },
+  'p1-ch1-014': { intuition: ['vb-vectors-16'] },
+  'p1-ch1-015': { intuition: ['vb-vectors-17', 'vb-vectors-18'] },
+  'p1-ch1-016': { intuition: ['vb-vectors-16'] },
+  'p1-ch1-017': { intuition: ['vb-vectors-19'] },
 
   // Physics Chapter 2: 1D Motion
-  'ch2-001': { intuition: ['vb-motion-1d-1'] },
-  'ch2-002': { intuition: ['vb-motion-1d-2'] },
-  'ch2-003': { intuition: ['vb-motion-1d-3'] },
-  'ch2-004': { intuition: ['vb-motion-1d-4'] },
-  'ch2-005': { intuition: ['vb-motion-1d-5'] },
-  'ch2-006': { intuition: ['vb-motion-1d-6'] },
-  'ch2-007': { intuition: ['vb-motion-1d-7'] },
-  'ch2-008': { intuition: ['vb-motion-1d-8'] },
-  'ch2-009': { intuition: ['vb-motion-1d-6'] },
-  'ch2-010': { intuition: ['vb-motion-1d-9', 'vb-motion-1d-10', 'vb-motion-1d-11'] },
-  'ch2-012': { intuition: ['vb-motion-1d-12', 'vb-motion-1d-13'] },
-  'ch2-013': { intuition: ['vb-motion-1d-13'] },
-  'ch2-014': { intuition: ['vb-motion-1d-13'] },
-  'ch2-015': { intuition: ['vb-motion-1d-14', 'vb-motion-1d-16'] },
-  'ch2-016': { intuition: ['vb-motion-1d-15', 'vb-motion-1d-17'] },
-  'ch2-017': { intuition: ['vb-motion-1d-18'] },
-  'ch2-019': { intuition: ['vb-motion-1d-19'] },
-  'ch2-020': { intuition: ['vb-motion-1d-20'] },
-  'ch2-021': { intuition: ['vb-motion-1d-21'] },
-  'ch2-022': { intuition: ['vb-motion-1d-22'] },
+  'p1-ch2-001': { intuition: ['vb-motion-1d-1'] },
+  'p1-ch2-002': { intuition: ['vb-motion-1d-2'] },
+  'p1-ch2-003': { intuition: ['vb-motion-1d-3'] },
+  'p1-ch2-004': { intuition: ['vb-motion-1d-4'] },
+  'p1-ch2-005': { intuition: ['vb-motion-1d-5'] },
+  'p1-ch2-006': { intuition: ['vb-motion-1d-6'] },
+  'p1-ch2-007': { intuition: ['vb-motion-1d-7'] },
+  'p1-ch2-008': { intuition: ['vb-motion-1d-8'] },
+  'p1-ch2-009': { intuition: ['vb-motion-1d-6'] },
+  'p1-ch2-010': { intuition: ['vb-motion-1d-9', 'vb-motion-1d-10', 'vb-motion-1d-11'] },
+  'p1-ch2-012': { intuition: ['vb-motion-1d-12', 'vb-motion-1d-13'] },
+  'p1-ch2-013': { intuition: ['vb-motion-1d-13'] },
+  'p1-ch2-014': { intuition: ['vb-motion-1d-13'] },
+  'p1-ch2-015': { intuition: ['vb-motion-1d-14', 'vb-motion-1d-16'] },
+  'p1-ch2-016': { intuition: ['vb-motion-1d-15', 'vb-motion-1d-17'] },
+  'p1-ch2-017': { intuition: ['vb-motion-1d-18'] },
+  'p1-ch2-019': { intuition: ['vb-motion-1d-19'] },
+  'p1-ch2-020': { intuition: ['vb-motion-1d-20'] },
+  'p1-ch2-021': { intuition: ['vb-motion-1d-21'] },
+  'p1-ch2-022': { intuition: ['vb-motion-1d-22'] },
 
   // Physics Chapter 3: 2D Motion (Projectile & Circular)
-  'ch3-001': { intuition: ['vb-motion-2d-1'] },
-  'ch3-002': { intuition: ['vb-motion-2d-2', 'vb-motion-2d-3', 'vb-motion-2d-4'] },
-  'ch3-005': { intuition: ['vb-motion-2d-5', 'vb-motion-2d-6'] },
-  'ch3-010': { intuition: ['vb-motion-2d-10', 'vb-motion-2d-11'] },
-  'ch3-100': { intuition: ['vb-motion-2d-7', 'vb-motion-2d-8', 'vb-motion-2d-9', 'vb-motion-2d-12', 'vb-motion-2d-13', 'vb-motion-2d-14', 'vb-motion-2d-15'] },
-  'ch3-016': { intuition: ['vb-motion-2d-16', 'vb-motion-2d-17'] },
-  'ch3-018': { intuition: ['vb-motion-2d-18', 'vb-motion-2d-19'] },
+  'p1-ch3-001': { intuition: ['vb-motion-2d-1'] },
+  'p1-ch3-002': { intuition: ['vb-motion-2d-2', 'vb-motion-2d-3', 'vb-motion-2d-4'] },
+  'p1-ch3-005': { intuition: ['vb-motion-2d-5', 'vb-motion-2d-6'] },
+  'p1-ch3-010': { intuition: ['vb-motion-2d-10', 'vb-motion-2d-11'] },
+  'p1-ch3-100': { intuition: ['vb-motion-2d-7', 'vb-motion-2d-8', 'vb-motion-2d-9', 'vb-motion-2d-12', 'vb-motion-2d-13', 'vb-motion-2d-14', 'vb-motion-2d-15'] },
+  'p1-ch3-016': { intuition: ['vb-motion-2d-16', 'vb-motion-2d-17'] },
+  'p1-ch3-018': { intuition: ['vb-motion-2d-18', 'vb-motion-2d-19'] },
 
   // Physics Chapter 4: Newton's Laws
-  'ch4-001': { intuition: ['vb-newton-1', 'vb-newton-5', 'vb-newton-6', 'vb-newton-7'] },
-  'ch4-002': { intuition: ['vb-newton-2', 'vb-newton-8', 'vb-newton-9', 'vb-newton-10', 'vb-newton-11', 'vb-newton-12'] },
-  'ch4-003': { intuition: ['vb-newton-3', 'vb-newton-13', 'vb-newton-14', 'vb-newton-15', 'vb-newton-16', 'vb-newton-17'] },
-  'ch4-004': { intuition: ['vb-newton-4', 'vb-fbd-incline-ex1'] },
-  'ch4-100': { intuition: ['vb-mechanics-app-1', 'vb-mechanics-app-6'] },
-  'ch4-200': { intuition: ['vb-newton-statics-1', 'vb-newton-statics-2', 'vb-newton-statics-3', 'vb-block-wall'] },
-  'ch4-300': { intuition: ['vb-mechanics-app-2', 'vb-mechanics-app-3', 'vb-mechanics-app-4', 'vb-mechanics-app-5', 'vb-mechanics-app-14', 'vb-incline-1', 'vb-incline-2'] },
-  'ch4-400': { intuition: ['vb-mechanics-app-10', 'vb-mechanics-app-11', 'vb-mechanics-app-13', 'vb-mechanics-app-16', 'vb-pulley-table-1', 'vb-pulley-table-2', 'vb-pulley-heavy-1', 'vb-pulley-heavy-2', 'vb-pulley-incline-1', 'vb-pulley-incline-2'] },
-  'ch4-500': { intuition: ['vb-circular-1', 'vb-circular-2', 'vb-circular-3', 'vb-circular-4', 'vb-circular-5', 'vb-circular-6', 'vb-circular-7', 'vb-circular-8', 'vb-circular-9', 'vb-circular-10'] },
+  'p1-ch4-001': { intuition: ['vb-newton-1', 'vb-newton-5', 'vb-newton-6', 'vb-newton-7'] },
+  'p1-ch4-002': { intuition: ['vb-newton-2', 'vb-newton-8', 'vb-newton-9', 'vb-newton-10', 'vb-newton-11', 'vb-newton-12'] },
+  'p1-ch4-003': { intuition: ['vb-newton-3', 'vb-newton-13', 'vb-newton-14', 'vb-newton-15', 'vb-newton-16', 'vb-newton-17'] },
+  'p1-ch4-004': { intuition: ['vb-newton-4', 'vb-fbd-incline-ex1'] },
+  'p1-ch4-100': { intuition: ['vb-mechanics-app-1', 'vb-mechanics-app-6'] },
+  'p1-ch4-200': { intuition: ['vb-newton-statics-1', 'vb-newton-statics-2', 'vb-newton-statics-3', 'vb-block-wall'] },
+  'p1-ch4-300': { intuition: ['vb-mechanics-app-2', 'vb-mechanics-app-3', 'vb-mechanics-app-4', 'vb-mechanics-app-5', 'vb-mechanics-app-14', 'vb-incline-1', 'vb-incline-2'] },
+  'p1-ch4-400': { intuition: ['vb-mechanics-app-10', 'vb-mechanics-app-11', 'vb-mechanics-app-13', 'vb-mechanics-app-16', 'vb-pulley-table-1', 'vb-pulley-table-2', 'vb-pulley-heavy-1', 'vb-pulley-heavy-2', 'vb-pulley-incline-1', 'vb-pulley-incline-2'] },
+  'p1-ch4-500': { intuition: ['vb-circular-1', 'vb-circular-2', 'vb-circular-3', 'vb-circular-4', 'vb-circular-5', 'vb-circular-6', 'vb-circular-7', 'vb-circular-8', 'vb-circular-9', 'vb-circular-10'] },
 
   // Physics Chapter 5: Work & Energy
-  'ch5-001': { intuition: ['vb-energy-1', 'vb-energy-2', 'vb-energy-3', 'vb-energy-8', 'vb-energy-10'] },
-  'ch5-002': { intuition: ['vb-energy-1', 'vb-energy-2'] }, // Kinetic basics in intros
-  'ch5-003': { intuition: ['vb-energy-4', 'vb-energy-9'] }, // Springs as potential example
-  'ch5-004': { intuition: ['vb-cons-energy-1', 'vb-cons-energy-2', 'vb-cons-energy-3', 'vb-cons-energy-4', 'vb-cons-energy-5', 'vb-cons-energy-6', 'vb-cons-energy-7', 'vb-cons-energy-8', 'vb-cons-energy-9', 'vb-cons-energy-10'] },
-  'ch5-011': { intuition: ['vb-energy-11', 'vb-energy-12', 'vb-energy-13', 'vb-energy-14', 'vb-energy-15', 'vb-energy-16', 'vb-energy-17', 'vb-energy-18', 'vb-energy-19', 'vb-energy-20'] },
-  'ch5-100': { intuition: ['vb-energy-21', 'vb-energy-22', 'vb-energy-23', 'vb-energy-24', 'vb-energy-25', 'vb-energy-26'] },
+  'p1-ch5-001': { intuition: ['vb-energy-1', 'vb-energy-2', 'vb-energy-3', 'vb-energy-8', 'vb-energy-10'] },
+  'p1-ch5-002': { intuition: ['vb-energy-1', 'vb-energy-2'] }, // Kinetic basics in intros
+  'p1-ch5-003': { intuition: ['vb-energy-4', 'vb-energy-9'] }, // Springs as potential example
+  'p1-ch5-004': { intuition: ['vb-cons-energy-1', 'vb-cons-energy-2', 'vb-cons-energy-3', 'vb-cons-energy-4', 'vb-cons-energy-5', 'vb-cons-energy-6', 'vb-cons-energy-7', 'vb-cons-energy-8', 'vb-cons-energy-9', 'vb-cons-energy-10'] },
+  'p1-ch5-011': { intuition: ['vb-energy-11', 'vb-energy-12', 'vb-energy-13', 'vb-energy-14', 'vb-energy-15', 'vb-energy-16', 'vb-energy-17', 'vb-energy-18', 'vb-energy-19', 'vb-energy-20'] },
+  'p1-ch5-100': { intuition: ['vb-energy-21', 'vb-energy-22', 'vb-energy-23', 'vb-energy-24', 'vb-energy-25', 'vb-energy-26'] },
 };

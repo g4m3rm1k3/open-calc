@@ -1,7 +1,7 @@
 export default {
 
   // ── Identity ────────────────────────────────────────────────────────────
-  id: 'ch1-001',
+  id: 'p1-ch1-001',
   slug: 'what-is-a-vector',
   chapter: 1,
   order: 1,

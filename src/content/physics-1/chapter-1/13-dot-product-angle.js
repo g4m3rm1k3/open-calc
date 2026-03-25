@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-013', slug: 'dot-product-angle', chapter: 1, order: 13,
+  id: 'p1-ch1-013', slug: 'dot-product-angle', chapter: 1, order: 13,
   title: 'Dot Product — Angle Between Vectors',
   subtitle: 'Use the dot product to solve for the geometric angle in any dimension.',
   tags: ['dot product', 'scalar product', 'angle between vectors', 'arc cosine'],

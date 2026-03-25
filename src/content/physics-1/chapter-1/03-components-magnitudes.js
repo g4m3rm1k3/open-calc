@@ -1,7 +1,7 @@
 export default {
 
   // ── Identity ─────────────────────────────────────────────────────────────
-  id: 'ch1-003',
+  id: 'p1-ch1-003',
   slug: 'components-and-magnitudes',
   chapter: 1,
   order: 3,

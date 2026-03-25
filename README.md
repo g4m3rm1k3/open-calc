@@ -143,6 +143,20 @@ For a full manual workflow (add lesson, add viz, register IDs, wire proof sync, 
 
 ---
 
+## Tutorial Hub & Video Library
+
+The application features a built-in **Tutorial Hub** that provides curated video content synchronized with the curriculum.
+
+### How to add a Video:
+1.  **Register the Metadata**: Add an entry to `src/content/videos/videoDatabase.js` with a unique handle, title, YouTube embed URL, and source.
+2.  **Map to a Lesson**: Associate the video handle with one or more lesson IDs in `src/content/videos/videoPlacementMap.js`.
+3.  **Cross-Course Scope**: When adding Physics content, ensure lesson IDs are prefixed with `p1-` to avoid collisions with the Calculus namespace.
+
+### Custom Tutorials:
+Users can add their own YouTube tutorials directly within the `FloatingVideoPlayer` UI. These are saved to local storage and associated with the currently active lesson.
+
+---
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

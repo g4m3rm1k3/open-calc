@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-006',
+  id: 'p1-ch1-006',
   slug: 'adding-vectors-numerically',
   chapter: 1,
   order: 6,

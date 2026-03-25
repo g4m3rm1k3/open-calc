@@ -1,7 +1,7 @@
 export default {
 
   // ── Identity ────────────────────────────────────────────────────────────
-  id: 'ch1-002',
+  id: 'p1-ch1-002',
   slug: 'vector-notation',
   chapter: 1,
   order: 2,

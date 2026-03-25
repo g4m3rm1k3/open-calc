@@ -1,5 +1,5 @@
 export default {
-  id: 'ch1-011', slug: 'dot-product-arithmetic', chapter: 1, order: 11,
+  id: 'p1-ch1-011', slug: 'dot-product-arithmetic', chapter: 1, order: 11,
   title: 'Dot Product — Arithmetic Calculation',
   subtitle: 'Multiply vectors by component: $A_xB_x + A_yB_y + A_zB_z$.',
   tags: ['dot product', 'scalar product', 'vector multiplication', 'arithmetic', 'component-wise multiplication'],
