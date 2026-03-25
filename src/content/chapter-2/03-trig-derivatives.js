@@ -229,6 +229,33 @@ export default {
         title: 'Deriving d/dx[cot x] via Quotient Rule',
         body: "\\frac{d}{dx}\\left[\\frac{\\cos x}{\\sin x}\\right] = \\frac{-\\sin x \\cdot \\sin x - \\cos x \\cdot \\cos x}{\\sin^2 x} = \\frac{-(\\sin^2 x + \\cos^2 x)}{\\sin^2 x} = \\frac{-1}{\\sin^2 x} = -\\csc^2 x",
       },
+{
+  type: 'derivation',
+  title: 'Deriving cos(arcsin x)',
+  body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\cos(\\arcsin x) = \\frac{\\text{adj}}{\\text{hyp}} = \\sqrt{1 - x^2}."
+},
+{
+  type: 'derivation',
+  title: 'Deriving sin(arccos x)',
+  body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\sin(\\arccos x) = \\frac{\\text{opp}}{\\text{hyp}} = \\sqrt{1 - x^2}."
+},
+{
+  type: 'derivation',
+  title: 'Deriving tan(arcsin x)',
+  body: "\\theta = \\arcsin x \\Rightarrow \\sin\\theta = x = \\frac{\\text{opp}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{adj} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arcsin x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{\\sqrt{1 - x^2}}."
+},
+{
+  type: 'derivation',
+  title: 'Deriving tan(arccos x)',
+  body: "\\theta = \\arccos x \\Rightarrow \\cos\\theta = x = \\frac{\\text{adj}}{\\text{hyp}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{opp} = \\sqrt{1 - x^2}.\\\\ \\tan(\\arccos x) = \\frac{\\text{opp}}{\\text{adj}} = \\frac{\\sqrt{1 - x^2}}{x}."
+},
+{
+  type: 'derivation',
+  title: 'Deriving sec(arctan x)',
+  body: "\\theta = \\arctan x \\Rightarrow \\tan\\theta = x = \\frac{\\text{opp}}{\\text{adj}} = \\frac{x}{1}.\\\\ \\text{Then } \\text{hyp} = \\sqrt{1 + x^2}.\\\\ \\sec(\\arctan x) = \\frac{\\text{hyp}}{\\text{adj}} = \\sqrt{1 + x^2}."
+},
+
+
     ],
     visualizationId: 'TrigDerivativeSync',
     visualizationProps: {},
@@ -293,6 +320,7 @@ export default {
         title: 'Proof: d/dx[sin x] = cos x',
         body: "\\frac{d}{dx}[\\sin x] = \\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h} = \\lim_{h\\to 0}\\left[\\sin x\\cdot\\frac{\\cos h - 1}{h} + \\cos x \\cdot\\frac{\\sin h}{h}\\right] = \\sin x\\cdot 0 + \\cos x\\cdot 1 = \\cos x",
       },
+
     ],
     visualizations: [
       {
@@ -301,6 +329,8 @@ export default {
         mathBridge: 'The two proof terms $\\sin x \\cdot \\frac{\\cos h - 1}{h}$ and $\\cos x \\cdot \\frac{\\sin h}{h}$ each correspond to visible geometry on the circle. Hover either term to highlight it. As $h \\to 0$, the horizontal correction (amber, vanishing) shrinks away and only the vertical velocity component (red, surviving) remains — giving $\\cos x$.',
         caption: 'Hover the proof terms to light up the matching geometry. Use the theta and h sliders to verify at any angle.',
       },
+
+
     ],
   },
 
