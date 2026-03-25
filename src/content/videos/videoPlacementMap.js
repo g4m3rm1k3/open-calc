@@ -332,4 +332,41 @@ export const VIDEO_PLACEMENT_MAP = {
   'p1-ch5-004': { intuition: ['vb-cons-energy-1', 'vb-cons-energy-2', 'vb-cons-energy-3', 'vb-cons-energy-4', 'vb-cons-energy-5', 'vb-cons-energy-6', 'vb-cons-energy-7', 'vb-cons-energy-8', 'vb-cons-energy-9', 'vb-cons-energy-10'] },
   'p1-ch5-011': { intuition: ['vb-energy-11', 'vb-energy-12', 'vb-energy-13', 'vb-energy-14', 'vb-energy-15', 'vb-energy-16', 'vb-energy-17', 'vb-energy-18', 'vb-energy-19', 'vb-energy-20'] },
   'p1-ch5-100': { intuition: ['vb-energy-21', 'vb-energy-22', 'vb-energy-23', 'vb-energy-24', 'vb-energy-25', 'vb-energy-26'] },
+  // Precalc 1 - Functions & Graphs
+  'ch1-graphs-001': ['pre-1-1', 'pre-1-2', 'pre-1-3'],
+  'ch1-graphs-002': ['pre-1-7'],
+  'ch1-graphs-003': ['pre-1-5'],
+  'ch1-graphs-004': ['pre-1-6'],
+  'precalc1-04': ['pre-1-4'],
+  'precalc1-09': ['pre-1-9'],
+  'precalc1-10': ['pre-1-10'],
+
+  // Precalc 2 - Algebra
+  'ch1-algebra-003': ['pre-2-1'],
+  'ch1-algebra-004': ['pre-2-6'],
+  'ch1-algebra-005': ['pre-7-1', 'pre-7-2', 'pre-7-3'],
+  'ch1-algebra-006': ['pre-2-4'],
+  'ch1-algebra-007': ['pre-2-7', 'pre-7-5'],
+  'ch2-alg-008': ['pre-7-6'],
+
+  // Precalc 3 - Trig Foundations
+  'angles-foundations': ['pre-4-1'],
+  'triangle-geometry': ['pre-4-2'],
+  'trig-ratios-right-triangles': ['pre-4-3'],
+  'trig-any-angle': ['pre-4-4'],
+  'graphing-trig-functions': ['pre-4-5', 'pre-4-6'],
+  'inverse-trig-functions': ['pre-4-7'],
+  'trig-applications': ['pre-4-8'],
+
+  // Precalc 4 - Exponential & Log
+  'exponential-functions': ['pre-3-1'],
+  'logarithms-intro': ['pre-3-2'],
+  'log-properties': ['pre-3-3'],
+  'solving-exponential-log': ['pre-3-4'],
+  'exponential-applications': ['pre-3-5'],
+
+  // Precalc 5 - Polar & Vectors
+  'vectors-2d': ['pre-6-3', 'pre-6-4'],
+  'polar-coordinates-deep': ['pre-6-5'],
+  'complex-polar-demoivre': ['pre-6-6'],
 };

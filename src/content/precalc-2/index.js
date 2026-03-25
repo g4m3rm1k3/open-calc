@@ -5,6 +5,7 @@ import rationalPartialFractions from './04-rational-partial-fractions.js'
 import systems from './05-systems.js'
 import complexNumbers from './06-complex-numbers.js'
 import inequalities from './07-inequalities.js'
+import linearProgramming from './08-linear-programming.js'
 
 export default {
   id: 'precalc-2',
@@ -21,5 +22,6 @@ export default {
     systems,
     complexNumbers,
     inequalities,
+    linearProgramming,
   ],
 }
