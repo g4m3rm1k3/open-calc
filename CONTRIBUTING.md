@@ -589,7 +589,30 @@ Use this checklist before merging content-heavy lessons.
 2. Keep `id` fields unique across lessons/examples/challenges.
 3. Prefer small, validated edits for long content arrays.
 
-### Phase O — GitHub Pages and Docs Surface (Project-Level)
+### Phase P — Adding Videos to the Tutorial Hub
+
+The Tutorial Hub uses a two-tier registry to decouple video metadata from lesson content.
+
+1. **Register the video:** Add the video metadata to `src/content/videos/videoDatabase.js`.
+   ```javascript
+   'my-video-id': { 
+     title: 'Video Title', 
+     url: 'https://www.youtube.com/embed/VIDEO_ID', 
+     source: 'Channel Name' 
+   },
+   ```
+2. **Map to a lesson:** Link the video ID to a lesson ID in `src/content/videos/videoPlacementMap.js`.
+   ```javascript
+   'ch1-001': { 
+     intuition: ['my-video-id'],
+     examples: {
+       'ch1-001-ex1': ['another-video-id']
+     }
+   },
+   ```
+3. **Verify:** Open the Tutorial Hub in the app and navigate to the lesson. The video should appear in the "intuition" or "examples" section of the playlist.
+
+### Phase Q — GitHub Pages and Docs Surface (Project-Level)
 
 For repository maintainers:
 

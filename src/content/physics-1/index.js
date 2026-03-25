@@ -2,62 +2,84 @@ import CH0 from "./chapter-0/index.js";
 import CH1 from "./chapter-1/index.js";
 import CH2 from "./chapter-2/index.js";
 
-// Newtonian Mechanics
+// Motion in 2-D (Projectile & Circular)
 const CH3 = {
-  title: "Newtonian Mechanics",
+  title: "Motion in 2-D",
   number: "p3",
+  slug: "motion-2d",
+  lessons: [
+    { id: "ch3-001", title: "Independence of x and y", slug: "independence-x-y" },
+    { id: "ch3-002", title: "Projectile Motion Basics", slug: "projectile-basics" },
+    { id: "ch3-005", title: "Finding the Range", slug: "projectile-range" },
+    { id: "ch3-010", title: "Finding the Max Height", slug: "projectile-height" },
+    { id: "ch3-100", title: "Projectile Worked Examples", slug: "projectile-examples" },
+    { id: "ch3-016", title: "Uniform Circular Motion", slug: "circular-motion" },
+    { id: "ch3-018", title: "Centripetal Acceleration", slug: "centripetal-accel" },
+  ],
+};
+
+// Newtonian Mechanics
+const CH4 = {
+  title: "Newton's Laws of Motion",
+  number: "p4",
   slug: "mechanics",
   lessons: [
-    { title: "Newton's Laws", slug: "newtons-laws" },
-    { title: "Free Body Diagrams", slug: "fbd-skill" },
-    { title: "Common Forces", slug: "common-forces" },
-    { title: "Inclined Planes", slug: "inclined-planes" },
+    { id: "ch4-001", title: "Newton's First Law", slug: "first-law" },
+    { id: "ch4-002", title: "Newton's Second Law", slug: "second-law" },
+    { id: "ch4-003", title: "Newton's Third Law", slug: "third-law" },
+    { id: "ch4-004", title: "Free Body Diagrams", slug: "fbd-skill" },
+    { id: "ch4-100", title: "Newton's Law Examples", slug: "newton-examples" },
+    { id: "ch4-200", title: "Statics Problems", slug: "statics-problems" },
+    { id: "ch4-300", title: "Inclined Planes", slug: "inclined-planes" },
+    { id: "ch4-400", title: "Pulley Systems", slug: "pulley-systems" },
+    { id: "ch4-500", title: "Circular Motion Dynamics", slug: "circular-dynamics" },
   ],
 };
 
 // Work & Energy
-const CH4 = {
+const CH5 = {
   title: "Work & Energy",
-  number: "p4",
+  number: "p5",
   slug: "energy",
   lessons: [
-    { title: "Work In Context", slug: "work-definition" },
-    { title: "Kinetic Energy & Derivation", slug: "kinetic-energy" },
-    { title: "Potential Energy", slug: "potential-energy" },
-    { title: "Conservation of Energy", slug: "energy-conservation" },
-    { title: "Power", slug: "power" },
+    { id: "ch5-001", title: "Work In Context", slug: "work-definition" },
+    { id: "ch5-002", title: "Kinetic Energy", slug: "kinetic-energy" },
+    { id: "ch5-003", title: "Potential Energy", slug: "potential-energy" },
+    { id: "ch5-004", title: "Conservation of Energy", slug: "energy-conservation" },
+    { id: "ch5-011", title: "Power", slug: "power" },
+    { id: "ch5-100", title: "Energy Worked Examples", slug: "energy-examples" },
   ],
 };
 
 // Momentum & Collisions
-const CH5 = {
+const CH6 = {
   title: "Momentum & Collisions",
-  number: "p5",
+  number: "p6",
   slug: "momentum",
   lessons: [
-    { title: "Momentum (p = mv)", slug: "momentum-definition" },
-    { title: "Impulse & Area", slug: "impulse" },
-    { title: "Conservation of Momentum", slug: "momentum-conservation" },
+    { id: "ch6-001", title: "Momentum (p = mv)", slug: "momentum-definition" },
+    { id: "ch6-002", title: "Impulse & Area", slug: "impulse" },
+    { id: "ch6-003", title: "Conservation of Momentum", slug: "momentum-conservation" },
   ],
 };
 
 // Rotational Motion
-const CH6 = {
+const CH7 = {
   title: "Rotational Motion",
-  number: "p6",
+  number: "p7",
   slug: "rotation",
   lessons: [
-    { title: "Angular Kinematics", slug: "angular-kinematics" },
-    { title: "Torque & Leverage", slug: "torque" },
-    { title: "Rotational Dynamics", slug: "rotational-dynamics" },
-    { title: "Moment of Inertia", slug: "moment-of-inertia" },
+    { id: "ch7-001", title: "Angular Kinematics", slug: "angular-kinematics" },
+    { id: "ch7-002", title: "Torque & Leverage", slug: "torque" },
+    { id: "ch7-003", title: "Rotational Dynamics", slug: "rotational-dynamics" },
+    { id: "ch7-004", title: "Moment of Inertia", slug: "moment-of-inertia" },
   ],
 };
 
 // Oscillations & Waves
-const CH7 = {
+const CH8 = {
   title: "Oscillations & Waves",
-  number: "p7",
+  number: "p8",
   slug: "oscillations-waves",
   lessons: [
     { title: "Hooke's Law", slug: "hookes-law" },
@@ -67,4 +89,4 @@ const CH7 = {
   ],
 };
 
-export default [CH0, CH1, CH2, CH3, CH4, CH5, CH6, CH7];
+export default [CH0, CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8];

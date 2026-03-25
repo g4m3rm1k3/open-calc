@@ -195,4 +195,113 @@ export const VIDEO_PLACEMENT_MAP = {
   'ch3-trig-003': {
     intuition: ["tr-14-the-unit-circle"],
   },
+  'discrete-1-00': {
+    hook: ["discrete-intro"],
+  },
+  'discrete-1-01': {
+    intuition: ["logic-statements", "truth-tables-intro", "truth-table-ex", "logical-equivalence", "tautology-contradiction", "demorgans-laws", "conditional-statements", "vacuously-true", "negating-conditional", "contrapositive-intro", "converse-inverse", "biconditional-intro"],
+  },
+  'discrete-1-01a': {
+    intuition: ["predicates-truth-sets", "quantifiers-intro", "negating-quantifiers", "multiple-quantifiers", "universal-conditionals", "necessary-sufficient"],
+  },
+  'discrete-1-01b': {
+    intuition: ["modus-ponens-tollens", "argument-forms", "argument-validity", "even-odd-integers", "prove-even-odd", "prove-evens-product", "rational-numbers-proof", "divisibility-transitive", "counterexamples-implications", "proof-by-cases", "proof-by-contradiction", "proof-by-contrapositive"],
+  },
+  'discrete-1-02a': {
+    intuition: ["set-intro", "set-notation", "empty-set", "cartesian-product", "function-intuition", "function-formal", "relation-is-function", "subset-element-method", "set-equality-proof", "set-union", "set-intersection", "set-complements", "subset-containment-proof", "power-sets"],
+  },
+  'discrete-1-02': {
+    intuition: ["relations-intro", "inverse-relations", "reflexive-symmetric-transitive", "equivalence-relations", "reflexivity-check"],
+  },
+  'discrete-1-03': {
+    intuition: ["induction-intro", "induction-inequality", "strong-induction", "sequences-intro", "sequence-formal", "sequence-sum-product"],
+  },
+  'discrete-1-04': {
+     intuition: ["permutations-intro", "summation-rule", "inclusion-exclusion", "combinations-formula", "mississippi-counting"],
+  },
+  'discrete-1-08': {
+    intuition: ["graph-theory-intro", "graph-properties", "vertex-degrees", "euler-paths"],
+    math: ["discrete-outro"],
+  },
+  'graph-theory-intro': {
+    intuition: ["graph-theory-intro", "graph-properties", "vertex-degrees", "euler-paths"],
+  },
+  'discrete-1-05': {
+    intuition: ["mod-arithmetic", "infinite-primes"],
+  },
+  'discrete-1-06': {
+    intuition: ["probability-intro", "probability-examples", "pin-code-probability", "triple-intersections", "probability-walkthrough", "conditional-probability", "conditional-prob-examples", "probability-tables", "bayes-simple", "bayes-false-positives", "bayes-disjoint-union", "chess-chance", "markov-chains-intro", "markov-matrices"],
+  },
+  'discrete-1-07': {
+    intuition: ["recursive-sequences", "fibonacci-sequence"],
+  },
+
+  // Physics Chapter 1: Vectors
+  'ch1-001': { intuition: ['vb-vectors-1'] },
+  'ch1-002': { intuition: ['vb-vectors-2'] },
+  'ch1-003': { intuition: ['vb-vectors-3', 'vb-vectors-4'] },
+  'ch1-004': { intuition: ['vb-vectors-5'] },
+  'ch1-005': { intuition: ['vb-vectors-6'] },
+  'ch1-006': { intuition: ['vb-vectors-7', 'vb-vectors-8'] },
+  'ch1-007': { intuition: ['vb-vectors-9'] },
+  'ch1-008': { intuition: ['vb-vectors-10'] },
+  'ch1-009': { intuition: ['vb-vectors-11'] },
+  'ch1-010': { intuition: ['vb-vectors-12'] },
+  'ch1-011': { intuition: ['vb-vectors-13', 'vb-vectors-14'] },
+  'ch1-012': { intuition: ['vb-vectors-12'] }, // Shared dot product concept
+  'ch1-013': { intuition: ['vb-vectors-15', 'vb-vectors-20'] },
+  'ch1-014': { intuition: ['vb-vectors-16'] },
+  'ch1-015': { intuition: ['vb-vectors-17', 'vb-vectors-18'] },
+  'ch1-016': { intuition: ['vb-vectors-16'] },
+  'ch1-017': { intuition: ['vb-vectors-19'] },
+
+  // Physics Chapter 2: 1D Motion
+  'ch2-001': { intuition: ['vb-motion-1d-1'] },
+  'ch2-002': { intuition: ['vb-motion-1d-2'] },
+  'ch2-003': { intuition: ['vb-motion-1d-3'] },
+  'ch2-004': { intuition: ['vb-motion-1d-4'] },
+  'ch2-005': { intuition: ['vb-motion-1d-5'] },
+  'ch2-006': { intuition: ['vb-motion-1d-6'] },
+  'ch2-007': { intuition: ['vb-motion-1d-7'] },
+  'ch2-008': { intuition: ['vb-motion-1d-8'] },
+  'ch2-009': { intuition: ['vb-motion-1d-6'] },
+  'ch2-010': { intuition: ['vb-motion-1d-9', 'vb-motion-1d-10', 'vb-motion-1d-11'] },
+  'ch2-012': { intuition: ['vb-motion-1d-12', 'vb-motion-1d-13'] },
+  'ch2-013': { intuition: ['vb-motion-1d-13'] },
+  'ch2-014': { intuition: ['vb-motion-1d-13'] },
+  'ch2-015': { intuition: ['vb-motion-1d-14', 'vb-motion-1d-16'] },
+  'ch2-016': { intuition: ['vb-motion-1d-15', 'vb-motion-1d-17'] },
+  'ch2-017': { intuition: ['vb-motion-1d-18'] },
+  'ch2-019': { intuition: ['vb-motion-1d-19'] },
+  'ch2-020': { intuition: ['vb-motion-1d-20'] },
+  'ch2-021': { intuition: ['vb-motion-1d-21'] },
+  'ch2-022': { intuition: ['vb-motion-1d-22'] },
+
+  // Physics Chapter 3: 2D Motion (Projectile & Circular)
+  'ch3-001': { intuition: ['vb-motion-2d-1'] },
+  'ch3-002': { intuition: ['vb-motion-2d-2', 'vb-motion-2d-3', 'vb-motion-2d-4'] },
+  'ch3-005': { intuition: ['vb-motion-2d-5', 'vb-motion-2d-6'] },
+  'ch3-010': { intuition: ['vb-motion-2d-10', 'vb-motion-2d-11'] },
+  'ch3-100': { intuition: ['vb-motion-2d-7', 'vb-motion-2d-8', 'vb-motion-2d-9', 'vb-motion-2d-12', 'vb-motion-2d-13', 'vb-motion-2d-14', 'vb-motion-2d-15'] },
+  'ch3-016': { intuition: ['vb-motion-2d-16', 'vb-motion-2d-17'] },
+  'ch3-018': { intuition: ['vb-motion-2d-18', 'vb-motion-2d-19'] },
+
+  // Physics Chapter 4: Newton's Laws
+  'ch4-001': { intuition: ['vb-newton-1', 'vb-newton-5', 'vb-newton-6', 'vb-newton-7'] },
+  'ch4-002': { intuition: ['vb-newton-2', 'vb-newton-8', 'vb-newton-9', 'vb-newton-10', 'vb-newton-11', 'vb-newton-12'] },
+  'ch4-003': { intuition: ['vb-newton-3', 'vb-newton-13', 'vb-newton-14', 'vb-newton-15', 'vb-newton-16', 'vb-newton-17'] },
+  'ch4-004': { intuition: ['vb-newton-4', 'vb-fbd-incline-ex1'] },
+  'ch4-100': { intuition: ['vb-mechanics-app-1', 'vb-mechanics-app-6'] },
+  'ch4-200': { intuition: ['vb-newton-statics-1', 'vb-newton-statics-2', 'vb-newton-statics-3', 'vb-block-wall'] },
+  'ch4-300': { intuition: ['vb-mechanics-app-2', 'vb-mechanics-app-3', 'vb-mechanics-app-4', 'vb-mechanics-app-5', 'vb-mechanics-app-14', 'vb-incline-1', 'vb-incline-2'] },
+  'ch4-400': { intuition: ['vb-mechanics-app-10', 'vb-mechanics-app-11', 'vb-mechanics-app-13', 'vb-mechanics-app-16', 'vb-pulley-table-1', 'vb-pulley-table-2', 'vb-pulley-heavy-1', 'vb-pulley-heavy-2', 'vb-pulley-incline-1', 'vb-pulley-incline-2'] },
+  'ch4-500': { intuition: ['vb-circular-1', 'vb-circular-2', 'vb-circular-3', 'vb-circular-4', 'vb-circular-5', 'vb-circular-6', 'vb-circular-7', 'vb-circular-8', 'vb-circular-9', 'vb-circular-10'] },
+
+  // Physics Chapter 5: Work & Energy
+  'ch5-001': { intuition: ['vb-energy-1', 'vb-energy-2', 'vb-energy-3', 'vb-energy-8', 'vb-energy-10'] },
+  'ch5-002': { intuition: ['vb-energy-1', 'vb-energy-2'] }, // Kinetic basics in intros
+  'ch5-003': { intuition: ['vb-energy-4', 'vb-energy-9'] }, // Springs as potential example
+  'ch5-004': { intuition: ['vb-cons-energy-1', 'vb-cons-energy-2', 'vb-cons-energy-3', 'vb-cons-energy-4', 'vb-cons-energy-5', 'vb-cons-energy-6', 'vb-cons-energy-7', 'vb-cons-energy-8', 'vb-cons-energy-9', 'vb-cons-energy-10'] },
+  'ch5-011': { intuition: ['vb-energy-11', 'vb-energy-12', 'vb-energy-13', 'vb-energy-14', 'vb-energy-15', 'vb-energy-16', 'vb-energy-17', 'vb-energy-18', 'vb-energy-19', 'vb-energy-20'] },
+  'ch5-100': { intuition: ['vb-energy-21', 'vb-energy-22', 'vb-energy-23', 'vb-energy-24', 'vb-energy-25', 'vb-energy-26'] },
 };
