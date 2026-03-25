@@ -29,7 +29,7 @@ export default function FloatingVideoPlayer() {
   const { 
     isOpen, isMinimized, currentVideo, lessonId, 
     searchQuery, setSearchQuery, 
-    closePlayer, toggleMinimize, selectVideo,
+    openPlayer, closePlayer, toggleMinimize, selectVideo,
     customVideos, addCustomVideo, setLessonId,
     pinnedVideos, togglePin
   } = useVideoPlayer();
@@ -61,6 +61,39 @@ export default function FloatingVideoPlayer() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Custom Resize Logic
+  const [isResizing, setIsResizing] = useState(false);
+  
+  const startResizing = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleMouseUp = () => setIsResizing(false);
+    const handleMouseMove = (e) => {
+      const parent = document.querySelector('[key="expanded-player"]');
+      if (parent) {
+        const rect = parent.getBoundingClientRect();
+        const newW = Math.max(480, e.clientX - rect.left);
+        const newH = Math.max(320, e.clientY - rect.top);
+        // Constrain to viewport
+        const maxW = windowDimensions.w - rect.left - 20;
+        const maxH = windowDimensions.h - rect.top - 20;
+        setWidth(Math.min(newW, maxW));
+        setHeight(Math.min(newH, maxH));
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, windowDimensions]);
 
   // Force sidebar open on mobile playlist view, or handle it
   useEffect(() => {
@@ -243,14 +276,14 @@ export default function FloatingVideoPlayer() {
            animate={{ opacity: 1, scale: 1 }}
            exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
            style={isMobile ? { width: '100%', height: '100%', top: 0, left: 0 } : { width, height }}
-           className={`fixed top-0 left-0 z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col ${
+           className={`fixed top-0 left-0 z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col group/player ${
              isMobile ? 'rounded-none' : 'rounded-2xl border border-slate-200 dark:border-slate-800'
            }`}
         >
-          {/* Header - now the ONLY draggable area */}
+          {/* Header - now the ONLY draggable area - hides until hover if playing */}
           <div 
             onPointerDown={(e) => dragControls.start(e)}
-            className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none"
+            className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none opacity-0 group-hover/player:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover/player:translate-y-0"
           >
             <div className="flex items-center gap-3 truncate">
               <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Video size={16} /></div>
@@ -495,6 +528,19 @@ export default function FloatingVideoPlayer() {
               </div>
             </div>
           </div>
+
+          {/* Resize Handle (Desktop Only) */}
+          {!isMobile && (
+            <div 
+              onMouseDown={startResizing}
+              className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize z-[10001] flex items-center justify-center group-hover/player:opacity-100 opacity-20 transition-opacity"
+            >
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 mb-1 ml-1" />
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-1 right-1" />
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-2.5 right-1" />
+               <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 absolute bottom-1 right-2.5" />
+            </div>
+          )}
         </motion.div>
         )}
       </AnimatePresence>

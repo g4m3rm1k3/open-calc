@@ -214,7 +214,47 @@ The key is the string ID you will use in content files.
 
 ---
 
-## 3. Common pitfalls
+## 3. Managing Video Content
+
+The Tutorial Hub uses a two-tier registry system to keep content decoupled from the player logic.
+
+### Tier 1 — Video Database (`src/content/videos/videoDatabase.js`)
+This is the master list of every video in the application. Entries are identified by a unique key (usually `youtube-ID`).
+
+```javascript
+export const VIDEO_DATABASE = {
+  'dQw4w9WgXcQ': {
+    title: 'The Secret of Limits',
+    source: 'YouTube',
+    url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+  },
+  // ...
+}
+```
+
+### Tier 2 — Video Placement (`src/content/videos/videoPlacementMap.js`)
+This maps the database IDs to specific lessons and categorizes them by their pedagogical intent.
+
+```javascript
+export const VIDEO_PLACEMENT_MAP = {
+  'ch2-001': { // The Lesson ID
+    hook: ['dQw4w9WgXcQ'],      // Intro/Motivating videos
+    intuition: [],             // Visual/Geometric concepts
+    math: [],                  // Formal proofs
+    rigor: [],                 // Deep technical dives
+    examples: {                // Tied to specific worked examples
+      'ch2-001-ex1': ['another-id']
+    }
+  }
+}
+```
+
+### Adding a custom video
+Users can add their own "Custom Tutorials" directly in the app. These are saved to `localStorage` and appear in a special "Your Videos" section within the playlist for that lesson.
+
+---
+
+## 4. Common pitfalls
 
 These mistakes are silent — they produce no error but the lesson looks wrong or broken.
 
