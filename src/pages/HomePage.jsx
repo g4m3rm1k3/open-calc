@@ -17,6 +17,12 @@ const CHAPTER_GRADIENTS = {
   p4: 'from-teal-500 to-teal-700',
   p5: 'from-blue-500 to-blue-700',
   p6: 'from-fuchsia-500 to-fuchsia-700',
+  'geometry-1': 'from-indigo-500 to-indigo-700',
+  'geometry-2': 'from-blue-500 to-blue-700',
+  'geometry-3': 'from-emerald-500 to-emerald-700',
+  'geometry-4': 'from-purple-500 to-purple-700',
+  'geometry-5': 'from-orange-500 to-orange-700',
+  'geometry-6': 'from-rose-500 to-rose-700',
 }
 
 export default function HomePage() {

@@ -18,7 +18,15 @@ const CHAPTER_COLORS = {
   p4: 'text-teal-600 dark:text-teal-400',
   p5: 'text-indigo-600 dark:text-indigo-400',
   p6: 'text-fuchsia-600 dark:text-fuchsia-400',
+  'geometry-1': 'text-indigo-600 dark:text-indigo-400',
+  'geometry-2': 'text-blue-600 dark:text-blue-400',
+  'geometry-3': 'text-emerald-600 dark:text-emerald-400',
+  'geometry-4': 'text-purple-600 dark:text-purple-400',
+  'geometry-5': 'text-orange-600 dark:text-orange-400',
+  'geometry-6': 'text-rose-600 dark:text-rose-400',
 }
+
+import { COURSES } from '../../content/index.js'
 
 export default function Sidebar({ onNavigate }) {
   const params = useParams()
@@ -40,33 +48,19 @@ export default function Sidebar({ onNavigate }) {
   if (chapterCandidate) {
     const chObj = CURRICULUM.find(c => String(c.number) === chapterCandidate)
     if (chObj) activeCourse = chObj.course
-  } else if (location.pathname.includes('/discrete-1')) {
-    activeCourse = 'discrete'
-  } else if (location.pathname.includes('/precalc-')) {
-    activeCourse = 'precalc'
-  } else if (/\/chapter\/p\d+/.test(location.pathname)) {
-    activeCourse = 'physics-1'
+  } else {
+    // Heuristic for landing pages (paths that don't have chapterId yet)
+    const match = COURSES.find(c => location.pathname.startsWith(c.path.split('/').slice(0,-1).join('/')) || location.pathname.includes(c.key))
+    if (match) activeCourse = match.key
   }
 
   const visibleChapters = CURRICULUM.filter(c => c.course === activeCourse)
-  const courseName = activeCourse === 'calc' ? 'OpenCalc' : activeCourse === 'discrete' ? 'Discrete Math' : activeCourse === 'precalc' ? 'Pre-Calculus' : activeCourse === 'physics-1' ? 'OpenPhysics' : 'OpenMath'
-  const courseDesc = activeCourse === 'calc' ? 'Interactive Calculus' : activeCourse === 'discrete' ? 'Logic & Puzzles' : activeCourse === 'precalc' ? 'Functions & Graphs' : activeCourse === 'physics-1' ? 'Mechanics & Waves' : ''
-  const courseHomePath = activeCourse === 'calc'
-    ? '/chapter/0'
-    : activeCourse === 'discrete'
-      ? '/chapter/discrete-1'
-      : activeCourse === 'precalc'
-        ? '/chapter/precalc-1'
-        : activeCourse === 'physics-1'
-          ? '/chapter/p0'
-          : '/'
+  const activeCourseObj = COURSES.find(c => c.key === activeCourse) || COURSES.find(c => c.key === 'calc')
+  
+  const courseName = activeCourseObj.label === 'Calculus' ? 'OpenCalc' : activeCourseObj.label === 'Physics' ? 'OpenPhysics' : `Open${activeCourseObj.label}`
+  const courseDesc = activeCourseObj.desc
+  const courseHomePath = activeCourseObj.path
 
-  const COURSES = [
-    { key: 'precalc',   label: 'Pre-Calc',  path: '/chapter/precalc-1' },
-    { key: 'calc',      label: 'Calculus',   path: '/chapter/0' },
-    { key: 'physics-1', label: 'Physics',    path: '/chapter/p0' },
-    { key: 'discrete',  label: 'Discrete',   path: '/chapter/discrete-1' },
-  ]
 
   // Auto-scroll to active lesson when not hovering
   useEffect(() => {

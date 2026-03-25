@@ -13,6 +13,7 @@ const courseTitles = {
   'calc': 'Calculus',
   'discrete': 'Discrete Math',
   'physics-1': 'Physics',
+  'geometry': 'Geometry',
 };
 
 const courseIcons = {
@@ -20,6 +21,7 @@ const courseIcons = {
   'calc': '∂',
   'discrete': '∴',
   'physics-1': '🚀',
+  'geometry': '📐',
 };
 
 export default function FloatingVideoPlayer() {
@@ -151,9 +153,16 @@ export default function FloatingVideoPlayer() {
     const custom = customVideos[id] || [];
     const categorized = {};
     if (custom.length > 0) categorized['Your Videos'] = custom;
+
+    // Handle flat array case (legacy/simple mapping)
+    if (Array.isArray(placement)) {
+      categorized['intuition'] = placement.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
+      return categorized;
+    }
+
     ['hook', 'intuition', 'math', 'rigor', 'examples'].forEach(section => {
       const ids = section === 'examples' ? Object.values(placement[section] || {}).flat() : (placement[section] || []);
-      const vids = ids.map(id => ({ ...VIDEO_DATABASE[id], id })).filter(v => v.url);
+      const vids = ids.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
       if (vids.length > 0) categorized[section] = vids;
     });
     return categorized;
@@ -174,9 +183,9 @@ export default function FloatingVideoPlayer() {
         ch.lessons.some(l => {
           const placement = VIDEO_PLACEMENT_MAP[l.id];
           if (!placement) return false;
-          // Check if any standard section has a non-empty ID array
+          // Support both flat arrays and categorized objects
+          if (Array.isArray(placement)) return placement.length > 0;
           const hasRegularVids = ['hook', 'intuition', 'math', 'rigor'].some(s => placement[s]?.length > 0);
-          // Check if examples section has any nested IDs
           const hasExampleVids = placement.examples && Object.values(placement.examples).some(exList => exList?.length > 0);
           return hasRegularVids || hasExampleVids;
         })

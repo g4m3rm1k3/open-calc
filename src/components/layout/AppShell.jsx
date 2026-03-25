@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
-import { LESSON_MAP, CURRICULUM } from '../../content/index.js'
+import { LESSON_MAP, CURRICULUM, COURSES } from '../../content/index.js'
 import PinsPanel from '../ui/PinsPanel.jsx'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
@@ -72,16 +72,20 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
         <MobileLocationBadge />
       </div>
 
-      {/* Desktop Navigation */}
       <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
-        <NavLink to="/chapter/precalc-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Pre-Calc</NavLink>
-        <NavLink to="/chapter/0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Calculus</NavLink>
-        <NavLink to="/chapter/p0" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Physics</NavLink>
-        <NavLink to="/chapter/discrete-1" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Discrete Math</NavLink>
-        <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
-        <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
-        
-        <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
+          {COURSES.map(course => (
+            <NavLink 
+              key={course.key}
+              to={course.path} 
+              className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}
+            >
+              {course.label}
+            </NavLink>
+          ))}
+          <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
+          <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
+          
+          <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
            <span className="text-sm font-bold text-slate-500">DSA</span>
            <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
         </div>

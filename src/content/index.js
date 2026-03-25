@@ -1,3 +1,4 @@
+import { COURSES } from './courses.js'
 import ch0 from './chapter-0/index.js'
 import ch1 from './chapter-1/index.js'
 import ch2 from './chapter-2/index.js'
@@ -39,4 +40,6 @@ export const ALL_LESSONS = CURRICULUM.flatMap((ch) =>
   ch.lessons.map((l) => ({ ...l, chapterNumber: ch.number, chapterTitle: ch.title }))
 )
 
-// Cache bust 1
+export { COURSES }
+
+// Cache bust 2
