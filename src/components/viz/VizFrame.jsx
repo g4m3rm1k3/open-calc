@@ -681,6 +681,12 @@ const VIZ_REGISTRY = {
   RelatedRatesProof: lazy(() => import("./react/RelatedRatesProof.jsx")),
   TaylorSeriesProof: lazy(() => import("./react/TaylorSeriesProof.jsx")),
   ProofEngineViz: lazy(() => import("./react/ProofEngineViz.jsx")),
+  InverseDerivativeProof: lazy(() => import("./react/InverseDerivativeProof.jsx")),
+  InverseFunctionReflection: lazy(() => import("./react/InverseFunctionReflection.jsx")),
+  InverseTrigDomainViz: lazy(() => import("./react/InverseTrigDomainViz.jsx")),
+  MonotoneSignChart: lazy(() => import("./react/MonotoneSignChart.jsx")),
+  SlopeReciprocalViz: lazy(() => import("./react/SlopeReciprocalViz.jsx")),
+  InverseDerivativeTriangle: lazy(() => import("./react/InverseDerivativeTriangle.jsx")),
 };
 
 function VizSkeleton() {
