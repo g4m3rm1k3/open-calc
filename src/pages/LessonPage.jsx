@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { LESSON_MAP, ALL_LESSONS } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
 import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
@@ -16,9 +16,12 @@ export default function LessonPage() {
   const key = `${chapterId}/${slug}`
   const rawLesson = LESSON_MAP[key]
   const lesson = rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null
-  const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus } = useProgress()
+  const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus, setReadingProgress, getReadingProgress } = useProgress()
   const { setLessonId } = useVideoPlayer()
   const activeTab = getActiveTab(lesson?.id ?? '')
+  const initialReadingProgress = getReadingProgress(lesson?.id ?? '')
+
+  const [scrollPercent, setScrollPercent] = useState(0)
 
   // Scroll to top only when navigating to a different lesson
   useEffect(() => {
@@ -43,6 +46,21 @@ export default function LessonPage() {
     }
   }, [lesson?.id, activeTab])
 
+  // Track scrolling progress
+  useEffect(() => {
+    if (!lesson?.id) return
+    const handleScroll = () => {
+      const winScroll = document.documentElement.scrollTop
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
+      if (height === 0) return
+      const scrolled = (winScroll / height) * 100
+      setScrollPercent(scrolled)
+      if (scrolled > 10) setReadingProgress(lesson.id, Math.floor(scrolled))
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lesson?.id, setReadingProgress])
+
   if (!lesson) {
     return (
       <div className="text-center py-20">
@@ -60,7 +78,14 @@ export default function LessonPage() {
   const nextLesson = lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null
 
   return (
-    <article className="max-w-4xl mx-auto">
+    <article className="max-w-4xl mx-auto pb-20">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800 z-[10001] pointer-events-none">
+        <div 
+          className="h-full bg-brand-500 transition-all duration-300 ease-out"
+          style={{ width: `${scrollPercent}%` }}
+        />
+      </div>
       {/* Breadcrumb */}
       <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5 flex-wrap">
         <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">Home</Link>

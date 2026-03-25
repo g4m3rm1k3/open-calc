@@ -61,6 +61,34 @@ export default function FloatingVideoPlayer() {
       return next;
     });
   };
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      // Must come from Youtube
+      if (!event.origin.includes('youtube.com') && !event.origin.includes('youtube-nocookie.com')) return;
+      try {
+        const data = JSON.parse(event.data);
+        
+        // Sometimes YT sends onStateChange: 1 when it starts playing
+        if (data.event === 'onStateChange' && data.info === 1) {
+           // We can assume it "started"
+           if (currentVideo && (videoProgress[currentVideo.id] || 0) === 0) {
+             updateProgress(currentVideo.id, 5);
+           }
+        }
+
+        if (data.event === 'infoDelivery' && data.info) {
+          const { currentTime, duration } = data.info;
+          if (currentTime !== undefined && duration !== undefined && currentVideo) {
+            const percent = Math.floor((currentTime / duration) * 100);
+            updateProgress(currentVideo.id, percent);
+          }
+        }
+      } catch (e) {}
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [currentVideo, videoProgress]);
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
   const [isLauncher, setIsLauncher] = useState(false);
@@ -348,9 +376,25 @@ export default function FloatingVideoPlayer() {
                  </div>
                )}
 
-               {currentVideo && (
-                 <iframe key={currentVideo.url} className="w-full h-full" src={currentVideo.url} title={currentVideo.title} frameBorder="0" allowFullScreen />
-               )}
+                {currentVideo && (
+                  <div className="w-full h-full relative">
+                    <iframe 
+                      key={currentVideo.url} 
+                      className="w-full h-full" 
+                      src={currentVideo.url.includes('?') ? `${currentVideo.url}&enablejsapi=1&origin=${window.location.host}` : `${currentVideo.url}?enablejsapi=1&origin=${window.location.host}`} 
+                      title={currentVideo.title} 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen 
+                    />
+                    <button 
+                      onClick={() => updateProgress(currentVideo.id, 100)}
+                      className="absolute bottom-4 right-4 bg-slate-900/60 backdrop-blur-md text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg border border-white/20 hover:bg-emerald-600 hover:border-emerald-500 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
+                    >
+                      {videoProgress[currentVideo.id] >= 95 ? 'Completed ✓' : 'Mark as Finished'}
+                    </button>
+                  </div>
+                )}
 
                {/* Mobile sidebar toggle Overlay button */}
                {!isMobile && (
@@ -483,6 +527,7 @@ export default function FloatingVideoPlayer() {
                                    key={vid.id} 
                                    video={vid} 
                                    active={vid.id === currentVideo?.id} 
+                                   progress={videoProgress[vid.id] || 0}
                                    onClick={() => selectVideo(vid)} 
                                    onPin={() => togglePin(vid.id)}
                                    isPinned={pinnedVideos.includes(vid.id)}
@@ -515,6 +560,7 @@ export default function FloatingVideoPlayer() {
                                         key={vidId} 
                                         video={{ ...vid, id: vidId }} 
                                         active={vidId === currentVideo?.id} 
+                                        progress={videoProgress[vidId] || 0}
                                         onClick={() => { handlePinnedSelect(vidId); setNavStack(['playlist']); }} 
                                         onPin={() => togglePin(vidId)}
                                         isPinned={true}

@@ -38,8 +38,26 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.activeTab ?? 'intuition'
   }, [progress])
 
+  const setReadingProgress = useCallback((lessonId, percent) => {
+    setProgress((prev) => {
+      const current = prev[lessonId]?.readingProgress ?? 0
+      if (percent <= current) return prev
+      return {
+        ...prev,
+        [lessonId]: { ...prev[lessonId], readingProgress: percent },
+      }
+    })
+  }, [setProgress])
+
+  const getReadingProgress = useCallback((lessonId) => {
+    return progress[lessonId]?.readingProgress ?? 0
+  }, [progress])
+
   return (
-    <ProgressContext.Provider value={{ progress, markCheckpoint, setActiveTab, getLessonStatus, getActiveTab }}>
+    <ProgressContext.Provider value={{ 
+      progress, markCheckpoint, setActiveTab, getLessonStatus, getActiveTab,
+      setReadingProgress, getReadingProgress
+    }}>
       {children}
     </ProgressContext.Provider>
   )
