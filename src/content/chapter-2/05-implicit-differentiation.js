@@ -48,39 +48,9 @@ export default {
     ],
     visualizations: [
       {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.5.1 Implicit Differentiation",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 5: Implicit differentiation, what's going on here?",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Implicit Differentiation Product Rule Normal Line",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Second Derivative Implicitly Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Implicit Differentiation 3  Examples Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Introduction to Implicit Differentiation Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Implicit Differentiation |  Differentiation when you only have an equation, not an explicit function",
-        props: { url: "" }
+        id: 'ImplicitDifferentiation',
+        title: 'Step-by-Step Implicit Differentiation',
+        caption: 'Walk through the machine-logic of differentiating both sides, applying the chain rule, and solving for dy/dx.',
       },
       {
         id: 'ImplicitTangentPlayground',

@@ -305,6 +305,13 @@ const VIZ_REGISTRY = {
   ),
   PythagoreanSlopeEngine: lazy(() => import("./d3/PythagoreanSlopeEngine.jsx")),
   LogExpReciprocalViz: lazy(() => import("./d3/LogExpReciprocalViz.jsx")),
+  InverseFunctionExplainer: lazy(
+    () => import("./react/InverseFunctionExplainer.jsx"),
+  ),
+  RationalExponentProof: lazy(() => import("./react/RationalExponentProof.jsx")),
+  ImplicitDifferentiation: lazy(
+    () => import("./react/ImplicitDifferentiation.jsx"),
+  ),
   // Chapter 2 — Reading derivatives game
   SketchDerivativeGame: lazy(() => import("./react/SketchDerivativeGame.jsx")),
   // Precalc — Algebra (contributed components)

@@ -5,16 +5,7 @@ export default {
   order: 2,
   title: 'Derivatives of Inverse Functions',
   subtitle: 'General inverse-derivative rule, formal proof, and inverse trig formulas',
-  tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'inverse functions',
-    'domain restriction',
-    'monotone',
-    'one-to-one',
-    'horizontal line test',
-    'derivative of inverse',
-    'arcsin',
-    'arctan',
-    'arccos',
-    'implicit differentiation',],
+  tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'domain restriction', 'monotone', 'one-to-one', 'horizontal line test'],
   aliases: 'section 3.7 derivative of inverse function formal proof inverse trig derivatives arcsin arccos arctan inverse trig derivatives, finding inverse, f inverse prime, 1 over f prime',
 
   hook: {
@@ -68,6 +59,11 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'InverseFunctionExplainer',
+        title: 'Step-by-Step Inverse Function Explainer',
+        caption: 'Walk through the logic of inverse functions, mirror geometry, and slope reciprocity.',
+      },
       {
         id: 'InverseSlopeReflectionLab',
         title: 'Slope Reciprocity via Reflection',
@@ -214,6 +210,11 @@ export default {
         title: 'arctan Derivative: Full Geometric Proof',
         mathBridge: 'The proof has three moves: (1) rewrite $y = \\arctan x$ as $\\tan y = x$; (2) differentiate implicitly to get $\\sec^2(y)\\cdot dy/dx = 1$; (3) read $\\sec^2(y) = 1 + \\tan^2(y) = 1 + x^2$ from the right triangle. The triangle in the visualization makes step (3) concrete — you can see the hypotenuse $\\sqrt{1+x^2}$ growing as $x$ grows, and $\\cos^2(y) = 1/(1+x^2)$ directly from the adjacent/hypotenuse ratio.',
         caption: 'Drag x and watch the triangle update. Each proof step stays fixed — only the live numerical values change. This is implicit differentiation made visual.',
+      },
+      {
+        id: 'RationalExponentProof',
+        title: 'Proof: The Power Rule for Rational Exponents',
+        caption: 'Step through the formal derivation of d/dx[x^(m/n)] = (m/n)x^(m/n-1) using the inverse rule.',
       },
       {
         id: 'InverseDerivativeProof',

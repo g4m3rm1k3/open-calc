@@ -128,7 +128,9 @@ export default function PythagoreanSlopeEngine({ params = {} }) {
 
       // Right angle mark
       const rSz = R * 0.07
-      svg.append('rect').attr('x', circPt.x).attr('y', lCy - rSz).attr('width', -rSz).attr('height', rSz)
+      const rX = px >= 0 ? circPt.x - rSz : circPt.x
+      const rY = py >= 0 ? lCy - rSz : lCy
+      svg.append('rect').attr('x', rX).attr('y', rY).attr('width', rSz).attr('height', rSz)
         .attr('fill', 'none').attr('stroke', C.muted).attr('stroke-width', 1)
 
       // Angle arc
