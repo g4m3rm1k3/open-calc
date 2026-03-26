@@ -11,14 +11,65 @@ export default {
     realWorldContext: `In manufacturing, derivatives tell you how fast a machine's output rate is changing — critical for catching drift before defects occur. In physics, velocity is the derivative of position; acceleration is the derivative of velocity. In finance, the "delta" of an option IS a derivative.`,
   },
 
+  mentalModel: [
+    'Derivative = slope = rate = sensitivity',
+    'It answers: “If x changes slightly, what happens to f(x)?”',
+    'It is a LOCAL property — depends on position'
+  ],
+
+  triggers: [
+    {
+      prompt: 'Rate, speed, change',
+      recall: 'Derivative'
+    },
+    {
+      prompt: 'Tangent line',
+      recall: 'Derivative at a point'
+    },
+    {
+      prompt: 'Small change approximation',
+      recall: "f(x+h) ≈ f(x) + f'(x)h"
+    }
+  ],
+
   intuition: {
+    semantics: {
+      core: [
+        { symbol: 'x', meaning: 'independent variable (input you control)' },
+        { symbol: 'f(x)', meaning: 'output produced by the system at input x' },
+        { symbol: 'h', meaning: 'a small change in x (probe distance)' },
+        { symbol: 'f(x+h)', meaning: 'output after a small shift in input' },
+        { symbol: 'f(x+h) - f(x)', meaning: 'change in output' },
+        { symbol: 'h \\to 0', meaning: 'we are zooming in infinitely close' },
+        { symbol: "f'(x)", meaning: 'instantaneous rate of change at x' },
+      ],
+      rulesOfThumb: [
+        'f(x) is NOT multiplication — it is a machine mapping input → output',
+        'The derivative is NOT a fraction, but dy/dx behaves like one algebraically',
+        'h is never zero — it approaches zero',
+        'The derivative is local: it only cares about behavior near x',
+      ]
+    },
+
     prose: [
-      'The derivative is the slope of a curve at a single point — found by taking the limit of secant lines (slopes between two points) as those points get infinitely close together.',
-      '**Visual Perspective**: Draw a curve. Pick a point. Draw a line through that point and another nearby point — that\'s a secant line. Now slide the second point closer and closer to the first. The secant line rotates until it becomes a TANGENT line. That tangent\'s slope is the derivative.',
-      '**Physical Perspective**: Consider position p(t). Average velocity over an interval is the change in position over change in time. Shrink that interval to zero, and you get instantaneous velocity — the derivative p\'(t). This is literally what a speedometer measures.',
-      '**Algebraic Perspective**: The difference quotient (f(x+h)-f(x))/h is the slope of a secant line. Taking the limit as h→0 gives the slope of the tangent. That\'s f\'(x) — the derivative.',
-      '**Geometric Perspective**: The derivative tells you: "if I move a tiny bit in x, how much does y change?" f\'(x) = 2 means "for every 1 unit right, y goes up approximately 2 units — right here." It\'s a LOCAL, INSTANTANEOUS rate, different at every point on the curve.'
+      'The derivative is the slope of a curve at a single point. We find it by taking the limit of "secant lines" (slopes between two points) as those points get infinitely close together.',
+      'This single number represents the **sensitivity** of the system: if I nudge the input by 1 unit, how many units does the output jump?',
     ],
+
+    perspectives: [
+      { type: 'geometric', statement: 'Slope of tangent line at x' },
+      { type: 'physical', statement: 'Instantaneous velocity' },
+      { type: 'algebraic', statement: 'Limit of difference quotient' },
+      { type: 'computational', statement: "Local linear approximation: f(x+h) ≈ f(x) + f'(x)h" }
+    ],
+    bridge: "All four perspectives describe the SAME quantity — f'(x)",
+
+    localLinearity: {
+      statement: 'Near a point, every smooth function behaves like a line',
+      formula: "f(x+h) \\approx f(x) + f'(x)h",
+      meaning: 'The derivative is the best linear predictor of change'
+    },
+
     visualizations: [
       {
         id: 'CalculusFoundationsLab',
@@ -36,12 +87,35 @@ export default {
         caption: 'Watch as secant lines transform into the tangent line as the interval h shrinks to zero.',
       },
     ],
+
+    failureModes: [
+      {
+        case: 'Corner',
+        example: '|x| \\text{ at } x=0',
+        reason: 'left slope ≠ right slope'
+      },
+      {
+        case: 'Vertical tangent',
+        example: 'x^{1/3} \\text{ at } x=0',
+        reason: 'slope → ∞'
+      },
+      {
+        case: 'Discontinuity',
+        example: '\\text{jump functions}',
+        reason: 'no limit exists'
+      }
+    ]
   },
 
   math: {
+    processDefinition: [
+      'Pick a point x',
+      'Move a small amount h → compute slope between x and x+h',
+      'Shrink h toward 0',
+      'Watch the slope stabilize → that value is the derivative'
+    ],
     prose: [
-      'The formal definition of the derivative is the limit of the difference quotient as the interval size h approaches zero.',
-      'Common notations for the derivative include Lagrange (f\'(x)), Leibniz (dy/dx), and Newton (ẋ). Each emphasizes a different aspect of the concept — ratio, function, or time-dependency.'
+      'Common notations for the derivative include Lagrange (f\'(x)), Leibniz (dy/dx), and Newton (ẋ). Each emphasizes a different aspect of the concept.',
     ],
     callouts: [
       {
@@ -51,63 +125,67 @@ export default {
       },
       {
         type: 'insight',
-        title: 'Derivative Rules Table',
+        title: 'Common Derivative Rules',
         body: `
 - **Power Rule**: $\\frac{d}{dx} x^n = n x^{n-1}$
 - **Constant Rule**: $\\frac{d}{dx} c = 0$
 - **Product Rule**: $(fg)' = f'g + fg'$
-- **Chain Rule**: $(f \\circ g)' = f'(g(x)) \\cdot g\'(x)$
-- **Sine/Cosine**: $(\\sin x)' = \\cos x, (\\cos x)' = -\\sin x$
+- **Chain Rule**: $(f \\circ g)' = f'(g(x)) \\cdot g'(x)$
         `
       }
     ]
   },
 
   rigor: {
-    title: 'Deriving the Power Rule from Scratch',
-
+    title: 'Deriving the Power Rule (x²) from First Principles',
+    prose: [
+       'We cancel h in the steps below because we are calculating a limit as h approaches zero, meaning h is specifically **not** zero during the algebraic simplification.'
+    ],
     proofSteps: [
-      { expression: 'f(x) = x^2', annotation: 'Start with the simplest non-trivial power: x².' },
-      { expression: 'f\'(x) = \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}', annotation: 'Apply the definition of the derivative.' },
-      { expression: '= \\lim_{h \\to 0} \\frac{x^2 + 2xh + h^2 - x^2}{h}', annotation: 'Expand (x+h)².' },
-      { expression: '= \\lim_{h \\to 0} \\frac{2xh + h^2}{h}', annotation: 'The x² terms cancel.' },
-      { expression: '= \\lim_{h \\to 0} (2x + h)', annotation: 'Factor out h, then cancel it (h≠0 in a limit).' },
-      { expression: '= 2x', annotation: 'As h→0, the h term vanishes. Power rule: n·xⁿ⁻¹ = 2x¹. ✓' },
+      { 
+        expression: "f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}", 
+        annotation: 'Definition of derivative' 
+      },
+      { 
+        expression: "= \\lim_{h \\to 0} \\frac{x^2 + 2xh + h^2 - x^2}{h}", 
+        annotation: 'Algebraic expansion' 
+      },
+      { 
+        expression: "= \\lim_{h \\to 0} \\frac{2xh + h^2}{h}", 
+        annotation: 'Cancellation' 
+      },
+      { 
+        expression: "= \\lim_{h \\to 0} (2x + h)", 
+        annotation: 'Factor and simplify (valid for h ≠ 0)' 
+      },
+      { 
+        expression: "= 2x", 
+        annotation: 'Limit as h → 0' 
+      }
     ],
   },
 
   examples: [
     {
       id: 'ch2-10-ex1',
-      title: 'Chain Rule: Composite Functions',
-      problem: 'Differentiate f(x) = sin(x³)',
+      title: 'Power Rule and Linearity',
+      problem: 'Find the derivative of f(x) = 5x³ + 2',
       steps: [
-        { expression: 'f(x) = \\sin(\\underbrace{x^3}_{\\text{inner}})', annotation: 'Identify outer function (sin) and inner (x³).' },
-        { expression: 'f\'(x) = \\cos(x^3) \\cdot \\frac{d}{dx}(x^3)', annotation: 'Chain rule: differentiate outer, multiply by derivative of inner.' },
-        { expression: '= \\cos(x^3) \\cdot 3x^2', annotation: 'Power rule on the inner function. Done.' },
+        { expression: "f'(x) = \\frac{d}{dx}(5x^3) + \\frac{d}{dx}(2)", annotation: 'Derivatives are linear: diff term-by-term.' },
+        { expression: "= 5 \\cdot (3x^2) + 0", annotation: 'Power rule: 5 is a constant, x³ becomes 3x².' },
+        { expression: "= 15x^2", annotation: 'Simplify. The constant 2 vanished because it doesn\'t change.' },
       ],
     },
     {
       id: 'ch2-10-ex2',
-      title: 'Product Rule in Action',
-      problem: 'Differentiate f(x) = x² · eˣ',
+      title: 'The "Right Now" Velocity',
+      problem: 'A ball falls $s(t) = 4.9t^2$. Find its velocity at exactly $t=2$.',
       steps: [
-        { expression: '(fg)\' = f\'g + fg\'', annotation: 'Product rule: two terms, each differentiating one factor.' },
-        { expression: 'f = x^2 \\Rightarrow f\' = 2x', annotation: 'Differentiate the first factor.' },
-        { expression: 'g = e^x \\Rightarrow g\' = e^x', annotation: 'Differentiate the second factor (eˣ is its own derivative).' },
-        { expression: '= 2x \\cdot e^x + x^2 \\cdot e^x = e^x(2x + x^2)', annotation: 'Combine and factor. Final answer.' },
+        { expression: "v(t) = s'(t) = \\frac{d}{dt}(4.9t^2)", annotation: 'Velocity is the derivative of position.' },
+        { expression: "v(t) = 4.9 \\cdot (2t) = 9.8t", annotation: 'Power rule on t².' },
+        { expression: "v(2) = 9.8(2) = 19.6 \\text{ m/s}", annotation: 'Evaluate at the specific instant t=2.' },
       ],
-    },
-    {
-      id: 'ch2-10-ex3',
-      title: 'Implicit Differentiation',
-      problem: 'Find dy/dx for x² + y² = 25 (a circle)',
-      steps: [
-        { expression: '\\frac{d}{dx}(x^2) + \\frac{d}{dx}(y^2) = \\frac{d}{dx}(25)', annotation: 'Differentiate both sides with respect to x.' },
-        { expression: '2x + 2y\\frac{dy}{dx} = 0', annotation: 'Chain rule on y² gives 2y·(dy/dx). Right side is 0.' },
-        { expression: '\\frac{dy}{dx} = -\\frac{x}{y}', annotation: 'Solve for dy/dx. The slope depends on BOTH x and y.' },
-      ],
-    },
+    }
   ],
 
   challenges: [
@@ -117,10 +195,10 @@ export default {
       problem: 'Find the equation of the tangent line to f(x) = x³ - 2x at x = 2.',
       hint: 'You need two things: the slope (use f\'(2)) and a point (use f(2)).',
       walkthrough: [
-        { expression: 'f\'(x) = 3x^2 - 2', annotation: 'Differentiate using power rule.' },
-        { expression: 'f\'(2) = 3(4) - 2 = 10', annotation: 'Slope of tangent at x=2 is 10.' },
-        { expression: 'f(2) = 8 - 4 = 4', annotation: 'The point is (2, 4).' },
-        { expression: 'y - 4 = 10(x - 2) \\Rightarrow y = 10x - 16', annotation: 'Point-slope form → tangent line equation.' },
+        { expression: "f'(x) = 3x^2 - 2", annotation: 'Differentiate using power rule.' },
+        { expression: "f'(2) = 3(4) - 2 = 10", annotation: 'Slope of tangent at x=2 is 10.' },
+        { expression: "f(2) = 8 - 4 = 4", annotation: 'The point is (2, 4).' },
+        { expression: "y - 4 = 10(x - 2) \\Rightarrow y = 10x - 16", annotation: 'Point-slope form → tangent line equation.' },
       ],
       answer: 'y = 10x - 16',
     },

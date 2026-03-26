@@ -16,6 +16,7 @@ import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
+import KatexBlock from '../math/KatexBlock.jsx'
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
 export { parseProse } from '../math/parseProse.jsx'
@@ -134,7 +135,7 @@ function SectionDivider({ icon, label, color = 'slate' }) {
 
 function VizCard({ viz, borderColor = 'border-slate-200 dark:border-slate-700' }) {
   return (
-    <div className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm`}>
+    <div className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}>
       {viz.title && (
         <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{viz.title}</p>
@@ -155,6 +156,148 @@ function VizCard({ viz, borderColor = 'border-slate-200 dark:border-slate-700' }
   )
 }
 
+// ─── 📘 Semantic Layer ─────────────────────────────────────────────────────
+
+function SemanticsBlock({ semantics }) {
+  if (!semantics) return null
+  return (
+    <div className="mb-10 rounded-2xl border border-sky-100 dark:border-sky-900/40 bg-sky-50/30 dark:bg-sky-950/20 overflow-hidden">
+      <div className="px-5 py-3 border-b border-sky-100 dark:border-sky-900/40 bg-sky-100/50 dark:bg-sky-900/40">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">Semantic Layer: Symbols & Meaning</h3>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {semantics.core?.map((item, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <div className="flex-shrink-0 min-w-[60px] p-1.5 rounded bg-white dark:bg-slate-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-sm font-bold text-sky-600 dark:text-sky-400 shadow-sm">
+                <KatexBlock expr={item.symbol} />
+              </div>
+              <p className="text-sm text-slate-700 dark:text-slate-300 pt-1.5">{item.meaning}</p>
+            </div>
+          ))}
+        </div>
+        
+        {semantics.rulesOfThumb?.length > 0 && (
+          <div className="rounded-xl bg-white dark:bg-slate-900/50 border border-sky-100 dark:border-sky-800/50 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-2">Rules of Thumb</p>
+            <ul className="space-y-2">
+              {semantics.rulesOfThumb.map((rule, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
+                  <span className="text-sky-500 mt-0.5">→</span>
+                  {parseProse(rule)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── 🌉 Multi-Perspective Synchronization ──────────────────────────────────
+
+function PerspectiveSync({ perspectives, bridge }) {
+  if (!perspectives?.length) return null
+  return (
+    <div className="mb-8 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-900 dark:to-indigo-950/20 shadow-sm">
+      <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4">Perspective Synchronization Block</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        {perspectives.map((p, i) => (
+          <div key={i} className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-indigo-50 dark:border-indigo-800 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-indigo-400 dark:text-indigo-500 mb-1">{p.type}</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.statement}</p>
+          </div>
+        ))}
+      </div>
+      {bridge && (
+        <div className="mt-4 pt-4 border-t border-indigo-100 dark:border-indigo-800 text-center">
+          <p className="inline-block px-4 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/30">
+            {bridge}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── ⚠️ Failure Modes ───────────────────────────────────────────────────────
+
+function FailureModes({ modes }) {
+  if (!modes?.length) return null
+  return (
+    <div className="mb-8 rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/20 dark:bg-rose-950/10 overflow-hidden">
+      <div className="px-5 py-3 border-b border-rose-100 dark:border-rose-900/40 bg-rose-100/30 dark:bg-rose-900/30">
+         <h3 className="text-xs font-bold uppercase tracking-widest text-rose-700 dark:text-rose-400 flex items-center gap-2">
+           <span>🚨</span> Failure Modes: Where the Definition Breaks
+         </h3>
+      </div>
+      <div className="p-4 overflow-x-auto">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-rose-100 dark:border-rose-900/50">
+              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">Case</th>
+              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">Example</th>
+              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">Internal Logic Failure</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-rose-50 dark:divide-rose-900/20">
+            {modes.map((m, i) => (
+              <tr key={i} className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors">
+                <td className="py-3 pr-4 font-bold text-slate-800 dark:text-slate-200">{m.case}</td>
+                <td className="py-3 pr-4 text-slate-600 dark:text-slate-400 font-mono"><KatexBlock expr={m.example} /></td>
+                <td className="py-3 italic text-rose-700 dark:text-rose-300">{m.reason}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ─── 🔍 Local Linearity ────────────────────────────────────────────────────
+
+function LocalLinearity({ config }) {
+  if (!config) return null
+  return (
+    <div className="mb-8 p-5 p-5 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/10 dark:bg-emerald-950/5">
+       <div className="flex items-center gap-3 mb-3">
+         <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">🔍</div>
+         <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest">Local Linearity Principle</h3>
+       </div>
+       <p className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-3 leading-snug">{config.statement}</p>
+       <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-emerald-100 dark:border-emerald-900 shadow-sm mb-3 text-center">
+          <KatexBlock expr={config.formula} />
+       </div>
+       <p className="text-sm text-emerald-800 dark:text-emerald-400 font-medium">Meaning: {config.meaning}</p>
+    </div>
+  )
+}
+
+// ─── 🎯 Recall Triggers ───────────────────────────────────────────────────
+
+function TriggerSystem({ triggers }) {
+  if (!triggers?.length) return null
+  return (
+    <div className="mt-8 space-y-3">
+       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">Internal Trigger & Recall System</p>
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+         {triggers.map((p, i) => (
+           <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-700 transition-colors cursor-default group">
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tight mb-1">Trigger</p>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-brand-600 transition-colors">"{p.prompt}"</p>
+              <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <p className="text-[10px] text-brand-500 font-bold uppercase mb-1">Recall</p>
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 italic">{p.recall}</p>
+              </div>
+           </div>
+         ))}
+       </div>
+    </div>
+  )
+}
+
 // ─── 🧠 Intuition block ────────────────────────────────────────────────────
 
 function IntuitionBlock({ data }) {
@@ -171,7 +314,10 @@ function IntuitionBlock({ data }) {
   return (
     <div className="mb-10">
       <SectionDivider icon="🧠" label="Intuition" color="slate" />
+      <SemanticsBlock semantics={data.semantics} />
       <SectionContent data={data} />
+      {data.perspectives?.length > 0 && <PerspectiveSync perspectives={data.perspectives} bridge={data.bridge} />}
+      {data.localLinearity && <LocalLinearity config={data.localLinearity} />}
       {primaryVizzes.length > 0 && (
         <div className="mt-6 space-y-4">
           {primaryVizzes.map((viz, i) => (
@@ -179,6 +325,7 @@ function IntuitionBlock({ data }) {
           ))}
         </div>
       )}
+      {data.failureModes?.length > 0 && <FailureModes modes={data.failureModes} />}
       {hasAlternate && (
         <>
           <div className="my-8 flex items-center gap-3 text-slate-400 dark:text-slate-600">
@@ -223,6 +370,19 @@ function MathBlock({ data }) {
       </button>
       {open && (
         <div className="px-6 py-5 bg-brand-50/30 dark:bg-brand-950/10 space-y-4">
+          {data.processDefinition?.length > 0 && (
+            <div className="mb-6 p-4 rounded-xl bg-brand-600 text-white shadow-xl shadow-brand-500/20">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-brand-200 mb-3">Operational Thinking: Finding the Derivative</p>
+              <ol className="space-y-3">
+                {data.processDefinition.map((step, i) => (
+                  <li key={i} className="flex gap-4 text-sm font-semibold border-l-2 border-brand-400/30 pl-4 items-center">
+                    <span className="w-5 h-5 rounded-full bg-brand-700 flex items-center justify-center text-[10px] text-brand-300 flex-shrink-0">{i+1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
           <SectionContent data={data} />
           {vizzes.length > 0 && (
             <div className="mt-4 space-y-4">
@@ -296,7 +456,7 @@ function RigorBlock({ data }) {
 
 // ─── 📝 Practice block ─────────────────────────────────────────────────────
 
-function PracticeBlock({ examples, challenges }) {
+function PracticeBlock({ examples, challenges, triggers }) {
   const hasExamples = examples?.length > 0
   const hasChallenges = challenges?.length > 0
   if (!hasExamples && !hasChallenges) return null
@@ -326,6 +486,7 @@ function PracticeBlock({ examples, challenges }) {
           </div>
         </div>
       )}
+      {triggers?.length > 0 && <TriggerSystem triggers={triggers} />}
     </div>
   )
 }
@@ -336,10 +497,22 @@ export default function MicroCycleLesson({ lesson }) {
   return (
     <div className="w-full">
       <IntuitionBlock data={lesson.intuition} />
+      {lesson.mentalModel?.length > 0 && (
+         <div className="mb-10 p-5 rounded-2xl bg-slate-900 text-white border-b-4 border-brand-500 shadow-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
+            <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
+               {lesson.mentalModel.map((item, i) => (
+                 <div key={i} className="text-center">
+                    <p className="text-base font-bold bg-gradient-to-r from-brand-300 to-emerald-300 bg-clip-text text-transparent">{item}</p>
+                 </div>
+               ))}
+            </div>
+         </div>
+      )}
       <MathBlock data={lesson.math} />
       <RigorBlock data={lesson.rigor} />
       <UnifiedLearningDock lesson={lesson} />
-      <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} />
+      <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
       {lesson.supplementalVisualizations?.length > 0 && (
         <div className="mt-12 space-y-8">
           <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />
