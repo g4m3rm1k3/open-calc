@@ -2,7 +2,7 @@ export default {
   id: 'ch2-002b',
   slug: 'derivatives-of-inverse-functions',
   chapter: 2,
-  order: 2,
+  order: 4,
   title: 'Derivatives of Inverse Functions',
   subtitle: 'General inverse-derivative rule, formal proof, and inverse trig formulas',
   tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'domain restriction', 'monotone', 'one-to-one', 'horizontal line test'],

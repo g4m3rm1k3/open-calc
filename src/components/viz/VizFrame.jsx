@@ -309,6 +309,7 @@ const VIZ_REGISTRY = {
     () => import("./react/InverseFunctionExplainer.jsx"),
   ),
   RationalExponentProof: lazy(() => import("./react/RationalExponentProof.jsx")),
+  CalculusFoundationsLab: lazy(() => import("./react/CalculusFoundationsLab.jsx")),
   ImplicitDifferentiation: lazy(
     () => import("./react/ImplicitDifferentiation.jsx"),
   ),

@@ -3,7 +3,7 @@ export default {
   id: 'ch2-001',
   slug: 'differentiation-rules',
   chapter: 2,
-  order: 1,
+  order: 2,
   title: 'Differentiation Rules — Power, Product, Quotient',
   subtitle: 'Shortcuts that transform hours of limit-computing into seconds of pattern-matching',
   tags: ['power rule', 'product rule', 'quotient rule', 'differentiation rules', 'constant rule', 'sum rule', 'polynomial derivatives'],

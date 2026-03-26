@@ -4,73 +4,68 @@ export default {
   title: 'Derivatives: The Slope Machine',
   tags: ['calculus', 'derivatives', 'rate-of-change', 'differentiation'],
   chapter: 2,
-  order: 10,
+  order: 0,
 
   hook: {
     question: 'How fast is something changing RIGHT NOW — not on average, but at this exact instant?',
-    context: `Speed on your car's speedometer isn't an average — it's instantaneous.
-      How does it know? Calculus. The derivative is the mathematical tool that captures
-      the EXACT rate of change at a single point, not over an interval.`,
-    realWorld: `In manufacturing, derivatives tell you how fast a machine's output rate is changing —
-      critical for catching drift before defects occur. In finance, the "delta" of an option IS
-      a derivative. In physics, velocity is the derivative of position; acceleration is the derivative of velocity.`,
+    realWorldContext: `In manufacturing, derivatives tell you how fast a machine's output rate is changing — critical for catching drift before defects occur. In physics, velocity is the derivative of position; acceleration is the derivative of velocity. In finance, the "delta" of an option IS a derivative.`,
   },
 
   intuition: {
-    summary: `The derivative is the slope of a curve at a single point — found by taking the limit
-      of secant lines (slopes between two points) as those points get infinitely close together.`,
-    perspectives: [
+    prose: [
+      'The derivative is the slope of a curve at a single point — found by taking the limit of secant lines (slopes between two points) as those points get infinitely close together.',
+      '**Visual Perspective**: Draw a curve. Pick a point. Draw a line through that point and another nearby point — that\'s a secant line. Now slide the second point closer and closer to the first. The secant line rotates until it becomes a TANGENT line. That tangent\'s slope is the derivative.',
+      '**Physical Perspective**: Consider position p(t). Average velocity over an interval is the change in position over change in time. Shrink that interval to zero, and you get instantaneous velocity — the derivative p\'(t). This is literally what a speedometer measures.',
+      '**Algebraic Perspective**: The difference quotient (f(x+h)-f(x))/h is the slope of a secant line. Taking the limit as h→0 gives the slope of the tangent. That\'s f\'(x) — the derivative.',
+      '**Geometric Perspective**: The derivative tells you: "if I move a tiny bit in x, how much does y change?" f\'(x) = 2 means "for every 1 unit right, y goes up approximately 2 units — right here." It\'s a LOCAL, INSTANTANEOUS rate, different at every point on the curve.'
+    ],
+    visualizations: [
       {
-        style: 'visual',
-        explanation: `Draw a curve. Pick a point. Draw a line through that point and another nearby point —
-          that's a secant line. Now slide the second point closer and closer to the first.
-          The secant line rotates until it becomes a TANGENT line. That tangent's slope is the derivative.`,
-        visualizationId: 'TangentLineViz',
+        id: 'CalculusFoundationsLab',
+        title: 'Calculus Foundations: The Semantic Lab',
+        caption: 'Before differentiating, we must understand WHAT the symbols mean. Use this lab to decode dependency, motion, and change propagation.',
       },
       {
-        style: 'physical',
-        explanation: `Position p(t). Average velocity over [t, t+h] = (p(t+h) - p(t)) / h.
-          Shrink h to zero. You get instantaneous velocity — the derivative p'(t).
-          This is literally what a speedometer measures.`,
+        id: 'TangentLineViz',
+        title: 'Visualizing the Derivative: The Tangent Line',
+        caption: 'The derivative at a point is literally the slope of the line that just brushes the curve at that exact location.',
       },
       {
-        style: 'algebraic',
-        explanation: `The difference quotient (f(x+h)-f(x))/h is the slope of a secant line.
-          Taking the limit as h→0 gives the slope of the tangent. That's f'(x) — the derivative.`,
-      },
-      {
-        style: 'geometric',
-        explanation: `The derivative tells you: "if I move a tiny bit in x, how much does y change?"
-          f'(x) = 2 means "for every 1 unit right, y goes up approximately 2 units — right here."
-          It's a LOCAL, INSTANTANEOUS rate. Different at every point on a curve.`,
+        id: 'DerivativeFromFirstPrinciplesViz',
+        title: 'The Limit Definition in Action',
+        caption: 'Watch as secant lines transform into the tangent line as the interval h shrinks to zero.',
       },
     ],
   },
 
   math: {
-    formalDefinition: `f'(x) = lim_{h→0} [f(x+h) - f(x)] / h`,
-    notation: `Common notations for the derivative:
-      f'(x)  (Lagrange / prime notation)
-      dy/dx  (Leibniz notation)
-      Df(x)  (operator notation)
-      ẋ      (Newton's dot notation — used in physics for time derivatives)`,
-    keyRules: [
-      { name: 'Power Rule', formula: '\\frac{d}{dx} x^n = n x^{n-1}' },
-      { name: 'Constant Rule', formula: '\\frac{d}{dx} c = 0' },
-      { name: 'Sum Rule', formula: '(f + g)\' = f\' + g\'' },
-      { name: 'Product Rule', formula: '(fg)\' = f\'g + fg\'' },
-      { name: 'Quotient Rule', formula: '\\left(\\frac{f}{g}\\right)\' = \\frac{f\'g - fg\'}{g^2}' },
-      { name: 'Chain Rule', formula: '(f \\circ g)\' = f\'(g(x)) \\cdot g\'(x)' },
-      { name: 'Common: sin', formula: '\\frac{d}{dx}\\sin x = \\cos x' },
-      { name: 'Common: cos', formula: '\\frac{d}{dx}\\cos x = -\\sin x' },
-      { name: 'Common: eˣ', formula: '\\frac{d}{dx}e^x = e^x' },
-      { name: 'Common: ln', formula: '\\frac{d}{dx}\\ln x = \\frac{1}{x}' },
+    prose: [
+      'The formal definition of the derivative is the limit of the difference quotient as the interval size h approaches zero.',
+      'Common notations for the derivative include Lagrange (f\'(x)), Leibniz (dy/dx), and Newton (ẋ). Each emphasizes a different aspect of the concept — ratio, function, or time-dependency.'
     ],
+    callouts: [
+      {
+        type: 'definition',
+        title: 'Formal Definition',
+        body: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}"
+      },
+      {
+        type: 'insight',
+        title: 'Derivative Rules Table',
+        body: `
+- **Power Rule**: $\\frac{d}{dx} x^n = n x^{n-1}$
+- **Constant Rule**: $\\frac{d}{dx} c = 0$
+- **Product Rule**: $(fg)' = f'g + fg'$
+- **Chain Rule**: $(f \\circ g)' = f'(g(x)) \\cdot g\'(x)$
+- **Sine/Cosine**: $(\\sin x)' = \\cos x, (\\cos x)' = -\\sin x$
+        `
+      }
+    ]
   },
 
   rigor: {
-    visualizationId: 'DerivativeFromFirstPrinciplesViz',
     title: 'Deriving the Power Rule from Scratch',
+
     proofSteps: [
       { expression: 'f(x) = x^2', annotation: 'Start with the simplest non-trivial power: x².' },
       { expression: 'f\'(x) = \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}', annotation: 'Apply the definition of the derivative.' },
@@ -129,35 +124,5 @@ export default {
       ],
       answer: 'y = 10x - 16',
     },
-    {
-      id: 'ch2-10-c2',
-      difficulty: 'medium',
-      problem: 'A ball\'s position is s(t) = -16t² + 64t feet. When does it reach maximum height?',
-      hint: 'Maximum height is when velocity = 0. Velocity is the derivative of position.',
-      walkthrough: [
-        { expression: 'v(t) = s\'(t) = -32t + 64', annotation: 'Differentiate position to get velocity.' },
-        { expression: '-32t + 64 = 0 \\Rightarrow t = 2', annotation: 'Set velocity to zero and solve.' },
-        { expression: 's(2) = -16(4) + 64(2) = 64 \\text{ feet}', annotation: 'Maximum height is 64 feet, reached at t=2 seconds.' },
-      ],
-      answer: 't = 2 seconds; maximum height = 64 feet',
-    },
   ],
-
-      visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "5 counterexamples every calculus student should know",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Finding Derivative with Definition of Derivative Calculus 1 AB",
-        props: { url: "" }
-      },
-      ],
-    }
+};

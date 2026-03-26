@@ -3,7 +3,7 @@ export default {
   id: 'ch2-000',
   slug: 'tangent-problem',
   chapter: 2,
-  order: 0,
+  order: 1,
   title: 'The Derivative — From Average to Instantaneous Change',
   subtitle: 'How a single limiting process unlocks the instantaneous rate of change of any function',
   tags: ['derivative', 'limit definition', 'difference quotient', 'tangent line', 'instantaneous rate of change', 'differentiability', 'notation'],

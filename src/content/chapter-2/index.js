@@ -19,6 +19,7 @@ export default {
   description: 'The instantaneous rate of change. Derivatives unlock velocity, optimization, curve sketching, and the fundamental link between a function and its slope at every point.',
   color: 'violet',
   lessons: [
+    derivativesIntroduction,
     tangentProblem,
     differentiationRules,
     chainRule,
@@ -28,7 +29,6 @@ export default {
     productRuleChainTrap,
     implicitDifferentiation,
     readingDerivatives,
-    derivativesIntroduction,
     polynomialDivisionRoots,
     absoluteValueRadicals,
   ],

@@ -3,7 +3,7 @@ export default {
   id: 'ch2-002',
   slug: 'chain-rule',
   chapter: 2,
-  order: 2,
+  order: 3,
   title: 'The Chain Rule — Differentiating Compositions',
   subtitle: 'How to differentiate a function inside another function — the most widely used rule in all of calculus',
   tags: ['chain rule', 'composite functions', 'composition', 'outside-inside', 'Leibniz form', 'triple composition'],
