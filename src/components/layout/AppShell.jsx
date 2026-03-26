@@ -10,7 +10,7 @@ import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import GrapherContext from '../../context/GrapherContext.jsx'
-import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu } from 'lucide-react'
+import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import MobileBottomNav from './MobileBottomNav.jsx'
 
@@ -45,7 +45,7 @@ function MobileLocationBadge() {
   )
 }
 
-function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -62,13 +62,23 @@ function TopBar({ onMenuToggle, onGraphToggle, onGraph3DToggle, onGraphJSXToggle
         <button
           onClick={onMenuToggle}
           className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          aria-label="Toggle menu"
+          aria-label={sidebarOpen ? "Close menu" : "Toggle menu"}
         >
-          <Menu className="w-6 h-6" />
+          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
-        <Link to="/" className="p-2 -ml-1 rounded-lg text-brand-600 dark:text-brand-400 font-bold text-xl">
-          ∂
-        </Link>
+        <AnimatePresence>
+          {!sidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+            >
+              <Link to="/" className="p-2 -ml-1 rounded-lg text-brand-600 dark:text-brand-400 font-bold text-xl">
+                ∂
+              </Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
@@ -292,6 +302,7 @@ export default function AppShell({ children }) {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <TopBar 
         onMenuToggle={() => setSidebarOpen((o) => !o)} 
+        sidebarOpen={sidebarOpen}
         onGraphToggle={() => setGraphOpen(prev => !prev)}
         onGraph3DToggle={() => setGraph3DOpen(prev => !prev)}
         onGraphJSXToggle={() => setGraphJSXOpen(prev => !prev)}
@@ -319,8 +330,9 @@ export default function AppShell({ children }) {
       <aside 
         onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
         onMouseLeave={() => setSidebarHovered(false)}
-        className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0 w-[280px]' : (isSidebarExpanded ? 'translate-x-0 w-[280px]' : '-translate-x-full lg:-translate-x-[276px] w-[280px]')}
+        className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out w-[280px]
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isSidebarExpanded ? 'lg:translate-x-0' : 'lg:-translate-x-[276px]'}
           ${!sidebarPinned && isSidebarExpanded ? 'shadow-2xl ring-1 ring-black/5 dark:ring-white/5' : ''}
         `}
       >
