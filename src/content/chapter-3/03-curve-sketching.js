@@ -122,6 +122,11 @@ export default {
         props: { url: "" }
       },
       {
+        id: 'RollerCoaster',
+        title: 'Roller Coaster Physics: Tangents & Curvature',
+        caption: 'The thrill of a roller coaster is all about the derivatives: the slope (first derivative) and the g-force from concavity (second derivative).',
+      },
+      {
         id: 'CurveSketchingBoard',
         title: 'Full Curve Analysis — Annotated',
         caption: 'Select a function from the menu. See f, f\', and f\'\' plotted together, with local extrema, inflection points, and concavity regions all labeled.',

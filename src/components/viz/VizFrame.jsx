@@ -604,6 +604,9 @@ const VIZ_REGISTRY = {
   DirectionCosineFormRecogniser: lazy(
     () => import("./react/DirectionCosineFormRecogniser.jsx"),
   ),
+  NewtonCooling: lazy(() => import("./react/NewtonCooling.jsx")),
+  RollerCoaster: lazy(() => import("./react/RollerCoaster.jsx")),
+  SpeedingTicket: lazy(() => import("./react/SpeedingTicket.jsx")),
 
   // Physics Chapter 2: Motion in One Dimension
   KinematicProof: lazy(() => import("./ch2/KinematicProof.jsx")),

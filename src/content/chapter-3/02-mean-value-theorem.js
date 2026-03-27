@@ -77,6 +77,11 @@ export default {
         props: { url: "" }
       },
       {
+        id: 'SpeedingTicket',
+        title: 'The Speeding Ticket Paradox',
+        caption: 'Average speed vs. Instantaneous speed. If the average exceeds the limit, the MVT guarantees you were speeding at some point.',
+      },
+      {
         id: 'MVTViz',
         title: 'Mean Value Theorem — Interactive',
         caption: 'Drag the interval endpoints a and b. The green tangent line at c is always parallel to the amber secant. There is always at least one such c.',

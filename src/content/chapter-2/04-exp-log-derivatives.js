@@ -120,6 +120,11 @@ export default {
         props: { url: "" },
       },
       {
+        id: 'NewtonCooling',
+        title: "Newton's Law of Cooling",
+        caption: "Witness exponential decay in action. The rate at which the coffee cools is proportional to the difference between its temperature and the room temperature.",
+      },
+      {
         id: 'VideoEmbed',
         title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
         props: { url: "" },
