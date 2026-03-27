@@ -127,6 +127,11 @@ export default {
         caption: 'The thrill of a roller coaster is all about the derivatives: the slope (first derivative) and the g-force from concavity (second derivative).',
       },
       {
+        id: 'RollerCoasterDeep',
+        title: 'Deep G-Force Analysis: The Vector Calculus of Thrills',
+        caption: 'Go beyond the slope. Explore how the normal acceleration (g-force) is a direct consequence of the second derivative and the radius of curvature.',
+      },
+      {
         id: 'CurveSketchingBoard',
         title: 'Full Curve Analysis — Annotated',
         caption: 'Select a function from the menu. See f, f\', and f\'\' plotted together, with local extrema, inflection points, and concavity regions all labeled.',

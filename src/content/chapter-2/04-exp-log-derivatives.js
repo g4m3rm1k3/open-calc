@@ -125,6 +125,11 @@ export default {
         caption: "Witness exponential decay in action. The rate at which the coffee cools is proportional to the difference between its temperature and the room temperature.",
       },
       {
+        id: 'NewtonCoolingDeep',
+        title: "The Mechanics of Decay: Why it Never Reaches",
+        caption: "Dive deeper into the halving-gap logic and the formal proof that objects never exactly reach equilibrium.",
+      },
+      {
         id: 'VideoEmbed',
         title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
         props: { url: "" },
