@@ -129,6 +129,40 @@ const VIZ_REGISTRY = {
   SeriesConvergenceLab: lazy(() => import("./d3/SeriesConvergenceLab.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
+  Ch2_1_LighthouseAngle: lazy(
+    () => import("./react/Ch2_1_LighthouseAngle.jsx"),
+  ),
+  Ch2_2_TwoStars: lazy(() => import("./react/Ch2_2_TwoStars.jsx")),
+  Ch2_3_RippleAndWave: lazy(() => import("./react/Ch2_3_RippleAndWave.jsx")),
+  Ch2_4_AngleAddition: lazy(() => import("./react/Ch2_4_AngleAddition.jsx")),
+  Ch2_5_SpinningWheel: lazy(() => import("./react/Ch2_5_SpinningWheel.jsx")),
+  Ch2_6_EchoProblem: lazy(() => import("./react/Ch2_6_EchoProblem.jsx")),
+  Ch3_1_HowFastWasIt: lazy(() => import("./react/Ch3_1_HowFastWasIt.jsx")),
+  Ch3_2_GettingCloser: lazy(() =>
+    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
+      default: m.Ch3_2_GettingCloser,
+    })),
+  ),
+  Ch3_3_InfiniteStaircase: lazy(() =>
+    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
+      default: m.Ch3_3_InfiniteStaircase,
+    })),
+  ),
+  Ch3_4_SineOfAlmostNothing: lazy(() =>
+    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
+      default: m.Ch3_4_SineOfAlmostNothing,
+    })),
+  ),
+  Ch3_5_BrokenFunction: lazy(() =>
+    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
+      default: m.Ch3_5_BrokenFunction,
+    })),
+  ),
+  Ch3_6_BridgeToCalculus: lazy(() =>
+    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
+      default: m.Ch3_6_BridgeToCalculus,
+    })),
+  ),
   PascalsTriangle: lazy(() => import("./react/PascalsTriangle.jsx")),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution: lazy(() => import("./d3/VolumesOfRevolution.jsx")),
@@ -309,8 +343,12 @@ const VIZ_REGISTRY = {
   InverseFunctionExplainer: lazy(
     () => import("./react/InverseFunctionExplainer.jsx"),
   ),
-  RationalExponentProof: lazy(() => import("./react/RationalExponentProof.jsx")),
-  CalculusFoundationsLab: lazy(() => import("./react/CalculusFoundationsLab.jsx")),
+  RationalExponentProof: lazy(
+    () => import("./react/RationalExponentProof.jsx"),
+  ),
+  CalculusFoundationsLab: lazy(
+    () => import("./react/CalculusFoundationsLab.jsx"),
+  ),
   ImplicitDifferentiation: lazy(
     () => import("./react/ImplicitDifferentiation.jsx"),
   ),
@@ -610,7 +648,9 @@ const VIZ_REGISTRY = {
   RollerCoaster: lazy(() => import("./react/RollerCoaster.jsx")),
   RollerCoasterDeep: lazy(() => import("./react/RollerCoasterDeep.jsx")),
   SpeedingTicket: lazy(() => import("./react/SpeedingTicket.jsx")),
-  KineticEnergySpeeding: lazy(() => import("./react/KineticEnergySpeeding.jsx")),
+  KineticEnergySpeeding: lazy(
+    () => import("./react/KineticEnergySpeeding.jsx"),
+  ),
 
   // Physics Chapter 2: Motion in One Dimension
   KinematicProof: lazy(() => import("./ch2/KinematicProof.jsx")),
@@ -699,12 +739,18 @@ const VIZ_REGISTRY = {
   RelatedRatesProof: lazy(() => import("./react/RelatedRatesProof.jsx")),
   TaylorSeriesProof: lazy(() => import("./react/TaylorSeriesProof.jsx")),
   ProofEngineViz: lazy(() => import("./react/ProofEngineViz.jsx")),
-  InverseDerivativeProof: lazy(() => import("./react/InverseDerivativeProof.jsx")),
-  InverseFunctionReflection: lazy(() => import("./react/InverseFunctionReflection.jsx")),
+  InverseDerivativeProof: lazy(
+    () => import("./react/InverseDerivativeProof.jsx"),
+  ),
+  InverseFunctionReflection: lazy(
+    () => import("./react/InverseFunctionReflection.jsx"),
+  ),
   InverseTrigDomainViz: lazy(() => import("./react/InverseTrigDomainViz.jsx")),
   MonotoneSignChart: lazy(() => import("./react/MonotoneSignChart.jsx")),
   SlopeReciprocalViz: lazy(() => import("./react/SlopeReciprocalViz.jsx")),
-  InverseDerivativeTriangle: lazy(() => import("./react/InverseDerivativeTriangle.jsx")),
+  InverseDerivativeTriangle: lazy(
+    () => import("./react/InverseDerivativeTriangle.jsx"),
+  ),
   VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
 };
 

@@ -64,6 +64,18 @@ export default {
           "The derivative is what the difference quotient becomes when $h$ reaches zero.",
       },
       {
+        id: "Ch3_1_HowFastWasIt",
+        title: "Story Viz — How Fast Was It?",
+        caption:
+          "Book 3 Chapter 1 narrative bridge from average speed to instantaneous rate.",
+      },
+      {
+        id: "Ch3_6_BridgeToCalculus",
+        title: "Story Viz — Bridge to Calculus",
+        caption:
+          "Book 3 Chapter 6 capstone connecting difference quotient limits to derivative definition.",
+      },
+      {
         id: "Ch4_RampSlope",
         title: "Story Mode: The Ramp That Fought Back",
         mathBridge:
