@@ -72,6 +72,11 @@ export default {
 
     visualizations: [
       {
+        id: 'LineFoundationsLab',
+        title: 'Foundations of Lines: Slope, Form, and Flow',
+        caption: 'Before calculus, we must master the line. Experience how Δy/Δx creates a constant rate of change and how equations are just constraints on a path.',
+      },
+      {
         id: 'CalculusFoundationsLab',
         title: 'Calculus Foundations: The Semantic Lab',
         caption: 'Before differentiating, we must understand WHAT the symbols mean. Use this lab to decode dependency, motion, and change propagation.',

@@ -3,6 +3,7 @@ import setsAndLogic from './00a-sets-and-logic.js'
 import geometryReview from './00b-geometry-review.js'
 import conicSections from './00d-conic-sections.js'
 import inequalities from './00c-inequalities.js'
+import linesMastery from './00c-lines-mastery.js'
 import absoluteValue from './01a-absolute-value.js'
 import algebraicTechniques from './01b-algebraic-techniques.js'
 import polynomialDivision from './01c-polynomial-division.js'
@@ -31,6 +32,7 @@ export default {
     geometryReview,
     conicSections,
     inequalities,
+    linesMastery,
     absoluteValue,
     algebraicTechniques,
     polynomialDivision,
