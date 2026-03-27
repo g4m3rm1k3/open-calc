@@ -287,6 +287,79 @@ export default {
     { lessonSlug: 'indefinite-integrals', label: 'Indefinite Integrals', context: 'Computing definite integrals algebraically requires antiderivatives. Lesson 4 builds the antiderivative toolkit.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "area under a curve",
+            "meaning": "the region between the function graph and the x-axis — counted positively above, negatively below"
+        },
+        {
+            "symbol": "accumulation",
+            "meaning": "the running total of the area as the upper limit x increases"
+        },
+        {
+            "symbol": "signed area",
+            "meaning": "area above x-axis is positive; area below is negative — the two can cancel"
+        }
+    ],
+    "rulesOfThumb": [
+        "Think physically: if f(t) is rate of flow (gallons/min), the area under f from 0 to T is total gallons accumulated.",
+        "The accumulation function A(x) = ∫₀ˣ f(t) dt is a new function of x — its derivative is f(x) (this is the FTC!).",
+        "Negative regions do not mean the area calculation is wrong — they represent net change, not total change."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: The Derivative",
+            "note": "The derivative asks: how fast is f changing at x? The integral asks: how much of f has accumulated from a to x? These are inverse questions — and the FTC makes that inversion precise."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch4-riemann-sums",
+            "label": "Next: Riemann Sums",
+            "note": "Area accumulation is formalized through Riemann sums — approximating curved areas with rectangles. The limit of those sums defines the definite integral."
+        },
+        {
+            "lessonId": "ch4-fundamental-theorem",
+            "label": "Ch. 4: Fundamental Theorem",
+            "note": "FTC Part 1 says: d/dx[A(x)] = f(x). The derivative of the accumulation function is f itself. This lesson introduces that idea intuitively before the formal proof."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "aa-assess-1",
+            "type": "choice",
+            "text": "If f(t) is the rate of fuel consumption in gallons/hour, what does ∫₀³ f(t) dt represent?",
+            "options": [
+                "The fuel consumption rate at t=3",
+                "Total gallons consumed from hour 0 to hour 3",
+                "Average consumption rate",
+                "Instantaneous rate at some moment"
+            ],
+            "answer": "Total gallons consumed from hour 0 to hour 3",
+            "hint": "Integrating a rate gives accumulated quantity. Area under a rate curve = total amount."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Integral = accumulated area (signed: positive above, negative below)",
+    "Rate × time = amount (integral generalizes this)",
+    "A(x) = ∫₀ˣ f(t) dt is a new function; its derivative is f(x)"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

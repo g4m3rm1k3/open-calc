@@ -713,6 +713,98 @@ export default {
     },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "objective function",
+            "meaning": "the quantity you want to maximize or minimize — e.g., area, cost, time"
+        },
+        {
+            "symbol": "constraint",
+            "meaning": "the equation that limits your choices — e.g., fixed perimeter, fixed volume"
+        },
+        {
+            "symbol": "critical number",
+            "meaning": "where f'= 0 inside the feasible domain — an interior max/min candidate"
+        },
+        {
+            "symbol": "Extreme Value Theorem",
+            "meaning": "guarantees a max and min exist when f is continuous on a closed interval"
+        }
+    ],
+    "rulesOfThumb": [
+        "5 steps: understand the problem → draw → label variables → write objective + constraint → use constraint to reduce to one variable → differentiate and solve.",
+        "Always verify your critical points are actually max/min using the second derivative test or endpoint comparison.",
+        "Check endpoints! On a closed interval, the global max/min might be at an endpoint, not a critical point.",
+        "If the domain is open or unbounded, use limits at the boundary to confirm the critical point is a global max/min."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch3-curve-sketching",
+            "label": "Previous: Curve Sketching",
+            "note": "Optimization uses exactly the same critical-point machinery as curve sketching. The difference is that you now have a real-world question attached to the mathematics."
+        },
+        {
+            "lessonId": "ch3-related-rates",
+            "label": "Ch. 3: Related Rates",
+            "note": "Both related rates and optimization require translating a geometric/physical situation into an equation. That modeling discipline — diagram, label, write constraint — is identical."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch4-applications",
+            "label": "Ch. 4: Applications of Integration",
+            "note": "Some optimization problems involve integrals (e.g., minimizing arc length, maximizing enclosed area). The same modeling approach applies, but the objective function requires integration."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "opt-assess-1",
+            "type": "choice",
+            "text": "After finding f'(c) = 0, how do you confirm c is a local maximum?",
+            "options": [
+                "f(c) > 0",
+                "f''(c) < 0",
+                "f''(c) > 0",
+                "f'(c) > 0 to the left"
+            ],
+            "answer": "f''(c) < 0",
+            "hint": "Second derivative test: f''< 0 → concave down → local max. f''> 0 → concave up → local min."
+        },
+        {
+            "id": "opt-assess-2",
+            "type": "choice",
+            "text": "On a closed interval [a,b], where can the global maximum occur?",
+            "options": [
+                "Only at critical points",
+                "Only at endpoints",
+                "At critical points OR endpoints",
+                "Only where f'' = 0"
+            ],
+            "answer": "At critical points OR endpoints",
+            "hint": "The Closed Interval Method: evaluate f at all critical points AND endpoints. The largest value is the global max."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Set up: objective function + constraint → one variable",
+    "Solve: differentiate → set to zero → solve for critical point",
+    "Verify: second derivative test or endpoint comparison",
+    "Check endpoints always on a closed interval"
+],
+
   checkpoints: [
     "read-intuition",
     "read-math",

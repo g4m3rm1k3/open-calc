@@ -8,6 +8,24 @@ export default {
   subtitle: 'How a single limiting process unlocks the instantaneous rate of change of any function',
   tags: ['derivative', 'limit definition', 'difference quotient', 'tangent line', 'instantaneous rate of change', 'differentiability', 'notation'],
 
+  // ─── Semantic Layer ───────────────────────────────────────────────
+  semantics: {
+    core: [
+      { symbol: 'h', meaning: 'the width of the interval, the probe distance (h \u2260 0 in the limit)' },
+      { symbol: 'f(x+h) - f(x)', meaning: 'the change in output when input shifts by h (the "rise")' },
+      { symbol: 'h', meaning: 'the change in input (the "run")' },
+      { symbol: '[f(x+h)-f(x)]/h', meaning: 'the difference quotient — slope of the secant line' },
+      { symbol: 'f\'(x)', meaning: 'the derivative — slope of the tangent line at x (the limit of the quotient)' },
+      { symbol: 'dy/dx', meaning: 'Leibniz notation for the derivative (not a fraction, but behaves like one)' },
+    ],
+    rulesOfThumb: [
+      'The difference quotient is average rate of change. The derivative is instantaneous rate of change.',
+      '0/0 in the difference quotient is the SAME indeterminate form from Chapter 1. The algebra is the same: factor, cancel, then substitute.',
+      'The derivative is a NEW function, not just a number. At each x, it tells you the slope of the original at that x.',
+      'Differentiable always implies continuous. Continuous does NOT always imply differentiable (corners, cusps).',
+    ]
+  },
+
   grapher: {
     mode: 'pro',
     label: 'Explore the Derivative',
@@ -21,6 +39,7 @@ export default {
     replace: true,
   },
 
+
   hook: {
     question: 'Your GPS app tells you that your current speed is 62 mph. But speed is distance divided by time — if the measurement takes zero time, you travel zero distance. Zero divided by zero is undefined. So how can your speed be anything at all at a single instant?',
     realWorldContext: 'Every speedometer, every radar gun, every GPS velocity readout faces this paradox. We want to know how fast something is changing right now, not averaged over an interval. Yet the very formula for rate of change — distance over time — seems to require an interval of nonzero length. The derivative is the mathematical resolution of this paradox. It is the tool that makes instantaneous change not only meaningful but computable, and it is arguably the central idea of all of calculus.',
@@ -29,6 +48,8 @@ export default {
 
   intuition: {
     prose: [
+      '**Let\'s place you exactly where you are in the course.** In Chapter 0, you learned that the slope of a line between two points is \u0394y/\u0394x. In Chapter 1, you learned that a limit is what a function approaches as its input gets close to a value. Both of those ideas were preparation for this exact moment. The derivative IS the limit of the slope formula. That’s it. The difference quotient [f(x+h) - f(x)] / h is \u0394y/\u0394x with \u0394x = h. The derivative is what that ratio approaches as h \u2192 0. You already know both halves — this lesson puts them together.',
+
       'Start with something we already understand: average rate of change. If you drive 120 miles in 2 hours, your average speed is 60 mph. If a population grows from 1,000 to 1,500 individuals over 5 years, the average growth rate is 100 individuals per year. In each case, we compute (change in output) divided by (change in input). This is the slope of the line connecting two points on the graph — called a secant line.',
       'Formally, the average rate of change of a function f over the interval from x = a to x = a + h is the slope of the secant line through the points (a, f(a)) and (a+h, f(a+h)). We write this as [f(a+h) - f(a)] / h. This expression has a name: the difference quotient. It is the single most important formula in differential calculus.',
       'Now ask: what happens as h gets smaller and smaller? The second point (a+h, f(a+h)) slides along the curve toward (a, f(a)). The secant line that once crossed the curve at two distinct points begins to rotate. In the limit, as h approaches 0, the secant line approaches a unique limiting position — the tangent line. The slope of that tangent line is the derivative.',
@@ -722,6 +743,95 @@ export default {
     { lessonSlug: 'continuity', label: 'Limits and Continuity', context: 'The derivative is defined as a limit; the limit laws and squeeze theorem are essential tools.' },
     { lessonSlug: 'differentiation-rules', label: 'Differentiation Rules', context: 'The limit definition motivates and proves the power rule and other shortcuts.' },
     { lessonSlug: 'linear-approximation', label: 'Linear Approximation', context: 'The tangent line at a point is the best linear approximation to the function near that point.' },
+  ],
+
+  // ─── Spiral Learning ───────────────────────────────────────────────
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'ch0-lines',
+        label: 'Chapter 0: Lines and Slope',
+        note: '\u0394y/\u0394x is the slope of a line through two points. That is the difference quotient with h fixed. The derivative is the same formula but h \u2192 0. Lines don\'t need a limit because their slope is already constant. Curves do, because their slope changes at every point.'
+      },
+      {
+        lessonId: 'ch1-limits-intro',
+        label: 'Chapter 1: Introduction to Limits',
+        note: 'The 0/0 indeterminate form you met in Chapter 1 is the exact same one in the difference quotient. The technique is the same: expand, cancel the h, then substitute. The limit is the engine of the derivative. If you feel shaky on limits, now is the time to revisit them — because you will use them in every single derivative calculation.'
+      },
+      {
+        lessonId: 'ch1-continuity',
+        label: 'Chapter 1: Continuity',
+        note: 'We now prove (not just assume) that differentiable \u21d2 continuous. The theorem is short: if the limit of the difference quotient exists and is finite, the function cannot have a jump. Understanding why requires the limit product rule you learned in Chapter 1.'
+      }
+    ],
+    futureLinks: [
+      {
+        lessonId: 'ch2-differentiation-rules',
+        label: 'Coming next: Differentiation Rules',
+        note: 'Computing derivatives from the limit definition every time is tedious. Chapter 2 gives you systematic shortcuts (power rule, product rule, chain rule) that you will use thousands of times. Each rule can be proved from the limit definition you learn here.'
+      },
+      {
+        lessonId: 'ch5-integration-intro',
+        label: 'Far ahead: Integration — The Reverse Derivative',
+        note: 'The integral is the "un-derivative." The Fundamental Theorem of Calculus will show that integration and differentiation are inverse operations — and that connection, when it clicks, is one of the most beautiful ideas in mathematics. You need a firm grip on the derivative to appreciate that reversal.'
+      }
+    ]
+  },
+
+  // ─── Assessment: Mastery Check ────────────────────────────────────────────
+  assessment: {
+    questions: [
+      {
+        id: 'deriv-assess-1',
+        type: 'input',
+        text: 'The difference quotient [f(x+h)-f(x)]/h represents the slope of what kind of line?',
+        answer: 'secant',
+        hint: 'It passes through TWO points on the curve. As h\u21920, this line approaches the tangent.'
+      },
+      {
+        id: 'deriv-assess-2',
+        type: 'input',
+        text: 'Using the limit definition, what is d/dx[x\u00b2]?',
+        answer: '2x',
+        hint: 'Expand (x+h)\u00b2, subtract x\u00b2, divide by h, cancel h, then let h\u21920.'
+      },
+      {
+        id: 'deriv-assess-3',
+        type: 'choice',
+        text: 'If f is differentiable at a, then f is:',
+        options: ['Necessarily continuous at a', 'Necessarily discontinuous at a', 'May or may not be continuous', 'Continuous everywhere except a'],
+        answer: 'Necessarily continuous at a',
+        hint: 'Differentiability \u21d2 Continuity (proven in the Rigor section). The converse is false: |x| is continuous but not differentiable at 0.'
+      },
+      {
+        id: 'deriv-assess-4',
+        type: 'input',
+        text: 'What is the equation of the tangent line to f(x) = x\u00b2 at the point (3, 9)?',
+        answer: 'y=6x-9',
+        hint: "f'(3) = 2(3) = 6. Then use point-slope: y - 9 = 6(x - 3), simplify to y = 6x - 9."
+      },
+      {
+        id: 'deriv-assess-5',
+        type: 'choice',
+        text: 'The function f(x) = |x| is NOT differentiable at x=0 because:',
+        options: [
+          'It is discontinuous at x=0',
+          'The left and right-hand derivatives are unequal (+1 and -1)',
+          'The limit does not exist',
+          'The function is undefined at x=0'
+        ],
+        answer: 'The left and right-hand derivatives are unequal (+1 and -1)',
+        hint: 'It is continuous (no hole), but it has a CORNER. From the right, slope = +1. From the left, slope = -1. They disagree, so no derivative exists.'
+      }
+    ]
+  },
+
+  // ─── Mental Model Compression ─────────────────────────────────────────────
+  mentalModel: [
+    'Derivative = Limit of (\u0394y / \u0394x) as \u0394x \u2192 0',
+    'Tangent Slope = Instantaneous Rate of Change',
+    'Corner = Continuous + Not Differentiable',
+    'f\u2019(x) = new function (slope at every point of f)',
   ],
 
   checkpoints: [

@@ -7,6 +7,24 @@ export default {
   subtitle: 'Getting arbitrarily close without arriving',
   tags: ['limits', 'approaching', 'informal', 'one-sided', 'two-sided', 'DNE', 'indeterminate form', '0/0'],
 
+  // ─── Semantic Layer: Define every symbol before using it ──────────────────
+  semantics: {
+    core: [
+      { symbol: 'x \\to c', meaning: 'x gets arbitrarily close to c, but never equals c' },
+      { symbol: 'L', meaning: 'the limit value — the y-value the function is heading toward' },
+      { symbol: 'f(c)', meaning: 'the actual function value at x=c (may or may not exist)' },
+      { symbol: '0/0', meaning: 'indeterminate form — not zero, not undefined — "more work needed"' },
+      { symbol: '\\varepsilon', meaning: 'epsilon: a tiny output tolerance (how close f(x) is to L)' },
+      { symbol: '\\delta', meaning: 'delta: the input radius that guarantees the output stays in tolerance' },
+    ],
+    rulesOfThumb: [
+      'The limit is about the JOURNEY, not the destination. f(c) is irrelevant.',
+      'If both sides agree on the same value, the limit exists. If they disagree, it DNE.',
+      '0/0 is a signal to do algebra — factor, rationalize, or use conjugates.',
+      'Continuity at c is the special case where limit = function value. It is the exception, not the rule.',
+    ]
+  },
+
   hook: {
     question: 'What is the speed of a car at exactly one instant in time?',
     realWorldContext:
@@ -20,6 +38,8 @@ export default {
 
   intuition: {
     prose: [
+      '**You have already met the seed of the limit.** In Chapter 0, you learned that the slope of a line is \u0394y / \u0394x — the ratio of rise to run. That slope is the rate of change averaged over the full run. Now ask: what if the run shrinks? What if \u0394x keeps getting smaller and smaller, never quite reaching zero? The number you are approaching is the limit. This is not a brand new idea — it is the slope idea taken to its extreme.',
+
       'Imagine walking toward a wall, cutting the remaining distance in half each step. You get closer and closer — 1 m, 0.5 m, 0.25 m, 0.125 m — but you never quite touch it. A **limit** describes the value a function approaches as its input gets close to some target value. The key insight: the function does not need to be defined *at* the target — only *near* it.',
 
       'Consider the function f(x) = (x² − 4)/(x − 2). At x = 2, we get 0/0, which is completely undefined. But watch what happens when x gets close to 2 from either side:',
@@ -429,6 +449,90 @@ export default {
     { lessonSlug: 'functions', label: 'Prerequisite: Functions', context: 'Limits describe behavior of functions near a point.' },
     { lessonSlug: 'limit-laws', label: 'Next: Limit Laws', context: 'Algebraic rules for computing limits without always going back to the definition.' },
     { lessonSlug: 'continuity', label: 'See Also: Continuity', context: 'Continuity is defined using limits.' },
+  ],
+
+  // ─── Spiral Learning: where we came from, where we are going ─────────────
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'ch0-lines',
+        label: 'Last lesson: Lines and Slope (Ch. 0)',
+        note: 'You computed slope as \u0394y / \u0394x — rise over run between two points. That ratio IS the difference quotient. The limit is what happens when you let the \u0394x shrink toward zero instead of leaving it fixed. Same formula. One more step.'
+      },
+      {
+        lessonId: 'ch0-functions',
+        label: 'Also from Ch. 0: What Is a Function?',
+        note: 'You learned that f(x) is a machine: put in x, get out y. The limit asks: as we feed in values of x closer and closer to c, what output does the machine home in on? The machine (the function) is the same — the question is new.'
+      }
+    ],
+    futureLinks: [
+      {
+        lessonId: 'ch2-derivative-intro',
+        label: 'Coming next: The Derivative (Ch. 2)',
+        note: 'The derivative is defined as lim(h\u21920) [f(x+h) - f(x)] / h. That is a limit. Every derivative you will ever compute is built on exactly what you learned here. The 0/0 indeterminate form you learn to handle now is the same one you will cancel your way through hundreds of times in Chapter 2.'
+      },
+      {
+        lessonId: 'ch1-continuity',
+        label: 'Coming soon: Continuity (Ch. 1)',
+        note: 'Continuity at c simply means the limit equals the function value: lim(x\u2192c) f(x) = f(c). That is the special case where the GPS prediction matches the actual destination. You will find continuity surprisingly nuanced.'
+      }
+    ]
+  },
+
+  // ─── Assessment: Mastery Check ────────────────────────────────────────────
+  assessment: {
+    questions: [
+      {
+        id: 'lim-assess-1',
+        type: 'input',
+        text: 'Evaluate: lim(x\u21922) of (x\u00b2 \u2212 4)/(x \u2212 2). Hint: factor the top.',
+        answer: '4',
+        hint: 'x\u00b2 \u2212 4 = (x+2)(x\u2212 2). Cancel (x\u22122), then substitute x=2 into what remains.'
+      },
+      {
+        id: 'lim-assess-2',
+        type: 'input',
+        text: 'The left-hand limit is 7 and the right-hand limit is 7. What is lim(x\u2192c) f(x)?',
+        answer: '7',
+        hint: 'When both sides agree, that shared value IS the two-sided limit.'
+      },
+      {
+        id: 'lim-assess-3',
+        type: 'choice',
+        text: 'When you get 0/0 from direct substitution, this means:',
+        options: ['The limit is zero', 'The limit does not exist', 'More algebraic work is needed — it is indeterminate', 'The function is continuous'],
+        answer: 'More algebraic work is needed \u2014 it is indeterminate',
+        hint: '0/0 is the indeterminate form. It signals that factoring, conjugates, or another technique is needed.'
+      },
+      {
+        id: 'lim-assess-4',
+        type: 'input',
+        text: 'In the epsilon-delta definition, which Greek letter controls the OUTPUT tolerance?',
+        answer: 'epsilon',
+        hint: '\u03b5 (epsilon) is the output tolerance. \u03b4 (delta) is the input radius you choose in response.'
+      },
+      {
+        id: 'lim-assess-5',
+        type: 'choice',
+        text: 'A slope of \u0394y/\u0394x is the _____ rate of change over an interval. The limit as \u0394x \u2192 0 gives the _____ rate of change.',
+        options: [
+          'average; instantaneous',
+          'instantaneous; average',
+          'continuous; discontinuous',
+          'marginal; total'
+        ],
+        answer: 'average; instantaneous',
+        hint: 'You computed \u0394y/\u0394x in the Lines lesson (average). As the interval shrinks to zero, it becomes the derivative (instantaneous). That transition is THIS lesson.'
+      }
+    ]
+  },
+
+  // ─── Mental Model Compression ─────────────────────────────────────────────
+  mentalModel: [
+    'Limit = What the function is heading toward',
+    '0/0 = Indeterminate (do more algebra)',
+    'DNE = Both sides disagree',
+    'Continuity = Limit matches Function Value',
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],

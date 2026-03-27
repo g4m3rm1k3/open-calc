@@ -300,7 +300,7 @@ function TriggerSystem({ triggers }) {
 
 // ─── 🧠 Intuition block ────────────────────────────────────────────────────
 
-function IntuitionBlock({ data }) {
+function IntuitionBlock({ data, lesson }) {
   const hasAlternate = data?.alternate?.prose?.length > 0
     || data?.alternate?.callouts?.length > 0
     || data?.alternate?.visualizations?.length > 0
@@ -314,7 +314,8 @@ function IntuitionBlock({ data }) {
   return (
     <div className="mb-10">
       <SectionDivider icon="🧠" label="Intuition" color="slate" />
-      <SemanticsBlock semantics={data.semantics} />
+      <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
+
       <SectionContent data={data} />
       {data.perspectives?.length > 0 && <PerspectiveSync perspectives={data.perspectives} bridge={data.bridge} />}
       {data.localLinearity && <LocalLinearity config={data.localLinearity} />}
@@ -491,12 +492,117 @@ function PracticeBlock({ examples, challenges, triggers }) {
   )
 }
 
+// ─── 🔗 Spiral Links block ─────────────────────────────────────────────────
+
+function SpiralBlock({ spiral }) {
+  if (!spiral) return null
+  const { recoveryPoints = [], futureLinks = [] } = spiral
+  if (!recoveryPoints.length && !futureLinks.length) return null
+  return (
+    <div className="mb-10 rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/20 dark:bg-amber-950/10 overflow-hidden">
+      <div className="px-5 py-3 border-b border-amber-100 dark:border-amber-900/40 bg-amber-100/40 dark:bg-amber-900/30 flex items-center gap-2">
+        <span>🔗</span>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-300">Spiral Learning — Where You've Been &amp; Where You're Going</h3>
+      </div>
+      <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+        {recoveryPoints.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">↩ Recovering From</p>
+            <div className="space-y-3">
+              {recoveryPoints.map((pt, i) => (
+                <div key={i} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-800/50 shadow-sm">
+                  <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1">{pt.label}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{pt.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {futureLinks.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3">→ Unlocking Next</p>
+            <div className="space-y-3">
+              {futureLinks.map((pt, i) => (
+                <div key={i} className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-800/50 shadow-sm">
+                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">{pt.label}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{pt.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── ✅ Assessment block ──────────────────────────────────────────────────────
+
+function InlineAssessment({ assessment }) {
+  if (!assessment?.questions?.length) return null
+  const [answers, setAnswers] = useState({})
+  const [revealed, setRevealed] = useState({})
+
+  return (
+    <div className="mt-10 rounded-2xl border border-emerald-200 dark:border-emerald-900/40 overflow-hidden">
+      <div className="px-5 py-3 border-b border-emerald-100 dark:border-emerald-900/40 bg-emerald-100/40 dark:bg-emerald-900/30 flex items-center gap-2">
+        <span>✅</span>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Mastery Check</h3>
+      </div>
+      <div className="p-5 space-y-6">
+        {assessment.questions.map((q, i) => {
+          const userAns = (answers[q.id] ?? '').trim().toLowerCase()
+          const correct = userAns === q.answer.trim().toLowerCase()
+          const isRevealed = revealed[q.id]
+          return (
+            <div key={q.id ?? i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-800/50">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3"><span className="text-emerald-500 font-bold mr-1">Q{i+1}.</span>{q.text}</p>
+              {q.type === 'choice' ? (
+                <div className="space-y-2">
+                  {q.options?.map((opt, j) => {
+                    const chosen = answers[q.id] === opt
+                    const isCorrect = opt.trim().toLowerCase() === q.answer.trim().toLowerCase()
+                    let cls = 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                    if (chosen && isCorrect) cls = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
+                    else if (chosen && !isCorrect) cls = 'border-rose-400 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
+                    return (
+                      <button key={j} onClick={() => setAnswers(a => ({...a, [q.id]: opt}))}
+                        className={`w-full text-left text-xs px-3 py-2 rounded-lg border transition-all ${cls}`}>
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <input
+                  className="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:border-emerald-400 focus:outline-none transition-colors"
+                  placeholder="Your answer…"
+                  value={answers[q.id] ?? ''}
+                  onChange={e => setAnswers(a => ({...a, [q.id]: e.target.value}))}
+                />
+              )}
+              {answers[q.id] && (
+                <p className={`mt-2 text-xs font-semibold ${correct ? 'text-emerald-600' : 'text-rose-500'}`}>
+                  {correct ? '✓ Correct!' : '✗ Not quite.'}
+                </p>
+              )}
+              <button className="mt-2 text-[10px] text-slate-400 hover:text-slate-600 underline" onClick={() => setRevealed(r => ({...r, [q.id]: !r[q.id]}))}>Hint</button>
+              {isRevealed && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 italic">{q.hint}</p>}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main export ───────────────────────────────────────────────────────────
 
 export default function MicroCycleLesson({ lesson }) {
   return (
     <div className="w-full">
-      <IntuitionBlock data={lesson.intuition} />
+      <IntuitionBlock data={lesson.intuition} lesson={lesson} />
+      <SpiralBlock spiral={lesson.spiral} />
       {lesson.mentalModel?.length > 0 && (
          <div className="mb-10 p-5 rounded-2xl bg-slate-900 text-white border-b-4 border-brand-500 shadow-2xl">
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
@@ -513,6 +619,7 @@ export default function MicroCycleLesson({ lesson }) {
       <RigorBlock data={lesson.rigor} />
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
+      <InlineAssessment assessment={lesson.assessment} />
       {lesson.supplementalVisualizations?.length > 0 && (
         <div className="mt-12 space-y-8">
           <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />

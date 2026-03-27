@@ -503,6 +503,107 @@ export default {
     },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "lim[fg]",
+            "meaning": "the limit of a product equals the product of the limits (when both exist)"
+        },
+        {
+            "symbol": "sin(x)/x",
+            "meaning": "the fundamental trig limit — approaches 1 as x→0, not 0/0"
+        },
+        {
+            "symbol": "Squeeze Theorem",
+            "meaning": "if g≤f≤h and g,h both approach L, then f is forced to L as well"
+        }
+    ],
+    "rulesOfThumb": [
+        "Direct substitution works if the denominator is nonzero and the function is continuous at the point.",
+        "When you see sin(ax)/bx, multiply and divide by a to force the pattern sin(u)/u.",
+        "A composite limit can pass through a continuous outer function: lim f(g(x)) = f(lim g(x)).",
+        "The Squeeze Theorem is the go-to tool whenever a bounded function is multiplied by something → 0."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-intro-limits",
+            "label": "Previous: Introduction to Limits",
+            "note": "The informal ε-δ notion you met there is what the Limit Laws formalize. Each law is a proof that the informal 'approach' behavior is preserved under arithmetic operations."
+        },
+        {
+            "lessonId": "ch0-inequalities",
+            "label": "Ch. 0: Inequalities and the Triangle Inequality",
+            "note": "The proof of the Sum Law uses |a+b| ≤ |a|+|b|. If that feels unfamiliar, revisit the inequalities lesson before reading the rigor section here."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch1-continuity",
+            "label": "Next: Continuity",
+            "note": "A function is continuous at c iff the Limit Laws guarantee lim f(x) = f(c). Every continuous-function limit in Chapters 2–4 is justified by what you learn here."
+        },
+        {
+            "lessonId": "ch2-trig-derivatives",
+            "label": "Ch. 2: Trig Derivatives",
+            "note": "The derivative of sin(x) requires lim(h→0) sin(h)/h = 1. That IS the fundamental trig limit from this lesson — you will use it directly in the derivation of d/dx[sin x] = cos x."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "ll-assess-1",
+            "type": "input",
+            "text": "Evaluate lim(x→0) sin(3x) / x.",
+            "answer": "3",
+            "hint": "Factor: sin(3x)/x = 3·[sin(3x)/(3x)]. Let u=3x; as x→0, u→0 and sin(u)/u→1."
+        },
+        {
+            "id": "ll-assess-2",
+            "type": "input",
+            "text": "Evaluate lim(x→0) x²·sin(1/x).",
+            "answer": "0",
+            "hint": "Since |sin(1/x)| ≤ 1, we have -x² ≤ x²sin(1/x) ≤ x². Both bounds → 0. Squeeze Theorem."
+        },
+        {
+            "id": "ll-assess-3",
+            "type": "choice",
+            "text": "Which technique evaluates lim(x→2) (3x²-x+1)/(x+5)?",
+            "options": [
+                "Factor and cancel",
+                "Direct substitution (denominator is 7≠0)",
+                "Squeeze Theorem",
+                "Conjugate multiplication"
+            ],
+            "answer": "Direct substitution (denominator is 7≠0)",
+            "hint": "Check the denominator first: x+5 at x=2 is 7. Nonzero means direct substitution is valid."
+        },
+        {
+            "id": "ll-assess-4",
+            "type": "input",
+            "text": "What does lim(x→0) tan(x)/x equal?",
+            "answer": "1",
+            "hint": "tan x = sin x / cos x. Write as [sin x / x] · [1 / cos x]. First factor → 1, second → 1/cos(0) = 1."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Limit Laws = arithmetic operations distribute through limits",
+    "sin(x)/x → 1 as x→0 (not 0/0 — this is a provable result)",
+    "Squeeze Theorem = bound a wild function between two tame ones",
+    "Direct substitution = valid iff denominator nonzero and function continuous"
+],
+
   checkpoints: [
     "read-intuition",
     "read-math",

@@ -411,6 +411,115 @@ export default {
     },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "f continuous at c",
+            "meaning": "three conditions: f(c) defined, lim exists, and they are equal"
+        },
+        {
+            "symbol": "removable discontinuity",
+            "meaning": "the limit exists but f(c) is wrong or missing — fixable by redefining one point"
+        },
+        {
+            "symbol": "jump discontinuity",
+            "meaning": "left and right limits both exist but differ — a true break, not fixable by redefining a point"
+        },
+        {
+            "symbol": "IVT",
+            "meaning": "if f is continuous on [a,b] and k is between f(a) and f(b), then f hits k somewhere inside"
+        }
+    ],
+    "rulesOfThumb": [
+        "Check the three-part checklist in order: (1) defined? (2) limit exists? (3) match?",
+        "Polynomials, trig, exponential, log — continuous everywhere on their domains.",
+        "Piecewise functions: check continuity at every breakpoint by matching left and right limits.",
+        "IVT proves existence of a root when f changes sign on a continuous interval."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-limit-laws",
+            "label": "Previous: Limit Laws",
+            "note": "Continuity is defined using limits. The limit must exist AND match f(c). The Limit Laws tell you when you can compute that limit by direct substitution — which is exactly when the function is continuous."
+        },
+        {
+            "lessonId": "ch1-intro-limits",
+            "label": "Ch. 1: Introduction to Limits",
+            "note": "You learned that the limit cares about the journey (approaching c) not the destination (f(c)). Continuity is the special case where the journey and the destination agree."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: Differentiability",
+            "note": "Differentiability implies continuity (proven there). Continuity is necessary but not sufficient for differentiability — the function |x| is continuous at 0 but not differentiable."
+        },
+        {
+            "lessonId": "ch3-mean-value-theorem",
+            "label": "Ch. 3: Mean Value Theorem",
+            "note": "The MVT and its corollaries require continuity on [a,b]. Without continuity, the conclusions fail. The IVT you prove here is a precursor to the same style of argument."
+        },
+        {
+            "lessonId": "ch4-fundamental-theorem",
+            "label": "Ch. 4: Fundamental Theorem of Calculus",
+            "note": "FTC Part 2 requires f to be continuous on [a,b]. Discontinuities inside the interval invalidate the evaluation formula — a critical error to avoid."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "cont-assess-1",
+            "type": "choice",
+            "text": "f(c) = 5 but lim(x→c) f(x) = 3. This is a:",
+            "options": [
+                "Removable discontinuity",
+                "Jump discontinuity",
+                "Infinite discontinuity",
+                "No discontinuity — it is continuous"
+            ],
+            "answer": "Removable discontinuity",
+            "hint": "The limit exists (3) but does not match f(c) = 5. Fixable by redefining f(c) = 3."
+        },
+        {
+            "id": "cont-assess-2",
+            "type": "input",
+            "text": "For f(x) = (x²-4)/(x-2), what value should f(2) be set to for f to be continuous at x=2?",
+            "answer": "4",
+            "hint": "Factor: x²-4=(x+2)(x-2). Cancel (x-2) to get x+2. At x=2 that is 4."
+        },
+        {
+            "id": "cont-assess-3",
+            "type": "choice",
+            "text": "Which theorem guarantees that x⁵ - x - 1 = 0 has a real root?",
+            "options": [
+                "Mean Value Theorem",
+                "Intermediate Value Theorem",
+                "Squeeze Theorem",
+                "Extreme Value Theorem"
+            ],
+            "answer": "Intermediate Value Theorem",
+            "hint": "f(1) = -1 < 0 and f(2) = 29 > 0. f is continuous (polynomial). By IVT, f = 0 somewhere in (1,2)."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Continuity = limit equals function value (3 conditions)",
+    "Removable = limit exists, value wrong (patchable)",
+    "Jump = both sides exist but differ (not patchable)",
+    "IVT = sign change on continuous function → root inside"
+],
+
   checkpoints: [
     "read-intuition",
     "read-math",

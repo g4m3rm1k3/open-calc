@@ -766,6 +766,94 @@ export default {
     },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "dx/dt",
+            "meaning": "rate of change of x with respect to time — how fast x is changing right now"
+        },
+        {
+            "symbol": "d/dt[x²]",
+            "meaning": "2x·(dx/dt), NOT just 2x — the chain rule factor dx/dt is mandatory"
+        },
+        {
+            "symbol": "geometric constraint",
+            "meaning": "an equation that links the changing quantities — e.g., x²+y²=L² for a right triangle with fixed hypotenuse"
+        }
+    ],
+    "rulesOfThumb": [
+        "NEVER substitute numbers before differentiating. Differentiate with variables, then substitute.",
+        "Identify which quantities are constant (they disappear when differentiated) and which vary (they generate rate terms).",
+        "The 5-step method: diagram → constraint equation → differentiate → substitute → solve.",
+        "Draw the diagram. Most setup errors are geometry errors, not calculus errors."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch2-implicit-differentiation",
+            "label": "Previous (Ch. 2): Implicit Differentiation",
+            "note": "Related rates IS implicit differentiation with t (time) as the independent variable. Every d/dx[y] from implicit differentiation becomes d/dt[y] = dy/dt in related rates. The algebra is identical."
+        },
+        {
+            "lessonId": "ch2-chain-rule",
+            "label": "Ch. 2: Chain Rule",
+            "note": "The rate factor (e.g., dx/dt) in every term comes from the chain rule. Forgetting it is the most common related-rates error — identical to the chain rule error from Ch. 2."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch3-optimization",
+            "label": "Next: Optimization",
+            "note": "Optimization also requires setting up geometric/physical constraint equations and using calculus to extract information. The modeling discipline is the same; the question is \"max/min\" instead of \"rate.\""
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "rr-assess-1",
+            "type": "choice",
+            "text": "In related rates, d/dt[r²] equals:",
+            "options": [
+                "2r",
+                "2r·(dr/dt)",
+                "2r + dr/dt",
+                "r²·(dr/dt)"
+            ],
+            "answer": "2r·(dr/dt)",
+            "hint": "Chain rule: outer derivative 2r, multiplied by the inner derivative dr/dt."
+        },
+        {
+            "id": "rr-assess-2",
+            "type": "choice",
+            "text": "When should you substitute the specific numerical values into a related rates equation?",
+            "options": [
+                "Before differentiating",
+                "After differentiating and collecting rates",
+                "At any point — order doesn't matter",
+                "Never"
+            ],
+            "answer": "After differentiating and collecting rates",
+            "hint": "Substituting before differentiating replaces variables with constants, destroying all rate information. Always differentiate first."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "d/dt[f(x(t))] = f'(x)·(dx/dt) (chain rule in t)",
+    "5 steps: diagram → constraint → differentiate → substitute → solve",
+    "Constant quantities vanish; variable quantities generate rate factors",
+    "Substitute numbers AFTER differentiating — never before"
+],
+
   checkpoints: [
     "read-intuition",
     "read-math",

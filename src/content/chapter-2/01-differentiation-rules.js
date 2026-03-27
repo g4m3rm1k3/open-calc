@@ -691,6 +691,89 @@ export default {
     { lessonSlug: 'exp-log-derivatives', label: 'Exponential and Log Derivatives', context: 'The product and quotient rules appear constantly when differentiating products/quotients involving e^x and ln x.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "Power Rule",
+            "meaning": "d/dx[xⁿ] = nxⁿ⁻¹ (the exponent comes down, decrements by 1)"
+        },
+        {
+            "symbol": "Product Rule",
+            "meaning": "d/dx[fg] = f'g + fg' (mnemonic: \"first times derivative of second plus second times derivative of first\")"
+        },
+        {
+            "symbol": "Quotient Rule",
+            "meaning": "d/dx[f/g] = (f'g - fg') / g² (mnemonic: \"low d-high minus high d-low, over low squared\")"
+        }
+    ],
+    "rulesOfThumb": [
+        "Check if a product/quotient can be simplified algebraically BEFORE differentiating. Often easier.",
+        "Quotient rule denominator is g², not g. Forgetting the square is the most common error.",
+        "Sum/difference rule: differentiate term by term. Constants vanish.",
+        "Every differentiation rule can be proved from the limit definition — but you rarely need to."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Previous: Derivative from the Limit Definition",
+            "note": "The power rule d/dx[xⁿ]=nxⁿ⁻¹ was previewed by computing xⁿ derivatives from the definition. This lesson gives you the shortcut so you never have to use the limit definition again for these forms."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch2-chain-rule",
+            "label": "Next: Chain Rule",
+            "note": "The chain rule extends differentiation rules to compositions. Without it, you cannot differentiate sin(x²) or e^(3x). Every composite function requires the chain rule layered on top of the rules here."
+        },
+        {
+            "lessonId": "ch3-related-rates",
+            "label": "Ch. 3: Related Rates",
+            "note": "Related rates uses these rules in implicit differentiation with t as the independent variable. Mastering them here makes Ch. 3 far more mechanical."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "dr-assess-1",
+            "type": "input",
+            "text": "d/dx[x⁵] = ?",
+            "answer": "5x^4",
+            "hint": "Power rule: bring the 5 down, reduce the exponent by 1."
+        },
+        {
+            "id": "dr-assess-2",
+            "type": "input",
+            "text": "d/dx[x·sin(x)] = ?",
+            "answer": "sin(x) + x·cos(x)",
+            "hint": "Product rule: (1)·sin(x) + x·cos(x)."
+        },
+        {
+            "id": "dr-assess-3",
+            "type": "input",
+            "text": "d/dx[x²/cos(x)] = ?",
+            "answer": "(2x·cos(x) + x²·sin(x)) / cos²(x)",
+            "hint": "Quotient rule: (low·d-high - high·d-low) / low². = (cos(x)·2x - x²·(-sin(x))) / cos²(x)."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Power: nxⁿ⁻¹",
+    "Product: f'g + fg'",
+    "Quotient: (f'g - fg') / g²",
+    "Sum: differentiate term by term; constants vanish"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

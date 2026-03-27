@@ -905,6 +905,94 @@ export default {
     { lessonSlug: 'implicit-differentiation', label: 'Implicit Differentiation', context: 'Implicit differentiation is the chain rule applied to expressions in y where y = y(x).' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "f(g(x))",
+            "meaning": "a composition — g is the inner function, f is the outer function"
+        },
+        {
+            "symbol": "dy/dx = (dy/du)(du/dx)",
+            "meaning": "Leibniz form of the chain rule: the rates multiply"
+        },
+        {
+            "symbol": "outer × inner'",
+            "meaning": "evaluate the outer derivative at the inner function, then multiply by the inner's derivative"
+        }
+    ],
+    "rulesOfThumb": [
+        "Identify the innermost function first. Differentiate from outside in.",
+        "Never forget to multiply by the inner derivative (du/dx). Forgetting it is the chain rule error.",
+        "If you see a function raised to a power: d/dx[f(x)ⁿ] = n·f(x)ⁿ⁻¹·f'(x).",
+        "Multiple compositions: peel layers from outside in, multiplying a new derivative at each layer."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch2-differentiation-rules",
+            "label": "Previous: Differentiation Rules",
+            "note": "The power, product and quotient rules handle non-composed functions. The chain rule is the single missing piece that handles everything else — any composition, any nesting."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch2-implicit-differentiation",
+            "label": "Next: Implicit Differentiation",
+            "note": "Implicit differentiation is the chain rule applied to y as a function of x. Every d/dx[y²] term in an implicit equation generates a 2y·(dy/dx) factor — that IS the chain rule."
+        },
+        {
+            "lessonId": "ch3-related-rates",
+            "label": "Ch. 3: Related Rates",
+            "note": "Related rates is implicit differentiation in t. The chain rule factor becomes (dx/dt), (dy/dt), etc. Every related-rates rate equation is a chain rule application."
+        },
+        {
+            "lessonId": "ch4-u-substitution",
+            "label": "Ch. 4: U-Substitution",
+            "note": "U-substitution is the chain rule run in reverse for integration. Recognizing the \"inner derivative\" factor in the integrand is the key skill — and it comes from deeply understanding the chain rule."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "cr-assess-1",
+            "type": "input",
+            "text": "d/dx[sin(x²)] = ?",
+            "answer": "cos(x²)·2x",
+            "hint": "Outer: sin → cos, evaluated at inner x². Inner: x² → 2x. Multiply."
+        },
+        {
+            "id": "cr-assess-2",
+            "type": "input",
+            "text": "d/dx[(3x+1)⁵] = ?",
+            "answer": "5(3x+1)^4 · 3",
+            "hint": "Outer: power rule → 5(3x+1)⁴. Inner: 3x+1 → 3. Multiply: 15(3x+1)⁴."
+        },
+        {
+            "id": "cr-assess-3",
+            "type": "input",
+            "text": "d/dx[e^(cos x)] = ?",
+            "answer": "e^(cos x)·(-sin x)",
+            "hint": "Outer: eᵘ → eᵘ at u=cos x. Inner: cos x → -sin x. Multiply."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Chain Rule = outer'(inner) × inner'",
+    "Leibniz: dy/dx = (dy/du)(du/dx)",
+    "Peel layers outside→in, multiply a derivative at each layer",
+    "Forgetting the inner derivative is the #1 chain rule error"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

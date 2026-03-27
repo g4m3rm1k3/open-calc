@@ -276,6 +276,93 @@ export default {
     { lessonSlug: 'curve-sketching', label: 'Curve Sketching', context: 'The increasing/decreasing test (f\' > 0 ⟹ increasing) is proved from the MVT corollaries.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "MVT conclusion",
+            "meaning": "there exists c in (a,b) where f'(c) = [f(b)-f(a)]/(b-a) — the instantaneous slope equals the average slope"
+        },
+        {
+            "symbol": "average slope",
+            "meaning": "[f(b)-f(a)]/(b-a) — the slope of the secant line from a to b"
+        },
+        {
+            "symbol": "hypotheses",
+            "meaning": "f continuous on [a,b] AND differentiable on (a,b) — both required"
+        }
+    ],
+    "rulesOfThumb": [
+        "The MVT is an existence theorem — it guarantees c exists but does not find it.",
+        "Hypotheses matter: if f is not continuous OR not differentiable, the MVT may fail.",
+        "Rolle's Theorem is the MVT with f(a) = f(b) — the secant is horizontal, so c has f'(c)=0.",
+        "The speed interpretation: if your average speed was 60 mph, your speedometer must have read exactly 60 at some moment."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-continuity",
+            "label": "Ch. 1: Continuity",
+            "note": "The MVT requires continuity on [a,b]. This is not just a technicality — without it the theorem genuinely fails. The piecewise velocity example from Ch. 1 is a discontinuous case where MVT does not apply."
+        },
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: The Derivative",
+            "note": "The \"average slope\" [f(b)-f(a)]/(b-a) is the same difference quotient you met in the derivative definition. The MVT says an instantaneous slope must equal that average somewhere."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch3-curve-sketching",
+            "label": "Next: Curve Sketching",
+            "note": "The MVT is used to prove: if f'> 0 then f is increasing; if f'< 0 then f is decreasing; if f'= 0 everywhere then f is constant. These facts underlie the entire theory of curve sketching."
+        },
+        {
+            "lessonId": "ch4-fundamental-theorem",
+            "label": "Ch. 4: Fundamental Theorem of Calculus",
+            "note": "The FTC Part 2 proof uses the MVT corollary: if two functions have the same derivative, they differ by a constant. This is a direct consequence of the MVT."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "mvt-assess-1",
+            "type": "input",
+            "text": "For f(x) = x² on [1,3], find the value c guaranteed by the MVT.",
+            "answer": "2",
+            "hint": "Average slope = (9-1)/(3-1) = 4. Set f'(c) = 2c = 4, so c = 2."
+        },
+        {
+            "id": "mvt-assess-2",
+            "type": "choice",
+            "text": "The MVT requires:",
+            "options": [
+                "Only differentiability on (a,b)",
+                "Only continuity on [a,b]",
+                "Continuity on [a,b] AND differentiability on (a,b)",
+                "Continuity and differentiability everywhere"
+            ],
+            "answer": "Continuity on [a,b] AND differentiability on (a,b)",
+            "hint": "Both are needed. Continuity on the closed interval, differentiability on the open interior."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "MVT: ∃c in (a,b) where f'(c) = average slope over [a,b]",
+    "Requires: continuous on [a,b], differentiable on (a,b)",
+    "Existence theorem — guarantees c, does not locate it",
+    "Speed corollary: if average speed = 60, speedometer hit 60 at some moment"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

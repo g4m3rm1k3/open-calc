@@ -314,6 +314,82 @@ export default {
     { lessonSlug: 'fundamental-theorem', label: 'FTC Part 2', context: 'For definite integrals, the fundamental theorem allows evaluation once the antiderivative is found via substitution.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "u",
+            "meaning": "the inner function — the substitution variable that simplifies the integrand"
+        },
+        {
+            "symbol": "du",
+            "meaning": "u'(x) dx — the differential of u, which must appear (up to a constant) in the integrand"
+        },
+        {
+            "symbol": "reverse chain rule",
+            "meaning": "u-substitution undoes the chain rule: ∫f(g(x))g'(x) dx = ∫f(u) du"
+        }
+    ],
+    "rulesOfThumb": [
+        "Look for a factor in the integrand that is the derivative of another factor. That's your u.",
+        "If the factor is off by a constant, multiply and divide by that constant to fix it.",
+        "Change the limits of integration when doing definite integrals with u-substitution.",
+        "After substituting, the integral should contain only u — if x remains, the substitution is wrong."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch2-chain-rule",
+            "label": "Ch. 2: Chain Rule",
+            "note": "U-substitution is the chain rule run backwards for integration. If d/dx[F(g(x))] = F'(g(x))·g'(x) (chain rule), then ∫F'(g(x))g'(x) dx = F(g(x))+C (u-substitution). Recognizing g'(x) = du/dx as a factor is the key skill from Ch. 2."
+        },
+        {
+            "lessonId": "ch4-fundamental-theorem",
+            "label": "Previous: Fundamental Theorem of Calculus",
+            "note": "FTC guarantees that every continuous function has an antiderivative. U-substitution is a systematic technique to find those antiderivatives for composite integrands."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch4-trig-substitution",
+            "label": "Ch. 4: Trig Substitution",
+            "note": "Trig substitution is a more advanced form of substitution where you substitute x = sin(θ) or x = tan(θ) to simplify expressions with √(a²-x²). The same logic applies — choose u to simplify."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "us-assess-1",
+            "type": "input",
+            "text": "∫ 2x·cos(x²) dx = ?",
+            "answer": "sin(x²) + C",
+            "hint": "Let u = x². Then du = 2x dx. Integral becomes ∫cos(u) du = sin(u) + C = sin(x²) + C."
+        },
+        {
+            "id": "us-assess-2",
+            "type": "input",
+            "text": "∫₀¹ 3x²·e^(x³) dx = ?",
+            "answer": "e - 1",
+            "hint": "Let u = x³, du = 3x² dx. When x=0, u=0; when x=1, u=1. Integral = ∫₀¹ eᵘ du = e¹-e⁰ = e-1."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "U-sub = chain rule in reverse",
+    "Identify u (inner fn), compute du, rewrite entirely in u",
+    "Trigger: factor in integrand looks like derivative of another factor",
+    "Definite integrals: change the bounds when you change variables"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

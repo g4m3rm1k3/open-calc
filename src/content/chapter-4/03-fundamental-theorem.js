@@ -327,6 +327,98 @@ export default {
     { lessonSlug: 'applications', label: 'Applications of Integration', context: 'Every application in Lesson 5 — net change, area between curves, average value — uses FTC Part 2 to compute the definite integral via antiderivatives.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "FTC Part 1",
+            "meaning": "d/dx[∫ₐˣ f(t) dt] = f(x) — differentiation undoes integration"
+        },
+        {
+            "symbol": "FTC Part 2",
+            "meaning": "∫ₐᵇ f(x) dx = F(b) - F(a) where F'= f — evaluate via antiderivative"
+        },
+        {
+            "symbol": "[F(x)]ₐᵇ",
+            "meaning": "shorthand for F(b) - F(a)"
+        },
+        {
+            "symbol": "antiderivative",
+            "meaning": "a function F such that F' = f (also written ∫f dx = F + C)"
+        }
+    ],
+    "rulesOfThumb": [
+        "FTC Part 1: the derivative of an integral with variable upper limit = the integrand at that limit.",
+        "FTC Part 2: to integrate f, find any antiderivative F and subtract F(a) from F(b).",
+        "Chain rule + FTC Part 1: d/dx[∫ₐ^g(x) f] = f(g(x))·g'(x).",
+        "Check for discontinuities inside [a,b] before applying FTC Part 2 — they invalidate it."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch4-area-accumulation",
+            "label": "Previous: Area and Accumulation",
+            "note": "FTC Part 1 is the formal theorem behind the intuition from that lesson: the derivative of the accumulation function is the original function. The height of the bar = the rate of growth of the area."
+        },
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: The Derivative",
+            "note": "The FTC says differentiation and integration are inverse operations. You spent all of Ch. 2 learning differentiation. The FTC is the theorem that connects it to Ch. 4. Read it as: integration undoes differentiation (up to a constant)."
+        },
+        {
+            "lessonId": "ch3-mean-value-theorem",
+            "label": "Ch. 3: Mean Value Theorem",
+            "note": "The proof of FTC Part 2 uses the MVT corollary: a function with zero derivative is constant. This is the key logical step linking Part 1 to Part 2."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch4-u-substitution",
+            "label": "Next: U-Substitution",
+            "note": "U-substitution is the FTC in reverse for composite functions. Recognizing which part of the integrand is the \"inner derivative\" (chain rule factor) is the core skill."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "ftc-assess-1",
+            "type": "input",
+            "text": "d/dx[∫₀ˣ sin(t²) dt] = ?",
+            "answer": "sin(x²)",
+            "hint": "FTC Part 1: derivative of accumulation function = integrand at upper limit. sin(x²)."
+        },
+        {
+            "id": "ftc-assess-2",
+            "type": "input",
+            "text": "d/dx[∫₀^(x³) eᵗ dt] = ?",
+            "answer": "e^(x³)·3x²",
+            "hint": "FTC Part 1 + chain rule: f(g(x))·g'(x) = e^(x³)·3x²."
+        },
+        {
+            "id": "ftc-assess-3",
+            "type": "input",
+            "text": "∫₀³ (2x+1) dx = ? Use FTC Part 2.",
+            "answer": "12",
+            "hint": "Antiderivative F = x²+x. F(3)-F(0) = (9+3)-(0) = 12."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "FTC = differentiation and integration are inverse operations",
+    "Part 1: d/dx[∫ₐˣ f dt] = f(x)",
+    "Part 2: ∫ₐᵇ f = F(b) - F(a) (antiderivative shortcut)",
+    "Chain rule version: d/dx[∫ₐ^g(x) f dt] = f(g(x))·g'(x)"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

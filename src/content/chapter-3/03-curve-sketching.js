@@ -397,6 +397,98 @@ export default {
     { lessonSlug: 'lhopital', label: "L'Hôpital's Rule", context: 'Computing limits for asymptotes of functions like ln(x)/x requires L\'Hôpital\'s Rule for the ∞/∞ and 0·∞ indeterminate forms.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "critical point",
+            "meaning": "x where f'(x) = 0 or f'(x) DNE — a candidate for local max/min"
+        },
+        {
+            "symbol": "inflection point",
+            "meaning": "x where concavity changes — f''changes sign"
+        },
+        {
+            "symbol": "f' > 0",
+            "meaning": "f is increasing on that interval"
+        },
+        {
+            "symbol": "f'' > 0",
+            "meaning": "f is concave up (bowl-shaped) on that interval"
+        }
+    ],
+    "rulesOfThumb": [
+        "Algorithm: find domain, intercepts, symmetry, asymptotes, f'(sign chart), critical pts, f''(sign chart), inflection pts.",
+        "f' tells you slope (increasing/decreasing). f'' tells you curvature (concave up/down).",
+        "A critical point with f''> 0 is a local min; with f''< 0 is a local max.",
+        "Inflection points are where f'' changes sign — NOT just where f'' = 0."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch3-mean-value-theorem",
+            "label": "Previous: Mean Value Theorem",
+            "note": "The proofs that f'>0 ⟹ f increasing and f'=0 everywhere ⟹ f constant are direct applications of the MVT. Curve sketching uses those results constantly."
+        },
+        {
+            "lessonId": "ch2-differentiation-rules",
+            "label": "Ch. 2: Differentiation Rules",
+            "note": "Curve sketching demands that you compute f' and f'' efficiently. Every differentiation rule from Ch. 2 is used here."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch3-optimization",
+            "label": "Next: Optimization",
+            "note": "Optimization is curve sketching with a purpose — you find the global maximum or minimum of f on an interval. The same sign-chart and critical-point machinery applies."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "cs-assess-1",
+            "type": "choice",
+            "text": "If f'(x) > 0 on (a,b), then on that interval f is:",
+            "options": [
+                "Increasing",
+                "Decreasing",
+                "Concave up",
+                "Concave down"
+            ],
+            "answer": "Increasing",
+            "hint": "Positive derivative = positive slope = function going up."
+        },
+        {
+            "id": "cs-assess-2",
+            "type": "choice",
+            "text": "If f''(c) = 0 and f''changes sign at c, then c is:",
+            "options": [
+                "A local maximum",
+                "A local minimum",
+                "An inflection point",
+                "A critical point"
+            ],
+            "answer": "An inflection point",
+            "hint": "Inflection points are where concavity changes direction. f''=0 alone is not sufficient — the sign must change."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "f' sign chart → increasing/decreasing intervals",
+    "f'' sign chart → concave up/down intervals",
+    "f'=0 → critical points (max/min candidates)",
+    "f'' changes sign → inflection point (concavity flip)"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

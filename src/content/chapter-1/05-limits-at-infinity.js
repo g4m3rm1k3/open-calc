@@ -203,5 +203,85 @@ export default {
     { lessonSlug: 'continuity', label: 'Review: Continuity', context: 'Asymptotes describe long-run behavior, not local continuity at a point.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "lim(x→∞) f(x) = L",
+            "meaning": "as x grows without bound, f(x) gets arbitrarily close to L — L is a horizontal asymptote"
+        },
+        {
+            "symbol": "leading term",
+            "meaning": "the highest-degree term in a polynomial — it dominates all others for large x"
+        },
+        {
+            "symbol": "horizontal asymptote",
+            "meaning": "the line y = L that the function approaches as x → ±∞"
+        }
+    ],
+    "rulesOfThumb": [
+        "For rational functions: compare degrees. Same degree → ratio of leading coefficients. Numerator higher → ±∞. Denominator higher → 0.",
+        "Divide numerator and denominator by the highest power of x in the denominator.",
+        "1/xⁿ → 0 as x→∞ for any n > 0. This is the anchor for all limit-at-infinity computations."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-intro-limits",
+            "label": "Ch. 1: Introduction to Limits",
+            "note": "Limits at infinity follow the same logic as finite limits — the function is approaching a value — but the \"approach\" is along the x-axis toward ±∞ rather than toward a finite point."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch3-lhopital",
+            "label": "Ch. 3: L'Hôpital's Rule",
+            "note": "∞/∞ is an indeterminate form handled by L'Hôpital. Many limits at infinity reduce to this form and require that rule."
+        },
+        {
+            "lessonId": "ch3-curve-sketching",
+            "label": "Ch. 3: Curve Sketching",
+            "note": "Horizontal asymptotes are one of the key features to determine when sketching a curve. Limits at infinity give you the end-behavior of the graph directly."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "linf-assess-1",
+            "type": "input",
+            "text": "lim(x→∞) (3x²+5) / (x²-2). What is the answer?",
+            "answer": "3",
+            "hint": "Same degree top and bottom. Divide both by x²: (3 + 5/x²)/(1 - 2/x²). As x→∞, those fractions → 0. Left with 3/1 = 3."
+        },
+        {
+            "id": "linf-assess-2",
+            "type": "choice",
+            "text": "lim(x→∞) (x³+1)/(x²+x). The answer is:",
+            "options": [
+                "1",
+                "0",
+                "+∞",
+                "-∞"
+            ],
+            "answer": "+∞",
+            "hint": "Numerator degree (3) > denominator degree (2). The rational function grows without bound."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Large x → 1/xⁿ → 0 (this is the anchor)",
+    "Rational: compare leading degrees (same, higher top, higher bottom)",
+    "Horizontal asymptote y=L ⟺ lim(x→±∞) f(x) = L"
+],
+
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
 }

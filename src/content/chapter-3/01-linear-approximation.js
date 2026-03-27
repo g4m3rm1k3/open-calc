@@ -291,6 +291,81 @@ export default {
     { lessonSlug: 'lhopital', label: "L'Hôpital's Rule", context: "L'Hôpital's rule can be understood as a consequence of linear approximation: f(x)/g(x) ≈ f'(c)(x-c)/[g'(c)(x-c)] = f'(c)/g'(c) near a zero of both f and g." },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "L(x) = f(a) + f'(a)(x-a)",
+            "meaning": "the linearization — the tangent line at x=a used as an approximation to f near a"
+        },
+        {
+            "symbol": "Δy ≈ f'(x)·Δx",
+            "meaning": "the differential approximation: output change ≈ derivative × input change"
+        },
+        {
+            "symbol": "error",
+            "meaning": "the difference between the true value f(x) and the linear approximation L(x) — grows as (x-a)²"
+        }
+    ],
+    "rulesOfThumb": [
+        "The approximation is most accurate when x is close to a. Quality degrades as |x-a| increases.",
+        "Differentials df = f'(x)dx are the infinitesimal version of the same idea.",
+        "In physics and engineering, linear approximation is used constantly to simplify nonlinear equations."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch0-lines",
+            "label": "Ch. 0: Lines",
+            "note": "The linearization IS a line — specifically the tangent line from Ch. 0. The formula y - f(a) = f'(a)(x-a) is the point-slope form of a line with slope f'(a) through the point (a, f(a))."
+        },
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: The Derivative and Tangent Lines",
+            "note": "You learned to find the tangent line equation in Ch. 2. The linearization is that same tangent line, now used as an approximating function."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch5-taylor-maclaurin",
+            "label": "Ch. 5: Taylor Series",
+            "note": "The linearization is the degree-1 Taylor polynomial. Taylor series extend this idea to degree-n polynomial approximations, capturing higher-order curvature."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "la-assess-1",
+            "type": "input",
+            "text": "Find the linearization of f(x) = √x at a = 4.",
+            "answer": "L(x) = 2 + (1/4)(x-4)",
+            "hint": "f(4)=2, f'(x)=1/(2√x), f'(4)=1/4. L(x) = 2 + (1/4)(x-4)."
+        },
+        {
+            "id": "la-assess-2",
+            "type": "input",
+            "text": "Use linear approximation to estimate √4.1.",
+            "answer": "2.025",
+            "hint": "L(4.1) = 2 + (1/4)(4.1-4) = 2 + 0.025 = 2.025."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Linearization = tangent line used as an approximating function",
+    "L(x) = f(a) + f'(a)(x-a)",
+    "df = f'(x)dx (differential form)",
+    "Error grows like (x-a)² — good near a, poor far away"
+],
+
   checkpoints: [
     'read-intuition',
     'read-math',

@@ -657,6 +657,97 @@ export default {
     },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "ε (epsilon)",
+            "meaning": "the output tolerance — how close f(x) must stay to L"
+        },
+        {
+            "symbol": "δ (delta)",
+            "meaning": "the input radius you choose — if x stays within δ of c, then f(x) stays within ε of L"
+        },
+        {
+            "symbol": "0 < |x-c| < δ",
+            "meaning": "x is close to c but not equal to c (strict inequality)"
+        },
+        {
+            "symbol": "|f(x) - L| < ε",
+            "meaning": "the output f(x) is within ε of L"
+        }
+    ],
+    "rulesOfThumb": [
+        "The ε-δ game: your opponent picks ε (any positive number). You must respond with a δ that works.",
+        "For polynomials: start by factoring |f(x)-L|. Bound the extra factor near c, then choose δ = min(1, ε/bound).",
+        "The phrase \"for all ε>0 there exists δ>0\" is the formal structure of every limit proof.",
+        "Direct substitution is the informal version of ε-δ for continuous functions."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-intro-limits",
+            "label": "Ch. 1: Introduction to Limits (informal)",
+            "note": "You met the intuition: the limit is what f(x) approaches. ε-δ is the same idea made mathematically rigorous. Epsilon is the output tolerance; delta is the input radius that guarantees it."
+        },
+        {
+            "lessonId": "ch0-inequalities",
+            "label": "Ch. 0: Inequalities",
+            "note": "The triangle inequality |a+b| ≤ |a|+|b| appears in every ε-δ proof. Reviewing it now will make the proofs flow naturally."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch2-tangent-problem",
+            "label": "Ch. 2: Derivative Definition",
+            "note": "The derivative is defined as a limit. The ε-δ definition ensures that limit is unambiguously defined. If you ever need to rigorously prove a derivative, ε-δ is the foundation."
+        },
+        {
+            "lessonId": "ch1-continuity",
+            "label": "Ch. 1: Continuity",
+            "note": "The ε-δ definition of continuity is: for every ε>0 there exists δ>0 such that |x-c|<δ implies |f(x)-f(c)|<ε. This is the same structure, applied directly at c (not just near c)."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "ed-assess-1",
+            "type": "choice",
+            "text": "In the ε-δ definition, who chooses ε first?",
+            "options": [
+                "You (the prover)",
+                "Your opponent (the challenger)",
+                "Both simultaneously",
+                "Neither — it is given by the problem"
+            ],
+            "answer": "Your opponent (the challenger)",
+            "hint": "The definition says \"for ALL ε > 0\" — meaning ε is arbitrary, chosen by a challenger. You must respond with a δ that works for that ε."
+        },
+        {
+            "id": "ed-assess-2",
+            "type": "input",
+            "text": "To prove lim(x→2) x² = 4 via ε-δ, we need δ = min(1, ε/?). What is the missing number?",
+            "answer": "5",
+            "hint": "Near x=2, |x+2| < 5 when δ ≤ 1. So |x²-4| = |x-2||x+2| < δ·5. Set δ = min(1, ε/5)."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "ε = output tolerance (any positive, chosen adversarially)",
+    "δ = input radius (you choose this in response to ε)",
+    "Proof structure: Given ε>0, let δ = …, then |x-c|<δ ⟹ |f(x)-L|<ε",
+    "Every limit you know informally has an ε-δ proof behind it"
+],
+
   checkpoints: [
     "read-intuition",
     "read-math",

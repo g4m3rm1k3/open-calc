@@ -277,5 +277,70 @@ export default {
     { lessonSlug: 'trig-derivatives', label: 'Essential For: Trig Derivatives', context: 'The proof that d/dx[sin x] = cos x uses lim sin(x)/x = 1.' },
   ],
 
+
+  // ─── Semantic Layer ───────────────────────────────────────────────────────
+  semantics: {
+    "core": [
+        {
+            "symbol": "g(x) ≤ f(x) ≤ h(x)",
+            "meaning": "f is bounded between g and h near the point of interest"
+        },
+        {
+            "symbol": "lim g = lim h = L",
+            "meaning": "the two bounding functions both converge to the same value L"
+        }
+    ],
+    "rulesOfThumb": [
+        "Trigger: you see |sin|, |cos|, or any bounded oscillating function multiplied by something going to 0.",
+        "Write the bound: -1 ≤ sin(anything) ≤ 1. Multiply by the expression going to 0. Squeeze.",
+        "Both bounding functions must approach the SAME limit for the Squeeze Theorem to conclude anything."
+    ]
+},
+
+  // ─── Spiral Learning ─────────────────────────────────────────────────────
+  spiral: {
+    "recoveryPoints": [
+        {
+            "lessonId": "ch1-limit-laws",
+            "label": "Previous: Limit Laws",
+            "note": "The Squeeze Theorem was introduced alongside the Limit Laws. This lesson deepens that tool with more examples and the geometric proof of sin(x)/x."
+        }
+    ],
+    "futureLinks": [
+        {
+            "lessonId": "ch2-trig-derivatives",
+            "label": "Ch. 2: Trig Derivatives",
+            "note": "The derivative of sin(x) cannot be computed without the Squeeze Theorem proof that sin(x)/x → 1. You will use this result directly."
+        }
+    ]
+},
+
+  // ─── Assessment ──────────────────────────────────────────────────────────
+  assessment: {
+    "questions": [
+        {
+            "id": "sq-assess-1",
+            "type": "input",
+            "text": "Evaluate lim(x→0) x²·cos(1/x).",
+            "answer": "0",
+            "hint": "Bound: -x² ≤ x²cos(1/x) ≤ x². Both bounds approach 0. Squeeze Theorem says the middle does too."
+        },
+        {
+            "id": "sq-assess-2",
+            "type": "input",
+            "text": "What is lim(x→0) sin(x)/x?",
+            "answer": "1",
+            "hint": "This is the fundamental trig limit proved via the Squeeze Theorem and unit circle geometry."
+        }
+    ]
+},
+
+  // ─── Mental Model Compression ────────────────────────────────────────────
+  mentalModel: [
+    "Squeeze = pin a wild function between two tame ones with the same limit",
+    "Trigger cue: bounded oscillation × vanishing factor",
+    "sin(x)/x → 1 as x→0 (proved by squeezing)"
+],
+
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
 }
