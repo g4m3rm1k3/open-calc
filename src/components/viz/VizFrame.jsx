@@ -471,6 +471,10 @@ const VIZ_REGISTRY = {
   LogGraphViz: lazy(() => import("./d3/LogGraphViz.jsx")),
   LogPropertiesViz: lazy(() => import("./d3/LogPropertiesViz.jsx")),
   ExpLogSolverViz: lazy(() => import("./d3/ExpLogSolverViz.jsx")),
+  ExponentialGrowth: lazy(() => import("./d3/ExponentialGrowth.jsx")),
+  ExponentialSlopeAtZero: lazy(() => import("./d3/ExponentialSlopeAtZero.jsx")),
+  ExpLogBridgeLab: lazy(() => import("./react/ExpLogBridgeLab.jsx")),
+  ExpLogGeometricProof: lazy(() => import("./d3/ExpLogGeometricProof.jsx")),
   // ─── Physics Chapter 1: Vectors ─────────────────────────────────────────────
   // Lesson 1: What Is a Vector? (P1-P5)
   VectorArrowIntuition: lazy(() => import("./react/VectorArrowIntuition.jsx")),
@@ -751,6 +755,7 @@ const VIZ_REGISTRY = {
   InverseDerivativeTriangle: lazy(
     () => import("./react/InverseDerivativeTriangle.jsx"),
   ),
+  VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
 };
 
 function VizSkeleton() {

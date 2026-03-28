@@ -39,6 +39,7 @@ export function getVideosForLesson(lessonId, section, exampleId = null) {
  * @returns {Object|null} - Visualization object for VizFrame
  */
 export function formatAsVisualization(videos, lessonId) {
+  return null;
   if (!videos || videos.length === 0) return null;
 
   return {
