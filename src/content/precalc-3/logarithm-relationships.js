@@ -19,6 +19,8 @@ export default {
       { type: 'prose', paragraphs: ['A logarithm answers the question: what exponent do I need? $\\log_b(x) = y$ means $b^y = x$. But this framing hides why logarithms are useful in calculus.'] },
       { type: 'viz', id: 'VideoEmbed', title: 'Logarithm Introduction', props: { url: "" } },
       { type: 'prose', paragraphs: ['The deeper view: $\\ln(x)$ is defined as the area under the curve $y = 1/t$ from $t=1$ to $t=x$. This is not a coincidence of notation — it is the actual definition that makes $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ obvious rather than mysterious.'] },
+      { type: 'prose', paragraphs: ['**The Multiplier to Slider**: Logarithms are the ultimate translators. They turn the complex operation of multiplication into the simpler world of addition. If you multiply two huge numbers, you are effectively adding their "Logarithmic Heights." This is why logs are the hidden engine of historical engineering and modern data science.'] },
+      { type: 'prose', paragraphs: ['**The Growth Scale**: In the physical world, our senses are logarithmic. To hear a sound as "twice as loud," the physical energy must increase tenfold. Logarithms allow us to map these exponential physical realities into a linear human experience.'] },
       { type: 'callout', callout: { type: 'definition', title: 'The area definition of $\\ln$', body: '\\ln(x) \\overset{\\text{def}}{=} \\int_1^x \\frac{1}{t}\\,dt \\qquad (x > 0)' } },
       { type: 'callout', callout: { type: 'insight', title: 'Why $e$ is the natural base', body: 'e \\text{ is defined as the unique number where } \\int_1^e \\frac{1}{t}\\,dt = 1. \\text{ In other words, the area from 1 to } e \\text{ under } 1/t \\text{ is exactly 1.}' } },
       { type: 'viz', id: 'LogAsAreaViz', title: '$\\ln(x)$ as Area Under $1/t$',
@@ -26,6 +28,10 @@ export default {
         caption: "When $x = e \\approx 2.718$, the area is exactly 1. That's what makes $e$ special.",
       },
       { type: 'callout', callout: { type: 'insight', title: 'Why this immediately gives us the derivative', body: '\\frac{d}{dx}\\ln(x) = \\frac{d}{dx}\\int_1^x \\frac{1}{t}\\,dt = \\frac{1}{x} \\qquad \\text{(Fundamental Theorem of Calculus)}' } },
+      { type: 'callout', callout: { type: 'insight', title: 'Linguistic Learner: The Language of Proportion', body: '\\text{"Logarithm" comes from the Greek "Logos" (Proportion) and "Arithmos" (Number).} \\\\ \\text{It is literally the "Number of Proportions"—the count of how many times a base must be multiplied to reach a target.}' } },
+      { type: 'callout', callout: { type: 'insight', title: 'Logical Learner: The Multiplier to Slider', body: '\\text{The slide rule uses logarithms to solve multiplication through addition.} \\\\ \\text{Logarithms linearize the exponential. $\\log(ab) = \\log a + \\log b$ is the logic of mapping "Circular Scales" to "Linear Rulers."}' } },
+      { type: 'callout', callout: { type: 'insight', title: 'Physical Learner: The Growth Scale', body: '\\text{The Richter scale for earthquakes and the Decibel scale for sound are logarithmic.} \\\\ \\text{Each step on the scale (1 to 2) represents a 10x jump in physical intensity. We use logs to keep massive physical forces within a "Human Scale."}' } },
+      { type: 'callout', callout: { type: 'insight', title: 'Visual Learner: The Hyperbolic Area', body: '\\text{Picture the curve } y = 1/x \\text{ plunging toward the axis.} \\\\ \\text{The area trapped under this curve is the unique source of all log properties. The natural log is the geometric "Signature" of this specific hyperbolic shape.}' } },
       { type: 'prose', paragraphs: ['This area definition also makes the log laws geometric. $\\ln(ab) = \\ln(a) + \\ln(b)$ because the area from 1 to $ab$ equals the area from 1 to $a$ plus a scaled copy of the area from 1 to $b$.'] },
       { type: 'viz', id: 'VideoCarousel', title: 'Graphing Logarithms',
         props: { videos: [
@@ -58,6 +64,8 @@ export default {
       { type: 'callout', callout: { type: 'warning', title: 'The absolute value matters', body: '\\int \\frac{1}{x}\\,dx = \\ln|x| + C, \\text{ not } \\ln(x) + C. \\text{ The domain of } \\ln \\text{ is } x > 0, \\text{ but } 1/x \\text{ is defined for } x < 0 \\text{ too.}' } },
       { type: 'callout', callout: { type: 'insight', title: 'The $n = -1$ gap in the power rule', body: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\text{ for } n \\neq -1. \\quad \\text{When } n = -1\\text{: } \\int x^{-1}\\,dx = \\ln|x| + C.' } },
       { type: 'prose', paragraphs: ['Solving logarithmic and exponential equations: isolate the log or exponential, apply the inverse operation, and check for extraneous solutions (log requires positive argument).'] },
+      { type: 'callout', callout: { type: 'theorem', title: 'The Unit Conversion for Logs', body: '\\log_b(x) = \\frac{\\ln x}{\\ln b}. \\\\ \\text{This is effectively a Change of Units. It proves that all logarithms are just scaled versions of the natural log.}' } },
+      { type: 'callout', callout: { type: 'theorem', title: 'The Limit Definition of e', body: 'e = \\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^n. \\\\ \\text{This algebraic limit links the geometry of logs to the physical reality of continuous interest and growth.}' } },
       { type: 'viz', id: 'VideoCarousel', title: 'Solving Logarithmic Equations',
         props: { videos: [
           { url: "", title: 'Solving Log Equations Pt 1' },
@@ -93,6 +101,26 @@ export default {
         expression: '\\ln(ab) = \\int_1^a \\frac{1}{t}\\,dt + \\ln b = \\ln a + \\ln b \\qquad \\blacksquare',
         annotation: 'Reassemble. The product rule for logs is really just a substitution inside a definite integral.',
       },
+      {
+         expression: '\\text{--- Part II: Proving the Change of Base Formula ---}',
+         annotation: 'Let us derive $\\log_b(x) = \\ln x / \\ln b$.'
+      },
+      {
+         expression: '\\text{Let } y = \\log_b(x) \\implies b^y = x',
+         annotation: 'Step 1: Write the log in its exponential equivalent.'
+      },
+      {
+         expression: '\\ln(b^y) = \\ln x',
+         annotation: 'Step 2: Take the natural log of both sides.'
+      },
+      {
+         expression: 'y \\ln b = \\ln x',
+         annotation: 'Step 3: Use the log power rule (already proven in Part I) to bring down the y.'
+      },
+      {
+         expression: 'y = \\frac{\\ln x}{\\ln b} \\qquad \\blacksquare',
+         annotation: 'Step 4: Solve for y. This proves that all logs are just rescaled versions of the natural log.'
+      }
     ],
   },
 
@@ -157,6 +185,50 @@ export default {
       ],
       conclusion: 'Always expand $\\ln$ using log laws before differentiating a product/quotient/power inside a log. It converts one hard problem into several easy ones.',
     },
+    {
+      id: 'ex-log-natural-descent',
+      title: 'The Natural Descent: Nested Logarithms',
+      problem: '\\text{Differentiate } f(x) = \\ln(\\ln(\\ln x)).',
+      steps: [
+        {
+          expression: "f'(x) = \\frac{1}{\\ln(\\ln x)} \\cdot \\frac{d}{dx}(\\ln(\\ln x))",
+          annotation: 'Step 1: Apply the outermost chain rule. Derivative of ln(u) is 1/u.'
+        },
+        {
+          expression: "\\frac{d}{dx}(\\ln(\\ln x)) = \\frac{1}{\\ln x} \\cdot \\frac{1}{x}",
+          annotation: 'Step 2: Chain again through the middle log.'
+        },
+        {
+          expression: "f'(x) = \\frac{1}{x \\ln x \\ln(\\ln x)} \\qquad \\blacksquare",
+          annotation: 'Step 3: Combine. The derivative cascades down the tower of logs.'
+        }
+      ],
+      conclusion: 'Nested logarithms create a product of inverse terms. This demonstrates the slow growth of logs—their derivatives diminish exponentially.'
+    },
+    {
+      id: 'ex-log-bridge-of-e',
+      title: 'The Bridge of Base e: Solving Different Bases',
+      problem: '\\text{Solve for x: } 2^x = 3^{x+1}.',
+      steps: [
+        {
+          expression: 'x \\ln 2 = (x+1) \\ln 3',
+          annotation: 'Step 1: Take the natural log of both sides.'
+        },
+        {
+          expression: 'x \\ln 2 = x \\ln 3 + \\ln 3',
+          annotation: 'Step 2: Distribute.'
+        },
+        {
+          expression: 'x(\\ln 2 - \\ln 3) = \\ln 3',
+          annotation: 'Step 3: Collect x terms.'
+        },
+        {
+          expression: 'x = \\frac{\\ln 3}{\\ln 2 - \\ln 3} \\approx -2.71 \\qquad \\blacksquare',
+          annotation: 'Step 4: Isolate x.'
+        }
+      ],
+      conclusion: "Base e acts as the 'Universal Language' for all exponential equations. It allows us to compare different growth rates on a single scale."
+    },
   ],
 
   challenges: [
@@ -198,5 +270,30 @@ export default {
       ],
       answer: '\\dfrac{1}{3}',
     },
+    {
+      id: 'ch3-log-010-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Solve for x: } \\log_x(100) = 2.',
+      hint: 'Apply the Change of Base formula to rewrite the log in terms of natural logs.',
+      walkthrough: [
+        {
+          expression: '\\frac{\\ln 100}{\\ln x} = 2',
+          annotation: 'Step 1: Universal Change of Base.'
+        },
+        {
+          expression: '\\ln 100 = 2 \\ln x \\implies \\ln 10^2 = 2 \\ln x',
+          annotation: 'Step 2: Recognize 100 as 10 squared.'
+        },
+        {
+          expression: '2 \\ln 10 = 2 \\ln x \\implies \\ln 10 = \\ln x',
+          annotation: 'Step 3: Use the log power rule.'
+        },
+        {
+          expression: 'x = 10 \\qquad \\blacksquare',
+          annotation: 'Step 4: Solve for x. The base of the logarithm is 10.'
+        }
+      ],
+      answer: '10'
+    }
   ],
 }
