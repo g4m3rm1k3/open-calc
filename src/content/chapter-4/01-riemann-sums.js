@@ -49,6 +49,11 @@ export default {
         title: "Bernhard Riemann's 1854 Thesis",
         body: "Georg Friedrich Bernhard Riemann (1826–1866) formalized the idea of integration in his habilitation thesis of 1854 — the same document where he introduced Riemann surfaces and the Riemann Hypothesis. Before Riemann, integration was an informal procedure. He asked: for which functions does the 'sum of rectangles' limit exist? His answer (Riemann integrability) remained the standard for 50 years until Lebesgue generalized it in 1902.",
       },
+      {
+        type: 'tip',
+        title: 'Physics Application: Displacement from Velocity is a Riemann Sum',
+        body: "Everything in this lesson appears concretely in kinematics. Divide a time interval into n subintervals of width Δt. On each piece, approximate velocity as constant at v(tᵢ). Displacement from that piece ≈ v(tᵢ)·Δt. Total displacement ≈ Σ v(tᵢ)Δt — a Riemann sum of v(t). As n → ∞ (Δt → 0), this converges to ∫v(t) dt = Δx. The area under the v–t graph IS a Riemann integral. See Physics Ch2 (Velocity Graph Analysis and Linking x, v, a) to see this integral in action before the formalism.",
+      },
     ],
     visualizations: [
                                                                 {

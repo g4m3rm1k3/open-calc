@@ -94,6 +94,11 @@ export default {
         title: 'Newton vs. Leibniz: The Calculus Priority Dispute',
         body: "Newton developed calculus in the 1660s using 'fluxions' (rates of change). Leibniz independently developed it in the 1670s-80s using infinitesimals. The resulting priority dispute was one of the bitterest in the history of science. Today, we use Leibniz's notation (dy/dx) because it is more versatile, but Newton's dot notation (ẏ) survives in physics.",
       },
+      {
+        type: 'tip',
+        title: 'Physics Application: Kinematics is Derivatives in Action',
+        body: "Everything in this lesson has a direct physical counterpart. Position x(t) is the function; velocity v = dx/dt is its derivative; acceleration a = dv/dt = d²x/dt² is the second derivative. The x–t graph you see in Physics Ch2 is exactly the graph of f; its slope at each point is exactly f′(x). See Physics Ch2 (Position, Velocity, and Acceleration Graphs) to watch this abstract limit definition become a speedometer reading in real time.",
+      },
     ],
     visualizations: [
                                                                                 {

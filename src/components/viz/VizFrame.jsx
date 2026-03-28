@@ -756,6 +756,11 @@ const VIZ_REGISTRY = {
     () => import("./react/InverseDerivativeTriangle.jsx"),
   ),
   VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
+  // Chapter 3 — Applications of Derivatives (self-contained lesson components)
+  HigherOrderDerivatives: lazy(() => import("./react/HigherOrderDerivatives.jsx")),
+  DerivativesRatesOfChange: lazy(() => import("./react/DerivativesRatesOfChange.jsx")),
+  MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
+  MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
 };
 
 function VizSkeleton() {

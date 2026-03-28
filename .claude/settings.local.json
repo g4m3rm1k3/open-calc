@@ -17,7 +17,12 @@
       "Bash(grep -E \"\\\\\\\\\\(dfrac|frac|text|begin|displaystyle\\)\")",
       "Bash(grep '\"\"katex\"\"' package.json)",
       "Bash(python3 -c \":*)",
-      "Bash(node -e \"require\\(''react-konva''\\)\")"
+      "Bash(node -e \"require\\(''react-konva''\\)\")",
+      "Bash(find \"/c/Users/g4m3r/Documents/testing tutorials/open-calc/src/content\" -name \"*.js\" -exec grep -l \"related\\\\|reference\\\\|seeLessonId\\\\|linkedLessons\\\\|crossLink\" {})",
+      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/HigherOrderDerivatives.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/HigherOrderDerivatives.jsx\")",
+      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/DerivativesratesOfchange.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/DerivativesRatesOfChange.jsx\")",
+      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Motionalongline.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MotionAlongLine.jsx\")",
+      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Maximaminima.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MaximaMinima.jsx\")"
     ]
   }
 }
