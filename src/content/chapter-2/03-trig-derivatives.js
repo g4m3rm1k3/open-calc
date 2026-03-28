@@ -403,16 +403,37 @@ export default {
             "\\text{Outer: } F(u) = \\sin(u), \\quad \\text{Inner: } u = 3x",
           annotation:
             "Identify the composition. The outer function is sine; the inner is 3x.",
+          strategyTitle: "Identify the composite structure: outer = sin, inner = 3x",
+          checkpoint: "Before differentiating, predict: is the argument of sin just plain x, or something else? Does that difference change which rules you need?",
+          hints: [
+            "Level 1: When a trig function's argument is not plain x, the chain rule is required. Spotting the inner function before differentiating prevents the most common trig derivative mistake.",
+            "Level 2: The Pythagorean identity sin²x + cos²x = 1 is not needed here — this step is purely about recognising the layered structure (composition) before touching any derivative.",
+            "Level 3: On the unit circle, sin(3x) traces the y-coordinate three times faster than sin(x). The factor of 3 that will appear in the derivative reflects that speed — it is the geometric meaning of the inner derivative.",
+          ],
         },
         {
           expression: "F'(u) = \\cos(u), \\quad u' = 3",
           annotation:
             "Derivative of sine is cosine; derivative of the inner function 3x is 3.",
+          strategyTitle: "Apply d/dx[sin(u)] = cos(u) · u' (chain rule): outer gives cos, inner gives 3",
+          checkpoint: "Predict the sign of F'(u): is the derivative of sine positive or negative? Does the inner derivative u' = 3 change the sign, or only the magnitude?",
+          hints: [
+            "Level 1: The trig derivative rule is d/dx[sin x] = cos x — the derivative of sine is cosine, always positive on (0, π/2). Remember this paired rule: d/dx[cos x] = -sin x (note the negative sign).",
+            "Level 2: No trig identity is needed here — the inner function 3x is linear, so its derivative 3 is just a constant multiplier. The sign of the final answer is determined by cos(3x), not by the inner derivative.",
+            "Level 3: Geometrically, on the unit circle the rate of change of the y-coordinate (sin) equals the x-coordinate (cos). The inner derivative 3 scales this rate — sin(3x) oscillates 3× faster, so its slope is 3× steeper at every point.",
+          ],
         },
         {
           expression: "f'(x) = \\cos(3x) \\cdot 3 = 3\\cos(3x)",
           annotation:
             "Apply chain rule: outer derivative (cosine, evaluated at inner) times inner derivative (3). The argument of cosine is the same as the original argument of sine.",
+          strategyTitle: "Assemble the chain rule result: cos(3x) · 3 = 3cos(3x)",
+          checkpoint: "Check the argument: the derivative of sin(3x) should produce cos of the same inner expression 3x. Did you keep the argument 3x inside the cosine, or did you accidentally simplify to cos(x)?",
+          hints: [
+            "Level 1: The chain rule assembly is: outer derivative evaluated at the inner × inner derivative. So d/dx[sin(3x)] = cos(3x) · 3. The inner function 3x stays intact inside cosine — it is not differentiated again.",
+            "Level 2: No trig identity is needed at this stage — the result 3cos(3x) is already fully simplified. The double-angle identity would be relevant if the original function were sin²(x), not sin(3x).",
+            "Level 3: Verify numerically: f(x) = sin(3x) at x = 0, the slope should be 3cos(0) = 3. A finite-difference check (f(0.001) - f(0))/0.001 = sin(0.003)/0.001 ≈ 3.000, confirming the factor of 3 is correct.",
+          ],
         },
       ],
       conclusion:
@@ -427,26 +448,61 @@ export default {
           expression: "\\text{Identify: } u(x) = x^2, \\quad v(x) = \\cos x",
           annotation:
             "This is a product of two functions. Assign the first factor and second factor for the product rule.",
+          strategyTitle: "Product rule setup: identify u = x² and v = cos x",
+          checkpoint: "Before differentiating, predict: does v = cos x need the chain rule, or is its argument plain x? Will v' be positive or negative?",
+          hints: [
+            "Level 1: The product rule applies whenever f(x) = u(x)·v(x). Labelling u and v first — before computing any derivatives — is the key habit that prevents the chain-trap mistake.",
+            "Level 2: v = cos x has plain x as its argument, so no chain rule is needed here. If it were cos(3x), the chain rule would add a factor of 3. This example is the simpler case.",
+            "Level 3: On the unit circle, cos(x) is the x-coordinate. The derivative -sin(x) is negative on (0, π) because the x-coordinate is decreasing there — the sign of v' has direct geometric meaning.",
+          ],
         },
         {
           expression: "u'(x) = 2x, \\quad v'(x) = -\\sin x",
           annotation:
             "Differentiate each factor separately. d/dx[x\u00b2] = 2x by the power rule; d/dx[cos x] = -sin x.",
+          strategyTitle: "Apply d/dx[cos x] = -sin x: note the negative sign",
+          checkpoint: "Confirm the sign of v': is d/dx[cos x] equal to +sin x or -sin x? Why does the negative sign appear?",
+          hints: [
+            "Level 1: The paired trig derivative rules are d/dx[sin x] = cos x (positive) and d/dx[cos x] = -sin x (negative). The negative sign on the cosine derivative is one of the most common sign errors in trig calculus.",
+            "Level 2: The Pythagorean identity sin²x + cos²x = 1 is not directly used here, but it is the reason d/dx[cos x] = -sin x — differentiating both sides of the identity gives 2sin x cos x + 2cos x(-sin x) = 0, which is consistent.",
+            "Level 3: Geometrically, cosine starts at its maximum at x = 0 and decreases — so its derivative at x = 0 should be 0 (flat). Check: v'(0) = -sin(0) = 0. ✓ At x = π/2, cosine is decreasing most steeply: v'(π/2) = -sin(π/2) = -1, the steepest negative slope.",
+          ],
         },
         {
           expression: "f'(x) = u'v + uv' = (2x)(\\cos x) + (x^2)(-\\sin x)",
           annotation:
             "Apply the product rule: (first)(second)' + (first)'(second).",
+          strategyTitle: "Assemble u'v + uv' with the correct negative sign from v'",
+          checkpoint: "Before simplifying, verify the sign of the second term: u = x², v' = -sin x, so uv' = x²·(-sin x). Is the second term positive or negative?",
+          hints: [
+            "Level 1: Product rule assembly: Term 1 = u'·v = 2x·cos x; Term 2 = u·v' = x²·(-sin x). Both ingredients are complete — no chain rule was needed on v because its argument was plain x.",
+            "Level 2: The negative sign belongs to v' = -sin x, not to the product rule template itself. The template h' = u'v + uv' always uses addition; the subtraction that appears in the simplified form comes from the negative sign in v'.",
+            "Level 3: No trig identity is needed for assembly. If the argument of cosine had been a function g(x) instead of plain x, the chain rule would have added a factor of g'(x) to v'. In this example g(x) = x, g'(x) = 1, so the chain rule multiplier is invisible.",
+          ],
         },
         {
           expression: "= 2x\\cos x - x^2 \\sin x",
           annotation:
             "Simplify by writing the two terms separately. This is the fully simplified form.",
+          strategyTitle: "Simplify: combine terms into standard form 2x cos x - x² sin x",
+          checkpoint: "Is there a common factor in both terms? Could this expression be factored further? Predict the factored form before reading the next step.",
+          hints: [
+            "Level 1: Both terms are already simplified. The result 2x cos x - x² sin x is the standard fully-expanded form of the derivative.",
+            "Level 2: No trig identity simplifies this further — sin and cos have different arguments (both are plain x, so the double-angle identity 2 sin x cos x = sin(2x) does not apply to these separated terms).",
+            "Level 3: To locate critical points of f(x) = x² cos x, you would set f'(x) = 0: 2x cos x - x² sin x = 0. The factored form in the next step makes solving this equation easier.",
+          ],
         },
         {
           expression: "= x(2\\cos x - x\\sin x)",
           annotation:
             "Optionally factor out x from both terms. This factored form can be useful for finding zeros.",
+          strategyTitle: "Factor out x to reveal critical-point structure",
+          checkpoint: "From the factored form x(2cos x - x sin x) = 0, what are the solutions? Is x = 0 always a critical point? What about the solutions from (2cos x - x sin x) = 0?",
+          hints: [
+            "Level 1: Factoring out x is optional — both forms are correct derivatives. Factoring is useful when you need to find zeros (critical points) or when the factored form matches a pattern needed in later work.",
+            "Level 2: Setting f'(x) = 0 gives x = 0 or 2cos x = x sin x, i.e. 2/x = tan x (for x ≠ 0). This transcendental equation has infinitely many solutions that cannot be found in closed form — numerical methods are needed.",
+            "Level 3: The factored form also connects to the unit circle: the factor (2cos x - x sin x) = 0 can be rewritten as tan x = 2/x, which geometrically describes intersections of the tangent curve with the hyperbola y = 2/x.",
+          ],
         },
       ],
       conclusion:

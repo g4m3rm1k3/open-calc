@@ -152,28 +152,70 @@ export default {
             "\\text{Let } x, y \\text{ be the sides. Constraint: } 2x + 2y = 100 \\Rightarrow x + y = 50.",
           annotation:
             "Draw a rectangle with sides x and y. Write the constraint from the fixed perimeter.",
+          strategyTitle: "Identify the objective and constraint: draw it first",
+          checkpoint: "Before writing any formula — what quantity are you trying to maximize? Write its name (Area). What equation must always be true no matter what dimensions you choose?",
+          hints: [
+            "Level 1: Label every quantity in your picture. The constraint comes from the physical restriction — here, total fence length is fixed at 100 m.",
+            "Level 2: You have two unknowns (x and y) and one constraint equation. That means you can eliminate one variable, leaving a single-variable problem.",
+            "Level 3: Setting up variables carefully — and writing the constraint explicitly — prevents algebra errors later. The domain (x > 0 and y > 0, so 0 < x < 50) also comes from the picture.",
+          ],
         },
         {
           expression: "A = xy \\text{ (objective)}",
           annotation: "The area is the objective function.",
+          strategyTitle: "Identify the objective: what quantity to maximize/minimize",
+          checkpoint: "What quantity are you optimizing? Write it as a function name before writing any formula.",
+          hints: [
+            "Level 1: The objective is the quantity the problem asks you to maximize or minimize. Here it's Area — write A = xy explicitly before doing anything else.",
+            "Level 2: A = xy currently has two free variables. You need the constraint to reduce this to one variable before you can differentiate.",
+            "Level 3: Naming the objective function explicitly (A =) forces you to think about what you are actually controlling. This discipline prevents the common mistake of differentiating the constraint instead of the objective.",
+          ],
         },
         {
           expression: "y = 50 - x \\Rightarrow A(x) = x(50-x) = 50x - x^2",
           annotation: "Substitute the constraint to eliminate y.",
+          strategyTitle: "Use the constraint to eliminate a variable",
+          checkpoint: "How many free variables does A = xy have before substituting? How many after? You need exactly one.",
+          hints: [
+            "Level 1: Solve the constraint x + y = 50 for y: y = 50 − x. Substitute into A = xy to get a function of x alone.",
+            "Level 2: A(x) = x(50 − x) = 50x − x² is a downward-opening parabola on (0, 50). Its maximum is at the vertex, which calculus will find.",
+            "Level 3: Any time you have one constraint and two variables, this substitution step is possible. With two constraints and three variables, you eliminate two variables. This is the general principle behind Lagrange multipliers in multivariable calculus.",
+          ],
         },
         {
           expression: "A'(x) = 50 - 2x = 0 \\Rightarrow x = 25",
           annotation: "Differentiate and set equal to zero.",
+          strategyTitle: "Differentiate: find critical points",
+          checkpoint: "Before differentiating, what rule will you use on 50x − x²? Can you predict the form of the derivative?",
+          hints: [
+            "Level 1: Differentiate A(x) = 50x − x² using the power rule: A'(x) = 50 − 2x. Set A'(x) = 0 and solve for x.",
+            "Level 2: x = 25 is the only critical point on (0, 50). Since the domain is an open interval, there are no endpoints to check — the maximum, if it exists, must be at this critical point.",
+            "Level 3: For a downward-opening parabola, there is exactly one critical point and it is always the global maximum. The second derivative test will confirm this formally.",
+          ],
         },
         {
           expression:
             "A''(x) = -2 < 0 \\Rightarrow \\text{local (global) maximum at } x = 25",
           annotation: "Second derivative confirms maximum.",
+          strategyTitle: "First or second derivative test: max or min?",
+          checkpoint: "A''(x) = −2 everywhere — what does a constant negative second derivative tell you about the shape of A(x)?",
+          hints: [
+            "Level 1: Second derivative test: A''(25) = −2 < 0 means the function is concave down at x = 25, so x = 25 is a local maximum.",
+            "Level 2: Because A''(x) = −2 < 0 everywhere (not just at x = 25), A is concave down on the entire domain. There is only one critical point, so x = 25 gives the global maximum.",
+            "Level 3: On an open interval (0, 50), there are no endpoints. The one-critical-point argument applies: if A → 0 at both ends of the domain and A(25) = 625 > 0, the interior critical point must be the global maximum.",
+          ],
         },
         {
           expression:
             "y = 50 - 25 = 25, \\quad A = 25 \\times 25 = 625 \\text{ m}^2",
           annotation: "Both sides are 25 m — a square. Maximum area is 625 m².",
+          strategyTitle: "Interpret the answer in context",
+          checkpoint: "Does the answer have the right units? Does 625 m² make physical sense — is it larger than, say, A(20) = 20 × 30 = 600 m²?",
+          hints: [
+            "Level 1: Substitute x = 25 back into the constraint to get y = 25. Then compute A = 25 × 25 = 625 m². Report both the dimensions AND the maximum area.",
+            "Level 2: Re-read the question — it asks for the maximum area AND the optimal dimensions. Report both: 25 m × 25 m square, area 625 m².",
+            "Level 3: Sanity check: try x = 20, y = 30. A = 600 < 625. Try x = 10, y = 40. A = 400 < 625. Every nearby rectangle has less area, confirming x = 25 is truly optimal.",
+          ],
         },
       ],
       conclusion:
@@ -189,36 +231,85 @@ export default {
           expression: "V(x) = (12-2x)(8-2x)x",
           annotation:
             "After cutting corners x × x, the box has dimensions (12-2x) × (8-2x) × x. Domain: x ∈ (0, 4) (need 8-2x > 0).",
+          strategyTitle: "Set up the objective function: Volume = length × width × height",
+          checkpoint: "What are the three dimensions of the box after folding? Write each dimension in terms of x before multiplying.",
+          hints: [
+            "Level 1: When you cut an x × x square from each corner and fold up the sides, the height becomes x, the length becomes 12 − 2x, and the width becomes 8 − 2x. Volume = length × width × height.",
+            "Level 2: The domain constraint x ∈ (0, 4) comes from requiring all dimensions positive: x > 0 and 8 − 2x > 0. The shorter side (8 inches) sets the tighter constraint.",
+            "Level 3: Unlike the fencing problem, there is no separate constraint equation here — the geometry of folding automatically expresses all dimensions in terms of one variable x. The 'constraint' is already built into the setup.",
+          ],
         },
         {
           expression:
             "V(x) = x(96 - 24x - 16x + 4x^2) = x(96 - 40x + 4x^2) = 4x^3 - 40x^2 + 96x",
           annotation: "Expand the product.",
+          strategyTitle: "Expand to a standard polynomial form before differentiating",
+          checkpoint: "Could you differentiate V(x) = (12−2x)(8−2x)x directly using the product rule? Why might expanding first be safer?",
+          hints: [
+            "Level 1: Expand (12 − 2x)(8 − 2x) first, then multiply by x. Work carefully: 12·8 = 96, 12·(−2x) = −24x, (−2x)·8 = −16x, (−2x)(−2x) = +4x².",
+            "Level 2: After expanding, V(x) = 4x³ − 40x² + 96x. This is a polynomial — easy to differentiate term by term using the power rule.",
+            "Level 3: You could use the product rule on the factored form, but expanding avoids potential errors. For polynomials, always expand before differentiating unless the factored form is extremely simple.",
+          ],
         },
         {
           expression: "V'(x) = 12x^2 - 80x + 96 = 4(3x^2 - 20x + 24)",
           annotation: "Differentiate.",
+          strategyTitle: "Differentiate: find critical points by solving V'(x) = 0",
+          checkpoint: "After differentiating, what type of equation do you need to solve? Can you factor out a common factor to simplify?",
+          hints: [
+            "Level 1: Differentiate V(x) = 4x³ − 40x² + 96x term by term: V'(x) = 12x² − 80x + 96. Factor out 4 to get 4(3x² − 20x + 24).",
+            "Level 2: Set V'(x) = 0 — since 4 ≠ 0, you only need 3x² − 20x + 24 = 0. This quadratic does not factor nicely, so use the quadratic formula.",
+            "Level 3: Critical points are where V'(x) = 0 or V'(x) is undefined. Since V' is a polynomial, it is defined everywhere, so the only candidates are where V'(x) = 0. Expect two critical points — but only one will lie in the domain (0, 4).",
+          ],
         },
         {
           expression:
             "3x^2 - 20x + 24 = 0 \\Rightarrow x = \\frac{20 \\pm \\sqrt{400 - 288}}{6} = \\frac{20 \\pm \\sqrt{112}}{6} = \\frac{20 \\pm 4\\sqrt{7}}{6} = \\frac{10 \\pm 2\\sqrt{7}}{3}",
           annotation: "Quadratic formula.",
+          strategyTitle: "Apply the quadratic formula and identify the domain-valid root",
+          checkpoint: "The quadratic formula gives two roots. Before computing decimals, can you tell which one will be inside (0, 4) and which will be outside?",
+          hints: [
+            "Level 1: With a = 3, b = −20, c = 24: discriminant = 400 − 288 = 112 = 16·7, so √112 = 4√7 ≈ 10.58. The two roots are (20 ± 10.58)/6.",
+            "Level 2: x₁ = (20 − 4√7)/3 ≈ 1.57 and x₂ = (20 + 4√7)/3 ≈ 5.10. Only x₁ ≈ 1.57 lies in (0, 4). Discard x₂ — it would require cutting more than half the 8-inch side, leaving negative width.",
+            "Level 3: Always check ALL roots against the domain before proceeding. A mathematically valid root outside the physical domain has no meaning in context. Discarding x₂ here is not optional — it is physically impossible.",
+          ],
         },
         {
           expression:
             "x = \\frac{10 - 2\\sqrt{7}}{3} \\approx \\frac{10 - 5.292}{3} \\approx \\frac{4.708}{3} \\approx 1.570",
           annotation:
             "The physically valid solution: x ≈ 1.570 in (the other root ≈ 5.097 is outside the domain (0,4)).",
+          strategyTitle: "Confirm the domain-valid critical point numerically",
+          checkpoint: "x ≈ 1.570 is in (0, 4). What are the resulting box dimensions? Do they all come out positive?",
+          hints: [
+            "Level 1: √7 ≈ 2.6458, so 2√7 ≈ 5.292. Then x = (10 − 5.292)/3 ≈ 4.708/3 ≈ 1.570 inches.",
+            "Level 2: Check dimensions: 12 − 2(1.570) = 8.860 in, 8 − 2(1.570) = 4.860 in, height = 1.570 in. All positive — good.",
+            "Level 3: It's worth keeping the exact form x = (10 − 2√7)/3 alongside the decimal. The exact form is needed for the second derivative check or if the problem asks for an exact answer.",
+          ],
         },
         {
           expression:
             "V(1.570) = (12 - 3.140)(8 - 3.140)(1.570) \\approx (8.860)(4.860)(1.570) \\approx 67.6 \\text{ in}^3",
           annotation: "Maximum volume is approximately 67.6 cubic inches.",
+          strategyTitle: "Evaluate the objective at the critical point",
+          checkpoint: "Does 67.6 in³ make sense? What is V(0) and V(4)? Confirm the critical point gives a larger volume than the endpoints.",
+          hints: [
+            "Level 1: Substitute x ≈ 1.570 into V(x) = (12 − 2x)(8 − 2x)x. Multiply the three factors step by step.",
+            "Level 2: Endpoint check: V(0) = 0 (no box height) and V(4) = 0 (8 − 2·4 = 0, zero width). V(1.570) ≈ 67.6 > 0, confirming the interior critical point gives the maximum.",
+            "Level 3: On a closed interval [0, 4], the closed-interval method says compare all critical point values and endpoint values. Both endpoints give V = 0, so the unique interior critical point at x ≈ 1.570 is the global maximum — no further test is needed.",
+          ],
         },
         {
           expression: "V''(x) = 24x - 80 < 0 \\text{ at } x \\approx 1.570",
           annotation:
             "V''(1.570) ≈ 24(1.570) - 80 = 37.68 - 80 = -42.32 < 0. Maximum confirmed.",
+          strategyTitle: "Second derivative test confirms maximum; interpret in context",
+          checkpoint: "V''(1.570) ≈ −42.32. What does this negative value tell you about the concavity of V at the critical point? Is the answer physically reasonable?",
+          hints: [
+            "Level 1: Second derivative test: V''(c) < 0 means the function is concave down at c, so c is a local maximum. V''(1.570) = 24(1.570) − 80 ≈ −42.32 < 0. Maximum confirmed.",
+            "Level 2: The answer: cut squares of ≈ 1.570 inches from each corner. The resulting box has dimensions ≈ 8.86 × 4.86 × 1.57 inches and volume ≈ 67.6 in³.",
+            "Level 3: Sanity check — cutting too little (say x = 0.5): V ≈ (11)(7)(0.5) = 38.5 in³ < 67.6. Cutting too much (say x = 3): V = (6)(2)(3) = 36 in³ < 67.6. Both sides give less volume, confirming optimality.",
+          ],
         },
       ],
       conclusion:

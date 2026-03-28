@@ -460,6 +460,146 @@ export default {
       ],
       conclusion: 'The derivative is (x\u00b2+1)^(sin x)\u00b7[cos(x)\u00b7ln(x\u00b2+1) + 2x sin(x)/(x\u00b2+1)]. This would have been completely intractable without logarithmic differentiation.',
     },
+    {
+      id: 'ch2-004-ex9',
+      title: 'Logarithmic Differentiation: Complex Product-Quotient-Power',
+      problem: "\\text{Find } \\dfrac{dy}{dx} \\text{ for } y = \\dfrac{x\\sqrt{2x+1}}{e^x \\sin^3 x}",
+      steps: [
+        {
+          expression: "\\text{Structure: numerator} = x \\cdot (2x+1)^{1/2}, \\quad \\text{denominator} = e^x \\cdot (\\sin x)^3",
+          strategyTitle: 'Recognize the complexity \u2014 choose your weapon',
+          annotation: "Direct differentiation would require the quotient rule, then the product rule (twice) in the numerator, plus chain rules throughout. That is four nested rule applications. Logarithmic differentiation is the clean escape: take ln of both sides and use log laws to convert multiplication \u2192 addition, division \u2192 subtraction, and powers \u2192 coefficients. Then differentiate the simple sum term by term.",
+          checkpoint: 'Why is this problem a candidate for logarithmic differentiation rather than the quotient rule directly?',
+          hints: [
+            'Level 1: Count how many differentiation rules direct differentiation would require. If it is more than 2, log diff is usually cleaner.',
+            'Level 2: The three log laws are: ln(ab) = ln a + ln b, ln(a/b) = ln a \u2212 ln b, ln(a\u207f) = n ln a. Each one converts a hard operation (multiply, divide, power) into an easy one (add, subtract, coefficient).',
+            'Level 3: This technique applies whenever y is a product/quotient of functions, some of which may be raised to powers. The prerequisite is implicit differentiation of ln y: d/dx[ln y] = (1/y)(dy/dx).',
+          ],
+        },
+        {
+          expression: "\\ln y = \\ln\\!\\left(\\frac{x\\sqrt{2x+1}}{e^x\\sin^3 x}\\right)",
+          strategyTitle: 'Step 1 \u2014 Take ln of both sides',
+          annotation: "Apply the natural log to both sides. This is legal because ln is a valid function \u2014 applying the same operation to both sides preserves equality. The left side becomes ln y (we will differentiate this implicitly in Step 4). The right side is now ready for log expansion.",
+          checkpoint: 'What does taking ln of both sides accomplish? Why does this help?',
+          hints: [
+            'Level 1: Taking ln of both sides creates an equation that is equivalent to the original but much easier to differentiate.',
+            "Level 2: We don't change the equation \u2014 we apply the same function (ln) to both sides. Since ln is strictly increasing, ln y = ln(rhs) \u27fa y = rhs.",
+            'Level 3: The left side ln y will be differentiated using the chain rule: d/dx[ln y] = (1/y)(dy/dx). This implicit differentiation step unlocks solving for dy/dx at the end.',
+          ],
+        },
+        {
+          expression: "\\ln y = \\ln(x\\sqrt{2x+1}) - \\ln(e^x\\sin^3 x)",
+          strategyTitle: 'Step 2 \u2014 Log law for quotients: ln(a/b) = ln a \u2212 ln b',
+          annotation: "Split the fraction into two logs using the quotient log law. The numerator group (x\u00b7\u221a(2x+1)) becomes one log, the denominator group (e\u02e3\u00b7sin\u00b3x) becomes another, subtracted. This is the first simplification \u2014 division becomes subtraction.",
+          checkpoint: 'Which log law justifies this step? What is a and what is b?',
+          hints: [
+            'Level 1: Log law: ln(a/b) = ln a \u2212 ln b. Here a = x\u221a(2x+1) and b = e^x sin\u00b3x.',
+            'Level 2: The fraction bar in the original function maps to a minus sign after taking ln. This is the key simplification.',
+            'Level 3: After this step, you have ln y = (log of numerator) \u2212 (log of denominator). Each group will be further expanded in the next two steps.',
+          ],
+        },
+        {
+          expression: "\\ln(x\\sqrt{2x+1}) = \\ln x + \\tfrac{1}{2}\\ln(2x+1)",
+          strategyTitle: 'Step 3a \u2014 Expand numerator using product and power log laws',
+          annotation: "Two sub-steps: First, ln(a\u00b7b) = ln a + ln b separates x from \u221a(2x+1). Second, ln((2x+1)^{1/2}) = (1/2)ln(2x+1) by the power log law. Multiplication becomes addition; the square root exponent (1/2) comes down as a coefficient. Algebra is now linear \u2014 no products, no roots.",
+          checkpoint: 'Which two log laws are used in this step? Identify them by name.',
+          hints: [
+            'Level 1: Product law: ln(ab) = ln a + ln b. Power law: ln(a\u207f) = n\u00b7ln a. Apply both.',
+            'Level 2: First: ln(x \u00b7 \u221a(2x+1)) = ln x + ln(\u221a(2x+1)). Then: ln(\u221a(2x+1)) = ln((2x+1)^{1/2}) = (1/2)ln(2x+1).',
+            "Level 3: The power law is the key algebraic trick \u2014 it converts a square root (an exponent of 1/2) into a multiplicative coefficient. Now (2x+1) appears inside a simple ln, easy to differentiate with chain rule in Step 4.",
+          ],
+        },
+        {
+          expression: "\\ln(e^x\\sin^3 x) = x + 3\\ln(\\sin x)",
+          strategyTitle: 'Step 3b \u2014 Expand denominator: ln(e\u02e3) = x and power law',
+          annotation: "Product law: ln(e\u02e3 \u00b7 sin\u00b3x) = ln(e\u02e3) + ln(sin\u00b3x). Then ln(e\u02e3) = x\u00b7ln(e) = x\u00b71 = x (since ln e = 1 exactly \u2014 this is why e is the natural base). And ln(sin\u00b3x) = 3\u00b7ln(sin x) by the power law. The exponential collapses beautifully to just x.",
+          checkpoint: 'Why does ln(e\u02e3) simplify to just x? What property of e is being used?',
+          hints: [
+            'Level 1: ln(e\u02e3) = x\u00b7ln(e) by the power law. And ln(e) = 1 by definition (since e\u00b9 = e). So ln(e\u02e3) = x.',
+            'Level 2: This is the inverse function identity: ln and e are inverses. ln(e\u02e3) = x for all x, just as e^(ln x) = x for x > 0.',
+            'Level 3: The reason we choose base e for logarithmic differentiation (and not base 10) is exactly this: ln(e\u02e3) = x collapses cleanly. With log\u2081\u2080, you would get x\u00b7log\u2081\u2080(e) \u2248 0.434x \u2014 messier.',
+          ],
+        },
+        {
+          expression: "\\ln y = \\ln x + \\tfrac{1}{2}\\ln(2x+1) - x - 3\\ln(\\sin x)",
+          strategyTitle: 'Step 3c \u2014 Combine all terms into a simple sum',
+          annotation: "Substitute the expanded forms of the numerator and denominator logs. The final expression is a sum of four terms, all of the form: constant \u00d7 ln(simple function) or just a polynomial. No products, no quotients, no nested functions. Differentiation is now term-by-term \u2014 the hard part is done.",
+          checkpoint: 'Before differentiating: what is the derivative of each of the four terms at a high level?',
+          hints: [
+            'Level 1: Term 1: ln x \u2192 1/x. Term 2: (1/2)ln(2x+1) \u2192 chain rule gives (1/2)\u00b71/(2x+1)\u00b72. Term 3: \u2212x \u2192 \u22121. Term 4: \u22123ln(sin x) \u2192 chain rule gives \u22123\u00b7cos(x)/sin(x).',
+            'Level 2: Every term is either: a constant times ln(function) \u2192 use chain rule, or a polynomial \u2192 use power rule.',
+            'Level 3: The sum structure is the whole point of log diff \u2014 you turned a product/quotient/power into a sum. Sums differentiate term-by-term, with no interaction between terms. Compare to the original function where the product and quotient rules would cause every term to interact.',
+          ],
+        },
+        {
+          expression: "\\frac{d}{dx}[\\ln y] = \\frac{1}{y}\\frac{dy}{dx} \\quad (\\text{chain rule on left side})",
+          strategyTitle: 'Step 4a \u2014 Differentiate the left side implicitly',
+          annotation: "The left side is ln(y(x)) \u2014 a composition. The outer function is ln(u), whose derivative is 1/u. The inner function is y(x). By the chain rule: d/dx[ln(y)] = (1/y)\u00b7(dy/dx). This is implicit differentiation in disguise \u2014 y is a function of x, so its derivative carries the dy/dx factor.",
+          checkpoint: 'Why does d/dx[ln y] give (1/y)(dy/dx) and not just 1/y? Which rule produces the dy/dx?',
+          hints: [
+            "Level 1: Chain rule: d/dx[F(g(x))] = F'(g(x))\u00b7g'(x). Here F(u) = ln(u), g(x) = y(x). So d/dx[ln y] = (1/y)\u00b7(dy/dx).",
+            'Level 2: This is the implicit differentiation step you practiced in the implicit differentiation lesson. y is a function of x, so when you differentiate ln y with respect to x, the chain rule forces a dy/dx factor.',
+            'Level 3: The entire log-differentiation technique works because this step produces (1/y)(dy/dx) on the left \u2014 and you will solve for dy/dx by multiplying both sides by y at the end.',
+          ],
+        },
+        {
+          expression: "\\frac{d}{dx}[\\ln x] = \\frac{1}{x}, \\quad \\frac{d}{dx}\\!\\left[\\tfrac{1}{2}\\ln(2x+1)\\right] = \\frac{1}{2x+1}",
+          strategyTitle: 'Step 4b \u2014 Differentiate terms 1 and 2 (chain rule each)',
+          annotation: "Term 1: d/dx[ln x] = 1/x (basic formula). Term 2: d/dx[(1/2)ln(2x+1)] \u2014 use chain rule with outer ln and inner (2x+1): gives (1/2)\u00b7(1/(2x+1))\u00b72 = 1/(2x+1). The 2 from the inner derivative cancels the 1/2 coefficient. These two terms connect back to Chapter 2: d/dx[ln(u)] = u'/u.",
+          checkpoint: 'For term 2, what is the outer function and what is the inner function? What is u\'?',
+          hints: [
+            "Level 1: Chain rule on ln(2x+1): outer F(u) = ln u, inner u = 2x+1. F'(u) = 1/u, u' = 2. Result: (1/u)\u00b7u' = 2/(2x+1). Then multiply by the coefficient 1/2: (1/2)\u00b72/(2x+1) = 1/(2x+1).",
+            "Level 2: The u'/u pattern: whenever you differentiate ln(something), you get (derivative of something)/(something). Here something = 2x+1, its derivative is 2, so the result is 2/(2x+1). Times the outer coefficient 1/2 gives 1/(2x+1).",
+            "Level 3: The 2 from the inner derivative exactly cancels the 1/2 from the power law \u2014 this is not a coincidence. The chain rule and power law are designed to interact this way. The (1/2) came from converting \u221a(2x+1) to (2x+1)^{1/2}, and the 2 comes from d/dx[2x+1] = 2.",
+          ],
+        },
+        {
+          expression: "\\frac{d}{dx}[-x] = -1, \\quad \\frac{d}{dx}[-3\\ln(\\sin x)] = -3\\cot x",
+          strategyTitle: 'Step 4c \u2014 Differentiate terms 3 and 4',
+          annotation: "Term 3: d/dx[\u2212x] = \u22121. Trivial. Term 4: d/dx[\u22123\u00b7ln(sin x)] \u2014 chain rule with outer ln, inner sin x. Gives \u22123\u00b7(cos x / sin x) = \u22123\u00b7cot x. Recognize cos x / sin x = cot x \u2014 this is why knowing your trig identities speeds up calculus. The negative sign stays through.",
+          checkpoint: 'What is cos(x)/sin(x) in terms of a standard trig function?',
+          hints: [
+            'Level 1: Chain rule on ln(sin x): outer = ln(u), inner = sin(x). d/dx[ln(sin x)] = (1/sin x)\u00b7cos x = cos x/sin x = cot x.',
+            'Level 2: The six trig functions and their ratios: cot x = cos x / sin x. This identity lets you write the derivative compactly as \u22123 cot x instead of \u22123 cos x / sin x.',
+            'Level 3: Connect to trig derivatives lesson: d/dx[ln(sin x)] = cot x appears frequently in integration as well. \u222bcot x dx = ln|sin x| + C is the reverse of this step.',
+          ],
+        },
+        {
+          expression: "\\frac{1}{y}\\frac{dy}{dx} = \\frac{1}{x} + \\frac{1}{2x+1} - 1 - 3\\cot x",
+          strategyTitle: 'Step 5 \u2014 Assemble the full derivative equation',
+          annotation: "Combine all the term-by-term derivatives from Steps 4a\u20134c. The left side is (1/y)(dy/dx). The right side is the sum of four derivative terms. This equation is linear in dy/dx \u2014 you need only one algebraic step to solve for it: multiply both sides by y.",
+          checkpoint: 'Count the four terms on the right. Verify each came from one of the four terms in Step 3c.',
+          hints: [
+            'Level 1: Left: (1/y)(dy/dx). Right: sum of all four term derivatives from Steps 4b and 4c.',
+            'Level 2: Match each right-side term to its source: 1/x from ln x, 1/(2x+1) from (1/2)ln(2x+1), \u22121 from \u2212x, \u22123cot x from \u22123ln(sin x).',
+            'Level 3: This step is where the payoff of log diff shows: you have four independent derivative computations, each simple, assembled as a sum. In the direct approach, these same four computations would have been entangled through product and quotient rule interactions.',
+          ],
+        },
+        {
+          expression: "\\frac{dy}{dx} = y\\!\\left(\\frac{1}{x} + \\frac{1}{2x+1} - 1 - 3\\cot x\\right)",
+          strategyTitle: 'Step 6 \u2014 Solve for dy/dx: multiply both sides by y',
+          annotation: "Multiply both sides by y. Since (1/y)(dy/dx) \u00d7 y = dy/dx, the left side simplifies to dy/dx. The right side becomes y times the four-term bracket. This is now the derivative in terms of y \u2014 but y is just the original function, which we know explicitly.",
+          checkpoint: 'After multiplying by y, what does the left side simplify to? Why?',
+          hints: [
+            'Level 1: (1/y)(dy/dx) times y = dy/dx. The y cancels on the left, giving you dy/dx isolated.',
+            'Level 2: This is the moment the implicit differentiation from Step 4a pays off. Because we got (1/y)(dy/dx) on the left, multiplying by y instantly isolates dy/dx with no further rearrangement needed.',
+            'Level 3: Compare to implicit differentiation of a circle: 2x + 2y(dy/dx) = 0 \u2192 dy/dx = \u2212x/y. Same pattern \u2014 isolate dy/dx by algebraic manipulation after differentiating implicitly.',
+          ],
+        },
+        {
+          expression: "\\frac{dy}{dx} = \\frac{x\\sqrt{2x+1}}{e^x\\sin^3 x}\\!\\left(\\frac{1}{x} + \\frac{1}{2x+1} - 1 - 3\\cot x\\right)",
+          strategyTitle: 'Step 7 \u2014 Substitute back y: final answer',
+          annotation: "Replace y with its original definition: y = x\u221a(2x+1)/(e\u02e3 sin\u00b3x). The derivative is the original function times a bracket of four simpler terms. This form is actually useful \u2014 each bracket term reveals something about the function's behavior. For example, the \u22121 term comes from e\u02e3 in the denominator; \u22123cot x comes from sin\u00b3x.",
+          checkpoint: 'What is the structural interpretation of the bracket? Each term in the bracket corresponds to which factor of the original y?',
+          hints: [
+            'Level 1: The four bracket terms (1/x), (1/(2x+1)), \u22121, \u22123cot x correspond to the four factors x, (2x+1)^{1/2}, e^x, and sin\u00b3x respectively.',
+            'Level 2: The general pattern for logarithmic differentiation of y = (product of factors): dy/dx = y \u00d7 \u03a3(derivative of ln of each factor). For a factor f raised to power n: its contribution is n\u00b7f\'(x)/f(x).',
+            'Level 3: For the original function y = x^a \u00b7 f(x)^b / (g(x)^c \u00b7 h(x)^d), log diff always gives dy/dx = y \u00b7 [a/x + b\u00b7f\'(x)/f(x) \u2212 c\u00b7g\'(x)/g(x) \u2212 d\u00b7h\'(x)/h(x)]. Each factor contributes an independent "logarithmic derivative" term.',
+          ],
+        },
+      ],
+      conclusion: "Final answer: dy/dx = [x\u221a(2x+1) / (e\u02e3 sin\u00b3x)] \u00b7 (1/x + 1/(2x+1) \u2212 1 \u2212 3cot x). STRUCTURAL INSIGHT: Logarithmic differentiation works by exploiting three log laws (ln(ab) = ln a + ln b; ln(a/b) = ln a \u2212 ln b; ln(a\u207f) = n ln a) to convert a product/quotient/power structure into a sum. Sums differentiate term-by-term with no interaction between terms \u2014 no product rule entanglement, no quotient rule cascade. MENTAL MODEL: Instead of 'differentiate a complicated product-quotient,' think: take log \u2192 expand into sum \u2192 differentiate linearly \u2192 multiply back by y. The original function reappears as a prefactor, and the bracket is the sum of logarithmic derivatives of each factor.",
+    },
   ],
 
   challenges: [

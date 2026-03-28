@@ -130,14 +130,35 @@ export default {
         {
           expression: 'u=x,\\;v=(6x+6)^{-3},\\;u\'=1',
           annotation: 'Choose factors for product rule.',
+          strategyTitle: 'Product rule setup: identify u and v',
+          checkpoint: 'Before computing any derivatives, predict: what rule will u = x need? What rule will v = (6x+6)^{-3} need? Write down your answers before moving on.',
+          hints: [
+            'Level 1: You are setting up the product rule template h\' = u\'v + uv\'. The first step is always to label the two factors.',
+            'Level 2: Notice that v = (6x+6)^{-3} has a linear expression inside a power — that inner expression means the chain rule will be required when computing v\'.',
+            'Level 3: This setup mirrors the 4-step Assembly Checklist from Ch2 Lesson 2 (Chain Rule). You must fully compute v\' before assembly — the inner derivative of (6x+6) is the factor this trap targets.',
+          ],
         },
         {
           expression: 'v\'=-3(6x+6)^{-4}\\cdot 6=-18(6x+6)^{-4}',
           annotation: 'Chain rule completes v\': outer power gives -3(·)^{-4}, inner derivative of (6x+6) is 6.',
+          strategyTitle: 'Correct: v\' = -18(6x+6)^{-4} by chain rule — the inner factor 6 is mandatory',
+          checkpoint: 'What is the outer function of v = (6x+6)^{-3}? What is the inner function? Predict v\' before reading the expression — then check whether you included the inner derivative.',
+          hints: [
+            'Level 1: v is a composite function — outer is (·)^{-3}, inner is (6x+6). The chain rule requires multiplying the outer derivative by the inner derivative.',
+            'Level 2: The outer derivative of (·)^{-3} is -3(·)^{-4}. The inner function is 6x+6, whose derivative is 6. The trap is writing v\' = -3(6x+6)^{-4} and stopping — that omits the ×6.',
+            'Level 3: Review Ch2 Lesson 2 (Chain Rule): d/dx[f(g(x))] = f\'(g(x))·g\'(x). Here f(u) = u^{-3} and g(x) = 6x+6, so g\'(x) = 6 must appear as a factor.',
+          ],
         },
         {
           expression: 'h\'=(1)\\cdot(6x+6)^{-3}+x\\cdot\\bigl(-18(6x+6)^{-4}\\bigr)',
           annotation: 'Assemble only after full v\'.',
+          strategyTitle: 'Product rule assembly: u\'v + uv\' with fully computed v\'',
+          checkpoint: 'Both u\' and v\' are now complete. Predict the two terms of h\' using the template h\' = u\'v + uv\' before reading the assembled expression.',
+          hints: [
+            'Level 1: This is Step 4 of the Assembly Checklist — substituting the completed u\', u, v, and v\' into the product rule template.',
+            'Level 2: The key distinction from the trap: the v\' used here is -18(6x+6)^{-4}, not -3(6x+6)^{-4}. The factor of 6 from the inner derivative is already baked in.',
+            'Level 3: Assembly is only valid when both derivatives are fully complete. If you had used the incomplete v\' = -3(6x+6)^{-4}, the second term would be off by a factor of 6 — this is precisely the trap described in Ch2 Lesson 2.',
+          ],
         },
       ],
       conclusion: 'The missing inner factor 6 is the trap. Inline chain completion prevents it.',
@@ -150,22 +171,57 @@ export default {
         {
           expression: 'u=x^2,\\quad v=\\sin(3x)',
           annotation: 'Step 1: label u and v.',
+          strategyTitle: 'Product rule setup: identify u and v',
+          checkpoint: 'Look at each factor. Does u = x² need only the power rule? Does v = sin(3x) need only a trig rule, or is a second rule also required? State your prediction.',
+          hints: [
+            'Level 1: The product rule template is h\' = u\'v + uv\'. Your first job is to assign u and v — pick the two factors of h(x).',
+            'Level 2: u = x² is a simple power — no composition. v = sin(3x) has 3x as the argument of sine, not plain x. That difference is what triggers the chain rule requirement on v.',
+            'Level 3: From Ch2 Lesson 2 (Chain Rule): any time a trig function\'s argument is not plain x, the chain rule must supply the inner derivative as a multiplying factor.',
+          ],
         },
         {
           expression: 'u\'=2x',
           annotation: 'Step 2: differentiate u. Plain power rule suffices — no composition.',
+          strategyTitle: 'Differentiate u = x²: power rule only, no chain rule needed',
+          checkpoint: 'Confirm that u = x² is NOT a composite function. What makes it safe to use the power rule alone here?',
+          hints: [
+            'Level 1: The power rule d/dx[x^n] = n·x^{n-1} applies directly when the base is plain x — no inner function is involved.',
+            'Level 2: A composition would look like (something other than x)^n — for example (3x)^2 or (x+1)^2. Since u = x^2 has plain x as the base, no chain rule is triggered.',
+            'Level 3: Contrasting with v: u\' is the easy case. The trap lives entirely in v\' — this step exists to emphasize that the product rule itself is not wrong, only a missing inner derivative on v would be.',
+          ],
         },
         {
           expression: 'v=\\sin(\\underbrace{3x}_{\\text{inner}}),\\quad v\'=\\cos(3x)\\cdot 3=3\\cos(3x)',
           annotation: 'Step 3: differentiate v FULLY. Outer is sin (derivative cos), inner is 3x (derivative 3). Both factors required.',
+          strategyTitle: 'Correct: v\' = 3cos(3x) by chain rule — v\' = cos(3x) is WRONG',
+          checkpoint: 'Before reading the expression, write down your own v\'. Did you get cos(3x) or 3cos(3x)? If you wrote cos(3x), you fell into the trap — why is that incomplete?',
+          hints: [
+            'Level 1: v = sin(3x) is a composition: outer function is sin(·), inner function is 3x. The chain rule requires multiplying by the inner derivative.',
+            'Level 2: Outer derivative: d/du[sin u] = cos u, evaluated at u = 3x gives cos(3x). Inner derivative: d/dx[3x] = 3. Both factors are mandatory — the trap is stopping at cos(3x) without the ×3.',
+            'Level 3: Ch2 Lesson 2 states d/dx[f(g(x))] = f\'(g(x))·g\'(x). Here f = sin, g = 3x, so g\'(x) = 3 must appear. The wrong answer v\' = cos(3x) omits g\'(x) = 3 — that is the entire mechanism of the trap.',
+          ],
         },
         {
           expression: 'h\'(x)=u\'v+uv\'=2x\\cdot\\sin(3x)+x^2\\cdot 3\\cos(3x)',
           annotation: 'Step 4: assemble. Both ingredients are complete.',
+          strategyTitle: 'Product rule assembly: all four ingredients u, v, u\', v\' are complete',
+          checkpoint: 'Check the two terms before simplifying: does the first term contain u\' and v? Does the second term contain u and v\'? Verify that both v\' factors show 3cos(3x), not cos(3x).',
+          hints: [
+            'Level 1: Assembly just substitutes the four completed values into h\' = u\'v + uv\'. Term 1 = u\'·v = 2x·sin(3x). Term 2 = u·v\' = x²·3cos(3x).',
+            'Level 2: The factor of 3 inside v\' = 3cos(3x) is what separates the correct answer from the trap. If you wrote x²·cos(3x) for the second term, you used the incomplete v\'.',
+            'Level 3: Numerically at x = 1: correct gives 2sin3 + 3cos3 ≈ -2.69; wrong gives 2sin3 + cos3 ≈ -0.71. The discrepancy (≈ factor of 3.8) is entirely due to the missing inner derivative 3.',
+          ],
         },
         {
           expression: 'h\'(x)=2x\\sin(3x)+3x^2\\cos(3x)',
           annotation: 'Simplified final answer. At x=1: 2\\sin 3+3\\cos 3\\approx 0.282-2.970\\approx -2.688, matching the numerical estimate.',
+          strategyTitle: 'Simplified result: factor of 3 in second term is the entire difference from the wrong answer',
+          checkpoint: 'Compare the correct answer 2x·sin(3x) + 3x²·cos(3x) with the trap answer 2x·sin(3x) + x²·cos(3x). Identify the single factor that differs and state where it came from.',
+          hints: [
+            'Level 1: The final simplified form has two terms. Both are correct only when v\' = 3cos(3x) was used. The trap answer is missing the coefficient 3 in the second term.',
+            'Level 2: The coefficient 3 is the inner derivative of 3x. It entered via the chain rule in Step 3. Every subsequent step that uses v\' inherits this factor — or loses it if the trap was taken.',
+            'Level 3: Use numerical verification as a habit (Ch2 Lesson 2 insight): plug in x = 1 to both answers. The correct answer matches the numerical difference quotient (≈ -2.69); the trap answer does not (≈ -0.71). Numeric checks catch inner-derivative errors immediately.',
+          ],
         },
       ],
       conclusion: 'The factor of 3 in v\'=3cos(3x) is what the trap omits. Without it the answer is off by that factor everywhere.',
