@@ -20,6 +20,8 @@ export default {
       'Situation 1: you\'re differentiating a trig function (possibly composed with something else). This is chain rule territory. The inner function tells you what to multiply by.',
       'Situation 2: you\'re integrating a power of $\\sin$ or $\\cos$. The exponent tells you the strategy: odd power → factor one out and use $u$-sub. Even power → power reduction identity first.',
       'Situation 3: you see $\\sqrt{a^2 - x^2}$, $\\sqrt{a^2 + x^2}$, or $\\sqrt{x^2 - a^2}$ under a radical. This screams trig substitution — the substitution is chosen so the Pythagorean identity eliminates the radical entirely.',
+      '**The Sine Approximation**: For very small angles, $\\sin x$ is indistinguishable from $x$. This logical bridge—the "Linearization" of circular motion—is why physics formulas for pendulums and waves can be simplified into linear equations at the limit.',
+      '**The Harmonic Slope**: Differentiating a wave reveals its velocity. The slope of a Sine wave is exactly the value of a Cosine wave. When the shadow of a rotating wheel moves fastest (at the origin), the cosine is at its peak. This physical synchrony is the heart of oscillatory calculus.',
     ],
     callouts: [
       {
@@ -31,6 +33,26 @@ export default {
         type: 'insight',
         title: 'Why trig substitution works geometrically',
         body: '\\sqrt{1 - x^2} \\text{ is the height of a point on a unit circle at horizontal position } x. \\text{ Setting } x = \\sin\\theta \\text{ makes } \\sqrt{1-x^2} = \\cos\\theta \\text{ — a leg of the same right triangle.}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Instantaneous Limit',
+        body: '\\text{"Limit" comes from the Latin "Limes" (a boundary or threshold).} \\\\ \\text{Trig in calculus is the art of pushing the boundary. "Instantaneous" change is simply the average change over a distance that becomes infinitely small.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Sine Approximation',
+        body: '\\text{Why is } \\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\text{?} \\\\ \\text{Logic: As the arc shrinks, the vertical height and the arc length become identical.} \\\\ \\text{In the limit, the curve and the straight line are one.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Harmonic Slope',
+        body: '\\text{Visualize a mass on a spring.} \\\\ \\text{The position is a sine wave. The velocity (the derivative) is a cosine wave. The velocity is highest when the position is zero (passing the center), and zero when the position is maxed. Calculus is the language of this trade-off.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Squeeze Theorem',
+        body: '\\text{Imagine a thin slice of pizza (a sector) squashed between two triangles.} \\\\ \\text{One triangle is smaller (height } \\sin x\\text{), one is larger (height } \\tan x\\text{). As the slice gets thinner, the area of the three shapes must converge to the same point.}',
       },
     ],
     visualizations: [
@@ -84,6 +106,16 @@ export default {
         type: 'warning',
         title: 'Don\'t forget $dx$ when substituting',
         body: 'x = a\\sin\\theta \\Rightarrow dx = a\\cos\\theta\\,d\\theta. \\text{ The } dx \\text{ replacement is essential and easy to drop under pressure.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Unit Threshold',
+        body: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1. \\\\ \\text{This is the single most important identity in trig calculus. It states that the arc and its sine merge at the limit.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Domain of Substitution',
+        body: '\\text{For } x = a\\sin\\theta \\text{, we restrict } \\theta \\in [-\\pi/2, \\pi/2]. \\\\ \\text{This restriction ensures the substitution is "One-to-One," allowing us to invert back to arcsin at the end.}',
       },
     ],
     visualizations: [
@@ -141,6 +173,30 @@ export default {
         expression: '\\int \\sqrt{1-x^2}\\,dx = \\frac{\\arcsin x}{2} + \\frac{x\\sqrt{1-x^2}}{2} + C',
         annotation: 'Final answer. Evaluate from 0 to 1: $\\frac{\\pi/2}{2} - 0 = \\frac{\\pi}{4}$ — exactly the area of a quarter circle. ✓',
       },
+      {
+         expression: '\\text{--- Part II: Proving } \\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\text{ ---}',
+         annotation: 'Let us use the Squeeze Theorem on a unit circle sector.'
+      },
+      {
+         expression: '\\cos x < \\frac{\\sin x}{x} < 1',
+         annotation: 'Step 1: On the interval $(0, \\pi/2)$, the area of the inner triangle is less than the sector area, which is less than the outer tangent triangle.'
+      },
+      {
+         expression: '\\frac{1}{2}\\sin x < \\frac{1}{2}x < \\frac{1}{2}\\tan x',
+         annotation: 'Step 2: Multiply by 2. $\\sin x < x < \\tan x$.'
+      },
+      {
+         expression: '1 < \\frac{x}{\\sin x} < \\frac{1}{\\cos x}',
+         annotation: 'Step 3: Divide everything by $\\sin x$. Note that $\\tan x / \\sin x = 1/\\cos x$.'
+      },
+      {
+         expression: '1 > \\frac{\\sin x}{x} > \\cos x',
+         annotation: 'Step 4: Take the reciprocals. The inequalities flip.'
+      },
+      {
+         expression: '\\lim_{x \\to 0} \\cos x = 1 \\implies \\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\qquad \\blacksquare',
+         annotation: 'Step 5: Apply the Squeeze Theorem. Since both outer functions limit to 1, the middle must as well.'
+      }
     ],
   },
 
@@ -209,6 +265,46 @@ export default {
       ],
       conclusion: 'Pattern recognition is everything: see which radical form you have, choose the substitution, and the Pythagorean identity does the rest.',
     },
+    {
+      id: 'ex-trig-implicit-osc',
+      title: 'Implicit Oscillation: Hidden Derivatives',
+      problem: '\\text{Find } dy/dx \\text{ for the curve } x^2 + \\sin y = xy.',
+      steps: [
+        {
+          expression: '2x + \\cos y \\cdot \\frac{dy}{dx} = y + x\\frac{dy}{dx}',
+          annotation: 'Step 1: Differentiate implicitly. Remember the chain rule for the sin(y) term and product rule for the xy term.'
+        },
+        {
+          expression: '\\frac{dy}{dx}(\\cos y - x) = y - 2x',
+          annotation: 'Step 2: Collect all dy/dx terms on one side.'
+        },
+        {
+          expression: '\\frac{dy}{dx} = \\frac{y-2x}{\\cos y - x} \\qquad \\blacksquare',
+          annotation: 'Step 3: Solve for the derivative.'
+        }
+      ],
+      conclusion: 'Trig functions in implicit equations behave like any other function, but the chain rule for the dependent variable ($y$) is the engine.'
+    },
+    {
+      id: 'ex-trig-lighthouse-tracking',
+      title: 'The Tracking Problem: Related Rates of Sweep',
+      problem: '\\text{A lighthouse is 2km from a shore. The light rotates at 3 rad/min. Find the beam speed on the shore when it is 1km from the point nearest the lighthouse.}',
+      steps: [
+        {
+          expression: 'x = 2\\tan\\theta \\implies \\frac{dx}{dt} = 2\\sec^2\\theta \\cdot \\frac{d\\theta}{dt}',
+          annotation: 'Step 1: Set up the geometric relationship. $x$ is the distance on shore, $2$ is the lighthouse distance.'
+        },
+        {
+          expression: 'x=1 \\implies \\tan\\theta = 1/2 \\implies \\sec^2\\theta = 1 + \\tan^2\\theta = 5/4',
+          annotation: 'Step 2: Find the trigonometric state at the moment of interest.'
+        },
+        {
+          expression: '\\frac{dx}{dt} = 2(5/4) \\cdot 3 = 7.5 \\text{ km/min} \\qquad \\blacksquare',
+          annotation: 'Step 3: Plug in the rotation rate (3 rad/min) and solve for the beam velocity.'
+        }
+      ],
+      conclusion: 'Polar sweeps translate into linear speeds through the derivative of the tangent function.'
+    },
   ],
 
   challenges: [
@@ -258,5 +354,26 @@ export default {
       ],
       answer: '\\dfrac{\\sin^3 x}{3} - \\dfrac{\\sin^5 x}{5} + C',
     },
+    {
+      id: 'ch3-trig-calculus-009-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Find the second derivative of } f(x) = \\sin^2 x.',
+      hint: 'Either use the power chain rule on two layers, or use the power reduction identity FIRST to make the calculation trivial.',
+      walkthrough: [
+        {
+          expression: 'f(x) = \\frac{1 - \\cos 2x}{2}',
+          annotation: 'Step 1: Apply the identity. This is the "Master Move" before doing any calculus.'
+        },
+        {
+          expression: "f'(x) = \\frac{1}{2}(2\\sin 2x) = \\sin 2x",
+          annotation: 'Step 2: Differentiate the linear terms. Derivative of -cos(2x) is +sin(2x)*2.'
+        },
+        {
+          expression: "f''(x) = 2\\cos 2x \\qquad \\blacksquare",
+          annotation: 'Step 3: Differentiate again. The acceleration of the energy wave is a cosine wave with double frequency.'
+        }
+      ],
+      answer: "f''(x) = 2\\cos 2x"
+    }
   ],
 }
