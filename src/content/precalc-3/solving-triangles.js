@@ -19,6 +19,8 @@ export default {
       'Right triangle trig (SOH-CAH-TOA) only works when there is a right angle. For oblique triangles (no right angle), two laws extend the power of trig: the Law of Sines and the Law of Cosines.',
       'The Law of Sines says: in any triangle, the ratio of a side to the sine of its opposite angle is constant. $a/\\sin A = b/\\sin B = c/\\sin C$. This ratio is actually the diameter of the circumscribed circle. Use it when you know two angles and one side (AAS or ASA), or two sides and a non-included angle (SSA — but beware the ambiguous case).',
       'The Law of Cosines generalises the Pythagorean theorem to non-right triangles. $c^2 = a^2 + b^2 - 2ab\\cos C$. When $C = 90°$, $\\cos C = 0$ and it reduces to $a^2 + b^2 = c^2$ exactly. Use it when you know two sides and the included angle (SAS), or all three sides (SSS).',
+      '**The Language of the Oblique**: "Oblique" means slant. While right triangles are the "Special Forces" of geometry, oblique triangles are the everyday reality. Solving them is the process of forced symmetry—breaking a slanted world into right-angled components to find the hidden truths of length and angle.',
+      '**Degrees of Freedom**: A triangle is "Locked" when its shape cannot change without breaking a side. In geometry, this requires 3 pieces of independent information. Two angles and a side lock the scale; three sides lock the rigidity. Without these, the triangle has a "Degree of Freedom" to wobble or collapse.',
     ],
     callouts: [
       {
@@ -35,6 +37,26 @@ export default {
         type: 'theorem',
         title: 'Law of Cosines — three equivalent forms',
         body: 'a^2 = b^2 + c^2 - 2bc\\cos A \\\\ b^2 = a^2 + c^2 - 2ac\\cos B \\\\ c^2 = a^2 + b^2 - 2ab\\cos C',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of the Oblique',
+        body: '\\text{"Oblique" comes from the Latin "obliquus" (skewed/slanted).} \\\\ \\text{It is an "Umbrella Term" for any triangle that refuses to be Right. We solve them not by inventing new trig, but by using the Law of Sines/Cosines as a bridge back to safe Right Triangle reality.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: Degrees of Freedom',
+        body: '\\text{Why does AAA fail to solve a triangle?} \\\\ \\text{Logic: Angles specify the SHAPE, but not the SCALE.} \\\\ \\text{A tiny triangle and a massive one can have identical angles. To "Solve" a triangle (finding its true size), you MUST anchor it with at least one Side Length.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Rigid Truss',
+        body: '\\text{In mechanical engineering, triangles are the only polygons that are naturally rigid.} \\\\ \\text{A square can be squashed into a rhombus, but a triangle made of three steel beams cannot move without bending the metal. The Law of Cosines is the fundamental equation of structural stability.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Pendulum Swing',
+        body: '\\text{For the SSA "Ambiguous Case," imagine Side B and Angle A are fixed.} \\\\ \\text{Side A is a pendulum hanging from the far vertex. If side A is too short, it misses the floor (No Triangle). If it hits exactly, it is a Right Triangle. If it swings through, it hits the floor twice (Two Triangles).}',
       },
     ],
     visualizations: [
@@ -80,6 +102,16 @@ export default {
         title: 'Law of Cosines for finding angles — use the rearranged form',
         body: '\\cos C = \\frac{a^2 + b^2 - c^2}{2ab} \\\\ \\text{Always compute the largest angle first (opposite the longest side).} \\\\ \\text{If } \\cos C < 0 \\text{, then } C \\text{ is obtuse — the other angles must both be acute.}',
       },
+      {
+        type: 'theorem',
+        title: 'The Shared Height (Law of Sines Proof)',
+        body: '\\text{By dropping an altitude } h \\text{ from angle C, we find } h = b\\sin A \\text{ and } h = a\\sin B. \\\\ \\text{Equating these gives } a/\\sin A = b/\\sin B. \\\\ \\text{The Law of Sines is simply the statement that any oblique triangle is two back-to-back right triangles.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Circle that Binds (The 2R Ratio)',
+        body: '\\text{For any triangle, } a/\\sin A = b/\\sin B = c/\\sin C = 2R. \\\\ \\text{Algebraically, any triangle is a chord in its own circumcircle. The Law of Sines is the quantitative measure of this topological fit.}',
+      },
     ],
     visualizations: [
       {
@@ -115,6 +147,26 @@ export default {
         expression: 'c^2 = a^2 + b^2 - 2ab\\cos C \\qquad \\blacksquare',
         annotation: 'Pythagorean identity $\\cos^2+\\sin^2=1$ collapses the brackets. When $C=90°$, $\\cos C=0$ and we recover the Pythagorean theorem — Law of Cosines is a direct generalisation.',
       },
+      {
+        expression: '\\text{--- Part II: Deriving the Law of Sines ---}',
+        annotation: 'Let us prove $a/\\sin A = b/\\sin B$.'
+      },
+      {
+        expression: 'h = b\\sin A',
+        annotation: 'Step 1: Dropping an altitude $h$ from vertex $C$ to side $c$ creates a right triangle where $h$ is the opposite side to $A$.'
+      },
+      {
+        expression: 'h = a\\sin B',
+        annotation: 'Step 2: The same altitude $h$ is also the opposite side to $B$ in the adjacent right triangle.'
+      },
+      {
+        expression: 'b\\sin A = a\\sin B',
+        annotation: 'Step 3: Equate the two expressions for the shared height.'
+      },
+      {
+        expression: '\\frac{a}{\\sin A} = \\frac{b}{\\sin B} \\qquad \\blacksquare',
+        annotation: 'Step 4: Divide by $\\sin A \\sin B$. The Law of Sines is the geometric result of shared altitude.'
+      }
     ],
   },
 
@@ -191,6 +243,50 @@ export default {
       ],
       conclusion: 'SSA with two triangles: solve for both possible angles B, check that each gives a positive C, then complete each triangle separately. Both answers are valid.',
     },
+    {
+      id: 'ex-trig-gps-logic',
+      title: 'The GPS Logic: SSS Trilateration',
+      problem: '\\text{A GPS receiver is at distances 20, 30, and 45 from towers A, B, and C.} \\text{ Find the bearing of the receiver relative to the line between A and B (side length 25).}',
+      steps: [
+        {
+          expression: 'a = 30, b = 25, c = 20',
+          annotation: 'Step 1: Identify the triangle sides. $a=30$ (distance to B), $b=25$ (distance between A and B), $c=20$ (distance to A).'
+        },
+        {
+          expression: '\\cos \\theta = \\frac{25^2 + 20^2 - 30^2}{2(25)(20)}',
+          annotation: 'Step 2: Use the Law of Cosines to find the angle at tower A.'
+        },
+        {
+          expression: '\\cos \\theta = \\frac{625 + 400 - 900}{1000} = 0.125',
+          annotation: 'Step 3: Solve the arithmetic.'
+        },
+        {
+          expression: '\\theta = \\arccos(0.125) \\approx 82.8^\\circ',
+          annotation: 'Step 4: The precise bearing is $82.8$ degrees from signal A.'
+        }
+      ],
+      conclusion: 'SSS solving is how your phone calculates position. 3 known distances lock you into a single unique point on the map.'
+    },
+    {
+      id: 'ex-trig-impossible-height',
+      title: 'Height of the Unreachable: Double Elevation',
+      problem: '\\text{To find the height of a tower, you measure an elevation of } 30^\\circ \\text{. Moving 100m closer, the elevation is } 45^\\circ \\text{. Find the tower height.}',
+      steps: [
+        {
+          expression: '\\triangle \\text{ with angles } 30, 135 \\text{ (external), } 15 \\text{ (top)}',
+          annotation: 'Step 1: Form an oblique triangle between your two measurement points and the tower peak. The top angle is $45-30=15$.'
+        },
+        {
+          expression: '\\frac{L}{\\sin 30} = \\frac{100}{\\sin 15} \\implies L = 100\\frac{\\sin 30}{\\sin 15} \\approx 193.18',
+          annotation: 'Step 2: Law of Sines gives the slant distance from the first point to the peak.'
+        },
+        {
+          expression: 'h = L\\sin 30 = 193.18 \\times 0.5 = 96.59',
+          annotation: 'Step 3: Use right triangle trig on the large triangle to find the height.'
+        }
+      ],
+      conclusion: 'Two measurement points allow us to bypass ignorance of the distance to the base. This is the foundation of terrestrial surveying.'
+    },
   ],
 
   challenges: [
@@ -236,6 +332,27 @@ export default {
       ],
       answer: '\\dfrac{\\sin A}{a} = \\dfrac{\\sin B}{b} = \\dfrac{\\sin C}{c}',
     },
+    {
+      id: 'ch3-trig-006-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Find the area of a triangle with side lengths 13, 14, and 15.}',
+      hint: 'First find the semi-perimeter s, then apply Heron\'s formula.',
+      walkthrough: [
+        {
+          expression: 's = \\frac{13+14+15}{2} = 21',
+          annotation: 'Step 1: Semi-perimeter is half the total boundary.'
+        },
+        {
+          expression: 'A = \\sqrt{21(21-13)(21-14)(21-15)} = \\sqrt{21 \\times 8 \\times 7 \\times 6}',
+          annotation: 'Step 2: Plug in the lengths.'
+        },
+        {
+          expression: 'A = \\sqrt{7056} = 84 \\qquad \\blacksquare',
+          annotation: 'Step 3: Solve the radical. The area of the plot is 84 square units.'
+        }
+      ],
+      answer: '84'
+    }
   ],
 
   calcBridge: {

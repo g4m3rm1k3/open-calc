@@ -19,6 +19,8 @@ export default {
       'Every trig identity is a geometric fact in disguise. The unit circle — radius 1, centered at the origin — is the source of all of them. A point on the unit circle at angle $\\theta$ has coordinates $(\\cos\\theta,\\, \\sin\\theta)$ by definition.',
       'Because the circle has radius 1, the Pythagorean theorem applied to that point gives $\\cos^2\\theta + \\sin^2\\theta = 1$ immediately. This is not a coincidence — it IS the Pythagorean theorem, just stated for a circle.',
       'The other identities flow from the same picture. The angle addition formulas come from rotating a point and reading off its new coordinates. The double angle formulas are just the angle addition formulas applied to $\\theta + \\theta$. Nothing is arbitrary.',
+      '**The Language of Sameness**: An identity is a "Mathematical Synonym." Unlike an equation (which you solve for x), an identity is a statement that two expressions are identical for ALL x. It is the art of re-reading the same geometric reality in a different algebraic dialect.',
+      '**The Area Puzzle**: Imagine a large rectangle with a diagonal. If you tilt the rectangle by an angle, its vertical height changes. The Sine Addition formula is the geometric account of how the "Components" of that tilt add up to the final height. It is a puzzle of rotational assembly.',
     ],
     callouts: [
       {
@@ -40,6 +42,26 @@ export default {
         type: 'proof-map',
         title: 'The identity family tree',
         body: '\\text{Pythagorean} \\xrightarrow{\\theta+\\theta} \\text{Double Angle} \\xrightarrow{\\div 2} \\text{Half Angle} \\xrightarrow{\\text{rearrange}} \\text{Power Reduction}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of Sameness',
+        body: '\\text{"Identity" comes from the Latin "Idem" (The Same).} \\\\ \\text{Think of identities as "Aliases." In identity proofs, the goal is to reveal that the masked stranger on the left is actually the familiar friend on the right.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: Algebraic Morphing',
+        body: '\\text{Identity proofs are "Non-Destructive."} \\\\ \\text{You are not "Solving"—you are "Simplifying" and "Mapping." Every step is a logical equivalence. If } A = B \\text{ and } B = C \\text{, then } A = C \\text{ is the engine of the entire deep dive.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: Rotational Synchrony',
+        body: '\\text{Double and Triple angle formulas describe "Harmonics."} \\\\ \\text{In acoustics or power electronics, } \\sin 2\\theta \\text{ is the first harmonic—a wave that spins twice as fast. Identities allow us to mix and separate these signals in the physical world.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Area Puzzle',
+        body: '\\text{Visualize tiling a rectangle with smaller blocks.} \\\\ \\text{The Sine Addition formula } \\sin(A+B) \\text{ is the area-equivalent of placing two rotations together in space. The resulting total height is the sum of the rotated components.}',
       },
     ],
     visualizations: [
@@ -105,6 +127,16 @@ export default {
         title: 'The most common calculus mistake with $\\cos 2A$',
         body: '\\cos 2A \\text{ has THREE equivalent forms. Pick the one that eliminates the variable you want.} \\\\ \\text{Seeing } \\sin^2? \\text{ Use } 1 - 2\\sin^2 A. \\quad \\text{Seeing } \\cos^2? \\text{ Use } 2\\cos^2 A - 1.',
       },
+      {
+        type: 'theorem',
+        title: 'The Tangent Construction',
+        body: '\\tan(A+B) = \\frac{\\tan A + \\tan B}{1 - \\tan A\\tan B}. \\\\ \\text{This is derived by dividing } \\frac{\\sin(A+B)}{\\cos(A+B)} \\text{ and then dividing all terms by } \\cos A\\cos B.',
+      },
+      {
+        type: 'theorem',
+        title: 'The Energy of the Wave',
+        body: '\\text{In physics, Intensity (Power) is proportional to } \\sin^2(t). \\\\ \\text{Power reduction reveals } (1 - \\cos 2t)/2 \\text{, which proves that the power of an oscillating wave is itself a wave of double the frequency, centered around an average value of 1/2.}',
+      },
     ],
     visualizations: [
       {
@@ -161,6 +193,26 @@ export default {
         expression: '\\therefore\\quad \\cos(\\alpha - \\beta) = \\cos\\alpha\\cos\\beta + \\sin\\alpha\\sin\\beta \\qquad \\blacksquare',
         annotation: 'Cancel 2 from both sides. All other angle formulas follow by substituting $-\\beta$, swapping to sin via co-function identities, and setting $\\beta = \\alpha$.',
       },
+      {
+        expression: '\\text{--- Part II: Deriving the Sine Addition Formula ---}',
+        annotation: 'Let us prove $\\sin(A+B) = \\sin A\\cos B + \\cos A\\sin B$ using co-functions.'
+      },
+      {
+        expression: '\\sin(A+B) = \\cos\\left(\\frac{\\pi}{2} - (A+B)\\right)',
+        annotation: 'Step 1: Use the co-function identity $\\sin \\theta = \\cos(\\pi/2 - \\theta)$.'
+      },
+      {
+        expression: '= \\cos\\left(\\left(\\frac{\\pi}{2} - A\\right) - B\\right)',
+        annotation: 'Step 2: Group the first two terms to use the Cosine Subtraction formula proved in Part I.'
+      },
+      {
+        expression: '= \\cos\\left(\\frac{\\pi}{2} - A\\right)\\cos B + \\sin\\left(\\frac{\\pi}{2} - A\\right)\\sin B',
+        annotation: 'Step 3: Expand using the Cosine Subtraction formula.'
+      },
+      {
+        expression: '= \\sin A\\cos B + \\cos A\\sin B \\qquad \\blacksquare',
+        annotation: 'Step 4: Use co-function identities again. $\\cos(90-A) = \\sin A$ and $\\sin(90-A) = \\cos A$.'
+      }
     ],
   },
 
@@ -240,6 +292,54 @@ export default {
       ],
       conclusion: 'When you see $1 \\pm \\cos x$ or $1 \\pm \\sin x$ in a denominator, your first instinct should be the Pythagorean identity — it almost always creates a factorable numerator.',
     },
+    {
+      id: 'ex-trig-rational-strategy',
+      title: 'The Rational Strategy: Complex Verification',
+      problem: '\\text{Verify: } \\frac{\\sin \\theta}{1+\\cos \\theta} + \\frac{1+\\cos \\theta}{\\sin \\theta} = 2\\csc \\theta.',
+      steps: [
+        {
+          expression: '\\frac{\\sin^2 \\theta + (1+\\cos \\theta)^2}{\\sin \\theta(1+\\cos \\theta)}',
+          annotation: 'Step 1: Find a common denominator.'
+        },
+        {
+          expression: '\\frac{\\sin^2 \\theta + 1 + 2\\cos \\theta + \\cos^2 \\theta}{\\dots}',
+          annotation: 'Step 2: Expand the squared binomial.'
+        },
+        {
+          expression: '\\frac{2 + 2\\cos \\theta}{\\sin \\theta(1+\\cos \\theta)}',
+          annotation: 'Step 3: Recognize the Pythagorean identity $\\sin^2 \\theta + \\cos^2 \\theta = 1$.'
+        },
+        {
+          expression: '\\frac{2(1+\\cos \\theta)}{\\sin \\theta(1+\\cos \\theta)} = \\frac{2}{\\sin \\theta} = 2\\csc \\theta \\qquad \\blacksquare',
+          annotation: 'Step 4: Factor out 2 and cancel the common term.'
+        }
+      ],
+      conclusion: 'Common denominators and Pythagorean recognition are the "Master Keys" for complex rational identities.'
+    },
+    {
+      id: 'ex-trig-triple-angle',
+      title: 'Triple Angle Expansion: Predicting the Future',
+      problem: '\\text{Derive an expression for } \\sin 3x \\text{ in terms of } \\sin x.',
+      steps: [
+        {
+          expression: '\\sin(2x + x) = \\sin 2x\\cos x + \\cos 2x\\sin x',
+          annotation: 'Step 1: Treat 3x as 2x + x.'
+        },
+        {
+          expression: '(2\\sin x\\cos x)\\cos x + (1 - 2\\sin^2 x)\\sin x',
+          annotation: 'Step 2: Use double angle identities for sin and cos.'
+        },
+        {
+          expression: '2\\sin x(1 - \\sin^2 x) + \\sin x - 2\\sin^3 x',
+          annotation: 'Step 3: Convert all terms to sine using the Pythagorean identity.'
+        },
+        {
+          expression: '3\\sin x - 4\\sin^3 x \\qquad \\blacksquare',
+          annotation: 'Step 4: Distribute and combine like terms.'
+        }
+      ],
+      conclusion: 'Higher harmonics can be systematically decomposed by nesting addition formulas.'
+    },
   ],
 
   challenges: [
@@ -281,5 +381,30 @@ export default {
       ],
       answer: '\\sin^2\\tfrac{x}{2} = \\tfrac{1 - \\cos x}{2}',
     },
+    {
+      id: 'ch3-trig-001-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Combine the addition and subtraction formulas to prove: } \\sin A\\cos B = \\frac{1}{2}\\left[\\sin(A+B) + \\sin(A-B)\\right].',
+      hint: 'Write out the full expansion for both sine formulas and add them together.',
+      walkthrough: [
+        {
+          expression: '\\sin(A+B) = \\sin A\\cos B + \\cos A\\sin B',
+          annotation: 'Step 1: Write the addition formula.'
+        },
+        {
+          expression: '\\sin(A-B) = \\sin A\\cos B - \\cos A\\sin B',
+          annotation: 'Step 2: Write the subtraction formula.'
+        },
+        {
+          expression: '\\sin(A+B) + \\sin(A-B) = 2\\sin A\\cos B',
+          annotation: 'Step 3: Combine. Notice the matched terms add up, while the opposite terms cancel out exactly.'
+        },
+        {
+          expression: '\\sin A\\cos B = \\frac{1}{2}\\left[\\sin(A+B) + \\sin(A-B)\\right] \\qquad \\blacksquare',
+          annotation: 'Step 4: Algebraic isolation for the product.'
+        }
+      ],
+      answer: '\\sin A\\cos B = \\frac{1}{2}[\\sin(A+B) + \\sin(A-B)]'
+    }
   ],
 }
