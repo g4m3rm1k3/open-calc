@@ -69,7 +69,7 @@ export default {
     prose: [
       "All constant-acceleration mixed problems reduce to a small, closed equation set plus calculus links.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "KinematicEquationSelector",
     proofSteps: [
       { expression: "v=v_0+at", annotation: "Rate update backbone." },
       {

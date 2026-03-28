@@ -67,7 +67,7 @@ export default {
     prose: [
       "Coordinate transforms preserve solutions if all terms transform consistently.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallIntuition",
     proofSteps: [
       {
         expression: "x'=-x,\\,v'=-v,\\,a'=-a",

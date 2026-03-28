@@ -100,7 +100,7 @@ export default {
         body: "\\frac{dv}{dt}=a(t),\\;v(0)=v_0;\\quad \\frac{dx}{dt}=v(t),\\;x(0)=x_0",
       },
     ],
-    visualizationId: "KinematicsDerivativeProof",
+    visualizationId: "VariableAccelerationExplorer",
     proofSteps: [
       {
         expression: "\\frac{dv}{dt}=a(t)",
@@ -117,13 +117,7 @@ export default {
       },
     ],
     title: "Deriving motion with variable acceleration",
-    visualizations: [
-      {
-        id: "KinematicsDerivativeProof",
-        title: "Proof steps",
-        mathBridge: "Each step builds on the previous.",
-      },
-    ],
+    visualizations: [],
   },
   examples: [
     {

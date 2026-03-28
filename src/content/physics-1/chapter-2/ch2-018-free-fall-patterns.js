@@ -72,7 +72,7 @@ export default {
     prose: [
       "Classification criteria come from the qualitative behavior of the governing equations.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallPatternSpotter",
     proofSteps: [
       {
         expression: "a=-g\\text{ (up-positive)}",

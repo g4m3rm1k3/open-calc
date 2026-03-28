@@ -106,7 +106,7 @@ export default {
       "Second application: since a = dv/dt (a is the derivative of v), the FTC gives ∫_{t₁}^{t₂} a(t) dt = v(t₂) − v(t₁) = Δv. These two FTC statements are the entire mathematical foundation of kinematic graph reading.",
       "The uniqueness of the reconstruction (given initial conditions) follows from the uniqueness theorem for antiderivatives: if two functions have the same derivative everywhere, they differ by at most a constant. So there is exactly one velocity function consistent with a given acceleration function AND a given v₀.",
     ],
-    visualizationId: "KinematicsDerivativeProof",
+    visualizationId: "TripleGraphExplorer",
     proofSteps: [
       {
         expression: "v(t) = \\frac{dx}{dt}",

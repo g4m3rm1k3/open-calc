@@ -58,7 +58,7 @@ export default {
     prose: [
       "Piecewise integration yields continuous state trajectories when boundary conditions are enforced.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "TwoPhaseMotionIntuition",
     proofSteps: [
       {
         expression: "x_1(t),v_1(t)\\text{ on phase 1}",

@@ -58,7 +58,7 @@ export default {
   },
   rigor: {
     prose: ["The equations are identical to upward launch; only signs differ."],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallExplorer",
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

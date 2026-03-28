@@ -63,7 +63,7 @@ export default {
   },
   rigor: {
     prose: ["Results follow from constant acceleration under uniform gravity."],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallExplorer",
     proofSteps: [
       { expression: "v=v_0-gt", annotation: "Velocity model." },
       {

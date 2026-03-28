@@ -106,7 +106,7 @@ export default {
       "Proof: v = dx/dt by definition of velocity. So x IS an antiderivative of v. By FTC Part 2, the definite integral of v over [t₁, t₂] equals [antiderivative evaluated at t₂] − [antiderivative evaluated at t₁] = x(t₂) − x(t₁) = Δx.",
       "The FTC Part 1 gives the inverse direction: if A(t) = ∫_{t₀}^{t} v(τ) dτ (accumulated area from t₀ to t), then dA/dt = v(t). The rate of change of accumulated displacement is velocity. This is obvious physically: the 'area counter' grows at rate v(t) at each moment, exactly as expected.",
     ],
-    visualizationId: "KinematicsDerivativeProof",
+    visualizationId: "IntegrationIntuition",
     proofSteps: [
       {
         expression: "v(t) = \\frac{dx}{dt}",

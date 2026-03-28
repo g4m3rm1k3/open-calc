@@ -93,7 +93,7 @@ export default {
         body: "f(t)=x_A(t)-x_B(t);\\;\\text{meeting}\\iff f(t)=0",
       },
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "TwoObjectsExplorer",
     proofSteps: [
       {
         expression: "x_A(t)=x_{A0}+v_A t,\\quad x_B(t)=x_{B0}+v_B t",
@@ -106,13 +106,7 @@ export default {
       },
     ],
     title: "Deriving the two-object meeting equation",
-    visualizations: [
-      {
-        id: "KinematicProof",
-        title: "Proof steps",
-        mathBridge: "Each step builds on the previous.",
-      },
-    ],
+    visualizations: [],
   },
   examples: [
     {

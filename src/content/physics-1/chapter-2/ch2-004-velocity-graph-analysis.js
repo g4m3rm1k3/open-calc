@@ -110,7 +110,7 @@ export default {
       "In kinematics: velocity v(t) is the derivative of position x(t). So x(t) is an antiderivative of v(t). By the FTC, ∫_{t_1}^{t_2} v(t) dt = x(t₂) − x(t₁) = Δx. The area under v–t is displacement because position is the antiderivative of velocity — and the FTC converts antiderivatives into definite integrals (areas). This is why differentiation and integration are inverse operations.",
       "For a formal derivation, Riemann sums make the connection explicit: divide [t₁, t₂] into n equal subintervals of width Δt. On each subinterval, approximate velocity as constant at v(tₖ). Displacement contribution from each piece ≈ v(tₖ)·Δt. Total displacement ≈ Σ v(tₖ)Δt. As n → ∞ (Δt → 0), this Riemann sum converges to the definite integral ∫v dt. This is exactly how integrals are defined in Calculus Chapter 4.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "VelocityGraphExplorer",
     proofSteps: [
       {
         expression: "a(t) = \\frac{dv}{dt}",

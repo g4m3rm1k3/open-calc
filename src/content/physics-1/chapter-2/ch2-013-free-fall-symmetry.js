@@ -60,7 +60,7 @@ export default {
     prose: [
       "Symmetry follows from constant acceleration and time-reversal structure of the equations.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallSymmetryIntuition",
     proofSteps: [
       { expression: "v(t)=v_0-gt", annotation: "Linear velocity in time." },
       { expression: "t_{up}=\\frac{v_0}{g}", annotation: "Set v=0 at apex." },

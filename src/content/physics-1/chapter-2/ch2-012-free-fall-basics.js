@@ -93,7 +93,7 @@ export default {
         body: "a(t)=\\text{constant}=-g\;(\\text{or }+g\\text{ by axis choice})",
       },
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallExplorer",
     proofSteps: [
       {
         expression: "a=-g",
@@ -111,13 +111,7 @@ export default {
       },
     ],
     title: "Deriving the basic free-fall equations",
-    visualizations: [
-      {
-        id: "KinematicProof",
-        title: "Proof steps",
-        mathBridge: "Each step builds on the previous.",
-      },
-    ],
+    visualizations: [],
   },
   examples: [
     {

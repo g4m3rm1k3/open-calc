@@ -56,7 +56,7 @@ export default {
   },
   rigor: {
     prose: ["Set v0=0 in the constant-acceleration formulas."],
-    visualizationId: "KinematicProof",
+    visualizationId: "FreeFallExplorer",
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

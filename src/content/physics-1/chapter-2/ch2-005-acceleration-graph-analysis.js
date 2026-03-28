@@ -109,7 +109,7 @@ export default {
       "The area-under-a-gives-Δv rule is the FTC applied to the (v, a) pair: since a = dv/dt, by the FTC, ∫_{t₁}^{t₂} a(t)dt = v(t₂) − v(t₁) = Δv. Applying the same argument one level down: since v = dx/dt, ∫_{t₁}^{t₂} v(t)dt = x(t₂) − x(t₁) = Δx.",
       "For constant acceleration a, the double integration produces SUVAT exactly: v(t) = v₀ + at (integrate a), then x(t) = x₀ + ∫(v₀ + at)dt = x₀ + v₀t + ½at² (integrate v). The kinematic equations are not empirical rules — they are antiderivatives of the constant-acceleration definition. Every SUVAT equation is a theorem in calculus.",
     ],
-    visualizationId: "KinematicProof",
+    visualizationId: "TripleGraphExplorer",
     proofSteps: [
       {
         expression: "a(t) = \\frac{dv}{dt}",
