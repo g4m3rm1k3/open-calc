@@ -18,6 +18,8 @@ export default {
       'A linear system is a set of constraints that must all be satisfied simultaneously. Each equation in two variables is a line — its solution set is a whole line of points. The system\'s solution is the set of points satisfying all equations at once. For two lines in a plane, there are exactly three cases: one intersection point (unique solution), parallel lines (no solution), or the same line (infinitely many solutions).',
       'Three methods — substitution, elimination, and matrix row reduction — all find this intersection. They differ in what they manipulate: substitution replaces one variable; elimination adds equations to cancel a variable; matrix methods automate elimination systematically. The Gaussian elimination algorithm is just elimination applied by an organised procedure.',
       'Matrices are a compact notation for systems. The augmented matrix $[A|\\mathbf{b}]$ stores the coefficients and constants. Row operations (swap rows, scale a row, add a multiple of one row to another) correspond exactly to valid moves in elimination — they do not change the solution set.',
+      '**The Web of Constraints**: Imagine a spiderweb where each strand is an equation. A system is the point where the strands cross. It represents a "Structural Consensus"—the only place where every rule in the environment is obeyed simultaneously.',
+      '**Equilibrium: The Tug of War**: In physics, an object stays still when the forces on it cancel out. A system of equations is a mathematical equilibrium. Each equation is a "Force" pulling the solution in a certain direction, and the intersection is the only place where the tension is perfectly balanced.',
     ],
     callouts: [
       {
@@ -34,6 +36,26 @@ export default {
         type: 'proof-map',
         title: 'Matrix row operations ↔ elimination moves',
         body: 'R_i \\leftrightarrow R_j \\quad \\text{swap rows (reorder equations)} \\\\ kR_i \\to R_i \\quad \\text{scale a row (multiply equation by constant)} \\\\ R_i + kR_j \\to R_i \\quad \\text{eliminate a variable}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: Standing Together',
+        body: '\\text{The word "System" comes from the Greek "Systema," meaning "that which stands together."} \\\\ \\text{An individual equation is a lonely fact. A system is a community of facts that define a single target.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Algebra AND Gate',
+        body: '\\text{In logic, we use the "AND" operator (conjunction). A system is } L_1 \\land L_2. \\\\ \\text{The solution must make the first statement TRUE AND the second statement TRUE at the same time.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: Forces in Balance',
+        body: '\\text{Think of each line as a tether pulling an object.} \\\\ \\text{The "System Solution" is the equilibrium point where the object rests. If the lines are parallel, they "Tug" in exactly opposing directions, leaving no rest point.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: Degrees of Freedom',
+        body: '\\text{In 2D, a line locks one "degree of freedom." Two non-parallel lines lock both, pinning you to a single point.} \\\\ \\text{Parallel lines maintain a gap that no point can cross, hence "No Solution."}',
       },
     ],
     visualizations: [
@@ -62,6 +84,21 @@ export default {
         type: 'definition',
         title: 'Augmented matrix and row echelon form',
         body: '\\begin{pmatrix} 2 & 3 & | & 7 \\\\ 1 & -1 & | & 1 \\end{pmatrix} \\xrightarrow{R_1 - 2R_2} \\begin{pmatrix} 2 & 3 & | & 7 \\\\ 0 & 5 & | & 5 \\end{pmatrix} \\\\ \\text{Row echelon: zeros below each pivot. Back-substitute: } y=1, x=2.',
+      },
+      {
+        type: 'insight',
+        title: 'The Determinant as Scaling Area',
+        body: '\\det(A) = ad-bc \\text{ represents the area of the parallelogram formed by the vectors } (a,c) \\text{ and } (b,d). \\\\ \\text{If the area is } 0, \\text{ the vectors are collinear (squashed), and the system is singular.}',
+      },
+      {
+        type: 'theorem',
+        title: 'Formal Proof of Inconsistency ($0=1$)',
+        body: '\\text{If Gaussian elimination produces a row } [0 \\dots 0 | k] \\text{ with } k \\neq 0, \\text{ the system is inconsistent.} \\\\ \\text{This is a proof by contradiction: the statement } 0x + 0y = k \\text{ is FALSE for all } (x,y).',
+      },
+      {
+        type: 'theorem',
+        title: 'Determinant & Matrix Invertibility',
+        body: '\\text{A system } A\\mathbf{x} = \\mathbf{b} \\text{ has a UNIQUE solution if and only if } \\det(A) \\neq 0. \\\\ \\text{This is because the inverse matrix } A^{-1} \\text{ (the "algebraic divisor") only exists when the determinant is non-zero.}',
       },
     ],
   },
@@ -99,6 +136,46 @@ export default {
       ],
       conclusion: 'Infinitely many solutions: every point on the line $2x - 4y = 6$. Geometrically, the two equations represent the same line.',
     },
+    {
+      id: 'ex-systems-nonlinear',
+      title: 'Structural Intersection: Parabola meets Line',
+      problem: '\\text{Solve for } (x,y): \\; y = x^2, \\quad y = x + 2',
+      steps: [
+        {
+          expression: 'x^2 = x + 2 \\implies x^2 - x - 2 = 0',
+          annotation: 'Step 1: Use direct substitution. Set the two expressions for $y$ equal to each other.'
+        },
+        {
+          expression: '(x-2)(x+1) = 0 \\implies x = 2, -1',
+          annotation: 'Step 2: Solve the resulting quadratic. This is the first link between Chapters 3 and 5.'
+        },
+        {
+          expression: 'x=2 \\Rightarrow y=4, \\quad x=-1 \\Rightarrow y=1',
+          annotation: 'Step 3: Pair the $x$-values with their corresponding $y$-values.'
+        }
+      ],
+      conclusion: 'The system has two solutions: $(2,4)$ and $(-1,1)$. Non-linear systems can have more than one intersection point.'
+    },
+    {
+      id: 'ex-systems-mixture',
+      title: 'The Mixture Problem: Proportional Balance',
+      problem: '\\text{Mix 10\\% and 30\\% acid solutions to get 50L of 18\\% solution. Find the volumes } x \\text{ and } y.',
+      steps: [
+        {
+          expression: 'x + y = 50, \\quad 0.10x + 0.30y = 0.18(50)',
+          annotation: 'Step 1: System of two constraints: total volume and total "Acid Content."'
+        },
+        {
+          expression: 'x = 50 - y \\implies 0.10(50-y) + 0.30y = 9',
+          annotation: 'Step 2: Solve by substitution. $5 - 0.10y + 0.30y = 9 \\implies 0.20y = 4$.'
+        },
+        {
+          expression: 'y = 20 \\text{ L}, \\quad x = 30 \\text{ L}',
+          annotation: 'Step 3: Solve for both volumes. $x$ and $y$ must sum to the target volume.'
+        }
+      ],
+      conclusion: 'Mixture problems are the standard test of system modelling. Each equation represents a "Total Balance" (mass, volume, or dollars).'
+    },
   ],
 
   challenges: [
@@ -114,6 +191,27 @@ export default {
       ],
       answer: 'x=1, \\; y=2, \\; z=3',
     },
+    {
+      id: 'ch2-005-ch2',
+      difficulty: 'harder',
+      problem: '\\text{Find the value of } k \\text{ such that the system has NO solution: } \\\\ kx + 4y = 12, \\quad 9x + ky = 24',
+      hint: 'A system with no solution must have parallel lines (same slope, different intercept). This occurs when the determinant is zero.',
+      walkthrough: [
+        {
+          expression: 'ad - bc = k^2 - 36 = 0',
+          annotation: 'Step 1: Set the determinant to zero. $(k-6)(k+6) = 0 \\implies k = 6, -6$.'
+        },
+        {
+          expression: 'k=6: \\; 6x+4y=12, \\; 9x+6y=24',
+          annotation: 'Step 2: Test $k=6$. Equation 2 is $1.5 \\times$ Eq 1 on the left side, but $1.5 \\times 12 = 18 \\neq 24$. NO solution.'
+        },
+        {
+          expression: 'k=-6: \\; -6x+4y=12, \\; 9x-6y=24',
+          annotation: 'Step 3: Test $k=-6$. Equation 2 is $-1.5 \\times$ Eq 1 on the left side, but $-1.5 \\times 12 = -18 \\neq 24$. NO solution.'
+        }
+      ],
+      answer: 'k = \\pm 6'
+    }
   ],
 
   calcBridge: {
