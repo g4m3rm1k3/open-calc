@@ -25,7 +25,10 @@ export const ch2_002 = {
       { type: 'mnemonic', title: 'SUVAT', body: 's = displacement (Δx), u = initial velocity (v₀), v = final velocity, a = acceleration, t = time. Each equation omits one.' },
       { type: 'warning', title: 'Only valid for constant acceleration', body: 'These equations break down the moment acceleration changes. For variable acceleration, use calculus (integration).' },
     ],
-    visualizations: [{ id: 'KinematicEquationsIntuition', title: 'Pick a missing variable — the right equation highlights', mathBridge: 'Select which quantity is unknown. The viz highlights the equation that doesn\'t contain it.', caption: 'One missing variable → one equation.' }],
+    visualizations: [
+      { id: 'SVGDiagram', props: { type: 'suvat-map' }, title: 'SUVAT relationship map', caption: 'Each equation connects 4 of the 5 quantities — it omits the one you don\'t know or don\'t need.' },
+      { id: 'KinematicEquationsIntuition', title: 'Pick a missing variable — the right equation highlights', mathBridge: 'Select which quantity is unknown. The viz highlights the equation that doesn\'t contain it.', caption: 'One missing variable → one equation.' },
+    ],
   },
   math: {
     prose: ['The equations are derived from the definitions of velocity and acceleration assuming $a = \\text{const}$:'],

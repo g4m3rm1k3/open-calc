@@ -49,6 +49,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'riemann-rect' },
+        title: 'Riemann rectangles → integral',
+        caption: 'Each rectangle has height v(tᵢ) and width Δt. Their total area approximates displacement. More rectangles → exact integral.',
+      },
+      {
         id: "VelocityGraphIntuition",
         title: "Area under v–t is displacement",
         mathBridge:

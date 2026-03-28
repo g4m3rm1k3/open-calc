@@ -43,6 +43,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'kinematic-chain' },
+        title: 'The kinematic chain',
+        caption: 'Position, velocity, and acceleration are linked by differentiation (d/dt) going right and integration (∫ dt) going left.',
+      },
+      {
         id: 'KinematicsDefinitionIntuition',
         title: 'Drag the object along the number line — watch displacement vs distance diverge',
         mathBridge: 'Displacement = final − initial position. Distance accumulates regardless of direction.',

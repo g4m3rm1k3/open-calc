@@ -43,6 +43,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'free-fall-axes' },
+        title: 'Sign convention: upward positive',
+        caption: 'g = 9.8 m/s² always points downward. When +y is upward, acceleration a = −g = −9.8 m/s². The trajectory y(t) curves downward because a is negative.',
+      },
+      {
         id: "FreeFallIntuition",
         title: "Free-fall motion intuition",
         mathBridge:

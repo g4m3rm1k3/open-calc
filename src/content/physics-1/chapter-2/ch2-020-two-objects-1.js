@@ -39,6 +39,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'two-objects-line' },
+        title: 'Meeting on a number line',
+        caption: 'Two objects start at different positions moving toward each other. They meet when xₐ(t) = x_b(t). Solve that equation for t.',
+      },
+      {
         id: "TwoObjectsIntuition",
         title: "Dual-position meeting view",
         mathBridge:

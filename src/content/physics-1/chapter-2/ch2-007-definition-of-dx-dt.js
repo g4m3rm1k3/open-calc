@@ -64,6 +64,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'slope-triangle' },
+        title: 'The slope triangle',
+        caption: 'Δx/Δt is the rise-over-run of the secant. As Δt → 0 the secant becomes the tangent — that limiting ratio is the derivative.',
+      },
+      {
         id: "DerivativeLimitIntuition",
         title: "Secant to tangent transition",
         mathBridge:

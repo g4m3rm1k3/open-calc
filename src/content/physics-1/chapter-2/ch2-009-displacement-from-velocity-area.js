@@ -49,6 +49,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'riemann-rect' },
+        title: 'Area = displacement',
+        caption: 'Rectangles of height v(tᵢ) and width Δt accumulate displacement. In the limit Δt → 0 this sum IS the definite integral.',
+      },
+      {
         id: "IntegrationIntuition",
         title: "Riemann sum to exact area",
         mathBridge:

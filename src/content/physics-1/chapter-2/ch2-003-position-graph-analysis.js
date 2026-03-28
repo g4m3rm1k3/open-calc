@@ -48,6 +48,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'slope-triangle' },
+        title: 'Secant slope → tangent slope',
+        caption: 'As Δt shrinks, the secant (dashed, average) rotates onto the tangent (solid, instantaneous). The limiting slope is dx/dt = velocity.',
+      },
+      {
         id: "PositionGraphIntuition",
         title: "Slope on x–t gives velocity",
         mathBridge:

@@ -22,6 +22,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'free-fall-axes' },
+        title: 'Axis orientation and sign of g',
+        caption: 'The physics is axis-independent. Choosing +y upward makes a = −g (negative). Choosing +y downward makes a = +g (positive). Both give the same trajectory.',
+      },
+      {
         id: "FreeFallExplorer",
         title: "Toggle sign conventions",
         mathBridge:

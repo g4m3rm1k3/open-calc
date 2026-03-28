@@ -49,6 +49,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'kinematic-chain' },
+        title: 'The x → v → a chain',
+        caption: 'Each arrow is a derivative; each reverse arrow is an integral. The entire kinematics course lives in this one diagram.',
+      },
+      {
         id: "TripleGraphIntuition",
         title: "Derivative chain visual",
         mathBridge:

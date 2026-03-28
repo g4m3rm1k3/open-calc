@@ -761,6 +761,9 @@ const VIZ_REGISTRY = {
   DerivativesRatesOfChange: lazy(() => import("./react/DerivativesRatesOfChange.jsx")),
   MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
   MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
+
+  // Static SVG diagrams — use props: { type: "kinematic-chain" } etc.
+  SVGDiagram: lazy(() => import("./SVGDiagram.jsx")),
 };
 
 function VizSkeleton() {
