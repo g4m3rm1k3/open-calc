@@ -18,6 +18,8 @@ export default {
       'A rational expression is a fraction where numerator and denominator are polynomials. They behave exactly like numeric fractions — same rules for multiplying, dividing, adding, subtracting. The only new complication is that you must track which values make the denominator zero (the domain restrictions).',
       'Partial fraction decomposition is the reverse of adding fractions. When you add $\\frac{A}{x-1} + \\frac{B}{x+1}$, you get a single fraction over $(x-1)(x+1)$. Partial fractions asks: given that combined fraction, recover the $A$ and $B$. The technique: multiply both sides by the denominator, then solve for the coefficients.',
       'The key insight: a fraction with a linear factor in the denominator integrates to a logarithm. A fraction with a repeated or quadratic factor needs different forms. Decomposing into these simple pieces is exactly what makes integration possible.',
+      '**The Ratio in Rational**: Just as a rational number is the ratio of two integers, a rational expression is the ratio of two functions. It describes how the "Growth Rate" of the numerator competes with the "Growth Rate" of the denominator. This tension is what creates the unique terrain of rational graphs.',
+      '**Algebraic Decompression**: Think of a complex rational expression as a "Zipped File." Partial Fraction Decomposition is the tool that "Un-zips" it. It takes a dense, single formula and expands it into a series of atomic, simple elements that are much easier to process, model, and integrate.',
     ],
     callouts: [
       {
@@ -34,6 +36,26 @@ export default {
         type: 'insight',
         title: 'The Heaviside cover-up method (for distinct linear factors)',
         body: '\\frac{f(x)}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b} \\\\ A = \\lim_{x\\to a}(x-a)\\cdot f(x)/\\text{denom} = f(a)/[(a-b)] \\\\ \\text{Cover the }(x-a)\\text{ factor, plug in }x=a\\text{ — that\'s }A.',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Habitat of Ratios',
+        body: '\\text{A rational expression is a relationship between two "Worlds."} \\\\ \\text{The numerator is the "Objective," and the denominator is the "Constraint."} \\\\ \\text{Factoring both reveals the shared terrain where they interact.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: Atomic Decomposition',
+        body: '\\text{Partial fractions decompose a complex system into independent "Modules."} \\\\ \\text{Each factor in the denominator represents a specific "Resonance" or "Pole" of the system.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Harmonic Filter',
+        body: '\\text{In audio engineering, complex waves are sums of simple tones.} \\\\ \\text{Adding fractions is "Mixing" the signal. Partial Fraction Decomposition is "Filtering" the signal back to its raw frequencies.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Tear in the Graph',
+        body: '\\text{A point where the denominator is zero creates a vertical asymptote—a "Tear" in the fabric of the Cartesian plane.} \\\\ \\text{Looking for these points is the first step in drawing any rational map.}',
       },
     ],
     visualizations: [
@@ -62,6 +84,21 @@ export default {
         type: 'theorem',
         title: 'The cover-up method — worked',
         body: '\\frac{3x+1}{(x-2)(x+3)} = \\frac{A}{x-2} + \\frac{B}{x+3} \\\\ A = \\frac{3(2)+1}{(2+3)} = \\frac{7}{5} \\quad B = \\frac{3(-3)+1}{(-3-2)} = \\frac{-8}{-5} = \\frac{8}{5}',
+      },
+      {
+        type: 'definition',
+        title: 'Holes vs. Asymptotes',
+        body: '\\text{If } (x-c) \\text{ is a factor of BOTH top and bottom: a **Hole** (removable discontinuity) exists at } x=c. \\\\ \\text{If } (x-c) \\text{ is a factor ONLY of the denominator: a **Vertical Asymptote** exists.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Heaviside Limiting Proof',
+        body: '\\lim_{x\\to a} (x-a) \\cdot \\left[ \\frac{A}{x-a} + \\frac{B}{x-b} \\right] = A + \\lim_{x\\to a} \\frac{B(x-a)}{x-b} = A. \\\\ \\text{This limit justifies the "Cover-Up" shortcut by zeroing out all non-target terms.}',
+      },
+      {
+        type: 'warning',
+        title: 'The Euclidean Pre-processing (Long Division)',
+        body: '\\text{Partial fraction templates ONLY work on "Proper Fractions" (numerator degree < denominator degree).} \\\\ \\text{If improper, you MUST use Long Division to peel off the polynomial part first.}',
       },
     ],
   },
@@ -114,6 +151,46 @@ export default {
       ],
       conclusion: 'LCD approach: factor all denominators, identify the LCD, convert, then add numerators.',
     },
+    {
+      id: 'ex-rational-improper',
+      title: 'Structural Pre-processing: Improper Fractions',
+      problem: '\\text{Setup the decomposition for: } \\dfrac{x^2+1}{x^2-1}',
+      steps: [
+        {
+          expression: '\\dfrac{x^2+1}{x^2-1} = 1 + \\dfrac{2}{x^2-1}',
+          annotation: 'Step 1: The fraction is improper (equal degrees). Use Polynomial Long Division first.'
+        },
+        {
+          expression: '1 + \\dfrac{2}{(x-1)(x+1)} = 1 + \\dfrac{A}{x-1} + \\frac{B}{x+1}',
+          annotation: 'Step 2: Factor the remaining proper fraction and set up the partial fraction template.'
+        },
+        {
+          expression: 'A = \\frac{2}{1+1} = 1, \\quad B = \\frac{2}{-1-1} = -1',
+          annotation: 'Step 3: Solve for coefficients using the cover-up method on the proper part.'
+        }
+      ],
+      conclusion: 'The constant "1" is the static "Baseline" of the system. Partial fractions only resolve the dynamic "decaying" parts.'
+    },
+    {
+      id: 'ex-rational-repeat',
+      title: 'Symmetry in Layers: Repeating Linear Factors',
+      problem: '\\text{Setup: } \\dfrac{1}{x(x-1)^2}',
+      steps: [
+        {
+          expression: '\\dfrac{A}{x} + \\dfrac{B}{x-1} + \\dfrac{C}{(x-1)^2}',
+          annotation: 'Step 1: Every power of the repeated factor needs its own term to reflect every layer of the resonance.'
+        },
+        {
+          expression: '1 = A(x-1)^2 + Bx(x-1) + Cx',
+          annotation: 'Step 2: Clear denominators. Substitute $x=0$ to find $A=1$, and $x=1$ to find $C=1$.'
+        },
+        {
+          expression: 'x^2 \\text{ coeff: } 0 = A + B \\implies B = -1',
+          annotation: 'Step 3: Compare coefficients of $x^2$ to find the missing $B$.'
+        }
+      ],
+      conclusion: 'Repeating factors model systems with "Memory" or "Double Resonance." Each power represents a more intense layer of the behavior.'
+    },
   ],
 
   challenges: [
@@ -130,6 +207,35 @@ export default {
       ],
       answer: '\\dfrac{1}{x-1} + \\dfrac{x}{x^2+1}',
     },
+    {
+      id: 'ch2-004-ch2',
+      difficulty: 'harder',
+      problem: '\\text{Decompose completely: } \\dfrac{4}{x(x^2+4)}',
+      hint: 'The $x^2+4$ is an irreducible quadratic. Its partial fraction must have the form $(Bx+C)/(x^2+4)$.',
+      walkthrough: [
+        {
+          expression: '\\dfrac{A}{x} + \\dfrac{Bx+C}{x^2+4}',
+          annotation: 'Step 1: Set up the template with a linear numerator for the quadratic factor.'
+        },
+        {
+          expression: '4 = A(x^2+4) + (Bx+C)x',
+          annotation: 'Step 2: Clear denominators. Substitute $x=0$ to quickly find $4 = 4A \\implies A=1$.'
+        },
+        {
+          expression: 'x^2 \\text{ coeff: } 0 = A + B \\implies B = -1',
+          annotation: 'Step 3: Compare coefficients of $x^2$ to find $B$.'
+        },
+        {
+          expression: 'x \\text{ coeff: } 0 = C \\implies C = 0',
+          annotation: 'Step 4: Compare coefficients of $x$ to find $C$.'
+        },
+        {
+          expression: '\\dfrac{1}{x} - \\dfrac{x}{x^2+4} \\qquad \\blacksquare',
+          annotation: 'Step 5: The decomposition is complete.'
+        }
+      ],
+      answer: '\\dfrac{1}{x} - \\dfrac{x}{x^2+4}'
+    }
   ],
 
   calcBridge: {
