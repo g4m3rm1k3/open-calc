@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Torque Vector', body: '\\vec{\tau} = \\vec{r} \\times \\vec{F}' },
       { type: 'insight', title: 'Geometric mapping', body: 'The cross product magnitude scales with the area of the surface formed by the vectors.' },
     ],
-    visualizations: [{ id: 'CrossProductExplorer', title: 'Cross Product Explorer (Area & Torque)', mathBridge: 'Adjust the magnitudes and angles of two vectors and see the parallelogram area and the resulting cross product normal update instantly.', caption: 'Area and torque are the same geometric multiplication.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'The right-hand rule and the parallelogram',
+        caption: '|A⃗ × B⃗| = |A||B|sinφ equals the area of the parallelogram formed by A⃗ and B⃗. The direction (out of the page here) is given by the right-hand rule: curl fingers from A⃗ to B⃗, thumb points in the cross product direction.',
+      },
+      { id: 'CrossProductExplorer', title: 'Cross Product Explorer (Area & Torque)', mathBridge: 'Adjust the magnitudes and angles of two vectors and see the parallelogram area and the resulting cross product normal update instantly.', caption: 'Area and torque are the same geometric multiplication.' },
+    ],
   },
   math: {
     prose: [
@@ -41,7 +49,7 @@ export default {
     callouts: [
       { type: 'theorem', title: 'Coordinate Handedness', body: '\\hat{i} \\times \\hat{j} = \\hat{k} \\implies \\text{Right-handed system.}' },
     ],
-    visualizationId: 'CrossProductProof',
+    visualizationId: 'CrossProductExplorer',
     proofSteps: [
       {
         title: "Define via determinant",

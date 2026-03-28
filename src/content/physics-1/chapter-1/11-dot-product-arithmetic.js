@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Component-wise Dot Product', body: '\\vec{A} \\cdot \\vec{B} = A_xB_x + A_yB_y + A_zB_z' },
       { type: 'insight', title: 'Scalar result', body: 'The sum of scalars is a scalar. Every time you "dot" two vectors, the "vec-ness" is lost into a single number.' },
     ],
-    visualizations: [{ id: 'DotProductExampleIntuition', title: 'Step-by-Step Dot Product Arithmetic', mathBridge: 'Watch each component pair multiply and add together in a live calculation.', caption: 'Arithmetic is the bridge to automation.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Why component multiplication = projection',
+        caption: 'A⃗·B⃗ = AₓBₓ + AyBy comes directly from multiplying projections onto each axis. The geometric formula |A||B|cosφ and the component formula always give the same number — they are two views of the same operation.',
+      },
+      { id: 'DotProductExampleIntuition', title: 'Step-by-Step Dot Product Arithmetic', mathBridge: 'Watch each component pair multiply and add together in a live calculation.', caption: 'Arithmetic is the bridge to automation.' },
+    ],
   },
   math: {
     prose: [
@@ -41,7 +49,7 @@ export default {
     callouts: [
       { type: 'theorem', title: 'Distributive property', body: '\\vec{A} \\cdot (\\vec{B} + \\vec{C}) = \\vec{A} \\cdot \\vec{B} + \\vec{A} \\cdot \\vec{C}' },
     ],
-    visualizationId: 'DotProductProof',
+    visualizationId: 'DotProductCalculator',
     proofSteps: [
       {
         title: "Define dot product (geometric)",

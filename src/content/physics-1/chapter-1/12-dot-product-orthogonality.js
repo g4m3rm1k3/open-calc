@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Orthogonality Condition', body: '\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0' },
       { type: 'insight', title: 'Perpendicular detection', body: 'The simplest check for 90 degrees: A_xB_x + A_yB_y + A_zB_z = 0.' },
     ],
-    visualizations: [{ id: 'OrthogonalityIntuition', title: 'Interactive Orthogonality Visualiser', mathBridge: 'Drag the vectors and watch the dot product value update. The graph highlights when the value hits zero and the vectors are orthogonal.', caption: 'A zero dot product is the signature of 90 degrees.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Zero projection = zero dot product = perpendicular',
+        caption: 'When φ = 90°, the projection of B⃗ onto A⃗ has length zero. The dot product is |A|×0 = 0. This is the exact algebraic test for perpendicularity: A⃗·B⃗ = AₓBₓ + AyBy = 0.',
+      },
+      { id: 'OrthogonalityIntuition', title: 'Interactive Orthogonality Visualiser', mathBridge: 'Drag the vectors and watch the dot product value update. The graph highlights when the value hits zero and the vectors are orthogonal.', caption: 'A zero dot product is the signature of 90 degrees.' },
+    ],
   },
   math: {
     prose: [
@@ -41,7 +49,7 @@ export default {
     callouts: [
       { type: 'theorem', title: 'Basis Orthogonality', body: '\\hat{i} \\cdot \\hat{j} = 0 \\quad\\hat{j} \\cdot \\hat{k} = 0 \\quad\\hat{k} \\cdot \\hat{i} = 0' },
     ],
-    visualizationId: 'DotProductProof',
+    visualizationId: 'OrthogonalityIntuition',
     proofSteps: [
       {
         title: "Define dot product (geometric)",

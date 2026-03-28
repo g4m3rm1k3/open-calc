@@ -55,6 +55,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Negate first, then DSMD',
+        caption: 'To compute A⃗ − B⃗ numerically: (1) negate B⃗ by flipping signs: (−Bₓ, −By). (2) Apply DSMD to A⃗ + (−B⃗). The result is (Aₓ − Bₓ, Ay − By). Components subtract axis by axis — pure arithmetic.',
+      },
+      {
         id: 'NumericalSubtractionWalkthrough',
         title: 'Step 0 through Step 4 — live calculation',
         mathBridge: 'Click through each step. Step 0 flips B⃗ in the diagram and negates its components in the table.',

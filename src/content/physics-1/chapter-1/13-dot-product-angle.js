@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Angle Between Vectors', body: '\\phi = \\arccos\\left(\\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}||\\vec{B}|}\\right)' },
       { type: 'insight', title: 'Magnitude-component bridge', body: 'The angle is the ratio of the actual dot product to the maximum possible dot product (|A||B|).' },
     ],
-    visualizations: [{ id: 'AngleBetweenIntuition', title: 'Interactive Angle Visualiser', mathBridge: 'Drag the vectors and see the angle between them update in real-time. Notice how the arc and degree readout match the formula output.', caption: 'The angle is always measured between the vectors, tail-to-tail.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Two paths to the same number',
+        caption: 'Geometric: A⃗·B⃗ = |A||B|cosφ. Component: A⃗·B⃗ = AₓBₓ + AyBy. Set them equal, divide both sides by |A||B|, and you get cosφ = (AₓBₓ + AyBy)/(|A||B|). The projection picture makes this formula inevitable.',
+      },
+      { id: 'AngleBetweenIntuition', title: 'Interactive Angle Visualiser', mathBridge: 'Drag the vectors and see the angle between them update in real-time. Notice how the arc and degree readout match the formula output.', caption: 'The angle is always measured between the vectors, tail-to-tail.' },
+    ],
   },
   math: {
     prose: [
@@ -41,7 +49,7 @@ export default {
     callouts: [
       { type: 'theorem', title: 'Law of Cosines (Vector Form)', body: '|\\vec{A} - \\vec{B}|^2 = |\\vec{A}|^2 + |\\vec{B}|^2 - 2\\vec{A}\\cdot\\vec{B}' },
     ],
-    visualizationId: 'DotProductProof',
+    visualizationId: 'AngleBetweenExplorer',
     proofSteps: [
       {
         title: "Define dot product (geometric)",

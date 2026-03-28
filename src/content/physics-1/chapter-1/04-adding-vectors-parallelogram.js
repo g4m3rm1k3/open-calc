@@ -55,6 +55,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'Two vectors, one resultant',
+        caption: 'Place A⃗ and B⃗ tail-to-tail. Complete the parallelogram. The diagonal from the shared tail is R⃗ = A⃗ + B⃗. Components add axis-by-axis: Rₓ = Aₓ + Bₓ, Ry = Ay + By.',
+      },
+      {
         id: 'ParallelogramIntuition',
         title: 'Drag both vectors — watch the parallelogram build and the diagonal appear',
         mathBridge: 'The diagonal is $\\vec{R}$. Its length and direction update as you reshape the parallelogram.',

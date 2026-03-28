@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Determinant Form', body: '\\vec{A} \\times \\vec{B} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ A_x & A_y & A_z \\\\ B_x & B_y & B_z \\end{vmatrix}' },
       { type: 'insight', title: 'Perpendicular detection', body: 'The cross product formula always produces a vector $(x, y, z)$ such that $\\vec{R} \\cdot \\vec{A} = 0$ and $\\vec{R} \\cdot \\vec{B} = 0$.' },
     ],
-    visualizations: [{ id: 'CrossProductCalculator', title: 'Step-by-Step Determinant Calculator', mathBridge: 'Enter any 3D components and watch the $3 \\times 3$ determinant expand into its component-wise formula in real-time.', caption: 'The determinant is the ultimate shorthand for cross product arithmetic.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'The direction before the calculation',
+        caption: 'Before computing components, check the direction with the right-hand rule: curl from A⃗ to B⃗, thumb points along A⃗×B⃗. Then the determinant formula gives the components. Knowing the expected direction catches sign errors.',
+      },
+      { id: 'CrossProductCalculator', title: 'Step-by-Step Determinant Calculator', mathBridge: 'Enter any 3D components and watch the $3 \\times 3$ determinant expand into its component-wise formula in real-time.', caption: 'The determinant is the ultimate shorthand for cross product arithmetic.' },
+    ],
   },
   math: {
     prose: [
@@ -41,7 +49,7 @@ export default {
     callouts: [
       { type: 'theorem', title: 'Distributive property', body: '\\vec{A} \\times (\\vec{B} + \\vec{C}) = \\vec{A} \\times \\vec{B} + \\vec{A} \\times \\vec{C}' },
     ],
-    visualizationId: 'CrossProductProof',
+    visualizationId: 'CrossProductCalculator',
     proofSteps: [
       {
         title: "Define via determinant",

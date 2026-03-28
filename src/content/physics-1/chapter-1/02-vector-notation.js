@@ -72,6 +72,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'All three notations, one vector',
+        caption: 'The vector shown can be written as $\\vec{A}$ (arrow notation), $\\mathbf{A}$ (bold), or $A_x\\hat{i}+A_y\\hat{j}$ (component form). Same object, three outfits. The right triangle shows how Aₓ and Ay relate to magnitude |A| and angle θ.',
+      },
+      {
         // Pillar 1
         id: 'NotationGallery',
         title: 'Click a notation — see the same vector appear five ways',

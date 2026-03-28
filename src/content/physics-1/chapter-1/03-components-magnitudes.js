@@ -72,6 +72,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'The right-triangle picture',
+        caption: 'A vector at angle θ is the hypotenuse. Aₓ = |A|cosθ is the adjacent leg; Ay = |A|sinθ is the opposite leg. SOH-CAH-TOA gives you both components directly.',
+      },
+      {
         // Pillar 1
         id: 'ComponentDecomposerLive',
         title: 'Drag the vector — watch the right triangle appear',

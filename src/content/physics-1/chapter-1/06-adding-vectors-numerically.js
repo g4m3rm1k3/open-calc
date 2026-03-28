@@ -61,6 +61,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Step 1 — Decompose each vector',
+        caption: 'Before you can add vectors numerically, each one becomes a right triangle: Aₓ = |A|cosθ and Ay = |A|sinθ. Then you add x-components together and y-components together. Pure arithmetic.',
+      },
+      {
         id: 'NumericalAdditionWalkthrough',
         title: 'Step through the four stages for two live vectors',
         mathBridge: 'Each stage of the four-step method is highlighted in sequence. Drag the vectors to see the steps update.',

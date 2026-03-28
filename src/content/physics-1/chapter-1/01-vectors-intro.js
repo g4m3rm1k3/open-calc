@@ -76,6 +76,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'The anatomy of a vector',
+        caption: 'A vector has two parts: magnitude |A| (the arrow length) and direction θ (the angle from +x). The right triangle shows how magnitude and angle together determine the x- and y-components. A scalar has only the first — no arrow, no direction.',
+      },
+      {
         // Pillar 1 — Intuition viz
         id: 'VectorArrowIntuition',
         title: 'Drag the arrow — feel magnitude and direction',

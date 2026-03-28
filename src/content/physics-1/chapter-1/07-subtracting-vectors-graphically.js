@@ -62,6 +62,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'Subtraction is addition in disguise',
+        caption: 'A⃗ − B⃗ = A⃗ + (−B⃗). Step 1: flip B⃗ to get −B⃗ (same length, opposite direction). Step 2: chain A⃗ and −B⃗ tip-to-tail. The closing arrow is A⃗ − B⃗. Components: (A−B)ₓ = Aₓ − Bₓ, (A−B)y = Ay − By.',
+      },
+      {
         id: 'SubtractionIntuition',
         title: 'Drag A⃗ and B⃗ — see −B⃗, and the two subtraction methods side by side',
         mathBridge: 'Left: flip-and-add method. Right: tail-to-tail shortcut. Both give the same A⃗ − B⃗.',

@@ -597,21 +597,355 @@ function TwoObjectsLine({ C }) {
   )
 }
 
+// ─── Vector Components (right triangle decomposition) ────────────────────────
+
+function VectorComponents({ C }) {
+  const W = 420, H = 220
+  const ox = 60, oy = H - 40
+  const ax = 310, ay = H - 40   // tip of Ax (horizontal)
+  const bx = 310, by = 50       // tip of A (diagonal)
+
+  function arrow(x1, y1, x2, y2, color, id) {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    const ux = dx / len, uy = dy / len
+    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    return (
+      <g key={id}>
+        <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
+        <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+      </g>
+    )
+  }
+
+  const angle = Math.atan2(oy - by, bx - ox) * 180 / Math.PI
+  const arcR = 36
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Grid suggestion lines */}
+      <line x1={ax} y1={ay} x2={bx} y2={by} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+      <line x1={ox} y1={by} x2={bx} y2={by} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+
+      {/* Right angle marker */}
+      <rect x={bx - 12} y={ay - 12} width={12} height={12} fill="none" stroke={C.muted} strokeWidth={1} />
+
+      {/* Component arrows */}
+      {arrow(ox, oy, ax, ay, C.sky, 'ax')}
+      {arrow(ax, ay, bx, by, C.rose, 'ay')}
+      {/* Main vector */}
+      {arrow(ox, oy, bx, by, C.emerald, 'a')}
+
+      {/* Angle arc */}
+      <path
+        d={`M ${ox + arcR} ${oy} A ${arcR} ${arcR} 0 0 0 ${ox + arcR * Math.cos(-angle * Math.PI / 180)} ${oy + arcR * Math.sin(-angle * Math.PI / 180)}`}
+        fill="none" stroke={C.amber} strokeWidth={1.5}
+      />
+      <text x={ox + arcR + 6} y={oy - 10} fill={C.amber} fontSize={12} fontFamily="monospace">θ</text>
+
+      {/* Labels */}
+      <text x={(ox + ax) / 2} y={oy + 16} textAnchor="middle" fill={C.sky} fontSize={13} fontFamily="monospace" fontWeight="700">Aₓ = A cos θ</text>
+      <text x={bx + 10} y={(ay + by) / 2} fill={C.rose} fontSize={13} fontFamily="monospace" fontWeight="700">A_y = A sin θ</text>
+      <text x={(ox + bx) / 2 - 24} y={(oy + by) / 2 - 8} fill={C.emerald} fontSize={14} fontFamily="monospace" fontWeight="700">A</text>
+
+      {/* Magnitude recovery */}
+      <text x={W - 16} y={30} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">|A| = √(Aₓ² + A_y²)</text>
+      <text x={W - 16} y={44} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">θ = atan2(A_y, Aₓ)</text>
+    </svg>
+  )
+}
+
+// ─── Vector Addition Chain ────────────────────────────────────────────────────
+
+function VectorAdditionChain({ C }) {
+  const W = 480, H = 210
+
+  // Three vectors tip-to-tail, then resultant from origin
+  const vecs = [
+    { dx: 120, dy: -30,  color: C.brand,   label: 'A' },
+    { dx: 80,  dy: -90,  color: C.emerald, label: 'B' },
+    { dx: -40, dy: -60,  color: C.amber,   label: 'C' },
+  ]
+
+  let cx = 60, cy = H - 40
+  const start = { x: cx, y: cy }
+  const segments = vecs.map(v => {
+    const x1 = cx, y1 = cy
+    cx += v.dx; cy += v.dy
+    return { x1, y1, x2: cx, y2: cy, color: v.color, label: v.label }
+  })
+  const end = { x: cx, y: cy }
+
+  function arrowHead(x1, y1, x2, y2, color) {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    const ux = dx / len, uy = dy / len
+    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    return (
+      <>
+        <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
+        <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+      </>
+    )
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Chain vectors */}
+      {segments.map((s, i) => (
+        <g key={i}>
+          {arrowHead(s.x1, s.y1, s.x2, s.y2, s.color)}
+          <text
+            x={(s.x1 + s.x2) / 2 + (s.y2 - s.y1 > 0 ? 10 : -10)}
+            y={(s.y1 + s.y2) / 2 + (s.x2 - s.x1 > 0 ? -8 : 8)}
+            fill={s.color} fontSize={14} fontFamily="monospace" fontWeight="700"
+          >{s.label}</text>
+        </g>
+      ))}
+
+      {/* Resultant */}
+      {arrowHead(start.x, start.y, end.x, end.y, C.rose)}
+      <text x={(start.x + end.x) / 2 - 20} y={(start.y + end.y) / 2 + 16}
+        fill={C.rose} fontSize={13} fontFamily="monospace" fontWeight="700">R = A+B+C</text>
+
+      {/* Dots at joints */}
+      {[start, ...segments.map(s => ({ x: s.x2, y: s.y2 }))].map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={3} fill={C.muted} />
+      ))}
+
+      <text x={W / 2} y={H - 8} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Tip-to-tail: place each vector's tail at the previous tip. Resultant = tail of first → tip of last.
+      </text>
+    </svg>
+  )
+}
+
+// ─── Dot Product Projection ───────────────────────────────────────────────────
+
+function DotProductProjection({ C }) {
+  const W = 460, H = 200
+  const ox = 60, oy = H - 50
+
+  // Vector A along x-ish, vector B at an angle
+  const Ax = 260                 // A is horizontal (Ay = 0, shares oy baseline)
+  const angle = 38 * Math.PI / 180
+  const Blen = 170
+  const Bx = Blen * Math.cos(angle), By = -Blen * Math.sin(angle)
+
+  // Projection of B onto A: scalar = B·Â = Blen*cos(angle)
+  const projLen = Blen * Math.cos(angle)
+  const projX = ox + projLen, projY = oy   // projection foot
+
+  function arr(x1, y1, x2, y2, color) {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    const ux = dx / len, uy = dy / len
+    const hx = x2 - ux * 9, hy = y2 - uy * 9
+    return <>
+      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
+      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+    </>
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Drop line from B tip to projection */}
+      <line x1={ox + Bx} y1={oy + By} x2={projX} y2={projY}
+        stroke={C.muted} strokeWidth={1.5} strokeDasharray="4,3" />
+      {/* Right angle mark at foot */}
+      <rect x={projX - 8} y={projY - 8} width={8} height={8} fill="none" stroke={C.muted} strokeWidth={1} />
+
+      {/* Projection segment on A-axis */}
+      <line x1={ox} y1={oy} x2={projX} y2={projY}
+        stroke={C.sky} strokeWidth={4} opacity={0.5} />
+      <text x={(ox + projX) / 2} y={oy + 20} textAnchor="middle"
+        fill={C.sky} fontSize={11} fontFamily="monospace">B cos θ = A⃗·B⃗ / |A⃗|</text>
+
+      {/* Vectors */}
+      {arr(ox, oy, ox + Ax, oy, C.emerald)}
+      {arr(ox, oy, ox + Bx, oy + By, C.amber)}
+
+      {/* Angle arc */}
+      <path d={`M ${ox + 40} ${oy} A 40 40 0 0 0 ${ox + 40 * Math.cos(angle)} ${oy - 40 * Math.sin(angle)}`}
+        fill="none" stroke={C.amber} strokeWidth={1.5} />
+      <text x={ox + 48} y={oy - 16} fill={C.amber} fontSize={12} fontFamily="monospace">θ</text>
+
+      {/* Labels */}
+      <text x={ox + Ax / 2} y={oy - 10} textAnchor="middle" fill={C.emerald} fontSize={14} fontFamily="monospace" fontWeight="700">A⃗</text>
+      <text x={ox + Bx / 2 - 12} y={oy + By / 2} fill={C.amber} fontSize={14} fontFamily="monospace" fontWeight="700">B⃗</text>
+
+      {/* Formula */}
+      <text x={W - 16} y={24} textAnchor="end" fill={C.text} fontSize={13} fontFamily="monospace" fontWeight="700">A⃗·B⃗ = |A||B| cos θ</text>
+      <text x={W - 16} y={42} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">= (projection of B onto A) × |A|</text>
+    </svg>
+  )
+}
+
+// ─── Cross Product Right-Hand Rule ────────────────────────────────────────────
+
+function CrossProductRHR({ C }) {
+  const W = 480, H = 220
+  // Show A×B=C with arrows in 3D-ish perspective, plus formula
+  // Use a simple 2D oblique projection
+
+  // Origin
+  const ox = 120, oy = 140
+
+  // A vector (along "x" direction with slight up-right tilt)
+  const Ax = 140, Ay = -20
+  // B vector (up-left, into screen)
+  const Bx = -30, By = -100
+  // C = A×B (out of screen = upward in our 2D view, perpendicular to both)
+  const Cx = 0, Cy = -90   // drawn perpendicular-ish
+
+  // Project "out of screen" axis (z) slightly right-down
+  const Zx = 60, Zy = 30
+
+  function arr(x1, y1, x2, y2, color, width = 2.5) {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    if (len < 1) return null
+    const ux = dx / len, uy = dy / len
+    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    return <>
+      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={width} />
+      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+    </>
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Axes hint */}
+      <text x={ox + Ax + 8} y={oy + Ay + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">x</text>
+      <text x={ox + Bx - 10} y={oy + By - 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">y</text>
+      <text x={ox + Zx + 4} y={oy + Zy + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">z</text>
+      {arr(ox, oy, ox + Ax * 0.4, oy + Ay * 0.4, C.muted, 1)}
+      {arr(ox, oy, ox + Bx * 0.4, oy + By * 0.4, C.muted, 1)}
+      {arr(ox, oy, ox + Zx * 0.5, oy + Zy * 0.5, C.muted, 1)}
+
+      {/* A and B vectors */}
+      {arr(ox, oy, ox + Ax, oy + Ay, C.brand)}
+      {arr(ox, oy, ox + Bx, oy + By, C.emerald)}
+      {/* C = A×B */}
+      {arr(ox, oy, ox + Cx, oy + Cy, C.rose, 3)}
+
+      {/* Labels */}
+      <text x={ox + Ax + 6} y={oy + Ay} fill={C.brand} fontSize={15} fontFamily="monospace" fontWeight="700">A⃗</text>
+      <text x={ox + Bx - 20} y={oy + By - 4} fill={C.emerald} fontSize={15} fontFamily="monospace" fontWeight="700">B⃗</text>
+      <text x={ox + Cx + 8} y={oy + Cy} fill={C.rose} fontSize={15} fontFamily="monospace" fontWeight="700">A⃗×B⃗</text>
+
+      {/* Curved arrow showing curl from A to B */}
+      <path d={`M ${ox + 50} ${oy - 14} Q ${ox + 20} ${oy - 60} ${ox - 16} ${oy - 60}`}
+        fill="none" stroke={C.amber} strokeWidth={2} strokeDasharray="5,3" />
+      <text x={ox + 16} y={oy - 64} textAnchor="middle" fill={C.amber} fontSize={9} fontFamily="sans-serif">curl fingers A→B</text>
+
+      {/* Right panel: formula and rule */}
+      <text x={280} y={36} fill={C.text} fontSize={13} fontFamily="monospace" fontWeight="700">A⃗ × B⃗ = |A||B| sin θ n̂</text>
+      <text x={280} y={56} fill={C.muted} fontSize={9} fontFamily="sans-serif">n̂ = unit normal (right-hand rule)</text>
+      <text x={280} y={80} fill={C.sky} fontSize={11} fontFamily="monospace">Right-hand rule:</text>
+      <text x={280} y={96} fill={C.muted} fontSize={9} fontFamily="sans-serif">1. Point fingers along A⃗</text>
+      <text x={280} y={110} fill={C.muted} fontSize={9} fontFamily="sans-serif">2. Curl toward B⃗</text>
+      <text x={280} y={124} fill={C.muted} fontSize={9} fontFamily="sans-serif">3. Thumb points along A⃗×B⃗</text>
+      <text x={280} y={146} fill={C.rose} fontSize={10} fontFamily="monospace">B⃗×A⃗ = −(A⃗×B⃗)</text>
+      <text x={280} y={160} fill={C.muted} fontSize={9} fontFamily="sans-serif">Anti-commutative — order matters!</text>
+
+      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        |A⃗×B⃗| = area of parallelogram spanned by A⃗ and B⃗
+      </text>
+    </svg>
+  )
+}
+
+// ─── Free Body Diagram ────────────────────────────────────────────────────────
+
+function FreeBodyDiagram({ C }) {
+  const W = 420, H = 220
+  const cx = 180, cy = 120
+  const r = 28
+
+  const forces = [
+    { label: 'N (normal)',  dx: 0,    dy: -90, color: C.emerald },
+    { label: 'W = mg',     dx: 0,    dy: 80,  color: C.rose },
+    { label: 'F (applied)',dx: 100,  dy: -20, color: C.brand },
+    { label: 'f (friction)',dx: -80, dy: 0,   color: C.amber },
+  ]
+
+  function arr(x1, y1, x2, y2, color) {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    const ux = dx / len, uy = dy / len
+    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    return <>
+      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
+      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+    </>
+  }
+
+  // Edge point of circle in direction of force
+  function edgePoint(dx, dy) {
+    const len = Math.sqrt(dx * dx + dy * dy)
+    return [cx + (dx / len) * r, cy + (dy / len) * r]
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Object */}
+      <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} rx={4}
+        fill={C.surface} stroke={C.border} strokeWidth={1.5} />
+      <text x={cx} y={cy + 5} textAnchor="middle" fill={C.muted} fontSize={11} fontFamily="sans-serif">m</text>
+
+      {/* Forces */}
+      {forces.map((f, i) => {
+        const [ex, ey] = edgePoint(f.dx, f.dy)
+        return <g key={i}>{arr(ex, ey, ex + f.dx, ey + f.dy, f.color)}</g>
+      })}
+
+      {/* Labels on the right */}
+      {forces.map((f, i) => (
+        <g key={i}>
+          <rect x={W - 130} y={20 + i * 44} width={8} height={8} rx={2} fill={f.color} />
+          <text x={W - 118} y={29 + i * 44} fill={f.color} fontSize={11} fontFamily="monospace">{f.label}</text>
+        </g>
+      ))}
+
+      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        F_net = ΣF = ma — isolate the object, draw every force acting ON it
+      </text>
+    </svg>
+  )
+}
+
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
-  // Algebra-first
+  // Algebra-first (kinematics)
   'algebra-rectangle':    AlgebraRectangle,
   'algebra-trapezoid':    AlgebraTrapezoid,
   'algebra-avg-velocity': AlgebraAvgVelocity,
   // Bridge: algebra → calculus
   'slope-triangle':       SlopeTriangle,
   'riemann-rect':         RiemannRect,
-  // Calculus / reference
+  // Kinematics reference
   'kinematic-chain':      KinematicChain,
   'suvat-map':            SuvatMap,
   'free-fall-axes':       FreeFallAxes,
   'two-objects-line':     TwoObjectsLine,
+  // Vectors (Ch1)
+  'vector-components':       VectorComponents,
+  'vector-addition-chain':   VectorAdditionChain,
+  'dot-product-projection':  DotProductProjection,
+  'cross-product-rhr':       CrossProductRHR,
+  'free-body-diagram':       FreeBodyDiagram,
 }
 
 export default function SVGDiagram({ params = {} }) {

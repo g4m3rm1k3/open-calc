@@ -62,6 +62,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'Chain arrows end-to-end',
+        caption: 'Place the tail of B⃗ at the tip of A⃗, then the tail of C⃗ at the tip of B⃗. The shortcut from first tail to last tip is R⃗. The path shape changes with order; the endpoint never does.',
+      },
+      {
         id: 'TipToToeIntuition',
         title: 'Chain up to 4 vectors — drag, reorder, watch the resultant close the loop',
         mathBridge: 'The closing arrow from first tail to last tip is R⃗. Reorder the chain and it stays the same.',

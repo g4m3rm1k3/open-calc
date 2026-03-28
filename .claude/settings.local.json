@@ -24,7 +24,8 @@
       "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Motionalongline.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MotionAlongLine.jsx\")",
       "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Maximaminima.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MaximaMinima.jsx\")",
       "Bash(find . -name parseProse* -o -name MicroCycleLesson*)",
-      "Bash(grep -rn \"\\\\`\" src/content --include=\"*.js\")"
+      "Bash(grep -rn \"\\\\`\" src/content --include=\"*.js\")",
+      "Bash(grep -l \"SVGDiagram\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/content/physics-1/chapter-1/\"*.js)"
     ]
   }
 }

@@ -25,7 +25,15 @@ export default {
       { type: 'definition', title: 'Equilibrium condition', body: '\\sum F_x = 0 \\quad\\text{AND}\\quad \\sum F_y = 0' },
       { type: 'warning', title: 'Do not add magnitudes', body: 'F_{net} \\ne F_1 + F_2 + \\cdots\\text{ unless all forces are parallel. Always add components.}' },
     ],
-    visualizations: [{ id: 'ForceVectorIntuition', title: 'Add up to 4 force vectors — see net force and equilibrium status', mathBridge: 'Net force arrow updates live. Green = significant net force; badge shows equilibrium when |F_net| < 0.1.', caption: 'This is a free body diagram in motion.', props: { maxForces: 4 } }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'free-body-diagram' },
+        title: 'Free body diagram — forces as vectors',
+        caption: 'Isolate the object. Draw every force as a labeled arrow: Normal N (up), Weight W (down), Applied F (angled), Friction f (opposing motion). Then DSMD gives the net force vector.',
+      },
+      { id: 'ForceVectorIntuition', title: 'Add up to 4 force vectors — see net force and equilibrium status', mathBridge: 'Net force arrow updates live. Green = significant net force; badge shows equilibrium when |F_net| < 0.1.', caption: 'This is a free body diagram in motion.', props: { maxForces: 4 } },
+    ],
   },
   math: {
     prose: ['The component table for force problems adds one column: the force label (e.g. weight, normal, tension). This keeps bookkeeping clear in multi-force problems.'],

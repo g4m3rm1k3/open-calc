@@ -24,7 +24,15 @@ export default {
       { type: 'definition', title: 'Scalar Product', body: '\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}|\\cos\\phi' },
       { type: 'insight', title: 'Geometric meaning', body: 'The dot product is the shadow of one vector onto another, scaled by the other\'s length.' },
     ],
-    visualizations: [{ id: 'DotProductIntuition', title: 'Interactive Dot Product', mathBridge: 'Drag the vectors and watch the dot product value and the geometric projection update in real time.', caption: 'Projection is the key to understanding the dot product.' }],
+    visualizations: [
+      {
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'The projection picture',
+        caption: 'A⃗ · B⃗ = |A||B|cosφ. The dashed line drops perpendicular from B⃗\'s tip to A⃗\'s line — that foot is the projection of B⃗ onto A⃗. The dot product is (projection length) × |A|. When φ = 90°, the projection is zero.',
+      },
+      { id: 'DotProductIntuition', title: 'Interactive Dot Product', mathBridge: 'Drag the vectors and watch the dot product value and the geometric projection update in real time.', caption: 'Projection is the key to understanding the dot product.' },
+    ],
   },
   math: {
     prose: [
