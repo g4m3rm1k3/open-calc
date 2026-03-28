@@ -3,7 +3,7 @@ export default {
   id: 'ch3-070',
   slug: 'differentials',
   chapter: 3,
-  order: 7,
+  order: 3,
   title: 'Differentials',
   subtitle: 'The notation dy = f\'(x)dx is not just shorthand — it is a precise tool for estimating errors and bridging derivatives to integrals',
   tags: ['differentials', 'dx', 'dy', 'error estimation', 'propagation', 'relative error', 'linear approximation', 'uncertainty'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "Linear approximation says Δy ≈ f'(a)Δx for small changes. Differentials are that same idea given formal mathematical names: we write dx for the independent change (an infinitesimal nudge in x) and dy = f'(x)dx for the dependent change (how y responds along the tangent line). The notation is not just cosmetic — it is the same Leibniz notation you have used for derivatives since Chapter 2. In fact, dy/dx being a 'fraction of differentials' that you can cancel is why the chain rule and substitution rule work the way they do. This lesson makes that informal intuition precise.",
       "You already know linear approximation: $f(x + \\Delta x) \\approx f(x) + f'(x) \\cdot \\Delta x$ when $\\Delta x$ is small. Differentials repackage this idea with a subtle but important shift in emphasis. Instead of approximating the value of $f$ at a nearby point, we approximate the change in $f$. The actual change is $\\Delta y = f(x + \\Delta x) - f(x)$. The approximate change is $dy = f'(x)\\,dx$, where $dx = \\Delta x$ is the change in $x$. The approximation says $\\Delta y \\approx dy$ when $dx$ is small.",
       "What are $dx$ and $dy$ as standalone objects? Think of $dx$ as an independent variable — it represents an arbitrary (small) increment in $x$. Given $dx$, the differential $dy = f'(x)\\,dx$ is defined to be the change along the tangent line, not the change along the curve. The actual change $\\Delta y$ follows the curve; the differential $dy$ follows the tangent. For small $dx$, the tangent and the curve are nearly identical, so $\\Delta y \\approx dy$.",
       "This notation has enormous power in physics and engineering. When a physicist writes $dW = F\\,dx$ (work equals force times displacement) or $dQ = mc\\,dT$ (heat equals mass times specific heat times temperature change), they are using differentials. The equation $dy = f'(x)\\,dx$ looks like you can divide both sides by $dx$ to get $dy/dx = f'(x)$, and indeed this is consistent — differentials are designed so that the ratio $dy/dx$ recovers the derivative. This is why Leibniz notation works so well: the derivative literally is the ratio of differentials.",
@@ -52,7 +53,7 @@ export default {
       },
     ],
     visualizations: [
-                                            { vizId: 'LinearApproximation', caption: 'Compare $\\Delta y$ (change along the curve) with $dy$ (change along the tangent line). For small $dx$, they are nearly equal.' },
+      { vizId: 'LinearApproximation', caption: "The differential dy = 12·dx approximates the actual curve change Δy for f(x) = x³ at a = 2. Error is O(dx²).", mathBridge: "Set f(x) = x³ and base point a = 2. Compute f(2) = 8 and f'(2) = 12. So dy = 12·dx. Move dx to 0.1: dy = 1.2, Δy = f(2.1) − f(2) = 9.261 − 8 = 1.261. Error = 0.061. Move dx to 0.01: dy = 0.12, Δy ≈ 0.1206. The error shrinks as (dx)². This is why dy is a good approximation for small dx." },
     ],
   },
 
@@ -83,7 +84,7 @@ export default {
       },
     ],
     visualizations: [
-      { vizId: 'LinearApproximation', caption: 'The differential $dy$ (tangent-line change) approximates $\\Delta y$ (curve change). The approximation error is $O(dx^2)$.' },
+      { vizId: 'LinearApproximation', caption: "Second-order error analysis: the quadratic gap between tangent and curve is bounded by the second derivative.", mathBridge: "The gap between the red curve and blue tangent line represents the approximation error |Δy − dy|. Taylor's theorem proves this gap is bounded by M/2·(dx)² where M = max|f''| on the interval. For f(x) = x³, f''(x) = 6x, so M ≈ 6·2 = 12 near x = 2. Error bound: 12/2·(0.1)² = 0.06, matching the observed error." },
     ],
   },
 
@@ -360,4 +361,17 @@ export default {
       reviewSection: 'Math — Error propagation for a cube',
     },
   ],
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Linear Approximation (Lesson 2)', note: 'Differentials are linear approximation in disguise: dy = f\'(x)dx is just Δy ≈ f\'(a)Δx with new notation' },
+      { label: 'Leibniz Notation (Ch. 2)', note: "The dy/dx notation you've been using IS a ratio of differentials — dx is an infinitesimal change in x, dy = f'(x)dx is the resulting change in y along the tangent" },
+      { label: 'Chain Rule (Ch. 2)', note: 'The chain rule dy/du · du/dx = dy/dx literally cancels differentials — this is why Leibniz notation was designed the way it was' },
+    ],
+    futureLinks: [
+      { label: 'Substitution Rule (Ch. 4)', note: 'In integration, the substitution u = g(x) uses du = g\'(x)dx — this is exactly the differential formalism you are learning now' },
+      { label: 'Error Propagation', note: 'In physics and engineering, differential notation encodes how measurement uncertainty propagates: if you measure r with error dr, then volume error dV = 4πr²dr' },
+      { label: 'Line Integrals (Multivariable)', note: 'The total differential df = (∂f/∂x)dx + (∂f/∂y)dy generalizes to multiple variables — the same structure, more dimensions' },
+    ],
+  },
 }

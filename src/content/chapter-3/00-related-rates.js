@@ -3,7 +3,7 @@ export default {
   id: "ch3-000",
   slug: "related-rates",
   chapter: 3,
-  order: 0,
+  order: 4,
   title: "Related Rates",
   subtitle:
     "When two quantities are geometrically linked, their rates of change are linked too — by the chain rule",
@@ -27,6 +27,7 @@ export default {
 
   intuition: {
     prose: [
+      "You have the chain rule, implicit differentiation, and all the tools of Chapter 2. Related rates is their first application in the wild. The setup is always this: two quantities are geometrically linked (a fixed triangle, a fixed volume, a fixed distance), and you want to know how fast one changes when you know how fast the other changes. The chain rule does the work — you just need to know when to apply it. Every air traffic controller, every civil engineer tracking water levels, every physician modeling drug concentration is doing related rates in some form.",
       "The key insight behind all related rates problems is this: two quantities are linked by a geometric or physical relationship, and that relationship does not just constrain the values — it also constrains the rates of change. If the position of the base of a ladder is x(t) and the position of the top is y(t), the Pythagorean theorem says x² + y² = L² (where L is the fixed ladder length). This equation holds for every value of t, not just one particular instant. It is an identity in t, valid throughout the motion.",
       'Because x² + y² = L² holds for all t, we can differentiate both sides with respect to t. The right side is constant, so its derivative is 0. The left side requires the chain rule: d/dt[x²] = 2x·(dx/dt) and d/dt[y²] = 2y·(dy/dt). So we get 2x(dx/dt) + 2y(dy/dt) = 0. This single equation is the "rate equation" — it links dx/dt and dy/dt at every moment. Given one rate, you can solve for the other.',
       "The chain rule is the engine driving every related rates calculation. Whenever you differentiate a function of a variable that itself depends on t, you must multiply by the derivative of that variable with respect to t. This is d/dt[f(x(t))] = f'(x)·(dx/dt). In the ladder problem, x is a function of t, so d/dt[x²] = 2x·(dx/dt) — you cannot just write 2x. The (dx/dt) factor is essential because x itself is changing in time.",
@@ -73,7 +74,13 @@ export default {
     ],
 
     visualizations: [
-                                                      {
+      {
+        id: "RelatedRatesLadder",
+        title: "Sliding Ladder: Live Rate Animation",
+        mathBridge: "The ladder is 10 ft long. Set x = 6 ft (base from wall). By Pythagorean theorem, y = √(100 − 36) = 8 ft. The rate equation from differentiating x² + y² = 100 is 2x(dx/dt) + 2y(dy/dt) = 0. Plug in: 2(6)(2) + 2(8)(dy/dt) = 0. Solve: dy/dt = −24/16 = −1.5 ft/s. The top drops slower than the base slides out. Verify with the animation.",
+        caption: "Watch the ladder slide and observe how dy/dt changes as x grows — the top accelerates as the ladder approaches horizontal.",
+      },
+      {
         id: "Ch6_TwoTanks",
         title: "Story Mode: Two Tanks, One Valve",
         mathBridge:
@@ -753,26 +760,16 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch2-implicit-differentiation",
-            "label": "Previous (Ch. 2): Implicit Differentiation",
-            "note": "Related rates IS implicit differentiation with t (time) as the independent variable. Every d/dx[y] from implicit differentiation becomes d/dt[y] = dy/dt in related rates. The algebra is identical."
-        },
-        {
-            "lessonId": "ch2-chain-rule",
-            "label": "Ch. 2: Chain Rule",
-            "note": "The rate factor (e.g., dx/dt) in every term comes from the chain rule. Forgetting it is the most common related-rates error — identical to the chain rule error from Ch. 2."
-        }
+    recoveryPoints: [
+      { label: 'Implicit Differentiation (Ch. 2)', note: 'Related rates IS implicit differentiation with time as the variable — every variable in your equation is a function of t' },
+      { label: 'Chain Rule (Ch. 2)', note: 'd/dt[f(x(t))] = f\'(x)·(dx/dt) — the chain rule is why every term picks up a (d/dt) factor' },
+      { label: 'Pythagorean Theorem / Geometry', note: 'Most related-rates diagrams produce geometric constraints (x² + y² = L², similar triangles, volume = (1/3)πr²h) — draw first, always' },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch3-optimization",
-            "label": "Next: Optimization",
-            "note": "Optimization also requires setting up geometric/physical constraint equations and using calculus to extract information. The modeling discipline is the same; the question is \"max/min\" instead of \"rate.\""
-        }
-    ]
-},
+    futureLinks: [
+      { label: 'Optimization (Lesson 6)', note: 'Optimization asks: at what INSTANT is the rate zero? Related rates asks: what IS the rate at a given instant? Same tools, different question' },
+      { label: 'Parametric Equations (Ch. 6)', note: 'In parametric curves, x(t) and y(t) are exactly the time-dependent quantities of related rates — dy/dx = (dy/dt)/(dx/dt)' },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

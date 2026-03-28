@@ -3,7 +3,7 @@ export default {
   id: 'ch3-001',
   slug: 'linear-approximation',
   chapter: 3,
-  order: 1,
+  order: 2,
   title: 'Linear Approximation & Differentials',
   subtitle: 'Zoom in on any smooth curve far enough and it becomes a straight line — and that line is enormously useful',
   tags: ['linear approximation', 'linearization', 'differentials', 'tangent line', 'error analysis', 'Taylor polynomial', 'sensitivity'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "The Mean Value Theorem proved that instantaneous and average rates must agree somewhere. Now we flip the idea into a practical tool: if we know f(a) and f'(a), we can approximate f(x) for x near a. This is linear approximation — the tangent line used as a calculator. NASA used linear approximation to compute trajectories in the 1960s. Your calculator uses it internally for sin, cos, exp, and ln. Engineers use it constantly for 'small signal analysis.' The idea sounds simple, but it is one of the most used tools in applied mathematics.",
       'Start with the central geometric fact: if you zoom into a differentiable function f at a point x = a, the curve eventually becomes indistinguishable from a straight line — the tangent line. This is not just a visual trick; it is the precise meaning of differentiability. A function is differentiable at a if and only if it "looks linear" at infinitely high magnification at a. The tangent line L(x) = f(a) + f\'(a)(x - a) is the unique line that matches both the function value and the slope of f at the point (a, f(a)). Because the curve and the tangent line agree in both value and direction at x = a, they stay close to each other for x near a.',
       'Think of it as replacing f with its tangent line locally. The linearization (also called the linear approximation) of f at x = a is L(x) = f(a) + f\'(a)(x - a). When you use L(x) as a surrogate for f(x) near a, you are making an approximation error f(x) - L(x). By Taylor\'s theorem, this error is approximately f\'\'(a)(x-a)²/2 — it grows like the square of the distance from a. This means the error is O((x-a)²): if you halve the distance from a, you quarter the error. For x very close to a, the linear approximation is astonishingly accurate.',
       'To estimate √26 without a calculator, choose a nearby perfect square: a = 25, f(x) = √x, f(a) = 5. Compute f\'(x) = 1/(2√x), so f\'(25) = 1/10. The linearization is L(x) = 5 + (1/10)(x - 25). At x = 26: L(26) = 5 + (1/10)(1) = 5.1. The actual value is √26 ≈ 5.0990..., so the error is about 0.001 — less than two parts in ten thousand. For √24: L(24) = 5 + (1/10)(-1) = 4.9. Actual: √24 ≈ 4.899... Error ≈ 0.001. The linear approximation is symmetric and equally accurate on both sides.',
@@ -59,7 +60,8 @@ export default {
       {
         id: "DerivativesRatesOfChange",
         title: "Derivatives as Rates of Change",
-        caption: "Explore marginal cost, population growth, and the amount of change formula.",
+        caption: "Linear approximation of √x at a = 25: the tangent line gives excellent estimates near the base point, degrading farther away.",
+        mathBridge: "Set the function to f(x) = √x and the base point to a = 25. The tangent line at a = 25 has slope f'(25) = 1/(2√25) = 1/10. So L(x) = 5 + (x − 25)/10. Try x = 26: L(26) = 5.1. Actual: √26 ≈ 5.099. Error: 0.001. Now try x = 30: L(30) = 5.5. Actual: √30 ≈ 5.477. Error: 0.023. Notice how error grows as you move away from the base point.",
       },
       {
         id: 'LinearApproximation',
@@ -302,26 +304,17 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch0-lines",
-            "label": "Ch. 0: Lines",
-            "note": "The linearization IS a line — specifically the tangent line from Ch. 0. The formula y - f(a) = f'(a)(x-a) is the point-slope form of a line with slope f'(a) through the point (a, f(a))."
-        },
-        {
-            "lessonId": "ch2-tangent-problem",
-            "label": "Ch. 2: The Derivative and Tangent Lines",
-            "note": "You learned to find the tangent line equation in Ch. 2. The linearization is that same tangent line, now used as an approximating function."
-        }
+    recoveryPoints: [
+      { label: 'Tangent Line (Ch. 2)', note: 'Linear approximation IS the tangent line repackaged as a practical tool: L(x) = f(a) + f\'(a)(x − a)' },
+      { label: 'Differentiability (Ch. 2)', note: 'The approximation only works because differentiability means the function looks like its tangent line locally' },
+      { label: 'Mean Value Theorem (Lesson 1)', note: 'MVT lets us bound the approximation error: |f(x) − L(x)| ≤ M/2 · (x − a)² where M = max|f\'\'| on [a, x]' },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch5-taylor-maclaurin",
-            "label": "Ch. 5: Taylor Series",
-            "note": "The linearization is the degree-1 Taylor polynomial. Taylor series extend this idea to degree-n polynomial approximations, capturing higher-order curvature."
-        }
-    ]
-},
+    futureLinks: [
+      { label: 'Differentials (Lesson 3)', note: 'Differentials are linear approximation written in dy/dx form: dy = f\'(a)dx. Same idea, different notation, used in engineering' },
+      { label: 'Related Rates (Lesson 4)', note: 'Many related-rates problems use linear approximation to estimate how one rate affects another for small changes' },
+      { label: 'Taylor Series (Ch. 5)', note: 'Linear approximation is the degree-1 Taylor polynomial. Chapter 5 extends this to any degree for better accuracy' },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

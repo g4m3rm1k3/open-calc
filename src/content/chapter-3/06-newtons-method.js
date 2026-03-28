@@ -3,7 +3,7 @@ export default {
   id: 'ch3-060',
   slug: 'newtons-method',
   chapter: 3,
-  order: 6,
+  order: 8,
   title: "Newton's Method",
   subtitle: 'Use tangent lines to hunt down roots with extraordinary speed — each step roughly doubles the number of correct digits',
   tags: ['Newton method', 'root finding', 'iteration', 'numerical methods', 'convergence', 'tangent line', 'approximation'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "You have spent this chapter using derivatives to analyze functions — their shape, their extrema, their limits. Newton's Method closes the chapter with a different kind of application: using derivatives to SOLVE equations. The idea is elegant: if you cannot solve f(x) = 0 algebraically, linearize f near your current best guess, solve the linear equation, and use that solution as your next guess. Repeat. The method converges so fast that it roughly doubles the number of correct decimal digits at every step. This is the algorithm behind square-root computations, GPS positioning, and most of the numerical methods in science and engineering.",
       "The idea behind Newton's Method is disarmingly simple. You want to solve $f(x) = 0$, but the equation is too complicated for algebra. So you start with a guess $x_0$ that is reasonably close to the root. At the point $(x_0, f(x_0))$, you draw the tangent line to the curve $y = f(x)$. This tangent line is a good local approximation to the curve, and it is easy to find where a straight line crosses the $x$-axis. Call that crossing point $x_1$. Now repeat: draw the tangent line at $(x_1, f(x_1))$ and find where it hits the $x$-axis to get $x_2$. Keep going. Each new point $x_n$ is (usually) closer to the true root than the last.",
       "Why does this work? Near a root, a smooth function looks almost like a straight line — this is precisely what differentiability means. The tangent line captures that local linear behavior. When you follow the tangent line to the $x$-axis, you are essentially solving the linearized version of the equation $f(x) = 0$. Since linearization is a good approximation near the root, the solution of the linearized equation is close to the true root. And the closer you start, the better the linear approximation, which is why the method accelerates as it converges.",
       "Let us derive the formula. The tangent line to $y = f(x)$ at the point $(x_n, f(x_n))$ is $y - f(x_n) = f'(x_n)(x - x_n)$. Setting $y = 0$ (finding the $x$-intercept): $-f(x_n) = f'(x_n)(x - x_n)$. Solving for $x$: $x = x_n - \\frac{f(x_n)}{f'(x_n)}$. This gives the iteration formula: $x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}$. Each step requires evaluating $f$ and $f'$ at the current guess, then updating.",
@@ -57,7 +58,7 @@ export default {
       },
     ],
     visualizations: [
-          { vizId: 'NewtonsMethod', caption: "Watch Newton's Method in action: each tangent line takes you closer to the root." },
+      { vizId: 'NewtonsMethod', mathBridge: "Solve f(x) = x² − 2 = 0 (i.e., compute √2). f'(x) = 2x. Start at x₀ = 1. Step 1: x₁ = 1 − (1−2)/(2·1) = 1.5. Step 2: x₂ = 1.5 − (2.25−2)/(3) = 1.4167. Step 3: x₃ = 1.4167 − (2.0050−2)/(2.833) = 1.4142. By step 4 you have 11 correct digits. Watch the tangent lines in the animation — each one aims closer to x = √2 ≈ 1.41421.", caption: "Newton's Method computing √2: each tangent line overshoots slightly, but the sequence 1 → 1.5 → 1.4167 → 1.4142... converges quadratically." },
     ],
   },
 
@@ -87,7 +88,7 @@ export default {
       },
     ],
     visualizations: [
-      { vizId: 'NewtonsMethod', caption: "Each iteration draws a tangent line and follows it to the $x$-axis, converging rapidly to the root." },
+      { vizId: 'NewtonsMethod', mathBridge: "Try a case where Newton's Method fails. Set f(x) = x^(1/3) (cube root). f'(x) = (1/3)x^(−2/3). The iteration gives xₙ₊₁ = xₙ − xₙ^(1/3) / ((1/3)xₙ^(−2/3)) = xₙ − 3xₙ = −2xₙ. This DIVERGES: the iterates double in magnitude each step. Start at x₀ = 1: x₁ = −2, x₂ = 4, x₃ = −8... The root is at 0, but we fly away. Why? The derivative at the root is undefined (infinite), violating the theorem's hypothesis f'(r) ≠ 0.", caption: "Newton's Method failure on f(x) = x^(1/3): when f'(r) = 0 at the root, the iteration diverges instead of converging." },
     ],
   },
 
@@ -380,4 +381,46 @@ export default {
       reviewSection: "Intuition — Babylonian square root algorithm",
     },
   ],
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Linear Approximation (Lesson 2)', note: "Newton's Method IS iterated linear approximation: at each step, replace f(x) with its tangent line and solve the linear equation" },
+      { label: 'Tangent Line (Ch. 2)', note: 'The tangent line at (xₙ, f(xₙ)) has equation y − f(xₙ) = f\'(xₙ)(x − xₙ). Setting y = 0 gives xₙ₊₁ — this is the entire algorithm' },
+      { label: 'Implicit Differentiation (Ch. 2)', note: 'To solve g(x, y) = 0 for y, Newton\'s Method in two variables uses the Jacobian — same principle, same tangent-line idea' },
+    ],
+    futureLinks: [
+      { label: 'Optimization (Lesson 6)', note: 'To find critical points of f, solve f\'(x) = 0. Newton\'s Method applied to f\'(x) uses f\'\'(x): xₙ₊₁ = xₙ − f\'(xₙ)/f\'\'(xₙ)' },
+      { label: 'Numerical Integration (Ch. 4)', note: 'Many integration methods (Runge-Kutta, etc.) use Newton-style iteration under the hood — calculus powers the algorithms that power computation' },
+      { label: 'Multivariable Newton (Calc 3)', note: 'For systems of equations F(x) = 0 in ℝⁿ, Newton\'s Method uses the Jacobian matrix: xₙ₊₁ = xₙ − J(xₙ)⁻¹F(xₙ)' },
+    ],
+  },
+
+  assessment: {
+    questions: [
+      {
+        id: 'nm-q1',
+        type: 'multiple-choice',
+        question: "Apply one step of Newton's Method to $f(x) = x^2 - 5$ starting from $x_0 = 2$. What is $x_1$?",
+        options: ['2.5', '2.25', '2.1', '2.4'],
+        answer: 'b',
+        explanation: "$f(x_0) = 4 - 5 = -1$, $f'(x_0) = 2(2) = 4$. So $x_1 = 2 - (-1)/4 = 2 + 0.25 = 2.25$. This is approaching $\\sqrt{5} \\approx 2.236$.",
+      },
+      {
+        id: 'nm-q2',
+        type: 'multiple-choice',
+        question: "Newton's Method converges quadratically. If the error at step $n$ is $10^{-3}$, roughly what is the error at step $n+1$?",
+        options: ['$10^{-3}$', '$10^{-4}$', '$10^{-6}$', '$10^{-9}$'],
+        answer: 'c',
+        explanation: "Quadratic convergence means $|e_{n+1}| \\approx C|e_n|^2$. With $C \\approx 1$ and $e_n = 10^{-3}$, we get $e_{n+1} \\approx (10^{-3})^2 = 10^{-6}$. The number of correct digits doubles.",
+      },
+      {
+        id: 'nm-q3',
+        type: 'multiple-choice',
+        question: "Newton's Method is applied to $f(x) = \\sin(x)$ starting near $x_0 = 3$. To which root does it converge?",
+        options: ['$x = 0$', '$x = \\pi$', '$x = 2\\pi$', 'It diverges'],
+        answer: 'b',
+        explanation: "Starting near $x = 3 \\approx \\pi$, the nearest root of $\\sin(x) = 0$ is $x = \\pi \\approx 3.14159$. Newton's Method converges to the root closest to the initial guess (when the function is well-behaved near that root).",
+      },
+    ],
+  },
 }

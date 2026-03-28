@@ -3,7 +3,7 @@ export default {
   id: "ch3-004",
   slug: "optimization",
   chapter: 3,
-  order: 4,
+  order: 6,
   title: "Optimization",
   subtitle:
     "Finding the best — maximum area, minimum cost, optimal angle — using critical points and the Extreme Value Theorem",
@@ -28,6 +28,7 @@ export default {
 
   intuition: {
     prose: [
+      "Curve sketching told you the whole story of a function. Optimization asks a sharper question: what is the BEST value? Maximizing area with fixed fencing, minimizing cost with fixed constraints, finding the angle that maximizes a projectile's range — these are the problems that motivated Newton and Leibniz to invent calculus in the first place. The strategy is always the same: translate the problem into a single-variable function, find its derivative, set derivative equal to zero to find candidates, classify them as max or min, and check the endpoints if on a closed interval. Every applied calculus problem you will ever see follows this blueprint.",
       "All optimization problems share the same mathematical skeleton: identify the quantity you want to maximize or minimize (the objective function), identify the constraint that links your variables, use the constraint to reduce the objective to a single-variable function, then find the critical points of that reduced function and check which gives the global optimum. The geometry varies enormously — from rectangles to cylinders to light rays — but the procedure is always the same. Once you recognize this structure, optimization problems become systematic rather than mysterious.",
       "The Extreme Value Theorem (EVT) is the guarantee that global extrema exist on closed intervals. If f is continuous on [a,b], then f attains both a global maximum and a global minimum on [a,b]. This is a non-trivial theorem — it fails for open intervals (consider f(x) = x on (0,1), which approaches but never attains the values 0 and 1) and for discontinuous functions. The EVT relies on the completeness of the real numbers. For calculus problems, the EVT justifies the closed-interval method: evaluate f at all critical points in (a,b) and at both endpoints a, b; the largest value is the global max and the smallest is the global min.",
       "For open intervals or unbounded domains (which are more common in word problems), you cannot use the endpoint evaluation directly. Instead, you rely on physical reasoning: if the problem guarantees a maximum or minimum exists (physically, there must be some optimal value), and you find only one critical point that is a local min, then it must be the global min. This \"one critical point\" argument is valid for many engineering and economic problems but requires justification. More rigorously: if f is continuous on (a,b), lim_{x→a⁺} f(x) = +∞ (or approaches a limit below the critical value), and lim_{x→b⁻} f(x) = +∞, and there is one critical point with f''> 0, then that critical point gives the global minimum.",
@@ -72,7 +73,8 @@ export default {
       {
         id: "MaximaMinima",
         title: "Maxima and Minima",
-        caption: "Explore Extreme Value Theorem, Fermat's Theorem, and critical points.",
+        mathBridge: "Classic fencing problem: you have 200 meters of fence and want to enclose a rectangle against a barn wall (so only 3 sides need fence). If the width is x, length is (200 − 2x)/1. Wait — draw it: width x, the two short sides cost 2x, the one long side costs 200 − 2x. Area = x(200 − 2x) = 200x − 2x². Take derivative: A'(x) = 200 − 4x. Set to zero: x = 50. Check: A(50) = 50·100 = 5000 m². Verify this is a maximum: A''(x) = −4 < 0. Drag the width slider to x = 50 and confirm maximum area.",
+        caption: "Optimization of rectangular area with 200 m of fence: critical point at x = 50 gives maximum area of 5000 m².",
       },
       {
         id: "Ch5_QuadraticShadow",
@@ -685,26 +687,18 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch3-curve-sketching",
-            "label": "Previous: Curve Sketching",
-            "note": "Optimization uses exactly the same critical-point machinery as curve sketching. The difference is that you now have a real-world question attached to the mathematics."
-        },
-        {
-            "lessonId": "ch3-related-rates",
-            "label": "Ch. 3: Related Rates",
-            "note": "Both related rates and optimization require translating a geometric/physical situation into an equation. That modeling discipline — diagram, label, write constraint — is identical."
-        }
+    recoveryPoints: [
+      { label: 'Critical Points (Ch. 2)', note: 'Every interior maximum or minimum satisfies f\'(c) = 0 — finding critical points is the heart of optimization' },
+      { label: 'Curve Sketching (Lesson 5)', note: 'Optimization is a focused version of curve sketching: you care only about the highest or lowest point, not the whole portrait' },
+      { label: 'Extreme Value Theorem (Calculus)', note: 'A continuous function on a closed interval [a, b] ALWAYS achieves its max and min — this guarantees the solution exists before you search for it' },
+      { label: 'Constraint Algebra', note: 'Most optimization problems have two equations: an objective function to maximize/minimize, and a constraint to eliminate one variable' },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch4-applications",
-            "label": "Ch. 4: Applications of Integration",
-            "note": "Some optimization problems involve integrals (e.g., minimizing arc length, maximizing enclosed area). The same modeling approach applies, but the objective function requires integration."
-        }
-    ]
-},
+    futureLinks: [
+      { label: 'Related Rates (Lesson 4)', note: 'Related rates asks "how fast?" at a given instant; optimization asks "when is the rate zero?" — the extremum is where the rate of change of the objective is zero' },
+      { label: 'Multivariable Optimization (Calc 3)', note: 'With two variables, you set both partial derivatives to zero: ∂f/∂x = 0 and ∂f/∂y = 0 — same idea, more dimensions' },
+      { label: 'Lagrange Multipliers (Calc 3)', note: 'The constraint-substitution method here generalizes to Lagrange multipliers for constrained optimization in multiple dimensions' },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

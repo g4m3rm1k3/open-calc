@@ -3,7 +3,7 @@ export default {
   id: 'ch3-005',
   slug: 'lhopital',
   chapter: 3,
-  order: 5,
+  order: 7,
   title: "L'Hôpital's Rule",
   subtitle: "When limits produce 0/0 or ∞/∞, differentiate numerator and denominator separately — a consequence of the MVT",
   tags: ["l'hopital", "l'hopital's rule", 'indeterminate forms', 'limits', '0/0', 'infinity over infinity', 'Cauchy MVT', 'indeterminate powers', 'sinc function'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "In Chapter 1, you learned that some limits produce the indeterminate form 0/0 — and you handled them by factoring, conjugate multiplication, or trigonometric identities. But those were tricks for special cases. L'Hôpital's Rule is the general weapon: whenever both numerator and denominator approach 0 (or both approach ∞), you can replace the limit of the ratio with the limit of the ratio of derivatives. It sounds almost too simple to be true, but it works because near the limit point, both f(x) and g(x) look like their tangent lines — and the ratio of tangent lines is exactly f'(a)/g'(a).",
       "The basic idea is beautifully simple once you understand linear approximation. Suppose f(c) = 0 and g(c) = 0. Near x = c, both functions are well approximated by their linearizations: f(x) ≈ f'(c)(x-c) and g(x) ≈ g'(c)(x-c) (since f(c) = g(c) = 0, the constant terms vanish). Dividing: f(x)/g(x) ≈ f'(c)(x-c)/[g'(c)(x-c)] = f'(c)/g'(c). The (x-c) factors cancel! L'Hôpital's Rule is the formal version of this linear approximation argument. Near a zero of both numerator and denominator, both functions look like their derivatives times (x-c), and the (x-c) factors cancel in the ratio.",
       "The formal statement: if lim_{x→c} f(x) = 0 and lim_{x→c} g(x) = 0, and if lim_{x→c} f'(x)/g'(x) exists (or equals ±∞), and g'(x) ≠ 0 near c (except possibly at c itself), then lim_{x→c} f(x)/g(x) = lim_{x→c} f'(x)/g'(x). The same rule applies when f(x) → ±∞ and g(x) → ±∞ (the ∞/∞ form), and also for one-sided limits and limits as x → ±∞. The rule can be applied repeatedly: if f'/g' is still 0/0, apply it again. Each application simplifies the problem, typically by reducing the degree of the functions involved.",
       "The other five indeterminate forms (0·∞, ∞-∞, 1^∞, 0^0, ∞^0) all convert to 0/0 or ∞/∞ through algebraic manipulation. For 0·∞: write f(x)·g(x) = f(x)/(1/g(x)) = 0/0, or g(x)/(1/f(x)) = ∞/∞. Which form to use depends on which gives a simpler derivative. For the power forms 1^∞, 0^0, ∞^0: take logarithms. If L = lim f(x)^{g(x)}, then ln(L) = lim g(x)·ln(f(x)). This converts the power form to a 0·∞ limit in the exponent, which then converts to 0/0 or ∞/∞. After evaluating ln(L) = K, conclude L = e^K.",
@@ -49,7 +50,8 @@ export default {
                   {
         id: 'LHopitalViz',
         title: "L'Hôpital's Rule — Side-by-Side",
-        caption: "Left: f(x)/g(x) with a hole at the limit point. Right: f'(x)/g'(x), which is defined at the limit point. Both values converge to the same limit L.",
+        mathBridge: "Try the limit lim_{x→0} sin(x)/x. Direct substitution gives 0/0. Apply L'Hôpital: differentiate numerator and denominator separately — d/dx[sin(x)] = cos(x), d/dx[x] = 1. New limit: cos(0)/1 = 1. Confirm visually: as x → 0, the ratio sin(x)/x approaches 1. Now try lim_{x→0} (1 − cos(x))/x². Two applications of L'Hôpital needed: first gives sin(x)/(2x) = 0/0 again, second gives cos(x)/2 → 1/2.",
+        caption: "L'Hôpital's Rule resolves sin(x)/x → 1 as x → 0: replace the limit of ratio with limit of ratio of derivatives.",
       },
     ],
   },
@@ -379,4 +381,17 @@ export default {
       reviewSection: "Rigor — Three applications of L'Hôpital",
     },
   ],
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Limits (Ch. 1)', note: 'L\'Hôpital\'s Rule resolves limits that look like 0/0 or ∞/∞ — the indeterminate forms you saw in Chapter 1 but could not always evaluate' },
+      { label: 'Linear Approximation (Lesson 2)', note: "The intuition behind L'Hôpital: near x = a, f(x) ≈ f'(a)(x−a) and g(x) ≈ g'(a)(x−a), so f(x)/g(x) ≈ f'(a)/g'(a)" },
+      { label: 'Mean Value Theorem (Lesson 1)', note: "L'Hôpital's Rule is proved using the Cauchy Mean Value Theorem, a generalization of the ordinary MVT" },
+    ],
+    futureLinks: [
+      { label: 'Improper Integrals (Ch. 4)', note: 'Improper integrals like ∫₀^∞ xe^{−x}dx involve limits of the form 0·∞ — L\'Hôpital (after algebraic manipulation) resolves them' },
+      { label: 'Taylor Series (Ch. 5)', note: "L'Hôpital is a shortcut for limits that Taylor series would resolve more transparently — for limits like sin(x)/x, both methods give 1" },
+      { label: 'Indeterminate Forms in Physics', note: 'The sinc function sin(x)/x appears in optics diffraction patterns; its limit at 0 is 1 by L\'Hôpital, critical for understanding wave interference' },
+    ],
+  },
 }

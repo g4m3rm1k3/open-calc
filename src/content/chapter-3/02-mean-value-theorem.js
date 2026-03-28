@@ -3,7 +3,7 @@ export default {
   id: 'ch3-002',
   slug: 'mean-value-theorem',
   chapter: 3,
-  order: 2,
+  order: 1,
   title: 'The Mean Value Theorem',
   subtitle: 'If your average speed was 75 mph, then at some moment your instantaneous speed was exactly 75 mph — and the proof uses only derivatives',
   tags: ['mean value theorem', 'Rolle\'s theorem', 'average rate', 'instantaneous rate', 'increasing functions', 'antiderivatives', 'Cauchy MVT', 'L\'Hôpital preview'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "Rolle's Theorem proved that equal endpoints force a horizontal tangent. But what about unequal endpoints? The Mean Value Theorem answers this: between any two points on a differentiable curve, there is always some point where the instantaneous rate of change equals the average rate of change over the whole interval. This sounds dry, but it is the engine behind almost every theorem in Chapter 3. Increasing functions, decreasing functions, the first derivative test, L'Hôpital's Rule — all of these rest on the MVT. Newton called it the cornerstone of calculus.",
       'The geometric picture makes the MVT obvious once you see it. Draw any smooth curve from point A = (a, f(a)) to point B = (b, f(b)). The secant line from A to B has slope m = (f(b) - f(a))/(b - a) — the average rate of change over the interval. Now imagine a horizontal line sliding up from below, parallel to the secant. At some point, this sliding line first touches the curve — at a tangent point. At that tangent point c, the tangent line is parallel to the secant, meaning f\'(c) = m. That is the entire content of the Mean Value Theorem: somewhere between a and b, the instantaneous slope equals the average slope.',
       "Rolle's Theorem is the special case where f(a) = f(b) — the starting and ending values are equal. In this case, the secant is horizontal (slope 0), and the tangent must also be horizontal somewhere. Geometrically: if you start and end at the same height, the graph must have a horizontal tangent somewhere in between. A ball thrown upward eventually falls — it must stop (instantaneous velocity = 0) at the peak. A pendulum swinging back to its starting position must momentarily stop at the peak. Rolle's Theorem captures this intuition precisely.",
       "To prove the MVT from Rolle's Theorem, define a new function g(x) that subtracts the secant line from f: g(x) = f(x) - [f(a) + ((f(b)-f(a))/(b-a))·(x-a)]. This g measures how far f is above the secant line. Note that g(a) = 0 and g(b) = 0 (f equals the secant at both endpoints). So g satisfies Rolle's hypotheses. Rolle's Theorem gives a point c in (a,b) with g'(c) = 0. But g'(x) = f'(x) - (f(b)-f(a))/(b-a), so g'(c) = 0 means f'(c) = (f(b)-f(a))/(b-a). That is the MVT. The trick is simply to subtract the secant line to create a function that satisfies Rolle's hypothesis.",
@@ -54,7 +55,8 @@ export default {
                                 {
         id: 'SpeedingTicket',
         title: 'The Speeding Ticket Paradox',
-        caption: 'Average speed vs. Instantaneous speed. If the average exceeds the limit, the MVT guarantees you were speeding at some point.',
+        mathBridge: "You drove 120 miles in 2 hours. Your average speed was 60 mph. The MVT says: at some moment during that drive, your speedometer read exactly 60 mph. Set the start and end positions in the simulation, then find the moment the instantaneous speed matches the average. This is the core logic a radar gun uses in speed trap evidence.",
+        caption: 'The MVT in a speed trap: if average speed exceeded the limit, you must have been speeding at some exact instant.',
       },
       {
         id: 'KineticEnergySpeeding',
@@ -278,31 +280,17 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch1-continuity",
-            "label": "Ch. 1: Continuity",
-            "note": "The MVT requires continuity on [a,b]. This is not just a technicality — without it the theorem genuinely fails. The piecewise velocity example from Ch. 1 is a discontinuous case where MVT does not apply."
-        },
-        {
-            "lessonId": "ch2-tangent-problem",
-            "label": "Ch. 2: The Derivative",
-            "note": "The \"average slope\" [f(b)-f(a)]/(b-a) is the same difference quotient you met in the derivative definition. The MVT says an instantaneous slope must equal that average somewhere."
-        }
+    recoveryPoints: [
+      { label: "Rolle's Theorem (Lesson 0)", note: "The MVT is proved by applying Rolle's Theorem to an auxiliary function h(x) = f(x) − [secant line]" },
+      { label: 'Average Rate of Change (Ch. 1)', note: 'The left side of the MVT, [f(b)−f(a)]/(b−a), is the slope of the secant line — your Ch. 1 average rate of change' },
+      { label: 'Differentiability (Ch. 2)', note: 'f must be differentiable on (a,b) for the MVT to apply; every derivative rule you learned is a tool for verifying this' },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch3-curve-sketching",
-            "label": "Next: Curve Sketching",
-            "note": "The MVT is used to prove: if f'> 0 then f is increasing; if f'< 0 then f is decreasing; if f'= 0 everywhere then f is constant. These facts underlie the entire theory of curve sketching."
-        },
-        {
-            "lessonId": "ch4-fundamental-theorem",
-            "label": "Ch. 4: Fundamental Theorem of Calculus",
-            "note": "The FTC Part 2 proof uses the MVT corollary: if two functions have the same derivative, they differ by a constant. This is a direct consequence of the MVT."
-        }
-    ]
-},
+    futureLinks: [
+      { label: 'Curve Sketching (Lesson 5)', note: "MVT proves the key theorem: if f'(x) > 0 on an interval, f is increasing there — the rigorous foundation for sign charts" },
+      { label: 'Optimization (Lesson 6)', note: 'MVT guarantees that at a global maximum on a closed interval, either the derivative is zero (interior) or you are at an endpoint' },
+      { label: "L'Hôpital's Rule (Lesson 7)", note: "The proof of L'Hôpital's Rule uses the Cauchy Mean Value Theorem, a generalization of the MVT" },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

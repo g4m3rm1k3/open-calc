@@ -3,7 +3,7 @@ export default {
   id: 'ch3-003',
   slug: 'curve-sketching',
   chapter: 3,
-  order: 3,
+  order: 5,
   title: 'Curve Sketching',
   subtitle: 'From formula to complete graph: critical points, inflection points, concavity, and asymptotes — all from derivatives alone',
   tags: ['curve sketching', 'critical points', 'local extrema', 'concavity', 'inflection points', 'first derivative test', 'second derivative test', 'asymptotes', 'sign chart'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "The Mean Value Theorem and its consequences have given us a rigorous foundation: f' > 0 means increasing, f' < 0 means decreasing, f'' > 0 means concave up, f'' < 0 means concave down. Curve sketching is the art of combining all of this information into a complete portrait of a function — without plotting hundreds of points. A professional sketch requires: domain, asymptotes, intercepts, sign chart for f' (increasing/decreasing and local extrema), sign chart for f'' (concavity and inflection points). When you can do this fluently, you understand what a function IS, not just what it computes.",
       'The complete qualitative picture of a function requires three layers of analysis. The first layer is f itself: domain (where is f defined?), x-intercepts (where does f = 0?), y-intercept (f(0)), symmetry (even/odd/neither), and asymptotes (what happens at the extremes?). The second layer is f\': where is f increasing (f\' > 0) and decreasing (f\' < 0)? Where does the function change direction (f\' = 0)? These changes of direction are local maxima and minima. The third layer is f\'\': where is the function concave up (bending upward, f\'\' > 0) and concave down (bending downward, f\'\' < 0)? Where does the concavity change (inflection points)? Together, these three layers give a complete picture.',
       'Critical points are where f\'(x) = 0 or f\'(x) is undefined. They are candidates for local extrema — but only candidates. The key tool for deciding is the first derivative test: make a sign chart for f\' by dividing the number line at the critical points and testing f\' in each interval. If f\' changes from positive to negative at c, then f has a local maximum at c (it was rising, now falling). If f\' changes from negative to positive, local minimum (was falling, now rising). If f\' does not change sign, neither — c is likely a saddle point or inflection point. The sign chart is indispensable and should be your default tool.',
       'Concavity tells you the shape of the curve between critical points. If f\'\'(x) > 0, the function is concave up — the graph looks like a bowl opening upward, tangent lines are below the curve. If f\'\'(x) < 0, concave down — tangent lines are above the curve, like a frown or an upside-down bowl. An inflection point is a point where the concavity changes — where f\'\'(x) = 0 AND f\'\' changes sign. At an inflection point, the tangent line actually crosses the curve rather than staying on one side.',
@@ -51,10 +52,11 @@ export default {
       },
     ],
     visualizations: [
-                                                                                  {
+      {
         id: 'RollerCoaster',
         title: 'Roller Coaster Physics: Tangents & Curvature',
-        caption: 'The thrill of a roller coaster is all about the derivatives: the slope (first derivative) and the g-force from concavity (second derivative).',
+        mathBridge: "This roller coaster IS the graph of a function. Identify: (1) Where is the coaster going up? f' > 0. (2) Where is it going down? f' < 0. (3) Where are the peaks and valleys? f' = 0 — these are critical points. (4) Where does it curve like a bowl (concave up)? f'' > 0. (5) Where does it arc like a hill (concave down)? f'' < 0. (6) Where does the curvature switch? Those are inflection points, where f'' = 0.",
+        caption: "A roller coaster as a function: read increasing/decreasing from slope direction, concavity from arc shape, critical points at peaks and valleys.",
       },
       {
         id: 'RollerCoasterDeep',
@@ -99,10 +101,11 @@ export default {
       },
     ],
     visualizations: [
-            {
+      {
         id: 'NewtonsMethod',
         title: "Newton's Method — Finding Roots via Tangent Lines",
-        caption: "Each step follows the tangent line to its x-intercept, giving the next guess. Convergence is quadratic — the number of correct decimal places doubles every step. This is how your calculator computes √2.",
+        mathBridge: "Build a complete sketch of f(x) = x³ − 3x. Step 1: f'(x) = 3x² − 3 = 3(x−1)(x+1). Critical points at x = ±1. Step 2: f' > 0 for |x| > 1 (increasing), f' < 0 for |x| < 1 (decreasing). Step 3: f(1) = −2 (local min), f(−1) = 2 (local max). Step 4: f''(x) = 6x. f'' > 0 for x > 0 (concave up), f'' < 0 for x < 0 (concave down). Inflection at x = 0.",
+        caption: "Complete sign-chart analysis of f(x) = x³ − 3x: two critical points, one inflection point, full increasing/decreasing and concavity information.",
       },
     ],
   },
@@ -349,26 +352,18 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch3-mean-value-theorem",
-            "label": "Previous: Mean Value Theorem",
-            "note": "The proofs that f'>0 ⟹ f increasing and f'=0 everywhere ⟹ f constant are direct applications of the MVT. Curve sketching uses those results constantly."
-        },
-        {
-            "lessonId": "ch2-differentiation-rules",
-            "label": "Ch. 2: Differentiation Rules",
-            "note": "Curve sketching demands that you compute f' and f'' efficiently. Every differentiation rule from Ch. 2 is used here."
-        }
+    recoveryPoints: [
+      { label: 'First Derivative (Ch. 2)', note: 'f\'(x) > 0 means increasing, f\'(x) < 0 means decreasing — the sign of f\' tells direction of travel' },
+      { label: 'Second Derivative (Ch. 2)', note: 'f\'\'(x) > 0 means concave up (bowl), f\'\'(x) < 0 means concave down (arch) — the sign of f\'\' tells curvature' },
+      { label: 'Critical Points (Ch. 2)', note: 'Where f\'(c) = 0 or undefined — these are the candidate extrema, the turning points of the function' },
+      { label: 'Mean Value Theorem (Lesson 1)', note: 'MVT rigorously proves that f\'(x) > 0 on an interval implies f is strictly increasing there — the mathematical basis of sign charts' },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch3-optimization",
-            "label": "Next: Optimization",
-            "note": "Optimization is curve sketching with a purpose — you find the global maximum or minimum of f on an interval. The same sign-chart and critical-point machinery applies."
-        }
-    ]
-},
+    futureLinks: [
+      { label: 'Optimization (Lesson 6)', note: 'Every optimization problem ends with: classify the critical point as max or min using the first or second derivative test' },
+      { label: 'Sketching Rational Functions', note: 'Asymptotes (vertical, horizontal, oblique) are the Ch. 1 limit analysis — curve sketching synthesizes Chapters 1, 2, and 3' },
+      { label: 'Integral Curves (Ch. 4)', note: 'Given f\'(x), reconstructing f(x) is the key problem of integration — reading derivative graphs now prepares you for that reversal' },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

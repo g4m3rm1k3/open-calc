@@ -3,7 +3,7 @@ export default {
   id: 'ch3-025',
   slug: 'rolles-theorem',
   chapter: 3,
-  order: 2.5,
+  order: 0,
   title: "Rolle's Theorem",
   subtitle: 'If you start and end at the same height, there must be a horizontal tangent somewhere in between',
   tags: ['Rolle theorem', 'horizontal tangent', 'critical point', 'existence theorem', 'mean value theorem'],
@@ -16,6 +16,7 @@ export default {
 
   intuition: {
     prose: [
+      "You have spent all of Chapter 2 building the derivative — limit definitions, power rule, chain rule, implicit differentiation. But so far, derivatives have been about computing. Chapter 3 is about what derivatives TELL you. We start with the simplest possible question: if a function starts and ends at the same height, what must be true between those endpoints? The answer — Rolle's Theorem — looks almost obvious when you draw a picture, but its proof requires everything you learned about continuity and differentiability in Chapters 1 and 2. More importantly, it is the foundation for the Mean Value Theorem in the very next lesson, which in turn unlocks every application in this chapter.",
       "Rolle's Theorem makes a beautifully simple claim: if a function starts and ends at the same height on some interval, and if the function is smooth enough (continuous on the closed interval, differentiable on the open interval), then somewhere in between there must be a point where the tangent line is perfectly horizontal. The derivative is zero at that point.",
       "Think about it graphically. You are drawing a curve that starts at the point $(a, f(a))$ and must end at the point $(b, f(b))$ where $f(a) = f(b)$. The curve must be unbroken (continuous) and smooth (differentiable). If the curve goes up at any point, it must eventually come back down to meet the same height at $b$ — and that means there is a peak somewhere with a horizontal tangent. If it goes down first, there must be a valley. If it stays perfectly flat, then $f'(c) = 0$ everywhere. No matter what path the curve takes, a horizontal tangent is unavoidable.",
       "The ball-tossing analogy is the most natural example. Let $f(t)$ be the height of a ball at time $t$. You throw it at time $a$ and catch it at time $b$ at the same height: $f(a) = f(b)$. The height function is continuous and differentiable (we ignore air resistance). Therefore, there exists some time $c$ between $a$ and $b$ where $f'(c) = 0$ — the ball is momentarily stationary at its peak. You do not need to solve any equations to know this; Rolle's Theorem guarantees it purely from the boundary conditions.",
@@ -52,7 +53,7 @@ export default {
       },
     ],
     visualizations: [
-                    { vizId: 'MVTViz', caption: "Rolle's Theorem: when $f(a) = f(b)$, the MVT guarantees a horizontal tangent between $a$ and $b$." },
+                    { vizId: 'MVTViz', mathBridge: "Set f(a) = f(b) by dragging the right endpoint up or down until both endpoints match height. Then drag the interior slider — the theorem guarantees you will find a point where the tangent is perfectly horizontal. Notice: no matter what continuous differentiable curve shape you choose, the flat tangent always exists.", caption: "Verify Rolle's Theorem: match the endpoint heights, then locate the horizontal tangent the theorem guarantees." },
     ],
   },
 
@@ -82,7 +83,7 @@ export default {
       },
     ],
     visualizations: [
-      { vizId: 'MVTViz', caption: "When $f(a) = f(b)$, the secant line is horizontal, and Rolle's Theorem guarantees a parallel (horizontal) tangent." },
+      { vizId: 'MVTViz', mathBridge: "This is the same viz, now used rigorously. Set up f(x) = x³ − x on [−1, 1]: f(−1) = 0 = f(1). Find all points where f'(x) = 3x² − 1 = 0. Compute: x = ±1/√3 ≈ ±0.577. Both lie in (−1, 1). Confirm visually that the tangent is horizontal at both points.", caption: "Rolle's Theorem applied to f(x) = x³ − x on [−1, 1]: two horizontal tangents guaranteed, both at x = ±1/√3." },
     ],
   },
 
@@ -225,6 +226,19 @@ export default {
     { lessonSlug: 'curve-sketching', label: 'Curve Sketching', context: "Rolle's Theorem explains why between consecutive zeros of $f$, the derivative $f'$ must vanish — a fact used when analyzing the shape of graphs." },
     { lessonSlug: 'optimization', label: 'Optimization', context: "Rolle's Theorem guarantees critical points exist under the right conditions, which is foundational for optimization problems." },
   ],
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Continuity (Ch. 1)', note: "Rolle's requires f continuous on [a,b] — a single hole or jump breaks the guarantee" },
+      { label: 'Differentiability (Ch. 2)', note: 'f must be differentiable on the open interval (a,b); corners and cusps disqualify' },
+      { label: 'Critical Points (Ch. 2)', note: "The guaranteed point c where f'(c)=0 is a critical point — you already know how to find these" },
+    ],
+    futureLinks: [
+      { label: 'Mean Value Theorem (Lesson 1)', note: "Rolle's Theorem IS the MVT with equal endpoints — you will prove MVT using Rolle's in the very next lesson" },
+      { label: 'Optimization (Lesson 6)', note: 'Every interior maximum and minimum satisfies the Rolle\'s-style condition f\'(c)=0; this is why critical points matter' },
+      { label: 'Root Counting', note: "Rolle's Theorem proves that between any two roots of f, there must be a root of f' — limiting how many zeros a function can have" },
+    ],
+  },
 
   checkpoints: [
     'read-intuition',
