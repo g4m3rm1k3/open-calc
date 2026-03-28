@@ -756,4 +756,122 @@ export default {
     "attempted-challenge-hard-2",
     "attempted-challenge-medium",
   ],
+
+  quiz: [
+    {
+      id: 'opt-q1',
+      type: 'choice',
+      text: 'What is the first step in solving an optimization problem with two variables and one constraint?',
+      options: [
+        'Differentiate the constraint immediately',
+        'Use the constraint to eliminate one variable from the objective function',
+        'Set both partial derivatives equal to zero',
+        'Evaluate the objective at the endpoints only',
+      ],
+      answer: 'Use the constraint to eliminate one variable from the objective function',
+      hints: [
+        'Reducing to a single-variable function allows you to use single-variable calculus (set $f\'(x) = 0$).',
+      ],
+      reviewSection: 'Intuition — The optimization procedure',
+    },
+    {
+      id: 'opt-q2',
+      type: 'input',
+      text: 'You have 100 m of fence for a rectangle. Constraint: $2x + 2y = 100$, so $y = 50 - x$. Write the area as a function of $x$ only: $A(x) = x(50-x)$. Find $A\'(x)$ and solve $A\'(x) = 0$. Enter the value of $x$ that maximizes area.',
+      answer: '25',
+      hints: [
+        "$A'(x) = 50 - 2x = 0 \\Rightarrow x = 25$.",
+      ],
+      reviewSection: 'Intuition — The fencing problem',
+    },
+    {
+      id: 'opt-q3',
+      type: 'input',
+      text: 'Continuing the fencing problem: at $x = 25$, compute $A\'\'(x)$. Enter the value (a constant).',
+      answer: '-2',
+      hints: [
+        "$A''(x) = -2$ for all $x$. Since $A''(25) = -2 < 0$, this is a local (and global) maximum.",
+      ],
+      reviewSection: 'Intuition — The fencing problem',
+    },
+    {
+      id: 'opt-q4',
+      type: 'input',
+      text: 'What is the maximum area (in m²) for the 100-m four-sided fence enclosing a rectangle?',
+      answer: '625',
+      hints: [
+        '$A(25) = 25 \\times 25 = 625$ m².',
+      ],
+      reviewSection: 'Intuition — The fencing problem',
+    },
+    {
+      id: 'opt-q5',
+      type: 'input',
+      text: 'With one side along a river (no fence needed there), 100 m of fence covers three sides: $2x + y = 100$, so $y = 100 - 2x$. Area $A(x) = x(100-2x)$. Solve $A\'(x) = 0$ to find the optimal $x$ (in m).',
+      answer: '25',
+      hints: [
+        "$A'(x) = 100 - 4x = 0 \\Rightarrow x = 25$.",
+      ],
+      reviewSection: 'Intuition — River fence variation',
+    },
+    {
+      id: 'opt-q6',
+      type: 'input',
+      text: 'For the river fence: $x = 25$ m, $y = 100 - 2(25) = 50$ m. What is the maximum enclosed area (m²)?',
+      answer: '1250',
+      hints: [
+        '$A = 25 \\times 50 = 1250$ m².',
+      ],
+      reviewSection: 'Intuition — River fence variation',
+    },
+    {
+      id: 'opt-q7',
+      type: 'choice',
+      text: 'The Extreme Value Theorem guarantees that a continuous function on $[a,b]$:',
+      options: [
+        'Has exactly one local maximum and one local minimum',
+        "Attains both its global maximum and minimum on $[a,b]$",
+        'Is differentiable at every point in $(a,b)$',
+        'Has a critical point in $(a,b)$',
+      ],
+      answer: "Attains both its global maximum and minimum on $[a,b]$",
+      hints: [
+        'The EVT requires continuity on a closed, bounded interval. It guarantees existence of global max and min.',
+      ],
+      reviewSection: 'Math — Extreme Value Theorem',
+    },
+    {
+      id: 'opt-q8',
+      type: 'input',
+      text: 'Find the global maximum of $f(x) = x^3 - 3x + 2$ on $[-2, 2]$ using the closed interval method. Candidates: endpoints $f(-2), f(2)$, and critical points where $f\'(x) = 3x^2 - 3 = 0$, i.e. $x = \\pm 1$. Compute all four values and enter the global maximum value.',
+      answer: '4',
+      hints: [
+        '$f(-2) = -8+6+2=0$, $f(2)=8-6+2=4$, $f(-1)=-1+3+2=4$, $f(1)=1-3+2=0$.',
+        'Global maximum is $4$, attained at both $x=2$ and $x=-1$.',
+      ],
+      reviewSection: 'Math — Closed interval method',
+    },
+    {
+      id: 'opt-q9',
+      type: 'input',
+      text: 'A square piece of cardboard is 12 cm on each side. Squares of side $x$ are cut from each corner and the sides folded up to make an open box. Volume: $V(x) = x(12-2x)^2$. Find $V\'(x)$, set it to zero, and find the value of $x$ (in cm) that maximizes volume.',
+      answer: '2',
+      hints: [
+        '$V(x) = x(144 - 48x + 4x^2) = 144x - 48x^2 + 4x^3$.',
+        "$V'(x) = 144 - 96x + 12x^2 = 12(x^2 - 8x + 12) = 12(x-2)(x-6) = 0$.",
+        '$x = 2$ or $x = 6$. Since the box requires $x < 6$, and $V\'\'(2) < 0$, $x = 2$ gives the maximum.',
+      ],
+      reviewSection: 'Examples — Open box problem',
+    },
+    {
+      id: 'opt-q10',
+      type: 'input',
+      text: 'Verify: for $f(x) = x^3$, $f\'(0) = 0$. Is $x = 0$ a local maximum, local minimum, or neither? Enter "max", "min", or "neither".',
+      answer: 'neither',
+      hints: [
+        "$f''(0) = 0$ (second derivative test inconclusive). Sign chart: $f'(x) = 3x^2 > 0$ for $x \\ne 0$ — no sign change. So $x=0$ is neither a max nor a min.",
+      ],
+      reviewSection: "Misconception — $f'(c)=0$ does not mean extremum",
+    },
+  ],
 };

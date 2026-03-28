@@ -53,12 +53,13 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.readingProgress ?? 0
   }, [progress])
 
-  const setQuizScore = useCallback((lessonId, correct, total) => {
+  // correct = right answers so far, attempted = questions answered, total = quiz length
+  const setQuizScore = useCallback((lessonId, correct, attempted, total) => {
     setProgress((prev) => ({
       ...prev,
       [lessonId]: {
         ...prev[lessonId],
-        quiz: { correct, total, attemptedAt: Date.now() },
+        quiz: { correct, attempted, total, attemptedAt: Date.now() },
       },
     }))
   }, [setProgress])

@@ -352,4 +352,121 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard-2',
   ],
+
+  quiz: [
+    {
+      id: 'mvt-q1',
+      type: 'choice',
+      text: 'The Mean Value Theorem guarantees a point $c \\in (a,b)$ with $f\'(c) = \\frac{f(b)-f(a)}{b-a}$. What are the two hypotheses required?',
+      options: [
+        '$f$ is differentiable on $[a,b]$ and $f(a) = f(b)$',
+        '$f$ is continuous on $[a,b]$ and differentiable on $(a,b)$',
+        '$f$ is continuous on $(a,b)$ and differentiable on $[a,b]$',
+        '$f$ is continuous on $[a,b]$ only',
+      ],
+      answer: '$f$ is continuous on $[a,b]$ and differentiable on $(a,b)$',
+      hints: [
+        'Continuity is required on the closed interval (including endpoints); differentiability on the open interval.',
+      ],
+      reviewSection: 'Math — Mean Value Theorem statement',
+    },
+    {
+      id: 'mvt-q2',
+      type: 'input',
+      text: 'For $f(x) = x^2$ on $[1, 3]$, compute the average rate of change $\\frac{f(3)-f(1)}{3-1}$. Enter the value.',
+      answer: '4',
+      hints: [
+        '$f(3) = 9$, $f(1) = 1$, so $\\frac{9-1}{3-1} = \\frac{8}{2} = 4$.',
+      ],
+      reviewSection: 'Intuition — Average rate of change equals instantaneous rate',
+    },
+    {
+      id: 'mvt-q3',
+      type: 'input',
+      text: 'For $f(x) = x^2$ on $[1, 3]$, the MVT guarantees $f\'(c) = 4$ for some $c \\in (1,3)$. Since $f\'(x) = 2x$, solve $2c = 4$ to find $c$.',
+      answer: '2',
+      hints: [
+        '$2c = 4 \\Rightarrow c = 2$. Check: $1 < 2 < 3$. ✓',
+      ],
+      reviewSection: 'Examples — Finding the MVT point $c$',
+    },
+    {
+      id: 'mvt-q4',
+      type: 'input',
+      text: 'For $f(x) = x^3 - x$ on $[0, 2]$, compute $\\frac{f(2) - f(0)}{2 - 0}$. Enter the value.',
+      answer: '3',
+      hints: [
+        '$f(2) = 8 - 2 = 6$, $f(0) = 0$. Average rate $= 6/2 = 3$.',
+      ],
+      reviewSection: 'Examples — Average rate of change',
+    },
+    {
+      id: 'mvt-q5',
+      type: 'input',
+      text: 'Continuing: $f(x) = x^3 - x$ on $[0,2]$, average rate $= 3$. Set $f\'(c) = 3$. Since $f\'(x) = 3x^2 - 1$, solve $3c^2 - 1 = 3$. Find the value of $c$ in $(0, 2)$. Enter the exact value as $\\sqrt{n/m}$ form or decimal.',
+      answer: 'sqrt(4/3)',
+      hints: [
+        '$3c^2 = 4$, so $c^2 = 4/3$, giving $c = \\sqrt{4/3} = \\frac{2}{\\sqrt{3}} \\approx 1.155$.',
+        'Check: $0 < 1.155 < 2$. ✓',
+      ],
+      reviewSection: 'Examples — Finding $c$ for a cubic',
+    },
+    {
+      id: 'mvt-q6',
+      type: 'choice',
+      text: 'The MVT implies: if $f\'(x) = 0$ for all $x$ in an interval, then $f$ is _____ on that interval.',
+      options: ['increasing', 'decreasing', 'constant', 'concave up'],
+      answer: 'constant',
+      hints: [
+        'Apply MVT to any two points $x_1 < x_2$: $f(x_2) - f(x_1) = f\'(c)(x_2-x_1) = 0$.',
+      ],
+      reviewSection: 'Intuition — Zero derivative means constant function',
+    },
+    {
+      id: 'mvt-q7',
+      type: 'choice',
+      text: 'If $f\'(x) > 0$ for all $x \\in (a,b)$, the MVT proves that $f$ is:',
+      options: [
+        'Concave up on $(a,b)$',
+        'Increasing on $(a,b)$',
+        'Decreasing on $(a,b)$',
+        'Constant on $(a,b)$',
+      ],
+      answer: 'Increasing on $(a,b)$',
+      hints: [
+        'For $x_1 < x_2$ in $(a,b)$: $f(x_2) - f(x_1) = f\'(c)(x_2-x_1) > 0$ since $f\'(c) > 0$ and $x_2 - x_1 > 0$.',
+      ],
+      reviewSection: 'Intuition — Positive derivative implies increasing',
+    },
+    {
+      id: 'mvt-q8',
+      type: 'input',
+      text: 'A car travels 240 miles in 3 hours. By the MVT, at some moment the instantaneous speed equaled the average speed. What was that average speed (mph)?',
+      answer: '80',
+      hints: [
+        'Average speed $= 240/3 = 80$ mph.',
+      ],
+      reviewSection: 'Hook — The speeding ticket argument',
+    },
+    {
+      id: 'mvt-q9',
+      type: 'input',
+      text: 'For $f(x) = \\sin x$ on $[0, \\pi]$: compute the average rate of change $\\frac{f(\\pi) - f(0)}{\\pi - 0}$. Enter the exact value.',
+      answer: '0',
+      hints: [
+        '$f(\\pi) = \\sin\\pi = 0$, $f(0) = \\sin 0 = 0$. Average rate $= 0/\\pi = 0$.',
+      ],
+      reviewSection: 'Examples — Trig function on $[0,\\pi]$',
+    },
+    {
+      id: 'mvt-q10',
+      type: 'input',
+      text: 'The MVT guarantees $\\cos c = 0$ for some $c \\in (0, \\pi)$ (from previous question). Find that $c$.',
+      answer: 'pi/2',
+      hints: [
+        '$\\cos c = 0$ and $c \\in (0, \\pi)$ means $c = \\pi/2$.',
+      ],
+      reviewSection: 'Examples — Finding $c$ for sine',
+    },
+  ],
 }

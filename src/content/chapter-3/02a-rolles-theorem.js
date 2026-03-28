@@ -239,4 +239,132 @@ export default {
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
   ],
+
+  quiz: [
+    {
+      id: 'rolle-q1',
+      type: 'choice',
+      text: "Rolle's Theorem requires three conditions. Which of the following is NOT one of them?",
+      options: [
+        '$f$ is continuous on $[a,b]$',
+        '$f$ is differentiable on $(a,b)$',
+        '$f(a) = f(b)$',
+        "$f'(a) = f'(b)$",
+      ],
+      answer: "$f'(a) = f'(b)$",
+      hints: [
+        "The three hypotheses are: continuity on $[a,b]$, differentiability on $(a,b)$, and equal endpoint values $f(a) = f(b)$.",
+      ],
+      reviewSection: "Math — Rolle's Theorem formal statement",
+    },
+    {
+      id: 'rolle-q2',
+      type: 'input',
+      text: 'For $f(x) = x^2 - 4x$ on $[0, 4]$: verify $f(0) = f(4)$. What is the common value?',
+      answer: '0',
+      hints: [
+        '$f(0) = 0 - 0 = 0$ and $f(4) = 16 - 16 = 0$. ✓',
+      ],
+      reviewSection: "Examples — Verifying Rolle's conditions",
+    },
+    {
+      id: 'rolle-q3',
+      type: 'input',
+      text: "Continuing: $f(x) = x^2 - 4x$ on $[0,4]$, $f(0) = f(4) = 0$. Rolle's Theorem guarantees $c \\in (0,4)$ with $f'(c) = 0$. Since $f'(x) = 2x - 4$, solve $f'(c) = 0$. Find $c$.",
+      answer: '2',
+      hints: [
+        '$2c - 4 = 0 \\Rightarrow c = 2$. Check: $0 < 2 < 4$. ✓',
+      ],
+      reviewSection: "Examples — Finding $c$ in Rolle's Theorem",
+    },
+    {
+      id: 'rolle-q4',
+      type: 'choice',
+      text: "Rolle's Theorem is a special case of the Mean Value Theorem where:",
+      options: [
+        "$f'(a) = 0$",
+        '$f(a) = f(b)$, making the average rate of change $= 0$',
+        'The interval $[a,b]$ has length 1',
+        "$f''(c) = 0$",
+      ],
+      answer: '$f(a) = f(b)$, making the average rate of change $= 0$',
+      hints: [
+        "When $f(a) = f(b)$, the MVT slope $\\frac{f(b)-f(a)}{b-a} = 0$, so the MVT conclusion $f'(c) = 0$ reduces to Rolle's conclusion.",
+      ],
+      reviewSection: "Intuition — Rolle's as a special case of MVT",
+    },
+    {
+      id: 'rolle-q5',
+      type: 'input',
+      text: 'For $f(x) = \\sin x$ on $[0, \\pi]$: verify $f(0) = f(\\pi)$. Solve $f\'(c) = \\cos c = 0$ to find $c \\in (0, \\pi)$.',
+      answer: 'pi/2',
+      hints: [
+        '$\\sin 0 = 0 = \\sin \\pi$. ✓ Then $\\cos c = 0$ with $c \\in (0, \\pi)$ gives $c = \\pi/2$.',
+      ],
+      reviewSection: 'Examples — Trigonometric example',
+    },
+    {
+      id: 'rolle-q6',
+      type: 'choice',
+      text: "Consider $f(x) = |x|$ on $[-1, 1]$. Does Rolle's Theorem apply?",
+      options: [
+        "Yes — $f(-1) = f(1) = 1$ and $|x|$ is continuous, so Rolle's applies",
+        "No — $f$ is not differentiable at $x = 0$, so the differentiability hypothesis fails",
+        "No — $f(-1) \\ne f(1)$",
+        "Yes — the minimum at $x=0$ gives $f'(0) = 0$",
+      ],
+      answer: "No — $f$ is not differentiable at $x = 0$, so the differentiability hypothesis fails",
+      hints: [
+        "$|x|$ has a corner at $x = 0$ where it is not differentiable. The hypothesis of differentiability on $(-1,1)$ fails.",
+      ],
+      reviewSection: "Intuition — Why differentiability is required",
+    },
+    {
+      id: 'rolle-q7',
+      type: 'input',
+      text: 'For $f(x) = x^3 - 3x$ on $[-\\sqrt{3}, \\sqrt{3}]$: compute $f(-\\sqrt{3})$ and $f(\\sqrt{3})$. Then solve $f\'(c) = 3c^2 - 3 = 0$ to find $c \\in (-\\sqrt{3}, \\sqrt{3})$. There are two values; enter the positive one.',
+      answer: '1',
+      hints: [
+        '$f(-\\sqrt{3}) = -3\\sqrt{3}+3\\sqrt{3} = 0 = f(\\sqrt{3})$. ✓',
+        '$3c^2 = 3 \\Rightarrow c = \\pm 1$. Both lie in $(-\\sqrt{3}, \\sqrt{3})$.',
+      ],
+      reviewSection: 'Examples — Multiple $c$ values',
+    },
+    {
+      id: 'rolle-q8',
+      type: 'choice',
+      text: "Rolle's Theorem is called an existence theorem because:",
+      options: [
+        'It only works for functions that exist on closed intervals',
+        'It guarantees a point $c$ exists but gives no formula to find it',
+        'It proves that $f$ exists everywhere',
+        "It proves that $f'$ exists everywhere on $[a,b]$",
+      ],
+      answer: 'It guarantees a point $c$ exists but gives no formula to find it',
+      hints: [
+        'To actually find $c$, you must solve $f\'(x) = 0$ separately.',
+      ],
+      reviewSection: "Intuition — Rolle's as an existence theorem",
+    },
+    {
+      id: 'rolle-q9',
+      type: 'input',
+      text: 'The auxiliary function used to prove the MVT from Rolle is $g(x) = f(x) - f(a) - \\frac{f(b)-f(a)}{b-a}(x-a)$. What is $g(b)$?',
+      answer: '0',
+      hints: [
+        '$g(b) = f(b) - f(a) - \\frac{f(b)-f(a)}{b-a}(b-a) = f(b) - f(a) - (f(b)-f(a)) = 0$.',
+      ],
+      reviewSection: "Math — Proof of MVT from Rolle's",
+    },
+    {
+      id: 'rolle-q10',
+      type: 'input',
+      text: 'For $f(x) = e^x - e$ on $[0, 1]$: compute $f(0)$ and $f(1)$. Do they satisfy $f(0) = f(1)$? If not, can you apply Rolle\'s Theorem? Enter $f(0)$ (just a number).',
+      answer: '1 - e',
+      hints: [
+        '$f(0) = 1 - e \\approx -1.718$ and $f(1) = e - e = 0$. Since $f(0) \\ne f(1)$, Rolle\'s Theorem does not apply.',
+      ],
+      reviewSection: "Intuition — Checking the hypothesis $f(a) = f(b)$",
+    },
+  ],
 }

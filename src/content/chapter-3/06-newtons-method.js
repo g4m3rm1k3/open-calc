@@ -252,4 +252,132 @@ export default {
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
   ],
+
+  quiz: [
+    {
+      id: 'nm-q1',
+      type: 'choice',
+      text: "Newton's Method generates the sequence $x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}$. Geometrically, $x_{n+1}$ is:",
+      options: [
+        'The midpoint of the interval $[x_n, x_{n-1}]$',
+        'Where the tangent line to $y = f(x)$ at $(x_n, f(x_n))$ crosses the $x$-axis',
+        'Where the secant through $(x_{n-1}, f(x_{n-1}))$ and $(x_n, f(x_n))$ crosses the $x$-axis',
+        'The average of $x_n$ and $f(x_n)$',
+      ],
+      answer: 'Where the tangent line to $y = f(x)$ at $(x_n, f(x_n))$ crosses the $x$-axis',
+      hints: [
+        'The tangent line at $(x_n, f(x_n))$ is $y = f(x_n) + f\'(x_n)(x - x_n)$. Setting $y = 0$ gives $x = x_n - f(x_n)/f\'(x_n) = x_{n+1}$.',
+      ],
+      reviewSection: "Intuition — Deriving Newton's formula",
+    },
+    {
+      id: 'nm-q2',
+      type: 'input',
+      text: "To find $\\sqrt{2}$, solve $f(x) = x^2 - 2 = 0$. The Newton iteration is $x_{n+1} = x_n - \\frac{x_n^2 - 2}{2x_n}$. Starting from $x_0 = 1$, compute $x_1$. Enter the value as a fraction or decimal.",
+      answer: '3/2',
+      hints: [
+        '$x_1 = 1 - \\frac{1 - 2}{2} = 1 + \\frac{1}{2} = \\frac{3}{2} = 1.5$.',
+      ],
+      reviewSection: "Intuition — Computing $\\sqrt{2}$ by Newton's Method",
+    },
+    {
+      id: 'nm-q3',
+      type: 'input',
+      text: "Continuing: $x_1 = 3/2$. Compute $x_2 = x_1 - \\frac{x_1^2 - 2}{2x_1}$. Enter the value as a fraction.",
+      answer: '17/12',
+      hints: [
+        '$x_2 = \\frac{3}{2} - \\frac{9/4 - 2}{3} = \\frac{3}{2} - \\frac{1/4}{3} = \\frac{3}{2} - \\frac{1}{12} = \\frac{18 - 1}{12} = \\frac{17}{12}$.',
+      ],
+      reviewSection: "Intuition — Computing $\\sqrt{2}$ by Newton's Method",
+    },
+    {
+      id: 'nm-q4',
+      type: 'choice',
+      text: "Newton's Method fails at step $n$ if:",
+      options: [
+        "$f(x_n) = 0$ (we found the root)",
+        "$f'(x_n) = 0$ (tangent line is horizontal)",
+        "$x_n > 0$",
+        "$f(x_n) > 0$",
+      ],
+      answer: "$f'(x_n) = 0$ (tangent line is horizontal)",
+      hints: [
+        "The formula $x_{n+1} = x_n - f(x_n)/f'(x_n)$ divides by $f'(x_n)$. If $f'(x_n) = 0$, the tangent is horizontal and never reaches the $x$-axis.",
+      ],
+      reviewSection: "Intuition — When Newton's Method fails",
+    },
+    {
+      id: 'nm-q5',
+      type: 'input',
+      text: "To solve $f(x) = x^3 - x - 1 = 0$ near $x_0 = 1$: compute $f(1)$ and $f'(1)$, then find $x_1 = x_0 - f(x_0)/f'(x_0)$. Enter $x_1$.",
+      answer: '1.5',
+      hints: [
+        '$f(1) = 1 - 1 - 1 = -1$ and $f\'(x) = 3x^2 - 1$, so $f\'(1) = 2$.',
+        '$x_1 = 1 - (-1)/2 = 1 + 0.5 = 1.5$.',
+      ],
+      reviewSection: "Examples — Newton's Method for a cubic",
+    },
+    {
+      id: 'nm-q6',
+      type: 'input',
+      text: "For $f(x) = \\cos x - x$, starting from $x_0 = 1$ (radian). Compute $f(1) = \\cos 1 - 1 \\approx -0.4597$ and $f'(x) = -\\sin x - 1$, so $f'(1) \\approx -1.8415$. Compute $x_1 = x_0 - f(x_0)/f'(x_0)$. Round to 4 decimal places.",
+      answer: '0.7503',
+      hints: [
+        '$x_1 = 1 - \\frac{-0.4597}{-1.8415} = 1 - 0.2497 \\approx 0.7503$.',
+      ],
+      reviewSection: "Examples — Newton's Method for a transcendental equation",
+    },
+    {
+      id: 'nm-q7',
+      type: 'choice',
+      text: "Newton's Method exhibits quadratic convergence near a simple root. This means if $e_n$ is the error at step $n$, then roughly:",
+      options: [
+        '$e_{n+1} \\approx \\frac{1}{2}e_n$ (error halves each step)',
+        '$e_{n+1} \\approx C \\cdot e_n^2$ (error squares each step)',
+        '$e_{n+1} \\approx e_n - 1$ (error decreases by a constant)',
+        '$e_{n+1} \\approx e_n$ (error stays constant)',
+      ],
+      answer: '$e_{n+1} \\approx C \\cdot e_n^2$ (error squares each step)',
+      hints: [
+        'Quadratic convergence means the number of correct digits roughly doubles each step.',
+      ],
+      reviewSection: "Math — Quadratic convergence",
+    },
+    {
+      id: 'nm-q8',
+      type: 'input',
+      text: "To find $\\sqrt[3]{5}$, solve $f(x) = x^3 - 5 = 0$. Starting from $x_0 = 2$: $f(2) = 3$, $f'(2) = 12$. Compute $x_1 = x_0 - f(x_0)/f'(x_0)$. Enter the fraction.",
+      answer: '7/4',
+      hints: [
+        '$x_1 = 2 - 3/12 = 2 - 1/4 = 7/4 = 1.75$.',
+      ],
+      reviewSection: "Examples — Cube root by Newton's Method",
+    },
+    {
+      id: 'nm-q9',
+      type: 'choice',
+      text: "Compared to the bisection method, Newton's Method is generally:",
+      options: [
+        'Slower but always converges',
+        'Faster but may fail to converge if the initial guess is poor',
+        'The same speed — both double correct digits each step',
+        'Slower and less reliable',
+      ],
+      answer: 'Faster but may fail to converge if the initial guess is poor',
+      hints: [
+        'Bisection converges linearly (adds ~0.3 digits per step) and is guaranteed to converge. Newton converges quadratically but needs a good start.',
+      ],
+      reviewSection: "Math — Bisection vs Newton comparison",
+    },
+    {
+      id: 'nm-q10',
+      type: 'input',
+      text: "Newton's Method iteration formula is $x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}$. For $f(x) = x^2 - a$ (finding $\\sqrt{a}$), simplify this iteration to the form $x_{n+1} = \\frac{1}{2}\\left(x_n + \\frac{a}{x_n}\\right)$. If $a = 9$ and $x_0 = 4$, compute $x_1$. Enter the exact value.",
+      answer: '25/8',
+      hints: [
+        '$x_1 = \\frac{1}{2}(4 + 9/4) = \\frac{1}{2} \\cdot \\frac{25}{4} = \\frac{25}{8} = 3.125$.',
+      ],
+      reviewSection: "Intuition — Babylonian square root algorithm",
+    },
+  ],
 }

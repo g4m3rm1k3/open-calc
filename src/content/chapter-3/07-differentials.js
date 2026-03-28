@@ -243,4 +243,121 @@ export default {
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
   ],
+
+  quiz: [
+    {
+      id: 'diff-q1',
+      type: 'choice',
+      text: 'The differential $dy = f\'(x)\\,dx$ represents:',
+      options: [
+        'The actual change in $f$ when $x$ increases by $dx$',
+        'The change in $f$ along the tangent line when $x$ increases by $dx$',
+        'The derivative $f\'(x)$ evaluated at $dx$',
+        'The second derivative of $f$',
+      ],
+      answer: 'The change in $f$ along the tangent line when $x$ increases by $dx$',
+      hints: [
+        '$\\Delta y$ is the actual change along the curve; $dy$ is the change along the tangent line. They are equal only in the limit as $dx \\to 0$.',
+      ],
+      reviewSection: 'Intuition — What $dy$ and $\\Delta y$ mean',
+    },
+    {
+      id: 'diff-q2',
+      type: 'input',
+      text: 'For $y = x^4$, compute the differential $dy$. Then evaluate $dy$ at $x = 2$ with $dx = 0.1$. Enter the value.',
+      answer: '3.2',
+      hints: [
+        '$dy = 4x^3\\,dx$. At $x=2$, $dx=0.1$: $dy = 4(8)(0.1) = 3.2$.',
+      ],
+      reviewSection: 'Math — Computing differentials',
+    },
+    {
+      id: 'diff-q3',
+      type: 'input',
+      text: 'For $y = \\sin x$, find $dy$. Evaluate at $x = 0$, $dx = 0.1$. Enter the value.',
+      answer: '0.1',
+      hints: [
+        '$dy = \\cos x\\,dx$. At $x=0$: $dy = \\cos(0)(0.1) = 1 \\cdot 0.1 = 0.1$.',
+      ],
+      reviewSection: 'Math — Differentials of standard functions',
+    },
+    {
+      id: 'diff-q4',
+      type: 'input',
+      text: 'A sphere has radius $r = 10$ m measured with error $\\pm 0.05$ m. Using $dV = 4\\pi r^2\\,dr$ with $dr = 0.05$, estimate the absolute error in volume. Enter the value (as a multiple of $\\pi$).',
+      answer: '20*pi',
+      hints: [
+        '$dV = 4\\pi(100)(0.05) = 20\\pi$ m³.',
+      ],
+      reviewSection: 'Hook — Volume error for a sphere',
+    },
+    {
+      id: 'diff-q5',
+      type: 'input',
+      text: 'For $y = \\ln x$, compute $dy$ at $x = 1$, $dx = 0.2$. Enter the value.',
+      answer: '0.2',
+      hints: [
+        '$dy = \\frac{1}{x}\\,dx$. At $x = 1$: $dy = (1)(0.2) = 0.2$.',
+      ],
+      reviewSection: 'Math — Differential of $\\ln x$',
+    },
+    {
+      id: 'diff-q6',
+      type: 'input',
+      text: 'For $y = x^n$, the relative error $\\frac{|dy|}{|y|}$ equals $n \\cdot \\frac{|dx|}{|x|}$. If $x = 5$ m is measured with a 2% relative error, what is the relative error (as a percentage) in $y = x^3$?',
+      answer: '6',
+      hints: [
+        'Relative error in $x^3$ is $3 \\times 2\\% = 6\\%$.',
+      ],
+      reviewSection: 'Intuition — Relative error rule for powers',
+    },
+    {
+      id: 'diff-q7',
+      type: 'choice',
+      text: 'The error in the differential approximation $\\Delta y \\approx dy$ is approximately:',
+      options: [
+        '$f\'(x) \\cdot dx$',
+        '$\\frac{1}{2}f\'\'(x)(dx)^2$',
+        '$f\'\'(x) \\cdot dx$',
+        'Exactly zero for all $dx$',
+      ],
+      answer: '$\\frac{1}{2}f\'\'(x)(dx)^2$',
+      hints: [
+        'By Taylor\'s theorem: $\\Delta y - dy = \\frac{1}{2}f\'\'(\\xi)(dx)^2$. The error is second-order in $dx$.',
+      ],
+      reviewSection: 'Warning — Differentials are approximations',
+    },
+    {
+      id: 'diff-q8',
+      type: 'input',
+      text: 'Use the differential to estimate $\\sqrt{16.4}$ (instead of $\\sqrt{16}$). Let $f(x) = \\sqrt{x}$, $a = 16$, $dx = 0.4$. Compute $dy = f\'(16) \\cdot 0.4$. Enter the approximate value of $\\sqrt{16.4}$.',
+      answer: '4.05',
+      hints: [
+        "$f'(x) = \\frac{1}{2\\sqrt{x}}$, so $f'(16) = \\frac{1}{8}$. $dy = \\frac{1}{8}(0.4) = 0.05$.",
+        '$\\sqrt{16.4} \\approx 4 + 0.05 = 4.05$.',
+      ],
+      reviewSection: 'Intuition — Differential as linear approximation',
+    },
+    {
+      id: 'diff-q9',
+      type: 'input',
+      text: 'For $y = e^x$ at $x = 0$, $dx = 0.1$: compute the differential $dy$ and the actual change $\\Delta y = e^{0.1} - 1 \\approx 0.10517$. What is $dy$?',
+      answer: '0.1',
+      hints: [
+        '$dy = e^x\\,dx$. At $x=0$: $dy = e^0 \\cdot 0.1 = 0.1$.',
+        'Compare: $\\Delta y \\approx 0.105$, $dy = 0.1$. The difference $\\approx 0.005$ is of order $(dx)^2$.',
+      ],
+      reviewSection: 'Warning — $dy \\ne \\Delta y$',
+    },
+    {
+      id: 'diff-q10',
+      type: 'input',
+      text: 'The side of a cube is measured as $s = 4$ cm with error $\\pm 0.02$ cm. Volume $V = s^3$. Compute $dV = 3s^2\\,ds$ with $s=4$, $ds=0.02$. Enter the estimated error in volume (cm³).',
+      answer: '0.96',
+      hints: [
+        '$dV = 3(16)(0.02) = 0.96$ cm³.',
+      ],
+      reviewSection: 'Math — Error propagation for a cube',
+    },
+  ],
 }

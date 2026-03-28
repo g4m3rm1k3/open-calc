@@ -17,11 +17,9 @@ function evaluateAnswer(userRaw, correctRaw) {
   const user = userRaw.trim()
   const correct = correctRaw.trim()
 
-  // Direct string match (for choice questions or simple values already normalised)
   if (user.toLowerCase() === correct.toLowerCase()) return true
 
   try {
-    // Try numeric evaluation — substitute a test value for symbolic answers
     const scope = { x: 2.7183, t: 1.4142, n: 3 }
     const uVal = mathEval(user, { ...scope })
     const cVal = mathEval(correct, { ...scope })
@@ -30,28 +28,26 @@ function evaluateAnswer(userRaw, correctRaw) {
       if (Math.abs(uVal - cVal) < 1e-6) return true
     }
 
-    // Symbolic: try simplify(user - correct) ≈ 0
     const diff = mathSimplify(`(${user}) - (${correct})`)
     const diffVal = mathEval(diff.toString(), { ...scope })
     if (typeof diffVal === 'number' && Math.abs(diffVal) < 1e-6) return true
   } catch (_) {
-    // Fall through to string normalisation
+    // fall through
   }
 
-  // Normalise: strip spaces, lower case, remove outer parens
   const norm = (s) => s.toLowerCase().replace(/\s/g, '').replace(/^\((.+)\)$/, '$1')
   return norm(user) === norm(correct)
 }
 
-function QuizQuestion({ q, index, onAnswer, answered }) {
-  const [selected, setSelected] = useState(null)   // for choice
-  const [inputVal, setInputVal] = useState('')       // for input
-  const [hintLevel, setHintLevel] = useState(-1)    // -1 = no hint shown
+function QuizQuestion({ q, index, onAnswer }) {
+  const [selected, setSelected] = useState(null)
+  const [inputVal, setInputVal] = useState('')
+  const [hintLevel, setHintLevel] = useState(-1)
   const [submitted, setSubmitted] = useState(false)
   const [correct, setCorrect] = useState(null)
 
   const hints = q.hints ?? []
-  const allHints = q.type === 'input' ? [null, ...hints] : hints  // null = typing guide for input
+  const allHints = q.type === 'input' ? [null, ...hints] : hints
 
   const handleSubmit = () => {
     const userAnswer = q.type === 'choice' ? selected : inputVal
@@ -64,9 +60,7 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
   const showHint = () => setHintLevel((h) => Math.min(h + 1, allHints.length - 1))
 
   const borderColor = submitted
-    ? correct
-      ? 'border-emerald-400 dark:border-emerald-600'
-      : 'border-red-400 dark:border-red-600'
+    ? correct ? 'border-emerald-400 dark:border-emerald-600' : 'border-red-400 dark:border-red-600'
     : 'border-slate-200 dark:border-slate-700'
 
   return (
@@ -79,7 +73,7 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
               : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
         }`}>
-          {index + 1}
+          {submitted ? (correct ? '✓' : '✗') : index + 1}
         </span>
 
         <div className="flex-1 min-w-0">
@@ -101,7 +95,6 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
                 } else if (isSelected) {
                   optStyle = 'border-brand-400 bg-brand-50 dark:bg-brand-900/30 dark:border-brand-500 cursor-pointer'
                 }
-
                 return (
                   <button
                     key={i}
@@ -127,15 +120,12 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
               placeholder="Type your answer…"
               className={`w-full px-3 py-2 rounded-lg border text-sm font-mono bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none transition-colors ${
                 submitted
-                  ? correct
-                    ? 'border-emerald-400 dark:border-emerald-600'
-                    : 'border-red-400 dark:border-red-600'
+                  ? correct ? 'border-emerald-400 dark:border-emerald-600' : 'border-red-400 dark:border-red-600'
                   : 'border-slate-300 dark:border-slate-600 focus:border-brand-400 dark:focus:border-brand-500'
               }`}
             />
           )}
 
-          {/* Submit / feedback row */}
           <div className="mt-3 flex items-center gap-3 flex-wrap">
             {!submitted ? (
               <>
@@ -157,7 +147,7 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
               </>
             ) : (
               <span className={`text-xs font-semibold ${correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                {correct ? 'Correct!' : `Incorrect — answer: ${q.answer}`}
+                {correct ? '+1 pt' : `Incorrect — answer: ${q.answer}`}
               </span>
             )}
 
@@ -168,7 +158,6 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
             )}
           </div>
 
-          {/* Hint display */}
           {hintLevel >= 0 && (
             <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-200">
               {allHints[hintLevel] === null ? MATH_TYPING_GUIDE : parseProse(allHints[hintLevel])}
@@ -183,59 +172,67 @@ function QuizQuestion({ q, index, onAnswer, answered }) {
 export default function LessonQuizBlock({ lessonId, questions }) {
   const { setQuizScore, getQuizScore } = useProgress()
   const saved = getQuizScore(lessonId)
+  const total = questions.length
 
+  // Local session state — fresh each page load
   const [answers, setAnswers] = useState({})  // index → true/false
-  const [showScore, setShowScore] = useState(!!saved)
+
+  const liveCorrect = Object.values(answers).filter(Boolean).length
+  const liveAttempted = Object.keys(answers).length
+  const allAttempted = liveAttempted === total
 
   const handleAnswer = useCallback((index, isCorrect) => {
     setAnswers((prev) => {
       const next = { ...prev, [index]: isCorrect }
-      const answered = Object.keys(next).length
-      if (answered === questions.length) {
-        const correct = Object.values(next).filter(Boolean).length
-        setQuizScore(lessonId, correct, questions.length)
-        setShowScore(true)
-      }
+      const attempted = Object.keys(next).length
+      const correct = Object.values(next).filter(Boolean).length
+      // Update persisted score immediately after every answer
+      setQuizScore(lessonId, correct, attempted, total)
       return next
     })
-  }, [questions.length, lessonId, setQuizScore])
+  }, [total, lessonId, setQuizScore])
 
-  const correct = Object.values(answers).filter(Boolean).length
-  const total = questions.length
-  const attempted = Object.keys(answers).length
-  const finalScore = saved ?? (showScore ? { correct, total } : null)
+  // What to show in the score badge:
+  // - During session: live count
+  // - On fresh load (no local answers yet): saved score if it exists
+  const displayCorrect = liveAttempted > 0 ? liveCorrect : (saved?.correct ?? null)
+  const displayAttempted = liveAttempted > 0 ? liveAttempted : (saved?.attempted ?? 0)
+  const isComplete = liveAttempted > 0 ? allAttempted : (saved?.attempted === saved?.total && saved?.total === total)
 
-  const scorePct = finalScore ? finalScore.correct / finalScore.total : 0
-  const scoreLabel = finalScore
-    ? scorePct >= 0.8
+  const scorePct = isComplete ? (displayCorrect / total) : null
+  const masteryLabel = scorePct === null ? null :
+    scorePct >= 0.8
       ? { text: 'Mastered', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' }
       : scorePct >= 0.5
         ? { text: 'Partial Credit', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' }
         : { text: 'Needs Review', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' }
-    : null
 
   return (
     <section className="mt-16 pt-10 border-t-2 border-slate-200 dark:border-slate-700">
+      {/* Header row */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Lesson Quiz</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {total} questions · answers evaluated by computer algebra
+            {total} questions · answer any order · skip and come back
           </p>
         </div>
-        {!showScore && attempted > 0 && (
+
+        {/* Live score counter */}
+        <div className="flex flex-col items-end gap-1">
+          {displayCorrect !== null && (
+            <div className="flex items-baseline gap-1">
+              <span className="text-yellow-400 text-sm">★</span>
+              <span className="text-2xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
+                {displayCorrect}
+              </span>
+              <span className="text-sm text-slate-400 dark:text-slate-500">/ {total} pts</span>
+            </div>
+          )}
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            {attempted}/{total} answered
+            {displayAttempted}/{total} answered
           </span>
-        )}
-        {finalScore && (
-          <div className={`px-4 py-2 rounded-xl border ${scoreLabel.bg} text-center`}>
-            <span className={`text-xl font-bold ${scoreLabel.color}`}>
-              {finalScore.correct}/{finalScore.total}
-            </span>
-            <div className={`text-xs font-semibold ${scoreLabel.color}`}>{scoreLabel.text}</div>
-          </div>
-        )}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -245,29 +242,31 @@ export default function LessonQuizBlock({ lessonId, questions }) {
             q={q}
             index={i}
             onAnswer={handleAnswer}
-            answered={i in answers}
           />
         ))}
       </div>
 
-      {showScore && finalScore && (
-        <div className={`mt-6 p-4 rounded-xl border ${scoreLabel.bg}`}>
-          <p className={`font-semibold ${scoreLabel.color}`}>
-            Score: {finalScore.correct}/{finalScore.total} — {scoreLabel.text}
+      {/* Mastery banner — only after all questions attempted */}
+      {isComplete && masteryLabel && (
+        <div className={`mt-6 p-4 rounded-xl border ${masteryLabel.bg}`}>
+          <p className={`font-semibold ${masteryLabel.color}`}>
+            {displayCorrect}/{total} correct — {masteryLabel.text}
           </p>
-          {scorePct < 0.8 && (
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              {scorePct < 0.5
-                ? 'Go back through the Intuition, Math, and Rigor tabs before retrying.'
-                : 'Review the sections flagged above, then try the challenging problems.'}
-            </p>
-          )}
-          {scorePct >= 0.8 && (
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Excellent work. The sidebar star marks this lesson as mastered.
-            </p>
-          )}
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+            {scorePct < 0.5
+              ? 'Go back through the Intuition, Math, and Rigor tabs, then retry.'
+              : scorePct < 0.8
+                ? 'Review the sections flagged above, then work through the challenge problems.'
+                : 'The sidebar star marks this lesson as mastered.'}
+          </p>
         </div>
+      )}
+
+      {/* Encouragement while quiz is in progress */}
+      {!isComplete && liveAttempted > 0 && liveAttempted < total && (
+        <p className="mt-4 text-xs text-slate-400 dark:text-slate-500 text-center">
+          {total - liveAttempted} question{total - liveAttempted !== 1 ? 's' : ''} remaining — answer all {total} to unlock mastery rating
+        </p>
       )}
     </section>
   )

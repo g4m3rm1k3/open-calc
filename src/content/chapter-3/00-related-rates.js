@@ -829,4 +829,124 @@ export default {
     "attempted-challenge-medium-1",
     "attempted-challenge-medium-2",
   ],
+
+  quiz: [
+    {
+      id: 'rr-q1',
+      type: 'input',
+      text: 'A spherical balloon is being inflated. Its volume is $V = \\frac{4}{3}\\pi r^3$. Differentiate both sides with respect to time $t$ to find $\\frac{dV}{dt}$ in terms of $r$ and $\\frac{dr}{dt}$. If $r = 5$ cm and $\\frac{dr}{dt} = 2$ cm/s, what is $\\frac{dV}{dt}$ (in cm³/s)? Enter a number.',
+      answer: '200*pi',
+      hints: [
+        'Differentiate $V = \\frac{4}{3}\\pi r^3$ w.r.t. $t$ using the chain rule: $\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$.',
+        'Substitute $r = 5$ and $\\frac{dr}{dt} = 2$: $4\\pi(25)(2) = 200\\pi$.',
+      ],
+      reviewSection: 'Intuition — Setting up the rate equation',
+    },
+    {
+      id: 'rr-q2',
+      type: 'choice',
+      text: 'In a related rates problem, when must you substitute known numerical values for position (e.g. $x = 6$)?',
+      options: [
+        'Before differentiating, to simplify the equation',
+        'After differentiating, into the rate equation',
+        'It does not matter — substituting before or after gives the same result',
+        'You never substitute; you always keep everything symbolic',
+      ],
+      answer: 'After differentiating, into the rate equation',
+      hints: [
+        'Substituting a position value before differentiating turns a variable into a constant, destroying its rate $dx/dt$.',
+      ],
+      reviewSection: 'Intuition — Do NOT substitute before differentiating',
+    },
+    {
+      id: 'rr-q3',
+      type: 'input',
+      text: 'A 10-ft ladder leans against a wall. Its base slides away at $\\frac{dx}{dt} = 2$ ft/s. The constraint is $x^2 + y^2 = 100$. Differentiating w.r.t. $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$. At the instant $x = 6$ ft, what is $y$ (in ft)?',
+      answer: '8',
+      hints: [
+        'Use $x^2 + y^2 = 100$ with $x = 6$: $36 + y^2 = 100$, so $y^2 = 64$.',
+      ],
+      reviewSection: 'Intuition — The sliding ladder geometry',
+    },
+    {
+      id: 'rr-q4',
+      type: 'input',
+      text: 'Continuing the ladder problem: $x = 6$ ft, $y = 8$ ft, $\\frac{dx}{dt} = 2$ ft/s. Using $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$, find $\\frac{dy}{dt}$ (in ft/s). Enter a signed number (negative = sliding down).',
+      answer: '-3/2',
+      hints: [
+        'Solve for $\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt} = -\\frac{6}{8}\\cdot 2 = -\\frac{3}{2}$.',
+      ],
+      reviewSection: 'Intuition — The sliding ladder geometry',
+    },
+    {
+      id: 'rr-q5',
+      type: 'input',
+      text: 'Water drains from a conical tank (apex down) of fixed proportions so that $V = \\frac{\\pi}{3}h^3$ (already simplified using similar triangles). If $\\frac{dV}{dt} = -2\\pi$ m³/min, find $\\frac{dh}{dt}$ when $h = 3$ m. Enter the value in m/min.',
+      answer: '-2/9',
+      hints: [
+        'Differentiate $V = \\frac{\\pi}{3}h^3$ w.r.t. $t$: $\\frac{dV}{dt} = \\pi h^2 \\frac{dh}{dt}$.',
+        'Substitute: $-2\\pi = \\pi(9)\\frac{dh}{dt}$, so $\\frac{dh}{dt} = -\\frac{2}{9}$.',
+      ],
+      reviewSection: 'Examples — Conical tank',
+    },
+    {
+      id: 'rr-q6',
+      type: 'choice',
+      text: 'Related rates problems use implicit differentiation with respect to which variable?',
+      options: ['$x$', '$y$', '$t$ (time)', '$r$ (radius)'],
+      answer: '$t$ (time)',
+      hints: [
+        'All quantities in a related rates problem are functions of time $t$, so you differentiate the geometric equation w.r.t. $t$.',
+      ],
+      reviewSection: 'Intuition — Related rates is implicit differentiation in $t$',
+    },
+    {
+      id: 'rr-q7',
+      type: 'input',
+      text: 'Two cars start at the same intersection. Car A travels east at 60 mph; Car B travels north at 80 mph. Let $z$ be the distance between them. The constraint is $z^2 = x^2 + y^2$. After 1 hour, $x = 60$, $y = 80$, $z = 100$. Find $\\frac{dz}{dt}$ (mph) at that moment.',
+      answer: '100',
+      hints: [
+        'Differentiate: $2z\\frac{dz}{dt} = 2x\\frac{dx}{dt} + 2y\\frac{dy}{dt}$.',
+        '$\\frac{dz}{dt} = \\frac{60\\cdot60 + 80\\cdot80}{100} = \\frac{3600+6400}{100} = 100$.',
+      ],
+      reviewSection: 'Examples — Two moving vehicles',
+    },
+    {
+      id: 'rr-q8',
+      type: 'input',
+      text: 'A streetlight is 15 ft high. A 6-ft-tall person walks away from the base at 4 ft/s. Let $s$ be the length of the shadow. By similar triangles, $\\frac{15}{6} = \\frac{x+s}{s}$, giving $s = \\frac{6}{9}x = \\frac{2}{3}x$. Find $\\frac{ds}{dt}$ (ft/s).',
+      answer: '8/3',
+      hints: [
+        'Differentiate $s = \\frac{2}{3}x$ w.r.t. $t$: $\\frac{ds}{dt} = \\frac{2}{3}\\frac{dx}{dt} = \\frac{2}{3}(4) = \\frac{8}{3}$.',
+      ],
+      reviewSection: 'Examples — Shadow problem',
+    },
+    {
+      id: 'rr-q9',
+      type: 'choice',
+      text: 'For the ladder problem, as $y \\to 0$ (the top nears the ground), what happens to $|dy/dt|$?',
+      options: [
+        'It approaches 0 — the top slows down',
+        'It stays constant',
+        'It grows without bound — the top falls faster and faster',
+        'It equals $dx/dt$ exactly',
+      ],
+      answer: 'It grows without bound — the top falls faster and faster',
+      hints: [
+        '$\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt}$. As $y \\to 0$ with $x \\to L$, the ratio $x/y \\to \\infty$.',
+      ],
+      reviewSection: 'Intuition — The sliding ladder geometry',
+    },
+    {
+      id: 'rr-q10',
+      type: 'input',
+      text: 'A point moves along the curve $y = x^2$. If $\\frac{dx}{dt} = 3$ units/s when $x = 2$, find $\\frac{dy}{dt}$ at that instant.',
+      answer: '12',
+      hints: [
+        'Differentiate $y = x^2$ w.r.t. $t$: $\\frac{dy}{dt} = 2x\\frac{dx}{dt}$.',
+        'At $x = 2$: $\\frac{dy}{dt} = 2(2)(3) = 12$.',
+      ],
+      reviewSection: 'Examples — Point on a curve',
+    },
+  ],
 };

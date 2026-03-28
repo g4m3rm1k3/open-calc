@@ -425,4 +425,127 @@ export default {
     'attempted-challenge-hard-1',
     'attempted-challenge-hard-2',
   ],
+
+  quiz: [
+    {
+      id: 'cs-q1',
+      type: 'input',
+      text: 'For $f(x) = x^3 - 3x$, find all critical points by solving $f\'(x) = 0$. Enter the positive critical point.',
+      answer: '1',
+      hints: [
+        "$f'(x) = 3x^2 - 3 = 3(x^2-1) = 0 \\Rightarrow x = \\pm 1$.",
+      ],
+      reviewSection: 'Intuition — Finding critical points',
+    },
+    {
+      id: 'cs-q2',
+      type: 'choice',
+      text: 'For $f(x) = x^3 - 3x$ with critical points at $x = -1$ and $x = 1$: the first derivative test shows $f\'$ changes from $+$ to $-$ at $x = -1$. What does this mean?',
+      options: [
+        '$f$ has a local minimum at $x = -1$',
+        '$f$ has a local maximum at $x = -1$',
+        '$f$ has an inflection point at $x = -1$',
+        '$f$ is increasing through $x = -1$',
+      ],
+      answer: '$f$ has a local maximum at $x = -1$',
+      hints: [
+        "First derivative test: $f'$ goes from $+$ to $-$ at $c$ ⟹ local maximum at $c$.",
+      ],
+      reviewSection: 'Intuition — First derivative test',
+    },
+    {
+      id: 'cs-q3',
+      type: 'input',
+      text: 'For $f(x) = x^3 - 3x$, compute $f\'\'(x)$. At the critical point $x = 1$, evaluate $f\'\'(1)$. Enter the value.',
+      answer: '6',
+      hints: [
+        "$f''(x) = 6x$. At $x = 1$: $f''(1) = 6 > 0$.",
+      ],
+      reviewSection: 'Math — Second derivative test',
+    },
+    {
+      id: 'cs-q4',
+      type: 'choice',
+      text: 'Since $f\'\'(1) = 6 > 0$ for $f(x) = x^3 - 3x$, what does the second derivative test conclude about $x = 1$?',
+      options: [
+        'Local maximum',
+        'Local minimum',
+        'Inflection point',
+        'Inconclusive',
+      ],
+      answer: 'Local minimum',
+      hints: [
+        "$f'(c) = 0$ and $f''(c) > 0$ \\Rightarrow$ local minimum.",
+      ],
+      reviewSection: 'Math — Second derivative test',
+    },
+    {
+      id: 'cs-q5',
+      type: 'input',
+      text: 'For $f(x) = x^3 - 3x$, find the inflection point(s) by solving $f\'\'(x) = 6x = 0$. Enter the $x$-value.',
+      answer: '0',
+      hints: [
+        '$6x = 0 \\Rightarrow x = 0$. Check sign change: $f\'\'(x) < 0$ for $x < 0$ and $f\'\'(x) > 0$ for $x > 0$. ✓ inflection point.',
+      ],
+      reviewSection: 'Intuition — Inflection points',
+    },
+    {
+      id: 'cs-q6',
+      type: 'input',
+      text: 'For $f(x) = x^4 - 4x^3$, find $f\'(x)$ and set it equal to zero. One critical point is $x = 0$. Find the other critical point.',
+      answer: '3',
+      hints: [
+        "$f'(x) = 4x^3 - 12x^2 = 4x^2(x-3) = 0 \\Rightarrow x = 0$ or $x = 3$.",
+      ],
+      reviewSection: 'Hook — Analyzing $x^4 - 4x^3$',
+    },
+    {
+      id: 'cs-q7',
+      type: 'choice',
+      text: 'For $f(x) = x^4 - 4x^3$, the sign of $f\'(x) = 4x^2(x-3)$ for $x \\in (-1, 0)$ is:',
+      options: ['positive', 'negative', 'zero', 'undefined'],
+      answer: 'negative',
+      hints: [
+        'At $x = -1$: $4(1)(-4) = -16 < 0$. The factor $4x^2 > 0$ always; $(x-3) < 0$ for $x < 3$.',
+      ],
+      reviewSection: 'Intuition — Sign chart for $f\'$',
+    },
+    {
+      id: 'cs-q8',
+      type: 'input',
+      text: 'For $f(x) = x^4 - 4x^3$, compute $f\'\'(x)$. Find the inflection points by solving $f\'\'(x) = 0$. Enter the positive inflection point $x$-value.',
+      answer: '2',
+      hints: [
+        "$f''(x) = 12x^2 - 24x = 12x(x-2) = 0 \\Rightarrow x = 0$ or $x = 2$.",
+        'Check sign changes: $f\'\'$ changes sign at both $x = 0$ and $x = 2$, so both are inflection points.',
+      ],
+      reviewSection: 'Intuition — Finding inflection points',
+    },
+    {
+      id: 'cs-q9',
+      type: 'choice',
+      text: 'A function has $f\'\'(c) = 0$. Is $x = c$ necessarily an inflection point?',
+      options: [
+        'Yes — $f\'\'(c) = 0$ always means inflection point',
+        "No — $f''$ must also change sign at $c$ for it to be an inflection point",
+        "Yes — as long as $f'(c) \\ne 0$",
+        "No — only if $f'(c) = 0$ too",
+      ],
+      answer: "$No — $f''$ must also change sign at $c$ for it to be an inflection point",
+      hints: [
+        "Counterexample: $f(x) = x^4$, $f''(0) = 0$ but $f''(x) = 12x^2 \\ge 0$ everywhere — no sign change, no inflection point.",
+      ],
+      reviewSection: "Misconception — $f''(c) = 0$ does not guarantee inflection",
+    },
+    {
+      id: 'cs-q10',
+      type: 'input',
+      text: 'For $f(x) = x^3$ at $x = 0$: $f\'(0) = 0$, so $x = 0$ is a critical point. The sign of $f\'(x) = 3x^2$ for $x < 0$ is positive, and for $x > 0$ is also positive. By the first derivative test, $x = 0$ is a local ___? Enter "max", "min", or "neither".',
+      answer: 'neither',
+      hints: [
+        "$f' = 3x^2 > 0$ on both sides of $x = 0$ — no sign change — so $x = 0$ is neither a max nor a min (it is an inflection point with a horizontal tangent).",
+      ],
+      reviewSection: "Warning — $f'(c) = 0$ does not guarantee an extremum",
+    },
+  ],
 }

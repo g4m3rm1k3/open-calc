@@ -9,6 +9,7 @@ import GlobalGrapher3D from '../ui/GlobalGrapher3D.jsx'
 import GlobalGrapherJSX from '../ui/GlobalGrapherJSX.jsx'
 import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
+import { useProgress } from '../../hooks/useProgress.js'
 import GrapherContext from '../../context/GrapherContext.jsx'
 import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -41,6 +42,64 @@ function MobileLocationBadge() {
       <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
         {label}
       </span>
+    </div>
+  )
+}
+
+function ScoreWidget() {
+  const location = useLocation()
+  const { progress } = useProgress()
+
+  // Parse chapter/lesson from URL (same approach as Sidebar — avoids useParams pitfalls)
+  const pathMatch = location.pathname.match(/^\/chapter\/([^/]+)(?:\/([^/]+))?/)
+  const chapterId = pathMatch?.[1] ?? null
+  const lessonSlug = pathMatch?.[2] ?? null
+
+  // Current lesson quiz score
+  const lessonKey = chapterId && lessonSlug ? `${chapterId}/${lessonSlug}` : null
+  const currentLesson = lessonKey ? LESSON_MAP[lessonKey] : null
+  const lessonQuiz = currentLesson?.id ? (progress[currentLesson.id]?.quiz ?? null) : null
+
+  // Active course totals
+  const chapter = chapterId ? CURRICULUM.find(c => String(c.number) === chapterId) : null
+  const activeCourse = chapter?.course ?? null
+  if (!activeCourse) return null
+
+  const courseChapters = CURRICULUM.filter(c => c.course === activeCourse)
+  const courseLessons = courseChapters.flatMap(c => c.lessons ?? []).filter(l => l.quiz?.length > 0)
+  const courseMax = courseLessons.reduce((acc, l) => acc + (l.quiz?.length ?? 0), 0)
+  const courseCorrect = courseLessons.reduce((acc, l) => acc + (progress[l.id]?.quiz?.correct ?? 0), 0)
+
+  if (courseMax === 0) return null
+
+  const lessonPct = lessonQuiz ? lessonQuiz.correct / lessonQuiz.total : null
+  const lessonColor = lessonPct === null ? '' :
+    lessonPct >= 0.8 ? 'text-emerald-600 dark:text-emerald-400' :
+    lessonPct >= 0.5 ? 'text-amber-500 dark:text-amber-400' :
+                       'text-red-500 dark:text-red-400'
+
+  const coursePct = courseMax > 0 ? courseCorrect / courseMax : 0
+  const barColor = coursePct >= 0.8 ? 'bg-emerald-500' : coursePct >= 0.5 ? 'bg-amber-400' : coursePct > 0 ? 'bg-brand-500' : 'bg-slate-300 dark:bg-slate-600'
+
+  return (
+    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs select-none">
+      <span className="text-yellow-400" aria-hidden>★</span>
+      <div className="flex items-baseline gap-0.5">
+        <span className="font-bold text-slate-800 dark:text-slate-200">{courseCorrect}</span>
+        <span className="text-slate-400 dark:text-slate-500">/{courseMax}</span>
+      </div>
+      {/* Mini progress bar */}
+      <div className="w-12 h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${Math.max(2, coursePct * 100)}%` }} />
+      </div>
+      {lessonQuiz && (
+        <>
+          <span className="w-px h-3 bg-slate-200 dark:bg-slate-700" />
+          <span className={`font-semibold ${lessonColor}`}>
+            {lessonQuiz.correct}<span className="font-normal text-slate-400">/10</span>
+          </span>
+        </>
+      )}
     </div>
   )
 }
@@ -123,6 +182,8 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
         <MobileLocationBadge />
       </div>
       <div className="flex-1 lg:hidden" />
+
+      <ScoreWidget />
 
       {/* Graph Utility buttons */}
       <div className="flex items-center gap-2 hidden lg:flex">

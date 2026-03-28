@@ -361,4 +361,125 @@ export default {
     'attempted-challenge-hard',
     'attempted-challenge-medium-2',
   ],
+
+  quiz: [
+    {
+      id: 'la-q1',
+      type: 'input',
+      text: 'Write the linearization formula: $L(x) = f(a) + f\'(a)(x - a)$. For $f(x) = \\sqrt{x}$ at $a = 25$, compute $f\'(25)$. Enter the value.',
+      answer: '1/10',
+      hints: [
+        '$f(x) = x^{1/2}$, so $f\'(x) = \\frac{1}{2}x^{-1/2} = \\frac{1}{2\\sqrt{x}}$.',
+        'At $x = 25$: $f\'(25) = \\frac{1}{2\\cdot 5} = \\frac{1}{10}$.',
+      ],
+      reviewSection: 'Intuition — Estimating $\\sqrt{26}$',
+    },
+    {
+      id: 'la-q2',
+      type: 'input',
+      text: 'Using $f(x) = \\sqrt{x}$, $a = 25$, $f(25) = 5$, $f\'(25) = 1/10$: the linearization is $L(x) = 5 + \\frac{1}{10}(x-25)$. Use it to approximate $\\sqrt{26}$. Enter the decimal value.',
+      answer: '5.1',
+      hints: [
+        'Substitute $x = 26$: $L(26) = 5 + \\frac{1}{10}(1) = 5.1$.',
+      ],
+      reviewSection: 'Intuition — Estimating $\\sqrt{26}$',
+    },
+    {
+      id: 'la-q3',
+      type: 'input',
+      text: 'Use linear approximation for $f(x) = x^{1/3}$ at $a = 8$ to approximate $\\sqrt[3]{8.06}$. First find $f\'(8)$, then compute $L(8.06)$. Enter the approximation.',
+      answer: '2.005',
+      hints: [
+        '$f\'(x) = \\frac{1}{3}x^{-2/3}$, so $f\'(8) = \\frac{1}{3 \\cdot 4} = \\frac{1}{12}$.',
+        '$L(8.06) = 2 + \\frac{1}{12}(0.06) = 2 + 0.005 = 2.005$.',
+      ],
+      reviewSection: 'Examples — Cube root approximation',
+    },
+    {
+      id: 'la-q4',
+      type: 'input',
+      text: 'Find the linearization of $f(x) = e^x$ at $a = 0$. Use it to approximate $e^{0.1}$. Enter the approximation.',
+      answer: '1.1',
+      hints: [
+        '$f(0) = 1$, $f\'(0) = 1$, so $L(x) = 1 + x$.',
+        '$L(0.1) = 1 + 0.1 = 1.1$.',
+      ],
+      reviewSection: 'Intuition — Standard linearizations at $x = 0$',
+    },
+    {
+      id: 'la-q5',
+      type: 'input',
+      text: 'For $f(x) = \\sin x$ near $a = 0$, the linearization is $L(x) = x$ (since $\\sin 0 = 0$ and $\\cos 0 = 1$). Use this to approximate $\\sin(0.05)$. Enter the value.',
+      answer: '0.05',
+      hints: [
+        '$L(0.05) = 0.05$ — just substitute directly into $L(x) = x$.',
+      ],
+      reviewSection: 'Intuition — Standard linearizations at $x = 0$',
+    },
+    {
+      id: 'la-q6',
+      type: 'choice',
+      text: 'The differential $dy$ and the actual change $\\Delta y$ satisfy which relationship for small $dx$?',
+      options: [
+        '$dy = \\Delta y$ exactly, always',
+        '$dy \\approx \\Delta y$; they differ by approximately $\\frac{1}{2}f\'\'(x)(dx)^2$',
+        '$dy > \\Delta y$ always',
+        '$dy = 0$ when $dx$ is small',
+      ],
+      answer: '$dy \\approx \\Delta y$; they differ by approximately $\\frac{1}{2}f\'\'(x)(dx)^2$',
+      hints: [
+        '$dy = f\'(x)\\,dx$ is the change along the tangent line; $\\Delta y$ is the actual change in $f$.',
+        'The error is $\\Delta y - dy \\approx \\frac{1}{2}f\'\'(x)(dx)^2$ by Taylor\'s theorem.',
+      ],
+      reviewSection: 'Intuition — $dy \\ne \\Delta y$',
+    },
+    {
+      id: 'la-q7',
+      type: 'input',
+      text: 'For $y = x^3$, compute the differential $dy$ at $x = 2$ with $dx = 0.01$.',
+      answer: '0.12',
+      hints: [
+        '$dy = f\'(x)\\,dx = 3x^2\\,dx$.',
+        'At $x=2$, $dx=0.01$: $dy = 3(4)(0.01) = 0.12$.',
+      ],
+      reviewSection: 'Math — The differential $dy = f\'(x)\\,dx$',
+    },
+    {
+      id: 'la-q8',
+      type: 'choice',
+      text: 'The linearization $L(x) = f(a) + f\'(a)(x-a)$ is geometrically the same as which of these?',
+      options: [
+        'The secant line through $(a, f(a))$ and $(a+1, f(a+1))$',
+        'The tangent line to $f$ at the point $(a, f(a))$',
+        'The horizontal line $y = f(a)$',
+        'The normal line to $f$ at $x = a$',
+      ],
+      answer: 'The tangent line to $f$ at the point $(a, f(a))$',
+      hints: [
+        'Point-slope form of the tangent line at $(a, f(a))$ with slope $f\'(a)$: $y - f(a) = f\'(a)(x-a)$, i.e. $y = f(a) + f\'(a)(x-a) = L(x)$.',
+      ],
+      reviewSection: 'Intuition — This is the point-slope tangent line',
+    },
+    {
+      id: 'la-q9',
+      type: 'input',
+      text: 'The volume of a sphere is $V = \\frac{4}{3}\\pi r^3$. Use the differential $dV = 4\\pi r^2\\,dr$ to estimate the change in volume when $r = 3$ cm increases by $dr = 0.02$ cm. Enter the approximate change in cm³.',
+      answer: '0.72*pi',
+      hints: [
+        '$dV = 4\\pi(3)^2(0.02) = 4\\pi(9)(0.02) = 0.72\\pi$.',
+      ],
+      reviewSection: 'Intuition — Error analysis with differentials',
+    },
+    {
+      id: 'la-q10',
+      type: 'input',
+      text: 'For $f(x) = \\ln x$ at $a = 1$, find $f\'(1)$ and write $L(x)$. Use $L(x)$ to approximate $\\ln(1.2)$. Enter the approximation.',
+      answer: '0.2',
+      hints: [
+        '$f\'(x) = 1/x$, so $f\'(1) = 1$. Then $L(x) = 0 + 1\\cdot(x-1) = x-1$.',
+        '$L(1.2) = 1.2 - 1 = 0.2$.',
+      ],
+      reviewSection: 'Intuition — Standard linearizations at $x = 0$',
+    },
+  ],
 }

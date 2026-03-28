@@ -255,4 +255,128 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard-2',
   ],
+
+  quiz: [
+    {
+      id: 'lhop-q1',
+      type: 'choice',
+      text: "L'Hôpital's Rule may only be applied when the limit has which form(s)?",
+      options: [
+        '$0/1$ or $1/0$',
+        '$0/0$ or $\\infty/\\infty$',
+        'Any fraction limit',
+        '$0/0$ only',
+      ],
+      answer: '$0/0$ or $\\infty/\\infty$',
+      hints: [
+        "The rule requires an indeterminate form. $0/0$ and $\\infty/\\infty$ are the two direct cases; all other indeterminate forms must first be converted to one of these.",
+      ],
+      reviewSection: "Warning — Verify indeterminate form first",
+    },
+    {
+      id: 'lhop-q2',
+      type: 'input',
+      text: "Apply L'Hôpital's Rule to $\\lim_{x \\to 0} \\frac{\\sin x}{x}$. Differentiate numerator and denominator separately and evaluate. Enter the limit value.",
+      answer: '1',
+      hints: [
+        'This is $0/0$ form. Differentiate: numerator $\\to \\cos x$, denominator $\\to 1$. Limit $= \\cos(0)/1 = 1$.',
+      ],
+      reviewSection: "Hook — $\\sin(x)/x$ via L'Hôpital",
+    },
+    {
+      id: 'lhop-q3',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}$ using L'Hôpital's Rule (it is $0/0$ form). Enter the limit.",
+      answer: '4',
+      hints: [
+        'Differentiate: numerator $\\to 2x$, denominator $\\to 1$. Limit $= 2(2)/1 = 4$.',
+        '(Check: factor gives $(x-2)(x+2)/(x-2) = x+2 \\to 4$. ✓)',
+      ],
+      reviewSection: "Math — Applying L'Hôpital to $0/0$",
+    },
+    {
+      id: 'lhop-q4',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2}$ using L'Hôpital's Rule. You may need to apply it twice. Enter the exact value.",
+      answer: '1/2',
+      hints: [
+        'First application ($0/0$): $\\frac{\\sin x}{2x}$ — still $0/0$.',
+        'Second application: $\\frac{\\cos x}{2} \\to \\frac{1}{2}$.',
+      ],
+      reviewSection: "Rigor — Repeated application of L'Hôpital",
+    },
+    {
+      id: 'lhop-q5',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to \\infty} \\frac{x^2}{e^x}$ using L'Hôpital's Rule ($\\infty/\\infty$ form). Apply it twice. Enter the limit.",
+      answer: '0',
+      hints: [
+        'First: $\\frac{2x}{e^x}$ — still $\\infty/\\infty$.',
+        'Second: $\\frac{2}{e^x} \\to 0$ as $x \\to \\infty$.',
+      ],
+      reviewSection: "Math — $\\infty/\\infty$ form with exponential",
+    },
+    {
+      id: 'lhop-q6',
+      type: 'choice',
+      text: "L'Hôpital's Rule states $\\lim f/g = \\lim f'/g'$. What distinguishes this from the Quotient Rule?",
+      options: [
+        "L'Hôpital differentiates $f/g$ as a whole; Quotient Rule differentiates $f$ and $g$ separately",
+        "L'Hôpital applies to LIMITS of indeterminate forms; the Quotient Rule computes the DERIVATIVE of a quotient function",
+        "L'Hôpital and the Quotient Rule are the same formula in different notation",
+        "L'Hôpital only works at $x = 0$; Quotient Rule works everywhere",
+      ],
+      answer: "L'Hôpital applies to LIMITS of indeterminate forms; the Quotient Rule computes the DERIVATIVE of a quotient function",
+      hints: [
+        "L'Hôpital: $\\lim f/g = \\lim f'/g'$ (separate derivatives, applied to a limit). Quotient Rule: $(f/g)' = (f'g - fg')/g^2$ (derivative of the ratio as a new function).",
+      ],
+      reviewSection: "Misconception — L'Hôpital is not the Quotient Rule",
+    },
+    {
+      id: 'lhop-q7',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to 0} \\frac{e^x - 1}{x}$. Identify the form, apply L'Hôpital's Rule, and enter the limit.",
+      answer: '1',
+      hints: [
+        '$0/0$ form. Differentiate: numerator $\\to e^x$, denominator $\\to 1$. Limit $= e^0/1 = 1$.',
+      ],
+      reviewSection: "Math — Exponential $0/0$ limit",
+    },
+    {
+      id: 'lhop-q8',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to 0} \\frac{\\tan x}{x}$. This is $0/0$ form. Apply L'Hôpital once. Enter the limit.",
+      answer: '1',
+      hints: [
+        'Differentiate: $\\tan x \\to \\sec^2 x$, $x \\to 1$. Limit $= \\sec^2(0)/1 = 1/1 = 1$.',
+      ],
+      reviewSection: "Math — Trig $0/0$ limit",
+    },
+    {
+      id: 'lhop-q9',
+      type: 'choice',
+      text: "Consider $\\lim_{x \\to 1} \\frac{x + 2}{x - 1}$. A student applies L'Hôpital and gets $\\lim 1/1 = 1$. Is this correct?",
+      options: [
+        'Yes — L\'Hôpital always applies to fractions',
+        "No — the limit is NOT $0/0$ form (denominator $\\to 0$ but numerator $\\to 3 \\ne 0$), so L'Hôpital cannot be used",
+        'Yes — since the denominator $\\to 0$, the rule applies',
+        'No — the student differentiated incorrectly',
+      ],
+      answer: "No — the limit is NOT $0/0$ form (denominator $\\to 0$ but numerator $\\to 3 \\ne 0$), so L'Hôpital cannot be used",
+      hints: [
+        "At $x=1$: numerator $\\to 3 \\ne 0$, denominator $\\to 0$. The form is $3/0 = \\pm\\infty$, not $0/0$. L'Hôpital does not apply.",
+      ],
+      reviewSection: "Warning — Verify indeterminate form first",
+    },
+    {
+      id: 'lhop-q10',
+      type: 'input',
+      text: "Evaluate $\\lim_{x \\to 0} \\frac{x - \\sin x}{x^3}$ using L'Hôpital's Rule. Apply the rule as many times as needed. Enter the exact value.",
+      answer: '1/6',
+      hints: [
+        '1st ($0/0$): $\\frac{1 - \\cos x}{3x^2}$. 2nd ($0/0$): $\\frac{\\sin x}{6x}$. 3rd ($0/0$): $\\frac{\\cos x}{6} \\to \\frac{1}{6}$.',
+      ],
+      reviewSection: "Rigor — Three applications of L'Hôpital",
+    },
+  ],
 }

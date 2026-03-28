@@ -176,7 +176,8 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                 const isActive = activeChapter === String(chapter.number) && activeSlug === lesson.slug
                 const quizScore = getQuizScore(lesson.id)
                 let status
-                if (quizScore) {
+                // Only show quiz-based color once ALL questions have been attempted
+                if (quizScore && quizScore.attempted === quizScore.total && quizScore.total > 0) {
                   const pct = quizScore.correct / quizScore.total
                   status = pct >= 0.8 ? 'quiz-pass' : pct >= 0.5 ? 'quiz-partial' : 'quiz-fail'
                 } else {
