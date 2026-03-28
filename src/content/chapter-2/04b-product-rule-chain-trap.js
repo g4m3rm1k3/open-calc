@@ -2,7 +2,7 @@ export default {
   id: 'ch2-004b',
   slug: 'product-rule-chain-trap',
   chapter: 2,
-  order: 4.5,
+  order: 4,
   title: 'Product Rule + Chain Rule Trap',
   subtitle: 'Why v\' must be fully differentiated before assembling u\'v + uv\'',
   tags: ['product rule', 'chain rule', 'common mistakes', 'composite functions', 'derivative traps'],
@@ -18,11 +18,24 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You just learned the chain rule. This lesson exists for one reason only: to show you the single most common mistake students make in the week after learning the chain rule — so you can recognize it and avoid it permanently. This is not punishment; it is insurance.',
+
+      '**Why put this lesson here?** Because the mistake happens *now*, in the first applications. If we waited until Lesson 8 to address it, you would have practiced the wrong pattern dozens of times. Instead, we surface it immediately, confirm it is wrong with a numeric check, and replace it with the correct workflow. That is the fastest path to reliable technique.',
+
+      '**The mistake in one sentence:** When using the product rule on h(x) = u(x)·v(x), students differentiate v(x) using only the *outer* derivative and forget to multiply by the inner derivative. They get a result that "looks right" algebraically but is numerically wrong at every point.',
+
       'The trap is sequencing, not memorization. Students know product rule and chain rule separately, but apply chain rule too late or only partially inside v\'.',
       'The fix is to treat product-rule assembly as a shopping list with four completed ingredients: u, v, u\', and full v\'. If v\' requires chain rule, finish it first before plugging into u\'v + uv\'.',
       'This lesson uses side-by-side wrong vs right derivations plus numeric checks to prove that incomplete v\' creates measurable error, even when the algebra looks superficially reasonable.',
+
+      '**Where this is heading:** The toolkit is now complete — you have the chain rule and you know its pitfall. The next three lessons apply this toolkit to three special families of functions: trig, exponential/log, and inverse functions. In each case, the chain rule is the engine powering every formula.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 10 — Act 2: Trap Drill',
+        body: '**Previous:** The chain rule — differentiating composed functions by multiplying outer and inner derivatives.\n**This lesson:** The #1 mistake when combining product and chain rules — recognize it, confirm it\'s wrong numerically, replace it with the correct workflow.\n**Next:** Trig derivatives — applying your full toolkit to sin, cos, tan and friends.',
+      },
       {
         type: 'warning',
         title: 'Core anti-pattern',

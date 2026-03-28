@@ -57,8 +57,15 @@ export default {
       'Think about what the difference quotient measures geometrically. The numerator f(a+h) - f(a) is the vertical rise from one point to the other. The denominator h is the horizontal run. So the ratio is rise over run — the slope of the secant line. As h shrinks, the two points get closer and closer together, but the slope of the line between them settles into a limiting value. That limiting slope is the derivative.',
       'The derivative tells us two things simultaneously, and they are really the same thing: (1) it is the slope of the curve at the point x = a, meaning the slope of the tangent line to the graph there, and (2) it is the instantaneous rate of change of the function at x = a. If f(t) is position, the derivative is instantaneous velocity. If f(x) is a population, the derivative is the instantaneous growth rate. If f(x) is profit as a function of units sold, the derivative is marginal profit.',
       'Mathematicians have invented several notations for the derivative, each with its own strengths. If y = f(x), then the derivative can be written as f\'(x) (read "f prime of x", due to Lagrange), or as dy/dx (Leibniz notation, emphasizing the ratio of infinitesimal changes), or as d/dx[f(x)] (operator notation), or as Df(x) (operator notation due to Euler), or even as y\u0307 (Newton\'s dot notation, used in physics for time derivatives). All of these mean exactly the same thing: the limit of the difference quotient. Leibniz notation dy/dx is especially useful when doing related rates and chain rule problems, because it behaves somewhat like a fraction (though it is not exactly one). Lagrange notation f\'(x) is compact and convenient for most algebraic work.',
+
+      '**Where this is heading:** You now have the definition of the derivative and you can compute it for simple functions using the limit process. But computing (x+h)^100 - x^100 from scratch every time would be unbearable. The next lesson gives you the shortcut rules — proved from limits once, then used freely. After that, every derivative you compute will take seconds instead of pages.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 10 — Act 1: The Question',
+        body: '**Previous:** Lesson 1 introduced the four perspectives on the derivative (geometric, physical, algebraic, computational) and the chapter roadmap.\n**This lesson:** We build the derivative rigorously from limits — the difference quotient made precise.\n**Next:** Lesson 3 gives you the shortcut rules (power, product, quotient) so you never have to grind through limits again.',
+      },
       {
         type: 'prior-knowledge',
         title: 'You may have computed average speed before',

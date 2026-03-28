@@ -33,6 +33,10 @@ export default {
   ],
 
   intuition: {
+    // ─── Chapter Roadmap ──────────────────────────────────────────────────
+    // This intro lesson gives the big picture. Here is the full arc of what
+    // lies ahead — so you always know where you are in the story.
+
     semantics: {
       core: [
         { symbol: 'x', meaning: 'independent variable (input you control)' },
@@ -52,6 +56,14 @@ export default {
     },
 
     prose: [
+      '**Welcome to Chapter 2 — the heart of differential calculus.** Everything in this chapter flows from one central question: "How fast is something changing at this exact instant?" Not over a stretch of time, not on average — *right now*. That question has a precise mathematical answer called the derivative, and by the end of this chapter you will be able to compute it, apply it, and read it from a graph.',
+
+      '**Here is the story of this chapter in four acts:**',
+      '**Act 1 (Lessons 1–2) — What is a derivative?** Lesson 1 (this one) surveys four perspectives so you build a complete mental model. Lesson 2 constructs the derivative rigorously from limits — the "difference quotient" that turns average change into instantaneous change.',
+      '**Act 2 (Lessons 3–5) — The Toolkit.** Going back to limits every time is slow. Lessons 3–5 give you the provable shortcuts: power rule, product rule, quotient rule, then the single most-used rule in all of calculus — the chain rule for composed functions. Lesson 5 drills the #1 trap students fall into combining those rules.',
+      '**Act 3 (Lessons 6–8) — Special Functions.** Every function you meet in applied math belongs to one of three families: trig, exponential/logarithmic, or inverse functions. Lessons 6–8 cover each family in turn, always using the chain rule as the engine.',
+      '**Act 4 (Lessons 9–10) — Synthesis.** Lesson 9 handles curves that resist being solved for y (implicit differentiation — it is just the chain rule in disguise). Lesson 10 closes the loop: given any graph of f, you will be able to read off f′, f′′, and what they say about motion and shape.',
+
       'The derivative is the slope of a curve at a single point. We find it by taking the limit of "secant lines" (slopes between two points) as those points get infinitely close together.',
       'This single number represents the **sensitivity** of the system: if I nudge the input by 1 unit, how many units does the output jump?',
     ],
@@ -107,6 +119,37 @@ export default {
         title: 'Implicit Differentiation — The Moving Tangent',
         mathBridge: 'Explore curves defined implicitly (circles, lemniscates). Watch how the tangent line at any point is found by differentiating both sides and solving for dy/dx.',
         caption: 'When you cannot solve for y, implicit differentiation finds the slope anyway.',
+      },
+    ],
+
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Chapter 2 at a Glance — Where This is Going',
+        body: `**Act 1 — The Question (Lessons 1–2)**
+• Lesson 1 (this one): Four perspectives on the derivative
+• Lesson 2: Limit definition — difference quotient → derivative
+
+**Act 2 — The Toolkit (Lessons 3–5)**
+• Lesson 3: Power, product, quotient rules
+• Lesson 4: The chain rule (most-used rule in calculus)
+• Lesson 5: Product + chain trap (common mistake, fixed immediately)
+
+**Act 3 — Special Functions (Lessons 6–8)**
+• Lesson 6: Trig derivatives (sin, cos, tan…)
+• Lesson 7: Exponential and log derivatives (e^x, ln x…)
+• Lesson 8: Inverse function derivatives (arcsin, arctan…)
+
+**Act 4 — Synthesis (Lessons 9–10)**
+• Lesson 9: Implicit differentiation (chain rule in disguise)
+• Lesson 10: Reading f, f′, f′′ from graphs (visual language)`,
+      },
+      {
+        type: 'insight',
+        title: 'What You Already Know That Makes This Possible',
+        body: `From Chapter 0: slope of a line = Δy/Δx. That formula is the backbone of the derivative.
+From Chapter 1: limits — what a function approaches as input gets close to a value. The derivative IS a limit.
+The derivative is literally the limit of the slope formula. You already know both halves.`,
       },
     ],
 

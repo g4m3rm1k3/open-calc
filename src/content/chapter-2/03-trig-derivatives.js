@@ -3,7 +3,7 @@ export default {
   id: "ch2-003",
   slug: "trig-derivatives",
   chapter: 2,
-  order: 3,
+  order: 5,
   title: "Derivatives of Trigonometric Functions",
   subtitle:
     "Why the slope of the sine curve is cosine — and deriving all six trig derivatives",
@@ -28,6 +28,10 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You now have a complete differentiation toolkit: power, product, quotient, and chain rules. That toolkit applies to any function — but we have only tested it on polynomials. This lesson and the next two apply the same toolkit to the three fundamental families of functions that appear throughout science and engineering: trigonometric functions (this lesson), exponential and logarithmic functions (next lesson), and inverse functions (the lesson after).',
+
+      '**The central question of this lesson:** The sine function oscillates smoothly. At some angles it is rising fast, at others it is flat, and at others it is falling. Can we find a formula for that rate of change at every angle? The answer turns out to be startlingly clean: the rate of change of sin(θ) is cos(θ). The cosine curve IS the derivative of the sine curve. This lesson shows why — geometrically, analytically, and through the unit circle.',
+
       "Imagine tracing around the unit circle as the angle theta increases from 0. The y-coordinate follows the sine function. Let's watch what happens to the slope of the sine curve as theta varies.",
       "At theta = 0: the point (1, 0) is moving straight upward. The y-coordinate is increasing at maximum rate. The slope of sin(theta) is 1, and cos(0) = 1.",
       "At theta = pi/2: the point (0, 1) is moving horizontally. The y-coordinate is at a local maximum, so its instantaneous rate is 0. The slope is 0, and cos(pi/2) = 0.",
@@ -36,8 +40,15 @@ export default {
       "Geometric proof bridge: position is (cos(theta), sin(theta)) and velocity is perpendicular to radius, so velocity has direction (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), and that y-component is exactly d/dtheta[sin(theta)].",
       "Why the minus sign for cosine? As theta increases through the first quadrant, cosine tracks horizontal position moving left, so its rate of change is negative. That directional fact is d/dx[cos x] = -sin x.",
       "Expert intuition: each derivative is a 90-degree phase rotation of the trig wave. sin -> cos -> -sin -> -cos -> sin.",
+
+      '**Where this is heading:** You now have derivatives for all six trig functions. The next lesson introduces the other great family: exponential and logarithmic functions. The highlight is e — the one base for which the exponential function literally equals its own derivative. That self-referential property is one of the most surprising facts in mathematics.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 10 — Act 3: Special Functions Begin',
+        body: '**Previous:** Product + chain trap drill — the correct workflow for combining rules.\n**This lesson:** Trig derivatives — why the slope of sin(x) is cos(x), and all six trig derivative formulas.\n**Next:** Exponential and logarithmic derivatives — the self-referential property of e^x and the derivative of ln(x).',
+      },
       {
         type: "insight",
         title: "Geometric Intuition: Unit Circle",

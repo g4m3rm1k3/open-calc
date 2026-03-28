@@ -2,7 +2,7 @@ export default {
   id: "ch2-reading-derivatives",
   slug: "reading-derivatives",
   chapter: 2,
-  order: 6,
+  order: 9,
   title: "Reading Derivatives from Graphs",
   subtitle:
     "The visual language of f, f', f'', and f''' — what graphs reveal about motion and change",
@@ -31,6 +31,10 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story — and what this lesson completes:** Over the past nine lessons you have built the entire toolkit of differential calculus: limit definition, shortcut rules, chain rule, special function families (trig, exp/log, inverse), and implicit differentiation. That is the "how to compute" side. This final lesson teaches the other side: **how to read**. Given any graph, you should be able to extract everything the derivative reveals — without computing anything.',
+
+      '**Why this matters as a capstone:** A physicist looking at a position-vs-time graph reads velocity and acceleration directly. An economist looking at a profit graph reads marginal profit. An engineer looking at a stress-strain curve reads stiffness. All of them are reading derivatives. This lesson builds that same visual fluency.',
+
       "Graphs tell stories. Once you learn the vocabulary, you can read the story directly from the picture.",
 
       "**The First Derivative f'(x): The Slope**  " +
@@ -67,8 +71,15 @@ export default {
         "High positive jerk means acceleration is increasing rapidly (fast onset of force). " +
         "Negative jerk means acceleration is decreasing (smooth relief from force). " +
         "Recognizing f''' helps understand more complex physical systems.",
+
+      "**Chapter 2 Complete — What You Now Know:** You have built derivative intuition from first principles, mastered all the differentiation rules, applied them to every fundamental function family, handled implicit curves, and learned to read the derivative language visually. The derivative is no longer an abstract concept — it is a tool you can wield. Chapter 3 will use these tools to answer the question calculus was originally invented to solve: optimization. Given any function, find where it reaches its maximum or minimum value.",
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 10 of 10 — Act 4: Synthesis Capstone',
+        body: '**Previous:** Implicit differentiation — the chain rule applied to equations F(x,y)=0.\n**This lesson:** The visual language of derivatives — reading f, f′, f′′, f′′′ from graphs to understand shape, motion, and change.\n**Chapter complete:** You can compute and read any derivative. Chapter 3 applies these tools to optimization.',
+      },
       {
         type: "vocabulary",
         title: "Four Levels of Information in One Graph",

@@ -3,7 +3,7 @@ export default {
   id: 'ch2-004',
   slug: 'exp-log-derivatives',
   chapter: 2,
-  order: 4,
+  order: 6,
   title: 'Derivatives of Exponential and Logarithmic Functions',
   subtitle: 'The function that equals its own derivative — and the logarithm that unlocks it',
   tags: ['exponential derivative', 'logarithm derivative', 'natural log', 'e^x', 'ln x', 'logarithmic differentiation', 'a^x'],
@@ -17,14 +17,25 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You have derivatives for polynomials (power rule), products and quotients, compositions (chain rule), and all six trig functions. There is one more fundamental family to master: exponential and logarithmic functions. These are the functions of growth and decay — they appear everywhere quantities change proportionally to their current size.',
+
+      '**The big question of this lesson:** Is there a base b such that b^x equals its own derivative? If such a base existed, it would mean the function\'s slope at every point equals its own height — a remarkable self-referential property. This lesson shows that the answer is yes, the base is e ≈ 2.718, and this is not a coincidence but the *defining property* that makes exponential calculus so clean.',
+
       'Let\'s understand e by starting from scratch. Consider the function b^x for different bases b. At x = 0, every such function equals 1 (since b\u2070 = 1). But what is the SLOPE of b^x at x = 0? For b = 2, the slope at 0 is approximately 0.693. For b = 3, the slope at 0 is approximately 1.099. As b increases from 2 to 3, the slope at x = 0 increases from 0.693 to 1.099. Somewhere between 2 and 3, the slope at x = 0 must equal exactly 1. That special base is called e. Numerically, e \u2248 2.71828...',
       'This definition — e is the base for which the slope of b^x at x = 0 is exactly 1 — has a stunning consequence. It means that for the function e^x, the derivative at x = 0 is exactly 1. But now we can use the law of exponents to compute the derivative at any other point x. We will see that d/dx[e^x] = e^x: the function e^x equals its own derivative everywhere, not just at x = 0.',
       'Why is this remarkable? It means that at every point, the slope of e^x equals its own height. The taller the curve is, the steeper it rises. The curve catches up to its own slope, then the increased slope makes it grow even faster, creating an accelerating feedback loop. This is why exponential growth "explodes" — it grows proportional to itself.',
       'Now for the natural logarithm. The natural log ln(x) is defined as the inverse of e^x: if e^y = x, then y = ln(x). Since e^x has derivative e^x, and ln(x) is its inverse function, we can find the derivative of ln(x) using implicit differentiation. Starting from e^y = x, differentiate both sides with respect to x: the right side gives 1, and the left side gives e^y \u00b7 dy/dx (by the chain rule, since y is a function of x). So e^y \u00b7 dy/dx = 1, giving dy/dx = 1/e^y = 1/x (since e^y = x). The derivative of ln(x) is 1/x.',
       'For other bases: if we want to differentiate a^x for any positive base a \u2260 1, we use the conversion a^x = e^(x ln a). This rewrites any exponential in base e, allowing us to use the chain rule: d/dx[e^(x ln a)] = e^(x ln a) \u00b7 ln(a) = a^x \u00b7 ln(a). The natural log of the base appears as a multiplicative factor.',
       'Logarithmic differentiation is a powerful technique that uses logarithms to convert hard differentiation problems into easier ones. The key idea: if y = f(x), take ln of both sides to get ln(y) = ln(f(x)), then differentiate implicitly. This works because the chain rule on the left gives (1/y)\u00b7(dy/dx), and we can solve for dy/dx = y\u00b7(d/dx)[ln(f(x))]. This technique is especially useful for (1) functions where the variable appears in both the base and exponent, like y = x^x, and (2) products of many functions, where logarithms convert multiplication into addition.',
+
+      '**Where this is heading:** Notice that we derived the derivative of ln(x) by using the fact that it is the inverse of e^x. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of arcsin, arccos, and arctan.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 7 of 10 — Act 3: Exponential and Log',
+        body: '**Previous:** Trig derivatives — sin, cos, tan and the unit circle connection.\n**This lesson:** e^x (the unique function that equals its own derivative), ln(x) = 1/x, other bases, and logarithmic differentiation.\n**Next:** Inverse function derivatives — the general rule that relates the slope of f to the slope of f⁻¹, and all inverse trig derivatives.',
+      },
       {
         type: 'definition',
         title: 'e is Defined by This Slope Condition',

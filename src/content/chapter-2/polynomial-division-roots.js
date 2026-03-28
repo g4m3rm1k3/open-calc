@@ -2,7 +2,7 @@ export default {
   id: 'ch2-008',
   slug: 'polynomial-division-roots',
   chapter: 2,
-  order: 8,
+  order: 10,
   title: 'Polynomial Division, Rational Zeros, and Descartes\' Rule',
   subtitle: 'Long division and synthetic division are the tools; the Rational Zero Theorem and Descartes\' Rule tell you where to look',
   tags: ['polynomial division', 'long division', 'synthetic division', 'remainder theorem', 'factor theorem', 'rational zeros', 'Descartes rule', 'linear factorization'],
@@ -16,6 +16,8 @@ export default {
 
   intuition: {
     prose: [
+      '**Appendix Tool Lesson — Not Part of the Main Derivative Story:** This lesson is a reference resource, not part of the ten-lesson arc of Chapter 2. You do not need it to understand derivatives. Come here when a calculus problem produces a polynomial that needs to be factored, and you need to find its roots systematically. The core story of Chapter 2 (Lessons 1–10) is complete before you reach this lesson.',
+
       'Dividing polynomials is identical to dividing integers — same algorithm, just with powers of $x$ instead of powers of 10. Long division of $x^3 + 2x^2 - 5x - 6$ by $(x-2)$ proceeds: how many times does $x$ go into $x^3$? Answer: $x^2$. Multiply, subtract, bring down. Repeat. The result is a quotient and a remainder.',
       'Synthetic division is long division compressed into a row of numbers — it only works when the divisor is linear of the form $(x - c)$. Write only the coefficients of the dividend, write $c$ to the left, and follow the bring-down-multiply-add pattern. It is faster than long division and less error-prone once you know the pattern.',
       'The Remainder Theorem connects division to evaluation: when you divide $f(x)$ by $(x-c)$, the remainder equals $f(c)$. This means synthetic division simultaneously divides the polynomial AND evaluates it at $c$. The Factor Theorem follows: $(x-c)$ is a factor of $f(x)$ if and only if $f(c) = 0$ — i.e., $c$ is a root.',

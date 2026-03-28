@@ -16,6 +16,10 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** In the last lesson you built the derivative from first principles using the limit definition. You proved that the derivative of x² is 2x by expanding (x+h)² and simplifying. You now *understand* what a derivative is. This lesson asks the next question: do you really need to go back to limits every time? The answer is no — and here is why.',
+
+      '**The payoff of Act 1:** Every rule in this lesson is a theorem proved from the limit definition you just learned. Once proved, it can be applied instantly to any function in its domain. Engineers, physicists, and economists differentiate hundreds of functions per day. The shortcut rules make that possible without going back to scratch every time.',
+
       'Look at the pattern from the previous lesson: the derivative of x\u00b9 is 1, the derivative of x\u00b2 is 2x, the derivative of x\u00b3 is 3x\u00b2, and the derivative of x\u2074 is 4x\u00b3. In every case, the exponent "drops down" to become the coefficient, and the exponent decreases by one. This pattern is the power rule, and it holds for every real number exponent — not just positive integers.',
       'Before diving into formulas, let us address a common misconception about the product rule. Students sometimes guess that the derivative of a product f(x)\u00b7g(x) should be f\'(x)\u00b7g\'(x) — just differentiate each factor. This guess is WRONG. A simple counterexample: take f(x) = x and g(x) = x. Then f(x)\u00b7g(x) = x\u00b2, whose derivative is 2x. But f\'(x)\u00b7g\'(x) = 1\u00b71 = 1. Since 2x \u2260 1 (except at x = 1/2), the naive guess fails. The actual product rule is more subtle.',
       'Why does the product rule have the form it does? Think of f(x)\u00b7g(x) as the area of a rectangle with side lengths f(x) and g(x). When x changes by a small amount h, both f and g change: f changes by approximately f\'(x)\u00b7h and g changes by approximately g\'(x)\u00b7h. The change in the area is the change in the rectangle. The new rectangle has area (f + \u0394f)(g + \u0394g) = fg + f\u00b7\u0394g + g\u00b7\u0394f + \u0394f\u00b7\u0394g. The total change in area is f\u00b7\u0394g + g\u00b7\u0394f + \u0394f\u00b7\u0394g. When we divide by h and let h\u21920, the \u0394f\u00b7\u0394g term (which is proportional to h\u00b2) becomes negligible, and we are left with f\u00b7g\'(x) + g\u00b7f\'(x). That is the product rule.',
@@ -23,8 +27,15 @@ export default {
       'Why does the quotient rule have a minus sign? Think of f/g: if the denominator g increases, the ratio f/g decreases. So an increase in g contributes negatively to the rate of change of the ratio. This negative contribution is captured by the minus sign in front of f(x)\u00b7g\'(x).',
       'The sum and difference rules say that differentiation is linear: you can differentiate term by term. This follows directly from the linearity of limits. The constant multiple rule follows similarly. These two rules together mean: to differentiate a polynomial, just differentiate each term independently.',
       'Second and higher derivatives are just what you get by differentiating again. If f\'(x) is the derivative of f, then f\'\'(x) is the derivative of f\', called the second derivative. It measures the rate of change of the rate of change — geometrically, it measures concavity. The notation f\'\'(x) = d\u00b2y/dx\u00b2 (read "d two y d x squared") looks like a fraction raised to a power but is actually a separate operator applied twice.',
+
+      '**Where this is heading:** Power, product, and quotient rules handle functions that are added, multiplied, or divided. But what about functions built by *nesting* — like sin(x²) or e^(3x) or √(x³+1)? The rules you just learned cannot reach inside those outer wrappers. The next lesson — the chain rule — is the key that unlocks every composed function in calculus.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 3 of 10 — Act 2: The Toolkit Begins',
+        body: '**Previous:** You built the derivative from the limit definition and saw the difference quotient become the tangent slope.\n**This lesson:** Power, product, quotient, and sum rules — shortcut theorems proved from limits, applied instantly.\n**Next:** The chain rule: how to differentiate one function nested inside another.',
+      },
       {
         type: 'warning',
         title: 'The Product Rule is NOT (fg)\u2019 = f\u2019g\u2019',

@@ -2,7 +2,7 @@ export default {
   id: 'ch2-002b',
   slug: 'derivatives-of-inverse-functions',
   chapter: 2,
-  order: 4,
+  order: 7,
   title: 'Derivatives of Inverse Functions',
   subtitle: 'General inverse-derivative rule, formal proof, and inverse trig formulas',
   tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'domain restriction', 'monotone', 'one-to-one', 'horizontal line test'],
@@ -19,6 +19,10 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** In the last lesson, you saw an inverse-function argument in action: the derivative of ln(x) was found by treating ln as the inverse of e^x, differentiating both sides of e^y = x, and solving. That approach was not a trick — it was a general theorem in disguise. This lesson makes that theorem explicit, proves it geometrically, and then applies it to derive all six inverse trig derivatives.',
+
+      '**The central insight:** If f maps x to y, then f⁻¹ maps y back to x. On a graph, f⁻¹ is the reflection of f across the line y = x. Reflection swaps the x and y axes — which means it swaps "rise" and "run" in every slope calculation. So the slope of f⁻¹ at y is the *reciprocal* of the slope of f at x. That is the whole theorem. The rest is applying it carefully.',
+
       'If y = f(x), then the inverse relation is x = f^(-1)(y). Intuitively, moving forward through f and then backward through f^(-1) cancels out.',
       'On a graph, f and f^(-1) are reflections across y = x. Reflection swaps x and y coordinates, so tangent rise/run becomes run/rise. That is why inverse slopes are reciprocals.',
       'The most common mistake is evaluating at the wrong point. If f(a) = b, then the reciprocal slope relation is between f\'(a) and (f^(-1))\'(b), not at the same x-value.',
@@ -27,8 +31,15 @@ export default {
       'Here is the single most important visual fact: the graph of $f^{-1}$ is the graph of $f$ reflected across the line $y = x$. Every point $(a, b)$ on $f$ becomes the point $(b, a)$ on $f^{-1}$. That reflection is not a trick — it is the geometric meaning of swapping input and output.',
       'But there is an immediate problem. If $f$ ever produces the same output from two different inputs — say $f(2) = 9$ and $f(-2) = 9$ — then the "undo" machine is confused: given output $9$, does it return $2$ or $-2$? It cannot do both and still be a function. This is why we need the function to be one-to-one: each output must come from exactly one input.',
       'The quick visual check is the horizontal line test. Draw any horizontal line across the graph of $f$. If any horizontal line hits the graph more than once, $f$ is not one-to-one and has no inverse on that full domain.',
+
+      '**Where this is heading:** You have now differentiated polynomials, trig, exponential/log, and inverse functions — a complete toolkit for every fundamental function type. The next lesson takes one final step: what if y is not even written explicitly as a function of x? That is implicit differentiation, and it is simply the chain rule applied to both sides of any equation.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 8 of 10 — Act 3: Inverse Functions',
+        body: '**Previous:** Exponential and log derivatives — e^x = its own derivative, ln(x) = 1/x.\n**This lesson:** The general inverse derivative theorem + arcsin, arccos, arctan formulas.\n**Next:** Implicit differentiation — differentiating curves defined by equations F(x,y)=0, not explicit formulas y=f(x).',
+      },
       {
         type: 'definition',
         title: 'Inverse Function',

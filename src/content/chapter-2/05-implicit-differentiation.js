@@ -3,7 +3,7 @@ export default {
   id: 'ch2-005',
   slug: 'implicit-differentiation',
   chapter: 2,
-  order: 5,
+  order: 8,
   title: 'Implicit Differentiation',
   subtitle: 'Finding dy/dx when y cannot be (or is not) solved for explicitly — the chain rule in disguise',
   tags: ['implicit differentiation', 'implicit function', 'dy/dx', 'circle', 'folium of Descartes', 'chain rule', 'tangent line to curve'],
@@ -17,14 +17,25 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You have a complete differentiation toolkit and you have applied it to every fundamental function type. But there is one situation we have avoided: what if you cannot write y as an explicit function of x? The equation x² + y² = 25 defines a circle. You can split it into y = √(25−x²) and y = −√(25−x²), but neither piece covers the whole circle. What if you need the slope at a point where the two pieces meet? Implicit differentiation is the answer.',
+
+      '**The key idea — and it is just the chain rule:** Treat y as an unknown function of x. When you differentiate any expression involving y with respect to x, you apply the chain rule — differentiate with respect to y first, then multiply by dy/dx. That is it. The method produces an equation you then solve for dy/dx. No new rules; just the chain rule used deliberately.',
+
       'The key insight of implicit differentiation is deceptively simple: y is a function of x. Even if we have not solved for y explicitly — even if solving for y is impossible — we can still treat y as if it is some function y(x). We just do not know which function it is. That is fine, because the chain rule tells us how to differentiate any expression involving y with respect to x, regardless of what y\'s explicit formula might be.',
       'The chain rule says: to differentiate a function of y with respect to x, differentiate with respect to y first, then multiply by dy/dx. This is because y is the inner function and x is the outer variable. So d/dx[y\u00b2] = 2y\u00b7(dy/dx), not just 2y. And d/dx[sin(y)] = cos(y)\u00b7(dy/dx). And d/dx[e^y] = e^y\u00b7(dy/dx). In each case, we treat y as a function of x and apply the chain rule.',
       'The procedure is clean and algorithmic. Step 1: Write down the equation. Step 2: Differentiate both sides with respect to x, applying the chain rule to every y-expression. Step 3: Gather all terms containing dy/dx on one side of the equation. Step 4: Factor out dy/dx. Step 5: Divide to isolate dy/dx. The result expresses dy/dx in terms of both x and y — which is perfectly fine, since dy/dx is the slope of the curve at a specific point (x, y).',
       'Why does dy/dx involve both x and y? Because the slope of an implicit curve at a point depends on where you are on the curve, and to specify a location on a curve like a circle you need both coordinates. At the point (3, 4) on x\u00b2+y\u00b2=25, the slope is different from the slope at (4, 3), even though both x and y values are the same set of numbers.',
       'The tangent line to an implicit curve at a point (x\u2080, y\u2080) is found the same way as always: evaluate dy/dx at (x\u2080, y\u2080) to get the slope m, then use the point-slope formula y - y\u2080 = m(x - x\u2080). The only new subtlety is that dy/dx may involve both x and y, so we must substitute both coordinates to get a number.',
       'The normal line to a curve at a point is perpendicular to the tangent line. If the tangent has slope m, the normal has slope -1/m. Normal lines appear in optics (reflections) and in differential geometry (evolutes and involutes).',
+
+      '**Where this is heading:** You now know how to differentiate anything — explicit or implicit. The final synthesis lesson (Lesson 10) asks a different kind of question: given the *graph* of a function, what can you read directly about its derivatives, without any computation? That visual literacy closes Chapter 2.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 9 of 10 — Act 4: Synthesis Begins',
+        body: '**Previous:** Inverse function derivatives — the slope-reciprocal theorem and arcsin/arctan formulas.\n**This lesson:** Implicit differentiation — when y is not solved for explicitly, the chain rule still finds dy/dx.\n**Next:** Reading derivatives from graphs — the visual language of f, f′, f′′, and what they say about shape and motion.',
+      },
       {
         type: 'insight',
         title: 'The Chain Rule in Disguise',

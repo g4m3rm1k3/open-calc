@@ -17,6 +17,10 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You have all the basic differentiation rules — power, product, and quotient. Those rules handle functions that are *combined* (added, multiplied, divided). But what about functions that are *nested* — one function applied inside another? sin(x²) is not a product; it is sine *applied to* x². The rules from the last lesson cannot reach inside that parenthesis. This lesson closes that gap.',
+
+      '**Why this matters:** The chain rule is the single most-used rule in all of applied calculus. It appears every time you differentiate any non-trivial function. In machine learning, every gradient computed through a deep neural network is chain rule applied millions of times (backpropagation). In physics, any coordinate transform or changing variable requires it. In the rest of this chapter alone, you will use it in every single subsequent lesson.',
+
       'Sequencing map: first derivatives are built from limits, then power/product/quotient rules are proved, and only then does the chain rule appear. The chain rule is layered on those earlier results.',
       'Let\'s build intuition for composition before worrying about differentiation. The expression f(g(x)) means: first apply g to x, get an intermediate result, then apply f to that intermediate result. For example, if g(x) = x\u00b2 + 1 and f(u) = \u221au, then f(g(x)) = \u221a(x\u00b2+1). The function g acts "on the inside" and f acts "on the outside." To evaluate at x = 3: first g(3) = 10, then f(10) = \u221a10. This two-step process is composition.',
       'Now think about rates. If u = g(x) changes by a certain rate as x changes, and y = f(u) changes at a certain rate as u changes, then what is the rate of change of y with respect to x? The answer is found by multiplying the rates: if u increases 3 times as fast as x, and y increases 4 times as fast as u, then y increases 12 times as fast as x. Rates along a chain multiply.',
@@ -28,8 +32,15 @@ export default {
       'Beginner survival skill: before differentiating, run a layer scan. For tan^3(4x), the outermost skin is (... )^3, the middle layer is tan(...), and the inner core is 4x. If you can label layers correctly, peeling becomes automatic.',
       'Pipeline view: composition is a relay race, not one giant jump. x flows through g to become u, then u flows through f to become y. If the first machine doubles speed and the second triples speed, output speed is six times faster. This is exactly dy/dx = (dy/du)(du/dx).',
       'The chain rule extends to triple and longer compositions. For y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). Differentiate the outermost layer first, then the next, and so on, each time multiplying by the derivative of the layer below. This is like peeling an onion, one layer at a time.',
+
+      '**Where this is heading:** The chain rule is now yours. But knowing a rule and applying it without error are two different things. The very next lesson deliberately shows you the most common mistake students make the first week after learning the chain rule — forgetting to fully differentiate the inner piece inside a product rule. Seeing the mistake made explicitly (and numerically confirmed wrong) is the fastest way to make sure you never make it.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 10 — Act 2: The Chain Rule',
+        body: '**Previous:** Power, product, and quotient rules — shortcuts for combining functions.\n**This lesson:** The chain rule — how to differentiate any composition f(g(x)).\n**Next:** The most common chain rule mistake (product + chain trap) — we drill it immediately so bad habits never form.',
+      },
       {
         type: 'sequencing',
         title: 'Prerequisite Reminder',
