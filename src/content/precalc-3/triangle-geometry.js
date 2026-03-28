@@ -19,6 +19,8 @@ export default {
       "The angles of any triangle always sum to 180°. This is not just a rule — it follows from the parallel line axiom of Euclidean geometry. Draw a line through the apex of any triangle parallel to the base. The three angles of the triangle line up along it, making a straight angle of 180°. This proof works for every triangle, every time.",
       "Two triangles are similar (∼) if their angles match — one is a scaled copy of the other. Similar triangles have equal ratios of corresponding sides. This is why the trigonometric ratios are well-defined: in any right triangle with a given acute angle, the ratio opposite/hypotenuse is always the same number, regardless of the triangle's size. That number is the sine of the angle.",
       "Two triangles are congruent (≅) if they have the same angles and the same side lengths — they are identical, not just scaled copies. The congruence conditions (SSS, SAS, ASA, AAS, HL for right triangles) tell you the minimum information needed to guarantee two triangles are identical.",
+      "**The Language of Inclosure**: A triangle is the simplest possible enclosure in flat space. It is the only polygon that is 'Rigid'—meaning its shape is completely determined by its side lengths. This unique property makes it the universal building block of stable structures.",
+      "**Structural Rigidity**: Unlike a square, which can 'shear' into a rhombus without changing its side lengths, a triangle cannot be deformed. To change an angle, you MUST change a side length. This is WHY bridges, cranes, and roof trusses are built from interconnected triangles.",
     ],
     callouts: [
       {
@@ -40,6 +42,26 @@ export default {
         type: 'theorem',
         title: 'Pythagorean triples — generating formula',
         body: '(m^2-n^2,\\; 2mn,\\; m^2+n^2) \\text{ for integers } m > n > 0 \\\\ m=2,n=1 \\to (3,4,5) \\quad m=3,n=2 \\to (5,12,13) \\\\ m=4,n=1 \\to (15,8,17) \\quad m=4,n=3 \\to (7,24,25)',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of Inclosure',
+        body: '\\text{The word "Triangle" (3 angles) implies "Trigon" (3 sides).} \\\\ \\text{In geometry, these are inseparable. To define three corners is to define three boundaries—the most efficient cage for a 2D area.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Sum of All Things',
+        body: '\\text{Why 180?} \\\\ \\text{Parallel translation tells us that as you walk the perimeter, your total turning must equal half a circle to return to the start.} \\\\ \\text{It is the logical boundary of Euclidean space.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: Structural Rigidity',
+        body: '\\text{A square can collapse; a triangle cannot.} \\\\ \\text{In engineering, "Triangulation" is the method of creating rigid frameworks. If the sides are fixed, the bridge is safe.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Half-Box Concept',
+        body: '\\text{Area} = \\frac{1}{2}bh. \\\\ \\text{Visualize a rectangle with base } b \\text{ and height } h. \\\\ \\text{No matter where the apex of the triangle is, it will always take up exactly 50% of that box\'s volume.}',
       },
     ],
     visualizations: [
@@ -95,6 +117,16 @@ export default {
         title: 'Common Pythagorean triples — memorise these',
         body: '3{-}4{-}5 \\quad 5{-}12{-}13 \\quad 8{-}15{-}17 \\quad 7{-}24{-}25 \\\\ \\text{Multiples also work: } 6{-}8{-}10,\\; 9{-}12{-}15,\\; 10{-}24{-}26 \\ldots',
       },
+      {
+        type: 'theorem',
+        title: 'The Parallel Line Argument (Angle Sum)',
+        body: '\\text{Draw a line through the apex triangle parallel to the base.} \\\\ \\text{Alternate interior angles show that the three angles of any triangle perfectly tessellate a straight line ($180^\\circ$).}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Exterior Angle Extension',
+        body: '\\text{The exterior angle of a triangle is equal to the sum of the two opposite interior angles.} \\\\ \\text{If interior angles are } \\alpha, \\beta, \\gamma \\text{, then } Ext_\\gamma = \\alpha + \\beta.',
+      },
     ],
   },
 
@@ -130,6 +162,26 @@ export default {
         expression: '2(\\alpha + \\beta) = 180° \\Rightarrow \\alpha + \\beta = 90° \\Rightarrow \\angle ACB = 90° \\qquad \\blacksquare',
         annotation: "The angle at C is always 90°, regardless of where C sits on the circle. This is Thales' theorem.",
       },
+      {
+        expression: '\\text{--- Part II: The Area Subtraction (Pythagorean Proof) ---}',
+        annotation: 'Let us prove $a^2 + b^2 = c^2$ using the geometry of a large square $(a+b) \\times (a+b)$.'
+      },
+      {
+        expression: '\\text{Total Area} = (a+b)^2 = a^2 + 2ab + b^2',
+        annotation: 'Step 1: Calculate the area of the large outer bounding square.'
+      },
+      {
+        expression: '\\text{Inner Area} = 4 \\cdot (\\tfrac{1}{2}ab) + c^2',
+        annotation: 'Step 2: The same space is made of 4 right triangles plus a tilted inner square of area $c^2$.'
+      },
+      {
+        expression: 'a^2 + 2ab + b^2 = 2ab + c^2',
+        annotation: 'Step 3: Equate the two expressions for the same total area.'
+      },
+      {
+        expression: 'a^2 + b^2 = c^2 \\qquad \\blacksquare',
+        annotation: 'Step 4: Subtract $2ab$ from both sides. The algebraic identity mirrors the geometric reality.'
+      }
     ],
   },
 
@@ -182,6 +234,46 @@ export default {
       ],
       conclusion: 'The 3D distance formula is exactly the Pythagorean theorem applied in three dimensions. There is nothing new to memorise — just one more square under the root.',
     },
+    {
+      id: 'ex-triangle-3d-diag',
+      title: 'The Room Diagonal: Distancing in Space',
+      problem: '\\text{A box has dimensions 3m } \\times \\text{ 4m } \\times \\text{ 12m. What is the longest distance between two opposite corners?}',
+      steps: [
+        {
+          expression: 'd_{floor} = \\sqrt{3^2 + 4^2} = 5',
+          annotation: 'Step 1: Calculate the diagonal of the floor. This is a 3-4-5 triangle.'
+        },
+        {
+          expression: 'd_{room} = \\sqrt{5^2 + 12^2} = 13',
+          annotation: 'Step 2: Use the floor diagonal as one leg and the height (12) as the other. This is a 5-12-13 triangle.'
+        }
+      ],
+      conclusion: '3D distance is just Pythagoras twice. The "Diagonal of the Box" is the ultimate test of spatial geometry.'
+    },
+    {
+      id: 'ex-triangle-factory',
+      title: 'The Triple Factory: Generating Primitives',
+      problem: '\\text{Use Euclid\'s formula with } m=5, n=2 \\text{ to generate a primitive Pythagorean triple.}',
+      steps: [
+        {
+          expression: 'a = 5^2 - 2^2 = 25 - 4 = 21',
+          annotation: 'Step 1: Calculate the first leg.'
+        },
+        {
+          expression: 'b = 2(5)(2) = 20',
+          annotation: 'Step 2: Calculate the second leg.'
+        },
+        {
+          expression: 'c = 5^2 + 2^2 = 25 + 4 = 29',
+          annotation: 'Step 3: Calculate the hypotenuse.'
+        },
+        {
+          expression: '21^2 + 20^2 = 441 + 400 = 841 = 29^2 \\checkmark',
+          annotation: 'Step 4: Verify the result. 21-20-29 is a primitive triple.'
+        }
+      ],
+      conclusion: 'Euclid\'s formula is a powerful engine for discovery. It proves that there are infinitely many integer solutions to the right-triangle problem.'
+    },
   ],
 
   challenges: [
@@ -223,6 +315,27 @@ export default {
       ],
       answer: '|OM| = |AM| = |BM| = \\sqrt{a^2+b^2} = \\tfrac{1}{2}|AB|',
     },
+    {
+      id: 'ch3-trig-002-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Verify Thales\' Theorem for a triangle with vertices } (0,0), (6,0), \\text{ and } (0,8). \\text{ Find the midpoint of the hypotenuse and check its distance to all three corners.}',
+      hint: 'The midpoint is the center of the circumscribed circle. It should be equidistant from the right angle and the two sharp corners.',
+      walkthrough: [
+        {
+          expression: 'M = (3,4)',
+          annotation: 'Step 1: Calculate the midpoint of the hypotenuse from (6,0) to (0,8).'
+        },
+        {
+          expression: 'd_{origin} = \\sqrt{3^2 + 4^2} = 5',
+          annotation: 'Step 2: Calculate the distance from (3,4) to the origin (0,0).'
+        },
+        {
+          expression: 'd_{A} = \\sqrt{(3-6)^2 + (4-0)^2} = 5 \\\\ d_{B} = \\sqrt{(3-0)^2 + (4-8)^2} = 5',
+          annotation: 'Step 3: Calculate the distance to the other two corners. All are equal.'
+        }
+      ],
+      answer: 'Distances to (0,0), (6,0), (0,8) are all 5.'
+    }
   ],
 
   calcBridge: {

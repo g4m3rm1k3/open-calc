@@ -19,6 +19,8 @@ export default {
       'In a right triangle, the six trig ratios are just the six ways to form a fraction from the three side lengths. With sides labelled relative to an acute angle $\\theta$: opposite (opp), adjacent (adj), hypotenuse (hyp), the six ratios are $\\sin = \\text{opp/hyp}$, $\\cos = \\text{adj/hyp}$, $\\tan = \\text{opp/adj}$, and their reciprocals $\\csc = \\text{hyp/opp}$, $\\sec = \\text{hyp/adj}$, $\\cot = \\text{adj/opp}$.',
       'The "co" prefix means complementary. The co-sine of an angle is the sine of its complement: $\\cos\\theta = \\sin(90°-\\theta)$. Similarly $\\cot\\theta = \\tan(90°-\\theta)$ and $\\csc\\theta = \\sec(90°-\\theta)$. This is why co-functions appear in pairs — they share the same values, just on opposite angles of the same right triangle.',
       'These ratios are well-defined because of similar triangles. Every right triangle with a given acute angle $\\theta$ is similar to every other — same angles, just different scale. The ratio opposite/hypotenuse is the same for all of them. That common ratio is exactly what we call $\\sin\\theta$. The ratio does not depend on the size of the triangle.',
+      '**The Grammar of Proportion**: The word "Sine" has a messy history—starting as "Jiva" (bowstring) in Sanskrit, becoming "Jaib" (fold) in Arabic, and being mistranslated into "Sinus" (bay/pocket) in Latin. Regardless of the name, it represents the "Vertical Chord"—the height of a point on the circle.',
+      '**The Scale-Free Universe**: Trigonometry is the math of Ratios, and ratios are the only true units in physics. Whether you are measuring the angle of an atom or the angle of a distant galaxy, the Sine of 30° is ALWAYS 0.5. It is a universal constant of shape, independent of size.',
     ],
     callouts: [
       {
@@ -35,6 +37,26 @@ export default {
         type: 'insight',
         title: 'The co-function symmetry',
         body: '\\sin\\theta = \\cos(90°-\\theta) \\qquad \\cos\\theta = \\sin(90°-\\theta) \\\\ \\tan\\theta = \\cot(90°-\\theta) \\qquad \\sec\\theta = \\csc(90°-\\theta) \\\\ \\text{"co" means complement: the co-function of } \\theta \\text{ is the function of } (90°-\\theta)',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Grammar of Proportion',
+        body: '\\text{The "co" in cosine stands for "complementary."} \\\\ \\text{The Sine of an angle is literally the "Fold" or "Chord" of the circle. The Cosine is just the Sine seen from the other corner\'s perspective.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Scale-Free Universe',
+        body: '\\text{Geometry is scale-invariant.} \\\\ \\text{Because a triangle is "Rigid," every angle is locked to a specific ratio of sides. Trigonometry is the catalog of these universal proportions.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Clinometer and Shadow',
+        body: '\\text{Ancient Egyptians found the height of pyramids by measuring shadows.} \\\\ \\text{The Tangent ratio is the "Shadow Factor"—tell me the angle of the sun, and I will tell you exactly how many times longer your shadow is than your height.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Tangent as Slope',
+        body: '\\text{Visualize a mountain climb.} \\\\ \\text{The Sine is your vertical gain; the Cosine is your horizontal travel; the Tangent is the "Steepness" of the path.} \\\\ \\tan\\theta \\text{ is the literal slope (rise/run) of the terminal side.}',
       },
     ],
     visualizations: [
@@ -82,7 +104,17 @@ export default {
       {
         type: 'mnemonic',
         title: 'ASTC — which functions are positive in each quadrant',
-        body: '\\text{QI: All positive} \\quad \\text{QII: Sin (and csc) positive} \\\\ \\text{QIII: Tan (and cot) positive} \\quad \\text{QIV: Cos (and sec) positive} \\\\ \\text{"All Students Take Calculus" or "Add Sugar To Coffee"}',
+        body: '\\text{"All Students Take Calculus"} \\quad \\text{QI: All | QII: Sin | QIII: Tan | QIV: Cos} \\\\ \\text{This follows from the }(x,y) \\text{ signs of the unit circle point } (\\cos, \\sin).',
+      },
+      {
+        type: 'theorem',
+        title: 'The Unit Circle Projection (Pythagorean Identity)',
+        body: '\\text{For any point } (x,y) \\text{ on the unit circle: } x^2 + y^2 = 1^2. \\\\ \\text{Substituting the trig coordinates: } \\cos^2\\theta + \\sin^2\\theta = 1. \\\\ \\text{This is the fundamental constraint of the trigonometric world.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Similarity Necessity',
+        body: '\\text{If triangles } T_1, T_2 \\text{ share angle } \\theta, \\text{ they share ALL angles (A-A similarity).} \\\\ \\text{Side ratios are fixed by similarity scale factors. Therefore, any two students solving the same trig problem will find the SAME numerical ratio.}',
       },
     ],
     visualizations: [
@@ -119,6 +151,26 @@ export default {
         expression: '\\sin 30° = \\frac{1}{2}, \\; \\cos 30° = \\frac{\\sqrt{3}}{2}, \\; \\sin 60° = \\frac{\\sqrt{3}}{2}, \\; \\cos 60° = \\frac{1}{2} \\qquad \\blacksquare',
         annotation: 'Read off the ratios. Note the co-function symmetry: $\\sin 30° = \\cos 60°$ and $\\cos 30° = \\sin 60°$ — complements of each other.',
       },
+      {
+        expression: '\\text{--- Part II: The Complementary Cofunction Proof ---}',
+        annotation: 'Let us prove why $\\sin \\theta = \\cos(90 - \\theta)$ for any right triangle.'
+      },
+      {
+        expression: '\\text{Let } A + B + 90^\\circ = 180^\\circ \\implies B = 90^\\circ - A',
+        annotation: 'Step 1: The two acute angles of a right triangle are complementary.'
+      },
+      {
+        expression: '\\sin A = \\frac{\\text{Opposite of } A}{\\text{Hypotenuse}}',
+        annotation: 'Step 2: Define Sine for angle A.'
+      },
+      {
+        expression: '\\text{The "Opposite of } A" \\text{ is the "Adjacent of } B"',
+        annotation: 'Step 3: Geometry of the shared sides. The side opposite to A is the one next to B.'
+      },
+      {
+        expression: '\\cos B = \\frac{\\text{Adjacent of } B}{\\text{Hypotenuse}} = \\sin A \\qquad \\blacksquare',
+        annotation: 'Step 4: Therefore, the Cosine of B is identical to the Sine of A. This is the definition of a Co-function.'
+      }
     ],
   },
 
@@ -163,6 +215,46 @@ export default {
       ],
       conclusion: 'Reference angle method: (1) find which quadrant, (2) find the reference angle (acute angle to the x-axis), (3) apply the ASTC sign rule.',
     },
+    {
+      id: 'ex-trig-reciprocal-recon',
+      title: 'Reciprocal Reconstruction: Working Backwards',
+      problem: '\\text{If } \\sec\\theta = \\sqrt{5} \\text{ and } \\sin\\theta < 0, \\text{ find all six trig ratios.}',
+      steps: [
+        {
+          expression: '\\cos\\theta = \\frac{1}{\\sqrt{5}}, \\quad \\theta \\in QIV',
+          annotation: 'Step 1: Reciprocal of secant is cosine. Since sec is positive and sin is negative, we must be in Quadrant IV.'
+        },
+        {
+          expression: '\\text{adj} = 1, \\text{ hyp} = \\sqrt{5} \\implies \\text{opp} = -\\sqrt{(\\sqrt{5})^2 - 1^2} = -2',
+          annotation: 'Step 2: Use Pythagoras to find the opposite side. It MUST be negative because of QIV.'
+        },
+        {
+          expression: '\\sin\\theta = -\\frac{2}{\\sqrt{5}}, \\quad \\tan\\theta = -2, \\quad \\cot\\theta = -\\frac{1}{2}, \\quad \\csc\\theta = -\\frac{\\sqrt{5}}{2}',
+          annotation: 'Step 3: Read off all remaining ratios from the side lengths.'
+        }
+      ],
+      conclusion: 'A single reciprocal ratio locks in the entire unit circle possibility. Sign analysis is the final filter.'
+    },
+    {
+      id: 'ex-trig-complement-eq',
+      title: 'The Complement Equation: Symmetry in Action',
+      problem: '\\text{Solve for } x: \\sin(20^\\circ) = \\cos(x).',
+      steps: [
+        {
+          expression: '\\cos(x) = \\sin(90^\\circ - x)',
+          annotation: 'Step 1: Use the co-function identity.'
+        },
+        {
+          expression: '\\sin(20^\\circ) = \\sin(90^\\circ - x) \\implies 20 = 90 - x',
+          annotation: 'Step 2: Equate the arguments.'
+        },
+        {
+          expression: 'x = 70^\\circ',
+          annotation: 'Step 3: Solve for x.'
+        }
+      ],
+      conclusion: 'Co-functions are identical once you cross the 45° boundary of the complement.'
+    },
   ],
 
   challenges: [
@@ -204,6 +296,27 @@ export default {
       ],
       answer: '\\tan\\theta + \\cot\\theta = \\sec\\theta\\csc\\theta',
     },
+    {
+      id: 'ch3-trig-003-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Start with the fundamental identity } \\sin^2\\theta + \\cos^2\\theta = 1. \\text{ Derive the identity relating cotangent and cosecant.}',
+      hint: 'Divide the entire identity by $\\sin^2\\theta$.',
+      walkthrough: [
+        {
+          expression: '\\frac{\\sin^2\\theta}{\\sin^2\\theta} + \\frac{\\cos^2\\theta}{\\sin^2\\theta} = \\frac{1}{\\sin^2\\theta}',
+          annotation: 'Step 1: Perform the same algebraic operation (division) on every term.'
+        },
+        {
+          expression: '1 + \\left(\\frac{\\cos\\theta}{\\sin\\theta}\\right)^2 = \\left(\\frac{1}{\\sin\\theta}\\right)^2',
+          annotation: 'Step 2: Group the squared terms.'
+        },
+        {
+          expression: '1 + \\cot^2\\theta = \\csc^2\\theta \\qquad \\blacksquare',
+          annotation: 'Step 3: Recognition. The ratio of cos-to-sin is cotangent; the reciprocal of sin is cosecant.'
+        }
+      ],
+      answer: '1 + \\cot^2\\theta = \\csc^2\\theta'
+    }
   ],
 
   calcBridge: {
