@@ -91,6 +91,23 @@ export default {
         title: 'The Limit Definition in Action',
         caption: 'Watch as secant lines transform into the tangent line as the interval h shrinks to zero.',
       },
+      {
+        id: 'PositionVelocityAcceleration',
+        title: 'Position, Velocity & Acceleration — The Derivative Chain',
+        mathBridge: 'See position, velocity, and acceleration graphs side by side. Drag the position curve and watch both derivative graphs update in real time. The derivative chain v = x\', a = v\' is the physical backbone of Chapter 2.',
+        caption: 'Every derivative in Chapter 2 is a rate of change. This viz shows the full semantic meaning of that chain.',
+      },
+      {
+        id: 'ChainRuleCompositionViz',
+        title: 'Two Function Machines — Inner and Outer',
+        mathBridge: 'Pick any composition. See x flow through inner g then outer f. The chain rule assembles from the two derivatives.',
+      },
+      {
+        id: 'ImplicitCurveExplorer',
+        title: 'Implicit Differentiation — The Moving Tangent',
+        mathBridge: 'Explore curves defined implicitly (circles, lemniscates). Watch how the tangent line at any point is found by differentiating both sides and solving for dy/dx.',
+        caption: 'When you cannot solve for y, implicit differentiation finds the slope anyway.',
+      },
     ],
 
     failureModes: [

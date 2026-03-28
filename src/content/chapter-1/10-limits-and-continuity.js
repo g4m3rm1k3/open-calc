@@ -85,7 +85,25 @@ export default {
     continuityDefinition: `f is continuous at a if: (1) f(a) is defined, (2) lim_{x→a} f(x) exists, (3) they're equal.`,
 
     visualizations: [
-                ],
+      {
+        id: 'LimitApproachViz',
+        title: 'The Limit Approach — Left and Right',
+        mathBridge: 'Drag x toward the target point from both sides. Watch the function values converge (or diverge). The two-sided limit exists only when both one-sided limits agree.',
+        caption: 'The fundamental question of Chapter 1: what value does f(x) approach as x approaches a?',
+      },
+      {
+        id: 'ContinuityViz',
+        title: 'Continuity — No Holes, No Jumps, No Breaks',
+        mathBridge: 'Explore all three continuity conditions: f(a) defined, limit exists, and they match. Toggle each condition on/off to see which types of failure each one creates.',
+        caption: 'A function is continuous at a if and only if all three conditions hold simultaneously.',
+      },
+      {
+        id: 'EpsilonDeltaViz',
+        title: 'Epsilon-Delta — The Formal Definition',
+        mathBridge: 'Set epsilon (the output tolerance). Watch delta (the input restriction) adjust. For any epsilon, there must exist a corresponding delta — that is what the formal definition requires.',
+        caption: 'The ε-δ definition makes "approaches" precise. Shrink ε to see how δ must shrink with it.',
+      },
+    ],
   },
 
   rigor: {
