@@ -18,6 +18,8 @@ export default {
       'A quadratic $ax^2 + bx + c$ is a parabola. Its vertex — the minimum or maximum point — is the geometric heart of the function. Vertex form $a(x-h)^2 + k$ makes the vertex $(h, k)$ immediately readable. Completing the square is the algebraic procedure that converts standard form into vertex form.',
       'The geometric intuition: $x^2 + bx$ is a square of side $x$ plus a rectangle of width $b$ and height $x$. To complete it into a perfect square, split the rectangle in half and attach one piece to each side of the square. The missing corner is a square of side $b/2$, area $(b/2)^2$. Add it in — and subtract it to keep the value the same. Now you have $(x + b/2)^2 - (b/2)^2$.',
       'The discriminant $b^2 - 4ac$ is not just a formula component — it is the quantity under the square root, telling you how far the vertex is from the $x$-axis. Positive: two real roots (vertex and $x$-axis are on opposite sides). Zero: one repeated root (vertex touches $x$-axis). Negative: no real roots (vertex does not reach the $x$-axis).',
+      '**The Symmetry of Change**: Every parabola is perfectly symmetrical. The **Axis of Symmetry** is the vertical line passing through the vertex, dividing the path into mirror images. In physics, this represents the moment an object stops rising and begins to fall—the perfect midpoint of a journey through time and space.',
+      '**Turning Points**: Unlike linear relationships that go in one direction forever, quadratics have a **Turning Point**. This vertex represents the absolute limit of the system—the maximum profit, the minimum fuel consumption, or the peak of a projectile’s flight.',
     ],
     callouts: [
       {
@@ -34,6 +36,26 @@ export default {
         type: 'theorem',
         title: 'The three forms of a quadratic — when to use each',
         body: '\\text{Standard: } ax^2+bx+c \\quad \\text{(easy to find }y\\text{-intercept: it\'s }c\\text{)} \\\\ \\text{Vertex: } a(x-h)^2+k \\quad \\text{(easy to read vertex }(h,k)\\text{ and axis of symmetry)} \\\\ \\text{Factored: } a(x-r_1)(x-r_2) \\quad \\text{(easy to read roots }r_1, r_2\\text{)}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Etymology of Square',
+        body: '\\text{The word "Quadratic" comes from the Latin "Quadratum," meaning Square.} \\\\ \\text{The highest power is 2 because the relationship describes area—literally, the area of a square with side length } x.',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Midpoint Constraint',
+        body: '\\text{Because of symmetry, the x-coordinate of the vertex (h) is ALWAYS the exact average of the roots.} \\\\ h = \\frac{r_1 + r_2}{2}. \\text{ This connects Vieta’s formulas directly to the geometry of the vertex.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Parabola of Gravity',
+        body: '\\text{A ball thrown in the air follows a quadratic path } y = at^2 + vt + s. \\\\ \\text{The vertex is the maximum height, and the roots represent the time of launch and the time of impact.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Turning Point',
+        body: '\\text{The vertex is a snapshot of Momentum in Transition.} \\\\ \\text{It is where the "speed" of the y-value hits zero before reversing direction. Look for where the slope mirrors itself.}',
       },
     ],
     visualizations: [
@@ -68,6 +90,16 @@ export default {
         title: 'The leading coefficient matters when completing the square',
         body: '2x^2 + 8x + 3: \\text{ factor out 2 first.} \\\\ 2(x^2 + 4x) + 3 = 2(x^2 + 4x + 4) + 3 - 8 = 2(x+2)^2 - 5 \\\\ \\text{Note: adding 4 inside the bracket adds } 2 \\times 4 = 8 \\text{ to the expression — subtract 8 outside.}',
       },
+      {
+        type: 'theorem',
+        title: 'The Average of Roots Proof ($h = -b/2a$)',
+        body: '\\text{By the Quadratic Formula, roots are } \\frac{-b}{2a} \\pm \\frac{\\sqrt{\\Delta}}{2a}. \\\\ \\text{The average is } h = \\frac{1}{2}\\left[\\left(\\frac{-b}{2a} + \\frac{\\sqrt{\\Delta}}{2a}\\right) + \\left(\\frac{-b}{2a} - \\frac{\\sqrt{\\Delta}}{2a}\\right)\\right] = -\\frac{b}{2a}. \\\\ \\text{The axis of symmetry is the center of the roots.}',
+      },
+      {
+        type: 'theorem',
+        title: 'Vieta\'s Algebraic Symmetries',
+        body: 'ax^2+bx+c = a(x-r_1)(x-r_2) = a(x^2 - (r_1+r_2)x + r_1r_2). \\\\ \\text{Matching coefficients gives } -a(r_1+r_2) = b \\implies r_1+r_2 = -b/a \\text{ and } ar_1r_2 = c \\implies r_1r_2 = c/a.',
+      },
     ],
   },
 
@@ -101,6 +133,26 @@ export default {
       {
         expression: 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a} \\qquad \\blacksquare',
         annotation: 'Subtract $b/(2a)$ from both sides. The quadratic formula is completing the square applied to the general case.',
+      },
+      {
+        expression: '\\text{--- Part II: Completing the Square as Linear Transformation ---}',
+        annotation: 'Let us see how vertex form is just a shift of the basic parabola $y = x^2$.',
+      },
+      {
+        expression: 'f(x) = a(x^2 + \\frac{b}{a}x) + c',
+        annotation: 'Start with standard form and factor $a$ out of the variable terms.',
+      },
+      {
+        expression: '= a(x^2 + \\frac{b}{a}x + \\frac{b^2}{4a^2}) + c - \\frac{b^2}{4a}',
+        annotation: 'Add and subtract the constant $(b/2a)^2$ adjusted by the scale factor $a$.',
+      },
+      {
+        expression: '= a(x + \\frac{b}{2a})^2 + (c - \\frac{b^2}{4a})',
+        annotation: 'The vertex $(h,k)$ is the horizontal shift $h = -b/2a$ and vertical shift $k = c - b^2/4a$.',
+      },
+      {
+        expression: 'a(x-h)^2 + k \\qquad \\blacksquare',
+        annotation: 'Algebraic structure determines geometric location. Every quadratic is a shifted and scaled unit parabola.',
       },
     ],
   },
@@ -158,6 +210,50 @@ export default {
       ],
       conclusion: 'Irrational roots always come in conjugate pairs $p \\pm \\sqrt{q}$ when the coefficients are rational. Vieta\'s formulas let you reconstruct the quadratic directly from the roots.',
     },
+    {
+      id: 'ex-quad-projectile',
+      title: 'Physics: Tracking a Projectile',
+      problem: '\\text{A ball is thrown with height } h(t) = -5t^2 + 20t + 2. \\text{ Find the maximum height and the time it hits the ground.}',
+      steps: [
+        {
+          expression: 't_{\\text{peak}} = -\\frac{b}{2a} = -\\frac{20}{2(-5)} = 2 \\text{ seconds}',
+          annotation: 'Step 1: The maximum height occurs at the vertex. Use $t = -b/2a$.'
+        },
+        {
+          expression: 'h(2) = -5(4) + 20(2) + 2 = -20 + 40 + 2 = 22 \\text{ meters}',
+          annotation: 'Step 2: Substitute $t=2$ into the height function to find the peak.'
+        },
+        {
+          expression: '0 = -5t^2 + 20t + 2 \\implies t = \\frac{-20 \\pm \\sqrt{400 - 4(-5)(2)}}{2(-5)} = \\frac{-20 \\pm \\sqrt{440}}{-10}',
+          annotation: 'Step 3: Ground impact occurs when height $h(t) = 0$. Solve using the Quadratic Formula.'
+        },
+        {
+          expression: 't \\approx \\frac{-20 - 20.98}{-10} \\approx 4.1 \\text{ seconds}',
+          annotation: 'Step 4: Only the positive time root is physically meaningful.'
+        }
+      ],
+      conclusion: 'The vertex is the peak of the journey, and the roots are the endpoints. Every projectile is a quadratic experiment.'
+    },
+    {
+      id: 'ex-quad-profit',
+      title: 'Economics: Profit Maximisation',
+      problem: '\\text{A company\'s profit follows } P(x) = -x^2 + 100x - 1200, \\text{ where } x \\text{ is units sold. Find the "Break-Even" points and the optimal sales volume.}',
+      steps: [
+        {
+          expression: '0 = -x^2 + 100x - 1200 \\implies x^2 - 100x + 1200 = 0',
+          annotation: 'Step 1: Break-even is where $P(x) = 0$. Solve by factoring: $(x-20)(x-80) = 0$.'
+        },
+        {
+          expression: 'x_{\\text{break-even}} = 20, 80 \\text{ units}',
+          annotation: 'Step 2: These are the roots. Any sales between 20 and 80 result in profit.'
+        },
+        {
+          expression: 'x_{\\text{opt}} = -\\frac{100}{2(-1)} = 50 \\text{ units}',
+          annotation: 'Step 3: The vertex gives the maximum profit. $x=50$ is exactly half-way between 20 and 80.'
+        }
+      ],
+      conclusion: 'The "sweet spot" of any quadratic system is its vertex. Symmetry ensures that the optimum is always perfectly balanced between the zero-points.'
+    },
   ],
 
   challenges: [
@@ -199,6 +295,35 @@ export default {
       ],
       answer: 'f(x) = x^2 - 4x + 1',
     },
+    {
+      id: 'ch2-003-ch3',
+      difficulty: 'hard',
+      problem: '\\text{A parabola has roots at } x = -1 \\text{ and } x = 5. \\text{ If the maximum value of the function is } 18, \\text{ find its standard form equation.}',
+      hint: 'The x-coordinate of the vertex must be the midpoint of the roots. Once you have the vertex, use $y = a(x-h)^2 + k$ to find $a$.',
+      walkthrough: [
+        {
+          expression: 'h = \\frac{-1 + 5}{2} = 2',
+          annotation: 'Step 1: The vertex $x$ is the average of the roots.'
+        },
+        {
+          expression: '\\text{Vertex} = (2, 18)',
+          annotation: 'Step 2: The given "maximum value" is the $y$-coordinate of the vertex.'
+        },
+        {
+          expression: '18 = a(5-2)^2 \\text{ (Relative to roots, use intercept form)} \\\\ f(x) = a(x+1)(x-5) \\implies 18 = a(2+1)(2-5)',
+          annotation: 'Step 3: Substitute $(2, 18)$ into the factored form to solve for $a$.'
+        },
+        {
+          expression: '18 = a(3)(-3) \\implies 18 = -9a \\implies a = -2',
+          annotation: 'Step 4: Solve for the scale factor. The negative $a$ confirms it was a maximum.'
+        },
+        {
+          expression: 'f(x) = -2(x+1)(x-5) = -2(x^2 - 4x - 5) = -2x^2 + 8x + 10',
+          annotation: 'Step 5: Expand to standard form.'
+        }
+      ],
+      answer: 'f(x) = -2x^2 + 8x + 10'
+    }
   ],
 
   calcBridge: {
