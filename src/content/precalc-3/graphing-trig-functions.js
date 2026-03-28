@@ -19,6 +19,8 @@ export default {
       'Sine and cosine are the foundation. Their graphs are identical in shape — cosine is just sine shifted left by $\\pi/2$. Both oscillate between $-1$ and $+1$, completing one full cycle every $2\\pi$. The sine graph starts at $(0,0)$; the cosine graph starts at $(0,1)$. Everything else about them follows directly from the unit circle.',
       'Tangent and cotangent have a completely different character. They are not bounded — they shoot to $\\pm\\infty$ at their asymptotes. Tangent has period $\\pi$ (not $2\\pi$), because $\\tan(x+\\pi) = \\tan x$ — the sine and cosine both flip sign, and the negatives cancel. Tangent is zero where sine is zero and undefined where cosine is zero.',
       'Secant and cosecant are the reciprocals of cosine and sine. Wherever cosine is 1, secant is 1; wherever cosine approaches 0, secant shoots to infinity. The secant graph looks like a series of upward and downward parabola-like arcs, never crossing the band $(-1, 1)$ — because $|\\sec x| = 1/|\\cos x| \\geq 1$ always.',
+      '**The Circle Unrolled**: Visualize a point spinning around the unit circle at a constant speed. If you track its vertical height over "time" (the angle), you trace out the sine curve. If you track its horizontal position, you trace out the cosine curve. A "wave" is just a circular rotation laid out flat.',
+      '**The Periodic Signature**: Nature repeats. Because a circle returns to its starting point every $2\\pi$, every trigonometric relationship MUST restart its story at that same interval. This is the "Periodic Signature"—the mathematical fingerprint of everything that oscillates.',
     ],
     callouts: [
       {
@@ -35,6 +37,26 @@ export default {
         type: 'insight',
         title: 'Why $|\\sec x| \\geq 1$ and $|\\csc x| \\geq 1$ — always',
         body: '|\\cos x| \\leq 1 \\Rightarrow |\\sec x| = \\frac{1}{|\\cos x|} \\geq 1 \\\\ \\text{The secant and cosecant graphs never enter the band } (-1, 1).',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of Oscillation',
+        body: '\\text{The word "Sinusoidal" comes from "Sinus" (fold/pocket), but in physics, we call it a "Wave."} \\\\ \\text{The "Period" is the time it takes to complete one full "Trip" around the circle. It is the heartbeat of the function.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Periodic Signature',
+        body: '\\text{Rotation is the only motion that is infinite yet bounded.} \\\\ \\text{Because you cannot go farther "Up" than one radius, the graph MUST turn back. This creates the local maxima and minima that define the wave\'s intensity.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Harmonic Pendulum',
+        body: '\\text{Every vibrating thing—a bridge in the wind, a guitar string, a light wave—follows a sine graph.} \\\\ \\text{Even your own heart rate is a sequence of non-sinusoidal periodic waves. Sine is the "Atom" of all vibration.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Circle Unrolled',
+        body: '\\text{Imagine a rolling wheel with a pen on the rim.} \\\\ \\text{As the wheel moves forward, the pen draws a curve. This "Cycloid" logic is the physical intuition behind why trig functions are so smooth and continuous.}',
       },
     ],
     visualizations: [
@@ -85,6 +107,16 @@ export default {
         title: 'Secant and cosecant touch but never cross the range gap',
         body: '\\sec x \\geq 1 \\text{ or } \\sec x \\leq -1 \\text{ — never in } (-1,1) \\\\ \\text{The arcs of sec touch } y=1 \\text{ where } \\cos x = 1, \\text{ and touch } y=-1 \\text{ where } \\cos x=-1. \\\\ \\text{They "hug" the sine and cosine curves from outside.}',
       },
+      {
+        type: 'theorem',
+        title: 'The Logic of the Full Circle',
+        body: '\\forall \\theta \\in \\mathbb{R}, \\; \\sin(\\theta + 2\\pi) = \\sin \\theta. \\\\ \\text{Algebraically: translating the unit circle by a full rotation returns all coordinates to their original indices.} \\\\ \\text{This confirms that periodicity is a fundamental topological property of circles.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Horizontal Lag (Phase Shift)',
+        body: '\\text{In } f(x - C), \\text{ the input } x \\text{ must be GREATER than usual to achieve the same output.} \\\\ \\text{This means the graph is "Delayed," shifting it to the RIGHT by } C \\text{ units.}',
+      },
     ],
   },
 
@@ -104,6 +136,26 @@ export default {
         expression: '\\tan(x+\\pi) = \\frac{-\\sin x}{-\\cos x} = \\frac{\\sin x}{\\cos x} = \\tan x \\qquad \\blacksquare',
         annotation: 'The negatives cancel. Tangent has period exactly $\\pi$, not $2\\pi$. The same argument works for cotangent.',
       },
+      {
+        expression: '\\text{--- Part II: Deriving the Period Formula ---}',
+        annotation: 'Let us prove why the period of $f(Bx)$ is $2\\pi/B$ for sin and cos.'
+      },
+      {
+        expression: 'f(\\text{Input}) = f(\\text{Input} + 2\\pi)',
+        annotation: 'Step 1: The standard trig function repeats when its argument increases by $2\\pi$.'
+      },
+      {
+        expression: '\\sin(B(x + T)) = \\sin(Bx + 2\\pi)',
+        annotation: 'Step 2: Let $T$ be the new period. The output at $x+T$ must match the output at $x$—which happens when the argument has grown by $2\\pi$.'
+      },
+      {
+        expression: 'Bx + BT = Bx + 2\\pi',
+        annotation: 'Step 3: Distribute the B coefficient.'
+      },
+      {
+        expression: 'BT = 2\\pi \\implies T = \\frac{2\\pi}{B} \\qquad \\blacksquare',
+        annotation: 'Step 4: Solve for $T$. The period is inversely proportional to the frequency coefficient.'
+      }
     ],
   },
 
@@ -152,6 +204,54 @@ export default {
       ],
       conclusion: 'Work backwards from features: period determines $B$, asymptote positions identify the function family, key points distinguish between candidates.',
     },
+    {
+      id: 'ex-trig-total-transform',
+      title: 'The Multi-Stage Wave: Total Transformation',
+      problem: '\\text{Sketch one period of } y = -2\\sin(2x - \\pi/2) + 1.',
+      steps: [
+        {
+          expression: 'A = |-2| = 2, \\quad \\text{Reflected over x-axis}',
+          annotation: 'Step 1: Amplitude is 2. The negative sign means it starts by going DOWN.'
+        },
+        {
+          expression: 'T = \\frac{2\\pi}{2} = \\pi',
+          annotation: 'Step 2: Period is pi.'
+        },
+        {
+          expression: '2x - \\pi/2 = 0 \\implies x = \\pi/4',
+          annotation: 'Step 3: Phase shift is pi/4 to the right.'
+        },
+        {
+          expression: 'D = 1',
+          annotation: 'Step 4: Vertical shift is up 1. The midline is y=1.'
+        }
+      ],
+      conclusion: 'Combine the "Four Pillars": Amplitude, Period, Phase, and Vertical Shift. Map the five key points starting from the shifted origin.'
+    },
+    {
+      id: 'ex-trig-signal-recon',
+      title: 'Signal Reconnaissance: Equation from Two Peaks',
+      problem: '\\text{Find the cosine equation for a wave with a peak at } (1, 10) \\text{ and the next peak at } (5, 10), \\text{ with a minimum valley at } y = 2.',
+      steps: [
+        {
+          expression: 'v = \\frac{10+2}{2} = 6, \\quad A = 10-6 = 4',
+          annotation: 'Step 1: Find the midline and amplitude. Midline is the average of max/min; amplitude is the distance from max to midline.'
+        },
+        {
+          expression: 'T = 5 - 1 = 4 \\implies \\frac{2\\pi}{B} = 4 \\implies B = \\frac{\\pi}{2}',
+          annotation: 'Step 2: Period is the horizontal peak-to-peak distance.'
+        },
+        {
+          expression: 'x = 1 \\implies y = A\\cos(B(x-C)) + D',
+          annotation: 'Step 3: Since the maximum is at x=1, the phase shift is 1 to the right.'
+        },
+        {
+          expression: 'y = 4\\cos(\\frac{\\pi}{2}(x-1)) + 6',
+          annotation: 'Step 4: Assemble the pieces.'
+        }
+      ],
+      conclusion: 'Every physical signal can be reconstructed by identifying its boundary box (max/min) and its temporal cycle (period).'
+    },
   ],
 
   challenges: [
@@ -176,6 +276,27 @@ export default {
       ],
       answer: '\\text{Period } 4\\pi. \\text{ Domain: } x \\neq 2k\\pi. \\text{ Range: } (-\\infty,-2]\\cup[2,\\infty).',
     },
+    {
+      id: 'ch3-trig-005-ch2',
+      difficulty: 'harder',
+      problem: '\\text{Find the horizontal shift } C \\text{ such that } \\sin(x + C) = \\cos(x) \\text{ for all } x. \\text{ Verify your result by sketching the relation.}',
+      hint: 'The cosine wave is just the sine wave shifted so its peak appears where the sine wave is at zero.',
+      walkthrough: [
+        {
+          expression: '\\sin(x + \\pi/2) = \\sin(x) \\cos(\\pi/2) + \\cos(x) \\sin(\\pi/2)',
+          annotation: 'Step 1: Use the sum identity. $\\cos(90^\\circ)=0$ and $\\sin(90^\\circ)=1$.'
+        },
+        {
+          expression: '0 + \\cos(x) \\cdot 1 = \\cos(x)',
+          annotation: 'Step 2: Simplify. This reveals the identity.'
+        },
+        {
+          expression: 'C = \\pi/2 \\qquad \\blacksquare',
+          annotation: 'Step 3: The cosine function is simply a sine function that has been "phase-advanced" by 90 degrees.'
+        }
+      ],
+      answer: 'C = \\pi/2'
+    }
   ],
 
   calcBridge: {
