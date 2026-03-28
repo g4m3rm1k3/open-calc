@@ -4,21 +4,21 @@ export default {
   chapter: 'precalc-1',
   order: 1,
   title: 'Graphs: The Invention That Changed Mathematics',
-  subtitle: 'What coordinates actually are, why they were revolutionary, and what every point on a graph is telling you',
-  tags: ['cartesian coordinates', 'history', 'zeros', 'y-intercept', 'inequalities', 'perpendicular lines'],
-  aliases: 'coordinate plane x-intercept roots graphing inequalities perpendicular slope Descartes history of graphs',
+  subtitle: 'Algebra meets Geometry — the foundation of every digital and physical map',
+  tags: ['cartesian coordinates', 'distance formula', 'midpoint', 'zeros', 'y-intercept', 'perpendicular lines'],
+  aliases: 'coordinate plane x-intercept roots graphing inequalities perpendicular slope Descartes history of graphs distance midpoint',
 
   hook: {
-    question: 'Before 1637, algebra and geometry were completely separate subjects. One person fused them forever — and the idea was so simple it seems obvious in hindsight. What was it?',
-    realWorldContext: 'Every chart, map, engineering drawing, computer screen, and GPS coordinate uses the idea invented by René Descartes in 1637. Manufacturing uses coordinate measuring machines (CMMs) that locate points in 3D space to micron precision — all Cartesian coordinates. Before graphs existed, mathematicians could not visualize equations. They had to reason purely through symbolic manipulation, which made many problems nearly impossible.',
+    question: 'How does your GPS know exactly how far you are from your destination? It boils down to a single formula invented 2,500 years ago.',
+    realWorldContext: 'Every digital map, MRI scan, and CNC machine relies on the Cartesian coordinate system. In **Engineering**, we use the distance formula to calculate cable lengths between bridge towers. In **Medicine**, imaging software uses coordinate geometry to measure a tumor\'s size across multiple planes. In **Computer Science**, finding the distance between two objects in a game (to see if they collide) is just the Pythagorean theorem in coordinate form. Fusing geometry (points) and algebra (numbers) allowed us to calculate the world before we even built it.',
   },
 
   intuition: {
     prose: [
-      'Before Descartes, mathematics had two completely separate branches. **Algebra** dealt with equations and symbols — abstract, numeric, disconnected from space. **Geometry** dealt with shapes, distances, and angles — visual, spatial, but hard to compute with precisely. The two fields had coexisted for nearly two thousand years without anyone connecting them.',
-      'The insight Descartes had — reportedly while watching a fly crawl across a tiled ceiling — was that you could describe the fly\'s *position* using just two numbers: how far across and how far up. That\'s it. Two numbers locate any point in a plane. An equation relating those two numbers describes a *curve*. Algebra and geometry became the same thing.',
-      'This seems trivial now because we grew up with it. It was not trivial. It meant you could suddenly *draw* an equation, or *calculate* a geometric shape. Calculus — invented 30 years later by Newton and Leibniz — was only possible because of this bridge. Without coordinate geometry, there is no calculus.',
-      'Before graphs, how did mathematicians work? They used **proportions**, **geometric constructions**, and **rhetorical algebra** — describing equations entirely in words. "A square plus twice the side equals 8" instead of $x^2 + 2x = 8$. The ancient Babylonians and Greeks solved quadratics geometrically using areas of rectangles. It worked, but it was slow and couldn\'t generalize easily.',
+      'Before Descartes, mathematics had two completely separate branches. **Algebra** dealt with equations and symbols; **Geometry** dealt with shapes and space. Fusing them allowed us to suddenly *draw* an equation, or *calculate* a geometric shape. This is the "Great Fusion" that created the modern world.',
+      'To "read" a graph, you must understand its landmarks. **Zeros (x-intercepts)** answer the question: *For what inputs does this system output nothing?* In physics, these are points of **Equilibrium**; in engineering, they are **Signal Crossings**. They are the moments a function "touches ground."',
+      '**The y-intercept** is the function\'s value at the very "start" ($x=0$). In economics, it represents **Fixed Overhead**; in medicine, it is the **Initial Dosage**. It anchors the system to its baseline.',
+      '**Quadrants as Solution Spaces**: The four quadrants tell us the signs of the system. $Q_I$ ($x,y > 0$) is the home of real-world physical values like time and mass. Shifting between quadrants is the visual representation of moving between surplus and deficit.',
     ],
     callouts: [
       {
@@ -27,6 +27,11 @@ export default {
         body: '\\text{A point in the plane} \\longleftrightarrow \\text{an ordered pair of numbers } (x, y) \\\\ \\text{An equation } f(x,y) = 0 \\longleftrightarrow \\text{a curve in the plane}',
       },
       {
+        type: 'insight',
+        title: 'Cognitive Framing: The Big Questions',
+        body: '\\text{Zeros: "When is the outcome zero?"} \\\\ \\text{Y-Intercept: "What happens at the beginning?"}',
+      },
+            {
         type: 'definition',
         title: 'What the axes actually represent',
         body: '\\text{The } x\\text{-axis is the set of all points where } y=0. \\\\ \\text{The } y\\text{-axis is the set of all points where } x=0. \\\\ \\text{The origin is where both are zero: } (0,0).',
@@ -36,26 +41,37 @@ export default {
         title: 'The four quadrants — and why they matter for sign analysis',
         body: 'Q_I: x>0, y>0 \\quad Q_{II}: x<0, y>0 \\quad Q_{III}: x<0, y<0 \\quad Q_{IV}: x>0, y<0',
       },
+      {
+        type: 'definition',
+        title: 'Formal Equivalence',
+        body: 'f(c) = 0 \\iff x = c \\text{ is a zero} \\\\ \\iff (c,0) \\text{ is an x-intercept}',
+      },
+      {
+        type: 'warning',
+        title: 'Edge Case: Undefined Slopes',
+        body: '\\text{The perpendicular rule } m_1 \\cdot m_2 = -1 \\text{ breaks down for vertical and horizontal lines.} \\\\ \\text{Horizontal (m=0) } \\perp \\text{ Vertical (m is undefined).}',
+      },
     ],
     visualizations: [
       {
         id: 'CartesianFoundationsViz',
-        title: 'The Cartesian Plane — Every Point Has an Address',
-        mathBridge: 'Click anywhere on the plane to place a point and see its coordinates. Notice how the two numbers uniquely identify every location.',
-        caption: 'The coordinate plane is a universal addressing system for the infinite flat plane.',
+        title: 'The Solution Map',
+        mathBridge: 'Observe the signs of the coordinates as you move between quadrants. Notice how the Zeros and Intercepts are the "Anchor Points" where the function switches territory.',
+        caption: 'Signs dictate the geometric territory.',
       },
-                                        ],
+    ],
   },
 
   math: {
     prose: [
-      'The **zeros** of a function — where $f(x) = 0$ — are the $x$-coordinates where the graph crosses or touches the $x$-axis. They are also called **roots** or **$x$-intercepts**. They answer the question: "for what inputs does this function output nothing?" In physics, zeros are equilibria. In engineering, they are where a signal crosses baseline. In calculus, zeros of $f\'(x)$ are where $f(x)$ has horizontal tangents.',
-      'The **$y$-intercept** is where $x = 0$, i.e., $f(0)$. It is the function\'s value at the "start" — before any input has been applied. For a distance function, it\'s where you began. For a cost function, it\'s the fixed overhead with zero production. It is always the easiest point to find: just substitute $x = 0$.',
-      '**Perpendicular lines** have slopes that are negative reciprocals: if one line has slope $m$, any perpendicular line has slope $-1/m$. The geometric reason: rotating a direction vector 90° negates one component and swaps the other, which exactly inverts and negates the slope ratio.',
-      '**Graphing inequalities** produces regions, not lines. The line $y = mx + b$ divides the plane into two half-planes. The inequality $y > mx + b$ is the half-plane *above* the line; $y < mx + b$ is *below*. The boundary line is dashed for strict inequalities ($>$, $<$) and solid for inclusive ones ($\\geq$, $\\leq$). To determine which side, test any point not on the line — $(0,0)$ works unless the line passes through the origin.',
+      'Having established the historical bridge between algebra and geometry, we must now define the definitive tools of the coordinate plane with symbolic precision.',
+      '**The Algebra-Graph Pipeline**: Equations don\'t just map points; they **predict** them. By factoring an expression like $x^3 - 4x = x(x-2)(x+2)$, we reveal its zeros ($0, 2, -2$) before even drawing a line. This symbolic structure controls the geographic reality.',
+      '**The Metric of Distance**: Distance is not merely a number, but the geometric consequence of the **Pythagorean Theorem**. Given two points $(x_1, y_1)$ and $(x_2, y_2)$, the straight-line distance $d$ is the square root of the sum of the squares of the differences: $d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$.',
+      '**The Geometry of the Circle**: Every circle is defined as the **Locus of points** situated at a constant distance $r$ from a fixed center $(h, k)$. Squaring the distance formula reveals the Standard Form $(x - h)^2 + (y - k)^2 = r^2$.',
+      '**Orthogonality and Slope**: When two paths are **Perpendicular**, their slopes $m_1$ and $m_2$ typically satisfy $m_1 \\cdot m_2 = -1$. However, we must be careful with **Special Cases**: vertical lines have undefined slope, and horizontal lines have zero slope—these are orthogonal but the formula does not apply.',
     ],
     callouts: [
-      {
+          {
         type: 'definition',
         title: 'Zeros, roots, and $x$-intercepts — three names, one concept',
         body: 'f(c) = 0 \\iff x = c \\text{ is a zero/root} \\iff (c, 0) \\text{ is an } x\\text{-intercept of the graph}',
@@ -75,18 +91,99 @@ export default {
         title: 'Horizontal and vertical lines are a special case',
         body: '\\text{A horizontal line (slope 0) is perpendicular to a vertical line (undefined slope).} \\\\ m_1 \\cdot m_2 = -1 \\text{ breaks down here — handle as a special case.}',
       },
+      {
+        type: 'theorem',
+        title: 'The Coordinate Pipeline',
+        body: '\\text{Factored Form } \\implies \\text{Zeros } \\implies \\text{Graph Crossings}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Metric of the Plane (Distance)',
+        body: 'd = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Standard Circle (Locus Definition)',
+        body: '(x - h)^2 + (y - k)^2 = r^2 \\\\ \\text{Center: } (h, k) \\quad \\text{Radius: } r',
+      },
+      {
+        type: 'theorem',
+        title: 'Perpendicularity',
+        body: '\\text{Perpendicular slope } m_\\perp = -\\frac{1}{m} \\\\ m_1 \\cdot m_2 = -1',
+      },
+      {
+        type: 'theorem',
+        title: 'Graphing Inequalities',
+        body: 'y > f(x) \\implies \\text{Shade ABOVE boundary} \\\\ y < f(x) \\implies \\text{Shade BELOW boundary} \\\\ \\text{Use a dashed line for } > < \\text{ and solid for } \\geq \\leq.',
+      },
+      {
+        type: 'definition',
+        title: 'Symmetry Tests',
+        body: '\\text{Even (y-axis): } f(-x) = f(x) \\\\ \\text{Odd (Origin): } f(-x) = -f(x)',
+      },
     ],
     visualizations: [
       {
+        id: 'SymmetryViz',
+        title: 'Symmetry: The Geometric Mirror',
+        mathBridge: 'Toggle between Even and Odd symmetry. Observe how "Even" is a mirror image across the center wall (y-axis), while "Odd" is a 180° rotation around the origin.',
+        caption: 'Symmetry simplifies the complexity of the world.',
+      },
+      {
+        id: 'InequalityGeometryViz',
+        title: 'Inequality Geometry: Shading the Regions',
+        mathBridge: 'Toggle between $>, <, \geq, \leq$. Notice how the shaded region represents the "Feasible Solution Space." Excluding a boundary (dashed line) is the graphical way to say a value is "Approached but never reached."',
+        caption: 'Inequalities define territories, not just paths.',
+      },
+      {
         id: 'ZerosAndInterceptsViz',
-        title: 'Zeros, $y$-intercepts, and What They Mean',
-        mathBridge: 'Adjust the polynomial and watch how the graph\'s crossings and starting point change. Each crossing of the $x$-axis is a zero; the $y$-axis crossing is $f(0)$.',
+        title: 'Anatomy of a Function',
+        mathBridge: 'Adjust the sliders to see how the "Roots" (crossings) and "Intercepts" (start) respond. These are the most critical data points in any model.',
         caption: 'Zeros are answers to $f(x)=0$. The $y$-intercept is the answer to $f(0)=?$',
       },
     ],
   },
 
   rigor: {
+    title: 'Formal Proofs in the Plane',
+    prose: [
+      'Coordinate geometry allows us to prove geometric properties with algebraic certainty. Let\'s prove two fundamental rules.'
+    ],
+    proofSteps: [
+      {
+        section: 'The Perpendicular Slope Condition',
+        expression: '\\text{Rotate point } (1, m) \\text{ by 90° about the origin.}',
+        annotation: 'A line with slope $m$ passing through the origin contains the point $(1, m)$.'
+      },
+      {
+        expression: '(1, m) \\xrightarrow{90^\\circ} (-m, 1)',
+        annotation: 'Rotation by 90° swaps $x$ and $y$ and negates the new $x$.'
+      },
+      {
+        expression: 'm_\\perp = \\frac{1 - 0}{-m - 0} = -\\frac{1}{m}',
+        annotation: 'Calculate the slope of the new line: rise/run.'
+      },
+      {
+        expression: 'm \\cdot \\left(-\\frac{1}{m}\\right) = -1 \\checkmark',
+        annotation: 'Multiplying the slopes always results in -1.'
+      },
+      {
+        section: 'Distance via Pythagoras',
+        expression: 'd = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}',
+        annotation: 'Derived by treating $(x_2-x_1)$ and $(y_2-y_1)$ as the legs of a right triangle.'
+      },
+      {
+        section: 'Algebraic Symmetry Tests',
+        expression: 'f(-x) = f(x) \\implies \\text{Even (y-axis reflection)}',
+        annotation: 'Rule: If replacing $x$ with $-x$ results in the original equation, the function is Even.'
+      },
+      {
+        expression: 'f(-x) = -f(x) \\implies \\text{Odd (Origin rotation)}',
+        annotation: 'Rule: If the negative input results in a negative output, the function is Odd.'
+      }
+    ]
+  },
+    rigor: {
     title: 'Proving the Perpendicular Slope Condition',
     prose: [
       'Why does perpendicularity mean slopes multiply to $-1$? The proof uses vectors and the dot product — a preview of ideas that become central in multivariable calculus.',
@@ -113,7 +210,7 @@ export default {
   },
 
   examples: [
-    {
+     {
       id: 'ch1-001-ex1',
       title: 'Finding zeros and $y$-intercept of a polynomial',
       problem: '\\text{Find all zeros and the } y\\text{-intercept of } f(x) = x^3 - 4x.',
@@ -134,6 +231,38 @@ export default {
       conclusion: 'A cubic with three distinct real zeros crosses the $x$-axis three times. The $y$-intercept is one of those zeros here — that only happens when $f(0)=0$, i.e., when there is no constant term.',
     },
     {
+      id: 'ex-gps-dist',
+      title: 'GPS: Calculating Distance',
+      problem: '\\text{A destination is at } (8, 12) \\text{ and you are at } (2, 4). \\\\ \\text{How many units away is the target?}',
+      steps: [
+        {
+          expression: 'd = \\sqrt{(8-2)^2 + (12-4)^2} = \\sqrt{6^2 + 8^2}',
+          annotation: 'Plug coordinates into the distance formula.'
+        },
+        {
+          expression: 'd = \\sqrt{36 + 64} = \\sqrt{100} = 10',
+          annotation: 'Simplify. This is a 6-8-10 triangle.'
+        }
+      ],
+      conclusion: 'The target is exactly 10 units away.'
+    },
+    {
+      id: 'ex-inequality-shading',
+      title: 'Rigor: The Inequality Decision',
+      problem: '\\text{Graph } 2x - 3y > 6. \\text{ How do we decide which region is "True"?}',
+      steps: [
+        {
+          expression: 'y = \\tfrac{2}{3}x - 2',
+          annotation: 'Step 1: The Boundary. Find the line where equality holds. (Dashed for pure $>$).'
+        },
+        {
+          expression: '2(0) - 3(0) > 6 \\implies 0 > 6 \\text{ (FALSE)}',
+          annotation: 'Step 2: The Decision. Test $(0, 0)$. Since the origin fails the test, its entire side of the boundary is "False." We shade the opposite side.'
+        }
+      ],
+      conclusion: 'The graph visually represents every possible solution to the constraint.'
+    },
+        {
       id: 'ch1-001-ex2',
       title: 'Writing the equation of a perpendicular line',
       problem: '\\text{Find the line perpendicular to } y = \\tfrac{3}{4}x - 2 \\text{ passing through } (3, 1).',
@@ -154,6 +283,46 @@ export default {
       conclusion: 'Always verify by multiplying the two slopes — the product must be $-1$.',
     },
     {
+      id: 'ex-perp-construction',
+      title: 'Rigor: Constructing a Perpendicular Line',
+      problem: '\\text{Find the equation of the line perpendicular to } y = 2x - 5 \\text{ passing through } (4, 1).',
+      steps: [
+        {
+          expression: 'm_1 = 2 \\implies m_2 = -\\frac{1}{2}',
+          annotation: 'Rule: Perpendicular slopes are negative reciprocals.'
+        },
+        {
+          expression: '1 = -\\frac{1}{2}(4) + b',
+          annotation: 'Substitute the point $(4, 1)$ into $y = mx + b$ to solve for the intercept.'
+        },
+        {
+          expression: '1 = -2 + b \\implies b = 3',
+          annotation: 'Solve for $b$.'
+        },
+        {
+          expression: 'y = -\\frac{1}{2}x + 3',
+          annotation: 'Construct the final equation.'
+        }
+      ],
+      conclusion: 'The perpendicular line is y = -1/2x + 3.'
+    },
+    {
+      id: 'ex-engineering-beam',
+      title: 'Engineering: Finding a Centroid',
+      problem: '\\text{A girder spans from } (-4, 2) \\text{ to } (10, 8). \\text{ Where is the center point?}',
+      steps: [
+        {
+          expression: 'M = \\left( \\frac{-4+10}{2}, \\frac{2+8}{2} \\right)',
+          annotation: 'Average the $x$ and $y$ values.'
+        },
+        {
+          expression: 'M = (3, 5)',
+          annotation: 'The balance point is at (3, 5).'
+        }
+      ],
+      conclusion: 'The exact center of the girder is located at (3, 5).'
+    },
+        {
       id: 'ch1-001-ex3',
       title: 'Graphing a linear inequality',
       problem: '\\text{Graph the solution region of } 2x - 3y < 6.',
@@ -177,6 +346,26 @@ export default {
 
   challenges: [
     {
+      id: 'ch-01-01',
+      difficulty: 'medium',
+      problem: '\\text{Find the equation of a circle centered at } (2, -3) \\text{ with radius 5.}',
+      walkthrough: [
+        { expression: '(x - 2)^2 + (y - (-3))^2 = 5^2', annotation: 'Plug $h, k, r$ into standard form.' },
+        { expression: '(x - 2)^2 + (y + 3)^2 = 25', annotation: 'Simplify signs and square the radius.' }
+      ],
+      answer: '(x - 2)^2 + (y + 3)^2 = 25'
+    },
+    {
+      id: 'ch-01-03',
+      difficulty: 'medium',
+      problem: '\\text{Algebraically determine if } f(x) = x^{4} - x^{2} \\text{ is even, odd, or neither.}',
+      walkthrough: [
+        { expression: 'f(-x) = (-x)^{4} - (-x)^{2}', annotation: 'Substitute $-x$ for every $x$.' },
+        { expression: 'f(-x) = x^{4} - x^{2} = f(x)', annotation: 'Simplify. The results are identical.' }
+      ],
+      answer: '\\text{Even (symmetric across the y-axis).}'
+    },
+        {
       id: 'ch1-001-ch1',
       difficulty: 'medium',
       problem: '\\text{Are the lines } 3x + 5y = 15 \\text{ and } 5x - 3y = 9 \\text{ perpendicular? Prove it.}',

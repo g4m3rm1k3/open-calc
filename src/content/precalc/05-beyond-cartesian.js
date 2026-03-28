@@ -3,25 +3,26 @@ export default {
   slug: 'beyond-cartesian',
   chapter: 'precalc-1',
   order: 5,
-  title: 'Beyond Cartesian: Polar, Parametric, Vectors, and 3D',
-  subtitle: 'New coordinate systems open new shapes — and every system connects back to the Cartesian plane',
+  title: 'Beyond Cartesian: Alternative Perspectives',
+  subtitle: 'Polar, Parametric, and Vectors — choosing the right language for the world',
   tags: ['polar coordinates', 'parametric curves', 'implicit curves', 'vectors', '3D coordinates', 'transformations 3D'],
-  aliases: 'polar curve rose cardioid parametric curve vector dot product cross product 3D xyz space transformation rotation',
+  aliases: 'polar curve rose cardioid parametric curve vector dot product cross product 3D xyz space transformation rotation elimination',
 
   hook: {
-    question: 'A circle is messy in Cartesian coordinates: $x^2 + y^2 = r^2$. In polar, it\'s just $r = $ constant. Why do some shapes have simple equations in one coordinate system but not another?',
-    realWorldContext: 'CNC machining uses parametric curves to trace tool paths — the cutter position is $(x(t), y(t))$ as $t$ runs over time. Polar coordinates are used in radar systems and antenna design. Vectors are the language of force analysis in structural engineering. Every 3D computer graphics transformation — rotation, scaling, translation — is a matrix acting on vectors. These coordinate systems are not abstract: they are the languages different engineering domains speak.',
+    question: 'How does a robot arm know exactly where to reach? It doesn\'t use $(x, y)$—it uses angles and lengths. Why shift your perspective?',
+    realWorldContext: 'In **Robotics**, "Inverse Kinematics" is the math of figuring out what angle ($\theta$) and length ($r$) a joint needs to reach a target. In **Electrical Engineering**, we treat Alternating Current (AC) as "Phasors"—rotating vectors. In **Medicine**, some MRI scans scan in a "Polar Spiral" to capture data faster. Shifting coordinate systems is about finding a language where the problem becomes easy to solve.',
   },
 
   intuition: {
     prose: [
-      '**Polar coordinates** locate a point not by its $(x, y)$ offset from the origin but by its *distance* $r$ from the origin and *angle* $\\theta$ from the positive $x$-axis. Same plane, different address system. The conversion is just trig: $x = r\\cos\\theta$, $y = r\\sin\\theta$. Polar is natural for anything with rotational structure: circles, spirals, roses, cardioids.',
-      '**Parametric curves** describe a path by giving $x$ and $y$ as separate functions of a third variable $t$ (often time). Instead of "what is $y$ for a given $x$?", you ask "where is the point at time $t$?" This lets you describe curves that would fail the vertical line test — like a full circle, or a figure-eight. The curve itself is the set of all points $(x(t), y(t))$ as $t$ varies.',
-      '**Implicit curves** are defined by an equation $F(x, y) = 0$ rather than $y = f(x)$. A circle $x^2 + y^2 = 4$ is implicit — no explicit formula for $y$ in terms of $x$ covers the whole circle. Implicit curves can have any shape: loops, cusps, self-intersections. They connect directly to multivariable calculus via implicit differentiation.',
-      '**Vectors** are the bridge to 3D. A vector is a quantity with magnitude and direction — an arrow, not a point. In 2D, $\\mathbf{v} = \\langle a, b \\rangle$ means "move $a$ in $x$ and $b$ in $y$". In 3D, add a $z$ component. Vectors add by component, scale by multiplying all components. The dot product measures how much two vectors point in the same direction; the cross product produces a vector perpendicular to both.',
+      'The Cartesian grid is perfect for square, static worlds, but it struggles with rotation and dynamic motion. To model the real world, we must choose the language that simplifies the geometry. This is the art of **Coordinate Selection.**',
+      '**Polar Coordinates (The Radar POV)**: Instead of "How far across/up," we use "Distance and Angle." This is the natural language of origin-centered sensors. Formally introduced by Newton and Bernoulli, it turns the complex circle $x^2 + y^2 = 25$ into a beautiful constant $r = 5$.',
+      '**Parametric Curves (The Path of Time)**: In Cartesian, $y$ depends on $x$. In Parametric, both are slaves to a third variable $t$ (time). This is how we describe **Tool Paths** in CNC machining or the flight of a bird—it’s not a static shape, but a position that evolves over time.',
+      '**Vectors (The Physics of Force)**: A vector is an **Action** with magnitude and direction. It models the push of a current against a ship or the pull of gravity on a satellite. It is the fundamental atom of physical simulation.',
+      '**3D Space (The Volume of Reality)**: Adding the $z$-axis ($depth$) allows us to step out of the flat page. This is the foundation of all modern engineering CAD and the three-dimensional worlds of modern cinema and gaming.',
     ],
     callouts: [
-      {
+          {
         type: 'theorem',
         title: 'Polar ↔ Cartesian conversion',
         body: 'x = r\\cos\\theta \\quad y = r\\sin\\theta \\quad r = \\sqrt{x^2+y^2} \\quad \\theta = \\arctan\\!\\left(\\frac{y}{x}\\right) \\text{ (careful with quadrant)}',
@@ -36,26 +37,42 @@ export default {
         title: 'Parametric curve',
         body: '\\text{Curve: } \\{(x(t), y(t)) : t \\in [a,b]\\}. \\quad \\text{Slope: } \\frac{dy}{dx} = \\frac{dy/dt}{dx/dt}. \\\\ \\text{Eliminates the parameter: solve one equation for } t, \\text{ substitute into the other.}',
       },
+      {
+        type: 'insight',
+        title: 'Cognitive Framing: The Big Questions',
+        body: '\\text{Cartesian: "Where is it on the grid?"} \\\\ \\text{Polar: "How far? In what direction?"} \\\\ \\text{Parametric: "Where is it at time } t\\text{?"}',
+      },
+      {
+        type: 'definition',
+        title: 'The Polar Identity',
+        body: '\\text{A point is defined by } (r, \\theta). \\\\ r \\text{ is the radial distance from the origin (pole).} \\\\ \\theta \\text{ is the angle from the positive x-axis (polar axis).}',
+      },
+      {
+        type: 'insight',
+        title: 'The Persistence of Dimension',
+        body: '\\text{Changing coordinates changes the address, but never the destination.} \\\\ \\text{The point } (3, 4) \\text{ is the same physical location as } (5, 53.1^\\circ).',
+      },
     ],
     visualizations: [
       {
         id: 'PolarCartesianViz',
-        title: 'Polar vs Cartesian — Same Point, Two Addresses',
-        mathBridge: 'Drag a point in either system and see the other coordinates update. Watch how polar curves trace out as $\\theta$ sweeps from $0$ to $2\\pi$.',
-        caption: 'Neither system is "right" — each makes different shapes simple.',
+        title: 'The Great Perspective Shift',
+        mathBridge: 'Toggle between the Square Grid and the Radar Ring. Watch how the same point has two different "Addresses." Choosing the right one is the difference between an elegant solution and an impossible calculation.',
+        caption: 'Efficiency is found in the choice of coordinate system.',
       },
-                                                                      ],
+    ],
   },
 
   math: {
     prose: [
-      'The **dot product** $\\mathbf{u} \\cdot \\mathbf{v} = u_1 v_1 + u_2 v_2 + u_3 v_3$ has a geometric meaning: $\\mathbf{u} \\cdot \\mathbf{v} = |\\mathbf{u}||\\mathbf{v}|\\cos\\theta$ where $\\theta$ is the angle between them. If the dot product is zero, the vectors are perpendicular. This generalises the perpendicular slope condition to any dimension.',
-      'The **cross product** $\\mathbf{u} \\times \\mathbf{v}$ produces a new vector perpendicular to both inputs, with magnitude $|\\mathbf{u}||\\mathbf{v}|\\sin\\theta$. It only exists in 3D. The magnitude equals the area of the parallelogram formed by the two vectors — a fact used in physics for torque and in calculus for surface integrals.',
-      '**3D Cartesian coordinates** add a $z$-axis perpendicular to the $xy$-plane. Every point is $(x, y, z)$. Surfaces are defined by equations in three variables: $z = f(x,y)$ (explicit) or $F(x,y,z) = 0$ (implicit). The sphere $x^2+y^2+z^2=r^2$ is the 3D analogue of a circle.',
-      '**3D transformations** are linear maps — they can be represented as $3 \\times 3$ matrices acting on coordinate vectors. Rotation by angle $\\theta$ about the $z$-axis has a clean matrix form. Scaling, shearing, and reflection are all matrix operations. Composing transformations = multiplying matrices. This is the foundation of 3D computer graphics.',
+      'For the student of mathematics, shifting perspective is an exercise in algebraic translation. Every coordinate system is linked by definitive identities that bridge the symbolic gap.',
+      '**3D Implicit Geometry**: A **Sphere** is the set of all points $(x, y, z)$ at distance $r$ from center $(h, k, l)$. The **3D Distance Formula**—an extension of Pythagoras—calculates the linear separation of any two points in space: $d = \\sqrt{\\Delta x^2 + \\Delta y^2 + \\Delta z^2}$.',
+      '**Vectors: Magnitude & Orientation**: A vector $\\mathbf{v} = \\langle x, y, z \\rangle$ has a magnitude $\|\mathbf{v}\| = \\sqrt{x^2+y^2+z^2}$. A **Unit Vector** ($\mathbf{v}/\|\mathbf{v}\|$) has a magnitude of 1 and defines pure direction without scale.',
+      '**The Scalar (Dot) Product**: $\\mathbf{u} \\cdot \\mathbf{v} = \\sum u_i v_i = \|\mathbf{u}\|\|\mathbf{v}\|\\cos\\theta$. If the sum equals zero, the vectors are **Orthogonal** (perpendicular). This is the gatekeeper for 3D alignment.',
+      '**The Vector (Cross) Product**: Found only in 3D. It produces a vector perpendicular to both inputs, defining the "Normal" direction of a surface—essential for lighting calculations in computer graphics.',
     ],
     callouts: [
-      {
+          {
         type: 'theorem',
         title: 'Dot product — two equivalent forms',
         body: '\\mathbf{u} \\cdot \\mathbf{v} = u_1 v_1 + u_2 v_2 + u_3 v_3 = |\\mathbf{u}||\\mathbf{v}|\\cos\\theta \\\\ \\mathbf{u} \\perp \\mathbf{v} \\iff \\mathbf{u} \\cdot \\mathbf{v} = 0',
@@ -80,9 +97,24 @@ export default {
         title: 'Common polar curves and their equations',
         body: '\\text{Circle: } r = a \\qquad \\text{Rose (}n\\text{ petals): } r = a\\cos(n\\theta) \\qquad \\text{Cardioid: } r = a(1+\\cos\\theta) \\\\ \\text{Spiral: } r = a\\theta \\qquad \\text{Limaçon: } r = a + b\\cos\\theta',
       },
+      {
+        type: 'theorem',
+        title: '3D Distance Formula',
+        body: 'd = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2 + (z_2-z_1)^2}',
+      },
+      {
+        type: 'theorem',
+        title: 'Polar ↔ Cartesian Translation',
+        body: 'x = r\\cos\\theta \\quad y = r\\sin\\theta \\\\ r^2 = x^2+y^2 \\quad \\theta = \\arctan(y/x)',
+      },
+      {
+        type: 'definition',
+        title: 'Formal Parameter Removal',
+        body: 'x = f(t), y = g(t) \\implies t = f^{-1}(x) \\\\ \\therefore y = g(f^{-1}(x))',
+      },
     ],
     visualizations: [
-      {
+          {
         id: 'ImplicitDiffProof',
         title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
         mathBridge: 'In Cartesian coordinates a circle is $x^2 + y^2 = r^2$. In polar it collapses to $r = \\text{const}$. But the Cartesian form carries calculus inside it: differentiating implicitly gives the slope $dy/dx = -x/y$ at every point — a preview of what makes the circle equation so central to calculus.',
@@ -90,14 +122,40 @@ export default {
       },
       {
         id: 'Vectors3DViz',
-        title: 'Vectors, Dot Product, and Cross Product',
-        mathBridge: 'Adjust two vectors and see the dot product (scalar) and cross product (perpendicular vector) computed live. Watch how the angle between vectors affects both products.',
-        caption: 'Dot product → parallel component. Cross product → perpendicular area vector.',
+        title: 'The Calculus of Space',
+        mathBridge: 'The Dot Product measures "Alignment" (scaling by cosine), while the Cross Product measures "Twist" (scaling by sine). These two geometric tools allow us to solve every force interaction in 3D.',
+        caption: 'Vectors are the atoms of physical measurement.',
       },
     ],
   },
 
   rigor: {
+    title: 'Formal Coordinate Construction',
+    prose: [
+      'Mathematical perspectives are defined by the formulas that bridge them. We prove two vital vector operations.'
+    ],
+    proofSteps: [
+      {
+        section: 'Formal Parameter Elimination',
+        expression: 'x(t) = t - 3, y(t) = t^2 + 1 \\implies t = x + 3',
+        annotation: 'Rule: Solve for the parameter and substitute.'
+      },
+      {
+        expression: 'y = (x + 3)^2 + 1',
+        annotation: 'The parametric path is simply a parabola $y = x^2 + 6x + 10$.'
+      },
+      {
+        section: 'Vector Angles (The Dot Product)',
+        expression: '\\mathbf{u} \\cdot \\mathbf{v} = \|\mathbf{u}\|\|\mathbf{v}\|\\cos\\theta',
+        annotation: 'Rule: The Dot Product is the bridge between magnitudes and orientation.'
+      },
+      {
+        expression: '\\theta = \\cos^{-1}\\left( \\frac{u_1 v_1 + u_2 v_2}{\|\mathbf{u}\|\|\mathbf{v}\|} \\right)',
+        annotation: 'Solve for $\\theta$ to find the angle between two forces or light rays.'
+      }
+    ]
+  },
+    rigor: {
     title: 'Converting a polar curve to Cartesian: the cardioid',
 
     proofSteps: [
@@ -125,7 +183,7 @@ export default {
   },
 
   examples: [
-    {
+      {
       id: 'ch1-005-ex1',
       title: 'Parametric curve: circle via $\\sin$ and $\\cos$',
       problem: '\\text{Show that } x(t)=\\cos t,\\ y(t)=\\sin t \\text{ traces a unit circle. Find the slope at } t=\\pi/4.',
@@ -165,10 +223,54 @@ export default {
       ],
       conclusion: 'The dot product is the most direct way to find the angle between two vectors in any dimension — it generalises the Cartesian perpendicularity condition.',
     },
+    {
+      id: 'ex-polar-conv',
+      title: 'Algebra: Cartesian to Polar',
+      problem: '\\text{Find the polar equation for the line } y = x.',
+      steps: [
+        {
+          expression: 'r\\sin\\theta = r\\cos\\theta',
+          annotation: 'Substitute the polar identities for $x$ and $y$.'
+        },
+        {
+          expression: '\\frac{\\sin\\theta}{\\cos\\theta} = 1 \\implies \\tan\\theta = 1',
+          annotation: 'Divide by $r\\cos\\theta$.'
+        },
+        {
+          expression: '\\theta = \\pi/4',
+          annotation: 'Solve for $\\theta$. The line is defined by a constant angle.'
+        }
+      ],
+      conclusion: 'The line y=x is just a 45-degree angle ($\pi/4$) in polar.'
+    },
+    {
+      id: 'ex-robot-kin',
+      title: 'Applied: Robot Join Angle',
+      problem: '\\text{A robot joint is at } (5, 5). \\\\ \\text{What angle } \\theta \\text{ must the motor be at?}',
+      steps: [
+        {
+          expression: '\\theta = \\tan^{-1}(5/5) = \\tan^{-1}(1)',
+          annotation: 'The angle is the inverse tangent of the $(y/x)$ ratio.'
+        }
+      ],
+      conclusion: 'The motor must turn to 45° ($\pi/4$).'
+    }
   ],
 
   challenges: [
     {
+      id: 'ch-05-01',
+      difficulty: 'medium',
+      problem: '\\text{State the parametric equations for a circle of radius 3.}',
+      answer: 'x(t) = 3\\cos t, \\quad y(t) = 3\\sin t'
+    },
+    {
+      id: 'ch-05-02',
+      difficulty: 'hard',
+      problem: '\\text{Why is } \\mathbf{u} \\cdot \\mathbf{v} = 0 \\text{ the test for perpendicularity?}',
+      answer: '\\text{Because } \\mathbf{u} \\cdot \\mathbf{v} = |u||v|\\cos\\theta. \\\\ \\text{If } \\theta = 90^\\circ, \\cos\\theta = 0, \\text{ so the entire product must be zero.}'
+    },
+        {
       id: 'ch1-005-ch1',
       difficulty: 'medium',
       problem: '\\text{Convert } x^2 + y^2 = 4y \\text{ to polar form and identify the curve.}',
