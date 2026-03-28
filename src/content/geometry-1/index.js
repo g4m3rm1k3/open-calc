@@ -1,6 +1,10 @@
 import introgeometry from './intro-geometry.js';
 import pointslinesplanes from './points-lines-planes.js';
 import anglessegments from './angles-segments.js';
+import parallellines from './parallel-lines.js';
+import trianglesum from './triangle-angle-sum.js';
+import congruence from './congruence.js';
+import pythagoras from './pythagorean-theorem.js';
 
 export default {
   id: 'geometry-1',
@@ -11,6 +15,10 @@ export default {
   lessons: [
     introgeometry,
     pointslinesplanes,
-    anglessegments
+    anglessegments,
+    parallellines,
+    trianglesum,
+    congruence,
+    pythagoras
   ]
 };

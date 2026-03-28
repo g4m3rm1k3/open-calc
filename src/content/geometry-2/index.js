@@ -1,16 +1,18 @@
-import logicstatements from './logic-statements.js';
-import introtoproofs from './intro-to-proofs.js';
-import parallellines from './parallel-lines.js';
+import circletheorems from './circle-theorems.js';
+import constructions from './constructions.js';
+import similarity from './similarity.js';
+import areasarcs from './areas-arcs.js';
 
 export default {
   id: 'geometry-2',
   number: 'geometry-2',
-  title: 'Geometry: 2',
+  title: 'Geometry: Chapter 2',
   slug: 'geometry-2',
   color: 'indigo',
   lessons: [
-    logicstatements,
-    introtoproofs,
-    parallellines
+    circletheorems,
+    constructions,
+    similarity,
+    areasarcs
   ]
 };

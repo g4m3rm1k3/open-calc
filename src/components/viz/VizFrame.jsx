@@ -138,31 +138,11 @@ const VIZ_REGISTRY = {
   Ch2_5_SpinningWheel: lazy(() => import("./react/Ch2_5_SpinningWheel.jsx")),
   Ch2_6_EchoProblem: lazy(() => import("./react/Ch2_6_EchoProblem.jsx")),
   Ch3_1_HowFastWasIt: lazy(() => import("./react/Ch3_1_HowFastWasIt.jsx")),
-  Ch3_2_GettingCloser: lazy(() =>
-    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
-      default: m.Ch3_2_GettingCloser,
-    })),
-  ),
-  Ch3_3_InfiniteStaircase: lazy(() =>
-    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
-      default: m.Ch3_3_InfiniteStaircase,
-    })),
-  ),
-  Ch3_4_SineOfAlmostNothing: lazy(() =>
-    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
-      default: m.Ch3_4_SineOfAlmostNothing,
-    })),
-  ),
-  Ch3_5_BrokenFunction: lazy(() =>
-    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
-      default: m.Ch3_5_BrokenFunction,
-    })),
-  ),
-  Ch3_6_BridgeToCalculus: lazy(() =>
-    import("./react/Ch3_2_through_Ch3_6.jsx").then((m) => ({
-      default: m.Ch3_6_BridgeToCalculus,
-    })),
-  ),
+  Ch3_2_GettingCloser: lazy(() => import("./react/Ch3_2_GettingCloser.jsx")),
+  Ch3_3_InfiniteStaircase: lazy(() => import("./react/Ch3_3_InfiniteStaircase.jsx")),
+  Ch3_4_SineOfAlmostNothing: lazy(() => import("./react/Ch3_4_SineOfAlmostNothing.jsx")),
+  Ch3_5_BrokenFunction: lazy(() => import("./react/Ch3_5_BrokenFunction.jsx")),
+  Ch3_6_BridgeToCalculus: lazy(() => import("./react/Ch3_6_BridgeToCalculus.jsx")),
   PascalsTriangle: lazy(() => import("./react/PascalsTriangle.jsx")),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution: lazy(() => import("./d3/VolumesOfRevolution.jsx")),
@@ -761,6 +741,36 @@ const VIZ_REGISTRY = {
   DerivativesRatesOfChange: lazy(() => import("./react/DerivativesRatesOfChange.jsx")),
   MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
   MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
+
+  // Geometry Book 1
+  G1_1_FivePostulates: lazy(() => import("./geometry/G1_1_FivePostulates.jsx")),
+  G1_2_AnglesAtAPoint: lazy(() => import("./geometry/G1_2_AnglesAtAPoint.jsx")),
+  G1_3_ParallelLines: lazy(() => import("./geometry/G1_3_ParallelLines.jsx")),
+  G1_4_TriangleAngleSum: lazy(() => import("./geometry/G1_4_TriangleAngleSum.jsx")),
+  G1_5_Congruence: lazy(() => import("./geometry/G1_5_Congruence.jsx")),
+  G1_6_Pythagorean: lazy(() => import("./geometry/G1_6_Pythagorean.jsx")),
+
+  // Geometry Book 2
+  G2_1_CircleTheorems1: lazy(() => import("./geometry/G2_1_CircleTheorems1.jsx")),
+  G2_2_CircleTheorems2: lazy(() => import("./geometry/G2_2_CircleTheorems2.jsx")),
+  G2_3_Constructions: lazy(() => import("./geometry/G2_3_Constructions.jsx")),
+  G2_4_SimilarTriangles: lazy(() => import("./geometry/G2_4_SimilarTriangles.jsx")),
+  G2_5_AreaFormulas: lazy(() => import("./geometry/G2_5_AreaFormulas.jsx")),
+  G2_6_ArcSectorPi: lazy(() => import("./geometry/G2_6_ArcSectorPi.jsx")),
+
+  // Geometry Book 3
+  G3_1_CoordinatePlane: lazy(() => import("./geometry/G3_1_CoordinatePlane.jsx")),
+  G3_2_LinesInPlane: lazy(() => import("./geometry/G3_2_LinesInPlane.jsx")),
+  G3_3_CircleEquation: lazy(() => import("./geometry/G3_3_CircleEquation.jsx")),
+  G3_4_Transformations: lazy(() => import("./geometry/G3_4_Transformations.jsx")),
+  G3_5_ConicSections: lazy(() => import("./geometry/G3_5_ConicSections.jsx")),
+  G3_6_Vectors: lazy(() => import("./geometry/G3_6_Vectors.jsx")),
+
+  // Geometry Book 4
+  G4_1_PrismsCylinders: lazy(() => import("./geometry/G4_1_PrismsCylinders.jsx")),
+  G4_2_PyramidsCones: lazy(() => import("./geometry/G4_2_PyramidsCones.jsx")),
+  G4_3_Sphere: lazy(() => import("./geometry/G4_3_Sphere.jsx")),
+  G4_4_CrossSections: lazy(() => import("./geometry/G4_4_CrossSections.jsx")),
 
   // Static SVG diagrams — use props: { type: "kinematic-chain" } etc.
   SVGDiagram: lazy(() => import("./SVGDiagram.jsx")),

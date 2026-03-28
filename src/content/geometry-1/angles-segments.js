@@ -10,7 +10,15 @@ export default {
     realWorldContext: 'Visualizing Angles and Segments is key to engineering and art.'
   },
   intuition: {
-    prose: ['Content coming soon...'],
-    visualizations: []
+    prose: [
+      'John believes vertical angles are obviously equal, but Albert insists on proving it. They discover that it takes only two logical steps to derive this from the fact that a straight line reflects 180 degrees.'
+    ],
+    visualizations: [
+      {
+        id: 'G1_2_AnglesAtAPoint',
+        title: 'Vertical Angles and Two-Step Proofs',
+        props: {}
+      }
+    ]
   }
 };
