@@ -22,6 +22,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'suvat-map' },
+        title: 'Your decision tree starts here',
+        caption: 'Mixed problems have many paths. The SUVAT map shows all valid paths given your knowns. Start by listing what you know and don\'t know — the equation that links exactly those variables is your first move.',
+      },
+      {
         id: "KinematicsPatternSpotter",
         title: "Mixed-method selector quiz",
         mathBridge:

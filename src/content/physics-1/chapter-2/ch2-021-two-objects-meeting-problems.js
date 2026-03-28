@@ -20,6 +20,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'two-objects-line' },
+        title: 'The meeting condition',
+        caption: 'Two objects meet when they occupy the same position at the same time: xₐ(t) = x_b(t). Write each position as a SUVAT equation, set them equal, solve for t. Pure algebra.',
+      },
+      {
         id: "TwoObjectsIntuition",
         title: "Dual-trajectory visual",
         mathBridge: "Track both x(t) curves and highlight intersection event.",

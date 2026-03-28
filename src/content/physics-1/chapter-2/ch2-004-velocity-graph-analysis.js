@@ -50,8 +50,20 @@ export default {
     visualizations: [
       {
         id: 'SVGDiagram',
+        props: { type: 'algebra-rectangle' },
+        title: 'Step 1 — constant velocity (algebra)',
+        caption: 'If velocity is constant, displacement = v × Δt. This is rectangle area. Pure algebra — no calculus needed.',
+      },
+      {
+        id: 'SVGDiagram',
+        props: { type: 'algebra-trapezoid' },
+        title: 'Step 2 — constant acceleration (algebra)',
+        caption: 'If velocity changes linearly (constant a), displacement = ½(v₀+v)t — the trapezoid area. Still algebra. This is SUVAT equation 2.',
+      },
+      {
+        id: 'SVGDiagram',
         props: { type: 'riemann-rect' },
-        title: 'Riemann rectangles → integral',
+        title: 'Step 3 — any v(t) curve (calculus)',
         caption: 'Each rectangle has height v(tᵢ) and width Δt. Their total area approximates displacement. More rectangles → exact integral.',
       },
       {

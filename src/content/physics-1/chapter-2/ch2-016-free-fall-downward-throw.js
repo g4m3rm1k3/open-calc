@@ -21,6 +21,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'free-fall-axes' },
+        title: 'Downward throw: v₀ < 0 (upward positive)',
+        caption: 'When throwing downward with +y upward: v₀ is negative, a = −g is negative. Both v and a point the same direction. The object accelerates continuously with no apex. Same equations — only the sign of v₀ differs from the upward case.',
+      },
+      {
         id: "FreeFallIntuition",
         title: "Downward-launch comparison",
         mathBridge: "Compare rest-drop and downward-throw from same height.",

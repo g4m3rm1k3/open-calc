@@ -48,6 +48,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'algebra-rectangle' },
+        title: 'Algebra: Δv = a·Δt (constant acceleration)',
+        caption: 'For constant acceleration, Δv = a·Δt — exactly the same rectangle-area logic as Δx = v·Δt. Integrate a once to get v, integrate v once to get x. Two steps, both with the same algebraic idea.',
+      },
+      {
         id: "AccelerationGraphIntuition",
         title: "Area under a–t is Δv",
         mathBridge:

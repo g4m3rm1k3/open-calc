@@ -21,6 +21,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'algebra-trapezoid' },
+        title: 'Drop from rest: v₀ = 0, so the trapezoid becomes a triangle',
+        caption: 'When v₀ = 0, the trapezoid ½(v₀+v)t collapses to a triangle: ½vt = ½(gt)t = ½gt². That\'s the SUVAT equation Δy = ½gt² — pure algebra from a triangle\'s area formula.',
+      },
+      {
         id: "FreeFallExplorer",
         title: "Drop from rest calculator",
         mathBridge: "Slide time and observe quadratic growth in displacement.",

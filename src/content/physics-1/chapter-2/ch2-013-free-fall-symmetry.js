@@ -22,6 +22,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'free-fall-axes' },
+        title: 'Symmetric trajectory about the apex',
+        caption: 'The trajectory y(t) = v₀t − ½gt² is a downward parabola. The apex is the axis of symmetry. Time to apex equals time from apex to the same height — a direct consequence of the quadratic structure. Algebra proves it; no calculus needed.',
+      },
+      {
         id: "FreeFallSymmetryIntuition",
         title: "Ascent-descent mirror",
         mathBridge: "Compare equal-time slices before and after the apex.",

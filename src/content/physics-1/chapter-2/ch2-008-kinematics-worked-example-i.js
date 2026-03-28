@@ -20,6 +20,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'suvat-map' },
+        title: 'Choose your equation',
+        caption: 'Before computing anything: identify the 3 knowns and 1 unknown. The SUVAT map shows which equation connects those 4 quantities (and omits the one you don\'t need).',
+      },
+      {
         id: "KinematicsExampleIntuition",
         title: "Full-solution walkthrough",
         mathBridge:

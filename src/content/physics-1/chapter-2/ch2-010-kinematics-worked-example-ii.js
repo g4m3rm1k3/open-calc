@@ -21,6 +21,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'suvat-map' },
+        title: 'SUVAT equation selector',
+        caption: 'Sign discipline starts before you write any equation. Identify knowns, mark their signs, then pick the equation that connects them. The map makes the choice mechanical.',
+      },
+      {
         id: "KinematicsPatternSpotter",
         title: "Sign-aware equation pattern drill",
         mathBridge:

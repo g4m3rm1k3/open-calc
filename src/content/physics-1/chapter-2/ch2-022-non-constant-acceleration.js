@@ -44,6 +44,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'kinematic-chain' },
+        title: 'The full integration chain',
+        caption: 'For variable acceleration, SUVAT fails — it assumes constant a. Instead: integrate a(t) once to get v(t), integrate v(t) again to get x(t). The kinematic chain shows exactly this: go right with d/dt, go left with ∫dt.',
+      },
+      {
         id: "VariableAccelerationIntuition",
         title: "Integration chain intuition",
         mathBridge:

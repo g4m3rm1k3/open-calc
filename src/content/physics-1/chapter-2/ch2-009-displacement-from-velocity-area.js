@@ -50,8 +50,14 @@ export default {
     visualizations: [
       {
         id: 'SVGDiagram',
+        props: { type: 'algebra-trapezoid' },
+        title: 'Algebra works for constant acceleration',
+        caption: 'When v(t) is a straight line, the area under it is exactly a trapezoid: ½(v₀+v)t. No calculus needed. Calculus becomes necessary only when v(t) is curved.',
+      },
+      {
+        id: 'SVGDiagram',
         props: { type: 'riemann-rect' },
-        title: 'Area = displacement',
+        title: 'Calculus handles any v(t) curve',
         caption: 'Rectangles of height v(tᵢ) and width Δt accumulate displacement. In the limit Δt → 0 this sum IS the definite integral.',
       },
       {

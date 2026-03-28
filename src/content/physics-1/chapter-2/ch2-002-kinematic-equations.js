@@ -36,7 +36,10 @@ export const ch2_002 = {
       { type: 'theorem', title: 'Derivation of equation 3', body: '\\Delta x = \\int_0^t v\\,dt = \\int_0^t (v_0+at)\\,dt = v_0t + \\tfrac{1}{2}at^2' },
       { type: 'theorem', title: 'Derivation of equation 5', body: 'v^2 = v_0^2 + 2a\\Delta x\\text{ — eliminates }t\\text{ using eq 1 and 3}' },
     ],
-    visualizations: [{ id: 'KinematicEquationSelector', title: 'Interactive equation chooser', mathBridge: 'Input known quantities, get the equation and answer.', caption: 'SUVAT in action.' }],
+    visualizations: [
+      { id: 'SVGDiagram', props: { type: 'algebra-trapezoid' }, title: 'Where Δx = ½(v₀+v)t comes from', caption: 'For constant acceleration, v(t) is a straight line. The displacement is the area of the trapezoid under it — ½ × (top + bottom) × height. That\'s algebra, not calculus.' },
+      { id: 'KinematicEquationSelector', title: 'Interactive equation chooser', mathBridge: 'Input known quantities, get the equation and answer.', caption: 'SUVAT in action.' },
+    ],
   },
   rigor: {
     prose: ['All five equations follow from two fundamental relations: $v = v_0 + at$ and $\\Delta x = v_0 t + \\frac{1}{2}at^2$. The other three are algebraic rearrangements.'],

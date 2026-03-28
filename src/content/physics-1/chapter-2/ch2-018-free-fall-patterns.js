@@ -20,6 +20,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'suvat-map' },
+        title: 'Pattern recognition starts with the map',
+        caption: 'Every free-fall scenario is a SUVAT problem with a = −g (or +g depending on convention). Identify what\'s given, find the missing variable, read off the right equation. Pattern fluency = recognizing this instantly.',
+      },
+      {
         id: "FreeFallPatternSpotter",
         title: "Scenario quiz",
         mathBridge:

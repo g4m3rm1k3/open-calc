@@ -49,6 +49,12 @@ export default {
     visualizations: [
       {
         id: 'SVGDiagram',
+        props: { type: 'algebra-avg-velocity' },
+        title: 'Average velocity — algebra only',
+        caption: 'Pick any two points on the x–t curve. Divide the rise (Δx) by the run (Δt). That ratio is the average velocity over that interval. No calculus — just subtraction and division.',
+      },
+      {
+        id: 'SVGDiagram',
         props: { type: 'slope-triangle' },
         title: 'Secant slope → tangent slope',
         caption: 'As Δt shrinks, the secant (dashed, average) rotates onto the tangent (solid, instantaneous). The limiting slope is dx/dt = velocity.',

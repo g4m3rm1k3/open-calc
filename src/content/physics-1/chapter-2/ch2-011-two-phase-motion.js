@@ -21,6 +21,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'algebra-rectangle' },
+        title: 'Each phase is its own rectangle (or trapezoid)',
+        caption: 'Two-phase problems are two separate constant-acceleration intervals. Solve each algebraically with its own SUVAT equations. The only bridge between phases: the final state of phase 1 is the initial state of phase 2.',
+      },
+      {
         id: "TwoPhaseMotionIntuition",
         title: "Phase handoff visual",
         mathBridge:

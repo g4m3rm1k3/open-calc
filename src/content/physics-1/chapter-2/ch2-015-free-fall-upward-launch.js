@@ -20,6 +20,12 @@ export default {
     ],
     visualizations: [
       {
+        id: 'SVGDiagram',
+        props: { type: 'free-fall-axes' },
+        title: 'Upward launch: v₀ > 0, a = −g',
+        caption: 'v₀ is positive (upward). a = −9.8 m/s² (downward, always). The object decelerates, reaches apex where v = 0, then accelerates downward. The sign of v changes; the sign of a never does.',
+      },
+      {
         id: "FreeFallIntuition",
         title: "Upward launch animation",
         mathBridge:
