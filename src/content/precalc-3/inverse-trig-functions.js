@@ -19,6 +19,8 @@ export default {
       'The sine function is not one-to-one — it takes the same value at infinitely many angles. $\\sin(\\pi/6) = \\sin(5\\pi/6) = \\sin(13\\pi/6) = \\cdots = 1/2$. A function that is not one-to-one has no inverse — there is no way to say "the angle whose sine is $1/2$" because there are infinitely many.',
       'The solution is domain restriction: we agree to only use a specific portion of the sine curve — the piece from $-\\pi/2$ to $\\pi/2$. On that interval, sine is strictly increasing and therefore one-to-one. The inverse of this restricted function is $\\arcsin$. The output is always in $[-\\pi/2, \\pi/2]$ — the "principal value." No ambiguity.',
       'Each inverse trig function has a different restriction, chosen to cover the full output range while keeping the function one-to-one: $\\arcsin$ uses $[-\\pi/2, \\pi/2]$, $\\arccos$ uses $[0, \\pi]$, $\\arctan$ uses $(-\\pi/2, \\pi/2)$. These choices are conventions — but they are universal conventions, and every calculator uses them.',
+      '**The Language of the Arc**: The prefix "Arc-" refers to the arc length on the unit circle. While "Sine" asks for the ratio of a given angle, "Arc-sine" asks for the length of the arc that produces that ratio. It is the language of reverse-engineering rotation.',
+      '**The Domain Trade**: To gain an inverse function, we must sacrifice the periodic nature of the original. We "Trade" the entire sine wave for a single strictly increasing piece that passes the horizontal line test. This segment becomes the "Reference Standard" for all reverse calculations.',
     ],
     callouts: [
       {
@@ -35,6 +37,26 @@ export default {
         type: 'insight',
         title: 'Why arctan has asymptotes but arcsin does not',
         body: '\\arctan x \\to \\pm\\tfrac{\\pi}{2} \\text{ as } x \\to \\pm\\infty \\quad \\text{(tan can take any real input)} \\\\ \\arcsin x \\text{ is only defined for } x \\in [-1, 1] \\quad \\text{(sin output is bounded)} \\\\ \\arccos x \\text{ is only defined for } x \\in [-1, 1] \\quad \\text{(same reason)}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of the Arc',
+        body: '\\text{While } \\sin^{-1} \\text{ is common shorthand, "Arcsine" is the more descriptive term.} \\\\ \\text{It literally asks "What is the Arc length on the circle whose vertical height is } Y\\text{?"}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Domain Trade',
+        body: '\\text{Why } [-\\pi/2, \\pi/2] \\text{ for sine but } [0, \\pi] \\text{ for cosine?} \\\\ \\text{Logic dictates we need a "One-to-One" piece.} \\\\ \\text{For sine, the most symmetric piece containing zero is the first and fourth quadrants. For cosine, the first and second quadrants cover all positive and negative ratios without repetition.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Reverse Engineer',
+        body: '\\text{In robotics, this is "Inverse Kinematics."} \\\\ \\text{The robot knows where its hand is (the coordinate). It uses inverse trig to solve for the target angle of its shoulder joint to reach that spot.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Mirror Reflection',
+        body: '\\text{Every inverse function is a mirror reflection over } Y = X. \\\\ \\text{Visualize the sine curve. Now rotate the whole graph 90 degrees and flip it. The "S-curve" you see in the middle is the Arcsine function.}',
       },
     ],
     visualizations: [
@@ -105,6 +127,16 @@ export default {
         title: 'Complementary identity',
         body: '\\arcsin x + \\arccos x = \\frac{\\pi}{2} \\quad \\text{for all } x \\in [-1,1] \\\\ \\text{So: } \\frac{d}{dx}\\arccos x = -\\frac{d}{dx}\\arcsin x \\text{ — the derivatives are negatives of each other.}',
       },
+      {
+        type: 'theorem',
+        title: 'Existence: Monotonicity and Invertibility',
+        body: '\\text{A function } f(x) \\text{ is invertible on an interval if it is strictly monotonic.} \\\\ \\sin x \\text{ is strictly increasing on } [-\\pi/2, \\pi/2] \\text{ from } -1 \\text{ to } 1. \\\\ \\text{This satisfies the Horizontal Line Test, guaranteeing arc-sine as a true function.}',
+      },
+      {
+        type: 'theorem',
+        title: 'The Quadrant Choice (Sign Continuity)',
+        body: '\\text{Sine outputs are positive in Q1 and negative in Q4. This spans } [-1, 1] \\text{ continuously.} \\\\ \\text{Cosine outputs are positive in Q1 and negative in Q2. This also spans } [-1, 1] \\text{ continuously.} \\\\ \\text{These choices minimize the "distance" from the standard 0-threshold.}',
+      },
     ],
   },
 
@@ -140,6 +172,26 @@ export default {
         expression: '\\therefore \\quad \\frac{d}{dx}\\arctan x = \\frac{1}{1+x^2} \\qquad \\blacksquare',
         annotation: 'Substitute back. The result is purely algebraic — no trig remains. This is why arctan appears as the antiderivative of $1/(1+x^2)$.',
       },
+      {
+        expression: '\\text{--- Part II: The Cancellation Trap Proof ---}',
+        annotation: 'Let us prove why $\\arcsin(\\sin x) \\neq x$ when $x = 5\\pi/6$.'
+      },
+      {
+        expression: 'x = \\frac{5\\pi}{6} \\implies \\sin(x) = \\frac{1}{2}',
+        annotation: 'Step 1: The input value produces a ratio.'
+      },
+      {
+        expression: '\\arcsin(1/2) = \\theta, \\quad \\theta \\in [-\\pi/2, \\pi/2]',
+        annotation: 'Step 2: The inverse function is restricted to producing outputs in the principal range.'
+      },
+      {
+        expression: '\\theta = \\frac{\\pi}{6}',
+        annotation: 'Step 3: The unique value in the range that produces 1/2 is $\\pi/6$.'
+      },
+      {
+        expression: '\\arcsin(\\sin(5\\pi/6)) = \\frac{\\pi}{6} \\neq \\frac{5\\pi}{6} \\qquad \\blacksquare',
+        annotation: 'Step 4: The function correctly "maps back," but to the reference quadrant—not the original rotation.'
+      }
     ],
   },
 
@@ -200,6 +252,46 @@ export default {
       ],
       conclusion: 'Completing the square converts a general quadratic denominator into the arctan standard form. This is the reverse path from the calculus bridge in the quadratics lesson.',
     },
+    {
+      id: 'ex-inverse-nested-reconstruct',
+      title: 'The Nested Triangle: Composition without Angles',
+      problem: '\\text{Evaluate } \\cos(\\arcsin(4/5)) \\text{ without finding the angle.}',
+      steps: [
+        {
+          expression: '\\theta = \\arcsin(4/5) \\implies \\sin(\\theta) = 4/5',
+          annotation: 'Step 1: Let the inner expression represent an angle theta.'
+        },
+        {
+          expression: '\\text{opp} = 4, \\text{ hyp} = 5 \\implies \\text{adj} = \\sqrt{25-16} = 3',
+          annotation: 'Step 2: Draw the triangle. Opposite is 4, Hypotenuse is 5 (a standard 3-4-5 triangle).'
+        },
+        {
+          expression: '\\cos(\\theta) = \\frac{\\text{adj}}{\\text{hyp}} = 3/5',
+          annotation: 'Step 3: Read the required ratio directly from the geometry.'
+        }
+      ],
+      conclusion: 'Nested trig functions are solved by drawing the representative triangle. You do not need to know the angle to know its other ratios.'
+    },
+    {
+      id: 'ex-inverse-arctan-shift',
+      title: 'The Arctan Shift: Solving for x',
+      problem: '\\text{Solve for } x: \\arctan(5x - 2) = \\frac{\\pi}{3}.',
+      steps: [
+        {
+          expression: '5x - 2 = \\tan(\\frac{\\pi}{3})',
+          annotation: 'Step 1: Apply tangent to both sides to "undo" the arctan.'
+        },
+        {
+          expression: '5x - 2 = \\sqrt{3}',
+          annotation: 'Step 2: Substitute the exact value for tan(60°).'
+        },
+        {
+          expression: 'x = \\frac{2 + \\sqrt{3}}{5}',
+          annotation: 'Step 3: Solve for x algebraically.'
+        }
+      ],
+      conclusion: 'Equations are "unwrapped" layer-by-layer. To remove an inverse trig function, apply its standard trig counterpart.'
+    },
   ],
 
   challenges: [
@@ -245,6 +337,31 @@ export default {
       ],
       answer: '\\arctan x + \\arctan(1/x) = \\pi/2 \\text{ for } x > 0.',
     },
+    {
+      id: 'ch3-004-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Prove: } \\arcsin x + \\arccos x = \\frac{\\pi}{2} \\text{ using the geometry of a right triangle.}',
+      hint: 'In a right triangle with hypotenuse 1, the two acute angles have sine and cosine values that are swapped.',
+      walkthrough: [
+        {
+          expression: '\\theta = \\arcsin x \\implies \\sin \\theta = x',
+          annotation: 'Step 1: Let $\\theta$ be the angle whose sine is $x$.'
+        },
+        {
+          expression: '\\cos(90^\\circ - \\theta) = \\sin \\theta = x',
+          annotation: 'Step 2: Use the co-function identity from Lesson 3.'
+        },
+        {
+          expression: '\\arccos x = 90^\\circ - \\theta = \\frac{\\pi}{2} - \\arcsin x',
+          annotation: 'Step 3: Therefore, the angle whose cosine is x is the complement of $\\theta$.'
+        },
+        {
+          expression: '\\arcsin x + \\arccos x = \\frac{\\pi}{2} \\qquad \\blacksquare',
+          annotation: 'Step 4: Algebraic sum confirms the geometric complementarity.'
+        }
+      ],
+      answer: '\\arcsin x + \\arccos x = \\pi/2'
+    }
   ],
 
   calcBridge: {
