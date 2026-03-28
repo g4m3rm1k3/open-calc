@@ -28,6 +28,12 @@ export const CH0_LESSONS = [
       ],
       visualizations: [
         {
+          id: 'SVGDiagram',
+          props: { type: 'kinematic-chain' },
+          title: 'The model structure: equations link x, v, and a',
+          caption: 'A physics model is a system of equations connecting position x(t), velocity v(t), and acceleration a(t). Differentiate to go right (d/dt); integrate to go left (∫dt). Every kinematics problem is a navigation problem on this chain — you know some values and need to find others.',
+        },
+        {
           id: 'ModelVsReality',
           title: 'Model vs Reality',
           mathBridge: 'Toggling drag changes the governing equation and therefore the predicted trajectory.',
@@ -100,12 +106,35 @@ export const CH0_LESSONS = [
     },
     intuition: {
       prose: [
-        'Dimensions are the physical type of a quantity: length [L], mass [M], time [T].',
-        'Units are labels (m, kg, s), while dimensions are structure. Different units can represent the same dimension, but incompatible dimensions cannot be added.',
-        'If left and right sides of an equation do not match dimensionally, the equation cannot represent reality no matter how neat it looks algebraically.',
-        'Dimensional checks are fast sanity tests: they catch conceptual mistakes before you waste time on arithmetic.',
+        'Every quantity in physics has a **dimension** — a physical type. The three fundamental ones in mechanics are length $[L]$, mass $[M]$, and time $[T]$.',
+        'Units (m, kg, s) are the human-chosen labels for dimensions. The dimension of velocity is always $[L/T]$ whether you measure it in m/s, km/h, or furlongs per fortnight.',
+        'The golden rule: **you can only add or equate quantities with the same dimension**. $5\\,\\text{m} + 10\\,\\text{s}$ is as meaningless as adding apples to hours.',
+        'Dimensional analysis is a free sanity check. Before solving anything, verify that the equation you are about to use is dimensionally consistent — this catches formula errors instantly.',
+      ],
+      callouts: [
+        {
+          type: 'definition',
+          title: 'Fundamental dimensions of mechanics',
+          body: '[L] = length,\\quad [M] = mass,\\quad [T] = time.',
+        },
+        {
+          type: 'theorem',
+          title: 'Homogeneity rule',
+          body: '\\text{Every term in a valid equation must have the same dimension: } [\\text{LHS}] = [\\text{RHS}].',
+        },
+        {
+          type: 'insight',
+          title: 'Units can change, dimensions cannot',
+          body: '$[v] = L/T$ whether you use m/s or mph. Changing units rescales the number but never changes the physical type.',
+        },
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'dimensions-equation' },
+          title: 'Dimensional check of x = v₀t + ½at²',
+          caption: 'Every term in the kinematic equation must reduce to [L]. Reading down each column: v₀ has [L/T], multiply by t which is [T], product is [L]. Same for ½at². The equation passes — this is why it can represent position.',
+        },
         {
           id: 'UnitValidator',
           title: 'Live Unit Checker',
@@ -116,9 +145,9 @@ export const CH0_LESSONS = [
     },
     math: {
       prose: [
-        'Velocity has dimensions $[v]=\\frac{L}{T}$ and units m/s. This means larger distance per same time or same distance in less time both increase speed.',
-        'Dimensional analysis does not tell you exact constants, but it strongly constrains legal equation forms.',
-        'Edge-case interpretation: formulas can be numerically plausible and still physically impossible if units do not balance.',
+        'Derived dimensions are built from the three fundamentals. Velocity: $[v] = L/T$. Acceleration: $[a] = L/T^2$. Force: $[F] = MLT^{-2}$ (from $F=ma$).',
+        'Dimensional analysis does not determine numerical constants (the $\\frac{1}{2}$ in $\\frac{1}{2}at^2$ has no dimension), but it tightly constrains which variable combinations are legal.',
+        'A powerful technique: if you forget a formula, dimensional analysis often reconstructs it. If something should have units of length and you have $v$ and $t$ available, $vt$ is the only combination that works.',
       ],
       callouts: [
         {
@@ -126,7 +155,39 @@ export const CH0_LESSONS = [
           title: 'Homogeneity Rule',
           body: '[\\text{LHS}] = [\\text{RHS}]',
         },
+        {
+          type: 'mnemonic',
+          title: 'Quick dimension check for kinematics',
+          body: '[x] = [L],\\quad [v] = [L/T],\\quad [a] = [L/T^2],\\quad [t] = [T].',
+        },
       ],
+    },
+    rigor: {
+      title: 'Why dimensional homogeneity is necessary',
+      prose: [
+        'Numbers are not physical quantities — they are dimensionless. A physical quantity is a number paired with a dimension.',
+        'When you add two physical quantities, the dimension must be common, just as fractions require common denominators. If dimensions mismatch, the addition is undefined in the physical sense.',
+        'This is a theorem about physical models, not arbitrary convention: since dimensions transform independently under unit changes, only equal-dimension quantities can be equal across all unit systems.',
+      ],
+      proofSteps: [
+        {
+          expression: '[x] = [L]',
+          annotation: 'Position is a length.',
+        },
+        {
+          expression: '[v_0 t] = [L/T]\\cdot[T] = [L]',
+          annotation: 'Velocity × time cancels the T, leaving length.',
+        },
+        {
+          expression: '[\\tfrac{1}{2}at^2] = [L/T^2]\\cdot[T^2] = [L]',
+          annotation: 'Acceleration × time² cancels T², leaving length.',
+        },
+        {
+          expression: '[L] = [L] + [L]\\;\\checkmark',
+          annotation: 'All three terms have the same dimension — the equation is dimensionally valid.',
+        },
+      ],
+      visualizationId: 'UnitValidator',
     },
     examples: [
       {
@@ -182,12 +243,35 @@ export const CH0_LESSONS = [
     },
     intuition: {
       prose: [
-        'Physics uses functions to describe dependence: one quantity changes because another changes.',
-        'A function is not just notation. It is a causal contract telling you what output you get for every allowed input.',
-        'In early mechanics, time is the universal input and position, velocity, and acceleration are outputs.',
-        'When a student says "I know the formula," the deeper question is whether they can explain the dependency graph among variables.',
+        'A function is a causal rule: for every allowed input, it outputs exactly one value. In physics, **time $t$ is the input** and everything measurable is an output.',
+        'Position $x(t)$, velocity $v(t)$, and acceleration $a(t)$ are all functions of time. When $t$ ticks forward, every one of these values updates according to the model.',
+        'The three quantities are not independent — they are linked by calculus. Velocity is the **rate of change** of position; acceleration is the **rate of change** of velocity. Knowing any one function and two initial values lets you reconstruct the other two.',
+        'This dependency chain — $x \\to v \\to a$ via differentiation, and $a \\to v \\to x$ via integration — is the backbone of all of mechanics.',
+      ],
+      callouts: [
+        {
+          type: 'definition',
+          title: 'The kinematic functions',
+          body: 'x(t): position\\;[\\text{m}],\\quad v(t): velocity\\;[\\text{m/s}],\\quad a(t): acceleration\\;[\\text{m/s}^2].',
+        },
+        {
+          type: 'insight',
+          title: 'The calculus link (preview)',
+          body: 'v = dx/dt\\;\\text{(derivative of position)},\\quad x = \\int v\\,dt\\;\\text{(integral of velocity)}.',
+        },
+        {
+          type: 'definition',
+          title: 'Independent vs dependent',
+          body: '$t$ is independent — we choose it. $x, v, a$ are dependent — the physics determines them.',
+        },
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'kinematic-chain' },
+          title: 'The kinematic chain: x → v → a',
+          caption: 'Go right (→) by differentiating: v = dx/dt, a = dv/dt. Go left (←) by integrating: v = ∫a dt, x = ∫v dt. Calculus is what connects the three functions — this chain is the skeleton of all of kinematics.',
+        },
         {
           id: 'FunctionMachine',
           title: 'Function Machine',
@@ -198,9 +282,9 @@ export const CH0_LESSONS = [
     },
     math: {
       prose: [
-        'Core notation: $x(t)$ for position (m), $v(t)$ for velocity (m/s), and $a(t)$ for acceleration (m/s$^2$).',
+        'Core notation: $x(t)$ for position (m), $v(t)$ for velocity (m/s), and $a(t)$ for acceleration (m/s²).',
         'If $t$ increases, these outputs update according to the model rule, which may be linear, curved, periodic, or piecewise.',
-        'Interpretation rule: when a function output rises with $t$, that physical quantity is increasing over time.',
+        'Interpretation: when a function output rises with $t$, that physical quantity is increasing. When the function is flat, that quantity is momentarily constant. When it decreases, the quantity is falling.',
       ],
       callouts: [
         {
@@ -208,7 +292,42 @@ export const CH0_LESSONS = [
           title: 'Independent vs Dependent',
           body: '$t$ is independent. $x, v, a$ are dependent variables in basic kinematics models.',
         },
+        {
+          type: 'insight',
+          title: 'Why three functions instead of one',
+          body: '$x(t)$ tells where. $v(t)=dx/dt$ tells how fast and which direction. $a(t)=dv/dt$ tells what is causing the velocity to change. Each level of the chain carries different physical information.',
+        },
       ],
+    },
+    rigor: {
+      title: 'The three kinematic functions are a dependency chain',
+      prose: [
+        'In calculus-based mechanics, the fundamental relationship is: $a(t)$ is given (by Newton\'s law $a=F/m$), and $v$ and $x$ are recovered by integration with initial conditions.',
+        'This means $x(t)$ is not memorized — it is derived from $a(t)$ in two integration steps.',
+      ],
+      proofSteps: [
+        {
+          expression: 'a(t) = \\frac{dv}{dt}',
+          annotation: 'Acceleration is defined as the rate of change of velocity. This is the starting point.',
+        },
+        {
+          expression: 'v(t) = v_0 + \\int_0^t a(\\tau)\\,d\\tau',
+          annotation: 'Integrate acceleration once, with initial condition v(0) = v₀. This gives velocity.',
+        },
+        {
+          expression: 'v(t) = \\frac{dx}{dt}',
+          annotation: 'Velocity is defined as the rate of change of position.',
+        },
+        {
+          expression: 'x(t) = x_0 + \\int_0^t v(\\tau)\\,d\\tau',
+          annotation: 'Integrate velocity once, with initial condition x(0) = x₀. This gives position.',
+        },
+        {
+          expression: 'a \\xrightarrow{\\int dt} v \\xrightarrow{\\int dt} x,\\quad x \\xrightarrow{d/dt} v \\xrightarrow{d/dt} a',
+          annotation: 'The full dependency chain. Integration and differentiation are inverse operations — that is the Fundamental Theorem of Calculus.',
+        },
+      ],
+      visualizationId: 'FunctionMachine',
     },
     examples: [
       {
@@ -312,6 +431,18 @@ export const CH0_LESSONS = [
         },
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'algebra-avg-velocity' },
+          title: 'Average velocity as slope between two points',
+          caption: 'v_avg = Δx/Δt = (x₂ − x₁)/(t₂ − t₁). This is the slope of the straight line connecting two points on the x–t graph — a secant line. The question calculus asks: what happens when we slide t₂ toward t₁?',
+        },
+        {
+          id: 'SVGDiagram',
+          props: { type: 'slope-triangle' },
+          title: 'From secant to tangent: the limit idea',
+          caption: 'As Δt → 0, the secant line (two-point average) rotates to become the tangent line at one point. The slope of that tangent is instantaneous velocity — the derivative dx/dt. Algebra gives you the secant; calculus gives you the tangent.',
+        },
         {
           id: 'MasterLimitGraph',
           title: 'Master Graph: Algebra -> Limit -> Calculus',
@@ -540,12 +671,30 @@ export const CH0_LESSONS = [
     },
     intuition: {
       prose: [
-        'A graph is a compressed story of motion. Geometry on the graph maps to physics in the world.',
-        'On a position-time graph, slope is velocity. On a velocity-time graph, area under the curve is displacement.',
-        'This is why graph reading is not optional in physics. It is the bridge between qualitative behavior and quantitative prediction.',
-        'Changing shape means changing mechanism: flat regions, sharp bends, and curvature each encode different motion behavior.',
+        'A graph is a compressed story of motion. Two facts unlock everything:',
+        '- **On an x–t graph**: the *slope* at any moment equals velocity. Steeper = faster. Positive slope = moving forward. Negative slope = moving backward. Zero slope = at rest.',
+        '- **On a v–t graph**: the *area* between the curve and the time axis equals displacement. Positive area (above axis) = forward motion. Negative area (below axis) = backward motion.',
+        'These two facts are not coincidences — they are the same as the calculus definitions: slope is the derivative, area is the integral. Graphs make those abstract operations concrete and visible.',
+      ],
+      callouts: [
+        {
+          type: 'definition',
+          title: 'Two graph facts to memorize permanently',
+          body: '\\text{slope of }x\\text{-}t = v,\\qquad \\text{area under }v\\text{-}t = \\Delta x.',
+        },
+        {
+          type: 'insight',
+          title: 'Algebra first: rectangles and trapezoids',
+          body: 'Before calculus, estimate area with simple shapes. A rectangle on a v–t graph (constant v) gives Δx = v·Δt exactly. A trapezoid gives Δx = ½(v₀+v)·Δt. Calculus is the limiting case of smaller and smaller shapes.',
+        },
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'xt-vt-graphs' },
+          title: 'Slope = velocity  |  Area = displacement',
+          caption: 'Left: the slope triangle on the x–t graph has rise = Δx and run = Δt, so slope = Δx/Δt = velocity. Right: the shaded region under the v–t graph has width Δt and height v, so area = v·Δt = displacement. These are the same relationship — just seen from opposite directions.',
+        },
         {
           id: 'GraphInterpreter',
           title: 'Graph Interpreter',
@@ -557,16 +706,46 @@ export const CH0_LESSONS = [
     math: {
       prose: [
         '$\\frac{dx}{dt}$ gives instantaneous velocity (m/s). Steeper positive slope means larger positive velocity.',
-        '$\\int v(t)dt$ accumulates displacement (m). If velocity is zero, area does not grow.',
-        'Edge behavior: negative velocity contributes signed negative area, meaning displacement can decrease even while time increases.',
+        '$\\int v(t)\\,dt$ accumulates displacement (m). If velocity is zero, area does not grow.',
+        'Edge behavior: negative velocity contributes signed negative area — displacement can decrease even while time increases. This is how an object can return to its starting point.',
       ],
       callouts: [
         {
           type: 'insight',
-          title: 'Edge Case',
-          body: 'Flat position graph means slope 0, so velocity 0 even though time continues.',
+          title: 'Algebra preview: constant-v case',
+          body: 'If v is constant, the v–t graph is a flat rectangle. Area = v × Δt = displacement. That is exactly Δx = vt — the simplest kinematic formula.',
+        },
+        {
+          type: 'warning',
+          title: 'Speed vs displacement from the graph',
+          body: 'Area below the t-axis is negative displacement (motion backward). Speed at any instant is |v|, the magnitude — always positive. Displacement includes direction.',
         },
       ],
+    },
+    rigor: {
+      title: 'Why slope = velocity and area = displacement',
+      prose: [
+        'These are not graph-reading tricks — they are direct consequences of the definitions.',
+      ],
+      proofSteps: [
+        {
+          expression: 'v(t) = \\frac{dx}{dt} = \\lim_{\\Delta t\\to 0}\\frac{\\Delta x}{\\Delta t}',
+          annotation: 'Velocity is defined as the derivative of position. The derivative IS the slope of the tangent line on the x–t graph.',
+        },
+        {
+          expression: '\\text{slope of }x\\text{-}t\\text{ at time }t = \\frac{dx}{dt} = v(t)',
+          annotation: 'Therefore: slope of x–t graph = velocity. Always, by definition.',
+        },
+        {
+          expression: '\\Delta x = x(t_2)-x(t_1) = \\int_{t_1}^{t_2} v(t)\\,dt',
+          annotation: 'The Fundamental Theorem of Calculus: displacement equals the integral of velocity.',
+        },
+        {
+          expression: '\\int_{t_1}^{t_2} v(t)\\,dt = \\text{signed area under }v\\text{-}t\\text{ from }t_1\\text{ to }t_2',
+          annotation: 'The geometric meaning of the integral is signed area. Therefore: area under v–t graph = displacement.',
+        },
+      ],
+      visualizationId: 'GraphInterpreter',
     },
     examples: [
       {
@@ -618,12 +797,30 @@ export const CH0_LESSONS = [
     },
     intuition: {
       prose: [
-        'Scalars only tell how much: mass, temperature, speed.',
-        'Vectors tell how much and where: displacement, velocity, force. Direction changes the physical outcome.',
-        'Two cars can each move at 20 m/s and still approach each other, separate, or travel parallel depending on velocity direction.',
-        'Component form turns directional ideas into computable pieces you can add, compare, and resolve.',
+        'A **scalar** is a single number with a unit: temperature (25°C), mass (70 kg), speed (15 m/s). It tells you *how much*.',
+        'A **vector** is a number with a unit *and* a direction: velocity (15 m/s east), force (500 N upward). It tells you *how much and which way*.',
+        'The difference is not cosmetic. Two cars can both travel at 60 km/h and still collide head-on, diverge, or travel in parallel — depending entirely on their velocity *directions*. Speed alone cannot predict the outcome.',
+        'To make vectors computable, we break them into **components**: the part along $x$ and the part along $y$. Components are ordinary scalars you can add, subtract, and multiply — the vector direction is encoded in their signs.',
+      ],
+      callouts: [
+        {
+          type: 'definition',
+          title: 'Scalar vs vector',
+          body: '\\text{Scalar: magnitude only. Example: } |\\vec{v}| = 20\\,m/s.\\quad \\text{Vector: magnitude + direction. Example: } \\vec{v} = (12, 16)\\,m/s.',
+        },
+        {
+          type: 'insight',
+          title: 'Components are the computable form',
+          body: 'v_x = |\\vec{v}|\\cos\\theta,\\quad v_y = |\\vec{v}|\\sin\\theta.\\quad\\text{Then: }|\\vec{v}|=\\sqrt{v_x^2+v_y^2}.',
+        },
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'vector-components' },
+          title: 'One vector, two components',
+          caption: 'The velocity arrow is the hypotenuse. vₓ = |v|cosθ (horizontal reach) and vy = |v|sinθ (vertical reach) are the legs. The Pythagorean theorem connects them back: |v|² = vₓ² + vy². A scalar only has the hypotenuse — no angle, no components.',
+        },
         {
           id: 'VectorBuilder',
           title: 'Vector Builder',
@@ -634,17 +831,47 @@ export const CH0_LESSONS = [
     },
     math: {
       prose: [
-        'Write velocity vector as $\\vec v=(v_x,v_y)$ with component units m/s.',
+        'Write velocity vector as $\\vec{v}=(v_x,v_y)$ with component units m/s.',
         'Increasing $v_x$ shifts motion rightward; increasing $v_y$ shifts motion upward.',
-        'Magnitude is $|\\vec v|=\\sqrt{v_x^2+v_y^2}$, but magnitude alone cannot distinguish opposite directions.',
+        'Magnitude is $|\\vec{v}|=\\sqrt{v_x^2+v_y^2}$, but magnitude alone cannot distinguish opposite directions.',
       ],
       callouts: [
         {
           type: 'definition',
           title: 'Speed vs Velocity',
-          body: 'Speed is scalar magnitude $|\\vec v|$. Velocity includes direction and components.',
+          body: 'Speed is scalar magnitude $|\\vec{v}|$. Velocity includes direction and components.',
+        },
+        {
+          type: 'warning',
+          title: 'Adding vectors is NOT adding magnitudes',
+          body: '|\\vec{A}+\\vec{B}| \\ne |\\vec{A}| + |\\vec{B}|\\text{ in general. You must add components: }(A_x+B_x,\\, A_y+B_y).',
         },
       ],
+    },
+    rigor: {
+      title: 'Why vectors require components for addition',
+      prose: [
+        'Scalar addition works because scalars are just numbers on a line. Vector addition must account for direction — the only correct way is component-wise.',
+      ],
+      proofSteps: [
+        {
+          expression: '\\vec{A} = A_x\\hat{i} + A_y\\hat{j},\\quad \\vec{B} = B_x\\hat{i} + B_y\\hat{j}',
+          annotation: 'Expand both vectors in component form using unit vectors î (east) and ĵ (north).',
+        },
+        {
+          expression: '\\vec{A}+\\vec{B} = (A_x+B_x)\\hat{i} + (A_y+B_y)\\hat{j}',
+          annotation: 'Group like unit vectors. Each component adds independently — just ordinary scalar addition along each axis.',
+        },
+        {
+          expression: '|\\vec{A}+\\vec{B}| = \\sqrt{(A_x+B_x)^2+(A_y+B_y)^2}',
+          annotation: 'The magnitude of the resultant. This is generally NOT equal to |A| + |B|.',
+        },
+        {
+          expression: '|\\vec{A}+\\vec{B}| = |\\vec{A}|+|\\vec{B}|\\text{ only when }\\vec{A}\\parallel\\vec{B}',
+          annotation: 'Magnitudes add directly only when both vectors point in the same direction. Any other angle gives a smaller resultant.',
+        },
+      ],
+      visualizationId: 'VectorBuilder',
     },
     examples: [
       {
@@ -702,6 +929,12 @@ export const CH0_LESSONS = [
         'Frame choice changes coordinate values, not physical events. Physics is in the relations, not a privileged observer.',
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'two-objects-line' },
+          title: 'Same event, two coordinate systems',
+          caption: 'A is the ground observer, B is the train. In the ground frame, both positions are measured from the fixed origin (A). In the train frame, everything is measured relative to B. Switching the origin changes all coordinates — but the physical distance between objects stays the same.',
+        },
         {
           id: 'FrameSwitcher',
           title: 'Train and Ground Frames',
@@ -780,6 +1013,12 @@ export const CH0_LESSONS = [
         'In practice, calculus is the limit of repeated algebraic refinement, not a separate universe.',
       ],
       visualizations: [
+        {
+          id: 'SVGDiagram',
+          props: { type: 'slope-triangle' },
+          title: 'Algebra (secant) → Calculus (tangent)',
+          caption: 'The algebra approach: pick two points, compute Δx/Δt. The calculus approach: shrink Δt to zero, getting dx/dt. Both use the same ratio — calculus just takes it to its limiting value. The tangent line IS the limit of the secant as the two points collapse into one.',
+        },
         {
           id: 'DiscreteVsContinuous',
           title: 'Stepwise vs Continuous Motion',

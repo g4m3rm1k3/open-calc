@@ -21,6 +21,17 @@
  *   suvat-map             — 5 SUVAT equations as a connection diagram
  *   free-fall-axes        — vertical axis, g downward, sign convention
  *   two-objects-line      — number line with two objects meeting
+ *
+ *   VECTORS (Ch1)
+ *   vector-components     — right-triangle decomposition Aₓ=A cosθ, Ay=A sinθ
+ *   vector-addition-chain — tip-to-tail chain of 3 vectors with resultant
+ *   dot-product-projection — projection of B onto A, angle arc, formula
+ *   cross-product-rhr     — 3D oblique view, right-hand rule, A×B direction
+ *   free-body-diagram     — object with N, W, F, friction arrows + labels
+ *
+ *   ORIENTATION (Ch0)
+ *   dimensions-equation   — SUVAT term-by-term dimension check, all → [L]
+ *   xt-vt-graphs          — twin panels: slope=v on x–t, area=Δx on v–t
  */
 
 import { useState, useEffect } from 'react'
@@ -925,6 +936,177 @@ function FreeBodyDiagram({ C }) {
   )
 }
 
+// ─── Dimensions Equation (Ch0) ────────────────────────────────────────────────
+// Shows x = v₀t + ½at² with dimension labels — teaches dimensional homogeneity.
+
+function DimensionsEquation({ C }) {
+  const W = 460, H = 210
+
+  // Three columns: term, raw dimension, simplified
+  const terms = [
+    { cx: 80,  term: 'x',    raw: '[L]',          simp: '[L]' },
+    { cx: 230, term: 'v₀·t', raw: '[L/T] · [T]',  simp: '[L]' },
+    { cx: 375, term: '½a·t²',raw: '[L/T²] · [T²]',simp: '[L]' },
+  ]
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Title */}
+      <text x={W / 2} y={22} textAnchor="middle" fill={C.label} fontSize={12} fontWeight="700" fontFamily="sans-serif">
+        Dimensional homogeneity: x = v₀t + ½at²
+      </text>
+
+      {/* Operator symbols between columns */}
+      <text x={150} y={72} textAnchor="middle" fill={C.muted} fontSize={18} fontFamily="monospace">=</text>
+      <text x={300} y={72} textAnchor="middle" fill={C.muted} fontSize={18} fontFamily="monospace">+</text>
+
+      {/* Per-term columns */}
+      {terms.map(({ cx, term, raw, simp }, i) => (
+        <g key={i}>
+          {/* Term box */}
+          <rect x={cx - 40} y={44} width={80} height={28} rx={6}
+            fill={C.surface} stroke={C.border} strokeWidth={1} />
+          <text x={cx} y={63} textAnchor="middle" fill={C.brand} fontSize={13}
+            fontWeight="700" fontFamily="monospace">{term}</text>
+
+          {/* Arrow down */}
+          <line x1={cx} y1={73} x2={cx} y2={88} stroke={C.muted} strokeWidth={1.5} />
+          <polygon points={`${cx},${92} ${cx - 4},${87} ${cx + 4},${87}`} fill={C.muted} />
+
+          {/* Raw dimension */}
+          <text x={cx} y={110} textAnchor="middle" fill={C.sky} fontSize={10} fontFamily="monospace">{raw}</text>
+
+          {/* Arrow down */}
+          <line x1={cx} y1={115} x2={cx} y2={130} stroke={C.muted} strokeWidth={1.5} />
+          <polygon points={`${cx},${134} ${cx - 4},${129} ${cx + 4},${129}`} fill={C.muted} />
+
+          {/* Simplified dimension */}
+          <rect x={cx - 20} y={136} width={40} height={20} rx={4}
+            fill={C.emerald} opacity={0.15} stroke={C.emerald} strokeWidth={1} />
+          <text x={cx} y={151} textAnchor="middle" fill={C.emerald} fontSize={12}
+            fontWeight="700" fontFamily="monospace">{simp}</text>
+
+          {/* Checkmark */}
+          <text x={cx} y={173} textAnchor="middle" fill={C.emerald} fontSize={14}>✓</text>
+        </g>
+      ))}
+
+      {/* Footer rule */}
+      <text x={W / 2} y={198} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Every term must reduce to the same dimension — if not, the equation is physically impossible
+      </text>
+    </svg>
+  )
+}
+
+// ─── X–t and V–t Twin Graphs (Ch0) ────────────────────────────────────────────
+// Left: x-t graph with slope triangle labeled "slope = v".
+// Right: v-t graph with shaded rectangle labeled "area = Δx".
+// Teaches: graphs encode physics — slope and area carry real meaning.
+
+function XtVtGraphs({ C }) {
+  const W = 460, H = 210
+  const pad = 32
+
+  // Left panel: x-t graph (parabola, slope triangle at t=3)
+  const lx0 = pad, lx1 = 210
+  const ly0 = H - pad, ly1 = pad
+  const lW = lx1 - lx0, lH = ly0 - ly1
+
+  function xtToSVG(t, x, tMax, xMax) {
+    return [lx0 + (t / tMax) * lW, ly0 - (x / xMax) * lH]
+  }
+  const tMax = 4, xMax = 16
+  // parabola x = t²
+  const xtPts = []
+  for (let t = 0; t <= tMax; t += 0.2) xtPts.push(xtToSVG(t, t * t, tMax, xMax))
+  const xtPath = 'M ' + xtPts.map(p => p.join(',')).join(' L ')
+
+  // Slope triangle at t=2 to t=3: x goes from 4 to 9, Δx=5, Δt=1
+  const [sx0, sy0] = xtToSVG(2, 4, tMax, xMax)
+  const [sx1, sy1] = xtToSVG(3, 4, tMax, xMax)
+  const [tx1, ty1] = xtToSVG(3, 9, tMax, xMax)
+
+  // Right panel: v-t graph (linear v = 2t)
+  const rx0 = 250, rx1 = W - pad
+  const ry0 = H - pad, ry1 = pad
+  const rW = rx1 - rx0, rH = ry0 - ry1
+
+  function vtToSVG(t, v, tMax, vMax) {
+    return [rx0 + (t / tMax) * rW, ry0 - (v / vMax) * rH]
+  }
+  const vMax = 8
+  const vtPts = []
+  for (let t = 0; t <= tMax; t += 0.2) vtPts.push(vtToSVG(t, 2 * t, tMax, vMax))
+  const vtPath = 'M ' + vtPts.map(p => p.join(',')).join(' L ')
+
+  // Shaded area: t=1 to t=3
+  const [ar0x, ar0y] = vtToSVG(1, 0, tMax, vMax)
+  const [ar1x, ar1y] = vtToSVG(3, 0, tMax, vMax)
+  const [ar2x, ar2y] = vtToSVG(3, 6, tMax, vMax)
+  const [ar3x, ar3y] = vtToSVG(1, 2, tMax, vMax)
+  const areaPath = `M ${ar0x},${ar0y} L ${ar1x},${ar1y} L ${ar2x},${ar2y} L ${ar3x},${ar3y} Z`
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Panel titles */}
+      <text x={(lx0 + lx1) / 2} y={14} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+        position–time (x–t)
+      </text>
+      <text x={(rx0 + rx1) / 2} y={14} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+        velocity–time (v–t)
+      </text>
+
+      {/* Left axes */}
+      <line x1={lx0} y1={ly0} x2={lx1 + 10} y2={ly0} stroke={C.border} strokeWidth={1.5} />
+      <line x1={lx0} y1={ly0} x2={lx0} y2={ly1 - 10} stroke={C.border} strokeWidth={1.5} />
+      <text x={lx1 + 12} y={ly0 + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">t</text>
+      <text x={lx0 - 6} y={ly1 - 12} fill={C.muted} fontSize={9} fontFamily="sans-serif">x</text>
+
+      {/* Right axes */}
+      <line x1={rx0} y1={ry0} x2={rx1 + 10} y2={ry0} stroke={C.border} strokeWidth={1.5} />
+      <line x1={rx0} y1={ry0} x2={rx0} y2={ry1 - 10} stroke={C.border} strokeWidth={1.5} />
+      <text x={rx1 + 12} y={ry0 + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">t</text>
+      <text x={rx0 - 6} y={ry1 - 12} fill={C.muted} fontSize={9} fontFamily="sans-serif">v</text>
+
+      {/* Left: parabola */}
+      <path d={xtPath} stroke={C.brand} strokeWidth={2} fill="none" />
+
+      {/* Slope triangle */}
+      <polygon points={`${sx0},${sy0} ${sx1},${sy1} ${tx1},${ty1}`}
+        fill={C.amber} opacity={0.25} />
+      <line x1={sx0} y1={sy0} x2={sx1} y2={sy1} stroke={C.amber} strokeWidth={1.5} strokeDasharray="3,2" />
+      <line x1={sx1} y1={sy1} x2={tx1} y2={ty1} stroke={C.amber} strokeWidth={1.5} strokeDasharray="3,2" />
+      <line x1={sx0} y1={sy0} x2={tx1} y2={ty1} stroke={C.amber} strokeWidth={2} />
+      <text x={(sx0 + tx1) / 2 - 28} y={(sy0 + ty1) / 2} fill={C.amber} fontSize={9} fontFamily="monospace">slope</text>
+      <text x={(sx0 + tx1) / 2 - 22} y={(sy0 + ty1) / 2 + 11} fill={C.amber} fontSize={9} fontFamily="monospace">= v</text>
+
+      {/* Right: area fill */}
+      <path d={areaPath} fill={C.emerald} opacity={0.2} />
+      <path d={vtPath} stroke={C.brand} strokeWidth={2} fill="none" />
+      {/* Vertical lines for area bounds */}
+      <line x1={ar0x} y1={ar0y} x2={ar3x} y2={ar3y} stroke={C.emerald} strokeWidth={1.5} strokeDasharray="3,2" />
+      <line x1={ar1x} y1={ar1y} x2={ar2x} y2={ar2y} stroke={C.emerald} strokeWidth={1.5} strokeDasharray="3,2" />
+      <text x={(ar0x + ar1x) / 2} y={(ar0y + ar2y) / 2 + 4} textAnchor="middle"
+        fill={C.emerald} fontSize={9} fontFamily="monospace">area</text>
+      <text x={(ar0x + ar1x) / 2} y={(ar0y + ar2y) / 2 + 15} textAnchor="middle"
+        fill={C.emerald} fontSize={9} fontFamily="monospace">= Δx</text>
+
+      {/* Panel divider */}
+      <line x1={225} y1={ly1} x2={225} y2={ly0} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+
+      {/* Footer */}
+      <text x={W / 2} y={H - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Slope of x–t = velocity  |  Area under v–t = displacement
+      </text>
+    </svg>
+  )
+}
+
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
@@ -946,6 +1128,9 @@ const DIAGRAMS = {
   'dot-product-projection':  DotProductProjection,
   'cross-product-rhr':       CrossProductRHR,
   'free-body-diagram':       FreeBodyDiagram,
+  // Orientation / Ch0
+  'dimensions-equation':     DimensionsEquation,
+  'xt-vt-graphs':            XtVtGraphs,
 }
 
 export default function SVGDiagram({ params = {} }) {
