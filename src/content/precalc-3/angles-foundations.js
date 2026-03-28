@@ -20,6 +20,8 @@ export default {
       'Degrees divide a full rotation into 360 equal parts. This is arbitrary but convenient — 360 is divisible by 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72, 90, 120, 180. Almost any fraction of a circle comes out to a whole number of degrees.',
       'Radians measure angles by arc length. One radian is the angle subtended by an arc equal in length to the radius. Since the circumference is $2\\pi r$, a full circle subtends $2\\pi$ radians. This is not a convention — it follows directly from the definition of $\\pi$. Radians are dimensionless: they are a ratio of lengths.',
       'The calculus reason radians win: $\\lim_{\\theta \\to 0} \\frac{\\sin\\theta}{\\theta} = 1$ only when $\\theta$ is in radians. This limit is the foundation of every trig derivative. In degrees, the limit gives $\\pi/180$ instead — a constant that would infect every derivative formula forever.',
+      '**The Cosmic Constant**: While 360 is a human choice (based on the Babylonian calendar), $2\\pi$ is a property of the Universe itself. Radians represent the "True Language" of circles—where the distance traveled along the edge is directly linked to the angle turned at the center.',
+      '**Circular Measure**: If you unrolled a circle onto a flat line, the distance you walked would be the "Arc Length." Trigonometry is the study of how that linear walk translates into rotational position. The radian is the only unit that keeps this relationship scale-free.',
     ],
     callouts: [
       {
@@ -41,6 +43,26 @@ export default {
         type: 'theorem',
         title: 'Degree ↔ Radian conversion',
         body: '\\theta_{\\text{rad}} = \\theta_{\\deg} \\times \\frac{\\pi}{180} \\qquad \\theta_{\\deg} = \\theta_{\\text{rad}} \\times \\frac{180}{\\pi} \\\\ \\text{Key values: } 30° = \\frac{\\pi}{6}, \\; 45° = \\frac{\\pi}{4}, \\; 60° = \\frac{\\pi}{3}, \\; 90° = \\frac{\\pi}{2}, \\; 180° = \\pi',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Language of the Radius',
+        body: '\\text{The word "Radian" is a portmanteau of "Radius" and "Angle."} \\\\ \\text{It literally tells you "How many Radii" make up the arc. This makes it a unitless ratio—the pure geometry of rotation.}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Cosmic Constant',
+        body: '\\text{A circle has no "Human" divisions.} \\\\ \\text{Using } 2\\pi \\text{ instead of } 360 \\text{ removes all arbitrary history and aligns the math with the physical ratio of geometry itself.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Spinning Wheel',
+        body: '\\text{In physics, an angle is a "Phase."} \\\\ \\text{Radians connect Linear Speed (m/s) to Angular Velocity (rad/s) with a single factor of } R. \\\\ \\text{Without radians, every physics formula for rotation would require a conversion constant.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: The Universal Map',
+        body: '\\text{The radian is a string equal to the radius, laid along the curve.} \\\\ \\text{Visualizing this "Bendable Ruler" is the key to understanding why } S = R\\theta \\text{ is so elegant. One radius of arc = one radian.}',
       },
     ],
     visualizations: [
@@ -91,6 +113,16 @@ export default {
         title: 'The most common radian error',
         body: 's = r\\theta \\text{ requires } \\theta \\text{ in radians — not degrees.} \\\\ \\text{An arc of a circle with } r=5, \\theta=60°: \\\\ \\text{Wrong: } s = 5 \\times 60 = 300 \\qquad \\text{Right: } s = 5 \\times \\frac{\\pi}{3} \\approx 5.24',
       },
+      {
+        type: 'theorem',
+        title: 'The Ratio of Arcs Proof ($s = r\\theta$)',
+        body: '\\text{By definition, the circumference of a circle is } 2\\pi r. \\\\ \\text{The arc length proportion is } \\frac{s}{2\\pi r} = \\frac{\\theta}{2\\pi}. \\\\ \\text{Solving for } s \\text{ yields } s = r\\theta. \\\\ \\text{This confirms radians are the proportional unit of rotation.}',
+      },
+      {
+        type: 'theorem',
+        title: 'Slicing the Pie Proof ($A = \\frac{1}{2}r^2\\theta$)',
+        body: '\\text{The area of a full circle is } \\pi r^2. \\\\ \\text{A sector is a proportional slice of that area: } \\frac{\\text{Area}}{\\pi r^2} = \\frac{\\theta}{2\\pi}. \\\\ \\text{Simplifying gives } \\text{Area} = \\frac{\\pi r^2 \\theta}{2\\pi} = \\frac{1}{2}r^2\\theta.',
+      },
     ],
   },
 
@@ -122,6 +154,26 @@ export default {
         expression: '\\lim_{\\theta \\to 0} \\frac{\\sin\\theta}{\\theta} = 1 \\qquad \\blacksquare',
         annotation: 'Squeeze theorem: both bounds go to 1, so the middle does too. If $\\theta$ were in degrees, the arc length would be $\\pi\\theta/180$, giving limit $\\pi/180$ — polluting every calculus formula that follows.',
       },
+      {
+        expression: '\\text{--- Part II: The Sector Area Proof ---}',
+        annotation: 'Let us prove the area formula $A = \\frac{1}{2}r^2\\theta$ using part-to-whole ratios.',
+      },
+      {
+        expression: '\\frac{\\text{Sector Area}}{\\text{Total Circle Area}} = \\frac{\\text{Central Angle}}{\\text{Total Circle Angle}}',
+        annotation: 'Step 1: Set up the fundamental proportion of a circle.'
+      },
+      {
+        expression: '\\frac{\\text{Area}}{\\pi r^2} = \\frac{\\theta}{2\\pi}',
+        annotation: 'Step 2: Use the radian definition of $2\\pi$ for a full rotation.'
+      },
+      {
+        expression: '\\text{Area} = \\frac{\\pi r^2 \\theta}{2\\pi}',
+        annotation: 'Step 3: Multiply both sides by $\\pi r^2$.'
+      },
+      {
+        expression: '\\text{Area} = \\frac{1}{2}r^2\\theta \\qquad \\blacksquare',
+        annotation: 'Step 4: Cancel $\\pi$ and simplify. The formula is a direct consequence of the definition of the radian.'
+      }
     ],
   },
 
@@ -178,6 +230,46 @@ export default {
       ],
       conclusion: 'Infinitely many coterminal angles exist. The one in $[0, 2\\pi)$ is the "principal" representative. To find it, add or subtract $2\\pi$ repeatedly until the result lands in range.',
     },
+    {
+      id: 'ex-angles-gps',
+      title: 'Navigating the Globe: DMS to Decimal',
+      problem: '\\text{Convert } 48^\\circ 51^\\prime 24^{\\prime\\prime} \\text{ (the latitude of Paris) to decimal degrees.}',
+      steps: [
+        {
+          expression: '48 + \\frac{51}{60} + \\frac{24}{3600}',
+          annotation: 'Step 1: Convert minutes to 1/60th of a degree and seconds to 1/3600th.'
+        },
+        {
+          expression: '48 + 0.85 + 0.00667 = 48.85667^\\circ',
+          annotation: 'Step 2: Sum the parts to find the decimal equivalent.'
+        }
+      ],
+      conclusion: 'DMS is the historical legacy of Babylonian navigation. Digital systems (GPS) prefer decimal degrees for easier computation.'
+    },
+    {
+      id: 'ex-angles-gears',
+      title: 'Angular Synchrony: Connected Gears',
+      problem: '\\text{A small gear (r=2) is connected to a large gear (r=8). If the small gear turns } 120^\\circ, \\text{ how far does the large gear turn?}',
+      steps: [
+        {
+          expression: '120^\\circ = \\frac{2\\pi}{3} \\text{ rad}',
+          annotation: 'Step 1: Convert to radians for rotation modeling.'
+        },
+        {
+          expression: 's = r_1 \\theta_1 = 2 \\cdot \\frac{2\\pi}{3} = \\frac{4\\pi}{3}',
+          annotation: 'Step 2: Calculate the arc length travel along the small gear.'
+        },
+        {
+          expression: '\\frac{4\\pi}{3} = 8 \\cdot \\theta_2 \\implies \\theta_2 = \\frac{4\\pi}{24} = \\frac{\\pi}{6} \\text{ rad}',
+          annotation: 'Step 3: The arc length travel is identical for the large gear. Solve for the large angle.'
+        },
+        {
+          expression: '\\theta_2 = 30^\\circ',
+          annotation: 'Step 4: Convert back to degrees for the final answer.'
+        }
+      ],
+      conclusion: 'Large gears turn less but with more torque. The ratio of angles is the inverse of the ratio of radii.'
+    },
   ],
 
   challenges: [
@@ -215,6 +307,23 @@ export default {
       ],
       answer: '40° \\text{ and } 140°',
     },
+    {
+      id: 'ch3-trig-000-ch3',
+      difficulty: 'harder',
+      problem: '\\text{The Earth has a radius of } 6400 \\text{ km and rotates once every } 24 \\text{ hours. Calculate the linear speed (km/h) of a person standing on the equator.}',
+      hint: 'Find the angular velocity in radians per hour first. One rotation = $2\\pi$ radians.',
+      walkthrough: [
+        {
+          expression: '\\omega = \\frac{2\\pi \\text{ rad}}{24 \\text{ hours}} = \\frac{\\pi}{12} \\text{ rad/h}',
+          annotation: 'Step 1: Calculate the angular speed of the planet.'
+        },
+        {
+          expression: 'v = r\\omega = 6400 \\times \\frac{\\pi}{12} = \\frac{1600\\pi}{3} \\approx 1675 \\text{ km/h}',
+          annotation: 'Step 2: Linear speed = radius × angular velocity. Multiply and simplify.'
+        }
+      ],
+      answer: '\\approx 1675 \\text{ km/h}'
+    }
   ],
 
   calcBridge: {
