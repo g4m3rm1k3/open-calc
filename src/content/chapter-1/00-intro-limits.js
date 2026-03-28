@@ -64,7 +64,7 @@ export default {
       {
         type: 'intuition',
         title: 'The Core Idea',
-        body: 'lim(x→c) f(x) = L means: f(x) gets arbitrarily close to L whenever x is sufficiently close to c (but x ≠ c). The value of f at c is irrelevant.',
+        body: '$\\lim_{x \\to c} f(x) = L$ means $f(x)$ gets arbitrarily close to $L$ whenever $x$ is sufficiently close to $c$ (but $x \\neq c$). The value of $f$ at $c$ is irrelevant.',
       },
       {
         type: 'tip',
@@ -148,23 +148,18 @@ export default {
 
   math: {
     prose: [
-      'The formal limit notation is: lim(x→c) f(x) = L.',
+      'The formal limit notation is $\\lim_{x \\to c} f(x) = L$, read "the limit of $f(x)$ as $x$ approaches $c$ equals $L$."',
 
-      '**One-sided limits**: We distinguish approaching from the left versus the right:',
-      '• **Left-hand limit**: lim(x→c⁻) f(x) = L₋ means x approaches c while staying strictly less than c (x < c).',
-      '• **Right-hand limit**: lim(x→c⁺) f(x) = L₊ means x approaches c while staying strictly greater than c (x > c).',
+      '**One-sided limits**: We distinguish approaching from the left versus the right. The **left-hand limit** $\\lim_{x \\to c^-} f(x) = L_-$ means $x$ approaches $c$ while staying strictly less than $c$. The **right-hand limit** $\\lim_{x \\to c^+} f(x) = L_+$ means $x$ approaches $c$ while staying strictly greater than $c$.',
 
-      'The two-sided limit exists if and only if both one-sided limits exist AND they are equal. Written precisely:',
-      'lim(x→c) f(x) = L  ⟺  lim(x→c⁻) f(x) = L = lim(x→c⁺) f(x)',
+      'The two-sided limit exists if and only if both one-sided limits exist AND they produce the same value: $\\lim_{x \\to c} f(x) = L \\iff \\lim_{x \\to c^-} f(x) = L = \\lim_{x \\to c^+} f(x)$. When either side fails to exist, or they produce different values, we say the limit **Does Not Exist (DNE)**.',
 
-      'When the one-sided limits are unequal, or when either fails to exist, we say the limit **Does Not Exist (DNE)**.',
+      '**Three techniques for evaluating limits** when direct substitution fails (producing $0/0$ or similar indeterminate forms):',
+      '1. **Factoring and canceling**: factor the numerator or denominator to expose a common factor that can be cancelled. Works whenever the numerator and denominator share a root at $c$.',
+      '2. **Rationalizing** (multiplying by conjugate): used when a square root creates the $0/0$ form. Multiply top and bottom by $(\\sqrt{\\cdot} + k)$ to clear the radical via the difference-of-squares identity.',
+      '3. **The Squeeze Theorem**: if you cannot simplify $f(x)$ directly, but can trap it between two simpler functions that share the same limit, then $f$ is squeezed to that same value. Used for the fundamental trig limits.',
 
-      '**Three techniques for evaluating limits** when direct substitution fails (giving 0/0 or similar):',
-      '1. **Factoring and canceling**: factor the numerator and/or denominator to cancel the problem term. The most common technique for rational functions.',
-      '2. **Rationalizing** (multiplying by conjugate): used when a square root appears in a numerator or denominator.',
-      '3. **The squeeze theorem**: used when the function is bounded between two simpler functions that share the same limit.',
-
-      '**Limits at infinity**: lim(x→∞) f(x) = L means f(x) approaches L as x grows without bound. This describes **horizontal asymptotes**. The key technique: for rational functions, divide numerator and denominator by the highest power of x in the denominator.',
+      '**Limits at infinity**: $\\lim_{x \\to \\infty} f(x) = L$ means $f(x)$ approaches $L$ as $x$ grows without bound — this describes **horizontal asymptotes**. For rational functions, divide every term by the highest power of $x$ in the denominator, then let $1/x \\to 0$.',
     ],
     callouts: [
       {
@@ -252,26 +247,18 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "A Limit Example Combining Multiple Algebraic Tricks",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Top 4 Algebraic Tricks for Computing Limits",
-        props: { url: "" }
-      },
-      {
+                  {
         id: 'EpsilonDelta',
         props: { fn: '2*x + 1', c: 2, L: 5 },
         title: 'Epsilon-Delta in Action',
-        caption: 'Drag ε to set the output tolerance. Watch the required δ adjust to guarantee the condition. This is what "the limit is 5" means formally.',
+        mathBridge: 'Before dragging the slider, read the definition again: for every $\\varepsilon > 0$, there must exist a $\\delta > 0$ such that $0 < |x - 2| < \\delta \\Rightarrow |(2x+1) - 5| < \\varepsilon$. Here, $|(2x+1)-5| = |2x-4| = 2|x-2|$, so choosing $\\delta = \\varepsilon/2$ always works. Drag $\\varepsilon$ to any tiny value and watch $\\delta$ adjust to exactly $\\varepsilon/2$. That mechanical response IS the formal proof.',
+        caption: 'Drag ε to set the output tolerance. Watch the required δ adjust automatically. This is what "the limit is 5" means formally.',
       },
       {
         id: 'OscillationViz',
         title: 'When the Limit Does NOT Exist — sin(1/x) near 0',
-        caption: 'Zoom in toward x=0: no matter how close you get, the function keeps oscillating between -1 and 1. No single value L can satisfy the epsilon-delta definition — the limit does not exist.',
+        mathBridge: 'Compare this to the well-behaved functions above. Here, as $x \\to 0$, the function $\\sin(1/x)$ oscillates infinitely many times between $-1$ and $+1$. No matter how small a $\\delta$ you choose, there are $x$-values within $\\delta$ of $0$ where $f(x) = +1$ AND other $x$-values where $f(x) = -1$. No single $L$ can satisfy $|f(x) - L| < \\varepsilon$ for both simultaneously. The limit does not exist — and the $\\varepsilon$-$\\delta$ definition tells you exactly why.',
+        caption: 'Zoom in toward x=0: the function never settles. No ε-δ box can trap it at a single value — the limit DNE.',
       },
     ],
   },

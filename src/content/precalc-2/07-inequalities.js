@@ -43,42 +43,7 @@ export default {
         mathBridge: 'Enter zeros of a factored polynomial and see the sign chart built automatically. Click intervals to see which satisfy $f(x) > 0$.',
         caption: 'The sign only changes at zeros (odd multiplicity) or undefined points. It is constant everywhere else.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Polynomial Inequalities a Graphical Approach',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Rational Inequalities',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Polynomial Inequalities',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Linear Inequalities 3 Examples',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing 1 Variable Inequalities',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Non-Linear Inequalities',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing System of Linear Inequalities',
-        props: { url: "" },
-      },
-    ],
+                                              ],
   },
 
   math: {

@@ -56,27 +56,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I Final Exam Review",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Hyperbolic Functions Derivative & Integrals 5 Examples Calculus 1",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Average Value of a Continuous Function on an Interval",
-        props: { url: "" }
-      },
-      {
+                            {
         id: 'AreaBetweenCurves',
         title: 'Area Between Two Curves',
         caption: 'The shaded region shows the area between the upper curve f(x) and the lower curve g(x). Drag the endpoints to change the interval. The integral ∫ₐᵇ [f(x)−g(x)] dx is computed in real time. Notice how the area is always positive (upper minus lower), even when both curves are below the x-axis.',
@@ -131,11 +111,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Exam Walkthrough | Calc 1, Test 3 | Integration, FTC I/II, Optimization, u-subs, Graphing",
-        props: { url: "" }
-      },],
+      ],
   },
 
   examples: [

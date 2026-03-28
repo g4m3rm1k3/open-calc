@@ -43,58 +43,33 @@ export default {
     ],
     visualizations: [
       {
-        id: 'VideoEmbed',
-        title: "Calculus I -2.3.1 The Product and Quotient Rules for Derivatives",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.2.2 Applying the Derivative to the Position Function",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.2.1 Basic Differentiation Rules",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 2: Derivative formulas through geometry",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Logarithmic Differentiation Derivative of a Fraction",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Derivative Rules:  Power Rule, Additivity, and Scalar Multiplication",
-        props: { url: "" }
-      },
-      {
         id: 'DerivativeRuleArenaGame',
         title: 'Derivative Rule Arena',
+        mathBridge: 'Before you can apply rules quickly, you need to identify WHICH rule applies. The first skill is not computation — it is classification: is the outermost operation a sum? a product? a quotient? a composition? This game trains your eye to see the structure of a function before touching any algebra. You will find that once rule recognition is automatic, the computation is mechanical.',
         caption: 'Train fast rule recognition before symbolic computation: pick the right opening rule under pressure.',
       },
       {
         id: 'PowerRulePattern',
         title: 'Power Rule Pattern',
+        mathBridge: 'Adjust the exponent $n$ with the slider and watch both $f(x) = x^n$ and $f\'(x) = nx^{n-1}$ update. Notice: the derivative is always one degree lower, and the coefficient is always the original exponent. When $n = 0$, $f$ is a constant and $f\' = 0$. When $n = 1$, $f = x$ and $f\' = 1$. When $n = -1$, $f = 1/x$ and $f\' = -1/x^2$. The pattern holds for every real $n$ — positive, negative, or fractional.',
         caption: 'Adjust n to see how f(x) = xⁿ and its derivative nxⁿ⁻¹ relate. Notice the degree drops by exactly 1 each time.',
       },
       {
         id: 'ProductRuleRectangle',
         title: 'Why the Product Rule Works — The Rectangle Proof',
+        mathBridge: 'Think of $f(x) \\cdot g(x)$ as the area of a rectangle with side lengths $f(x)$ and $g(x)$. When $x$ increases by a small $h$: $f$ grows by $\\Delta f \\approx f\'h$ and $g$ grows by $\\Delta g \\approx g\'h$. The new area is $(f + \\Delta f)(g + \\Delta g) = fg + f\\Delta g + g\\Delta f + \\Delta f \\Delta g$. The last term is proportional to $h^2$ and vanishes as $h \\to 0$. What remains: $\\Delta(fg)/h \\to f\'g + fg\'$. That is the product rule — not a formula to memorize, but geometry made algebraic.',
         caption: 'f(x)·g(x) is the area of a rectangle. When x changes, the area grows by f·Δg + g·Δf + a tiny corner (Δf·Δg). As Δx→0, the corner vanishes, giving (fg)\' = f\'g + fg\'.',
       },
       {
         id: 'ProjectileMotion',
         title: 'Projectile Motion — Derivatives in Physics',
+        mathBridge: 'The height of a projectile is $h(t) = v_0 \\sin(\\theta) \\cdot t - \\tfrac{1}{2}g t^2$ — a polynomial in $t$ when $\\theta$ is fixed. Differentiating: $h\'(t) = v_0 \\sin(\\theta) - gt$ is the vertical velocity, which is zero at maximum height. Differentiating again: $h\'\'(t) = -g$ is the (constant) downward acceleration of gravity. This single example shows all three derivatives — position, velocity, acceleration — in one coherent physical picture.',
         caption: 'Adjust the launch angle and speed. The height function h(t) = v·sin(θ)·t − ½gt² is a polynomial — differentiate it to find max height and landing time.',
       },
       {
         id: 'SlopeField',
         title: 'Slope Field — The Derivative as a Function',
+        mathBridge: 'The derivative $f\'(x)$ is not just a slope at one point — it defines a slope at EVERY point on the curve simultaneously. Each tiny segment in this field is drawn with the actual slope $f\'(x)$ at that $x$. Notice: where $f\'(x) = 0$, the segments are horizontal (flat); where $f\'(x)$ is large, the segments are steep. The slope field is a portrait of the derivative function, visualized geometrically across the whole domain.',
         caption: 'The derivative is not just a number at one point — it defines a slope at EVERY point. This slope field shows tiny line segments colored by the derivative value.',
       },
     ],
@@ -104,12 +79,12 @@ export default {
     prose: [
       'We now state all five differentiation rules precisely. Each is a theorem — a mathematical fact that can be proved and that holds without exception wherever the functions involved are differentiable.',
       'The constant rule says the derivative of any constant function is zero. This makes geometric sense: a constant function is a horizontal line with slope 0 everywhere.',
-      'The power rule is the most-used rule in calculus: d/dx[x\u207f] = nx\u207f\u207b\u00b9. This holds for any real number n — positive, negative, fractional, or irrational. For the moment we prove it for positive integers; the general case follows from logarithmic differentiation or the generalized binomial theorem.',
-      'The constant multiple rule lets constants pass through the derivative. If c is a constant, d/dx[cf(x)] = c\u00b7f\'(x). This follows because constants can be factored out of limits.',
-      'The sum/difference rules say d/dx[f(x) \u00b1 g(x)] = f\'(x) \u00b1 g\'(x). Derivatives of sums and differences are computed term by term.',
-      'The product rule: d/dx[f(x)\u00b7g(x)] = f\'(x)\u00b7g(x) + f(x)\u00b7g\'(x). In words: the derivative of a product is (derivative of first)(second) plus (first)(derivative of second).',
-      'The quotient rule: if g(x) \u2260 0, then d/dx[f(x)/g(x)] = [f\'(x)\u00b7g(x) - f(x)\u00b7g\'(x)] / [g(x)]\u00b2.',
-      'Higher-order derivatives are defined by repeated differentiation. The second derivative is f\'\'(x) = d/dx[f\'(x)], the third derivative is f\'\'\'(x) = d/dx[f\'\'(x)], and so on. For the nth derivative we write f\u1d3c\u207f\u207d(x) or d\u207fy/dx\u207f.',
+      'The power rule is the most-used rule in calculus: $\\frac{d}{dx}[x^n] = nx^{n-1}$. This holds for any real number $n$ — positive, negative, fractional, or irrational. For the moment we prove it for positive integers; the general case follows from logarithmic differentiation or the generalized binomial theorem.',
+      'The constant multiple rule lets constants pass through the derivative. If $c$ is a constant, $\\frac{d}{dx}[cf(x)] = c \\cdot f\'(x)$. This follows because constants can be factored out of limits.',
+      'The sum/difference rules say $\\frac{d}{dx}[f(x) \\pm g(x)] = f\'(x) \\pm g\'(x)$. Derivatives of sums and differences are computed term by term.',
+      'The product rule: $\\frac{d}{dx}[f(x) \\cdot g(x)] = f\'(x) \\cdot g(x) + f(x) \\cdot g\'(x)$. In words: the derivative of a product is (derivative of first)(second) plus (first)(derivative of second).',
+      'The quotient rule: if $g(x) \\neq 0$, then $\\frac{d}{dx}[f(x)/g(x)] = \\frac{f\'(x) \\cdot g(x) - f(x) \\cdot g\'(x)}{[g(x)]^2}$.',
+      'Higher-order derivatives are defined by repeated differentiation. The second derivative is $f\'\'(x) = \\frac{d}{dx}[f\'(x)]$, the third derivative is $f\'\'\'(x) = \\frac{d}{dx}[f\'\'(x)]$, and so on. For the nth derivative we write $f^{(n)}(x)$ or $\\frac{d^ny}{dx^n}$.',
     ],
     callouts: [
       {
@@ -160,17 +135,20 @@ export default {
     },
   
       visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "How to Find the Equation of a Tangent Line",
-        props: { url: "" }
-      },
-      ],
+            ],
     },
 
   rigor: {
     prose: [
-      'Every shortcut in calculus is a theorem derived from the limit definition. Here, we move from pattern-matching to formal proof.',
+      'Every shortcut in calculus is a theorem proved from the limit definition. Here we look under the hood at the three most important proofs.',
+
+      '**Power Rule proof (positive integer case):** We need to show $\\frac{d}{dx}[x^n] = nx^{n-1}$. Write the difference quotient: $\\frac{(x+h)^n - x^n}{h}$. Expand $(x+h)^n$ using the Binomial Theorem: $(x+h)^n = x^n + nx^{n-1}h + \\binom{n}{2}x^{n-2}h^2 + \\cdots + h^n$. Subtract $x^n$ from the numerator, leaving $nx^{n-1}h + \\binom{n}{2}x^{n-2}h^2 + \\cdots$. Divide by $h$: $nx^{n-1} + \\binom{n}{2}x^{n-2}h + \\cdots$. As $h \\to 0$, every term containing $h$ vanishes, leaving exactly $nx^{n-1}$.',
+
+      '**Sum Rule proof:** Let $s(x) = f(x) + g(x)$. Then $s\'(x) = \\lim_{h\\to 0} \\frac{[f(x+h)+g(x+h)] - [f(x)+g(x)]}{h} = \\lim_{h\\to 0} \\frac{f(x+h)-f(x)}{h} + \\lim_{h\\to 0} \\frac{g(x+h)-g(x)}{h} = f\'(x) + g\'(x)$. The step where we split the limit into two uses the Sum Limit Law from Chapter 1.',
+
+      '**Product Rule proof (the "add zero" trick):** In the numerator of the difference quotient for $f(x)g(x)$, add and subtract $f(x+h)g(x)$. This zero insertion creates two recognizable groups: $f(x+h)[g(x+h)-g(x)] + g(x)[f(x+h)-f(x)]$. Dividing by $h$ and taking the limit gives $f(x)g\'(x) + g(x)f\'(x)$. The key subtlety: $\\lim_{h\\to 0} f(x+h) = f(x)$ because differentiability implies continuity.',
+
+      '**What "adding a clever zero" means:** Many calculus proofs work by inserting $\\pm something$ in the numerator. The inserted term is $+f(x+h)g(x) - f(x+h)g(x) = 0$, so we haven\'t changed the expression. But now the numerator splits into two parts, each of which collapses to a recognizable limit. This technique appears over and over in rigorous calculus.',
     ],
     visualizationId: 'ProductRuleProof',
     proofSteps: [

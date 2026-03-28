@@ -51,67 +51,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.2.3 Find the Area Under a Curve Using the Limit Definition",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.2.2 Approximating the Area Under a Curve",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.2.1 Sigma Notation and Summation Formulas",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 8: What does area have to do with slope?",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definite Integrals Defined w. Riemann Limit of Sums Example Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Riemann Sum Defined w/ 2 Limit of Sums Examples Calculus 1",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Estimating Area with Rectangles & Riemann Limit of Sums Definition of Area Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definition of Area Riemann Sum Limit of Sums Part 2 of 2 Calculus 1",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Estimating Area with Riemann Sums Finite Rectangles Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Riemann Sum and Definite Integral Introduction",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Summation Notation (Sigma)",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The Definite Integral Part I: Approximating Areas with rectangles",
-        props: { url: "" }
-      },
-      {
+                                                                {
         id: 'RiemannSum',
         title: 'Left, Right, and Midpoint Riemann Sums',
         caption: 'Drag the slider to increase n, the number of rectangles. Observe how the left sum (red, underestimating), right sum (blue, overestimating), and midpoint sum (green, most accurate) all converge to the true area as n → ∞. Toggle between sum types to compare their accuracy.',
@@ -144,11 +84,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "The Definite Integral Part II: Using Summation Notation to Define the Definite Integral",
-        props: { url: "" }
-      },],
+      ],
   },
 
   rigor: {

@@ -61,52 +61,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 7: Integration and the fundamental theorem of calculus",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Area Under a Curve & Definite Integrals with TI NSPIRE Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Inverse Hyperbolic Functions Derivative and Integral Calculus 1",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integrating Exponential Functions Base a Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Maximum Error in Trapezoidal Rule & Simpson's Rule Calculus 1 AB READ DESCRIPTION",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Trapezoidal Rule & Simpson's Rule Estimating Definite Integrals Calculus 1 AB READ DESCRIPTION",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Accumulation Function Definite Integral",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Properties of Definite Integrals Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Estimating Area with Rectangles Part 1 of 2 Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
+                                            {
         id: 'WaterTank',
         title: 'Variable Flow Rate → Water Accumulation',
         mathBridge: 'The accumulated volume at time $t$ is $V(t) = \\int_0^t r(s)\\,ds$ — the signed area under the rate curve from $0$ to $t$. When $r(t) > 0$ (rate is positive), $V$ increases. When $r(t) < 0$ (water flowing out), $V$ decreases. This is the integral as a running total: $V\'(t) = r(t)$, which is the Fundamental Theorem of Calculus in action.',

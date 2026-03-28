@@ -53,17 +53,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "TR-46: Polar Equations (Trigonometry Series by Dennis F. Davis)",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "TR-45: Polar Coordinates (Trigonometry Series by Dennis F. Davis)",
-        props: { url: "" }
-      },
-      { id: 'PolarCurve', title: 'Polar Curve Plotter', caption: 'Enter a polar equation r = f(theta) and watch the curve sweep out as theta increases. Toggle common curves: cardioid, rose, limacon, spiral, lemniscate.' },
+                  { id: 'PolarCurve', title: 'Polar Curve Plotter', caption: 'Enter a polar equation r = f(theta) and watch the curve sweep out as theta increases. Toggle common curves: cardioid, rose, limacon, spiral, lemniscate.' },
     ],
   },
 

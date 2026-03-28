@@ -56,62 +56,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.3.2 Evaluating Definite Integrals Without the FTC",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.3.1 Riemann Sums and Definite Integrals Defined",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration involving Inverse Trig Functions",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Base a Derivative & Integration (13 Examples)",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Review of Basic Integration Rules Calculus 1 AB - 6 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration Involving Inverse Trigonometric Functions Calculus 1 AB 6 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definite Integration with U Substitution Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Indefinite Integration by U Substitution Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definite Integration & Displacement and Total Distance of Linear Motion Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Antiderivative & Indefinite Integration 11 Examples Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The Definite Integral Part III: Evaluating From The Definition",
-        props: { url: "" }
-      },
-      {
+                                                        {
         id: 'SignedArea',
         title: 'Signed Area: Positive and Negative Regions',
         caption: 'The shaded area above the x-axis is positive (green) and below is negative (red). The definite integral is the net signed area. Drag the endpoints to explore how the integral changes when more positive or negative region is included.',
@@ -149,11 +94,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "\"Reverse\" Riemann Sums | Finding the Definite Integral Given a Sum",
-        props: { url: "" }
-      },],
+      ],
   },
 
   rigor: {

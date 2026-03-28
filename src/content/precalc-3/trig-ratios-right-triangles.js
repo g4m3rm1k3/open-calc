@@ -49,8 +49,7 @@ export default {
           { url: "", title: 'TR-13Z — How the Co- Functions Got Their Names' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-14: The Unit Circle', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Sine & Cosine of Common Angles', props: { videos: [
+            { id: 'VideoCarousel', title: 'Sine & Cosine of Common Angles', props: { videos: [
           { url: "", title: 'TR-15 — Sine & Cosine of Common Angles' },
           { url: "", title: 'TR-15Z — Proof of Common Values' },
         ]},

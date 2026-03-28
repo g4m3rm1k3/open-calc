@@ -216,32 +216,7 @@ export default {
         caption:
           "Try multiple invertible families and verify slope reciprocity at reflected points.",
       },
-      {
-        id: "VideoEmbed",
-        title: "Setting up the Unit Circle Part 1 and Reference Angle",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Fundamental Trigonometric Identities Intro & Proofs",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Intro to Fundamental Trig Identities",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Understanding Basic Sine & Cosine Graphs",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Evaluating Trig Functions w/ Unit Circle Degrees & Radians",
-        props: { url: "" },
-      },
-    ],
+                                  ],
   },
 
   math: {

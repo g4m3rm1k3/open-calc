@@ -54,14 +54,12 @@ export default {
           { url: "", title: "TR-07Z — Thales' Theorem Proof" },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-08: Similar and Congruent Triangles', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'The Pythagorean Theorem', props: { videos: [
+            { id: 'VideoCarousel', title: 'The Pythagorean Theorem', props: { videos: [
           { url: "", title: 'TR-09 — The Pythagorean Theorem' },
           { url: "", title: 'TR-09Z — Proof of Pythagorean Theorem' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-10: Pythagorean Triples', props: { url: "" } },
-      {
+            {
         id: 'ImplicitDiffProof',
         title: 'Proof: x² + y² = r²  →  dy/dx = −x/y',
         mathBridge: 'The circle $x^2 + y^2 = r^2$ is the Pythagorean theorem applied to every point on the circle. When calculus arrives, differentiating this equation implicitly reveals that the tangent at any point is perpendicular to the radius — a fact that geometry predicts and calculus confirms.',

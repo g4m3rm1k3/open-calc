@@ -52,22 +52,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.2.1 Rolle's Theorem",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Application of Rolle's Theorem with Intermediate Value Theorem Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Rolle's Theorem Calculus 1 AB",
-        props: { url: "" }
-      },
-      { vizId: 'MVTViz', caption: "Rolle's Theorem: when $f(a) = f(b)$, the MVT guarantees a horizontal tangent between $a$ and $b$." },
+                    { vizId: 'MVTViz', caption: "Rolle's Theorem: when $f(a) = f(b)$, the MVT guarantees a horizontal tangent between $a$ and $b$." },
     ],
   },
 

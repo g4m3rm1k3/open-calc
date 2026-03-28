@@ -53,27 +53,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.8.1 Inverse Trigonometric Functions: Integration",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Integration involving Inverse Trig Functions",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Integration Involving Inverse Trigonometric Functions Calculus 1 AB 6 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration involving Natural Logarithm Function (5 Examples)",
-        props: { url: "" }
-      },
-      {
+                            {
         id: 'IntegrationMethodLab',
         title: 'Method Selection Trainer',
         caption: 'Toggle trig-pattern signals to decide when to use odd/even power identities versus other major integration techniques.',

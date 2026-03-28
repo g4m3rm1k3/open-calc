@@ -52,52 +52,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus - 3.9.2 Propagated and Relative Error in Differentials",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Introduction to Separable Differential Equations (7 Examples)",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Homogeneous Differential Equations First Order3 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Solving First Order Linear Differential Equations 3 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "More Solving Separable Differential Equations Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Separable Differential Equations & Growth and Decay Model Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Intro to Solving Separable Differential Equation Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Verifying Particular Solutions to Differential Equations Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Differentials Tangent Line Approximation Propagated Error Linearization",
-        props: { url: "" }
-      },
-      { vizId: 'LinearApproximation', caption: 'Compare $\\Delta y$ (change along the curve) with $dy$ (change along the tangent line). For small $dx$, they are nearly equal.' },
+                                            { vizId: 'LinearApproximation', caption: 'Compare $\\Delta y$ (change along the curve) with $dy$ (change along the tangent line). For small $dx$, they are nearly equal.' },
     ],
   },
 

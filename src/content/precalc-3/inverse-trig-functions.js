@@ -56,14 +56,12 @@ export default {
         mathBridge: 'The slope of e^x at any point equals its y-value. Drag the amber point to see how this flips to give ln(x) a slope of 1/x.',
         caption: 'The most famous inverse pair shows slope reciprocity most clearly.',
       },
-      { id: 'VideoEmbed', title: 'TR-22: Algebra Review of Inverse Functions', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Inverse Sine & Cosine Functions', props: { videos: [
+            { id: 'VideoCarousel', title: 'Inverse Sine & Cosine Functions', props: { videos: [
           { url: "", title: 'TR-23 — Dennis F. Davis' },
           { url: "", title: 'TR-23X — Extended version' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-24: Other Inverse Trig Functions', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Evaluating Inverse Trig Functions', props: { videos: [
+            { id: 'VideoCarousel', title: 'Evaluating Inverse Trig Functions', props: { videos: [
           { url: "", title: 'TR-25 — Calculator Methods' },
           { url: "", title: 'Evaluating Inverse Trig — Kim' },
           { url: "", title: 'Evaluating Inverse Trig — Kim (Extended)' },

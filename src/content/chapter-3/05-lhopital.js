@@ -46,17 +46,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.6.1 Indeterminant Forms and L’Hopital’s Rule",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Using L'Hopital's Rule to show that exponentials dominate polynomials",
-        props: { url: "" }
-      },
-      {
+                  {
         id: 'LHopitalViz',
         title: "L'Hôpital's Rule — Side-by-Side",
         caption: "Left: f(x)/g(x) with a hole at the limit point. Right: f'(x)/g'(x), which is defined at the limit point. Both values converge to the same limit L.",
@@ -86,11 +76,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Applying L'Hopital's Rule to Exponential Indeterminate Forms",
-        props: { url: "" }
-      },],
+      ],
   },
 
   rigor: {

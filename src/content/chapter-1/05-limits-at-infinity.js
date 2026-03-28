@@ -35,32 +35,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.5.2 Horizontal Asymptotes and Computational Techniques",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.5.1 Limits at Infinity",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 1.5.2 Vertical Asymptotes",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 1.5.1 Infinite Limits and Their Properties",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Limits \"at\" infinity",
-        props: { url: "" }
-      },
-      {
+                                    {
         id: 'LimitApproach',
         props: { fn: '(3*x*x - 2*x + 1)/(5*x*x + 4*x - 7)', targetX: 200, limitVal: 0.6 },
         title: 'Rational End Behavior',
@@ -91,12 +66,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Computing Limits at Infinity for Rational Functions",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'LimitApproach',
         props: { fn: '(2*x*x + 3)/(x*x - 1)', targetX: 120, limitVal: 2, showTable: true },
         title: 'Equal-Degree Ratio Rule',
@@ -120,12 +90,7 @@ export default {
     visualizationId: null,
   
       visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Infinite Limit vs Limits at Infinity of a Composite Function",
-        props: { url: "" }
-      },
-      ],
+            ],
     },
 
   examples: [

@@ -85,18 +85,7 @@ export default {
     continuityDefinition: `f is continuous at a if: (1) f(a) is defined, (2) lim_{x→a} f(x) exists, (3) they're equal.`,
 
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title:
-          "Continuity On an Interval Open & Closed Intervals & 1 Sided Limits Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "CALCULUS SPEEDRUN || Limits || Episode 1",
-        props: { url: "" },
-      },
-    ],
+                ],
   },
 
   rigor: {

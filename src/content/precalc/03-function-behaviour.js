@@ -45,42 +45,7 @@ export default {
         mathBridge: 'Switch between functions and see vertical asymptotes (walls), holes (missing points), horizontal asymptotes (long-run levels), and oblique asymptotes (diagonal approach).',
         caption: 'Each type of asymptote corresponds to a different algebraic condition in the formula.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Even Odd Polynomial Functions & Symmetry',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Even and Odd Functions Many Examples',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Horizontal Asymptotes of Rational Equations',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Rational Functions with Slant Asymptotes',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Finding vertical asymptotes and holes of rational equations',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Determining Domain of Functions',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Domain of Rational Functions & Decomposing Functions',
-        props: { url: "" },
-      },
-    ],
+                                              ],
   },
 
   math: {

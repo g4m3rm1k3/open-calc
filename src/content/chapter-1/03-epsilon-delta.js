@@ -66,18 +66,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.2.3 The Epsilon-Delta Limit Definition",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title:
-          "Definition of a Limit Epsilon Delta Proof 3 Examples Calculus 1",
-        props: { url: "" },
-      },
-      {
+                  {
         id: "EpsilonDelta",
         props: { fn: "2*x + 1", c: 3, L: 7 },
         title: "The ε-δ Game — Interactive",

@@ -56,27 +56,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus - 3.9.2 Propagated and Relative Error in Differentials",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus - 3.9.1 Tangent Line Approximation and Differentials",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Area Between Curves (8 Examples)",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Linear Approximations | Using Tangent Lines to Approximate Functions",
-        props: { url: "" }
-      },
-      {
+                            {
         id: 'LinearApproximation',
         title: 'Zoom In Until the Curve Becomes a Line',
         caption: 'Increase the zoom level to see the curve and its tangent line converge. At high zoom, they are indistinguishable — that is what differentiability means geometrically.',

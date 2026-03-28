@@ -55,42 +55,7 @@ export default {
       },
     ],
     visualizations: [
-    {
-        id: 'VideoEmbed',
-        title: "Volume of Solids with Cross Sections",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Intro to Volumes of Solids Geometry vs Calculus",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Area of a Surface of Revolution Calculus 1",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Volume of Solid of Revolution Shell Method Calculus 1 AB 3 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Volumes of Solids with Known Cross Sections Calculus 1 AB 3 Examples",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Volume of Solid of Revolution Disk Method and Washer Method Calculus 1 AB (Read Description)",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Application of Definite Integration Volume & Rate of Flow Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
+                                  {
         id: 'VolumesOfRevolution',
         title: '3D Solid of Revolution — Interactive',
         caption: 'Rotate the plane region around the axis and see the 3D solid form. Toggle between disk, washer, and shell representations. Drag n to see how more slices approximate the volume better.',

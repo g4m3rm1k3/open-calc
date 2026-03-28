@@ -50,8 +50,7 @@ export default {
         mathBridge: 'Drag the angle. Watch degrees and radians update simultaneously. See the arc length change as you move — the radian is literally defined by that arc.',
         caption: 'One radian is the angle where the arc length equals the radius. Drag to feel it.',
       },
-      { id: 'VideoEmbed', title: 'TR-00: Introduction to the Trigonometry Series', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Introduction to Angles', props: { videos: [
+            { id: 'VideoCarousel', title: 'Introduction to Angles', props: { videos: [
           { url: "", title: 'TR-01 — Introduction to Angles' },
           { url: "", title: 'TR-02 — Types of Angles' },
           { url: "", title: 'TR-03 — Angle Relationships' },

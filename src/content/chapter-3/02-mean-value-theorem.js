@@ -51,32 +51,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.2.2 The Mean Value Theorem",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.2.1 Rolle's Theorem",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Mean Value & Average Value Theorem of Integration Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Mean Value Theorem for Derivatives Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The MEAN Value Theorem is Actually Very Nice",
-        props: { url: "" }
-      },
-      {
+                                {
         id: 'SpeedingTicket',
         title: 'The Speeding Ticket Paradox',
         caption: 'Average speed vs. Instantaneous speed. If the average exceeds the limit, the MVT guarantees you were speeding at some point.',

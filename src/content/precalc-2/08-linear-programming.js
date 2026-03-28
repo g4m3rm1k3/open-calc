@@ -37,17 +37,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: 'Linear Programming',
-        props: { videoId: "pre-7-6" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Systems of Inequalities',
-        props: { videoId: "pre-7-5" },
-      },
-    ],
+                ],
   },
 
   math: {

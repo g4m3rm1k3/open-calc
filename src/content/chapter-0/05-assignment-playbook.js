@@ -49,11 +49,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Tips for Success in Flipped Classrooms + OMG BABY!!!",
-        props: { url: "" }
-      },],
+      ],
   },
 
   math: {

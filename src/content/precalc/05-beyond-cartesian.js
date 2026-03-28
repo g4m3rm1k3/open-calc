@@ -44,62 +44,7 @@ export default {
         mathBridge: 'Drag a point in either system and see the other coordinates update. Watch how polar curves trace out as $\\theta$ sweeps from $0$ to $2\\pi$.',
         caption: 'Neither system is "right" — each makes different shapes simple.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Understanding Polar Coordinates',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Converting Coordinates between Polar and Rectangular Form',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Converting Equations Between Polar & Rectangular Form',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Graphing Polar Equations, Test for Symmetry & 4 Examples Corrected',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Introduction to Vectors',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Writing Vector in terms of Magnitude & Direction Example',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Vector Application Examples',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Dot Product & Angle Between Vectors',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Projection of a Vector onto another Vector',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Introduction to Parametric Equations',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Parametric Equations Eliminating Parameter T',
-        props: { url: "" },
-      },
-    ],
+                                                                      ],
   },
 
   math: {

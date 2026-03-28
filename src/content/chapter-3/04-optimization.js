@@ -69,59 +69,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title: "Calculus I Final Exam Review",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 3.7.2 Optimization Practice",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 3.7.1 Optimization",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title:
-          "Area Between 2 Curves Vertical and Horizontal Representative Rectangles Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Optimization Cylinder in Sphere with Radius r",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Optimization Calculus Problems Volume Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title:
-          "Optimization Calculus Problems Minimizing Lengths Calculus 1 AB READ DESCRIPTION",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Ex: Optimizing the Volume of a Box With  Fixed Surface Area",
-        props: { url: "" },
-      },
-      {
+                                                                  {
         id: "Ch5_QuadraticShadow",
         title: "Story Mode: The Quadratic Shadow",
         mathBridge:
@@ -163,13 +111,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title:
-          "Folding a wire into the largest rectangle | Optimization example",
-        props: { url: "" },
-      },
-    ],
+          ],
   },
 
   rigor: {
@@ -187,13 +129,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title:
-          "Optimization Example: Minimizing Surface Area Given a Fixed Volume",
-        props: { url: "" },
-      },
-    ],
+          ],
   },
 
   examples: [

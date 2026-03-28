@@ -28,134 +28,98 @@ export default {
 
   intuition: {
     prose: [
-      "The limit laws capture an intuitive idea: if two functions are each settling down to their respective limits, then their combinations (sum, product, etc.) should settle to the corresponding combination of those limits.",
+      '**You already know the limit laws intuitively.** Suppose your friend tells you the temperature in Room A is approaching 20°C and the temperature in Room B is approaching 30°C. Without thinking, you know the average of the two temperatures is approaching 25°C. You just used the Sum Law for limits. The Limit Laws are not new ideas — they are the precise mathematical justification for arithmetic that already feels obvious.',
 
-      "Think about it physically: if the temperature at location A approaches 20°C and the temperature at location B approaches 30°C, then the average of the two temperatures approaches (20 + 30)/2 = 25°C. No surprise. The Sum Law and Constant Multiple Law say the same thing for limits.",
+      'Here is the key insight: if two functions are each "settling down" to their own limits, then any arithmetic combination of those functions settles down to the same arithmetic combination of those limits. Addition distributes through limits. Multiplication distributes through limits. The only exceptions are when you might be dividing by zero or taking an even root of a negative number — situations that would be problematic in ordinary arithmetic too.',
 
-      "The **Squeeze Theorem** (also called the Sandwich Theorem) is a different kind of tool. Sometimes a function is too complicated to evaluate directly, but you can pin it between two simpler functions that both approach the same value. Like a hot dog in a bun — the hot dog is forced to stay where the bun takes it.",
+      '**So what does this buy us?** It means we can break complicated limits into simpler pieces. To evaluate lim(x→2) (3x²−x+5), you do not need a table of values. You can write: limit of 3x² is 3·4 = 12, limit of x is 2, limit of 5 is 5, and then combine: 12 − 2 + 5 = 15. This is exactly what "direct substitution" means and why it works: the Limit Laws guarantee the pieces combine correctly.',
 
-      "The canonical example: f(x) = x·sin(1/x). As x → 0, sin(1/x) oscillates infinitely rapidly — it doesn't have a limit on its own. But |sin(anything)| ≤ 1, so −|x| ≤ x·sin(1/x) ≤ |x|. Both −|x| and |x| approach 0, so x·sin(1/x) is squeezed to 0.",
+      '**But there is a catch.** Direct substitution only works when the denominator is nonzero and the function is "nice" (continuous) at the point. What happens when it gives 0/0? The function (x²−4)/(x−2) seems to equal 0/0 at x = 2. But remember: a limit cares about the journey toward 2, not the value at 2. Factor the top: (x+2)(x−2)/(x−2). For any x≠2, you can cancel (x−2)/(x−2) = 1, leaving x+2. As x approaches 2, x+2 approaches 4. The limit is 4, even though the function has a hole there. This algebraic cancellation technique — factor and cancel before substituting — is the standard first move when you get 0/0.',
 
-      'The most important limits in calculus are the two "fundamental trig limits": lim(x→0) sin(x)/x = 1 and lim(x→0) (1−cos x)/x = 0. These cannot be proved by algebra alone — they require the Squeeze Theorem plus a geometric argument about areas on the unit circle. They come up in every derivative of a trig function.',
+      '**The Squeeze Theorem is a completely different kind of tool.** Sometimes a function is so wild that you cannot factor or simplify it. The classic example is f(x) = x·sin(1/x) near x = 0. As x approaches 0, sin(1/x) oscillates infinitely many times back and forth between −1 and +1 — it has no limit of its own. You cannot factor it. You cannot simplify it. But here is the key observation: |sin(anything)| ≤ 1 always. So −|x| ≤ x·sin(1/x) ≤ |x| for all x ≠ 0. Both −|x| and |x| approach 0. The function is sandwiched (squeezed) between two things that both go to 0, so it must go to 0 too. No algebra involved — just the logical consequence of being trapped.',
+
+      '**The fundamental trig limits, sin(x)/x → 1 and (1−cos x)/x → 0 as x→0, are the most important applications of the Squeeze Theorem in Calculus 1.** They cannot be obtained by algebra. They require the Squeeze Theorem plus a geometric argument about areas on the unit circle. And they come back in every single derivative of a trig function. If you ever see $\\frac{\\sin(5x)}{x}$, the trick is to force the pattern: multiply and divide by 5 to get $5 \\cdot \\frac{\\sin(5x)}{5x}$, and now the piece in brackets approaches 1 as x goes to 0. So the answer is 5.',
     ],
     callouts: [
       {
-        type: "intuition",
-        title: "The Squeeze in a picture",
-        body: "g(x) ≤ f(x) ≤ h(x) near c. Both g and h → L. Then f is squeezed: f must also → L.",
+        type: 'intuition',
+        title: 'The Squeeze in a picture',
+        body: 'g(x) \\leq f(x) \\leq h(x) \\text{ near } c. \\text{ Both } g,h \\to L. \\Rightarrow f \\to L. \\text{ The middle function has no choice.}',
       },
       {
-        type: "tip",
-        title: "When to use the Squeeze Theorem",
-        body: "Look for |f(x)| ≤ something simpler. Specifically: if you see sin, cos, or any oscillating/bounded function multiplied by something that → 0, the Squeeze Theorem likely applies.",
+        type: 'tip',
+        title: 'When to reach for the Squeeze Theorem',
+        body: '\\text{Trigger: bounded oscillation} \\times \\text{something} \\to 0. \\\\ \\text{e.g. } \\sin(1/x) \\cdot x, \\; \\cos(1/x) \\cdot x^2, \\; (-1)^n / n.',
+      },
+      {
+        type: 'strategy',
+        title: 'The Trig Limit Pattern',
+        body: '\\lim_{x\\to 0}\\frac{\\sin(ax)}{bx} = \\frac{a}{b} \\cdot \\underbrace{\\lim_{u\\to 0}\\frac{\\sin u}{u}}_{=1} = \\frac{a}{b}',
       },
     ],
-    visualizationId: "SqueezeTheorem",
+    visualizationId: 'SqueezeTheorem',
     visualizationProps: {},
     visualizations: [
       {
-        id: "VideoEmbed",
-        title:
-          "Calculus I - 1.3.2 Finding Limits of Indeterminant Form Functions",
-        props: { url: "" },
+        id: 'Ch3_2_GettingCloser',
+        title: 'Story Viz — Getting Closer',
+        mathBridge: 'This story visualization follows a character who needs to figure out what a sequence approaches. As you watch, notice that the narrative structure mirrors the Limit Law decomposition: each smaller piece of the problem is handled separately, then combined. This is exactly what the Sum and Product Laws let you do algebraically.',
+        caption: 'Book 3 Chapter 2 story visualization focused on applying limit laws in context.',
       },
       {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.3.1 Properties of Limits",
-        props: { url: "" },
+        id: 'LimitBridgeLab',
+        title: 'Limit Law Bridge Lab',
+        mathBridge: 'This lab lets you test when limit laws are safe to apply and when they break down. Try a case where the denominator approaches zero — the Quotient Law fails there. Then try a well-behaved rational function and see that the law applies. The two-sided approach controls let you verify left- and right-hand limits agree before declaring the limit exists.',
+        caption: 'Test limit law conditions interactively. Observe when decomposition rules are safe and when naive substitution fails.',
       },
       {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.2.1 Finding Limits Numerically and Graphically",
-        props: { url: "" },
+        id: 'SqueezeTheorem',
+        title: 'Squeeze Theorem in Action',
+        mathBridge: 'Before you interact with this, identify the wild (oscillating) function and the two bounding functions. The wild function is being sandwiched between -|x| and |x|. Watch what happens as x approaches 0 — the bounding curves close like a vice. The oscillating function has nowhere to go except 0.',
+        caption: 'Watch a bounded oscillating function get pinned to zero by two tame bounding functions.',
       },
-      {
-        id: "VideoEmbed",
-        title: "First Fundamental Theorem of Calculus Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Squeeze Theorem for Sequences Sandwich Theorem Calculus 1",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Limits of Trig Functions Special Ratios 3 Examples 4k",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Why Limits are Important in Calculus",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Limit Laws | Breaking Up Complicated Limits Into Simpler Ones",
-        props: { url: "" },
-      },
-      {
-        id: "Ch3_2_GettingCloser",
-        title: "Story Viz — Getting Closer",
-        caption:
-          "Book 3 Chapter 2 story visualization focused on proving and using limit laws.",
-      },
-      {
-        id: "LimitBridgeLab",
-        title: "Limit Law Bridge Lab",
-        caption:
-          "Use two-sided approach controls to verify when decomposition rules are safe and when naive substitution fails.",
-      },
-    ],
+                                  ],
   },
 
   math: {
     prose: [
-      "Assume lim(x→c) f(x) = L and lim(x→c) g(x) = M. Then the limit laws say we can compute limits of combinations.",
+      'Assume $\\lim_{x \\to c} f(x) = L$ and $\\lim_{x \\to c} g(x) = M$. The Limit Laws tell you exactly how to compute limits of combinations built from $f$ and $g$.',
 
-      "**Direct Substitution Property**: if p(x) is a polynomial, lim(x→c) p(x) = p(c). If r(x) = p(x)/q(x) is a rational function and q(c) ≠ 0, then lim(x→c) r(x) = r(c). This also extends to trig, exponential, and logarithmic functions at points where they are defined.",
+      '**The most useful consequence: the Direct Substitution Property.** If $p(x)$ is a polynomial, then $\\lim_{x \\to c} p(x) = p(c)$ — just plug in. If $r(x) = p(x)/q(x)$ is a rational function and $q(c) \\neq 0$, then again you just substitute. The same goes for trig, exponential, and log functions at points where they are defined. This is a direct consequence of the Limit Laws applied repeatedly to the building blocks of the function.',
 
-      "**The two fundamental trig limits** cannot be derived from the laws above — they require a geometric proof or the definition of the derivative. They are:",
-      "• lim(x→0) sin(x)/x = 1",
-      "• lim(x→0) (1 − cos x)/x = 0",
+      '**What to do when substitution gives 0/0.** Factor, cancel, then substitute. The function $\\frac{x^2-4}{x-2}$ equals $(x+2)$ for every $x \\neq 2$ and is undefined only at $x = 2$ itself. But the limit as $x \\to 2$ only cares about values near 2, not at 2. So $\\lim_{x \\to 2} \\frac{x^2-4}{x-2} = \\lim_{x \\to 2}(x+2) = 4$. The Quotient Law requires that the denominator\'s limit is nonzero — but after we cancel, the new simpler function is defined at 2.',
 
-      "These appear constantly. A useful technique: whenever you see sin(ax)/x or sin(ax)/(bx), force the pattern sin(u)/u by multiplying and dividing by a:",
-      "lim(x→0) sin(5x)/x = lim(x→0) [sin(5x)/(5x)] · 5 = 1 · 5 = 5",
+      '**The two fundamental trig limits** require the Squeeze Theorem and a unit-circle area argument. They cannot be obtained by algebra. They are used in every proof of a trig derivative:',
+      '$\\displaystyle\\lim_{x \\to 0}\\frac{\\sin x}{x} = 1$ and $\\displaystyle\\lim_{x \\to 0}\\frac{1-\\cos x}{x} = 0$',
 
-      "**Limits of composite functions**: if lim(x→c) g(x) = M and f is continuous at M, then lim(x→c) f(g(x)) = f(M). This is why lim(x→0) √(x²+1) = √(0+1) = 1 — the square root function is continuous at 1.",
+      'When you see $\\sin(ax)/x$, multiply and divide by $a$ to force the pattern: $\\frac{\\sin(5x)}{x} = 5 \\cdot \\frac{\\sin(5x)}{5x}$. Let $u = 5x$; as $x \\to 0$, $u \\to 0$ too, so the factor $\\sin(u)/u \\to 1$. The limit is $5$.',
     ],
     callouts: [
       {
-        type: "theorem",
-        title: "Limit Laws",
-        body: "\\lim[f \\pm g] = L \\pm M \\\\ \\lim[f \\cdot g] = L \\cdot M \\\\ \\lim[f/g] = L/M \\quad (M \\neq 0) \\\\ \\lim[f^n] = L^n \\quad (n \\in \\mathbb{Z}^+) \\\\ \\lim[k \\cdot f] = k \\cdot L \\\\ \\lim[\\sqrt[n]{f}] = \\sqrt[n]{L} \\quad (\\text{if defined})",
+        type: 'theorem',
+        title: 'The Limit Laws',
+        body: '\\begin{aligned} \\lim[f \\pm g] &= L \\pm M \\\\ \\lim[f \\cdot g] &= L \\cdot M \\\\ \\lim[f/g] &= L/M \\quad (M \\neq 0) \\\\ \\lim[f^n] &= L^n \\quad (n \\in \\mathbb{Z}^+) \\\\ \\lim[k \\cdot f] &= k \\cdot L \\\\ \\lim[\\sqrt[n]{f}] &= \\sqrt[n]{L} \\quad (\\text{if defined}) \\end{aligned}',
       },
       {
-        type: "theorem",
-        title: "Squeeze Theorem",
-        body: "\\text{If } g(x) \\leq f(x) \\leq h(x) \\text{ near } c, \\text{ and} \\\\ \\lim_{x \\to c} g(x) = \\lim_{x \\to c} h(x) = L, \\\\ \\text{then } \\lim_{x \\to c} f(x) = L.",
+        type: 'theorem',
+        title: 'Squeeze Theorem',
+        body: '\\text{If } g(x) \\leq f(x) \\leq h(x) \\text{ near } c \\text{ and } \\lim_{x \\to c} g = \\lim_{x \\to c} h = L, \\text{ then } \\lim_{x \\to c} f = L.',
       },
       {
-        type: "theorem",
-        title: "Two Fundamental Trig Limits",
-        body: "\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\qquad \\lim_{x \\to 0} \\frac{1 - \\cos x}{x} = 0",
+        type: 'theorem',
+        title: 'Two Fundamental Trig Limits',
+        body: '\\lim_{x \\to 0} \\dfrac{\\sin x}{x} = 1 \\qquad \\lim_{x \\to 0} \\dfrac{1 - \\cos x}{x} = 0',
       },
     ],
-    visualizationId: "LimitApproach",
+    visualizationId: 'LimitApproach',
     visualizationProps: {
-      fn: "Math.sin(x)/x",
+      fn: 'Math.sin(x)/x',
       targetX: 0,
       limitVal: 1,
       showTable: true,
     },
-
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title: "Building up to computing limits of rational functions",
-        props: { url: "" },
-      },
-    ],
+          ],
   },
 
   rigor: {
@@ -166,7 +130,10 @@ export default {
 
       "The Squeeze Theorem proof is especially clean: if g(x) ≤ f(x) ≤ h(x) and both g and h are within ε of L, then g(x) > L − ε and h(x) < L + ε, which forces L − ε < f(x) < L + ε, i.e., |f(x) − L| < ε.",
 
-      "The proof that lim(x→0) sin(x)/x = 1 uses a geometric argument: comparing the areas of two triangles and a circular sector on the unit circle. This gives the inequality cos(x) < sin(x)/x < 1 for 0 < x < π/2, and the Squeeze Theorem finishes it.",
+      'Each Limit Law is a precise theorem proven from the $\\varepsilon$-$\\delta$ definition. The strategy is always the same: start from the limits of $f$ and $g$ individually, then show that combining them gives the combined limit. Here is how it works for the Sum Law.',
+      'The heart of the argument is the **Triangle Inequality**: $|a + b| \\leq |a| + |b|$. This lets us split one error into two smaller errors — one for $f$ and one for $g$. We make each piece smaller than $\\varepsilon/2$, so the total error is smaller than $\\varepsilon$.',
+      '**How to read the proof**: You are given an arbitrary (possibly very tiny) $\\varepsilon > 0$. You must produce a $\\delta > 0$ that works. The choice $\\delta = \\min(\\delta_1, \\delta_2)$ ensures that being within $\\delta$ of $c$ simultaneously makes $|f - L| < \\varepsilon/2$ AND $|g - M| < \\varepsilon/2$. The Triangle Inequality then closes the argument.',
+      'The proofs of the Product and Quotient Laws require a bounding argument: near $c$, $|g(x)|$ cannot be arbitrarily large (it is close to $M$), so we can control the interaction term $|f||g - M|$ as well. These are slightly more involved than the Sum Law proof but follow the same template.',
     ],
     callouts: [
       {
@@ -176,6 +143,14 @@ export default {
       },
     ],
     visualizationId: "TriangleInequalityViz",
+    visualizations: [
+      {
+        id: 'TriangleInequalityViz',
+        title: 'Triangle Inequality — The Tool Behind Every Limit Law Proof',
+        mathBridge: 'The Triangle Inequality $|a + b| \\leq |a| + |b|$ says that no matter what values $a$ and $b$ take, the absolute value of their sum is at most the sum of their absolute values. In the Sum Law proof, $a = f(x) - L$ and $b = g(x) - M$. The Triangle Inequality lets us replace one combined error $|(f+g)-(L+M)|$ with two separately manageable pieces $|f-L| + |g-M|$. Drag the vectors in this visualization to see how the geometric triangle inequality corresponds to the algebraic one.',
+        caption: 'Drag both vectors and observe |a + b| \u2264 |a| + |b| always holds. This is the geometric foundation of every limit law proof.',
+      },
+    ],
   },
 
   examples: [
@@ -187,15 +162,9 @@ export default {
       steps: [
         {
           expression: "\\lim_{x \\to 2} \\frac{3x^2-x+1}{x+5}",
-          annotation:
-            "Check denominator: x + 5 = 7 ≠ 0 at x = 2. Direct substitution is valid.",
-        },
-        {
-          expression: "\\lim_{x \\to 2} \\frac{3x^2-x+1}{x+5}",
-          annotation:
-            "Check denominator: x + 5 = 7 ≠ 0 at x = 2. Direct substitution is valid.",
+          annotation: "Check denominator first: $x + 5 = 2 + 5 = 7 \\neq 0$ at $x = 2$. Since the denominator is nonzero, the Direct Substitution Property applies and we can simply plug in $x = 2$.",
           hints: [
-            "First verify the denominator is nonzero at x = 2.",
+            "Verify the denominator is nonzero at x = 2.",
             "Since the denominator is 7, direct substitution is allowed.",
           ],
         },

@@ -67,13 +67,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title:
-          "The most important limit in Calculus // Geometric Proof & Applications",
-        props: { url: "" },
-      },
-      {
+            {
         id: "RadianDegreeLimitLab",
         title: "Radians vs Degrees Toggle",
         mathBridge:

@@ -80,23 +80,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title:
-          "Arc Length of a Curve ( Smooth Curve ) Calculus 1 BC 5 Examples",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Second Fundamental Theorem Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "What is an infinite limit?",
-        props: { url: "" },
-      },
-      {
+                        {
         id: "HoleVsValue",
         title: "Removable Discontinuity: Hole vs. Redefined Value",
         caption:

@@ -26,83 +26,55 @@ export default {
       "and the Fundamental Theorem of Calculus all work.",
     previewVisualizationId: "ContinuityViz",
   },
-
   intuition: {
     prose: [
-      "A function is **continuous at a point c** if three things are all true: " +
-        "(1) f(c) is defined, (2) the limit exists at c, and (3) the limit equals f(c).",
-      "Intuitively: no holes, no jumps, no vertical asymptotes at x = c.",
-      "Continuity is local: a function can be continuous at one point and discontinuous at another. Always ask: continuous where?",
-      "There are three types of discontinuity:",
-      "**Removable discontinuity** (hole): the limit exists, but either f(c) is undefined or f(c) ≠ limit. Example: f(x) = (x²−1)/(x−1) has a hole at x = 1. Fixable by redefining f(1) = 2.",
-      '**Jump discontinuity**: the left and right limits both exist but are different. The function "jumps." Example: the floor function ⌊x⌋ at every integer.',
-      "**Infinite discontinuity**: the function blows up (goes to ±∞). Example: 1/x at x = 0.",
-      "A fourth common behavior to watch: oscillatory non-limit behavior, such as sin(1/x) near x = 0. The function keeps oscillating and never settles, so continuity fails because the limit does not exist.",
-      "Continuity does not mean smoothness. The function |x| is continuous at 0 but has a sharp corner, so it is not differentiable there. Differentiability is a stronger condition than continuity.",
-      "A function is **continuous on an interval** if it's continuous at every point of that interval. " +
-        "Polynomials, trig functions, and exponentials are continuous everywhere on their domains.",
+      '**You have been computing limits for two lessons now. Here is the payoff.** A limit tells you what $f(x)$ is *heading toward* as $x$ approaches $c$. But every time you evaluated a limit, you checked: is the denominator zero? Can I substitute directly? The reason some functions let you substitute and others don\'t is **continuity**. Continuous functions are the "well-behaved" ones where the limit and the value agree. Everything else is a special case.',
+
+      '**The pencil test.** Imagine drawing the graph of a function without lifting your pencil. If you can do it over an interval, the function is continuous there. The moment you have to lift your pencil — to jump to a new height, or skip over a hole, or avoid a vertical spike — you have a discontinuity. This physical test captures the essential idea, even if it is not quite rigorous enough for proofs.',
+
+      '**Three conditions, all required.** A function $f$ is continuous at a point $c$ if and only if ALL three of these hold simultaneously: (1) $f(c)$ exists — the function is actually defined there; (2) $\\lim_{x \\to c} f(x)$ exists — both sides approach the same value; (3) $\\lim_{x \\to c} f(x) = f(c)$ — the limit and the function value match. Miss any one of them and the function is discontinuous at $c$. Each condition catches a different failure mode.',
+
+      '**Removable discontinuity (hole).** The limit exists but the function either is not defined at $c$, or is defined but at the wrong height. Example: $f(x) = (x^2-1)/(x-1)$ simplifies to $x+1$ for $x \\neq 1$, but is undefined at $x=1$. The limit as $x \\to 1$ is $2$. There is a hole at $(1, 2)$. We say this discontinuity is "removable" because we can patch it: just define $f(1) = 2$ and the function becomes continuous. The hole is an artifact of how the function was written, not a genuine break in the graph.',
+
+      '**Jump discontinuity.** Both one-sided limits exist but they give different values, so the two-sided limit does not exist. The function literally jumps from one level to another. The floor function $\\lfloor x \\rfloor$ is the classic example: at every integer, the left-hand limit is one number and the right-hand limit is one higher. You cannot patch a jump by redefining one point — it is a genuine break.',
+
+      '**Infinite discontinuity.** The function grows without bound (heads toward $\\pm \\infty$) as $x \\to c$. The example everyone knows: $f(x) = 1/x$ at $x = 0$. From the right, $1/x \\to +\\infty$; from the left, $1/x \\to -\\infty$. There is a vertical asymptote at $x = 0$. No limit exists, and no amount of redefining fixes it.',
+
+      '**Continuity on an interval.** A function is continuous on an open interval $(a, b)$ if it is continuous at every single point in that interval. For a closed interval $[a, b]$, we also require one-sided continuity at the endpoints: the right-hand limit equals $f(a)$ at $a$, and the left-hand limit equals $f(b)$ at $b$. Polynomials, trig functions, exponentials, and logarithms (on their domains) are all continuous everywhere they are defined. These are your "safe" functions for direct substitution.',
+
+      '**Why does any of this matter?** Because continuity is the hypothesis of every major theorem in Calculus 1: the Intermediate Value Theorem, the Extreme Value Theorem, the Mean Value Theorem, and the Fundamental Theorem of Calculus. The reason those theorems work is that continuous functions do not have hidden jumps or holes that could cause the conclusion to fail.',
     ],
     callouts: [
       {
-        type: "intuition",
-        title: "Pencil Test",
-        body: "A function is continuous on [a,b] if and only if you can draw its graph from (a, f(a)) to (b, f(b)) without lifting your pencil.",
+        type: 'definition',
+        title: 'The Three Conditions for Continuity at $c$',
+        body: '\\text{(1) } f(c) \\text{ exists.} \\\\ \\text{(2) } \\lim_{x \\to c} f(x) \\text{ exists.} \\\\ \\text{(3) } \\lim_{x \\to c} f(x) = f(c). \\\\ \\text{All three must hold simultaneously.}',
       },
       {
-        type: "misconception",
-        title: "Continuous Does Not Mean Differentiable",
-        body: "f(x)=|x| is continuous at x=0 because both sides approach 0 and f(0)=0. But it is not differentiable there because the left and right slopes are -1 and +1. Continuity allows corners; differentiability does not.",
+        type: 'misconception',
+        title: 'Continuous Does NOT Mean Differentiable',
+        body: '$f(x) = |x|$ is continuous at $x=0$: $f(0) = 0$, both one-sided limits are $0$, and they match. But it has a sharp corner there, so it is NOT differentiable at $0$. Continuity allows corners; differentiability requires smoothness.',
       },
       {
-        type: "history",
+        type: 'history',
         title: "Bolzano's 1817 Breakthrough",
-        body: "Bernard Bolzano gave one of the first rigorous statements of continuity and the intermediate value principle in 1817, years before Cauchy's textbook formalization. His work helped shift calculus from geometric intuition to arithmetic rigor.",
+        body: 'Bernard Bolzano gave one of the first rigorous statements of continuity and the Intermediate Value Principle in 1817, years before Cauchy formalized it in his textbook. His motivation was purely logical: he wanted to prove that a continuous function that changes sign must cross zero, without appealing to geometric intuition.',
       },
     ],
     visualizationId: "ContinuityViz",
     visualizationProps: {},
     visualizations: [
       {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.4.3 The Intermediate Value Theorem",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.4.2 Properties of Continuity",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.4.1 Continuity",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 1.2.2 Limits That Fail to Exist",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Intermediate Value Theorem Calculus 1 AB PreCalculus",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Limits are simple for continuous functions",
-        props: { url: "" },
-      },
-      {
         id: "Ch3_3_InfiniteStaircase",
-        title: "Story Viz — Infinite Staircase",
+        title: "Story Viz — The Infinite Staircase",
+        mathBridge: 'This staircase represents the floor function $\\lfloor x \\rfloor$, the classic jump-discontinuity function. At every integer $n$, the function leaps from $n-1$ up to $n$. Notice: the limit from the left is $n-1$, the limit from the right is $n$, and they disagree. So condition (2) fails — the two-sided limit does not exist at any integer. The staircase shape makes it obvious; the limit definition makes it rigorous.',
         caption:
-          "Book 3 Chapter 3 story visualization for continuity breakdowns and jump behavior.",
+          "Book 3 Chapter 3 story visualization for continuity breakdowns and jump discontinuities.",
       },
       {
         id: "ContinuityRepairGame",
         title: "Continuity Repair Game",
-        mathBridge:
-          'A function $f$ is continuous at $c$ iff all three conditions hold: (1) $f(c)$ is defined, (2) $\\lim_{x\\to c}f(x)$ exists, and (3) $\\lim_{x\\to c}f(x) = f(c)$. In this game, the limit already exists (the left and right sides agree) but $f(c)$ is placed at the wrong height — violating condition 3. Dragging the point to match the limit value restores condition 3 and makes the function continuous. This is a removable discontinuity: it can be "repaired" by redefining exactly one point.',
+        mathBridge: 'A function $f$ is continuous at $c$ iff all three conditions hold: (1) $f(c)$ is defined, (2) $\\lim_{x\\to c}f(x)$ exists, and (3) $\\lim_{x\\to c}f(x) = f(c)$. In this game, the limit already exists (both sides agree) but $f(c)$ is placed at the wrong height — violating condition (3). Drag the point to match the limit value to restore continuity. This is a removable discontinuity: it can be “repaired” by redefining exactly one point.',
         caption:
           "Drag the broken point to match the limit and repair continuity in real time.",
       },
@@ -111,32 +83,31 @@ export default {
 
   math: {
     prose: [
-      "The formal definition uses limits.",
-      "Continuity is preserved under arithmetic operations: sums, products, quotients (if denominator ≠ 0), and compositions of continuous functions are continuous.",
-      "The **Intermediate Value Theorem (IVT)** is one of the most useful theorems in all of calculus:",
+      'The formal definition packages the three intuitive conditions into one equation: $f$ is continuous at $c$ if $\\lim_{x \\to c} f(x) = f(c)$. This single equation secretly requires all three conditions: for it to make sense, $f(c)$ must be defined (condition 1); for $\\lim_{x \\to c} f(x)$ to exist, both sides must agree (condition 2); and the equation requires they agree with $f(c)$ (condition 3).',
+
+      'Continuity is **closed under algebra**: if $f$ and $g$ are both continuous at $c$, then so are $f+g$, $f-g$, $f \\cdot g$, and $f/g$ (as long as $g(c) \\neq 0$). Composition is also preserved: if $g$ is continuous at $c$ and $f$ is continuous at $g(c)$, then $f(g(x))$ is continuous at $c$. These facts are what justify saying polynomials, rational functions (where defined), trig, exponentials, and logs are continuous on their domains without proving it from scratch every time.',
+
+      '**The Intermediate Value Theorem (IVT)** is the first great consequence of continuity. It says that continuous functions cannot skip values. If $f(a) = -3$ and $f(b) = 7$, then somewhere in between, $f$ must equal every value from $-3$ to $7$: every integer, every irrational, $\\pi$, $\\sqrt{2}$, all of them. A function with a gap or jump could avoid a target value entirely — continuity prevents that.',
+
+      '**How to use IVT**: to show a function has a root (solution to $f(c) = 0$), find two points $a$ and $b$ where $f$ changes sign: $f(a) < 0$ and $f(b) > 0$ (or vice versa). If $f$ is continuous on $[a,b]$, then IVT guarantees a root exists in $(a, b)$. IVT does not tell you where the root is — only that it exists. Numerical methods (like the Bisection Method in Chapter 3) can then find it.',
     ],
     callouts: [
       {
-        type: "definition",
-        title: "Continuity at a Point",
-        body: "f \\text{ is continuous at } c \\iff \\lim_{x \\to c} f(x) = f(c) \\\\ \\text{(requires f(c) defined, limit exists, and they're equal)}",
+        type: 'definition',
+        title: 'Continuity at a Point',
+        body: 'f \\text{ is continuous at } c \\iff \\lim_{x \\to c} f(x) = f(c). \\\\ \\text{(Requires: } f(c) \\text{ defined, limit exists, and they equal.)}',
       },
       {
-        type: "theorem",
-        title: "Intermediate Value Theorem (IVT)",
-        body: "\\text{If } f \\text{ is continuous on } [a, b] \\text{ and } k \\text{ is any value between } f(a) \\text{ and } f(b), \\\\ \\text{then } \\exists\\, c \\in (a, b) \\text{ such that } f(c) = k.",
+        type: 'theorem',
+        title: 'Intermediate Value Theorem (IVT)',
+        body: '\\text{If } f \\text{ is continuous on } [a, b] \\text{ and } k \\text{ is any value with } f(a) \\leq k \\leq f(b), \\\\ \\text{then } \\exists\\, c \\in (a, b) \\text{ such that } f(c) = k.',
       },
     ],
     visualizationId: "ContinuityViz",
     visualizationProps: { showIVT: true },
 
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title: "Example: When is a Piecewise Function Continuous?",
-        props: { url: "" },
-      },
-    ],
+          ],
   },
 
   rigor: {

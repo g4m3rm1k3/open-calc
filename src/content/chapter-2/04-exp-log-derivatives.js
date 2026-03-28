@@ -47,47 +47,7 @@ export default {
       highlightBaseE: true,
     },
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.5.1 Logarithmic and Exponential Functions: Derivatives and Integrals (Base not e)",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.1.2 The Natural Logarithmic Function: Differentiation",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 4: What's so special about Euler's number e?",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Logarithms Base a Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Exponential Functions Base a Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Derivative of Natural Logarithm Functions Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "The derivative of e^x.",
-        props: { url: "" }
-      },
-      {
+                                                {
         id: 'ExpLogBridgeLab',
         title: 'Exponential/Log Bridge Lab',
         mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes.',
@@ -99,27 +59,7 @@ export default {
         mathBridge: 'At paired points on $e^x$ and $\\ln x$, inverse-function geometry enforces reciprocal tangent slopes. This is the visual reason both formulas are true together: $\\frac{d}{dx}[e^x]=e^x$ and $\\frac{d}{dx}[\\ln x]=1/x$.',
         caption: 'Move along either curve and compare the mirrored point, tangent lines, and slope product.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Logarithm Introduction',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Using Properties of Logarithms to Expand Logs',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Using Properties of Logarithms to Condense Logs',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Change of Base Formula Logarithms',
-        props: { url: "" },
-      },
-      {
+                              {
         id: 'NewtonCooling',
         title: "Newton's Law of Cooling",
         caption: "Witness exponential decay in action. The rate at which the coffee cools is proportional to the difference between its temperature and the room temperature.",
@@ -129,12 +69,7 @@ export default {
         title: "The Mechanics of Decay: Why it Never Reaches",
         caption: "Dive deeper into the halving-gap logic and the formal proof that objects never exactly reach equilibrium.",
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Solving Natural Exponential Functions 3 Examples with Natural Logarithms',
-        props: { url: "" },
-      },
-    ],
+          ],
   },
 
   math: {
@@ -167,12 +102,7 @@ export default {
       showSlopeComparison: true,
     },
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "The Derivative of ln(x) via Implicit Differentiation",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'ExpLogBridgeLab',
         title: 'Derivative Formula Bridge Lab',
         mathBridge: 'The four formulas in one view: $\\frac{d}{dx}[e^x]=e^x$, $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$, $\\frac{d}{dx}[a^x]=a^x\\ln a$, $\\frac{d}{dx}[\\log_a x]=\\frac{1}{x\\ln a}$. At any $x$-value, the slider shows the function value and its derivative side by side. Notice: for $e^x$ they are always equal; for $\\ln x$ the derivative $\\frac{1}{x}$ is always less than the function value (for $x>1$); for $a^x$ with $a\\neq e$ there is an extra factor of $\\ln a$.',
@@ -230,12 +160,7 @@ export default {
     ],
   
       visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Logarithmic Differentiation |  Example: x^sinx",
-        props: { url: "" }
-      },
-      ],
+            ],
     },
 
   examples: [

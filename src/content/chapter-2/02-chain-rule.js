@@ -10,9 +10,9 @@ export default {
   aliases: 'section 3.6 chain rule derivation formal proof leibniz notation dy du times du dx chain and power product quotient composite three layers',
 
   hook: {
-          annotation: 'Structural view: rewrite first so the power is visibly the outer skin. This makes the onion explicit before any derivative work.',
-    realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. Stress in a beam depends on deflection, which depends on load. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
-    previewVisualizationId: 'LeibnizUnitTrackerLab',
+    question: 'Here is a real puzzle: the volume of a balloon depends on its radius, and the radius depends on time as you inflate it. If you know how fast you are pumping air (dV/dt) and how volume relates to radius (V = (4/3)\u03c0r\u00b3), can you figure out how fast the radius is growing at any instant? This is a chain of dependencies — and the chain rule is precisely the tool that breaks it open.',
+    realWorldContext: 'This is the fundamental challenge of all real-world calculus: quantities rarely depend directly on the variable we care about. Temperature depends on altitude, and altitude depends on time as an airplane climbs. A company\'s profit depends on price, and optimal price depends on consumer demand, which depends on the economy. In modern AI, a loss function depends on output, output depends on hidden layers, and hidden layers depend on millions of weights; computing each gradient is repeated chain rule (backpropagation). In every case, we have a chain of dependencies, and computing the overall rate of change requires the chain rule. It is not an exaggeration to say the chain rule is used more than any other single rule in applied calculus.',
+    previewVisualizationId: 'ChainRulePipelineLab',
   },
 
   intuition: {
@@ -72,91 +72,47 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 3: Visualizing the chain rule and product rule",
-        props: { url: "" }
-      },
-      {
-        id: "DeepProofSolver",
-        props:{},
-        title:"Dependency Hierarchy Proof: H(x) = sin(x^3)"
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Chain Rule: the Derivative of a Composition",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.4.1 The Chain Rule and General Power Rule",
-        props: { url: "" }
-      },
             {
-        id: "RecursiveProofStepper",
-        props:{},
-        title:"Dependency Hierarchy Proof: H(x) = sin(x^3)"
+        id: 'ChainRulePipelineLab',
+        title: 'Function Pipeline Relay',
+        mathBridge: 'Before clicking play, notice there are TWO machines in sequence: an "inner" machine (g) that transforms x into an intermediate value u, and an "outer" machine (f) that transforms u into the final output y. Each machine has its own speed — its own derivative. The chain rule says the total speed from x to y is the product of the two machine speeds. Watch what happens when you change the inner rate versus the outer rate.',
+        caption: 'Watch stage speeds multiply in real time: inner rate times outer rate equals the total output rate.',
       },
       {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.4.2 Differentiation Strategies and Practice",
-        props: { url: "" }
+        id: 'InterlockingGearsViz',
+        title: 'Interlocking Gears — Rates Multiply',
+        mathBridge: 'This is the gear analogy made interactive. Set the ratio of Gear A to Gear B (this is dy/du), then set the ratio of Gear B to Gear C (this is du/dx). Notice that Gear B is the intermediate — the "u" that appears in both ratios. When you multiply the two ratios, Gear B cancels out, exactly like the du in dy/dx = (dy/du)·(du/dx). The gears are not just a metaphor — they ARE the chain rule.',
+        caption: 'The chain rule is not symbolic manipulation — it is rates multiplying through a mechanical chain.',
       },
       {
-        id: 'VideoEmbed',
-        title: "Chain Rule with Trig Functions — Harder Examples",
-        props: { url: "" }
+        id: 'ChainRuleOnionLab',
+        title: 'Composition is an Onion: Layers to Peel',
+        mathBridge: 'Look at f(g(x)) and identify the layer structure before touching any derivative. The outermost "skin" is the last thing done to x. The innermost "core" is the first thing done to x. The chain rule says: differentiate the outer skin (keeping the inside wrapped up), then multiply by the derivative of everything inside.',
+        caption: 'Label outer, middle, and inner layers correctly before computing — the prerequisite for any chain-rule problem.',
       },
-      {
-        id: 'VideoEmbed',
-        title: "Chain Rule — Harder Algebraic Examples",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Chain Rule — 3 Algebraic Examples",
-        props: { url: "" }
-      },
+
       {
         id: 'ChainRuleAssemblerGame',
         title: 'Chain Rule Assembler Game',
-        mathBridge: 'The chain rule formula is $\\frac{d}{dx}[f(g(x))] = f\'(g(x))\\cdot g\'(x)$. "Assembling" means: identify the outer function $f$ and inner function $g$, differentiate $f$ (evaluated at $g(x)$, not at $x$), then multiply by $g\'(x)$. This game makes the two-part structure explicit — outer derivative times inner derivative — before you try to execute it on paper.',
+        mathBridge: 'Now that you understand the gear/pipeline analogy, this game makes the two-part structure explicit in algebraic form. You will identify the outer function f and the inner function g for various compositions, then "assemble" the derivative by multiplying f\'(g(x)) by g\'(x). The key discipline: you must evaluate f\' AT g(x), not at x directly.',
         caption: 'Build derivatives by selecting outside and inside gears, then verify the full assembled result.',
       },
       {
         id: 'LayerScanGame',
         title: 'Layer Identification Mini-Game',
-        mathBridge: 'Before computing a chain-rule derivative, you must correctly identify the composition structure. For $\\tan^3(4x)$: outermost layer is $(\\cdot)^3$, middle layer is $\\tan(\\cdot)$, innermost is $4x$. The derivative peels these in order: $3\\tan^2(4x)\\cdot\\sec^2(4x)\\cdot 4$. If you mislabel the layers, you get the wrong derivative. This game trains the pattern recognition that makes execution automatic.',
+        mathBridge: 'Before you can use the chain rule, you must correctly identify the composition structure. This is a trainable skill that becomes automatic with practice. For tan³(4x): ask yourself — if I evaluated this at x = 2, what would I do LAST? Cube the result. So the outermost layer is (·)³. Then ask: what is the SECOND-to-last step? Take the tangent. So middle layer is tan(·). The innermost is 4x.',
         caption: 'Label outer, middle, and inner layers correctly before computing — the prerequisite for any chain-rule problem.',
-      },
-      {
-        id: 'ChainRulePipelineLab',
-        title: 'Function Pipeline Relay',
-        mathBridge: 'In Leibniz notation: $\\frac{dy}{dx} = \\frac{dy}{du}\\cdot\\frac{du}{dx}$. Think of it as a relay race: $x$ flows into the first machine (inner function $g$), producing $u = g(x)$ at rate $\\frac{du}{dx}$. Then $u$ flows into the second machine (outer function $f$), producing $y$ at rate $\\frac{dy}{du}$. The overall rate from $x$ to $y$ is the product of both stage rates. This is why "rates multiply along a chain."',
-        caption: 'Watch stage speeds multiply in real time: inner rate times outer rate equals the total output rate.',
-      },
-      {
-        id: 'ChainRulePeeler',
-        title: 'Peel the Onion',
-        mathBridge: 'For nested compositions like $f(g(h(x)))$, the extended chain rule gives $f\'(g(h(x)))\\cdot g\'(h(x))\\cdot h\'(x)$ — one derivative factor per layer. Each click peels one layer: differentiate the current outer function (keeping everything inside intact), then multiply by the derivative of the remaining inside. Stopping early or differentiating the inside prematurely are the two most common mistakes the peeler prevents.',
-        caption: 'Differentiate from the outside in. Each peel produces one factor in the chain-rule product.',
-      },
-      {
-        id: 'BlindChainRuleLab',
-        title: 'Blindfolded Chain Rule — Table Version',
-        mathBridge: "When $h(x) = f(g(x))$, the formula $h'(a) = f'(g(a))\\cdot g'(a)$ is a two-step table lookup: (1) find $g(a)$ — your intermediate value; (2) look up $f'$ evaluated at $g(a)$, not at $a$. The most common exam error is reading $f'(a)$ directly, skipping the inner function evaluation entirely. This lab strips away all algebra to train pure Chain Rule grammar.",
-        caption: "Select the correct table cells to assemble h'(a). The grammar doesn't change when the functions have no formulas.",
       },
       {
         id: 'NestedTrigMachine',
         title: 'Trig Trap: sin(x²) vs sin²(x)',
-        mathBridge: 'Two expressions that look similar but are completely different compositions: $\\sin(x^2)$ has outer $\\sin$ and inner $x^2$ — derivative is $\\cos(x^2)\\cdot 2x$. But $\\sin^2(x)$ has outer $u^2$ and inner $\\sin x$ — derivative is $2\\sin(x)\\cos(x)$. The position of the exponent changes which function is outer and which is inner. This is the most common Chain Rule mistake on trig exams.',
+        mathBridge: 'These two expressions look the same to a tired eye, but they are completely different compositions. In sin(x²), the outer function is sine and the inner is x². In sin²(x), the outer function is squaring and the inner is sine. Toggle between them in this visualizer to watch the layer structure flip — and watch the derivative change completely.',
         caption: 'Toggle between sin(x²) and sin²(x) to see how the layer swap changes the derivative completely.',
       },
       {
         id: 'ChainRulePracticeViz',
         title: 'Chain Rule Category Drill (Standard)',
-        mathBridge: 'Apply the "Outside-Inside" method to 10 distinct forms, from trig-of-polynomial to log-of-linear. Each drill identifies outer/inner functions, reveals steps one-by-one, and checks the results numerically.',
+        mathBridge: 'Apply the "Outside-Inside" method to 10 distinct composition forms, from trig-of-polynomial to log-of-linear. For each problem: (1) identify the outer and inner functions, (2) differentiate the outer at the inner, (3) multiply by the inner derivative. The drill reveals each step and confirms numerically.',
         caption: 'Master the 10 most common composition forms found in calculus exams.',
       },
       {
@@ -165,13 +121,25 @@ export default {
         mathBridge: 'This version of the Drill features a different UI with color-coded containers and interactive step reveals.',
         caption: 'An alternative view of the 10 most common composition forms.',
       },
+      {
+        id: 'ChainRulePeeler',
+        title: 'Peel the Onion \u2014 Layer-by-Layer Differentiation',
+        mathBridge: 'For nested compositions like $f(g(h(x)))$, the extended chain rule gives $f\'(g(h(x)))\\cdot g\'(h(x))\\cdot h\'(x)$ \u2014 one derivative factor per layer, peeled outside-in. Each click removes one layer: differentiate the current outermost function (keeping everything inside intact), then multiply by the derivative of the remaining inside. Stopping early or differentiating the inside prematurely are the two most common mistakes this tool trains you to avoid.',
+        caption: 'Differentiate from the outside in. Each peel produces exactly one factor in the chain-rule product.',
+      },
+      {
+        id: 'BlindChainRuleLab',
+        title: 'Blindfolded Chain Rule \u2014 Table Version',
+        mathBridge: "When $h(x) = f(g(x))$, computing $h'(a) = f'(g(a))\\cdot g'(a)$ is a two-step table lookup: (1) find $g(a)$ first \u2014 your intermediate value; (2) look up $f'$ evaluated at $g(a)$, NOT at $a$. The most common exam error is reading $f'(a)$ directly, skipping the inner evaluation entirely. This lab strips away all algebra so the only skill tested is Chain Rule grammar.",
+        caption: "Select the correct table cells to assemble h'(a). The grammar doesn't change when the functions have no formulas.",
+      },
     ],
   },
 
   math: {
     prose: [
       'There are two equivalent forms of the chain rule. The Lagrange/function-composition form names the outer and inner functions explicitly and is cleaner for algebraic manipulation. The Leibniz form uses dy/du and du/dx and is more intuitive for applied problems involving rates.',
-      'An approachable derivation idea: if \u0394u \approx g\'(x)\u0394x and \u0394y \approx f\'(u)\u0394u, then \u0394y \approx f\'(u)g\'(x)\u0394x. Dividing by \u0394x and taking the limiting view gives dy/dx = f\'(g(x))g\'(x).',
+      'An approachable derivation idea: if \u0394u \u2248 g\'(x)\u0394x and \u0394y \u2248 f\'(u)\u0394u, then \u0394y \u2248 f\'(u)g\'(x)\u0394x. Dividing by \u0394x and taking the limiting view gives dy/dx = f\'(g(x))g\'(x).',
       'The chain rule combined with the power rule gives one of the most common differentiation formulas in all of calculus: d/dx[u\u207f] = nu\u207f\u207b\u00b9\u00b7u\', where u = g(x) is any differentiable function. This formula applies whenever you have "something to a power" — the power rule applies to the outer function, and the chain rule contributes the u\' factor.',
       'The extended chain rule for triple compositions states that for y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). The pattern is clear: differentiate each layer from outside to inside, evaluate each outer derivative at everything inside it, and multiply all the factors together.',
       'Identifying the outer and inner functions correctly is a skill that develops with practice. The best approach is to always ask: "What is the last thing done to x if I evaluate this at a number?" That last operation is the outer function. Everything that comes before is the inner function.',
@@ -204,27 +172,16 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Interpreting the Chain Rule Graphically",
-        props: { url: "" }
-      },
-      {
-        id: 'InterlockingGearsViz',
-        title: 'Interlocking Gears — Rates Multiply',
-        mathBridge: 'Set gear ratios dA/dB and dB/dC with the sliders, then spin. Gear A\'s speed is exactly dA/dB × dB/dC times the base speed — the intermediate Gear B cancels out, just like du cancels in dy/dx = (dy/du)·(du/dx).',
-        caption: 'The chain rule is not symbolic manipulation — it is rates multiplying through a mechanical chain.',
-      },
-      {
+            {
         id: 'ChainRuleMicroscope',
         title: 'Microscope Mode: The Visual Derivation',
-        mathBridge: 'Every differentiable function looks linear when you zoom in far enough — its graph becomes indistinguishable from its tangent line. If the inner function $g$ has local slope $m_1$ and the outer function $f$ has local slope $m_2$, then feeding a line of slope $m_1$ into a line of slope $m_2$ gives a composed line of slope $m_1\\cdot m_2$. The chain rule $(f\\circ g)\'(x) = f\'(g(x))\\cdot g\'(x)$ is just this slope-multiplication fact, made rigorous via limits.',
+        mathBridge: 'Zoom in on the graph of a composition f(g(x)) at a point. At fine enough scale, every differentiable function looks like a straight line — its local slope. If the inner function g has local slope m₁ and the outer function f has local slope m₂ at g(x), then the composition has local slope m₁·m₂. The chain rule (f∘g)\' = f\'(g(x))·g\'(x) is mathematically encoding exactly this: slope of composition = product of slopes.',
         caption: 'Zoom in to see both curves linearize, then watch the composed slope = m₁ × m₂.',
       },
       {
         id: 'LeibnizUnitTrackerLab',
         title: 'Leibniz Unit Tracker',
-        mathBridge: 'Leibniz notation $\\frac{dy}{dx} = \\frac{dy}{du}\\cdot\\frac{du}{dx}$ behaves like unit cancellation: $\\frac{\\text{cm}^3}{\\text{cm}}\\cdot\\frac{\\text{cm}}{\\text{s}} = \\frac{\\text{cm}^3}{\\text{s}}$. This is not a coincidence — the chain rule ensures that physical rates compose correctly. If volume $V$ depends on radius $r$ (in cm) and radius depends on time $t$ (in seconds), then $\\frac{dV}{dt}$ automatically has units cm³/s. Without the chain rule, unit consistency would fail.',
+        mathBridge: 'Here is something remarkable about Leibniz notation: $\\frac{dy}{dx} = \\frac{dy}{du}\\cdot\\frac{du}{dx}$ looks like the du terms cancel like fractions. This is NOT a coincidence — the chain rule was designed to make this true. This visualization tracks physical units through the chain: if V is in cm³ and r is in cm and t is in seconds, then dV/dt ends up in cm³/s automatically. The unit cancellation is the chain rule doing its job.',
         caption: 'Verify that Leibniz notation forces units to cancel correctly along the dependency chain.',
       },
     ],
@@ -267,12 +224,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "The Chain Rule using Leibniz notation",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'ChainRuleProofMapLab',
         title: 'Annotated Proof Map',
         mathBridge: 'The naive proof divides by $g(x+h)-g(x)$, which can equal zero even for $h\\neq 0$ (e.g. $g(x)=x^2\\sin(1/x)$). The rigorous fix defines $\\Phi(k) = \\frac{f(g(x)+k)-f(g(x))}{k}$ for $k\\neq 0$ and $\\Phi(0)=f\'(g(x))$. This makes $\\Phi$ continuous at 0, so the proof works even when $g(x+h)-g(x)=0$. Each labeled term in the proof map corresponds to one of: the definition of $\\Phi$, continuity of $g$, or the limit product rule.',
@@ -300,6 +252,18 @@ export default {
         title: 'Annotated Proof: d/dx[sin(x³)] (Detailed)',
         mathBridge: 'This version of the proof features the "Infinite Nesting" WhyPanel system, allowing you to dive deeper into every sub-axiom of the proof.',
         caption: 'A more detailed version of the rigorous limit-based proof.',
+      },
+      {
+        id: 'DeepProofSolver',
+        title: 'Dependency Hierarchy Solver: H(x) = sin(x³)',
+        mathBridge: 'This tool builds the full dependency graph for H(x) = sin(x³) before differentiating. At the top is the output H; below it are the intermediate nodes (the composition layers); at the bottom are the input x dependencies. Each edge in the graph carries a local derivative. The chain rule says the total derivative from root to leaf is the product of all edge derivatives along any path \u2014 exactly what the visual shows. Use it to see WHY the "multiply down the chain" instruction works.',
+        caption: 'Visualize the full dependency graph of a composition and read off the chain rule product from the graph edges.',
+      },
+      {
+        id: 'RecursiveProofStepper',
+        title: 'Recursive Proof Stepper: d/dx[sin(x³)]',
+        mathBridge: 'While DeepProofSolver shows the full graph at once, this stepper takes you through the proof recursively \u2014 one sub-problem at a time. Each step exposes one layer: "To differentiate sin(x³), I first need d/dx[x³], so I recurse..." This models exactly how a skilled mathematician thinks: break the problem into smaller problems, solve them in order, then combine. If recursive thinking feels hard, step through this slowly \u2014 it will become your natural approach.',
+        caption: 'Step through the chain rule proof one sub-problem at a time, deepening the recursive structure of the argument.',
       },
     ],
     visualizationId: 'DerivativeMotionLabPro',
@@ -909,81 +873,81 @@ export default {
   // ─── Semantic Layer ───────────────────────────────────────────────────────
   semantics: {
     "core": [
-        {
-            "symbol": "f(g(x))",
-            "meaning": "a composition — g is the inner function, f is the outer function"
-        },
-        {
-            "symbol": "dy/dx = (dy/du)(du/dx)",
-            "meaning": "Leibniz form of the chain rule: the rates multiply"
-        },
-        {
-            "symbol": "outer × inner'",
-            "meaning": "evaluate the outer derivative at the inner function, then multiply by the inner's derivative"
-        }
+      {
+        "symbol": "f(g(x))",
+        "meaning": "a composition — g is the inner function, f is the outer function"
+      },
+      {
+        "symbol": "dy/dx = (dy/du)(du/dx)",
+        "meaning": "Leibniz form of the chain rule: the rates multiply"
+      },
+      {
+        "symbol": "outer × inner'",
+        "meaning": "evaluate the outer derivative at the inner function, then multiply by the inner's derivative"
+      }
     ],
     "rulesOfThumb": [
-        "Identify the innermost function first. Differentiate from outside in.",
-        "Never forget to multiply by the inner derivative (du/dx). Forgetting it is the chain rule error.",
-        "If you see a function raised to a power: d/dx[f(x)ⁿ] = n·f(x)ⁿ⁻¹·f'(x).",
-        "Multiple compositions: peel layers from outside in, multiplying a new derivative at each layer."
+      "Identify the innermost function first. Differentiate from outside in.",
+      "Never forget to multiply by the inner derivative (du/dx). Forgetting it is the chain rule error.",
+      "If you see a function raised to a power: d/dx[f(x)ⁿ] = n·f(x)ⁿ⁻¹·f'(x).",
+      "Multiple compositions: peel layers from outside in, multiplying a new derivative at each layer."
     ]
-},
+  },
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
     "recoveryPoints": [
-        {
-            "lessonId": "ch2-differentiation-rules",
-            "label": "Previous: Differentiation Rules",
-            "note": "The power, product and quotient rules handle non-composed functions. The chain rule is the single missing piece that handles everything else — any composition, any nesting."
-        }
+      {
+        "lessonId": "ch2-differentiation-rules",
+        "label": "Previous: Differentiation Rules",
+        "note": "The power, product and quotient rules handle non-composed functions. The chain rule is the single missing piece that handles everything else — any composition, any nesting."
+      }
     ],
     "futureLinks": [
-        {
-            "lessonId": "ch2-implicit-differentiation",
-            "label": "Next: Implicit Differentiation",
-            "note": "Implicit differentiation is the chain rule applied to y as a function of x. Every d/dx[y²] term in an implicit equation generates a 2y·(dy/dx) factor — that IS the chain rule."
-        },
-        {
-            "lessonId": "ch3-related-rates",
-            "label": "Ch. 3: Related Rates",
-            "note": "Related rates is implicit differentiation in t. The chain rule factor becomes (dx/dt), (dy/dt), etc. Every related-rates rate equation is a chain rule application."
-        },
-        {
-            "lessonId": "ch4-u-substitution",
-            "label": "Ch. 4: U-Substitution",
-            "note": "U-substitution is the chain rule run in reverse for integration. Recognizing the \"inner derivative\" factor in the integrand is the key skill — and it comes from deeply understanding the chain rule."
-        }
+      {
+        "lessonId": "ch2-implicit-differentiation",
+        "label": "Next: Implicit Differentiation",
+        "note": "Implicit differentiation is the chain rule applied to y as a function of x. Every d/dx[y²] term in an implicit equation generates a 2y·(dy/dx) factor — that IS the chain rule."
+      },
+      {
+        "lessonId": "ch3-related-rates",
+        "label": "Ch. 3: Related Rates",
+        "note": "Related rates is implicit differentiation in t. The chain rule factor becomes (dx/dt), (dy/dt), etc. Every related-rates rate equation is a chain rule application."
+      },
+      {
+        "lessonId": "ch4-u-substitution",
+        "label": "Ch. 4: U-Substitution",
+        "note": "U-substitution is the chain rule run in reverse for integration. Recognizing the \"inner derivative\" factor in the integrand is the key skill — and it comes from deeply understanding the chain rule."
+      }
     ]
-},
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {
     "questions": [
-        {
-            "id": "cr-assess-1",
-            "type": "input",
-            "text": "d/dx[sin(x²)] = ?",
-            "answer": "cos(x²)·2x",
-            "hint": "Outer: sin → cos, evaluated at inner x². Inner: x² → 2x. Multiply."
-        },
-        {
-            "id": "cr-assess-2",
-            "type": "input",
-            "text": "d/dx[(3x+1)⁵] = ?",
-            "answer": "5(3x+1)^4 · 3",
-            "hint": "Outer: power rule → 5(3x+1)⁴. Inner: 3x+1 → 3. Multiply: 15(3x+1)⁴."
-        },
-        {
-            "id": "cr-assess-3",
-            "type": "input",
-            "text": "d/dx[e^(cos x)] = ?",
-            "answer": "e^(cos x)·(-sin x)",
-            "hint": "Outer: eᵘ → eᵘ at u=cos x. Inner: cos x → -sin x. Multiply."
-        }
+      {
+        "id": "cr-assess-1",
+        "type": "input",
+        "text": "d/dx[sin(x²)] = ?",
+        "answer": "cos(x²)·2x",
+        "hint": "Outer: sin → cos, evaluated at inner x². Inner: x² → 2x. Multiply."
+      },
+      {
+        "id": "cr-assess-2",
+        "type": "input",
+        "text": "d/dx[(3x+1)⁵] = ?",
+        "answer": "5(3x+1)^4 · 3",
+        "hint": "Outer: power rule → 5(3x+1)⁴. Inner: 3x+1 → 3. Multiply: 15(3x+1)⁴."
+      },
+      {
+        "id": "cr-assess-3",
+        "type": "input",
+        "text": "d/dx[e^(cos x)] = ?",
+        "answer": "e^(cos x)·(-sin x)",
+        "hint": "Outer: eᵘ → eᵘ at u=cos x. Inner: cos x → -sin x. Multiply."
+      }
     ]
-},
+  },
 
   // ─── Mental Model Compression ────────────────────────────────────────────
   mentalModel: [
@@ -991,7 +955,7 @@ export default {
     "Leibniz: dy/dx = (dy/du)(du/dx)",
     "Peel layers outside→in, multiply a derivative at each layer",
     "Forgetting the inner derivative is the #1 chain rule error"
-],
+  ],
 
   checkpoints: [
     'read-intuition',

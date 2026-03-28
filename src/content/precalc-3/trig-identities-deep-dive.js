@@ -49,27 +49,7 @@ export default {
         mathBridge: 'Drag the angle $\\theta$ and watch $\\sin^2\\theta + \\cos^2\\theta$ stay exactly 1. The right triangle IS the Pythagorean theorem.',
         caption: 'Every trig value is a length on or inside the unit circle.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Setting up the Unit Circle Part 1 and Reference Angle',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Setting Up the Unit Circle Part 2',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Trig Functions w/ Unit Circle Degrees & Radians',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Intro to Fundamental Trig Identities',
-        props: { url: "" },
-      },
-      { id: 'VideoCarousel', title: 'Intro to Trig Identities & Proofs', props: { videos: [
+                              { id: 'VideoCarousel', title: 'Intro to Trig Identities & Proofs', props: { videos: [
           { url: "", title: 'TR-32 — Dennis F. Davis' },
           { url: "", title: 'Fundamental Identities — Kim' },
         ]},
@@ -79,8 +59,7 @@ export default {
           { url: "", title: 'TR-33Z — All 6 Functions on the Unit Circle' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-34: Using Pythagorean Identities', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Symmetry, Conjugates & Reflections', props: { videos: [
+            { id: 'VideoCarousel', title: 'Symmetry, Conjugates & Reflections', props: { videos: [
           { url: "", title: 'TR-35 — Conjugate Identities' },
           { url: "", title: 'TR-36 — Even & Odd Trig Functions' },
           { url: "", title: 'TR-37 — More Trig Reflections' },
@@ -140,77 +119,7 @@ export default {
         mathBridge: 'The Pythagorean identity $\\sin^2\\theta + \\cos^2\\theta = 1$ comes from $x^2 + y^2 = 1$ on the unit circle. When you later learn calculus, this same equation can be differentiated implicitly to find the slope at every point on the circle — a preview of what these identities make possible.',
         caption: 'See what happens when calculus meets the Pythagorean identity: implicit differentiation of x² + y² = r².',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Sum & Difference Identities Intro (5 Examples)',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Sum and Difference Trigonometric Identities',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Sum & Difference Identities Proofs & Equation (3 Examples)',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Deriving Trig Identities from Sin(A+B) and Cos(A+B)',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Double & Half Angle Identities (9 Examples)',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Trigonometry Expressions with Half and Double Angles Pt1',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Trigonometry Expressions with Half and Double Angles Pt2',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometry Proofs Involving Half and Double Angles',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Product to Sum and Sum to Product Formulas',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Verifying Trigonometric Identities Intro (4 Examples)',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Verifying Trigonometric Identities Pt 1',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Verifying Trigonometric Identities Pt2',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Verifying Trigonometric Identities Pt3',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Verifying Trigonometric Identities Involving Sum & Difference',
-        props: { url: "" },
-      },
-    ],
+                                                                                        ],
   },
 
   rigor: {

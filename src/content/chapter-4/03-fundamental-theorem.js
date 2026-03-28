@@ -46,37 +46,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.4.3 The Second Fundamental Theorem of Calculus",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.4.2 The Mean Value Theorem for Integrals and the Average Value of a Function",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.4.1 The Fundamental Theorem of Calculus",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integrating Natural Logarithm Function Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definite Integrals Common Geometric Area Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Fundamental Theorem of Calculus 1  |  Geometric Idea + Chain Rule Example",
-        props: { url: "" }
-      },
-      {
+                                      {
         id: 'FTCLink',
         title: 'The Accumulation Function A(x) and its Derivative',
         caption: 'The left panel shows f(t) with the accumulated area A(x) = ∫₀ˣ f(t) dt shaded. The right panel shows A(x) as a function of x. Drag the slider to change x and observe: A increases when f > 0, decreases when f < 0, and has a horizontal tangent when f = 0. The slope of A(x) at each x is exactly f(x) — FTC Part 1.',
@@ -109,11 +79,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Fundamental Theorem of Calculus II",
-        props: { url: "" }
-      },],
+      ],
   },
 
   rigor: {

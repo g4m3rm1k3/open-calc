@@ -48,12 +48,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.8.1 Inverse Trigonometric Functions: Integration",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'IntegrationMethodLab',
         title: 'Method Selection Trainer',
         caption: 'Mark radical patterns like a^2-x^2 or a^2+x^2 and compare trig substitution against competing techniques.',

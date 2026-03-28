@@ -54,12 +54,7 @@ export default {
     visualizationId: 'TaylorApproximation',
     visualizationProps: {},
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 10: Taylor series",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'GraphMorph',
         title: 'Taylor Polynomials Approaching sin(x)',
         caption: 'Watch as $T_1(x) = x$, $T_3(x) = x - x^3/6$, $T_5(x) = x - x^3/6 + x^5/120$, $\\ldots$ progressively better approximate $\\sin(x)$. Each successive polynomial hugs the sine curve over a wider interval.',

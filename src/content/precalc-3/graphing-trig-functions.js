@@ -49,14 +49,12 @@ export default {
           { url: "", title: 'TR-17 — Most Common Use of Trigonometry' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-18: Graphing Sine and Cosine', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Graphing Tan, Cot, Sec, Csc', props: { videos: [
+            { id: 'VideoCarousel', title: 'Graphing Tan, Cot, Sec, Csc', props: { videos: [
           { url: "", title: 'TR-19 — Graphing Tangent & Cotangent' },
           { url: "", title: 'TR-20 — Graphing Secant & Cosecant' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-21: Domain and Range of Trig Functions', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'Trig Graph Variations', props: { videos: [
+            { id: 'VideoCarousel', title: 'Trig Graph Variations', props: { videos: [
           { url: "", title: 'TR-42 — Trig Graph Variations 1' },
           { url: "", title: 'TR-43 — Trig Graph Variations 2' },
           { url: "", title: 'TR-44 — Trig Graph Variations 3' },

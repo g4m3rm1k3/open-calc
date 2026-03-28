@@ -81,17 +81,7 @@ export default {
         title: 'Reflection and Reciprocal Slopes (Symbolic View)',
         caption: 'As a point moves on f, the reflected point on f^(-1) shows reciprocal tangent slope at matching coordinates.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Inverse Trigonometric Functions',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Evaluating Inverse Trigonometric Functions Full Length',
-        props: { url: "" },
-      },
-      {
+                  {
         id: 'InverseFunctionReflection',
         title: 'Geometric Reflection Lab',
         caption: 'Watch points swap as they reflect across y=x. See why domain and range must swap too.',

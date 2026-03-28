@@ -44,9 +44,7 @@ export default {
         mathBridge: 'Drag any vertex. All three ratios $a/\\sin A$, $b/\\sin B$, $c/\\sin C$ update and stay equal. Watch how they all equal $2R$.',
         caption: 'The constant ratio is the diameter of the circumscribed circle — true for every triangle.',
       },
-      { id: 'VideoEmbed', title: 'TR-26: Solving Right Triangles', props: { url: "" } },
-      { id: 'VideoEmbed', title: 'TR-27: Triangle Types to Solve', props: { url: "" } },
-      { id: 'VideoCarousel', title: 'The Law of Sines', props: { videos: [
+                  { id: 'VideoCarousel', title: 'The Law of Sines', props: { videos: [
           { url: "", title: 'TR-28 — Dennis F. Davis' },
           { url: "", title: 'Oblique Triangles — Kim' },
         ]},
@@ -57,10 +55,7 @@ export default {
           { url: "", title: 'Law of Cosines — Kim' },
         ]},
       },
-      { id: 'VideoEmbed', title: 'TR-30: SSA Triangles Overview', props: { url: "" } },
-      { id: 'VideoEmbed', title: 'TR-31: Solving SSA Triangles', props: { url: "" } },
-      { id: 'VideoEmbed', title: 'Solving Trigonometric Equations (5 Examples)', props: { url: "" } },
-    ],
+                      ],
   },
 
   math: {

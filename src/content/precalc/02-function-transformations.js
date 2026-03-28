@@ -44,27 +44,7 @@ export default {
         caption: 'Every parameter has a single, predictable effect. Build the intuition by isolating one at a time.',
         props: { baseFunction: 'quadratic' },
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Transformation of Functions',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Piecewise Functions Evaluating & Graphing',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Average Rate of Change',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Difference Quotient',
-        props: { url: "" },
-      },
-    ],
+                            ],
   },
 
   math: {

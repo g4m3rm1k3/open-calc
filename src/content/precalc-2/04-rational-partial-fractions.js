@@ -43,17 +43,7 @@ export default {
         mathBridge: 'See both directions: adding two simple fractions to get a combined one, and decomposing the combined one back. Adjust $A$ and $B$ to match a target.',
         caption: 'Partial fractions is fraction addition in reverse — we\'re finding the addends, not the sum.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Partial Fraction Decomposition Part 1',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Partial Fractions Decomposition Part 2',
-        props: { url: "" },
-      },
-    ],
+                ],
   },
 
   math: {

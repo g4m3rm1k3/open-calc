@@ -13,17 +13,7 @@ export default {
   intuition: {
     prose: ['Explore the definitions and visual concepts behind this topic.'],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "TR-45: Polar Coordinates",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "TR-46: Polar Equations",
-        props: { url: "" }
-      }
-    ]
+                ]
   },
   math: {
     prose: ['Review the mathematical derivations covered in the video series.']

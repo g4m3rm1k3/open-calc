@@ -36,11 +36,7 @@ export default {
       },
     ],
     visualizations: [
-      { id: 'VideoEmbed', title: "Graphing Ellipses & Circles", props: { url: "" } },
-      { id: 'VideoEmbed', title: "Graphing Hyperbolas in Standard Form", props: { url: "" } },
-      { id: 'VideoEmbed', title: "Graphing Parabolas in Standard Form", props: { url: "" } },
-      { id: 'VideoEmbed', title: "Finding Equations of Conics from Given Conditions", props: { url: "" } },
-    ],
+                            ],
   },
 
   math: {
@@ -65,10 +61,7 @@ export default {
       },
     ],
     visualizations: [
-      { id: 'VideoEmbed', title: "Application of Ellipses", props: { url: "" } },
-      { id: 'VideoEmbed', title: "Application of Hyperbolas", props: { url: "" } },
-      { id: 'VideoEmbed', title: "Applications of Parabolas in Standard Form", props: { url: "" } },
-    ],
+                      ],
   },
 
   rigor: {
@@ -79,8 +72,7 @@ export default {
     ],
     callouts: [],
     visualizations: [
-      { id: 'VideoEmbed', title: "Rotated Conic Section Identifying & Graphing 4 Examples", props: { url: "" } },
-    ],
+          ],
   },
 
   examples: [

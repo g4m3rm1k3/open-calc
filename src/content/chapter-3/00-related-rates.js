@@ -73,47 +73,7 @@ export default {
     ],
 
     visualizations: [
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 2.6.2 Related Rates - Modeling with Triangles",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus I - 2.6.1 Related Rates - Modeling with Circles",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Calculus Related Rates Example Volume of Cone Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Related Rates Similar Triangles   4K",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Related Rates Right Triangles 2 Examples 4K",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Related Rates Part 2 Linear vs Angular Speed Calculus 1 AB",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Related Rates Introduction Area & Volume 4K",
-        props: { url: "" },
-      },
-      {
-        id: "VideoEmbed",
-        title: "Intro to Related Rates",
-        props: { url: "" },
-      },
-      {
+                                                      {
         id: "Ch6_TwoTanks",
         title: "Story Mode: Two Tanks, One Valve",
         mathBridge:

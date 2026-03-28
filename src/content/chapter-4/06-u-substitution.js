@@ -66,32 +66,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.2.2 Natural Logarithmic Integration: Difficult Examples",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.5.2 Integration by Substitution: Definite Integrals",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.5.1 Integration by Substitution: Indefinite Integrals",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Intro to Substitution - Undoing the Chain Rule",
-        props: { url: "" }
-      },
-      {
+                                    {
         id: 'IntegrationMethodLab',
         title: 'Method Selection Trainer',
         caption: 'Use the checklist to decide whether this integrand family is a substitution, by-parts, trig-sub, trig-identity, or partial-fractions problem.',
@@ -132,12 +107,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Adjusting the Constant in Integration by Substitution",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'FunctionPlotter',
         props: { fn: 'x * Math.exp(x * x)', xMin: -2, xMax: 2 },
         title: 'Integrand: x·e^(x²)',
@@ -164,16 +134,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Back Substitution - When a u-sub doesn't match cleanly!",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Substitution Method for Definite Integrals **careful!**",
-        props: { url: "" }
-      },],
+            ],
   },
 
   examples: [

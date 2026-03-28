@@ -51,57 +51,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.4.1 Derivatives and Integrals of the Natural Exponential Function",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 5.2.1 The Natural Logarithmic Function: Integration",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.1.2 Initial Conditions and the Particular Solution to a Differential Equation",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 4.1.1 Antiderivatives and the General Solution to a Differential Equation",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration Techniques Reviewed (5 Examples)",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration of Natural Exponential Functions Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Integration of Natural Exponential Function e^x (4 Examples)",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Indefinite Integration Word Problems Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Initial Condition Particular Solution for Antiderivative Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "What's an anti-derivative?",
-        props: { url: "" }
-      },
-      {
+                                                        {
         id: 'FunctionPlotter',
         title: 'Family of Antiderivatives',
         caption: 'The graph shows f(x) = x² (bottom) and several members of the antiderivative family F(x) = x³/3 + C for various values of C. Each curve has the same slope at every x-value (equal to x²), but different vertical positions. The initial condition x(0) = k selects the unique member with F(0) = k.',
@@ -134,11 +84,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Solving for the constant in the general anti-derivative",
-        props: { url: "" }
-      },],
+      ],
   },
 
   rigor: {

@@ -40,32 +40,7 @@ export default {
         mathBridge: 'The substitution $x = \\sin\\theta$ is not a trick — it is the unit circle. $\\sqrt{1 - x^2}$ is literally $\\cos\\theta$ in the same right triangle.',
         caption: 'Drag $x$ along the circle to see how $\\sqrt{1 - x^2}$ corresponds to $\\cos\\theta$.',
       },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometric Cofunctions',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trig Expressions & Finding Trig Functions Given another Trig Ratio',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Trigonometric Functions of Any Angle',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Right Triangle Trigonometry Part 1: Finding Missing Sides',
-        props: { url: "" },
-      },
-      {
-        id: 'VideoEmbed',
-        title: 'Right Triangle Trigonometry Part 2: Solving for Acute Angles',
-        props: { url: "" },
-      },
-      {
+                                    {
         id: 'ChainRuleCompositionViz',
         title: 'Two Function Machines — Inner and Outer',
         mathBridge: 'Pick any composition. See x flow through inner g then outer f. The chain rule assembles from the two derivatives.',

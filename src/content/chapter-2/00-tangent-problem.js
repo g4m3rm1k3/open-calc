@@ -96,92 +96,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.1.2 The Derivative Using the Definition of a Derivative",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 2.1.1 The Slope of the Tangent Line Using the Definition of Slope",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Graphical Comparison Function to its 1st and 2nd Derivative Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Horizontal Tangent Lines and Differentiation Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Tangent Line of Curve Parallel to A Line Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Tangent Line Through Point not on Curve   4K",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Tangent Line Parallel to a Given Line Calculus Derivative 4K",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Tangent Line and Normal Line in Calculus   4K",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Instantaneous Velocity and Speed of Linear Motion Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Basic Differentiation Rules Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Graphical Comparison of Function vs Derivative Graphs Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Why there is no Derivative at a Sharp Bend 4k",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definition of Derivative and Vertical Tangent Line Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Slope of Tangent Line Derivative at a Point Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definition of a Derivative & Alternative Form at a Point 4k",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definition of Derivative & Tangent Line Problems Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Definition of the Derivative  | Part I",
-        props: { url: "" }
-      },
-      {
+                                                                                {
         id: 'SecantToTangent',
         title: 'Secant Line → Tangent Line',
         mathBridge: 'The secant line through $(a, f(a))$ and $(a+h, f(a+h))$ has slope $\\frac{f(a+h)-f(a)}{h}$ — the difference quotient. As $h \\to 0$, the second point slides toward the first and the secant rotates into the tangent line. The derivative $f\'(a)$ is the limiting slope of that rotation.',
@@ -240,12 +155,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Applying the Definition of the Derivative to 1/x",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'TangentLineConstructor',
         props: { showPointSlope: true, showDifferenceQuotientLabels: true },
         title: 'Secant → Tangent: Limit of Difference Quotient',
@@ -289,17 +199,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "The derivative of a constant and of x^2  from the definition",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Definition of Derivative Example: f(x) = x + 1/(x+1)",
-        props: { url: "" }
-      },
-      {
+                  {
         id: 'AbsoluteValueDiffViz',
         title: 'The Corner: Why |x| Fails at x = 0',
         mathBridge: 'The rigor section proves this algebraically: $(|0+h| - 0)/h = |h|/h$, which equals $+1$ when $h > 0$ and $-1$ when $h < 0$. The visualization makes the algebra geometric — both secant lines are shown simultaneously. No matter how small $h$ gets, the green (right) secant locks at slope $+1$ and the red (left) at slope $-1$. That immovable mismatch is exactly what the limit calculation says. Compare this to the smooth $x^2$ example where both secants converge to the same slope as $h \\to 0$.',

@@ -51,77 +51,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.6.2 Curve Sketching Using Derivatives",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.6.1 Curve Sketching Using Graph Attributes",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.4.2 The Second Derivative Test",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.4.1 Intervals of Concavity and Points of Inflection",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.3.2 The First Derivative Test",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.3.1 Increasing and Decreasing Functions",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.1.2 Critical Numbers and Extrema",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Calculus I - 3.1.1 Relative and Absolute Extrema",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Essence of Calculus, Chapter 9: Higher order derivatives",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Definite Integral as a Function of X Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Summary of Curve Sketching Rational Exponent Odd Function Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "Summary of Curve Sketching Rational Function with Slant Asymptote Calculus 1 AB",
-        props: { url: "" }
-      },
-    {
-        id: 'VideoEmbed',
-        title: "First Derivative Test Intervals of Increasing Decreasing & Relative Extrema Calculus 1 AB",
-        props: { url: "" }
-      },
-      {
-        id: 'VideoEmbed',
-        title: "Relative and Absolute Maximums and Minimums | Part I",
-        props: { url: "" }
-      },
-      {
+                                                                                  {
         id: 'RollerCoaster',
         title: 'Roller Coaster Physics: Tangents & Curvature',
         caption: 'The thrill of a roller coaster is all about the derivatives: the slope (first derivative) and the g-force from concavity (second derivative).',
@@ -169,12 +99,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Relative and Absolute Maximums and Minimums | Part II",
-        props: { url: "" }
-      },
-      {
+            {
         id: 'NewtonsMethod',
         title: "Newton's Method — Finding Roots via Tangent Lines",
         caption: "Each step follows the tangent line to its x-intercept, giving the next guess. Convergence is quadratic — the number of correct decimal places doubles every step. This is how your calculator computes √2.",
@@ -196,11 +121,7 @@ export default {
       },
     ],
     visualizations: [
-      {
-        id: 'VideoEmbed',
-        title: "Concavity and the 2nd Derivative Test",
-        props: { url: "" }
-      },],
+      ],
   },
 
   examples: [
