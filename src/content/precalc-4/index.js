@@ -1,4 +1,5 @@
 import exponentialFunctions from './exponential-functions.js'
+import naturalBaseEAndLn from './natural-base-e-and-ln.js'
 import logarithmsIntro from './logarithms-intro.js'
 import logProperties from './log-properties.js'
 import solvingExponentialLog from './solving-exponential-log.js'
@@ -13,6 +14,7 @@ export default {
   color: 'amber',
   lessons: [
     exponentialFunctions,
+    naturalBaseEAndLn,
     logarithmsIntro,
     logProperties,
     solvingExponentialLog,

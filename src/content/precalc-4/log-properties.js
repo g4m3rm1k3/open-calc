@@ -1,8 +1,8 @@
 export default {
-  id: 'ch4-003',
+  id: 'ch4-004',
   slug: 'log-properties',
   chapter: 4,
-  order: 3,
+  order: 4,
   title: 'Properties of Logarithms: Why Every Rule Follows from the Exponent Laws',
   subtitle: 'Log properties are not arbitrary rules to memorise — each one is just an exponent law in disguise',
   tags: ['log properties', 'product rule', 'quotient rule', 'power rule', 'change of base', 'expand logarithms', 'condense logarithms', 'logarithm rules'],

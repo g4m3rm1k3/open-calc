@@ -1,8 +1,8 @@
 export default {
-  id: 'ch4-004',
+  id: 'ch4-005',
   slug: 'solving-exponential-log',
   chapter: 4,
-  order: 4,
+  order: 5,
   title: 'Solving Exponential and Logarithmic Equations',
   subtitle: 'Two moves unlock every equation in this family: take a log of both sides, or exponentiate both sides',
   tags: ['solving exponential equations', 'solving logarithmic equations', 'natural log', 'common log', 'extraneous solutions', 'one-to-one property', 'different bases'],

@@ -1,8 +1,8 @@
 export default {
-  id: 'ch4-005',
+  id: 'ch4-006',
   slug: 'exponential-applications',
   chapter: 4,
-  order: 5,
+  order: 6,
   title: 'Exponential Models: Growth, Decay, and Everything In Between',
   subtitle: 'One equation — $A = A_0 e^{kt}$ — models populations, radioactive decay, cooling, and more. The sign of $k$ decides everything.',
   tags: ['exponential growth', 'exponential decay', 'population growth', 'radioactive decay', 'half-life', 'doubling time', 'Newton law of cooling', 'logistic growth', 'carrying capacity', 'modeling'],

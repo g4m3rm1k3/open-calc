@@ -751,7 +751,6 @@ const VIZ_REGISTRY = {
   InverseDerivativeTriangle: lazy(
     () => import("./react/InverseDerivativeTriangle.jsx"),
   ),
-  VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
 };
 
 function VizSkeleton() {
