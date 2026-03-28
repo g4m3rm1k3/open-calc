@@ -1107,6 +1107,222 @@ function XtVtGraphs({ C }) {
   )
 }
 
+// ─── Projectile Arc (Ch3) ────────────────────────────────────────────────────
+// θ=45°, v₀=20 m/s, g=10 m/s² → R=40, hmax=10 (normalised units)
+
+function ProjectileArc({ C }) {
+  const W = 460, H = 220
+  const padL = 36, padR = 24, padT = 28, padB = 36
+  const plotW = W - padL - padR
+  const plotH = H - padT - padB
+
+  const R = 40, hmax = 10          // domain: x in [0,40], y in [0,10]
+  const xMax = 42, yMax = 13       // a little headroom
+  const ox = padL, oy = H - padB
+
+  const toSVG = (x, y) => [ox + (x / xMax) * plotW, oy - (y / yMax) * plotH]
+
+  // Parabola: y = x(R-x)*4hmax/R²
+  const arc = []
+  for (let x = 0; x <= R; x += 0.4) {
+    arc.push(toSVG(x, (4 * hmax / (R * R)) * x * (R - x)))
+  }
+  const arcPath = 'M ' + arc.map(p => p.join(',')).join(' L ')
+
+  // Key points
+  const [lx, ly] = toSVG(0, 0)          // launch
+  const [px, py] = toSVG(R / 2, hmax)   // peak
+  const [rx, ry] = toSVG(R, 0)          // landing
+
+  // Launch velocity arrows (45°: vx=vy in length, each 34px)
+  const vLen = 36
+  const vxEnd = [lx + vLen, ly]
+  const vyEnd = [lx, ly - vLen]
+  const v0End = [lx + vLen, ly - vLen]
+
+  // Peak: only horizontal vx arrow
+  const pvxEnd = [px + vLen * 0.8, py]
+
+  // hmax vertical dashed line (base x only — y is always oy)
+  const [hmx0] = toSVG(R / 2, 0)
+
+  // Arrow helper: tiny triangle head
+  const arrow = (x1, y1, x2, y2, col, w = 1.8) => {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy) || 1
+    const ux = dx / len, uy = dy / len
+    const px1 = x2 - ux * 8 - uy * 4
+    const py1 = y2 - uy * 8 + ux * 4
+    const px2 = x2 - ux * 8 + uy * 4
+    const py2 = y2 - uy * 8 - ux * 4
+    return (
+      <>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={col} strokeWidth={w} />
+        <polygon points={`${x2},${y2} ${px1},${py1} ${px2},${py2}`} fill={col} />
+      </>
+    )
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Axes */}
+      <line x1={ox} y1={oy} x2={ox + plotW + 10} y2={oy} stroke={C.border} strokeWidth={1.5} />
+      <line x1={ox} y1={oy} x2={ox} y2={padT - 8} stroke={C.border} strokeWidth={1.5} />
+      <text x={ox + plotW + 13} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">x</text>
+      <text x={ox - 4} y={padT - 10} fill={C.muted} fontSize={10} fontFamily="sans-serif">y</text>
+
+      {/* Range label on x-axis */}
+      <line x1={lx} y1={oy + 8} x2={rx} y2={oy + 8} stroke={C.muted} strokeWidth={1} />
+      <text x={(lx + rx) / 2} y={oy + 20} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="monospace">
+        R = v₀²sin(2θ)/g
+      </text>
+
+      {/* hmax dashed vertical */}
+      <line x1={hmx0} y1={oy} x2={hmx0} y2={py} stroke={C.amber} strokeWidth={1.2} strokeDasharray="4,3" />
+      <text x={hmx0 + 5} y={(oy + py) / 2 + 4} fill={C.amber} fontSize={9} fontFamily="monospace">h</text>
+      <text x={hmx0 + 5} y={(oy + py) / 2 + 14} fill={C.amber} fontSize={9} fontFamily="monospace">max</text>
+
+      {/* Parabola */}
+      <path d={arcPath} stroke={C.brand} strokeWidth={2.5} fill="none" />
+
+      {/* Launch velocity decomposition */}
+      {arrow(lx, ly, ...v0End, C.text, 2)}
+      {arrow(lx, ly, ...vxEnd, C.emerald, 1.8)}
+      {arrow(lx, ly, ...vyEnd, C.rose, 1.8)}
+      {/* Dashed box */}
+      <line x1={lx} y1={vyEnd[1]} x2={v0End[0]} y2={v0End[1]} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
+      <line x1={vxEnd[0]} y1={vxEnd[1]} x2={v0End[0]} y2={v0End[1]} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
+
+      {/* Labels at launch */}
+      <text x={lx + vLen / 2} y={ly + 14} textAnchor="middle" fill={C.emerald} fontSize={9} fontFamily="monospace">vₓ = v₀cosθ</text>
+      <text x={lx - 6} y={ly - vLen / 2} textAnchor="end" fill={C.rose} fontSize={9} fontFamily="monospace">vᵧ = v₀sinθ</text>
+      <text x={v0End[0] + 5} y={v0End[1] - 4} fill={C.text} fontSize={10} fontFamily="monospace">v₀</text>
+      {/* θ label */}
+      <text x={lx + 14} y={ly - 8} fill={C.muted} fontSize={10} fontFamily="monospace">θ</text>
+
+      {/* Peak vx arrow */}
+      {arrow(px, py, ...pvxEnd, C.emerald, 1.8)}
+      <text x={pvxEnd[0] + 5} y={py + 4} fill={C.emerald} fontSize={9} fontFamily="monospace">vₓ (const)</text>
+      {/* Peak dot */}
+      <circle cx={px} cy={py} r={3} fill={C.amber} />
+      <text x={px} y={py - 8} textAnchor="middle" fill={C.amber} fontSize={9} fontFamily="monospace">vᵧ = 0</text>
+
+      {/* Landing dot */}
+      <circle cx={rx} cy={ry} r={3} fill={C.brand} />
+
+      {/* Launch dot */}
+      <circle cx={lx} cy={ly} r={3} fill={C.brand} />
+
+      {/* Footer */}
+      <text x={W / 2} y={H - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        x and y motions are independent — time t is the shared parameter
+      </text>
+    </svg>
+  )
+}
+
+// ─── Circular Motion (Ch3) ───────────────────────────────────────────────────
+
+function CircularMotionDiagram({ C }) {
+  const W = 460, H = 220
+  const cx = 180, cy = 110, r = 75   // circle center and radius
+
+  // Point P at 45° (upper-right of circle)
+  const angle = -Math.PI / 4   // -45° from x-axis → upper right in SVG (y inverts)
+  const px = cx + r * Math.cos(angle)
+  const py = cy + r * Math.sin(angle)
+
+  // Velocity vector: tangent to circle, perpendicular to radius, CCW direction
+  // Tangent direction (CCW): (-sin(angle), cos(angle))  → in SVG (sin flipped for y)
+  const vLen = 54
+  const tvx = -Math.sin(angle)  // tangent x component
+  const tvy = Math.cos(angle)   // tangent y component (SVG y-down)
+  const vex = px + tvx * vLen
+  const vey = py + tvy * vLen
+
+  // Centripetal acceleration: from P toward center
+  const acLen = 44
+  const acx = px + (cx - px) / r * acLen
+  const acy = py + (cy - py) / r * acLen
+
+  // Radius line
+  const arrow = (x1, y1, x2, y2, col, w = 2) => {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy) || 1
+    const ux = dx / len, uy = dy / len
+    const p1x = x2 - ux * 9 - uy * 4
+    const p1y = y2 - uy * 9 + ux * 4
+    const p2x = x2 - ux * 9 + uy * 4
+    const p2y = y2 - uy * 9 - ux * 4
+    return (
+      <>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={col} strokeWidth={w} />
+        <polygon points={`${x2},${y2} ${p1x},${p1y} ${p2x},${p2y}`} fill={col} />
+      </>
+    )
+  }
+
+  // ω arc indicator (small arc in upper-left quadrant of circle)
+  const arcR = 22
+  const omegaArc = `M ${cx + arcR} ${cy} A ${arcR} ${arcR} 0 0 0 ${cx} ${cy - arcR}`
+
+  // Period arc + right-side info panel
+  const infoX = 300
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Circle */}
+      <circle cx={cx} cy={cy} r={r} stroke={C.border} strokeWidth={1.8} fill="none" />
+
+      {/* Center dot */}
+      <circle cx={cx} cy={cy} r={3} fill={C.muted} />
+      <text x={cx - 8} y={cy + 14} fill={C.muted} fontSize={9} fontFamily="monospace">O</text>
+
+      {/* Radius line */}
+      <line x1={cx} y1={cy} x2={px} y2={py} stroke={C.muted} strokeWidth={1.2} strokeDasharray="5,3" />
+      <text x={(cx + px) / 2 - 14} y={(cy + py) / 2 - 4} fill={C.muted} fontSize={10} fontFamily="monospace">r</text>
+
+      {/* ω rotation arc */}
+      <path d={omegaArc} stroke={C.amber} strokeWidth={1.5} fill="none" strokeDasharray="3,2" />
+      <text x={cx - 12} y={cy - arcR - 4} fill={C.amber} fontSize={10} fontFamily="monospace">ω</text>
+
+      {/* Velocity arrow (tangent) */}
+      {arrow(px, py, vex, vey, C.emerald)}
+      <text x={vex + 5} y={vey - 4} fill={C.emerald} fontSize={10} fontFamily="monospace">v</text>
+
+      {/* Centripetal acceleration arrow */}
+      {arrow(px, py, acx, acy, C.rose)}
+      <text x={acx + 5} y={acy + 4} fill={C.rose} fontSize={9} fontFamily="monospace">aᶜ</text>
+
+      {/* Point P */}
+      <circle cx={px} cy={py} r={4} fill={C.brand} />
+      <text x={px + 6} y={py - 8} fill={C.brand} fontSize={10} fontFamily="monospace">P</text>
+
+      {/* Info panel */}
+      <line x1={infoX - 12} y1={28} x2={infoX - 12} y2={H - 28} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+
+      <text x={infoX} y={44} fill={C.text} fontSize={10} fontFamily="monospace" fontWeight="bold">Key formulas</text>
+      <text x={infoX} y={64} fill={C.emerald} fontSize={10} fontFamily="monospace">v = 2πr / T = ωr</text>
+      <text x={infoX} y={82} fill={C.rose} fontSize={10} fontFamily="monospace">aᶜ = v²/r = ω²r</text>
+      <text x={infoX} y={100} fill={C.amber} fontSize={10} fontFamily="monospace">ω = 2π / T</text>
+      <text x={infoX} y={118} fill={C.muted} fontSize={10} fontFamily="monospace">T = period (s)</text>
+      <text x={infoX} y={136} fill={C.muted} fontSize={10} fontFamily="monospace">f = 1/T (Hz)</text>
+
+      <text x={infoX} y={160} fill={C.muted} fontSize={9} fontFamily="sans-serif">Direction of v: tangent</text>
+      <text x={infoX} y={174} fill={C.muted} fontSize={9} fontFamily="sans-serif">Direction of aᶜ: toward O</text>
+
+      {/* Footer */}
+      <text x={cx} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        |v| is constant; direction changes → centripetal acceleration
+      </text>
+    </svg>
+  )
+}
+
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
@@ -1131,6 +1347,9 @@ const DIAGRAMS = {
   // Orientation / Ch0
   'dimensions-equation':     DimensionsEquation,
   'xt-vt-graphs':            XtVtGraphs,
+  // 2D Motion / Ch3
+  'projectile-arc':          ProjectileArc,
+  'circular-motion':         CircularMotionDiagram,
 }
 
 export default function SVGDiagram({ params = {} }) {

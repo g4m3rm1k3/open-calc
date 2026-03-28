@@ -1,22 +1,7 @@
 import CH0 from "./chapter-0/index.js";
 import CH1 from "./chapter-1/index.js";
 import CH2 from "./chapter-2/index.js";
-
-// Motion in 2-D (Projectile & Circular)
-const CH3 = {
-  title: "Motion in 2-D",
-  number: "p3",
-  slug: "motion-2d",
-  lessons: [
-    { id: "p1-ch3-001", title: "Independence of x and y", slug: "independence-x-y" },
-    { id: "p1-ch3-002", title: "Projectile Motion Basics", slug: "projectile-basics" },
-    { id: "p1-ch3-005", title: "Finding the Range", slug: "projectile-range" },
-    { id: "p1-ch3-010", title: "Finding the Max Height", slug: "projectile-height" },
-    { id: "p1-ch3-100", title: "Projectile Worked Examples", slug: "projectile-examples" },
-    { id: "p1-ch3-016", title: "Uniform Circular Motion", slug: "circular-motion" },
-    { id: "p1-ch3-018", title: "Centripetal Acceleration", slug: "centripetal-accel" },
-  ],
-};
+import CH3 from "./chapter-3/index.js";
 
 // Newtonian Mechanics
 const CH4 = {
