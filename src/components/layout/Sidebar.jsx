@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { Link, useParams, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical, Pin, PinOff } from 'lucide-react';
 import { CURRICULUM, COURSES } from '../../content/index.js'
 import { useProgress } from '../../hooks/useProgress.js'
@@ -28,7 +28,6 @@ const CHAPTER_COLORS = {
 }
 
 export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, onSearchOpen }) {
-  const params = useParams()
   const location = useLocation()
   const { getLessonStatus } = useProgress()
 
@@ -36,16 +35,17 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   const activeLinkRef = useRef(null)
   const [hovered, setHovered] = useState(false)
 
-  const activeChapter = params.chapterId ? String(params.chapterId) : null
-  const activeSlug = params.lessonSlug ?? params['*']
-  const chapterMatch = location.pathname.match(/\/chapter\/([^/]+)/)
-  const chapterFromPath = chapterMatch?.[1] ?? null
-  const chapterCandidate = activeChapter ?? chapterFromPath
+  // Parse chapter and lesson from the current URL path directly.
+  // Works because Sidebar lives outside the Route tree (in AppShell),
+  // so useParams() is always empty — useLocation() is the reliable source.
+  const pathMatch = location.pathname.match(/^\/chapter\/([^/]+)(?:\/([^/]+))?/)
+  const activeChapter = pathMatch?.[1] ?? null
+  const activeSlug = pathMatch?.[2] ?? null
 
-  // Determine which course we are in based on active chapter or URL
+  // Determine which course we are in based on active chapter
   let activeCourse = 'calc'
-  if (chapterCandidate) {
-    const chObj = CURRICULUM.find(c => String(c.number) === chapterCandidate)
+  if (activeChapter) {
+    const chObj = CURRICULUM.find(c => String(c.number) === activeChapter)
     if (chObj) activeCourse = chObj.course
   } else {
     // Heuristic for landing pages (paths that don't have chapterId yet)
@@ -60,14 +60,22 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   const courseDesc = activeCourseObj.desc
   const courseHomePath = activeCourseObj.path
 
-  // Auto-scroll to active lesson when not hovering
+  // Auto-scroll to active lesson on route change and initial mount
   useEffect(() => {
     if (hovered) return
     const id = setTimeout(() => {
-      activeLinkRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }, 50)
+      activeLinkRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 80)
     return () => clearTimeout(id)
   }, [activeChapter, activeSlug, hovered])
+
+  // Also fire once on mount (hard-refresh / initial load)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      activeLinkRef.current?.scrollIntoView({ behavior: 'instant', block: 'center' })
+    }, 150)
+    return () => clearTimeout(id)
+  }, [])
 
   return (
     <nav
