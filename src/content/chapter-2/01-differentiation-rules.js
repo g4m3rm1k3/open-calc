@@ -29,6 +29,10 @@ export default {
       'Second and higher derivatives are just what you get by differentiating again. If f\'(x) is the derivative of f, then f\'\'(x) is the derivative of f\', called the second derivative. It measures the rate of change of the rate of change — geometrically, it measures concavity. The notation f\'\'(x) = d\u00b2y/dx\u00b2 (read "d two y d x squared") looks like a fraction raised to a power but is actually a separate operator applied twice.',
 
       '**Where this is heading:** Power, product, and quotient rules handle functions that are added, multiplied, or divided. But what about functions built by *nesting* — like sin(x²) or e^(3x) or √(x³+1)? The rules you just learned cannot reach inside those outer wrappers. The next lesson — the chain rule — is the key that unlocks every composed function in calculus.',
+
+      'It is worth pausing to appreciate what these rules actually are. Each one is a theorem — a mathematical fact with a proof. The power rule was proved by expanding (x+h)^n with the Binomial Theorem, cancelling, dividing by h, and taking the limit. The product rule was proved using an "add-zero" trick inside the difference quotient. The quotient rule follows from the product rule applied to f(x) times (1/g(x)). Crucially, each proof was done once and only once. From now on you can apply these rules to any differentiable function in their domain without returning to limits. This is how mathematics works: hard work done once at the foundation level earns you effortless tools forever after. Every time you write d/dx[x^7] = 7x^6 in a two-second step, you are cashing in a proof that someone (Newton, Leibniz, their successors) worked hard to establish.',
+
+      'The second derivative deserves special attention because it is not just a curiosity — it carries independent geometric meaning. If f\'(x) tells you the slope of f at x, then f\'\'(x) tells you how that slope is changing. Geometrically, f\'\'(x) > 0 means the slope is increasing as you move right, which means the curve is bending upward (concave up, like the inside of a bowl). f\'\'(x) < 0 means the slope is decreasing, so the curve bends downward (concave down, like the outside of a bowl). A point where f\'\'(x) changes sign is called an inflection point — the curve switches from concave up to concave down or vice versa. Physically, if f(t) is position, then f\'(t) is velocity and f\'\'(t) is acceleration. Acceleration is the rate of change of the rate of change — exactly what the second derivative captures. This triple relationship (position, velocity, acceleration) will come up in physics, differential equations, and optimization for the rest of your STEM career.',
     ],
     callouts: [
       {
@@ -56,32 +60,32 @@ export default {
       {
         id: 'DerivativeRuleArenaGame',
         title: 'Derivative Rule Arena',
-        mathBridge: 'Before you can apply rules quickly, you need to identify WHICH rule applies. The first skill is not computation — it is classification: is the outermost operation a sum? a product? a quotient? a composition? This game trains your eye to see the structure of a function before touching any algebra. You will find that once rule recognition is automatic, the computation is mechanical.',
-        caption: 'Train fast rule recognition before symbolic computation: pick the right opening rule under pressure.',
+        mathBridge: 'Before you touch any algebra, practice this habit: look at the function and ask "what is the outermost operation?" For $3x^4 + 2x$, the outermost operation is addition, so the sum rule fires first and you split term by term. For $x^2 \\sin x$, the outermost is multiplication, so the product rule fires. For $(x^2+1)^5$, the outermost is "raise to a power" applied to a non-trivial inside — that is a chain rule situation (which you will learn next lesson). This game presents functions one at a time. Your only job: identify the correct first rule under time pressure. Correct classification before any algebra is the single most important habit in all of differentiation.',
+        caption: 'Each function flashes for 5 seconds. Pick the correct opening rule: sum/difference, constant multiple, product, or quotient. Speed and accuracy both count — this trains the pattern recognition that makes computation effortless.',
       },
       {
         id: 'PowerRulePattern',
         title: 'Power Rule Pattern',
-        mathBridge: 'Adjust the exponent $n$ with the slider and watch both $f(x) = x^n$ and $f\'(x) = nx^{n-1}$ update. Notice: the derivative is always one degree lower, and the coefficient is always the original exponent. When $n = 0$, $f$ is a constant and $f\' = 0$. When $n = 1$, $f = x$ and $f\' = 1$. When $n = -1$, $f = 1/x$ and $f\' = -1/x^2$. The pattern holds for every real $n$ — positive, negative, or fractional.',
-        caption: 'Adjust n to see how f(x) = xⁿ and its derivative nxⁿ⁻¹ relate. Notice the degree drops by exactly 1 each time.',
+        mathBridge: 'Do this experiment: drag $n$ through the values 1, 2, 3, 4 and read the displayed derivative formula each time. You should see: $x^1 \\to 1$, $x^2 \\to 2x$, $x^3 \\to 3x^2$, $x^4 \\to 4x^3$. The pattern is exact — the exponent drops down as a coefficient and the new exponent is one less. Now try $n = 0$: the derivative is 0 because $x^0 = 1$ is a constant. Try $n = -1$: you get $-1 \\cdot x^{-2} = -1/x^2$ — the power rule still works for negative exponents. Try $n = 0.5$: you get $0.5 x^{-0.5} = 1/(2\\sqrt{x})$ — it works for fractions too. The rule $d/dx[x^n] = nx^{n-1}$ is universal for all real $n$.',
+        caption: 'Drag n through integers first, then try negative and fractional values. The formula nxⁿ⁻¹ holds for every real n — watch the graph and formula update together to confirm it is not a coincidence.',
       },
       {
         id: 'ProductRuleRectangle',
         title: 'Why the Product Rule Works — The Rectangle Proof',
-        mathBridge: 'Think of $f(x) \\cdot g(x)$ as the area of a rectangle with side lengths $f(x)$ and $g(x)$. When $x$ increases by a small $h$: $f$ grows by $\\Delta f \\approx f\'h$ and $g$ grows by $\\Delta g \\approx g\'h$. The new area is $(f + \\Delta f)(g + \\Delta g) = fg + f\\Delta g + g\\Delta f + \\Delta f \\Delta g$. The last term is proportional to $h^2$ and vanishes as $h \\to 0$. What remains: $\\Delta(fg)/h \\to f\'g + fg\'$. That is the product rule — not a formula to memorize, but geometry made algebraic.',
-        caption: 'f(x)·g(x) is the area of a rectangle. When x changes, the area grows by f·Δg + g·Δf + a tiny corner (Δf·Δg). As Δx→0, the corner vanishes, giving (fg)\' = f\'g + fg\'.',
+        mathBridge: 'Watch this carefully — it explains WHY the product rule is not just $f\'g\'$. The rectangle has width $f(x)$ and height $g(x)$, so its area is $f \\cdot g$. Now increase $x$ slightly: $f$ grows by a thin strip on the right (area $g \\cdot \\Delta f$), and $g$ grows by a thin strip on top (area $f \\cdot \\Delta g$). There is also a tiny corner square of area $\\Delta f \\cdot \\Delta g$. Total change in area: $g\\Delta f + f\\Delta g + \\Delta f\\Delta g$. Divide by $\\Delta x$ and take the limit: the corner square term $\\Delta f \\cdot \\Delta g / \\Delta x \\to 0$ because it is second-order small. What remains is $g \\cdot f\' + f \\cdot g\'$. This is the product rule — not a formula you memorize but a consequence of area growing in two strips simultaneously. Ask yourself: which strip corresponds to which term in $(fg)\'= f\'g + fg\'$?',
+        caption: 'Use the slider to grow x. Watch the rectangle expand: the two thin strips give gf\' and fg\', the tiny corner gives Δf·Δg which vanishes. The product rule is the algebra of those two surviving strips.',
       },
       {
         id: 'ProjectileMotion',
         title: 'Projectile Motion — Derivatives in Physics',
-        mathBridge: 'The height of a projectile is $h(t) = v_0 \\sin(\\theta) \\cdot t - \\tfrac{1}{2}g t^2$ — a polynomial in $t$ when $\\theta$ is fixed. Differentiating: $h\'(t) = v_0 \\sin(\\theta) - gt$ is the vertical velocity, which is zero at maximum height. Differentiating again: $h\'\'(t) = -g$ is the (constant) downward acceleration of gravity. This single example shows all three derivatives — position, velocity, acceleration — in one coherent physical picture.',
-        caption: 'Adjust the launch angle and speed. The height function h(t) = v·sin(θ)·t − ½gt² is a polynomial — differentiate it to find max height and landing time.',
+        mathBridge: 'Here is how to read this visualization as a calculus exercise. The height function is $h(t) = v_0 \\sin(\\theta)\\cdot t - \\tfrac{1}{2}g t^2$. Treat this as a polynomial in $t$ (with $v_0$, $\\theta$, $g$ as constants). Step 1: Apply the sum rule — differentiate term by term. Step 2: For the first term $v_0 \\sin(\\theta)\\cdot t$, the constant multiple rule gives $v_0 \\sin(\\theta)\\cdot 1 = v_0 \\sin(\\theta)$. Step 3: For the second term $\\tfrac{1}{2}g t^2$, the power rule gives $g t$. Step 4: The derivative is $h\'(t) = v_0 \\sin(\\theta) - gt$. This is the vertical velocity. Step 5: Set $h\'(t) = 0$ to find the time of maximum height: $t_{\\max} = v_0 \\sin(\\theta)/g$. Now use the slider to change $\\theta$ and watch $t_{\\max}$ move. Differentiating again: $h\'\'(t) = -g$ — constant downward acceleration, exactly $-9.8$ m/s\u00b2. Three differentiation rules, one physical story.',
+        caption: 'Set launch angle and speed. Find max height by solving h\'(t) = 0 — that is the power rule plus setting a derivative to zero. Watch the parabola shape and landing time update: all of it is polynomial differentiation.',
       },
       {
         id: 'SlopeField',
         title: 'Slope Field — The Derivative as a Function',
-        mathBridge: 'The derivative $f\'(x)$ is not just a slope at one point — it defines a slope at EVERY point on the curve simultaneously. Each tiny segment in this field is drawn with the actual slope $f\'(x)$ at that $x$. Notice: where $f\'(x) = 0$, the segments are horizontal (flat); where $f\'(x)$ is large, the segments are steep. The slope field is a portrait of the derivative function, visualized geometrically across the whole domain.',
-        caption: 'The derivative is not just a number at one point — it defines a slope at EVERY point. This slope field shows tiny line segments colored by the derivative value.',
+        mathBridge: 'Use the function dropdown to select $f(x) = x^2$. Look at the slope field: each tiny segment is drawn with slope $f\'(x) = 2x$ at that $x$. Do the following checks: (1) At $x = 0$, the segments should be horizontal — confirm that $f\'(0) = 2(0) = 0$. (2) At $x = 1$, segments should slope upward at 45 degrees (slope = 2) — confirm $f\'(1) = 2$. (3) At $x = -1$, segments slope downward (slope = -2). (4) Now switch to $f(x) = x^3$. The derivative is $3x^2$, which is always non-negative — so no segment should point downward. Verify this. (5) Switch to a constant function — every segment should be perfectly flat. The slope field makes the derivative function visible as a field of directions rather than a single number.',
+        caption: 'Select different functions and read the slope field. At every x, the segment angle equals f\'(x). Find the x-values where segments are flat (f\'=0), steep (f\' large), and tilting left (f\'<0). This trains you to read derivative information geometrically.',
       },
     ],
   },
@@ -707,26 +711,31 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch2-tangent-problem",
-            "label": "Previous: Derivative from the Limit Definition",
-            "note": "The power rule d/dx[xⁿ]=nxⁿ⁻¹ was previewed by computing xⁿ derivatives from the definition. This lesson gives you the shortcut so you never have to use the limit definition again for these forms."
-        }
+    recoveryPoints: [
+      {
+        lessonId: 'ch2-tangent-problem',
+        label: 'Limit definition of the derivative (previous lesson)',
+        note: 'Every rule in this lesson is a theorem proved from the limit definition. The power rule d/dx[x\u207f]=nx\u207f\u207b\u00b9 was previewed by computing x\u207f derivatives from the definition. This lesson gives you the shortcuts so you never have to grind through limits again, but knowing they come from limits tells you when they apply and why.'
+      },
+      {
+        lessonId: 'ch0-algebra',
+        label: 'Algebra of polynomials (Chapter 0)',
+        note: 'Applying the power and sum rules to polynomials is purely mechanical algebra — expanding, collecting like terms, and reading off coefficients. If polynomial arithmetic feels slow, a few minutes of review now will pay off across every problem in this lesson.'
+      }
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch2-chain-rule",
-            "label": "Next: Chain Rule",
-            "note": "The chain rule extends differentiation rules to compositions. Without it, you cannot differentiate sin(x²) or e^(3x). Every composite function requires the chain rule layered on top of the rules here."
-        },
-        {
-            "lessonId": "ch3-related-rates",
-            "label": "Ch. 3: Related Rates",
-            "note": "Related rates uses these rules in implicit differentiation with t as the independent variable. Mastering them here makes Ch. 3 far more mechanical."
-        }
+    futureLinks: [
+      {
+        lessonId: 'ch2-chain-rule',
+        label: 'Chain rule (next lesson)',
+        note: 'The chain rule extends these rules to composed functions. Without it, you cannot differentiate sin(x\u00b2) or e^(3x). Every rule from this lesson combines with the chain rule when functions are nested — you will use all of them again immediately.'
+      },
+      {
+        lessonId: 'ch3-related-rates',
+        label: 'Trig derivatives',
+        note: 'Derivatives of sin, cos, tan etc. require the chain rule plus the sum and constant-multiple rules you learn here. This lesson is a direct prerequisite for all trig differentiation and related rates.'
+      }
     ]
-},
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {

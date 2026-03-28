@@ -8,6 +8,17 @@ export default {
   tags: ['inverse functions', 'derivative of inverse', 'arcsin', 'arccos', 'arctan', 'implicit differentiation', 'domain restriction', 'monotone', 'one-to-one', 'horizontal line test'],
   aliases: 'section 3.7 derivative of inverse function formal proof inverse trig derivatives arcsin arccos arctan inverse trig derivatives, finding inverse, f inverse prime, 1 over f prime',
 
+  spiral: {
+    recoveryPoints: [
+      { label: 'Exp/Log Derivatives (previous lesson)', note: 'ln(x) is the inverse of e^x, and its derivative 1/x was derived here by implicit differentiation of e^y = x. That argument is exactly the general inverse-derivative theorem applied to one specific function.' },
+      { label: 'Domain Restrictions (Chapter 0)', note: 'sin(x) is not one-to-one on all of ℝ, so arcsin only exists on a restricted domain [−π/2, π/2]. The choice of principal branch is a domain-restriction decision from precalculus that must be in place before calculus can proceed.' },
+    ],
+    futureLinks: [
+      { label: 'Implicit Differentiation (Lesson 9)', note: 'The derivation of every inverse trig derivative uses implicit differentiation — differentiating both sides of an equation like tan(y)=x. Implicit differentiation is the same chain-rule logic applied to equations rather than explicit formulas.' },
+      { label: 'Integration (Chapter 4)', note: 'arctan(x) and arcsin(x) appear constantly as antiderivatives: ∫1/(1+x²) dx = arctan(x)+C and ∫1/√(1−x²) dx = arcsin(x)+C. Knowing their derivatives from this chapter makes recognizing those integral patterns automatic.' },
+    ],
+  },
+
   hook: {
     question: 'If a function maps x to y, how do slopes transform when we reverse that mapping and view x as a function of y?',
     realWorldContext:
@@ -31,6 +42,10 @@ export default {
       'Here is the single most important visual fact: the graph of $f^{-1}$ is the graph of $f$ reflected across the line $y = x$. Every point $(a, b)$ on $f$ becomes the point $(b, a)$ on $f^{-1}$. That reflection is not a trick — it is the geometric meaning of swapping input and output.',
       'But there is an immediate problem. If $f$ ever produces the same output from two different inputs — say $f(2) = 9$ and $f(-2) = 9$ — then the "undo" machine is confused: given output $9$, does it return $2$ or $-2$? It cannot do both and still be a function. This is why we need the function to be one-to-one: each output must come from exactly one input.',
       'The quick visual check is the horizontal line test. Draw any horizontal line across the graph of $f$. If any horizontal line hits the graph more than once, $f$ is not one-to-one and has no inverse on that full domain.',
+
+      '**Deriving d/dx[arctan(x)] step by step:** This derivation uses the same implicit-differentiation move that produced d/dx[ln(x)], but now applied to the arctangent. Step 1: let y = arctan(x). By the definition of arctan, this means tan(y) = x, with y restricted to (−π/2, π/2). Step 2: differentiate both sides of tan(y) = x with respect to x. The right side gives 1. The left side requires the chain rule on tan(y) — its derivative is sec²(y)·(dy/dx). So: sec²(y)·(dy/dx) = 1. Step 3: solve for dy/dx: dy/dx = 1/sec²(y) = cos²(y). Step 4: convert cos²(y) back to an expression in x. Since tan(y) = x, draw a right triangle with opposite side x and adjacent side 1, giving hypotenuse √(1+x²). Then cos(y) = 1/√(1+x²), so cos²(y) = 1/(1+x²). Therefore d/dx[arctan(x)] = 1/(1+x²). This formula is valid for all real x, because arctan is defined and differentiable everywhere.',
+
+      '**A practical note: why arcsin and arctan matter for integration:** Knowing the derivatives d/dx[arcsin(x)] = 1/√(1−x²) and d/dx[arctan(x)] = 1/(1+x²) is not just an endpoint — it is a starting point for Chapter 4. Integration reverses differentiation: since d/dx[arctan(x)] = 1/(1+x²), the antiderivative of 1/(1+x²) is arctan(x)+C. Similarly, since d/dx[arcsin(x)] = 1/√(1−x²), the antiderivative of 1/√(1−x²) is arcsin(x)+C. These two integral formulas — ∫1/(1+x²)dx = arctan(x)+C and ∫1/√(1−x²)dx = arcsin(x)+C — appear constantly in calculus applications. Students who memorize the derivative formulas from this chapter recognize these integral patterns immediately in Chapter 4, while students who do not have to re-derive them each time.',
 
       '**Where this is heading:** You have now differentiated polynomials, trig, exponential/log, and inverse functions — a complete toolkit for every fundamental function type. The next lesson takes one final step: what if y is not even written explicitly as a function of x? That is implicit differentiation, and it is simply the chain rule applied to both sides of any equation.',
     ],
@@ -90,6 +105,7 @@ export default {
       {
         id: 'DualGraphSync',
         title: 'Reflection and Reciprocal Slopes (Symbolic View)',
+        mathBridge: 'Set f(x) = e^x. Find the point (1, e) on f. The inverse function ln(x) has the point (e, 1) — swapped coordinates. The slope of e^x at x=1 is e¹=e≈2.718. The slope of ln(x) at x=e is 1/e≈0.368. They are reciprocals: e × (1/e) = 1. This is the Inverse Function Theorem in action. Try other functions and verify: slope of f at (a,b) × slope of f⁻¹ at (b,a) = 1 always. Try f(x)=x³: the slope at (2,8) is 3(2²)=12, so the slope of f⁻¹ at (8,2) must be 1/12. Check it.',
         caption: 'As a point moves on f, the reflected point on f^(-1) shows reciprocal tangent slope at matching coordinates.',
       },
                   {

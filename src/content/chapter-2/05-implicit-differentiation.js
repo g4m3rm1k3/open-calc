@@ -4,6 +4,19 @@ export default {
   slug: 'implicit-differentiation',
   chapter: 2,
   order: 8,
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Chain Rule', note: 'The entire method is the chain rule applied to y as a function of x — d/dx[f(y)] = f\'(y)·dy/dx. Without the chain rule, implicit differentiation is impossible.' },
+      { label: 'Inverse Functions', note: 'Implicit differentiation was used to derive the arctan and arcsin derivative formulas by differentiating the identity sin(arcsin x)=x or tan(arctan x)=x implicitly.' },
+    ],
+    futureLinks: [
+      { label: 'Related Rates', note: 'Applying implicit differentiation to time-dependent equations — same technique, just replace dy/dx with dy/dt and x with x(t).' },
+      { label: 'Optimization with Constraints', note: 'Constrained optimization uses the implicit sensitivity dy/dx = -F_x/F_y to find how the constrained optimum changes with parameters.' },
+      { label: 'Curve Sketching', note: 'Implicit curves (ellipses, lemniscates, level curves) are sketched using the dy/dx formula derived here, together with sign analysis of the numerator and denominator.' },
+    ],
+  },
+
   title: 'Implicit Differentiation',
   subtitle: 'Finding dy/dx when y cannot be (or is not) solved for explicitly — the chain rule in disguise',
   tags: ['implicit differentiation', 'implicit function', 'dy/dx', 'circle', 'folium of Descartes', 'chain rule', 'tangent line to curve'],
@@ -29,6 +42,12 @@ export default {
       'The normal line to a curve at a point is perpendicular to the tangent line. If the tangent has slope m, the normal has slope -1/m. Normal lines appear in optics (reflections) and in differential geometry (evolutes and involutes).',
 
       '**Where this is heading:** You now know how to differentiate anything — explicit or implicit. The final synthesis lesson (Lesson 10) asks a different kind of question: given the *graph* of a function, what can you read directly about its derivatives, without any computation? That visual literacy closes Chapter 2.',
+
+      '**A hard implicit curve — the folium of Descartes:** The equation x\u00b3+y\u00b3=6xy is a genuinely hard implicit curve. Unlike the circle x\u00b2+y\u00b2=r\u00b2, you cannot split the folium into two explicit halves y = (something). There is no algebraic formula for y in terms of x. Yet implicit differentiation still delivers dy/dx = (2xy\u2212x\u00b2)/(y\u00b2\u22122xy) without any knowledge of what y explicitly is. The formula tells you the slope at any point (x,y) on the curve, even at points where the curve crosses itself (the origin, where the formula breaks down because both numerator and denominator vanish). This is the power of the method: the algebraic structure alone carries enough information to find the slope, without ever needing to solve for y.',
+
+      '**Finding d\u00b2y/dx\u00b2 implicitly:** To find the second derivative, differentiate dy/dx once more with respect to x, treating dy/dx as a function of x (and using the chain rule and quotient rule as needed), then substitute the known expression for dy/dx wherever it appears. For the circle x\u00b2+y\u00b2=r\u00b2: the first derivative is dy/dx = \u2212x/y. Differentiating again: d\u00b2y/dx\u00b2 = \u2212(y\u00b71 \u2212 x\u00b7dy/dx)/y\u00b2 = \u2212(y \u2212 x(\u2212x/y))/y\u00b2 = \u2212(y + x\u00b2/y)/y\u00b2 = \u2212(y\u00b2+x\u00b2)/y\u00b3 = \u2212r\u00b2/y\u00b3 (using x\u00b2+y\u00b2=r\u00b2). The second derivative is negative in the upper semicircle (y>0), confirming that the circle is concave down there, as expected geometrically.',
+
+      '**The big picture — constraint sensitivity:** The formula dy/dx = \u2212F_x/F_y (where F(x,y)=0 is the defining equation) is more than a calculation trick. It expresses the rate at which y must change to keep the constraint satisfied as x changes. In economics this is a marginal rate of substitution; in thermodynamics it is a thermodynamic slope along a level curve; in constrained optimization it appears in the Lagrange multiplier condition. The slope of a level curve of F is exactly \u2212F_x/F_y, and that quantity appears everywhere in multivariable calculus, optimization, and applied mathematics. Implicit differentiation is not just a technique for circles and ellipses \u2014 it is the foundational formula connecting partial derivatives to constrained rates of change.',
     ],
     callouts: [
       {
@@ -66,6 +85,7 @@ export default {
       {
         id: 'ImplicitDifferentiation',
         title: 'Step-by-Step Implicit Differentiation',
+        mathBridge: 'Walk through the five-step machine: (1) write the equation, (2) differentiate both sides term by term with chain rule on every y-term, (3) collect all dy/dx terms on one side, (4) factor out dy/dx, (5) divide. The viz shows each step. Pause after step 2 and verify you get the same intermediate expression before advancing — if your algebra does not match, back up and find the discrepancy. The most common mistake is forgetting the dy/dx factor on a y-term, so check every y-expression carefully.',
         caption: 'Walk through the machine-logic of differentiating both sides, applying the chain rule, and solving for dy/dx.',
       },
       {
@@ -77,6 +97,7 @@ export default {
         id: 'ImplicitCurveExplorer',
         props: { showCircle: true, showFolium: true, showTangentAtPoint: true },
         title: 'Implicit Curves and Their Tangent Lines',
+        mathBridge: 'Click on the circle x\u00b2+y\u00b2=25. The tangent at point (3,4): before interacting, compute it by hand \u2014 differentiate both sides, get 2x+2y(dy/dx)=0, solve to get dy/dx=\u2212x/y=\u22123/4. Now look at the viz \u2014 drag the point to (3,4) and read the slope. It should be \u22120.75. Does your hand calculation match? Try the point (0,5) \u2014 what slope do you predict? (Answer: 0, because the tangent is horizontal at the top of the circle.)',
         caption: 'Drag the point around the curve to see the tangent computed by implicit differentiation.',
       },
       {

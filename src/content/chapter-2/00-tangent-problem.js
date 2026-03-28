@@ -59,6 +59,12 @@ export default {
       'Mathematicians have invented several notations for the derivative, each with its own strengths. If y = f(x), then the derivative can be written as f\'(x) (read "f prime of x", due to Lagrange), or as dy/dx (Leibniz notation, emphasizing the ratio of infinitesimal changes), or as d/dx[f(x)] (operator notation), or as Df(x) (operator notation due to Euler), or even as y\u0307 (Newton\'s dot notation, used in physics for time derivatives). All of these mean exactly the same thing: the limit of the difference quotient. Leibniz notation dy/dx is especially useful when doing related rates and chain rule problems, because it behaves somewhat like a fraction (though it is not exactly one). Lagrange notation f\'(x) is compact and convenient for most algebraic work.',
 
       '**Where this is heading:** You now have the definition of the derivative and you can compute it for simple functions using the limit process. But computing (x+h)^100 - x^100 from scratch every time would be unbearable. The next lesson gives you the shortcut rules — proved from limits once, then used freely. After that, every derivative you compute will take seconds instead of pages.',
+
+      'Not every function has a derivative everywhere, and it is important to understand exactly when and why the derivative fails. There are three geometric failure modes for a continuous function. A corner is a point where the left-hand and right-hand difference quotients both converge but to different values — the classic example is f(x) = |x| at x = 0, where the left limit gives -1 and the right limit gives +1. A cusp is sharper than a corner: one or both one-sided difference quotients blow up to infinity, giving the graph a pointed tip — f(x) = x^(2/3) at x = 0 is the textbook example, where the tangent line would be vertical. A vertical tangent is a subtler case: the slope grows without bound in the same direction from both sides, so the "tangent line" would be a vertical line, which has undefined slope — f(x) = x^(1/3) at x = 0 exhibits this. In all three cases, the function is continuous but the limit of the difference quotient fails to be a finite real number, so f\'(a) does not exist.',
+
+      'There is a profound and one-directional relationship between differentiability and continuity: differentiability always implies continuity, but continuity does NOT always imply differentiability. The proof that differentiability implies continuity is short: write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). As x approaches a, the first factor approaches f\'(a) (a finite number, since f is differentiable), and the second factor approaches 0. Their product approaches f\'(a) times 0 = 0, so f(x) approaches f(a), which is exactly the definition of continuity. The converse fails because continuity only requires that the function has no jumps or holes — it says nothing about whether the graph has a well-defined direction (slope) at each point. The absolute value function |x| is the standard counterexample: perfectly continuous on all of R, but non-differentiable at x = 0 because of the corner.',
+
+      'A practical checklist for differentiability: before computing a derivative, ask three questions. (1) Is the function continuous at the point? If not, it cannot be differentiable. (2) Is there a corner, cusp, or vertical tangent? If so, the derivative does not exist there. (3) Is the function defined by cases (piecewise)? At the boundary between pieces, you must check that the one-sided derivatives match. Only if all three checks pass can you proceed to compute the derivative using the limit definition or the shortcut rules.',
     ],
     callouts: [
       {
@@ -111,20 +117,20 @@ export default {
                                                                                 {
         id: 'SecantToTangent',
         title: 'Secant Line → Tangent Line',
-        mathBridge: 'The secant line through $(a, f(a))$ and $(a+h, f(a+h))$ has slope $\\frac{f(a+h)-f(a)}{h}$ — the difference quotient. As $h \\to 0$, the second point slides toward the first and the secant rotates into the tangent line. The derivative $f\'(a)$ is the limiting slope of that rotation.',
-        caption: 'Drag h toward 0. The secant slope converges to the derivative — the tangent slope.',
+        mathBridge: 'Step 1: Set the point $a$ using the slider and notice the two points on the curve. Step 2: Drag $h$ from 1 down to 0.1, then 0.01. Watch the displayed slope value in the box — it is computing $[f(a+h)-f(a)]/h$ live. Step 3: Notice that the slope is settling toward a specific number before you even reach $h=0$. That settled value IS the derivative $f\'(a)$. Step 4: Now try to set $h$ exactly to 0. The display shows "undefined" — because $0/0$ is not a number. The key insight: the derivative exists at the limit, not at $h=0$ itself. The secant becomes the tangent in the limiting position, not by ever touching it.',
+        caption: 'Drag h from 1 down toward 0. Watch the secant slope number stabilize — that limiting value is f\'(a). Notice that "undefined" appears at h=0 exactly, confirming why we need a limit rather than direct substitution.',
       },
       {
         id: 'PositionVelocityAcceleration',
         title: 'Position, Velocity, and Acceleration — Live',
-        mathBridge: 'If $s(t)$ is position, then $v(t) = s\'(t) = \\frac{ds}{dt}$ is velocity, and $a(t) = v\'(t) = s\'\'(t)$ is acceleration. Each graph is the derivative of the one above it. When the position curve bends upward, the velocity is positive; when position peaks, velocity is zero — because the tangent slope at a maximum is zero.',
-        caption: 'Watch the car move and see all three graphs update in real time. Velocity is the derivative of position; acceleration is the derivative of velocity.',
+        mathBridge: 'Do this in sequence. First, pause the animation and drag the time slider slowly. Watch the position graph: when it slopes upward, the car moves forward. Now look at the velocity graph directly below it — notice it is POSITIVE during those upward-sloping stretches. Step 2: Find the moment the position graph peaks (changes from rising to falling). What is the velocity at that exact instant? It is zero — because the slope of the tangent at a maximum is horizontal. Step 3: Now watch the acceleration graph. When velocity is increasing, acceleration is positive. When velocity decreases (even if positive), acceleration is negative. The acceleration graph is the derivative of velocity, which is the second derivative of position. Every relationship between these three graphs is a derivative relationship.',
+        caption: 'Pause and drag the time slider. At every moment, the velocity graph value equals the slope of the position curve above it. At every position peak, velocity is zero. At every velocity peak, acceleration is zero.',
       },
       {
         id: 'LimitBridgeLab',
         title: 'Instantaneous Change Bridge Lab',
-        mathBridge: 'Average rate of change over $[a, a+h]$ is $\\frac{f(a+h)-f(a)}{h}$. Instantaneous rate is $\\lim_{h \\to 0} \\frac{f(a+h)-f(a)}{h}$. This lab makes that transition visible: as $h$ shrinks, the "average" calculation becomes indistinguishable from the derivative.',
-        caption: 'Practice shrinking a two-point measurement into a single-point slope using an interactive approach slider.',
+        mathBridge: 'This lab has three columns: the $h$ value you set, the computed difference quotient $[f(a+h)-f(a)]/h$, and the error compared to the true derivative. Here is what to do: (1) Start with $h = 1$ — the difference quotient is a rough average over a wide interval. (2) Halve $h$ repeatedly: 0.5, 0.25, 0.1, 0.01, 0.001. Watch the middle column converge to a fixed number. That number is $f\'(a)$. (3) Notice the error column shrinks proportionally to $h$ — this is called first-order convergence and it confirms the limit exists. (4) Try a different function using the dropdown and repeat. Every function that is differentiable at $a$ will show the same convergence behavior. Functions with corners (like $|x|$ at 0) will NOT converge — they will show the left and right averages converging to different values.',
+        caption: 'Choose a function and shrink h from 1 to 0.001. The middle column converges to f\'(a) — that convergence IS the definition of the derivative. Functions with corners will show the column failing to settle.',
       },
     ],
   },
@@ -662,13 +668,13 @@ export default {
     recoveryPoints: [
       {
         lessonId: 'ch0-lines',
-        label: 'Chapter 0: Lines and Slope',
-        note: '\u0394y/\u0394x is the slope of a line through two points. That is the difference quotient with h fixed. The derivative is the same formula but h \u2192 0. Lines don\'t need a limit because their slope is already constant. Curves do, because their slope changes at every point.'
+        label: 'Slope formula (Chapter 0)',
+        note: 'The difference quotient [f(x+h)-f(x)]/h IS the slope formula \u0394y/\u0394x with \u0394x = h. \u0394y/\u0394x is the slope of a line through two points — the derivative is that formula with h \u2192 0. If slope between two points feels rusty, review it now: lines have constant slope, curves need a limit because slope changes at every point.'
       },
       {
         lessonId: 'ch1-limits-intro',
-        label: 'Chapter 1: Introduction to Limits',
-        note: 'The 0/0 indeterminate form you met in Chapter 1 is the exact same one in the difference quotient. The technique is the same: expand, cancel the h, then substitute. The limit is the engine of the derivative. If you feel shaky on limits, now is the time to revisit them — because you will use them in every single derivative calculation.'
+        label: 'Limits (Chapter 1)',
+        note: 'The derivative is defined as a limit. The 0/0 indeterminate form and the algebra of cancelling h in the difference quotient are the exact same techniques from Chapter 1. If you feel shaky on limits, revisit them now — you will use them in every derivative calculation in this lesson.'
       },
       {
         lessonId: 'ch1-continuity',
@@ -679,13 +685,13 @@ export default {
     futureLinks: [
       {
         lessonId: 'ch2-differentiation-rules',
-        label: 'Coming next: Differentiation Rules',
-        note: 'Computing derivatives from the limit definition every time is tedious. Chapter 2 gives you systematic shortcuts (power rule, product rule, chain rule) that you will use thousands of times. Each rule can be proved from the limit definition you learn here.'
+        label: 'Differentiation rules (next lesson)',
+        note: 'Every shortcut rule (power, product, quotient) is a theorem proved exactly once from the limit definition you learn here, then used freely ever after. Computing (x+h)^100 from scratch would take a page; the power rule makes it three seconds.'
       },
       {
         lessonId: 'ch5-integration-intro',
-        label: 'Far ahead: Integration — The Reverse Derivative',
-        note: 'The integral is the "un-derivative." The Fundamental Theorem of Calculus will show that integration and differentiation are inverse operations — and that connection, when it clicks, is one of the most beautiful ideas in mathematics. You need a firm grip on the derivative to appreciate that reversal.'
+        label: 'Chain rule',
+        note: 'The chain rule depends on understanding that the limit process is the foundation of every derivative — knowing why the definition works makes the chain rule proof transparent. The limit definition you master here is the starting point for every derivative rule in the course.'
       }
     ]
   },

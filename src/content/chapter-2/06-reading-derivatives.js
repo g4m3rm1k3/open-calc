@@ -3,6 +3,19 @@ export default {
   slug: "reading-derivatives",
   chapter: 2,
   order: 9,
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'All Differentiation Rules', note: 'You need to be able to compute derivatives to verify your visual readings algebraically — every differentiation rule you learned is a tool for confirming what you see in the graph.' },
+      { label: 'Slope and Tangent Line', note: 'The derivative f\'(x) is defined as the slope of the tangent line at x. Reading f\' from a graph is reading the slope of the tangent at each point.' },
+    ],
+    futureLinks: [
+      { label: 'Curve Sketching (Chapter 3)', note: 'This lesson is the foundation for curve sketching — the systematic process of constructing the graph of f from information about f\', f\'\', and f\'\'\'.' },
+      { label: 'Optimization', note: 'Finding maxima and minima requires reading f\'=0 to locate critical point candidates, then using sign charts or the second derivative test to classify them.' },
+      { label: 'Related Rates', note: 'Reading velocity from a position graph is exactly the related rates idea — the derivative of position with respect to time gives the velocity at each instant.' },
+    ],
+  },
+
   title: "Reading Derivatives from Graphs",
   subtitle:
     "The visual language of f, f', f'', and f''' — what graphs reveal about motion and change",
@@ -73,6 +86,10 @@ export default {
         "Recognizing f''' helps understand more complex physical systems.",
 
       "**Chapter 2 Complete — What You Now Know:** You have built derivative intuition from first principles, mastered all the differentiation rules, applied them to every fundamental function family, handled implicit curves, and learned to read the derivative language visually. The derivative is no longer an abstract concept — it is a tool you can wield. Chapter 3 will use these tools to answer the question calculus was originally invented to solve: optimization. Given any function, find where it reaches its maximum or minimum value.",
+
+      "**First derivative test vs. second derivative test:** At a critical point where f'(c)=0, you can determine whether it is a local max or min in two ways. (1) First derivative test: check the sign of f' just before and after c. If f' changes from positive to negative, f goes from increasing to decreasing, so c is a local max. If f' changes from negative to positive, f goes from decreasing to increasing, so c is a local min. If f' does not change sign, c is neither (a horizontal inflection). (2) Second derivative test: if f''(c)>0, the curve is concave up at c, which means the critical point is a local min (bowl shape). If f''(c)<0, the curve is concave down at c, which means the critical point is a local max (cap shape). If f''(c)=0, the test is inconclusive — the curve could be a max, min, or inflection, and you must fall back on the first derivative test. The second derivative test is faster when f'' is easy to compute, but it fails in the inconclusive case, so knowing both tests is essential.",
+
+      "**Reading derivatives on standard exams — given a graph of f', what can you say about f?** This is a classic AP Calculus and college exam question type. The rules are: (1) When f'>0, f is increasing. (2) When f'<0, f is decreasing. (3) When f' changes sign from positive to negative at x=c, f has a local maximum at c. (4) When f' changes sign from negative to positive at x=c, f has a local minimum at c. (5) When f' is increasing on an interval, f is concave up there (because f''=(f')'>0). (6) When f' is decreasing on an interval, f is concave down there (because f''=(f')'<0). (7) Where f' has a local maximum or local minimum, f has an inflection point — the concavity of f changes at that x-value. Internalizing these seven rules lets you reconstruct the qualitative shape of f from any graph of f' alone.",
     ],
     callouts: [
       {
@@ -130,12 +147,14 @@ export default {
       {
         id: "PositionVelocityAcceleration",
         title: "Position, Velocity, and Acceleration Graphs",
+        mathBridge: "Before interacting: given the position curve, identify by eye: (a) where is the object moving fastest upward? (b) where does it stop momentarily? (c) where does it reverse direction? Your answers become verifiable — where position peaks, velocity is zero; where position has steepest positive slope, velocity is maximum. After verifying visually, check: does the velocity curve change sign exactly where you predicted? The position and velocity curves must be consistent: every zero of velocity must align with a peak or valley of position, and every zero of acceleration must align with a peak or valley of velocity.",
         caption:
           "Interactive: change the position curve and watch how f', f'', and f''' respond in real time.",
       },
       {
         id: "SignChartBuilder",
         title: "Sign Chart Builder (f' and f'')",
+        mathBridge: "Build a sign chart by placing critical points (where f\'=0) and inflection points (where f\'\'=0) on the number line. In each region between these markers, pick a test point and evaluate f\' and f\'\' to determine their signs. The sign of f\' tells you whether f is increasing (+) or decreasing (\u2212). The sign of f\'\' tells you whether f is concave up (+) or concave down (\u2212). A sign change in f\' at a critical point means a local extremum. A sign change in f\'\' means an inflection point. Complete this chart before sketching any curve \u2014 the chart is the algebraic skeleton that your sketch must honor.",
         caption:
           "Use this to practice interval-sign reasoning before doing full symbolic curve sketching.",
       },
@@ -664,6 +683,45 @@ export default {
         "Two local mins (x = ±1), one local max (x = 0). Two inflection points at x = ±√(1/3). W-shaped with bumps at x = ±1, dip at x = 0.",
     },
   ],
+
+  assessment: {
+    questions: [
+      {
+        id: "rd-assess-1",
+        type: "choice",
+        text: "If f'(3)=0 and f''(3)>0, then f has a local ___ at x=3.",
+        options: ["maximum", "minimum", "inflection point", "discontinuity"],
+        answer: "minimum",
+        hint: "f''(3)>0 means the curve is concave up (bowl-shaped) at x=3. A critical point at the bottom of a bowl is a local minimum.",
+      },
+      {
+        id: "rd-assess-2",
+        type: "choice",
+        text: "A graph of f' shows f'(x)>0 for x<2, f'(2)=0, and f'(x)<0 for x>2. What does f have at x=2?",
+        options: [
+          "A local minimum",
+          "An inflection point",
+          "A local maximum",
+          "A vertical tangent",
+        ],
+        answer: "A local maximum",
+        hint: "f' going from positive to negative means f goes from increasing to decreasing — that is the signature of a local maximum.",
+      },
+      {
+        id: "rd-assess-3",
+        type: "choice",
+        text: "On a graph of f', you see that f' has a local minimum at x=5. What does the graph of f have at x=5?",
+        options: [
+          "A local minimum",
+          "A local maximum",
+          "An inflection point",
+          "A zero",
+        ],
+        answer: "An inflection point",
+        hint: "Where f' has a local extremum, f'' changes sign (f'' goes from negative to positive at a minimum of f'). A sign change in f'' means f has an inflection point.",
+      },
+    ],
+  },
 
   crossRefs: [
     {

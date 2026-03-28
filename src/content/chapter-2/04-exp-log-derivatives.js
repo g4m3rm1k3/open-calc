@@ -9,6 +9,17 @@ export default {
   tags: ['exponential derivative', 'logarithm derivative', 'natural log', 'e^x', 'ln x', 'logarithmic differentiation', 'a^x'],
   aliases: 'section 3.9 derivative exponential function derivative logarithmic function formal proof e^x ln x logarithmic differentiation',
 
+  spiral: {
+    recoveryPoints: [
+      { label: 'Chain Rule (previous lesson)', note: 'Every exponential with a composite exponent — e^(g(x)) — requires chain rule for its derivative: e^(g(x))·g\'(x). Without it the inner derivative is missing.' },
+      { label: 'What e is (natural exponential from Chapter 0 or Precalc)', note: 'e ≈ 2.718 is introduced informally as a base of growth. This lesson provides the calculus definition: e is the unique base for which the exponential has slope exactly 1 at the origin.' },
+    ],
+    futureLinks: [
+      { label: 'Inverse Function Derivatives (next lesson)', note: 'ln(x) is the inverse of e^x. The derivative of ln(x) = 1/x was derived here using that inverse relationship — the next lesson generalizes this argument to every invertible function.' },
+      { label: 'Logarithmic Differentiation (tool used in this lesson)', note: 'Taking ln of both sides before differentiating is a technique introduced here for x^x-type functions. It reappears whenever the variable sits in both the base and the exponent.' },
+    ],
+  },
+
   hook: {
     question: 'Bacteria in a culture double every hour. A radioactive isotope loses half its mass every 5,730 years. A savings account grows at 5% per year compounded continuously. Why do all three follow the same mathematical pattern, and what does calculus tell us is special about them?',
     realWorldContext: 'Population growth, radioactive decay, cooling and heating, compound interest, the spread of disease, the absorption of drugs in the bloodstream — all of these phenomena share one defining property: the rate of change is proportional to the current value. If you have more money, you earn more interest. If you have more bacteria, more bacteria are multiplying. If you have more radioactive atoms, more are decaying. This proportionality law leads directly to exponential functions, and the magical number e = 2.71828... is the one base for which the function literally equals its own derivative. This lesson explores why that is true and how to differentiate every exponential and logarithmic function.',
@@ -27,6 +38,10 @@ export default {
       'Now for the natural logarithm. The natural log ln(x) is defined as the inverse of e^x: if e^y = x, then y = ln(x). Since e^x has derivative e^x, and ln(x) is its inverse function, we can find the derivative of ln(x) using implicit differentiation. Starting from e^y = x, differentiate both sides with respect to x: the right side gives 1, and the left side gives e^y \u00b7 dy/dx (by the chain rule, since y is a function of x). So e^y \u00b7 dy/dx = 1, giving dy/dx = 1/e^y = 1/x (since e^y = x). The derivative of ln(x) is 1/x.',
       'For other bases: if we want to differentiate a^x for any positive base a \u2260 1, we use the conversion a^x = e^(x ln a). This rewrites any exponential in base e, allowing us to use the chain rule: d/dx[e^(x ln a)] = e^(x ln a) \u00b7 ln(a) = a^x \u00b7 ln(a). The natural log of the base appears as a multiplicative factor.',
       'Logarithmic differentiation is a powerful technique that uses logarithms to convert hard differentiation problems into easier ones. The key idea: if y = f(x), take ln of both sides to get ln(y) = ln(f(x)), then differentiate implicitly. This works because the chain rule on the left gives (1/y)\u00b7(dy/dx), and we can solve for dy/dx = y\u00b7(d/dx)[ln(f(x))]. This technique is especially useful for (1) functions where the variable appears in both the base and exponent, like y = x^x, and (2) products of many functions, where logarithms convert multiplication into addition.',
+
+      '**Logarithmic differentiation — how to differentiate y = x^x:** Functions like y = x^x are neither a pure power (the exponent is not a constant) nor a pure exponential (the base is not a constant), so neither the power rule nor the standard exponential rule applies directly. The technique is to take the natural log of both sides: ln(y) = ln(x^x) = x·ln(x). Now differentiate both sides with respect to x. The left side gives (1/y)·(dy/dx) by the chain rule (since y is a function of x). The right side gives d/dx[x·ln(x)] = ln(x) + x·(1/x) = ln(x) + 1 by the product rule. Solving: dy/dx = y·(ln(x)+1) = x^x·(ln(x)+1). This technique works for any function where logarithms simplify the structure — it converts hard exponent problems into tractable algebra.',
+
+      '**Chain rule with exponentials — the most important application:** The formula d/dx[e^x] = e^x extends immediately to composites via the chain rule: d/dx[e^(g(x))] = e^(g(x))·g\'(x). The outer derivative of e^(·) is just e^(·) unchanged, and then we multiply by g\'(x) as the chain rule demands. Example: d/dx[e^(3x²)] — here g(x) = 3x², so g\'(x) = 6x. Therefore d/dx[e^(3x²)] = e^(3x²)·6x = 6x·e^(3x²). The same pattern extends to other bases: d/dx[a^(g(x))] = a^(g(x))·ln(a)·g\'(x). Forgetting the inner derivative g\'(x) is the chain-trap in exponential form.',
 
       '**Where this is heading:** Notice that we derived the derivative of ln(x) by using the fact that it is the inverse of e^x. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of arcsin, arccos, and arctan.',
     ],
@@ -58,10 +73,16 @@ export default {
       highlightBaseE: true,
     },
     visualizations: [
-                                                {
+      {
+        id: 'ExponentialSlopeAtZero',
+        title: 'Finding e Through the Slope Experiment',
+        mathBridge: 'Start with base b=2. Read the slope at x=0 (approximately 0.693). Move to b=3 (slope ≈ 1.099). The slope at x=0 is ln(b). Find the base where slope=exactly 1. That base is e≈2.718. This experiment DEFINES e — the unique base where the exponential has slope 1 at the origin. Now observe what happens away from x=0: because e^(x+h)=e^x·e^h, the slope at any x is exactly e^x times the slope at 0 — and since the slope at 0 is 1, the slope everywhere equals e^x itself.',
+        caption: 'Drag the base slider and watch the slope at x=0 change. Find the base that makes slope=1 exactly — that is e.',
+      },
+      {
         id: 'ExpLogBridgeLab',
         title: 'Exponential/Log Bridge Lab',
-        mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes.',
+        mathBridge: '$e^x$ and $\\ln x$ are inverse functions — they undo each other. Their derivatives reflect this inverse relationship: $\\frac{d}{dx}[e^x]=e^x$ (slope equals value, always positive and growing), while $\\frac{d}{dx}[\\ln x]=\\frac{1}{x}$ (slope shrinks as $x$ grows, reflecting how logarithms "flatten" explosive growth). Graphically: the two functions are reflections across $y=x$, and their tangent lines at corresponding points have reciprocal slopes. Before interacting, predict: at x=1 the slope of $\\ln x$ should be 1/1=1. At x=2 it should be 1/2=0.5. At x=10 it should be 0.1. Drag the slider to verify each prediction.',
         caption: 'Switch between eˣ and ln(x) to connect growth intuition with the derivative formulas.',
       },
       {

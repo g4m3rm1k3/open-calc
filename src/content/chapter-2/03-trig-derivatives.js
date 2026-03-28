@@ -18,6 +18,17 @@ export default {
   aliases:
     "section 3.5 derivatives trig functions formal proof sin cos tan cot sec csc limit definition derivative",
 
+  spiral: {
+    recoveryPoints: [
+      { label: 'Chain Rule (Lesson 4)', note: 'Every trig derivative involving a composed argument — sin(g(x)), cos(g(x)) — requires the chain rule for its derivative. Without it the inner derivative is missing.' },
+      { label: 'Unit Circle Definitions of sin/cos (Chapter 0/Trig)', note: 'The definitions sin(θ) = y-coordinate and cos(θ) = x-coordinate on the unit circle are the geometric engine behind the derivative formulas proved in this lesson.' },
+    ],
+    futureLinks: [
+      { label: 'Exponential/Log Derivatives (next lesson)', note: 'Same toolkit — just applied to a different family of functions. The pattern of "one clean self-referential formula" appears again with e^x.' },
+      { label: 'Implicit Differentiation (Lesson 9)', note: 'Equations like x·sin(y) = y·cos(x) require differentiating trig functions of y, which uses the chain rule with dy/dx — all the formulas from this lesson reappear.' },
+    ],
+  },
+
   hook: {
     question:
       "A point moves around the unit circle at constant angular speed. Its y-coordinate is y = sin(theta). When theta = 0, the point is at (1, 0) and is moving straight upward, so height increases as fast as possible. When theta = pi/2, the point is at (0, 1) moving sideways, so height is not changing at all. When theta = pi, the point is at (-1, 0) moving downward, so height decreases at maximum rate. These rates, 1, 0, and -1, are exactly cos(0), cos(pi/2), and cos(pi). Why does this happen for every angle?",
@@ -42,6 +53,10 @@ export default {
       "Expert intuition: each derivative is a 90-degree phase rotation of the trig wave. sin -> cos -> -sin -> -cos -> sin.",
 
       '**Where this is heading:** You now have derivatives for all six trig functions. The next lesson introduces the other great family: exponential and logarithmic functions. The highlight is e — the one base for which the exponential function literally equals its own derivative. That self-referential property is one of the most surprising facts in mathematics.',
+
+      '**The 90-degree phase shift pattern — a cycle of four:** Each derivative of a trig function is a quarter-period (90-degree) shift of the wave. Starting from sin(x): its derivative is cos(x), which is sin(x) shifted left by π/2. The derivative of cos(x) is −sin(x), another 90-degree shift. The derivative of −sin(x) is −cos(x), and the derivative of −cos(x) returns to sin(x). So the cycle is sin → cos → −sin → −cos → sin, repeating every four derivatives. This means: to find the 47th derivative of sin(x), compute 47 mod 4 = 3, so the 47th derivative is −cos(x). This four-step cycle is unique to trigonometric functions and reflects the geometric fact that rotating the unit-circle velocity vector by 90 degrees four times returns to the original direction.',
+
+      '**Chain rule with trig — the most important application:** Once you have d/dx[sin(x)] = cos(x) and d/dx[cos(x)] = −sin(x), the chain rule extends these to any composite argument. The pattern is: d/dx[sin(g(x))] = cos(g(x))·g\'(x) and d/dx[cos(g(x))] = −sin(g(x))·g\'(x). The outer derivative uses the trig formula as usual, but the result must be multiplied by the derivative of the inner function g\'(x). Example 1: d/dx[sin(3x)] = cos(3x)·3 = 3cos(3x). Example 2: d/dx[cos(x²)] = −sin(x²)·2x = −2x·sin(x²). Forgetting the inner derivative is the chain-trap in trig form — the same mistake isolated in the previous lesson now appears in trig context.',
     ],
     callouts: [
       {
@@ -83,7 +98,7 @@ export default {
         id: "TrigDerivativeSync",
         title: 'The "Moving Point" Deep Sync',
         mathBridge:
-          "This shows three views of the same fact: $\\frac{d}{d\\theta}[\\sin\\theta] = \\cos\\theta$. The unit-circle panel shows where the point is. The middle panel shows the slope of the sine curve there. The right panel shows the cosine value. All three update together because slope of sine = cosine — every single angle.",
+          "Before interacting, identify the four quadrants of the unit circle and predict: where is sin(θ) increasing fastest? Where does it flatten? Now drag θ and watch the slope value. At θ=0 the slope is 1 — which is cos(0)=1. At θ=π/2 the slope is 0 — which is cos(π/2)=0. At θ=π the slope is −1 — which is cos(π)=−1. Every value matches cos(θ). This is not coincidence — it is a theorem. The three panels stay synchronized because slope of sine = cosine at every single angle: the unit-circle panel shows where the point is, the middle panel shows the slope of the sine curve there, and the right panel shows the cosine value confirming the match.",
         caption:
           "Watch one angle drive three views at once: motion on the circle, slope of sine, and value of cosine. They stay synchronized because the sine slope is exactly cosine.",
       },

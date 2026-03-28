@@ -86,39 +86,39 @@ export default {
             {
         id: 'ChainRulePipelineLab',
         title: 'Function Pipeline Relay',
-        mathBridge: 'Before clicking play, notice there are TWO machines in sequence: an "inner" machine (g) that transforms x into an intermediate value u, and an "outer" machine (f) that transforms u into the final output y. Each machine has its own speed — its own derivative. The chain rule says the total speed from x to y is the product of the two machine speeds. Watch what happens when you change the inner rate versus the outer rate.',
-        caption: 'Watch stage speeds multiply in real time: inner rate times outer rate equals the total output rate.',
+        mathBridge: 'Before pressing play, identify the two boxes on screen: the left box is the inner function $g$ (it turns $x$ into $u$), and the right box is the outer function $f$ (it turns $u$ into $y$). Each box displays its own local rate — $du/dx$ for the inner machine and $dy/du$ for the outer. Step 1: Set both rates to 1 and verify the output rate is also 1. Step 2: Set the inner rate to 3 and outer rate to 2 — watch the output rate snap to 6. This is $dy/dx = (dy/du)(du/dx) = 2 \\cdot 3 = 6$. Step 3: Change the inner function to something nonlinear. Notice the local rate now depends on the current value of $x$ — that is because $g\'(x)$ is not constant. The chain rule must be evaluated at the current $x$, not at a fixed rate. The key lesson: the chain rule is rate multiplication along a dependency chain, not just symbol manipulation.',
+        caption: 'Set inner and outer rates separately. Verify the output rate is always their product. Then switch to a nonlinear inner function and watch the output rate change with x — that is the chain rule evaluated at a point.',
       },
       {
         id: 'InterlockingGearsViz',
         title: 'Interlocking Gears — Rates Multiply',
-        mathBridge: 'This is the gear analogy made interactive. Set the ratio of Gear A to Gear B (this is dy/du), then set the ratio of Gear B to Gear C (this is du/dx). Notice that Gear B is the intermediate — the "u" that appears in both ratios. When you multiply the two ratios, Gear B cancels out, exactly like the du in dy/dx = (dy/du)·(du/dx). The gears are not just a metaphor — they ARE the chain rule.',
-        caption: 'The chain rule is not symbolic manipulation — it is rates multiplying through a mechanical chain.',
+        mathBridge: 'Here is the specific experiment to run. Set Gear A-to-B ratio to 3 (Gear A turns 3 times per revolution of B). Set Gear B-to-C ratio to 4 (Gear B turns 4 times per revolution of C). Ask: how many times does Gear A turn per revolution of Gear C? Your intuition says 12 — and the display confirms it. This is $3 \\times 4 = 12$, or in calculus notation, $dA/dC = (dA/dB)(dB/dC)$. Now notice that Gear B appears in BOTH ratios as the intermediate: it is both a "fast" gear relative to C and a "slow" gear relative to A. When you write the product $(dA/dB)(dB/dC)$, the $dB$ terms cancel just like they would if these were fractions. That cancellation is exactly the structure of the Leibniz form of the chain rule: $dy/dx = (dy/du)(du/dx)$. The intermediate variable $u$ cancels out.',
+        caption: 'Set A-to-B and B-to-C gear ratios. Compute A-to-C by multiplying — verify the display agrees. Notice that B is the intermediate that cancels, just like du in dy/dx = (dy/du)(du/dx).',
       },
       {
         id: 'ChainRuleOnionLab',
         title: 'Composition is an Onion: Layers to Peel',
-        mathBridge: 'Look at f(g(x)) and identify the layer structure before touching any derivative. The outermost "skin" is the last thing done to x. The innermost "core" is the first thing done to x. The chain rule says: differentiate the outer skin (keeping the inside wrapped up), then multiply by the derivative of everything inside.',
-        caption: 'Label outer, middle, and inner layers correctly before computing — the prerequisite for any chain-rule problem.',
+        mathBridge: 'For each function shown, practice the layer-scan before touching any derivative. Ask yourself: "If I evaluated this at $x = 2$, what would I do LAST?" That last step is the outermost layer. For $\\sin(x^2 + 1)$: the last step is taking the sine, so outer = $\\sin(\\cdot)$, inner = $x^2 + 1$. For $(3x-1)^5$: the last step is raising to the fifth power, so outer = $(\\cdot)^5$, inner = $3x - 1$. For $\\sqrt{\\cos x}$: the last step is square root, so outer = $\\sqrt{\\cdot}$, inner = $\\cos x$. Now click on each layer in the visualizer to label it. The chain rule fires once per layer boundary. When you have correctly labeled outer and inner, the derivative assembles itself: differentiate the outer (keeping inner intact), multiply by the derivative of the inner.',
+        caption: 'Click to label each layer before the derivative appears. Getting the layer structure right is 80 percent of the chain rule — the actual differentiation is mechanical once you know the structure.',
       },
 
       {
         id: 'ChainRuleAssemblerGame',
         title: 'Chain Rule Assembler Game',
-        mathBridge: 'Now that you understand the gear/pipeline analogy, this game makes the two-part structure explicit in algebraic form. You will identify the outer function f and the inner function g for various compositions, then "assemble" the derivative by multiplying f\'(g(x)) by g\'(x). The key discipline: you must evaluate f\' AT g(x), not at x directly.',
-        caption: 'Build derivatives by selecting outside and inside gears, then verify the full assembled result.',
+        mathBridge: 'This game has two steps that you must not blur together. Step 1: Identify $f$ (outer) and $g$ (inner) and drag them into the correct slots. Step 2: Assemble the derivative. The derivative of $f(g(x))$ has two factors: the first factor is $f\'$ evaluated at $g(x)$ — NOT at $x$ itself. This is the most common mistake: students write $f\'(x) \\cdot g\'(x)$ instead of $f\'(g(x)) \\cdot g\'(x)$. The game will mark you wrong if you evaluate the outer derivative at $x$ instead of at $g(x)$. For example, for $h(x) = (x^2+1)^5$: $f(u) = u^5$, so $f\'(u) = 5u^4$, and you evaluate it at $u = g(x) = x^2 + 1$, giving $5(x^2+1)^4$. THEN multiply by $g\'(x) = 2x$. Final: $10x(x^2+1)^4$.',
+        caption: 'Drag outer and inner functions to their slots, then assemble the derivative in the correct order. Watch for the evaluation point: f\' must be evaluated at g(x), not at x.',
       },
       {
         id: 'LayerScanGame',
         title: 'Layer Identification Mini-Game',
-        mathBridge: 'Before you can use the chain rule, you must correctly identify the composition structure. This is a trainable skill that becomes automatic with practice. For tan³(4x): ask yourself — if I evaluated this at x = 2, what would I do LAST? Cube the result. So the outermost layer is (·)³. Then ask: what is the SECOND-to-last step? Take the tangent. So middle layer is tan(·). The innermost is 4x.',
-        caption: 'Label outer, middle, and inner layers correctly before computing — the prerequisite for any chain-rule problem.',
+        mathBridge: 'The fastest way to master layer scanning is the "last operation" rule: work backward from evaluation order. For $\\tan^3(4x)$, evaluate mentally at $x = 1$: first compute $4(1) = 4$ (innermost layer: multiply by 4), then compute $\\tan(4)$ (middle layer: apply tangent), then cube the result (outermost layer: raise to power 3). So the layers from outside in are: $(\\cdot)^3$, $\\tan(\\cdot)$, $4x$. When you differentiate, you peel from outside in: $3[\\tan(4x)]^2 \\cdot \\sec^2(4x) \\cdot 4$. Each factor comes from one layer. In this game, practice labeling at least 10 functions before moving on — once layer scanning is automatic, the chain rule mechanics become trivial.',
+        caption: 'For each function, identify all layers from outside in using the "last operation" rule. You must correctly label before the derivative is revealed. Aim for 10 in a row without mistakes.',
       },
       {
         id: 'NestedTrigMachine',
-        title: 'Trig Trap: sin(x²) vs sin²(x)',
-        mathBridge: 'These two expressions look the same to a tired eye, but they are completely different compositions. In sin(x²), the outer function is sine and the inner is x². In sin²(x), the outer function is squaring and the inner is sine. Toggle between them in this visualizer to watch the layer structure flip — and watch the derivative change completely.',
-        caption: 'Toggle between sin(x²) and sin²(x) to see how the layer swap changes the derivative completely.',
+        title: 'Trig Trap: sin(x\u00b2) vs sin\u00b2(x)',
+        mathBridge: 'Work out both derivatives by hand BEFORE toggling, then use the visualizer to check. For $\\sin(x^2)$: outer = $\\sin(\\cdot)$, inner = $x^2$. Derivative: $\\cos(x^2) \\cdot 2x$. For $\\sin^2(x)$: outer = $(\\cdot)^2$, inner = $\\sin(x)$. Derivative: $2\\sin(x) \\cdot \\cos(x)$ (which equals $\\sin(2x)$ by a trig identity). These are completely different functions with completely different derivatives. Now toggle in the visualizer and verify the graphs match what you computed. The important takeaway: reading the layer structure correctly is not optional — misreading $\\sin^2(x)$ as $\\sin(x^2)$ will give you a completely wrong derivative with no error message. Only careful attention to parentheses and exponent placement prevents this mistake.',
+        caption: 'Compute both derivatives by hand first, then toggle to verify. The two functions look similar but have opposite layer structures — one has sine as outer, the other as inner.',
       },
       {
         id: 'ChainRulePracticeViz',
@@ -154,6 +154,10 @@ export default {
       'The chain rule combined with the power rule gives one of the most common differentiation formulas in all of calculus: d/dx[u\u207f] = nu\u207f\u207b\u00b9\u00b7u\', where u = g(x) is any differentiable function. This formula applies whenever you have "something to a power" — the power rule applies to the outer function, and the chain rule contributes the u\' factor.',
       'The extended chain rule for triple compositions states that for y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). The pattern is clear: differentiate each layer from outside to inside, evaluate each outer derivative at everything inside it, and multiply all the factors together.',
       'Identifying the outer and inner functions correctly is a skill that develops with practice. The best approach is to always ask: "What is the last thing done to x if I evaluate this at a number?" That last operation is the outer function. Everything that comes before is the inner function.',
+
+      'Here is a complete worked example of triple composition, done layer by layer. Find $\\frac{d}{dx}[\\sin^3(4x)]$. Before writing a single derivative, run the layer scan: what is the last thing done to x? Cube the result. So the outermost layer is $(\\cdot)^3$. What is the second-to-last step? Take the sine. Middle layer: $\\sin(\\cdot)$. What is the innermost operation? Multiply by 4. Inner core: $4x$. Now peel outside-in. Outer layer: differentiate $(\\cdot)^3$ to get $3(\\cdot)^2$, evaluated at $\\sin(4x)$, giving $3\\sin^2(4x)$. Middle layer: differentiate $\\sin(\\cdot)$ to get $\\cos(\\cdot)$, evaluated at $4x$, giving $\\cos(4x)$. Inner layer: differentiate $4x$ to get $4$. Multiply all three factors: $3\\sin^2(4x) \\cdot \\cos(4x) \\cdot 4 = 12\\sin^2(4x)\\cos(4x)$. The pattern is clear: one multiplicative factor per layer, each factor from differentiating that layer, evaluated at everything inside it. Do NOT skip the inner derivative — that is the most common error in triple compositions.',
+
+      'A powerful way to verify any chain-rule answer is the numerical derivative check. For any function $F(x)$, the numerical derivative at $x = a$ is approximated by $[F(a + 0.001) - F(a)] / 0.001$. For example, to check $d/dx[\\sin^3(4x)]$ at $x = 0.5$: compute $[\\sin^3(4 \\cdot 0.501) - \\sin^3(4 \\cdot 0.5)] / 0.001$ using a calculator, and compare to $12\\sin^2(2)\\cos(2)$ evaluated at $x = 0.5$. If your symbolic answer matches the numerical approximation to 3 decimal places, it is almost certainly correct. This check works because the numerical difference quotient is an approximation of the limit definition, and the limit definition is exactly what the chain rule computes. Whenever you are uncertain about a chain-rule answer on a homework problem, run this 30-second numerical check before moving on.',
     ],
     callouts: [
       {
@@ -907,28 +911,33 @@ export default {
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
+    recoveryPoints: [
       {
-        "lessonId": "ch2-differentiation-rules",
-        "label": "Previous: Differentiation Rules",
-        "note": "The power, product and quotient rules handle non-composed functions. The chain rule is the single missing piece that handles everything else — any composition, any nesting."
+        lessonId: 'ch0-composition',
+        label: 'Composition of functions (Chapter 0)',
+        note: 'The chain rule differentiates f(g(x)). If writing f(g(x)) and identifying the outer and inner functions still feels awkward, review function composition before this lesson — the chain rule is built entirely on that idea.'
+      },
+      {
+        lessonId: 'ch2-differentiation-rules',
+        label: 'Differentiation rules (previous lesson)',
+        note: 'The chain rule multiplies the derivative of the outer function by the derivative of the inner. Every outer and inner derivative you compute uses the power, product, or quotient rules from the last lesson. The power, product and quotient rules handle non-composed functions; the chain rule is the single missing piece that handles everything else.'
       }
     ],
-    "futureLinks": [
+    futureLinks: [
       {
-        "lessonId": "ch2-implicit-differentiation",
-        "label": "Next: Implicit Differentiation",
-        "note": "Implicit differentiation is the chain rule applied to y as a function of x. Every d/dx[y²] term in an implicit equation generates a 2y·(dy/dx) factor — that IS the chain rule."
+        lessonId: 'ch2-implicit-differentiation',
+        label: 'Implicit differentiation',
+        note: 'Implicit differentiation treats y as a function of x and differentiates both sides. Every d/dx[y\u207f] step is chain rule with u = y(x). The chain rule proof you learn here is the backbone of implicit differentiation, and every related-rates equation is a chain rule application in t.'
       },
       {
-        "lessonId": "ch3-related-rates",
-        "label": "Ch. 3: Related Rates",
-        "note": "Related rates is implicit differentiation in t. The chain rule factor becomes (dx/dt), (dy/dt), etc. Every related-rates rate equation is a chain rule application."
+        lessonId: 'ch2-trig-derivatives',
+        label: 'Trig derivatives',
+        note: 'Every trig derivative involving a non-trivial argument — like sin(3x) or cos(x\u00b2) — requires the chain rule. The trig derivatives lesson applies chain rule from the very first problem.'
       },
       {
-        "lessonId": "ch4-u-substitution",
-        "label": "Ch. 4: U-Substitution",
-        "note": "U-substitution is the chain rule run in reverse for integration. Recognizing the \"inner derivative\" factor in the integrand is the key skill — and it comes from deeply understanding the chain rule."
+        lessonId: 'ch4-u-substitution',
+        label: 'Ch. 4: U-Substitution',
+        note: 'U-substitution is the chain rule run in reverse for integration. Recognizing the inner derivative factor in the integrand is the key skill — and it comes from deeply understanding the chain rule here.'
       }
     ]
   },
