@@ -19,6 +19,7 @@ export default {
       'An algebraic expression is a combination of numbers, variables, and operations — but no equals sign. $3x^2 - 5x + 7$ is an expression. It has a value for every value of $x$, but we have not asked what that value equals. An equation sets two expressions equal: $3x^2 - 5x + 7 = 0$ is now a question with specific answers.',
       'Every expression is made of terms — pieces separated by addition and subtraction. In $3x^2 - 5x + 7$, the terms are $3x^2$, $-5x$, and $7$. Each term has a coefficient (the number part: $3$, $-5$, $1$) and a variable part ($x^2$, $x$, none). Like terms share the same variable part and can be combined — $3x^2 + 2x^2 = 5x^2$ because you have 3 of something plus 2 of the same thing.',
       'The real number line is the geometric home of algebra. Every real number is a point. Operations move you along it: addition shifts right, subtraction shifts left, multiplication scales. Absolute value is distance from zero — always non-negative. Inequalities are intervals on this line.',
+      '**The Grammar of Structure**: Think of algebra as a language. The **Variables** are nouns (the objects we are talking about), the **Operators** are verbs (the actions we take on them), and the **Structure** of the expression is the syntax. Just as you cannot have a sentence without a verb, you cannot have a meaningful algebraic relationship without an operation.',
     ],
     callouts: [
       {
@@ -40,6 +41,26 @@ export default {
         type: 'mnemonic',
         title: 'The distributive property — the engine of algebra',
         body: 'a(b + c) = ab + ac \\qquad \\text{This single rule justifies expanding, factoring, and combining.} \\\\ \\text{Everything else in algebra is either this rule or a rule about how numbers work.}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Grammar of Math',
+        body: '\\text{Variables = Nouns (the things)} \\\\ \\text{Operators = Verbs (the actions)} \\\\ \\text{Terms = Phrases (the units of meaning)} \\\\ \\text{Expressions = Sentences (the complete thought)}',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: The Computational Pipeline',
+        body: 'x \\xrightarrow{\\text{Square}} x^2 \\xrightarrow{\\times 3} 3x^2 \\xrightarrow{-5x+7} 3x^2 - 5x + 7 \\\\ \\text{An expression is just a set of ordered instructions for a computer.}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: The Shifting Balance',
+        body: '\\text{Addition +3 is a jump 3 units to the Right.} \\\\ \\text{Subtraction -x is a jump } x \\text{ units to the Left.} \\\\ \\text{The variable is the unknown length of your leap.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: Geometric Tiling',
+        body: '\\text{The product } (x+1)(x+2) \\text{ is the area of a rectangle with sides } (x+1) \\text{ and } (x+2). \\\\ \\text{Expansion is just finding the area of the individual tiles.}',
       },
     ],
     visualizations: [
@@ -74,6 +95,16 @@ export default {
         title: 'Polynomial vocabulary',
         body: 'p(x) = a_n x^n + a_{n-1}x^{n-1} + \\cdots + a_1 x + a_0 \\\\ \\text{Degree: highest power } n. \\quad \\text{Leading term: } a_n x^n. \\quad \\text{Constant term: } a_0.',
       },
+      {
+        type: 'theorem',
+        title: 'The architectural identities',
+        body: '\\text{Difference of Squares: } a^2 - b^2 = (a-b)(a+b) \\\\ \\text{This is the single most important identity for simplifying complex quotients.}',
+      },
+      {
+        type: 'insight',
+        title: 'The uniqueness of identity',
+        body: '\\text{In any field, there is ONLY ONE 0 and ONLY ONE 1.} \\\\ \\text{This ensures that equations have singular targets of balance.}',
+      },
     ],
   },
 
@@ -100,6 +131,26 @@ export default {
       {
         expression: '(a+b)^2 = a^2 + 2ab + b^2 \\neq a^2 + b^2 \\quad (\\text{unless } ab = 0) \\qquad \\blacksquare',
         annotation: 'The missing $2ab$ is the most common algebraic error. Skipping it loses real area — you can see it in the geometric proof.',
+      },
+      {
+        expression: '\\text{--- Part II: The Difference of Squares Geometric Proof ---}',
+        annotation: 'Now, let us examine why $a^2 - b^2$ factors into $(a-b)(a+b)$.',
+      },
+      {
+        expression: 'a^2 - b^2 = \\text{Area of a Large Square (side } a \\text{) minus a Small Square (side } b \\text{)}',
+        annotation: 'Define the starting geometry: a square with a corner cut out.',
+      },
+      {
+        expression: '\\text{Remaining Area} = (a-b)b + a(a-b)',
+        annotation: 'Slice the remaining L-shape into two rectangles: one $b \\times (a-b)$ and one $a \\times (a-b)$.',
+      },
+      {
+        expression: '= (a-b) [ b + a ]',
+        annotation: 'Factor out the common width $(a-b)$. This is the Distributive Property in reverse.',
+      },
+      {
+        expression: '= (a-b)(a+b) \\qquad \\blacksquare',
+        annotation: 'The result is a single rectangle with dimensions $(a-b)$ and $(a+b)$. Verified by geometry.',
       },
     ],
   },
@@ -161,6 +212,46 @@ export default {
       ],
       conclusion: 'Substituting an expression (not just a number) into a function is the foundation of the chain rule in calculus: $f(g(x))$ is exactly this idea.',
     },
+    {
+      id: 'ex-struct-pascal',
+      title: 'Structural Expansion: Pascal\'s Shortcut',
+      problem: '\\text{Expand } (2x + 1)^3 \\text{ using the Binomial Theorem coefficients (1, 3, 3, 1).}',
+      steps: [
+        {
+          expression: '1(2x)^3(1)^0 + 3(2x)^2(1)^1 + 3(2x)^1(1)^2 + 1(2x)^0(1)^3',
+          annotation: 'Step 1: Apply the 1-3-3-1 coefficients to the descending powers of $2x$ and ascending of $1$.'
+        },
+        {
+          expression: '1(8x^3) + 3(4x^2)(1) + 3(2x)(1) + 1(1)',
+          annotation: 'Step 2: Evaluate the powers. $(2x)^3 = 8x^3$ and $(2x)^2 = 4x^2$.'
+        },
+        {
+          expression: '8x^3 + 12x^2 + 6x + 1',
+          annotation: 'Step 3: Simplify the terms. Much faster than three rounds of FOIL.'
+        }
+      ],
+      conclusion: 'Expansion is a predictable template. Learning the pattern avoids thousands of small mechanical errors.'
+    },
+    {
+      id: 'ex-struct-sub',
+      title: 'Substitution: The Chain Reaction',
+      problem: '\\text{If } f(x) = x^2 - 4x, \\text{ find and simplify } f(a+h).',
+      steps: [
+        {
+          expression: '(a+h)^2 - 4(a+h)',
+          annotation: 'Step 1: Replace every instance of $x$ with the block $(a+h)$.'
+        },
+        {
+          expression: '(a^2 + 2ah + h^2) - 4a - 4h',
+          annotation: 'Step 2: Expand the binomial and distribute the $-4$.'
+        },
+        {
+          expression: 'a^2 + 2ah + h^2 - 4a - 4h',
+          annotation: 'Step 3: Collect like terms (no combinations possible here).'
+        }
+      ],
+      conclusion: 'This is the most common move in First Semester Calculus. The result represents the system after a shift $h$.'
+    },
   ],
 
   challenges: [
@@ -202,6 +293,37 @@ export default {
       ],
       answer: 'a^3 + 3a^2b + 3ab^2 + b^3',
     },
+    {
+      id: 'ch2-001-ch3',
+      difficulty: 'hard',
+      problem: '\\text{Factor } x^4 - 81 \\text{ completely using the Difference of Squares twice.}',
+      walkthrough: [
+        { expression: '(x^2 - 9)(x^2 + 9)', annotation: 'First pass: $a=x^2, b=9$.' },
+        { expression: '(x-3)(x+3)(x^2 + 9)', annotation: 'Second pass: $(x^2-9)$ is another difference of squares. $(x^2+9)$ remains irreducible over the reals.' }
+      ],
+      answer: '(x-3)(x+3)(x^2+9)'
+    },
+    {
+      id: 'ch2-001-ch4',
+      difficulty: 'hard',
+      problem: '\\text{Prove the Sum of Cubes identity: } a^3 + b^3 = (a+b)(a^2 - ab + b^2).',
+      hint: 'Multiply the right side out and watch the "middle" terms cancel.',
+      walkthrough: [
+        {
+          expression: 'a(a^2 - ab + b^2) + b(a^2 - ab + b^2)',
+          annotation: 'Distribute each term of $(a+b)$ across the trinomial.'
+        },
+        {
+          expression: '(a^3 - a^2b + ab^2) + (a^2b - ab^2 + b^3)',
+          annotation: 'Expand. Notice the symmetrical pairs: $-a^2b$ vs $+a^2b$ and $+ab^2$ vs $-ab^2$.'
+        },
+        {
+          expression: 'a^3 + b^3 \\qquad \\blacksquare',
+          annotation: 'All middle terms cancel, leaving only the sum of cubes.'
+        }
+      ],
+      answer: '\\text{Proven via distributive expansion.}'
+    }
   ],
 
   calcBridge: {
