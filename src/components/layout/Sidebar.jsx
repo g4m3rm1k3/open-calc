@@ -29,7 +29,7 @@ const CHAPTER_COLORS = {
 
 export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, onSearchOpen }) {
   const location = useLocation()
-  const { getLessonStatus } = useProgress()
+  const { getLessonStatus, getQuizScore } = useProgress()
 
   const navRef = useRef(null)
   const activeLinkRef = useRef(null)
@@ -174,7 +174,14 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
 
               {!chapter.comingSoon && chapter.lessons.map((lesson) => {
                 const isActive = activeChapter === String(chapter.number) && activeSlug === lesson.slug
-                const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 3)
+                const quizScore = getQuizScore(lesson.id)
+                let status
+                if (quizScore) {
+                  const pct = quizScore.correct / quizScore.total
+                  status = pct >= 0.8 ? 'quiz-pass' : pct >= 0.5 ? 'quiz-partial' : 'quiz-fail'
+                } else {
+                  status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 3)
+                }
 
                 return (
                   <Link

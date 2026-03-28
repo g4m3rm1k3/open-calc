@@ -53,10 +53,24 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.readingProgress ?? 0
   }, [progress])
 
+  const setQuizScore = useCallback((lessonId, correct, total) => {
+    setProgress((prev) => ({
+      ...prev,
+      [lessonId]: {
+        ...prev[lessonId],
+        quiz: { correct, total, attemptedAt: Date.now() },
+      },
+    }))
+  }, [setProgress])
+
+  const getQuizScore = useCallback((lessonId) => {
+    return progress[lessonId]?.quiz ?? null
+  }, [progress])
+
   return (
-    <ProgressContext.Provider value={{ 
+    <ProgressContext.Provider value={{
       progress, markCheckpoint, setActiveTab, getLessonStatus, getActiveTab,
-      setReadingProgress, getReadingProgress
+      setReadingProgress, getReadingProgress, setQuizScore, getQuizScore
     }}>
       {children}
     </ProgressContext.Provider>

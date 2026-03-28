@@ -8,6 +8,7 @@ import VizFrame from '../components/viz/VizFrame.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
 import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLessonEnhancer.js'
 import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
+import LessonQuizBlock from '../components/lesson/LessonQuizBlock.jsx'
 import { useVideoPlayer } from '../context/VideoPlayerContext.jsx'
 
 export default function LessonPage() {
@@ -147,6 +148,11 @@ export default function LessonPage() {
       <section className="mb-10 w-full">
         <MicroCycleLesson lesson={lesson} />
       </section>
+
+      {/* End-of-lesson quiz */}
+      {lesson.quiz?.length > 0 && (
+        <LessonQuizBlock lessonId={lesson.id} questions={lesson.quiz} />
+      )}
 
       {/* Cross references */}
       {lesson.crossRefs?.length > 0 && (
