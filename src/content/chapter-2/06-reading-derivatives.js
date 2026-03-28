@@ -106,7 +106,17 @@ export default {
       },
     ],
     visualizations: [
-                        {
+      {
+        id: "HigherOrderDerivatives",
+        title: "Higher Order Derivatives",
+        caption: "Understand the visual and physical properties of second and third derivatives.",
+      },
+      {
+        id: "MotionAlongLine",
+        title: "Motion Along a Line",
+        caption: "Watch displacement, velocity, and acceleration interact in real time.",
+      },
+      {
         id: "PositionVelocityAcceleration",
         title: "Position, Velocity, and Acceleration Graphs",
         caption:

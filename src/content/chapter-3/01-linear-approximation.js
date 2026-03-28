@@ -56,7 +56,12 @@ export default {
       },
     ],
     visualizations: [
-                            {
+      {
+        id: "DerivativesRatesOfChange",
+        title: "Derivatives as Rates of Change",
+        caption: "Explore marginal cost, population growth, and the amount of change formula.",
+      },
+      {
         id: 'LinearApproximation',
         title: 'Zoom In Until the Curve Becomes a Line',
         caption: 'Increase the zoom level to see the curve and its tangent line converge. At high zoom, they are indistinguishable — that is what differentiability means geometrically.',

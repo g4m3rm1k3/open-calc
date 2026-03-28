@@ -69,7 +69,12 @@ export default {
       },
     ],
     visualizations: [
-                                                                  {
+      {
+        id: "MaximaMinima",
+        title: "Maxima and Minima",
+        caption: "Explore Extreme Value Theorem, Fermat's Theorem, and critical points.",
+      },
+      {
         id: "Ch5_QuadraticShadow",
         title: "Story Mode: The Quadratic Shadow",
         mathBridge:

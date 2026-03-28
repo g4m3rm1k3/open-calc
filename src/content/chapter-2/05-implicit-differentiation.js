@@ -48,6 +48,11 @@ export default {
     ],
     visualizations: [
       {
+        id: 'ImplicitDiffReal',
+        title: 'Implicit Differentiation in the Real World',
+        caption: 'A deep dive into why implicit differentiation exists, how to read formulas like PV=nRT, and core gotchas.',
+      },
+      {
         id: 'ImplicitDifferentiation',
         title: 'Step-by-Step Implicit Differentiation',
         caption: 'Walk through the machine-logic of differentiating both sides, applying the chain rule, and solving for dy/dx.',

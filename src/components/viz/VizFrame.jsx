@@ -741,6 +741,7 @@ const VIZ_REGISTRY = {
   DerivativesRatesOfChange: lazy(() => import("./react/DerivativesRatesOfChange.jsx")),
   MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
   MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
+  ImplicitDiffReal: lazy(() => import("./react/ImplicitDiffReal.jsx")),
 
   // Geometry Book 1
   G1_1_FivePostulates: lazy(() => import("./geometry/G1_1_FivePostulates.jsx")),
