@@ -27,6 +27,48 @@ function ProseParagraph({ text }) {
   return <p className="mb-4 leading-relaxed last:mb-0 text-slate-700 dark:text-slate-300">{parseProse(text)}</p>
 }
 
+const BULLET_RE = /^[•\-*]\s+/
+const ORDERED_RE = /^\d+\.\s+/
+
+function renderMixedProse(prose) {
+  const out = []
+  let i = 0
+  while (i < prose.length) {
+    const p = prose[i]
+    if (BULLET_RE.test(p)) {
+      const items = []
+      while (i < prose.length && BULLET_RE.test(prose[i])) {
+        items.push(prose[i].replace(BULLET_RE, ''))
+        i++
+      }
+      out.push(
+        <ul key={`ul-${i}`} className="list-disc pl-5 space-y-1.5 mb-4 text-slate-700 dark:text-slate-300">
+          {items.map((item, j) => (
+            <li key={j} className="leading-relaxed">{parseProse(item)}</li>
+          ))}
+        </ul>
+      )
+    } else if (ORDERED_RE.test(p)) {
+      const items = []
+      while (i < prose.length && ORDERED_RE.test(prose[i])) {
+        items.push(prose[i].replace(ORDERED_RE, ''))
+        i++
+      }
+      out.push(
+        <ol key={`ol-${i}`} className="list-decimal pl-5 space-y-1.5 mb-4 text-slate-700 dark:text-slate-300">
+          {items.map((item, j) => (
+            <li key={j} className="leading-relaxed">{parseProse(item)}</li>
+          ))}
+        </ol>
+      )
+    } else {
+      out.push(<ProseParagraph key={`p-${i}`} text={p} />)
+      i++
+    }
+  }
+  return out
+}
+
 function normalizeProse(paragraphs = []) {
   const merged = []
   for (const raw of paragraphs) {
@@ -58,7 +100,7 @@ function SectionContent({ data }) {
           if (block.type === 'prose') {
             return (
               <div key={i} className="prose-content text-slate-700 dark:text-slate-300">
-                {normalizeProse(block.paragraphs ?? []).map((p, j) => <ProseParagraph key={j} text={p} />)}
+                {renderMixedProse(normalizeProse(block.paragraphs ?? []))}
               </div>
             )
           }
@@ -79,7 +121,7 @@ function SectionContent({ data }) {
   const prose = normalizeProse(data.prose)
   return (
     <div className="space-y-4">
-      {prose.map((p, i) => <ProseParagraph key={i} text={p} />)}
+      {renderMixedProse(prose)}
       {(data.callouts ?? []).map((c, i) => <Callout key={i} {...c} />)}
     </div>
   )

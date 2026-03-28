@@ -86,6 +86,19 @@ export function parseProse(text) {
   let keyIdx = 0
 
   while (i < text.length) {
+    // Newline → <br />, double newline → paragraph gap
+    if (text[i] === '\n') {
+      if (i + 1 < text.length && text[i + 1] === '\n') {
+        parts.push(<span key={`nl${keyIdx++}`} className="block mb-3" />)
+        i += 2
+        while (i < text.length && text[i] === '\n') i++
+      } else {
+        parts.push(<br key={`br${keyIdx++}`} />)
+        i++
+      }
+      continue
+    }
+
     // <span class="tooltip" data-tooltip="...">label</span>
     if (text.startsWith('<span class="tooltip" data-tooltip="', i)) {
       const attrStart = i + '<span class="tooltip" data-tooltip="'.length
@@ -217,7 +230,8 @@ export function parseProse(text) {
     const nextInline    = text.indexOf('\\(', i)
     const nextBackslash = text.indexOf('\\', i)
     const nextTooltip   = text.indexOf('<span class="tooltip" data-tooltip="', i)
-    const candidates = [nextBold, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash, nextTooltip].filter(v => v !== -1)
+    const nextNewline   = text.indexOf('\n', i)
+    const candidates = [nextBold, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash, nextTooltip, nextNewline].filter(v => v !== -1)
     const stop = candidates.length ? Math.min(...candidates) : text.length
     if (stop > i) {
       parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)

@@ -22,7 +22,9 @@
       "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/HigherOrderDerivatives.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/HigherOrderDerivatives.jsx\")",
       "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/DerivativesratesOfchange.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/DerivativesRatesOfChange.jsx\")",
       "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Motionalongline.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MotionAlongLine.jsx\")",
-      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Maximaminima.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MaximaMinima.jsx\")"
+      "Bash(cp \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/incomplete ideas/Maximaminima.jsx\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/components/viz/react/MaximaMinima.jsx\")",
+      "Bash(find . -name parseProse* -o -name MicroCycleLesson*)",
+      "Bash(grep -rn \"\\\\`\" src/content --include=\"*.js\")"
     ]
   }
 }
