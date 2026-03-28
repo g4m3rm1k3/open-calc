@@ -116,96 +116,102 @@ function EnergyCurveCanvas({ vLimit, vYours, C }) {
   const ke = v => 0.5 * mass * (v / 3.6) ** 2
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const draw = () => {
-      const cv = canvasRef.current; if (!cv) return
-      const cw = cv.offsetWidth || 500
-      const ch = 260
-      cv.width = cw; cv.height = ch
-      const ctx = cv.getContext('2d')
-      const pl = 64, pr = 20, pt = 24, pb = 44
-      const iw = cw - pl - pr, ih = ch - pt - pb
-      const vMax = 130, eMax = ke(vMax)
-      const tx = v => pl + (v / vMax) * iw
-      const ty = e => pt + ih - (e / eMax) * ih
+      const cv = canvasRef.current;
+      if (!cv || !C) return;
+      const ctx = cv.getContext('2d');
+      if (!ctx) return;
 
-      ctx.clearRect(0, 0, cw, ch)
+      const cw = cv.offsetWidth || 500;
+      const ch = 260;
+      if (cv.width !== cw) cv.width = cw;
+      if (cv.height !== ch) cv.height = ch;
 
+      const pl = 64, pr = 20, pt = 24, pb = 44;
+      const iw = cw - pl - pr, ih = ch - pt - pb;
+      if (iw <= 0 || ih <= 0) return;
+
+      const vMax = 130, eMax = ke(vMax);
+      const tx = (v) => pl + (v / vMax) * iw;
+      const ty = (e) => pt + ih - (e / eMax) * ih;
+
+      ctx.clearRect(0, 0, cw, ch);
+
+      // Grid
+      ctx.strokeStyle = C.border || "#cbd5e1"; ctx.lineWidth = 1;
       for (let v = 0; v <= vMax; v += 20) {
-        ctx.strokeStyle = C.border; ctx.lineWidth = 1
-        ctx.beginPath(); ctx.moveTo(tx(v), pt); ctx.lineTo(tx(v), pt + ih); ctx.stroke()
-        ctx.fillStyle = C.muted; ctx.font = '11px sans-serif'; ctx.textAlign = 'center'
-        ctx.fillText(v + ' km/h', tx(v), pt + ih + 16)
+        ctx.beginPath(); ctx.moveTo(tx(v), pt); ctx.lineTo(tx(v), pt + ih); ctx.stroke();
+        ctx.fillStyle = C.muted || "#64748b"; ctx.font = "11px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText(v + " km/h", tx(v), pt + ih + 16);
       }
       for (let pct = 0; pct <= 1; pct += 0.25) {
-        const e = eMax * pct
-        ctx.strokeStyle = C.border; ctx.lineWidth = 1
-        ctx.beginPath(); ctx.moveTo(pl, ty(e)); ctx.lineTo(pl + iw, ty(e)); ctx.stroke()
-        ctx.fillStyle = C.muted; ctx.font = '11px sans-serif'; ctx.textAlign = 'right'
-        ctx.fillText(Math.round(e / 1000) + 'kJ', pl - 4, ty(e) + 4)
+        const e = eMax * pct;
+        ctx.beginPath(); ctx.moveTo(pl, ty(e)); ctx.lineTo(pl + iw, ty(e)); ctx.stroke();
+        ctx.fillStyle = C.muted || "#64748b"; ctx.font = "11px sans-serif"; ctx.textAlign = "right";
+        ctx.fillText(Math.round(e / 1000) + "kJ", pl - 4, ty(e) + 4);
       }
 
-      // blue fill under limit
-      ctx.beginPath(); ctx.moveTo(tx(0), ty(0))
-      for (let v = 0; v <= vLimit; v += 0.5) ctx.lineTo(tx(v), ty(ke(v)))
-      ctx.lineTo(tx(vLimit), ty(0)); ctx.closePath()
-      ctx.fillStyle = 'rgba(56,189,248,0.10)'; ctx.fill()
+      // Energy regions
+      ctx.beginPath(); ctx.moveTo(tx(0), ty(0));
+      for (let v = 0; v <= vLimit; v += 0.5) ctx.lineTo(tx(v), ty(ke(v)));
+      ctx.lineTo(tx(vLimit), ty(0)); ctx.closePath();
+      ctx.fillStyle = "rgba(56,189,248,0.10)"; ctx.fill();
 
-      // red fill: extra energy
       if (vYours > vLimit) {
-        ctx.beginPath(); ctx.moveTo(tx(vLimit), ty(ke(vLimit)))
-        for (let v = vLimit; v <= vYours; v += 0.5) ctx.lineTo(tx(v), ty(ke(v)))
-        ctx.lineTo(tx(vYours), ty(0)); ctx.lineTo(tx(vLimit), ty(0)); ctx.closePath()
-        ctx.fillStyle = 'rgba(248,113,113,0.18)'; ctx.fill()
+        ctx.beginPath(); ctx.moveTo(tx(vLimit), ty(ke(vLimit)));
+        for (let v = vLimit; v <= vYours; v += 0.5) ctx.lineTo(tx(v), ty(ke(v)));
+        ctx.lineTo(tx(vYours), ty(0)); ctx.lineTo(tx(vLimit), ty(0)); ctx.closePath();
+        ctx.fillStyle = "rgba(248,113,113,0.18)"; ctx.fill();
       }
 
-      // curve
-      ctx.strokeStyle = C.blue; ctx.lineWidth = 2.5; ctx.beginPath()
+      // Main curve
+      ctx.strokeStyle = C.blue || "#0284c7"; ctx.lineWidth = 2.5; ctx.beginPath();
       for (let v = 0; v <= vMax; v += 0.5) {
-        v === 0 ? ctx.moveTo(tx(v), ty(ke(v))) : ctx.lineTo(tx(v), ty(ke(v)))
+        v === 0 ? ctx.moveTo(tx(v), ty(ke(v))) : ctx.lineTo(tx(v), ty(ke(v)));
       }
-      ctx.stroke()
+      ctx.stroke();
 
-      // tangent at limit
-      const dkdv = (ke(vLimit + 0.1) - ke(vLimit - 0.1)) / 0.2
-      const tlen = 15
-      ctx.strokeStyle = C.amber; ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.moveTo(tx(vLimit - tlen), ty(ke(vLimit) - tlen * dkdv))
-      ctx.lineTo(tx(vLimit + tlen), ty(ke(vLimit) + tlen * dkdv))
-      ctx.stroke()
+      // Tangent
+      const dkdv = (ke(vLimit + 0.1) - ke(vLimit - 0.1)) / 0.2;
+      const tlen = 15;
+      ctx.strokeStyle = C.amber || "#d97706"; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.moveTo(tx(vLimit - tlen), ty(ke(vLimit) - tlen * dkdv));
+      ctx.lineTo(tx(vLimit + tlen), ty(ke(vLimit) + tlen * dkdv));
+      ctx.stroke();
 
-      // dots
-      [[vLimit, C.blue], vYours > vLimit ? [vYours, C.red] : null]
-        .filter(Boolean)
-        .forEach(([v, col]) => {
-          ctx.fillStyle = col; ctx.beginPath()
-          ctx.arc(tx(v), ty(ke(v)), 6, 0, Math.PI * 2); ctx.fill()
-          ctx.fillStyle = C.text; ctx.font = '500 12px sans-serif'; ctx.textAlign = 'center'
-          ctx.fillText(v + ' km/h', tx(v), ty(ke(v)) - 12)
-          ctx.fillStyle = col; ctx.font = '11px sans-serif'
-          ctx.fillText(Math.round(ke(v) / 1000) + 'kJ', tx(v), ty(ke(v)) + 22)
-        })
+      // Interaction points
+      [[vLimit, C.blue || "#0284c7"], vYours > vLimit ? [vYours, C.red || "#dc2626"] : null]
+        .filter(Boolean).forEach(([v, col]) => {
+          ctx.fillStyle = col; ctx.beginPath();
+          ctx.arc(tx(v), ty(ke(v)), 6, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = C.text || "#1e293b"; ctx.font = "500 12px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText(v + " km/h", tx(v), ty(ke(v)) - 12);
+          ctx.fillStyle = col; ctx.font = "11px sans-serif";
+          ctx.fillText(Math.round(ke(v) / 1000) + "kJ", tx(v), ty(ke(v)) + 22);
+        });
 
       if (vYours > vLimit) {
-        ctx.fillStyle = C.red; ctx.font = '500 11px sans-serif'; ctx.textAlign = 'center'
-        ctx.fillText('+' + Math.round((ke(vYours) - ke(vLimit)) / 1000) + 'kJ extra',
-          tx((vLimit + vYours) / 2), ty((ke(vLimit) + ke(vYours)) / 2))
+        ctx.fillStyle = C.red || "#dc2626"; ctx.font = "500 11px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("+" + Math.round((ke(vYours) - ke(vLimit)) / 1000) + "kJ extra", tx((vLimit + vYours) / 2), ty((ke(vLimit) + ke(vYours)) / 2));
       }
 
-      ctx.fillStyle = C.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText('speed (km/h)', pl + iw / 2, ch - 5)
-      ctx.save(); ctx.translate(14, pt + ih / 2); ctx.rotate(-Math.PI / 2)
-      ctx.fillText('kinetic energy (kJ)', 0, 0); ctx.restore()
-      ctx.fillStyle = C.blue; ctx.font = '500 12px sans-serif'; ctx.textAlign = 'right'
-      ctx.fillText('KE = ½mv²', pl + iw - 4, pt + 16)
-    }
-    draw()
-    if (!roRef.current) {
-      roRef.current = new ResizeObserver(draw)
-      if (canvasRef.current?.parentElement) roRef.current.observe(canvasRef.current.parentElement)
-    }
-    return () => { if (roRef.current) { roRef.current.disconnect(); roRef.current = null } }
-  }, [vLimit, vYours, C])
+      // Labels
+      ctx.fillStyle = C.muted || "#64748b"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("speed (km/h)", pl + iw / 2, ch - 5);
+      ctx.save(); ctx.translate(14, pt + ih / 2); ctx.rotate(-Math.PI / 2);
+      ctx.fillText("kinetic energy (kJ)", 0, 0); ctx.restore();
+      ctx.fillStyle = C.blue || "#0284c7"; ctx.font = "500 12px sans-serif"; ctx.textAlign = "right";
+      ctx.fillText("KE = ½mv²", pl + iw - 4, pt + 16);
+    };
+
+    draw();
+    const ro = new ResizeObserver(draw);
+    ro.observe(canvas.parentElement || canvas);
+    return () => ro.disconnect();
+  }, [vLimit, vYours, C]);
 
   return <canvas ref={canvasRef} style={{ width: '100%', height: 260, display: 'block' }} />
 }
@@ -243,52 +249,64 @@ function CarCrashCanvas({ impactSpeed, crush, C }) {
   const canvasRef = useRef(null)
   const roRef = useRef(null)
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const draw = () => {
-      const cv = canvasRef.current; if (!cv) return
-      const cw = cv.offsetWidth || 500, ch = 170
-      cv.width = cw; cv.height = ch
-      const ctx = cv.getContext('2d')
-      ctx.clearRect(0, 0, cw, ch)
-      ctx.fillStyle = C.hint; ctx.fillRect(cw - 55, 15, 55, ch - 30)
-      ctx.fillStyle = C.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText('WALL', cw - 27, ch / 2)
-      const carRight = cw - 58
-      const bodyW = 170
-      const crumplePx = crush * 110
-      const bodyLeft = carRight - bodyW
+      const cv = canvasRef.current;
+      if (!cv || !C) return;
+      const ctx = cv.getContext("2d");
+      if (!ctx) return;
+
+      const cw = cv.offsetWidth || 500, ch = 170;
+      if (cv.width !== cw) cv.width = cw;
+      if (cv.height !== ch) cv.height = ch;
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.fillStyle = C.hint || "#94a3b8"; ctx.fillRect(cw - 55, 15, 55, ch - 30);
+      ctx.fillStyle = C.muted || "#64748b"; ctx.font = "12px sans-serif"; ctx.textAlign = "center";
+      ctx.fillText("WALL", cw - 27, ch / 2);
+
+      const carRight = cw - 58;
+      const bodyW = 170;
+      const crumplePx = crush * 110;
+      const bodyLeft = carRight - bodyW;
+
       if (crumplePx > 2) {
         for (let i = 0; i < Math.floor(crumplePx / 5); i++) {
-          const px = carRight - crumplePx + i * 5
-          const jitter = Math.sin(i * 2.7) * 7 * Math.min(crush, 1)
-          ctx.fillStyle = i % 2 === 0 ? C.redBg : C.amberBg
-          ctx.fillRect(px, 48 + jitter, 5, 74)
+          const px = carRight - crumplePx + i * 5;
+          const jitter = Math.sin(i * 2.7) * 7 * Math.min(crush, 1);
+          ctx.fillStyle = i % 2 === 0 ? C.redBg : C.amberBg;
+          ctx.fillRect(px, 48 + jitter, 5, 74);
         }
-        ctx.strokeStyle = C.red; ctx.lineWidth = 1.5
-        ctx.strokeRect(carRight - crumplePx, 48, crumplePx, 74)
+        ctx.strokeStyle = C.red || "#dc2626"; ctx.lineWidth = 1.5;
+        ctx.strokeRect(carRight - crumplePx, 48, crumplePx, 74);
       }
-      ctx.fillStyle = C.surface2; ctx.fillRect(bodyLeft, 48, bodyW - crumplePx, 74)
-      ctx.strokeStyle = C.border; ctx.lineWidth = 1; ctx.strokeRect(bodyLeft, 48, bodyW - crumplePx, 74)
-      ctx.fillStyle = C.blueBg; ctx.fillRect(bodyLeft + 20, 54, 50, 28)
-        ;[bodyLeft + 28, bodyLeft + bodyW - crumplePx - 32].forEach(wx => {
-          if (wx > bodyLeft + 10) {
-            ctx.fillStyle = C.hint; ctx.beginPath(); ctx.arc(wx, 132, 13, 0, Math.PI * 2); ctx.fill()
-            ctx.fillStyle = C.surface2; ctx.beginPath(); ctx.arc(wx, 132, 5, 0, Math.PI * 2); ctx.fill()
-          }
-        })
-      ctx.fillStyle = C.text; ctx.font = '500 13px sans-serif'; ctx.textAlign = 'left'
-      ctx.fillText(impactSpeed + ' km/h', bodyLeft + 8, 44)
+
+      ctx.fillStyle = C.surface2 || "#f1f5f9"; ctx.fillRect(bodyLeft, 48, bodyW - crumplePx, 74);
+      ctx.strokeStyle = C.border || "#cbd5e1"; ctx.lineWidth = 1; ctx.strokeRect(bodyLeft, 48, bodyW - crumplePx, 74);
+      ctx.fillStyle = C.blueBg || "rgba(56,189,248,0.12)"; ctx.fillRect(bodyLeft + 20, 54, 50, 28);
+
+      [bodyLeft + 28, bodyLeft + bodyW - crumplePx - 32].forEach((wx) => {
+        if (wx > bodyLeft + 10) {
+          ctx.fillStyle = C.hint || "#94a3b8"; ctx.beginPath(); ctx.arc(wx, 132, 13, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = C.surface2 || "#f1f5f9"; ctx.beginPath(); ctx.arc(wx, 132, 5, 0, Math.PI * 2); ctx.fill();
+        }
+      });
+
+      ctx.fillStyle = C.text || "#1e293b"; ctx.font = "500 13px sans-serif"; ctx.textAlign = "left";
+      ctx.fillText(impactSpeed + " km/h", bodyLeft + 8, 44);
       if (crush > 0.05) {
-        ctx.fillStyle = C.red; ctx.font = '500 12px sans-serif'; ctx.textAlign = 'center'
-        ctx.fillText('crush: ' + (crush * 100).toFixed(0) + 'cm', carRight - crumplePx / 2, 38)
+        ctx.fillStyle = C.red || "#dc2626"; ctx.font = "500 12px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("crush: " + (crush * 100).toFixed(0) + "cm", carRight - crumplePx / 2, 38);
       }
-    }
-    draw()
-    if (!roRef.current) {
-      roRef.current = new ResizeObserver(draw)
-      if (canvasRef.current?.parentElement) roRef.current.observe(canvasRef.current.parentElement)
-    }
-    return () => { if (roRef.current) { roRef.current.disconnect(); roRef.current = null } }
-  }, [impactSpeed, crush, C])
+    };
+
+    draw();
+    const ro = new ResizeObserver(draw);
+    ro.observe(canvas.parentElement || canvas);
+    return () => ro.disconnect();
+  }, [impactSpeed, crush, C]);
   return <canvas ref={canvasRef} style={{ width: '100%', height: 170, display: 'block', borderRadius: 8 }} />
 }
 
