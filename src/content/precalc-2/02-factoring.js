@@ -18,6 +18,8 @@ export default {
       'Multiplication builds expressions; factoring dismantles them. When you multiply $(x+3)(x-2)$, you get $x^2 + x - 6$. Factoring asks: given $x^2 + x - 6$, can you recover the pieces? The answer is yes — because multiplication of polynomials has a unique inverse (over the integers).',
       'The area model makes this concrete. A rectangle with width $(x+3)$ and height $(x-2)$ has area $x^2 + x - 6$. Factoring means finding rectangle dimensions whose product gives the target area. This is not just a mnemonic — it is why factoring works: multiplication IS area, and area has a unique rectangular decomposition.',
       'Every factoring problem has a decision tree. The first question is always: is there a GCF? Pull it out before anything else — it simplifies every subsequent step. The second question: how many terms? Two terms have special forms (difference of squares, sum/difference of cubes). Three terms are trinomials. Four or more terms usually factor by grouping.',
+      '**Finding the DNA**: In biology, DNA determines the traits of an organism. In algebra, **Factors** are the "DNA" of a function—they tell you exactly where the graph touches the ground (the x-axis) and how it behaves when it gets there. To factor is to find the fundamental identity of the mathematical system.',
+      '**Reverse Engineering**: If Lesson 1 was "building the engine" (expansion), Lesson 2 is "taking it apart" (factoring). Every time you pull out a GCF or a binomial factor, you are reducing the complexity of the machine to see how its parts work together.',
     ],
     callouts: [
       {
@@ -34,6 +36,26 @@ export default {
         type: 'warning',
         title: 'Sum of squares does NOT factor over the reals',
         body: 'a^2 - b^2 = (a-b)(a+b) \\qquad \\checkmark \\\\ a^2 + b^2 = \\text{prime over } \\mathbb{R} \\qquad \\times \\\\ \\text{(It factors over } \\mathbb{C}\\text{: }(a+bi)(a-bi)\\text{ — covered in L6.)}',
+      },
+      {
+        type: 'insight',
+        title: 'Linguistic Learner: The Etymology of Algebra',
+        body: '\\text{Factoring is like finding the "root" of a complex word.} \\\\ \\text{Just as "un-happy" breaks into "un" and "happy," } x^2-9 \\text{ breaks into its fundamental meanings: } (x-3) \\text{ and } (x+3).',
+      },
+      {
+        type: 'insight',
+        title: 'Logical Learner: Reverse Engineering',
+        body: '\\text{If expansion was the "Build" step, factoring is the "Debug" step.} \\\\ \\text{You are taking the final result and tracing it back to the original inputs to find why it "zeros out."}',
+      },
+      {
+        type: 'insight',
+        title: 'Physical Learner: Tiling the Footprint',
+        body: '\\text{Imagine you have } 6x^2+7x-3 \\text{ floor tiles. Factoring is the physical act of arranging them into a perfect rectangle.} \\\\ \\text{The dimensions of that rectangle are your factors.}',
+      },
+      {
+        type: 'insight',
+        title: 'Visual Learner: Visions of Zero',
+        body: '\\text{Look for the "Sign Crossings." Every factor } (x-c) \\text{ is a visual instruction to cross the origin at point } c. \\\\ \\text{Factoring is drawing the map of the crossing points.}',
       },
     ],
     visualizations: [
@@ -68,12 +90,26 @@ export default {
         title: 'Sum/difference of cubes memory: SOAP',
         body: '(a \\pm b)(a^2 \\mp ab + b^2) \\\\ \\text{S: Same sign as original. O: Opposite sign. A: Always positive.} \\\\ a^3 + b^3 = (a+b)(a^2 - ab + b^2) \\quad \\text{same, opposite, always}+',
       },
+      {
+        type: 'theorem',
+        title: 'The Rational Roots Theorem',
+        body: '\\text{For a polynomial with integer coefficients: any rational zero must be } \\frac{\\text{factor of constant term } a_0}{\\text{factor of leading coeff } a_n}. \\\\ \\text{This provides the list of all possible "DNA candidates" for factoring.}',
+      },
+      {
+        type: 'theorem',
+        title: 'Proof of the Zero Product Property',
+        body: '\\text{If } a \\cdot b = 0 \\text{ and } a \\neq 0, \\text{ then } \\frac{1}{a}(a \\cdot b) = \\frac{1}{a}(0) \\implies b = 0. \\\\ \\text{This logic is why factoring is a mandatory tool for solving equations.}',
+      },
     ],
   },
 
   rigor: {
-    title: 'Visual proof: why $(a-b)(a+b) = a^2 - b^2$ (difference of squares)',
+    title: 'Proof: The Geometry of Factoring',
     proofSteps: [
+      {
+        expression: '\\text{--- Part I: The Difference of Squares Area Move ---}',
+        annotation: 'Let us visualize $a^2 - b^2$ through area rearrangement.',
+      },
       {
         expression: '\\text{Start with a square of side } a. \\text{ Area} = a^2.',
         annotation: 'Draw a large square with side length $a$.',
@@ -83,16 +119,20 @@ export default {
         annotation: 'Cut out a $b \\times b$ square from one corner. The L-shaped region has area $a^2 - b^2$.',
       },
       {
-        expression: '\\text{Cut the L-shape horizontally to make two rectangles.}',
-        annotation: 'Slice the L along the horizontal: top rectangle is $(a-b) \\times a$, bottom piece is $(a-b) \\times b$.',
+        expression: '\\text{Slice and rotate: the L-shape becomes a rectangle of } (a-b) \\times (a+b).',
+        annotation: 'Same area, two representations. $a^2 - b^2 = (a-b)(a+b)$.',
       },
       {
-        expression: '\\text{Rotate the bottom rectangle and attach it to the right of the top.}',
-        annotation: 'The two pieces form a single rectangle of dimensions $(a-b) \\times (a+b)$.',
+        expression: '\\text{--- Part II: Sum of Cubes Volume Decomposition ---}',
+        annotation: 'A sum of cubes $a^3 + b^3$ can be visualized as two solid blocks fused into one L-shaped volume.',
       },
       {
-        expression: 'a^2 - b^2 = (a-b)(a+b) \\qquad \\blacksquare',
-        annotation: 'Same area, two representations. The rearrangement proves the identity — no algebra needed.',
+        expression: '\\text{Volume} = (a+b)a^2 - (a+b)ab + (a+b)b^2',
+        annotation: 'By slicing the combined volume along the junction planes, we find three sub-volumes that all share the factor $(a+b)$.',
+      },
+      {
+        expression: '= (a+b)(a^2 - ab + b^2) \\qquad \\blacksquare',
+        annotation: 'Factoring out $(a+b)$ reveals the quadratic "base" of the identity. Geometry again verifies the algebra.',
       },
     ],
   },
@@ -178,6 +218,42 @@ export default {
       ],
       conclusion: 'Grouping works when the four terms split into two pairs that share a common factor. If the first grouping does not work, try a different pairing.',
     },
+    {
+      id: 'ex-factoring-rational',
+      title: 'Advanced Structure: Rational Exponents',
+      problem: '\\text{Factor completely: } x^{3/2} - x^{1/2} - 6x^{-1/2}',
+      steps: [
+        {
+          expression: '= x^{-1/2}(x^2 - x - 6)',
+          annotation: 'Step 1: Always pull out the GCF. Here, the lowest power $x^{-1/2}$ is the factor common to all terms.'
+        },
+        {
+          expression: '= x^{-1/2}(x-3)(x+2)',
+          annotation: 'Step 2: Factor the remaining quadratic trinomial. Need product $-6$ and sum $-1$.'
+        }
+      ],
+      conclusion: 'Even with negative or fractional exponents, the "Lowest Power" is always your GCF. This unlocks the quadratic structure inside.'
+    },
+    {
+      id: 'ex-factoring-quadform',
+      title: 'Factoring in Quadratic Form',
+      problem: '\\text{Factor completely: } x^4 - 5x^2 + 4',
+      steps: [
+        {
+          expression: '(x^2)^2 - 5(x^2) + 4',
+          annotation: 'Step 1: Recognise the structure as $u^2 - 5u + 4$ where $u = x^2$.'
+        },
+        {
+          expression: '(x^2 - 1)(x^2 - 4)',
+          annotation: 'Step 2: Factor the trinomial. Need product $4$ and sum $-5$.'
+        },
+        {
+          expression: '(x-1)(x+1)(x-2)(x+2)',
+          annotation: 'Step 3: Each factor is a Difference of Squares. Break them down completely.'
+        }
+      ],
+      conclusion: 'Many high-degree polynomials are just quadratics in disguise. Scaling the variable (substitution) reveals the path.'
+    },
   ],
 
   challenges: [
@@ -231,6 +307,27 @@ export default {
       ],
       answer: '(x-1)(x+1)(x^2+x+1)(x^2-x+1)',
     },
+    {
+      id: 'ch2-002-ch3',
+      difficulty: 'harder',
+      problem: '\\text{Factor completely using the "Sophie Germain" identity: } x^4 + 4.',
+      hint: 'Add and subtract a term ($4x^2$) to complete a perfect square. The original is not a difference of squares... yet.',
+      walkthrough: [
+        {
+          expression: 'x^4 + 4 = (x^4 + 4x^2 + 4) - 4x^2',
+          annotation: 'Step 1: Complete the square $(x^2+2)^2$ by adding and subtracting $4x^2$.'
+        },
+        {
+          expression: '= (x^2+2)^2 - (2x)^2',
+          annotation: 'Step 2: Recognize the difference of squares: $a = (x^2+2)$ and $b = (2x)$.'
+        },
+        {
+          expression: '= (x^2 + 2x + 2)(x^2 - 2x + 2) \\qquad \\blacksquare',
+          annotation: 'Step 3: Factors are the sum and difference. Both are irreducible over the reals.'
+        }
+      ],
+      answer: '(x^2+2x+2)(x^2-2x+2)'
+    }
   ],
 
   calcBridge: {
