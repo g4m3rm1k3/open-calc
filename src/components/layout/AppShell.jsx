@@ -11,7 +11,8 @@ import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import GrapherContext from '../../context/GrapherContext.jsx'
-import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X } from 'lucide-react'
+import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X, Calculator } from 'lucide-react'
+import TICalc from '../calculator/TICalc.jsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import MobileBottomNav from './MobileBottomNav.jsx'
 
@@ -104,7 +105,7 @@ function ScoreWidget() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -226,6 +227,19 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
           <PenLine className="w-4 h-4" />
           <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Notes</span>
         </button>
+
+        <button
+          onClick={onCalcToggle}
+          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
+            calcOpen
+              ? 'text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/40 border-violet-200 dark:border-violet-800/50'
+              : 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 hover:bg-violet-100 dark:hover:bg-violet-900/50 border-violet-100 dark:border-violet-800/50'
+          }`}
+          title="TI Calculator (C)"
+        >
+          <Calculator className="w-4 h-4" />
+          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Calc</span>
+        </button>
       </div>
 
       {/* Dark mode toggle */}
@@ -304,6 +318,7 @@ export default function AppShell({ children }) {
   const [graph3DOpen, setGraph3DOpen] = useState(false)
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
   const [scratchOpen, setScratchOpen] = useState(false)
+  const [calcOpen, setCalcOpen] = useState(false)
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
 
@@ -346,12 +361,17 @@ export default function AppShell({ children }) {
       if (e.key.toLowerCase() === 's' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         setScratchOpen(prev => !prev)
       }
+      // 'c' key for TI calculator
+      if (e.key.toLowerCase() === 'c' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        setCalcOpen(prev => !prev)
+      }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
         setGraph3DOpen(false)
         setGraphJSXOpen(false)
         setScratchOpen(false)
+        setCalcOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -361,14 +381,16 @@ export default function AppShell({ children }) {
   return (
     <GrapherContext.Provider value={{ openGrapher }}>
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <TopBar 
-        onMenuToggle={() => setSidebarOpen((o) => !o)} 
+      <TopBar
+        onMenuToggle={() => setSidebarOpen((o) => !o)}
         sidebarOpen={sidebarOpen}
         onGraphToggle={() => setGraphOpen(prev => !prev)}
         onGraph3DToggle={() => setGraph3DOpen(prev => !prev)}
         onGraphJSXToggle={() => setGraphJSXOpen(prev => !prev)}
         onScratchToggle={() => setScratchOpen(prev => !prev)}
         scratchOpen={scratchOpen}
+        onCalcToggle={() => setCalcOpen(prev => !prev)}
+        calcOpen={calcOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -487,6 +509,17 @@ export default function AppShell({ children }) {
                 </div>
                 <span className="text-[11px] font-bold uppercase tracking-wider">Scratchpad</span>
               </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { setCalcOpen(true); setMobileToolsOpen(false) }}
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 border border-violet-100 dark:border-violet-800/50 shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-800/50 flex items-center justify-center">
+                  <Calculator className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-wider">TI Calc</span>
+              </motion.button>
             </div>
 
             {/* Quick stats / tips? */}
@@ -499,6 +532,7 @@ export default function AppShell({ children }) {
       </AnimatePresence>
 
 
+      {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
       <PinsPanel />
       <WelcomeModal />
       <SearchModal />
