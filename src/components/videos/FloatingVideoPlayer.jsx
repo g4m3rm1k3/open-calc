@@ -277,6 +277,25 @@ export default function FloatingVideoPlayer() {
     setIsAddingCustom(false);
   };
 
+  const handleOpenYouTubeSearch = () => {
+    if (!lessonId) return;
+    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+    if (!lesson) return;
+    
+    const tags = Array.isArray(lesson.tags) ? lesson.tags.join('+') : '';
+    const course = lesson.course === 'web-1' ? 'web+development' : (lesson.course || '');
+    const query = `${lesson.title}+${tags}+${course}+tutorial`.trim().replace(/\s+/g, '+');
+    
+    const url = `https://www.youtube.com/results?search_query=${query}`;
+    
+    const width = 800;
+    const height = 600;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+    
+    window.open(url, 'youtubeSearchPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
+  };
+
   if (!isOpen) {
     if (!isLauncher) return null;
     return (
@@ -528,25 +547,41 @@ export default function FloatingVideoPlayer() {
                              )}
                           </div>
 
-                          {currentLessonVideos ? Object.entries(currentLessonVideos).map(([section, vids]) => (
-                            <div key={section} className="mb-4">
-                              <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
-                              {vids.map(vid => (
-                                 <VideoRow 
-                                   key={vid.id} 
-                                   video={vid} 
-                                   active={vid.id === currentVideo?.id} 
-                                   progress={videoProgress[vid.id] || 0}
-                                   onClick={() => selectVideo(vid)} 
-                                   onPin={() => togglePin(vid.id)}
-                                   isPinned={pinnedVideos.includes(vid.id)}
-                                 />
+                          {currentLessonVideos ? (
+                            <>
+                              {Object.entries(currentLessonVideos).map(([section, vids]) => (
+                                <div key={section} className="mb-4">
+                                  <p className="text-[9px] font-bold uppercase tracking-widest text-brand-500/60 px-2 mb-1">{section}</p>
+                                  {vids.map(vid => (
+                                    <VideoRow 
+                                      key={vid.id} 
+                                      video={vid} 
+                                      active={vid.id === currentVideo?.id} 
+                                      progress={videoProgress[vid.id] || 0}
+                                      onClick={() => selectVideo(vid)} 
+                                      onPin={() => togglePin(vid.id)}
+                                      isPinned={pinnedVideos.includes(vid.id)}
+                                    />
+                                  ))}
+                                </div>
                               ))}
-                            </div>
-                          )) : (
+                              {lessonId && (
+                                <div className="mt-6 mb-4 px-2">
+                                  <button onClick={handleOpenYouTubeSearch} className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors">
+                                    <Search size={14} /> Search more on YouTube
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          ) : (
                             <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
                               <Compass size={32} className="text-slate-300 mb-3" />
                               <p className="text-xs text-slate-500 leading-relaxed font-medium">Select a lesson from the curriculum or browse subjects above to see tutorials.</p>
+                              {lessonId && (
+                                <button onClick={handleOpenYouTubeSearch} className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-brand-500/20 hover:bg-brand-600 hover:-translate-y-0.5 transition-all">
+                                  <Search size={14} /> Search YouTube
+                                </button>
+                              )}
                             </div>
                           )}
                         </motion.div>
