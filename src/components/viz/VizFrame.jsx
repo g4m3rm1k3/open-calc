@@ -107,6 +107,10 @@ const VIZ_REGISTRY = {
   SignedArea: lazy(() => import("./d3/SignedArea.jsx")),
   AreaBetweenCurves: lazy(() => import("./d3/AreaBetweenCurves.jsx")),
   IntegrationMethodLab: lazy(() => import("./d3/IntegrationMethodLab.jsx")),
+  // Physics — Interactive Simulations (Matter.js / canvas)
+  ForceBlockSim: lazy(() => import("./matter/ForceBlockSim.jsx")),
+  InclinedPlaneSim: lazy(() => import("./matter/InclinedPlaneSim.jsx")),
+  AtwoodMachineSim: lazy(() => import("./matter/AtwoodMachineSim.jsx")),
   // Chapter 3 — Applications of Derivatives
   NewtonsMethod: lazy(() => import("./d3/NewtonsMethod.jsx")),
   SpringOscillation: lazy(() => import("./d3/SpringOscillation.jsx")),

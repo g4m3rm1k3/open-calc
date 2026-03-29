@@ -1323,6 +1323,240 @@ function CircularMotionDiagram({ C }) {
   )
 }
 
+// ─── Inclined Plane (Ch4) ────────────────────────────────────────────────────
+
+function InclinedPlaneDiagram({ C }) {
+  const W = 500, H = 260
+  const θ = 32 * Math.PI / 180
+  const sinθ = Math.sin(θ), cosθ = Math.cos(θ)
+  // Slope base: ox,oy to ox+L,oy; apex at ox,oy-L*tanθ
+  const ox = 55, oy = H - 50, L = 320
+  const tx = ox + L, ty = oy
+  const apx = ox, apy = oy - L * Math.tan(θ)
+  // Block sits 55% up slope
+  const t = 0.52
+  const bsx = ox + t * L, bsy = oy - t * L * Math.tan(θ)
+  const bHalf = 18
+  // Block center offset perpendicular to slope (outward)
+  const bcx = bsx - bHalf * sinθ, bcy = bsy - bHalf * cosθ
+
+  const arrow = (x1, y1, x2, y2, color, label, lx = 0, ly = -10) => {
+    const dx = x2 - x1, dy = y2 - y1
+    const len = Math.sqrt(dx * dx + dy * dy)
+    if (len < 3) return null
+    const ux = dx / len, uy = dy / len
+    const h = 9
+    const tip1x = x2 - h * ux + h * 0.4 * uy, tip1y = y2 - h * uy - h * 0.4 * ux
+    const tip2x = x2 - h * ux - h * 0.4 * uy, tip2y = y2 - h * uy + h * 0.4 * ux
+    return (
+      <g key={label}>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
+        <polygon points={`${x2},${y2} ${tip1x},${tip1y} ${tip2x},${tip2y}`} fill={color} />
+        {label && <text x={(x1+x2)/2+lx} y={(y1+y2)/2+ly} textAnchor="middle" fill={color} fontSize={10} fontFamily="monospace">{label}</text>}
+      </g>
+    )
+  }
+
+  const forceScale = 36
+  const W_mag = forceScale
+  // W_par = sinθ * forceScale (down slope)
+  // W_perp = cosθ * forceScale (into slope)
+  // N = cosθ * forceScale (out of slope)
+
+  // Down-slope unit vector: (cosθ, sinθ) in screen coords (y flipped)
+  const dsux = cosθ, dsuy = sinθ  // screen: y increases downward
+  // Into-slope unit: (sinθ, -cosθ) pointing into slope (screen)
+  // Normal: (-sinθ, cosθ) pointing away from slope (screen)
+  const normX = -sinθ, normY = cosθ   // screen-space normal (upward from slope)
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 260 }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Slope triangle */}
+      <polygon points={`${ox},${apy} ${tx},${ty} ${ox},${ty}`} fill={C.surface} stroke={C.border} strokeWidth={1.5} />
+      {/* Slope surface (highlighted) */}
+      <line x1={ox} y1={apy} x2={tx} y2={ty} stroke={C.muted} strokeWidth={2} />
+
+      {/* Angle arc + label */}
+      <path d={`M ${tx-36},${ty} A 36,36 0 0,0 ${tx - 36*cosθ},${ty - 36*sinθ}`} fill="none" stroke={C.muted} strokeWidth={1.5} />
+      <text x={tx - 50} y={ty - 10} fill={C.muted} fontSize={11} fontFamily="monospace">θ=32°</text>
+
+      {/* Ground hatching */}
+      {[...Array(12)].map((_, i) => (
+        <line key={i} x1={ox + i*22} y1={ty} x2={ox + i*22 - 10} y2={ty + 12} stroke={C.border} strokeWidth={1} />
+      ))}
+      <line x1={ox} y1={ty} x2={tx+8} y2={ty} stroke={C.border} strokeWidth={1.5} />
+
+      {/* Block */}
+      <g transform={`translate(${bcx},${bcy}) rotate(${-θ * 180/Math.PI})`}>
+        <rect x={-bHalf} y={-bHalf} width={bHalf*2} height={bHalf*2} fill={C.brand} rx={3} />
+        <text x={0} y={4} textAnchor="middle" fill="#fff" fontSize={10} fontFamily="monospace" fontWeight="bold">m</text>
+      </g>
+
+      {/* Weight arrow (straight down) */}
+      {arrow(bcx, bcy, bcx, bcy + W_mag, C.rose, 'W=mg', 16, 0)}
+
+      {/* Normal force (perpendicular out of slope, cyan) */}
+      {arrow(bcx, bcy, bcx + normX * W_mag * cosθ, bcy + normY * W_mag * cosθ, C.sky, 'N', -20, -6)}
+
+      {/* W_parallel (down slope, dashed, amber) */}
+      <line x1={bcx} y1={bcy} x2={bcx + dsux * W_mag * sinθ} y2={bcy + dsuy * W_mag * sinθ}
+        stroke={C.amber} strokeWidth={2} strokeDasharray="5,3" />
+      <text x={bcx + dsux * W_mag * sinθ * 0.5 + 12} y={bcy + dsuy * W_mag * sinθ * 0.5 + 10}
+        fill={C.amber} fontSize={10} fontFamily="monospace">W∥=mg sinθ</text>
+
+      {/* W_perp (into slope, dashed, muted) */}
+      <line x1={bcx} y1={bcy} x2={bcx - normX * W_mag * cosθ} y2={bcy - normY * W_mag * cosθ}
+        stroke={C.muted} strokeWidth={2} strokeDasharray="5,3" />
+      <text x={bcx - normX * W_mag * cosθ * 0.5 - 28} y={bcy - normY * W_mag * cosθ * 0.5 - 4}
+        fill={C.muted} fontSize={10} fontFamily="monospace">W⊥=mg cosθ</text>
+
+      {/* Friction arrow (up slope, orange) */}
+      {arrow(bcx, bcy, bcx - dsux * W_mag * sinθ * 0.55, bcy - dsuy * W_mag * sinθ * 0.55, C.amber, 'f', -12, -6)}
+
+      {/* Footer formula */}
+      <text x={W/2} y={H-8} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="monospace">
+        a = g(sinθ − μcosθ)   ·   N = mg cosθ
+      </text>
+    </svg>
+  )
+}
+
+// ─── Pulley / Atwood Machine (Ch4) ───────────────────────────────────────────
+
+function PulleySystemDiagram({ C }) {
+  const W = 400, H = 300
+  const px = W / 2, py = 52   // pulley center
+  const pR = 20                 // pulley radius
+  const ropeY = py + pR
+  const lx = px - 38, rx = px + 38  // rope x coords left/right
+  const m1y = ropeY + 120, m2y = ropeY + 80  // block centers
+  const bW = 50, bH = 34
+
+  const arrow = (x1, y1, x2, y2, color, label, above = true) => {
+    const dx = x2-x1, dy = y2-y1
+    const len = Math.sqrt(dx*dx+dy*dy)
+    if (len < 3) return null
+    const ux = dx/len, uy = dy/len, h = 9
+    return (
+      <g key={label}>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round"/>
+        <polygon points={`${x2},${y2} ${x2-h*ux+h*0.4*uy},${y2-h*uy-h*0.4*ux} ${x2-h*ux-h*0.4*uy},${y2-h*uy+h*0.4*ux}`} fill={color}/>
+        {label && <text x={(x1+x2)/2+(above?-14:14)} y={(y1+y2)/2+(above?-5:12)} fill={color} fontSize={10} fontFamily="monospace">{label}</text>}
+      </g>
+    )
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 300 }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Ceiling */}
+      <rect x={0} y={0} width={W} height={18} fill={C.surface} />
+      {[...Array(10)].map((_,i) => (
+        <line key={i} x1={10+i*36} y1={18} x2={10+i*36-10} y2={28} stroke={C.border} strokeWidth={1} />
+      ))}
+
+      {/* Pulley axle */}
+      <line x1={px} y1={18} x2={px} y2={py} stroke={C.muted} strokeWidth={2}/>
+      {/* Pulley wheel */}
+      <circle cx={px} cy={py} r={pR} fill={C.surface} stroke={C.muted} strokeWidth={3}/>
+      <circle cx={px} cy={py} r={6} fill={C.border}/>
+
+      {/* Ropes */}
+      <line x1={lx} y1={ropeY} x2={lx} y2={m1y - bH/2} stroke={C.muted} strokeWidth={2.5}/>
+      <line x1={rx} y1={ropeY} x2={rx} y2={m2y - bH/2} stroke={C.muted} strokeWidth={2.5}/>
+
+      {/* m1 (heavier, indigo) */}
+      <rect x={lx-bW/2} y={m1y-bH/2} width={bW} height={bH} fill={C.brand} rx={4}/>
+      <text x={lx} y={m1y+5} textAnchor="middle" fill="#fff" fontSize={11} fontFamily="monospace" fontWeight="bold">m₁</text>
+      {/* m2 (lighter, emerald) */}
+      <rect x={rx-bW/2} y={m2y-bH/2} width={bW} height={bH} fill={C.emerald} rx={4}/>
+      <text x={rx} y={m2y+5} textAnchor="middle" fill="#fff" fontSize={11} fontFamily="monospace" fontWeight="bold">m₂</text>
+
+      {/* Forces on m1 */}
+      {arrow(lx, m1y-bH/2, lx, m1y-bH/2-38, C.sky, 'T', true)}
+      {arrow(lx, m1y+bH/2, lx, m1y+bH/2+38, C.rose, 'W₁', false)}
+
+      {/* Forces on m2 */}
+      {arrow(rx, m2y-bH/2, rx, m2y-bH/2-38, C.sky, 'T', true)}
+      {arrow(rx, m2y+bH/2, rx, m2y+bH/2+30, C.rose, 'W₂', false)}
+
+      {/* m1 label (heavier) */}
+      <text x={lx-bW/2-4} y={m1y+4} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="monospace">(heavier)</text>
+
+      {/* Footer formulas */}
+      <text x={W/2} y={H-22} textAnchor="middle" fill={C.brand} fontSize={10} fontFamily="monospace">
+        a = (m₁−m₂)g/(m₁+m₂)
+      </text>
+      <text x={W/2} y={H-7} textAnchor="middle" fill={C.sky} fontSize={10} fontFamily="monospace">
+        T = 2m₁m₂g/(m₁+m₂)
+      </text>
+    </svg>
+  )
+}
+
+// ─── Action-Reaction (Ch4) ────────────────────────────────────────────────────
+
+function ActionReactionDiagram({ C }) {
+  const W = 500, H = 200
+  // Two blocks pressing against each other
+  const cx = W / 2, cy = H / 2
+  const bW = 80, bH = 50
+
+  const arrow = (x1, y1, x2, y2, color, label) => {
+    const dx = x2-x1, dy = y2-y1
+    const len = Math.sqrt(dx*dx+dy*dy)
+    if (len < 3) return null
+    const ux = dx/len, uy = dy/len, h = 10
+    return (
+      <g key={`${x1}${y1}${label}`}>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round"/>
+        <polygon points={`${x2},${y2} ${x2-h*ux+h*0.38*uy},${y2-h*uy-h*0.38*ux} ${x2-h*ux-h*0.38*uy},${y2-h*uy+h*0.38*ux}`} fill={color}/>
+        {label && <text x={(x1+x2)/2} y={(y1+y2)/2-8} textAnchor="middle" fill={color} fontSize={11} fontFamily="monospace">{label}</text>}
+      </g>
+    )
+  }
+
+  const gap = 4
+  const L_right = cx - gap / 2  // right edge of left block
+  const R_left  = cx + gap / 2  // left edge of right block
+  const aLen = 68
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 200 }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* Left block (indigo) */}
+      <rect x={L_right-bW} y={cy-bH/2} width={bW} height={bH} fill={C.brand} rx={5}/>
+      <text x={L_right-bW/2} y={cy+5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="monospace" fontWeight="bold">A</text>
+
+      {/* Right block (emerald) */}
+      <rect x={R_left} y={cy-bH/2} width={bW} height={bH} fill={C.emerald} rx={5}/>
+      <text x={R_left+bW/2} y={cy+5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="monospace" fontWeight="bold">B</text>
+
+      {/* Applied force on A (pushing right) */}
+      {arrow(L_right-bW-aLen, cy, L_right-bW, cy, C.amber, 'F applied')}
+
+      {/* A pushes B (action, right, indigo) */}
+      {arrow(R_left, cy-10, R_left+aLen, cy-10, C.brand, 'F_AB')}
+      {/* B pushes A (reaction, left, emerald) */}
+      {arrow(L_right, cy+10, L_right-aLen, cy+10, C.emerald, 'F_BA')}
+
+      {/* Equal & opposite label */}
+      <text x={cx} y={cy+bH/2+22} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="monospace">
+        |F_AB| = |F_BA|  ·  opposite directions  ·  act on DIFFERENT objects
+      </text>
+
+      {/* Newton's 3rd statement */}
+      <text x={W/2} y={H-6} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+        Newton's 3rd Law: every action has an equal and opposite reaction
+      </text>
+    </svg>
+  )
+}
+
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
@@ -1350,6 +1584,10 @@ const DIAGRAMS = {
   // 2D Motion / Ch3
   'projectile-arc':          ProjectileArc,
   'circular-motion':         CircularMotionDiagram,
+  // Newton's Laws / Ch4
+  'inclined-plane':          InclinedPlaneDiagram,
+  'pulley-system':           PulleySystemDiagram,
+  'action-reaction':         ActionReactionDiagram,
 }
 
 export default function SVGDiagram({ params = {} }) {

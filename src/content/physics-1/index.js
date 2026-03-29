@@ -2,24 +2,7 @@ import CH0 from "./chapter-0/index.js";
 import CH1 from "./chapter-1/index.js";
 import CH2 from "./chapter-2/index.js";
 import CH3 from "./chapter-3/index.js";
-
-// Newtonian Mechanics
-const CH4 = {
-  title: "Newton's Laws of Motion",
-  number: "p4",
-  slug: "mechanics",
-  lessons: [
-    { id: "p1-ch4-001", title: "Newton's First Law", slug: "first-law" },
-    { id: "p1-ch4-002", title: "Newton's Second Law", slug: "second-law" },
-    { id: "p1-ch4-003", title: "Newton's Third Law", slug: "third-law" },
-    { id: "p1-ch4-004", title: "Free Body Diagrams", slug: "fbd-skill" },
-    { id: "p1-ch4-100", title: "Newton's Law Examples", slug: "newton-examples" },
-    { id: "p1-ch4-200", title: "Statics Problems", slug: "statics-problems" },
-    { id: "p1-ch4-300", title: "Inclined Planes", slug: "inclined-planes" },
-    { id: "p1-ch4-400", title: "Pulley Systems", slug: "pulley-systems" },
-    { id: "p1-ch4-500", title: "Circular Motion Dynamics", slug: "circular-dynamics" },
-  ],
-};
+import CH4 from "./chapter-4/index.js";
 
 // Work & Energy
 const CH5 = {
