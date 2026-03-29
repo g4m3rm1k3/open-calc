@@ -41,4 +41,11 @@ export const COURSES = [
     desc: 'DOM, Reactivity & APIs',
     color: 'orange'
   },
+  { 
+    key: 'linear-algebra',  
+    label: 'Linear Algebra',   
+    path: '/chapter/la1', 
+    desc: 'Vectors & Matrices',
+    color: 'teal'
+  },
 ];

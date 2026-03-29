@@ -157,6 +157,19 @@ const VIZ_REGISTRY = {
   WebLesson09_EventLoop: lazy(() => import("./react/WebLesson09_EventLoop.jsx")),
   WebLesson10_Async: lazy(() => import("./react/WebLesson10_Async.jsx")),
   WebLesson11_StateUI: lazy(() => import("./react/WebLesson11_StateUI.jsx")),
+  // Linear Algebra Module
+  LALesson01_Vectors: lazy(() => import("./react/LALesson01_Vectors.jsx")),
+  LALesson02_Combinations: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson03_DotCross: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson04_Matrices: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson05_MatrixMult: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson06_Inverses: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson07_NullSpace: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson08_Eigen: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson09_Diagonalization: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson10_ComplexEigen: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson11_OrthogonalProjections: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson12_SVD: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
   Ch2_1_LighthouseAngle: lazy(
@@ -481,10 +494,7 @@ const VIZ_REGISTRY = {
   LogGraphViz: lazy(() => import("./d3/LogGraphViz.jsx")),
   LogPropertiesViz: lazy(() => import("./d3/LogPropertiesViz.jsx")),
   ExpLogSolverViz: lazy(() => import("./d3/ExpLogSolverViz.jsx")),
-  ExponentialGrowth: lazy(() => import("./d3/ExponentialGrowth.jsx")),
-  ExponentialSlopeAtZero: lazy(() => import("./d3/ExponentialSlopeAtZero.jsx")),
-  ExpLogBridgeLab: lazy(() => import("./react/ExpLogBridgeLab.jsx")),
-  ExpLogGeometricProof: lazy(() => import("./d3/ExpLogGeometricProof.jsx")),
+
   // ─── Physics Chapter 1: Vectors ─────────────────────────────────────────────
   // Lesson 1: What Is a Vector? (P1-P5)
   VectorArrowIntuition: lazy(() => import("./react/VectorArrowIntuition.jsx")),

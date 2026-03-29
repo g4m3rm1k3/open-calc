@@ -20,6 +20,7 @@ import geo4 from './geometry-4/index.js'
 import geo5 from './geometry-5/index.js'
 import geo6 from './geometry-6/index.js'
 import web1 from './web-1/index.js'
+import linearAlgebra1 from './linear-algebra/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
 const DISCRETE_CURRICULUM = [discrete1].map(ch => ({ ...ch, course: 'discrete' }))
@@ -27,8 +28,9 @@ const PRECALC_CURRICULUM = [precalc1, precalc2, precalc3, precalc4, precalc5].ma
 const PHYSICS_CURRICULUM = physics1Chapters.map(ch => ({ ...ch, course: 'physics-1' }))
 const GEOMETRY_CURRICULUM = [geo1, geo2, geo3, geo4, geo5, geo6].map(ch => ({ ...ch, course: 'geometry' }))
 const WEB_CURRICULUM = web1.map(ch => ({ ...ch, course: 'web-1' }))
+const LA_CURRICULUM = linearAlgebra1.map(ch => ({ ...ch, course: 'linear-algebra' }))
 
-export const CURRICULUM = [...PRECALC_CURRICULUM, ...GEOMETRY_CURRICULUM, ...CALC_CURRICULUM, ...DISCRETE_CURRICULUM, ...PHYSICS_CURRICULUM, ...WEB_CURRICULUM]
+export const CURRICULUM = [...PRECALC_CURRICULUM, ...GEOMETRY_CURRICULUM, ...CALC_CURRICULUM, ...DISCRETE_CURRICULUM, ...PHYSICS_CURRICULUM, ...WEB_CURRICULUM, ...LA_CURRICULUM]
 
 // Flat map for O(1) lookup by slug within chapter
 export const LESSON_MAP = Object.fromEntries(
