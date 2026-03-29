@@ -64,6 +64,16 @@ export default {
         title: 'Fourier Series and Data Compression',
         caption: 'Computer Scientists compress signals (like JPEG/MP3 data) by storing only the lowest-frequency terms. See how truncating the series creates an error ripple (Gibbs phenomenon).',
       },
+      {
+        id: 'Ch5Review',
+        title: 'Chapter 5 Review Board',
+        caption: 'A complete map of Sequences and Series, convergence tests, and Taylor Polynomials.',
+      },
+      {
+        id: 'Ch5Applied',
+        title: 'Chapter 5 Applied Problems',
+        caption: 'Real-world applications of series: signal processing, probability, and physics models.',
+      },
     ],
   },
 

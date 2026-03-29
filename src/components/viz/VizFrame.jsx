@@ -107,6 +107,20 @@ const VIZ_REGISTRY = {
   SignedArea: lazy(() => import("./d3/SignedArea.jsx")),
   AreaBetweenCurves: lazy(() => import("./d3/AreaBetweenCurves.jsx")),
   IntegrationMethodLab: lazy(() => import("./d3/IntegrationMethodLab.jsx")),
+  // ── Chapter Review Boards (end-of-chapter summary + bridge panels) ─────────
+  // Order: Ch2–Ch6 map to project chapters 1–6 (OpenStax Calc Vol 1 numbering)
+  Ch1Review: lazy(() => import("./react/Ch1Review.jsx")),  // Functions & Graphs (Ch0 prereq review)
+  Ch2Review: lazy(() => import("./react/Ch2Review.jsx")),  // Limits & Continuity  → chapter-1
+  Ch3Review: lazy(() => import("./react/Ch3Review.jsx")),  // Derivatives          → chapter-2
+  Ch4Review: lazy(() => import("./react/Ch4Review.jsx")),  // Applications (Optim) → chapter-3
+  Ch5Review: lazy(() => import("./react/Ch5Review.jsx")),  // Integration          → chapter-4
+  Ch6Review: lazy(() => import("./react/Ch6Review.jsx")),  // Applications of Int  → chapter-5/6
+  // ── Chapter Applied Problem Sets (real-world capstone beside each review) ──
+  Ch1Applied: lazy(() => import("./react/Ch1Applied.jsx")),  // Domain, composition, demand
+  Ch2Applied: lazy(() => import("./react/Ch2Applied.jsx")),  // Drug clearance, avg cost, continuity
+  Ch3Applied: lazy(() => import("./react/Ch3Applied.jsx")),  // Marginal analysis, motion, rates
+  Ch4Applied: lazy(() => import("./react/Ch4Applied.jsx")),  // Box, cylinder, 5-step optimisation
+  Ch5Applied: lazy(() => import("./react/Ch5Applied.jsx")),  // Series applications (Taylor bounds, etc.)
   // Physics — Interactive Simulations (Matter.js / canvas)
   ForceBlockSim: lazy(() => import("./matter/ForceBlockSim.jsx")),
   InclinedPlaneSim: lazy(() => import("./matter/InclinedPlaneSim.jsx")),

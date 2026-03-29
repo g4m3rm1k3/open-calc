@@ -166,6 +166,16 @@ export default {
         mathBridge: 'If s(t) is position, then v(t) = s\'(t) is velocity, and a(t) = v\'(t) = s\'\'(t) is acceleration. Each lower graph is the derivative of the one above. Notice: where the position graph is rising steeply, the velocity graph is large and positive. Where position peaks, velocity = 0 (the derivative of a local maximum is zero). Where position is concave up (curving upward), acceleration is positive. Every relationship you see here will be proved rigorously in the lessons ahead.',
         caption: 'Watch all three graphs update simultaneously. Click and drag the position curve to reshape it. This physical picture — not just algebra — is what differentiation means.',
       },
+      {
+        id: 'Ch2Review',
+        title: 'Chapter 2 Review Board',
+        caption: 'A complete map of Chapter 2 Derivatives, highlighting the core concepts and common traps before entering Chapter 3.',
+      },
+      {
+        id: 'Ch2Applied',
+        title: 'Chapter 2 Applied Problems',
+        caption: 'Real-world applications of derivatives: related rates, marginal analysis, and kinematics.',
+      },
     ],
 
     callouts: [

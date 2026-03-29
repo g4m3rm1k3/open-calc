@@ -54,6 +54,16 @@ export default {
     ],
     visualizations: [
       { vizId: 'LinearApproximation', caption: "The differential dy = 12·dx approximates the actual curve change Δy for f(x) = x³ at a = 2. Error is O(dx²).", mathBridge: "Set f(x) = x³ and base point a = 2. Compute f(2) = 8 and f'(2) = 12. So dy = 12·dx. Move dx to 0.1: dy = 1.2, Δy = f(2.1) − f(2) = 9.261 − 8 = 1.261. Error = 0.061. Move dx to 0.01: dy = 0.12, Δy ≈ 0.1206. The error shrinks as (dx)². This is why dy is a good approximation for small dx." },
+      {
+        id: 'Ch3Review',
+        title: 'Chapter 3 Review Board',
+        caption: 'A complete map of Applications of Derivatives, highlighting optimization, related rates, and curve sketching.',
+      },
+      {
+        id: 'Ch3Applied',
+        title: 'Chapter 3 Applied Problems',
+        caption: 'Real-world applications: minimizing costs, predicting trajectories, and maximizing efficiency.',
+      },
     ],
   },
 

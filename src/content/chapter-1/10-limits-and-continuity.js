@@ -103,6 +103,16 @@ export default {
         mathBridge: 'Set epsilon (the output tolerance). Watch delta (the input restriction) adjust. For any epsilon, there must exist a corresponding delta — that is what the formal definition requires.',
         caption: 'The ε-δ definition makes "approaches" precise. Shrink ε to see how δ must shrink with it.',
       },
+      {
+        id: 'Ch1Review',
+        title: 'Chapter 1 Review Board',
+        caption: 'A complete map of Functions and Graphs, highlighting the core concepts and common traps before entering Chapter 2.',
+      },
+      {
+        id: 'Ch1Applied',
+        title: 'Chapter 1 Applied Problems',
+        caption: 'Real-world applications of functions: domain constraints, composition in pricing, and piecewise models.',
+      },
     ],
   },
 

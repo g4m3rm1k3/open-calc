@@ -54,6 +54,11 @@ export default {
         title: 'AI Loss Surface Trajectory',
         caption: 'In Machine Learning, a neural network "learns" by steering a vector-valued path downward along a 3D loss surface using the negative gradient. This is autonomous vector kinematics.',
       },
+      {
+        id: 'Ch6Review',
+        title: 'Chapter 6 Review Board',
+        caption: 'A complete map of Vectors, Parametric Equations, Polar Coordinates, and vector-valued pathways.',
+      },
     ],
   },
 

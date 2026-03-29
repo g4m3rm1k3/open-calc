@@ -63,6 +63,16 @@ export default {
         title: 'Centroid of a Region — Interactive',
         caption: 'The balance point (centroid) is displayed as the region is built up. Notice how adding area far from the current centroid pulls the balance point toward the new area — reflecting the weighted average nature of x̄ and ȳ.',
       },
+      {
+        id: 'Ch4Review',
+        title: 'Chapter 4 Review Board',
+        caption: 'A complete map of Integration and its Fundamental Theorem.',
+      },
+      {
+        id: 'Ch4Applied',
+        title: 'Chapter 4 Applied Problems',
+        caption: 'Real-world applications of integration: distance, displacement, and cost.',
+      },
     ],
   },
 
