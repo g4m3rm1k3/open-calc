@@ -246,5 +246,87 @@ export default {
     'completed-example-2',
     'attempted-challenge-easy',
     'attempted-challenge-medium'
-  ]
+  ],
+  semantics: {
+    core: [
+      { symbol: 'A, B', meaning: 'Sets — collections of unique elements' },
+      { symbol: '∈, ∉', meaning: 'Membership — "is an element of" or "is NOT an element of"' },
+      { symbol: '⊆, ⊂', meaning: 'Subset and Proper Subset' },
+      { symbol: '∪, ∩', meaning: 'Union (ALL elements) and Intersection (Common elements)' },
+      { symbol: 'A \\ B', meaning: 'Set Difference — elements in A but not in B' },
+      { symbol: 'P(A)', meaning: 'Power Set — the set of all subsets of A' },
+      { symbol: 'A × B', meaning: 'Cartesian Product — set of all ordered pairs (a, b)' },
+      { symbol: '|A|', meaning: 'Cardinality — the number of elements in a set' },
+    ],
+    rulesOfThumb: [
+      'Sets are unordered and contain only unique items. {1,2} = {2,1} = {1,1,2}.',
+      'The empty set ∅ is a subset of EVERY set.',
+      'A function f: A → B maps EVERY element of A to EXACTLY ONE element of B.',
+      'Injective = One-to-One (no collisions). Surjective = Onto (all targets hit).',
+      'Bijective = Both (perfect matching, invertible).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-01b-logic-and-proofs',
+        label: 'Logic and Proofs',
+        note: 'Set operations (∪, ∩,ᶜ) are the direct geometric manifestations of logical connectives (∨, ∧, ¬).',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-02-relations-and-structures',
+        label: 'Relations and Structures',
+        note: 'We will generalize functions into relations, where one input can map to multiple outputs.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Sets are bags; functions are predictable machines.',
+    'A function is just a specific subset of the Cartesian Product that obeys the "One-Arrow-Out" rule.',
+    'The Power Set is an exponential explosion of possibilities (2^n).',
+    'Surjective means "No target left behind"; Injective means "No collisions allowed".',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'sf-assess-1',
+        type: 'choice',
+        text: 'If A = {1, 2} and B = {x, y}, what is the cardinality of A × B?',
+        options: ['2', '4', '8', '1'],
+        answer: '4',
+        hint: 'The Cartesian product size is |A| * |B|.',
+      },
+      {
+        id: 'sf-assess-2',
+        type: 'input',
+        text: 'What is the cardinality of the power set of the empty set |P(∅)|?',
+        answer: '1',
+        hint: 'The power set of ∅ contains exactly one element: the empty set itself. 2^0 = 1.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'sf-q1',
+      type: 'choice',
+      text: 'Which type of function is required to be "perfectly invertible"?',
+      options: ['Injective', 'Surjective', 'Bijective', 'Constant'],
+      answer: 'Bijective',
+      hints: ['A function must be both one-to-one and onto for its inverse to be a valid function.'],
+    },
+    {
+      id: 'sf-q2',
+      type: 'choice',
+      text: 'If f: A → B is surjective, which of the following is true about the codomain B?',
+      options: ['B equals the Range', 'B contains zero elements', 'B is a subset of the Domain', 'B has more elements than A'],
+      answer: 'B equals the Range',
+      hints: ['Surjective means every element in the codomain is hit by at least one arrow from the domain.'],
+    },
+  ],
 };

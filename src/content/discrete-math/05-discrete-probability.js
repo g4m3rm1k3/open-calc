@@ -195,4 +195,83 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  semantics: {
+    core: [
+      { symbol: 'S', meaning: 'Sample Space — the set of all possible outcomes' },
+      { symbol: 'E ⊆ S', meaning: 'Event — a subset of the sample space' },
+      { symbol: 'P(E)', meaning: 'Probability of E — |E|/|S| in uniform spaces' },
+      { symbol: 'P(A|B)', meaning: 'Conditional Probability — chance of A given B occurred' },
+      { symbol: 'E[X]', meaning: 'Expectation — the long-run average value of random variable X' },
+      { symbol: 'A ⊥ B', meaning: 'Independence — P(A ∩ B) = P(A)P(B)' },
+    ],
+    rulesOfThumb: [
+      'Complement: P(not E) = 1 - P(E).',
+      'Union: P(A ∪ B) = P(A) + P(B) - P(A ∩ B).',
+      'Bayes: Posterior = (Likelihood × Prior) / Evidence.',
+      'Expectation is Linear: E[X+Y] = E[X] + E[Y] even if X and Y are dependent.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-03-counting-and-combinatorics',
+        label: 'Counting and Combinatorics',
+        note: 'Discrete probability is essentially counting favorite outcomes and dividing by total outcomes. Combinatorial tools like C(n,k) are your primary calculation engine.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-06-algorithms-and-complexity',
+        label: 'Algorithms and Complexity',
+        note: 'Randomized algorithms (like Quicksort) use expectation to prove average-case efficiency.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Probability is "Normalized Counting".',
+    'Conditional probability is "Zooming In" on a specific subset of the universe.',
+    'Independence means one event "Carries No Information" about the other.',
+    'Bayes Theorem is the "Mechanism of Learning" — updating beliefs based on evidence.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'prob-assess-1',
+        type: 'choice',
+        text: 'If you roll a fair 6-sided die, what is the probability of rolling a number greater than 4?',
+        options: ['1/6', '1/3', '1/2', '2/3'],
+        answer: '1/3',
+        hint: 'Favorable outcomes are {5, 6}. Total outcomes are 6.',
+      },
+      {
+        id: 'prob-assess-2',
+        type: 'input',
+        text: 'If P(A) = 0.5 and P(B|A) = 0.4, what is P(A ∩ B)?',
+        answer: '0.2',
+        hint: 'Use the definition: P(A ∩ B) = P(A) * P(B|A).',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'prob-q1',
+      type: 'choice',
+      text: 'Which rule allows you to update the probability of a hypothesis after seeing new evidence?',
+      options: ['The Product Rule', 'The Inclusion-Exclusion Principle', 'Bayes Theorem', 'The Law of Large Numbers'],
+      answer: 'Bayes Theorem',
+      hints: ['Bayes Theorem calculates P(Hypothesis | Evidence).'],
+    },
+    {
+      id: 'prob-q2',
+      type: 'choice',
+      text: 'What is the sum of probabilities of all possible outcomes in a sample space S?',
+      options: ['0', '0.5', '1', 'Infinity'],
+      answer: '1',
+      hints: ['The total probability of the entire sample space is always 100% or 1.'],
+    },
+  ],
 }

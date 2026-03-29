@@ -182,4 +182,85 @@ export default {
       answer: '∃ a student who can solve every problem.',
     },
   ],
+  semantics: {
+    core: [
+      { symbol: 'P, Q', meaning: 'Propositions — statements that are either True or False' },
+      { symbol: '¬', meaning: 'Negation — the logical NOT operator' },
+      { symbol: '∧, ∨', meaning: 'Conjunction (AND) and Disjunction (OR)' },
+      { symbol: '→', meaning: 'Conditional — "If P then Q"' },
+      { symbol: '↔', meaning: 'Biconditional — "P if and only if Q"' },
+      { symbol: '∀, ∃', meaning: 'Universal (For All) and Existential (There Exists) quantifiers' },
+      { symbol: '∴', meaning: 'Therefore — precedes a conclusion in a deductive argument' },
+    ],
+    rulesOfThumb: [
+      'Proof is not about examples; it is about universal exhaustion of possibilities.',
+      'A single counterexample destroys a universal claim (∀).',
+      'The conditional P → Q is only False when P is True and Q is False.',
+      'Contrapositive (¬Q → ¬P) is always logically equivalent to the original implication.',
+      'Strong induction assumes the property holds for ALL smaller values, not just the one immediately prior.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-00-logic-puzzles',
+        label: 'Logic Puzzles',
+        note: 'The informal reasoning used to solve grid puzzles is organized here into a formal system of symbols and rules.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-01a-predicate-logic',
+        label: 'Predicate Logic',
+        note: 'We will take these single propositions and extend them to range over infinite collections using quantifiers.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Logic is the grammar of certainty.',
+    'Proof is an exhaustive search for contradiction or a constructive path to truth.',
+    'Induction is like a ladder: stand on one rung, prove you can reach the next.',
+    'Negation flips quantifiers and connectives in a predictable symmetry.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'lp-assess-1',
+        type: 'choice',
+        text: 'Which row of the truth table for P → Q is False?',
+        options: ['P=T, Q=T', 'P=T, Q=F', 'P=F, Q=T', 'P=F, Q=F'],
+        answer: 'P=T, Q=F',
+        hint: 'A promise is only broken if the condition is met but the result is not.',
+      },
+      {
+        id: 'lp-assess-2',
+        type: 'input',
+        text: 'What is the logical negation of "Every bird can fly"?',
+        answer: 'Some bird cannot fly',
+        hint: 'Negating a universal (∀) gives an existential (∃) of the negated property.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'lp-q1',
+      type: 'choice',
+      text: 'If the hypothesis of an "if-then" statement is False, what is the truth value of the entire statement?',
+      options: ['True', 'False', 'Depends on the conclusion', 'Undefined'],
+      answer: 'True',
+      hints: ['A conditional with a false premise is "vacuously true" because the promise is never broken.'],
+    },
+    {
+      id: 'lp-q2',
+      type: 'choice',
+      text: 'Which proof technique involves assuming the opposite of what you want to prove?',
+      options: ['Direct Proof', 'Contradiction', 'Induction', 'Contrapositive'],
+      answer: 'Contradiction',
+      hints: ['Assumming ¬P and finding a conflict proves P must be true.'],
+    },
+  ],
 }

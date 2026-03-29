@@ -126,6 +126,86 @@ export default {
     'completed-example-1',
     'completed-example-2',
     'attempted-challenge-easy',
+    'attempted-challenge-easy',
     'attempted-challenge-medium',
+  ],
+  semantics: {
+    core: [
+      { symbol: 'O(g(n))', meaning: 'Big-O — Upper bound on the growth rate' },
+      { symbol: 'Ω(g(n))', meaning: 'Big-Omega — Lower bound on the growth rate' },
+      { symbol: 'Θ(g(n))', meaning: 'Big-Theta — Tight bound (both O and Ω)' },
+      { symbol: 'n', meaning: 'The size of the input (number of elements, bits, etc.)' },
+      { symbol: 'log n', meaning: 'Logarithmic growth — characteristic of "divide and conquer"' },
+      { symbol: 'n!', meaning: 'Factorial growth — characteristic of permutations/brute force' },
+    ],
+    rulesOfThumb: [
+      'Big-O ignores constants: O(2n) is simply O(n).',
+      'Drop lower-order terms: O(n² + n + 100) is O(n²).',
+      'Polynomial > Logarithmic: Any power of n eventually beats any log n.',
+      'Exponential > Polynomial: 2ⁿ eventually beats any nᵏ.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-02-induction-and-recursion',
+        label: 'Induction and Recursion',
+        note: 'The runtime of recursive algorithms is naturally expressed as a recurrence relation, which we solve using induction.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-07-recurrence-relations',
+        label: 'Recurrence Relations',
+        note: 'Advanced complexity analysis uses the Master Theorem to solve recurrences from divide-and-conquer algorithms.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Asymptotics is "Math at a Distance" — we care about the shape of the curve, not the exact values.',
+    'Big-O is a "Safety Ceiling"; it guarantees your program won\'t be slower than a certain rate.',
+    'Growth classes are "Speed Zones" for algorithms (Highway, City, School Zone).',
+    'Scaling is the real test: an algorithm that is fast for n=10 might be impossible for n=1,000,000.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'comp-assess-1',
+        type: 'choice',
+        text: 'Which of the following growth rates is the slowest (most efficient)?',
+        options: ['O(n)', 'O(n²)', 'O(log n)', 'O(2ⁿ)'],
+        answer: 'O(log n)',
+        hint: 'Logarithmic growth stays very small even as n grows to astronomical sizes.',
+      },
+      {
+        id: 'comp-assess-2',
+        type: 'input',
+        text: 'Simplify to the tightest Big-O: f(n) = 10n³ + 50n² + 1000.',
+        answer: 'O(n³)',
+        hint: 'Keep only the highest-power term and drop the coefficient.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'comp-q1',
+      type: 'choice',
+      text: 'What does f(n) = O(g(n)) formally mean?',
+      options: ['f grows faster than g', 'f is always less than g', 'f is eventually bounded above by a constant multiple of g', 'f and g are the same function'],
+      answer: 'f is eventually bounded above by a constant multiple of g',
+      hints: ['Big-O defines an asymptotic upper bound.'],
+    },
+    {
+      id: 'comp-q2',
+      type: 'choice',
+      text: 'Why do we ignore constant factors like "10" in 10n² when doing Big-O analysis?',
+      options: ['Constants are always small', 'Constants depend on the specific hardware/compiler, but the growth rate is a property of the algorithm itself', 'The math is easier that way', 'Constants always cancel out in the end'],
+      answer: 'Constants depend on the specific hardware/compiler, but the growth rate is a property of the algorithm itself',
+      hints: ['Asymptotics focuses on how the work scales with input size, independent of hardware constants.'],
+    },
   ],
 }

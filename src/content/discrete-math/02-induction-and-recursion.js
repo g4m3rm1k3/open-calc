@@ -193,5 +193,85 @@ export default {
       ],
       answer: 'The spacing breaks exactly between Domino 1 and Domino 2! The Inductive Step completely fails because the logic of "overlapping subgroups sharing color" structurally requires a minimum of $k=3$ horses! The chain violently breaks instantly on the very first jump.'
     }
-  ]
+  ],
+  semantics: {
+    core: [
+      { symbol: 'P(n)', meaning: 'Proposition — a statement depending on an integer n' },
+      { symbol: 'Base Case', meaning: 'The smallest value (e.g., P(1)) for which the statement is proven' },
+      { symbol: 'Inductive Hypothesis', meaning: 'The assumption that P(k) is true for some arbitrary k' },
+      { symbol: 'Inductive Step', meaning: 'Proving that P(k) ⇒ P(k+1)' },
+      { symbol: 'Strong Induction', meaning: 'Assuming P(i) is true for all 1 ≤ i ≤ k' },
+      { symbol: 'Recursion', meaning: 'Defining a function or set in terms of itself' },
+      { symbol: 'Base Case (Recursion)', meaning: 'The stopping condition for a recursive process' },
+    ],
+    rulesOfThumb: [
+      'Induction is for proving; Recursion is for computing.',
+      'Always verify the base case first. Without it, the "ladder" has no floor.',
+      'In the inductive step, you MUST use the inductive hypothesis.',
+      'Strong induction is best for properties like prime factorization or Fibonacci sequences.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-01b-logic-and-proofs',
+        label: 'Logic and Proofs',
+        note: 'Induction is a specific formal proof technique used for claims involving natural numbers.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-07-recurrence-relations',
+        label: 'Recurrence Relations',
+        note: 'We will use induction to prove the closed-form solutions of recursive sequences.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Induction is a domino effect: if one falls, the next MUST fall.',
+    'Recursion is a "Divide and Conquer" strategy: solve a smaller version of the same problem.',
+    'The Well-Ordering Principle guarantees there is always a "first" domino.',
+    'Strong induction is just standard induction with a bigger "history" buffer.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'ind-assess-1',
+        type: 'choice',
+        text: 'What is the "Inductive Hypothesis"?',
+        options: ['The base case', 'The conclusion to be proven', 'The assumption that P(k) is true', 'The final step of the proof'],
+        answer: 'The assumption that P(k) is true',
+        hint: 'You assume the statement holds for k to prove it holds for k+1.',
+      },
+      {
+        id: 'ind-assess-2',
+        type: 'input',
+        text: 'In recursive Fibonacci f(n) = f(n-1) + f(n-2), how many base cases are needed?',
+        answer: '2',
+        hint: 'Since it looks back at two prior values, you need two seeds to start.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'ind-q1',
+      type: 'choice',
+      text: 'What happens if you prove the Inductive Step but the Base Case is False?',
+      options: ['The statement is still True', 'The proof is valid for n > 1', 'The entire statement is unproven', 'The statement is only true for prime numbers'],
+      answer: 'The entire statement is unproven',
+      hints: ['Without the base case, the domino chain is never initiated.'],
+    },
+    {
+      id: 'ind-q2',
+      type: 'choice',
+      text: 'When should you use Strong Induction instead of Weak Induction?',
+      options: ['When n is very large', 'When the k+1 step depends on multiple previous steps', 'When proving geometric theorems', 'When the base case is n=0'],
+      answer: 'When the k+1 step depends on multiple previous steps',
+      hints: ['Strong induction allows you to use the entire history of proven cases.'],
+    },
+  ],
 }

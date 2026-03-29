@@ -182,4 +182,84 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  semantics: {
+    core: [
+      { symbol: 'V, E', meaning: 'Vertices (nodes) and Edges (links)' },
+      { symbol: 'deg(v)', meaning: 'Degree of vertex v' },
+      { symbol: 'Path', meaning: 'A sequence of vertices connected by edges' },
+      { symbol: 'Cycle', meaning: 'A path that starts and ends at the same vertex' },
+      { symbol: 'Isomorphism', meaning: 'A mapping between two graphs that preserves connectivity' },
+      { symbol: 'Planarity', meaning: 'The property of being drawn in a 2D plane without edge crossings' },
+      { symbol: 'χ(G)', meaning: 'Chromatic Number — the minimum number of colors needed for a proper coloring' },
+    ],
+    rulesOfThumb: [
+      'Handshaking Lemma: Total degree sum is twice the edge count.',
+      'A graph is bipartite if and only if it contains no odd cycles.',
+      'Euler\'s Formula for planar graphs: V - E + F = 2.',
+      'Every planar graph is 4-colorable.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-04a-graph-theory-intro',
+        label: 'Graph Theory Intro',
+        note: 'We extend basic connectivity and degree results to complex network properties and coloring.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-09-trees-and-hierarchies',
+        label: 'Trees and Hierarchies',
+        note: 'Trees are the most important acyclic connected subgraph family.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Graphs are universal relationship maps.',
+    'Coloring is a way to model constraints (e.g., scheduling).',
+    'Planarity is a physical constraint of 2D geometry (e.g., PCB design).',
+    'Connectivity is the measure of network robustness.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'gt-assess-3',
+        type: 'choice',
+        text: 'What is the chromatic number of a complete graph K₄?',
+        options: ['2', '3', '4', '5'],
+        answer: '4',
+        hint: 'In a complete graph, every vertex is connected to every other vertex.',
+      },
+      {
+        id: 'gt-assess-4',
+        type: 'input',
+        text: 'In a planar graph with 6 vertices and 7 edges, how many faces are there?',
+        answer: '3',
+        hint: 'Use Euler\'s Formula: V - E + F = 2.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'gt-q3',
+      type: 'choice',
+      text: 'Which property guarantees that a graph can be colored with only 2 colors?',
+      options: ['Connected', 'Planar', 'Bipartite', 'Acyclic'],
+      answer: 'Bipartite',
+      hints: ['A bipartite graph has two disjoint sets of vertices.'],
+    },
+    {
+      id: 'gt-q4',
+      type: 'choice',
+      text: 'What does the Handshaking Lemma imply about the number of odd-degree vertices?',
+      options: ['It must be zero', 'It must be even', 'It must be odd', 'It must be the same as the number of edges'],
+      answer: 'It must be even',
+      hints: ['The sum of degrees is always even.'],
+    },
+  ],
 }

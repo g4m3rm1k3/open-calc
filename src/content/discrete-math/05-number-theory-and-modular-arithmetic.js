@@ -181,4 +181,83 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  semantics: {
+    core: [
+      { symbol: 'a | b', meaning: 'Divisibility — a divides b (b = ak for some integer k)' },
+      { symbol: 'gcd(a, b)', meaning: 'Greatest Common Divisor' },
+      { symbol: 'lcm(a, b)', meaning: 'Least Common Multiple' },
+      { symbol: 'a ≡ b (mod n)', meaning: 'Congruence — a and b have same remainder when divided by n' },
+      { symbol: 'a⁻¹ (mod n)', meaning: 'Modular Inverse — a number x such that ax ≡ 1 (mod n)' },
+      { symbol: 'φ(n)', meaning: 'Euler\'s Totient Function — count of numbers < n coprime to n' },
+    ],
+    rulesOfThumb: [
+      'gcd(a, b) * lcm(a, b) = a * b.',
+      'Modular inverse exists ONLY if gcd(a, n) = 1.',
+      'If p is prime and p | ab, then p | a or p | b (Euclid\'s Lemma).',
+      'The Euclidean Algorithm is O(log(min(a,b))).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-01b-logic-and-proofs',
+        label: 'Logic and Proofs',
+        note: 'The Fundamental Theorem of Arithmetic is often proven using strong induction or contradiction.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-10-boolean-algebra-and-circuits',
+        label: 'Boolean Algebra',
+        note: 'Modular arithmetic base 2 (mod 2) is the foundation of XOR logic and bitwise operations.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Modular arithmetic is "Clock Math".',
+    'Primes are the "Atoms" of the integers.',
+    'The Euclidean Algorithm is a "Rectangle-Fitting" process.',
+    'Public-key encryption is based on the difficulty of reversing a one-way mathematical function (factoring).',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'nt-assess-1',
+        type: 'choice',
+        text: 'What is the value of 17 mod 5?',
+        options: ['1', '2', '3', '0'],
+        answer: '2',
+        hint: '17 = 5 * 3 + 2.',
+      },
+      {
+        id: 'nt-assess-2',
+        type: 'input',
+        text: 'What is the gcd(12, 18)?',
+        answer: '6',
+        hint: 'The largest number that divides both 12 and 18.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'nt-q1',
+      type: 'choice',
+      text: 'Which of the following is true for a number to have an inverse mod n?',
+      options: ['The number must be prime', 'The number must be smaller than n', 'The number and n must be coprime (gcd=1)', 'n must be prime'],
+      answer: 'The number and n must be coprime (gcd=1)',
+      hints: ['gcd(a, n) = 1 is the necessary and sufficient condition.'],
+    },
+    {
+      id: 'nt-q2',
+      type: 'choice',
+      text: 'What is the main idea behind the Euclidean Algorithm?',
+      options: ['Factoring both numbers completely', 'Repeatedly replacing the larger number with the remainder', 'Multiplying the numbers', 'Checking every possible divisor'],
+      answer: 'Repeatedly replacing the larger number with the remainder',
+      hints: ['gcd(a, b) = gcd(b, a % b).'],
+    },
+  ],
 }

@@ -161,4 +161,84 @@ function bfs(start, end) {
       answer: 'Proven by induction: every tree on n vertices has exactly n-1 edges.',
     },
   ],
+  semantics: {
+    core: [
+      { symbol: 'G = (V, E)', meaning: 'Graph — a set of Vertices and Edges' },
+      { symbol: 'deg(v)', meaning: 'Degree — number of edges connected to vertex v' },
+      { symbol: 'Path', meaning: 'A sequence of connected edges' },
+      { symbol: 'Cycle', meaning: 'A path that starts and ends at the same vertex' },
+      { symbol: 'Handshaking Lemma', meaning: 'Σ deg(v) = 2|E|' },
+      { symbol: 'Adjacency Matrix', meaning: 'A 2D array representation of a graph' },
+      { symbol: 'Adjacency List', meaning: 'An object/map representation of a graph' },
+    ],
+    rulesOfThumb: [
+      'Every edge contributes 2 to the total degree sum.',
+      'Euler Circuit: Possible if and only if every vertex has EVEN degree and the graph is connected.',
+      'Euler Path: Possible if and only if exactly 0 or 2 vertices have ODD degree.',
+      'Trees on n vertices always have exactly n-1 edges.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-02-relations-and-structures',
+        label: 'Relations and Structures',
+        note: 'Graphs are the physical map of the abstract relations we studied previously.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-04-graph-theory',
+        label: 'Graph Theory and Networks',
+        note: 'We will dive deeper into advanced graph properties, such as planarity and coloring.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'A graph is a data structure for relationships.',
+    'Euler is about edges; Hamilton is about vertices.',
+    'BFS explores in ripples (breadth); DFS explores in tunnels (depth).',
+    'Connectedness is the ability to get from anywhere to anywhere else.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'gt-assess-1',
+        type: 'choice',
+        text: 'How many edges are in a graph where the sum of all vertex degrees is 20?',
+        options: ['10', '20', '5', '40'],
+        answer: '10',
+        hint: 'Use the Handshaking Lemma: sum of degrees = 2 * edges.',
+      },
+      {
+        id: 'gt-assess-2',
+        type: 'input',
+        text: 'Does an Euler circuit exist in a graph with vertex degrees {2, 2, 3, 3}?',
+        answer: 'No',
+        hint: 'An Euler circuit requires ALL vertices to have even degrees.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'gt-q1',
+      type: 'choice',
+      text: 'What is the primary difference between a Path and a Cycle?',
+      options: ['Paths are longer', 'Cycles return to the start vertex', 'Paths use all edges', 'Cycles use all vertices'],
+      answer: 'Cycles return to the start vertex',
+      hints: ['A cycle is a closed path.'],
+    },
+    {
+      id: 'gt-q2',
+      type: 'choice',
+      text: 'Which data structure is usually more space-efficient for "sparse" graphs (few edges)?',
+      options: ['Adjacency Matrix', 'Adjacency List', 'Coordinate Plane', 'Array of Arrays'],
+      answer: 'Adjacency List',
+      hints: ['Adjacency lists only store the edges that actually exist.'],
+    },
+  ],
 }

@@ -127,4 +127,83 @@ export default {
     'attempted-challenge-easy',
     'attempted-challenge-medium',
   ],
+  semantics: {
+    core: [
+      { symbol: 'aₙ', meaning: 'The nth term of a sequence' },
+      { symbol: 'Initial Condition', meaning: 'The specific starting values (e.g., a₀ = 1) needed to define a unique sequence' },
+      { symbol: 'Closed Form', meaning: 'A formula that calculates aₙ directly from n (no recursion required)' },
+      { symbol: 'Characteristic Equation', meaning: 'A polynomial used to solve linear homogeneous recurrences' },
+      { symbol: 'Homogeneous', meaning: 'All terms depend only on previous terms in the sequence' },
+      { symbol: 'T(n)', meaning: 'Algorithm runtime recurrence (complexity)' },
+    ],
+    rulesOfThumb: [
+      'An order-k recurrence needs exactly k initial conditions.',
+      'Linear homogeneous recurrences with constant coefficients always have exponential-style solutions.',
+      'Divide and Conquer recurrences (T(n) = aT(n/b) + f(n)) are solved using the Master Theorem.',
+      'If the characteristic equation has a repeated root r with multiplicity m, the solution terms are nⁱrⁿ.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-02-induction-and-recursion',
+        label: 'Induction and Recursion',
+        note: 'Recurrence relations are the explicit mathematical definitions of the recursive processes we studied earlier.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-06-algorithms-and-complexity',
+        label: 'Algorithms and Complexity',
+        note: 'Recurrences are the primary tool for proving the Big-O complexity of recursive algorithms like Mergesort.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'A recurrence is a "Rule for the Next Step".',
+    'Solving a recurrence is like finding the "General Formula" from a "Recursive Rule".',
+    'Initial conditions are the "Seeds"; the recurrence is the "Growth Rule".',
+    'The Master Theorem is a "Complexity Cheat Sheet" for recursive algorithms.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'rec-assess-1',
+        type: 'choice',
+        text: 'What is the characteristic equation for aₙ = 5aₙ₋₁ - 6aₙ₋₂?',
+        options: ['r² - 5r + 6 = 0', 'r² + 5r - 6 = 0', 'r² - 6r + 5 = 0', 'r² + 6r - 5 = 0'],
+        answer: 'r² - 5r + 6 = 0',
+        hint: 'Rearrange all terms to one side: aₙ - 5aₙ₋₁ + 6aₙ₋₂ = 0.',
+      },
+      {
+        id: 'rec-assess-2',
+        type: 'input',
+        text: 'If a₀ = 2 and aₙ = aₙ₋₁ + 5, what is a₁?',
+        answer: '7',
+        hint: 'Plug n=1 into the recurrence.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'rec-q1',
+      type: 'choice',
+      text: 'What do you call a formula that lets you calculate aₙ directly without knowing aₙ₋₁?',
+      options: ['Recursive Form', 'Closed Form', 'Differential Form', 'Base Case'],
+      answer: 'Closed Form',
+      hints: ['A non-recursive explicit formula.'],
+    },
+    {
+      id: 'rec-q2',
+      type: 'choice',
+      text: 'Which technique is typically used to verify that a conjectured closed-form solution is correct?',
+      options: ['Integration', 'Mathematical Induction', 'Truth Tables', 'Binary Search'],
+      answer: 'Mathematical Induction',
+      hints: ['Proving a pattern holds for all n.'],
+    },
+  ],
 }

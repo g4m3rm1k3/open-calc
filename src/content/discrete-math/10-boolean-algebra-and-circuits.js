@@ -122,4 +122,83 @@ export default {
     'attempted-challenge-easy',
     'attempted-challenge-medium',
   ],
+  semantics: {
+    core: [
+      { symbol: '1, 0', meaning: 'True and False (High and Low voltage)' },
+      { symbol: '· (AND)', meaning: 'Conjunction — true only if both are 1' },
+      { symbol: '+ (OR)', meaning: 'Disjunction — true if at least one is 1' },
+      { symbol: 'ā or ¬a', meaning: 'Inversion — the NOT operation' },
+      { symbol: '⊕ (XOR)', meaning: 'Exclusive OR — true if inputs differ' },
+      { symbol: 'NAND / NOR', meaning: 'Universal gates capable of building any other logic' },
+    ],
+    rulesOfThumb: [
+      'De Morgan: NOT(A AND B) = (NOT A) OR (NOT B).',
+      'XOR is essentially "Addition modulo 2".',
+      'Absorption: A + (A · B) = A.',
+      'Double Negation: NOT(NOT A) = A.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-01b-logic-and-proofs',
+        label: 'Logic and Proofs',
+        note: 'Boolean algebra is the formal symbolic system for the propositional logic we studied at the beginning.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-11-automata-theory',
+        label: 'Automata Theory',
+        note: 'Sequential circuits use Boolean logic combined with memory (Flip-Flops) to implement state machines.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Boolean algebra is the "Math of Switches".',
+    'Logic gates are the "Atomic Building Blocks" of digital hardware.',
+    'Truth Tables are the "Input-Output Maps" for any circuit.',
+    'Functional completeness means you only need one type of "Universal" brick to build anything.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'bool-assess-1',
+        type: 'choice',
+        text: 'What is the output of an OR gate if one input is 1 and the other is 0?',
+        options: ['0', '1', 'Undefined', 'Depends on the previous state'],
+        answer: '1',
+        hint: 'OR requires at least one input to be 1.',
+      },
+      {
+        id: 'bool-assess-2',
+        type: 'input',
+        text: 'Simplify: A AND (NOT A).',
+        answer: '0',
+        hint: 'A value cannot be both true and false at the same time.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'bool-q1',
+      type: 'choice',
+      text: 'Which gate is called "Universal" because it can implement any Boolean function?',
+      options: ['AND', 'OR', 'NAND', 'XOR'],
+      answer: 'NAND',
+      hints: ['NAND and NOR are functionally complete.'],
+    },
+    {
+      id: 'bool-q2',
+      type: 'choice',
+      text: 'According to De Morgan\'s Law, NOT(A OR B) is equivalent to:',
+      options: ['(NOT A) OR (NOT B)', '(NOT A) AND (NOT B)', 'A AND B', 'A OR B'],
+      answer: '(NOT A) AND (NOT B)',
+      hints: ['The negation of a disjunction is a conjunction of negations.'],
+    },
+  ],
 }

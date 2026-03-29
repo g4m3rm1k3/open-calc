@@ -123,4 +123,84 @@ export default {
     'attempted-challenge-easy',
     'attempted-challenge-medium',
   ],
+  semantics: {
+    core: [
+      { symbol: 'Root', meaning: 'The designated top-level node in a tree' },
+      { symbol: 'Leaf', meaning: 'A node with no children (degree 1 in unrooted trees)' },
+      { symbol: 'Parent / Child', meaning: 'The direct ancestor and descendant in a rooted tree' },
+      { symbol: 'Height', meaning: 'The longest path from the root to a leaf' },
+      { symbol: 'Preorder', meaning: 'Traversal: Root -> Left -> Right' },
+      { symbol: 'Postorder', meaning: 'Traversal: Left -> Right -> Root' },
+      { symbol: 'Inorder', meaning: 'Traversal: Left -> Root -> Right (Binary trees only)' },
+    ],
+    rulesOfThumb: [
+      'A tree with n vertices ALWAYS has n-1 edges.',
+      'There is exactly one unique path between any two nodes in a tree.',
+      'Adding any edge to a tree creates exactly one cycle.',
+      'Removing any edge from a tree makes it disconnected.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-04-graph-theory',
+        label: 'Graph Theory',
+        note: 'Trees are the special case of graphs where connectivity is achieved with the minimum possible number of edges.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-06-algorithms-and-complexity',
+        label: 'Algorithms and Complexity',
+        note: 'Balanced trees (like AVL or Red-Black trees) ensure O(log n) performance for search and insertion.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'A tree is a graph that never loops back on itself.',
+    'Hierarchies represent nested relationships (e.g., folders, logic, HTML).',
+    'Traversals are different ways of reading the "Story" of the tree.',
+    'Leaves are the "Dead Ends" of the structure.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'tree-assess-1',
+        type: 'choice',
+        text: 'In a rooted tree, what do you call a node with zero children?',
+        options: ['Root', 'Parent', 'Leaf', 'Internal Node'],
+        answer: 'Leaf',
+        hint: 'Leaves are the terminals of the branching structure.',
+      },
+      {
+        id: 'tree-assess-2',
+        type: 'input',
+        text: 'If a tree has 100 vertices, how many edges does it have?',
+        answer: '99',
+        hint: '|E| = |V| - 1.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'tree-q1',
+      type: 'choice',
+      text: 'Which traversal visits the root first, then the children?',
+      options: ['Preorder', 'Inorder', 'Postorder', 'Level-order'],
+      answer: 'Preorder',
+      hints: ['"Pre" means the root comes before the children.'],
+    },
+    {
+      id: 'tree-q2',
+      type: 'choice',
+      text: 'What property is guaranteed if you add an edge between two existing nodes in a tree?',
+      options: ['It becomes a faster tree', 'A cycle is created', 'A leaf is removed', 'The height increases'],
+      answer: 'A cycle is created',
+      hints: ['Trees are acyclic. Connecting two existing nodes provides a second path, creating a loop.'],
+    },
+  ],
 }

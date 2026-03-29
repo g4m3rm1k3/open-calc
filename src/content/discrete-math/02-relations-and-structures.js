@@ -299,5 +299,86 @@ export default {
       ],
       answer: 'It successfully passes all three rules flawlessly! The Identity Matrix is theoretically the most pure, basic Equivalence Relation in existence.'
     }
-  ]
+  ],
+  semantics: {
+    core: [
+      { symbol: 'R', meaning: 'Relation — a subset of the Cartesian Product A × B' },
+      { symbol: 'a R b', meaning: 'Infix notation — element a is related to element b' },
+      { symbol: 'Reflexive', meaning: '∀a, (a, a) ∈ R' },
+      { symbol: 'Symmetric', meaning: 'a R b ⇒ b R a' },
+      { symbol: 'Transitive', meaning: 'a R b ∧ b R c ⇒ a R c' },
+      { symbol: 'Antisymmetric', meaning: 'a R b ∧ b R a ⇒ a = b' },
+      { symbol: '[a]', meaning: 'Equivalence Class — set of all elements related to a' },
+      { symbol: 'A / R', meaning: 'Quotient Set — the set of all equivalence classes' },
+    ],
+    rulesOfThumb: [
+      'Equivalence Relation = Reflexive + Symmetric + Transitive. It partitions the set.',
+      'Partial Order = Reflexive + Antisymmetric + Transitive. It creates a hierarchy (Poset).',
+      'Relations are just directed graphs.',
+      'A Hasse diagram is a cleaned-up visualization of a partial order (no loops, no transitive shortcuts).',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'discrete-1-02a-sets-and-functions-for-discrete',
+        label: 'Sets and Functions',
+        note: 'Relations are the raw combinatorial soil (Cartesian Products) from which Functions are carefully selected.',
+      },
+    ],
+    futureLinks: [
+      {
+        lessonId: 'discrete-1-04-graph-theory',
+        label: 'Graph Theory',
+        note: 'Every relation is a graph. We will study the structural properties of these networks in detail.',
+      },
+    ],
+  },
+
+  mentalModel: [
+    'Relations are the "anything goes" version of functions.',
+    'Equivalence relations are like "Grouping by property"; Partial orders are like "Prerequisites".',
+    'Transitivity is the "Shortcut" rule.',
+    'Partitions and equivalence relations are two sides of the same coin.',
+  ],
+
+  assessment: {
+    questions: [
+      {
+        id: 'rel-assess-1',
+        type: 'choice',
+        text: 'Which property is required for an Equivalence Relation but NOT for a Partial Order?',
+        options: ['Reflexive', 'Symmetric', 'Transitive', 'Antisymmetric'],
+        answer: 'Symmetric',
+        hint: 'Partial orders swap Symmetry for Antisymmetry.',
+      },
+      {
+        id: 'rel-assess-2',
+        type: 'input',
+        text: 'If a relation on {1, 2, 3} contains only (1,1), (2,2), (3,3), is it symmetric?',
+        answer: 'Yes',
+        hint: 'For symmetry, if (a,b) is there, (b,a) must be there. Since only self-loops exist, it is vacuously symmetric.',
+      },
+    ],
+  },
+
+  quiz: [
+    {
+      id: 'rel-q1',
+      type: 'choice',
+      text: 'What is a "partition" of a set?',
+      options: ['A collection of overlapping subsets', 'A collection of disjoint subsets whose union is the original set', 'A subset containing only prime numbers', 'The set of all subsets'],
+      answer: 'A collection of disjoint subsets whose union is the original set',
+      hints: ['Equivalence relations slice a set into these non-overlapping pieces.'],
+    },
+    {
+      id: 'rel-q2',
+      type: 'choice',
+      text: 'In a Hasse diagram, why do we leave out the loops at each vertex?',
+      options: ['To save space', 'Because partial orders are already assumed to be reflexive', 'Because loops are illegal in partial orders', 'Because they are too hard to draw'],
+      answer: 'Because partial orders are already assumed to be reflexive',
+      hints: ['Hasse diagrams only show the "interesting" essential connections.'],
+    },
+  ],
 }
