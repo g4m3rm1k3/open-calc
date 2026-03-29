@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'DeclarativeImperativeViz',
+        id: 'WebLesson13_Reactive',
         title: 'Logic Explosion Comparison',
         caption: 'Watch an interface scale complexity between Imperative and Declarative logic bases.',
         mathBridge: 'Step 1: Add three interactive toggles. Step 2: Notice the imperative logic code physically explode into unscalable spaghetti due to edge case syncing. The key lesson: Declarative UI avoids local desynchronization.'

@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'AbstractionDiffViz',
+        id: 'WebLesson17_Abstraction',
         title: 'Abstraction Diff Comparator',
         caption: 'Compare a 100-line imperative logic module explicitly against an identical 5-line declarative abstraction implementation.',
         mathBridge: 'Step 1: Inspect the Raw JS block. Note exactly how error handling and state-DOM tracking bloats the execution script. Step 2: Inspect the Abstract block. The key lesson: Abstraction condenses human interaction surface.'

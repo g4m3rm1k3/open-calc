@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'ArchitectureLayerViz',
+        id: 'WebLesson18_Architecture',
         title: 'Data vs Logic vs UI Topology',
         caption: 'Diagram analyzing the strict boundaries separating the Network logic, local State logic, and the View rendering mechanics.',
         mathBridge: 'Step 1: Click the UI button mapping. Observe how the instruction algorithmically flows downwards mechanically to the logic controller, then directly translates data, and flows outwards back upwards to UI listeners.'

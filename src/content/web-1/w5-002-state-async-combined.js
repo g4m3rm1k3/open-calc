@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'AsyncStateCombinedViz',
+        id: 'WebLesson15_StateAsync',
         title: 'The Tri-State Machine',
         caption: 'Simulate differing network conditions to observe UI handlers flip dynamically between loading, error, and success states.',
         mathBridge: 'Step 1: Toggle the "Force Network Failure" boolean. Step 2: Trigger a fetch. Notice exactly how the UI bypasses the Success renderer entirely and natively paints the Error fallback screen.'

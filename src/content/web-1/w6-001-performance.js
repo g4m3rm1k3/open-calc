@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'ReflowRepaintViz',
+        id: 'WebLesson16_Performance',
         title: 'The Rendering Pipeline',
         caption: 'Compare the processor execution paths of unoptimized property changes vs GPU offloading.',
         mathBridge: 'Step 1: Actuate the "Margin" transition. Notice the CPU spike diagram correctly track the math-heavy layout recalculation cycle. Step 2: Actuate the "Transform" transition. Notice exactly how the Reflow stage is entirely bypassed.'

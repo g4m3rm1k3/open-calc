@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'ApiDataFlowViz',
+        id: 'WebLesson14_APIs',
         title: 'Network Traversal Visualizer',
         caption: 'Adjust the network latency parameter and watch a packet traverse from the remote server down to the UI Layer.',
         mathBridge: 'Step 1: Increase the latency slider to 3000ms. Step 2: Trigger a fetch command. The key lesson: The UI sits idle waiting strictly for the JSON packet to natively resolve through the network socket.'

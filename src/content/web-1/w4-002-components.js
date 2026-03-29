@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'ComponentTreeViz',
+        id: 'WebLesson12_Components',
         title: 'Component vs DOM Tree',
         caption: 'Examine how an Abstract Component tree physically maps to the literal HTML DOM tree mapping.',
         mathBridge: 'Step 1: Duplicate the standard Card component. Step 2: Notice the physical DOM expands but the internal component logic remains geometrically encapsulated. The key lesson: DRY principle translates mathematically to interfaces.'

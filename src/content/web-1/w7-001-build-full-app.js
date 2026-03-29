@@ -29,7 +29,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CapstoneSystemViz',
+        id: 'WebLesson19_Capstone',
         title: 'The System Sandbox',
         caption: 'A simulated full dashboard application mapping its internal structural layers simultaneously alongside the physical UI output.',
         mathBridge: 'Step 1: Toggle the isolated system layers representing DOM, State, Events, and the Networking core natively. Step 2: Use the dashboard interface and observe precisely how user execution cascades fundamentally across all four abstract topologies simultaneously.'
