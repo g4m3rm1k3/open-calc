@@ -127,6 +127,33 @@ export default {
       answer: "f'(x) = 7x^6",
     },
   ],
+
+  // ── Quiz ────────────────────────────────────────────────────────────────
+  // REQUIRED — every lesson must end with a quiz array (see Section 1c)
+  quiz: [
+    {
+      id: 'differentiation-rules-q1',   // format: {lesson-slug}-q{N}
+      type: 'choice',                    // 'choice' | 'input'
+      text: 'What is $\\dfrac{d}{dx}[x^5]$?',
+      options: ['$5x^4$', '$x^4$', '$5x^6$', '$4x^5$'],
+      answer: '$5x^4$',                  // must exactly match one options string
+      hints: [
+        'Apply the power rule: bring the exponent down as a coefficient.',
+      ],
+      reviewSection: 'Math tab — power rule',
+    },
+    {
+      id: 'differentiation-rules-q2',
+      type: 'input',
+      text: 'Find $\\dfrac{d}{dx}[3x^4 - 2x]$.',
+      answer: '12*x^3 - 2',             // valid mathjs expression (see Section 1c)
+      hints: [
+        'Apply the power rule term-by-term.',
+        'Power rule: $d/dx[3x^4] = 12x^3$; $d/dx[-2x] = -2$.',
+      ],
+      reviewSection: 'Math tab — power rule',
+    },
+  ],
 }
 ```
 
@@ -230,43 +257,69 @@ In addition to the types listed in Section 1, the following are used in lesson-s
 
 ## 1c. Quiz Section Standard
 
-Every lesson must end with a `quiz` array. The quiz was added as a first-class feature after the initial lesson schema — it is the primary self-check mechanism. Do not omit it.
+Every lesson must end with a `quiz` array. This is the primary self-check mechanism — it drives the mastery star in the sidebar. Do not omit it.
+
+### How the quiz works (implementation details)
+
+The quiz is rendered by `src/components/lesson/LessonQuizBlock.jsx`. Understanding how it works helps you write correct quizzes:
+
+- **`input` grading:** The grader uses [mathjs](https://mathjs.org/) to evaluate the student's answer and the correct answer as math expressions, testing at several numeric sample points (x=2.7183, t=1.4142, n=3). Expressions that are symbolically equivalent pass even if written differently. String fallback: normalized case- and whitespace-insensitive comparison.
+- **Auto-prepended typing guide:** For `input` questions, the grader automatically prepends a "How to type math" hint (showing `x^2`, `sqrt(x)`, `2*x`, `pi`, etc.) as the very first hint level. You do not need to write this yourself — your hints array starts at hint level 2.
+- **`choice` grading:** Exact string match against `answer`. The `answer` string must be identical to one of the `options` strings character-for-character (including any LaTeX).
+- **Mastery scoring:** ≥ 80% correct = **Mastered** (green); 50–79% = **Partial Credit** (amber); < 50% = **Needs Review** (red). Score is persisted to `localStorage` per lesson.
 
 ### Full quiz schema
 
 ```javascript
 quiz: [
+  // — Multiple choice —
   {
-    id: 'slug-q1',                    // REQUIRED — format: {lesson-slug}-q{N}
-    type: 'input',                    // 'input' | 'choice'
-    text: 'Question text with $\\LaTeX$ inline math.',
-    answer: '7/3',                    // exact string match for 'input'; must match one option for 'choice'
-    hints: [
-      'Level-1 hint — minimal nudge.',
-      'Level-2 hint — bigger nudge with the key step.',
-    ],
-    reviewSection: 'Tab name — specific section title',  // tells student where to review if stuck
-  },
-  {
-    id: 'slug-q2',
+    id: 'chain-rule-q1',              // REQUIRED — format: {lesson-slug}-q{N}
     type: 'choice',
-    text: 'Multiple-choice question text.',
-    options: ['Option A', 'Option B', 'Option C', 'Option D'],
-    answer: 'Option B',               // must exactly match one of the options strings
-    hints: ['Hint pointing to the relevant concept.'],
-    reviewSection: 'Intuition tab — relevant callout name',
+    text: 'For $y = f(g(x))$, the chain rule gives $dy/dx =$',
+    options: [
+      "$f'(x) \\cdot g'(x)$",
+      "$f'(g(x)) \\cdot g'(x)$",     // ← answer must exactly match this string
+      "$f'(g'(x))$",
+      "$f(g'(x)) \\cdot g(x)$",
+    ],
+    answer: "$f'(g(x)) \\cdot g'(x)$",  // verbatim copy of the correct option
+    hints: [
+      'Differentiate the outside function at the inside, then multiply by the inner derivative.',
+    ],
+    reviewSection: 'Intuition tab — outside-inside method',
+  },
+
+  // — Free-input (mathjs-graded) —
+  {
+    id: 'chain-rule-q2',
+    type: 'input',
+    text: 'Find $\\dfrac{d}{dx}[(3x+1)^5]$.',
+    answer: '5*(3*x+1)^4 * 3',        // valid mathjs expression; equivalent forms also accepted
+    hints: [
+      // Hint (2/2) — first shown after the auto-prepended typing guide
+      'Outside function: $u^5$; inside: $3x+1$. Derivative of outside at inside is $5(3x+1)^4$.',
+      // Hint (2/2) — bigger nudge
+      'Multiply by the inner derivative: $d/dx[3x+1] = 3$. Result: $5(3x+1)^4 \\cdot 3$.',
+    ],
+    reviewSection: 'Math tab — chain rule with power functions',
   },
 ],
 ```
 
 ### Quiz writing rules
 
-- **Coverage:** Include at least one question per major concept in the lesson. A 10-question quiz covers the lesson thoroughly; 5–7 is a minimum for shorter lessons.
-- **`reviewSection` format:** Use the pattern `"Tab name — section title"` (e.g., `'Math tab — twin pillars'`, `'Intuition tab — outside-inside method'`). This links the question to a specific review location so students who answer wrong know exactly where to look.
-- **Answer format for `input` type:** Use a simplified mathematical expression the grader can match (e.g., `'7/3'`, `'9/2'`, `'0'`). Avoid ambiguous forms.
-- **Two hints minimum:** The first hint is a gentle nudge; the second shows the key algebraic or conceptual step. Together they scaffold without giving the answer away directly.
-- **Question ordering:** Start with recall questions (What is the formula?), then computation questions (Evaluate this limit), then conceptual questions (Why does this condition matter?).
-- **`id` format:** `{lesson-slug}-q{N}` where N is 1-indexed. For example, questions in the `chain-rule` lesson use `chain-q1`, `chain-q2`, etc.
+| Rule | Detail |
+|---|---|
+| **Coverage** | At least one question per major concept. 8–10 questions covers a full lesson; 5–7 is the minimum. |
+| **Question order** | Recall first (What is the formula?), then computation (Evaluate this), then conceptual (Why does this condition matter?). |
+| **`id` format** | `{lesson-slug}-q{N}`, 1-indexed. The `chain-rule` lesson uses `chain-rule-q1`, `chain-rule-q2`, etc. |
+| **`input` answer format** | Write as a valid [mathjs](https://mathjs.org/docs/expressions/syntax.html) expression: `12*x^3 - 2`, `sqrt(x^2+9)`, `x / sqrt(x^2+9)`, `pi/4`. Equivalent forms are accepted. Avoid ambiguous notation. |
+| **`choice` answer format** | Verbatim copy of the correct option string — including all LaTeX. Even a space difference causes a mismatch. |
+| **`hints` count** | For `input`: your array is hints 2 and 3 (hint 1 is the auto-injected typing guide). One substantive hint is fine; two is better. For `choice`: one hint pointing to the concept is sufficient. |
+| **`reviewSection`** | Pattern: `"Tab name — section title"` e.g. `'Math tab — twin pillars'`. Shown below an incorrect answer so students know where to look. |
+| **LaTeX in `text` and `options`** | Use `$...$` for inline math. Escape backslashes as `\\`: `$\\dfrac{d}{dx}$`. |
+| **Conceptual questions** | At least one `choice` question per quiz that tests understanding, not just computation. These are the hardest to fake — include them. |
 
 ---
 
@@ -451,6 +504,8 @@ Without `ResizeObserver`, a D3 visualization freezes at its initial size and bre
 - [ ] `npm run build` completes without errors
 - [ ] Every new `visualizationId` / `visualizations[].id` exists in `VizFrame.jsx`
 - [ ] Every new `examples` entry has a unique `id` field
+- [ ] Lesson has a `quiz` array with at least 5 questions (see Section 1c)
+- [ ] Quiz `input` answers are valid mathjs expressions; `choice` answers verbatim-match an option
 - [ ] D3 visualizations handle dark mode via color tokens, not hardcoded colors
 - [ ] D3 visualizations use `ResizeObserver`
 - [ ] No duplicate keys in any JS content object
@@ -603,6 +658,7 @@ Use this when you need to:
   - `rigor`
   - `examples`
   - `challenges`
+  - `quiz` (required — see Section 1c)
 3. Keep additions additive unless replacement is explicitly requested.
 4. Keep IDs unique across examples/challenges.
 
