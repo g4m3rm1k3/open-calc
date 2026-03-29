@@ -468,6 +468,101 @@ Without `ResizeObserver`, a D3 visualization freezes at its initial size and bre
 
 ---
 
+## 1d. Supporting Sections Standard
+
+Every lesson also includes four supporting sections that appear after `crossRefs` and before `checkpoints`. These are not optional — they serve specific pedagogical roles and are used by the app.
+
+### `semantics` — Symbols & Meaning
+
+Maps the key symbols and notation in the lesson to plain-English meanings, plus a short list of rules of thumb for applying the lesson's techniques.
+
+```javascript
+// ─── Semantic Layer ───────────────────────────────────────────────────────
+semantics: {
+  core: [
+    {
+      symbol: 'f(g(x))',
+      meaning: 'a composition — g is the inner function, f is the outer function',
+    },
+    // one entry per key symbol or term in the lesson
+  ],
+  rulesOfThumb: [
+    'Identify the outermost operation first before choosing a rule.',
+    'Never forget to multiply by the inner derivative.',
+    // 3-5 short, actionable rules — these become the student\'s mental checklist
+  ],
+},
+```
+
+### `spiral` — Recovery Points & Future Links
+
+Two-directional navigation: where to go if the student is lost, and where this lesson leads.
+
+```javascript
+// ─── Spiral Learning ─────────────────────────────────────────────────────
+spiral: {
+  recoveryPoints: [
+    {
+      lessonId: 'ch0-composition',
+      label: 'Composition of functions (Chapter 0)',
+      note: 'Explain exactly why this prerequisite matters for THIS lesson — be specific.',
+    },
+  ],
+  futureLinks: [
+    {
+      lessonId: 'ch4-u-substitution',
+      label: 'Ch. 4: U-Substitution',
+      note: 'Explain exactly how this lesson becomes prerequisite for the future lesson — be specific.',
+    },
+  ],
+},
+```
+
+`recoveryPoints` — 1-3 earlier lessons the student should review if stuck. The `note` must explain the specific connection, not just name the topic.
+
+`futureLinks` — 1-3 future lessons that depend on this one. The `note` should make the dependency explicit so students understand why they are learning this now.
+
+### `assessment` — Quick-Fire Self-Check
+
+3 short questions for rapid self-assessment, distinct from the full `quiz`. These are simpler than quiz questions — recall and direct application only.
+
+```javascript
+// ─── Assessment ──────────────────────────────────────────────────────────
+assessment: {
+  questions: [
+    {
+      id: 'slug-assess-1',
+      type: 'input',        // or 'choice'
+      text: 'Short direct question.',
+      answer: 'answer',
+      hint: 'One-sentence hint showing the key step.',
+    },
+  ],
+},
+```
+
+### `mentalModel` — Compression
+
+3-5 ultra-compressed phrases that capture the entire lesson. These become the student's mental shorthand when they need to recall the lesson under exam pressure.
+
+```javascript
+// ─── Mental Model Compression ────────────────────────────────────────────
+mentalModel: [
+  'Chain Rule = outer\'(inner) × inner\'',
+  'Leibniz: dy/dx = (dy/du)(du/dx)',
+  'Peel layers outside→in, multiply a derivative at each layer',
+  'Forgetting the inner derivative is the #1 chain rule error',
+],
+```
+
+Rules:
+
+- Maximum 10 words per entry.
+- Write as the student would say it to themselves, not as a formal definition.
+- The last entry should name the most common mistake if there is a clear one.
+
+---
+
 ## 6. Manual Build Playbook (End-to-End)
 
 This section is a practical, copyable checklist for contributors who want to manually build lessons and visualizations from scratch.
