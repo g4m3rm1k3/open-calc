@@ -412,18 +412,46 @@ export default {
         {
           expression: "\\text{Outer: } F(u) = \\sin(u), \\quad \\text{Inner: } u = 5x^3",
           annotation: 'The outer function is the sine function and the inner function is 5x\u00b3.',
+          strategyTitle: 'Identify outer/inner: last operation determines the outer function',
+          checkpoint: 'When evaluating sin(5x³) at a number, what is the last step — multiplying by 5, cubing x, or taking the sine? That last step is the outer function.',
+          hints: [
+            'Level 1: The last step is taking the sine, so outer = sin(u) and inner = u = 5x³. Write F(u) = sin(u) and g(x) = 5x³.',
+            'Level 2: Formally, f(x) = F(g(x)) with F(u) = sin(u) and g(x) = 5x³. Naming these explicitly prevents the common error of treating the whole expression as a single function.',
+            'Level 3: Geometrically, the inner function 5x³ compresses or stretches the input before the sine acts on it. When x increases by 1, the argument of sine jumps by 5x³ — that is why the derivative picks up an extra factor of g\'(x) = 15x².',
+          ],
         },
         {
           expression: "F'(u) = \\cos(u), \\quad g'(x) = 15x^2",
           annotation: 'The derivative of sine is cosine (covered in the trig derivatives lesson). The derivative of the inner function 5x\u00b3 is 15x\u00b2 by the power and constant multiple rules.',
+          strategyTitle: 'Differentiate each layer separately before combining',
+          checkpoint: 'What is d/du[sin(u)]? What is d/dx[5x³]? Compute both independently, keeping them as two separate results.',
+          hints: [
+            'Level 1: d/du[sin(u)] = cos(u). d/dx[5x³] = 5·3x² = 15x². Keep these two results separate until the assembly step.',
+            'Level 2: The derivative of sin is cos — this is the trig derivative rule. For 5x³, apply constant-multiple rule and power rule: 5·(3x²) = 15x².',
+            'Level 3: Numerical check at x = 1: g\'(1) = 15. F\'(g(1)) = cos(5). Predicted derivative: 15cos(5) ≈ 15·(0.2837) ≈ 4.26. You can verify: [sin(5·1.001³) − sin(5·1³)] / 0.001 ≈ 4.26.',
+          ],
         },
         {
           expression: "f'(x) = \\cos(5x^3) \\cdot 15x^2",
           annotation: 'Apply the chain rule: differentiate the outer function (giving cos(u)), evaluated at the inner (replacing u with 5x\u00b3), then multiply by the inner derivative 15x\u00b2.',
+          strategyTitle: 'Assemble chain rule result: F\'(g(x)) · g\'(x)',
+          checkpoint: 'Replace u with g(x) = 5x³ in F\'(u) = cos(u). Then multiply by g\'(x) = 15x². What is the assembled result?',
+          hints: [
+            'Level 1: F\'(g(x)) = cos(5x³). Multiply by g\'(x) = 15x². Result: cos(5x³)·15x².',
+            'Level 2: The chain rule formula d/dx[F(g(x))] = F\'(g(x))·g\'(x) requires evaluating F\' at g(x), not at x. Writing cos(x)·15x² would be the classic error — the argument of cosine must be 5x³, not x.',
+            'Level 3: The general pattern is d/dx[sin(g(x))] = cos(g(x))·g\'(x). Whenever you see sine of anything, the derivative is cosine of the same thing, times the derivative of that thing. This pattern extends to every trig function.',
+          ],
         },
         {
           expression: "= 15x^2 \\cos(5x^3)",
           annotation: 'Rewrite with the constant factor first for standard form.',
+          strategyTitle: 'Reorder to standard form: constant factor written first',
+          checkpoint: 'Rewrite cos(5x³)·15x² in the conventional order with the coefficient leading. Does the order of factors affect the value?',
+          hints: [
+            'Level 1: Multiplication is commutative, so cos(5x³)·15x² = 15x²cos(5x³). Convention places numerical/polynomial factors before trig factors.',
+            'Level 2: The standard form 15x²cos(5x³) is easier to read and matches the form you would expect from the general pattern 15x²·(trig function of inner).',
+            'Level 3: At x = 0: f\'(0) = 15·0²·cos(0) = 0. The derivative is zero at x = 0 because the inner function 5x³ has zero slope there — a flat inner function means the outer barely changes regardless of its own derivative.',
+          ],
         },
       ],
       conclusion: 'f\'(x) = 15x\u00b2 cos(5x\u00b3). This illustrates the general pattern: d/dx[sin(g(x))] = cos(g(x))\u00b7g\'(x). The argument of cosine is the same as the argument of sine was.',
@@ -436,18 +464,46 @@ export default {
         {
           expression: "\\text{Outer: } F(u) = e^u, \\quad \\text{Inner: } u = x^2",
           annotation: 'The outer function is e to the power u, and the inner function is x\u00b2.',
+          strategyTitle: 'Identify outer/inner: the exponent is the argument, so e^(·) is the outer function',
+          checkpoint: 'When evaluating e^(x²) at a number, what is the last step — squaring x, or raising e to a power? That last step is the outer function.',
+          hints: [
+            'Level 1: The last operation is raising e to a power, so outer = F(u) = eᵘ. The inner function is what sits in the exponent: g(x) = x².',
+            'Level 2: Any time you see e^(something non-trivial), the outer function is eᵘ and the inner is that something. The chain rule is mandatory — forgetting it gives just eˣ² with no inner derivative, which is wrong.',
+            'Level 3: Geometrically, e^(x²) grows much faster than eˣ because the exponent itself grows. The factor of 2x in the derivative captures exactly how fast the exponent is growing, and hence how much faster e^(x²) accelerates compared to a simple exponential.',
+          ],
         },
         {
           expression: "F'(u) = e^u, \\quad g'(x) = 2x",
           annotation: 'The key property of e^u is that it equals its own derivative (proved in the exponential derivatives lesson). The inner derivative is 2x.',
+          strategyTitle: 'Differentiate each layer: e^u is its own derivative; x² gives 2x',
+          checkpoint: 'What is d/du[eᵘ]? What makes eᵘ unique among all functions? And what is d/dx[x²]?',
+          hints: [
+            'Level 1: d/du[eᵘ] = eᵘ — the exponential function equals its own derivative. This is its defining property. d/dx[x²] = 2x by the power rule.',
+            'Level 2: The self-derivative property of eᵘ means F\'(u) = eᵘ and then F\'(g(x)) = e^(g(x)) = e^(x²) — the outer derivative looks exactly like the original outer function. The chain rule still requires you to multiply by g\'(x).',
+            'Level 3: Numerical check at x = 1: g\'(1) = 2. F\'(g(1)) = e^1 = e ≈ 2.718. Predicted f\'(1) = 2e ≈ 5.436. Verify: [e^(1.001²) − e^(1²)] / 0.001 = [e^(1.002001) − e] / 0.001 ≈ 5.44. Matches.',
+          ],
         },
         {
           expression: "f'(x) = e^{x^2} \\cdot 2x",
           annotation: 'Apply the chain rule: the outer derivative e^u evaluated at u = x\u00b2 gives e^(x\u00b2), times the inner derivative 2x.',
+          strategyTitle: 'Assemble chain rule result: F\'(g(x)) · g\'(x)',
+          checkpoint: 'Replace u with x² in F\'(u) = eᵘ. Then multiply by g\'(x) = 2x. Write the assembled product before simplifying.',
+          hints: [
+            'Level 1: F\'(g(x)) = e^(x²). Multiply by g\'(x) = 2x. Result: e^(x²)·2x.',
+            'Level 2: The critical step is evaluating eᵘ at u = x², giving e^(x²). A common error is writing just eˣ — that would be the derivative of eˣ, not e^(x²). The argument must remain x², not x.',
+            'Level 3: The general pattern is d/dx[e^(g(x))] = e^(g(x))·g\'(x). The exponential e^(g(x)) is unchanged in the derivative; only the chain factor g\'(x) is appended. This pattern appears constantly in physics (e.g., e^(−kt)), statistics (Gaussian e^(−x²/2)), and engineering.',
+          ],
         },
         {
           expression: "= 2x\\,e^{x^2}",
           annotation: 'Rewrite with the constant factor first.',
+          strategyTitle: 'Reorder to standard form: polynomial coefficient written before the exponential',
+          checkpoint: 'Write e^(x²)·2x in standard order with 2x first. At x = 0, what is f\'(0)? Does this make sense from the graph?',
+          hints: [
+            'Level 1: e^(x²)·2x = 2x·e^(x²). Convention: polynomial or simple factor first, then the exponential.',
+            'Level 2: f\'(0) = 2·0·e^0 = 0. The derivative is zero at x = 0 because the inner function x² has a critical point at 0 (its minimum). Near x = 0, x² is nearly flat, so e^(x²) barely changes — hence zero derivative.',
+            'Level 3: For x > 0, f\'(x) = 2xe^(x²) > 0 so f is increasing. For x < 0, f\'(x) < 0 so f is decreasing. This confirms x = 0 is a global minimum of e^(x²), which matches the graph. The derivative analysis via chain rule reveals the full shape of this important function.',
+          ],
         },
       ],
       conclusion: 'f\'(x) = 2xe^(x\u00b2). The function e^(x\u00b2) grows enormously fast but its derivative is not just itself — the chain rule contributes the factor of 2x from the exponent.',

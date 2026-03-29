@@ -518,16 +518,37 @@ export default {
             "\\text{Outer: } F(u) = \\tan u, \\quad \\text{Inner: } u = x^2 + 1",
           annotation:
             "Identify the composition. The outer function is tangent; the inner is x\u00b2+1.",
+          strategyTitle: "Decompose the composition: outer = tan, inner = x\u00b2+1",
+          checkpoint: "Is the argument of tan just plain x, or something more? Does that change which rules you need?",
+          hints: [
+            "Level 1: When tan\u2019s argument is not plain x, chain rule is required. The inner function is x\u00b2+1 \u2014 not x \u2014 so the chain rule will add a factor of 2x in the final answer.",
+            "Level 2: The derivative rule for tangent is d/dx[tan u] = sec\u00b2(u)\u00b7u\u2019. The sec\u00b2 comes from tan = sin/cos; the quotient rule on sin/cos produces 1/cos\u00b2 = sec\u00b2.",
+            "Level 3: Numerically verify: f(x) = tan(x\u00b2+1) at x = 0 gives tan(1) \u2248 1.557. The derivative at x=0 should be sec\u00b2(1)\u00b72\u00b70 = 0 (since inner derivative 2x = 0 at x=0). Check: (tan(0.001\u00b2+1) - tan(1))/0.001 \u2248 0.000. \u2713",
+          ],
         },
         {
           expression: "F'(u) = \\sec^2 u, \\quad u' = 2x",
           annotation:
             "The derivative of tan(u) is sec\u00b2(u). The inner derivative is 2x.",
+          strategyTitle: "Apply d/dx[tan u] = sec\u00b2(u): where does sec\u00b2 come from?",
+          checkpoint: "Can you derive d/dx[tan x] = sec\u00b2 x from the quotient rule on sin x / cos x? Try it before moving on.",
+          hints: [
+            "Level 1: tan x = sin x / cos x. Quotient rule: (cos x \u00b7 cos x - sin x \u00b7 (-sin x)) / cos\u00b2 x = (cos\u00b2x + sin\u00b2x)/cos\u00b2x = 1/cos\u00b2x = sec\u00b2x.",
+            "Level 2: This derivation is the proof that d/dx[tan x] = sec\u00b2 x. Memorize the result but also know it follows from quotient rule on sin/cos.",
+            "Level 3: The inner derivative u\u2019 = 2x is the derivative of x\u00b2+1 by the power rule. Always compute inner and outer derivatives separately before combining via chain rule.",
+          ],
         },
         {
           expression: "f'(x) = \\sec^2(x^2+1) \\cdot 2x = 2x\\sec^2(x^2+1)",
           annotation:
             "Apply chain rule: outer derivative (sec\u00b2, evaluated at x\u00b2+1) times inner derivative (2x).",
+          strategyTitle: "Assemble: sec\u00b2(x\u00b2+1) \u00b7 2x \u2014 keep the argument x\u00b2+1 inside sec\u00b2",
+          checkpoint: "Why is the argument of sec\u00b2 still x\u00b2+1, not x? What would be wrong about writing 2x sec\u00b2(x)?",
+          hints: [
+            "Level 1: Chain rule: F\u2019(g(x)) \u00b7 g\u2019(x). Here F\u2019(u) = sec\u00b2(u) evaluated at u = x\u00b2+1 gives sec\u00b2(x\u00b2+1). The inner function x\u00b2+1 is preserved inside sec\u00b2.",
+            "Level 2: Writing sec\u00b2(x) would mean you replaced u with x instead of u = x\u00b2+1 \u2014 that discards the inner function entirely. This is the chain-trap error.",
+            "Level 3: Multiply 2x to the left by convention: 2x sec\u00b2(x\u00b2+1). Both orders are correct, but leading with the inner derivative coefficient is standard form.",
+          ],
         },
       ],
       conclusion:
@@ -542,25 +563,60 @@ export default {
           expression: "f(x) = (\\sin x)^2",
           annotation:
             "Logic narrator: this is a power-rule shell first, not a trig-first move. See a square around something, peel the square before touching the sine.",
+          strategyTitle: "Rewrite: sin\u00b2x means (sin x)\u00b2 \u2014 outer = power, inner = trig",
+          checkpoint: "Which operation acts LAST when evaluating sin\u00b2(x)? Is it \u2018taking the sine\u2019 or \u2018squaring\u2019? The last operation is the outer function.",
+          hints: [
+            "Level 1: sin\u00b2(x) is shorthand for (sin x)\u00b2. The squaring happens last \u2014 so outer = u\u00b2, inner = sin x. This is the opposite trap from sin(x\u00b2): there, the squaring is INSIDE the trig.",
+            "Level 2: This is critical: sin(x\u00b2) has outer = sin, inner = x\u00b2. But sin\u00b2(x) = (sin x)\u00b2 has outer = u\u00b2, inner = sin x. The derivatives are completely different.",
+            "Level 3: Numerically: at x = \u03c0/4, sin\u00b2(x) = 0.5, d/dx[sin\u00b2x] should be sin(2x) = sin(\u03c0/2) = 1. At the same point, d/dx[sin(x\u00b2)] = 2x cos(x\u00b2) = (\u03c0/2)cos(\u03c0\u00b2/16) \u2248 1.25. Completely different.",
+          ],
         },
         {
           expression:
             "\\text{Outer: } F(u) = u^2, \\quad \\text{Inner: } u = \\sin x",
           annotation: "Identify the layers.",
+          strategyTitle: "Set up chain rule: outer = u\u00b2, inner = sin x",
+          checkpoint: "What is F\u2019(u) for F(u) = u\u00b2? What is u\u2019 for u = sin x?",
+          hints: [
+            "Level 1: F\u2019(u) = 2u by the power rule. u\u2019 = cos x by the trig derivative rule.",
+            "Level 2: Keep them separate for now: F\u2019(u) = 2u and u\u2019 = cos x. Combine in the next step.",
+            "Level 3: This is exactly the chain rule pattern from Lesson 2: d/dx[F(g(x))] = F\u2019(g(x))\u00b7g\u2019(x). Here F = u\u00b2, g = sin x.",
+          ],
         },
         {
           expression: "F'(u) = 2u, \\quad u' = \\cos x",
           annotation: "Differentiate each layer.",
+          strategyTitle: "Differentiate each layer independently",
+          checkpoint: "Before combining: write out F\u2019(g(x)) by substituting u = sin x into 2u. What do you get?",
+          hints: [
+            "Level 1: F\u2019(u) = 2u. Evaluated at u = sin x: F\u2019(sin x) = 2 sin x. The inner derivative: u\u2019 = cos x.",
+            "Level 2: The chain rule then gives 2 sin x \u00b7 cos x. This is the unsimplified form \u2014 valid and complete.",
+            "Level 3: Recognizing 2 sin x cos x = sin(2x) is the bonus simplification in the next step. It uses the double-angle identity, which comes from the angle-addition formula for sine.",
+          ],
         },
         {
           expression: "f'(x) = 2\\sin x \\cdot \\cos x",
           annotation:
             "Chain rule: 2u evaluated at u = sin x gives 2 sin x, times the inner derivative cos x.",
+          strategyTitle: "Assemble via chain rule: 2 sin x \u00b7 cos x",
+          checkpoint: "Is 2 sin x \u00b7 cos x a valid final answer? Or must you simplify to sin(2x)?",
+          hints: [
+            "Level 1: Both 2 sin x cos x and sin(2x) are correct. The double-angle form is more compact but 2 sin x cos x is equally valid on any exam.",
+            "Level 2: The simplification uses the identity 2 sin\u03b8 cos\u03b8 = sin(2\u03b8). This identity comes from the sine addition formula: sin(A+B) = sin A cos B + cos A sin B with A = B = x.",
+            "Level 3: In integration, you will prefer the form 2 sin x cos x because it suggests the u-substitution u = sin x: \u222b 2 sin x cos x dx = \u222b 2u du = u\u00b2 = sin\u00b2x + C.",
+          ],
         },
         {
           expression: "= \\sin(2x)",
           annotation:
             "Apply the double angle identity: 2 sin(x) cos(x) = sin(2x). This is a nice simplification, though both forms are correct.",
+          strategyTitle: "Apply double-angle identity: 2 sin x cos x = sin(2x)",
+          checkpoint: "Where does the identity 2 sin x cos x = sin(2x) come from? Can you derive it from the sine addition formula?",
+          hints: [
+            "Level 1: sin(A+B) = sin A cos B + cos A sin B. Set A = B = x: sin(2x) = sin x cos x + cos x sin x = 2 sin x cos x.",
+            "Level 2: This identity appears constantly in integration (Chapter 4). Recognizing it now saves work later: \u222b sin(2x) dx = -cos(2x)/2 + C.",
+            "Level 3: Verify numerically: at x = \u03c0/4, sin(2\u00b7\u03c0/4) = sin(\u03c0/2) = 1. And 2 sin(\u03c0/4) cos(\u03c0/4) = 2\u00b7(1/\u221a2)\u00b7(1/\u221a2) = 2\u00b71/2 = 1. \u2713",
+          ],
         },
       ],
       conclusion:
@@ -576,16 +632,37 @@ export default {
             "\\text{Outer: } F(u) = \\cos u, \\quad \\text{Inner: } u = \\sin x",
           annotation:
             "Both outer and inner functions are trigonometric. The outer is cosine (acting on the result of sine) and the inner is sine.",
+          strategyTitle: "Both functions are trig \u2014 outer = cos, inner = sin",
+          checkpoint: "What acts last when evaluating cos(sin x)? First you compute sin x, then you take the cosine of that result. Which is outer?",
+          hints: [
+            "Level 1: The last operation is \u2018take cosine of \u2026\u2019. So outer = cos(u), inner = sin x. This is a composition of two trig functions \u2014 chain rule is required.",
+            "Level 2: The chain rule does not care what the functions are, only their order of composition. Outer derivative times inner derivative, always.",
+            "Level 3: cos(sin x) oscillates within [\u22121, 1] but its oscillation rate varies \u2014 fastest where |cos x| is largest (near x = 0 and \u03c0), zero where cos x = 0 (at x = \u03c0/2).",
+          ],
         },
         {
           expression: "F'(u) = -\\sin u, \\quad u' = \\cos x",
           annotation:
             "Differentiate each layer: derivative of cosine is negative sine; derivative of sin x is cos x.",
+          strategyTitle: "d/dx[cos u] = \u2212sin u: the outer derivative carries a negative sign",
+          checkpoint: "The derivative of cosine is negative sine. Why negative? Can you verify using the unit-circle velocity-vector argument?",
+          hints: [
+            "Level 1: d/dx[cos x] = \u2212sin x. The negative sign appears because cosine is decreasing on (0, \u03c0) \u2014 it starts at its maximum (1) and decreases, so its derivative must start negative.",
+            "Level 2: Unit circle: the position vector is (cos\u03b8, sin\u03b8). The velocity vector (derivative) is (\u2212sin\u03b8, cos\u03b8). The x-component is \u2212sin x \u2014 that\u2019s d/dx[cos x].",
+            "Level 3: The inner derivative u\u2019 = cos x comes from d/dx[sin x] = cos x. Note: inner here is sin x \u2014 the trig function whose derivative is POSITIVE cosine, unlike the outer function (cosine) whose derivative is NEGATIVE sine.",
+          ],
         },
         {
           expression: "f'(x) = -\\sin(\\sin x) \\cdot \\cos x",
           annotation:
             "Apply chain rule: outer derivative -sin(u) evaluated at u = sin x gives -sin(sin x), times the inner derivative cos x.",
+          strategyTitle: "Assemble: \u2212sin(sin x) \u00b7 cos x \u2014 inner function preserved inside outer derivative",
+          checkpoint: "Why is the argument of the outermost sin still \u2018sin x\u2019 and not just \u2018x\u2019?",
+          hints: [
+            "Level 1: F\u2019(u) = \u2212sin(u). Evaluate at u = sin x: F\u2019(sin x) = \u2212sin(sin x). The argument is sin x, not x. Multiplied by inner derivative cos x gives the final answer.",
+            "Level 2: This is the key chain rule preservation rule: when evaluating F\u2019(g(x)), replace u with the ENTIRE inner function g(x). Never simplify g(x) inside F\u2019 before evaluation.",
+            "Level 3: Verify: at x = 0, f(x) = cos(sin 0) = cos(0) = 1. f\u2019(0) = \u2212sin(sin 0) \u00b7 cos(0) = \u2212sin(0) \u00b7 1 = 0. This makes sense: x = 0 is near a local max of cos(sin x) (since sin x = 0 is an extremum of cos), so slope should be 0.",
+          ],
         },
       ],
       conclusion:
@@ -600,31 +677,73 @@ export default {
           expression: "\\text{Let } u(x) = \\sec(5x), \\quad v(x) = \\tan(5x)",
           annotation:
             "This is a product of two functions, each requiring the chain rule.",
+          strategyTitle: "Product rule setup: u = sec(5x), v = tan(5x) \u2014 both need chain rule",
+          checkpoint: "Does each factor require the chain rule? What is the inner function for both sec(5x) and tan(5x)?",
+          hints: [
+            "Level 1: Both sec(5x) and tan(5x) have inner function 5x (not plain x), so both require chain rule when differentiating. The outer product rule structure is u\u2019v + uv\u2019.",
+            "Level 2: Identify the four derivative rules needed: product rule (outer structure), chain rule for sec(5x), chain rule for tan(5x). That is three rule applications in a single problem.",
+            "Level 3: This example is the product-chain combination from Lesson 4.5. The discipline is: compute u\u2019 and v\u2019 SEPARATELY with their chain rule factors, then assemble the product rule. Never mix the two steps.",
+          ],
         },
         {
           expression:
             "u'(x) = \\sec(5x)\\tan(5x) \\cdot 5 = 5\\sec(5x)\\tan(5x)",
           annotation:
             "Differentiate sec(5x) using the chain rule: d/dx[sec u] = sec u tan u times u'. Here u = 5x and u' = 5.",
+          strategyTitle: "d/dx[sec(5x)]: use d/dx[sec u] = sec u tan u, then \u00d7 inner derivative 5",
+          checkpoint: "What is d/dx[sec u]? Where does the \u2018sec u tan u\u2019 form come from? Can you derive it from the quotient rule on 1/cos u?",
+          hints: [
+            "Level 1: sec u = 1/cos u. Quotient rule: d/du[1/cos u] = (0 \u00b7 cos u \u2212 1 \u00b7 (\u2212sin u))/cos\u00b2u = sin u/cos\u00b2u = (1/cos u)(sin u/cos u) = sec u tan u.",
+            "Level 2: The chain rule adds the inner derivative: d/dx[sec(5x)] = sec(5x)tan(5x) \u00b7 5. The factor of 5 is the derivative of the inner function 5x.",
+            "Level 3: Memorize the six trig derivatives as three pairs: (sin, cos), (tan, sec\u00b2), (sec, sec\u00b7tan). The co-functions (cos, cot, csc) each have a minus sign. This pairing makes them easier to recall.",
+          ],
         },
         {
           expression: "v'(x) = \\sec^2(5x) \\cdot 5 = 5\\sec^2(5x)",
           annotation:
             "Differentiate tan(5x) using the chain rule: d/dx[tan u] = sec\u00b2 u times u'. Here u = 5x and u' = 5.",
+          strategyTitle: "d/dx[tan(5x)]: use d/dx[tan u] = sec\u00b2u, then \u00d7 inner derivative 5",
+          checkpoint: "Compare u\u2019 and v\u2019: both have a factor of 5. Is this a coincidence, or does it always happen when both functions share the same inner function?",
+          hints: [
+            "Level 1: d/dx[tan(5x)] = sec\u00b2(5x) \u00b7 5. The chain rule factor is 5 because the inner function is 5x and d/dx[5x] = 5.",
+            "Level 2: Both factors u = sec(5x) and v = tan(5x) share the same inner function 5x. Both therefore get the same chain rule factor of 5. This is exactly what will let us factor out 5 sec(5x) at the end.",
+            "Level 3: If the factors had different inner functions (e.g., sec(3x)\u00b7tan(5x)), the chain rule factors would be 3 and 5 respectively, and no clean factoring would emerge. Same inner function = clean factoring at the end.",
+          ],
         },
         {
           expression:
             "f'(x) = u'v + uv' = [5\\sec(5x)\\tan(5x)]\\cdot\\tan(5x) + \\sec(5x)\\cdot[5\\sec^2(5x)]",
           annotation: "Apply the product rule.",
+          strategyTitle: "Product rule assembly: u\u2019v + uv\u2019 with all chain-rule factors included",
+          checkpoint: "Before expanding, verify: did both u\u2019 and v\u2019 include their chain-rule factors of 5? What happens if you forget them?",
+          hints: [
+            "Level 1: u\u2019 = 5sec(5x)tan(5x) and v\u2019 = 5sec\u00b2(5x). Both already include the chain-rule factor 5. Assemble: u\u2019v + uv\u2019 = [5 sec(5x)tan(5x)] \u00b7 tan(5x) + sec(5x) \u00b7 [5 sec\u00b2(5x)].",
+            "Level 2: If you forgot the chain-rule \u00d75 in u\u2019 or v\u2019, the assembled product rule would be off by a factor of 5 on one or both terms \u2014 a very common exam error.",
+            "Level 3: At this stage the expression looks messy. Resist simplifying prematurely \u2014 write out both terms in full first, then look for common factors in the next step.",
+          ],
         },
         {
           expression: "= 5\\sec(5x)\\tan^2(5x) + 5\\sec^3(5x)",
           annotation:
             "Expand: tan(5x) \u00b7 tan(5x) = tan\u00b2(5x) and sec(5x) \u00b7 sec\u00b2(5x) = sec\u00b3(5x).",
+          strategyTitle: "Expand powers: tan \u00b7 tan = tan\u00b2, sec \u00b7 sec\u00b2 = sec\u00b3",
+          checkpoint: "What is sec(5x) \u00b7 sec\u00b2(5x)? Is it sec\u00b3(5x) or sec\u00b2(5x)?",
+          hints: [
+            "Level 1: sec(5x) \u00b7 sec\u00b2(5x) = sec^{1+2}(5x) = sec\u00b3(5x). And tan(5x) \u00b7 tan(5x) = tan\u00b2(5x).",
+            "Level 2: When multiplying powers of the same base function, add exponents: sec^a \u00b7 sec^b = sec^{a+b}.",
+            "Level 3: After this step, both terms have the common factor 5 sec(5x). Factoring it out in the next step yields the compact final form.",
+          ],
         },
         {
           expression: "= 5\\sec(5x)[\\tan^2(5x) + \\sec^2(5x)]",
           annotation: "Factor out 5 sec(5x) from both terms.",
+          strategyTitle: "Factor 5 sec(5x) from both terms: common factor in every term",
+          checkpoint: "After factoring, can the bracket [tan\u00b2(5x) + sec\u00b2(5x)] be simplified further using a trig identity?",
+          hints: [
+            "Level 1: Both terms contain 5 sec(5x). Factor it out: 5 sec(5x) \u00b7 [tan\u00b2(5x) + sec\u00b2(5x)].",
+            "Level 2: The identity tan\u00b2(x) + 1 = sec\u00b2(x) gives tan\u00b2(x) = sec\u00b2(x) \u2212 1. So tan\u00b2(5x) + sec\u00b2(5x) = (sec\u00b2(5x) \u2212 1) + sec\u00b2(5x) = 2sec\u00b2(5x) \u2212 1.",
+            "Level 3: Fully simplified: f\u2019(x) = 5 sec(5x)[2sec\u00b2(5x) \u2212 1]. Both the factored form and this simplified form are correct. Which to use depends on whether the Pythagorean identity simplification is required.",
+          ],
         },
       ],
       conclusion:
@@ -641,34 +760,76 @@ export default {
             "\\text{Numerator: } N = 1+\\sin x, \\quad \\text{Denominator: } D = 1-\\sin x",
           annotation:
             "Identify numerator and denominator for the quotient rule.",
+          strategyTitle: "Quotient rule setup: label N and D before differentiating",
+          checkpoint: "Do either N or D require the chain rule when differentiating? What is the argument of sin in each?",
+          hints: [
+            "Level 1: N = 1 + sin x (argument is plain x, no chain rule). D = 1 \u2212 sin x (same). Both differentiate simply with d/dx[sin x] = cos x.",
+            "Level 2: The quotient rule is (N\u2019D \u2212 ND\u2019)/D\u00b2. This formula is sometimes remembered as \u2018low d-high minus high d-low, all over low squared.\u2019",
+            "Level 3: Prediction before computing: the numerator will have cos x factors (from differentiating sin x). The denominator squared becomes (1 \u2212 sin x)\u00b2. The key simplification will happen in the numerator via factoring cos x.",
+          ],
         },
         {
           expression: "N' = \\cos x, \\quad D' = -\\cos x",
           annotation:
             "Differentiate numerator: d/dx[1+sin x] = cos x. Differentiate denominator: d/dx[1-sin x] = -cos x.",
+          strategyTitle: "Differentiate N and D: note D\u2019 is \u2212cos x (negative from \u2212sin x term)",
+          checkpoint: "Why is D\u2019 = \u2212cos x and not +cos x? Trace through d/dx[1 \u2212 sin x] step by step.",
+          hints: [
+            "Level 1: d/dx[1 \u2212 sin x] = d/dx[1] \u2212 d/dx[sin x] = 0 \u2212 cos x = \u2212cos x. The minus sign in the original expression carries through.",
+            "Level 2: The derivative rules are linear: d/dx[f \u2212 g] = f\u2019 \u2212 g\u2019. The constant 1 vanishes; the \u2212sin x term gives \u2212cos x.",
+            "Level 3: A sign error here (writing D\u2019 = +cos x) would cause incorrect sign in the quotient rule numerator, leading to a completely wrong answer. Double-check D\u2019 signs before proceeding.",
+          ],
         },
         {
           expression:
             "f'(x) = \\frac{N'D - ND'}{D^2} = \\frac{\\cos x(1-\\sin x) - (1+\\sin x)(-\\cos x)}{(1-\\sin x)^2}",
           annotation:
             "Logic narrator: run quotient rule cleanly, then hunt for identity-style collapse opportunities in the numerator to escape complexity.",
+          strategyTitle: "Apply quotient rule: (N\u2019D \u2212 ND\u2019) / D\u00b2",
+          checkpoint: "Before distributing, predict: the second term has \u2212(1+sin x)(\u2212cos x). Two negatives multiply to give what sign?",
+          hints: [
+            "Level 1: N\u2019D = cos x \u00b7 (1 \u2212 sin x). ND\u2019 = (1 + sin x) \u00b7 (\u2212cos x). The formula is N\u2019D \u2212 ND\u2019 = cos x(1 \u2212 sin x) \u2212 (1 + sin x)(\u2212cos x).",
+            "Level 2: The minus sign in the quotient rule formula combined with D\u2019 = \u2212cos x gives \u2212(1+sin x)(\u2212cos x) = +(1+sin x)cos x. Two negatives cancel to a positive.",
+            "Level 3: This double-negative collapse is the algebraic key that makes the problem tractable. When the quotient rule produces a \u2212(\u2026)(\u2212\u2026) term, expand the double negative immediately to reveal the factoring opportunity.",
+          ],
         },
         {
           expression:
             "= \\frac{\\cos x(1-\\sin x) + \\cos x(1+\\sin x)}{(1-\\sin x)^2}",
           annotation:
             "Distribute the negative sign on the second term: -(1+sin x)(-cos x) = +cos x(1+sin x).",
+          strategyTitle: "Simplify the double negative: \u2212(1+sin x)(\u2212cos x) = +cos x(1+sin x)",
+          checkpoint: "Now both terms in the numerator contain cos x as a factor. What can you factor out?",
+          hints: [
+            "Level 1: After simplifying the double negative: numerator = cos x(1\u2212sin x) + cos x(1+sin x). Both terms have cos x as a factor.",
+            "Level 2: Factor cos x from both terms: cos x [(1\u2212sin x) + (1+sin x)]. This is the factoring step that cleans up the numerator.",
+            "Level 3: The factoring is enabled by the double-negative collapse. Without recognizing that opportunity, you might try to expand everything and drown in algebra. Pattern: when quotient rule gives two terms with a common factor in the numerator, factor before expanding.",
+          ],
         },
         {
           expression:
             "= \\frac{\\cos x[(1-\\sin x) + (1+\\sin x)]}{(1-\\sin x)^2}",
           annotation: "Factor cos x from both terms in the numerator.",
+          strategyTitle: "Factor cos x from the numerator: reveal the cancellation inside brackets",
+          checkpoint: "Simplify the bracket (1\u2212sin x) + (1+sin x). What do the sin x terms do?",
+          hints: [
+            "Level 1: (1\u2212sin x) + (1+sin x) = 1 \u2212 sin x + 1 + sin x = 2. The sin x terms cancel exactly.",
+            "Level 2: This cancellation is the beautiful payoff of the double-negative collapse and factoring strategy. The \u2212sin x and +sin x annihilate each other.",
+            "Level 3: This type of simplification \u2014 where opposite terms cancel in the numerator after factoring \u2014 is the hallmark of a well-structured trig quotient rule problem. Exam problems are often designed to produce this clean cancellation.",
+          ],
         },
         {
           expression:
             "= \\frac{\\cos x \\cdot 2}{(1-\\sin x)^2} = \\frac{2\\cos x}{(1-\\sin x)^2}",
           annotation:
             "Simplify inside the brackets: (1-sin x)+(1+sin x) = 2. The sin x terms cancel.",
+          strategyTitle: "Final form: 2 cos x / (1\u2212sin x)\u00b2",
+          checkpoint: "Is further simplification possible? Could you use sin\u00b2x + cos\u00b2x = 1 to rewrite the denominator?",
+          hints: [
+            "Level 1: The answer 2cos x / (1\u2212sin x)\u00b2 is fully simplified. No further trig identity applies here.",
+            "Level 2: You could multiply numerator and denominator by (1+sin x) to get 2cos x(1+sin x)/(1\u2212sin\u00b2x) = 2cos x(1+sin x)/cos\u00b2x = 2(1+sin x)/cos x. Different equivalent form, not necessarily simpler.",
+            "Level 3: Verify at x = 0: f(0) = (1+0)/(1\u22120) = 1. f\u2019(0) = 2cos(0)/(1\u2212sin(0))\u00b2 = 2\u00b71/1\u00b2 = 2. Finite difference: (f(0.001)\u2212f(0))/0.001 = ((1+0.001)/(1\u22120.001)\u22121)/0.001 \u2248 2.000. \u2713",
+          ],
         },
       ],
       conclusion:
@@ -683,29 +844,64 @@ export default {
         {
           expression: "f'(x) = \\cos x",
           annotation:
-            "The derivative of sin x is cos x — no chain rule needed since the argument is just x.",
+            "The derivative of sin x is cos x \u2014 no chain rule needed since the argument is just x.",
+          strategyTitle: "Find the slope function: f\u2019(x) = cos x",
+          checkpoint: "The slope at every point on y = sin x is given by f\u2019(x) = cos x. What is the slope at x = 0? At x = \u03c0/2? At x = \u03c0?",
+          hints: [
+            "Level 1: d/dx[sin x] = cos x. No chain rule since the argument is plain x.",
+            "Level 2: The slope values confirm the geometry: at x = 0 (bottom of a rising section), slope = cos(0) = 1 (steepest rise). At x = \u03c0/2 (the peak), slope = cos(\u03c0/2) = 0 (horizontal tangent). At x = \u03c0 (zero crossing with descending sine), slope = cos(\u03c0) = \u22121 (steepest descent).",
+            "Level 3: The fact that the derivative of sine is cosine is why these two functions are described as 90\u00b0 phase shifts of each other. Sine leads cosine by \u03c0/2 in position; their derivatives satisfy the same relationship.",
+          ],
         },
         {
           expression: "f'(\\pi/3) = \\cos(\\pi/3) = \\frac{1}{2}",
           annotation:
             "Logic narrator: this derivative value is the steerable slope. Plugging x = pi/3 locks the steering wheel to one tangent line.",
+          strategyTitle: "Evaluate the slope at x = \u03c0/3: cos(\u03c0/3) = 1/2",
+          checkpoint: "From the unit circle, what are the exact values of cos(\u03c0/3), cos(\u03c0/4), and cos(\u03c0/6)?",
+          hints: [
+            "Level 1: Unit circle values: cos(\u03c0/6) = \u221a3/2, cos(\u03c0/4) = 1/\u221a2, cos(\u03c0/3) = 1/2. These are essential to memorize for any calculus exam.",
+            "Level 2: At x = \u03c0/3 \u2248 60\u00b0, the tangent line has slope 1/2. The sine curve is still rising at this point (slope > 0), but not as steeply as at x = 0 (slope = 1).",
+            "Level 3: The slope m = 1/2 is the only piece of information needed to write the tangent line, once we also know the point (x\u2080, f(x\u2080)). Two pieces of information define a unique line.",
+          ],
         },
         {
           expression: "f(\\pi/3) = \\sin(\\pi/3) = \\frac{\\sqrt{3}}{2}",
           annotation:
             "Find the y-coordinate of the tangent point. From the unit circle, sin(\u03c0/3) = \u221a3/2.",
+          strategyTitle: "Find the contact point: evaluate f(\u03c0/3) = sin(\u03c0/3) = \u221a3/2",
+          checkpoint: "You now have both pieces needed for a line: a point (\u03c0/3, \u221a3/2) and a slope (1/2). Which line equation formula will you use?",
+          hints: [
+            "Level 1: sin(\u03c0/3) = \u221a3/2 \u2248 0.866. The contact point is (\u03c0/3, \u221a3/2) \u2248 (1.047, 0.866).",
+            "Level 2: Two methods to write the line: (1) point-slope: y \u2212 y\u2080 = m(x \u2212 x\u2080), or (2) slope-intercept: y = mx + b with b found by substitution. Point-slope is faster here.",
+            "Level 3: Confirm \u03c0/3 is on the curve: f(\u03c0/3) = sin(\u03c0/3) = \u221a3/2. The tangent line touches the curve at exactly this point and has the same slope there.",
+          ],
         },
         {
           expression:
             "y - \\frac{\\sqrt{3}}{2} = \\frac{1}{2}\\left(x - \\frac{\\pi}{3}\\right)",
           annotation:
             "Write in point-slope form with point (\u03c0/3, \u221a3/2) and slope 1/2.",
+          strategyTitle: "Point-slope form: y \u2212 y\u2080 = m(x \u2212 x\u2080)",
+          checkpoint: "Identify m, x\u2080, and y\u2080 in this equation. Where did each quantity come from?",
+          hints: [
+            "Level 1: m = 1/2 (from f\u2019(\u03c0/3)), x\u2080 = \u03c0/3, y\u2080 = \u221a3/2 (from f(\u03c0/3)). Point-slope form is the most direct way to write any tangent line.",
+            "Level 2: This formula works for any tangent line: y \u2212 f(a) = f\u2019(a)(x \u2212 a). You only need the base point a and the function value and derivative at a.",
+            "Level 3: This is exactly the linear approximation formula L(x) = f(a) + f\u2019(a)(x \u2212 a) from Chapter 3. Tangent lines and linear approximations are the same object viewed differently: geometry vs. computation.",
+          ],
         },
         {
           expression:
             "y = \\frac{1}{2}x - \\frac{\\pi}{6} + \\frac{\\sqrt{3}}{2}",
           annotation:
-            "Distribute 1/2 across (x - \u03c0/3) = x - \u03c0/3, giving (1/2)x - \u03c0/6, then add \u221a3/2.",
+            "Distribute 1/2 across (x \u2212 \u03c0/3) = x \u2212 \u03c0/3, giving (1/2)x \u2212 \u03c0/6, then add \u221a3/2.",
+          strategyTitle: "Simplify to slope-intercept form y = mx + b",
+          checkpoint: "What is the y-intercept b = \u2212\u03c0/6 + \u221a3/2 numerically? Is it positive or negative?",
+          hints: [
+            "Level 1: Distribute: (1/2)(x \u2212 \u03c0/3) = x/2 \u2212 \u03c0/6. Add y\u2080 = \u221a3/2: y = x/2 \u2212 \u03c0/6 + \u221a3/2.",
+            "Level 2: y-intercept: b = \u2212\u03c0/6 + \u221a3/2 \u2248 \u22120.524 + 0.866 = 0.342. The tangent line crosses the y-axis above zero.",
+            "Level 3: Sanity check: the tangent line at x = \u03c0/3 should pass through (\u03c0/3, \u221a3/2). Check: y = (1/2)(\u03c0/3) \u2212 \u03c0/6 + \u221a3/2 = \u03c0/6 \u2212 \u03c0/6 + \u221a3/2 = \u221a3/2. \u2713",
+          ],
         },
       ],
       conclusion:

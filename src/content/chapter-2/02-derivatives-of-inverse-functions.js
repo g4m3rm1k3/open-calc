@@ -248,11 +248,61 @@ export default {
       title: 'Finding the Derivative of an Inverse from a Table',
       problem: '\\text{Given } f(5) = 2 \\text{ and } f\'(5) = 4 \\text{, find } (f^{-1})\'(2).',
       steps: [
-        { expression: '(f^{-1})\'(x) = \\frac{1}{f\'(f^{-1}(x))}', annotation: 'Write the theorem for the derivative of an inverse function.' },
-        { expression: '(f^{-1})\'(2) = \\frac{1}{f\'(f^{-1}(2))}', annotation: 'Substitute x = 2.' },
-        { expression: 'f^{-1}(2) = 5', annotation: 'Since f(5) = 2, it implies f^{-1}(2) = 5.' },
-        { expression: '(f^{-1})\'(2) = \\frac{1}{f\'(5)}', annotation: 'Substitute 5 for f^{-1}(2).' },
-        { expression: '(f^{-1})\'(2) = \\frac{1}{4}', annotation: 'Substitute the given slope f\'(5) = 4.' },
+        {
+          expression: '(f^{-1})\'(x) = \\frac{1}{f\'(f^{-1}(x))}',
+          annotation: 'Write the theorem for the derivative of an inverse function.',
+          strategyTitle: 'State the inverse function derivative theorem',
+          checkpoint: 'Before substituting, can you name the two things you need to evaluate this formula — what input to look up, and in which function?',
+          hints: [
+            'Write down the general formula (f⁻¹)\'(x) = 1 / f\'(f⁻¹(x)) as the starting template.',
+            'The Inverse Function Derivative Theorem states: (f⁻¹)\'(b) = 1 / f\'(a) whenever f(a) = b.',
+            'Think of the graph of f⁻¹ as the reflection of f across y = x. Reflection swaps rise and run, turning slope m into slope 1/m — that geometric swap is exactly this formula.',
+          ],
+        },
+        {
+          expression: '(f^{-1})\'(2) = \\frac{1}{f\'(f^{-1}(2))}',
+          annotation: 'Substitute x = 2.',
+          strategyTitle: 'Plug in the target output value',
+          checkpoint: 'You\'ve replaced x with 2. What still needs to be resolved inside the formula before you can get a number?',
+          hints: [
+            'Replace every x in the general formula with 2 to get a specific expression.',
+            'The formula now reads (f⁻¹)\'(2) = 1 / f\'(f⁻¹(2)). You still need to evaluate f⁻¹(2).',
+            'The output 2 sits on the inverse function\'s graph at the point (2, ?). Finding that ? is exactly reading the reflected point on f.',
+          ],
+        },
+        {
+          expression: 'f^{-1}(2) = 5',
+          annotation: 'Since f(5) = 2, it implies f^{-1}(2) = 5.',
+          strategyTitle: 'Decode f⁻¹(2) from the given table data',
+          checkpoint: 'Why does f(5) = 2 tell you that f⁻¹(2) = 5? State this in your own words before moving on.',
+          hints: [
+            'Scan the given information for f(a) = 2. Once you find a, that value is f⁻¹(2) by definition.',
+            'By the definition of inverse functions: f(a) = b ⟺ f⁻¹(b) = a. Here b = 2 and a = 5.',
+            'On the graph, the point (5, 2) lies on f, so (2, 5) lies on f⁻¹ — coordinates swapped by reflection. Reading off the y-value at x = 2 on f⁻¹ gives 5.',
+          ],
+        },
+        {
+          expression: '(f^{-1})\'(2) = \\frac{1}{f\'(5)}',
+          annotation: 'Substitute 5 for f^{-1}(2).',
+          strategyTitle: 'Evaluate the inner composition to reach a known input',
+          checkpoint: 'You now have 1 / f\'(5). What piece of given information will you use next, and do you already have it?',
+          hints: [
+            'Replace f⁻¹(2) in the denominator with 5, leaving you with 1 / f\'(5).',
+            'Applying the theorem at the correct point: (f⁻¹)\'(b) = 1 / f\'(a), with b = 2 and a = f⁻¹(2) = 5, so you need f\'(5).',
+            'Common mistake: students try to use f\'(2) instead. The formula requires f\' evaluated at the *input* a = 5, not at the *output* b = 2.',
+          ],
+        },
+        {
+          expression: '(f^{-1})\'(2) = \\frac{1}{4}',
+          annotation: 'Substitute the given slope f\'(5) = 4.',
+          strategyTitle: 'Take the reciprocal to complete the theorem',
+          checkpoint: 'The answer is 1/4. What does this number mean geometrically — what does it describe about the graph of f⁻¹ at x = 2?',
+          hints: [
+            'Substitute f\'(5) = 4 into the denominator: (f⁻¹)\'(2) = 1/4.',
+            'The Inverse Function Derivative Theorem: (f⁻¹)\'(b) = 1 / f\'(a). With f\'(5) = 4, the result is 1/4.',
+            'Geometrically: the tangent to f at (5, 2) has slope 4 (steep rise). After reflection across y = x, the tangent to f⁻¹ at (2, 5) has slope 1/4 (gentle rise). Steepness and shallowness are exchanged by the mirror.',
+          ],
+        },
       ],
       conclusion: 'The slope at y=2 on the original function translates to 1/4 at x=2 on the inverse.',
       visualizations: [
@@ -269,10 +319,50 @@ export default {
       title: 'Differentiating an Inverse Trig Function with the Chain Rule',
       problem: '\\text{Find } y\' \\text{ for } y = \\arctan(e^x).',
       steps: [
-        { expression: "\\frac{d}{dx}[\\arctan(u)] = \\frac{1}{1+u^2} \\cdot u'", annotation: 'Write the derivative rule for arctan combined with the Chain Rule.' },
-        { expression: "u = e^x \\implies u' = e^x", annotation: 'Identify the inside function as e^x and its derivative.' },
-        { expression: "y' = \\frac{1}{1+(e^x)^2} \\cdot e^x", annotation: 'Substitute into the Chain Rule formula.' },
-        { expression: "y' = \\frac{e^x}{1+e^{2x}}", annotation: 'Simplify the power using (e^x)^2 = e^{2x}.' },
+        {
+          expression: "\\frac{d}{dx}[\\arctan(u)] = \\frac{1}{1+u^2} \\cdot u'",
+          annotation: 'Write the derivative rule for arctan combined with the Chain Rule.',
+          strategyTitle: 'Apply the arctan derivative formula via the Chain Rule',
+          checkpoint: 'What is the "outer" function and what is the "inner" function here? Identify both before differentiating.',
+          hints: [
+            'Recognise y = arctan(eˣ) as a composition: outer function is arctan(·), inner function is eˣ. Write the Chain Rule template d/dx[arctan(u)] = (1/(1+u²))·u\'.',
+            'The arctan derivative d/dx[arctan u] = 1/(1+u²) comes from implicit differentiation of tan y = u: sec²y · dy/dx = 1, then sec²y = 1 + tan²y = 1 + u².',
+            'Arctan is the reflection of tan across y = x, restricted to (−π/2, π/2). Reflection makes the slope formula 1/f\'(u) where f\'(u) = sec²u = 1+u² — so the Chain Rule coefficient 1/(1+u²) is slope reciprocity built into the formula.',
+          ],
+        },
+        {
+          expression: "u = e^x \\implies u' = e^x",
+          annotation: 'Identify the inside function as e^x and its derivative.',
+          strategyTitle: 'Differentiate the inner function',
+          checkpoint: 'What is the derivative of eˣ, and why is it also eˣ? State the rule you are using.',
+          hints: [
+            'Set u = eˣ and differentiate: u\' = d/dx[eˣ] = eˣ.',
+            'The exponential derivative rule: d/dx[eˣ] = eˣ. This is the unique property of base e — it is its own derivative.',
+            'Spiral connection: d/dx[eˣ] = eˣ was established in the previous lesson. The chain rule multiplier here — eˣ — comes from that same rule, now feeding into an arctan inverse.',
+          ],
+        },
+        {
+          expression: "y' = \\frac{1}{1+(e^x)^2} \\cdot e^x",
+          annotation: 'Substitute into the Chain Rule formula.',
+          strategyTitle: 'Substitute u and u\' into the Chain Rule expression',
+          checkpoint: 'After substitution, you have two factors. What does each factor represent in the Chain Rule structure?',
+          hints: [
+            'Replace u with eˣ in the 1/(1+u²) outer-derivative factor, then multiply by u\' = eˣ.',
+            'The Chain Rule: d/dx[f(g(x))] = f\'(g(x))·g\'(x). Here f\'(u) = 1/(1+u²) and g\'(x) = eˣ, giving 1/(1+(eˣ)²)·eˣ.',
+            'The factor 1/(1+(eˣ)²) captures how arctan slopes shrink as the argument grows large — arctan flattens toward ±π/2, so its derivative approaches 0. The eˣ factor accelerates the input, but arctan\'s flatness dominates for large x.',
+          ],
+        },
+        {
+          expression: "y' = \\frac{e^x}{1+e^{2x}}",
+          annotation: 'Simplify the power using (e^x)^2 = e^{2x}.',
+          strategyTitle: 'Simplify using the power-of-exponential identity',
+          checkpoint: 'Is this answer fully simplified? Could you factor or cancel anything further?',
+          hints: [
+            'Use the exponent rule (eˣ)² = e^(2x) to rewrite the denominator, then move the numerator eˣ into a single fraction.',
+            'Identity used: (eˣ)² = e^(2x). This gives y\' = eˣ / (1 + e^(2x)), which is in simplest form.',
+            'Notice the shape of the answer: for large x, e^(2x) dominates the denominator, so y\' ≈ eˣ/e^(2x) = e^(−x) → 0. The derivative dying off for large x reflects that arctan saturates at π/2 — the composed function stops changing quickly.',
+          ],
+        },
       ],
       conclusion: 'The Chain Rule works seamlessly with inverse trig functions.',
       visualizations: [
@@ -289,10 +379,50 @@ export default {
       title: 'Derivative of arcsin(sqrt(x))',
       problem: '\\text{Find } y\' \\text{ for } y = \\arcsin(\\sqrt{x}).',
       steps: [
-        { expression: "\\frac{d}{dx}[\\arcsin(u)] = \\frac{u'}{\\sqrt{1-u^2}}", annotation: 'Use inverse trig derivative with chain rule.' },
-        { expression: "u = \\sqrt{x} = x^{1/2},\\; u' = 1/(2\\sqrt{x})", annotation: 'Differentiate inner function.' },
-        { expression: "y' = \\frac{1}{2\\sqrt{x}} \\cdot \\frac{1}{\\sqrt{1-(\\sqrt{x})^2}}", annotation: 'Substitute u and u\'.' },
-        { expression: "y' = \\frac{1}{2\\sqrt{x}\\sqrt{1-x}}", annotation: 'Simplify (sqrt(x))^2 = x.' },
+        {
+          expression: "\\frac{d}{dx}[\\arcsin(u)] = \\frac{u'}{\\sqrt{1-u^2}}",
+          annotation: 'Use inverse trig derivative with chain rule.',
+          strategyTitle: 'Apply the arcsin derivative formula via the Chain Rule',
+          checkpoint: 'What condition on u is required for the arcsin derivative to be valid? Will that condition be satisfied here?',
+          hints: [
+            'Recognise y = arcsin(√x) as a composition. Write the Chain Rule template: d/dx[arcsin(u)] = u\' / √(1−u²).',
+            'The arcsin derivative d/dx[arcsin u] = 1/√(1−u²) comes from implicit differentiation of sin y = u: cos y · dy/du = 1, then cos y = √(1−u²) on the principal branch [−π/2, π/2].',
+            'Arcsin is the reflection of sin (restricted to [−π/2, π/2]) across y = x. The slope of sin at angle y is cos y; after reflection, the slope of arcsin at u is 1/cos y = 1/√(1−u²). The √(1−u²) denominator literally is the adjacent leg of the unit-circle right triangle.',
+          ],
+        },
+        {
+          expression: "u = \\sqrt{x} = x^{1/2},\\; u' = 1/(2\\sqrt{x})",
+          annotation: 'Differentiate inner function.',
+          strategyTitle: 'Differentiate the inner function using the power rule',
+          checkpoint: 'Write √x as x^(1/2) and apply the power rule. What do you get?',
+          hints: [
+            'Rewrite √x = x^(1/2), then differentiate using the power rule: d/dx[x^(1/2)] = (1/2)x^(−1/2) = 1/(2√x).',
+            'Power rule: d/dx[xⁿ] = nxⁿ⁻¹. With n = 1/2: (1/2)x^(−1/2) = 1/(2√x).',
+            'The 1/(2√x) factor comes from the "rate of change of the inner zoom" in the Chain Rule. As x grows, √x grows more slowly (concave down), so this multiplier is less than 1 for x > 1 — the composition compresses the input change.',
+          ],
+        },
+        {
+          expression: "y' = \\frac{1}{2\\sqrt{x}} \\cdot \\frac{1}{\\sqrt{1-(\\sqrt{x})^2}}",
+          annotation: 'Substitute u and u\'.',
+          strategyTitle: 'Substitute u and u\' into the Chain Rule template',
+          checkpoint: 'Before simplifying, confirm that the two factors match the Chain Rule structure: one from the outer derivative, one from the inner derivative.',
+          hints: [
+            'Plug u = √x into √(1−u²) to get √(1−(√x)²), and place u\' = 1/(2√x) as the numerator.',
+            'Chain Rule structure: outer derivative 1/√(1−u²) evaluated at u = √x, times inner derivative u\' = 1/(2√x). This gives (1/(2√x)) · 1/√(1−(√x)²).',
+            'Notice (√x)² = x inside the square root — that simplification is the next step. Anticipating it here helps you see that the two separate square roots will combine into a product of simpler radicals.',
+          ],
+        },
+        {
+          expression: "y' = \\frac{1}{2\\sqrt{x}\\sqrt{1-x}}",
+          annotation: 'Simplify (sqrt(x))^2 = x.',
+          strategyTitle: 'Simplify the radical using (√x)² = x',
+          checkpoint: 'State the domain of the final answer. What constraints come from √x and from √(1−x)?',
+          hints: [
+            'Replace (√x)² with x inside the radical: √(1−(√x)²) = √(1−x). The answer is 1 / (2√x · √(1−x)).',
+            'Identity used: (√x)² = x (for x ≥ 0). This collapses the nested radical and gives the clean product form.',
+            'Domain check: √x requires x > 0; √(1−x) requires x < 1; arcsin requires |√x| ≤ 1, i.e., 0 ≤ x ≤ 1. Together: 0 < x < 1. This is also visible from the arcsin graph — it has vertical asymptotic tangents at ±1, meaning the derivative blows up at the endpoints.',
+          ],
+        },
       ],
       conclusion: "y' = 1/(2sqrt(x)sqrt(1-x)), valid for 0 < x < 1.",
       visualizations: [

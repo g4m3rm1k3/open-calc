@@ -160,19 +160,27 @@ export default {
           expression: "x^2 + y^2 = 100",
           annotation:
             "The Pythagorean theorem: base x, height y, and the fixed 10-ft hypotenuse. This holds for all t.",
+          strategyTitle: "Step 1 of 5: Write the geometric constraint equation",
+          checkpoint:
+            "This equation must be true at EVERY moment, not just one instant. Is it a geometric identity (Pythagorean theorem, volume formula, similar triangles)?",
           hints: [
-            "Identify the fixed hypotenuse (the ladder) and the two changing sides (x and y).",
-            "The triangle is a right triangle, so x² + y² = L².",
+            "Identify the fixed hypotenuse (the ladder) and the two changing sides (x and y). The Pythagorean theorem gives the geometric relationship.",
+            "The triangle is a right triangle, so x² + y² = L². Variables x and y appear (not numbers) because the equation must hold for all values of t throughout the motion.",
+            "This is the same operation as implicit differentiation from Ch2 lesson 8 — the constraint holds for all t, just as an implicit curve holds for all (x, y). The independent variable is t instead of x.",
           ],
         },
         {
           expression: "2x\\,\\frac{dx}{dt} + 2y\\,\\frac{dy}{dt} = 0",
           annotation:
             "Differentiate both sides with respect to t. The right side is 0 because 100 is constant. The chain rule gives the factor dx/dt and dy/dt on each term.",
+          strategyTitle:
+            "Step 2 of 5: Differentiate BOTH sides with respect to t — chain rule on every variable",
+          checkpoint:
+            "Every variable that depends on t picks up a d/dt factor from the chain rule. Which variables here depend on t?",
           hints: [
-            "Differentiate with respect to time (t), not x.",
-            "Apply the chain rule to both x² and y², creating dx/dt and dy/dt terms.",
-            "Remember d/dt[100] is 0 because the ladder length is constant.",
+            "Apply d/dt term by term to both sides: d/dt[x²] + d/dt[y²] = d/dt[100].",
+            "Chain rule: d/dt[x²] = 2x·(dx/dt) because x = x(t). Similarly d/dt[y²] = 2y·(dy/dt). Both x and y depend on t.",
+            "Connect to implicit differentiation (Ch2 lesson 8): differentiating x² + y² = 100 with respect to t is exactly the same operation as differentiating with respect to x — only the independent variable changes. Here t is the independent variable.",
           ],
         },
         {
@@ -180,33 +188,49 @@ export default {
             "x = 6 \\Rightarrow y = \\sqrt{100 - 36} = \\sqrt{64} = 8",
           annotation:
             "Find y at the instant x = 6 using the original equation. We must know the current position of BOTH variables before substituting rates.",
+          strategyTitle:
+            "Step 3 of 5: Find all missing position values at the specific instant",
+          checkpoint:
+            "Do you know the values of every variable (not rate) that appears in the differentiated equation? If any position is missing, use the original constraint to find it now.",
           hints: [
-            'Solve for the "missing" side at the specific moment mentioned.',
-            "Plug x = 6 back into the original Pythagorean equation.",
+            "Solve for the missing side at the specific moment mentioned. Substitute x = 6 back into the original Pythagorean equation.",
+            "Plug x = 6 into x² + y² = 100 and solve: y = √(100 − 36) = √64 = 8 ft.",
           ],
         },
         {
           expression: "2(6)(2) + 2(8)\\,\\frac{dy}{dt} = 0",
           annotation:
             "Substitute x = 6, y = 8, and dx/dt = 2 into the rate equation.",
+          strategyTitle:
+            "Step 4 of 5: Substitute the known VALUES — but only AFTER differentiating",
+          checkpoint:
+            "Warning: you must differentiate first, then substitute. Why would substituting first destroy the rate information?",
           hints: [
-            "Now that you have the position (y=8) and the rate (dx/dt=2), plug them into the differentiated equation.",
-            "Ensure you don't mix up x/y with dx/dt / dy/dt.",
+            "Substitute the position values (not velocities yet) from the given instant: x = 6, y = 8. Then substitute the known rate dx/dt = 2.",
+            "If you substituted x = 6 into x² + y² = 100 before differentiating, you would get a constant (no variables to differentiate); the rate information would be completely lost.",
+            "The rates dx/dt and dy/dt are still unknowns at this point — dx/dt = 2 is given, dy/dt is what you solve for. Substitute the known rate (dx/dt = 2) and positions (x = 6, y = 8) into the differentiated equation.",
           ],
         },
         {
           expression: "24 + 16\\,\\frac{dy}{dt} = 0",
           annotation: "Simplify the left side.",
-          hints: ["Perform the multiplication: 2 * 6 * 2 = 24 and 2 * 8 = 16."],
+          strategyTitle: "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
+          checkpoint:
+            "Have all the known numerical values been correctly substituted? Check each term: 2·6·2 = 24 and 2·8 = 16.",
+          hints: ["Perform the multiplication: 2 × 6 × 2 = 24 and 2 × 8 = 16."],
         },
         {
           expression:
             "\\frac{dy}{dt} = -\\frac{24}{16} = -\\frac{3}{2} \\text{ ft/s}",
           annotation:
             "Solve for dy/dt. The negative sign means y is decreasing — the top slides DOWN. At this moment the top drops at 3/2 ft/s while the base slides out at 2 ft/s — the top moves slower than the base because the ladder is more horizontal than vertical (x > y).",
+          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          checkpoint:
+            "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
-            "Isolate the unknown rate dy/dt.",
-            "The negative result is physically meaningful: the height y is decreasing.",
+            "Linear algebra: isolate the unknown rate dy/dt by subtracting 24 from both sides and dividing by 16.",
+            "Check units: distances in ft and time in seconds, so rates should be in ft/s. dy/dt = −24/16 = −3/2 ft/s. ✓",
+            "Physical interpretation: negative dy/dt means y is decreasing (top sliding down) — this is expected since the ladder is falling. The top drops at 3/2 ft/s while the base slides out at 2 ft/s, consistent with the ratio −(x/y) = −(6/8) = −3/4.",
           ],
         },
       ],
@@ -222,41 +246,63 @@ export default {
         {
           expression: "V = \\frac{4}{3}\\pi r^3",
           annotation: "Volume of a sphere. r and V are both functions of t.",
+          strategyTitle: "Step 1 of 5: Write the geometric constraint equation",
+          checkpoint:
+            "This equation must be true at EVERY moment, not just one instant. Is it a geometric identity (Pythagorean theorem, volume formula, similar triangles)?",
           hints: [
-            "Start with the standard volume formula for a sphere.",
-            "Identify V and r as the quantities changing over time.",
+            "The geometry here is a sphere — the standard volume formula V = (4/3)πr³ is the geometric identity linking V and r.",
+            "Both V and r are functions of t (not fixed numbers). The equation must hold for all t as the balloon inflates, not just at r = 5 cm.",
+            "This is the same as implicit differentiation from Ch2 lesson 8 — the constraint V = (4/3)πr³ holds for all t, so it is an identity in t that we can differentiate on both sides.",
           ],
         },
         {
           expression: "\\frac{dV}{dt} = 4\\pi r^2 \\,\\frac{dr}{dt}",
           annotation:
             "Differentiate both sides with respect to t. d/dt[(4/3)πr³] = (4/3)π·3r²·(dr/dt) = 4πr²·(dr/dt). The factor 4πr² is the surface area — new volume is added in a thin surface layer.",
+          strategyTitle:
+            "Step 2 of 5: Differentiate BOTH sides with respect to t — chain rule on every variable",
+          checkpoint:
+            "Every variable that depends on t picks up a d/dt factor from the chain rule. Which variables here depend on t?",
           hints: [
-            "Use the power rule and the chain rule on r³.",
-            "Notice that the resulting coefficient 4πr² is the sphere's surface area.",
+            "Apply d/dt term by term to both sides: d/dt[V] on the left = d/dt[(4/3)πr³] on the right.",
+            "Chain rule: d/dt[r³] = 3r²·(dr/dt) because r = r(t). So d/dt[(4/3)πr³] = (4/3)π·3r²·(dr/dt) = 4πr²·(dr/dt). Both V and r depend on t.",
+            "Connect to implicit differentiation (Ch2 lesson 8): differentiating V = (4/3)πr³ with respect to t is the same operation — t is the independent variable, r is a function of t, so the chain rule produces the dr/dt factor.",
           ],
         },
         {
           expression: "100 = 4\\pi(5)^2 \\cdot \\frac{dr}{dt}",
           annotation: "Substitute dV/dt = 100 and r = 5.",
+          strategyTitle:
+            "Step 4 of 5: Substitute the known VALUES — but only AFTER differentiating",
+          checkpoint:
+            "Warning: you must differentiate first, then substitute. Why would substituting first destroy the rate information?",
           hints: [
-            "Plug in the given rate of air input (dV/dt) and the specific radius (r).",
+            "Substitute the position value from the given instant: r = 5. Then substitute the known rate dV/dt = 100.",
+            "If you substituted r = 5 into V = (4/3)π(5)³ before differentiating, you would get a constant number — no variables left to differentiate and no rate information.",
+            "The rate dr/dt is still unknown at this point — dV/dt = 100 is given, dr/dt is what you solve for. Substitute the known rate and position into the differentiated equation.",
           ],
         },
         {
           expression:
             "100 = 4\\pi(25)\\,\\frac{dr}{dt} = 100\\pi\\,\\frac{dr}{dt}",
           annotation: "Simplify: 4π·25 = 100π.",
-          hints: ["Square the radius and multiply by the coefficients."],
+          strategyTitle: "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
+          checkpoint:
+            "Have all known values been substituted correctly? Verify: 4π·(5)² = 4π·25 = 100π.",
+          hints: ["Square the radius: (5)² = 25. Then multiply: 4π × 25 = 100π."],
         },
         {
           expression:
             "\\frac{dr}{dt} = \\frac{100}{100\\pi} = \\frac{1}{\\pi} \\approx 0.318 \\text{ cm/s}",
           annotation:
             "Solve for dr/dt. The radius grows at 1/π cm/s at this moment.",
+          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          checkpoint:
+            "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
-            "Divide by 100π to isolate the radial rate.",
-            "The units are cm/s since volume was cm³ and time was seconds.",
+            "Linear algebra: isolate the unknown rate dr/dt by dividing both sides by 100π.",
+            "Check units: volume in cm³ and time in seconds, so dV/dt is in cm³/s and dr/dt is in cm/s. ✓",
+            "Physical interpretation: positive dr/dt means r is increasing (balloon expanding) — this is expected since air is being pumped in. As r grows, dr/dt = dV/dt/(4πr²) decreases, meaning the radius grows more slowly as the balloon gets larger.",
           ],
         },
       ],
@@ -274,9 +320,13 @@ export default {
             "\\frac{r}{h} = \\frac{3}{4} \\Rightarrow r = \\frac{3h}{4}",
           annotation:
             "Similar triangles: the tank has radius 3 when height is 4. At any water height h, the water surface radius r satisfies r/h = 3/4. This is the key geometric constraint that reduces two variables to one.",
+          strategyTitle: "Step 1 of 5: Write the geometric constraint equation",
+          checkpoint:
+            "This equation must be true at EVERY moment, not just one instant. Is it a geometric identity (Pythagorean theorem, volume formula, similar triangles)?",
           hints: [
-            "Use similar triangles to relate the radius of the water surface to its current height.",
-            "Since we want the rate of height change, it's best to express r in terms of h.",
+            "The cone's fixed proportions give the geometric identity: the cross-section of the tank is a triangle, so the water surface radius and water height are always in the same ratio as the tank's full radius to full height (similar triangles).",
+            "Both r and h are functions of t (not fixed numbers). The ratio r/h = 3/4 holds for all values of t throughout the draining — it is a geometric identity, not a number-specific substitution.",
+            "This is the same as implicit differentiation from Ch2 lesson 8 — the similar-triangles constraint r/h = 3/4 holds for all t, allowing us to differentiate it. Here we use it to eliminate r before differentiating (reducing two variables to one).",
           ],
         },
         {
@@ -284,18 +334,27 @@ export default {
             "V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi \\left(\\frac{3h}{4}\\right)^2 h = \\frac{3\\pi h^3}{16}",
           annotation:
             "Substitute r = 3h/4 into the cone volume formula. Now V is a function of h alone — a single-variable relationship.",
+          strategyTitle:
+            "Step 2 of 5: Use the geometric constraint to eliminate a variable before differentiating",
+          checkpoint:
+            "Are you substituting a geometric identity (valid for all t) or a specific number? Substituting r = 3h/4 is valid here because it holds for all t — this is different from substituting h = 2, which is only true at one instant.",
           hints: [
-            "Substitute your expression for r into the volume formula V = (1/3)πr²h.",
-            "Simplify the expression so only h remains.",
+            "Substitute r = 3h/4 into the volume formula V = (1/3)πr²h. This is a symbolic substitution (r in terms of h, both varying in time) — not substituting a specific number.",
+            "Simplify: V = (1/3)π(3h/4)²h = (1/3)π(9h²/16)h = (3π/16)h³. Now V is a function of h alone, making the next differentiation step simpler.",
           ],
         },
         {
           expression: "\\frac{dV}{dt} = \\frac{9\\pi h^2}{16}\\,\\frac{dh}{dt}",
           annotation:
             "Differentiate V = 3πh³/16 with respect to t. d/dt[3πh³/16] = (9πh²/16)·(dh/dt).",
+          strategyTitle:
+            "Step 3 of 5: Differentiate BOTH sides with respect to t — chain rule on every variable",
+          checkpoint:
+            "Every variable that depends on t picks up a d/dt factor from the chain rule. Which variables here depend on t?",
           hints: [
-            "Apply the power rule to h³ and don't forget the dh/dt factor.",
-            "Keep the constants (3π/16) as a coefficient.",
+            "Apply d/dt term by term to both sides: d/dt[V] on the left = d/dt[(3π/16)h³] on the right.",
+            "Chain rule: d/dt[h³] = 3h²·(dh/dt) because h = h(t). So d/dt[(3π/16)h³] = (3π/16)·3h²·(dh/dt) = (9πh²/16)·(dh/dt). Both V and h depend on t.",
+            "Connect to implicit differentiation (Ch2 lesson 8): differentiating V = (3π/16)h³ with respect to t uses the same chain rule — t is the independent variable, h is a function of t, so every power of h produces a dh/dt factor.",
           ],
         },
         {
@@ -303,18 +362,27 @@ export default {
             "-2 = \\frac{9\\pi(2)^2}{16}\\,\\frac{dh}{dt} = \\frac{9\\pi}{4}\\,\\frac{dh}{dt}",
           annotation:
             "Substitute dV/dt = -2 (negative because draining) and h = 2. Simplify: 9π·4/16 = 9π/4.",
+          strategyTitle:
+            "Step 4 of 5: Substitute the known VALUES — but only AFTER differentiating",
+          checkpoint:
+            "Warning: you must differentiate first, then substitute. Why would substituting first destroy the rate information?",
           hints: [
-            "dV/dt is -2 because the water is leaving the tank.",
-            "Substitute h = 2 and simplify the coefficient.",
+            "Substitute the position value from the given instant: h = 2. Then substitute the known rate dV/dt = −2 (negative because water is draining out).",
+            "If you substituted h = 2 into V = (3π/16)(2)³ before differentiating, you would get a constant number — no variables left to differentiate and no rate information.",
+            "The rate dh/dt is still unknown at this point — dV/dt = −2 is given, dh/dt is what you solve for. Substitute the known rate (dV/dt = −2) and the position (h = 2) into the differentiated equation.",
           ],
         },
         {
           expression:
             "\\frac{dh}{dt} = \\frac{-2 \\cdot 4}{9\\pi} = \\frac{-8}{9\\pi} \\approx -0.283 \\text{ m/min}",
           annotation: "Solve for dh/dt. The water level drops at 8/(9π) m/min.",
+          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          checkpoint:
+            "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
-            "Isolate dh/dt.",
-            "The negative value confirms the water level is dropping.",
+            "Linear algebra: isolate the unknown rate dh/dt by dividing both sides by 9π/4, which is equivalent to multiplying by 4/(9π).",
+            "Check units: volume in m³ and time in minutes, so dV/dt is in m³/min and dh/dt is in m/min. ✓",
+            "Physical interpretation: negative dh/dt means h is decreasing (water level dropping) — this is expected since dV/dt = −2 (tank is draining). The water level drops faster as h decreases, because the cone narrows near the vertex.",
           ],
         },
       ],
