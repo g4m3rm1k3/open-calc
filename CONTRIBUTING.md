@@ -140,6 +140,136 @@ export default {
 
 ---
 
+## 1b. Lesson Narrative Style Standard
+
+Lessons must read like a chapter of a textbook, not a reference card. The chain rule (`src/content/chapter-2/02-chain-rule.js`) is the canonical example. Every lesson converted or written from scratch should follow this standard.
+
+### The three narrative markers in `intuition.prose`
+
+The `intuition.prose` array must open and close with bold story-arc headers. Use `**...**` syntax (rendered as bold by the prose parser).
+
+```javascript
+intuition: {
+  prose: [
+    // ── Opening: orient the student ──────────────────────────────────────
+    '**Where you are in the story:** You have just learned X. That gave you Y. But it cannot handle Z. This lesson closes that gap.',
+
+    // ── Body: build understanding with analogies ──────────────────────────
+    'First, think about this concept as an analogy...',
+    'A more precise way to see this is...',
+    'Here is a worked example in prose before the formal treatment...',
+
+    // ── Closing: forward pointer ─────────────────────────────────────────
+    '**Where this is heading:** Now that you have X, the next lesson immediately builds on it by doing Y. Seeing the connection upfront is the point.',
+  ],
+}
+```
+
+The three required markers are:
+| Marker | Purpose |
+|---|---|
+| `**Where you are in the story:**` | Connects to the previous lesson; explains what gap this lesson fills |
+| `**Why this matters:**` | (optional but preferred) Names a real-world or within-calculus motivation |
+| `**Where this is heading:**` | Forward pointer to the next lesson; makes the chapter arc visible |
+
+### The sequencing callout
+
+Every lesson must include a `type: 'sequencing'` callout in `intuition.callouts` that shows exactly where the lesson sits in the chapter flow:
+
+```javascript
+{
+  type: 'sequencing',
+  title: 'Lesson N of M — Chapter Title',
+  body: '**Previous:** One-line description of the prior lesson.\n**This lesson:** One-line description of what this lesson teaches.\n**Next:** One-line description of the next lesson.',
+},
+```
+
+This callout is how students know they are not lost. It must appear first (or second) in `intuition.callouts`.
+
+### Visualization `mathBridge` instructions
+
+`mathBridge` text is not a description of the visualization — it is a **lesson inside a lesson**. It should give the student explicit step-by-step instructions for what to do and what to observe, following this pattern:
+
+```javascript
+{
+  id: 'SomeVizId',
+  title: 'Descriptive Title',
+  mathBridge: 'Before pressing play, identify [something]. Step 1: Set X to Y and verify Z. Step 2: Change A to B — watch C happen. This is [concept] doing its job. The key lesson: [one sentence takeaway].',
+  caption: 'Short caption — the one thing to notice.',
+}
+```
+
+Rules:
+- Always start with what the student should do **before** interacting.
+- Use numbered steps (`Step 1: ...`, `Step 2: ...`) when there is a sequence to follow.
+- End with "The key lesson: ..." to make the mathematical point explicit.
+- The caption should be one sentence that could stand alone as a label.
+
+### Analogies and concrete examples in prose
+
+Every `intuition.prose` block should include at least one concrete analogy. The chain rule uses gears, relay races, and onion peeling. Good analogies share these traits:
+- They can be described in one or two sentences.
+- They make the *structure* of the math visible, not just the answer.
+- They transfer — a student can return to the analogy when stuck.
+
+Avoid analogies that require long setup or domain expertise the student may not have.
+
+### Callout types — extended list
+
+In addition to the types listed in Section 1, the following are used in lesson-style content:
+
+| Type | Use |
+|---|---|
+| `sequencing` | Chapter position map (Previous / This / Next) — required in every lesson |
+| `insight` | A short but non-obvious mathematical observation |
+| `real-world` | A LaTeX-illustrated connection to physics, engineering, or computing |
+| `strategy` | A decision tree or step-by-step workflow for problem solving |
+| `proof-map` | A numbered sequence of logical steps (used in `intuition` when a mini-proof belongs in the concept section) |
+
+---
+
+## 1c. Quiz Section Standard
+
+Every lesson must end with a `quiz` array. The quiz was added as a first-class feature after the initial lesson schema — it is the primary self-check mechanism. Do not omit it.
+
+### Full quiz schema
+
+```javascript
+quiz: [
+  {
+    id: 'slug-q1',                    // REQUIRED — format: {lesson-slug}-q{N}
+    type: 'input',                    // 'input' | 'choice'
+    text: 'Question text with $\\LaTeX$ inline math.',
+    answer: '7/3',                    // exact string match for 'input'; must match one option for 'choice'
+    hints: [
+      'Level-1 hint — minimal nudge.',
+      'Level-2 hint — bigger nudge with the key step.',
+    ],
+    reviewSection: 'Tab name — specific section title',  // tells student where to review if stuck
+  },
+  {
+    id: 'slug-q2',
+    type: 'choice',
+    text: 'Multiple-choice question text.',
+    options: ['Option A', 'Option B', 'Option C', 'Option D'],
+    answer: 'Option B',               // must exactly match one of the options strings
+    hints: ['Hint pointing to the relevant concept.'],
+    reviewSection: 'Intuition tab — relevant callout name',
+  },
+],
+```
+
+### Quiz writing rules
+
+- **Coverage:** Include at least one question per major concept in the lesson. A 10-question quiz covers the lesson thoroughly; 5–7 is a minimum for shorter lessons.
+- **`reviewSection` format:** Use the pattern `"Tab name — section title"` (e.g., `'Math tab — twin pillars'`, `'Intuition tab — outside-inside method'`). This links the question to a specific review location so students who answer wrong know exactly where to look.
+- **Answer format for `input` type:** Use a simplified mathematical expression the grader can match (e.g., `'7/3'`, `'9/2'`, `'0'`). Avoid ambiguous forms.
+- **Two hints minimum:** The first hint is a gentle nudge; the second shows the key algebraic or conceptual step. Together they scaffold without giving the answer away directly.
+- **Question ordering:** Start with recall questions (What is the formula?), then computation questions (Evaluate this limit), then conceptual questions (Why does this condition matter?).
+- **`id` format:** `{lesson-slug}-q{N}` where N is 1-indexed. For example, questions in the `chain-rule` lesson use `chain-q1`, `chain-q2`, etc.
+
+---
+
 ## 2. Adding a new visualization
 
 ### Step 1 — Create the component
