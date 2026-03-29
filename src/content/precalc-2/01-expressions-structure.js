@@ -15,13 +15,20 @@ export default {
 
   intuition: {
     prose: [
+      '**Where you are in the story:** You have just finished Precalc-1 (Graphs & Functions), where you plotted relationships and interpreted them visually. Now the chapter shifts: before we can work with any function algebraically — factorise it, solve it, simplify it — we need the raw vocabulary of algebra. This lesson names the pieces and establishes the rules that everything else depends on.',
       'A variable is not a mystery number waiting to be found. It is a placeholder — a name for a quantity that can change, or a quantity we have chosen not to specify yet. When you write $A = lw$, the variables $l$ and $w$ do not represent unknown lengths: they represent all possible lengths simultaneously. The formula works for any rectangle.',
       'An algebraic expression is a combination of numbers, variables, and operations — but no equals sign. $3x^2 - 5x + 7$ is an expression. It has a value for every value of $x$, but we have not asked what that value equals. An equation sets two expressions equal: $3x^2 - 5x + 7 = 0$ is now a question with specific answers.',
       'Every expression is made of terms — pieces separated by addition and subtraction. In $3x^2 - 5x + 7$, the terms are $3x^2$, $-5x$, and $7$. Each term has a coefficient (the number part: $3$, $-5$, $1$) and a variable part ($x^2$, $x$, none). Like terms share the same variable part and can be combined — $3x^2 + 2x^2 = 5x^2$ because you have 3 of something plus 2 of the same thing.',
       'The real number line is the geometric home of algebra. Every real number is a point. Operations move you along it: addition shifts right, subtraction shifts left, multiplication scales. Absolute value is distance from zero — always non-negative. Inequalities are intervals on this line.',
       '**The Grammar of Structure**: Think of algebra as a language. The **Variables** are nouns (the objects we are talking about), the **Operators** are verbs (the actions we take on them), and the **Structure** of the expression is the syntax. Just as you cannot have a sentence without a verb, you cannot have a meaningful algebraic relationship without an operation.',
+      '**Where this is heading:** The vocabulary introduced here — terms, coefficients, the distributive property, the difference of squares — will be the exact tools used in the next lesson on Factoring. Every factoring technique is the distributive property in reverse.',
     ],
     callouts: [
+      {
+        type: 'sequencing',
+        title: 'Precalc-2 arc — Lesson 1 of 8',
+        body: '(Precalc-1: Graphs & Functions) | **Expressions & Algebraic Structure** | Factoring →',
+      },
       {
         type: 'definition',
         title: 'The anatomy of an expression',
@@ -38,7 +45,7 @@ export default {
         body: '3x + 1 \\quad \\text{expression (no equals sign, has many values)} \\\\ 3x + 1 = 7 \\quad \\text{equation (a question: which } x\\text{ makes this true?)} \\\\ 3x + 1 > 7 \\quad \\text{inequality (which } x\\text{ makes this hold?)}',
       },
       {
-        type: 'mnemonic',
+        type: 'insight',
         title: 'The distributive property — the engine of algebra',
         body: 'a(b + c) = ab + ac \\qquad \\text{This single rule justifies expanding, factoring, and combining.} \\\\ \\text{Everything else in algebra is either this rule or a rule about how numbers work.}',
       },
@@ -67,7 +74,7 @@ export default {
       {
         id: 'NumberLineViz',
         title: 'The Real Number Line — Algebra\'s Geometric Home',
-        mathBridge: 'Every number is a point. Operations are movements. Absolute value is distance. Drag points and see algebra happen geometrically.',
+        mathBridge: 'Before interacting, notice the number line with labeled points. Step 1: Drag the point labeled $a$ left and right — watch how its absolute value (distance from zero) updates. Step 2: Drag a second point $b$ and observe the interval $[a, b]$ shade in. Step 3: Toggle the "show operations" mode and drag $a$ — addition moves the point right, subtraction moves it left. The key lesson: every algebraic operation on a real number is a geometric movement on this line.',
         caption: 'The number line is where all of pre-calculus lives. Every inequality, root, and domain is a region on this line.',
       },
     ],
@@ -164,10 +171,12 @@ export default {
         {
           expression: '(5x^2 + 2x^2) + (-3x + 7x) + (2 - 9)',
           annotation: 'Group like terms: same variable part together.',
+          hint: 'Identify which terms share the same variable part: $x^2$ terms go together, $x$ terms go together, constants go together.',
         },
         {
           expression: '7x^2 + 4x - 7',
           annotation: 'Add coefficients within each group. The variable parts stay unchanged.',
+          hint: 'Add only the numerical coefficients: $5+2=7$, $-3+7=4$, $2-9=-7$. The variable attached stays the same.',
         },
       ],
       conclusion: 'Like terms combine by adding their coefficients. Non-like terms (different variable parts) are left separate.',
@@ -180,14 +189,17 @@ export default {
         {
           expression: '= 2x(x+5) - 3(x+5)',
           annotation: 'Distribute the first factor across the second.',
+          hint: 'Treat the entire second binomial $(x+5)$ as a single unit and distribute each term of the first binomial across it.',
         },
         {
           expression: '= 2x^2 + 10x - 3x - 15',
           annotation: 'Distribute each term individually.',
+          hint: '$2x \\cdot x = 2x^2$, $2x \\cdot 5 = 10x$, $-3 \\cdot x = -3x$, $-3 \\cdot 5 = -15$.',
         },
         {
           expression: '= 2x^2 + 7x - 15',
           annotation: 'Combine the like terms $10x - 3x = 7x$.',
+          hint: 'Only $10x$ and $-3x$ are like terms. The $2x^2$ and $-15$ have no matching terms.',
         },
       ],
       conclusion: 'FOIL is just the distributive property applied twice. The name stands for First, Outer, Inner, Last — the four pairs produced.',
@@ -200,14 +212,17 @@ export default {
         {
           expression: 'p(0) = 3(0)^2 - 2(0) + 1 = 1',
           annotation: 'Substitute $x = 0$. The constant term is all that survives.',
+          hint: 'Replace every $x$ with $0$. Any term containing $x$ becomes $0$, leaving only the constant.',
         },
         {
           expression: 'p(-1) = 3(1) - 2(-1) + 1 = 3 + 2 + 1 = 6',
           annotation: 'Substitute $x = -1$. Watch signs carefully with even/odd powers.',
+          hint: '$(-1)^2 = 1$ (even power gives positive), $-2(-1) = +2$ (negative times negative is positive).',
         },
         {
           expression: 'p(a+1) = 3(a+1)^2 - 2(a+1) + 1 = 3a^2 + 4a + 2',
           annotation: 'Substitute $x = a+1$, expand $(a+1)^2 = a^2 + 2a + 1$, then simplify. This is how function composition works algebraically.',
+          hint: 'Replace every $x$ with the block $(a+1)$. Then expand $(a+1)^2 = a^2+2a+1$, distribute the $-2$, and collect like terms.',
         },
       ],
       conclusion: 'Substituting an expression (not just a number) into a function is the foundation of the chain rule in calculus: $f(g(x))$ is exactly this idea.',
@@ -219,18 +234,21 @@ export default {
       steps: [
         {
           expression: '1(2x)^3(1)^0 + 3(2x)^2(1)^1 + 3(2x)^1(1)^2 + 1(2x)^0(1)^3',
-          annotation: 'Step 1: Apply the 1-3-3-1 coefficients to the descending powers of $2x$ and ascending of $1$.'
+          annotation: 'Step 1: Apply the 1-3-3-1 coefficients to the descending powers of $2x$ and ascending of $1$.',
+          hint: 'The pattern for $(A+B)^3$ is: $1 \\cdot A^3 B^0 + 3 \\cdot A^2 B^1 + 3 \\cdot A^1 B^2 + 1 \\cdot A^0 B^3$. Here $A = 2x$ and $B = 1$.',
         },
         {
           expression: '1(8x^3) + 3(4x^2)(1) + 3(2x)(1) + 1(1)',
-          annotation: 'Step 2: Evaluate the powers. $(2x)^3 = 8x^3$ and $(2x)^2 = 4x^2$.'
+          annotation: 'Step 2: Evaluate the powers. $(2x)^3 = 8x^3$ and $(2x)^2 = 4x^2$.',
+          hint: 'Compute each power of $2x$ carefully: $(2x)^3 = 2^3 x^3 = 8x^3$, $(2x)^2 = 4x^2$, $(2x)^1 = 2x$.',
         },
         {
           expression: '8x^3 + 12x^2 + 6x + 1',
-          annotation: 'Step 3: Simplify the terms. Much faster than three rounds of FOIL.'
-        }
+          annotation: 'Step 3: Simplify the terms. Much faster than three rounds of FOIL.',
+          hint: 'Multiply the binomial coefficients by the evaluated powers: $3 \\cdot 4x^2 = 12x^2$, $3 \\cdot 2x = 6x$.',
+        },
       ],
-      conclusion: 'Expansion is a predictable template. Learning the pattern avoids thousands of small mechanical errors.'
+      conclusion: 'Expansion is a predictable template. Learning the pattern avoids thousands of small mechanical errors.',
     },
     {
       id: 'ex-struct-sub',
@@ -239,18 +257,21 @@ export default {
       steps: [
         {
           expression: '(a+h)^2 - 4(a+h)',
-          annotation: 'Step 1: Replace every instance of $x$ with the block $(a+h)$.'
+          annotation: 'Step 1: Replace every instance of $x$ with the block $(a+h)$.',
+          hint: 'Everywhere you see $x$ in the formula, substitute the entire expression $(a+h)$ — use parentheses to avoid sign errors.',
         },
         {
           expression: '(a^2 + 2ah + h^2) - 4a - 4h',
-          annotation: 'Step 2: Expand the binomial and distribute the $-4$.'
+          annotation: 'Step 2: Expand the binomial and distribute the $-4$.',
+          hint: 'Use $(A+B)^2 = A^2 + 2AB + B^2$ with $A=a$, $B=h$. Then distribute $-4$ across $(a+h)$.',
         },
         {
           expression: 'a^2 + 2ah + h^2 - 4a - 4h',
-          annotation: 'Step 3: Collect like terms (no combinations possible here).'
-        }
+          annotation: 'Step 3: Collect like terms (no combinations possible here).',
+          hint: 'Check each term for a matching variable part. Here there are no pairs to combine.',
+        },
       ],
-      conclusion: 'This is the most common move in First Semester Calculus. The result represents the system after a shift $h$.'
+      conclusion: 'This is the most common move in First Semester Calculus. The result represents the system after a shift $h$.',
     },
   ],
 
@@ -299,9 +320,9 @@ export default {
       problem: '\\text{Factor } x^4 - 81 \\text{ completely using the Difference of Squares twice.}',
       walkthrough: [
         { expression: '(x^2 - 9)(x^2 + 9)', annotation: 'First pass: $a=x^2, b=9$.' },
-        { expression: '(x-3)(x+3)(x^2 + 9)', annotation: 'Second pass: $(x^2-9)$ is another difference of squares. $(x^2+9)$ remains irreducible over the reals.' }
+        { expression: '(x-3)(x+3)(x^2 + 9)', annotation: 'Second pass: $(x^2-9)$ is another difference of squares. $(x^2+9)$ remains irreducible over the reals.' },
       ],
-      answer: '(x-3)(x+3)(x^2+9)'
+      answer: '(x-3)(x+3)(x^2+9)',
     },
     {
       id: 'ch2-001-ch4',
@@ -311,23 +332,172 @@ export default {
       walkthrough: [
         {
           expression: 'a(a^2 - ab + b^2) + b(a^2 - ab + b^2)',
-          annotation: 'Distribute each term of $(a+b)$ across the trinomial.'
+          annotation: 'Distribute each term of $(a+b)$ across the trinomial.',
         },
         {
           expression: '(a^3 - a^2b + ab^2) + (a^2b - ab^2 + b^3)',
-          annotation: 'Expand. Notice the symmetrical pairs: $-a^2b$ vs $+a^2b$ and $+ab^2$ vs $-ab^2$.'
+          annotation: 'Expand. Notice the symmetrical pairs: $-a^2b$ vs $+a^2b$ and $+ab^2$ vs $-ab^2$.',
         },
         {
           expression: 'a^3 + b^3 \\qquad \\blacksquare',
-          annotation: 'All middle terms cancel, leaving only the sum of cubes.'
-        }
+          annotation: 'All middle terms cancel, leaving only the sum of cubes.',
+        },
       ],
-      answer: '\\text{Proven via distributive expansion.}'
-    }
+      answer: '\\text{Proven via distributive expansion.}',
+    },
   ],
 
-  calcBridge: {
-    teaser: 'In calculus, substituting $x + h$ into a function — computing $f(x+h)$ — is exactly this skill. The difference quotient $\\frac{f(x+h)-f(x)}{h}$ requires expanding expressions like $(x+h)^2$ and simplifying. Every derivative you compute starts here.',
-    linkedLessons: ['limits-and-continuity', 'derivatives-introduction'],
+  crossRefs: [
+    { slug: 'factoring-every-method', reason: 'Factoring is the distributive property in reverse — every technique builds directly on the expansion skills practised here.' },
+    { slug: 'quadratics-completing-the-square', reason: 'Completing the square requires fluent expansion of $(x+k)^2$, a direct application of the algebraic identities from this lesson.' },
+    { slug: 'rational-expressions-partial-fractions', reason: 'Simplifying rational expressions requires recognising difference-of-squares and other patterns from this lesson in both numerator and denominator.' },
+  ],
+
+  checkpoints: [
+    'What is the difference between a term and a factor in an expression?',
+    'Explain why $3x^2 + 2x$ cannot be combined into a single term.',
+    'What does the distributive property say, and why is it the "engine" of algebra?',
+    'Without expanding, what is the middle term of $(x + 5)^2$?',
+    'Why does $(a+b)^2 \\neq a^2 + b^2$? Give a numerical counterexample.',
+  ],
+
+  semantics: {
+    symbols: [
+      { symbol: 'a_n', meaning: 'Coefficient of the $x^n$ term in a polynomial' },
+      { symbol: '|x|', meaning: 'Absolute value of $x$ — distance from zero on the number line' },
+      { symbol: 'p(x)', meaning: 'Polynomial function evaluated at $x$' },
+      { symbol: '\\Delta', meaning: 'Discriminant $b^2 - 4ac$; determines nature of quadratic roots' },
+    ],
+    rulesOfThumb: [
+      'Always check for like terms (same variable part) before declaring an expression simplified.',
+      'Distribute a negative sign carefully — it changes the sign of every term inside the parentheses.',
+      'The number of terms produced when multiplying two binomials is always 4 before combining.',
+      'Constant terms survive substitution of $x=0$; all variable terms vanish.',
+    ],
   },
+
+  spiral: {
+    recoveryPoints: [
+      { topic: 'Signed number arithmetic', where: 'Precalc-1 — real number operations', why: 'Sign errors in coefficients cascade through every algebraic manipulation.' },
+      { topic: 'Order of operations', where: 'Precalc-1 — arithmetic review', why: 'Applying PEMDAS correctly is a prerequisite for evaluating expressions at specific values.' },
+    ],
+    futureLinks: [
+      { topic: 'Factoring polynomials', where: 'Precalc-2 Lesson 2 — Factoring', why: 'Every factoring method is the distributive property applied in reverse to the structures introduced here.' },
+      { topic: 'Difference quotient', where: 'Calculus — introduction to derivatives', why: 'The difference quotient $[f(x+h)-f(x)]/h$ requires expanding $f(x+h)$, exactly the substitution practised in Ex 5.' },
+    ],
+  },
+
+  assessment: [
+    {
+      question: 'Simplify: $4x^2 - 7x + 3x^2 + 2x$',
+      answer: '$7x^2 - 5x$',
+      difficulty: 'quick-fire',
+    },
+    {
+      question: 'Expand: $(x+4)(x-4)$',
+      answer: '$x^2 - 16$',
+      difficulty: 'quick-fire',
+    },
+    {
+      question: 'If $f(x) = x^2 + 1$, find $f(3)$.',
+      answer: '$10$',
+      difficulty: 'quick-fire',
+    },
+  ],
+
+  mentalModel: [
+    'An expression is a machine: plug in $x$, get a value. No equals sign means no question yet.',
+    'Like terms are terms with the identical variable part — only their coefficients get added.',
+    'The distributive property is the one rule: $a(b+c) = ab + ac$. Everything follows from this.',
+    '$(a+b)^2 = a^2 + 2ab + b^2$ — the middle term $2ab$ is the "cross rectangle" in the geometric proof.',
+    'Substituting an expression like $(x+h)$ into $f$ is the algebraic form of function composition.',
+  ],
+
+  quiz: [
+    {
+      id: 'q-es-01',
+      type: 'input',
+      text: 'Simplify: $3x^2 - 5x + 2x^2 + 8x - 4$',
+      answer: '5x^2 + 3x - 4',
+      hints: ['Group terms with the same variable part: $x^2$ terms together, $x$ terms together, constants together.', 'Add coefficients within each group: $3+2=5$, $-5+8=3$, $-4$ stays.'],
+      reviewSection: 'Intuition tab — like terms',
+    },
+    {
+      id: 'q-es-02',
+      type: 'choice',
+      text: 'Which of the following is a correct expansion of $(x+3)^2$?',
+      options: ['$x^2 + 9$', '$x^2 + 3x + 9$', '$x^2 + 6x + 9$', '$x^2 + 6x + 3$'],
+      answer: '$x^2 + 6x + 9$',
+      hints: ['$(a+b)^2 = a^2 + 2ab + b^2$. Identify $a=x$ and $b=3$.', 'The middle term is $2 \\cdot x \\cdot 3 = 6x$. The last term is $3^2 = 9$.'],
+      reviewSection: 'Rigor tab — why $(a+b)^2 \\neq a^2+b^2$',
+    },
+    {
+      id: 'q-es-03',
+      type: 'input',
+      text: 'Expand: $(2x-1)(3x+4)$',
+      answer: '6x^2 + 5x - 4',
+      hints: ['Use FOIL (or distribution): First $2x \\cdot 3x$, Outer $2x \\cdot 4$, Inner $-1 \\cdot 3x$, Last $-1 \\cdot 4$.', 'Combine the like terms: $8x - 3x = 5x$.'],
+      reviewSection: 'Examples tab — expanding with the distributive property',
+    },
+    {
+      id: 'q-es-04',
+      type: 'choice',
+      text: 'Which expression is NOT the same as $-(a - b)$?',
+      options: ['$-a + b$', '$b - a$', '$-(a-b)$', '$-a - b$'],
+      answer: '$-a - b$',
+      hints: ['Distribute the negative sign: $-(a - b) = -a + b$.', '$-a - b$ would come from $-(a + b)$, not $-(a-b)$.'],
+      reviewSection: 'Math tab — two classic expression errors',
+    },
+    {
+      id: 'q-es-05',
+      type: 'input',
+      text: 'If $f(x) = 2x^2 - x + 3$, evaluate $f(-2)$.',
+      answer: '13',
+      hints: ['Substitute $x = -2$: $2(-2)^2 - (-2) + 3$.', '$(-2)^2 = 4$, so $2(4) = 8$. Then $8 + 2 + 3 = 13$.'],
+      reviewSection: 'Examples tab — evaluating an expression',
+    },
+    {
+      id: 'q-es-06',
+      type: 'choice',
+      text: 'What is the degree of the polynomial $5x^3 - 2x^4 + x - 7$?',
+      options: ['3', '4', '1', '0'],
+      answer: '4',
+      hints: ['The degree is the highest power of $x$ in the polynomial.', 'The term $-2x^4$ has the highest power: $4$.'],
+      reviewSection: 'Math tab — polynomial vocabulary',
+    },
+    {
+      id: 'q-es-07',
+      type: 'input',
+      text: 'Factor using difference of squares: $x^2 - 49$',
+      answer: '(x-7)(x+7)',
+      hints: ['$a^2 - b^2 = (a-b)(a+b)$. Identify $a = x$ and $b = 7$.', '$49 = 7^2$, so this fits the pattern perfectly.'],
+      reviewSection: 'Math tab — the architectural identities',
+    },
+    {
+      id: 'q-es-08',
+      type: 'choice',
+      text: 'Which of the following are like terms?',
+      options: ['$3x^2$ and $3x$', '$5xy$ and $5x^2y$', '$7ab$ and $-2ab$', '$4x$ and $4y$'],
+      answer: '$7ab$ and $-2ab$',
+      hints: ['Like terms must have the exact same variable part (same variables to the same powers).', '$7ab$ and $-2ab$ both have the variable part $ab$, so they are like terms.'],
+      reviewSection: 'Intuition tab — like terms: same variable part, any coefficient',
+    },
+    {
+      id: 'q-es-09',
+      type: 'input',
+      text: 'Expand and simplify: $(x+5)^2 - (x-5)^2$',
+      answer: '20x',
+      hints: ['Expand each square separately: $(x+5)^2 = x^2+10x+25$ and $(x-5)^2 = x^2-10x+25$.', 'Subtract: $(x^2+10x+25)-(x^2-10x+25)$. Distribute the minus sign, then cancel.'],
+      reviewSection: 'Challenges — expand and simplify',
+    },
+    {
+      id: 'q-es-10',
+      type: 'choice',
+      text: 'If $f(x) = x^2 - 3$, what is $f(a+1)$?',
+      options: ['$a^2 - 2$', '$a^2 + 2a - 2$', '$a^2 + a - 2$', '$a^2 + 2a + 1 - 3$'],
+      answer: '$a^2 + 2a - 2$',
+      hints: ['Substitute $x = (a+1)$: $f(a+1) = (a+1)^2 - 3$.', 'Expand $(a+1)^2 = a^2 + 2a + 1$, then subtract $3$: $a^2 + 2a + 1 - 3 = a^2 + 2a - 2$.'],
+      reviewSection: 'Examples tab — evaluating an expression',
+    },
+  ],
 }
