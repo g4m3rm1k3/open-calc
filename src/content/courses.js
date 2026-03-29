@@ -34,4 +34,11 @@ export const COURSES = [
     desc: 'Logic & Puzzles',
     color: 'purple'
   },
+  { 
+    key: 'web-1',  
+    label: 'Web Systems',   
+    path: '/chapter/w1', 
+    desc: 'DOM, Reactivity & APIs',
+    color: 'orange'
+  },
 ];
