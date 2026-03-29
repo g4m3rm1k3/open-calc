@@ -6,6 +6,7 @@ import { PinsProvider } from './context/PinsContext.jsx'
 import AppShell from './components/layout/AppShell.jsx'
 import { VideoPlayerProvider } from './context/VideoPlayerContext.jsx'
 import FloatingVideoPlayer from './components/videos/FloatingVideoPlayer.jsx'
+import ContributingModal from './components/ui/ContributingModal.jsx'
 import LoadingSpinner from './components/ui/LoadingSpinner.jsx'
 
 const HomePage    = lazy(() => import('./pages/HomePage.jsx'))
@@ -31,6 +32,7 @@ export default function App() {
           <VideoPlayerProvider>
             <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <FloatingVideoPlayer />
+              <ContributingModal />
               <AppShell>
                 <Suspense fallback={<Fallback />}>
                   <Routes>
