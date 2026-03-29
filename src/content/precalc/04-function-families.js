@@ -4,34 +4,31 @@ export default {
   chapter: 'precalc-1',
   order: 4,
   title: 'Function Families: The DNA of Every Mathematical Model',
-  subtitle: 'Algebraic structure and behavior of our most powerful mathematical tools',
+  subtitle: 'Algebraic structure and behavior of polynomials, exponentials, and logarithms',
   tags: ['polynomials', 'exponentials', 'logarithms', 'laws of logs', 'laws of exponents', 'root multiplicity'],
   aliases: 'polynomial root multiplicity bounce cross touch rational function sketch exponential log laws expansion contraction',
 
   hook: {
-    question: 'Why does gravity follow an $x^2$ rule, while a bank account follows an $e^x$ rule? And why do your ears hear sound on a Logarithmic scale?',
-    realWorldContext: 'In **Physics**, the "Inverse Square Law" ($1/x^2$) governs light and gravity. In **Medicine**, Body Mass Index (BMI) is a Power Law. In **Biology**, populations grow Exponentially. In **Human Sensation**, we perceive sound and light Logarithmically — our brains "compress" huge ranges of data into a manageable scale. Every "Family" of functions is a different template for how the universe behaves.',
+    question: 'Why does gravity follow an $x^2$ rule, while a bank account follows an $e^x$ rule? And why do your ears hear sound on a logarithmic scale?',
+    realWorldContext: 'In **Physics**, the "Inverse Square Law" ($1/x^2$) governs both light and gravity. In **Biology**, populations grow exponentially. In **Human Sensation**, we perceive sound and light logarithmically — our brains compress huge ranges of energy into a manageable scale. Every function family is a different template for how the universe actually behaves. Identifying the family tells you the system\'s destiny before you write a single equation.',
+    previewVisualizationId: 'RootMultiplicityViz',
   },
 
   intuition: {
     prose: [
-      'Think of Function Families as the "Species" of math. Identifying the species reveals the system\'s future, limits, and growth speed. To understand how the world scales, we must understand the DNA of these functions.',
-      '**Polynomials (The Power of Roots)**: These are smooth, predictable curves built from powers of $x$. Their local behavior is dictated by their **Roots**. A root with an even multiplicity ($x^2$) causes a "Bounce" (touching the axis), while one with an odd multiplicity ($x^3$) causes a "Cross" (slicing through). This is the "DNA" that determines the shape of the path.',
-      '**Exponentials (The Law of Proportional Growth)**: Unlike polynomials where $x$ is the base, here $x$ is the **Power**. This represents systems where the more you have, the faster you grow (like a bank account or a spreading virus). The constant $e \\approx 2.718$ is the universal baseline for continuous, organic growth.',
-      '**Logarithms (The Data Compressors)**: Logs are the inverse of growth. They turn exponential gaps into manageable linear distances. This is why our ears hear volume and our eyes perceive light on a Logarithmic scale—our brains "compress" huge ranges of energy so we can process them.',
+      '**Where you are in the story:** The previous lesson gave you the tools to read a function\'s behaviour — asymptotes, extrema, concavity. Now you meet the specific families that generate those behaviours. Each family has its own DNA: its own signature shape, growth rate, and algebraic laws.',
+      '**Polynomials — the power of roots**: These are smooth, predictable curves built from powers of $x$. Their local behavior is dictated by their roots. A root with an even multiplicity causes a "bounce" (the curve touches the $x$-axis but does not cross it), while a root with an odd multiplicity causes a "cross" (the curve slices through). This single rule determines the entire qualitative shape of a polynomial from its factored form.',
+      '**Exponentials — the law of proportional growth**: Unlike polynomials where $x$ is the base, in $b^x$ the variable $x$ is the exponent. This means every unit of increase in $x$ multiplies the output by $b$. This is the mathematical signature of systems where "the more you have, the faster you grow" — compound interest, viral spread, radioactive decay all follow this pattern.',
+      '**Logarithms — the data compressors**: Logs are the inverse of exponential growth. They turn exponential gaps into manageable linear distances, which is exactly why our ears and eyes are logarithmic — our brains compress the enormous range of sound intensities (from a whisper to a jet engine) so we can process them.',
+      '**Where this is heading:** The final precalc lesson introduces coordinate systems beyond the Cartesian plane — polar, parametric, and vectors. Those tools represent the same mathematical objects in different languages, just as exponentials and logs represent the same relationship from opposite directions.',
     ],
     callouts: [
       {
-        type: 'insight',
-        title: 'The "Bounce or Cross" Rule',
-        body: '\\text{Factor } (x-c)^m: \\\\ m \\text{ is EVEN: Bounces off axis at } c. \\\\ m \\text{ is ODD: Crosses through axis at } c.',
+        type: 'sequencing',
+        title: 'Precalc arc — Lesson 4 of 5',
+        body: '← Function Behaviour | **Function Families** | Beyond Cartesian →',
       },
       {
-        type: 'theorem',
-        title: 'The Laws of Exponents',
-        body: 'b^x \\cdot b^y = b^{x+y} \\\\ (b^x)^y = b^{xy} \\\\ b^{-x} = 1/b^x',
-      },
-            {
         type: 'theorem',
         title: 'Root multiplicity and crossing behaviour',
         body: '\\text{Root } c \\text{ of multiplicity } m: \\\\ m \\text{ odd} \\Rightarrow \\text{graph CROSSES the } x\\text{-axis at } c \\\\ m \\text{ even} \\Rightarrow \\text{graph TOUCHES (bounces off) the } x\\text{-axis at } c',
@@ -41,12 +38,22 @@ export default {
         title: 'Why even multiplicity bounces',
         body: '(x-c)^2 \\geq 0 \\text{ for all } x. \\text{ So } f(x) = (x-c)^2 g(x) \\text{ has the same sign as } g(x) \\text{ on both sides of } c.',
       },
+      {
+        type: 'theorem',
+        title: 'The laws of exponents',
+        body: 'b^x \\cdot b^y = b^{x+y} \\qquad (b^x)^y = b^{xy} \\qquad b^{-x} = 1/b^x',
+      },
+      {
+        type: 'theorem',
+        title: 'The laws of logarithms',
+        body: '\\log_b(xy) = \\log_b x + \\log_b y \\\\ \\log_b(x/y) = \\log_b x - \\log_b y \\\\ \\log_b(x^n) = n \\log_b x',
+      },
     ],
     visualizations: [
       {
         id: 'RootMultiplicityViz',
         title: 'The Geometry of Roots',
-        mathBridge: 'Observe how the multiplicity $m$ changes the "approach" to the $x$-axis. This is the local behavior dictated by the specific algebraic factor $(x-c)^m$.',
+        mathBridge: 'Step 1: Set a root with multiplicity 1. Watch the curve cross straight through the $x$-axis — it behaves locally like a line. Step 2: Increase to multiplicity 2. The curve touches the axis and bounces back — it behaves locally like a parabola. Step 3: Try multiplicity 3. The curve crosses but with a flat "S"-shape — locally cubic. The key lesson: each factor $(x-c)^m$ in the formula produces a predictable local shape. The degree of the factor determines whether the graph crosses, bounces, or flexes at that root.',
         caption: 'The power of a factor determines the local topography of the graph.',
       },
     ],
@@ -54,24 +61,19 @@ export default {
 
   math: {
     prose: [
-      'For the student of algebra, every function family is governed by definitive laws that allow for the manipulation of complex models into solvable forms.',
-      '**Polynomial Structure**: $P(x) = a_n x^n + \\dots + a_0$. The **Fundamental Theorem of Algebra** guarantees that a polynomial of degree $n$ has exactly $n$ complex roots. We use the **Rational Roots Theorem** to identify potential integer zeros by evaluating the ratio of factors of $a_0$ to $a_n$.',
-      '**The Factor & Remainder Identity**: A value $c$ is a zero of $P(x)$ if and only if $(x-c)$ is a factor. This relationship is verified by the **Remainder Theorem**, which states that the result of $P(c)$ is exactly the remainder of $P(x) / (x-c)$.',
-      '**Logarithmic Identities**: Logarithms transform multiplication into addition and exponents into multipliers. The **Change of Base Formula** ($\\log_b A = \\frac{\\log_c A}{\\log_c b}$) allows us to translate any logarithmic system into a common or natural base for computation.',
-      '**Exponential Foundations**: Modeled by $f(x) = ab^x$ or $Ae^{rt}$. These functions represent steady growth ($r>0$) or decay ($r<0$) where the rate of change is directly proportional to the current value.',
+      'Every function family is governed by definitive laws that allow complex models to be manipulated into solvable forms.',
+      '**Polynomial structure**: $P(x) = a_n x^n + \\dots + a_0$. The Fundamental Theorem of Algebra guarantees exactly $n$ complex roots (counting multiplicity). The Rational Root Theorem identifies potential integer zeros as ratios of factors of $a_0$ to $a_n$. The Factor/Remainder Theorem links factors to zeros: $(x-c)$ divides $P(x)$ iff $P(c) = 0$.',
+      '**Rational function sketching**: Factor completely → identify zeros (numerator) and VAs (denominator, after cancellation) → determine HA or oblique asymptote → find $y$-intercept → build sign chart → sketch VA behaviour → assemble. Eight steps, zero guessing.',
+      '**Exponential transformations**: $y = a \\cdot b^{x-h} + k$ has HA at $y = k$ (not $y = 0$). The vertical shift $k$ is the only parameter that moves the horizontal asymptote. The growth/decay rate is unchanged by $h$.',
+      '**Logarithmic structure**: $y = a\\log_b(x - h) + k$ has VA at $x = h$ and domain $x > h$. Log laws turn multiplication into addition, division into subtraction, and powers into multiplication — essential for solving exponential equations.',
     ],
     callouts: [
       {
         type: 'theorem',
-        title: 'The Laws of Logs (Cheat Sheet)',
-        body: '\\log_b(xy) = \\log_b x + \\log_b y \\\\ \\log_b(x/y) = \\log_b x - \\log_b y \\\\ \\log_b(x^n) = n \\log_b x',
+        title: 'The Factor/Remainder bridge',
+        body: 'f(c) = 0 \\iff (x-c) \\text{ is a factor} \\\\ \\text{Remainder of } f(x) \\div (x-c) = f(c)',
       },
       {
-        type: 'theorem',
-        title: 'The Factor/Remainder Bridge',
-        body: 'f(c) = 0 \\iff (x-c) \\text{ is a factor} \\\\ \\text{Remainder of } f(x)/(x-c) = f(c)',
-      },
-            {
         type: 'proof-map',
         title: 'Rational function sketching checklist',
         body: '1.\\ \\text{Factor} \\to 2.\\ \\text{Zeros \\& mult.} \\to 3.\\ \\text{VAs \\& holes} \\to 4.\\ \\text{HA/oblique} \\to 5.\\ y\\text{-intercept} \\to 6.\\ \\text{Sign chart} \\to 7.\\ \\text{VA behaviour} \\to 8.\\ \\text{Sketch}',
@@ -79,51 +81,29 @@ export default {
       {
         type: 'theorem',
         title: 'Sign near a vertical asymptote',
-        body: '\\text{Evaluate the sign of the numerator and denominator separately as } x \\to c^+ \\text{ and } x \\to c^-. \\\\ \\frac{+}{+} \\to +\\infty \\quad \\frac{+}{-} \\to -\\infty \\quad \\frac{-}{+} \\to -\\infty \\quad \\frac{-}{-} \\to +\\infty',
+        body: '\\text{Evaluate sign of numerator and denominator separately as } x \\to c^+ \\text{ and } x \\to c^-. \\\\ \\frac{+}{+} \\to +\\infty \\quad \\frac{+}{-} \\to -\\infty \\quad \\frac{-}{+} \\to -\\infty \\quad \\frac{-}{-} \\to +\\infty',
       },
       {
         type: 'theorem',
-        title: 'Exponential transformation effects on the asymptote',
-        body: 'y = a \\cdot b^{x-h} + k: \\text{ HA shifts to } y = k. \\\\ y = a \\cdot b^{x-h}: \\text{ HA stays at } y = 0. \\\\ \\text{The vertical shift } k \\text{ is the ONLY thing that moves the horizontal asymptote.}',
+        title: 'Exponential transformation: asymptote rule',
+        body: 'y = a \\cdot b^{x-h} + k: \\text{ HA shifts to } y = k. \\\\ \\text{The vertical shift } k \\text{ is the ONLY thing that moves the HA.}',
       },
       {
         type: 'theorem',
-        title: 'Logarithm transformation effects on the asymptote',
-        body: 'y = a\\log_b(x - h) + k: \\text{ VA shifts to } x = h. \\\\ \\text{Domain: } x > h. \\quad y\\text{-intercept: set } x=0 \\text{ (only if } 0 > h\\text{)}. \\\\ \\text{The horizontal shift } h \\text{ is the ONLY thing that moves the vertical asymptote.}',
+        title: 'Logarithm transformation: asymptote rule',
+        body: 'y = a\\log_b(x - h) + k: \\text{ VA shifts to } x = h. \\quad \\text{Domain: } x > h. \\\\ \\text{The horizontal shift } h \\text{ is the ONLY thing that moves the VA.}',
       },
     ],
     visualizations: [
       {
         id: 'RationalSketchViz',
         title: 'Prototyping a Rational Function',
-        mathBridge: 'Combine Horizontal Asymptotes (degrees), Vertical Asymptotes (denominator zeros), and $x$-intercepts (numerator zeros) to construct the curve.',
-        caption: 'Sketching is the process of eliminating impossible geographic states.',
+        mathBridge: 'Step 1: Read the zeros (where the numerator is 0) and VAs (where the denominator is 0). These are the key landmarks. Step 2: Determine the HA or oblique asymptote using the degree rule. Step 3: Build the sign chart: pick one test value per interval and determine the sign of $f$. Step 4: Near each VA, check whether the function goes to $+\\infty$ or $-\\infty$ on each side. Step 5: Connect the constraints with a smooth curve. The key lesson: sketching a rational function is assembling constraints, not guessing a shape.',
+        caption: 'Sketching is the process of eliminating impossible geometric states.',
       },
     ],
   },
 
-  rigor: {
-    title: 'Anatomy of a Polynomial',
-    prose: [
-      'To model a system, we must find its "Anchor Points": the Intercepts.'
-    ],
-    proofSteps: [
-      {
-        section: 'Proof of End Behavior (Leading Term Wins)',
-        expression: 'P(x) = x^3 - 4x^2 + 5 \\implies x^3(1 - \\frac{4}{x} + \\frac{5}{x^3})',
-        annotation: 'Factor out the highest power. This reveals the dominant growth engine.'
-      },
-      {
-        expression: '\\text{As } x \\to \\infty, \\frac{4}{x} \\to 0, \\frac{5}{x^3} \\to 0. \\implies P(x) \\approx x^3',
-        annotation: 'Rule: For huge values, all other terms "evaporate" compared to the leading power.'
-      },
-      {
-        section: 'Method: Zeros and y-intercepts',
-        expression: 'P(0) = a_0, \\quad P(x) = 0 \\implies (x-c_1)(x-c_2)...',
-        annotation: 'Rule: set $x=0$ for the vertical start; factor the equation for the horizontal crossings.'
-      }
-    ]
-  },
   rigor: {
     title: 'Complete sketch of $f(x) = \\dfrac{x(x-2)^2}{(x+1)(x-3)}$',
 
@@ -137,127 +117,105 @@ export default {
         annotation: 'Denominator zeros where numerator is nonzero.',
       },
       {
-        expression: '\\deg(\\text{num})=3,\\ \\deg(\\text{denom})=2 \\Rightarrow \\text{oblique asymptote}',
+        expression: '\\deg(\\text{num})=3,\\ \\deg(\\text{denom})=2 \\Rightarrow \\text{oblique asymptote (long division gives } y = x - 2 + \\cdots\\text{)}',
         annotation: 'Numerator degree exceeds denominator by 1 — long division gives the slant asymptote.',
       },
       {
         expression: 'y\\text{-intercept: } f(0) = \\frac{0 \\cdot 4}{1 \\cdot (-3)} = 0 \\quad (\\text{same as zero at }x=0)',
-        annotation: '$f(0)=0$ because $x=0$ is a zero of $f$.',
+        annotation: '$f(0) = 0$ because $x = 0$ is a zero of $f$.',
       },
       {
         expression: '\\text{Sign chart: intervals } (-\\infty,-1),(-1,0),(0,2),(2,3),(3,\\infty)',
-        annotation: 'Key values split the number line into 5 intervals. Test each: e.g., $x=-2$: $\\frac{-(-4)^2}{(-1)(-5)}<0$.',
+        annotation: 'Key values split the number line into 5 intervals. Test each: e.g., $x = -2$: sign is negative.',
       },
       {
-        expression: '\\text{Near VA } x=-1^+: \\frac{(+)(-)^2}{(+)(-)} = \\frac{(+)}{(-)} \\to -\\infty \\quad x=-1^-: \\to +\\infty',
+        expression: '\\text{Near VA } x=-1^+: \\frac{(+)(-)^2}{(+)(-)} \\to -\\infty \\quad x=-1^-: \\to +\\infty',
         annotation: 'Evaluate sign of numerator and denominator separately on each side of VA.',
       },
       {
         expression: '\\text{Graph: crosses at 0, bounces at 2, VAs at -1 and 3, rises to oblique asymptote}',
-        annotation: 'Assemble all constraints. The graph is now fully determined without plotting hundreds of points.',
+        annotation: 'Assemble all constraints. The graph is fully determined without plotting hundreds of points.',
       },
     ],
   },
+
   examples: [
-      {
+    {
       id: 'ch1-004-ex1',
       title: 'Reading a polynomial graph from its factored form',
-      problem: '\\text{Sketch the key features of } f(x) = -2(x+3)(x-1)^2(x-4).',
+      problem: 'Sketch the key features of $f(x) = -2(x+3)(x-1)^2(x-4)$.',
       steps: [
         {
           expression: '\\text{Leading term: } -2x^4 \\Rightarrow n \\text{ even}, a_n<0 \\Rightarrow \\text{both ends } \\to -\\infty',
           annotation: 'End behaviour from leading term: degree 4, negative coefficient → both ends down.',
+          hint: 'Multiply the highest-degree terms: $(-2)(x)(x^2)(x) = -2x^4$. Even degree and negative → ∩-shape.',
         },
         {
           expression: 'x=-3 \\text{ (mult. 1, crosses)},\\ x=1 \\text{ (mult. 2, bounces)},\\ x=4 \\text{ (mult. 1, crosses)}',
-          annotation: 'Three distinct zeros with multiplicities. The multiplicity tells the crossing behaviour.',
+          annotation: 'Three distinct zeros with multiplicities. Multiplicity tells the crossing behaviour.',
+          hint: 'Read multiplicities from the exponents of each factor. $(x-1)^2$ has multiplicity 2 → bounce.',
         },
         {
           expression: 'y\\text{-intercept: } f(0) = -2(3)(-1)^2(-4) = -2(3)(1)(-4) = 24',
-          annotation: 'Substitute $x=0$.',
+          annotation: 'Substitute $x = 0$.',
+          hint: 'Plug $x=0$ into every factor: $-2(0+3)(0-1)^2(0-4) = -2(3)(1)(-4) = 24$.',
         },
       ],
-      conclusion: 'With end behaviour, zeros (including multiplicities), and the $y$-intercept, you can sketch the qualitative shape of any polynomial without a calculator.',
+      conclusion: 'With end behaviour, zeros (with multiplicities), and the $y$-intercept, you can sketch any polynomial\'s qualitative shape without a calculator.',
     },
     {
       id: 'ch1-004-ex2',
       title: 'Graphing a transformed exponential — and finding the new asymptote',
-      problem: '\\text{Graph } f(x) = 3 \\cdot 2^{x+1} - 4. \\text{ State the asymptote and key points.}',
+      problem: 'Graph $f(x) = 3 \\cdot 2^{x+1} - 4$. State the asymptote and key points.',
       steps: [
         {
           expression: '\\text{Base graph: } y = 2^x. \\text{ Shift LEFT 1, vertical stretch by 3, shift DOWN 4.}',
-          annotation: 'Read the transformations: $h=-1$ (left 1), $a=3$ (stretch), $k=-4$ (down 4).',
+          annotation: 'Read transformations: $h = -1$ (left 1), $a = 3$ (stretch), $k = -4$ (down 4).',
+          hint: 'Write in master form: $3 \\cdot 2^{x - (-1)} + (-4)$. So $h = -1$, $a = 3$, $k = -4$.',
         },
         {
           expression: '\\text{Horizontal asymptote: } y = -4 \\quad (\\text{the } k \\text{ value}).',
-          annotation: 'The vertical shift moves the HA from $y=0$ to $y=-4$. The base asymptote moves with $k$.',
+          annotation: 'The vertical shift moves the HA from $y = 0$ to $y = -4$.',
+          hint: 'The base exponential $2^x$ has HA at $y=0$. Adding $k = -4$ shifts the HA to $y = -4$.',
         },
         {
           expression: 'f(0) = 3 \\cdot 2^1 - 4 = 6 - 4 = 2 \\quad f(-1) = 3 \\cdot 2^0 - 4 = -1',
-          annotation: 'Key points: $y$-intercept $(0,2)$ and the inflection reference point $(-1,-1)$.',
+          annotation: '$y$-intercept $(0, 2)$ and the anchor point $(-1, -1)$ (where $x+1 = 0$, so base $= 1$).',
+          hint: 'Key points: plug in $x = 0$ (gives $y$-intercept) and $x = -1$ (the "reference" point where the exponent is 0).',
         },
       ],
-      conclusion: 'The horizontal asymptote of a transformed exponential is always the vertical shift $k$. It\'s the one parameter that "relocates" where the function flattens out.',
+      conclusion: 'The horizontal asymptote of a transformed exponential is always $y = k$. It is the one parameter that "relocates" where the function flattens.',
     },
     {
-      id: 'ex-log-expand',
-      title: 'Algebra: Expanding Logarithms',
-      problem: '\\text{Expand } \\ln(x^3 \\sqrt{y} / z).',
+      id: 'ch1-004-ex3',
+      title: 'Expanding and condensing logarithms',
+      problem: 'Expand $\\ln\\!\\left(\\dfrac{x^3\\sqrt{y}}{z}\\right)$, then condense $3\\ln x + \\tfrac{1}{2}\\ln y - \\ln z$.',
       steps: [
         {
-          expression: '\\ln(x^3 \\sqrt{y}) - \\ln(z)',
-          annotation: 'Use Quotient Law: $\ln(A/B) = \ln A - \ln B$.'
+          expression: '\\ln\\!\\left(\\frac{x^3\\sqrt{y}}{z}\\right) = \\ln(x^3) + \\ln(y^{1/2}) - \\ln(z)',
+          annotation: 'Quotient law: $\\ln(A/B) = \\ln A - \\ln B$. Product law: $\\ln(AB) = \\ln A + \\ln B$.',
+          hint: 'Split using quotient law first, then product law for the numerator.',
         },
         {
-          expression: '\\ln(x^3) + \\ln(y^{1/2}) - \\ln(z)',
-          annotation: 'Use Product Law: $\ln(AB) = \ln A + \ln B$.'
+          expression: '= 3\\ln x + \\tfrac{1}{2}\\ln y - \\ln z',
+          annotation: 'Power law: $\\ln(A^n) = n\\ln A$. Write $\\sqrt{y} = y^{1/2}$.',
+          hint: 'Apply power law to each term: $\\ln(x^3) = 3\\ln x$ and $\\ln(y^{1/2}) = \\frac{1}{2}\\ln y$.',
         },
         {
-          expression: '3\\ln x + \\tfrac{1}{2}\\ln y - \\ln z',
-          annotation: 'Use Power Law: $\ln A^n = n \ln A$.'
-        }
+          expression: '3\\ln x + \\tfrac{1}{2}\\ln y - \\ln z = \\ln(x^3) + \\ln(\\sqrt{y}) - \\ln(z) = \\ln\\!\\left(\\frac{x^3\\sqrt{y}}{z}\\right)',
+          annotation: 'Condensing is the reverse: power law first, then product/quotient laws.',
+          hint: 'To condense: first use power law in reverse ($3\\ln x \\to \\ln(x^3)$), then combine with product/quotient laws.',
+        },
       ],
-      conclusion: 'The complex log is decomposed into basic building blocks.'
+      conclusion: 'Expansion and condensation are inverse operations. The three laws are all you need: product ↔ addition, quotient ↔ subtraction, power ↔ multiplication.',
     },
-    {
-      id: 'ex-eng-decay',
-      title: 'Applied: Radioactive Decay',
-      problem: '\\text{A sample decays by } m(t) = 100(2)^{-t/10}. \\\\ \\text{Find the mass after 30 years.}',
-      steps: [
-        {
-          expression: 'm(30) = 100(2)^{-30/10} = 100(2)^{-3}',
-          annotation: 'Substitute 30 for time.'
-        },
-        {
-          expression: 'm(30) = 100/2^3 = 100/8 = 12.5',
-          annotation: 'Apply Exponent Law: $b^{-n} = 1/b^n$.'
-        }
-      ],
-      conclusion: 'Only 12.5g of the original 100g remains.'
-    }
   ],
 
   challenges: [
     {
-      id: 'ch-04-01',
-      difficulty: 'medium',
-      problem: '\\text{Simplify } \log_2(8) + \log_3(1/9).',
-      walkthrough: [
-        { expression: '2^3 = 8 \\implies \log_2(8) = 3', annotation: 'Definition of log.' },
-        { expression: '3^{-2} = 1/9 \\implies \log_3(1/9) = -2', annotation: 'Definition of log.' }
-      ],
-      answer: '3 - 2 = 1'
-    },
-    {
-      id: 'ch-04-02',
-      difficulty: 'hard',
-      problem: '\\text{Identify the family and behavior of } f(x) = \dfrac{x-1}{(x-1)(x-2)}.',
-      answer: '\\text{Family: Rational. } \\\\ \\text{Features: Hole at } x=1, \\text{ VA at } x=2, \\text{ HA at } y=0.'
-    },
-        {
       id: 'ch1-004-ch1',
       difficulty: 'hard',
-      problem: '\\text{Find the domain of } f(x) = \\ln(x^2 - 5x + 6) \\text{ and identify the VAs of the graph.}',
+      problem: 'Find the domain of $f(x) = \\ln(x^2 - 5x + 6)$ and identify the VAs of the graph.',
       hint: 'Logarithm requires a positive argument. Factor $x^2 - 5x + 6$ to find where the argument is positive.',
       walkthrough: [
         {
@@ -266,14 +224,249 @@ export default {
         },
         {
           expression: '(x-2)(x-3)>0 \\Rightarrow x<2 \\text{ or } x>3',
-          annotation: 'Sign analysis: product of two factors is positive when both positive or both negative.',
+          annotation: 'Sign analysis: product is positive when both factors have the same sign.',
         },
         {
           expression: '\\text{VAs at } x=2 \\text{ and } x=3 \\text{ (where argument} \\to 0^+\\text{, so } \\ln\\to-\\infty\\text{)}',
-          annotation: 'At the boundary of the domain, $\\ln \\to -\\infty$. These are vertical asymptotes going downward.',
+          annotation: 'At the domain boundaries, $\\ln(\\text{argument}) \\to -\\infty$. These are vertical asymptotes going downward.',
         },
       ],
       answer: '\\text{Domain: } (-\\infty, 2) \\cup (3, \\infty). \\text{ VAs at } x=2 \\text{ and } x=3.',
+    },
+    {
+      id: 'ch1-004-ch2',
+      difficulty: 'medium',
+      problem: 'Simplify $\\log_2 8 + \\log_3(1/9)$.',
+      hint: 'Express each as a power of the base using the definition of logarithm.',
+      walkthrough: [
+        { expression: '2^3 = 8 \\implies \\log_2 8 = 3', annotation: 'Definition of log: $\\log_b x = n \\iff b^n = x$.' },
+        { expression: '3^{-2} = 1/9 \\implies \\log_3(1/9) = -2', annotation: '$1/9 = 3^{-2}$.' },
+      ],
+      answer: '3 + (-2) = 1',
+    },
+    {
+      id: 'ch1-004-ch3',
+      difficulty: 'hard',
+      problem: 'Solve $2^{3x-1} = 5^{x+2}$ for $x$. Express the answer in terms of $\\ln$.',
+      hint: 'Take $\\ln$ of both sides and use the power law $\\ln(a^b) = b\\ln a$. Then collect $x$ terms.',
+      walkthrough: [
+        {
+          expression: '(3x-1)\\ln 2 = (x+2)\\ln 5',
+          annotation: 'Take $\\ln$ of both sides; power law pulls exponents in front.',
+        },
+        {
+          expression: '3x\\ln 2 - \\ln 2 = x\\ln 5 + 2\\ln 5',
+          annotation: 'Distribute.',
+        },
+        {
+          expression: 'x(3\\ln 2 - \\ln 5) = 2\\ln 5 + \\ln 2 \\Rightarrow x = \\frac{2\\ln 5 + \\ln 2}{3\\ln 2 - \\ln 5}',
+          annotation: 'Collect $x$ terms on one side, factor, divide.',
+        },
+      ],
+      answer: 'x = \\dfrac{2\\ln 5 + \\ln 2}{3\\ln 2 - \\ln 5} \\approx 4.07',
+    },
+  ],
+
+  crossRefs: [
+    { slug: 'function-behaviour', reason: 'Asymptote and end-behaviour vocabulary from Lesson 3 applies directly to each function family here' },
+    { slug: 'function-transformations', reason: 'Transformed exponentials and logs use the master transformation formula from Lesson 2' },
+    { slug: 'rate-of-change', reason: 'The derivative of $e^x$ is itself — exponential families have unique differentiation properties explored in Chapter 1' },
+  ],
+
+  checkpoints: [
+    'Given a factored polynomial, can you determine zero locations, multiplicities, and end behaviour without graphing?',
+    'Can you read the horizontal asymptote of a transformed exponential directly from $k$?',
+    'Can you use the three log laws to expand or condense any logarithmic expression?',
+    'Do you know the eight-step rational function sketching process?',
+    'Can you solve an exponential equation by taking $\\ln$ of both sides?',
+  ],
+
+  semantics: {
+    symbols: [
+      { symbol: '(x-c)^m', meaning: 'Factor with root $c$ of multiplicity $m$: even $m$ → bounce, odd $m$ → cross' },
+      { symbol: 'b^x', meaning: 'Exponential function — $x$ is the exponent; every unit increase multiplies output by $b$' },
+      { symbol: '\\log_b x', meaning: 'Logarithm base $b$ — asks: "What power of $b$ gives $x$?"' },
+      { symbol: 'e \\approx 2.718', meaning: 'Natural base — the unique base where $\\frac{d}{dx}e^x = e^x$' },
+      { symbol: '\\ln x = \\log_e x', meaning: 'Natural logarithm — inverse of $e^x$; the default logarithm in calculus' },
+    ],
+    rulesOfThumb: [
+      'Bounce-or-cross test: even multiplicity → bounce; odd multiplicity → cross.',
+      'Log of a product = sum of logs. Log of a quotient = difference. Log of a power = multiplied coefficient.',
+      'Exponential HA = $k$ (vertical shift). Log VA = $h$ (horizontal shift).',
+      'To solve exponential equations: take $\\ln$ of both sides, use power law, isolate $x$.',
+    ],
+  },
+
+  spiral: {
+    recoveryPoints: [
+      { topic: 'Laws of exponents', where: 'Algebra 1 / Algebra 2', why: 'Log laws are derived from exponent laws; you need fluency with $b^x \\cdot b^y = b^{x+y}$ etc.' },
+      { topic: 'Polynomial factoring', where: 'Algebra 2', why: 'Reading zeros and multiplicities requires being able to factor polynomials into $(x-c)^m$ form' },
+      { topic: 'Rational expressions', where: 'Algebra 2', why: 'The eight-step rational sketch process requires polynomial long division and sign charts' },
+    ],
+    futureLinks: [
+      { topic: 'Derivative of exponential/log', where: 'Chapter 2 Calculus', why: '$\\frac{d}{dx}e^x = e^x$ and $\\frac{d}{dx}\\ln x = \\frac{1}{x}$ — the function families from this lesson have elegant derivatives' },
+      { topic: 'Integration of exponentials', where: 'Chapter 3 Calculus', why: 'Exponential integrals are the direct reverse of their derivatives; the family knowledge here is prerequisite' },
+      { topic: 'Limits of exponentials and logs', where: 'Chapter 1, Lesson 5', why: 'The dominance hierarchy — $\\ln x \\ll x^a \\ll b^x$ — explains why exponentials beat polynomials at infinity' },
+    ],
+  },
+
+  assessment: [
+    {
+      question: 'For $f(x) = (x+2)^3(x-1)^2$, describe the behaviour at each zero.',
+      answer: 'At $x=-2$ (mult. 3, odd): crosses. At $x=1$ (mult. 2, even): bounces.',
+      difficulty: 'quick-fire',
+    },
+    {
+      question: 'What is the HA of $g(x) = -3 \\cdot 2^x + 7$?',
+      answer: '$y = 7$ (the vertical shift $k$).',
+      difficulty: 'quick-fire',
+    },
+    {
+      question: 'Expand: $\\log_3\\!\\left(\\dfrac{x^2}{y}\\right)$.',
+      answer: '$2\\log_3 x - \\log_3 y$.',
+      difficulty: 'quick-fire',
+    },
+  ],
+
+  mentalModel: [
+    'Polynomials: smooth, bounded by their degree. Root multiplicity → bounce (even) or cross (odd).',
+    'Exponentials: "more you have, faster you grow." The exponent is the variable. HA at $y=k$.',
+    'Logarithms: inverse of exponentials; compress big ranges. VA at $x=h$. Defined only for positive arguments.',
+    'Log laws: product ↔ add, quotient ↔ subtract, power ↔ multiply. All three follow from exponent laws.',
+    'Rational sketching: factor → landmarks (zeros, VAs, holes) → HA/oblique → sign chart → assemble.',
+  ],
+
+  quiz: [
+    {
+      id: 'pc1-004-q1',
+      type: 'choice',
+      text: 'For $f(x) = (x-3)^2(x+1)$, what happens at $x = 3$?',
+      options: ['Crosses the $x$-axis', 'Bounces off the $x$-axis', 'Has a vertical asymptote', 'Has a hole'],
+      answer: 'Bounces off the $x$-axis',
+      hints: [
+        'Check the multiplicity of the factor $(x-3)$: it appears as $(x-3)^2$, so multiplicity 2.',
+        'Even multiplicity → bounce (graph touches axis but does not cross).',
+      ],
+      reviewSection: 'Intuition tab — root multiplicity and crossing behaviour',
+    },
+    {
+      id: 'pc1-004-q2',
+      type: 'choice',
+      text: 'For $f(x) = -2x^5 + 3x^2 - 1$, describe the end behaviour.',
+      options: [
+        'Both ends $\\to +\\infty$',
+        'Both ends $\\to -\\infty$',
+        'Left $\\to +\\infty$, right $\\to -\\infty$',
+        'Left $\\to -\\infty$, right $\\to +\\infty$',
+      ],
+      answer: 'Left $\\to +\\infty$, right $\\to -\\infty$',
+      hints: [
+        'Leading term: $-2x^5$. Degree 5 (odd), coefficient $-2$ (negative).',
+        'Odd degree → opposite ends. Negative coefficient → right goes down. So left $\\to +\\infty$, right $\\to -\\infty$.',
+      ],
+      reviewSection: 'Math tab — polynomial end behaviour',
+    },
+    {
+      id: 'pc1-004-q3',
+      type: 'input',
+      text: 'Expand: $\\log_2(8x^3)$.',
+      answer: '3 + 3*log_2(x)',
+      hints: [
+        'Product law: $\\log_2(8x^3) = \\log_2 8 + \\log_2(x^3)$.',
+        '$\\log_2 8 = 3$ (since $2^3 = 8$). Power law: $\\log_2(x^3) = 3\\log_2 x$. Total: $3 + 3\\log_2 x$.',
+      ],
+      reviewSection: 'Intuition tab — laws of logarithms',
+    },
+    {
+      id: 'pc1-004-q4',
+      type: 'input',
+      text: 'What is the horizontal asymptote of $f(x) = 5 \\cdot 3^{x-2} + 1$?',
+      answer: 'y = 1',
+      hints: [
+        'This is a transformed exponential: $a = 5$, $b = 3$, $h = 2$, $k = 1$.',
+        'The HA is always $y = k$. Here $k = 1$, so HA: $y = 1$.',
+      ],
+      reviewSection: 'Math tab — exponential transformation asymptote rule',
+    },
+    {
+      id: 'pc1-004-q5',
+      type: 'choice',
+      text: 'What is the domain of $f(x) = \\log_3(x - 4)$?',
+      options: ['All real numbers', '$x > 4$', '$x > 0$', '$x > -4$'],
+      answer: '$x > 4$',
+      hints: [
+        'Logarithm requires positive argument: $x - 4 > 0$.',
+        'Solve: $x > 4$.',
+      ],
+      reviewSection: 'Math tab — logarithm transformation asymptote rule',
+    },
+    {
+      id: 'pc1-004-q6',
+      type: 'input',
+      text: 'Condense into a single logarithm: $2\\ln x - \\ln y$.',
+      answer: 'ln(x^2/y)',
+      hints: [
+        'Power law in reverse: $2\\ln x = \\ln(x^2)$.',
+        'Quotient law: $\\ln(x^2) - \\ln y = \\ln(x^2/y)$.',
+      ],
+      reviewSection: 'Examples tab — expanding and condensing logarithms',
+    },
+    {
+      id: 'pc1-004-q7',
+      type: 'choice',
+      text: 'For $f(x) = \\dfrac{(x-1)(x+3)}{(x-1)(x-5)}$, what is at $x = 1$?',
+      options: ['Vertical asymptote', 'Hole', 'Zero', 'Nothing special'],
+      answer: 'Hole',
+      hints: [
+        'Factor $(x-1)$ appears in both numerator and denominator.',
+        'It cancels → removable discontinuity (hole). The function is undefined at $x=1$ but the limit exists.',
+      ],
+      reviewSection: 'Rigor tab — rational function sketch',
+    },
+    {
+      id: 'pc1-004-q8',
+      type: 'input',
+      text: 'A population doubles every 3 years. If $P(0) = 500$, write $P(t)$.',
+      answer: 'P(t) = 500 * 2^(t/3)',
+      hints: [
+        'Doubling model: $P(t) = P_0 \\cdot 2^{t/T}$ where $T$ is the doubling time.',
+        'Here $P_0 = 500$ and $T = 3$: $P(t) = 500 \\cdot 2^{t/3}$.',
+      ],
+      reviewSection: 'Intuition tab — exponentials and proportional growth',
+    },
+    {
+      id: 'pc1-004-q9',
+      type: 'choice',
+      text: 'Which is the correct factored form showing multiplicity for $f(x) = x^4 - 2x^3 + x^2$?',
+      options: [
+        '$x^2(x-1)^2$',
+        '$x^2(x^2-1)$',
+        '$x(x-1)^3$',
+        '$(x-1)^2(x+1)^2$',
+      ],
+      answer: '$x^2(x-1)^2$',
+      hints: [
+        'Factor out $x^2$: $x^4 - 2x^3 + x^2 = x^2(x^2 - 2x + 1)$.',
+        '$x^2 - 2x + 1 = (x-1)^2$. So $f(x) = x^2(x-1)^2$.',
+      ],
+      reviewSection: 'Examples tab — reading polynomial graphs from factored form',
+    },
+    {
+      id: 'pc1-004-q10',
+      type: 'choice',
+      text: 'Which log property justifies $\\ln(e^5) = 5$?',
+      options: [
+        'Product law',
+        'Quotient law',
+        'Power law',
+        'Change of base formula',
+      ],
+      answer: 'Power law',
+      hints: [
+        '$\\ln(e^5) = 5\\ln(e)$ by the power law.',
+        '$\\ln e = 1$ (since $e^1 = e$), so $5 \\cdot 1 = 5$.',
+      ],
+      reviewSection: 'Intuition tab — laws of logarithms',
     },
   ],
 }
