@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'If CSS handles all of the visual styling, what is the actual purpose of HTML tags?',
     realWorldContext: 'Search engines, screen readers, and programmatic scrapers do not "see" visual layouts. They only extract meaning directly from semantic HTML structures.',
-    previewVisualizationId: 'HTMLBuilderViz',
+    previewVisualizationId: 'WebLesson02_HTML',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'HTMLBuilderViz',
+        id: 'WebLesson02_HTML',
         title: 'Semantic Tree Builder',
         caption: 'Drag and drop HTML elements into the DOM tree and watch the structural meaning update live.',
         mathBridge: 'Step 1: Drag a <header> element into the root. Step 2: Nest a <nav> inside it. Notice how visual defaults appear. The key lesson: The structure creates innate grouping, visual quirks are just browser defaults.'

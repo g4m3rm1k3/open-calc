@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'Why did the entire web industry abandon manual `document.querySelector` manipulation for complex applications?',
     realWorldContext: 'Manually syncing a Javascript variable (State) with a DOM tag (View) generates immense bug surfaces. If state changes in 5 places, updating 5 disparate DOM nodes creates brittle entropy.',
-    previewVisualizationId: 'StateRerenderViz',
+    previewVisualizationId: 'WebLesson11_StateUI',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'StateRerenderViz',
+        id: 'WebLesson11_StateUI',
         title: 'State vs DOM Visualizer',
         caption: 'Compare a manual DOM mutation pipeline side-by-side with a state-driven reactive pipeline.',
         mathBridge: 'Step 1: Mutate the core array variable on the left. Step 2: Observe the state-driven pipeline automatically flush the DOM visually without manual query selectors. The key lesson: State implies Render.'

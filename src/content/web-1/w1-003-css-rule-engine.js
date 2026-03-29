@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'When two conflicting design rules target the exact same button, how does the browser mathematically decide which one wins?',
     realWorldContext: 'In massive production CSS architectures, styles clash. Understanding the deterministic "cascade" algorithm prevents brittle stylesheets and hours of debugging.',
-    previewVisualizationId: 'RuleResolverViz',
+    previewVisualizationId: 'WebLesson03_CSSCascade',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'RuleResolverViz',
+        id: 'WebLesson03_CSSCascade',
         title: 'The Cascade Resolver',
         caption: 'Watch competing CSS rules attempt to overwrite styles based on specificity weight.',
         mathBridge: 'Step 1: Increase the class rule specificity using the dynamic slider. Step 2: See the element instantaneously swap from red to blue as the formula algorithm flips. The key lesson: Specificity mathematically outranks execution order.'

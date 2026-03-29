@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How does a browser turn a flat text file into an interactive application interface?',
     realWorldContext: 'Every modern complex web application ultimately reduces to a mathematical tree of visual nodes called the Document Object Model (DOM).',
-    previewVisualizationId: 'DOMTreeVisualizer',
+    previewVisualizationId: 'WebLesson01_DOMTree',
   },
 
   intuition: {
@@ -35,7 +35,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'DOMTreeVisualizer',
+        id: 'WebLesson01_DOMTree',
         title: 'The Document Object Model (DOM)',
         caption: 'The left side represents the HTML structure as a tree of nodes, mapping to the rendered interface on the right.',
         mathBridge: 'Step 1: Hover over any node in the tree diagram. Notice how its boundaries highlight dynamically on the rendered page preview. The key lesson: Structure and visual layout are decoupled but mapped 1:1.'

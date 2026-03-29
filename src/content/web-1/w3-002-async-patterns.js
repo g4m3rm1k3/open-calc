@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How do you structure code when Step B relies entirely on Step A, but Step A takes exactly 2 unpredictable seconds to finish?',
     realWorldContext: 'Database queries, network requests, and cryptographic operations are inherently asynchronous. Badly structured async logic leads natively to "Callback Hell" and system fragility.',
-    previewVisualizationId: 'PromiseStateViz',
+    previewVisualizationId: 'WebLesson10_Async',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'PromiseStateViz',
+        id: 'WebLesson10_Async',
         title: 'Asynchronous Timeline',
         caption: 'Watch a Promise transition from Pending to Fulfilled along a timeline.',
         mathBridge: 'Step 1: Initiate the mock network request. Step 2: Observe the State switch and instantly trigger the `.then()` block downstream. The key lesson: A Promise is a persistent container for a future value.'

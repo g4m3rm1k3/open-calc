@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How does code know exactly when a user decides to finally press a hardware button after staring idly for ten minutes?',
     realWorldContext: 'Applications do not sit executing endlessly in a loop waiting for clicks; they sleep computationally until the foundational Browser Engine fires an "interrupt" signal through the hardware.',
-    previewVisualizationId: 'EventPipelineViz',
+    previewVisualizationId: 'WebLesson07_Events',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'EventPipelineViz',
+        id: 'WebLesson07_Events',
         title: 'The Event Flow Timeline',
         caption: 'Watch the user click generate an event object that gets piped into the handler function.',
         mathBridge: 'Step 1: Physically click the simulated button. Step 2: Watch the event object structure traverse down the DOM. The key lesson: Events propagate down and bubble up structurally, carrying precise interaction data.'

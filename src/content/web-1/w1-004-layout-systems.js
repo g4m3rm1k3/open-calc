@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How does an interface fluidly rearrange itself instantly without JS when a screen rotates?',
     realWorldContext: 'Modern responsive application scaffolding purely relies on deep internal C++ browser engines solving spatial CSS constraints natively via Flex and Grid algorithms.',
-    previewVisualizationId: 'FlexLayoutViz',
+    previewVisualizationId: 'WebLesson04_Layout',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'FlexLayoutViz',
+        id: 'WebLesson04_Layout',
         title: 'Flexbox Constraint Solver',
         caption: 'Toggle flex properties on containers and drag elements to see real-time layout recalculations.',
         mathBridge: 'Step 1: Enable the "Show invisible boxes" toggle to see the true boundaries. Step 2: Switch the flex direction axis constraint from row to column. The key lesson: Sibling boxes physically adapt natively according to inherited geometry parent limits.'

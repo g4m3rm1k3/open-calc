@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'If JavaScript can only do one thing at a time, how can it wait for a 5-second network response without freezing the entire browser?',
     realWorldContext: 'The Event Loop is the most misunderstood engine mechanic in JavaScript. Without it, the UI would lock up constantly whenever data is fetched or timers run.',
-    previewVisualizationId: 'EventLoopViz',
+    previewVisualizationId: 'WebLesson09_EventLoop',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'EventLoopViz',
+        id: 'WebLesson09_EventLoop',
         title: 'The Event Loop Animation',
         caption: 'Watch functions bounce between the Call Stack, Web APIs, and the Task Queue.',
         mathBridge: 'Step 1: Execute the asynchronous simulator block. Step 2: Notice the `setTimeout` callback bypass the immediate stack and wait in the queue. The key lesson: The queue dictates the execution timeline completely independent of the written code order.'

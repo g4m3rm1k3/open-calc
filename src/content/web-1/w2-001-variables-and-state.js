@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How does an application remember what a user clicked 5 seconds ago?',
     realWorldContext: 'Without state, an interface is purely amnesiac. State is the singular mathematical concept separating static posters from dynamic logic systems.',
-    previewVisualizationId: 'StateBoxesViz',
+    previewVisualizationId: 'WebLesson05_Variables',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'StateBoxesViz',
+        id: 'WebLesson05_Variables',
         title: 'Memory and State Transmutation',
         caption: 'Watch virtual memory addresses update in real time as variables are reassigned.',
         mathBridge: 'Step 1: Change the variable value in the input simulator. Step 2: Watch the physical UI update immediately downstream. The key lesson: The UI is inherently bound directly to the underlying raw logic state.'

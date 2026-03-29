@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How do you prevent a system from becoming a chaotic tangle of millions of line-by-line instructions?',
     realWorldContext: 'Engineering scales entirely through encapsulation. Functions wrap complex transformation algorithms into isolated black-box machines.',
-    previewVisualizationId: 'FunctionPipelineViz',
+    previewVisualizationId: 'WebLesson06_Functions',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'FunctionPipelineViz',
+        id: 'WebLesson06_Functions',
         title: 'The Function Machine',
         caption: 'Adjust the raw inputs and systematically watch the algorithm pipeline return novel outputs.',
         mathBridge: 'Step 1: Increase the parameter slider numerically. Step 2: Observe the block pipeline. The key lesson: A function operates blindly on strictly whatever is dropped into its scope.'

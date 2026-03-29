@@ -145,6 +145,18 @@ const VIZ_REGISTRY = {
   TaylorApproximation: lazy(() => import("./d3/TaylorApproximation.jsx")),
   ConvergenceViz: lazy(() => import("./d3/ConvergenceViz.jsx")),
   SeriesConvergenceLab: lazy(() => import("./d3/SeriesConvergenceLab.jsx")),
+  // Web Development Module
+  WebLesson01_DOMTree: lazy(() => import("./react/WebLesson01_DOMTree.jsx")),
+  WebLesson02_HTML: lazy(() => import("./react/WebLesson02_HTML.jsx")),
+  WebLesson03_CSSCascade: lazy(() => import("./react/WebLesson03_CSSCascade.jsx")),
+  WebLesson04_Layout: lazy(() => import("./react/WebLesson04_Layout.jsx")),
+  WebLesson05_Variables: lazy(() => import("./react/WebLesson05_Variables.jsx")),
+  WebLesson06_Functions: lazy(() => import("./react/WebLesson06_Functions.jsx")),
+  WebLesson07_Events: lazy(() => import("./react/WebLesson07_Events.jsx")),
+  WebLesson08_DOM: lazy(() => import("./react/WebLesson08_DOM.jsx")),
+  WebLesson09_EventLoop: lazy(() => import("./react/WebLesson09_EventLoop.jsx")),
+  WebLesson10_Async: lazy(() => import("./react/WebLesson10_Async.jsx")),
+  WebLesson11_StateUI: lazy(() => import("./react/WebLesson11_StateUI.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
   Ch2_1_LighthouseAngle: lazy(

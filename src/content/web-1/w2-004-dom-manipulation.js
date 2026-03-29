@@ -11,7 +11,7 @@ export default {
   hook: {
     question: 'How do pixels actually shift on the screen after you type into an input box?',
     realWorldContext: 'Nearly all physical UI lag and jank originates from unoptimized programmatic manipulation of the Document Object Model tree structure during animation ticks.',
-    previewVisualizationId: 'DOMDiffViz',
+    previewVisualizationId: 'WebLesson08_DOM',
   },
 
   intuition: {
@@ -30,7 +30,7 @@ export default {
     ],
     visualizations: [
       {
-        id: 'DOMDiffViz',
+        id: 'WebLesson08_DOM',
         title: 'Before/After DOM Diff Viewer',
         caption: 'Compare the live raw structural tree against a pending programmatic mutation before rendering occurs.',
         mathBridge: 'Step 1: Execute the simulated JavaScript function block. Step 2: Observe the tree difference highlight. The key lesson: JS mutates memory logic nodes; the browser internally handles the heavy graphics translation natively.'
