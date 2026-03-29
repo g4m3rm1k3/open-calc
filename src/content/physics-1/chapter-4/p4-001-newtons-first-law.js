@@ -4,249 +4,248 @@ export default {
   chapter: 'p4',
   order: 0,
   title: "Newton's First Law: Inertia",
-  subtitle: 'Objects in motion stay in motion — and objects at rest stay at rest — unless acted on by an unbalanced force.',
-  tags: ['newtons-laws', 'inertia', 'equilibrium', 'force', 'dynamics'],
+  subtitle: 'The natural state of an object is not rest — it is whatever it is already doing.',
+  tags: ['newtons-first-law', 'inertia', 'net-force', 'equilibrium', 'dynamics'],
 
   hook: {
-    question: 'Why do passengers lurch forward when a bus suddenly brakes — even though nothing pushed them forward?',
-    realWorldContext: "Every seatbelt, every spacecraft trajectory, and every magic tablecloth trick exploits Newton's First Law. Before Newton, Aristotle convinced nearly everyone that objects naturally slow down and stop — that motion requires a continuous push. Newton (and Galileo before him) showed this was completely backwards. Understanding WHY objects keep moving is the foundation of all dynamics.",
-    previewVisualizationId: 'InertiaIntuition',
+    question: 'A hockey puck sliding on ice gradually slows to a stop. Aristotle used this as proof that objects need a continuous force to keep moving. Newton showed this reasoning was exactly backwards. Who is right, and how do we know?',
+    realWorldContext: "For two thousand years, the most respected answer to 'why do things move?' came from Aristotle: objects move because something pushes them, and when the pushing stops, they stop. This felt obviously true — push a book across a table, let go, it stops. Push a cart, let go, it stops. It took Galileo's experiments and Newton's genius to reveal the hidden variable Aristotle missed: friction. Strip friction away, and objects keep moving forever. That insight — the natural state of motion is constant velocity, not rest — overturned two millennia of physics and made the modern world possible.",
+    previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'kinematic-chain' },
   },
 
   intuition: {
     prose: [
-      "Aristotle's view: a moving object eventually stops because 'motion requires a mover.' This seemed obvious — push a box, it slides, then stops. The problem is that Aristotle was explaining friction, not motion itself.",
-      "Galileo's insight (polished surfaces, reduced friction): the LESS friction you have, the FARTHER an object travels before stopping. Extrapolate to zero friction — the object never stops. Motion is the natural state, not rest.",
-      "Newton formalized this: in the absence of a net force, an object's velocity vector remains constant. Constant velocity means constant speed AND constant direction. Any change in either — speeding up, slowing down, or turning — requires a net force.",
-      "Inertia is the property of matter that resists changes to velocity. More mass = more inertia = harder to accelerate or decelerate. A loaded freight train is nearly impossible to stop quickly; a ping-pong ball stops almost instantly.",
+      "**Where you are in the story.** In Chapters 2 and 3, you built a complete toolkit for describing motion: position x(t), velocity v(t), acceleration a(t), the SUVAT equations, projectile motion, circular motion. You could answer every question of the form 'given this acceleration, where does the object end up?' But there was always a variable you accepted without explanation — the acceleration itself. You were told a = 9.8 m/s² downward or a = 5 m/s² to the right and you used it. Chapter 4 asks the deeper question: where does acceleration come from? What causes it? This is the shift from kinematics (describing motion) to dynamics (explaining motion). The answer is Newton's three laws, and this lesson is the first.",
+
+      "**Aristotle's theory — and why it seemed bulletproof.** Push a book across a table. The moment you stop pushing, the book stops moving. Push a cart. The moment your hand leaves it, the cart slows and stops. Aristotle saw this pattern and concluded: motion requires a continuously applied force. Rest is the natural state. Objects return to rest when the force is removed. For over two thousand years this was accepted physics, and it was hard to argue with — you could test it a hundred times and it always seemed true. The problem was not with his observations. The problem was with what he was not observing.",
+
+      "**Galileo's thought experiment: strip away the hidden variable.** Around 1600, Galileo noticed something: a ball rolling on a rough surface stops quickly, but on a smoother surface it rolls much farther before stopping. On a smoother surface still, it goes even farther. He proposed a thought experiment: what if you could make a surface perfectly smooth — perfectly frictionless? The ball would never stop. It would roll forever at constant speed. The thing Aristotle was observing — objects stopping — was not evidence of a natural tendency toward rest. It was evidence that friction is everywhere, slowing everything down. Aristotle mistook the effect of friction for the nature of matter.",
+
+      "**Newton's First Law, precisely stated.** Newton synthesized Galileo's insight into a law: an object at rest remains at rest, and an object in motion remains in motion at constant velocity, unless acted upon by a net external force. The critical phrase is net external force — the vector sum of all forces acting on the object. If that sum is zero, the acceleration is zero, and velocity stays constant (including zero as a special case). The law does not say 'no forces.' It says 'no net force.' A book resting on a table has two forces acting on it: gravity pulling down and the table pushing up. Both are real forces. But they cancel — net force is zero — so the book doesn't accelerate.",
+
+      "**Inertia: resistance to change, not resistance to motion.** The word inertia comes from Latin for 'laziness' or 'idleness,' but it doesn't mean what it sounds like. Inertia is not resistance to moving — it is resistance to changing. A bowling ball at rest resists being kicked into motion. That same bowling ball, once rolling toward you at 5 m/s, resists being stopped just as stubbornly. It is the exact same property — it resists any change in velocity, whether that means starting, stopping, speeding up, slowing down, or turning. Mass is the quantitative measure of inertia: the more mass, the harder it is to change the state of motion. A 200 kg boulder and a 2 kg ball at rest look the same in terms of velocity (both zero), but they have very different resistances to being accelerated.",
+
+      "**Why this is philosophically deep.** Newton's First Law does something radical: it says rest and constant motion are the same thing. A spacecraft coasting through interstellar space — no engines, no friction, billions of kilometers from anything — is in exactly the same physical situation as a spacecraft sitting on a launch pad. Neither is accelerating. Neither requires any net force. They differ only in what velocity they happen to have. This equivalence between 'at rest' and 'moving at constant velocity' was the seed of Einstein's special relativity three centuries later, which proved that there is no experiment you can do inside a closed box to determine whether you are at rest or moving at constant velocity. Newton planted that idea here.",
+
+      "**Where this is heading.** The First Law answers: when is acceleration zero? When net force is zero. But it raises the obvious next question: when there IS a net force, how much acceleration results? The Second Law — the most important equation in classical mechanics — answers this precisely. It is the subject of the next lesson.",
     ],
     callouts: [
       {
-        type: 'definition',
-        title: "Newton's First Law (Law of Inertia)",
-        body: "An object at rest remains at rest, and an object in motion remains in motion at constant velocity, unless acted upon by a net external force.",
-      },
-      {
-        type: 'definition',
-        title: 'Inertia',
-        body: "The tendency of an object to resist any change in its state of motion. Inertia is measured by mass — the more massive the object, the greater its inertia.",
+        type: 'sequencing',
+        title: 'Lesson 1 of 9 — The Turn from Kinematics to Dynamics',
+        body: "**Chapters 0–3 (Kinematics):** How things move — position, velocity, acceleration, SUVAT, projectiles, circular motion.\n**Chapter 4 (Dynamics, this chapter):** Why things move — forces, Newton's three laws, friction, inclined planes, pulleys.\n**This lesson:** The First Law establishes the baseline — no net force means no acceleration.\n**Next lesson:** The Second Law — when net force IS present, how large is the resulting acceleration?",
       },
       {
         type: 'insight',
-        title: 'Aristotle vs. Newton',
-        body: "Aristotle: objects naturally come to rest. Newton: objects naturally MAINTAIN their motion. Friction is the force that stops objects on Earth — remove it, and motion continues forever.",
+        title: "Newton's First Law",
+        body: "An object remains at rest or moves at **constant velocity** unless acted upon by a **net external force** (\\(\\sum \\vec{F} \\neq 0\\)).\n\nEquivalently: \\(\\sum \\vec{F} = 0 \\iff \\vec{a} = 0\\)",
       },
       {
-        type: 'insight',
-        title: 'What is an inertial reference frame?',
-        body: "Newton's First Law defines an inertial reference frame: any frame where an object with no net force moves at constant velocity. A non-accelerating lab is inertial; an accelerating car is not.",
+        type: 'warning',
+        title: "Inertia ≠ Tendency to Stop",
+        body: "Aristotle confused friction with inertia. Inertia resists **any change** in velocity — starting, stopping, or turning. A bowling ball rolling at 5 m/s has the same inertia as when it was at rest. The inertia that resisted starting is the same inertia that resists stopping.",
+      },
+      {
+        type: 'connection',
+        title: 'Calculus connection: zero net force → linear x(t)',
+        body: "\\(\\sum F = 0 \\Rightarrow a = \\dfrac{d^2x}{dt^2} = 0 \\Rightarrow v = \\text{const} \\Rightarrow x(t) = x_0 + v_0 t\\)\n\nZero net force makes position a **linear** function of time. A straight line on an x-t graph is always a signature of zero net force — and therefore of Newton's First Law.",
       },
     ],
     visualizations: [
       {
         id: 'SVGDiagram',
-        props: { type: 'inertia-objects' },
-        title: 'Objects in deep space with no net force',
-        caption: "Far from all gravitational sources, these objects travel in perfectly straight lines at constant speed indefinitely. There is nothing to slow them down, speed them up, or change their direction — Newton's First Law in its purest form.",
-      },
-      {
-        id: 'InertiaIntuition',
-        title: 'Seatbelt scenario: sudden deceleration',
-        mathBridge: 'When the car decelerates, the passenger continues forward at the original velocity v₀ until the seatbelt exerts a backward force. Without the belt, the passenger would continue at v₀ — First Law in action.',
-        caption: "The passenger is not 'thrown forward' — they simply continue at the speed they had before braking. The car stops; the passenger (without a seatbelt) does not.",
+        props: { type: 'kinematic-chain' },
+        title: 'Kinematics to Dynamics: what drives acceleration?',
+        mathBridge: "You have used this chain before: position → velocity → acceleration. In Chapters 2–3, you moved left-to-right — given x(t), differentiate to get v(t), differentiate again to get a(t). Chapter 4 reverses the question: what determines a(t)? Newton's First Law answers the zero-force case: if net force is zero, a = 0, and everything to the left stays constant. Look at the chain and ask: for a block sliding on a frictionless surface with no applied force, what are x(t), v(t), and a(t) doing? Position grows linearly, velocity is constant, acceleration is zero. That is the First Law expressed in kinematics language.",
+        caption: "The chain x → v → a. Newton's laws explain what controls acceleration — the rightmost quantity and the root cause of all motion change.",
       },
     ],
   },
 
   math: {
     prose: [
-      "The mathematical content of the First Law is clean: if ΣF = 0, then a = 0, and therefore v = constant. In the absence of net force, velocity does not change.",
-      "For position: if v = v₀ = constant, then integrating once gives x(t) = x₀ + v₀t. This is a linear function of time — a straight line on an x-t graph. The slope IS the (constant) velocity.",
-      "This is the simplest possible kinematics case: uniform motion. Every more-complex case (acceleration, changing forces) builds on this base by adding nonzero net forces.",
+      "The First Law simultaneously defines what we mean by an inertial reference frame and makes a physical claim about what happens in one. An inertial frame is a frame of reference in which a free object (no net force) moves in a straight line at constant speed. The surface of the Earth is approximately inertial for most problems — the rotation of the Earth introduces tiny fictitious forces (Coriolis, centrifugal) that are negligible for lab-scale experiments but matter for long-range projectiles and weather systems.",
+
+      "The condition for equilibrium is ΣF = 0, a vector equation. In 2D problems it means both ΣFₓ = 0 and ΣFᵧ = 0 independently. An object is in mechanical equilibrium if and only if its acceleration is zero — which includes both objects at rest and objects moving at constant velocity. These two cases are physically indistinguishable from the perspective of forces.",
+
+      "Mass is the measure of inertia. It tells you how hard it is to change an object's velocity. The SI unit is the kilogram (kg). Mass is a scalar, always positive, and the same everywhere in the universe — your mass is identical on Earth, on the Moon, and in deep space. This is different from weight, which is a force (W = mg) and changes with the local gravitational field strength g. On the Moon, g ≈ 1.6 m/s², so your weight is about one-sixth of what it is on Earth. Your mass is unchanged.",
     ],
-    callouts: [
+    keyFormulas: [
       {
-        type: 'theorem',
-        title: 'First Law in equations',
-        body: '\\sum \\vec{F} = 0 \\quad\\Rightarrow\\quad \\vec{a} = 0 \\quad\\Rightarrow\\quad \\vec{v} = \\vec{v}_0 = \\text{constant}',
+        label: 'Equilibrium condition',
+        formula: '\\sum \\vec{F} = 0 \\implies \\vec{a} = 0 \\implies \\vec{v} = \\vec{v}_0 = \\text{const}',
+        note: 'Both the vector sum and each component separately must be zero.',
       },
       {
-        type: 'theorem',
-        title: 'Position under constant velocity',
-        body: 'x(t) = x_0 + v_0 t \\qquad \\text{(linear in time when } a = 0\\text{)}',
-      },
-      {
-        type: 'insight',
-        title: 'Balanced forces ≠ no forces',
-        body: "An object can have many forces acting on it and still be in First Law conditions — as long as they sum to zero (balanced). A book on a table has gravity pulling down and the normal force pushing up; ΣF = 0, so the book doesn't accelerate.",
+        label: 'Component form',
+        formula: '\\sum F_x = 0 \\quad \\text{and} \\quad \\sum F_y = 0',
+        note: 'Both conditions must hold simultaneously.',
       },
     ],
-    visualizations: [],
   },
 
   rigor: {
-    prose: [
-      "The First Law is both a physical statement and a definition. Physically, it asserts that all isolated objects (no external forces) maintain constant velocity — this has been confirmed to extraordinary precision in particle physics and space missions.",
-      "Mathematically, 'no net force' means ΣF = 0. From Newton's Second Law (F = ma), this gives a = 0. Zero acceleration means dv/dt = 0, so v is constant with respect to time.",
-      "Integrating dv/dt = 0 once: v(t) = C₁ = v₀. Integrating the velocity equation dx/dt = v₀: x(t) = v₀t + C₂ = x₀ + v₀t. This is a linear function — the position graph is a straight line with slope v₀.",
-      "Calculus connection: the First Law says that when ΣF = 0, the second derivative of position is zero (d²x/dt² = 0). The general solution to d²x/dt² = 0 is a first-degree polynomial: x(t) = x₀ + v₀t. Constant velocity IS the solution to a zero-force differential equation.",
-    ],
-    callouts: [
+    title: 'The First Law as a definition of inertial frames',
+    content: [
       {
-        type: 'theorem',
-        title: 'Derivation from zero-force condition',
-        body: '\\frac{d^2x}{dt^2} = \\frac{a}{1} = \\frac{\\sum F}{m} = 0 \\quad\\Rightarrow\\quad \\frac{dx}{dt} = v_0 \\quad\\Rightarrow\\quad x(t) = x_0 + v_0 t',
+        type: 'paragraph',
+        text: "Newton's First Law is not just a physical claim — it is the definition of the class of reference frames in which Newton's laws hold. An inertial frame is one in which a free particle (zero net force) travels in a straight line at constant velocity. Non-inertial frames — rotating platforms, accelerating cars, the inside of a rocket under thrust — are frames where objects appear to accelerate even with no real force acting. In those frames, you must introduce fictitious forces (centrifugal, Coriolis, Euler) to make Newton's equations work. All the mechanics in this course assumes an inertial frame unless stated otherwise.",
+      },
+      {
+        type: 'derivation',
+        steps: [
+          { expression: "\\text{Assume: } \\sum \\vec{F} = 0 \\text{ (no net force on object)}", annotation: "Starting condition: First Law applies" },
+          { expression: "\\sum \\vec{F} = m\\vec{a} = 0 \\implies \\vec{a} = 0", annotation: "Using the Second Law to formalize: zero net force → zero acceleration" },
+          { expression: "\\vec{a} = \\frac{d\\vec{v}}{dt} = 0 \\implies \\vec{v} = \\vec{v}_0 = \\text{const}", annotation: "Integrate: constant acceleration of zero gives constant velocity" },
+          { expression: "x(t) = x_0 + v_0 t", annotation: "Integrate again: position is a linear function of time" },
+          { expression: "\\text{x-t graph: straight line with slope } v_0", annotation: "Observable prediction: any deviation from a straight line indicates net force" },
+        ],
+        answer: "The First Law predicts a straight-line x-t graph whenever net force is zero. Any curve on an x-t graph — any non-constant slope — signals that a net force is acting and the Second Law takes over.",
       },
     ],
     visualizationId: 'InertiaDerivation',
-    proofSteps: [
-      {
-        title: 'Assume no net force',
-        expression: '\\sum \\vec{F} = 0',
-        annotation: 'Either no forces act, or all forces cancel (vector sum is zero).',
-      },
-      {
-        title: "Apply Newton's Second Law",
-        expression: '\\vec{a} = \\frac{\\sum \\vec{F}}{m} = \\frac{0}{m} = 0',
-        annotation: 'If net force is zero, acceleration is zero regardless of mass.',
-      },
-      {
-        title: 'Integrate acceleration to get velocity',
-        expression: '\\vec{v}(t) = \\int \\vec{a}\\,dt = \\int 0\\,dt = \\vec{v}_0',
-        annotation: 'Velocity is constant — equal to whatever it was at t = 0.',
-      },
-      {
-        title: 'Integrate velocity to get position',
-        expression: 'x(t) = \\int v_0\\,dt = x_0 + v_0 t',
-        annotation: 'Position is a linear function of time. The x-t graph is a straight line.',
-      },
-      {
-        title: 'Conclusion',
-        expression: '\\text{If } \\sum F = 0: \\quad x(t) = x_0 + v_0 t, \\quad v = v_0, \\quad a = 0',
-        annotation: 'Constant velocity is the unique motion when no net force acts.',
-      },
-    ],
-    title: "Derivation: First Law from the calculus of Newton's Second Law",
-    visualizations: [
-      {
-        id: 'InertiaDerivation',
-        title: 'From zero force to linear position',
-        mathBridge: 'Setting d²x/dt² = 0 and integrating twice yields the linear position equation x(t) = x₀ + v₀t. The First Law is the zero-force special case of the Second Law.',
-        caption: 'Zero second derivative → linear function. This is the calculus foundation of inertia.',
-      },
-    ],
   },
 
-  examples: [
+  checkpoints: [
+    { id: 'p4-001-cp1', question: "A box slides on a frictionless floor at 4 m/s with no applied force. What is its acceleration?", answer: "0 m/s² — zero net force, so zero acceleration (First Law)." },
+    { id: 'p4-001-cp2', question: "Two forces act on a block: 10 N east and 10 N west. Is the block in equilibrium? What is its acceleration?", answer: "Yes — ΣF = 0, so a = 0 and velocity is constant." },
+    { id: 'p4-001-cp3', question: "A spacecraft far from all planets has engines off and moves at 2000 m/s. What happens to its speed over the next hour?", answer: "It stays at 2000 m/s — no net force means constant velocity." },
+  ],
+
+  quiz: [
     {
-      id: 'ch4-001-ex1',
-      title: 'Spacecraft in deep space',
-      problem: 'A spacecraft traveling at 3000 m/s fires its engines briefly to escape a planet, then shuts them off. Far from all gravitational sources, no forces act on it. Describe its motion for the next 10 hours.',
-      steps: [
-        {
-          expression: '\\sum \\vec{F} = 0 \\quad \\text{(engines off, deep space)}',
-          annotation: 'No thrust, no gravity — the net force is exactly zero.',
-        },
-        {
-          expression: '\\vec{a} = 0 \\quad\\Rightarrow\\quad \\vec{v} = 3000\\,\\text{m/s} = \\text{constant}',
-          annotation: "By Newton's First Law, velocity remains constant at 3000 m/s.",
-        },
-        {
-          expression: 'd = v \\cdot t = 3000\\,\\frac{\\text{m}}{\\text{s}} \\times (10 \\times 3600\\,\\text{s}) = 1.08 \\times 10^8\\,\\text{m}',
-          annotation: 'Convert 10 hours to seconds, multiply by constant speed.',
-        },
+      id: 'p4-001-q1',
+      type: 'choice',
+      text: "Aristotle believed objects in motion naturally slow down and stop. What was the key flaw in his reasoning?",
+      options: [
+        "He forgot that mass increases with speed",
+        "He did not account for friction — friction stops objects, not their natural tendency",
+        "He used the wrong units for force",
+        "He only studied objects in water",
       ],
-      conclusion: 'The spacecraft travels 108,000 km in a perfectly straight line at exactly 3000 m/s — no fuel required. Voyager 1 does exactly this in the space between star systems.',
+      answer: "He did not account for friction — friction stops objects, not their natural tendency",
+      hints: ["Galileo's thought experiment: what happens on a perfectly frictionless surface?"],
+      reviewSection: "Galileo's Thought Experiment",
     },
     {
-      id: 'ch4-001-ex2',
-      title: 'Book on a table — identifying balanced forces',
-      problem: 'A 2 kg textbook sits motionless on a horizontal table. Identify all forces acting on it, determine whether they are balanced, and justify using Newton\'s First Law. Use g = 10 m/s².',
-      steps: [
-        {
-          expression: 'W = mg = 2 \\times 10 = 20\\,\\text{N}\\;(\\text{downward})',
-          annotation: "Weight: Earth's gravitational pull on the book.",
-        },
-        {
-          expression: 'N = 20\\,\\text{N}\\;(\\text{upward})',
-          annotation: "Normal force from the table surface — Newton's Third Law response to the book pressing on the table.",
-        },
-        {
-          expression: '\\sum F_y = N - W = 20 - 20 = 0\\,\\text{N}',
-          annotation: 'Net vertical force is zero. No horizontal forces act.',
-        },
-        {
-          expression: '\\sum \\vec{F} = 0 \\quad\\Rightarrow\\quad a = 0',
-          annotation: "By Newton's First Law, the book remains at rest. This is consistent with observation.",
-        },
+      id: 'p4-001-q2',
+      type: 'choice',
+      text: "A hockey puck slides on frictionless ice at constant velocity. Which statement is correct?",
+      options: [
+        "A net force must be acting to keep it moving",
+        "No net force acts on it — it moves at constant velocity by the First Law",
+        "Gravity is the net force keeping it on the ice",
+        "The puck will eventually stop because all objects return to rest",
       ],
-      conclusion: "The book has two forces acting on it (weight down, normal up) that are equal and opposite, giving ΣF = 0. Newton's First Law predicts zero acceleration — exactly what we observe.",
+      answer: "No net force acts on it — it moves at constant velocity by the First Law",
+      hints: ["Constant velocity ↔ zero net force. That is the First Law."],
+      reviewSection: "Newton's First Law, Precisely Stated",
+    },
+    {
+      id: 'p4-001-q3',
+      type: 'choice',
+      text: "A 200 kg boulder and a 2 kg ball are both at rest. Which requires more force to accelerate at 1 m/s²?",
+      options: [
+        "The ball, because it is lighter",
+        "The boulder, because it has more inertia",
+        "Both require the same force",
+        "Neither requires force — they will start moving on their own",
+      ],
+      answer: "The boulder, because it has more inertia",
+      hints: ["Inertia = resistance to acceleration. Mass is the measure of inertia."],
+      reviewSection: "Inertia: Resistance to Change",
+    },
+    {
+      id: 'p4-001-q4',
+      type: 'choice',
+      text: "Two forces act on an object: 15 N north and 15 N south. What is the acceleration?",
+      options: ["30 m/s² north", "15 m/s² south", "0 m/s² — the forces cancel", "Cannot be determined without the mass"],
+      answer: "0 m/s² — the forces cancel",
+      hints: ["Net force = vector sum. Equal and opposite forces give ΣF = 0."],
+      reviewSection: "Newton's First Law, Precisely Stated",
+    },
+    {
+      id: 'p4-001-q5',
+      type: 'choice',
+      text: "In calculus terms, if net force is zero then position x(t) is:",
+      options: [
+        "A constant function (object doesn't move)",
+        "A linear function of t — a straight line on the x-t graph",
+        "A quadratic — a parabola on the x-t graph",
+        "An exponential function",
+      ],
+      answer: "A linear function of t — a straight line on the x-t graph",
+      hints: ["a = d²x/dt² = 0. Integrate twice: v = const, x = x₀ + v₀t."],
+      reviewSection: "Calculus Connection",
+    },
+    {
+      id: 'p4-001-q6',
+      type: 'input',
+      text: "A 5 kg block moves at 3 m/s on a frictionless surface. Three seconds later, what is its speed? (in m/s)",
+      answer: "3",
+      hints: ["No friction = no net force = no acceleration = constant velocity."],
+      reviewSection: "Newton's First Law, Precisely Stated",
+    },
+    {
+      id: 'p4-001-q7',
+      type: 'choice',
+      text: "Which is NOT an example of inertia?",
+      options: [
+        "A passenger lurching forward when a car brakes suddenly",
+        "A tablecloth pulled from under dishes (dishes stay put)",
+        "A ball slowing because of air resistance",
+        "A spacecraft coasting at constant speed with engines off",
+      ],
+      answer: "A ball slowing because of air resistance",
+      hints: ["Air resistance is an external force causing change — that is the opposite of inertia."],
+      reviewSection: "Inertia: Resistance to Change",
+    },
+    {
+      id: 'p4-001-q8',
+      type: 'choice',
+      text: "A book rests on a table. Gravity pulls it down (10 N) and the table pushes up (10 N). Which law explains why it doesn't accelerate?",
+      options: [
+        "Third Law — gravity and normal force are action-reaction pairs",
+        "First Law — ΣF = 0, so a = 0",
+        "Second Law — since a = 0, we conclude F = 0",
+        "Newton's laws don't apply to objects at rest",
+      ],
+      answer: "First Law — ΣF = 0, so a = 0",
+      hints: ["The book is in equilibrium. ΣF = 0 → a = 0. First Law."],
+      reviewSection: "Newton's First Law, Precisely Stated",
+    },
+    {
+      id: 'p4-001-q9',
+      type: 'choice',
+      text: "An inertial reference frame is defined as:",
+      options: [
+        "Any frame that is at rest",
+        "Any frame attached to the Earth's surface",
+        "A frame in which Newton's First Law holds — a free particle moves at constant velocity",
+        "A frame with no gravity",
+      ],
+      answer: "A frame in which Newton's First Law holds — a free particle moves at constant velocity",
+      hints: ["See the Rigor section on inertial frames."],
+      reviewSection: "The Rigor Section",
+    },
+    {
+      id: 'p4-001-q10',
+      type: 'choice',
+      text: "You push a 10 kg box at constant velocity across a floor. What must be true about the applied force?",
+      options: [
+        "The applied force is greater than friction",
+        "The applied force equals friction exactly — ΣF = 0",
+        "No force is needed to maintain constant velocity",
+        "The applied force equals mg = 98 N",
+      ],
+      answer: "The applied force equals friction exactly — ΣF = 0",
+      hints: ["Constant velocity → a = 0 → ΣF = 0. Your push exactly cancels friction."],
+      reviewSection: "Newton's First Law, Precisely Stated",
     },
   ],
 
-  challenges: [
-    {
-      id: 'ch4-001-ch1',
-      difficulty: 'easy',
-      problem: 'A hockey puck slides on frictionless ice at 8 m/s. What is its speed after 5 seconds? What is its acceleration? How far does it travel in 5 s?',
-      hint: 'On frictionless ice, what is the net force? Apply the First Law.',
-      walkthrough: [
-        {
-          expression: '\\sum F = 0 \\quad\\Rightarrow\\quad a = 0',
-          annotation: 'No friction, no air resistance — net force is zero.',
-        },
-        {
-          expression: 'v = 8\\,\\text{m/s} \\;(\\text{unchanged}), \\quad a = 0\\,\\text{m/s}^2',
-          annotation: 'Velocity stays constant at 8 m/s by the First Law.',
-        },
-        {
-          expression: 'd = v_0 t = 8 \\times 5 = 40\\,\\text{m}',
-          annotation: 'Uniform motion: distance = constant speed × time.',
-        },
-      ],
-      answer: 'Speed = 8 m/s (unchanged), acceleration = 0 m/s², distance = 40 m.',
-    },
-    {
-      id: 'ch4-001-ch2',
-      difficulty: 'medium',
-      problem: "A 5 kg box sits on a table. Someone pushes it horizontally with 20 N but it doesn't move. (a) What is the net force on the box? (b) What is the friction force? (c) Is the box in First Law conditions?",
-      hint: "If the box doesn't accelerate, what must ΣF equal? Use that to find friction.",
-      walkthrough: [
-        {
-          expression: 'a = 0 \\;(\\text{box stationary}) \\quad\\Rightarrow\\quad \\sum F = ma = 0',
-          annotation: "Zero acceleration means zero net force, by Newton's Second Law.",
-        },
-        {
-          expression: 'F_{\\text{push}} + F_{\\text{friction}} = 0 \\quad\\Rightarrow\\quad F_{\\text{friction}} = -20\\,\\text{N}',
-          annotation: 'Static friction exactly cancels the applied push. It equals 20 N backward.',
-        },
-        {
-          expression: '\\sum F = 0 \\quad\\Rightarrow\\quad \\text{Yes, the box is in First Law (equilibrium) conditions}',
-          annotation: 'Multiple forces act, but they balance. First Law applies.',
-        },
-      ],
-      answer: 'Net force = 0 N, friction force = 20 N (opposing push), yes the box is in First Law equilibrium.',
-    },
-    {
-      id: 'ch4-001-ch3',
-      difficulty: 'hard',
-      problem: "An object at position x₀ = 5 m has velocity v₀ = −3 m/s (moving left). No net force acts. Write x(t), find when it crosses x = 0, and identify what the x-t graph looks like.",
-      hint: 'Use x(t) = x₀ + v₀t with the given values. Set x = 0 and solve for t.',
-      walkthrough: [
-        {
-          expression: 'x(t) = x_0 + v_0 t = 5 + (-3)t = 5 - 3t',
-          annotation: 'Linear position equation — valid because a = 0 (no net force).',
-        },
-        {
-          expression: '0 = 5 - 3t \\quad\\Rightarrow\\quad t = \\tfrac{5}{3} \\approx 1.67\\,\\text{s}',
-          annotation: 'Set x = 0 and solve. The object crosses the origin at t ≈ 1.67 s.',
-        },
-        {
-          expression: '\\text{x-t graph: straight line, slope} = v_0 = -3\\,\\text{m/s, y-intercept} = 5\\,\\text{m}',
-          annotation: 'Zero acceleration → linear (not parabolic) position graph.',
-        },
-      ],
-      answer: 'x(t) = 5 − 3t; crosses x = 0 at t = 5/3 ≈ 1.67 s; the x-t graph is a downward-sloping straight line.',
-    },
+  viz: [
+    { id: 'SVGDiagram', props: { type: 'kinematic-chain' }, title: 'The kinematics chain — forces drive acceleration' },
   ],
 }
