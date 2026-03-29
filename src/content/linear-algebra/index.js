@@ -1,6 +1,7 @@
 import la1_001 from './la1-001-vectors.js';
 import la1_002 from './la1-002-linear-combinations.js';
 import la1_003 from './la1-003-dot-and-cross-products.js';
+import la1_004 from './la1-004-systems-of-equations.js';
 
 import la2_001 from './la2-001-matrices-as-transformations.js';
 import la2_002 from './la2-002-matrix-multiplication.js';
@@ -12,7 +13,9 @@ import la3_002 from './la3-002-diagonalization.js';
 import la3_003 from './la3-003-complex-eigenvalues.js';
 
 import la4_001 from './la4-001-orthogonal-projections.js';
-import la4_002 from './la4-002-svd.js';
+import la4_002 from './la4-002-gram-schmidt.js';
+import la4_003 from './la4-003-least-squares.js';
+import la4_004 from './la4-002-svd.js';
 
 // Phase 1: Vectors & Spaces
 const LA1 = {
@@ -22,7 +25,8 @@ const LA1 = {
   lessons: [
     la1_001,
     la1_002,
-    la1_003
+    la1_003,
+    la1_004,
   ],
 };
 
@@ -35,7 +39,7 @@ const LA2 = {
     la2_001,
     la2_002,
     la2_003,
-    la2_004
+    la2_004,
   ],
 };
 
@@ -47,7 +51,7 @@ const LA3 = {
   lessons: [
     la3_001,
     la3_002,
-    la3_003
+    la3_003,
   ],
 };
 
@@ -58,7 +62,9 @@ const LA4 = {
   slug: 'advanced-projections-svd',
   lessons: [
     la4_001,
-    la4_002
+    la4_002,
+    la4_003,
+    la4_004,
   ],
 };
 
