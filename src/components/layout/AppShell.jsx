@@ -158,10 +158,6 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
            <span className="text-sm font-bold text-slate-500">DSA</span>
            <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
         </div>
-        <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
-           <span className="text-sm font-bold text-slate-500">Linear Algebra</span>
-           <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
-        </div>
       </nav>
 
       <div className="flex-1 lg:hidden" />
