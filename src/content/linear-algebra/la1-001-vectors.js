@@ -13,7 +13,7 @@ export default {
   hook: {
     question: "How do we mathematically describe both the speed and direction of a moving object at the same time?",
     realWorldContext: "When a pilot calculates the flight path of an airplane, they must account for the plane's velocity (speed and direction) and the wind's velocity (speed and direction). A single number (like '500 mph') is not enough to predict where the plane will end up. We need a mathematical object that can stretch across space and point specifically toward a target. In modern AI, vectors represent meaning: the word 'king' and the word 'queen' are represented as lists of numbers in a high-dimensional space, and the distance between them mathematically captures their linguistic relationship. Vectors are the universal language for things that have multiple dimensions.",
-    previewVisualizationId: 'LALesson01_Vectors',
+    previewVisualizationId: 'LALesson11_OrthogonalProjections',
   },
 
   // ── Intuition ──────────────────────────────────────────────────
@@ -45,6 +45,12 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'LALesson11_OrthogonalProjections',
+        title: 'The Geometric Engine of Linear Algebra',
+        mathBridge: 'Before we dive into what vectors are, see the absolute geometric pinnacle: the Orthogonal Projection. Every vector can be decomposed into a shadow and a perpendicular. This is the core engine of everything you are about to study.',
+        caption: 'A teaser of the projection mechanics you will master in Phase 4.',
+      },
       {
         id: 'LALesson01_Vectors',
         title: 'Vector Components',

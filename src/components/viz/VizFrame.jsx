@@ -176,7 +176,7 @@ const VIZ_REGISTRY = {
   LALesson08_Eigen: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   LALesson09_Diagonalization: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   LALesson10_ComplexEigen: lazy(() => import("./react/LALesson_Placeholder.jsx")),
-  LALesson11_OrthogonalProjections: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  LALesson11_OrthogonalProjections: lazy(() => import("./react/LALesson11_OrthogonalProjectionsFull.jsx")),
   LALesson12_SVD: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
