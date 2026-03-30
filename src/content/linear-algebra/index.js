@@ -16,6 +16,7 @@ import la4_001 from './la4-001-orthogonal-projections.js';
 import la4_002 from './la4-002-gram-schmidt.js';
 import la4_003 from './la4-003-least-squares.js';
 import la4_004 from './la4-002-svd.js';
+import la_sandbox from './la-sandbox.js';
 
 // Phase 1: Vectors & Spaces
 const LA1 = {
@@ -68,4 +69,14 @@ const LA4 = {
   ],
 };
 
-export default [LA1, LA2, LA3, LA4];
+// Phase 5: Python Lab
+const LA5 = {
+  title: 'Python in the Browser',
+  number: 'la5',
+  slug: 'python-in-the-browser',
+  lessons: [
+    la_sandbox,
+  ],
+};
+
+export default [LA1, LA2, LA3, LA4, LA5];

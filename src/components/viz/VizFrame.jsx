@@ -178,6 +178,7 @@ const VIZ_REGISTRY = {
   LALesson10_ComplexEigen: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   LALesson11_OrthogonalProjections: lazy(() => import("./react/LALesson11_OrthogonalProjectionsFull.jsx")),
   LALesson12_SVD: lazy(() => import("./react/LALesson_Placeholder.jsx")),
+  PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
   Ch2_1_LighthouseAngle: lazy(

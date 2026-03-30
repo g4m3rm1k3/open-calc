@@ -13,8 +13,10 @@ import { useProgress } from '../../hooks/useProgress.js'
 import GrapherContext from '../../context/GrapherContext.jsx'
 import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X, Calculator } from 'lucide-react'
 import TICalc from '../calculator/TICalc.jsx'
-import { motion, AnimatePresence } from 'framer-motion'
 import MobileBottomNav from './MobileBottomNav.jsx'
+import GlobalPythonNotebook from '../ui/GlobalPythonNotebook.jsx'
+import { Terminal } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams()
@@ -105,7 +107,7 @@ function ScoreWidget() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -236,6 +238,19 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
           <Calculator className="w-4 h-4" />
           <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Calc</span>
         </button>
+
+        <button
+          onClick={onPythonToggle}
+          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
+            pythonOpen
+              ? 'text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/40 border-teal-200 dark:border-teal-800/50'
+              : 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 hover:bg-teal-100 dark:hover:bg-teal-900/50 border-teal-100 dark:border-teal-800/50'
+          }`}
+          title="Python Sandbox (P)"
+        >
+          <Terminal className="w-4 h-4" />
+          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Python</span>
+        </button>
       </div>
 
       {/* Dark mode toggle */}
@@ -315,6 +330,7 @@ export default function AppShell({ children }) {
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
   const [scratchOpen, setScratchOpen] = useState(false)
   const [calcOpen, setCalcOpen] = useState(false)
+  const [pythonOpen, setPythonOpen] = useState(false)
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
 
@@ -361,6 +377,10 @@ export default function AppShell({ children }) {
       if (e.key.toLowerCase() === 'c' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         setCalcOpen(prev => !prev)
       }
+      // 'p' key for Python sandbox
+      if (e.key.toLowerCase() === 'p' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        setPythonOpen(prev => !prev)
+      }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
@@ -368,6 +388,7 @@ export default function AppShell({ children }) {
         setGraphJSXOpen(false)
         setScratchOpen(false)
         setCalcOpen(false)
+        setPythonOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -387,6 +408,8 @@ export default function AppShell({ children }) {
         scratchOpen={scratchOpen}
         onCalcToggle={() => setCalcOpen(prev => !prev)}
         calcOpen={calcOpen}
+        onPythonToggle={() => setPythonOpen(prev => !prev)}
+        pythonOpen={pythonOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -400,6 +423,7 @@ export default function AppShell({ children }) {
               setGraphOpen(false)
               setGraph3DOpen(false)
               setGraphJSXOpen(false)
+              setPythonOpen(false)
             }
           }}
         />
@@ -554,6 +578,7 @@ export default function AppShell({ children }) {
         onSwitchTo3D={() => { setGraphJSXOpen(false); setGraph3DOpen(true) }}
       />
       <ScratchPad isOpen={scratchOpen} onClose={() => setScratchOpen(false)} />
+      <GlobalPythonNotebook isOpen={pythonOpen} onClose={() => setPythonOpen(false)} />
     </div>
     </GrapherContext.Provider>
   )
