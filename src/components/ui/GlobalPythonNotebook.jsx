@@ -103,6 +103,37 @@ function renderNotebookOutput(output, isError) {
  */
 export default function GlobalPythonNotebook({ isOpen, onClose }) {
   const [popouts, setPopouts] = useState([]); // {id, title, content}
+  // Download cell code as .py file
+  const downloadCellCode = (cell) => {
+    const blob = new Blob([cell.code], { type: "text/x-python" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cell-${cell.id}.py`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  };
+
+  // Upload code to a cell
+  const uploadCellCode = (cellId) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".py,.txt";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        updateCellCode(cellId, evt.target.result);
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
   const [pyodide, setPyodide] = useState(null);
   const [runtimeStatus, setRuntimeStatus] = useState("loading"); // loading, ready, installing, error
   const [installProgress, setInstallProgress] = useState(0);
@@ -432,6 +463,38 @@ if _last_expr is not None:
                             In [{cell.id}]
                           </span>
                           <div className="flex items-center gap-2 opacity-100 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => downloadCellCode(cell)}
+                              className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                              title="Download cell as .py"
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M12 5v14m0 0l-5-5m5 5l5-5" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => uploadCellCode(cell.id)}
+                              className="p-1.5 text-slate-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"
+                              title="Upload code to cell"
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M12 19V5m0 0l-5 5m5-5l5 5" />
+                              </svg>
+                            </button>
                             <button
                               onClick={() => runCell(cell.id)}
                               disabled={isExecuting}
