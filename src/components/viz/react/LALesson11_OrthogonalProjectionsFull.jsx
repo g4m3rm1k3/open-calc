@@ -1,230 +1,187 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import katex from "katex";
-import "katex/dist/katex.min.css";
-
-// ─── Math Renderer ───────────────────────────────────────────────────────────
-function MathBlock({ tex, display = false }) {
-  const ref = useRef();
-  useEffect(() => {
-    if (ref.current) {
-      katex.render(tex, ref.current, {
-        throwOnError: false,
-        displayMode: display,
-      });
-    }
-  }, [tex, display]);
-  return <span ref={ref} />;
-}
+import { OrbitControls, Grid } from "@react-three/drei";
+import Katex from "katex-react";
+import 'katex/dist/katex.min.css';
 
 // ─── Vector Visualization ────────────────────────────────────────────────────
-function ProjectionVisualization({ vector, target }) {
-  const sceneRef = useRef();
+function ProjectionVisualization({ v, u }) {
+  const u_normalized = useMemo(() => u.clone().normalize(), [u]);
+  const proj_v_on_u = useMemo(
+    () => u_normalized.clone().multiplyScalar(v.dot(u_normalized)),
+    [v, u_normalized]
+  );
+  const error = useMemo(() => v.clone().sub(proj_v_on_u), [v, proj_v_on_u]);
 
-  useEffect(() => {
-    const scene = sceneRef.current;
-    if (!scene) return;
+  return (
+    <>
+      <axesHelper args={[5]} />
+      <Grid args={[10, 10]} />
 
-    // Clear previous objects
-    while (scene.children.length > 0) {
-      scene.remove(scene.children[0]);
-    }
+      {/* Vector v */}
+      <arrowHelper args={[v.clone().normalize(), new THREE.Vector3(0,0,0), v.length(), 0xff0000]} />
+      
+      {/* Target vector u */}
+      <arrowHelper args={[u.clone().normalize(), new THREE.Vector3(0,0,0), u.length(), 0x0000ff]} />
 
-    // Axes helper
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+      {/* Projection of v onto u */}
+      <arrowHelper args={[proj_v_on_u.clone().normalize(), new THREE.Vector3(0,0,0), proj_v_on_u.length(), 0x00ff00]} />
+      
+      {/* Error vector */}
+      <arrowHelper args={[error.clone().normalize(), proj_v_on_u, error.length(), 0xffa500]} />
 
-    // Add grid lines
-    const gridHelper = new THREE.GridHelper(10, 10, "#94a3b8", "#e2e8f0");
-    scene.add(gridHelper);
-
-    // Normalize target vector
-    const targetNormalized = target.clone().normalize();
-
-    // Compute projection
-    const dotProduct = vector.dot(targetNormalized);
-    const projection = targetNormalized.clone().multiplyScalar(dotProduct);
-
-    // Compute error vector
-    const error = vector.clone().sub(projection);
-
-    // Add original vector (red)
-    const vectorGeometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0, 0),
-      vector,
-    ]);
-    const vectorMaterial = new THREE.LineBasicMaterial({ color: "red" });
-    const vectorLine = new THREE.Line(vectorGeometry, vectorMaterial);
-    scene.add(vectorLine);
-
-    // Add projection vector (green)
-    const projectionGeometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0, 0),
-      projection,
-    ]);
-    const projectionMaterial = new THREE.LineBasicMaterial({ color: "green" });
-    const projectionLine = new THREE.Line(projectionGeometry, projectionMaterial);
-    scene.add(projectionLine);
-
-    // Add error vector (blue)
-    const errorGeometry = new THREE.BufferGeometry().setFromPoints([
-      projection,
-      vector,
-    ]);
-    const errorMaterial = new THREE.LineBasicMaterial({ color: "blue" });
-    const errorLine = new THREE.Line(errorGeometry, errorMaterial);
-    scene.add(errorLine);
-
-    // Add arrows to vectors
-    const arrowHelperV = new THREE.ArrowHelper(
-      vector.clone().normalize(),
-      new THREE.Vector3(0, 0, 0),
-      vector.length(),
-      "red"
-    );
-    scene.add(arrowHelperV);
-
-    const arrowHelperProj = new THREE.ArrowHelper(
-      projection.clone().normalize(),
-      new THREE.Vector3(0, 0, 0),
-      projection.length(),
-      "green"
-    );
-    scene.add(arrowHelperProj);
-
-    const arrowHelperError = new THREE.ArrowHelper(
-      error.clone().normalize(),
-      projection,
-      error.length(),
-      "blue"
-    );
-    scene.add(arrowHelperError);
-  }, [vector, target]);
-
-  return <scene ref={sceneRef} />;
+      <line>
+        <bufferGeometry attach="geometry">
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([proj_v_on_u.x, proj_v_on_u.y, proj_v_on_u.z, v.x, v.y, v.z])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial attach="material" color={0xffa500} dashSize={0.2} gapSize={0.1} />
+      </line>
+    </>
+  );
 }
+
+// ─── UI Components ───────────────────────────────────────────────────────────
+
+function VectorControl({ label, vector, onChange, color }) {
+  const [x, y, z] = vector.toArray();
+
+  const handleSliderChange = (component, value) => {
+    const newVector = new THREE.Vector3(x, y, z);
+    newVector[component] = parseFloat(value);
+    onChange(newVector);
+  };
+  
+  return (
+    <div className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
+        <h4 className="font-bold mb-2" style={{color: color}}>{label}</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {['x', 'y', 'z'].map(comp => (
+                <div key={comp}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {comp.toUpperCase()}: {vector[comp].toFixed(2)}
+                    </label>
+                    <input
+                        type="range"
+                        min="-5"
+                        max="5"
+                        step="0.1"
+                        value={vector[comp]}
+                        onChange={e => handleSliderChange(comp, e.target.value)}
+                        className="w-full"
+                    />
+                </div>
+            ))}
+        </div>
+    </div>
+  );
+}
+
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function OrthogonalProjection() {
-  const [vector, setVector] = useState(new THREE.Vector3(3, 4, 0));
-  const [target, setTarget] = useState(new THREE.Vector3(1, 0, 0));
+  const [v, setV] = useState(new THREE.Vector3(3, 4, 2));
+  const [u, setU] = useState(new THREE.Vector3(5, 0, 0));
   const [step, setStep] = useState(0);
+
+  const dotProduct = useMemo(() => v.dot(u), [v, u]);
+  const uLengthSq = useMemo(() => u.lengthSq(), [u]);
 
   const steps = [
     {
-      label: "Step 1: Define the problem",
+      label: "Introduction",
       explanation:
-        "We want to project the vector \\( \\mathbf{v} \\) onto the vector \\( \\mathbf{u} \\).",
-      formula: "\\text{proj}_u(v) = \\frac{\\mathbf{v} \\cdot \\mathbf{u}}{\\|\\mathbf{u}\\|^2} \\cdot \\mathbf{u}",
+        "This lesson explores orthogonal projections. In simple terms, we're finding the 'shadow' that one vector (\\(\\mathbf{v}\\), in red) casts onto another (\\(\\mathbf{u}\\), in blue). This shadow, shown in green, is the projection. This is one of the most fundamental operations in linear algebra.",
+      formula: "\\text{proj}_\\mathbf{u}(\\mathbf{v}) = \\frac{\\mathbf{v} \\cdot \\mathbf{u}}{\\|\\mathbf{u}\\|^2} \\mathbf{u}",
     },
     {
-      label: "Step 2: Compute the dot product",
-      explanation:
-        "The dot product \\( \\mathbf{v} \\cdot \\mathbf{u} \\) measures how much \\( \\mathbf{v} \\) aligns with \\( \\mathbf{u} \\).",
-      formula: `\\mathbf{v} \\cdot \\mathbf{u} = ${vector.dot(target).toFixed(2)}`,
+        label: "Why is this useful?",
+        explanation:
+            "Orthogonal projections are incredibly useful. For example, in **computer graphics**, they are essential for calculating lighting and shadows. In **machine learning**, they are the basis for finding the 'best fit' line in linear regression. In **physics**, they are used to determine the component of a force acting in a specific direction. Understanding projections is key to solving many real-world problems.",
+        formula: "",
     },
     {
-      label: "Step 3: Normalize the target vector",
-      explanation:
-        "We normalize \\( \\mathbf{u} \\) to ensure the projection is scaled correctly.",
-      formula: `\\|\\mathbf{u}\\|^2 = ${target.lengthSq().toFixed(2)}`,
+        label: "The Dot Product",
+        explanation:
+          "The first step is to compute the dot product of \\(\\mathbf{v}\\) and \\(\\mathbf{u}\\). The dot product is a scalar that tells us about the alignment of the two vectors. If they point in similar directions, the dot product is positive. If they are orthogonal, it's zero.",
+        formula: `\\mathbf{v} \\cdot \\mathbf{u} = (v_x u_x) + (v_y u_y) + (v_z u_z) = ${dotProduct.toFixed(2)}`,
     },
     {
-      label: "Step 4: Compute the projection",
-      explanation:
-        "Multiply the normalized \\( \\mathbf{u} \\) by the scalar \\( \\frac{\\mathbf{v} \\cdot \\mathbf{u}}{\\|\\mathbf{u}\\|^2} \\).",
-      formula: `\\text{proj}_u(v) = (${vector.dot(target).toFixed(2)} / ${target
-        .lengthSq()
-        .toFixed(2)}) \\cdot \\mathbf{u}`,
+        label: "Scaling Factor",
+        explanation:
+            "The term \\( \\frac{\\mathbf{v} \\cdot \\mathbf{u}}{\\|\\mathbf{u}\\|^2} \\) is a scalar that tells us how much to scale \\(\\mathbf{u}\\) to get the projection vector. It's the ratio of the dot product to the squared length of \\(\\mathbf{u}\\).",
+        formula: `\\frac{\\mathbf{v} \\cdot \\mathbf{u}}{\\|\\mathbf{u}\\|^2} = \\frac{${dotProduct.toFixed(2)}}{${uLengthSq.toFixed(2)}} = ${(dotProduct / uLengthSq).toFixed(2)}`,
     },
     {
-      label: "Step 5: Visualize the result",
+      label: "The Projection Vector",
       explanation:
-        "The green vector is the projection, and the blue vector is the error (perpendicular to \\( \\mathbf{u} \\)).",
-      formula: "",
+        "Now, we multiply the scaling factor by the vector \\(\\mathbf{u}\\) to get the projection vector \\(\\text{proj}_\\mathbf{u}(\\mathbf{v})\\). This new vector (in green) lies on the same line as \\(\\mathbf{u}\\).",
+      formula: `\\text{proj}_\\mathbf{u}(\\mathbf{v}) = ${(dotProduct / uLengthSq).toFixed(2)} \\cdot \\mathbf{u}`,
+    },
+    {
+        label: "The Error Vector",
+        explanation:
+          "The orange vector is the 'error' or 'rejection' vector. It is the difference between \\(\\mathbf{v}\\) and its projection onto \\(\\mathbf{u}\\). Notice that it is always orthogonal (perpendicular) to \\(\\mathbf{u}\\). This is a key property of orthogonal projections!",
+        formula: "\\mathbf{e} = \\mathbf{v} - \\text{proj}_\\mathbf{u}(\\mathbf{v})",
+      },
+    {
+      label: "Challenge: Orthogonality",
+      explanation:
+        "Adjust vector \\(\\mathbf{v}\\) using the controls below. Can you make the projection of \\(\\mathbf{v}\\) onto \\(\\mathbf{u}\\) equal to the zero vector? What does this imply about the relationship between \\(\\mathbf{v}\\) and \\(\\mathbf{u}\\)?",
+      formula: `\\text{proj}_\\mathbf{u}(\\mathbf{v}) = \\mathbf{0} \\implies \\mathbf{v} \\cdot \\mathbf{u} = 0`,
     },
   ];
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Orthogonal Projection</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        This lesson demonstrates how to project a vector <strong>v</strong> onto
-        another vector <strong>u</strong>. Follow the steps below to understand
-        the process.
-      </p>
+    <div className="p-4 max-w-5xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Interactive Lesson: Orthogonal Projections</h1>
 
-      {/* Step Navigation */}
-      <div className="flex gap-2 mb-4">
-        {steps.map((s, i) => (
-          <button
-            key={i}
-            onClick={() => setStep(i)}
-            className={`px-4 py-2 rounded ${
-              i === step
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-            }`}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Explanation */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">{steps[step].label}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-          {steps[step].explanation}
-        </p>
-        {steps[step].formula && (
-          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
-            <MathBlock tex={steps[step].formula} display={true} />
-          </div>
-        )}
-      </div>
-
-      {/* Interactive Visualization */}
-      <div className="h-96 border border-gray-300 dark:border-gray-700 rounded">
-        <Canvas>
-          <ProjectionVisualization vector={vector} target={target} />
-          <OrbitControls />
-        </Canvas>
-      </div>
-
-      {/* Controls */}
-      <div className="mt-4 flex gap-4">
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-300">
-            Vector v (x, y, z):
-          </label>
-          <input
-            type="range"
-            min="-5"
-            max="5"
-            step="0.1"
-            value={vector.x}
-            onChange={(e) =>
-              setVector(new THREE.Vector3(parseFloat(e.target.value), vector.y, vector.z))
-            }
-          />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 h-96 md:h-[500px] border border-gray-300 dark:border-gray-700 rounded-lg">
+          <Canvas camera={{ position: [5, 5, 5], fov: 35 }}>
+            <ProjectionVisualization v={v} u={u} />
+            <OrbitControls />
+          </Canvas>
         </div>
-        <div>
-          <label className="block text-sm text-gray-600 dark:text-gray-300">
-            Target u (x, y, z):
-          </label>
-          <input
-            type="range"
-            min="-5"
-            max="5"
-            step="0.1"
-            value={target.x}
-            onChange={(e) =>
-              setTarget(new THREE.Vector3(parseFloat(e.target.value), target.y, target.z))
-            }
-          />
+
+        <div className="flex flex-col gap-4">
+            <VectorControl label="Vector v" vector={v} onChange={setV} color="#ff0000" />
+            <VectorControl label="Vector u" vector={u} onChange={setU} color="#0000ff" />
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="flex gap-2 mb-4 flex-wrap">
+            {steps.map((s, i) => (
+                <button
+                    key={i}
+                    onClick={() => setStep(i)}
+                    className={`px-3 py-1.5 text-sm rounded-md ${
+                    i === step
+                        ? "bg-blue-600 text-white font-semibold"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    }`}
+                >
+                {i+1}. {s.label}
+                </button>
+            ))}
+        </div>
+
+        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">{steps[step].label}</h3>
+          <p className="text-gray-700 dark:text-gray-300 mb-4 prose">
+            <Katex>{steps[step].explanation}</Katex>
+          </p>
+          {steps[step].formula && (
+            <div className="bg-white dark:bg-gray-900 p-4 rounded text-center">
+              <Katex block>{steps[step].formula}</Katex>
+            </div>
+          )}
         </div>
       </div>
     </div>
