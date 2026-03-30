@@ -354,31 +354,43 @@ export default function AppShell({ children }) {
         e.preventDefault()
         openSearch()
       }
-      // 'g' key for graph (if not in an input)
-      if (e.key.toLowerCase() === 'g' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+
+      // If the Python notebook is open, we do not want global single-key shortcuts to fire!
+      if (pythonOpen) {
+        if (e.key === 'Escape') setPythonOpen(false)
+        return
+      }
+
+      const activeTag = document.activeElement?.tagName
+      const isInput = ['INPUT', 'TEXTAREA'].includes(activeTag)
+
+      if (isInput) return
+
+      // 'g' key for graph
+      if (e.key.toLowerCase() === 'g') {
         setGraphOpen(prev => !prev)
         if (!graphOpen) { setGraph3DOpen(false); setGraphJSXOpen(false); }
       }
       // '3' key for 3D plotter
-      if (e.key === '3' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (e.key === '3') {
         setGraph3DOpen(prev => !prev)
         if (!graph3DOpen) { setGraphOpen(false); setGraphJSXOpen(false); }
       }
       // 'x' key for JSXGraph Pro
-      if (e.key.toLowerCase() === 'x' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (e.key.toLowerCase() === 'x') {
         setGraphJSXOpen(prev => !prev)
         if (!graphJSXOpen) { setGraphOpen(false); setGraph3DOpen(false); }
       }
       // 's' key for scratchpad
-      if (e.key.toLowerCase() === 's' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (e.key.toLowerCase() === 's') {
         setScratchOpen(prev => !prev)
       }
       // 'c' key for TI calculator
-      if (e.key.toLowerCase() === 'c' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (e.key.toLowerCase() === 'c') {
         setCalcOpen(prev => !prev)
       }
       // 'p' key for Python sandbox
-      if (e.key.toLowerCase() === 'p' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      if (e.key.toLowerCase() === 'p') {
         setPythonOpen(prev => !prev)
       }
       // 'Escape' to close modals
@@ -393,7 +405,7 @@ export default function AppShell({ children }) {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen])
+  }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen, pythonOpen])
 
   return (
     <GrapherContext.Provider value={{ openGrapher }}>
