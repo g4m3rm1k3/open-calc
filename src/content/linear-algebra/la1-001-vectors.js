@@ -25,7 +25,8 @@ export default {
       'Perspective 2: The Computer Science View. To a computer scientist, a vector is just a list of numbers. An array like `[3, 4]` represents a vector. This perspective says nothing about arrows or geometry; it only cares about ordered data. For example, a house might be modeled as a vector: `[square_footage, bedrooms, bathrooms]`.',
       'Perspective 3: The Mathematics View. To a mathematician, a vector is whatever you want it to be, as long as it follows two simple rules: you can add two of them together, and you can multiply them by a scalar (a regular number) to scale them up or down. As long as those operations behave predictably, the object is a vector.',
       'In this course, we will constantly bridge the Physics (geometric) and Computer Science (algebraic) views. A list of numbers like `[3, 4]` algebraically defines an arrow that points 3 units to the right and 4 units up. The numbers are the DNA; the arrow is the physical manifestation.',
-      '**Where this is heading:** Once we establish how to represent these arrows, we will learn how to combine them (Linear Combinations). The rest of linear algebra is the study of how spaces of these arrows transform into other spaces.',
+      '**Scalars: the third ingredient.** Linear algebra is built from three objects: scalars, vectors, and matrices. A **scalar** is just a regular number — something from $\\mathbb{R}$ like $2$, $-0.5$, or $\\pi$. The word "scalar" comes from "scale." When you multiply a vector by a scalar, you scale it. Specifically: multiply by $2$ and the vector doubles in length. Multiply by $0.5$ and it shrinks to half. Multiply by $-1$ and it flips to point the opposite direction. Multiply by $0$ and it collapses completely to the zero vector $\\mathbf{0}$ — a vector with no length and no direction. Every one of these behaviors matters and will show up again throughout the course.',
+      '**Where this is heading:** Once we establish how to represent these arrows and scale them with scalars, we will learn how to combine them (Linear Combinations). The rest of linear algebra is the study of how spaces of these arrows transform into other spaces.',
     ],
     callouts: [
       {
@@ -37,6 +38,11 @@ export default {
         type: 'insight',
         title: 'Vectors vs. Points',
         body: 'A point (x, y) is a location. A vector [x, y] is a movement or displacement. While we often draw vectors starting from the origin (0,0) to reach a point, the vector itself is just the *instructions* on how to get there, not the destination itself.',
+      },
+      {
+        type: 'insight',
+        title: 'Scalar Multiplication — Four Behaviors to Know',
+        body: 'Given a vector $\\mathbf{v}$ and a scalar $c$:\n\n• $c > 1$: stretches (makes longer)\n• $0 < c < 1$: shrinks (makes shorter)\n• $c = -1$: flips direction exactly\n• $c < 0$: flips AND scales\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector)\n\nDirection only changes sign when $c < 0$. Magnitude always becomes $|c| \\cdot \\|\\mathbf{v}\\|$.',
       },
       {
         type: 'strategy',
