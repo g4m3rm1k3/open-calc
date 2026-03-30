@@ -12,6 +12,8 @@ import {
   Activity,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+import PopoutWindow from "./PopoutWindow.jsx";
 import KatexBlock from "../math/KatexBlock.jsx";
 
 const LATEX_MARKER = "__LATEX__:";
@@ -20,6 +22,7 @@ function renderNotebookOutput(output, isError) {
   const plainClass = `whitespace-pre-wrap ${isError ? "text-rose-400" : "text-slate-300"}`;
   if (!output) return null;
 
+  const VIZ_MARKER = "__VIZ__:";
   const lines = output.split("\n");
   const parts = [];
   let plainBuffer = [];
@@ -51,6 +54,37 @@ function renderNotebookOutput(output, isError) {
       }
       return;
     }
+    if (!isError && line.startsWith(VIZ_MARKER)) {
+      flushPlain();
+      try {
+        const payload = JSON.parse(line.slice(VIZ_MARKER.length));
+        parts.push(
+          <div key={`viz-${idx}`} className="my-2">
+            {/* Placeholder: Replace with actual visualization component */}
+            <div className="rounded-lg bg-indigo-950/60 p-2 text-indigo-200">
+              <strong>Visualization:</strong> {payload.method || "custom"}
+              <br />
+              <span className="text-xs">{JSON.stringify(payload.data)}</span>
+              {payload.kwargs && (
+                <div className="text-xs mt-1">
+                  Args: {JSON.stringify(payload.kwargs)}
+                </div>
+              )}
+              <div className="text-xs italic mt-1">
+                (Interactive 2D/3D visualization will appear here)
+              </div>
+            </div>
+          </div>,
+        );
+      } catch (e) {
+        parts.push(
+          <div key={`viz-error-${idx}`} className="text-rose-400">
+            [viz parse error]
+          </div>,
+        );
+      }
+      return;
+    }
     plainBuffer.push(line);
   });
 
@@ -68,6 +102,7 @@ function renderNotebookOutput(output, isError) {
  * - Modern Glassmorphism UI
  */
 export default function GlobalPythonNotebook({ isOpen, onClose }) {
+  const [popouts, setPopouts] = useState([]); // {id, title, content}
   const [pyodide, setPyodide] = useState(null);
   const [runtimeStatus, setRuntimeStatus] = useState("loading"); // loading, ready, installing, error
   const [installProgress, setInstallProgress] = useState(0);
@@ -177,23 +212,32 @@ export default function GlobalPythonNotebook({ isOpen, onClose }) {
       try {
         // Inject helpers for LaTeX rendering
         await pyodide.runPythonAsync(`
-from builtins import print as _print
-try:
-    from sympy import latex as _sympy_latex, Basic as _sympy_Basic
-    def show_latex(expr):
+    from builtins import print as _print
+    import json as _json
+    try:
+      from sympy import latex as _sympy_latex, Basic as _sympy_Basic
+      def show_latex(expr):
         _print("__LATEX__:" + _sympy_latex(expr))
-    def print_latex(expr):
+      def print_latex(expr):
         show_latex(expr)
-    def display(expr):
+      def display(expr):
         show_latex(expr)
-except Exception:
-    def show_latex(expr):
+    except Exception:
+      def show_latex(expr):
         _print("__LATEX__:" + str(expr))
-    def print_latex(expr):
+      def print_latex(expr):
         show_latex(expr)
-    def display(expr):
+      def display(expr):
         show_latex(expr)
-`);
+
+    def viz(obj, method=None, **kwargs):
+      payload = {"data": obj}
+      if method:
+        payload["method"] = method
+      if kwargs:
+        payload["kwargs"] = kwargs
+      _print("__VIZ__:" + _json.dumps(payload))
+    `);
 
         // Run the cell code
         let lastExprResult;
@@ -276,222 +320,256 @@ if _last_expr is not None:
   // but for now let's focus on a fixed-right overlay that feels premium.
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] pointer-events-none flex justify-end p-4">
-          {/* Backdrop for mobile */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/20 backdrop-blur-[2px] pointer-events-auto lg:hidden"
-          />
+    <>
+      {popouts.map((pop) => (
+        <PopoutWindow
+          key={pop.id}
+          title={pop.title}
+          onClose={() =>
+            setPopouts((prev) => prev.filter((p) => p.id !== pop.id))
+          }
+        >
+          {pop.content}
+        </PopoutWindow>
+      ))}
+      <AnimatePresence>
+        {isOpen && (
+          <div className="fixed inset-0 z-[100] pointer-events-none flex justify-end p-4">
+            {/* Backdrop for mobile */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/20 backdrop-blur-[2px] pointer-events-auto lg:hidden"
+            />
 
-          <motion.div
-            initial={{ x: 600, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 600, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-2xl h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto"
-          >
-            {/* Header */}
-            <header className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
-                  <Terminal size={20} />
+            <motion.div
+              initial={{ x: 600, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 600, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-2xl h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto"
+            >
+              {/* Header */}
+              <header className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
+                    <Terminal size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+                      Python Sandbox
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span
+                        className={`w-2 h-2 rounded-full ${runtimeStatus === "ready" ? "bg-teal-500 animate-pulse" : "bg-amber-500"}`}
+                      />
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                        {runtimeStatus === "loading"
+                          ? "Initializing Core..."
+                          : runtimeStatus === "installing"
+                            ? "Hydrating Libraries (NumPy, SciPy, SymPy)..."
+                            : "Kernel: Python 3.11 (WASM)"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-800 dark:text-white">
-                    Python Sandbox
-                  </h2>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span
-                      className={`w-2 h-2 rounded-full ${runtimeStatus === "ready" ? "bg-teal-500 animate-pulse" : "bg-amber-500"}`}
-                    />
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">
-                      {runtimeStatus === "loading"
-                        ? "Initializing Core..."
-                        : runtimeStatus === "installing"
-                          ? "Hydrating Libraries (NumPy, SciPy, SymPy)..."
-                          : "Kernel: Python 3.11 (WASM)"}
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </header>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                {runtimeStatus === "ready" ? (
+                  <>
+                    <div className="grid grid-cols-3 gap-3 mb-2">
+                      <div className="p-3 rounded-2xl bg-teal-50 dark:bg-teal-500/10 border border-teal-100 dark:border-teal-500/20 text-center">
+                        <Cpu
+                          size={14}
+                          className="mx-auto mb-1 text-teal-600 dark:text-teal-400"
+                        />
+                        <span className="block text-[10px] font-bold text-teal-700 dark:text-teal-300">
+                          NumPy Loaded
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-center">
+                        <Activity
+                          size={14}
+                          className="mx-auto mb-1 text-indigo-600 dark:text-indigo-400"
+                        />
+                        <span className="block text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                          SciPy Ready
+                        </span>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-center">
+                        <Database
+                          size={14}
+                          className="mx-auto mb-1 text-amber-600 dark:text-amber-400"
+                        />
+                        <span className="block text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                          SymPy Ready
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                      Use <span className="font-mono">display(expr)</span> (or{" "}
+                      <span className="font-mono">print_latex(expr)</span>) for
+                      rendered SymPy LaTeX output.
+                    </p>
+
+                    {cells.map((cell) => (
+                      <div
+                        key={cell.id}
+                        className="group bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all"
+                      >
+                        <div className="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            In [{cell.id}]
+                          </span>
+                          <div className="flex items-center gap-2 opacity-100 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => runCell(cell.id)}
+                              disabled={isExecuting}
+                              className="p-1 px-3 text-[10px] font-bold bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                            >
+                              {cell.status === "running" ? (
+                                <>
+                                  <span className="w-2 h-2 rounded-full border border-white border-t-transparent animate-spin" />{" "}
+                                  RUNNING
+                                </>
+                              ) : (
+                                <>
+                                  <Play size={10} fill="currentColor" /> RUN
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => removeCell(cell.id)}
+                              className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="min-h-[80px]">
+                          <Editor
+                            height="140px"
+                            defaultLanguage="python"
+                            theme="vs-dark"
+                            value={cell.code}
+                            onChange={(val) => updateCellCode(cell.id, val)}
+                            options={{
+                              minimap: { enabled: false },
+                              scrollBeyondLastLine: false,
+                              fontSize: 13,
+                              lineNumbers: "on",
+                              padding: { top: 12, bottom: 12 },
+                              automaticLayout: true,
+                              backgroundColor: "transparent",
+                            }}
+                          />
+                        </div>
+
+                        {cell.output && (
+                          <div className="px-5 py-4 bg-slate-900 border-t border-slate-800 font-mono text-[12px] leading-relaxed relative">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+                                Result [{cell.id}]
+                              </div>
+                              <button
+                                className="text-xs text-teal-400 hover:text-teal-200 bg-slate-800 rounded px-2 py-1 ml-2 border border-slate-700"
+                                title="Pop out output"
+                                onClick={() => {
+                                  setPopouts((prev) => [
+                                    ...prev,
+                                    {
+                                      id: `${cell.id}-${Date.now()}`,
+                                      title: `Output [${cell.id}]`,
+                                      content: renderNotebookOutput(
+                                        cell.output,
+                                        cell.status === "error",
+                                      ),
+                                    },
+                                  ]);
+                                }}
+                              >
+                                Pop Out
+                              </button>
+                            </div>
+                            <div className="space-y-2">
+                              {renderNotebookOutput(
+                                cell.output,
+                                cell.status === "error",
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={addCell}
+                      className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-teal-500 hover:border-teal-500/50 hover:bg-teal-50 dark:hover:bg-teal-500/5 transition-all text-xs font-bold flex items-center justify-center gap-2"
+                    >
+                      <Plus size={16} />
+                      ADD CODE CELL
+                    </button>
+                  </>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center space-y-6 text-center">
+                    <div className="w-16 h-16 rounded-3xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center relative overflow-hidden">
+                      <motion.div
+                        animate={{ y: [0, -40, 0] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                        className="w-full h-full bg-teal-500/20 absolute bottom-0 left-0"
+                      />
+                      <Terminal className="text-teal-500" size={32} />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-slate-800 dark:text-white">
+                        Setting up Python...
+                      </h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
+                        Downloading high-performance math libraries. This
+                        happens once per session.
+                      </p>
+                    </div>
+                    {runtimeStatus === "error" && (
+                      <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 rounded-2xl text-rose-600 dark:text-rose-400 text-xs font-medium">
+                        Network Error: Could not download Pyodide. Check your
+                        connection.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <footer className="p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 rounded-b-3xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-4">
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                      <Save size={12} /> SESSION PERSISTENT
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                      <Activity size={12} /> OPTIMIZED WASM
                     </span>
                   </div>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-              >
-                <X size={20} />
-              </button>
-            </header>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-              {runtimeStatus === "ready" ? (
-                <>
-                  <div className="grid grid-cols-3 gap-3 mb-2">
-                    <div className="p-3 rounded-2xl bg-teal-50 dark:bg-teal-500/10 border border-teal-100 dark:border-teal-500/20 text-center">
-                      <Cpu
-                        size={14}
-                        className="mx-auto mb-1 text-teal-600 dark:text-teal-400"
-                      />
-                      <span className="block text-[10px] font-bold text-teal-700 dark:text-teal-300">
-                        NumPy Loaded
-                      </span>
-                    </div>
-                    <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-center">
-                      <Activity
-                        size={14}
-                        className="mx-auto mb-1 text-indigo-600 dark:text-indigo-400"
-                      />
-                      <span className="block text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
-                        SciPy Ready
-                      </span>
-                    </div>
-                    <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-center">
-                      <Database
-                        size={14}
-                        className="mx-auto mb-1 text-amber-600 dark:text-amber-400"
-                      />
-                      <span className="block text-[10px] font-bold text-amber-700 dark:text-amber-300">
-                        SymPy Ready
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
-                    Use <span className="font-mono">display(expr)</span> (or{" "}
-                    <span className="font-mono">print_latex(expr)</span>) for
-                    rendered SymPy LaTeX output.
+                  <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-tighter">
+                    All state is local to this tab
                   </p>
-
-                  {cells.map((cell) => (
-                    <div
-                      key={cell.id}
-                      className="group bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all"
-                    >
-                      <div className="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          In [{cell.id}]
-                        </span>
-                        <div className="flex items-center gap-2 opacity-100 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => runCell(cell.id)}
-                            disabled={isExecuting}
-                            className="p-1 px-3 text-[10px] font-bold bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all disabled:opacity-50 flex items-center gap-1.5"
-                          >
-                            {cell.status === "running" ? (
-                              <>
-                                <span className="w-2 h-2 rounded-full border border-white border-t-transparent animate-spin" />{" "}
-                                RUNNING
-                              </>
-                            ) : (
-                              <>
-                                <Play size={10} fill="currentColor" /> RUN
-                              </>
-                            )}
-                          </button>
-                          <button
-                            onClick={() => removeCell(cell.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="min-h-[80px]">
-                        <Editor
-                          height="140px"
-                          defaultLanguage="python"
-                          theme="vs-dark"
-                          value={cell.code}
-                          onChange={(val) => updateCellCode(cell.id, val)}
-                          options={{
-                            minimap: { enabled: false },
-                            scrollBeyondLastLine: false,
-                            fontSize: 13,
-                            lineNumbers: "on",
-                            padding: { top: 12, bottom: 12 },
-                            automaticLayout: true,
-                            backgroundColor: "transparent",
-                          }}
-                        />
-                      </div>
-
-                      {cell.output && (
-                        <div className="px-5 py-4 bg-slate-900 border-t border-slate-800 font-mono text-[12px] leading-relaxed">
-                          <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-2">
-                            Result [{cell.id}]
-                          </div>
-                          <div className="space-y-2">
-                            {renderNotebookOutput(
-                              cell.output,
-                              cell.status === "error",
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  <button
-                    onClick={addCell}
-                    className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-teal-500 hover:border-teal-500/50 hover:bg-teal-50 dark:hover:bg-teal-500/5 transition-all text-xs font-bold flex items-center justify-center gap-2"
-                  >
-                    <Plus size={16} />
-                    ADD CODE CELL
-                  </button>
-                </>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center space-y-6 text-center">
-                  <div className="w-16 h-16 rounded-3xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center relative overflow-hidden">
-                    <motion.div
-                      animate={{ y: [0, -40, 0] }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                      className="w-full h-full bg-teal-500/20 absolute bottom-0 left-0"
-                    />
-                    <Terminal className="text-teal-500" size={32} />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">
-                      Setting up Python...
-                    </h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-                      Downloading high-performance math libraries. This happens
-                      once per session.
-                    </p>
-                  </div>
-                  {runtimeStatus === "error" && (
-                    <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 rounded-2xl text-rose-600 dark:text-rose-400 text-xs font-medium">
-                      Network Error: Could not download Pyodide. Check your
-                      connection.
-                    </div>
-                  )}
                 </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <footer className="p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 rounded-b-3xl">
-              <div className="flex items-center justify-between">
-                <div className="flex gap-4">
-                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                    <Save size={12} /> SESSION PERSISTENT
-                  </span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-                    <Activity size={12} /> OPTIMIZED WASM
-                  </span>
-                </div>
-                <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-tighter">
-                  All state is local to this tab
-                </p>
-              </div>
-            </footer>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+              </footer>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
