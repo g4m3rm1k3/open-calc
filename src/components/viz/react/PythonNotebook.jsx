@@ -375,8 +375,19 @@ export default function PythonNotebook({ params, onParamChange }) {
   const [pyodide, setPyodide] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
-  const [cells, setCells] = useState(STARTER_CELLS)
+  const [showHelp, setShowHelp] = useState(false)
+
+  // Use initialCells from params if provided, otherwise fallback to STARTER_CELLS
+  const initialCells = params?.initialCells || STARTER_CELLS
+  const [cells, setCells] = useState(initialCells)
   const [isExecuting, setIsExecuting] = useState(false)
+
+  // Update cells if params.initialCells changes (mostly for HMR or switching lessons)
+  useEffect(() => {
+    if (params?.initialCells) {
+      setCells(params.initialCells)
+    }
+  }, [params?.initialCells])
 
   // ── Load Pyodide via Singleton ─────────────────────────────────────────────
   useEffect(() => {
@@ -534,6 +545,16 @@ export default function PythonNotebook({ params, onParamChange }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => setShowHelp(!showHelp)}
+            style={{
+              fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
+              border: `0.5px solid ${showHelp ? C.teal : C.border}`,
+              background: showHelp ? C.tealBg : 'transparent',
+              color: showHelp ? C.teal : C.muted,
+              transition: 'all 0.2s'
+            }}>
+            {showHelp ? '✕ Close Help' : 'Help & API'}
+          </button>
           <button onClick={runAll} disabled={isExecuting}
             style={{
               fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
@@ -551,6 +572,56 @@ export default function PythonNotebook({ params, onParamChange }) {
           </button>
         </div>
       </div>
+
+      {/* API Help Panel */}
+      {showHelp && (
+        <div style={{
+          background: C.surface, border: `1px solid ${C.tealBd}`, borderRadius: 12,
+          padding: 20, marginBottom: 20, animation: 'fadeIn 0.3s ease-out',
+          boxShadow: '0 10px 25px -5px rgba(45,212,191,0.1)'
+        }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: C.teal, marginBottom: 16 }}>
+            opencalc Visualization Library
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+            <div>
+              <h4 style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 8 }}>The Figure Engine</h4>
+              <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.5, marginBottom: 12 }}>
+                Create a <code>Figure</code> object and chain methods to draw. End with <code>.show()</code>.
+              </p>
+              <pre style={{
+                fontSize: 11, background: C.surface2, padding: 12, borderRadius: 8,
+                color: C.blue, border: `0.5px solid ${C.border}`, overflowX: 'auto'
+              }}>
+{`from opencalc import Figure
+fig = Figure(xmin=-5, xmax=5)
+fig.grid().axes()
+fig.plot(lambda x: x**2, color='teal')
+fig.point([2, 4], label="(2,4)")
+fig.show()`}
+              </pre>
+            </div>
+            <div style={{ fontSize: 12, color: C.text }}>
+              <h4 style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 8 }}>Common Methods</h4>
+              <ul style={{ paddingLeft: 16, spaceY: 6, color: C.muted }}>
+                <li><code>.grid(step=1)</code>: Draw a background grid</li>
+                <li><code>.axes()</code>: Draw X/Y coordinate axes</li>
+                <li><code>.vector([x,y], origin=[0,0])</code>: Draw an arrow</li>
+                <li><code>.plot(fn, color='blue')</code>: Plot math functions</li>
+                <li><code>.parametric(xfn, yfn, steps=300)</code>: Parametric curves</li>
+                <li><code>.riemann(fn, a, b, n=10)</code>: Draw integral rects</li>
+                <li><code>.transformed_grid(matrix)</code>: Linear transformations</li>
+              </ul>
+              <h4 style={{ fontSize: 13, fontWeight: 600, color: C.text, marginTop: 16, marginBottom: 8 }}>Quick Helpers</h4>
+              <p style={{ fontSize: 11, color: C.muted }}>
+                <code>quick_plot(fn)</code><br/>
+                <code>quick_vectors(v1, v2, ...)</code><br/>
+                <code>quick_transform(matrix, vector=v)</code>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cells */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

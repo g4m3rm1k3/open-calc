@@ -32,6 +32,20 @@ export default {
         title: 'Interactive Python Environment',
         mathBridge: 'Run Python code to perform matrix operations. The results are computed entirely on your device.',
         caption: 'A fully functional Python 3 environment.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              code: `# ── NumPy Matrix Basics ─────────────────────────\nimport numpy as np\n\n# Define variables and matrices\nA = np.array([[1, 2], [3, 4]])\nv = np.array([5, 6])\n\n# Matrix multiplication (A @ v)\nresult = A @ v\nprint(f"Matrix A:\\n{A}")\nprint(f"Vector v: {v}")\nprint(f"A @ v = {result}")`,
+              output: '', status: 'idle', figureJson: null
+            },
+            {
+              id: 2,
+              code: `# ── Geometry of Transformations ──────────────────\nfrom opencalc import Figure, quick_transform\n\n# Define a shear transformation matrix\nshear_matrix = [[1, 1], [0, 1]]\n\n# Visualize the transformation of the grid\nquick_transform(shear_matrix, vector=[1, 1])`,
+              output: '', status: 'idle', figureJson: null
+            }
+          ]
+        }
       }
     ]
   },
