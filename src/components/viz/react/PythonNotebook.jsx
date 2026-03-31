@@ -219,8 +219,158 @@ function CellOutput({ cell, C }) {
   )
 }
 
+// ── Pyodide Singleton Management ──────────────────────────────────────────
+// We use a global promise to ensure Pyodide is only loaded ONCE even if 
+// multiple notebook components are mounted (e.g. lesson sandbox + global sandbox).
+let pyodidePromise = null;
+
+async function getPyodide() {
+  if (pyodidePromise) return pyodidePromise;
+
+  pyodidePromise = (async () => {
+    // 1. Load the script strictly once
+    if (!window.loadPyodide) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Failed to load Pyodide CDN'));
+        document.head.appendChild(script);
+      });
+    }
+
+    // 2. Initialize
+    const py = await window.loadPyodide();
+
+    // 3. Setup filesystem
+    py.FS.writeFile('/home/pyodide/opencalc.py', OPENCALC_LIB_SOURCE);
+
+    // 4. Pre-load only strictly necessary heavy packages
+    // Small ones like micropip are core and don't need explicit loadPackage usually,
+    // but we can ensure they are ready.
+    await py.loadPackage(['numpy']);
+    
+    await py.runPythonAsync('from opencalc import Figure; print("opencalc ready")');
+    return py;
+  })();
+
+  return pyodidePromise;
+}
+
+// ── Memoized Cell Component ──────────────────────────────────────────────
+const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate, isExecuting, isOnlyCell }) => {
+  return (
+    <div
+      style={{
+        background: C.surface,
+        border: `0.5px solid ${cell.status === 'error' ? C.redBd : cell.status === 'running' ? C.tealBd : C.border}`,
+        borderRadius: 12,
+        overflow: 'hidden',
+        transition: 'border-color .2s',
+      }}
+    >
+      {/* Cell header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '6px 14px',
+          background: C.surface2,
+          borderBottom: `0.5px solid ${C.border}`,
+        }}
+      >
+        <span style={{ fontFamily: 'monospace', fontSize: 11, color: C.hint }}>
+          In [{cell.id}]
+          {cell.status === 'running' && (
+            <span style={{ color: C.teal, marginLeft: 8 }}>● running</span>
+          )}
+        </span>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onClick={() => onRun(cell.id)}
+            disabled={isExecuting}
+            style={{
+              fontSize: 11,
+              padding: '3px 10px',
+              borderRadius: 6,
+              cursor: isExecuting ? 'default' : 'pointer',
+              border: 'none',
+              background: C.teal,
+              color: '#fff',
+              opacity: isExecuting ? 0.5 : 1,
+            }}
+          >
+            {cell.status === 'running' ? '...' : '▶ Run'}
+          </button>
+          <button
+            onClick={() => onClear(cell.id)}
+            style={{
+              fontSize: 11,
+              padding: '3px 8px',
+              borderRadius: 6,
+              cursor: 'pointer',
+              border: `0.5px solid ${C.border}`,
+              background: 'transparent',
+              color: C.hint,
+            }}
+          >
+            Clear
+          </button>
+          <button
+            onClick={() => onRemove(cell.id)}
+            disabled={isOnlyCell}
+            style={{
+              fontSize: 11,
+              padding: '3px 8px',
+              borderRadius: 6,
+              cursor: isOnlyCell ? 'default' : 'pointer',
+              border: `0.5px solid ${C.border}`,
+              background: 'transparent',
+              color: C.hint,
+              opacity: isOnlyCell ? 0.3 : 1,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Monaco Editor */}
+      <Editor
+        height="180px"
+        defaultLanguage="python"
+        theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs'}
+        value={cell.code}
+        onChange={(val) => onUpdate(cell.id, val || '')}
+        options={{
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+          fontSize: 13,
+          lineNumbers: 'on',
+          padding: { top: 10, bottom: 10 },
+          automaticLayout: true,
+          scrollbar: {
+            vertical: 'hidden',
+            alwaysConsumeMouseWheel: false
+          }
+        }}
+        onMount={(editor) => {
+          // monaco.KeyMod.Shift | monaco.KeyCode.Enter = 1024 | 3
+          // We use the numerical constants to avoid referencing a global 'monaco' object
+          // which might not be in scope. Shift=1024, Enter=3
+          editor.addCommand(1024 | 3, () => onRun(cell.id));
+        }}
+      />
+
+      {/* Output */}
+      <CellOutput cell={cell} C={C} />
+    </div>
+  );
+});
+
 // ── Main notebook ─────────────────────────────────────────────────────────────
-export default function PythonNotebook() {
+export default function PythonNotebook({ params, onParamChange }) {
   const C = useColors()
   const [pyodide, setPyodide] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -228,37 +378,26 @@ export default function PythonNotebook() {
   const [cells, setCells] = useState(STARTER_CELLS)
   const [isExecuting, setIsExecuting] = useState(false)
 
-  // ── Load Pyodide and install the opencalc library ──────────────────────────
+  // ── Load Pyodide via Singleton ─────────────────────────────────────────────
   useEffect(() => {
+    let mounted = true;
     async function init() {
       try {
-        // Load Pyodide if not already on window
-        if (!window.loadPyodide) {
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script')
-            script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
-            script.onload = resolve
-            script.onerror = () => reject(new Error('Failed to load Pyodide CDN'))
-            document.head.appendChild(script)
-          })
+        const py = await getPyodide();
+        if (mounted) {
+          setPyodide(py);
+          setIsLoading(false);
         }
-        const py = await window.loadPyodide()
-
-        // Write opencalc.py into Pyodide's virtual filesystem
-        py.FS.writeFile('/home/pyodide/opencalc.py', OPENCALC_LIB_SOURCE)
-
-        // Verify it works
-        await py.runPythonAsync('from opencalc import Figure; print("opencalc ready")')
-
-        setPyodide(py)
-        setIsLoading(false)
       } catch (err) {
-        console.error('Pyodide init failed:', err)
-        setLoadError(err.message)
-        setIsLoading(false)
+        if (mounted) {
+          console.error('Pyodide init failed:', err);
+          setLoadError(err.message);
+          setIsLoading(false);
+        }
       }
     }
-    init()
+    init();
+    return () => { mounted = false; };
   }, [])
 
   // ── Run a cell ─────────────────────────────────────────────────────────────
@@ -416,85 +555,17 @@ export default function PythonNotebook() {
       {/* Cells */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {cells.map((cell) => (
-          <div key={cell.id}
-            style={{
-              background: C.surface, border: `0.5px solid ${cell.status === 'error' ? C.redBd :
-                  cell.status === 'running' ? C.tealBd : C.border}`,
-              borderRadius: 12, overflow: 'hidden',
-              transition: 'border-color .2s'
-            }}>
-
-            {/* Cell header */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '6px 14px', background: C.surface2,
-              borderBottom: `0.5px solid ${C.border}`
-            }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 11, color: C.hint }}>
-                In [{cell.id}]
-                {cell.status === 'running' && (
-                  <span style={{ color: C.teal, marginLeft: 8 }}>● running</span>
-                )}
-              </span>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={() => runCell(cell.id)} disabled={isExecuting}
-                  style={{
-                    fontSize: 11, padding: '3px 10px', borderRadius: 6,
-                    cursor: isExecuting ? 'default' : 'pointer', border: 'none',
-                    background: C.teal, color: '#fff', opacity: isExecuting ? 0.5 : 1
-                  }}>
-                  {cell.status === 'running' ? '...' : '▶ Run'}
-                </button>
-                <button onClick={() => clearOutput(cell.id)}
-                  style={{
-                    fontSize: 11, padding: '3px 8px', borderRadius: 6,
-                    cursor: 'pointer', border: `0.5px solid ${C.border}`,
-                    background: 'transparent', color: C.hint
-                  }}>
-                  Clear
-                </button>
-                <button onClick={() => removeCell(cell.id)} disabled={cells.length <= 1}
-                  style={{
-                    fontSize: 11, padding: '3px 8px', borderRadius: 6,
-                    cursor: cells.length <= 1 ? 'default' : 'pointer',
-                    border: `0.5px solid ${C.border}`, background: 'transparent',
-                    color: C.hint, opacity: cells.length <= 1 ? 0.3 : 1
-                  }}>
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            {/* Monaco Editor */}
-            <Editor
-              height="auto"
-              minHeight="80px"
-              defaultLanguage="python"
-              theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs'}
-              value={cell.code}
-              onChange={val => updateCode(cell.id, val || '')}
-              options={{
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 13,
-                lineNumbers: 'on',
-                padding: { top: 10, bottom: 10 },
-                automaticLayout: true,
-                // Keyboard shortcut: Shift+Enter to run
-                extraEditorClassName: '',
-              }}
-              onMount={(editor) => {
-                editor.addCommand(
-                  // Shift+Enter = run this cell
-                  monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-                  () => runCell(cell.id)
-                )
-              }}
-            />
-
-            {/* Output */}
-            <CellOutput cell={cell} C={C} />
-          </div>
+          <CellComponent
+            key={cell.id}
+            cell={cell}
+            C={C}
+            onRun={runCell}
+            onClear={clearOutput}
+            onRemove={removeCell}
+            onUpdate={updateCode}
+            isExecuting={isExecuting}
+            isOnlyCell={cells.length <= 1}
+          />
         ))}
       </div>
 
