@@ -97,7 +97,7 @@ export default {
               challengeTitle: 'The Multi-Step Trace',
               difficulty: 'medium',
               prompt: 'Trace the state by hand. What is the value of **c** at the end?',
-              instructions: "Type the following four lines into the cell. Predict the value of `c` before you click Run:\n\n```python\na = 3\nb = a + 4\na = a + 2\nc = a + b\nc\n```",
+              instructions: "Type the following four lines into the cell. Predict the value of `c` before you click Run:\n\n\na = 3\nb = a + 4\na = a + 2\nc = a + b\nc\n",
               starterBlock: [
                 'a = 3',
                 'b = a + 4',
@@ -142,29 +142,6 @@ True
       },
     ],
     visualizations: [],
-  },
-
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        text: 'If x = 5 and y = x, then x = 10, what is the value of y?',
-        options: ['5 (y captured the snapshot of x)', '10 (y is linked to x automatically)', 'An error'],
-        correct: 0,
-      },
-      {
-        id: 'q2',
-        text: 'In the line "z = x + 10", what happens first?',
-        options: ['z is updated', 'x + 10 is evaluated to a value', 'The program stops'],
-        correct: 1,
-      },
-      {
-        id: 'q3',
-        text: 'Which rule is true regarding execution flow?',
-        options: ['Lines run bottom to top', 'Each line must complete before the next begins', 'Variables must be used before being assigned'],
-        correct: 1,
-      }
-    ],
   },
 
   mentalModel: [

@@ -4,6 +4,7 @@ import lesson2 from './lesson2.js'
 import lesson3 from './lesson3.js'
 import lesson4 from './lesson4.js'
 import lesson5 from './lesson5.js'
+import lesson7 from './lesson7.js'
 
 export default [
   {
@@ -17,5 +18,11 @@ export default [
     title: 'Python Core Syntax',
     course: 'python-1',
     lessons: [lesson1, lesson2, lesson3, lesson4, lesson5]
+  },
+  {
+    number: 0.3,
+    title: 'Computational Methods',
+    course: 'python-1',
+    lessons: [lesson7]
   }
 ]

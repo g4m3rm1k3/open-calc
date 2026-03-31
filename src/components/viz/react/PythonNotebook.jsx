@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import FigureRenderer from './FigureRenderer'
+import { parseProse } from '../../math/parseProse.jsx'
 
 // ── Colors hook (same as all viz components) ─────────────────────────────────
 function useColors() {
@@ -359,7 +360,7 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
                   margin: i === 0 ? 0 : '8px 0 0',
                   fontSize: 13, color: C.text, lineHeight: 1.7,
                 }}>
-                  {p}
+                  {parseProse(p)}
                 </p>
               ))}
             </div>
@@ -373,9 +374,8 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
               background: C.amberBg,
               border: `1px solid ${C.amberBd}`,
               fontSize: 12, color: C.amber, lineHeight: 1.65,
-              whiteSpace: 'pre-line',
             }} className="notebook-instructions">
-              {cell.instructions}
+              {parseProse(cell.instructions)}
             </div>
           )}
         </div>
