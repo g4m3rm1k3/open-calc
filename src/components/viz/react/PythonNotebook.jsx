@@ -338,6 +338,49 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
         </div>
       )}
 
+      {/* ── Demo prose box (non-challenge cells with prose/instructions) ── */}
+      {!isChallenge && (cell.prose || cell.instructions || cell.cellTitle) && (
+        <div style={{ borderBottom: `0.5px solid ${C.border}` }}>
+          {/* Title bar */}
+          {cell.cellTitle && (
+            <div style={{
+              padding: '8px 16px 0',
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.07em',
+              textTransform: 'uppercase', color: C.muted,
+            }}>
+              {cell.cellTitle}
+            </div>
+          )}
+          {/* Prose */}
+          {cell.prose && (
+            <div style={{ padding: cell.cellTitle ? '6px 16px 10px' : '10px 16px 10px' }}>
+              {(Array.isArray(cell.prose) ? cell.prose : [cell.prose]).map((p, i) => (
+                <p key={i} style={{
+                  margin: i === 0 ? 0 : '8px 0 0',
+                  fontSize: 13, color: C.text, lineHeight: 1.7,
+                }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+          )}
+          {/* Instructions highlight (amber) */}
+          {cell.instructions && (
+            <div style={{
+              margin: '0 16px 12px',
+              padding: '8px 12px',
+              borderRadius: 8,
+              background: C.amberBg,
+              border: `1px solid ${C.amberBd}`,
+              fontSize: 12, color: C.amber, lineHeight: 1.65,
+              whiteSpace: 'pre-line',
+            }}>
+              {cell.instructions}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Fill-in: copyable starter block ─────────────────────────────── */}
       {isFillIn && cell.starterBlock && (
         <div style={{ padding: '10px 16px', background: C.blueBg, borderBottom: `0.5px solid ${C.blueBd}` }}>
@@ -374,10 +417,10 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
         }}
       >
         <span style={{ fontFamily: 'monospace', fontSize: 11, color: C.hint }}>
-          In [{cell.id}]
-          {cell.status === 'running' && (
-            <span style={{ color: C.teal, marginLeft: 8 }}>● running</span>
-          )}
+          {cell.status === 'running'
+            ? <span>In [<span style={{ color: C.teal }}>*</span>]</span>
+            : <span>In [{cell.executionCount ?? ' '}]</span>
+          }
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
           <button
@@ -500,6 +543,7 @@ export default function PythonNotebook({ params, onParamChange }) {
   const initialCells = params?.initialCells || STARTER_CELLS
   const [cells, setCells] = useState(initialCells)
   const [isExecuting, setIsExecuting] = useState(false)
+  const execCounterRef = useRef(0)  // global execution counter — increments each time any cell runs
 
   // Update cells if params.initialCells changes (mostly for HMR or switching lessons)
   useEffect(() => {
@@ -569,9 +613,11 @@ export default function PythonNotebook({ params, onParamChange }) {
       const resultStr = result !== undefined && result !== null ? String(result) : ''
       const isFigure = isFigureOutput(resultStr)
 
+      execCounterRef.current += 1
       setCells(prev => prev.map(c => c.id === cellId ? {
         ...c,
         status: 'idle',
+        executionCount: execCounterRef.current,
         output: textOutput || (!isFigure && resultStr ? resultStr : ''),
         figureJson: isFigure ? resultStr : null,
         testResult: testFeedback

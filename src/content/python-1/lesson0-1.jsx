@@ -4,212 +4,139 @@ export default {
   chapter: 0.1,
   order: 1,
   title: 'Environment: The Notebook Model',
-  subtitle: 'Cells, state, and the flow of computation',
-  tags: ['basics', 'python', 'environment', 'print', 'variables'],
+  subtitle: 'Understanding your tool before you learn the language',
+  tags: ['environment', 'notebook', 'kernel', 'execution', 'reproducibility'],
 
   hook: {
-    question: 'Why do data scientists use notebooks instead of regular scripts?',
+    question: 'Before you write a single line of Python — what is a notebook, and why does the order you run cells matter?',
     realWorldContext:
-      'A notebook is a live document — part lab journal, part calculator. Every block of code is a "cell" you can run one at a time, see results immediately, and experiment freely. ' +
-      'This is how real data scientists explore data at companies like Google, Netflix, and OpenAI. ' +
-      'Before we write algorithms or visualize data, we need to understand the execution model that makes all of it possible.',
+      'Every data scientist at Google, Netflix, or a research lab works in a notebook. ' +
+      'Before you learn Python syntax, you need to understand the environment you\'re working in. ' +
+      'A notebook is not just a text editor — it has a memory model, an execution order, and rules for reproducibility. ' +
+      'Getting this wrong is the most common source of "it worked on my machine" bugs in data science. ' +
+      'In this chapter, you run pre-written cells and observe how the system behaves. No typing yet.',
     previewVisualizationId: 'PythonNotebook',
   },
 
   intuition: {
     prose: [
-      '**The core idea:** a notebook is a sequence of cells. Each cell is a unit of code you can run independently. ' +
-      'When you run a cell, its output appears directly below it — no separate terminal needed.',
+      'A **notebook** is a document made of **cells** — boxes that hold code. Nothing happens until you run a cell. The notebook never executes on its own.',
 
-      'Two things make notebooks powerful and dangerous at the same time: ' +
-      '(1) **Shared memory** — all cells share the same Python kernel, so a variable defined in cell 1 is available in cell 3. ' +
-      '(2) **Order dependency** — the kernel only knows about cells you have actually run, in the order you ran them.',
+      'Behind the cells is the **kernel**: the Python process that actually runs your code. Every cell shares the same kernel. When a cell runs, it deposits its results into the kernel\'s memory. Other cells can use those results — but only after the cell that creates them has run.',
 
-      'A notebook is NOT a static document. It is a living computation. ' +
-      'If you go back and change cell 1, you must re-run it for the change to take effect everywhere else.',
+      'Your job in this chapter: press ▶ Run on each cell, in order, and read the prose above each one. All the code is pre-written. You are learning the tool, not the language.',
     ],
     callouts: [
       {
-        type: 'insight',
-        title: 'The Kernel: Python\'s Brain',
-        body: 'The kernel is the hidden Python process behind your notebook. Every cell you run deposits its results into the kernel\'s memory. ' +
-              'Think of it like a whiteboard — you can write on it, erase parts, and everything written so far is visible to new code.',
+        type: 'tip',
+        title: 'Shift+Enter',
+        body: 'Shift+Enter runs the current cell and moves to the next one. It\'s the fastest way to advance through a notebook.',
       },
       {
-        type: 'warning',
-        title: 'Order Matters More Than Position',
-        body: 'The kernel tracks execution order, not cell position. ' +
-              'If you run cell 3 before cell 1, the kernel has cell 3\'s variables but not cell 1\'s — even though cell 1 appears first in the document. ' +
-              '"Run All" from top to bottom is the safe reset.',
+        type: 'insight',
+        title: 'The [n] Counter',
+        body: 'The number in brackets next to each cell (In [1], In [2]...) is the execution counter. It shows when that cell ran in this session — not its position in the document. [*] means the cell is currently running.',
       },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
-        title: 'The Notebook Lab — Learn by Doing',
-        mathBridge: 'Work through these cells in order. Each one builds on the last to demonstrate the execution model.',
-        caption: 'Run each cell using the ▶ Run button or Shift+Enter. Watch how variables from earlier cells are available in later ones.',
+        title: 'Chapter 0.1 — Guided Notebook Tour',
+        mathBridge: 'Every cell is pre-written. Read the box above each cell, then press Run. Some cells ask you to run them in a specific order — that is the experiment.',
+        caption: 'Run each cell with ▶ Run or Shift+Enter.',
         props: {
           initialCells: [
-            // ── DEMO: First output ─────────────────────────────────────────────
+
+            // ── CELL 1: What is a cell? ──────────────────────────────────────
             {
               id: 1,
-              code: [
-                '# DEMO: Your first cell',
-                '# Press ▶ Run (or Shift+Enter) to execute this cell.',
-                '# The output appears directly below.',
-                '',
-                'print("Welcome to open-calc!")',
-                'print("Python is running live in your browser.")',
-                'print("Every line inside print() becomes a line of output.")',
-              ].join('\n'),
+              cellTitle: 'Cell 1 of 8 — What is a cell?',
+              prose: 'This box is a cell. It contains code. Press ▶ Run now.\n\nWhat to observe: output appears directly below, and the [n] counter updates to [1]. Before you ran it, the counter was empty — the notebook was waiting for you.',
+              code: '2 + 3',
               output: '', status: 'idle', figureJson: null,
             },
 
-            // ── CHALLENGE 1: Write — print something ───────────────────────────
+            // ── CELL 2: Last expression wins ─────────────────────────────────
             {
               id: 2,
-              challengeType: 'write',
-              challengeNumber: 1,
-              challengeTitle: 'Your First Output',
-              difficulty: 'easy',
-              prompt:
-                'Write a print() statement that outputs your name. ' +
-                'For example, if your name is Alex, output: My name is Alex',
-              code: '# Write your print() statement below:\n\n',
-              output: '', status: 'idle', figureJson: null,
-              testCode: [
-                '# Auto-pass: if your code runs without an error, you succeed.',
-                'True',
+              cellTitle: 'Cell 2 of 8 — Multiple lines, one output',
+              prose: 'A cell can have many lines. All of them execute top-to-bottom. Without print(), only the last expression is shown as output — the others run silently.\n\nWhat to observe: three expressions below, but only one number appears.',
+              code: [
+                '10 * 10    # runs — result discarded (not the last line)',
+                '50 + 50    # runs — result discarded (not the last line)',
+                '7 * 6      # runs — this IS the last expression → shown as output',
               ].join('\n'),
-              hint: 'Use print("My name is ...") — text inside quotes is a string. ' +
-                    'Strings can contain spaces, punctuation, and letters.',
+              output: '', status: 'idle', figureJson: null,
             },
 
-            // ── DEMO: Variables ────────────────────────────────────────────────
+            // ── CELL 3: Import ───────────────────────────────────────────────
             {
               id: 3,
+              cellTitle: 'Cell 3 of 8 — Importing a library',
+              prose: 'Python has thousands of libraries — pre-built collections of tools. "import" loads one into the kernel\'s memory. We are loading NumPy: the foundational numerical computing library used by nearly every data scientist.\n\nWhat to observe: importing is silent. No output appears. But the library is now in kernel memory — you will see it used in Cell 5.',
               code: [
-                '# DEMO: Variables store values in the kernel\'s memory.',
-                '# Once a cell runs, its variables are available to ALL later cells.',
+                'import numpy as np',
                 '',
-                'temperature = 98.6        # float (decimal number)',
-                'city = "San Francisco"    # str (text)',
-                'is_sunny = True           # bool (True/False)',
-                '',
-                'print(f"In {city}, it is {temperature}°F and sunny: {is_sunny}")',
+                '# Confirm it loaded — ask for the value of π:',
+                'np.pi',
               ].join('\n'),
               output: '', status: 'idle', figureJson: null,
             },
 
-            // ── CHALLENGE 2: Fill-in — create variables ────────────────────────
+            // ── CELL 4: NameError (intentional) ─────────────────────────────
             {
               id: 4,
-              challengeType: 'fill-in',
-              challengeNumber: 2,
-              challengeTitle: 'Store Your Info',
-              difficulty: 'easy',
-              prompt:
-                'Copy the starter code into the cell, then fill in the blanks. ' +
-                'Store your name, age, and whether you have studied Python before.',
-              starterBlock: [
-                'my_name = ___       # your name as a string, e.g. "Sam"',
-                'my_age  = ___       # your age as a whole number, e.g. 20',
-                'studied_python = ___ # True or False',
-                '',
-                'print(f"Name: {my_name}, Age: {my_age}, Studied before: {studied_python}")',
-              ].join('\n'),
-              code: '# Paste the starter code here and fill in the blanks.\n\n',
+              cellTitle: 'Cell 4 of 8 — The kernel only knows what you\'ve run',
+              prose: 'The kernel\'s memory starts empty. It only contains what cells you have actually run.',
+              instructions: 'Run THIS cell first (before Cell 5).\nYou will see a red NameError — that error is the lesson.\nThen run Cell 5, and come back and run this cell again.',
+              code: 'radius * 2',
               output: '', status: 'idle', figureJson: null,
-              testCode: [
-                'assert "my_name" in dir(), "Define my_name first."',
-                'assert "my_age" in dir(), "Define my_age first."',
-                'assert "studied_python" in dir(), "Define studied_python first."',
-                'assert isinstance(my_name, str) and len(my_name) > 0, \\',
-                '    f"my_name must be a non-empty string, got {type(my_name).__name__}"',
-                'assert isinstance(my_age, int) and my_age > 0, \\',
-                '    f"my_age must be a positive integer, got {my_age!r}"',
-                'assert isinstance(studied_python, bool), \\',
-                '    f"studied_python must be True or False, got {type(studied_python).__name__}"',
-                '"SUCCESS: All three variables are set correctly!"',
-              ].join('\n'),
-              hint: 'Strings need quotes: my_name = "Alex". ' +
-                    'Integers do not: my_age = 20. ' +
-                    'Booleans are exactly True or False (capital T/F, no quotes).',
             },
 
-            // ── DEMO: Order dependency ─────────────────────────────────────────
+            // ── CELL 5: Deposit into kernel ──────────────────────────────────
             {
               id: 5,
+              cellTitle: 'Cell 5 of 8 — Depositing state into the kernel',
+              prose: 'Running this cell stores the name "radius" in kernel memory. After it runs, Cell 4 can use it.\n\nWhat to observe: run this cell, then go back and run Cell 4 again. The NameError disappears — because "radius" now exists in the kernel. This is the whole shared-memory model.',
               code: [
-                '# DEMO: Variables from earlier cells are available here.',
-                '# Run cells 3 and 4 before this one, or you will see a NameError.',
+                'radius = 7',
                 '',
-                '# "my_name" was defined in Challenge 2 (cell 4).',
-                '# "city" was defined in the Demo above (cell 3).',
-                '',
-                'print(f"Hello {my_name}! You are visiting {city} today.")',
-                'print(f"Your age is {my_age}. In 10 years you will be {my_age + 10}.")',
+                '# Area of a circle = π × r²',
+                '# Uses "radius" defined above AND "np" loaded in Cell 3',
+                'np.pi * radius ** 2',
               ].join('\n'),
               output: '', status: 'idle', figureJson: null,
             },
 
-            // ── CHALLENGE 3: Write — arithmetic with variables ─────────────────
+            // ── CELL 6: [n] counter experiment Part A ───────────────────────
             {
               id: 6,
-              challengeType: 'write',
-              challengeNumber: 3,
-              challengeTitle: 'Compute and Print',
-              difficulty: 'easy',
-              prompt:
-                'Define two numeric variables called a and b (any values you like). ' +
-                'Then compute their sum, difference, and product, storing each in a new variable. ' +
-                'Print all five values.',
-              code: '# Define a and b, then compute sum, difference, and product.\n\n',
+              cellTitle: 'Cell 6 of 8 — Execution order experiment (Part A)',
+              prose: 'The [n] counter tracks when a cell ran, not where it sits in the document.',
+              instructions: 'Run Cell 7 (below) FIRST.\nThen come back and run this cell.\nCompare the [n] counters — Cell 7\'s number should be lower than Cell 6\'s, even though Cell 6 is above Cell 7 in the document.',
+              code: '"Cell 6: I ran second in this experiment"',
               output: '', status: 'idle', figureJson: null,
-              testCode: [
-                'assert "a" in dir() and "b" in dir(), "Define variables a and b."',
-                'assert isinstance(a, (int, float)), f"a must be a number, got {type(a).__name__}"',
-                'assert isinstance(b, (int, float)), f"b must be a number, got {type(b).__name__}"',
-                '"SUCCESS: a and b are defined. Check your output looks correct!"',
-              ].join('\n'),
-              hint: [
-                'Example structure:',
-                '  a = 12',
-                '  b = 4',
-                '  total = a + b',
-                '  diff  = a - b',
-                '  prod  = a * b',
-                '  print(total, diff, prod)',
-              ].join('\n'),
             },
 
-            // ── CHALLENGE 4: Write — out-of-order trap ─────────────────────────
+            // ── CELL 7: [n] counter experiment Part B ───────────────────────
             {
               id: 7,
-              challengeType: 'write',
-              challengeNumber: 4,
-              challengeTitle: 'The Out-of-Order Trap',
-              difficulty: 'medium',
-              prompt:
-                'This challenge builds intuition for why order matters.\n\n' +
-                '1. Run this cell: it sets counter = 1.\n' +
-                '2. Click "+ Add cell" and write: counter = counter + 1\n' +
-                '3. Run your new cell several times.\n' +
-                '4. Come back here and change counter = 1 to counter = 100, ' +
-                'but do NOT re-run this cell yet.\n' +
-                '5. Run your new cell again. Is the result what you expected?\n\n' +
-                'Set counter = 0 in this cell to begin.',
-              code: '# Step 1: Run this cell to initialise counter.\ncounter = 0\nprint(f"counter is now {counter}")\n',
+              cellTitle: 'Cell 7 of 8 — Execution order experiment (Part B)',
+              instructions: 'Run THIS cell before Cell 6 above.\nThen compare the [n] counters on both cells.',
+              code: '"Cell 7: I ran first in this experiment"',
               output: '', status: 'idle', figureJson: null,
-              testCode: [
-                'assert "counter" in dir() and isinstance(counter, int), \\',
-                '    "counter must be an integer."',
-                '"SUCCESS: counter is set. Now experiment with the out-of-order pattern!"',
-              ].join('\n'),
-              hint: 'The kernel only updates counter when you run the cell that defines it. ' +
-                    'Editing the source does not change memory until the cell is executed.',
             },
+
+            // ── CELL 8: Run All ──────────────────────────────────────────────
+            {
+              id: 8,
+              cellTitle: 'Cell 8 of 8 — Reproducibility: Run All',
+              prose: 'The out-of-order experiments left the kernel in an unpredictable state. This is the most common source of notebook bugs.\n\nThe fix is "Run All" — it runs every cell in document order from a clean start. After Run All, the [n] counters read 1, 2, 3 ... 8 in order. The kernel is now in a guaranteed, reproducible state.\n\nRule: always Run All before sharing or submitting a notebook.',
+              instructions: 'Click ▶ Run All in the notebook header above.\nWatch every cell execute in document order.\nConfirm the [n] counters now go 1, 2, 3, 4, 5, 6, 7, 8.',
+              code: '"Chapter 0.1 complete — you understand the notebook model."',
+              output: '', status: 'idle', figureJson: null,
+            },
+
           ],
         },
       },
@@ -220,21 +147,15 @@ export default {
 
   rigor: {
     prose: [
-      '**Kernel lifecycle:** the kernel is born when the notebook loads and dies when you refresh the page. ' +
-      'Every variable, import, and function definition lives in the kernel\'s namespace until that moment.',
-
-      '**Reproducibility rule:** a notebook is only reproducible if running all cells top-to-bottom produces the same result every time. ' +
-      'This means: no cell should depend on variables defined in cells that come after it in the document.',
-
-      '**The execution counter:** the [n] label next to each cell is the execution counter — it tells you the order cells were actually run, ' +
-      'not their position in the document. If [3] appears before [1] in the document, something ran out of order.',
+      '**Kernel lifecycle**: the kernel starts when the page loads and resets on refresh. Every import, variable, and result accumulates in kernel memory until the reset. A fresh kernel has no memory — you must re-run cells to rebuild state.',
+      '**NameError as signal**: a NameError means precisely one thing — you are referencing a name that has never been deposited into the kernel in this session. The fix is always: run the cell that defines that name first.',
+      '**Reproducibility rule**: a notebook is reproducible if and only if running all cells top-to-bottom from a fresh kernel produces the correct result. Any notebook that only works because of a specific run order is considered broken.',
     ],
     callouts: [
       {
-        type: 'tip',
-        title: 'Always use Run All before sharing',
-        body: 'Before handing a notebook to anyone, click "Run All" to verify it works from a clean state. ' +
-              'Hidden state from out-of-order execution is the #1 source of "works on my machine" bugs in data science.',
+        type: 'definition',
+        title: 'The Kernel',
+        body: 'The kernel is the Python process behind the notebook. It holds all variables, imports, and computed values in memory. All cells share one kernel. Refreshing the page kills the kernel and wipes all memory.',
       },
     ],
     visualizations: [],
@@ -243,37 +164,56 @@ export default {
   examples: [],
   challenges: [],
   semantics: { core: [] },
+
   spiral: {
     recoveryPoints: [
-      'If a cell throws NameError, run all cells above it first.',
-      'If behaviour seems wrong, restart the kernel (refresh) and Run All.',
+      'If a cell shows [*] permanently, the kernel is stuck. Refresh the page and Run All.',
+      'If you get a NameError, run all cells above the failing one first.',
     ],
     futureLinks: [
-      'In Chapter 0.2 we fill these variables with structured types: int, float, str, bool.',
-      'In Phase 2 we import NumPy and the kernel state grows to include array objects.',
+      'Chapter 0.2 begins with values and expressions — you saw expressions here (2 + 3). Next you learn exactly what they are.',
+      'The "import numpy as np" pattern from Cell 3 appears in every lesson from Phase 2 onward.',
+      'Variables (Cell 5: radius = 7) are explained properly in Chapter 0.2 Lesson 5.',
     ],
   },
+
   assessment: {
     questions: [
       {
         id: 'q1',
-        text: 'You edit cell 1 to change a variable. Without re-running cell 1, does the change appear in cell 3?',
-        options: ['Yes — editing updates memory immediately', 'No — the kernel only sees the old value', 'Only if cell 3 is above cell 1'],
+        text: 'You write code in a cell but do not press Run. Does the kernel update?',
+        options: ['Yes — writing code updates the kernel immediately', 'No — the kernel only sees code after you run the cell', 'Only if you press Save first'],
         correct: 1,
       },
       {
         id: 'q2',
-        text: 'What does print("hello") do?',
-        options: ['Stores "hello" in a variable', 'Sends "hello" to the output area', 'Creates a file called hello'],
+        text: 'Cell 7 is below Cell 6 in the document. You run Cell 7 first. Cell 7\'s [n] counter shows:',
+        options: ['[7] — it is the seventh cell', '[1] — it was the first cell run in this session', 'An error — you cannot run out of order'],
+        correct: 1,
+      },
+      {
+        id: 'q3',
+        text: 'What does "Run All" do?',
+        options: ['Saves the notebook', 'Runs all cells in document order, guaranteeing a reproducible state', 'Checks for syntax errors without running'],
+        correct: 1,
+      },
+      {
+        id: 'q4',
+        text: 'Cell 5 defines "radius". Cell 4 uses "radius". You run Cell 4 before Cell 5. What happens?',
+        options: ['Cell 4 uses 0 as a default', 'Cell 4 raises a NameError — radius is not in the kernel yet', 'Cell 4 automatically runs Cell 5 first'],
         correct: 1,
       },
     ],
   },
+
   mentalModel: [
-    'A notebook is a sequence of cells sharing one kernel (memory).',
-    'Variables only exist in memory after their cell has been run.',
-    '"Run All" is the safe reset — it guarantees top-to-bottom order.',
+    'A cell runs when you tell it to — not when you write it.',
+    'All cells share one kernel. State persists between cells.',
+    'The [n] counter shows execution order, not document position.',
+    'NameError = this name was never deposited into the kernel.',
+    '"Run All" is the reproducibility guarantee.',
   ],
+
   checkpoints: ['read-intuition'],
   quiz: [],
 }
