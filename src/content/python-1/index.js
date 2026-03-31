@@ -1,0 +1,17 @@
+import lesson0_1 from './lesson0-1.jsx'
+import lesson1 from './lesson1.jsx'
+
+export default [
+  {
+    number: 0.1,
+    title: 'Computational Foundations',
+    course: 'python-1',
+    lessons: [lesson0_1]
+  },
+  {
+    number: 0.2,
+    title: 'Python Core Syntax',
+    course: 'python-1',
+    lessons: [lesson1]
+  }
+]

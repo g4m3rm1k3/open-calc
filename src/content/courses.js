@@ -48,4 +48,11 @@ export const COURSES = [
     desc: 'Vectors & Matrices',
     color: 'teal'
   },
+  { 
+    key: 'python-1',  
+    label: 'Python & Data Science',   
+    path: '/chapter/0.1', 
+    desc: 'Compute, Visualise & Analyze',
+    color: 'amber'
+  },
 ];

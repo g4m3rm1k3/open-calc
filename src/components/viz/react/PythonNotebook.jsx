@@ -150,39 +150,10 @@ def quick_transform(matrix,vector=None):
 const STARTER_CELLS = [
   {
     id: 1,
-    code: `# Welcome to the open-calc Python Notebook
-# Run any Python — or use the opencalc library to create visualisations.
-
-import math
-print("Python is running!")
-print(f"pi = {math.pi:.6f}")`,
+    code: `# Python Sandbox\n# Type code here and press Shift+Enter to run\n\nprint("Hello, open-calc!")`,
     output: '', status: 'idle', figureJson: null,
-  },
-  {
-    id: 2,
-    code: `# ── opencalc library — visualise anything ────────────────
-from opencalc import Figure, quick_plot
-
-# Plot a function
-fig = Figure(xmin=-4, xmax=4, ymin=-2, ymax=10, title="y = x²")
-fig.grid()
-fig.axes()
-fig.plot(lambda x: x**2, color='blue', label='x²', fill=True)
-fig.tangent(lambda x: x**2, x0=2, color='amber')
-fig.point([2, 4], color='amber', label='(2, 4)')
-fig.show()   # ← last line returns the figure JSON`,
-    output: '', status: 'idle', figureJson: null,
-  },
-  {
-    id: 3,
-    code: `# ── Linear algebra ────────────────────────────────────────
-from opencalc import Figure, quick_vectors, quick_transform
-
-# Visualise a linear transformation (90° rotation)
-quick_transform([[0, -1], [1, 0]], vector=[2, 1])`,
-    output: '', status: 'idle', figureJson: null,
-  },
-]
+  }
+];
 
 // ── CellOutput ────────────────────────────────────────────────────────────────
 function CellOutput({ cell, C }) {
@@ -214,6 +185,30 @@ function CellOutput({ cell, C }) {
         }}>
           {cell.output}
         </pre>
+      )}
+
+      {/* Test Feedback Banner */}
+      {cell.testResult && (
+        <div style={{
+          margin: '0 14px 14px', padding: '12px 16px', borderRadius: 10,
+          background: cell.testResult.success ? C.tealBg : C.redBg,
+          border: `1px solid ${cell.testResult.success ? C.tealBd : C.redBd}`,
+          display: 'flex', alignItems: 'center', gap: 12,
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          <span style={{ fontSize: 20 }}>{cell.testResult.success ? '🎉' : '❌'}</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ 
+              fontSize: 13, fontWeight: 600, 
+              color: cell.testResult.success ? C.teal : C.red 
+            }}>
+              {cell.testResult.success ? 'Challenge Complete!' : 'Not quite there yet'}
+            </div>
+            <div style={{ fontSize: 12, color: cell.testResult.success ? C.teal : C.red, opacity: 0.8 }}>
+              {cell.testResult.message}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -429,7 +424,25 @@ export default function PythonNotebook({ params, onParamChange }) {
     pyodide.setStderr({ batched: msg => { textOutput += msg + '\n' } })
 
     try {
+      // 1. Run user code
       const result = await pyodide.runPythonAsync(cell.code)
+      
+      let testFeedback = null
+      
+      // 2. Run test code if provided
+      if (cell.testCode) {
+        try {
+          const testResult = await pyodide.runPythonAsync(cell.testCode)
+          // Look for 'SUCCESS' or True
+          const isSuccess = testResult === true || (typeof testResult === 'string' && testResult.includes('SUCCESS'))
+          testFeedback = {
+            success: isSuccess,
+            message: typeof testResult === 'string' ? testResult.replace('SUCCESS:', '').trim() : (isSuccess ? 'Great job! Your code passed the test.' : 'The test failed. Try again!')
+          }
+        } catch (testErr) {
+          testFeedback = { success: false, message: `Test Error: ${testErr.message}` }
+        }
+      }
 
       // Check if the return value is an opencalc figure
       const resultStr = result !== undefined && result !== null ? String(result) : ''
@@ -438,10 +451,9 @@ export default function PythonNotebook({ params, onParamChange }) {
       setCells(prev => prev.map(c => c.id === cellId ? {
         ...c,
         status: 'idle',
-        // Text output: show if there's stdout, or show result if not a figure
         output: textOutput || (!isFigure && resultStr ? resultStr : ''),
-        // Figure: set if result is opencalc JSON
         figureJson: isFigure ? resultStr : null,
+        testResult: testFeedback
       } : c))
 
     } catch (err) {
