@@ -255,19 +255,114 @@ async function getPyodide() {
   return pyodidePromise;
 }
 
+// ── Challenge difficulty color map ────────────────────────────────────────────
+function difficultyStyle(difficulty, C) {
+  if (difficulty === 'easy')   return { bg: C.greenBg,  border: C.greenBd,  text: C.green }
+  if (difficulty === 'hard')   return { bg: C.redBg,    border: C.redBd,    text: C.red }
+  return { bg: C.amberBg, border: C.amberBd, text: C.amber } // medium default
+}
+
 // ── Memoized Cell Component ──────────────────────────────────────────────
 const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate, isExecuting, isOnlyCell }) => {
+  const [copied, setCopied] = useState(false)
+  const [hintOpen, setHintOpen] = useState(false)
+
+  const isChallenge = !!cell.challengeType
+  const isFillIn = cell.challengeType === 'fill-in'
+  const dc = difficultyStyle(cell.difficulty, C)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(cell.starterBlock || '').then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  // Compute Monaco height from line count
+  const lineCount = (cell.code || '').split('\n').length
+  const editorHeight = `${Math.min(320, Math.max(80, lineCount * 21 + 24))}px`
+
   return (
     <div
       style={{
         background: C.surface,
-        border: `0.5px solid ${cell.status === 'error' ? C.redBd : cell.status === 'running' ? C.tealBd : C.border}`,
+        border: `0.5px solid ${cell.status === 'error' ? C.redBd : cell.status === 'running' ? C.tealBd : isChallenge ? C.purpleBd : C.border}`,
         borderRadius: 12,
         overflow: 'hidden',
         transition: 'border-color .2s',
       }}
     >
-      {/* Cell header */}
+      {/* ── Challenge header ────────────────────────────────────────────── */}
+      {isChallenge && (
+        <div style={{ padding: '12px 16px', background: C.purpleBg, borderBottom: `0.5px solid ${C.purpleBd}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: cell.prompt ? 8 : 0 }}>
+            {/* Number badge */}
+            {cell.challengeNumber != null && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: 24, height: 24, borderRadius: '50%', background: C.purple,
+                color: '#fff', fontSize: 11, fontWeight: 700, flexShrink: 0,
+              }}>
+                {cell.challengeNumber}
+              </span>
+            )}
+            <span style={{ fontSize: 13, fontWeight: 600, color: C.text, flex: 1 }}>
+              {cell.challengeTitle || 'Challenge'}
+            </span>
+            {/* Type badge */}
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+              textTransform: 'uppercase', padding: '2px 7px', borderRadius: 5,
+              background: isFillIn ? C.blueBg : C.tealBg,
+              border: `1px solid ${isFillIn ? C.blueBd : C.tealBd}`,
+              color: isFillIn ? C.blue : C.teal,
+            }}>
+              {isFillIn ? 'Fill In' : 'Write'}
+            </span>
+            {/* Difficulty badge */}
+            {cell.difficulty && (
+              <span style={{
+                fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5,
+                background: dc.bg, border: `1px solid ${dc.border}`, color: dc.text,
+              }}>
+                {cell.difficulty}
+              </span>
+            )}
+          </div>
+          {/* Prompt */}
+          {cell.prompt && (
+            <p style={{ margin: 0, fontSize: 13, color: C.muted, lineHeight: 1.65 }}>
+              {cell.prompt}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* ── Fill-in: copyable starter block ─────────────────────────────── */}
+      {isFillIn && cell.starterBlock && (
+        <div style={{ padding: '10px 16px', background: C.blueBg, borderBottom: `0.5px solid ${C.blueBd}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: C.blue }}>
+              Starter — copy &amp; paste into the cell, then fill in the ___
+            </span>
+            <button onClick={handleCopy} style={{
+              fontSize: 11, padding: '2px 10px', borderRadius: 6, cursor: 'pointer',
+              border: `1px solid ${C.blueBd}`, background: copied ? C.blue : 'transparent',
+              color: copied ? '#fff' : C.blue, transition: 'all 0.2s',
+            }}>
+              {copied ? '✓ Copied' : 'Copy'}
+            </button>
+          </div>
+          <pre style={{
+            margin: 0, fontFamily: 'monospace', fontSize: 12.5, color: C.blue,
+            lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+          }}>
+            {cell.starterBlock}
+          </pre>
+        </div>
+      )}
+
+      {/* ── Cell header (In [n] label + buttons) ────────────────────────── */}
       <div
         style={{
           display: 'flex',
@@ -336,7 +431,7 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
 
       {/* Monaco Editor */}
       <Editor
-        height="180px"
+        height={editorHeight}
         defaultLanguage="python"
         theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs'}
         value={cell.code}
@@ -363,6 +458,32 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
 
       {/* Output */}
       <CellOutput cell={cell} C={C} />
+
+      {/* Hint toggle (challenge cells only) */}
+      {isChallenge && cell.hint && (
+        <div style={{ borderTop: `0.5px solid ${C.border}` }}>
+          <button
+            onClick={() => setHintOpen(h => !h)}
+            style={{
+              width: '100%', padding: '8px 16px', background: 'transparent',
+              border: 'none', cursor: 'pointer', textAlign: 'left',
+              fontSize: 12, color: C.amber, display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <span>{hintOpen ? '▾' : '▸'}</span>
+            {hintOpen ? 'Hide hint' : 'Show hint'}
+          </button>
+          {hintOpen && (
+            <div style={{
+              padding: '8px 16px 12px', background: C.amberBg,
+              borderTop: `0.5px solid ${C.amberBd}`,
+              fontSize: 13, color: C.amber, lineHeight: 1.6,
+            }}>
+              {cell.hint}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 });

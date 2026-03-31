@@ -594,22 +594,31 @@ function InlineAssessment({ assessment }) {
       <div className="p-5 space-y-6">
         {assessment.questions.map((q, i) => {
           const userAns = (answers[q.id] ?? '').trim().toLowerCase()
-          const correct = userAns === q.answer.trim().toLowerCase()
+          const correctAnswer = (q.answer ?? '').toString().trim().toLowerCase()
+          const correct = userAns !== '' && correctAnswer !== '' && userAns === correctAnswer
           const isRevealed = revealed[q.id]
+          
           return (
             <div key={q.id ?? i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-800/50">
               <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3"><span className="text-emerald-500 font-bold mr-1">Q{i+1}.</span>{q.text}</p>
+              
               {q.type === 'choice' ? (
                 <div className="space-y-2">
                   {q.options?.map((opt, j) => {
                     const chosen = answers[q.id] === opt
-                    const isCorrect = opt.trim().toLowerCase() === q.answer.trim().toLowerCase()
+                    const optNormalized = (opt ?? '').toString().trim().toLowerCase()
+                    const optionCorrect = optNormalized === correctAnswer
+                    
                     let cls = 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-                    if (chosen && isCorrect) cls = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
-                    else if (chosen && !isCorrect) cls = 'border-rose-400 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
+                    if (chosen && optionCorrect) cls = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
+                    else if (chosen && !optionCorrect) cls = 'border-rose-400 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
+                    
                     return (
-                      <button key={j} onClick={() => setAnswers(a => ({...a, [q.id]: opt}))}
-                        className={`w-full text-left text-xs px-3 py-2 rounded-lg border transition-all ${cls}`}>
+                      <button 
+                        key={j} 
+                        onClick={() => setAnswers(a => ({...a, [q.id]: opt}))}
+                        className={`w-full text-left text-xs px-3 py-2 rounded-lg border transition-all ${cls}`}
+                      >
                         {opt}
                       </button>
                     )
@@ -623,13 +632,17 @@ function InlineAssessment({ assessment }) {
                   onChange={e => setAnswers(a => ({...a, [q.id]: e.target.value}))}
                 />
               )}
+              
               {answers[q.id] && (
                 <p className={`mt-2 text-xs font-semibold ${correct ? 'text-emerald-600' : 'text-rose-500'}`}>
                   {correct ? '✓ Correct!' : '✗ Not quite.'}
                 </p>
               )}
-              <button className="mt-2 text-[10px] text-slate-400 hover:text-slate-600 underline" onClick={() => setRevealed(r => ({...r, [q.id]: !r[q.id]}))}>Hint</button>
-              {isRevealed && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 italic">{q.hint}</p>}
+              
+              <button className="mt-2 text-[10px] text-slate-400 hover:text-slate-600 underline" onClick={() => setRevealed(r => ({...r, [q.id]: !r[q.id]}))}>
+                {isRevealed ? 'Hide Hint' : 'Show Hint'}
+              </button>
+              {isRevealed && q.hint && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 italic">{q.hint}</p>}
             </div>
           )
         })}
