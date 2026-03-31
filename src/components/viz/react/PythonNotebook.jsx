@@ -1,202 +1,533 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Editor from '@monaco-editor/react';
+// PythonNotebook.jsx
+// Interactive Python notebook with Pyodide + Monaco Editor.
+// Detects opencalc Figure output and renders it via FigureRenderer.
+// Drop-in replacement for the provided PythonNotebook component.
 
-/**
- * PythonNotebook component
- * A client-side Python notebook using Pyodide and Monaco Editor.
- */
-export default function PythonNotebook() {
-  const [pyodide, setPyodide] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [cells, setCells] = useState([
-    { id: 1, code: '# Welcome to the Python Notebook\n# You can run Python code directly in your browser using Pyodide.\n\nimport math\nprint("Hello from Python!")\nx = math.sqrt(25)\nx', output: '', status: 'idle' }
-  ]);
-  const [isExecuting, setIsExecuting] = useState(false);
-  
-  // Initialize Pyodide
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import Editor from '@monaco-editor/react'
+import FigureRenderer from './FigureRenderer'
+
+// ── Colors hook (same as all viz components) ─────────────────────────────────
+function useColors() {
+  const isDark = () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const [dark, setDark] = useState(isDark)
   useEffect(() => {
-    async function initPyodide() {
-      try {
-        const { loadPyodide } = window;
-        if (!loadPyodide) {
-           // If script isn't loaded yet, we might need to add it dynamically or rely on public CDN in index.html
-           // For this implementation, we assume the script will be available via CDN
-           const script = document.createElement('script');
-           script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
-           script.onload = async () => {
-             const py = await window.loadPyodide();
-             setPyodide(py);
-             setIsLoading(false);
-           };
-           document.head.appendChild(script);
-        } else {
-          const py = await loadPyodide();
-          setPyodide(py);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('Failed to load Pyodide:', err);
-      }
-    }
-    initPyodide();
-  }, []);
-
-  const runCell = useCallback(async (cellId) => {
-    if (!pyodide || isExecuting) return;
-
-    setIsExecuting(true);
-    setCells(prev => prev.map(c => c.id === cellId ? { ...c, status: 'running' } : c));
-
-    const cell = cells.find(c => c.id === cellId);
-    let output = '';
-    
-    // Intercept stdout
-    pyodide.setStdout({
-      batched: (msg) => {
-        output += msg + '\n';
-      }
-    });
-
-    try {
-      const result = await pyodide.runPythonAsync(cell.code);
-      if (result !== undefined) {
-        output += String(result);
-      }
-      setCells(prev => prev.map(c => c.id === cellId ? { ...c, output, status: 'idle' } : c));
-    } catch (err) {
-      setCells(prev => prev.map(c => c.id === cellId ? { ...c, output: output + '\nError: ' + err.message, status: 'error' } : c));
-    } finally {
-      setIsExecuting(false);
-    }
-  }, [pyodide, cells, isExecuting]);
-
-  const addCell = () => {
-    const newId = cells.length > 0 ? Math.max(...cells.map(c => c.id)) + 1 : 1;
-    setCells([...cells, { id: newId, code: '', output: '', status: 'idle' }]);
-  };
-
-  const updateCellCode = (id, newCode) => {
-    setCells(prev => prev.map(c => c.id === id ? { ...c, code: newCode } : c));
-  };
-
-  const removeCell = (id) => {
-    if (cells.length > 1) {
-      setCells(prev => prev.filter(c => c.id !== id));
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-20 space-y-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Initializing Python Runtime...</p>
-        <p className="text-xs text-gray-400">This might take a moment as we download Pyodide (WASM).</p>
-      </div>
-    );
+    const obs = new MutationObserver(() => setDark(isDark()))
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+  return {
+    bg: dark ? '#0f172a' : '#f8fafc', surface: dark ? '#1e293b' : '#ffffff',
+    surface2: dark ? '#0f172a' : '#f1f5f9', border: dark ? '#334155' : '#e2e8f0',
+    text: dark ? '#e2e8f0' : '#1e293b', muted: dark ? '#94a3b8' : '#64748b', hint: dark ? '#475569' : '#94a3b8',
+    blue: dark ? '#38bdf8' : '#0284c7', blueBg: dark ? 'rgba(56,189,248,0.12)' : 'rgba(2,132,199,0.08)', blueBd: dark ? '#38bdf8' : '#0284c7',
+    amber: dark ? '#fbbf24' : '#d97706', amberBg: dark ? 'rgba(251,191,36,0.12)' : 'rgba(217,119,6,0.08)', amberBd: dark ? '#fbbf24' : '#d97706',
+    green: dark ? '#4ade80' : '#16a34a', greenBg: dark ? 'rgba(74,222,128,0.12)' : 'rgba(22,163,74,0.08)', greenBd: dark ? '#4ade80' : '#16a34a',
+    red: dark ? '#f87171' : '#dc2626', redBg: dark ? 'rgba(248,113,113,0.12)' : 'rgba(220,38,38,0.08)', redBd: dark ? '#f87171' : '#dc2626',
+    teal: dark ? '#2dd4bf' : '#0d9488', tealBg: dark ? 'rgba(45,212,191,0.12)' : 'rgba(13,148,136,0.08)', tealBd: dark ? '#2dd4bf' : '#0d9488',
+    purple: dark ? '#a78bfa' : '#7c3aed', purpleBg: dark ? 'rgba(167,139,250,0.12)' : 'rgba(124,58,237,0.08)', purpleBd: dark ? '#a78bfa' : '#7c3aed',
   }
+}
+
+// ── Detect opencalc figure JSON ───────────────────────────────────────────────
+function isFigureOutput(str) {
+  if (typeof str !== 'string') return false
+  const trimmed = str.trim()
+  return trimmed.startsWith('{"type":"opencalc_figure"') ||
+    trimmed.startsWith('{"type": "opencalc_figure"')
+}
+
+// ── The Python source of opencalc.py, embedded as a string ───────────────────
+// This gets written to Pyodide's virtual filesystem so students can import it.
+// Update this when opencalc_python_lib.py changes.
+const OPENCALC_LIB_SOURCE = `
+import json
+import math
+
+BLUE='blue';AMBER='amber';GREEN='green';RED='red';PURPLE='purple';TEAL='teal';GRAY='gray'
+
+class Figure:
+    def __init__(self,width=None,height=None,square=False,xmin=-5,xmax=5,ymin=-5,ymax=5,title=None):
+        self._elements=[];self._width=width;self._height=height;self._square=square
+        self._xmin=xmin;self._xmax=xmax;self._ymin=ymin;self._ymax=ymax;self._title=title
+    def grid(self,step=1,color='border'):
+        self._elements.append({'type':'grid','step':step,'color':color});return self
+    def axes(self,labels=True,ticks=True):
+        self._elements.append({'type':'axes','labels':labels,'ticks':ticks});return self
+    def arrow(self,start,end,color='blue',label=None,width=2.5,dashed=False,alpha=1.0):
+        self._elements.append({'type':'arrow','start':list(start),'end':list(end),'color':color,'label':label,'width':width,'dashed':dashed,'alpha':alpha});return self
+    def vector(self,v,color='blue',label=None,origin=None,width=2.5):
+        ox,oy=(origin or [0,0]);self._elements.append({'type':'arrow','start':[ox,oy],'end':[ox+v[0],oy+v[1]],'color':color,'label':label or f'[{v[0]},{v[1]}]','width':width,'dashed':False,'alpha':1.0});return self
+    def point(self,pos,color='amber',label=None,radius=6):
+        self._elements.append({'type':'point','pos':list(pos),'color':color,'label':label,'radius':radius});return self
+    def line(self,start,end,color='muted',width=1.5,dashed=False,alpha=1.0):
+        self._elements.append({'type':'line','start':list(start),'end':list(end),'color':color,'width':width,'dashed':dashed,'alpha':alpha});return self
+    def hline(self,y,color='muted',width=1,dashed=True):
+        self._elements.append({'type':'line','start':[self._xmin,y],'end':[self._xmax,y],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
+    def vline(self,x,color='muted',width=1,dashed=True):
+        self._elements.append({'type':'line','start':[x,self._ymin],'end':[x,self._ymax],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
+    def plot(self,fn,xmin=None,xmax=None,steps=300,color='blue',width=2.5,label=None,fill=False,fill_alpha=0.15):
+        x0=xmin if xmin is not None else self._xmin;x1=xmax if xmax is not None else self._xmax
+        xs=[x0+(x1-x0)*i/steps for i in range(steps+1)];ys=[]
+        for x in xs:
+            try:
+                y=fn(x);ys.append(float('inf') if y!=y else y)
+            except:ys.append(None)
+        self._elements.append({'type':'curve','xs':xs,'ys':ys,'color':color,'width':width,'label':label,'fill':fill,'fill_alpha':fill_alpha});return self
+    def scatter(self,xs,ys,color='blue',radius=4,labels=None):
+        self._elements.append({'type':'scatter','xs':list(xs),'ys':list(ys),'color':color,'radius':radius,'labels':labels});return self
+    def parametric(self,xfn,yfn,tmin=0,tmax=2*math.pi,steps=300,color='purple',width=2):
+        ts=[tmin+(tmax-tmin)*i/steps for i in range(steps+1)];xs=[];ys=[]
+        for t in ts:
+            try:xs.append(xfn(t))
+            except:xs.append(None)
+            try:ys.append(yfn(t))
+            except:ys.append(None)
+        self._elements.append({'type':'curve','xs':xs,'ys':ys,'color':color,'width':width,'label':None,'fill':False,'fill_alpha':0});return self
+    def fill_between(self,fn_top,fn_bottom=None,xmin=None,xmax=None,color='blue',alpha=0.2,steps=200):
+        x0=xmin if xmin is not None else self._xmin;x1=xmax if xmax is not None else self._xmax
+        xs=[x0+(x1-x0)*i/steps for i in range(steps+1)];tops=[];bottoms=[]
+        for x in xs:
+            try:tops.append(fn_top(x))
+            except:tops.append(None)
+            if fn_bottom:
+                try:bottoms.append(fn_bottom(x))
+                except:bottoms.append(None)
+            else:bottoms.append(0)
+        self._elements.append({'type':'region','xs':xs,'tops':tops,'bottoms':bottoms,'color':color,'alpha':alpha});return self
+    def text(self,pos,content,color='text',size=13,align='center',bold=False):
+        self._elements.append({'type':'text','pos':list(pos),'content':str(content),'color':color,'size':size,'align':align,'bold':bold});return self
+    def polygon(self,points,color='blue',fill=True,alpha=0.2,stroke=True,stroke_width=1.5):
+        self._elements.append({'type':'polygon','points':[list(p) for p in points],'color':color,'fill':fill,'alpha':alpha,'stroke':stroke,'stroke_width':stroke_width});return self
+    def rect(self,x,y,w,h,color='blue',fill=True,alpha=0.2):
+        return self.polygon([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],color=color,fill=fill,alpha=alpha)
+    def circle(self,center,radius,color='blue',fill=False,alpha=0.2,steps=60):
+        pts=[[center[0]+radius*math.cos(2*math.pi*i/steps),center[1]+radius*math.sin(2*math.pi*i/steps)] for i in range(steps+1)]
+        self._elements.append({'type':'polygon','points':pts,'color':color,'fill':fill,'alpha':alpha,'stroke':True,'stroke_width':1.5});return self
+    def transformed_grid(self,matrix,color_h='blue',color_v='green',range_=5,alpha=0.7):
+        a,b=matrix[0];c,d=matrix[1]
+        self._elements.append({'type':'transformed_grid','a':a,'b':b,'c':c,'d':d,'range':range_,'color_h':color_h,'color_v':color_v,'alpha':alpha});return self
+    def riemann(self,fn,a,b,n=10,method='midpoint',color='blue',alpha=0.3):
+        rects=[];width=(b-a)/n
+        for i in range(n):
+            x_left=a+i*width;x_eval=x_left+(width/2 if method=='midpoint' else width if method=='right' else 0)
+            try:h=fn(x_eval);rects.append({'x':x_left,'w':width,'h':h})
+            except:pass
+        self._elements.append({'type':'riemann','rects':rects,'color':color,'alpha':alpha});return self
+    def tangent(self,fn,x0,length=2,color='amber',width=2,label=None):
+        dx=1e-5;slope=(fn(x0+dx)-fn(x0-dx))/(2*dx);y0=fn(x0)
+        self._elements.append({'type':'tangent','x0':x0,'y0':y0,'slope':slope,'x1':x0-length/2,'x2':x0+length/2,'color':color,'width':width,'label':label or f'slope = {slope:.3f}'});return self
+    def bars(self,labels,values,color='blue',alpha=0.8):
+        self._elements.append({'type':'bars','labels':[str(l) for l in labels],'values':[float(v) for v in values],'color':color,'alpha':alpha});return self
+    def show(self):
+        return json.dumps({'type':'opencalc_figure','width':self._width,'height':self._height,'square':self._square,'xmin':self._xmin,'xmax':self._xmax,'ymin':self._ymin,'ymax':self._ymax,'title':self._title,'elements':self._elements})
+
+def quick_plot(fn,xmin=-5,xmax=5,color='blue',label=None,title=None):
+    fig=Figure(xmin=xmin,xmax=xmax,ymin=-10,ymax=10,title=title)
+    fig.grid().axes();fig.plot(fn,color=color,label=label);return fig.show()
+
+def quick_vectors(*vectors,labels=None):
+    colors=['blue','amber','green','red','purple','teal']
+    fig=Figure(square=True,xmin=-6,xmax=6,ymin=-6,ymax=6)
+    fig.grid().axes()
+    for i,v in enumerate(vectors):
+        lbl=labels[i] if labels and i<len(labels) else f'v{i+1}'
+        fig.vector(v,color=colors[i%len(colors)],label=lbl)
+    return fig.show()
+
+def quick_transform(matrix,vector=None):
+    fig=Figure(square=True,xmin=-5,xmax=5,ymin=-5,ymax=5)
+    fig.grid();fig.transformed_grid(matrix)
+    a,b=matrix[0];c,d=matrix[1]
+    fig.vector([a,b],color='red',label='î→');fig.vector([c,d],color='green',label='ĵ→')
+    if vector:
+        vx,vy=vector;fig.vector([vx,vy],color='purple',label='v')
+        fig.vector([a*vx+c*vy,b*vx+d*vy],color='purple',label='Tv')
+    return fig.show()
+`
+
+// ── Starter cells ─────────────────────────────────────────────────────────────
+const STARTER_CELLS = [
+  {
+    id: 1,
+    code: `# Welcome to the open-calc Python Notebook
+# Run any Python — or use the opencalc library to create visualisations.
+
+import math
+print("Python is running!")
+print(f"pi = {math.pi:.6f}")`,
+    output: '', status: 'idle', figureJson: null,
+  },
+  {
+    id: 2,
+    code: `# ── opencalc library — visualise anything ────────────────
+from opencalc import Figure, quick_plot
+
+# Plot a function
+fig = Figure(xmin=-4, xmax=4, ymin=-2, ymax=10, title="y = x²")
+fig.grid()
+fig.axes()
+fig.plot(lambda x: x**2, color='blue', label='x²', fill=True)
+fig.tangent(lambda x: x**2, x0=2, color='amber')
+fig.point([2, 4], color='amber', label='(2, 4)')
+fig.show()   # ← last line returns the figure JSON`,
+    output: '', status: 'idle', figureJson: null,
+  },
+  {
+    id: 3,
+    code: `# ── Linear algebra ────────────────────────────────────────
+from opencalc import Figure, quick_vectors, quick_transform
+
+# Visualise a linear transformation (90° rotation)
+quick_transform([[0, -1], [1, 0]], vector=[2, 1])`,
+    output: '', status: 'idle', figureJson: null,
+  },
+]
+
+// ── CellOutput ────────────────────────────────────────────────────────────────
+function CellOutput({ cell, C }) {
+  if (!cell.output && !cell.figureJson) return null
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8 min-h-screen pb-20">
-      <header className="flex justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+    <div style={{ borderTop: `0.5px solid ${C.border}` }}>
+      <div style={{
+        fontSize: 10, color: C.hint, padding: '6px 14px 2px',
+        fontFamily: 'monospace', fontWeight: 500
+      }}>
+        Out [{cell.id}]
+      </div>
+
+      {/* Figure canvas */}
+      {cell.figureJson && (
+        <div style={{ padding: '0 14px 10px' }}>
+          <FigureRenderer figureJson={cell.figureJson} C={C} />
+        </div>
+      )}
+
+      {/* Text output */}
+      {cell.output && (
+        <pre style={{
+          margin: 0, padding: '4px 14px 12px',
+          fontFamily: 'monospace', fontSize: 13, lineHeight: 1.6,
+          color: cell.status === 'error' ? C.red : C.text,
+          background: 'transparent', whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+        }}>
+          {cell.output}
+        </pre>
+      )}
+    </div>
+  )
+}
+
+// ── Main notebook ─────────────────────────────────────────────────────────────
+export default function PythonNotebook() {
+  const C = useColors()
+  const [pyodide, setPyodide] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
+  const [cells, setCells] = useState(STARTER_CELLS)
+  const [isExecuting, setIsExecuting] = useState(false)
+
+  // ── Load Pyodide and install the opencalc library ──────────────────────────
+  useEffect(() => {
+    async function init() {
+      try {
+        // Load Pyodide if not already on window
+        if (!window.loadPyodide) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script')
+            script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
+            script.onload = resolve
+            script.onerror = () => reject(new Error('Failed to load Pyodide CDN'))
+            document.head.appendChild(script)
+          })
+        }
+        const py = await window.loadPyodide()
+
+        // Write opencalc.py into Pyodide's virtual filesystem
+        py.FS.writeFile('/home/pyodide/opencalc.py', OPENCALC_LIB_SOURCE)
+
+        // Verify it works
+        await py.runPythonAsync('from opencalc import Figure; print("opencalc ready")')
+
+        setPyodide(py)
+        setIsLoading(false)
+      } catch (err) {
+        console.error('Pyodide init failed:', err)
+        setLoadError(err.message)
+        setIsLoading(false)
+      }
+    }
+    init()
+  }, [])
+
+  // ── Run a cell ─────────────────────────────────────────────────────────────
+  const runCell = useCallback(async (cellId) => {
+    if (!pyodide || isExecuting) return
+    setIsExecuting(true)
+    setCells(prev => prev.map(c => c.id === cellId
+      ? { ...c, status: 'running', output: '', figureJson: null } : c))
+
+    const cell = cells.find(c => c.id === cellId)
+    let textOutput = ''
+
+    // Capture stdout
+    pyodide.setStdout({ batched: msg => { textOutput += msg + '\n' } })
+    pyodide.setStderr({ batched: msg => { textOutput += msg + '\n' } })
+
+    try {
+      const result = await pyodide.runPythonAsync(cell.code)
+
+      // Check if the return value is an opencalc figure
+      const resultStr = result !== undefined && result !== null ? String(result) : ''
+      const isFigure = isFigureOutput(resultStr)
+
+      setCells(prev => prev.map(c => c.id === cellId ? {
+        ...c,
+        status: 'idle',
+        // Text output: show if there's stdout, or show result if not a figure
+        output: textOutput || (!isFigure && resultStr ? resultStr : ''),
+        // Figure: set if result is opencalc JSON
+        figureJson: isFigure ? resultStr : null,
+      } : c))
+
+    } catch (err) {
+      setCells(prev => prev.map(c => c.id === cellId ? {
+        ...c,
+        status: 'error',
+        output: (textOutput ? textOutput + '\n' : '') + 'Error: ' + err.message,
+        figureJson: null,
+      } : c))
+    } finally {
+      setIsExecuting(false)
+    }
+  }, [pyodide, cells, isExecuting])
+
+  // ── Run all cells in order ─────────────────────────────────────────────────
+  const runAll = useCallback(async () => {
+    for (const cell of cells) {
+      await new Promise(resolve => {
+        // Small delay between cells so state updates render
+        setTimeout(resolve, 50)
+      })
+      await runCell(cell.id)
+    }
+  }, [cells, runCell])
+
+  const addCell = () => {
+    const newId = cells.length > 0 ? Math.max(...cells.map(c => c.id)) + 1 : 1
+    setCells([...cells, {
+      id: newId, code: '# New cell\n', output: '', status: 'idle', figureJson: null,
+    }])
+  }
+
+  const updateCode = (id, code) =>
+    setCells(prev => prev.map(c => c.id === id ? { ...c, code } : c))
+
+  const removeCell = (id) => {
+    if (cells.length > 1) setCells(prev => prev.filter(c => c.id !== id))
+  }
+
+  const clearOutput = (id) =>
+    setCells(prev => prev.map(c => c.id === id
+      ? { ...c, output: '', figureJson: null } : c))
+
+  // ── Loading screen ─────────────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', padding: 60, gap: 16, fontFamily: 'sans-serif'
+      }}>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+        <div style={{
+          width: 40, height: 40, borderRadius: '50%',
+          border: `3px solid ${C.teal}`, borderTopColor: 'transparent',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <div style={{ fontSize: 14, fontWeight: 500, color: C.text }}>
+          Loading Python runtime...
+        </div>
+        <div style={{ fontSize: 12, color: C.hint }}>
+          Downloading Pyodide (WebAssembly) — first load takes ~10s
+        </div>
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
+        <div style={{
+          background: C.redBg, border: `1px solid ${C.redBd}`,
+          borderRadius: 10, padding: '12px 16px', color: C.red
+        }}>
+          <div style={{ fontWeight: 500, marginBottom: 4 }}>Failed to load Python runtime</div>
+          <div style={{ fontSize: 12 }}>{loadError}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Main UI ────────────────────────────────────────────────────────────────
+  return (
+    <div style={{ width: '100%', fontFamily: 'sans-serif', maxWidth: 900, margin: '0 auto' }}>
+
+      {/* Header */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        background: C.surface, border: `0.5px solid ${C.border}`, borderRadius: 12,
+        padding: '12px 18px', marginBottom: 16
+      }}>
         <div>
-          <h1 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <span className="p-1.5 bg-teal-500 rounded-lg text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </span>
-            Interactive Python Notebook
-          </h1>
-          <p className="text-xs text-gray-500 mt-1">Python 3.x running in WebAssembly (Pyodide)</p>
+          <div style={{
+            fontSize: 15, fontWeight: 500, color: C.text, display: 'flex',
+            alignItems: 'center', gap: 8
+          }}>
+            <span style={{
+              background: C.teal, borderRadius: 6, padding: '3px 7px',
+              fontSize: 12, color: '#fff'
+            }}>{'<>'}</span>
+            Python Notebook
+          </div>
+          <div style={{ fontSize: 11, color: C.hint, marginTop: 2 }}>
+            Python 3.x · WebAssembly · opencalc visualisation library loaded
+          </div>
         </div>
-        <div className="px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full text-xs font-semibold ring-1 ring-teal-500/20">
-          Kernel: Ready
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={runAll} disabled={isExecuting}
+            style={{
+              fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
+              border: 'none', background: C.teal, color: '#fff',
+              opacity: isExecuting ? 0.5 : 1
+            }}>
+            ▶ Run all
+          </button>
+          <button onClick={addCell}
+            style={{
+              fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
+              border: `0.5px solid ${C.border}`, background: 'transparent', color: C.muted
+            }}>
+            + Add cell
+          </button>
         </div>
-      </header>
+      </div>
 
-      <div className="space-y-4">
-        {cells.map((cell, index) => (
-          <div key={cell.id} className="group relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 transition-all hover:border-teal-500/30">
-            <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
-              <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+      {/* Cells */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {cells.map((cell) => (
+          <div key={cell.id}
+            style={{
+              background: C.surface, border: `0.5px solid ${cell.status === 'error' ? C.redBd :
+                  cell.status === 'running' ? C.tealBd : C.border}`,
+              borderRadius: 12, overflow: 'hidden',
+              transition: 'border-color .2s'
+            }}>
+
+            {/* Cell header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '6px 14px', background: C.surface2,
+              borderBottom: `0.5px solid ${C.border}`
+            }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: C.hint }}>
                 In [{cell.id}]
+                {cell.status === 'running' && (
+                  <span style={{ color: C.teal, marginLeft: 8 }}>● running</span>
+                )}
               </span>
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => runCell(cell.id)}
-                  disabled={isExecuting}
-                  className="p-1 px-2 text-[10px] font-bold bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors disabled:opacity-50 flex items-center gap-1"
-                >
-                  {cell.status === 'running' ? 'Running...' : 'Run Cell'}
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={() => runCell(cell.id)} disabled={isExecuting}
+                  style={{
+                    fontSize: 11, padding: '3px 10px', borderRadius: 6,
+                    cursor: isExecuting ? 'default' : 'pointer', border: 'none',
+                    background: C.teal, color: '#fff', opacity: isExecuting ? 0.5 : 1
+                  }}>
+                  {cell.status === 'running' ? '...' : '▶ Run'}
                 </button>
-                <button 
-                  onClick={() => removeCell(cell.id)}
-                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                <button onClick={() => clearOutput(cell.id)}
+                  style={{
+                    fontSize: 11, padding: '3px 8px', borderRadius: 6,
+                    cursor: 'pointer', border: `0.5px solid ${C.border}`,
+                    background: 'transparent', color: C.hint
+                  }}>
+                  Clear
+                </button>
+                <button onClick={() => removeCell(cell.id)} disabled={cells.length <= 1}
+                  style={{
+                    fontSize: 11, padding: '3px 8px', borderRadius: 6,
+                    cursor: cells.length <= 1 ? 'default' : 'pointer',
+                    border: `0.5px solid ${C.border}`, background: 'transparent',
+                    color: C.hint, opacity: cells.length <= 1 ? 0.3 : 1
+                  }}>
+                  ✕
                 </button>
               </div>
-            </div>
-            
-            <div className="h-auto min-h-[100px]">
-              <Editor
-                height="150px"
-                defaultLanguage="python"
-                theme="vs-dark"
-                value={cell.code}
-                onChange={(value) => updateCellCode(cell.id, value)}
-                options={{
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  fontSize: 14,
-                  lineNumbers: 'on',
-                  roundedSelection: false,
-                  padding: { top: 10, bottom: 10 },
-                  automaticLayout: true
-                }}
-              />
             </div>
 
-            {cell.output && (
-              <div className="p-4 bg-gray-50 dark:bg-black/20 font-mono text-sm border-t border-gray-100 dark:border-gray-800">
-                <div className="text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1">Out [{cell.id}]</div>
-                <pre className={`whitespace-pre-wrap ${cell.status === 'error' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}`}>
-                  {cell.output}
-                </pre>
-              </div>
-            )}
+            {/* Monaco Editor */}
+            <Editor
+              height="auto"
+              minHeight="80px"
+              defaultLanguage="python"
+              theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs'}
+              value={cell.code}
+              onChange={val => updateCode(cell.id, val || '')}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 13,
+                lineNumbers: 'on',
+                padding: { top: 10, bottom: 10 },
+                automaticLayout: true,
+                // Keyboard shortcut: Shift+Enter to run
+                extraEditorClassName: '',
+              }}
+              onMount={(editor) => {
+                editor.addCommand(
+                  // Shift+Enter = run this cell
+                  monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+                  () => runCell(cell.id)
+                )
+              }}
+            />
+
+            {/* Output */}
+            <CellOutput cell={cell} C={C} />
           </div>
         ))}
       </div>
 
-      <button 
-        onClick={addCell}
-        className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl text-gray-400 hover:text-teal-500 hover:border-teal-500 hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-all font-medium flex items-center justify-center gap-2"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-        Add New Cell
+      {/* Add cell button */}
+      <button onClick={addCell}
+        style={{
+          width: '100%', marginTop: 12, padding: 16,
+          border: `1.5px dashed ${C.border}`, borderRadius: 12,
+          background: 'transparent', color: C.hint, fontSize: 13,
+          cursor: 'pointer', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', gap: 6
+        }}>
+        + Add cell
       </button>
 
-      <footer className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 text-center space-y-4">
-        <p className="text-sm text-gray-500">
-          This notebook shares a single global Python state. Variables defined in one cell are accessible in others.
-        </p>
-        <div className="flex justify-center gap-4 text-xs font-medium text-gray-400">
-          <span className="flex items-center gap-1">
-             <div className="w-2 h-2 rounded-full bg-teal-500"></div> Python 3.11+
-          </span>
-          <span className="flex items-center gap-1">
-             <div className="w-2 h-2 rounded-full bg-teal-500"></div> WebAssembly
-          </span>
-          <span className="flex items-center gap-1">
-             <div className="w-2 h-2 rounded-full bg-teal-500"></div> No Server Required
-          </span>
+      {/* Footer */}
+      <div style={{
+        marginTop: 24, paddingTop: 16, borderTop: `0.5px solid ${C.border}`,
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: 12, color: C.hint, marginBottom: 8 }}>
+          All cells share a single Python kernel. Variables persist between cells.
         </div>
-      </footer>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, fontSize: 11, color: C.hint }}>
+          {['Python 3.11+', 'WebAssembly', 'opencalc viz library', 'Shift+Enter to run'].map(t => (
+            <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: C.teal, display: 'inline-block' }} />
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+
     </div>
-  );
+  )
 }
