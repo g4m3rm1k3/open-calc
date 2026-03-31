@@ -1,8 +1,8 @@
-import lesson0_1 from './lesson0-1.jsx'
-import lesson1 from './lesson1.jsx'
-import lesson2 from './lesson2.jsx'
-import lesson3 from './lesson3.jsx'
-import lesson4 from './lesson4.jsx'
+import lesson0_1 from './lesson0-1.js'
+import lesson1 from './lesson1.js'
+import lesson2 from './lesson2.js'
+import lesson3 from './lesson3.js'
+import lesson4 from './lesson4.js'
 
 export default [
   {
