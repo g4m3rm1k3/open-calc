@@ -361,10 +361,18 @@ export default function AppShell({ children }) {
         return
       }
 
-      const activeTag = document.activeElement?.tagName
-      const isInput = ['INPUT', 'TEXTAREA'].includes(activeTag)
+      const activeElement = document.activeElement
+      const target = e.target
+      
+      // Nuclear Typing Check: Covers Monaco (Python), CodeMirror, Standard Inputs, and Custom Editable Divs
+      const isTyping = 
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement?.tagName) || 
+        activeElement?.isContentEditable ||
+        target?.closest('.monaco-editor') || 
+        target?.closest('.cm-editor') ||
+        target?.closest('[contenteditable="true"]')
 
-      if (isInput) return
+      if (isTyping && e.key !== 'Escape') return
 
       // 'g' key for graph
       if (e.key.toLowerCase() === 'g') {

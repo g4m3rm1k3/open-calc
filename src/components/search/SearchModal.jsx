@@ -38,6 +38,19 @@ export default function SearchModal() {
 
   useEffect(() => {
     const handler = (e) => {
+      const activeElement = document.activeElement
+      const target = e.target
+      
+      const isTyping = 
+        (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement?.tagName) || 
+         activeElement?.isContentEditable ||
+         target?.closest('.monaco-editor') || 
+         target?.closest('.cm-editor') ||
+         target?.closest('[contenteditable="true"]')) &&
+        activeElement !== inputRef.current // Allow CMD+K inside the search MODAL itself only if intended
+
+      if (isTyping && e.key !== 'Escape') return
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         isOpen ? closeSearch() : openSearch()
