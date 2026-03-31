@@ -118,10 +118,10 @@ export default {
               testCode: `
 if 'cube' not in locals(): raise ValueError("Missing: cube")
 if cube == 216: # 6^3
-    print("Correct! len('Python') is 6, 6^3 is 216.")
+    res = "SUCCESS: Correct! len('Python') is 6, 6^3 is 216."
 else:
     raise ValueError(f"Got {cube}, expected 216. Did you use len(word) then pow(val, 3)?")
-True
+res
 `,
               hint: 'cube = pow(len(word), 3)',
             },
@@ -139,10 +139,10 @@ True
 if 'safe_result' not in locals(): raise ValueError("Missing: safe_result")
 # round(-15.8) is -16. max(0, -16) is 0.
 if safe_result == 0:
-    print("Safe! You successfully used max() to clamp a negative rounded result.")
+    res = "SUCCESS: Safe! You successfully used max() to clamp a negative rounded result."
 else:
     raise ValueError(f"Got {safe_result}, expected 0. (-16 vs 0).")
-True
+res
 `,
               hint: 'safe_result = max(0, round(val))',
             },
@@ -159,10 +159,10 @@ True
               testCode: `
 if 'check' not in locals(): raise ValueError("Missing: check")
 if check == int:
-    print("Perfect. The metadata shows that lengths are always Integers.")
+    res = "SUCCESS: Perfect. The metadata shows that lengths are always Integers."
 else:
     raise ValueError("Did you type(len(text))?")
-True
+res
 `,
               hint: 'check = type(len(text))',
             },
@@ -182,10 +182,10 @@ if 'master' not in locals(): raise ValueError("Missing: master")
 # len('OK') -> 2. pow(2,2) -> 4.
 # 6 + 4 = 10.
 if master == 10:
-    print("MASTER TRACE SUCCESS! You have perfectly simulated the evaluation spiral.")
+    res = "SUCCESS: MASTER TRACE SUCCESS! You have perfectly simulated the evaluation spiral."
 else:
     raise ValueError(f"Trace mismatch! Got {master}, expected 10.")
-True
+res
 `,
               hint: 'master = abs(round(a)) + pow(len("OK"), 2)',
             }

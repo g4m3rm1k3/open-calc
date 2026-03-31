@@ -197,10 +197,10 @@ export default {
               testCode: `
 if 'say_hello' not in locals(): raise ValueError("Missing function: say_hello")
 if say_hello("User") == "Hi User":
-    print("Greeter active!")
+    res = "SUCCESS: Greeter active! Communication tools are now under your control."
 else:
     raise ValueError("Check your return string and parameters.")
-True
+res
 `,
             },
             {
@@ -216,10 +216,10 @@ True
               testCode: `
 if 'square' not in locals(): raise ValueError("Missing: square")
 if square(4) == 16:
-    print("Power tool verified.")
+    res = "SUCCESS: Power tool verified. Math logic is now abstracted."
 else:
     raise ValueError("Check multiplication logic.")
-True
+res
 `,
             },
             {
@@ -235,8 +235,10 @@ True
               testCode: `
 if 'subtract' not in locals(): raise ValueError("Missing: subtract")
 if subtract(10, 4) == 6:
-    print("Subtraction active.")
-True
+    res = "SUCCESS: Subtraction active. Multi-input machines confirmed."
+else:
+    raise ValueError("Check your subtraction logic.")
+res
 `,
             },
             {
@@ -246,15 +248,20 @@ True
               challengeTitle: 'Word Scrutiny',
               difficulty: 'medium',
               prompt: 'Define `is_epic(word)`: returns True if length > 7, else False.',
-              instructions: 'Hint: use len(word) > 7.',
+              instructions: 'Synthesize len() and Boolean Logic.',
               code: '# Your code\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if not is_epic("Short"):
-    if is_epic("Legendary"):
-        print("Epic logic verified.")
-True
+if 'is_epic' not in locals(): raise ValueError("Missing: is_epic")
+short = is_epic("Hi")
+long = is_epic("Monumental")
+if short == False and long == True:
+    res = "SUCCESS: Logic verified. Function accurately measures and categorizes strings."
+else:
+    raise ValueError(f"Epic mismatch! 'Hi' should be False, 'Monumental' should be True.")
+res
 `,
+              hint: 'return len(word) > 7',
             },
             {
               id: 25,
@@ -267,10 +274,12 @@ True
               code: '# Your code\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
+if 'to_kelvin' not in locals(): raise ValueError("Missing: to_kelvin")
 if round(to_kelvin(0), 2) == 273.15:
-    print("Thermo tool active.")
-True
+    res = "SUCCESS: Conversion machine verified. Absolute zero is now accessible."
+res
 `,
+              hint: 'return celsius + 273.15',
             },
             {
               id: 26,
@@ -283,10 +292,14 @@ True
               code: '# Your code',
               output: '', status: 'idle', figureJson: null,
               testCode: `
+if 'shout' not in locals(): raise ValueError("Missing: shout")
 if shout("Hi") == "Hi!!!":
-    print("Sound level maximized.")
-True
+    res = "SUCCESS: Communication level maximized. Shout received."
+else:
+    raise ValueError("Check your return string concatenation.")
+res
 `,
+              hint: 'return text + "!!!"',
             },
             {
               id: 27,
@@ -299,10 +312,14 @@ True
               code: '# Your code',
               output: '', status: 'idle', figureJson: null,
               testCode: `
+if 'clamp' not in locals(): raise ValueError("Missing: clamp")
 if clamp(150) == 100 and clamp(50) == 50:
-    print("Safety clamp active.")
-True
+    res = "SUCCESS: Safety clamp active. Infinite values restricted."
+else:
+    raise ValueError("Check your use of min(val, 100).")
+res
 `,
+              hint: 'return min(val, 100)',
             },
             {
               id: 28,
@@ -315,10 +332,14 @@ True
               code: '# Your code',
               output: '', status: 'idle', figureJson: null,
               testCode: `
+if 'identify' not in locals(): raise ValueError("Missing: identify")
 if identify(10) == int:
-    print("Metadata tool verified.")
-True
+    res = "SUCCESS: Metadata analyzer verified."
+else:
+    raise ValueError("Did you return type(x)?")
+res
 `,
+              hint: 'print("Identity Known") then return type(x)',
             },
             {
               id: 29,
@@ -331,10 +352,14 @@ True
               code: '# Your code',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if diff(10, 50) == 40:
-    print("Magnitude tool active.")
-True
+if 'diff' not in locals(): raise ValueError("Missing: diff")
+if diff(10, 50) == 40 and diff(50, 10) == 40:
+    res = "SUCCESS: Magnitude tool active. Distance is always positive."
+else:
+    raise ValueError("Use return abs(a - b).")
+res
 `,
+              hint: 'return abs(a - b)',
             },
             {
               id: 30,
@@ -347,10 +372,14 @@ True
               code: '# Build the machine\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
+if 'score_word' not in locals(): raise ValueError("Missing: score_word")
 if score_word("Code", 10) == 40:
-    print("ARCHITECT STATUS ACHIEVED. You have mastered defining your own tools.")
-True
+    res = "SUCCESS: ARCHITECT STATUS ACHIEVED. You have mastered defining your own tools."
+else:
+    raise ValueError("Check your math: length * multiplier.")
+res
 `,
+              hint: 'return len(word) * multiplier',
             }
           ],
         },
