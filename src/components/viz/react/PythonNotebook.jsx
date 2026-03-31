@@ -338,11 +338,11 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
         </div>
       )}
 
-      {/* ── Demo prose box (non-challenge cells with prose/instructions) ── */}
-      {!isChallenge && (cell.prose || cell.instructions || cell.cellTitle) && (
+      {/* ── Demo prose / instructions box ── */}
+      {(cell.prose || cell.instructions || (!isChallenge && cell.cellTitle)) && (
         <div style={{ borderBottom: `0.5px solid ${C.border}` }}>
-          {/* Title bar */}
-          {cell.cellTitle && (
+          {/* Title bar (only for non-challenges, challenges have their own header) */}
+          {!isChallenge && cell.cellTitle && (
             <div style={{
               padding: '8px 16px 0',
               fontSize: 11, fontWeight: 700, letterSpacing: '0.07em',
@@ -353,7 +353,7 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
           )}
           {/* Prose */}
           {cell.prose && (
-            <div style={{ padding: cell.cellTitle ? '6px 16px 10px' : '10px 16px 10px' }}>
+            <div style={{ padding: (!isChallenge && cell.cellTitle) ? '6px 16px 10px' : '10px 16px 10px' }}>
               {(Array.isArray(cell.prose) ? cell.prose : [cell.prose]).map((p, i) => (
                 <p key={i} style={{
                   margin: i === 0 ? 0 : '8px 0 0',
@@ -374,7 +374,7 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
               border: `1px solid ${C.amberBd}`,
               fontSize: 12, color: C.amber, lineHeight: 1.65,
               whiteSpace: 'pre-line',
-            }}>
+            }} className="notebook-instructions">
               {cell.instructions}
             </div>
           )}
