@@ -240,7 +240,10 @@ async function getPyodide() {
     }
 
     // 2. Initialize
-    const py = await window.loadPyodide();
+    const py = await window.loadPyodide({
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
+      fullStdLib: false
+    });
 
     // 3. Setup filesystem
     py.FS.writeFile('/home/pyodide/opencalc.py', OPENCALC_LIB_SOURCE);
