@@ -355,7 +355,7 @@ export default function JSNotebook({ lesson: lessonProp, params = {} }) {
       {/* Cells */}
       {cells.map((cell, i) => (
         <NotebookCell
-          key={i}
+          key={`${title}-${i}`}
           cell={cell}
           cellIndex={i}
         />

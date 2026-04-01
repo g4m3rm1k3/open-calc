@@ -6,11 +6,11 @@ const LESSON_JS_CORE_0_1 = {
   cells: [
     {
       type: 'markdown',
-      instruction: `### Lesson Framing: Language Before Tools\nIn this lesson, each visual cell demonstrates one core runtime-language fact.\n\nRead first, then run:\n1. **Prediction**: what should happen?\n2. **Observation**: what actually happened?\n3. **Explanation**: which rule caused it?\n\nYou are building a stable model: **syntax** (form), **semantics** (meaning), **spec** (contract), **engine** (implementation).`,
+      instruction: `### Before You Begin\n\nThis is a **conceptual lesson** — you are building mental models, not writing JavaScript yet. Every line of code you write later will be more reliable when these foundations are precise.\n\nFor each visual cell:\n1. **Read the instruction fully** before pressing Run.\n2. **Form a prediction** — what should this show?\n3. **Run it**, then explain which rule produced that behavior.\n\nBy the end of this lesson you will have four precise terms: **syntax**, **semantics**, **spec**, **engine**. These terms replace vague explanations like "JavaScript does weird things."`,
     },
     {
       type: 'js',
-      instruction: 'Slide 1: A language is a contract.\nTeaching goal: separate human intent from machine execution.\nWatch how meaning flows from symbols to behavior.',
+      instruction: `A programming language is a formal contract between a developer and a machine.\n\nWhen you write code, you are not issuing hardware instructions directly. You are writing symbols that follow the rules of a language specification — a precise document that defines what those symbols must mean. Any engine that correctly implements that spec will honor those rules and produce the same result.\n\nThis contract separates two things:\n  What must happen — defined by the spec\n  How it happens — decided by the engine\n\nThe animation below shows this flow. Run it and watch human intent connect to machine behavior through the language contract.`,
       html: `<div class="stage">
   <div class="label top">Human Intent</div>
   <div class="arrow" id="flow"></div>
@@ -36,7 +36,7 @@ console.log('A programming language maps intent to behavior.');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 2: Syntax is code shape, not usefulness.\nValid syntax can still be bad logic.\nRun and observe: the syntax gate checks structure only.',
+      instruction: `Syntax is the structural grammar of a language — the rules that define whether code is well-formed.\n\nA syntax check happens before any code runs. The parser reads the tokens you wrote and verifies they follow legal patterns. If the structure is wrong (wrong order, missing bracket, misplaced keyword), execution stops immediately with a SyntaxError. Your code never runs at all.\n\nImportant: syntax says nothing about whether your code is correct or useful — only whether it is structurally legal. "Eat the car quietly" is grammatically valid English but makes no sense. Same idea applies here.\n\nThe three tokens below illustrate this. Two pass the structure check; one does not. Watch the gate classify them.`,
       html: `<div class="board">
   <div class="token" id="t1">const x = 4;</div>
   <div class="token" id="t2">if (x > 2) { ... }</div>
@@ -71,7 +71,7 @@ setTimeout(() => {
     },
     {
       type: 'js',
-      instruction: 'Slide 3: Semantics is meaning.\nDifferent syntax can compute the same value.\nFocus on output equivalence, not surface appearance.',
+      instruction: `Semantics is what code means — the value or behavior it produces when executed.\n\nTwo pieces of code with different appearances can share identical semantics if they evaluate to the same result. JavaScript follows standard operator precedence: multiplication runs before addition. So both "2 + 3 * 4" and "2 + (3 * 4)" mean exactly the same thing — they both produce 14.\n\nThe key insight: you can write the same meaning in multiple syntactic forms. Conversely, two things that look similar can have different semantics if the rules treat them differently.\n\nRun the cells below and confirm both expressions evaluate to the same value.`,
       html: `<div class="wrap">
   <div class="card"><div>2 + 3 * 4</div><div class="out" id="a">?</div></div>
   <div class="card"><div>2 + (3 * 4)</div><div class="out" id="b">?</div></div>
@@ -93,7 +93,7 @@ console.log('a =', a, 'b =', b, 'equal =', a === b);`,
     },
     {
       type: 'js',
-      instruction: 'Slide 4: Abstraction layers reduce cognitive load.\nYou do not control transistors directly; you target a higher layer.\nRun and trace the stack from hardware to your program.',
+      instruction: `Every program runs on hardware, but you never write hardware instructions. You write at a high abstraction layer — the language — and each layer below translates it toward the machine.\n\nThe layers from bottom to top:\n  Hardware — transistors and circuits\n  Operating System — manages hardware resources\n  JavaScript Engine — parses and executes your JS\n  Runtime APIs — browser DOM, Node filesystem, etc.\n  Your Program — the code you actually write\n\nEach layer hides the complexity of the layers below it. This is why the same JavaScript works on your laptop, a server, and a smart TV — the engine layer handles those differences. You target the language; the engine handles the rest.\n\nWatch each layer activate. Your program is at the top, highlighted in blue.`,
       html: `<div class="stack" id="stack"></div>`,
       css: `.stack{height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;background:#0a1320;padding:14px;border-radius:10px;}
 .layer{padding:8px 10px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#cbd5e1;opacity:.35;transform:translateY(10px);transition:all .35s ease;font-size:12px;}`,
@@ -114,7 +114,7 @@ console.log('Abstraction lowers cognitive load while preserving behavior.');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 5: ECMAScript is the spec; engines are implementations.\nSpec says what must happen, engines decide how to execute it efficiently.',
+      instruction: `ECMAScript is the name of the JavaScript language specification. It is a published standard document — currently maintained by the TC39 committee — that precisely defines how every feature must behave. When TC39 approves a change, all engines must eventually implement it.\n\nV8 (used by Chrome and Node.js), SpiderMonkey (used by Firefox), and JavaScriptCore (used by Safari) are separate implementations of that specification. They compete on speed and efficiency, but they must all produce the same results for any valid JavaScript program.\n\nOne spec, many engines. Your code targets the spec. Any engine that correctly implements the spec will execute it correctly.\n\nWatch the three engines each confirm compliance with the spec.`,
       html: `<div class="grid">
   <div class="spec" id="spec">ECMAScript Spec</div>
   <div class="engine" id="v8">V8</div>
@@ -137,7 +137,7 @@ console.log('One spec, multiple engines.');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 6: Language stays stable, host APIs change.\nBrowser and server expose different capabilities while keeping JavaScript semantics.',
+      instruction: `The core JavaScript language — syntax, operators, data types, closures, prototypes — is identical whether code runs in a browser or on a server. What changes are the host APIs.\n\nThe browser runtime exposes APIs like the DOM (document), the window object, and user event handling. Node.js exposes APIs for the filesystem, raw network sockets, and the process. Neither set is part of the JavaScript spec — they are provided by the environment.\n\nThis is why "document is not defined" appears in Node.js: document is a browser host API, not a JavaScript language feature. The language stayed the same; the toolbox around it changed.\n\nClick Browser and Server to compare what each environment provides.`,
       html: `<div class="ctx">
   <button id="browserBtn">Browser</button>
   <button id="serverBtn">Server</button>
@@ -164,7 +164,7 @@ render('browser');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 7: Evaluation uses substitution.\nTrack each line collapse in order; this is how debugging should be reasoned.',
+      instruction: `JavaScript evaluates expressions by substituting known values step by step.\n\nWhen the engine sees "y = x + 2" and x holds the value 5, it substitutes: y = 5 + 2 = 7. When it later sees "z = y * 3", it substitutes: z = 7 * 3 = 21. Each expression collapses to a concrete value before the next step runs.\n\nThis substitution model is your primary debugging tool. When code behaves unexpectedly, trace each substitution. The answer is always in the values.\n\nWatch each line collapse in order. This is exactly how the engine reasons.`,
       html: `<div class="trace">
   <div class="line" id="l1">x = 5</div>
   <div class="line" id="l2">y = x + 2</div>
@@ -193,7 +193,7 @@ console.log('Execution is deterministic when inputs are fixed.');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 8: Determinism check.\nIf inputs and state are fixed, output should be repeatable.\nRun twice and verify consistency.',
+      instruction: `A function is deterministic if the same input always produces the same output — no matter how many times you call it or when.\n\nDeterminism is a prerequisite for reliable reasoning. If f(6) always returns 37, you can substitute f(6) with 37 anywhere in your mental model. If f(6) might return different values depending on hidden state, your reasoning breaks down.\n\nMost real-world bugs occur when code that should be deterministic secretly depends on external state — a global variable that changed, a network response that varied, a timestamp that shifted. Pure deterministic functions have no such dependencies.\n\nRun the function twice with the same input and confirm it returns the same value.`,
       html: `<div class="det">
   <div class="row">Input: <span id="input"></span></div>
   <div class="row">Run 1: <span id="r1">?</span></div>
@@ -219,7 +219,7 @@ console.log('Deterministic function verified:', first === second);`,
     },
     {
       type: 'js',
-      instruction: 'Slide 9: Distinguish core JS from runtime APIs.\nThis distinction prevents confusion when moving between environments.',
+      instruction: `As you write more JavaScript, you will use hundreds of APIs. It matters which layer they come from.\n\nECMAScript spec features like Array.map, Promise.then, and Object.keys are guaranteed to work identically in every conforming JavaScript environment — browser, server, edge runtime, or embedded device.\n\nHost APIs like document.querySelector, window.setTimeout, and fetch are provided by the environment. Some are shared across environments (setTimeout was eventually added to the spec). Others are browser-only or Node-only. When you see "document is not defined" in Node.js, you have hit this boundary.\n\nCore language features travel with you everywhere. Host APIs depend on where you are.`,
       html: `<div class="api-grid">
   <div><h4>Core JS (Spec)</h4><ul id="core"></ul></div>
   <div><h4>Browser Runtime</h4><ul id="host"></ul></div>
@@ -237,7 +237,7 @@ console.log('Core JS comes from spec; host APIs come from runtime environment.')
     },
     {
       type: 'js',
-      instruction: 'Slide 10: Concept map integration.\nRun this only after you can explain each term in your own words.',
+      instruction: `Before moving to challenges, lock in the four core terms from this lesson.\n\nSyntax — the structural rules that determine whether code is well-formed. Checked before execution.\nSemantics — the meaning or value a piece of code produces when it runs.\nSpec (ECMAScript) — the contract that defines what every language feature must do.\nEngine — the implementation that executes your code according to the spec.\n\nThese four terms replace vague descriptions. Every confusing JavaScript behavior has an explanation in these terms — never in "JavaScript is weird."\n\nRun to activate the map. Then, before looking at challenges, write a one-sentence definition for each term in your own words.`,
       html: `<div class="map">
   <div class="node" id="n1">Syntax</div>
   <div class="node" id="n2">Semantics</div>
@@ -260,100 +260,126 @@ console.log('Vocabulary locked: syntax, semantics, spec, engine.');`,
     },
     {
       type: 'markdown',
-      instruction: `### Before Challenges\nUse this checklist before you code:\n- Can you explain **syntax vs semantics** without examples?\n- Can you explain **spec vs engine** without naming a browser?\n- Can you explain why runtime APIs differ but language rules remain?\n\nIf not, rerun the previous visual cells slowly and narrate each step.`,
+      instruction: `### Before Challenges\n\nThese challenges test your **understanding of the concepts**, not your ability to write JavaScript. You are not expected to know JavaScript syntax yet — that starts in Phase 1.\n\nEach challenge gives you code that is mostly pre-written. Your job is to:\n- Change a single value to reflect your prediction or understanding\n- Or complete a single console.log with your own words\n\nDo not guess. If you are unsure of an answer, rerun the relevant visual cell and reason from the model before submitting.`,
     },
     {
       type: 'challenge',
-      instruction: 'Challenge 1: Build a syntax/semantics demo. Define `left` and `right` so they use different syntax but evaluate to the same number. Log `left === right`.',
+      instruction: 'Challenge 1: Operator precedence prediction. In Slide 3 you saw that multiplication runs before addition. What does 5 + 2 * 3 evaluate to? Change myAnswer to your predicted number, then run to check.',
       html: `<div class="challenge-panel">
-  <div>Goal: make the equality light turn green.</div>
+  <div>Goal: set myAnswer to the correct value.</div>
   <div id="light">WAITING</div>
 </div>`,
       css: `.challenge-panel{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;align-content:center;gap:10px;color:#cbd5e1;}
 #light{padding:10px;border:1px solid #334155;border-radius:8px;text-align:center;font-weight:800;}`,
-      startCode: `// Define both values and log equality.
-// const left = ...
-// const right = ...
-// console.log(left === right)
+      startCode: `// Multiplication runs before addition (operator precedence).
+// 5 + 2 * 3  means  5 + (2 * 3)
+//
+// Change myAnswer to your predicted number.
+const myAnswer = 0;
+
+const actual = 5 + 2 * 3;
+console.log('My answer:', myAnswer);
+console.log('Actual:', actual);
+console.log('Correct?', myAnswer === actual);
+document.getElementById('light').textContent = myAnswer === actual ? 'PASS' : 'FAIL — try again';
+document.getElementById('light').style.background = myAnswer === actual ? '#052e28' : '#3a0d14';
+document.getElementById('light').style.borderColor = myAnswer === actual ? '#10b981' : '#ef4444';
 `,
-      solutionCode: `const left = 2 + 3 * 4;
-const right = 2 + (3 * 4);
-const same = left === right;
-console.log(same);
-document.getElementById('light').textContent = same ? 'PASS' : 'FAIL';
-document.getElementById('light').style.background = same ? '#052e28' : '#3a0d14';
-document.getElementById('light').style.borderColor = same ? '#10b981' : '#ef4444';`,
-      check: (code) => /const\s+left/.test(code) && /const\s+right/.test(code) && /left\s*===\s*right/.test(code),
-      successMessage: 'Great. You separated code form from meaning.',
-      failMessage: 'Create left/right and log left === right.',
+      solutionCode: `const myAnswer = 11;
+const actual = 5 + 2 * 3;
+console.log('My answer:', myAnswer);
+console.log('Actual:', actual);
+console.log('Correct?', myAnswer === actual);
+document.getElementById('light').textContent = 'PASS';
+document.getElementById('light').style.background = '#052e28';
+document.getElementById('light').style.borderColor = '#10b981';
+`,
+      check: (code) => /myAnswer\s*=\s*11/.test(code),
+      successMessage: 'Correct. Semantics (operator precedence) determines meaning, not surface appearance.',
+      failMessage: 'Multiplication runs first: 2 * 3 = 6, then 5 + 6 = ?',
       outputHeight: 220,
     },
     {
       type: 'challenge',
-      instruction: 'Challenge 2: Model spec and engines. Create `specName` and `engines`, then log both.',
-      html: `<div class="challenge-panel"><div id="status">Waiting for your model...</div></div>`,
+      instruction: 'Challenge 2: Spec vs engine. ECMAScript is the spec; V8 is an engine. Change whatIsECMAScript and whatIsV8 to the strings "spec" or "engine" to classify each correctly.',
+      html: `<div class="challenge-panel"><div id="status">Waiting for your classification...</div></div>`,
       css: `.challenge-panel{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;place-items:center;color:#cbd5e1;}
-#status{padding:10px;border:1px solid #334155;border-radius:8px;}`,
-      startCode: `// const specName = 'ECMAScript';
-// const engines = ['V8', 'SpiderMonkey'];
-// console.log(specName);
-// console.log(engines);
+#status{padding:10px;border:1px solid #334155;border-radius:8px;text-align:center;}`,
+      startCode: `// Options: 'spec' or 'engine'
+const whatIsECMAScript = '???'; // change this
+const whatIsV8 = '???';          // change this
+
+const correct = whatIsECMAScript === 'spec' && whatIsV8 === 'engine';
+console.log('ECMAScript is the:', whatIsECMAScript);
+console.log('V8 is an:', whatIsV8);
+console.log('Correct?', correct);
+document.getElementById('status').textContent = correct ? 'Correct!' : 'Check your answers.';
+document.getElementById('status').style.borderColor = correct ? '#10b981' : '#ef4444';
 `,
-      solutionCode: `const specName = 'ECMAScript';
-const engines = ['V8', 'SpiderMonkey', 'JavaScriptCore'];
-console.log(specName);
-console.log(engines);
-document.getElementById('status').textContent = specName + ' -> ' + engines.length + ' engines mapped';
-document.getElementById('status').style.borderColor = '#10b981';`,
-      check: (code) => /specName/.test(code) && /engines/.test(code) && /console\.log/.test(code),
+      solutionCode: `const whatIsECMAScript = 'spec';
+const whatIsV8 = 'engine';
+const correct = whatIsECMAScript === 'spec' && whatIsV8 === 'engine';
+console.log('ECMAScript is the:', whatIsECMAScript);
+console.log('V8 is an:', whatIsV8);
+console.log('Correct?', correct);
+document.getElementById('status').textContent = 'Correct!';
+document.getElementById('status').style.borderColor = '#10b981';
+`,
+      check: (code) => /whatIsECMAScript\s*=\s*['"]spec['"]/.test(code) && /whatIsV8\s*=\s*['"]engine['"]/.test(code),
       successMessage: 'Exactly right: one contract, many implementations.',
-      failMessage: 'Declare specName, engines, and log both.',
+      failMessage: 'ECMAScript is the published standard (spec). V8 is an implementation (engine).',
       outputHeight: 220,
     },
     {
       type: 'challenge',
-      instruction: 'Challenge 3: Create `runtime` with `browser` and `server` arrays. Log one capability from each.',
-      html: `<div class="challenge-panel"><div id="status">Waiting for runtime map...</div></div>`,
+      instruction: 'Challenge 3: Identify the syntax error. Line A is valid JavaScript. Line B has a syntax error. Change errorLine to the letter of the broken line.',
+      html: `<div class="challenge-panel"><div id="status">Waiting for your answer...</div></div>`,
       css: `.challenge-panel{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;place-items:center;color:#cbd5e1;}
-#status{padding:10px;border:1px solid #334155;border-radius:8px;}`,
-      startCode: `// const runtime = {
-//   browser: [...],
-//   server: [...]
-// };
-// console.log(runtime.browser[0]);
-// console.log(runtime.server[0]);
+#status{padding:10px;border:1px solid #334155;border-radius:8px;text-align:center;}`,
+      startCode: `// Line A:  const greeting = 'hello';   <- valid structure
+// Line B:  const = greeting 'hello';   <- broken structure
+//
+// Which line has a syntax error? Change errorLine to 'A' or 'B'.
+const errorLine = '?';
+
+const correct = errorLine === 'B';
+console.log('Syntax error is on line:', errorLine);
+console.log('Correct?', correct);
+document.getElementById('status').textContent = correct ? 'Correct!' : 'Look at each line carefully.';
+document.getElementById('status').style.borderColor = correct ? '#10b981' : '#ef4444';
 `,
-      solutionCode: `const runtime = {
-  browser: ['DOM', 'window'],
-  server: ['filesystem', 'network sockets'],
-};
-console.log(runtime.browser[0]);
-console.log(runtime.server[0]);
-document.getElementById('status').textContent = 'Browser + Server capabilities mapped';
-document.getElementById('status').style.borderColor = '#10b981';`,
-      check: (code) => /runtime\s*=\s*\{/.test(code) && /browser/.test(code) && /server/.test(code) && /runtime\.browser\[0\]/.test(code) && /runtime\.server\[0\]/.test(code),
-      successMessage: 'Nice. Language stayed the same while host capabilities changed.',
-      failMessage: 'Define runtime.browser/runtime.server and log one item from each.',
+      solutionCode: `const errorLine = 'B';
+const correct = errorLine === 'B';
+console.log('Syntax error is on line:', errorLine);
+console.log('Correct?', correct);
+document.getElementById('status').textContent = 'Correct!';
+document.getElementById('status').style.borderColor = '#10b981';
+`,
+      check: (code) => /errorLine\s*=\s*['"]B['"]/.test(code),
+      successMessage: 'Line B puts the = before the name, which violates the grammar rule for declarations.',
+      failMessage: 'In Line B the tokens are in the wrong order: "const = greeting" is not valid structure.',
       outputHeight: 220,
     },
     {
       type: 'challenge',
-      instruction: 'Challenge 4: In one console.log sentence, include all four words: syntax, semantics, spec, engine.',
-      html: `<div class="challenge-panel"><div id="status">Waiting for final synthesis...</div></div>`,
+      instruction: 'Challenge 4: Synthesis. Write one sentence inside console.log that uses all four terms from this lesson: syntax, semantics, spec, engine.',
+      html: `<div class="challenge-panel"><div id="status">Waiting for your synthesis...</div></div>`,
       css: `.challenge-panel{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;place-items:center;color:#cbd5e1;}
-#status{padding:10px;border:1px solid #334155;border-radius:8px;}`,
-      startCode: `// Write one summary sentence and log it.
+#status{padding:10px;border:1px solid #334155;border-radius:8px;text-align:center;}`,
+      startCode: `// Replace the ??? with a sentence that includes:
+// syntax, semantics, spec, engine
+console.log('???');
 `,
-      solutionCode: `const sentence = 'Syntax is form, semantics is meaning, spec is the contract, and the engine is the implementation.';
-console.log(sentence);
+      solutionCode: `console.log('Syntax is form, semantics is meaning, the spec is the contract, and the engine is the implementation that runs it.');
 document.getElementById('status').textContent = 'Synthesis complete.';
-document.getElementById('status').style.borderColor = '#10b981';`,
+document.getElementById('status').style.borderColor = '#10b981';
+`,
       check: (code) => {
         const lower = code.toLowerCase();
         return lower.includes('console.log') && lower.includes('syntax') && lower.includes('semantics') && lower.includes('spec') && lower.includes('engine');
       },
       successMessage: 'First lesson complete. Your model is now precise and reusable.',
-      failMessage: 'Your logged sentence must include syntax, semantics, spec, and engine.',
+      failMessage: 'Your logged sentence must include all four terms: syntax, semantics, spec, and engine.',
       outputHeight: 220,
     },
   ],
@@ -384,7 +410,7 @@ export default {
       {
         type: 'important',
         title: 'No Passive Reading',
-        body: 'Every cell is now visual and runnable so the concept is seen, not just described.',
+        body: 'Every cell is visual and runnable. The concept is seen, not just described.',
       },
     ],
     visualizations: [
