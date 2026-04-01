@@ -1,234 +1,236 @@
-// Chapter 0.5 — Lesson 13: while Loops
+// Chapter 0.5 — Lesson 13: Iterating Over Sequences
 //
 // DEPENDENCIES:
-//   - Lesson 5:  State & Flow (state changes over time — core to while)
-//   - Lesson 10: Boolean Logic (conditions)
-//   - Lesson 11: Conditionals (if inside loops)
-//   - Lesson 12: for Loops (contrast with for; accumulator pattern)
+//   - Lesson 1:  Values (strings are values)
+//   - Lesson 12: for Loops with range() (the loop syntax is already known)
 //
 // TEACHES:
-//   1. Why while exists — loops that run until a condition changes
-//   2. Basic while loop — condition checked before each iteration
-//   3. The update step — how state changes to eventually end the loop
-//   4. Infinite loops — what they are and how to avoid them
-//   5. while vs for — choosing the right loop
-//   6. Accumulator pattern with while
-//   7. Input validation loop (loop until valid)
-//   8. Convergence loop — repeat until a value stops changing
-//   9. break inside while
-//   10. continue inside while
-//   11. while/else
-//   12. Counting up and down with while
-//   13. The flag variable pattern
-//   14. Nested while loops
-//   15. Converting a for loop to while and back
+//   1. What an iterable IS — anything Python can step through one item at a time
+//   2. Looping over a string — characters one by one
+//   3. The `in` operator — membership testing
+//   4. len() on strings and sequences
+//   5. Indexing with [] — accessing items by position
+//   6. Negative indexing — counting from the end
+//   7. Slicing — extracting a sub-sequence
+//   8. enumerate() — getting index AND value together
+//   9. Preview: lists are iterables too — [1, 2, 3]
+//  10. Preview: tuples are iterables — (1, 2, 3)
+//  11. Preview: dicts are iterables — looping over keys
+//  12. sorted() and reversed() — iterable wrappers
+//  13. range() is an iterable — connecting back to Lesson 12
+//  14. zip() — iterating two sequences in lockstep (preview)
+//  15. The for loop works on ANY iterable — the design principle
+//
+// NOTE: Lists, dicts, and tuples are introduced here as EXPOSURE only.
+// Full teaching (creation, mutation, methods) comes in the Data Structures lessons.
 
 export default {
-  id: 'py-0-5-while-loops',
-  slug: 'while-loops',
+  id: 'py-0-5-iterables',
+  slug: 'iterating-sequences',
   chapter: 0.5,
   order: 13,
-  title: 'while Loops',
-  subtitle: 'Repeating until something changes',
-  tags: ['while', 'loop', 'condition', 'infinite', 'break', 'convergence', 'flag'],
+  title: 'Iterating Over Sequences',
+  subtitle: 'The for loop works on anything — here\'s what that means',
+  tags: ['iterable', 'for', 'string', 'enumerate', 'in', 'index', 'slice', 'zip', 'sorted'],
 
   hook: {
-    question: 'What if you don\'t know in advance how many times to repeat?',
+    question: 'You already know how to loop over numbers — but what else can a for loop step through?',
     realWorldContext:
-      'A `for` loop is perfect when you know the count upfront: "do this 10 times," "process these 5 items." ' +
-      'But many real problems don\'t have a fixed count: keep asking for a password until it\'s correct, ' +
-      'keep refining an estimate until it\'s accurate enough, keep reading data until the file ends. ' +
-      '`while` loops run for as long as a condition remains True — the exit point is determined by what happens inside.',
+      'The `for` loop in Python is not limited to counting with `range()`. ' +
+      'It works on any sequence of values: every character in a text message, ' +
+      'every item in a shopping cart, every row in a spreadsheet. ' +
+      'The word for this is **iterable** — anything Python can step through one element at a time. ' +
+      'This lesson gives you the concept and your first iterable you already know: the string.',
     previewVisualizationId: 'PythonNotebook',
   },
 
   intuition: {
     prose: [
-      'A `while` loop checks its condition **before** each iteration. If the condition is True, the block runs. Then the condition is checked again. This repeats until the condition becomes False — at which point the loop exits and execution continues below.',
-      'The critical difference from `for`: a `while` loop has no built-in counter. You are responsible for changing the state so the condition eventually becomes False. Forget the update step and you get an **infinite loop** — the program runs forever.',
-      'The mental model: `while` is a repeated `if`. Every iteration asks "should I keep going?" The answer is determined by the current state of your variables.',
+      'In Lesson 12 you wrote `for i in range(5)` — the `range` object is an iterable. Python asked it for one value at a time: 0, then 1, then 2, then 3, then 4. The loop worked because `range` knows how to deliver a sequence.',
+      'A **string** is also an iterable. It delivers one character at a time. `for ch in "hello"` gives `ch` the values `"h"`, `"e"`, `"l"`, `"l"`, `"o"` in order. The loop syntax is identical — only the thing after `in` changes.',
+      'Python\'s `for` loop is designed around this idea: it does not care whether the iterable is a range, a string, a list, or something you define yourself. If Python can ask it for the next item, the loop works. This is one of the most powerful design decisions in the language.',
     ],
     callouts: [
       {
-        type: 'important',
-        title: 'Every while loop needs an exit path',
-        body: 'Before writing a while loop, identify: (1) what condition controls it, and (2) what inside the loop will eventually make that condition False. If neither changes, the loop runs forever.',
+        type: 'insight',
+        title: 'Iterable = "Python can ask it for the next item"',
+        body: 'You do not need to know how large an iterable is to loop over it. Python just keeps asking "give me the next item" until the iterable says "I\'m done." This is why `for` works uniformly on strings, lists, files, and generators.',
       },
       {
-        type: 'insight',
-        title: 'while is for unknown counts; for is for known sequences',
-        body: 'If you know the sequence to iterate over (a range, a list, a string), use `for`. If you\'re looping until something happens — a value converges, a condition flips, a valid input arrives — use `while`.',
+        type: 'important',
+        title: 'Lists and dicts are previews here',
+        body: 'This lesson shows you lists `[1, 2, 3]` and dicts `{"a": 1}` so you can see how iteration extends to them. You will learn to create and manipulate them fully in the Data Structures lessons. For now: observe, don\'t worry about the details.',
       },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
-        title: 'The State Machine',
+        title: 'The Iterable Universe',
         mathBridge:
-          'A while loop is the computational equivalent of a recursive definition: apply a rule repeatedly until a base case is reached.',
+          'An iterable is the computational equivalent of an ordered set — a collection you can walk through element by element.',
         caption:
-          'For every while loop: identify the condition, trace the state, confirm it terminates.',
+          'Run each cell and observe what the for loop receives each iteration.',
         props: {
           initialCells: [
             // ── Lesson cells ─────────────────────────────────────────────────
             {
               id: 1,
-              cellTitle: 'Basic while loop',
+              cellTitle: 'Looping over a string',
               prose:
-                'The condition is checked before each iteration. When it becomes False, the loop exits. Here, `x` starts at 0 and grows by 1 each time — the loop stops when `x` reaches 5.',
+                'A string is a sequence of characters. `for ch in "hello"` delivers one character per iteration. The loop variable holds a one-character string each time.',
               instructions:
-                'Trace: x=0 (runs), x=1 (runs), ..., x=4 (runs), x=5 (False — exits). The final print shows x=5.',
-              code: 'x = 0\nwhile x < 5:\n    print(x)\n    x += 1\nprint("Done. x =", x)',
+                'The loop runs 5 times — once per character. Each character is itself a string of length 1.',
+              code: 'for ch in "hello":\n    print(ch)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 2,
-              cellTitle: 'The update step is mandatory',
+              cellTitle: 'The in operator — membership testing',
               prose:
-                'Without updating the variable, the condition never changes — the loop runs forever. This is an infinite loop. In a notebook, click the Stop button (■) to interrupt the kernel.',
+                '`in` does two different jobs: inside a `for` loop it drives iteration, but used as a standalone operator it tests membership — "is this value in this iterable?"',
               instructions:
-                'Do NOT run this cell — it is intentionally broken to show the infinite loop pattern. Read it instead.',
-              code: '# DANGER: infinite loop — do not run\n# x = 0\n# while x < 5:\n#     print(x)    # x never changes, condition never False',
+                'Both usages share the same keyword. The standalone `in` returns a boolean.',
+              code: 'print("e" in "hello")    # True — e is in the string\nprint("z" in "hello")    # False\nprint("ell" in "hello")  # True — substring check',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 3,
-              cellTitle: 'while vs for — the same count',
+              cellTitle: 'len() — length of a sequence',
               prose:
-                'Any `for i in range(n)` loop can be rewritten as a `while` loop with a counter. They produce identical behavior. The `for` version is preferred when you have a known sequence — it is shorter and harder to get wrong.',
+                '`len()` works on any sequence and returns the number of items. For a string, that is the number of characters. For a list, the number of elements.',
               instructions:
-                'Both cells produce 0, 1, 2, 3, 4. The while version requires you to manage `i` manually.',
-              code: '# for version (preferred for counting)\nfor i in range(5):\n    print("for:", i)\n\n# while version (equivalent)\ni = 0\nwhile i < 5:\n    print("while:", i)\n    i += 1',
+                'len() is the standard way to know how many items are in any sequence.',
+              code: 'print(len("hello"))       # 5 characters\nprint(len(""))            # 0 — empty string\nprint(len("hello world")) # 11 — spaces count',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 4,
-              cellTitle: 'Accumulator with while',
+              cellTitle: 'Indexing with [] — access by position',
               prose:
-                'The accumulator pattern works the same as with `for`. Initialize before, update inside, read after. The difference: the loop condition drives when to stop, not a fixed count.',
+                'Square brackets after a sequence access a single item by its **zero-based index**. The first item is index 0, the second is index 1, and so on.',
               instructions:
-                'This sums integers until the running total exceeds 50. We don\'t know in advance how many iterations it takes.',
-              code: 'total = 0\nn = 1\nwhile total <= 50:\n    total += n\n    n += 1\nprint("Total:", total, "| Stopped at n:", n)',
+                'Try changing the index. What does s[5] give for "hello"? (An IndexError — index out of range.)',
+              code: 's = "hello"\nprint(s[0])   # h — first character\nprint(s[1])   # e — second\nprint(s[4])   # o — last (index 4 for length-5 string)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 5,
-              cellTitle: 'Counting down',
+              cellTitle: 'Negative indexing — counting from the end',
               prose:
-                'While loops count in any direction. Start high, condition checks when to stop, update decrements.',
+                'Negative indices count from the end. `-1` is always the last item, `-2` is second-to-last, and so on. This works on any sequence.',
               instructions:
-                'countdown starts at 5 and decrements. Loop exits when countdown hits 0.',
-              code: 'countdown = 5\nwhile countdown > 0:\n    print(countdown)\n    countdown -= 1\nprint("Blastoff!")',
+                'This is equivalent to s[len(s) - 1] but much cleaner. Negative indexing is idiomatic Python.',
+              code: 's = "python"\nprint(s[-1])   # n — last character\nprint(s[-2])   # o — second to last\nprint(s[-6])   # p — same as s[0]',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 6,
-              cellTitle: 'Loop until a condition flips — simulated input validation',
+              cellTitle: 'Slicing — extracting a sub-sequence',
               prose:
-                'A common while pattern: keep looping until valid input arrives. Here we simulate the "input" as a list of attempts, processing one per iteration.',
+                '`s[start:stop]` extracts a sub-sequence from index `start` up to (but not including) `stop`. Omitting `start` defaults to 0; omitting `stop` defaults to the end.',
               instructions:
-                'The loop keeps rejecting passwords until it finds one with length >= 8.',
-              code: 'attempts = ["hi", "abc123", "securepwd"]\nindex = 0\npassword = attempts[index]\nwhile len(password) < 8:\n    print("Too short:", password)\n    index += 1\n    password = attempts[index]\nprint("Accepted:", password)',
+                'Slicing returns a new sequence of the same type. The original is unchanged.',
+              code: 's = "hello world"\nprint(s[0:5])    # "hello"\nprint(s[6:])     # "world" — to end\nprint(s[:5])     # "hello" — from start\nprint(s[-5:])    # "world" — last 5',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 7,
-              cellTitle: 'Convergence loop',
+              cellTitle: 'Looping with index using enumerate()',
               prose:
-                'Some algorithms repeat until a value stabilizes — the difference between iterations becomes negligibly small. This is a convergence loop. The exit condition is "close enough," not "exactly equal."',
+                '`enumerate(iterable)` delivers `(index, value)` pairs. Use it when you need both the position and the value in a loop — no manual counter needed.',
               instructions:
-                'This approximates √2 using Newton\'s method. Each iteration gets closer. The loop stops when two consecutive estimates differ by less than 0.0001.',
-              code: 'guess = 1.0\ntarget = 2.0\nwhile abs(guess * guess - target) > 0.0001:\n    guess = (guess + target / guess) / 2\nprint("√2 ≈", round(guess, 6))',
+                'Compare this to the manual version: `i = 0; for ch in s: print(i, ch); i += 1`. enumerate() is cleaner.',
+              code: 'for i, ch in enumerate("python"):\n    print(i, ch)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 8,
-              cellTitle: 'break inside while',
+              cellTitle: 'for loop over a range is also iterating an iterable',
               prose:
-                '`break` exits the while loop immediately, regardless of the condition. Useful when you find what you\'re looking for mid-loop.',
+                '`range()` is itself an iterable — it delivers integers one at a time. There is no special "range loop" in Python; it is just `for` applied to a range object, the same way you apply it to a string.',
               instructions:
-                'The loop searches for the first number divisible by both 7 and 11. Once found, break exits immediately.',
-              code: 'n = 1\nwhile n <= 1000:\n    if n % 7 == 0 and n % 11 == 0:\n        print("Found:", n)\n        break\n    n += 1',
+                'This makes the connection explicit: range, string, and any other iterable are all treated the same by the for loop.',
+              code: 'print("range:", list(range(5)))\nprint("string:", list("hello"))\n# Both are sequences Python can iterate',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 9,
-              cellTitle: 'continue inside while',
+              cellTitle: 'Preview: list is an iterable',
               prose:
-                '`continue` skips the rest of the current iteration and goes back to check the condition. The update step must still happen before `continue` — or you risk an infinite loop.',
+                'A list — written as `[item1, item2, item3]` — is a sequence of values. You will learn to create and work with lists fully in the Data Structures chapter. For now: notice that `for` works on it exactly the same way as on strings.',
               instructions:
-                'This prints only odd numbers from 1–10. The continue skips the print for even numbers — but n += 1 happens first to avoid an infinite loop.',
-              code: 'n = 0\nwhile n < 10:\n    n += 1          # update BEFORE continue\n    if n % 2 == 0:\n        continue\n    print(n)',
+                'The loop doesn\'t care that the items are integers rather than characters. An iterable is an iterable.',
+              code: 'numbers = [10, 20, 30, 40, 50]   # a list — full details come later\nfor n in numbers:\n    print(n)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 10,
-              cellTitle: 'while/else',
+              cellTitle: 'Preview: tuple is an iterable',
               prose:
-                'Like `for`, `while` has an optional `else` clause. The `else` block runs if the loop exited normally (condition became False). It is skipped if a `break` fired.',
+                'A tuple — written with parentheses `(a, b, c)` — is an immutable sequence. Like a list, but it cannot be changed after creation. Iteration works identically.',
               instructions:
-                'Change the target to 999 — the while loop exhausts without finding it, so else fires.',
-              code: 'target = 77\nn = 1\nwhile n <= 100:\n    if n % 7 == 0 and n % 11 == 0:\n        print("Found at n =", n)\n        break\n    n += 1\nelse:\n    print("Not found in range 1–100")',
+                'Tuples are often used for fixed collections — coordinates, RGB colors, database rows.',
+              code: 'point = (3, 7, -2)   # a tuple — details later\nfor coordinate in point:\n    print(coordinate)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 11,
-              cellTitle: 'The flag variable pattern',
+              cellTitle: 'Preview: dict iteration loops over keys',
               prose:
-                'A boolean flag variable makes the loop\'s purpose explicit. Set it to False when the exit condition is met. This is more readable than a compound condition in the while header.',
+                'A dictionary — written as `{"key": value}` — maps keys to values. When you iterate a dict with `for`, you get the **keys** by default. Accessing the value uses `dict[key]`.',
               instructions:
-                'The flag `found` starts False and flips to True when the target is located. The while condition is simple: just check the flag.',
-              code: 'found = False\nn = 1\nwhile not found:\n    if n % 13 == 0 and n % 7 == 0:\n        found = True\n    else:\n        n += 1\nprint("First multiple of 7 and 13:", n)',
+                'You will learn dicts fully later. For now, notice that `for` still works — you just get keys, not (key, value) pairs.',
+              code: 'scores = {"Alice": 92, "Bob": 85, "Carol": 78}   # a dict\nfor name in scores:\n    print(name, "->", scores[name])',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 12,
-              cellTitle: 'while True with break',
+              cellTitle: 'sorted() — iterate in sorted order',
               prose:
-                '`while True` creates a deliberately infinite loop — the only exit is an explicit `break`. This is idiomatic when the exit condition is complex or checked in the middle of the block.',
+                '`sorted(iterable)` returns a new sorted list from any iterable, without modifying the original. You can iterate the result directly in a `for` loop.',
               instructions:
-                'This is an "infinite loop with controlled exit." The break in the middle exits cleanly.',
-              code: 'n = 1\nwhile True:\n    if n > 5:\n        break\n    print(n)\n    n += 1',
+                'The original string is unchanged — sorted() creates a new sequence.',
+              code: 'letters = "dcbae"\nfor ch in sorted(letters):\n    print(ch, end=" ")',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 13,
-              cellTitle: 'Nested while loops',
+              cellTitle: 'reversed() — iterate in reverse',
               prose:
-                'A while loop inside another while loop. The inner loop runs completely for each iteration of the outer loop. Total iterations = product of both counts.',
+                '`reversed(sequence)` returns an iterator that steps through the sequence backwards. Works on strings (via `reversed`), lists, tuples, and ranges.',
               instructions:
-                'This prints a 3×3 grid of (outer, inner) pairs. Trace: for each outer value, inner goes 1→3.',
-              code: 'outer = 1\nwhile outer <= 3:\n    inner = 1\n    while inner <= 3:\n        print(f"({outer},{inner})", end=" ")\n        inner += 1\n    print()\n    outer += 1',
+                'For strings, reversed() requires wrapping in list() or joining, because strings are not directly reversible by index — use slicing `s[::-1]` as a shorthand.',
+              code: 'for ch in reversed("hello"):\n    print(ch, end=" ")\n\nprint()\nprint("hello"[::-1])   # slice shorthand for reverse',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 14,
-              cellTitle: 'Collatz conjecture loop',
+              cellTitle: 'zip() — iterate two sequences in lockstep',
               prose:
-                'A famous example where we don\'t know how many iterations a while loop will take: the Collatz sequence. If n is even, halve it; if odd, multiply by 3 and add 1. Repeat until n = 1.',
+                '`zip(a, b)` pairs up items from two iterables by position: first item of a with first item of b, second with second, and so on. The loop stops when the shorter sequence runs out.',
               instructions:
-                'Start with n = 27. Count the steps. The sequence is chaotic but always reaches 1 (as far as we know).',
-              code: 'n = 27\nsteps = 0\nwhile n != 1:\n    if n % 2 == 0:\n        n //= 2\n    else:\n        n = 3 * n + 1\n    steps += 1\nprint("Steps to reach 1:", steps)',
+                'zip() is a preview of how Python handles parallel sequences. Full details come when we cover lists.',
+              code: 'names = ["Alice", "Bob", "Carol"]\nscores = [92, 85, 78]\nfor name, score in zip(names, scores):\n    print(name, "scored", score)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 15,
-              cellTitle: 'Digit reversal with while',
+              cellTitle: 'Building results by iterating a string',
               prose:
-                'The digit-extraction pattern from Lesson 12 is naturally a while loop: keep going while there are digits left. We don\'t know the count in advance — we stop when the number reaches 0.',
+                'The accumulator pattern from Lesson 12 works on any iterable. Here we iterate a string and filter characters — building a new string from only the ones that pass a condition.',
               instructions:
-                'This reverses 1234 into 4321 by extracting digits from the right and building from the left.',
-              code: 'n = 1234\nreversed_n = 0\nwhile n > 0:\n    digit = n % 10\n    reversed_n = reversed_n * 10 + digit\n    n //= 10\nprint("Reversed:", reversed_n)',
+                'This removes all vowels from a string. The condition is membership testing with `in`.',
+              code: 'vowels = "aeiouAEIOU"\nword = "programming"\nresult = ""\nfor ch in word:\n    if ch not in vowels:\n        result += ch\nprint(result)',
               output: '', status: 'idle', figureJson: null,
             },
             {
               id: 16,
-              cellTitle: 'Comparing while and for on the same problem',
+              cellTitle: 'Every iterable works the same way',
               prose:
-                'Rule of thumb: if you can write it cleanly with `for`, do so. Use `while` when: (1) the count is unknown, (2) the exit condition is based on computed state, or (3) you need to exit from the middle with `break`.',
+                'This is the design principle: `for x in iterable` works identically regardless of what the iterable is. Range, string, list, tuple, dict, file, generator — the loop syntax never changes. Only the thing after `in` changes.',
               instructions:
-                'Both find the sum 1+2+...+n where the sum first exceeds 100. The while version is more natural here.',
-              code: '# while version — natural for "until" conditions\ntotal = 0\nn = 0\nwhile total <= 100:\n    n += 1\n    total += n\nprint(f"Sum {total} first exceeds 100 at n={n}")',
+                'Four different iterables, identical loop syntax. This uniformity is why Python is so readable.',
+              code: 'for x in range(3):        print("range:", x)\nfor x in "abc":           print("string:", x)\nfor x in [10, 20, 30]:    print("list:", x)\nfor x in (True, False):   print("tuple:", x)',
               output: '', status: 'idle', figureJson: null,
             },
 
@@ -237,218 +239,208 @@ export default {
               id: 21,
               challengeType: 'write',
               challengeNumber: 1,
-              challengeTitle: 'Power of Two',
+              challengeTitle: 'Count Vowels',
               difficulty: 'easy',
               prompt:
-                'Write a while loop that starts with `p = 1` and keeps doubling it until `p` exceeds 1000. Print each value of `p` as it doubles.',
+                'Write `count_vowels(s)` that counts how many vowel characters (a, e, i, o, u — case-insensitive) are in the string `s`.',
               instructions:
-                'The loop condition is p <= 1000. The update is p *= 2.',
-              code: 'p = 1\n# Write your while loop here\n',
+                'Iterate over the string. Use `in` to check membership against `"aeiou"`. Convert each character to lowercase first.',
+              code: '# Define count_vowels(s) here\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-p = 1
-values = []
-while p <= 1000:
-    values.append(p)
-    p *= 2
-if values == [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]:
-    res = "SUCCESS: Powers of 2 up to 1000 verified. p doubles each iteration."
+if 'count_vowels' not in dir():
+    res = "ERROR: Function 'count_vowels' not found."
+elif count_vowels("hello") == 2 and count_vowels("Python") == 1 and count_vowels("rhythm") == 0:
+    res = "SUCCESS: count_vowels verified. 'hello'=2, 'Python'=1, 'rhythm'=0."
 else:
-    res = f"ERROR: Expected [1,2,4,...,512], got {values}."
+    res = f"ERROR: Got count_vowels('hello')={count_vowels('hello')}, count_vowels('Python')={count_vowels('Python')}."
 res
 `,
-              hint: 'while p <= 1000: print(p), then p *= 2',
+              hint: 'for ch in s: if ch.lower() in "aeiou": count += 1',
             },
             {
               id: 22,
               challengeType: 'fill',
               challengeNumber: 2,
-              challengeTitle: 'Fill the Convergence Loop',
+              challengeTitle: 'Enumerate Positions',
               difficulty: 'easy',
               prompt:
-                'Fill in the blanks to complete a loop that repeatedly halves `x` until it falls below 0.01.',
+                'Fill in the blanks to print each character and its index in the format `0: h`, `1: e`, etc.',
               instructions:
-                'The condition checks if x is still too large. The update halves x.',
-              starterBlock: `x = 100.0
-while ___:
-    x ___= 2
-print(round(x, 6))
+                'Use `enumerate()` to get both the index and the character in one step.',
+              starterBlock: `for ___, ___ in enumerate("hello"):
+    print(f"___: ___")
 `,
-              code: `x = 100.0
-while ___:
-    x ___= 2
-print(round(x, 6))
+              code: `for ___, ___ in enumerate("hello"):
+    print(f"___: ___")
 `,
               output: '', status: 'idle', figureJson: null,
               testCode: `
-x = 100.0
-while x >= 0.01:
-    x /= 2
-if abs(x - 0.006104) < 0.0001:
-    res = "SUCCESS: x halved until below 0.01. Final value ≈ 0.006104."
+output = []
+for i, ch in enumerate("hello"):
+    output.append(f"{i}: {ch}")
+if output == ["0: h", "1: e", "2: l", "3: l", "4: o"]:
+    res = "SUCCESS: enumerate() verified. Index and character paired correctly."
 else:
-    res = f"ERROR: Expected ≈0.006104, got {round(x, 6)}. Check condition (x >= 0.01) and update (x /= 2)."
+    res = f"ERROR: Expected ['0: h', '1: e', ...]. Got {output}."
 res
 `,
-              hint: 'Condition: x >= 0.01. Update: x /= 2 (divide by 2 each step)',
+              hint: 'for i, ch in enumerate("hello"): print(f"{i}: {ch}")',
             },
             {
               id: 23,
               challengeType: 'write',
               challengeNumber: 3,
-              challengeTitle: 'Sum Until Limit',
-              difficulty: 'medium',
+              challengeTitle: 'Reverse a String',
+              difficulty: 'easy',
               prompt:
-                'Write `sum_until(limit)` that adds consecutive integers 1, 2, 3, ... until the running total would EXCEED `limit`. Return the total at that point.\n\nCompound: accumulator pattern + while condition.',
+                'Write `reverse_string(s)` that returns the string reversed.\n\nWrite two versions:\n1. Using a `for` loop and accumulator\n2. Using slicing `s[::-1]`\n\nBoth should return the same result.',
               instructions:
-                'Keep adding while total + next_n <= limit. Stop before you exceed it.',
-              code: '# Define sum_until(limit) here\n',
+                'The loop version: iterate in reverse using reversed(s), or iterate forward and prepend each character.',
+              code: '# Define reverse_string(s) using a for loop\n# Then add reverse_string_v2 using slicing\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if 'sum_until' not in dir():
-    res = "ERROR: Function 'sum_until' not found."
-elif sum_until(10) == 10 and sum_until(15) == 15 and sum_until(11) == 10:
-    res = "SUCCESS: sum_until verified. Stops before exceeding the limit."
+if 'reverse_string' not in dir():
+    res = "ERROR: Function 'reverse_string' not found."
+elif reverse_string("hello") == "olleh" and reverse_string("python") == "nohtyp" and reverse_string("a") == "a":
+    res = "SUCCESS: reverse_string verified. 'hello'→'olleh', 'python'→'nohtyp'."
 else:
-    res = f"ERROR: Got sum_until(10)={sum_until(10)}, sum_until(11)={sum_until(11)}. The sum should not exceed the limit."
+    res = f"ERROR: Got reverse_string('hello')={reverse_string('hello')!r}. Expected 'olleh'."
 res
 `,
-              hint: 'n=1, total=0. while total + n <= limit: total += n, n += 1. return total',
+              hint: 'Loop version: result = ""; for ch in reversed(s): result += ch; return result. Slice version: return s[::-1]',
             },
             {
               id: 24,
               challengeType: 'write',
               challengeNumber: 4,
-              challengeTitle: 'Collatz Steps',
+              challengeTitle: 'Find First Digit',
               difficulty: 'medium',
               prompt:
-                'Write `collatz_steps(n)` that returns the number of steps to reach 1 using the Collatz rule:\n- If n is even: n = n // 2\n- If n is odd: n = 3 * n + 1\n\nCompound: uses `%` (L2), conditionals (L11), while loops (L13).',
+                'Write `first_digit(s)` that returns the first digit character found in the string, or `None` if there are no digits.\n\nCompound: uses `for`, `in`, conditionals (L11), string iteration (L13).',
               instructions:
-                'Count steps until n == 1. Do not count the final state (n=1 is the stopping point, not a step).',
-              code: '# Define collatz_steps(n) here\n',
+                'Use `ch.isdigit()` to check if a character is a digit. Return immediately on the first match.',
+              code: '# Define first_digit(s) here\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if 'collatz_steps' not in dir():
-    res = "ERROR: Function 'collatz_steps' not found."
-elif collatz_steps(1) == 0 and collatz_steps(2) == 1 and collatz_steps(6) == 8:
-    res = "SUCCESS: Collatz steps verified. collatz_steps(6)=8, collatz_steps(2)=1."
+if 'first_digit' not in dir():
+    res = "ERROR: Function 'first_digit' not found."
+elif first_digit("abc3def7") == "3" and first_digit("hello") is None and first_digit("9xyz") == "9":
+    res = "SUCCESS: first_digit verified. Returns first digit character or None."
 else:
-    res = f"ERROR: Got collatz_steps(1)={collatz_steps(1)}, collatz_steps(2)={collatz_steps(2)}, collatz_steps(6)={collatz_steps(6)}."
+    res = f"ERROR: Got first_digit('abc3def7')={first_digit('abc3def7')!r}, first_digit('hello')={first_digit('hello')!r}."
 res
 `,
-              hint: 'steps=0, while n != 1: apply rule, steps += 1. return steps',
+              hint: 'for ch in s: if ch.isdigit(): return ch. After the loop: return None',
             },
             {
               id: 25,
               challengeType: 'write',
               challengeNumber: 5,
-              challengeTitle: 'GCD with Euclid\'s Algorithm',
+              challengeTitle: 'Zip Score Reporter',
               difficulty: 'medium',
               prompt:
-                'Write `gcd(a, b)` using Euclid\'s algorithm:\n- While b != 0: replace (a, b) with (b, a % b)\n- Return a\n\nThis is a classic "loop until convergence" pattern.\nExample: gcd(48, 18) → 6',
+                'Given two lists (provided), use `zip()` to iterate them in lockstep and print a summary.\n\nFor each (name, score) pair, print:\n- `"PASS: Alice - 92"` if score >= 60\n- `"FAIL: Bob - 45"` if score < 60\n\nCompound: zip(), conditionals (L11), f-strings, for loop.',
               instructions:
-                'Use simultaneous assignment: `a, b = b, a % b` each iteration.',
-              code: '# Define gcd(a, b) here\n',
+                'The lists are already defined — just write the for loop using zip().',
+              code: `names = ["Alice", "Bob", "Carol", "David"]
+scores = [92, 45, 78, 55]
+
+# Write your for loop here using zip(names, scores)
+`,
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if 'gcd' not in dir():
-    res = "ERROR: Function 'gcd' not found."
-elif gcd(48, 18) == 6 and gcd(100, 75) == 25 and gcd(17, 5) == 1:
-    res = "SUCCESS: Euclid's algorithm verified. gcd(48,18)=6, gcd(100,75)=25, gcd(17,5)=1."
+names = ["Alice", "Bob", "Carol", "David"]
+scores = [92, 45, 78, 55]
+results = []
+for name, score in zip(names, scores):
+    if score >= 60:
+        results.append(f"PASS: {name} - {score}")
+    else:
+        results.append(f"FAIL: {name} - {score}")
+expected = ["PASS: Alice - 92", "FAIL: Bob - 45", "PASS: Carol - 78", "FAIL: David - 55"]
+if results == expected:
+    res = "SUCCESS: zip() reporter verified. PASS/FAIL applied to all pairs."
 else:
-    res = f"ERROR: Got gcd(48,18)={gcd(48,18)}, gcd(100,75)={gcd(100,75)}, gcd(17,5)={gcd(17,5)}."
+    res = f"ERROR: Expected {expected}. Got {results}."
 res
 `,
-              hint: 'while b != 0: a, b = b, a % b. return a',
+              hint: 'for name, score in zip(names, scores): if score >= 60: print(f"PASS: {name} - {score}") else: ...',
             },
             {
               id: 26,
-              challengeType: 'fill',
+              challengeType: 'write',
               challengeNumber: 6,
-              challengeTitle: 'Number Guessing Logic',
+              challengeTitle: 'Caesar Cipher',
               difficulty: 'hard',
               prompt:
-                'Fill in the while loop that simulates a number-guessing game. The loop keeps trying guesses from a list until it finds the secret or exhausts all attempts.',
+                'CUMULATIVE — Lessons 1, 2, 4, 9, 11, 13.\n\nWrite `caesar(text, shift)` that shifts every letter by `shift` positions in the alphabet (wrapping around). Non-letter characters are unchanged.\n\nHints:\n- `ord(ch)` converts a character to its ASCII code\n- `chr(n)` converts an ASCII code back to a character\n- Lowercase letters are ASCII 97–122, uppercase 65–90\n- Use `%` for wrapping',
               instructions:
-                'The loop exits on a correct guess (break) or when all attempts are used (condition). The for/else reports the outcome.',
-              starterBlock: `secret = 42
-attempts = [10, 55, 42, 99]
-index = 0
-
-while ___ and ___:
-    guess = attempts[index]
-    if guess ___:
-        print("Too low")
-    elif guess ___:
-        print("Too high")
-    index += 1
-
-if index < len(attempts) and attempts[index - 1] == secret:
-    print("Found it!")
-else:
-    print("Ran out of attempts")
-`,
-              code: `secret = 42
-attempts = [10, 55, 42, 99]
-index = 0
-
-while ___ and ___:
-    guess = attempts[index]
-    if guess ___:
-        print("Too low")
-    elif guess ___:
-        print("Too high")
-    index += 1
-
-if index < len(attempts) and attempts[index - 1] == secret:
-    print("Found it!")
-else:
-    print("Ran out of attempts")
-`,
+                'For each character: if it\'s a letter, shift it (preserving case). If not a letter, keep it as-is.',
+              code: '# Define caesar(text, shift) here\n',
               output: '', status: 'idle', figureJson: null,
               testCode: `
-secret = 42
-attempts = [10, 55, 42, 99]
-index = 0
-results = []
-while index < len(attempts) and attempts[index] != secret:
-    guess = attempts[index]
-    if guess < secret:
-        results.append("low")
-    elif guess > secret:
-        results.append("high")
-    index += 1
-found = index < len(attempts) and attempts[index] == secret
-if results == ["low", "high"] and found:
-    res = "SUCCESS: Loop terminates when secret is found. Correct low/high feedback."
+if 'caesar' not in dir():
+    res = "ERROR: Function 'caesar' not found."
+elif (caesar("hello", 3) == "khoor" and
+      caesar("xyz", 3) == "abc" and
+      caesar("Hello, World!", 13) == "Uryyb, Jbeyq!" and
+      caesar("abc", 0) == "abc"):
+    res = "SUCCESS: Caesar cipher verified. Shift, wrap, and non-letter preservation all correct."
 else:
-    res = f"ERROR: Expected ['low','high'] then found. Got {results}, found={found}."
+    res = f"ERROR: caesar('hello',3)={caesar('hello',3)!r} (expected 'khoor'), caesar('xyz',3)={caesar('xyz',3)!r} (expected 'abc')."
 res
 `,
-              hint: 'Conditions: index < len(attempts) and attempts[index] != secret. Comparisons: guess < secret and guess > secret',
+              hint: 'for ch in text: if ch.isalpha(): base = ord("a") if ch.islower() else ord("A"); result += chr((ord(ch) - base + shift) % 26 + base) else: result += ch',
             },
             {
               id: 27,
-              challengeType: 'write',
+              challengeType: 'fill',
               challengeNumber: 7,
-              challengeTitle: 'Integer Square Root',
+              challengeTitle: 'Dict Score Summary',
               difficulty: 'hard',
               prompt:
-                'CUMULATIVE — Lessons 2, 9, 10, 11, 13.\n\nWrite `isqrt(n)` that returns the largest integer `k` such that `k * k <= n`, without using `**` or any math library.\n\nUse a while loop that increments a counter until it overshoots, then steps back by 1.\n\nExamples: isqrt(16)=4, isqrt(17)=4, isqrt(25)=5, isqrt(2)=1',
+                'A dict is provided. Fill in the loop to compute the average score across all students.\n\nThe dict maps names (keys) to scores (values). Access the value for each key with `scores[name]`.',
               instructions:
-                'Start k=0, keep incrementing while k*k <= n, then return k-1.',
-              code: '# Define isqrt(n) here\n',
+                'Loop over the dict (you get keys). Sum the values, divide by count. Round to 1 decimal place.',
+              starterBlock: `scores = {"Alice": 92, "Bob": 85, "Carol": 78, "David": 91, "Eve": 64}
+
+total = 0
+count = 0
+for ___ in ___:
+    total += ___
+    count += 1
+
+average = round(total / count, 1)
+average
+`,
+              code: `scores = {"Alice": 92, "Bob": 85, "Carol": 78, "David": 91, "Eve": 64}
+
+total = 0
+count = 0
+for ___ in ___:
+    total += ___
+    count += 1
+
+average = round(total / count, 1)
+average
+`,
               output: '', status: 'idle', figureJson: null,
               testCode: `
-if 'isqrt' not in dir():
-    res = "ERROR: Function 'isqrt' not found."
-elif isqrt(16) == 4 and isqrt(17) == 4 and isqrt(25) == 5 and isqrt(2) == 1 and isqrt(1) == 1:
-    res = "SUCCESS: Integer square root verified. isqrt(16)=4, isqrt(17)=4, isqrt(25)=5."
+scores = {"Alice": 92, "Bob": 85, "Carol": 78, "David": 91, "Eve": 64}
+total = 0
+count = 0
+for name in scores:
+    total += scores[name]
+    count += 1
+average = round(total / count, 1)
+if average == 82.0:
+    res = "SUCCESS: Dict iteration verified. Average score = 82.0."
 else:
-    res = f"ERROR: Got isqrt(16)={isqrt(16)}, isqrt(17)={isqrt(17)}, isqrt(25)={isqrt(25)}."
+    res = f"ERROR: Expected 82.0, got {average}. Did you access scores[name] inside the loop?"
 res
 `,
-              hint: 'k=0. while k*k <= n: k += 1. return k - 1',
+              hint: 'for name in scores: total += scores[name], count += 1',
             },
           ],
         },
@@ -458,31 +450,31 @@ res
 
   rigor: {
     prose: [
-      '**Termination proof**: before writing a while loop, you should be able to argue why it terminates. Identify a quantity that changes monotonically toward the exit condition (e.g., n decreases by at least 1 each iteration, total strictly increases). If no such quantity exists, the loop may not terminate.',
-      '**continue + update ordering**: when using `continue` inside a while loop, make sure the update step runs before the `continue`. Otherwise the loop variable never changes and the loop runs infinitely. This is one of the most common while loop bugs.',
-      '**while True is not always bad**: `while True: ... break` is idiomatic when the natural exit check belongs in the middle of the block, not the top. It is also used in event loops and servers that run "forever" by design.',
+      '**Iterables vs iterators**: an *iterable* is anything that can produce an iterator (a string, list, range). An *iterator* is the object that actually tracks position and delivers the next item. `iter(iterable)` creates an iterator; `next(iterator)` advances it. The `for` loop calls these internally — you never need to call them directly, but knowing they exist explains how `for` works under the hood.',
+      '**Strings are immutable sequences**: you can index and slice a string, but you cannot assign to an index (`s[0] = "H"` raises a TypeError). This will contrast with lists, which are mutable.',
+      '**dict ordering**: as of Python 3.7, dictionaries maintain insertion order. Iterating a dict gives keys in the order they were inserted. This was not guaranteed in earlier versions.',
     ],
     callouts: [
       {
-        type: 'warning',
-        title: 'Off-by-one in the exit condition',
-        body: '`while x < 5` stops when x==5 (x is 0–4). `while x <= 5` stops when x==6 (x is 0–5). The choice between `<` and `<=` shifts the last iteration. Always trace the boundary case before running.',
+        type: 'insight',
+        title: 'dict.keys(), .values(), .items()',
+        body: 'Dicts have three iterator-producing methods. `.keys()` gives keys (same as iterating the dict directly). `.values()` gives just the values. `.items()` gives (key, value) tuples — letting you unpack both in a for loop: `for name, score in scores.items()`. Full coverage in the Data Structures lesson.',
       },
       {
         type: 'insight',
-        title: 'Most while loops can be written as for loops with itertools',
-        body: 'Python\'s `itertools` module provides `takewhile`, `dropwhile`, and `count` that express many while-loop patterns as iterators. You will encounter these in Phase 3 (data pipelines). For now, explicit while loops make the mechanics visible.',
+        title: 'map() and filter() are also iterables',
+        body: '`map(func, iterable)` applies a function to every item and returns an iterable of results. `filter(func, iterable)` returns only items where the function returns True. These are more advanced patterns you will see when combining functions with data.',
       },
     ],
   },
 
   mentalModel: [
-    'while checks condition before each iteration — exits when condition is False.',
-    'Always identify what changes inside the loop to eventually make the condition False.',
-    'for = known sequence; while = unknown count / condition-driven exit.',
-    'continue before update in a while loop → infinite loop (common bug).',
-    'while True + break = "exit from the middle" pattern.',
-    'while/else: else runs only if the loop exited normally (no break).',
+    'An iterable is anything Python can step through one item at a time.',
+    'for x in iterable: always works — range, string, list, tuple, dict (keys), file.',
+    'in tests membership: "e" in "hello" → True.',
+    's[i] accesses by index (0-based); s[-1] is the last item.',
+    's[start:stop] slices from start up to (not including) stop.',
+    'enumerate() gives (index, value); zip() pairs two iterables together.',
   ],
 
   checkpoints: ['read-intuition'],
