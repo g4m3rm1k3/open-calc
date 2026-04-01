@@ -10,6 +10,7 @@ import lesson9 from './lesson9.js'
 import lesson10 from './lesson10.js'
 import lesson11 from './lesson11.js'
 import lesson12 from './lesson12.js'
+import lesson13 from './lesson13.js'
 
 export default [
   {
@@ -40,6 +41,6 @@ export default [
     number: 0.5,
     title: 'Iteration',
     course: 'python-1',
-    lessons: [lesson12]
+    lessons: [lesson12, lesson13]
   }
 ]
