@@ -185,86 +185,38 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
 
       <ScoreWidget />
 
-      {/* Graph Utility buttons */}
-      <div className="flex items-center gap-2 hidden lg:flex">
-        <button
-          onClick={onGraphToggle}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800/50"
-          title="Open 2D Grapher (G)"
-        >
-          <Activity className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">2D</span>
-        </button>
+      {/* Utility tool buttons — icon only, grouped by type */}
+      <div className="hidden lg:flex items-center gap-1">
+        {/* Graphers */}
+        <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <button onClick={onGraphToggle}    className="p-2 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors" title="2D Grapher (G)"><Activity className="w-4 h-4" /></button>
+          <button onClick={onGraph3DToggle}  className="p-2 text-amber-500  dark:text-amber-400  hover:bg-amber-50  dark:hover:bg-amber-900/30  transition-colors border-l border-slate-200 dark:border-slate-700" title="3D Plotter (3)"><Box      className="w-4 h-4" /></button>
+          <button onClick={onGraphJSXToggle} className="p-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors border-l border-slate-200 dark:border-slate-700" title="JSXGraph Pro (X)"><Settings2 className="w-4 h-4" /></button>
+        </div>
 
-        <button
-          onClick={onGraph3DToggle}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors border border-amber-100 dark:border-amber-800/50"
-          title="Open 3D Plotter (3)"
-        >
-          <Box className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">3D</span>
-        </button>
-
-        <button
-          onClick={onGraphJSXToggle}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800/50"
-          title="Open JSXGraph Pro (X)"
-        >
-          <Settings2 className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Pro</span>
-        </button>
-
-        <button
-          onClick={onScratchToggle}
-          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-            scratchOpen
-              ? 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/40 border-rose-200 dark:border-rose-800/50'
-              : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 border-rose-100 dark:border-rose-800/50'
-          }`}
-          title="Scratchpad (S)"
-        >
-          <PenLine className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Notes</span>
-        </button>
-
-        <button
-          onClick={onCalcToggle}
-          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-            calcOpen
-              ? 'text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/40 border-violet-200 dark:border-violet-800/50'
-              : 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/30 hover:bg-violet-100 dark:hover:bg-violet-900/50 border-violet-100 dark:border-violet-800/50'
-          }`}
-          title="TI Calculator (C)"
-        >
-          <Calculator className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Calc</span>
-        </button>
-
-        <button
-          onClick={onPythonToggle}
-          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-            pythonOpen
-              ? 'text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/40 border-teal-200 dark:border-teal-800/50'
-              : 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 hover:bg-teal-100 dark:hover:bg-teal-900/50 border-teal-100 dark:border-teal-800/50'
-          }`}
-          title="Python Sandbox (P)"
-        >
-          <Terminal className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Python</span>
-        </button>
-
-        <button
-          onClick={onJsToggle}
-          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-            jsOpen
-              ? 'text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/40 border-yellow-200 dark:border-yellow-800/50'
-              : 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 border-yellow-100 dark:border-yellow-800/50'
-          }`}
-          title="JS Playground (J)"
-        >
-          <Code2 className="w-4 h-4" />
-          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">JS</span>
-        </button>
+        {/* Other tools */}
+        <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden ml-1">
+          <button
+            onClick={onScratchToggle}
+            className={`p-2 transition-colors ${scratchOpen ? 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-900/30' : 'text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30'}`}
+            title="Scratchpad (S)"
+          ><PenLine className="w-4 h-4" /></button>
+          <button
+            onClick={onCalcToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${calcOpen ? 'text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30' : 'text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30'}`}
+            title="TI Calculator (C)"
+          ><Calculator className="w-4 h-4" /></button>
+          <button
+            onClick={onPythonToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${pythonOpen ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30' : 'text-teal-500 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30'}`}
+            title="Python Sandbox (P)"
+          ><Terminal className="w-4 h-4" /></button>
+          <button
+            onClick={onJsToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${jsOpen ? 'text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30' : 'text-yellow-500 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30'}`}
+            title="JS Playground (J)"
+          ><Code2 className="w-4 h-4" /></button>
+        </div>
       </div>
 
       {/* Dark mode toggle */}
