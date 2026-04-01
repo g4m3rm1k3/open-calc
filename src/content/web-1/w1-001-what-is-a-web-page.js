@@ -44,7 +44,81 @@ export default {
   },
 
   math: { prose: [], callouts: [], visualizations: [] },
-  rigor: { prose: [], callouts: [], visualizations: [] },
+
+  rigor: {
+    prose: [
+      'The DOM is not a file format — it is a **live data structure** in memory. The HTML file on disk is just the instructions for building it. Once built, the file is irrelevant — JavaScript talks to the tree, not the text.',
+      'Every node in the tree is a JavaScript object with properties: `tagName`, `textContent`, `style`, `classList`, `children`. When you change a property, the browser re-renders only the affected subtree — not the whole page.',
+    ],
+    callouts: [],
+    visualizations: [
+      {
+        id: 'JSNotebook',
+        title: 'Hands-On: Talking to the DOM',
+        caption: 'Write code in the JS tab and click Run to see it change the preview live.',
+        props: {
+          lesson: {
+            title: 'Your First DOM Manipulation',
+            subtitle: 'The tree is live — change an object property and the page updates instantly.',
+            sequential: true,
+            cells: [
+              {
+                type: 'markdown',
+                instruction: 'The DOM tree you just saw in the diagram is a live JavaScript object. Below are two cells that let you reach into that tree and change it.\n\nRead each instruction, write the code, and click ▶ Run to see the result in the preview above the editor.',
+              },
+              {
+                type: 'js',
+                instruction: '`document.querySelector(selector)` finds the first matching element in the tree and returns it as a JavaScript object. Once you have the object, you can read and write its properties.\n\nRun the starter code, then try changing the `textContent` to something else.',
+                html: `<h2 id="heading">The DOM is a tree of live objects.</h2>
+<p id="sub">Change me with JavaScript.</p>`,
+                css: `body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+h2 { color: #38bdf8; margin: 0 0 8px; }
+p  { color: #94a3b8; margin: 0; }`,
+                startCode: `// Find the heading node in the tree
+const heading = document.querySelector('#heading');
+
+// Read its current text
+console.log('Before:', heading.textContent);
+
+// Write a new value — the preview updates instantly
+heading.textContent = 'I just changed a live DOM node!';
+
+console.log('After:', heading.textContent);`,
+                solutionCode: `const heading = document.querySelector('#heading');
+console.log('Before:', heading.textContent);
+heading.textContent = 'I just changed a live DOM node!';
+console.log('After:', heading.textContent);`,
+                outputHeight: 120,
+                showDom: false,
+              },
+              {
+                type: 'challenge',
+                instruction: 'The paragraph below has id `"message"`. Write JavaScript that:\n1. Selects it with `querySelector`\n2. Changes its `textContent` to `"DOM nodes are just objects!"`\n3. Changes its `style.color` to `"#34d399"` (green)\n\nClick Run, then check the preview.',
+                html: `<p id="message">This text needs to change.</p>`,
+                css: `body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 24px; font-size: 16px; }`,
+                startCode: `// Select the paragraph by its id
+const msg = document.querySelector('#message');
+
+// 1. Change its text
+// 2. Change its color to '#34d399'
+`,
+                solutionCode: `const msg = document.querySelector('#message');
+msg.textContent = 'DOM nodes are just objects!';
+msg.style.color = '#34d399';`,
+                outputHeight: 100,
+                check: (code) =>
+                  code.includes('querySelector') &&
+                  (code.includes('"DOM nodes are just objects!"') || code.includes("'DOM nodes are just objects!'")) &&
+                  (code.includes('"#34d399"') || code.includes("'#34d399'")),
+                successMessage: '✓ You reached into the live tree and changed two properties at once. That is the entire DOM API in miniature.',
+                failMessage: '✗ Make sure you set textContent to "DOM nodes are just objects!" and style.color to "#34d399".',
+              },
+            ],
+          },
+        },
+      },
+    ],
+  },
 
   examples: [],
   challenges: [],

@@ -24,7 +24,7 @@ export default {
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 2 of 4 — JavaScript as Behavior',
+        title: 'Lesson 2 of 5 — JavaScript as Behavior',
         body: '**Previous:** Allocating system memory via variables.\n**This lesson:** Transforming memory via functions.\n**Next:** Triggering functions through async events.',
       }
     ],

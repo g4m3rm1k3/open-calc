@@ -24,7 +24,7 @@ export default {
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 1 of 4 — JavaScript as Behavior',
+        title: 'Lesson 1 of 5 — JavaScript as Behavior',
         body: '**Previous:** Resolving structural layouts manually.\n**This lesson:** Giving the system memory via variables.\n**Next:** Operating on memory via functions.',
       }
     ],

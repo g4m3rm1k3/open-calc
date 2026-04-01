@@ -24,7 +24,7 @@ export default {
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 3 of 4 — JavaScript as Behavior',
+        title: 'Lesson 3 of 5 — JavaScript as Behavior',
         body: '**Previous:** Formalizing transformation functions.\n**This lesson:** Instructing the browser when to fire functions.\n**Next:** Dynamically altering the fundamental DOM tree via events.',
       }
     ],

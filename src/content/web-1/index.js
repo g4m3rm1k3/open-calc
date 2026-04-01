@@ -6,7 +6,8 @@ import w1_004 from './w1-004-layout-systems.js';
 import w2_001 from './w2-001-variables-and-state.js';
 import w2_002 from './w2-002-functions.js';
 import w2_003 from './w2-003-events.js';
-import w2_004 from './w2-004-dom-manipulation.js';
+import w2_004 from './w2-004-dom-intro.js';
+import w2_005 from './w2-005-dom-manipulation.js';
 
 import w3_001 from './w3-001-event-loop.js';
 import w3_002 from './w3-002-async-patterns.js';
@@ -46,7 +47,8 @@ const W2 = {
     w2_001,
     w2_002,
     w2_003,
-    w2_004
+    w2_004,
+    w2_005
   ],
 };
 
