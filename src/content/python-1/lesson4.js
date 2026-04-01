@@ -182,6 +182,146 @@ export default {
               output: '', status: 'idle', figureJson: null,
             },
 
+            // ── CELL 10: Multiple assignment on one line ──────────────────────
+            {
+              id: 10,
+              cellTitle: 'Multiple assignment — one line, many names',
+              prose: 'You can assign the same value to several names at once by chaining `=` signs:\n\n`a = b = c = 0`\n\nPython evaluates `0` once, then binds all three names to that value. This is useful for initializing a group of counters or accumulators to a common starting value.',
+              instructions: 'After this cell runs, all three names hold 0. Change the starting value to 10 and re-run — all three update together.',
+              code: [
+                'a = b = c = 0',
+                'a, b, c     # shown as a tuple — all three are 0',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 11: Simultaneous swap ────────────────────────────────────
+            {
+              id: 11,
+              cellTitle: "Python's idiomatic swap — no temp variable needed",
+              prose: 'In most languages, swapping two variables requires a temporary holder:\n\n```\ntemp = a\na = b\nb = temp\n```\n\nPython lets you swap in a single line:\n\n`a, b = b, a`\n\nPython evaluates the entire right side first (building a tuple of the current values), then unpacks and rebinds both names simultaneously. The old values are never lost before being assigned.',
+              instructions: 'Trace the values before and after the swap line.',
+              code: [
+                'a = 10',
+                'b = 99',
+                'a, b = b, a   # simultaneous swap',
+                'a, b          # shown — a is now 99, b is now 10',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 12: del statement ────────────────────────────────────────
+            {
+              id: 12,
+              cellTitle: 'del — removing a name from the kernel',
+              prose: 'The `del` statement unbinds a name. After `del x`, the name `x` no longer exists in the kernel — using it raises a `NameError` just as if it had never been assigned.\n\n`del` is rarely needed in everyday code, but it is useful when you want to explicitly clean up a large object from memory, or when you want to prove to yourself that a name is gone.',
+              instructions: 'The first two lines work fine. The third line will raise a NameError after `del` has removed the name.',
+              code: [
+                'x = 42',
+                'x           # 42 — name exists',
+                '# del x     # uncomment this line to remove x',
+                '# x         # uncomment this to see the NameError',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 13: Shadowing a built-in ─────────────────────────────────
+            {
+              id: 13,
+              cellTitle: 'Danger: shadowing a built-in name',
+              prose: 'Python has many built-in names like `list`, `len`, `max`, `min`, `type`, `print`. These are pre-bound in the kernel.\n\nIf you write `list = 5`, you rebind the name `list` to the integer `5`. Now `list()` raises a `TypeError` because `5` is not callable. The built-in function is hidden — **shadowed** — by your variable.\n\nThe fix: `del list` removes your binding and restores access to the built-in. Better fix: never name a variable after a built-in in the first place.',
+              instructions: 'Read the code but do NOT run it as written — it will break `list` in your kernel. The commented-out version shows the safe recovery path.',
+              code: [
+                '# DO NOT run — for illustration only',
+                '# list = 5           # shadows the built-in',
+                '# list([1, 2, 3])    # TypeError: int is not callable',
+                '# del list           # restores the built-in',
+                '# list([1, 2, 3])    # works again: [1, 2, 3]',
+                '',
+                '# Safe names: use descriptive words — shopping_list, task_list',
+                'shopping_list_count = 5   # this is fine',
+                'shopping_list_count',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 14: //= and **= augmented operators ──────────────────────
+            {
+              id: 14,
+              cellTitle: '//= and **= — two more augmented operators',
+              prose: 'The augmented assignment family extends beyond `+=`, `-=`, `*=`:\n\n`x //= 3`  is the same as  `x = x // 3`  (floor-divide-assign)\n`x **= 2`  is the same as  `x = x ** 2`  (power-assign)\n\nThese follow exactly the same pattern: evaluate the right side using the current value of `x`, then rebind `x` to the result.',
+              instructions: 'Trace the value of `n` after each augmented operation.',
+              code: [
+                'n = 100',
+                'n //= 3     # 100 // 3 = 33',
+                'n **= 2     # 33 ** 2 = 1089',
+                'n           # shown',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 15: Augmented assignment with strings ────────────────────
+            {
+              id: 15,
+              cellTitle: 'Augmented assignment works on strings too',
+              prose: 'The `+=` operator is not limited to numbers. On strings, `+=` appends (concatenates) the right side to the current value of the variable.\n\n`s += " world"` is shorthand for `s = s + " world"`.\n\nThis pattern is useful for building up a string piece by piece, though for large-scale string assembly, `join()` is more efficient (covered later).',
+              instructions: 'Watch the string grow with each `+=`.',
+              code: [
+                's = "hello"',
+                's += " world"',
+                's += "!"',
+                's           # shown — "hello world!"',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 16: Variables as subexpressions ──────────────────────────
+            {
+              id: 16,
+              cellTitle: 'Building expressions from named parts',
+              prose: 'Assigning intermediate values to descriptive names makes complex calculations readable. Compare:\n\n```python\n3.14159 * 7 * 7\n```\nvs.\n```python\npi = 3.14159\nr = 7\narea = pi * r * r\n```\n\nThe second version documents its own intent. Each name is a subexpression that Python evaluates (looks up) when the full expression runs.',
+              instructions: 'Change `r` to a different value and re-run. Notice that `area` updates because it is recomputed from the current values of `pi` and `r`.',
+              code: [
+                'pi = 3.14159',
+                'r = 7',
+                'area = pi * r * r',
+                'area        # shown — area of a circle with radius 7',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 17: NameError fires at evaluation time ───────────────────
+            {
+              id: 17,
+              cellTitle: 'NameError fires at evaluation time — not at write time',
+              prose: 'Python does not check whether names exist when you *write* code. It only checks when it *runs* the line that uses the name.\n\nThis means a cell can have a NameError lurking on line 5 even if lines 1–4 run perfectly. The error fires the moment Python tries to evaluate the missing name — not before.',
+              instructions: 'Run this cell. Lines 1 and 2 succeed. Line 3 raises a NameError because `z` was never assigned. The value of `result` is never set.',
+              code: [
+                'a = 10',
+                'b = 20',
+                'result = a + b + z   # NameError: z is not defined',
+                'result               # never reached',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 18: Constants by convention ─────────────────────────────
+            {
+              id: 18,
+              cellTitle: 'Constants by convention — ALL_CAPS names',
+              prose: 'Python has no built-in mechanism to prevent a variable from being changed. But there is a strong convention: if a name is written in ALL_CAPS, it signals "this value should not be changed."\n\n```python\nPI = 3.14159\nSPEED_OF_LIGHT = 299_792_458   # m/s\n```\n\nOther programmers (and your future self) will know not to reassign these names. Python will not stop you from writing `PI = 0`, but it is considered a serious style violation.',
+              instructions: 'Use the ALL_CAPS constant in an expression. The convention is just a signal — Python treats it like any other variable.',
+              code: [
+                'PI = 3.14159',
+                'MAX_RETRIES = 5',
+                '',
+                'r = 4',
+                'circumference = 2 * PI * r',
+                'circumference   # shown',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
             // ── CHALLENGE 1: Trace the state ──────────────────────────────────
             {
               id: 10,
@@ -275,6 +415,188 @@ export default {
                 'True',
               ].join('\n'),
               hint: 'Save one value before overwriting it: temp = a, then a = b, then b = temp. Without temp, you lose the original value of a the moment you write a = b.',
+            },
+
+            // ── CHALLENGE 4: Augmented multiplication ────────────────────────
+            {
+              id: 21,
+              challengeType: 'write',
+              challengeNumber: 4,
+              challengeTitle: 'Triple with Augmented Assignment',
+              difficulty: 'easy',
+              prompt:
+                'Assign `x = 7`, then use a single augmented assignment statement to triple `x` (multiply it by 3).\n\n' +
+                'What is `x` after the operation? Write the two lines and evaluate `x`.',
+              code: [
+                '# Step 1: assign x = 7',
+                '# Step 2: use augmented assignment to triple x',
+                '# Step 3: evaluate x on the last line',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+x = 7
+x *= 3
+if x == 21:
+    res = "SUCCESS: Augmented multiplication confirmed. 7 × 3 = 21."
+else:
+    res = f"ERROR: Expected 21, got {x}. Use x *= 3 to triple x."
+res
+`,
+              hint: 'Tripling means multiplying by 3. The augmented operator for multiplication is `*=`. So `x *= 3` is the same as `x = x * 3`.',
+            },
+
+            // ── CHALLENGE 5: Fill-in swap ─────────────────────────────────────
+            {
+              id: 22,
+              challengeType: 'fill',
+              challengeNumber: 5,
+              challengeTitle: "Fill the Swap — Python's One-Line Idiom",
+              difficulty: 'easy',
+              prompt:
+                'Complete the simultaneous swap so that after execution `a` is `20` and `b` is `10`.\n\n' +
+                'Fill in both blanks on the right side of the assignment.',
+              starterBlock:
+                'a = 10\nb = 20\na, b = ___, ___\na, b',
+              code:
+                'a = 10\nb = 20\na, b = ___, ___\na, b',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+a = 10
+b = 20
+a, b = b, a
+if a == 20 and b == 10:
+    res = "SUCCESS: Simultaneous swap confirmed. a=20, b=10."
+else:
+    res = f"ERROR: Expected a=20, b=10, got a={a}, b={b}. Put b first, then a."
+res
+`,
+              hint: 'The right side should list the values in the new order you want. To make `a` get the old value of `b`, put `b` first.',
+            },
+
+            // ── CHALLENGE 6: Compound expression from 3 variables ────────────
+            {
+              id: 23,
+              challengeType: 'write',
+              challengeNumber: 6,
+              challengeTitle: 'Volume from Three Variables',
+              difficulty: 'medium',
+              prompt:
+                'Assign three variables: `width = 6`, `height = 4`, `depth = 3`.\n\n' +
+                'Then compute `volume = width * height * depth`.\n\n' +
+                'Evaluate `volume` on the last line. The result should be `72`.',
+              code: [
+                '# Assign the three dimension variables',
+                '# Compute volume',
+                '# Evaluate volume',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+width = 6
+height = 4
+depth = 3
+volume = width * height * depth
+if volume == 72:
+    res = "SUCCESS: Volume verified. 6 × 4 × 3 = 72."
+else:
+    res = f"ERROR: Expected 72, got {volume}. Check that width=6, height=4, depth=3."
+res
+`,
+              hint: 'Assign each variable on its own line, then multiply all three together and store in `volume`.',
+            },
+
+            // ── CHALLENGE 7: Reach 47 with augmented assignment ───────────────
+            {
+              id: 24,
+              challengeType: 'write',
+              challengeNumber: 7,
+              challengeTitle: 'Reach 47 — Creative Augmented Path',
+              difficulty: 'medium',
+              prompt:
+                'Start with `n = 100`. Apply exactly **three** augmented assignment operations (any combination of `+=`, `-=`, `*=`, `//=`, `**=`) so that `n` ends up equal to `47`.\n\n' +
+                'There are many valid paths. Find one that works and verify it.',
+              code: [
+                'n = 100',
+                '# Apply three augmented operations to reach n = 47',
+                '',
+                'n   # should be 47',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+# Student must reach 47 in three augmented steps from 100
+# We only check the final value
+if 'n' in dir() and n == 47:
+    res = "SUCCESS: n is 47. Creative path confirmed."
+else:
+    res = f"ERROR: Expected n=47, got n={n if 'n' in dir() else 'undefined'}. Keep trying different operations."
+res
+`,
+              hint: 'One path: n //= 2 gives 50, then n -= 3 gives 47. You only need two operations — try to find a three-step path. Another idea: n -= 53 in one step, but can you make it more interesting?',
+            },
+
+            // ── CHALLENGE 8: Type chain ────────────────────────────────────────
+            {
+              id: 25,
+              challengeType: 'write',
+              challengeNumber: 8,
+              challengeTitle: 'Type Chain — int → double → str',
+              difficulty: 'hard',
+              prompt:
+                'Perform this chain of operations:\n\n' +
+                '1. Convert the string `"42"` to an int and store in `n`\n' +
+                '2. Use `*=` to double `n` in place\n' +
+                '3. Convert `n` back to a string and store in `result`\n\n' +
+                'What is `result`? Evaluate it on the last line.',
+              code: [
+                '# Step 1: n = int("42")',
+                '# Step 2: double n with *=',
+                '# Step 3: result = str(n)',
+                'result',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+n = int("42")
+n *= 2
+result = str(n)
+if result == "84":
+    res = "SUCCESS: Type chain verified. '42' → 42 → 84 → '84'."
+else:
+    res = f"ERROR: Expected '84', got {result!r}. Check each step."
+res
+`,
+              hint: 'Step 1: `int("42")` converts the string to the integer 42. Step 2: `n *= 2` doubles it to 84. Step 3: `str(84)` converts back to the string "84".',
+            },
+
+            // ── CHALLENGE 9: Variable shadowing ───────────────────────────────
+            {
+              id: 26,
+              challengeType: 'write',
+              challengeNumber: 9,
+              challengeTitle: 'Shadow and Restore — del in Action',
+              difficulty: 'hard',
+              prompt:
+                'Demonstrate the built-in shadowing problem:\n\n' +
+                '1. Call `max(1, 2, 3)` first to confirm it works — you should get `3`\n' +
+                '2. Assign `max = 100` — this shadows the built-in\n' +
+                '3. Try to call `max(1, 2, 3)` again — observe the TypeError\n' +
+                '4. Use `del max` to remove your binding\n' +
+                '5. Call `max(1, 2, 3)` one final time — it works again\n\n' +
+                'Run each step as a comment-guided block. The goal is to understand what `del` recovers.',
+              code: [
+                '# Step 1: confirm the built-in works',
+                'max(1, 2, 3)',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+# After del, the built-in max should be restored
+del max  # safe even if not shadowed in test environment
+result = max(1, 2, 3)
+if result == 3:
+    res = "SUCCESS: del restored the built-in max. max(1,2,3) = 3."
+else:
+    res = f"ERROR: Expected 3, got {result}. Did you del the shadow variable?"
+res
+`,
+              hint: 'After `max = 100`, the name `max` points to 100, not the function. Calling `max(1, 2, 3)` is like calling `100(1, 2, 3)` — a TypeError. `del max` removes that binding, revealing the original built-in underneath.',
             },
 
           ],

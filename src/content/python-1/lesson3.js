@@ -177,6 +177,122 @@ export default {
               output: '', status: 'idle', figureJson: null,
             },
 
+            // ── CELL 10: int() truncates toward zero ─────────────────────────
+            {
+              id: 10,
+              cellTitle: 'int() truncates toward zero — not toward negative infinity',
+              prose: '`int()` on a float removes the decimal part, always moving **toward zero**.\n\n- `int(3.9)` → `3` (not 4)\n- `int(-3.9)` → `-3` (not -4)\n\nThis differs from floor division `//`, which rounds toward negative infinity. For `-3.9`, floor gives `-4` but `int()` gives `-3`.\n\nIf you want true rounding, use `round()` — introduced in Lesson 7.',
+              instructions: 'Confirm that int(-3.9) is -3, not -4. Then compare with -3.9 // 1.',
+              code: [
+                'int(-3.9)       # truncates toward zero: -3',
+                '-3.9 // 1       # shown — floors toward -∞: -4.0',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 11: float('inf') and float('nan') ───────────────────────
+            {
+              id: 11,
+              cellTitle: 'Special floats: infinity and NaN',
+              prose: 'Python\'s `float()` accepts two special string values that represent mathematical concepts:\n\n- `float("inf")` — positive infinity (larger than any finite number)\n- `float("nan")` — Not a Number (the result of undefined operations like 0/0 in some contexts)\n\nThese arise naturally in scientific computing. Phase 2 covers when and why they appear. For now, just know they exist and are valid Python values.',
+              instructions: 'Run this. Notice that inf and nan are real Python values, not errors.',
+              code: [
+                'float("inf")        # positive infinity',
+                'float("nan")        # shown — Not a Number',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 12: str() of various types ──────────────────────────────
+            {
+              id: 12,
+              cellTitle: 'str() converts any value to its string form',
+              prose: '`str()` converts any value to a string representation:\n\n- `str(True)` → `"True"` (capital T)\n- `str(False)` → `"False"` (capital F)\n- `str(3.14)` → `"3.14"`\n- `str(42)` → `"42"`\n\nThis is useful when you need to join a number into a string using `+` concatenation.',
+              instructions: 'Run this. Notice that str(True) gives the string "True" — with a capital T.',
+              code: [
+                'str(True)       # → "True"',
+                'str(3.14)       # → "3.14"',
+                'str(42)         # shown — → "42"',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 13: bool() of non-zero numbers ──────────────────────────
+            {
+              id: 13,
+              cellTitle: 'bool() — non-zero is truthy, zero is falsy',
+              prose: '`bool()` of a number follows a simple rule:\n- `0` and `0.0` → `False`\n- Everything else → `True` — including negative numbers\n\n`bool(-1)` is `True`. `bool(0.0)` is `False`. `bool(-0.001)` is `True`.\n\nThe rule: **zero is falsy, non-zero is truthy** — regardless of sign.',
+              instructions: 'Predict each result before running. Does the sign of -1 matter?',
+              code: [
+                'bool(-1)        # non-zero negative — truthy',
+                'bool(0.0)       # zero float — falsy',
+                'bool(-100)      # shown — negative but non-zero: truthy',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 14: isinstance() ─────────────────────────────────────────
+            {
+              id: 14,
+              cellTitle: 'isinstance() — checking type membership',
+              prose: '`isinstance(value, Type)` returns `True` if a value belongs to that type (or a subtype of it).\n\nBecause `bool` is a **subtype** of `int`, `isinstance(True, int)` returns `True`. This is surprising — `True` is both a bool and an int.\n\n`isinstance()` is more flexible than `type() ==` because it respects the type hierarchy. For now, use it as an observation tool.',
+              instructions: 'Run this. Then try isinstance(3.14, int) — should that be True or False?',
+              code: [
+                'isinstance(True, bool)      # True is a bool: True',
+                'isinstance(True, int)       # shown — bool is subtype of int: also True',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 15: Type of an expression result ────────────────────────
+            {
+              id: 15,
+              cellTitle: 'The type of an expression depends on its operands',
+              prose: 'The type of an expression\'s result is determined by the types of its operands:\n\n- `3 + 1` → both ints → result is `int`\n- `3 + 1.0` → int + float → result is `float` (promoted)\n- `10 / 2` → always `float` (the `/` operator always returns float)\n- `10 // 2` → both ints → result is `int`\n\nThis connects Lesson 2 (operators) with Lesson 3 (types).',
+              instructions: 'Run both. The first gives int, the second gives float — same numbers, different operator.',
+              code: [
+                'type(3 + 1)         # int + int → int',
+                'type(3 + 1.0)       # shown — int + float → float',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 16: int() raises ValueError ─────────────────────────────
+            {
+              id: 16,
+              cellTitle: 'int() raises ValueError on non-numeric strings',
+              prose: '`int()` can convert a numeric string like `"42"` to an integer. But if the string is not a valid integer, Python raises a `ValueError` — not a TypeError.\n\n`int("hello")` → `ValueError: invalid literal for int() with base 10: \'hello\'`\n\n`int("3.14")` also fails — even though the string looks numeric, it contains a decimal point. To handle that, you need `float()` first: `int(float("3.14"))` → `3`.',
+              instructions: 'Run this to see the ValueError. Then fix it by wrapping in float() first.',
+              code: 'int("hello")    # raises ValueError',
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 17: / always returns float ──────────────────────────────
+            {
+              id: 17,
+              cellTitle: 'Why 1/1 is not 1 — / always returns float',
+              prose: 'In Python 3, the `/` operator **always** returns a float, even when the division is exact:\n\n- `1 / 1` → `1.0` (not `1`)\n- `10 / 2` → `5.0` (not `5`)\n\nThis was a deliberate change from Python 2, where `1 / 1` gave `1` (integer). The change prevents silent truncation bugs. If you need an integer result, use `//`.',
+              instructions: 'Run this. Confirm that 1 / 1 returns 1.0, not 1.',
+              code: [
+                '1 / 1           # exact division, but still float: 1.0',
+                'type(1 / 1)     # shown — <class \'float\'>',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 18: The conversion chain ────────────────────────────────
+            {
+              id: 18,
+              cellTitle: 'The conversion chain — nesting conversions',
+              prose: 'Conversions can be **nested** — the output of one feeds into the next:\n\n`float(int("42"))` → `float(42)` → `42.0`\n\nTrace it inside out:\n1. `int("42")` — string to int → `42`\n2. `float(42)` — int to float → `42.0`\n\nThis pattern is common when reading data (which arrives as strings) and converting it for computation.',
+              instructions: 'Run this. You should get 42.0. Confirm the type is float.',
+              code: [
+                'float(int("42"))        # "42" → 42 → 42.0',
+                'type(float(int("42")))  # shown — <class \'float\'>',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
             // ── CHALLENGE 1: Identify the type ───────────────────────────────
             {
               id: 10,
@@ -248,6 +364,177 @@ export default {
                 'True',
               ].join('\n'),
               hint: 'You can nest conversion calls: float(int("255")). The inner call runs first, producing 255. The outer call converts that to 255.0.',
+            },
+
+            // ── CHALLENGE 4: type() of expression results ────────────────────
+            {
+              id: 21,
+              challengeType: 'write',
+              challengeNumber: 4,
+              challengeTitle: 'Types of Division Results',
+              difficulty: 'easy',
+              prompt:
+                'What does `type(10 // 3)` return? And `type(10 / 3)`?\n\n' +
+                'Predict both answers, then verify by running each expression separately.\n\n' +
+                'Remember: `//` is floor division, `/` is regular division.',
+              code: [
+                '# Check type of floor division result',
+                'type(10 // 3)',
+                '# Then check type of regular division result',
+                'type(10 / 3)    # shown',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+r1 = type(10 // 3)
+r2 = type(10 / 3)
+if r1 == int and r2 == float:
+    res = "SUCCESS: 10 // 3 is int (floor division of two ints returns int). 10 / 3 is float (/ always returns float)."
+else:
+    res = f"ERROR: Got type(10 // 3) = {r1.__name__}, type(10 / 3) = {r2.__name__}. Floor division of two ints gives int; / always gives float."
+res
+`,
+              hint: '// on two ints returns an int. / always returns a float, even when the result is a whole number.',
+            },
+
+            // ── CHALLENGE 5: int() from a float ──────────────────────────────
+            {
+              id: 22,
+              challengeType: 'fill',
+              challengeNumber: 5,
+              challengeTitle: 'Truncate a Float',
+              difficulty: 'easy',
+              prompt:
+                'Fill in the blank so that `int(___)` produces `3`.\n\n' +
+                'Use the float `3.99` as your input. Remember: `int()` truncates toward zero.',
+              starterBlock: 'int(___)',
+              code: 'int(___)',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = int(3.99)
+if result == 3:
+    res = "SUCCESS: int(3.99) = 3. int() truncates the decimal — it does not round."
+else:
+    res = f"ERROR: Got {result}. Replace ___ with 3.99. int() truncates toward zero, so int(3.99) = 3."
+res
+`,
+              hint: 'Replace ___ with 3.99. int(3.99) truncates the .99 and gives 3 — not 4.',
+            },
+
+            // ── CHALLENGE 6: type of ** results — compound Lessons 2+3 ───────
+            {
+              id: 23,
+              challengeType: 'write',
+              challengeNumber: 6,
+              challengeTitle: 'Types Through Exponentiation',
+              difficulty: 'medium',
+              prompt:
+                '**Compound challenge (Lessons 2 + 3):** This draws on both expressions and types.\n\n' +
+                'What is `type(2 ** 10)`? And `type(2.0 ** 10)`? Why are they different?\n\n' +
+                'Predict both, then verify. Write a comment explaining why the float operand changes the result type.',
+              code: [
+                '# Predict: what type does 2 ** 10 produce?',
+                'type(2 ** 10)',
+                '# Now with a float base:',
+                'type(2.0 ** 10)   # shown',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+r1 = type(2 ** 10)
+r2 = type(2.0 ** 10)
+if r1 == int and r2 == float:
+    res = "SUCCESS: 2 ** 10 is int (both operands are ints). 2.0 ** 10 is float (one operand is float, so result is promoted to float)."
+else:
+    res = f"ERROR: Got {r1.__name__} and {r2.__name__}. When both operands of ** are ints, the result is int. When either is a float, the result is float."
+res
+`,
+              hint: 'When both operands are ints, ** returns int. When either operand is a float, the result is promoted to float — the same promotion rule as +, -, *, //.',
+            },
+
+            // ── CHALLENGE 7: Conversion chain write ──────────────────────────
+            {
+              id: 24,
+              challengeType: 'write',
+              challengeNumber: 7,
+              challengeTitle: 'String → Compute → String',
+              difficulty: 'medium',
+              prompt:
+                'Write a single expression that:\n\n' +
+                '1. Converts `"3"` to an integer\n' +
+                '2. Multiplies it by `4`\n' +
+                '3. Converts the result back to a string\n\n' +
+                'The final result should be the string `"12"` (not the number 12).',
+              code: '# str(int("3") * 4) — fill in the steps\nstr(int("3") * ___)',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = str(int("3") * 4)
+if result == "12":
+    res = "SUCCESS: Conversion chain verified. str→int→multiply→str produces '12'."
+else:
+    res = f"ERROR: Expected '12', got {result!r}. Check each step: int('3') = 3, 3 * 4 = 12, str(12) = '12'."
+res
+`,
+              hint: 'Nest the calls: str(int("3") * 4). First int("3") = 3, then 3 * 4 = 12, then str(12) = "12".',
+            },
+
+            // ── CHALLENGE 8: bool("False") — hard ────────────────────────────
+            {
+              id: 25,
+              challengeType: 'write',
+              challengeNumber: 8,
+              challengeTitle: 'The Truthy String Trap',
+              difficulty: 'hard',
+              prompt:
+                '**Compound challenge (Lessons 1 + 3):** What does `bool("False")` return?\n\n' +
+                'Think carefully:\n' +
+                '- `"False"` is a string containing the word "False"\n' +
+                '- It is not the boolean value `False`\n' +
+                '- What is the truthiness rule for strings?\n\n' +
+                'Write your reasoning as a comment, then verify with `bool("False")`.',
+              code: [
+                '# My prediction: bool("False") ==',
+                '# Reasoning: ...',
+                'bool("False")',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = bool("False")
+if result == True:
+    res = "SUCCESS: Correct — bool('False') is True. Any non-empty string is truthy, even if it spells 'False'. Only the empty string '' is falsy."
+else:
+    res = "ERROR: Unexpected result. The string 'False' is non-empty, so bool() returns True. Don't confuse the string 'False' with the boolean False."
+res
+`,
+              hint: 'The truthiness rule for strings: an empty string "" is falsy; any non-empty string is truthy. "False" is a non-empty string — it has 5 characters — so bool("False") is True.',
+            },
+
+            // ── CHALLENGE 9: Fix two type bugs ───────────────────────────────
+            {
+              id: 26,
+              challengeType: 'fill',
+              challengeNumber: 9,
+              challengeTitle: 'Fix Two Type Bugs',
+              difficulty: 'hard',
+              prompt:
+                'Two broken expressions need fixing:\n\n' +
+                '1. `"Score: " + 42` — raises TypeError. Fix it so it produces `"Score: 42"`.\n' +
+                '2. `int("3.14")` — raises ValueError. Fix it so it produces `3`.\n\n' +
+                'For (1): convert 42 to a string before concatenating.\n' +
+                'For (2): you need an intermediate conversion step — `int()` cannot parse a decimal string directly.',
+              starterBlock:
+                '# Bug 1: Fix the concatenation\n"Score: " + str(___)\n# Bug 2: Fix the conversion\nint(float(___))',
+              code:
+                '# Bug 1: Fix the concatenation\n"Score: " + str(___)\n# Bug 2: Fix the conversion\nint(float(___))',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+r1 = "Score: " + str(42)
+r2 = int(float("3.14"))
+if r1 == "Score: 42" and r2 == 3:
+    res = "SUCCESS: Both bugs fixed. str(42) enables concatenation; int(float('3.14')) handles the decimal string."
+else:
+    res = f"ERROR: Got r1={r1!r}, r2={r2}. Bug 1: use str(42). Bug 2: float('3.14') = 3.14, then int(3.14) = 3."
+res
+`,
+              hint: 'Bug 1: str(42) converts the integer to a string so it can be concatenated. Bug 2: int("3.14") fails because the string has a decimal point. Fix: int(float("3.14")) — first parse as float 3.14, then truncate to int 3.',
             },
 
           ],

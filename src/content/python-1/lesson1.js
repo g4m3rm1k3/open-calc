@@ -140,9 +140,102 @@ export default {
               output: '', status: 'idle', figureJson: null,
             },
 
-            // ── CHALLENGE 1: Predict and verify ──────────────────────────────
+            // ── CELL 9: Large integers ───────────────────────────────────────
             {
               id: 9,
+              cellTitle: 'Large integers — Python has unlimited precision',
+              prose: 'In many languages, integers have a maximum size — exceed it and you get overflow or garbage. Python has no such limit. An integer can be as large as your computer\'s memory allows.\n\n`2 ** 100` computes two to the power of one hundred — a number with 31 digits. Python computes it exactly, with no approximation.',
+              instructions: 'Run this cell. Notice that the result is an exact integer, not scientific notation.',
+              code: '2 ** 100',
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 10: Negative literals ───────────────────────────────────
+            {
+              id: 10,
+              cellTitle: 'Negative literals — -5 and -3.14 are valid values',
+              prose: 'A negative sign in front of a number is valid Python. `-5` is the integer negative five. `-3.14` is the float negative three-point-one-four.\n\nTechnically the minus sign is a unary operator (it negates the value), but for all practical purposes you can treat `-5` as a negative integer literal.',
+              code: [
+                '-5',
+                '-3.14',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 11: Multi-line strings ──────────────────────────────────
+            {
+              id: 11,
+              cellTitle: 'Multi-line strings — triple quotes',
+              prose: 'A regular string (`"..."` or `\'...\'`) must start and end on one line. A **triple-quoted string** (`"""..."""` or `\'\'\'...\'\'\'`) can span multiple lines. The newlines are part of the string value.\n\nMulti-line strings are used for long text, documentation, and SQL queries embedded in Python code.',
+              code: [
+                '"""This string',
+                'spans',
+                'three lines."""',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 12: Single vs double quotes ─────────────────────────────
+            {
+              id: 12,
+              cellTitle: 'Single quotes and double quotes are interchangeable',
+              prose: 'Python accepts both `\'hello\'` and `"hello"` — they produce identical string values. There is no difference.\n\nThe practical reason to have both: if your string contains a single quote, wrap it in double quotes (and vice versa) to avoid escaping.',
+              code: [
+                '\'single-quoted string\'',
+                '"double-quoted string"',
+                '"it\'s easy when you mix them"',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 13: None ────────────────────────────────────────────────
+            {
+              id: 13,
+              cellTitle: 'None — the absence of a value',
+              prose: '`None` is a special value that represents the absence of a value. It is its own type. It is not zero, not an empty string, not False — it is specifically "nothing".\n\nYou will encounter `None` when a function does not return anything, or when a variable has not been assigned a meaningful value yet. For now, just know it exists.',
+              instructions: 'Run this cell. Notice that Python shows nothing in the output area — None produces no visible output by default.',
+              code: 'None',
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 14: String repetition ───────────────────────────────────
+            {
+              id: 14,
+              cellTitle: 'String repetition — "ha" * 3',
+              prose: 'The `*` operator has a special meaning when used with a string and an integer: it repeats the string that many times.\n\n`"ha" * 3` produces `"hahaha"`. This is not multiplication — Python recognises the combination of a string and an integer and applies repetition instead.',
+              code: '"ha" * 3',
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 15: Float scientific notation ───────────────────────────
+            {
+              id: 15,
+              cellTitle: 'Float scientific notation — 1e6, 2.5e-3',
+              prose: 'Python accepts scientific notation for floats. `1e6` means 1 × 10⁶ = 1,000,000.0. `2.5e-3` means 2.5 × 10⁻³ = 0.0025.\n\nThe `e` stands for "exponent". This notation is common in science and data work where values span many orders of magnitude.',
+              code: [
+                '1e6',
+                '2.5e-3',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CELL 16: Not a value — identifier without quotes ──────────────
+            {
+              id: 16,
+              cellTitle: 'What is NOT a value — an identifier without quotes',
+              prose: 'A common beginner mistake: writing text without quotes, thinking it is a string.\n\n`hello` (no quotes) is not a string. Python treats it as a **variable name** — an identifier — and looks it up in the kernel. If no variable called `hello` exists, you get a NameError.\n\nRule: text in code is only a string if it has quotes. Without quotes, it is a name.',
+              instructions: 'Run this cell to see the NameError that results from a bare identifier.',
+              code: [
+                '# This looks like text but is NOT a string — it is an identifier',
+                '# Python looks for a variable named "hello" and fails',
+                'hello',
+              ].join('\n'),
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            // ── CHALLENGE 1: Predict and verify ──────────────────────────────
+            {
+              id: 21,
               challengeType: 'write',
               challengeNumber: 1,
               challengeTitle: 'Predict, then Verify',
@@ -163,7 +256,7 @@ export default {
 
             // ── CHALLENGE 2: What kind of value? ─────────────────────────────
             {
-              id: 10,
+              id: 22,
               challengeType: 'write',
               challengeNumber: 2,
               challengeTitle: 'What Kind of Value?',
@@ -179,6 +272,117 @@ export default {
               output: '', status: 'idle', figureJson: null,
               testCode: 'True  # Self-check: did "True" (in quotes) behave differently from True (no quotes)?',
               hint: '"True" is a string — text that happens to spell the word True. True (no quotes) is a boolean. They are completely different values.',
+            },
+
+            // ── CHALLENGE 3: Fix a broken string literal ──────────────────────
+            {
+              id: 23,
+              challengeType: 'fill',
+              challengeNumber: 3,
+              challengeTitle: 'Fix the Broken String',
+              difficulty: 'easy',
+              prompt: 'The string literal below is broken — it is missing a closing quote. Fix it so the cell runs without a SyntaxError and produces the string value `"open sesame"`.',
+              instructions: 'Add the missing closing quote so the code is valid Python.',
+              starterBlock: '"open sesame',
+              code: '"open sesame',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = _
+if result == "open sesame":
+    res = "SUCCESS: The string is complete and evaluates to 'open sesame'."
+else:
+    res = "ERROR: Expected the string 'open sesame'. Make sure you closed the quote: \\"open sesame\\"."
+res
+`,
+              hint: 'A string that starts with `"` must end with `"`. Add the closing double quote at the end.',
+            },
+
+            // ── CHALLENGE 4: Scientific notation ─────────────────────────────
+            {
+              id: 24,
+              challengeType: 'write',
+              challengeNumber: 4,
+              challengeTitle: 'Float Scientific Notation',
+              difficulty: 'easy',
+              prompt: 'Write an expression that produces the float `1000.0` using scientific notation (the `e` notation). Do not write `1000.0` directly — use `1e3`.',
+              instructions: 'Your cell output should show: 1000.0',
+              code: '# Write your scientific notation expression here\n',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = _
+if result == 1000.0 and isinstance(result, float):
+    res = "SUCCESS: 1e3 evaluates to the float 1000.0."
+else:
+    res = "ERROR: Expected 1000.0 as a float. Use scientific notation: 1e3."
+res
+`,
+              hint: '`1e3` means 1 × 10³ = 1000.0. The result is always a float when you use e-notation.',
+            },
+
+            // ── CHALLENGE 5: String repetition ───────────────────────────────
+            {
+              id: 25,
+              challengeType: 'write',
+              challengeNumber: 5,
+              challengeTitle: 'String Repetition',
+              difficulty: 'medium',
+              prompt: 'Produce the string `"abcabcabc"` using the `*` repetition operator. Do not write the string directly — use `"abc" * 3`.',
+              instructions: 'Your cell output should show: \'abcabcabc\'',
+              code: '# Write your expression using * here\n',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = _
+if result == "abcabcabc":
+    res = "SUCCESS: 'abc' * 3 produces 'abcabcabc'. String repetition works just like numeric multiplication — but for text."
+else:
+    res = "ERROR: Expected 'abcabcabc'. Use 'abc' * 3 — the * operator repeats a string when combined with an integer."
+res
+`,
+              hint: 'The `*` operator between a string and an integer repeats the string. `"abc" * 3` produces `"abcabcabc"`.',
+            },
+
+            // ── CHALLENGE 6: Bool arithmetic ──────────────────────────────────
+            {
+              id: 26,
+              challengeType: 'write',
+              challengeNumber: 6,
+              challengeTitle: 'Boolean Arithmetic',
+              difficulty: 'medium',
+              prompt: 'In Python, `True` equals `1` and `False` equals `0`. This means booleans participate in arithmetic.\n\nWrite an expression that computes `True + True + True` and produces the integer result.',
+              instructions: 'Your cell output should show: 3',
+              code: 'True + True + True',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = True + True + True
+if result == 3:
+    res = "SUCCESS: bool arithmetic verified — True is 1, so 3 × True = 3."
+else:
+    res = "ERROR: Expected 3. Remember: True == 1 in Python."
+res
+`,
+              hint: 'Python treats True as 1 in arithmetic contexts. So True + True + True = 1 + 1 + 1 = 3.',
+            },
+
+            // ── CHALLENGE 7: Compound — type reasoning ────────────────────────
+            {
+              id: 27,
+              challengeType: 'write',
+              challengeNumber: 7,
+              challengeTitle: 'Compound: Reason Through a Type Expression',
+              difficulty: 'hard',
+              prompt: 'This challenge uses values and string operations together.\n\nStep through this expression manually before running it:\n```\ntype("10" + str(5 * 2))\n```\n1. What is `5 * 2`? → `10` (integer)\n2. What is `str(10)`? → `"10"` (string)\n3. What is `"10" + "10"`? → `"1010"` (string concatenation)\n4. What is `type("1010")`? → `<class \'str\'>`\n\nWrite the expression and run it to verify your reasoning.',
+              instructions: 'Your cell output should show: <class \'str\'>',
+              code: 'type("10" + str(5 * 2))',
+              output: '', status: 'idle', figureJson: null,
+              testCode: `
+result = type("10" + str(5 * 2))
+if result == str:
+    res = "SUCCESS: The expression produces a string. '10' + str(10) = '10' + '10' = '1010', and type('1010') is str."
+else:
+    res = "ERROR: Expected <class 'str'>. Trace: 5*2=10, str(10)='10', '10'+'10'='1010', type('1010')=str."
+res
+`,
+              hint: '`str()` converts any value to its string representation. `5 * 2` is 10 (int), `str(10)` is `"10"` (string). Then `"10" + "10"` is string concatenation, not addition.',
             },
 
           ],
@@ -264,6 +468,9 @@ export default {
     'An expression evaluates to produce a value.',
     'Only the last expression in a cell is shown as output.',
     'Mixing incompatible types causes a TypeError — Python tells you exactly what went wrong.',
+    'Python integers have unlimited precision — no overflow.',
+    'None represents the absence of a value — it is its own type.',
+    'String repetition: "ha" * 3 produces "hahaha".',
   ],
 
   checkpoints: ['read-intuition'],
