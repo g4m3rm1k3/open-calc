@@ -1,6 +1,84 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Trash2, Code2, LayoutTemplate, ChevronDown } from 'lucide-react'
+import { X, Plus, Trash2, Code2, LayoutTemplate, ChevronDown, Download, FileDown, Upload } from 'lucide-react'
+import { zipSync, strToU8 } from 'fflate'
+
+// ── File helpers ──────────────────────────────────────────────────────────────
+
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'cell'
+}
+
+function triggerDownload(content, filename, mime) {
+  const blob = new Blob([content instanceof Uint8Array ? [content] : [content]], { type: mime })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = filename
+  document.body.appendChild(a); a.click()
+  document.body.removeChild(a); URL.revokeObjectURL(url)
+}
+
+// Download a single cell as three separate files:
+//   index.html  (references style.css and script.js)
+//   style.css
+//   script.js
+// Browsers can only trigger one download at a time, so we use a tiny zip.
+function downloadCell(cell, index) {
+  const name = cell.label ? slugify(cell.label) : `cell-${index + 1}`
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${name}</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+${cell.html || ''}
+<script src="script.js"><\/script>
+</body>
+</html>`
+  const files = {
+    [`${name}/index.html`]: strToU8(html),
+    [`${name}/style.css`]:  strToU8(cell.css || ''),
+    [`${name}/script.js`]:  strToU8(cell.js  || ''),
+  }
+  const zipped = zipSync(files)
+  triggerDownload(zipped, `${name}.zip`, 'application/zip')
+}
+
+
+// Parse an uploaded file (.html or .css or .js) and return a new cell
+function parseUploadedFile(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const text = e.target.result
+      const name = file.name
+      if (name.endsWith('.html') || name.endsWith('.htm')) {
+        const styleMatch  = text.match(/<style[^>]*>([\s\S]*?)<\/style>/i)
+        const scriptMatch = text.match(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/i)
+        const bodyMatch   = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i)
+        resolve({
+          id: nextId(),
+          label: name.replace(/\.html?$/, ''),
+          css:  styleMatch  ? styleMatch[1].trim()  : '',
+          js:   scriptMatch ? scriptMatch[1].trim()  : '',
+          html: bodyMatch
+            ? bodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<link[^>]*>/gi, '').trim()
+            : text,
+        })
+      } else if (name.endsWith('.css')) {
+        resolve({ id: nextId(), label: name.replace('.css', ''), html: '', css: text, js: '' })
+      } else if (name.endsWith('.js')) {
+        resolve({ id: nextId(), label: name.replace('.js', ''), html: '', css: '', js: text })
+      } else {
+        resolve(null)
+      }
+    }
+    reader.readAsText(file)
+  })
+}
 import Editor from '@monaco-editor/react'
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
@@ -570,9 +648,29 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
   const iframeRef = useRef(null)
   const iframeUidRef = useRef(null)
   const debounceRef = useRef(null)
+  const uploadRef = useRef(null)
   const [activeTab, setActiveTab] = useState(cell.html ? 'html' : 'js')
   const [logs, setLogs] = useState([])
   const [showTemplates, setShowTemplates] = useState(false)
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const imported = await parseUploadedFile(file)
+    if (!imported) return
+    // Merge into current cell — put content in the matching tab
+    onChange({
+      ...cell,
+      html: imported.html !== '' ? imported.html : cell.html,
+      css:  imported.css  !== '' ? imported.css  : cell.css,
+      js:   imported.js   !== '' ? imported.js   : cell.js,
+    })
+    // Switch to whichever tab has the new content
+    if (file.name.endsWith('.css')) setActiveTab('css')
+    else if (file.name.endsWith('.js')) setActiveTab('js')
+    else setActiveTab('html')
+  }
 
   useEffect(() => {
     const handler = (e) => {
@@ -638,6 +736,8 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 0', position: 'relative' }}>
+
+          {/* Templates */}
           <div style={{ position: 'relative' }}>
             <button
               onClick={() => setShowTemplates(s => !s)}
@@ -651,6 +751,61 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Upload a file into this cell */}
+          <input
+            ref={uploadRef}
+            type="file"
+            accept=".html,.htm,.css,.js"
+            style={{ display: 'none' }}
+            onChange={handleUpload}
+          />
+          <button
+            onClick={() => uploadRef.current?.click()}
+            title="Upload .html / .css / .js into this cell"
+            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+          >
+            <Upload size={13} />
+          </button>
+
+          {/* Download — individual files (zip) */}
+          <button
+            onClick={() => downloadCell(cell, 0)}
+            title="Download as index.html + style.css + script.js (zip)"
+            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+          >
+            <Download size={13} />
+          </button>
+
+          {/* Download — combined single HTML file */}
+          <button
+            onClick={() => {
+              const name = cell.label ? slugify(cell.label) : 'cell'
+              const combined = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${name}</title>
+<style>
+${cell.css || ''}
+</style>
+</head>
+<body>
+${cell.html || ''}
+<script>
+${cell.js || ''}
+<\/script>
+</body>
+</html>`
+              triggerDownload(combined, `${name}.html`, 'text/html')
+            }}
+            title="Download as single combined .html file"
+            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+          >
+            <FileDown size={13} />
+          </button>
+
           {canDelete && (
             <button onClick={onDelete} title="Delete cell" style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}>
               <Trash2 size={13} />
