@@ -5,8 +5,12 @@ const LESSON_JS_CORE_0_1 = {
 
   cells: [
     {
+      type: 'markdown',
+      instruction: `### Lesson Framing: Language Before Tools\nIn this lesson, each visual cell demonstrates one core runtime-language fact.\n\nRead first, then run:\n1. **Prediction**: what should happen?\n2. **Observation**: what actually happened?\n3. **Explanation**: which rule caused it?\n\nYou are building a stable model: **syntax** (form), **semantics** (meaning), **spec** (contract), **engine** (implementation).`,
+    },
+    {
       type: 'js',
-      instruction: 'Slide 1: A language is a contract. Hit Run to animate the contract between human intent and machine behavior.',
+      instruction: 'Slide 1: A language is a contract.\nTeaching goal: separate human intent from machine execution.\nWatch how meaning flows from symbols to behavior.',
       html: `<div class="stage">
   <div class="label top">Human Intent</div>
   <div class="arrow" id="flow"></div>
@@ -32,7 +36,7 @@ console.log('A programming language maps intent to behavior.');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 2: Syntax is the shape of code. Run to see legal forms pass the gate.',
+      instruction: 'Slide 2: Syntax is code shape, not usefulness.\nValid syntax can still be bad logic.\nRun and observe: the syntax gate checks structure only.',
       html: `<div class="board">
   <div class="token" id="t1">const x = 4;</div>
   <div class="token" id="t2">if (x > 2) { ... }</div>
@@ -53,7 +57,7 @@ good.forEach((id, i) => {
     el.style.borderColor = '#10b981';
     el.style.background = '#052e28';
     el.style.transform = 'translateX(8px)';
-  }, i * 260);
+  }, i * 520);
 });
 
 setTimeout(() => {
@@ -62,12 +66,12 @@ setTimeout(() => {
   bad.style.transform = 'translateX(-4px)';
   gate.textContent = 'Syntax gate: accepted 2, rejected 1';
   console.log('Syntax checks form, not usefulness.');
-}, 650);`,
+}, 1400);`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: 'Slide 3: Semantics is meaning. Run to watch two different forms produce the same outcome.',
+      instruction: 'Slide 3: Semantics is meaning.\nDifferent syntax can compute the same value.\nFocus on output equivalence, not surface appearance.',
       html: `<div class="wrap">
   <div class="card"><div>2 + 3 * 4</div><div class="out" id="a">?</div></div>
   <div class="card"><div>2 + (3 * 4)</div><div class="out" id="b">?</div></div>
@@ -89,7 +93,7 @@ console.log('a =', a, 'b =', b, 'equal =', a === b);`,
     },
     {
       type: 'js',
-      instruction: 'Slide 4: Abstraction layers hide details. Run to reveal the stack from hardware up to your app.',
+      instruction: 'Slide 4: Abstraction layers reduce cognitive load.\nYou do not control transistors directly; you target a higher layer.\nRun and trace the stack from hardware to your program.',
       html: `<div class="stack" id="stack"></div>`,
       css: `.stack{height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;background:#0a1320;padding:14px;border-radius:10px;}
 .layer{padding:8px 10px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#cbd5e1;opacity:.35;transform:translateY(10px);transition:all .35s ease;font-size:12px;}`,
@@ -103,14 +107,14 @@ Array.from(stack.children).forEach((el, i) => {
     el.style.transform = 'translateY(0)';
     el.style.background = i === labels.length - 1 ? '#082f49' : '#0f172a';
     el.style.borderColor = i === labels.length - 1 ? '#38bdf8' : '#334155';
-  }, i * 220);
+  }, i * 480);
 });
 console.log('Abstraction lowers cognitive load while preserving behavior.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: 'Slide 5: ECMAScript is the spec; engines implement it. Run to animate one spec powering many engines.',
+      instruction: 'Slide 5: ECMAScript is the spec; engines are implementations.\nSpec says what must happen, engines decide how to execute it efficiently.',
       html: `<div class="grid">
   <div class="spec" id="spec">ECMAScript Spec</div>
   <div class="engine" id="v8">V8</div>
@@ -126,14 +130,14 @@ console.log('Abstraction lowers cognitive load while preserving behavior.');`,
     el.style.background = '#052e28';
     el.style.borderColor = '#10b981';
     el.textContent = el.textContent + ' ✓';
-  }, i * 260);
+  }, i * 520);
 });
 console.log('One spec, multiple engines.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: 'Slide 6: Runtime context changes available APIs. Run and toggle between browser and server capabilities.',
+      instruction: 'Slide 6: Language stays stable, host APIs change.\nBrowser and server expose different capabilities while keeping JavaScript semantics.',
       html: `<div class="ctx">
   <button id="browserBtn">Browser</button>
   <button id="serverBtn">Server</button>
@@ -160,7 +164,7 @@ render('browser');`,
     },
     {
       type: 'js',
-      instruction: 'Slide 7: Evaluation follows rules. Run to animate step-by-step substitution.',
+      instruction: 'Slide 7: Evaluation uses substitution.\nTrack each line collapse in order; this is how debugging should be reasoned.',
       html: `<div class="trace">
   <div class="line" id="l1">x = 5</div>
   <div class="line" id="l2">y = x + 2</div>
@@ -182,14 +186,14 @@ steps.forEach((s, i) => {
     el.textContent = s.txt;
     el.style.borderColor = '#22d3ee';
     el.style.background = '#082f49';
-  }, i * 260);
+  }, i * 520);
 });
 console.log('Execution is deterministic when inputs are fixed.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: 'Slide 8: Determinism check. Run twice and compare outputs for same input.',
+      instruction: 'Slide 8: Determinism check.\nIf inputs and state are fixed, output should be repeatable.\nRun twice and verify consistency.',
       html: `<div class="det">
   <div class="row">Input: <span id="input"></span></div>
   <div class="row">Run 1: <span id="r1">?</span></div>
@@ -215,7 +219,7 @@ console.log('Deterministic function verified:', first === second);`,
     },
     {
       type: 'js',
-      instruction: 'Slide 9: Language vs runtime APIs. Run to show core JS methods and host-provided APIs side-by-side.',
+      instruction: 'Slide 9: Distinguish core JS from runtime APIs.\nThis distinction prevents confusion when moving between environments.',
       html: `<div class="api-grid">
   <div><h4>Core JS (Spec)</h4><ul id="core"></ul></div>
   <div><h4>Browser Runtime</h4><ul id="host"></ul></div>
@@ -233,7 +237,7 @@ console.log('Core JS comes from spec; host APIs come from runtime environment.')
     },
     {
       type: 'js',
-      instruction: 'Slide 10: Concept map. Run to pulse all first-principles terms together before challenges.',
+      instruction: 'Slide 10: Concept map integration.\nRun this only after you can explain each term in your own words.',
       html: `<div class="map">
   <div class="node" id="n1">Syntax</div>
   <div class="node" id="n2">Semantics</div>
@@ -249,10 +253,14 @@ console.log('Core JS comes from spec; host APIs come from runtime environment.')
     el.style.borderColor = '#22d3ee';
     el.style.color = '#e0f2fe';
     el.style.transform = 'scale(1.03)';
-  }, i * 180);
+  }, i * 420);
 });
 console.log('Vocabulary locked: syntax, semantics, spec, engine.');`,
       outputHeight: 220,
+    },
+    {
+      type: 'markdown',
+      instruction: `### Before Challenges\nUse this checklist before you code:\n- Can you explain **syntax vs semantics** without examples?\n- Can you explain **spec vs engine** without naming a browser?\n- Can you explain why runtime APIs differ but language rules remain?\n\nIf not, rerun the previous visual cells slowly and narrate each step.`,
     },
     {
       type: 'challenge',
