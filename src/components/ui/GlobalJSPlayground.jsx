@@ -74,7 +74,7 @@ function nextId() { return _nextId++ }
 const DEMO_TORUS = {
   id: nextId(),
   label: 'Three.js Torus Knot',
-  html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  html: `<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <canvas id="c"></canvas>`,
   css: `* { margin: 0; padding: 0; }
 body { background: #000; overflow: hidden; }
@@ -325,7 +325,7 @@ body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif;
     description: 'CDN import + renderer setup',
     icon: '🧊',
     cell: {
-      html: `<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>\n<canvas id="c"></canvas>`,
+      html: `<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>\n<canvas id="c"></canvas>`,
       css: `* { margin: 0; } body { background: #000; overflow: hidden; } canvas { display: block; width: 100%; }`,
       js: `const canvas = document.getElementById('c');
 const W = canvas.offsetWidth || 600, H = 300;

@@ -228,7 +228,7 @@ async function getPyodide() {
     if (!window.loadPyodide) {
       await new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
         script.onload = resolve;
         script.onerror = () => reject(new Error('Failed to load Pyodide CDN'));
         document.head.appendChild(script);
@@ -237,7 +237,7 @@ async function getPyodide() {
 
     // 2. Initialize
     const py = await window.loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/',
       fullStdLib: false
     });
 
