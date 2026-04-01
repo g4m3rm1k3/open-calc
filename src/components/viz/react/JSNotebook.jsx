@@ -199,11 +199,11 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
     );
   }
 
-  // Determine which tabs to show — JS only appears when startCode is set
+  // Always show all three tabs — JS may be empty but is always available
   const visibleTabs = TABS.filter(t => {
     if (t === "html") return !!(cell.html);
     if (t === "css")  return !!(cell.css);
-    return !!(cell.startCode); // js tab only when there is starter code
+    return true;
   });
 
   const editorValue = showSolution

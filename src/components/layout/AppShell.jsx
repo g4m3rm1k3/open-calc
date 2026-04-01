@@ -15,7 +15,8 @@ import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen
 import TICalc from '../calculator/TICalc.jsx'
 import MobileBottomNav from './MobileBottomNav.jsx'
 import GlobalPythonNotebook from '../ui/GlobalPythonNotebook.jsx'
-import { Terminal } from 'lucide-react'
+import GlobalJSPlayground from '../ui/GlobalJSPlayground.jsx'
+import { Terminal, Code2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 function MobileLocationBadge() {
@@ -107,7 +108,7 @@ function ScoreWidget() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen }) {
   const { openSearch } = useSearchContext()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
 
@@ -251,6 +252,19 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
           <Terminal className="w-4 h-4" />
           <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">Python</span>
         </button>
+
+        <button
+          onClick={onJsToggle}
+          className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors border ${
+            jsOpen
+              ? 'text-yellow-700 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/40 border-yellow-200 dark:border-yellow-800/50'
+              : 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 border-yellow-100 dark:border-yellow-800/50'
+          }`}
+          title="JS Playground (J)"
+        >
+          <Code2 className="w-4 h-4" />
+          <span className="hidden sm:inline font-medium text-[11px] uppercase tracking-tighter">JS</span>
+        </button>
       </div>
 
       {/* Dark mode toggle */}
@@ -331,6 +345,7 @@ export default function AppShell({ children }) {
   const [scratchOpen, setScratchOpen] = useState(false)
   const [calcOpen, setCalcOpen] = useState(false)
   const [pythonOpen, setPythonOpen] = useState(false)
+  const [jsOpen, setJsOpen] = useState(false)
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
 
@@ -401,6 +416,10 @@ export default function AppShell({ children }) {
       if (e.key.toLowerCase() === 'p') {
         setPythonOpen(prev => !prev)
       }
+      // 'j' key for JS playground
+      if (e.key.toLowerCase() === 'j') {
+        setJsOpen(prev => !prev)
+      }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
@@ -409,6 +428,7 @@ export default function AppShell({ children }) {
         setScratchOpen(false)
         setCalcOpen(false)
         setPythonOpen(false)
+        setJsOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -430,6 +450,8 @@ export default function AppShell({ children }) {
         calcOpen={calcOpen}
         onPythonToggle={() => setPythonOpen(prev => !prev)}
         pythonOpen={pythonOpen}
+        onJsToggle={() => setJsOpen(prev => !prev)}
+        jsOpen={jsOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -599,6 +621,7 @@ export default function AppShell({ children }) {
       />
       <ScratchPad isOpen={scratchOpen} onClose={() => setScratchOpen(false)} />
       <GlobalPythonNotebook isOpen={pythonOpen} onClose={() => setPythonOpen(false)} />
+      <GlobalJSPlayground isOpen={jsOpen} onClose={() => setJsOpen(false)} />
     </div>
     </GrapherContext.Provider>
   )
