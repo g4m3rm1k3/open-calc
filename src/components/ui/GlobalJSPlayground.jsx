@@ -48,37 +48,7 @@ ${cell.html || ''}
 }
 
 
-// Parse an uploaded file (.html or .css or .js) and return a new cell
-function parseUploadedFile(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const text = e.target.result
-      const name = file.name
-      if (name.endsWith('.html') || name.endsWith('.htm')) {
-        const styleMatch  = text.match(/<style[^>]*>([\s\S]*?)<\/style>/i)
-        const scriptMatch = text.match(/<script(?![^>]*src)[^>]*>([\s\S]*?)<\/script>/i)
-        const bodyMatch   = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i)
-        resolve({
-          id: nextId(),
-          label: name.replace(/\.html?$/, ''),
-          css:  styleMatch  ? styleMatch[1].trim()  : '',
-          js:   scriptMatch ? scriptMatch[1].trim()  : '',
-          html: bodyMatch
-            ? bodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<link[^>]*>/gi, '').trim()
-            : text,
-        })
-      } else if (name.endsWith('.css')) {
-        resolve({ id: nextId(), label: name.replace('.css', ''), html: '', css: text, js: '' })
-      } else if (name.endsWith('.js')) {
-        resolve({ id: nextId(), label: name.replace('.js', ''), html: '', css: '', js: text })
-      } else {
-        resolve(null)
-      }
-    }
-    reader.readAsText(file)
-  })
-}
+
 import Editor from '@monaco-editor/react'
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
@@ -653,23 +623,15 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
   const [logs, setLogs] = useState([])
   const [showTemplates, setShowTemplates] = useState(false)
 
-  const handleUpload = async (e) => {
+  const handleUpload = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
-    const imported = await parseUploadedFile(file)
-    if (!imported) return
-    // Merge into current cell — put content in the matching tab
-    onChange({
-      ...cell,
-      html: imported.html !== '' ? imported.html : cell.html,
-      css:  imported.css  !== '' ? imported.css  : cell.css,
-      js:   imported.js   !== '' ? imported.js   : cell.js,
-    })
-    // Switch to whichever tab has the new content
-    if (file.name.endsWith('.css')) setActiveTab('css')
-    else if (file.name.endsWith('.js')) setActiveTab('js')
-    else setActiveTab('html')
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      onChange({ ...cell, [activeTab]: ev.target.result })
+    }
+    reader.readAsText(file)
   }
 
   useEffect(() => {
