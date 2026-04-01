@@ -128,7 +128,7 @@ function ConsolePanel({ logs }) {
 }
 
 // ── Single CodePen-style cell ─────────────────────────────────────────────────
-function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
+function NotebookCell({ cell, cellIndex }) {
   const iframeRef = useRef(null);
   // Default to the first meaningful tab — html if present, else js
   const defaultTab = cell.html ? "html" : "js";
@@ -163,13 +163,10 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
         try {
           const passed = cell.check(activeJs, logs, html);
           setChallengeState(passed ? "pass" : "fail");
-          if (passed) onUnlock?.(cellIndex);
         } catch (_) { setChallengeState("fail"); }
       }, 300);
-    } else {
-      onUnlock?.(cellIndex);
     }
-  }, [html, css, js, showSolution, cell, cellIndex, onUnlock]);
+  }, [html, css, js, showSolution, cell]);
 
   const reset = () => {
     setHtml(cell.html || "");
@@ -187,17 +184,6 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
     return (
       <div style={{ background: T.panel, borderRadius: 12, border: `1px solid ${T.border}`, padding: "20px 22px", marginBottom: 20 }}>
         <InstructionText text={cell.instruction} />
-      </div>
-    );
-  }
-
-  if (!isUnlocked) {
-    return (
-      <div style={{ background: T.panel, borderRadius: 12, border: `1px solid ${T.border}`, padding: "18px 20px", marginBottom: 20, opacity: 0.45 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, color: T.muted, fontSize: 13 }}>
-          <span>🔒</span>
-          <span>Complete the previous step to unlock this one.</span>
-        </div>
       </div>
     );
   }
@@ -349,26 +335,7 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
 // ── Main JSNotebook component ─────────────────────────────────────────────────
 export default function JSNotebook({ lesson: lessonProp, params = {} }) {
   const lesson = lessonProp ?? params.lesson;
-  const { title, subtitle, cells = [], sequential = false } = lesson || {};
-
-  const [unlocked, setUnlocked] = useState(() => {
-    if (!sequential) return new Set(cells.map((_, i) => i));
-    // Unlock leading markdown cells + the first interactive cell
-    const initial = new Set();
-    for (let i = 0; i < cells.length; i++) {
-      initial.add(i);
-      if (cells[i].type !== "markdown") break;
-    }
-    return initial;
-  });
-
-  const handleUnlock = (idx) => {
-    setUnlocked(prev => {
-      const next = new Set(prev);
-      next.add(idx + 1);
-      return next;
-    });
-  };
+  const { title, subtitle, cells = [] } = lesson || {};
 
   if (!lesson) return null;
 
@@ -391,8 +358,6 @@ export default function JSNotebook({ lesson: lessonProp, params = {} }) {
           key={i}
           cell={cell}
           cellIndex={i}
-          isUnlocked={unlocked.has(i)}
-          onUnlock={handleUnlock}
         />
       ))}
     </div>
