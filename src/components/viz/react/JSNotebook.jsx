@@ -108,18 +108,21 @@ function InstructionText({ text }) {
 
 // ── Console output panel ──────────────────────────────────────────────────────
 function ConsolePanel({ logs }) {
-  if (logs.length === 0) return null;
   const color = { log: T.text, error: T.red, warn: T.yellow };
   const icon  = { log: ">", error: "✗", warn: "⚠" };
   return (
-    <div style={{ background: "#080e18", borderTop: `1px solid ${T.border}`, padding: "8px 14px", maxHeight: 140, overflowY: "auto" }}>
+    <div style={{ background: "#080e18", borderTop: `1px solid ${T.border}`, padding: "8px 14px", height: 120, overflowY: "auto" }}>
       <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6 }}>Console</div>
-      {logs.map((log, i) => (
-        <div key={i} style={{ fontFamily: "monospace", fontSize: 12, lineHeight: 1.6, color: color[log.level] || T.text, display: "flex", gap: 8 }}>
-          <span style={{ color: T.muted, flexShrink: 0 }}>{icon[log.level]}</span>
-          <span style={{ wordBreak: "break-all" }}>{log.msg}</span>
-        </div>
-      ))}
+      {logs.length === 0 ? (
+        <div style={{ fontFamily: "monospace", fontSize: 12, lineHeight: 1.6, color: T.muted }}>Run the cell to stream output here.</div>
+      ) : (
+        logs.map((log, i) => (
+          <div key={i} style={{ fontFamily: "monospace", fontSize: 12, lineHeight: 1.6, color: color[log.level] || T.text, display: "flex", gap: 8 }}>
+            <span style={{ color: T.muted, flexShrink: 0 }}>{icon[log.level]}</span>
+            <span style={{ wordBreak: "break-all" }}>{log.msg}</span>
+          </div>
+        ))
+      )}
     </div>
   );
 }
@@ -332,9 +335,11 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
       <ConsolePanel logs={logs} />
 
       {/* ── Challenge feedback ── */}
-      {cell.type === "challenge" && hasRun && challengeState && (
-        <div style={{ padding: "10px 16px", borderTop: `1px solid ${T.border}`, background: challengeState === "pass" ? T.green + "14" : T.red + "12", color: challengeState === "pass" ? T.green : T.red, fontSize: 13, fontWeight: 500 }}>
-          {challengeState === "pass" ? (cell.successMessage || "✓ Challenge complete!") : (cell.failMessage || "✗ Not quite — try again.")}
+      {cell.type === "challenge" && (
+        <div style={{ minHeight: 44, padding: "10px 16px", borderTop: `1px solid ${T.border}`, background: !hasRun || !challengeState ? "transparent" : (challengeState === "pass" ? T.green + "14" : T.red + "12"), color: challengeState === "pass" ? T.green : (challengeState === "fail" ? T.red : T.muted), fontSize: 13, fontWeight: 500 }}>
+          {!hasRun || !challengeState
+            ? "Run your solution to unlock the next step."
+            : (challengeState === "pass" ? (cell.successMessage || "✓ Challenge complete!") : (cell.failMessage || "✗ Not quite — try again."))}
         </div>
       )}
     </div>

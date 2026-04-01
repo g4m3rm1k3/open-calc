@@ -55,4 +55,11 @@ export const COURSES = [
     desc: 'Compute, Visualise & Analyze',
     color: 'amber'
   },
+  {
+    key: 'javascript-core',
+    label: 'JavaScript Core',
+    path: '/chapter/js0.1',
+    desc: 'Language & Runtime Fundamentals',
+    color: 'cyan'
+  },
 ];
