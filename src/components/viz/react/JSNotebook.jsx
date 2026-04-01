@@ -127,7 +127,9 @@ function ConsolePanel({ logs }) {
 // ── Single CodePen-style cell ─────────────────────────────────────────────────
 function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
   const iframeRef = useRef(null);
-  const [activeTab, setActiveTab] = useState("js");
+  // Default to the first meaningful tab — html if present, else js
+  const defaultTab = cell.html ? "html" : "js";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [html, setHtml] = useState(cell.html || "");
   const [css,  setCss]  = useState(cell.css  || "");
   const [js,   setJs]   = useState(cell.startCode || "");
@@ -156,7 +158,7 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
     if (cell.type === "challenge" && cell.check) {
       setTimeout(() => {
         try {
-          const passed = cell.check(activeJs);
+          const passed = cell.check(activeJs, logs, html);
           setChallengeState(passed ? "pass" : "fail");
           if (passed) onUnlock?.(cellIndex);
         } catch (_) { setChallengeState("fail"); }
@@ -197,11 +199,11 @@ function NotebookCell({ cell, cellIndex, isUnlocked, onUnlock }) {
     );
   }
 
-  // Determine which tabs to show (only tabs that have content)
+  // Determine which tabs to show — JS only appears when startCode is set
   const visibleTabs = TABS.filter(t => {
     if (t === "html") return !!(cell.html);
     if (t === "css")  return !!(cell.css);
-    return true; // always show js
+    return !!(cell.startCode); // js tab only when there is starter code
   });
 
   const editorValue = showSolution
