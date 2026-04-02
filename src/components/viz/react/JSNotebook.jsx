@@ -34,7 +34,7 @@ const TAB_LABEL = { html: "HTML", css: "CSS", js: "JavaScript" };
 const MONACO_LANG = { html: "html", css: "css", js: "javascript" };
 
 // ── Build sandboxed iframe document ──────────────────────────────────────────
-function buildIframeDoc(html = "", css = "", js = "") {
+function buildIframeDoc(html = "", css = "", js = "", cellIndex) {
   const uid = Math.random().toString(36).slice(2);
   return `<!DOCTYPE html>
 <html>
@@ -66,7 +66,7 @@ window.__cellId = '${uid}';
       try { return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a); }
       catch(_) { return String(a); }
     }).join(' ');
-    window.parent.postMessage({ type: 'jsnb_console', level, msg, id: window.__cellId }, '*');
+    window.parent.postMessage({ type: 'jsnb_console', level, msg, id: window.__cellId, cellIndex: ${cellIndex} }, '*');
   }
   console.log   = (...a) => { _log(...a);  post('log',  a); };
   console.error = (...a) => { _err(...a);  post('error',a); };
@@ -140,23 +140,29 @@ function NotebookCell({ cell, cellIndex }) {
   const [hasRun, setHasRun] = useState(false);
   const [challengeState, setChallengeState] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
+  const [showConsole, setShowConsole] = useState(false);
 
   // Listen for console messages from this cell's iframe
   useEffect(() => {
     const handler = (e) => {
       if (!e.data || e.data.type !== "jsnb_console") return;
+      // ONLY accept logs if they match this cell's index to prevent cross-talk
+      if (e.data.cellIndex !== cellIndex) return;
+
       setLogs(prev => [...prev, { level: e.data.level, msg: e.data.msg }]);
+      // Force console open if there's content
+      setShowConsole(true);
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, []);
+  }, [cellIndex]);
 
   const run = useCallback(() => {
     setLogs([]);
     setHasRun(true);
     const activeJs = showSolution ? (cell.solutionCode || js) : js;
     if (iframeRef.current) {
-      iframeRef.current.srcdoc = buildIframeDoc(html, css, activeJs);
+      iframeRef.current.srcdoc = buildIframeDoc(html, css, activeJs, cellIndex);
     }
     if (cell.type === "challenge" && cell.check) {
       setTimeout(() => {
@@ -166,7 +172,7 @@ function NotebookCell({ cell, cellIndex }) {
         } catch (_) { setChallengeState("fail"); }
       }, 300);
     }
-  }, [html, css, js, showSolution, cell]);
+  }, [html, css, js, showSolution, cell, logs]);
 
   const reset = () => {
     setHtml(cell.html || "");
@@ -174,6 +180,7 @@ function NotebookCell({ cell, cellIndex }) {
     setJs(cell.startCode || "");
     setLogs([]);
     setHasRun(false);
+    setShowConsole(false);
     setChallengeState(null);
     setShowSolution(false);
     if (iframeRef.current) iframeRef.current.srcdoc = "";
@@ -267,6 +274,12 @@ function NotebookCell({ cell, cellIndex }) {
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: 6, padding: "6px 0" }}>
+          <button
+            onClick={() => setShowConsole(s => !s)}
+            style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
+          >
+            {showConsole ? "Hide Console" : "Show Console"}
+          </button>
           {cell.solutionCode && (
             <button
               onClick={() => setShowSolution(s => !s)}
@@ -318,7 +331,7 @@ function NotebookCell({ cell, cellIndex }) {
       </div>
 
       {/* ── Console output ── */}
-      <ConsolePanel logs={logs} />
+      {showConsole && <ConsolePanel logs={logs} />}
 
       {/* ── Challenge feedback ── */}
       {cell.type === "challenge" && (
