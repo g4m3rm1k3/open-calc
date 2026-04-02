@@ -76,10 +76,10 @@ var code = \`<div class="card">
 function hlHTML(raw) {
   var e = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return e
-    .replace(/(&lt;\/?)(\w[\w-]*)/g,'$1<b style="color:#60a5fa">$2</b>')
+    .replace(/(&lt;[\/]?)([\w\d-]+)/g,'$1<b style="color:#60a5fa">$2</b>')
     .replace(/(&gt;)/g,'<span style="color:#475569">$1</span>')
     .replace(/(&lt;)/g,'<span style="color:#475569">$1</span>')
-    .replace(/([\w-]+=)(&quot;[^&]*&quot;)/g,'<span style="color:#fb923c">$1</span><span style="color:#4ade80">$2</span>');
+    .replace(/([\w\d-]+)(=)(&quot;[^&]*&quot;)/g,'<span style="color:#fb923c">$1</span><span style="color:#4ade80">$2</span><span style="color:#4ade80">$3</span>');
 }
 
 function startTyping() {
@@ -346,7 +346,7 @@ export default {
   order: 0,
   title: 'How to Use This Notebook',
   subtitle: 'Press Run. Watch code appear. See it render.',
-  tags: ['javascript', 'notebook', 'intro', 'html', 'css', 'javascript'],
+  tags: ['javascript', 'notebook', 'intro', 'html', 'css', ],
 
   hook: {
     question: 'What happens when you press Run?',
