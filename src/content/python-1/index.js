@@ -15,6 +15,7 @@ import lesson14 from './lesson14.js'
 import lesson15 from './lesson15.js'
 import lesson16 from './lesson16.js'
 import lesson17 from './lesson17.js'
+import lesson18 from './lesson18.js'
 
 export default [
   {
@@ -52,5 +53,11 @@ export default [
     title: 'Data Structures',
     course: 'python-1',
     lessons: [lesson15, lesson16, lesson17]
+  },
+  {
+    number: 0.7,
+    title: 'Abstraction & Design',
+    course: 'python-1',
+    lessons: [lesson18]
   }
 ]
