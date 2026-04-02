@@ -3,6 +3,7 @@ import lesson0_1 from './lesson0-1.js'
 import lesson0_2 from './lesson0-2.js'
 import lesson0_3 from './lesson0-3.js'
 import lesson1_1 from './lesson1-1.js'
+import lesson1_2 from './lesson1-2.js'
 
 const J1 = {
   title: 'JavaScript Core Foundations',
@@ -25,7 +26,8 @@ const J2 = {
   description: 'Variables, Bindings, and the proper way to think about JS syntax.',
   course: 'javascript-core',
   lessons: [
-    lesson1_1
+    lesson1_1,
+    lesson1_2
   ],
 };
 
