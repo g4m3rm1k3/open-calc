@@ -36,6 +36,8 @@ const MONACO_LANG = { html: "html", css: "css", js: "javascript" };
 // ── Build sandboxed iframe document ──────────────────────────────────────────
 function buildIframeDoc(html = "", css = "", js = "", cellIndex) {
   const uid = Math.random().toString(36).slice(2);
+  const escapedJs = js.replace(/<\/script>/gi, "<\\/script>");
+  
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -72,7 +74,6 @@ window.__cellId = '${uid}';
   console.error = (...a) => { _err(...a);  post('error',a); };
   console.warn  = (...a) => { _warn(...a); post('warn', a); };
   
-  // Only capture real errors, avoid capturing the script source
   window.addEventListener('error', e => {
     if (e.error) post('error', [e.message]);
     e.preventDefault();
@@ -80,7 +81,7 @@ window.__cellId = '${uid}';
 })();
 try {
   (function() {
-${js}
+${escapedJs}
   })();
 } catch(e) {
   console.error('Runtime error: ' + e.message);
@@ -148,6 +149,11 @@ function NotebookCell({ cell, cellIndex }) {
   const [challengeState, setChallengeState] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
   const [showConsole, setShowConsole] = useState(false);
+  const [showPreview, setShowPreview] = useState(!!cell.showPreviewByDefault);
+
+  // Force the iframe to ALWAYS exist in the DOM from the beginning
+  // so the iframeRef is never null when we click Run.
+  const [hasInitializedIframe, setHasInitializedIframe] = useState(true);
 
   // Listen for console messages from this cell's iframe
   useEffect(() => {
@@ -167,10 +173,20 @@ function NotebookCell({ cell, cellIndex }) {
   const run = useCallback(() => {
     setLogs([]);
     setHasRun(true);
+    
+    // 1. Determine which panels to show
+    const needsPreview = html.trim() || css.trim();
+    if (needsPreview) setShowPreview(true);
+    setShowConsole(true);
+
     const activeJs = showSolution ? (cell.solutionCode || js) : js;
+
+    // 2. Inject content into iframe
     if (iframeRef.current) {
       iframeRef.current.srcdoc = buildIframeDoc(html, css, activeJs, cellIndex);
     }
+
+    // 3. Challenge check
     if (cell.type === "challenge" && cell.check) {
       setTimeout(() => {
         try {
@@ -179,7 +195,7 @@ function NotebookCell({ cell, cellIndex }) {
         } catch (_) { setChallengeState("fail"); }
       }, 300);
     }
-  }, [html, css, js, showSolution, cell, logs]);
+  }, [html, css, js, showSolution, cell, logs, cellIndex]);
 
   const reset = () => {
     setHtml(cell.html || "");
@@ -243,7 +259,11 @@ function NotebookCell({ cell, cellIndex }) {
       )}
 
       {/* ── Live preview canvas ── */}
-      <div style={{ background: "#0a1016", borderBottom: `1px solid ${T.border}` }}>
+      <div style={{ 
+        background: "#0a1016", 
+        borderBottom: `1px solid ${T.border}`,
+        display: showPreview ? "block" : "none" 
+      }}>
         <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: ".08em", textTransform: "uppercase", padding: "7px 14px 0" }}>Preview</div>
         <iframe
           ref={iframeRef}
@@ -281,6 +301,12 @@ function NotebookCell({ cell, cellIndex }) {
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: 6, padding: "6px 0" }}>
+          <button
+            onClick={() => setShowPreview(s => !s)}
+            style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
+          >
+            {showPreview ? "Hide Preview" : "Show Preview"}
+          </button>
           <button
             onClick={() => setShowConsole(s => !s)}
             style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
