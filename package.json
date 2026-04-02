@@ -2,6 +2,7 @@
   "name": "open-calc",
   "version": "0.1.0",
   "description": "An open-source interactive calculus textbook — intuition first, rigor always",
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "dev": "node src/scripts/build-search-index.js && vite",

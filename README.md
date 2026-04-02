@@ -159,4 +159,4 @@ Users can add their own YouTube tutorials directly within the `FloatingVideoPlay
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+GPLv3. See [LICENSE](LICENSE).
