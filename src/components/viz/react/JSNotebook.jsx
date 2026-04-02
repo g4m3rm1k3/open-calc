@@ -71,10 +71,17 @@ window.__cellId = '${uid}';
   console.log   = (...a) => { _log(...a);  post('log',  a); };
   console.error = (...a) => { _err(...a);  post('error',a); };
   console.warn  = (...a) => { _warn(...a); post('warn', a); };
-  window.addEventListener('error', e => post('error', [e.message]));
+  
+  // Only capture real errors, avoid capturing the script source
+  window.addEventListener('error', e => {
+    if (e.error) post('error', [e.message]);
+    e.preventDefault();
+  }, true);
 })();
 try {
+  (function() {
 ${js}
+  })();
 } catch(e) {
   console.error('Runtime error: ' + e.message);
 }
