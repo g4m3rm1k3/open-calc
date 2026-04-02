@@ -10,7 +10,7 @@ const LESSON_JS_CORE_0_1 = {
     },
     {
       type: 'js',
-      instruction: `A programming language is a formal contract between a developer and a machine.\n\nWhen you write code, you are not issuing hardware instructions directly. You are writing symbols that follow the rules of a language specification — a precise document that defines what those symbols must mean. Any engine that correctly implements that spec will honor those rules and produce the same result.\n\nThis contract separates two things:\n  What must happen — defined by the spec\n  How it happens — decided by the engine\n\nThe animation below shows this flow. Run it and watch human intent connect to machine behavior through the language contract.`,
+      instruction: `### The Programming Language Contract\n\nA programming language is a formal contract between a developer and a machine.\n\nWhen you write code, you are not issuing hardware instructions directly. You are writing symbols that follow the rules of a **language specification** — a precise document that defines what those symbols must mean. Any engine that correctly implements that spec will honor those rules and produce the same result.\n\nThis contract separates two things:\n- **What** must happen — defined by the spec\n- **How** it happens — decided by the engine\n\nThe animation below shows this flow. Run it and watch human intent connect to machine behavior through the language contract.`,
       html: `<div class="stage">
   <div class="label top">Human Intent</div>
   <div class="arrow" id="flow"></div>
@@ -36,7 +36,7 @@ console.log('A programming language maps intent to behavior.');`,
     },
     {
       type: 'js',
-      instruction: `Syntax is the structural grammar of a language — the rules that define whether code is well-formed.\n\nA syntax check happens before any code runs. The parser reads the tokens you wrote and verifies they follow legal patterns. If the structure is wrong (wrong order, missing bracket, misplaced keyword), execution stops immediately with a SyntaxError. Your code never runs at all.\n\nImportant: syntax says nothing about whether your code is correct or useful — only whether it is structurally legal. "Eat the car quietly" is grammatically valid English but makes no sense. Same idea applies here.\n\nThe three tokens below illustrate this. Two pass the structure check; one does not. Watch the gate classify them.`,
+      instruction: `### Syntax: The Rules of Grammar\n\n**Syntax** is the structural grammar of a language — the rules that define whether code is well-formed.\n\nA syntax check happens **before** any code runs. The parser reads the tokens you wrote and verifies they follow legal patterns. If the structure is wrong (wrong order, missing bracket, misplaced keyword), execution stops immediately with a \`SyntaxError\`. Your code never runs at all.\n\n> **Important**: Syntax says nothing about whether your code is correct or useful — only whether it is structurally legal.\n\n"Eat the car quietly" is grammatically valid English but makes no sense. Same idea applies here. The three tokens below illustrate this. Two pass the structure check; one does not. Watch the gate classify them.`,
       html: `<div class="board">
   <div class="token" id="t1">const x = 4;</div>
   <div class="token" id="t2">if (x > 2) { ... }</div>
@@ -71,7 +71,7 @@ setTimeout(() => {
     },
     {
       type: 'js',
-      instruction: `Semantics is what code means — the value or behavior it produces when executed.\n\nTwo pieces of code with different appearances can share identical semantics if they evaluate to the same result. JavaScript follows standard operator precedence: multiplication runs before addition. So both "2 + 3 * 4" and "2 + (3 * 4)" mean exactly the same thing — they both produce 14.\n\nThe key insight: you can write the same meaning in multiple syntactic forms. Conversely, two things that look similar can have different semantics if the rules treat them differently.\n\nRun the cells below and confirm both expressions evaluate to the same value.`,
+      instruction: `### Semantics: The Meaning\n\n**Semantics** is what code means — the value or behavior it produces when executed.\n\nTwo pieces of code with different appearances can share identical semantics if they evaluate to the same result. JavaScript follows standard operator precedence: multiplication runs before addition. So both \`2 + 3 * 4\` and \`2 + (3 * 4)\` mean exactly the same thing — they both produce 14.\n\n**Key Insight**:\n- You can write the same meaning in multiple syntactic forms.\n- You can write similar-looking code that has different meanings.\n\nRun the cell and confirm both expressions evaluate to the same value.`,
       html: `<div class="wrap">
   <div class="card"><div>2 + 3 * 4</div><div class="out" id="a">?</div></div>
   <div class="card"><div>2 + (3 * 4)</div><div class="out" id="b">?</div></div>
@@ -93,28 +93,7 @@ console.log('a =', a, 'b =', b, 'equal =', a === b);`,
     },
     {
       type: 'js',
-      instruction: `Every program runs on hardware, but you never write hardware instructions. You write at a high abstraction layer — the language — and each layer below translates it toward the machine.\n\nThe layers from bottom to top:\n  Hardware — transistors and circuits\n  Operating System — manages hardware resources\n  JavaScript Engine — parses and executes your JS\n  Runtime APIs — browser DOM, Node filesystem, etc.\n  Your Program — the code you actually write\n\nEach layer hides the complexity of the layers below it. This is why the same JavaScript works on your laptop, a server, and a smart TV — the engine layer handles those differences. You target the language; the engine handles the rest.\n\nWatch each layer activate. Your program is at the top, highlighted in blue.`,
-      html: `<div class="stack" id="stack"></div>`,
-      css: `.stack{height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;background:#0a1320;padding:14px;border-radius:10px;}
-.layer{padding:8px 10px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#cbd5e1;opacity:.35;transform:translateY(10px);transition:all .35s ease;font-size:12px;}`,
-      startCode: `const labels = ['Hardware', 'Operating System', 'JavaScript Engine', 'Runtime APIs', 'Your Program'];
-const stack = document.getElementById('stack');
-stack.innerHTML = labels.map((label) => '<div class="layer">' + label + '</div>').join('');
-
-Array.from(stack.children).forEach((el, i) => {
-  setTimeout(() => {
-    el.style.opacity = '1';
-    el.style.transform = 'translateY(0)';
-    el.style.background = i === labels.length - 1 ? '#082f49' : '#0f172a';
-    el.style.borderColor = i === labels.length - 1 ? '#38bdf8' : '#334155';
-  }, i * 480);
-});
-console.log('Abstraction lowers cognitive load while preserving behavior.');`,
-      outputHeight: 220,
-    },
-    {
-      type: 'js',
-      instruction: `ECMAScript is the name of the JavaScript language specification. It is a published standard document — currently maintained by the TC39 committee — that precisely defines how every feature must behave. When TC39 approves a change, all engines must eventually implement it.\n\nV8 (used by Chrome and Node.js), SpiderMonkey (used by Firefox), and JavaScriptCore (used by Safari) are separate implementations of that specification. They compete on speed and efficiency, but they must all produce the same results for any valid JavaScript program.\n\nOne spec, many engines. Your code targets the spec. Any engine that correctly implements the spec will execute it correctly.\n\nWatch the three engines each confirm compliance with the spec.`,
+      instruction: `### One Spec, Many Engines\n\n**ECMAScript** is the name of the JavaScript language specification. It is a published standard document — currently maintained by the TC39 committee — that precisely defines how every feature must behave.\n\n**V8** (Chrome/Node), **SpiderMonkey** (Firefox), and **JavaScriptCore** (Safari) are separate implementations of that specification. They compete on speed and efficiency, but they must all produce the same results for any valid JavaScript program.\n\n> **Key takeaway**: Your code targets the **spec**. Any engine that correctly implements the spec will execute it correctly.\n\nWatch the three engines each confirm compliance with the spec.`,
       html: `<div class="grid">
   <div class="spec" id="spec">ECMAScript Spec</div>
   <div class="engine" id="v8">V8</div>
@@ -137,24 +116,27 @@ console.log('One spec, multiple engines.');`,
     },
     {
       type: 'js',
-      instruction: `The core JavaScript language — syntax, operators, data types, closures, prototypes — is identical whether code runs in a browser or on a server. What changes are the host APIs.\n\nThe browser runtime exposes APIs like the DOM (document), the window object, and user event handling. Node.js exposes APIs for the filesystem, raw network sockets, and the process. Neither set is part of the JavaScript spec — they are provided by the environment.\n\nThis is why "document is not defined" appears in Node.js: document is a browser host API, not a JavaScript language feature. The language stayed the same; the toolbox around it changed.\n\nClick Browser and Server to compare what each environment provides.`,
+      instruction: `### Browser vs. Server Runtimes\n\nThe core JavaScript language — syntax, operators, and types — is identical whether code runs in a browser or on a server. What changes are the **Host APIs**.\n\n- **Browser Runtime**: Exposes the DOM (\`document\`), \`window\`, and user events.\n- **Node.js Runtime**: Exposes the filesystem (\`fs\`), \`process\`, and networking.\n\nNeither set is part of the JavaScript spec; they are provided by the environment. This is why \`document is not defined\` appears in Node.js. The language stayed the same; the environment changed.\n\nCompare what each environment provides below.`,
       html: `<div class="ctx">
-  <button id="browserBtn">Browser</button>
-  <button id="serverBtn">Server</button>
+  <div class="btns">
+    <button id="browserBtn">Browser</button>
+    <button id="serverBtn">Server</button>
+  </div>
   <ul id="list"></ul>
 </div>`,
       css: `.ctx{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:flex;flex-direction:column;gap:10px;}
-button{padding:8px 10px;border:1px solid #334155;background:#111827;color:#cbd5e1;border-radius:8px;cursor:pointer;font-weight:700;}
+.btns{display:flex;gap:8px;}
+button{flex:1;padding:8px;border:1px solid #334155;background:#111827;color:#cbd5e1;border-radius:8px;cursor:pointer;font-weight:700;}
 ul{margin:0;padding-left:18px;color:#93c5fd;font-size:12px;line-height:1.8;}`,
       startCode: `const capabilities = {
-  browser: ['DOM access', 'window object', 'user events'],
-  server: ['filesystem', 'process APIs', 'raw network sockets'],
+  browser: ['DOM (document.querySelector)', 'window object', 'User Events (clicks)'],
+  server: ['File System (fs)', 'Process Management', 'Network Sockets'],
 };
 const list = document.getElementById('list');
 
 function render(mode) {
   list.innerHTML = capabilities[mode].map((x) => '<li>' + x + '</li>').join('');
-  console.log('Runtime mode:', mode);
+  console.log('Runtime changed to:', mode);
 }
 
 document.getElementById('browserBtn').onclick = () => render('browser');
@@ -164,7 +146,7 @@ render('browser');`,
     },
     {
       type: 'js',
-      instruction: `JavaScript evaluates expressions by substituting known values step by step.\n\nWhen the engine sees "y = x + 2" and x holds the value 5, it substitutes: y = 5 + 2 = 7. When it later sees "z = y * 3", it substitutes: z = 7 * 3 = 21. Each expression collapses to a concrete value before the next step runs.\n\nThis substitution model is your primary debugging tool. When code behaves unexpectedly, trace each substitution. The answer is always in the values.\n\nWatch each line collapse in order. This is exactly how the engine reasons.`,
+      instruction: `### Substitution & Evaluation\n\nJavaScript evaluates expressions by substituting known values step by step. This is how the engine "thinks."\n\nIf \`x = 5\`, the engine sees \`y = x + 2\` and substitutes it: \`y = 5 + 2 = 7\`. When it later sees \`z = y * 3\`, it substitutes: \`z = 7 * 3 = 21\`. \n\nThis **substitution model** is your primary debugging tool. When code behaves unexpectedly, trace the substitutions. The answer is always in the values.\n\nWatch each line collapse. Deterministic values make code predictable.`,
       html: `<div class="trace">
   <div class="line" id="l1">x = 5</div>
   <div class="line" id="l2">y = x + 2</div>
@@ -173,7 +155,7 @@ render('browser');`,
 </div>`,
       css: `.trace{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:flex;flex-direction:column;gap:8px;}
 .line{padding:8px 10px;border:1px solid #334155;border-radius:8px;color:#cbd5e1;background:#111827;transition:all .3s ease;font-family:monospace;}
-.out{color:#93c5fd;font-weight:800;}`,
+.out{color:#93c5fd;font-weight:800;border-color:#38bdf8;}`,
       startCode: `const steps = [
   { id: 'l1', txt: 'x = 5' },
   { id: 'l2', txt: 'y = 5 + 2 = 7' },
@@ -184,13 +166,19 @@ steps.forEach((s, i) => {
   setTimeout(() => {
     const el = document.getElementById(s.id);
     el.textContent = s.txt;
-    el.style.borderColor = '#22d3ee';
-    el.style.background = '#082f49';
+    if(i === steps.length - 1) {
+       el.style.borderColor = '#10b981';
+       el.style.background = '#06201b';
+    } else {
+       el.style.borderColor = '#38bdf8';
+       el.style.background = '#082f49';
+    }
   }, i * 520);
 });
-console.log('Execution is deterministic when inputs are fixed.');`,
+console.log('Execution is substitution of values.');`,
       outputHeight: 220,
     },
+
     {
       type: 'js',
       instruction: `A function is deterministic if the same input always produces the same output — no matter how many times you call it or when.\n\nDeterminism is a prerequisite for reliable reasoning. If f(6) always returns 37, you can substitute f(6) with 37 anywhere in your mental model. If f(6) might return different values depending on hidden state, your reasoning breaks down.\n\nMost real-world bugs occur when code that should be deterministic secretly depends on external state — a global variable that changed, a network response that varied, a timestamp that shifted. Pure deterministic functions have no such dependencies.\n\nRun the function twice with the same input and confirm it returns the same value.`,

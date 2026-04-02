@@ -10,7 +10,7 @@ const LESSON_JS_CORE_0_2 = {
     },
     {
       type: 'js',
-      instruction: `The JavaScript runtime has four components that work together on every piece of code you run.\n\nThe call stack tracks active function execution — when a function is called, a frame is pushed; when it returns, the frame is popped. The heap is where all objects are stored — a large region of memory that holds the data your program creates. The single thread means only one stack frame can be executing at any moment — there is no true parallelism. The event loop watches the stack and a callback queue; when the stack is empty, it moves queued callbacks onto the stack to run.\n\nThese four components together explain all JavaScript execution behavior. Run the map below to lock in all four terms before diving deeper.`,
+      instruction: `### The Core Components\n\nThe JavaScript runtime has four main components that work together on every piece of code you run:\n\n- **Call stack**: Tracks active function execution (Last-In-First-Out).\n- **Heap**: A large memory region where objects and arrays live.\n- **Single thread**: Only one stack frame executes at a time (no parallelism).\n- **Event loop**: Coordinates callbacks between the queue and the stack.\n\nThese components explain all JavaScript execution behavior. Run the map below to lock in these terms.`,
       html: `<div class="grid">
   <div class="tile" id="stack">Call Stack</div>
   <div class="tile" id="heap">Heap</div>
@@ -18,7 +18,7 @@ const LESSON_JS_CORE_0_2 = {
   <div class="tile" id="loop">Event Loop</div>
 </div>`,
       css: `.grid{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#0a1220;padding:14px;border-radius:10px;}
-.tile{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;display:grid;place-items:center;font-weight:800;opacity:.5;transform:translateY(8px);transition:all .25s ease;}`,
+.tile{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;display:grid;place-items:center;font-size:13px;font-weight:800;opacity:.5;transform:translateY(8px);transition:all .25s ease;}`,
       startCode: `['stack','heap','thread','loop'].forEach((id,i)=>{
   setTimeout(()=>{
     const el=document.getElementById(id);
@@ -26,6 +26,7 @@ const LESSON_JS_CORE_0_2 = {
     el.style.transform='translateY(0)';
     el.style.borderColor='#22d3ee';
     el.style.background='#082f49';
+    el.style.color='#fff';
       },i*420);
 });
 console.log('Runtime model = stack + heap + single thread + event loop');`,
@@ -33,11 +34,11 @@ console.log('Runtime model = stack + heap + single thread + event loop');`,
     },
     {
       type: 'js',
-      instruction: `The call stack is a last-in-first-out (LIFO) structure that tracks active function calls.\n\nWhen your program starts, a "global" frame is pushed onto the stack. Every time a function is called, a new frame is pushed on top. When that function returns (either explicitly or by reaching its end), its frame is popped off and execution resumes wherever it was before the call.\n\nLIFO means the last function called is always the first to return. If a() calls b() which calls c(), then c() returns before b() returns before a() returns.\n\nWatch frames push and pop in the animation below. The most-recently-called function is always at the top.`,
+      instruction: `### The Call Stack: Tracking Execution\n\nThe **call stack** is a "Last-In, First-Out" (LIFO) structure that tracks active function calls.\n\n- **Push**: When a function is called, a new "frame" is added to the top.\n- **Pop**: When a function returns, its frame is removed, and execution resumes in the frame below.\n\nLIFO means the last function called is always the first to finish. If \`a()\` calls \`b()\`, then \`b()\` must finish before \`a()\` can continue.\n\nWatch frames push and pop. The function at the top is the one currently running.`,
       html: `<div class="stackWrap"><div id="stackBox" class="stackBox"></div></div>`,
       css: `.stackWrap{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:flex;align-items:flex-end;justify-content:center;}
 .stackBox{width:70%;height:100%;border:1px dashed #334155;border-radius:10px;padding:8px;display:flex;flex-direction:column-reverse;gap:6px;}
-.frame{padding:8px;border:1px solid #334155;border-radius:8px;background:#111827;color:#e2e8f0;font-family:monospace;font-size:12px;}`,
+.frame{padding:8px;border:1px solid #334155;border-radius:8px;background:#111827;color:#e2e8f0;font-family:monospace;font-size:12px;box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);}`,
       startCode: `const box=document.getElementById('stackBox');
 function push(name){
   const d=document.createElement('div');
@@ -46,127 +47,150 @@ function push(name){
   box.prepend(d);
   return d;
 }
-const f1=push('global()');
+push('global()');
 setTimeout(()=>push('main()'),550);
 setTimeout(()=>push('compute()'),1100);
-setTimeout(()=>{ box.firstChild?.remove(); console.log('return compute()'); },1750);
-setTimeout(()=>{ box.firstChild?.remove(); console.log('return main()'); },2400);
-setTimeout(()=>console.log('stack back to global frame'),3000);`,
+setTimeout(()=>{ box.firstChild?.remove(); console.log('return compute()'); },1900);
+setTimeout(()=>{ box.firstChild?.remove(); console.log('return main()'); },2600);
+setTimeout(()=>console.log('Stack back to global frame'),3200);`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `The heap is a large region of memory where JavaScript stores all objects.\n\nWhen you create an object (like { name: 'Ada', score: 10 }), the engine allocates a chunk of heap memory and stores the object there. Variables do not hold the object directly — they hold a reference (essentially an address) pointing to where the object lives in the heap.\n\nThis is why two variables can point to the same object. In the example below, both "user" and "alias" hold a reference to the same heap location. Mutating through one alias changes the object that the other alias also points to.\n\nRun the demo to see shared-reference mutation in action.`,
+      instruction: `### The Heap: Object Memory\n\nThe **heap** is where JavaScript stores objects, arrays, and functions. \n\nVariables don't hold objects directly — they hold **references** (pointers) to a location in the heap. In the example below, both \`user\` and \`alias\` point to the exact same heap object (#A).\n\n> **The "Aha!" Moment**: Because they share a reference, changing the property via \`alias\` is immediately visible via \`user\`. They aren't copies; they are two names for the same thing.\n\nRun to see shared-reference mutation in action.`,
       html: `<div class="heapView">
   <div id="refs" class="panel"></div>
   <div id="objs" class="panel"></div>
 </div>`,
       css: `.heapView{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#0a1220;padding:14px;border-radius:10px;}
-.panel{border:1px solid #334155;border-radius:10px;padding:8px;color:#cbd5e1;font-family:monospace;font-size:12px;background:#111827;line-height:1.6;}`,
+.panel{border:1px solid #334155;border-radius:10px;padding:12px;color:#cbd5e1;font-family:monospace;font-size:12px;background:#111827;line-height:1.6;}
+.panel::before{content:attr(data-title); display:block; color:#94a3b8; font-size:10px; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;}`,
       startCode: `const user={name:'Ada',score:10};
 const alias=user;
 alias.score=42;
 
-document.getElementById('refs').innerHTML='Stack refs:<br>user -> #A<br>alias -> #A';
-document.getElementById('objs').innerHTML='Heap object #A:<br>{ name: "'+user.name+'", score: '+user.score+' }';
-console.log('Shared reference mutation:', user.score);`,
+const r = document.getElementById('refs');
+const o = document.getElementById('objs');
+r.setAttribute('data-title', 'Stack References');
+o.setAttribute('data-title', 'Heap Objects');
+
+r.innerHTML='user -> #A <br>alias -> #A';
+o.innerHTML='#A: { name: "Ada", score: 42 }';
+console.log('Shared reference mutation: user.score is now', user.score);`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `Primitives and objects behave differently when you assign one variable to another. This difference is the source of many bugs.\n\nFor primitives (numbers, strings, booleans), assignment copies the value itself. Changing one variable has no effect on the other — they each hold an independent copy.\n\nFor objects (arrays, objects, functions), assignment copies the reference — the address pointing into the heap. Both variables now point to the same heap object. Changing a property through one variable changes it for both.\n\nThis is not a quirk — it is how memory works. Primitives are small enough to copy directly; objects are not, so you share a pointer to them.\n\nRun and compare primitive copy versus object aliasing side by side.`,
-      html: `<div class="cmp"><div id="p"></div><div id="o"></div></div>`,
+      instruction: `### Value vs. Reference\n\nPrimitives and objects behave differently when you assign one variable to another:\n\n- **Primitives** (Number, String, Boolean): Assignment **copies the value**. They are independent.\n- **Objects** (Array, Object): Assignment **copies the reference**. They share the same underlying data.\n\nThis is not a quirk — it's about efficiency. Large objects are expensive to copy, so JavaScript shares a pointer instead.\n\nCompare primitive copy vs. object aliasing side-by-side.`,
+      html: `<div class="cmp"><div id="p" class="box"></div><div id="o" class="box"></div></div>`,
       css: `.cmp{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-#p,#o{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;}`,
+.box{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;font-family:monospace;padding:12px;font-size:11px;line-height:1.5;}
+.box::before{content:attr(data-type); display:block; color:#38bdf8; font-size:10px; margin-bottom:8px; font-weight:800;}`,
       startCode: `let a=5; let b=a; b=9;
 const obj1={x:1}; const obj2=obj1; obj2.x=9;
 
-document.getElementById('p').textContent='Primitives: a='+a+', b='+b+' (copied value)';
-document.getElementById('o').textContent='Objects: obj1.x='+obj1.x+', obj2.x='+obj2.x+' (shared ref)';
-console.log('Primitive copy vs object reference.');`,
+const p = document.getElementById('p');
+const o = document.getElementById('o');
+p.setAttribute('data-type', 'PRIMITIVES (Copy)');
+o.setAttribute('data-type', 'OBJECTS (Ref)');
+
+p.innerHTML='let a=5;<br>let b=a;<br>b=9;<br><br>Result:<br>a: 5, b: 9';
+o.innerHTML='obj1={x:1};<br>obj2=obj1;<br>obj2.x=9;<br><br>Result:<br>obj1.x: 9, obj2.x: 9';
+console.log('Primitive copy vs object reference comparison complete.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `JavaScript is single-threaded: only one task can execute at a time on the call stack.\n\nThis is not a limitation to work around — it is a design decision that eliminates a whole class of concurrency bugs. You never have to worry about two pieces of code racing to modify the same variable at the same moment. The thread runs one thing, finishes it, and only then moves to the next.\n\nThis means if you have a long synchronous operation (a large loop, heavy computation), nothing else can run during that time. The thread is occupied. Other tasks — including user events and timers — must wait in a queue until the thread becomes available.\n\nWatch the queue drain one task at a time.`,
+      instruction: `### Single Thread: One Task at a Time\n\nJavaScript is **single-threaded**, meaning it can only execute one line of code at a time on the stack.\n\n- **Benefit**: No race conditions. You don't have to worry about two things changing a variable at once.\n- **Cost**: Long-running synchronous code (like a massive loop) will **block** the thread, making the UI freeze until it finishes.\n\nWatch the queue drain. Tasks must wait for the thread to become idle before they can start.`,
       html: `<div class="lane">
   <div id="thread" class="thread">Thread: idle</div>
   <div id="queue" class="queue"></div>
 </div>`,
       css: `.lane{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;gap:10px;}
-.thread{border:1px solid #334155;border-radius:8px;padding:10px;background:#111827;color:#93c5fd;font-weight:700;}
-.queue{border:1px dashed #334155;border-radius:8px;padding:10px;min-height:90px;color:#cbd5e1;font-family:monospace;font-size:12px;}`,
+.thread{border:1px solid #334155;border-radius:8px;padding:12px;background:#111827;color:#93c5fd;font-weight:800;text-align:center;}
+.queue{border:1px dashed #334155;border-radius:8px;padding:12px;min-height:90px;color:#cbd5e1;font-family:monospace;font-size:12px;display:flex;align-items:center;justify-content:center;}`,
       startCode: `const q=['taskA','taskB','taskC'];
 const thread=document.getElementById('thread');
 const queue=document.getElementById('queue');
-function paint(){ queue.textContent='Queue: '+q.join(' -> '); }
+function paint(){ queue.textContent= q.length ? 'Queue: ' + q.join(' ← ') : 'Queue: empty'; }
 paint();
 let i=0;
 function runOne(){
-  if(i>=q.length){ thread.textContent='Thread: idle'; return; }
-  thread.textContent='Thread: running '+q[i];
-  q.shift(); paint();
-  i++;
-      setTimeout(runOne,700);
+  if(q.length === 0){ thread.textContent='Thread: idle'; thread.style.borderColor='#334155'; return; }
+  const current = q.shift();
+  thread.textContent='Thread: running '+ current;
+  thread.style.borderColor='#10b981';
+  paint();
+  setTimeout(runOne,800);
 }
 runOne();
-console.log('Only one task executes at a time on this thread.');`,
+console.log('Synchronous execution ensures order, but risks blocking.');`,
       outputHeight: 220,
     },
+
     {
       type: 'js',
-      instruction: `Synchronous code runs in a straight line — no waiting, no skipping. The engine executes each statement in order before moving to the next.\n\nWhen you have a large synchronous operation (like a loop that counts to 4 million), the thread is fully occupied for the entire duration. No user interactions, no timer callbacks, no other work can interrupt it. Everything waits.\n\nThis is what "blocking" means: the thread is blocked from doing anything else until the current synchronous work finishes. Heavy synchronous operations in the browser cause the UI to freeze — the page stops responding because the thread cannot process user events while it is occupied.\n\nRun the demo to see synchronous execution block progress step by step.`,
+      instruction: `### Blocking the Thread\n\nSynchronous code runs in a straight line — no waiting, no skipping. The engine executes each statement in order before moving to the next.\n\nWhen you run a massive synchronous task (like a loop that counts to 4 million), the **thread is fully occupied**. No user interaction, no scrolling, and no timers can interrupt it. \n\n> **Definition**: "Blocking" occurs when the thread is stuck on a task, preventing it from doing anything else. In the browser, this causes the page to freeze.\n\nRun the demo to see synchronous execution "block" progress until the final line.`,
       html: `<div class="blk"><div id="log"></div></div>`,
       css: `.blk{height:100%;background:#0a1220;padding:14px;border-radius:10px;}
-#log{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;line-height:1.6;height:100%;}`,
+#log{border:1px solid #334155;border-radius:12px;background:#111827;color:#cbd5e1;font-family:monospace;padding:14px;font-size:12px;line-height:1.7;height:100%; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);}`,
       startCode: `const out=[];
-out.push('1) start');
+out.push('<span style="color:#94a3b8">1) Sync start...</span>');
 for(let i=0;i<4000000;i++){}
-out.push('2) finished heavy sync loop');
-out.push('3) now next line can run');
+out.push('<span style="color:#10b981">2) Finished heavy loop!</span>');
+out.push('<span style="color:#38bdf8">3) Next line runs now.</span>');
 document.getElementById('log').innerHTML=out.join('<br>');
-console.log('Sync loop blocked progress until done.');`,
+console.log('Synchronous loop blocked progress until done.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `The event loop is the mechanism that allows JavaScript to handle callbacks without being multi-threaded.\n\nWhen you schedule a callback (with setTimeout, for example), the callback is not placed directly on the call stack. Instead, when the timer fires (or the event occurs), the callback is placed into a callback queue. The event loop watches the call stack. When the stack is completely empty — meaning all synchronous work has finished — the event loop moves the next callback from the queue onto the stack and it runs.\n\nThis is why setTimeout(fn, 0) still runs after surrounding synchronous code. "0 milliseconds" means "as soon as the stack is clear" — not "immediately interrupting whatever is currently running."\n\nWatch the callback wait in the queue, then get picked up by the event loop when the stack clears.`,
-      html: `<div class="loop"><div id="s"></div><div id="q"></div></div>`,
-      css: `.loop{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#0a1220;padding:14px;border-radius:10px;}
-#s,#q{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;}`,
+      instruction: `### The Event Loop: Callback Traffic Control\n\nThe **Event Loop** is why JavaScript can handle things like "waiting for a click" without needing multiple threads.\n\n1. When you schedule a callback (e.g., \`setTimeout\`), it goes to the **Callback Queue**.\n2. The Event Loop watches the **Call Stack**.\n3. **The Rule**: When the stack is empty, the loop moves the next callback from the queue to the stack.\n\nWatch the callback wait in the queue, then get picked up only after the "stack" clears.`,
+      html: `<div class="loop">
+  <div id="s" class="box" data-title="Call Stack"></div>
+  <div id="q" class="box" data-title="Callback Queue"></div>
+</div>`,
+      css: `.loop{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#0a1220;padding:14px;border-radius:10px;}
+.box{border:1px solid #334155;border-radius:10px;background:#111827;color:#cbd5e1;font-family:monospace;padding:14px;font-size:11px;min-height:100px;}
+.box::before{content:attr(data-title); display:block; color:#94a3b8; font-size:10px; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; font-weight:800;}`,
       startCode: `const s=document.getElementById('s');
 const q=document.getElementById('q');
-s.innerHTML='Stack:<br>global()';
-q.innerHTML='Queue:<br>(empty)';
+s.innerHTML='global() <br><span style="color:#64748b">// Running sync code...</span>';
+q.innerHTML='(empty)';
 
 setTimeout(()=>{
-  q.innerHTML='Queue:<br>timerCallback()';
-      setTimeout(()=>{
-    s.innerHTML='Stack:<br>global()<br>timerCallback()';
-    q.innerHTML='Queue:<br>(empty)';
-    console.log('Callback moved from queue to stack after stack was clear.');
-      },700);
-},700);`,
+  q.innerHTML='<span style="color:#fbbf24">timerCallback()</span>';
+  setTimeout(()=>{
+    s.innerHTML='global()<br><span style="color:#10b981">timerCallback()</span>';
+    q.innerHTML='(empty)';
+    console.log('Callback moved from queue to stack.');
+  },1000);
+},800);`,
       outputHeight: 220,
     },
     {
       type: 'markdown',
-      instruction: `### The Event Loop Rule\n\nThe rule is precise and absolute:\n\n**The engine executes all synchronous stack frames first. Queued callbacks are only moved to the stack when the stack is completely empty.**\n\nThis means:\n- \`setTimeout(fn, 0)\` does not run immediately — it runs *after* all synchronous code in the current execution finishes.\n- User click handlers, fetch callbacks, and timer callbacks all follow the same rule.\n- A callback can only interrupt synchronous code if synchronous code voluntarily yields (which it does not).\n\nMemorise this rule. It explains every "why does this log in this order?" question you will ever have about JavaScript.`,
+      instruction: `### The Golden Rule\n\nThe rule of the event loop is absolute:\n\n> **All synchronous stack frames execute first. Queued callbacks only move to the stack when the stack is completely empty.**\n\nThis means:\n- \`setTimeout(fn, 0)\` doesn't mean "now". It means "as soon as the stack is clear."\n- User clicks and network responses also wait for the stack.\n- JavaScript doesn't interrupt currently running code; it waits for it to finish.`,
     },
     {
       type: 'js',
-      instruction: `Now apply the event loop rule to a real execution order question.\n\nThe code runs three things:\n  1. A synchronous console.log('1) sync start')\n  2. A setTimeout callback — scheduled for "0ms" delay\n  3. Another synchronous console.log('2) sync end')\n\nBefore you run: predict the output order. The timer says 0ms, but that does not mean it runs immediately.\n\nRule: synchronous code runs to completion first. The timer callback is in a queue and can only run after the stack is clear.\n\nRun and verify. The output order should confirm the rule, not contradict it.`,
+      instruction: `### Predicting Execution Order\n\nPredict the output before you run this code. It uses a \`0ms\` timer, but remember the **Golden Rule**.\n\n1. A synchronous log (\`1) sync start\`)\n2. A \`setTimeout\` callback (scheduled for 0ms delay)\n3. A second synchronous log (\`2) sync end\`)\n\nEven though the timer is 0ms, it is a callback. It must wait for the stack to clear.`,
       html: `<div class="ord"><div id="ordLog"></div></div>`,
       css: `.ord{height:100%;background:#0a1220;padding:14px;border-radius:10px;}
-#ordLog{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;line-height:1.6;height:100%;}`,
+#ordLog{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:12px;font-size:12px;line-height:1.7;height:100%;}`,
       startCode: `const lines=[];
-setTimeout(()=>{ lines.push('3) timer callback'); document.getElementById('ordLog').innerHTML=lines.join('<br>'); console.log('timer callback'); },0);
-lines.push('1) sync start');
-lines.push('2) sync end');
-document.getElementById('ordLog').innerHTML=lines.join('<br>');
-console.log('sync done');`,
+const el = document.getElementById('ordLog');
+setTimeout(()=>{ 
+  lines.push('<span style="color:#10b981">3) Timer callback run</span>'); 
+  el.innerHTML=lines.join('<br>'); 
+},0);
+lines.push('1) Sync start');
+lines.push('2) Sync end');
+el.innerHTML=lines.join('<br>');
+console.log('Synchronous sequence finished.');`,
       outputHeight: 220,
     },
+
     {
       type: 'js',
       instruction: `Every function call adds a frame to the stack. Deeply nested calls create a tall stack.\n\nIf a() calls b() which calls c(), the stack contains three frames: global at the bottom, then a(), then b(), then c() at the top. The top frame is the one currently executing. All frames below it are paused, waiting for the function above them to return.\n\nThis nesting is bounded by the call stack size. Most engines allow a few thousand nested frames before throwing a RangeError: Maximum call stack size exceeded — commonly called a stack overflow.\n\nWatch the stack grow as nested calls are added.`,
@@ -232,53 +256,58 @@ const id=setInterval(()=>{
     },
     {
       type: 'js',
-      instruction: `User interaction events do not run immediately when triggered. They follow the same event loop rule as timers.\n\nWhen you click a button, the browser detects the click and places the event handler callback into the queue. The event loop can only move it to the stack when the stack is empty. If synchronous code is running at the moment you click, the handler waits.\n\nThis is why a frozen UI (caused by a blocking sync loop) does not respond to clicks during the freeze — the click handler is in the queue but the thread is occupied and the event loop cannot dispatch it.\n\nClick the button below to trigger an event and observe the two-step process: queue → stack → run.`,
-      html: `<div class="evt"><button id="btn">Click Event</button><div id="out"></div></div>`,
-      css: `.evt{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;gap:10px;align-content:center;}
-button{padding:10px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e2e8f0;cursor:pointer;font-weight:700;}
-#out{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;min-height:64px;font-size:12px;}`,
+      instruction: `### Event Order: Real World\n\nUser interactions like clicks follow the same rule. If the stack is busy, the click handler waits in the queue.\n\nThis is why a "blocking" loop makes a page unresponsive. The browser records your click, but the **Event Loop** can't move the handler to the stack until the loop finishes.\n\n1. Run the cell.\n2. Click the button immediately.\n3. Observe the delay between the "Click" and the "Handler" message.`,
+      html: `<div class="evt"><button id="btn">Click This Button</button><div id="out"></div></div>`,
+      css: `.evt{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;gap:12px;align-content:center;}
+button{padding:12px;border-radius:12px;border:1px solid #334155;background:#111827;color:#e2e8f0;cursor:pointer;font-weight:700; transition: all 0.2s ease;}
+button:hover{border-color: #38bdf8; background: #1e293b;}
+#out{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:12px;min-height:64px;font-size:11px;line-height:1.5;}`,
       startCode: `const out=document.getElementById('out');
 out.textContent='Waiting for click...';
 document.getElementById('btn').onclick=()=>{
-  out.innerHTML='1) click event queued<br>2) stack clear -> handler runs';
-  console.log('Event callback executed via event loop.');
+  out.innerHTML='<span style="color:#fbbf24">1) Click Queued</span><br><span style="color:#10b981">2) Stack Clear -> Handler Run</span>';
+  console.log('Event callback executed.');
 };`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `A timer's delay value is a minimum wait, not an exact execution time.\n\nsetTimeout(fn, 120) means "enqueue fn no sooner than 120ms from now." It does not mean fn will run exactly at 120ms. If the thread is occupied when the timer fires, the callback waits in the queue. Execution only happens when the stack is clear.\n\nThis also means two timers with different delays might complete in delay order, but they still must wait for the stack. The event loop processes them in readiness order once the thread is available.\n\nWatch 'timer 120ms' and 'timer 300ms' in the demo — notice they run after sync end, in delay order.`,
+      instruction: `### Minimum Delay, Not Exact\n\nWhen you call \`setTimeout(fn, 120)\`, it means: "Enqueue this function in **at least** 120ms."\n\nIf the thread is busy at exactly 120ms, the callback waits. It will never run *before* the time, but it might run much *after* if the stack is blocked.\n\nWatch 'Timer 120ms' and 'Timer 300ms' below. Even though they have different delays, they both wait for the synchronous code to finish ("Sync End") before they can even start.`,
       html: `<div class="tm"><div id="tmout"></div></div>`,
       css: `.tm{height:100%;background:#0a1220;padding:14px;border-radius:10px;}
-#tmout{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;line-height:1.6;height:100%;}`,
+#tmout{border:1px solid #334155;border-radius:12px;background:#111827;color:#cbd5e1;font-family:monospace;padding:14px;font-size:12px;line-height:1.7;height:100%;}`,
       startCode: `const out=[];
-function paint(){ document.getElementById('tmout').innerHTML=out.join('<br>'); }
-out.push('sync start'); paint();
-setTimeout(()=>{ out.push('timer 300ms ready -> run'); paint(); },300);
-setTimeout(()=>{ out.push('timer 120ms ready -> run'); paint(); },120);
-out.push('sync end'); paint();`,
+const el = document.getElementById('tmout');
+function paint(){ el.innerHTML=out.join('<br>'); }
+out.push('<span style="color:#94a3b8">Sync Start</span>'); paint();
+setTimeout(()=>{ out.push('<span style="color:#fbbf24">Timer 300ms: Run</span>'); paint(); },300);
+setTimeout(()=>{ out.push('<span style="color:#fbbf24">Timer 120ms: Run</span>'); paint(); },120);
+out.push('<span style="color:#94a3b8">Sync End</span>'); paint();
+console.log('Synchronous sequence finished.');`,
       outputHeight: 220,
     },
     {
       type: 'js',
-      instruction: `Now apply the full model. Before reading further, you should be able to explain any JavaScript execution order question using exactly four terms: stack, heap, thread, event loop.\n\nStack — tracks active function frames; LIFO unwind on return.\nHeap — stores all objects; references in variables point into it.\nSingle thread — one frame executes at a time; sync work blocks all other work.\nEvent loop — moves queued callbacks to the stack when the stack is empty.\n\nIf you cannot explain why a snippet logs in a particular order using only these four terms, rerun the relevant cell and trace through it slowly.\n\nRun the map below to lock in the summary before moving to challenges.`,
+      instruction: `### Master the Model\n\nTo debug effectively, replace phrases like "JavaScript is weird" with these four terms:\n\n- **Stack**: Active call frames (unwinds top-down).\n- **Heap**: Object memory (referenced by variables).\n- **Single Thread**: Only one frame path runs at a time.\n- **Event Loop**: Moves callbacks from queue to stack when clear.\n\nIf you can't explain why a piece of code works using these terms, you don't yet understand it. Every behavior in this course can be traced back to this model.`,
       html: `<div class="map">
-  <div class="node" id="a">Stack = active calls</div>
-  <div class="node" id="b">Heap = objects</div>
-  <div class="node" id="c">Single thread = one active frame path</div>
-  <div class="node" id="d">Event loop = schedules callbacks</div>
+  <div class="node" id="a">STACK (Current Task)</div>
+  <div class="node" id="b">HEAP (Memory)</div>
+  <div class="node" id="c">THREAD (One Path)</div>
+  <div class="node" id="d">EVENT LOOP (Orchestrator)</div>
 </div>`,
-      css: `.map{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;gap:8px;}
-.node{padding:8px;border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-size:12px;transition:all .2s ease;}`,
+      css: `.map{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:grid;grid-template-columns: 1fr 1fr; gap:12px;}
+.node{padding:14px;border:1px solid #334155;border-radius:12px;background:#111827;color:#94a3b8;font-size:11px; font-weight: 700; text-align: center; transition:all 0.3s ease;}`,
       startCode: `['a','b','c','d'].forEach((id,i)=>setTimeout(()=>{
   const el=document.getElementById(id);
-  el.style.borderColor='#22d3ee';
+  el.style.borderColor='#38bdf8';
   el.style.background='#082f49';
-  el.style.color='#e0f2fe';
+  el.style.color='#fff';
+  el.style.transform='scale(1.05)';
 },i*380));
 console.log('Runtime model summary complete.');`,
       outputHeight: 220,
     },
+
     {
       type: 'js',
       instruction: `One more visual before challenges: the predict-before-run pattern.\n\nThis is the study method you should use for every code snippet in this course. Read the code, write your predicted output order, then run to compare.\n\nThe code below logs A synchronously, schedules a timer for C, then logs B synchronously. Apply the event loop rule and predict the order before pressing Run.\n\nExpected order: A → B → C. A and B are synchronous and run in sequence. C is in a timer callback that only runs after the synchronous code finishes and the stack clears.\n\nRun and confirm.`,
@@ -309,19 +338,28 @@ setTimeout(()=>{ s.innerHTML='Stack:<br>global()'; console.log('Simulator step c
     },
     {
       type: 'js',
-      instruction: `This is the complete runtime timeline — all four model components working together in one trace.\n\nRead each step as a causal chain: one thing causes the next. Nothing in this sequence is random. Every line follows directly from the rules you have learned.\n\n1. Objects are created and stored in the heap.\n2. A function is called — its frame is pushed onto the stack.\n3. A setTimeout call schedules a callback — it goes to the queue when the timer fires.\n4. The function returns — its frame is popped off the stack.\n5. The stack is now empty — the event loop checks the queue.\n6. The event loop moves the callback to the stack — the callback runs.\n\nEvery asynchronous program you write follows some version of this sequence.`,
-      html: `<div class="cap"><div id="capOut"></div></div>`,
+      instruction: `### The Complete Runtime Timeline\n\nThis is the complete runtime timeline — all four model components working together in one trace. \n\nRead each step as a **causal chain**: one thing causes the next. Nothing in this sequence is random. Every line follows directly from the rules you have learned:\n\n1. **Heap**: Objects are created and stored in the heap.\n2. **Stack (Push)**: A function is called — its frame is pushed onto the stack.\n3. **Queue**: A \`setTimeout\` call schedules a callback — it goes to the queue when the timer fires.\n4. **Stack (Pop)**: The function returns — its frame is popped off the stack.\n5. **Empty Stack**: The stack is now empty — the event loop checks the queue.\n6. **Execution**: The event loop moves the callback to the stack — the callback runs.\n\nEvery asynchronous program you write follows some version of this sequence.`,
+      html: `<div class="cap"><div id="capOut" class="timeline-box"></div></div>`,
       css: `.cap{height:100%;background:#0a1220;padding:14px;border-radius:10px;}
-#capOut{border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;padding:10px;font-size:12px;line-height:1.6;height:100%;}`,
+.timeline-box{border:1px solid #334155;border-radius:12px;background:#111827;color:#cbd5e1;font-family:monospace;padding:16px;font-size:11px;line-height:1.8;height:100%; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);}`,
       startCode: `const lines=[];
-lines.push('1) create objects in heap');
-lines.push('2) push function on call stack');
-lines.push('3) schedule callback in queue');
-lines.push('4) stack clears');
-lines.push('5) event loop moves callback to stack');
-lines.push('6) callback runs');
-document.getElementById('capOut').innerHTML=lines.join('<br>');
-console.log('Runtime timeline complete.');`,
+const el = document.getElementById('capOut');
+const sequence = [
+  '<span style="color:#94a3b8">1) Heap:</span> Create objects',
+  '<span style="color:#38bdf8">2) Stack:</span> Push main()',
+  '<span style="color:#fbbf24">3) Queue:</span> Timer scheduled',
+  '<span style="color:#38bdf8">4) Stack:</span> main() popped',
+  '<span style="color:#10b981">5) Loop:</span> Transferring callback...',
+  '<span style="color:#10b981">6) Run:</span> Callback executing'
+];
+
+sequence.forEach((text, i) => {
+  setTimeout(() => {
+    lines.push(text);
+    el.innerHTML = lines.join('<br>');
+    console.log('Timeline step:', i + 1);
+  }, i * 600);
+});`,
       outputHeight: 220,
     },
 

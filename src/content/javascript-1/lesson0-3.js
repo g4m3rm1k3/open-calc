@@ -7,193 +7,215 @@ const LESSON_JS_CORE_0_3 = {
   sequential: true,
 
   cells: [
-    // ── 1. The Core Split ──────────────────────────────────────────────────
     {
       type: 'markdown',
-      instruction: `### The Great Divide: Primitives vs. Objects\n\nEvery value in JavaScript falls into one of two categories. How the computer stores them in memory is completely different:\n\n1. **Primitives** (Strings, Numbers, Booleans, null, undefined, Symbol, BigInt)\n2. **Objects** (Objects, Arrays, Functions)\n\n**Primitives are values.** When you move a primitive, you move the actual data.\n**Objects are addresses.** When you move an object, you are moving a pointer to a location in memory.`,
+      instruction: `### The Great Divide: Primitives vs. Objects\n\nEvery value in JavaScript falls into one of two categories. How the computer stores them in memory is completely different:\n\n1. **Primitives**: (Strings, Numbers, Booleans, null, undefined, Symbol, BigInt)\n2. **Objects**: (Objects, Arrays, Functions)\n\n> **The Key Difference**:\n> - **Primitives are values**. When you move a primitive, you move the actual data.\n> - **Objects are addresses**. When you move an object, you are moving a **pointer** to a location in memory.`,
     },
-
-    // ── 2. Primitive Immutability ──────────────────────────────────────────
     {
       type: 'js',
-      instruction: `**Primitives are immutable.** You cannot "change" the number 5 into the number 6. You can only choose a different number.\n\nRun this code. Notice that even though we call a method on the string, the original string remains exactly the same. We can only create *new* strings.`,
+      instruction: `### Primitives are Immutable\n\n**Primitives are immutable.** You cannot "change" the number 5 into the number 6; you can only choose a different number.\n\nRun this code. Notice that even though we call \`.toUpperCase()\` on the string, the original string remains exactly the same. We can only create *new* strings; we cannot edit existing ones.`,
+      html: `<div class="pView">
+  <div class="val" id="orig">Original: ?</div>
+  <div class="val" id="res">Result: ?</div>
+</div>`,
+      css: `.pView{height:100%;background:#0a1120;padding:14px;border-radius:10px;display:grid;gap:10px;}
+.val{padding:12px;border:1px solid #334155;border-radius:8px;background:#111827;color:#cbd5e1;font-family:monospace;font-size:12px;}`,
       startCode: `let name = "alice";
-name.toUpperCase(); // This returns "ALICE" but does NOT change 'name'
-console.log("Original name:", name); 
+let result = name.toUpperCase(); // Returns "ALICE" 
 
-let newName = name.toUpperCase();
-console.log("New name:", newName);`,
-      outputHeight: 120,
+document.getElementById('orig').textContent = 'Original: "' + name + '"';
+document.getElementById('res').textContent = 'Result of method: "' + result + '"';
+console.log("Original name remains unchanged:", name);`,
+      outputHeight: 180,
     },
-
-    // ── 3. Objects are Mutable ──────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `**Objects are mutable.** Unlike primitives, you can reach inside an object and change its properties without creating a new one.\n\nWatch how the same object in memory is being modified directly.`,
+      instruction: `### Objects are Mutable\n\nUnlike primitives, you can reach inside an object and change its properties without creating a new one.\n\nWatch how the same object in memory is being modified directly. We didn't swap the object; we just changed the **data** sitting at that memory address.`,
+      html: `<div class="oView">
+  <div class="row" id="u1">User: ?</div>
+  <div class="row" id="u2">User (after change): ?</div>
+</div>`,
+      css: `.oView{height:100%;background:#0a1120;padding:14px;border-radius:10px;display:grid;gap:10px;}
+.row{padding:12px;border:1px solid #334155;border-radius:8px;background:#111c30;color:#93c5fd;font-family:monospace;font-size:12px;}`,
       startCode: `const user = { name: "Alice" };
-user.name = "Bob"; // We changed a property INSIDE the object
-console.log("User object:", user);
+document.getElementById('u1').textContent = 'Step 1: ' + JSON.stringify(user);
 
-const scores = [10, 20];
-scores.push(30); // We added a value to the same array in memory
-console.log("Scores array:", scores);`,
-      outputHeight: 120,
+user.name = "Bob"; // Mutation!
+document.getElementById('u2').textContent = 'Step 2: ' + JSON.stringify(user);
+
+console.log("Object mutated in-place:", user);`,
+      outputHeight: 180,
     },
-
-    // ── 4. The Memory Model: Stack vs Heap ──────────────────────────────────
     {
       type: 'markdown',
-      instruction: `### Stack vs. Heap\n\nTo understand why they behave differently, we must look at memory:\n\n- **The Stack** is for fast, small items. Primitives live here. They are stored directly in the "execution context."\n- **The Heap** is a large, unstructured pool of memory. Objects live here because they can grow to any size.\n\nWhen you create an object, the **Stack** only holds a small "Reference" (an address like \`0x001\`) that points to the actual data in the **Heap**.`,
+      instruction: `### Stack vs. Heap\n\nTo understand why they behave differently, we must look at where the engine puts them:\n\n- **The Stack**: Fast, fixed-size memory. Primitives live here. They are stored directly.\n- **The Heap**: Large, flexible memory. Objects live here because they can grow to any size.\n\nWhen you create an object, the **Stack** only holds a small **Reference** (an address like \`0x001\`) that points to the actual data in the **Heap**.`,
     },
-
-    // ── 5. Copying Primitives (By Value) ────────────────────────────────────
     {
       type: 'js',
-      instruction: `When you copy a primitive, you are making a **real copy** of the data. Changing one does not affect the other because they live in two different spots on the Stack.`,
+      instruction: `### Copying Primitives (By Value)\n\nWhen you copy a primitive, you are making a **real copy** of the data. Changing one does not affect the other because they live in two different spots on the Stack.`,
+      html: `<div class="stackSim">
+  <div class="slot" id="a">a: 10</div>
+  <div class="slot" id="b">b: 10</div>
+</div>`,
+      css: `.stackSim{height:100%;background:#0a1220;padding:14px;border-radius:10px;display:flex;gap:10px;justify-content:center;align-items:center;}
+.slot{width:80px;height:80px;border:2px solid #334155;border-radius:12px;display:grid;place-items:center;background:#111827;color:#cbd5e1;font-weight:800;transition:all 0.3s ease;}`,
       startCode: `let a = 10;
-let b = a; // 'b' gets its own copy of 10
+let b = a; 
 b = 20;
 
-console.log("a is still:", a);
-console.log("b is now:", b);`,
-      outputHeight: 100,
+setTimeout(() => {
+  const elB = document.getElementById('b');
+  elB.textContent = 'b: 20';
+  elB.style.borderColor = '#38bdf8';
+  elB.style.background = '#0c2035';
+  console.log("a is still 10, b is now 20. Copy successful.");
+}, 800);`,
+      outputHeight: 180,
     },
-
-    // ── 6. Copying Objects (By Reference) ───────────────────────────────────
     {
       type: 'js',
-      instruction: `When you "copy" an object, you are only copying the **Address**. Both variables now point to the exact same spot in the Heap.\n\nThis is why changing \`userB\` also changes \`userA\`. They are two names for the same thing.`,
-      startCode: `const userA = { name: "Alice" };
-const userB = userA; // Both point to the same memory address
-
-userB.name = "Bob";
-
-console.log("userA name:", userA.name);
-console.log("userB name:", userB.name);
-console.log("Are they the same object?", userA === userB);`,
-      outputHeight: 140,
+      instruction: `### Copying Objects (By Reference)\n\nWhen you "copy" an object, you are only copying the **Address**. Both variables now point to the exact same spot in the Heap.\n\nThis is why changing \`userB\` also changes \`userA\`. They are two names for the same thing.`,
+      html: `<div class="refSim">
+  <div class="vars">
+    <div class="v" id="va">userA -> #101</div>
+    <div class="v" id="vb">userB -> #101</div>
+  </div>
+  <div class="heap" id="h101">#101: { name: "Alice" }</div>
+</div>`,
+      css: `.refSim{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:20px;background:#0a1220;padding:20px;border-radius:10px;align-items:center;}
+.v{padding:10px;border:1px solid #334155;border-radius:8px;background:#111827;color:#94a3b8;font-size:11px;margin-bottom:8px;font-family:monospace;}
+.heap{padding:20px;border:2px solid #10b981;border-radius:12px;background:#06201b;color:#10b981;font-family:monospace;font-size:12px;text-align:center;}`,
+      startCode: `setTimeout(() => {
+  const h = document.getElementById('h101');
+  h.textContent = '#101: { name: "Bob" }';
+  h.style.background = '#0c2d22';
+  console.log("Both variables point to #101. Mutation affects both.");
+}, 1000);`,
+      outputHeight: 200,
     },
-
-    // ── 7. Identity vs Equality ─────────────────────────────────────────────
     {
       type: 'markdown',
-      instruction: `### Identity vs. Structural Equality\n\nThis is the #1 source of bugs for new JS developers.\n\n- **Primitives** are compared by **Value**. If the contents match, they are equal.\n- **Objects** are compared by **Identity** (Address). Two objects are only equal if they are the *exact same instance* in memory.`,
+      instruction: `### Identity vs. Structural Equality\n\nThis is the #1 source of bugs for new developers.\n\n- **Primitives** are compared by **Value**. If the contents match, they are equal.\n- **Objects** are compared by **Identity** (Address). Two objects are only equal if they are the *exact same instance* in memory.`,
     },
-
-    // ── 8. Object Comparison Trap ──────────────────────────────────────────
     {
       type: 'js',
-      instruction: `Even if two objects look identical, they are **not equal** if they live at different addresses. Every time you use \`{}\`, you are carving out a *new* spot in the Heap.`,
-      startCode: `console.log("Strings:", "hi" === "hi"); // true (same value)
-console.log("Numbers:", 5 === 5);      // true (same value)
-
-const obj1 = { id: 1 };
+      instruction: `### The Object Comparison Trap\n\nEven if two objects look identical, they are **not equal** if they live at different addresses. Every time you use \`{}\`, you are carving out a **new** spot in the Heap.\n\nRun the cell to see common equality results.`,
+      html: `<div class="eqView" id="ev"></div>`,
+      css: `.eqView{height:100%;background:#0a1220;padding:14px;border-radius:10px;color:#cbd5e1;font-family:monospace;font-size:11px;line-height:1.7;}`,
+      startCode: `const obj1 = { id: 1 };
 const obj2 = { id: 1 };
-
-console.log("Identical objects:", obj1 === obj2); // false! Differend addresses.`,
-      outputHeight: 120,
+const lines = [
+  'Strings: "hi" === "hi" -> ' + ("hi" === "hi"),
+  'Numbers: 5 === 5 -> ' + (5 === 5),
+  'Identical Objects: obj1 === obj2 -> ' + (obj1 === obj2),
+  'Same Reference: obj1 === obj1 -> ' + (obj1 === obj1)
+];
+document.getElementById('ev').innerHTML = lines.join('<br>');
+console.log("Object equality checks identity, not content.");`,
+      outputHeight: 200,
     },
 
-    // ── 9. Challenge: The Reference Trap ────────────────────────────────────
+
     {
       type: 'challenge',
-      instruction: `### Challenge: Don't break the original!\n\nI've given you a \`hero\` object. Create a variable \`sidekick\` that starts with the same data, but fix the sidekick's name to "Robin" **without** changing the hero's name to "Robin".\n\n*Hint: If you just do \`sidekick = hero\`, they will share the same memory!*`,
+      instruction: `### Challenge: The Clone vs. Reference Trap\n\nI've given you a \`hero\` object. Create a variable \`sidekick\` that starts with the same data, but fix the sidekick's name to "Robin" **without** changing the hero's name.\n\n> **Hint**: If you just do \`sidekick = hero\`, they will share the same memory address. You need to create a **new** object.`,
+      html: `<div class="cBox" id="status">Waiting for your code...</div>`,
+      css: `.cBox{height:100%; border:1px solid #334155; border-radius:12px; background:#0a1220; display:grid; place-items:center; color:#94a3b8; font-weight:800;}`,
       startCode: `const hero = { name: "Batman" };
-// 1. Create sidekick as a SEPARATE object with the same name
-const sidekick = { name: hero.name };
 
-// 2. Change sidekick's name
-sidekick.name = "Robin";
+// 1. Create sidekick as a SEPARATE object 
+// 2. Change sidekick's name to "Robin"
+const sidekick = ???;
 
 console.log("Hero:", hero.name);
 console.log("Sidekick:", sidekick.name);`,
       solutionCode: `const hero = { name: "Batman" };
-const sidekick = { ...hero };
-sidekick.name = "Robin";`,
+const sidekick = { name: "Batman" };
+sidekick.name = "Robin";
+document.getElementById('status').textContent = 'Hero is still Batman. Success!';
+document.getElementById('status').style.color = '#10b981';`,
       check: (js, logs) => {
         return logs.some(l => l.msg.includes("Hero: Batman")) && 
                logs.some(l => l.msg.includes("Sidekick: Robin"));
       },
-      successMessage: "Great! You successfully 'cloned' the object instead of just copying the reference.",
+      successMessage: "Great! You created a separate spot in the Heap instead of just copying the address.",
     },
-
-    // ── 10. The 'null' vs 'undefined' Distinction ─────────────────────────────
     {
       type: 'markdown',
-      instruction: `### Empty Values: null vs undefined\n\nBoth represent "nothing," but with different semantic meanings:\n\n- **undefined**: A variable has been declared but has no value yet (The computer's "I don't know").\n- **null**: An intentional absence of value (The programmer's "This is empty").`,
+      instruction: `### Empty Values: null vs. undefined\n\nBoth represent "nothing," but with different semantic meanings:\n\n- **undefined**: A variable has been declared but has no value yet. (JavaScript's default "nothing").\n- **null**: An intentional absence of value. (The programmer's "this is empty on purpose").`,
     },
-
-    // ── 11. Visualizing undefined ────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `JavaScript gives you \`undefined\` automatically for things that don't exist yet.`,
+      instruction: `### Visualizing undefined\n\nJavaScript gives you \`undefined\` automatically for things that don't exist yet: declared variables without values, missing properties, or missing arguments.`,
+      html: `<div class="uView" id="uv"></div>`,
+      css: `.uView{height:100%; background:#0a1220; padding:14px; border-radius:10px; color:#cbd5e1; font-family:monospace; line-height:1.7;}`,
       startCode: `let x;
-console.log("Declared but not set:", x);
-
 const obj = { a: 1 };
-console.log("Missing property:", obj.b);
-
-function test(y) { console.log("Missing argument:", y); }
-test();`,
-      outputHeight: 140,
+const lines = [
+  'Variable with no value: ' + x,
+  'Missing property obj.b: ' + obj.b
+];
+document.getElementById('uv').innerHTML = lines.join('<br>');
+console.log("undefined is the engine's way of saying 'not found'.");`,
+      outputHeight: 180,
     },
-
-    // ── 12. Visualizing null ─────────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `You use \`null\` when you want to explicitly say "this value is gone" or "this has no owner."`,
+      instruction: `### Visualizing null\n\nYou use \`null\` when you want to explicitly say "this value is gone" or "this has no owner." It is a deliberate signal from you to other developers.`,
+      html: `<div class="nView" id="nv">Current User: null</div>`,
+      css: `.nView{height:100%; border:1px dashed #334155; border-radius:12px; background:#0a1220; color:#94a3b8; display:grid; place-items:center;}`,
       startCode: `let currentUser = { name: "Alice" };
 // User logs out...
 currentUser = null; 
 
-console.log("Value is now intentionally empty:", currentUser);`,
-      outputHeight: 100,
+document.getElementById('nv').textContent = 'Current User: ' + currentUser;
+console.log("null is your way of saying 'intentionally empty'.");`,
+      outputHeight: 180,
     },
-
-    // ── 13. Type Checking with 'typeof' ──────────────────────────────────────
     {
       type: 'markdown',
       instruction: `### The 'typeof' Operator\n\nYou can ask JavaScript what type a value is. But be careful—there are some famous historical bugs in this tool!`,
     },
-
-    // ── 14. typeof demonstration ─────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `Try these different values. Notice the weird result for \`null\`—this is a bug in JavaScript from 1995 that can never be fixed because it would break the internet!`,
-      startCode: `console.log(typeof 42);
-console.log(typeof "hello");
-console.log(typeof true);
-console.log(typeof { a: 1 });
-console.log(typeof [1, 2]); // Arrays are objects!
-console.log(typeof null);    // "object" (The 30-year-old bug)
-console.log(typeof undefined);`,
+      instruction: `### Measuring Types\n\nTry these different values. Notice the weird result for \`null\` — **this is a bug in JavaScript from 1995** that can never be fixed because it would break the internet!\n\n> **Historical Note**: In early JS, values were stored in 32-bit units. The type "object" used a tag of \`000\`. Since \`null\` was represented as all zeros, \`typeof null\` returned \`"object"\`.`,
+      html: `<div class="tView" id="tv"></div>`,
+      css: `.tView{height:100%; background:#0a1220; padding:14px; border-radius:10px; color:#38bdf8; font-family:monospace; font-size:11px; line-height:1.7;}`,
+      startCode: `const types = [
+  '42 is: ' + typeof 42,
+  '"hi" is: ' + typeof "hi",
+  'true is: ' + typeof true,
+  'null is: ' + typeof null + ' (THE BUG!)',
+  'undefined is: ' + typeof undefined
+];
+document.getElementById('tv').innerHTML = types.join('<br>');
+console.log("typeof is helpful but imperfect.");`,
+      outputHeight: 180,
+    },
+    {
+      type: 'markdown',
+      instruction: `### Does 'const' mean "Locked"?\n\nThis is the most common point of confusion. \`const\` does **not** make a value immutable. It only prevents you from **reassigning** the variable to a different address.\n\n- If \`const\` points to a **Primitive**, it's effectively locked.\n- If \`const\` points to an **Object**, you can still change the contents of that object!`,
+    },
+    {
+      type: 'js',
+      instruction: `### Mutability vs Reassignment\n\nWatch how we can modify the array inside the object even though it's a \`const\`. The "binding" is locked, but the "data" in the heap is not. We only get an error when we try to swap the whole object for a new one.`,
+      html: `<div class="cBox" id="cStatus">Running Bag Demo...</div>`,
+      css: `.cBox{height:100%; border:1px solid #334155; border-radius:12px; background:#0a1220; padding:14px; color:#cbd5e1; font-family:monospace; font-size:11px;}`,
+      startCode: `const bag = { items: ["apple"] };
+const s = document.getElementById('cStatus');
+bag.items.push("orange");
+
+s.innerHTML = 'Bag Items: ' + bag.items.join(', ');
+
+try {
+  bag = { items: ["banana"] };
+} catch(e) {
+  s.innerHTML += '<br><br><span style="color:#ef4444">ERROR: ' + e.message + '</span>';
+  console.log("Reassignment failed as expected.");
+}`,
       outputHeight: 180,
     },
 
-    // ── 15. The 'const' Misconception ─────────────────────────────────────────
-    {
-      type: 'markdown',
-      instruction: `### Does 'const' mean unchangeable?\n\nThis is the most common point of confusion. \`const\` does **not** make a value immutable. It only prevents you from **reassigning** the variable to a different address.\n\n- If \`const\` points to a **Primitive**, it's effectively locked.\n- If \`const\` points to an **Object**, you can still change the contents of that object!`,
-    },
-
-    // ── 16. const + objects ──────────────────────────────────────────────────
-    {
-      type: 'js',
-      instruction: `Watch how we can modify the object even though it's a \`const\`. The "binding" is locked, but the "data" in the heap is not.`,
-      startCode: `const bag = { items: ["apple"] };
-
-// This is ALLOWED (modifying the heap)
-bag.items.push("orange");
-console.log("Bag contents changed:", bag.items);
-
-try {
-  // This is FORBIDDEN (trying to change the address on the stack)
-  bag = { items: ["banana"] };
-} catch(e) {
-  console.error("Error:", e.message);
-}`,
-      outputHeight: 160,
-    },
 
     // ── 17. The Visual Memory Model ──────────────────────────────────────────
     {

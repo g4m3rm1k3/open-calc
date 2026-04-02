@@ -69,7 +69,7 @@ const LESSON_JS_CORE_0_0 = {
     // ── 1. HTML tab demo ─────────────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `Press Run.\n\nThe HTML tab activates and code starts typing into the editor. Watch the preview on the right: as soon as the code is complete, the page structure appears.\n\nHTML is the skeleton of every web page. It defines elements — headings, paragraphs, buttons — without any styling or behavior. The rendered result looks bare because HTML only answers one question: what is on the page?\n\nEvery element you will ever interact with in a browser starts as an HTML tag like the ones you see typing out now.`,
+      instruction: `### HTML: The Skeleton\n\nPress **Run**.\n\nThe HTML tab activates and code starts typing into the editor. Watch the preview on the right: as soon as the code is complete, the page structure appears.\n\nHTML is the skeleton of every web page. It defines elements — headings, paragraphs, buttons — without any styling or behavior. The rendered result looks bare because HTML only answers one question: **what is on the page?**\n\nEvery element you will ever interact with in a browser starts as an HTML tag like the ones you see typing out now.`,
       html: STUDIO_HTML,
       css: STUDIO_CSS,
       startCode: `var pre = document.getElementById('cd');
@@ -124,7 +124,7 @@ function startTyping() {
     // ── 2. CSS tab demo ──────────────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `Press Run.\n\nWatch the HTML tab mark itself as done and the CSS tab activate. The same structural elements from the previous step now receive style.\n\nCSS answers a different question: how should each element look? It targets elements by tag name or class, then assigns visual rules — color, spacing, shape, shadow. The page you are looking at right now is HTML dressed in CSS.\n\nThe preview shows the transformation: the bare elements from the HTML step become a composed, styled card. Nothing structural changed — only the presentation layer was added.`,
+      instruction: `### CSS: The Presentation Layer\n\nPress **Run**.\n\nWatch the HTML tab mark itself as done and the CSS tab activate. The same structural elements from the previous step now receive style.\n\n**CSS** answers a different question: **how should each element look?** It targets elements by tag name or class, then assigns visual rules — color, spacing, shape, shadow. The page you are looking at right now is HTML dressed in CSS.\n\nThe preview shows the transformation: the bare elements from the HTML step become a composed, styled card. Nothing structural changed — only the presentation layer was added.`,
       html: STUDIO_HTML,
       css: STUDIO_CSS,
       startCode: `var pre = document.getElementById('cd');
@@ -195,7 +195,7 @@ function startTyping() {
     // ── 3. JS tab demo ───────────────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `Press Run.\n\nHTML and CSS tabs mark themselves done. The JS tab activates and JavaScript code types in. After the typing completes, the preview becomes interactive.\n\nClick the button in the preview — it responds. That response is JavaScript. It listens for events (your click), reads the current state (how many times you have clicked), and updates the page (changes the button text and fills the progress bar).\n\nThis is the full picture: HTML is the structure, CSS is the appearance, JavaScript is what makes the page alive and responsive. Every interactive element on the web is these three layers working together.`,
+      instruction: `### JavaScript: The Behavior\n\nPress **Run**.\n\nHTML and CSS tabs mark themselves done. The JS tab activates and JavaScript code types in. After the typing completes, the preview becomes interactive.\n\n**Click the button in the preview** — it responds. That response is JavaScript. It listens for events (your click), reads the current state (how many times you have clicked), and updates the page (changes the button text and fills the progress bar).\n\nThis is the full picture:\n- **HTML** is the structure\n- **CSS** is the appearance\n- **JavaScript** is what makes the page alive and responsive. \n\nEvery interactive element on the web is these three layers working together.`,
       html: STUDIO_HTML,
       css: STUDIO_CSS,
       startCode: `var pre = document.getElementById('cd');
