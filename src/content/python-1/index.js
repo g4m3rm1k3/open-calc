@@ -13,6 +13,7 @@ import lesson12 from './lesson12.js'
 import lesson13 from './lesson13.js'
 import lesson14 from './lesson14.js'
 import lesson15 from './lesson15.js'
+import lesson16 from './lesson16.js'
 
 export default [
   {
@@ -49,6 +50,6 @@ export default [
     number: 0.6,
     title: 'Data Structures',
     course: 'python-1',
-    lessons: [lesson15]
+    lessons: [lesson15, lesson16]
   }
 ]
