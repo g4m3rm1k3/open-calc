@@ -255,6 +255,78 @@ export default {
               output: '', status: 'idle', figureJson: null,
             },
 
+            {
+              id: 26,
+              cellTitle: 'Type checking — isinstance() and type() is',
+              prose: '`isinstance(x, list)` returns `True` if `x` is a list or a subclass of list — preferred because it handles inheritance. `type(x) is list` is strict: only `True` for exact list type. Use `isinstance` in general code.',
+              code: 'print(isinstance([1, 2], list))    # True\nprint(isinstance((1, 2), list))   # False — tuple\nprint(type([1, 2]) is list)        # True\nprint(type([1, 2]) == list)        # also True\n\n# Practical guard:\ndef process(data):\n    if not isinstance(data, list):\n        raise TypeError(f"Expected list, got {type(data).__name__}")\n    return sum(data)\n\nprint(process([1, 2, 3]))',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 27,
+              cellTitle: 'Mutating a list while iterating — the danger and the fix',
+              prose: 'Removing or inserting items while a `for` loop iterates a list causes skipped or repeated elements — Python advances the index regardless of removals. Always iterate over a **copy** when you need to mutate.',
+              instructions: 'The broken version silently skips items. The fix iterates a copy.',
+              code: '# Broken — skips items\nnums = [1, 2, 3, 4, 5]\nfor n in nums:\n    if n % 2 == 0:\n        nums.remove(n)   # shifts everything left — next item skipped\nprint("broken:", nums)   # [1, 3, 5] — looks right but only by accident\n\n# Safe — iterate a copy\nnums = [1, 2, 2, 3, 4, 4, 5]\nfor n in nums[:]:        # nums[:] is a shallow copy\n    if n % 2 == 0:\n        nums.remove(n)\nprint("safe:  ", nums)',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 28,
+              cellTitle: 'Slice assignment — replace a range of items',
+              prose: 'You can assign to a slice: `lst[1:3] = [10, 20, 30]` replaces items at indices 1 and 2 with three new items. The replacement can be a different length — the list grows or shrinks accordingly.',
+              code: 'lst = [0, 1, 2, 3, 4]\nlst[1:3] = [10, 20, 30]   # replace 2 items with 3\nprint(lst)                # [0, 10, 20, 30, 3, 4]\n\nlst[1:4] = []             # delete a slice\nprint(lst)                # [0, 3, 4]',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 29,
+              cellTitle: 'is vs == — identity vs equality',
+              prose: '`==` compares values: two lists are equal if they have the same elements in the same order. `is` tests identity: whether two names point to the exact same object in memory. Two lists can be `==` but not `is`.',
+              code: 'a = [1, 2, 3]\nb = [1, 2, 3]\nc = a\n\nprint(a == b)    # True  — same values\nprint(a is b)    # False — different objects\nprint(a is c)    # True  — c is an alias for a\nprint(id(a), id(b), id(c))',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 30,
+              cellTitle: 'map() — apply a function to every element',
+              prose: '`map(func, iterable)` returns an iterator that applies `func` to each item. Wrap in `list()` to materialise. It is lazy — no computation until you consume it. Equivalent to a list comprehension `[func(x) for x in iterable]`.',
+              code: 'nums = [1, 4, 9, 16, 25]\n\n# map with a built-in\nroots = list(map(abs, [-1, -4, 9, -16]))\nprint(roots)   # [1, 4, 9, 16]\n\n# map with a lambda\ndoubled = list(map(lambda x: x * 2, nums))\nprint(doubled)',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 31,
+              cellTitle: 'filter() — keep only elements that pass a test',
+              prose: '`filter(func, iterable)` returns an iterator of elements where `func(element)` is truthy. Pass `None` as the function to filter out falsy values. Like `map()`, it is lazy.',
+              code: 'nums = [0, -3, 5, -1, 8, 0, 2]\n\npositives = list(filter(lambda x: x > 0, nums))\nprint(positives)           # [5, 8, 2]\n\n# filter(None, ...) removes falsy values\ntruthy_only = list(filter(None, [0, 1, "", "hi", False, True, [], [1]]))\nprint(truthy_only)         # [1, "hi", True, [1]]',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 32,
+              cellTitle: 'lambda as sort key',
+              prose: 'For complex sort criteria, pass a `lambda` as the `key=` argument. Sort a list of pairs by second element, sort strings by last character, sort objects by any attribute.',
+              code: 'pairs = [(1, 5), (3, 1), (2, 8), (4, 3)]\n\n# sort by second element of each tuple\nby_second = sorted(pairs, key=lambda p: p[1])\nprint(by_second)   # [(3,1),(4,3),(1,5),(2,8)]\n\n# sort words by their last character\nwords = ["banana", "cherry", "apple", "date"]\nprint(sorted(words, key=lambda w: w[-1]))',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 33,
+              cellTitle: 'List comprehensions — full syntax',
+              prose: 'The full comprehension syntax: `[expr for item in iterable if condition]`. The `if` filter is optional. Comprehensions are faster than equivalent `for` + `.append()` loops and considered more Pythonic.',
+              code: '# With filter\nevens_sq = [x**2 for x in range(10) if x % 2 == 0]\nprint(evens_sq)      # [0, 4, 16, 36, 64]\n\n# Nested comprehension — flatten a matrix\nmatrix = [[1,2,3],[4,5,6],[7,8,9]]\nflat = [x for row in matrix for x in row]\nprint(flat)          # [1,2,3,4,5,6,7,8,9]\n\n# Conditional expression inside comprehension\nclipped = [x if x <= 5 else 5 for x in [1, 3, 5, 7, 9]]\nprint(clipped)       # [1, 3, 5, 5, 5]',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 34,
+              cellTitle: '* unpacking in function calls and assignments',
+              prose: '`*lst` unpacks a list into positional arguments: `print(*["a","b","c"])` calls `print("a","b","c")`. In assignments, `*` captures multiple values. Two lists can be merged into a new list with `[*a, *b]`.',
+              code: 'a = [1, 2, 3]\nb = [4, 5, 6]\n\nprint(*a)              # 1 2 3  (unpacked as args)\n\ncombined = [*a, *b]    # [1,2,3,4,5,6] — cleaner than a + b\nprint(combined)\n\nfirst, *rest, last = [10, 20, 30, 40, 50]\nprint(first, rest, last)',
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 35,
+              cellTitle: 'Practical patterns — deduplication, grouping, transposing',
+              prose: 'Three high-value idioms:\n1. Deduplicate while preserving order: `list(dict.fromkeys(lst))`\n2. Transpose a matrix: `list(zip(*matrix))`\n3. Partition into two lists with a condition — use two comprehensions.',
+              code: '# Deduplicate preserving order (faster than "not in" check)\ndupes = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]\nprint(list(dict.fromkeys(dupes)))   # [3,1,4,5,9,2,6]\n\n# Transpose a matrix\nmatrix = [[1,2,3],[4,5,6],[7,8,9]]\ntransposed = [list(row) for row in zip(*matrix)]\nprint(transposed)   # [[1,4,7],[2,5,8],[3,6,9]]\n\n# Partition\nnums = range(-5, 6)\nneg = [x for x in nums if x < 0]\npos = [x for x in nums if x >= 0]\nprint(neg, pos)',
+              output: '', status: 'idle', figureJson: null,
+            },
+
             // ── Challenges ────────────────────────────────────────────────────
             {
               id: 21,
