@@ -22,6 +22,7 @@ import geo6 from './geometry-6/index.js'
 import web1 from './web-1/index.js'
 import linearAlgebra1 from './linear-algebra/index.js'
 import python1 from './python-1/index.js'
+import dataScience1 from './data-science/index.js'
 import javascriptCore1 from './javascript-1/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
@@ -32,6 +33,7 @@ const GEOMETRY_CURRICULUM = [geo1, geo2, geo3, geo4, geo5, geo6].map(ch => ({ ..
 const WEB_CURRICULUM = web1.map(ch => ({ ...ch, course: 'web-1' }))
 const LA_CURRICULUM = linearAlgebra1.map(ch => ({ ...ch, course: 'linear-algebra' }))
 const PYTHON_CURRICULUM = python1.map(ch => ({ ...ch, course: 'python-1' }))
+const DATA_SCIENCE_CURRICULUM = dataScience1.map(ch => ({ ...ch, course: 'data-science-1' }))
 const JAVASCRIPT_CORE_CURRICULUM = javascriptCore1.map(ch => ({ ...ch, course: 'javascript-core' }))
 
 export const CURRICULUM = [
@@ -43,6 +45,7 @@ export const CURRICULUM = [
   ...WEB_CURRICULUM, 
   ...LA_CURRICULUM,
   ...PYTHON_CURRICULUM,
+  ...DATA_SCIENCE_CURRICULUM,
   ...JAVASCRIPT_CORE_CURRICULUM
 ]
 

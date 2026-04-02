@@ -247,9 +247,9 @@ async function getPyodide() {
     // 4. Pre-load only strictly necessary heavy packages
     // Small ones like micropip are core and don't need explicit loadPackage usually,
     // but we can ensure they are ready.
-    await py.loadPackage(['numpy']);
+    await py.loadPackage(['numpy', 'pandas', 'matplotlib', 'scikit-learn', 'scipy']);
     
-    await py.runPythonAsync('from opencalc import Figure; print("opencalc ready")');
+    await py.runPythonAsync('from opencalc import Figure; print("Python stack ready")');
     return py;
   })();
 

@@ -50,10 +50,17 @@ export const COURSES = [
   },
   { 
     key: 'python-1',  
-    label: 'Python & Data Science',   
+    label: 'Python Programming',   
     path: '/chapter/0.1', 
-    desc: 'Compute, Visualise & Analyze',
+    desc: 'Core Language & Logic',
     color: 'amber'
+  },
+  { 
+    key: 'data-science-1',  
+    label: 'Data Science',   
+    path: '/chapter/ds1.1', 
+    desc: 'NumPy, Pandas & ML Foundations',
+    color: 'sky'
   },
   {
     key: 'javascript-core',
