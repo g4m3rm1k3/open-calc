@@ -218,10 +218,10 @@ btn.onclick = function() {
 function hlJS(raw) {
   var e = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return e
-    .replace(/\b(const|let|var|function|return|if|else)\b/g,'<span style="color:#c084fc">$1</span>')
-    .replace(/\b(document|Math)\b/g,'<span style="color:#60a5fa">$1</span>')
-    .replace(/'([^']*)'/g,"'<span style=\"color:#4ade80\">$1</span>'")
-    .replace(/\b(\d+)\b/g,'<span style="color:#fb923c">$1</span>');
+    .replace(/\\b(const|let|var|function|return|if|else)\\b/g,'<span style="color:#c084fc">$1</span>')
+    .replace(/\\b(document|Math)\\b/g,'<span style="color:#60a5fa">$1</span>')
+    .replace(/'([^']*)'/g,"'<span style=\\\"color:#4ade80\\\">$1</span>'")
+    .replace(/\\b(\\d+)\\b/g,'<span style="color:#fb923c">$1</span>');
 }
 
 function startTyping() {
