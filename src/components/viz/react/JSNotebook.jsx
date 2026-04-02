@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
+import ReactMarkdown from "react-markdown";
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const T = {
@@ -91,25 +92,34 @@ ${escapedJs}
 </html>`;
 }
 
-// ── Render inline-code spans in instruction text ──────────────────────────────
+// ── Render markdown instruction text ──────────────────────────────────────────
 function InstructionText({ text }) {
   if (!text) return null;
   return (
-    <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
-      {text.split("\n").map((line, i) => {
-        const parts = line.split(/(`[^`]+`)/g);
-        return (
-          <p key={i} style={{ margin: i === 0 ? 0 : "8px 0 0" }}>
-            {parts.map((part, j) =>
-              part.startsWith("`") ? (
-                <code key={j} style={{ fontFamily: "monospace", background: "#0c1222", color: T.accent, padding: "1px 6px", borderRadius: 4, fontSize: 12 }}>
-                  {part.slice(1, -1)}
-                </code>
-              ) : part
-            )}
-          </p>
-        );
-      })}
+    <div className="prose prose-invert max-w-none" style={{ 
+      fontSize: 14, 
+      lineHeight: 1.8, 
+      color: T.text 
+    }}>
+      <ReactMarkdown
+        components={{
+          h1: ({node, ...props}) => <h1 style={{fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem', color: T.accent}} {...props}/>,
+          h2: ({node, ...props}) => <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem', color: T.accent}} {...props}/>,
+          h3: ({node, ...props}) => <h3 style={{fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem', color: T.accent}} {...props}/>,
+          p: ({node, ...props}) => <p style={{marginBottom: '1rem'}} {...props}/>,
+          ul: ({node, ...props}) => <ul style={{listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '1rem'}} {...props}/>,
+          li: ({node, ...props}) => <li style={{marginBottom: '0.25rem'}} {...props}/>,
+          code: ({node, inline, ...props}) => 
+            inline ? (
+              <code style={{ fontFamily: "monospace", background: "#0c1222", color: T.accent, padding: "2px 6px", borderRadius: 4, fontSize: 12 }} {...props} />
+            ) : (
+              <code style={{ display: 'block', padding: '12px', background: '#080c14', borderRadius: 8, margin: '12px 0' }} {...props} />
+            ),
+          strong: ({node, ...props}) => <strong style={{color: T.accent, fontWeight: 700}} {...props}/>
+        }}
+      >
+        {text}
+      </ReactMarkdown>
     </div>
   );
 }

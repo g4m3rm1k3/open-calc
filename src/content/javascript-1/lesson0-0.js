@@ -48,6 +48,24 @@ const LESSON_JS_CORE_0_0 = {
       instruction: `### Welcome to your interactive learning environment\n\nBefore writing any JavaScript, you need to understand the tool. Every interactive cell in this course is a live coding environment built from three layers:\n\n- **HTML** — defines the structure of what appears on screen\n- **CSS** — controls how that structure looks\n- **JavaScript** — makes it respond to interaction\n\nThe next three cells demonstrate each layer by building a live page from nothing. **Press Run on each cell** and watch the notebook type code and render it in real time.\n\nYou are not writing any code yet. You are learning to read the instrument.`,
     },
 
+    // ── 0.5. UI Orientation ──────────────────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Anatomy of a Notebook Cell\n\nEvery interactive cell in this course has the same structure:\n\n- **Editor tabs (HTML / CSS / JS)** — each tab holds one layer of the page. The JS tab is where most of your work happens. You can switch between tabs to read or edit any layer.\n\n- **Run** — executes the cell. The preview updates and the console below streams any \`console.log\` output. You will press this after every edit.\n\n- **Reset** — restores the editor to the original starter code. Use this when you want to start over.\n\n- **Challenge cells** look different: a purple header, a prompt above the editor, and a green/red result banner after you press Run. Challenges are gated — they appear only after the lesson slides that teach the concept being tested.\n\n- **Sequential locking** — cells unlock in order. You cannot skip ahead. Each cell builds on the one before it.`,
+    },
+
+    // ── 0.6. The Console ─────────────────────────────────────────────────────
+    {
+      type: "markdown",
+      instruction: `### The Console: Your Feedback Loop\n\nIn professional development, we spend as much time looking at the **Console** as we do looking at the screen. The console is a direct communication line from your code to you.\n\nWhile the **Preview** window shows you visual results (HTML/CSS), the **Console** shows you what is happening inside the computer's logic. We use \`console.log()\` to "print" values so we can see data in motion.\n\n**Try it**: In the next cell, press **Run**. Notice how the Console automatically slides open to show you the output, while the Preview window stays hidden because there is no visual code to display.`
+    },
+    {
+      type: "js",
+      instruction: `### The Console in Action\n\nEvery professional developer uses the console to debug and inspect data. This is our primary way of "seeing" what the computer is thinking when there is no user interface yet.\n\nPress **Run** to execute the code. You will see three different messages appear in the console below. Notice that:\n\n1.  **Multiple values** can be logged in one line.\n2.  **Logic results** (like \`1 + 1\`) evaluate before being printed.\n3.  **The Window stays hidden** if there is no HTML or CSS.\n\nExperiment: try changing the numbers or text, then press Run again.`,
+      startCode: `// This is a comment. The computer ignores it.\n// The line below tells the computer to send a message to the Console.\n\nconsole.log("Hello from the Console!");\nconsole.log("1 + 1 =", 1 + 1);\nconsole.log("The Console is where we debug our logic.");`,
+      showPreviewByDefault: false
+    },
+
     // ── 1. HTML tab demo ─────────────────────────────────────────────────────
     {
       type: 'js',
