@@ -1,28 +1,19 @@
 import { Link } from 'react-router-dom'
-import { CURRICULUM } from '../content/index.js'
+import { CURRICULUM, COURSES } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
 
-const CHAPTER_GRADIENTS = {
-  0: 'from-slate-500 to-slate-600',
-  1: 'from-blue-500 to-blue-700',
-  2: 'from-emerald-500 to-emerald-700',
-  3: 'from-purple-500 to-purple-700',
-  4: 'from-orange-500 to-orange-700',
-  5: 'from-rose-500 to-rose-700',
-  6: 'from-cyan-500 to-cyan-700',
-  p0: 'from-slate-500 to-slate-600',
-  p1: 'from-red-500 to-red-700',
-  p2: 'from-orange-500 to-orange-700',
-  p3: 'from-yellow-500 to-yellow-700',
-  p4: 'from-teal-500 to-teal-700',
-  p5: 'from-blue-500 to-blue-700',
-  p6: 'from-fuchsia-500 to-fuchsia-700',
-  'geometry-1': 'from-indigo-500 to-indigo-700',
-  'geometry-2': 'from-blue-500 to-blue-700',
-  'geometry-3': 'from-emerald-500 to-emerald-700',
-  'geometry-4': 'from-purple-500 to-purple-700',
-  'geometry-5': 'from-orange-500 to-orange-700',
-  'geometry-6': 'from-rose-500 to-rose-700',
+const COURSE_GRADIENTS = {
+  indigo:  'from-indigo-500 to-indigo-700',
+  blue:    'from-blue-500 to-blue-700',
+  emerald: 'from-emerald-500 to-emerald-700',
+  red:     'from-red-500 to-red-700',
+  purple:  'from-purple-500 to-purple-700',
+  orange:  'from-orange-500 to-orange-700',
+  teal:    'from-teal-500 to-teal-700',
+  amber:   'from-amber-500 to-amber-700',
+  sky:     'from-sky-500 to-sky-700',
+  cyan:    'from-cyan-500 to-cyan-700',
+  rose:    'from-rose-500 to-rose-700',
 }
 
 export default function HomePage() {
@@ -87,58 +78,45 @@ export default function HomePage() {
       {/* Curriculum */}
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Curriculum</h2>
-        <div className="space-y-6">
-          {CURRICULUM.map((chapter) => {
-            const grad = CHAPTER_GRADIENTS[chapter.number] ?? CHAPTER_GRADIENTS[0]
-            const chLessonsCompleted = chapter.lessons.filter(
-              (l) => getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete'
-            ).length
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {COURSES.map((course) => {
+            const chapters = CURRICULUM.filter(c => c.course === course.key)
+            if (chapters.length === 0) return null
+            const courseTotalLessons = chapters.reduce((s, c) => s + c.lessons.length, 0)
+            const courseCompleted = chapters.reduce((s, c) =>
+              s + c.lessons.filter(l => getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete').length
+            , 0)
+            const grad = COURSE_GRADIENTS[course.color] ?? 'from-slate-500 to-slate-600'
+            const pct = courseTotalLessons > 0 ? courseCompleted / courseTotalLessons : 0
             return (
-              <div key={chapter.id} className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <Link
-                  to={`/chapter/${chapter.number}`}
-                  className={`block bg-gradient-to-r ${grad} p-5 text-white hover:opacity-95 transition-opacity`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm opacity-75 font-medium mb-0.5">Chapter {chapter.number}</p>
-                      <h3 className="text-xl font-bold">{chapter.title}</h3>
-                    </div>
-                    {chapter.comingSoon ? (
-                      <span className="px-2 py-1 bg-white/20 rounded-full text-xs">Coming soon</span>
-                    ) : (
-                      <span className="text-sm opacity-75">{chLessonsCompleted}/{chapter.lessons.length} done</span>
+              <Link
+                key={course.key}
+                to={course.path}
+                className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all group"
+              >
+                <div className={`bg-gradient-to-r ${grad} p-5 text-white`}>
+                  <h3 className="text-xl font-bold mb-0.5">{course.label}</h3>
+                  <p className="text-sm opacity-80">{course.desc}</p>
+                </div>
+                <div className="p-4 bg-white dark:bg-slate-900">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-slate-500 dark:text-slate-400">
+                      {chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'} · {courseTotalLessons} lessons
+                    </span>
+                    {courseCompleted > 0 && (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium text-xs">
+                        {courseCompleted}/{courseTotalLessons} done
+                      </span>
                     )}
                   </div>
-                  <p className="text-sm opacity-80 mt-2 leading-relaxed">{chapter.description}</p>
-                </Link>
-
-                {!chapter.comingSoon && chapter.lessons.length > 0 && (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {chapter.lessons.map((lesson, i) => {
-                      const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
-                      return (
-                        <Link
-                          key={lesson.id}
-                          to={`/chapter/${chapter.number}/${lesson.slug}`}
-                          className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                        >
-                          <span className="text-slate-400 dark:text-slate-500 text-sm font-mono w-5 text-right">{i + 1}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-slate-800 dark:text-slate-200 text-sm">{lesson.title}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{lesson.subtitle}</p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {status === 'complete' && <span className="text-emerald-500 text-xs font-medium">✓ Done</span>}
-                            {status === 'in-progress' && <span className="text-amber-500 text-xs font-medium">In progress</span>}
-                            <span className="text-slate-300 dark:text-slate-600">→</span>
-                          </div>
-                        </Link>
-                      )
-                    })}
+                  <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-brand-500 transition-all"
+                      style={{ width: `${pct > 0 ? Math.max(4, pct * 100) : 0}%` }}
+                    />
                   </div>
-                )}
-              </div>
+                </div>
+              </Link>
             )
           })}
         </div>

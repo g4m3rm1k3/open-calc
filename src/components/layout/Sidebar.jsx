@@ -27,6 +27,21 @@ const CHAPTER_COLORS = {
   'geometry-6': 'text-rose-600 dark:text-rose-400',
 }
 
+// Fallback colors keyed by the `color` field on each course in courses.js
+const COURSE_TEXT_COLORS = {
+  indigo:  'text-indigo-600 dark:text-indigo-400',
+  blue:    'text-blue-600 dark:text-blue-400',
+  emerald: 'text-emerald-600 dark:text-emerald-400',
+  red:     'text-red-600 dark:text-red-400',
+  purple:  'text-purple-600 dark:text-purple-400',
+  orange:  'text-orange-600 dark:text-orange-400',
+  teal:    'text-teal-600 dark:text-teal-400',
+  amber:   'text-amber-600 dark:text-amber-400',
+  sky:     'text-sky-600 dark:text-sky-400',
+  cyan:    'text-cyan-600 dark:text-cyan-400',
+  rose:    'text-rose-600 dark:text-rose-400',
+}
+
 export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, onSearchOpen }) {
   const location = useLocation()
   const { getLessonStatus, getQuizScore } = useProgress()
@@ -164,7 +179,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
               <Link
                 to={`/chapter/${chapter.number}`}
                 onClick={onNavigate}
-                className={`flex items-center justify-between px-5 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:text-slate-900 dark:hover:text-slate-100 ${isActiveChapter ? 'sidebar-chapter-active' : (CHAPTER_COLORS[chapter.number] ?? CHAPTER_COLORS[0])}`}
+                className={`flex items-center justify-between px-5 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:text-slate-900 dark:hover:text-slate-100 ${isActiveChapter ? 'sidebar-chapter-active' : (CHAPTER_COLORS[chapter.number] ?? COURSE_TEXT_COLORS[activeCourseObj?.color] ?? CHAPTER_COLORS[0])}`}
               >
                 <span>Ch. {chapter.number} — {chapter.title}</span>
                 {chapter.comingSoon && (

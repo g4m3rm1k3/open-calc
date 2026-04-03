@@ -11,7 +11,7 @@ import ScratchPad from '../ui/ScratchPad.jsx'
 import { useSearchContext } from '../../context/SearchContext.jsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import GrapherContext from '../../context/GrapherContext.jsx'
-import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X, Calculator } from 'lucide-react'
+import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X, Calculator, ChevronDown } from 'lucide-react'
 import TICalc from '../calculator/TICalc.jsx'
 import MobileBottomNav from './MobileBottomNav.jsx'
 import GlobalPythonNotebook from '../ui/GlobalPythonNotebook.jsx'
@@ -109,6 +109,60 @@ function ScoreWidget() {
   )
 }
 
+function CoursesDropdown() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const location = useLocation()
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  useEffect(() => { setOpen(false) }, [location.pathname])
+
+  const isActive = location.pathname.startsWith('/chapter')
+
+  return (
+    <div ref={ref} className="relative z-[60] h-full flex items-center">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-1 text-sm font-bold transition-colors ${
+          isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'
+        }`}
+      >
+        Courses
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-[400] p-3 grid grid-cols-2 gap-1">
+          {COURSES.map(c => (
+            <NavLink
+              key={c.key}
+              to={c.path}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `flex flex-col px-3 py-2.5 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300'
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                }`
+              }
+            >
+              <span className="text-sm font-semibold leading-tight">{c.label}</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{c.desc}</span>
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen }) {
   const { openSearch } = useSearchContext()
   const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
@@ -123,7 +177,7 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+    <header className="fixed top-0 left-0 right-0 z-[60] h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
       {/* Mobile Menu & Brand */}
       <div className="lg:hidden flex items-center gap-1">
         <button
@@ -148,23 +202,14 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
         </AnimatePresence>
       </div>
 
-      <nav className="hidden lg:flex flex-1 items-center gap-6 ml-6 h-full">
-          {COURSES.map(course => (
-            <NavLink 
-              key={course.key}
-              to={course.path} 
-              className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}
-            >
-              {course.label}
-            </NavLink>
-          ))}
+      <nav className="hidden lg:flex flex-1 items-center gap-5 ml-6 h-full">
+          <CoursesDropdown />
           <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
           <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
-          
           <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
-           <span className="text-sm font-bold text-slate-500">DSA</span>
-           <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
-        </div>
+            <span className="text-sm font-bold text-slate-500">DSA</span>
+            <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>
+          </div>
       </nav>
 
       <div className="flex-1 lg:hidden" />
