@@ -1,5 +1,6 @@
 import Fuse from 'fuse.js'
 import { useState, useEffect, useMemo, useRef } from 'react'
+import { ALL_LESSONS } from '../content/index.js'
 
 const QUERY_SYNONYMS = {
   'rate of change': ['derivative', 'slope', 'dy/dx'],
@@ -97,8 +98,31 @@ export function useSearch() {
         setIsReady(true)
       })
       .catch(() => {
-        // Search index not yet built — silently continue
-        setIsReady(false)
+        // Search index not yet built — fall back to an in-memory index from ALL_LESSONS
+        const fallbackDocs = ALL_LESSONS.map((l) => ({
+          id: l.id,
+          title: l.title ?? '',
+          subtitle: l.subtitle ?? '',
+          tags: l.tags ?? [],
+          slug: l.slug ?? '',
+          chapterNumber: l.chapterNumber ?? l.chapter,
+          aliases: l.aliases ?? [],
+          content: '',
+        }))
+        docsRef.current = fallbackDocs
+        fuseRef.current = new Fuse(fallbackDocs, {
+          keys: [
+            { name: 'title', weight: 4 },
+            { name: 'subtitle', weight: 2 },
+            { name: 'aliases', weight: 2 },
+            { name: 'tags', weight: 2 },
+          ],
+          includeMatches: true,
+          threshold: 0.3,
+          minMatchCharLength: 2,
+          ignoreLocation: true,
+        })
+        setIsReady(true)
       })
   }, [])
 

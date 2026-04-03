@@ -348,7 +348,8 @@ function IntuitionBlock({ data, lesson }) {
     || data?.alternate?.visualizations?.length > 0
 
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
-  const primaryVizzes = getSectionVizzes(data)
+  // If blocks format, vizzes are already rendered inline by SectionContent — don't render them again
+  const primaryVizzes = isBlocksFormat ? [] : getSectionVizzes(data)
   const hasPrimary = data?.prose?.length > 0 || data?.callouts?.length > 0 || primaryVizzes.length > 0 || isBlocksFormat
   const alternateVizzes = hasAlternate ? getSectionVizzes(data.alternate) : []
   if (!hasPrimary && !hasAlternate) return null

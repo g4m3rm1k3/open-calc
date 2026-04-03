@@ -16,8 +16,9 @@ import TICalc from '../calculator/TICalc.jsx'
 import MobileBottomNav from './MobileBottomNav.jsx'
 import GlobalPythonNotebook from '../ui/GlobalPythonNotebook.jsx'
 import GlobalJSPlayground from '../ui/GlobalJSPlayground.jsx'
-import { Terminal, Code2 } from 'lucide-react'
+import { Terminal, Code2, PlayCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx'
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams()
@@ -110,7 +111,10 @@ function ScoreWidget() {
 
 function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen }) {
   const { openSearch } = useSearchContext()
+  const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const videoActive = videoOpen && !videoMinimized
+  const handleVideoToggle = () => videoOpen ? toggleMinimize() : openPlayer()
 
   const toggleDark = () => {
     const isDark = document.documentElement.classList.toggle('dark')
@@ -216,6 +220,11 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${jsOpen ? 'text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30' : 'text-yellow-500 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30'}`}
             title="JS Playground (J)"
           ><Code2 className="w-4 h-4" /></button>
+          <button
+            onClick={handleVideoToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${videoActive ? 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30' : 'text-sky-500 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30'}`}
+            title="Video Player (V)"
+          ><PlayCircle className="w-4 h-4" /></button>
         </div>
       </div>
 
@@ -371,6 +380,11 @@ export default function AppShell({ children }) {
       // 'j' key for JS playground
       if (e.key.toLowerCase() === 'j') {
         setJsOpen(prev => !prev)
+      }
+      // 'v' key for video player
+      if (e.key.toLowerCase() === 'v') {
+        // handled via context; dispatch a custom event the FloatingVideoPlayer can listen to
+        window.dispatchEvent(new CustomEvent('oc-toggle-video'))
       }
       // 'Escape' to close modals
       if (e.key === 'Escape') {

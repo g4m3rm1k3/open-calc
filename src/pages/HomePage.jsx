@@ -30,7 +30,7 @@ export default function HomePage() {
 
   const totalLessons = CURRICULUM.reduce((s, ch) => s + ch.lessons.length, 0)
   const completedLessons = CURRICULUM.reduce((s, ch) =>
-    s + ch.lessons.filter((l) => getLessonStatus(l.id, l.checkpoints?.length ?? 3) === 'complete').length
+    s + ch.lessons.filter((l) => getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete').length
   , 0)
 
   return (
@@ -91,7 +91,7 @@ export default function HomePage() {
           {CURRICULUM.map((chapter) => {
             const grad = CHAPTER_GRADIENTS[chapter.number] ?? CHAPTER_GRADIENTS[0]
             const chLessonsCompleted = chapter.lessons.filter(
-              (l) => getLessonStatus(l.id, l.checkpoints?.length ?? 3) === 'complete'
+              (l) => getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete'
             ).length
             return (
               <div key={chapter.id} className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
@@ -116,7 +116,7 @@ export default function HomePage() {
                 {!chapter.comingSoon && chapter.lessons.length > 0 && (
                   <div className="divide-y divide-slate-100 dark:divide-slate-800">
                     {chapter.lessons.map((lesson, i) => {
-                      const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 3)
+                      const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
                       return (
                         <Link
                           key={lesson.id}

@@ -69,4 +69,11 @@ export const COURSES = [
     desc: 'Language & Runtime Fundamentals',
     color: 'cyan'
   },
+  {
+    key: 'tetris',
+    label: 'Build Tetris',
+    path: '/chapter/tetris.1',
+    desc: 'Build a Full Game from Scratch',
+    color: 'rose'
+  },
 ];

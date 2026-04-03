@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { X, Minus, Maximize2, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical } from 'lucide-react';
+import { X, Minus, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe, Trash2, BookOpen, ChevronLeft, Home, Layers, Compass, Sidebar as SidebarIcon, GripVertical } from 'lucide-react';
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
 import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
 import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
@@ -93,7 +93,7 @@ export default function FloatingVideoPlayer() {
   }, [currentVideo, videoProgress]);
   const [width, setWidth] = useState(900);
   const [height, setHeight] = useState(550);
-  const [isLauncher, setIsLauncher] = useState(false);
+
   const [windowDimensions, setWindowDimensions] = useState({ 
     w: window.innerWidth, 
     h: window.innerHeight 
@@ -205,6 +205,13 @@ export default function FloatingVideoPlayer() {
     }
   }, [lessonId, navStack]);
 
+  // Global 'V' keyboard shortcut dispatched by AppShell
+  useEffect(() => {
+    const handler = () => isOpen ? toggleMinimize() : openPlayer();
+    window.addEventListener('oc-toggle-video', handler);
+    return () => window.removeEventListener('oc-toggle-video', handler);
+  }, [isOpen, toggleMinimize, openPlayer]);
+
   const pushNav = (view, data = {}) => {
     if (view === 'chapters') setSelectedCourse(data.courseId);
     if (view === 'lessons') setSelectedChapter(data.chapter);
@@ -296,19 +303,7 @@ export default function FloatingVideoPlayer() {
     window.open(url, 'youtubeSearchPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
   };
 
-  if (!isOpen) {
-    if (!isLauncher) return null;
-    return (
-      <motion.div 
-        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        onClick={() => { setIsLauncher(false); openPlayer(); }}
-        className="fixed bottom-10 right-10 z-[10000] w-14 h-14 bg-brand-500 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer hover:scale-110 transition-transform active:scale-95 group"
-      >
-         <Play size={24} fill="currentColor" />
-         <div className="absolute right-16 px-3 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl border border-slate-700">Open Tutorial Hub</div>
-      </motion.div>
-    );
-  }
+  if (!isOpen || isMinimized) return null;
 
   return (
     <>
@@ -316,25 +311,6 @@ export default function FloatingVideoPlayer() {
       <div ref={constraintsRef} className="fixed inset-0 pointer-events-none z-[9997]" />
 
       <AnimatePresence mode="wait">
-        {isMinimized ? (
-          <motion.div
-            key="minimized-dock"
-            initial={{ y: 100, opacity: 0 }} 
-            animate={{ y: 0, opacity: 1 }} 
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 right-8 z-[9999] bg-slate-900 border-x border-t border-slate-700 rounded-t-2xl px-5 py-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all border-b-4 border-b-brand-500 min-w-[340px]"
-            onClick={toggleMinimize}
-          >
-            <div className="flex items-center gap-4 truncate">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Play size={20} fill="currentColor" /></div>
-              <div className="truncate">
-                <p className="text-[10px] font-bold text-brand-400 uppercase tracking-[0.2em] leading-none mb-1.5">Tutorial Hub</p>
-                <h4 className="text-sm font-bold text-white leading-none tracking-tight truncate">{currentVideo?.title || 'Videos & Tutorials'}</h4>
-              </div>
-            </div>
-            <Maximize2 size={18} className="text-slate-500 flex-shrink-0 ml-4" />
-          </motion.div>
-        ) : (
           <motion.div
              key="expanded-player"
              drag={!isMobile} 
@@ -386,7 +362,7 @@ export default function FloatingVideoPlayer() {
               <button onClick={toggleMinimize} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Minimize">
                 <Minus size={18} />
               </button>
-                <button onClick={() => { setIsLauncher(true); closePlayer(); }} className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors" title="Close Hub">
+                <button onClick={toggleMinimize} className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors" title="Close Hub">
                   <X size={18} />
                 </button>
             </div>
@@ -667,7 +643,6 @@ export default function FloatingVideoPlayer() {
             </div>
           )}
         </motion.div>
-        )}
       </AnimatePresence>
     </>
   );

@@ -40,12 +40,12 @@ export default function LessonPage() {
     return () => { document.title = 'OpenCalc' }
   }, [lesson?.id])
 
-  // Mark progress checkpoint when tab is read (no scroll)
+  // Mark the reading checkpoint only after the user has scrolled at least 60% of the page.
+  // Firing on mount made every lesson "complete" before the user read anything.
   useEffect(() => {
-    if (lesson) {
-      markCheckpoint(lesson.id, `read-${activeTab}`)
-    }
-  }, [lesson?.id, activeTab])
+    if (!lesson?.id || scrollPercent < 60) return
+    markCheckpoint(lesson.id, `read-${activeTab}`)
+  }, [lesson?.id, activeTab, scrollPercent >= 60])
 
   // Track scrolling progress
   useEffect(() => {
@@ -122,14 +122,17 @@ export default function LessonPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-500 dark:text-brand-400 mb-2">Why This Matters</p>
           <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3 leading-relaxed">{parseProse(lesson.hook.question)}</h2>
           <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{parseProse(lesson.hook.realWorldContext)}</p>
-          {lesson.hook.previewVisualizationId && (
-            <VizFrame id={lesson.hook.previewVisualizationId} initialProps={lesson.hook.previewVisualizationProps ?? {}} />
-          )}
-          {lesson.hook.visualizations?.map((viz, i) => (
-            <div key={i} className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
-               <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
+          {lesson.hook.visualizations?.length > 0 ? (
+            lesson.hook.visualizations.map((viz, i) => (
+              <div key={i} className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+                <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
+              </div>
+            ))
+          ) : lesson.hook.previewVisualizationId ? (
+            <div className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
+              <VizFrame id={lesson.hook.previewVisualizationId} initialProps={lesson.hook.previewVisualizationProps ?? {}} />
             </div>
-          ))}
+          ) : null}
         </section>
       )}
 

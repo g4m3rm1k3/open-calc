@@ -65,32 +65,47 @@ function ensureSection(section) {
   };
 }
 
+function sectionHasContent(section) {
+  const hasProse = (section?.prose?.length ?? 0) > 0 || (section?.blocks?.length ?? 0) > 0;
+  const hasViz = !!(section?.visualizationId) || (section?.visualizations?.length ?? 0) > 0;
+  return hasProse || hasViz;
+}
+
 function addConnectorCallouts(intuition, math, rigor, topicMessage) {
-  const nextMathTitle = 'Bridge: Visual -> Formula';
-  if (!hasCallout(intuition.callouts, nextMathTitle)) {
-    intuition.callouts.push({
-      type: 'insight',
-      title: nextMathTitle,
-      body: 'Use the visual model to name the changing quantities first, then map each quantity to a symbol before applying formulas.',
-    });
+  // Only inject bridge callouts into sections that already have real content.
+  // Injecting into empty sections creates phantom "Mathematics" / "Formal Proof"
+  // expandable blocks that confuse readers.
+  if (sectionHasContent(intuition)) {
+    const nextMathTitle = 'Bridge: Visual -> Formula';
+    if (!hasCallout(intuition.callouts, nextMathTitle)) {
+      intuition.callouts.push({
+        type: 'insight',
+        title: nextMathTitle,
+        body: 'Use the visual model to name the changing quantities first, then map each quantity to a symbol before applying formulas.',
+      });
+    }
   }
 
-  const nextRigorTitle = 'Bridge: Formula -> Proof Logic';
-  if (!hasCallout(math.callouts, nextRigorTitle)) {
-    math.callouts.push({
-      type: 'strategy',
-      title: nextRigorTitle,
-      body: 'Ask two questions: what assumptions make this formula legal, and what breaks if one assumption fails?',
-    });
+  if (sectionHasContent(math)) {
+    const nextRigorTitle = 'Bridge: Formula -> Proof Logic';
+    if (!hasCallout(math.callouts, nextRigorTitle)) {
+      math.callouts.push({
+        type: 'strategy',
+        title: nextRigorTitle,
+        body: 'Ask two questions: what assumptions make this formula legal, and what breaks if one assumption fails?',
+      });
+    }
   }
 
-  const backToRealityTitle = 'Bridge: Proof -> Real World';
-  if (!hasCallout(rigor.callouts, backToRealityTitle)) {
-    rigor.callouts.push({
-      type: 'real-world',
-      title: backToRealityTitle,
-      body: topicMessage,
-    });
+  if (sectionHasContent(rigor)) {
+    const backToRealityTitle = 'Bridge: Proof -> Real World';
+    if (!hasCallout(rigor.callouts, backToRealityTitle)) {
+      rigor.callouts.push({
+        type: 'real-world',
+        title: backToRealityTitle,
+        body: topicMessage,
+      });
+    }
   }
 }
 

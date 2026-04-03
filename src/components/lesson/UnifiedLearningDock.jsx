@@ -32,7 +32,9 @@ function shuffle(array) {
 export default function UnifiedLearningDock({ lesson }) {
   const [choice, setChoice] = useState(null);
   const [tries, setTries] = useState(0);
-  const missionPack = lesson?.unifiedMissionPack ?? null;
+  // Only show the topic-level mission pack when the lesson explicitly opts in.
+  // Without this guard, every lesson in the same topic renders the same 4 cards.
+  const missionPack = lesson?.showLearningDock ? (lesson?.unifiedMissionPack ?? null) : null;
 
   const question = useMemo(() => pickGameQuestion(lesson), [lesson]);
   const options = useMemo(() => (question ? shuffle(question.options) : []), [question]);

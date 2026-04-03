@@ -24,6 +24,7 @@ import linearAlgebra1 from './linear-algebra/index.js'
 import python1 from './python-1/index.js'
 import dataScience1 from './data-science/index.js'
 import javascriptCore1 from './javascript-1/index.js'
+import tetris1 from './tetris-1/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
 const DISCRETE_CURRICULUM = [discrete1].map(ch => ({ ...ch, course: 'discrete' }))
@@ -35,6 +36,7 @@ const LA_CURRICULUM = linearAlgebra1.map(ch => ({ ...ch, course: 'linear-algebra
 const PYTHON_CURRICULUM = python1.map(ch => ({ ...ch, course: 'python-1' }))
 const DATA_SCIENCE_CURRICULUM = dataScience1.map(ch => ({ ...ch, course: 'data-science-1' }))
 const JAVASCRIPT_CORE_CURRICULUM = javascriptCore1.map(ch => ({ ...ch, course: 'javascript-core' }))
+const TETRIS_CURRICULUM = tetris1.map(ch => ({ ...ch, course: 'tetris' }))
 
 export const CURRICULUM = [
   ...PRECALC_CURRICULUM, 
@@ -46,7 +48,8 @@ export const CURRICULUM = [
   ...LA_CURRICULUM,
   ...PYTHON_CURRICULUM,
   ...DATA_SCIENCE_CURRICULUM,
-  ...JAVASCRIPT_CORE_CURRICULUM
+  ...JAVASCRIPT_CORE_CURRICULUM,
+  ...TETRIS_CURRICULUM
 ]
 
 // Flat map for O(1) lookup by slug within chapter
