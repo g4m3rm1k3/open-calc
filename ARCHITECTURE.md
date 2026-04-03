@@ -60,7 +60,7 @@ src/App.jsx    → HashRouter + all top-level routes
 
 | URL hash | Page component | Notes |
 |---|---|---|
-| `#/` | `HomePage.jsx` | Course grid |
+| `#/` | `HomePage.jsx` | Course card grid (one card per course, not per chapter) |
 | `#/chapter/:chapterId` | `ChapterPage.jsx` | Lesson list for one chapter |
 | `#/chapter/:chapterId/:lessonSlug` | `LessonPage.jsx` | **Main lesson renderer** |
 | `#/reference` | `ReferencePage.jsx` | Formula cards + proof modals |
@@ -78,8 +78,9 @@ src/App.jsx    → HashRouter + all top-level routes
 
 ```
 src/components/layout/AppShell.jsx    ← the single layout wrapper for the whole app
-  ├── TopBar (logo, dark mode toggle, search button, tool icon buttons)
-  ├── Sidebar (desktop — collapsible/pinnable, shows full course tree)
+  ├── TopBar (CoursesDropdown, Reference, Universal Calc links, dark mode toggle, tool icon buttons)
+  ├── CoursesDropdown (inside TopBar) — "Courses ▾" button; 2-col grid of all courses; z-[400]
+  ├── Sidebar (desktop — collapsible/pinnable, shows full course tree for active course)
   ├── MobileBottomNav (mobile — 4 tabs: Home, Courses, Reference, About)
   └── Tool panels (floating overlays, toggled via local state):
         GlobalGrapher           — 2D function grapher    (key: G)
@@ -95,7 +96,15 @@ src/components/layout/AppShell.jsx    ← the single layout wrapper for the whol
         WelcomeModal            — first-visit onboarding
 ```
 
-**Tool mount behavior**: `GlobalGrapher`, `GlobalGrapher3D`, and `GlobalGrapherJSX` are always mounted and receive an `isOpen` prop (so the grapher preserves its graph state when minimized). `TICalc` is only mounted while `calcOpen` is true. `FloatingVideoPlayer` is always mounted (renders a minimized tab by default, expands on click/V key). All others use conditional rendering.
+**Tool mount behavior**: `GlobalGrapher`, `GlobalGrapher3D`, and `GlobalGrapherJSX` are always mounted and receive an `isOpen` prop (so the grapher preserves its graph state when minimized). `TICalc` is only mounted while `calcOpen` is true. `FloatingVideoPlayer` is always mounted but returns `null` when closed/minimized. All others use conditional rendering.
+
+**Z-index stack** (highest wins):
+- `z-[400]` — `CoursesDropdown` panel
+- `z-[300]` — Tool panel modals (SearchModal, welcome overlay)
+- `z-[200]` — Other floating panels
+- `z-[60]` — TopBar `<header>` (must be above sidebar so dropdown renders on top)
+- `z-50` — Sidebar
+- `z-[10001]` — Scroll progress bar in `LessonPage`
 
 ---
 
@@ -133,6 +142,7 @@ Courses are imported from their `index.js` file, which either exports a **single
 | `python-1/` | Python Programming | Array of chapters |
 | `web-1/` | Web Development | Array of chapters |
 | `javascript-1/` | JavaScript Core | Array of chapters |
+| `tetris-1/` | Build Tetris (JS/Web curriculum) | Array of chapters |
 | `data-science/` | Data Science | Single object |
 | `math-1/` | Math 1 | Single object |
 | `proofs/` | (Proof data, not a course — used by Reference) | n/a |
@@ -1181,4 +1191,4 @@ incomplete ideas/
 
 ---
 
-*Generated from full codebase audit. Last updated April 2026. Sections 13–14 reflect changes made to `unifiedLessonEnhancer.js`, `UnifiedLearningDock.jsx`, `MicroCycleLesson.jsx`, `LessonPage.jsx`, `AppShell.jsx`, `FloatingVideoPlayer.jsx`, `useSearch.js`, and `HomePage.jsx`. Section 15 tracks issue status.*
+*Last updated April 3, 2026. Recent changes: Tetris course (`tetris-1/`) added; navbar replaced with `CoursesDropdown`; `HomePage` now shows course cards instead of flat chapter list; sidebar chapter colors now fall back to course color; header raised to `z-[60]` to fix dropdown layering over sidebar.*

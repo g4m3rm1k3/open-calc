@@ -4,6 +4,7 @@ import { X, Minus, Search, Video, ChevronRight, Play, Layout, Menu, Plus, Globe,
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx';
 import { VIDEO_PLACEMENT_MAP } from '../../content/videos/videoPlacementMap.js';
 import { VIDEO_DATABASE } from '../../content/videos/videoDatabase.js';
+import { selectVideosByKeywords } from '../../content/videos/videoSelector.js';
 import { CURRICULUM, ALL_LESSONS } from '../../content/index.js';
 
 import { useNavigate } from 'react-router-dom';
@@ -149,23 +150,34 @@ export default function FloatingVideoPlayer() {
 
   const getCategorizedVideos = (id) => {
     if (!id) return null;
-    const placement = VIDEO_PLACEMENT_MAP[id] || {};
     const custom = customVideos[id] || [];
     const categorized = {};
     if (custom.length > 0) categorized['Your Videos'] = custom;
 
-    // Handle flat array case (legacy/simple mapping)
-    if (Array.isArray(placement)) {
-      categorized['intuition'] = placement.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
-      return categorized;
+    const placement = VIDEO_PLACEMENT_MAP[id];
+    if (placement) {
+      // Explicit placement map override
+      if (Array.isArray(placement)) {
+        const vids = placement.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
+        if (vids.length > 0) categorized['intuition'] = vids;
+      } else {
+        ['hook', 'intuition', 'math', 'rigor', 'examples'].forEach(section => {
+          const ids = section === 'examples' ? Object.values(placement[section] || {}).flat() : (placement[section] || []);
+          const vids = ids.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
+          if (vids.length > 0) categorized[section] = vids;
+        });
+      }
+    } else {
+      // No explicit placement — match by lesson tags
+      const lesson = ALL_LESSONS.find(l => l.id === id);
+      const tags = lesson?.tags ?? [];
+      if (tags.length > 0) {
+        const matched = selectVideosByKeywords({ keywords: tags, limit: 15 });
+        if (matched.length > 0) categorized['Related'] = matched;
+      }
     }
 
-    ['hook', 'intuition', 'math', 'rigor', 'examples'].forEach(section => {
-      const ids = section === 'examples' ? Object.values(placement[section] || {}).flat() : (placement[section] || []);
-      const vids = ids.map(vidId => ({ ...VIDEO_DATABASE[vidId], id: vidId })).filter(v => v.url);
-      if (vids.length > 0) categorized[section] = vids;
-    });
-    return categorized;
+    return Object.keys(categorized).length > 0 ? categorized : null;
   };
 
   const currentLessonVideos = useMemo(() => getCategorizedVideos(lessonId), [lessonId, customVideos]);
@@ -182,28 +194,29 @@ export default function FloatingVideoPlayer() {
       return courseChapters.some(ch => 
         ch.lessons.some(l => {
           const placement = VIDEO_PLACEMENT_MAP[l.id];
-          if (!placement) return false;
-          // Support both flat arrays and categorized objects
-          if (Array.isArray(placement)) return placement.length > 0;
-          const hasRegularVids = ['hook', 'intuition', 'math', 'rigor'].some(s => placement[s]?.length > 0);
-          const hasExampleVids = placement.examples && Object.values(placement.examples).some(exList => exList?.length > 0);
-          return hasRegularVids || hasExampleVids;
+          if (placement) {
+            if (Array.isArray(placement)) return placement.length > 0;
+            const hasRegularVids = ['hook', 'intuition', 'math', 'rigor'].some(s => placement[s]?.length > 0);
+            const hasExampleVids = placement.examples && Object.values(placement.examples).some(exList => exList?.length > 0);
+            if (hasRegularVids || hasExampleVids) return true;
+          }
+          // Also include if lesson has tags that can drive tag-based matching
+          return (l.tags?.length ?? 0) > 0;
         })
       );
     });
   }, []);
 
-  // Sync to active course/lesson if open and nothing selected
+  // Sync sidebar selection to whichever lesson is currently active
   useEffect(() => {
-    if (lessonId && navStack[navStack.length-1] === 'playlist' && !selectedCourse) {
-      const lesson = ALL_LESSONS.find(l => l.id === lessonId);
-      const ch = CURRICULUM.find(c => c.number === lesson?.chapterNumber);
-      if (ch) {
-        setSelectedCourse(ch.course);
-        setSelectedChapter(ch);
-      }
+    if (!lessonId) return;
+    const lesson = ALL_LESSONS.find(l => l.id === lessonId);
+    const ch = CURRICULUM.find(c => c.number === lesson?.chapterNumber);
+    if (ch) {
+      setSelectedCourse(ch.course);
+      setSelectedChapter(ch);
     }
-  }, [lessonId, navStack]);
+  }, [lessonId]);
 
   // Global 'V' keyboard shortcut dispatched by AppShell
   useEffect(() => {
