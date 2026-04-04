@@ -20,6 +20,7 @@ import ch1_1 from './ch1-1.js'
 import ch1_2 from './ch1-2.js'
 import ch1_3 from './ch1-3.js'
 import ch1_4 from './ch1-4.js'
+import ch1_5 from './ch1-5.js'
 
 export default [
   {
@@ -87,5 +88,11 @@ export default [
     title: 'Exponentials & Logarithms',
     course: 'python-1',
     lessons: [ch1_4]
+  },
+  {
+    number: 1.5,
+    title: 'Trigonometry Applied',
+    course: 'python-1',
+    lessons: [ch1_5]
   }
 ]
