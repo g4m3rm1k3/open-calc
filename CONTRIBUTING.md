@@ -2,6 +2,8 @@
 
 Thanks for helping improve open-calc. This guide covers everything you need to add a lesson, a visualization, or fix a bug — including the pitfalls that are easy to miss.
 
+> **New here?** The fastest way to start is the interactive in-app tutorial. Open the app, click the **?** button in the top navigation bar, and follow the "Your First Lesson" walkthrough. It downloads starter templates, steps through each field, and explains how to register your lesson. Come back here when you're ready to understand the full schema.
+
 ---
 
 ## Development workflow
@@ -257,7 +259,92 @@ In addition to the types listed in Section 1, the following are used in lesson-s
 
 ---
 
-## 1c. Quiz Section Standard
+## 1c. Content Quality Standards
+
+Every lesson passes through three stages before it is considered complete. The standards below define what each stage looks like. Do not submit a PR for a lesson below **Review-Ready**.
+
+### Lesson states
+
+| State | What it means |
+|---|---|
+| **Draft** | File exists, identity fields filled in, prose is rough notes |
+| **Review-Ready** | Meets all minimum requirements below — ready for feedback |
+| **Complete** | Meets all requirements + has passed a content review |
+
+### Minimum requirements (Review-Ready)
+
+**Identity**
+- [ ] `id` is unique across the entire codebase (search for it before using it)
+- [ ] `slug` is lowercase, hyphen-separated, no spaces, ≤ 4 words
+- [ ] `chapter` matches the chapter `number` in the chapter's `index.js`
+- [ ] `order` is correct — no two lessons in the same chapter share the same `order`
+- [ ] `title` is a clear question or concept name ≤ 8 words
+- [ ] `subtitle` is one descriptive sentence ≤ 15 words
+- [ ] `tags` includes at least 3 searchable terms that students would actually type
+
+**Hook**
+- [ ] `question` is a genuine curiosity-generating question a real person would ask
+- [ ] `realWorldContext` names a specific domain (physics, engineering, computing, finance) and explains *why this concept is needed there* — not just that it exists
+- [ ] The hook does not begin teaching — it only creates the need to know
+
+**Intuition**
+- [ ] `prose` has at least 4 paragraphs (for a typical lesson)
+- [ ] The first prose entry begins with the `**Where you are in the story:**` narrative marker
+- [ ] At least one paragraph uses a concrete physical or visual analogy
+- [ ] Inline formulas use `$...$` syntax; display formulas use `$$...$$`
+- [ ] All symbols introduced in prose are also listed in `semantics.core`
+- [ ] A `type: 'sequencing'` callout is present
+
+**Visualizations**
+- [ ] Every `id` in `visualizations` exists in `VizFrame.jsx`
+- [ ] Every `mathBridge` follows the pattern: orient → numbered steps → "The key lesson:"
+- [ ] Captions are one sentence that stands alone without reading the `mathBridge`
+
+**Math / Rigor (if present)**
+- [ ] Definitions are stated precisely — no ambiguous pronouns
+- [ ] Examples have both `problem` and `solution` (or `steps` + `conclusion`)
+- [ ] All examples have unique `id` fields
+- [ ] Proof steps in `rigor.proofSteps` each have a complete `annotation` — not just the expression
+
+**Quiz**
+- [ ] Minimum 5 questions; 8–10 for a full lesson
+- [ ] Order: recall → computation → conceptual
+- [ ] Every question has a unique `id` in `{lesson-slug}-q{N}` format
+- [ ] `input` answers are valid mathjs expressions (test them at [mathjs.org](https://mathjs.org/))
+- [ ] `choice` answers are verbatim copies of one option string
+- [ ] At least one question tests conceptual understanding, not just computation
+
+**Supporting sections**
+- [ ] `semantics` covers every symbol used in the lesson
+- [ ] `spiral.recoveryPoints` has 1–3 entries with specific connection notes
+- [ ] `spiral.futureLinks` has 1–3 entries with specific dependency notes
+- [ ] `mentalModel` has 3–5 entries, each ≤ 10 words, in student-voice language
+
+### Quality bar for prose
+
+The following phrases indicate prose that needs revision:
+
+| Weak pattern | What to do instead |
+|---|---|
+| "As you can see" / "Clearly" | State what the student sees or why it's clear |
+| "It can be shown that" | Show it, or link to the rigor section where it is shown |
+| "Simply" / "Just" | Remove — what is simple to an expert is not simple to a learner |
+| "In conclusion" | The closing must say something new, not summarize the summary |
+| Analogy with no follow-through | Return to the analogy when introducing the formula |
+| Formula introduced before motivation | Move any formula below its intuitive explanation |
+
+### Math accuracy checklist
+
+Before submitting, verify:
+- [ ] Every formula appears correctly rendered in the dev build (`npm run dev`)
+- [ ] Notation is consistent with neighboring lessons (same symbols, same conventions)
+- [ ] No sign errors, coefficient errors, or limit errors in worked examples
+- [ ] The conclusion of every example is explicitly stated, not left implicit
+- [ ] Edge cases and restrictions (domain, continuity requirements) are noted where relevant
+
+---
+
+## 1d. Quiz Section Standard
 
 Every lesson must end with a `quiz` array. This is the primary self-check mechanism — it drives the mastery star in the sidebar. Do not omit it.
 

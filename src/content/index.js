@@ -67,7 +67,7 @@ export const ALL_LESSONS = CURRICULUM.flatMap((ch) =>
 export { COURSES }
 
 // Dev-only: validate lesson.chapter fields match the chapter.number they live in
-if (import.meta.env.DEV) {
+if (typeof import.meta.env !== 'undefined' && import.meta.env.DEV) {
   const knownChapterNumbers = new Set(CURRICULUM.map((ch) => ch.number))
   for (const ch of CURRICULUM) {
     for (const lesson of ch.lessons) {

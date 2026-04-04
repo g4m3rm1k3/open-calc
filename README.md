@@ -1,54 +1,50 @@
-# open-calc
+﻿# open-calc
 
-An open-source interactive STEM textbook — intuition first, rigor always.
+An open-source interactive STEM platform — intuition first, rigour always.
 
-Every proof has a synchronized visualization. Every worked example is interactive. The math connects explicitly to what you see on screen.
+Every proof has a synchronized visualization. Every worked example is interactive. Lessons explicitly connect what you see on screen to the math that creates it.
 
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
 ![D3](https://img.shields.io/badge/D3.js-7-f9a03c?logo=d3.js&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-0.168-black?logo=three.js)
 ![KaTeX](https://img.shields.io/badge/KaTeX-0.16-2c3e50)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38bdf8?logo=tailwindcss&logoColor=white)
+![Pyodide](https://img.shields.io/badge/Pyodide-0.26-3776ab?logo=python&logoColor=white)
 
 ---
 
 ## What it is
 
-open-calc teaches university-level STEM with the philosophy that **intuition and rigor are not opposites** — they reinforce each other. Every concept follows a four-stage cycle:
+open-calc teaches university-level STEM with the belief that **intuition and rigour are not opposites** — they reinforce each other. Every concept follows the same cycle:
 
 | Stage | What happens |
 |---|---|
 | **Hook** | A real-world question that makes the concept feel necessary |
 | **Intuition** | Geometric or physical reasoning with interactive visualizations |
-| **Math** | Precise definitions, theorems, and worked examples — each with its own visualization |
-| **Rigor** | Step-by-step proof with a synchronized visualization — each proof step lights up the matching geometry |
+| **Math** | Precise definitions, theorems, and worked examples |
+| **Rigor** | Step-by-step proof with a synchronized visualization |
 
-A `mathBridge` field on every visualization explicitly states *which part of the proof* it is showing, so you never have to guess what the animation means.
+A `mathBridge` field on every visualization explicitly states which part of the concept it is showing, so students never have to guess what the animation means.
 
----
-
-## Current content
-
-**Calculus** (chapters 0–5)
-- Pre-calculus review — trig, exponentials, transformations
-- Limits and continuity — epsilon-delta, squeeze theorem, fundamental trig limits
-- Derivatives — differentiation rules, chain rule, trig/exp/log derivatives, implicit differentiation, inverse functions, reading derivatives
-- Applications — curve sketching, optimization, L'Hôpital's rule, Newton's method, differentials
-- Integration — Riemann sums, Fundamental Theorem, techniques
-- Sequences and series
-
-**Discrete Mathematics**
-- Logic, sets, functions, relations, induction, recursion
-- Combinatorics, graph theory, automata
+Students can run Python and JavaScript code directly in the browser — no installation required, powered by Pyodide and a sandboxed JS runtime.
 
 ---
 
-## Planned subjects
+## Courses
 
-- Physics (mechanics, waves, electromagnetism, thermodynamics)
-- Chemistry (stoichiometry, equilibrium, quantum basics)
-- Linear algebra
-- Probability and statistics
+| Course | Description | Status |
+|---|---|---|
+| **Pre-Calculus** | Functions, graphs, transformations, trigonometry | ✅ Active |
+| **Geometry** | Proofs, constructions, similarity, circles, coordinates | ✅ Active |
+| **Calculus** | Limits, derivatives, applications, integration, series (chapters 0–6) | ✅ Active |
+| **Physics** | Mechanics, kinematics, forces, waves | ✅ Active |
+| **Discrete Math** | Logic, sets, induction, combinatorics, graph theory | ✅ Active |
+| **Linear Algebra** | Vectors, matrices, transformations, eigenvalues | ✅ Active |
+| **Python Programming** | Core language, data structures, algorithms | ✅ Active |
+| **Data Science** | NumPy, Pandas, visualization, ML foundations | ✅ Active |
+| **JavaScript Core** | Language fundamentals and runtime mechanics | ✅ Active |
+| **Web Systems** | DOM, reactivity, APIs | ✅ Active |
+| **Build Tetris** | Build a complete game from scratch — project-driven | ✅ Active |
 
 ---
 
@@ -60,7 +56,8 @@ A `mathBridge` field on every visualization explicitly states *which part of the
 | D3.js 7 | 2D interactive visualizations |
 | Three.js | 3D visualizations |
 | KaTeX | Math rendering |
-| Tailwind CSS | Styling with full dark mode support |
+| Pyodide | Python runtime in the browser (no server) |
+| Tailwind CSS | Styling with full dark mode |
 | React Router | Client-side routing |
 | Fuse.js | Full-text search across all lessons |
 
@@ -74,15 +71,23 @@ A `mathBridge` field on every visualization explicitly states *which part of the
 git clone https://github.com/your-username/open-calc.git
 cd open-calc
 npm install
-npm run dev        # builds search index then starts dev server
+npm run dev        # starts dev server
 ```
 
 Open `http://localhost:5173`.
 
 ```bash
-npm run build      # production build + search index
+npm run build      # production build + generates search index
 npm run preview    # preview the production build locally
 ```
+
+---
+
+## Contributing a lesson
+
+The fastest way to get started is the **interactive in-app tutorial**: open the app and click the **?** button in the top navigation bar. It walks you through writing your first lesson with downloadable templates, step-by-step guidance, and a live hoverable preview that shows you the code behind each section.
+
+For the complete technical reference — full lesson schema, visualization API, quiz grading system, and quality standards — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -91,16 +96,26 @@ npm run preview    # preview the production build locally
 ```
 src/
   content/          # lesson files — one JS object per lesson
-    chapter-0/
-    chapter-1/
-    ...
+    chapter-0/      # Calculus prerequisites
+    chapter-1/      # Limits
+    chapter-2/      # Derivatives
+    ...chapter-6/
+    precalc/
+    geometry-1/ ... geometry-6/
+    python-1/
+    data-science/
+    javascript-1/
+    physics-1/
+    discrete-math/
+    linear-algebra/
+    web-1/
   components/
     viz/
       d3/           # 2D D3 visualizations
       three/        # 3D Three.js visualizations
-      react/        # pure React visualizations
+      react/        # pure React vizs (Python notebook, JS notebook, games)
       VizFrame.jsx  # registry — maps string IDs to components
-    lesson/         # lesson layout components (DynamicProof, ExampleBlock, etc.)
+    lesson/         # lesson layout components
     math/           # KaTeX wrappers
   pages/            # route-level components
   context/          # app-level state (progress, theme)
@@ -112,51 +127,8 @@ public/
 
 ## How it works
 
-Each lesson is a single JS file in `src/content/chapter-X/` exporting a structured object. Visualizations are React components registered by string ID in `VizFrame.jsx`. Adding a visualization to a lesson requires only adding its ID string to the content file — the renderer handles everything else.
+Each lesson is a single JS file in `src/content/{course}/` exporting a structured object. The renderer reads the object and renders all sections automatically — prose, visualizations, examples, quiz. Adding a visualization to a lesson requires only adding its ID string to the content file.
 
-Proof steps automatically sync to the visualization via a `currentStep` prop, so as a user steps through a proof, the geometry updates in lockstep.
+Proof steps sync to visualizations via a `currentStep` prop, so as a student steps through a proof, the geometry updates in lockstep.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full architecture and a complete contribution guide.
-
----
-
-## GitHub Pages deployment
-
-A workflow deploys to GitHub Pages on every push to `main`.
-
-**One-time setup:**
-1. Push this repo to GitHub.
-2. Go to Settings → Pages → set Source to **GitHub Actions**.
-3. Ensure your default branch is `main`.
-
-Every subsequent push to `main` rebuilds and redeploys automatically.
-
----
-
-## Contributing
-
-Contributions are welcome — new lessons, new visualizations, bug fixes, and math accuracy corrections. The architecture is additive: most changes touch only one file.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete guide including the content format, visualization API, dark mode requirements, and common pitfalls.
-
-For a full manual workflow (add lesson, add viz, register IDs, wire proof sync, tooltip/LaTeX gotchas, and GitHub visibility), use the Manual Build Playbook section in [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## Tutorial Hub & Video Library
-
-The application features a built-in **Tutorial Hub** that provides curated video content synchronized with the curriculum.
-
-### How to add a Video:
-1.  **Register the Metadata**: Add an entry to `src/content/videos/videoDatabase.js` with a unique handle, title, YouTube embed URL, and source.
-2.  **Map to a Lesson**: Associate the video handle with one or more lesson IDs in `src/content/videos/videoPlacementMap.js`.
-3.  **Cross-Course Scope**: When adding Physics content, ensure lesson IDs are prefixed with `p1-` to avoid collisions with the Calculus namespace.
-
-### Custom Tutorials:
-Users can add their own YouTube tutorials directly within the `FloatingVideoPlayer` UI. These are saved to local storage and associated with the currently active lesson.
-
----
-
-## License
-
-GPLv3. See [LICENSE](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full architecture and contribution guide.
