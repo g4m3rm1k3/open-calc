@@ -1,6 +1,6 @@
 // PeriodicTable.jsx
 // Interactive periodic table — fixed 3D atom viewer, periodic trends, quick filters.
-// Uses Three.js for the atom visualization.
+// Tiles scale dynamically to fill available width via ResizeObserver.
 
 import { useState, useEffect, useRef } from 'react'
 import * as THREE from 'three'
@@ -55,12 +55,11 @@ function useColors() {
 }
 
 // ── 3D Atom Viewer ────────────────────────────────────────────────────────────
-// Each shell's electrons live inside a THREE.Group that shares the exact same
-// rotation as its orbit ring, so Three.js keeps them perfectly on the ring —
-// no manual rotation math needed.
+// Electrons live inside THREE.Groups that share the ring's rotation — no
+// manual trig needed, Three.js keeps them perfectly on the orbit ring.
 function AtomViewer({ element }) {
   const mountRef = useRef(null)
-  const ctrlRef  = useRef(null)   // exposes zoomIn / zoomOut / reset to buttons
+  const ctrlRef  = useRef(null)
 
   useEffect(() => {
     if (!mountRef.current || !element) return
@@ -68,19 +67,16 @@ function AtomViewer({ element }) {
     const W = container.offsetWidth || 360
     const H = 380
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(W, H)
     renderer.setClearColor(0x000000, 0)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     container.appendChild(renderer.domElement)
 
-    // Scene / Camera
     const scene  = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 1000)
     camera.position.set(0, 0, 8)
 
-    // Lighting
     scene.add(new THREE.AmbientLight(0xffffff, 0.4))
     const pl1 = new THREE.PointLight(0xffffff, 0.8); pl1.position.set(5, 5, 5);   scene.add(pl1)
     const pl2 = new THREE.PointLight(0x4488ff, 0.4); pl2.position.set(-5,-3,-5);  scene.add(pl2)
@@ -102,24 +98,22 @@ function AtomViewer({ element }) {
       mesh.position.set(r*Math.sin(phi)*Math.cos(th), r*Math.sin(phi)*Math.sin(th), r*Math.cos(phi))
       scene.add(mesh)
     }
-    // Nucleus glow
     const nucleusHex = parseInt(catColor.border.replace('#',''), 16)
     scene.add(new THREE.Mesh(
       new THREE.SphereGeometry(nucleonR + 0.18, 20, 20),
       new THREE.MeshBasicMaterial({ color: nucleusHex, transparent: true, opacity: 0.12 })
     ))
 
-    // Electron shells
-    const shells      = element.shells || []
-    const electronObjs = []  // { mesh, radius, phase, speed }
+    // Electron shells — each shell gets a Group with same rotation as its ring
+    const shells       = element.shells || []
+    const electronObjs = []
     const SHELL_COLORS = [0x38bdf8, 0xa78bfa, 0x4ade80, 0xfbbf24, 0xf87171, 0xfb923c, 0xe879f9]
 
     shells.forEach((count, si) => {
       const shellR = 1.4 + si * 1.0
-      const tiltX  = Math.PI / 2 + si * 0.35   // unique tilt per shell for 3-D look
+      const tiltX  = Math.PI / 2 + si * 0.35
       const tiltY  = si * 0.5
 
-      // Orbit ring
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(shellR, 0.012, 8, 80),
         new THREE.MeshBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.5 })
@@ -128,24 +122,21 @@ function AtomViewer({ element }) {
       ring.rotation.y = tiltY
       scene.add(ring)
 
-      // Orbit group — SAME rotation as ring so electrons are always on the ring
       const group = new THREE.Group()
       group.rotation.x = tiltX
       group.rotation.y = tiltY
       scene.add(group)
 
-      // Electrons — colour cycles per shell for easy visual separation
       const eColor = SHELL_COLORS[si % SHELL_COLORS.length]
       const eMat   = new THREE.MeshPhongMaterial({ color: eColor, emissive: eColor, emissiveIntensity: 0.5, shininess: 100 })
-      const eGeo   = new THREE.SphereGeometry(0.09, 8, 8)
       for (let e = 0; e < count; e++) {
-        const mesh = new THREE.Mesh(eGeo, eMat)
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eMat)
         group.add(mesh)
         electronObjs.push({ mesh, radius: shellR, phase: (e / count) * Math.PI * 2, speed: 0.4 / (si + 1) })
       }
     })
 
-    // Mouse drag to orbit
+    // Mouse drag + scroll zoom
     let isDragging = false, prev = { x:0, y:0 }
     let rotX = 0.3, rotY = 0.2
     const onDown = e => { isDragging = true; prev = { x: e.clientX, y: e.clientY } }
@@ -156,7 +147,6 @@ function AtomViewer({ element }) {
       rotX += (e.clientY - prev.y) * 0.01
       prev = { x: e.clientX, y: e.clientY }
     }
-    // Scroll wheel zoom
     const onWheel = e => {
       e.preventDefault()
       camera.position.z = Math.max(3, Math.min(22, camera.position.z + e.deltaY * 0.02))
@@ -166,14 +156,12 @@ function AtomViewer({ element }) {
     window.addEventListener('mouseup', onUp)
     window.addEventListener('mousemove', onMove)
 
-    // Expose controls to overlay buttons
     ctrlRef.current = {
       zoomIn:  () => { camera.position.z = Math.max(3,  camera.position.z - 1.5) },
       zoomOut: () => { camera.position.z = Math.min(22, camera.position.z + 1.5) },
       reset:   () => { rotX = 0.3; rotY = 0.2; camera.position.z = 8 },
     }
 
-    // Animation loop
     let t = 0, animId
     const animate = () => {
       animId = requestAnimationFrame(animate)
@@ -181,7 +169,6 @@ function AtomViewer({ element }) {
       if (!isDragging) rotY += 0.004
       scene.rotation.y = rotY
       scene.rotation.x = rotX * 0.3
-      // Electrons orbit in the group's local XY plane — always on the ring
       electronObjs.forEach(obj => {
         const angle = obj.phase + t * obj.speed
         obj.mesh.position.set(obj.radius * Math.cos(angle), obj.radius * Math.sin(angle), 0)
@@ -204,16 +191,14 @@ function AtomViewer({ element }) {
 
   return (
     <div style={{ position:'relative', userSelect:'none' }}>
-      {/* Canvas */}
       <div ref={mountRef} style={{
         width:'100%', height:380, cursor:'grab', borderRadius:10, overflow:'hidden',
         background:'radial-gradient(ellipse at 50% 50%, #0a1a35 0%, #050a18 100%)',
       }} />
-      {/* Zoom / reset buttons */}
       <div style={{ position:'absolute', bottom:10, right:10, display:'flex', flexDirection:'column', gap:4 }}>
         {[
-          { s:'+', fn: () => ctrlRef.current?.zoomIn(),  t:'Zoom in'   },
-          { s:'−', fn: () => ctrlRef.current?.zoomOut(), t:'Zoom out'  },
+          { s:'+', fn: () => ctrlRef.current?.zoomIn(),  t:'Zoom in'    },
+          { s:'−', fn: () => ctrlRef.current?.zoomOut(), t:'Zoom out'   },
           { s:'⟲', fn: () => ctrlRef.current?.reset(),  t:'Reset view' },
         ].map(({ s, fn, t }) => (
           <button key={s} onClick={fn} title={t} style={{
@@ -223,7 +208,6 @@ function AtomViewer({ element }) {
           }}>{s}</button>
         ))}
       </div>
-      {/* Shell legend */}
       <div style={{ position:'absolute', top:8, left:8, display:'flex', flexWrap:'wrap', gap:4 }}>
         {(element?.shells || []).map((count, i) => (
           <div key={i} style={{
@@ -236,13 +220,12 @@ function AtomViewer({ element }) {
   )
 }
 
-// ── Element tile ──────────────────────────────────────────────────────────────
-function ElementCell({ el, isSelected, onClick, scale }) {
-  if (!el) return <div style={{ width:40, height:48, flexShrink:0 }} />
-  const cat    = CATEGORY_COLORS[el.cat] || CATEGORY_COLORS.unknown
-  const state  = stateAtSTP(el)
+// ── Element tile — accepts tileW/tileH for dynamic sizing ─────────────────────
+function ElementCell({ el, isSelected, onClick, scale, tileW, tileH }) {
+  if (!el) return <div style={{ width:tileW, height:tileH, flexShrink:0 }} />
+  const cat   = CATEGORY_COLORS[el.cat] || CATEGORY_COLORS.unknown
+  const state = stateAtSTP(el)
 
-  // Trend colour overlay replaces category background
   let bg     = isSelected ? 'rgba(251,191,36,0.28)' : cat.bg
   let border = isSelected ? '#fbbf24' : cat.border
   if (scale) {
@@ -253,35 +236,39 @@ function ElementCell({ el, isSelected, onClick, scale }) {
     }
   }
 
+  // Font sizes scale with tile width
+  const fs = { n: Math.max(7, Math.round(tileW*0.20)), sym: Math.max(10, Math.round(tileW*0.325)), mass: Math.max(6, Math.round(tileW*0.175)) }
+  const dotSz = Math.max(3, Math.round(tileW * 0.10))
+
   return (
     <div onClick={() => onClick(el)}
       title={`${el.name} (${el.n}) · ${el.mass} u · ${STATE_LABEL[state]}`}
       style={{
-        width:40, height:48, borderRadius:5, border:`1px solid ${border}`,
-        background: bg, cursor:'pointer', flexShrink:0,
+        width:tileW, height:tileH, borderRadius: Math.max(3, Math.round(tileW*0.08)),
+        border:`1px solid ${border}`, background:bg,
+        cursor:'pointer', flexShrink:0,
         display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
         transition:'transform .12s, box-shadow .12s',
-        transform: isSelected ? 'scale(1.14)' : 'scale(1)',
+        transform: isSelected ? 'scale(1.12)' : 'scale(1)',
         boxShadow: isSelected ? '0 0 12px rgba(251,191,36,0.55)' : 'none',
       }}>
-      <div style={{ fontSize:8,  color:cat.text, opacity:0.65, lineHeight:1 }}>{el.n}</div>
-      <div style={{ fontSize:13, color:cat.text, fontWeight:700, fontFamily:'monospace', lineHeight:1.1 }}>{el.symbol}</div>
-      <div style={{ fontSize:7,  color:cat.text, opacity:0.6,  lineHeight:1 }}>{el.mass.toFixed(1)}</div>
-      <div style={{ width:4, height:4, borderRadius:'50%', background:STATE_DOT[state], marginTop:1 }} />
+      <div style={{ fontSize:fs.n,   color:cat.text, opacity:0.65, lineHeight:1 }}>{el.n}</div>
+      <div style={{ fontSize:fs.sym, color:cat.text, fontWeight:700, fontFamily:'monospace', lineHeight:1.1 }}>{el.symbol}</div>
+      <div style={{ fontSize:fs.mass,color:cat.text, opacity:0.6, lineHeight:1 }}>{el.mass.toFixed(1)}</div>
+      <div style={{ width:dotSz, height:dotSz, borderRadius:'50%', background:STATE_DOT[state], marginTop:1 }} />
     </div>
   )
 }
 
-// Ghost placeholder at La / Ac positions in the main body
-function GhostTile({ label, sub }) {
+function GhostTile({ label, sub, tileW, tileH }) {
   return (
     <div style={{
-      width:40, height:48, borderRadius:5, border:'1px dashed #334155',
+      width:tileW, height:tileH, borderRadius:4, border:'1px dashed #334155',
       background:'rgba(99,102,241,0.07)', flexShrink:0,
       display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
     }}>
-      <div style={{ fontSize:8,  color:'#6366f1', textAlign:'center' }}>{label}</div>
-      <div style={{ fontSize:7,  color:'#475569', textAlign:'center' }}>{sub}</div>
+      <div style={{ fontSize: Math.max(7, Math.round(tileW*0.175)), color:'#6366f1', textAlign:'center', lineHeight:1.2 }}>{label}</div>
+      <div style={{ fontSize: Math.max(6, Math.round(tileW*0.15)),  color:'#475569', textAlign:'center' }}>{sub}</div>
     </div>
   )
 }
@@ -313,10 +300,8 @@ function InfoPanel({ element, C }) {
     ['Discovered by',   fmt(element.discovered)],
     ['Year',            fmt(element.year)],
   ]
-
   return (
     <div style={{ display:'flex', flexDirection:'column' }}>
-      {/* Header */}
       <div style={{ background:cat.bg, borderBottom:`1px solid ${cat.border}`, padding:'14px 18px', display:'flex', alignItems:'center', gap:14 }}>
         <div style={{ width:68, height:68, borderRadius:10, border:`2px solid ${cat.border}`, background:'rgba(0,0,0,0.28)',
                       display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
@@ -336,16 +321,12 @@ function InfoPanel({ element, C }) {
           </div>
         </div>
       </div>
-
-      {/* 3D Atom viewer */}
       <div style={{ padding:'12px 14px', background:C.surface2 }}>
         <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>
           Bohr Model — drag to rotate · scroll to zoom
         </div>
         <AtomViewer element={element} />
       </div>
-
-      {/* Properties */}
       <div style={{ padding:'12px 18px' }}>
         <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>Properties</div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'3px 10px' }}>
@@ -357,14 +338,10 @@ function InfoPanel({ element, C }) {
           ))}
         </div>
       </div>
-
-      {/* Uses */}
       <div style={{ padding:'0 18px 12px' }}>
         <div style={{ fontSize:10, color:C.hint, marginBottom:5, letterSpacing:'.08em', textTransform:'uppercase' }}>Common Uses</div>
         <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>{element.uses}</div>
       </div>
-
-      {/* Fun fact */}
       <div style={{ margin:'0 18px 18px', padding:'10px 14px', background:cat.bg, borderLeft:`3px solid ${cat.border}`, borderRadius:'0 8px 8px 0' }}>
         <div style={{ fontSize:10, color:cat.text, opacity:0.65, fontWeight:600, marginBottom:4 }}>⚡ Fun fact</div>
         <div style={{ fontSize:12, color:cat.text, lineHeight:1.65 }}>{element.fact}</div>
@@ -373,7 +350,7 @@ function InfoPanel({ element, C }) {
   )
 }
 
-// ── Category legend (clickable filters) ──────────────────────────────────────
+// ── Category legend (clickable, with clear) ───────────────────────────────────
 function Legend({ filterCat, setFilterCat, C }) {
   const cats = [
     ['alkali-metal','Alkali Metal'],        ['alkaline-earth','Alkaline Earth'],
@@ -383,7 +360,13 @@ function Legend({ filterCat, setFilterCat, C }) {
     ['lanthanide','Lanthanide'],            ['actinide','Actinide'],
   ]
   return (
-    <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+    <div style={{ display:'flex', flexWrap:'wrap', gap:4, alignItems:'center' }}>
+      {filterCat && (
+        <button onClick={() => setFilterCat(null)} style={{
+          padding:'2px 8px', borderRadius:4, border:'1px solid #475569',
+          background:'transparent', color:'#94a3b8', fontSize:10, cursor:'pointer',
+        }}>× All</button>
+      )}
       {cats.map(([key, label]) => {
         const c      = CATEGORY_COLORS[key]
         const active = filterCat === key
@@ -396,7 +379,7 @@ function Legend({ filterCat, setFilterCat, C }) {
               border:     active ? `1px solid ${c.border}` : '1px solid transparent',
             }}>
             <div style={{ width:8, height:8, borderRadius:2, background:c.bg, border:`1px solid ${c.border}`, flexShrink:0 }} />
-            <span style={{ fontSize:10, color: active ? c.text : C.muted }}>{label}</span>
+            <span style={{ fontSize:10, color: active ? c.text : C.muted }}>{active ? `${label} ×` : label}</span>
           </div>
         )
       })}
@@ -404,7 +387,7 @@ function Legend({ filterCat, setFilterCat, C }) {
   )
 }
 
-// ── State-at-STP filter chips ─────────────────────────────────────────────────
+// ── State-at-STP filter chips with clear button ───────────────────────────────
 function StateFilters({ filterState, setFilterState, C }) {
   const opts = [
     { key:'solid',  label:'Solids',  color:'#94a3b8' },
@@ -412,7 +395,13 @@ function StateFilters({ filterState, setFilterState, C }) {
     { key:'gas',    label:'Gases',   color:'#fbbf24' },
   ]
   return (
-    <div style={{ display:'flex', gap:5 }}>
+    <div style={{ display:'flex', gap:5, alignItems:'center' }}>
+      {filterState && (
+        <button onClick={() => setFilterState(null)} style={{
+          padding:'4px 9px', borderRadius:6, border:'1px solid #475569',
+          background:'transparent', color:'#94a3b8', fontSize:11, cursor:'pointer',
+        }}>× All</button>
+      )}
       {opts.map(({ key, label, color }) => {
         const active = filterState === key
         return (
@@ -424,7 +413,7 @@ function StateFilters({ filterState, setFilterState, C }) {
             display:'flex', alignItems:'center', gap:5,
           }}>
             <span style={{ width:6, height:6, borderRadius:'50%', background:color, display:'inline-block' }} />
-            {label}
+            {active ? `${label} ×` : label}
           </button>
         )
       })}
@@ -437,6 +426,12 @@ function TrendBar({ active, setActive, C }) {
   return (
     <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
       <span style={{ fontSize:11, color:C.hint, whiteSpace:'nowrap' }}>Trend:</span>
+      {active && (
+        <button onClick={() => setActive(null)} style={{
+          padding:'4px 9px', borderRadius:6, border:'1px solid #475569',
+          background:'transparent', color:'#94a3b8', fontSize:11, cursor:'pointer',
+        }}>× Off</button>
+      )}
       {TRENDS.map(t => {
         const on = active === t.key
         return (
@@ -445,7 +440,7 @@ function TrendBar({ active, setActive, C }) {
             border:`1px solid ${on ? t.color : C.border}`,
             background: on ? `${t.color}22` : C.surface,
             color: on ? t.color : C.muted,
-          }}>{t.label}</button>
+          }}>{on ? `${t.label} ×` : t.label}</button>
         )
       })}
     </div>
@@ -460,6 +455,25 @@ export default function PeriodicTable({ params = {} }) {
   const [filterCat,   setFilterCat]   = useState(null)
   const [filterState, setFilterState] = useState(null)
   const [activeTrend, setActiveTrend] = useState(null)
+
+  // Dynamic tile sizing via ResizeObserver
+  const tableAreaRef = useRef(null)
+  const [tileW, setTileW] = useState(40)
+  const tileH = Math.round(tileW * 1.2)
+
+  useEffect(() => {
+    const el = tableAreaRef.current
+    if (!el) return
+    const compute = () => {
+      // container width minus: horizontal padding (12px each side), period label (22px), 17 gaps (2px each)
+      const available = el.offsetWidth - 24 - 22 - 17 * 2
+      setTileW(Math.max(32, Math.min(72, Math.floor(available / 18))))
+    }
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const scale = activeTrend ? buildScale(activeTrend) : null
 
@@ -477,21 +491,23 @@ export default function PeriodicTable({ params = {} }) {
     if (!search) return true
     const q = search.toLowerCase()
     return (
-      el.name.toLowerCase().includes(q)                              ||
-      el.symbol.toLowerCase().includes(q)                            ||
-      String(el.n).includes(q)                                       ||
-      el.cat.toLowerCase().replace(/-/g,' ').includes(q)             ||
-      STATE_LABEL[stateAtSTP(el)].toLowerCase().includes(q)          ||
-      `period ${el.period}`.includes(q)                              ||
+      el.name.toLowerCase().includes(q)                     ||
+      el.symbol.toLowerCase().includes(q)                   ||
+      String(el.n).includes(q)                              ||
+      el.cat.toLowerCase().replace(/-/g,' ').includes(q)    ||
+      STATE_LABEL[stateAtSTP(el)].toLowerCase().includes(q) ||
+      `period ${el.period}`.includes(q)                     ||
       `group ${el.group}`.includes(q)
     )
   }
 
+  const gap = 2  // px gap between tiles
+
   return (
-    <div style={{ width:'100%', fontFamily:'sans-serif', background:C.bg, minHeight:'100vh' }}>
+    <div style={{ width:'100%', height:'100%', fontFamily:'sans-serif', background:C.bg, display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
       {/* Header */}
-      <div style={{ padding:'10px 14px', borderBottom:`0.5px solid ${C.border}`, display:'flex', flexDirection:'column', gap:8 }}>
+      <div style={{ padding:'10px 14px', borderBottom:`0.5px solid ${C.border}`, display:'flex', flexDirection:'column', gap:8, flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
           <div>
             <div style={{ fontSize:16, fontWeight:600, color:C.text }}>Periodic Table</div>
@@ -512,31 +528,31 @@ export default function PeriodicTable({ params = {} }) {
         <Legend filterCat={filterCat} setFilterCat={setFilterCat} C={C} />
       </div>
 
-      <div style={{ display:'flex' }}>
+      {/* Body */}
+      <div style={{ display:'flex', flex:1, minHeight:0 }}>
 
-        {/* Table area */}
-        <div style={{ flex:1, padding:'8px 6px', overflowX:'auto' }}>
+        {/* Table area — flex:1 fills remaining space, ResizeObserver watches it */}
+        <div ref={tableAreaRef} style={{ flex:1, padding:'8px 12px', overflowX:'auto', overflowY:'auto' }}>
 
           {/* Group numbers 1–18 */}
-          <div style={{ display:'flex', gap:2, marginBottom:2, paddingLeft:22 }}>
+          <div style={{ display:'flex', gap, marginBottom:2, paddingLeft:22 }}>
             {Array.from({ length:18 }, (_,i) => (
-              <div key={i} style={{ width:40, fontSize:8, color:C.hint, textAlign:'center', flexShrink:0 }}>{i+1}</div>
+              <div key={i} style={{ width:tileW, fontSize:8, color:C.hint, textAlign:'center', flexShrink:0 }}>{i+1}</div>
             ))}
           </div>
 
           {/* Periods 1–7 */}
-          <div style={{ display:'flex', flexDirection:'column', gap:2, marginBottom:6 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap, marginBottom:6 }}>
             {grid.slice(0,7).map((row, ri) => (
-              <div key={ri} style={{ display:'flex', gap:2, alignItems:'center' }}>
+              <div key={ri} style={{ display:'flex', gap, alignItems:'center' }}>
                 <div style={{ width:18, fontSize:9, color:C.hint, textAlign:'right', flexShrink:0 }}>{ri+1}</div>
                 {row.map((el, ci) => {
-                  // Ghost placeholders where lanthanide/actinide rows branch off
-                  if (!el && ri === 5 && ci === 2) return <GhostTile key={ci} label="57–71" sub="La–Lu" />
-                  if (!el && ri === 6 && ci === 2) return <GhostTile key={ci} label="89–103" sub="Ac–Lr" />
-                  if (!el) return <div key={ci} style={{ width:40, height:48, flexShrink:0 }} />
+                  if (!el && ri === 5 && ci === 2) return <GhostTile key={ci} label="57–71" sub="La–Lu" tileW={tileW} tileH={tileH} />
+                  if (!el && ri === 6 && ci === 2) return <GhostTile key={ci} label="89–103" sub="Ac–Lr" tileW={tileW} tileH={tileH} />
+                  if (!el) return <div key={ci} style={{ width:tileW, height:tileH, flexShrink:0 }} />
                   return (
                     <div key={ci} style={{ opacity: matches(el) ? 1 : 0.13, transition:'opacity .18s' }}>
-                      <ElementCell el={el} isSelected={selected?.n === el.n} onClick={setSelected} scale={scale} />
+                      <ElementCell el={el} isSelected={selected?.n === el.n} onClick={setSelected} scale={scale} tileW={tileW} tileH={tileH} />
                     </div>
                   )
                 })}
@@ -545,31 +561,30 @@ export default function PeriodicTable({ params = {} }) {
           </div>
 
           {/* Separator */}
-          <div style={{ height:1, background:C.border, margin:'0 0 5px 22px' }} />
+          <div style={{ height:1, background:C.border, margin:`0 0 5px 22px` }} />
           <div style={{ fontSize:10, color:C.hint, marginBottom:4, paddingLeft:22 }}>
             Lanthanides (period 6) · Actinides (period 7)
           </div>
 
           {/* Lanthanide / actinide rows */}
           {grid.slice(7).map((row, ri) => (
-            <div key={ri} style={{ display:'flex', gap:2, marginBottom:2, alignItems:'center' }}>
+            <div key={ri} style={{ display:'flex', gap, marginBottom:gap, alignItems:'center' }}>
               <div style={{ width:18, fontSize:9, color:C.hint, textAlign:'right', flexShrink:0 }}>{ri===0?'6':'7'}</div>
-              {/* Spacer to align with column 3 */}
-              <div style={{ width: 2*(40+2)+2, flexShrink:0 }} />
+              <div style={{ width: 2*(tileW+gap)+gap, flexShrink:0 }} />
               {row.slice(2).map((el, ci) => {
-                if (!el) return <div key={ci} style={{ width:40, height:48, flexShrink:0 }} />
+                if (!el) return <div key={ci} style={{ width:tileW, height:tileH, flexShrink:0 }} />
                 return (
                   <div key={ci} style={{ opacity: matches(el) ? 1 : 0.13, transition:'opacity .18s' }}>
-                    <ElementCell el={el} isSelected={selected?.n === el.n} onClick={setSelected} scale={scale} />
+                    <ElementCell el={el} isSelected={selected?.n === el.n} onClick={setSelected} scale={scale} tileW={tileW} tileH={tileH} />
                   </div>
                 )
               })}
             </div>
           ))}
 
-          {/* Trend colour scale legend */}
+          {/* Trend scale legend */}
           {scale && (
-            <div style={{ marginTop:12, marginLeft:22, display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ marginTop:10, marginLeft:22, display:'flex', alignItems:'center', gap:8 }}>
               <span style={{ fontSize:10, color:C.muted }}>{scale.label}{scale.unit ? ` (${scale.unit})` : ''} :</span>
               <div style={{ width:100, height:8, borderRadius:4,
                             background:`linear-gradient(to right, rgba(${scale.rgb.join(',')},0.12), ${scale.color})` }} />
@@ -591,7 +606,7 @@ export default function PeriodicTable({ params = {} }) {
         {/* Info panel */}
         <div style={{
           width:400, flexShrink:0, borderLeft:`0.5px solid ${C.border}`,
-          background:C.surface, overflowY:'auto', maxHeight:'calc(100vh - 80px)',
+          background:C.surface, overflowY:'auto', height:'100%',
         }}>
           <InfoPanel element={selected} C={C} />
         </div>

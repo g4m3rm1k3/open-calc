@@ -136,6 +136,13 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                 Reference
               </Link>
               <Link
+                to="/chemistry"
+                onClick={onNavigate}
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+              >
+                ⚛ Chemistry
+              </Link>
+              <Link
                 to="/universal-calc"
                 onClick={onNavigate}
                 className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"

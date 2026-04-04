@@ -1,17 +1,9 @@
-import { useState, useMemo, Suspense, lazy } from 'react'
+import { useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import katex from 'katex'
 import { REFERENCE_CATEGORIES, ALL_ENTRIES } from '../content/reference-data.js'
 import { PROOFS } from '../content/proofs/index.js'
 import ProofModal from '../components/ui/ProofModal.jsx'
-import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
-
-const PeriodicTable  = lazy(() => import('../components/viz/react/PeriodicTable.jsx'))
-const MoleculeBuilder = lazy(() => import('../components/viz/react/MoleculeBuilder.jsx'))
-
-const CHEM_TABS = [
-  { id: 'periodic', label: 'Periodic Table' },
-  { id: 'molecules', label: 'Molecule Builder' },
-]
 
 const COLOR_CLASSES = {
   blue:    { badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',    tab: 'bg-blue-600 text-white',    tabInactive: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30' },
@@ -81,8 +73,6 @@ function FormulaCard({ entry, onOpenProof }) {
 }
 
 export default function ReferencePage() {
-  const [periodicOpen, setPeriodicOpen] = useState(false)
-  const [chemTab, setChemTab] = useState('periodic')
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
   const [proofEntry, setProofEntry] = useState(null)
@@ -105,65 +95,24 @@ export default function ReferencePage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Fullscreen Periodic Table overlay */}
-      {periodicOpen && (
-        <div className="fixed inset-0 z-[9999] bg-slate-950 flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 shrink-0">
-            <div className="flex gap-1">
-              {CHEM_TABS.map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setChemTab(t.id)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
-                    chemTab === t.id
-                      ? 'bg-lime-700/60 text-lime-200'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setPeriodicOpen(false)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Close
-            </button>
-          </div>
-          <div className="flex-1 overflow-auto">
-            <Suspense fallback={<div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>}>
-              {chemTab === 'periodic'  && <PeriodicTable   params={{}} />}
-              {chemTab === 'molecules' && <MoleculeBuilder params={{}} />}
-            </Suspense>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">Reference</h1>
           <p className="text-slate-500 dark:text-slate-400">
             Laws, identities, and theorems — every formula in one place.{' '}
-          <span className="text-amber-600 dark:text-amber-400 font-medium">
-            {proofCount} formulas have step-by-step proofs.
-          </span>{' '}
-          Click any highlighted card to explore.
+            <span className="text-amber-600 dark:text-amber-400 font-medium">
+              {proofCount} formulas have step-by-step proofs.
+            </span>{' '}
+            Click any highlighted card to explore.
           </p>
         </div>
-        <button
-          onClick={() => setPeriodicOpen(true)}
-          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-lime-300 dark:border-lime-700 bg-lime-50 dark:bg-lime-950/40 text-lime-700 dark:text-lime-400 text-sm font-semibold hover:bg-lime-100 dark:hover:bg-lime-900/50 transition-colors"
+        <Link
+          to="/chemistry"
+          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M10 3v18M14 3v18" />
-          </svg>
-          Periodic Table
-        </button>
+          ⚛ Periodic Table
+        </Link>
       </div>
 
       {/* Search */}

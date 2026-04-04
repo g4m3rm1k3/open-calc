@@ -351,6 +351,7 @@ function WelcomeModal() {
 export default function AppShell({ children }) {
   const location = useLocation()
   const isUniversalCalcRoute = location.pathname.startsWith('/universal-calc')
+  const isChemistryRoute     = location.pathname.startsWith('/chemistry')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem('oc-sidebar-pinned')
@@ -551,10 +552,14 @@ export default function AppShell({ children }) {
       </aside>
 
       {/* Main content */}
-      <main className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 min-h-screen ${sidebarPinned ? 'lg:pl-[280px]' : 'lg:pl-3'}`}>
-        <div className={isUniversalCalcRoute
-          ? 'max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8'
-          : `${sidebarPinned ? 'max-w-4xl' : 'max-w-6xl'} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`}>
+      <main className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 ${isChemistryRoute ? 'h-screen overflow-hidden' : 'min-h-screen'} ${sidebarPinned ? 'lg:pl-[280px]' : 'lg:pl-3'}`}>
+        <div className={
+          isChemistryRoute
+            ? 'w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden'
+            : isUniversalCalcRoute
+              ? 'max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8'
+              : `${sidebarPinned ? 'max-w-4xl' : 'max-w-6xl'} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`
+        }>
           {children ?? <Outlet />}
         </div>
       </main>
