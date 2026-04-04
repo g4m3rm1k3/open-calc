@@ -89,8 +89,8 @@ function QuizQuestion({ q, index, onAnswer }) {
                 const isCorrectOpt = opt === q.answer
                 let optStyle = 'border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 cursor-pointer'
                 if (submitted) {
-                  if (isCorrectOpt) optStyle = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-600'
-                  else if (isSelected && !isCorrectOpt) optStyle = 'border-red-400 bg-red-50 dark:bg-red-900/30 dark:border-red-600'
+                  if (isSelected && correct) optStyle = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-600'
+                  else if (isSelected && !correct) optStyle = 'border-red-400 bg-red-50 dark:bg-red-900/30 dark:border-red-600'
                   else optStyle = 'border-slate-200 dark:border-slate-700 opacity-50'
                 } else if (isSelected) {
                   optStyle = 'border-brand-400 bg-brand-50 dark:bg-brand-900/30 dark:border-brand-500 cursor-pointer'
@@ -146,9 +146,19 @@ function QuizQuestion({ q, index, onAnswer }) {
                 )}
               </>
             ) : (
-              <span className={`text-xs font-semibold ${correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                {correct ? '+1 pt' : `Incorrect — answer: ${q.answer}`}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className={`text-xs font-semibold ${correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {correct ? '+1 pt' : 'Incorrect — try again'}
+                </span>
+                {!correct && (
+                  <button
+                    onClick={() => { setSubmitted(false); setSelected(null); setInputVal(''); setCorrect(null) }}
+                    className="text-xs text-brand-600 dark:text-brand-400 underline underline-offset-2 hover:text-brand-700"
+                  >
+                    Try again
+                  </button>
+                )}
+              </div>
             )}
 
             {submitted && !correct && q.reviewSection && (
@@ -170,7 +180,7 @@ function QuizQuestion({ q, index, onAnswer }) {
 }
 
 export default function LessonQuizBlock({ lessonId, questions }) {
-  const { setQuizScore, getQuizScore } = useProgress()
+  const { setQuizScore, getQuizScore, markCheckpoint } = useProgress()
   const saved = getQuizScore(lessonId)
   const total = questions.length
 
@@ -188,9 +198,13 @@ export default function LessonQuizBlock({ lessonId, questions }) {
       const correct = Object.values(next).filter(Boolean).length
       // Update persisted score immediately after every answer
       setQuizScore(lessonId, correct, attempted, total)
+      // Mark quiz checkpoint when all questions answered with ≥ 80%
+      if (attempted === total && correct / total >= 0.8) {
+        markCheckpoint(lessonId, 'quiz-passed')
+      }
       return next
     })
-  }, [total, lessonId, setQuizScore])
+  }, [total, lessonId, setQuizScore, markCheckpoint])
 
   // What to show in the score badge:
   // - During session: live count

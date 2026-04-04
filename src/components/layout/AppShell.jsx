@@ -35,7 +35,9 @@ function MobileLocationBadge() {
 
   if (!label) return null
 
-  const chapterLabel = chapter ? `Ch. ${chapter.number}` : null
+  const chapterLabel = chapter
+    ? /^\d+$/.test(String(chapter.number)) ? `Ch. ${chapter.number}` : chapter.title
+    : null
 
   return (
     <div className="lg:hidden flex items-center gap-1.5 min-w-0 max-w-[160px]">
@@ -486,7 +488,7 @@ export default function AppShell({ children }) {
       <aside 
         onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
         onMouseLeave={() => setSidebarHovered(false)}
-        className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out w-[280px]
+        className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 ease-in-out w-[280px]
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           ${isSidebarExpanded ? 'lg:translate-x-0' : 'lg:-translate-x-[276px]'}
           ${!sidebarPinned && isSidebarExpanded ? 'shadow-2xl ring-1 ring-black/5 dark:ring-white/5' : ''}
@@ -507,7 +509,7 @@ export default function AppShell({ children }) {
       </aside>
 
       {/* Main content */}
-      <main className={`transition-all duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 min-h-screen ${sidebarPinned ? 'lg:pl-[280px]' : 'lg:pl-3'}`}>
+      <main className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 min-h-screen ${sidebarPinned ? 'lg:pl-[280px]' : 'lg:pl-3'}`}>
         <div className={isUniversalCalcRoute
           ? 'max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8'
           : `${sidebarPinned ? 'max-w-4xl' : 'max-w-6xl'} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`}>

@@ -792,9 +792,42 @@ All tools are accessible from the top bar on any page. Each is a floating panel 
 
 ## 13. Video System
 
-The video system has three parts that are loosely connected.
+The video system uses a three-tier priority chain to associate videos with lessons. No manual curation is required for new courses — tag matching handles discovery automatically.
 
-### `src/content/videos/videoDatabase.js`
+### File Inventory
+
+| File | Role |
+|---|---|
+| `src/content/videos/videoDatabase.js` | Flat dictionary of all known videos, keyed by slug |
+| `src/content/videos/videoPlacementMap.js` | Manual override map: `lessonId → {section: [videoSlugs]}` |
+| `src/content/videos/videoLibrary.generated.js` | Auto-generated metadata: each video entry has `tags[]` and `keywords[]` |
+| `src/content/videos/videoSelector.js` | Scoring function `selectVideosByKeywords(keywords, {limit})` |
+| `src/context/VideoPlayerContext.jsx` | React context holding all player state and current video selection |
+| `src/components/videos/FloatingVideoPlayer.jsx` | Floating drag/resize panel; playlist browser + playback UI |
+
+### Priority Chain
+
+Both `VideoPlayerContext` and `FloatingVideoPlayer` resolve videos for a lesson using the same three-tier chain:
+
+1. **Custom videos** — user-added YouTube URLs stored in localStorage (`open-calc-custom-videos`). Always shown first.
+2. **Placement map** — if the lesson ID appears in `VIDEO_PLACEMENT_MAP`, those curated slugs are used. This is the hand-picked path for calc/physics lessons.
+3. **Tag-based fallback** — `selectVideosByKeywords(lesson.tags, {limit})` scores every video in `videoLibrary.generated.js` by keyword overlap and returns the top N. This runs for any lesson that has a `tags[]` array and is not in the placement map. Panel section label: **"Related"**.
+
+If none of the three tiers yields a result, `currentVideo` is `null` and the player shows an empty state.
+
+### `videoSelector.js` Scoring
+
+```js
+// Each video in videoLibrary.generated.js is scored:
+// +3  exact keyword match in video's keywords[], tags[], title, or source
+// +1  partial match
+// Returns top-N by descending score
+export function selectVideosByKeywords(keywords, { limit = 5 } = {}) { ... }
+```
+
+To make tag-matching work for a new course, ensure `videoLibrary.generated.js` has entries with relevant `tags`/`keywords`. The lesson's own `tags: [...]` array drives discovery — no changes to `videoPlacementMap.js` needed.
+
+### `videoDatabase.js`
 
 A flat dictionary of all known videos:
 ```js
@@ -807,49 +840,38 @@ export const VIDEO_DATABASE = {
   // ... hundreds more
 }
 ```
-Videos are keyed by a short slug. Adding a video = one entry here.
+Videos are keyed by a short slug. Adding a video = one entry here, plus a matching entry in `videoLibrary.generated.js` with `tags` and `keywords`.
 
-### `src/content/videos/videoPlacementMap.js`
-
-Maps lesson IDs to arrays of video slugs per section:
-```js
-export const VIDEO_PLACEMENT_MAP = {
-  'ch1-limits-intro': {
-    intuition: ['3b1b-essence-limits', 'ka-EKvHQc3QEow', ...],
-    math: [...],
-  },
-}
-```
-This is a manual curation file. Only lesson IDs that appear here will have videos associated.
-
-### `src/components/videos/FloatingVideoPlayer.jsx`
+### `FloatingVideoPlayer.jsx`
 
 A large floating panel built with `framer-motion` (drag + resize). Features:
 - Playlist browser: navigable by course → chapter → lesson
-- Per-lesson video list pulled from `VIDEO_PLACEMENT_MAP`
+- Per-lesson video list resolved via the three-tier priority chain above
 - Custom video add (converts YouTube watch URLs to embed URLs)
 - Pin tracking (saved to localStorage `open-calc-pinned-videos`)
 - Video progress tracking via YouTube's postMessage API (percentage stored in `open-calc-video-progress`)
 - Sidebar toggle (playlist vs. player only mode)
 - Mobile responsive (sidebar collapses)
 
-**How it is opened**: The player has no visible UI of its own when closed. Open it via the `PlayCircle` button in the TopBar or press `V`. When closed or minimized, `FloatingVideoPlayer` returns `null`. `LessonPage` calls `setLessonId(lesson.id)` on mount so the context pre-selects the first available video for that lesson. The in-player X and Minimize buttons both call `toggleMinimize()`, which sets `isMinimized=true` and hides the player.
+**`dynamicCourses` filter**: the playlist sidebar shows a course in the browser if any of its lessons appear in `VIDEO_PLACEMENT_MAP` OR if any lesson has a `tags[]` array (enabling tag-based discovery). Both paths qualify.
+
+**How it is opened**: Open via the `PlayCircle` button in the TopBar or press `V`. `LessonPage` calls `setLessonId(lesson.id)` on mount so the context pre-selects the first available video for that lesson.
 
 **`formatAsVisualization` is hardcoded to return `null`**:
 ```js
-// VideoProvider.js line ~42:
 export function formatAsVisualization(videos, lessonId) {
   return null;   // ← early return, rest of function is dead code
-  ...
 }
 ```
-The enhancer calls this function to inject video vizzes into lesson sections — but it always returns null. **Videos never appear inline inside lesson content.** They are only accessible through the floating player.
+Videos are never injected inline into lesson content. They are only accessible through the floating player.
 
-### `src/context/VideoPlayerContext.jsx`
+### `VideoPlayerContext.jsx`
 
 Provides: `isOpen`, `isMinimized`, `currentVideo`, `lessonId`, `searchQuery`, `openPlayer`, `closePlayer`, `toggleMinimize`, `selectVideo`, `setLessonId`, `addCustomVideo`, `pinnedVideos`, `togglePin`, `customVideos`.
 
 State is fully in-memory (no React Reducer). `pinnedVideos` and `customVideos` are synced to localStorage on every change.
+
+**Sync effect**: fires unconditionally on every `lessonId` change. Sets `selectedCourse` and `selectedChapter` in the floating player to match the current lesson's location. Previously had a `!selectedCourse` guard that prevented re-syncing after initial load — removed.
 
 ---
 
@@ -925,12 +947,8 @@ If `public/search-index.json` is missing or fails to load, `useSearch` now build
 
 ---
 
-### 🔴 I — `formatAsVisualization` dead code
-```js
-export function formatAsVisualization(videos, lessonId) {
-  return null;  // ← first line, rest is dead code
-```
-Videos are never injected inline into lesson content. `VIDEO_DATABASE` and `VIDEO_PLACEMENT_MAP` are populated but only used by `FloatingVideoPlayer`'s sidebar browser. The inline injection pipeline is fully built but disabled. **Decision needed**: keep the floating-player-only model, or restore inline video blocks.
+### ✅ I — `formatAsVisualization` dead code
+Function kept as a named export (imported by `unifiedLessonEnhancer.js`) but now has a top-of-file comment marking it explicitly disabled. The body still returns `null` on the first line. Decision: floating-player-only model is the current design. Restoring inline video blocks is left as future work.
 
 ### 🔴 J — Three overlapping quiz systems
 - `InlineAssessment` inside `MicroCycleLesson` — renders `lesson.assessment.questions[]`, simple choice/input
@@ -939,18 +957,22 @@ Videos are never injected inline into lesson content. `VIDEO_DATABASE` and `VIDE
 
 Most lessons use none of them. Completing any quiz does not call `markCheckpoint`, so quiz scores never affect lesson completion status.
 
-### 🔴 K — SpiralBlock renders before MathBlock
-Actual render order: `Intuition → Spiral → mentalModel → Math → Rigor → Dock → Practice → Assessment`
-Spiral ("where you've been / where you're going") sits between Intuition and Math, breaking the conceptual flow. Should be near the end, after Practice.
+### ✅ K — SpiralBlock renders before MathBlock
+Fixed render order: `Intuition → mentalModel → Math → Rigor → Dock → Practice → Spiral → Assessment`. Spiral ("where you've been / where you're going") now appears after Practice as a capstone, not mid-flow.
 
-### 🔴 L — Viz silent 404
-When a lesson references an unknown viz `id`, `VizFrame` renders a blank div with no warning. In dev this is a silent runtime failure that's easy to miss. Should show a visible placeholder in dev mode.
+### ✅ L — Viz silent 404
+In dev mode (`import.meta.env.DEV`), `VizFrame` now renders a visible amber dashed-border placeholder showing the unknown `id` and the instruction to register it in `VIZ_REGISTRY`. In production it still returns `null` silently.
 
 ### 🟡 M — Three chapter index formats
 Some courses export a single chapter object, others export an array. `content/index.js` handles both, but new contributors frequently get this wrong. Standardizing to array format for all courses would eliminate the confusion (one-line wrap per course).
 
-### 🟡 N — `MobileLocationBadge` doesn't work for non-numeric chapter IDs
-Uses `String(c.number) === String(chapterId)`. Works for calc (chapters 0–6), silently shows nothing for `geometry-1`, `python-1-chapter-1`, etc.
+### ✅ P — FloatingVideoPlayer not syncing to current lesson on navigation
+The `lessonId` sync effect in `FloatingVideoPlayer` had a `!selectedCourse` guard — it ran once on first load, then never again. Navigation to a new lesson left `selectedCourse`/`selectedChapter` pointing at the original lesson. A secondary `navStack` check also blocked the update when the playlist sidebar was open. Both guards removed; the effect now fires unconditionally on every `lessonId` change.
+
+---
+
+### ✅ N — `MobileLocationBadge` doesn't work for non-numeric chapter IDs
+Fixed. For numeric chapter numbers (0–6) the badge still shows `Ch. N`. For string-based chapter numbers (`geometry-1`, `tetris.1`, etc.) it now shows the chapter title instead, using `/^\d+$/.test(String(chapter.number))`.
 
 ### 🟡 O — Search index requires manual rebuild
 After adding lessons, `public/search-index.json` must be regenerated (build script in `src/scripts/`). There's no CI step that enforces this. New lessons are absent from search until the index is rebuilt and committed.
@@ -1191,4 +1213,4 @@ incomplete ideas/
 
 ---
 
-*Last updated April 3, 2026. Recent changes: Tetris course (`tetris-1/`) added; navbar replaced with `CoursesDropdown`; `HomePage` now shows course cards instead of flat chapter list; sidebar chapter colors now fall back to course color; header raised to `z-[60]` to fix dropdown layering over sidebar.*
+*Last updated April 3, 2026. Recent changes: Tetris course (`tetris-1/`) added; navbar replaced with `CoursesDropdown`; `HomePage` now shows course cards instead of flat chapter list; sidebar chapter colors now fall back to course color; header raised to `z-[60]` to fix dropdown layering over sidebar; video system refactored to tag-based three-tier discovery (`videoSelector.js`); `FloatingVideoPlayer` sync effect fixed; `VizFrame` dev placeholder for unknown viz IDs (Issue L); `SpiralBlock` moved after Practice (Issue K); `MobileLocationBadge` fixed for non-numeric chapter IDs (Issue N); `formatAsVisualization` dead code annotated (Issue I).*

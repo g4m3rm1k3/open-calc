@@ -658,7 +658,6 @@ export default function MicroCycleLesson({ lesson }) {
   return (
     <div className="w-full">
       <IntuitionBlock data={lesson.intuition} lesson={lesson} />
-      <SpiralBlock spiral={lesson.spiral} />
       {lesson.mentalModel?.length > 0 && (
          <div className="mb-10 p-5 rounded-2xl bg-slate-900 text-white border-b-4 border-brand-500 shadow-2xl">
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
@@ -675,6 +674,7 @@ export default function MicroCycleLesson({ lesson }) {
       <RigorBlock data={lesson.rigor} />
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
+      <SpiralBlock spiral={lesson.spiral} />
       <InlineAssessment assessment={lesson.assessment} />
       {lesson.supplementalVisualizations?.length > 0 && (
         <div className="mt-12 space-y-8">

@@ -38,6 +38,9 @@ export function getVideosForLesson(lessonId, section, exampleId = null) {
  * @param {string} lessonId - Current lesson context
  * @returns {Object|null} - Visualization object for VizFrame
  */
+// NOTE: This function always returns null — inline video injection is disabled.
+// Videos are only accessible through FloatingVideoPlayer. The body below is
+// dead code kept for future reference. Do not call this function for new work.
 export function formatAsVisualization(videos, lessonId) {
   return null;
   if (!videos || videos.length === 0) return null;

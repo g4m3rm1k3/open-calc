@@ -855,7 +855,21 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     setParams(initialProps ?? {});
   }, [id, initialPropsKey]);
 
-  if (!VizComponent) return null;
+  if (!VizComponent) {
+    if (import.meta.env.DEV) {
+      return (
+        <div className="my-4 rounded-lg border-2 border-dashed border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-4 text-center">
+          <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">
+            ⚠ Unknown viz id: <span className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">{id}</span>
+          </p>
+          <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">
+            Register it in VizFrame.jsx → VIZ_REGISTRY
+          </p>
+        </div>
+      );
+    }
+    return null;
+  }
 
   const content = (
     <Suspense fallback={<VizSkeleton />}>
