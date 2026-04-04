@@ -257,6 +257,7 @@ export default function PhysicsPoolLab({ onClose }) {
     trail: false,
     forces: false,
     labels: false,
+    aimVectors: false,
   })
   const [panel,     setPanel]     = useState('data')       // 'data' | 'hit' | 'help'
   const [events,    setEvents]    = useState([])
@@ -267,6 +268,16 @@ export default function PhysicsPoolLab({ onClose }) {
   const [expandedEvent, setExpandedEvent] = useState(null)  // index of expanded event row
   const [friction,  setFrictionUI]  = useState(0.982)
   const [restitution, setRestitutionUI] = useState(0.88)
+  const [collisionStep, setCollisionStep] = useState(-1)
+  const [selectedVector, setSelectedVector] = useState(null)
+
+  // ── Collision browser refs ────────────────────────────────────────────────
+  const simSnapshotsRef  = useRef([])
+  const collisionStepRef = useRef(-1)
+  const drawnVectorsRef  = useRef([])
+  const frameCounterRef  = useRef(0)
+  const [slowMo, setSlowMo] = useState(false)
+  const slowMoRef = useRef(false)
 
   // ── Hit position picker ref (avoids closure stale) ────────────────────────
   const hitOffsetRef = useRef({ dx: 0, dy: 0 })
@@ -365,6 +376,15 @@ export default function PhysicsPoolLab({ onClose }) {
     const { x, y } = toWorld(sx, sy)
     const cue = st.balls.find(b => b.isCue && !b.pocketed)
     if (!cue) return
+    // Vector tip hit-test (collision step browser) — click near arrowhead to label
+    if (collisionStepRef.current >= 0 && drawnVectorsRef.current.length > 0) {
+      let hit = null
+      for (const v of drawnVectorsRef.current) {
+        if (hypot(x - v.ex, y - v.ey) < 22) { hit = v; break }
+      }
+      setSelectedVector(hit)
+      if (hit) return
+    }
     const ah = st.aimHandle
     const clickAngle = Math.atan2(y - cue.y, x - cue.x)
     const distFromBall = hypot(x - cue.x, y - cue.y)
@@ -435,6 +455,9 @@ export default function PhysicsPoolLab({ onClose }) {
     cue.spin = (ho.dx * cue.vy - ho.dy * cue.vx) * 1.6
     ah.dragging = false
     ah.dist = 90   // reset to mid-range for next shot
+    // keep simSnapshotsRef — user can still browse after shooting
+    setCollisionStep(-1); collisionStepRef.current = -1
+    setSelectedVector(null)
     st.shots++
     st.phase = 'rolling'
     setShots(st.shots)
@@ -473,12 +496,16 @@ export default function PhysicsPoolLab({ onClose }) {
     const W = canvas.width, H = canvas.height
     const scale = st.scale ?? 1
 
+    // Slow-mo: skip physics every 4 out of 5 frames
+    frameCounterRef.current++
+    const runPhysics = !slowMoRef.current || (frameCounterRef.current % 5 === 0)
+
     // Transform: world → canvas
     ctx.setTransform(scale, 0, 0, scale, 0, 0)
 
     // ── Physics update ────────────────────────────────────────────────────
     const eventsThisFrame = []
-    for (const b of st.balls) {
+    if (runPhysics) for (const b of st.balls) {
       if (b.pocketed) continue
       b.x += b.vx
       b.y += b.vy
@@ -529,9 +556,11 @@ export default function PhysicsPoolLab({ onClose }) {
 
     // Ball–ball collisions — use mutable friction & restitution
     const active = st.balls.filter(b => !b.pocketed)
-    for (let i = 0; i < active.length; i++) {
-      for (let j = i + 1; j < active.length; j++) {
-        resolveBallCollision(active[i], active[j], eventsThisFrame, st)
+    if (runPhysics) {
+      for (let i = 0; i < active.length; i++) {
+        for (let j = i + 1; j < active.length; j++) {
+          resolveBallCollision(active[i], active[j], eventsThisFrame, st)
+        }
       }
     }
 
@@ -540,32 +569,34 @@ export default function PhysicsPoolLab({ onClose }) {
       setEvents([...st.events])
     }
 
-    // Sleep detection → back to aim phase
-    if (st.phase === 'rolling') {
-      const maxV = Math.max(...active.map(b => hypot(b.vx, b.vy)))
-      if (maxV < SLEEP_THRESH) {
-        st.balls.forEach(b => { b.vx = 0; b.vy = 0; b.spin = 0 })
-        st.phase = 'aim'
-        setPhase('aim')
+    if (runPhysics) {
+      // Sleep detection → back to aim phase
+      if (st.phase === 'rolling') {
+        const maxV = Math.max(...active.map(b => hypot(b.vx, b.vy)))
+        if (maxV < SLEEP_THRESH) {
+          st.balls.forEach(b => { b.vx = 0; b.vy = 0; b.spin = 0 })
+          st.phase = 'aim'
+          setPhase('aim')
+        }
       }
-    }
 
-    // ── Live table data for UI ──────────────────────────────────────────────
-    const td = st.balls.filter(b => !b.pocketed).map((b, i) => ({
-      id: i,
-      color: b.color,
-      isCue: b.isCue,
-      x: b.x.toFixed(0),
-      y: b.y.toFixed(0),
-      vx: b.vx.toFixed(2),
-      vy: b.vy.toFixed(2),
-      speed: hypot(b.vx, b.vy).toFixed(2),
-      momentum: (b.mass * hypot(b.vx, b.vy)).toFixed(2),
-      spin: b.spin.toFixed(2),
-      mass: b.mass,
-      KE: (0.5 * b.mass * (b.vx**2 + b.vy**2)).toFixed(3),
-    }))
-    setTableData(td)
+      // ── Live table data for UI ──────────────────────────────────────────────
+      const td = st.balls.filter(b => !b.pocketed).map((b, i) => ({
+        id: i,
+        color: b.color,
+        isCue: b.isCue,
+        x: b.x.toFixed(0),
+        y: b.y.toFixed(0),
+        vx: b.vx.toFixed(2),
+        vy: b.vy.toFixed(2),
+        speed: hypot(b.vx, b.vy).toFixed(2),
+        momentum: (b.mass * hypot(b.vx, b.vy)).toFixed(2),
+        spin: b.spin.toFixed(2),
+        mass: b.mass,
+        KE: (0.5 * b.mass * (b.vx**2 + b.vy**2)).toFixed(3),
+      }))
+      setTableData(td)
+    }
 
     // ── Render ──────────────────────────────────────────────────────────────
 
@@ -703,6 +734,69 @@ export default function PhysicsPoolLab({ onClose }) {
           ctx.font = 'bold 9px monospace'
           ctx.textAlign = 'center'
           ctx.fillText(`θ=${impactAngleDeg}°`, gx, gy + cue.r + 14)
+
+          // ── Impact decomposition vectors (aimVectors overlay) ─────────────
+          if (overlays.aimVectors) {
+            // Physics: elastic collision, compute post-collision velocities
+            const mA = cue.r * cue.r   // use r² as proxy for mass (matches sim)
+            const mB = closestTarget.r * closestTarget.r
+            // cue incoming velocity components along normal and tangent
+            const vAn = aimNx * power * licNx + aimNy * power * licNy  // along impact normal
+            const vAt_x = aimNx * power - vAn * licNx                   // tangent component x
+            const vAt_y = aimNy * power - vAn * licNy                   // tangent component y
+            // target ball has velocity 0, so elastic normal transfer:
+            const vAn_after = vAn * (mA - mB) / (mA + mB)
+            const vBn_after = vAn * (2 * mA)  / (mA + mB)
+            // post-collision velocities
+            const vA_after_x = vAn_after * licNx + vAt_x
+            const vA_after_y = vAn_after * licNy + vAt_y
+            const vB_after_x = vBn_after * licNx
+            const vB_after_y = vBn_after * licNy
+
+            const VSCALE = 5  // world-units per speed unit for arrow length
+
+            // ── Cue ball post-collision velocity (cyan) ───────────────────
+            drawArrow(ctx, gx, gy, vA_after_x * VSCALE, vA_after_y * VSCALE, '#22d3ee', 2)
+            // ── Target ball velocity (green) ──────────────────────────────
+            drawArrow(ctx, closestTarget.x, closestTarget.y, vB_after_x * VSCALE, vB_after_y * VSCALE, '#4ade80', 2.5)
+
+            // ── Normal & tangent component lines at contact ───────────────
+            // Normal component of cue (red — energy transferred)
+            drawArrow(ctx, gx, gy, vAn * licNx * VSCALE, vAn * licNy * VSCALE, '#f87171', 1.5)
+            // Tangent component of cue (amber — passes through)
+            drawArrow(ctx, gx, gy, vAt_x * VSCALE, vAt_y * VSCALE, '#fbbf24', 1.5)
+
+            // ── KE budget ─────────────────────────────────────────────────
+            // Scale: 1 speed unit = 1 inch/frame @60fps -> real v = speed*(60in/s)
+            // KE in arbitrary units; we set 1 world-unit = 1 inch, 1 frame = 1/60s
+            // v_real (in/s) = speed * 60 ; m_real (lbs) ≈ 0.4 (pool ball ~5.75oz)
+            const BALL_MASS_LB = 0.359   // 5.75 oz pool ball
+            const INCH_PER_WU  = 0.5     // 1 world unit = 0.5 inch (reasonable for 900wu wide table ~37.5in)
+            const s_to_real    = INCH_PER_WU * 60  // world-units/frame → inches/sec
+            const ke_in_lbft   = (v) => 0.5 * BALL_MASS_LB * (v * s_to_real / 12) ** 2  // ft·lbf
+            const ke_in_J      = (lbft) => lbft * 1.35582                                  // J
+            const ke_cue_before = ke_in_lbft(power)
+            const vA_after_spd  = hypot(vA_after_x, vA_after_y)
+            const vB_after_spd  = hypot(vB_after_x, vB_after_y)
+            const ke_cue_after  = ke_in_lbft(vA_after_spd)
+            const ke_tgt_after  = ke_in_lbft(vB_after_spd)
+            const ke_transferred_pct = ke_cue_before > 0
+              ? Math.round((ke_tgt_after / ke_cue_before) * 100) : 0
+
+            // Draw KE info box near contact point
+            const bx = gx + 18, by = gy - 60
+            ctx.fillStyle = 'rgba(0,0,0,0.65)'
+            ctx.beginPath(); ctx.roundRect(bx, by, 130, 72, 5); ctx.fill()
+            ctx.fillStyle = '#4ade80'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'left'
+            ctx.fillText('IMPACT ENERGY', bx + 6, by + 13)
+            ctx.fillStyle = '#fbbf24'
+            ctx.fillText(`KE in:  ${ke_cue_before.toFixed(4)} ft·lbf`, bx + 6, by + 27)
+            ctx.fillText(`        ${ke_in_J(ke_cue_before).toFixed(4)} J`, bx + 6, by + 38)
+            ctx.fillStyle = '#4ade80'
+            ctx.fillText(`→ tgt:  ${ke_transferred_pct}%  ${ke_tgt_after.toFixed(4)} J`, bx + 6, by + 51)
+            ctx.fillStyle = '#22d3ee'
+            ctx.fillText(`→ cue:  ${(100 - ke_transferred_pct)}%  ${ke_in_J(ke_cue_after).toFixed(4)} J`, bx + 6, by + 62)
+          }
         }
 
         // ── Forward simulation — run exact physics engine on cloned state ──
@@ -717,6 +811,7 @@ export default function PhysicsPoolLab({ onClose }) {
               _trail: [{ x: b.x, y: b.y }],
             }))
 
+          const snapshots = []
           const simCue = simBalls.find(b => b.isCue)
           if (simCue) {
             simCue.vx = aimNx * power
@@ -737,10 +832,10 @@ export default function PhysicsPoolLab({ onClose }) {
                 b.spin *= SPIN_DECAY
                 b.vx += b.spin * (-b.vy) * 0.0012
                 b.vy += b.spin * (b.vx)  * 0.0012
-                if (b.x < left)  { b.x = left;  b.vx =  Math.abs(b.vx) * RESTITUTION_MUT }
-                if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * RESTITUTION_MUT }
-                if (b.y < top)   { b.y = top;   b.vy =  Math.abs(b.vy) * RESTITUTION_MUT }
-                if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * RESTITUTION_MUT }
+                if (b.x < left)  { b.x = left;  b.vx =  Math.abs(b.vx) * RESTITUTION_MUT; b.spin *= -0.5 }
+                if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * RESTITUTION_MUT; b.spin *= -0.5 }
+                if (b.y < top)   { b.y = top;   b.vy =  Math.abs(b.vy) * RESTITUTION_MUT; b.spin *= -0.5 }
+                if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * RESTITUTION_MUT; b.spin *= -0.5 }
                 for (let pi = 0; pi < POCKETS.length; pi++) {
                   const p = POCKETS[pi]
                   if (hypot(b.x - p.x, b.y - p.y) < POCKET_R + 2) {
@@ -764,12 +859,32 @@ export default function PhysicsPoolLab({ onClose }) {
                   const rvx = b.vx - a.vx, rvy = b.vy - a.vy
                   const velN = rvx * nx + rvy * ny
                   if (velN > 0) continue
+                  const aPreVx = a.vx, aPreVy = a.vy
+                  const bPreVx = b.vx, bPreVy = b.vy
                   const imp = (2 * velN) / (1 / a.mass + 1 / b.mass)
                   a.vx += (imp * nx) / a.mass; a.vy += (imp * ny) / a.mass
                   b.vx -= (imp * nx) / b.mass; b.vy -= (imp * ny) / b.mass
+                  // Spin transfer (match real physics)
+                  const spinEffect = (a.spin - b.spin) * 0.3
+                  const tx = -ny, ty = nx
+                  a.vx += spinEffect * tx * 0.25 / a.mass; a.vy += spinEffect * ty * 0.25 / a.mass
+                  b.vx -= spinEffect * tx * 0.25 / b.mass; b.vy -= spinEffect * ty * 0.25 / b.mass
                   const ov = a.r + b.r - dist + 0.5
                   a.x -= ov * nx * 0.5; a.y -= ov * ny * 0.5
                   b.x += ov * nx * 0.5; b.y += ov * ny * 0.5
+                  if (snapshots.length < 80) {
+                    const aIdx = simBalls.indexOf(a), bIdx = simBalls.indexOf(b)
+                    // Skip if this exact pair collided last step (overlap correction jitter)
+                    const last = snapshots[snapshots.length - 1]
+                    if (!last || last.step < step - 2 || last.aIdx !== aIdx || last.bIdx !== bIdx) {
+                      snapshots.push({
+                        step, nx, ny, aIdx, bIdx,
+                        allBalls: simBalls.map(bb => ({ x: bb.x, y: bb.y, vx: bb.vx, vy: bb.vy, r: bb.r, color: bb.color, isCue: bb.isCue, ballNum: bb.ballNum, mass: bb.mass, pocketed: bb.pocketed })),
+                        aPre: { vx: aPreVx, vy: aPreVy }, aPost: { vx: a.vx, vy: a.vy },
+                        bPre: { vx: bPreVx, vy: bPreVy }, bPost: { vx: b.vx, vy: b.vy },
+                      })
+                    }
+                  }
                 }
               }
               if (step % RECORD_EVERY === 0) {
@@ -829,6 +944,74 @@ export default function PhysicsPoolLab({ onClose }) {
                 }
               }
             }
+            simSnapshotsRef.current = snapshots
+          }
+        }
+
+        // ── Collision snapshot overlay (when browsing steps) ─────────────────
+        if (overlays.aimVectors && collisionStepRef.current >= 0 && simSnapshotsRef.current.length > 0) {
+          const snapIdx = Math.min(collisionStepRef.current, simSnapshotsRef.current.length - 1)
+          const snap = simSnapshotsRef.current[snapIdx]
+          if (snap) {
+            drawnVectorsRef.current = []
+            const VSCALE = 12
+            const BALL_MASS_LB = 0.359, INCH_PER_WU = 0.5, s_to_real = INCH_PER_WU * 60
+            const ke_J    = v => 0.5 * BALL_MASS_LB * (v * s_to_real / 12) ** 2 * 1.35582
+            const ke_ftlb = v => 0.5 * BALL_MASS_LB * (v * s_to_real / 12) ** 2
+            // All balls at snapshot positions
+            for (const b of snap.allBalls) {
+              if (b.pocketed) continue
+              ctx.globalAlpha = 0.55
+              ctx.fillStyle = b.color
+              ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill()
+              ctx.globalAlpha = 1
+              ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1.5
+              ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke()
+            }
+            const bA = snap.allBalls[snap.aIdx], bB = snap.allBalls[snap.bIdx]
+            // Highlight colliding pair
+            ;[bA, bB].forEach(b => {
+              ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.5
+              ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 5, 0, Math.PI * 2); ctx.stroke()
+            })
+            // Contact dashed line
+            ctx.strokeStyle = 'rgba(251,191,36,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4])
+            ctx.beginPath(); ctx.moveTo(bA.x, bA.y); ctx.lineTo(bB.x, bB.y); ctx.stroke()
+            ctx.setLineDash([])
+            // Draw vector + X/Y components + register for click
+            const drawVec = (ox, oy, vx, vy, color, ballLabel, ph) => {
+              const spd = hypot(vx, vy)
+              if (spd < 0.001) return
+              const ex = ox + vx * VSCALE, ey = oy + vy * VSCALE
+              ctx.strokeStyle = 'rgba(96,165,250,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 5])
+              ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ex, oy); ctx.stroke()
+              ctx.strokeStyle = 'rgba(167,139,250,0.5)'
+              ctx.beginPath(); ctx.moveTo(ex, oy); ctx.lineTo(ex, ey); ctx.stroke()
+              ctx.setLineDash([])
+              drawArrow(ctx, ox, oy, vx * VSCALE, vy * VSCALE, color, 2.5)
+              drawnVectorsRef.current.push({ ex, ey, ox, oy, color, data: {
+                ball: ballLabel, phase: ph,
+                vx: vx.toFixed(4), vy: vy.toFixed(4), spd: spd.toFixed(4),
+                angle_deg: ((Math.atan2(vy, vx) * 180 / Math.PI + 360) % 360).toFixed(1),
+                ke_J: ke_J(spd).toFixed(5), ke_ftlb: ke_ftlb(spd).toFixed(5),
+                momentum: (BALL_MASS_LB * spd).toFixed(5),
+              }})
+            }
+            const aLabel = bA.isCue ? 'Cue' : `Ball ${bA.ballNum}`
+            const bLabel = bB.isCue ? 'Cue' : `Ball ${bB.ballNum}`
+            drawVec(bA.x, bA.y, snap.aPre.vx, snap.aPre.vy, 'rgba(156,163,175,0.55)', aLabel, 'before')
+            drawVec(bA.x, bA.y, snap.aPost.vx, snap.aPost.vy, '#22d3ee', aLabel, 'after')
+            drawVec(bB.x, bB.y, snap.bPre.vx, snap.bPre.vy, 'rgba(156,163,175,0.55)', bLabel, 'before')
+            drawVec(bB.x, bB.y, snap.bPost.vx, snap.bPost.vy, '#4ade80', bLabel, 'after')
+            // KE budget badge
+            const keIn  = ke_J(hypot(snap.aPre.vx, snap.aPre.vy)) + ke_J(hypot(snap.bPre.vx, snap.bPre.vy))
+            const keOut = ke_J(hypot(snap.aPost.vx, snap.aPost.vy)) + ke_J(hypot(snap.bPost.vx, snap.bPost.vy))
+            const keLostPct = keIn > 0 ? Math.round((1 - keOut / keIn) * 100) : 0
+            const mx = (bA.x + bB.x) / 2, my = Math.min(bA.y, bB.y) - 28
+            ctx.fillStyle = 'rgba(0,0,0,0.78)'; ctx.beginPath(); ctx.roundRect(mx - 84, my - 12, 168, 24, 4); ctx.fill()
+            ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'
+            ctx.fillText(`Collision ${snapIdx + 1}/${simSnapshotsRef.current.length}  \u2502  \u0394KE ${keLostPct}% lost  \u2502  click arrow tip`, mx, my + 2)
+            ctx.textAlign = 'left'
           }
         }
 
@@ -889,9 +1072,11 @@ export default function PhysicsPoolLab({ onClose }) {
       }
     }
 
-    // Balls
+    // Balls — hidden while browsing collision snapshots
+    const hideBalls = st.phase === 'aim' && collisionStepRef.current >= 0
     for (const b of st.balls) {
       if (b.pocketed) continue
+      if (hideBalls) continue
       const isFollowed = followed !== null && st.balls[followed] === b
 
       // Shadow
@@ -1057,7 +1242,7 @@ export default function PhysicsPoolLab({ onClose }) {
     }
 
     // ── Floating velocity labels on all moving balls ────────────────────────
-    if (overlays.labels) {
+    if (overlays.labels && slowMoRef.current) {
       for (const b of active) {
         const speed = hypot(b.vx, b.vy)
         if (speed < SLEEP_THRESH * 3) continue
@@ -1212,8 +1397,15 @@ export default function PhysicsPoolLab({ onClose }) {
           </div>
         )}
 
+        {/* Slow-mo */}
+        <button onClick={() => { const v = !slowMo; setSlowMo(v); slowMoRef.current = v; if (v) setOverlays(o => ({ ...o, trail: true })) }}
+          className="px-3 py-1 text-xs font-medium rounded"
+          style={{ background: slowMo ? 'rgba(56,189,248,0.2)' : 'rgba(56,189,248,0.08)', color: slowMo ? '#38bdf8' : C.muted, border: `1px solid ${slowMo ? '#38bdf8' : C.border}` }}>
+          🐢 {slowMo ? 'SLOW' : 'Speed'}
+        </button>
+
         {/* Reset */}
-        <button onClick={() => initState(levelIdx, mode)}
+        <button onClick={() => { initState(levelIdx, mode); simSnapshotsRef.current = []; setCollisionStep(-1); collisionStepRef.current = -1; setSelectedVector(null) }}
           className="px-3 py-1 text-xs font-medium rounded"
           style={{ background: 'rgba(248,113,113,0.15)', color: C.red, border: `1px solid ${C.red}` }}>
           ↺ Reset
@@ -1258,6 +1450,51 @@ export default function PhysicsPoolLab({ onClose }) {
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full text-xs font-medium text-center pointer-events-none"
               style={{ background: 'rgba(0,0,0,0.6)', color: C.amber, border: `1px solid rgba(251,191,36,0.3)`, backdropFilter: 'blur(4px)' }}>
               {currentLevel.name} · {currentLevel.goal}
+            </div>
+          )}
+
+          {/* Collision step browser — show whenever snapshots exist */}
+          {simSnapshotsRef.current.length > 0 && (
+            <div className="absolute top-3 right-3 z-20 flex items-center gap-2 px-3 py-2 rounded-lg"
+              style={{ background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(251,191,36,0.45)', fontFamily: 'monospace' }}>
+              <span style={{ color: '#fbbf24', fontSize: 11 }}>
+                {collisionStep < 0 ? '\ud83d\udd0d Collisions' : `${collisionStep + 1} / ${simSnapshotsRef.current.length}`}
+              </span>
+              {collisionStep >= 0 && (
+                <button onClick={() => { const s = collisionStep - 1; setCollisionStep(s); collisionStepRef.current = s; setSelectedVector(null) }}
+                  className="px-2 py-0.5 rounded text-xs" style={{ background: 'rgba(251,191,36,0.18)', color: '#fbbf24', cursor: 'pointer' }}>\u2190</button>
+              )}
+              <button onClick={() => {
+                const total = simSnapshotsRef.current.length
+                if (total === 0) return
+                if (collisionStep < 0) { setCollisionStep(0); collisionStepRef.current = 0 }
+                else if (collisionStep < total - 1) { const s = collisionStep + 1; setCollisionStep(s); collisionStepRef.current = s }
+                else { setCollisionStep(-1); collisionStepRef.current = -1; setSelectedVector(null) }
+              }} className="px-2 py-0.5 rounded text-xs"
+                style={{ background: 'rgba(251,191,36,0.18)', color: '#fbbf24', cursor: 'pointer' }}>
+                {collisionStep < 0 ? '\u25b6' : collisionStep < simSnapshotsRef.current.length - 1 ? '\u2192' : '\u2715'}
+              </button>
+            </div>
+          )}
+
+          {/* Selected vector popup */}
+          {selectedVector && (
+            <div className="absolute right-4 top-20 z-30 p-3 rounded-lg"
+              style={{ background: 'rgba(8,12,22,0.96)', border: `2px solid ${selectedVector.color}`, fontFamily: 'monospace', fontSize: 11, color: '#e2e8f0', minWidth: 190 }}>
+              <div style={{ color: selectedVector.color, fontWeight: 'bold', marginBottom: 6, fontSize: 12 }}>
+                {selectedVector.data.ball} \u2014 {selectedVector.data.phase}
+              </div>
+              <div style={{ color: '#94a3b8', lineHeight: 1.8 }}>
+                <div>vx &nbsp;= <span style={{ color: '#60a5fa' }}>{selectedVector.data.vx}</span></div>
+                <div>vy &nbsp;= <span style={{ color: '#a78bfa' }}>{selectedVector.data.vy}</span></div>
+                <div>|v| = <span style={{ color: '#e2e8f0' }}>{selectedVector.data.spd}</span></div>
+                <div>\u03b8 &nbsp;&nbsp;= <span style={{ color: '#fbbf24' }}>{selectedVector.data.angle_deg}\u00b0</span></div>
+                <div style={{ marginTop: 6 }}>KE &nbsp;= <span style={{ color: '#4ade80' }}>{selectedVector.data.ke_J} J</span></div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span style={{ color: '#4ade80' }}>{selectedVector.data.ke_ftlb} ft\u00b7lbf</span></div>
+                <div>p &nbsp;&nbsp;&nbsp;= <span style={{ color: '#c084fc' }}>{selectedVector.data.momentum} lb\u00b7wu/f</span></div>
+              </div>
+              <button onClick={() => setSelectedVector(null)}
+                style={{ marginTop: 8, color: '#64748b', fontSize: 10, cursor: 'pointer', background: 'none', border: 'none' }}>\u2715 close</button>
             </div>
           )}
 
@@ -1387,12 +1624,13 @@ export default function PhysicsPoolLab({ onClose }) {
                 <div className="text-xs font-medium mb-2" style={{ color: C.text }}>Visible Overlays</div>
                 <div className="flex flex-col gap-1.5">
                   {[
-                    { key: 'vectors',  label: '⟶ Velocity Vectors',   color: C.blue   },
-                    { key: 'momentum', label: '⟹ Momentum (p=mv)',    color: C.purple  },
-                    { key: 'forces',   label: '⬅ Friction Force',     color: C.red    },
-                    { key: 'spin',     label: '↺ Spin / English',      color: C.teal   },
-                    { key: 'trail',    label: '· Trail',               color: C.amber  },
-                    { key: 'labels',   label: '🏷 Live Labels (v, p)', color: C.blue },
+                    { key: 'vectors',    label: '⟶ Velocity Vectors',        color: C.blue   },
+                    { key: 'momentum',   label: '⟹ Momentum (p=mv)',          color: C.purple  },
+                    { key: 'forces',     label: '⬅ Friction Force',           color: C.red    },
+                    { key: 'spin',       label: '↺ Spin / English',            color: C.teal   },
+                    { key: 'trail',      label: '· Trail',                     color: C.amber  },
+                    { key: 'labels',     label: '🏷 Live Labels (v, p)',       color: C.blue },
+                    { key: 'aimVectors', label: '⊕ Aim Impact Vectors',       color: '#4ade80' },
                   ].map(o => (
                     <button key={o.key} onClick={() => toggleOverlay(o.key)}
                       className="flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left"
