@@ -23,6 +23,7 @@ import ch1_4 from './ch1-4.js'
 import ch1_5 from './ch1-5.js'
 import ch1_6 from './ch1-6.js'
 import ch2_1 from './ch2-1.js'
+import ch2_2 from './ch2-2.js'
 
 export default [
   {
@@ -108,5 +109,11 @@ export default [
     title: 'Arrays & Vectorization',
     course: 'python-1',
     lessons: [ch2_1]
+  },
+  {
+    number: 2.2,
+    title: 'Linear Algebra (Computational)',
+    course: 'python-1',
+    lessons: [ch2_2]
   }
 ]

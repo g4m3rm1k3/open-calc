@@ -12,9 +12,9 @@
 //            arithmetic, boolean indexing, fancy indexing, array slicing,
 //            2D arrays, shape/reshape, timeit for performance comparison
 //
-//   Library: opencalc accepts numpy arrays natively in fig.plot() and
-//            fig.scatter(); np.linspace() is the idiomatic way to generate
-//            smooth x-values for any opencalc curve
+//   Library: opencalc requires Python lists — always call .tolist() on numpy
+//            arrays before passing to fig.plot() / fig.scatter();
+//            np.linspace() is the idiomatic x-axis generator for smooth curves
 
 export default {
   id: 'py-2-1-arrays-vectorization',
@@ -230,22 +230,21 @@ print(np.round(waves, 2))`,
               prose: [
                 'opencalc\'s `fig.plot(xs, ys)` accepts numpy arrays directly. The idiomatic pattern is: generate x-values with `np.linspace`, compute y-values with a vectorized expression, pass both to `fig.plot()`. The denser the x-array, the smoother the curve.',
                 '## The smooth plotting recipe',
-                '1. `x = np.linspace(start, stop, 500)` — 500 points is smooth for almost any function\n2. `y = some_vectorized_expression(x)` — one line, no loop\n3. `fig.plot(x, y)` — opencalc renders it\n- Compare: the old way needed `[f(xi) for xi in xs]` — a Python loop\n- The numpy way: `f(x)` — the array IS the loop',
+                '- `fig.plot(fn, color=...)` — takes a **callable** that maps one float to one float\n- `fig.plot(np.sin, color=BLUE)` — numpy ufuncs like `np.sin`, `np.cos`, `np.exp` are directly callable\n- `fig.plot(lambda x: x**2 - 1, color=RED)` — use a lambda for any expression\n- `fig.scatter(xs_list, ys_list, color=..., radius=...)` — for pre-computed (x,y) pairs; call `.tolist()` on numpy arrays first\n- Rule of thumb: use `fig.plot(fn)` when you have a formula; use `fig.scatter(xs, ys)` when you have data',
                 '## Plotting multiple curves',
                 'Call `fig.plot()` multiple times before `fig.show()`. Each call adds a layer. Use the `color=` parameter (BLUE, RED, AMBER, GREEN, GRAY, PURPLE from opencalc) to distinguish them.',
               ],
               code: `import numpy as np
 from opencalc import Figure, BLUE, RED, AMBER, GREEN, GRAY
 
-x = np.linspace(-2 * np.pi, 2 * np.pi, 600)
-
+# fig.plot(fn, color=...) takes a CALLABLE — pass numpy ufuncs directly
 fig = Figure(xmin=-6.5, xmax=6.5, ymin=-1.4, ymax=1.4,
              title="sin(x), cos(x), and sin(x)·cos(x)")
 fig.grid().axes()
 
-fig.plot(x, np.sin(x),          color=BLUE)
-fig.plot(x, np.cos(x),          color=RED)
-fig.plot(x, np.sin(x)*np.cos(x), color=AMBER)  # = sin(2x)/2
+fig.plot(np.sin,                        color=BLUE)   # np.sin is callable
+fig.plot(np.cos,                        color=RED)
+fig.plot(lambda x: np.sin(x)*np.cos(x), color=AMBER)  # = sin(2x)/2
 
 fig.text([-5,  0.9], "sin(x)",       color='blue',   size=11, bold=True)
 fig.text([ 1,  1.15], "cos(x)",      color='red',    size=11, bold=True)
@@ -556,9 +555,7 @@ fig.show()`,
               output: '', status: 'idle', figureJson: null,
             },
 
-          ], // end initialCells
-
-          challenges: [
+            // ── CHALLENGES ───────────────────────────────────────────────────
 
             // ── CHALLENGE 1: fill/easy ────────────────────────────────────────
             {
@@ -646,8 +643,8 @@ print(f"Max derivative at x=0: {ds.max():.4f}  (should be 0.25)")
 fig = Figure(xmin=-6.5, xmax=6.5, ymin=-0.05, ymax=1.1,
              title="Sigmoid σ(x) and its derivative")
 fig.grid().axes()
-fig.plot(x, s,  color=BLUE)
-fig.plot(x, ds, color=RED)
+fig.plot(sigmoid,                       color=BLUE)
+fig.plot(lambda x: sigmoid(np.array([x]))[0] * (1 - sigmoid(np.array([x]))[0]), color=RED)
 fig.hline(0.5, color=GRAY)
 fig.text([-5.5, 0.92], "σ(x)",    color='blue', size=12, bold=True)
 fig.text([-5.5, 0.30], "σ'(x)",   color='red',  size=12, bold=True)
@@ -920,7 +917,7 @@ res
               hint: 'Loop over output positions (i, j) with a Python loop over the output rows/cols, but use vectorized slice multiplication: out[i,j] = (image[i:i+kH, j:j+kW] * kernel).sum(). For the fully numpy approach: use np.lib.stride_tricks.as_strided to create a view of shape (out_H, out_W, kH, kW), then multiply by kernel and sum over last two axes.',
             },
 
-          ], // end challenges
+          ], // end initialCells
         }, // end props
       }, // end visualization
     ], // end visualizations
