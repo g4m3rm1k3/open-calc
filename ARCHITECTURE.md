@@ -950,34 +950,37 @@ If `public/search-index.json` is missing or fails to load, `useSearch` now build
 ### ✅ I — `formatAsVisualization` dead code
 Function kept as a named export (imported by `unifiedLessonEnhancer.js`) but now has a top-of-file comment marking it explicitly disabled. The body still returns `null` on the first line. Decision: floating-player-only model is the current design. Restoring inline video blocks is left as future work.
 
-### ⚠️ J — Three overlapping quiz systems (partially resolved)
-- `InlineAssessment` inside `MicroCycleLesson` — now calls `markCheckpoint(lessonId, 'quiz-passed')` via `useEffect` when all questions are answered correctly
-- `LessonQuizBlock` in `LessonPage` — now calls `markCheckpoint` when all questions answered with ≥ 80%
-- `AssessmentBlock.jsx` — now calls `markCheckpoint` when all questions reach 100%
+### ✅ J — Three overlapping quiz systems (resolved)
+Unified to a single system: `LessonQuizBlock` in `src/components/lesson/LessonQuizBlock.jsx`.
 
-The three components still co-exist (consolidation deferred). Quiz scores now affect lesson completion status. To require quiz completion for a lesson, add `checkpoints: ['read-intuition', 'quiz-passed']` to the lesson object.
+- `AssessmentBlock.jsx` — deleted (was never imported anywhere)
+- `InlineAssessment` (private function inside `MicroCycleLesson`) — deleted; replaced with `<LessonQuizBlock lessonId={lesson.id} questions={lesson.assessment.questions} />`
+- `LessonQuizBlock` is now the sole quiz renderer for all lesson types
 
-**Answer reveal removed**: wrong answers no longer expose the correct answer. Choice questions only highlight the user’s selection (red/green). Input questions say “Incorrect — try again” with a retry button.
+Unified quiz schema: `{ id, type: 'choice'|'input', text, options, answer, hints[] }`. The `python-1` assessment questions were migrated from `correct: N` (index) to `answer: 'string'` format.
 
-### ✅ K — SpiralBlock renders before MathBlock
-Fixed render order: `Intuition → mentalModel → Math → Rigor → Dock → Practice → Spiral → Assessment`. Spiral ("where you've been / where you're going") now appears after Practice as a capstone, not mid-flow.
+**Answer reveal removed**: wrong answers do not expose the correct answer. Input questions show "Incorrect — try again" with a retry button.
 
-### ✅ L — Viz silent 404
+
+
+Fixed render order: `Intuition ΓåÆ mentalModel ΓåÆ Math ΓåÆ Rigor ΓåÆ Dock ΓåÆ Practice ΓåÆ Spiral ΓåÆ Assessment`. Spiral ("where you've been / where you're going") now appears after Practice as a capstone, not mid-flow.
+
+### Γ£à L ΓÇö Viz silent 404
 In dev mode (`import.meta.env.DEV`), `VizFrame` now renders a visible amber dashed-border placeholder showing the unknown `id` and the instruction to register it in `VIZ_REGISTRY`. In production it still returns `null` silently.
 
-### 🟡 M — Three chapter index formats
+### ≡ƒƒí M ΓÇö Three chapter index formats
 Some courses export a single chapter object, others export an array. `content/index.js` handles both, but new contributors frequently get this wrong. Standardizing to array format for all courses would eliminate the confusion (one-line wrap per course).
 
-### ✅ P — FloatingVideoPlayer not syncing to current lesson on navigation
-The `lessonId` sync effect in `FloatingVideoPlayer` had a `!selectedCourse` guard — it ran once on first load, then never again. Navigation to a new lesson left `selectedCourse`/`selectedChapter` pointing at the original lesson. A secondary `navStack` check also blocked the update when the playlist sidebar was open. Both guards removed; the effect now fires unconditionally on every `lessonId` change.
+### Γ£à P ΓÇö FloatingVideoPlayer not syncing to current lesson on navigation
+The `lessonId` sync effect in `FloatingVideoPlayer` had a `!selectedCourse` guard ΓÇö it ran once on first load, then never again. Navigation to a new lesson left `selectedCourse`/`selectedChapter` pointing at the original lesson. A secondary `navStack` check also blocked the update when the playlist sidebar was open. Both guards removed; the effect now fires unconditionally on every `lessonId` change.
 
 ---
 
-### ✅ N — `MobileLocationBadge` doesn't work for non-numeric chapter IDs
-Fixed. For numeric chapter numbers (0–6) the badge still shows `Ch. N`. For string-based chapter numbers (`geometry-1`, `tetris.1`, etc.) it now shows the chapter title instead, using `/^\d+$/.test(String(chapter.number))`.
+### Γ£à N ΓÇö `MobileLocationBadge` doesn't work for non-numeric chapter IDs
+Fixed. For numeric chapter numbers (0ΓÇô6) the badge still shows `Ch. N`. For string-based chapter numbers (`geometry-1`, `tetris.1`, etc.) it now shows the chapter title instead, using `/^\d+$/.test(String(chapter.number))`.
 
-### ✅ O — Search index auto-rebuilds on every build
-`package.json` `build` and `dev` scripts both run `node src/scripts/build-search-index.js` before Vite starts. New lessons appear in search immediately on the next `npm run dev` or `npm run build` — no manual step needed.
+### Γ£à O ΓÇö Search index auto-rebuilds on every build
+`package.json` `build` and `dev` scripts both run `node src/scripts/build-search-index.js` before Vite starts. New lessons appear in search immediately on the next `npm run dev` or `npm run build` ΓÇö no manual step needed.
 
 ---
 
@@ -987,7 +990,7 @@ Contributions are roughly ordered by complexity. Start at Tier 1, build up.
 
 ---
 
-### Tier 1 — Add a reference formula (10 minutes)
+### Tier 1 ΓÇö Add a reference formula (10 minutes)
 
 **File to edit**: `src/content/reference-data.js`  
 **No other files needed**
@@ -998,17 +1001,17 @@ Contributions are roughly ordered by complexity. Start at Tier 1, build up.
    { id: 'my-formula', name: 'My Formula Name', latex: 'f(x) = x^2', note: 'Optional hint.' }
    ```
 3. The id must be unique across all entries (search the file for it first)
-4. Done — it appears on the Reference page
+4. Done ΓÇö it appears on the Reference page
 
 ---
 
-### Tier 2 — Add a proof for an existing formula (30–60 minutes)
+### Tier 2 ΓÇö Add a proof for an existing formula (30ΓÇô60 minutes)
 
 **File to edit**: `src/content/proofs/{category}.js`  
 **`id` must match an existing entry in `reference-data.js`**
 
 1. Write a `steps[]` array where each step has `{ id, tag, tagStyle, instruction, math, note, why? }`
-2. `why` is optional but powerful — it's a recursive drill-down panel
+2. `why` is optional but powerful ΓÇö it's a recursive drill-down panel
 3. Export it and merge into `PROOFS` in `proofs/index.js`
 4. The formula card on the Reference page will automatically gain a highlighted border and click-to-open proof modal
 
@@ -1016,7 +1019,7 @@ See `src/content/proofs/derivatives.js` (the `deriv-def` proof) for a complete e
 
 ---
 
-### Tier 3 — Add content to an existing lesson (30 minutes)
+### Tier 3 ΓÇö Add content to an existing lesson (30 minutes)
 
 **File to edit**: `src/content/{course}/{lesson}.js`
 
@@ -1028,7 +1031,7 @@ See `src/content/proofs/derivatives.js` (the `deriv-def` proof) for a complete e
 
 ---
 
-### Tier 4 — Add a quiz to an existing lesson (15 minutes)
+### Tier 4 ΓÇö Add a quiz to an existing lesson (15 minutes)
 
 **File to edit**: `src/content/{course}/{lesson}.js`
 
@@ -1036,7 +1039,7 @@ See `src/content/proofs/derivatives.js` (the `deriv-def` proof) for a complete e
    ```js
    quiz: [
      { type: 'choice', question: 'What is 2+2?', choices: ['2', '4', '6', '8'], answer: '4', hints: ['Think addition.'] },
-     { type: 'input',  question: 'Simplify: x²·x³', answer: 'x^5', hints: ['Add the exponents.'] },
+     { type: 'input',  question: 'Simplify: x┬▓┬╖x┬│', answer: 'x^5', hints: ['Add the exponents.'] },
    ]
    ```
 2. `type: 'input'` uses mathjs to evaluate, so `x^5` will match `x**5`, `x^(2+3)`, etc.
@@ -1044,7 +1047,7 @@ See `src/content/proofs/derivatives.js` (the `deriv-def` proof) for a complete e
 
 ---
 
-### Tier 5 — Write a new lesson (1–4 hours)
+### Tier 5 ΓÇö Write a new lesson (1ΓÇô4 hours)
 
 1. Identify which course and chapter this lesson belongs to
 2. Check which schema the course uses (Section 5)
@@ -1060,31 +1063,31 @@ node --check src/content/{course}/{your-lesson-slug}.js
 ```
 
 Common errors:
-- Template literal with `${}` inside instruction strings — escape with `\${}` or use string concatenation
-- `chapter` field doesn't match the chapter's `id` — the lesson won't appear
-- Missing `export default` — the chapter index import will be `undefined`
+- Template literal with `${}` inside instruction strings ΓÇö escape with `\${}` or use string concatenation
+- `chapter` field doesn't match the chapter's `id` ΓÇö the lesson won't appear
+- Missing `export default` ΓÇö the chapter index import will be `undefined`
 
 ---
 
-### Tier 6 — Create a new React viz (2–8 hours)
+### Tier 6 ΓÇö Create a new React viz (2ΓÇô8 hours)
 
 1. Copy `src/components/viz/react/` any small existing component as a starting point
 2. Or copy the template from `incomplete ideas/vizTutorial/TEMPLATE_canvas.jsx` (for canvas/d3-style) or `TEMPLATE_prose_only.jsx` (for UI panels)
-3. Always include the standard `useColors()` hook (copy it verbatim — it watches for dark mode)
-4. The component receives `params` prop (the lesson's `props` object) — use that for configuration
+3. Always include the standard `useColors()` hook (copy it verbatim ΓÇö it watches for dark mode)
+4. The component receives `params` prop (the lesson's `props` object) ΓÇö use that for configuration
 5. Keep all state local with `useState` / `useReducer`
 6. Register in `VizFrame.jsx`: `MyNewViz: lazy(() => import('./react/MyNewViz.jsx'))`
 7. Reference in a lesson: `{ id: 'MyNewViz', title: '...', props: { myParam: true } }`
 
-**The viz is self-contained — it doesn't use app contexts, doesn't import from `content/`, doesn't use Tailwind classes.** Use inline styles with `useColors()` values.
+**The viz is self-contained ΓÇö it doesn't use app contexts, doesn't import from `content/`, doesn't use Tailwind classes.** Use inline styles with `useColors()` values.
 
 ---
 
-### Tier 7 — Create a new course (full day+)
+### Tier 7 ΓÇö Create a new course (full day+)
 
 1. Create `src/content/{course-name}/` directory
-2. Write all lesson files (Schema A, B, C, or D — pick one and be consistent)
-3. Write `index.js` (Format 1 or 2 — pick one based on whether you have multiple sub-chapters)
+2. Write all lesson files (Schema A, B, C, or D ΓÇö pick one and be consistent)
+3. Write `index.js` (Format 1 or 2 ΓÇö pick one based on whether you have multiple sub-chapters)
 4. Import and add to `src/content/index.js` in the `CURRICULUM` array
 5. Add course metadata to `src/content/courses.js` for the home page card
 6. If using new viz IDs, create the viz files and register them in `VizFrame.jsx`
@@ -1095,124 +1098,124 @@ Common errors:
 
 ```
 src/
-├── main.jsx                     — app entry
-├── App.jsx                      — HashRouter + route table
-│
-├── pages/
-│   ├── HomePage.jsx             — course grid
-│   ├── ChapterPage.jsx          — lesson list
-│   ├── LessonPage.jsx           — main lesson renderer + prev/next
-│   ├── ReferencePage.jsx        — formula cards + proof modal
-│   ├── LearningPathsPage.jsx    — curated playlists
-│   └── AboutPage.jsx
-│
-├── components/
-│   ├── layout/
-│   │   ├── AppShell.jsx         — top bar + sidebar + mobile nav + tool panels
-│   │   ├── Sidebar.jsx
-│   │   └── MobileBottomNav.jsx
-│   │
-│   ├── lesson/
-│   │   ├── MicroCycleLesson.jsx — renders all lesson sections
-│   │   ├── LessonQuizBlock.jsx  — end-of-lesson quiz (lesson.quiz[])
-│   │   ├── AssessmentBlock.jsx  — inline mastery check (lesson.assessment{})
-│   │   ├── ChallengeBlock.jsx
-│   │   ├── UnifiedLearningDock.jsx
-│   │   ├── IntuitionBlock.jsx
-│   │   ├── MathBlock.jsx
-│   │   ├── RigorBlock.jsx
-│   │   ├── PracticeBlock.jsx
-│   │   ├── SpiralBlock.jsx
-│   │   └── InlineAssessment.jsx
-│   │
-│   ├── viz/
-│   │   ├── VizFrame.jsx         — VIZ_REGISTRY + lazy dispatch
-│   │   ├── react/               — 200+ React viz components
-│   │   ├── d3/                  — D3.js viz components
-│   │   ├── three/               — Three.js viz components
-│   │   ├── matter/              — Matter.js physics simulations
-│   │   ├── geometry/            — Geometry book viz (G1-G4)
-│   │   └── ch2/                 — Physics Ch2 kinematics viz
-│   │
-│   ├── math/
-│   │   ├── parseProse.jsx       — parses $math$, **bold**, `code` in strings
-│   │   ├── KatexBlock.jsx
-│   │   └── KatexInline.jsx
-│   │
-│   ├── calculator/
-│   │   └── TICalc.jsx           — TI-84-style calculator
-│   │
-│   ├── search/
-│   │   └── SearchModal.jsx
-│   │
-│   ├── tools/
-│   │   ├── GlobalGrapher.jsx
-│   │   ├── GlobalGrapher3D.jsx
-│   │   └── Scratchpad.jsx
-│   │
-│   ├── ui/                      — shared button, card, badge components
-│   └── videos/                  — video embed + carousel
-│
-├── content/
-│   ├── index.js                 — CURRICULUM, LESSON_MAP, ALL_LESSONS
-│   ├── courses.js               — course metadata for home page
-│   ├── learningPaths.js         — LEARNING_PATHS (curated playlists)
-│   ├── reference-data.js        — REFERENCE_CATEGORIES, ALL_ENTRIES
-│   ├── algebraRegistry.js       — algebra cheat-sheet (chapter-0 only)
-│   │
-│   ├── proofs/
-│   │   ├── index.js             — merges all PROOFS
-│   │   ├── derivatives.js
-│   │   ├── limits.js
-│   │   ├── integrals.js
-│   │   ├── algebra.js
-│   │   ├── geometry.js
-│   │   ├── trig.js
-│   │   └── series.js
-│   │
-│   ├── enhancers/
-│   │   └── unifiedLessonEnhancer.js  — auto-injects context + callouts
-│   │
-│   ├── chapter-0/ through chapter-6/ — Calculus lessons
-│   ├── geometry-1/ through geometry-6/
-│   ├── precalc/ through precalc-5/
-│   ├── discrete-math/
-│   ├── linear-algebra/
-│   ├── physics-1/
-│   ├── python-1/
-│   ├── web-1/
-│   ├── javascript-1/
-│   ├── data-science/
-│   └── math-1/
-│
-├── context/
-│   ├── ProgressContext.jsx      — lesson completion (localStorage)
-│   ├── SearchContext.jsx        — search index + query state
-│   ├── PinsContext.jsx          — saved pinned visualizations
-│   └── VideoPlayerContext.jsx   — floating video player
-│
-├── hooks/
-│   ├── useProgress.js
-│   ├── useSearch.js
-│   └── useLocalStorage.js
-│
-└── styles/
-    └── index.css                — Tailwind base + CSS variables
+Γö£ΓöÇΓöÇ main.jsx                     ΓÇö app entry
+Γö£ΓöÇΓöÇ App.jsx                      ΓÇö HashRouter + route table
+Γöé
+Γö£ΓöÇΓöÇ pages/
+Γöé   Γö£ΓöÇΓöÇ HomePage.jsx             ΓÇö course grid
+Γöé   Γö£ΓöÇΓöÇ ChapterPage.jsx          ΓÇö lesson list
+Γöé   Γö£ΓöÇΓöÇ LessonPage.jsx           ΓÇö main lesson renderer + prev/next
+Γöé   Γö£ΓöÇΓöÇ ReferencePage.jsx        ΓÇö formula cards + proof modal
+Γöé   Γö£ΓöÇΓöÇ LearningPathsPage.jsx    ΓÇö curated playlists
+Γöé   ΓööΓöÇΓöÇ AboutPage.jsx
+Γöé
+Γö£ΓöÇΓöÇ components/
+Γöé   Γö£ΓöÇΓöÇ layout/
+Γöé   Γöé   Γö£ΓöÇΓöÇ AppShell.jsx         ΓÇö top bar + sidebar + mobile nav + tool panels
+Γöé   Γöé   Γö£ΓöÇΓöÇ Sidebar.jsx
+Γöé   Γöé   ΓööΓöÇΓöÇ MobileBottomNav.jsx
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ lesson/
+Γöé   Γöé   Γö£ΓöÇΓöÇ MicroCycleLesson.jsx ΓÇö renders all lesson sections
+Γöé   Γöé   Γö£ΓöÇΓöÇ LessonQuizBlock.jsx  ΓÇö end-of-lesson quiz (lesson.quiz[])
+Γöé   Γöé   Γö£ΓöÇΓöÇ AssessmentBlock.jsx  ΓÇö inline mastery check (lesson.assessment{})
+Γöé   Γöé   Γö£ΓöÇΓöÇ ChallengeBlock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ UnifiedLearningDock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ IntuitionBlock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ MathBlock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ RigorBlock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ PracticeBlock.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ SpiralBlock.jsx
+Γöé   Γöé   ΓööΓöÇΓöÇ InlineAssessment.jsx
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ viz/
+Γöé   Γöé   Γö£ΓöÇΓöÇ VizFrame.jsx         ΓÇö VIZ_REGISTRY + lazy dispatch
+Γöé   Γöé   Γö£ΓöÇΓöÇ react/               ΓÇö 200+ React viz components
+Γöé   Γöé   Γö£ΓöÇΓöÇ d3/                  ΓÇö D3.js viz components
+Γöé   Γöé   Γö£ΓöÇΓöÇ three/               ΓÇö Three.js viz components
+Γöé   Γöé   Γö£ΓöÇΓöÇ matter/              ΓÇö Matter.js physics simulations
+Γöé   Γöé   Γö£ΓöÇΓöÇ geometry/            ΓÇö Geometry book viz (G1-G4)
+Γöé   Γöé   ΓööΓöÇΓöÇ ch2/                 ΓÇö Physics Ch2 kinematics viz
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ math/
+Γöé   Γöé   Γö£ΓöÇΓöÇ parseProse.jsx       ΓÇö parses $math$, **bold**, `code` in strings
+Γöé   Γöé   Γö£ΓöÇΓöÇ KatexBlock.jsx
+Γöé   Γöé   ΓööΓöÇΓöÇ KatexInline.jsx
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ calculator/
+Γöé   Γöé   ΓööΓöÇΓöÇ TICalc.jsx           ΓÇö TI-84-style calculator
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ search/
+Γöé   Γöé   ΓööΓöÇΓöÇ SearchModal.jsx
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ tools/
+Γöé   Γöé   Γö£ΓöÇΓöÇ GlobalGrapher.jsx
+Γöé   Γöé   Γö£ΓöÇΓöÇ GlobalGrapher3D.jsx
+Γöé   Γöé   ΓööΓöÇΓöÇ Scratchpad.jsx
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ ui/                      ΓÇö shared button, card, badge components
+Γöé   ΓööΓöÇΓöÇ videos/                  ΓÇö video embed + carousel
+Γöé
+Γö£ΓöÇΓöÇ content/
+Γöé   Γö£ΓöÇΓöÇ index.js                 ΓÇö CURRICULUM, LESSON_MAP, ALL_LESSONS
+Γöé   Γö£ΓöÇΓöÇ courses.js               ΓÇö course metadata for home page
+Γöé   Γö£ΓöÇΓöÇ learningPaths.js         ΓÇö LEARNING_PATHS (curated playlists)
+Γöé   Γö£ΓöÇΓöÇ reference-data.js        ΓÇö REFERENCE_CATEGORIES, ALL_ENTRIES
+Γöé   Γö£ΓöÇΓöÇ algebraRegistry.js       ΓÇö algebra cheat-sheet (chapter-0 only)
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ proofs/
+Γöé   Γöé   Γö£ΓöÇΓöÇ index.js             ΓÇö merges all PROOFS
+Γöé   Γöé   Γö£ΓöÇΓöÇ derivatives.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ limits.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ integrals.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ algebra.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ geometry.js
+Γöé   Γöé   Γö£ΓöÇΓöÇ trig.js
+Γöé   Γöé   ΓööΓöÇΓöÇ series.js
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ enhancers/
+Γöé   Γöé   ΓööΓöÇΓöÇ unifiedLessonEnhancer.js  ΓÇö auto-injects context + callouts
+Γöé   Γöé
+Γöé   Γö£ΓöÇΓöÇ chapter-0/ through chapter-6/ ΓÇö Calculus lessons
+Γöé   Γö£ΓöÇΓöÇ geometry-1/ through geometry-6/
+Γöé   Γö£ΓöÇΓöÇ precalc/ through precalc-5/
+Γöé   Γö£ΓöÇΓöÇ discrete-math/
+Γöé   Γö£ΓöÇΓöÇ linear-algebra/
+Γöé   Γö£ΓöÇΓöÇ physics-1/
+Γöé   Γö£ΓöÇΓöÇ python-1/
+Γöé   Γö£ΓöÇΓöÇ web-1/
+Γöé   Γö£ΓöÇΓöÇ javascript-1/
+Γöé   Γö£ΓöÇΓöÇ data-science/
+Γöé   ΓööΓöÇΓöÇ math-1/
+Γöé
+Γö£ΓöÇΓöÇ context/
+Γöé   Γö£ΓöÇΓöÇ ProgressContext.jsx      ΓÇö lesson completion (localStorage)
+Γöé   Γö£ΓöÇΓöÇ SearchContext.jsx        ΓÇö search index + query state
+Γöé   Γö£ΓöÇΓöÇ PinsContext.jsx          ΓÇö saved pinned visualizations
+Γöé   ΓööΓöÇΓöÇ VideoPlayerContext.jsx   ΓÇö floating video player
+Γöé
+Γö£ΓöÇΓöÇ hooks/
+Γöé   Γö£ΓöÇΓöÇ useProgress.js
+Γöé   Γö£ΓöÇΓöÇ useSearch.js
+Γöé   ΓööΓöÇΓöÇ useLocalStorage.js
+Γöé
+ΓööΓöÇΓöÇ styles/
+    ΓööΓöÇΓöÇ index.css                ΓÇö Tailwind base + CSS variables
 
 incomplete ideas/
-├── vizTutorial/
-│   ├── buildAVizTutorial.md     — step-by-step: build the balloon viz from scratch
-│   ├── TEMPLATE_canvas.jsx      — copy-paste starting point (canvas/D3 viz)
-│   ├── TEMPLATE_prose_only.jsx  — copy-paste starting point (UI/info viz)
-│   └── TEMPLATE_errors_and_rules.md
-├── Relatedratesballoon.jsx      — example finished viz (balloon inflation)
-├── JS1_Domintro.jsx             — example: DOM lesson viz
-├── JSNotebook.jsx               — prototype notebook (now merged into viz/react/)
-├── PythonNotebook.jsx           — prototype Python notebook
-└── pythonViz/
-    └── PythonNotebook.jsx       — another prototype version
+Γö£ΓöÇΓöÇ vizTutorial/
+Γöé   Γö£ΓöÇΓöÇ buildAVizTutorial.md     ΓÇö step-by-step: build the balloon viz from scratch
+Γöé   Γö£ΓöÇΓöÇ TEMPLATE_canvas.jsx      ΓÇö copy-paste starting point (canvas/D3 viz)
+Γöé   Γö£ΓöÇΓöÇ TEMPLATE_prose_only.jsx  ΓÇö copy-paste starting point (UI/info viz)
+Γöé   ΓööΓöÇΓöÇ TEMPLATE_errors_and_rules.md
+Γö£ΓöÇΓöÇ Relatedratesballoon.jsx      ΓÇö example finished viz (balloon inflation)
+Γö£ΓöÇΓöÇ JS1_Domintro.jsx             ΓÇö example: DOM lesson viz
+Γö£ΓöÇΓöÇ JSNotebook.jsx               ΓÇö prototype notebook (now merged into viz/react/)
+Γö£ΓöÇΓöÇ PythonNotebook.jsx           ΓÇö prototype Python notebook
+ΓööΓöÇΓöÇ pythonViz/
+    ΓööΓöÇΓöÇ PythonNotebook.jsx       ΓÇö another prototype version
 ```
 
 ---
 
-*Last updated April 4, 2026. Recent changes: Tetris course; CoursesDropdown nav; course card homepage; sidebar color fallback; header z-index fix; video tag-based discovery; FloatingVideoPlayer sync fix; VizFrame dev placeholder (L); SpiralBlock reorder (K); MobileLocationBadge fix (N); formatAsVisualization annotated (I); all three quiz components now call `markCheckpoint` (J); quiz answer reveal removed; `CONTRIBUTING.md` updated with string chapter IDs; `MobileBottomNav` now rendered in AppShell (was dead import); mobile tools hub now includes Python, JS Playground, Video Player (O ✅).*
+*Last updated April 4, 2026. Recent changes: Tetris course; CoursesDropdown nav; course card homepage; sidebar color fallback; header z-index fix; video tag-based discovery; FloatingVideoPlayer sync fix; VizFrame dev placeholder (L); SpiralBlock reorder (K); MobileLocationBadge fix (N); formatAsVisualization annotated (I); quiz systems unified to LessonQuizBlock, AssessmentBlock deleted, python-1 schema fixed (J ✅); `CONTRIBUTING.md` updated; `MobileBottomNav` rendered; mobile tools hub + 3 new tools (O ✅); all tools full-viewport on mobile with close buttons; TICalc centered on mobile with backdrop; ScratchPad mobile backdrop; Home link in desktop nav.*

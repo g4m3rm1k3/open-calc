@@ -868,6 +868,13 @@ export default function ScratchPad({isOpen,onClose}) {
   const rowStyle={display:'flex',alignItems:'center',gap:4,padding:'5px 10px',background:tbBg,flexShrink:0,overflowX:'auto',overflowY:'hidden',scrollbarWidth:'none',msOverflowStyle:'none',WebkitOverflowScrolling:'touch',userSelect:'none'}
 
   return (
+    <>
+      {isMobile && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 119, background: 'rgba(0,0,0,0.4)' }}
+          onClick={onClose}
+        />
+      )}
     <div style={isMobile?mobileStyle:desktopStyle}>
 
       {/* Resize handles */}
@@ -1031,5 +1038,6 @@ export default function ScratchPad({isOpen,onClose}) {
         </div>
       )}
     </div>
+    </>
   )
 }

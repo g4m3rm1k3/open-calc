@@ -15,6 +15,7 @@ import DynamicProof from './DynamicProof.jsx'
 import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
+import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 import KatexBlock from '../math/KatexBlock.jsx'
 import { useProgress } from '../../hooks/useProgress.js'
@@ -582,88 +583,6 @@ function SpiralBlock({ spiral }) {
 
 // ─── ✅ Assessment block ──────────────────────────────────────────────────────
 
-function InlineAssessment({ assessment, lessonId }) {
-  if (!assessment?.questions?.length) return null
-  const [answers, setAnswers] = useState({})
-  const [revealed, setRevealed] = useState({})
-  const { markCheckpoint } = useProgress()
-
-  const total = assessment.questions.length
-  useEffect(() => {
-    const allCorrect = assessment.questions.every(q => {
-      const userAns = (answers[q.id] ?? '').trim().toLowerCase()
-      const correctAnswer = (q.answer ?? '').toString().trim().toLowerCase()
-      return userAns !== '' && correctAnswer !== '' && userAns === correctAnswer
-    })
-    if (allCorrect && lessonId) markCheckpoint(lessonId, 'quiz-passed')
-  }, [answers])
-
-  return (
-    <div className="mt-10 rounded-2xl border border-emerald-200 dark:border-emerald-900/40 overflow-hidden">
-      <div className="px-5 py-3 border-b border-emerald-100 dark:border-emerald-900/40 bg-emerald-100/40 dark:bg-emerald-900/30 flex items-center gap-2">
-        <span>✅</span>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Mastery Check</h3>
-      </div>
-      <div className="p-5 space-y-6">
-        {assessment.questions.map((q, i) => {
-          const userAns = (answers[q.id] ?? '').trim().toLowerCase()
-          const correctAnswer = (q.answer ?? '').toString().trim().toLowerCase()
-          const correct = userAns !== '' && correctAnswer !== '' && userAns === correctAnswer
-          const isRevealed = revealed[q.id]
-          
-          return (
-            <div key={q.id ?? i} className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-800/50">
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3"><span className="text-emerald-500 font-bold mr-1">Q{i+1}.</span>{q.text}</p>
-              
-              {q.type === 'choice' ? (
-                <div className="space-y-2">
-                  {q.options?.map((opt, j) => {
-                    const chosen = answers[q.id] === opt
-                    const optNormalized = (opt ?? '').toString().trim().toLowerCase()
-                    const optionCorrect = optNormalized === correctAnswer
-                    
-                    let cls = 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-                    if (chosen && optionCorrect) cls = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
-                    else if (chosen && !optionCorrect) cls = 'border-rose-400 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
-                    
-                    return (
-                      <button 
-                        key={j} 
-                        onClick={() => setAnswers(a => ({...a, [q.id]: opt}))}
-                        className={`w-full text-left text-xs px-3 py-2 rounded-lg border transition-all ${cls}`}
-                      >
-                        {opt}
-                      </button>
-                    )
-                  })}
-                </div>
-              ) : (
-                <input
-                  className="w-full text-sm px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:border-emerald-400 focus:outline-none transition-colors"
-                  placeholder="Your answer…"
-                  value={answers[q.id] ?? ''}
-                  onChange={e => setAnswers(a => ({...a, [q.id]: e.target.value}))}
-                />
-              )}
-              
-              {answers[q.id] && (
-                <p className={`mt-2 text-xs font-semibold ${correct ? 'text-emerald-600' : 'text-rose-500'}`}>
-                  {correct ? '✓ Correct!' : '✗ Not quite.'}
-                </p>
-              )}
-              
-              <button className="mt-2 text-[10px] text-slate-400 hover:text-slate-600 underline" onClick={() => setRevealed(r => ({...r, [q.id]: !r[q.id]}))}>
-                {isRevealed ? 'Hide Hint' : 'Show Hint'}
-              </button>
-              {isRevealed && q.hint && <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 italic">{q.hint}</p>}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // ─── Main export ───────────────────────────────────────────────────────────
 
 export default function MicroCycleLesson({ lesson }) {
@@ -687,7 +606,9 @@ export default function MicroCycleLesson({ lesson }) {
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
       <SpiralBlock spiral={lesson.spiral} />
-      <InlineAssessment assessment={lesson.assessment} lessonId={lesson.id} />
+      {lesson.assessment?.questions?.length > 0 && (
+        <AssessmentBlock assessment={lesson.assessment} />
+      )}
       {lesson.supplementalVisualizations?.length > 0 && (
         <div className="mt-12 space-y-8">
           <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />

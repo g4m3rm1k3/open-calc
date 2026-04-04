@@ -221,11 +221,12 @@ export default function TICalc({ onClose }) {
   const [toolResult, setToolResult] = useState('')
   const [toolError, setToolError]   = useState('')
 
-  // ── Draggable position ──
+  // ── Draggable position (desktop only) ──
   const [pos, setPos] = useState(() => ({
     x: Math.max(16, window.innerWidth - 400),
     y: Math.max(16, Math.round((window.innerHeight - 620) / 2)),
   }))
+  const isMobile = window.innerWidth < 640
   const dragging   = useRef(false)
   const dragOrigin = useRef({ mx: 0, my: 0, px: 0, py: 0 })
 
@@ -425,11 +426,19 @@ export default function TICalc({ onClose }) {
     : [['sqrt','fn'],['abs','fn'], ['(−)','num'], ['π','fn'], ['ℇ','fn']]
 
   return (
+    <>
+      {/* Backdrop for mobile */}
+      {isMobile && (
+        <div className="fixed inset-0 z-[1999] bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      )}
     <div
       ref={calcRef}
       tabIndex={-1}
       className={`fixed z-[2000] rounded-2xl shadow-2xl border ${bdr} ${bg1} overflow-hidden`}
-      style={{ left: pos.x, top: pos.y, width: 352, outline: 'none' }}
+      style={isMobile
+        ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: Math.min(352, window.innerWidth - 16), maxHeight: '92dvh', overflowY: 'auto', outline: 'none' }
+        : { left: pos.x, top: pos.y, width: 352, outline: 'none' }
+      }
     >
       {/* ── Title bar ──────────────────────────────────────────────────── */}
       <div
@@ -758,5 +767,6 @@ export default function TICalc({ onClose }) {
         </div>
       )}
     </div>
+    </>
   )
 }
