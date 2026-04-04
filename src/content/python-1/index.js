@@ -16,6 +16,7 @@ import lesson15 from './lesson15.js'
 import lesson16 from './lesson16.js'
 import lesson17 from './lesson17.js'
 import lesson18 from './lesson18.js'
+import ch1_1 from './ch1-1.js'
 
 export default [
   {
@@ -59,5 +60,11 @@ export default [
     title: 'Abstraction & Design',
     course: 'python-1',
     lessons: [lesson18]
+  },
+  {
+    number: 1.1,
+    title: 'Numbers & Structure',
+    course: 'python-1',
+    lessons: [ch1_1]
   }
 ]
