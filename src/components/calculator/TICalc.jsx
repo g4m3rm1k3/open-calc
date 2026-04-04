@@ -448,7 +448,7 @@ export default function TICalc({ onClose }) {
         >
           toggle
         </button>
-        <button onClick={onClose} className={`ml-1 text-lg leading-none ${muted} hover:text-rose-400`}>×</button>
+        <button onClick={onClose} className={`ml-1 p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/40 ${muted} hover:text-rose-500 transition-colors`} title="Close">×</button>
       </div>
 
       {/* ── Tab bar ────────────────────────────────────────────────────── */}

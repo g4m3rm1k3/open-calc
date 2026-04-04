@@ -592,8 +592,8 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchC
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl overflow-hidden text-slate-900 dark:text-slate-100">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-7xl flex flex-col md:flex-row h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xl overflow-hidden text-slate-900 dark:text-slate-100 sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl w-full sm:max-w-7xl flex flex-col md:flex-row h-full sm:h-[92vh] overflow-hidden">
 
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <div className="w-full md:w-80 bg-slate-50/50 dark:bg-slate-950/40 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
@@ -621,6 +621,10 @@ const GlobalGrapherJSX = ({ isOpen, onClose, onSwitchTo2D, onSwitchTo3D, launchC
                 title={tab === 'functions' ? 'Add function' : 'Add slider'}
                 className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95 ml-1">
                 <Plus className="w-4 h-4" />
+              </button>
+              <button onClick={onClose} title="Close"
+                className="md:hidden p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-all ml-1">
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>

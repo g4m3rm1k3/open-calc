@@ -144,8 +144,8 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl transition-all duration-500 overflow-hidden">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-7xl flex flex-col md:flex-row h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xl overflow-hidden sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl w-full sm:max-w-7xl flex flex-col md:flex-row h-full sm:h-[92vh] overflow-hidden">
         
         {/* Sidebar */}
         <div className="w-full md:w-80 bg-slate-50/50 dark:bg-slate-950/30 border-r border-slate-200 dark:border-slate-800 flex flex-col">
@@ -174,6 +174,10 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
                 className="p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
               >
                 <Plus className="w-5 h-5" />
+              </button>
+              <button onClick={onClose} title="Close"
+                className="md:hidden p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-all ml-1">
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>

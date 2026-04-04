@@ -828,7 +828,7 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex justify-end p-4 pointer-events-none">
+      <div className="fixed inset-0 z-[100] flex justify-end sm:p-4 pointer-events-none">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -841,7 +841,7 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 600, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="relative w-full max-w-3xl h-full bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto overflow-hidden"
+          className="relative w-full max-w-3xl h-full bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto overflow-hidden"
         >
           {/* Header */}
           <header className="flex items-center justify-between p-4 px-6 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50">

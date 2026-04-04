@@ -205,6 +205,7 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
       </div>
 
       <nav className="hidden lg:flex flex-1 items-center gap-5 ml-6 h-full">
+          <NavLink to="/" end className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'}`}>Home</NavLink>
           <CoursesDropdown />
           <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
           <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
@@ -354,6 +355,10 @@ export default function AppShell({ children }) {
   const [calcOpen, setCalcOpen] = useState(false)
   const [pythonOpen, setPythonOpen] = useState(false)
   const [jsOpen, setJsOpen] = useState(false)
+  const closeAllTools = useCallback(() => {
+    setGraphOpen(false); setGraph3DOpen(false); setGraphJSXOpen(false)
+    setScratchOpen(false); setCalcOpen(false); setPythonOpen(false); setJsOpen(false)
+  }, [])
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
 
@@ -543,7 +548,7 @@ export default function AppShell({ children }) {
             <div className="grid grid-cols-2 gap-4">
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setGraphOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setGraphOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/50 flex items-center justify-center">
@@ -554,7 +559,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setGraph3DOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setGraph3DOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center">
@@ -565,7 +570,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setGraphJSXOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setGraphJSXOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
@@ -576,7 +581,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setScratchOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setScratchOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-300 border border-rose-100 dark:border-rose-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-800/50 flex items-center justify-center">
@@ -587,7 +592,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setCalcOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setCalcOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 border border-violet-100 dark:border-violet-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-800/50 flex items-center justify-center">
@@ -598,7 +603,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setPythonOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setPythonOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300 border border-teal-100 dark:border-teal-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-800/50 flex items-center justify-center">
@@ -609,7 +614,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { setJsOpen(true); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); setJsOpen(true); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 border border-yellow-100 dark:border-yellow-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-800/50 flex items-center justify-center">
@@ -620,7 +625,7 @@ export default function AppShell({ children }) {
 
               <motion.button
                 whileTap={{ scale: 0.96 }}
-                onClick={() => { window.dispatchEvent(new CustomEvent('oc-toggle-video')); setMobileToolsOpen(false) }}
+                onClick={() => { closeAllTools(); window.dispatchEvent(new CustomEvent('oc-toggle-video')); setMobileToolsOpen(false) }}
                 className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 shadow-sm"
               >
                 <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-800/50 flex items-center justify-center">
