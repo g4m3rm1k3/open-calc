@@ -21,18 +21,19 @@ const C = {
   teal:      '#2dd4bf',
 }
 
-// ─── Physics constants ───────────────────────────────────────────────────────
-const BALL_R       = 16
-const FRICTION     = 0.982
-const WALL_RESTITUTION = 0.88
-const SPIN_DECAY   = 0.97
-const SLEEP_THRESH = 0.04
+// ─── Physics constants (mutable via sliders) ────────────────────────────────
+let FRICTION_MUT     = 0.982
+let RESTITUTION_MUT  = 0.88
+const SPIN_DECAY     = 0.97
+const SLEEP_THRESH   = 0.04
 
 // ─── Pool table geometry ─────────────────────────────────────────────────────
-// These are in "world units", canvas is scaled to fit
-const TW = 900  // table world width
-const TH = 500  // table world height
-const RAIL = 48 // rail width on each side
+const BALL_R = 16
+const TW = 900
+const TH = 500
+const RAIL = 48
+// Kitchen line (cue ball must be placed here after scratch)
+const KITCHEN_X = RAIL + (TW - RAIL * 2) * 0.25
 
 // Pockets (6) in world coords
 const POCKETS = [
@@ -128,7 +129,7 @@ function makeBall(def) {
 }
 
 // ─── Collision (elastic, mass-aware, with spin transfer) ─────────────────────
-function resolveBallCollision(a, b, events) {
+function resolveBallCollision(a, b, events, st) {
   const dx = b.x - a.x
   const dy = b.y - a.y
   const dist = hypot(dx, dy)
@@ -165,20 +166,36 @@ function resolveBallCollision(a, b, events) {
   b.x += overlap * nx * 0.5
   b.y += overlap * ny * 0.5
 
-  // Record event
+  // Record collision event + flash geometry
   const impulseMag = Math.abs(impulse)
   if (impulseMag > 0.1) {
-    const p1Before = { vx: a.vx - impulse/a.mass*nx, vy: a.vy - impulse/a.mass*ny }
-    const p2Before = { vx: b.vx + impulse/b.mass*nx, vy: b.vy + impulse/b.mass*ny }
+    const v1i = hypot(a.vx - impulse/a.mass*nx, a.vy - impulse/a.mass*ny)
+    const v2i = hypot(b.vx + impulse/b.mass*nx, b.vy + impulse/b.mass*ny)
+    const v1f = hypot(a.vx, a.vy)
+    const v2f = hypot(b.vx, b.vy)
+    const p1i = (a.mass * v1i).toFixed(2)
+    const p2i = (b.mass * v2i).toFixed(2)
+    const p1f = (a.mass * v1f).toFixed(2)
+    const p2f = (b.mass * v2f).toFixed(2)
+    const pTotal_i = (a.mass * v1i + b.mass * v2i).toFixed(2)
+    const pTotal_f = (a.mass * v1f + b.mass * v2f).toFixed(2)
     events.push({
       type: 'collision',
       time: Date.now(),
-      ax: (a.x + b.x) / 2,
-      ay: (a.y + b.y) / 2,
-      a: { mass: a.mass, vBefore: hypot(p1Before.vx, p1Before.vy).toFixed(2), vAfter: hypot(a.vx, a.vy).toFixed(2), pBefore: (a.mass * hypot(p1Before.vx, p1Before.vy)).toFixed(2), pAfter: (a.mass * hypot(a.vx, a.vy)).toFixed(2) },
-      b: { mass: b.mass, vBefore: hypot(p2Before.vx, p2Before.vy).toFixed(2), vAfter: hypot(b.vx, b.vy).toFixed(2), pBefore: (b.mass * hypot(p2Before.vx, p2Before.vy)).toFixed(2), pAfter: (b.mass * hypot(b.vx, b.vy)).toFixed(2) },
+      ax: (a.x + b.x) / 2, ay: (a.y + b.y) / 2,
+      nx, ny,
+      a: { mass: a.mass, vBefore: v1i.toFixed(2), vAfter: v1f.toFixed(2), pBefore: p1i, pAfter: p1f },
+      b: { mass: b.mass, vBefore: v2i.toFixed(2), vAfter: v2f.toFixed(2), pBefore: p2i, pAfter: p2f },
+      pTotal_i, pTotal_f,
       angle: (Math.atan2(ny, nx) * 180 / Math.PI).toFixed(1),
+      ke_i: (0.5 * a.mass * v1i**2 + 0.5 * b.mass * v2i**2).toFixed(3),
+      ke_f: (0.5 * a.mass * v1f**2 + 0.5 * b.mass * v2f**2).toFixed(3),
     })
+    // Store flash on stateRef so it survives across RAF frames
+    if (st) {
+      if (!st.flashes) st.flashes = []
+      st.flashes.push({ ax: (a.x + b.x) / 2, ay: (a.y + b.y) / 2, nx, ny, time: Date.now() })
+    }
   }
 }
 
@@ -222,13 +239,17 @@ export default function PhysicsPoolLab({ onClose }) {
     spin: true,
     trail: false,
     forces: false,
+    labels: false,
   })
   const [panel,     setPanel]     = useState('data')       // 'data' | 'hit' | 'help'
   const [events,    setEvents]    = useState([])
   const [hitOffset, setHitOffset] = useState({ dx: 0, dy: 0 })
-  const [phase,     setPhase]     = useState('aim')        // 'aim'|'rolling'|'levelDone'
-  const [followed,  setFollowed]  = useState(null)         // null | ball index to follow
-  const [tableData, setTableData] = useState([])           // per-ball live data
+  const [phase,     setPhase]     = useState('aim')        // 'aim'|'rolling'
+  const [followed,  setFollowed]  = useState(null)
+  const [tableData, setTableData] = useState([])
+  const [expandedEvent, setExpandedEvent] = useState(null)  // index of expanded event row
+  const [friction,  setFrictionUI]  = useState(0.982)
+  const [restitution, setRestitutionUI] = useState(0.88)
 
   // ── Hit position picker ref (avoids closure stale) ────────────────────────
   const hitOffsetRef = useRef({ dx: 0, dy: 0 })
@@ -396,21 +417,21 @@ export default function PhysicsPoolLab({ onClose }) {
       if (b.pocketed) continue
       b.x += b.vx
       b.y += b.vy
-      b.vx *= FRICTION
-      b.vy *= FRICTION
+      b.vx *= FRICTION_MUT
+      b.vy *= FRICTION_MUT
       b.spin *= SPIN_DECAY
 
       // Spin applies lateral drift (English effect)
       b.vx += b.spin * (-b.vy) * 0.0012
       b.vy += b.spin * (b.vx) * 0.0012
 
-      // Wall bounce
+      // Wall bounce (uses mutable restitution)
       const left = RAIL + b.r, right = TW - RAIL - b.r
       const top  = RAIL + b.r, bot   = TH  - RAIL - b.r
-      if (b.x < left)  { b.x = left;  b.vx = Math.abs(b.vx) * WALL_RESTITUTION; b.spin *= -0.5 }
-      if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * WALL_RESTITUTION; b.spin *= -0.5 }
-      if (b.y < top)   { b.y = top;   b.vy = Math.abs(b.vy) * WALL_RESTITUTION; b.spin *= -0.5 }
-      if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * WALL_RESTITUTION; b.spin *= -0.5 }
+      if (b.x < left)  { b.x = left;  b.vx = Math.abs(b.vx) * RESTITUTION_MUT; b.spin *= -0.5 }
+      if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * RESTITUTION_MUT; b.spin *= -0.5 }
+      if (b.y < top)   { b.y = top;   b.vy = Math.abs(b.vy) * RESTITUTION_MUT; b.spin *= -0.5 }
+      if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * RESTITUTION_MUT; b.spin *= -0.5 }
 
       // Trail
       if (overlays.trail) {
@@ -423,19 +444,29 @@ export default function PhysicsPoolLab({ onClose }) {
       // Pocket check
       for (const p of POCKETS) {
         if (hypot(b.x - p.x, b.y - p.y) < POCKET_R + 2) {
-          b.pocketed = true
-          b.vx = b.vy = 0
-          st.pocketed.push(b)
+          if (b.isCue) {
+            // ── Scratch: ball-in-hand — place cue in kitchen, don't end game
+            b.x = KITCHEN_X
+            b.y = TH / 2
+            b.vx = 0; b.vy = 0; b.spin = 0
+            st.scratchCount = (st.scratchCount ?? 0) + 1
+            st.events.push({ type: 'scratch', time: Date.now() })
+            setEvents([...st.events])
+          } else {
+            b.pocketed = true
+            b.vx = b.vy = 0
+            st.pocketed.push(b)
+          }
           break
         }
       }
     }
 
-    // Ball–ball collisions
+    // Ball–ball collisions — use mutable friction & restitution
     const active = st.balls.filter(b => !b.pocketed)
     for (let i = 0; i < active.length; i++) {
       for (let j = i + 1; j < active.length; j++) {
-        resolveBallCollision(active[i], active[j], eventsThisFrame)
+        resolveBallCollision(active[i], active[j], eventsThisFrame, st)
       }
     }
 
@@ -667,21 +698,83 @@ export default function PhysicsPoolLab({ onClose }) {
 
       // Force (friction) vector
       if (overlays.forces && speed > SLEEP_THRESH * 2) {
-        const frix = -b.vx * (1 - FRICTION) * 25
-        const friy = -b.vy * (1 - FRICTION) * 25
+        const frix = -b.vx * (1 - FRICTION_MUT) * 25
+        const friy = -b.vy * (1 - FRICTION_MUT) * 25
         drawArrow(ctx, b.x, b.y, frix, friy, '#f87171', 1.5)
       }
     }
 
-    // "Following" label
+    // ── Collision flashes (line of impact + tangent lines) ──────────────────
+    const now = Date.now()
+    if (!st.flashes) st.flashes = []
+    // prune old
+    st.flashes = st.flashes.filter(f => now - f.time < 700)
+    for (const f of st.flashes) {
+      const age = (now - f.time) / 700
+      const alpha = 1 - age
+      const len = 55
+      // Line of impact (along normal)
+      ctx.strokeStyle = `rgba(168,139,250,${alpha * 0.9})`
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.moveTo(f.ax - f.nx * len, f.ay - f.ny * len)
+      ctx.lineTo(f.ax + f.nx * len, f.ay + f.ny * len)
+      ctx.stroke()
+      // Tangent line
+      ctx.strokeStyle = `rgba(45,212,191,${alpha * 0.7})`
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 4])
+      ctx.beginPath()
+      ctx.moveTo(f.ax - f.ny * len, f.ay + f.nx * len)
+      ctx.lineTo(f.ax + f.ny * len, f.ay - f.nx * len)
+      ctx.stroke()
+      ctx.setLineDash([])
+      // Impact dot
+      ctx.fillStyle = `rgba(251,191,36,${alpha})`
+      ctx.beginPath()
+      ctx.arc(f.ax, f.ay, 3, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // "Following" label — now shows live velocity readout
     if (followed !== null && st.balls[followed] && !st.balls[followed].pocketed) {
       const b = st.balls[followed]
+      const speed = hypot(b.vx, b.vy)
       ctx.fillStyle = C.amber
       ctx.font = 'bold 9px monospace'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
-      ctx.fillText('TRACKING', b.x, b.y + b.r + 3)
+      ctx.fillText(`v=${speed.toFixed(2)}  p=${(b.mass*speed).toFixed(2)}`, b.x, b.y + b.r + 4)
     }
+
+    // ── Floating velocity labels on all moving balls ────────────────────────
+    if (overlays.labels) {
+      for (const b of active) {
+        const speed = hypot(b.vx, b.vy)
+        if (speed < SLEEP_THRESH * 3) continue
+        ctx.fillStyle = 'rgba(56,189,248,0.92)'
+        ctx.font = '8px monospace'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(`v=${speed.toFixed(1)}`, b.x + b.r + 3, b.y - 5)
+        ctx.fillStyle = 'rgba(167,139,250,0.85)'
+        ctx.fillText(`p=${(b.mass * speed).toFixed(1)}`, b.x + b.r + 3, b.y + 5)
+      }
+    }
+
+    // Kitchen line (scratch placement zone)
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+    ctx.lineWidth = 1
+    ctx.setLineDash([6, 8])
+    ctx.beginPath()
+    ctx.moveTo(KITCHEN_X, RAIL)
+    ctx.lineTo(KITCHEN_X, TH - RAIL)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.fillStyle = 'rgba(255,255,255,0.06)'
+    ctx.font = '8px monospace'
+    ctx.textAlign = 'center'
+    ctx.fillText('KITCHEN', KITCHEN_X, RAIL + 10)
 
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     animRef.current = requestAnimationFrame(loop)
@@ -950,6 +1043,7 @@ export default function PhysicsPoolLab({ onClose }) {
                     { key: 'forces',   label: '⬅ Friction Force',     color: C.red    },
                     { key: 'spin',     label: '↺ Spin / English',      color: C.teal   },
                     { key: 'trail',    label: '· Trail',               color: C.amber  },
+                    { key: 'labels',   label: '🏷 Live Labels (v, p)', color: C.blue },
                   ].map(o => (
                     <button key={o.key} onClick={() => toggleOverlay(o.key)}
                       className="flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left"
@@ -965,7 +1059,39 @@ export default function PhysicsPoolLab({ onClose }) {
                 </div>
               </div>
 
-              {/* Ball tracker */}
+              {/* Physics sliders */}
+              <div>
+                <div className="text-xs font-medium mb-2" style={{ color: C.text }}>Table Parameters</div>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span style={{ color: C.muted }}>Friction</span>
+                      <span style={{ color: C.text, fontFamily: 'monospace' }}>{friction.toFixed(3)}</span>
+                    </div>
+                    <input type="range" min="0.940" max="0.999" step="0.001" value={friction}
+                      onChange={e => { const v = parseFloat(e.target.value); setFrictionUI(v); FRICTION_MUT = v }}
+                      className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                      style={{ accentColor: C.teal }} />
+                    <div className="flex justify-between text-xs mt-0.5" style={{ color: C.hint }}>
+                      <span>sticky</span><span>slick</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span style={{ color: C.muted }}>Cushion Bounce</span>
+                      <span style={{ color: C.text, fontFamily: 'monospace' }}>{restitution.toFixed(2)}</span>
+                    </div>
+                    <input type="range" min="0.40" max="1.00" step="0.01" value={restitution}
+                      onChange={e => { const v = parseFloat(e.target.value); setRestitutionUI(v); RESTITUTION_MUT = v }}
+                      className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+                      style={{ accentColor: C.purple }} />
+                    <div className="flex justify-between text-xs mt-0.5" style={{ color: C.hint }}>
+                      <span>dead</span><span>superball</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <div className="text-xs font-medium mb-2" style={{ color: C.text }}>Ball Physics</div>
                 <div className="flex flex-col gap-1.5">
@@ -1014,7 +1140,13 @@ export default function PhysicsPoolLab({ onClose }) {
                 </div>
               )}
               {[...events].reverse().map((ev, i) => (
-                <div key={i} className="rounded p-2 text-xs" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                <div key={i}
+                  className="rounded p-2 text-xs"
+                  style={{ background: C.bg, border: `1px solid ${ev.type === 'collision' && expandedEvent === i ? C.purple : C.border}`, cursor: ev.type === 'collision' ? 'pointer' : 'default' }}
+                  onClick={() => ev.type === 'collision' && setExpandedEvent(x => x === i ? null : i)}>
+                  {ev.type === 'scratch' && (
+                    <div style={{ color: C.amber }}>⚠️ Scratch — cue returned to kitchen</div>
+                  )}
                   {ev.type === 'shot' && (
                     <>
                       <div className="font-medium mb-1" style={{ color: C.blue }}>🎯 Shot #{events.filter(e=>e.type==='shot').length - i}</div>
@@ -1026,8 +1158,10 @@ export default function PhysicsPoolLab({ onClose }) {
                   )}
                   {ev.type === 'collision' && (
                     <>
-                      <div className="font-medium mb-1" style={{ color: C.purple }}>💥 Collision</div>
-                      <div style={{ color: C.muted }}>Angle: <span style={{ color: C.text }}>{ev.angle}°</span></div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium" style={{ color: C.purple }}>💥 Collision — {ev.angle}°</span>
+                        <span style={{ color: C.hint, fontSize: 9 }}>{expandedEvent === i ? '▲ less' : '▼ equation'}</span>
+                      </div>
                       <div className="grid grid-cols-2 gap-1 mt-1">
                         {[ev.a, ev.b].map((ball, j) => (
                           <div key={j} className="rounded p-1" style={{ background: C.surface }}>
@@ -1037,6 +1171,17 @@ export default function PhysicsPoolLab({ onClose }) {
                           </div>
                         ))}
                       </div>
+                      {expandedEvent === i && (
+                        <div className="mt-2 p-2 rounded" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                          <div className="font-medium mb-1" style={{ color: C.blue, fontSize: 9 }}>Conservation of Momentum: m₁v₁ᵢ + m₂v₂ᵢ = m₁v₁f + m₂v₂f</div>
+                          <div style={{ color: C.hint, fontFamily: 'monospace', fontSize: 9, lineHeight: 1.9 }}>
+                            <div>({ev.a.mass})({ev.a.vBefore}) + ({ev.b.mass})({ev.b.vBefore})</div>
+                            <div style={{ color: C.green }}>= ({ev.a.mass})({ev.a.vAfter}) + ({ev.b.mass})({ev.b.vAfter})</div>
+                            <div style={{ color: C.muted, marginTop: 4 }}>pᵢ = {ev.pTotal_i} &rarr; pf = <span style={{color:C.purple}}>{ev.pTotal_f}</span></div>
+                            <div style={{ color: C.muted }}>KEᵢ = {ev.ke_i} &rarr; KEf = <span style={{color: parseFloat(ev.ke_f) <= parseFloat(ev.ke_i) ? C.green : C.amber}}>{ev.ke_f}</span></div>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
