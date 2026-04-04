@@ -376,6 +376,11 @@ export default function PhysicsPoolLab({ onClose }) {
     stateRef.current.mouse = toWorld(sx, sy)
   }, [])
 
+  const handleCancelDrag = useCallback(() => {
+    if (!stateRef.current) return
+    stateRef.current.isDragging = false
+  }, [])
+
   const handleMouseUp = useCallback((e) => {
     if (!stateRef.current) return
     const st = stateRef.current
@@ -658,8 +663,8 @@ export default function PhysicsPoolLab({ onClose }) {
             .map(b => ({
               x: b.x, y: b.y, vx: b.vx, vy: b.vy, spin: b.spin,
               mass: b.mass, r: b.r, isCue: b.isCue,
-              color: b.color, pocketed: false,
-              _trail: [{ x: b.x, y: b.y }],  // path history
+              color: b.color, ballNum: b.ballNum, pocketed: false,
+              _trail: [{ x: b.x, y: b.y }],
             }))
 
           const simCue = simBalls.find(b => b.isCue)
@@ -670,11 +675,11 @@ export default function PhysicsPoolLab({ onClose }) {
 
             const left = RAIL + BALL_R, right = TW - RAIL - BALL_R
             const top  = RAIL + BALL_R, bot   = TH  - RAIL - BALL_R
-            const RECORD_EVERY = 4   // record every N steps
+            const RECORD_EVERY = 4
             const MAX_STEPS = 600
+            const litPockets = new Set()  // pocket indices that will be sunk into
 
             for (let step = 0; step < MAX_STEPS; step++) {
-              // Integrate
               for (const b of simBalls) {
                 if (b.pocketed) continue
                 b.x += b.vx; b.y += b.vy
@@ -686,14 +691,18 @@ export default function PhysicsPoolLab({ onClose }) {
                 if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * RESTITUTION_MUT }
                 if (b.y < top)   { b.y = top;   b.vy =  Math.abs(b.vy) * RESTITUTION_MUT }
                 if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * RESTITUTION_MUT }
-                // Pocket — remove from sim
-                for (const p of POCKETS) {
+                for (let pi = 0; pi < POCKETS.length; pi++) {
+                  const p = POCKETS[pi]
                   if (hypot(b.x - p.x, b.y - p.y) < POCKET_R + 2) {
-                    b.pocketed = true; break
+                    // record final trail point at pocket centre
+                    b._trail.push({ x: p.x, y: p.y })
+                    b._pocketIdx = pi
+                    b.pocketed = true
+                    litPockets.add(pi)
+                    break
                   }
                 }
               }
-              // Ball-ball collisions (inline — no event recording needed)
               const active = simBalls.filter(b => !b.pocketed)
               for (let i = 0; i < active.length; i++) {
                 for (let j = i + 1; j < active.length; j++) {
@@ -713,17 +722,26 @@ export default function PhysicsPoolLab({ onClose }) {
                   b.x += ov * nx * 0.5; b.y += ov * ny * 0.5
                 }
               }
-              // Record trail
               if (step % RECORD_EVERY === 0) {
                 for (const b of simBalls) {
                   if (!b.pocketed) b._trail.push({ x: b.x, y: b.y })
                 }
               }
-              // Early exit when everything stopped
               if (active.every(b => hypot(b.vx, b.vy) < SLEEP_THRESH)) break
             }
 
-            // Draw predicted paths
+            // Pocket glow for balls that will be sunk
+            for (const pi of litPockets) {
+              const p = POCKETS[pi]
+              const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, POCKET_R * 2.2)
+              grad.addColorStop(0, 'rgba(74,222,128,0.7)')
+              grad.addColorStop(0.5, 'rgba(74,222,128,0.25)')
+              grad.addColorStop(1, 'rgba(74,222,128,0)')
+              ctx.fillStyle = grad
+              ctx.beginPath(); ctx.arc(p.x, p.y, POCKET_R * 2.2, 0, Math.PI * 2); ctx.fill()
+            }
+
+            // Draw predicted paths + ghost balls
             const ballColors = [
               [251, 191, 36],  // cue — amber
               [45, 212, 191],  // others — teal
@@ -731,7 +749,7 @@ export default function PhysicsPoolLab({ onClose }) {
             for (const b of simBalls) {
               if (b._trail.length < 2) continue
               const [r, g, bl] = b.isCue ? ballColors[0] : ballColors[1]
-              ctx.lineWidth = b.isCue ? 1.5 : 1.5
+              ctx.lineWidth = 1.5
               for (let i = 1; i < b._trail.length; i++) {
                 const alpha = (i / b._trail.length) * 0.7
                 ctx.strokeStyle = `rgba(${r},${g},${bl},${alpha})`
@@ -740,13 +758,26 @@ export default function PhysicsPoolLab({ onClose }) {
                 ctx.lineTo(b._trail[i].x, b._trail[i].y)
                 ctx.stroke()
               }
-              // Ghost ball at final position
+              // Ghost ball or pocket-sink indicator
               const last = b._trail[b._trail.length - 1]
-              ctx.globalAlpha = 0.25
-              ctx.strokeStyle = `rgb(${r},${g},${bl})`
-              ctx.lineWidth = 1.5
-              ctx.beginPath(); ctx.arc(last.x, last.y, b.r, 0, Math.PI * 2); ctx.stroke()
-              ctx.globalAlpha = 1
+              if (!b.pocketed) {
+                // ghost ball ring
+                ctx.globalAlpha = 0.3
+                ctx.strokeStyle = `rgb(${r},${g},${bl})`
+                ctx.lineWidth = 1.5
+                ctx.beginPath(); ctx.arc(last.x, last.y, b.r, 0, Math.PI * 2); ctx.stroke()
+                ctx.globalAlpha = 1
+                // ball number label
+                if (b.ballNum != null || b.isCue) {
+                  ctx.globalAlpha = 0.55
+                  ctx.fillStyle = `rgb(${r},${g},${bl})`
+                  ctx.font = 'bold 9px monospace'
+                  ctx.textAlign = 'center'
+                  ctx.textBaseline = 'middle'
+                  ctx.fillText(b.isCue ? 'Q' : String(b.ballNum), last.x, last.y)
+                  ctx.globalAlpha = 1
+                }
+              }
             }
           }
         }
@@ -999,6 +1030,14 @@ export default function PhysicsPoolLab({ onClose }) {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
   }, [loop])
 
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') handleCancelDrag()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [handleCancelDrag])
+
   // ── Hit position picker ───────────────────────────────────────────────────
   const hitPickerRef = useRef(null)
   const handleHitPick = useCallback((e) => {
@@ -1134,6 +1173,7 @@ export default function PhysicsPoolLab({ onClose }) {
             onTouchStart={e => handleMouseDown(e.touches[0])}
             onTouchMove={e => { e.preventDefault(); handleMouseMove(e.touches[0]) }}
             onTouchEnd={handleMouseUp}
+            onContextMenu={e => { e.preventDefault(); handleCancelDrag() }}
             className="cursor-crosshair rounded-lg shadow-2xl"
             style={{ display: 'block', userSelect: 'none', touchAction: 'none' }}
           />
