@@ -90,4 +90,11 @@ export const COURSES = [
     desc: 'Elements, Reactions & Structure',
     color: 'lime'
   },
+  {
+    key: 'cnc-logic',
+    label: 'CNC Macro Systems',
+    path: '/course/cnc-logic',
+    desc: 'G-Code, Kinematics & Logic',
+    color: 'slate'
+  },
 ];

@@ -94,6 +94,8 @@ export const LEARNING_PATHS = [
       'series-applications',
       'parametric-equations',
       'vector-calculus-preview',
+      'machine-as-computer',
+      'macro-variables',
     ],
   },
 ]

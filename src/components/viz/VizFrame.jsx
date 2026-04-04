@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
 const VIZ_REGISTRY = {
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
+  CNCLab: lazy(() => import("./cnc/CNCLab.jsx")),
+  CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   NumberLine: lazy(() => import("./d3/NumberLine.jsx")),
   FunctionMachine: lazy(() => import("./d3/FunctionMachine.jsx")),
