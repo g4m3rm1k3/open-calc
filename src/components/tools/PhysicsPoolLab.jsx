@@ -696,6 +696,9 @@ export default function PhysicsPoolLab({ onClose }) {
           const gx = cue.x + aimNx * closestT
           const gy = cue.y + aimNy * closestT
 
+          // Hide aim overlays while stepping through collision snapshots
+          if (collisionStepRef.current < 0) {
+
           // Aim guideline to ghost pos
           ctx.strokeStyle = 'rgba(255,255,255,0.3)'
           ctx.lineWidth = 1
@@ -797,6 +800,7 @@ export default function PhysicsPoolLab({ onClose }) {
             ctx.fillStyle = '#22d3ee'
             ctx.fillText(`→ cue:  ${(100 - ke_transferred_pct)}%  ${ke_in_J(ke_cue_after).toFixed(4)} J`, bx + 6, by + 62)
           }
+          } // end: hide aim overlays during snapshot browse
         }
 
         // ── Forward simulation — run exact physics engine on cloned state ──
@@ -906,7 +910,8 @@ export default function PhysicsPoolLab({ onClose }) {
               ctx.beginPath(); ctx.arc(p.x, p.y, POCKET_R * 2.2, 0, Math.PI * 2); ctx.fill()
             }
 
-            // Draw predicted paths + ghost balls
+            // Draw predicted paths + ghost balls (hidden during snapshot browse)
+            if (collisionStepRef.current < 0) {
             const ballColors = [
               [251, 191, 36],  // cue — amber
               [45, 212, 191],  // others — teal
@@ -944,6 +949,7 @@ export default function PhysicsPoolLab({ onClose }) {
                 }
               }
             }
+            } // end: hide sim trails during snapshot browse
             simSnapshotsRef.current = snapshots
           }
         }
@@ -1160,11 +1166,11 @@ export default function PhysicsPoolLab({ onClose }) {
     }
 
     // ── Collision flashes (line of impact + tangent lines + impact pop-up) ──
+    // Only shown in slow-mo so they don't clutter full-speed play
     const now = Date.now()
     if (!st.flashes) st.flashes = []
-    // prune old
     st.flashes = st.flashes.filter(f => now - f.time < 2500)
-    for (const f of st.flashes) {
+    for (const f of slowMoRef.current ? st.flashes : []) {
       const age = (now - f.time) / 700
       const alpha = Math.max(0, 1 - age)
       const len = 55
@@ -1190,8 +1196,8 @@ export default function PhysicsPoolLab({ onClose }) {
       ctx.arc(f.ax, f.ay, 3, 0, Math.PI * 2)
       ctx.fill()
 
-      // ── Impact pop-up card (visible for 2.5s) ──────────────────────────
-      if (f.popupData && now - f.time < 2500) {
+      // ── Impact pop-up card (visible for 2.5s, only in slow-mo) ─────────
+      if (f.popupData && now - f.time < 2500 && overlays.labels) {
         const popAlpha = Math.max(0, 1 - (now - f.time) / 2500)
         const pd = f.popupData
         const bx = f.ax + 14, by = f.ay - 58
