@@ -1,7 +1,7 @@
 export default {
   id: 'w2-003',
   slug: 'events',
-  chapter: 2,
+  chapter: 'w2',
   order: 3,
   title: 'Events (Critical Pivot)',
   subtitle: 'Programs react to unexpected user or system disruptions computationally',

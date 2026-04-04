@@ -1,7 +1,7 @@
 export default {
   id: "ch2-013",
   slug: "free-fall-symmetry",
-  chapter: 2,
+  chapter: 'p2',
   order: 13,
   title: "Free Fall Symmetry",
   subtitle:

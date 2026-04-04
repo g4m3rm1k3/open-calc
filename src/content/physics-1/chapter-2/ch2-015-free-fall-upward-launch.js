@@ -1,7 +1,7 @@
 export default {
   id: "ch2-015",
   slug: "free-fall-upward-launch",
-  chapter: 2,
+  chapter: 'p2',
   order: 15,
   title: "Free Fall: Upward Launch",
   subtitle: "Analyze rise, apex, and descent after an upward throw.",

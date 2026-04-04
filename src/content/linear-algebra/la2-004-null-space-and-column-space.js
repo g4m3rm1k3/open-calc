@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-004',
   slug: 'null-space-and-column-space',
-  chapter: 2,
+  chapter: 'la2',
   order: 4,
   title: 'Null Space and Column Space',
   subtitle: 'When a matrix destroys space, where does the debris go?',

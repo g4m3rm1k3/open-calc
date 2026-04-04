@@ -1,7 +1,7 @@
 export default {
   id: "ch2-019",
   slug: "mixed-kinematics-problems",
-  chapter: 2,
+  chapter: 'p2',
   order: 19,
   title: "Mixed Kinematics Problems",
   subtitle:

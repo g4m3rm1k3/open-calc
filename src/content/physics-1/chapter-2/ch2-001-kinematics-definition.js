@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch2-001',
   slug: 'kinematics-definition',
-  chapter: 2,
+  chapter: 'p2',
   order: 1,
   title: 'Motion in One Dimension — Definitions',
   subtitle: 'Position, displacement, velocity, and acceleration: the four quantities that describe all motion.',

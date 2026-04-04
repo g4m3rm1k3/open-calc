@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-002',
   slug: 'gram-schmidt',
-  chapter: 4,
+  chapter: 'la4',
   order: 2,
   title: 'Gram-Schmidt Orthogonalization',
   subtitle: 'How to manufacture a perfectly clean, perpendicular coordinate system out of any messy, tilted basis.',

@@ -1,5 +1,5 @@
 export default {
-  id: 'p1-ch1-015', slug: 'cross-product-calculator', chapter: 1, order: 15,
+  id: 'p1-ch1-015', slug: 'cross-product-calculator', chapter: 'p1', order: 15,
   title: 'Cross Product — Numerical Calculation',
   subtitle: 'Multiply vectors by component in 3D: using the determinant $A_yB_z - A_zB_y$.',
   tags: ['cross product', 'vector product', 'determinant', 'component calculation'],

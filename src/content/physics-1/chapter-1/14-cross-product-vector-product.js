@@ -1,5 +1,5 @@
 export default {
-  id: 'p1-ch1-014', slug: 'cross-product-vector-product', chapter: 1, order: 14,
+  id: 'p1-ch1-014', slug: 'cross-product-vector-product', chapter: 'p1', order: 14,
   title: 'Cross Product — Vector Product',
   subtitle: 'Multiply two vectors and get a third that is perpendicular to both.',
   tags: ['cross product', 'vector product', 'right-hand rule', 'torque', 'normal vector'],

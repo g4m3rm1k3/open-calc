@@ -1,7 +1,7 @@
 export default {
   id: "ch2-004",
   slug: "velocity-graph-analysis",
-  chapter: 2,
+  chapter: 'p2',
   order: 4,
   title: "Velocity-Time Graph Analysis",
   subtitle:

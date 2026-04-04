@@ -1,7 +1,7 @@
 export default {
   id: 'w1-001',
   slug: 'what-is-a-web-page',
-  chapter: 1,
+  chapter: 'w1',
   order: 1,
   title: 'What is a Web Page?',
   subtitle: 'A webpage is a tree of objects rendered visually',

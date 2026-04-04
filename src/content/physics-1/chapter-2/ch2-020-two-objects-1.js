@@ -1,7 +1,7 @@
 export default {
   id: "ch2-020",
   slug: "two-objects-1",
-  chapter: 2,
+  chapter: 'p2',
   order: 20,
   title: "Two Objects — Meeting Problems (Part 1)",
   subtitle:

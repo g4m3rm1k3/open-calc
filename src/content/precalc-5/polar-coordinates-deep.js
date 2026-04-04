@@ -1,7 +1,7 @@
 export default {
   id: 'ch5-001',
   slug: 'polar-coordinates-deep',
-  chapter: 5,
+  chapter: 'precalc-5',
   order: 1,
   title: 'Polar Coordinates: Distance and Direction Instead of Right and Up',
   subtitle: 'Cartesian asks "how far right and up?" — polar asks "how far, and which direction?" Same point, two languages. Choosing the right one makes the math trivial or horrible.',

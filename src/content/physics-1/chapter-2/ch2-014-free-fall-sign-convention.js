@@ -1,7 +1,7 @@
 export default {
   id: "ch2-014",
   slug: "free-fall-sign-convention",
-  chapter: 2,
+  chapter: 'p2',
   order: 14,
   title: "Free Fall Sign Convention",
   subtitle: "Pick one positive direction and keep all quantities consistent.",

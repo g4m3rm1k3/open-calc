@@ -1,7 +1,7 @@
 export default {
   id: 'w2-001',
   slug: 'variables-and-state',
-  chapter: 2,
+  chapter: 'w2',
   order: 1,
   title: 'Variables and State',
   subtitle: 'Programs store and transform state',

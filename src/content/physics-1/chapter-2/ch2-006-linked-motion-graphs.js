@@ -1,7 +1,7 @@
 export default {
   id: "ch2-006",
   slug: "linked-motion-graphs",
-  chapter: 2,
+  chapter: 'p2',
   order: 6,
   title: "Linking x(t), v(t), and a(t)",
   subtitle:

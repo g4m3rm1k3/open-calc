@@ -1,7 +1,7 @@
 export default {
   id: 'w1-002',
   slug: 'html-structure',
-  chapter: 1,
+  chapter: 'w1',
   order: 2,
   title: 'HTML as Structure',
   subtitle: 'HTML defines meaning and structure, not appearance',

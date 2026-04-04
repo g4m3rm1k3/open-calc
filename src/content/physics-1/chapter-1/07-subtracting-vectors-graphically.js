@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch1-007',
   slug: 'subtracting-vectors-graphically',
-  chapter: 1,
+  chapter: 'p1',
   order: 7,
   title: 'Subtracting Vectors Graphically',
   subtitle: 'A − B is just A + (−B). Flip the arrow, then add.',

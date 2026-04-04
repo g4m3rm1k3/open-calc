@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la1-003',
   slug: 'dot-and-cross-products',
-  chapter: 1,
+  chapter: 'la1',
   order: 3,
   title: 'Dot and Cross Products',
   subtitle: 'How to multiply vectors to measure angles, projections, and perpendicular spaces.',

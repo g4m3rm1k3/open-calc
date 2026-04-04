@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la1-002',
   slug: 'linear-combinations',
-  chapter: 1,
+  chapter: 'la1',
   order: 2,
   title: 'Linear Combinations, Span, and Basis',
   subtitle: 'How to build entire mathematical universes by adding and scaling a few fundamental arrows.',

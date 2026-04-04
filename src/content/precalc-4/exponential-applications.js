@@ -1,7 +1,7 @@
 export default {
   id: 'ch4-006',
   slug: 'exponential-applications',
-  chapter: 4,
+  chapter: 'precalc-4',
   order: 6,
   title: 'Exponential Models: Growth, Decay, and Everything In Between',
   subtitle: 'One equation — $A = A_0 e^{kt}$ — models populations, radioactive decay, cooling, and more. The sign of $k$ decides everything.',

@@ -1,7 +1,7 @@
 export default {
   id: 'w1-004',
   slug: 'layout-systems',
-  chapter: 1,
+  chapter: 'w1',
   order: 4,
   title: 'Layout Systems',
   subtitle: 'Constraint solving via the Box Model and Flexbox',

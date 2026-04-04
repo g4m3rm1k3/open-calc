@@ -1,7 +1,7 @@
 export default {
   id: 'w1-003',
   slug: 'css-rule-engine',
-  chapter: 1,
+  chapter: 'w1',
   order: 3,
   title: 'CSS as a Rule Engine',
   subtitle: 'Pattern matching, the cascade, and specificity weights',

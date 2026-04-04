@@ -1,7 +1,7 @@
 export default {
   id: 'la-sandbox',
   slug: 'python-sandbox',
-  chapter: 5,
+  chapter: 'la5',
   order: 1,
   title: 'Python Lab: Linear Algebra',
   subtitle: 'Experiment with vectors and matrices using Python in the browser',

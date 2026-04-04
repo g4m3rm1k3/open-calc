@@ -1,7 +1,7 @@
 export default {
   id: "ch2-018",
   slug: "free-fall-patterns",
-  chapter: 2,
+  chapter: 'p2',
   order: 18,
   title: "Free Fall Pattern Recognition",
   subtitle: "Classify scenarios quickly from equations, signs, and graphs.",

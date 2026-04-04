@@ -1,7 +1,7 @@
 export default {
   id: 'w6-003',
   slug: 'architecture',
-  chapter: 6,
+  chapter: 'w6',
   order: 3,
   title: 'Architecture',
   subtitle: 'Organizing massive disparate application layers coherently',

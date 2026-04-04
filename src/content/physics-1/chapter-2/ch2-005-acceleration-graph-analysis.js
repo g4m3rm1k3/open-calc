@@ -1,7 +1,7 @@
 export default {
   id: "ch2-005",
   slug: "acceleration-graph-analysis",
-  chapter: 2,
+  chapter: 'p2',
   order: 5,
   title: "Acceleration-Time Graph Analysis",
   subtitle: "Use a–t graphs to predict how velocity — and therefore position — evolves over time.",

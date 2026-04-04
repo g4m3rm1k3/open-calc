@@ -1,7 +1,7 @@
 export default {
   id: 'w5-001',
   slug: 'apis-and-data',
-  chapter: 5,
+  chapter: 'w5',
   order: 1,
   title: 'APIs and Data Flow',
   subtitle: 'Applications communicate with entirely external remote systems natively',

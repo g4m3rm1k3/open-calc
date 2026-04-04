@@ -1,5 +1,5 @@
 export default {
-  id: 'p1-ch1-009', slug: 'adding-force-vectors-numerically', chapter: 1, order: 9,
+  id: 'p1-ch1-009', slug: 'adding-force-vectors-numerically', chapter: 'p1', order: 9,
   title: 'Adding Force Vectors Numerically',
   subtitle: 'DSMD meets Newton: find the net force and predict the motion.',
   tags: ['force vectors','net force','resultant force','Newton second law','equilibrium','free body diagram'],

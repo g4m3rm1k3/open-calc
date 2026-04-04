@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-003',
   slug: 'inverse-matrices',
-  chapter: 2,
+  chapter: 'la2',
   order: 3,
   title: 'Inverse Matrices and Determinants',
   subtitle: 'How to play a transformation backwards, and why sometimes space is irreversibly flattened.',

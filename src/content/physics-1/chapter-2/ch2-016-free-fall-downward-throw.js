@@ -1,7 +1,7 @@
 export default {
   id: "ch2-016",
   slug: "free-fall-downward-throw",
-  chapter: 2,
+  chapter: 'p2',
   order: 16,
   title: "Free Fall: Downward Throw",
   subtitle:

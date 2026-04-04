@@ -1,7 +1,7 @@
 export default {
   id: 'ch4-004',
   slug: 'log-properties',
-  chapter: 4,
+  chapter: 'precalc-4',
   order: 4,
   title: 'Properties of Logarithms: Why Every Rule Follows from the Exponent Laws',
   subtitle: 'Log properties are not arbitrary rules to memorise — each one is just an exponent law in disguise',

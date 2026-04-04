@@ -1,7 +1,7 @@
 export default {
   id: 'w3-002',
   slug: 'async-patterns',
-  chapter: 3,
+  chapter: 'w3',
   order: 2,
   title: 'Async Patterns',
   subtitle: 'Managing delayed logic execution mathematically pipelines',

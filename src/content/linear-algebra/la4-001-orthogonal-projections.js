@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-001',
   slug: 'orthogonal-projections',
-  chapter: 4,
+  chapter: 'la4',
   order: 1,
   title: 'Orthogonal Projections',
   subtitle: 'The mathematical art of finding the closest point in a lower-dimensional space — the foundation of least squares, Gram-Schmidt, and SVD.',

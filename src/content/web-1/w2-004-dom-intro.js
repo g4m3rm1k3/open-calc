@@ -271,7 +271,7 @@ Next: Chapter JS2 — Making Things Move covers createElement, appendChild, and 
 export default {
   id: 'w2-004',
   slug: 'dom-intro',
-  chapter: 2,
+  chapter: 'w2',
   order: 4,
   title: 'DOM Introduction',
   subtitle: "The Document Object Model: Your doorway to the live webpage.",

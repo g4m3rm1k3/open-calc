@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-003',
   slug: 'least-squares',
-  chapter: 4,
+  chapter: 'la4',
   order: 3,
   title: 'Least Squares',
   subtitle: 'When the exact answer does not exist, find the best approximate answer — the foundation of data fitting and linear regression.',

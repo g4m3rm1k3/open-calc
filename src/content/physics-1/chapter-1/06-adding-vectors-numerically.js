@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch1-006',
   slug: 'adding-vectors-numerically',
-  chapter: 1,
+  chapter: 'p1',
   order: 6,
   title: 'Adding Vectors Numerically',
   subtitle: 'The four-step method that works for any vectors, every time.',

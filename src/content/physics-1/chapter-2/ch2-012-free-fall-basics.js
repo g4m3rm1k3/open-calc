@@ -1,7 +1,7 @@
 export default {
   id: "ch2-012",
   slug: "free-fall-basics",
-  chapter: 2,
+  chapter: 'p2',
   order: 12,
   title: "Free Fall — Basics",
   subtitle:

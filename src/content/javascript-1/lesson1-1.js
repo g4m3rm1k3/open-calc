@@ -390,7 +390,7 @@ export default {
   title: 'Variables: Bindings, Not Boxes',
   slug: 'variables-bindings-properly',
   number: '1.1',
-  chapter: 'JavaScript 1',
+  chapter: 'js1.1',
   description: 'Master the nuance of let, const, TDZ, and the reference model of variables.',
   
   tags: ['javascript', 'variables', 'scope', 'tdz', 'hoisting', 'mutation'],

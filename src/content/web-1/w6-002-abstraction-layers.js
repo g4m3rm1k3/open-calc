@@ -1,7 +1,7 @@
 export default {
   id: 'w6-002',
   slug: 'abstraction-layers',
-  chapter: 6,
+  chapter: 'w6',
   order: 2,
   title: 'Abstraction Layers',
   subtitle: 'Frameworks natively isolate developers from repeating structural problems',

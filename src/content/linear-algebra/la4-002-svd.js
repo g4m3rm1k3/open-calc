@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-004',
   slug: 'svd',
-  chapter: 4,
+  chapter: 'la4',
   order: 4,
   title: 'Singular Value Decomposition (SVD)',
   subtitle: 'Every matrix — square or not, invertible or not — can be broken into three clean pieces: two rotations and a diagonal stretch. This is the most powerful factorization in all of linear algebra.',

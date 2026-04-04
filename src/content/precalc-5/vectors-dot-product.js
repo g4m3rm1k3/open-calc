@@ -1,7 +1,7 @@
 export default {
   id: 'ch5-004',
   slug: 'vectors-dot-product',
-  chapter: 5,
+  chapter: 'precalc-5',
   order: 4,
   title: 'The Dot Product: Measuring How Much Two Vectors Agree',
   subtitle: 'The dot product answers one question: how much of $\\vec{u}$ points in the direction of $\\vec{v}$? The answer is a single number — and it encodes the angle, projection, and work all at once.',

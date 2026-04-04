@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-001',
   slug: 'eigenvectors-and-eigenvalues',
-  chapter: 3,
+  chapter: 'la3',
   order: 1,
   title: 'Eigenvectors and Eigenvalues',
   subtitle: 'Every matrix has a hidden skeleton — a few special directions it never rotates, only stretches. Finding them reveals the true nature of a transformation.',

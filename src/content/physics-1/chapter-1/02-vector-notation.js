@@ -3,7 +3,7 @@ export default {
   // ── Identity ────────────────────────────────────────────────────────────
   id: 'p1-ch1-002',
   slug: 'vector-notation',
-  chapter: 1,
+  chapter: 'p1',
   order: 2,
   title: 'Vector Notation',
   subtitle: 'Every symbol physicists use for vectors — and why there are so many.',

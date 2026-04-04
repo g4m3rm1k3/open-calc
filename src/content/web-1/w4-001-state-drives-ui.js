@@ -1,7 +1,7 @@
 export default {
   id: 'w4-001',
   slug: 'state-drives-ui',
-  chapter: 4,
+  chapter: 'w4',
   order: 1,
   title: 'State Drives UI',
   subtitle: 'The modern paradigm: UI is a pure function of strict State',

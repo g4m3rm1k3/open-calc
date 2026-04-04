@@ -1,7 +1,7 @@
 export default {
   id: 'w3-001',
   slug: 'event-loop',
-  chapter: 3,
+  chapter: 'w3',
   order: 1,
   title: 'The Event Loop',
   subtitle: 'JavaScript is single-threaded but natively time-aware',

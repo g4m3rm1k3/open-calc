@@ -1,7 +1,7 @@
 export default {
   id: 'w2-005',
   slug: 'dom-manipulation',
-  chapter: 2,
+  chapter: 'w2',
   order: 5,
   title: 'DOM Manipulation',
   subtitle: 'JavaScript mutates the structural tree actively via the Event pipeline',

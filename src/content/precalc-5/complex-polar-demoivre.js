@@ -1,7 +1,7 @@
 export default {
   id: 'ch5-002',
   slug: 'complex-polar-demoivre',
-  chapter: 5,
+  chapter: 'precalc-5',
   order: 2,
   title: "Complex Numbers in Polar Form and De Moivre's Theorem",
   subtitle: "Multiplying complex numbers rotates and scales — once you see that, De Moivre's theorem stops being a miracle and becomes obvious",

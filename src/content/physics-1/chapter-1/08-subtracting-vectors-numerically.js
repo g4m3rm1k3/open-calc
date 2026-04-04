@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch1-008',
   slug: 'subtracting-vectors-numerically',
-  chapter: 1,
+  chapter: 'p1',
   order: 8,
   title: 'Subtracting Vectors Numerically',
   subtitle: 'Negate, decompose, sum — the DSMD method applied to differences.',

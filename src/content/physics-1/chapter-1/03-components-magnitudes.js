@@ -3,7 +3,7 @@ export default {
   // ── Identity ─────────────────────────────────────────────────────────────
   id: 'p1-ch1-003',
   slug: 'components-and-magnitudes',
-  chapter: 1,
+  chapter: 'p1',
   order: 3,
   title: 'Components and Magnitudes',
   subtitle: 'How to pull a vector apart — and put it back together.',

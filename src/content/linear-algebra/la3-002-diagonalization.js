@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-002',
   slug: 'diagonalization',
-  chapter: 3,
+  chapter: 'la3',
   order: 2,
   title: 'Change of Basis and Diagonalization',
   subtitle: 'Rebuild your coordinate system around eigenvectors, and the most complicated matrix becomes trivial diagonal scaling.',

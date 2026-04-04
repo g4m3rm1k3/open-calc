@@ -1,7 +1,7 @@
 export default {
   id: "ch2-017",
   slug: "free-fall-from-rest",
-  chapter: 2,
+  chapter: 'p2',
   order: 17,
   title: "Free Fall from Rest",
   subtitle: "The simplest gravity model: v0=0 and constant acceleration.",

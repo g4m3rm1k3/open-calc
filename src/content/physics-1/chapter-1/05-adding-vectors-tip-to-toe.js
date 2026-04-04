@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch1-005',
   slug: 'adding-vectors-graphically-tip-to-toe',
-  chapter: 1,
+  chapter: 'p1',
   order: 5,
   title: 'Adding Vectors Graphically — Tip-to-Toe Method',
   subtitle: 'Chain arrows end-to-end; the shortcut from start to finish is the sum.',

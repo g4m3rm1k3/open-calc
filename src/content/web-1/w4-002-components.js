@@ -1,7 +1,7 @@
 export default {
   id: 'w4-002',
   slug: 'components',
-  chapter: 4,
+  chapter: 'w4',
   order: 2,
   title: 'Components',
   subtitle: 'Break complex applications into reusable, encapsulated units',

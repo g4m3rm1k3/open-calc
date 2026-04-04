@@ -1,7 +1,7 @@
 export default {
   id: 'ch4-001',
   slug: 'exponential-functions',
-  chapter: 4,
+  chapter: 'precalc-4',
   order: 1,
   title: 'Exponential Functions: When the Exponent Is the Variable',
   subtitle: 'The difference between $x^2$ and $2^x$ is everything — one grows polynomially, the other eventually overtakes any polynomial',

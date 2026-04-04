@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-003',
   slug: 'complex-eigenvalues',
-  chapter: 3,
+  chapter: 'la3',
   order: 3,
   title: 'Complex Eigenvalues',
   subtitle: 'When a matrix rotates space, real eigenvectors vanish — and algebra forces us into complex numbers that beautifully encode both rotation and scaling.',

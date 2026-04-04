@@ -1,7 +1,7 @@
 export default {
   id: 'p1-ch1-004',
   slug: 'adding-vectors-graphically-parallelogram',
-  chapter: 1,
+  chapter: 'p1',
   order: 4,
   title: 'Adding Vectors Graphically — Parallelogram Method',
   subtitle: 'Two arrows into one: the diagonal of the parallelogram they form.',

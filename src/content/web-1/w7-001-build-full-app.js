@@ -1,7 +1,7 @@
 export default {
   id: 'w7-001',
   slug: 'build-app',
-  chapter: 7,
+  chapter: 'w7',
   order: 1,
   title: 'Build a Full App',
   subtitle: 'Capstone Dashboard integrating Data, Reactivity, Geometry, and Time',

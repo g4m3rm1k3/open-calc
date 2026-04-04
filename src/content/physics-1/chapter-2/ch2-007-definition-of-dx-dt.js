@@ -1,7 +1,7 @@
 export default {
   id: "ch2-007",
   slug: "definition-of-dx-dt",
-  chapter: 2,
+  chapter: 'p2',
   order: 7,
   title: "Definition of dx/dt — Instantaneous Velocity",
   subtitle:

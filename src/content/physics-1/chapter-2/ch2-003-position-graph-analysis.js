@@ -1,7 +1,7 @@
 export default {
   id: "ch2-003",
   slug: "position-graph-analysis",
-  chapter: 2,
+  chapter: 'p2',
   order: 3,
   title: "Position-Time Graph Analysis",
   subtitle: "Read motion directly from the shape and slope of an x–t graph.",

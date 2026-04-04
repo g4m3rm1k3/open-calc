@@ -1,7 +1,7 @@
 export default {
   id: "ch2-008",
   slug: "kinematics-worked-example-i",
-  chapter: 2,
+  chapter: 'p2',
   order: 8,
   title: "Kinematics Worked Example I",
   subtitle: "Solve a full constant-acceleration problem from setup to check.",

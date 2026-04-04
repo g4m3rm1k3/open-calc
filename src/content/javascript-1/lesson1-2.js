@@ -485,7 +485,7 @@ export default {
   title: 'Expressions vs Statements',
   slug: 'expressions-vs-statements',
   number: '1.2',
-  chapter: 'JavaScript 1',
+  chapter: 'js1.1',
   description: 'Understand how JavaScript decides whether code produces a value or controls execution.',
 
   tags: ['javascript', 'expressions', 'statements', 'ternary', 'short-circuit', 'syntax'],

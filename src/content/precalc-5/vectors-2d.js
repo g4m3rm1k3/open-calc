@@ -1,7 +1,7 @@
 export default {
   id: 'ch5-003',
   slug: 'vectors-2d',
-  chapter: 5,
+  chapter: 'precalc-5',
   order: 3,
   title: 'Vectors: Quantities That Have Both Size and Direction',
   subtitle: 'A vector is an arrow. Its length is magnitude, its direction is heading. Components are just that arrow described with coordinates — one description, two representations.',

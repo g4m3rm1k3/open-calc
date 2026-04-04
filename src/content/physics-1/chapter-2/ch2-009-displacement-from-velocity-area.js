@@ -1,7 +1,7 @@
 export default {
   id: "ch2-009",
   slug: "displacement-from-velocity-area",
-  chapter: 2,
+  chapter: 'p2',
   order: 9,
   title: "Displacement from Velocity Area",
   subtitle:

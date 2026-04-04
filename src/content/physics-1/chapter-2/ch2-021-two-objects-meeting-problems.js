@@ -1,7 +1,7 @@
 export default {
   id: "ch2-021",
   slug: "two-objects-meeting-problems",
-  chapter: 2,
+  chapter: 'p2',
   order: 21,
   title: "Two-Object Meeting Problems",
   subtitle: "Set x1(t)=x2(t) to find meeting time and location.",

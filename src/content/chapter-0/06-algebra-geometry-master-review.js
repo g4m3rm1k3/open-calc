@@ -1,7 +1,7 @@
 export default {
   id: 'ch5-precalc-review',
   slug: 'algebra-geometry-master-review',
-  chapter: 5,
+  chapter: 0,
   order: 0,
   title: 'Algebra and Geometry Master Review',
   subtitle: 'Comprehensive toolbox review for limits, derivatives, and related rates',

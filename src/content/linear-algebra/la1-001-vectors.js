@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la1-001',
   slug: 'what-is-a-vector',
-  chapter: 1,
+  chapter: 'la1',
   order: 1,
   title: 'What is a Vector?',
   subtitle: 'The fundamental building block of linear algebra, viewed through the lenses of physics, computer science, and mathematics.',

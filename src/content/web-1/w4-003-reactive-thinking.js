@@ -1,7 +1,7 @@
 export default {
   id: 'w4-003',
   slug: 'reactive-thinking',
-  chapter: 4,
+  chapter: 'w4',
   order: 3,
   title: 'Reactive Thinking',
   subtitle: 'Stop telling the app what to do; formally describe what it should look like',

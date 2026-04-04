@@ -1,7 +1,7 @@
 export default {
   id: 'w5-002',
   slug: 'state-async-combined',
-  chapter: 5,
+  chapter: 'w5',
   order: 2,
   title: 'State + Async Combined',
   subtitle: 'Real applications are strictly temporal state-machines',

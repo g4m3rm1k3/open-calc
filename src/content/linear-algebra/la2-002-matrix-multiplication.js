@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-002',
   slug: 'matrix-multiplication',
-  chapter: 2,
+  chapter: 'la2',
   order: 2,
   title: 'Matrix Multiplication as Composition',
   subtitle: 'Chaining spatial transformations together into a single, perfectly calculated movement.',

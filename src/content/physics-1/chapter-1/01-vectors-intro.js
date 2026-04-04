@@ -3,7 +3,7 @@ export default {
   // ── Identity ────────────────────────────────────────────────────────────
   id: 'p1-ch1-001',
   slug: 'what-is-a-vector',
-  chapter: 1,
+  chapter: 'p1',
   order: 1,
   title: 'What Is a Vector?',
   subtitle: 'The first tool of physics: quantities that carry both size and direction.',

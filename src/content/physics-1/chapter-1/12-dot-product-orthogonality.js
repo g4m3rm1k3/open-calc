@@ -1,5 +1,5 @@
 export default {
-  id: 'p1-ch1-012', slug: 'dot-product-orthogonality', chapter: 1, order: 12,
+  id: 'p1-ch1-012', slug: 'dot-product-orthogonality', chapter: 'p1', order: 12,
   title: 'Dot Product — Orthogonality & Perpendicularity',
   subtitle: 'Two vectors are orthogonal if and only if their dot product is zero.',
   tags: ['dot product', 'scalar product', 'orthogonality', 'perpendicular vectors', 'perpendicularity'],

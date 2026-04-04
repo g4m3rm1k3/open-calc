@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-001',
   slug: 'matrices-as-transformations',
-  chapter: 2,
+  chapter: 'la2',
   order: 1,
   title: 'Matrices as Linear Transformations',
   subtitle: 'A matrix is not just a block of numbers—it is a machine that stretches, squishes, and rotates space.',

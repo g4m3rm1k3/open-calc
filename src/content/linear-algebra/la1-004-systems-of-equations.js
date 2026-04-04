@@ -2,7 +2,7 @@ export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la1-004',
   slug: 'systems-of-linear-equations',
-  chapter: 1,
+  chapter: 'la1',
   order: 4,
   title: 'Systems of Linear Equations',
   subtitle: 'The central question of linear algebra: given a target, can we reach it — and if so, how?',

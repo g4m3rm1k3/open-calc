@@ -1,7 +1,7 @@
 export default {
   id: "ch2-010",
   slug: "kinematics-worked-example-ii",
-  chapter: 2,
+  chapter: 'p2',
   order: 10,
   title: "Kinematics Worked Example II",
   subtitle: "Multi-step solving with equation choice and sign discipline.",

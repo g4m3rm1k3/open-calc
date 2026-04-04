@@ -1,7 +1,7 @@
 export default {
   id: 'w6-001',
   slug: 'performance',
-  chapter: 6,
+  chapter: 'w6',
   order: 1,
   title: 'Performance',
   subtitle: 'Not all code updates are executed equally by the graphics engine',

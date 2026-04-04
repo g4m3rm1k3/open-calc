@@ -1,7 +1,7 @@
 export default {
   id: 'ch4-003',
   slug: 'logarithms-intro',
-  chapter: 4,
+  chapter: 'precalc-4',
   order: 3,
   title: 'Logarithms: The Inverse of the Exponential',
   subtitle: 'A logarithm answers one question: "what exponent did we use?" — understanding this makes every log property obvious',

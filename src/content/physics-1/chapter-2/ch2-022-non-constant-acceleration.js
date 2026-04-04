@@ -1,7 +1,7 @@
 export default {
   id: "ch2-022",
   slug: "non-constant-acceleration",
-  chapter: 2,
+  chapter: 'p2',
   order: 22,
   title: "Non-Constant Acceleration",
   subtitle:

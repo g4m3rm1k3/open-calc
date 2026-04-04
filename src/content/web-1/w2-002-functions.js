@@ -1,7 +1,7 @@
 export default {
   id: 'w2-002',
   slug: 'functions',
-  chapter: 2,
+  chapter: 'w2',
   order: 2,
   title: 'Functions as Transformations',
   subtitle: 'Functions map geometric input directly to determined output',
