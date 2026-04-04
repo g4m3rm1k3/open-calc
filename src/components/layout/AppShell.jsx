@@ -167,7 +167,7 @@ function CoursesDropdown() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen, onPoolToggle, poolOpen }) {
   const { openSearch } = useSearchContext()
   const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -276,6 +276,11 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${videoActive ? 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30' : 'text-sky-500 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30'}`}
             title="Video Player (V)"
           ><PlayCircle className="w-4 h-4" /></button>
+          <button
+            onClick={onPoolToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${poolOpen ? 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30' : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30'}`}
+            title="Physics Pool Lab"
+          ><span className="text-base leading-none" style={{lineHeight:'16px',display:'block'}}>🎱</span></button>
         </div>
       </div>
 
@@ -482,10 +487,6 @@ export default function AppShell({ children }) {
         setHelpOpen(false)
         setPoolOpen(false)
       }
-      // 'l' key for Physics Pool Lab
-      if (e.key.toLowerCase() === 'l') {
-        setPoolOpen(prev => !prev)
-      }
       // 'Shift+D' — toggle Dev Mode (shows VIZ component names on every viz frame)
       if (e.shiftKey && e.key === 'D') {
         const html = document.documentElement
@@ -516,6 +517,8 @@ export default function AppShell({ children }) {
         jsOpen={jsOpen}
         onHelpToggle={() => setHelpOpen(prev => !prev)}
         helpOpen={helpOpen}
+        onPoolToggle={() => setPoolOpen(prev => !prev)}
+        poolOpen={poolOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
