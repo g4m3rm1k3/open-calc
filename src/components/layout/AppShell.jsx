@@ -13,10 +13,11 @@ import { useProgress } from '../../hooks/useProgress.js'
 import GrapherContext from '../../context/GrapherContext.jsx'
 import { Activity, Box, Settings2, PenLine, Smartphone, Layers, Search, BookOpen, Home, Compass, Menu, X, Calculator, ChevronDown } from 'lucide-react'
 import TICalc from '../calculator/TICalc.jsx'
+import HelpModal from '../ui/HelpModal.jsx'
 import MobileBottomNav from './MobileBottomNav.jsx'
 import GlobalPythonNotebook from '../ui/GlobalPythonNotebook.jsx'
 import GlobalJSPlayground from '../ui/GlobalJSPlayground.jsx'
-import { Terminal, Code2, PlayCircle } from 'lucide-react'
+import { Terminal, Code2, PlayCircle, HelpCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx'
 
@@ -165,7 +166,7 @@ function CoursesDropdown() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen }) {
   const { openSearch } = useSearchContext()
   const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -276,6 +277,20 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
         </div>
       </div>
 
+      {/* Help */}
+      <button
+        onClick={onHelpToggle}
+        className={`p-2 rounded-lg transition-colors ${
+          helpOpen
+            ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50'
+            : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+        }`}
+        aria-label="Open contributor docs"
+        title="Contributor Docs (?)"
+      >
+        <HelpCircle className="w-5 h-5" />
+      </button>
+
       {/* Dark mode toggle */}
       <button
         onClick={toggleDark}
@@ -355,6 +370,7 @@ export default function AppShell({ children }) {
   const [calcOpen, setCalcOpen] = useState(false)
   const [pythonOpen, setPythonOpen] = useState(false)
   const [jsOpen, setJsOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const closeAllTools = useCallback(() => {
     setGraphOpen(false); setGraph3DOpen(false); setGraphJSXOpen(false)
     setScratchOpen(false); setCalcOpen(false); setPythonOpen(false); setJsOpen(false)
@@ -438,6 +454,10 @@ export default function AppShell({ children }) {
         // handled via context; dispatch a custom event the FloatingVideoPlayer can listen to
         window.dispatchEvent(new CustomEvent('oc-toggle-video'))
       }
+      // '?' key for help docs
+      if (e.key === '?') {
+        setHelpOpen(prev => !prev)
+      }
       // 'Escape' to close modals
       if (e.key === 'Escape') {
         setGraphOpen(false)
@@ -447,6 +467,7 @@ export default function AppShell({ children }) {
         setCalcOpen(false)
         setPythonOpen(false)
         setJsOpen(false)
+        setHelpOpen(false)
       }
     }
     window.addEventListener('keydown', handler)
@@ -470,6 +491,8 @@ export default function AppShell({ children }) {
         pythonOpen={pythonOpen}
         onJsToggle={() => setJsOpen(prev => !prev)}
         jsOpen={jsOpen}
+        onHelpToggle={() => setHelpOpen(prev => !prev)}
+        helpOpen={helpOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -679,6 +702,7 @@ export default function AppShell({ children }) {
       <ScratchPad isOpen={scratchOpen} onClose={() => setScratchOpen(false)} />
       <GlobalPythonNotebook isOpen={pythonOpen} onClose={() => setPythonOpen(false)} />
       <GlobalJSPlayground isOpen={jsOpen} onClose={() => setJsOpen(false)} />
+      <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
     </GrapherContext.Provider>
   )
