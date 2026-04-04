@@ -73,7 +73,12 @@ export default {
             {
               id: 1,
               cellTitle: 'The number hierarchy — ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ',
-              prose: 'Numbers come in nested families. Each row below is a proper subset of everything below it. Python\'s types map onto this hierarchy — but not perfectly.',
+              prose: [
+                '## The four families — ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ',
+                '- **ℕ Natural numbers** — {1, 2, 3, …} — counting, always positive\n- **ℤ Integers** — {…, −2, −1, 0, 1, 2, …} — add zero and negatives\n- **ℚ Rationals** — any fraction p/q — decimals that terminate (0.25) or repeat (0.333…)\n- **ℝ Reals** — add irrationals like √2 and π whose decimals never repeat',
+                '## Python\'s mapping',
+                '- **`int`** → ℤ exactly, arbitrary size, no overflow\n- **`float`** → ℝ approximately, 64-bit IEEE 754, ~15 decimal digits of precision\n- **`Fraction`** → ℚ exactly (from the `fractions` module) — useful when you need exact rational results',
+              ],
               code: `# Natural numbers ℕ — counting numbers (positive integers)
 naturals = [1, 2, 3, 4, 5]
 
@@ -96,7 +101,12 @@ print("e   =", math.e)          # 2.71828182...`,
             {
               id: 2,
               cellTitle: 'Python int — exact, unbounded',
-              prose: '`int` in Python uses arbitrary-precision arithmetic. It allocates as many bits as the number requires. There is no overflow. 2**1000 is computed exactly — try it.',
+              prose: [
+                'Python\'s `int` uses **arbitrary-precision** arithmetic — it allocates as many bits as the number needs, so there is no overflow. `2**1000` (302 digits) is computed exactly and instantly. Most other languages store integers in fixed 32 or 64 bits and overflow silently.',
+                '## Division operators',
+                '- `/` — always returns a `float`, even `4 / 2` → `2.0`\n- `//` — floor (integer) division, returns `int`, e.g. `7 // 2` → `3`\n- `%` — remainder (modulo), e.g. `7 % 2` → `1`',
+                'This distinction matters: many bugs come from expecting an integer but getting a float (or vice versa) because of which division operator was used.',
+              ],
               code: `# int never overflows in Python
 print(2**100)
 print(2**1000)
@@ -119,7 +129,15 @@ print(7 % 2)    # 1    (remainder)`,
             {
               id: 3,
               cellTitle: 'Python float — 64-bit IEEE 754',
-              prose: 'A `float` stores a number in 64 bits: 1 sign bit, 11 exponent bits, 52 mantissa bits. It can represent about 15–17 significant decimal digits. Outside a certain range, it rounds to the nearest representable value.',
+              prose: [
+                '## The 64-bit layout',
+                'A Python `float` is a 64-bit **IEEE 754 binary floating-point number**. Those 64 bits are split into three fields:',
+                '- **1 sign bit** — positive or negative\n- **11 exponent bits** — sets the scale, covering roughly 10^−308 to 10^308\n- **52 mantissa bits** — sets the precision, giving about 15–17 reliable decimal digits',
+                '## What this means in practice',
+                'Float can cover an enormous range of magnitudes but only a **finite** number of exact values — about 2^64 ≈ 18 quintillion specific numbers. Every other real number is rounded to the nearest representable value. `sys.float_info.epsilon` (~2.2 × 10^−16) is **machine epsilon** — the smallest ε such that 1.0 + ε ≠ 1.0. It is the unit of rounding error.',
+                '## Special float values',
+                '- `float(\'inf\')` — positive infinity (overflow or 1/0 in some contexts)\n- `float(\'-inf\')` — negative infinity\n- `float(\'nan\')` — Not-a-Number, from undefined operations like 0/0. **NaN does not equal itself** — `nan == nan` is False.',
+              ],
               code: `import sys
 
 print(type(3.14))                     # <class 'float'>
@@ -143,7 +161,7 @@ print(float('nan') == float('nan'))  # False — NaN is not equal to itself!`,
             {
               id: 4,
               cellTitle: 'The floating-point surprise',
-              prose: '0.1 in decimal is the repeating binary fraction 0.0001100110011…  — exactly like 1/3 in decimal. The hardware stores the closest 64-bit approximation. Adding two approximations compounds the error.',
+              prose: 'Here is the fundamental surprise of computer arithmetic: **0.1 + 0.2 ≠ 0.3** in Python. This is not a bug — it is correct behaviour for IEEE 754 arithmetic, and every serious programming language on the planet (JavaScript, Java, C, Rust...) gives the same result. Why? Because 0.1 in binary is a **repeating fraction**: 0.0001100110011001100... — exactly analogous to how 1/3 in decimal is 0.333333... The hardware cannot store infinitely many binary digits, so it rounds to the nearest 64-bit value. When you write `0.1`, Python stores approximately 0.10000000000000000555... When you write `0.2`, Python stores approximately 0.20000000000000001110... Adding these two approximate values gives approximately 0.30000000000000004441... which is not equal to the approximate stored value of `0.3` (which is slightly less). The f-string `f"{0.1:.55f}"` shows the full stored value — not the 0.1 Python usually displays (Python rounds the display for readability). Understanding this is essential: **never compare floats with ==**.',
               code: `# The classic demonstration
 print(0.1 + 0.2)          # 0.30000000000000004
 print(0.1 + 0.2 == 0.3)   # False
@@ -158,7 +176,7 @@ print(f"{0.3:.55f}")   # 0.29999999999999998889776975374843459576368331909179687
             {
               id: 5,
               cellTitle: 'Measuring the error',
-              prose: 'The error in 0.1 + 0.2 is about 5.5 × 10⁻¹⁷ — far smaller than machine epsilon (2.2 × 10⁻¹⁶). This is expected: the error is within one unit in the last place (ULP). But == has zero tolerance, so even this tiny discrepancy returns False.',
+              prose: 'The error in `0.1 + 0.2` is approximately 5.5 × 10^−17 — an astonishingly small number. For most engineering purposes, this is completely negligible: a measurement accurate to 16 significant figures is more precise than any physical instrument. But `==` has **zero tolerance**: even a discrepancy of 10^−17 makes it return False. This is why the `==` operator is wrong for float comparison. The `abs(result - true_value)` computation is the correct approach: measure the actual error, and decide explicitly whether it is small enough for your purpose. The `sys.float_info.epsilon` value (~2.2 × 10^−16) is the standard reference: if your error is smaller than epsilon × |value|, it is within the expected floating-point rounding budget. **Python pattern:** `f"{value:.20f}"` formats a float with 20 decimal places, revealing the stored value beyond what Python normally displays. `.20f` means "fixed-point notation, 20 decimal places" — a format spec. This diagnostic technique is invaluable when debugging numerical code.',
               code: `import sys
 
 result = 0.1 + 0.2
@@ -175,7 +193,13 @@ print(f"error < eps: {error < sys.float_info.epsilon}")  # True — expected`,
             {
               id: 6,
               cellTitle: 'Safe float comparison — math.isclose',
-              prose: '`math.isclose(a, b)` checks whether |a − b| is small relative to max(|a|, |b|). Use `abs_tol` for comparisons near zero. Never use `==` on floats in production code.',
+              prose: [
+                '`math.isclose(a, b)` checks: |a − b| ≤ rel_tol × max(|a|, |b|). The default `rel_tol=1e-9` means "within 1 part in a billion" — automatically scaling with magnitude. This is almost always what you want for general float comparisons.',
+                '## The four rules',
+                '- **Never** use `==` on floats\n- **Most comparisons:** `math.isclose(a, b)` — uses relative tolerance\n- **Values near zero:** add `abs_tol=1e-14` — relative tolerance breaks down near 0\n- **Explicit one-liner:** `abs(a - b) < 1e-9` — clear, readable, works everywhere',
+                '## Why relative tolerance?',
+                'Comparing 1,000,000.0 and 1,000,000.001 — a 10^−9 relative difference — is very close. But comparing 1e-15 and 2e-15 has a 100% relative error yet a negligible absolute difference. The `abs_tol` parameter handles the near-zero case where relative tolerance fails.',
+              ],
               code: `import math
 
 a = 0.1 + 0.2
@@ -201,7 +225,7 @@ print(abs(a - b) < 1e-9)          # True`,
             {
               id: 7,
               cellTitle: 'Exact decimal arithmetic — the decimal module',
-              prose: 'When you need exact decimal results (currency, tax, scientific measurements), use `decimal.Decimal`. It stores numbers as decimal fractions — 0.1 is exactly 0.1, not the nearest binary approximation.',
+              prose: 'For most scientific and engineering work, float\'s approximation is perfectly acceptable. But some domains **require** exact decimal arithmetic: financial calculations (rounding $0.005 to $0.01), tax computations (where $0.001 error per transaction × millions of transactions = lawsuits), and metrological measurements with defined precision. `decimal.Decimal` solves this by storing numbers as base-10 fractions rather than base-2 fractions. When you write `Decimal("0.1")`, Python stores exactly one-tenth — no approximation, no rounding error. Adding `Decimal("0.1") + Decimal("0.2")` gives exactly `Decimal("0.3")`. The precision (number of significant digits) is configurable via `getcontext().prec`; the default is 28, sufficient for almost all needs. **Critical detail:** always create Decimals from **strings** — `Decimal("0.1")` — not from floats — `Decimal(0.1)`. The float version captures the binary approximation before Decimal ever sees it, giving the wrong result. The last `print` in the cell demonstrates this trap explicitly.',
               code: `from decimal import Decimal, getcontext
 
 # Standard float — approximate
@@ -225,7 +249,15 @@ print(Decimal(0.1))   # 0.100000000000000005551115123125782702118158340454101562
             {
               id: 8,
               cellTitle: 'Scientific notation',
-              prose: 'Python uses `e` notation: `1.5e3` means 1.5 × 10³ = 1500. The exponent tells you the **order of magnitude** — a rough measure of scale. `math.log10` extracts it.',
+              prose: [
+                'Scientists work across enormous ranges of scale: an electron\'s charge is 1.6 × 10^−19 coulombs; Avogadro\'s number is 6.022 × 10^23 — a factor of 10^42 difference. Writing all those zeros is error-prone and unreadable. **Scientific notation** represents any number as a coefficient (1–10) times a power of 10.',
+                '## Python e-notation',
+                '- `1.5e3` → 1.5 × 10³ = 1500\n- `3.0e-4` → 3.0 × 10^−4 = 0.0003\n- `6.022e23` → Avogadro\'s number\n- Python auto-switches to e-notation when displaying very large or small floats',
+                '## Order of magnitude',
+                'The **order of magnitude** is `math.floor(math.log10(abs(x)))` — the exponent rounded down. It answers "roughly how big is this?" A proton mass of 10^−27 kg and a car mass of 10^3 kg differ by 30 orders of magnitude.',
+                '## Python pattern',
+                '`f"{val:.3e}"` formats any number in scientific notation with 3 decimal places — the cleanest way to print values at extreme scales. **Warning:** adding numbers of very different magnitudes (10^20 + 1) loses the smaller value entirely — a numerical stability issue called **catastrophic cancellation**.',
+              ],
               code: `import math
 
 # e-notation
@@ -244,11 +276,77 @@ for val in [1, 10, 100, 0.001, 6.022e23]:
     print(f"{val:.3e}  →  order of magnitude: {om}")`,
               output: '', status: 'idle', figureJson: null,
             },
+            // ── OPENCALC LIBRARY INTRO ─────────────────────────────────────────
+            {
+              id: 'oc-1',
+              cellTitle: 'Introducing opencalc — the visualization library',
+              prose: [
+                'From this chapter on, every concept gets a visual. `opencalc` is the course\'s built-in library — no configuration, no axes objects, no boilerplate. You work directly in mathematical vocabulary: functions, points, segments, annotations.',
+                '## Importing',
+                '- `from opencalc import Figure` — the canvas class\n- `from opencalc import BLUE, AMBER, GREEN, RED, PURPLE, TEAL, GRAY` — course colour palette\n- Any CSS colour string also works: `\'steelblue\'`, `\'#ff6600\'`, `\'rgba(0,100,200,0.5)\'`',
+                '## When does a figure appear?',
+                'The notebook renders a figure when a cell\'s **last expression** is `fig.show()`. The library returns a JSON value that the notebook detects and converts to a canvas. `print(fig.show())` wraps the JSON in text — the renderer never sees it, so no figure appears.',
+              ],
+              code: `# opencalc is available in every lesson notebook
+from opencalc import Figure
+
+# Color constants — friendly names that match the course theme
+from opencalc import BLUE, AMBER, GREEN, RED, PURPLE, TEAL, GRAY
+
+# You can also use any CSS color string directly:
+# color='#ff6600', color='rgba(0,100,200,0.5)', color='steelblue'
+
+print("opencalc imported successfully.")
+print("Available colors:", ['BLUE', 'AMBER', 'GREEN', 'RED', 'PURPLE', 'TEAL', 'GRAY'])
+
+# Quick sanity check — does Figure exist?
+print(type(Figure))`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 'oc-2',
+              cellTitle: 'The Figure class — canvas and coordinate system',
+              prose: [
+                '`Figure(xmin, xmax, ymin, ymax)` defines the rectangular window of the coordinate plane you want to see. Choose the bounds to match your content — the default (−5 to 5 on both axes) works for general plots.',
+                '## Constructor parameters',
+                '- `xmin`, `xmax` — horizontal extent of the visible window\n- `ymin`, `ymax` — vertical extent of the visible window\n- `title` — heading text at the top; always set this so figures are self-labelled\n- `square=True` — forces equal pixel-per-unit on both axes; use for geometry (circles, right angles), not needed for data plots',
+              ],
+              code: `from opencalc import Figure
+
+# Default Figure — -5 to 5 on both axes
+fig_default = Figure()
+fig_default.axes()
+fig_default.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 'oc-3',
+              cellTitle: 'Adding elements — the builder pattern and .show()',
+              prose: [
+                'Every Figure method returns `self`, enabling **method chaining**: `fig.grid().axes()` calls `grid()`, gets back `fig`, then calls `axes()` immediately. Add elements in any order — the library draws them all when `show()` is called.',
+                '## Core methods',
+                '- `fig.grid()` — faint background grid lines\n- `fig.axes()` — x-axis and y-axis with tick marks and labels\n- `fig.plot(fn, color, label, width)` — sample a function and draw a curve\n- `fig.point([x, y], color, radius, label)` — dot at a coordinate\n- `fig.show()` — render the figure (**must be the last expression in the cell**)',
+                '**Never** write `print(fig.show())` — that shows a JSON string instead of a figure.',
+              ],
+              code: `from opencalc import Figure, BLUE, AMBER
+
+# Chain: grid → axes → plot → show
+fig = Figure(xmin=-3, xmax=3, ymin=-1, ymax=9, title="Builder pattern demo")
+fig.grid()                                        # draw grid lines
+fig.axes()                                        # draw x and y axes with labels
+fig.plot(lambda x: x**2, color=BLUE, label='x²') # add a curve
+fig.point([1, 1], color=AMBER, label='(1,1)')     # add a point
+fig.show()    # ← must be the last expression, no print()
+
+# Equivalent one-liner:
+# Figure(xmin=-3,xmax=3,ymin=-1,ymax=9).grid().axes().plot(lambda x:x**2).show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
             // ── VISUALIZATION — NUMBER LINE ────────────────────────────────────
             {
               id: 9,
               cellTitle: 'Visualizing the number line with opencalc',
-              prose: 'Starting now, we use the `Figure` class from `opencalc` to build mathematical visualizations. A Figure is a canvas with a coordinate system. Call methods to add elements, then call `.show()` as the last expression in the cell.',
+              prose: 'The number line is the geometric model of ℝ — every real number corresponds to exactly one point, and every point corresponds to exactly one real number. This cell draws one with opencalc: a flat figure (ymin/ymax close to zero collapses the y-dimension into a line), a horizontal segment for the line itself, blue dots for the integers, and amber/teal dots for key irrationals. Notice where √2 ≈ 1.414 and π ≈ 3.142 sit relative to the integers — they are genuinely between rational values, not at any fraction. The number line makes three properties of ℝ visible: **density** (between any two rationals there is always another rational — and an irrational), **completeness** (no gaps — every convergent sequence has a limit in ℝ), and **ordering** (numbers have a natural left-to-right order). **Library technique:** a very flat Figure (ymin=−0.5, ymax=0.5) effectively reduces to 1D — a useful trick for number line diagrams. `fig.axes(labels=True, ticks=True)` adds numbered tick marks, making it easy to read off approximate values.',
               instructions: 'Run this cell. The number line appears below the code. Experiment: add more points, change colors.',
               code: `from opencalc import Figure, BLUE, AMBER, GREEN, RED, PURPLE, TEAL
 
@@ -278,7 +376,14 @@ fig.show()`,
             {
               id: 10,
               cellTitle: 'Absolute value — definition and implementation',
-              prose: '|x| strips the sign from x — it returns the distance from x to zero. Piecewise: |x| = x if x ≥ 0, else −x. Python\'s built-in `abs()` implements this exactly.',
+              prose: [
+                '**Absolute value** |x| strips the sign — it returns the distance from x to the origin, always non-negative.',
+                '## Piecewise definition',
+                '- `x ≥ 0` → return x (already non-negative)\n- `x < 0` → return −x (flip the sign)',
+                '## Python\'s abs()',
+                '- `abs(int)` and `abs(float)` → same as the math definition\n- `abs(complex)` → the **magnitude** √(a² + b²), distance from origin in the complex plane (e.g. `abs(3 + 4j) = 5`)',
+                '|x| appears in: error measurements `|actual − predicted|`, distance formulas, and optimisation objectives (L1 / mean absolute error loss).',
+              ],
               code: `# Piecewise implementation
 def absolute_value(x):
     if x >= 0:
@@ -301,7 +406,7 @@ print(abs(3 + 4j))          # 5.0 — magnitude of complex number: √(3²+4²)`
             {
               id: 11,
               cellTitle: 'Plotting |x| with opencalc',
-              prose: 'The graph of f(x) = |x| is a V-shape — two rays meeting at the origin. The slope is −1 for x < 0 and +1 for x > 0. This "V" shape appears constantly in optimization and loss functions.',
+              prose: 'The graph of f(x) = |x| is the iconic V-shape — two straight rays meeting at a sharp point (the **vertex**) at the origin. The left ray has slope −1 (descending toward zero as x approaches from the left), and the right ray has slope +1 (ascending as x grows). At exactly x = 0, the slope is undefined — there is a kink. This is mathematically significant: |x| is continuous everywhere (no jumps) but not differentiable at 0 (no smooth tangent). You will encounter this distinction repeatedly when you study derivatives. The V-shape is also the fundamental shape of the **L1 loss function** (also called mean absolute error) used in machine learning — it penalises large and small errors equally, unlike the squared error which penalises large errors much more. **Library:** We pass Python\'s built-in `abs` directly to `fig.plot()` — any callable works, including built-ins. The two `xmin/xmax` restricted plots in red show the two pieces separately, making the piecewise structure visible.',
               code: `from opencalc import Figure, BLUE, AMBER, RED
 
 fig = Figure(xmin=-5, xmax=5, ymin=-0.5, ymax=5, title="f(x) = |x|")
@@ -324,7 +429,12 @@ fig.show()`,
             {
               id: 12,
               cellTitle: 'Absolute value as distance',
-              prose: '|a − b| is the distance between a and b on the number line. It is symmetric (|a−b| = |b−a|), always non-negative, and zero only when a = b. These three properties make it a **metric**.',
+              prose: [
+                '`|a − b|` is the distance between a and b on the number line. It satisfies the three axioms that define a **metric** — a formal, general notion of distance:',
+                '- **Non-negativity:** |a − b| ≥ 0, and equals 0 only when a = b\n- **Symmetry:** |a − b| = |b − a| — direction does not matter\n- **Triangle inequality:** |a − c| ≤ |a − b| + |b − c| — going via a midpoint cannot shorten the trip',
+                '## Why these axioms matter',
+                'Every distance formula you encounter later — Euclidean distance √(Δx² + Δy²), Manhattan distance |Δx| + |Δy|, cosine distance in NLP, L2 norm in machine learning — satisfies these same three axioms. Recognising them here means you can instantly understand any new distance metric you encounter in terms of properties you already know.',
+              ],
               code: `def distance(a, b):
     return abs(a - b)
 
@@ -351,7 +461,7 @@ print(distance(a, b) + distance(b, c))    # 9 + 6 = 15 (strict inequality)`,
             {
               id: 13,
               cellTitle: 'Visualizing distance',
-              prose: 'Two points on the number line — the distance between them is the gap you can see. The line segment connecting them has length |a − b|.',
+              prose: 'Geometry makes abstract distance tangible. This diagram shows two points — a = −2 and b = 3 — on the number line, connected by an amber segment. The length of that segment is |a − b| = |−2 − 3| = |−5| = 5. The figure title shows the full computation, making the formula and the picture read together. This is the standard mathematical diagram for distance: mark the points, draw the connecting segment, label its length. **Library technique:** the segment is drawn slightly above y = 0 (`fig.line([a, 0.12], [b, 0.12], ...)`) to avoid overlapping with the number line itself. The text label is placed at the midpoint `(a+b)/2` horizontally and slightly higher — an f-string computes both values dynamically. Changing `a` and `b` at the top of the cell updates the entire diagram automatically: the segment length, the points, the title, and the label all recompute. **This is the power of programmatic figures** — the diagram and the mathematics are the same code.',
               code: `from opencalc import Figure, BLUE, RED, AMBER, GREEN
 
 a, b = -2, 3
@@ -376,7 +486,7 @@ fig.show()`,
             {
               id: 14,
               cellTitle: '|x − c| < r — the interval interpretation',
-              prose: '|x − c| < r means "x is within distance r of the center c." This is a ball of radius r on the number line — the open interval (c−r, c+r). This interpretation is fundamental to limits, epsilon-delta, and later to optimization.',
+              prose: '|x − c| < r is one of the most important inequality forms in mathematics. Translated to English: "the distance from x to c is less than r." In other words, x lives within a radius r of the centre c. On the number line, this is the open interval (c − r, c + r) — all points closer than r to the centre. This geometric reading unlocks the meaning of the **epsilon-delta definition of a limit**: "for all ε > 0, there exists δ > 0 such that |x − a| < δ implies |f(x) − L| < ε" is just saying "whenever x is within a δ-ball of a, f(x) is within an ε-ball of L." Without the distance-as-absolute-value interpretation, the epsilon-delta definition looks like symbol soup. With it, it is a precise geometric statement. This interval interpretation also appears in **optimization** (converge within r of the minimum), **statistics** (confidence intervals are centred at an estimate with radius = margin of error), and **physics** (fields that decay with distance). **Library:** `fig.rect(left, -0.08, width, 0.16, ...)` draws the shaded interval as a thin rectangle straddling the number line. `fig.arrow()` marks the radius from centre to endpoint in both directions.',
               code: `from opencalc import Figure, BLUE, AMBER, PURPLE
 
 c = 2      # center

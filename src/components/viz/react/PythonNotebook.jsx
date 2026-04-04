@@ -355,14 +355,46 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
           {/* Prose */}
           {cell.prose && (
             <div style={{ padding: (!isChallenge && cell.cellTitle) ? '6px 16px 10px' : '10px 16px 10px' }}>
-              {(Array.isArray(cell.prose) ? cell.prose : [cell.prose]).map((p, i) => (
-                <p key={i} style={{
-                  margin: i === 0 ? 0 : '8px 0 0',
-                  fontSize: 13, color: C.text, lineHeight: 1.7,
-                }}>
-                  {parseProse(p)}
-                </p>
-              ))}
+              {(Array.isArray(cell.prose) ? cell.prose : [cell.prose]).map((p, i) => {
+                // ## Header line
+                if (typeof p === 'string' && p.startsWith('## ')) {
+                  return (
+                    <p key={i} style={{
+                      margin: i === 0 ? '0 0 4px' : '12px 0 4px',
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
+                      textTransform: 'uppercase', color: C.muted, lineHeight: 1.4,
+                    }}>
+                      {p.slice(3)}
+                    </p>
+                  )
+                }
+                // - Bullet list: string with lines starting with "- "
+                if (typeof p === 'string' && p.trimStart().startsWith('- ')) {
+                  const items = p.split('\n').filter(l => l.trim().startsWith('- '))
+                  return (
+                    <ul key={i} style={{
+                      margin: i === 0 ? 0 : '6px 0 0',
+                      paddingLeft: 18, fontSize: 13, color: C.text,
+                      lineHeight: 1.7, listStyleType: 'disc',
+                    }}>
+                      {items.map((item, j) => (
+                        <li key={j} style={{ marginBottom: j < items.length - 1 ? 3 : 0 }}>
+                          {parseProse(item.replace(/^[\s]*-\s*/, ''))}
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                }
+                // Default: paragraph
+                return (
+                  <p key={i} style={{
+                    margin: i === 0 ? 0 : '8px 0 0',
+                    fontSize: 13, color: C.text, lineHeight: 1.7,
+                  }}>
+                    {parseProse(p)}
+                  </p>
+                )
+              })}
             </div>
           )}
           {/* Instructions highlight (amber) */}
