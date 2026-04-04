@@ -126,16 +126,8 @@ export default function CNCBackplot({ pathPoints = [], currentStep = 0, width = 
   }, [currentStep, pathPoints])
 
   return (
-    <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900 shadow-2xl">
-      <div ref={mountRef} style={{ width, height }} />
-      <div className="absolute top-4 left-4 bg-slate-800/80 backdrop-blur border border-white/10 rounded px-3 py-2 text-[10px] text-slate-300 font-mono space-y-1">
-        <div>X: {pathPoints[currentStep]?.machineX.toFixed(4) || '0.0000'}</div>
-        <div>Y: {pathPoints[currentStep]?.machineY.toFixed(4) || '0.0000'}</div>
-        <div>Z: {pathPoints[currentStep]?.machineZ.toFixed(4) || '0.0000'}</div>
-        <div className="text-brand-400 mt-2 border-t border-white/10 pt-1">
-          MODE: {pathPoints[currentStep]?.motionMode || 'IDLE'}
-        </div>
-      </div>
+    <div className="relative border border-slate-700 rounded-lg overflow-hidden bg-slate-900 shadow-2xl h-full">
+      <div ref={mountRef} className="w-full h-full min-h-[400px]" />
     </div>
   )
 }
