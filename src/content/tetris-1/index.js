@@ -2,6 +2,7 @@ import lesson1 from './lesson1.js'
 import lesson2 from './lesson2.js'
 import lesson3 from './lesson3.js'
 import lesson4 from './lesson4.js'
+import lesson5 from './lesson5.js'
 
 const TETRIS_CH1 = {
   title: 'Build Tetris',
@@ -14,6 +15,7 @@ const TETRIS_CH1 = {
     lesson2,
     lesson3,
     lesson4,
+    lesson5,
   ],
 };
 
