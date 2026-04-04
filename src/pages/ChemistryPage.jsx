@@ -9,7 +9,7 @@ const TABS = [
   { id:'molecules', label:'Molecule Builder',  icon:'🔬' },
 ]
 
-export default function ChemistryPage() {
+export default function ChemistryPage({ onClose }) {
   const [tab, setTab] = useState('periodic')
 
   return (
@@ -30,6 +30,13 @@ export default function ChemistryPage() {
             {t.icon} {t.label}
           </button>
         ))}
+        {onClose && (
+          <button onClick={onClose} style={{
+            marginLeft:'auto', padding:'4px 10px', borderRadius:8, border:'1px solid #334155',
+            cursor:'pointer', fontSize:13, fontWeight:600, background:'transparent',
+            color:'#94a3b8', transition:'all .15s',
+          }} title="Close">✕</button>
+        )}
       </div>
 
       {/* Content fills remaining height */}
