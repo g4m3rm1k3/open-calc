@@ -20,6 +20,7 @@ import GlobalJSPlayground from '../ui/GlobalJSPlayground.jsx'
 import { Terminal, Code2, PlayCircle, HelpCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx'
+import PhysicsPoolLab from '../tools/PhysicsPoolLab.jsx'
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams()
@@ -380,9 +381,11 @@ export default function AppShell({ children }) {
   const [pythonOpen, setPythonOpen] = useState(false)
   const [jsOpen, setJsOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [poolOpen, setPoolOpen] = useState(false)
   const closeAllTools = useCallback(() => {
     setGraphOpen(false); setGraph3DOpen(false); setGraphJSXOpen(false)
     setScratchOpen(false); setCalcOpen(false); setPythonOpen(false); setJsOpen(false)
+    setPoolOpen(false)
   }, [])
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
@@ -477,6 +480,11 @@ export default function AppShell({ children }) {
         setPythonOpen(false)
         setJsOpen(false)
         setHelpOpen(false)
+        setPoolOpen(false)
+      }
+      // 'l' key for Physics Pool Lab
+      if (e.key.toLowerCase() === 'l') {
+        setPoolOpen(prev => !prev)
       }
       // 'Shift+D' — toggle Dev Mode (shows VIZ component names on every viz frame)
       if (e.shiftKey && e.key === 'D') {
@@ -722,6 +730,7 @@ export default function AppShell({ children }) {
       <GlobalPythonNotebook isOpen={pythonOpen} onClose={() => setPythonOpen(false)} />
       <GlobalJSPlayground isOpen={jsOpen} onClose={() => setJsOpen(false)} />
       <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+      {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
     </div>
     </GrapherContext.Provider>
   )
