@@ -22,6 +22,7 @@ import ch1_3 from './ch1-3.js'
 import ch1_4 from './ch1-4.js'
 import ch1_5 from './ch1-5.js'
 import ch1_6 from './ch1-6.js'
+import ch2_1 from './ch2-1.js'
 
 export default [
   {
@@ -101,5 +102,11 @@ export default [
     title: 'Sequences & Series',
     course: 'python-1',
     lessons: [ch1_6]
+  },
+  {
+    number: 2.1,
+    title: 'Arrays & Vectorization',
+    course: 'python-1',
+    lessons: [ch2_1]
   }
 ]
