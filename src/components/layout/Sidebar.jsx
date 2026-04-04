@@ -199,7 +199,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                   const pct = quizScore.correct / quizScore.total
                   status = pct >= 0.8 ? 'quiz-pass' : pct >= 0.5 ? 'quiz-partial' : 'quiz-fail'
                 } else {
-                  status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 3)
+                  status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
                 }
 
                 return (

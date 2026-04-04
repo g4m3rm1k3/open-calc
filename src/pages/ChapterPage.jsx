@@ -43,7 +43,7 @@ export default function ChapterPage() {
       ) : (
         <div className="space-y-4">
           {chapter.lessons.map((lesson, i) => {
-            const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 3)
+            const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
             return (
               <Link
                 key={lesson.id}
