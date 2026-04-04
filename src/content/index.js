@@ -66,4 +66,27 @@ export const ALL_LESSONS = CURRICULUM.flatMap((ch) =>
 
 export { COURSES }
 
+// Dev-only: validate lesson.chapter fields match the chapter.number they live in
+if (import.meta.env.DEV) {
+  const knownChapterNumbers = new Set(CURRICULUM.map((ch) => ch.number))
+  for (const ch of CURRICULUM) {
+    for (const lesson of ch.lessons) {
+      if (lesson.chapter !== undefined && lesson.chapter !== ch.number) {
+        console.warn(
+          `[open-calc validator] Lesson chapter mismatch:\n` +
+          `  lesson.id      = "${lesson.id}"\n` +
+          `  lesson.chapter = ${lesson.chapter}  ← should be ${ch.number}\n` +
+          `  chapter.title  = "${ch.title}"\n` +
+          `  Fix: set chapter: ${ch.number} in ${lesson.id}.js`
+        )
+      }
+      if (lesson.chapter !== undefined && !knownChapterNumbers.has(lesson.chapter)) {
+        console.warn(
+          `[open-calc validator] Lesson references unknown chapter: "${lesson.id}" has chapter=${lesson.chapter} which does not match any chapter.number`
+        )
+      }
+    }
+  }
+}
+
 // Cache bust 2
