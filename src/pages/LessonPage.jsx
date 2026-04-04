@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { LESSON_MAP, ALL_LESSONS } from '../content/index.js'
+import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
 import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
@@ -88,22 +88,40 @@ export default function LessonPage() {
         />
       </div>
       {/* Breadcrumb */}
-      <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5 flex-wrap">
-        <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">Home</Link>
-        <span>›</span>
-        <Link to={`/chapter/${lesson.chapter}`} className="hover:text-brand-600 dark:hover:text-brand-400">
-          Chapter {lesson.chapter}
-        </Link>
-        <span>›</span>
-        <span className="text-slate-700 dark:text-slate-300">{lesson.title}</span>
-      </nav>
+      {(() => {
+        const chObj = CURRICULUM.find(c => String(c.number) === chapterId)
+        return (
+          <nav className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-1.5 flex-wrap">
+            <Link to="/" className="hover:text-brand-600 dark:hover:text-brand-400">Home</Link>
+            {chObj?.course && (
+              <>
+                <span>›</span>
+                <Link to={`/course/${chObj.course}`} className="hover:text-brand-600 dark:hover:text-brand-400 capitalize">
+                  {chObj.course.replace(/-\d+$/, '').replace(/-/g, ' ')}
+                </Link>
+              </>
+            )}
+            <span>›</span>
+            <Link to={`/chapter/${chapterId}`} className="hover:text-brand-600 dark:hover:text-brand-400">
+              {chObj?.title ?? chapterId}
+            </Link>
+            <span>›</span>
+            <span className="text-slate-700 dark:text-slate-300">{lesson.title}</span>
+          </nav>
+        )
+      })()}
 
       {/* Lesson header */}
       <header className="mb-8">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-mono text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 rounded">
-            Chapter {lesson.chapter} · {lesson.order !== undefined ? `Lesson ${lesson.order + 1}` : ''}
-          </span>
+          {(() => {
+            const chObj = CURRICULUM.find(c => String(c.number) === chapterId)
+            return (
+              <span className="text-xs font-mono text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 rounded">
+                {chObj?.title ?? chapterId}{lesson.order !== undefined ? ` · Lesson ${lesson.order + 1}` : ''}
+              </span>
+            )
+          })()}
         </div>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{lesson.title}</h1>
         {lesson.subtitle && (

@@ -58,13 +58,16 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   const activeSlug = pathMatch?.[2] ?? null
 
   // Determine which course we are in based on active chapter
+  const coursePageMatch = location.pathname.match(/^\/course\/([^/]+)/)
   let activeCourse = 'calc'
   if (activeChapter) {
     const chObj = CURRICULUM.find(c => String(c.number) === activeChapter)
     if (chObj) activeCourse = chObj.course
+  } else if (coursePageMatch?.[1]) {
+    activeCourse = coursePageMatch[1]
   } else {
     // Heuristic for landing pages (paths that don't have chapterId yet)
-    const match = COURSES.find(c => location.pathname.startsWith(c.path.split('/').slice(0,-1).join('/')) || location.pathname.includes(c.key))
+    const match = COURSES.find(c => location.pathname.includes(c.key))
     if (match) activeCourse = match.key
   }
 

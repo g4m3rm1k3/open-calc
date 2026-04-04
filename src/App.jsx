@@ -17,6 +17,7 @@ const AboutPage   = lazy(() => import('./pages/AboutPage.jsx'))
 const LearningPathsPage = lazy(() => import('./pages/LearningPathsPage.jsx'))
 const ReferencePage     = lazy(() => import('./pages/ReferencePage.jsx'))
 const UniversalCalcPage = lazy(() => import('./pages/UniversalCalcPage.jsx'))
+const CoursePage        = lazy(() => import('./pages/CoursePage.jsx'))
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -37,6 +38,7 @@ export default function App() {
                 <Suspense fallback={<Fallback />}>
                   <Routes>
                     <Route index element={<HomePage />} />
+                    <Route path="course/:courseKey" element={<CoursePage />} />
                     <Route path="chapter/:chapterId" element={<ChapterPage />} />
                     <Route path="chapter/:chapterId/:lessonSlug" element={<LessonPage />} />
                     <Route path="chapter/:chapterId/:lessonSlug/*" element={<LessonPage />} />

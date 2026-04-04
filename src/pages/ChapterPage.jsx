@@ -26,8 +26,13 @@ export default function ChapterPage() {
 
   return (
     <div>
-      <Link to="/" className="text-sm text-brand-600 dark:text-brand-400 hover:underline mb-4 inline-block">← All chapters</Link>
-      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Chapter {chapter.number}: {chapter.title}</h1>
+      <Link
+        to={chapter.course ? `/course/${chapter.course}` : '/'}
+        className="text-sm text-brand-600 dark:text-brand-400 hover:underline mb-4 inline-block"
+      >
+        ← {chapter.course ? `All ${chapter.title.split(':')[0].trim().split(' ')[0]} chapters` : 'All courses'}
+      </Link>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{chapter.title}</h1>
       <p className="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">{chapter.description}</p>
 
       {chapter.comingSoon ? (
