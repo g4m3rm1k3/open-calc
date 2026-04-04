@@ -123,6 +123,7 @@ function makeBall(def) {
     pocketed: false,
     id: Math.random(),
     trail: [],
+    ballNum: def.ballNum ?? null,
   }
 }
 
@@ -235,22 +236,34 @@ export default function PhysicsPoolLab({ onClose }) {
   // ── Initialise game state in a ref so RAF loop has stable access ──────────
   const initState = useCallback((lvlIdx, m) => {
     const level = LEVELS[lvlIdx % LEVELS.length]
+    // ── Preserve scale so the table doesn't shrink on mode/level switch ──
+    const existingScale = stateRef.current?.scale ?? 1
     let ballDefs
 
     if (m === 'freeplay') {
-      // Full rack — triangle of 15 balls + cue
+      // Full rack — proper pool triangle (5 rows = 15 balls)
       const rack = []
-      let row = 0, col = 0, num = 1
-      const startX = 580, startY = 250
-      const spacing = BALL_R * 2 + 1
-      for (let r = 0; r < 5; r++) {
-        for (let c = 0; c <= r; c++) {
-          rack.push({ x: startX + r * spacing, y: startY - r * BALL_R + c * (BALL_R * 2 + 1), mass: 1, colorIdx: num % 9, isCue: false })
+      const spacing = BALL_R * 2 + 1.5
+      const startX = 590
+      const startY = TH / 2
+      let num = 1
+      for (let row = 0; row < 5; row++) {
+        const rowCount = row + 1
+        const rowOffsetY = -(row * (BALL_R + 0.75))
+        for (let col = 0; col < rowCount; col++) {
+          rack.push({
+            x: startX + row * spacing,
+            y: startY + rowOffsetY + col * spacing,
+            mass: 1,
+            colorIdx: num % 9,
+            isCue: false,
+            ballNum: num,
+          })
           num++
         }
       }
       ballDefs = [
-        { x: 220, y: 250, mass: 1, colorIdx: 0, isCue: true },
+        { x: 220, y: TH / 2, mass: 1, colorIdx: 0, isCue: true, ballNum: 0 },
         ...rack,
       ]
     } else {
@@ -266,7 +279,7 @@ export default function PhysicsPoolLab({ onClose }) {
       mouse: { x: 0, y: 0 },
       shots: 0,
       phase: 'aim',
-      scale: 1,
+      scale: existingScale,   // ← key fix: carry forward the real scale
       offsetX: 0,
       offsetY: 0,
       pocketed: [],
@@ -605,12 +618,15 @@ export default function PhysicsPoolLab({ onClose }) {
       ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2)
       ctx.stroke()
 
-      // Mass label inside ball
-      ctx.fillStyle = b.isCue ? '#333' : '#fff'
-      ctx.font = `bold ${9}px monospace`
+      // Label inside ball — number in free play, mass in challenges
+      ctx.fillStyle = b.isCue ? '#333' : (b.colorIdx === 8 ? '#aaa' : '#fff')
+      ctx.font = `bold ${b.ballNum !== null ? 10 : 9}px monospace`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      if (!b.isCue) ctx.fillText(b.mass.toFixed(1), b.x, b.y + 1)
+      if (!b.isCue) {
+        const label = b.ballNum !== null ? String(b.ballNum) : b.mass.toFixed(1) + 'x'
+        ctx.fillText(label, b.x, b.y + 1)
+      }
 
       // Hit contact dot on cue ball (when at rest)
       if (b.isCue && st.phase === 'aim') {
