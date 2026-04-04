@@ -45,6 +45,11 @@ const POCKETS = [
   { x: TW - RAIL, y: TH - RAIL },  // BR
 ]
 const POCKET_R = 22
+const MIN_HANDLE_DIST = 30
+const MAX_HANDLE_DIST = 190
+
+// Ring radius is always capped to MAX_HANDLE_DIST — ring may clip edge near rails, that's fine
+function maxRadius() { return MAX_HANDLE_DIST }
 
 // ─── Ball colours in numbered pool order ─────────────────────────────────────
 const BALL_COLORS = [
@@ -307,8 +312,6 @@ export default function PhysicsPoolLab({ onClose }) {
     stateRef.current = {
       balls,
       events: [],
-      isDragging: false,
-      dragStart: { x: 0, y: 0 },
       mouse: { x: 0, y: 0 },
       shots: 0,
       phase: 'aim',
@@ -316,6 +319,7 @@ export default function PhysicsPoolLab({ onClose }) {
       offsetX: 0,
       offsetY: 0,
       pocketed: [],
+      aimHandle: { dragging: false, angle: Math.PI, dist: 90 },
     }
     setShots(0)
     setPhase('aim')
@@ -361,11 +365,17 @@ export default function PhysicsPoolLab({ onClose }) {
     const { x, y } = toWorld(sx, sy)
     const cue = st.balls.find(b => b.isCue && !b.pocketed)
     if (!cue) return
-    const d = hypot(x - cue.x, y - cue.y)
-    if (d > cue.r + 20) return
-    st.isDragging = true
-    st.dragStart = { x, y }
-    st.mouse = { x, y }
+    const ah = st.aimHandle
+    const clickAngle = Math.atan2(y - cue.y, x - cue.x)
+    const distFromBall = hypot(x - cue.x, y - cue.y)
+    const capR = maxRadius()
+    const curR = clamp(ah.dist, MIN_HANDLE_DIST, capR)
+    // Grab if click is within 40px of the ring
+    if (Math.abs(distFromBall - curR) <= 40) {
+      ah.grabAngle = clickAngle      // where on the ring you grabbed
+      ah.startAngle = ah.angle       // aim angle at grab time
+      ah.dragging = true
+    }
   }, [])
 
   const handleMouseMove = useCallback((e) => {
@@ -373,50 +383,88 @@ export default function PhysicsPoolLab({ onClose }) {
     const rect = canvasRef.current.getBoundingClientRect()
     const sx = (e.clientX || e.touches?.[0]?.clientX) - rect.left
     const sy = (e.clientY || e.touches?.[0]?.clientY) - rect.top
-    stateRef.current.mouse = toWorld(sx, sy)
+    const pos = toWorld(sx, sy)
+    stateRef.current.mouse = pos
+    const st = stateRef.current
+    const ah = st.aimHandle
+    if (!ah?.dragging) return
+    const cue = st.balls.find(b => b.isCue && !b.pocketed)
+    if (!cue) return
+    const dx = pos.x - cue.x
+    const dy = pos.y - cue.y
+    const dist = hypot(dx, dy)
+    const capR = maxRadius(cue.x, cue.y)
+    // Steering wheel: rotate by delta from grab point
+    const currentAngle = Math.atan2(dy, dx)
+    let delta = currentAngle - ah.grabAngle
+    // Normalize delta to [-π, π]
+    while (delta > Math.PI) delta -= Math.PI * 2
+    while (delta < -Math.PI) delta += Math.PI * 2
+    ah.angle = ah.startAngle + delta
+    // Radial drag resizes the ring
+    ah.dist = clamp(dist, MIN_HANDLE_DIST, capR)
   }, [])
 
   const handleCancelDrag = useCallback(() => {
     if (!stateRef.current) return
-    stateRef.current.isDragging = false
+    const ah = stateRef.current.aimHandle
+    if (ah) ah.dragging = false
   }, [])
 
-  const handleMouseUp = useCallback((e) => {
+  const handleMouseUp = useCallback(() => {
+    if (!stateRef.current) return
+    if (stateRef.current.aimHandle) stateRef.current.aimHandle.dragging = false
+  }, [])
+
+  const handleShoot = useCallback(() => {
     if (!stateRef.current) return
     const st = stateRef.current
-    if (!st.isDragging) return
-    st.isDragging = false
+    if (st.phase !== 'aim') return
     const cue = st.balls.find(b => b.isCue && !b.pocketed)
     if (!cue) return
-    const dx = st.dragStart.x - st.mouse.x
-    const dy = st.dragStart.y - st.mouse.y
-    const rawMag = hypot(dx, dy)
-    if (rawMag < 4) return   // too small a drag
-    const power = clamp(rawMag / 3.2, 0, 22)
-    const nx = dx / rawMag, ny = dy / rawMag
+    const ah = st.aimHandle
+    const nx = -Math.cos(ah.angle)
+    const ny = -Math.sin(ah.angle)
+    const capR = maxRadius()
+    const safeDist = clamp(ah.dist, MIN_HANDLE_DIST, capR)
+    const range = Math.max(capR - MIN_HANDLE_DIST, 1)
+    const power = clamp(((safeDist - MIN_HANDLE_DIST) / range) * 22, 0.3, 22)
     cue.vx = nx * power
     cue.vy = ny * power
-    // Spin from hit offset
     const ho = hitOffsetRef.current
-    const spinX = ho.dx, spinY = ho.dy
-    cue.spin = (spinX * cue.vy - spinY * cue.vx) * 1.6
+    cue.spin = (ho.dx * cue.vy - ho.dy * cue.vx) * 1.6
+    ah.dragging = false
+    ah.dist = 90   // reset to mid-range for next shot
     st.shots++
     st.phase = 'rolling'
     setShots(st.shots)
     setPhase('rolling')
-    // Record shot event
     st.events.push({
-      type: 'shot',
-      time: Date.now(),
+      type: 'shot', time: Date.now(),
       power: power.toFixed(1),
-      angle: (Math.atan2(-ny, nx) * 180 / Math.PI).toFixed(1),
+      angle: (((Math.atan2(-ny, nx) * 180 / Math.PI) + 360) % 360).toFixed(1),
       spin: cue.spin.toFixed(2),
       hitOffset: { ...ho },
     })
     setEvents([...st.events])
   }, [])
 
-  // ── Main physics + render loop ────────────────────────────────────────────
+  const handleDoubleClick = useCallback(() => {
+    if (!stateRef.current) return
+    if (stateRef.current.phase !== 'aim') return
+    handleShoot()
+  }, [handleShoot])
+
+  const handleWheel = useCallback((e) => {
+    e.preventDefault()
+    if (!stateRef.current) return
+    const st = stateRef.current
+    if (st.phase !== 'aim') return
+    const ah = st.aimHandle
+    // deltaY: positive = scroll down = rotate clockwise
+    ah.angle += (e.deltaY / Math.abs(e.deltaY || 1)) * 0.02
+  }, [])
+
   const loop = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas || !stateRef.current) { animRef.current = requestAnimationFrame(loop); return }
@@ -582,21 +630,23 @@ export default function PhysicsPoolLab({ onClose }) {
       }
     }
 
-    // Aiming line while dragging
-    if (st.isDragging) {
+    // ── Aim handle: always visible in aim phase ──────────────────────────
+    const ah = st.aimHandle
+    if (st.phase === 'aim') {
       const cue = st.balls.find(b => b.isCue && !b.pocketed)
       if (cue) {
-        const dx = st.dragStart.x - st.mouse.x
-        const dy = st.dragStart.y - st.mouse.y
-        const rawMag = hypot(dx, dy)
-        const power = clamp(rawMag / 3.2, 0, 22)
-        const pct = power / 22
+        const capR = maxRadius()
+        const safeDist = clamp(ah.dist, MIN_HANDLE_DIST, capR)
+        const range = Math.max(capR - MIN_HANDLE_DIST, 1)
+        const hx = cue.x + safeDist * Math.cos(ah.angle)
+        const hy = cue.y + safeDist * Math.sin(ah.angle)
+        const shotNx = -Math.cos(ah.angle)
+        const shotNy = -Math.sin(ah.angle)
+        const power  = clamp(((safeDist - MIN_HANDLE_DIST) / range) * 22, 0, 22)
+        const pct    = power / 22
+        const aimNx  = shotNx, aimNy = shotNy
 
-        const aimNx = rawMag > 0 ? dx / rawMag : 0
-        const aimNy = rawMag > 0 ? dy / rawMag : 0
-
-        // ── Forward-simulation predictor ─────────────────────────────────
-        // Find nearest ball along aim line (for ghost ball display only)
+        // ── Ghost ball contact predictor ──────────────────────────────────
         const otherBalls = st.balls.filter(b => !b.pocketed && !b.isCue)
         let closestTarget = null, closestT = Infinity
         for (const ob of otherBalls) {
@@ -782,34 +832,60 @@ export default function PhysicsPoolLab({ onClose }) {
           }
         }
 
-        // Pull-back line (dotted, to mouse)
-        ctx.strokeStyle = 'rgba(255,200,50,0.3)'
-        ctx.lineWidth = 1
-        ctx.setLineDash([4, 6])
-        ctx.beginPath()
-        ctx.moveTo(cue.x, cue.y)
-        ctx.lineTo(st.mouse.x, st.mouse.y)
-        ctx.stroke()
-        ctx.setLineDash([])
+        // ── Aim ring: amber circle capped to always fit on screen ──────────
+        // Ghost ring at max allowed radius
+        ctx.strokeStyle = 'rgba(251,191,36,0.12)'
+        ctx.lineWidth = 2; ctx.setLineDash([])
+        ctx.beginPath(); ctx.arc(cue.x, cue.y, capR, 0, Math.PI * 2); ctx.stroke()
+        // Main ring at current radius (brightness = power)
+        ctx.strokeStyle = `rgba(251,191,36,${0.4 + pct * 0.55})`
+        ctx.lineWidth = 5
+        ctx.beginPath(); ctx.arc(cue.x, cue.y, safeDist, 0, Math.PI * 2); ctx.stroke()
 
-        // Power bar
-        const barW = 60, barH = 7
-        const bx = cue.x - barW/2, by = cue.y - cue.r - 18
-        ctx.fillStyle = 'rgba(0,0,0,0.5)'
-        ctx.fillRect(bx, by, barW, barH)
-        const grad = ctx.createLinearGradient(bx, by, bx + barW, by)
-        grad.addColorStop(0, '#4ade80')
-        grad.addColorStop(0.5, '#fbbf24')
-        grad.addColorStop(1, '#f87171')
-        ctx.fillStyle = grad
-        ctx.fillRect(bx, by, barW * pct, barH)
+        // ── Cue-stick line: handle → through ball → forward aim ──────────
+        ctx.strokeStyle = 'rgba(200,180,120,0.22)'
+        ctx.lineWidth = 1.5; ctx.setLineDash([10, 6])
+        ctx.beginPath()
+        ctx.moveTo(hx, hy)
+        ctx.lineTo(cue.x + shotNx * 230, cue.y + shotNy * 230)
+        ctx.stroke(); ctx.setLineDash([])
+
+        // ── Force vector arrow (green→red with power) ─────────────────────
+        const arrowLen = 14 + pct * 58
+        drawArrow(ctx, cue.x, cue.y, shotNx * arrowLen, shotNy * arrowLen,
+          `hsl(${Math.round(120 - pct * 120)},100%,60%)`, 2.5)
+
+        // ── Power bar ─────────────────────────────────────────────────────
+        const barW = 64, barH = 7
+        const bxb = cue.x - barW / 2, byb = cue.y - cue.r - 24
+        ctx.fillStyle = 'rgba(0,0,0,0.55)'
+        ctx.fillRect(bxb, byb, barW, barH)
+        const barGrad = ctx.createLinearGradient(bxb, byb, bxb + barW, byb)
+        barGrad.addColorStop(0, '#4ade80')
+        barGrad.addColorStop(0.5, '#fbbf24')
+        barGrad.addColorStop(1, '#f87171')
+        ctx.fillStyle = barGrad
+        ctx.fillRect(bxb, byb, barW * pct, barH)
         ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-        ctx.lineWidth = 1
-        ctx.strokeRect(bx, by, barW, barH)
-        ctx.fillStyle = '#fff'
-        ctx.font = `bold ${8}px monospace`
-        ctx.textAlign = 'center'
-        ctx.fillText(`${(pct * 100).toFixed(0)}%`, cue.x, by - 3)
+        ctx.lineWidth = 1; ctx.strokeRect(bxb, byb, barW, barH)
+
+        // ── Angle + power label ────────────────────────────────────────────
+        const shotDeg = ((Math.atan2(-shotNy, shotNx) * 180 / Math.PI) + 360) % 360
+        ctx.fillStyle = '#fbbf24'
+        ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'
+        ctx.fillText(`${shotDeg.toFixed(1)}°   ${(pct * 100).toFixed(0)}%`, cue.x, byb - 4)
+
+        // ── Handle knob: big solid circle on the ring ──────────────────────
+        const handleR2 = 20
+        ctx.shadowBlur = ah.dragging ? 22 : 12; ctx.shadowColor = '#fbbf24'
+        ctx.fillStyle = ah.dragging ? '#fbbf24' : 'rgba(251,191,36,0.82)'
+        ctx.beginPath(); ctx.arc(hx, hy, handleR2, 0, Math.PI * 2); ctx.fill()
+        ctx.shadowBlur = 0
+        ctx.strokeStyle = '#fff'
+        ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(hx, hy, handleR2, 0, Math.PI * 2); ctx.stroke()
+
+        // Reset textBaseline for subsequent draws
+        ctx.textBaseline = 'alphabetic'
       }
     }
 
@@ -1033,10 +1109,19 @@ export default function PhysicsPoolLab({ onClose }) {
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') handleCancelDrag()
+      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); handleShoot() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [handleCancelDrag])
+  }, [handleCancelDrag, handleShoot])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const onWheel = (e) => { e.preventDefault(); handleWheel(e) }
+    canvas.addEventListener('wheel', onWheel, { passive: false })
+    return () => canvas.removeEventListener('wheel', onWheel)
+  }, [handleWheel])
 
   // ── Hit position picker ───────────────────────────────────────────────────
   const hitPickerRef = useRef(null)
@@ -1148,6 +1233,26 @@ export default function PhysicsPoolLab({ onClose }) {
         {/* ── Canvas area ───────────────────────────────────────────────────── */}
         <div className="flex-1 relative flex items-center justify-center min-w-0" style={{ background: C.bg }}>
 
+          {/* Aim hint */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+            style={{ color: 'rgba(148,163,184,0.55)', fontSize: 11, fontFamily: 'monospace', textAlign: 'center', whiteSpace: 'nowrap' }}>
+            {phase === 'aim' && 'Drag the ring to aim · in/out = power'}
+          </div>
+
+          {/* SHOOT button — always visible in aim phase */}
+          {phase === 'aim' && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1">
+              <button
+                onClick={handleShoot}
+                className="px-5 py-2 rounded-lg font-bold text-sm transition-all active:scale-95"
+                style={{ background: 'rgba(251,191,36,0.92)', color: '#000', boxShadow: '0 0 18px rgba(251,191,36,0.45)', border: '1px solid #fef3c7', letterSpacing: '0.05em' }}
+              >
+                🎱 SHOOT
+              </button>
+              <span style={{ color: 'rgba(148,163,184,0.6)', fontSize: 10, fontFamily: 'monospace' }}>Space · Enter · Double-click</span>
+            </div>
+          )}
+
           {/* Challenge goal banner */}
           {mode === 'challenge' && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-4 py-1.5 rounded-full text-xs font-medium text-center pointer-events-none"
@@ -1170,6 +1275,7 @@ export default function PhysicsPoolLab({ onClose }) {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            onDoubleClick={handleDoubleClick}
             onTouchStart={e => handleMouseDown(e.touches[0])}
             onTouchMove={e => { e.preventDefault(); handleMouseMove(e.touches[0]) }}
             onTouchEnd={handleMouseUp}
