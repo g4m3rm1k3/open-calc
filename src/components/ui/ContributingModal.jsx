@@ -77,6 +77,21 @@ export default function ContributingModal() {
                         <Terminal size={18} />
                         Read the visual contributor playbook
                       </button>
+                      <a
+                        href="https://github.com/g4m3rm1k3/open-calc"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors w-full sm:w-auto shadow-sm"
+                      >
+                        <Github size={18} />
+                        github.com/g4m3rm1k3/open-calc
+                      </a>
+                      <div className="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-xs text-slate-500 dark:text-slate-400">
+                        <kbd className="font-mono text-xs bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600">Shift</kbd>
+                        <span>+</span>
+                        <kbd className="font-mono text-xs bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600">D</kbd>
+                        <span>— toggle Dev Mode (shows component names on every viz)</span>
+                      </div>
                     </div>
                   </section>
 

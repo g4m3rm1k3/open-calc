@@ -4,7 +4,23 @@ import { VIDEO_DATABASE } from '../content/videos/videoDatabase.js';
 import { selectVideosByKeywords } from '../content/videos/videoSelector.js';
 import { ALL_LESSONS } from '../content/index.js';
 
-const VideoPlayerContext = createContext();
+const VideoPlayerContext = createContext({
+  isOpen: false,
+  isMinimized: true,
+  currentVideo: null,
+  lessonId: null,
+  searchQuery: '',
+  setSearchQuery: () => {},
+  customVideos: {},
+  openPlayer: () => {},
+  closePlayer: () => {},
+  toggleMinimize: () => {},
+  selectVideo: () => {},
+  setLessonId: () => {},
+  togglePin: () => {},
+  pinnedVideos: [],
+  addCustomVideo: () => {},
+});
 
 export function VideoPlayerProvider({ children }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -140,9 +156,5 @@ export function VideoPlayerProvider({ children }) {
 }
 
 export function useVideoPlayer() {
-  const context = useContext(VideoPlayerContext);
-  if (!context) {
-    throw new Error('useVideoPlayer must be used within a VideoPlayerProvider');
-  }
-  return context;
+  return useContext(VideoPlayerContext);
 }

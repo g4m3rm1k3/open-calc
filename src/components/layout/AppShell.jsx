@@ -364,6 +364,13 @@ export default function AppShell({ children }) {
   useEffect(() => {
     localStorage.setItem('oc-sidebar-pinned', sidebarPinned)
   }, [sidebarPinned])
+
+  // Restore dev mode across page refreshes
+  useEffect(() => {
+    if (localStorage.getItem('oc-dev-mode')) {
+      document.documentElement.classList.add('dev-mode')
+    }
+  }, [])
   const [graphOpen, setGraphOpen] = useState(false)
   const [graph3DOpen, setGraph3DOpen] = useState(false)
   const [graphJSXOpen, setGraphJSXOpen] = useState(false)
@@ -469,6 +476,12 @@ export default function AppShell({ children }) {
         setPythonOpen(false)
         setJsOpen(false)
         setHelpOpen(false)
+      }
+      // 'Shift+D' — toggle Dev Mode (shows VIZ component names on every viz frame)
+      if (e.shiftKey && e.key === 'D') {
+        const html = document.documentElement
+        const isDevMode = html.classList.toggle('dev-mode')
+        localStorage.setItem('oc-dev-mode', isDevMode ? '1' : '')
       }
     }
     window.addEventListener('keydown', handler)

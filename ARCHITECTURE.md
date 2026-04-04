@@ -1,4 +1,4 @@
-﻿# open-calc Architecture Map
+# open-calc Architecture Map
 
 > A complete reference document for contributors. Covers every layer of the app — routing, layout, content formats, viz system, reference system, progress system, known inconsistencies, and a tiered contribution guide.
 
@@ -987,6 +987,26 @@ Fixed. For numeric chapter numbers (0–6) the badge still shows `Ch. N`. For st
 
 ### ✅ O — Search index auto-rebuilds on every build
 `package.json` `build` and `dev` scripts both run `node src/scripts/build-search-index.js` before Vite starts. New lessons appear in search immediately on the next `npm run dev` or `npm run build` — no manual step needed.
+
+---
+
+## Dev Mode (Shift+D)
+
+Press **`Shift+D`** anywhere in the app to toggle Developer Mode on/off.
+
+**What it does:**
+- Shows an amber **VIZ** badge in the top-left corner of every visualization, displaying its exact registry ID (e.g. `RiemannSum`, `WebLesson04_Layout`)
+- Outlines every viz frame with a dashed amber border so you can see where one component ends and another begins
+- State persists across page refreshes (stored in `localStorage` as `oc-dev-mode`)
+- Press `Shift+D` again to turn it off
+
+**Why this exists:**  
+Viz components use hardcoded inline styles and are sandboxed — you can't inspect their name from the DOM without Dev Mode. This shortcut lets you identify any component in the app without opening browser devtools, so you can look up or fix the correct file in `VizFrame.jsx`.
+
+**Implementation:**  
+- The toggle adds/removes `.dev-mode` class on `<html>` (same pattern as `.dark`)
+- The badge is rendered in `VizFrame.jsx` and hidden by default via `.dev-viz-label { display: none }`
+- `.dev-mode .dev-viz-label { display: flex }` makes it visible
 
 ---
 

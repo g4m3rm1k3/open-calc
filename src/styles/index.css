@@ -213,3 +213,17 @@
 .sidebar-chapter-active {
   @apply text-brand-600 dark:text-brand-400 font-black;
 }
+
+/* ── Dev Mode ─────────────────────────────────────────────────────────────── */
+/* Toggle with Shift+D. Shows viz component name on every VizFrame. */
+.dev-viz-label {
+  display: none;
+}
+.dev-mode .dev-viz-label {
+  display: flex;
+}
+/* Outline every viz frame when in dev mode */
+.dev-mode .viz-frame {
+  outline: 2px dashed #f59e0b !important;
+  outline-offset: 2px;
+}

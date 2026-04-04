@@ -931,6 +931,11 @@ export default function VizFrame({ id, initialProps = {}, title }) {
       id={`viz-${id}`}
       className="viz-frame relative group w-full max-w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl"
     >
+      {/* ── Dev Mode Label — hidden until html.dev-mode is toggled via Shift+D ── */}
+      <div className="dev-viz-label absolute top-0 left-0 z-[9999] items-center gap-1.5 px-2 py-1 rounded-br-lg rounded-tl-xl bg-amber-400 text-slate-900 pointer-events-none select-none">
+        <span className="text-[10px] font-black uppercase tracking-widest">VIZ</span>
+        <span className="text-xs font-mono font-bold">{id}</span>
+      </div>
       {title && (
         <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3 px-2 pt-2">
           {title}

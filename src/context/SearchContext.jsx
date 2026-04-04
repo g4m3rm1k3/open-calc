@@ -1,7 +1,14 @@
 import { createContext, useState, useContext, useCallback } from 'react'
 import { useSearch } from '../hooks/useSearch.js'
 
-export const SearchContext = createContext(null)
+export const SearchContext = createContext({
+  isOpen: false,
+  openSearch: () => {},
+  closeSearch: () => {},
+  query: '',
+  setQuery: () => {},
+  results: [],
+})
 
 export function SearchProvider({ children }) {
   const [isOpen, setIsOpen] = useState(false)
