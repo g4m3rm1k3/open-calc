@@ -17,6 +17,7 @@ import lesson16 from './lesson16.js'
 import lesson17 from './lesson17.js'
 import lesson18 from './lesson18.js'
 import ch1_1 from './ch1-1.js'
+import ch1_2 from './ch1-2.js'
 
 export default [
   {
@@ -66,5 +67,11 @@ export default [
     title: 'Numbers & Structure',
     course: 'python-1',
     lessons: [ch1_1]
+  },
+  {
+    number: 1.2,
+    title: 'Functions as Mappings',
+    course: 'python-1',
+    lessons: [ch1_2]
   }
 ]
