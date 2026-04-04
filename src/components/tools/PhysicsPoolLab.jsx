@@ -179,6 +179,9 @@ function resolveBallCollision(a, b, events, st) {
     const p2f = (b.mass * v2f).toFixed(2)
     const pTotal_i = (a.mass * v1i + b.mass * v2i).toFixed(2)
     const pTotal_f = (a.mass * v1f + b.mass * v2f).toFixed(2)
+    const ke_i = (0.5 * a.mass * v1i**2 + 0.5 * b.mass * v2i**2)
+    const ke_f = (0.5 * a.mass * v1f**2 + 0.5 * b.mass * v2f**2)
+    const keTransferPct = ke_i > 0 ? Math.round((1 - (ke_f / ke_i)) * 100) : 0
     events.push({
       type: 'collision',
       time: Date.now(),
@@ -188,8 +191,10 @@ function resolveBallCollision(a, b, events, st) {
       b: { mass: b.mass, vBefore: v2i.toFixed(2), vAfter: v2f.toFixed(2), pBefore: p2i, pAfter: p2f },
       pTotal_i, pTotal_f,
       angle: (Math.atan2(ny, nx) * 180 / Math.PI).toFixed(1),
-      ke_i: (0.5 * a.mass * v1i**2 + 0.5 * b.mass * v2i**2).toFixed(3),
-      ke_f: (0.5 * a.mass * v1f**2 + 0.5 * b.mass * v2f**2).toFixed(3),
+      ke_i: parseFloat(ke_i).toFixed(3),
+      ke_f: parseFloat(ke_f).toFixed(3),
+      keTransferPct,
+      impulse: impulseMag.toFixed(3),
     })
     // Store flash on stateRef so it survives across RAF frames
     if (st) {
@@ -575,21 +580,128 @@ export default function PhysicsPoolLab({ onClose }) {
         const power = clamp(rawMag / 3.2, 0, 22)
         const pct = power / 22
 
-        // Direction line
-        ctx.strokeStyle = `rgba(255,255,255,${0.5 + pct * 0.4})`
-        ctx.lineWidth = 1.5
-        ctx.setLineDash([8, 6])
-        ctx.beginPath()
-        ctx.moveTo(cue.x, cue.y)
-        // Project aim line forward (opposite of pull direction)
-        const nx = rawMag > 0 ? -dx / rawMag : 0
-        const ny = rawMag > 0 ? -dy / rawMag : 0
-        ctx.lineTo(cue.x + nx * 160, cue.y + ny * 160)
-        ctx.stroke()
-        ctx.setLineDash([])
+        const aimNx = rawMag > 0 ? -dx / rawMag : 0
+        const aimNy = rawMag > 0 ? -dy / rawMag : 0
+
+        // ── Ghost ball + deflection paths ────────────────────────────────
+        // Find nearest ball along aim line
+        const otherBalls = st.balls.filter(b => !b.pocketed && !b.isCue)
+        let closestTarget = null, closestT = Infinity
+        for (const ob of otherBalls) {
+          // ray-circle intersection
+          const ex = ob.x - cue.x, ey = ob.y - cue.y
+          const proj = ex * aimNx + ey * aimNy
+          if (proj < 0) continue
+          const perp2 = (ex * ex + ey * ey) - proj * proj
+          const sumR = cue.r + ob.r
+          if (perp2 > sumR * sumR) continue
+          const t = proj - Math.sqrt(sumR * sumR - perp2)
+          if (t > 0 && t < closestT) { closestT = t; closestTarget = ob }
+        }
+
+        if (closestTarget && closestT < 500) {
+          // Ghost ball position (where cue makes contact)
+          const gx = cue.x + aimNx * closestT
+          const gy = cue.y + aimNy * closestT
+
+          // Line of impact (cue center → target center)
+          const licDx = closestTarget.x - gx
+          const licDy = closestTarget.y - gy
+          const licMag = hypot(licDx, licDy) || 1
+          const licNx = licDx / licMag, licNy = licDy / licMag
+
+          // Tangent (cue deflection direction — perpendicular to line of impact)
+          const tanNx = -licNy, tanNy = licNx
+
+          // Masses for elastic collision
+          const ma = cue.mass, mb = closestTarget.mass
+
+          // Target ball path — gets component along line of impact
+          const vDotN = power * (aimNx * licNx + aimNy * licNy)
+          const targetSpeed = (2 * ma / (ma + mb)) * vDotN
+
+          // Cue ball remaining speed along tangent
+          const cueRemain = power * ((ma - mb) / (ma + mb))
+          const cueTanSpeed = power * (aimNx * tanNx + aimNy * tanNy)
+
+          const arrowScale = 5
+
+          // Aim guideline (dashed, to ghost pos)
+          ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+          ctx.lineWidth = 1
+          ctx.setLineDash([6, 5])
+          ctx.beginPath()
+          ctx.moveTo(cue.x, cue.y)
+          ctx.lineTo(gx, gy)
+          ctx.stroke()
+          ctx.setLineDash([])
+
+          // Ghost ball (semi-transparent)
+          ctx.globalAlpha = 0.35
+          ctx.fillStyle = cue.color
+          ctx.beginPath()
+          ctx.arc(gx, gy, cue.r, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.globalAlpha = 1
+          ctx.strokeStyle = 'rgba(255,255,255,0.5)'
+          ctx.lineWidth = 1
+          ctx.beginPath()
+          ctx.arc(gx, gy, cue.r, 0, Math.PI * 2)
+          ctx.stroke()
+
+          // Line of impact (dotted purple)
+          ctx.strokeStyle = 'rgba(168,139,250,0.7)'
+          ctx.lineWidth = 1.5
+          ctx.setLineDash([4, 4])
+          ctx.beginPath()
+          ctx.moveTo(gx - licNx * 20, gy - licNy * 20)
+          ctx.lineTo(closestTarget.x + licNx * 20, closestTarget.y + licNy * 20)
+          ctx.stroke()
+          ctx.setLineDash([])
+
+          // Target ball path (solid teal arrow)
+          const tLen = Math.abs(targetSpeed) * arrowScale
+          drawArrow(ctx, closestTarget.x, closestTarget.y, licNx * tLen, licNy * tLen, '#2dd4bf', 2.5)
+
+          // Label target path
+          ctx.fillStyle = '#2dd4bf'
+          ctx.font = 'bold 9px monospace'
+          ctx.textAlign = 'left'
+          const tlx = closestTarget.x + licNx * tLen * 0.5
+          const tly = closestTarget.y + licNy * tLen * 0.5
+          ctx.fillText(`v=${(targetSpeed).toFixed(1)}`, tlx + 6, tly - 5)
+
+          // Cue ball deflection path (solid amber arrow)
+          const cLen = Math.abs(cueTanSpeed) * arrowScale * 0.8
+          drawArrow(ctx, gx, gy, tanNx * cLen * Math.sign(cueTanSpeed), tanNy * cLen * Math.sign(cueTanSpeed), '#fbbf24', 2)
+
+          // Label cue deflection
+          ctx.fillStyle = '#fbbf24'
+          ctx.font = 'bold 9px monospace'
+          ctx.textAlign = 'right'
+          ctx.fillText('cue →', gx + tanNx * cLen * 0.45 - 4, gy + tanNy * cLen * 0.45 - 5)
+
+          // Impact angle label
+          const impactAngleDeg = (Math.acos(clamp(aimNx * licNx + aimNy * licNy, -1, 1)) * 180 / Math.PI).toFixed(1)
+          ctx.fillStyle = 'rgba(167,139,250,0.9)'
+          ctx.font = 'bold 9px monospace'
+          ctx.textAlign = 'center'
+          ctx.fillText(`θ=${impactAngleDeg}°`, gx, gy + cue.r + 14)
+
+        } else {
+          // No target — plain aim line
+          ctx.strokeStyle = `rgba(255,255,255,${0.5 + pct * 0.4})`
+          ctx.lineWidth = 1.5
+          ctx.setLineDash([8, 6])
+          ctx.beginPath()
+          ctx.moveTo(cue.x, cue.y)
+          ctx.lineTo(cue.x + aimNx * 160, cue.y + aimNy * 160)
+          ctx.stroke()
+          ctx.setLineDash([])
+        }
 
         // Pull-back line (dotted, to mouse)
-        ctx.strokeStyle = 'rgba(255,200,50,0.4)'
+        ctx.strokeStyle = 'rgba(255,200,50,0.3)'
         ctx.lineWidth = 1
         ctx.setLineDash([4, 6])
         ctx.beginPath()
@@ -704,14 +816,14 @@ export default function PhysicsPoolLab({ onClose }) {
       }
     }
 
-    // ── Collision flashes (line of impact + tangent lines) ──────────────────
+    // ── Collision flashes (line of impact + tangent lines + impact pop-up) ──
     const now = Date.now()
     if (!st.flashes) st.flashes = []
     // prune old
-    st.flashes = st.flashes.filter(f => now - f.time < 700)
+    st.flashes = st.flashes.filter(f => now - f.time < 2500)
     for (const f of st.flashes) {
       const age = (now - f.time) / 700
-      const alpha = 1 - age
+      const alpha = Math.max(0, 1 - age)
       const len = 55
       // Line of impact (along normal)
       ctx.strokeStyle = `rgba(168,139,250,${alpha * 0.9})`
@@ -734,6 +846,45 @@ export default function PhysicsPoolLab({ onClose }) {
       ctx.beginPath()
       ctx.arc(f.ax, f.ay, 3, 0, Math.PI * 2)
       ctx.fill()
+
+      // ── Impact pop-up card (visible for 2.5s) ──────────────────────────
+      if (f.popupData && now - f.time < 2500) {
+        const popAlpha = Math.max(0, 1 - (now - f.time) / 2500)
+        const pd = f.popupData
+        const bx = f.ax + 14, by = f.ay - 58
+        const bw = 120, bh = 58
+        // Card background
+        ctx.fillStyle = `rgba(15,23,42,${popAlpha * 0.92})`
+        ctx.strokeStyle = `rgba(168,139,250,${popAlpha * 0.6})`
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 5) : ctx.rect(bx, by, bw, bh)
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
+
+        // Title
+        ctx.fillStyle = `rgba(168,139,250,${popAlpha})`
+        ctx.font = 'bold 8px monospace'
+        ctx.fillText('IMPACT', bx + 6, by + 5)
+
+        // Impulse J = Δp
+        ctx.fillStyle = `rgba(56,189,248,${popAlpha})`
+        ctx.font = '8px monospace'
+        ctx.fillText(`J = ${pd.impulse}  (Δp)`, bx + 6, by + 17)
+
+        // KE transfer
+        const keColor = pd.keTransferPct > 70 ? '#4ade80' : pd.keTransferPct > 40 ? '#fbbf24' : '#f87171'
+        ctx.fillStyle = `rgba(${keColor === '#4ade80' ? '74,222,128' : keColor === '#fbbf24' ? '251,191,36' : '248,113,113'},${popAlpha})`
+        ctx.font = '8px monospace'
+        ctx.fillText(`KE xfer: ${pd.keTransferPct}%`, bx + 6, by + 29)
+
+        // Angle
+        ctx.fillStyle = `rgba(167,139,250,${popAlpha})`
+        ctx.fillText(`θ = ${pd.angle}°`, bx + 6, by + 41)
+      }
     }
 
     // "Following" label — now shows live velocity readout
