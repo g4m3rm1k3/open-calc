@@ -76,4 +76,18 @@ export const COURSES = [
     desc: 'Build a Full Game from Scratch',
     color: 'rose'
   },
+  {
+    key: 'cs-1',
+    label: 'Computer Science',
+    path: '/course/cs-1',
+    desc: 'Logic, Circuits & Algorithms',
+    color: 'violet'
+  },
+  {
+    key: 'chemistry-1',
+    label: 'Chemistry',
+    path: '/course/chemistry-1',
+    desc: 'Elements, Reactions & Structure',
+    color: 'lime'
+  },
 ];

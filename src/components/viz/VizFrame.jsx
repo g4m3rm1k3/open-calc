@@ -828,6 +828,13 @@ const VIZ_REGISTRY = {
 
   // Static SVG diagrams — use props: { type: "kinematic-chain" } etc.
   SVGDiagram: lazy(() => import("./SVGDiagram.jsx")),
+
+  // ─── Computer Science ─────────────────────────────────────────────────────
+  LogicSim: lazy(() => import("./react/LogicSim.jsx")),
+
+  // ─── Chemistry ────────────────────────────────────────────────────────────
+  PeriodicTable:    lazy(() => import("./react/PeriodicTable.jsx")),
+  MoleculeBuilder:  lazy(() => import("./react/MoleculeBuilder.jsx")),
 };
 
 function VizSkeleton() {

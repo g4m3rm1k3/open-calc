@@ -210,6 +210,7 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
           <CoursesDropdown />
           <NavLink to="/reference" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-100 hover:text-amber-600'}`}>Reference</NavLink>
           <NavLink to="/universal-calc" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100 hover:text-emerald-600'}`}>Universal Calc</NavLink>
+          <NavLink to="/logic-sim" className={({ isActive }) => `text-sm font-bold transition-colors ${isActive ? 'text-violet-600 dark:text-violet-400' : 'text-slate-800 dark:text-slate-100 hover:text-violet-600'}`}>Logic Sim</NavLink>
           <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none">
             <span className="text-sm font-bold text-slate-500">DSA</span>
             <span className="text-[9px] uppercase tracking-widest font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-1 py-0.5 rounded">Soon</span>

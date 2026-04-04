@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import {
   X, Download, BookOpen, Code2, Terminal, Layers, ChevronRight,
   ArrowRight, ArrowLeft, Check, MousePointer, Play, FileText,
-  Lightbulb, GraduationCap, Zap, Info, Eye, CheckSquare
+  Lightbulb, GraduationCap, Zap, Info, Eye, CheckSquare, Bot, ClipboardCopy
 } from 'lucide-react'
 
 // ─── TEMPLATE STRINGS ────────────────────────────────────────────────────────
@@ -1518,6 +1518,322 @@ function SectionStandards() {
   )
 }
 
+// ─── SECTION: AI PROMPTS ─────────────────────────────────────────────────────
+
+const AI_PROMPTS = [
+  {
+    id: 'math-lesson',
+    label: 'Math Lesson',
+    color: 'blue',
+    prompt: `You are generating a lesson for open-calc, an interactive math/STEM platform.
+
+The lesson is a JS file with one default export matching this EXACT schema (no extra fields):
+
+export default {
+  id: 'ch1-derivatives',           // kebab-case, globally unique across all lessons
+  slug: 'ch1-what-is-a-derivative', // kebab-case, used in the URL
+  chapter: 'calc.1',               // MUST match the chapter object's number field exactly
+  order: 3,                        // integer position within chapter
+  title: 'What is a Derivative?',
+  subtitle: 'One-line plain-English description',
+  tags: ['calculus', 'derivatives'], // lowercase, hyphenated
+
+  hook: {
+    question: 'How fast is something changing right now?',
+    realWorldContext: 'One paragraph explaining real-world relevance.',
+    previewVisualizationId: 'SecantToTangent', // optional — leave out if none
+  },
+
+  intuition: {
+    prose: ['Paragraph 1.', 'Paragraph 2.'], // plain English, no LaTeX
+    callouts: [
+      { type: 'important', title: 'Key idea', body: 'Explanation.' },
+      { type: 'tip',       title: 'Shortcut', body: 'Explanation.' },
+    ],
+    visualizations: [
+      { id: 'SecantToTangent', title: 'Display title', props: {} }
+    ],
+  },
+
+  math: {
+    prose: ['Formal definition...'],
+    callouts: [],
+    visualizations: [],
+  },
+  rigor: { prose: [], callouts: [], visualizations: [] },
+
+  examples: [
+    {
+      title: 'Example: Power Rule',
+      problem: 'Find the derivative of f(x) = x^3.',
+      solution: 'Apply the power rule: bring down the exponent, reduce by 1.',
+      latex: 'f(x)=x^3 \\\\Rightarrow f\'(x)=3x^2',
+    },
+  ],
+
+  mentalModel: ['Key takeaway 1.', 'Key takeaway 2.'],
+  checkpoints: ['read-intuition'],
+  quiz: [
+    {
+      id: 'q1',
+      question: 'What does f\'(x) measure?',
+      options: ['Area under f', 'Instantaneous rate of change', 'Average value', 'Antiderivative'],
+      answer: 1, // 0-indexed correct answer
+      explanation: 'Because the derivative measures instantaneous rate of change.',
+    },
+  ],
+};
+
+RULES:
+- All prose arrays contain plain English sentences — NO LaTeX, NO Markdown
+- LaTeX only goes in: latex fields, callout body strings (use \\\\frac not \\frac in those)
+- callout type must be one of: 'important', 'tip', 'warning'
+- Never add schema fields not listed above
+- Do not invent visualization IDs — only use ones explicitly provided to you
+- id must be unique across the entire codebase`,
+  },
+  {
+    id: 'js-playground',
+    label: 'JS Notebook Lesson',
+    color: 'amber',
+    prompt: `You are generating an interactive JS coding lesson for open-calc using the JSNotebook component.
+
+The file has TWO parts — a notebook cells const, then a lesson metadata export.
+
+PART 1 — Notebook cells (define at module top level):
+
+const LESSON_MY_TOPIC = {
+  title: 'Lesson Title',
+  subtitle: 'One-line description',
+  sequential: true,
+  cells: [
+    // MARKDOWN cell — explanation/context only, no code
+    {
+      type: 'markdown',
+      instruction: '## Section heading\n\nExplanation prose. Use **bold** for emphasis.',
+    },
+    // JS cell — live runnable code
+    {
+      type: 'js',
+      instruction: 'What this cell teaches (use backtick code spans for keywords).',
+      html: '<div id="output"></div>',
+      css: 'body { background: #0f172a; color: #e2e8f0; padding: 12px; font-family: monospace; }',
+      startCode: '// Starter code the student sees and can run',
+      outputHeight: 300,
+    },
+    // CHALLENGE cell — student fills in blanks
+    {
+      type: 'challenge',
+      instruction: '**Challenge:** Complete the function...',
+      html: '<div id="result"></div>',
+      css: 'body { background: #0f172a; color: #e2e8f0; padding: 12px; }',
+      startCode: '// Scaffold with YOUR CODE HERE comments',
+      solutionCode: '// The complete working solution',
+      check: (code) => /expectedPattern/.test(code),
+      successMessage: 'Correct! Here is why it works.',
+      failMessage: 'Check X and Y in your code.',
+      outputHeight: 400,
+    },
+  ],
+};
+
+PART 2 — Lesson metadata export:
+
+export default {
+  id: 'tetris-02-describing-a-piece',
+  slug: 'tetris-describing-a-piece',
+  chapter: 'tetris.1',
+  order: 2,
+  title: 'Describing a Piece',
+  subtitle: '...',
+  tags: ['javascript', 'arrays'],
+  hook: { question: '...', realWorldContext: '...', previewVisualizationId: 'JSNotebook' },
+  intuition: {
+    prose: ['...'],
+    callouts: [],
+    visualizations: [{ id: 'JSNotebook', title: 'Lesson display title', props: { lesson: LESSON_MY_TOPIC } }],
+  },
+  math: { prose: [], callouts: [], visualizations: [] },
+  rigor: { prose: [], callouts: [], visualizations: [] },
+  examples: [],
+  challenges: [],
+  mentalModel: ['Takeaway 1.', 'Takeaway 2.'],
+  checkpoints: ['read-intuition'],
+  quiz: [],
+};
+
+RULES:
+- sequential: true means later cells can use variables declared in earlier cells
+- Every js/challenge cell must have: html, css, startCode, outputHeight
+- Every challenge cell must also have: solutionCode, check(), successMessage, failMessage
+- CSS uses dark theme by default: background #0f172a, text #e2e8f0
+- check() receives the student's full code as a string — use regex to verify key patterns
+- Keep each cell focused on ONE concept
+- Don't import anything — the notebook environment provides the browser globals`,
+  },
+  {
+    id: 'viz-component',
+    label: 'New Viz Component',
+    color: 'violet',
+    prompt: `You are building a new visualization React component for open-calc.
+
+FILE TARGET: src/components/viz/react/MyComponent.jsx
+
+COMPONENT RULES:
+1. One file, one default export — the React component
+2. Props signature: ({ params = {} }) — read config from params if needed
+3. Self-contained — no external data file imports, no CSS module imports
+4. Styling: inline styles or Tailwind classes only (no styled-components)
+5. No document.querySelector outside useEffect. Clean up all effects on unmount.
+6. Responsive: do not use height: 100vh. Render inside a card of natural height.
+7. Dark mode: check document.documentElement.classList.contains('dark') or listen for class changes via MutationObserver.
+8. Available globals: React, three (as 'three'), d3 (as 'd3'). No other external libs.
+9. Keep the component under 400 lines. Move sub-components into the same file.
+
+REGISTRATION — add one line to src/components/viz/VizFrame.jsx inside VIZ_REGISTRY:
+  MyComponent: lazy(() => import('./react/MyComponent.jsx')),
+
+USAGE in a lesson file:
+  visualizations: [{ id: 'MyComponent', title: 'Display Title', props: { key: value } }]
+
+VALIDATION:
+  Run: npm run build
+  No TypeScript, no JSX transform issues — the project uses standard Vite + React 18.`,
+  },
+  {
+    id: 'new-course',
+    label: 'New Course',
+    color: 'green',
+    prompt: `You are adding a new course to open-calc. Complete all 5 steps exactly.
+
+STEP 1 — Create src/content/[course-key]-1/lesson1.js
+Use the full Math Lesson schema. Set chapter: '[coursekey.1]' — must match STEP 2's number.
+
+STEP 2 — Create src/content/[course-key]-1/index.js
+import lesson1 from './lesson1.js'
+const COURSE_CH1 = {
+  title: 'Chapter Title',
+  number: '[coursekey.1]',   // ← lesson chapter fields must match this exactly
+  slug: 'coursekey-chapter-slug',
+  description: 'One paragraph.',
+  course: '[course-key]-1',  // must match STEP 3's key
+  lessons: [lesson1],
+};
+export default [COURSE_CH1];
+
+STEP 3 — Add to src/content/courses.js (inside the COURSES array):
+{
+  key: '[course-key]-1',
+  label: 'Course Display Name',
+  path: '/course/[course-key]-1',
+  desc: 'Short tagline',
+  color: 'indigo',  // Tailwind color name
+},
+
+STEP 4 — Add to src/content/index.js:
+// At the top with other imports:
+import courseKey1 from './[course-key]-1/index.js'
+// In the const section:
+const COURSE_KEY_CURRICULUM = courseKey1.map(ch => ({ ...ch, course: '[course-key]-1' }))
+// In the CURRICULUM array:
+...COURSE_KEY_CURRICULUM,
+
+STEP 5 — Register any new viz components in VizFrame.jsx if lessons use them.
+
+VALIDATION: Run npm run build and check for:
+  ✔ "[N] lessons indexed" — number should increase
+  ✔ No "[open-calc validator]" warnings (chapter mismatch)
+  ✔ "built in Xs" with no errors`,
+  },
+]
+
+function SectionAIPrompts() {
+  const [active, setActive] = useState('math-lesson')
+  const [copied, setCopied] = useState(false)
+  const prompt = AI_PROMPTS.find(p => p.id === active)
+
+  const copy = () => {
+    navigator.clipboard.writeText(prompt.prompt).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const colorMap = {
+    blue:   'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    amber:  'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    violet: 'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+    green:  'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+  }
+
+  return (
+    <div>
+      <SectionHeading sub="Paste into any AI assistant. It already knows the rules.">
+        AI Generation Prompts
+      </SectionHeading>
+
+      <Para>
+        These prompts encode open-calc conventions — the exact lesson schema, JSNotebook cell format, viz registration steps, and build validation commands. Paste one into ChatGPT, Claude, or Copilot Chat and describe what you want to build.
+      </Para>
+
+      <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 mb-5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+        <span className="font-bold text-amber-700 dark:text-amber-400">Why a prompt?</span>{' '}
+        AI-generated files often deviate from project structure — wrong schema fields, bad import paths, invented viz IDs. These prompts front-load the rules so the AI follows them from the first response.
+      </div>
+
+      {/* Selector tabs */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {AI_PROMPTS.map(p => (
+          <button
+            key={p.id}
+            onClick={() => { setActive(p.id); setCopied(false) }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+              active === p.id
+                ? colorMap[p.color]
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Prompt display */}
+      <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-950 overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-700">
+          <span className="text-xs font-mono text-slate-400">{prompt?.label} prompt</span>
+          <button
+            onClick={copy}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-colors bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600"
+          >
+            <ClipboardCopy className="w-3.5 h-3.5" />
+            {copied ? 'Copied!' : 'Copy prompt'}
+          </button>
+        </div>
+        <pre className="px-4 py-4 text-xs text-slate-300 font-mono leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto">
+          {prompt?.prompt}
+        </pre>
+      </div>
+
+      <H3>How to use</H3>
+      <ol className="space-y-3 mt-3">
+        {[
+          'Pick the prompt matching what you want to build: Math Lesson, JS Notebook, Viz Component, or New Course.',
+          'Click Copy and paste the prompt into your AI chat as the first message (system prompt or opening context).',
+          'Describe your request: "Write a lesson on the chain rule with 3 worked examples" or "Build an interactive pendulum for the physics course."',
+          'Review the AI output against the schema. Check: chapter matches, id is unique, no extra fields, viz IDs are real.',
+          'Run npm run build and watch for [open-calc validator] warnings. Fix any chapter mismatches before committing.',
+        ].map((step, i) => (
+          <li key={i} className="flex items-start gap-3">
+            <span className="w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{step}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
 
 const NAV = [
@@ -1554,6 +1870,12 @@ const NAV = [
       { id: 'standards',     label: 'Content Standards',   Icon: CheckSquare },
     ],
   },
+  {
+    group: 'AI Generation',
+    items: [
+      { id: 'ai-prompts',    label: 'AI Prompts',          Icon: Bot },
+    ],
+  },
 ]
 
 const SECTION_MAP = {
@@ -1565,6 +1887,7 @@ const SECTION_MAP = {
   'use-viz':      SectionUseViz,
   'build-viz':    SectionBuildViz,
   'standards':    SectionStandards,
+  'ai-prompts':   SectionAIPrompts,
 }
 
 // ─── MAIN MODAL ──────────────────────────────────────────────────────────────
