@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { parseProse } from '../math/parseProse.jsx';
 import KatexBlock from '../math/KatexBlock.jsx';
+import { useProgress } from '../../hooks/useProgress.js';
 
 // Normalize user input for robust verification
 function normalize(str) {
@@ -17,6 +18,7 @@ export default function AssessmentBlock({ assessment, lessonId }) {
   const [status, setStatus] = useState({});
   const [hints, setHints] = useState({});
   const [progress, setProgress] = useState(0);
+  const { markCheckpoint } = useProgress();
 
   useEffect(() => {
     // Load from localStorage if available
@@ -48,6 +50,9 @@ export default function AssessmentBlock({ assessment, lessonId }) {
     // Calculate progress
     const correctCount = Object.values(newStatus).filter(v => v === 'correct').length;
     setProgress(Math.round((correctCount / assessment.questions.length) * 100));
+    if (correctCount === assessment.questions.length && lessonId) {
+      markCheckpoint(lessonId, 'quiz-passed');
+    }
   };
 
   const showHint = (qId) => {

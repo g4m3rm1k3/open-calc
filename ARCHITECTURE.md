@@ -950,12 +950,14 @@ If `public/search-index.json` is missing or fails to load, `useSearch` now build
 ### ✅ I — `formatAsVisualization` dead code
 Function kept as a named export (imported by `unifiedLessonEnhancer.js`) but now has a top-of-file comment marking it explicitly disabled. The body still returns `null` on the first line. Decision: floating-player-only model is the current design. Restoring inline video blocks is left as future work.
 
-### 🔴 J — Three overlapping quiz systems
-- `InlineAssessment` inside `MicroCycleLesson` — renders `lesson.assessment.questions[]`, simple choice/input
-- `LessonQuizBlock` in `LessonPage` after the lesson — renders `lesson.quiz[]`, uses mathjs eval
-- `AssessmentBlock.jsx` — a third separate component, partially duplicates `InlineAssessment`
+### ⚠️ J — Three overlapping quiz systems (partially resolved)
+- `InlineAssessment` inside `MicroCycleLesson` — now calls `markCheckpoint(lessonId, 'quiz-passed')` via `useEffect` when all questions are answered correctly
+- `LessonQuizBlock` in `LessonPage` — now calls `markCheckpoint` when all questions answered with ≥ 80%
+- `AssessmentBlock.jsx` — now calls `markCheckpoint` when all questions reach 100%
 
-Most lessons use none of them. Completing any quiz does not call `markCheckpoint`, so quiz scores never affect lesson completion status.
+The three components still co-exist (consolidation deferred). Quiz scores now affect lesson completion status. To require quiz completion for a lesson, add `checkpoints: ['read-intuition', 'quiz-passed']` to the lesson object.
+
+**Answer reveal removed**: wrong answers no longer expose the correct answer. Choice questions only highlight the user’s selection (red/green). Input questions say “Incorrect — try again” with a retry button.
 
 ### ✅ K — SpiralBlock renders before MathBlock
 Fixed render order: `Intuition → mentalModel → Math → Rigor → Dock → Practice → Spiral → Assessment`. Spiral ("where you've been / where you're going") now appears after Practice as a capstone, not mid-flow.
@@ -1213,4 +1215,4 @@ incomplete ideas/
 
 ---
 
-*Last updated April 3, 2026. Recent changes: Tetris course (`tetris-1/`) added; navbar replaced with `CoursesDropdown`; `HomePage` now shows course cards instead of flat chapter list; sidebar chapter colors now fall back to course color; header raised to `z-[60]` to fix dropdown layering over sidebar; video system refactored to tag-based three-tier discovery (`videoSelector.js`); `FloatingVideoPlayer` sync effect fixed; `VizFrame` dev placeholder for unknown viz IDs (Issue L); `SpiralBlock` moved after Practice (Issue K); `MobileLocationBadge` fixed for non-numeric chapter IDs (Issue N); `formatAsVisualization` dead code annotated (Issue I).*
+*Last updated April 4, 2026. Recent changes: Tetris course; CoursesDropdown nav; course card homepage; sidebar color fallback; header z-index fix; video tag-based discovery; FloatingVideoPlayer sync fix; VizFrame dev placeholder (L); SpiralBlock reorder (K); MobileLocationBadge fix (N); formatAsVisualization annotated (I); all three quiz components now call `markCheckpoint` (J); quiz answer reveal removed; `CONTRIBUTING.md` updated with string chapter IDs.*

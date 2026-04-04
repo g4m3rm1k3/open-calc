@@ -15,18 +15,20 @@ Thanks for helping improve open-calc. This guide covers everything you need to a
 
 ## 1. Adding a new lesson
 
-All lesson content lives in `src/content/chapter-X/`. Each file exports a single JS object. Here is the complete format with every supported field:
+All lesson content lives in `src/content/{course-folder}/`. Each file exports a single JS object. Here is the complete format with every supported field:
 
 ```javascript
 export default {
   // ── Identity ────────────────────────────────────────────────────────────
   id: 'ch2-001',                         // unique, used for cross-refs
   slug: 'differentiation-rules',         // URL segment
-  chapter: 2,
+  chapter: 2,                            // must match the chapter's `number` field in index.js
+                                         // For calc: a number (0–6). For other courses: a string.
+                                         // e.g. chapter: 'geometry-1' or chapter: 'tetris.1'
   order: 1,
   title: 'Differentiation Rules',
   subtitle: 'One-line teaser shown in the chapter index',
-  tags: ['power rule', 'product rule'],  // for search
+  tags: ['power rule', 'product rule'],  // drives video tag-matching and search
   aliases: 'alternate search terms',     // extra search index terms
 
   // ── Hook ────────────────────────────────────────────────────────────────

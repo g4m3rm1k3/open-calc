@@ -7,7 +7,7 @@
  * Visualizations are embedded full-width inside their section, not in a sidebar.
  * Mathematics starts open; Formal Proof starts collapsed ("prove it when ready").
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import StepThrough from './StepThrough.jsx'
@@ -17,6 +17,7 @@ import ChallengeBlock from './ChallengeBlock.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 import KatexBlock from '../math/KatexBlock.jsx'
+import { useProgress } from '../../hooks/useProgress.js'
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
 export { parseProse } from '../math/parseProse.jsx'
@@ -581,10 +582,21 @@ function SpiralBlock({ spiral }) {
 
 // ─── ✅ Assessment block ──────────────────────────────────────────────────────
 
-function InlineAssessment({ assessment }) {
+function InlineAssessment({ assessment, lessonId }) {
   if (!assessment?.questions?.length) return null
   const [answers, setAnswers] = useState({})
   const [revealed, setRevealed] = useState({})
+  const { markCheckpoint } = useProgress()
+
+  const total = assessment.questions.length
+  useEffect(() => {
+    const allCorrect = assessment.questions.every(q => {
+      const userAns = (answers[q.id] ?? '').trim().toLowerCase()
+      const correctAnswer = (q.answer ?? '').toString().trim().toLowerCase()
+      return userAns !== '' && correctAnswer !== '' && userAns === correctAnswer
+    })
+    if (allCorrect && lessonId) markCheckpoint(lessonId, 'quiz-passed')
+  }, [answers])
 
   return (
     <div className="mt-10 rounded-2xl border border-emerald-200 dark:border-emerald-900/40 overflow-hidden">
@@ -675,7 +687,7 @@ export default function MicroCycleLesson({ lesson }) {
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
       <SpiralBlock spiral={lesson.spiral} />
-      <InlineAssessment assessment={lesson.assessment} />
+      <InlineAssessment assessment={lesson.assessment} lessonId={lesson.id} />
       {lesson.supplementalVisualizations?.length > 0 && (
         <div className="mt-12 space-y-8">
           <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />
