@@ -590,12 +590,12 @@ export default function MicroCycleLesson({ lesson }) {
     <div className="w-full">
       <IntuitionBlock data={lesson.intuition} lesson={lesson} />
       {lesson.mentalModel?.length > 0 && (
-         <div className="mb-10 p-5 rounded-2xl bg-slate-900 text-white border-b-4 border-brand-500 shadow-2xl">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
+         <div className="mb-10 p-5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-transparent border-b-4 border-b-brand-500 shadow-md dark:shadow-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
             <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
                {lesson.mentalModel.map((item, i) => (
                  <div key={i} className="text-center">
-                    <p className="text-base font-bold bg-gradient-to-r from-brand-300 to-emerald-300 bg-clip-text text-transparent">{item}</p>
+                    <p className="text-base font-bold text-slate-800 dark:text-transparent dark:bg-gradient-to-r dark:from-brand-300 dark:to-emerald-300 dark:bg-clip-text">{item}</p>
                  </div>
                ))}
             </div>

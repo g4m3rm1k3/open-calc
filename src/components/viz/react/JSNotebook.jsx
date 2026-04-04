@@ -1,58 +1,134 @@
 /**
  * JSNotebook.jsx
  * CodePen-style interactive JavaScript learning environment.
- *
- * Layout per cell:
- *   1. Lesson instruction (prose)
- *   2. Live preview canvas (iframe)
- *   3. Tabbed editor — HTML | CSS | JS — using Monaco
- *   4. Console output panel
- *   5. Challenge feedback banner
+ * Fully theme-aware — adapts to light/dark mode automatically.
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import ReactMarkdown from "react-markdown";
 
-// ── Colour tokens ─────────────────────────────────────────────────────────────
-const T = {
-  bg:       "var(--color-background-primary, #0f172a)",
-  panel:    "var(--color-background-secondary, #1e293b)",
-  border:   "var(--color-border-tertiary, #334155)",
-  text:     "var(--color-text-primary, #e2e8f0)",
-  muted:    "var(--color-text-tertiary, #64748b)",
-  accent:   "#38bdf8",
-  green:    "#34d399",
-  red:      "#f87171",
-  yellow:   "#fbbf24",
-  purple:   "#a78bfa",
-  editorBg: "#0c1222",
-  runBtn:   "#0ea5e9",
-};
+// ── Theme hook ────────────────────────────────────────────────────────────────
+function useIsDark() {
+  const isDark = () =>
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark");
+  const [dark, setDark] = useState(isDark);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(isDark()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
+}
+
+// ── Colour tokens — computed per theme ───────────────────────────────────────
+function makeT(dark) {
+  return {
+    bg:       dark ? "#0f172a"  : "#f8fafc",
+    panel:    dark ? "#1e293b"  : "#ffffff",
+    panel2:   dark ? "#0f172a"  : "#f1f5f9",
+    border:   dark ? "#334155"  : "#e2e8f0",
+    text:     dark ? "#e2e8f0"  : "#1e293b",
+    muted:    dark ? "#94a3b8"  : "#64748b",
+    accent:   dark ? "#38bdf8"  : "#0284c7",
+    green:    dark ? "#34d399"  : "#16a34a",
+    red:      dark ? "#f87171"  : "#dc2626",
+    yellow:   dark ? "#fbbf24"  : "#d97706",
+    editorBg: dark ? "#0c1222"  : "#f8fafc",
+    runBtn:   "#0ea5e9",
+    tabBar:   dark ? "#0c1520"  : "#f1f5f9",
+    iframeBg: dark ? "#0f1923"  : "#ffffff",
+    iframeText: dark ? "#e2e8f0" : "#1e293b",
+  };
+}
+
+// CSS vars injected into every iframe so lesson CSS (var(--color-*)) resolves correctly
+function iframeThemeVars(dark) {
+  return dark ? `
+    --color-background-primary:   #0f172a;
+    --color-background-secondary: #1e293b;
+    --color-background-tertiary:  #0f172a;
+    --color-background-info:      #172554;
+    --color-border-primary:       #334155;
+    --color-border-secondary:     #475569;
+    --color-border-tertiary:      #334155;
+    --color-text-primary:         #e2e8f0;
+    --color-text-secondary:       #94a3b8;
+    --color-text-tertiary:        #64748b;
+    --color-text-info:            #93c5fd;
+  ` : `
+    --color-background-primary:   #ffffff;
+    --color-background-secondary: #f8fafc;
+    --color-background-tertiary:  #f1f5f9;
+    --color-background-info:      #eff6ff;
+    --color-border-primary:       #e2e8f0;
+    --color-border-secondary:     #cbd5e1;
+    --color-border-tertiary:      #e2e8f0;
+    --color-text-primary:         #1e293b;
+    --color-text-secondary:       #475569;
+    --color-text-tertiary:        #64748b;
+    --color-text-info:            #1d4ed8;
+  `;
+}
 
 const TABS = ["html", "css", "js"];
 const TAB_LABEL = { html: "HTML", css: "CSS", js: "JavaScript" };
 const MONACO_LANG = { html: "html", css: "css", js: "javascript" };
 
 // ── Build sandboxed iframe document ──────────────────────────────────────────
-function buildIframeDoc(html = "", css = "", js = "", cellIndex) {
+function buildIframeDoc(html = "", css = "", js = "", cellIndex, dark) {
   const uid = Math.random().toString(36).slice(2);
   const escapedJs = js.replace(/<\/script>/gi, "<\\/script>");
-  
+  const iframeBg   = dark ? "#0f1923" : "#ffffff";
+  const iframeText = dark ? "#e2e8f0" : "#1e293b";
+
+  // Feedback colors accessible to lesson JS as window.__theme
+  const theme = dark ? {
+    ok:    { bg:"#052e16", border:"#10b981", color:"#4ade80" },
+    err:   { bg:"#450a0a", border:"#ef4444", color:"#f87171" },
+    warn:  { bg:"#451a03", border:"#f59e0b", color:"#fbbf24" },
+  } : {
+    ok:    { bg:"#d1fae5", border:"#10b981", color:"#065f46" },
+    err:   { bg:"#fee2e2", border:"#ef4444", color:"#991b1b" },
+    warn:  { bg:"#fef3c7", border:"#f59e0b", color:"#92400e" },
+  };
+
   return `<!DOCTYPE html>
-<html>
+<html class="${dark ? "dark" : ""}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
+:root {
+  ${iframeThemeVars(dark)}
+}
 *, *::before, *::after { box-sizing: border-box; }
 body {
   margin: 0; padding: 14px;
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 14px;
-  background: #0f1923;
-  color: #e2e8f0;
+  background: ${iframeBg};
+  color: ${iframeText};
 }
+/* ── Dark-mode overrides for common lesson CSS patterns ── */
+html.dark .ch1 { background: #052e16 !important; border-color: #166534 !important; }
+html.dark .ch1 .ch-label { color: #4ade80 !important; }
+html.dark .ch2 { background: #172554 !important; border-color: #1e40af !important; }
+html.dark .ch2 .ch-label { color: #93c5fd !important; }
+html.dark .ch3 { background: #2e1065 !important; border-color: #7c3aed !important; }
+html.dark .ch3 .ch-label { color: #c4b5fd !important; }
+html.dark .ch4 { background: #431407 !important; border-color: #c2410c !important; }
+html.dark .ch4 .ch-label { color: #fdba74 !important; }
+html.dark .burns  { background: #451a03 !important; color: #fbbf24 !important; }
+html.dark .stable { background: #052e16 !important; color: #4ade80 !important; }
+html.dark .dissolves { background: #052e16 !important; color: #4ade80 !important; }
+html.dark .separates { background: #450a0a !important; color: #f87171 !important; }
+html.dark .atom-card { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .fact-card  { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .result-box { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .comp-item  { background: #1e293b !important; border-color: #334155 !important; }
+html.dark .demo       { background: #1e293b !important; border-color: #334155 !important; }
 ${css}
 </style>
 </head>
@@ -60,6 +136,7 @@ ${css}
 ${html}
 <script>
 window.__cellId = '${uid}';
+window.__theme = ${JSON.stringify(theme)};
 (function() {
   const _log = console.log.bind(console);
   const _err = console.error.bind(console);
@@ -74,7 +151,6 @@ window.__cellId = '${uid}';
   console.log   = (...a) => { _log(...a);  post('log',  a); };
   console.error = (...a) => { _err(...a);  post('error',a); };
   console.warn  = (...a) => { _warn(...a); post('warn', a); };
-  
   window.addEventListener('error', e => {
     if (e.error) post('error', [e.message]);
     e.preventDefault();
@@ -92,30 +168,30 @@ ${escapedJs}
 </html>`;
 }
 
-// ── Render markdown instruction text ──────────────────────────────────────────
-function InstructionText({ text }) {
+// ── Markdown instruction text ─────────────────────────────────────────────────
+function InstructionText({ text, T }) {
   if (!text) return null;
   return (
-    <div className="prose prose-invert max-w-none" style={{ 
-      fontSize: 14, 
-      lineHeight: 1.8, 
-      color: T.text 
-    }}>
+    <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
       <ReactMarkdown
         components={{
-          h1: ({node, ...props}) => <h1 style={{fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem', color: T.accent}} {...props}/>,
-          h2: ({node, ...props}) => <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem', color: T.accent}} {...props}/>,
-          h3: ({node, ...props}) => <h3 style={{fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem', color: T.accent}} {...props}/>,
-          p: ({node, ...props}) => <p style={{marginBottom: '1rem'}} {...props}/>,
-          ul: ({node, ...props}) => <ul style={{listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '1rem'}} {...props}/>,
-          li: ({node, ...props}) => <li style={{marginBottom: '0.25rem'}} {...props}/>,
-          code: ({node, inline, ...props}) => 
+          h1: ({ node, ...p }) => <h1 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "1rem", color: T.accent }} {...p} />,
+          h2: ({ node, ...p }) => <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem", color: T.accent }} {...p} />,
+          h3: ({ node, ...p }) => <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: "0.5rem", color: T.accent }} {...p} />,
+          p:  ({ node, ...p }) => <p style={{ marginBottom: "1rem" }} {...p} />,
+          ul: ({ node, ...p }) => <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", marginBottom: "1rem" }} {...p} />,
+          ol: ({ node, ...p }) => <ol style={{ listStyleType: "decimal", paddingLeft: "1.5rem", marginBottom: "1rem" }} {...p} />,
+          li: ({ node, ...p }) => <li style={{ marginBottom: "0.25rem" }} {...p} />,
+          code: ({ node, inline, ...p }) =>
             inline ? (
-              <code style={{ fontFamily: "monospace", background: "#0c1222", color: T.accent, padding: "2px 6px", borderRadius: 4, fontSize: 12 }} {...props} />
+              <code style={{ fontFamily: "monospace", background: T.panel2, color: T.accent, padding: "2px 6px", borderRadius: 4, fontSize: 12 }} {...p} />
             ) : (
-              <code style={{ display: 'block', padding: '12px', background: '#080c14', borderRadius: 8, margin: '12px 0' }} {...props} />
+              <code style={{ display: "block", padding: "12px", background: T.panel2, borderRadius: 8, margin: "12px 0", fontSize: 12, fontFamily: "monospace" }} {...p} />
             ),
-          strong: ({node, ...props}) => <strong style={{color: T.accent, fontWeight: 700}} {...props}/>
+          strong: ({ node, ...p }) => <strong style={{ color: T.text, fontWeight: 700 }} {...p} />,
+          blockquote: ({ node, ...p }) => (
+            <blockquote style={{ borderLeft: `3px solid ${T.accent}`, paddingLeft: 14, color: T.muted, margin: "12px 0" }} {...p} />
+          ),
         }}
       >
         {text}
@@ -124,12 +200,12 @@ function InstructionText({ text }) {
   );
 }
 
-// ── Console output panel ──────────────────────────────────────────────────────
-function ConsolePanel({ logs }) {
+// ── Console panel ─────────────────────────────────────────────────────────────
+function ConsolePanel({ logs, T }) {
   const color = { log: T.text, error: T.red, warn: T.yellow };
   const icon  = { log: ">", error: "✗", warn: "⚠" };
   return (
-    <div style={{ background: "#080e18", borderTop: `1px solid ${T.border}`, padding: "8px 14px", height: 120, overflowY: "auto" }}>
+    <div style={{ background: T.panel2, borderTop: `1px solid ${T.border}`, padding: "8px 14px", height: 120, overflowY: "auto" }}>
       <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6 }}>Console</div>
       {logs.length === 0 ? (
         <div style={{ fontFamily: "monospace", fontSize: 12, lineHeight: 1.6, color: T.muted }}>Run the cell to stream output here.</div>
@@ -145,10 +221,9 @@ function ConsolePanel({ logs }) {
   );
 }
 
-// ── Single CodePen-style cell ─────────────────────────────────────────────────
-function NotebookCell({ cell, cellIndex }) {
+// ── Single notebook cell ──────────────────────────────────────────────────────
+function NotebookCell({ cell, cellIndex, T, dark }) {
   const iframeRef = useRef(null);
-  // Default to the first meaningful tab — html if present, else js
   const defaultTab = cell.html ? "html" : "js";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [html, setHtml] = useState(cell.html || "");
@@ -161,19 +236,11 @@ function NotebookCell({ cell, cellIndex }) {
   const [showConsole, setShowConsole] = useState(false);
   const [showPreview, setShowPreview] = useState(!!cell.showPreviewByDefault);
 
-  // Force the iframe to ALWAYS exist in the DOM from the beginning
-  // so the iframeRef is never null when we click Run.
-  const [hasInitializedIframe, setHasInitializedIframe] = useState(true);
-
-  // Listen for console messages from this cell's iframe
   useEffect(() => {
     const handler = (e) => {
       if (!e.data || e.data.type !== "jsnb_console") return;
-      // ONLY accept logs if they match this cell's index to prevent cross-talk
       if (e.data.cellIndex !== cellIndex) return;
-
       setLogs(prev => [...prev, { level: e.data.level, msg: e.data.msg }]);
-      // Force console open if there's content
       setShowConsole(true);
     };
     window.addEventListener("message", handler);
@@ -183,20 +250,13 @@ function NotebookCell({ cell, cellIndex }) {
   const run = useCallback(() => {
     setLogs([]);
     setHasRun(true);
-    
-    // 1. Determine which panels to show
     const needsPreview = html.trim() || css.trim();
     if (needsPreview) setShowPreview(true);
     setShowConsole(true);
-
     const activeJs = showSolution ? (cell.solutionCode || js) : js;
-
-    // 2. Inject content into iframe
     if (iframeRef.current) {
-      iframeRef.current.srcdoc = buildIframeDoc(html, css, activeJs, cellIndex);
+      iframeRef.current.srcdoc = buildIframeDoc(html, css, activeJs, cellIndex, dark);
     }
-
-    // 3. Challenge check
     if (cell.type === "challenge" && cell.check) {
       setTimeout(() => {
         try {
@@ -205,7 +265,7 @@ function NotebookCell({ cell, cellIndex }) {
         } catch (_) { setChallengeState("fail"); }
       }, 300);
     }
-  }, [html, css, js, showSolution, cell, logs, cellIndex]);
+  }, [html, css, js, showSolution, cell, logs, cellIndex, dark]);
 
   const reset = () => {
     setHtml(cell.html || "");
@@ -223,12 +283,11 @@ function NotebookCell({ cell, cellIndex }) {
   if (cell.type === "markdown") {
     return (
       <div style={{ background: T.panel, borderRadius: 12, border: `1px solid ${T.border}`, padding: "20px 22px", marginBottom: 20 }}>
-        <InstructionText text={cell.instruction} />
+        <InstructionText text={cell.instruction} T={T} />
       </div>
     );
   }
 
-  // Always show all three tabs — JS may be empty but is always available
   const visibleTabs = TABS.filter(t => {
     if (t === "html") return !!(cell.html);
     if (t === "css")  return !!(cell.css);
@@ -246,16 +305,15 @@ function NotebookCell({ cell, cellIndex }) {
     if (activeTab === "css")  setCss(val);
   };
 
-  // Line count for Monaco height
   const lineCount = editorValue.split("\n").length;
   const editorHeight = Math.min(360, Math.max(120, lineCount * 20 + 28));
 
   return (
-    <div style={{ marginBottom: 24, borderRadius: 12, border: `1px solid ${T.border}`, overflow: "hidden" }}>
+    <div style={{ marginBottom: 24, borderRadius: 12, border: `1px solid ${T.border}`, overflow: "hidden", background: T.panel }}>
 
-      {/* ── Instruction ── */}
+      {/* Instruction */}
       {cell.instruction && (
-        <div style={{ background: T.panel, padding: "16px 20px", borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${T.border}` }}>
           {cell.type === "challenge" && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
               <div style={{ width: 26, height: 26, borderRadius: "50%", background: T.yellow + "22", border: `1.5px solid ${T.yellow}`, color: T.yellow, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -264,16 +322,12 @@ function NotebookCell({ cell, cellIndex }) {
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: T.yellow, background: T.yellow + "18", padding: "2px 8px", borderRadius: 10, border: `0.5px solid ${T.yellow}` }}>Challenge</span>
             </div>
           )}
-          <InstructionText text={cell.instruction} />
+          <InstructionText text={cell.instruction} T={T} />
         </div>
       )}
 
-      {/* ── Live preview canvas ── */}
-      <div style={{ 
-        background: "#0a1016", 
-        borderBottom: `1px solid ${T.border}`,
-        display: showPreview ? "block" : "none" 
-      }}>
+      {/* Live preview */}
+      <div style={{ background: T.iframeBg, borderBottom: `1px solid ${T.border}`, display: showPreview ? "block" : "none" }}>
         <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: ".08em", textTransform: "uppercase", padding: "7px 14px 0" }}>Preview</div>
         <iframe
           ref={iframeRef}
@@ -283,102 +337,86 @@ function NotebookCell({ cell, cellIndex }) {
         />
       </div>
 
-      {/* ── Tab bar + action buttons ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0c1520", borderBottom: `1px solid ${T.border}`, padding: "0 10px" }}>
-        {/* Tabs */}
+      {/* Tab bar + action buttons */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: T.tabBar, borderBottom: `1px solid ${T.border}`, padding: "0 10px" }}>
         <div style={{ display: "flex" }}>
           {visibleTabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: "8px 16px",
-                background: "transparent",
-                border: "none",
-                borderBottom: activeTab === tab ? `2px solid ${T.accent}` : "2px solid transparent",
-                color: activeTab === tab ? T.accent : T.muted,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-                letterSpacing: ".04em",
-                transition: "color .15s",
-              }}
-            >
+            <button key={tab} onClick={() => setActiveTab(tab)} style={{
+              padding: "8px 16px", background: "transparent", border: "none",
+              borderBottom: activeTab === tab ? `2px solid ${T.accent}` : "2px solid transparent",
+              color: activeTab === tab ? T.accent : T.muted,
+              fontSize: 12, fontWeight: 600, cursor: "pointer", letterSpacing: ".04em", transition: "color .15s",
+            }}>
               {TAB_LABEL[tab]}
             </button>
           ))}
         </div>
-
-        {/* Action buttons */}
         <div style={{ display: "flex", gap: 6, padding: "6px 0" }}>
-          <button
-            onClick={() => setShowPreview(s => !s)}
-            style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
-          >
-            {showPreview ? "Hide Preview" : "Show Preview"}
-          </button>
-          <button
-            onClick={() => setShowConsole(s => !s)}
-            style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
-          >
-            {showConsole ? "Hide Console" : "Show Console"}
-          </button>
+          {["Show Preview", "Show Console"].map((label, i) => {
+            const isVisible = i === 0 ? showPreview : showConsole;
+            const toggle = i === 0 ? () => setShowPreview(s => !s) : () => setShowConsole(s => !s);
+            return (
+              <button key={label} onClick={toggle} style={{
+                padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`,
+                background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer",
+              }}>
+                {isVisible ? label.replace("Show", "Hide") : label}
+              </button>
+            );
+          })}
           {cell.solutionCode && (
-            <button
-              onClick={() => setShowSolution(s => !s)}
-              style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.muted}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
-            >
+            <button onClick={() => setShowSolution(s => !s)} style={{
+              padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.muted}`,
+              background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer",
+            }}>
               {showSolution ? "Hide solution" : "Show solution"}
             </button>
           )}
-          <button
-            onClick={reset}
-            style={{ padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`, background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer" }}
-          >
-            Reset
-          </button>
-          <button
-            onClick={run}
-            style={{ padding: "5px 16px", borderRadius: 6, border: "none", background: T.runBtn, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
-          >
-            ▶ Run
-          </button>
+          <button onClick={reset} style={{
+            padding: "4px 11px", borderRadius: 6, border: `0.5px solid ${T.border}`,
+            background: "transparent", color: T.muted, fontSize: 11, cursor: "pointer",
+          }}>Reset</button>
+          <button onClick={run} style={{
+            padding: "5px 16px", borderRadius: 6, border: "none",
+            background: T.runBtn, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
+          }}>▶ Run</button>
         </div>
       </div>
 
-      {/* ── Monaco editor ── */}
+      {/* Monaco editor */}
       <div style={{ background: T.editorBg }}>
         <Editor
-          key={activeTab}
+          key={`${activeTab}-${dark}`}
           height={editorHeight}
           language={MONACO_LANG[activeTab]}
           value={editorValue}
           onChange={handleEditorChange}
-          theme="vs-dark"
+          theme={dark ? "vs-dark" : "light"}
           options={{
-            fontSize: 13,
-            lineHeight: 20,
+            fontSize: 13, lineHeight: 20,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
-            wordWrap: "on",
-            tabSize: 2,
+            wordWrap: "on", tabSize: 2,
             readOnly: showSolution && activeTab === "js",
             renderLineHighlight: "none",
-            overviewRulerLanes: 0,
-            folding: false,
-            lineDecorationsWidth: 6,
-            lineNumbersMinChars: 3,
+            overviewRulerLanes: 0, folding: false,
+            lineDecorationsWidth: 6, lineNumbersMinChars: 3,
             padding: { top: 10, bottom: 10 },
           }}
         />
       </div>
 
-      {/* ── Console output ── */}
-      {showConsole && <ConsolePanel logs={logs} />}
+      {/* Console */}
+      {showConsole && <ConsolePanel logs={logs} T={T} />}
 
-      {/* ── Challenge feedback ── */}
+      {/* Challenge feedback */}
       {cell.type === "challenge" && (
-        <div style={{ minHeight: 44, padding: "10px 16px", borderTop: `1px solid ${T.border}`, background: !hasRun || !challengeState ? "transparent" : (challengeState === "pass" ? T.green + "14" : T.red + "12"), color: challengeState === "pass" ? T.green : (challengeState === "fail" ? T.red : T.muted), fontSize: 13, fontWeight: 500 }}>
+        <div style={{
+          minHeight: 44, padding: "10px 16px", borderTop: `1px solid ${T.border}`,
+          background: !hasRun || !challengeState ? "transparent" : (challengeState === "pass" ? T.green + "14" : T.red + "12"),
+          color: challengeState === "pass" ? T.green : (challengeState === "fail" ? T.red : T.muted),
+          fontSize: 13, fontWeight: 500,
+        }}>
           {!hasRun || !challengeState
             ? "Run your solution to unlock the next step."
             : (challengeState === "pass" ? (cell.successMessage || "✓ Challenge complete!") : (cell.failMessage || "✗ Not quite — try again."))}
@@ -392,29 +430,24 @@ function NotebookCell({ cell, cellIndex }) {
 export default function JSNotebook({ lesson: lessonProp, params = {} }) {
   const lesson = lessonProp ?? params.lesson;
   const { title, subtitle, cells = [] } = lesson || {};
+  const dark = useIsDark();
+  const T = makeT(dark);
 
   if (!lesson) return null;
 
   return (
     <div style={{ fontFamily: "var(--font-sans, system-ui)", color: T.text, padding: "4px 0" }}>
-      {/* Lesson header */}
       {title && (
         <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: `1px solid ${T.border}` }}>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: T.accent, marginBottom: 5 }}>
-            JavaScript · Interactive Lesson
+            Interactive Lesson
           </div>
           <div style={{ fontSize: 20, fontWeight: 600, color: T.text, marginBottom: subtitle ? 6 : 0 }}>{title}</div>
           {subtitle && <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6 }}>{subtitle}</div>}
         </div>
       )}
-
-      {/* Cells */}
       {cells.map((cell, i) => (
-        <NotebookCell
-          key={`${title}-${i}`}
-          cell={cell}
-          cellIndex={i}
-        />
+        <NotebookCell key={`${title}-${i}`} cell={cell} cellIndex={i} T={T} dark={dark} />
       ))}
     </div>
   );
