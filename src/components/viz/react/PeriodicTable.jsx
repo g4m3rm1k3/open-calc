@@ -159,16 +159,10 @@ function AtomViewer({ element, C }) {
 
     electronsRef.current = electronObjs
 
-    // Mouse orbit control (basic)
+    // Mouse orbit control
     let isDragging = false
     let prevMouse = { x: 0, y: 0 }
     let rotX = 0.3, rotY = 0.2
-    const group = new THREE.Group()
-    scene.children.filter(c => c !== ambient && c !== point1 && c !== point2)
-                   .forEach(c => group.add(c))
-    // Actually just let the scene rotate
-    const pivot = new THREE.Group()
-    scene.add(pivot)
 
     const onDown = e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY } }
     const onUp   = () => { isDragging = false }
