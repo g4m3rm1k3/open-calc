@@ -199,7 +199,14 @@ function resolveBallCollision(a, b, events, st) {
     // Store flash on stateRef so it survives across RAF frames
     if (st) {
       if (!st.flashes) st.flashes = []
-      st.flashes.push({ ax: (a.x + b.x) / 2, ay: (a.y + b.y) / 2, nx, ny, time: Date.now() })
+      st.flashes.push({
+        ax: (a.x + b.x) / 2, ay: (a.y + b.y) / 2, nx, ny, time: Date.now(),
+        popupData: {
+          impulse: impulseMag.toFixed(3),
+          keTransferPct,
+          angle: (Math.atan2(ny, nx) * 180 / Math.PI).toFixed(1),
+        }
+      })
     }
   }
 }
@@ -580,15 +587,14 @@ export default function PhysicsPoolLab({ onClose }) {
         const power = clamp(rawMag / 3.2, 0, 22)
         const pct = power / 22
 
-        const aimNx = rawMag > 0 ? -dx / rawMag : 0
-        const aimNy = rawMag > 0 ? -dy / rawMag : 0
+        const aimNx = rawMag > 0 ? dx / rawMag : 0
+        const aimNy = rawMag > 0 ? dy / rawMag : 0
 
-        // ── Ghost ball + deflection paths ────────────────────────────────
-        // Find nearest ball along aim line
+        // ── Forward-simulation predictor ─────────────────────────────────
+        // Find nearest ball along aim line (for ghost ball display only)
         const otherBalls = st.balls.filter(b => !b.pocketed && !b.isCue)
         let closestTarget = null, closestT = Infinity
         for (const ob of otherBalls) {
-          // ray-circle intersection
           const ex = ob.x - cue.x, ey = ob.y - cue.y
           const proj = ex * aimNx + ey * aimNy
           if (proj < 0) continue
@@ -599,34 +605,12 @@ export default function PhysicsPoolLab({ onClose }) {
           if (t > 0 && t < closestT) { closestT = t; closestTarget = ob }
         }
 
-        if (closestTarget && closestT < 500) {
-          // Ghost ball position (where cue makes contact)
+        // ── Ghost ball (where cue contacts nearest target) ────────────────
+        if (closestTarget) {
           const gx = cue.x + aimNx * closestT
           const gy = cue.y + aimNy * closestT
 
-          // Line of impact (cue center → target center)
-          const licDx = closestTarget.x - gx
-          const licDy = closestTarget.y - gy
-          const licMag = hypot(licDx, licDy) || 1
-          const licNx = licDx / licMag, licNy = licDy / licMag
-
-          // Tangent (cue deflection direction — perpendicular to line of impact)
-          const tanNx = -licNy, tanNy = licNx
-
-          // Masses for elastic collision
-          const ma = cue.mass, mb = closestTarget.mass
-
-          // Target ball path — gets component along line of impact
-          const vDotN = power * (aimNx * licNx + aimNy * licNy)
-          const targetSpeed = (2 * ma / (ma + mb)) * vDotN
-
-          // Cue ball remaining speed along tangent
-          const cueRemain = power * ((ma - mb) / (ma + mb))
-          const cueTanSpeed = power * (aimNx * tanNx + aimNy * tanNy)
-
-          const arrowScale = 5
-
-          // Aim guideline (dashed, to ghost pos)
+          // Aim guideline to ghost pos
           ctx.strokeStyle = 'rgba(255,255,255,0.3)'
           ctx.lineWidth = 1
           ctx.setLineDash([6, 5])
@@ -636,20 +620,19 @@ export default function PhysicsPoolLab({ onClose }) {
           ctx.stroke()
           ctx.setLineDash([])
 
-          // Ghost ball (semi-transparent)
+          // Ghost ball outline
           ctx.globalAlpha = 0.35
           ctx.fillStyle = cue.color
-          ctx.beginPath()
-          ctx.arc(gx, gy, cue.r, 0, Math.PI * 2)
-          ctx.fill()
+          ctx.beginPath(); ctx.arc(gx, gy, cue.r, 0, Math.PI * 2); ctx.fill()
           ctx.globalAlpha = 1
           ctx.strokeStyle = 'rgba(255,255,255,0.5)'
           ctx.lineWidth = 1
-          ctx.beginPath()
-          ctx.arc(gx, gy, cue.r, 0, Math.PI * 2)
-          ctx.stroke()
+          ctx.beginPath(); ctx.arc(gx, gy, cue.r, 0, Math.PI * 2); ctx.stroke()
 
-          // Line of impact (dotted purple)
+          // Line of impact
+          const licDx = closestTarget.x - gx, licDy = closestTarget.y - gy
+          const licMag = hypot(licDx, licDy) || 1
+          const licNx = licDx / licMag, licNy = licDy / licMag
           ctx.strokeStyle = 'rgba(168,139,250,0.7)'
           ctx.lineWidth = 1.5
           ctx.setLineDash([4, 4])
@@ -659,45 +642,113 @@ export default function PhysicsPoolLab({ onClose }) {
           ctx.stroke()
           ctx.setLineDash([])
 
-          // Target ball path (solid teal arrow)
-          const tLen = Math.abs(targetSpeed) * arrowScale
-          drawArrow(ctx, closestTarget.x, closestTarget.y, licNx * tLen, licNy * tLen, '#2dd4bf', 2.5)
-
-          // Label target path
-          ctx.fillStyle = '#2dd4bf'
-          ctx.font = 'bold 9px monospace'
-          ctx.textAlign = 'left'
-          const tlx = closestTarget.x + licNx * tLen * 0.5
-          const tly = closestTarget.y + licNy * tLen * 0.5
-          ctx.fillText(`v=${(targetSpeed).toFixed(1)}`, tlx + 6, tly - 5)
-
-          // Cue ball deflection path (solid amber arrow)
-          const cLen = Math.abs(cueTanSpeed) * arrowScale * 0.8
-          drawArrow(ctx, gx, gy, tanNx * cLen * Math.sign(cueTanSpeed), tanNy * cLen * Math.sign(cueTanSpeed), '#fbbf24', 2)
-
-          // Label cue deflection
-          ctx.fillStyle = '#fbbf24'
-          ctx.font = 'bold 9px monospace'
-          ctx.textAlign = 'right'
-          ctx.fillText('cue →', gx + tanNx * cLen * 0.45 - 4, gy + tanNy * cLen * 0.45 - 5)
-
-          // Impact angle label
+          // Angle label
           const impactAngleDeg = (Math.acos(clamp(aimNx * licNx + aimNy * licNy, -1, 1)) * 180 / Math.PI).toFixed(1)
           ctx.fillStyle = 'rgba(167,139,250,0.9)'
           ctx.font = 'bold 9px monospace'
           ctx.textAlign = 'center'
           ctx.fillText(`θ=${impactAngleDeg}°`, gx, gy + cue.r + 14)
+        }
 
-        } else {
-          // No target — plain aim line
-          ctx.strokeStyle = `rgba(255,255,255,${0.5 + pct * 0.4})`
-          ctx.lineWidth = 1.5
-          ctx.setLineDash([8, 6])
-          ctx.beginPath()
-          ctx.moveTo(cue.x, cue.y)
-          ctx.lineTo(cue.x + aimNx * 160, cue.y + aimNy * 160)
-          ctx.stroke()
-          ctx.setLineDash([])
+        // ── Forward simulation — run exact physics engine on cloned state ──
+        {
+          // Clone all active balls (shallow position/velocity copy only)
+          const simBalls = st.balls
+            .filter(b => !b.pocketed)
+            .map(b => ({
+              x: b.x, y: b.y, vx: b.vx, vy: b.vy, spin: b.spin,
+              mass: b.mass, r: b.r, isCue: b.isCue,
+              color: b.color, pocketed: false,
+              _trail: [{ x: b.x, y: b.y }],  // path history
+            }))
+
+          const simCue = simBalls.find(b => b.isCue)
+          if (simCue) {
+            simCue.vx = aimNx * power
+            simCue.vy = aimNy * power
+            simCue.spin = (hitOffsetRef.current.dx * simCue.vy - hitOffsetRef.current.dy * simCue.vx) * 1.6
+
+            const left = RAIL + BALL_R, right = TW - RAIL - BALL_R
+            const top  = RAIL + BALL_R, bot   = TH  - RAIL - BALL_R
+            const RECORD_EVERY = 4   // record every N steps
+            const MAX_STEPS = 600
+
+            for (let step = 0; step < MAX_STEPS; step++) {
+              // Integrate
+              for (const b of simBalls) {
+                if (b.pocketed) continue
+                b.x += b.vx; b.y += b.vy
+                b.vx *= FRICTION_MUT; b.vy *= FRICTION_MUT
+                b.spin *= SPIN_DECAY
+                b.vx += b.spin * (-b.vy) * 0.0012
+                b.vy += b.spin * (b.vx)  * 0.0012
+                if (b.x < left)  { b.x = left;  b.vx =  Math.abs(b.vx) * RESTITUTION_MUT }
+                if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * RESTITUTION_MUT }
+                if (b.y < top)   { b.y = top;   b.vy =  Math.abs(b.vy) * RESTITUTION_MUT }
+                if (b.y > bot)   { b.y = bot;   b.vy = -Math.abs(b.vy) * RESTITUTION_MUT }
+                // Pocket — remove from sim
+                for (const p of POCKETS) {
+                  if (hypot(b.x - p.x, b.y - p.y) < POCKET_R + 2) {
+                    b.pocketed = true; break
+                  }
+                }
+              }
+              // Ball-ball collisions (inline — no event recording needed)
+              const active = simBalls.filter(b => !b.pocketed)
+              for (let i = 0; i < active.length; i++) {
+                for (let j = i + 1; j < active.length; j++) {
+                  const a = active[i], b = active[j]
+                  const dx = b.x - a.x, dy = b.y - a.y
+                  const dist = hypot(dx, dy)
+                  if (dist === 0 || dist > a.r + b.r) continue
+                  const nx = dx / dist, ny = dy / dist
+                  const rvx = b.vx - a.vx, rvy = b.vy - a.vy
+                  const velN = rvx * nx + rvy * ny
+                  if (velN > 0) continue
+                  const imp = (2 * velN) / (1 / a.mass + 1 / b.mass)
+                  a.vx += (imp * nx) / a.mass; a.vy += (imp * ny) / a.mass
+                  b.vx -= (imp * nx) / b.mass; b.vy -= (imp * ny) / b.mass
+                  const ov = a.r + b.r - dist + 0.5
+                  a.x -= ov * nx * 0.5; a.y -= ov * ny * 0.5
+                  b.x += ov * nx * 0.5; b.y += ov * ny * 0.5
+                }
+              }
+              // Record trail
+              if (step % RECORD_EVERY === 0) {
+                for (const b of simBalls) {
+                  if (!b.pocketed) b._trail.push({ x: b.x, y: b.y })
+                }
+              }
+              // Early exit when everything stopped
+              if (active.every(b => hypot(b.vx, b.vy) < SLEEP_THRESH)) break
+            }
+
+            // Draw predicted paths
+            const ballColors = [
+              [251, 191, 36],  // cue — amber
+              [45, 212, 191],  // others — teal
+            ]
+            for (const b of simBalls) {
+              if (b._trail.length < 2) continue
+              const [r, g, bl] = b.isCue ? ballColors[0] : ballColors[1]
+              ctx.lineWidth = b.isCue ? 1.5 : 1.5
+              for (let i = 1; i < b._trail.length; i++) {
+                const alpha = (i / b._trail.length) * 0.7
+                ctx.strokeStyle = `rgba(${r},${g},${bl},${alpha})`
+                ctx.beginPath()
+                ctx.moveTo(b._trail[i - 1].x, b._trail[i - 1].y)
+                ctx.lineTo(b._trail[i].x, b._trail[i].y)
+                ctx.stroke()
+              }
+              // Ghost ball at final position
+              const last = b._trail[b._trail.length - 1]
+              ctx.globalAlpha = 0.25
+              ctx.strokeStyle = `rgb(${r},${g},${bl})`
+              ctx.lineWidth = 1.5
+              ctx.beginPath(); ctx.arc(last.x, last.y, b.r, 0, Math.PI * 2); ctx.stroke()
+              ctx.globalAlpha = 1
+            }
+          }
         }
 
         // Pull-back line (dotted, to mouse)
@@ -1097,6 +1148,7 @@ export default function PhysicsPoolLab({ onClose }) {
               { key: 'hit',  label: '🎯 Hit Pos' },
               { key: 'data', label: '📊 Physics' },
               { key: 'log',  label: '📋 Events' },
+              { key: 'help', label: '❓ Legend' },
             ].map(t => (
               <button key={t.key} onClick={() => setPanel(t.key)}
                 className="flex-1 py-2 text-xs font-medium transition-colors"
@@ -1324,12 +1376,38 @@ export default function PhysicsPoolLab({ onClose }) {
                       </div>
                       {expandedEvent === i && (
                         <div className="mt-2 p-2 rounded" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-                          <div className="font-medium mb-1" style={{ color: C.blue, fontSize: 9 }}>Conservation of Momentum: m₁v₁ᵢ + m₂v₂ᵢ = m₁v₁f + m₂v₂f</div>
+                          {/* Natural-language narrative */}
+                          <div className="mb-2 leading-relaxed" style={{ color: C.hint, fontSize: 9 }}>
+                            Ball A hit Ball B at <span style={{ color: C.purple }}>{ev.angle}°</span>.&nbsp;
+                            <span style={{ color: C.green }}>{ev.keTransferPct ?? '—'}%</span> of kinetic energy was transferred.&nbsp;
+                            {parseFloat(ev.ke_f) <= parseFloat(ev.ke_i)
+                              ? <span style={{ color: C.green }}>The collision was nearly elastic — little energy was lost.</span>
+                              : <span style={{ color: C.amber }}>Some energy was lost to deformation or spin.</span>}
+                          </div>
+                          {/* Impulse row */}
+                          <div className="font-medium mb-1" style={{ color: C.blue, fontSize: 9 }}>
+                            Impulse &amp; Momentum
+                          </div>
+                          <div style={{ color: C.hint, fontFamily: 'monospace', fontSize: 9, lineHeight: 2 }}>
+                            <div>J = Δp = <span style={{ color: C.teal }}>{ev.impulse ?? '—'} kg·m/s</span></div>
+                            <div>pᵢ = {ev.pTotal_i} &rarr; pf = <span style={{ color: C.purple }}>{ev.pTotal_f}</span></div>
+                          </div>
+                          {/* KE rows */}
+                          <div className="font-medium mt-2 mb-1" style={{ color: C.blue, fontSize: 9 }}>
+                            Kinetic Energy  (KE = ½mv²)
+                          </div>
+                          <div style={{ color: C.hint, fontFamily: 'monospace', fontSize: 9, lineHeight: 2 }}>
+                            <div>KEᵢ = {ev.ke_i}</div>
+                            <div>KEf = <span style={{ color: parseFloat(ev.ke_f) <= parseFloat(ev.ke_i) ? C.green : C.amber }}>{ev.ke_f}</span></div>
+                            <div>Transfer: <span style={{ color: C.green }}>{ev.keTransferPct ?? '—'}%</span></div>
+                          </div>
+                          {/* Conservation of momentum equation */}
+                          <div className="font-medium mt-2 mb-1" style={{ color: C.blue, fontSize: 9 }}>
+                            Conservation of Momentum: m₁v₁ᵢ + m₂v₂ᵢ = m₁v₁f + m₂v₂f
+                          </div>
                           <div style={{ color: C.hint, fontFamily: 'monospace', fontSize: 9, lineHeight: 1.9 }}>
                             <div>({ev.a.mass})({ev.a.vBefore}) + ({ev.b.mass})({ev.b.vBefore})</div>
                             <div style={{ color: C.green }}>= ({ev.a.mass})({ev.a.vAfter}) + ({ev.b.mass})({ev.b.vAfter})</div>
-                            <div style={{ color: C.muted, marginTop: 4 }}>pᵢ = {ev.pTotal_i} &rarr; pf = <span style={{color:C.purple}}>{ev.pTotal_f}</span></div>
-                            <div style={{ color: C.muted }}>KEᵢ = {ev.ke_i} &rarr; KEf = <span style={{color: parseFloat(ev.ke_f) <= parseFloat(ev.ke_i) ? C.green : C.amber}}>{ev.ke_f}</span></div>
                           </div>
                         </div>
                       )}
@@ -1337,6 +1415,64 @@ export default function PhysicsPoolLab({ onClose }) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {panel === 'help' && (
+            <div className="flex-1 overflow-y-auto p-3" style={{ color: C.text }}>
+              <div className="text-xs font-semibold mb-3" style={{ color: C.blue }}>Symbol Reference</div>
+              <table className="w-full text-xs" style={{ borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ color: C.hint, borderBottom: `1px solid ${C.border}` }}>
+                    <th className="text-left pb-1 pr-2" style={{ width: 28 }}>Sym</th>
+                    <th className="text-left pb-1 pr-2">Name</th>
+                    <th className="text-left pb-1">Meaning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['v', 'Velocity', 'Speed + direction of a ball'],
+                    ['p', 'Momentum', 'm × v — harder to stop = more p'],
+                    ['KE', 'Kinetic Energy', '½mv² — energy of motion'],
+                    ['J', 'Impulse', 'Δp = change in momentum during hit'],
+                    ['ω', 'Spin / English', 'Angular velocity — topspin or backspin'],
+                    ['θ', 'Angle', 'Direction of impact normal (0°=right)'],
+                    ['e', 'Restitution', 'v_after / v_before — 1=perfectly elastic'],
+                    ['μ', 'Friction', 'Slows balls; rolls → slides transition'],
+                  ].map(([sym, name, meaning]) => (
+                    <tr key={sym} style={{ borderBottom: `1px solid ${C.border}` }}>
+                      <td className="py-1 pr-2 font-mono font-bold" style={{ color: C.purple }}>{sym}</td>
+                      <td className="py-1 pr-2 font-medium" style={{ color: C.blue }}>{name}</td>
+                      <td className="py-1" style={{ color: C.muted }}>{meaning}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="mt-4 text-xs font-semibold mb-2" style={{ color: C.blue }}>Key Equations</div>
+              <div className="flex flex-col gap-2">
+                {[
+                  ['p = mv', 'Momentum = mass × velocity'],
+                  ['KE = ½mv²', 'Kinetic energy of a moving ball'],
+                  ['J = Δp', 'Impulse equals change in momentum'],
+                  ['m₁v₁ᵢ + m₂v₂ᵢ = m₁v₁f + m₂v₂f', 'Conservation of momentum'],
+                  ['v_f = v_i + at', 'Velocity changes with friction deceleration'],
+                ].map(([eq, desc]) => (
+                  <div key={eq} className="rounded p-2" style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                    <div className="font-mono font-bold mb-0.5" style={{ color: C.teal, fontSize: 10 }}>{eq}</div>
+                    <div style={{ color: C.hint, fontSize: 9 }}>{desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 text-xs font-semibold mb-1" style={{ color: C.blue }}>Canvas Overlays</div>
+              <div className="flex flex-col gap-1 text-xs" style={{ color: C.muted }}>
+                <div><span style={{ color: C.purple }}>Purple line</span> — line of impact (collision normal)</div>
+                <div><span style={{ color: C.teal }}>Teal dashes</span> — tangent line (perpendicular to impact)</div>
+                <div><span style={{ color: C.teal }}>Teal arrow</span> — predicted target ball path</div>
+                <div><span style={{ color: C.amber }}>Amber arrow</span> — predicted cue ball deflection</div>
+                <div><span style={{ color: C.amber }}>Amber dot</span> — impact point</div>
+              </div>
             </div>
           )}
 
