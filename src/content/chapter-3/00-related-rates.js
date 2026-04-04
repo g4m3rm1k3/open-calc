@@ -81,6 +81,12 @@ export default {
         caption: "Watch the ladder slide and observe how dy/dt changes as x grows — the top accelerates as the ladder approaches horizontal.",
       },
       {
+        id: "RelatedRatesBalloon",
+        title: "Balloon Problem: How Radius Speed Shrinks as Volume Grows",
+        mathBridge: "V = (4/3)πr³ → dV/dt = 4πr²·(dr/dt). Solve for dr/dt = dV/dt / (4πr²). As r increases, the denominator 4πr² grows — so dr/dt shrinks even though dV/dt is constant. Drag the sliders to see this live.",
+        caption: "Sets dV/dt and observe how dr/dt (green arrow) shrinks as the balloon grows. The surface area is the 'spreading factor' that slows the radius.",
+      },
+      {
         id: "Ch6_TwoTanks",
         title: "Story Mode: Two Tanks, One Valve",
         mathBridge:
@@ -122,6 +128,12 @@ export default {
         title: "Proof: x² + y² = r²  →  dy/dx = −x/y",
         caption:
           "Related rates differentiates x² + y² = L² with respect to t. This proof shows the same equation differentiated with respect to x — the technique is identical, only the independent variable changes.",
+      },
+      {
+        id: "RelatedRatesEngine",
+        title: "The Machine Behind Every Related Rates Problem",
+        mathBridge: "The gear animation shows the abstract structure: two quantities locked by a geometric equation, the chain rule as the transmitting gear. The Anatomy tab shows the same three-step structure across four different problem types simultaneously. The Scenarios tab shows five classic problems reduced to their geometric equation and rates equation. Use the 'Which equation?' decision guide when you are stuck on step 1.",
+        caption: "Use the Anatomy and Scenarios tabs to see that every related rates problem — balloon, ladder, plane, cone, shadow — is the same three-step structure. Only the geometric equation changes.",
       },
     ],
   },

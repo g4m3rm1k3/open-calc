@@ -793,6 +793,8 @@ const VIZ_REGISTRY = {
   MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
   MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
   ImplicitDiffReal: lazy(() => import("./react/ImplicitDiffReal.jsx")),
+  RelatedRatesBalloon: lazy(() => import("./react/RelatedRatesBalloon.jsx")),
+  RelatedRatesEngine: lazy(() => import("./react/RelatedRatesEngine.jsx")),
 
   // Geometry Book 1
   G1_1_FivePostulates: lazy(() => import("./geometry/G1_1_FivePostulates.jsx")),
