@@ -19,6 +19,7 @@ import lesson18 from './lesson18.js'
 import ch1_1 from './ch1-1.js'
 import ch1_2 from './ch1-2.js'
 import ch1_3 from './ch1-3.js'
+import ch1_4 from './ch1-4.js'
 
 export default [
   {
@@ -80,5 +81,11 @@ export default [
     title: 'Linear Relationships',
     course: 'python-1',
     lessons: [ch1_3]
+  },
+  {
+    number: 1.4,
+    title: 'Exponentials & Logarithms',
+    course: 'python-1',
+    lessons: [ch1_4]
   }
 ]
