@@ -976,8 +976,8 @@ The `lessonId` sync effect in `FloatingVideoPlayer` had a `!selectedCourse` guar
 ### ✅ N — `MobileLocationBadge` doesn't work for non-numeric chapter IDs
 Fixed. For numeric chapter numbers (0–6) the badge still shows `Ch. N`. For string-based chapter numbers (`geometry-1`, `tetris.1`, etc.) it now shows the chapter title instead, using `/^\d+$/.test(String(chapter.number))`.
 
-### 🟡 O — Search index requires manual rebuild
-After adding lessons, `public/search-index.json` must be regenerated (build script in `src/scripts/`). There's no CI step that enforces this. New lessons are absent from search until the index is rebuilt and committed.
+### ✅ O — Search index auto-rebuilds on every build
+`package.json` `build` and `dev` scripts both run `node src/scripts/build-search-index.js` before Vite starts. New lessons appear in search immediately on the next `npm run dev` or `npm run build` — no manual step needed.
 
 ---
 
@@ -1215,4 +1215,4 @@ incomplete ideas/
 
 ---
 
-*Last updated April 4, 2026. Recent changes: Tetris course; CoursesDropdown nav; course card homepage; sidebar color fallback; header z-index fix; video tag-based discovery; FloatingVideoPlayer sync fix; VizFrame dev placeholder (L); SpiralBlock reorder (K); MobileLocationBadge fix (N); formatAsVisualization annotated (I); all three quiz components now call `markCheckpoint` (J); quiz answer reveal removed; `CONTRIBUTING.md` updated with string chapter IDs.*
+*Last updated April 4, 2026. Recent changes: Tetris course; CoursesDropdown nav; course card homepage; sidebar color fallback; header z-index fix; video tag-based discovery; FloatingVideoPlayer sync fix; VizFrame dev placeholder (L); SpiralBlock reorder (K); MobileLocationBadge fix (N); formatAsVisualization annotated (I); all three quiz components now call `markCheckpoint` (J); quiz answer reveal removed; `CONTRIBUTING.md` updated with string chapter IDs; `MobileBottomNav` now rendered in AppShell (was dead import); mobile tools hub now includes Python, JS Playground, Video Player (O ✅).*

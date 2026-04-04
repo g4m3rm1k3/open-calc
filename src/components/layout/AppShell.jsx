@@ -595,6 +595,39 @@ export default function AppShell({ children }) {
                 </div>
                 <span className="text-[11px] font-bold uppercase tracking-wider">TI Calc</span>
               </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { setPythonOpen(true); setMobileToolsOpen(false) }}
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300 border border-teal-100 dark:border-teal-800/50 shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-800/50 flex items-center justify-center">
+                  <Terminal className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-wider">Python</span>
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { setJsOpen(true); setMobileToolsOpen(false) }}
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 border border-yellow-100 dark:border-yellow-800/50 shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-800/50 flex items-center justify-center">
+                  <Code2 className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-wider">JS Playground</span>
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { window.dispatchEvent(new CustomEvent('oc-toggle-video')); setMobileToolsOpen(false) }}
+                className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-800/50 flex items-center justify-center">
+                  <PlayCircle className="w-5 h-5" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-wider">Video Player</span>
+              </motion.button>
             </div>
 
             {/* Quick stats / tips? */}
@@ -606,6 +639,12 @@ export default function AppShell({ children }) {
         )}
       </AnimatePresence>
 
+
+      <MobileBottomNav
+        onMenuToggle={() => setSidebarOpen(o => !o)}
+        onSearchOpen={openSearch}
+        onToolsToggle={() => setMobileToolsOpen(o => !o)}
+      />
 
       {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
       <PinsPanel />
