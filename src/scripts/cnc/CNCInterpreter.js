@@ -89,7 +89,18 @@ export class CNCInterpreter {
     const snaps = [{ ...this.state }]
     for (let i = 0; i < maxSteps; i++) {
       if (this.state.isDone || this.state.isError) break
-      snaps.push(this.step())
+      const s = this.step()
+      // Inject canned-cycle plunge/retract intermediate path points
+      if (s._cycleSnaps) {
+        const off = (s.offsets ?? {})[s.activeOffset] ?? { X:0, Y:0, Z:0 }
+        for (const cs of s._cycleSnaps) {
+          snaps.push({ ...s, X: cs.X, Y: cs.Y, Z: cs.Z,
+            MX: cs.X + (off.X ?? 0), MY: cs.Y + (off.Y ?? 0), MZ: cs.Z + (off.Z ?? 0),
+            _cycleSnaps: null })
+        }
+        s._cycleSnaps = null
+      }
+      snaps.push(s)
     }
     return snaps
   }
@@ -142,7 +153,7 @@ export class CNCInterpreter {
       activeOffset: 'G54',
       offsets,
       // Canned cycle params
-      cycleR: 0, cycleF: 0, cycleQ: 0, cycleP: 0, cycleL: 1,
+      cycleR: 5, cycleF: 0, cycleQ: 0, cycleP: 0, cycleL: 1, cycleZ: -5,
       // Arc params
       arcI: 0, arcJ: 0, arcK: 0, arcR: null,
       // Variables: numeric-keyed Map (shared by #n / Rn / Vn)
@@ -332,9 +343,15 @@ export class CNCInterpreter {
         case 'K': tK = v; break
 
         case 'R': {
-          // Siemens: R-var assignments handled by _tryAssignment before this path
-          // Here: arc radius (Fanuc) or cycle retract (canned cycles)
-          if (this.dialect !== 'siemens') tR = v
+          if (this.dialect !== 'siemens') {
+            // Route R to cycleR if a canned cycle G-code is present in this block OR already active
+            const hasCycle = tokens.some(t2 => t2.word === 'G' && t2.value >= 81 && t2.value <= 89)
+            if (hasCycle || this.state.cycleMode !== 'G80') {
+              this.state.cycleR = v
+            } else {
+              tR = v  // arc radius
+            }
+          }
           break
         }
         case 'Q': this.state.cycleQ = v; break
@@ -353,6 +370,28 @@ export class CNCInterpreter {
     }
 
     if (hasG10) { this._handleG10(tokens, rawLine); return }
+
+    // ── Catch axis+variable-ref moves that the tokenizer can't parse numerically
+    // e.g. G00 X#104 Y#105  or  G00 X=R5 Y=R6 (Siemens)
+    let _avm
+    const _axVarRe = /\b([XYZ])\s*#(\d+)/gi
+    while ((_avm = _axVarRe.exec(rawLine)) !== null) {
+      const ax = _avm[1].toUpperCase()
+      const id = _avm[2]
+      const sv = this._getSystemVar(parseInt(id))
+      const val = sv !== null ? sv : (this.state.vars.get(id) ?? 0)
+      if (ax === 'X' && tX === null) tX = val
+      if (ax === 'Y' && tY === null) tY = val
+      if (ax === 'Z' && tZ === null) tZ = val
+    }
+    const _axEqRe = /\b([XYZ])\s*=\s*(R\d+|\[[^\]]+\])/gi
+    while ((_avm = _axEqRe.exec(rawLine)) !== null) {
+      const ax = _avm[1].toUpperCase()
+      const val = this._evalExpr(_avm[2])
+      if (ax === 'X' && tX === null) tX = val
+      if (ax === 'Y' && tY === null) tY = val
+      if (ax === 'Z' && tZ === null) tZ = val
+    }
 
     if (tI !== null) this.state.arcI = tI
     if (tJ !== null) this.state.arcJ = tJ
@@ -378,8 +417,24 @@ export class CNCInterpreter {
       if (rY !== null) this.state.Y += rY
       if (rZ !== null) this.state.Z += rZ
     }
+
     if (this.state.cycleMode !== 'G80') {
-      this.state.message = `${this.state.cycleMode} X${this.state.X.toFixed(3)} Y${this.state.Y.toFixed(3)} Z${this.state.cycleR.toFixed(3)}`
+      // Store drill depth when Z is commanded, else reuse stored cycleZ
+      if (rZ !== null) this.state.cycleZ = this.state.Z
+      const drillZ = this.state.cycleZ
+      const retZ   = this.state.cycleR
+      this.state.message = `${this.state.cycleMode} X${this.state.X.toFixed(3)} Y${this.state.Y.toFixed(3)} Z${drillZ.toFixed(3)}`
+      // Generate plunge/retract intermediate snapshots (picked up by runAll)
+      // Only when an X or Y move triggers the cycle (positioning pass)
+      if (rX !== null || rY !== null) {
+        this.state._cycleSnaps = [
+          { X: this.state.X, Y: this.state.Y, Z: retZ },    // rapid to R plane
+          { X: this.state.X, Y: this.state.Y, Z: drillZ },  // feed to drill depth
+          { X: this.state.X, Y: this.state.Y, Z: retZ },    // retract to R (G99)
+        ]
+      }
+      // Leave Z at R plane (G99 return) after cycle
+      this.state.Z = retZ
     }
     this._updateMachine()
   }

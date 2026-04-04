@@ -9,6 +9,7 @@ const PROGRAM_LIBRARY = {
       id: 'O0001', name: 'Simple Square Pocket',
       desc: 'G01 linear moves in a square pattern. Teaches: G00, G01, G90.',
       code: `O0001 (SIMPLE SQUARE POCKET)
+G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN AT MACHINE HOME)
 G21 G90 G17 G40 G49 G80
 T1 M06
 G43 H1
@@ -30,6 +31,7 @@ M30`
       id: 'O0002', name: 'Bolt Circle (WHILE Loop)',
       desc: 'Drills 8 holes equally spaced on a circle using a WHILE macro loop. Teaches: #vars, WHILE, SIN, COS.',
       code: `O0002 (BOLT CIRCLE - 8 HOLES)
+G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17 G40 G49 G80
 T2 M06
 G43 H2
@@ -55,6 +57,7 @@ M30`
       id: 'O0003', name: 'Arc Pocket (G02/G03)',
       desc: 'Circular pocket using arc interpolation. Teaches: G02, G03, I, J.',
       code: `O0003 (CIRCULAR POCKET)
+G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17
 T1 M06
 G43 H1
@@ -71,6 +74,7 @@ M30`
       id: 'O0004', name: 'Subroutine Demo (M98/M99)',
       desc: 'Main program calls a drilling subroutine at multiple positions. Teaches: M98, M99, L repeats.',
       code: `O0004 (SUBROUTINE DEMO)
+G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90
 T1 M06
 S2000 M03
@@ -94,6 +98,7 @@ M99`
       id: 'O0006', name: 'Named Variables (#_ALM, #[NAME])',
       desc: 'Fanuc Macro B named variables. Teaches: #[RADIUS], #_ALM, system vars #5041-5043, #3011.',
       code: `O0006 (NAMED MACRO VARIABLES DEMO)
+G10 L2 P1 X0 Y0 Z0 (G54 PART ORIGIN)
 G21 G90 G17 G40 G49 G80
 (DEFINE NAMED USER VARIABLES)
 #[RADIUS]   = 50.0  (BOLT CIRCLE RADIUS)
@@ -330,7 +335,9 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
     preview.setToolTable(tbl)
     preview.loadProgram(prog)
     const snaps = preview.runAll(12000)
-    setPathPoints(snaps.map(s => ({ machineX: s.MX ?? 0, machineY: s.MY ?? 0, machineZ: s.MZ ?? 0 })))
+    // Use work coords (X/Y/Z) not machine coords: MZ includes TLO which
+    // offsets the whole path upward relative to the workpiece visually.
+    setPathPoints(snaps.map(s => ({ machineX: s.X ?? 0, machineY: s.Y ?? 0, machineZ: s.Z ?? 0 })))
     stepCountRef.current = 0
     setCurrentStep(0)
     setMachineState({ ...interp.state })
@@ -383,11 +390,47 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
-      setCode(ev.target.result)
-    }
+    reader.onload = (ev) => { setCode(ev.target.result) }
     reader.readAsText(file)
     e.target.value = ''
+  }, [])
+
+  // ─── Download program ───────────────────────────────────────────────────────────
+  const downloadProgram = useCallback(() => {
+    const ext = dialect === 'siemens' ? '.mpf' : dialect === 'okuma' ? '.min' : '.nc'
+    const blob = new Blob([code], { type: 'text/plain' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `cnc_program${ext}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [code, dialect])
+
+  // ─── LocalStorage save / load ───────────────────────────────────────────────────────
+  const LS_KEY = 'cnc_saved_programs'
+  const [savedPrograms, setSavedPrograms] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]') } catch { return [] }
+  })
+  const [saveNameInput, setSaveNameInput] = useState('')
+
+  const saveToMemory = useCallback(() => {
+    const name = saveNameInput.trim() || `Program ${new Date().toLocaleTimeString()}`
+    const entry = { name, code, dialect, savedAt: Date.now() }
+    setSavedPrograms(prev => {
+      const next = [...prev, entry]
+      localStorage.setItem(LS_KEY, JSON.stringify(next))
+      return next
+    })
+    setSaveNameInput('')
+  }, [code, dialect, saveNameInput])
+
+  const deleteSaved = useCallback((idx) => {
+    setSavedPrograms(prev => {
+      const next = prev.filter((_, i) => i !== idx)
+      localStorage.setItem(LS_KEY, JSON.stringify(next))
+      return next
+    })
   }, [])
 
   // ─── Load preset program ───────────────────────────────────────────────────
@@ -505,6 +548,12 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
           className="px-3 py-2 rounded text-[10px] font-bold"
           style={{ background: C.purple + '15', color: C.purple, border: `1px solid ${C.purple}40` }}>
           ⬆ UPLOAD
+        </button>
+        {/* Download */}
+        <button onClick={downloadProgram}
+          className="px-3 py-2 rounded text-[10px] font-bold"
+          style={{ background: C.teal + '15', color: C.teal, border: `1px solid ${C.teal}40` }}>
+          ⬇ DOWNLOAD
         </button>
         <input ref={fileInputRef} type="file" accept=".nc,.txt,.cnc,.mpf,.min"
           style={{ display: 'none' }} onChange={handleUpload} />
@@ -902,6 +951,42 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
                   style={{ background: C.purple + '15', color: C.purple, border: `1px solid ${C.purple}40` }}>
                   ⬆ Upload .nc / .mpf / .min
                 </button>
+                {/* Saved to memory */}
+                <div style={{ color: C.hint, fontSize: 8, marginTop: 8, letterSpacing: 2 }}>SAVE TO MACHINE MEMORY</div>
+                <div className="flex gap-1">
+                  <input
+                    value={saveNameInput}
+                    onChange={e => setSaveNameInput(e.target.value)}
+                    placeholder="Program name..."
+                    className="flex-1 rounded px-2 py-1"
+                    style={{ background: C.bg, color: C.text, border: `1px solid ${C.border}`, fontSize: 9 }}
+                  />
+                  <button onClick={saveToMemory}
+                    className="px-2 py-1 rounded text-[9px] font-bold"
+                    style={{ background: C.green + '20', color: C.green, border: `1px solid ${C.green}40` }}>
+                    SAVE
+                  </button>
+                </div>
+                {savedPrograms.length > 0 && (
+                  <>
+                    <div style={{ color: C.hint, fontSize: 8, marginTop: 6, letterSpacing: 2 }}>SAVED PROGRAMS</div>
+                    {savedPrograms.map((sp, idx) => (
+                      <div key={idx} className="rounded p-2 flex items-center justify-between"
+                        style={{ background: C.bg, border: `1px solid ${C.border}` }}>
+                        <div>
+                          <div style={{ color: C.text, fontSize: 9, fontWeight: 700 }}>{sp.name}</div>
+                          <div style={{ color: C.hint, fontSize: 8 }}>{DIALECT_LABELS[sp.dialect] ?? sp.dialect} · {new Date(sp.savedAt).toLocaleDateString()}</div>
+                        </div>
+                        <div className="flex gap-1">
+                          <button onClick={() => { setCode(sp.code); if (sp.dialect) setDialect(sp.dialect); setPanel('code') }}
+                            style={{ color: C.green, fontSize: 9 }}>LOAD ▸</button>
+                          <button onClick={() => deleteSaved(idx)}
+                            style={{ color: C.red, fontSize: 9 }}>✕</button>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>
