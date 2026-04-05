@@ -68,6 +68,155 @@ export default {
         title: 'Zoom In Until the Curve Becomes a Line',
         caption: 'Increase the zoom level to see the curve and its tangent line converge. At high zoom, they are indistinguishable — that is what differentiability means geometrically.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Build the Linearization',
+        caption: 'Run the cells below to plot f(x) = √x and its tangent line L(x) at a = 25. Then modify the base point or the function and re-run to see how the approximation changes.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'What is Linear Approximation?',
+              prose: [
+                'Linear approximation replaces a curve with its **tangent line** near a chosen base point $a$:',
+                '$$L(x) = f(a) + f\'(a)(x - a)$$',
+                'The key insight: near $a$, the tangent line and the curve are so close that the difference is negligible.',
+                '## How to use this notebook',
+                '- Press **▶ Run** (or Shift+Enter) to execute a cell.',
+                '- The `opencalc` library is pre-loaded — use `Figure()` to draw plots.',
+                '- Change the base point `a` or the function `f` below and re-run to explore.',
+              ],
+              code: `# opencalc is already imported — let's verify.
+from opencalc import Figure
+import math
+
+print("opencalc ready! Python", __import__('sys').version.split()[0])`,
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Plot f(x) = √x and its linearization at a = 25',
+              prose: [
+                'We define $f(x) = \\sqrt{x}$, compute $f\'(25) = \\tfrac{1}{10}$, then plot:',
+                '- The **curve** $f(x)$ in blue',
+                '- The **tangent line** $L(x) = 5 + \\tfrac{1}{10}(x-25)$ in amber',
+                '- The **base point** $(25, 5)$ as a dot',
+              ],
+              instructions: 'Try changing `a = 25` to `a = 9` or `a = 100` and pressing Run again. Watch how the tangent line shifts.',
+              code: `from opencalc import Figure
+import math
+
+# ── Configuration (try changing these!) ──────────────────────
+f   = math.sqrt          # function
+df  = lambda x: 1 / (2 * math.sqrt(x))   # derivative
+a   = 25                 # base point
+window = 10              # how wide (+/-) to show
+
+# ── Derived values ────────────────────────────────────────────
+fa  = f(a)
+dfa = df(a)
+L   = lambda x: fa + dfa * (x - a)   # linearization
+error_at = lambda x: abs(f(x) - L(x))
+
+print(f"f({a})  = {fa}")
+print(f"f'({a}) = {dfa:.6f}")
+print(f"L(x)   = {fa} + {dfa:.4f} * (x - {a})")
+print(f"\nSpot checks:")
+for x in [a - 3, a - 1, a, a + 1, a + 3, a + 5]:
+    print(f"  x = {x:6.1f}  |  f(x) = {f(x):.6f}  |  L(x) = {L(x):.6f}  |  error = {error_at(x):.6f}")
+
+# ── Plot ─────────────────────────────────────────────────────
+fig = Figure(
+    xmin = a - window, xmax = a + window,
+    ymin = f(max(1, a - window)) - 1,
+    ymax = f(a + window) + 1,
+    title = f"Linear Approximation of √x at a = {a}"
+)
+fig.grid().axes()
+fig.plot(f,  color='blue',  label='f(x) = √x',      width=2.5)
+fig.plot(L,  color='amber', label=f'L(x) (tangent)', width=2, dashed=False)
+fig.point([a, fa], color='green', label=f'({a}, {fa})', radius=7)
+fig.show()`,
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Error grows with distance from a',
+              prose: [
+                'The error $|f(x) - L(x)|$ is approximately $\\tfrac{f\'\'(a)}{2}(x-a)^2$ — **quadratic** in the distance.',
+                'This means: halve the distance from $a$ → quarter the error.',
+              ],
+              instructions: 'Run this cell, then try changing `a` and `f` to a different function (e.g. `f = math.sin`, `df = math.cos`) to see how the error profile changes.',
+              code: `from opencalc import Figure
+import math
+
+f   = math.sqrt
+df  = lambda x: 1 / (2 * math.sqrt(x))
+a   = 25
+
+fa  = f(a)
+dfa = df(a)
+L   = lambda x: fa + dfa * (x - a)
+error = lambda x: abs(f(x) - L(x))
+
+# Plot the error curve
+xs  = [a + i * 0.1 for i in range(-60, 61)]
+
+fig = Figure(
+    xmin = a - 7, xmax = a + 7,
+    ymin = -0.01, ymax = 0.6,
+    title = "Approximation Error |f(x) - L(x)|"
+)
+fig.grid(step=1).axes()
+fig.plot(error, xmin=max(0.01, a-6), xmax=a+6, color='red', label='|error|', width=2.5)
+fig.vline(a, color='amber')
+fig.text([a + 0.3, 0.04], f'a = {a}', color='amber', size=11)
+fig.show()`,
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Linearize e^x at a = 0',
+              difficulty: 'easy',
+              prompt: 'The standard linearization of e^x at a = 0 is L(x) = 1 + x.\n\nComplete the code below to (1) print L(0.2) and the actual e^0.2, and (2) plot both curves from x = -1 to x = 1.',
+              hint: 'f = math.exp, df = math.exp, a = 0. Then f(a)=1, f\'(a)=1, so L(x) = 1 + x. Use fig.plot() twice — once for f and once for L.',
+              code: `from opencalc import Figure
+import math
+
+# ── Fill in the blanks ────────────────────────────────────────
+f   = math.exp
+df  = math.exp
+a   = 0
+
+fa  = f(a)
+dfa = df(a)
+L   = lambda x: fa + dfa * (x - a)  # L(x) = 1 + x
+
+# 1. Print the comparison
+print(f"L(0.2)       = {L(0.2):.6f}")
+print(f"e^0.2 actual = {f(0.2):.6f}")
+print(f"Error        = {abs(f(0.2) - L(0.2)):.6f}")
+
+# 2. Plot — add your plot() calls below
+fig = Figure(xmin=-1, xmax=1, ymin=0, ymax=3, title="Linearization of e^x at a=0")
+fig.grid().axes()
+# YOUR CODE HERE: plot f and L, add the base point dot
+
+fig.show()`,
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+          ]
+        }
+      },
     ],
   },
 
