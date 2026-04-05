@@ -78,7 +78,150 @@ export default {
       },
     ],
     visualizations: [
-      ],
+      {
+        id: 'PythonNotebook',
+        title: "Python Lab: Verify All 7 Indeterminate Forms Numerically",
+        caption: "Compute limits numerically by approaching from both sides and compare to L'Hôpital's analytical answer. Expose the failure case.",
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: '0/0 and ∞/∞: numerical approach vs L\'Hôpital',
+              prose: [
+                "**Strategy**: approach x → c from both sides with small steps and watch f(x)/g(x) converge.",
+                "L'Hôpital's theoretical answer: differentiate numerator & denominator separately.",
+              ],
+              instructions: 'Run this cell then change f/g to any 0/0 limit you want to verify.',
+              code: `import math
+
+def numerical_limit(f, g, c, side='both', steps=8):
+    """Approach x -> c and print f(x)/g(x)."""
+    deltas = [10**(-k) for k in range(1, steps+1)]
+    sign   = -1 if side == 'left' else 1
+    print(f"Approaching x -> {c} from {'left' if side=='left' else 'right'}:")
+    for d in deltas:
+        x   = c + sign * d
+        try:
+            ratio = f(x) / g(x)
+            print(f"  x={x:>14.10f}  f(x)/g(x) = {ratio:.12f}")
+        except ZeroDivisionError:
+            print(f"  x={x:.10f}  ZeroDivisionError")
+
+# Example 1: sin(x)/x  -> 1  as x->0  (0/0 form)
+print("=" * 55)
+print("lim(x->0) sin(x)/x   [L'Hopital: cos(0)/1 = 1]")
+print("=" * 55)
+numerical_limit(math.sin, lambda x: x, c=0, side='right')
+
+# Example 2: (e^x - 1)/x -> 1 as x->0  (0/0 form)
+print()
+print("=" * 55)
+print("lim(x->0) (e^x-1)/x  [L'Hopital: e^0/1 = 1]")
+print("=" * 55)
+numerical_limit(lambda x: math.exp(x)-1, lambda x: x, c=0, side='right')`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: '0·∞, 1^∞, 0^0 power forms \u2014 all resolve via ln',
+              prose: [
+                '**Trick**: for $f(x)^{g(x)}$, take $\\ln L = \\lim g(x)\\ln f(x)$, then $L = e^{\\ln L}$.',
+                '| Form | Example | Answer |',
+                '|---|---|---|',
+                '| $0 \\cdot \\infty$ | $x \\ln x \\to 0^+$ | $0$ |',
+                '| $0^0$ | $x^x \\to 0^+$ | $1$ |',
+                '| $1^\\infty$ | $(1+1/x)^x \\to \\infty$ | $e$ |',
+              ],
+              code: `import math
+
+print("Form 0*inf: lim(x->0+) x*ln(x)")
+for x in [0.1, 0.01, 0.001, 0.0001, 0.00001]:
+    print(f"  x={x:>8.5f}  x*ln(x) = {x*math.log(x):>12.8f}")
+print("  L'Hopital answer: 0")
+
+print()
+print("Form 0^0: lim(x->0+) x^x")
+for x in [0.1, 0.01, 0.001, 0.0001]:
+    print(f"  x={x:>8.5f}  x^x = {x**x:.10f}")
+print("  L'Hopital answer: 1 (ln L = lim x*ln(x) = 0 => L=e^0=1)")
+
+print()
+print("Form 1^inf: lim(x->inf) (1 + 1/x)^x")
+for x in [10, 100, 1000, 10000, 100000]:
+    print(f"  x={x:>8}  (1+1/x)^x = {(1+1/x)**x:.10f}")
+print(f"  True value of e = {math.e:.10f}")
+print("  L'Hopital answer: e (ln L = lim x*ln(1+1/x) = 1 => L=e^1=e)")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: "L'Hôpital failure: (x + sin x)/x",
+              prose: [
+                'Applying the rule: $\\lim \\frac{1+\\cos x}{1}$ — no limit (oscillates).',
+                'Yet the original limit clearly equals **1** by algebra.',
+                'The rule **requires** $\\lim f\'/g\'$ to exist — if it doesn\'t, you must use another method.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+# The original limit DOES exist: (x+sin x)/x = 1 + sin(x)/x -> 1
+print("Original limit: (x + sin x) / x")
+for x in [10, 100, 1000, 10000]:
+    val = (x + math.sin(x)) / x
+    print(f"  x={x:>6}  value = {val:.10f}")
+print("Correct limit = 1 (squeeze theorem)")
+
+# But L'Hopital gives (1 + cos x)/1 which oscillates
+print()
+print("L'Hopital suggests: (1 + cos x)/1")
+for x in [10, 100, 1000, 10000]:
+    val = 1 + math.cos(x)
+    print(f"  x={x:>6}  1+cos(x) = {val:.6f}  (oscillates between 0 and 2)")
+
+# Plot to visualize the oscillation
+fig = Figure(xmin=0, xmax=50, ymin=-0.5, ymax=2.5,
+    title="(x+sin x)/x = 1 (true limit), but (1+cos x) oscillates")
+fig.grid().axes()
+fig.plot(lambda x: (x+math.sin(x))/x if x>0 else 1,
+    color='blue', label='(x+sin x)/x', width=2.5)
+fig.plot(lambda x: 1+math.cos(x), color='red',
+    label="L'Hopital candidate 1+cos(x)", width=1.5)
+fig.hline(1, color='amber', dashed=True)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: "Your Turn: Evaluate lim(x→0) (1 − cos x)/x² three ways",
+              difficulty: 'medium',
+              prompt: "Compute lim(x→0) (1-cos x)/x².\n\n1. Numerically: approach x=0 and observe the value converging\n2. L'Hôpital: apply twice (0/0 form each time)\n3. Power series: 1 - cos x = x²/2 - x⁴/24 + ..., so (1-cos x)/x² ≈ 1/2\n\nAnswer: 1/2",
+              hint: "L'Hôpital step 1: sin(x)/(2x) — still 0/0. Step 2: cos(x)/2 → 1/2.",
+              code: `import math
+
+# Step 1: numerical approach
+print("Numerical approach to lim(x->0) (1 - cos x) / x^2:")
+for x in [0.1, 0.01, 0.001, 0.0001]:
+    val = (1 - math.cos(x)) / x**2
+    print(f"  x={x:>7.4f}  value = {val:.10f}")
+print()
+
+# YOUR CODE - Step 2: verify with L'Hopital (just print the answer)
+# print("L'Hopital: first d(1-cos x)/d(x^2) = sin(x)/(2x) ... still 0/0")
+# print("Second application: cos(x)/2 -> 1/2")
+
+# YOUR CODE - Step 3: power series check
+# from decimal import Decimal
+# import math
+# x = 0.001
+# cos_approx = 1 - x**2/2 + x**4/24   # first two nonzero terms of cos
+# print(f"Power series (1 - cos_approx)/x^2 = {(1-cos_approx)/x**2:.10f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {

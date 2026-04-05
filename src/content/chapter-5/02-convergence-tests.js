@@ -100,8 +100,216 @@ export default {
         body: '$\\sum_{n=1}^{\\infty} \\frac{1}{n^p}$ converges if $p > 1$ and diverges if $p \\le 1$. The boundary case $p = 1$ is the harmonic series (diverges).',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Apply Every Convergence Test & Watch Partial Sums',
+        caption: 'Build a test-selector toolkit, watch partial sums converge with alternating series error bounds, and classify 5 mystery series.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Ratio & Root tests: build the functions, run on examples',
+              prose: [
+                '**Ratio test**: $L = \\lim_{n\\to\\infty} |a_{n+1}/a_n|$. Converges if $L < 1$.',
+                '**Root test**: $L = \\lim_{n\\to\\infty} |a_n|^{1/n}$. Converges if $L < 1$.',
+                'We estimate $L$ by evaluating at a large $n$.',
+              ],
+              instructions: 'Change `a` to try different series. The tests tell you immediately which limit they find.',
+              code: `import math
+
+def ratio_test(a, n=1000):
+    """Estimate lim |a(n+1)/a(n)| at large n."""
+    return abs(a(n+1) / a(n))
+
+def root_test(a, n=1000):
+    """Estimate lim |a(n)|^(1/n) at large n."""
+    val = abs(a(n))
+    if val == 0:
+        return 0
+    return val ** (1/n)
+
+def verdict(L):
+    if L < 1:   return f"L={L:.6f} < 1  => CONVERGES absolutely"
+    if L > 1:   return f"L={L:.6f} > 1  => DIVERGES"
+    return f"L={L:.6f} = 1  => INCONCLUSIVE"
+
+print("=" * 60)
+print("Series 1: Σ n²/3ⁿ")
+a1 = lambda n: n**2 / 3**n
+print("  Ratio:", verdict(ratio_test(a1)))
+print("  Root: ", verdict(root_test(a1)))
+
+print()
+print("Series 2: Σ n!/nⁿ")
+a2 = lambda n: math.factorial(n) / n**n
+print("  Ratio:", verdict(ratio_test(a2, n=20)))   # factorial grows fast
+
+print()
+print("Series 3: Σ (2n/(3n+1))ⁿ")
+a3 = lambda n: (2*n/(3*n+1))**n
+print("  Root: ", verdict(root_test(a3)))
+
+print()
+print("Series 4: Σ 1/n²  (ratio/root INCONCLUSIVE — use p-test)")
+a4 = lambda n: 1/n**2
+print("  Ratio:", verdict(ratio_test(a4)))
+print("  p=2 > 1 => use p-series test => CONVERGES")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Alternating Series: partial sums & error bounds',
+              prose: [
+                '**Alternating Series Estimation Theorem**: if the AST conditions hold, error after $N$ terms $\\leq b_{N+1}$.',
+                'The partial sums oscillate and squeeze toward the true limit.',
+                '$\\sum_{n=1}^\\infty \\frac{(-1)^{n+1}}{n} = \\ln 2$',
+              ],
+              code: `from opencalc import Figure
+import math
+
+# Alternating harmonic series: Σ (-1)^(n+1) / n = ln(2)
+true = math.log(2)
+an   = lambda n: (-1)**(n+1) / n
+bn   = lambda n: 1/n   # positive terms
+
+N = 50
+partial_sums = []
+s = 0
+for n in range(1, N+1):
+    s += an(n)
+    partial_sums.append(s)
+
+print(f"True value: ln(2) = {true:.15f}")
+print()
+print(f"{'N':>4}  {'Partial Sum':>18}  {'Error':>15}  {'Bound (b_{{N+1}})':>15}  Bound holds?")
+print("-" * 75)
+for n in [1, 2, 5, 10, 20, 30, 50]:
+    sn  = partial_sums[n-1]
+    err = abs(sn - true)
+    bnd = bn(n+1)
+    ok  = err <= bnd + 1e-12
+    print(f"{n:>4}  {sn:>18.12f}  {err:>15.2e}  {bnd:>15.2e}  {'✓' if ok else '✗'}")
+
+# Plot oscillating convergence
+ns = list(range(1, N+1))
+fig = Figure(xmin=0, xmax=N+1, ymin=0.5, ymax=0.9,
+    title="Alternating Harmonic Series: partial sums oscillate toward ln(2)")
+fig.grid().axes()
+fig.scatter(ns, partial_sums, color='blue', radius=3)
+for i in range(len(ns)-1):
+    fig.line([ns[i], partial_sums[i]], [ns[i+1], partial_sums[i+1]],
+        color='blue', width=0.8)
+fig.hline(true, color='amber', dashed=True)
+fig.text([35, true+0.01], f'ln(2) = {true:.5f}', color='amber', size=10)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Limit Comparison: rational functions always need p-series',
+              prose: [
+                'For $a_n = $ rational function of $n$: ratio/root give $L=1$ (useless).',
+                'Instead: find the dominant term, form $b_n$, compute $\\lim a_n/b_n$.',
+                'If the limit is a positive finite constant, both series share convergence.',
+              ],
+              code: `import math
+
+def limit_comparison(a, b, n_large=100000):
+    """Estimate lim_{n->inf} a(n)/b(n)."""
+    return a(n_large) / b(n_large)
+
+print("Limit Comparison Test Examples")
+print()
+
+# Σ n/(n³+1) vs Σ 1/n²
+a1 = lambda n: n / (n**3 + 1)
+b1 = lambda n: 1 / n**2
+L1 = limit_comparison(a1, b1)
+print(f"Σ n/(n³+1) vs Σ 1/n²:")
+print(f"  lim a(n)/b(n) = {L1:.8f}  (positive finite)")
+print(f"  Σ 1/n² converges (p=2>1) => Σ n/(n³+1) CONVERGES")
+
+print()
+# Σ (3n+2)/(n²-5) vs Σ 3/n
+a2 = lambda n: (3*n+2) / (n**2 - 5)
+b2 = lambda n: 3 / n
+L2 = limit_comparison(a2, b2)
+print(f"Σ (3n+2)/(n²-5) vs Σ 3/n:")
+print(f"  lim a(n)/b(n) = {L2:.8f}  (positive finite)")
+print(f"  Σ 1/n diverges (p=1) => Σ (3n+2)/(n²-5) DIVERGES")
+
+print()
+# Σ (n+3)/(n³-n+1) vs Σ 1/n²
+a3 = lambda n: (n+3) / (n**3 - n + 1)
+b3 = lambda n: 1 / n**2
+L3 = limit_comparison(a3, b3)
+print(f"Σ (n+3)/(n³-n+1) vs Σ 1/n²:")
+print(f"  lim a(n)/b(n) = {L3:.8f}  (positive finite)")
+print(f"  Σ 1/n² converges => Σ (n+3)/(n³-n+1) CONVERGES")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Classify 5 mystery series using the flowchart',
+              difficulty: 'hard',
+              prompt: 'For each series below, identify the best test and determine convergence.\n\n1. Σ n!/10ⁿ\n2. Σ (-1)ⁿ n/(n²+1)\n3. Σ 1/(n ln n)\n4. Σ (2/3)ⁿ\n5. Σ n²/(2n+1)³\n\nStrategy: check nth-term test first, then geometric, then p-series/comparison/ratio/root.',
+              hint: '1. Ratio test (factorial). 2. AST then check absolute (p=1, conditional). 3. Integral test (substitute u=ln x). 4. Geometric (r=2/3<1). 5. Limit compare to 1/n.',
+              code: `import math
+
+# Helper functions
+def ratio_test(a, n=500):
+    return abs(a(n+1)/a(n))
+
+def root_test(a, n=500):
+    v = abs(a(n)); return v**(1/n) if v>0 else 0
+
+def nth_term(a, n=10000):
+    return abs(a(n))
+
+print("Mystery Series Classification")
+print()
+
+# 1. Σ n!/10ⁿ
+a1 = lambda n: math.factorial(min(n,170)) / 10**n   # cap for overflow
+print("1. Σ n!/10ⁿ")
+print(f"   Ratio test L = {ratio_test(a1, n=15):.4f}")
+# YOUR CODE: verdict?
+
+print()
+# 2. Σ (-1)ⁿ n/(n²+1)
+a2 = lambda n: (-1)**n * n / (n**2+1)
+b2 = lambda n: n / (n**2+1)   # positive terms for AST
+print("2. Σ (-1)ⁿ n/(n²+1)")
+print(f"   nth term -> 0? {nth_term(b2):.2e}")
+# YOUR CODE: check AST, check absolute convergence
+
+print()
+# 3. Σ 1/(n ln n)  -- integral test!
+print("3. Σ 1/(n ln n)  -- use integral test")
+# YOUR CODE: ∫₂^∞ 1/(x ln x) dx = [ln(ln x)]₂^∞ = ?
+
+print()
+# 4. Σ (2/3)ⁿ
+a4 = lambda n: (2/3)**n
+print("4. Σ (2/3)ⁿ  -- geometric series, r=2/3")
+print(f"   Sum = 1/(1-2/3) = 3  (confirmed: partial sum at n=1000 = {sum((2/3)**n for n in range(1,1001)):.8f})")
+
+print()
+# 5. Σ n²/(2n+1)³
+a5 = lambda n: n**2 / (2*n+1)**3
+print("5. Σ n²/(2n+1)³  -- dominant behavior: n²/n³ = 1/n")
+print(f"   lim comparison with 1/n: L = {a5(100000)/(1/100000):.6f}")
+# YOUR CODE: does Σ 1/n converge?`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
   },
+
 
   rigor: {
     prose: [

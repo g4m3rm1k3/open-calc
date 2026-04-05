@@ -118,7 +118,144 @@ export default {
       },
     ],
     visualizations: [
-          ],
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Solve & Verify Optimization Problems',
+        caption: 'Minimize/maximize numerically, then confirm your calculus answer. Visualize how objective functions behave across the domain.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Fencing Problem: scan the domain, find the max',
+              prose: [
+                '**Problem**: 100 m of fence. Maximize area $A = x(50-x)$.',
+                'Calculus says $x^* = 25$ m. Verify by plotting and checking nearby values.',
+              ],
+              instructions: 'Run this cell, then change P = 100 to 200 or 60 and watch x* = P/4 always.',
+              code: `from opencalc import Figure
+import math
+
+P = 100.0   # total fence (change me)
+A  = lambda x: x * (P/2 - x)
+
+x_star = P / 4
+A_max  = A(x_star)
+
+print(f"Perimeter P = {P} m")
+print(f"Optimal x = P/4 = {x_star:.4f} m")
+print(f"Optimal y = {P/2 - x_star:.4f} m")
+print(f"Maximum area = {A_max:.4f} m\u00b2")
+print()
+print("Sanity check - nearby values:")
+for x in [x_star-5, x_star-1, x_star, x_star+1, x_star+5]:
+    if 0 < x < P/2:
+        print(f"  A({x:.1f}) = {A(x):.4f}")
+
+fig = Figure(xmin=0, xmax=P/2, ymin=0, ymax=A_max*1.1,
+    title=f"Area vs x (fencing, P={P})")
+fig.grid().axes()
+fig.plot(A, color='blue', label='A(x)', width=2.5)
+fig.vline(x_star, color='amber', dashed=True)
+fig.point([x_star, A_max], color='red', label=f'max: ({x_star:.1f}, {A_max:.1f})', radius=7)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Tin Can: minimize surface area for fixed volume',
+              prose: [
+                '$SA(r) = 2\\pi r^2 + \\dfrac{2V}{r}$',
+                'Setting $SA\'(r) = 0$ gives $r^3 = V/(2\\pi)$, so $h = 2r$ at the optimum.',
+              ],
+              instructions: 'Change V to 1000 or 250 and verify h = 2r always holds.',
+              code: `from opencalc import Figure
+import math
+
+V = 500.0   # cm\u00b3 (fixed volume)
+SA  = lambda r: 2*math.pi*r**2 + 2*V/r
+
+r_star = (V / (2*math.pi))**(1/3)
+h_star = V / (math.pi * r_star**2)
+
+print(f"V = {V} cm\u00b3")
+print(f"Optimal r = {r_star:.4f} cm")
+print(f"Optimal h = {h_star:.4f} cm")
+print(f"h / r = {h_star/r_star:.6f}  (always exactly 2!)")
+print(f"Min SA = {SA(r_star):.4f} cm\u00b2")
+
+fig = Figure(xmin=0.5, xmax=10, ymin=0, ymax=2000,
+    title=f"Surface Area vs radius (V={V} cm\u00b3)")
+fig.grid().axes()
+fig.plot(SA, color='green', label='SA(r)', width=2.5)
+fig.vline(r_star, color='amber', dashed=True)
+fig.point([r_star, SA(r_star)], color='red',
+    label=f'min: r={r_star:.2f}, h={h_star:.2f}', radius=7)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Open Box: visualize V(x) and locate the max',
+              prose: [
+                'A 12\u00d78 in cardboard sheet. Cut corners of size $x$ and fold.',
+                '$V(x) = (12-2x)(8-2x)x$, $x \\in (0,4)$.',
+                'Calculus gives $x^* = (10-2\\sqrt{7})/3 \\approx 1.5685$ in.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+V  = lambda x: (12-2*x)*(8-2*x)*x
+
+x_star = (10 - 2*math.sqrt(7)) / 3
+V_max  = V(x_star)
+
+print(f"Exact x* = (10-2\u221a7)/3 = {x_star:.6f} in")
+print(f"V(x*) = {V_max:.6f} in\u00b3")
+print()
+for x in [1.0, 1.3, x_star, 1.8, 2.5]:
+    print(f"  V({x:.4f}) = {V(x):.4f} in\u00b3")
+
+fig = Figure(xmin=0, xmax=4, ymin=0, ymax=80,
+    title="Box Volume vs corner cut x (12\u00d78 sheet)")
+fig.grid().axes()
+fig.plot(V, color='blue', label='V(x)', width=2.5)
+fig.vline(x_star, color='amber', dashed=True)
+fig.point([x_star, V_max], color='red',
+    label=f'max: x\u2248{x_star:.3f}, V\u2248{V_max:.1f}', radius=7)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Nearest point on y = x\u00b2 to (0, 3)',
+              difficulty: 'medium',
+              prompt: 'Find the point on y = x\u00b2 closest to (0, 3).\n\nObjective: minimize D\u00b2 = x\u00b2 + (x\u00b2 - 3)\u00b2\nCalculus answer: x = \u00b1\u221a(5/2), y = 5/2, distance = \u221a(11)/2 \u2248 1.658',
+              hint: 'd(D\u00b2)/dx = 2x + 2(x\u00b2-3)(2x) = 2x(1 + 2x\u00b2 - 6) = 2x(2x\u00b2-5). Critical points: x=0 and x=\u00b1\u221a(5/2). Check which gives minimum.',
+              code: `from opencalc import Figure
+import math
+
+D2 = lambda x: x**2 + (x**2 - 3)**2
+
+# YOUR CODE: solve for x_star and compute min distance
+# x_star = ???
+# d_min  = math.sqrt(D2(x_star))
+# print(f"Nearest x = {x_star:.4f}, y = {x_star**2:.4f}")
+# print(f"Min distance = {d_min:.4f}")
+
+# Scaffold plot
+fig = Figure(xmin=-3, xmax=3, ymin=0, ymax=15,
+    title="D\u00b2(x) = x\u00b2 + (x\u00b2-3)\u00b2  \u2014 find the minimum")
+fig.grid().axes()
+fig.plot(D2, color='blue', label='D\u00b2(x)', width=2.5)
+fig.point([0, D2(0)], color='red', label='x=0 local MAX', radius=6)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {

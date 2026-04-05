@@ -86,8 +86,160 @@ export default {
         body: '\\[\\int e^{ax}\\sin(bx)\\,dx = \\frac{e^{ax}(a\\sin bx - b\\cos bx)}{a^2+b^2}+C\\]\n\\[\\int e^{ax}\\cos(bx)\\,dx = \\frac{e^{ax}(a\\cos bx + b\\sin bx)}{a^2+b^2}+C\\]',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Build & Verify Integration by Parts',
+        caption: 'Implement the tabular method, verify antiderivatives by differentiation, and discover the cycling trick numerically before working it algebraically.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Verify ∫x·eˣ dx = eˣ(x−1) + C by differentiation',
+              prose: [
+                'After computing an antiderivative, **always verify**: differentiate and check you get the integrand back.',
+                'Python can do symbolic-style checks numerically at many test points.',
+              ],
+              instructions: 'Run to verify. Then change F to verify ∫x cos x dx = x sin x + cos x + C.',
+              code: `import math
+
+# The antiderivative we claim: F(x) = e^x * (x - 1)
+F  = lambda x: math.exp(x) * (x - 1)
+f  = lambda x: x * math.exp(x)   # the original integrand
+
+# Numerical derivative check: F'(x) should equal f(x)
+h = 1e-7   # small step for finite difference
+
+print("Verifying F'(x) = f(x) = x·eˣ")
+print()
+print(f"{'x':>6}  {'F(x)':>18}  {'F\\'(x)≈':>18}  {'f(x)=x·eˣ':>18}  {'match?'}")
+print("-" * 75)
+for x in [-2, -1, 0, 1, 2, 3, 5]:
+    dF = (F(x+h) - F(x-h)) / (2*h)     # central difference derivative
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-5
+    print(f"{x:>6}  {F(x):>18.10f}  {dF:>18.10f}  {fx:>18.10f}  {'✓' if ok else '✗'}")
+
+print()
+print("All match? =>", all(abs((F(x+h)-F(x-h))/(2*h) - f(x)) < 1e-5 for x in range(-5, 6)))`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Tabular method: ∫x³·eˣ dx in one shot',
+              prose: [
+                '**Tabular method**: list derivatives of $u$ down one column, antiderivatives of $dv$ down the other, alternate signs.',
+                '| D (derivatives of $x^3$) | I (antiderivatives of $e^x$) | Sign |',
+                '|---|---|---|',
+                '| $x^3$ | $e^x$ | $+$ |',
+                '| $3x^2$ | $e^x$ | $-$ |',
+                '| $6x$ | $e^x$ | $+$ |',
+                '| $6$ | $e^x$ | $-$ |',
+                '| $0$ | $e^x$ | stop |',
+                'Answer: $e^x(x^3 - 3x^2 + 6x - 6) + C$',
+              ],
+              code: `import math
+
+# Tabular method result
+F  = lambda x: math.exp(x) * (x**3 - 3*x**2 + 6*x - 6)
+f  = lambda x: x**3 * math.exp(x)
+
+h  = 1e-7
+
+print("Verifying tabular result: ∫x³·eˣ dx = eˣ(x³-3x²+6x-6) + C")
+print()
+print(f"{'x':>5}  {'F\\'(x)≈':>20}  {'f(x)=x³eˣ':>20}  {'match?'}")
+print("-" * 55)
+for x in [-2, 0, 1, 2, 3]:
+    dF = (F(x+h) - F(x-h)) / (2*h)
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-4
+    print(f"{x:>5}  {dF:>20.10f}  {fx:>20.10f}  {'✓' if ok else '✗'}")
+
+print()
+print("The tabular method gave the right answer in one organized pass.")
+print()
+print("Spot check: F(1) =", F(1))
+print("Reference:  e^1*(1-3+6-6) =", math.exp(1)*(1-3+6-6))`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Cycling trick: ∫eˣ sin x dx — solve the equation',
+              prose: [
+                'Two rounds of by-parts bring the original $I$ back to the right side:',
+                '$I = e^x \\sin x - e^x \\cos x - I$',
+                '$\\Rightarrow 2I = e^x(\\sin x - \\cos x) \\Rightarrow I = \\frac{e^x(\\sin x - \\cos x)}{2}$',
+              ],
+              code: `import math
+
+F  = lambda x: math.exp(x) * (math.sin(x) - math.cos(x)) / 2
+f  = lambda x: math.exp(x) * math.sin(x)
+
+h = 1e-7
+
+print("Verifying cycling result: ∫eˣ sin x dx = eˣ(sin x − cos x)/2 + C")
+print()
+print(f"{'x':>8}  {'F\\'(x)≈':>20}  {'eˣ sin x':>20}  match?")
+print("-" * 60)
+for x in [0, 1, 2, 3.14, -1]:
+    dF = (F(x+h) - F(x-h)) / (2*h)
+    fx = f(x)
+    ok = abs(dF - fx) < 1e-4
+    print(f"{x:>8.2f}  {dF:>20.10f}  {fx:>20.10f}  {'✓' if ok else '✗'}")
+
+print()
+# Curious: also verify the cycling structure numerically
+print("Verifying definite integral: ∫₀^π eˣ sin x dx")
+# Riemann sum approximation
+n = 10000
+xs = [i/n * math.pi for i in range(n)]
+riemann = sum(f(x) * (math.pi/n) for x in xs)
+exact   = F(math.pi) - F(0)
+print(f"  Riemann sum (n={n}): {riemann:.8f}")
+print(f"  Exact [F(π)-F(0)]:  {exact:.8f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Verify ∫ln(x) dx and ∫arctan(x) dx',
+              difficulty: 'easy',
+              prompt: 'Two classic lone-function by-parts:\n\n∫ln(x) dx = x ln(x) − x + C\n∫arctan(x) dx = x arctan(x) − (1/2) ln(1+x²) + C\n\nTask: write numerical derivative checks for both, like Cell 1 showed.',
+              hint: 'Copy the pattern from Cell 1. Define F = the antiderivative, f = the integrand, then loop over test points computing (F(x+h)-F(x-h))/(2h) and comparing to f(x).',
+              code: `import math
+
+h = 1e-7
+
+# Part 1: ∫ln(x) dx
+F_ln = lambda x: x * math.log(x) - x
+f_ln = lambda x: math.log(x)
+
+print("Part 1: ∫ln(x) dx = x·ln(x) − x + C")
+print()
+# YOUR CODE: verify F_ln'(x) = f_ln(x) for several x > 0
+# for x in [0.5, 1, 2, 5, 10]:
+#     dF = (F_ln(x+h) - F_ln(x-h)) / (2*h)
+#     print(f"  x={x}  F'(x)={dF:.10f}  f(x)={f_ln(x):.10f}  match={abs(dF-f_ln(x))<1e-5}")
+
+# Part 2: ∫arctan(x) dx
+F_at = lambda x: x * math.atan(x) - 0.5 * math.log(1 + x**2)
+f_at = lambda x: math.atan(x)
+
+print()
+print("Part 2: ∫arctan(x) dx = x·arctan(x) − (1/2)·ln(1+x²) + C")
+print()
+# YOUR CODE: verify F_at'(x) = f_at(x)
+# for x in [-2, -1, 0, 1, 2, 5]:
+#     ...`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
   },
+
 
   rigor: {
     prose: [

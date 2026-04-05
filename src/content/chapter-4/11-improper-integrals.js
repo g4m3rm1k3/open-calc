@@ -85,8 +85,167 @@ export default {
         body: '\\[\\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}\\]\nThis integral has no elementary antiderivative but has a finite value, computed by a polar-coordinates trick (squaring and converting to 2D). It is the foundation of the normal distribution in statistics.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Watch Improper Integrals Converge (or Diverge)',
+        caption: 'Compute ∫₁^b f(x)dx as b grows, see partial areas accumulate, and watch the p-test cutoff at p=1 in real time.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'p-Test: ∫₁^∞ 1/xᵖ dx — converge or diverge?',
+              prose: [
+                '**Theory**: converges iff $p > 1$, value $= 1/(p-1)$.',
+                'Watch partial integrals $\\int_1^b x^{-p}\\,dx$ as $b$ grows to see convergence vs divergence.',
+              ],
+              instructions: 'Change p to 1.5, 0.5, 1.001, 0.999 and see the sharp cutoff at p=1.',
+              code: `from opencalc import Figure
+import math
+
+p = 2.0   # try 0.5, 1.0, 1.5, 1.001, 0.999
+
+def partial_integral(b, p):
+    """∫₁^b x^(-p) dx"""
+    if p == 1:
+        return math.log(b)
+    return (b**(1-p) - 1) / (1-p)
+
+bs = [1, 2, 5, 10, 50, 100, 500, 1000, 5000]
+print(f"p = {p}  (converges if p > 1)")
+print()
+print(f"{'b':>6}  {'∫₁^b x^(-p) dx':>22}  {'limit prediction'}")
+print("-" * 55)
+if p > 1:
+    theory = 1 / (p-1)
+    for b in bs:
+        v = partial_integral(b, p)
+        print(f"{b:>6}  {v:>22.12f}  → {theory:.12f}")
+    print(f"\\nConverges to 1/(p-1) = 1/{p-1:.3f} = {theory:.12f}")
+else:
+    for b in bs:
+        v = partial_integral(b, p)
+        print(f"{b:>6}  {v:>22.6f}  → ∞ (diverges!)")
+    print(f"\\nDiverges (p={p} ≤ 1)")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Plot: convergent 1/x² vs divergent 1/x — same picture, different fate',
+              prose: [
+                'Both $1/x$ and $1/x^2$ approach zero as $x \\to \\infty$.',
+                'Yet $\\int_1^\\infty 1/x^2\\,dx = 1$ (finite) while $\\int_1^\\infty 1/x\\,dx = \\infty$.',
+                'The **area** under the tail is what matters, not the height alone.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+def running_area(p, b_max=20, n=500):
+    """Compute running area ∫₁^b for b in [1, b_max]."""
+    db = (b_max - 1) / n
+    bs, areas = [1.0], [0.0]
+    for i in range(1, n+1):
+        b = 1 + i * db
+        if p == 1:
+            a = math.log(b)
+        else:
+            a = (b**(1-p) - 1) / (1-p)
+        bs.append(b)
+        areas.append(a)
+    return bs, areas
+
+bs1, a1 = running_area(2)    # 1/x² → total 1
+bs2, a2 = running_area(1)    # 1/x  → ∞
+
+fig = Figure(xmin=1, xmax=20, ymin=0, ymax=4,
+    title="Running area ∫₁^b xᵖ dx: p=2 (converges to 1) vs p=1 (diverges)")
+fig.grid().axes()
+for i in range(len(bs1)-1):
+    fig.line([bs1[i], a1[i]], [bs1[i+1], a1[i+1]], color='blue', width=2)
+for i in range(len(bs2)-1):
+    fig.line([bs2[i], a2[i]], [bs2[i+1], a2[i+1]], color='red', width=2)
+fig.hline(1.0, color='amber', dashed=True)
+fig.text([12, 1.15], '∫1/x² → 1', color='blue', size=11)
+fig.text([12, 3.2], '∫1/x → ∞', color='red', size=11)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: "Gabriel's Horn: finite volume, infinite surface area",
+              prose: [
+                'Rotate $y = 1/x$ for $x \\geq 1$ around the $x$-axis.',
+                '**Volume** $= \\pi \\int_1^\\infty \\frac{1}{x^2}\\,dx = \\pi$ — **finite!**',
+                '**Surface area** $\\geq 2\\pi \\int_1^\\infty \\frac{1}{x}\\,dx = \\infty$',
+                'You can fill Gabriel\'s Horn with $\\pi$ cm³ of paint — but not paint its outside.',
+              ],
+              code: `import math
+
+def horn_volume(b):
+    """π ∫₁^b (1/x)² dx = π[-1/x]₁^b = π(1 - 1/b)"""
+    return math.pi * (1 - 1/b)
+
+def horn_surface_lower(b):
+    """Lower bound: 2π ∫₁^b (1/x) dx = 2π ln(b)"""
+    return 2 * math.pi * math.log(b)
+
+print("Gabriel's Horn: Rotate y=1/x around x-axis")
+print()
+print(f"{'b':>8}  {'Volume':>18}  {'Surface (lower bound)':>22}")
+print("-" * 55)
+for b in [2, 5, 10, 100, 1000, 10000]:
+    V = horn_volume(b)
+    S = horn_surface_lower(b)
+    print(f"{b:>8}  {V:>18.10f}  {S:>22.10f}")
+
+print()
+print(f"Volume → π = {math.pi:.10f}")
+print("Surface → ∞ (grows without bound)")
+print()
+print("Paradox resolved:")
+print("  Volume integral:  ∫1/x² dx (p=2>1) → CONVERGES to 1")
+print("  Surface integral: ∫1/x dx  (p=1)   → DIVERGES to ∞")
+print("  One sign difference in the exponent changes everything.")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Estimate the Gaussian integral ∫₀^∞ e^(−x²) dx',
+              difficulty: 'hard',
+              prompt: 'The Gaussian integral ∫₀^∞ e^(−x²) dx = √π/2 ≈ 0.8862...\n\nIt has no elementary antiderivative, but it converges. Verify this numerically:\n\n1. Compute ∫₀^b e^(−x²) dx for b = 1, 2, 3, 5, 10 using a Riemann sum\n2. Confirm it approaches √π/2\n3. Plot the running area as a function of b',
+              hint: 'Use a Riemann sum with n=10000 strips: sum f(x)*dx for x from 0 to b. Compare to math.sqrt(math.pi)/2.',
+              code: `import math
+from opencalc import Figure
+
+f    = lambda x: math.exp(-x**2)
+true = math.sqrt(math.pi) / 2   # ≈ 0.8862269...
+
+print(f"True value: √π/2 = {true:.12f}")
+print()
+
+# YOUR CODE: compute ∫₀^b e^(-x²) dx for several values of b
+# Hint: n=10000 strips, dx = b/n, sum = sum(f(0 + i*dx) * dx for i in range(n))
+
+# for b in [1, 2, 3, 5, 10]:
+#     n  = 10000
+#     dx = b / n
+#     area = sum(f(i*dx) * dx for i in range(n))
+#     print(f"  b={b:>4}: ∫₀^b = {area:.10f}  error = {abs(area-true):.2e}")
+
+# Bonus: plot the running area vs b
+# bs = ...
+# areas = ...
+# fig = Figure(...)
+# fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
+    ],
   },
+
 
   rigor: {
     prose: [
