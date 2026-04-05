@@ -376,7 +376,6 @@ export default {
   hook: {
     question: 'How does a computer represent the number 42 — or a whole song — using only 0s and 1s?',
     realWorldContext: 'Every number, text character, pixel, and sound sample in your computer is stored as a sequence of binary digits.',
-    previewVisualizationId: 'BinaryAndWaveforms',
   },
   intuition: {
     prose: [

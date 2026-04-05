@@ -63,15 +63,22 @@ src/App.jsx    → HashRouter + all top-level routes
 | `#/` | `HomePage.jsx` | Course card grid (one card per course) |
 | `#/course/:courseKey` | `CoursePage.jsx` | **All chapters for a course** — the course overview |
 | `#/chapter/:chapterId` | `ChapterPage.jsx` | Lesson list for one chapter |
-| `#/chapter/:chapterId/:lessonSlug` | `LessonPage.jsx` | **Main lesson renderer** |
+| `#/chapter/:chapterId/:lessonSlug` | `LessonPage.jsx` | **Main lesson renderer — used by ALL courses** |
 | `#/reference` | `ReferencePage.jsx` | Formula cards + proof modals |
 | `#/search` | search modal (in AppShell) | Opens search overlay |
 | `#/paths` | `LearningPathsPage.jsx` | Curated learning paths |
 | `#/about` | `AboutPage.jsx` | |
+| `#/chemistry` | `ChemistryPage.jsx` | **Tools page only** — Periodic Table + Molecule Builder |
+| `#/logic-sim` | `LogicSimPage.jsx` | **Tools page only** — digital logic circuit simulator |
+| `#/universal-calc` | `UniversalCalcPage.jsx` | **Tools page only** — calculator tools |
 
 **How lesson routing works internally:**
 
 `LessonPage` calls `LESSON_MAP[chapterId + '/' + lessonSlug]` (from `content/index.js`). That flat map is built at startup by assembling every lesson from every course's index file. A lesson must have both a correct `chapter` field AND a matching mapping in its chapter's index, or it will 404.
+
+### ⚠ Tools pages vs lesson pages
+
+`ChemistryPage`, `LogicSimPage`, and `UniversalCalcPage` are **tools pages** — they contain interactive tools (periodic table, circuit simulator, calculator). They do **not** render lessons and must never be modified to do so. All lessons for all courses — including chemistry and digital fundamentals — go through `LessonPage` via `#/chapter/:chapterId/:lessonSlug`.
 
 ---
 
@@ -131,22 +138,28 @@ Courses are imported from their `index.js` file, which either exports a **single
 
 ### Course inventory
 
-| Course folder | Curriculum subject | Chapter format |
-|---|---|---|
-| `chapter-0/` | Pre-calculus review | Single object |
-| `chapter-1/` through `chapter-6/` | Calculus Vol. 1 | Single object each |
-| `discrete-math/` | Discrete Mathematics | Single object |
-| `geometry-1/` through `geometry-6/` | Geometry (Books 1–6) | Single object each |
-| `linear-algebra/` | Linear Algebra | Single object |
-| `physics-1/` | Physics: Vectors & Kinematics | Single object |
-| `precalc/` through `precalc-5/` | Pre-Calculus series | Single object each |
-| `python-1/` | Python Programming | Array of chapters |
-| `web-1/` | Web Development | Array of chapters |
-| `javascript-1/` | JavaScript Core | Array of chapters |
-| `tetris-1/` | Build Tetris (JS/Web curriculum) | Array of chapters |
-| `data-science/` | Data Science | Single object |
-| `math-1/` | Math 1 | Single object |
-| `proofs/` | (Proof data, not a course — used by Reference) | n/a |
+| Course folder | Curriculum subject | Chapter format | Lesson schema |
+|---|---|---|---|
+| `chapter-0/` | Pre-calculus review | Single object | Schema A |
+| `chapter-1/` through `chapter-6/` | Calculus Vol. 1 | Single object each | Schema A |
+| `discrete-math/` | Discrete Mathematics | Single object | Schema A |
+| `geometry-1/` through `geometry-6/` | Geometry (Books 1–6) | Single object each | Schema A |
+| `linear-algebra/` | Linear Algebra | Single object | Schema A |
+| `physics-1/` | Physics: Vectors & Kinematics | Single object | Schema A |
+| `precalc/` through `precalc-5/` | Pre-Calculus series | Single object each | Schema A |
+| `python-1/` | Python Programming | Array of chapters | Schema B |
+| `web-1/` | Web Development | Array of chapters | Schema C |
+| `javascript-1/` | JavaScript Core | Array of chapters | Schema D |
+| `tetris-1/` | Build Tetris (JS/Web curriculum) | Array of chapters | Schema D |
+| `data-science/` | Data Science | Single object | Schema A |
+| `math-1/` | Math 1 | Single object | Schema A |
+| `chemistry-1/` | Chemistry | Array of chapters | **Schema E** |
+| `digital-fundamentals/` | Digital Fundamentals | Array of chapters | **Schema E** |
+| `proofs/` | (Proof data, not a course — used by Reference) | n/a | n/a |
+
+**Chapter number convention:**
+- Calculus (`chapter-0` through `chapter-6`): integer `number` fields (`0`, `1`, … `6`)
+- All other courses: string `number` fields matching `'coursekey.N'` pattern, e.g. `'chem.1'`, `'df.1'`, `'geo.1'`, `'py.1'`
 
 ---
 
@@ -376,6 +389,89 @@ export default {
   quiz: [],
 }
 ```
+
+---
+
+### Schema E — ScienceNotebook (chemistry-1, digital-fundamentals)
+
+Used for concept-first, no-math courses where every lesson is a sequential visual notebook — no symbolic math entry, no proof steps, no quiz with mathjs grading. The lesson data is a flat `cells` array.
+
+Each lesson file has **two exports**:
+- A named `export const LESSON_XY_N_N` — the notebook data object, imported by the lesson's wrapper viz component
+- A default export — the metadata object used by the chapter index and `LESSON_MAP`
+
+```js
+// Part 1 — notebook data (named export)
+export const LESSON_CHEM_1_0 = {
+  title:     'Why Chemistry?',
+  subtitle:  'Every question about the physical world is a chemistry question.',
+  sequential: true,   // each cell unlocks after the previous one is completed
+  cells: [
+    // markdown cell — prose only
+    { type: 'markdown', instruction: 'Text here. Supports **bold** and _italic_.' },
+
+    // visual cell — canvas/HTML demo, auto-runs on mount in a sandboxed iframe
+    { type: 'js', instruction: 'Prose above the demo.', html: '<div id="app"></div>', css: '', startCode: '/* vanilla JS */', outputHeight: 320 },
+
+    // challenge cell — multiple choice, no code evaluation
+    {
+      type: 'challenge',
+      instruction: 'The question.',
+      options: [
+        { label: 'A', text: 'First choice' },
+        { label: 'B', text: 'Correct choice' },
+      ],
+      check: (label) => label === 'B',
+      successMessage: 'Correct! Because...',
+      failMessage: 'Not quite. Think about...',
+    },
+  ],
+}
+
+// Part 2 — metadata (default export, used by chapter index)
+export default {
+  id:    'chem-1-0-why-chemistry',
+  slug:  'why-chemistry',
+  chapter: 'chem.1',          // string, not a number
+  order: 0,
+  title: 'Why Chemistry?',
+  subtitle: 'Every question about the physical world is a chemistry question.',
+  previewVisualizationId: 'WhyChemistry',  // the wrapper viz ID
+  intuition: {
+    visualizations: [{ id: 'WhyChemistry', title: 'Why Chemistry?' }],
+  },
+}
+```
+
+**Wrapper viz component** — required for each lesson:
+
+Because `VizFrame` passes `params` (not a `lesson` object) to viz components, each ScienceNotebook lesson needs a thin wrapper that self-imports its own data:
+
+```js
+// src/components/viz/react/WhyChemistry.jsx
+import ScienceNotebook from './ScienceNotebook.jsx'
+import { LESSON_CHEM_1_0 } from '../../../content/chemistry-1/lesson1-0.js'
+
+export default function WhyChemistry({ params }) {
+  return <ScienceNotebook lesson={LESSON_CHEM_1_0} params={params} />
+}
+```
+
+Registered in `VizFrame.jsx`:
+```js
+WhyChemistry: lazy(() => import('./react/WhyChemistry.jsx')),
+```
+
+**Never point two different lessons at the same wrapper ID.** Each lesson must have its own wrapper file and its own unique `VIZ_REGISTRY` key.
+
+**Current Schema E lessons and their wrapper IDs:**
+
+| Lesson file | Named export | Wrapper component | VIZ_REGISTRY key |
+|---|---|---|---|
+| `chemistry-1/lesson1-0.js` | `LESSON_CHEM_1_0` | `WhyChemistry.jsx` | `WhyChemistry` |
+| `chemistry-1/lesson1-1.js` | `LESSON_CHEM_1_1` | `WhatIsAnAtom.jsx` | `WhatIsAnAtom` |
+| `digital-fundamentals/lesson1-0.js` | `LESSON_DF_1_0` | `AnalogVsDigital.jsx` | `AnalogVsDigital` |
+| `digital-fundamentals/lesson1-1.js` | `LESSON_DF_1_1` | `BinaryAndWaveforms.jsx` | `BinaryAndWaveforms` |
 
 ---
 
@@ -710,7 +806,26 @@ To add a proof:
 
 ### Layer 3 — Algebra cheat-sheet (`src/content/algebraRegistry.js`)
 
-A separate object used only in Chapter 0 lessons. Each entry has `name`, `formula`, `example`, `description`, `chapterZeroSlug`. This is NOT connected to the Reference page — it's an inline quick-reference system for the algebra review chapter.
+A flat dictionary of algebra prerequisite topics used as **inline popover tooltips** inside lesson prose. Currently used in: `chapter-0/01b-algebraic-techniques.js`, `chapter-1/03-epsilon-delta.js`, `chapter-1/04a-visual-epsilon-delta.js`, `chapter-2/02-chain-rule.js`.
+
+**Entry shape:**
+```js
+'topic-id': {
+  name: 'Human-Readable Name',
+  formula: 'a^2 - b^2 = (a-b)(a+b)',  // KaTeX — escape backslashes in JS: \\frac
+  example: 'x^2 - 9 = (x-3)(x+3)',    // KaTeX
+  description: 'Plain English explanation.',
+  chapterZeroSlug: 'algebraic-techniques',  // slug for "review it" deep-link
+}
+```
+
+**Trigger syntax in prose strings:**
+```js
+"Use {{algebra:difference-of-squares|difference of squares}} to factor."
+```
+`parseProse.jsx` detects `{{algebra:topicId|link text}}` and renders `<AlgebraMicroLesson topicId="...">`. The component looks up the ID in `ALGEBRA_REGISTRY` and shows a popover card with formula, example, description, and a Chapter 0 deep-link. The link text is rendered as KaTeX. If the ID is missing from the registry, it renders as a plain underlined span (no crash).
+
+**Not connected to the Reference page** — this is separate from formula cards and proofs.
 
 ---
 

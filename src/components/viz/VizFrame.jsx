@@ -184,6 +184,9 @@ const VIZ_REGISTRY = {
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
+  // Chemistry lessons
+  WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
+  WhatIsAnAtom: lazy(() => import("./react/WhatIsAnAtom.jsx")),
   // Digital Fundamentals lessons
   AnalogVsDigital: lazy(() => import("./react/AnalogVsDigital.jsx")),
   BinaryAndWaveforms: lazy(() => import("./react/BinaryAndWaveforms.jsx")),

@@ -300,7 +300,6 @@ export default {
   hook: {
     question: 'Why do we convert everything — music, photos, temperature — into streams of 0s and 1s?',
     realWorldContext: 'Every digital device you own translates the continuous physical world into discrete numbers before processing it.',
-    previewVisualizationId: 'AnalogVsDigital',
   },
   intuition: {
     prose: [

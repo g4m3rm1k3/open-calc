@@ -319,7 +319,6 @@ export default {
   hook: {
     question: "Why does ice float, wood burn, and salt dissolve — but oil doesn't?",
     realWorldContext: 'These are not trivial questions. They are the questions chemistry was built to answer.',
-    previewVisualizationId: 'ScienceNotebook',
   },
   intuition: {
     prose: [
@@ -327,7 +326,7 @@ export default {
       'Every observable phenomenon is a consequence of specific atomic and molecular behaviour.',
     ],
     callouts: [{ type: 'important', title: 'The core pattern', body: 'Visible phenomenon → invisible atomic explanation. This pattern repeats in every lesson.' }],
-    visualizations: [{ id: 'ScienceNotebook', title: 'Why Chemistry', props: { lesson: LESSON_CHEM_1_0 } }],
+    visualizations: [{ id: 'WhyChemistry', title: 'Why Chemistry?' }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

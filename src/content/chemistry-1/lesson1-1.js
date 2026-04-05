@@ -263,7 +263,6 @@ export default {
   hook: {
     question: 'Why does water always form from exactly 2 parts hydrogen and 1 part oxygen?',
     realWorldContext: 'The answer to this question forced scientists to accept that matter must be made of discrete, indivisible particles.',
-    previewVisualizationId: 'ScienceNotebook',
   },
   intuition: {
     prose: [
@@ -272,7 +271,7 @@ export default {
       'Einstein proved atoms are real by predicting the exact statistical pattern of Brownian motion.',
     ],
     callouts: [{ type: 'important', title: 'The atom as a necessary idea', body: 'Dalton did not assume atoms. He reasoned: discrete particles are the only model that explains fixed combination ratios.' }],
-    visualizations: [{ id: 'ScienceNotebook', title: 'What Is an Atom', props: { lesson: LESSON_CHEM_1_1 } }],
+    visualizations: [{ id: 'WhatIsAnAtom', title: 'What Is an Atom?' }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

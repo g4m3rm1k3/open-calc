@@ -898,6 +898,195 @@ If you want this guide to be easy for contributors to find on GitHub, do all thr
 2. Keep a clear link in `README.md` to this guide.
 3. In pull requests, reference `CONTRIBUTING.md` when review comments involve lesson or visualization workflow.
 
+---
+
+## 7. ScienceNotebook Lesson Format
+
+Some courses (Chemistry, Digital Fundamentals) use a different lesson content format instead of the standard `hook / intuition / math / rigor / quiz` structure. These lessons render through the `ScienceNotebook` component — a no-code, sequential cell viewer.
+
+### When to use ScienceNotebook
+
+Use this format when:
+- The lesson is primarily visual and interactive (canvas demos, toggles, sliders)
+- There is no prerequisite symbolic math — the course is concept-first
+- The lesson has challenge questions answered by selecting options, not typing math
+
+Use the standard lesson format for all calculus, precalc, linear algebra, discrete math, and physics content.
+
+### Cell format
+
+A ScienceNotebook lesson is a plain JS object with a `cells` array:
+
+```javascript
+export const LESSON_XY_1_0 = {
+  title: 'Lesson Title',
+  subtitle: 'One-sentence teaser.',
+  sequential: true,   // each cell unlocks after the previous one is interacted with
+
+  cells: [
+    // ── Markdown cell — prose only ──────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `Prose text here. Supports **bold**, _italic_, and \`code\`.`,
+    },
+
+    // ── Visual cell — canvas/HTML demo, auto-runs on mount ──────────────
+    {
+      type: 'js',
+      instruction: `Prose shown above the demo.`,
+      html: `<div id="app">...</div>`,
+      css:  `body { margin: 0; }`,
+      startCode: `// vanilla JS that runs inside a sandboxed iframe`,
+      outputHeight: 320,   // iframe height in px, default 320
+    },
+
+    // ── Challenge cell — multiple choice ────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `The question text.`,
+      options: [
+        { label: 'A', text: 'First choice' },
+        { label: 'B', text: 'Second choice' },
+        { label: 'C', text: 'Third choice' },
+      ],
+      check: (label) => label === 'B',   // return true for the correct label
+      successMessage: 'Correct! Because...',
+      failMessage: 'Not quite. Think about...',
+    },
+  ],
+}
+```
+
+### File exports
+
+Every ScienceNotebook lesson file needs **two exports**:
+
+```javascript
+// Named export — used by the wrapper viz component
+export const LESSON_XY_1_0 = { ... }
+
+// Default export — used by the chapter index and course registration
+export default {
+  id: 'xy-1-0-lesson-title',
+  slug: 'lesson-title',
+  chapter: 'xy.1',           // string, not a number
+  order: 0,
+  title: 'Lesson Title',
+  subtitle: 'One-sentence teaser.',
+  previewVisualizationId: 'MyWrapperViz',
+  intuition: {
+    visualizations: [{ id: 'MyWrapperViz', title: 'Lesson Title' }],
+  },
+}
+```
+
+### Wrapper viz component
+
+Because `VizFrame` renders a component by ID and passes `params` — not a `lesson` object — each ScienceNotebook lesson needs a thin wrapper component that self-imports its own data:
+
+```javascript
+// src/components/viz/react/MyWrapperViz.jsx
+import ScienceNotebook from './ScienceNotebook.jsx'
+import { LESSON_XY_1_0 } from '../../../content/my-course/lesson1-0.js'
+
+export default function MyWrapperViz({ params }) {
+  return <ScienceNotebook lesson={LESSON_XY_1_0} params={params} />
+}
+```
+
+Register it in `VizFrame.jsx`:
+```javascript
+MyWrapperViz: lazy(() => import("./react/MyWrapperViz.jsx")),
+```
+
+**Do not** point multiple lessons at the same wrapper ID. Each lesson needs its own wrapper file so they render independently.
+
+---
+
+## 8. Page Types — Tools Pages vs Lesson Pages
+
+### ⚠ Critical distinction — do not confuse these
+
+The app has two fundamentally different types of pages. **Never add lesson content to a tools page.**
+
+#### Lesson pages — `LessonPage.jsx`
+Route: `#/chapter/:chapterId/:lessonSlug`
+
+Every lesson in every course — calculus, chemistry, digital fundamentals, discrete math, physics — is accessed through this single route. `LessonPage` reads from `LESSON_MAP` (built from `src/content/index.js`) and renders the lesson via `MicroCycleLesson`. ScienceNotebook lessons appear in the intuition tab as a viz registered in `VizFrame`.
+
+**Do not build custom per-course lesson pages.**
+
+#### Tools pages — standalone pages for interactive tools
+These pages exist for tools that are not lessons. They have their own routes registered in `App.jsx`.
+
+| Page | Route | What it contains |
+|---|---|---|
+| `ChemistryPage.jsx` | `#/chemistry` | Periodic Table, Molecule Builder |
+| `LogicSimPage.jsx` | `#/logic-sim` | Digital logic circuit simulator |
+| `UniversalCalcPage.jsx` | `#/universal-calc` | Calculator tools |
+| `ReferencePage.jsx` | `#/reference` | Math reference cards |
+
+**`ChemistryPage` is a tools page.** It contains the Periodic Table (`PeriodicTable.jsx`) and Molecule Builder (`MoleculeBuilder.jsx`). It does not render chemistry lessons. Chemistry lessons live in `src/content/chemistry-1/` and are accessed via `#/chapter/chem.1/:lessonSlug` like every other course.
+
+If a future course needs a dedicated tools page (e.g. a circuit board for electronics), create a new page file and route. Never add lesson rendering to an existing tools page.
+
+---
+
+## 9. Adding a New Course
+
+To add a course that goes through the standard lesson route:
+
+### Step 1 — Register the course key
+Add an entry to `src/content/courses.js`:
+```javascript
+{ key: 'my-course', label: 'My Course', path: '/course/my-course', desc: 'Short description', color: 'sky' }
+```
+`color` must be a Tailwind color name (`sky`, `lime`, `violet`, `amber`, etc.).
+
+### Step 2 — Create lesson files
+Create `src/content/my-course/lesson1-0.js` etc. following Section 1 (standard format) or Section 7 (ScienceNotebook format).
+
+### Step 3 — Create a chapter index
+Create `src/content/my-course/index.js`:
+```javascript
+import lesson1_0 from './lesson1-0.js'
+import lesson1_1 from './lesson1-1.js'
+
+const MY_CH1 = {
+  title: 'Chapter Title',
+  number: 'my.1',          // string key — must be unique across all courses
+  slug: 'my-chapter-slug',
+  course: 'my-course',
+  lessons: [lesson1_0, lesson1_1],
+}
+
+export default [MY_CH1]
+```
+
+Chapter `number` convention:
+- Calculus: integers `0`–`6`
+- All other courses: `'coursekey.N'` strings, e.g. `'chem.1'`, `'df.1'`, `'geo.1'`
+
+### Step 4 — Register in content/index.js
+In `src/content/index.js`:
+```javascript
+import myCourse from './my-course/index.js'
+
+const MY_COURSE_CURRICULUM = myCourse.map(ch => ({ ...ch, course: 'my-course' }))
+
+export const CURRICULUM = [
+  ...CALC_CURRICULUM,
+  // ... other courses
+  ...MY_COURSE_CURRICULUM,
+]
+```
+
+### Step 5 — Build and verify
+```bash
+npm run build
+```
+The course will appear in `CoursePage` automatically once registered. Lessons are accessible at `#/chapter/my.1/:lessonSlug`.
+
 How GitHub surfaces this file:
 
 1. GitHub automatically recognizes root `CONTRIBUTING.md` as contribution instructions.
@@ -1003,3 +1192,61 @@ For repository maintainers:
 3. If creating additional docs (for example under `docs/`), keep `CONTRIBUTING.md` as canonical and link outward, not vice versa.
 
 This avoids split-brain documentation where instructions drift between multiple files.
+
+## 10. Algebra Registry — Inline Popover Tooltips
+
+### What it is
+
+`src/content/algebraRegistry.js` is a flat dictionary of algebra prerequisite topics. Each entry is a short reference card (name, formula, example, description) that pops up inline inside lesson prose when a student clicks a linked term. This lets lessons reference algebra techniques without repeating explanations or sending the student away.
+
+### How it renders
+
+In lesson prose strings, use the `{{algebra:topicId|link text}}` pattern:
+
+```js
+"Factor the numerator using {{algebra:difference-of-squares|difference of squares}}."
+```
+
+`parseProse.jsx` detects this pattern and renders it as an `<AlgebraMicroLesson>` component. The `link text` portion is rendered as a KaTeX inline expression (so it can contain math). On click, a popover appears showing the formula, example, and description from the registry.
+
+### Registry entry shape
+
+```js
+'topic-id': {
+  name: 'Human-Readable Name',         // popover header
+  formula: 'a^2 - b^2 = (a-b)(a+b)',  // KaTeX block (escape backslashes in JS: \\frac)
+  example: 'x^2 - 9 = (x-3)(x+3)',    // KaTeX block
+  description: 'Plain English explanation.',
+  chapterZeroSlug: 'algebraic-techniques', // slug of the Ch0 lesson to deep-link to
+}
+```
+
+### Adding a new entry
+
+1. Open `src/content/algebraRegistry.js`.
+2. Add a new key–object pair before the closing `};`.
+3. Use kebab-case for the key (e.g. `'sum-of-cubes'`).
+4. Set `chapterZeroSlug` to the Chapter 0 lesson slug that covers this technique — used for the "review it" deep-link at the bottom of the popover.
+5. Use the entry in prose with `{{algebra:your-new-key|display text}}`.
+
+### Current entries
+
+| ID | Name |
+|---|---|
+| `difference-of-squares` | Difference of Squares |
+| `difference-of-cubes` | Difference of Cubes |
+| `exponent-rules-multiply` | Multiplying Exponents |
+| `exponent-rules-power` | Power of a Power |
+| `log-power-rule` | Log Power Rule |
+| `triangle-inequality` | Triangle Inequality |
+| `conjugate-multiplication` | Multiplying by the Conjugate |
+| `fraction-split` | Splitting the Numerator |
+| `factoring-fractional-powers` | Factoring Fractional Powers |
+| `solve-simple-quadratic` | Solving Simple Quadratics |
+
+### Rules
+
+1. Registry entries are shared across all lessons — edits affect every lesson that uses that ID.
+2. The `formula` and `example` fields go through KatexBlock — escape all backslashes in JS strings (`\\frac`, `\\sqrt`).
+3. If a `topicId` is not found in the registry, `AlgebraMicroLesson` renders the link text as a plain underlined span (graceful fallback — no crash).
+4. Do not use `{{algebra:...}}` syntax inside KaTeX expressions — only in plain prose strings processed by `parseProse`.

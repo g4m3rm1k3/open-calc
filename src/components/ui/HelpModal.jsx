@@ -1045,11 +1045,16 @@ function SectionTypes() {
     { id: 'python', label: '🐍 Python / Code' },
     { id: 'proof', label: '📝 Proof / Geometry' },
     { id: 'web', label: '🌐 Web / JavaScript' },
+    { id: 'science', label: '🔬 Science / ScienceNotebook' },
   ]
   const content = {
     math: (
       <div>
-        <Para>The classic lesson type. All sections are available. Emphasis on building intuition first, then the formal definition, then practice.</Para>
+        <Para>The classic lesson type. All sections are available. Emphasis on building intuition first, then formal definition, then practice.</Para>
+        <H3>Inline algebra popovers</H3>
+        <Para>In any prose string, use <Cb>{'{{'}</Cb><Cb>algebra:id|link text</Cb><Cb>{'}}'}</Cb> to link a term to a pop-up reference card. The link text is KaTeX.</Para>
+        <CodeBlock>{`"Factor using {{algebra:difference-of-squares|difference of squares}}."`}</CodeBlock>
+        <Para>Available IDs: <Cb>difference-of-squares</Cb>, <Cb>difference-of-cubes</Cb>, <Cb>exponent-rules-multiply</Cb>, <Cb>exponent-rules-power</Cb>, <Cb>log-power-rule</Cb>, <Cb>triangle-inequality</Cb>, <Cb>conjugate-multiplication</Cb>, <Cb>fraction-split</Cb>, <Cb>factoring-fractional-powers</Cb>, <Cb>solve-simple-quadratic</Cb>. Add new ones to <Cb>src/content/algebraRegistry.js</Cb>.</Para>
         <H3>Typical structure</H3>
         <CodeBlock>{`hook → intuition (+ viz) → math definition
   → examples → assessment → quiz`}</CodeBlock>
@@ -1090,6 +1095,37 @@ function SectionTypes() {
         <DownloadCard icon="📝" title="Proof Lesson Template" filename="proof-lesson-template.js" template={TPL_PROOF} desc="Step-by-step proof structure with intuition-first approach and formal justification." />
       </div>
     ),
+    science: (
+      <div>
+        <Para>Used for chemistry and digital-fundamentals lessons. The entire lesson — prose, callouts, steps, and interactive viz — is packaged inside a <Cb>ScienceNotebook</Cb> component. This is <strong>Schema E</strong>.</Para>
+        <H3>File structure — two exports required</H3>
+        <CodeBlock>{`// lesson1-0.js
+const LESSON_CHEM_1_0 = { ...full lesson object... }
+export { LESSON_CHEM_1_0 }   // named export — for the viz wrapper
+export default LESSON_CHEM_1_0  // default export — for the chapter index`}</CodeBlock>
+        <H3>Cells in a ScienceNotebook lesson</H3>
+        <CodeBlock>{`cells: [
+  { type: 'prose',    content: 'Explanation text...' },
+  { type: 'callout',  variant: 'key-idea', title: 'Big Idea', body: '...' },
+  { type: 'step',     label: '1', content: 'First step...' },
+  { type: 'formula',  latex: 'E = mc^2' },
+  { type: 'viz',      id: 'MyVizId' },
+]`}</CodeBlock>
+        <H3>Viz wrapper — required for every ScienceNotebook lesson</H3>
+        <Para>Create a wrapper file in <Cb>src/components/viz/react/</Cb> that self-imports the lesson and passes it to ScienceNotebook. Each lesson needs its own wrapper so VizFrame can load it by ID.</Para>
+        <CodeBlock>{`// src/components/viz/react/WhyChemistry.jsx
+import ScienceNotebook from './ScienceNotebook.jsx'
+import { LESSON_CHEM_1_0 } from '../../../content/chemistry-1/lesson1-0.js'
+
+export default function WhyChemistry({ params }) {
+  return <ScienceNotebook lesson={LESSON_CHEM_1_0} params={params} />
+}`}</CodeBlock>
+        <Para>Then register it in <Cb>VizFrame.jsx</Cb>:</Para>
+        <CodeBlock>{`WhyChemistry: lazy(() => import('./react/WhyChemistry.jsx')),`}</CodeBlock>
+        <Note color="amber">Do NOT set <Cb>previewVisualizationId</Cb> in the lesson's <Cb>hook</Cb> — the viz is rendered from <Cb>intuition.visualizations</Cb> only. Setting it in both causes a double-render.</Note>
+        <Note color="violet">Full spec: CONTRIBUTING.md § 7 — ScienceNotebook Lesson Format</Note>
+      </div>
+    ),
     web: (
       <div>
         <Para>For lessons where students write JavaScript, HTML, or CSS. Uses <Cb>JSNotebook</Cb> — students see live output immediately as they type.</Para>
@@ -1112,7 +1148,7 @@ function SectionTypes() {
   return (
     <div>
       <SectionHeading sub="All types share the same file structure — you just use different fields.">Lesson Types</SectionHeading>
-      <Para>"Types" are just conventions for which fields to use based on subject. You can mix and match freely.</Para>
+      <Para>"Types" are conventions for which fields and components to use based on subject. Each course uses one type consistently — check ARCHITECTURE.md § 4 for the course→schema mapping before starting.</Para>
       <div className="flex flex-wrap gap-2 mb-6">
         {types.map(t => (
           <button key={t.id} onClick={() => setActive(t.id)}
