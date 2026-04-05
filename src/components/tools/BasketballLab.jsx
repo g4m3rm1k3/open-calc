@@ -46,6 +46,9 @@ export default function BasketballLab({ onClose }) {
   const rafRef         = useRef(null)
   const clockRef       = useRef(new THREE.Clock(false))
   const hudRef         = useRef(null)
+  const sideCanvasRef  = useRef(null)
+  const replayFrames   = useRef([])
+  const savedReplay    = useRef([])
 
   // Mutable game-state — inside ref to avoid causing re-renders per frame
   const gs = useRef({
@@ -60,8 +63,11 @@ export default function BasketballLab({ onClose }) {
     makes:    0,
     attempts: 0,
     locked:   false,
-    doneTimer: 0,
-    doneMsg:  '',
+    doneTimer:  0,
+    doneMsg:   '',
+    canReplay:  false,
+    replayIdx:  0,
+    replaySub:  0,
   })
 
   // React state (for UI only)
@@ -69,7 +75,8 @@ export default function BasketballLab({ onClose }) {
   const [attempts, setAttempts] = useState(0)
   const [power,    setPower]    = useState(0.58)
   const [locked,   setLocked]   = useState(false)
-  const [feedback, setFeedback] = useState('')
+  const [feedback,   setFeedback]   = useState('')
+  const [showReplay, setShowReplay] = useState(false)
 
   // ── Shoot ─────────────────────────────────────────────────────────────────
   const shoot = useCallback(() => {
@@ -95,6 +102,9 @@ export default function BasketballLab({ onClose }) {
     g.rimHits = 0
     g.backboardHit = false
     g.phase = 'flight'
+    g.canReplay = false
+    replayFrames.current = []
+    setShowReplay(false)
     g.attempts++
     setAttempts(g.attempts)
     setFeedback('')
@@ -372,6 +382,11 @@ export default function BasketballLab({ onClose }) {
       if (e.key === 'r' || e.key === 'R') {
         g.phase = 'aim'; ballMeshRef.current.visible = false; setFeedback('')
       }
+      if ((e.key === 'v' || e.key === 'V') && g.canReplay && g.phase === 'aim') {
+        g.phase = 'replay'; g.replayIdx = 0; g.replaySub = 0; g.canReplay = false
+        setShowReplay(false)
+        if (ballMeshRef.current) ballMeshRef.current.visible = true
+      }
       if (e.key === 'e' || e.key === 'E') { g.power = clamp(g.power + 0.05, 0, 1); setPower(g.power) }
       if (e.key === 'q' || e.key === 'Q') { g.power = clamp(g.power - 0.05, 0, 1); setPower(g.power) }
       if (e.key === 'Escape') document.exitPointerLock()
@@ -502,16 +517,18 @@ export default function BasketballLab({ onClose }) {
               g.ballVel.set(0, 0, 0)
               g.phase = 'done'
               g.doneMsg = 'Miss'
+              savedReplay.current = [...replayFrames.current]
               setFeedback('Miss')
-              setTimeout(() => { gs.current.phase = 'aim'; ball.visible = false; setFeedback('') }, 1800)
+              setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 1800)
             }
           }
 
           // ── Out of play ────────────────────────────────────────────────────
           if (Math.abs(g.ballPos.x) > 20 || Math.abs(g.ballPos.z) > 20) {
             g.phase = 'done'; g.doneMsg = 'Miss'
+            savedReplay.current = [...replayFrames.current]
             setFeedback('Miss')
-            setTimeout(() => { gs.current.phase = 'aim'; ball.visible = false; setFeedback('') }, 1500)
+            setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 1500)
           }
 
           // ── Score check: ball descends through rim ─────────────────────────
@@ -525,17 +542,44 @@ export default function BasketballLab({ onClose }) {
             const isBankSwish = g.backboardHit && g.rimHits === 0
             const msg = isBankSwish ? 'BANK SHOT! 💥' : isSwish ? 'SWISH! 🏀' : g.rimHits > 1 ? 'Rattle in! 🔥' : 'BUCKET! 💪'
             g.doneMsg = msg
+            savedReplay.current = [...replayFrames.current]
             setMakes(g.makes); setFeedback(msg)
-            setTimeout(() => { gs.current.phase = 'aim'; ball.visible = false; setFeedback('') }, 2500)
+            setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 2500)
           }
         }
 
         ball.position.copy(g.ballPos)
+        replayFrames.current.push({
+          px: g.ballPos.x, py: g.ballPos.y, pz: g.ballPos.z,
+          qx: ball.quaternion.x, qy: ball.quaternion.y,
+          qz: ball.quaternion.z, qw: ball.quaternion.w,
+        })
       }
 
-      // ── HUD ───────────────────────────────────────────────────────────────
+      // ── Replay playback ──────────────────────────────────────────────────────
+      if (g.phase === 'replay') {
+        const rball = ballMeshRef.current
+        if (rball && savedReplay.current.length > 0) {
+          g.replaySub += dt * 0.22
+          while (g.replaySub >= 0.016 && g.replayIdx < savedReplay.current.length) {
+            g.replaySub -= 0.016; g.replayIdx++
+          }
+          const idx = Math.min(g.replayIdx, savedReplay.current.length - 1)
+          const rf = savedReplay.current[idx]
+          rball.position.set(rf.px, rf.py, rf.pz)
+          rball.quaternion.set(rf.qx, rf.qy, rf.qz, rf.qw)
+          rball.visible = true
+          if (g.replayIdx >= savedReplay.current.length) {
+            g.phase = 'aim'; rball.visible = false
+          }
+        }
+      }
+
+      // ── HUD ────────────────────────────────────────────────────────────────────
       const hud = hudRef.current
       if (hud) drawHud(hud, g, mount.clientWidth, mount.clientHeight)
+      const side = sideCanvasRef.current
+      if (side) drawSidePanel(side, g, camera, ballMeshRef.current)
 
       renderer.render(scene, camera)
     }
@@ -645,7 +689,25 @@ export default function BasketballLab({ onClose }) {
               <span>Scroll/Q,E — power</span>
               <span>Click — shoot</span>
               <span>R — reset</span>
+              <span>V — replay</span>
             </div>
+          </div>
+        )}
+
+        {/* V — replay last shot notification */}
+        {locked && showReplay && (
+          <div className="absolute bottom-16 inset-x-0 flex justify-center pointer-events-none">
+            <div className="flex items-center gap-2 text-xs font-mono bg-black/60 px-4 py-1.5 rounded-lg"
+              style={{ border: '1px solid rgba(245,158,11,0.4)' }}>
+              <span className="text-amber-400">V — watch replay in slow-mo</span>
+            </div>
+          </div>
+        )}
+
+        {/* Side-view physics panel */}
+        {locked && (
+          <div className="absolute pointer-events-none" style={{ bottom: 12, left: 12 }}>
+            <canvas ref={sideCanvasRef} style={{ display: 'block', borderRadius: 8 }} />
           </div>
         )}
       </div>
@@ -687,4 +749,146 @@ function drawHud(canvas, gs, w, h) {
   // Centre dot
   ctx.fillStyle = 'rgba(255,255,255,0.88)'
   ctx.beginPath(); ctx.arc(cx, cy, 1.8, 0, Math.PI * 2); ctx.fill()
+}
+
+// ─── Side-view physics panel ────────────────────────────────────────────────────────────
+function drawSidePanel(canvas, gs, camera, ball) {
+  const CW = 262, CH = 188
+  if (!canvas) return
+  if (canvas.width !== CW || canvas.height !== CH) { canvas.width = CW; canvas.height = CH }
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, CW, CH)
+
+  // Background
+  ctx.fillStyle = 'rgba(2,8,22,0.9)'
+  ctx.beginPath()
+  if (ctx.roundRect) ctx.roundRect(0, 0, CW, CH, 8); else ctx.rect(0, 0, CW, CH)
+  ctx.fill()
+  ctx.strokeStyle = '#1e3a5f'; ctx.lineWidth = 1
+  ctx.beginPath()
+  if (ctx.roundRect) ctx.roundRect(0.5, 0.5, CW - 1, CH - 1, 8); else ctx.rect(0.5, 0.5, CW - 1, CH - 1)
+  ctx.stroke()
+
+  const BASKET_Z  = COURT_L / 2 - 1.2
+  const playerZ   = camera?.position?.z ?? (BASKET_Z - 7.7)
+  const distToRim = Math.max(0, BASKET_Z - playerZ).toFixed(1)
+
+  // Plot area margins
+  const ml = 20, mr = 12, mb = 30, mt = 20
+  const plotW = CW - ml - mr, plotH = CH - mt - mb
+  const wz0 = playerZ - 0.8, wz1 = BASKET_Z + 1.8
+  const wy0 = -0.3, wy1 = 5.8
+  const sx = z => ml + (z - wz0) / (wz1 - wz0) * plotW
+  const sy = y => CH - mb - (y - wy0) / (wy1 - wy0) * plotH
+
+  // Title
+  ctx.font = 'bold 9px monospace'
+  if (gs.phase === 'replay') {
+    ctx.fillStyle = '#f59e0b'; ctx.fillText('● REPLAY', ml + 60, 13)
+    ctx.fillStyle = '#475569'; ctx.fillText('SIDE VIEW', ml, 13)
+  } else {
+    ctx.fillStyle = '#334155'; ctx.fillText('SIDE VIEW', ml, 13)
+  }
+
+  // Floor line
+  ctx.strokeStyle = '#7c3f1a'; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(ml, sy(0)); ctx.lineTo(ml + plotW, sy(0)); ctx.stroke()
+
+  // Rim height dashed reference
+  ctx.strokeStyle = 'rgba(249,115,22,0.2)'; ctx.lineWidth = 1; ctx.setLineDash([2, 5])
+  ctx.beginPath(); ctx.moveTo(ml, sy(RIM_HEIGHT)); ctx.lineTo(ml + plotW, sy(RIM_HEIGHT)); ctx.stroke()
+  ctx.setLineDash([])
+  ctx.font = '7px monospace'; ctx.fillStyle = 'rgba(249,115,22,0.4)'
+  ctx.fillText('3.05m', ml + 2, sy(RIM_HEIGHT) - 2)
+
+  // Basket pole
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5
+  ctx.beginPath(); ctx.moveTo(sx(BASKET_Z), sy(0)); ctx.lineTo(sx(BASKET_Z), sy(RIM_HEIGHT + 0.6)); ctx.stroke()
+
+  // Backboard
+  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 3
+  const bbWZ = BASKET_Z + BACKBOARD_Z
+  ctx.beginPath(); ctx.moveTo(sx(bbWZ), sy(BB_Y_BOT)); ctx.lineTo(sx(bbWZ), sy(BB_Y_BOT + BACKBOARD_H)); ctx.stroke()
+
+  // Rim bar
+  ctx.strokeStyle = '#f97316'; ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(sx(BASKET_Z - RIM_RADIUS), sy(RIM_HEIGHT))
+  ctx.lineTo(sx(BASKET_Z + RIM_RADIUS), sy(RIM_HEIGHT))
+  ctx.stroke()
+
+  // Player eye dot
+  const plsx = sx(playerZ), plsy = sy(PLAYER_EYE)
+  ctx.fillStyle = '#3b82f6'
+  ctx.beginPath(); ctx.arc(plsx, plsy, 4, 0, Math.PI * 2); ctx.fill()
+
+  // Arc preview (aim phase only)
+  if (gs.phase === 'aim') {
+    const speed = gs.power * 10 + 7
+    const pitch = gs.pitch
+    const dz = Math.cos(pitch), dy = Math.sin(pitch)
+    let pz2 = playerZ + dz * 0.35, py2 = PLAYER_EYE - 0.12
+    let vz2 = dz * speed, vy2 = dy * speed + 1.2
+    const dt2 = 0.045
+
+    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3])
+    ctx.beginPath(); ctx.moveTo(sx(pz2), sy(py2))
+    for (let i = 0; i < 80; i++) {
+      vy2 += GRAVITY * dt2; pz2 += vz2 * dt2; py2 += vy2 * dt2
+      if (py2 < -0.5 || pz2 > wz1 + 1) break
+      ctx.lineTo(sx(pz2), sy(py2))
+    }
+    ctx.stroke(); ctx.setLineDash([])
+
+    // Shot angle indicator line from player
+    const lineLen = 22
+    ctx.strokeStyle = 'rgba(251,191,36,0.6)'; ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(plsx, plsy)
+    ctx.lineTo(plsx + Math.cos(-pitch) * lineLen, plsy + Math.sin(-pitch) * lineLen)
+    ctx.stroke()
+
+    // Horizontal reference guide
+    ctx.strokeStyle = 'rgba(100,116,139,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4])
+    ctx.beginPath(); ctx.moveTo(plsx, plsy); ctx.lineTo(plsx + lineLen + 6, plsy); ctx.stroke()
+    ctx.setLineDash([])
+
+    // Angle label
+    ctx.font = 'bold 10px monospace'; ctx.fillStyle = '#fbbf24'
+    ctx.fillText((pitch * 180 / Math.PI).toFixed(1) + '°', plsx + lineLen + 7, plsy - 2)
+  }
+
+  // Ball tracking dot (flight / replay / done)
+  if (ball?.visible) {
+    const bsx = sx(ball.position.z), bsy = sy(ball.position.y)
+    ctx.fillStyle = '#f97316'
+    ctx.beginPath(); ctx.arc(bsx, bsy, 5, 0, Math.PI * 2); ctx.fill()
+    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.stroke()
+  }
+
+  // Stats row
+  const statSpeed = (gs.power * 10 + 7).toFixed(1)
+  const statAngle = (gs.pitch * 180 / Math.PI).toFixed(1)
+  ctx.font = '9px monospace'
+  ctx.fillStyle = '#fbbf24'; ctx.fillText(statAngle + '°', ml, CH - mb + 15)
+  ctx.fillStyle = '#4ade80'; ctx.fillText(statSpeed + 'm/s', ml + 46, CH - mb + 15)
+  ctx.fillStyle = '#60a5fa'; ctx.fillText(distToRim + 'm dist', ml + 106, CH - mb + 15)
+
+  // Spin indicator (backspin symbol, top-right)
+  const spx = CW - 26, spy = 32
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1
+  ctx.beginPath(); ctx.arc(spx, spy, 12, 0, Math.PI * 2); ctx.stroke()
+  ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 2; ctx.lineCap = 'round'
+  ctx.beginPath(); ctx.arc(spx, spy, 12, 0.45, Math.PI * 1.65); ctx.stroke()
+  const tipA = Math.PI * 1.65
+  const tx = spx + Math.cos(tipA) * 12, ty = spy + Math.sin(tipA) * 12
+  const ta = tipA + Math.PI / 2
+  ctx.beginPath()
+  ctx.moveTo(tx - Math.cos(ta) * 4, ty - Math.sin(ta) * 4)
+  ctx.lineTo(tx, ty)
+  ctx.lineTo(tx - Math.cos(ta - 0.8) * 4, ty - Math.sin(ta - 0.8) * 4)
+  ctx.stroke()
+  ctx.lineCap = 'butt'
+  ctx.font = '7px monospace'; ctx.fillStyle = '#7c3aed'
+  ctx.fillText('spin', spx - 8, spy + 23)
 }
