@@ -46,7 +46,6 @@ const COLORS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function StickyNote({ noteId }) {
-  const dark = useIsDark()
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [color, setColor] = useState('yellow')
@@ -59,28 +58,35 @@ export default function StickyNote({ noteId }) {
   // Always-current ref so scroll/resize closures see latest size
   const sizeRef = useRef({ w: 320, h: null })
   sizeRef.current = size
+  // Prevents save from firing with stale state on the first render after open
+  const loadedRef = useRef(false)
 
   const stored = getNote(noteId)
   const hasNote = !!stored?.text?.trim()
   const C = COLORS.find(c => c.id === color) ?? COLORS[0]
-  const cardBg = dark ? C.bgDark : C.bg
-  const textColor = dark ? '#e2e8f0' : '#1e293b'
-  const mutedColor = dark ? '#94a3b8' : '#64748b'
+  const cardBg = C.bg
+  const textColor = '#1e293b'
+  const mutedColor = '#64748b'
 
   // Load from storage when opening
   useEffect(() => {
     if (open) {
+      loadedRef.current = false
       const n = getNote(noteId)
       setText(n?.text ?? '')
       setColor(n?.color ?? 'yellow')
       setRuled(n?.ruled ?? false)
       setSize({ w: n?.w ?? 320, h: n?.h ?? null })
+    } else {
+      loadedRef.current = false
     }
   }, [open, noteId])
 
   // Auto-save when text or color changes while open
   useEffect(() => {
     if (!open) return
+    // Skip the very first fire after open — loaded state hasn't settled yet
+    if (!loadedRef.current) { loadedRef.current = true; return }
     if (text.trim()) {
       saveNote(noteId, { text, color, ruled, w: size.w, h: size.h })
     } else {
@@ -160,26 +166,20 @@ export default function StickyNote({ noteId }) {
         style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           gap: 3,
-          background: hasNote
-            ? (dark ? `${C.dot}22` : `${C.dot}33`)
-            : (dark ? 'rgba(148,163,184,0.12)' : 'rgba(100,116,139,0.10)'),
+          background: hasNote ? `${C.dot}33` : 'rgba(100,116,139,0.10)',
           border: hasNote
             ? `1px solid ${C.dot}66`
-            : `1px solid ${dark ? 'rgba(148,163,184,0.25)' : 'rgba(100,116,139,0.22)'}`,
+            : '1px solid rgba(100,116,139,0.22)',
           borderRadius: 5,
           padding: '2px 5px',
           cursor: 'pointer', flexShrink: 0,
           transition: 'background 0.15s, border-color 0.15s',
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.background = hasNote
-            ? (dark ? `${C.dot}44` : `${C.dot}55`)
-            : (dark ? 'rgba(148,163,184,0.22)' : 'rgba(100,116,139,0.18)')
+          e.currentTarget.style.background = hasNote ? `${C.dot}55` : 'rgba(100,116,139,0.18)'
         }}
         onMouseLeave={e => {
-          e.currentTarget.style.background = hasNote
-            ? (dark ? `${C.dot}22` : `${C.dot}33`)
-            : (dark ? 'rgba(148,163,184,0.12)' : 'rgba(100,116,139,0.10)')
+          e.currentTarget.style.background = hasNote ? `${C.dot}33` : 'rgba(100,116,139,0.10)'
         }}
       >
         {/* Outlined pencil icon — filled when a note exists, outline-only when empty */}
@@ -197,9 +197,9 @@ export default function StickyNote({ noteId }) {
             /* Outline-only pencil */
             <>
               <path d="M11.5 1.5a1.5 1.5 0 0 1 2.121 2.121l-1 1L10.5 2.5l1-1z"
-                fill="none" stroke={dark ? '#94a3b8' : '#64748b'} strokeWidth="1.2" strokeLinejoin="round" />
+                fill="none" stroke="#64748b" strokeWidth="1.2" strokeLinejoin="round" />
               <path d="M9.5 3.5l3 3L5 14H2v-3L9.5 3.5z"
-                fill="none" stroke={dark ? '#94a3b8' : '#64748b'} strokeWidth="1.2" strokeLinejoin="round" />
+                fill="none" stroke="#64748b" strokeWidth="1.2" strokeLinejoin="round" />
             </>
           )}
         </svg>
@@ -222,7 +222,7 @@ export default function StickyNote({ noteId }) {
           background: cardBg,
           border: `1.5px solid ${C.border}`,
           borderRadius: 10,
-          boxShadow: dark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 24px rgba(0,0,0,0.15)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
           zIndex: 9999,
         }}>
           {/* Drag handle */}
@@ -248,7 +248,7 @@ export default function StickyNote({ noteId }) {
                   style={{
                     width: 13, height: 13, borderRadius: '50%',
                     background: c.dot,
-                    border: color === c.id ? `2px solid ${dark ? '#e2e8f0' : '#1e293b'}` : '1.5px solid transparent',
+                    border: color === c.id ? '2px solid #1e293b' : '1.5px solid transparent',
                     cursor: 'pointer', padding: 0,
                   }}
                 />
@@ -299,7 +299,7 @@ export default function StickyNote({ noteId }) {
                 <div style={{
                     fontSize: 12, lineHeight: 1.7, color: textColor, minHeight: 60, wordBreak: 'break-word',
                     ...(ruled ? {
-                      backgroundImage: `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), ${dark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.14)'} calc(1.7em - 1px), ${dark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.14)'} 1.7em)`,
+                      backgroundImage: `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), rgba(100,116,139,0.14) calc(1.7em - 1px), rgba(100,116,139,0.14) 1.7em)`,
                       backgroundSize: '100% 1.7em',
                     } : {}),
                   }}>
@@ -318,7 +318,7 @@ export default function StickyNote({ noteId }) {
                   style={{
                     width: '100%', height: '100%', minHeight: 60, resize: 'none',
                     background: ruled
-                      ? `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), ${dark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.14)'} calc(1.7em - 1px), ${dark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.14)'} 1.7em)`
+                      ? `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), rgba(100,116,139,0.14) calc(1.7em - 1px), rgba(100,116,139,0.14) 1.7em)`
                       : 'transparent',
                     backgroundSize: '100% 1.7em',
                     border: 'none', outline: 'none',

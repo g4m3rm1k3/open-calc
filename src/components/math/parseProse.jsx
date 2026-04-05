@@ -237,6 +237,13 @@ export function parseProse(text) {
       parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)
       i = stop
     } else {
+      // Newline → line break
+      if (text[i] === '\n') {
+        parts.push(<br key={`br${keyIdx++}`} />)
+        i++
+        continue
+      }
+
       // Safety valve: unhandled character (e.g. lone \ not followed by a letter).
       // Output it literally and advance — prevents infinite loop.
       parts.push(<span key={`t${keyIdx++}`}>{text[i]}</span>)

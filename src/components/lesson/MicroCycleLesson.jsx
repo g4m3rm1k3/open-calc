@@ -168,7 +168,7 @@ function SectionDivider({ icon, label, color = 'slate', noteId }) {
     emerald: 'text-emerald-600 dark:text-emerald-400 after:bg-emerald-200 dark:after:bg-emerald-800',
   }
   return (
-    <div className={`flex items-center gap-3 mb-6 ${colors[color]}`}>
+    <div id={noteId ? noteId.replace(/:/g, '-') : undefined} className={`flex items-center gap-3 mb-6 ${colors[color]}`}>
       <span className="text-xl flex-shrink-0">{icon}</span>
       <span className="font-bold text-sm uppercase tracking-widest flex-shrink-0">{label}</span>
       {noteId && <StickyNote noteId={noteId} />}
@@ -181,7 +181,7 @@ function SectionDivider({ icon, label, color = 'slate', noteId }) {
 
 function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slate-700' }) {
   return (
-    <div className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}>
+    <div id={noteId ? noteId.replace(/:/g, '-') : undefined} className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}>
       <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
         {viz.title
           ? <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{viz.title}</p>
@@ -408,7 +408,7 @@ function MathBlock({ data, lessonId }) {
   if (!hasProse && !hasCallouts && !vizzes.length) return null
 
   return (
-    <div className="mb-8 rounded-2xl overflow-hidden border border-brand-200 dark:border-brand-900/60 shadow-sm">
+    <div id={lessonId ? `${lessonId}-math` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-brand-200 dark:border-brand-900/60 shadow-sm">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-6 py-4 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 dark:hover:bg-brand-950/60 transition-colors text-left"
@@ -467,7 +467,7 @@ function RigorBlock({ data, lessonId }) {
   if (!hasProse && !hasCallouts && !vizzes.length && !hasProofSteps) return null
 
   return (
-    <div className="mb-8 rounded-2xl overflow-hidden border border-purple-200 dark:border-purple-900/60 shadow-sm">
+    <div id={lessonId ? `${lessonId}-rigor` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-purple-200 dark:border-purple-900/60 shadow-sm">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-6 py-4 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 transition-colors text-left"
