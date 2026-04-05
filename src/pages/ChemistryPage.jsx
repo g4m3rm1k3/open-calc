@@ -77,7 +77,7 @@ export default function ChemistryPage({ onClose }) {
               </div>
               {/* Notebook scroll area */}
               <div style={{ flex:1, overflowY:'auto', padding:'20px 24px' }}>
-                <ScienceNotebook lesson={CHEM_LESSONS[lessonIdx].data} />
+                <ScienceNotebook key={CHEM_LESSONS[lessonIdx].id} lesson={CHEM_LESSONS[lessonIdx].data} />
               </div>
             </div>
           )}

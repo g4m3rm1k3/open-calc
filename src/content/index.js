@@ -27,6 +27,7 @@ import javascriptCore1 from './javascript-1/index.js'
 import tetris1 from './tetris-1/index.js'
 import cs1 from './cs-1/index.js'
 import chemistry1 from './chemistry-1/index.js'
+import digitalFundamentals from './digital-fundamentals/index.js'
 import cnc1 from './cnc-1/index.js'
 import git1 from './git-1/index.js'
 
@@ -43,6 +44,7 @@ const JAVASCRIPT_CORE_CURRICULUM = javascriptCore1.map(ch => ({ ...ch, course: '
 const TETRIS_CURRICULUM = tetris1.map(ch => ({ ...ch, course: 'tetris' }))
 const CS_CURRICULUM = cs1.map(ch => ({ ...ch, course: 'cs-1' }))
 const CHEMISTRY_CURRICULUM = chemistry1.map(ch => ({ ...ch, course: 'chemistry-1' }))
+const DIGITAL_FUNDAMENTALS_CURRICULUM = digitalFundamentals.map(ch => ({ ...ch, course: 'digital-fundamentals' }))
 const CNC_CURRICULUM = [cnc1].map(ch => ({ ...ch, course: 'cnc-logic' }))
 const GIT_CURRICULUM = [git1].map(ch => ({ ...ch, course: 'git-logic' }))
 
@@ -60,6 +62,7 @@ export const CURRICULUM = [
   ...TETRIS_CURRICULUM,
   ...CS_CURRICULUM,
   ...CHEMISTRY_CURRICULUM,
+  ...DIGITAL_FUNDAMENTALS_CURRICULUM,
   ...CNC_CURRICULUM,
   ...GIT_CURRICULUM,
 ]

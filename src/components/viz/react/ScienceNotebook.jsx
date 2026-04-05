@@ -217,7 +217,7 @@ function VisualCell({ cell, cellIndex, T, dark }) {
       )
       setLoaded(true)
     }
-  }, [dark]) // re-render when theme changes
+  }, [cell.html, cell.css, cell.startCode, dark])
 
   const height = cell.outputHeight || 320
 
@@ -271,7 +271,7 @@ function ChallengeCell({ cell, cellIndex, T, dark, onPass }) {
       (cell.startCode || '') + initCall,
       cell.options, dark
     )
-  }, [dark])
+  }, [cell.html, cell.css, cell.startCode, cell.options, correctLabel, dark])
 
   // Listen for answer postMessage from iframe
   useEffect(() => {

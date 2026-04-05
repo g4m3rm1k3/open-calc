@@ -91,6 +91,13 @@ export const COURSES = [
     color: 'lime'
   },
   {
+    key: 'digital-fundamentals',
+    label: 'Digital Fundamentals',
+    path: '/course/digital-fundamentals',
+    desc: 'Signals, Binary & Logic',
+    color: 'sky'
+  },
+  {
     key: 'cnc-logic',
     label: 'CNC Macro Systems',
     path: '/course/cnc-logic',
