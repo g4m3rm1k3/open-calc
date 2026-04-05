@@ -21,6 +21,7 @@ import { Terminal, Code2, PlayCircle, HelpCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx'
 import PhysicsPoolLab from '../tools/PhysicsPoolLab.jsx'
+import BasketballLab from '../tools/BasketballLab.jsx'
 import ChemistryPage from '../../pages/ChemistryPage.jsx'
 
 function MobileLocationBadge() {
@@ -168,7 +169,7 @@ function CoursesDropdown() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen, onPoolToggle, poolOpen, onChemToggle, chemOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen, onPoolToggle, poolOpen, onChemToggle, chemOpen, onBasketToggle, basketOpen }) {
   const { openSearch } = useSearchContext()
   const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -287,6 +288,11 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${chemOpen ? 'text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30' : 'text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30'}`}
             title="Periodic Table & Chemistry"
           ><span className="text-base leading-none" style={{lineHeight:'16px',display:'block'}}>⚛</span></button>
+          <button
+            onClick={onBasketToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${basketOpen ? 'text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30' : 'text-orange-500 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30'}`}
+            title="Basketball Physics Lab"
+          ><span className="text-base leading-none" style={{lineHeight:'16px',display:'block'}}>🏀</span></button>
         </div>
       </div>
 
@@ -394,10 +400,11 @@ export default function AppShell({ children }) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [poolOpen, setPoolOpen] = useState(false)
   const [chemOpen, setChemOpen] = useState(false)
+  const [basketOpen, setBasketOpen] = useState(false)
   const closeAllTools = useCallback(() => {
     setGraphOpen(false); setGraph3DOpen(false); setGraphJSXOpen(false)
     setScratchOpen(false); setCalcOpen(false); setPythonOpen(false); setJsOpen(false)
-    setPoolOpen(false); setChemOpen(false)
+    setPoolOpen(false); setChemOpen(false); setBasketOpen(false)
   }, [])
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
@@ -528,6 +535,8 @@ export default function AppShell({ children }) {
         poolOpen={poolOpen}
         onChemToggle={() => setChemOpen(prev => !prev)}
         chemOpen={chemOpen}
+        onBasketToggle={() => setBasketOpen(prev => !prev)}
+        basketOpen={basketOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -743,6 +752,7 @@ export default function AppShell({ children }) {
       <GlobalJSPlayground isOpen={jsOpen} onClose={() => setJsOpen(false)} />
       <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
       {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
+      {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
       {chemOpen && (
         <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
           <ChemistryPage onClose={() => setChemOpen(false)} />
