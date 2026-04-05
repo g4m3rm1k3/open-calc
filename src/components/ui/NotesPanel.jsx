@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ALL_LESSONS } from '../../content/index.js'
+import DEFAULT_NOTES from '../../content/default-notes.json'
 
 const STORAGE_KEY = 'oc-sticky-notes'
 
@@ -24,24 +25,42 @@ function parseNoteId(noteId) {
   return { lessonId, section }
 }
 
-function readNotes() {
+function readUserNotes() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') }
   catch { return {} }
+}
+
+// Merged view: user notes win; tombstones hide defaults; defaults fill the rest
+function readMergedNotes() {
+  const user = readUserNotes()
+  const merged = {}
+  // Start with all defaults (excluding meta keys)
+  for (const [id, note] of Object.entries(DEFAULT_NOTES)) {
+    if (id === '__version') continue
+    if (note?.text?.trim()) merged[id] = { ...note, _isDefault: true }
+  }
+  // Layer user notes on top
+  for (const [id, note] of Object.entries(user)) {
+    if (note?.deleted) { delete merged[id]; continue }  // tombstone hides default
+    if (note?.text?.trim()) merged[id] = note           // user text wins
+  }
+  return merged
 }
 
 export default function NotesPanel() {
   const [open, setOpen] = useState(false)
   const [notes, setNotes] = useState({})
   const navigate = useNavigate()
+  const importRef = useRef(null)
 
   // Refresh list whenever the panel opens
   useEffect(() => {
-    if (open) setNotes(readNotes())
+    if (open) setNotes(readMergedNotes())
   }, [open])
 
   // Sync from other tabs or same-tab saves via custom event
   useEffect(() => {
-    const handler = () => setNotes(readNotes())
+    const handler = () => setNotes(readMergedNotes())
     window.addEventListener('storage', handler)
     window.addEventListener('oc-note-change', handler)
     return () => {
@@ -53,6 +72,48 @@ export default function NotesPanel() {
   const entries = Object.entries(notes)
     .filter(([, n]) => n?.text?.trim())
     .sort((a, b) => (b[1].updatedAt ?? 0) - (a[1].updatedAt ?? 0))
+
+  function exportNotes() {
+    // Export only the user's own notes (not bundled defaults)
+    const user = readUserNotes()
+    const clean = {}
+    for (const [id, n] of Object.entries(user)) {
+      if (n?.text?.trim()) {
+        const { _isDefault, _imported, ...rest } = n
+        clean[id] = rest
+      }
+    }
+    const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'open-calc-notes.json'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  function handleImportFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target.result)
+        if (typeof imported !== 'object' || Array.isArray(imported)) return
+        const current = readUserNotes()
+        for (const [id, note] of Object.entries(imported)) {
+          if (id === '__version') continue
+          if (!current[id]?.text?.trim()) {   // only fill empty user slots
+            current[id] = { ...note, _imported: true }
+          }
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(current))
+        setNotes(readMergedNotes())
+        window.dispatchEvent(new Event('oc-note-change'))
+      } catch {}
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
 
   function go(noteId) {
     const { lessonId } = parseNoteId(noteId)
@@ -99,12 +160,31 @@ export default function NotesPanel() {
               </span>
             )}
           </div>
-          <button
-            onClick={() => setOpen(false)}
-            className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            {/* Export */}
+            <button
+              onClick={exportNotes}
+              title="Export notes as JSON"
+              className="p-1.5 rounded text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs"
+            >
+              ↓
+            </button>
+            {/* Import */}
+            <button
+              onClick={() => importRef.current?.click()}
+              title="Import notes from JSON"
+              className="p-1.5 rounded text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs"
+            >
+              ↑
+            </button>
+            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImportFile} />
+            <button
+              onClick={() => setOpen(false)}
+              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Note list */}
@@ -145,10 +225,15 @@ export default function NotesPanel() {
 
                   <button
                     onClick={() => {
-                      const all = readNotes()
-                      delete all[noteId]
-                      localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
-                      setNotes({ ...all })
+                      const user = readUserNotes()
+                      const hasDefault = !!DEFAULT_NOTES[noteId]?.text?.trim()
+                      if (hasDefault) {
+                        user[noteId] = { deleted: true }
+                      } else {
+                        delete user[noteId]
+                      }
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+                      setNotes(readMergedNotes())
                     }}
                     className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-0.5 text-slate-300 hover:text-red-400 transition-all"
                     title="Delete note"

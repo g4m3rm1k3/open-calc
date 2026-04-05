@@ -1,22 +1,41 @@
 import { useState, useEffect, useRef } from 'react'
 import { parseProse } from '../math/parseProse.jsx'
+import DEFAULT_NOTES from '../../content/default-notes.json'
 
-// ─── localStorage helpers ─────────────────────────────────────────────────────
+// ─── Storage helpers ──────────────────────────────────────────────────────────
+// oc-sticky-notes  = ONLY the user's own writes/edits + tombstones for deleted defaults
+// Default notes come from default-notes.json at read time, never persisted to localStorage.
 
 const STORAGE_KEY = 'oc-sticky-notes'
 
-function readAll() {
+function readUserNotes() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') } catch { return {} }
 }
-function getNote(id) { return readAll()[id] ?? null }
+
+// Merge: user note wins; tombstone hides default; else fall back to default
+function getNote(id) {
+  const user = readUserNotes()[id]
+  if (user?.deleted) return null           // user deleted a default
+  if (user?.text?.trim()) return user      // user wrote their own
+  const def = DEFAULT_NOTES[id]
+  if (def?.text?.trim()) return { ...def, _isDefault: true }
+  return null
+}
+
 function saveNote(id, data) {
-  const all = readAll()
-  all[id] = { ...data, updatedAt: Date.now() }
+  const all = readUserNotes()
+  all[id] = { ...data, updatedAt: Date.now(), deleted: false }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
 }
+
 function deleteNote(id) {
-  const all = readAll()
-  delete all[id]
+  const all = readUserNotes()
+  const hasDefault = !!DEFAULT_NOTES[id]?.text?.trim()
+  if (hasDefault) {
+    all[id] = { deleted: true }            // tombstone so default stays hidden
+  } else {
+    delete all[id]
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
 }
 
