@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom'
 import { LESSON_MAP, CURRICULUM, COURSES } from '../../content/index.js'
 import PinsPanel from '../ui/PinsPanel.jsx'
+import NotesPanel from '../ui/NotesPanel.jsx'
 import Sidebar from './Sidebar.jsx'
 import SearchModal from '../search/SearchModal.jsx'
 import GlobalGrapher from '../ui/GlobalGrapher.jsx'
@@ -724,6 +725,7 @@ export default function AppShell({ children }) {
 
       {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
       <PinsPanel />
+      <NotesPanel />
       <WelcomeModal />
       <SearchModal />
       <GlobalGrapher

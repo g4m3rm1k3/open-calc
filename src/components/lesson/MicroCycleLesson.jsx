@@ -19,6 +19,7 @@ import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 import KatexBlock from '../math/KatexBlock.jsx'
 import { useProgress } from '../../hooks/useProgress.js'
+import StickyNote from '../ui/StickyNote.jsx'
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
 export { parseProse } from '../math/parseProse.jsx'
@@ -159,7 +160,7 @@ function getSectionVizzes(section) {
 
 // ─── Section divider ───────────────────────────────────────────────────────
 
-function SectionDivider({ icon, label, color = 'slate' }) {
+function SectionDivider({ icon, label, color = 'slate', noteId }) {
   const colors = {
     slate: 'text-slate-500 dark:text-slate-400 after:bg-slate-200 dark:after:bg-slate-700',
     brand: 'text-brand-600 dark:text-brand-400 after:bg-brand-200 dark:after:bg-brand-800',
@@ -170,6 +171,7 @@ function SectionDivider({ icon, label, color = 'slate' }) {
     <div className={`flex items-center gap-3 mb-6 ${colors[color]}`}>
       <span className="text-xl flex-shrink-0">{icon}</span>
       <span className="font-bold text-sm uppercase tracking-widest flex-shrink-0">{label}</span>
+      {noteId && <StickyNote noteId={noteId} />}
       <div className="flex-1 h-px after:block after:h-px bg-current opacity-30" />
     </div>
   )
@@ -177,14 +179,16 @@ function SectionDivider({ icon, label, color = 'slate' }) {
 
 // ─── Full-width viz card ───────────────────────────────────────────────────
 
-function VizCard({ viz, borderColor = 'border-slate-200 dark:border-slate-700' }) {
+function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slate-700' }) {
   return (
     <div className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}>
-      {viz.title && (
-        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{viz.title}</p>
-        </div>
-      )}
+      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+        {viz.title
+          ? <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{viz.title}</p>
+          : <span />
+        }
+        {noteId && <StickyNote noteId={noteId} />}
+      </div>
       {viz.mathBridge && (
         <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50">
           <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">{parseProse(viz.mathBridge)}</p>
@@ -358,7 +362,7 @@ function IntuitionBlock({ data, lesson }) {
 
   return (
     <div className="mb-10">
-      <SectionDivider icon="🧠" label="Intuition" color="slate" />
+      <SectionDivider icon="🧠" label="Intuition" color="slate" noteId={lesson?.id ? `${lesson.id}:intuition` : undefined} />
       <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
 
       <SectionContent data={data} />
@@ -367,7 +371,7 @@ function IntuitionBlock({ data, lesson }) {
       {primaryVizzes.length > 0 && (
         <div className="mt-6 space-y-4">
           {primaryVizzes.map((viz, i) => (
-            <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-slate-200 dark:border-slate-700" />
+            <VizCard key={`${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
           ))}
         </div>
       )}
@@ -383,7 +387,7 @@ function IntuitionBlock({ data, lesson }) {
           {alternateVizzes.length > 0 && (
             <div className="mt-6 space-y-4">
               {alternateVizzes.map((viz, i) => (
-                <VizCard key={`alt-${viz.id}-${i}`} viz={viz} borderColor="border-slate-200 dark:border-slate-700" />
+                <VizCard key={`alt-${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:alt-${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
               ))}
             </div>
           )}
@@ -395,7 +399,7 @@ function IntuitionBlock({ data, lesson }) {
 
 // ─── 📐 Mathematics block ──────────────────────────────────────────────────
 
-function MathBlock({ data }) {
+function MathBlock({ data, lessonId }) {
   const [open, setOpen] = useState(true)
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
   const vizzes = isBlocksFormat ? [] : getSectionVizzes(data)
@@ -412,6 +416,7 @@ function MathBlock({ data }) {
         <span className="text-xl">📐</span>
         <span className="font-bold text-brand-800 dark:text-brand-200 text-sm uppercase tracking-wider">Mathematics</span>
         <div className="flex-1 h-px bg-brand-200 dark:bg-brand-800/50" />
+        {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:math`} /></span>}
         <span className="text-brand-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Show ▼'}</span>
       </button>
       {open && (
@@ -433,7 +438,7 @@ function MathBlock({ data }) {
           {vizzes.length > 0 && (
             <div className="mt-4 space-y-4">
               {vizzes.map((viz, i) => (
-                <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-brand-100 dark:border-brand-900" />
+                <VizCard key={`${viz.id}-${i}`} viz={viz} noteId={lessonId ? `${lessonId}:viz:${viz.id}` : undefined} borderColor="border-brand-100 dark:border-brand-900" />
               ))}
             </div>
           )}
@@ -445,7 +450,7 @@ function MathBlock({ data }) {
 
 // ─── ∴ Rigor / Formal Proof block ─────────────────────────────────────────
 
-function RigorBlock({ data }) {
+function RigorBlock({ data, lessonId }) {
   const [open, setOpen] = useState(false)
   const isBlocksFormat = (data?.blocks?.length ?? 0) > 0
   const vizzes = isBlocksFormat ? [] : getSectionVizzes(data)
@@ -475,6 +480,7 @@ function RigorBlock({ data }) {
             Ready to see why this is true?
           </span>
         )}
+        {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:rigor`} /></span>}
         <span className="text-purple-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Prove it ▼'}</span>
       </button>
       {open && (
@@ -490,7 +496,7 @@ function RigorBlock({ data }) {
           {extraVizzes.length > 0 && (
             <div className="mt-4 space-y-4">
               {extraVizzes.map((viz, i) => (
-                <VizCard key={`${viz.id}-${i}`} viz={viz} borderColor="border-purple-100 dark:border-purple-900" />
+                <VizCard key={`${viz.id}-${i}`} viz={viz} noteId={lessonId ? `${lessonId}:viz:${viz.id}` : undefined} borderColor="border-purple-100 dark:border-purple-900" />
               ))}
             </div>
           )}
@@ -601,8 +607,8 @@ export default function MicroCycleLesson({ lesson }) {
             </div>
          </div>
       )}
-      <MathBlock data={lesson.math} />
-      <RigorBlock data={lesson.rigor} />
+      <MathBlock data={lesson.math} lessonId={lesson.id} />
+      <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
       <SpiralBlock spiral={lesson.spiral} />
@@ -613,7 +619,7 @@ export default function MicroCycleLesson({ lesson }) {
         <div className="mt-12 space-y-8">
           <SectionDivider icon="🚀" label="Guided Walkthroughs" color="brand" />
           {lesson.supplementalVisualizations.map((v, i) => (
-            <VizCard key={i} viz={v} borderColor="border-brand-200 dark:border-brand-900/60" />
+            <VizCard key={i} viz={v} noteId={`${lesson.id}:viz:supp-${v.id ?? i}`} borderColor="border-brand-200 dark:border-brand-900/60" />
           ))}
         </div>
       )}
