@@ -928,7 +928,7 @@ renderBoard(cells,boardData,activePiece);`,
 export default {
   id: 'tetris-06-line-clearing',
   slug: 'tetris-line-clearing',
-  chapter: 'tetris.6',
+  chapter: 'tetris.1',
   order: 6,
   title: 'Line Clearing',
   subtitle: 'Clear complete rows using filter, every, and unshift — and track score with the real Tetris scoring system',

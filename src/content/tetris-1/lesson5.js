@@ -972,7 +972,7 @@ renderBoard(cells,boardData,activePiece);`,
 export default {
   id: 'tetris-05-collision-detection',
   slug: 'tetris-collision-detection',
-  chapter: 'tetris.5',
+  chapter: 'tetris.1',
   order: 5,
   title: 'Collision Detection',
   subtitle: 'Stop pieces phasing through each other — upgrade isWithinBounds to isValidPosition by checking the board',

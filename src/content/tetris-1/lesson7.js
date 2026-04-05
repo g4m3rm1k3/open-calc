@@ -965,7 +965,7 @@ renderUI();renderBoard(cells,boardData,activePiece);`,
 export default {
   id: 'tetris-07-game-over-restart',
   slug: 'tetris-game-over-restart',
-  chapter: 'tetris.7',
+  chapter: 'tetris.1',
   order: 7,
   title: 'Game Over and Restart',
   subtitle: 'Add a start screen, game over overlay, and clean restart using a state machine and state-driven rendering',

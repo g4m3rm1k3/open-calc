@@ -255,7 +255,7 @@ document.getElementById('rst').onclick=function(){px=cx;py=cy;path=[{x:cx,y:cy}]
 export default {
   id: 'chem-1-1-what-is-an-atom',
   slug: 'what-is-an-atom',
-  chapter: 'chem1',
+  chapter: 'chem.1',
   order: 1,
   title: 'What Is an Atom?',
   subtitle: 'The particle that explains why matter behaves the way it does.',

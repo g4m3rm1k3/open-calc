@@ -137,6 +137,22 @@ ${html}
 <script>
 window.__cellId = '${uid}';
 window.__theme = ${JSON.stringify(theme)};
+// localStorage mock — sandbox lacks allow-same-origin so the getter throws.
+// window.localStorage = {...} silently fails (no setter); Object.defineProperty bypasses the accessor.
+(function() {
+  try { window.localStorage; } catch(_) {
+    var _store = {};
+    var _mock = {
+      getItem:    function(k)    { return Object.prototype.hasOwnProperty.call(_store, k) ? _store[k] : null; },
+      setItem:    function(k, v) { _store[String(k)] = String(v); },
+      removeItem: function(k)    { delete _store[k]; },
+      clear:      function()     { _store = {}; },
+      key:        function(i)    { return Object.keys(_store)[i] || null; },
+      get length(){ return Object.keys(_store).length; }
+    };
+    try { Object.defineProperty(window, 'localStorage', { value: _mock, writable: true, configurable: true }); } catch(__) {}
+  }
+})();
 (function() {
   const _log = console.log.bind(console);
   const _err = console.error.bind(console);

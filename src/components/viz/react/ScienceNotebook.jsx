@@ -102,6 +102,7 @@ ${css}
 <body>
 ${html}
 <script>
+(function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
 try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
@@ -174,6 +175,7 @@ function pick(btn) {
   fb.className = 'sn-feedback show ' + (isCorrect ? 'pass' : 'fail');
   window.parent.postMessage({type:'sn_answer',label:label,correct:isCorrect},'*');
 }
+(function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
 try{(function(){
 ${escapedJs}
 })()}catch(e){}

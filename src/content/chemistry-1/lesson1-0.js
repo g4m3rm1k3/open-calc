@@ -311,7 +311,7 @@ Three questions based on what you have just seen. Read each question, think abou
 export default {
   id: 'chem-1-0-why-chemistry',
   slug: 'why-chemistry',
-  chapter: 'chem1',
+  chapter: 'chem.1',
   order: 0,
   title: 'Why Chemistry?',
   subtitle: 'Every question about the physical world is a chemistry question.',
