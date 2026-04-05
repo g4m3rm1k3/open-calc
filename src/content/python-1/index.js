@@ -24,6 +24,7 @@ import ch1_5 from './ch1-5.js'
 import ch1_6 from './ch1-6.js'
 import ch2_1 from './ch2-1.js'
 import ch2_2 from './ch2-2.js'
+import ch2_3 from './ch2-3.js'
 
 export default [
   {
@@ -115,5 +116,11 @@ export default [
     title: 'Linear Algebra (Computational)',
     course: 'python-1',
     lessons: [ch2_2]
+  },
+  {
+    number: 2.3,
+    title: 'Systems & Geometry',
+    course: 'python-1',
+    lessons: [ch2_3]
   }
 ]
