@@ -123,7 +123,7 @@ error_at = lambda x: abs(f(x) - L(x))
 print(f"f({a})  = {fa}")
 print(f"f'({a}) = {dfa:.6f}")
 print(f"L(x)   = {fa} + {dfa:.4f} * (x - {a})")
-print(f"\nSpot checks:")
+print(f"Spot checks:")
 for x in [a - 3, a - 1, a, a + 1, a + 3, a + 5]:
     print(f"  x = {x:6.1f}  |  f(x) = {f(x):.6f}  |  L(x) = {L(x):.6f}  |  error = {error_at(x):.6f}")
 

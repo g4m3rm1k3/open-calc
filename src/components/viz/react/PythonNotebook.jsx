@@ -67,14 +67,14 @@ class Figure:
         self._elements.append({'type':'line','start':[self._xmin,y],'end':[self._xmax,y],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
     def vline(self,x,color='muted',width=1,dashed=True):
         self._elements.append({'type':'line','start':[x,self._ymin],'end':[x,self._ymax],'color':color,'width':width,'dashed':dashed,'alpha':0.7});return self
-    def plot(self,fn,xmin=None,xmax=None,steps=300,color='blue',width=2.5,label=None,fill=False,fill_alpha=0.15):
+    def plot(self,fn,xmin=None,xmax=None,steps=300,color='blue',width=2.5,label=None,fill=False,fill_alpha=0.15,dashed=False):
         x0=xmin if xmin is not None else self._xmin;x1=xmax if xmax is not None else self._xmax
         xs=[x0+(x1-x0)*i/steps for i in range(steps+1)];ys=[]
         for x in xs:
             try:
                 y=fn(x);ys.append(float('inf') if y!=y else y)
             except:ys.append(None)
-        self._elements.append({'type':'curve','xs':xs,'ys':ys,'color':color,'width':width,'label':label,'fill':fill,'fill_alpha':fill_alpha});return self
+        self._elements.append({'type':'curve','xs':xs,'ys':ys,'color':color,'width':width,'label':label,'fill':fill,'fill_alpha':fill_alpha,'dashed':dashed});return self
     def scatter(self,xs,ys,color='blue',radius=4,labels=None):
         self._elements.append({'type':'scatter','xs':list(xs),'ys':list(ys),'color':color,'radius':radius,'labels':labels});return self
     def parametric(self,xfn,yfn,tmin=0,tmax=2*math.pi,steps=300,color='purple',width=2):

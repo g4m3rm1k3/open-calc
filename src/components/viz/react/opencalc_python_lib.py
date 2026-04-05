@@ -166,7 +166,7 @@ class Figure:
     # ── Curves ────────────────────────────────────────────────────────────────
 
     def plot(self, fn, xmin=None, xmax=None, steps=300,
-             color='blue', width=2.5, label=None, fill=False, fill_alpha=0.15):
+             color='blue', width=2.5, label=None, fill=False, fill_alpha=0.15, dashed=False):
         """
         Plot a function y = fn(x).
         fn: a callable taking a single float, returning a float.
@@ -191,6 +191,7 @@ class Figure:
             'label': label,
             'fill': fill,
             'fill_alpha': fill_alpha,
+            'dashed': dashed,
         })
         return self
 

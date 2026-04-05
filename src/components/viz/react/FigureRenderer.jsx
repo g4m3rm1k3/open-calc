@@ -197,6 +197,7 @@ export default function FigureRenderer({ figureJson, C }) {
             }
             // Curve line
             ctx.strokeStyle = color; ctx.lineWidth = el.width || 2.5
+            if (el.dashed) ctx.setLineDash([8, 5])
             ctx.beginPath()
             let started = false
             for (let i = 0; i < xs.length; i++) {
@@ -207,6 +208,7 @@ export default function FigureRenderer({ figureJson, C }) {
               started = true
             }
             ctx.stroke()
+            if (el.dashed) ctx.setLineDash([])
             // Label at midpoint
             if (el.label) {
               const mid = Math.floor(xs.length / 2)
