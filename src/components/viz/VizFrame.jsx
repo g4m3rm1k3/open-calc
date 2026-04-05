@@ -851,6 +851,12 @@ const VIZ_REGISTRY = {
   MoleculeBuilder:  lazy(() => import("./react/MoleculeBuilder.jsx")),
 };
 
+// Vizzes that work fine on a phone-sized screen
+const PHONE_OK = new Set([
+  'PythonNotebook', 'JSNotebook', 'ScienceNotebook',
+  'VideoEmbed', 'VideoCarousel', 'VideoLauncher',
+])
+
 function VizSkeleton() {
   return (
     <div className="animate-pulse bg-slate-200 dark:bg-slate-700 rounded-lg h-64 flex items-center justify-center">
@@ -864,6 +870,7 @@ function VizSkeleton() {
 export default function VizFrame({ id, initialProps = {}, title }) {
   const [params, setParams] = useState(initialProps);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPhone, setIsPhone] = useState(() => window.innerWidth < 640);
   const VizComponent = VIZ_REGISTRY[id];
   const initialPropsKey = useMemo(
     () => JSON.stringify(initialProps ?? {}),
@@ -877,6 +884,12 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   useEffect(() => {
     setParams(initialProps ?? {});
   }, [id, initialPropsKey]);
+
+  useEffect(() => {
+    const h = () => setIsPhone(window.innerWidth < 640);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
 
   if (!VizComponent) {
     if (import.meta.env.DEV) {
@@ -892,6 +905,20 @@ export default function VizFrame({ id, initialProps = {}, title }) {
       );
     }
     return null;
+  }
+
+  // On phone-sized screens (< 640px), most interactive vizzes don't work well.
+  // Show a "Desktop only" placeholder unless this viz is known to work on phones.
+  if (!isExpanded && isPhone && !PHONE_OK.has(id)) {
+    return (
+      <div id={`viz-${id}`} className="viz-frame rounded-xl overflow-hidden">
+        <div className="flex flex-col items-center justify-center py-8 px-4 text-center bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <span className="text-3xl mb-2">🖥️</span>
+          <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Desktop &amp; tablet only</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">This interactive works best on a larger screen</p>
+        </div>
+      </div>
+    );
   }
 
   const content = (

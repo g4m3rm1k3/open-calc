@@ -352,13 +352,13 @@ export default function FloatingVideoPlayer() {
              isMobile ? 'rounded-none' : 'rounded-2xl border border-slate-200 dark:border-slate-800'
            }`}
         >
-          {/* Header - now the ONLY draggable area - hides until hover if playing */}
+          {/* Header - draggable area on desktop; always visible on mobile */}
           <div 
             onPointerDown={(e) => dragControls.start(e)}
-            className={`flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 cursor-grab active:cursor-grabbing select-none transition-all duration-500 transform ${
-              currentVideo 
-                ? 'opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0' 
-                : 'opacity-100 translate-y-0'
+            className={`flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 select-none transition-all duration-500 transform ${
+              !isMobile && currentVideo
+                ? 'opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0 cursor-grab active:cursor-grabbing'
+                : 'opacity-100 translate-y-0 cursor-grab active:cursor-grabbing'
             }`}
           >
             <div className="flex items-center gap-3 truncate">
@@ -377,8 +377,12 @@ export default function FloatingVideoPlayer() {
               <button onClick={toggleMinimize} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Minimize">
                 <Minus size={18} />
               </button>
-                <button onClick={toggleMinimize} className="p-1.5 hover:bg-red-900/40 hover:text-red-500 rounded-lg text-slate-400 transition-colors" title="Close Hub">
-                  <X size={18} />
+                <button
+                  onClick={isMobile ? closePlayer : toggleMinimize}
+                  className={`rounded-lg text-slate-400 transition-colors ${isMobile ? 'p-2 bg-red-600 hover:bg-red-700 text-white' : 'p-1.5 hover:bg-red-900/40 hover:text-red-500'}`}
+                  title="Close"
+                >
+                  <X size={isMobile ? 20 : 18} />
                 </button>
             </div>
           </div>

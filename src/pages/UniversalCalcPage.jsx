@@ -2,8 +2,20 @@ import { useState } from 'react'
 import UniversalCalcExplainer from '../components/tools/UniversalCalcExplainer.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
 
+const PhoneGuard = () => (
+  <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+    <span className="text-5xl mb-4">🖥️</span>
+    <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">Desktop &amp; Tablet Only</h2>
+    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs">
+      The Calculus Explainer requires a larger screen. Open it on a tablet or desktop for the full experience.
+    </p>
+  </div>
+)
+
 export default function UniversalCalcPage() {
   const [activeTab, setActiveTab] = useState('explainer')
+
+  if (window.innerWidth < 640) return <PhoneGuard />
 
   return (
     <div className="py-2">

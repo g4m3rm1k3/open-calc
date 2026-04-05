@@ -1,15 +1,16 @@
-// Service worker — network-first for navigation, auto-reload on new deploy
+// Service worker — network-first for navigation, user-triggered reload on new deploy
 
-self.addEventListener('install', () => self.skipWaiting())
+// Don't auto-skipWaiting — wait for the page to send SKIP_WAITING so the
+// update banner shows BEFORE the page reloads, not during the reload.
+self.addEventListener('install', () => {})
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    self.clients.claim().then(() =>
-      self.clients.matchAll({ type: 'window' }).then(clients =>
-        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED' }))
-      )
-    )
-  )
+  e.waitUntil(self.clients.claim())
+})
+
+// Page sends this when user clicks "Reload" in the update banner.
+self.addEventListener('message', e => {
+  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 self.addEventListener('fetch', e => {
