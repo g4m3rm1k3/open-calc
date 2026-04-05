@@ -190,6 +190,7 @@ const VIZ_REGISTRY = {
   // Chemistry lessons
   WhyChemistry: lazy(() => import("./react/WhyChemistry.jsx")),
   WhatIsAnAtom: lazy(() => import("./react/WhatIsAnAtom.jsx")),
+  InsideTheAtom: lazy(() => import("./react/InsideTheAtom.jsx")),
   // Digital Fundamentals lessons
   AnalogVsDigital: lazy(() => import("./react/AnalogVsDigital.jsx")),
   BinaryAndWaveforms: lazy(() => import("./react/BinaryAndWaveforms.jsx")),
