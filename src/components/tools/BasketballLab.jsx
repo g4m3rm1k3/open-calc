@@ -77,8 +77,9 @@ export default function BasketballLab({ onClose }) {
     canReplay:   false,
     replayIdx:   0,
     replaySub:   0,
-    launchAngle: 0.55,   // 0–1.3 rad, scroll-controlled, independent of camera
+    launchAngle: 0.55,
     slowMo:      false,
+    scoredTimer: 0,   // >0 means ball is falling through net after score
   })
 
   // React state (for UI only)
@@ -526,9 +527,9 @@ export default function BasketballLab({ onClose }) {
           const distXZ = Math.sqrt(dx * dx + dz * dz)
 
           // ── Rim collision (8 sample points on rim ring) ─────────────────
-          if (Math.abs(g.ballPos.y - RIM_HEIGHT) < BALL_RADIUS + RIM_TUBE + 0.06) {
-            for (let i = 0; i < 8; i++) {
-              const th = (i / 8) * Math.PI * 2
+          if (Math.abs(g.ballPos.y - RIM_HEIGHT) < BALL_RADIUS + RIM_TUBE + 0.08) {
+            for (let i = 0; i < 16; i++) {  // 16 pts = smoother rim
+              const th = (i / 16) * Math.PI * 2
               const rp = new THREE.Vector3(bw.x + Math.cos(th) * RIM_RADIUS, RIM_HEIGHT, bw.z + Math.sin(th) * RIM_RADIUS)
               const diff = g.ballPos.clone().sub(rp)
               const d = diff.length()
@@ -537,8 +538,8 @@ export default function BasketballLab({ onClose }) {
                 g.ballPos.copy(rp).addScaledVector(diff, BALL_RADIUS + RIM_TUBE + 0.003)
                 const vn = g.ballVel.dot(diff)
                 if (vn < 0) {
-                  g.ballVel.addScaledVector(diff, -(1 + 0.6) * vn)
-                  g.ballVel.multiplyScalar(0.72)
+                  g.ballVel.addScaledVector(diff, -(1 + 0.55) * vn)
+                  g.ballVel.multiplyScalar(0.68)   // more energy loss = more rattling
                   g.rimHits++
                 }
               }
@@ -592,14 +593,18 @@ export default function BasketballLab({ onClose }) {
             Math.abs(g.ballPos.y - RIM_HEIGHT) < BALL_RADIUS * 1.05 &&
             distXZ < RIM_RADIUS - BALL_RADIUS * 0.75
           ) {
-            g.makes++; g.phase = 'done'
+            g.makes++; g.phase = 'scoring'  // 'scoring' = fall through net, still visible
+            g.scoredTimer = 0.9             // seconds to fall through net
+            // bleed off XZ velocity so ball drops straight through
+            g.ballVel.x *= 0.15
+            g.ballVel.z *= 0.15
+            g.ballVel.y  = -3.5             // pull it down quickly
             const isSwish = g.rimHits === 0
             const isBankSwish = g.backboardHit && g.rimHits === 0
             const msg = isBankSwish ? 'BANK SHOT! 💥' : isSwish ? 'SWISH! 🏀' : g.rimHits > 1 ? 'Rattle in! 🔥' : 'BUCKET! 💪'
             g.doneMsg = msg
             savedReplay.current = [...replayFrames.current]
             setMakes(g.makes); setFeedback(msg)
-            setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 2500)
           }
         }
 
@@ -609,6 +614,25 @@ export default function BasketballLab({ onClose }) {
           qx: ball.quaternion.x, qy: ball.quaternion.y,
           qz: ball.quaternion.z, qw: ball.quaternion.w,
         })
+      }
+
+      // ── Scoring: ball falls through net then transitions ───────────────────────
+      if (g.phase === 'scoring') {
+        const sball = ballMeshRef.current
+        if (sball) {
+          g.ballVel.y += GRAVITY * effDt * 0.5  // gentle gravity during drop
+          g.ballPos.addScaledVector(g.ballVel, effDt)
+          sball.position.copy(g.ballPos)
+          sball.visible = true   // stays visible while falling through net
+        }
+        g.scoredTimer -= rawDt
+        if (g.scoredTimer <= 0) {
+          g.phase = 'done'
+          if (sball) sball.visible = false
+          g.canReplay = true
+          setFeedback('')
+          setShowReplay(true)
+        }
       }
 
       // ── Replay playback ──────────────────────────────────────────────────────
@@ -884,8 +908,9 @@ function drawSidePanel(canvas, gs, camera, ball) {
   ctx.lineTo(sx(BASKET_Z + RIM_RADIUS), sy(RIM_HEIGHT))
   ctx.stroke()
 
-  // Player eye dot
-  const plsx = sx(playerZ), plsy = sy(PLAYER_EYE)
+  // Player dot — use actual launch origin height, not eye height
+  const LAUNCH_H   = PLAYER_EYE - 0.25
+  const plsx = sx(playerZ), plsy = sy(LAUNCH_H)
   ctx.fillStyle = '#3b82f6'
   ctx.beginPath(); ctx.arc(plsx, plsy, 4, 0, Math.PI * 2); ctx.fill()
 
@@ -894,7 +919,7 @@ function drawSidePanel(canvas, gs, camera, ball) {
     const speed = gs.power * 10 + 7
     const pitch = gs.launchAngle  // launch angle, not camera pitch
     const dz = Math.cos(pitch), dy = Math.sin(pitch)
-    let pz2 = playerZ + dz * 0.3, py2 = PLAYER_EYE - 0.25
+    let pz2 = playerZ + dz * 0.3, py2 = LAUNCH_H
     let vz2 = dz * speed, vy2 = dy * speed
     const dt2 = 0.045
 
@@ -911,7 +936,7 @@ function drawSidePanel(canvas, gs, camera, ball) {
     }
     ctx.stroke(); ctx.setLineDash([])
 
-    // Shot angle indicator line from player
+    // Angle indicator line from actual launch origin
     const lineLen = 22
     ctx.strokeStyle = 'rgba(251,191,36,0.6)'; ctx.lineWidth = 1.5
     ctx.beginPath()
@@ -919,7 +944,7 @@ function drawSidePanel(canvas, gs, camera, ball) {
     ctx.lineTo(plsx + Math.cos(-pitch) * lineLen, plsy + Math.sin(-pitch) * lineLen)
     ctx.stroke()
 
-    // Horizontal reference guide
+    // Horizontal reference from launch origin
     ctx.strokeStyle = 'rgba(100,116,139,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([3, 4])
     ctx.beginPath(); ctx.moveTo(plsx, plsy); ctx.lineTo(plsx + lineLen + 6, plsy); ctx.stroke()
     ctx.setLineDash([])
