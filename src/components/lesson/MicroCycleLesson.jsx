@@ -409,16 +409,19 @@ function MathBlock({ data, lessonId }) {
 
   return (
     <div id={lessonId ? `${lessonId}-math` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-brand-200 dark:border-brand-900/60 shadow-sm">
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-6 py-4 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 dark:hover:bg-brand-950/60 transition-colors text-left"
+        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-6 py-4 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 dark:hover:bg-brand-950/60 transition-colors text-left cursor-pointer"
       >
         <span className="text-xl">📐</span>
         <span className="font-bold text-brand-800 dark:text-brand-200 text-sm uppercase tracking-wider">Mathematics</span>
         <div className="flex-1 h-px bg-brand-200 dark:bg-brand-800/50" />
         {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:math`} /></span>}
         <span className="text-brand-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Show ▼'}</span>
-      </button>
+      </div>
       {open && (
         <div className="px-6 py-5 bg-brand-50/30 dark:bg-brand-950/10 space-y-4">
           {data.processDefinition?.length > 0 && (
@@ -468,9 +471,12 @@ function RigorBlock({ data, lessonId }) {
 
   return (
     <div id={lessonId ? `${lessonId}-rigor` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-purple-200 dark:border-purple-900/60 shadow-sm">
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-6 py-4 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 transition-colors text-left"
+        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-6 py-4 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 transition-colors text-left cursor-pointer"
       >
         <span className="text-lg font-bold text-purple-600 dark:text-purple-400">∴</span>
         <span className="font-bold text-purple-800 dark:text-purple-200 text-sm uppercase tracking-wider">Formal Proof</span>
@@ -482,7 +488,7 @@ function RigorBlock({ data, lessonId }) {
         )}
         {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:rigor`} /></span>}
         <span className="text-purple-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Prove it ▼'}</span>
-      </button>
+      </div>
       {open && (
         <div className="px-6 py-5 bg-purple-50/20 dark:bg-purple-950/10 space-y-4">
           {hasProse || hasCallouts || isBlocksFormat ? <SectionContent data={data} /> : null}
