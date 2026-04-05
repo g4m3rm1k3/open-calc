@@ -22,7 +22,7 @@ export default {
       "A 10-foot ladder is leaning against a wall. The base slides away from the wall at 2 ft/s. How fast is the top of the ladder sliding DOWN the wall at the moment the base is 6 feet from the wall? At that same moment, is the top sliding down faster or slower than the base is sliding out?",
     realWorldContext:
       "Air traffic controllers face this problem every second: a radar system tracks an aircraft's slant range (the straight-line distance from the antenna to the plane) and the angle of elevation. The rate of change of slant range and the rate of change of angle are different quantities, linked through trigonometry. Neither one directly gives the aircraft's speed, but together they do. The same mathematics governs water draining from conical tanks (a classic engineering problem), balloons inflating, shadows lengthening as the sun moves, and the distances between moving vehicles on a highway. Whenever two geometric quantities are constrained by a relationship — a fixed triangle, a fixed volume, similar triangles — differentiating that constraint with respect to time gives you a new equation linking their rates.",
-    previewVisualizationId: "RelatedRatesLadder",
+
   },
 
   intuition: {
@@ -166,7 +166,7 @@ export default {
       title: "Ladder Sliding Down a Wall",
       problem:
         "\\text{A 10-ft ladder leans against a wall. The base slides away at } \\frac{dx}{dt} = 2 \\text{ ft/s. Find } \\frac{dy}{dt} \\text{ when } x = 6 \\text{ ft.}",
-      visualizationId: "RelatedRatesLadder",
+  
       steps: [
         {
           expression: "x^2 + y^2 = 100",
@@ -592,7 +592,6 @@ export default {
       title: "Spreading Circular Oil Slick",
       problem:
         "\\text{A circular oil slick grows at } dA/dt = 50 \\text{ m}^2/\\text{hr. Find } dr/dt \\text{ when } r = 10 \\text{ m.}",
-      visualizationId: "RelatedRatesLadder",
       steps: [
         {
           expression: "A = \\pi r^2",
