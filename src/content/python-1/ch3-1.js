@@ -497,10 +497,12 @@ fig.show()`,
             // ── CHALLENGE CELLS ──────────────────────────────────────────────
             {
               id: 'c1',
-              type: 'challenge',
-              cellTitle: 'Challenge 1 — Filter and aggregate',
-              prose: 'The DataFrame below contains sales records. Write one expression to compute the **mean revenue** for rows where `region == "North"` only. Expected answer: around 4650.',
-              starterCode: `import pandas as pd
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Filter and aggregate',
+              difficulty: 'easy',
+              prompt: 'The DataFrame below contains sales records. Write one expression to compute the mean revenue for rows where region == "North" only. Expected answer: around 4650.',
+              code: `import pandas as pd
 
 df = pd.DataFrame({
     "region":  ["North","South","North","East","North","South"],
@@ -511,24 +513,16 @@ df = pd.DataFrame({
 # Your code here — one expression
 # north_mean = ...
 # print(north_mean)`,
-              solution: `import pandas as pd
-
-df = pd.DataFrame({
-    "region":  ["North","South","North","East","North","South"],
-    "product": ["Widget","Gadget","Widget","Doohickey","Gadget","Widget"],
-    "revenue": [4200, 8100, 5100, 3300, 4650, 7200],
-})
-
-north_mean = df[df["region"] == "North"]["revenue"].mean()
-print(f"Mean North revenue: {north_mean:.2f}")`,
             },
 
             {
               id: 'c2',
-              type: 'challenge',
-              cellTitle: 'Challenge 2 — Computed column',
-              prose: 'Add a column `"bonus"` to the DataFrame that equals 10% of salary for employees with rating ≥ 4.0, and 5% for everyone else. Then print the total bonus payout.',
-              starterCode: `import pandas as pd
+              challengeType: 'write',
+              challengeNumber: 2,
+              challengeTitle: 'Computed column',
+              difficulty: 'medium',
+              prompt: 'Add a column "bonus" to the DataFrame that equals 10% of salary for employees with rating >= 4.0, and 5% for everyone else. Then print the total bonus payout.',
+              code: `import pandas as pd
 
 df = pd.DataFrame({
     "name":   ["Alice","Bob","Carol","Dave","Eve"],
@@ -538,30 +532,17 @@ df = pd.DataFrame({
 
 # Your code: add df["bonus"] then print total
 `,
-              solution: `import pandas as pd
-
-df = pd.DataFrame({
-    "name":   ["Alice","Bob","Carol","Dave","Eve"],
-    "salary": [90000, 72000, 85000, 61000, 95000],
-    "rating": [4.5, 3.7, 4.1, 3.2, 4.8],
-})
-
-df["bonus"] = df.apply(
-    lambda row: row["salary"] * 0.10 if row["rating"] >= 4.0 else row["salary"] * 0.05,
-    axis=1
-)
-
-print(df[["name","salary","rating","bonus"]])
-print()
-print(f"Total bonus payout: \${df['bonus'].sum():,.2f}")`,
+              hint: 'Use df.apply(lambda row: ..., axis=1) to compute per-row logic. Access row["salary"] and row["rating"] inside the lambda.',
             },
 
             {
               id: 'c3',
-              type: 'challenge',
-              cellTitle: 'Challenge 3 — GroupBy and bar chart',
-              prose: 'Group the sales data by `"category"` and compute the **total revenue per category**. Then visualize it as a bar chart with `fig.bars()`.',
-              starterCode: `import pandas as pd
+              challengeType: 'write',
+              challengeNumber: 3,
+              challengeTitle: 'GroupBy and bar chart',
+              difficulty: 'medium',
+              prompt: 'Group the sales data by "category" and compute the total revenue per category. Then visualize it as a bar chart with fig.bars(). Remember: convert values to plain Python floats with [float(v) for v in ...].',
+              code: `import pandas as pd
 from opencalc import Figure, GREEN
 
 df = pd.DataFrame({
@@ -573,29 +554,16 @@ df = pd.DataFrame({
 # 2. create a Figure and call fig.bars(labels, values, color=GREEN)
 # 3. fig.show()
 `,
-              solution: `import pandas as pd
-from opencalc import Figure, GREEN
-
-df = pd.DataFrame({
-    "category": ["Books","Electronics","Books","Clothing","Electronics","Books","Clothing"],
-    "revenue":  [45, 320, 62, 89, 415, 38, 130],
-})
-
-totals = df.groupby("category")["revenue"].sum()
-labels = list(totals.index)
-values = [float(v) for v in totals.values]
-
-fig = Figure(title="Total Revenue by Category", xmin=0, xmax=3, ymin=0, ymax=500)
-fig.bars(labels, values, color=GREEN)
-fig.show()`,
             },
 
             {
               id: 'c4',
-              type: 'challenge',
-              cellTitle: 'Challenge 4 — loc vs iloc',
-              prose: 'Create a DataFrame with country names as the index. Then:\n1. Use `loc` to get the row for `"Japan"`\n2. Use `iloc` to get the second row\n3. Use `iloc` to get the first two rows and the first column only\n\nPrint all three results.',
-              starterCode: `import pandas as pd
+              challengeType: 'write',
+              challengeNumber: 4,
+              challengeTitle: 'loc vs iloc',
+              difficulty: 'easy',
+              prompt: 'Using the DataFrame with country names as the index:\n1. Use loc to get the row for "Japan"\n2. Use iloc to get the second row\n3. Use iloc to get the first two rows and the first column only\nPrint all three results.',
+              code: `import pandas as pd
 
 df = pd.DataFrame({
     "gdp_trillion": [23.0, 17.7, 4.9, 4.2, 3.7],
@@ -606,21 +574,7 @@ df = pd.DataFrame({
 # 2. iloc for second row
 # 3. iloc for first 2 rows, first column
 `,
-              solution: `import pandas as pd
-
-df = pd.DataFrame({
-    "gdp_trillion": [23.0, 17.7, 4.9, 4.2, 3.7],
-    "population_m": [331, 1412, 126, 83, 67],
-}, index=["USA", "China", "Japan", "Germany", "UK"])
-
-print("1. df.loc['Japan']:")
-print(df.loc["Japan"])
-print()
-print("2. df.iloc[1] (second row):")
-print(df.iloc[1])
-print()
-print("3. df.iloc[:2, 0] (first 2 rows, first column):")
-print(df.iloc[:2, 0])`,
+              hint: 'df.loc["Japan"] selects by label. df.iloc[1] selects by position. df.iloc[:2, 0] selects first 2 rows, first column by position.',
             },
 
           ]

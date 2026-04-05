@@ -27,6 +27,7 @@ import ch2_2 from './ch2-2.js'
 import ch2_3 from './ch2-3.js'
 import ch2_4 from './ch2-4.js'
 import ch3_1 from './ch3-1.js'
+import ch3_2 from './ch3-2.js'
 
 export default [
   {
@@ -136,5 +137,11 @@ export default [
     title: 'Tabular Data Model',
     course: 'python-1',
     lessons: [ch3_1]
+  },
+  {
+    number: 3.2,
+    title: 'Data Cleaning',
+    course: 'python-1',
+    lessons: [ch3_2]
   }
 ]
