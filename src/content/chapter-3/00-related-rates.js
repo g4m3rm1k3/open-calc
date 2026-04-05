@@ -87,6 +87,12 @@ export default {
         caption: "Sets dV/dt and observe how dr/dt (green arrow) shrinks as the balloon grows. The surface area is the 'spreading factor' that slows the radius.",
       },
       {
+        id: "RelatedRatesRocket",
+        title: "The Premier Related Rates Lab: Rocket & Plane",
+        mathBridge: "Two classic problems in one tool. 🚀 Rocket: A camera d ft away tracks a rising rocket (tan θ = h/d). ✈️ Plane: An observer tracks a plane flying at altitude H (x² + H² = s²). Both use the chain rule to link the measurable rate to the unknown rate. Use the 'Math' tab to see step-by-step symbolic and numeric derivations for both scenarios side-by-side.",
+        caption: "Explore two different geometric constraints (triangles) and see how their rate equations are derived through implicit differentiation.",
+      },
+      {
         id: "Ch6_TwoTanks",
         title: "Story Mode: Two Tanks, One Valve",
         mathBridge:

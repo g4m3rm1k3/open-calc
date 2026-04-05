@@ -132,6 +132,7 @@ const VIZ_REGISTRY = {
   NewtonsMethod: lazy(() => import("./d3/NewtonsMethod.jsx")),
   SpringOscillation: lazy(() => import("./d3/SpringOscillation.jsx")),
   RelatedRatesLadder: lazy(() => import("./d3/RelatedRatesLadder.jsx")),
+  RelatedRatesRocket: lazy(() => import("./react/RelatedRatesRocket.jsx")),
   LinearApproximation: lazy(() => import("./d3/LinearApproximation.jsx")),
   MVTViz: lazy(() => import("./d3/MVTViz.jsx")),
   CurveSketchingBoard: lazy(() => import("./d3/CurveSketchingBoard.jsx")),
