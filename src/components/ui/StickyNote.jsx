@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { parseProse } from '../math/parseProse.jsx'
+import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import DEFAULT_NOTES from '../../content/default-notes.json'
 
 // ─── Storage helpers ──────────────────────────────────────────────────────────
@@ -52,6 +54,11 @@ function useIsDark() {
   return dark
 }
 
+// ─── Font sizes ─────────────────────────────────────────────────────────────────
+
+const FONT_SIZES = [12, 18, 24]               // 1×, 1.5×, 2×
+const FONT_LABELS = ['1×', '1.5×', '2×']
+
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const COLORS = [
@@ -70,6 +77,7 @@ export default function StickyNote({ noteId }) {
   const [color, setColor] = useState('yellow')
   const [preview, setPreview] = useState(false)
   const [ruled, setRuled] = useState(false)
+  const [fontIdx, setFontIdx] = useState(0)
   const [size, setSize] = useState({ w: 320, h: null })
   const [pos, setPos] = useState(null)
   const btnRef = useRef(null)
@@ -95,6 +103,7 @@ export default function StickyNote({ noteId }) {
       setText(n?.text ?? '')
       setColor(n?.color ?? 'yellow')
       setRuled(n?.ruled ?? false)
+      setFontIdx(n?.fontIdx ?? 0)
       setSize({ w: n?.w ?? 320, h: n?.h ?? null })
       setPreview(!!(n?.text?.trim()))
     } else {
@@ -108,12 +117,12 @@ export default function StickyNote({ noteId }) {
     // Skip the very first fire after open — loaded state hasn't settled yet
     if (!loadedRef.current) { loadedRef.current = true; return }
     if (text.trim()) {
-      saveNote(noteId, { text, color, ruled, w: size.w, h: size.h })
+      saveNote(noteId, { text, color, ruled, fontIdx, w: size.w, h: size.h })
     } else {
       deleteNote(noteId)
     }
     window.dispatchEvent(new Event('oc-note-change'))
-  }, [text, color, ruled, size, open, noteId])
+  }, [text, color, ruled, fontIdx, size, open, noteId])
 
   const computePos = () => {
     if (!btnRef.current) return null
@@ -290,6 +299,19 @@ export default function StickyNote({ noteId }) {
               </button>
               <button
                 onMouseDown={e => e.stopPropagation()}
+                onClick={() => setFontIdx(i => (i + 1) % FONT_SIZES.length)}
+                title={`Font size: ${FONT_LABELS[fontIdx]} — click to cycle`}
+                style={{
+                  fontSize: 10, background: 'none', cursor: 'pointer', padding: '1px 4px',
+                  border: fontIdx > 0 ? `1px solid ${C.dot}88` : '1px solid transparent',
+                  borderRadius: 3, color: fontIdx > 0 ? C.dot : mutedColor,
+                  fontWeight: 600, letterSpacing: '-0.02em',
+                }}
+              >
+                A{fontIdx === 0 ? '' : fontIdx === 1 ? '⁺' : '⁺⁺'}
+              </button>
+              <button
+                onMouseDown={e => e.stopPropagation()}
                 onClick={() => setPreview(p => !p)}
                 style={{ fontSize: 10, color: mutedColor, background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px' }}
               >
@@ -317,14 +339,37 @@ export default function StickyNote({ noteId }) {
             {preview
               ? (
                 <div style={{
-                    fontSize: 12, lineHeight: 1.7, color: textColor, minHeight: 60, wordBreak: 'break-word',
+                    fontSize: FONT_SIZES[fontIdx], lineHeight: 1.7, color: textColor, minHeight: 60, wordBreak: 'break-word',
                     ...(ruled ? {
                       backgroundImage: `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), rgba(100,116,139,0.14) calc(1.7em - 1px), rgba(100,116,139,0.14) 1.7em)`,
                       backgroundSize: '100% 1.7em',
                     } : {}),
                   }}>
                   {text.trim()
-                    ? parseProse(text)
+                    ? <ReactMarkdown
+                        remarkPlugins={[remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          h1: ({children}) => <h1 style={{fontSize:'1.3em',fontWeight:700,margin:'0.4em 0'}}>{children}</h1>,
+                          h2: ({children}) => <h2 style={{fontSize:'1.15em',fontWeight:700,margin:'0.4em 0'}}>{children}</h2>,
+                          h3: ({children}) => <h3 style={{fontSize:'1.05em',fontWeight:700,margin:'0.3em 0'}}>{children}</h3>,
+                          p: ({children}) => <p style={{margin:'0.3em 0'}}>{children}</p>,
+                          ul: ({children}) => <ul style={{paddingLeft:'1.4em',margin:'0.3em 0'}}>{children}</ul>,
+                          ol: ({children}) => <ol style={{paddingLeft:'1.4em',margin:'0.3em 0'}}>{children}</ol>,
+                          li: ({children}) => <li style={{margin:'0.1em 0'}}>{children}</li>,
+                          strong: ({children}) => <strong style={{fontWeight:700}}>{children}</strong>,
+                          em: ({children}) => <em>{children}</em>,
+                          code: ({inline, children}) => inline
+                            ? <code style={{background:'rgba(100,116,139,0.15)',borderRadius:3,padding:'1px 4px',fontFamily:'monospace'}}>{children}</code>
+                            : <pre style={{background:'rgba(100,116,139,0.12)',borderRadius:6,padding:'8px',overflowX:'auto',margin:'0.4em 0'}}><code style={{fontFamily:'monospace',fontSize:'0.9em'}}>{children}</code></pre>,
+                          table: ({children}) => <table style={{borderCollapse:'collapse',width:'100%',margin:'0.4em 0',fontSize:'0.9em'}}>{children}</table>,
+                          th: ({children}) => <th style={{border:'1px solid rgba(100,116,139,0.3)',padding:'4px 8px',background:'rgba(100,116,139,0.1)',textAlign:'left'}}>{children}</th>,
+                          td: ({children}) => <td style={{border:'1px solid rgba(100,116,139,0.2)',padding:'4px 8px'}}>{children}</td>,
+                          hr: () => <hr style={{border:'none',borderTop:'1px solid rgba(100,116,139,0.2)',margin:'0.5em 0'}} />,
+                          blockquote: ({children}) => <blockquote style={{borderLeft:'3px solid rgba(100,116,139,0.4)',paddingLeft:'0.75em',margin:'0.3em 0',color:'rgba(30,41,59,0.7)',fontStyle:'italic'}}>{children}</blockquote>,
+                          a: ({href, children}) => <a href={href} target="_blank" rel="noopener noreferrer" style={{color:'#2563eb',textDecoration:'underline'}}>{children}</a>,
+                        }}
+                      >{text}</ReactMarkdown>
                     : <span style={{ color: mutedColor, fontStyle: 'italic' }}>Nothing here yet</span>
                   }
                 </div>
@@ -342,7 +387,7 @@ export default function StickyNote({ noteId }) {
                       : 'transparent',
                     backgroundSize: '100% 1.7em',
                     border: 'none', outline: 'none',
-                    fontSize: 12, lineHeight: 1.7, color: textColor,
+                    fontSize: FONT_SIZES[fontIdx], lineHeight: 1.7, color: textColor,
                     fontFamily: 'inherit', padding: 0, boxSizing: 'border-box',
                   }}
                 />

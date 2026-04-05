@@ -36,6 +36,8 @@
     "react-konva": "^18.2.14",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.26.2",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "three": "^0.168.0"
   },
   "devDependencies": {
