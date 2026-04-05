@@ -24,11 +24,19 @@ function simArc(ox, oy, oz, vx, vy, vz, steps, stepDt) {
   const pts = []
   let px = ox, py = oy, pz = oz
   let pvx = vx, pvy = vy, pvz = vz
+  const bbwz = COURT_L / 2 - 1.2 + BACKBOARD_Z  // backboard world-Z
   for (let i = 0; i < steps; i++) {
     pts.push(new THREE.Vector3(px, py, pz))
     pvx *= 0.9992; pvz *= 0.9992
     pvy += GRAVITY * stepDt
     px += pvx * stepDt; py += pvy * stepDt; pz += pvz * stepDt
+    // backboard bounce
+    if (pvz > 0 && pz >= bbwz - BALL_RADIUS &&
+        py > BB_Y_BOT - BALL_RADIUS && py < BB_Y_BOT + BACKBOARD_H + BALL_RADIUS) {
+      pz = bbwz - BALL_RADIUS; pvz *= -0.82; pvx *= 0.93; pvy *= 0.9
+    }
+    // floor bounce
+    if (py < BALL_RADIUS) { py = BALL_RADIUS; pvy *= -0.45; pvx *= 0.8; pvz *= 0.8 }
     if (py < -0.5) break
   }
   return pts
@@ -47,6 +55,7 @@ export default function BasketballLab({ onClose }) {
   const clockRef       = useRef(new THREE.Clock(false))
   const hudRef         = useRef(null)
   const sideCanvasRef  = useRef(null)
+  const arrowRef       = useRef(null)
   const replayFrames   = useRef([])
   const savedReplay    = useRef([])
 
@@ -65,9 +74,11 @@ export default function BasketballLab({ onClose }) {
     locked:   false,
     doneTimer:  0,
     doneMsg:   '',
-    canReplay:  false,
-    replayIdx:  0,
-    replaySub:  0,
+    canReplay:   false,
+    replayIdx:   0,
+    replaySub:   0,
+    launchAngle: 0.55,   // 0–1.3 rad, scroll-controlled, independent of camera
+    slowMo:      false,
   })
 
   // React state (for UI only)
@@ -75,8 +86,10 @@ export default function BasketballLab({ onClose }) {
   const [attempts, setAttempts] = useState(0)
   const [power,    setPower]    = useState(0.58)
   const [locked,   setLocked]   = useState(false)
-  const [feedback,   setFeedback]   = useState('')
-  const [showReplay, setShowReplay] = useState(false)
+  const [feedback,     setFeedback]     = useState('')
+  const [showReplay,   setShowReplay]   = useState(false)
+  const [launchAngle,  setLaunchAngle]  = useState(0.55)
+  const [slowMo,       setSlowMo]       = useState(false)
 
   // ── Shoot ─────────────────────────────────────────────────────────────────
   const shoot = useCallback(() => {
@@ -85,19 +98,16 @@ export default function BasketballLab({ onClose }) {
     if (g.phase !== 'aim' || !cam) return
     const speed = g.power * 10 + 7     // 7–17 m/s
 
-    // Direction from camera looking (quaternion avoids Euler sign-flip at yaw=π)
-    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(
-      new THREE.Quaternion()
-        .setFromAxisAngle(new THREE.Vector3(0, 1, 0), g.yaw)
-        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), g.pitch))
-    )
+    // Direction from yaw + independent launch angle scroll-dialled by player
+    const cosA = Math.cos(g.launchAngle), sinA = Math.sin(g.launchAngle)
+    const dir = new THREE.Vector3(-Math.sin(g.yaw) * cosA, sinA, -Math.cos(g.yaw) * cosA)
 
     g.ballPos.set(
-      cam.position.x + dir.x * 0.35,
-      cam.position.y - 0.12,
-      cam.position.z + dir.z * 0.35,
+      cam.position.x + dir.x * 0.3,
+      PLAYER_EYE - 0.25,
+      cam.position.z + dir.z * 0.3,
     )
-    g.ballVel.set(dir.x * speed, dir.y * speed + 1.2, dir.z * speed)
+    g.ballVel.set(dir.x * speed, dir.y * speed, dir.z * speed)
 
     g.rimHits = 0
     g.backboardHit = false
@@ -150,20 +160,31 @@ export default function BasketballLab({ onClose }) {
     const _vRight = new THREE.Vector3(1, 0, 0)
 
     // ── Lights ──────────────────────────────────────────────────────────────
-    scene.add(new THREE.AmbientLight(0xffffff, 0.3))
+    scene.add(new THREE.AmbientLight(0xfff4e0, 0.6))
 
-    // 4 arena spotlights
-    const spotCfg = [[-5, 11, -4], [5, 11, -4], [-5, 11, 4], [5, 11, 4]]
-    spotCfg.forEach(([x, y, z]) => {
-      const s = new THREE.SpotLight(0xfff5e0, 3.2, 28, 0.6, 0.35, 1.6)
-      s.position.set(x, y, z); s.castShadow = true
-      s.shadow.mapSize.set(512, 512)
+    // 8 overhead arena spots (6 along court + 2 focused on basket end)
+    const spotCfg = [
+      [-5, 11, -8], [5, 11, -8],
+      [-5, 11, 0],  [5, 11, 0],
+      [-5, 11, 8],  [5, 11, 8],
+      [-2.5, 10, COURT_L / 2 - 3.5], [2.5, 10, COURT_L / 2 - 3.5],
+    ]
+    spotCfg.forEach(([x, y, z], i) => {
+      const isBasket = i >= 6
+      const s = new THREE.SpotLight(0xfff5e0, isBasket ? 5.5 : 2.6, 30, isBasket ? 0.45 : 0.6, 0.4, 1.4)
+      s.position.set(x, y, z)
+      s.castShadow = isBasket
+      if (isBasket) s.shadow.mapSize.set(1024, 1024)
       scene.add(s); scene.add(s.target)
     })
-    // basket warm glow
-    const bg = new THREE.PointLight(0xff6600, 2, 7)
-    bg.position.set(0, RIM_HEIGHT + 1.2, COURT_L / 2 - 1)
+    // Basket warm rim glow
+    const bg = new THREE.PointLight(0xff7020, 4, 8)
+    bg.position.set(0, RIM_HEIGHT + 1.4, COURT_L / 2 - 1)
     scene.add(bg)
+    // Cool blue fill from behind shooter
+    const fillL = new THREE.PointLight(0x1a3aff, 0.9, 16)
+    fillL.position.set(0, 3.5, -COURT_L / 2 + 2)
+    scene.add(fillL)
 
     // ── Court floor ─────────────────────────────────────────────────────────
     {
@@ -329,6 +350,18 @@ export default function BasketballLab({ onClose }) {
       m.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts31), seamMat))
     }
 
+    // ── Launch-angle arrow (yellow, updates each frame) ─────────────────────────
+    {
+      const arr = new THREE.ArrowHelper(
+        new THREE.Vector3(0, 0, 1),
+        new THREE.Vector3(0, 1.5, 0),
+        1.4, 0xfbbf24, 0.3, 0.12
+      )
+      arr.visible = false
+      arrowRef.current = arr
+      scene.add(arr)
+    }
+
     // ── Arc preview line ─────────────────────────────────────────────────────
     {
       const pts = Array.from({ length: 80 }, () => new THREE.Vector3())
@@ -366,11 +399,16 @@ export default function BasketballLab({ onClose }) {
     }
     document.addEventListener('mousemove', onMouseMove)
 
-    // ── Scroll: power ─────────────────────────────────────────────────────────
+    // ── Scroll: launch angle | Shift+Scroll: power ────────────────────────────
     function onWheel(e) {
       const g = gs.current
-      g.power = clamp(g.power - e.deltaY * 0.0006, 0.05, 1)
-      setPower(g.power)
+      if (e.shiftKey) {
+        g.power = clamp(g.power - e.deltaY * 0.0006, 0.05, 1)
+        setPower(g.power)
+      } else {
+        g.launchAngle = clamp(g.launchAngle + e.deltaY * 0.0009, 0.05, 1.3)
+        setLaunchAngle(g.launchAngle)
+      }
     }
     dom.addEventListener('wheel', onWheel, { passive: true })
 
@@ -389,6 +427,7 @@ export default function BasketballLab({ onClose }) {
       }
       if (e.key === 'e' || e.key === 'E') { g.power = clamp(g.power + 0.05, 0, 1); setPower(g.power) }
       if (e.key === 'q' || e.key === 'Q') { g.power = clamp(g.power - 0.05, 0, 1); setPower(g.power) }
+      if (e.key === 'p' || e.key === 'P') { g.slowMo = !g.slowMo; setSlowMo(g.slowMo) }
       if (e.key === 'Escape') document.exitPointerLock()
     }
     function onKeyUp(e) { keysDown.delete(e.key) }
@@ -408,8 +447,9 @@ export default function BasketballLab({ onClose }) {
 
     function loop() {
       rafRef.current = requestAnimationFrame(loop)
-      const dt = clamp(clock.getDelta(), 0, 0.05)
+      const rawDt = clamp(clock.getDelta(), 0, 0.05)
       const g  = gs.current
+      const effDt = rawDt * (g.slowMo ? 0.2 : 1)  // physics run at 0.2× in slo-mo
 
       // Apply yaw/pitch via quaternion — avoids Euler sign-flip when yaw=π
       _qCamY.setFromAxisAngle(_vUp, g.yaw)
@@ -418,7 +458,7 @@ export default function BasketballLab({ onClose }) {
 
       // ── WASD movement ────────────────────────────────────────────────────
       if (g.locked && g.phase === 'aim') {
-        const spd = 5 * dt
+        const spd = 5 * rawDt
         const fwx = -Math.sin(g.yaw), fwz = -Math.cos(g.yaw)
         const rgx =  Math.cos(g.yaw), rgz = -Math.sin(g.yaw)
         if (keysDown.has('w') || keysDown.has('W')) { camera.position.x += fwx * spd; camera.position.z += fwz * spd }
@@ -429,18 +469,33 @@ export default function BasketballLab({ onClose }) {
         camera.position.z = clamp(camera.position.z, -COURT_L / 2 + 0.5, COURT_L / 2 - 0.5)
       }
 
+      // ── Launch angle arrow update ───────────────────────────────────────────
+      const arrow = arrowRef.current
+      if (arrow) {
+        arrow.visible = g.locked && g.phase === 'aim'
+        if (arrow.visible) {
+          const cosA = Math.cos(g.launchAngle), sinA = Math.sin(g.launchAngle)
+          arrow.setDirection(new THREE.Vector3(-Math.sin(g.yaw) * cosA, sinA, -Math.cos(g.yaw) * cosA))
+          arrow.position.set(
+            camera.position.x - Math.sin(g.yaw) * 0.45,
+            1.45,
+            camera.position.z - Math.cos(g.yaw) * 0.45,
+          )
+        }
+      }
+
       // ── Arc preview ──────────────────────────────────────────────────────
       const arcLine = arcLineRef.current
       if (arcLine) {
         if (g.phase === 'aim' && g.locked) {
           arcLine.visible = true
           const speed = g.power * 10 + 7
-          const dir = new THREE.Vector3(0, 0, -1)
-            .applyQuaternion(new THREE.Quaternion().copy(_qCamY).multiply(_qCamX))
-          const ox = camera.position.x + dir.x * 0.35
-          const oy = camera.position.y - 0.12
-          const oz = camera.position.z + dir.z * 0.35
-          const arcPts = simArc(ox, oy, oz, dir.x * speed, dir.y * speed + 1.2, dir.z * speed, 80, 0.045)
+          const cosA = Math.cos(g.launchAngle), sinA = Math.sin(g.launchAngle)
+          const dir = new THREE.Vector3(-Math.sin(g.yaw) * cosA, sinA, -Math.cos(g.yaw) * cosA)
+          const ox = camera.position.x + dir.x * 0.3
+          const oy = PLAYER_EYE - 0.25
+          const oz = camera.position.z + dir.z * 0.3
+          const arcPts = simArc(ox, oy, oz, dir.x * speed, dir.y * speed, dir.z * speed, 80, 0.045)
           arcLine.geometry.setFromPoints(arcPts)
           arcLine.geometry.attributes.position.needsUpdate = true
         } else {
@@ -453,7 +508,7 @@ export default function BasketballLab({ onClose }) {
       if (ball && g.phase === 'flight') {
         const STEPS = 4
         for (let s = 0; s < STEPS; s++) {
-          const sdt = dt / STEPS
+          const sdt = effDt / STEPS
           g.ballVel.y += GRAVITY * sdt
           g.ballVel.x *= (1 - 0.003 * sdt * 60)
           g.ballVel.z *= (1 - 0.003 * sdt * 60)
@@ -560,7 +615,7 @@ export default function BasketballLab({ onClose }) {
       if (g.phase === 'replay') {
         const rball = ballMeshRef.current
         if (rball && savedReplay.current.length > 0) {
-          g.replaySub += dt * 0.22
+          g.replaySub += rawDt * (g.slowMo ? 0.055 : 0.22)
           while (g.replaySub >= 0.016 && g.replayIdx < savedReplay.current.length) {
             g.replaySub -= 0.016; g.replayIdx++
           }
@@ -620,15 +675,23 @@ export default function BasketballLab({ onClose }) {
           <span className="text-slate-600 text-xs ml-1">{fgPct}% FG</span>
         </div>
 
-        {/* Power bar */}
+        {/* Launch angle + Power bar */}
         <div className="flex items-center gap-2 ml-3">
-          <span className="text-xs text-slate-500 font-mono">Power</span>
-          <div className="relative w-24 h-2 rounded overflow-hidden" style={{ background: '#1e293b' }}>
+          <span className="text-xs text-slate-500 font-mono">Angle</span>
+          <span className="text-sm font-bold font-mono" style={{ color: '#fbbf24', minWidth: 42 }}>
+            {Math.round(launchAngle * 180 / Math.PI)}°
+          </span>
+          <span className="text-xs text-slate-500 font-mono ml-1">Power</span>
+          <div className="relative w-20 h-2 rounded overflow-hidden" style={{ background: '#1e293b' }}>
             <div className="absolute inset-y-0 left-0 rounded transition-all duration-75"
               style={{ width: `${power * 100}%`, background: `hsl(${120 - power * 120},75%,52%)` }} />
           </div>
           <span className="text-xs font-mono text-amber-400 w-8 text-right">{Math.round(power * 100)}%</span>
         </div>
+        {slowMo && (
+          <div className="ml-2 px-2 py-0.5 text-xs font-bold rounded"
+            style={{ background: '#7c3aed', color: '#e9d5ff' }}>SLO-MO</div>
+        )}
 
         <button onClick={onClose}
           className="ml-3 px-2.5 py-1 text-xs rounded font-mono"
@@ -672,10 +735,13 @@ export default function BasketballLab({ onClose }) {
             </button>
             <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 text-xs font-mono text-slate-500">
               <span>W A S D</span><span className="text-slate-400">Move</span>
-              <span>Mouse</span><span className="text-slate-400">Aim</span>
-              <span>Scroll / Q, E</span><span className="text-slate-400">Power</span>
+              <span>Mouse</span><span className="text-slate-400">Look / horizontal aim</span>
+              <span>Scroll</span><span className="text-slate-400">Launch angle</span>
+              <span>Shift+Scroll / Q,E</span><span className="text-slate-400">Power</span>
+              <span>P</span><span className="text-slate-400">Slow-mo (flight)</span>
               <span>Click</span><span className="text-slate-400">Shoot</span>
               <span>R</span><span className="text-slate-400">Reset ball</span>
+              <span>V</span><span className="text-slate-400">Replay last shot</span>
               <span>Esc</span><span className="text-slate-400">Unlock mouse</span>
             </div>
           </div>
@@ -684,12 +750,13 @@ export default function BasketballLab({ onClose }) {
         {/* In-game controls hint (dims after first shot) */}
         {locked && attempts === 0 && (
           <div className="absolute bottom-5 inset-x-0 flex justify-center pointer-events-none">
-            <div className="flex gap-6 text-xs font-mono text-slate-500 bg-black/40 px-4 py-2 rounded-lg">
-              <span>WASD — move</span>
-              <span>Scroll/Q,E — power</span>
-              <span>Click — shoot</span>
-              <span>R — reset</span>
-              <span>V — replay</span>
+            <div className="flex gap-5 text-xs font-mono text-slate-500 bg-black/40 px-4 py-2 rounded-lg">
+              <span>WASD—move</span>
+              <span>Scroll—angle</span>
+              <span>Q,E—power</span>
+              <span>P—slo-mo</span>
+              <span>Click—shoot</span>
+              <span>R—reset | V—replay</span>
             </div>
           </div>
         )}
@@ -825,16 +892,20 @@ function drawSidePanel(canvas, gs, camera, ball) {
   // Arc preview (aim phase only)
   if (gs.phase === 'aim') {
     const speed = gs.power * 10 + 7
-    const pitch = gs.pitch
+    const pitch = gs.launchAngle  // launch angle, not camera pitch
     const dz = Math.cos(pitch), dy = Math.sin(pitch)
-    let pz2 = playerZ + dz * 0.35, py2 = PLAYER_EYE - 0.12
-    let vz2 = dz * speed, vy2 = dy * speed + 1.2
+    let pz2 = playerZ + dz * 0.3, py2 = PLAYER_EYE - 0.25
+    let vz2 = dz * speed, vy2 = dy * speed
     const dt2 = 0.045
 
+    const bbwz2 = BASKET_Z + BACKBOARD_Z
     ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3])
     ctx.beginPath(); ctx.moveTo(sx(pz2), sy(py2))
     for (let i = 0; i < 80; i++) {
       vy2 += GRAVITY * dt2; pz2 += vz2 * dt2; py2 += vy2 * dt2
+      if (vz2 > 0 && pz2 >= bbwz2 - BALL_RADIUS && py2 > BB_Y_BOT - BALL_RADIUS && py2 < BB_Y_BOT + BACKBOARD_H + BALL_RADIUS)
+        { pz2 = bbwz2 - BALL_RADIUS; vz2 *= -0.82; vy2 *= 0.9 }
+      if (py2 < BALL_RADIUS && vy2 < 0) { py2 = BALL_RADIUS; vy2 *= -0.45; vz2 *= 0.8 }
       if (py2 < -0.5 || pz2 > wz1 + 1) break
       ctx.lineTo(sx(pz2), sy(py2))
     }
@@ -868,7 +939,7 @@ function drawSidePanel(canvas, gs, camera, ball) {
 
   // Stats row
   const statSpeed = (gs.power * 10 + 7).toFixed(1)
-  const statAngle = (gs.pitch * 180 / Math.PI).toFixed(1)
+  const statAngle = (gs.launchAngle * 180 / Math.PI).toFixed(1)
   ctx.font = '9px monospace'
   ctx.fillStyle = '#fbbf24'; ctx.fillText(statAngle + '°', ml, CH - mb + 15)
   ctx.fillStyle = '#4ade80'; ctx.fillText(statSpeed + 'm/s', ml + 46, CH - mb + 15)
