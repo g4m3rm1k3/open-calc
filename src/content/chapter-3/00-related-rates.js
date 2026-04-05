@@ -100,6 +100,18 @@ export default {
         caption:
           "Narrative system-solving scenario that complements formal related-rates workflows.",
       },
+      {
+        id: "SlidingLadder",
+        title: "Sliding Ladder: Premium Interaction",
+        mathBridge: "A premium 13ft ladder model. Features live dx/dt and dy/dt panels and a dark-mode optimized interface. Notice how the top speed accelerates as it approach the floor.",
+        caption: "Explore the nonlinear relationship x² + y² = 13² in this hifi lab.",
+      },
+      {
+        id: "RocketCamera",
+        title: "Rocket Camera: Derivation Engine",
+        mathBridge: "Step through the 5 logical stages of related rates derivation: from variable setup to the 'Master Formula' θ' = D·h'/s². This lab proves that trig identities can sometimes hide the underlying simplicity.",
+        caption: "Click through the steps 1-5 to see the math evolve alongside the rising rocket.",
+      },
     ],
   },
 
