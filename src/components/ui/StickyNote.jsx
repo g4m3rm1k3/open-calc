@@ -96,6 +96,7 @@ export default function StickyNote({ noteId }) {
       setColor(n?.color ?? 'yellow')
       setRuled(n?.ruled ?? false)
       setSize({ w: n?.w ?? 320, h: n?.h ?? null })
+      setPreview(!!(n?.text?.trim()))
     } else {
       loadedRef.current = false
     }
