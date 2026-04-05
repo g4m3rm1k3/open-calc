@@ -2,7 +2,7 @@ export default {
   id: 'cnc-logic-loops',
   slug: 'logic-and-loops',
   chapter: 'cnc-1',
-  order: 4,
+  order: 22,
   title: 'Programmatic Control',
   subtitle: 'IF, GOTO, and WHILE Loops',
   tags: ['logic', 'WHILE', 'GOTO', 'IF', 'Roughing'],

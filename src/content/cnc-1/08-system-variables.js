@@ -2,7 +2,7 @@ export default {
   id: 'cnc-system-variables',
   slug: 'system-variables',
   chapter: 'cnc-1',
-  order: 7,
+  order: 24,
   title: 'System Variables',
   subtitle: 'The Sensor and State Interface (#5000+)',
   tags: ['System Variables', '#5000', 'Telemetry', 'Probing', 'Machine State'],

@@ -2,7 +2,7 @@ export default {
   id: 'cnc-linear-motion',
   slug: 'linear-interpolation',
   chapter: 'cnc-1',
-  order: 0,
+  order: 9,
   title: 'Linear Interpolation',
   subtitle: 'Rapid (G00) vs. Linear (G01)',
   tags: ['G00', 'G01', 'feedrate', 'modal', 'axes'],
@@ -27,7 +27,7 @@ export default {
       'If you move your hand to grab a coffee cup, your brain coordinates your shoulder, elbow, and wrist simultaneously. ' +
       'In CNC, the **Motion Planner** does this for the motors. If you want to move 10 inches in X and only 1 inch in Y, the X motor must run 10 times faster than the Y motor. ' +
       'This coordination is called **Linear Interpolation (G01)**.',
-    previewVisualizationId: 'CNCLab',
+   
   },
 
   intuition: {

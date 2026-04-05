@@ -2,7 +2,7 @@ export default {
   id: 'cnc-coordinate-systems',
   slug: 'coordinate-systems',
   chapter: 'cnc-1',
-  order: 2,
+  order: 7,
   title: 'Coordinate Systems & Offsets',
   subtitle: 'Machine Zero (G53) vs. Work Zero (G54)',
   tags: ['G53', 'G54', 'offsets', 'probing', 'H-offset'],

@@ -2,7 +2,7 @@ export default {
   id: 'cnc-dialects',
   slug: 'controller-dialects',
   chapter: 'cnc-1',
-  order: 8,
+  order: 27,
   title: 'Controller Dialects',
   subtitle: 'Fanuc vs. Siemens vs. Okuma',
   tags: ['Macro B', 'R-Parameters', 'UserTask', 'THINC', 'SINUMERIK'],

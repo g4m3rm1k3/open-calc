@@ -2,7 +2,7 @@ export default {
   id: 'cnc-variables',
   slug: 'macro-variables',
   chapter: 'cnc-1',
-  order: 3,
+  order: 20,
   title: 'CNC Variables (The # System)',
   subtitle: 'Parametric Geometry with #, R and V',
   tags: ['Macro B', '# variables', 'R-variables', 'UserTask', 'VC'],

@@ -2,7 +2,7 @@ export default {
   id: 'cnc-subprograms',
   slug: 'macro-subroutines',
   chapter: 'cnc-1',
-  order: 5,
+  order: 19,
   title: 'Macro Subroutine Calling',
   subtitle: 'The G65 Command & Argument Passing',
   tags: ['G65', 'subprogram', 'arguments', 'modular', 'reusable'],

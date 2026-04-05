@@ -2,7 +2,7 @@ export default {
   id: 'cnc-scopes',
   slug: 'variable-scopes',
   chapter: 'cnc-1',
-  order: 6,
+  order: 23,
   title: 'Variable Scopes',
   subtitle: 'Local, Common, and Permanent Memory',
   tags: ['Local Variables', 'Common Variables', 'Permanent', 'Memory', 'Logic'],

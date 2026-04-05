@@ -106,6 +106,12 @@ ${html}
 try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
+;(function(){
+  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  report();
+  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  else{window.addEventListener('load',report)}
+})();
 <\/script>
 </body>
 </html>`
@@ -179,6 +185,12 @@ function pick(btn) {
 try{(function(){
 ${escapedJs}
 })()}catch(e){}
+;(function(){
+  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  report();
+  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  else{window.addEventListener('load',report)}
+})();
 <\/script>
 </body>
 </html>`
@@ -211,6 +223,8 @@ function MDText({ text, T }) {
 function VisualCell({ cell, cellIndex, T, dark }) {
   const iframeRef = useRef(null)
   const [loaded, setLoaded] = useState(false)
+  const [height, setHeight] = useState(cell.outputHeight || 160)
+  const manualRef = useRef(false)
 
   useEffect(() => {
     if (iframeRef.current) {
@@ -218,15 +232,34 @@ function VisualCell({ cell, cellIndex, T, dark }) {
         cell.html || '', cell.css || '', cell.startCode || '', dark
       )
       setLoaded(true)
+      manualRef.current = false
     }
   }, [cell.html, cell.css, cell.startCode, dark])
 
-  const height = cell.outputHeight || 320
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || e.data.type !== 'sn_resize') return
+      if (e.source !== iframeRef.current?.contentWindow) return
+      if (!manualRef.current) setHeight(Math.max(80, e.data.h + 4))
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
+  function startResize(e) {
+    e.preventDefault()
+    manualRef.current = true
+    const startY = e.clientY, startH = height
+    const onMove = (ev) => setHeight(Math.max(80, startH + ev.clientY - startY))
+    const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   return (
     <div style={{
       marginBottom: 20, borderRadius: 12,
-      border: `1px solid ${T.border}`, overflow: 'hidden', background: T.panel,
+      border: `1px solid ${T.border}`, background: T.panel,
     }}>
       {/* Instruction prose */}
       {cell.instruction && (
@@ -234,14 +267,26 @@ function VisualCell({ cell, cellIndex, T, dark }) {
           <MDText text={cell.instruction} T={T} />
         </div>
       )}
-      {/* Preview — full width, no chrome */}
-      <div style={{ background: T.iframeBg }}>
+      {/* Preview — auto-sized to content */}
+      <div style={{ background: T.iframeBg, borderRadius: '0 0 10px 10px', overflow: 'hidden' }}>
         <iframe
           ref={iframeRef}
           sandbox="allow-scripts"
           style={{ width: '100%', height, border: 'none', display: 'block' }}
           title={`cell-${cellIndex}`}
         />
+      </div>
+      {/* Resize handle */}
+      <div
+        onMouseDown={startResize}
+        title="Drag to resize"
+        style={{
+          height: 8, cursor: 'ns-resize', background: T.border,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '0 0 12px 12px',
+        }}
+      >
+        <div style={{ width: 32, height: 3, borderRadius: 2, background: T.muted, opacity: 0.5 }} />
       </div>
     </div>
   )
@@ -287,7 +332,28 @@ function ChallengeCell({ cell, cellIndex, T, dark, onPass }) {
     return () => window.removeEventListener('message', handler)
   }, [cellIndex, onPass])
 
-  const height = cell.outputHeight || 320
+  const [height, setHeight] = useState(cell.outputHeight || 160)
+  const manualRef = useRef(false)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || e.data.type !== 'sn_resize') return
+      if (e.source !== iframeRef.current?.contentWindow) return
+      if (!manualRef.current) setHeight(Math.max(80, e.data.h + 4))
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
+  function startResize(e) {
+    e.preventDefault()
+    manualRef.current = true
+    const startY = e.clientY, startH = height
+    const onMove = (ev) => setHeight(Math.max(80, startH + ev.clientY - startY))
+    const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   return (
     <div style={{
@@ -332,6 +398,17 @@ function ChallengeCell({ cell, cellIndex, T, dark, onPass }) {
         style={{ width: '100%', height, border: 'none', display: 'block' }}
         title={`challenge-${cellIndex}`}
       />
+      {/* Resize handle */}
+      <div
+        onMouseDown={startResize}
+        title="Drag to resize"
+        style={{
+          height: 8, cursor: 'ns-resize', background: T.border,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        <div style={{ width: 32, height: 3, borderRadius: 2, background: T.muted, opacity: 0.5 }} />
+      </div>
     </div>
   )
 }

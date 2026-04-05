@@ -2,7 +2,7 @@ export default {
   id: 'cnc-circular-motion',
   slug: 'circular-interpolation',
   chapter: 'cnc-1',
-  order: 1,
+  order: 11,
   title: 'Circular Interpolation',
   subtitle: 'Curves, Arcs, and Circles (G02/G03)',
   tags: ['G02', 'G03', 'IJK', 'G17', 'arcs'],
@@ -28,7 +28,7 @@ export default {
       'Everything in high-precision manufacturing relies on arcs—from the rounded edges of a luxury watch to the complex cooling fins of a jet engine turbine. ' +
       'While a G01 move only cares about Start and End, a Circular move care about **Start, End, and Center**. ' +
       'By pulsing the motors in a sine/cosine relationship, we create a curves with sub-micron accuracy.',
-    previewVisualizationId: 'CNCLab',
+
   },
 
   intuition: {
