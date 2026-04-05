@@ -89,6 +89,151 @@ export default {
     ],
     visualizations: [
       { vizId: 'NewtonsMethod', mathBridge: "Try a case where Newton's Method fails. Set f(x) = x^(1/3) (cube root). f'(x) = (1/3)x^(−2/3). The iteration gives xₙ₊₁ = xₙ − xₙ^(1/3) / ((1/3)xₙ^(−2/3)) = xₙ − 3xₙ = −2xₙ. This DIVERGES: the iterates double in magnitude each step. Start at x₀ = 1: x₁ = −2, x₂ = 4, x₃ = −8... The root is at 0, but we fly away. Why? The derivative at the root is undefined (infinite), violating the theorem's hypothesis f'(r) ≠ 0.", caption: "Newton's Method failure on f(x) = x^(1/3): when f'(r) = 0 at the root, the iteration diverges instead of converging." },
+      {
+        id: 'PythonNotebook',
+        title: "Python Lab: Run Newton's Method & Watch Digits Double",
+        caption: "Execute the iteration numerically and watch quadratic convergence in action. Modify f and df to solve any equation. Try the cycling case to see failure.",
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: "Run Newton's Method on any f(x) = 0",
+              prose: [
+                'The iteration: $x_{n+1} = x_n - \\dfrac{f(x_n)}{f\'(x_n)}$',
+                '**Quadratic convergence** means: correct digits roughly **double** every step.',
+                'Watch the `error` column shrink — first slowly, then explosively fast.',
+              ],
+              instructions: "Change `f`, `df`, `x0` to solve a different equation. Try f = lambda x: x**3 - x - 1 with x0 = 1.5",
+              code: `import math
+
+# ── Define your equation f(x) = 0 and its derivative ──
+f  = lambda x: x**2 - 2          # solving x² = 2  (root = √2)
+df = lambda x: 2*x
+true_root = math.sqrt(2)          # known for comparison
+
+x0    = 1.0    # initial guess
+steps = 6      # number of iterations
+
+print(f"Solving f(x) = 0 by Newton's Method")
+print(f"True root = {true_root:.15f}")
+print()
+print(f"{'Step':>4}  {'x_n':>20}  {'f(x_n)':>14}  {'error':>14}  {'digits gained'}")
+print("-" * 75)
+
+x = x0
+for n in range(steps):
+    fx  = f(x)
+    dfx = df(x)
+    err = abs(x - true_root)
+    print(f"{n:>4}  {x:>20.15f}  {fx:>14.2e}  {err:>14.2e}")
+    x = x - fx / dfx
+
+print(f"{steps:>4}  {x:>20.15f}  {f(x):>14.2e}  {abs(x-true_root):>14.2e}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Visualize convergence: errors on a log scale',
+              prose: [
+                'On a **linear** scale, errors look like they jump to zero instantly.',
+                'On a **log scale**, quadratic convergence is the straight-downward slope that doubles in steepness each step.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+f  = lambda x: x**2 - 2
+df = lambda x: 2*x
+true_root = math.sqrt(2)
+
+x, errors = 1.0, []
+for _ in range(8):
+    errors.append(abs(x - true_root))
+    x = x - f(x) / df(x)
+
+# log10 of each error (stops when we hit machine precision)
+log_errors = [math.log10(e) if e > 1e-16 else -16 for e in errors]
+steps = list(range(len(log_errors)))
+
+fig = Figure(xmin=-0.5, xmax=len(steps)-0.5, ymin=-17, ymax=1,
+    title="Newton's Method: log10(error) vs iteration (f=x²-2)")
+fig.grid(step=1).axes()
+fig.scatter(steps, log_errors, color='red', radius=6)
+for i in range(len(steps)-1):
+    fig.line([steps[i], log_errors[i]], [steps[i+1], log_errors[i+1]],
+        color='red', width=1.5)
+fig.hline(-15.5, color='amber', dashed=True)
+fig.text([0.2, -14.5], 'machine precision', color='amber', size=10)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: "Failure case: cycling on f(x) = x³ - 2x + 2",
+              prose: [
+                'Starting at $x_0 = 0$: the iterates cycle $0 \\to 1 \\to 0 \\to 1 \\to \\ldots$ forever.',
+                'The actual root is near $x \\approx -1.769$. Change `x0 = -2` to find it instantly.',
+              ],
+              instructions: 'Run with x0 = 0 to see cycling. Then change x0 = -2 to see fast convergence to the real root.',
+              code: `import math
+
+f  = lambda x: x**3 - 2*x + 2
+df = lambda x: 3*x**2 - 2
+
+x0    = 0.0    # try changing to -2.0
+steps = 8
+
+print(f"Starting at x0 = {x0}")
+print()
+print(f"{'Step':>4}  {'x_n':>18}  {'f(x_n)':>14}")
+print("-" * 40)
+
+x = x0
+for n in range(steps):
+    fx  = f(x)
+    dfx = df(x)
+    if abs(dfx) < 1e-12:
+        print(f"{n:>4}  f'(x) ≈ 0 — division by zero! Stopping.")
+        break
+    print(f"{n:>4}  {x:>18.10f}  {fx:>14.6f}")
+    x = x - fx / dfx
+print(f"{steps:>4}  {x:>18.10f}  {f(x):>14.6f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: "Your Turn: Find all 3 roots of x³ - 6x² + 11x - 5",
+              difficulty: 'hard',
+              prompt: 'The cubic f(x) = x³ - 6x² + 11x - 5 has three real roots.\n\nStrategy: evaluate f at integers 0-5 to find sign changes, then run Newton from 3 different starting points.',
+              hint: 'f(0)<0, f(1)>0, f(2)<0, f(5)>0. Try x0 = 0.5, x0 = 2.0, x0 = 4.5.',
+              code: `import math
+
+f  = lambda x: x**3 - 6*x**2 + 11*x - 5
+df = lambda x: 3*x**2 - 12*x + 11
+
+# Step 1: sign survey
+print("Sign survey:")
+for xi in range(6):
+    print(f"  f({xi}) = {f(xi):.4f}")
+print()
+
+# Step 2: run Newton from three starting points
+def newton(f, df, x0, steps=10):
+    x = x0
+    for _ in range(steps):
+        x = x - f(x) / df(x)
+    return x
+
+# YOUR CODE: find the three roots
+# r1 = newton(f, df, 0.5)
+# r2 = newton(f, df, ???)
+# r3 = newton(f, df, ???)
+# print(f"Roots: {r1:.6f}, {r2:.6f}, {r3:.6f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
     ],
   },
 

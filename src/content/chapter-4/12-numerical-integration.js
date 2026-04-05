@@ -97,6 +97,175 @@ export default {
         title: 'Interactive Numerical Integration',
         caption: 'Adjust n to see how quickly each method converges. The error display shows the actual error for each method. Notice: Simpson\'s error decreases 16× when n doubles, while the others decrease only 4×.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Implement All Three Rules & Compare',
+        caption: 'Build midpoint, trapezoidal, and Simpson\'s rules from scratch, compare their accuracy, and visualize how Simpson\'s wins by orders of magnitude.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Implement all three rules',
+              prose: [
+                '## The three methods',
+                '- **Midpoint**: $M_n = h\\sum_{i=1}^n f(\\bar{x}_i)$',
+                '- **Trapezoidal**: $T_n = \\tfrac{h}{2}[f(x_0) + 2\\sum_{i=1}^{n-1} f(x_i) + f(x_n)]$',
+                '- **Simpson\'s** (n even): $S_n = \\tfrac{h}{3}[f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + \\ldots + f(x_n)]$',
+              ],
+              instructions: 'Run this cell. Then change `f` and the limits `a`, `b` and re-run.',
+              code: `import math
+
+def midpoint(f, a, b, n):
+    h = (b - a) / n
+    return h * sum(f(a + (i + 0.5)*h) for i in range(n))
+
+def trapezoid(f, a, b, n):
+    h = (b - a) / n
+    xs = [a + i*h for i in range(n+1)]
+    weights = [1] + [2]*(n-1) + [1]
+    return h/2 * sum(w * f(x) for w, x in zip(weights, xs))
+
+def simpsons(f, a, b, n):
+    if n % 2 != 0:
+        n += 1   # ensure even
+    h = (b - a) / n
+    xs = [a + i*h for i in range(n+1)]
+    weights = []
+    for i in range(n+1):
+        if i == 0 or i == n:  weights.append(1)
+        elif i % 2 == 1:      weights.append(4)
+        else:                  weights.append(2)
+    return h/3 * sum(w * f(x) for w, x in zip(weights, xs))
+
+# ── Test on ∫₀¹ e^(-x²) dx (true value ≈ 0.746824...) ──
+f    = lambda x: math.exp(-x**2)
+a, b = 0, 1
+true = 0.7468241328124270   # high-precision value
+
+print(f"{'n':>5}  {'Midpoint':>14}  {'Trapezoid':>14}  {'Simpson':>14}")
+for n in [4, 8, 16, 32, 64]:
+    m = midpoint(f, a, b, n)
+    t = trapezoid(f, a, b, n)
+    s = simpsons(f, a, b, n)
+    print(f"{n:>5}  {m:>14.10f}  {t:>14.10f}  {s:>14.10f}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Error vs n on a log-log scale',
+              prose: [
+                'On a **log-log** plot, slope = convergence rate:',
+                '- Midpoint & Trapezoidal: slope ≈ **-2** (error ∝ 1/n²)',
+                '- Simpson\'s: slope ≈ **-4** (error ∝ 1/n⁴)',
+              ],
+              code: `from opencalc import Figure
+import math
+
+def midpoint(f,a,b,n):
+    h=(b-a)/n; return h*sum(f(a+(i+.5)*h) for i in range(n))
+def trapezoid(f,a,b,n):
+    h=(b-a)/n; xs=[a+i*h for i in range(n+1)]
+    w=[1]+[2]*(n-1)+[1]; return h/2*sum(w*f(x) for w,x in zip(w,xs))
+def simpsons(f,a,b,n):
+    if n%2!=0: n+=1
+    h=(b-a)/n; xs=[a+i*h for i in range(n+1)]
+    w=[1 if i==0 or i==n else 4 if i%2==1 else 2 for i in range(n+1)]
+    return h/3*sum(w*f(x) for w,x in zip(w,xs))
+
+f    = lambda x: math.exp(-x**2)
+true = 0.7468241328124270
+ns   = [2,4,8,16,32,64,128]
+
+em = [abs(midpoint(f,0,1,n)-true) for n in ns]
+et = [abs(trapezoid(f,0,1,n)-true) for n in ns]
+es = [abs(simpsons(f,0,1,n)-true) for n in ns]
+
+log_n  = [math.log10(n) for n in ns]
+log_em = [math.log10(e) if e>1e-16 else -16 for e in em]
+log_et = [math.log10(e) if e>1e-16 else -16 for e in et]
+log_es = [math.log10(e) if e>1e-16 else -16 for e in es]
+
+fig = Figure(xmin=0.2, xmax=2.2, ymin=-15, ymax=1,
+    title="Error vs n (log-log): ∫₀¹ e^(-x²) dx")
+fig.grid().axes()
+fig.scatter(log_n, log_em, color='blue', radius=5)
+fig.scatter(log_n, log_et, color='amber', radius=5)
+fig.scatter(log_n, log_es, color='green', radius=5)
+for i in range(len(ns)-1):
+    fig.line([log_n[i],log_em[i]],[log_n[i+1],log_em[i+1]], color='blue', width=1.5)
+    fig.line([log_n[i],log_et[i]],[log_n[i+1],log_et[i+1]], color='amber', width=1.5)
+    fig.line([log_n[i],log_es[i]],[log_n[i+1],log_es[i+1]], color='green', width=2)
+fig.text([1.8, -1], 'Midpoint (slope≈-2)', color='blue', size=10)
+fig.text([1.8, -3], 'Trapezoid (slope≈-2)', color='amber', size=10)
+fig.text([1.8, -9], "Simpson's (slope≈-4)", color='green', size=10)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'The identity: Simpson = (2×Midpoint + Trapezoid) / 3',
+              prose: [
+                'Richardson extrapolation tells us: since midpoint and trapezoid errors cancel in opposite directions, their weighted average eliminates the $h^2$ term entirely.',
+                'This gives Simpson\'s rule **for free** with no extra function evaluations.',
+              ],
+              code: `import math
+
+def midpoint(f,a,b,n):
+    h=(b-a)/n; return h*sum(f(a+(i+.5)*h) for i in range(n))
+def trapezoid(f,a,b,n):
+    h=(b-a)/n; xs=[a+i*h for i in range(n+1)]
+    w=[1]+[2]*(n-1)+[1]; return h/2*sum(w*f(x) for w,x in zip(w,xs))
+def simpsons(f,a,b,n):
+    if n%2!=0: n+=1
+    h=(b-a)/n; xs=[a+i*h for i in range(n+1)]
+    w=[1 if i==0 or i==n else 4 if i%2==1 else 2 for i in range(n+1)]
+    return h/3*sum(w*f(x) for w,x in zip(w,xs))
+
+f    = lambda x: math.exp(-x**2)
+true = 0.7468241328124270
+
+print(f"Verifying: S_2n = (2*M_n + T_n) / 3")
+print()
+for n in [4, 8, 16]:
+    Mn  = midpoint(f, 0, 1, n)
+    Tn  = trapezoid(f, 0, 1, n)
+    S2n = (2*Mn + Tn) / 3
+    direct_S2n = simpsons(f, 0, 1, 2*n)
+    print(f"n={n:>3}: (2M+T)/3 = {S2n:.12f}  direct S_(2n) = {direct_S2n:.12f}  match={abs(S2n-direct_S2n)<1e-14}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: How many points for 10-digit accuracy?',
+              difficulty: 'medium',
+              prompt: 'Use Simpson\'s rule to approximate ∫₀¹ e^(-x²) dx to within 10^-10.\n\nStrategy: increase n (must be even) until your result agrees with true = 0.7468241328124270 to 10 decimal places.',
+              hint: 'Try n = 10, 20, 50, 100. The error bound formula gives n \u2265 [(M4)/(180\u00d710^-10)]^(1/4) where M4 = max|f(4)| \u2248 12 on [0,1].',
+              code: `import math
+
+def simpsons(f,a,b,n):
+    if n%2!=0: n+=1
+    h=(b-a)/n; xs=[a+i*h for i in range(n+1)]
+    w=[1 if i==0 or i==n else 4 if i%2==1 else 2 for i in range(n+1)]
+    return h/3*sum(w*f(x) for w,x in zip(w,xs))
+
+f    = lambda x: math.exp(-x**2)
+true = 0.7468241328124270
+target_err = 1e-10
+
+# YOUR CODE: find the smallest even n that gives error < 1e-10
+# Hint: try a loop over n = 10, 20, 30, ...
+# for n in range(10, 200, 2):
+#     result = simpsons(f, 0, 1, n)
+#     error  = abs(result - true)
+#     if error < target_err:
+#         print(f"n = {n}: error = {error:.2e}  SUCCESS")
+#         break`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
     ],
   },
 

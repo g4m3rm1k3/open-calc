@@ -99,6 +99,144 @@ export default {
         title: 'Taylor Polynomial Approximations to eˣ',
         caption: 'Successive Taylor polynomials $T_1, T_2, T_3, \\ldots$ for $e^x$. Near $x=0$ they are nearly indistinguishable from $e^x$; further away, higher degrees are needed.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Build Taylor Polynomials & Watch Convergence',
+        caption: 'Compute partial sums of the Taylor series, plot how approximations improve with degree, and explore why the series can diverge away from the center.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Taylor polynomials for e^x, sin(x), cos(x)',
+              prose: [
+                'The Maclaurin series: $e^x = \\sum_{n=0}^\\infty \\tfrac{x^n}{n!}$, converges for all $x$.',
+                'Partial sum $T_N(x) = \\sum_{n=0}^N \\tfrac{x^n}{n!}$ is the degree-$N$ polynomial approximation.',
+                '## Watch digits accumulate as N grows',
+              ],
+              instructions: 'Change `x_val` to 2, 5, or 10. Watch how many terms you need to get 10 correct digits as x grows.',
+              code: `import math
+
+def taylor_exp(x, N):
+    """Partial sum T_N of the Maclaurin series for e^x."""
+    total, term = 0.0, 1.0
+    for n in range(N+1):
+        total += term
+        term  *= x / (n+1)
+    return total
+
+def taylor_sin(x, N):
+    """Partial sum up to degree 2N+1 of the Maclaurin series for sin(x)."""
+    total, term = 0.0, x
+    for n in range(N):
+        term  *= -x**2 / ((2*n+2)*(2*n+3))
+        total += term
+    return total + x
+
+x_val = 1.0   # try 2, 5, 10
+
+print(f"x = {x_val}")
+print()
+print(f"{'N':>3}  {'T_N(exp)':>20}  {'error(exp)':>14}  {'T_N(sin)':>18}  {'error(sin)':>14}")
+print("-"*80)
+for N in range(0, 16, 1):
+    te = taylor_exp(x_val, N)
+    ts = taylor_sin(x_val, N)
+    print(f"{N:>3}  {te:>20.15f}  {abs(te-math.exp(x_val)):>14.2e}  {ts:>18.15f}  {abs(ts-math.sin(x_val)):>14.2e}")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Plot: partial sums vs the true function',
+              prose: [
+                'Each curve below is a Taylor polynomial $T_N(x)$ for $\\sin(x)$.',
+                'Near $x=0$ they hug the sine curve. Far away they peel off wildly.',
+                'Higher $N$ \u2194 good approximation over a wider interval.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+def taylor_sin_fn(N):
+    """Return a function that computes T_N for sin(x)."""
+    def T(x):
+        total, term = x, x
+        for n in range(N):
+            term  *= -x**2 / ((2*n+2)*(2*n+3))
+            total += term
+        return total
+    return T
+
+fig = Figure(xmin=-8, xmax=8, ymin=-3, ymax=3,
+    title="Taylor Polynomials for sin(x)")
+fig.grid().axes()
+fig.plot(math.sin, color='blue', label='sin(x)', width=3)
+
+colors = ['red', 'amber', 'green', 'purple', 'teal']
+for i, N in enumerate([1, 3, 5, 7, 9]):
+    fig.plot(taylor_sin_fn(N), color=colors[i], label=f'T_{2*N+1}', width=1.5)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Compute e to 50 decimal places',
+              prose: [
+                'Setting $x=1$ in the Maclaurin series: $e = \\sum_{n=0}^\\infty \\tfrac{1}{n!}$.',
+                'Python\'s `Decimal` module gives arbitrary-precision arithmetic — we can compute $e$ to however many digits we want.',
+              ],
+              code: `from decimal import Decimal, getcontext
+getcontext().prec = 60   # 60 significant digits
+
+e_sum   = Decimal(0)
+term    = Decimal(1)
+for n in range(50):
+    e_sum += term
+    term  /= (n + 1)
+
+print("Our series sum for e:")
+print(f"  {e_sum}")
+print()
+print("Python's math.e (53-bit float):")
+import math
+print(f"  {math.e}")
+print()
+print("How many terms needed to get 15 digits?")
+from decimal import Decimal as D
+target = D(str(math.e))
+t, s = D(1), D(0)
+for n in range(30):
+    s += t
+    t /= (n+1)
+    if abs(s - target) < D('1e-15'):
+        print(f"  {n+1} terms")
+        break`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Approximate \u222b\u2080\u00b9 e^(-x\u00b2) dx using Taylor series',
+              difficulty: 'hard',
+              prompt: 'e^(-x\u00b2) has no elementary antiderivative. But its Taylor series is:\ne^(-x\u00b2) = \u03a3 (-1)^n x^(2n) / n!\n\nIntegrating term by term on [0,1]:\n\u222b\u2080\u00b9 e^(-x\u00b2) dx = \u03a3 (-1)^n / (n! (2n+1))\n\nThis alternating series converges. How many terms for error < 10^-8?',
+              hint: 'Each term is (-1)^n / (n! * (2n+1)). By the alternating series test, error <= |a_{n+1}|. Loop until the term size drops below 1e-8.',
+              code: `import math
+
+# True value (from scipy / known reference)
+true = 0.7468241328124270
+
+total = 0.0
+for n in range(30):
+    term = (-1)**n / (math.factorial(n) * (2*n + 1))
+    total += term
+    error = abs(total - true)
+    print(f"n={n:>2}: partial sum = {total:.12f}  error = {error:.2e}")
+    if error < 1e-8:
+        print(f"Converged after {n+1} terms!")
+        break`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
     ],
   },
 
