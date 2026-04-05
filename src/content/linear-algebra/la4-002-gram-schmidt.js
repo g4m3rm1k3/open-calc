@@ -99,6 +99,94 @@ export default {
         mathBridge: 'The visualization shows a 2×2 matrix $A$ with its columns as vectors. Run Gram-Schmidt to see $Q$ (the orthonormal columns) and $R$ (the upper triangular matrix) appear. Verify that $QR = A$ by multiplying them back together. Change $A$ and confirm the decomposition always works.',
         caption: 'QR decomposition is Gram-Schmidt, written as a matrix equation.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Gram-Schmidt and QR Decomposition',
+        mathBridge: 'numpy.linalg.qr(A) returns the QR factorization directly. Q has orthonormal columns (Qᵀ Q = I), R is upper triangular. Verify: Q @ R ≈ A and Q.T @ Q ≈ I.',
+        caption: 'Implement Gram-Schmidt step by step, then verify it matches NumPy\'s QR decomposition.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Gram-Schmidt step by step',
+              prose: [
+                'Each step: subtract all projections onto previous basis vectors, then normalize.',
+                'After the process, every pair of output vectors is orthogonal (dot product = 0), and each has magnitude 1.',
+              ],
+              code: `import numpy as np
+
+def gram_schmidt(vectors):
+    """Orthonormalize a list of vectors using Gram-Schmidt."""
+    basis = []
+    for v in vectors:
+        u = v.copy().astype(float)
+        for e in basis:
+            u -= np.dot(v, e) * e   # subtract projection onto each prior basis vector
+        norm = np.linalg.norm(u)
+        if norm > 1e-10:            # skip near-zero vectors (dependent)
+            basis.append(u / norm)
+    return basis
+
+v1 = np.array([1.0, 1.0, 0.0])
+v2 = np.array([1.0, 0.0, 1.0])
+v3 = np.array([0.0, 1.0, 1.0])
+
+Q_cols = gram_schmidt([v1, v2, v3])
+Q = np.column_stack(Q_cols)
+
+print("Orthonormal basis (columns of Q):")
+print(Q.round(4))
+print()
+print("QᵀQ (should be identity):")
+print((Q.T @ Q).round(10))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
+              prose: [
+                '`np.linalg.qr(A)` computes the QR decomposition. Q has orthonormal columns; R is upper triangular.',
+                'Verify: Q @ R ≈ A (reconstruction). Qᵀ Q ≈ I (orthonormality).',
+              ],
+              code: `import numpy as np
+
+A = np.array([[1., 1., 0.],
+              [1., 0., 1.],
+              [0., 1., 1.]])
+
+Q, R = np.linalg.qr(A)
+
+print("Q (orthonormal columns):")
+print(Q.round(4))
+print()
+print("R (upper triangular):")
+print(R.round(4))
+print()
+print("Q @ R = A?", np.allclose(Q @ R, A))
+print("QᵀQ = I?", np.allclose(Q.T @ Q, np.eye(3)))`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Gram-Schmidt by hand, verified by QR',
+              difficulty: 'hard',
+              prompt: 'Given v1 = [3, 1] and v2 = [2, 2], apply Gram-Schmidt manually: (1) e1 = v1 / ‖v1‖, (2) u2 = v2 − (v2·e1)e1, e2 = u2 / ‖u2‖. Verify e1·e2 = 0 and ‖e1‖ = ‖e2‖ = 1. Then confirm using np.linalg.qr.',
+              code: `import numpy as np
+
+v1 = np.array([3.0, 1.0])
+v2 = np.array([2.0, 2.0])
+
+# Step 1: normalize v1 to get e1
+# Step 2: subtract projection of v2 onto e1, normalize to get e2
+# Step 3: verify orthogonality and unit length
+# Step 4: confirm with np.linalg.qr(np.column_stack([v1, v2]))
+`,
+              hint: 'e1 = v1/np.linalg.norm(v1). u2 = v2 - np.dot(v2,e1)*e1. e2 = u2/np.linalg.norm(u2). Then check np.dot(e1,e2) ≈ 0.',
+            },
+          ]
+        }
+      },
     ],
   },
 

@@ -77,7 +77,80 @@ export default {
         body: 'Do not try to memorize the formula for a $3 \\times 3$ inverse. It is a massive mess of algebra utilizing "Cofactor Expansion." In practice, computers use an algorithmic process called Gaussian Elimination to find larger inverses.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Determinant and Inverse',
+        mathBridge: 'np.linalg.det(A) computes det(A) = ad − bc. np.linalg.inv(A) computes A⁻¹. Verify: A @ A_inv ≈ I. det = 0 means singular — no inverse exists.',
+        caption: 'Verify the invertibility conditions and confirm A·A⁻¹ = I numerically.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Determinant — the scaling factor',
+              prose: [
+                'The determinant measures how much a transformation scales area. det = 2 means areas double; det = 0 means space collapses to a line.',
+                '`np.linalg.det(A)` computes it numerically.',
+              ],
+              code: `import numpy as np
+
+# Invertible: det ≠ 0
+A = np.array([[3., 1.],
+              [2., 4.]])
+
+# Singular: det = 0 (rows are proportional)
+S = np.array([[2., 4.],
+              [1., 2.]])
+
+print(f"det(A) = {np.linalg.det(A):.1f}  (non-zero → invertible)")
+print(f"det(S) = {np.linalg.det(S):.1f}  (zero → singular, no inverse)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Computing the inverse and verifying A·A⁻¹ = I',
+              prose: [
+                '`np.linalg.inv(A)` computes A⁻¹. Multiplying A by its inverse should give the identity matrix I.',
+                'In practice, use `np.linalg.solve(A, b)` to solve systems — never compute the inverse just to multiply it.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[3., 1.],
+              [2., 4.]])
+
+A_inv = np.linalg.inv(A)
+print("A⁻¹ =")
+print(A_inv.round(4))
+print()
+
+# Verify: A @ A⁻¹ should be the identity
+I = A @ A_inv
+print("A @ A⁻¹ =")
+print(I.round(10))
+print()
+print("Is it the identity?", np.allclose(I, np.eye(2)))`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Invertibility check',
+              difficulty: 'medium',
+              prompt: 'For each matrix below: (1) compute the determinant, (2) state whether it is invertible, (3) for any invertible matrix, compute A⁻¹ and verify A @ A⁻¹ = I. Explain why matrix C is singular.',
+              code: `import numpy as np
+
+A = np.array([[4., 2.], [1., 3.]])
+B = np.array([[1., 2.], [3., 6.]])   # note: row2 = 3 × row1
+C = np.array([[2., -1.], [4., 3.]])
+
+# For each: det, invertible?, and if yes: compute inv and verify
+`,
+              hint: 'np.linalg.det() for determinant. np.linalg.inv() for inverse. B is singular because its rows are proportional (det = 1×6 - 2×3 = 0).',
+            },
+          ]
+        }
+      },
+    ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────

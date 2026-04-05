@@ -90,6 +90,113 @@ export default {
         mathBridge: 'Enter any 2×2 matrix. The visualization computes $(A - \\lambda I)$ symbolically and plots $\\det(A - \\lambda I)$ as a function of $\\lambda$ on the horizontal axis. The zeros of this parabola are the eigenvalues. Drag the matrix entries and watch the parabola shift — pay attention to when it dips below the axis (two real eigenvalues), just touches it (repeated eigenvalue), or stays above it (complex eigenvalues, coming next lesson).',
         caption: 'Eigenvalues are where the characteristic polynomial crosses zero.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Eigenvalues and Eigenvectors',
+        mathBridge: 'np.linalg.eig(A) returns (eigenvalues, eigenvectors). Each column of the eigenvector matrix is an eigenvector. Verify: A @ v ≈ λ * v. Sanity check: trace(A) = sum of eigenvalues, det(A) = product of eigenvalues.',
+        caption: 'Compute eigenvalues, verify the defining equation Av = λv, and visualize the invariant directions.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing eigenvalues and eigenvectors',
+              prose: [
+                '`np.linalg.eig(A)` returns `(eigenvalues, eigenvectors)`. The eigenvectors are columns of the second output.',
+                'Verify the defining equation: `A @ v` should equal `λ * v` for each eigenpair.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[3., 1.],
+              [0., 2.]])   # upper triangular: eigenvalues are diagonal entries
+
+eigenvalues, eigenvectors = np.linalg.eig(A)
+print("Eigenvalues:", eigenvalues)
+print()
+print("Eigenvectors (each column):")
+print(eigenvectors)
+print()
+
+# Verify Av = λv for each pair
+for i in range(len(eigenvalues)):
+    lam = eigenvalues[i]
+    v   = eigenvectors[:, i]
+    Av  = A @ v
+    lv  = lam * v
+    ok  = np.allclose(Av, lv)
+    print(f"λ={lam:.1f}: A@v={Av.round(4)}, λv={lv.round(4)}, ✓={ok}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Sanity checks — trace and determinant',
+              prose: [
+                'For any matrix: sum of eigenvalues = trace(A), product of eigenvalues = det(A).',
+                'These are fast sanity checks after computing eigenvalues.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[4., 2.],
+              [1., 3.]])
+
+evals, _ = np.linalg.eig(A)
+print(f"Eigenvalues: {evals}")
+print()
+print(f"trace(A) = {np.trace(A):.1f}  |  sum of eigenvalues = {evals.sum():.1f}")
+print(f"det(A)   = {np.linalg.det(A):.1f}  |  product of eigenvalues = {evals.prod():.1f}")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Visualize: eigenvectors are the invariant directions',
+              prose: [
+                'Eigenvectors are the arrows a transformation never rotates — only stretches or shrinks.',
+                'The blue and amber arrows are the two eigenvectors. The dashed arrows show where A sends a general vector [1,1].',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN
+
+A = np.array([[3., 1.], [0., 2.]])
+evals, evecs = np.linalg.eig(A)
+
+v1 = evecs[:, 0].real
+v2 = evecs[:, 1].real
+
+fig = Figure(square=True, xmin=-3, xmax=4, ymin=-2, ymax=4,
+             title="Eigenvectors (invariant directions)")
+fig.grid().axes()
+
+# Eigenvectors
+fig.vector(v1.tolist(), color=BLUE,  label=f"λ={evals[0]:.0f}")
+fig.vector(v2.tolist(), color=AMBER, label=f"λ={evals[1]:.0f}")
+
+# A general vector and where A sends it
+g = np.array([1.0, 1.0])
+Ag = A @ g
+fig.vector(g.tolist(),  color=GREEN, label="v")
+fig.arrow(g.tolist(), Ag.tolist(), color=GREEN, dashed=True, label="Av")
+
+fig.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Full eigen-analysis',
+              difficulty: 'medium',
+              prompt: 'For the matrix A = [[5, 2],[2, 2]]: (1) compute eigenvalues and eigenvectors, (2) verify Av = λv for each pair, (3) verify trace = sum of eigenvalues and det = product of eigenvalues.',
+              code: `import numpy as np
+
+A = np.array([[5., 2.],
+              [2., 2.]])
+
+# 1. eigenvalues and eigenvectors
+# 2. verify Av = λv for each eigenpair
+# 3. trace and determinant sanity check
+`,
+              hint: 'np.linalg.eig(A) gives (evals, evecs). evecs[:,i] is the i-th eigenvector. np.trace(A) for trace, np.linalg.det(A) for determinant.',
+            },
+          ]
+        }
+      },
     ],
   },
 

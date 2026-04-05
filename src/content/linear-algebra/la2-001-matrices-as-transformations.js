@@ -84,7 +84,102 @@ export default {
         body: 'Many textbooks teach matrix multiplication as "multiply the rows by the columns" and taking a dot product. While true for computing, the "Linear Combination of Columns" perspective shown above is far better for geometric intuition.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Matrices as Transformations',
+        mathBridge: 'A @ v is matrix-vector multiplication. The columns of A tell you where î and ĵ land. fig.transformed_grid([[a,b],[c,d]]) draws the warped coordinate system.',
+        caption: 'Apply transformations to vectors and visualize how the grid warps.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Matrix-vector multiplication — where does a vector land?',
+              prose: [
+                'The `@` operator is matrix multiplication in NumPy. `A @ v` applies transformation A to vector v.',
+                'The columns of A tell you where î = [1,0] and ĵ = [0,1] land. Any other vector\'s destination is a linear combination of those columns.',
+              ],
+              code: `import numpy as np
+
+# A rotation 90° counterclockwise: î→[0,1], ĵ→[-1,0]
+A = np.array([[0.0, -1.0],
+              [1.0,  0.0]])
+
+# Where does each basis vector land?
+i_hat = np.array([1.0, 0.0])
+j_hat = np.array([0.0, 1.0])
+
+print("î lands at:", A @ i_hat, " (first column of A)")
+print("ĵ lands at:", A @ j_hat, " (second column of A)")
+print()
+
+# Where does v = [3, 1] land?
+v = np.array([3.0, 1.0])
+print(f"v = {v} lands at: {A @ v}")
+print(f"Verify: 3 × (A@î) + 1 × (A@ĵ) = {3*(A@i_hat) + 1*(A@j_hat)}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Visualize: the transformed grid',
+              prose: [
+                '`fig.transformed_grid(matrix)` draws the coordinate grid after the transformation.',
+                'The red arrow shows where î lands; the green arrow shows where ĵ lands.',
+                'Try changing the matrix below to a shear [[1,1],[0,1]] or a scale [[2,0],[0,0.5]] and re-run.',
+              ],
+              code: `from opencalc import quick_transform
+
+# 90° rotation
+rotation = [[0, -1], [1, 0]]
+quick_transform(rotation, vector=[2, 1])`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Common transformations',
+              prose: [
+                'Every 2×2 matrix is a transformation. Here are the most common ones — each described by where î and ĵ land.',
+              ],
+              code: `import numpy as np
+
+transformations = {
+    "90° rotation":  np.array([[0., -1.], [1., 0.]]),
+    "Reflect x-axis": np.array([[1., 0.], [0., -1.]]),
+    "Horizontal shear": np.array([[1., 1.], [0., 1.]]),
+    "Scale 2x, 0.5y": np.array([[2., 0.], [0., 0.5]]),
+    "Project to x-axis": np.array([[1., 0.], [0., 0.]]),
+}
+
+v = np.array([2.0, 1.0])
+print(f"Input vector: {v}")
+print()
+for name, T in transformations.items():
+    print(f"{name}: {T @ v}")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Build a transformation matrix',
+              difficulty: 'medium',
+              prompt: 'Build a matrix A that sends î = [1,0] to [2, 1] and ĵ = [0,1] to [-1, 3]. Then apply it to the vector [4, 2] and visualize the result using quick_transform.',
+              code: `import numpy as np
+from opencalc import quick_transform
+
+# Columns of A are where î and ĵ land
+A = np.array([[2., -1.],
+              [1.,  3.]])
+
+v = np.array([4.0, 2.0])
+
+# Apply A to v
+# Then visualize: quick_transform(A.tolist(), vector=v.tolist())
+`,
+              hint: 'The columns of A are directly the images of î and ĵ. A = [[2,-1],[1,3]] means first column is where î goes, second column is where ĵ goes. A.tolist() converts to plain lists for quick_transform.',
+            },
+          ]
+        }
+      },
+    ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────

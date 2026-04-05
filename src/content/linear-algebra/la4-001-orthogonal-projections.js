@@ -91,6 +91,96 @@ export default {
         mathBridge: 'Apply the projection matrix $P$ to a vector $\\mathbf{b}$ — get $P\\mathbf{b}$. Now apply $P$ again to that result: $P(P\\mathbf{b})$. Watch: nothing changes. The projected vector is already on the subspace — projecting again is a no-op. This is $P^2 = P$ in action. Drag $\\mathbf{b}$ to different positions and verify the double-projection always gives the same result as a single projection.',
         caption: 'Projecting twice = projecting once. That is idempotency.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Orthogonal Projections',
+        mathBridge: 'proj_a(b) = (a·b / a·a) * a. Projection matrix: P = a @ a.T / (a.T @ a). For subspace: P = A @ inv(A.T @ A) @ A.T. Verify P² = P and P = Pᵀ.',
+        caption: 'Compute vector projections, build projection matrices, and verify the idempotency property.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Vector projection onto a line',
+              prose: [
+                'The projection of **b** onto the line spanned by **a** is the closest point on that line to **b**.',
+                'Formula: proj = (a·b / a·a) × a. The error e = b − proj is always perpendicular to a.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN
+
+a = np.array([4.0, 0.0])   # the line direction
+b = np.array([3.0, 3.0])   # the vector to project
+
+proj = (np.dot(a, b) / np.dot(a, a)) * a
+error = b - proj
+
+print(f"a = {a},  b = {b}")
+print(f"proj_a(b) = {proj}")
+print(f"error = b - proj = {error}")
+print(f"perpendicular check: a · error = {np.dot(a, error):.10f}  (should be 0)")
+
+fig = Figure(square=True, xmin=-1, xmax=5, ymin=-1, ymax=5,
+             title="Projection of b onto a")
+fig.grid().axes()
+fig.vector(a.tolist(), color=BLUE, label="a")
+fig.vector(b.tolist(), color=AMBER, label="b")
+fig.vector(proj.tolist(), color=GREEN, label="proj")
+fig.arrow(proj.tolist(), b.tolist(), color=AMBER, dashed=True, label="error")
+fig.show()`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Projection matrix P and idempotency P² = P',
+              prose: [
+                'The projection matrix P = aaᵀ / aᵀa projects any vector onto the line spanned by a in one multiplication.',
+                'Key property: P² = P (idempotent). Projecting twice gives the same result — the projected vector is already on the line.',
+              ],
+              code: `import numpy as np
+
+a = np.array([[4.0], [0.0]])   # column vector (2×1)
+
+# Projection matrix: P = aaᵀ / (aᵀa)
+P = (a @ a.T) / float(a.T @ a)
+print("Projection matrix P:")
+print(P)
+print()
+
+# Verify idempotency: P² = P
+P2 = P @ P
+print("P² =")
+print(P2)
+print()
+print("P² = P?", np.allclose(P2, P))
+
+# Verify symmetry: Pᵀ = P
+print("P symmetric?", np.allclose(P.T, P))`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Projection onto a subspace',
+              difficulty: 'hard',
+              prompt: 'Build the projection matrix onto the column space of A = [[1,0],[1,1],[0,1]] (a plane in 3D). Use P = A(AᵀA)⁻¹Aᵀ. Then project b = [1,2,3] onto that plane. Verify P² = P and Pᵀ = P. Also verify that the error e = b − Pb is perpendicular to both columns of A.',
+              code: `import numpy as np
+
+A = np.array([[1., 0.],
+              [1., 1.],
+              [0., 1.]])
+b = np.array([1., 2., 3.])
+
+# P = A @ inv(A.T @ A) @ A.T
+# proj = P @ b
+# error = b - proj
+# verify P² = P, Pᵀ = P
+# verify A.T @ error ≈ 0
+`,
+              hint: 'P = A @ np.linalg.inv(A.T @ A) @ A.T. Check np.allclose(P @ P, P) for idempotency. np.allclose(A.T @ (b - P @ b), 0) for perpendicularity.',
+            },
+          ]
+        }
+      },
     ],
   },
 

@@ -96,6 +96,114 @@ export default {
         mathBridge: 'The slider controls $k$ — the number of singular values kept. At $k=1$, only the single most important "direction" of the image is kept — a blurry shadow. As $k$ increases, more detail returns. Observe how quickly the image becomes recognizable (often around $k = 20$ for a $256\\times256$ image, while full quality requires $k = 256$). The compression ratio is $(m + n + 1)k / mn$. Watch it in the corner.',
         caption: 'Singular values ranked by importance. Truncate to compress.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: SVD and Low-Rank Approximation',
+        mathBridge: 'U, S, Vt = np.linalg.svd(A). Singular values S are sorted descending. Reconstruct: A ≈ U[:,:k] @ diag(S[:k]) @ Vt[:k,:]. Condition number = S[0]/S[-1]. Rank = number of non-zero singular values.',
+        caption: 'Decompose a matrix into singular values, build low-rank approximations, and measure the condition number.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing the SVD',
+              prose: [
+                '`np.linalg.svd(A)` returns U, S, Vt where A = U @ diag(S) @ Vt.',
+                'U has orthonormal columns, S contains singular values in descending order, Vt has orthonormal rows.',
+                'The rank of A equals the number of non-zero singular values.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[3., 1., 1.],
+              [1., 3., 1.]])   # 2×3 matrix
+
+U, S, Vt = np.linalg.svd(A)
+
+print(f"Shape of A: {A.shape}")
+print(f"U shape: {U.shape}  (orthonormal columns)")
+print(f"S = {S.round(4)}  (singular values, descending)")
+print(f"Vt shape: {Vt.shape}  (orthonormal rows)")
+print()
+
+# Reconstruct A from full SVD
+S_mat = np.zeros_like(A, dtype=float)
+np.fill_diagonal(S_mat, S)
+A_reconstructed = U @ S_mat @ Vt
+print("A reconstructed:", np.allclose(A_reconstructed, A))
+print()
+print(f"rank(A) ≈ {np.sum(S > 1e-10)}  (non-zero singular values)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Low-rank approximation — Eckart-Young theorem',
+              prose: [
+                'The rank-k approximation keeps only the k largest singular values. It is the best possible rank-k approximation (Eckart-Young theorem).',
+                'Watch how quickly the approximation improves as k increases.',
+              ],
+              code: `import numpy as np
+
+# A 5×5 matrix
+np.random.seed(42)
+A = np.random.randint(1, 10, (5, 5)).astype(float)
+U, S, Vt = np.linalg.svd(A)
+
+print("Original matrix A:")
+print(A)
+print(f"Singular values: {S.round(2)}")
+print()
+
+for k in [1, 2, 3, 5]:
+    # Rank-k approximation
+    A_k = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
+    error = np.linalg.norm(A - A_k, 'fro')
+    print(f"k={k}: Frobenius error = {error:.4f}")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Condition number — numerical stability',
+              prose: [
+                'The condition number = σ₁ / σₙ (largest / smallest singular value). It measures how much a small change in b amplifies the error in the solution to Ax = b.',
+                'A large condition number means the matrix is nearly singular — small input errors cause large output errors.',
+              ],
+              code: `import numpy as np
+
+# Well-conditioned
+A = np.array([[3., 1.], [1., 3.]])
+U, S, Vt = np.linalg.svd(A)
+cond = S[0] / S[-1]
+print(f"Well-conditioned: condition number = {cond:.2f}")
+print(f"  (np.linalg.cond = {np.linalg.cond(A):.2f})")
+print()
+
+# Ill-conditioned: nearly singular (rows almost proportional)
+B = np.array([[1., 2.], [1.001, 2.001]])
+print(f"Ill-conditioned: condition number = {np.linalg.cond(B):.1f}")
+print("  (large → tiny input error causes huge solution error)")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'SVD-based pseudoinverse',
+              difficulty: 'hard',
+              prompt: 'Compute the pseudoinverse of A = [[1,2],[3,4],[5,6]] using SVD: A⁺ = V Σ⁺ Uᵀ, where Σ⁺ replaces each σᵢ with 1/σᵢ. Verify by checking that A⁺ @ A ≈ I (n×n identity). Compare with np.linalg.pinv(A).',
+              code: `import numpy as np
+
+A = np.array([[1., 2.],
+              [3., 4.],
+              [5., 6.]])
+
+# U, S, Vt = np.linalg.svd(A, full_matrices=False)
+# S_plus = 1/S for non-zero entries
+# A_plus = Vt.T @ np.diag(S_plus) @ U.T
+# verify: A_plus @ A ≈ I (2×2)
+# compare: np.linalg.pinv(A)
+`,
+              hint: 'Use full_matrices=False for the compact SVD. S_plus = 1.0/S (all entries are non-zero here). A_plus = Vt.T @ np.diag(S_plus) @ U.T. Check np.allclose(A_plus @ A, np.eye(2)).',
+            },
+          ]
+        }
+      },
     ],
   },
 

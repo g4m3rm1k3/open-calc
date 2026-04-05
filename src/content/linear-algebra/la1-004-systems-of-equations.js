@@ -97,6 +97,103 @@ export default {
         mathBridge: 'Enter a 3×3 system and press "Next Step". The visualization highlights the current pivot row in blue and the row being eliminated in red. Watch the augmented matrix transform row by row into echelon form, then RREF. At each step, confirm that the solution set has not changed — only our view of it.',
         caption: 'Gaussian elimination in slow motion.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Solving Linear Systems',
+        mathBridge: 'np.linalg.solve(A, b) computes A⁻¹b efficiently via LU factorization. np.linalg.matrix_rank() counts pivots. Always verify with np.allclose(A @ x, b).',
+        caption: 'Solve systems of equations in one line — and visualize the geometry of the solution.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Solve Ax = b — unique solution',
+              prose: [
+                '`np.linalg.solve(A, b)` solves the system in one call. It uses LU factorization — faster and more stable than computing A⁻¹ directly.',
+                'Geometrically: each row of Ax = b defines a line. The solution is their intersection.',
+              ],
+              code: `import numpy as np
+
+# System: 2x + y = 8,  x + 3y = 9
+A = np.array([[2.0, 1.0],
+              [1.0, 3.0]])
+b = np.array([8.0, 9.0])
+
+x = np.linalg.solve(A, b)
+print(f"Solution: x = {x[0]:.4f},  y = {x[1]:.4f}")
+print(f"Verify A @ x = {A @ x}  (should equal b = {b})")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Visualize the intersection of two lines',
+              prose: [
+                'Each equation in the 2×2 system is a line. The solution is where they cross.',
+                'Line 1: 2x + y = 8 → y = 8 − 2x. Line 2: x + 3y = 9 → y = (9 − x)/3.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN
+
+A = np.array([[2.0, 1.0], [1.0, 3.0]])
+b = np.array([8.0, 9.0])
+x = np.linalg.solve(A, b)
+
+fig = Figure(xmin=-1, xmax=7, ymin=-1, ymax=7,
+             title="Intersection of Two Lines")
+fig.grid().axes()
+fig.plot(lambda t: 8 - 2*t,     color=BLUE,  label="2x+y=8")
+fig.plot(lambda t: (9-t)/3,     color=AMBER, label="x+3y=9")
+fig.point([float(x[0]), float(x[1])], color=GREEN,
+          label=f"({x[0]:.1f}, {x[1]:.1f})", radius=7)
+fig.show()`,
+            },
+            {
+              id: 3,
+              cellTitle: 'No solution vs. infinitely many',
+              prose: [
+                'The rank of A tells you the structure of the solution:',
+                '- rank(A) = n and system consistent → **unique solution**\n- rank([A|b]) > rank(A) → **no solution** (inconsistent)\n- rank(A) < n and consistent → **infinitely many solutions** (free variables)',
+              ],
+              code: `import numpy as np
+
+# Inconsistent: parallel lines (no solution)
+A1 = np.array([[1.0, 2.0], [2.0, 4.0]])   # row 2 = 2 × row 1
+b1 = np.array([3.0, 7.0])                  # but 7 ≠ 2×3
+
+# Infinitely many: same line
+b2 = np.array([3.0, 6.0])                  # 6 = 2×3 → consistent
+
+print("=== Inconsistent system ===")
+print(f"rank(A1) = {np.linalg.matrix_rank(A1)}")
+Ab1 = np.column_stack([A1, b1])
+print(f"rank([A1|b1]) = {np.linalg.matrix_rank(Ab1)}")
+print("rank increased → NO solution")
+print()
+print("=== Infinitely many ===")
+Ab2 = np.column_stack([A1, b2])
+print(f"rank([A1|b2]) = {np.linalg.matrix_rank(Ab2)}")
+print("rank unchanged, but rank < n → INFINITE solutions")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Solve a 3×3 system',
+              difficulty: 'medium',
+              prompt: 'Solve the 3×3 system: x + 2y + z = 9,  2x - y + z = 3,  x + y - z = 1. Use np.linalg.solve(). Then verify with np.allclose(A @ x, b) and print each unknown.',
+              code: `import numpy as np
+
+A = np.array([[1.0,  2.0,  1.0],
+              [2.0, -1.0,  1.0],
+              [1.0,  1.0, -1.0]])
+b = np.array([9.0, 3.0, 1.0])
+
+# Solve and verify
+`,
+              hint: 'x = np.linalg.solve(A, b). Print x[0], x[1], x[2] for the three unknowns. Verify: np.allclose(A @ x, b) should be True.',
+            },
+          ]
+        }
+      },
     ],
   },
 

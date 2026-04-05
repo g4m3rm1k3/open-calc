@@ -80,7 +80,113 @@ export default {
         body: 'Matrix multiplication is explicitly NOT commutative ($AB \\neq BA$). But it IS perfectly associative: $(AB)C = A(BC)$. You can group multiplications however you want, as long as you strictly maintain the left-to-right order.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Matrix Multiplication as Composition',
+        mathBridge: 'A @ B computes the product. (A @ B) @ v = A @ (B @ v): apply B first, then A. Matrix multiplication is NOT commutative: A @ B ≠ B @ A in general.',
+        caption: 'Verify the composition property: chaining two transformations equals multiplying their matrices.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Matrix multiplication — the mechanics',
+              prose: [
+                '`A @ B` in NumPy computes the matrix product. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
+                'The result is a new matrix representing the composition of the two transformations.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[1., 2.],
+              [3., 4.]])
+B = np.array([[5., 6.],
+              [7., 8.]])
+
+AB = A @ B
+print("A @ B =")
+print(AB)
+print()
+
+# Verify entry (0,0): row 0 of A · col 0 of B
+r0 = A[0]      # [1, 2]
+c0 = B[:, 0]   # [5, 7]
+print(f"Entry (0,0) = {r0} · {c0} = {np.dot(r0, c0)}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Not commutative — order matters geometrically',
+              prose: [
+                'AB ≠ BA in general. "Rotate then shear" is a different transformation than "shear then rotate".',
+                'The order in which you compose transformations changes the final result.',
+              ],
+              code: `import numpy as np
+from opencalc import quick_transform
+
+rotate = np.array([[0., -1.], [1., 0.]])   # 90° CCW
+shear  = np.array([[1.,  1.], [0., 1.]])   # horizontal shear
+
+rotate_then_shear = shear @ rotate   # apply rotate first, shear second
+shear_then_rotate = rotate @ shear
+
+print("Rotate then shear:")
+print(rotate_then_shear)
+print()
+print("Shear then rotate:")
+print(shear_then_rotate)
+print()
+print("Equal?", np.allclose(rotate_then_shear, shear_then_rotate))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Composition: applying B then A',
+              prose: [
+                '(A @ B) @ v = A @ (B @ v). Applying the product matrix to v gives the same result as applying B first, then A.',
+                'This is the associativity property — you can group however you like, but you cannot change the order.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[2., 0.], [0., 0.5]])  # scale x2, shrink y
+B = np.array([[0., -1.], [1., 0.]])  # 90° rotation
+v = np.array([3.0, 1.0])
+
+# Method 1: apply B then A separately
+step1 = B @ v
+step2 = A @ step1
+
+# Method 2: compose first, then apply
+AB = A @ B
+result = AB @ v
+
+print(f"B @ v = {step1}")
+print(f"A @ (B @ v) = {step2}")
+print(f"(A @ B) @ v = {result}")
+print(f"Same result: {np.allclose(step2, result)}")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Verify non-commutativity',
+              difficulty: 'easy',
+              prompt: 'Let A be a 45° rotation matrix [[cos45, -sin45],[sin45, cos45]] and B be a reflection across the x-axis [[1,0],[0,-1]]. Compute AB and BA. Show they are different and describe geometrically what each composition does to the vector [1, 0].',
+              code: `import numpy as np
+
+angle = np.radians(45)
+A = np.array([[np.cos(angle), -np.sin(angle)],
+              [np.sin(angle),  np.cos(angle)]])  # 45° rotation
+B = np.array([[1., 0.], [0., -1.]])              # reflect x-axis
+
+# Compute AB and BA
+# Apply each to v = [1, 0] and compare
+v = np.array([1.0, 0.0])
+`,
+              hint: 'AB = A @ B. Then (A@B)@v vs (B@A)@v. Print both results and note the different final vectors.',
+            },
+          ]
+        }
+      },
+    ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────
