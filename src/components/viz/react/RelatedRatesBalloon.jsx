@@ -42,21 +42,40 @@ function M({ t, display = false, ready }) {
     return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
 }
 
+// ── Theme hook ────────────────────────────────────────────────────────────────
+function useIsDark() {
+    const isDark = () => document.documentElement.classList.contains('dark');
+    const [dark, setDark] = useState(isDark);
+    useEffect(() => {
+        const obs = new MutationObserver(() => setDark(isDark()));
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => obs.disconnect();
+    }, []);
+    return dark;
+}
+
 // ── Shared style tokens ───────────────────────────────────────────────────────
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md,8px)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
-const warn = { borderLeft: "3px solid #d97706", borderRadius: 0, background: "var(--color-background-warning,#fffbeb)" };
-const ok = { borderLeft: "3px solid #059669", borderRadius: 0, background: "var(--color-background-success,#ecfdf5)" };
+const warn = (dark) => ({ borderLeft: "3px solid #d97706", borderRadius: 0, background: dark ? "#1c0a00" : "#fffbeb" });
+const ok = (dark) => ({ borderLeft: "3px solid #059669", borderRadius: 0, background: dark ? "#052e16" : "#ecfdf5" });
 const prose = { fontSize: 14, lineHeight: 1.75, color: "var(--color-text-secondary)" };
 
 // ── WhyPanel ──────────────────────────────────────────────────────────────────
-const DS = [
-    { border: "#6366f1", bg: "#eef2ff", text: "#4338ca" },
-    { border: "#0891b2", bg: "#ecfeff", text: "#0e7490" },
-    { border: "#059669", bg: "#ecfdf5", text: "#047857" },
-];
-function WhyPanel({ why, depth = 0, ready }) {
+function makeDS(dark) {
+    return dark ? [
+        { border: "#818cf8", bg: "#1e1b4b", text: "#a5b4fc" },
+        { border: "#22d3ee", bg: "#083344", text: "#67e8f9" },
+        { border: "#34d399", bg: "#052e16", text: "#6ee7b7" },
+    ] : [
+        { border: "#6366f1", bg: "#eef2ff", text: "#4338ca" },
+        { border: "#0891b2", bg: "#ecfeff", text: "#0e7490" },
+        { border: "#059669", bg: "#ecfdf5", text: "#047857" },
+    ];
+}
+function WhyPanel({ why, depth = 0, ready, dark }) {
     const [open, setOpen] = useState(false);
     if (!why) return null;
+    const DS = makeDS(dark);
     const d = DS[Math.min(depth, 2)];
     const lbl = why.tag || ["Why?", "But why?", "Prove it"][Math.min(depth, 2)];
     return (
@@ -78,7 +97,7 @@ function WhyPanel({ why, depth = 0, ready }) {
 }
 
 // ── Balloon canvas ────────────────────────────────────────────────────────────
-function BalloonCanvas({ r, dvRate }) {
+function BalloonCanvas({ r, dvRate, dark }) {
     const ref = useRef(null);
     const draw = useCallback(() => {
         const c = ref.current; if (!c) return;
@@ -87,7 +106,6 @@ function BalloonCanvas({ r, dvRate }) {
         const cx = W / 2, cy = H / 2;
         const maxPx = Math.min(W, H) / 2 - 16;
         const px = (r / 10) * maxPx;
-        const dark = window.matchMedia("(prefers-color-scheme:dark)").matches;
         ctx.clearRect(0, 0, W, H);
         // Ghost ring showing max size
         ctx.beginPath(); ctx.arc(cx, cy, maxPx, 0, 2 * Math.PI);
@@ -123,14 +141,14 @@ function BalloonCanvas({ r, dvRate }) {
         ctx.fillStyle = dark ? "#34d399" : "#059669";
         ctx.font = "10px system-ui"; ctx.textAlign = "left";
         ctx.fillText("dr/dt", cx + px + arrowLen + 5, cy + 4);
-    }, [r, dvRate]);
+    }, [r, dvRate, dark]);
 
     useEffect(() => { draw(); }, [draw]);
     return <canvas ref={ref} width={220} height={220} style={{ width: "100%", maxWidth: 220, display: "block", borderRadius: 8, background: "var(--color-background-secondary)", border: "0.5px solid var(--color-border-tertiary)" }} />;
 }
 
 // ── Rate graph canvas ─────────────────────────────────────────────────────────
-function RateGraph({ dvRate }) {
+function RateGraph({ dvRate, dark }) {
     const ref = useRef(null);
     const cRef = useRef(null);
 
@@ -138,7 +156,6 @@ function RateGraph({ dvRate }) {
         const c = ref.current; if (!c) return;
         const ctx = c.getContext("2d");
         const W = c.width, H = c.height;
-        const dark = window.matchMedia("(prefers-color-scheme:dark)").matches;
         const PI = Math.PI;
         ctx.clearRect(0, 0, W, H);
         const pad = { l: 50, r: 20, t: 20, b: 40 };
@@ -177,7 +194,7 @@ function RateGraph({ dvRate }) {
         // Label
         ctx.fillStyle = dark ? "#38bdf8" : "#0284c7"; ctx.textAlign = "right";
         ctx.fillText("dr/dt ∝ 1/r²", pad.l + iW - 8, pad.t + 16);
-    }, [dvRate]);
+    }, [dvRate, dark]);
 
     useEffect(() => { draw(); }, [draw]);
 
@@ -222,6 +239,7 @@ function StepItem({ num, title, desc, numColor, numBg, children }) {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function RelatedRatesBalloon({ params = {} }) {
     const ready = useMath();
+    const dark = useIsDark();
     const [tab, setTab] = useState("intuition");
     const [r, setR] = useState(5);
     const [dvRate, setDvRate] = useState(2);
@@ -244,10 +262,10 @@ export default function RelatedRatesBalloon({ params = {} }) {
             <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
             {/* Header */}
-            <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: "#ecfeff", marginBottom: 14 }}>
+            <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: dark ? "#083344" : "#ecfeff", marginBottom: 14 }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: "#0891b2", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Related Rates — Worked Example</div>
-                <div style={{ fontSize: 15, fontWeight: 500, color: "#0e7490", marginBottom: 4 }}>The Balloon Problem</div>
-                <div style={{ fontSize: 13, color: "#0e7490", lineHeight: 1.7 }}>
+                <div style={{ fontSize: 15, fontWeight: 500, color: dark ? "#67e8f9" : "#0e7490", marginBottom: 4 }}>The Balloon Problem</div>
+                <div style={{ fontSize: 13, color: dark ? "#67e8f9" : "#0e7490", lineHeight: 1.7 }}>
                     Air is pumped into a balloon at 2 cm³/sec. How fast is the radius growing when r = 5 cm?
                     This single problem contains every idea in related rates.
                 </div>
@@ -271,7 +289,7 @@ export default function RelatedRatesBalloon({ params = {} }) {
                         </div>
                         <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
                             <div style={{ flex: "0 0 auto" }}>
-                                <BalloonCanvas r={r} dvRate={dvRate} />
+                                <BalloonCanvas r={r} dvRate={dvRate} dark={dark} />
                                 <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                         <span style={{ fontSize: 12, color: "var(--color-text-secondary)", minWidth: 60 }}>Radius r</span>
@@ -304,23 +322,23 @@ export default function RelatedRatesBalloon({ params = {} }) {
                             </div>
                         </div>
                     </div>
-                    <div style={{ ...card, ...ok }}>
+                    <div style={{ ...card, ...ok(dark) }}>
                         <div style={{ fontSize: 12, fontWeight: 600, color: "#059669", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".06em" }}>The swimming pool analogy</div>
                         <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
                             Pour a cup of water into a tall thin glass — the level rises fast. Pour the same cup into a swimming pool — barely moves.
                             Same volume rate, very different level rate. The balloon is the same: as r grows, dr/dt falls — always proportional to 1/r².
                         </div>
                     </div>
-                    <WhyPanel why={{ tag: "Why exactly 1/r²?", explanation: "dr/dt = dV/dt ÷ 4πr². With dV/dt fixed, dr/dt = constant / r². That's an inverse-square relationship. Double r → one-quarter the radius speed. Triple r → one-ninth. The surface area (4πr²) grows as r², so the rate shrinks as 1/r².", math: "\\frac{dr}{dt} = \\frac{dV/dt}{4\\pi r^2} \\propto \\frac{1}{r^2}", why: null }} depth={0} ready={ready} />
+                    <WhyPanel why={{ tag: "Why exactly 1/r²?", explanation: "dr/dt = dV/dt ÷ 4πr². With dV/dt fixed, dr/dt = constant / r². That's an inverse-square relationship. Double r → one-quarter the radius speed. Triple r → one-ninth. The surface area (4πr²) grows as r², so the rate shrinks as 1/r².", math: "\\frac{dr}{dt} = \\frac{dV/dt}{4\\pi r^2} \\propto \\frac{1}{r^2}", why: null }} depth={0} ready={ready} dark={dark} />
                 </div>
             )}
 
             {/* ── TAB 2: WHAT IT MEANS ── */}
             {tab === "theorem" && (
                 <div style={{ animation: "sd .2s ease-out" }}>
-                    <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 12 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "#26215C", marginBottom: 6 }}>The core idea</div>
-                        <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+                    <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: dark ? "#1a1547" : "#EEEDFE", marginBottom: 12 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: dark ? "#c4b5fd" : "#26215C", marginBottom: 6 }}>The core idea</div>
+                        <div style={{ fontSize: 13, color: dark ? "#a5b4fc" : "#3C3489", lineHeight: 1.7 }}>
                             V and r are linked by geometry. Because both change with time, their <em>rates of change</em> are also linked — by the Chain Rule. Differentiating both sides with respect to t is the bridge.
                         </div>
                     </div>
@@ -336,9 +354,9 @@ export default function RelatedRatesBalloon({ params = {} }) {
                             </div>
                         ))}
                     </div>
-                    <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE" }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: "#534AB7", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Connection to implicit differentiation</div>
-                        <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7, marginBottom: 8 }}>
+                    <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: dark ? "#1a1547" : "#EEEDFE" }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: dark ? "#c4b5fd" : "#534AB7", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Connection to implicit differentiation</div>
+                        <div style={{ fontSize: 13, color: dark ? "#a5b4fc" : "#3C3489", lineHeight: 1.7, marginBottom: 8 }}>
                             Related rates IS implicit differentiation — with time (t) as the variable instead of x.
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -350,7 +368,7 @@ export default function RelatedRatesBalloon({ params = {} }) {
                             ))}
                         </div>
                     </div>
-                    <WhyPanel why={{ tag: "Why does differentiating r³ give two 'r' terms?", explanation: "Chain Rule: d/dt[r³] = 3r² · dr/dt. The '3r²' is the outer derivative (power rule on r³). The 'dr/dt' is the inner derivative — because r itself is a function of t, the chain rule forces you to multiply by dr/dt. So you get two pieces, both containing r. One gets a number substituted (25 when r=5), the other stays as the unknown dr/dt.", math: "\\frac{d}{dt}[r^3] = \\underbrace{3r^2}_{\\text{outer: power rule}} \\cdot \\underbrace{\\frac{dr}{dt}}_{\\text{inner: r depends on t}}", why: null }} depth={0} ready={ready} />
+                    <WhyPanel why={{ tag: "Why does differentiating r³ give two 'r' terms?", explanation: "Chain Rule: d/dt[r³] = 3r² · dr/dt. The '3r²' is the outer derivative (power rule on r³). The 'dr/dt' is the inner derivative — because r itself is a function of t, the chain rule forces you to multiply by dr/dt. So you get two pieces, both containing r. One gets a number substituted (25 when r=5), the other stays as the unknown dr/dt.", math: "\\frac{d}{dt}[r^3] = \\underbrace{3r^2}_{\\text{outer: power rule}} \\cdot \\underbrace{\\frac{dr}{dt}}_{\\text{inner: r depends on t}}", why: null }} depth={0} ready={ready} dark={dark} />
                 </div>
             )}
 
@@ -363,15 +381,15 @@ export default function RelatedRatesBalloon({ params = {} }) {
                         </div>
                     </div>
                     <div style={{ border: "0.5px solid var(--color-border-tertiary)", borderRadius: 8, overflow: "hidden" }}>
-                        <StepItem num={1} title="Write the static geometric relationship" desc="What equation connects V and r at any frozen moment?" numColor="#0c447c" numBg="#e6f1fb">
+                        <StepItem num={1} title="Write the static geometric relationship" desc="What equation connects V and r at any frozen moment?" numColor={dark?"#93c5fd":"#0c447c"} numBg={dark?"#1e2d47":"#e6f1fb"}>
                             <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginTop: 10 }}>
                                 <M t={"V = \\frac{4}{3}\\pi r^3"} display ready={ready} />
                             </div>
                             <p style={{ ...prose, fontSize: 13 }}>This is just the sphere volume formula — nothing calculus yet. It is the <em>static</em> relationship, true at any single frozen moment.</p>
-                            <WhyPanel why={{ tag: "Why do we need a geometric equation?", explanation: "Related rates problems always start with a relationship between the variables — before either of them is changing. That's the 'static' equation. Calculus (the Chain Rule) then converts it into a relationship between their rates. You cannot skip straight to rates — you need the geometry first.", why: null }} depth={0} ready={ready} />
+                            <WhyPanel why={{ tag: "Why do we need a geometric equation?", explanation: "Related rates problems always start with a relationship between the variables — before either of them is changing. That's the 'static' equation. Calculus (the Chain Rule) then converts it into a relationship between their rates. You cannot skip straight to rates — you need the geometry first.", why: null }} depth={0} ready={ready} dark={dark} />
                         </StepItem>
 
-                        <StepItem num={2} title="Differentiate both sides with respect to t" desc="Both V and r change with time — apply d/dt to every term" numColor="#0c447c" numBg="#e6f1fb">
+                        <StepItem num={2} title="Differentiate both sides with respect to t" desc="Both V and r change with time — apply d/dt to every term" numColor={dark?"#93c5fd":"#0c447c"} numBg={dark?"#1e2d47":"#e6f1fb"}>
                             <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginTop: 10 }}>
                                 <M t={"\\frac{d}{dt}[V] = \\frac{d}{dt}\\!\\left[\\frac{4}{3}\\pi r^3\\right]"} display ready={ready} />
                                 <M t={"\\frac{dV}{dt} = 4\\pi r^2 \\cdot \\frac{dr}{dt}"} display ready={ready} />
@@ -386,36 +404,36 @@ export default function RelatedRatesBalloon({ params = {} }) {
                                     <div style={{ fontSize: 13 }}>→ multiply by dr/dt</div>
                                 </div>
                             </div>
-                            <WhyPanel why={{ tag: "Why does the chain rule force a dr/dt here?", explanation: "When you differentiate r³ with respect to t, r is not the independent variable — t is. So r is a composition: r(t). The chain rule says: d/dt[f(r(t))] = f′(r(t)) · r′(t). Here f(r) = r³, so f′(r) = 3r², and r′(t) = dr/dt. Multiplying them: d/dt[r³] = 3r² · dr/dt. Without the dr/dt, you'd be treating r as a constant — which it's not.", math: "\\frac{d}{dt}[r^3] = 3r^2 \\cdot \\frac{dr}{dt}", why: null }} depth={0} ready={ready} />
+                            <WhyPanel why={{ tag: "Why does the chain rule force a dr/dt here?", explanation: "When you differentiate r³ with respect to t, r is not the independent variable — t is. So r is a composition: r(t). The chain rule says: d/dt[f(r(t))] = f′(r(t)) · r′(t). Here f(r) = r³, so f′(r) = 3r², and r′(t) = dr/dt. Multiplying them: d/dt[r³] = 3r² · dr/dt. Without the dr/dt, you'd be treating r as a constant — which it's not.", math: "\\frac{d}{dt}[r^3] = 3r^2 \\cdot \\frac{dr}{dt}", why: null }} depth={0} ready={ready} dark={dark} />
                         </StepItem>
 
-                        <StepItem num={3} title="Substitute what you know at r = 5" desc="Plug in dV/dt = 2 and r = 5 — now it's one equation, one unknown" numColor="#0c447c" numBg="#e6f1fb">
+                        <StepItem num={3} title="Substitute what you know at r = 5" desc="Plug in dV/dt = 2 and r = 5 — now it's one equation, one unknown" numColor={dark?"#93c5fd":"#0c447c"} numBg={dark?"#1e2d47":"#e6f1fb"}>
                             <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginTop: 10 }}>
                                 <M t={"2 = 4\\pi \\cdot (5)^2 \\cdot \\frac{dr}{dt}"} display ready={ready} />
                                 <M t={"2 = 4\\pi \\cdot 25 \\cdot \\frac{dr}{dt}"} display ready={ready} />
                                 <M t={"2 = 100\\pi \\cdot \\frac{dr}{dt}"} display ready={ready} />
                             </div>
-                            <div style={{ ...card, ...warn, marginTop: 8 }}>
+                            <div style={{ ...card, ...warn(dark), marginTop: 8 }}>
                                 <div style={{ fontSize: 12, fontWeight: 600, color: "#d97706", marginBottom: 4 }}>The "disappearing r" explained</div>
                                 <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
                                     The r² term became 25 because you substituted r = 5. The dr/dt term stayed symbolic because it's the unknown you're solving for.
                                     One r "disappeared" by becoming a constant — the other stays until the last step.
                                 </div>
                             </div>
-                            <WhyPanel why={{ tag: "Why must we substitute AFTER differentiating?", explanation: "If you plug r=5 into V = (4/3)πr³ first, you get V = 500π/3 — a constant. Its derivative is 0. You'd end up with 2 = 0, which is nonsense. The substitution can only happen after differentiation because differentiation is what produced the dr/dt term. Always: differentiate first, substitute second.", why: null }} depth={0} ready={ready} />
+                            <WhyPanel why={{ tag: "Why must we substitute AFTER differentiating?", explanation: "If you plug r=5 into V = (4/3)πr³ first, you get V = 500π/3 — a constant. Its derivative is 0. You'd end up with 2 = 0, which is nonsense. The substitution can only happen after differentiation because differentiation is what produced the dr/dt term. Always: differentiate first, substitute second.", why: null }} depth={0} ready={ready} dark={dark} />
                         </StepItem>
 
-                        <StepItem num={4} title="Solve for dr/dt — pure algebra" desc="Divide both sides by 100π" numColor="#085041" numBg="#e1f5ee">
+                        <StepItem num={4} title="Solve for dr/dt — pure algebra" desc="Divide both sides by 100π" numColor={dark?"#6ee7b7":"#085041"} numBg={dark?"#1a3829":"#e1f5ee"}>
                             <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginTop: 10 }}>
                                 <M t={"\\frac{dr}{dt} = \\frac{2}{100\\pi} = \\frac{1}{50\\pi} \\approx 0.00637 \\text{ cm/sec}"} display ready={ready} />
                             </div>
-                            <div style={{ ...card, ...ok, marginTop: 8 }}>
+                            <div style={{ ...card, ...ok(dark), marginTop: 8 }}>
                                 <div style={{ fontSize: 12, fontWeight: 600, color: "#059669", marginBottom: 4 }}>Units check</div>
                                 <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
                                     dV/dt has units cm³/s. 4πr² has units cm². Dividing: cm³/s ÷ cm² = cm/s. That's the correct unit for dr/dt — speed of the radius expanding outward. ✓
                                 </div>
                             </div>
-                            <WhyPanel why={{ tag: "What does the textbook's r′(t) notation mean vs dr/dt?", explanation: "They mean exactly the same thing: r′(t) is Lagrange's notation, dr/dt is Leibniz's notation. The textbook uses r′(t) because it's compact. Leibniz's notation (dr/dt) is often preferred in related rates problems because it explicitly reminds you what is changing relative to what — r relative to t.", why: null }} depth={0} ready={ready} />
+                            <WhyPanel why={{ tag: "What does the textbook's r′(t) notation mean vs dr/dt?", explanation: "They mean exactly the same thing: r′(t) is Lagrange's notation, dr/dt is Leibniz's notation. The textbook uses r′(t) because it's compact. Leibniz's notation (dr/dt) is often preferred in related rates problems because it explicitly reminds you what is changing relative to what — r relative to t.", why: null }} depth={0} ready={ready} dark={dark} />
                         </StepItem>
                     </div>
                 </div>
@@ -431,7 +449,7 @@ export default function RelatedRatesBalloon({ params = {} }) {
                             Change the pump speed — the curve scales up or down, but the shape never changes.
                         </div>
                     </div>
-                    <RateGraph dvRate={dvGraph} />
+                    <RateGraph dvRate={dvGraph} dark={dark} />
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, marginBottom: 12 }}>
                         <span style={{ fontSize: 12, color: "var(--color-text-secondary)", minWidth: 60 }}>dV/dt</span>
                         <input type="range" min={1} max={20} step={1} value={dvGraph} onChange={e => setDvGraph(parseInt(e.target.value))} style={{ flex: 1, accentColor: "#BA7517" }} />
@@ -461,15 +479,15 @@ export default function RelatedRatesBalloon({ params = {} }) {
             {/* ── TAB 5: STRATEGY ── */}
             {tab === "strategy" && (
                 <div style={{ animation: "sd .2s ease-out" }}>
-                    <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: "#FCEBEB", marginBottom: 12 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "#501313", marginBottom: 4 }}>The 4-step method — works for every related rates problem</div>
-                        <div style={{ fontSize: 13, color: "#791F1F", lineHeight: 1.7 }}>Ladder, shadow, cone draining, balloon expanding — all four steps, every time. No exceptions.</div>
+                    <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: dark ? "#3b1919" : "#FCEBEB", marginBottom: 12 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: dark ? "#fca5a5" : "#501313", marginBottom: 4 }}>The 4-step method — works for every related rates problem</div>
+                        <div style={{ fontSize: 13, color: dark ? "#fca5a5" : "#791F1F", lineHeight: 1.7 }}>Ladder, shadow, cone draining, balloon expanding — all four steps, every time. No exceptions.</div>
                     </div>
                     {[
-                        { n: 1, c: "#0c447c", bg: "#e6f1fb", title: "Draw a diagram. Label all quantities.", desc: "Identify which quantities change with time (give them d/dt tags mentally) and which are constant at the instant you care about." },
-                        { n: 2, c: "#0c447c", bg: "#e6f1fb", title: "Write the static geometric equation.", desc: "Volume formula, Pythagorean theorem, similar triangles, trig ratio — whatever connects your variables. Do NOT differentiate yet.", note: "This step is where students most often get stuck. The equation comes from geometry, not calculus." },
-                        { n: 3, c: "#0c447c", bg: "#e6f1fb", title: "Differentiate both sides with respect to t.", desc: "Chain rule every variable that depends on t. Each one gets a d(var)/dt multiplier. This is the 'rates equation.'" },
-                        { n: 4, c: "#085041", bg: "#e1f5ee", title: "Substitute known values. Solve algebraically.", desc: "Plug in every known rate and every known instantaneous value. The calculus is done — from here it's algebra only." },
+                        { n: 1, c: dark?"#93c5fd":"#0c447c", bg: dark?"#1e2d47":"#e6f1fb", title: "Draw a diagram. Label all quantities.", desc: "Identify which quantities change with time (give them d/dt tags mentally) and which are constant at the instant you care about." },
+                        { n: 2, c: dark?"#93c5fd":"#0c447c", bg: dark?"#1e2d47":"#e6f1fb", title: "Write the static geometric equation.", desc: "Volume formula, Pythagorean theorem, similar triangles, trig ratio — whatever connects your variables. Do NOT differentiate yet.", note: "This step is where students most often get stuck. The equation comes from geometry, not calculus." },
+                        { n: 3, c: dark?"#93c5fd":"#0c447c", bg: dark?"#1e2d47":"#e6f1fb", title: "Differentiate both sides with respect to t.", desc: "Chain rule every variable that depends on t. Each one gets a d(var)/dt multiplier. This is the 'rates equation.'" },
+                        { n: 4, c: dark?"#6ee7b7":"#085041", bg: dark?"#1a3829":"#e1f5ee", title: "Substitute known values. Solve algebraically.", desc: "Plug in every known rate and every known instantaneous value. The calculus is done — from here it's algebra only." },
                     ].map(({ n, c, bg, title, desc, note }) => (
                         <div key={n} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
                             <div style={{ width: 26, height: 26, borderRadius: "50%", background: bg, color: c, border: `1px solid ${c}`, fontSize: 12, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{n}</div>
@@ -480,14 +498,14 @@ export default function RelatedRatesBalloon({ params = {} }) {
                             </div>
                         </div>
                     ))}
-                    <div style={{ ...card, ...warn, marginTop: 10 }}>
+                    <div style={{ ...card, ...warn(dark), marginTop: 10 }}>
                         <div style={{ fontSize: 12, fontWeight: 600, color: "#d97706", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".06em" }}>The most common mistake</div>
                         <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
                             Substituting the known values BEFORE differentiating. If you plug r=5 into V = ⅓πr³ first, you get a constant — and its derivative is zero.
                             The unknown rate disappears before you can find it. <strong>Always differentiate first, substitute second.</strong>
                         </div>
                     </div>
-                    <WhyPanel why={{ tag: "What geometric equations should I know for common related rates problems?", explanation: "Sphere: V = (4/3)πr³, SA = 4πr². Cone: V = (1/3)πr²h. Cylinder: V = πr²h. Pythagorean theorem: a²+b²=c². Similar triangles (ratios of sides). Trig: sin=opp/hyp, tan=opp/adj. You don't need calculus to find these — they're geometry. The calculus only happens in step 3.", why: null }} depth={0} ready={ready} />
+                    <WhyPanel why={{ tag: "What geometric equations should I know for common related rates problems?", explanation: "Sphere: V = (4/3)πr³, SA = 4πr². Cone: V = (1/3)πr²h. Cylinder: V = πr²h. Pythagorean theorem: a²+b²=c². Similar triangles (ratios of sides). Trig: sin=opp/hyp, tan=opp/adj. You don't need calculus to find these — they're geometry. The calculus only happens in step 3.", why: null }} depth={0} ready={ready} dark={dark} />
                 </div>
             )}
         </div>

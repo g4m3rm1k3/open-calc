@@ -49,24 +49,44 @@ function M({ t, display = false, ready }) {
   return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
 }
 
+// ── Theme hook ────────────────────────────────────────────────────────────────
+function useIsDark() {
+  const isDark = () => document.documentElement.classList.contains('dark');
+  const [dark, setDark] = useState(isDark);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(isDark()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
+}
+
 // ── Shared styles ─────────────────────────────────────────────────────────────
-const C = {
-  card:   { background:"var(--color-background-secondary)", borderRadius:"var(--border-radius-md,8px)", padding:"12px 14px", border:"0.5px solid var(--color-border-tertiary)", marginBottom:8 },
-  warn:   { borderLeft:"3px solid #d97706", borderRadius:0, background:"var(--color-background-warning,#fffbeb)" },
-  ok:     { borderLeft:"3px solid #059669", borderRadius:0, background:"var(--color-background-success,#ecfdf5)" },
-  info:   { borderLeft:"3px solid #0891b2", borderRadius:0, background:"#ecfeff" },
-  purple: { borderLeft:"3px solid #7F77DD", borderRadius:0, background:"#EEEDFE" },
-};
+const Ccard = { background:"var(--color-background-secondary)", borderRadius:"var(--border-radius-md,8px)", padding:"12px 14px", border:"0.5px solid var(--color-border-tertiary)", marginBottom:8 };
+function makeC(dark) {
+  return {
+    card:   Ccard,
+    warn:   { borderLeft:"3px solid #d97706", borderRadius:0, background: dark ? "#1c0a00" : "#fffbeb" },
+    ok:     { borderLeft:"3px solid #059669", borderRadius:0, background: dark ? "#052e16" : "#ecfdf5" },
+    info:   { borderLeft:"3px solid #0891b2", borderRadius:0, background: dark ? "#083344" : "#ecfeff" },
+    purple: { borderLeft:"3px solid #7F77DD", borderRadius:0, background: dark ? "#1a1547" : "#EEEDFE" },
+  };
+}
 
 // ── WhyPanel ──────────────────────────────────────────────────────────────────
-function WhyPanel({ why, depth = 0, ready }) {
+function WhyPanel({ why, depth = 0, ready, dark }) {
   const [open, setOpen] = useState(false);
   if (!why) return null;
-  const d = [
+  const DS = dark ? [
+    { border:"#818cf8", bg:"#1e1b4b", text:"#a5b4fc" },
+    { border:"#22d3ee", bg:"#083344", text:"#67e8f9" },
+    { border:"#34d399", bg:"#052e16", text:"#6ee7b7" },
+  ] : [
     { border:"#6366f1", bg:"#eef2ff", text:"#4338ca" },
     { border:"#0891b2", bg:"#ecfeff", text:"#0e7490" },
     { border:"#059669", bg:"#ecfdf5", text:"#047857" },
-  ][Math.min(depth, 2)];
+  ];
+  const d = DS[Math.min(depth, 2)];
   const lbl = why.tag || ["Why?","But why?","Prove it"][Math.min(depth, 2)];
   return (
     <div style={{ marginLeft:depth*14, marginTop:8 }}>
@@ -88,7 +108,7 @@ function WhyPanel({ why, depth = 0, ready }) {
 // ════════════════════════════════════════════════════════════════════════════
 // TAB 1: THE MACHINE — animated gear canvas
 // ════════════════════════════════════════════════════════════════════════════
-function MachineTab({ ready }) {
+function MachineTab({ ready, dark }) {
   const canvasRef = useRef(null);
   const cWrap     = useRef(null);
   const animRef   = useRef(null);
@@ -105,7 +125,6 @@ function MachineTab({ ready }) {
     c.height = 280;
     const ctx = c.getContext("2d");
     const W = c.width, H = c.height;
-    const dark = window.matchMedia("(prefers-color-scheme:dark)").matches;
 
     const col = {
       bg:      dark ? "#0f172a" : "#f8fafc",
@@ -207,7 +226,7 @@ function MachineTab({ ready }) {
 
     stateRef.current.angle += 0.015;
     animRef.current = requestAnimationFrame(draw);
-  }, []);
+  }, [dark]);
 
   useEffect(() => {
     animRef.current = requestAnimationFrame(draw);
@@ -216,6 +235,7 @@ function MachineTab({ ready }) {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); ro.disconnect(); };
   }, [draw]);
 
+  const C = makeC(dark);
   return (
     <div>
       <div style={{ ...C.card, marginBottom:12 }}>
@@ -249,8 +269,8 @@ function MachineTab({ ready }) {
         ))}
       </div>
       <div style={{ ...C.card, ...C.purple, marginTop:4 }}>
-        <div style={{ fontSize:12, fontWeight:600, color:"#534AB7", marginBottom:4 }}>The one sentence that unlocks every related rates problem</div>
-        <div style={{ fontSize:13, color:"#3C3489", lineHeight:1.7 }}>
+        <div style={{ fontSize:12, fontWeight:600, color:dark?"#c4b5fd":"#534AB7", marginBottom:4 }}>The one sentence that unlocks every related rates problem</div>
+        <div style={{ fontSize:13, color:dark?"#a5b4fc":"#3C3489", lineHeight:1.7 }}>
           If two variables are connected by an equation, differentiating that equation (with respect to time) connects their rates.
           The geometric equation is the <em>lock</em>. The Chain Rule is the <em>key</em>.
         </div>
@@ -312,9 +332,18 @@ const ANATOMY_STEPS = [
   },
 ];
 
-function AnatomyTab({ ready }) {
+const STEP_DARK = [
+  { bg:"#2a1500", text:"#fcd34d" },
+  { bg:"#1a1547", text:"#c4b5fd" },
+  { bg:"#052e16", text:"#6ee7b7" },
+];
+
+function AnatomyTab({ ready, dark }) {
   const [activeStep, setActiveStep] = useState(0);
   const step = ANATOMY_STEPS[activeStep];
+  const C = makeC(dark);
+  const stepBg   = dark ? STEP_DARK[activeStep].bg   : step.bg;
+  const stepText = dark ? STEP_DARK[activeStep].text : step.text;
 
   return (
     <div>
@@ -326,18 +355,22 @@ function AnatomyTab({ ready }) {
       </div>
       {/* Layer selector */}
       <div style={{ display:"flex", gap:0, marginBottom:14, borderRadius:8, overflow:"hidden", border:"0.5px solid var(--color-border-tertiary)" }}>
-        {ANATOMY_STEPS.map((s, i) => (
-          <button key={s.id} onClick={() => setActiveStep(i)} style={{ flex:1, padding:"10px 8px", border:"none", borderRight:i<2?"0.5px solid var(--color-border-tertiary)":"none", background:activeStep===i ? s.bg : "var(--color-background-secondary)", color:activeStep===i ? s.text : "var(--color-text-secondary)", fontSize:12, fontWeight:activeStep===i?600:400, cursor:"pointer", lineHeight:1.4 }}>
-            <div style={{ fontSize:10, fontWeight:600, letterSpacing:".07em", textTransform:"uppercase", marginBottom:3, color:activeStep===i?s.color:"var(--color-text-tertiary)" }}>{i+1}</div>
-            {s.label}
-          </button>
-        ))}
+        {ANATOMY_STEPS.map((s, i) => {
+          const sBg   = dark ? STEP_DARK[i].bg   : s.bg;
+          const sText = dark ? STEP_DARK[i].text : s.text;
+          return (
+            <button key={s.id} onClick={() => setActiveStep(i)} style={{ flex:1, padding:"10px 8px", border:"none", borderRight:i<2?"0.5px solid var(--color-border-tertiary)":"none", background:activeStep===i ? sBg : "var(--color-background-secondary)", color:activeStep===i ? sText : "var(--color-text-secondary)", fontSize:12, fontWeight:activeStep===i?600:400, cursor:"pointer", lineHeight:1.4 }}>
+              <div style={{ fontSize:10, fontWeight:600, letterSpacing:".07em", textTransform:"uppercase", marginBottom:3, color:activeStep===i?s.color:"var(--color-text-tertiary)" }}>{i+1}</div>
+              {s.label}
+            </button>
+          );
+        })}
       </div>
       {/* Active step detail */}
       <div key={step.id} style={{ animation:"sd .18s ease-out" }}>
-        <div style={{ ...C.card, borderLeft:`3px solid ${step.color}`, borderRadius:0, background:step.bg, marginBottom:10 }}>
-          <div style={{ fontSize:14, fontWeight:500, color:step.text, marginBottom:6 }}>{step.title}</div>
-          <div style={{ fontSize:13, color:step.text, lineHeight:1.75, opacity:0.85 }}>{step.prose}</div>
+        <div style={{ ...C.card, borderLeft:`3px solid ${step.color}`, borderRadius:0, background:stepBg, marginBottom:10 }}>
+          <div style={{ fontSize:14, fontWeight:500, color:stepText, marginBottom:6 }}>{step.title}</div>
+          <div style={{ fontSize:13, color:stepText, lineHeight:1.75, opacity:0.85 }}>{step.prose}</div>
         </div>
         {/* Four examples side by side */}
         <div style={{ fontSize:11, fontWeight:600, color:"var(--color-text-tertiary)", letterSpacing:".07em", textTransform:"uppercase", marginBottom:8 }}>
@@ -443,9 +476,10 @@ const SCENARIOS = [
   },
 ];
 
-function ScenariosTab({ ready }) {
+function ScenariosTab({ ready, dark }) {
   const [idx, setIdx] = useState(1); // default to plane (your idea)
   const sc = SCENARIOS[idx];
+  const C = makeC(dark);
 
   return (
     <div>
@@ -501,7 +535,7 @@ function ScenariosTab({ ready }) {
           <div style={{ fontSize:11, fontWeight:600, color:"var(--color-text-tertiary)", marginBottom:4, textTransform:"uppercase", letterSpacing:".06em" }}>Pattern type</div>
           <div style={{ fontSize:13, color:"var(--color-text-secondary)" }}>{sc.pattern}</div>
         </div>
-        <WhyPanel why={{ tag:"Why does the plane problem use the Pythagorean theorem?", explanation:"The observer is on the ground. The plane is at altitude h. The horizontal distance is x. These three lengths form a right triangle: D² = x² + h². D is the direct-line distance from observer to plane. As the plane moves, x changes, h stays fixed, and D changes. Differentiating D² = x² + h² gives 2D·(dD/dt) = 2x·(dx/dt). So dD/dt = (x/D)·(dx/dt). When x is large, D ≈ x and dD/dt ≈ dx/dt — the distance changes at nearly the plane's speed. When x=0 (directly overhead), dD/dt = 0 — at that instant the distance is momentarily not changing.", math:"D^2 = x^2 + h^2 \\Rightarrow 2D\\frac{dD}{dt} = 2x\\frac{dx}{dt} \\Rightarrow \\frac{dD}{dt} = \\frac{x}{D}\\cdot\\frac{dx}{dt}", why:null }} depth={0} ready={ready}/>
+        <WhyPanel why={{ tag:"Why does the plane problem use the Pythagorean theorem?", explanation:"The observer is on the ground. The plane is at altitude h. The horizontal distance is x. These three lengths form a right triangle: D² = x² + h². D is the direct-line distance from observer to plane. As the plane moves, x changes, h stays fixed, and D changes. Differentiating D² = x² + h² gives 2D·(dD/dt) = 2x·(dx/dt). So dD/dt = (x/D)·(dx/dt). When x is large, D ≈ x and dD/dt ≈ dx/dt — the distance changes at nearly the plane's speed. When x=0 (directly overhead), dD/dt = 0 — at that instant the distance is momentarily not changing.", math:"D^2 = x^2 + h^2 \\Rightarrow 2D\\frac{dD}{dt} = 2x\\frac{dx}{dt} \\Rightarrow \\frac{dD}{dt} = \\frac{x}{D}\\cdot\\frac{dx}{dt}", why:null }} depth={0} ready={ready} dark={dark}/>
       </div>
     </div>
   );
@@ -510,9 +544,10 @@ function ScenariosTab({ ready }) {
 // ════════════════════════════════════════════════════════════════════════════
 // TAB 4: DECISION GUIDE — how to choose the geometric equation
 // ════════════════════════════════════════════════════════════════════════════
-function DecisionTab({ ready }) {
+function DecisionTab({ ready, dark }) {
   const [q1, setQ1] = useState(null);
   const [q2, setQ2] = useState(null);
+  const C = makeC(dark);
 
   const reset = () => { setQ1(null); setQ2(null); };
 
@@ -539,7 +574,7 @@ function DecisionTab({ ready }) {
       </div>
       <div style={{ display:"flex", gap:8, marginBottom:16 }}>
         {[["same","Same object (radius & volume of one balloon)"],["diff","Different positions (plane & observer)"]].map(([v,l]) => (
-          <button key={v} onClick={() => { setQ1(v); setQ2(null); }} style={{ flex:1, padding:"10px 12px", borderRadius:8, border:`0.5px solid ${q1===v?"#7c3aed":"var(--color-border-secondary)"}`, background:q1===v?"#eef2ff":"transparent", color:q1===v?"#3730a3":"var(--color-text-secondary)", fontSize:13, cursor:"pointer", textAlign:"left" }}>
+          <button key={v} onClick={() => { setQ1(v); setQ2(null); }} style={{ flex:1, padding:"10px 12px", borderRadius:8, border:`0.5px solid ${q1===v?"#7c3aed":"var(--color-border-secondary)"}`, background:q1===v?(dark?"#1a1547":"#eef2ff"):"transparent", color:q1===v?(dark?"#c4b5fd":"#3730a3"):"var(--color-text-secondary)", fontSize:13, cursor:"pointer", textAlign:"left" }}>
             {l}
           </button>
         ))}
@@ -551,7 +586,7 @@ function DecisionTab({ ready }) {
           </div>
           <div style={{ display:"flex", gap:8, marginBottom:16 }}>
             {[["same","No — all variables appear directly"],["diff","Yes — there's a proportional relationship or fixed ratio"]].map(([v,l]) => (
-              <button key={v} onClick={() => setQ2(v)} style={{ flex:1, padding:"10px 12px", borderRadius:8, border:`0.5px solid ${q2===v?"#059669":"var(--color-border-secondary)"}`, background:q2===v?"#ecfdf5":"transparent", color:q2===v?"#065f46":"var(--color-text-secondary)", fontSize:13, cursor:"pointer", textAlign:"left" }}>
+              <button key={v} onClick={() => setQ2(v)} style={{ flex:1, padding:"10px 12px", borderRadius:8, border:`0.5px solid ${q2===v?"#059669":"var(--color-border-secondary)"}`, background:q2===v?(dark?"#052e16":"#ecfdf5"):"transparent", color:q2===v?(dark?"#6ee7b7":"#065f46"):"var(--color-text-secondary)", fontSize:13, cursor:"pointer", textAlign:"left" }}>
                 {l}
               </button>
             ))}
@@ -578,8 +613,8 @@ function DecisionTab({ ready }) {
         </div>
       )}
       <div style={{ ...C.card, ...C.purple, marginTop:12 }}>
-        <div style={{ fontSize:12, fontWeight:600, color:"#534AB7", marginBottom:4 }}>Remember: the geometric equation is always a fact about the shape</div>
-        <div style={{ fontSize:13, color:"#3C3489", lineHeight:1.7 }}>
+        <div style={{ fontSize:12, fontWeight:600, color:dark?"#c4b5fd":"#534AB7", marginBottom:4 }}>Remember: the geometric equation is always a fact about the shape</div>
+        <div style={{ fontSize:13, color:dark?"#a5b4fc":"#3C3489", lineHeight:1.7 }}>
           It is not derived — it is looked up. Volume of a sphere, Pythagorean theorem, similar triangle ratios.
           The calculus only starts when you differentiate that fact with respect to time.
           If you're stuck on step 1, you're stuck on geometry, not calculus.
@@ -594,7 +629,9 @@ function DecisionTab({ ready }) {
 // ════════════════════════════════════════════════════════════════════════════
 export default function RelatedRatesEngine({ params = {} }) {
   const ready = useMath();
+  const dark = useIsDark();
   const [tab, setTab] = useState("machine");
+  const C = makeC(dark);
 
   const TABS = [
     ["machine",   "The machine",    "#7c3aed"],
@@ -607,10 +644,10 @@ export default function RelatedRatesEngine({ params = {} }) {
     <div style={{ fontFamily:"var(--font-sans,system-ui)", padding:"4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...C.card, borderLeft:"3px solid #7c3aed", borderRadius:0, background:"#eef2ff", marginBottom:14 }}>
+      <div style={{ ...C.card, borderLeft:"3px solid #7c3aed", borderRadius:0, background:dark?"#1a1547":"#eef2ff", marginBottom:14 }}>
         <div style={{ fontSize:11, fontWeight:600, color:"#7c3aed", letterSpacing:".07em", textTransform:"uppercase", marginBottom:3 }}>Related Rates — Abstract Intuition</div>
-        <div style={{ fontSize:15, fontWeight:500, color:"#3730a3", marginBottom:4 }}>The Machine Behind Every Problem</div>
-        <div style={{ fontSize:13, color:"#4338ca", lineHeight:1.7 }}>
+        <div style={{ fontSize:15, fontWeight:500, color:dark?"#c4b5fd":"#3730a3", marginBottom:4 }}>The Machine Behind Every Problem</div>
+        <div style={{ fontSize:13, color:dark?"#a5b4fc":"#4338ca", lineHeight:1.7 }}>
           Every related rates problem is the same machine: two quantities locked by geometry, the Chain Rule connecting their speeds.
           This viz teaches the structure so you can apply it to anything — balloon, plane, ladder, shadow, cone.
         </div>
@@ -622,10 +659,10 @@ export default function RelatedRatesEngine({ params = {} }) {
         ))}
       </div>
 
-      {tab === "machine"   && <div style={{animation:"sd .2s ease-out"}}><MachineTab  ready={ready}/></div>}
-      {tab === "anatomy"   && <div style={{animation:"sd .2s ease-out"}}><AnatomyTab  ready={ready}/></div>}
-      {tab === "scenarios" && <div style={{animation:"sd .2s ease-out"}}><ScenariosTab ready={ready}/></div>}
-      {tab === "decision"  && <div style={{animation:"sd .2s ease-out"}}><DecisionTab  ready={ready}/></div>}
+      {tab === "machine"   && <div style={{animation:"sd .2s ease-out"}}><MachineTab  ready={ready} dark={dark}/></div>}
+      {tab === "anatomy"   && <div style={{animation:"sd .2s ease-out"}}><AnatomyTab  ready={ready} dark={dark}/></div>}
+      {tab === "scenarios" && <div style={{animation:"sd .2s ease-out"}}><ScenariosTab ready={ready} dark={dark}/></div>}
+      {tab === "decision"  && <div style={{animation:"sd .2s ease-out"}}><DecisionTab  ready={ready} dark={dark}/></div>}
     </div>
   );
 }
