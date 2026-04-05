@@ -1719,30 +1719,135 @@ RULES:
     id: 'viz-component',
     label: 'New Viz Component',
     color: 'violet',
-    prompt: `You are building a new visualization React component for open-calc.
+    prompt: `═══════════════════════════════════════════════
+FILL THIS IN — replace before sending
+═══════════════════════════════════════════════
+TOPIC: [e.g. "The unit circle — interactive, drag the angle point around the circle and watch sin/cos/tan update live"]
+STYLE: [canvas (D3 SVG math graph) | prose (sliders, toggles, step-through panels) | both]
 
-FILE TARGET: src/components/viz/react/MyComponent.jsx
+═══════════════════════════════════════════════
+WHAT YOU ARE BUILDING
+═══════════════════════════════════════════════
+A self-contained React component that teaches one math/STEM concept visually and interactively.
+It renders inside a lesson card — roughly 300–500px tall, full container width.
+Students interact with it: drag points, move sliders, step through stages, watch values update live.
+The goal is to make the concept physically tangible — not just a static diagram.
 
-COMPONENT RULES:
-1. One file, one default export — the React component
-2. Props signature: ({ params = {} }) — read config from params if needed
-3. Self-contained — no external data file imports, no CSS module imports
-4. Styling: inline styles or Tailwind classes only (no styled-components)
-5. No document.querySelector outside useEffect. Clean up all effects on unmount.
-6. Responsive: do not use height: 100vh. Render inside a card of natural height.
-7. Dark mode: check document.documentElement.classList.contains('dark') or listen for class changes via MutationObserver.
-8. Available globals: React, three (as 'three'), d3 (as 'd3'). No other external libs.
-9. Keep the component under 400 lines. Move sub-components into the same file.
+File: src/components/viz/react/MyComponent.jsx
+One file, one default export. No TypeScript. Vite + React 18 + JSX.
+Props: ({ params = {} }) — params is optional config from the lesson.
 
-REGISTRATION — add one line to src/components/viz/VizFrame.jsx inside VIZ_REGISTRY:
-  MyComponent: lazy(() => import('./react/MyComponent.jsx')),
+═══════════════════════════════════════════════
+DARK MODE — copy this hook verbatim into the file
+═══════════════════════════════════════════════
+function useIsDark() {
+  const isDark = () => document.documentElement.classList.contains('dark');
+  const [dark, setDark] = useState(isDark);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(isDark()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
+}
+// In draw() or render: const dark = useIsDark();
+// Then produce a color object branching on dark, e.g.:
+// const C = {
+//   bg:    dark ? '#0f172a' : '#ffffff',   // slate-900 / white
+//   panel: dark ? '#1e293b' : '#f1f5f9',   // slate-800 / slate-100
+//   axis:  dark ? '#475569' : '#94a3b8',   // slate-600 / slate-400
+//   curve: dark ? '#38bdf8' : '#0284c7',   // sky-400 / sky-600
+//   accent:dark ? '#34d399' : '#059669',   // emerald-400 / emerald-600
+//   warn:  dark ? '#fbbf24' : '#d97706',   // amber-400 / amber-600
+//   point: dark ? '#f472b6' : '#db2777',   // pink-400 / pink-700
+//   text:  dark ? '#94a3b8' : '#64748b',   // slate-400 / slate-500
+// };
 
-USAGE in a lesson file:
-  visualizations: [{ id: 'MyComponent', title: 'Display Title', props: { key: value } }]
+═══════════════════════════════════════════════
+CSS VARIABLES (defined in the app — safe to use)
+═══════════════════════════════════════════════
+var(--color-surface)     // #ffffff light / #0f172a dark — card background
+var(--color-border)      // #e2e8f0 light / #334155 dark — borders
+var(--color-text-muted)  // #64748b light / #94a3b8 dark — captions
 
-VALIDATION:
-  Run: npm run build
-  No TypeScript, no JSX transform issues — the project uses standard Vite + React 18.`,
+═══════════════════════════════════════════════
+CANVAS PATTERN — for math graphs, geometry, animations
+═══════════════════════════════════════════════
+import { useRef, useEffect, useState } from 'react';
+
+export default function MyComponent({ params = {} }) {
+  const dark = useIsDark();
+  const containerRef = useRef(null);
+  const svgRef = useRef(null);
+  const [value, setValue] = useState(1); // example slider state
+
+  useEffect(() => {
+    const draw = () => {
+      const C = { bg: dark ? '#0f172a' : '#ffffff', curve: dark ? '#38bdf8' : '#0284c7' /* etc */ };
+      const W = containerRef.current?.clientWidth || 480;
+      const H = 260;
+      // d3 is available globally — do NOT import it
+      const svg = d3.select(svgRef.current);
+      svg.selectAll('*').remove();
+      svg.attr('width', W).attr('height', H);
+      // build scales, draw axes, paths, circles...
+    };
+    const ro = new ResizeObserver(draw);
+    if (containerRef.current) ro.observe(containerRef.current);
+    draw();
+    return () => ro.disconnect();
+  }, [dark, value]); // re-draw on theme change OR state change
+
+  return (
+    <div ref={containerRef} style={{ padding: 12 }}>
+      <input type="range" min={0} max={10} step={0.1} value={value}
+        onChange={e => setValue(+e.target.value)} style={{ width: '100%', accentColor: '#38bdf8' }} />
+      <svg ref={svgRef} style={{ width: '100%', display: 'block', borderRadius: 8,
+        background: 'var(--color-surface)', border: '1px solid var(--color-border)' }} />
+    </div>
+  );
+}
+
+═══════════════════════════════════════════════
+PROSE + TOGGLES PATTERN — for step-through, comparisons, interactive panels
+═══════════════════════════════════════════════
+export default function MyComponent({ params = {} }) {
+  const dark = useIsDark();
+  const [step, setStep] = useState(0);
+  const panel = dark ? '#1e293b' : '#f1f5f9';
+  const border = dark ? '#334155' : '#e2e8f0';
+  const text   = dark ? '#e2e8f0' : '#1e293b';
+  const muted  = dark ? '#94a3b8' : '#64748b';
+
+  const steps = ['Step 1 content', 'Step 2 content', 'Step 3 content'];
+  return (
+    <div style={{ background: panel, borderRadius: 12, padding: 16, border: \`1px solid \${border}\` }}>
+      <p style={{ color: text, fontSize: 14 }}>{steps[step]}</p>
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <button onClick={() => setStep(s => Math.max(0, s - 1))}
+          style={{ padding: '6px 14px', borderRadius: 6, background: dark ? '#334155' : '#e2e8f0', color: text, border: 'none', cursor: 'pointer' }}>← Back</button>
+        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))}
+          style={{ padding: '6px 14px', borderRadius: 6, background: '#0284c7', color: '#fff', border: 'none', cursor: 'pointer' }}>Next →</button>
+      </div>
+    </div>
+  );
+}
+
+═══════════════════════════════════════════════
+AVAILABLE GLOBALS (do NOT import these)
+═══════════════════════════════════════════════
+d3    — full D3 library (scales, shapes, selections, transitions)
+THREE — Three.js for 3D
+
+═══════════════════════════════════════════════
+HARD RULES
+═══════════════════════════════════════════════
+- No CSS files, no CSS modules, no styled-components — inline styles only
+- No document.querySelector outside useEffect
+- No height: 100vh — use natural heights
+- Always return a cleanup: () => { ro.disconnect(); cancelAnimationFrame(raf); }
+- Under 500 lines. All sub-components in the same file.
+- No TypeScript, no prop-types`,
   },
   {
     id: 'new-course',
