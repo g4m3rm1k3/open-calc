@@ -97,6 +97,101 @@ export default {
         mathBridge: 'The visualization shows $\\mathbf{b}$ as a vector NOT in the column space of $A$ (a 2D plane in 3D). The blue vector is the projection $A\\hat{\\mathbf{x}}$ — the closest point in the column space. The red vector is the residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$. Confirm that the red vector is perpendicular to the blue plane. Drag $\\mathbf{b}$ — watch the projection update.',
         caption: 'Least squares = project b onto the column space of A.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Least Squares and Linear Regression',
+        mathBridge: 'np.linalg.lstsq(A, b) solves the normal equations. x̂ = (AᵀA)⁻¹Aᵀb. Residual = b − Ax̂. Linear regression: A = [x | 1], b = y-values, solution gives slope and intercept.',
+        caption: 'Solve overdetermined systems and fit a best-fit line through data using the normal equations.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Solving an overdetermined system',
+              prose: [
+                'An overdetermined system (more equations than unknowns) usually has no exact solution. Least squares finds the x̂ that minimizes ‖b − Ax‖².',
+                '`np.linalg.lstsq(A, b, rcond=None)` solves this directly. Compare to directly applying the normal equations.',
+              ],
+              code: `import numpy as np
+
+# 3 equations, 2 unknowns — no exact solution
+A = np.array([[1., 1.],
+              [1., 2.],
+              [1., 3.]])
+b = np.array([2., 3., 4.5])
+
+# Method 1: lstsq
+x_hat, residuals, _, _ = np.linalg.lstsq(A, b, rcond=None)
+print("Least squares solution:", x_hat)
+
+# Method 2: normal equations (A^T A x = A^T b)
+x_normal = np.linalg.solve(A.T @ A, A.T @ b)
+print("Normal equations solution:", x_normal)
+print("Same?", np.allclose(x_hat, x_normal))
+print()
+
+# Residual
+e = b - A @ x_hat
+print(f"Residual vector: {e.round(4)}")
+print(f"‖residual‖ = {np.linalg.norm(e):.4f}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Linear regression as least squares',
+              prose: [
+                'Fitting the line y = ax + c to data points is a least squares problem.',
+                'Build the matrix A with a column of x-values and a column of ones. Solve for [a, c].',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER
+
+# Data points: study hours vs. exam score
+hours = [2., 4., 5., 7., 9., 10., 12.]
+scores = [51., 65., 68., 76., 82., 87., 92.]
+
+x = np.array(hours)
+y = np.array(scores)
+
+# Build A: [x | 1]
+A = np.column_stack([x, np.ones_like(x)])
+b = y
+
+# Solve
+coeffs, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
+slope, intercept = coeffs
+print(f"Best-fit line: y = {slope:.2f}x + {intercept:.2f}")
+
+# Visualize
+fig = Figure(xmin=0, xmax=14, ymin=40, ymax=100,
+             title="Linear Regression via Least Squares")
+fig.grid().axes()
+fig.scatter(x.tolist(), y.tolist(), color=BLUE, radius=6, labels=None)
+fig.plot(lambda t: slope * t + intercept, color=AMBER,
+         label=f"y={slope:.1f}x+{intercept:.1f}")
+fig.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Fit a quadratic',
+              difficulty: 'hard',
+              prompt: 'The data below follows a quadratic pattern y ≈ ax² + bx + c. Build the matrix A with columns [x², x, 1] and use np.linalg.lstsq to find the best-fit quadratic. Then plot the data (scatter) and the fitted curve (fig.plot(lambda t: ...)) on the same figure.',
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER
+
+x = np.array([0., 1., 2., 3., 4., 5., 6.])
+y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
+
+# Build A with columns [x², x, 1]
+# Solve with lstsq
+# Plot scatter + fitted curve
+`,
+              hint: 'A = np.column_stack([x**2, x, np.ones_like(x)]). coeffs, _, _, _ = np.linalg.lstsq(A, y, rcond=None). a, b, c = coeffs. Then fig.plot(lambda t: a*t**2 + b*t + c, ...).',
+            },
+          ]
+        }
+      },
     ],
   },
 

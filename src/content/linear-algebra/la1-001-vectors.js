@@ -94,6 +94,93 @@ export default {
         mathBridge: 'The visualization shows the right triangle formed by the vector. Drag the vector to $[3, 4]$ and observe the resulting magnitude of exactly $5$. Notice how the Pythagorean theorem connects the orthogonal components to the direct path.',
         caption: 'Calculating vector magnitude using perpendicular components.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Vectors in NumPy',
+        mathBridge: 'A numpy array IS a vector. np.array([3, 4]) creates the column vector [3, 4]^T. np.linalg.norm(v) computes ‖v‖ = √(3²+4²) = 5. Dividing by the norm gives the unit vector.',
+        caption: 'Run each cell to see the math formulas become one-liners in code.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Vectors: creation, addition, scalar multiplication',
+              prose: [
+                'A `numpy` array is a vector. The two fundamental operations — addition and scalar multiplication — are `+` and `*`.',
+                'Notice that `2 * a` stretches the vector, `-1 * a` flips it, and `a + b` follows the tip-to-tail rule.',
+              ],
+              code: `import numpy as np
+
+a = np.array([3.0, 1.0])
+b = np.array([1.0, 2.0])
+
+print("a =", a)
+print("b =", b)
+print("a + b =", a + b)       # tip-to-tail
+print("2 * a =", 2 * a)       # stretch
+print("-1 * a =", -1 * a)     # flip direction
+print("a - b =", a - b)       # a + (-b)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Magnitude and unit vectors',
+              prose: [
+                '`np.linalg.norm(v)` computes ‖v‖ = √(v₁² + v₂² + …). Dividing by the norm normalizes to a unit vector.',
+                'The vector [3, 4] is the classic 3-4-5 right triangle. Its unit vector is [0.6, 0.8] — verify: 0.6² + 0.8² = 1. ✓',
+              ],
+              code: `import numpy as np
+
+v = np.array([3.0, 4.0])
+
+magnitude = np.linalg.norm(v)
+unit = v / magnitude
+
+print(f"v = {v}")
+print(f"‖v‖ = {magnitude}")       # should be 5.0
+print(f"unit vector = {unit}")    # [0.6, 0.8]
+print(f"‖unit‖ = {np.linalg.norm(unit):.6f}")  # should be 1.0`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Visualize: vector and its unit vector',
+              prose: [
+                'The blue arrow is **v = [3, 4]**. The amber arrow is its unit vector — same direction, length 1.',
+                'Scaling the unit vector by the magnitude reconstructs the original: 5 × [0.6, 0.8] = [3, 4].',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER
+
+v = np.array([3.0, 4.0])
+unit = v / np.linalg.norm(v)
+
+fig = Figure(square=True, xmin=-1, xmax=5, ymin=-1, ymax=5,
+             title="Vector and its Unit Vector")
+fig.grid().axes()
+fig.vector(v.tolist(), color=BLUE, label="v = [3,4]")
+fig.vector(unit.tolist(), color=AMBER, label="unit v")
+fig.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Normalize a vector',
+              difficulty: 'easy',
+              prompt: 'Given w = [-6, 8], compute: (1) its magnitude (should be 10), (2) its unit vector, (3) verify the unit vector has magnitude 1. Then compute the angle between w and the positive x-axis using np.degrees(np.arctan2(y, x)).',
+              code: `import numpy as np
+
+w = np.array([-6.0, 8.0])
+
+# 1. magnitude
+# 2. unit vector
+# 3. verify ‖unit‖ = 1
+# 4. angle with x-axis: np.degrees(np.arctan2(w[1], w[0]))
+`,
+              hint: 'np.linalg.norm(w) for magnitude. w / np.linalg.norm(w) for unit. np.arctan2 gives the angle of the vector directly.',
+            },
+          ]
+        }
+      },
     ],
   },
 

@@ -91,6 +91,100 @@ export default {
         mathBridge: 'The complex plane is shown with the unit circle. Each eigenvalue $\\lambda = a + bi$ appears as a point at coordinates $(a, b)$. Drag the eigenvalue point and watch the trajectory of a starting vector as the matrix is applied repeatedly. Points inside the unit circle → spiral in. Outside → spiral out. On the circle → orbit. The angle $\\theta$ from the positive real axis is the rotation angle per step.',
         caption: 'The unit circle separates convergence from divergence.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Complex Eigenvalues and Spirals',
+        mathBridge: 'np.linalg.eig() returns complex eigenvalues automatically. |λ| = np.abs(λ). Angle θ = np.angle(λ). If |λ| < 1 → spirals in; |λ| > 1 → spirals out; |λ| = 1 → pure rotation.',
+        caption: 'Compute complex eigenvalues, extract magnitude and angle, and trace the spiral trajectory of iterated application.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing complex eigenvalues',
+              prose: [
+                'NumPy handles complex eigenvalues automatically. The rotation matrix R_θ has eigenvalues e^{±iθ} — both on the unit circle.',
+                '`np.abs(λ)` gives the magnitude (|λ|). `np.angle(λ)` gives the angle θ in radians.',
+              ],
+              code: `import numpy as np
+
+# 90° rotation matrix
+theta = np.pi / 2
+R = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])
+
+evals, _ = np.linalg.eig(R)
+print("Rotation matrix (90°):")
+print(f"  Eigenvalues: {evals}")
+print(f"  |λ₁| = {abs(evals[0]):.4f}  (on the unit circle)")
+print(f"  angle(λ₁) = {np.degrees(np.angle(evals[0])):.1f}°")
+print()
+
+# Spiral-in: |λ| < 1
+S = 0.9 * R    # rotate 90° AND shrink by 0.9
+evals_s, _ = np.linalg.eig(S)
+print("Shrinking spiral matrix (0.9 × rotation):")
+print(f"  |λ| = {abs(evals_s[0]):.4f}  (< 1 → spiral in)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Tracing the spiral trajectory',
+              prose: [
+                'Apply the matrix repeatedly to a starting vector and plot each step.',
+                'If |λ| < 1, points spiral toward the origin. If |λ| > 1, they spiral outward.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER
+
+# Spiral-in matrix: rotate 30° and scale by 0.85
+theta = np.radians(30)
+r = 0.85
+A = r * np.array([[np.cos(theta), -np.sin(theta)],
+                  [np.sin(theta),  np.cos(theta)]])
+
+# Apply A repeatedly to v0
+v = np.array([3.0, 0.0])
+xs, ys = [float(v[0])], [float(v[1])]
+for _ in range(20):
+    v = A @ v
+    xs.append(float(v[0]))
+    ys.append(float(v[1]))
+
+fig = Figure(square=True, xmin=-4, xmax=4, ymin=-4, ymax=4,
+             title=f"Spiral: |λ|={r}, θ=30°")
+fig.grid().axes()
+fig.scatter(xs, ys, color=BLUE, radius=4)
+
+# Connect points with line segments
+for i in range(len(xs)-1):
+    fig.line([xs[i], ys[i]], [xs[i+1], ys[i+1]], color=AMBER, width=1)
+fig.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Stability classification',
+              difficulty: 'medium',
+              prompt: 'For each matrix below, compute its eigenvalues, find |λ| for each, and classify as: stable (all |λ| < 1), unstable (any |λ| > 1), or neutral (all |λ| = 1). Print your classification and the reason.',
+              code: `import numpy as np
+
+theta = np.radians(45)
+A = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])     # pure rotation
+
+B = 1.1 * A   # rotation + slight growth
+
+C = np.array([[0.5, 0.2],
+              [0.0, 0.8]])   # triangular — eigenvalues are diagonal entries
+
+# For each: compute evals, |λ|, classify stability
+`,
+              hint: 'evals, _ = np.linalg.eig(A). magnitudes = np.abs(evals). All < 1 → stable. Any > 1 → unstable. All = 1 → neutral. Use np.allclose(magnitudes, 1) for the neutral check.',
+            },
+          ]
+        }
+      },
     ],
   },
 

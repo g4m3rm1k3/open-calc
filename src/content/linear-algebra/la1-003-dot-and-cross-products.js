@@ -84,6 +84,88 @@ export default {
         mathBridge: 'Observe the two basis vectors on the floor of the 3D grid. As you drag them apart to form a larger parallelogram, the cross product vector (pointing straight up) grows taller. The key lesson: The height of the new vector is exactly the area of the ground parallelogram.',
         caption: 'The cross product generates a vector whose length equals the swept area.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Dot Product, Angle, Cross Product',
+        mathBridge: 'np.dot(a, b) = Σ aᵢbᵢ. Angle: θ = arccos(a·b / (‖a‖‖b‖)). Cross product (3D only): np.cross(a, b). Its magnitude = area of parallelogram = ‖a‖‖b‖ sin θ.',
+        caption: 'Confirm the geometric meaning of both products with live computation.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Dot product — measuring alignment',
+              prose: [
+                '`np.dot(a, b)` computes the dot product: positive when vectors align, zero when perpendicular, negative when opposing.',
+                'The geometric formula a · b = ‖a‖ ‖b‖ cos θ lets us recover the angle.',
+              ],
+              code: `import numpy as np
+
+a = np.array([1.0, 0.0])   # x-axis
+b = np.array([0.0, 1.0])   # y-axis (perpendicular)
+c = np.array([1.0, 1.0])   # 45° diagonal
+
+print(f"a · b = {np.dot(a, b)}  (orthogonal → 0)")
+print(f"a · c = {np.dot(a, c)}  (partially aligned → positive)")
+print(f"a · (-a) = {np.dot(a, -a)}  (opposing → negative)")
+print()
+
+# Recover the angle: cos θ = (a · b) / (‖a‖ ‖b‖)
+def angle_deg(u, v):
+    cos_t = np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+    return float(np.degrees(np.arccos(np.clip(cos_t, -1, 1))))
+
+p = np.array([3.0, 1.0])
+q = np.array([1.0, 3.0])
+print(f"angle(p, q) = {angle_deg(p, q):.2f}°")
+print(f"angle(a, b) = {angle_deg(a, b):.1f}°  (right angle confirmed)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Cross product — perpendicular and area (3D)',
+              prose: [
+                '`np.cross(a, b)` produces a vector perpendicular to both a and b. Its magnitude equals the area of the parallelogram they span.',
+                'The result is perpendicular to both inputs — verify with dot products.',
+              ],
+              code: `import numpy as np
+
+a = np.array([3.0, 0.0, 0.0])
+b = np.array([0.0, 4.0, 0.0])
+
+axb = np.cross(a, b)
+print(f"a × b = {axb}  (should point in z direction)")
+print(f"‖a × b‖ = {np.linalg.norm(axb)}  (area of parallelogram = 3×4 = 12)")
+print()
+
+# Perpendicularity check
+print(f"(a×b)·a = {np.dot(axb, a):.1f}  (should be 0)")
+print(f"(a×b)·b = {np.dot(axb, b):.1f}  (should be 0)")
+print()
+
+# Anti-commutativity: a×b = -(b×a)
+print(f"b × a = {np.cross(b, a)}  (sign flipped)")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Orthogonality and projection',
+              difficulty: 'medium',
+              prompt: 'Given a = [4, 0] and b = [3, 3]: (1) compute the angle between them, (2) compute the vector projection of b onto a — the formula is (a·b / a·a) * a, (3) verify that b minus its projection is perpendicular to a.',
+              code: `import numpy as np
+
+a = np.array([4.0, 0.0])
+b = np.array([3.0, 3.0])
+
+# 1. angle between a and b
+# 2. vector projection of b onto a
+# 3. perpendicularity check: dot(b - proj, a) ≈ 0
+`,
+              hint: 'proj = (np.dot(a,b) / np.dot(a,a)) * a. Then check np.dot(b - proj, a) is close to zero.',
+            },
+          ]
+        }
+      },
     ],
   },
 

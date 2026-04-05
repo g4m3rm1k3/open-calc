@@ -85,6 +85,106 @@ export default {
         mathBridge: 'Observe two vectors $\\vec{v}_1$ and $\\vec{v}_2$ pointing along the exact same line. Try to adjust $c_1$ and $c_2$ to reach the red point hovering in 2D space. You cannot. The key lesson: Dependent vectors cannot span a higher dimension regardless of how many you add.',
         caption: 'Linearly dependent vectors collapse the span into a lower dimension.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Span, Basis, and Independence',
+        mathBridge: 'Linear independence test: stack vectors as rows, compute np.linalg.matrix_rank(). If rank == number of vectors, they are independent. If rank < n, some are redundant (dependent).',
+        caption: 'See how the algebra of linear combinations connects to the rank test in NumPy.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Building linear combinations',
+              prose: [
+                'A **linear combination** of vectors v₁, v₂ with scalars c₁, c₂ is: c₁v₁ + c₂v₂.',
+                'The set of ALL such combinations (for every possible c₁, c₂) is the **span**.',
+                'Below: see which points you can reach by varying the scalars.',
+              ],
+              code: `import numpy as np
+
+v1 = np.array([2.0, 0.0])   # points right
+v2 = np.array([0.0, 1.0])   # points up
+
+# Various linear combinations c1*v1 + c2*v2
+combos = [
+    (1, 0),   # just v1
+    (0, 1),   # just v2
+    (2, 3),   # 2v1 + 3v2
+    (-1, 2),  # -v1 + 2v2
+]
+
+for c1, c2 in combos:
+    result = c1 * v1 + c2 * v2
+    print(f"{c1}·{v1} + {c2}·{v2} = {result}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Testing linear independence — rank',
+              prose: [
+                'Stack vectors as rows of a matrix. `np.linalg.matrix_rank()` counts the independent directions.',
+                'If `rank == number of vectors`, they are independent. If rank is less, at least one is a combination of the others.',
+              ],
+              code: `import numpy as np
+
+# Independent: point in different directions
+indep = np.array([[1.0, 0.0],
+                  [0.0, 1.0]])
+
+# Dependent: second = 2 × first
+dep = np.array([[2.0, 1.0],
+                [4.0, 2.0]])  # row 2 = 2 × row 1
+
+print("Independent vectors:")
+print(f"  rank = {np.linalg.matrix_rank(indep)}  (equals 2, the number of vectors → independent)")
+print()
+print("Dependent vectors:")
+print(f"  rank = {np.linalg.matrix_rank(dep)}  (only 1, not 2 → second is redundant)")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Visualize: span of two vectors',
+              prose: [
+                'Two independent vectors span the entire plane — you can reach any point by scaling and adding.',
+                'The amber and blue arrows are the basis vectors. The green arrow shows a specific linear combination.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN
+
+v1 = np.array([2.0, 1.0])
+v2 = np.array([0.0, 1.5])
+c1, c2 = 1.5, 1.0
+combo = c1 * v1 + c2 * v2
+
+fig = Figure(square=True, xmin=-1, xmax=5, ymin=-1, ymax=5,
+             title=f"Linear Combination: {c1}·v1 + {c2}·v2")
+fig.grid().axes()
+fig.vector(v1.tolist(), color=BLUE, label="v1")
+fig.vector(v2.tolist(), color=AMBER, label="v2")
+fig.vector(combo.tolist(), color=GREEN, label=f"{c1}v1+{c2}v2")
+fig.show()`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Find the coefficients',
+              difficulty: 'medium',
+              prompt: 'Given v1 = [1, 2] and v2 = [3, 1], find scalars c1 and c2 such that c1*v1 + c2*v2 = [5, 5]. Set up the system as Ax = b and use np.linalg.solve(). Verify by printing c1*v1 + c2*v2.',
+              code: `import numpy as np
+
+v1 = np.array([1.0, 2.0])
+v2 = np.array([3.0, 1.0])
+target = np.array([5.0, 5.0])
+
+# A = matrix with v1 and v2 as columns
+# Solve A @ [c1, c2] = target
+`,
+              hint: 'A = np.column_stack([v1, v2]) puts v1 and v2 as columns. Then np.linalg.solve(A, target) gives [c1, c2]. Verify: c1*v1 + c2*v2 == target.',
+            },
+          ]
+        }
+      },
     ],
   },
 

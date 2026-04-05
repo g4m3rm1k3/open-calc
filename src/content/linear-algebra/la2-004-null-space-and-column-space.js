@@ -71,7 +71,88 @@ export default {
         body: 'Do not use the columns of the row-reduced matrix as the basis for the Column Space! Row operations change the Column Space. You must trace the pivots back to the completely original matrix $A$.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Null Space and Column Space',
+        mathBridge: 'np.linalg.matrix_rank(A) = number of pivot columns = dim(C(A)). Null space dimension = n − rank (rank-nullity theorem). scipy.linalg.null_space(A) computes a basis for N(A).',
+        caption: 'Find what a matrix destroys (null space) and what it can reach (column space).',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Rank — counting the independent directions',
+              prose: [
+                'The **rank** of A is the number of pivot columns — the dimension of the column space.',
+                'The **rank-nullity theorem**: rank(A) + nullity(A) = n (number of columns).',
+                'nullity = number of free variables = dimension of the null space.',
+              ],
+              code: `import numpy as np
+
+# Full rank: det ≠ 0
+A = np.array([[1., 2.], [3., 4.]])
+
+# Rank-deficient: row 2 = 3 × row 1
+B = np.array([[1., 2.], [3., 6.]])
+
+print(f"rank(A) = {np.linalg.matrix_rank(A)}  (full rank, 2×2 → only the zero vector in null space)")
+print(f"rank(B) = {np.linalg.matrix_rank(B)}  (rank 1, nullity = 2-1 = 1 → 1D null space)")
+print()
+
+# Rank-nullity theorem for B (2 columns)
+rank_B = np.linalg.matrix_rank(B)
+nullity_B = B.shape[1] - rank_B
+print(f"rank(B) + nullity(B) = {rank_B} + {nullity_B} = {rank_B + nullity_B} = n ✓")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Computing the null space',
+              prose: [
+                'The null space is all vectors x such that Ax = 0.',
+                '`scipy.linalg.null_space(A)` returns an orthonormal basis for N(A). Verify by checking A @ null_vec ≈ 0.',
+              ],
+              code: `import numpy as np
+from scipy import linalg
+
+# B has a 1D null space (row 2 = 3 × row 1)
+B = np.array([[1., 2.],
+              [3., 6.]])
+
+null_B = linalg.null_space(B)
+print("Null space basis vector:")
+print(null_B)
+print()
+
+# Verify: B @ null_vec = 0
+print("B @ null_vec =", (B @ null_B).round(10))
+print("(all zeros → null space confirmed)")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Rank-nullity in action',
+              difficulty: 'medium',
+              prompt: 'For the matrix A below: (1) compute its rank, (2) compute the nullity (= n − rank), (3) find the null space basis using scipy.linalg.null_space, (4) verify each basis vector satisfies Av = 0.',
+              code: `import numpy as np
+from scipy import linalg
+
+A = np.array([[1., 2., 3.],
+              [2., 4., 6.],
+              [1., 1., 2.]])
+
+# 1. rank
+# 2. nullity = n - rank (n = 3 columns)
+# 3. null_space basis
+# 4. verify each column of null_basis satisfies A @ col ≈ 0
+`,
+              hint: 'np.linalg.matrix_rank(A). null_basis = linalg.null_space(A). Each column of null_basis is a basis vector. Check np.allclose(A @ null_basis, 0).',
+            },
+          ]
+        }
+      },
+    ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────

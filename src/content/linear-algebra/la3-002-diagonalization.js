@@ -91,6 +91,96 @@ export default {
         mathBridge: 'Enter a 2×2 matrix. The stepper walks through: (1) finding eigenvalues from the characteristic equation, (2) finding eigenvectors for each eigenvalue, (3) assembling $P$ and $D$, (4) verifying $AP = PD$. At each step, the computation is shown in full. Change the matrix and repeat.',
         caption: 'Diagonalization made step-by-step explicit.',
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Diagonalization and Matrix Powers',
+        mathBridge: 'A = P D P⁻¹. eig() gives P and D. A^k = P D^k P⁻¹ — raise diagonal entries to the k-th power, no repeated multiplication. Verify: P @ D @ P_inv ≈ A.',
+        caption: 'Diagonalize a matrix, then use it to compute high matrix powers instantly.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Building P and D from eigenvalues',
+              prose: [
+                '`np.linalg.eig(A)` gives the eigenvector matrix P and eigenvalue array. Put eigenvalues on the diagonal of D.',
+                'Verify: `P @ D @ P_inv ≈ A`. If it does not match, something went wrong.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[4., 1.],
+              [2., 3.]])
+
+evals, P = np.linalg.eig(A)
+
+# D = diagonal matrix of eigenvalues
+D = np.diag(evals)
+P_inv = np.linalg.inv(P)
+
+print("Eigenvalues:", evals)
+print()
+print("P (eigenvectors as columns):")
+print(P.round(4))
+print()
+print("Reconstructed A = P @ D @ P_inv:")
+print((P @ D @ P_inv).real.round(6))
+print()
+print("Matches original A?", np.allclose((P @ D @ P_inv).real, A))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Matrix powers via diagonalization',
+              prose: [
+                'A^k = P D^k P⁻¹. Raising D to the k-th power just raises each diagonal entry (eigenvalue) to the k-th power.',
+                'This makes computing A^100 as easy as A^2 — no repeated matrix multiplication.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[3., 1.],
+              [0., 2.]])
+
+evals, P = np.linalg.eig(A)
+P_inv = np.linalg.inv(P)
+
+def matrix_power_diag(A, P, evals, P_inv, k):
+    Dk = np.diag(evals ** k)
+    return (P @ Dk @ P_inv).real.round(6)
+
+# Verify with numpy's built-in matrix power
+k = 5
+A_power_diag = matrix_power_diag(A, P, evals, P_inv, k)
+A_power_numpy = np.linalg.matrix_power(A, k).astype(float)
+
+print(f"A^{k} via diagonalization:")
+print(A_power_diag)
+print()
+print(f"A^{k} via numpy:")
+print(A_power_numpy)
+print()
+print("Match:", np.allclose(A_power_diag, A_power_numpy))`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Diagonalize and compute A^10',
+              difficulty: 'hard',
+              prompt: 'Diagonalize A = [[2, 1],[1, 2]]. Then compute A^10 using P D^10 P⁻¹. Verify against np.linalg.matrix_power(A, 10). Finally, print the eigenvalues — what symmetry do you notice about a symmetric matrix\'s eigenvalues?',
+              code: `import numpy as np
+
+A = np.array([[2., 1.],
+              [1., 2.]])
+
+# 1. compute evals and P via np.linalg.eig(A)
+# 2. compute A^10 using P @ diag(evals**10) @ P_inv
+# 3. verify against np.linalg.matrix_power(A, 10)
+# 4. comment on the eigenvalues (are they real? symmetric?)
+`,
+              hint: 'evals, P = np.linalg.eig(A). Dk = np.diag(evals**10). A10 = (P @ Dk @ np.linalg.inv(P)).real. Symmetric matrices always have real eigenvalues.',
+            },
+          ]
+        }
+      },
     ],
   },
 
