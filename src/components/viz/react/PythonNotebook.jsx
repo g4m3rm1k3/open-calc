@@ -572,6 +572,7 @@ export default function PythonNotebook({ params, onParamChange }) {
   const [showHelp, setShowHelp] = useState(false)
 
   // Use initialCells from params if provided, otherwise fallback to STARTER_CELLS
+  const disableRunAll = params?.disableRunAll ?? false
   const initialCells = params?.initialCells || STARTER_CELLS
   const [cells, setCells] = useState(initialCells)
   const [isExecuting, setIsExecuting] = useState(false)
@@ -769,6 +770,7 @@ export default function PythonNotebook({ params, onParamChange }) {
             }}>
             {showHelp ? '✕ Close Help' : 'Help & API'}
           </button>
+          {!disableRunAll && (
           <button onClick={runAll} disabled={isExecuting}
             style={{
               fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
@@ -777,6 +779,7 @@ export default function PythonNotebook({ params, onParamChange }) {
             }}>
             ▶ Run all
           </button>
+          )}
           <button onClick={addCell}
             style={{
               fontSize: 12, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',

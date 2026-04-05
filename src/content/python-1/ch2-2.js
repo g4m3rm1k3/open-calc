@@ -74,6 +74,7 @@ export default {
         mathBridge: 'dot(a,b) = |a||b|cos θ. det(A) = area scale. Av = λv defines eigenvectors. np.linalg.solve(A, b) solves Ax = b without computing A⁻¹.',
         caption: 'Work through every cell. The transformation and eigenvector visualizations make the abstract geometry concrete.',
         props: {
+          disableRunAll: true,
           initialCells: [
 
             // ── VECTORS ───────────────────────────────────────────────────────

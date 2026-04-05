@@ -71,6 +71,7 @@ export default {
         mathBridge: 'Element-wise: (a + b)_i = a_i + b_i. Dot product: a · b = Σ aᵢbᵢ. Broadcasting: scalar s applied to array a gives (s · aᵢ).',
         caption: 'Work through every cell. The final cells reveal how numpy powers smooth opencalc visualizations.',
         props: {
+          disableRunAll: true,
           initialCells: [
 
             // ── THE LOOP PROBLEM ─────────────────────────────────────────────

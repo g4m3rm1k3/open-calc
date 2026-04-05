@@ -25,6 +25,8 @@ import ch1_6 from './ch1-6.js'
 import ch2_1 from './ch2-1.js'
 import ch2_2 from './ch2-2.js'
 import ch2_3 from './ch2-3.js'
+import ch2_4 from './ch2-4.js'
+import ch3_1 from './ch3-1.js'
 
 export default [
   {
@@ -122,5 +124,17 @@ export default [
     title: 'Systems & Geometry',
     course: 'python-1',
     lessons: [ch2_3]
+  },
+  {
+    number: 2.4,
+    title: 'Performance Thinking',
+    course: 'python-1',
+    lessons: [ch2_4]
+  },
+  {
+    number: 3.1,
+    title: 'Tabular Data Model',
+    course: 'python-1',
+    lessons: [ch3_1]
   }
 ]

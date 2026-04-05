@@ -73,6 +73,7 @@ export default {
         mathBridge: 'Ax = b: each row is a hyperplane. The solution is their intersection. rank(A) + nullity(A) = n. κ(A) = σ_max / σ_min.',
         caption: 'Work through every cell — the transformed_grid visualization makes the geometry of transformations concrete.',
         props: {
+          disableRunAll: true,
           initialCells: [
 
             // ── TWO LINES: GEOMETRIC VIEW ─────────────────────────────────────
