@@ -182,6 +182,7 @@ const VIZ_REGISTRY = {
   LALesson12_SVD: lazy(() => import("./react/LALesson_Placeholder.jsx")),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
+  ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
   JS1_DomIntro: lazy(() => import("./react/JS1_DomIntro.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
