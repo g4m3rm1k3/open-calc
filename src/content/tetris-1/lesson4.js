@@ -945,7 +945,7 @@ renderBoard(cells,boardData,activePiece);`,
 export default {
   id: 'tetris-04-keyboard-control',
   slug: 'tetris-keyboard-control',
-  chapter: 'tetris.4',
+  chapter: 'tetris.1',
   order: 4,
   title: 'Keyboard Control',
   subtitle: 'Wire up arrow keys using addEventListener — and learn how event-driven code coexists with a game loop',

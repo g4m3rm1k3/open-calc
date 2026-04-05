@@ -97,4 +97,11 @@ export const COURSES = [
     desc: 'G-Code, Kinematics & Logic',
     color: 'slate'
   },
+  {
+    key: 'git-logic',
+    label: 'Git Systems',
+    path: '/course/git-logic',
+    desc: 'Content-Addressable Versions & Logic',
+    color: 'emerald'
+  },
 ];

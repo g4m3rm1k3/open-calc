@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { CNCInterpreter } from '../../../scripts/cnc/CNCInterpreter.js'
 import CNCBackplot from './CNCBackplot.jsx'
 
@@ -275,23 +275,45 @@ const DIALECTS = ['fanuc', 'okuma', 'siemens']
 const DIALECT_LABELS = { fanuc: 'FANUC', okuma: 'OKUMA OSP', siemens: 'SIEMENS 840D' }
 const DIALECT_COLORS = { fanuc: '#3b82f6', okuma: '#f59e0b', siemens: '#10b981' }
 
-const C = {
-  bg:      '#0f172a',
-  surface: '#1e293b',
-  border:  '#334155',
-  text:    '#f1f5f9',
-  muted:   '#94a3b8',
-  hint:    '#475569',
-  green:   '#4ade80',
-  amber:   '#fbbf24',
-  red:     '#f87171',
-  blue:    '#38bdf8',
-  teal:    '#2dd4bf',
-  purple:  '#a78bfa',
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fanuc', lessonProgram = null }) {
+  // Theme awareness
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'))
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  const C = useMemo(() => isDark ? {
+    bg:      '#0f172a',
+    surface: '#1e293b',
+    border:  '#334155',
+    text:    '#f1f5f9',
+    muted:   '#94a3b8',
+    hint:    '#475569',
+    green:   '#4ade80',
+    amber:   '#fbbf24',
+    red:     '#f87171',
+    blue:    '#38bdf8',
+    teal:    '#2dd4bf',
+    purple:  '#a78bfa',
+  } : {
+    bg:      '#f1f5f9',
+    surface: '#ffffff',
+    border:  '#cbd5e1',
+    text:    '#0f172a',
+    muted:   '#475569',
+    hint:    '#94a3b8',
+    green:   '#16a34a',
+    amber:   '#d97706',
+    red:     '#dc2626',
+    blue:    '#2563eb',
+    teal:    '#0d9488',
+    purple:  '#7c3aed',
+  }, [isDark])
   // ── Dialect & machine ──────────────────────────────────────────────────────
   const [dialect, setDialect] = useState(initialDialect)
   const [singleBlock, setSingleBlock] = useState(false)
@@ -337,7 +359,12 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
     const snaps = preview.runAll(12000)
     // Use work coords (X/Y/Z) not machine coords: MZ includes TLO which
     // offsets the whole path upward relative to the workpiece visually.
-    setPathPoints(snaps.map(s => ({ machineX: s.X ?? 0, machineY: s.Y ?? 0, machineZ: s.Z ?? 0 })))
+    setPathPoints(snaps.map(s => ({ 
+      machineX: s.X ?? 0, 
+      machineY: s.Y ?? 0, 
+      machineZ: s.Z ?? 0,
+      motionMode: s.motionMode
+    })))
     stepCountRef.current = 0
     setCurrentStep(0)
     setMachineState({ ...interp.state })
@@ -994,8 +1021,8 @@ export default function CNCLab({ initialCode = '', dialect: initialDialect = 'fa
 
         {/* ── RIGHT: Backplot + Program trace ─────────────────────────── */}
         <div className="flex flex-col flex-1 min-w-0">
-          <div className="flex-1" style={{ minHeight: 360 }}>
-            <CNCBackplot pathPoints={pathPoints} currentStep={currentStep} height="360" />
+          <div className="flex-[3] relative" style={{ minHeight: 480 }}>
+            <CNCBackplot pathPoints={pathPoints} currentStep={currentStep} width="100%" height="100%" isDark={isDark} />
           </div>
 
           {/* Program trace */}
