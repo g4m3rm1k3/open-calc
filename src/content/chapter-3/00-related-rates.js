@@ -153,6 +153,145 @@ export default {
         mathBridge: "The gear animation shows the abstract structure: two quantities locked by a geometric equation, the chain rule as the transmitting gear. The Anatomy tab shows the same three-step structure across four different problem types simultaneously. The Scenarios tab shows five classic problems reduced to their geometric equation and rates equation. Use the 'Which equation?' decision guide when you are stuck on step 1.",
         caption: "Use the Anatomy and Scenarios tabs to see that every related rates problem — balloon, ladder, plane, cone, shadow — is the same three-step structure. Only the geometric equation changes.",
       },
+      {
+        id: 'PythonNotebook',
+        title: 'Python Lab: Compute & Visualize Related Rates',
+        caption: 'Run each cell to numerically verify the classic related-rates results. Modify parameters and re-run to build intuition for how geometry drives the rates.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'The 5-Step Method — Ladder Problem',
+              prose: [
+                '**The Setup**: A 10-ft ladder leans against a wall. The base slides away at $dx/dt = 2$ ft/s.',
+                'We want $dy/dt$ when $x = 6$ ft.',
+                '## The 5 Steps',
+                '- **Step 1** — Constraint: $x^2 + y^2 = 100$',
+                '- **Step 2** — Differentiate: $2x\\dot{x} + 2y\\dot{y} = 0$',
+                '- **Step 3** — Find y at $x=6$: $y = \\sqrt{100 - 36} = 8$',
+                '- **Step 4** — Substitute: $2(6)(2) + 2(8)\\dot{y} = 0$',
+                '- **Step 5** — Solve: $\\dot{y} = -3/2$ ft/s',
+              ],
+              instructions: 'Change `x0` to 3, 8, or 9.9 and re-run. Watch dy_dt blow up as the ladder approaches the floor!',
+              code: `import math
+
+# ── Ladder parameters (try changing x0) ──
+L    = 10.0   # ladder length (ft)
+dx   = 2.0    # base sliding speed (ft/s)
+x0   = 6.0    # position of base at the instant we care about
+
+# Step 3: find y
+y0 = math.sqrt(L**2 - x0**2)
+
+# Step 5: solve for dy/dt from 2x dx/dt + 2y dy/dt = 0
+dy = -(x0 / y0) * dx
+
+print(f"Ladder length L = {L} ft")
+print(f"Base position  x = {x0} ft")
+print(f"Top position   y = {y0:.4f} ft")
+print(f"dx/dt = {dx} ft/s  (base sliding out)")
+print(f"dy/dt = {dy:.4f} ft/s  (top sliding down)")
+print()
+print(f"Ratio |dy/dt| / dx/dt = {abs(dy/dx):.4f}  (= x/y = {x0/y0:.4f})")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: 'Visualize how dy/dt changes across all positions',
+              prose: [
+                'The rate equation is $dy/dt = -(x/y) \\cdot dx/dt$.',
+                'As the ladder approaches horizontal ($y \\to 0$), the ratio $x/y \\to \\infty$, so $|dy/dt| \\to \\infty$.',
+                'This singularity is **physical**, not a math artifact.',
+              ],
+              code: `from opencalc import Figure
+import math
+
+L   = 10.0
+dx  = 2.0
+
+# Plot dy/dt as a function of x from 0 to L
+def dy_dt(x):
+    if x <= 0 or x >= L:
+        return None
+    y = math.sqrt(L**2 - x**2)
+    return -(x / y) * dx
+
+fig = Figure(xmin=0, xmax=10, ymin=-30, ymax=0,
+    title="dy/dt vs x (ladder base position, L=10, dx/dt=2)")
+fig.grid(step=2).axes()
+fig.plot(dy_dt, xmin=0.1, xmax=9.9, color='red', label='dy/dt', width=2.5)
+fig.vline(6, color='amber')
+fig.point([6, dy_dt(6)], color='amber', label=f'x=6: dy/dt={dy_dt(6):.2f}', radius=7)
+fig.text([6.2, -3], 'x = 6 ft', color='amber', size=11)
+fig.hline(-2, color='blue', dashed=True)
+fig.text([1, -2.5], 'dx/dt = 2 ft/s', color='blue', size=10)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: 'Balloon: dV/dt = 100 cm³/s, find dr/dt when r = 5',
+              prose: [
+                'For a sphere: $V = \\tfrac{4}{3}\\pi r^3$ → $\\dfrac{dV}{dt} = 4\\pi r^2 \\dfrac{dr}{dt}$.',
+                'The factor $4\\pi r^2$ is the **surface area** — new volume is added in a thin shell.',
+                'As $r$ grows, the same $dV/dt$ produces a smaller $dr/dt$.',
+              ],
+              instructions: 'Change `dV_dt` or `r_target` and re-run to see how the radius growth rate depends on size.',
+              code: `from opencalc import Figure
+import math
+
+dV_dt    = 100.0   # cm³/s
+r_target = 5.0     # cm
+
+# At r = r_target:
+dr_dt = dV_dt / (4 * math.pi * r_target**2)
+print(f"dV/dt  = {dV_dt} cm³/s")
+print(f"r      = {r_target} cm")
+print(f"4πr²   = {4*math.pi*r_target**2:.4f} cm²  (surface area)")
+print(f"dr/dt  = {dr_dt:.6f} cm/s")
+print()
+print("dr/dt as r increases (same dV/dt):")
+for r in [1, 2, 3, 5, 8, 12]:
+    print(f"  r={r:3d}  dr/dt={dV_dt/(4*math.pi*r**2):.5f} cm/s")
+
+# Plot dr/dt vs r
+fig = Figure(xmin=0, xmax=15, ymin=0, ymax=9,
+    title="dr/dt vs balloon radius (dV/dt=100 cm³/s)")
+fig.grid(step=2).axes()
+fig.plot(lambda r: dV_dt/(4*math.pi*r**2) if r > 0 else None,
+    xmin=0.3, xmax=15, color='green', label='dr/dt', width=2.5)
+fig.point([r_target, dr_dt], color='amber',
+    label=f'r={r_target}: dr/dt≈{dr_dt:.3f}', radius=7)
+fig.show()`,
+              output: '', status: 'idle', figureJson: null,
+            },
+            {
+              id: 4,
+              challengeType: 'write',
+              challengeTitle: 'Your Turn: Two Cars at an Intersection',
+              difficulty: 'medium',
+              prompt: 'Car A heads north at 60 mph, Car B heads west at 80 mph, both toward an intersection.\nWhen A is 5 mi away and B is 12 mi away, find dz/dt (how fast the gap is closing).\n\nConstraint: z² = x² + y²\nDiff: 2z dz/dt = 2x dx/dt + 2y dy/dt\nNote: dx/dt and dy/dt are NEGATIVE (cars approach).',
+              hint: 'z = √(5² + 12²) = 13. dx/dt = -80, dy/dt = -60. Plug into 2z dz/dt = 2x dx/dt + 2y dy/dt and solve.',
+              code: `import math
+
+# ── Fill in the values ──
+x = 12       # Car B distance from intersection (mi)
+y  = 5       # Car A distance from intersection (mi)
+dx = -80     # Car B rate: moving TOWARD intersection
+dy = -60     # Car A rate: moving TOWARD intersection
+
+# Step: compute z
+z = math.sqrt(x**2 + y**2)
+print(f"z (current gap) = {z} mi")
+
+# YOUR CODE: solve for dz/dt using 2z*dz_dt = 2x*dx + 2y*dy
+# dz_dt = ???
+# print(f"dz/dt = {dz_dt:.4f} mph")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+          ]
+        }
+      },
     ],
   },
 
