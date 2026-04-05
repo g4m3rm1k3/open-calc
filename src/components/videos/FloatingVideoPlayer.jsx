@@ -29,6 +29,7 @@ export default function FloatingVideoPlayer() {
   const navigate = useNavigate();
   const dragControls = useDragControls();
   const constraintsRef = useRef(null);
+  const playerRef = useRef(null);
   const { 
     isOpen, isMinimized, currentVideo, lessonId, 
     searchQuery, setSearchQuery, 
@@ -123,7 +124,7 @@ export default function FloatingVideoPlayer() {
     if (!isResizing) return;
     const handleMouseUp = () => setIsResizing(false);
     const handleMouseMove = (e) => {
-      const parent = document.querySelector('[key="expanded-player"]');
+      const parent = playerRef.current;
       if (parent) {
         const rect = parent.getBoundingClientRect();
         const newW = Math.max(480, e.clientX - rect.left);
@@ -345,6 +346,7 @@ export default function FloatingVideoPlayer() {
            }}
            animate={{ opacity: 1, scale: 1 }}
            exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
+           ref={playerRef}
            style={isMobile ? { width: '100%', height: '100%', top: 0, left: 0 } : { width, height }}
            className={`fixed top-0 left-0 z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col group/player ${
              isMobile ? 'rounded-none' : 'rounded-2xl border border-slate-200 dark:border-slate-800'
