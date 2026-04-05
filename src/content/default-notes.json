@@ -78,5 +78,15 @@
     "h": 759,
     "updatedAt": 1775424622581,
     "deleted": false
+  },
+    "ch3-002:intuition": {
+    "text": "Here’s the **fast, first-derivative-test recipe** applied to your function.\n\n---\n\n### 1. Write the function cleanly\n\n$$\nf(x) = -x^3 + 3x^2 + 9x\n$$\n\n---\n\n### 2. Take the derivative\n\n$$\nf'(x) = -3x^2 + 6x + 9 = -3(x^2 - 2x - 3) = -3(x-3)(x+1)\n$$\n\n---\n\n### 3. Find critical points\n\nSet $f'(x)=0$:\n\n$$\n-3(x-3)(x+1)=0 \\Rightarrow x = -1,\\; 3\n$$\n\nThese are your candidates for local extrema.\n\n---\n\n### 4. Do a quick sign check (first derivative test)\n\nUse the factored form $f'(x) = -3(x-3)(x+1)$:\n\n- **For $x < -1$** (say $x=-2$):  \n  $(x-3)<0,\\ (x+1)<0 \\Rightarrow (x-3)(x+1)>0$, then $-3\\cdot(\\text{positive})<0$ → **decreasing**\n\n- **For $-1 < x < 3$** (say $x=0$):  \n  $(x-3)<0,\\ (x+1)>0 \\Rightarrow (x-3)(x+1)<0$, then $-3\\cdot(\\text{negative})>0$ → **increasing**\n\n- **For $x > 3$** (say $x=4$):  \n  $(x-3)>0,\\ (x+1)>0 \\Rightarrow (x-3)(x+1)>0$, then $-3\\cdot(\\text{positive})<0$ → **decreasing**\n\nSo:\n\n- At $x=-1$: derivative goes **negative → positive** → **local minimum**  \n- At $x=3$: derivative goes **positive → negative** → **local maximum**\n\n---\n\n### 5. Get the actual extrema values\n\n- Local min at $x=-1$:\n\n$$\nf(-1) = -(-1)^3 + 3(-1)^2 + 9(-1) = 1 + 3 - 9 = -5\n$$\n\n- Local max at $x=3$:\n\n$$\nf(3) = -27 + 27 + 27 = 27\n$$\n\n---\n\n### Final answer (what you’d write on a test)\n\n- **Local minimum:** at $x=-1$, value $f(-1) = -5$  \n- **Local maximum:** at $x=3$, value $f(3) = 27$  \n\nFast pattern to remember:\n\n1. Compute $f'(x)$  \n2. Solve $f'(x)=0$  \n3. Use sign of $f'$ around each critical point  \n4. Down–up → local min, up–down → local max",
+    "color": "yellow",
+    "ruled": true,
+    "fontIdx": 1,
+    "w": 1365,
+    "h": 816,
+    "updatedAt": 1775425238671,
+    "deleted": false
   }
 }

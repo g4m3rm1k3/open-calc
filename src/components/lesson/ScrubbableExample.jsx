@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from '../math/parseProse.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
+import StickyNote from '../ui/StickyNote.jsx';
 
 function buildVisualizations(example, currentStep) {
   const items = [];
@@ -165,7 +166,7 @@ function getContextualHintLevels(step, prevStep, nextStep) {
   return [level1, level2, level3];
 }
 
-export default function ScrubbableExample({ example, number }) {
+export default function ScrubbableExample({ example, number, lessonId }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -228,10 +229,13 @@ export default function ScrubbableExample({ example, number }) {
     <div className="example-block bg-surface border border-border shadow-sm rounded-xl mb-8 overflow-hidden">
       {/* Header */}
       <div className="bg-slate-50 dark:bg-slate-800/50 px-6 py-4 border-b border-border flex justify-between items-center">
-        <h3 className="font-bold text-slate-800 dark:text-slate-200">
-          Example {number}: {example.title}
-        </h3>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2 min-w-0">
+          <h3 className="font-bold text-slate-800 dark:text-slate-200 truncate">
+            Example {number}: {example.title}
+          </h3>
+          {lessonId && <StickyNote noteId={`${lessonId}:example:${example.id ?? number}`} />}
+        </div>
+        <div className="flex items-center gap-2 text-xs flex-shrink-0">
           <span className="px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200 font-semibold">Points: {score}</span>
           <span className="px-2 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 font-semibold">Streak: {streak}</span>
         </div>

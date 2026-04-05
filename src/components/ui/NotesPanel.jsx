@@ -21,7 +21,10 @@ function parseNoteId(noteId) {
   if (idx === -1) return { lessonId: noteId, section: '' }
   const lessonId = noteId.slice(0, idx)
   const rest = noteId.slice(idx + 1)
-  const section = rest.startsWith('viz:') ? 'Viz' : rest.charAt(0).toUpperCase() + rest.slice(1)
+  let section
+  if (rest.startsWith('viz:')) section = 'Viz'
+  else if (rest.startsWith('example:')) section = 'Example'
+  else section = rest.charAt(0).toUpperCase() + rest.slice(1)
   return { lessonId, section }
 }
 

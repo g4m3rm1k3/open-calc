@@ -514,7 +514,7 @@ function RigorBlock({ data, lessonId }) {
 
 // ─── 📝 Practice block ─────────────────────────────────────────────────────
 
-function PracticeBlock({ examples, challenges, triggers }) {
+function PracticeBlock({ examples, challenges, triggers, lessonId }) {
   const hasExamples = examples?.length > 0
   const hasChallenges = challenges?.length > 0
   if (!hasExamples && !hasChallenges) return null
@@ -526,7 +526,7 @@ function PracticeBlock({ examples, challenges, triggers }) {
           <SectionDivider icon="📝" label="Worked Examples" color="emerald" />
           <div className="space-y-6">
             {examples.map((ex, i) => (
-              <ScrubbableExample key={ex.id ?? i} example={ex} number={i + 1} />
+              <ScrubbableExample key={ex.id ?? i} example={ex} number={i + 1} lessonId={lessonId} />
             ))}
           </div>
         </div>
@@ -616,7 +616,7 @@ export default function MicroCycleLesson({ lesson }) {
       <MathBlock data={lesson.math} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
       <UnifiedLearningDock lesson={lesson} />
-      <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} />
+      <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
       <SpiralBlock spiral={lesson.spiral} />
       {lesson.assessment?.questions?.length > 0 && (
         <AssessmentBlock assessment={lesson.assessment} />
