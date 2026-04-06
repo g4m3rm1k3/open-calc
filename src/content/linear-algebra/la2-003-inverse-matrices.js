@@ -59,10 +59,10 @@ export default {
   math: {
     prose: [
       'For a $2 \\times 2$ matrix $A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$, the formula for the determinant is incredibly simple:',
-      '$$ \\det(A) = ad - bc $$',
+      '$ \\det(A) = ad - bc $',
       'If $ad - bc$ equals $0$, the matrix is called **Singular**. It has no inverse.',
       'If $ad - bc \\neq 0$, the matrix is invertible, and the formula for $A^{-1}$ is:',
-      '$$ A^{-1} = \\frac{1}{ad - bc} \\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix} $$',
+      '$ A^{-1} = \\frac{1}{ad - bc} \\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix} $',
       'Notice how the formula requires dividing by the determinant. This algebraic formula perfectly matches our geometric intuition: if the determinant is $0$, you would divide by $0$, which breaks math. You cannot invert a squished space.'
     ],
     callouts: [

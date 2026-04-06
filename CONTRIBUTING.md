@@ -291,7 +291,7 @@ Every lesson passes through three stages before it is considered complete. The s
 - [ ] `prose` has at least 4 paragraphs (for a typical lesson)
 - [ ] The first prose entry begins with the `**Where you are in the story:**` narrative marker
 - [ ] At least one paragraph uses a concrete physical or visual analogy
-- [ ] Inline formulas use `$...$` syntax; display formulas use `$$...$$`
+- [ ] Inline formulas use `$...$` syntax; display formulas use `$...$`
 - [ ] All symbols introduced in prose are also listed in `semantics.core`
 - [ ] A `type: 'sequencing'` callout is present
 

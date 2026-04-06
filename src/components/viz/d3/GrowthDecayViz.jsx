@@ -65,7 +65,7 @@ export default function GrowthDecayViz({ params = {} }) {
       const yTicks = yS.ticks(5)
       yTicks.forEach(v => {
         svg.append('line').attr('x1', pad.l).attr('y1', yS(v)).attr('x2', pad.l + iW).attr('y2', yS(v)).attr('stroke', C.grid).attr('stroke-width', 1)
-        const label = v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`
+        const label = v >= 1000 ? `${(v/1000).toFixed(1)}k` : `${v.toFixed(0)}`
         svg.append('text').attr('x', pad.l - 4).attr('y', yS(v) + 4).attr('text-anchor', 'end').attr('fill', C.muted).attr('font-size', 10).text(label)
       })
       ;[0, tMax/4, tMax/2, 3*tMax/4, tMax].forEach(v => {
@@ -106,8 +106,8 @@ export default function GrowthDecayViz({ params = {} }) {
       const finalMonthly = monthlyFn(tMax)
       svg.append('rect').attr('x', pad.l + iW - 160).attr('y', pad.t + 4).attr('width', 158).attr('height', 58).attr('rx', 6).attr('fill', C.panel2).attr('stroke', C.border).attr('stroke-width', 0.5)
       svg.append('text').attr('x', pad.l + iW - 82).attr('y', pad.t + 18).attr('text-anchor', 'middle').attr('fill', C.muted).attr('font-size', 10).text(`After ${tMax} years:`)
-      svg.append('text').attr('x', pad.l + iW - 82).attr('y', pad.t + 32).attr('text-anchor', 'middle').attr('fill', C.cont).attr('font-size', 11).attr('font-weight', 'bold').text(`Continuous: $${finalCont.toFixed(0)}`)
-      svg.append('text').attr('x', pad.l + iW - 82).attr('y', pad.t + 46).attr('text-anchor', 'middle').attr('fill', C.monthly).attr('font-size', 11).attr('font-weight', 'bold').text(`Monthly: $${finalMonthly.toFixed(0)}`)
+      svg.append('text').attr('x', pad.l + iW - 82).attr('y', pad.t + 32).attr('text-anchor', 'middle').attr('fill', C.cont).attr('font-size', 11).attr('font-weight', 'bold').text(`Continuous: ${finalCont.toFixed(0)}`)
+      svg.append('text').attr('x', pad.l + iW - 82).attr('y', pad.t + 46).attr('text-anchor', 'middle').attr('fill', C.monthly).attr('font-size', 11).attr('font-weight', 'bold').text(`Monthly: ${finalMonthly.toFixed(0)}`)
 
       // Axis labels
       svg.append('text').attr('x', pad.l + iW / 2).attr('y', H - 6).attr('text-anchor', 'middle').attr('fill', C.muted).attr('font-size', 11).text('Time (years)')
@@ -133,7 +133,7 @@ export default function GrowthDecayViz({ params = {} }) {
       <svg ref={svgRef} className="w-full" />
       <div style={{ padding: '10px 2px 0' }}>
         {[
-          { label: 'Principal P', val: P, set: setP, min: 100, max: 10000, step: 100, color: '#34d399', fmt: v => `$${v}` },
+          { label: 'Principal P', val: P, set: setP, min: 100, max: 10000, step: 100, color: '#34d399', fmt: v => `${v}` },
           { label: 'Rate r', val: r, set: setR, min: 1, max: 20, step: 0.5, color: '#38bdf8', fmt: v => `${v}%` },
           { label: 'Time span', val: tMax, set: setTMax, min: 5, max: 50, step: 5, color: '#fbbf24', fmt: v => `${v} yr` },
         ].map(({ label, val, set, min, max, step, color, fmt }) => (

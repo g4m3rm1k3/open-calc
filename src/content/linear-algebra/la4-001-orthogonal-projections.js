@@ -41,7 +41,7 @@ export default {
       {
         type: 'definition',
         title: 'The Two Projection Formulas',
-        body: '**Onto a line** spanned by $\\mathbf{a}$:\n$$\\text{proj}_{\\mathbf{a}}\\mathbf{b} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\,\\mathbf{a}$$\n\n**Onto the column space of $A$:**\n$$P\\mathbf{b} = A(A^TA)^{-1}A^T\\mathbf{b}$$',
+        body: '**Onto a line** spanned by $\\mathbf{a}$:\n$\\text{proj}_{\\mathbf{a}}\\mathbf{b} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\,\\mathbf{a}$\n\n**Onto the column space of $A$:**\n$P\\mathbf{b} = A(A^TA)^{-1}A^T\\mathbf{b}$',
       },
       {
         type: 'insight',
@@ -62,9 +62,9 @@ export default {
   // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
-      '**Projection onto a line.** Let $\\mathbf{a}$ span the line. We want to find the scalar $c$ such that $c\\mathbf{a}$ is the closest point on the line to $\\mathbf{b}$. The error $\\mathbf{e} = \\mathbf{b} - c\\mathbf{a}$ must be perpendicular to $\\mathbf{a}$:\n\n$$\\mathbf{a} \\cdot \\mathbf{e} = 0 \\quad \\Rightarrow \\quad \\mathbf{a} \\cdot (\\mathbf{b} - c\\mathbf{a}) = 0 \\quad \\Rightarrow \\quad c = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{\\mathbf{a} \\cdot \\mathbf{a}}$$\n\nThe projection is $\\mathbf{p} = c\\mathbf{a} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
-      'The **projection matrix** for projecting onto the line spanned by $\\mathbf{a}$ is:\n\n$$P = \\frac{\\mathbf{a}\\mathbf{a}^T}{\\mathbf{a}^T\\mathbf{a}}$$\n\n(Note: $\\mathbf{a}\\mathbf{a}^T$ is an outer product — an $n\\times n$ rank-1 matrix. $\\mathbf{a}^T\\mathbf{a}$ is a scalar.)',
-      '**Projection onto a subspace.** When the subspace is the column space of $A$ (with linearly independent columns), the same perpendicularity condition applies: the error $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$, meaning $A^T\\mathbf{e} = \\mathbf{0}$. This gives:\n\n$$A^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = \\mathbf{0} \\quad \\Rightarrow \\quad A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b} \\quad \\Rightarrow \\quad \\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$$\n\nThe projection of $\\mathbf{b}$ onto $\\text{col}(A)$ is then $\\mathbf{p} = A\\hat{\\mathbf{x}} = A(A^TA)^{-1}A^T\\mathbf{b} = P\\mathbf{b}$.',
+      '**Projection onto a line.** Let $\\mathbf{a}$ span the line. We want to find the scalar $c$ such that $c\\mathbf{a}$ is the closest point on the line to $\\mathbf{b}$. The error $\\mathbf{e} = \\mathbf{b} - c\\mathbf{a}$ must be perpendicular to $\\mathbf{a}$:\n\n$\\mathbf{a} \\cdot \\mathbf{e} = 0 \\quad \\Rightarrow \\quad \\mathbf{a} \\cdot (\\mathbf{b} - c\\mathbf{a}) = 0 \\quad \\Rightarrow \\quad c = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{\\mathbf{a} \\cdot \\mathbf{a}}$\n\nThe projection is $\\mathbf{p} = c\\mathbf{a} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
+      'The **projection matrix** for projecting onto the line spanned by $\\mathbf{a}$ is:\n\n$P = \\frac{\\mathbf{a}\\mathbf{a}^T}{\\mathbf{a}^T\\mathbf{a}}$\n\n(Note: $\\mathbf{a}\\mathbf{a}^T$ is an outer product — an $n\\times n$ rank-1 matrix. $\\mathbf{a}^T\\mathbf{a}$ is a scalar.)',
+      '**Projection onto a subspace.** When the subspace is the column space of $A$ (with linearly independent columns), the same perpendicularity condition applies: the error $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ must be perpendicular to every column of $A$, meaning $A^T\\mathbf{e} = \\mathbf{0}$. This gives:\n\n$A^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = \\mathbf{0} \\quad \\Rightarrow \\quad A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b} \\quad \\Rightarrow \\quad \\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$\n\nThe projection of $\\mathbf{b}$ onto $\\text{col}(A)$ is then $\\mathbf{p} = A\\hat{\\mathbf{x}} = A(A^TA)^{-1}A^T\\mathbf{b} = P\\mathbf{b}$.',
       '**Key properties of the projection matrix $P = A(A^TA)^{-1}A^T$:**\n\n1. **Idempotent:** $P^2 = P$ — projecting twice gives the same result as projecting once.\n2. **Symmetric:** $P^T = P$.\n3. **$P\\mathbf{b}$ is always in $\\text{col}(A)$** by construction.\n4. **$(I - P)\\mathbf{b}$ is always perpendicular to $\\text{col}(A)$** — $(I-P)$ is the complementary projection onto the orthogonal complement.',
     ],
     callouts: [
@@ -187,9 +187,9 @@ b = np.array([1., 2., 3.])
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      '**Orthogonal Decomposition Theorem.** Let $W$ be a subspace of $\\mathbb{R}^n$. Every vector $\\mathbf{y} \\in \\mathbb{R}^n$ can be written uniquely as:\n\n$$\\mathbf{y} = \\hat{\\mathbf{y}} + \\mathbf{z}, \\quad \\hat{\\mathbf{y}} \\in W, \\quad \\mathbf{z} \\in W^\\perp$$\n\nwhere $W^\\perp$ is the **orthogonal complement** of $W$ — the set of all vectors perpendicular to every vector in $W$. The vector $\\hat{\\mathbf{y}}$ is the orthogonal projection of $\\mathbf{y}$ onto $W$.',
-      '**Best Approximation Theorem.** If $\\hat{\\mathbf{y}}$ is the orthogonal projection of $\\mathbf{y}$ onto $W$, then $\\hat{\\mathbf{y}}$ is the closest vector in $W$ to $\\mathbf{y}$:\n\n$$\\|\\mathbf{y} - \\hat{\\mathbf{y}}\\| \\leq \\|\\mathbf{y} - \\mathbf{v}\\| \\quad \\text{for all } \\mathbf{v} \\in W$$\n\nEquality holds only if $\\mathbf{v} = \\hat{\\mathbf{y}}$.',
-      '**Proof of the Best Approximation Theorem.** For any $\\mathbf{v} \\in W$, write $\\mathbf{y} - \\mathbf{v} = (\\mathbf{y} - \\hat{\\mathbf{y}}) + (\\hat{\\mathbf{y}} - \\mathbf{v})$. The first term is in $W^\\perp$ and the second is in $W$, so they are orthogonal. By the Pythagorean theorem:\n\n$$\\|\\mathbf{y}-\\mathbf{v}\\|^2 = \\|\\mathbf{y}-\\hat{\\mathbf{y}}\\|^2 + \\|\\hat{\\mathbf{y}}-\\mathbf{v}\\|^2 \\geq \\|\\mathbf{y}-\\hat{\\mathbf{y}}\\|^2$$\n\nThe inequality is strict unless $\\hat{\\mathbf{y}} = \\mathbf{v}$.',
+      '**Orthogonal Decomposition Theorem.** Let $W$ be a subspace of $\\mathbb{R}^n$. Every vector $\\mathbf{y} \\in \\mathbb{R}^n$ can be written uniquely as:\n\n$\\mathbf{y} = \\hat{\\mathbf{y}} + \\mathbf{z}, \\quad \\hat{\\mathbf{y}} \\in W, \\quad \\mathbf{z} \\in W^\\perp$\n\nwhere $W^\\perp$ is the **orthogonal complement** of $W$ — the set of all vectors perpendicular to every vector in $W$. The vector $\\hat{\\mathbf{y}}$ is the orthogonal projection of $\\mathbf{y}$ onto $W$.',
+      '**Best Approximation Theorem.** If $\\hat{\\mathbf{y}}$ is the orthogonal projection of $\\mathbf{y}$ onto $W$, then $\\hat{\\mathbf{y}}$ is the closest vector in $W$ to $\\mathbf{y}$:\n\n$\\|\\mathbf{y} - \\hat{\\mathbf{y}}\\| \\leq \\|\\mathbf{y} - \\mathbf{v}\\| \\quad \\text{for all } \\mathbf{v} \\in W$\n\nEquality holds only if $\\mathbf{v} = \\hat{\\mathbf{y}}$.',
+      '**Proof of the Best Approximation Theorem.** For any $\\mathbf{v} \\in W$, write $\\mathbf{y} - \\mathbf{v} = (\\mathbf{y} - \\hat{\\mathbf{y}}) + (\\hat{\\mathbf{y}} - \\mathbf{v})$. The first term is in $W^\\perp$ and the second is in $W$, so they are orthogonal. By the Pythagorean theorem:\n\n$\\|\\mathbf{y}-\\mathbf{v}\\|^2 = \\|\\mathbf{y}-\\hat{\\mathbf{y}}\\|^2 + \\|\\hat{\\mathbf{y}}-\\mathbf{v}\\|^2 \\geq \\|\\mathbf{y}-\\hat{\\mathbf{y}}\\|^2$\n\nThe inequality is strict unless $\\hat{\\mathbf{y}} = \\mathbf{v}$.',
       '**The four fundamental subspaces.** For an $m\\times n$ matrix $A$: the column space $\\text{col}(A)$ and the left null space $\\text{null}(A^T)$ are orthogonal complements in $\\mathbb{R}^m$. The row space $\\text{row}(A)$ and the null space $\\text{null}(A)$ are orthogonal complements in $\\mathbb{R}^n$. The projection onto $\\text{col}(A)$ is $P = A(A^TA)^{-1}A^T$, and the projection onto $\\text{null}(A^T)$ is $I - P$.',
     ],
     callouts: [
@@ -201,7 +201,7 @@ b = np.array([1., 2., 3.])
       {
         type: 'theorem',
         title: 'Best Approximation Theorem',
-        body: 'The orthogonal projection $\\hat{\\mathbf{y}} = P\\mathbf{y}$ is the unique closest point in $W$ to $\\mathbf{y}$.\n\n$$\\|\\mathbf{y} - P\\mathbf{y}\\| < \\|\\mathbf{y} - \\mathbf{v}\\| \\quad \\forall\\, \\mathbf{v} \\in W, \\mathbf{v} \\neq P\\mathbf{y}$$',
+        body: 'The orthogonal projection $\\hat{\\mathbf{y}} = P\\mathbf{y}$ is the unique closest point in $W$ to $\\mathbf{y}$.\n\n$\\|\\mathbf{y} - P\\mathbf{y}\\| < \\|\\mathbf{y} - \\mathbf{v}\\| \\quad \\forall\\, \\mathbf{v} \\in W, \\mathbf{v} \\neq P\\mathbf{y}$',
       },
     ],
     visualizations: [],

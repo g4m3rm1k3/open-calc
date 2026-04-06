@@ -55,14 +55,14 @@ export default {
       'During a G01 move from $(x_1, y_1)$ to $(x_2, y_2)$ at feedrate $F$, the controller decomposes the total velocity into components for each axis.',
       
       'First, it calculates the total distance $D$:',
-      '$$D = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2 + (z_2-z_1)^2}$$',
+      '$D = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2 + (z_2-z_1)^2}$',
 
       'Next, it calculates the time $T$ required for the move:',
-      '$$T = D / F$$',
+      '$T = D / F$',
 
       'Finally, it sets the velocity for each axis ($V_x, V_y, V_z$):',
-      '$$V_x = (x_2 - x_1) / T$$',
-      '$$V_y = (y_2 - y_1) / T$$',
+      '$V_x = (x_2 - x_1) / T$',
+      '$V_y = (y_2 - y_1) / T$',
       
       'The result is that every point on the path $(x,y,z)$ is reached at the exact same moment across all motors, creating a perfect straight line.',
     ],

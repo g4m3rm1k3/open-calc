@@ -65,8 +65,8 @@ export default {
     prose: [
       'Given a set of linearly independent vectors $\\{\\mathbf{v}_1, \\mathbf{v}_2, \\ldots, \\mathbf{v}_k\\}$, the Gram-Schmidt process produces an orthonormal set $\\{\\mathbf{e}_1, \\mathbf{e}_2, \\ldots, \\mathbf{e}_k\\}$ that spans the exact same subspace.',
       'The recipe has two clean phases: (1) subtract off all prior-direction contamination, then (2) normalize to unit length.',
-      'For the first vector: there is nothing to subtract yet. Just normalize:\n\n$$\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|}$$',
-      'For each subsequent vector $\\mathbf{v}_j$, subtract its projection onto every previously computed basis vector, then normalize:\n\n$$\\mathbf{u}_j = \\mathbf{v}_j - \\sum_{i=1}^{j-1} (\\mathbf{v}_j \\cdot \\mathbf{e}_i)\\,\\mathbf{e}_i \\qquad \\mathbf{e}_j = \\frac{\\mathbf{u}_j}{\\|\\mathbf{u}_j\\|}$$',
+      'For the first vector: there is nothing to subtract yet. Just normalize:\n\n$\\mathbf{e}_1 = \\frac{\\mathbf{v}_1}{\\|\\mathbf{v}_1\\|}$',
+      'For each subsequent vector $\\mathbf{v}_j$, subtract its projection onto every previously computed basis vector, then normalize:\n\n$\\mathbf{u}_j = \\mathbf{v}_j - \\sum_{i=1}^{j-1} (\\mathbf{v}_j \\cdot \\mathbf{e}_i)\\,\\mathbf{e}_i \\qquad \\mathbf{e}_j = \\frac{\\mathbf{u}_j}{\\|\\mathbf{u}_j\\|}$',
       'The term $(\\mathbf{v}_j \\cdot \\mathbf{e}_i)$ is just the scalar projection of $\\mathbf{v}_j$ onto $\\mathbf{e}_i$ — the amount of $\\mathbf{v}_j$ that points in the $\\mathbf{e}_i$ direction. Subtracting that amount removes all overlap with $\\mathbf{e}_i$.',
       '**Connection to QR decomposition.** If we assemble the original vectors as columns of a matrix $A$, then Gram-Schmidt produces a factorization $A = QR$, where $Q$ has orthonormal columns (the $\\mathbf{e}_j$\'s) and $R$ is upper triangular with entries $r_{ij} = \\mathbf{v}_j \\cdot \\mathbf{e}_i$. QR is the matrix restatement of Gram-Schmidt.',
     ],
@@ -84,7 +84,7 @@ export default {
       {
         type: 'definition',
         title: 'QR Decomposition',
-        body: 'If $A = [\\mathbf{v}_1 \\cdots \\mathbf{v}_k]$ has linearly independent columns, then:\n$$A = QR$$\nwhere $Q = [\\mathbf{e}_1 \\cdots \\mathbf{e}_k]$ has orthonormal columns and $R$ is upper triangular with $r_{ij} = \\mathbf{v}_j \\cdot \\mathbf{e}_i$.',
+        body: 'If $A = [\\mathbf{v}_1 \\cdots \\mathbf{v}_k]$ has linearly independent columns, then:\n$A = QR$\nwhere $Q = [\\mathbf{e}_1 \\cdots \\mathbf{e}_k]$ has orthonormal columns and $R$ is upper triangular with $r_{ij} = \\mathbf{v}_j \\cdot \\mathbf{e}_i$.',
       },
       {
         type: 'warning',

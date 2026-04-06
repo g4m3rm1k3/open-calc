@@ -49,7 +49,7 @@ export default {
     text: \`
 Write your explanation here.
 
-Formatting: **bold** *italic* \\\`code\\\` $f(x)$ inline math $$display math$$
+Formatting: **bold** *italic* \\\`code\\\` $f(x)$ inline math $display math$
 
 Tip: Explain the concept as if talking to a curious 16-year-old.
 Don't introduce the formula yet — build the IDEA first.
@@ -488,13 +488,13 @@ Zoom infinitely close: $f'(x)$.
     id: 'math', color: 'blue', label: 'Formal Math', badge: 'Optional',
     explanation: 'The precise definition box and worked examples — shown AFTER the intuition section. Because students have context first, the formal definition lands much better.',
     tips: [
-      'Write the definition with LaTeX: $$f\'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$$',
+      'Write the definition with LaTeX: $f\'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$',
       'Examples work best as a clear problem statement with step-by-step solution.',
       'Leave examples: [] if you only want a definition box with no worked examples.',
     ],
     code: `  math: {
     definition: \`The **derivative** $f'(x)$ is:
-$$f'(x) = \\\\lim_{h \\\\to 0} \\\\frac{f(x+h)-f(x)}{h}$$\`,
+$f'(x) = \\\\lim_{h \\\\to 0} \\\\frac{f(x+h)-f(x)}{h}$\`,
 
     examples: [
       {
@@ -928,7 +928,7 @@ The wall is *there*, you're just always approaching.
 In math, a **limit** asks: what value does a function
 *approach* as input gets close to something?
 
-$$\\lim_{x \\to 2} x^2 = 4$$
+$\\lim_{x \\to 2} x^2 = 4$
     \`,
   },`,
   },
@@ -938,7 +938,7 @@ $$\\lim_{x \\to 2} x^2 = 4$$
     desc: 'Now that students have intuition, introduce the formal definition and worked examples. Skip this for Python or web lessons.',
     code: `  math: {
     definition: \`The **limit** of $f(x)$ as $x \\to a$ is $L$:
-$$\\lim_{x \\to a} f(x) = L$$\`,
+$\\lim_{x \\to a} f(x) = L$\`,
     examples: [
       {
         problem: 'Evaluate $\\\\displaystyle\\\\lim_{x\\\\to 3}(x^2-1)$',
@@ -946,7 +946,7 @@ $$\\lim_{x \\to a} f(x) = L$$\`,
       },
     ],
   },`,
-    note: 'Inline math uses $...$, display math uses $$...$$.',
+    note: 'Inline math uses $...$, display math uses $...$.',
     noteColor: 'blue',
   },
   {

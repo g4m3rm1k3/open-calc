@@ -79,7 +79,7 @@ export default {
               cellTitle: 'What is Linear Approximation?',
               prose: [
                 'Linear approximation replaces a curve with its **tangent line** near a chosen base point $a$:',
-                '$$L(x) = f(a) + f\'(a)(x - a)$$',
+                '$L(x) = f(a) + f\'(a)(x - a)$',
                 'The key insight: near $a$, the tangent line and the curve are so close that the difference is negligible.',
                 '## How to use this notebook',
                 '- Press **▶ Run** (or Shift+Enter) to execute a cell.',

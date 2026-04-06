@@ -77,7 +77,7 @@ export default {
       {
         type: 'definition',
         title: 'Row Echelon Form (REF)',
-        body: 'Each pivot is strictly right of the pivot above it. All entries below each pivot are zero.\n\n$$\\begin{bmatrix} \\blacksquare & * & * \\\\ 0 & \\blacksquare & * \\\\ 0 & 0 & \\blacksquare \\end{bmatrix}$$\n\nA staircase of leading entries descending left-to-right.',
+        body: 'Each pivot is strictly right of the pivot above it. All entries below each pivot are zero.\n\n$\\begin{bmatrix} \\blacksquare & * & * \\\\ 0 & \\blacksquare & * \\\\ 0 & 0 & \\blacksquare \\end{bmatrix}$\n\nA staircase of leading entries descending left-to-right.',
       },
       {
         type: 'theorem',

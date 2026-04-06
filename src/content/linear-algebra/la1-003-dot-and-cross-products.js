@@ -57,19 +57,19 @@ export default {
   math: {
     prose: [
       'The **Dot Product** (or inner product) is remarkably easy to calculate algebraically. You just multiply the matching components and add them all up. For two vectors $\\vec{v}$ and $\\vec{w}$:',
-      '$$ \\vec{v} \\cdot \\vec{w} = v_1 w_1 + v_2 w_2 + \\dots + v_n w_n $$',
+      '$ \\vec{v} \\cdot \\vec{w} = v_1 w_1 + v_2 w_2 + \\dots + v_n w_n $',
       'This simple arithmetic carries a profound geometric meaning. The exact same calculation is tied to the angle $\\theta$ between the vectors by this formula:',
-      '$$ \\vec{v} \\cdot \\vec{w} = \\|\\vec{v}\\| \\|\\vec{w}\\| \\cos(\\theta) $$',
+      '$ \\vec{v} \\cdot \\vec{w} = \\|\\vec{v}\\| \\|\\vec{w}\\| \\cos(\\theta) $',
       'Because $\\cos(90^\\circ) = 0$, the dot product of any two perpendicular (orthogonal) vectors is always 0. This is the fastest way to check if two things are perpendicular in math.',
       'The **Cross Product** only works in $\\mathbb{R}^3$. The algebra is a bit messy (often memorized using a Matrix Determinant trick), but the geometric formula is clean:',
-      '$$ \\|\\vec{v} \\times \\vec{w}\\| = \\|\\vec{v}\\| \\|\\vec{w}\\| \\sin(\\theta) $$',
+      '$ \\|\\vec{v} \\times \\vec{w}\\| = \\|\\vec{v}\\| \\|\\vec{w}\\| \\sin(\\theta) $',
       'The direction of $\\vec{v} \\times \\vec{w}$ is given by the Right-Hand Rule: point your index finger along $\\vec{v}$, your middle finger along $\\vec{w}$, and your thumb points exactly in the direction of the cross product.'
     ],
     callouts: [
       {
         type: 'strategy',
         title: 'Finding the Angle',
-        body: 'You can rearrange the geometric dot product formula to instantly find the angle between any two vectors in any dimension:\n\n$$ \\cos(\\theta) = \\frac{\\vec{v} \\cdot \\vec{w}}{\\|\\vec{v}\\| \\|\\vec{w}\\|} $$',
+        body: 'You can rearrange the geometric dot product formula to instantly find the angle between any two vectors in any dimension:\n\n$ \\cos(\\theta) = \\frac{\\vec{v} \\cdot \\vec{w}}{\\|\\vec{v}\\| \\|\\vec{w}\\|} $',
       },
       {
         type: 'theorem',

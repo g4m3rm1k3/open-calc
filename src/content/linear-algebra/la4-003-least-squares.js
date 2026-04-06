@@ -46,7 +46,7 @@ export default {
       {
         type: 'definition',
         title: 'The Normal Equations',
-        body: 'A^T A \\hat{\\mathbf{x}} = A^T \\mathbf{b}\n\nWhen $A$ has linearly independent columns, $A^TA$ is invertible and:\n$$\\hat{\\mathbf{x}} = (A^T A)^{-1} A^T \\mathbf{b}$$',
+        body: 'A^T A \\hat{\\mathbf{x}} = A^T \\mathbf{b}\n\nWhen $A$ has linearly independent columns, $A^TA$ is invertible and:\n$\\hat{\\mathbf{x}} = (A^T A)^{-1} A^T \\mathbf{b}$',
       },
       {
         type: 'warning',
@@ -67,11 +67,11 @@ export default {
   // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
-      'Given an overdetermined system $A\\mathbf{x} \\approx \\mathbf{b}$ (where $A$ is $m \\times n$ with $m > n$), the **least squares solution** $\\hat{\\mathbf{x}}$ minimizes:\n\n$$\\|\\mathbf{b} - A\\mathbf{x}\\|^2 = \\sum_{i=1}^m (b_i - [A\\mathbf{x}]_i)^2$$',
-      '**Deriving the normal equations.** Geometrically, the minimum occurs when the residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is orthogonal to the column space of $A$, meaning $\\mathbf{e} \\perp A\\mathbf{z}$ for all $\\mathbf{z}$. This gives:\n\n$$(A\\mathbf{z})^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = 0 \\quad \\forall \\mathbf{z} \\quad \\Rightarrow \\quad A^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = \\mathbf{0}$$\n\nRearranging: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$. These are the **normal equations**.',
-      'When $A$ has **linearly independent columns** (which is the typical case), $A^TA$ is a square, symmetric, positive-definite $n \\times n$ matrix, and it is invertible. The unique solution is:\n\n$$\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$$\n\nThe matrix $(A^TA)^{-1}A^T$ is called the **pseudoinverse** of $A$ and is often written $A^+$.',
+      'Given an overdetermined system $A\\mathbf{x} \\approx \\mathbf{b}$ (where $A$ is $m \\times n$ with $m > n$), the **least squares solution** $\\hat{\\mathbf{x}}$ minimizes:\n\n$\\|\\mathbf{b} - A\\mathbf{x}\\|^2 = \\sum_{i=1}^m (b_i - [A\\mathbf{x}]_i)^2$',
+      '**Deriving the normal equations.** Geometrically, the minimum occurs when the residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is orthogonal to the column space of $A$, meaning $\\mathbf{e} \\perp A\\mathbf{z}$ for all $\\mathbf{z}$. This gives:\n\n$(A\\mathbf{z})^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = 0 \\quad \\forall \\mathbf{z} \\quad \\Rightarrow \\quad A^T(\\mathbf{b} - A\\hat{\\mathbf{x}}) = \\mathbf{0}$\n\nRearranging: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$. These are the **normal equations**.',
+      'When $A$ has **linearly independent columns** (which is the typical case), $A^TA$ is a square, symmetric, positive-definite $n \\times n$ matrix, and it is invertible. The unique solution is:\n\n$\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$\n\nThe matrix $(A^TA)^{-1}A^T$ is called the **pseudoinverse** of $A$ and is often written $A^+$.',
       '**Projection onto the column space.** The vector $A\\hat{\\mathbf{x}} = A(A^TA)^{-1}A^T\\mathbf{b}$ is the orthogonal projection of $\\mathbf{b}$ onto the column space of $A$. The matrix $P = A(A^TA)^{-1}A^T$ is the projection matrix onto $\\text{col}(A)$. It is symmetric and idempotent: $P^T = P$ and $P^2 = P$.',
-      '**Linear regression.** Fitting a line $y = ax + b$ to data points $(x_1, y_1), \\ldots, (x_m, y_m)$ is a least squares problem where:\n\n$$A = \\begin{bmatrix}x_1 & 1 \\\\ x_2 & 1 \\\\ \\vdots & \\vdots \\\\ x_m & 1\\end{bmatrix}, \\quad \\mathbf{x} = \\begin{bmatrix}a \\\\ b\\end{bmatrix}, \\quad \\mathbf{b} = \\begin{bmatrix}y_1 \\\\ y_2 \\\\ \\vdots \\\\ y_m\\end{bmatrix}$$\n\nSolving the normal equations gives the unique best-fit line.',
+      '**Linear regression.** Fitting a line $y = ax + b$ to data points $(x_1, y_1), \\ldots, (x_m, y_m)$ is a least squares problem where:\n\n$A = \\begin{bmatrix}x_1 & 1 \\\\ x_2 & 1 \\\\ \\vdots & \\vdots \\\\ x_m & 1\\end{bmatrix}, \\quad \\mathbf{x} = \\begin{bmatrix}a \\\\ b\\end{bmatrix}, \\quad \\mathbf{b} = \\begin{bmatrix}y_1 \\\\ y_2 \\\\ \\vdots \\\\ y_m\\end{bmatrix}$\n\nSolving the normal equations gives the unique best-fit line.',
     ],
     callouts: [
       {

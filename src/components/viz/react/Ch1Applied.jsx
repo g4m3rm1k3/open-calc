@@ -72,7 +72,7 @@ function DemandViz() {
         svg.append("circle").attr("cx", xS(qEq)).attr("cy", yS(pEq)).attr("r", 6).attr("fill", C.eq).attr("stroke", "var(--color-background-primary)").attr("stroke-width", 2);
         svg.append("line").attr("x1", 40).attr("y1", yS(pEq)).attr("x2", xS(qEq)).attr("y2", yS(pEq)).attr("stroke", C.eq).attr("stroke-width", 1).attr("stroke-dasharray", "4,3");
         svg.append("line").attr("x1", xS(qEq)).attr("y1", H - 24).attr("x2", xS(qEq)).attr("y2", yS(pEq)).attr("stroke", C.eq).attr("stroke-width", 1).attr("stroke-dasharray", "4,3");
-        svg.append("text").attr("x", xS(qEq) + 6).attr("y", yS(pEq) - 6).attr("fill", C.eq).attr("font-size", 10).text(`Eq: ($${pEq.toFixed(1)}, q=${qEq.toFixed(1)})`);
+        svg.append("text").attr("x", xS(qEq) + 6).attr("y", yS(pEq) - 6).attr("fill", C.eq).attr("font-size", 10).text(`Eq: (${pEq.toFixed(1)}, q=${qEq.toFixed(1)})`);
       }
       // Labels
       svg.append("text").attr("x", xS(22)).attr("y", yS(demand(22)) - 6).attr("fill", C.dem).attr("font-size", 11).text("Demand");

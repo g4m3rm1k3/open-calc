@@ -78,7 +78,7 @@ export default {
   math: {
     prose: [
       'The controller solves basic but time-critical math in real time. For every axis, it tracks position as a signed number:',
-      '$$\\text{Position} = x \\in \\mathbb{R}$$',
+      '$\\text{Position} = x \\in \\mathbb{R}$',
       'Positive and negative values give direction. On a mill, moving the table toward the operator is typically $+Y$; moving the spindle up is $+Z$. The controller stores these as floating-point numbers, usually with 4 decimal places of precision (0.0001 inch or 0.001 mm).',
       'The entire G-code program is a sequence of target positions. The controller\'s job is to compute smooth motion from the current position to each next position, coordinating all axes simultaneously — all while running at hundreds of interpolation cycles per second.',
     ],

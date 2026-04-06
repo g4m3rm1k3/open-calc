@@ -66,10 +66,10 @@ export default {
     prose: [
       'A 2D linear transformation relies on $2 \\times 2$ matrices. When applying a matrix $A$ to an input vector $\\vec{v}$, the output vector is written as $A\\vec{v}$.',
       'Let\'s build a matrix $A$. Suppose we want to transform space such that $\\hat{i}$ lands at $[a, c]$ and $\\hat{j}$ lands at $[b, d]$. We simply paste those landing coordinates in as the *columns* of our matrix:',
-      '$$ A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} $$',
+      '$ A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} $',
       'Now, suppose we want to know where a specific input vector $\\vec{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}$ lands. Remember that $\\vec{v}$ is just a set of instructions: "Take $x$ steps along $\\hat{i}$ and $y$ steps along $\\hat{j}$".',
       'Because the grid lines remain straight and evenly spaced, the new vector will just take $x$ steps along the *new* $\\hat{i}$ and $y$ steps along the *new* $\\hat{j}$. Algebraically, we are just taking a linear combination of the columns of the matrix:',
-      '$$ \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\end{bmatrix} = x\\begin{bmatrix} a \\\\ c \\end{bmatrix} + y\\begin{bmatrix} b \\\\ d \\end{bmatrix} $$',
+      '$ \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\end{bmatrix} = x\\begin{bmatrix} a \\\\ c \\end{bmatrix} + y\\begin{bmatrix} b \\\\ d \\end{bmatrix} $',
       'This equation is the definition of Matrix-Vector multiplication. It proves that a matrix just scales and adds its own columns based on the input vector\'s coordinates.'
     ],
     callouts: [

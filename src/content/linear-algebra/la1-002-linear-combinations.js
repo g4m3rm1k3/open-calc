@@ -61,7 +61,7 @@ export default {
   math: {
     prose: [
       'Algebraically, a linear combination of vectors $\\vec{v}_1, \\vec{v}_2, \\dots, \\vec{v}_n$ with scalar multipliers (weights) $c_1, c_2, \\dots, c_n$ is written as:',
-      '$$ c_1\\vec{v}_1 + c_2\\vec{v}_2 + \\dots + c_n\\vec{v}_n $$',
+      '$ c_1\\vec{v}_1 + c_2\\vec{v}_2 + \\dots + c_n\\vec{v}_n $',
       'The **Span** of a set of vectors in $\\mathbb{R}^n$ is the collection of all vectors that can be written in the form above. It is formally denoted as $\\text{Span}(\\vec{v}_1, \\vec{v}_2, \\dots, \\vec{v}_n)$.',
       'If no vector in the set can be written as a linear combination of the others, the set is **Linearly Independent**. A simple check in 2D or 3D: if one vector is just a scaled multiple of another (e.g., $[1, 2]$ and $[2, 4]$), they are dependent. They lie on the same line.',
       'A set of vectors forms a **Basis** for a vector space if they are (1) linearly independent, and (2) they span the space. In $\\mathbb{R}^n$, any basis must have exactly $n$ vectors. For example, the standard basis in $\\mathbb{R}^2$ is $\\hat{i} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$ and $\\hat{j} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$.'
@@ -70,7 +70,7 @@ export default {
       {
         type: 'theorem',
         title: 'Linear Independence Formal Definition',
-        body: 'Vectors $\\vec{v}_1, \\dots, \\vec{v}_n$ are linearly independent if and only if the vector equation: \n\n$$ c_1\\vec{v}_1 + c_2\\vec{v}_2 + \\dots + c_n\\vec{v}_n = 0 $$\n\nhas ONLY the trivial solution $c_1 = 0, c_2 = 0, \\dots, c_n = 0$.',
+        body: 'Vectors $\\vec{v}_1, \\dots, \\vec{v}_n$ are linearly independent if and only if the vector equation: \n\n$ c_1\\vec{v}_1 + c_2\\vec{v}_2 + \\dots + c_n\\vec{v}_n = 0 $\n\nhas ONLY the trivial solution $c_1 = 0, c_2 = 0, \\dots, c_n = 0$.',
       },
       {
         type: 'strategy',

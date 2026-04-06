@@ -115,7 +115,7 @@ function MarginalViz({ ready }) {
       </div>
       <svg ref={svgRef} style={{ width: "100%", display: "block", borderRadius: 8, background: "var(--color-background-secondary)" }} />
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 8 }}>
-        {[{ label: "MC (cost of 1 more)", val: `$${mc.toFixed(2)}`, color: "#0284c7" }, { label: "MR (revenue from 1 more)", val: `$${mr.toFixed(2)}`, color: "#059669" }, { label: "MP (profit from 1 more)", val: `$${mp.toFixed(2)}`, color: mp >= 0 ? "#059669" : "#ef4444" }, { label: "Decision", val: decision, color: decCol }].map(({ label, val, color }, i) => (
+        {[{ label: "MC (cost of 1 more)", val: `${mc.toFixed(2)}`, color: "#0284c7" }, { label: "MR (revenue from 1 more)", val: `${mr.toFixed(2)}`, color: "#059669" }, { label: "MP (profit from 1 more)", val: `${mp.toFixed(2)}`, color: mp >= 0 ? "#059669" : "#ef4444" }, { label: "Decision", val: decision, color: decCol }].map(({ label, val, color }, i) => (
           <div key={i} style={{ padding: "8px 10px", borderRadius: 8, background: "var(--color-background-secondary)", border: `1px solid ${color}33`, textAlign: "center" }}>
             <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginBottom: 2 }}>{label}</div>
             <div style={{ fontSize: i === 3 ? 10 : 14, fontWeight: 600, color, lineHeight: 1.3 }}>{val}</div>

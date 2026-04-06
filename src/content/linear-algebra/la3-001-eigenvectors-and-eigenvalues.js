@@ -23,7 +23,7 @@ export default {
       'Here is the core idea. When a matrix $A$ acts on a vector $\\mathbf{v}$, it generally knocks that vector off its original line — both the direction and magnitude change. But there exist special vectors where the matrix only changes the magnitude, not the direction. The output $A\\mathbf{v}$ points in exactly the same direction as $\\mathbf{v}$, just scaled by some factor. Those are the **eigenvectors**. The scaling factor is the **eigenvalue**.',
       'Think about stretching a rubber sheet along two perpendicular axes — say, horizontally and vertically. Draw any diagonal line on the sheet. After the stretch, that diagonal gets rotated to a new angle. But the two lines you pulled along (horizontal and vertical) do not rotate at all — they only get longer or shorter. Those are the eigenvectors of the stretch.',
       'For a 3D rotation around an axis (like the Earth rotating around its polar axis), the rotation axis itself is an eigenvector — it does not move at all under the rotation. Its eigenvalue is $\\lambda = 1$, meaning it is scaled by a factor of 1 (not stretched or squished, just left alone).',
-      'The equation that captures this is beautifully compact:\n\n$$A\\mathbf{v} = \\lambda\\mathbf{v}$$\n\nMatrix multiplication on the left equals scalar multiplication on the right. The vector $\\mathbf{v}$ is treated identically whether $A$ acts on it as a full transformation or $\\lambda$ scales it as a plain number. That equivalence is what makes eigenvectors special.',
+      'The equation that captures this is beautifully compact:\n\n$A\\mathbf{v} = \\lambda\\mathbf{v}$\n\nMatrix multiplication on the left equals scalar multiplication on the right. The vector $\\mathbf{v}$ is treated identically whether $A$ acts on it as a full transformation or $\\lambda$ scales it as a plain number. That equivalence is what makes eigenvectors special.',
       '**Where this is heading:** Eigenvectors are the natural axes of a transformation — the directions where everything is simplest. In the very next lesson, you will rebuild your entire coordinate system so the $x$- and $y$-axes align with the eigenvectors. When you do, the complicated matrix $A$ becomes a beautiful diagonal matrix where the only non-zero entries are the eigenvalues themselves.',
     ],
     callouts: [
@@ -61,8 +61,8 @@ export default {
   // ── Math ───────────────────────────────────────────────────────
   math: {
     prose: [
-      'Starting from $A\\mathbf{v} = \\lambda\\mathbf{v}$, subtract the right side:\n\n$$A\\mathbf{v} - \\lambda\\mathbf{v} = \\mathbf{0}$$\n\nFactor out $\\mathbf{v}$ (using $\\lambda\\mathbf{v} = \\lambda I\\mathbf{v}$):\n\n$$(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$$',
-      'We want a **non-zero** $\\mathbf{v}$. The only way $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ has a non-zero solution is if the matrix $(A - \\lambda I)$ is singular — meaning it squishes some direction to zero, meaning its determinant is zero:\n\n$$\\det(A - \\lambda I) = 0$$\n\nThis is the **characteristic equation**. Expanding the determinant gives a polynomial in $\\lambda$ called the **characteristic polynomial**. For an $n \\times n$ matrix, this polynomial has degree $n$ and therefore has exactly $n$ roots in $\\mathbb{C}$ (counting multiplicity).',
+      'Starting from $A\\mathbf{v} = \\lambda\\mathbf{v}$, subtract the right side:\n\n$A\\mathbf{v} - \\lambda\\mathbf{v} = \\mathbf{0}$\n\nFactor out $\\mathbf{v}$ (using $\\lambda\\mathbf{v} = \\lambda I\\mathbf{v}$):\n\n$(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$',
+      'We want a **non-zero** $\\mathbf{v}$. The only way $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ has a non-zero solution is if the matrix $(A - \\lambda I)$ is singular — meaning it squishes some direction to zero, meaning its determinant is zero:\n\n$\\det(A - \\lambda I) = 0$\n\nThis is the **characteristic equation**. Expanding the determinant gives a polynomial in $\\lambda$ called the **characteristic polynomial**. For an $n \\times n$ matrix, this polynomial has degree $n$ and therefore has exactly $n$ roots in $\\mathbb{C}$ (counting multiplicity).',
       'The two-step process is:\n\n**Step 1 — Find eigenvalues:** Solve $\\det(A - \\lambda I) = 0$ for $\\lambda$.\n\n**Step 2 — Find eigenvectors:** For each eigenvalue $\\lambda$, solve the homogeneous system $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ using Gaussian elimination. Every non-zero solution is an eigenvector with that eigenvalue.',
       'The set of all solutions to $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ — including the zero vector — forms a subspace called the **eigenspace** of $\\lambda$. Its dimension is called the **geometric multiplicity** of $\\lambda$.',
     ],
@@ -80,7 +80,7 @@ export default {
       {
         type: 'insight',
         title: 'Two Signatures of the Eigenvalues',
-        body: 'For any $n \\times n$ matrix $A$ with eigenvalues $\\lambda_1, \\ldots, \\lambda_n$:\n\n$$\\text{trace}(A) = \\lambda_1 + \\lambda_2 + \\cdots + \\lambda_n$$\n$$\\det(A) = \\lambda_1 \\cdot \\lambda_2 \\cdots \\lambda_n$$\n\nThese are fast sanity checks after finding eigenvalues.',
+        body: 'For any $n \\times n$ matrix $A$ with eigenvalues $\\lambda_1, \\ldots, \\lambda_n$:\n\n$\\text{trace}(A) = \\lambda_1 + \\lambda_2 + \\cdots + \\lambda_n$\n$\\det(A) = \\lambda_1 \\cdot \\lambda_2 \\cdots \\lambda_n$\n\nThese are fast sanity checks after finding eigenvalues.',
       },
     ],
     visualizations: [

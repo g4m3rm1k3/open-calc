@@ -56,10 +56,10 @@ export default {
       'Circular interpolation uses the radius $R$ to maintain a constant distance from the center $(X_c, Y_c)$.',
       
       'For an arc from $(x_s, y_s)$ to $(x_e, y_e)$ at center $(x_c, y_c)$:',
-      '$$R = \\sqrt{(x_s-x_c)^2 + (y_s-y_c)^2}$$',
+      '$R = \\sqrt{(x_s-x_c)^2 + (y_s-y_c)^2}$',
 
       'The controller ensures that at every point $(x,y)$ on the path:',
-      '$$\\sqrt{(x-x_c)^2 + (y-y_c)^2} = R \\text{ (within tolerance)}$$',
+      '$\\sqrt{(x-x_c)^2 + (y-y_c)^2} = R \\text{ (within tolerance)}$',
 
       'The motors must maintain a velocity such that:',
       '$V_x = -V \\cdot \\sin(\\theta)$',

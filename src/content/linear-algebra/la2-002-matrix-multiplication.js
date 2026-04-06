@@ -65,7 +65,7 @@ export default {
       'There is a mechanical algorithm for multiplying two matrices $A$ and $B$ by hand. Note that to multiply two matrices, their inner dimensions must match: an $(m \\times n)$ matrix times an $(n \\times p)$ matrix creates an $(m \\times p)$ matrix.',
       'To find the entry in the $i$-th row and $j$-th column of the new matrix, you take the **Dot Product** of the $i$-th row of the left matrix and the $j$-th column of the right matrix.',
       'For a $2 \\times 2$ example:',
-      '$$ \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} \\begin{bmatrix} e & f \\\\ g & h \\end{bmatrix} = \\begin{bmatrix} (ae+bg) & (af+bh) \\\\ (ce+dg) & (cf+dh) \\end{bmatrix} $$',
+      '$ \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} \\begin{bmatrix} e & f \\\\ g & h \\end{bmatrix} = \\begin{bmatrix} (ae+bg) & (af+bh) \\\\ (ce+dg) & (cf+dh) \\end{bmatrix} $',
       'While computing dot products row-by-column is the fastest way for a human or computer to churn out the numbers, the geometric insight is different. The first column of the final matrix, $\\begin{bmatrix} ae+bg \\\\ ce+dg \\end{bmatrix}$, is exactly the result of applying the left matrix to the first column of the right matrix $\\begin{bmatrix} e \\\\ g \\end{bmatrix}$.'
     ],
     callouts: [
