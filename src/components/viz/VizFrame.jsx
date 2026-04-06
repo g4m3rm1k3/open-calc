@@ -861,6 +861,47 @@ const VIZ_REGISTRY = {
   // ─── Chemistry ────────────────────────────────────────────────────────────
   PeriodicTable:    lazy(() => import("./react/PeriodicTable.jsx")),
   MoleculeBuilder:  lazy(() => import("./react/MoleculeBuilder.jsx")),
+
+  // ─── Physics Chapter 3: Forces & Newton's Laws ───────────────────────────
+  FBDIntuition: lazy(() => import("./react/FBDIntuition.jsx")),
+  FBDMethodology: lazy(() => import("./react/FBDMethodology.jsx")),
+  FrictionIntuition: lazy(() => import("./react/FrictionIntuition.jsx")),
+  FrictionDerivation: lazy(() => import("./react/FrictionDerivation.jsx")),
+  StaticsIntuition: lazy(() => import("./react/StaticsIntuition.jsx")),
+  StaticsDerivation: lazy(() => import("./react/StaticsDerivation.jsx")),
+  ThirdLawIntuition: lazy(() => import("./react/ThirdLawIntuition.jsx")),
+  ThirdLawDerivation: lazy(() => import("./react/ThirdLawDerivation.jsx")),
+  SecondLawDerivation: lazy(() => import("./react/SecondLawDerivation.jsx")),
+  WorkDotProductViz: lazy(() => import("./react/WorkDotProductViz.jsx")),
+
+  // ─── Physics Chapter 4: Projectile & Circular Motion (additional) ────────
+  ProjectileBasicsViz: lazy(() => import("./react/ProjectileBasicsViz.jsx")),
+  WaveformViz: lazy(() => import("./react/WaveformViz.jsx")),
+  IndependenceIntuition: lazy(() => import("./react/IndependenceIntuition.jsx")),
+  IndependenceDerivation: lazy(() => import("./react/IndependenceDerivation.jsx")),
+  TrajectoryDerivation: lazy(() => import("./react/TrajectoryDerivation.jsx")),
+  MaxHeightViz: lazy(() => import("./react/MaxHeightViz.jsx")),
+  MaxHeightDerivation: lazy(() => import("./react/MaxHeightDerivation.jsx")),
+  RangeDerivation: lazy(() => import("./react/RangeDerivation.jsx")),
+  ProjectileExamplesViz: lazy(() => import("./react/ProjectileExamplesViz.jsx")),
+  ProjectileSymmetry: lazy(() => import("./react/ProjectileSymmetry.jsx")),
+  CentripetalViz: lazy(() => import("./react/CentripetalViz.jsx")),
+  CentripetalDerivation: lazy(() => import("./react/CentripetalDerivation.jsx")),
+  CircularMotionDerivation: lazy(() => import("./react/CircularMotionDerivation.jsx")),
+
+  // ─── Precalc / Algebra additional vizzes ─────────────────────────────────
+  SystemsOfEquationsGeometric: lazy(() => import("./react/SystemsOfEquationsGeometric.jsx")),
+  GramSchmidtProcess: lazy(() => import("./react/GramSchmidtProcess.jsx")),
+  SecantLineViz: lazy(() => import("./react/SecantLineViz.jsx")),
+  SymmetryViz: lazy(() => import("./react/SymmetryViz.jsx")),
+  InequalityGeometryViz: lazy(() => import("./react/InequalityGeometryViz.jsx")),
+  CeilingFunctionViz: lazy(() => import("./react/CeilingFunctionViz.jsx")),
+  BlindChainRuleLab: lazy(() => import("./react/BlindChainRuleLab.jsx")),
+  LeastSquaresFit: lazy(() => import("./react/LeastSquaresFit.jsx")),
+
+  // ─── Discrete Math additional vizzes ─────────────────────────────────────
+  ProofStrategySelector: lazy(() => import("./react/ProofStrategySelector.jsx")),
+  QuantifierNegationPusher: lazy(() => import("./react/QuantifierNegationPusher.jsx")),
 };
 
 // Vizzes that work fine on a phone-sized screen
