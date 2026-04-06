@@ -4,34 +4,76 @@ export default {
   chapter: 'cnc-1',
   order: 27,
   title: 'Lookahead and Path Smoothing',
-  subtitle: 'G61, G64, and Why Corners Slow You Down',
-  tags: ['G61', 'G64', 'lookahead', 'smoothing', 'corner rounding', 'exact stop', 'feed override', 'HSM', 'high-speed machining'],
+  subtitle: 'G61, G64, Following Error, and the Block Processing Bottleneck',
+  tags: [
+    'G61', 'G64', 'G09', 'G61.1', 'lookahead', 'smoothing', 'corner blending',
+    'exact stop', 'following error', 'servo lag', 'block cycle time',
+    'S-curve', 'HSM', 'high-speed machining', 'AICC', 'NURBS',
+  ],
 
   semantics: {
     core: [
-      { symbol: 'G61', meaning: 'Exact stop mode: the machine fully decelerates to zero feed at the endpoint of every block before starting the next. No blending. Guarantees the programmed corner is hit exactly.' },
-      { symbol: 'G64', meaning: 'Continuous mode (path mode): the machine blends adjacent blocks smoothly, maintaining feedrate through corners wherever possible. The default on most controls. May slightly deviate from exact programmed path at transitions.' },
-      { symbol: 'G61.1', meaning: 'Exact stop mode for the current block only (some Fanuc variants). One-shot G61 for a single critical corner.' },
-      { symbol: 'Lookahead (look-ahead buffer)', meaning: 'The controller pre-reads N upcoming blocks to compute velocity profiles in advance, preventing abrupt deceleration at sharp corners. Deeper lookahead = smoother motion at higher feedrates.' },
-      { symbol: 'Corner deceleration', meaning: 'When two moves meet at a sharp angle, the machine must slow down to negotiate the direction change within servo acceleration limits. The lookahead computes how much deceleration is needed for each corner angle.' },
-      { symbol: 'Tolerance band (G64 P_)', meaning: 'On some controllers (Fanuc 0i, 30i), G64 P_ sets the maximum path deviation allowed during smoothing. Larger P = smoother = more deviation from programmed path.' },
+      {
+        symbol: 'G61',
+        meaning: 'Exact Stop mode (modal). The machine decelerates to zero feedrate at the programmed endpoint of every block before starting the next. No path blending. Guarantees the tool reaches the exact programmed coordinate. Slow on multi-segment paths.',
+      },
+      {
+        symbol: 'G61.1',
+        meaning: 'Exact Stop Check mode (Fanuc, modal). A softer version of G61. The machine checks that the position error is within an in-position window before proceeding — it may not fully reach zero velocity, but it must be within the tolerance band. Faster than G61, still more accurate than G64.',
+      },
+      {
+        symbol: 'G09',
+        meaning: 'Exact Stop Check (non-modal, one-shot). Applies exact stop check behavior to a single block only. The next block returns to the previous modal mode (G61 or G64). Write G09 on the same line as a critical move: `G09 G01 X50.`',
+      },
+      {
+        symbol: 'G64',
+        meaning: 'Continuous Path mode (modal). The controller blends adjacent blocks, maintaining feedrate through corners wherever acceleration limits allow. May deviate slightly from the exact programmed path at transitions. Default on most controls. Required for HSM.',
+      },
+      {
+        symbol: 'G64 P_',
+        meaning: 'Continuous Path with tolerance band (Fanuc 0i, 30i). The P value (mm) sets the maximum permissible path deviation during blending. Larger P = smoother motion = more deviation from programmed path. `G64 P0.005` is common for precision finish work.',
+      },
+      {
+        symbol: 'Lookahead buffer',
+        meaning: 'The number of upcoming program blocks the controller pre-reads before executing the current block. Allows the controller to pre-compute deceleration ramps before reaching corners. Older Fanuc controls: 4–16 blocks. Modern 30i/31i: 200–2000+ blocks.',
+      },
+      {
+        symbol: 'Following error (servo lag)',
+        meaning: 'The instantaneous distance between the commanded position (where the controller says the axis should be) and the actual encoder position (where it really is). At any non-zero feedrate, following error is always nonzero. It is proportional to velocity: E = v / Kv.',
+      },
+      {
+        symbol: 'Kv (position loop gain)',
+        meaning: 'The servo amplifier\'s position loop gain coefficient. Units: (m/min) per mm of error — or equivalently, (1/min) × (1/1000). Higher Kv = less following error at the same feedrate, but more risk of instability. Typical values: 20–50 m/min/mm.',
+      },
+      {
+        symbol: 'Block cycle time (BCT)',
+        meaning: 'The time the controller needs to process one G-code block: parse it, run interpolation, update the servo trajectory. On Fanuc Series 0: ~16 ms. Series 16/18: ~4 ms. 30i/31i: ~0.5–1 ms. If the tool reaches the end of a block before the next block is processed, the machine jerks or stalls — the "block processing bottleneck".',
+      },
+      {
+        symbol: 'S-curve acceleration',
+        meaning: 'An acceleration profile where the jerk (rate of change of acceleration) is limited, creating a smooth S-shape instead of an abrupt trapezoidal ramp. Reduces mechanical shock on axes and reduces surface finish marks caused by vibration. Standard on high-end controls (Fanuc 30i, Siemens 840D).',
+      },
+      {
+        symbol: 'NURBS interpolation (G5.1, G6.1)',
+        meaning: 'Non-Uniform Rational B-Spline interpolation. The CNC controller interpolates directly along a smooth spline curve defined by control points and knot vectors, rather than from thousands of tiny G01 segments. Produces the smoothest possible path with the fewest program blocks.',
+      },
     ],
     rulesOfThumb: [
-      'G64 (continuous mode) is correct for the vast majority of machining: profiling, pocketing, contouring. G61 is for specific situations — boring, tapping, probing — where you must stop exactly at a position.',
-      'If your program has many short segments (as from CAM output for curved surfaces), lookahead depth matters enormously. Shallow lookahead causes the machine to slow down hundreds of times per second, drastically cutting effective feedrate.',
-      'The machine cannot violate its acceleration limits regardless of G61/G64. The lookahead computes the velocity profile to stay within servo capacity while meeting mode requirements.',
+      'G64 is correct for almost all contouring, profiling, and pocketing. G61 is for probing, boring, and any operation where the tool must physically reach a coordinate before proceeding.',
+      'G09 (non-modal exact stop check) is the precision tool. Use it on individual critical corners within a G64 program without slowing the whole path.',
+      'The block processing bottleneck is the hidden enemy of high-speed machining. If your CAM segments are 0.05mm and the controller takes 4ms per block, you cannot run faster than F0.05/0.004 = 750 mm/min — regardless of what F value you program.',
+      'Following error is always proportional to feedrate. Doubling the feed doubles the servo lag. On a sharp corner at high feed, the lag means the tool starts turning before it fully reaches the corner — creating corner rounding.',
     ]
   },
 
   hook: {
-    question: 'You program G01 at F2000 mm/min, but the machine never seems to reach that speed — it feels like it\'s constantly slowing down and speeding up. What is happening, and which G-code controls it?',
+    question: 'You program F3000 and the machine moves at F800. You check the feedrate display on the controller — it reads 3000. Where did the speed go?',
     realWorldContext:
-      'A CAM system generates thousands of short G01 segments to approximate a smooth curve. ' +
-      'Each segment is a few tenths of a millimeter long. ' +
-      'Without proper lookahead and path smoothing, the machine decelerates to (nearly) zero at each segment endpoint, ' +
-      'then accelerates into the next segment. At F2000, the machine should be fast — ' +
-      'but the constant stop-start reduces actual cutting feedrate to a fraction of programmed speed. ' +
-      'Understanding G61 vs G64, and what the lookahead buffer does, is the key to getting full speed from modern HSM (high-speed machining) toolpaths.',
+      'This is one of the most confusing experiences in CNC. The program says F3000, the controller display says F3000, but the machine sounds like it\'s constantly braking. ' +
+      'The cause is almost always one of two things: the G-code mode is G61 (exact stop, so the machine brakes to zero at every segment endpoint), ' +
+      'or the block cycle time bottleneck is limiting the achievable speed — the controller cannot process the short CAM segments fast enough to sustain the commanded feedrate. ' +
+      'Understanding what happens inside the controller between "read the block" and "move the axis" is the foundation of high-speed machining. ' +
+      'Peter Smid calls this the most underappreciated topic in CNC programming. It separates programmers who know G-codes from programmers who understand the machine.',
     previewVisualizationId: 'ScienceNotebook',
   },
 
@@ -40,217 +82,375 @@ export default {
       {
         id: 'ScienceNotebook',
         props: {
-          cells: [
-            {
-              cellTitle: 'G61 vs G64 — Velocity Profile Comparison',
-              prose:
-                'This animation compares the velocity (feedrate) profile along a multi-segment toolpath under G61 (exact stop) and G64 (continuous/blended). ' +
-                'The horizontal axis is distance traveled along the path. The vertical axis is instantaneous feedrate. ' +
-                'Notice how G61 forces the velocity to zero at every programmed corner, while G64 blends through them.',
-              html: '',
-              startCode: `
-const canvas = document.getElementById('lookahead-canvas')
-const ctx = canvas.getContext('2d')
-let frame = 0
-const TOTAL = 280
+          lesson: {
+            title: 'G61 vs G64 — Velocity Profile & Path Comparison',
+            cells: [
+              {
+                type: 'js',
+                title: 'G61 vs G64 — Velocity Profile Along a Multi-Corner Path',
+                html: `<canvas id="c" width="680" height="320" style="display:block;max-width:100%;border-radius:8px;background:#0f172a"></canvas>
+<div style="display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+  <button id="btnG61" style="padding:7px 16px;border-radius:5px;border:none;background:#f87171;color:#0f172a;font:bold 12px monospace;cursor:pointer">G61 — Exact Stop</button>
+  <button id="btnG64" style="padding:7px 16px;border-radius:5px;border:none;background:#38bdf8;color:#0f172a;font:bold 12px monospace;cursor:pointer">G64 — Continuous</button>
+  <button id="btnG641" style="padding:7px 16px;border-radius:5px;border:none;background:#a78bfa;color:#0f172a;font:bold 12px monospace;cursor:pointer">G61.1 — Check Mode</button>
+</div>`,
+                css: `body{margin:0;background:#0f172a;padding:12px;font-family:monospace;display:flex;flex-direction:column;align-items:center}`,
+                startCode: `
+const c = document.getElementById('c');
+const W = c.width, H = c.height;
+const ctx = c.getContext('2d');
 
-// Simulated path: 8 waypoints with varying corner angles
-const waypoints = [
-  {x: 40,  y: 160}, {x: 110, y: 160}, {x: 150, y: 120},
-  {x: 200, y: 160}, {x: 240, y: 110}, {x: 290, y: 155},
-  {x: 340, y: 100}, {x: 400, y: 150},
-]
+// 7 waypoints — mix of sharp and shallow corners
+const wp = [
+  {x:40,y:110},{x:130,y:110},{x:170,y:75},
+  {x:230,y:130},{x:290,y:75},{x:370,y:110},{x:460,y:110}
+];
+const chartTop=180, chartH=100, chartL=40, chartR=W-20;
 
-// Compute corner "sharpness" at each interior waypoint (0=straight, 1=90°, 2=180° reversal)
-function cornerSharpness(a, b, c) {
-  const d1x = b.x-a.x, d1y = b.y-a.y
-  const d2x = c.x-b.x, d2y = c.y-b.y
-  const len1 = Math.sqrt(d1x*d1x+d1y*d1y)
-  const len2 = Math.sqrt(d2x*d2x+d2y*d2y)
-  if (len1 < 0.001 || len2 < 0.001) return 0
-  const dot = (d1x*d2x + d1y*d2y) / (len1*len2)
-  return 1 - Math.max(-1, Math.min(1, dot))  // 0=same dir, 1=90°, 2=reversal
+function sharpness(a,b,c){
+  const d1x=b.x-a.x,d1y=b.y-a.y,d2x=c.x-b.x,d2y=c.y-b.y;
+  const l1=Math.hypot(d1x,d1y),l2=Math.hypot(d2x,d2y);
+  if(l1<1e-4||l2<1e-4)return 0;
+  const dot=(d1x*d2x+d1y*d2y)/(l1*l2);
+  return 1-Math.max(-1,Math.min(1,dot));
 }
 
-function draw() {
-  const W = canvas.width, H = canvas.height
-  ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = '#0f172a'
-  ctx.fillRect(0, 0, W, H)
+const sh=[0];
+for(let i=1;i<wp.length-1;i++) sh.push(sharpness(wp[i-1],wp[i],wp[i+1]));
+sh.push(0);
 
-  const t = (frame % TOTAL) / TOTAL
-  const mode = frame < TOTAL ? 'G61' : 'G64'
-  const isG64 = frame >= TOTAL
+const segL=[];let totL=0;
+for(let i=1;i<wp.length;i++){const l=Math.hypot(wp[i].x-wp[i-1].x,wp[i].y-wp[i-1].y);segL.push(l);totL+=l;}
+const cum=[0];for(const l of segL)cum.push(cum[cum.length-1]+l);
+const nx=d=>(d/totL)*(chartR-chartL)+chartL;
 
-  // Chart area
-  const chartTop = 180, chartH = 80, chartLeft = 30, chartRight = W - 20
+let mode='G64', animId, frame=0;
 
-  // --- Draw path (top half) ---
-  // Waypoint connections
-  ctx.strokeStyle = '#334155'
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  waypoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y))
-  ctx.stroke()
+const MODES={
+  G61: {color:'#f87171',label:'G61 EXACT STOP',sub:'Decelerates to 0 at every corner',vel:i=>0},
+  'G61.1':{color:'#a78bfa',label:'G61.1 EXACT STOP CHECK',sub:'Slows to near-0 within tolerance window',vel:i=>Math.max(0,0.08*(1-sh[i]))},
+  G64: {color:'#38bdf8',label:'G64 CONTINUOUS',sub:'Blends through corners — feedrate stays high',vel:i=>Math.max(0.22,1-sh[i]*0.62)},
+};
 
-  // Compute total path length and segment distances
-  const segLengths = []
-  let totalLen = 0
-  for (let i = 1; i < waypoints.length; i++) {
-    const dx = waypoints[i].x - waypoints[i-1].x
-    const dy = waypoints[i].y - waypoints[i-1].y
-    const l = Math.sqrt(dx*dx + dy*dy)
-    segLengths.push(l)
-    totalLen += l
-  }
-
-  // Corner sharpnesses
-  const sharpness = [0]
-  for (let i = 1; i < waypoints.length - 1; i++) {
-    sharpness.push(cornerSharpness(waypoints[i-1], waypoints[i], waypoints[i+1]))
-  }
-  sharpness.push(0)
-
-  // Velocity at each waypoint
-  const maxV = 1.0
-  const velocities = waypoints.map((_, i) => {
-    if (i === 0 || i === waypoints.length-1) return 0
-    if (isG64) {
-      // G64: blend — reduce speed proportional to sharpness, but never to zero
-      return maxV * Math.max(0.25, 1 - sharpness[i] * 0.6)
-    } else {
-      // G61: exact stop — velocity goes to 0 at every interior corner
-      return 0
-    }
-  })
-
-  // Cumulative distance array
-  const cumDist = [0]
-  for (const l of segLengths) cumDist.push(cumDist[cumDist.length-1] + l)
-  const norm = d => (d / totalLen) * (chartRight - chartLeft) + chartLeft
-
-  // --- Draw velocity chart ---
-  // Background
-  ctx.fillStyle = '#0f172a'
-  ctx.fillRect(chartLeft, chartTop, chartRight - chartLeft, chartH)
-  ctx.strokeStyle = '#1e293b'
-  ctx.lineWidth = 0.5
-  ctx.strokeRect(chartLeft, chartTop, chartRight - chartLeft, chartH)
-
-  // Grid lines
-  ctx.strokeStyle = '#1e293b'
-  ctx.setLineDash([3,3])
-  ctx.beginPath(); ctx.moveTo(chartLeft, chartTop + chartH/2); ctx.lineTo(chartRight, chartTop + chartH/2); ctx.stroke()
-  ctx.setLineDash([])
-
-  // Labels
-  ctx.fillStyle = '#475569'
-  ctx.font = '8px monospace'
-  ctx.textAlign = 'right'
-  ctx.fillText('F max', chartLeft - 2, chartTop + 5)
-  ctx.fillText('0', chartLeft - 2, chartTop + chartH)
-
-  // Velocity profile curve
-  const color = isG64 ? '#38bdf8' : '#f87171'
-  ctx.strokeStyle = color
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  for (let i = 0; i < waypoints.length; i++) {
-    const px = norm(cumDist[i])
-    const vy = chartTop + chartH - velocities[i] * chartH
-    i === 0 ? ctx.moveTo(px, vy) : ctx.lineTo(px, vy)
-  }
-  ctx.stroke()
-
-  // Corner markers on velocity chart
-  for (let i = 1; i < waypoints.length-1; i++) {
-    const px = norm(cumDist[i])
-    ctx.fillStyle = sharpness[i] > 0.5 ? '#fbbf24' : '#475569'
-    ctx.beginPath(); ctx.arc(px, chartTop + chartH - velocities[i] * chartH, 3, 0, Math.PI*2); ctx.fill()
-  }
-
-  // Tool position on path
-  const toolDist = t * totalLen
-  let seg = 0, distAcc = 0
-  for (let i = 0; i < segLengths.length; i++) {
-    if (distAcc + segLengths[i] >= toolDist || i === segLengths.length-1) { seg = i; break }
-    distAcc += segLengths[i]
-  }
-  const segT = segLengths[seg] > 0 ? (toolDist - distAcc) / segLengths[seg] : 0
-  const tp = {
-    x: waypoints[seg].x + (waypoints[seg+1].x - waypoints[seg].x) * segT,
-    y: waypoints[seg].y + (waypoints[seg+1].y - waypoints[seg].y) * segT,
-  }
-
-  // Draw executed path portion
-  ctx.strokeStyle = color
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  waypoints.slice(0, seg+1).forEach((p, i) => i===0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y))
-  ctx.lineTo(tp.x, tp.y)
-  ctx.stroke()
-
-  // Tool dot
-  ctx.fillStyle = '#ffffff'
-  ctx.beginPath(); ctx.arc(tp.x, tp.y, 5, 0, Math.PI*2); ctx.fill()
-  ctx.fillStyle = color
-  ctx.beginPath(); ctx.arc(tp.x, tp.y, 3, 0, Math.PI*2); ctx.fill()
-
-  // Waypoint markers (corners)
-  waypoints.slice(1, -1).forEach((p, i) => {
-    ctx.fillStyle = sharpness[i+1] > 0.5 ? '#fbbf24' : '#334155'
-    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill()
-  })
-
-  // Mode indicator and velocity indicator on chart
-  const curVelIdx = Math.min(Math.round(t * (waypoints.length-1)), waypoints.length-1)
-  const curVel = velocities[curVelIdx]
-  const chartX = norm(toolDist)
-  ctx.strokeStyle = color + '80'
-  ctx.lineWidth = 1
-  ctx.setLineDash([3,3])
-  ctx.beginPath(); ctx.moveTo(chartX, chartTop); ctx.lineTo(chartX, chartTop + chartH); ctx.stroke()
-  ctx.setLineDash([])
-
-  // Mode label
-  ctx.fillStyle = color
-  ctx.font = 'bold 14px monospace'
-  ctx.textAlign = 'left'
-  ctx.fillText(isG64 ? 'G64 CONTINUOUS' : 'G61 EXACT STOP', 36, 25)
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '9px monospace'
-  ctx.fillText(isG64
-    ? 'Machine blends through corners — feedrate stays high'
-    : 'Machine stops completely at each corner — feedrate collapses', 36, 38)
-
-  // Average feedrate indicator
-  const avgV = velocities.reduce((a,b) => a+b, 0) / velocities.length
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '9px monospace'
-  ctx.textAlign = 'right'
-  ctx.fillText(\`Avg feed: \${Math.round(avgV * 100)}% of F max\`, chartRight, 25)
-
-  frame = (frame + 1) % (TOTAL * 2)
-  requestAnimationFrame(draw)
+function velAt(i){
+  if(i===0||i===wp.length-1)return 0;
+  return MODES[mode].vel(i);
 }
-draw()
-              `,
-              canvasId: 'lookahead-canvas',
-              canvasWidth: 440,
-              canvasHeight: 280,
-            },
-          ]
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  const t=(frame%240)/240;
+  const m=MODES[mode];
+
+  // --- PATH HALF ---
+  // dim unexecuted path
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=1.5;ctx.beginPath();
+  wp.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+
+  // tool position
+  const td=t*totL;
+  let seg=0,da=0;
+  for(let i=0;i<segL.length;i++){if(da+segL[i]>=td||i===segL.length-1){seg=i;break;}da+=segL[i];}
+  const st=segL[seg]>0?(td-da)/segL[seg]:0;
+  const tp={x:wp[seg].x+(wp[seg+1].x-wp[seg].x)*st,y:wp[seg].y+(wp[seg+1].y-wp[seg].y)*st};
+
+  // executed path (bright)
+  ctx.strokeStyle=m.color;ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<=seg+1&&i<wp.length;i++){
+    const p=i<=seg?wp[i]:(i===seg+1?tp:null);if(!p)break;
+    i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);
+  }
+  ctx.stroke();
+
+  // corner markers
+  wp.slice(1,-1).forEach((p,i)=>{
+    ctx.fillStyle=sh[i+1]>0.5?'#fbbf24':'#334155';
+    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();
+  });
+
+  // tool dot
+  ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(tp.x,tp.y,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(tp.x,tp.y,4,0,Math.PI*2);ctx.fill();
+
+  // corner angle labels for sharp corners
+  ctx.fillStyle='#fbbf24';ctx.font='8px monospace';ctx.textAlign='center';
+  wp.slice(1,-1).forEach((p,i)=>{
+    if(sh[i+1]>0.3){const deg=Math.round(Math.acos(1-sh[i+1])*180/Math.PI);ctx.fillText(deg+'°',p.x,p.y-10);}
+  });
+
+  // --- VELOCITY CHART ---
+  ctx.fillStyle='#0a1628';ctx.fillRect(chartL,chartTop,chartR-chartL,chartH);
+  // grid
+  ctx.strokeStyle='#1e293b';ctx.lineWidth=0.5;
+  [0.25,0.5,0.75].forEach(f=>{
+    ctx.beginPath();ctx.moveTo(chartL,chartTop+chartH*(1-f));ctx.lineTo(chartR,chartTop+chartH*(1-f));ctx.stroke();
+  });
+  // labels
+  ctx.fillStyle='#334155';ctx.font='8px monospace';ctx.textAlign='right';
+  ctx.fillText('F',chartL-2,chartTop+4);
+  ctx.fillText('0',chartL-2,chartTop+chartH);
+  ctx.fillStyle='#475569';
+  ctx.fillText('100%',chartL-2,chartTop+4);
+  ctx.fillText('50%',chartL-2,chartTop+chartH/2+4);
+
+  // velocity curve
+  const vels=wp.map((_,i)=>velAt(i));
+  ctx.strokeStyle=m.color;ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<wp.length;i++){
+    const px=nx(cum[i]);const vy=chartTop+chartH-vels[i]*chartH;
+    i===0?ctx.moveTo(px,vy):ctx.lineTo(px,vy);
+  }
+  ctx.stroke();
+  // corner dots on chart
+  for(let i=1;i<wp.length-1;i++){
+    ctx.fillStyle=sh[i]>0.5?'#fbbf24':'#64748b';
+    ctx.beginPath();ctx.arc(nx(cum[i]),chartTop+chartH-vels[i]*chartH,3,0,Math.PI*2);ctx.fill();
+  }
+  // tool position cursor on chart
+  const cx2=nx(td);
+  ctx.strokeStyle=m.color+'80';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(cx2,chartTop);ctx.lineTo(cx2,chartTop+chartH);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // avg feed area fill
+  const avg=vels.reduce((a,b)=>a+b,0)/vels.length;
+  ctx.fillStyle=m.color+'18';
+  ctx.beginPath();
+  for(let i=0;i<wp.length;i++){const px=nx(cum[i]);const vy=chartTop+chartH-vels[i]*chartH;i===0?ctx.moveTo(px,vy):ctx.lineTo(px,vy);}
+  ctx.lineTo(chartR,chartTop+chartH);ctx.lineTo(chartL,chartTop+chartH);ctx.closePath();ctx.fill();
+
+  // labels
+  ctx.fillStyle=m.color;ctx.font='bold 13px monospace';ctx.textAlign='left';
+  ctx.fillText(m.label,chartL,chartTop-8);
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';
+  ctx.fillText(m.sub,chartL,chartTop-20);
+  ctx.textAlign='right';
+  ctx.fillText('Avg feed: '+Math.round(avg*100)+'% of F max',chartR,chartTop-8);
+
+  frame++;
+  animId=requestAnimationFrame(draw);
+}
+
+document.getElementById('btnG61').onclick=()=>{mode='G61';frame=0;};
+document.getElementById('btnG64').onclick=()=>{mode='G64';frame=0;};
+document.getElementById('btnG641').onclick=()=>{mode='G61.1';frame=0;};
+draw();
+                `,
+              },
+              {
+                type: 'js',
+                title: 'Block Cycle Time Bottleneck — Why Short Segments Kill Feedrate',
+                html: `<canvas id="c2" width="680" height="300" style="display:block;max-width:100%;border-radius:8px;background:#0f172a"></canvas>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+  <label style="color:#94a3b8;font:11px monospace;display:flex;align-items:center;gap:6px">
+    Seg length (mm): <input id="segLen" type="range" min="0.05" max="2" step="0.05" value="0.2" style="width:100px">
+    <span id="segLenVal" style="color:#38bdf8;min-width:36px">0.20</span>
+  </label>
+  <label style="color:#94a3b8;font:11px monospace;display:flex;align-items:center;gap:6px">
+    Controller BCT (ms): <input id="bct" type="range" min="0.5" max="16" step="0.5" value="4" style="width:100px">
+    <span id="bctVal" style="color:#fbbf24;min-width:36px">4.0</span>
+  </label>
+  <label style="color:#94a3b8;font:11px monospace;display:flex;align-items:center;gap:6px">
+    Programmed F: <input id="feed" type="range" min="500" max="5000" step="100" value="2000" style="width:100px">
+    <span id="feedVal" style="color:#4ade80;min-width:48px">2000</span>
+  </label>
+</div>`,
+                css: `body{margin:0;background:#0f172a;padding:12px;font-family:monospace;display:flex;flex-direction:column;align-items:center}`,
+                startCode: `
+const c=document.getElementById('c2');
+const W=c.width,H=c.height;
+const ctx=c.getContext('2d');
+
+const slSeg=document.getElementById('segLen');
+const slBCT=document.getElementById('bct');
+const slFeed=document.getElementById('feed');
+const vSeg=document.getElementById('segLenVal');
+const vBCT=document.getElementById('bctVal');
+const vFeed=document.getElementById('feedVal');
+
+[slSeg,slBCT,slFeed].forEach(s=>s.oninput=draw);
+
+function draw(){
+  const segMm=parseFloat(slSeg.value);
+  const bctMs=parseFloat(slBCT.value);
+  const progF=parseFloat(slFeed.value);
+  vSeg.textContent=segMm.toFixed(2);
+  vBCT.textContent=bctMs.toFixed(1);
+  vFeed.textContent=progF.toFixed(0);
+
+  // Max feedrate before BCT bottleneck
+  // BCT limits: tool must not exceed one segment per BCT interval
+  const fMaxBCT = (segMm / bctMs) * 60000; // mm/min
+  const fActual = Math.min(progF, fMaxBCT);
+  const limited = fActual < progF * 0.98;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+
+  const barW=W-80,barX=60,barY1=60,barY2=130,barH=36;
+
+  // --- BAR 1: Programmed Feed ---
+  ctx.fillStyle='#1e293b';ctx.fillRect(barX,barY1,barW,barH);
+  ctx.fillStyle='#4ade80';
+  ctx.fillRect(barX,barY1,barW,barH);
+  ctx.fillStyle='#0f172a';ctx.font='bold 13px monospace';ctx.textAlign='center';
+  ctx.fillText('Programmed: F'+progF,barX+barW/2,barY1+barH/2+5);
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='left';
+  ctx.fillText('Programmed feedrate',barX,barY1-8);
+
+  // --- BAR 2: Actual Achievable Feed ---
+  ctx.fillStyle='#1e293b';ctx.fillRect(barX,barY2,barW,barH);
+  const ratio=Math.min(1,fActual/progF);
+  ctx.fillStyle=limited?'#f87171':'#38bdf8';
+  ctx.fillRect(barX,barY2,barW*ratio,barH);
+  ctx.fillStyle='#f1f5f9';ctx.font='bold 13px monospace';ctx.textAlign='center';
+  ctx.fillText('Actual: F'+Math.round(fActual)+(limited?' ← CAPPED':' ✓'),barX+barW/2,barY2+barH/2+5);
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='left';
+  ctx.fillText('Achievable with these settings',barX,barY2-8);
+
+  // --- Calculation display ---
+  const bY=200;
+  ctx.fillStyle='#1e293b';ctx.fillRect(20,bY,W-40,85);
+  ctx.strokeStyle='#334155';ctx.lineWidth=1;ctx.strokeRect(20,bY,W-40,85);
+
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='left';
+  const lh=16;
+  ctx.fillText('Segment length:  '+segMm+' mm',30,bY+lh);
+  ctx.fillText('Block cycle time: '+bctMs+' ms  ('+bctMs/1000+' s)',30,bY+lh*2);
+  ctx.fillStyle='#fbbf24';
+  ctx.fillText('F_max = ('+segMm+' mm / '+bctMs+' ms) × 60,000 = '+Math.round(fMaxBCT)+' mm/min',30,bY+lh*3);
+  if(limited){
+    ctx.fillStyle='#f87171';
+    ctx.fillText('⚠  BOTTLENECK: programmed F'+progF+' > F_max '+Math.round(fMaxBCT)+' — machine runs at F'+Math.round(fActual),30,bY+lh*4);
+    ctx.fillText('   Fix: increase segment length, upgrade controller, or reduce feed.',30,bY+lh*5);
+  }else{
+    ctx.fillStyle='#4ade80';
+    ctx.fillText('✓  No bottleneck: controller processes blocks fast enough for this feed.',30,bY+lh*4);
+  }
+
+  // --- Controller comparison table ---
+  const controllers=[
+    {name:'Fanuc 0M / 3M',bct:16,color:'#f87171'},
+    {name:'Fanuc 16i / 18i',bct:4,color:'#fbbf24'},
+    {name:'Fanuc 30i / 31i',bct:1,color:'#38bdf8'},
+    {name:'Siemens 840D SL',bct:0.5,color:'#4ade80'},
+  ];
+  const tY=H-10;
+  ctx.fillStyle='#475569';ctx.font='8px monospace';ctx.textAlign='left';
+  ctx.fillText('Controller BCT reference:',20,tY-controllers.length*13-5);
+  controllers.forEach((ct,i)=>{
+    const fLim=(segMm/ct.bct)*60000;
+    ctx.fillStyle=ct.color;
+    ctx.fillText(ct.name+': '+ct.bct+'ms BCT → F_max '+Math.round(fLim)+' mm/min @ '+segMm+'mm segments',20,tY-i*13);
+  });
+}
+draw();
+                `,
+              },
+              {
+                type: 'js',
+                title: 'Following Error — The Servo Lag That Rounds Every Corner',
+                html: `<canvas id="c3" width="680" height="280" style="display:block;max-width:100%;border-radius:8px;background:#0f172a"></canvas>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+  <label style="color:#94a3b8;font:11px monospace;display:flex;align-items:center;gap:6px">
+    Feedrate F (mm/min): <input id="fv" type="range" min="100" max="5000" step="100" value="1000" style="width:110px">
+    <span id="fvVal" style="color:#38bdf8;min-width:42px">1000</span>
+  </label>
+  <label style="color:#94a3b8;font:11px monospace;display:flex;align-items:center;gap:6px">
+    Kv (m/min per mm): <input id="kv" type="range" min="10" max="60" step="2" value="30" style="width:110px">
+    <span id="kvVal" style="color:#fbbf24;min-width:24px">30</span>
+  </label>
+</div>`,
+                css: `body{margin:0;background:#0f172a;padding:12px;font-family:monospace;display:flex;flex-direction:column;align-items:center}`,
+                startCode: `
+const c=document.getElementById('c3');
+const W=c.width,H=c.height;
+const ctx=c.getContext('2d');
+const sfv=document.getElementById('fv'),skv=document.getElementById('kv');
+const vfv=document.getElementById('fvVal'),vkv=document.getElementById('kvVal');
+[sfv,skv].forEach(s=>s.oninput=draw);
+
+function draw(){
+  const F=parseFloat(sfv.value);   // mm/min
+  const Kv=parseFloat(skv.value);  // m/min per mm of error => effectively Kv [mm/min per mm]
+  vfv.textContent=F; vkv.textContent=Kv;
+
+  // Following error = (F mm/min) / (Kv * 1000 mm/min per mm) = F/(Kv*1000) mm
+  const E = F / (Kv * 1000); // mm
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+
+  const cx=W*0.35, cy=H*0.42, scale=2.2;
+
+  // Programmed path: an L-shaped corner
+  const corner={x:cx,y:cy};
+  const start={x:cx-80*scale,y:cy};
+  const end={x:cx,y:cy-60*scale};
+
+  ctx.strokeStyle='#334155';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(corner.x,corner.y);ctx.lineTo(end.x,end.y);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#334155';ctx.font='9px monospace';ctx.textAlign='center';
+  ctx.fillText('Programmed path',cx+60,cy-30);
+
+  // Actual path (with following error rounding the corner)
+  const eScale=Math.min(E*scale*40,30); // visual rounding radius
+  const rounded=[
+    {x:start.x,y:start.y},
+    {x:corner.x-eScale*1.2,y:corner.y},
+    {x:corner.x-eScale*0.3,y:corner.y-eScale*0.3},
+    {x:corner.x,y:corner.y-eScale*1.2},
+    {x:end.x,y:end.y},
+  ];
+  ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(rounded[0].x,rounded[0].y);
+  ctx.lineTo(rounded[1].x,rounded[1].y);
+  ctx.bezierCurveTo(corner.x,corner.y,corner.x,corner.y,rounded[3].x,rounded[3].y);
+  ctx.lineTo(rounded[4].x,rounded[4].y);
+  ctx.stroke();
+  ctx.fillStyle='#38bdf8';ctx.font='9px monospace';ctx.textAlign='left';
+  ctx.fillText('Actual path (servo lag)',cx+4,cy-eScale*1.2-8);
+
+  // Corner error annotation
+  ctx.strokeStyle='#fbbf24';ctx.lineWidth=1;ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(corner.x,corner.y);ctx.lineTo(corner.x-eScale*0.3,corner.y-eScale*0.3);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#fbbf24';ctx.textAlign='right';
+  ctx.fillText('Corner rounding ≈ E = '+E.toFixed(3)+' mm',corner.x-2,corner.y+20);
+
+  // Formulas and readout
+  const fy=H*0.72,lh=18;
+  ctx.fillStyle='#1e293b';ctx.fillRect(20,fy,W-40,H*0.28-10);
+  ctx.strokeStyle='#334155';ctx.lineWidth=1;ctx.strokeRect(20,fy,W-40,H*0.28-10);
+  ctx.fillStyle='#94a3b8';ctx.font='9px monospace';ctx.textAlign='left';
+  ctx.fillText('Following Error formula:  E = F / (Kv × 1000)',30,fy+lh);
+  ctx.fillStyle='#fbbf24';
+  ctx.fillText('E = '+F+' mm/min  /  ('+Kv+' × 1000) = '+E.toFixed(4)+' mm',30,fy+lh*2);
+  ctx.fillStyle='#94a3b8';
+  ctx.fillText('At this feed, the servo lags '+E.toFixed(3)+'mm behind the commanded position.',30,fy+lh*3);
+  if(E>0.03){ctx.fillStyle='#f87171';ctx.fillText('⚠  E > 0.03mm — corner rounding likely visible. Reduce feed or increase Kv.',30,fy+lh*4);}
+  else{ctx.fillStyle='#4ade80';ctx.fillText('✓  E within typical tolerance for finish work.',30,fy+lh*4);}
+}
+draw();
+                `,
+              },
+            ],
+          },
         },
-        title: 'G61 vs G64 Velocity Profiles',
-        caption: 'The animation cycles through G61 and G64 on the same toolpath. Yellow dots mark sharp corners. In G61 mode, velocity drops to zero at every corner — the feedrate profile looks like a saw wave. In G64, the machine blends through corners, maintaining significantly higher average feedrate.',
+        title: 'G61/G64, Block Cycle Time, and Following Error',
+        caption: 'Three interactive animations: (1) velocity profiles for G61, G61.1, and G64 on the same multi-corner path; (2) the block cycle time bottleneck — how short CAM segments and slow controllers cap achievable feedrate; (3) following error (servo lag) — how feedrate and Kv combine to round every corner.',
       },
       {
         id: 'CNCLab',
         props: {
           initialCode:
-            '(EXACT STOP vs CONTINUOUS MODE)\n' +
-            '(G61 = exact stop at every corner)\n' +
-            '(G64 = smooth blend through corners)\n' +
+            '(G61 vs G64 — Mode Switch Demo)\n' +
+            '(G61: exact stop at every corner)\n' +
+            '(G64: continuous blend through corners)\n' +
+            '(G09: one-shot exact stop on a single block)\n' +
             '\n' +
             'G21 G90 G17 G40 G49 G80\n' +
             'T1 M06\n' +
@@ -258,91 +458,127 @@ draw()
             'S1500 M03\n' +
             'G54\n' +
             '\n' +
-            '(TRY 1: G64 CONTINUOUS - CHANGE TO G61 AND COMPARE)\n' +
+            '(--- CONTOURING: G64 ---)\n' +
             'G64\n' +
             'G00 X0 Y0 Z5.\n' +
-            'G01 Z-2. F150\n' +
-            'G01 X50. F800\n' +
-            'G01 X50. Y50.\n' +
-            'G01 X0 Y50.\n' +
+            'G01 Z-2. F120\n' +
+            'G01 X60. F1500\n' +
+            'G01 X60. Y40.\n' +
+            'G01 X0 Y40.\n' +
             'G01 X0 Y0\n' +
+            '\n' +
+            '(One-shot exact stop on critical corner:)\n' +
+            'G64\n' +
+            'G01 X30. Y0\n' +
+            'G09 G01 X30. Y20.   (G09 = exact stop THIS block only)\n' +
+            'G01 X60. Y20.\n' +
             'G00 Z50.\n' +
             'M30',
         },
-        title: 'G61 vs G64 Lab',
-        caption: 'Swap G64 for G61 in the editor and re-run. In a real machine the difference shows in cycle time and corner finish. In the backplot, both look identical — G61/G64 affects velocity, not the programmed path.',
-      }
+        title: 'G61 / G64 / G09 Lab',
+        caption: 'Try switching between G61 and G64 at the top of the square contour. Also note G09 on one block — the exact stop check applies only to that move, then G64 resumes. The backplot path looks identical; the speed difference is invisible in a simulator but dramatic on a real machine.',
+      },
     ],
     prose: [
-      '**The Problem with Short Segments**: Modern CAM software outputs toolpaths as sequences of tiny G01 moves — each segment might be only 0.05–0.5mm long. At F2000 mm/min, each segment takes 1.5–15 milliseconds. At each endpoint, the controller must decide: stop here, or blend into the next move? With G61, it always stops. The machine decelerates, touches zero, reaccelerates — for every single one of those thousands of segments. Actual cutting speed drops to a fraction of programmed feed.',
+      '**The Controller\'s Job Between Blocks**: Think of the CNC controller as reading a book — it reads blocks one at a time. After reading a block, it must parse the G-codes, evaluate any macro expressions, compute the interpolation trajectory for every axis, and queue the motion for the servo drives. This takes time — the **block cycle time (BCT)**. On a Fanuc Series 0 from the 1990s, BCT was about 16 milliseconds. A modern Fanuc 30i can process a block in 0.5 milliseconds. That 32× difference is why older machines struggle with HSM toolpaths that newer ones handle easily.',
 
-      '**G64 — Continuous/Blended Mode**: In G64, the controller looks ahead at upcoming blocks (the lookahead buffer) and computes a continuous velocity profile. If two consecutive moves are nearly collinear, the machine barely slows down. If they meet at 90°, it slows more — but not necessarily to zero. The result is a smooth velocity profile that maintains high average feedrate while still respecting servo acceleration limits.',
+      '**The Block Processing Bottleneck (Peter Smid\'s "Hidden Wall")**: Here is the math most textbooks skip. At F2000 mm/min, the tool travels 33.3 mm/s. If each CAM segment is 0.2mm long, the tool covers one segment in 0.2/33.3 = 6ms. But if the controller needs 8ms to process each block, the tool reaches the end of the segment before the next motion command is ready. The machine stalls — or the controller hardware-limits the feedrate to what it can sustain. This is why the BCT bottleneck formula matters:\n```\nF_max = (segment_length × 60,000) / BCT_ms   [mm/min]\n```\nAt 0.2mm segments and 4ms BCT: F_max = (0.2 × 60,000) / 4 = 3000 mm/min. Program F5000 and the machine physically cannot comply — it runs at 3000 regardless of what the display shows.',
 
-      '**G61 — Exact Stop Mode**: In G61, the machine decelerates to zero at the endpoint of every block before beginning the next one. This guarantees that the tool reaches the exact programmed XYZ coordinate. It is slow on multi-segment paths, but it is correct and predictable. Use it for: probing cycles (where the probe must trigger at rest), boring bar retract positions, tapping retract positions, and any operation where the machine absolutely must touch a specific point before continuing.',
+      '**G64 — Continuous Path Mode**: In G64, the lookahead buffer allows the controller to pre-read upcoming blocks and build a continuous velocity profile. Adjacent moves are "blended" — at a shallow corner, the machine barely slows. At a sharp corner, it slows proportionally. At a reversal (180°), it still must stop. The key insight is that G64 never violates servo acceleration limits; it uses the lookahead to *schedule* decelerations in advance rather than reacting to them.',
 
-      '**The Lookahead Buffer**: A modern Fanuc 30i or Siemens 840D controller may look ahead 200–2000 blocks. Older controls look ahead 4–16 blocks. For HSM (high-speed machining) with CAM output of 0.1mm segments, a 16-block lookahead covers only 1.6mm of path — barely enough time to plan a smooth deceleration into a tight corner. A 2000-block lookahead covers 200mm and can maintain F5000+ smoothly through complex 3D surfaces.',
+      '**G61 — Exact Stop Mode**: In G61, the machine decelerates to zero and waits within the "in-position" window (a tight position tolerance, typically 0.001–0.005mm) at the endpoint of every block. Only when the axis is confirmed to be within tolerance does the next block begin executing. This is the correct mode for: probing (probe must be stationary at trigger), boring retract (tool must be centered before retracting to avoid scratching the bore wall), tapping (spindle-to-feed synchronization must be verified at depth), and any fixture probing or measurement cycle.',
 
-      '**G64 P_ — Tolerance Band** (Fanuc 0i/30i and above): `G64 P0.01` permits the controller to deviate up to 0.01mm from the programmed path during blending. Larger tolerance = smoother at higher speeds but more path error. For finish passes on precision surfaces, use a small P value or G61. For roughing, a larger P dramatically improves cycle time. Siemens 840D has a similar parameter called SOFT (smooth interpolation) and COMPCAD.',
+      '**G61.1 — Exact Stop Check Mode**: Smid distinguishes carefully between G61 and G61.1. G61 is "exact stop" — the machine actually touches zero velocity. G61.1 is "exact stop check" — the machine continues as soon as the position error falls within the in-position tolerance band, which may happen slightly before velocity reaches zero. G61.1 is faster than G61 for the same tolerance, and is the preferred mode for precision contouring where sharp corners must be exact but where demanding that velocity reach true zero is overkill.',
 
-      '**Practical Mode Selection**:\n' +
-      '- **Roughing / pocketing**: G64 (possibly with larger P tolerance). Speed matters, accuracy is secondary.\n' +
-      '- **Contouring / finishing**: G64 with a tight P tolerance, or G61 on critical corners.\n' +
-      '- **Drilling / boring / probing**: G61 — you must reach the exact hole bottom.\n' +
-      '- **Tapping**: G61 or the tap cycle\'s built-in exact-stop behavior.',
+      '**G09 — The Precision Scalpel**: G09 is non-modal (one-shot). It applies exact stop check behavior to a single block, then the program reverts to whatever modal mode (G61 or G64) was active before. Write `G09 G01 X50. Y30.` to hit that specific point exactly within a otherwise-continuous G64 program. This is the cleanest way to guarantee a critical position — a pocket corner, a datum probe point, a thread start — without slowing the entire toolpath.',
+
+      '**Following Error: Why Every Corner Rounds at High Speed**: The servo drive uses a **position loop** to compare commanded position to actual encoder position. The difference — called **following error** or **position error** — is the input to the position controller. At steady-state, following error is always nonzero at any nonzero feedrate:\n```\nE = F / (Kv × 1000)\n```\nWhere F is feedrate in mm/min and Kv is the position loop gain in (m/min)/mm. At F = 3000 mm/min and Kv = 30, following error = 3000/(30×1000) = 0.1mm. The servo physically lags 0.1mm behind the commanded position. At a 90° corner, this lag means the tool begins turning the corner before it has fully reached the corner point — creating a visible radius even in G64. Higher Kv = less error, but too high and the servo oscillates (instability). This is a machine parameter set by the builder\'s service engineer.',
+
+      '**S-Curve Acceleration: Why Surface Finish Changes at High Feed**: Most shop-floor machines use trapezoidal velocity profiles: the feedrate ramps up linearly to the commanded value, holds, then ramps down linearly. The discontinuity in acceleration at the start and end of each ramp transmits an impulse to the machine structure. At high feedrates, this impulse excites resonant frequencies and causes micro-vibrations that show up as periodic surface marks. **S-curve acceleration** limits the rate of change of acceleration (jerk) so the velocity profile is smooth — no abrupt corners. This is standard on Fanuc 30i and Siemens 840D. On older machines with trapezoidal ramps, slightly reducing feed on finish passes (even if within BCT limits) often improves surface finish.',
+
+      '**NURBS Interpolation (G5.1 / G6.1)**: The ultimate solution to the short-segment problem. Instead of approximating a curve with thousands of tiny G01 segments, the CAM system describes the surface mathematically as a NURBS (Non-Uniform Rational B-Spline). The CNC program contains only the control points, weights, and knot vectors — typically a few dozen numbers per curve. The controller\'s internal interpolator computes the actual motion directly on the smooth curve, producing zero segmentation error, dramatically fewer program blocks, and genuinely smooth velocity profiles at the highest feedrates. `G5.1 Q1` activates AI nano contour control with NURBS on Fanuc 30i. Available only on high-end controllers with the NURBS option.',
+
+      '**HSM Recipe — What to Set for True High-Speed Machining**: Real HSM programs combine: G64 (continuous mode), a BCT-appropriate segment length from the CAM post, the correct G64 P_ tolerance for the pass type, AICC or nano smoothing if available, and the right feedrate for the actual Kv of the machine. Missing any one of these — especially running G61 on CAM-generated surface paths, or ignoring the BCT bottleneck — collapses actual cutting speed to a fraction of commanded feed.',
     ],
   },
 
   math: {
     prose: [
-      'The minimum deceleration distance before a corner of angle θ:',
-      '$d_{\\text{dec}} = \\frac{v^2}{2 \\cdot a_{\\text{max}}}$',
-      'Where v is the current feedrate (m/s) and a_max is the servo\'s maximum deceleration (m/s²).',
-      'For a corner angle change of Δθ, the maximum blend-through speed in G64 is:',
-      '$v_{\\text{corner}} = v_{\\text{max}} \\cdot \\cos\\left(\\frac{\\Delta\\theta}{2}\\right)$',
-      'At Δθ = 0° (straight line): v_corner = v_max (no deceleration needed).',
-      'At Δθ = 90°: v_corner ≈ 0.707 × v_max (√2/2 reduction).',
-      'At Δθ = 180° (full reversal): v_corner = 0 (must stop).',
-      'This formula explains why shallow-angle corners are almost free (machine barely decelerates) while sharp corners are expensive (large speed reduction required). The lookahead computes this for every upcoming corner and builds a smooth velocity ramp in advance.',
+      '**Block cycle time bottleneck — maximum feedrate:**',
+      '$F_{\\text{max}} = \\dfrac{L_{\\text{seg}} \\times 60{,}000}{\\text{BCT}_{\\text{ms}}}$ [mm/min]',
+      'Where $L_{\\text{seg}}$ is the CAM segment length in mm and BCT is the controller block cycle time in milliseconds.',
+      'Example: $L_{\\text{seg}} = 0.1$ mm, BCT = 4 ms (Fanuc 16i): $F_{\\text{max}} = 0.1 \\times 60{,}000 / 4 = 1500$ mm/min.',
+      '',
+      '**Following error (servo position error):**',
+      '$E = \\dfrac{F}{K_v \\times 1000}$ [mm]',
+      'Where $F$ is feedrate in mm/min and $K_v$ is the position loop gain in (m/min)/mm.',
+      'At F = 3000 mm/min, Kv = 30 (m/min)/mm: $E = 3000 / 30{,}000 = 0.1$ mm.',
+      'Doubling feedrate doubles following error and doubles corner rounding.',
+      '',
+      '**Corner blend-through speed in G64:**',
+      '$v_{\\text{corner}} = v_{\\text{max}} \\cdot \\cos\\!\\left(\\dfrac{\\Delta\\theta}{2}\\right)$',
+      'At $\\Delta\\theta = 0°$ (collinear): $v_{\\text{corner}} = v_{\\text{max}}$ — no deceleration.',
+      'At $\\Delta\\theta = 90°$: $v_{\\text{corner}} \\approx 0.707\\, v_{\\text{max}}$.',
+      'At $\\Delta\\theta = 180°$ (reversal): $v_{\\text{corner}} = 0$ — must stop.',
+      '',
+      '**Deceleration distance before a corner:**',
+      '$d_{\\text{dec}} = \\dfrac{v^2 - v_{\\text{corner}}^2}{2 \\, a_{\\text{max}}}$ [mm]',
+      'This is the distance the controller needs to schedule the deceleration ramp. If the lookahead buffer does not extend far enough ahead to cover $d_{\\text{dec}}$, the machine cannot reach the corner at the correct speed and must brake abruptly.',
     ],
   },
 
   rigor: {
     prose: [
-      '**Jerk limits and S-curves**: Modern high-end controllers (Fanuc 30i, Siemens 840D) apply jerk limits (rate of change of acceleration) in addition to acceleration limits. This creates S-curve velocity profiles instead of trapezoidal ones, further reducing mechanical shock on machine axes and improving surface finish at high feedrates.',
+      '**In-position check and G61 vs G61.1 precision**: The in-position band is a machine parameter (Fanuc parameter #1826). The default is typically 0.004–0.010mm. G61 requires the axis to be within this band *and* at near-zero velocity. G61.1 requires only that the position error is within the band. The practical difference is 5–40ms per corner — small on one corner, significant across thousands of corners in a complex program.',
 
-      '**CAM post-processor interaction**: Most CAM post-processors emit a G64 (or equivalent) at the start of 3D contouring toolpaths and G61 at the start of drilling cycles. If your post-processor is not setting the correct mode, you can add it manually to the program header. Always verify.',
+      '**Fanuc lookahead depth by series**: Fanuc 0: ~4–8 blocks. Fanuc 16/18/21: ~16 blocks. Fanuc 30i/31i with AICC II: 200–2000 blocks depending on the option. Each generation roughly doubles the sustainable feedrate on a given CAM toolpath. This is why upgrading a controller (not just the machine) is a productivity investment.',
 
-      '**AICC / AI nano contour control**: Fanuc AICC (AI Contour Control) and similar features on high-end controls extend the lookahead to thousands of blocks and apply predictive algorithms to maintain feedrate through complex 3D surface toolpaths. These are machine parameter/option settings, not G-codes. They work alongside G64.',
+      '**Siemens 840D: SOFT, COMPCAD, and TOP_SURFACE**: Siemens uses G64 equivalent (DYNFINISH, DYNPOS, DYNNORM modes) plus geometric tolerance via G64 with SOFT. COMPCAD is the equivalent of Fanuc AICC — it smooths CAM-generated paths on the controller before execution. TOP_SURFACE applies spline fitting to short-segment paths in real time. These are invoked in the part program or via machine parameter — comparable in capability to Fanuc AICC II.',
 
-      '**G61 produces better corner geometry**: On a square pocket corner that must be sharp (0° radius), G61 guarantees the tool reaches the exact corner coordinate. G64 will slightly round the corner within its tolerance band. For die/mold work where the toolpath produces the final form, G61 on corners and G64 on straight runs (or AI contour control for the entire path) is the standard approach.',
+      '**Surface finish consequences of mode choice**: G61 on a contoured surface leaves "dwell marks" — tiny flat spots at every programmed corner where the tool paused while stationary. These are visible (and measurable) on reflective surfaces like aluminum. G64 eliminates dwell marks but, if the P tolerance is too large, leaves path deviation visible as facets. The optimal setting is: G64 with a P value ≤ the maximum chordal error from the CAM tolerance — matching the controller tolerance to the CAM tolerance so the controller doesn\'t introduce additional deviation beyond what was already in the toolpath.',
+
+      '**Feed forward: reducing following error without changing Kv**: Many controllers support a velocity feed-forward parameter. Instead of waiting for position error to accumulate and then correcting, the controller adds a fraction of the *commanded velocity* directly to the servo output — pre-compensating for the lag before it occurs. With 100% feed-forward, following error drops to near zero even at high feedrates. Feed-forward is a parameter (not a G-code) and must be tuned carefully — too much causes overshoot.',
     ],
   },
 
   examples: [
     {
-      id: 'ex-lookahead-corner-speed',
-      title: 'Calculate Corner Speed at 90° in G64',
-      problem: 'A machine runs at F3000 mm/min (50 mm/s). At a 90° corner (Δθ = 90°), what is the maximum blend-through speed in G64 mode?',
+      id: 'ex-la-bct',
+      title: 'Finding the BCT Bottleneck on a Specific Machine',
+      problem: 'A Fanuc 16i (BCT ≈ 4 ms) runs a 3D surface program with 0.05mm CAM segments at programmed F3000. What is the actual achievable feedrate?',
       steps: [
-        { expression: 'v_max = 3000 mm/min = 50 mm/s', annotation: 'Convert programmed feedrate to mm/s.' },
-        { expression: 'Δθ = 90°', annotation: 'A square corner — the most common case.' },
-        { expression: 'v_corner = 50 × cos(90°/2) = 50 × cos(45°)', annotation: 'Apply the corner blend formula.' },
-        { expression: 'v_corner = 50 × 0.7071 = 35.35 mm/s ≈ 2121 mm/min', annotation: 'Blend-through speed at a 90° corner is about 70% of programmed feedrate.' },
+        { expression: 'F_max = (0.05 mm × 60,000) / 4 ms', annotation: 'Apply the BCT bottleneck formula.' },
+        { expression: 'F_max = 3000 / 4 = 750 mm/min', annotation: 'The controller can only process one 0.05mm block every 4ms, capping speed at 750 mm/min.' },
+        { expression: 'Programmed F3000 → actual F750', annotation: 'The machine runs at 25% of the programmed feedrate. The display may still show F3000.' },
+        { expression: 'Fix option 1: increase CAM segment to 0.2mm → F_max = 3000 mm/min', annotation: 'Larger segments allow higher sustainable feedrate.' },
+        { expression: 'Fix option 2: upgrade to Fanuc 30i (BCT ≈ 1ms) → F_max = 3000 mm/min at 0.05mm', annotation: 'Faster controller eliminates the bottleneck without changing the CAM output.' },
       ],
-      conclusion: 'At a 90° corner, G64 allows blending at ~70% of feedrate. At a 45° corner it would be ~92%. At 180° (reversal), it must drop to 0. The lookahead pre-computes and schedules these decelerations in advance.',
+      conclusion: 'The BCT bottleneck is why identical programs run 4× faster on newer controllers. Always compute F_max before assuming the machine can run a given CAM feedrate.',
     },
     {
-      id: 'ex-lookahead-cycle-time',
-      title: 'G61 vs G64 Cycle Time on a Short-Segment Toolpath',
-      problem: 'A CAM path has 200 segments of 0.2mm each (40mm total). Programmed feed F2000 mm/min. Machine a_max = 500 mm/s². Compare cycle times in G61 vs G64.',
+      id: 'ex-la-following-error',
+      title: 'Following Error on a Precision Corner',
+      problem: 'A die mold machine has Kv = 25 (m/min)/mm. A finish pass runs at F1500 mm/min. What is the corner rounding error, and should G61.1 be used?',
       steps: [
-        { expression: 'G64: mostly at F2000 ≈ 33.3 mm/s → 40mm ÷ 33 mm/s ≈ 1.2 s', annotation: 'With G64, the machine maintains near-max feedrate through shallow corners.' },
-        { expression: 'G61: each segment = decel + 0.2mm + accel', annotation: 'Every segment requires full stop and restart.' },
-        { expression: 'Stop/start per segment: v²/a = (33)²/500 ≈ 2.2 mm each way', annotation: 'Deceleration distance for v=33mm/s at 500mm/s².' },
-        { expression: 'But segments are only 0.2mm! Machine barely reaches 10 mm/s per segment', annotation: 'Short segments in G61 severely limit achievable speed.' },
-        { expression: 'G61 cycle time ≈ 4–8× longer than G64 for this path', annotation: 'Real-world measurement on HSM toolpaths confirms this order of magnitude difference.' },
+        { expression: 'E = F / (Kv × 1000)', annotation: 'Following error formula.' },
+        { expression: 'E = 1500 / (25 × 1000) = 0.060 mm', annotation: '60 microns of servo lag — visible on a precision mold.' },
+        { expression: 'G61.1 forces error to ≤ in-position band (≈ 0.005mm) at corners', annotation: 'G61.1 waits until the servo catches up before blending into the next move.' },
+        { expression: 'Penalty: ~10–20ms per corner × 500 corners = ~5–10 seconds extra cycle time', annotation: 'Acceptable cost for a precision die or form tool.' },
+        { expression: 'Alternative: feed-forward compensation reduces E without speed penalty', annotation: 'Machine parameter change, requires servo tuning by a Fanuc field engineer.' },
       ],
-      conclusion: 'For CAM-generated paths with short segments, G61 is prohibitively slow. G64 with appropriate lookahead depth is mandatory for high-speed machining.',
+      conclusion: 'For Kv = 25 and F1500, following error is 0.060mm — too large for die work. G61.1 at precision corners is the correct program-level fix. Feed-forward is the machine-level fix.',
+    },
+    {
+      id: 'ex-la-g09',
+      title: 'Using G09 for One Critical Datum Point',
+      problem: 'A pocket has 7 blend radius corners (G64 is fine) and 1 sharp datum corner that must be hit exactly for fixturing. Write the code.',
+      steps: [
+        { expression: 'G64  (continuous mode for the whole pocket)', annotation: 'G64 modal — speeds through the 6 blend corners.' },
+        { expression: 'G01 X0 Y0 F800   (approach to datum corner)', annotation: 'Normal blended move.' },
+        { expression: 'G09 G01 X50. Y0  (exact stop check on THIS block)', annotation: 'G09 applies only here. Machine waits within in-position tolerance before continuing.' },
+        { expression: 'G01 X50. Y50.    (G64 resumes — G09 was one-shot)', annotation: 'Next block blends normally. G64 is still modal.' },
+      ],
+      conclusion: 'G09 is the precision scalpel: exact position on one critical point without penalizing the rest of the path. No mode-switch overhead.',
     },
   ],
 
@@ -353,65 +589,103 @@ draw()
         type: 'choice',
         text: 'G61 mode causes the machine to:',
         options: [
-          'Skip short segments for faster motion',
-          'Decelerate to zero at the endpoint of every block before starting the next',
-          'Blend motion smoothly through corners',
-          'Enable high-speed machining mode',
+          'Blend motion smoothly through corners at maximum speed',
+          'Decelerate to zero velocity at the endpoint of every block, then check position before starting the next',
+          'Skip short segments to avoid the block cycle time limit',
+          'Enable NURBS spline interpolation',
         ],
-        answer: 'Decelerate to zero at the endpoint of every block before starting the next',
+        answer: 'Decelerate to zero velocity at the endpoint of every block, then check position before starting the next',
       },
       {
         id: 'cnc-la-2',
         type: 'choice',
-        text: 'Which mode should you use for a drilling cycle that requires exact hole positioning?',
-        options: ['G64', 'G61', 'G17', 'G49'],
-        answer: 'G61',
+        text: 'What is the key difference between G61 and G61.1?',
+        options: [
+          'G61 is modal; G61.1 is non-modal (one-shot)',
+          'G61 waits for true zero velocity; G61.1 continues once position error is within tolerance',
+          'G61 applies only to linear moves; G61.1 applies to arc moves',
+          'G61.1 is a Siemens code; G61 is Fanuc only',
+        ],
+        answer: 'G61 waits for true zero velocity; G61.1 continues once position error is within tolerance',
       },
       {
         id: 'cnc-la-3',
         type: 'choice',
-        text: 'What does a deeper lookahead buffer enable?',
+        text: 'G09 is:',
         options: [
-          'Faster rapid traverse speed',
-          'Higher maximum spindle RPM',
-          'Smoother velocity profiles on paths with many short segments at high feedrates',
-          'Larger tool diameter compensation',
+          'Modal exact stop — stays active until G64 cancels it',
+          'Non-modal (one-shot) exact stop check — applies to the next block only',
+          'Equivalent to G61.1 but for arc moves only',
+          'A canned probing cycle requiring G80 to cancel',
         ],
-        answer: 'Smoother velocity profiles on paths with many short segments at high feedrates',
+        answer: 'Non-modal (one-shot) exact stop check — applies to the next block only',
       },
       {
         id: 'cnc-la-4',
         type: 'choice',
-        text: 'At a 180° reversal (the tool must go back the way it came), G64 will:',
-        options: [
-          'Maintain full feedrate through the reversal',
-          'Slow to 50% feedrate',
-          'Decelerate to zero — a reversal cannot be blended',
-          'Skip the reversal and go straight through',
-        ],
-        answer: 'Decelerate to zero — a reversal cannot be blended',
+        text: 'A Fanuc 16i has a block cycle time of 4ms. CAM generates 0.1mm segments. What is the maximum feedrate before the BCT bottleneck?',
+        options: ['750 mm/min', '1500 mm/min', '3000 mm/min', '6000 mm/min'],
+        answer: '1500 mm/min',
       },
       {
         id: 'cnc-la-5',
         type: 'choice',
-        text: 'G64 P0.01 means:',
+        text: 'Following error (servo lag) is proportional to:',
         options: [
-          'The lookahead buffer holds 0.01 seconds of data',
-          'The machine may deviate up to 0.01mm from the programmed path during blending',
-          'The feedrate is limited to 0.01% of programmed feed',
-          'Exact stop tolerance is 0.01mm',
+          'Spindle RPM',
+          'Feedrate — higher feed = more lag',
+          'Corner angle — sharper corners = more lag',
+          'Tool length offset',
         ],
-        answer: 'The machine may deviate up to 0.01mm from the programmed path during blending',
+        answer: 'Feedrate — higher feed = more lag',
+      },
+      {
+        id: 'cnc-la-6',
+        type: 'choice',
+        text: 'At a 90° corner in G64, the blend-through speed is approximately:',
+        options: [
+          '100% of F_max (no deceleration)',
+          '70.7% of F_max',
+          '50% of F_max',
+          '0% — must stop at 90°',
+        ],
+        answer: '70.7% of F_max',
+      },
+      {
+        id: 'cnc-la-7',
+        type: 'choice',
+        text: 'Dwell marks on a contoured surface are caused by:',
+        options: [
+          'G64 tolerance band being set too small',
+          'G61 (or G61.1) causing the tool to pause at every corner while stationary',
+          'NURBS interpolation rounding the path',
+          'Feedrate overshoot at corners',
+        ],
+        answer: 'G61 (or G61.1) causing the tool to pause at every corner while stationary',
+      },
+      {
+        id: 'cnc-la-8',
+        type: 'choice',
+        text: 'What is the advantage of NURBS/spline interpolation over short-segment G01 toolpaths?',
+        options: [
+          'NURBS does not require the controller to have a lookahead buffer',
+          'The controller interpolates on a smooth mathematical curve — eliminating segment-count limitations and producing genuine smooth motion with far fewer blocks',
+          'NURBS paths always run at exactly the programmed feedrate',
+          'NURBS works only in G61 mode',
+        ],
+        answer: 'The controller interpolates on a smooth mathematical curve — eliminating segment-count limitations and producing genuine smooth motion with far fewer blocks',
       },
     ]
   },
 
   mentalModel: [
-    'G64 = blend/continuous. Machine smooths through corners. Use for contouring, pocketing.',
-    'G61 = exact stop. Machine stops at every endpoint. Use for drilling, boring, probing.',
-    'Lookahead buffer: more blocks = smoother HSM toolpaths at high feed.',
-    'Corner speed formula: v_corner = v_max × cos(Δθ/2). 90° corner = 70% speed, 180° = 0.',
-    'Short CAM segments + G61 = catastrophically slow. Always use G64 for 3D surface machining.',
-    'G64 P_ sets path deviation tolerance. Larger = faster, more deviation.',
+    'G64 = continuous/blend. G61 = exact stop. G61.1 = exact stop check. G09 = one-shot exact stop check.',
+    'BCT bottleneck: F_max = (segment_length × 60,000) / BCT_ms. Short segments + slow controller = capped feedrate.',
+    'Following error: E = F / (Kv × 1000). More speed = more servo lag = more corner rounding.',
+    'Corner blend speed: v_corner = v_max × cos(Δθ/2). 90° → 70% speed. 180° → must stop.',
+    'Dwell marks = G61 on contoured surfaces. Fix: use G64 with appropriate P tolerance.',
+    'G09 on one line = exact stop on that move only. G64 continues after. The precision scalpel.',
+    'NURBS (G5.1): smooth curve interpolation — eliminates the short-segment problem at the source.',
+    'HSM recipe: G64 + correct BCT-limited segment length + AICC/lookahead option + correct Kv.',
   ],
 }

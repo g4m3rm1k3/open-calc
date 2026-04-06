@@ -87,7 +87,7 @@ export default {
       {
         type: 'theorem',
         title: 'Key Corollaries of the MVT',
-        body: '(1) f\'=0 on (a,b) \\implies f \\text{ is constant.}\\\\ (2) f\'>0 \\implies f \\text{ strictly increasing.}\\\\ (3) F\'=G\' \\implies F = G + C.\\\\ (4) |f(b)-f(a)| \\le (b-a)\\max|f\'|.',
+        body: '(1) f\'=0 on (a,b) \\\\implies f \\\\text{ is constant.}\\\\ (2) f\'>0 \\\implies f \\text{ strictly increasing.}\\\\ (3) F\'=G\' \\implies F = G + C.\\\\ (4) |f(b)-f(a)| \\le (b-a)\\max|f\'|.',
       },
       {
         type: 'theorem',

@@ -76,156 +76,98 @@ export default {
       {
         id: 'ScienceNotebook',
         props: {
-          cells: [
-            {
-              cellTitle: 'ATC Motion Sequence — Z Retract → Swap → Reposition',
-              prose:
-                'This animation shows the three phases of a tool change on a vertical machining center: ' +
-                '(1) Z retracts to machine home (G28 Z0), (2) the ATC arm swaps tools, (3) Z descends to the approach position above the part.',
-              html: '',
-              startCode: `
-const canvas = document.getElementById('atc-canvas')
-const ctx = canvas.getContext('2d')
-let frame = 0
-const TOTAL = 240
+          lesson: {
+            title: 'ATC Motion Sequence',
+            cells: [
+              {
+                type: 'js',
+                title: 'ATC Motion Sequence — Z Retract → Swap → Reposition',
+                html: `<canvas id="c" width="560" height="280" style="display:block;max-width:100%;border-radius:8px;background:#0f172a"></canvas>`,
+                css: `body{margin:0;background:#0f172a;padding:12px;font-family:monospace;display:flex;flex-direction:column;align-items:center}`,
+                startCode: `
+const c = document.getElementById('c');
+const W = c.width, H = c.height;
+const ctx = c.getContext('2d');
+let frame = 0;
+const TOTAL = 240;
 
 function draw() {
-  const W = canvas.width, H = canvas.height
-  ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = '#0f172a'
-  ctx.fillRect(0, 0, W, H)
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, W, H);
 
-  const isDark = true
-  const t = frame / TOTAL
-
-  // Phase boundaries: 0-0.3 = retract, 0.3-0.6 = swap, 0.6-1.0 = approach
-  const phase = t < 0.3 ? 0 : t < 0.6 ? 1 : 2
-  const phaseT = phase === 0 ? t / 0.3 : phase === 1 ? (t - 0.3) / 0.3 : (t - 0.6) / 0.4
+  const t = frame / TOTAL;
+  const phase = t < 0.3 ? 0 : t < 0.6 ? 1 : 2;
+  const phaseT = phase === 0 ? t / 0.3 : phase === 1 ? (t - 0.3) / 0.3 : (t - 0.6) / 0.4;
 
   // Machine body
-  ctx.fillStyle = '#1e293b'
-  ctx.fillRect(W*0.1, 20, W*0.8, H*0.7)
-  ctx.strokeStyle = '#334155'
-  ctx.lineWidth = 1
-  ctx.strokeRect(W*0.1, 20, W*0.8, H*0.7)
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(W*0.1, 20, W*0.8, H*0.7);
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+  ctx.strokeRect(W*0.1, 20, W*0.8, H*0.7);
 
-  // Tool carousel (right side)
-  const carX = W * 0.75, carY = 80
-  ctx.fillStyle = '#475569'
-  ctx.beginPath()
-  ctx.arc(carX, carY, 38, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.fillStyle = '#64748b'
-  ctx.beginPath()
-  ctx.arc(carX, carY, 28, 0, Math.PI * 2)
-  ctx.fill()
-  // Tool pockets on carousel
+  // Tool carousel
+  const carX = W * 0.75, carY = 70;
+  ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.arc(carX, carY, 36, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.arc(carX, carY, 26, 0, Math.PI*2); ctx.fill();
   for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2 - Math.PI / 2
-    const px = carX + Math.cos(angle) * 30
-    const py = carY + Math.sin(angle) * 30
-    ctx.fillStyle = i === 1 ? '#f59e0b' : '#1e3a5f'
-    ctx.beginPath()
-    ctx.arc(px, py, 5, 0, Math.PI * 2)
-    ctx.fill()
+    const a = (i/8)*Math.PI*2 - Math.PI/2;
+    ctx.fillStyle = i === 1 ? '#f59e0b' : '#1e3a5f';
+    ctx.beginPath(); ctx.arc(carX+Math.cos(a)*28, carY+Math.sin(a)*28, 5, 0, Math.PI*2); ctx.fill();
   }
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '9px monospace'
-  ctx.textAlign = 'center'
-  ctx.fillText('ATC', carX, carY + 3)
+  ctx.fillStyle = '#94a3b8'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('ATC', carX, carY+3);
 
   // Spindle column
-  const colX = W * 0.4
-  ctx.fillStyle = '#334155'
-  ctx.fillRect(colX - 12, 20, 24, H * 0.65)
+  const colX = W * 0.38;
+  ctx.fillStyle = '#334155'; ctx.fillRect(colX-12, 20, 24, H*0.65);
 
-  // Z machine home line
-  const zHome = 60
-  ctx.strokeStyle = '#4ade80'
-  ctx.lineWidth = 0.7
-  ctx.setLineDash([4, 3])
-  ctx.beginPath(); ctx.moveTo(W*0.1, zHome); ctx.lineTo(W*0.9, zHome); ctx.stroke()
-  ctx.setLineDash([])
-  ctx.fillStyle = '#4ade80'
-  ctx.font = '8px monospace'
-  ctx.textAlign = 'left'
-  ctx.fillText('Z machine home (G28)', W*0.1 + 4, zHome - 3)
+  // Reference lines
+  const zHome = 55, partY = H*0.58, zApproach = partY-38;
+  ctx.lineWidth = 0.7; ctx.textAlign = 'left'; ctx.font = '8px monospace';
+  ctx.strokeStyle = '#4ade80'; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(W*0.1, zHome); ctx.lineTo(W*0.9, zHome); ctx.stroke();
+  ctx.fillStyle = '#4ade80'; ctx.fillText('Z machine home (G28)', W*0.1+4, zHome-3);
+  ctx.strokeStyle = '#38bdf8';
+  ctx.beginPath(); ctx.moveTo(W*0.1, zApproach); ctx.lineTo(W*0.7, zApproach); ctx.stroke();
+  ctx.fillStyle = '#38bdf8'; ctx.fillText('Z approach (R plane)', W*0.1+4, zApproach-3);
+  ctx.setLineDash([]);
 
-  // Part surface
-  const partY = H * 0.6
-  ctx.fillStyle = '#94a3b8'
-  ctx.fillRect(W*0.2, partY, W*0.45, 12)
-  ctx.fillStyle = '#64748b'
-  ctx.font = '8px monospace'
-  ctx.textAlign = 'left'
-  ctx.fillText('PART', W*0.2 + 4, partY + 9)
+  // Part
+  ctx.fillStyle = '#94a3b8'; ctx.fillRect(W*0.18, partY, W*0.44, 10);
+  ctx.fillStyle = '#64748b'; ctx.font = '8px monospace';
+  ctx.fillText('PART', W*0.18+4, partY+8);
 
-  // Z approach line
-  const zApproach = partY - 40
-  ctx.strokeStyle = '#38bdf8'
-  ctx.lineWidth = 0.7
-  ctx.setLineDash([3, 4])
-  ctx.beginPath(); ctx.moveTo(W*0.1, zApproach); ctx.lineTo(W*0.7, zApproach); ctx.stroke()
-  ctx.setLineDash([])
-  ctx.fillStyle = '#38bdf8'
-  ctx.fillText('Z approach (R plane)', W*0.1 + 4, zApproach - 3)
+  // Spindle Z position
+  const cutZ = partY-8;
+  let spZ = phase===0 ? cutZ+(zHome-cutZ)*phaseT : phase===1 ? zHome : zHome+(zApproach-zHome)*phaseT;
+  ctx.fillStyle = '#64748b'; ctx.fillRect(colX-8, spZ-12, 16, 18);
+  ctx.fillStyle = phase===2 ? '#f59e0b' : '#94a3b8'; ctx.fillRect(colX-3, spZ+6, 6, 18);
+  ctx.fillStyle = '#ef4444'; ctx.fillRect(colX-3, spZ+23, 6, 4);
 
-  // Spindle + tool Z position
-  let spindleZ
-  const cutZ = partY - 10
-  if (phase === 0) {
-    // Retracting: from cut depth to Z home
-    spindleZ = cutZ + (zHome - cutZ) * phaseT
-  } else if (phase === 1) {
-    spindleZ = zHome  // at home while swapping
-  } else {
-    // Approaching: from Z home to approach
-    spindleZ = zHome + (zApproach - zHome) * phaseT
-  }
-
-  // Draw spindle + tool
-  ctx.fillStyle = '#64748b'
-  ctx.fillRect(colX - 8, spindleZ - 12, 16, 20)  // spindle housing
-  // Tool (yellow = new during phase 2, gray otherwise)
-  ctx.fillStyle = phase === 2 ? '#f59e0b' : '#94a3b8'
-  ctx.fillRect(colX - 3, spindleZ + 8, 6, 20)  // tool body
-  ctx.fillStyle = '#ef4444'
-  ctx.fillRect(colX - 3, spindleZ + 26, 6, 5)   // cutting end
-
-  // Phase labels
-  const phases = ['① Z RETRACTING', '② TOOL SWAP', '③ Z APPROACHING']
-  const phaseColors = ['#fbbf24', '#f59e0b', '#38bdf8']
-  ctx.fillStyle = phaseColors[phase]
-  ctx.font = 'bold 11px monospace'
-  ctx.textAlign = 'center'
-  ctx.fillText(phases[phase], W / 2, H * 0.82)
-
-  // Current tool indicator
-  const toolNum = phase < 2 ? 1 : 2
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '9px monospace'
-  ctx.textAlign = 'center'
-  ctx.fillText(\`Active tool: T\${toolNum}\`, W / 2, H * 0.89)
+  // Phase label
+  const phases=['① Z RETRACTING','② TOOL SWAP','③ Z APPROACHING'];
+  const phCols=['#fbbf24','#f59e0b','#38bdf8'];
+  ctx.fillStyle=phCols[phase]; ctx.font='bold 11px monospace'; ctx.textAlign='center';
+  ctx.fillText(phases[phase], W/2, H*0.82);
+  ctx.fillStyle='#94a3b8'; ctx.font='9px monospace';
+  ctx.fillText('Active: T'+(phase<2?1:2), W/2, H*0.89);
 
   // Progress bar
-  ctx.fillStyle = '#1e293b'
-  ctx.fillRect(W*0.1, H*0.93, W*0.8, 8)
-  ctx.fillStyle = phaseColors[phase]
-  ctx.fillRect(W*0.1, H*0.93, W*0.8*t, 8)
+  ctx.fillStyle='#1e293b'; ctx.fillRect(W*0.1, H*0.93, W*0.8, 7);
+  ctx.fillStyle=phCols[phase]; ctx.fillRect(W*0.1, H*0.93, W*0.8*t, 7);
 
-  frame = (frame + 1) % TOTAL
-  requestAnimationFrame(draw)
+  frame = (frame+1) % TOTAL;
+  requestAnimationFrame(draw);
 }
-draw()
-              `,
-              canvasId: 'atc-canvas',
-              canvasWidth: 520,
-              canvasHeight: 280,
-            },
-          ]
+draw();
+                `,
+              },
+            ],
+          },
         },
         title: 'ATC Motion Sequence',
-        caption: 'Three phases of every tool change: retract Z to machine home, execute the physical swap, then descend to the approach position. If any phase is interrupted (wrong Z on M06, missing G43 after), the program is unsafe.',
+        caption: 'Three phases of every tool change: retract Z to machine home, execute the physical swap, then descend to the approach position. If any phase is interrupted — wrong Z on M06, or missing G43 after — the program is unsafe.',
       }
     ],
     prose: [

@@ -9,19 +9,21 @@ export default {
 
   semantics: {
     core: [
-      { symbol: 'X', meaning: 'Left–right axis (on a VMC: table moves left/right, or spindle moves left/right depending on machine design).' },
-      { symbol: 'Y', meaning: 'Front–back axis (in/out from the operator on a VMC).' },
-      { symbol: 'Z', meaning: 'Up–down axis: the spindle axis. Positive Z moves the tool away from the part (up on a VMC).' },
-      { symbol: 'A', meaning: 'Rotary axis around the X-axis (tilting in the Y–Z plane).' },
-      { symbol: 'B', meaning: 'Rotary axis around the Y-axis (tilting in the X–Z plane).' },
-      { symbol: 'C', meaning: 'Rotary axis around the Z-axis (rotation in the X–Y plane, like a rotary table or live tooling on a lathe).' },
-      { symbol: 'Machine Zero', meaning: 'The fixed hardware home position, defined by physical limit switches. G53 coordinates reference this point.' },
-      { symbol: 'Work Zero', meaning: 'The user-defined origin for a specific part setup, stored in work offsets (G54–G59).' },
+      { symbol: 'X', meaning: 'Left–right axis (on a VMC: table moves left/right). Positive X is to the right of the operator.' },
+      { symbol: 'Y', meaning: 'Front–back axis (in/out from the operator). Positive Y is away from you — toward the back of the machine.' },
+      { symbol: 'Z', meaning: 'Up–down axis: the spindle axis. Positive Z moves the tool away from the part (up on a VMC) — the safety direction.' },
+      { symbol: 'A', meaning: 'Rotary axis around X (tilts in the Y–Z plane). Right-hand rule: thumb in +X, fingers curl from +Y toward +Z.' },
+      { symbol: 'B', meaning: 'Rotary axis around Y (tilts in the X–Z plane). Right-hand rule: thumb in +Y, fingers curl from +Z toward +X.' },
+      { symbol: 'C', meaning: 'Rotary axis around Z (rotation in the X–Y plane). Right-hand rule: thumb in +Z, fingers curl from +X toward +Y.' },
+      { symbol: 'Machine Zero', meaning: 'The fixed hardware home position, defined by physical limit switches. G53 coordinates reference this point. It never moves.' },
+      { symbol: 'Work Zero', meaning: 'The user-defined origin for a specific part setup, stored in work offsets (G54–G59). All G-code programs reference this point.' },
+      { symbol: 'DRO', meaning: 'Digital Readout — the live position display showing current axis coordinates. The machine\'s odometer. Can show machine coords (G53), work coords (G54), or distance-to-go.' },
     ],
     rulesOfThumb: [
-      'Z is always the spindle axis. Positive Z always moves the tool away from the part — safety direction.',
-      'Right-hand rule: point your right thumb along an axis, your fingers curl in the positive rotation direction for that rotary axis.',
-      'On a VMC, the table moves, not the spindle, in X and Y. But in G-code we always program the tool position, not the table position.',
+      'Z is always the spindle axis. Positive Z always moves the tool away from the part — safety direction. When in doubt, go positive Z.',
+      'Right-hand rule for rotary axes: curl the fingers of your right hand around the linear axis it rotates around. Your thumb points in the positive linear direction; your fingers point in the positive rotation direction.',
+      'On a VMC, the table moves in X and Y — the spindle is fixed in XY. But in G-code we always program the tool\'s position relative to the part, regardless of which motor actually moves.',
+      'A, B, C always pair with X, Y, Z respectively. A rotates around X. B rotates around Y. C rotates around Z. Memory trick: alphabetical pairing.',
     ]
   },
 
@@ -31,11 +33,23 @@ export default {
       'A CNC machine is a 3D Cartesian robot. Every point in the working volume of the machine is described by a set of signed numbers: X, Y, and Z coordinates. ' +
       'The machine\'s controller maintains a running position register — a live readout called the **DRO (Digital Readout)** — showing exactly where the tool tip is at all times. ' +
       'When you command X1.0, you are telling the controller: "move until the X register reads 1.0000". ' +
-      'Understanding the axis convention for your machine type is the first requirement for writing any G-code correctly.',
+      'Understanding the axis convention — and especially the right-hand rule for rotary axes — is the first requirement for writing any G-code correctly. ' +
+      'Click each axis in the explorer below to see exactly what it does, where positive is, and for rotary axes, watch the right-hand rule curl in real time.',
+    previewVisualizationId: 'CNCAxesExplorer',
   },
 
   intuition: {
     visualizations: [
+      {
+        id: 'CNCAxesExplorer',
+        props: {
+          height: 460,
+          showRotary: true,
+          initialAxis: 'Z',
+        },
+        title: '3D Axis Explorer',
+        caption: 'Click any axis arrow in the 3D view — or press the buttons below — to highlight it and see its direction, machine context, and G-code. For rotary axes A/B/C, the animated arc shows the right-hand rule curl in real time: the moving dot travels in the positive rotation direction around the corresponding linear axis.',
+      },
       {
         id: 'CNCLab',
         props: {
