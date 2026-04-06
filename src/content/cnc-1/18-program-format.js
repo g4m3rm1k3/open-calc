@@ -189,7 +189,7 @@ sections.forEach(sec => {
   math: {
     prose: [
       'The program structure is not mathematical, but the safe start block represents a formal initialization of a state machine:',
-      '$$\\text{State}_{\\text{init}} = \\{G21, G90, G17, G40, G49, G80, G94\\}$$',
+      '$\\text{State}_{\\text{init}} = \\{G21, G90, G17, G40, G49, G80, G94\\}$',
       'This is a deterministic initial state that overrides any previous modal state. The subsequent blocks of the program compute position trajectories within this known initial state, making the program\'s behavior predictable regardless of what ran before it.',
     ],
   },

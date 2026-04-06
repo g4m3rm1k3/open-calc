@@ -927,13 +927,13 @@ draw();
   math: {
     prose: [
       'Every CNC macro is computing a mathematical function. The bolt circle computes hole positions via polar-to-Cartesian conversion:',
-      '$$x_i = R \\cdot \\cos\\!\\left(\\frac{2\\pi i}{n}\\right), \\qquad y_i = R \\cdot \\sin\\!\\left(\\frac{2\\pi i}{n}\\right)$$',
+      '$x_i = R \\cdot \\cos\\!\\left(\\frac{2\\pi i}{n}\\right), \\qquad y_i = R \\cdot \\sin\\!\\left(\\frac{2\\pi i}{n}\\right)$',
       'In degrees (as Fanuc requires): $\\theta_i = \\frac{360°}{n} \\cdot i$, so:',
-      '$$x_i = R \\cdot \\text{COS}[\\theta_i], \\qquad y_i = R \\cdot \\text{SIN}[\\theta_i]$$',
+      '$x_i = R \\cdot \\text{COS}[\\theta_i], \\qquad y_i = R \\cdot \\text{SIN}[\\theta_i]$',
       'This is why the trig unit matters. Radians and degrees give the same answer only for $0°$ and multiples of $90°$. For any other angle, they diverge:',
-      '$$\\sin(30_{\\text{radians}}) \\approx -0.988, \\qquad \\sin(30°) = 0.5$$',
+      '$\\sin(30_{\\text{radians}}) \\approx -0.988, \\qquad \\sin(30°) = 0.5$',
       'The two-argument arctangent gives the full four-quadrant angle and is critical for reversing this:',
-      '$$\\theta = \\text{ATAN}[y]/[x] \\in [0°, 360°]$$',
+      '$\\theta = \\text{ATAN}[y]/[x] \\in [0°, 360°]$',
       'Fanuc\'s ATAN takes the $y$ and $x$ components in two separate bracket groups with `/` between them — a unique but powerful syntax.',
     ],
   },

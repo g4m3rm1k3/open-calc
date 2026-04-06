@@ -222,10 +222,10 @@ draw(toolX, toolY);
   math: {
     prose: [
       'G28 moves through the intermediate point $(X_i, Y_i, Z_i)$ specified in the block, then to the machine reference position $(X_{ref}, Y_{ref}, Z_{ref})$:',
-      '$$\\text{G28:} \\quad \\mathbf{P}_{\\text{tool}} \\xrightarrow{\\text{rapid}} (X_i, Y_i, Z_i) \\xrightarrow{\\text{rapid}} (X_{ref}, Y_{ref}, Z_{ref})$$',
+      '$\\text{G28:} \\quad \\mathbf{P}_{\\text{tool}} \\xrightarrow{\\text{rapid}} (X_i, Y_i, Z_i) \\xrightarrow{\\text{rapid}} (X_{ref}, Y_{ref}, Z_{ref})$',
       'When only some axes are specified (e.g., G28 Z0), only those axes move to the intermediate point and then home. Unspecified axes do not move.',
       'In G91 mode, the intermediate point is computed relative to current position $\\mathbf{P}_{\\text{tool}}$:',
-      '$$X_i = X_{\\text{current}} + \\Delta X_{\\text{block}}, \\quad Z_i = Z_{\\text{current}} + \\Delta Z_{\\text{block}}$$',
+      '$X_i = X_{\\text{current}} + \\Delta X_{\\text{block}}, \\quad Z_i = Z_{\\text{current}} + \\Delta Z_{\\text{block}}$',
       'So `G91 G28 Z0` gives $\\Delta Z = 0$, meaning $Z_i = Z_{\\text{current}}$ — the tool stays at its current Z, then moves to Z home. This is the key insight of the pattern.',
     ],
   },

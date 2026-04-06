@@ -88,11 +88,11 @@ export default {
   math: {
     prose: [
       'The controller\'s modal state can be formally modeled as a tuple of group states:',
-      '$$\\text{State} = (G_1, G_2, G_3, G_5, G_6, G_7, G_8, G_{10}, G_{12}, \\ldots)$$',
+      '$\\text{State} = (G_1, G_2, G_3, G_5, G_6, G_7, G_8, G_{10}, G_{12}, \\ldots)$',
       'where each $G_i$ is the currently active code from modal group $i$. Initially (power-on):',
-      '$$\\text{State}_0 = (G00, G17, G90, G94, G21, G40, G49, G98, G54, \\ldots)$$',
+      '$\\text{State}_0 = (G00, G17, G90, G94, G21, G40, G49, G98, G54, \\ldots)$',
       'When block $k$ is executed, only the groups referenced in that block change:',
-      '$$G_i^{(k+1)} = \\begin{cases} \\text{new code from block}_k & \\text{if block}_k \\text{ contains a Group } i \\text{ code} \\\\ G_i^{(k)} & \\text{otherwise (modal inheritance)} \\end{cases}$$',
+      '$G_i^{(k+1)} = \\begin{cases} \\text{new code from block}_k & \\text{if block}_k \\text{ contains a Group } i \\text{ code} \\\\ G_i^{(k)} & \\text{otherwise (modal inheritance)} \\end{cases}$',
       'This is the formal definition of "sticky" modal behavior. Every block is a partial update to the state vector.',
     ],
   },

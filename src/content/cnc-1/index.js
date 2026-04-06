@@ -23,12 +23,12 @@ import toolLengthComp     from './08-tool-length-comp.js'
 import rapidMotion        from './09-rapid-motion.js'
 import linearMotion       from './01-linear-motion.js'         // order 10 (G01)
 import circularArcs       from './02-circular-arcs.js'         // order 11
-// 12-plane-selection.js  TODO
+import planeSelection     from './12-plane-selection.js'       // order 12
 
 // ── Part 5: Machine Functions ────────────────────────────────
 import spindleCoolant     from './13-spindle-coolant.js'
-// 14-tool-changes.js     TODO
-// 15-dwell.js            TODO
+import toolChanges        from './14-tool-changes.js'          // order 14
+import dwell              from './15-dwell.js'                 // order 15
 import cannedCycles       from './16-canned-cycles.js'
 
 // ── Part 6: Program Architecture ────────────────────────────
@@ -43,10 +43,10 @@ import arithmeticFunctions from './21-arithmetic-functions.js'
 import logicLoops         from './05-logic-loops.js'           // order 23
 import variableScopes     from './07-variable-scopes.js'       // order 24
 import systemVariables    from './08-system-variables.js'      // order 25
-// 25-parametric-programming.js  TODO
+import parametricProgramming from './25-parametric-programming.js' // order 26
 
 // ── Part 8: Advanced Topics ──────────────────────────────────
-// 26-lookahead-smoothing.js  TODO
+import lookaheadSmoothing from './26-lookahead-smoothing.js'   // order 27
 import controllerDialects from './09-controller-dialects.js'   // order 28
 
 export default {
@@ -80,9 +80,12 @@ export default {
     rapidMotion,
     linearMotion,
     circularArcs,
+    planeSelection,
 
     // Part 5 — Machine Functions
     spindleCoolant,
+    toolChanges,
+    dwell,
     cannedCycles,
 
     // Part 6 — Program Architecture
@@ -97,8 +100,10 @@ export default {
     logicLoops,
     variableScopes,
     systemVariables,
+    parametricProgramming,
 
     // Part 8 — Advanced Topics
+    lookaheadSmoothing,
     controllerDialects,
   ],
 }

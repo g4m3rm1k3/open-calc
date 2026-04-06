@@ -105,10 +105,10 @@ export default {
   math: {
     prose: [
       'A G-code block is parsed left-to-right. The controller uses a formal grammar to decode each word. Conceptually, each block maps to a command tuple:',
-      '$$\\text{Block} = \\{G_{\\text{motion}},\\; G_{\\text{mode}},\\; X,\\; Y,\\; Z,\\; F,\\; S,\\; T,\\; \\ldots\\}$$',
+      '$\\text{Block} = \\{G_{\\text{motion}},\\; G_{\\text{mode}},\\; X,\\; Y,\\; Z,\\; F,\\; S,\\; T,\\; \\ldots\\}$',
       'Words that are missing in a block are inherited from the **modal state** — the previous active value. This is why N80 can say just X50.0 without repeating G01 F200.0 from N70. The modal state keeps G01 and F50 active.',
       'The controller\'s internal state machine can be written as a transition function:',
-      '$$\\text{State}_{n+1} = \\text{Update}(\\text{State}_n,\\; \\text{Block}_n)$$',
+      '$\\text{State}_{n+1} = \\text{Update}(\\text{State}_n,\\; \\text{Block}_n)$',
       'Each block potentially changes some subset of the modal state. Words not present in the block leave their modal values unchanged.',
     ],
   },

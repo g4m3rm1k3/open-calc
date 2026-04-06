@@ -270,14 +270,14 @@ export default {
   math: {
     prose: [
       'Fanuc trig functions use degrees. The conversion to understand:',
-      '$$\\sin(\\theta_{\\text{deg}}) = \\sin\\left(\\frac{\\pi \\cdot \\theta_{\\text{deg}}}{180}\\right)$$',
+      '$\\sin(\\theta_{\\text{deg}}) = \\sin\\left(\\frac{\\pi \\cdot \\theta_{\\text{deg}}}{180}\\right)$',
       'The standard polar-to-Cartesian conversion (used in bolt circles, cam profiles):',
-      '$$x = R \\cdot \\text{COS}[\\theta], \\quad y = R \\cdot \\text{SIN}[\\theta]$$',
+      '$x = R \\cdot \\text{COS}[\\theta], \\quad y = R \\cdot \\text{SIN}[\\theta]$',
       'In Fanuc: `#104 = [#101 * COS[#103]]`, `#105 = [#101 * SIN[#103]]`',
       'The ATAN two-argument form computes:',
-      '$$\\theta = \\text{ATAN}[y]/[x] = \\arctan\\left(\\frac{y}{x}\\right) \\in [0°, 360°]$$',
+      '$\\theta = \\text{ATAN}[y]/[x] = \\arctan\\left(\\frac{y}{x}\\right) \\in [0°, 360°]$',
       'Cutting speed to RPM (in a macro, so speed can change dynamically):',
-      '$$\\text{#RPM} = \\frac{\\text{#Vc} \\times 1000}{3.14159 \\times \\text{#D}}$$',
+      '$\\text{#RPM} = \\frac{\\text{#Vc} \\times 1000}{3.14159 \\times \\text{#D}}$',
       'A macro can compute this for any diameter variable and set the spindle speed dynamically: `S#RPM M03`.',
     ],
   },

@@ -241,11 +241,11 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
   math: {
     prose: [
       'In G00, each axis moves at its own maximum speed $v_{\\text{max},i}$ independently. The time for axis $i$ to complete its move is:',
-      '$$t_i = \\frac{|\\Delta P_i|}{v_{\\text{max},i}}$$',
+      '$t_i = \\frac{|\\Delta P_i|}{v_{\\text{max},i}}$',
       'The total move time is determined by the slowest axis (the one with the most distance relative to its max speed):',
-      '$$T_{\\text{move}} = \\max(t_x, t_y, t_z)$$',
+      '$T_{\\text{move}} = \\max(t_x, t_y, t_z)$',
       'At any instant $t \\leq T$, the tool position is:',
-      '$$x(t) = x_1 + \\text{sign}(\\Delta x) \\cdot \\min(v_{\\text{max},x} \\cdot t,\\; |\\Delta x|)$$',
+      '$x(t) = x_1 + \\text{sign}(\\Delta x) \\cdot \\min(v_{\\text{max},x} \\cdot t,\\; |\\Delta x|)$',
       'This produces a non-linear path in the multi-axis sense. The actual path is a piecewise linear trajectory, not the straight Euclidean line between start and end.',
       'Contrast with G01, where all axes arrive simultaneously by design (see Linear Interpolation lesson).',
     ],

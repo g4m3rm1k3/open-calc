@@ -53,13 +53,13 @@ export default {
   math: {
     prose: [
       'The controller calculates the final machine position $\\mathbf{P}_{machine}$ using vector addition:',
-      '$$\\mathbf{P}_{machine} = \\mathbf{P}_{programmed} + \\mathbf{O}_{work} + \\mathbf{O}_{tool}$$',
+      '$\\mathbf{P}_{machine} = \\mathbf{P}_{programmed} + \\mathbf{O}_{work} + \\mathbf{O}_{tool}$',
       
       'For the X-axis specifically:',
-      '$$X_{machine} = X_{prog} + X_{offset}$$',
+      '$X_{machine} = X_{prog} + X_{offset}$',
 
       'For the Z-axis (with Tool Length $H$):',
-      '$$Z_{machine} = Z_{prog} + Z_{wcs} + Z_{tool}$$',
+      '$Z_{machine} = Z_{prog} + Z_{wcs} + Z_{tool}$',
 
       'This addition happens in real-time for every single point calculated by the motion planner.',
     ],

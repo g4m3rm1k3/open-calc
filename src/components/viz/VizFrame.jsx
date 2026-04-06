@@ -6,6 +6,7 @@ const VIZ_REGISTRY = {
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
   CNCLab: lazy(() => import("./cnc/CNCLab.jsx")),
   CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),
+  CNCMacroLab: lazy(() => import("./cnc/CNCMacroLab.jsx")),
   GitLab: lazy(() => import("./git/GitLab.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   NumberLine: lazy(() => import("./d3/NumberLine.jsx")),

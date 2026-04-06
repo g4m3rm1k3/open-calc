@@ -234,9 +234,9 @@ document.getElementById('withG43').addEventListener('click', ()=>drawScene(true)
     prose: [
       'Let $H_n$ be the tool length stored in register $n$, and $Z_{\\text{prog}}$ be the programmed Z value.',
       'With G43 active, the actual machine Z movement (in machine coordinates) is:',
-      '$$Z_{\\text{machine}} = Z_{\\text{prog}} + Z_{\\text{WCS offset}} + H_n$$',
+      '$Z_{\\text{machine}} = Z_{\\text{prog}} + Z_{\\text{WCS offset}} + H_n$',
       'Without G43 (or with G49), the machine moves the gauge line to the programmed Z:',
-      '$$Z_{\\text{machine}} = Z_{\\text{prog}} + Z_{\\text{WCS offset}}$$',
+      '$Z_{\\text{machine}} = Z_{\\text{prog}} + Z_{\\text{WCS offset}}$',
       'The difference $H_n$ is the tool length compensation. For a tool that extends 80mm below the gauge line, $H_n = 80$. ' +
       'When G43 is active and $Z_{\\text{prog}} = 0$, the machine moves the spindle 80mm higher than it would without compensation, ' +
       'placing the tip exactly at Z=0 (the part surface).',
