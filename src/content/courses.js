@@ -111,4 +111,11 @@ export const COURSES = [
     desc: 'Content-Addressable Versions & Logic',
     color: 'emerald'
   },
+  {
+    key: 'dsa-1',
+    label: 'Data Structures & Algorithms',
+    path: '/course/dsa-1',
+    desc: 'Memory, Structures & Algorithmic Thinking',
+    color: 'violet'
+  },
 ];
