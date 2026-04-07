@@ -3,6 +3,7 @@
 // Each chapter maps to a Phase in the curriculum.
 
 import dsa0_001 from './dsa0-001-execution-model.js';
+import dsa0_002 from './dsa0-002-big-o.js';
 
 const DSA_CH0 = {
   title: 'Computational Foundations',
@@ -12,6 +13,7 @@ const DSA_CH0 = {
   course: 'dsa-1',
   lessons: [
     dsa0_001,
+    dsa0_002,
   ],
 };
 
