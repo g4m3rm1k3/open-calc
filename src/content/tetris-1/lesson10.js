@@ -987,7 +987,7 @@ renderUI();renderPreview(pv,pq[0]);`,
 export default {
     id: 'tetris-10-mobile-touch',
     slug: 'tetris-mobile-touch-controls',
-    chapter: 'tetris.10',
+    chapter: 'tetris.1',
     order: 10,
     title: 'Mobile and Touch Controls',
     subtitle: 'Add swipe gestures, an on-screen D-pad, and responsive layout — so the game works on any device',

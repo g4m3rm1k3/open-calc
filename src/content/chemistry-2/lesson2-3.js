@@ -367,7 +367,7 @@ function draw(){
     var ax=cx+Math.cos(atom.angle*degToRad)*atom.r;
     var ay=cy+Math.sin(atom.angle*degToRad)*atom.r;
     var outAngle=atom.angle*degToRad;
-    drawLonePairCloud(ax,ay,outAngle,color+'88');
+    drawLonePairCloud(ax,ay,outAngle,color);
   });
 
   // Central atom (drawn on top)

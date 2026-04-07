@@ -926,7 +926,7 @@ renderUI();renderPreview(previewCells,pieceQueue[0]);`,
 export default {
     id: 'tetris-08-next-piece-preview',
     slug: 'tetris-next-piece-preview',
-    chapter: 'tetris.8',
+    chapter: 'tetris.1',
     order: 8,
     title: 'Next Piece Preview',
     subtitle: 'Show upcoming pieces and replace pure random with the 7-bag algorithm for fair distribution',

@@ -1015,7 +1015,7 @@ renderUI();renderPreview(previewCells,pieceQueue[0]);`,
 export default {
     id: 'tetris-09-polish-animation',
     slug: 'tetris-polish-animation',
-    chapter: 'tetris.9',
+    chapter: 'tetris.1',
     order: 9,
     title: 'Polish and Animation',
     subtitle: 'Line-clear flash, animated score, and Tetris special effects — using CSS transitions, keyframes, classList, and requestAnimationFrame',
