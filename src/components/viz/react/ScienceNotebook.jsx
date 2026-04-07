@@ -19,6 +19,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
 function useIsDark() {
@@ -201,7 +202,7 @@ function MDText({ text, T }) {
   if (!text) return null
   return (
     <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
-      <ReactMarkdown components={{
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
         h3: ({...p}) => <h3 style={{fontSize:'1.05rem',fontWeight:600,marginBottom:'0.5rem',color:T.accent}} {...p}/>,
         p:  ({...p}) => <p  style={{marginBottom:'1rem'}} {...p}/>,
         ul: ({...p}) => <ul style={{listStyleType:'disc',paddingLeft:'1.5rem',marginBottom:'1rem'}} {...p}/>,
@@ -212,6 +213,10 @@ function MDText({ text, T }) {
           ? <code style={{fontFamily:'monospace',background:T.panel2,color:T.accent,padding:'2px 6px',borderRadius:4,fontSize:12}} {...p}/>
           : <code style={{display:'block',padding:'12px',background:T.panel2,borderRadius:8,margin:'10px 0',fontSize:12,fontFamily:'monospace'}} {...p}/>,
         blockquote: ({...p}) => <blockquote style={{borderLeft:`3px solid ${T.accent}`,paddingLeft:14,color:T.muted,margin:'10px 0'}} {...p}/>,
+        table: ({...p}) => <table style={{borderCollapse:'collapse',width:'100%',margin:'12px 0',fontSize:13}} {...p}/>,
+        th: ({...p}) => <th style={{padding:'6px 12px',borderBottom:`2px solid ${T.accent}`,textAlign:'left',color:T.accent,fontWeight:600}} {...p}/>,
+        td: ({...p}) => <td style={{padding:'6px 12px',borderBottom:`1px solid ${T.border||'rgba(255,255,255,0.08)'}`,color:T.text}} {...p}/>,
+        tr: ({...p}) => <tr {...p}/>
       }}>
         {text}
       </ReactMarkdown>

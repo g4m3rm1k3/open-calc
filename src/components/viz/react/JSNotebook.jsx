@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm';
 
 // ── Theme hook ────────────────────────────────────────────────────────────────
 function useIsDark() {
@@ -190,6 +191,7 @@ function InstructionText({ text, T }) {
   return (
     <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ node, ...p }) => <h1 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "1rem", color: T.accent }} {...p} />,
           h2: ({ node, ...p }) => <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem", color: T.accent }} {...p} />,
@@ -208,6 +210,10 @@ function InstructionText({ text, T }) {
           blockquote: ({ node, ...p }) => (
             <blockquote style={{ borderLeft: `3px solid ${T.accent}`, paddingLeft: 14, color: T.muted, margin: "12px 0" }} {...p} />
           ),
+          table: ({ node, ...p }) => <table style={{ borderCollapse: 'collapse', width: '100%', margin: '12px 0', fontSize: 13 }} {...p} />,
+          th: ({ node, ...p }) => <th style={{ padding: '6px 12px', borderBottom: `2px solid ${T.accent}`, textAlign: 'left', color: T.accent, fontWeight: 600 }} {...p} />,
+          td: ({ node, ...p }) => <td style={{ padding: '6px 12px', borderBottom: `1px solid rgba(255,255,255,0.08)`, color: T.text }} {...p} />,
+          tr: ({ node, ...p }) => <tr {...p} />,
         }}
       >
         {text}
