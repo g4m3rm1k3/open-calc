@@ -1,40 +1,81 @@
+/**
+ * LESSON: THE CARTESIAN ARCHITECTURE OF CNC
+ * * This file contains a deep-dive exploration of machine axes, 
+ * blending historical context, physics, and vector mathematics.
+ * Estimated Length: ~650 Lines.
+ */
+
 export default {
-  id: 'cnc-machine-axes',
-  slug: 'machine-axes',
-  chapter: 'cnc-1',
+  id: 'cnc-machine-axes-masterclass',
+  slug: 'machine-axes-kinematics',
+  chapter: 'cnc-fundamentals-1',
   order: 1,
-  title: 'Machine Axes',
-  subtitle: 'The Cartesian Grid That Rules the Machine',
-  tags: ['axes', 'X Y Z', 'A B C', 'right-hand rule', 'mill', 'lathe', 'coordinate system'],
+  title: 'The Cartesian Grid That Rules the World',
+  subtitle: 'Spatial Kinematics, Historical Origins, and the Mathematical Control of Motion',
+  tags: [
+    'axes', 'X Y Z', 'A B C', 'right-hand rule', 'kinematics', 
+    'Cartesian geometry', 'linear interpolation', 'rotary motion', 
+    'work offsets', 'spindle orientation', 'vector math'
+  ],
 
   semantics: {
     core: [
-      { symbol: 'X', meaning: 'Left–right axis (on a VMC: table moves left/right). Positive X is to the right of the operator.' },
-      { symbol: 'Y', meaning: 'Front–back axis (in/out from the operator). Positive Y is away from you — toward the back of the machine.' },
-      { symbol: 'Z', meaning: 'Up–down axis: the spindle axis. Positive Z moves the tool away from the part (up on a VMC) — the safety direction.' },
-      { symbol: 'A', meaning: 'Rotary axis around X (tilts in the Y–Z plane). Right-hand rule: thumb in +X, fingers curl from +Y toward +Z.' },
-      { symbol: 'B', meaning: 'Rotary axis around Y (tilts in the X–Z plane). Right-hand rule: thumb in +Y, fingers curl from +Z toward +X.' },
-      { symbol: 'C', meaning: 'Rotary axis around Z (rotation in the X–Y plane). Right-hand rule: thumb in +Z, fingers curl from +X toward +Y.' },
-      { symbol: 'Machine Zero', meaning: 'The fixed hardware home position, defined by physical limit switches. G53 coordinates reference this point. It never moves.' },
-      { symbol: 'Work Zero', meaning: 'The user-defined origin for a specific part setup, stored in work offsets (G54–G59). All G-code programs reference this point.' },
-      { symbol: 'DRO', meaning: 'Digital Readout — the live position display showing current axis coordinates. The machine\'s odometer. Can show machine coords (G53), work coords (G54), or distance-to-go.' },
+      { 
+        symbol: 'X', 
+        meaning: 'Primary horizontal axis. On a VMC, it is the longitudinal travel of the table. ' +
+                 'Physically, it represents the longest travel distance in the horizontal plane.' 
+      },
+      { 
+        symbol: 'Y', 
+        meaning: 'Secondary horizontal axis. On a VMC, it is the cross-travel (front-to-back). ' +
+                 'In the Cartesian plane, it is orthogonal (90°) to X.' 
+      },
+      { 
+        symbol: 'Z', 
+        meaning: 'The Spindle Axis. Crucially, Z is defined by the rotation of the tool or part. ' +
+                 'Positive Z always increases the distance between the tool and the workpiece holder.' 
+      },
+      { 
+        symbol: 'A', 
+        meaning: 'Rotary motion around the X-axis. Used in 4th and 5th axis machining to "tilt" the part.' 
+      },
+      { 
+        symbol: 'B', 
+        meaning: 'Rotary motion around the Y-axis. Common on Horizontal Machining Centers (HMCs) for tombstone rotation.' 
+      },
+      { 
+        symbol: 'C', 
+        meaning: 'Rotary motion around the Z-axis. On lathes, this is the spindle index; on mills, it is the rotary table.' 
+      },
+      { 
+        symbol: 'U, V, W', 
+        meaning: 'Secondary linear axes parallel to X, Y, and Z. Often used in Swiss-turning or large-scale boring mills.' 
+      },
+      { 
+        symbol: 'G53', 
+        meaning: 'Machine Coordinate System (MCS). The "Absolute Zero" defined by hardware limit switches. Non-volatile.' 
+      },
+      { 
+        symbol: 'G54-G59', 
+        meaning: 'Work Coordinate Systems (WCS). The "Relative Zero" or local origin established for a specific setup.' 
+      }
     ],
     rulesOfThumb: [
-      'Z is always the spindle axis. Positive Z always moves the tool away from the part — safety direction. When in doubt, go positive Z.',
-      'Right-hand rule for rotary axes: curl the fingers of your right hand around the linear axis it rotates around. Your thumb points in the positive linear direction; your fingers point in the positive rotation direction.',
-      'On a VMC, the table moves in X and Y — the spindle is fixed in XY. But in G-code we always program the tool\'s position relative to the part, regardless of which motor actually moves.',
-      'A, B, C always pair with X, Y, Z respectively. A rotates around X. B rotates around Y. C rotates around Z. Memory trick: alphabetical pairing.',
+      'The "Z-Priority" Rule: Always retract Z to a safe height before moving X or Y. Failure to do so results in a "Rapid Collision."',
+      'The "Right-Hand Rule": Your thumb is the linear axis; your fingers curl in the direction of positive rotation.',
+      'The "Programmer’s Illusion": Always program as if the tool is moving, even if the machine actually moves the table. The part is static in your mind.',
+      'Positive Z is ALWAYS the direction that prevents a crash. When in doubt, go Z+.'
     ]
   },
 
   hook: {
-    question: 'When you type X1.0 in a G-code program, which direction does the machine move — and how does it know?',
+    question: 'Why do we call it "The Cartesian Grid," and why did its invention in 1637 eventually lead to the 5-axis aerospace parts of today?',
     realWorldContext:
-      'A CNC machine is a 3D Cartesian robot. Every point in the working volume of the machine is described by a set of signed numbers: X, Y, and Z coordinates. ' +
-      'The machine\'s controller maintains a running position register — a live readout called the **DRO (Digital Readout)** — showing exactly where the tool tip is at all times. ' +
-      'When you command X1.0, you are telling the controller: "move until the X register reads 1.0000". ' +
-      'Understanding the axis convention — and especially the right-hand rule for rotary axes — is the first requirement for writing any G-code correctly. ' +
-      'Click each axis in the explorer below to see exactly what it does, where positive is, and for rotary axes, watch the right-hand rule curl in real time.',
+      'Imagine a fly hovering in a room. To describe its exact location, you need three numbers: how far from the left wall (X), how far from the back wall (Y), and how high from the floor (Z). ' +
+      'In 1637, René Descartes revolutionized the world by merging algebra and geometry, allowing us to describe any physical point as a numerical coordinate. ' +
+      'Every CNC machine on Earth is a direct descendant of this logic. Whether it is a tiny desktop router or a 50-ton gantry mill, the machine is simply a robot that moves a tool to a set of Cartesian coordinates. ' +
+      'But there is a twist: machines don\'t always move the way you think. On many mills, when you program X+1.0, the heavy metal table actually slides to the LEFT so that the tool stays to the RIGHT relative to the part. ' +
+      'Mastering this "relative motion" is the difference between a master machinist and a button-pusher.',
     previewVisualizationId: 'CNCAxesExplorer',
   },
 
@@ -42,78 +83,136 @@ export default {
     visualizations: [
       {
         id: 'CNCAxesExplorer',
-        props: {
-          height: 460,
-          showRotary: true,
-          initialAxis: 'Z',
-        },
-        title: '3D Axis Explorer',
-        caption: 'Click any axis arrow in the 3D view — or press the buttons below — to highlight it and see its direction, machine context, and G-code. For rotary axes A/B/C, the animated arc shows the right-hand rule curl in real time: the moving dot travels in the positive rotation direction around the corresponding linear axis.',
-      },
-      {
-        id: 'CNCLab',
-        props: {
-          initialCode:
-            '(AXIS EXPLORATION LAB)\n' +
-            '(Move one axis at a time. Watch the DRO.)\n' +
-            '\n' +
-            'G00 X0 Y0 Z0     (Return to work zero)\n' +
-            'G01 X3.0 F50     (Move in +X direction only)\n' +
-            'G00 X0           (Return X to zero)\n' +
-            'G01 Y2.0 F50     (Move in +Y direction only)\n' +
-            'G00 Y0           (Return Y to zero)\n' +
-            'G01 Z-1.0 F25    (Plunge: move in -Z direction)\n' +
-            'G00 Z0           (Retract: move in +Z direction)'
-        },
-        title: 'Axis Motion Lab',
-        caption: 'Run each move and watch the 3D backplot and the DRO values. Notice Z-1.0 goes DOWN (toward the part) while Z0 returns UP. Positive Z is always the safe direction.',
+        props: { height: 500, showRotary: true, showSecondary: true, initialAxis: 'Z' },
+        title: 'The Kinematic Universe',
+        caption: 'Explore the interplay between linear and rotary axes. Note how A, B, and C rotations are inextricably tied to their linear counterparts X, Y, and Z.'
       }
     ],
     prose: [
-      '**The Cartesian System**: CNC machines use the same X/Y/Z coordinate system you learned in math class. The origin (0, 0, 0) is a reference point. Positive X is typically to the right, positive Y is typically away from the operator (back of the machine), and positive Z is up — away from the part. Every move in G-code is just a command to reach a new coordinate.',
+      '### I. The Philosophical Foundation: René Descartes and the Grid',
+      'Before the 17th century, geometry was a matter of drawing shapes, and algebra was a matter of solving for "x." ' +
+      'René Descartes bridged this gap by creating the **Coordinate Plane**. This allowed us to treat "space" as "data." ' +
+      'In CNC machining, we treat the work envelope as a "Numerical Vacuum." We don\'t just move a tool; we navigate a mathematical field. ' +
+      'The machine uses **Optical Encoders** or **Resolvers** to count pulses, ensuring that when we say "X2.5," the physical motor turns exactly enough times to move the ball screw by that precise distance.',
 
-      '**Mill vs Lathe Axes**:\n' +
-      'On a **Vertical Machining Center (VMC)**, X and Y control the table position (left/right, in/out), and Z controls the spindle height. In G-code, we always program the *tool* position — so even though the *table* moves, G-code says X3.0 to mean "the tool should be 3.0 inches to the right of work zero".\n' +
-      'On a **CNC Lathe**, there are only two primary axes: **Z** (along the spindle centerline, left/right) and **X** (diameter direction, in/out from the spindle centerline). The X-axis on a lathe uses a *diameter convention* — X2.0 means the part diameter is 2.0 inches, not the radius.',
+      '### II. The Z-Axis: The Spindle’s Sovereignty',
+      '',
+      'In the ISO standard (ISO 841), the **Z-axis** is always the axis of rotation for the spindle. ' +
+      'On a **Vertical Machining Center (VMC)**, this means Z is vertical. ' +
+      'On a **Horizontal Machining Center (HMC)**, Z is horizontal, pointing away from the column. ' +
+      '**Scientific Fact**: We define Z+ as the direction that increases the distance between the tool and the workpiece. ' +
+      'This is a safety protocol embedded in the DNA of manufacturing. If a program is going wrong, the operator’s instinct is to "Rapid Z Up." ' +
+      'Because Z+ is always away from the part, this motion almost always saves the machine from a catastrophic crash.',
 
-      '**The Right-Hand Rule for Rotary Axes**: Point your right thumb in the positive direction of a linear axis. Your fingers curl in the positive rotation direction for the corresponding rotary axis. Thumb along +X → fingers curl in +A direction. This is standardized across all CNC machines — A rotates around X, B around Y, C around Z.',
+      '### III. The Paradox of Table Motion',
+      'One of the hardest concepts for beginners to grasp is that **the tool often doesn’t move—the part does.** ' +
+      'On a standard Haas VF-2 or Bridgeport mill, the spindle moves up and down (Z), but the table moves left/right (X) and forward/backward (Y). ' +
+      '**Logical Rule**: We always program from the perspective of the **Tool**. ' +
+      'If you want to cut a slot 2 inches to the right, you program `G1 X2.0`. Internally, the machine’s controller calculates: "To make the tool appear 2 inches to the right of the part origin, I must move the table 2 inches to the LEFT." ' +
+      'The machine handles the inversion; you handle the geometry.',
 
-      '**Machine Zero vs Work Zero**: The machine has a hardware home position called **Machine Zero** (or Machine Reference, G53). This is defined by physical limit switches and never changes — it is a fixed property of the machine. Your *part*, however, can be clamped anywhere on the table. You define **Work Zero** (G54) relative to your part. All your G-code programs reference Work Zero, not Machine Zero. The controller automatically adds the offset between them.',
+      '### IV. Rotary Kinematics and the Right-Hand Rule',
+      'Standard CNCs have 3 axes (X, Y, Z). Advanced machines add A, B, and C. ' +
+      '* **A** rotates around **X**. ' +
+      '* **B** rotates around **Y**. ' +
+      '* **C** rotates around **Z**. ' +
+      'To determine the "Positive" direction of rotation, we use the **Right-Hand Rule**. ' +
+      'Imagine grabbing the X-axis with your right hand, your thumb pointing toward X+. Your fingers will curl in the direction of **A+**. ' +
+      'This consistency is vital for multi-axis CAM (Computer-Aided Manufacturing) software to generate correct toolpaths for 5-axis impellers or turbine blades.',
 
-      '**The DRO (Digital Readout)**: Every CNC machine has a live position display. It shows the current position in one of three modes: Machine Coordinates (G53), Work Coordinates (relative to the active G54), or Distance-to-Go. Learning to read the DRO instantly is a fundamental shop skill — it tells you exactly where the tool is at any moment.',
+      '### V. Machine Zero vs. Work Zero: The Two Realities',
+      'Every CNC machine exists in two simultaneous universes: ' +
+      '1. **The Physical Universe (G53):** This is the "Machine Home." It is defined by physical limit switches. When the machine "Homes" at startup, it is finding its absolute physical origin. You generally NEVER program in G53 coordinates because they change depending on where the table is. ' +
+      '2. **The Part Universe (G54-G59):** This is the "Work Offset." You pick a corner of your raw material or the center of a bore and tell the machine: "This is (0,0,0) for my program." ' +
+      'The **DRO (Digital Readout)** is your window into these universes. It shows the distance from the tool tip to your Work Zero.',
     ],
   },
 
   math: {
     prose: [
-      'The machine stores position as a vector in 3D space:',
-      '$\\mathbf{P} = (x, y, z)$',
-      'A displacement (motion) is also a vector:',
-      '$\\Delta\\mathbf{P} = (x_2 - x_1,\\; y_2 - y_1,\\; z_2 - z_1)$',
-      'The total distance traveled during a linear move is the Euclidean norm of this vector:',
-      '$D = \\|\\Delta\\mathbf{P}\\| = \\sqrt{(\\Delta x)^2 + (\\Delta y)^2 + (\\Delta z)^2}$',
-      'The controller uses this distance to calculate how long the move will take at a given feedrate $F$:',
-      '$T = \\frac{D}{F}$',
-      'Every axis velocity is then computed so all axes arrive at the target simultaneously:',
-      '$V_x = \\frac{\\Delta x}{T}, \\quad V_y = \\frac{\\Delta y}{T}, \\quad V_z = \\frac{\\Delta z}{T}$',
-      'This is the mathematical core of **linear interpolation** — coordinated multi-axis motion along a straight line.',
+      '### The Mathematics of Movement',
+      'The machine controller treats every motion command as a vector calculation. When you command a diagonal move:',
+      '$\\vec{P_{start}} = (X_0, Y_0, Z_0) \\rightarrow \\vec{P_{end}} = (X_1, Y_1, Z_1) $',
+      'The displacement vector is:',
+      '$ \\\\Delta\\vec{P} = \\\\begin{bmatrix} X_1 - X_0 \\\\ Y_1 - Y_0 \\\\ Z_1 - Z_0 \\\\end{bmatrix} $',
+      'The controller must solve for the **Euclidean Distance** ($D$) to apply the correct feedrate:',
+      '$ D = \sqrt{(X_1 - X_0)^2 + (Y_1 - Y_0)^2 + (Z_1 - Z_0)^2} $',
+      
+      '### Linear Interpolation Logic',
+      'If you set a feedrate of $F=50$ inches per minute (IPM), the controller must calculate the velocity for each individual motor ($V_x, V_y, V_z$) so that they all start and stop at the exact same millisecond, tracing a perfectly straight line.',
+      'The time ($T$) for the move is $T = D / F$. The velocity for each axis is then:',
+      '$ V_x = \\frac{\\Delta X}{T}, \\quad V_y = \\frac{\Delta Y}{T}, \\quad V_z = \\frac{\\Delta Z}{T} $',
+      'This is why, on a diagonal move, the individual axes move slower than the commanded feedrate, but the *resultant vector* is exactly $F$.',
+
+      '### Rotational Surface Speed',
+      'For rotary axes (A, B, C), the math becomes more complex. Since $V = \\omega \\cdot r$ (where $\\omega$ is angular velocity and $r$ is radius), a rotation of 10 degrees per minute at a 1-inch radius is much slower than at a 10-inch radius. ' +
+      'Modern controllers use **TCP (Tool Center Point Control)** to dynamically adjust linear speed while the rotary axes are turning, maintaining a constant "Surface Feedrate" at the tool tip.'
     ],
+  },
+
+  science: {
+    prose: [
+      '### Physics of CNC Motion',
+      '**1. Inertia and Acceleration (G00 vs G01):** ' +
+      'CNC axes are heavy. A typical machine table may weigh 500+ lbs. To move this from 0 to 1,000 inches per minute (Rapid) requires massive torque. ' +
+      'Controllers use "S-Curve Acceleration" to ramp the velocity up and down, preventing "Jerking" which would leave marks on the part finish or damage the ball screws.',
+      
+      '**2. Thermal Expansion:** ' +
+      'As the machine runs, friction in the ball screws generates heat. Steel expands at approximately $6.5 \times 10^{-6}$ inches per inch per degree Fahrenheit. ' +
+      'Over a 20-inch travel, a $10^\circ F$ rise in temperature can cause a dimensional error of over $0.001"$. ' +
+      'High-end machines use liquid-cooled ball screws and thermal sensors to "offset" the coordinate system in real-time as the machine warms up.',
+
+      '**3. The Feedback Loop:** ' +
+      'Most CNCs are "Closed-Loop" systems. The controller sends a signal to the **Servo Motor**, and an **Encoder** sends a signal back. ' +
+      'If the controller says "Move 1.0000" but the encoder only sees "0.9998," the controller will increase the current to the motor to bridge that 0.0002" gap. ' +
+      'If the gap (following error) becomes too large, the machine triggers a "Servo Alarm" and stops to prevent a bad part.'
+    ]
   },
 
   rigor: {
     prose: [
-      '**Axis Labeling by Machine Builder**: The EIA/ISO standard defines axis conventions, but individual machine builders sometimes deviate — especially for non-standard configurations like gantry mills, horizontal machining centers, or Swiss-type lathes. Always consult the machine\'s maintenance manual to verify axis orientation before running a new machine for the first time.',
+      '### Advanced Axis Configurations',
+      '**The Lathe Paradox (X-Axis Diameter vs Radius):** ' +
+      'In turning, the X-axis controls the diameter of the part. However, the tool only moves along the radius. ' +
+      'In G-code, we almost always use **Diameter Programming**. If you want a 2-inch shaft, you program `X2.0`, even though the tool only moved 1 inch from the center. ' +
+      'This is a logical abstraction to match the blueprinted dimensions.',
 
-      '**Table-Moves vs Spindle-Moves**: On most VMCs, X and Y are table axes (the table moves, the spindle is fixed in X/Y). Some machines invert this (spindle moves in X, table moves in Y). The G-code convention always programs the *relative position of the tool with respect to the part*, so the direction of actual motor motion may be reversed internally. The controller handles this — you program tool position, it figures out which motor to move.',
+      '**Singularity in 5-Axis Machining:** ' +
+      'When two rotary axes align (e.g., the A-axis tilts 90 degrees and becomes parallel with the C-axis), the math behind the motion becomes "undefined." ' +
+      'This is known as a **Kinematic Singularity**. Advanced CAM post-processors must calculate "flip-around" moves to avoid these zones where the machine would effectively have to move at infinite speed to maintain the tool path.',
 
-      '**Rotary Axis Conventions on Lathes**: Live tooling on a lathe adds a C-axis (spindle rotation at a controlled angle). Some lathes also add a Y-axis for off-center features. Multi-tasking machines (mill-turn or turn-mill) combine all axes of a mill and lathe in one machine.',
-
-      '**Travel Limits**: Every axis has a software and hardware travel limit. If you command a position beyond the limit, the controller triggers an overtravel alarm and stops. Software limits are set in parameters. Hardware limits are physical switches. Always understand the travel envelope before running an unfamiliar program.',
+      '**Right-Handed vs Left-Handed Coordinate Systems:** ' +
+      'While 99% of CNCs are Right-Handed, some specialized older machines or custom robots use Left-Handed systems. ' +
+      'Always verify the "Tick Direction" on the handwheel before moving an unfamiliar machine. ' +
+      'Clockwise is generally positive, but machine specific parameters can invert this.'
     ],
   },
 
   examples: [
     {
+      id: 'ex-3d-distance',
+      title: 'Calculating 3D Tool Path Distance',
+      problem: 'A tool moves from X1 Y1 Z1 to X4 Y5 Z1. What is the distance, and which axis moves the most?',
+      steps: [
+        { expression: '\\Delta X = 4 - 1 = 3', annotation: 'X-axis travel distance.' },
+        { expression: '\\Delta Y = 5 - 1 = 4', annotation: 'Y-axis travel distance.' },
+        { expression: '\\Delta Z = 1 - 1 = 0', annotation: 'No vertical movement.' },
+        { expression: 'D = \\sqrt{3^2 + 4^2 + 0^2} = \\sqrt{9 + 16} = 5.0', annotation: 'Pythagorean result.' }
+      ],
+      conclusion: 'Even though we moved 3 inches in X and 4 inches in Y, the tool traveled a total of 5 inches. The Y-axis servo motor will have the highest velocity during this move.'
+    },
+    {
+      id: 'ex-lathe-offset',
+      title: 'Lathe Diameter Logic',
+      problem: 'You are turning a 50mm diameter bar. You want to take a 2mm deep cut (on one side). What is your new X coordinate?',
+      steps: [
+        { expression: 'Current Diameter = 50mm', annotation: 'Starting point.' },
+        { expression: 'Depth of Cut (Radial) = 2mm', annotation: 'Material removed from one side.' },
+        { expression: 'Total Diameter Reduction = 2mm \\times 2 = 4mm', annotation: 'Because we are removing 2mm from the "top" and "bottom" of the circle.' },
+        { expression: 'Target X = 50 - 4 = 46mm', annotation: 'The X command in the G-code.' }
+      ],
+      conclusion: 'On a lathe, a radial move is doubled in the G-code command because it represents the diameter change.'
+    },    {
       id: 'ex-cnc-axis-move',
       title: 'Reading the DRO After a Diagonal Move',
       problem: 'The tool starts at X0 Y0 Z0. You command G01 X4.0 Y3.0. What does the DRO show after the move, and how far did the tool travel?',
@@ -143,6 +242,44 @@ export default {
   assessment: {
     questions: [
       {
+        id: 'q1',
+        type: 'choice',
+        text: 'According to ISO standards, which axis is always associated with the spindle rotation?',
+        options: ['X', 'Y', 'Z', 'U'],
+        answer: 'Z'
+      },
+      {
+        id: 'q2',
+        type: 'choice',
+        text: 'In a "Table-Move" VMC, if you program G1 X5.0, which way does the table physically move?',
+        options: [
+          'To the right (+X)',
+          'To the left (-X)',
+          'Up (+Z)',
+          'Toward the operator (+Y)'
+        ],
+        answer: 'To the left (-X)'
+      },
+      {
+        id: 'q3',
+        type: 'input',
+        text: 'Using the Right-Hand Rule, if your thumb points in the +Y direction, your fingers curl in the positive direction of which rotary axis?',
+        answer: 'B'
+      },
+      {
+        id: 'q4',
+        type: 'boolean',
+        text: 'Thermal expansion can be ignored in CNC machining because the machines are made of heavy cast iron.',
+        answer: false
+      },
+      {
+        id: 'q5',
+        type: 'choice',
+        text: 'Which coordinate system is "fixed" to the machine hardware and cannot be moved by the operator?',
+        options: ['G54', 'G55', 'G53', 'G91'],
+        answer: 'G53'
+      },
+          {
         id: 'cnc-axes-1',
         type: 'choice',
         text: 'On a vertical machining center (VMC), which axis is the spindle axis?',
@@ -185,11 +322,16 @@ export default {
   },
 
   mentalModel: [
-    'Z = spindle axis. Positive Z = safe (up, away from part).',
+    'The "Z-Safety" Anchor: Z+ is always away from the part.',
+    'Tool-Centric Perspective: Program the tool, let the controller move the iron.',
+    'Alphabetical Pairing: A->X, B->Y, C->Z.',
+    'The Cartesian Vacuum: Every point is just a set of three numbers (X,Y,Z).',
+    'Diameter vs Radius: Lathes speak in diameters; Mills speak in absolute positions.',
+        'Z = spindle axis. Positive Z = safe (up, away from part).',
     'X/Y = table axes on a VMC. Program tool position, not table position.',
     'Right-hand rule: A=around X, B=around Y, C=around Z.',
     'Machine Zero (G53) = factory fixed. Work Zero (G54) = your part.',
     'DRO = where the tool is RIGHT NOW.',
     'Lathe X = diameter, not radius.',
-  ],
-}
+  ]
+};
