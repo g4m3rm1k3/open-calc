@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
 const VIZ_REGISTRY = {
+  MiniGolfGame: lazy(() => import("./react/MiniGolfGame.jsx")),
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
   CNCLab: lazy(() => import("./cnc/CNCLab.jsx")),
   CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),

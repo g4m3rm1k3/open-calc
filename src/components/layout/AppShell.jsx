@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useVideoPlayer } from '../../context/VideoPlayerContext.jsx'
 import PhysicsPoolLab from '../tools/PhysicsPoolLab.jsx'
 import BasketballLab from '../tools/BasketballLab.jsx'
+import MiniGolfGame from '../tools/MiniGolfGame.jsx'
 import ChemistryPage from '../../pages/ChemistryPage.jsx'
 
 function MobileLocationBadge() {
@@ -170,7 +171,7 @@ function CoursesDropdown() {
   )
 }
 
-function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen, onPoolToggle, poolOpen, onChemToggle, chemOpen, onBasketToggle, basketOpen }) {
+function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onGraphJSXToggle, onScratchToggle, scratchOpen, onCalcToggle, calcOpen, onPythonToggle, pythonOpen, onJsToggle, jsOpen, onHelpToggle, helpOpen, onPoolToggle, poolOpen, onChemToggle, chemOpen, onBasketToggle, basketOpen, onGolfToggle, golfOpen }) {
   const { openSearch } = useSearchContext()
   const { isOpen: videoOpen, isMinimized: videoMinimized, openPlayer, toggleMinimize } = useVideoPlayer()
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -293,6 +294,11 @@ function TopBar({ onMenuToggle, sidebarOpen, onGraphToggle, onGraph3DToggle, onG
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${basketOpen ? 'text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30' : 'text-orange-500 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30'}`}
             title="Basketball Physics Lab"
           ><span className="text-base leading-none" style={{lineHeight:'16px',display:'block'}}>🏀</span></button>
+          <button
+            onClick={onGolfToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${golfOpen ? 'text-lime-700 dark:text-lime-300 bg-lime-50 dark:bg-lime-900/30' : 'text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-900/30'}`}
+            title="Physics Mini Golf Lab"
+          ><span className="text-base leading-none" style={{lineHeight:'16px',display:'block'}}>⛳</span></button>
         </div>
       </div>
 
@@ -401,10 +407,11 @@ export default function AppShell({ children }) {
   const [poolOpen, setPoolOpen] = useState(false)
   const [chemOpen, setChemOpen] = useState(false)
   const [basketOpen, setBasketOpen] = useState(false)
+  const [golfOpen, setGolfOpen] = useState(false)
   const closeAllTools = useCallback(() => {
     setGraphOpen(false); setGraph3DOpen(false); setGraphJSXOpen(false)
     setScratchOpen(false); setCalcOpen(false); setPythonOpen(false); setJsOpen(false)
-    setPoolOpen(false); setChemOpen(false); setBasketOpen(false)
+    setPoolOpen(false); setChemOpen(false); setBasketOpen(false); setGolfOpen(false)
   }, [])
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null)
   const { openSearch } = useSearchContext()
@@ -500,6 +507,7 @@ export default function AppShell({ children }) {
         setJsOpen(false)
         setHelpOpen(false)
         setPoolOpen(false)
+        setGolfOpen(false)
       }
       // 'Shift+D' — toggle Dev Mode (shows VIZ component names on every viz frame)
       if (e.shiftKey && e.key === 'D') {
@@ -537,6 +545,8 @@ export default function AppShell({ children }) {
         chemOpen={chemOpen}
         onBasketToggle={() => setBasketOpen(prev => !prev)}
         basketOpen={basketOpen}
+        onGolfToggle={() => setGolfOpen(prev => !prev)}
+        golfOpen={golfOpen}
       />
 
       {/* Mobile sidebar/tools backdrop */}
@@ -754,6 +764,7 @@ export default function AppShell({ children }) {
       <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
       {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
       {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
+      {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
       {chemOpen && (
         <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
           <ChemistryPage onClose={() => setChemOpen(false)} />

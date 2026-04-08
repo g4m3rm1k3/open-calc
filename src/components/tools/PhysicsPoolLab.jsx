@@ -66,49 +66,175 @@ const BALL_COLORS = [
 
 // ─── Levels ──────────────────────────────────────────────────────────────────
 const LEVELS = [
+  // ── Physics tutorials ──────────────────────────────────────────────────────
   {
     name: 'Straight Shot',
-    description: 'Aim the cue ball directly at ball 1. Watch momentum transfer perfectly.',
+    description: 'Aim the cue ball directly at the yellow ball. Watch how momentum transfers perfectly head-on — the cue stops and the target moves at the same speed.',
     balls: [
-      { x:200, y:250, mass:1, colorIdx:0, isCue:true },
-      { x:560, y:250, mass:1, colorIdx:1 },
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:580, y:250, mass:1, colorIdx:1, ballNum:1 },
     ],
-    pocketTarget: null,
+    aimAngle: Math.PI,
     goal: 'Pocket the yellow ball in any pocket.',
   },
   {
     name: 'Mass Difference',
-    description: 'Ball 2 (blue) is 3× heavier. Hit with the right force.',
+    description: 'The blue ball is 3× heavier than the cue. After impact a lighter cue bounces back, a heavier target barely moves. Observe how KE distributes differently.',
     balls: [
-      { x:200, y:250, mass:1,   colorIdx:0, isCue:true },
-      { x:500, y:200, mass:1,   colorIdx:1 },
-      { x:580, y:310, mass:3,   colorIdx:2 },
+      { x:200, y:250, mass:1,   colorIdx:0, isCue:true, ballNum:0 },
+      { x:500, y:200, mass:1,   colorIdx:1, ballNum:1 },
+      { x:580, y:310, mass:3,   colorIdx:2, ballNum:2 },
     ],
+    aimAngle: Math.PI,
     goal: 'Pocket both colored balls.',
   },
   {
-    name: 'English Required',
-    description: 'Use off-center spin (English) to curve the cue ball after contact.',
+    name: 'English / Spin',
+    description: 'Open the Hit panel and drag the contact point off-center. Left/right English rotates the cue after contact; top-spin (follow) makes it roll forward, backspin (draw) pulls it back.',
     balls: [
-      { x:200, y:250, mass:1, colorIdx:0, isCue:true },
-      { x:490, y:250, mass:1, colorIdx:7  },
-      { x:490, y:160, mass:1, colorIdx:1  },
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:490, y:250, mass:1, colorIdx:7, ballNum:1 },
+      { x:490, y:160, mass:1, colorIdx:1, ballNum:2 },
     ],
-    goal: 'Pocket all colored balls.',
+    aimAngle: Math.PI,
+    goal: 'Pocket both colored balls using spin to control the cue ball path.',
   },
   {
     name: 'Chain Reaction',
-    description: 'One perfect shot triggers a cascade. Use spin to set angles.',
+    description: 'One perfect shot triggers a cascade. Each ball transfers momentum to the next. Use the collision-step browser (⟵ ⟶ buttons) to pause and analyse each impact.',
     balls: [
-      { x:200, y:250, mass:1, colorIdx:0, isCue:true },
-      { x:430, y:250, mass:1, colorIdx:1 },
-      { x:475, y:232, mass:1, colorIdx:3 },
-      { x:475, y:268, mass:1, colorIdx:2 },
-      { x:520, y:215, mass:1, colorIdx:4 },
-      { x:520, y:250, mass:1, colorIdx:8 },
-      { x:520, y:285, mass:1, colorIdx:5 },
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:430, y:250, mass:1, colorIdx:1, ballNum:1 },
+      { x:475, y:232, mass:1, colorIdx:3, ballNum:2 },
+      { x:475, y:268, mass:1, colorIdx:2, ballNum:3 },
+      { x:520, y:215, mass:1, colorIdx:4, ballNum:4 },
+      { x:520, y:250, mass:1, colorIdx:8, ballNum:5 },
+      { x:520, y:285, mass:1, colorIdx:5, ballNum:6 },
     ],
-    goal: 'Pocket all balls from a single break shot.',
+    aimAngle: Math.PI,
+    goal: 'Pocket all balls from a single shot.',
+  },
+
+  // ── Classic pool shots ─────────────────────────────────────────────────────
+  {
+    name: 'The Break',
+    description: 'Full 15-ball rack at the foot spot. Place the cue ball anywhere behind the head string and strike the head ball (tip of the triangle) full-force. Aim centre-ball or slightly high for maximum spread.',
+    balls: [
+      { x:220, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      // Row 0
+      { x:590, y:250, mass:1, colorIdx:1, ballNum:1 },
+      // Row 1
+      { x:624, y:233, mass:1, colorIdx:2, ballNum:2 },
+      { x:624, y:267, mass:1, colorIdx:3, ballNum:3 },
+      // Row 2 — 8-ball at centre
+      { x:657, y:217, mass:1, colorIdx:4, ballNum:4 },
+      { x:657, y:250, mass:1, colorIdx:8, ballNum:8 },
+      { x:657, y:284, mass:1, colorIdx:5, ballNum:5 },
+      // Row 3
+      { x:691, y:200, mass:1, colorIdx:6, ballNum:6 },
+      { x:691, y:233, mass:1, colorIdx:7, ballNum:7 },
+      { x:691, y:267, mass:1, colorIdx:1, ballNum:9 },
+      { x:691, y:300, mass:1, colorIdx:2, ballNum:10 },
+      // Row 4
+      { x:724, y:183, mass:1, colorIdx:3, ballNum:11 },
+      { x:724, y:217, mass:1, colorIdx:4, ballNum:12 },
+      { x:724, y:250, mass:1, colorIdx:5, ballNum:13 },
+      { x:724, y:283, mass:1, colorIdx:6, ballNum:14 },
+      { x:724, y:317, mass:1, colorIdx:7, ballNum:15 },
+    ],
+    aimAngle: Math.PI,
+    goal: 'Pocket at least 2 balls on the break without scratching.',
+  },
+  {
+    name: 'The Cut Shot',
+    description: 'A cut pockets the ball by hitting it off-centre. Use the ghost-ball predictor (the faint circle on the aim line) — position your shot so the ghost ball aligns the target ball directly toward the pocket.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:720, y:155, mass:1, colorIdx:3, ballNum:1 },
+    ],
+    aimAngle: Math.PI - 0.18,
+    goal: 'Cut the red ball into the top-right corner pocket.',
+  },
+  {
+    name: 'Bank Shot',
+    description: 'The direct path to any pocket is blocked by the black ball. Bank the purple ball off the bottom rail — angle in = angle out. Aim the purple ball ⅓ of the way toward the far end of the bottom rail.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:620, y:340, mass:1, colorIdx:4, ballNum:1 },
+      { x:620, y:240, mass:1, colorIdx:8, ballNum:2 },
+    ],
+    aimAngle: Math.PI - 0.12,
+    goal: 'Bank the purple ball off the bottom rail into a pocket.',
+  },
+  {
+    name: '1-2 Combination',
+    description: 'Three balls are perfectly collinear to the bottom-right corner pocket. Hit the blue ball (A) — it transfers momentum to the red ball (B) which pockets. The cue needs no direct contact with B.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:602, y:282, mass:1, colorIdx:2, ballNum:1 },
+      { x:752, y:384, mass:1, colorIdx:3, ballNum:2 },
+    ],
+    aimAngle: Math.PI - 0.3,
+    goal: 'Pocket the red ball via the blue ball without pocketing the blue.',
+  },
+  {
+    name: 'The Stop Shot',
+    description: 'Hit the cue ball dead centre (no spin) and it stops completely on contact — 100% of momentum goes to the yellow ball. Add backspin (draw) and the cue reverses. Add topspin (follow) and the cue rolls forward.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:530, y:250, mass:1, colorIdx:1, ballNum:1 },
+      { x:770, y:380, mass:1, colorIdx:6, ballNum:2 },
+    ],
+    aimAngle: Math.PI,
+    goal: 'Pocket the yellow ball, then the green — in two shots, using spin to control cue position.',
+  },
+  {
+    name: 'Cluster Buster',
+    description: 'Three balls are frozen together near the corner pocket. A direct hit on the lead ball sends energy through the cluster. Experiment with aim angle and spin to scatter them into the pockets.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:660, y:250, mass:1, colorIdx:2, ballNum:1 },
+      { x:694, y:250, mass:1, colorIdx:3, ballNum:2 },
+      { x:677, y:278, mass:1, colorIdx:4, ballNum:3 },
+    ],
+    aimAngle: Math.PI,
+    goal: 'Pocket at least 2 of the 3 clustered balls.',
+  },
+  {
+    name: 'The Masse Curve',
+    description: 'The black ball blocks every straight path. Use extreme side-spin (English) to curve the cue ball around the obstacle. Open the Hit panel and drag the contact point near the edge of the circle.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:450, y:250, mass:2, colorIdx:8, ballNum:1 },
+      { x:620, y:250, mass:1, colorIdx:1, ballNum:2 },
+      { x:620, y:200, mass:1, colorIdx:3, ballNum:3 },
+    ],
+    aimAngle: Math.PI,
+    goal: 'Pocket at least one coloured ball without directly hitting the black blocker.',
+  },
+  {
+    name: 'Two-Rail Bank',
+    description: 'The yellow ball must travel off two rails before reaching its pocket — a classic trick shot. Aim the cue ball at a steep angle toward the top-right; the ball should bounce off the right rail then the bottom rail.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:680, y:200, mass:1, colorIdx:1, ballNum:1 },
+    ],
+    aimAngle: Math.PI - 0.22,
+    goal: 'Pocket the yellow ball using at least two rail bounces.',
+  },
+  {
+    name: 'The Run-Out',
+    description: 'Classic end-game scenario — 5 balls scattered around the table. You must pocket them all in order, controlling cue position after each shot so the next is always makeable.',
+    balls: [
+      { x:200, y:250, mass:1, colorIdx:0, isCue:true, ballNum:0 },
+      { x:480, y:160, mass:1, colorIdx:1, ballNum:1 },
+      { x:680, y:200, mass:1, colorIdx:2, ballNum:2 },
+      { x:740, y:340, mass:1, colorIdx:3, ballNum:3 },
+      { x:520, y:360, mass:1, colorIdx:4, ballNum:4 },
+      { x:380, y:300, mass:1, colorIdx:5, ballNum:5 },
+    ],
+    aimAngle: Math.PI,
+    goal: 'Clear all 5 balls using spin and position play.',
   },
 ]
 
@@ -331,7 +457,7 @@ export default function PhysicsPoolLab({ onClose }) {
       offsetY: 0,
       pocketed: [],
       pendingPlace: false,
-      aimHandle: { dragging: false, angle: Math.PI, dist: 90 },
+      aimHandle: { dragging: false, angle: level?.aimAngle ?? Math.PI, dist: 90 },
     }
     setShots(0)
     setPhase('placing')
