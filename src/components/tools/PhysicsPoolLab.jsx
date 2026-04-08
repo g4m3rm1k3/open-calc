@@ -325,15 +325,16 @@ export default function PhysicsPoolLab({ onClose }) {
       events: [],
       mouse: { x: 0, y: 0 },
       shots: 0,
-      phase: 'aim',
+      phase: 'placing',
       scale: existingScale,   // ← key fix: carry forward the real scale
       offsetX: 0,
       offsetY: 0,
       pocketed: [],
+      pendingPlace: false,
       aimHandle: { dragging: false, angle: Math.PI, dist: 90 },
     }
     setShots(0)
-    setPhase('aim')
+    setPhase('placing')
     setEvents([])
   }, [])
 
@@ -369,13 +370,21 @@ export default function PhysicsPoolLab({ onClose }) {
   const handleMouseDown = useCallback((e) => {
     if (!stateRef.current) return
     const st = stateRef.current
-    if (st.phase !== 'aim') return
+    if (st.phase !== 'aim' && st.phase !== 'placing') return
     const rect = canvasRef.current.getBoundingClientRect()
     const sx = (e.clientX || e.touches?.[0]?.clientX) - rect.left
     const sy = (e.clientY || e.touches?.[0]?.clientY) - rect.top
     const { x, y } = toWorld(sx, sy)
     const cue = st.balls.find(b => b.isCue && !b.pocketed)
     if (!cue) return
+    // Placing phase: click to confirm position
+    if (st.phase === 'placing') {
+      cue.x = clamp(x, RAIL + BALL_R, KITCHEN_X - BALL_R)
+      cue.y = clamp(y, RAIL + BALL_R, TH - RAIL - BALL_R)
+      st.phase = 'aim'
+      setPhase('aim')
+      return
+    }
     // Vector tip hit-test (collision step browser) — click near arrowhead to label
     if (collisionStepRef.current >= 0 && drawnVectorsRef.current.length > 0) {
       let hit = null
@@ -406,6 +415,15 @@ export default function PhysicsPoolLab({ onClose }) {
     const pos = toWorld(sx, sy)
     stateRef.current.mouse = pos
     const st = stateRef.current
+    // Placing phase: cue ball tracks the cursor
+    if (st.phase === 'placing') {
+      const cue = st.balls.find(b => b.isCue && !b.pocketed)
+      if (cue) {
+        cue.x = clamp(pos.x, RAIL + BALL_R, KITCHEN_X - BALL_R)
+        cue.y = clamp(pos.y, RAIL + BALL_R, TH - RAIL - BALL_R)
+      }
+      return
+    }
     const ah = st.aimHandle
     if (!ah?.dragging) return
     const cue = st.balls.find(b => b.isCue && !b.pocketed)
@@ -537,12 +555,13 @@ export default function PhysicsPoolLab({ onClose }) {
       for (const p of POCKETS) {
         if (hypot(b.x - p.x, b.y - p.y) < POCKET_R + 2) {
           if (b.isCue) {
-            // ── Scratch: ball-in-hand — place cue in kitchen, don't end game
-            b.x = KITCHEN_X
+            // ── Scratch: ball-in-hand — let player place cue in kitchen
+            b.x = KITCHEN_X - BALL_R * 2
             b.y = TH / 2
             b.vx = 0; b.vy = 0; b.spin = 0
             st.scratchCount = (st.scratchCount ?? 0) + 1
             st.events.push({ type: 'scratch', time: Date.now() })
+            st.pendingPlace = true
             setEvents([...st.events])
           } else {
             b.pocketed = true
@@ -570,13 +589,19 @@ export default function PhysicsPoolLab({ onClose }) {
     }
 
     if (runPhysics) {
-      // Sleep detection → back to aim phase
+      // Sleep detection → back to aim (or placing if scratch pending)
       if (st.phase === 'rolling') {
         const maxV = Math.max(...active.map(b => hypot(b.vx, b.vy)))
         if (maxV < SLEEP_THRESH) {
           st.balls.forEach(b => { b.vx = 0; b.vy = 0; b.spin = 0 })
-          st.phase = 'aim'
-          setPhase('aim')
+          if (st.pendingPlace) {
+            st.phase = 'placing'
+            st.pendingPlace = false
+            setPhase('placing')
+          } else {
+            st.phase = 'aim'
+            setPhase('aim')
+          }
         }
       }
 
@@ -1262,19 +1287,33 @@ export default function PhysicsPoolLab({ onClose }) {
       }
     }
 
-    // Kitchen line (scratch placement zone)
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-    ctx.lineWidth = 1
+    // Kitchen line (cue ball placement zone)
+    const isPlacing = st.phase === 'placing'
+    if (isPlacing) {
+      // shade invalid zone (right of kitchen line)
+      ctx.fillStyle = 'rgba(239,68,68,0.07)'
+      ctx.fillRect(KITCHEN_X, RAIL, TW - RAIL - KITCHEN_X, TH - RAIL * 2)
+      // shade valid zone
+      ctx.fillStyle = 'rgba(74,222,128,0.05)'
+      ctx.fillRect(RAIL, RAIL, KITCHEN_X - RAIL, TH - RAIL * 2)
+    }
+    ctx.strokeStyle = isPlacing ? 'rgba(74,222,128,0.6)' : 'rgba(255,255,255,0.08)'
+    ctx.lineWidth = isPlacing ? 2 : 1
     ctx.setLineDash([6, 8])
     ctx.beginPath()
     ctx.moveTo(KITCHEN_X, RAIL)
     ctx.lineTo(KITCHEN_X, TH - RAIL)
     ctx.stroke()
     ctx.setLineDash([])
-    ctx.fillStyle = 'rgba(255,255,255,0.06)'
-    ctx.font = '8px monospace'
+    ctx.fillStyle = isPlacing ? 'rgba(74,222,128,0.9)' : 'rgba(255,255,255,0.06)'
+    ctx.font = isPlacing ? 'bold 9px monospace' : '8px monospace'
     ctx.textAlign = 'center'
     ctx.fillText('KITCHEN', KITCHEN_X, RAIL + 10)
+    if (isPlacing) {
+      ctx.fillStyle = 'rgba(255,255,255,0.75)'
+      ctx.font = '10px monospace'
+      ctx.fillText('Click to place the cue ball', KITCHEN_X / 2 + RAIL / 2, TH / 2 - 14)
+    }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     animRef.current = requestAnimationFrame(loop)
@@ -1373,6 +1412,11 @@ export default function PhysicsPoolLab({ onClose }) {
           {phase === 'aim' && (
             <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(56,189,248,0.15)', color: C.blue, border: `1px solid ${C.blue}` }}>
               AIM · Shots: {shots}
+            </span>
+          )}
+          {phase === 'placing' && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(74,222,128,0.15)', color: C.green, border: `1px solid ${C.green}` }}>
+              PLACE CUE BALL
             </span>
           )}
         </div>

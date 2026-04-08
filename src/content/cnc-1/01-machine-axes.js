@@ -8,7 +8,7 @@
 export default {
   id: 'cnc-machine-axes-masterclass',
   slug: 'machine-axes-kinematics',
-  chapter: 'cnc-fundamentals-1',
+  chapter: 'cnc-1',
   order: 1,
   title: 'The Cartesian Grid That Rules the World',
   subtitle: 'Spatial Kinematics, Historical Origins, and the Mathematical Control of Motion',
