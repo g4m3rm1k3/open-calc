@@ -214,6 +214,7 @@ const VIZ_REGISTRY = {
   // Digital Fundamentals lessons
   AnalogVsDigital: lazy(() => import("./react/AnalogVsDigital.jsx")),
   BinaryAndWaveforms: lazy(() => import("./react/BinaryAndWaveforms.jsx")),
+  DF_L3_1_ANDORNOTGates: lazy(() => import("./react/DF_L3_1_ANDORNOTGates.jsx")),
   JS1_DomIntro: lazy(() => import("./react/JS1_DomIntro.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
