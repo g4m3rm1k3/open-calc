@@ -5,6 +5,8 @@
 import dsa0_001 from './dsa0-001-execution-model.js';
 import dsa0_002 from './dsa0-002-big-o.js';
 import dsa0_003 from './dsa0-003-algorithmic-thinking.js';
+import dsa1_001 from './dsa1-001-arrays.js';
+import dsa1_002 from './dsa1-002-linked-lists.js';
 
 const DSA_CH0 = {
   title: 'Computational Foundations',
@@ -19,15 +21,16 @@ const DSA_CH0 = {
   ],
 };
 
-// Placeholder chapters — filled in as lessons are built
 const DSA_CH1 = {
   title: 'Linear Structures',
   number: 'dsa1',
   slug: 'linear-structures',
   description: 'Arrays, strings, linked lists, stacks, and queues — the backbone of every algorithm.',
   course: 'dsa-1',
-  comingSoon: true,
-  lessons: [],
+  lessons: [
+    dsa1_001,
+    dsa1_002,
+  ],
 };
 
 const DSA_CH2 = {
