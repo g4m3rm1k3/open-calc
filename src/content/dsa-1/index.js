@@ -4,6 +4,7 @@
 
 import dsa0_001 from './dsa0-001-execution-model.js';
 import dsa0_002 from './dsa0-002-big-o.js';
+import dsa0_003 from './dsa0-003-algorithmic-thinking.js';
 
 const DSA_CH0 = {
   title: 'Computational Foundations',
@@ -14,6 +15,7 @@ const DSA_CH0 = {
   lessons: [
     dsa0_001,
     dsa0_002,
+    dsa0_003,
   ],
 };
 
