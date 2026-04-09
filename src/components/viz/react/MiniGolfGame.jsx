@@ -231,10 +231,11 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     let stopped = false;
 
     // loop-the-loop state
-    let loopMode = false;
-    let loopSpeed = 0;    // scalar speed along track (positive = CCW)
-    let loopAngle = 0;    // angle from +X axis about loop center; -π/2 = bottom
-    let loopData  = null; // { cx, cz, r } of current loop
+    let loopMode       = false;
+    let loopSpeed      = 0;    // scalar speed along track (positive = CCW)
+    let loopAngle      = 0;    // current angle from loop center (+X axis)
+    let loopAngleEntry = 0;    // angle at entry — exit after exactly 2π of travel
+    let loopData       = null; // { cx, cz, r } of current loop
 
     const FORCES = {
       velocity: { label: 'Velocity (v)',  color: '#38b6ff', on: true },
@@ -857,12 +858,42 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       return new THREE.Vector3(h1 - h2, 2 * eps, h3 - h4).normalize();
     }
 
-    // Always-running scene updates (spinners spin even before ball is putted)
+    // Always-running scene updates (spinners spin and collide every frame)
     function updateSceneObjects(dt) {
+      if (!pos) return;
       for (let mesh of obstacles3d) {
-        if (mesh.userData.wallType === 'spinner') {
-          mesh.userData.angle += mesh.userData.speed * dt;
-          mesh.rotation.y = mesh.userData.angle;
+        if (mesh.userData.wallType !== 'spinner') continue;
+        const wd = mesh.userData;
+        wd.angle += wd.speed * dt;
+        mesh.rotation.y = wd.angle;
+
+        // Collision runs every frame — arm hits ball whether rolling or stopped
+        const ang  = wd.angle;
+        const cosA = Math.cos(ang), sinA = Math.sin(ang);
+        const ax1 = wd.cx + cosA * wd.armLen, az1 = wd.cz - sinA * wd.armLen;
+        const ax2 = wd.cx - cosA * wd.armLen, az2 = wd.cz + sinA * wd.armLen;
+        const adx = ax2 - ax1, adz = az2 - az1;
+        const al  = Math.sqrt(adx*adx + adz*adz);
+        const t   = Math.max(0, Math.min(1, ((pos.x - ax1)*adx + (pos.z - az1)*adz) / (al*al)));
+        const cpx = ax1 + t*adx, cpz = az1 + t*adz;
+        const ddx = pos.x - cpx, ddz = pos.z - cpz;
+        const dd  = Math.sqrt(ddx*ddx + ddz*ddz);
+        if (dd < BALL_R + wd.armW / 2) {
+          const nn  = dd > 0.001 ? 1/dd : 1;
+          const nx2 = ddx * nn, nz2 = ddz * nn;
+          const pen = BALL_R + wd.armW / 2 - dd;
+          pos.x += nx2 * pen;
+          pos.z += nz2 * pen;
+          // Transfer arm's surface velocity to ball
+          const armTipSpeed = wd.speed * wd.armLen;
+          const armVx = -sinA * armTipSpeed, armVz = -cosA * armTipSpeed;
+          vel.x = vel.x * 0.3 + armVx * 0.7;
+          vel.z = vel.z * 0.3 + armVz * 0.7;
+          if (ball3d) ball3d.position.copy(pos);
+          if (!ballActive && vel.length() > 0.2) {
+            ballActive = true; // arm knocks a resting ball
+            trailPoints = [];
+          }
         }
       }
     }
@@ -890,7 +921,9 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         } else {
           const frictionAcc = mu * N * (loopSpeed > 0 ? -1 : 1);
           loopSpeed += (gTan + frictionAcc) * dt;
-          loopAngle += (loopSpeed / ld.r) * dt;
+          const dAngle = (loopSpeed / ld.r) * dt;
+          loopAngle    += dAngle;
+          ld.travel    += Math.abs(dAngle);
           pos.x = ld.cx + ld.r * Math.cos(loopAngle);
           pos.y = ld.r  + ld.r * Math.sin(loopAngle);
           pos.z = ld.cz;
@@ -902,10 +935,10 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           rollDist += Math.abs(loopSpeed) * dt;
           recordedFrames.push({ pos: pos.clone(), vel: vel.clone(), t: rollTime });
           updateTrail(); updateArrows(); updateStats();
-          // Exit: completed loop (angle past -π/2 after going all the way around)
-          if (loopAngle > Math.PI * 1.3) {
+          // Exit after exactly one revolution
+          if (ld.travel >= Math.PI * 2) {
             loopMode = false; loopData = null;
-            vel.set(loopSpeed, 0, 0);
+            vel.set(Math.abs(loopSpeed), 0, 0); // exit rightward at loop base
             pos.y = BALL_R;
           }
           return; // skip normal physics
@@ -924,10 +957,11 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           const distToCenter = Math.sqrt(dx2*dx2 + dy2*dy2);
           // Ball near circle, approaching from left, going right
           if (Math.abs(distToCenter - wd.r) < BALL_R * 3 && pos.x < wd.cx && vel.x > 0.5) {
-            loopMode  = true;
-            loopData  = { cx: wd.cx, cz: wd.cz, r: wd.r };
-            loopAngle = Math.atan2(dy2, dx2);
-            loopSpeed = vel.length();
+            loopMode       = true;
+            loopData       = { cx: wd.cx, cz: wd.cz, r: wd.r, travel: 0 };
+            loopAngle      = Math.atan2(dy2, dx2);
+            loopAngleEntry = loopAngle;
+            loopSpeed      = vel.length();
             const vMin = Math.sqrt(G_CONST * wd.r);
             toast(`Kelty Loop! Need v ≥ ${vMin.toFixed(1)} m/s at top. Current: ${loopSpeed.toFixed(1)}`);
             return;
