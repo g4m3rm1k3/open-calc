@@ -973,7 +973,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
 
       const currentH = getTerrainHeight(pos.x, pos.z);
-      const isAirborne = pos.y > currentH + 0.05;
+      // Ball is airborne if physically above terrain OR just launched upward (loft)
+      const isAirborne = pos.y > currentH + 0.05 || vel.y > 0.01;
 
       if (isAirborne) {
         vel.y -= G_CONST * dt;
@@ -981,8 +982,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           vel.add(lv.wind.clone().multiplyScalar(dt));
         }
       } else {
-        // Ground physics
-        vel.y = 0; // Lock to slope plane conceptually
+        // Ground physics — safe to zero y here since ball is confirmed on ground
+        vel.y = 0;
         const frictionDV = mu * G_CONST * dt;
         const unitV = vel.clone();
         unitV.y = 0;
