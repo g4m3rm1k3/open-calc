@@ -745,19 +745,30 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         }
       }
 
-      const frictionMag = mu * G_CONST;
-      const frictionDir = speed > 0.01 ? vel.clone().normalize().negate() : new THREE.Vector3(0,0,0);
-      
-      const normal = getTerrainNormal(pos.x, pos.z);
+      const isAirborne = pos.y > getTerrainHeight(pos.x, pos.z) + 0.05;
+
+      let frictionMag = mu * G_CONST;
+      let normal = getTerrainNormal(pos.x, pos.z);
       const gravity = new THREE.Vector3(0, -G_CONST, 0);
-      const gravityOnPlane = gravity.clone().projectOnPlane(normal);
-      const netForce = frictionDir.clone().multiplyScalar(frictionMag).add(windForce).add(gravityOnPlane);
+      let gravityEffect = gravity.clone().projectOnPlane(normal);
+
+      if (isAirborne) {
+        frictionMag = 0;
+        normal = new THREE.Vector3(0, 0, 0);
+        gravityEffect = gravity; // Full downward pull
+      }
+
+      const frictionDir = speed > 0.01 ? vel.clone().normalize().negate() : new THREE.Vector3(0,0,0);
+      const netForce = frictionDir.clone().multiplyScalar(frictionMag).add(windForce).add(gravityEffect);
+
+      const nLen = isAirborne ? 0 : 2.5;
+      const nDir = isAirborne ? new THREE.Vector3(0,1,0) : normal;
 
       const defs = {
         velocity: { dir: speed > 0.01 ? vel.clone().normalize() : new THREE.Vector3(1,0,0), len: Math.min(speed*0.35,6)+0.5, y:0.8 },
         friction: { dir: frictionDir.length()>0 ? frictionDir : new THREE.Vector3(-1,0,0), len: Math.min(frictionMag*0.35,4)+0.3, y:0.9 },
-        normal:   { dir: normal, len: 2.5, y: BALL_R },
-        net:      { dir: netForce.length() > 0.01 ? netForce.normalize() : normal, len: Math.min(netForce.length()*0.5, 4), y:1.1 },
+        normal:   { dir: nDir, len: nLen, y: BALL_R },
+        net:      { dir: netForce.length() > 0.01 ? netForce.normalize() : nDir, len: Math.min(netForce.length()*0.5, 4), y:1.1 },
         wind:     { dir: windForce.length()>0.1 ? windForce.clone().normalize() : new THREE.Vector3(0,0,1), len: Math.min(windForce.length()*0.4,4), y:0.7 },
       };
 
@@ -871,46 +882,69 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         return;
       }
 
-      const frictionDV = mu * G_CONST * dt;
-      const unitV = vel.clone().normalize();
-      if (frictionDV >= speed) {
-        vel.set(0, 0, 0);
+      const currentH = getTerrainHeight(pos.x, pos.z);
+      const isAirborne = pos.y > currentH + 0.05;
+
+      if (isAirborne) {
+        vel.y -= G_CONST * dt;
+        if (lv.wind.length() > 0.01) {
+          vel.add(lv.wind.clone().multiplyScalar(dt));
+        }
       } else {
-        vel.sub(unitV.multiplyScalar(frictionDV));
-      }
-
-      if (lv.wind.length() > 0.01) {
-        vel.add(lv.wind.clone().multiplyScalar(dt));
-      }
-
-      // Hole 8: Dynamic Pulsing Green
-      if (lv.dynamicGreen) {
-        const t = clock.getElapsedTime();
-        const pulse = Math.sin(t * 3);
-        const ground = obstacles3d.find(o => o.geometry.type === 'PlaneGeometry');
-        if (ground) ground.scale.set(1 + pulse * 0.05, 1 + pulse * 0.05, 1);
+        // Ground physics
+        vel.y = 0; // Lock to slope plane conceptually
+        const frictionDV = mu * G_CONST * dt;
+        const unitV = vel.clone();
+        unitV.y = 0;
+        const speedXZ = unitV.length();
+        if (speedXZ > 0.01) {
+          unitV.normalize();
+          if (frictionDV >= speedXZ) {
+            vel.x = 0; vel.z = 0;
+          } else {
+            vel.sub(unitV.multiplyScalar(frictionDV));
+          }
+        }
         
-        const distFromCenter = new THREE.Vector2(pos.x, pos.z).length();
-        if (distFromCenter > 0.1) {
-          const radialImpulse = new THREE.Vector3(pos.x, 0, pos.z).normalize().multiplyScalar(pulse * 2 * dt);
-          vel.add(radialImpulse);
+        if (lv.wind.length() > 0.01) {
+          vel.add(lv.wind.clone().multiplyScalar(dt));
+        }
+
+        // Gravity on slopes
+        const normal = getTerrainNormal(pos.x, pos.z);
+        const gravityEffect = new THREE.Vector3(0, -G_CONST, 0).projectOnPlane(normal);
+        vel.add(gravityEffect.multiplyScalar(dt));
+
+        // Hole 8: Dynamic Pulsing Green
+        if (lv.dynamicGreen) {
+          const t = clock.getElapsedTime();
+          const pulse = Math.sin(t * 3);
+          const ground = obstacles3d.find(o => o.geometry.type === 'PlaneGeometry');
+          if (ground) ground.scale.set(1 + pulse * 0.05, 1 + pulse * 0.05, 1);
+          
+          const distFromCenter = new THREE.Vector2(pos.x, pos.z).length();
+          if (distFromCenter > 0.1) {
+            const radialImpulse = new THREE.Vector3(pos.x, 0, pos.z).normalize().multiplyScalar(pulse * 2 * dt);
+            vel.add(radialImpulse);
+          }
         }
       }
 
       const newPos = pos.clone().add(vel.clone().multiplyScalar(dt));
-      const h = getTerrainHeight(newPos.x, newPos.z);
       const collided = resolveCollisions(pos, newPos, vel);
       pos.copy(collided.pos);
       vel.copy(collided.vel);
       
-      // Gravity on slopes
-      if (h > BALL_R + 0.01 || vel.y !== 0) {
-        const normal = getTerrainNormal(pos.x, pos.z);
-        const gravityEffect = new THREE.Vector3(0, -G_CONST, 0).projectOnPlane(normal);
-        vel.add(gravityEffect.multiplyScalar(dt));
+      const newH = getTerrainHeight(pos.x, pos.z);
+      if (!isAirborne) {
+        pos.y = newH;
+      } else if (pos.y <= newH) {
+        pos.y = newH;
+        vel.y *= -0.5; // Restitution
+        vel.x *= 0.8;
+        vel.z *= 0.8;
       }
 
-      pos.y = h;
       ball3d.position.copy(pos);
       ball3d.rotation.x += vel.z * dt * 3;
       ball3d.rotation.z -= vel.x * dt * 3;
@@ -927,7 +961,9 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       if (Math.sqrt(dx*dx + dz*dz) < HOLE_R && vel.length() < 0.5) {
         winLevel();
       }
-      if (Math.abs(pos.x) > 17 || Math.abs(pos.z) > 9) {
+      
+      const gSize = lv.greenSize || { w: 40, d: 20 };
+      if (Math.abs(pos.x) > (gSize.w / 2) + 2 || Math.abs(pos.z) > (gSize.d / 2) + 2) {
         toast('Out of bounds! Resetting…');
         setTimeout(resetBall, 600);
       }
@@ -1031,7 +1067,9 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
       const a   = parseFloat(q('s-angle').value) * Math.PI / 180;
       const pwr = parseFloat(q('s-power').value);
-      vel.set(pwr * Math.cos(a), 0, pwr * Math.sin(a));
+      const lft = parseFloat(q('s-loft').value) * Math.PI / 180;
+      const vxz = pwr * Math.cos(lft);
+      vel.set(vxz * Math.cos(a), pwr * Math.sin(lft), vxz * Math.sin(a));
       initialKE  = 0.5 * vel.lengthSq();
       ballActive = true;
       rollTime   = 0; rollDist = 0; recordedFrames = [];
@@ -1274,11 +1312,13 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     }
 
     function updateUI() {
-      const a   = parseFloat(q('s-angle').value);
-      const pwr = parseFloat(q('s-power').value);
-      const mu  = parseFloat(q('s-friction').value);
+      const a    = parseFloat(q('s-angle').value);
+      const pwr  = parseFloat(q('s-power').value);
+      const loft = parseFloat(q('s-loft').value);
+      const mu   = parseFloat(q('s-friction').value);
       q('v-angle').textContent    = a + '°';
       q('v-power').textContent    = pwr.toFixed(1);
+      q('v-loft').textContent     = loft + '°';
       q('v-friction').textContent = mu.toFixed(2);
       updateEquation();
       updateAimArrow();
@@ -1326,6 +1366,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     q('af-mag').addEventListener('input', updateAFDisplay);
     q('s-angle').addEventListener('input', updateUI);
     q('s-power').addEventListener('input', updateUI);
+    q('s-loft').addEventListener('input', updateUI);
     q('s-friction').addEventListener('input', updateUI);
     q('ov-hide').addEventListener('click', hideOverlay);
     q('ov-next').addEventListener('click', nextLevel);
@@ -1406,6 +1447,14 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
                 <span className="ctrl-val" id="mg-v-power">18.0</span>
               </div>
               <input type="range" id="mg-s-power" min="3" max="40" defaultValue="18" step="0.5" />
+            </div>
+
+            <div className="ctrl">
+              <div className="ctrl-row">
+                <span className="ctrl-label">Loft (Pitch)</span>
+                <span className="ctrl-val" id="mg-v-loft">0°</span>
+              </div>
+              <input type="range" id="mg-s-loft" min="0" max="60" defaultValue="0" step="1" />
             </div>
 
             <div className="ctrl">
