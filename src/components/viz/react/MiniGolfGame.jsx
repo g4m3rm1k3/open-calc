@@ -958,7 +958,20 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       updateStats();
 
       const dx = pos.x - lv.hole.x, dz = pos.z - lv.hole.z;
-      if (Math.sqrt(dx*dx + dz*dz) < HOLE_R && vel.length() < 0.5) {
+      const distToHole = Math.sqrt(dx*dx + dz*dz);
+      
+      // Gravity well pull towards hole (simulating dropping into the cup edge)
+      if (distToHole < HOLE_R * 1.5 && !isAirborne) {
+         const pullStr = (HOLE_R * 1.5 - distToHole) * 15;
+         vel.add(new THREE.Vector3(-dx, 0, -dz).normalize().multiplyScalar(pullStr * dt));
+      }
+
+      // Drop in if moving reasonably slow and directly over hole
+      if (distToHole < HOLE_R * 0.9 && vel.length() < 3.5 && !isAirborne) {
+        vel.set(0, 0, 0);
+        pos.x = lv.hole.x;
+        pos.z = lv.hole.z;
+        pos.y -= 0.1;
         winLevel();
       }
       
