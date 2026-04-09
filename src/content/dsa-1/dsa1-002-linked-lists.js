@@ -800,6 +800,192 @@ document.getElementById('btn-del').addEventListener('click',()=>{const val=parse
 document.getElementById('btn-rst').addEventListener('click',()=>{list.head=null;[12,7,43,5,28].forEach(v=>list.append(v));renderList(list);MSG.textContent='';});`,
                 outputHeight: 200,
               },
+
+              // ── JS Cell 5: Build it from scratch ─────────────────────────────
+              {
+                type: 'js',
+                instruction: `## Challenge — Build the Whole Thing From Scratch
+
+No skeletons. No TODOs. Just the class shells.
+
+You know what each method needs to do — you just built them one at a time. Now put it all together from memory.
+
+**What to implement:**
+- \`Node\` constructor: store \`val\`, set \`next = null\`
+- \`LinkedList\` constructor: \`head = null\`
+- \`append(val)\` — walk to end, link the new node
+- \`prepend(val)\` — new node points at old head, update head
+- \`toArray()\` — traverse, collect values into an array
+- \`delete(val)\` — handle head deletion + general prev/cur walk
+
+The render and test code is provided. When all four operations work, you'll see a green success banner.`,
+                html: `<div id="out" style="font-family:monospace;font-size:13px"></div>`,
+                css: `body{margin:0;padding:14px;background:#0f172a;color:#e2e8f0;box-sizing:border-box;font-family:monospace}
+.node{display:inline-flex;border:2px solid #6366f1;border-radius:6px;overflow:hidden;margin:2px}
+.val{padding:7px 12px;background:#1e1b4b;color:#a5b4fc;font-weight:bold}
+.nxt{padding:7px 8px;background:#0f172a;color:#6366f1;font-size:10px;border-left:1px solid #4b5563}
+.arrow{color:#6366f1;margin:0 3px;font-size:15px;vertical-align:middle}
+.null{color:#475569;font-style:italic;font-size:12px;vertical-align:middle}
+.pass{color:#4ade80;margin:4px 0;font-size:12px}
+.fail{color:#f87171;margin:4px 0;font-size:12px}
+.section{margin-top:12px;color:#94a3b8;font-size:11px;border-top:1px solid #1e293b;padding-top:8px}
+.banner{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px}
+.banner.ok{background:#052e16;border:1px solid #166534;color:#4ade80}
+.banner.bad{background:#450a0a;border:1px solid #7f1d1d;color:#f87171}`,
+                startCode: `// ─── Your implementation goes here ───────────────────
+
+class Node {
+  // fill in the constructor
+}
+
+class LinkedList {
+  // fill in the constructor
+
+  append(val) {
+    // walk to the end, link the new node
+  }
+
+  prepend(val) {
+    // new node points at old head, then update head
+  }
+
+  toArray() {
+    // traverse and collect values
+  }
+
+  delete(val) {
+    // handle head deletion + general prev/cur walk
+  }
+}
+
+// ─── Tests & render (don't edit below) ────────────────
+
+function renderList(head) {
+  if (!head) return '<span class="null">(empty)</span>';
+  let html = '', cur = head;
+  while (cur) {
+    html += \`<span class="node"><span class="val">\${cur.val}</span><span class="nxt">next</span></span>\`;
+    html += cur.next ? '<span class="arrow">→</span>' : '<span class="null">→ null</span>';
+    cur = cur.next;
+  }
+  return html;
+}
+
+const out = document.getElementById('out');
+const results = [];
+
+function test(label, got, expected) {
+  const pass = JSON.stringify(got) === JSON.stringify(expected);
+  results.push(pass);
+  out.innerHTML += \`<div class="\${pass?'pass':'fail'}">\${pass?'✓':'✗'} \${label}: got \${JSON.stringify(got)}\${pass?'':' — expected '+JSON.stringify(expected)}</div>\`;
+}
+
+try {
+  // Build list via append
+  const ll = new LinkedList();
+  ll.append(12); ll.append(7); ll.append(43); ll.append(5);
+  out.innerHTML += '<div class="section">append(12, 7, 43, 5)</div>';
+  out.innerHTML += renderList(ll.head) + '<br>';
+  test('toArray after 4 appends', ll.toArray(), [12,7,43,5]);
+
+  // Prepend
+  ll.prepend(99);
+  out.innerHTML += '<div class="section">prepend(99)</div>';
+  out.innerHTML += renderList(ll.head) + '<br>';
+  test('toArray after prepend', ll.toArray(), [99,12,7,43,5]);
+
+  // Delete middle
+  ll.delete(7);
+  out.innerHTML += '<div class="section">delete(7)</div>';
+  out.innerHTML += renderList(ll.head) + '<br>';
+  test('toArray after delete(7)', ll.toArray(), [99,12,43,5]);
+
+  // Delete head
+  ll.delete(99);
+  test('toArray after delete(99) — head', ll.toArray(), [12,43,5]);
+
+  // Delete tail
+  ll.delete(5);
+  test('toArray after delete(5) — tail', ll.toArray(), [12,43]);
+
+  const allPassed = results.every(Boolean);
+  out.innerHTML += \`<div class="banner \${allPassed?'ok':'bad'}">\${allPassed
+    ? '✓ All tests pass. You built a linked list from scratch.'
+    : \`\${results.filter(Boolean).length}/\${results.length} tests passing — keep going.\`
+  }</div>\`;
+} catch(e) {
+  out.innerHTML += '<div class="fail">Error: ' + e.message + '</div>';
+}`,
+                solutionCode: `class Node {
+  constructor(val) { this.val = val; this.next = null; }
+}
+
+class LinkedList {
+  constructor() { this.head = null; }
+
+  append(val) {
+    const n = new Node(val);
+    if (!this.head) { this.head = n; return; }
+    let cur = this.head;
+    while (cur.next) cur = cur.next;
+    cur.next = n;
+  }
+
+  prepend(val) {
+    const n = new Node(val);
+    n.next = this.head;
+    this.head = n;
+  }
+
+  toArray() {
+    const r = []; let cur = this.head;
+    while (cur) { r.push(cur.val); cur = cur.next; }
+    return r;
+  }
+
+  delete(val) {
+    if (!this.head) return;
+    if (this.head.val === val) { this.head = this.head.next; return; }
+    let prev = this.head, cur = this.head.next;
+    while (cur) {
+      if (cur.val === val) { prev.next = cur.next; return; }
+      prev = cur; cur = cur.next;
+    }
+  }
+}
+
+function renderList(head) {
+  if (!head) return '<span class="null">(empty)</span>';
+  let html = '', cur = head;
+  while (cur) {
+    html += \`<span class="node"><span class="val">\${cur.val}</span><span class="nxt">next</span></span>\`;
+    html += cur.next ? '<span class="arrow">→</span>' : '<span class="null">→ null</span>';
+    cur = cur.next;
+  }
+  return html;
+}
+
+const out = document.getElementById('out');
+const results = [];
+function test(label, got, expected) {
+  const pass = JSON.stringify(got) === JSON.stringify(expected);
+  results.push(pass);
+  out.innerHTML += \`<div class="\${pass?'pass':'fail'}">\${pass?'✓':'✗'} \${label}: got \${JSON.stringify(got)}</div>\`;
+}
+const ll = new LinkedList();
+ll.append(12); ll.append(7); ll.append(43); ll.append(5);
+out.innerHTML += '<div class="section">append(12,7,43,5)</div>' + renderList(ll.head) + '<br>';
+test('toArray after 4 appends', ll.toArray(), [12,7,43,5]);
+ll.prepend(99);
+out.innerHTML += '<div class="section">prepend(99)</div>' + renderList(ll.head) + '<br>';
+test('toArray after prepend', ll.toArray(), [99,12,7,43,5]);
+ll.delete(7); test('delete(7)', ll.toArray(), [99,12,43,5]);
+ll.delete(99); test('delete(99) head', ll.toArray(), [12,43,5]);
+ll.delete(5); test('delete(5) tail', ll.toArray(), [12,43]);
+const ok = results.every(Boolean);
+out.innerHTML += \`<div class="banner \${ok?'ok':'bad'}">\${ok?'✓ All tests pass. You built a linked list from scratch.':results.filter(Boolean).length+'/'+results.length+' passing.'}</div>\`;`,
+                outputHeight: 340,
+              },
             ],
           },
         },
@@ -1004,6 +1190,87 @@ print(f"{'Insert at front':<28} {t_arr_insert:>8.2f}μs {t_ll_prep:>10.2f}μs")
 print()
 print("Key insight: prepend is FASTER in linked list (O(1) vs O(n)).")
 print("But random access doesn't exist in linked list at all.")`,
+              output: '', status: 'idle', figureJson: null,
+            },
+
+            {
+              id: 4,
+              cellTitle: 'Challenge — Build the Whole LinkedList From Scratch in Python',
+              prose: [
+                'No hints. No skeleton methods. You have the class shells — fill in every method yourself.',
+                'When your implementation passes all the assertions, the opencalc Figure will draw the final list state showing you built it correctly.',
+              ],
+              instructions: `Implement Node and LinkedList completely. Then the test block at the bottom will verify every operation and draw the final list.
+
+**What you need:**
+- \`Node.__init__\`: store val, set next to None
+- \`LinkedList.__init__\`: set head to None
+- \`append(val)\`: walk to end, link new node — O(n)
+- \`prepend(val)\`: new node points at old head, update head — O(1)
+- \`to_list()\`: traverse and return Python list
+- \`delete(val)\`: handle head case + prev/cur walk`,
+              code: `from opencalc import Figure, BLUE, GREEN, AMBER, RED
+
+# ── Your implementation ────────────────────────────────
+
+class Node:
+    def __init__(self, val):
+        pass  # fill this in
+
+class LinkedList:
+    def __init__(self):
+        pass  # fill this in
+
+    def append(self, val):
+        pass  # walk to end, link the new node
+
+    def prepend(self, val):
+        pass  # new node points at old head, update head
+
+    def to_list(self):
+        pass  # traverse and collect values
+
+    def delete(self, val):
+        pass  # handle head case + prev/cur walk
+
+# ── Tests ──────────────────────────────────────────────
+ll = LinkedList()
+ll.append(12); ll.append(7); ll.append(43); ll.append(5)
+assert ll.to_list() == [12, 7, 43, 5], f"append failed: {ll.to_list()}"
+print("✓ append: ", ll.to_list())
+
+ll.prepend(99)
+assert ll.to_list() == [99, 12, 7, 43, 5], f"prepend failed: {ll.to_list()}"
+print("✓ prepend:", ll.to_list())
+
+ll.delete(7)
+assert ll.to_list() == [99, 12, 43, 5], f"delete middle failed: {ll.to_list()}"
+print("✓ delete middle:", ll.to_list())
+
+ll.delete(99)
+assert ll.to_list() == [12, 43, 5], f"delete head failed: {ll.to_list()}"
+print("✓ delete head:", ll.to_list())
+
+ll.delete(5)
+assert ll.to_list() == [12, 43], f"delete tail failed: {ll.to_list()}"
+print("✓ delete tail:", ll.to_list())
+
+print()
+print("All tests passed — drawing your list:")
+
+# ── Draw final state ───────────────────────────────────
+vals = ll.to_list()
+n = len(vals)
+fig = Figure(xmin=0, xmax=n*2+1, ymin=0, ymax=3,
+             width=max(300, n*100), height=110,
+             title="Your linked list — built from scratch")
+for i, v in enumerate(vals):
+    x = 1 + i * 2
+    color = GREEN if i == 0 else BLUE
+    fig.point((x, 1.5), color=color, label=str(v), radius=20)
+    if i < n - 1:
+        fig.arrow((x+0.3, 1.5), (x+1.7, 1.5), color=AMBER, width=2)
+print(fig.show())`,
               output: '', status: 'idle', figureJson: null,
             },
           ],
