@@ -1,5 +1,6 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // ── Scoped CSS (all selectors under .golf-wrap) ─────────────────
 const CSS = `
@@ -178,7 +179,7 @@ const CSS = `
 .golf-wrap .insight-box { background: var(--bg); border: 1px solid var(--green); border-radius: 10px; padding: 12px 14px; text-align: left; font-size: 12px; line-height: 1.7; color: var(--muted); margin-bottom: 20px; }
 .golf-wrap .insight-box strong { color: var(--green); }
 
-.golf-wrap .g-canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+.golf-wrap .g-canvas-wrap { flex: 1; position: relative; overflow: hidden; pointer-events: auto; }
 .golf-wrap .g-canvas-wrap canvas { position: absolute; inset: 0; }
 
 .golf-wrap .g-toast {
@@ -208,7 +209,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     const qq = cls => root.querySelectorAll('.' + cls);
 
     // ── Game state ─────────────────────────────────────────────
-    let scene, camera, renderer, clock;
+    let scene, camera, renderer, clock, controls;
     let ball3d, arrowMeshes = {}, trailPoints = [], trailLine;
     let obstacles3d = [];
     let pos, vel;
@@ -247,7 +248,10 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         hole: new THREE.Vector3( 10, BALL_R, 0),
         friction: 0.18,
         wind: new THREE.Vector3(0, 0, 0),
-        obstacles: [],
+        obstacles: [
+          { type:'sand', x:4, z:3, r:2.5 },
+          { type:'sand', x:4, z:-3, r:2.5 },
+        ],
         walls: [
           { type:'rect', x1:-14, z1:-4, x2:14, z2:-4 },
           { type:'rect', x1:-14, z1: 4, x2:14, z2: 4 },
@@ -322,6 +326,105 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         ],
         insight: 'Net acceleration a = -μg·v̂ + F_wind/m. The ball curves because wind continuously adds Z-velocity while friction reduces total speed. To compensate: aim "into" the wind — an upwind angle that lets the wind push you onto line.',
       },
+      {
+        name: 'Hole 6 — The Kelty Loop', par: 3,
+        concept: 'Centripetal Force & Minimum Velocity',
+        desc: '<strong>Concept: Centripetal force vs. Gravity.</strong><br>You must hit the ball with enough speed to stay on the loop! If velocity drops below √(gr), gravity wins and the ball falls.<br><span class="concept">v_min = √(g·r)</span>',
+        tee:  new THREE.Vector3(-12, BALL_R, 0),
+        hole: new THREE.Vector3( 12, BALL_R, 0),
+        friction: 0.1,
+        wind: new THREE.Vector3(0, 0, 0),
+        obstacles: [
+          { type:'loop', x:0, z:0, r:4, w:2 },
+        ],
+        walls: [
+          { type:'rect', x1:-14, z1:-4, x2:14, z2:-4 },
+          { type:'rect', x1:-14, z1: 4, x2:14, z2: 4 },
+        ],
+        insight: 'To go upside down, the normal force must be > 0 at the top. This happens if v² / r ≥ g.',
+      },
+      {
+        name: 'Hole 7 — Curved Greens', par: 3,
+        concept: 'Potential Energy & Slopes',
+        desc: '<strong>Concept: Gravitational potential energy on sloped grass.</strong><br>The green curves upward. Hit it hard to crest the hill, or watch it roll back down.<br><span class="concept">ΔPE = mgΔh</span>',
+        tee:  new THREE.Vector3(-12, BALL_R, 0),
+        hole: new THREE.Vector3( 12, BALL_R, 0),
+        friction: 0.1,
+        wind: new THREE.Vector3(0, 0, 0),
+        obstacles: [
+          { type:'hill', x:0, z:0, w:8, d:10, h:2 },
+        ],
+        walls: [
+          { type:'rect', x1:-14, z1:-6, x2:14, z2:-6 },
+          { type:'rect', x1:-14, z1: 6, x2:14, z2: 6 },
+        ],
+        insight: 'Gravity pulls the ball down the gradient. Kinetic energy is converted to potential energy as you go up.',
+      },
+      {
+        name: 'Hole 8 — Pulsing Green', par: 4,
+        concept: 'Oscillating External Forces',
+        desc: '<strong>Concept: Time-varying force fields.</strong><br>The green itself is expanding and contracting, applying a radial impulse. Time your putt to use the expansion for a boost!<br><span class="concept">F(t) = F₀ sin(ωt)</span>',
+        tee:  new THREE.Vector3(-12, BALL_R, 0),
+        hole: new THREE.Vector3( 12, BALL_R, 0),
+        friction: 0.15,
+        wind: new THREE.Vector3(0, 0, 0),
+        obstacles: [],
+        dynamicGreen: true,
+        walls: [
+          { type:'rect', x1:-14, z1:-6, x2:14, z2:-6 },
+          { type:'rect', x1:-14, z1: 6, x2:14, z2: 6 },
+        ],
+        insight: 'Dynamic environments require spatial and temporal planning. The "force" here is a change in velocity Δv based on the distance from the center.',
+      },
+      {
+        name: 'Hole 9 — Double Peak Valley', par: 4,
+        concept: 'Potential Well',
+        desc: '<strong>Concept: Navigation through a potential well.</strong><br>Two hills sandwich a deep valley. You must gain enough speed on the first descent to scale the second peak.<br><span class="concept">KE + PE = Constant</span>',
+        tee:  new THREE.Vector3(-18, BALL_R, 0),
+        hole: new THREE.Vector3( 18, BALL_R, 0),
+        friction: 0.1,
+        wind: new THREE.Vector3(0, 0, 0),
+        greenSize: { w: 45, d: 25 },
+        walls: [{ type:'rect', x1:-22, z1:-8, x2:22, z2:-8 }, { type:'rect', x1:-22, z1: 8, x2:22, z2: 8 }],
+        obstacles: [
+          { type:'hill', x:-10, z:0, w:12, d:12, h:3 },
+          { type:'valley', x:0, z:0, w:15, d:15, h:4 },
+          { type:'hill', x:10, z:0, w:12, d:12, h:3 },
+        ],
+        insight: 'Energy is conserved (minus friction). The depth of the valley provides kinetic energy boost, but you must keep enough to reach the cup on the other side.',
+      },
+      {
+        name: 'Hole 10 — The Half-Pipe', par: 3,
+        concept: 'Oscillation',
+        desc: '<strong>Concept: Lateral potential energy.</strong><br>The green is curved like a half-pipe. Aim slightly up the bank to let the curve guide you to the hole.<br><span class="concept">a_curve = g·sin(θ)</span>',
+        tee:  new THREE.Vector3(-18, BALL_R, 3),
+        hole: new THREE.Vector3( 18, BALL_R, -3),
+        friction: 0.08,
+        wind: new THREE.Vector3(0, 0, 0),
+        greenSize: { w: 50, d: 30 },
+        walls: [],
+        obstacles: [
+          { type:'valley', x:0, z:0, w:60, d:15, h:5 },
+        ],
+        insight: 'A continuous valley creates a restoring force toward the center. Use the banks to steer!',
+      },
+      {
+        name: 'Hole 11 — The Oasis', par: 4,
+        concept: 'Discontinuous Friction',
+        desc: '<strong>Concept: Different surfaces have different friction coefficients.</strong><br>Sand traps drastically increase the deceleration force μg. Water traps are out of bounds and apply a penalty!<br><span class="concept">f_k = μ_k N</span>',
+        tee:  new THREE.Vector3(-15, BALL_R, 0),
+        hole: new THREE.Vector3( 15, BALL_R, 0),
+        friction: 0.12,
+        wind: new THREE.Vector3(0, 0, 0),
+        greenSize: { w: 40, d: 25 },
+        walls: [{ type:'rect', x1:-20, z1:-12, x2:20, z2:-12 }, { type:'rect', x1:-20, z1: 12, x2:20, z2: 12 }],
+        obstacles: [
+          { type:'sand', x:-5, z:5, r:4.5 },
+          { type:'sand', x:-5, z:-5, r:4.5 },
+          { type:'water', x:5, z:0, r:5.5 },
+        ],
+        insight: 'Entering sand multiplies friction by 3, rapidly draining kinetic energy. Water terminates the ball state.',
+      },
     ];
 
     // ── Three.js init ──────────────────────────────────────────
@@ -342,6 +445,13 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2.1;
+      controls.minDistance = 5;
+      controls.maxDistance = 100;
 
       const hemi = new THREE.HemisphereLight(0x90cfff, 0x1a8c2e, 0.6);
       scene.add(hemi);
@@ -370,6 +480,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
     // ── Level building ─────────────────────────────────────────
     function buildLevel(idx) {
+      currentLevel = idx;
       for (let obj of obstacles3d) scene.remove(obj);
       obstacles3d = [];
       if (trailLine) { scene.remove(trailLine); trailLine = null; }
@@ -378,46 +489,71 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       arrowMeshes = {};
 
       const lv = LEVELS[idx];
-      windForce.copy(lv.wind);
+      if (lv.wind) windForce.copy(lv.wind);
+      else windForce.set(0, 0, 0);
 
-      // Green
-      const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(32, 14),
-        new THREE.MeshLambertMaterial({ color: 0x1a7a2c })
-      );
+      // Green (Bigger)
+      const gSize = lv.greenSize || { w: 40, d: 20 };
+      const groundGeo = new THREE.PlaneGeometry(gSize.w, gSize.d, 64, 64);
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x1a7a2c, roughness: 0.9, metalness: 0.1 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       ground.receiveShadow = true;
+      ground.isHoleAsset = true;
       scene.add(ground); obstacles3d.push(ground);
 
-      const grid = new THREE.GridHelper(32, 32, 0x1e3d1e, 0x1e3d1e);
+      // Deform ground based on obstacles (Hills/Valleys)
+      const posAttr = groundGeo.attributes.position;
+      for (const o of lv.obstacles || []) {
+        if (o.type === 'hill' || o.type === 'valley') {
+          for (let i = 0; i < posAttr.count; i++) {
+            const px = posAttr.getX(i);
+            const py = posAttr.getY(i);
+            const dx = px - o.x;
+            const dz = -py - o.z; // Plane is rotated
+            const dist = Math.sqrt(dx*dx + dz*dz);
+            const maxDist = Math.max(o.w, o.d) / 2;
+            if (dist < maxDist) {
+              const weight = Math.cos((dist / maxDist) * Math.PI / 2);
+              const val = (o.type === 'hill' ? o.h : -o.h) * weight;
+              posAttr.setZ(i, posAttr.getZ(i) + val);
+            }
+          }
+        }
+      }
+      groundGeo.computeVertexNormals();
+
+      const grid = new THREE.GridHelper(gSize.w, gSize.w * 2, 0x1e3d1e, 0x1e3d1e);
       grid.position.y = 0.02;
-      grid.material.opacity = 0.3; grid.material.transparent = true;
+      grid.material.opacity = 0.2; grid.material.transparent = true;
       scene.add(grid); obstacles3d.push(grid);
 
       for (let w of lv.walls) buildWall(w);
       for (let o of lv.obstacles) buildObstacle(o);
 
-      // Hole
+      // Hole (Classic Minigolf Cup)
       const hole3d = new THREE.Mesh(
-        new THREE.CylinderGeometry(HOLE_R, HOLE_R, 0.2, 32),
-        new THREE.MeshLambertMaterial({ color: 0x111111 })
+        new THREE.CylinderGeometry(HOLE_R, HOLE_R, 0.4, 32),
+        new THREE.MeshLambertMaterial({ color: 0x000000 })
       );
-      hole3d.position.copy(lv.hole); hole3d.position.y = 0.05;
+      hole3d.position.copy(lv.hole);
+      hole3d.position.y = getTerrainHeight(lv.hole.x, lv.hole.z) - 0.2;
       scene.add(hole3d); obstacles3d.push(hole3d);
 
       // Flag
+      const hY = getTerrainHeight(lv.hole.x, lv.hole.z);
       const pole3d = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.04, 5, 8),
         new THREE.MeshLambertMaterial({ color: 0xffffff })
       );
-      pole3d.position.copy(lv.hole); pole3d.position.y = 2.5;
+      pole3d.position.set(lv.hole.x, hY + 2.5, lv.hole.z);
       scene.add(pole3d); obstacles3d.push(pole3d);
 
       const flag3d = new THREE.Mesh(
         new THREE.PlaneGeometry(1.6, 0.9),
         new THREE.MeshLambertMaterial({ color: 0xff3333, side: THREE.DoubleSide })
       );
-      flag3d.position.copy(lv.hole); flag3d.position.x += 0.8; flag3d.position.y = 4.7;
+      flag3d.position.set(lv.hole.x + 0.8, hY + 4.7, lv.hole.z);
       scene.add(flag3d); obstacles3d.push(flag3d);
 
       // Tee
@@ -425,7 +561,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         new THREE.CylinderGeometry(0.3, 0.3, 0.1, 16),
         new THREE.MeshLambertMaterial({ color: 0xffb800 })
       );
-      tee3d.position.copy(lv.tee); tee3d.position.y = 0.05;
+      tee3d.position.copy(lv.tee); 
+      tee3d.position.y = getTerrainHeight(lv.tee.x, lv.tee.z);
       scene.add(tee3d); obstacles3d.push(tee3d);
 
       // Ball (reuse across levels)
@@ -441,6 +578,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       if (idx === 4) buildWindParticles(lv.wind);
 
       pos = lv.tee.clone();
+      pos.y = getTerrainHeight(pos.x, pos.z);
       vel = new THREE.Vector3(0, 0, 0);
       ball3d.position.copy(pos);
       ballActive = false;
@@ -480,11 +618,18 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         mesh.userData = { wallType:'bank', cx:o.x, cz:o.z, rot:o.rot, halfW:o.w/2, restitution: o.restitution||0.85 };
       }
       if (o.type === 'spinner') {
+        const mat = new THREE.MeshLambertMaterial({ color: 0xffb800 });
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), mat);
+        tower.position.set(o.cx, 1.5, o.cz - 1);
+        tower.castShadow = true;
+        scene.add(tower); obstacles3d.push(tower);
+
         const mesh = new THREE.Mesh(
           new THREE.BoxGeometry(o.armLen * 2, 0.4, o.armW),
-          new THREE.MeshLambertMaterial({ color: 0xffb800 })
+          new THREE.MeshLambertMaterial({ color: 0xff3333 })
         );
-        mesh.position.set(o.cx, 0.2, o.cz);
+        mesh.position.set(o.cx, 0.3, o.cz);
+        mesh.castShadow = true;
         scene.add(mesh); obstacles3d.push(mesh);
         mesh.userData = { wallType:'spinner', cx:o.cx, cz:o.cz, r:o.r, armLen:o.armLen, armW:o.armW, speed:o.speed, phase:o.phase||0, angle:o.phase||0 };
       }
@@ -505,6 +650,55 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         obstacles3d.push(top, bot, roof);
         top.userData = { wallType:'edge', x1:o.x1, z1:o.z2, x2:o.x2, z2:o.z2, nx:0, nz:-1 };
         bot.userData = { wallType:'edge', x1:o.x1, z1:o.z,  x2:o.x2, z2:o.z,  nx:0, nz:1  };
+      }
+      if (o.type === 'loop') {
+        const lGeo = new THREE.TorusGeometry(o.r, o.w / 2, 32, 100);
+        const lMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.5, roughness: 0.3 });
+        const loop = new THREE.Mesh(lGeo, lMat);
+        loop.position.set(o.x, o.r, o.z);
+        loop.rotation.y = Math.PI / 2;
+        loop.castShadow = true;
+        loop.receiveShadow = true;
+        scene.add(loop);
+        obstacles3d.push(loop);
+        loop.userData = { wallType: 'loop', r: o.r, w: o.w, cx: o.x, cz: o.z };
+      }
+      if (o.type === 'sand' || o.type === 'water') {
+        const isSand = o.type === 'sand';
+        const geo = new THREE.CircleGeometry(o.r, 32);
+        const mat = new THREE.MeshLambertMaterial({ 
+          color: isSand ? 0xd2b48c : 0x1ca3ff,
+          transparent: !isSand, opacity: isSand ? 1 : 0.8
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.position.set(o.x, getTerrainHeight(o.x, o.z) + 0.02, o.z);
+        scene.add(mesh); obstacles3d.push(mesh);
+        mesh.userData = { type: o.type, x: o.x, z: o.z, r: o.r };
+      }
+      if (o.type === 'hill') {
+        const hGeo = new THREE.PlaneGeometry(o.w, o.d, 32, 32);
+        const hMat = new THREE.MeshStandardMaterial({ color: 0x1a7a2c, roughness: 0.9 });
+        const hill = new THREE.Mesh(hGeo, hMat);
+        hill.rotation.x = -Math.PI / 2;
+        hill.position.set(o.x, 0.01, o.z);
+        
+        const posAttr = hGeo.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+          const px = posAttr.getX(i);
+          const py = posAttr.getY(i);
+          const dist = Math.sqrt(px*px + py*py);
+          const maxDist = Math.max(o.w, o.d) / 2;
+          if (dist < maxDist) {
+            const val = o.h * Math.cos((dist / maxDist) * Math.PI / 2);
+            posAttr.setZ(i, val);
+          }
+        }
+        hGeo.computeVertexNormals();
+        hill.receiveShadow = true;
+        scene.add(hill);
+        obstacles3d.push(hill);
+        hill.userData = { wallType: 'hill', x: o.x, z: o.z, w: o.w, d: o.d, h: o.h };
       }
     }
 
@@ -539,16 +733,31 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     function updateArrows() {
       if (!pos || !vel) return;
       const speed = vel.length();
-      const mu = parseFloat(q('s-friction').value);
+      let mu = parseFloat(q('s-friction').value);
+
+      // Check if in sand to update arrow visually
+      for (let mesh of obstacles3d) {
+        if (mesh.userData.type === 'sand') {
+          const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
+          if (dist < mesh.userData.r) {
+            mu *= 3;
+          }
+        }
+      }
+
       const frictionMag = mu * G_CONST;
       const frictionDir = speed > 0.01 ? vel.clone().normalize().negate() : new THREE.Vector3(0,0,0);
-      const netDir = frictionDir.clone().add(windForce.clone().normalize());
+      
+      const normal = getTerrainNormal(pos.x, pos.z);
+      const gravity = new THREE.Vector3(0, -G_CONST, 0);
+      const gravityOnPlane = gravity.clone().projectOnPlane(normal);
+      const netForce = frictionDir.clone().multiplyScalar(frictionMag).add(windForce).add(gravityOnPlane);
 
       const defs = {
         velocity: { dir: speed > 0.01 ? vel.clone().normalize() : new THREE.Vector3(1,0,0), len: Math.min(speed*0.35,6)+0.5, y:0.8 },
         friction: { dir: frictionDir.length()>0 ? frictionDir : new THREE.Vector3(-1,0,0), len: Math.min(frictionMag*0.35,4)+0.3, y:0.9 },
-        normal:   { dir: new THREE.Vector3(0,1,0), len: 2, y: BALL_R },
-        net:      { dir: netDir.length()>0.01 ? netDir.normalize() : new THREE.Vector3(0,1,0), len: 1.5, y:1.1 },
+        normal:   { dir: normal, len: 2.5, y: BALL_R },
+        net:      { dir: netForce.length() > 0.01 ? netForce.normalize() : normal, len: Math.min(netForce.length()*0.5, 4), y:1.1 },
         wind:     { dir: windForce.length()>0.1 ? windForce.clone().normalize() : new THREE.Vector3(0,0,1), len: Math.min(windForce.length()*0.4,4), y:0.7 },
       };
 
@@ -586,17 +795,60 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     }
 
     // ── Physics ────────────────────────────────────────────────
+    function getTerrainHeight(x, z) {
+      const lv = LEVELS[currentLevel];
+      let h = BALL_R;
+      for (const o of lv.obstacles || []) {
+        if (o.type === 'hill' || o.type === 'valley') {
+          const dx = x - o.x;
+          const dz = z - o.z;
+          const dist = Math.sqrt(dx*dx + dz*dz);
+          const maxDist = Math.max(o.w, o.d) / 2;
+          if (dist < maxDist) {
+            const weight = Math.cos((dist / maxDist) * Math.PI / 2);
+            const val = (o.type === 'hill' ? o.h : -o.h) * weight;
+            h += val;
+          }
+        }
+      }
+      return h;
+    }
+
+    function getTerrainNormal(x, z) {
+      const eps = 0.05;
+      const h1 = getTerrainHeight(x - eps, z);
+      const h2 = getTerrainHeight(x + eps, z);
+      const h3 = getTerrainHeight(x, z - eps);
+      const h4 = getTerrainHeight(x, z + eps);
+      return new THREE.Vector3(h1 - h2, 2 * eps, h3 - h4).normalize();
+    }
+
     function physicsStep(dt) {
       if (!ballActive) return;
       dt = Math.min(dt, 0.04);
       const speed = vel.length();
-      const mu    = parseFloat(q('s-friction').value);
-      const lv    = LEVELS[currentLevel];
+      let mu = parseFloat(q('s-friction').value);
+      const lv = LEVELS[currentLevel];
 
       for (let mesh of obstacles3d) {
         if (mesh.userData.wallType === 'spinner') {
           mesh.userData.angle += mesh.userData.speed * dt;
           mesh.rotation.y = mesh.userData.angle;
+        }
+        if (mesh.userData.type === 'water') {
+          const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
+          if (dist < mesh.userData.r) {
+            toast('Splash! Water hazard. Respun with penalty.');
+            ballActive = false;
+            setTimeout(resetBall, 600);
+            return;
+          }
+        }
+        if (mesh.userData.type === 'sand') {
+          const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
+          if (dist < mesh.userData.r) {
+            mu *= 3; // Triple friction in sand
+          }
         }
       }
 
@@ -631,11 +883,34 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         vel.add(lv.wind.clone().multiplyScalar(dt));
       }
 
+      // Hole 8: Dynamic Pulsing Green
+      if (lv.dynamicGreen) {
+        const t = clock.getElapsedTime();
+        const pulse = Math.sin(t * 3);
+        const ground = obstacles3d.find(o => o.geometry.type === 'PlaneGeometry');
+        if (ground) ground.scale.set(1 + pulse * 0.05, 1 + pulse * 0.05, 1);
+        
+        const distFromCenter = new THREE.Vector2(pos.x, pos.z).length();
+        if (distFromCenter > 0.1) {
+          const radialImpulse = new THREE.Vector3(pos.x, 0, pos.z).normalize().multiplyScalar(pulse * 2 * dt);
+          vel.add(radialImpulse);
+        }
+      }
+
       const newPos = pos.clone().add(vel.clone().multiplyScalar(dt));
+      const h = getTerrainHeight(newPos.x, newPos.z);
       const collided = resolveCollisions(pos, newPos, vel);
       pos.copy(collided.pos);
       vel.copy(collided.vel);
-      pos.y = BALL_R;
+      
+      // Gravity on slopes
+      if (h > BALL_R + 0.01 || vel.y !== 0) {
+        const normal = getTerrainNormal(pos.x, pos.z);
+        const gravityEffect = new THREE.Vector3(0, -G_CONST, 0).projectOnPlane(normal);
+        vel.add(gravityEffect.multiplyScalar(dt));
+      }
+
+      pos.y = h;
       ball3d.position.copy(pos);
       ball3d.rotation.x += vel.z * dt * 3;
       ball3d.rotation.z -= vel.x * dt * 3;
@@ -717,6 +992,30 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
             const vn  = v.x*nx2 + v.z*nz2;
             v.x -= (1 + 0.75)*vn*nx2;
             v.z -= (1 + 0.75)*vn*nz2;
+          }
+        }
+
+        if (wd.wallType === 'loop') {
+          // Snap ball to loop track if conditions met
+          const dx = p.x - wd.cx, dz = p.z - wd.cz;
+          const distFromPlane = Math.abs(dz);
+          if (distFromPlane < wd.w && Math.abs(dx) < wd.r + BALL_R) {
+             const distToCenter = Math.sqrt(dx*dx + (p.y - wd.r)**2);
+             if (Math.abs(distToCenter - wd.r) < BALL_R * 2) {
+               const angle = Math.atan2(p.y - wd.r, dx);
+               const speed = v.length();
+               // Centripetal check: v² / r must be > g at peak (angle ≈ π/2)
+               const vMin = Math.sqrt(G_CONST * wd.r);
+               if (speed > vMin * 0.7) { 
+                 const nextAngle = angle + (v.x / wd.r) * dt;
+                 p.x = wd.cx + Math.cos(nextAngle) * wd.r;
+                 p.y = wd.r + Math.sin(nextAngle) * wd.r;
+                 p.z = wd.cz;
+                 v.x = -Math.sin(nextAngle) * speed;
+                 v.y = Math.cos(nextAngle) * speed;
+                 v.z = 0;
+               }
+             }
           }
         }
       }
@@ -1009,6 +1308,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         physicsStep(dt);
       }
 
+      if (controls) controls.update();
       renderer.render(scene, camera);
     }
 
@@ -1068,7 +1368,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
         {/* Top bar */}
         <div className="g-topbar">
-          <div className="logo">⛳ PhysicsGolf</div>
+          <div className="logo">⛳ Kelty's Championship Greens</div>
           <div className="level-pills" id="mg-level-pills"></div>
           <div className="spacer"></div>
           <div className="stroke-badge" id="mg-stroke-badge">Stroke 1</div>
