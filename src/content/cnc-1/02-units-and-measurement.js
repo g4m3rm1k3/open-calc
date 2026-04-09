@@ -1,37 +1,75 @@
+/**
+ * LESSON: UNITS & MEASUREMENT (G20/G21)
+ * A deep-dive into the dual-world of CNC machining: Inches and Millimeters.
+ * Historical context: The 1959 International Yard and Pound Agreement.
+ * Estimated Length: ~600 Lines.
+ */
+
 export default {
   id: 'cnc-units-measurement',
   slug: 'units-and-measurement',
   chapter: 'cnc-1',
   order: 2,
-  title: 'Units & Measurement',
-  subtitle: 'G20/G21 — Inches, Millimeters, and Why It Matters',
-  tags: ['G20', 'G21', 'metric', 'imperial', 'inch', 'millimeter', 'tolerance', 'conversion'],
+  title: 'Units & Measurement: The Language of Precision',
+  subtitle: 'G20/G21 — From the Mars Orbiter to the Sub-Micron Chip',
+  tags: ['G20', 'G21', 'metric', 'imperial', 'inch', 'millimeter', 'tolerance', 'conversion', 'kinematics'],
 
   semantics: {
     core: [
-      { symbol: 'G20', meaning: 'Inch Mode: All programmed coordinates and feedrates are in inches and inches-per-minute (ipm).' },
-      { symbol: 'G21', meaning: 'Metric Mode: All programmed coordinates and feedrates are in millimeters and millimeters-per-minute (mm/min).' },
-      { symbol: 'IPM', meaning: 'Inches Per Minute — standard feedrate unit in inch mode.' },
-      { symbol: 'mm/min', meaning: 'Millimeters Per Minute — standard feedrate unit in metric mode.' },
-      { symbol: 'IPR / mm/rev', meaning: 'Inches Per Revolution / mm per Revolution — used in G95 (per-revolution feedrate mode), common on lathes.' },
-      { symbol: 'Tolerance', meaning: 'The allowable deviation from the nominal dimension. Typically ±0.001" (0.025 mm) for general machining; ±0.0001" (0.0025 mm) for precision work.' },
+      { 
+        symbol: 'G20', 
+        meaning: 'Imperial/Inch Mode. Interprets all linear coordinate words (X, Y, Z, U, V, W, I, J, K, R) ' +
+                 'as inches. Feedrates (F) are interpreted as Inches Per Minute (IPM) or Inches Per Revolution (IPR).' 
+      },
+      { 
+        symbol: 'G21', 
+        meaning: 'Metric/Millimeter Mode. Interprets all linear coordinate words as millimeters. ' +
+                 'Feedrates (F) are interpreted as Millimeters Per Minute (mm/min) or mm Per Revolution (mm/rev).' 
+      },
+      { 
+        symbol: 'Modal Group 6', 
+        meaning: 'The G-code category containing G20 and G21. Only one can be active at any time; ' +
+                 'calling one automatically cancels the other.' 
+      },
+      { 
+        symbol: '25.4', 
+        meaning: 'The Exact Constant. By international law, 1 inch is defined as exactly 25.4 millimeters. ' +
+                 'There is no rounding error in this conversion.' 
+      },
+      { 
+        symbol: 'IPM (Inches Per Minute)', 
+        meaning: 'The velocity of the tool tip in Imperial mode. Common machining feedrates range from 0.5 to 300 IPM.' 
+      },
+      { 
+        symbol: 'mm/min', 
+        meaning: 'The velocity of the tool tip in Metric mode. Equivalent to IPM × 25.4. ' +
+                 'Common machining feedrates range from 12 to 7500 mm/min.' 
+      },
+      { 
+        symbol: 'Machine Parameter', 
+        meaning: 'The "Native" unit system of the machine controller. While G20/G21 overrides the program ' +
+                 'units, the machine’s internal "brain" (and often its offsets) stays in its native parameter mode.' 
+      }
     ],
     rulesOfThumb: [
-      'G20/G21 must match the machine\'s configured unit mode. A mismatch causes crashes or severely wrong dimensions.',
-      'Always put G20 or G21 at the top of every program — never rely on whatever mode the machine happens to be in.',
-      '1 inch = 25.4 mm exactly. This is a defined exact relationship, not an approximation.',
-      'Metric programs use larger numbers (X25.4 instead of X1.0) — don\'t be surprised by 4-digit feedrates.',
+      'The "Safety Header" Rule: Always place G20 or G21 in the first two lines of your program. Never assume.',
+      'Unit Mismatch = Disaster: If you run an inch program in metric mode, the machine moves 1/25th the intended distance. If you run a metric program in inch mode, it moves 25x further (and will likely crash instantly).',
+      'Offsets Follow the Mode: On many older Fanuc controls, your tool offsets must be entered in the system\'s native units, even if the program uses the other G-code.',
+      'Scale your Feedrates: When converting from G20 to G21, remember that F10.0 becomes F254.0. If you forget, the machine will move like a snail.',
     ]
   },
 
   hook: {
-    question: 'If your program says X1.0 but the machine thinks in millimeters, how far does it actually move?',
+    question: 'How did a simple unit conversion error cost NASA $327 million and destroy a spacecraft?',
     realWorldContext:
-      'In 1999, NASA lost the $327 million Mars Climate Orbiter because one engineering team sent thruster data in imperial units ' +
-      'while another team expected metric units. The spacecraft burned up in the Martian atmosphere. ' +
-      'CNC machines have the same problem. If you load an inch-mode program into a metric machine without the correct G20/G21 header, ' +
-      'a command for X1.0 (meaning 1 inch = 25.4 mm) will be executed as X1.0 mm — about 96% short of the intended move. ' +
-      'Every dimension, every feedrate, every tolerance — all of it depends on the unit mode being correct.',
+      'In September 1999, the Mars Climate Orbiter approached the Red Planet. One engineering team at Lockheed Martin ' +
+      'calculated the thruster performance in Imperial units (Pound-seconds), while the navigation team at NASA ' +
+      'expected Metric units (Newton-seconds). The software failed to convert. The orbiter dipped too low into the ' +
+      'atmosphere and burned up. ' +
+      'This same catastrophe happens in CNC machine shops every day. A machinist loads a program written for a metric ' +
+      'machine into an imperial one, or forgets a G20/G21 header. The result is a "Scrapped" part at best, and a ' +
+      'shattered spindle at worst. In the world of CNC, units are not just a preference; they are a binding contract ' +
+      'between the programmer and the iron.',
     previewVisualizationId: 'CNCLab',
   },
 
@@ -41,146 +79,214 @@ export default {
         id: 'CNCLab',
         props: {
           initialCode:
-            '(UNIT MODE DEMONSTRATION)\n' +
-            '(This program runs in inch mode)\n' +
-            'G20             (Explicitly set inch mode)\n' +
+            '(THE UNIT MISMATCH EXPERIMENT)\n' +
+            'G20 (Set to Inches)\n' +
             'G00 X0 Y0\n' +
-            'G01 X1.0 F20.0  (1.000 inch = 25.4 mm)\n' +
-            'G01 Y0.5 F20.0  (0.500 inch = 12.7 mm)\n' +
-            'G01 X0\n' +
-            'G01 Y0\n' +
-            'M30\n' +
-            '\n' +
-            '(Try changing G20 to G21 and see how the)\n' +
-            '(path compares — same numbers, MUCH smaller move)'
+            'G01 X1.0 F30.0 (Move 1.0 Inch)\n' +
+            'G01 Y1.0 \n' +
+            'G00 X0 Y0\n\n' +
+            '(NOW, CHANGE G20 TO G21 AND RE-RUN)\n' +
+            '(Notice the tiny square in the corner?)\n' +
+            '(That is the same "1.0" interpreted as 1mm)'
         },
-        title: 'Unit Mode Lab',
-        caption: 'Run the program as-is (G20, inch mode). Then change G20 to G21 and run again. The numbers are identical but the physical distances are 25× smaller in G21. This is the unit mismatch problem.',
+        title: 'Visualizing the 25.4x Difference',
+        caption: 'Watch how the machine interprets the number "1.0" depending on the active unit mode. ' +
+                 'In G20, it is a significant move. In G21, it is almost invisible.'
       }
     ],
     prose: [
-      '**Two Worlds, One Language**: The CNC world is split between metric (millimeters) and imperial (inches). Europe, Asia, and most of the global automotive and aerospace industry use metric. Much of the United States — especially job shops — still works in inches. Both systems use the same G-code commands (G01, G00, etc.) but all dimensional values are interpreted according to the active unit mode.',
+      '### I. The Great Divide: A Tale of Two Systems',
+      'The manufacturing world is physically split. North America remains largely anchored to the **Imperial System** ' +
+      '(inches, feet, pounds), a legacy of the British Industrial Revolution. The rest of the globe, and nearly all ' +
+      'modern high-tech industries (automotive, electronics, medical), operates on the **International System of Units (SI)**, ' +
+      'specifically millimeters.',
+      
+      'In CNC, this creates a "Bilingual" requirement. A modern CNC controller is perfectly happy in either world, ' +
+      'but it requires a specific command to tell it which language we are speaking today. ' +
+      '* **G20** tells the machine: "Every number you see is an Inch." ' +
+      '* **G21** tells the machine: "Every number you see is a Millimeter."',
 
-      '**What G20 and G21 Actually Do**: These codes don\'t move anything. They set a **modal flag** inside the controller that tells it: "interpret all subsequent coordinate values as inches" (G20) or "as millimeters" (G21). Every axis word (X, Y, Z), every feedrate (F), every radius (R), every offset value — all of it is scaled by this flag.',
+      '### II. The 1959 Legal Pivot: Why 25.4 is Perfect',
+      'Historically, the "Inch" varied slightly between the US and the UK. To solve this, the **1959 International ' +
+      'Yard and Pound Agreement** defined the inch as exactly **25.4 millimeters**. ' +
+      '**Scientific Fact:** This is not an approximation. It is an "Absolute Definition." ' +
+      'When you convert an inch program to metric, you aren\'t losing precision through rounding; you are ' +
+      'performing a perfect mathematical mapping. This is why CNC controllers can toggle between them ' +
+      'without "drifting" off target.',
 
-      '**Feedrates Change Too**: An inch-mode feedrate of F20 means 20 inches per minute. That same number in metric mode (F20 after G21) means 20 mm/min — about 39× slower. Forgetting this is a very common crash scenario. A program with F200 in metric mode feeds at 200 mm/min (reasonable). Load it into an inch machine that interprets F200 as 200 ipm (extremely fast) and you have a problem.',
+      '### III. The Invisible Trap: Feedrate Inversion',
+      'While coordinate moves are obvious, **Feedrates (F-words)** are the silent killers. ' +
+      'Imagine you are cutting aluminum at 20 Inches Per Minute (G20 F20.0). ' +
+      'If you accidentally switch to G21 without updating the F-word, the machine now moves at 20 Millimeters Per Minute. ' +
+      '**The Result:** The tool is moving so slowly that it creates "Friction Rubbing" instead of "Cutting." This ' +
+      'generates massive heat, melts the aluminum to the tool, and snaps the cutter in seconds.',
+      
+      'Conversely, a metric feedrate of F500 (500 mm/min) is a slow crawl. But if interpreted as G20 F500 (500 IPM), ' +
+      'the machine will scream across the table at its maximum velocity, likely resulting in a violent collision.',
 
-      '**Metric Machines vs Imperial Machines**: Most modern machines ship configured for one unit system via a machine parameter. The G20/G21 command overrides this temporarily for the current program. On some older machines, G20/G21 is replaced by G70/G71 (check your controller manual — this is the Fanuc 6M/10/11 convention). On all modern Fanuc 0i and later: G20 = inches, G21 = metric.',
-
-      '**The Conversion Factor — Know It Cold**: $1 \\text{ inch} = 25.4 \\text{ mm}$ exactly. This is a legally defined exact relationship since 1959. To convert inches to mm: multiply by 25.4. To convert mm to inches: divide by 25.4. A 0.500 inch drill bit has a 12.7 mm diameter. A 6 mm end mill is 0.2362 inches in diameter.',
+      '### IV. Modal Logic and the Power-On State',
+      'G20 and G21 are **Modal Group 6** codes. "Modal" means the machine remembers the setting until it is ' +
+      'explicitly told otherwise. ' +
+      '**The Danger:** If the previous machinist ran a metric job and left the machine in G21 mode, and you ' +
+      'load your inch program without a G20 header, the machine will run your code as metric. ' +
+      'This is why the **"Safety Line"** at the start of a program usually looks like this: `G20 G17 G40 G80 G90`. ' +
+      'It "resets" the machine’s brain to a known state before the first move.',
     ],
   },
 
   math: {
     prose: [
-      'The fundamental conversion is exact and defined:',
-      '$1 \\text{ inch} \\equiv 25.4 \\text{ mm}$',
-      'Converting coordinates:',
-      '$x_{\\text{mm}} = x_{\\text{in}} \\times 25.4$',
-      '$x_{\\text{in}} = \\frac{x_{\\text{mm}}}{25.4}$',
-      'Feedrate conversion (both measure distance per unit time):',
-      '$F_{\\text{mm/min}} = F_{\\text{ipm}} \\times 25.4$',
-      'Tolerance conversion — a general machining tolerance of $\\pm0.001$ inch:',
-      '$0.001 \\text{ in} \\times 25.4 = 0.0254 \\text{ mm} \\approx 0.025 \\text{ mm}$',
-      'Precision machining tolerance $\\pm0.0001$ inch:',
-      '$0.0001 \\text{ in} \\times 25.4 = 0.00254 \\text{ mm} \\approx 0.0025 \\text{ mm}$',
-      'CNC controllers store position to **4 decimal places in inches** (0.0001") or **3 decimal places in mm** (0.001 mm). Both represent approximately the same physical resolution.',
+      '### The Mathematical Transformation',
+      'When a controller receives a G20/G21 command, it applies a scalar transformation to the entire ' +
+      'coordinate system. Let $C_{native}$ be the internal machine unit (usually stored in microns or tenths of a thou).',
+      
+      '**Conversion Formulas:**',
+      '$ \text{Target (mm)} = \text{Target (inch)} \times 25.4 $',
+      '$ \text{Target (inch)} = \text{Target (mm)} / 25.4 $',
+
+      '### Precision and Significant Digits',
+      'CNC controllers have a "Least Input Increment." ' +
+      '* In **Imperial (G20)**, this is typically **0.0001"** (one ten-thousandth of an inch). ' +
+      '* In **Metric (G21)**, this is typically **0.001mm** (one micron).',
+
+      '**Comparing the Resolution:**',
+      '$ 0.0001 \text{ inch} = 0.00254 \text{ mm} $',
+      '$ 0.001 \text{ mm} = 0.000039 \text{ inch} $',
+      
+      'Notice that 1 micron ($0.001\text{mm}$) is actually more precise than "one tenth" ($0.0001\text{"}$). ' +
+      'For this reason, ultra-precision aerospace and medical parts are almost exclusively programmed in **Metric**, ' +
+      'as the "Grid" of the machine is finer, allowing for tighter mathematical rounding during complex 3D surfacing.',
+
+      '### Feedrate Math',
+      'If you need to maintain a specific "Chip Load" (the thickness of the slice of metal each tooth takes), ' +
+      'you must convert the feedrate perfectly:',
+      '$ F_{mm} = F_{in} \times 25.4 $',
+      'Failure to maintain this ratio changes the physics of the cut, affecting tool life and surface finish.'
     ],
+  },
+
+  science: {
+    prose: [
+      '### Thermodynamics and Measurement',
+      'The choice of units doesn\'t change physics, but it affects how we perceive it. ' +
+      '**Coefficient of Thermal Expansion (CTE):** Machine tools are made of steel and cast iron. ' +
+      'In Imperial units, steel expands at roughly $0.0000065$ inches per inch per degree Fahrenheit. ' +
+      'In Metric, this is expressed as $11.7$ microns per meter per degree Celsius.',
+      
+      'When working to high precision, machinists must "soak" the part to a standard temperature ' +
+      '($20^\circ\text{C}$ or $68^\circ\text{F}$). A unit error in the measurement of the part ' +
+      'compared to the unit error in the measurement of the machine leads to "Stack-up Errors."',
+
+      '### Encoder Resolution',
+      'The "Eyes" of the machine are the optical encoders. They count pulses as the motor turns. ' +
+      'Most encoders are designed with a specific "Native" resolution (e.g., 10,000 pulses per revolution). ' +
+      'The controller uses a "Gear Ratio" parameter to convert these pulses into the active G20 or G21 display. ' +
+      'Because the conversion factor (25.4) is a terminating decimal, the controller can switch between ' +
+      'units with nearly zero "floating-point drift," a testament to the digital logic of modern CNC processors.'
+    ]
   },
 
   rigor: {
     prose: [
-      '**Decimal Resolution Difference**: In G20 (inch), coordinates are stored to 4 decimal places: X1.2345. In G21 (metric), to 3 decimal places: X31.369. The physical resolution is about the same (~0.001 mm / 0.0001"), but be aware that metric programs look different numerically.',
+      '### The Paradox of Tool Offsets',
+      'This is the most common "Advanced" mistake: **The Offset Table.** ' +
+      'On many controllers (especially older Fanuc and Haas), there is a setting called "Setting 15: H/D Code System." ' +
+      'If the machine is natively set to Inches, and you run a G21 program, the machine will interpret ' +
+      'your tool lengths as millimeters. ' +
+      '**Scenario:** You have a tool length of `H5.0` (5 inches). You switch to G21. The machine now ' +
+      'thinks that tool is `5.0mm` long. When it goes to find the part, it will plunge **4.8 inches too deep**, ' +
+      'destroying the spindle.',
+      
+      '**Rigor Rule:** Never switch unit modes on a machine that already has a setup on the table ' +
+      'unless you are prepared to re-measure EVERY tool and EVERY work offset in the new unit system.',
 
-      '**Tool Offsets Are Also Unit-Dependent**: When you store a tool length offset (H value) in the controller, it is stored in the current unit mode. If you switch unit modes mid-setup, offsets measured in inches will be wrong on a metric machine and vice versa. Most shops keep the controller in one unit mode and never switch unless they have a specific workflow for it.',
-
-      '**G20/G21 is a Modal Group 6 Code**: You cannot have both active at once. Writing G21 cancels G20 and vice versa. This is the modal system in action — a concept we cover thoroughly in the Modal Groups lesson.',
-
-      '**Some CAM Systems Always Output One Unit**: If your CAM system is set to output metric G-code, every program it generates will have G21 at the top. If the shop machine is in inch mode and your operator does not notice the G21, disaster. Always check the first few lines of a G-code file before loading it.',
+      '### The G70/G71 Exception',
+      'While G20/G21 is the "ISO Standard," some machines (notably older lathes and specific European controls) ' +
+      'use **G70** for Inches and **G71** for Millimeters. ' +
+      'Always consult the "Programming Manual" for the specific serial number of your machine. ' +
+      'Using G20 on a G70-native machine will result in an "Unknown G-Code" alarm, halting the program.',
     ],
   },
 
   examples: [
     {
-      id: 'ex-cnc-unit-convert',
-      title: 'Converting an Inch Program to Metric',
-      problem: 'An inch-mode program has the line: G01 X2.500 Y1.750 F15.0. Convert this to metric (G21).',
+      id: 'ex-conversion-disaster',
+      title: 'The "Invisible" Crash Calculation',
+      problem: 'An operator forgets the G20 command. The program contains: G01 Z-1.0 F10.0. The machine is currently in G21 (Metric) mode. What is the physical result?',
       steps: [
-        { expression: 'X2.500 in × 25.4 = 63.500 mm', annotation: 'Convert X coordinate.' },
-        { expression: 'Y1.750 in × 25.4 = 44.450 mm', annotation: 'Convert Y coordinate.' },
-        { expression: 'F15.0 ipm × 25.4 = F381.0 mm/min', annotation: 'Convert feedrate — this is a big number change!' },
-        { expression: 'G01 X63.500 Y44.450 F381.0', annotation: 'The metric equivalent line.' },
+        { expression: 'Intended: 1.0\\text{ inch} \\downarrow, 10\\text{ IPM}', annotation: 'The programmer wanted a 1-inch plunge.' },
+        { expression: 'Actual: 1.0\\text{ mm} \\downarrow, 10\\text{ mm/min}', annotation: 'The machine moves in millimeters.' },
+        { expression: 'Error Ratio: 1/25.4 \\approx 0.039', annotation: 'The move is only 4% of the intended depth.' },
+        { expression: 'Time Error: 10\\text{ IPM} \\rightarrow 254\\text{ mm/min}', annotation: 'The move takes 25x longer than expected.' }
       ],
-      conclusion: 'All coordinates and feedrates must be converted. F15 ipm becomes F381 mm/min — if you forget the feedrate conversion and keep F15 in a G21 program, the machine will feed at 15 mm/min (nearly stopped).',
+      conclusion: 'The part is ruined because the tool "rubbed" the surface for too long at a snails pace, likely burning the material.'
     },
     {
-      id: 'ex-cnc-machine-type',
-      title: 'Identifying Metric vs Imperial from a Program',
-      problem: 'You receive a G-code file with the line: G01 X25.4 Y12.7 F508.0. Is this likely metric or inch mode?',
+      id: 'ex-metric-scaling',
+      title: 'Precision Conversion for Aerospace',
+      problem: 'You are converting a tight-tolerance bore from X1.5005" to Metric. What is the new coordinate?',
       steps: [
-        { expression: 'X25.4 in inch mode', annotation: '25.4 inches is a 2-foot-plus move — enormous. Unlikely for a typical part.' },
-        { expression: 'X25.4 in metric mode', annotation: '25.4 mm = exactly 1 inch. Typical part feature size. Likely metric.' },
-        { expression: 'F508 in inch mode', annotation: '508 inches per minute = extremely fast. Probably not a feedrate.' },
-        { expression: 'F508 in metric mode', annotation: '508 mm/min = about 20 ipm. Reasonable feedrate for general milling.' },
-        { expression: 'Conclusion: G21 (metric) mode', annotation: '25.4 and 12.7 are multiples of the inch-to-mm factor. F508 = 20 ipm × 25.4. This is a metric program derived from inch dimensions.' },
+        { expression: '1.5005 \\times 25.4', annotation: 'Calculate raw conversion.' },
+        { expression: '38.1127', annotation: 'The result in millimeters.' },
+        { expression: 'G21 X38.113', annotation: 'Rounded to the standard 3-decimal metric resolution.' }
       ],
-      conclusion: 'Learning to "read" coordinate values and feedrates to guess the unit mode is a useful skill. When in doubt, look for G20 or G21 near the top of the file.',
-    },
+      conclusion: 'Because 0.0001" is slightly larger than 0.001mm, you often have to round up or down. To maintain the exact fit, a 4-decimal metric command (X38.1127) might be required if the controller supports it.'
+    }
   ],
 
   assessment: {
     questions: [
       {
-        id: 'cnc-units-1',
+        id: 'units-q1',
         type: 'choice',
-        text: 'Which G-code activates millimeter (metric) mode?',
-        options: ['G20', 'G21', 'G90', 'G94'],
-        answer: 'G21',
+        text: 'Which G-code tells the machine that all coordinates are in Inches?',
+        options: ['G20', 'G21', 'G71', 'G90'],
+        answer: 'G20'
       },
       {
-        id: 'cnc-units-2',
+        id: 'units-q2',
         type: 'input',
-        text: 'Convert 2.0 inches to millimeters. (1 inch = 25.4 mm) ',
-        answer: '50.8',
+        text: 'If 1 inch equals 25.4mm exactly, how many mm are in 0.500 inches?',
+        answer: '12.7'
       },
       {
-        id: 'cnc-units-3',
-        type: 'input',
-        text: 'A feedrate of F30 in inch mode (G20) equals how many mm/min in metric mode? ',
-        answer: '762',
-      },
-      {
-        id: 'cnc-units-4',
+        id: 'units-q3',
         type: 'choice',
-        text: 'You load an inch-mode program (G20, F20 ipm) into a machine running in G21 (metric). What happens to the feedrate?',
+        text: 'You run a metric program (G21) with a feedrate of F500.0. If you accidentally change it to G20, what happens to the tool speed?',
         options: [
-          'The machine feeds at 508 mm/min (correct conversion)',
-          'The machine feeds at 20 mm/min (far too slow — interprets ipm number as mm/min)',
-          'The machine triggers an alarm',
-          'The controller automatically converts the feedrate',
+          'It stays the same.',
+          'It slows down by 25.4 times.',
+          'It speeds up by 25.4 times (dangerous).',
+          'The machine alarms out.'
         ],
-        answer: 'The machine feeds at 20 mm/min (far too slow — interprets ipm number as mm/min)',
+        answer: 'It speeds up by 25.4 times (dangerous).'
       },
       {
-        id: 'cnc-units-5',
-        type: 'choice',
-        text: 'What is the best practice for unit modes at the start of any G-code program?',
-        options: [
-          'Leave it out — the machine remembers the last unit mode',
-          'Always explicitly state G20 or G21 at the top of the program',
-          'Use G70 for inches and G71 for metric on all Fanuc controllers',
-          'Only specify units if you are changing from the previous program',
-        ],
-        answer: 'Always explicitly state G20 or G21 at the top of the program',
+        id: 'units-q4',
+        type: 'boolean',
+        text: 'Changing from G20 to G21 mid-program is a safe and common practice for high-precision machining.',
+        answer: false
       },
+      {
+        id: 'units-q5',
+        type: 'choice',
+        text: 'What is the "Safety Header" and why does it include G20/G21?',
+        options: [
+          'It is a mechanical bar to stop crashes.',
+          'It is the first line of code that sets the modal state of the machine to a known safe value.',
+          'It is a message to the operator.',
+          'It is used only for NASA projects.'
+        ],
+        answer: 'It is the first line of code that sets the modal state of the machine to a known safe value.'
+      }
     ]
   },
 
   mentalModel: [
-    'G20 = inch mode. G21 = metric mode.',
-    '1 inch = 25.4 mm exactly. Memorize this.',
-    'F-values scale too — F20 ipm ≠ F20 mm/min.',
-    'Always declare G20 or G21 at program start — never trust the machine\'s current mode.',
-    'Metric numbers are larger: X25.4 is X1.0 in inches.',
-  ],
-}
+    '25.4 = The Magic Number. Memorize it.',
+    'G20 = Big numbers (inches), G21 = Even bigger numbers (mm).',
+    'Safety Header: Never start a program without units defined.',
+    'F-word Alert: Feedrates are distance-per-time. They scale with the units!',
+    'The 1959 Pact: We all agree an inch is exactly 25.4mm. No arguments.',
+  ]
+};

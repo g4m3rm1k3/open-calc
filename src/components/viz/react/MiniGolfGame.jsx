@@ -230,10 +230,16 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     let aimArrow = null;
     let stopped = false;
 
+    // loop-the-loop state
+    let loopMode = false;
+    let loopSpeed = 0;    // scalar speed along track (positive = CCW)
+    let loopAngle = 0;    // angle from +X axis about loop center; -π/2 = bottom
+    let loopData  = null; // { cx, cz, r } of current loop
+
     const FORCES = {
       velocity: { label: 'Velocity (v)',  color: '#38b6ff', on: true },
       friction: { label: 'Friction (f)',  color: '#ff4545', on: true },
-      normal:   { label: 'Normal (N)',    color: '#00c875', on: false },
+      normal:   { label: 'Normal (N)',    color: '#00c875', on: true },
       net:      { label: 'Net force',     color: '#ffb800', on: true },
       wind:     { label: 'Wind / field',  color: '#9b5de5', on: true },
     };
@@ -652,16 +658,30 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         bot.userData = { wallType:'edge', x1:o.x1, z1:o.z,  x2:o.x2, z2:o.z,  nx:0, nz:1  };
       }
       if (o.type === 'loop') {
-        const lGeo = new THREE.TorusGeometry(o.r, o.w / 2, 32, 100);
-        const lMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.5, roughness: 0.3 });
+        // Torus in default XY plane — vertical ring the ball travels through in X direction
+        const lGeo = new THREE.TorusGeometry(o.r, 0.18, 24, 80);
+        const lMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.7, roughness: 0.2 });
         const loop = new THREE.Mesh(lGeo, lMat);
+        // Center at (x, r, z) so bottom of ring sits at ground level y=0
         loop.position.set(o.x, o.r, o.z);
-        loop.rotation.y = Math.PI / 2;
+        // NO rotation.y — default XY orientation is correct for X-direction travel
         loop.castShadow = true;
         loop.receiveShadow = true;
         scene.add(loop);
         obstacles3d.push(loop);
-        loop.userData = { wallType: 'loop', r: o.r, w: o.w, cx: o.x, cz: o.z };
+        // Ramp approach on left side
+        const rampGeo = new THREE.BoxGeometry(4, 0.15, 2.4);
+        const rampMat = new THREE.MeshLambertMaterial({ color: 0x8B7355 });
+        const ramp = new THREE.Mesh(rampGeo, rampMat);
+        ramp.position.set(o.x - o.r - 2, 0.5, o.z);
+        ramp.rotation.z = -0.12;
+        scene.add(ramp); obstacles3d.push(ramp);
+        // Exit ramp on right
+        const ramp2 = new THREE.Mesh(rampGeo, rampMat);
+        ramp2.position.set(o.x + o.r + 2, 0.5, o.z);
+        ramp2.rotation.z = 0.12;
+        scene.add(ramp2); obstacles3d.push(ramp2);
+        loop.userData = { wallType: 'loop', r: o.r, cx: o.x, cz: o.z, tubeW: 2.4 };
       }
       if (o.type === 'sand' || o.type === 'water') {
         const isSand = o.type === 'sand';
@@ -735,51 +755,52 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       const speed = vel.length();
       let mu = parseFloat(q('s-friction').value);
 
-      // Check if in sand to update arrow visually
       for (let mesh of obstacles3d) {
         if (mesh.userData.type === 'sand') {
           const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
-          if (dist < mesh.userData.r) {
-            mu *= 3;
-          }
+          if (dist < mesh.userData.r) mu *= 3;
         }
       }
 
-      const isAirborne = pos.y > getTerrainHeight(pos.x, pos.z) + 0.05;
+      const groundH = getTerrainHeight(pos.x, pos.z);
+      const isAirborne = pos.y > groundH + 0.12;
 
-      let frictionMag = mu * G_CONST;
-      let normal = getTerrainNormal(pos.x, pos.z);
+      let frictionMag = isAirborne ? 0 : mu * G_CONST;
+      const normal = isAirborne ? new THREE.Vector3(0,1,0) : getTerrainNormal(pos.x, pos.z);
       const gravity = new THREE.Vector3(0, -G_CONST, 0);
-      let gravityEffect = gravity.clone().projectOnPlane(normal);
-
-      if (isAirborne) {
-        frictionMag = 0;
-        normal = new THREE.Vector3(0, 0, 0);
-        gravityEffect = gravity; // Full downward pull
-      }
-
+      const gravityEffect = isAirborne ? gravity.clone() : gravity.clone().projectOnPlane(normal);
       const frictionDir = speed > 0.01 ? vel.clone().normalize().negate() : new THREE.Vector3(0,0,0);
       const netForce = frictionDir.clone().multiplyScalar(frictionMag).add(windForce).add(gravityEffect);
 
-      const nLen = isAirborne ? 0 : 2.5;
-      const nDir = isAirborne ? new THREE.Vector3(0,1,0) : normal;
+      // In loop mode, override with centripetal + tangential arrows
+      let normalDir = normal;
+      let normalLen = isAirborne ? 0 : 2.5;
+      if (loopMode && loopData) {
+        const N = (loopSpeed * loopSpeed / loopData.r) - G_CONST * Math.sin(loopAngle);
+        const inward = new THREE.Vector3(-Math.cos(loopAngle), -Math.sin(loopAngle), 0);
+        normalDir = inward.clone().negate(); // outward from track = normal reaction
+        normalLen = Math.max(0, N) * 0.25;
+      }
 
       const defs = {
-        velocity: { dir: speed > 0.01 ? vel.clone().normalize() : new THREE.Vector3(1,0,0), len: Math.min(speed*0.35,6)+0.5, y:0.8 },
-        friction: { dir: frictionDir.length()>0 ? frictionDir : new THREE.Vector3(-1,0,0), len: Math.min(frictionMag*0.35,4)+0.3, y:0.9 },
-        normal:   { dir: nDir, len: nLen, y: BALL_R },
-        net:      { dir: netForce.length() > 0.01 ? netForce.normalize() : nDir, len: Math.min(netForce.length()*0.5, 4), y:1.1 },
-        wind:     { dir: windForce.length()>0.1 ? windForce.clone().normalize() : new THREE.Vector3(0,0,1), len: Math.min(windForce.length()*0.4,4), y:0.7 },
+        velocity: { dir: speed > 0.01 ? vel.clone().normalize() : new THREE.Vector3(1,0,0), len: Math.min(speed*0.35,6)+0.5, yOff: BALL_R + 0.2 },
+        friction: { dir: frictionDir.length()>0 ? frictionDir : new THREE.Vector3(-1,0,0), len: Math.min(frictionMag*0.35,4)+0.3, yOff: BALL_R + 0.3 },
+        normal:   { dir: normalDir, len: normalLen, yOff: 0 },
+        net:      { dir: netForce.length() > 0.01 ? netForce.clone().normalize() : normal, len: Math.min(netForce.length()*0.4, 4), yOff: BALL_R + 0.5 },
+        wind:     { dir: windForce.length()>0.1 ? windForce.clone().normalize() : new THREE.Vector3(0,0,1), len: Math.min(windForce.length()*0.4,4), yOff: BALL_R },
       };
 
       for (let k in arrowMeshes) {
         const arr = arrowMeshes[k];
         const def = defs[k];
-        const forceOn = FORCES[k]?.on && showForces && (ballActive || k==='wind');
-        arr.visible = forceOn && (k !== 'wind' || windForce.length() > 0.1);
+        // Forces always visible at ball (not gated on ballActive) so students see forces at rest too
+        const forceOn = FORCES[k]?.on && showForces && (k !== 'wind' || windForce.length() > 0.1);
+        arr.visible = Boolean(forceOn && def.len > 0.1);
         if (arr.visible) {
-          arr.position.copy(pos); arr.position.y = def.y;
-          arr.setDirection(def.dir);
+          arr.position.set(pos.x, pos.y + def.yOff, pos.z);
+          const safeDir = def.dir.clone();
+          if (safeDir.length() < 0.001) safeDir.set(0,1,0);
+          arr.setDirection(safeDir.normalize());
           arr.setLength(def.len, Math.min(def.len*0.25,0.5), Math.min(def.len*0.15,0.3));
         }
       }
@@ -836,18 +857,85 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       return new THREE.Vector3(h1 - h2, 2 * eps, h3 - h4).normalize();
     }
 
-    function physicsStep(dt) {
-      if (!ballActive) return;
-      dt = Math.min(dt, 0.04);
-      const speed = vel.length();
-      let mu = parseFloat(q('s-friction').value);
-      const lv = LEVELS[currentLevel];
-
+    // Always-running scene updates (spinners spin even before ball is putted)
+    function updateSceneObjects(dt) {
       for (let mesh of obstacles3d) {
         if (mesh.userData.wallType === 'spinner') {
           mesh.userData.angle += mesh.userData.speed * dt;
           mesh.rotation.y = mesh.userData.angle;
         }
+      }
+    }
+
+    function physicsStep(dt) {
+      if (!ballActive) return;
+      dt = Math.min(dt, 0.04);
+      let mu = parseFloat(q('s-friction').value);
+      const lv = LEVELS[currentLevel];
+
+      // ── Kelty Loop constraint physics ───────────────────────────
+      if (loopMode && loopData) {
+        const ld = loopData;
+        // Tangential gravity: -g·cos(θ)  [decelerates going up, accelerates going down]
+        const gTan = -G_CONST * Math.cos(loopAngle);
+        // Normal force per unit mass: v²/r - g·sin(θ)
+        const N = (loopSpeed * loopSpeed / ld.r) - G_CONST * Math.sin(loopAngle);
+        if (N < 0) {
+          // Ball falls off — becomes airborne from current position
+          loopMode = false;
+          loopData = null;
+          const tDir = new THREE.Vector3(-Math.sin(loopAngle), Math.cos(loopAngle), 0);
+          vel.copy(tDir.multiplyScalar(loopSpeed));
+          // Normal physics (airborne) will handle it next frame
+        } else {
+          const frictionAcc = mu * N * (loopSpeed > 0 ? -1 : 1);
+          loopSpeed += (gTan + frictionAcc) * dt;
+          loopAngle += (loopSpeed / ld.r) * dt;
+          pos.x = ld.cx + ld.r * Math.cos(loopAngle);
+          pos.y = ld.r  + ld.r * Math.sin(loopAngle);
+          pos.z = ld.cz;
+          const tDir = new THREE.Vector3(-Math.sin(loopAngle), Math.cos(loopAngle), 0);
+          vel.copy(tDir.multiplyScalar(loopSpeed));
+          ball3d.position.copy(pos);
+          ball3d.rotation.x += loopSpeed * dt * 3;
+          rollTime += dt;
+          rollDist += Math.abs(loopSpeed) * dt;
+          recordedFrames.push({ pos: pos.clone(), vel: vel.clone(), t: rollTime });
+          updateTrail(); updateArrows(); updateStats();
+          // Exit: completed loop (angle past -π/2 after going all the way around)
+          if (loopAngle > Math.PI * 1.3) {
+            loopMode = false; loopData = null;
+            vel.set(loopSpeed, 0, 0);
+            pos.y = BALL_R;
+          }
+          return; // skip normal physics
+        }
+      }
+
+      const speed = vel.length();
+
+      // ── Loop entry detection ─────────────────────────────────────
+      if (!loopMode) {
+        for (let mesh of obstacles3d) {
+          if (mesh.userData.wallType !== 'loop') continue;
+          const wd = mesh.userData;
+          if (Math.abs(pos.z - wd.cz) > wd.tubeW) continue;
+          const dx2 = pos.x - wd.cx, dy2 = pos.y - wd.r;
+          const distToCenter = Math.sqrt(dx2*dx2 + dy2*dy2);
+          // Ball near circle, approaching from left, going right
+          if (Math.abs(distToCenter - wd.r) < BALL_R * 3 && pos.x < wd.cx && vel.x > 0.5) {
+            loopMode  = true;
+            loopData  = { cx: wd.cx, cz: wd.cz, r: wd.r };
+            loopAngle = Math.atan2(dy2, dx2);
+            loopSpeed = vel.length();
+            const vMin = Math.sqrt(G_CONST * wd.r);
+            toast(`Kelty Loop! Need v ≥ ${vMin.toFixed(1)} m/s at top. Current: ${loopSpeed.toFixed(1)}`);
+            return;
+          }
+        }
+      }
+
+      for (let mesh of obstacles3d) {
         if (mesh.userData.type === 'water') {
           const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
           if (dist < mesh.userData.r) {
@@ -961,20 +1049,32 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
       const dx = pos.x - lv.hole.x, dz = pos.z - lv.hole.z;
       const distToHole = Math.sqrt(dx*dx + dz*dz);
-      
-      // Gravity well pull towards hole (simulating dropping into the cup edge)
-      if (distToHole < HOLE_R * 1.5 && !isAirborne) {
-         const pullStr = (HOLE_R * 1.5 - distToHole) * 15;
-         vel.add(new THREE.Vector3(-dx, 0, -dz).normalize().multiplyScalar(pullStr * dt));
-      }
+      const spd = vel.length();
 
-      // Drop in if moving reasonably slow and directly over hole
-      if (distToHole < HOLE_R * 0.9 && vel.length() < 3.5 && !isAirborne) {
-        vel.set(0, 0, 0);
-        pos.x = lv.hole.x;
-        pos.z = lv.hole.z;
-        pos.y -= 0.1;
-        winLevel();
+      if (!isAirborne && distToHole < HOLE_R * 2.2) {
+        // Real cup physics: rim acts as a barrier — ball must be slow enough to drop in.
+        // v_lip ≈ √(2g · HOLE_R) ≈ 3.4 m/s; faster than that and it lips out.
+        const V_LIP = Math.sqrt(2 * G_CONST * HOLE_R); // ~3.4 m/s
+
+        if (distToHole < HOLE_R * 0.85 && spd < V_LIP) {
+          // Ball drops in — holed!
+          vel.set(0, 0, 0);
+          pos.x = lv.hole.x; pos.z = lv.hole.z; pos.y -= 0.12;
+          winLevel();
+        } else if (distToHole < HOLE_R * 1.3 && spd < V_LIP * 0.7) {
+          // Slow enough — funnel pull toward center
+          const pullStr = (HOLE_R * 1.3 - distToHole) * 12;
+          const toHole = new THREE.Vector3(-dx, 0, -dz).normalize();
+          vel.add(toHole.multiplyScalar(pullStr * dt));
+        } else if (distToHole < HOLE_R && spd >= V_LIP) {
+          // Too fast — lip-out: reflect velocity component away from center
+          const outDir = new THREE.Vector3(dx, 0, dz).normalize();
+          const vn = vel.dot(outDir);
+          if (vn < 0) { // heading into hole
+            vel.addScaledVector(outDir, -2 * vn * 0.6); // elastic bounce outward, lose 40%
+            toast(`Lip out! Hit it softer — v_lip ≈ ${V_LIP.toFixed(1)} m/s`);
+          }
+        }
       }
       
       const gSize = lv.greenSize || { w: 40, d: 20 };
@@ -1353,6 +1453,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       requestAnimationFrame(animate);
       const raw = clock.getDelta();
       const dt  = slowMo ? raw * 0.2 : raw;
+
+      updateSceneObjects(dt);   // spinners always rotate, even pre-putt
 
       if (isReplaying && replayPlaying) {
         const step = Math.max(1, Math.round(replaySpeed * 1));
