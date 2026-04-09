@@ -797,7 +797,9 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
     function updateTrail() {
       if (!ballActive) return;
-      trailPoints.push(pos.clone());
+      if (!isNaN(pos.x) && !isNaN(pos.y) && !isNaN(pos.z)) {
+        trailPoints.push(pos.clone());
+      }
       if (trailLine) scene.remove(trailLine);
       if (trailPoints.length < 2) return;
       const geo = new THREE.BufferGeometry().setFromPoints(trailPoints.map(p => { const v = p.clone(); v.y = 0.05; return v; }));
@@ -931,7 +933,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
 
       const newPos = pos.clone().add(vel.clone().multiplyScalar(dt));
-      const collided = resolveCollisions(pos, newPos, vel);
+      const collided = resolveCollisions(pos, newPos, vel, dt);
       pos.copy(collided.pos);
       vel.copy(collided.vel);
       
@@ -982,7 +984,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
     }
 
-    function resolveCollisions(oldPos, newPos, vel) {
+    function resolveCollisions(oldPos, newPos, vel, dt) {
       let p = newPos.clone(), v = vel.clone();
 
       for (let mesh of obstacles3d) {
