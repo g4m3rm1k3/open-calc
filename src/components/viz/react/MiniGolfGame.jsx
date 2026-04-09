@@ -232,10 +232,12 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
     // loop-the-loop state
     let loopMode       = false;
-    let loopSpeed      = 0;    // scalar speed along track (positive = CCW)
-    let loopAngle      = 0;    // current angle from loop center (+X axis)
-    let loopAngleEntry = 0;    // angle at entry — exit after exactly 2π of travel
-    let loopData       = null; // { cx, cz, r } of current loop
+    let loopSpeed      = 0;      // scalar speed along track (positive = CCW)
+    let loopAngle      = 0;      // current angle from loop center (+X axis)
+    let loopAngleEntry = 0;      // angle at entry — exit after exactly 2π of travel
+    let loopEntryDir   = new THREE.Vector3(1, 0, 0); // XZ heading when entering loop
+    let loopData       = null;   // { cx, cz, r, travel }
+    let loopCooldown   = 0;      // seconds before ball can re-enter loop after exit
 
     const FORCES = {
       velocity: { label: 'Velocity (v)',  color: '#38b6ff', on: true },
@@ -245,192 +247,206 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       wind:     { label: 'Wind / field',  color: '#9b5de5', on: true },
     };
 
-    // ── Level definitions ──────────────────────────────────────
+    // ── Kelty's Championship Greens — 9 holes ─────────────────
     const LEVELS = [
+      // ── Hole 1: The Straight ──────────────────────────────────
       {
-        name: 'L1 — Vectors', par: 2,
-        concept: 'Vector decomposition & friction',
-        desc: '<strong>Concept: Linear motion, friction, energy dissipation.</strong><br>Aim the ball from the tee to the cup. Adjust power and angle. Watch kinetic energy (½mv²) drain to zero as friction converts it to heat.<br><span class="concept">F = μ·N = μ·mg</span> <span class="concept">KE = ½mv²</span>',
-        tee:  new THREE.Vector3(-10, BALL_R, 0),
-        hole: new THREE.Vector3( 10, BALL_R, 0),
-        friction: 0.18,
-        wind: new THREE.Vector3(0, 0, 0),
-        obstacles: [
-          { type:'sand', x:4, z:3, r:2.5 },
-          { type:'sand', x:4, z:-3, r:2.5 },
-        ],
-        walls: [
-          { type:'rect', x1:-14, z1:-4, x2:14, z2:-4 },
-          { type:'rect', x1:-14, z1: 4, x2:14, z2: 4 },
-        ],
-        insight: 'Friction force F = μmg decelerates the ball at a = μg = ' + (0.18*9.81).toFixed(2) + ' m/s². Doubling friction halves rolling distance. This is Newton\'s second law: F = ma.',
-      },
-      {
-        name: 'L2 — Bank Shot', par: 2,
-        concept: 'Reflection, momentum, impulse',
-        desc: '<strong>Concept: Elastic wall reflections, momentum transfer.</strong><br>Bounce the ball off banked walls to reach the cup. The angle of incidence equals the angle of reflection — just like light.<br><span class="concept">p = mv</span> <span class="concept">θᵢ = θᵣ (reflection)</span>',
-        tee:  new THREE.Vector3(-10, BALL_R, -5),
-        hole: new THREE.Vector3( 10, BALL_R,  5),
-        friction: 0.14,
-        wind: new THREE.Vector3(0, 0, 0),
-        obstacles: [
-          { type:'bank', x:-2, z:0, w:12, rot: Math.PI/4, restitution: 0.85 },
-        ],
-        walls: [
-          { type:'rect', x1:-14, z1:-8, x2:14, z2:-8 },
-          { type:'rect', x1:-14, z1: 8, x2:14, z2: 8 },
-          { type:'rect', x1:-14, z1:-8, x2:-14, z2: 8 },
-          { type:'rect', x1: 14, z1:-8, x2: 14, z2: 8 },
-        ],
-        insight: 'When a ball bounces off a wall, momentum is conserved along the wall axis, and reversed (×restitution) perpendicular to it. Restitution e=1 = perfectly elastic. Real golf: e≈0.7–0.9.',
-      },
-      {
-        name: 'L3 — Roundabout', par: 3,
-        concept: 'Centripetal force & circular paths',
-        desc: '<strong>Concept: Centripetal force, circular motion.</strong><br>A rotating barrier sweeps the green. Time your putt to pass through the gap, or watch it redirect you. The barrier applies an impulsive centripetal force.<br><span class="concept">F꜀ = mv²/r</span> <span class="concept">a = v²/r</span>',
-        tee:  new THREE.Vector3(-11, BALL_R, 0),
-        hole: new THREE.Vector3( 11, BALL_R, 0),
-        friction: 0.16,
-        wind: new THREE.Vector3(0, 0, 0),
-        obstacles: [
-          { type:'spinner', cx:0, cz:0, r:5, armW:0.5, armLen:9, speed:0.9, phase:0 },
-        ],
-        walls: [
-          { type:'rect', x1:-14, z1:-5, x2:14, z2:-5 },
-          { type:'rect', x1:-14, z1: 5, x2:14, z2: 5 },
-        ],
-        insight: 'For circular motion, F꜀ = mv²/r points toward the center. At v=10, r=5: F꜀ = 20 N/kg. The spinner arm redirects the ball by applying a brief impulsive force — changing momentum without doing much work.',
-      },
-      {
-        name: 'L4 — Tunnel', par: 2,
-        concept: 'Projectile motion & blind prediction',
-        desc: '<strong>Concept: Kinematic prediction — aim without seeing.</strong><br>The ball passes through a tunnel. Inside, you see nothing — predict where it exits using kinematics. Ball exits where: x = x₀ + v·t<br><span class="concept">x(t) = x₀ + v₀t - ½μgt²</span>',
+        name: 'H1 — The Straight', par: 2,
+        concept: 'F = μmg  ·  KE = ½mv²',
+        greenSize: { w: 32, d: 10 },
         tee:  new THREE.Vector3(-12, BALL_R, 0),
         hole: new THREE.Vector3( 12, BALL_R, 0),
-        friction: 0.12,
-        wind: new THREE.Vector3(0, 0, 0),
+        friction: 0.18, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-16, z1:-5, x2:16, z2:-5 },
+          { type:'rect', x1:-16, z1: 5, x2:16, z2: 5 },
+          { type:'rect', x1:-16, z1:-5, x2:-16, z2: 5 },
+          { type:'rect', x1: 16, z1:-5, x2: 16, z2: 5 },
+        ],
         obstacles: [
-          { type:'tunnel', x1:-4, x2:4, z:-1.2, z2:1.2, exitForce:0 },
+          { type:'sand', x: 0, z: 2.5, r: 2 },
+          { type:'sand', x: 0, z:-2.5, r: 2 },
         ],
-        walls: [
-          { type:'rect', x1:-14, z1:-4, x2:14, z2:-4 },
-          { type:'rect', x1:-14, z1: 4, x2:14, z2: 4 },
-        ],
-        insight: 'Inside the tunnel the ball follows the exact same kinematic equations — friction still decelerates it. If you know v₀ and μ, you can compute exactly where it exits and at what speed: v = √(v₀² - 2μg·d)',
+        desc: '<strong>Hole 1: Linear motion & friction.</strong><br>Aim straight for the cup. Sand traps slow the ball — μ_sand ≈ 3× normal. Watch kinetic energy drain as friction converts it to heat.<br><span class="concept">F_friction = μ·mg</span>',
+        insight: 'a = μg = ' + (0.18*9.81).toFixed(2) + ' m/s². Max roll = v₀²/(2μg). Doubling μ halves rolling distance.',
       },
+      // ── Hole 2: Dog-leg & Bank Shot ───────────────────────────
       {
-        name: 'L5 — Wind', par: 3,
-        concept: 'Vector fields & superposition',
-        desc: '<strong>Concept: Vector field superposition — wind + friction.</strong><br>A wind field applies a constant sideways force while friction decelerates. Net force is the vector SUM. Adjust angle to compensate.<br><span class="concept">F_net = F_friction + F_wind</span> <span class="concept">a = F/m</span>',
-        tee:  new THREE.Vector3(-11, BALL_R, 0),
-        hole: new THREE.Vector3( 11, BALL_R, 0),
-        friction: 0.16,
-        wind: new THREE.Vector3(0, 0, 5.5),
-        obstacles: [],
+        name: 'H2 — Dog-Leg', par: 3,
+        concept: 'p = mv  ·  θᵢ = θᵣ',
+        greenSize: { w: 40, d: 22 },
+        tee:  new THREE.Vector3(-16, BALL_R, -6),
+        hole: new THREE.Vector3( 14, BALL_R,  6),
+        friction: 0.14, wind: new THREE.Vector3(0,0,0),
         walls: [
-          { type:'rect', x1:-14, z1:-6, x2:14, z2:-6 },
-          { type:'rect', x1:-14, z1: 6, x2:14, z2: 6 },
+          { type:'rect', x1:-18, z1:-9, x2:18, z2:-9 },
+          { type:'rect', x1:-18, z1: 9, x2:18, z2: 9 },
+          { type:'rect', x1:-18, z1:-9, x2:-18, z2: 9 },
+          { type:'rect', x1: 18, z1:-9, x2: 18, z2: 9 },
+          // dog-leg wall forcing a turn
+          { type:'rect', x1: -2, z1:-9, x2: -2, z2: 0 },
         ],
-        insight: 'Net acceleration a = -μg·v̂ + F_wind/m. The ball curves because wind continuously adds Z-velocity while friction reduces total speed. To compensate: aim "into" the wind — an upwind angle that lets the wind push you onto line.',
-      },
-      {
-        name: 'Hole 6 — The Kelty Loop', par: 3,
-        concept: 'Centripetal Force & Minimum Velocity',
-        desc: '<strong>Concept: Centripetal force vs. Gravity.</strong><br>You must hit the ball with enough speed to stay on the loop! If velocity drops below √(gr), gravity wins and the ball falls.<br><span class="concept">v_min = √(g·r)</span>',
-        tee:  new THREE.Vector3(-12, BALL_R, 0),
-        hole: new THREE.Vector3( 12, BALL_R, 0),
-        friction: 0.1,
-        wind: new THREE.Vector3(0, 0, 0),
         obstacles: [
-          { type:'loop', x:0, z:0, r:4, w:2 },
+          { type:'bank', x: 4, z: 0, w: 10, rot: -Math.PI/4, restitution: 0.82 },
         ],
-        walls: [
-          { type:'rect', x1:-14, z1:-4, x2:14, z2:-4 },
-          { type:'rect', x1:-14, z1: 4, x2:14, z2: 4 },
-        ],
-        insight: 'To go upside down, the normal force must be > 0 at the top. This happens if v² / r ≥ g.',
+        desc: '<strong>Hole 2: Reflection & momentum.</strong><br>The wall forces a dog-leg. Use the angled bank to redirect momentum into the cup. θ_incidence = θ_reflection.<br><span class="concept">p = mv</span>',
+        insight: 'Momentum along the wall is conserved. Only the normal component flips. e = 0.82 means 18% energy loss per bounce.',
       },
+
+      // ── Hole 3: The Windmill ──────────────────────────────────
       {
-        name: 'Hole 7 — Curved Greens', par: 3,
-        concept: 'Potential Energy & Slopes',
-        desc: '<strong>Concept: Gravitational potential energy on sloped grass.</strong><br>The green curves upward. Hit it hard to crest the hill, or watch it roll back down.<br><span class="concept">ΔPE = mgΔh</span>',
-        tee:  new THREE.Vector3(-12, BALL_R, 0),
-        hole: new THREE.Vector3( 12, BALL_R, 0),
-        friction: 0.1,
-        wind: new THREE.Vector3(0, 0, 0),
+        name: 'H3 — Windmill', par: 3,
+        concept: 'Timing & angular velocity',
+        greenSize: { w: 36, d: 12 },
+        tee:  new THREE.Vector3(-14, BALL_R, 0),
+        hole: new THREE.Vector3( 14, BALL_R, 0),
+        friction: 0.15, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-16, z1:-6, x2:16, z2:-6 },
+          { type:'rect', x1:-16, z1: 6, x2:16, z2: 6 },
+          { type:'rect', x1:-16, z1:-6, x2:-16, z2: 6 },
+          { type:'rect', x1: 16, z1:-6, x2: 16, z2: 6 },
+        ],
         obstacles: [
-          { type:'hill', x:0, z:0, w:8, d:10, h:2 },
+          { type:'windmill', x: 0, z: 0, bladeLen: 4, speed: 1.8, gap: 0.8 },
+          { type:'sand', x: 8, z: 3, r: 2 },
         ],
-        walls: [
-          { type:'rect', x1:-14, z1:-6, x2:14, z2:-6 },
-          { type:'rect', x1:-14, z1: 6, x2:14, z2: 6 },
-        ],
-        insight: 'Gravity pulls the ball down the gradient. Kinetic energy is converted to potential energy as you go up.',
+        desc: '<strong>Hole 3: Timing & angular velocity.</strong><br>The windmill rotates at ω rad/s. Time your putt to pass through when the gap is open. ω = v / r.<br><span class="concept">ω = 2π / T</span>',
+        insight: 'The blade tip moves at v_tip = ω·r. At ω=1.8 and r=4: v_tip = 7.2 m/s. The period T = 2π/ω ≈ 3.5 s — that\'s your window.',
       },
+
+      // ── Hole 4: The Barn & Tires ─────────────────────────────
       {
-        name: 'Hole 8 — Pulsing Green', par: 4,
-        concept: 'Oscillating External Forces',
-        desc: '<strong>Concept: Time-varying force fields.</strong><br>The green itself is expanding and contracting, applying a radial impulse. Time your putt to use the expansion for a boost!<br><span class="concept">F(t) = F₀ sin(ωt)</span>',
-        tee:  new THREE.Vector3(-12, BALL_R, 0),
-        hole: new THREE.Vector3( 12, BALL_R, 0),
-        friction: 0.15,
-        wind: new THREE.Vector3(0, 0, 0),
-        obstacles: [],
-        dynamicGreen: true,
+        name: 'H4 — Barn Run', par: 3,
+        concept: 'x(t) = x₀ + v₀t − ½at²',
+        greenSize: { w: 36, d: 14 },
+        tee:  new THREE.Vector3(-14, BALL_R, 0),
+        hole: new THREE.Vector3( 13, BALL_R, 4),
+        friction: 0.12, wind: new THREE.Vector3(0,0,0),
         walls: [
-          { type:'rect', x1:-14, z1:-6, x2:14, z2:-6 },
-          { type:'rect', x1:-14, z1: 6, x2:14, z2: 6 },
+          { type:'rect', x1:-16, z1:-7, x2:16, z2:-7 },
+          { type:'rect', x1:-16, z1: 7, x2:16, z2: 7 },
+          { type:'rect', x1:-16, z1:-7, x2:-16, z2: 7 },
+          { type:'rect', x1: 16, z1:-7, x2: 16, z2: 7 },
         ],
-        insight: 'Dynamic environments require spatial and temporal planning. The "force" here is a change in velocity Δv based on the distance from the center.',
+        obstacles: [
+          { type:'barn', x: 0, z: 0, len: 7, w: 3.2 },
+          { type:'tires', positions: [[-8, 4], [-8, -4], [6, -5], [9, 2]] },
+        ],
+        desc: '<strong>Hole 4: Kinematics through a tunnel.</strong><br>The ball passes through the barn. Inside, only friction acts — predict exit speed using v² = v₀² − 2μg·d.<br><span class="concept">v = √(v₀² − 2μgd)</span>',
+        insight: 'Tunnel length d = 7 m, μ = 0.12. Exit speed: v = √(v₀² − 2×0.12×9.81×7). Tires are solid obstacles — bounce angle tells you the reflection normal.',
       },
+
+      // ── Hole 5: Roundabout ────────────────────────────────────
       {
-        name: 'Hole 9 — Double Peak Valley', par: 4,
-        concept: 'Potential Well',
-        desc: '<strong>Concept: Navigation through a potential well.</strong><br>Two hills sandwich a deep valley. You must gain enough speed on the first descent to scale the second peak.<br><span class="concept">KE + PE = Constant</span>',
+        name: 'H5 — Roundabout', par: 3,
+        concept: 'F_c = mv²/r',
+        greenSize: { w: 34, d: 14 },
+        tee:  new THREE.Vector3(-13, BALL_R, 0),
+        hole: new THREE.Vector3( 13, BALL_R, 0),
+        friction: 0.16, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-15, z1:-7, x2:15, z2:-7 },
+          { type:'rect', x1:-15, z1: 7, x2:15, z2: 7 },
+        ],
+        obstacles: [
+          { type:'spinner', cx:0, cz:0, r:5, armW:0.55, armLen:8, speed:1.1, phase:0 },
+          { type:'sand', x: 8, z: 4, r: 1.8 },
+          { type:'sand', x:-8, z:-4, r: 1.8 },
+        ],
+        desc: '<strong>Hole 5: Centripetal force & timing.</strong><br>The arm always rotates — even when your ball is still. Time your putt. If the arm hits you, it transfers angular momentum!<br><span class="concept">F_c = mv²/r</span>',
+        insight: 'Arm speed at tip: v_tip = ω·r = 1.1×8 = 8.8 m/s. The arm imparts an impulsive force — Δp = F·Δt — changing ball direction instantly.',
+      },
+
+      // ── Hole 6: The Kelty Loop ────────────────────────────────
+      {
+        name: 'H6 — Kelty Loop', par: 3,
+        concept: 'v_min = √(g·r)  ·  N = mv²/r − mg',
+        greenSize: { w: 36, d: 10 },
+        tee:  new THREE.Vector3(-14, BALL_R, 0),
+        hole: new THREE.Vector3( 14, BALL_R, 0),
+        friction: 0.09, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-16, z1:-5, x2:16, z2:-5 },
+          { type:'rect', x1:-16, z1: 5, x2:16, z2: 5 },
+          { type:'rect', x1:-16, z1:-5, x2:-16, z2: 5 },
+          { type:'rect', x1: 16, z1:-5, x2: 16, z2: 5 },
+        ],
+        obstacles: [
+          { type:'loop', x: 0, z: 0, r: 3.5, w: 1.8 },
+        ],
+        desc: '<strong>Hole 6 — The Kelty Loop.</strong><br>Hit fast enough to complete the loop. At the top, centripetal acceleration must exceed g or the ball falls off.<br><span class="concept">v_top ≥ √(g·r) = ' + Math.sqrt(9.81*3.5).toFixed(1) + ' m/s</span>',
+        insight: 'Normal force N = mv²/r − mg·sin(θ). At the top (θ=90°): N = mv²/r − mg. N < 0 means the ball leaves the track. You need v_entry ≥ √(5gr) ≈ ' + Math.sqrt(5*9.81*3.5).toFixed(1) + ' m/s.',
+      },
+
+      // ── Hole 7: Ramp & Bridge ─────────────────────────────────
+      {
+        name: 'H7 — Bridge Jump', par: 4,
+        concept: 'Projectile motion over a gap',
+        greenSize: { w: 40, d: 16 },
+        tee:  new THREE.Vector3(-16, BALL_R, 0),
+        hole: new THREE.Vector3( 15, BALL_R, 4),
+        friction: 0.13, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-18, z1:-8, x2:18, z2:-8 },
+          { type:'rect', x1:-18, z1: 8, x2:18, z2: 8 },
+          { type:'rect', x1:-18, z1:-8, x2:-18, z2: 8 },
+          { type:'rect', x1: 18, z1:-8, x2: 18, z2: 8 },
+        ],
+        obstacles: [
+          { type:'bridge', x: 0, z:-2, len: 9, w: 2.8, h: 1.6 },
+          { type:'ramp',   x:-6, z:-2, w: 3,   d: 4,   h: 1.6, dir:'x' },
+          { type:'sand',   x: 10, z: 0, r: 2 },
+          { type:'water',  x: 0,  z: 3, r: 3 },
+        ],
+        desc: '<strong>Hole 7: Ramp & projectile motion.</strong><br>Hit the ramp to launch over the water onto the bridge. Use loft to give vertical velocity — then gravity takes over.<br><span class="concept">y = v_y·t − ½g·t²</span>',
+        insight: 'Launch angle θ and speed v₀ set the trajectory. Range R = v₀²·sin(2θ)/g. Bridge height h = 1.6 m — you need v_y = √(2gh) ≈ ' + Math.sqrt(2*9.81*1.6).toFixed(1) + ' m/s minimum.',
+      },
+
+      // ── Hole 8: Volcano ───────────────────────────────────────
+      {
+        name: 'H8 — Volcano', par: 4,
+        concept: 'Impulse J = F·Δt = Δp',
+        greenSize: { w: 38, d: 20 },
+        tee:  new THREE.Vector3(-14, BALL_R, 0),
+        hole: new THREE.Vector3( 12, BALL_R, -6),
+        friction: 0.14, wind: new THREE.Vector3(0,0,0),
+        walls: [
+          { type:'rect', x1:-17, z1:-10, x2:17, z2:-10 },
+          { type:'rect', x1:-17, z1: 10, x2:17, z2: 10 },
+          { type:'rect', x1:-17, z1:-10, x2:-17, z2: 10 },
+          { type:'rect', x1: 17, z1:-10, x2: 17, z2: 10 },
+        ],
+        obstacles: [
+          { type:'volcano', x: 0, z: 3, launchSpeed: 14 },
+          { type:'chains',  x: 6, z: 0, gapAt: -5, gapW: 1.2, spacing: 1.4 },
+          { type:'sand',    x:-6, z:-5, r: 2.2 },
+          { type:'sand',    x: 8, z: 5, r: 1.8 },
+        ],
+        desc: '<strong>Hole 8: Impulse & momentum.</strong><br>The volcano launches the ball with a sudden impulse J = F·Δt. Navigate through the chain wall gap to reach the cup.<br><span class="concept">J = Δp = m·Δv</span>',
+        insight: 'The volcano applies a large force over a tiny Δt — an impulse. The ball gains Δv = J/m regardless of direction. After launch, only gravity and friction control it.',
+      },
+
+      // ── Hole 9: Wind + Hills ─────────────────────────────────
+      {
+        name: 'H9 — Crosswind Valley', par: 4,
+        concept: 'F_net = F_friction + F_wind + F_gravity',
+        greenSize: { w: 44, d: 22 },
         tee:  new THREE.Vector3(-18, BALL_R, 0),
         hole: new THREE.Vector3( 18, BALL_R, 0),
-        friction: 0.1,
-        wind: new THREE.Vector3(0, 0, 0),
-        greenSize: { w: 45, d: 25 },
-        walls: [{ type:'rect', x1:-22, z1:-8, x2:22, z2:-8 }, { type:'rect', x1:-22, z1: 8, x2:22, z2: 8 }],
-        obstacles: [
-          { type:'hill', x:-10, z:0, w:12, d:12, h:3 },
-          { type:'valley', x:0, z:0, w:15, d:15, h:4 },
-          { type:'hill', x:10, z:0, w:12, d:12, h:3 },
+        friction: 0.13, wind: new THREE.Vector3(0,0,4.5),
+        walls: [
+          { type:'rect', x1:-20, z1:-11, x2:20, z2:-11 },
+          { type:'rect', x1:-20, z1: 11, x2:20, z2: 11 },
         ],
-        insight: 'Energy is conserved (minus friction). The depth of the valley provides kinetic energy boost, but you must keep enough to reach the cup on the other side.',
-      },
-      {
-        name: 'Hole 10 — The Half-Pipe', par: 3,
-        concept: 'Oscillation',
-        desc: '<strong>Concept: Lateral potential energy.</strong><br>The green is curved like a half-pipe. Aim slightly up the bank to let the curve guide you to the hole.<br><span class="concept">a_curve = g·sin(θ)</span>',
-        tee:  new THREE.Vector3(-18, BALL_R, 3),
-        hole: new THREE.Vector3( 18, BALL_R, -3),
-        friction: 0.08,
-        wind: new THREE.Vector3(0, 0, 0),
-        greenSize: { w: 50, d: 30 },
-        walls: [],
         obstacles: [
-          { type:'valley', x:0, z:0, w:60, d:15, h:5 },
+          { type:'hill',  x:-8, z: 0, w:10, d:14, h: 2.5 },
+          { type:'valley',x: 4, z: 0, w:10, d:14, h: 2.0 },
+          { type:'sand',  x: 0, z: 6, r: 2.5 },
+          { type:'water', x: 0, z:-5, r: 2.5 },
         ],
-        insight: 'A continuous valley creates a restoring force toward the center. Use the banks to steer!',
-      },
-      {
-        name: 'Hole 11 — The Oasis', par: 4,
-        concept: 'Discontinuous Friction',
-        desc: '<strong>Concept: Different surfaces have different friction coefficients.</strong><br>Sand traps drastically increase the deceleration force μg. Water traps are out of bounds and apply a penalty!<br><span class="concept">f_k = μ_k N</span>',
-        tee:  new THREE.Vector3(-15, BALL_R, 0),
-        hole: new THREE.Vector3( 15, BALL_R, 0),
-        friction: 0.12,
-        wind: new THREE.Vector3(0, 0, 0),
-        greenSize: { w: 40, d: 25 },
-        walls: [{ type:'rect', x1:-20, z1:-12, x2:20, z2:-12 }, { type:'rect', x1:-20, z1: 12, x2:20, z2: 12 }],
-        obstacles: [
-          { type:'sand', x:-5, z:5, r:4.5 },
-          { type:'sand', x:-5, z:-5, r:4.5 },
-          { type:'water', x:5, z:0, r:5.5 },
-        ],
-        insight: 'Entering sand multiplies friction by 3, rapidly draining kinetic energy. Water terminates the ball state.',
+        desc: '<strong>Hole 9: Superposition of forces.</strong><br>Crosswind pushes sideways. Hills convert KE to PE. Net force = vector sum of all forces. Aim into the wind.<br><span class="concept">a = (F_friction + F_wind + F_slope) / m</span>',
+        insight: 'On the hill slope, gravity\'s tangential component a_t = g·sin(θ) decelerates you. Wind continuously adds lateral velocity. The net trajectory is a curve — plan ahead.',
       },
     ];
 
@@ -721,6 +737,192 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         obstacles3d.push(hill);
         hill.userData = { wallType: 'hill', x: o.x, z: o.z, w: o.w, d: o.d, h: o.h };
       }
+
+      // ── Windmill ──────────────────────────────────────────────────
+      if (o.type === 'windmill') {
+        // Tower
+        const tower = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 4, 1.2),
+          new THREE.MeshLambertMaterial({ color: 0xd4a574 })
+        );
+        tower.position.set(o.x, 2, o.z);
+        tower.castShadow = true;
+        scene.add(tower); obstacles3d.push(tower);
+        // Rotor hub
+        const hub = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.25, 0.25, 0.5, 12),
+          new THREE.MeshLambertMaterial({ color: 0x888888 })
+        );
+        hub.rotation.x = Math.PI / 2;
+        hub.position.set(o.x, 2.5, o.z - 0.8);
+        scene.add(hub); obstacles3d.push(hub);
+        // 4 blades as a rotating group
+        const bladeGroup = new THREE.Group();
+        bladeGroup.position.set(o.x, 2.5, o.z - 0.9);
+        for (let b = 0; b < 4; b++) {
+          const blade = new THREE.Mesh(
+            new THREE.BoxGeometry(0.25, o.bladeLen || 3.5, 0.08),
+            new THREE.MeshLambertMaterial({ color: 0xf5e6c8 })
+          );
+          blade.rotation.z = (b * Math.PI) / 2;
+          blade.position.y = (o.bladeLen || 3.5) / 2;
+          blade.rotation.z = (b / 4) * Math.PI * 2;
+          // position along blade
+          blade.position.set(
+            Math.sin((b/4)*Math.PI*2) * (o.bladeLen||3.5)/2,
+            Math.cos((b/4)*Math.PI*2) * (o.bladeLen||3.5)/2,
+            0
+          );
+          const bladeM = new THREE.Mesh(
+            new THREE.BoxGeometry(0.22, o.bladeLen || 3.5, 0.1),
+            new THREE.MeshLambertMaterial({ color: 0xf5e6c8 })
+          );
+          bladeGroup.add(bladeM);
+          bladeM.position.set(0, (o.bladeLen||3.5)/2, 0);
+          bladeM.rotation.z = (b / 4) * Math.PI * 2;
+        }
+        scene.add(bladeGroup); obstacles3d.push(bladeGroup);
+        bladeGroup.userData = {
+          wallType: 'windmill',
+          cx: o.x, cz: o.z, bladeLen: o.bladeLen || 3.5,
+          speed: o.speed || 1.5, angle: 0,
+          gapZ: o.z, passY: 2.5
+        };
+        // Wall segments either side of gap
+        const gapHalf = o.gap || 0.7;
+        const wallH = 0.8;
+        [-1, 1].forEach(side => {
+          const ww = new THREE.Mesh(
+            new THREE.BoxGeometry(0.3, wallH * 2, 0.22),
+            new THREE.MeshLambertMaterial({ color: 0x2a4a3a })
+          );
+          ww.position.set(o.x, wallH, o.z + side * (gapHalf + 1.2));
+          scene.add(ww); obstacles3d.push(ww);
+          ww.userData = { wallType: 'edge', x1: o.x - 0.2, z1: o.z + side*(gapHalf+0.1), x2: o.x + 0.2, z2: o.z + side*(gapHalf+2.4), nx: 1, nz: 0 };
+        });
+      }
+
+      // ── Bridge ────────────────────────────────────────────────────
+      if (o.type === 'bridge') {
+        const bridgeMat = new THREE.MeshLambertMaterial({ color: 0x8B6914 });
+        const deck = new THREE.Mesh(new THREE.BoxGeometry(o.len||8, 0.2, o.w||2.6), bridgeMat);
+        deck.position.set(o.x, o.h||1.5, o.z);
+        deck.castShadow = true; deck.receiveShadow = true;
+        scene.add(deck); obstacles3d.push(deck);
+        deck.userData = { wallType: 'bridge', x: o.x, z: o.z, len: o.len||8, w: o.w||2.6, h: o.h||1.5 };
+        // Water below
+        const water = new THREE.Mesh(
+          new THREE.PlaneGeometry(o.len||8, o.w||2.6),
+          new THREE.MeshLambertMaterial({ color: 0x1ca3ff, transparent: true, opacity: 0.75 })
+        );
+        water.rotation.x = -Math.PI/2;
+        water.position.set(o.x, 0.05, o.z);
+        scene.add(water); obstacles3d.push(water);
+        water.userData = { type: 'water', x: o.x, z: o.z, lenX: o.len||8, lenZ: o.w||2.6, isRect: true };
+        // Railings
+        [-1,1].forEach(side => {
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(o.len||8, 0.5, 0.1), bridgeMat);
+          rail.position.set(o.x, (o.h||1.5)+0.35, o.z + side*((o.w||2.6)/2));
+          scene.add(rail); obstacles3d.push(rail);
+          rail.userData = { wallType:'edge', x1:o.x-(o.len||8)/2, z1:o.z+side*((o.w||2.6)/2), x2:o.x+(o.len||8)/2, z2:o.z+side*((o.w||2.6)/2), nx:0, nz:side };
+        });
+        // Support posts
+        [-1,1].forEach(ex => {
+          const post = new THREE.Mesh(new THREE.BoxGeometry(0.3, o.h||1.5, 0.3), bridgeMat);
+          post.position.set(o.x + ex*((o.len||8)/2 - 0.15), (o.h||1.5)/2, o.z);
+          scene.add(post); obstacles3d.push(post);
+        });
+      }
+
+      // ── Ramp jump ─────────────────────────────────────────────────
+      if (o.type === 'ramp') {
+        const rampMat = new THREE.MeshLambertMaterial({ color: 0x8B7355 });
+        const ramp = new THREE.Mesh(new THREE.BoxGeometry(o.w||3, 0.2, o.d||5), rampMat);
+        ramp.position.set(o.x, (o.h||1.5)/2, o.z);
+        ramp.rotation.x = -(o.h||1.5) / (o.d||5) * 1.2; // slope angle
+        ramp.castShadow = true;
+        scene.add(ramp); obstacles3d.push(ramp);
+        ramp.userData = { wallType:'ramp', x:o.x, z:o.z, w:o.w||3, d:o.d||5, h:o.h||1.5, dir: o.dir||'x' };
+      }
+
+      // ── Volcano / pipe launcher ───────────────────────────────────
+      if (o.type === 'volcano') {
+        const vMat = new THREE.MeshLambertMaterial({ color: 0x8B3A1A });
+        const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 2.5, 3, 16), vMat);
+        cone.position.set(o.x, 1.5, o.z);
+        scene.add(cone); obstacles3d.push(cone);
+        cone.userData = { wallType:'volcano', x:o.x, z:o.z, r:2.5, launchSpeed: o.launchSpeed||12 };
+        // Lava glow ring
+        const glow = new THREE.Mesh(
+          new THREE.TorusGeometry(0.6, 0.15, 8, 24),
+          new THREE.MeshLambertMaterial({ color: 0xff4500, emissive: 0xff2200, emissiveIntensity:0.8 })
+        );
+        glow.position.set(o.x, 3.05, o.z);
+        scene.add(glow); obstacles3d.push(glow);
+      }
+
+      // ── Wall of chains (posts with narrow gaps) ───────────────────
+      if (o.type === 'chains') {
+        const postMat = new THREE.MeshLambertMaterial({ color: 0x444444 });
+        const gapCenter = o.gapAt || 0;
+        for (let i = -3; i <= 3; i++) {
+          const zPos = o.z + i * (o.spacing||1.4);
+          if (Math.abs(zPos - gapCenter) < (o.gapW||0.9)) continue;
+          const post = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.5, 8), postMat);
+          post.position.set(o.x, 0.75, zPos);
+          scene.add(post); obstacles3d.push(post);
+          post.userData = { wallType:'cylinderObstacle', cx:o.x, cz:zPos, r:0.18 };
+        }
+        // Chain links between posts (visual)
+        for (let i = -2; i <= 2; i++) {
+          const zPos = o.z + i * (o.spacing||1.4) + (o.spacing||1.4)/2;
+          if (Math.abs(zPos - gapCenter) < (o.gapW||0.9)) continue;
+          const chain = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.025, 6, 12), postMat);
+          chain.position.set(o.x, 0.8, zPos);
+          chain.rotation.y = Math.PI/2;
+          scene.add(chain);
+        }
+      }
+
+      // ── Tires ─────────────────────────────────────────────────────
+      if (o.type === 'tires') {
+        const tireMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+        (o.positions || [[o.x, o.z]]).forEach(([tx, tz]) => {
+          const tire = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.28, 8, 20), tireMat);
+          tire.rotation.x = Math.PI/2;
+          tire.position.set(tx, 0.28, tz);
+          scene.add(tire); obstacles3d.push(tire);
+          tire.userData = { wallType:'cylinderObstacle', cx:tx, cz:tz, r:0.98 };
+        });
+      }
+
+      // ── Log cabin / barn tunnel ───────────────────────────────────
+      if (o.type === 'barn') {
+        const woodMat = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+        const roofMat = new THREE.MeshLambertMaterial({ color: 0xcc3300 });
+        const len = o.len || 6;
+        // Floor (just visual)
+        const floor = new THREE.Mesh(new THREE.BoxGeometry(len, 0.1, o.w||3), woodMat);
+        floor.position.set(o.x, 0.05, o.z);
+        scene.add(floor); obstacles3d.push(floor);
+        // Side walls (with gap for ball)
+        [-1,1].forEach(side => {
+          const wall = new THREE.Mesh(new THREE.BoxGeometry(len, 1.6, 0.25), woodMat);
+          wall.position.set(o.x, 0.8, o.z + side*((o.w||3)/2));
+          wall.castShadow = true;
+          scene.add(wall); obstacles3d.push(wall);
+          wall.userData = { wallType:'edge', x1:o.x-len/2, z1:o.z+side*(o.w||3)/2, x2:o.x+len/2, z2:o.z+side*(o.w||3)/2, nx:0, nz:side };
+        });
+        // Peaked roof
+        const roofL = new THREE.Mesh(new THREE.BoxGeometry(len, 0.15, (o.w||3)/2+0.4), roofMat);
+        roofL.position.set(o.x, 1.8, o.z - (o.w||3)/4);
+        roofL.rotation.x = 0.4;
+        scene.add(roofL);
+        const roofR = new THREE.Mesh(new THREE.BoxGeometry(len, 0.15, (o.w||3)/2+0.4), roofMat);
+        roofR.position.set(o.x, 1.8, o.z + (o.w||3)/4);
+        roofR.rotation.x = -0.4;
+        scene.add(roofR);
+      }
     }
 
     function buildWindParticles(wind) {
@@ -912,11 +1114,12 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         // Normal force per unit mass: v²/r - g·sin(θ)
         const N = (loopSpeed * loopSpeed / ld.r) - G_CONST * Math.sin(loopAngle);
         if (N < 0) {
-          // Ball falls off — becomes airborne from current position
-          loopMode = false;
-          loopData = null;
+          // Ball falls off top — tangential direction at that angle, blended with entry dir
+          loopMode = false; loopData = null; loopCooldown = 1.5;
           const tDir = new THREE.Vector3(-Math.sin(loopAngle), Math.cos(loopAngle), 0);
-          vel.copy(tDir.multiplyScalar(loopSpeed));
+          // Preserve Z heading from entry so ball doesn't fly into the wall
+          tDir.z = loopEntryDir.z * Math.abs(Math.sin(loopAngle));
+          vel.copy(tDir.normalize().multiplyScalar(Math.abs(loopSpeed)));
           // Normal physics (airborne) will handle it next frame
         } else {
           const frictionAcc = mu * N * (loopSpeed > 0 ? -1 : 1);
@@ -938,17 +1141,21 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           // Exit after exactly one revolution
           if (ld.travel >= Math.PI * 2) {
             loopMode = false; loopData = null;
-            vel.set(Math.abs(loopSpeed), 0, 0); // exit rightward at loop base
+            loopCooldown = 1.2; // prevent immediate re-entry
+            // Exit in the same direction the ball entered, preserving speed
+            vel.copy(loopEntryDir.clone().multiplyScalar(Math.abs(loopSpeed)));
             pos.y = BALL_R;
           }
           return; // skip normal physics
         }
       }
 
+      if (loopCooldown > 0) loopCooldown -= dt;
+
       const speed = vel.length();
 
       // ── Loop entry detection ─────────────────────────────────────
-      if (!loopMode) {
+      if (!loopMode && loopCooldown <= 0) {
         for (let mesh of obstacles3d) {
           if (mesh.userData.wallType !== 'loop') continue;
           const wd = mesh.userData;
@@ -962,6 +1169,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
             loopAngle      = Math.atan2(dy2, dx2);
             loopAngleEntry = loopAngle;
             loopSpeed      = vel.length();
+            // Save XZ heading so exit preserves direction
+            loopEntryDir   = new THREE.Vector3(vel.x, 0, vel.z).normalize();
             const vMin = Math.sqrt(G_CONST * wd.r);
             toast(`Kelty Loop! Need v ≥ ${vMin.toFixed(1)} m/s at top. Current: ${loopSpeed.toFixed(1)}`);
             return;
@@ -1056,7 +1265,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
 
       const newPos = pos.clone().add(vel.clone().multiplyScalar(dt));
-      const collided = resolveCollisions(pos, newPos, vel, dt);
+      const collided = resolveCollisions(pos, newPos, vel);
       pos.copy(collided.pos);
       vel.copy(collided.vel);
       
@@ -1119,7 +1328,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
     }
 
-    function resolveCollisions(oldPos, newPos, vel, dt) {
+    function resolveCollisions(oldPos, newPos, vel) {
       let p = newPos.clone(), v = vel.clone();
 
       for (let mesh of obstacles3d) {
@@ -1181,27 +1390,57 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           }
         }
 
-        if (wd.wallType === 'loop') {
-          // Snap ball to loop track if conditions met
-          const dx = p.x - wd.cx, dz = p.z - wd.cz;
-          const distFromPlane = Math.abs(dz);
-          if (distFromPlane < wd.w && Math.abs(dx) < wd.r + BALL_R) {
-             const distToCenter = Math.sqrt(dx*dx + (p.y - wd.r)**2);
-             if (Math.abs(distToCenter - wd.r) < BALL_R * 2) {
-               const angle = Math.atan2(p.y - wd.r, dx);
-               const speed = v.length();
-               // Centripetal check: v² / r must be > g at peak (angle ≈ π/2)
-               const vMin = Math.sqrt(G_CONST * wd.r);
-               if (speed > vMin * 0.7) { 
-                 const nextAngle = angle + (v.x / wd.r) * dt;
-                 p.x = wd.cx + Math.cos(nextAngle) * wd.r;
-                 p.y = wd.r + Math.sin(nextAngle) * wd.r;
-                 p.z = wd.cz;
-                 v.x = -Math.sin(nextAngle) * speed;
-                 v.y = Math.cos(nextAngle) * speed;
-                 v.z = 0;
-               }
-             }
+        // Cylinder obstacles (tires, chains)
+        if (wd.wallType === 'cylinderObstacle') {
+          const ddx = p.x - wd.cx, ddz = p.z - wd.cz;
+          const dd = Math.sqrt(ddx*ddx + ddz*ddz);
+          if (dd < BALL_R + wd.r && dd > 0.001) {
+            const pen = BALL_R + wd.r - dd;
+            const nx2 = ddx/dd, nz2 = ddz/dd;
+            p.x += nx2 * pen; p.z += nz2 * pen;
+            const vn = v.x*nx2 + v.z*nz2;
+            if (vn < 0) { v.x -= 1.6*vn*nx2; v.z -= 1.6*vn*nz2; }
+          }
+        }
+
+        // Windmill blade collision (treated as spinning bar)
+        if (wd.wallType === 'windmill') {
+          const ang = wd.angle;
+          for (let b = 0; b < 4; b++) {
+            const bAng = ang + (b/4)*Math.PI*2;
+            const bLen = wd.bladeLen;
+            const bx1 = wd.cx;
+            const bx2 = wd.cx + Math.sin(bAng) * bLen;
+            const by2 = wd.passY + Math.cos(bAng) * bLen;
+            // Only check if ball is near the windmill in Z
+            if (Math.abs(p.z - wd.cz) > 2.5) continue;
+            const adx = bx2-bx1, ady = by2-wd.passY;
+            const al2 = Math.sqrt(adx*adx + ady*ady);
+            const t2 = Math.max(0,Math.min(1,((p.x-bx1)*adx + (p.y-wd.passY)*ady)/(al2*al2)));
+            const cpx2 = bx1+t2*adx, cpy2 = wd.passY+t2*ady;
+            const dxx = p.x-cpx2, dyy = p.y-cpy2;
+            const dd2 = Math.sqrt(dxx*dxx + dyy*dyy);
+            if (dd2 < BALL_R + 0.14) {
+              const nn2 = dd2 > 0.001 ? 1/dd2 : 1;
+              const nx3 = dxx*nn2, ny3 = dyy*nn2;
+              const pen = BALL_R + 0.14 - dd2;
+              p.x += nx3*pen; p.y += ny3*pen;
+              const bladeSpd = wd.speed * bLen;
+              v.x += Math.sin(bAng)*bladeSpd*0.4;
+              v.y += Math.cos(bAng)*bladeSpd*0.4;
+            }
+          }
+        }
+
+        // Volcano — teleport/launch ball
+        if (wd.wallType === 'volcano') {
+          const ddx = p.x - wd.x, ddz = p.z - wd.z;
+          if (Math.sqrt(ddx*ddx + ddz*ddz) < wd.r * 0.6) {
+            // Launch ball up and slightly forward
+            v.y = wd.launchSpeed;
+            v.x = (Math.random()-0.5)*4;
+            v.z = (Math.random()-0.5)*4;
+            toast(`Volcano! Launched at ${wd.launchSpeed} m/s`);
           }
         }
       }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -151,9 +151,8 @@ export default function CNCDialectTable({ params = {} }) {
             {ROWS.map((row, i) => {
               const isActive = activeRow === i
               return (
-                <>
+                <React.Fragment key={i}>
                   <tr
-                    key={i}
                     onClick={() => setActiveRow(isActive ? null : i)}
                     style={{ cursor: 'pointer', background: isActive ? C.rowHover : 'transparent', borderBottom: isActive ? 'none' : `1px solid ${C.border}` }}
                   >
@@ -185,7 +184,7 @@ export default function CNCDialectTable({ params = {} }) {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               )
             })}
           </tbody>

@@ -6,6 +6,7 @@ const VIZ_REGISTRY = {
   MiniGolfGame: lazy(() => import("./react/MiniGolfGame.jsx")),
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
   CNCLab: lazy(() => import("./cnc/CNCLab.jsx")),
+  ErrorAccumulationLab: lazy(() => import("./cnc/ErrorAccumulationLab.jsx")),
   CNCBackplot: lazy(() => import("./cnc/CNCBackplot.jsx")),
   CNCMacroLab: lazy(() => import("./cnc/CNCMacroLab.jsx")),
   CNCAxesExplorer: lazy(() => import("./cnc/CNCAxesExplorer.jsx")),
