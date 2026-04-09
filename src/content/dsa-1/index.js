@@ -7,6 +7,8 @@ import dsa0_002 from './dsa0-002-big-o.js';
 import dsa0_003 from './dsa0-003-algorithmic-thinking.js';
 import dsa1_001 from './dsa1-001-arrays.js';
 import dsa1_002 from './dsa1-002-linked-lists.js';
+import dsa1_003 from './dsa1-003-stacks-and-queues.js';
+import dsa1_004 from './dsa1-004-strings.js';
 
 const DSA_CH0 = {
   title: 'Computational Foundations',
@@ -30,6 +32,8 @@ const DSA_CH1 = {
   lessons: [
     dsa1_001,
     dsa1_002,
+    dsa1_003,
+    dsa1_004,
   ],
 };
 
