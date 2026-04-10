@@ -634,19 +634,33 @@ var chartX=60,chartY=18,chartW=W-90,chartH=H-66;
 var minT=0,maxT=100;
 
 // Solubility data: [temp, solubility g/100mL]
-var substances=[
-  {name:\'KNO₃\',  color:\'#f87171\',
-   data:[[0,13],[20,32],[40,64],[60,110],[80,169],[100,246]]},
-  {name:\'NaCl\',  color:\'#38bdf8\',
-   data:[[0,35.7],[20,35.9],[40,36.4],[60,37.1],[80,38.0],[100,39.2]]},
-  {name:\'KCl\',   color:\'#a78bfa\',
-   data:[[0,27.6],[20,34.0],[40,40.0],[60,45.5],[80,51.1],[100,56.7]]},
-  {name:\'NaHCO₃\',color:\'#fb923c\',
-   data:[[0,6.9],[20,9.6],[40,12.7],[60,16.4],[80,20.0],[100,--0]]},
-  {name:\'CO₂ (×100)\',color:\'#4ade80\',
-   data:[[0,0.335],[20,0.169],[40,0.097],[60,0.058],[80,0.035],[100,0.02]],
-   scale:100},
-];
+try {
+  var substances = [
+    {
+      name: 'KNO₃', color: '#f87171',
+      data: [[0, 13], [20, 32], [40, 64], [60, 110], [80, 169], [100, 246]]
+    },
+    {
+      name: 'NaCl', color: '#38bdf8',
+      data: [[0, 35.7], [20, 35.9], [40, 36.4], [60, 37.1], [80, 38.0], [100, 39.2]]
+    },
+    {
+      name: 'KCl', color: '#a78bfa',
+      data: [[0, 27.6], [20, 34.0], [40, 40.0], [60, 45.5], [80, 51.1], [100, 56.7]]
+    },
+    {
+      name: 'NaHCO₃', color: '#fb923c',
+      data: [[0, 6.9], [20, 9.6], [40, 12.7], [60, 16.4], [80, 20.0], [100, 23.6]] 
+    }, // Closed the array and the object here
+    {
+      name: 'CO₂ (×100)', color: '#4ade80',
+      data: [[0, 0.335], [20, 0.169], [40, 0.097], [60, 0.058], [80, 0.035], [100, 0.02]],
+      scale: 100
+    }
+  ];
+} catch (error) { // Added parentheses
+  console.log(error);
+}
 
 // Find max solubility for scaling
 var maxSol=0;
