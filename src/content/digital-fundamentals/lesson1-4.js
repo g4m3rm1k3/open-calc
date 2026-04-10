@@ -374,7 +374,7 @@ Typical propagation delays in modern processes:
 
 **Combinational logic depth** (the number of gates a signal must pass through from input to output) determines the minimum clock period:
 
-$$T_{clock} \geq n \times t_{pd,max}$$
+$T_{clock} \geq n \times t_{pd,max}$
 
 where $n$ is the maximum logic depth and $t_{pd,max}$ is the slowest gate's delay. This is the fundamental timing constraint of synchronous digital design.
 

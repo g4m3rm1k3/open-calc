@@ -27,8 +27,8 @@ The last rule is the key one: **1 + 1 = 10 in binary** (decimal 2), giving a sum
 
 A **full adder** handles three inputs: bit A, bit B, and a carry-in from the previous column. It produces a Sum bit and a Carry-out:
 
-$$\\text{Sum} = A \\oplus B \\oplus C_{in}$$
-$$\\text{Carry}_{out} = (A \\cdot B) + (C_{in} \\cdot (A \\oplus B))$$
+$\\text{Sum} = A \\oplus B \\oplus C_{in}$
+$\\text{Carry}_{out} = (A \\cdot B) + (C_{in} \\cdot (A \\oplus B))$
 
 Chaining eight full adders gives an **8-bit ripple-carry adder**. The carry propagates (ripples) from bit 0 through to bit 7. If the final carry-out is 1 and there is nowhere for it to go, the result has overflowed the 8-bit range (0–255 for unsigned integers).`,
     },
@@ -363,7 +363,7 @@ draw();verify();`,
 
 Once you have two's complement, **subtraction requires no new hardware**:
 
-$$A - B = A + (-B) = A + (\\overline{B} + 1)$$
+$A - B = A + (-B) = A + (\\overline{B} + 1)$
 
 where $\\overline{B}$ is the bitwise NOT (one's complement) of B.
 

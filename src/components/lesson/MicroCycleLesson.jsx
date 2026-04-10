@@ -615,6 +615,17 @@ export default function MicroCycleLesson({ lesson }) {
       )}
       <MathBlock data={lesson.math} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
+      {lesson.python?.visualizations?.length > 0 && (
+        <div className="mb-8">
+          <SectionDivider icon="🐍" label={lesson.python.title ?? 'Python Lab'} color="brand" noteId={lesson.id ? `${lesson.id}:python` : undefined} />
+          {lesson.python.description && (
+            <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{lesson.python.description}</p>
+          )}
+          {lesson.python.visualizations.map((v, i) => (
+            <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined} borderColor="border-brand-200 dark:border-brand-900/60" />
+          ))}
+        </div>
+      )}
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
       <SpiralBlock spiral={lesson.spiral} />

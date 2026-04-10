@@ -18,11 +18,11 @@ Our familiar decimal system uses base 10 — ten distinct digit symbols (0–9).
 
 **Positional notation** works identically in any base. In base 10:
 
-$$345 = 3 \\times 10^2 + 4 \\times 10^1 + 5 \\times 10^0$$
+$345 = 3 \\times 10^2 + 4 \\times 10^1 + 5 \\times 10^0$
 
 In base 2, each position's weight is a power of 2:
 
-$$1011_2 = 1 \\times 2^3 + 0 \\times 2^2 + 1 \\times 2^1 + 1 \\times 2^0 = 8 + 0 + 2 + 1 = 11_{10}$$
+$1011_2 = 1 \\times 2^3 + 0 \\times 2^2 + 1 \\times 2^1 + 1 \\times 2^0 = 8 + 0 + 2 + 1 = 11_{10}$
 
 The rightmost bit (weight $2^0 = 1$) is the **Least Significant Bit (LSB)**. The leftmost bit (highest weight) is the **Most Significant Bit (MSB)**.
 
@@ -36,7 +36,7 @@ The rightmost bit (weight $2^0 = 1$) is the **Least Significant Bit (LSB)**. The
 | Word | Processor-defined width: 16, 32, or 64 bits |
 
 **Range of an N-bit unsigned integer**:
-$$0 \\text{ to } 2^N - 1$$
+$0 \\text{ to } 2^N - 1$
 
 Adding one bit doubles the range. An 8-bit byte holds 256 distinct values (0–255), a 16-bit word holds 65,536 (0–65535), and a 32-bit word holds over 4 billion values.`,
     },
@@ -287,7 +287,7 @@ refresh();`,
 
 **Binary → Decimal**: Sum the weights of all positions where the bit is 1.
 
-$$1101_2 = 1 \\times 8 + 1 \\times 4 + 0 \\times 2 + 1 \\times 1 = 13_{10}$$
+$1101_2 = 1 \\times 8 + 1 \\times 4 + 0 \\times 2 + 1 \\times 1 = 13_{10}$
 
 **Decimal → Binary**: Use the **divide-by-two algorithm**. Repeatedly divide by 2 and write down each remainder. Read the remainders from bottom to top.
 
