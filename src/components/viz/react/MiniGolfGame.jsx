@@ -554,22 +554,32 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       for (let w of lv.walls) buildWall(w);
       for (let o of lv.obstacles) buildObstacle(o);
 
-      // Hole (Classic Minigolf Cup)
+      // Hole — deep cylinder so ball visually drops in
+      const holeTerrY = getTerrainHeight(lv.hole.x, lv.hole.z);
       const hole3d = new THREE.Mesh(
-        new THREE.CylinderGeometry(HOLE_R, HOLE_R, 0.4, 32),
-        new THREE.MeshLambertMaterial({ color: 0x000000 })
+        new THREE.CylinderGeometry(HOLE_R, HOLE_R, 0.7, 32),
+        new THREE.MeshLambertMaterial({ color: 0x050505 })
       );
-      hole3d.position.copy(lv.hole);
-      hole3d.position.y = getTerrainHeight(lv.hole.x, lv.hole.z) - 0.2;
+      hole3d.position.set(lv.hole.x, holeTerrY - 0.35, lv.hole.z); // top flush with terrain
       scene.add(hole3d); obstacles3d.push(hole3d);
+      // Metal cup rim
+      const rimRing = new THREE.Mesh(
+        new THREE.TorusGeometry(HOLE_R, 0.04, 8, 32),
+        new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.7, roughness: 0.3 })
+      );
+      rimRing.rotation.x = Math.PI / 2;
+      rimRing.position.set(lv.hole.x, holeTerrY + 0.01, lv.hole.z);
+      scene.add(rimRing); obstacles3d.push(rimRing);
 
       // Flag
-      const hY = getTerrainHeight(lv.hole.x, lv.hole.z);
+      const hY = holeTerrY;
       const pole3d = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.04, 5, 8),
         new THREE.MeshLambertMaterial({ color: 0xffffff })
       );
       pole3d.position.set(lv.hole.x, hY + 2.5, lv.hole.z);
+      // Flag pole is a solid obstacle — ball bounces off it (guarded in resolveCollisions so it can't block scoring)
+      pole3d.userData = { wallType: 'cylinderObstacle', cx: lv.hole.x, cz: lv.hole.z, r: 0.06, isFlagPole: true };
       scene.add(pole3d); obstacles3d.push(pole3d);
 
       const flag3d = new THREE.Mesh(
@@ -595,6 +605,12 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 80, specular: 0x999999 })
         );
         ball3d.castShadow = true;
+        // Red stripe so spin is visible when ball rotates
+        const stripe = new THREE.Mesh(
+          new THREE.TorusGeometry(BALL_R * 0.72, BALL_R * 0.18, 6, 24),
+          new THREE.MeshPhongMaterial({ color: 0xff3333 })
+        );
+        ball3d.add(stripe);
         scene.add(ball3d);
       }
 
@@ -781,6 +797,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           bladeM.position.set(0, (o.bladeLen||3.5)/2, 0);
           bladeM.rotation.z = (b / 4) * Math.PI * 2;
         }
+        // Position blades at ball-path Z so rotation actually blocks the ball
+        bladeGroup.position.set(o.x, 2.5, o.z);
         scene.add(bladeGroup); obstacles3d.push(bladeGroup);
         bladeGroup.userData = {
           wallType: 'windmill',
@@ -1060,9 +1078,18 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       return new THREE.Vector3(h1 - h2, 2 * eps, h3 - h4).normalize();
     }
 
-    // Always-running scene updates (spinners spin and collide every frame)
+    // Always-running scene updates (spinners + windmill spin every frame)
     function updateSceneObjects(dt) {
       if (!pos) return;
+
+      // Windmill blade rotation (around Z axis)
+      for (let mesh of obstacles3d) {
+        if (mesh.userData.wallType !== 'windmill') continue;
+        const wd = mesh.userData;
+        wd.angle += wd.speed * dt;
+        mesh.rotation.z = wd.angle;
+      }
+
       for (let mesh of obstacles3d) {
         if (mesh.userData.wallType !== 'spinner') continue;
         const wd = mesh.userData;
@@ -1264,6 +1291,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         }
       }
 
+      const prevPos = pos.clone(); // capture pre-integration position for swept cup test
       const newPos = pos.clone().add(vel.clone().multiplyScalar(dt));
       const collided = resolveCollisions(pos, newPos, vel);
       pos.copy(collided.pos);
@@ -1280,8 +1308,9 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       }
 
       ball3d.position.copy(pos);
-      ball3d.rotation.x += vel.z * dt * 3;
-      ball3d.rotation.z -= vel.x * dt * 3;
+      // Rolling without slipping: ω = v / r
+      ball3d.rotation.x += vel.z / BALL_R * dt;
+      ball3d.rotation.z -= vel.x / BALL_R * dt;
 
       rollTime += dt;
       rollDist += vel.length() * dt;
@@ -1291,32 +1320,34 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       updateArrows();
       updateStats();
 
-      const dx = pos.x - lv.hole.x, dz = pos.z - lv.hole.z;
-      const distToHole = Math.sqrt(dx*dx + dz*dz);
-      const spd = vel.length();
-
-      if (!isAirborne && distToHole < HOLE_R * 2.2) {
-        // Real cup physics: rim acts as a barrier — ball must be slow enough to drop in.
-        // v_lip ≈ √(2g · HOLE_R) ≈ 3.4 m/s; faster than that and it lips out.
-        const V_LIP = Math.sqrt(2 * G_CONST * HOLE_R); // ~3.4 m/s
-
-        if (distToHole < HOLE_R * 0.85 && spd < V_LIP) {
-          // Ball drops in — holed!
+      // Cup check — swept segment prevents tunneling at high speed
+      // Ball enters hole at ANY speed (no lip-out mechanic — just like a real cup cut in the green)
+      {
+        const hx = lv.hole.x, hz = lv.hole.z;
+        const sx = pos.x - prevPos.x, sz = pos.z - prevPos.z;
+        const segLen2 = sx*sx + sz*sz;
+        let closestDist;
+        if (segLen2 < 0.0001) {
+          const ddx = pos.x - hx, ddz = pos.z - hz;
+          closestDist = Math.sqrt(ddx*ddx + ddz*ddz);
+        } else {
+          const t = Math.max(0, Math.min(1, ((hx - prevPos.x)*sx + (hz - prevPos.z)*sz) / segLen2));
+          const cx2 = prevPos.x + t*sx, cz2 = prevPos.z + t*sz;
+          closestDist = Math.sqrt((cx2-hx)*(cx2-hx) + (cz2-hz)*(cz2-hz));
+        }
+        if (!isAirborne && closestDist < HOLE_R) {
           vel.set(0, 0, 0);
-          pos.x = lv.hole.x; pos.z = lv.hole.z; pos.y -= 0.12;
+          pos.x = hx; pos.z = hz;
           winLevel();
-        } else if (distToHole < HOLE_R * 1.3 && spd < V_LIP * 0.7) {
-          // Slow enough — funnel pull toward center
-          const pullStr = (HOLE_R * 1.3 - distToHole) * 12;
-          const toHole = new THREE.Vector3(-dx, 0, -dz).normalize();
-          vel.add(toHole.multiplyScalar(pullStr * dt));
-        } else if (distToHole < HOLE_R && spd >= V_LIP) {
-          // Too fast — lip-out: reflect velocity component away from center
-          const outDir = new THREE.Vector3(dx, 0, dz).normalize();
-          const vn = vel.dot(outDir);
-          if (vn < 0) { // heading into hole
-            vel.addScaledVector(outDir, -2 * vn * 0.6); // elastic bounce outward, lose 40%
-            toast(`Lip out! Hit it softer — v_lip ≈ ${V_LIP.toFixed(1)} m/s`);
+          return;
+        } else if (!isAirborne && closestDist < HOLE_R * 1.5) {
+          // Gentle funnel pull near rim so ball rolls in naturally
+          const pullDx = pos.x - hx, pullDz = pos.z - hz;
+          const pullDist = Math.sqrt(pullDx*pullDx + pullDz*pullDz);
+          if (pullDist > 0.01) {
+            const pullStr = (HOLE_R * 1.5 - pullDist) * 7;
+            vel.x -= (pullDx / pullDist) * pullStr * dt;
+            vel.z -= (pullDz / pullDist) * pullStr * dt;
           }
         }
       }
@@ -1390,8 +1421,15 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           }
         }
 
-        // Cylinder obstacles (tires, chains)
+        // Cylinder obstacles (tires, chains, flag pole)
         if (wd.wallType === 'cylinderObstacle') {
+          // Flag pole: skip collision when ball is already inside the cup radius
+          // so it can never block a legitimate hole-out
+          if (wd.isFlagPole) {
+            const fpLv = LEVELS[currentLevel];
+            const fpDx2 = p.x - fpLv.hole.x, fpDz2 = p.z - fpLv.hole.z;
+            if (Math.sqrt(fpDx2*fpDx2 + fpDz2*fpDz2) < HOLE_R) continue;
+          }
           const ddx = p.x - wd.cx, ddz = p.z - wd.cz;
           const dd = Math.sqrt(ddx*ddx + ddz*ddz);
           if (dd < BALL_R + wd.r && dd > 0.001) {
@@ -1412,8 +1450,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
             const bx1 = wd.cx;
             const bx2 = wd.cx + Math.sin(bAng) * bLen;
             const by2 = wd.passY + Math.cos(bAng) * bLen;
-            // Only check if ball is near the windmill in Z
-            if (Math.abs(p.z - wd.cz) > 2.5) continue;
+            // Only check when ball is within blade-plane thickness in Z
+            if (Math.abs(p.z - wd.cz) > BALL_R + 0.08) continue;
             const adx = bx2-bx1, ady = by2-wd.passY;
             const al2 = Math.sqrt(adx*adx + ady*ady);
             const t2 = Math.max(0,Math.min(1,((p.x-bx1)*adx + (p.y-wd.passY)*ady)/(al2*al2)));
@@ -1428,6 +1466,26 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
               const bladeSpd = wd.speed * bLen;
               v.x += Math.sin(bAng)*bladeSpd*0.4;
               v.y += Math.cos(bAng)*bladeSpd*0.4;
+            }
+          }
+        }
+
+        // Ramp — slope that launches the ball into the air
+        if (wd.wallType === 'ramp') {
+          const halfW = (wd.w || 3) / 2, halfD = (wd.d || 5) / 2;
+          const inX = Math.abs(p.x - wd.x) < halfW;
+          const inZ = Math.abs(p.z - wd.z) < halfD;
+          if (inX && inZ) {
+            // Slope rises from z = wd.z + halfD (bottom, y=0) to z = wd.z - halfD (top, y=wd.h)
+            const tRamp = ((wd.z + halfD) - p.z) / (halfD * 2); // 0 at bottom, 1 at top
+            const rampY = Math.max(0, tRamp * wd.h);
+            if (p.y < rampY + BALL_R) {
+              p.y = rampY + BALL_R;
+              // Convert some horizontal speed to vertical (launch component)
+              const slope = wd.h / (wd.d || 5);
+              if (v.z < 0 && rampY > 0) { // moving up the ramp
+                v.y = Math.max(v.y, Math.abs(v.z) * slope * 0.9);
+              }
             }
           }
         }
@@ -1550,6 +1608,8 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       q('sv-ff').textContent     = (mu * G_CONST).toFixed(2);
       q('sv-time').textContent   = rollTime.toFixed(1) + 's';
       q('sv-rolled').textContent = rollDist.toFixed(1);
+      // Angular velocity: rolling without slipping ω = v / r
+      q('sv-omega').textContent  = (speed / BALL_R).toFixed(1);
     }
 
     function updateEquation() {
@@ -1880,6 +1940,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
             <div className="stat-grid">
               <div className="stat-card"><div className="sk">Speed</div><div className="sv blue" id="mg-sv-speed">0.00</div></div>
               <div className="stat-card"><div className="sk">KE (½mv²)</div><div className="sv amber" id="mg-sv-ke">0.00</div></div>
+              <div className="stat-card"><div className="sk">ω = v/r (rad/s)</div><div className="sv" style={{color:'#b8ff3e'}} id="mg-sv-omega">0.0</div></div>
               <div className="stat-card"><div className="sk">Distance to hole</div><div className="sv" id="mg-sv-dist">—</div></div>
               <div className="stat-card"><div className="sk">Friction force</div><div className="sv" id="mg-sv-ff">0.00</div></div>
               <div className="stat-card"><div className="sk">Roll time</div><div className="sv" id="mg-sv-time">0.0s</div></div>
