@@ -1205,10 +1205,13 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         }
       }
 
+      const groundHazard = getTerrainHeight(pos.x, pos.z);
+      const isAirborneHazard = pos.y > groundHazard + BALL_R * 1.5;
       for (let mesh of obstacles3d) {
         if (mesh.userData.type === 'water') {
           const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
-          if (dist < mesh.userData.r) {
+          // Only trigger if ball is on or below ground level — not flying over
+          if (dist < mesh.userData.r && !isAirborneHazard) {
             toast('Splash! Water hazard. Respun with penalty.');
             ballActive = false;
             setTimeout(resetBall, 600);
@@ -1217,7 +1220,7 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         }
         if (mesh.userData.type === 'sand') {
           const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
-          if (dist < mesh.userData.r) {
+          if (dist < mesh.userData.r && !isAirborneHazard) {
             mu *= 3; // Triple friction in sand
           }
         }
