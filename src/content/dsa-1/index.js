@@ -9,6 +9,9 @@ import dsa1_001 from './dsa1-001-arrays.js';
 import dsa1_002 from './dsa1-002-linked-lists.js';
 import dsa1_003 from './dsa1-003-stacks-and-queues.js';
 import dsa1_004 from './dsa1-004-strings.js';
+import dsa2_001 from './dsa2-001-recursion-basics.js';
+import dsa2_002 from './dsa2-002-recursion-trees.js';
+import dsa2_003 from './dsa2-003-backtracking.js';
 
 const DSA_CH0 = {
   title: 'Computational Foundations',
@@ -43,8 +46,11 @@ const DSA_CH2 = {
   slug: 'recursion-and-state',
   description: 'Understand how function calls create state, build recursion trees, and prune search spaces with backtracking.',
   course: 'dsa-1',
-  comingSoon: true,
-  lessons: [],
+  lessons: [
+    dsa2_001,
+    dsa2_002,
+    dsa2_003,
+  ],
 };
 
 const DSA_CH3 = {
