@@ -230,6 +230,11 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
     let aimArrow = null;
     let stopped = false;
 
+    // cup-sink animation state
+    let sinkMode    = false;
+    let sinkTimer   = 0;
+    let sinkStartY  = 0;
+
     // loop-the-loop state
     let loopMode       = false;
     let loopSpeed      = 0;      // scalar speed along track (positive = CCW)
@@ -772,30 +777,19 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         hub.rotation.x = Math.PI / 2;
         hub.position.set(o.x, 2.5, o.z - 0.8);
         scene.add(hub); obstacles3d.push(hub);
-        // 4 blades as a rotating group
+        // 4 blades as a rotating group — all centered at group origin so the group
+        // rotates correctly about its own hub point
         const bladeGroup = new THREE.Group();
-        bladeGroup.position.set(o.x, 2.5, o.z - 0.9);
         for (let b = 0; b < 4; b++) {
-          const blade = new THREE.Mesh(
-            new THREE.BoxGeometry(0.25, o.bladeLen || 3.5, 0.08),
-            new THREE.MeshLambertMaterial({ color: 0xf5e6c8 })
-          );
-          blade.rotation.z = (b * Math.PI) / 2;
-          blade.position.y = (o.bladeLen || 3.5) / 2;
-          blade.rotation.z = (b / 4) * Math.PI * 2;
-          // position along blade
-          blade.position.set(
-            Math.sin((b/4)*Math.PI*2) * (o.bladeLen||3.5)/2,
-            Math.cos((b/4)*Math.PI*2) * (o.bladeLen||3.5)/2,
-            0
-          );
           const bladeM = new THREE.Mesh(
             new THREE.BoxGeometry(0.22, o.bladeLen || 3.5, 0.1),
             new THREE.MeshLambertMaterial({ color: 0xf5e6c8 })
           );
-          bladeGroup.add(bladeM);
-          bladeM.position.set(0, (o.bladeLen||3.5)/2, 0);
+          // Center each blade at (0,0,0) in group space — BoxGeometry extends ±half-len
+          // in Y before rotation, rotation.z staggers them 90° apart
+          bladeM.position.set(0, 0, 0);
           bladeM.rotation.z = (b / 4) * Math.PI * 2;
+          bladeGroup.add(bladeM);
         }
         // Position blades at ball-path Z so rotation actually blocks the ball
         bladeGroup.position.set(o.x, 2.5, o.z);
@@ -931,15 +925,15 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           scene.add(wall); obstacles3d.push(wall);
           wall.userData = { wallType:'edge', x1:o.x-len/2, z1:o.z+side*(o.w||3)/2, x2:o.x+len/2, z2:o.z+side*(o.w||3)/2, nx:0, nz:side };
         });
-        // Peaked roof
+        // Peaked roof — pushed to obstacles3d so they are removed on level change
         const roofL = new THREE.Mesh(new THREE.BoxGeometry(len, 0.15, (o.w||3)/2+0.4), roofMat);
         roofL.position.set(o.x, 1.8, o.z - (o.w||3)/4);
-        roofL.rotation.x = 0.4;
-        scene.add(roofL);
+        roofL.rotation.x = -0.4; // slopes DOWN toward the ridge at z = o.z
+        scene.add(roofL); obstacles3d.push(roofL);
         const roofR = new THREE.Mesh(new THREE.BoxGeometry(len, 0.15, (o.w||3)/2+0.4), roofMat);
         roofR.position.set(o.x, 1.8, o.z + (o.w||3)/4);
-        roofR.rotation.x = -0.4;
-        scene.add(roofR);
+        roofR.rotation.x = 0.4;  // slopes DOWN toward the ridge at z = o.z
+        scene.add(roofR); obstacles3d.push(roofR);
       }
     }
 
@@ -1339,9 +1333,13 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           closestDist = Math.sqrt((cx2-hx)*(cx2-hx) + (cz2-hz)*(cz2-hz));
         }
         if (!isAirborne && closestDist < HOLE_R) {
-          vel.set(0, 0, 0);
+          // Start sink animation instead of instant win
+          sinkMode   = true;
+          sinkTimer  = 0;
+          sinkStartY = pos.y;
           pos.x = hx; pos.z = hz;
-          winLevel();
+          vel.set(0, 0, 0);
+          ballActive = false;
           return;
         } else if (!isAirborne && closestDist < HOLE_R * 1.5) {
           // Gentle funnel pull near rim so ball rolls in naturally
@@ -1792,6 +1790,24 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       const dt  = slowMo ? raw * 0.2 : raw;
 
       updateSceneObjects(dt);   // spinners always rotate, even pre-putt
+
+      // Cup-sink animation: ball visually drops into cup, then win fires
+      if (sinkMode) {
+        const SINK_DUR = 0.55;
+        sinkTimer += dt;
+        const t = Math.min(sinkTimer / SINK_DUR, 1.0);
+        // Ease-in: accelerate downward, shrink slightly
+        ball3d.position.y = sinkStartY - BALL_R * 5 * t * t;
+        ball3d.scale.setScalar(1 - t * 0.5);
+        if (t >= 1.0) {
+          sinkMode = false;
+          ball3d.scale.setScalar(1);
+          winLevel();
+        }
+        if (controls) controls.update();
+        renderer.render(scene, camera);
+        return;
+      }
 
       if (isReplaying && replayPlaying) {
         const step = Math.max(1, Math.round(replaySpeed * 1));
