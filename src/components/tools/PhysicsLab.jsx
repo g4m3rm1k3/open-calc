@@ -370,6 +370,49 @@ const STYLES = `
   transition:all .13s; width:auto;
 }
 #physlab-root .pl-plot-btn:hover { background:var(--phosphor); color:var(--bg); }
+
+/* Guide panel */
+#physlab-root .pl-guide { max-width:700px; margin:0 auto; }
+#physlab-root .pl-guide-title {
+  font-family:var(--serif); font-size:20px; font-weight:600;
+  color:var(--text-bright); margin-bottom:10px; letter-spacing:-.01em;
+}
+#physlab-root .pl-guide-intro {
+  font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:22px;
+  padding-bottom:16px; border-bottom:1px solid var(--border);
+}
+#physlab-root .pl-guide-steps { margin-bottom:20px; }
+#physlab-root .pl-gs {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:10px 0; border-bottom:1px solid var(--border2);
+}
+#physlab-root .pl-gs:last-child { border-bottom:none; }
+#physlab-root .pl-gsn {
+  flex-shrink:0; width:24px; height:24px; border-radius:50%;
+  background:var(--phosphor-d); border:1px solid var(--phosphor2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:var(--phosphor); margin-top:1px;
+}
+#physlab-root .pl-gs div { font-size:13px; color:var(--text2); line-height:1.6; }
+#physlab-root .pl-gs div strong { color:var(--text-bright); }
+#physlab-root .pl-gs div em { color:var(--amber); font-style:normal; }
+#physlab-root .pl-guide-callout {
+  border-radius:4px; padding:11px 14px; margin:10px 0;
+  font-size:12px; line-height:1.65; color:var(--text2);
+}
+#physlab-root .pl-guide-callout.tip {
+  background:rgba(0,229,160,0.05); border:1px solid rgba(0,229,160,0.2);
+}
+#physlab-root .pl-guide-callout.warn {
+  background:rgba(245,166,35,0.06); border:1px solid rgba(245,166,35,0.25);
+  color:var(--amber);
+}
+#physlab-root .pl-gc-head {
+  font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  margin-bottom:4px; font-family:var(--mono);
+}
+#physlab-root .pl-guide-callout.tip .pl-gc-head { color:var(--phosphor); }
+#physlab-root .pl-guide-callout.warn .pl-gc-head { color:var(--amber); }
 `;
 
 // ─────────────────────────────────────────────────────────────────
@@ -482,7 +525,7 @@ const LABS = [
     Before running the experiment: write down your prediction for g and your main source of expected error. After, compare to your measurement. This is the scientific method.</div>
   </div>
 </div>`,
-    initState: () => ({ h: 1.0, falling: false, ballY: 0, startY: 0, dropH: 1.0, tDrop: 0 }),
+    initState: () => ({ h: 1.0, falling: false, tDrop: 0, pauseTimer: 0 }),
     drawApparatus: (ctx, W, H, state, running, dt) => {
       ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
       drawGrid(ctx, W, H);
@@ -524,17 +567,30 @@ const LABS = [
       ctx.fillText("h = " + state.h.toFixed(2) + "m", floorX - 25, (startY + groundY) / 2 + 4);
       ctx.textAlign = "left";
 
-      // Animate ball
+      // Animate ball — fall, pause 0.8 s at ground, repeat
       let ballY;
       if (running && state.falling) {
         state.tDrop = (state.tDrop || 0) + dt;
         const d = 0.5 * 9.81 * state.tDrop * state.tDrop;
-        if (d >= state.h) { state.falling = false; state.tDrop = Math.sqrt(2 * state.h / 9.81); }
-        ballY = startY + (d / state.h) * (groundY - startY);
+        if (d >= state.h) {
+          state.falling = false;
+          state.tDrop = Math.sqrt(2 * state.h / 9.81);
+          state.pauseTimer = 0.8;
+          ballY = groundY;
+        } else {
+          ballY = startY + (d / state.h) * (groundY - startY);
+        }
       } else if (running && !state.falling) {
-        state.falling = true; state.tDrop = 0;
-        ballY = startY;
+        state.pauseTimer = (state.pauseTimer || 0) - dt;
+        if (state.pauseTimer <= 0) {
+          state.falling = true;
+          state.tDrop = 0;
+        }
+        ballY = groundY;
       } else {
+        state.falling = false;
+        state.tDrop = 0;
+        state.pauseTimer = 0;
         ballY = startY;
       }
 
@@ -587,11 +643,11 @@ const LABS = [
       cols: ["#", "h (m)", "t (s)", "t² (s²)", "g_point (m/s²)"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: { xi: 1, yi: 3, xLabel: "t² (s²)", yLabel: "d (m)", title: "d vs t² — Free Fall" },
+    analyzeSetup: { xi: 3, yi: 1, xLabel: "t² (s²)", yLabel: "h (m)", title: "h vs t² — Free Fall" },
     analysisInsight: (slope, intercept, r2) => {
       const g_exp = 2 * slope;
       const err = Math.abs((g_exp - 9.81) / 9.81 * 100);
-      return `<strong>g = 2 × slope = ${g_exp.toFixed(4)} m/s²</strong> — theory: 9.8100 m/s², error: ${err.toFixed(2)}%. The d vs t² plot is linear because d = (g/2)·t² is linear in t². R² = ${r2.toFixed(5)} confirms the parabolic free-fall law.`;
+      return `<strong>g = 2 × slope = ${g_exp.toFixed(4)} m/s²</strong> — theory: 9.8100 m/s², error: ${err.toFixed(2)}%. h = (g/2)·t² so slope = g/2. R² = ${r2.toFixed(5)} confirms the parabolic free-fall law.`;
     },
     theoryResult: (slope) => ({
       label: "g (measured)", value: (2 * slope).toFixed(4),
@@ -664,7 +720,7 @@ const LABS = [
     Predict the angle at which the cart will accelerate at exactly 5.00 m/s². Then verify in the simulation.</div>
   </div>
 </div>`,
-    initState: () => ({ angle: 20, cartPos: 0, cartV: 0, running_: false }),
+    initState: () => ({ angle: 20, cartPos: 0.72, cartV: 0, pauseTimer: 0 }),
     drawApparatus: (ctx, W, H, state, running, dt) => {
       ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
       drawGrid(ctx, W, H);
@@ -702,14 +758,20 @@ const LABS = [
         ctx.stroke();
       }
 
-      // Animate cart
+      // Animate cart — slides downhill from top (cp≈0.72) to bottom (cp≈0)
       if (running) {
-        state.cartPos = (state.cartPos || 0) + state.cartV * dt;
-        state.cartV = (state.cartV || 0) + a * dt;
-        if (state.cartPos > 0.8) { state.cartPos = 0; state.cartV = 0; }
+        if ((state.pauseTimer || 0) > 0) {
+          state.pauseTimer -= dt;
+        } else {
+          state.cartV = (state.cartV || 0) - a * dt;   // accelerate downhill (decreasing cp)
+          state.cartPos = (state.cartPos ?? 0.72) + state.cartV * dt;
+          if (state.cartPos < 0.02) {                  // reached bottom — reset to top
+            state.cartPos = 0.72; state.cartV = 0; state.pauseTimer = 0.6;
+          }
+        }
       }
 
-      const cp = Math.min(state.cartPos || 0, 0.75);
+      const cp = Math.min(Math.max(state.cartPos ?? 0.72, 0), 0.75);
       const cartX = pivX + cp * trackLen * Math.cos(angleRad) + 12;
       const cartY = pivY - cp * trackLen * Math.sin(angleRad);
 
@@ -737,7 +799,7 @@ const LABS = [
       // Acceleration arrow on cart
       const accLen = Math.min(a * 12, 70);
       const arrX1 = cartX, arrY1 = cartY - 20;
-      const arrX2 = arrX1 + accLen * Math.cos(angleRad), arrY2 = arrY1 - accLen * Math.sin(angleRad);
+      const arrX2 = arrX1 - accLen * Math.cos(angleRad), arrY2 = arrY1 + accLen * Math.sin(angleRad);
       ctx.strokeStyle = "#e05050"; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(arrX1, arrY1); ctx.lineTo(arrX2, arrY2); ctx.stroke();
       arrowHead(ctx, arrX1, arrY1, arrX2, arrY2, "#e05050");
@@ -1299,9 +1361,24 @@ const LABS = [
   <div class="pl-insight"><div class="pl-insight-head">Ohmic vs non-ohmic</div>
   A resistor: straight I–V line. A bulb filament: curves upward (R rises with T). A diode: near-zero current below ~0.6V, then exponential rise. The I–V curve is the fingerprint of a component.</div>
 </div>`,
-    initState: () => ({ V: 6, R: 100 }),
-    drawApparatus: (ctx, W, H, state, running) => {
-      const I = state.V / state.R * (running ? (1 + (Math.random() - 0.5) * 0.015) : 1);
+    initState: () => ({ V: 6, R: 100, sweepT: 0, ivTrace: [] }),
+    drawApparatus: (ctx, W, H, state, running, dt) => {
+      // Voltage sweep: V oscillates 0→12→0 over 4 s when running
+      if (running) {
+        state.sweepT = (state.sweepT || 0) + dt;
+        const phase = (state.sweepT % 4) / 4; // 0–1 over 4 s
+        state.sweepV = phase < 0.5 ? phase * 2 * 12 : (1 - phase) * 2 * 12;
+        const traceI = state.sweepV / state.R;
+        if (!state.ivTrace) state.ivTrace = [];
+        state.ivTrace.push([state.sweepV, traceI * 1000]);
+        if (state.ivTrace.length > 300) state.ivTrace.shift();
+      } else {
+        state.sweepV = state.V;
+        state.sweepT = 0;
+        state.ivTrace = [];
+      }
+      const displayV = state.sweepV ?? state.V;
+      const I = displayV / state.R * (1 + (Math.random() - 0.5) * 0.008);
       ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
       drawGrid(ctx, W, H);
 
@@ -1325,7 +1402,7 @@ const LABS = [
       ctx.lineWidth=4;
       ctx.beginPath(); ctx.moveTo(lx-4,cy+5); ctx.lineTo(lx+4,cy+5); ctx.stroke();
       ctx.fillStyle="#f5a623"; ctx.font="10px JetBrains Mono,monospace"; ctx.textAlign="center";
-      ctx.fillText(state.V.toFixed(1)+"V", lx, cy-36);
+      ctx.fillText(displayV.toFixed(1)+"V", lx, cy-36);
 
       // Resistor
       const rh=54, rw=22;
@@ -1347,13 +1424,38 @@ const LABS = [
       ctx.fillStyle="#4da6ff"; ctx.font="10px JetBrains Mono,monospace";
       ctx.fillText("A", cx, ty+4);
 
+      // I-V mini trace (shown when running)
+      if (running && state.ivTrace && state.ivTrace.length > 1) {
+        const trPad = { l: W*0.52, r: W*0.96, t: H*0.06, b: H*0.42 };
+        const trW = trPad.r - trPad.l, trH = trPad.b - trPad.t;
+        ctx.fillStyle = "rgba(17,21,32,0.88)"; ctx.fillRect(trPad.l-4, trPad.t-4, trW+8, trH+8);
+        ctx.strokeStyle="#252e42"; ctx.lineWidth=1;
+        ctx.strokeRect(trPad.l-4, trPad.t-4, trW+8, trH+8);
+        const maxV=12, maxI=12000/state.R;
+        const sx=v=>(trPad.l+v/maxV*trW), sy=im=>(trPad.b-im/maxI*trH);
+        // Theory line
+        ctx.beginPath(); ctx.moveTo(sx(0),sy(0)); ctx.lineTo(sx(maxV),sy(maxI));
+        ctx.strokeStyle="rgba(245,166,35,0.25)"; ctx.lineWidth=1; ctx.stroke();
+        // Traced data
+        ctx.beginPath();
+        state.ivTrace.forEach(([v,im],i) => i===0?ctx.moveTo(sx(v),sy(im)):ctx.lineTo(sx(v),sy(im)));
+        ctx.strokeStyle="#00e5a0"; ctx.lineWidth=1.5; ctx.stroke();
+        // Current point
+        const cpI = displayV/state.R*1000;
+        ctx.beginPath(); ctx.arc(sx(displayV),sy(cpI),4,0,Math.PI*2);
+        ctx.fillStyle="#00e5a0"; ctx.fill();
+        ctx.fillStyle="#4a5a72"; ctx.font="9px JetBrains Mono,monospace"; ctx.textAlign="center";
+        ctx.fillText("I–V trace (sweeping)", trPad.l+trW/2, trPad.t-8);
+        ctx.fillText("V →", trPad.l+trW/2, trPad.b+12);
+      }
+
       ctx.textAlign="left";
       drawDRO(ctx, W, [
-        ["V (V)",  state.V.toFixed(3)],
+        ["V (V)",  displayV.toFixed(2)],
         ["R (Ω)",  state.R.toFixed(0)],
-        ["I (mA)", (I*1000).toFixed(3)],
-        ["P (mW)", (state.V*I*1000).toFixed(2)],
-        ["G (mS)", (I/state.V*1000).toFixed(4)],
+        ["I (mA)", (I*1000).toFixed(2)],
+        ["P (mW)", (displayV*I*1000).toFixed(2)],
+        ["G (mS)", displayV > 0 ? (I/displayV*1000).toFixed(4) : "—"],
       ]);
     },
     controls: () => [
@@ -1586,6 +1688,131 @@ function registerLiveCalcs() {
     },
   };
 }
+
+// ─────────────────────────────────────────────────────────────────
+//  PER-LAB GUIDE CONTENT
+// ─────────────────────────────────────────────────────────────────
+const GUIDES = {
+  freefall: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring <strong>g</strong> by timing a ball dropped from different heights. The key insight: h = ½g·t², so a plot of h vs t² is a straight line with slope = g/2.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Go to Apparatus.</strong> Set the drop height h with the slider. The DRO shows the theoretical fall time t and t².</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Click Run</strong> to see the ball fall in real time. It will pause briefly at the ground then repeat. This helps visualise the parabolic acceleration.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Click Record Point.</strong> This captures (h, t, t²) for your current height with small realistic timing noise added. You do <em>not</em> need Run active to record.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Change h</strong> using the slider and record again. Aim for 8–10 points spread from 0.2 m to 3 m.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Go to Analysis.</strong> Click "Plot & Fit". The x-axis is t² and the y-axis is h. The slope equals g/2 ≈ 4.90.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">6</span><div><strong>Read the result.</strong> g = 2 × slope. A good experiment gives g within 1–2% of 9.81 m/s². Check your R² — it should be &gt;0.999.</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Why not plot h vs t?</div>h vs t is a parabola — hard to fit. Squaring t linearises it. This trick (substituting u = t²) converts a nonlinear relationship into one you can fit with a ruler.</div>
+  <div class="pl-guide-callout warn"><div class="pl-gc-head">Air resistance</div>This simulation ignores air drag. In a real lab, use dense compact objects (steel balls) dropped over short distances (&lt;3 m) to keep drag negligible.</div>
+</div>`,
+
+  airtrack: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring <strong>g</strong> via a frictionless inclined plane. The cart acceleration a = g·sin θ, so a plot of a vs sin θ gives a straight line with slope = g.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Go to Apparatus.</strong> Set the angle θ with the slider.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Click Run</strong> to watch the cart accelerate down the track and reset. This helps you visualise how acceleration changes with angle.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Click Record Point.</strong> This captures (θ, sin θ, a) for your current angle.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Vary θ</strong> from 2° up to 60°. Record 8–10 points spread across the range.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Go to Analysis → Plot & Fit.</strong> x = sin θ, y = a. Slope = g ≈ 9.81 m/s².</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Yes — the cart is supposed to speed up at larger angles</div>This is correct physics. a = g·sin θ means at 30° the cart accelerates at 4.9 m/s², at 60° it accelerates at 8.5 m/s². The experiment exploits this relationship to recover g from the slope of the a vs sin θ graph.</div>
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Why sin θ, not θ?</div>Newton's law gives a = g·sin θ exactly. Plotting vs θ directly would give a curve (since sin θ ≠ θ for large angles). Plotting vs sin θ gives a perfect straight line through the origin.</div>
+</div>`,
+
+  hooke: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring the spring constant <strong>k</strong> from the slope of an F vs x graph. Hooke's Law: F = k·x. No animation is needed — this is a static equilibrium lab.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Go to Apparatus.</strong> The sliders control mass m and spring constant k. The spring stretches in real time to show the equilibrium position.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Do not click Run</strong> — this lab is static. The extension x = mg/k is computed from equilibrium, not from motion.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Record Point</strong> at your current mass. This captures (F = mg, x) with small realistic measurement noise.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Change the mass slider</strong> and record again. Aim for 8–10 points covering the full mass range 0.02–1.0 kg.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Analysis → Plot & Fit.</strong> x on x-axis, F on y-axis. Slope = k.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">6</span><div>Compare measured k to the slider value. Expect &lt;2% error. The y-intercept should be ~0 (spring passes through origin).</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Elastic limit</div>Real springs stop obeying F = kx at high extensions (the elastic limit). In this simulation the spring is ideal, but in a real lab approach the maximum load gradually and watch for the curve departing from a straight line.</div>
+</div>`,
+
+  pendulum: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring <strong>g</strong> from the slope of a T² vs L graph. T = 2π√(L/g), so T² = (4π²/g)·L and slope = 4π²/g.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Go to Apparatus.</strong> Set length L and initial angle θ₀ (keep θ₀ &lt; 15° for small-angle validity).</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Click Run</strong> to watch the pendulum swing. The DRO shows the live period T and T².</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Click Record Point</strong> to capture (L, T, T²). You can record while running or stopped.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Change L</strong> from 0.1 m to 2.0 m and record 6–8 points. The wider the L range, the better the fit.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Analysis → Plot & Fit.</strong> x = L, y = T². Slope = 4π²/g. The panel calculates g = 4π²/slope automatically.</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Why T² vs L and not T vs L?</div>T vs L is a square-root curve — hard to fit. T² vs L is perfectly linear. This is a standard linearisation technique: square both sides of T = 2π√(L/g) to get T² = (4π²/g)·L.</div>
+  <div class="pl-guide-callout warn"><div class="pl-gc-head">Keep θ₀ small</div>The formula T = 2π√(L/g) assumes sin θ ≈ θ (small angle). At θ₀ = 30° the true period is ~2% longer. Keep θ₀ ≤ 14° (the slider maximum) for accurate results.</div>
+</div>`,
+
+  snell: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring the refractive index <strong>n₂</strong> of a medium by plotting sin θ₂ vs sin θ₁. Snell's Law: sin θ₁ = n₂·sin θ₂, so slope = 1/n₂.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Go to Apparatus.</strong> Set the angle of incidence θ₁ and choose the refractive index n₂ of your medium (glass ≈ 1.50, water ≈ 1.33, diamond ≈ 2.42).</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Run is not needed</strong> — this lab is instantaneous. The refracted ray updates immediately.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Click Record Point.</strong> This captures (θ₁, θ₂, sin θ₁, sin θ₂). Stay below total internal reflection (the boundary turns red).</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Vary θ₁</strong> from 10° to 70° in 10° steps. 6–8 points is enough for a reliable fit.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Analysis → Plot & Fit.</strong> x = sin θ₁, y = sin θ₂. Slope = 1/n₂. The panel calculates n₂ = 1/slope.</div></div>
+  </div>
+
+  <div class="pl-guide-callout warn"><div class="pl-gc-head">Total Internal Reflection</div>When θ₁ exceeds the critical angle θ_c = arcsin(1/n₂), no refracted ray exists. The Record button returns no point in TIR. Keep θ₁ below θ_c to stay in the valid data range.</div>
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Why sin θ₁ vs sin θ₂?</div>Snell's Law is a ratio of sines. Plotting the sines (not the angles) gives a perfectly straight line through the origin, regardless of the medium. The slope directly gives n₁/n₂ = 1/n₂ (since n₁ = 1.00 for air).</div>
+</div>`,
+
+  ohm: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are plotting an <strong>I–V characteristic</strong> to measure resistance R. Ohm's Law: I = V/R, so a plot of I vs V is linear with slope = G = 1/R (conductance).</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Set the resistance R</strong> using the slider. This is the "component under test".</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Click Run</strong> to see an animated voltage sweep. The voltage automatically ramps 0 → 12 V → 0 V while the I–V curve is traced on screen in real time.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>To record data manually,</strong> stop the simulation, set V with the slider, and click Record Point. This captures (V, I, R_measured).</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Step V from 0 to 12 V</strong> in 1–2 V increments. 8+ points gives a reliable fit.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Analysis → Plot & Fit.</strong> x = V, y = I (mA). Slope = G = 1/R (in mA/V). The panel calculates R = 1000/slope.</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">What you see when Run is active</div>The mini I–V trace in the top-right corner shows the characteristic being swept. The green dot is the current operating point. The amber dashed line is the theoretical prediction. A perfectly ohmic resistor traces a straight line through the origin.</div>
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Slope = conductance G, not resistance</div>The slope of I vs V equals G = 1/R (in siemens or A/V). To get R: flip it. A steeper line means lower R (easier for current to flow). A flatter line means higher R.</div>
+</div>`,
+
+  cooling: `
+<div class="pl-guide">
+  <div class="pl-guide-title">How to Run This Lab</div>
+  <div class="pl-guide-intro">You are measuring the cooling constant <strong>k</strong> by linearising an exponential decay. Newton's Cooling: T(t) = Tₐ + ΔT₀·e⁻ᵏᵗ. Taking ln(T−Tₐ) vs t gives a straight line with slope = −k.</div>
+
+  <div class="pl-guide-steps">
+    <div class="pl-gs"><span class="pl-gsn">1</span><div><strong>Set initial temperature T₀</strong> (e.g. 85°C) and ambient temperature Tₐ (e.g. 20°C). The bigger the difference, the more data range you have.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">2</span><div><strong>Click Run</strong> — the simulation advances time at 6× real speed. You will see the temperature curve traced on the graph in real time.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">3</span><div><strong>Click Record Point</strong> periodically as the temperature falls. Each click advances the simulated time by 15 s and records (t, T, T−Tₐ, ln(T−Tₐ)).</div></div>
+    <div class="pl-gs"><span class="pl-gsn">4</span><div><strong>Aim for 8–10 points spanning at least 3 time constants</strong> (3/k seconds). If τ = 1/k = 67 s, record data up to ~200 s.</div></div>
+    <div class="pl-gs"><span class="pl-gsn">5</span><div><strong>Analysis → Plot & Fit.</strong> x = t, y = ln(T−Tₐ). Slope = −k. The panel calculates k and τ = 1/k.</div></div>
+  </div>
+
+  <div class="pl-guide-callout tip"><div class="pl-gc-head">Why take the natural log?</div>ln(T−Tₐ) = ln(ΔT₀) − k·t. The −k·t term is linear in t. Taking the log of the temperature excess converts the exponential curve into a straight line you can fit with linear regression.</div>
+  <div class="pl-guide-callout warn"><div class="pl-gc-head">Don't let T reach Tₐ</div>When T → Tₐ, ln(T−Tₐ) → −∞. Stop recording before the temperature excess (T−Tₐ) drops below ~1°C. The last few points will have large errors and will pull the fit off.</div>
+</div>`,
+};
 
 // ─────────────────────────────────────────────────────────────────
 //  LINEAR REGRESSION
@@ -1869,7 +2096,7 @@ export default function PhysicsLab({ onClose }) {
         {/* ── MAIN ── */}
         <div className="pl-main">
           <div className="pl-panel-tabs">
-            {["theory","apparatus","data","analysis"].map(p => (
+            {["theory","apparatus","data","analysis","guide"].map(p => (
               <button key={p} className={`pl-ptab ${panel===p?"active":""}`} onClick={()=>setPanel(p)}>{p}</button>
             ))}
           </div>
@@ -1987,6 +2214,13 @@ export default function PhysicsLab({ onClose }) {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* GUIDE */}
+            <div className={`pl-panel ${panel==="guide"?"active":""}`}>
+              <div className="pl-theory-wrap">
+                <div dangerouslySetInnerHTML={{__html: GUIDES[lab.id] ?? "<div class='pl-guide'><div class='pl-guide-title'>No guide yet for this lab.</div></div>"}} />
               </div>
             </div>
 
