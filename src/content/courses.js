@@ -118,4 +118,11 @@ export const COURSES = [
     desc: 'Memory, Structures & Algorithmic Thinking',
     color: 'violet'
   },
+  {
+    key: 'dp-1',
+    label: 'Dynamic Programming',
+    path: '/course/dp-1',
+    desc: 'Overlapping Subproblems, Optimal Substructure & Classic Patterns',
+    color: 'fuchsia'
+  },
 ];
