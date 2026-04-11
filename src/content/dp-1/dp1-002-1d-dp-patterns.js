@@ -81,7 +81,7 @@ for (let i = 0; i < n; i++) {
     '<div style="color:#94a3b8;font-size:11px">h=' + nums[i] + '</div></div>';
 }
 html += '</div>';
-html += '<div style="background:#052e16;border-radius:6px;padding:8px 12px;color:#4ade80;font-size:13px">Answer: dp[' + (n-1) + '] = <b>' + dp[n-1] + '</b> (rob houses 0, 2, 4: 2+9+1=12 — wait, that\'s 12, and dp gives ' + dp[n-1] + ')</div>';
+html += '<div style="background:#052e16;border-radius:6px;padding:8px 12px;color:#4ade80;font-size:13px">Answer: dp[\' + (n-1) + \'] = <b>\' + dp[n-1] + \'</b> (rob houses 0, 2, 4: 2+9+1=12 — wait, that\\'s 12, and dp gives \' + dp[n-1] + \')</div>';
 const recurrences = [];
 for (let i = 2; i < n; i++) {
   const robIt = dp[i-2] + nums[i];

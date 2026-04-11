@@ -132,7 +132,7 @@ export default {
                 `# Dimensional check`,
                 `print(f"Units of v    : m/s  ✓")`,
                 `print(f"Units of dx   : m    ✓")`,
-                `# Sign check: a>0, v0>0 → v > v0 → {v} > {v0}  ✓`)`,
+                `# Sign check: a>0, v0>0 → v > v0 → {v} > {v0}  ✓`,
               ].join('\n'),
               output: '',
               status: 'idle',
