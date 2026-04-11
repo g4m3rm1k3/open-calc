@@ -1484,12 +1484,24 @@ const LABS = [
     objective: "Record T(t). Plot ln(T−Tₐ) vs t. Slope = −k. Find τ = 1/k.",
     category: "Thermodynamics",
     steps: [
-      { title: "Read theory", desc: "Understand dT/dt = −k(T−Tₐ) and exponential solution." },
+      {
+        title: "Read theory",
+        desc: "Understand dT/dt = −k(T−Tₐ) and exponential solution.",
+      },
       { title: "Set conditions", desc: "Set initial T₀ and ambient Tₐ." },
-      { title: "Start cooling", desc: "Run. Temperature falls — record T every 10s." },
-      { title: "Fill table", desc: "Record ≥8 points spanning 2–3 time constants." },
+      {
+        title: "Start cooling",
+        desc: "Run. Temperature falls — record T every 10s.",
+      },
+      {
+        title: "Fill table",
+        desc: "Record ≥8 points spanning 2–3 time constants.",
+      },
       { title: "Linearize", desc: "Plot ln(T−Tₐ) vs t. Slope = −k." },
-      { title: "Find τ", desc: "τ = 1/k. Verify T reaches Tₐ + ΔT/e at t = τ." },
+      {
+        title: "Find τ",
+        desc: "τ = 1/k. Verify T reaches Tₐ + ΔT/e at t = τ.",
+      },
     ],
     theory: () => `
 <div class="theory-block">
@@ -1530,11 +1542,13 @@ const LABS = [
       if (running) state.t = (state.t || 0) + dt * 6;
       const T = state.Ta + (state.T0 - state.Ta) * Math.exp(-state.k * state.t);
       const tMax = 6 / state.k;
-      const TMin = state.Ta - 3, TMax = state.T0 + 5;
+      const TMin = state.Ta - 3,
+        TMax = state.T0 + 5;
       ctx.fillStyle = "#0b0e12";
       ctx.fillRect(0, 0, W, H);
       const pad = { l: 60, r: 20, t: 20, b: 44 };
-      const aw = W - pad.l - pad.r, ah = H - pad.t - pad.b;
+      const aw = W - pad.l - pad.r,
+        ah = H - pad.t - pad.b;
       const sx = (t) => pad.l + (t / tMax) * aw;
       const sy = (T2) => pad.t + ah * (1 - (T2 - TMin) / (TMax - TMin));
       ctx.strokeStyle = "rgba(0,229,160,0.05)";
@@ -1614,21 +1628,62 @@ const LABS = [
       });
     },
     controls: () => [
-      { id: "c-T0", label: "Initial T₀ (°C)", min: 40, max: 150, step: 5, init: 85, stateKey: "T0", fmt: (v) => v.toFixed(0) },
-      { id: "c-Ta", label: "Ambient Tₐ (°C)", min: 5, max: 30, step: 1, init: 20, stateKey: "Ta", fmt: (v) => v.toFixed(0) },
-      { id: "c-k", label: "Cooling k (s⁻¹)", min: 0.002, max: 0.04, step: 0.001, init: 0.015, stateKey: "k", fmt: (v) => v.toFixed(3) },
+      {
+        id: "c-T0",
+        label: "Initial T₀ (°C)",
+        min: 40,
+        max: 150,
+        step: 5,
+        init: 85,
+        stateKey: "T0",
+        fmt: (v) => v.toFixed(0),
+      },
+      {
+        id: "c-Ta",
+        label: "Ambient Tₐ (°C)",
+        min: 5,
+        max: 30,
+        step: 1,
+        init: 20,
+        stateKey: "Ta",
+        fmt: (v) => v.toFixed(0),
+      },
+      {
+        id: "c-k",
+        label: "Cooling k (s⁻¹)",
+        min: 0.002,
+        max: 0.04,
+        step: 0.001,
+        init: 0.015,
+        stateKey: "k",
+        fmt: (v) => v.toFixed(3),
+      },
     ],
     recordPoint: (state) => {
-      const T = state.Ta + (state.T0 - state.Ta) * Math.exp(-state.k * state.t) + (Math.random() - 0.5) * 0.4;
+      const T =
+        state.Ta +
+        (state.T0 - state.Ta) * Math.exp(-state.k * state.t) +
+        (Math.random() - 0.5) * 0.4;
       const dT = Math.max(0.01, T - state.Ta);
       state.t = (state.t || 0) + 15;
-      return [state.t.toFixed(0), T.toFixed(2), dT.toFixed(2), Math.log(dT).toFixed(4)];
+      return [
+        state.t.toFixed(0),
+        T.toFixed(2),
+        dT.toFixed(2),
+        Math.log(dT).toFixed(4),
+      ];
     },
     dataSchema: {
       cols: ["#", "t (s)", "T (°C)", "T−Tₐ (°C)", "ln(T−Tₐ)"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: { xi: 1, yi: 4, xLabel: "t (s)", yLabel: "ln(T − Tₐ)", title: "Linearized Cooling: ln(T−Tₐ) vs t" },
+    analyzeSetup: {
+      xi: 1,
+      yi: 4,
+      xLabel: "t (s)",
+      yLabel: "ln(T − Tₐ)",
+      title: "Linearized Cooling: ln(T−Tₐ) vs t",
+    },
     analysisInsight: (slope, intercept, r2, state) => {
       const k_exp = -slope;
       const tau = 1 / k_exp;
@@ -1639,19 +1694,29 @@ const LABS = [
       value: (-slope).toFixed(5),
       unit: "s⁻¹",
       theory: state.k.toFixed(5),
-      pctError: Math.abs((-slope - state.k) / state.k * 100).toFixed(2),
+      pctError: Math.abs(((-slope - state.k) / state.k) * 100).toFixed(2),
     }),
   },
   {
     id: "waves",
     name: "Standing Waves",
     subtitle: "Harmonics and Wave Speed",
-    objective: "Find resonant frequencies for n = 1–5. Verify fₙ = n·f₁. Measure v.",
+    objective:
+      "Find resonant frequencies for n = 1–5. Verify fₙ = n·f₁. Measure v.",
     category: "Waves",
     steps: [
-      { title: "Read theory", desc: "Understand standing waves, harmonics, and v = fλ." },
-      { title: "Set string", desc: "Choose length L and tension T. Observe wave." },
-      { title: "Find harmonics", desc: "Use n slider to select each harmonic. Record f." },
+      {
+        title: "Read theory",
+        desc: "Understand standing waves, harmonics, and v = fλ.",
+      },
+      {
+        title: "Set string",
+        desc: "Choose length L and tension T. Observe wave.",
+      },
+      {
+        title: "Find harmonics",
+        desc: "Use n slider to select each harmonic. Record f.",
+      },
       { title: "Record 5 points", desc: "Record f for n = 1, 2, 3, 4, 5." },
       { title: "Plot f vs n", desc: "Slope = f₁. Intercept should be ~0." },
       { title: "Find v", desc: "v = f₁ · 2L. Compare to √(T/μ)." },
@@ -1687,7 +1752,8 @@ const LABS = [
       const v = Math.sqrt(state.tension / state.mu);
       const f1 = v / (2 * state.L);
       const fn = state.n * f1;
-      if (running) state.phase = (state.phase || 0) + dt * fn * 2 * Math.PI * 0.3;
+      if (running)
+        state.phase = (state.phase || 0) + dt * fn * 2 * Math.PI * 0.3;
       ctx.fillStyle = "#0b0e12";
       ctx.fillRect(0, 0, W, H);
       ctx.strokeStyle = "rgba(0,229,160,0.04)";
@@ -1704,7 +1770,8 @@ const LABS = [
         ctx.lineTo(W, y);
         ctx.stroke();
       }
-      const pad = 60, cy = H / 2;
+      const pad = 60,
+        cy = H / 2;
       const sw = W - pad * 2;
       ctx.fillStyle = "#252e42";
       ctx.fillRect(pad - 14, cy - 50, 14, 100);
@@ -1722,7 +1789,8 @@ const LABS = [
       for (let i = 0; i <= 500; i++) {
         const x = i / 500;
         const xp = pad + x * sw;
-        const y = cy + amp * Math.sin(state.n * Math.PI * x) * Math.cos(state.phase);
+        const y =
+          cy + amp * Math.sin(state.n * Math.PI * x) * Math.cos(state.phase);
         i === 0 ? ctx.moveTo(xp, y) : ctx.lineTo(xp, y);
       }
       ctx.strokeStyle = "#00e5a0";
@@ -1760,21 +1828,59 @@ const LABS = [
       });
     },
     controls: () => [
-      { id: "c-wL", label: "Length L (m)", min: 0.3, max: 3.0, step: 0.1, init: 1.0, stateKey: "L", fmt: (v) => v.toFixed(1) },
-      { id: "c-wT", label: "Tension T (N)", min: 5, max: 100, step: 5, init: 40, stateKey: "tension", fmt: (v) => v.toFixed(0) },
-      { id: "c-wn", label: "Harmonic n", min: 1, max: 5, step: 1, init: 1, stateKey: "n", fmt: (v) => v.toFixed(0) },
+      {
+        id: "c-wL",
+        label: "Length L (m)",
+        min: 0.3,
+        max: 3.0,
+        step: 0.1,
+        init: 1.0,
+        stateKey: "L",
+        fmt: (v) => v.toFixed(1),
+      },
+      {
+        id: "c-wT",
+        label: "Tension T (N)",
+        min: 5,
+        max: 100,
+        step: 5,
+        init: 40,
+        stateKey: "tension",
+        fmt: (v) => v.toFixed(0),
+      },
+      {
+        id: "c-wn",
+        label: "Harmonic n",
+        min: 1,
+        max: 5,
+        step: 1,
+        init: 1,
+        stateKey: "n",
+        fmt: (v) => v.toFixed(0),
+      },
     ],
     recordPoint: (state) => {
       const v = Math.sqrt(state.tension / state.mu);
       const f1 = v / (2 * state.L);
       const fn = state.n * f1 * (1 + (Math.random() - 0.5) * 0.005);
-      return [state.n.toFixed(0), fn.toFixed(3), (v / fn).toFixed(4), (fn * (v / fn)).toFixed(3)];
+      return [
+        state.n.toFixed(0),
+        fn.toFixed(3),
+        (v / fn).toFixed(4),
+        (fn * (v / fn)).toFixed(3),
+      ];
     },
     dataSchema: {
       cols: ["#", "n", "fₙ (Hz)", "λ (m)", "v = fλ (m/s)"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: { xi: 1, yi: 2, xLabel: "Harmonic n", yLabel: "fₙ (Hz)", title: "Frequency vs Harmonic Number" },
+    analyzeSetup: {
+      xi: 1,
+      yi: 2,
+      xLabel: "Harmonic n",
+      yLabel: "fₙ (Hz)",
+      title: "Frequency vs Harmonic Number",
+    },
     analysisInsight: (slope, intercept, r2, state) => {
       const v = Math.sqrt(state.tension / state.mu);
       const v_exp = slope * 2 * state.L;
@@ -1787,7 +1893,7 @@ const LABS = [
         value: (slope * 2 * state.L).toFixed(3),
         unit: "m/s",
         theory: v.toFixed(3),
-        pctError: Math.abs((slope * 2 * state.L - v) / v * 100).toFixed(2),
+        pctError: Math.abs(((slope * 2 * state.L - v) / v) * 100).toFixed(2),
       };
     },
   },
@@ -1897,7 +2003,9 @@ export default function PhysicsLab({ onClose }) {
     }
     const slope = den > 0 ? num / den : 0;
     const intercept = ym - slope * xm;
-    const ss_res = ys.slice(0, n).reduce((s, y, i) => s + (y - (slope * xs[i] + intercept)) ** 2, 0);
+    const ss_res = ys
+      .slice(0, n)
+      .reduce((s, y, i) => s + (y - (slope * xs[i] + intercept)) ** 2, 0);
     const ss_tot = ys.slice(0, n).reduce((s, y) => s + (y - ym) ** 2, 0);
     const r2 = ss_tot > 0 ? 1 - ss_res / ss_tot : 1;
 
@@ -1940,7 +2048,7 @@ export default function PhysicsLab({ onClose }) {
     ctx.strokeStyle = "rgba(0,229,160,0.06)";
     ctx.lineWidth = 0.8;
     for (let i = 0; i <= 5; i++) {
-      const x = xMin - xPad + ((i * (xRange + xPad * 2)) / 5);
+      const x = xMin - xPad + (i * (xRange + xPad * 2)) / 5;
       ctx.beginPath();
       ctx.moveTo(sx(x), pad.t);
       ctx.lineTo(sx(x), pad.t + ah);
@@ -1948,9 +2056,13 @@ export default function PhysicsLab({ onClose }) {
       ctx.font = "10px IBM Plex Mono, monospace";
       ctx.fillStyle = "#4a5a72";
       ctx.textAlign = "center";
-      ctx.fillText(x.toFixed(x < 1 ? 3 : x < 10 ? 2 : 1), sx(x), pad.t + ah + 18);
+      ctx.fillText(
+        x.toFixed(x < 1 ? 3 : x < 10 ? 2 : 1),
+        sx(x),
+        pad.t + ah + 18,
+      );
 
-      const y = yMin - yPad + ((i * (yRange + yPad * 2)) / 5);
+      const y = yMin - yPad + (i * (yRange + yPad * 2)) / 5;
       ctx.beginPath();
       ctx.moveTo(pad.l, sy(y));
       ctx.lineTo(pad.l + aw, sy(y));
@@ -2273,7 +2385,9 @@ export default function PhysicsLab({ onClose }) {
           >
             <div className="data-header" style={{ marginBottom: "16px" }}>
               <div>
-                <div className="panel-title">{currentLab.analyzeSetup.title}</div>
+                <div className="panel-title">
+                  {currentLab.analyzeSetup.title}
+                </div>
                 <div className="panel-sub">
                   {dataRows.length} data point{dataRows.length !== 1 ? "s" : ""}{" "}
                   available
@@ -2300,7 +2414,9 @@ export default function PhysicsLab({ onClose }) {
                 {regressionResults ? (
                   <>
                     <div className="result-card">
-                      <div className="result-card-title">Regression Results</div>
+                      <div className="result-card-title">
+                        Regression Results
+                      </div>
                       <div className="result-row">
                         <span className="result-key">Slope</span>
                         <span className="result-val">
