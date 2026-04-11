@@ -11,11 +11,8 @@ export default {
   hook: {
     question: 'A robot arm has two links. The first points in direction (3, 0, 4). The second points in direction (1, 2, -1). What is the joint angle between them?',
     realWorldContext:
-      'This is a real robotics problem. Every robot joint angle, every molecular bond angle in chemistry, ' +
-      'every lighting angle in 3D graphics — all are computed using the same formula: ' +
-      '$\\phi = \\arccos\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}\\right)$. ' +
-      'This single equation is one of the most-used formulas in all of computational physics.',
-    previewVisualizationId: 'AngleBetweenIntuition',
+      'This is a real robotics problem. Every robot joint angle, every molecular bond angle in chemistry, every lighting angle in 3D graphics — all are computed using the same formula: $\\phi = \\arccos\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}\\right)$. This single equation is one of the most-used formulas in all of computational physics.',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [{
@@ -81,10 +78,10 @@ Set them equal, divide by $|A||B|$: $\\cos\\phi = \\frac{A_xB_x+A_yB_y}{|A||B|}$
 The projection picture makes this formula inevitable.`,
       },
       {
-        id: 'AngleBetweenIntuition',
-        title: 'Drag the vectors — watch the angle update in real time',
-        mathBridge: `The arc shows the angle $\\phi$. The dot product readout shows $\\cos\\phi$ scaling with the relative orientation.`,
-        caption: 'The angle is measured tail-to-tail. Rotating both vectors by the same amount leaves the angle unchanged.',
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Angle between vectors — the arccos formula',
+        caption: `The angle is measured tail-to-tail: $\\phi = \\arccos\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}\\right)$. Rotating both vectors by the same amount leaves $\\phi$ unchanged. The result is always in $[0°, 180°]$.`,
       },
     ],
   },
@@ -125,10 +122,10 @@ Normalize first with $\\hat{A} = \\vec{A}/|\\vec{A}|$, then take the dot product
       },
     ],
     visualizations: [{
-      id: 'AngleBetweenExplorer',
-      title: '3D Angle Between Vectors Calculator',
-      mathBridge: 'Switch to 3D mode. Enter any components and see the exact angle.',
-      caption: 'Calculators are for checking; understanding is the goal.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Angle formula — 2D and 3D',
+      caption: `$\\cos\\phi = \\frac{A_xB_x+A_yB_y+A_zB_z}{|\\vec{A}||\\vec{B}|}$. Divide the component dot product by the product of magnitudes to get $\\cos\\phi$, then apply $\\arccos$.`,
     }],
   },
 
@@ -183,10 +180,10 @@ Equality holds iff the vectors are parallel ($\\phi = 0°$ or $180°$).`,
     ],
     title: 'Deriving the angle formula from the two dot product definitions',
     visualizations: [{
-      id: 'AngleBetweenPatternSpotter',
-      title: 'Angle Estimation Pattern Spotter',
-      mathBridge: 'Estimate angles from dot product signs and component ratios.',
-      caption: 'Train your brain for visual estimation.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Angle range and dot product sign',
+      caption: `$\\arccos$ always returns $[0°, 180°]$. If $\\vec{A}\\cdot\\vec{B} > 0$: acute angle. If $= 0$: right angle. If $< 0$: obtuse angle. You can determine the rough angle just from the sign of the dot product.`,
     }],
   },
 
@@ -460,6 +457,81 @@ This means the panel FACES the sun (normal is anti-parallel to sun direction = p
         },
       ],
       answer: `\\text{Tilted panel facing sun: max power (angle between normal and sun-ray = 0°). Horizontal panel: } \\cos50°\\approx 64\\%\\text{ of max.}`,
+    },
+  ],
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-013-q1',
+      question: `The formula for the angle between two vectors is:`,
+      options: [
+        `$\\phi = \\arcsin\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|}\\right)$`,
+        `$\\phi = \\arccos\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|}\\right)$`,
+        `$\\phi = \\arctan\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|}\\right)$`,
+        `$\\phi = \\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|}$`,
+      ],
+      answer: 1,
+      explanation: `From $\\vec{A}\\cdot\\vec{B} = |A||B|\\cos\\phi$, solving for $\\phi$: $\\cos\\phi = \\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|}$, then $\\phi = \\arccos(\\ldots)$.`,
+    },
+    {
+      id: 'p1-ch1-013-q2',
+      question: `$\\vec{A} = (1, 1)$, $\\vec{B} = (1, -1)$. What is the angle between them?`,
+      options: [`$45°$`, `$90°$`, `$135°$`, `$60°$`],
+      answer: 1,
+      explanation: `$\\vec{A}\\cdot\\vec{B} = 1-1 = 0$. So $\\cos\\phi = 0$ and $\\phi = 90°$.`,
+    },
+    {
+      id: 'p1-ch1-013-q3',
+      question: `The angle formula always returns a value in the range:`,
+      options: [`$(-90°, 90°)$`, `$[0°, 180°]$`, `$[0°, 360°]$`, `$(-180°, 180°]$`],
+      answer: 1,
+      explanation: `$\\arccos$ always returns $[0°, 180°]$. Angles between vectors are measured as the smaller angle between the arrows, so this range is sufficient.`,
+    },
+    {
+      id: 'p1-ch1-013-q4',
+      question: `$\\vec{A} = (1, 0, 0)$, $\\vec{B} = (0, 1, 0)$. What angle does the formula give?`,
+      options: [`$0°$`, `$45°$`, `$90°$`, `$180°$`],
+      answer: 2,
+      explanation: `$\\vec{A}\\cdot\\vec{B} = 0$. $\\cos\\phi = 0/1 = 0$. $\\phi = \\arccos(0) = 90°$.`,
+    },
+    {
+      id: 'p1-ch1-013-q5',
+      question: `Why does dividing the dot product by $|\\vec{A}||\\vec{B}|$ give $\\cos\\phi$?`,
+      options: [
+        `It normalises the result to $[0, 1]$`,
+        `Dividing by the magnitudes converts to unit vectors; the dot product of unit vectors is $\\cos\\phi$`,
+        `It makes the formula dimensionless`,
+        `Both B and C`,
+      ],
+      answer: 3,
+      explanation: `$\\frac{\\vec{A}\\cdot\\vec{B}}{|A||B|} = \\hat{A}\\cdot\\hat{B} = \\cos\\phi$. Dividing by magnitudes normalises to unit vectors. The result is dimensionless AND equals $\\cos\\phi$. Both B and C are correct.`,
+    },
+    {
+      id: 'p1-ch1-013-q6',
+      question: `$\\vec{A} = (3, 0, 4)$. What is $|\\vec{A}|$ and $\\hat{A}$?`,
+      options: [
+        `$|A|=5$, $\\hat{A}=(3/5, 0, 4/5)$`,
+        `$|A|=7$, $\\hat{A}=(3/7, 0, 4/7)$`,
+        `$|A|=5$, $\\hat{A}=(3, 0, 4)$`,
+        `$|A|=7$, $\\hat{A}=(3, 0, 4)$`,
+      ],
+      answer: 0,
+      explanation: `$|\\vec{A}| = \\sqrt{9+0+16} = 5$. $\\hat{A} = (3/5, 0, 4/5)$.`,
+    },
+    {
+      id: 'p1-ch1-013-q7',
+      question: `A solar panel has normal vector $\\hat{n} = (0, 1)$ (pointing straight up). Sunlight comes from direction $\\vec{s} = (\\sin50°, -\\cos50°)$ (50° from vertical). The power factor $\\cos\\phi$ is:`,
+      options: [`$\\sin50°$`, `$\\cos50°$`, `$0$`, `$1$`],
+      answer: 1,
+      explanation: `$\\hat{n}\\cdot\\hat{s} = (0)(\\sin50°) + (1)(-\\cos50°) = -\\cos50°$. Since $\\phi$ is the angle between normal and sun direction, and $|\\cos\\phi| = \\cos50° \\approx 0.643$ gives the fraction of maximum power.`,
+    },
+    {
+      id: 'p1-ch1-013-q8',
+      question: `$\\vec{A}\\cdot\\vec{B} < 0$ implies the angle between them is:`,
+      options: [`Acute ($< 90°$)`, `A right angle ($90°$)`, `Obtuse ($> 90°$)`, `Zero`],
+      answer: 2,
+      explanation: `$\\vec{A}\\cdot\\vec{B} = |A||B|\\cos\\phi < 0 \\Rightarrow \\cos\\phi < 0 \\Rightarrow \\phi \\in (90°, 180°)$ — obtuse.`,
     },
   ],
 }

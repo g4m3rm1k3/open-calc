@@ -13,7 +13,7 @@ export default {
       "Why does an object thrown straight up return with the same speed magnitude?",
     realWorldContext:
       "Ballistics and sports tracking rely on this symmetry as a first-order model before adding drag.",
-    previewVisualizationId: "FreeFallSymmetryIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -28,20 +28,22 @@ export default {
         caption: 'The trajectory y(t) = v₀t − ½gt² is a downward parabola. The apex is the axis of symmetry. Time to apex equals time from apex to the same height — a direct consequence of the quadratic structure. Algebra proves it; no calculus needed.',
       },
       {
-        id: "FreeFallSymmetryIntuition",
+        id: 'VerticalThrow',
+        props: {},
         title: "Ascent-descent mirror",
         mathBridge: "Compare equal-time slices before and after the apex.",
         caption: "Same |v| at same height in opposite directions.",
       },
       {
-        id: "FreeFallIntuition",
+        id: 'VerticalThrow',
+        props: {},
         title: "Trajectory and kinematics",
         mathBridge:
           "Animate launch speed and observe symmetric timing around the peak.",
         caption: "Apex is the turning point where v=0.",
       },
       {
-        id: "RangeIntuition",
+        id: 'SVGDiagram',
         title: "Complementary-angle symmetry",
         mathBridge:
           "Explore how angle pairs θ and 90°−θ produce equal range under ideal projectile assumptions.",
@@ -54,7 +56,7 @@ export default {
     prose: ["Use v=0 at top with v^2=v0^2+2aΔx to get max height."],
     visualizations: [
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
         title: "Symmetry calculator",
         mathBridge:
           "Solve for peak height, time up, and return speed under chosen sign convention.",
@@ -66,7 +68,7 @@ export default {
     prose: [
       "Symmetry follows from constant acceleration and time-reversal structure of the equations.",
     ],
-    visualizationId: "FreeFallSymmetryIntuition",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       { expression: "v(t)=v_0-gt", annotation: "Linear velocity in time." },
       { expression: "t_{up}=\\frac{v_0}{g}", annotation: "Set v=0 at apex." },

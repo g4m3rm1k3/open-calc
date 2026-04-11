@@ -12,7 +12,7 @@ export default {
     question: 'Three ropes pull a ring: 50 N at 0°, 70 N at 130°, 40 N at 250°. Will the ring move — and if so, which way?',
     realWorldContext:
       `This is the central calculation of structural engineering. Every bridge truss, every crane cable, every airplane in level flight is held in equilibrium by forces that vector-cancel to exactly zero. The moment that cancellation fails, the structure accelerates — or fails. Learning to add force vectors numerically gives you the single most powerful tool in applied physics.`,
-    previewVisualizationId: 'ForceVectorIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [{
@@ -68,11 +68,9 @@ export default {
           `The free body diagram shows: Normal N (up), Weight W (down), Applied F (angled), Friction f (opposing motion). DSMD on all forces gives the net force vector and thus the acceleration.`,
       },
       {
-        id: 'ForceVectorIntuition',
-        title: 'Add up to 4 force vectors — watch the net force update live',
-        mathBridge: 'Each force is decomposed into components. The net force arrow is their vector sum.',
-        caption: 'This is a free body diagram in motion. Try making the system equilibrium (net force = 0).',
-        props: { maxForces: 4 },
+        id: 'ForceBlockSim',
+        title: 'Multiple forces — net force and acceleration',
+        caption: `Each force is decomposed into components. The net force arrow is their vector sum. Try adjusting forces until the system reaches equilibrium ($\\vec{F}_{net} = \\vec{0}$).`,
       },
     ],
   },
@@ -106,10 +104,10 @@ export default {
       },
     ],
     visualizations: [{
-      id: 'ForceComponentTable',
-      title: 'Live force component table — add forces, check equilibrium',
-      mathBridge: 'Edit forces and angles. The equilibrium badge turns green when ΣFₓ ≈ 0 and ΣFᵧ ≈ 0.',
-      caption: 'The component table is the free body diagram in numeric form.',
+      id: 'SVGDiagram',
+      props: { type: 'free-body-diagram' },
+      title: 'Free body diagram — component table',
+      caption: `Fill the component table row by row. The bottom row $\\sum F_x$ and $\\sum F_y$ is the net force. Equilibrium means both sums equal zero.`,
     }],
   },
 
@@ -160,9 +158,10 @@ export default {
     ],
     title: 'Newton 2 in component form',
     visualizations: [{
-      id: 'ForceProof',
-      title: 'Force components combine independently',
-      mathBridge: 'Each step highlights one axis of the force diagram.',
+      id: 'SVGDiagram',
+      props: { type: 'free-body-diagram' },
+      title: 'Newton 2 per axis',
+      caption: `$\\sum F_x = ma_x$ and $\\sum F_y = ma_y$ are independent. A horizontal force has no effect on vertical acceleration. The component method works because the axes are orthogonal.`,
     }],
   },
 
@@ -550,7 +549,82 @@ export default {
           annotation: 'Back-substitute.',
         },
       ],
-      answer: 'T_1\\approx143.5\\,N,\\quad T_2\\approx175.8\\,N',
+      answer: `T_1\\approx143.5\\,N,\\quad T_2\\approx175.8\\,N`,
+    },
+  ],
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-009-q1',
+      question: `Three forces act on an object: 10 N east, 6 N north, 4 N south. What is $F_{net,y}$?`,
+      options: [`$10$ N`, `$6$ N`, `$2$ N`, `$-2$ N`],
+      answer: 2,
+      explanation: `$F_{net,y} = 6 - 4 = 2$ N north. x and y are independent.`,
+    },
+    {
+      id: 'p1-ch1-009-q2',
+      question: `An object is in equilibrium. What must be true?`,
+      options: [
+        `It is at rest`,
+        `$\\vec{F}_{net} = \\vec{0}$ (both $\\sum F_x = 0$ and $\\sum F_y = 0$)`,
+        `All forces are equal in magnitude`,
+        `There are at most two forces`,
+      ],
+      answer: 1,
+      explanation: `Equilibrium means zero net force in EVERY direction. Both component equations must be satisfied simultaneously.`,
+    },
+    {
+      id: 'p1-ch1-009-q3',
+      question: `A 50 N force acts at 37° above horizontal. What is $F_y$?`,
+      options: [`$40$ N`, `$30$ N`, `$50$ N`, `$10$ N`],
+      answer: 1,
+      explanation: `$F_y = 50\\sin37° \\approx 50 \\times 0.6 = 30$ N. ($\\sin37° \\approx 0.6$ in the 3-4-5 approximate.)`,
+    },
+    {
+      id: 'p1-ch1-009-q4',
+      question: `$\\vec{F}_{net} = (4, -3)$ N on a 2 kg object. What is $a_x$?`,
+      options: [`$2$ m/s²`, `$-1.5$ m/s²`, `$5$ m/s²`, `$-3$ m/s²`],
+      answer: 0,
+      explanation: `$a_x = F_{net,x}/m = 4/2 = 2$ m/s². The $y$-component gives $a_y = -3/2 = -1.5$ m/s² independently.`,
+    },
+    {
+      id: 'p1-ch1-009-q5',
+      question: `Why does a horizontal force have no effect on vertical acceleration?`,
+      options: [
+        `Because horizontal forces are weaker`,
+        `Because the axes are orthogonal — $\\hat{i}$ and $\\hat{j}$ are independent`,
+        `This is only true for small forces`,
+        `It affects vertical acceleration through friction`,
+      ],
+      answer: 1,
+      explanation: `Orthogonal axes are completely independent. A force along $\\hat{i}$ has zero component along $\\hat{j}$, so $F_y = 0$ and $a_y = 0$ from that force.`,
+    },
+    {
+      id: 'p1-ch1-009-q6',
+      question: `Two cables pull a mass: cable 1 at 60°, cable 2 at 120°, each with tension $T$. What is the direction of the net cable force?`,
+      options: [`$0°$ (east)`, `$90°$ (north)`, `$45°$ (NE)`, `$60°$`],
+      answer: 1,
+      explanation: `By symmetry about 90°, the $x$-components cancel ($T\\cos60° - T\\cos60° = 0$). The $y$-components add ($T\\sin60° + T\\sin60° = T\\sqrt{3}$). Net force is straight up (90°).`,
+    },
+    {
+      id: 'p1-ch1-009-q7',
+      question: `Newton's second law $\\vec{F}_{net} = m\\vec{a}$ in 2D gives how many scalar equations?`,
+      options: [`One`, `Two`, `Three`, `Four`],
+      answer: 1,
+      explanation: `One vector equation = two scalar equations: $\\sum F_x = ma_x$ and $\\sum F_y = ma_y$. In 3D it gives three.`,
+    },
+    {
+      id: 'p1-ch1-009-q8',
+      question: `A free body diagram is useful because it:`,
+      options: [
+        `Shows the object's trajectory`,
+        `Isolates one object and shows ALL forces acting on it as vectors`,
+        `Shows forces the object exerts on others`,
+        `Requires only one force to be drawn`,
+      ],
+      answer: 1,
+      explanation: `A free body diagram isolates one object and shows every external force acting on it. This makes DSMD systematic and prevents missing forces.`,
     },
   ],
 }

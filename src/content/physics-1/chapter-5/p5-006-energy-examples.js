@@ -9,58 +9,32 @@ export default {
 
   hook: {
     question:
-      'A ball is launched from a spring, flies through the air, hits an incline, and slides to a stop. ' +
-      'How many physics concepts does this single problem connect? ' +
-      'Before reading on, list every type of energy transformation you can identify.',
+      'A ball is launched from a spring, flies through the air, hits an incline, and slides to a stop. How many physics concepts does this single problem connect? Before reading on, list every type of energy transformation you can identify.',
     realWorldContext:
-      'Real engineering problems are never isolated. ' +
-      'A roller coaster uses springs, gravitational PE, KE, friction losses, and power requirements all in one design. ' +
-      'This lesson builds the habit of seeing problems in terms of energy flow — ' +
-      'where does it start, where does it end, and what happens in between.',
+      'Real engineering problems are never isolated. A roller coaster uses springs, gravitational PE, KE, friction losses, and power requirements all in one design. This lesson builds the habit of seeing problems in terms of energy flow — where does it start, where does it end, and what happens in between.',
     previewVisualizationId: 'ProjectileMotion',
   },
 
   intuition: {
     prose: [
-      '**The energy audit approach:** Every problem is an accounting exercise. ' +
-        'At the start, inventory all energy forms. At the end, inventory again. ' +
-        'What changed? Where did the difference go (heat, sound, deformation)? ' +
-        'This framework solves problems that would require multiple kinematics equations — in one step.',
+      '**The energy audit approach:** Every problem is an accounting exercise. At the start, inventory all energy forms. At the end, inventory again. What changed? Where did the difference go (heat, sound, deformation)? This framework solves problems that would require multiple kinematics equations — in one step.',
 
-      '**The spiral: everything we\'ve built connects here.** ' +
-        'Work (Lesson 1) is how energy enters or leaves a system. ' +
-        'KE (Lesson 2) is what motion carries. ' +
-        'PE (Lesson 3) is what conservative forces store. ' +
-        'Conservation (Lesson 4) is the accounting rule. ' +
-        'Power (Lesson 5) is the time rate. ' +
-        'This lesson is where you practice moving fluidly between all five.',
+      '**The spiral: everything we\'ve built connects here.** Work (Lesson 1) is how energy enters or leaves a system. KE (Lesson 2) is what motion carries. PE (Lesson 3) is what conservative forces store. Conservation (Lesson 4) is the accounting rule. Power (Lesson 5) is the time rate. This lesson is where you practice moving fluidly between all five.',
 
-      '**When to use energy vs Newton\'s Laws:** If a problem asks about speed or height — use energy (no need for acceleration or time). ' +
-        'If a problem asks about force at a specific instant — use Newton\'s Laws. ' +
-        'If a problem mixes force and distance with no time specified — the Work-Energy Theorem is the bridge.',
+      '**When to use energy vs Newton\'s Laws:** If a problem asks about speed or height — use energy (no need for acceleration or time). If a problem asks about force at a specific instant — use Newton\'s Laws. If a problem mixes force and distance with no time specified — the Work-Energy Theorem is the bridge.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 6 of 6 — Synthesis of Chapter 5',
         body:
-          '**Chapter 5 complete map:**\n' +
-          '1. Work = F·d·cosθ (energy transferred)\n' +
-          '2. Work-Energy Theorem: W_net = ΔKE\n' +
-          '3. PE = mgh (gravity), ½kx² (spring)\n' +
-          '4. Conservation: KE_i + PE_i = KE_f + PE_f + W_friction\n' +
-          '5. Power: P = W/t = Fv\n' +
-          '**Chapter 6 next:** Momentum — a different conserved quantity that handles collisions and impacts.',
+          '**Chapter 5 complete map:**\n1. Work = F·d·cosθ (energy transferred)\n2. Work-Energy Theorem: W_net = ΔKE\n3. PE = mgh (gravity), ½kx² (spring)\n4. Conservation: KE_i + PE_i = KE_f + PE_f + W_friction\n5. Power: P = W/t = Fv\n**Chapter 6 next:** Momentum — a different conserved quantity that handles collisions and impacts.',
       },
       {
         type: 'insight',
         title: 'Energy method checklist',
         body:
-          '□ Define the system (what is included).\n' +
-          '□ Choose the reference level (where PE = 0).\n' +
-          '□ Identify the initial and final states.\n' +
-          '□ List all energy terms at each state.\n' +
-          '□ Apply conservation: E_i = E_f + losses.',
+          '□ Define the system (what is included).\n□ Choose the reference level (where PE = 0).\n□ Identify the initial and final states.\n□ List all energy terms at each state.\n□ Apply conservation: E_i = E_f + losses.',
       },
     ],
     visualizations: [
@@ -68,8 +42,7 @@ export default {
         id: 'ProjectileMotion',
         title: 'Projectile energy throughout the flight',
         mathBridge:
-          'Adjust launch speed and angle. At every point of the trajectory, the total energy KE + PE is constant. ' +
-          'Watch how PE peaks at maximum height while KE is minimum.',
+          'Adjust launch speed and angle. At every point of the trajectory, the total energy KE + PE is constant. Watch how PE peaks at maximum height while KE is minimum.',
         caption: 'Launch, rise, peak, fall — one conservation equation covers the entire flight.',
         props: { showEnergyBars: true },
       },
@@ -87,11 +60,7 @@ export default {
         type: 'mnemonic',
         title: 'Decision guide: which tool?',
         body:
-          'Asked for speed/height → Conservation of Energy.\n' +
-          'Asked for force at a point → Newton\'s Second Law.\n' +
-          'Asked for work from a graph → W = area under F-x curve.\n' +
-          'Asked for time or acceleration → Kinematics (SUVAT).\n' +
-          'Problem mixes force and displacement → Work-Energy Theorem.',
+          'Asked for speed/height → Conservation of Energy.\nAsked for force at a point → Newton\'s Second Law.\nAsked for work from a graph → W = area under F-x curve.\nAsked for time or acceleration → Kinematics (SUVAT).\nProblem mixes force and displacement → Work-Energy Theorem.',
       },
     ],
   },
@@ -130,8 +99,7 @@ export default {
       id: 'ch5-100-ex1',
       title: 'Bungee jump — spring PE and gravity',
       problem:
-        '\\text{A 70 kg bungee jumper falls 20 m freely, then the bungee cord (k = 40 N/m) stretches another 15 m. ' +
-        'Find the jumper\'s speed when the cord is fully stretched. (g = 9.8 m/s²)}',
+        '\\text{A 70 kg bungee jumper falls 20 m freely, then the bungee cord (k = 40 N/m) stretches another 15 m. Find the jumper\'s speed when the cord is fully stretched. (g = 9.8 m/s²)}',
       steps: [
         {
           expression: 'E_i = mgh_{\\text{total}} = (70)(9.8)(35) = 24{,}010\\,\\text{J}',
@@ -160,8 +128,7 @@ export default {
       id: 'ch5-100-ex2',
       title: 'Motor lifting a load — power and time',
       problem:
-        '\\text{A 2 kW motor lifts a 200 kg crate to a height of 12 m. ' +
-        'Assuming 80% efficiency, find the time required.}',
+        '\\text{A 2 kW motor lifts a 200 kg crate to a height of 12 m. Assuming 80% efficiency, find the time required.}',
       steps: [
         {
           expression: 'W_{\\text{useful}} = mgh = (200)(9.8)(12) = 23{,}520\\,\\text{J}',
@@ -182,8 +149,7 @@ export default {
       id: 'ch5-100-ex3',
       title: 'Ball on a loop-the-loop — minimum speed at top',
       problem:
-        '\\text{A ball must maintain contact with the top of a circular loop of radius R = 2 m. ' +
-        'Find the minimum height h from which to release it (frictionless). (g = 9.8 m/s²)}',
+        '\\text{A ball must maintain contact with the top of a circular loop of radius R = 2 m. Find the minimum height h from which to release it (frictionless). (g = 9.8 m/s²)}',
       steps: [
         {
           expression: '\\text{At top of loop: minimum speed from } N = 0 \\Rightarrow mg = \\frac{mv_{\\text{top}}^2}{R}',
@@ -222,8 +188,7 @@ export default {
       id: 'ch5-100-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A 10 kg block compresses a spring (k = 2000 N/m) by 0.3 m, then is launched up a frictionless 30° ramp. ' +
-        'Find how far up the ramp it travels.}',
+        '\\text{A 10 kg block compresses a spring (k = 2000 N/m) by 0.3 m, then is launched up a frictionless 30° ramp. Find how far up the ramp it travels.}',
       hint: 'Spring PE converts to gravitational PE. Height = d sin 30°.',
       walkthrough: [
         {
@@ -241,11 +206,9 @@ export default {
       id: 'ch5-100-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A car engine (P = 80 kW) accelerates a 1200 kg car from 0 to 30 m/s on a level road. ' +
-        'The total friction force is 400 N. Find: (a) time to reach 30 m/s, (b) distance covered.}',
+        '\\text{A car engine (P = 80 kW) accelerates a 1200 kg car from 0 to 30 m/s on a level road. The total friction force is 400 N. Find: (a) time to reach 30 m/s, (b) distance covered.}',
       hint:
-        'Energy supplied by engine = ΔKE + work against friction. ' +
-        'P × t = ½mv² + F_friction × d. Use W-E Theorem and kinematics to find both t and d.',
+        'Energy supplied by engine = ΔKE + work against friction. P × t = ½mv² + F_friction × d. Use W-E Theorem and kinematics to find both t and d.',
       walkthrough: [
         {
           expression: '\\Delta KE = \\tfrac{1}{2}(1200)(900) = 540{,}000\\,\\text{J}',

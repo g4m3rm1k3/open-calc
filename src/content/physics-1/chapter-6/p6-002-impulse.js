@@ -9,49 +9,28 @@ export default {
 
   hook: {
     question:
-      'A car crashes at 60 km/h into a wall of foam and into a solid concrete wall. ' +
-      'Same mass, same initial speed. Both stop completely. ' +
-      'The momentum change is identical in both crashes. ' +
-      'Yet the foam crash is survivable and the concrete crash is fatal. ' +
-      'What is the physics difference?',
+      'A car crashes at 60 km/h into a wall of foam and into a solid concrete wall. Same mass, same initial speed. Both stop completely. The momentum change is identical in both crashes. Yet the foam crash is survivable and the concrete crash is fatal. What is the physics difference?',
     realWorldContext:
-      'Impulse is the bridge between force and momentum. ' +
-      'Understanding it explains every piece of crash safety technology: ' +
-      'airbags, crumple zones, helmets, landing mats in gymnastics, and padding in boxing gloves. ' +
-      'They all work by one mechanism: extending the time of impact to reduce the peak force.',
+      'Impulse is the bridge between force and momentum. Understanding it explains every piece of crash safety technology: airbags, crumple zones, helmets, landing mats in gymnastics, and padding in boxing gloves. They all work by one mechanism: extending the time of impact to reduce the peak force.',
     previewVisualizationId: 'SVGDiagram',
   },
 
   intuition: {
     prose: [
-      '**The answer:** The time of impact. ' +
-        'Foam takes 200 ms to stop the car; concrete takes 5 ms. Same momentum change (\\(\\Delta p = mv\\)), but spread over very different times. ' +
-        'From \\(F = dp/dt\\): the concrete wall exerts 40× more force. ' +
-        'That force is what kills — not the speed, not the momentum change, but the force × time relationship.',
+      '**The answer:** The time of impact. Foam takes 200 ms to stop the car; concrete takes 5 ms. Same momentum change (\\(\\Delta p = mv\\)), but spread over very different times. From \\(F = dp/dt\\): the concrete wall exerts 40× more force. That force is what kills — not the speed, not the momentum change, but the force × time relationship.',
 
-      '**Impulse:** The product \\(J = F\\Delta t\\) is called impulse. ' +
-        'It equals the change in momentum: \\(J = \\Delta p = m\\Delta v\\). ' +
-        'This is the **Impulse-Momentum Theorem**. ' +
-        'The same impulse (same Δp) can be delivered by a large force over a short time or a small force over a long time.',
+      '**Impulse:** The product \\(J = F\\Delta t\\) is called impulse. It equals the change in momentum: \\(J = \\Delta p = m\\Delta v\\). This is the **Impulse-Momentum Theorem**. The same impulse (same Δp) can be delivered by a large force over a short time or a small force over a long time.',
 
-      '**Variable forces:** Real collision forces are not constant — they spike, peak, and decay. ' +
-        'The impulse is the area under the F–t graph: \\(J = \\int F\\,dt\\). ' +
-        'A force-time graph is therefore the key to understanding any collision — the area tells you the momentum change, regardless of force shape.',
+      '**Variable forces:** Real collision forces are not constant — they spike, peak, and decay. The impulse is the area under the F–t graph: \\(J = \\int F\\,dt\\). A force-time graph is therefore the key to understanding any collision — the area tells you the momentum change, regardless of force shape.',
 
-      '**Transfer to design:** Airbags extend collision time from ~5 ms (steering wheel) to ~30–50 ms. ' +
-        'Same ΔP, 6–10× longer time, 6–10× smaller peak force. ' +
-        'Crumple zones do the same with the car body. ' +
-        'Helmets do it with foam between skull and hard shell. ' +
-        'The physics is always: larger Δt → smaller F for the same J = Δp.',
+      '**Transfer to design:** Airbags extend collision time from ~5 ms (steering wheel) to ~30–50 ms. Same ΔP, 6–10× longer time, 6–10× smaller peak force. Crumple zones do the same with the car body. Helmets do it with foam between skull and hard shell. The physics is always: larger Δt → smaller F for the same J = Δp.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 2 of 3 — The force-momentum mechanism',
         body:
-          '**Lesson 1:** Momentum p = mv. Conserved when no net external force.\n' +
-          '**This lesson:** How a net external force *changes* momentum: impulse J = FΔt = Δp.\n' +
-          '**Next lesson:** Conservation of momentum in collisions — both elastic and inelastic.',
+          '**Lesson 1:** Momentum p = mv. Conserved when no net external force.\n**This lesson:** How a net external force *changes* momentum: impulse J = FΔt = Δp.\n**Next lesson:** Conservation of momentum in collisions — both elastic and inelastic.',
       },
       {
         type: 'theorem',
@@ -68,17 +47,13 @@ export default {
         type: 'insight',
         title: 'Trade-off: F × Δt = constant',
         body:
-          'For a fixed momentum change, force and time are inversely related: \\(F = \\Delta p / \\Delta t\\). ' +
-          'Double the impact time → half the force. ' +
-          'This inverse relationship is exploited by every piece of safety equipment ever designed.',
+          'For a fixed momentum change, force and time are inversely related: \\(F = \\Delta p / \\Delta t\\). Double the impact time → half the force. This inverse relationship is exploited by every piece of safety equipment ever designed.',
       },
       {
         type: 'connection',
         title: 'Calculus connection: J = ∫F dt is momentum\'s antiderivative',
         body:
-          'Since \\(F = dp/dt\\), integrating both sides: \\(\\int_{t_i}^{t_f} F\\,dt = \\int dp = \\Delta p\\). ' +
-          'The impulse (area under F-t graph) is exactly what you get by integrating the derivative of momentum. ' +
-          'This is the Fundamental Theorem of Calculus applied to mechanics.',
+          'Since \\(F = dp/dt\\), integrating both sides: \\(\\int_{t_i}^{t_f} F\\,dt = \\int dp = \\Delta p\\). The impulse (area under F-t graph) is exactly what you get by integrating the derivative of momentum. This is the Fundamental Theorem of Calculus applied to mechanics.',
       },
     ],
     visualizations: [
@@ -87,16 +62,13 @@ export default {
         props: { type: 'impulse-area' },
         title: 'Area under F-t graph = impulse = Δp',
         caption:
-          'Two collision scenarios with the same area under their F-t curves but different peak forces. ' +
-          'The tall, narrow spike (concrete wall) and the short, wide hump (foam) deliver identical impulse — but the spike force is lethal.',
+          'Two collision scenarios with the same area under their F-t curves but different peak forces. The tall, narrow spike (concrete wall) and the short, wide hump (foam) deliver identical impulse — but the spike force is lethal.',
       },
       {
         id: 'FunctionPlotter',
         title: 'Spike vs spread: same area, different peaks',
         mathBridge:
-          'Plot two F-t curves with equal areas. ' +
-          'A spike 10× taller must be 10× narrower for equal impulse. ' +
-          'The area = impulse = Δp is the same. The peak force is not.',
+          'Plot two F-t curves with equal areas. A spike 10× taller must be 10× narrower for equal impulse. The area = impulse = Δp is the same. The peak force is not.',
         caption: 'Same Δp, very different peak force. This is the physics of safety engineering.',
         props: {
           expression: '400*exp(-50*x*x)',
@@ -123,16 +95,13 @@ export default {
         type: 'mnemonic',
         title: 'Reading a F-t graph',
         body:
-          'The **area** under F-t = impulse = Δp.\\\\' +
-          'The **slope** of a p-t graph = force.\\\\' +
-          'A constant F gives a straight p-t line. A spike gives a sudden jump in p.',
+          'The **area** under F-t = impulse = Δp.\\\\The **slope** of a p-t graph = force.\\\\A constant F gives a straight p-t line. A spike gives a sudden jump in p.',
       },
       {
         type: 'warning',
         title: 'Impulse is not the same as work',
         body:
-          'Work = \\(\\int F\\,dx\\) — force over displacement. Impulse = \\(\\int F\\,dt\\) — force over time. ' +
-          'They are different integrals of force. Work changes KE; impulse changes momentum.',
+          'Work = \\(\\int F\\,dx\\) — force over displacement. Impulse = \\(\\int F\\,dt\\) — force over time. They are different integrals of force. Work changes KE; impulse changes momentum.',
       },
     ],
     visualizations: [
@@ -140,9 +109,7 @@ export default {
         id: 'PositionVelocityAcceleration',
         title: 'Momentum changes when force is applied',
         mathBridge:
-          'Watch the p-t graph (which is just v-t scaled by mass). ' +
-          'The slope of p-t at any instant is the force at that instant. ' +
-          'A constant force gives a straight p-t line (constant slope).',
+          'Watch the p-t graph (which is just v-t scaled by mass). The slope of p-t at any instant is the force at that instant. A constant force gives a straight p-t line (constant slope).',
         caption: 'dp/dt = F — the slope of the momentum curve is the applied force.',
         props: { showMomentum: true },
       },
@@ -176,8 +143,7 @@ export default {
       id: 'ch6-002-ex1',
       title: 'Baseball bat impact',
       problem:
-        '\\text{A 0.145 kg baseball at −35 m/s (toward batter) is hit and leaves at +48 m/s. ' +
-        'Contact time = 1.5 ms. Find (a) impulse, (b) average force.}',
+        '\\text{A 0.145 kg baseball at −35 m/s (toward batter) is hit and leaves at +48 m/s. Contact time = 1.5 ms. Find (a) impulse, (b) average force.}',
       steps: [
         {
           expression: '\\Delta p = m(v_f - v_i) = 0.145(48 - (-35)) = 0.145(83) = 12.0\\,\\text{N·s}',
@@ -194,8 +160,7 @@ export default {
       id: 'ch6-002-ex2',
       title: 'Variable force — impulse from graph',
       problem:
-        '\\text{A force follows } F(t) = 6t - t^2 \\text{ (N) from } t = 0 \\text{ to } t = 6\\text{ s. ' +
-        'A 3 kg object starts from rest. Find its final speed.}',
+        '\\text{A force follows } F(t) = 6t - t^2 \\text{ (N) from } t = 0 \\text{ to } t = 6\\text{ s. A 3 kg object starts from rest. Find its final speed.}',
       steps: [
         {
           expression: 'J = \\int_0^6 (6t - t^2)\\,dt = \\left[3t^2 - \\frac{t^3}{3}\\right]_0^6',
@@ -229,8 +194,7 @@ export default {
       id: 'ch6-002-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A 70 kg person jumps off a 0.5 m ledge. On landing with bent knees, the stopping time is 0.3 s. ' +
-        'Find the average force the ground exerts on the person during landing.}',
+        '\\text{A 70 kg person jumps off a 0.5 m ledge. On landing with bent knees, the stopping time is 0.3 s. Find the average force the ground exerts on the person during landing.}',
       hint: 'First find landing speed using energy: v = √(2gh). Then use impulse-momentum for landing force.',
       walkthrough: [
         {
@@ -252,8 +216,7 @@ export default {
       id: 'ch6-002-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A force } F(t) = F_0\\sin(\\pi t/T) \\text{ acts on a } m = 2\\text{ kg object from } t=0 \\text{ to } t=T. ' +
-        '\\text{Find the resulting velocity change in terms of } F_0 \\text{ and } T.',
+        '\\text{A force } F(t) = F_0\\sin(\\pi t/T) \\text{ acts on a } m = 2\\text{ kg object from } t=0 \\text{ to } t=T. \\text{Find the resulting velocity change in terms of } F_0 \\text{ and } T.',
       hint: 'Integrate F(t) from 0 to T. Use ∫sin(πt/T) dt = −(T/π)cos(πt/T).',
       walkthrough: [
         {

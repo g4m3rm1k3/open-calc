@@ -12,7 +12,7 @@ export default {
     question: 'You push a heavy box with 40 N — but at an angle. How much of that force is actually moving the box?',
     realWorldContext:
       `This is the core question behind the concept of **work** in physics. Only the component of force in the direction of motion does useful work. If you push perpendicular to the motion, you do zero work — no matter how hard you push. The dot product is the mathematical tool that extracts exactly this "component in a given direction." It appears in work ($W = \\vec{F}\\cdot\\vec{d}$), power ($P = \\vec{F}\\cdot\\vec{v}$), electric potential, magnetic flux, and almost every other "how much overlap is there?" question in physics.`,
-    previewVisualizationId: 'DotProductIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [{
@@ -73,12 +73,10 @@ export default {
           `Geometric meaning: $\\vec{A}\\cdot\\vec{B} = |A||B|\\cos\\phi$. The dashed line is the perpendicular from $\\vec{B}$'s tip to $\\vec{A}$'s line. The foot is the projection of $\\vec{B}$ onto $\\vec{A}$. Dot product = (projection length) × |A|. When φ = 90°, projection = 0.`,
       },
       {
-        id: 'DotProductIntuition',
-        title: 'Drag the vectors — watch the dot product and projection update',
-        mathBridge:
-          `The blue line shows the projection of $\\vec{B}$ onto $\\vec{A}$. The dot product readout shows $|A||B|\\cos\\phi$.`,
-        caption:
-          'Rotate one vector through 360°. Notice the dot product: positive for acute angles, zero at 90°, negative for obtuse.',
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Dot product — projection and sign',
+        caption: `Rotate one vector through 360°. The dot product is positive for acute angles ($\\phi < 90°$), zero at exactly 90°, and negative for obtuse angles ($\\phi > 90°$). The projection of $\\vec{B}$ onto $\\vec{A}$ is $|B|\\cos\\phi$.`,
       },
     ],
   },
@@ -118,10 +116,10 @@ export default {
       },
     ],
     visualizations: [{
-      id: 'DotProductExplorer',
-      title: 'Dot Product Geometric Explorer',
-      mathBridge: 'Vary magnitudes and angles to see how the scalar product scales.',
-      caption: 'Maximum alignment = maximum dot product.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Dot Product Explorer — magnitudes and angles',
+      caption: `$\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y = |A||B|\\cos\\phi$. Maximum when fully aligned ($\\phi=0$); zero when perpendicular ($\\phi=90°$); minimum when anti-aligned ($\\phi=180°$).`,
     }],
   },
 
@@ -175,10 +173,10 @@ export default {
     ],
     title: 'Geometric = Component: The two dot product formulas agree',
     visualizations: [{
-      id: 'DotProductFormRecogniser',
-      title: 'Notation Drill',
-      mathBridge: 'Identify valid vs invalid dot product expressions.',
-      caption: 'Rigor starts with notation.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Proof: geometric = component formula',
+      caption: `Expanding $(A_x\\hat{i}+A_y\\hat{j})\\cdot(B_x\\hat{i}+B_y\\hat{j})$ and applying orthonormality ($\\hat{i}\\cdot\\hat{j}=0$, $\\hat{i}\\cdot\\hat{i}=1$) leaves only $A_xB_x + A_yB_y$. The two formulas are identical.`,
     }],
   },
 
@@ -489,7 +487,77 @@ export default {
           annotation: 'Net work is negative — the ball loses kinetic energy (it\'s going uphill).',
         },
       ],
-      answer: 'W_{\\text{total}} = -136\\,\\text{J}',
+      answer: `W_{\\text{total}} = -136\\,\\text{J}`,
+    },
+  ],
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-010-q1',
+      question: `The dot product $\\vec{A}\\cdot\\vec{B}$ produces:`,
+      options: [`A vector perpendicular to both`, `A scalar (a number)`, `A unit vector`, `A vector in the same direction as $\\vec{A}$`],
+      answer: 1,
+      explanation: `The dot product (scalar product) takes two vectors and produces a single number — a scalar. This distinguishes it from the cross product.`,
+    },
+    {
+      id: 'p1-ch1-010-q2',
+      question: `$\\vec{A} = (3, 4)$ and $\\vec{B} = (4, -3)$. What is $\\vec{A}\\cdot\\vec{B}$?`,
+      options: [`$25$`, `$0$`, `$7$`, `$-7$`],
+      answer: 1,
+      explanation: `$\\vec{A}\\cdot\\vec{B} = (3)(4) + (4)(-3) = 12 - 12 = 0$. The vectors are perpendicular!`,
+    },
+    {
+      id: 'p1-ch1-010-q3',
+      question: `Work is defined as $W = \\vec{F}\\cdot\\vec{d}$. If $\\vec{F}$ is perpendicular to $\\vec{d}$, the work done is:`,
+      options: [`$|F||d|$`, `$-|F||d|$`, `$0$`, `$|F|+|d|$`],
+      answer: 2,
+      explanation: `$W = |F||d|\\cos90° = |F||d|(0) = 0$. A force perpendicular to motion does no work — no matter how large the force.`,
+    },
+    {
+      id: 'p1-ch1-010-q4',
+      question: `$\\vec{A}\\cdot\\vec{A} = ?$`,
+      options: [`$1$`, `$|\\vec{A}|^2$`, `$0$`, `$2|\\vec{A}|$`],
+      answer: 1,
+      explanation: `$\\vec{A}\\cdot\\vec{A} = A_x^2+A_y^2+A_z^2 = |\\vec{A}|^2$. The angle between a vector and itself is 0°, so $\\cos0° = 1$.`,
+    },
+    {
+      id: 'p1-ch1-010-q5',
+      question: `The dot product is positive when the angle $\\phi$ between the vectors is:`,
+      options: [`$\\phi > 90°$`, `$\\phi = 90°$`, `$\\phi < 90°$`, `Always`],
+      answer: 2,
+      explanation: `$\\cos\\phi > 0$ for $\\phi < 90°$ (acute). $\\cos\\phi = 0$ at $90°$. $\\cos\\phi < 0$ for $\\phi > 90°$ (obtuse).`,
+    },
+    {
+      id: 'p1-ch1-010-q6',
+      question: `Is $\\vec{A}\\cdot\\vec{B} = \\vec{B}\\cdot\\vec{A}$?`,
+      options: [`No — order matters`, `Yes — the dot product is commutative`, `Only when vectors are parallel`, `Only in 2D`],
+      answer: 1,
+      explanation: `$A_xB_x + A_yB_y = B_xA_x + B_yA_y$. The dot product is commutative.`,
+    },
+    {
+      id: 'p1-ch1-010-q7',
+      question: `$(\\vec{A}\\cdot\\vec{B})\\cdot\\vec{C}$ is:`,
+      options: [
+        `A vector in the direction of $\\vec{C}$`,
+        `Undefined — you cannot dot a scalar with a vector`,
+        `Equal to $\\vec{A}\\cdot(\\vec{B}\\cdot\\vec{C})$`,
+        `Always zero`,
+      ],
+      answer: 1,
+      explanation: `$\\vec{A}\\cdot\\vec{B}$ is a scalar. Scalars cannot be dotted with vectors. The dot product is not associative in this sense.`,
+    },
+    {
+      id: 'p1-ch1-010-q8',
+      question: `The Cauchy-Schwarz inequality states $|\\vec{A}\\cdot\\vec{B}| \\le |\\vec{A}||\\vec{B}|$. When does equality hold?`,
+      options: [
+        `When $\\vec{A} = \\vec{B}$`,
+        `When $\\vec{A}$ and $\\vec{B}$ are parallel (same or opposite directions)`,
+        `When $\\vec{A}$ and $\\vec{B}$ are perpendicular`,
+        `Always`,
+      ],
+      answer: 1,
+      explanation: `Equality holds when $|\\cos\\phi| = 1$, i.e. $\\phi = 0°$ (same direction) or $\\phi = 180°$ (opposite). In both cases the vectors are parallel.`,
     },
   ],
 }

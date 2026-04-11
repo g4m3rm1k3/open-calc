@@ -9,105 +9,64 @@ export default {
 
   hook: {
     question:
-      'A guitar string is plucked at its center. ' +
-      'The disturbance splits into two pulses traveling in opposite directions. ' +
-      'When they meet at the ends of the string, they reflect and travel back. ' +
-      'When two waves occupy the same string simultaneously — what happens? ' +
-      'Does the string break? Do the waves cancel? Do they add? ' +
-      'And why does the string eventually settle into a smooth, sustained tone?',
+      'A guitar string is plucked at its center. The disturbance splits into two pulses traveling in opposite directions. When they meet at the ends of the string, they reflect and travel back. When two waves occupy the same string simultaneously — what happens? Does the string break? Do the waves cancel? Do they add? And why does the string eventually settle into a smooth, sustained tone?',
     realWorldContext:
-      'The wave equation ∂²y/∂t² = v² ∂²y/∂x² is one of the most important equations in all of physics. ' +
-      'Maxwell derived it for electromagnetic fields in 1865 — and found v = 1/√(ε₀μ₀) = c. ' +
-      'This single calculation revealed that light is an electromagnetic wave. ' +
-      'Schrödinger\'s equation (quantum mechanics) is a wave equation. ' +
-      'Einstein\'s gravitational wave equation (GR) is a wave equation. ' +
-      'Every wave phenomenon in nature descends from the same mathematical structure.',
+      'The wave equation ∂²y/∂t² = v² ∂²y/∂x² is one of the most important equations in all of physics. Maxwell derived it for electromagnetic fields in 1865 — and found v = 1/√(ε₀μ₀) = c. This single calculation revealed that light is an electromagnetic wave. Schrödinger\'s equation (quantum mechanics) is a wave equation. Einstein\'s gravitational wave equation (GR) is a wave equation. Every wave phenomenon in nature descends from the same mathematical structure.',
     previewVisualizationId: 'WaveformViz',
   },
 
   intuition: {
     prose: [
-      '**Superposition:** When two waves occupy the same medium, they simply add. ' +
-        'y_total = y₁ + y₂. The string doesn\'t break or cancel — ' +
-        'each wave passes through the other as if the other weren\'t there. ' +
-        'After they cross, each continues unchanged. This is the **principle of superposition**, ' +
-        'and it holds whenever the medium responds linearly (which it does for small amplitudes).',
+      '**Superposition:** When two waves occupy the same medium, they simply add. y_total = y₁ + y₂. The string doesn\'t break or cancel — each wave passes through the other as if the other weren\'t there. After they cross, each continues unchanged. This is the **principle of superposition**, and it holds whenever the medium responds linearly (which it does for small amplitudes).',
 
-      '**Standing waves from superposition:** When two identical waves travel in opposite directions, ' +
-        'their superposition creates a **standing wave** — a pattern that oscillates in place without traveling. ' +
-        'Some points (nodes) never move; others (antinodes) oscillate with maximum amplitude. ' +
-        'This is the vibration pattern of guitar strings, organ pipes, and laser cavities.',
+      '**Standing waves from superposition:** When two identical waves travel in opposite directions, their superposition creates a **standing wave** — a pattern that oscillates in place without traveling. Some points (nodes) never move; others (antinodes) oscillate with maximum amplitude. This is the vibration pattern of guitar strings, organ pipes, and laser cavities.',
 
-      '**Why the guitar settles into a tone:** The string can only sustain vibrations where ' +
-        'integer numbers of half-wavelengths fit between the fixed ends: L = nλ/2. ' +
-        'These are the **harmonics** or **normal modes**. ' +
-        'The fundamental (n=1) is the lowest pitch. Overtones (n=2,3,...) create the timbre. ' +
-        'The Fourier theorem says any pluck shape can be decomposed into these modes — ' +
-        'and each mode sustains independently. The tone you hear is the superposition.',
+      '**Why the guitar settles into a tone:** The string can only sustain vibrations where integer numbers of half-wavelengths fit between the fixed ends: L = nλ/2. These are the **harmonics** or **normal modes**. The fundamental (n=1) is the lowest pitch. Overtones (n=2,3,...) create the timbre. The Fourier theorem says any pluck shape can be decomposed into these modes — and each mode sustains independently. The tone you hear is the superposition.',
 
-      '**The wave equation:** The mathematical statement that disturbances propagate at speed v. ' +
-        'It equates the second time-derivative (acceleration of the medium) to the second space-derivative (curvature of the wave): ' +
-        '∂²y/∂t² = v² ∂²y/∂x². ' +
-        'Any function of the form f(x − vt) or g(x + vt) satisfies it — and so does any sum of such functions. ' +
-        'This is why superposition works: the equation is linear.',
+      '**The wave equation:** The mathematical statement that disturbances propagate at speed v. It equates the second time-derivative (acceleration of the medium) to the second space-derivative (curvature of the wave): ∂²y/∂t² = v² ∂²y/∂x². Any function of the form f(x − vt) or g(x + vt) satisfies it — and so does any sum of such functions. This is why superposition works: the equation is linear.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 4 of 4 — The wave equation closes Chapter 8',
         body:
-          '**Lessons 1–3:** Hooke\'s Law → SHM → wave properties.\\n' +
-          '**This lesson:** The wave equation — the PDE that governs all wave phenomena.\\n' +
-          '**Physics 2:** Interference, diffraction, EM waves, Maxwell\'s equations.\\n' +
-          '**Math connection:** This is the first PDE you\'ve seen — it opens the door to differential equations.',
+          '**Lessons 1–3:** Hooke\'s Law → SHM → wave properties.\\n**This lesson:** The wave equation — the PDE that governs all wave phenomena.\\n**Physics 2:** Interference, diffraction, EM waves, Maxwell\'s equations.\\n**Math connection:** This is the first PDE you\'ve seen — it opens the door to differential equations.',
       },
       {
         type: 'theorem',
         title: 'The wave equation',
         body:
-          '\\frac{\\partial^2 y}{\\partial t^2} = v^2 \\frac{\\partial^2 y}{\\partial x^2}\\\\' +
-          '\\text{Solutions: } y = f(x - vt) + g(x + vt) \\text{ (d\'Alembert)}',
+          '\\frac{\\partial^2 y}{\\partial t^2} = v^2 \\frac{\\partial^2 y}{\\partial x^2}\\\\\\text{Solutions: } y = f(x - vt) + g(x + vt) \\text{ (d\'Alembert)}',
       },
       {
         type: 'theorem',
         title: 'Principle of superposition',
         body:
-          '\\text{If } y_1 \\text{ and } y_2 \\text{ are solutions, so is } y_1 + y_2.\\\\' +
-          '\\text{(The wave equation is linear — no } y^2 \\text{ terms.)}',
+          '\\text{If } y_1 \\text{ and } y_2 \\text{ are solutions, so is } y_1 + y_2.\\\\\\text{(The wave equation is linear — no } y^2 \\text{ terms.)}',
       },
       {
         type: 'theorem',
         title: 'Standing waves on a string',
         body:
-          'y(x,t) = 2A\\sin(kx)\\cos(\\omega t)\\\\' +
-          '\\text{Nodes: } x = 0, \\lambda/2, \\lambda, \\ldots \\quad (\\sin(kx) = 0)\\\\' +
-          '\\text{Antinodes: } x = \\lambda/4, 3\\lambda/4, \\ldots \\quad (|\\sin(kx)| = 1)',
+          'y(x,t) = 2A\\sin(kx)\\cos(\\omega t)\\\\\\text{Nodes: } x = 0, \\lambda/2, \\lambda, \\ldots \\quad (\\sin(kx) = 0)\\\\\\text{Antinodes: } x = \\lambda/4, 3\\lambda/4, \\ldots \\quad (|\\sin(kx)| = 1)',
       },
       {
         type: 'theorem',
         title: 'Harmonics of a string fixed at both ends',
         body:
-          'L = n\\frac{\\lambda_n}{2} \\Rightarrow \\lambda_n = \\frac{2L}{n} \\Rightarrow f_n = \\frac{nv}{2L} = nf_1\\\\' +
-          '\\text{Fundamental: } f_1 = \\frac{v}{2L} = \\frac{1}{2L}\\sqrt{\\frac{F_T}{\\mu}}',
+          'L = n\\frac{\\lambda_n}{2} \\Rightarrow \\lambda_n = \\frac{2L}{n} \\Rightarrow f_n = \\frac{nv}{2L} = nf_1\\\\\\text{Fundamental: } f_1 = \\frac{v}{2L} = \\frac{1}{2L}\\sqrt{\\frac{F_T}{\\mu}}',
       },
       {
         type: 'connection',
         title: 'Calculus: the wave equation is a second-order PDE',
         body:
-          '\\(\\partial^2 y/\\partial t^2\\) and \\(\\partial^2 y/\\partial x^2\\) are partial derivatives — ' +
-          'differentiate with respect to one variable while treating the other as constant. ' +
-          'This is your first PDE: an equation for an unknown function of two variables. ' +
-          'The techniques for ODEs (Lesson 8.2) extend naturally: guess a separable solution y = X(x)T(t), ' +
-          'substitute, and reduce to two ODEs.',
+          '\\(\\partial^2 y/\\partial t^2\\) and \\(\\partial^2 y/\\partial x^2\\) are partial derivatives — differentiate with respect to one variable while treating the other as constant. This is your first PDE: an equation for an unknown function of two variables. The techniques for ODEs (Lesson 8.2) extend naturally: guess a separable solution y = X(x)T(t), substitute, and reduce to two ODEs.',
       },
       {
         type: 'insight',
         title: 'Why light is a wave: Maxwell\'s wave equation',
         body:
-          'From Maxwell\'s equations, the electric field satisfies \\(\\partial^2 E/\\partial t^2 = (1/\\varepsilon_0\\mu_0)\\partial^2 E/\\partial x^2\\). ' +
-          'This is the wave equation with \\(v^2 = 1/(\\varepsilon_0\\mu_0)\\). ' +
-          'Plugging in measured values: \\(v = 3 \\times 10^8\\) m/s = c. ' +
-          'Maxwell concluded: light is an electromagnetic wave.',
+          'From Maxwell\'s equations, the electric field satisfies \\(\\partial^2 E/\\partial t^2 = (1/\\varepsilon_0\\mu_0)\\partial^2 E/\\partial x^2\\). This is the wave equation with \\(v^2 = 1/(\\varepsilon_0\\mu_0)\\). Plugging in measured values: \\(v = 3 \\times 10^8\\) m/s = c. Maxwell concluded: light is an electromagnetic wave.',
       },
     ],
     visualizations: [
@@ -115,9 +74,7 @@ export default {
         id: 'WaveformViz',
         title: 'Two waves passing through each other — superposition live',
         mathBridge:
-          'Watch two pulses approach, overlap (showing their sum), then separate unchanged. ' +
-          'Set them to equal but opposite amplitudes: they cancel at the crossing moment, then reappear. ' +
-          'The medium briefly shows zero displacement — but each wave\'s energy continues forward.',
+          'Watch two pulses approach, overlap (showing their sum), then separate unchanged. Set them to equal but opposite amplitudes: they cancel at the crossing moment, then reappear. The medium briefly shows zero displacement — but each wave\'s energy continues forward.',
         caption: 'Superposition: waves add algebraically at every point. Each wave continues unchanged after the overlap.',
         props: { showSuperposition: true, twoWaves: true },
       },
@@ -125,9 +82,7 @@ export default {
         id: 'WaveformViz',
         title: 'Standing wave — nodes and antinodes',
         mathBridge:
-          'Set two waves of equal amplitude traveling in opposite directions. ' +
-          'Watch the standing wave form: nodes stay fixed, antinodes oscillate in place. ' +
-          'Change frequency to hit different harmonics: n=1 (fundamental), n=2 (first overtone).',
+          'Set two waves of equal amplitude traveling in opposite directions. Watch the standing wave form: nodes stay fixed, antinodes oscillate in place. Change frequency to hit different harmonics: n=1 (fundamental), n=2 (first overtone).',
         caption: 'y = 2A sin(kx) cos(ωt). The pattern oscillates in place — no net energy transport.',
         props: { showStandingWave: true, interactive: true },
       },
@@ -149,19 +104,13 @@ export default {
         type: 'theorem',
         title: 'Open pipe vs closed pipe harmonics',
         body:
-          '\\text{Open both ends (antinodes at ends): } f_n = \\frac{nv}{2L}, \\; n = 1,2,3,\\ldots\\\\' +
-          '\\text{Closed one end (node at closed, antinode at open): } f_n = \\frac{nv}{4L}, \\; n = 1,3,5,\\ldots \\text{(odd only)}',
+          '\\text{Open both ends (antinodes at ends): } f_n = \\frac{nv}{2L}, \\; n = 1,2,3,\\ldots\\\\\\text{Closed one end (node at closed, antinode at open): } f_n = \\frac{nv}{4L}, \\; n = 1,3,5,\\ldots \\text{(odd only)}',
       },
       {
         type: 'insight',
         title: 'Fourier\'s theorem: any wave is a sum of sinusoids',
         body:
-          'The wave equation is linear, so any sum of solutions is a solution. ' +
-          'Fourier\'s theorem says: any periodic function can be written as a sum of sinusoids ' +
-          '(at the fundamental frequency and its harmonics). ' +
-          'This is why: (1) complex waveforms decompose into pure tones, ' +
-          '(2) a guitar sounds different from a flute at the same pitch — different harmonic content, ' +
-          '(3) signal processing, image compression, and quantum mechanics all use the same mathematics.',
+          'The wave equation is linear, so any sum of solutions is a solution. Fourier\'s theorem says: any periodic function can be written as a sum of sinusoids (at the fundamental frequency and its harmonics). This is why: (1) complex waveforms decompose into pure tones, (2) a guitar sounds different from a flute at the same pitch — different harmonic content, (3) signal processing, image compression, and quantum mechanics all use the same mathematics.',
       },
     ],
     visualizations: [
@@ -169,10 +118,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'Standing wave: y = 2A sin(kx) cos(ωt)',
         mathBridge:
-          'At t = 0: y = 2A sin(kx) — full amplitude spatial pattern. ' +
-          'At t = T/4 (ωt = π/2): cos(π/2) = 0 — every point at zero (string flat). ' +
-          'At t = T/2: y = −2A sin(kx) — inverted. ' +
-          'The nodes (sin(kx) = 0) never move regardless of time.',
+          'At t = 0: y = 2A sin(kx) — full amplitude spatial pattern. At t = T/4 (ωt = π/2): cos(π/2) = 0 — every point at zero (string flat). At t = T/2: y = −2A sin(kx) — inverted. The nodes (sin(kx) = 0) never move regardless of time.',
         caption: 'Standing wave is a product of space (sin kx) and time (cos ωt). Nodes are fixed in space.',
         props: { expression: '0.1*sin(PI*x)', variable: 'x', xMin: 0, xMax: 2, label: 'y (m)' },
       },
@@ -200,9 +146,7 @@ export default {
       },
       {
         expression:
-          'A\\sin(kx-\\omega t) + A\\sin(kx+\\omega t)\\\\' +
-          '= A[\\sin(kx)\\cos(\\omega t) - \\cos(kx)\\sin(\\omega t)] + A[\\sin(kx)\\cos(\\omega t) + \\cos(kx)\\sin(\\omega t)]\\\\' +
-          '= 2A\\sin(kx)\\cos(\\omega t)',
+          'A\\sin(kx-\\omega t) + A\\sin(kx+\\omega t)\\\\= A[\\sin(kx)\\cos(\\omega t) - \\cos(kx)\\sin(\\omega t)] + A[\\sin(kx)\\cos(\\omega t) + \\cos(kx)\\sin(\\omega t)]\\\\= 2A\\sin(kx)\\cos(\\omega t)',
         annotation: 'Standing wave from superposition. The cos(kx) sin(ωt) terms cancel; the sin(kx) cos(ωt) terms add.',
       },
     ],
@@ -213,8 +157,7 @@ export default {
       id: 'ch8-004-ex1',
       title: 'Harmonics of a guitar string',
       problem:
-        '\\text{A guitar string (L = 0.65 m, v = 410 m/s). ' +
-        'Find the fundamental frequency and first three overtone frequencies.}',
+        '\\text{A guitar string (L = 0.65 m, v = 410 m/s). Find the fundamental frequency and first three overtone frequencies.}',
       steps: [
         {
           expression: 'f_1 = v/(2L) = 410/(2 \\times 0.65) = 410/1.3 \\approx 315\\,\\text{Hz}',
@@ -265,8 +208,7 @@ export default {
       id: 'ch8-004-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{Two waves: y₁ = 0.04 sin(3x − 6t) and y₂ = 0.04 sin(3x + 6t). ' +
-        'Write the standing wave and find the positions of the first three nodes and antinodes.}',
+        '\\text{Two waves: y₁ = 0.04 sin(3x − 6t) and y₂ = 0.04 sin(3x + 6t). Write the standing wave and find the positions of the first three nodes and antinodes.}',
       hint: 'Use the superposition formula. Nodes where sin(kx) = 0; antinodes where |sin(kx)| = 1.',
       walkthrough: [
         {
@@ -288,8 +230,7 @@ export default {
       id: 'ch8-004-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{Verify by substitution that y(x,t) = A sin(kx)cos(ωt) satisfies the wave equation, ' +
-        'and find the condition on k, ω, and v for it to be a valid standing wave solution.}',
+        '\\text{Verify by substitution that y(x,t) = A sin(kx)cos(ωt) satisfies the wave equation, and find the condition on k, ω, and v for it to be a valid standing wave solution.}',
       hint: 'Compute ∂²y/∂t² and ∂²y/∂x². Set them equal with the wave equation factor v².',
       walkthrough: [
         {

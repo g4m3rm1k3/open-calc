@@ -9,139 +9,62 @@ export default {
 
   hook: {
     question:
-      'A feather and a bowling ball are dropped from the same height at the same moment. ' +
-      'Which hits the ground first? ' +
-      'For 2,000 years the answer was obvious to every educated person on Earth — the bowling ball, of course. ' +
-      'It\'s heavier. Aristotle said so. ' +
-      'Then one man climbed a tower, dropped two cannonballs of different weights, ' +
-      'and watched them hit the ground at exactly the same time. ' +
-      'Everything changed. Why was everyone wrong for two millennia — and what exactly did Galileo do that nobody had done before?',
+      'A feather and a bowling ball are dropped from the same height at the same moment. Which hits the ground first? For 2,000 years the answer was obvious to every educated person on Earth — the bowling ball, of course. It\'s heavier. Aristotle said so. Then one man climbed a tower, dropped two cannonballs of different weights, and watched them hit the ground at exactly the same time. Everything changed. Why was everyone wrong for two millennia — and what exactly did Galileo do that nobody had done before?',
     realWorldContext:
-      'Physics is the reason your phone knows where you are, ' +
-      'why airplanes don\'t fall out of the sky, ' +
-      'why nuclear power plants work, ' +
-      'why MRI machines can see inside your body without cutting you open, ' +
-      'and why the internet can send information at the speed of light through glass cables. ' +
-      'Every piece of technology you use descended from someone asking "why does that happen?" ' +
-      'and then doing the experiment to find out.',
+      'Physics is the reason your phone knows where you are, why airplanes don\'t fall out of the sky, why nuclear power plants work, why MRI machines can see inside your body without cutting you open, and why the internet can send information at the speed of light through glass cables. Every piece of technology you use descended from someone asking "why does that happen?" and then doing the experiment to find out.',
     previewVisualizationId: 'ModelVsReality',
   },
 
   intuition: {
     prose: [
-      '**The 2,000-year mistake — and what it teaches us.** ' +
-        'Aristotle was the smartest person of his era. He had a theory for why heavy objects fall faster: ' +
-        'everything in the universe wants to reach its natural place. ' +
-        'Heavy objects have more "earth" in them, so they want to reach the ground more urgently. ' +
-        'It was a beautiful, logical argument. It felt right. ' +
-        'And for 2,000 years, nobody bothered to test it — because *of course* it was right. ' +
-        'Aristotle said so. ' +
-        'This is the first lesson of physics: **authority is not evidence**. ' +
-        'A beautiful argument that contradicts experiment is wrong. Full stop.',
+      '**The 2,000-year mistake — and what it teaches us. ** Aristotle was the smartest person of his era. He had a theory for why heavy objects fall faster: everything in the universe wants to reach its natural place. Heavy objects have more "earth" in them, so they want to reach the ground more urgently. It was a beautiful, logical argument. It felt right. And for 2,000 years, nobody bothered to test it — because *of course* it was right. Aristotle said so. This is the first lesson of physics: **authority is not evidence**. A beautiful argument that contradicts experiment is wrong. Full stop.',
 
-      '**Galileo\'s revolution: making physics a science.** ' +
-        'Around 1590, Galileo Galilei did something radical. ' +
-        'Instead of arguing from logic, he did experiments. ' +
-        'He rolled balls down inclined ramps (slow enough to measure with a water clock), ' +
-        'and he found that the distance covered grew as the *square* of the time elapsed — not linearly. ' +
-        'A ball rolling for 2 seconds covered 4 times the distance of one rolling for 1 second. ' +
-        '3 seconds: 9 times the distance. ' +
-        'This was not common sense. It was a discovery. ' +
-        'Galileo also introduced something else revolutionary: **idealization**. ' +
-        'He imagined perfectly smooth ramps, perfectly round balls, no air resistance. ' +
-        'Real ramps are rough. Real balls wobble. But the idealized version revealed the underlying pattern — ' +
-        'and the underlying pattern is what physics is actually about.',
+      '**Galileo\'s revolution: making physics a science. ** Around 1590, Galileo Galilei did something radical. Instead of arguing from logic, he did experiments. He rolled balls down inclined ramps (slow enough to measure with a water clock), and he found that the distance covered grew as the *square* of the time elapsed — not linearly. A ball rolling for 2 seconds covered 4 times the distance of one rolling for 1 second. 3 seconds: 9 times the distance. This was not common sense. It was a discovery. Galileo also introduced something else revolutionary: **idealization**. He imagined perfectly smooth ramps, perfectly round balls, no air resistance. Real ramps are rough. Real balls wobble. But the idealized version revealed the underlying pattern — and the underlying pattern is what physics is actually about.',
 
-      '**What a model is — and what it isn\'t.** ' +
-        'A physics model is not a perfect copy of reality. ' +
-        'It is a *simplified version* that keeps the dominant causes and throws away weak effects. ' +
-        'When you drop a bowling ball, gravity dominates. Air resistance is tiny in comparison. ' +
-        'So the model says: ignore air resistance. ' +
-        'The model gives you an answer that is *close enough to be useful*. ' +
-        'An engineer designing a building doesn\'t need the exact air resistance on every molecule of concrete. ' +
-        'They need to know if the building will stand. ' +
-        'The model is a tool — and like all tools, it has a job it\'s good at and situations where it breaks down.',
+      '**What a model is — and what it isn\'t. ** A physics model is not a perfect copy of reality. It is a *simplified version* that keeps the dominant causes and throws away weak effects. When you drop a bowling ball, gravity dominates. Air resistance is tiny in comparison. So the model says: ignore air resistance. The model gives you an answer that is *close enough to be useful*. An engineer designing a building doesn\'t need the exact air resistance on every molecule of concrete. They need to know if the building will stand. The model is a tool — and like all tools, it has a job it\'s good at and situations where it breaks down.',
 
-      '**The model-building loop — how physics actually works.** ' +
-        'Physics has a four-step cycle that has powered every discovery from Galileo to gravitational waves: ' +
-        '**(1) Observe** — look at the world carefully and notice a pattern. ' +
-        '**(2) Model** — build a simplified mathematical description that captures the pattern. ' +
-        '**(3) Predict** — use the model to calculate something you haven\'t measured yet. ' +
-        '**(4) Test** — do the experiment and check if the prediction is right. ' +
-        'If the prediction fails, refine or replace the model and repeat. ' +
-        'This loop never ends. Newton\'s model of gravity was "correct" for 200 years — ' +
-        'then Einstein showed it broke down near massive stars. ' +
-        'Einstein\'s model is "correct" — until we find where it breaks. ' +
-        'Progress in physics is not about finding perfect models. ' +
-        'It is about finding better ones.',
+      '**The model-building loop — how physics actually works. ** Physics has a four-step cycle that has powered every discovery from Galileo to gravitational waves: **(1) Observe** — look at the world carefully and notice a pattern. **(2) Model** — build a simplified mathematical description that captures the pattern. **(3) Predict** — use the model to calculate something you haven\'t measured yet. **(4) Test** — do the experiment and check if the prediction is right. If the prediction fails, refine or replace the model and repeat. This loop never ends. Newton\'s model of gravity was "correct" for 200 years — then Einstein showed it broke down near massive stars. Einstein\'s model is "correct" — until we find where it breaks. Progress in physics is not about finding perfect models. It is about finding better ones.',
 
-      '**Newton and the laws that ran the world.** ' +
-        'Isaac Newton (1643–1727) built on Galileo\'s experiments and created a mathematical framework ' +
-        'so powerful it predicted the orbits of planets, the tides of oceans, ' +
-        'and the trajectory of cannonballs — all from three simple laws. ' +
-        'Newton\'s laws ran engineering for 250 years. ' +
-        'Bridges, steam engines, factories, railroads, ships — all classical mechanics applied. ' +
-        'When NASA launched the Apollo missions in 1969, they used Newton\'s equations. ' +
-        'Newton\'s model is not "wrong" — it is an excellent approximation for objects moving ' +
-        'much slower than light and not too close to a black hole. ' +
-        'This is exactly what physics models are: *good enough for a domain*.',
+      '**Newton and the laws that ran the world. ** Isaac Newton (1643–1727) built on Galileo\'s experiments and created a mathematical framework so powerful it predicted the orbits of planets, the tides of oceans, and the trajectory of cannonballs — all from three simple laws. Newton\'s laws ran engineering for 250 years. Bridges, steam engines, factories, railroads, ships — all classical mechanics applied. When NASA launched the Apollo missions in 1969, they used Newton\'s equations. Newton\'s model is not "wrong" — it is an excellent approximation for objects moving much slower than light and not too close to a black hole. This is exactly what physics models are: *good enough for a domain*.',
 
-      '**Where you are in the story, and where this course is going.** ' +
-        'You are starting physics from the very beginning — from Galileo\'s ramps. ' +
-        'By the time you finish, you will understand Newton\'s three laws, energy, momentum, rotation, waves, ' +
-        'and the mathematical language that connects them all. ' +
-        'Calculus is part of that language — but you don\'t need it to start. ' +
-        'We will build it in alongside the physics, teaching the mathematical tools exactly when you need them. ' +
-        'Everything connects. Nothing is arbitrary. ' +
-        'Physics is not a collection of formulas to memorize. ' +
-        'It is a way of thinking — and this lesson is where that thinking starts.',
+      '**Where you are in the story, and where this course is going. ** You are starting physics from the very beginning — from Galileo\'s ramps. By the time you finish, you will understand Newton\'s three laws, energy, momentum, rotation, waves, and the mathematical language that connects them all. Calculus is part of that language — but you don\'t need it to start. We will build it in alongside the physics, teaching the mathematical tools exactly when you need them. Everything connects. Nothing is arbitrary. Physics is not a collection of formulas to memorize. It is a way of thinking — and this lesson is where that thinking starts.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 1 of 8 — Chapter 0: Orientation',
         body:
-          '**This lesson:** What physics is, how models work, the Galileo story.\\n' +
-          '**Next (Lesson 2):** Units and dimensions — the grammar of physics equations.\\n' +
-          '**Chapter 1:** Kinematics — using equations to describe and predict motion.\\n' +
-          '**The arc:** Every chapter after this builds on the model-building habit you\'re starting here.',
+          '**This lesson:** What physics is, how models work, the Galileo story.\\n**Next (Lesson 2):** Units and dimensions — the grammar of physics equations.\\n**Chapter 1:** Kinematics — using equations to describe and predict motion.\\n**The arc:** Every chapter after this builds on the model-building habit you\'re starting here.',
       },
       {
         type: 'definition',
         title: 'What a physics model is',
         body:
-          '\\text{A model is a simplified mathematical description of a physical system.}\\\\' +
-          '\\text{It keeps dominant causes and drops weak effects.}\\\\' +
-          '\\text{Its job: make accurate predictions within a defined domain.}',
+          '\\text{A model is a simplified mathematical description of a physical system.}\\\\\\text{It keeps dominant causes and drops weak effects.}\\\\\\text{Its job: make accurate predictions within a defined domain.}',
       },
       {
         type: 'insight',
         title: 'The four-step physics cycle',
         body:
-          '\\text{Observe} \\rightarrow \\text{Model} \\rightarrow \\text{Predict} \\rightarrow \\text{Test} \\rightarrow \\text{Repeat}\\\\' +
-          '\\text{Every discovery in physics follows this loop.}',
+          '\\text{Observe} \\rightarrow \\text{Model} \\rightarrow \\text{Predict} \\rightarrow \\text{Test} \\rightarrow \\text{Repeat}\\\\\\text{Every discovery in physics follows this loop.}',
       },
       {
         type: 'insight',
         title: 'Galileo\'s two gifts to science',
         body:
-          '\\text{1. Experiment beats authority: check claims against reality.}\\\\' +
-          '\\text{2. Idealization: strip away weak effects to reveal the core pattern.}',
+          '\\text{1. Experiment beats authority: check claims against reality.}\\\\\\text{2. Idealization: strip away weak effects to reveal the core pattern.}',
       },
       {
         type: 'warning',
         title: 'A model that fails outside its domain is not "wrong" — it\'s limited',
         body:
-          'Newton\'s gravity is not wrong for dropping a ball. It is wrong near a neutron star. ' +
-          'Every model has a domain of validity. Knowing that domain is as important as knowing the model itself.',
+          'Newton\'s gravity is not wrong for dropping a ball. It is wrong near a neutron star. Every model has a domain of validity. Knowing that domain is as important as knowing the model itself.',
       },
       {
         type: 'real-world',
         title: 'How far Newton\'s model reaches',
         body:
-          '\\text{Newton\'s laws were published in 1687.}\\\\' +
-          '\\text{They were used to land on the Moon in 1969 — 282 years later.}\\\\' +
-          '\\text{The Apollo trajectory calculation used } F = ma \\text{ essentially unchanged.}',
+          '\\text{Newton\'s laws were published in 1687.}\\\\\\text{They were used to land on the Moon in 1969 — 282 years later.}\\\\\\text{The Apollo trajectory calculation used } F = ma \\text{ essentially unchanged.}',
       },
     ],
     visualizations: [
@@ -149,11 +72,7 @@ export default {
         id: 'ModelVsReality',
         title: 'Same drop, different models — toggle air resistance',
         mathBridge:
-          'Step 1: Click "No air resistance" and watch the ball fall. Note how long it takes. ' +
-          'Step 2: Click "With air resistance" and watch the same drop. The ball takes longer. ' +
-          'Step 3: Now drag the density slider. Feather (low density) → huge difference. Bowling ball (high density) → almost no difference. ' +
-          'The key lesson: the no-air-resistance model is excellent for dense objects, poor for light ones. ' +
-          'This is what "domain of validity" means — not that the model is wrong, but that it has limits.',
+          'Step 1: Click "No air resistance" and watch the ball fall. Note how long it takes. Step 2: Click "With air resistance" and watch the same drop. The ball takes longer. Step 3: Now drag the density slider. Feather (low density) → huge difference. Bowling ball (high density) → almost no difference. The key lesson: the no-air-resistance model is excellent for dense objects, poor for light ones. This is what "domain of validity" means — not that the model is wrong, but that it has limits.',
         caption: 'The simplest model (no drag) is accurate for dense objects and misleading for light ones. Every model has a domain.',
         props: { showAirResistance: false, interactive: true },
       },
@@ -162,11 +81,7 @@ export default {
         props: { type: 'kinematic-chain' },
         title: 'The model chain: position, velocity, acceleration',
         mathBridge:
-          'Before reading the diagram, ask yourself: what three things would you need to describe motion completely? ' +
-          'The chain shows the answer: where something is (position x), ' +
-          'how fast it\'s moving (velocity v), and what\'s causing that speed to change (acceleration a). ' +
-          'The arrows show that calculus connects these — but we will build that connection from algebra first, ' +
-          'before we ever write a derivative.',
+          'Before reading the diagram, ask yourself: what three things would you need to describe motion completely? The chain shows the answer: where something is (position x), how fast it\'s moving (velocity v), and what\'s causing that speed to change (acceleration a). The arrows show that calculus connects these — but we will build that connection from algebra first, before we ever write a derivative.',
         caption: 'Physics models motion through three linked quantities: position, velocity, and acceleration. They form a chain — change one and the others respond.',
       },
     ],
@@ -174,74 +89,42 @@ export default {
 
   math: {
     prose: [
-      '**Variables, proportions, and the language of prediction.**',
-      'A variable is a symbol that stands for a measurable quantity. ' +
-        'In physics, the most important variables in mechanics are: ' +
-        '\\(x\\) for position (measured in meters), ' +
-        '\\(t\\) for time (measured in seconds), ' +
-        '\\(v\\) for velocity (meters per second), ' +
-        '\\(a\\) for acceleration (meters per second squared), ' +
-        'and \\(m\\) for mass (kilograms).',
-      'Galileo discovered that the distance an object falls from rest is proportional to the square of the time: ' +
-        '\\(x \\propto t^2\\). ' +
-        'This means if you double the time, the distance quadruples. Triple the time — nine times the distance. ' +
-        'The full equation (which we will derive properly in Chapter 1) is: \\(x = \\frac{1}{2}at^2\\).',
-      'The constant \\(a\\) is the acceleration due to gravity, which Galileo measured (roughly) ' +
-        'and Newton later explained: \\(a = g \\approx 9.8 \\text{ m/s}^2\\). ' +
-        'This is the same for all objects in free fall — bowling balls, feathers, and everything in between — ' +
-        'provided air resistance is negligible.',
-      '**Substituting into a model: the basic skill.**  ' +
-        'Using a physics model means plugging numbers in for variables and computing the result. ' +
-        'This is pure algebra — no calculus needed. ' +
-        'If \\(x = \\frac{1}{2}(9.8)t^2\\) and you want to know how far an object falls in \\(t = 3\\) seconds: ' +
-        'substitute \\(t = 3\\), compute \\(t^2 = 9\\), then \\(x = \\frac{1}{2}(9.8)(9) = 44.1 \\text{ m}\\). ' +
-        'That\'s it. The model does the physics. The algebra does the arithmetic.',
+      '**Variables, proportions, and the language of prediction. **',
+      'A variable is a symbol that stands for a measurable quantity. In physics, the most important variables in mechanics are: \\(x\\) for position (measured in meters), \\(t\\) for time (measured in seconds), \\(v\\) for velocity (meters per second), \\(a\\) for acceleration (meters per second squared), and \\(m\\) for mass (kilograms).',
+      'Galileo discovered that the distance an object falls from rest is proportional to the square of the time: \\(x \\propto t^2\\). This means if you double the time, the distance quadruples. Triple the time — nine times the distance. The full equation (which we will derive properly in Chapter 1) is: \\(x = \\frac{1}{2}at^2\\).',
+      'The constant \\(a\\) is the acceleration due to gravity, which Galileo measured (roughly) and Newton later explained: \\(a = g \\approx 9.8 \\text{ m/s}^2\\). This is the same for all objects in free fall — bowling balls, feathers, and everything in between — provided air resistance is negligible.',
+      '**Substituting into a model: the basic skill. **  Using a physics model means plugging numbers in for variables and computing the result. This is pure algebra — no calculus needed. If \\(x = \\frac{1}{2}(9.8)t^2\\) and you want to know how far an object falls in \\(t = 3\\) seconds: substitute \\(t = 3\\), compute \\(t^2 = 9\\), then \\(x = \\frac{1}{2}(9.8)(9) = 44.1 \\text{ m}\\). That\'s it. The model does the physics. The algebra does the arithmetic.',
     ],
     callouts: [
       {
         type: 'definition',
         title: 'The five core variables of mechanics',
         body:
-          'x \\text{ — position [m]}\\\\' +
-          't \\text{ — time [s]}\\\\' +
-          'v \\text{ — velocity [m/s]}\\\\' +
-          'a \\text{ — acceleration [m/s}^2\\text{]}\\\\' +
-          'm \\text{ — mass [kg]}',
+          'x \\text{ — position [m]}\\\\t \\text{ — time [s]}\\\\v \\text{ — velocity [m/s]}\\\\a \\text{ — acceleration [m/s}^2\\text{]}\\\\m \\text{ — mass [kg]}',
       },
       {
         type: 'theorem',
         title: 'Galileo\'s free-fall result (no air resistance)',
         body:
-          'x = \\tfrac{1}{2}g t^2 \\qquad g = 9.8\\,\\text{m/s}^2\\\\' +
-          '\\text{distance doubles with every 1.4× increase in time (because } \\sqrt{2} \\approx 1.4\\text{)}\\\\' +
-          '\\text{holds for any object, any mass — as long as drag is negligible}',
+          'x = \\tfrac{1}{2}g t^2 \\qquad g = 9.8\\,\\text{m/s}^2\\\\\\text{distance doubles with every 1.4× increase in time (because } \\sqrt{2} \\approx 1.4\\text{)}\\\\\\text{holds for any object, any mass — as long as drag is negligible}',
       },
       {
         type: 'insight',
         title: 'Why x ∝ t² and not x ∝ t',
         body:
-          '\\text{If distance were proportional to time (}x \\propto t\\text{), speed would be constant.}\\\\' +
-          '\\text{But free fall keeps getting faster — speed grows with time.}\\\\' +
-          '\\text{Accumulating speed means distance grows faster than time — hence } t^2.',
+          '\\text{If distance were proportional to time (}x \\propto t\\text{), speed would be constant.}\\\\\\text{But free fall keeps getting faster — speed grows with time.}\\\\\\text{Accumulating speed means distance grows faster than time — hence } t^2.',
       },
       {
         type: 'definition',
         title: 'What ∝ means',
         body:
-          'a \\propto b \\text{ means "a is proportional to b": double b → double a.}\\\\' +
-          'a \\propto b^2 \\text{ means "a is proportional to b squared": double b → quadruple a.}\\\\' +
-          '\\text{Proportionality tells you the shape of a relationship before you know the constant.}',
+          'a \\propto b \\text{ means "a is proportional to b": double b → double a.}\\\\a \\propto b^2 \\text{ means "a is proportional to b squared": double b → quadruple a.}\\\\\\text{Proportionality tells you the shape of a relationship before you know the constant.}',
       },
       {
         type: 'mnemonic',
         title: 'The substitution checklist',
         body:
-          '1. Write the model equation.\\n' +
-          '2. List what you know (write down numbers and units).\\n' +
-          '3. Identify what you want to find.\\n' +
-          '4. Substitute known values for variables.\\n' +
-          '5. Compute the arithmetic.\\n' +
-          '6. Check the units in your answer.',
+          '1. Write the model equation.\\n2. List what you know (write down numbers and units).\\n3. Identify what you want to find.\\n4. Substitute known values for variables.\\n5. Compute the arithmetic.\\n6. Check the units in your answer.',
       },
     ],
     visualizations: [
@@ -249,11 +132,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'x = ½gt² — distance vs time for free fall',
         mathBridge:
-          'The curve shows distance fallen vs time. ' +
-          'Notice it curves upward — distance grows faster and faster. ' +
-          'At t = 1 s: about 4.9 m. At t = 2 s: about 19.6 m (four times as much). At t = 3 s: about 44.1 m (nine times as much). ' +
-          'This curvature is the signature of t² — it is not a straight line because the object keeps accelerating. ' +
-          'A straight-line x-t graph would mean constant speed. The curve tells you there is acceleration.',
+          'The curve shows distance fallen vs time. Notice it curves upward — distance grows faster and faster. At t = 1 s: about 4.9 m. At t = 2 s: about 19.6 m (four times as much). At t = 3 s: about 44.1 m (nine times as much). This curvature is the signature of t² — it is not a straight line because the object keeps accelerating. A straight-line x-t graph would mean constant speed. The curve tells you there is acceleration.',
         caption: 'x = ½(9.8)t². The curve bends upward because speed keeps increasing — this is what acceleration looks like on an x-t graph.',
         props: { expression: '0.5*9.8*x*x', variable: 't', xMin: 0, xMax: 4, label: 'x (m)' },
       },
@@ -263,8 +142,7 @@ export default {
   rigor: {
     title: 'Why all objects fall at the same rate: the logic behind Galileo\'s result',
     prose: [
-      'This is one of the most surprising results in all of physics. Here is the logical argument — ' +
-        'no calculus required, just careful reasoning.',
+      'This is one of the most surprising results in all of physics. Here is the logical argument — no calculus required, just careful reasoning.',
     ],
     proofSteps: [
       {
@@ -282,20 +160,15 @@ export default {
       },
       {
         expression:
-          '\\text{But: the slow stone (L) drags on the fast stone (H), slowing the pair down.}\\\\' +
-          '\\text{So the combined object should fall slower than H alone.}',
+          '\\text{But: the slow stone (L) drags on the fast stone (H), slowing the pair down.}\\\\\\text{So the combined object should fall slower than H alone.}',
         annotation:
-          'This is the contradiction. If heavier = faster, the combined object should be fastest. ' +
-          'But if the light stone retards the heavy one, the pair should be slower. ' +
-          'These two conclusions cannot both be true. Aristotle\'s assumption leads to a logical impossibility.',
+          'This is the contradiction. If heavier = faster, the combined object should be fastest. But if the light stone retards the heavy one, the pair should be slower. These two conclusions cannot both be true. Aristotle\'s assumption leads to a logical impossibility.',
       },
       {
         expression:
           '\\text{Contradiction. The only escape: all objects fall at the same rate regardless of mass.}',
         annotation:
-          'Galileo\'s insight: this thought experiment — done on paper, not in a lab — already defeats Aristotle. ' +
-          'The experiment confirms it. ' +
-          'This argument is called a "reductio ad absurdum" — reduce the assumption to an absurdity to disprove it.',
+          'Galileo\'s insight: this thought experiment — done on paper, not in a lab — already defeats Aristotle. The experiment confirms it. This argument is called a "reductio ad absurdum" — reduce the assumption to an absurdity to disprove it.',
       },
     ],
   },
@@ -322,15 +195,13 @@ export default {
         },
       ],
       conclusion:
-        'The object falls 19.6 m — about the height of a 6-story building — in just 2 seconds. ' +
-        'This shows how fast free fall accelerates.',
+        'The object falls 19.6 m — about the height of a 6-story building — in just 2 seconds. This shows how fast free fall accelerates.',
     },
     {
       id: 'p0-001-ex2',
       title: 'The proportionality rule: doubling time',
       problem:
-        '\\text{An object falls } 19.6 \\text{ m in } 2 \\text{ s. ' +
-        'Without computing, predict how far it falls in } 4 \\text{ s.}',
+        '\\text{An object falls } 19.6 \\text{ m in } 2 \\text{ s. Without computing, predict how far it falls in } 4 \\text{ s.}',
       steps: [
         {
           expression: '\\text{Because } x \\propto t^2, \\text{ doubling } t \\text{ multiplies } x \\text{ by } 2^2 = 4.',
@@ -343,15 +214,13 @@ export default {
         },
       ],
       conclusion:
-        'Proportionality reasoning is a physicist\'s superpower. ' +
-        'Once you know the shape of a relationship (like x ∝ t²), you can predict how the answer scales without recalculating everything.',
+        'Proportionality reasoning is a physicist\'s superpower. Once you know the shape of a relationship (like x ∝ t²), you can predict how the answer scales without recalculating everything.',
     },
     {
       id: 'p0-001-ex3',
       title: 'Finding time from distance — working backwards',
       problem:
-        '\\text{You drop a coin into a well and hear a splash after } 3 \\text{ s. ' +
-        'How deep is the well? (Ignore the travel time of sound.)}',
+        '\\text{You drop a coin into a well and hear a splash after } 3 \\text{ s. How deep is the well? (Ignore the travel time of sound.)}',
       steps: [
         {
           expression: 'x = \\tfrac{1}{2}(9.8)(3)^2',
@@ -364,23 +233,17 @@ export default {
         {
           expression: 'x = 44.1\\,\\text{m}',
           annotation:
-            'The well is about 44 m deep. For context: a 14-story building is about 42 m. ' +
-            'Note the model assumption: we ignored how long the sound takes to travel back up. ' +
-            'For a 44 m well, sound (343 m/s) takes about 0.13 s — small but nonzero. ' +
-            'A better model would account for this.',
+            'The well is about 44 m deep. For context: a 14-story building is about 42 m. Note the model assumption: we ignored how long the sound takes to travel back up. For a 44 m well, sound (343 m/s) takes about 0.13 s — small but nonzero. A better model would account for this.',
         },
       ],
       conclusion:
-        '44 m. And notice: we just identified a place where the model could be improved. ' +
-        'This is the model-building habit — always ask "what did we ignore, and does it matter?"',
+        '44 m. And notice: we just identified a place where the model could be improved. This is the model-building habit — always ask "what did we ignore, and does it matter?"',
     },
     {
       id: 'p0-001-ex4',
       title: 'Identifying model assumptions',
       problem:
-        '\\text{A skydiver jumps from a plane and falls for } 10 \\text{ s. ' +
-        'The model } x = \\tfrac{1}{2}(9.8)(10)^2 = 490 \\text{ m. ' +
-        'The actual distance fallen is about 400 m. What is the model missing?}',
+        '\\text{A skydiver jumps from a plane and falls for } 10 \\text{ s. The model } x = \\tfrac{1}{2}(9.8)(10)^2 = 490 \\text{ m. The actual distance fallen is about 400 m. What is the model missing?}',
       steps: [
         {
           expression: '\\text{Model predicts: } x = \\tfrac{1}{2}(9.8)(100) = 490\\,\\text{m}',
@@ -393,15 +256,11 @@ export default {
         {
           expression: '\\text{Error} = 490 - 400 = 90\\,\\text{m}, \\text{ about } 18\\% \\text{ overestimate.}',
           annotation:
-            'The model overestimates because it ignores air resistance. ' +
-            'A skydiver (arms out) experiences significant drag — especially after the first few seconds when speed builds up. ' +
-            'The simple model is wrong because air resistance is NOT negligible for a human body at terminal velocity.',
+            'The model overestimates because it ignores air resistance. A skydiver (arms out) experiences significant drag — especially after the first few seconds when speed builds up. The simple model is wrong because air resistance is NOT negligible for a human body at terminal velocity.',
         },
       ],
       conclusion:
-        'The model x = ½gt² assumes no air resistance. ' +
-        'For a skydiver, that assumption breaks down badly by the 10-second mark. ' +
-        'A better model adds a drag term. This is exactly the model-building loop in action: test → failure → refine.',
+        'The model x = ½gt² assumes no air resistance. For a skydiver, that assumption breaks down badly by the 10-second mark. A better model adds a drag term. This is exactly the model-building loop in action: test → failure → refine.',
     },
   ],
 
@@ -429,8 +288,7 @@ export default {
       id: 'p0-001-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{An object falls from rest and covers 80 m. ' +
-        'Using } x = \\tfrac{1}{2}(9.8)t^2, \\text{ how long did it fall?}',
+        '\\text{An object falls from rest and covers 80 m. Using } x = \\tfrac{1}{2}(9.8)t^2, \\text{ how long did it fall?}',
       hint:
         'You know x, you want t. Rearrange the equation: t² = 2x/g. Then take the square root.',
       walkthrough: [
@@ -453,14 +311,9 @@ export default {
       id: 'p0-001-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{On the Moon, gravity is } g_{Moon} = 1.6\\,\\text{m/s}^2 \\text{ (about 1/6 of Earth\'s). ' +
-        'An astronaut drops a wrench from 10 m height. ' +
-        '(a) How long does it take to hit the Moon\'s surface? ' +
-        '(b) How much longer is that than on Earth? ' +
-        '(c) Why does this support Galileo, not Aristotle?}',
+        '\\text{On the Moon, gravity is } g_{Moon} = 1.6\\,\\text{m/s}^2 \\text{ (about 1/6 of Earth\'s). An astronaut drops a wrench from 10 m height. (a) How long does it take to hit the Moon\'s surface? (b) How much longer is that than on Earth? (c) Why does this support Galileo, not Aristotle?}',
       hint:
-        'Use t² = 2x/g with the appropriate g for each location. ' +
-        'For part (c): the wrench and a feather would hit at exactly the same time on the Moon (no atmosphere = no air resistance).',
+        'Use t² = 2x/g with the appropriate g for each location. For part (c): the wrench and a feather would hit at exactly the same time on the Moon (no atmosphere = no air resistance).',
       walkthrough: [
         {
           expression: 't_{Moon}^2 = \\frac{2(10)}{1.6} = 12.5 \\Rightarrow t_{Moon} = \\sqrt{12.5} \\approx 3.54\\,\\text{s}',
@@ -477,8 +330,7 @@ export default {
         {
           expression: '\\text{On the Moon: no air, so a feather and a wrench fall identically. Galileo confirmed.}',
           annotation:
-            'Apollo 15 astronaut David Scott actually did this experiment live on the Moon in 1971 — ' +
-            'dropped a feather and a hammer. They hit at exactly the same time.',
+            'Apollo 15 astronaut David Scott actually did this experiment live on the Moon in 1971 — dropped a feather and a hammer. They hit at exactly the same time.',
         },
       ],
       answer:
@@ -530,8 +382,7 @@ export default {
         lessonId: 'p0-002',
         label: 'Units and Dimensions (Lesson 2)',
         note:
-          'If the algebra above feels shaky, Lesson 2 on units will solidify the notation — ' +
-          'every variable has a physical type, and checking those types catches algebra errors early.',
+          'If the algebra above feels shaky, Lesson 2 on units will solidify the notation — every variable has a physical type, and checking those types catches algebra errors early.',
       },
     ],
     futureLinks: [
@@ -539,15 +390,13 @@ export default {
         lessonId: 'p1-ch1-001',
         label: 'Ch. 1: Kinematics — Constant Acceleration',
         note:
-          'The equation x = ½gt² introduced here is a special case of the full SUVAT equation x = v₀t + ½at². ' +
-          'Chapter 1 derives all five SUVAT equations from the same model-building logic you learned here.',
+          'The equation x = ½gt² introduced here is a special case of the full SUVAT equation x = v₀t + ½at². Chapter 1 derives all five SUVAT equations from the same model-building logic you learned here.',
       },
       {
         lessonId: 'p1-ch2-001',
         label: 'Ch. 2: Newton\'s Laws',
         note:
-          'Galileo measured g = 9.8 m/s² experimentally. Newton\'s Second Law (F = ma) explains why — ' +
-          'gravity exerts a force F = mg on every mass m, giving acceleration a = g.',
+          'Galileo measured g = 9.8 m/s² experimentally. Newton\'s Second Law (F = ma) explains why — gravity exerts a force F = mg on every mass m, giving acceleration a = g.',
       },
     ],
   },

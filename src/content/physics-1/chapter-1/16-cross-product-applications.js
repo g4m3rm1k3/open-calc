@@ -15,7 +15,7 @@ export default {
     question: 'A spinning gyroscope, a current-carrying wire in a magnetic field, a door closing on a hinge — what do these have in common?',
     realWorldContext:
       `They all involve a force or momentum that acts at an angle to a pivot, and the physical effect depends critically on BOTH the magnitude of that force AND the geometry of where it's applied. A door closes faster when you push far from the hinge, not near it. A magnetic compass needle swings because the magnetic force on moving charges acts perpendicular to both the velocity and the field. A spinning top precesses because gravity's torque acts perpendicular to the angular momentum. In every case, the answer is a cross product: $\\vec{\\tau}=\\vec{r}\\times\\vec{F}$, $\\vec{F}=q\\vec{v}\\times\\vec{B}$, $\\vec{L}=\\vec{r}\\times\\vec{p}$. These aren't abstract formulas — they're the three most important equations in classical mechanics and electromagnetism, and they all share the same mathematical structure.`,
-    previewVisualizationId: 'CrossProductExplorer',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────
@@ -70,10 +70,10 @@ export default {
         caption: `The shaded region is the parallelogram formed by A⃗ and B⃗. Its area equals |A⃗ × B⃗| = |A||B|sinφ. For a triangle with the same two edges, divide by 2. The perpendicular result vector (not shown) points out of the page.`,
       },
       {
-        id: 'CrossProductExplorer',
-        title: 'Explore torque and area interactively',
-        mathBridge: `Drag the vectors to change the angle φ. Watch the parallelogram area change — it's maximum at φ=90° and zero when φ=0°. The torque or magnetic force has the same pattern.`,
-        caption: `Every application of the cross product inherits the same geometry: perpendicular effect, zero when parallel, maximum when perpendicular.`,
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'Torque and area — the same cross product geometry',
+        caption: `Whether computing torque τ⃗ = r⃗ × F⃗ or a parallelogram area, the geometry is identical: the magnitude is |A||B|sinφ (zero when parallel, maximum at 90°) and the result vector is perpendicular to both inputs. Only the physical interpretation changes.`,
       },
     ],
   },
@@ -110,10 +110,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CrossProductPatternSpotter',
-        title: 'Geometry pattern recognition',
-        mathBridge: `Identify which cross product formula applies to each physical scenario: torque, magnetic force, or area calculation. The formula is the same — only the interpretation changes.`,
-        caption: `Physics is about identifying the right pattern, not memorising separate formulas for each scenario.`,
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'One formula, many interpretations',
+        caption: `Torque: τ⃗ = r⃗ × F⃗ — the result points along the rotation axis. Magnetic force: F⃗ = qv⃗ × B⃗ — the force is perpendicular to both velocity and field. Parallelogram area: |a⃗ × b⃗|. In every case the cross product structure is the same — only the physical quantities plugged in change.`,
       },
     ],
   },
@@ -539,4 +539,104 @@ print("All coplanarity tests passed ✓")`,
       },
     ],
   },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-016-q1',
+      question: `The torque on a bolt is $\\vec{\\tau} = \\vec{r} \\times \\vec{F}$. If $|\\vec{r}| = 0.4\\text{ m}$ and $|\\vec{F}| = 10\\text{ N}$ with $\\phi = 90°$ between them, what is $|\\vec{\\tau}|$?`,
+      options: [
+        `$4\\text{ N·m}$`,
+        `$25\\text{ N·m}$`,
+        `$14\\text{ N·m}$`,
+        `$0\\text{ N·m}$`,
+      ],
+      answer: 0,
+      explanation: `$|\\vec{\\tau}| = |\\vec{r}||\\vec{F}|\\sin\\phi = 0.4 \\times 10 \\times \\sin 90° = 0.4 \\times 10 \\times 1 = 4\\text{ N·m}$. At 90° the force is fully perpendicular to the lever arm, giving maximum torque.`,
+    },
+    {
+      id: 'p1-ch1-016-q2',
+      question: `A force is applied along the same line as the position vector $\\vec{r}$ (i.e. directed through the pivot). What is the torque?`,
+      options: [
+        `Maximum torque`,
+        `$|\\vec{r}||\\vec{F}|$`,
+        `Zero`,
+        `$|\\vec{r}| + |\\vec{F}|$`,
+      ],
+      answer: 2,
+      explanation: `When $\\vec{F}$ is parallel to $\\vec{r}$, $\\phi = 0°$ and $\\sin 0° = 0$, so $|\\vec{\\tau}| = 0$. Force directed through the pivot produces no rotation — the classic "pushing on a door at the hinge" example.`,
+    },
+    {
+      id: 'p1-ch1-016-q3',
+      question: `The area of the parallelogram formed by vectors $\\vec{a} = (3, 0, 0)$ and $\\vec{b} = (0, 4, 0)$ is:`,
+      options: [
+        `7`,
+        `5`,
+        `12`,
+        `$\\sqrt{7}$`,
+      ],
+      answer: 2,
+      explanation: `$\\vec{a} \\times \\vec{b} = (0, 0, 12)$, so $|\\vec{a} \\times \\vec{b}| = 12$. Alternatively, $|\\vec{a}||\\vec{b}|\\sin 90° = 3 \\times 4 \\times 1 = 12$. The triangle formed by the same two edges has half this area: 6.`,
+    },
+    {
+      id: 'p1-ch1-016-q4',
+      question: `The magnetic force on a moving charge is $\\vec{F} = q\\vec{v} \\times \\vec{B}$. If a proton moves in $+x$ and the field points in $+y$, which direction does the force act?`,
+      options: [
+        `$+x$`,
+        `$+y$`,
+        `$+z$`,
+        `$-z$`,
+      ],
+      answer: 2,
+      explanation: `$\\hat{x} \\times \\hat{y} = \\hat{z}$ by the cyclic rule. Right-hand rule: point fingers along $+x$, curl toward $+y$, thumb points $+z$. The proton is deflected in the $+z$ direction.`,
+    },
+    {
+      id: 'p1-ch1-016-q5',
+      question: `The scalar triple product $\\vec{A} \\cdot (\\vec{B} \\times \\vec{C})$ equals zero. What does this mean geometrically?`,
+      options: [
+        `$\\vec{A}$ is perpendicular to $\\vec{B}$`,
+        `$\\vec{B}$ and $\\vec{C}$ are parallel`,
+        `The three vectors are coplanar (lie in the same plane)`,
+        `$\\vec{A}$ is parallel to $\\vec{B} \\times \\vec{C}$`,
+      ],
+      answer: 2,
+      explanation: `The scalar triple product equals the signed volume of the parallelepiped formed by the three vectors. Zero volume means the three vectors are coplanar — they all lie in the same plane, so no 3D solid can be formed.`,
+    },
+    {
+      id: 'p1-ch1-016-q6',
+      question: `Which cross product formula gives the area of a triangle with edge vectors $\\vec{a}$ and $\\vec{b}$?`,
+      options: [
+        `$|\\vec{a} \\times \\vec{b}|$`,
+        `$\\frac{1}{2}|\\vec{a} \\times \\vec{b}|$`,
+        `$|\\vec{a} \\cdot \\vec{b}|$`,
+        `$2|\\vec{a} \\times \\vec{b}|$`,
+      ],
+      answer: 1,
+      explanation: `A triangle is half a parallelogram, so its area is $\\frac{1}{2}|\\vec{a} \\times \\vec{b}|$. This works in 3D for any triangle, regardless of its orientation in space.`,
+    },
+    {
+      id: 'p1-ch1-016-q7',
+      question: `A magnetic force $\\vec{F} = q\\vec{v} \\times \\vec{B}$ is always perpendicular to $\\vec{v}$. What physical consequence does this have?`,
+      options: [
+        `The particle accelerates in the direction it's moving`,
+        `The magnetic force does no work on the particle and cannot change its speed`,
+        `The magnetic force slows the particle down`,
+        `The particle moves in a straight line`,
+      ],
+      answer: 1,
+      explanation: `Work = $\\vec{F} \\cdot d\\vec{s}$. Since $\\vec{F}$ is always perpendicular to $\\vec{v}$ (and therefore to $d\\vec{s}$), the dot product is always zero — the magnetic force does no work. It can only change direction, not speed, causing the particle to move in a circular arc.`,
+    },
+    {
+      id: 'p1-ch1-016-q8',
+      question: `The moment arm in torque is defined as:`,
+      options: [
+        `The full length of $|\\vec{r}|$`,
+        `$|\\vec{F}|\\sin\\phi$ — the component of force perpendicular to $\\vec{r}$`,
+        `$|\\vec{r}||\\vec{F}|$`,
+        `$|\\vec{r}|\\cos\\phi$ — the component of $\\vec{r}$ along $\\vec{F}$`,
+      ],
+      answer: 1,
+      explanation: `The moment arm is the perpendicular distance from the pivot to the line of action of the force, which equals $|\\vec{r}|\\sin\\phi$ — or equivalently, the component of force perpendicular to the position vector, $|\\vec{F}|\\sin\\phi$. Both give the same $|\\vec{\\tau}| = rF\\sin\\phi$.`,
+    },
+  ],
 }

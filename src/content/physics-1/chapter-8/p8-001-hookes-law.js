@@ -9,48 +9,28 @@ export default {
 
   hook: {
     question:
-      'You stretch a spring gently — it pulls back. ' +
-      'You stretch it twice as far — it pulls back twice as hard. ' +
-      'Three times as far — three times as hard. ' +
-      'But then you stretch it too far — and suddenly it doesn\'t spring back at all. ' +
-      'What is the law governing the first part, and what breaks it in the second?',
+      'You stretch a spring gently — it pulls back. You stretch it twice as far — it pulls back twice as hard. Three times as far — three times as hard. But then you stretch it too far — and suddenly it doesn\'t spring back at all. What is the law governing the first part, and what breaks it in the second?',
     realWorldContext:
-      'Hooke\'s Law is the foundation of every spring, every elastic material, and every oscillating system. ' +
-      'Suspension bridges sway with it. Atomic bonds obey it near equilibrium. ' +
-      'Every musical instrument string vibrates because of it. ' +
-      'Even the bonds between atoms in a solid act like tiny springs — ' +
-      'which is why solids have a Young\'s modulus and why sound travels through them.',
+      'Hooke\'s Law is the foundation of every spring, every elastic material, and every oscillating system. Suspension bridges sway with it. Atomic bonds obey it near equilibrium. Every musical instrument string vibrates because of it. Even the bonds between atoms in a solid act like tiny springs — which is why solids have a Young\'s modulus and why sound travels through them.',
     previewVisualizationId: 'SpringOscillation',
   },
 
   intuition: {
     prose: [
-      '**The law:** Within the elastic limit, the restoring force of a spring is proportional to its displacement: \\(F = -kx\\). ' +
-        'The minus sign is crucial — it means the force always acts opposite to the displacement, pushing or pulling the spring back toward equilibrium.',
+      '**The law:** Within the elastic limit, the restoring force of a spring is proportional to its displacement: \\(F = -kx\\). The minus sign is crucial — it means the force always acts opposite to the displacement, pushing or pulling the spring back toward equilibrium.',
 
-      '**The elastic limit:** The linear relationship holds only up to a certain extension. ' +
-        'Beyond this, the material deforms permanently (plastic deformation) and Hooke\'s Law fails. ' +
-        'A rubber band, a spring, a steel beam — all are Hookean for small deformations and non-Hookean for large ones. ' +
-        'Physics begins with the linear region.',
+      '**The elastic limit:** The linear relationship holds only up to a certain extension. Beyond this, the material deforms permanently (plastic deformation) and Hooke\'s Law fails. A rubber band, a spring, a steel beam — all are Hookean for small deformations and non-Hookean for large ones. Physics begins with the linear region.',
 
-      '**The spring constant k:** A stiff spring has a large k (requires more force per metre of stretch). ' +
-        'A soft spring has a small k. Units: N/m. ' +
-        'A car suspension spring might have k ≈ 20,000 N/m; a watch spring k ≈ 0.001 N/m; an atomic bond k ≈ 10 N/m.',
+      '**The spring constant k:** A stiff spring has a large k (requires more force per metre of stretch). A soft spring has a small k. Units: N/m. A car suspension spring might have k ≈ 20,000 N/m; a watch spring k ≈ 0.001 N/m; an atomic bond k ≈ 10 N/m.',
 
-      '**Why the minus sign creates oscillation:** If you displace a mass from equilibrium, Hooke\'s Law restores it. ' +
-        'But it overshoots — and the restoring force pulls it back again. ' +
-        'This alternation between restoring force and overshoot is the origin of all oscillatory motion. ' +
-        'Hooke\'s Law is the starting point for the next three lessons.',
+      '**Why the minus sign creates oscillation:** If you displace a mass from equilibrium, Hooke\'s Law restores it. But it overshoots — and the restoring force pulls it back again. This alternation between restoring force and overshoot is the origin of all oscillatory motion. Hooke\'s Law is the starting point for the next three lessons.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 1 of 4 — Chapter 8: Oscillations & Waves',
         body:
-          '**Chapter 5:** Spring PE = ½kx² — work done against Hooke\'s Law, stored as elastic energy.\n' +
-          '**This chapter:** Hooke\'s Law as a restoring force that creates oscillatory motion.\n' +
-          '**This lesson:** F = −kx — the linear restoring force.\n' +
-          '**Next:** Simple Harmonic Motion — the oscillation that results.',
+          '**Chapter 5:** Spring PE = ½kx² — work done against Hooke\'s Law, stored as elastic energy.\n**This chapter:** Hooke\'s Law as a restoring force that creates oscillatory motion.\n**This lesson:** F = −kx — the linear restoring force.\n**Next:** Simple Harmonic Motion — the oscillation that results.',
       },
       {
         type: 'theorem',
@@ -61,28 +41,19 @@ export default {
         type: 'definition',
         title: 'Spring constant k',
         body:
-          'k measures the stiffness: force per unit displacement. ' +
-          'Large k = stiff spring (hard to stretch). ' +
-          'Small k = soft spring (easy to stretch). ' +
-          'Units: N/m.',
+          'k measures the stiffness: force per unit displacement. Large k = stiff spring (hard to stretch). Small k = soft spring (easy to stretch). Units: N/m.',
       },
       {
         type: 'warning',
         title: 'The minus sign is not optional',
         body:
-          'F = −kx, not F = kx. ' +
-          'The restoring force points opposite to x. ' +
-          'If x > 0 (stretched), F < 0 (pulls back). ' +
-          'If x < 0 (compressed), F > 0 (pushes back). ' +
-          'Dropping the minus sign predicts a force that accelerates the spring away from equilibrium — the wrong physics entirely.',
+          'F = −kx, not F = kx. The restoring force points opposite to x. If x > 0 (stretched), F < 0 (pulls back). If x < 0 (compressed), F > 0 (pushes back). Dropping the minus sign predicts a force that accelerates the spring away from equilibrium — the wrong physics entirely.',
       },
       {
         type: 'connection',
         title: 'Calculus connection: F = −dPE/dx confirms the minus sign',
         body:
-          'Spring PE = ½kx². Differentiating: \\(F = -\\dfrac{d}{dx}(\\tfrac{1}{2}kx^2) = -kx\\). ' +
-          'The minus sign in Hooke\'s Law comes directly from the negative gradient of the PE curve. ' +
-          'The parabolic PE well always curves upward — force always points toward the minimum.',
+          'Spring PE = ½kx². Differentiating: \\(F = -\\dfrac{d}{dx}(\\tfrac{1}{2}kx^2) = -kx\\). The minus sign in Hooke\'s Law comes directly from the negative gradient of the PE curve. The parabolic PE well always curves upward — force always points toward the minimum.',
       },
     ],
     visualizations: [
@@ -90,9 +61,7 @@ export default {
         id: 'SpringOscillation',
         title: 'Stretch the spring — feel the restoring force',
         mathBridge:
-          'Drag the mass to stretch or compress the spring. ' +
-          'Watch the force arrow: it always points back toward equilibrium (x = 0). ' +
-          'The force magnitude is proportional to displacement. Release and watch it oscillate.',
+          'Drag the mass to stretch or compress the spring. Watch the force arrow: it always points back toward equilibrium (x = 0). The force magnitude is proportional to displacement. Release and watch it oscillate.',
         caption: 'F = −kx: force is linear in displacement and always restorative.',
         props: { showForce: true, interactive: true },
       },
@@ -100,9 +69,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'F-x graph: slope = −k',
         mathBridge:
-          'Plot F = −kx. The slope is −k. ' +
-          'Double k → steeper slope → stiffer spring. ' +
-          'The area under a triangle on this graph = work = ½kx² (spring PE).',
+          'Plot F = −kx. The slope is −k. Double k → steeper slope → stiffer spring. The area under a triangle on this graph = work = ½kx² (spring PE).',
         caption: 'Linear F-x relationship. The slope gives k directly.',
         props: { expression: '-200*x', variable: 'x', xMin: -0.2, xMax: 0.2, label: 'F (N)' },
       },
@@ -123,16 +90,13 @@ export default {
         type: 'theorem',
         title: 'Springs in series vs parallel',
         body:
-          '\\text{Series: } \\frac{1}{k_{\\text{eff}}} = \\sum_i \\frac{1}{k_i} \\quad (\\text{softer})\\\\' +
-          '\\text{Parallel: } k_{\\text{eff}} = \\sum_i k_i \\quad (\\text{stiffer})',
+          '\\text{Series: } \\frac{1}{k_{\\text{eff}}} = \\sum_i \\frac{1}{k_i} \\quad (\\text{softer})\\\\\\text{Parallel: } k_{\\text{eff}} = \\sum_i k_i \\quad (\\text{stiffer})',
       },
       {
         type: 'insight',
         title: 'Springs are capacitors for mechanical energy',
         body:
-          'A spring stores ½kx² joules when displaced by x. ' +
-          'Double the displacement → 4× the stored energy (quadratic, not linear). ' +
-          'This is the same scaling as kinetic energy ½mv² — by design, they exchange perfectly in SHM.',
+          'A spring stores ½kx² joules when displaced by x. Double the displacement → 4× the stored energy (quadratic, not linear). This is the same scaling as kinetic energy ½mv² — by design, they exchange perfectly in SHM.',
       },
     ],
     visualizations: [
@@ -141,8 +105,7 @@ export default {
         props: { type: 'spring-series-parallel' },
         title: 'Series vs parallel spring combinations',
         caption:
-          'Series: same force, displacements add. Effective k is less than either spring alone. ' +
-          'Parallel: same displacement, forces add. Effective k is greater than either spring.',
+          'Series: same force, displacements add. Effective k is less than either spring alone. Parallel: same displacement, forces add. Effective k is greater than either spring.',
       },
     ],
   },
@@ -225,8 +188,7 @@ export default {
       id: 'ch8-001-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A diatomic molecule has PE: } U(r) = \\frac{A}{r^{12}} - \\frac{B}{r^6} \\text{ (Lennard-Jones). ' +
-        'At equilibrium } r_0 \\text{, show it behaves like a spring. Find k in terms of A, B, r₀.}',
+        '\\text{A diatomic molecule has PE: } U(r) = \\frac{A}{r^{12}} - \\frac{B}{r^6} \\text{ (Lennard-Jones). At equilibrium } r_0 \\text{, show it behaves like a spring. Find k in terms of A, B, r₀.}',
       hint: 'Find r₀ from dU/dr = 0. Then k = d²U/dr² evaluated at r₀.',
       walkthrough: [
         {

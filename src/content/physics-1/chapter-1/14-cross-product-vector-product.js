@@ -15,7 +15,7 @@ export default {
     question: 'You pull a wrench handle at an angle — the bolt turns. Which way? How hard? And why does the answer depend on which direction you pull?',
     realWorldContext:
       `Picture a bolt you're trying to loosen. You grab the wrench handle and pull. If you pull straight toward the bolt, nothing happens — the force goes through the pivot and produces zero rotation. If you pull perpendicular to the handle, you get maximum turning effect. Somewhere in between, the result is proportional to the "crosswise" part of the force. And there's a direction to the torque too: the bolt either spins clockwise or counterclockwise. This is exactly what the **cross product** captures — it measures how much two vectors are "crossing" each other, produces a magnitude that tells you how strong the effect is, and a direction that tells you which way it acts. Torque, angular momentum, magnetic force on a moving charge, and the normal to a surface — all are cross products.`,
-    previewVisualizationId: 'CrossProductIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────
@@ -75,11 +75,10 @@ export default {
         caption: `A⃗ and B⃗ are shown in the xy-plane. The shaded parallelogram has area |A||B|sinφ — that is the magnitude of A⃗ × B⃗. The result vector (not shown) points straight out of the page (in the +z direction) because the rotation from A⃗ to B⃗ is counterclockwise. If you swapped the order, the result would point into the page.`,
       },
       {
-        id: 'CrossProductIntuition',
-        title: 'Interactive cross product',
-        mathBridge: `Drag $\\vec{A}$ and $\\vec{B}$ in 3D. Watch the perpendicular result vector $\\vec{A}\\times\\vec{B}$ update in real time. Check: when $\\vec{A}$ and $\\vec{B}$ are parallel, the result is zero. When they are 90° apart, it is maximum.`,
-        caption: `The result vector is always perpendicular to both inputs. The parallelogram area equals the magnitude.`,
-        props: { interactive: true },
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'Right-hand rule — interactive overview',
+        caption: `Point your right-hand fingers along A⃗ and curl them toward B⃗. Your thumb points in the direction of A⃗ × B⃗. When A⃗ and B⃗ are parallel the parallelogram collapses to zero area — the cross product is zero. When they are 90° apart the area is maximum. The result vector is always perpendicular to both inputs.`,
       },
     ],
   },
@@ -121,10 +120,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CrossProductExplorer',
-        title: 'Adjust A⃗ and B⃗ — watch components update',
-        mathBridge: `Each component of the result changes as you rotate the input vectors. Watch how the $\\hat{j}$ component switches sign compared to the $\\hat{i}$ and $\\hat{k}$ components — that's the cofactor minus sign in action.`,
-        caption: `The component formula and the magnitude formula always agree. Rotate both vectors to parallel — the result goes to zero.`,
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'Component formula — determinant view',
+        caption: `Each component of A⃗ × B⃗ is a 2×2 minor of the determinant. The ĵ component carries a built-in minus sign from the cofactor expansion (+−+ pattern). When the two vectors are parallel, all three components go to zero simultaneously. When they are perpendicular, the area — and the magnitude — is at its peak.`,
       },
     ],
   },
@@ -605,4 +604,104 @@ print(f"A × B = {C3}  (points in +z — out of the page)")`,
       },
     ],
   },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-014-q1',
+      question: `The cross product $\\vec{A} \\times \\vec{B}$ produces which type of result?`,
+      options: [
+        `A scalar (a single number)`,
+        `A vector perpendicular to both $\\vec{A}$ and $\\vec{B}$`,
+        `A vector parallel to $\\vec{A}$`,
+        `A vector in the same plane as $\\vec{A}$ and $\\vec{B}$`,
+      ],
+      answer: 1,
+      explanation: `The cross product always produces a vector that is perpendicular to both input vectors — it points out of the plane containing $\\vec{A}$ and $\\vec{B}$.`,
+    },
+    {
+      id: 'p1-ch1-014-q2',
+      question: `What is $|\\vec{A} \\times \\vec{B}|$ when $\\vec{A}$ and $\\vec{B}$ are parallel?`,
+      options: [
+        `$|\\vec{A}||\\vec{B}|$`,
+        `$|\\vec{A}| + |\\vec{B}|$`,
+        `0`,
+        `$|\\vec{A}||\\vec{B}|/2$`,
+      ],
+      answer: 2,
+      explanation: `$|\\vec{A} \\times \\vec{B}| = |\\vec{A}||\\vec{B}|\\sin\\phi$. When the vectors are parallel, $\\phi = 0°$ and $\\sin 0° = 0$, so the cross product magnitude is zero.`,
+    },
+    {
+      id: 'p1-ch1-014-q3',
+      question: `If $\\vec{A} \\times \\vec{B} = \\vec{C}$, what is $\\vec{B} \\times \\vec{A}$?`,
+      options: [
+        `$\\vec{C}$`,
+        `$-\\vec{C}$`,
+        `$\\vec{0}$`,
+        `$2\\vec{C}$`,
+      ],
+      answer: 1,
+      explanation: `The cross product is anti-commutative: $\\vec{B} \\times \\vec{A} = -(\\vec{A} \\times \\vec{B}) = -\\vec{C}$. Swapping the order flips the direction of the result.`,
+    },
+    {
+      id: 'p1-ch1-014-q4',
+      question: `What does the geometric magnitude $|\\vec{A} \\times \\vec{B}|$ equal?`,
+      options: [
+        `The perimeter of the parallelogram formed by $\\vec{A}$ and $\\vec{B}$`,
+        `The area of the parallelogram formed by $\\vec{A}$ and $\\vec{B}$`,
+        `The diagonal length of the parallelogram`,
+        `Half the area of the triangle formed by $\\vec{A}$ and $\\vec{B}$`,
+      ],
+      answer: 1,
+      explanation: `$|\\vec{A} \\times \\vec{B}| = |\\vec{A}||\\vec{B}|\\sin\\phi$, which equals the base times height of the parallelogram — that is exactly the area of the parallelogram spanned by the two vectors.`,
+    },
+    {
+      id: 'p1-ch1-014-q5',
+      question: `Which component has a built-in minus sign when expanding the cross product determinant?`,
+      options: [
+        `The $\\hat{i}$ component`,
+        `The $\\hat{j}$ component`,
+        `The $\\hat{k}$ component`,
+        `All three components have minus signs`,
+      ],
+      answer: 1,
+      explanation: `When expanding $\\vec{A} \\times \\vec{B} = (A_yB_z-A_zB_y)\\hat{i} - (A_xB_z-A_zB_x)\\hat{j} + (A_xB_y-A_yB_x)\\hat{k}$, the $\\hat{j}$ component carries a minus sign from the cofactor expansion (+−+ pattern along the first row).`,
+    },
+    {
+      id: 'p1-ch1-014-q6',
+      question: `Compute $\\hat{i} \\times \\hat{j}$.`,
+      options: [
+        `$\\hat{i}$`,
+        `$-\\hat{k}$`,
+        `$\\hat{k}$`,
+        `$\\hat{j}$`,
+      ],
+      answer: 2,
+      explanation: `By the cyclic rule: $\\hat{i} \\times \\hat{j} = \\hat{k}$. The cycle is $i \\to j \\to k \\to i$. Going forward (counterclockwise) gives a positive result.`,
+    },
+    {
+      id: 'p1-ch1-014-q7',
+      question: `A wrench handle is along $\\hat{x}$ and a force is applied along $\\hat{y}$. The torque $\\vec{\\tau} = \\vec{r} \\times \\vec{F}$ points in which direction?`,
+      options: [
+        `$+\\hat{x}$`,
+        `$+\\hat{y}$`,
+        `$+\\hat{z}$`,
+        `$-\\hat{z}$`,
+      ],
+      answer: 2,
+      explanation: `$\\hat{x} \\times \\hat{y} = \\hat{z}$ by the cyclic rule. Point right-hand fingers along $+x$, curl toward $+y$, thumb points $+z$. The bolt turns counterclockwise when viewed from above.`,
+    },
+    {
+      id: 'p1-ch1-014-q8',
+      question: `After computing $\\vec{C} = \\vec{A} \\times \\vec{B}$, how do you verify the result is correct?`,
+      options: [
+        `Check that $|\\vec{C}| = |\\vec{A}| + |\\vec{B}|$`,
+        `Check that $\\vec{A} \\cdot \\vec{C} = 0$ and $\\vec{B} \\cdot \\vec{C} = 0$`,
+        `Check that $\\vec{A} \\times \\vec{C} = \\vec{B}$`,
+        `Check that $\\vec{C}$ lies in the same plane as $\\vec{A}$ and $\\vec{B}$`,
+      ],
+      answer: 1,
+      explanation: `The cross product is always perpendicular to both inputs, so $\\vec{A} \\cdot \\vec{C}$ and $\\vec{B} \\cdot \\vec{C}$ must both equal zero. This is a fast arithmetic check that catches most computation errors.`,
+    },
+  ],
 }

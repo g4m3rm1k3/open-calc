@@ -13,7 +13,7 @@ export default {
       "How do you decide quickly whether to start from a graph, equation, or known-value table?",
     realWorldContext:
       "Real tasks rarely announce a method; they require method selection under uncertainty.",
-    previewVisualizationId: "KinematicsPatternSpotter",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -28,28 +28,29 @@ export default {
         caption: 'Mixed problems have many paths. The SUVAT map shows all valid paths given your knowns. Start by listing what you know and don\'t know — the equation that links exactly those variables is your first move.',
       },
       {
-        id: "KinematicsPatternSpotter",
+        id: 'SVGDiagram',
         title: "Mixed-method selector quiz",
         mathBridge:
           "Practice deciding the best first move: derivative, integral, or SUVAT substitution.",
         caption: "Decision quality drives solution speed.",
       },
       {
-        id: "KinematicEquationSelector",
+        id: 'SVGDiagram',
         title: "Knowns-to-unknowns solver",
         mathBridge:
           "After selecting method, execute with consistent variables and signs.",
         caption: "Convert strategy to answer.",
       },
       {
-        id: "ProjectileExplorer",
+        id: 'VerticalThrow',
+        props: {},
         title: "Projectile case solver",
         mathBridge:
           "Blend kinematics method selection with horizontal, level-ground, and elevated projectile solve modes.",
         caption: "A unified solver workflow across motion families.",
       },
       {
-        id: "RangeExplorer",
+        id: 'SVGDiagram',
         title: "Range step-through",
         mathBridge:
           "Walk through decomposition, flight-time, and range formulas in an explicit multi-step chain.",
@@ -63,7 +64,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "KinematicsFormRecogniser",
+        id: 'SVGDiagram',
         title: "Formula fit and recall",
         mathBridge:
           "Instantly verify which formulas are admissible for a given variable set.",
@@ -75,7 +76,7 @@ export default {
     prose: [
       "All constant-acceleration mixed problems reduce to a small, closed equation set plus calculus links.",
     ],
-    visualizationId: "KinematicEquationSelector",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       { expression: "v=v_0+at", annotation: "Rate update backbone." },
       {

@@ -11,9 +11,8 @@ export default {
   hook: {
     question: 'A car drives 10 km east, then 4 km west. It travelled 14 km — but its displacement is only 6 km. Why does the difference matter?',
     realWorldContext:
-      'GPS navigation, rocket guidance, and sports biomechanics all depend on tracking displacement — not distance. ' +
-      'Kinematics is the language physicists use to describe motion precisely, without asking why the motion happens.',
-    previewVisualizationId: 'KinematicsDefinitionIntuition',
+      'GPS navigation, rocket guidance, and sports biomechanics all depend on tracking displacement — not distance. Kinematics is the language physicists use to describe motion precisely, without asking why the motion happens.',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [
@@ -26,14 +25,9 @@ export default {
 
   intuition: {
     prose: [
-      'Kinematics asks **what** an object does — not **why**. ' +
-        'It describes motion using four fundamental quantities: position, displacement, velocity, and acceleration.',
-      '**Position** $x$ locates an object on a number line (needs a reference point and a direction for positive). ' +
-        '**Displacement** $\\Delta x = x_f - x_i$ measures the net change in position — it is a vector (has sign). ' +
-        '**Distance** is the total path length — always positive, always $\\ge |\\Delta x|$.',
-      '**Average velocity** $\\bar{v} = \\Delta x / \\Delta t$ is displacement per unit time — a vector. ' +
-        '**Average speed** $= \\text{distance} / \\Delta t$ — a scalar, always $\\ge |\\bar{v}|$. ' +
-        '**Acceleration** $a = \\Delta v / \\Delta t$ is the rate of change of velocity.',
+      'Kinematics asks **what** an object does — not **why**. It describes motion using four fundamental quantities: position, displacement, velocity, and acceleration.',
+      '**Position** $x$ locates an object on a number line (needs a reference point and a direction for positive). **Displacement** $\\Delta x = x_f - x_i$ measures the net change in position — it is a vector (has sign). **Distance** is the total path length — always positive, always $\\ge |\\Delta x|$.',
+      '**Average velocity** $\\bar{v} = \\Delta x / \\Delta t$ is displacement per unit time — a vector. **Average speed** $= \\text{distance} / \\Delta t$ — a scalar, always $\\ge |\\bar{v}|$. **Acceleration** $a = \\Delta v / \\Delta t$ is the rate of change of velocity.',
     ],
     callouts: [
       { type: 'definition', title: 'Displacement', body: '\\Delta x = x_f - x_i \\quad (\\text{vector — has sign})' },
@@ -49,19 +43,17 @@ export default {
         caption: 'Position, velocity, and acceleration are linked by differentiation (d/dt) going right and integration (∫ dt) going left.',
       },
       {
-        id: 'KinematicsDefinitionIntuition',
-        title: 'Drag the object along the number line — watch displacement vs distance diverge',
-        mathBridge: 'Displacement = final − initial position. Distance accumulates regardless of direction.',
-        caption: 'Reverse direction once and the gap between distance and |displacement| becomes obvious.',
-        props: { showBoth: true },
+        id: 'SVGDiagram',
+        props: { type: 'xt-vt-graphs' },
+        title: 'Displacement vs distance on a position–time graph',
+        caption: `Displacement = final position − initial position (signed). Distance = total path length (always positive). If the object reverses direction, the two quantities diverge: distance grows while displacement shrinks or reverses. On an x–t graph, displacement is the net change in height; distance is the total arc length traced.`,
       },
     ],
   },
 
   math: {
     prose: [
-      'In 1D, direction is encoded by sign: positive = right (or up), negative = left (or down). ' +
-        'The sign convention must be stated at the start of every problem.',
+      'In 1D, direction is encoded by sign: positive = right (or up), negative = left (or down). The sign convention must be stated at the start of every problem.',
       'The five kinematic quantities and their SI units:',
     ],
     callouts: [
@@ -71,27 +63,24 @@ export default {
     ],
     visualizations: [
       {
-        id: 'KinematicsQuantitiesExplorer',
-        title: 'Set position vs time — read off all five quantities',
-        mathBridge: 'Drag the start and end points on the x–t graph. All five kinematic quantities update instantly.',
-        caption: 'Average velocity = rise/run on the x–t graph.',
+        id: 'SVGDiagram',
+        props: { type: 'xt-vt-graphs' },
+        title: 'Reading all five kinematic quantities from an x–t graph',
+        caption: `Average velocity = Δx/Δt = rise/run on the x–t graph (slope of the secant line). Instantaneous velocity = slope of the tangent at any point. Acceleration is the rate of change of that slope. All five kinematic quantities — x, Δx, v, a, t — can be read or inferred from a single x–t graph.`,
       },
     ],
   },
 
   rigor: {
     prose: [
-      'Formally, position is a function $x(t): \\mathbb{R} \\to \\mathbb{R}$. ' +
-        'Displacement over $[t_1, t_2]$ is $\\Delta x = x(t_2) - x(t_1)$. ' +
-        'Distance is $\\int_{t_1}^{t_2} |\\dot{x}(t)|\\,dt$ — the arc length of the trajectory. ' +
-        'These are equal only when $\\dot{x}(t)$ does not change sign on the interval.',
+      'Formally, position is a function $x(t): \\mathbb{R} \\to \\mathbb{R}$. Displacement over $[t_1, t_2]$ is $\\Delta x = x(t_2) - x(t_1)$. Distance is $\\int_{t_1}^{t_2} |\\dot{x}(t)|\\,dt$ — the arc length of the trajectory. These are equal only when $\\dot{x}(t)$ does not change sign on the interval.',
     ],
     callouts: [
       { type: 'definition', title: 'Instantaneous velocity (calculus)', body: 'v(t) = \\lim_{\\Delta t \\to 0} \\frac{\\Delta x}{\\Delta t} = \\frac{dx}{dt}' },
       { type: 'definition', title: 'Instantaneous acceleration', body: 'a(t) = \\frac{dv}{dt} = \\frac{d^2x}{dt^2}' },
       { type: 'insight', title: 'Why derivatives?', body: 'The limit definition captures behaviour at a single instant. Average velocity over a shrinking interval converges to the instantaneous velocity.' },
     ],
-    visualizationId: 'KinematicsDerivativeProof',
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       { expression: '\\bar{v} = \\frac{x(t+\\Delta t) - x(t)}{\\Delta t}', annotation: 'Average velocity over a small interval Δt starting at time t.' },
       { expression: 'v(t) = \\lim_{\\Delta t \\to 0} \\frac{x(t+\\Delta t) - x(t)}{\\Delta t}', annotation: 'Take the limit as Δt → 0. The secant slope becomes the tangent slope.' },
@@ -101,10 +90,10 @@ export default {
     title: 'Instantaneous velocity from the limit definition',
     visualizations: [
       {
-        id: 'KinematicsDerivativeProof',
-        title: 'Secant → tangent as Δt → 0',
-        mathBridge: 'Watch the secant line rotate toward the tangent as the interval shrinks.',
-        caption: 'The slope of the tangent is the instantaneous velocity.',
+        id: 'SVGDiagram',
+        props: { type: 'slope-triangle' },
+        title: 'Secant slope → tangent slope as Δt → 0',
+        caption: `The secant line connects two points on x(t) separated by Δt. Its slope equals the average velocity over that interval. As Δt shrinks toward zero, the secant rotates and converges to the tangent line — whose slope is the instantaneous velocity v(t) = dx/dt. This is the geometric meaning of the derivative.`,
       },
     ],
   },
@@ -155,6 +144,257 @@ export default {
         { expression: '\\text{avg speed} = 10/2 = 5\\,\\text{m/s}', annotation: 'Speed uses total path length — always positive.' },
       ],
       answer: '\\bar{v} = -4\\,\\text{m/s},\\quad \\text{avg speed} = 5\\,\\text{m/s}',
+    },
+  ],
+
+  // ── Python Lab ────────────────────────────────────────────────────────────
+  python: {
+    title: `Python Lab — Kinematics Definitions`,
+    description: `Use Python to compute displacement, distance, average velocity, and acceleration from raw position data. We'll also plot x–t graphs and measure slopes.`,
+    placement: 'after-examples',
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Kinematics quantities from data',
+        props: {
+          initialCells: [
+            {
+              id: 'cell-01',
+              type: 'code',
+              cellTitle: 'Displacement vs distance',
+              prose: `Let's compute displacement and distance for a runner who goes 400 m east then 150 m west.`,
+              code: [
+                `import numpy as np`,
+                ``,
+                `# Position snapshots along +x axis (east = positive)`,
+                `positions = [0, 400, 250]   # start, turn-around, finish  (metres)`,
+                ``,
+                `# Displacement = final - initial`,
+                `displacement = positions[-1] - positions[0]`,
+                ``,
+                `# Distance = sum of absolute leg lengths`,
+                `legs = [abs(positions[i+1] - positions[i]) for i in range(len(positions)-1)]`,
+                `distance = sum(legs)`,
+                ``,
+                `print(f"Displacement : {displacement} m")`,
+                `print(f"Distance     : {distance} m")`,
+                `print(f"Distance >= |displacement|: {distance >= abs(displacement)}")`,
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 'cell-02',
+              type: 'code',
+              cellTitle: 'Average velocity and average speed',
+              prose: `Average velocity = displacement ÷ elapsed time. Average speed = distance ÷ elapsed time.`,
+              code: [
+                `# Continuing from previous cell`,
+                `dt = 60   # total elapsed time in seconds`,
+                ``,
+                `avg_velocity = displacement / dt   # signed`,
+                `avg_speed    = distance    / dt   # always positive`,
+                ``,
+                `print(f"Average velocity : {avg_velocity:.2f} m/s")`,
+                `print(f"Average speed    : {avg_speed:.2f} m/s")`,
+                `print(f"|avg_velocity| <= avg_speed: {abs(avg_velocity) <= avg_speed}")`,
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 'cell-03',
+              type: 'code',
+              cellTitle: 'Plotting a position–time graph',
+              prose: `Visualise position vs time and see how the slope gives velocity.`,
+              code: [
+                `import matplotlib.pyplot as plt`,
+                ``,
+                `# Piecewise linear motion: 400 m east in 40 s, then 150 m west in 20 s`,
+                `t = np.array([0, 40, 60])`,
+                `x = np.array([0, 400, 250])`,
+                ``,
+                `plt.figure(figsize=(7, 4))`,
+                `plt.plot(t, x, 'b-o', linewidth=2)`,
+                `plt.xlabel('Time (s)')`,
+                `plt.ylabel('Position (m)')`,
+                `plt.title('Position–time graph')`,
+                `plt.grid(True, alpha=0.4)`,
+                ``,
+                `# Annotate slopes`,
+                `v1 = (x[1]-x[0])/(t[1]-t[0])`,
+                `v2 = (x[2]-x[1])/(t[2]-t[1])`,
+                `plt.text(20, 210, f'slope = {v1} m/s', color='green', fontsize=10)`,
+                `plt.text(50, 330, f'slope = {v2} m/s', color='red',   fontsize=10)`,
+                `plt.savefig('xt_graph.png', dpi=100, bbox_inches='tight')`,
+                `plt.show()`,
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 'cell-04',
+              type: 'code',
+              cellTitle: 'Average acceleration',
+              prose: `Acceleration is the rate of change of velocity. Here we compute it from two velocity measurements.`,
+              code: [
+                `# Two velocity readings`,
+                `v_i = 10.0   # m/s  initial`,
+                `v_f = -5.0   # m/s  final (braking, reversed direction)`,
+                `delta_t = 3.0  # s`,
+                ``,
+                `avg_acceleration = (v_f - v_i) / delta_t`,
+                `print(f"Δv = {v_f - v_i} m/s")`,
+                `print(f"Δt = {delta_t} s")`,
+                `print(f"Average acceleration = {avg_acceleration:.2f} m/s²")`,
+                `print(f"Negative sign → acceleration opposes motion (deceleration + reversal)")`,
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 'cell-05',
+              type: 'code',
+              cellTitle: 'Challenge — analyse a real motion dataset',
+              prose: `A sensor records position every 0.5 s. Compute: displacement, distance, average velocity, and average acceleration.`,
+              code: [
+                `# Sensor data: time (s) and position (m)`,
+                `t_data = np.array([0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0])`,
+                `x_data = np.array([0.0, 1.2, 2.1, 2.5, 2.2, 1.6, 2.8])`,
+                ``,
+                `# TODO: Compute and print:`,
+                `#   1. total displacement  (x_final - x_initial)`,
+                `#   2. total distance      (sum of |Δx| for each step)`,
+                `#   3. average velocity    (displacement / total time)`,
+                `#   4. velocity at each step (Δx/Δt for each pair)`,
+                `#   5. average acceleration (Δv over full interval)`,
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Sensor data analysis',
+              difficulty: 'medium',
+              prompt: `Fill in the TODO block to compute all five quantities from the sensor data.`,
+              starterBlock: ``,
+              testCode: [
+                `disp = x_data[-1] - x_data[0]`,
+                `assert abs(disp - 2.8) < 0.01, f"Displacement should be 2.8 m, got {disp}"`,
+                `steps = np.abs(np.diff(x_data))`,
+                `dist = steps.sum()`,
+                `assert abs(dist - 5.4) < 0.01, f"Distance should be 5.4 m, got {dist}"`,
+                `print("Challenge passed ✓")`,
+              ].join('\n'),
+              hint: `np.diff(x_data) gives the step-by-step Δx array. Distance = np.abs(np.diff(x_data)).sum(). Velocity at each step = np.diff(x_data) / np.diff(t_data).`,
+            },
+          ],
+        },
+      },
+    ],
+  },
+
+  // ── Quiz ──────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch2-001-q1',
+      question: `A cyclist rides 6 km north, then 2 km south. What is the displacement?`,
+      options: [
+        `8 km north`,
+        `4 km north`,
+        `4 km south`,
+        `8 km (no direction)`,
+      ],
+      answer: 1,
+      explanation: `Displacement = final position − initial position = 6 − 2 = 4 km north. Distance (total path length) is 8 km. Displacement is a vector; distance is a scalar.`,
+    },
+    {
+      id: 'p1-ch2-001-q2',
+      question: `Which statement about distance and displacement is always true?`,
+      options: [
+        `Distance = |displacement|`,
+        `Distance ≥ |displacement|`,
+        `Distance < displacement`,
+        `They are always equal`,
+      ],
+      answer: 1,
+      explanation: `Distance ≥ |displacement| always. They are equal only when the object moves in one direction without reversing. If the object reverses, the distance grows while the displacement can shrink.`,
+    },
+    {
+      id: 'p1-ch2-001-q3',
+      question: `An object moves from $x = 20$ m to $x = 5$ m in 3 s. What is its average velocity?`,
+      options: [
+        `$+5$ m/s`,
+        `$-5$ m/s`,
+        `$+8.3$ m/s`,
+        `$-8.3$ m/s`,
+      ],
+      answer: 1,
+      explanation: `$\\bar{v} = \\Delta x / \\Delta t = (5 - 20)/3 = -15/3 = -5$ m/s. Negative means moving in the negative-$x$ direction.`,
+    },
+    {
+      id: 'p1-ch2-001-q4',
+      question: `What is the difference between average velocity and average speed?`,
+      options: [
+        `They are the same thing with different names`,
+        `Average velocity uses displacement (signed); average speed uses total distance (positive)`,
+        `Average speed uses displacement; average velocity uses total distance`,
+        `Average velocity is always larger`,
+      ],
+      answer: 1,
+      explanation: `Average velocity = displacement ÷ time (vector, can be negative). Average speed = distance ÷ time (scalar, always positive). Average speed ≥ |average velocity| always.`,
+    },
+    {
+      id: 'p1-ch2-001-q5',
+      question: `What does the slope of a position–time ($x$–$t$) graph represent?`,
+      options: [
+        `Acceleration`,
+        `Distance`,
+        `Velocity`,
+        `Displacement`,
+      ],
+      answer: 2,
+      explanation: `Slope = rise/run = Δx/Δt = average velocity. For the instantaneous velocity, the slope of the tangent to the curve at any point equals dx/dt.`,
+    },
+    {
+      id: 'p1-ch2-001-q6',
+      question: `An object starts at rest and reaches $v = 12$ m/s in 4 s. What is the average acceleration?`,
+      options: [
+        `48 m/s²`,
+        `$0.33$ m/s²`,
+        `$3$ m/s²`,
+        `$16$ m/s²`,
+      ],
+      answer: 2,
+      explanation: `$\\bar{a} = \\Delta v / \\Delta t = (12 - 0)/4 = 3$ m/s².`,
+    },
+    {
+      id: 'p1-ch2-001-q7',
+      question: `Instantaneous velocity is defined as:`,
+      options: [
+        `$\\Delta x / \\Delta t$ for a large time interval`,
+        `$\\lim_{\\Delta t \\to 0} \\Delta x / \\Delta t = dx/dt$`,
+        `The average velocity over the whole trip`,
+        `Speed in the positive direction`,
+      ],
+      answer: 1,
+      explanation: `Instantaneous velocity is the derivative of position: $v(t) = \\lim_{\\Delta t \\to 0} \\frac{\\Delta x}{\\Delta t} = \\frac{dx}{dt}$. It is the slope of the tangent to the $x(t)$ curve at a specific instant.`,
+    },
+    {
+      id: 'p1-ch2-001-q8',
+      question: `In the kinematic chain, what operation takes you from position to velocity?`,
+      options: [
+        `Integration with respect to time`,
+        `Differentiation with respect to time`,
+        `Multiplication by time`,
+        `Division by acceleration`,
+      ],
+      answer: 1,
+      explanation: `Differentiation: $v = dx/dt$. Going the other direction (velocity → position) requires integration: $x = \\int v\\,dt$. The kinematic chain is: position ←(integrate)→ velocity ←(integrate)→ acceleration, with differentiation going in the reverse direction.`,
     },
   ],
 }

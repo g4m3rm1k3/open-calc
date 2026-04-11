@@ -11,7 +11,7 @@ export default {
     question: "How high does it go, and when does it return?",
     realWorldContext:
       "Projectile prediction in sports and safety engineering starts with this idealized vertical model.",
-    previewVisualizationId: "FreeFallIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -26,20 +26,21 @@ export default {
         caption: 'v₀ is positive (upward). a = −9.8 m/s² (downward, always). The object decelerates, reaches apex where v = 0, then accelerates downward. The sign of v changes; the sign of a never does.',
       },
       {
-        id: "FreeFallIntuition",
+        id: 'VerticalThrow',
+        props: {},
         title: "Upward launch animation",
         mathBridge:
           "Vary launch speed and observe apex height/time and return behavior.",
         caption: "Apex is a velocity event, not an acceleration event.",
       },
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
         title: "Launch solver",
         mathBridge: "Compute max height, time to apex, and round-trip time.",
         caption: "Link animation and equations.",
       },
       {
-        id: "AngledLaunchIntuition",
+        id: 'VerticalThrow',
         title: "Angled launch decomposition",
         mathBridge:
           "Connect vertical-launch ideas to full projectile decomposition into horizontal and vertical components.",
@@ -52,14 +53,14 @@ export default {
     prose: ["Use v=0 at peak, then solve with constant acceleration formulas."],
     visualizations: [
       {
-        id: "KinematicEquationSelector",
+        id: 'SVGDiagram',
         title: "Equation chooser",
         mathBridge:
           "Pick unknowns (height/time/velocity) and see best-fit equation.",
         caption: "Efficient selection for launch problems.",
       },
       {
-        id: "ProjectileProof",
+        id: 'SVGDiagram',
         title: "Projectile derivation map",
         mathBridge:
           "Follow the full two-axis derivation and identify where upward-launch equations appear as a special case.",
@@ -69,7 +70,7 @@ export default {
   },
   rigor: {
     prose: ["Results follow from constant acceleration under uniform gravity."],
-    visualizationId: "FreeFallExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       { expression: "v=v_0-gt", annotation: "Velocity model." },
       {

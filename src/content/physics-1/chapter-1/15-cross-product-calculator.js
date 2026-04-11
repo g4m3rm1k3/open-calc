@@ -15,7 +15,7 @@ export default {
     question: 'Your drone\'s navigation computer has three vectors describing its orientation. How does it compute the axis perpendicular to its nose direction and wing direction — in milliseconds, automatically?',
     realWorldContext:
       `Every 3D rendering engine, robotics controller, and physics simulation that deals with rotation, surface orientation, or magnetic forces needs to compute cross products from raw components. The determinant expansion is the formula those systems use. It looks intimidating at first — a 3×3 grid of numbers with alternating signs — but there is a completely regular pattern that you can learn to execute flawlessly in under a minute once you've practiced it a few times. This lesson is dedicated to mastering that calculation: reading components in, applying the pattern, and reading the perpendicular vector out.`,
-    previewVisualizationId: 'CrossProductCalculator',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────
@@ -70,10 +70,10 @@ export default {
         caption: `Use the right-hand rule to predict the direction of the result BEFORE doing arithmetic. This gives you a sanity check: if your computed result points the wrong way, you know you made a sign error.`,
       },
       {
-        id: 'CrossProductCalculator',
-        title: 'Step-by-step determinant calculator',
-        mathBridge: `Enter any 3D components and watch the $3\\times3$ determinant expand step by step, showing each minor calculation and the final result.`,
-        caption: `Use this to check your hand calculations. The goal is to get fast enough that you don't need it — but it's a great learning tool.`,
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'Step-by-step determinant expansion',
+        caption: `The determinant grid: row 1 = unit vectors î ĵ k̂, row 2 = components of A⃗, row 3 = components of B⃗. Cover each column in turn to read off R_x, R_y (negate!), and R_z. The right-hand rule diagram alongside lets you sanity-check the direction of your computed result.`,
       },
     ],
   },
@@ -110,10 +110,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'CrossProductFormRecogniser',
-        title: 'Pattern recognition drill',
-        mathBridge: `Practice identifying which term is $R_x$, $R_y$, or $R_z$ from scrambled component expressions. Speed matters — in physics problems you often need to compute this quickly.`,
-        caption: `Train your brain for the determinant expansion pattern until it's automatic.`,
+        id: 'SVGDiagram',
+        props: { type: 'cross-product-rhr' },
+        title: 'Recognising component patterns in the expansion',
+        caption: `Each of the three result components is a 2×2 minor: R_x = A_yB_z − A_zB_y, R_y = −(A_xB_z − A_zB_x), R_z = A_xB_y − A_yB_x. Notice R_y's minus sign and that every pair of subscripts comes from the two rows not in that column. Practice reading the sign pattern (+−+) and the subscript pattern until they are automatic.`,
       },
     ],
   },
@@ -521,4 +521,104 @@ print("All 5 pairs satisfy the Lagrange identity ✓")`,
       },
     ],
   },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-015-q1',
+      question: `In the cross-product determinant, which row goes FIRST?`,
+      options: [
+        `Components of $\\vec{A}$`,
+        `Components of $\\vec{B}$`,
+        `The unit vectors $\\hat{i}, \\hat{j}, \\hat{k}$`,
+        `The zero vector`,
+      ],
+      answer: 2,
+      explanation: `The first row always holds the unit vectors $\\hat{i}, \\hat{j}, \\hat{k}$. The second row is $\\vec{A}$'s components and the third row is $\\vec{B}$'s components. Swapping rows 2 and 3 would negate the entire result.`,
+    },
+    {
+      id: 'p1-ch1-015-q2',
+      question: `The sign pattern for the three components when expanding the first row is:`,
+      options: [
+        `$+, +, +$`,
+        `$+, -, +$`,
+        `$-, +, -$`,
+        `$+, -, -$`,
+      ],
+      answer: 1,
+      explanation: `The cofactor expansion pattern for the first row of a 3×3 determinant is $+, -, +$. This means $R_x$ gets a $+$, $R_y$ gets a $-$ (the most common source of error), and $R_z$ gets a $+$.`,
+    },
+    {
+      id: 'p1-ch1-015-q3',
+      question: `Given $\\vec{A} = (1, 0, 0)$ and $\\vec{B} = (0, 1, 0)$, what is $\\vec{A} \\times \\vec{B}$?`,
+      options: [
+        `$(1, 0, 0)$`,
+        `$(0, 0, 1)$`,
+        `$(0, 0, -1)$`,
+        `$(0, 1, 0)$`,
+      ],
+      answer: 1,
+      explanation: `$\\hat{i} \\times \\hat{j} = \\hat{k} = (0, 0, 1)$ by the cyclic rule. Using the determinant: $R_x = 0\\cdot0 - 0\\cdot1 = 0$, $R_y = -(1\\cdot0 - 0\\cdot0) = 0$, $R_z = 1\\cdot1 - 0\\cdot0 = 1$. Result: $(0, 0, 1)$.`,
+    },
+    {
+      id: 'p1-ch1-015-q4',
+      question: `What formula gives the $\\hat{j}$ component of $\\vec{A} \\times \\vec{B}$?`,
+      options: [
+        `$A_yB_z - A_zB_y$`,
+        `$A_xB_z - A_zB_x$`,
+        `$-(A_xB_z - A_zB_x)$`,
+        `$A_xB_y - A_yB_x$`,
+      ],
+      answer: 2,
+      explanation: `The $\\hat{j}$ component is $-(A_xB_z - A_zB_x)$. This is the minor obtained by covering column 2, with the required minus sign from the cofactor expansion. Forgetting the negative is the most common cross product error.`,
+    },
+    {
+      id: 'p1-ch1-015-q5',
+      question: `How do you verify that a computed cross product $\\vec{C} = \\vec{A} \\times \\vec{B}$ is correct?`,
+      options: [
+        `Check $|\\vec{C}| = |\\vec{A}| + |\\vec{B}|$`,
+        `Check $\\vec{A} \\cdot \\vec{C} = 0$ and $\\vec{B} \\cdot \\vec{C} = 0$`,
+        `Check $\\vec{C} = \\vec{A} + \\vec{B}$`,
+        `Check that $\\vec{C}$ points in the same direction as $\\vec{A}$`,
+      ],
+      answer: 1,
+      explanation: `The cross product is perpendicular to both inputs, so dotting $\\vec{C}$ with either $\\vec{A}$ or $\\vec{B}$ must give zero. This is the standard perpendicularity check and catches most arithmetic errors.`,
+    },
+    {
+      id: 'p1-ch1-015-q6',
+      question: `Compute $\\vec{A} \\times \\vec{B}$ for $\\vec{A} = (2, 0, 0)$ and $\\vec{B} = (0, 0, 3)$.`,
+      options: [
+        `$(0, 6, 0)$`,
+        `$(0, -6, 0)$`,
+        `$(6, 0, 0)$`,
+        `$(0, 0, 6)$`,
+      ],
+      answer: 1,
+      explanation: `$R_x = 0\\cdot3 - 0\\cdot0 = 0$; $R_y = -(2\\cdot3 - 0\\cdot0) = -6$; $R_z = 2\\cdot0 - 0\\cdot0 = 0$. So $\\vec{A} \\times \\vec{B} = (0, -6, 0)$. Right-hand rule confirms: fingers along $+x$, curl toward $+z$, thumb points $-y$.`,
+    },
+    {
+      id: 'p1-ch1-015-q7',
+      question: `The "cover-column" technique says: to find $R_z$, cover column 3 and compute the 2×2 determinant. The 2×2 determinant of $\\begin{pmatrix}a & b \\\\ c & d\\end{pmatrix}$ equals:`,
+      options: [
+        `$a + d$`,
+        `$ab - cd$`,
+        `$ad - bc$`,
+        `$ac - bd$`,
+      ],
+      answer: 2,
+      explanation: `The 2×2 determinant is $ad - bc$: multiply the main diagonal, subtract the anti-diagonal product. This pattern repeats for each minor in the cross product expansion.`,
+    },
+    {
+      id: 'p1-ch1-015-q8',
+      question: `The Lagrange identity states $|\\vec{A} \\times \\vec{B}|^2 + (\\vec{A} \\cdot \\vec{B})^2 = |\\vec{A}|^2|\\vec{B}|^2$. What does this tell you about dot and cross products?`,
+      options: [
+        `The dot product and cross product are always equal`,
+        `Together, the dot and cross products capture all of the "interaction" between two vectors`,
+        `The dot product squared equals the cross product magnitude`,
+        `The two products are independent and share no relationship`,
+      ],
+      answer: 1,
+      explanation: `The Lagrange identity ($\\sin^2\\phi + \\cos^2\\phi = 1$ in disguise) shows that the cross product ($\\sin\\phi$) and dot product ($\\cos\\phi$) together fully characterise the relative orientation of two vectors. Knowing both tells you everything about how the vectors relate to each other.`,
+    },
+  ],
 }

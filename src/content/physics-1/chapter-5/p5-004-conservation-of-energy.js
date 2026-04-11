@@ -9,47 +9,28 @@ export default {
 
   hook: {
     question:
-      'A roller coaster car is released from rest at the top of a 40 m hill. ' +
-      'Predict its speed at the bottom. You have: g = 9.8 m/s², mass unknown. ' +
-      'Here\'s the twist: can you solve it without knowing the mass? What does that tell you?',
+      'A roller coaster car is released from rest at the top of a 40 m hill. Predict its speed at the bottom. You have: g = 9.8 m/s², mass unknown. Here\'s the twist: can you solve it without knowing the mass? What does that tell you?',
     realWorldContext:
-      'Conservation of energy is the single most powerful tool in all of physics. ' +
-      'Engineers use it to design roller coasters, predict satellite orbits, and size hydraulic systems. ' +
-      'It works because energy is a scalar — you never need to track directions, just totals. ' +
-      'The mass cancelling out (as you\'ll see) reveals something deep: the speed at the bottom is determined by height alone.',
+      'Conservation of energy is the single most powerful tool in all of physics. Engineers use it to design roller coasters, predict satellite orbits, and size hydraulic systems. It works because energy is a scalar — you never need to track directions, just totals. The mass cancelling out (as you\'ll see) reveals something deep: the speed at the bottom is determined by height alone.',
     previewVisualizationId: 'SVGDiagram',
   },
 
   intuition: {
     prose: [
-      '**Prediction answer:** The mass cancels. \\(mgh = \\tfrac{1}{2}mv^2\\) → \\(v = \\sqrt{2gh} = \\sqrt{2(9.8)(40)} \\approx 28\\) m/s. ' +
-        'Every roller coaster car — 1 kg or 10,000 kg — reaches the same speed at the bottom from the same height. ' +
-        'Galileo discovered this for free fall; energy conservation explains why.',
+      '**Prediction answer:** The mass cancels. \\(mgh = \\tfrac{1}{2}mv^2\\) → \\(v = \\sqrt{2gh} = \\sqrt{2(9.8)(40)} \\approx 28\\) m/s. Every roller coaster car — 1 kg or 10,000 kg — reaches the same speed at the bottom from the same height. Galileo discovered this for free fall; energy conservation explains why.',
 
-      '**The principle:** In any system where only conservative forces do work (gravity, springs — no friction, no air resistance), ' +
-        'the total mechanical energy \\(E = KE + PE\\) remains constant. ' +
-        'Energy is not created or destroyed — it flows between kinetic and potential forms.',
+      '**The principle:** In any system where only conservative forces do work (gravity, springs — no friction, no air resistance), the total mechanical energy \\(E = KE + PE\\) remains constant. Energy is not created or destroyed — it flows between kinetic and potential forms.',
 
-      '**What friction actually does:** Friction converts mechanical energy into thermal energy (heat). ' +
-        'It does NOT violate conservation of energy — total energy (including thermal) is still conserved. ' +
-        'But it does mean the mechanical energy decreases: \\(KE_f + PE_f = KE_i + PE_i - Q\\), ' +
-        'where \\(Q\\) is the energy lost to friction (heat generated).',
+      '**What friction actually does:** Friction converts mechanical energy into thermal energy (heat). It does NOT violate conservation of energy — total energy (including thermal) is still conserved. But it does mean the mechanical energy decreases: \\(KE_f + PE_f = KE_i + PE_i - Q\\), where \\(Q\\) is the energy lost to friction (heat generated).',
 
-      '**The power of the scalar:** Unlike Newton\'s Second Law (which requires vector components, equations per dimension, kinematics), ' +
-        'energy conservation is one equation with one unknown. ' +
-        'No directions, no time — just initial and final states. ' +
-        'For many problems, it is 10× faster than any other method.',
+      '**The power of the scalar:** Unlike Newton\'s Second Law (which requires vector components, equations per dimension, kinematics), energy conservation is one equation with one unknown. No directions, no time — just initial and final states. For many problems, it is 10× faster than any other method.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 4 of 6 — The crown of Chapter 5',
         body:
-          '**Lessons 1–3 built:** Work transfers energy; KE is energy of motion (W = ΔKE); ' +
-          'PE is stored work against conservative forces.\n' +
-          '**This lesson:** All three combine into the Conservation of Energy — ' +
-          'the most powerful tool in classical mechanics.\n' +
-          '**Next lesson:** Power — energy transferred per unit time.',
+          '**Lessons 1–3 built:** Work transfers energy; KE is energy of motion (W = ΔKE); PE is stored work against conservative forces.\n**This lesson:** All three combine into the Conservation of Energy — the most powerful tool in classical mechanics.\n**Next lesson:** Power — energy transferred per unit time.',
       },
       {
         type: 'theorem',
@@ -65,26 +46,19 @@ export default {
         type: 'insight',
         title: 'Why choose a reference level wisely',
         body:
-          'Set the reference (h = 0) at the lowest point in the problem. ' +
-          'This makes \\(PE = 0\\) there, simplifying the algebra. ' +
-          'The choice is always valid — only \\(\\Delta PE\\) matters, and it is the same regardless of reference.',
+          'Set the reference (h = 0) at the lowest point in the problem. This makes \\(PE = 0\\) there, simplifying the algebra. The choice is always valid — only \\(\\Delta PE\\) matters, and it is the same regardless of reference.',
       },
       {
         type: 'warning',
         title: 'Energy conservation ≠ momentum conservation',
         body:
-          'These are separate laws. Momentum is conserved when net external force = 0. ' +
-          'Mechanical energy is conserved when only conservative forces do work. ' +
-          'In a collision, momentum is always conserved — but kinetic energy may not be (inelastic collisions).',
+          'These are separate laws. Momentum is conserved when net external force = 0. Mechanical energy is conserved when only conservative forces do work. In a collision, momentum is always conserved — but kinetic energy may not be (inelastic collisions).',
       },
       {
         type: 'connection',
         title: 'Calculus connection: E = constant means dE/dt = 0',
         body:
-          '\\(\\dfrac{dE}{dt} = \\dfrac{d}{dt}(KE + PE) = 0\\). ' +
-          'Expanding: \\(mv\\dot{v} + \\dfrac{dPE}{dx}\\dot{x} = 0\\). ' +
-          'Since \\(\\dot{x} = v\\) and \\(F = -dPE/dx\\): this reduces to \\(ma = F\\) — Newton\'s Second Law. ' +
-          'Energy conservation and Newton\'s Law are equivalent statements.',
+          '\\(\\dfrac{dE}{dt} = \\dfrac{d}{dt}(KE + PE) = 0\\). Expanding: \\(mv\\dot{v} + \\dfrac{dPE}{dx}\\dot{x} = 0\\). Since \\(\\dot{x} = v\\) and \\(F = -dPE/dx\\): this reduces to \\(ma = F\\) — Newton\'s Second Law. Energy conservation and Newton\'s Law are equivalent statements.',
       },
     ],
     visualizations: [
@@ -93,16 +67,13 @@ export default {
         props: { type: 'pe-ke-exchange' },
         title: 'Total energy stays constant across height changes',
         caption:
-          'Track the energy bar as the coaster moves: when PE is high, KE is low; when PE is zero, KE is maximum. ' +
-          'The total bar length never changes (frictionless). ' +
-          'Add friction: the total bar shrinks, with the lost portion appearing as thermal energy.',
+          'Track the energy bar as the coaster moves: when PE is high, KE is low; when PE is zero, KE is maximum. The total bar length never changes (frictionless). Add friction: the total bar shrinks, with the lost portion appearing as thermal energy.',
       },
       {
         id: 'ProjectileMotion',
         title: 'Projectile energy: KE + PE = constant throughout flight',
         mathBridge:
-          'At every point on the trajectory, compute ½mv² + mgh. ' +
-          'The sum is constant — the energy exchanged between forms is exact.',
+          'At every point on the trajectory, compute ½mv² + mgh. The sum is constant — the energy exchanged between forms is exact.',
         caption: 'The parabolic path is the geometric consequence of energy conservation under gravity.',
         props: { showEnergyBars: true },
       },
@@ -128,11 +99,7 @@ export default {
         type: 'mnemonic',
         title: 'Strategy for energy problems',
         body:
-          '1. Identify initial and final states.\\\\' +
-          '2. List all energy types present (KE, gravitational PE, spring PE).\\\\' +
-          '3. Note any friction (subtract from right-side total).\\\\' +
-          '4. Set up: all energies at start = all energies at end.\\\\' +
-          '5. Cancel terms that are zero (e.g., v = 0 at rest, h = 0 at reference).',
+          '1. Identify initial and final states.\\\\2. List all energy types present (KE, gravitational PE, spring PE).\\\\3. Note any friction (subtract from right-side total).\\\\4. Set up: all energies at start = all energies at end.\\\\5. Cancel terms that are zero (e.g., v = 0 at rest, h = 0 at reference).',
       },
     ],
     visualizations: [
@@ -140,9 +107,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'PE curve → force and equilibrium',
         mathBridge:
-          'A PE curve shows stored energy as a function of position. ' +
-          'Where PE is minimum, the force is zero (equilibrium). ' +
-          'The slope of PE at any point equals the negative force at that point: F = −dPE/dx.',
+          'A PE curve shows stored energy as a function of position. Where PE is minimum, the force is zero (equilibrium). The slope of PE at any point equals the negative force at that point: F = −dPE/dx.',
         caption: 'Valleys in the PE curve are stable equilibria — balls roll toward them and oscillate around them.',
         props: { expression: '(x-2)*(x-2)', variable: 'x', xMin: -1, xMax: 5, label: 'PE (J)' },
       },
@@ -187,8 +152,7 @@ export default {
       id: 'ch5-004-ex1',
       title: 'Roller coaster — finding speed at the bottom',
       problem:
-        '\\text{A 500 kg coaster starts from rest at h = 30 m. ' +
-        'Find its speed at h = 5 m (frictionless).}',
+        '\\text{A 500 kg coaster starts from rest at h = 30 m. Find its speed at h = 5 m (frictionless).}',
       steps: [
         {
           expression: 'E_i = mgh_i = (500)(9.8)(30) = 147{,}000\\,\\text{J}',
@@ -213,8 +177,7 @@ export default {
       id: 'ch5-004-ex2',
       title: 'Slide with friction — finding energy loss',
       problem:
-        '\\text{A 60 kg person slides down a 5 m slide, dropping 3 m in height. ' +
-        'They reach the bottom at 4 m/s. How much energy was lost to friction?}',
+        '\\text{A 60 kg person slides down a 5 m slide, dropping 3 m in height. They reach the bottom at 4 m/s. How much energy was lost to friction?}',
       steps: [
         {
           expression: 'E_i = mgh = (60)(9.8)(3) = 1764\\,\\text{J}',
@@ -252,8 +215,7 @@ export default {
       id: 'ch5-004-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A spring (k = 500 N/m) is compressed 0.2 m and launches a 0.1 kg ball vertically. ' +
-        'Find the maximum height reached.}',
+        '\\text{A spring (k = 500 N/m) is compressed 0.2 m and launches a 0.1 kg ball vertically. Find the maximum height reached.}',
       hint: 'All spring PE converts to gravitational PE at maximum height.',
       walkthrough: [
         {
@@ -271,8 +233,7 @@ export default {
       id: 'ch5-004-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A 4 kg block slides from rest down a 3 m ramp inclined at 30°. ' +
-        'The coefficient of kinetic friction is 0.2. Find the speed at the bottom.}',
+        '\\text{A 4 kg block slides from rest down a 3 m ramp inclined at 30°. The coefficient of kinetic friction is 0.2. Find the speed at the bottom.}',
       hint: 'Height dropped = 3 sin 30° = 1.5 m. Friction force = μₖ N = μₖ mg cos 30°. Friction work = friction force × 3 m.',
       walkthrough: [
         {

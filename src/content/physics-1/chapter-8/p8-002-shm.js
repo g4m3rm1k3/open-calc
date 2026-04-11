@@ -9,108 +9,66 @@ export default {
 
   hook: {
     question:
-      'A mass on a spring is displaced 10 cm and released from rest. ' +
-      'Where is it after exactly 1 second? After 1.5 seconds? After 17 seconds? ' +
-      'You could track it step-by-step using F = ma — but that would require thousands of tiny steps. ' +
-      'Is there a formula that gives the position at any time directly?',
+      'A mass on a spring is displaced 10 cm and released from rest. Where is it after exactly 1 second? After 1.5 seconds? After 17 seconds? You could track it step-by-step using F = ma — but that would require thousands of tiny steps. Is there a formula that gives the position at any time directly?',
     realWorldContext:
-      'Simple Harmonic Motion is the template for all oscillation in physics. ' +
-      'Pendulum clocks, guitar strings, electronic oscillators, and the vibration of molecules in a crystal ' +
-      'all obey the same equations. ' +
-      'Even quantum mechanics uses SHM: the quantum harmonic oscillator is the most-solved problem ' +
-      'in all of quantum physics, underlying the structure of every field theory.',
+      'Simple Harmonic Motion is the template for all oscillation in physics. Pendulum clocks, guitar strings, electronic oscillators, and the vibration of molecules in a crystal all obey the same equations. Even quantum mechanics uses SHM: the quantum harmonic oscillator is the most-solved problem in all of quantum physics, underlying the structure of every field theory.',
     previewVisualizationId: 'SpringOscillation',
   },
 
   intuition: {
     prose: [
-      '**The answer:** Yes — the position is \\(x(t) = A\\cos(\\omega t + \\phi)\\), ' +
-        'where \\(A\\) is the amplitude, \\(\\omega = \\sqrt{k/m}\\) is the angular frequency, ' +
-        'and \\(\\phi\\) is the initial phase. ' +
-        'This single formula encodes the entire future of the oscillation — position at any time, forever.',
+      '**The answer:** Yes — the position is \\(x(t) = A\\cos(\\omega t + \\phi)\\), where \\(A\\) is the amplitude, \\(\\omega = \\sqrt{k/m}\\) is the angular frequency, and \\(\\phi\\) is the initial phase. This single formula encodes the entire future of the oscillation — position at any time, forever.',
 
-      '**Why cosine?** The restoring force F = −kx creates an acceleration a = −(k/m)x. ' +
-        'This says: *acceleration is proportional to and opposite displacement*. ' +
-        'The function whose second derivative equals −(constant)×itself is exactly cosine (or sine). ' +
-        'Nature chose the only function that satisfies this equation.',
+      '**Why cosine?** The restoring force F = −kx creates an acceleration a = −(k/m)x. This says: *acceleration is proportional to and opposite displacement*. The function whose second derivative equals −(constant)×itself is exactly cosine (or sine). Nature chose the only function that satisfies this equation.',
 
-      '**The three parameters:** ' +
-        '**A (amplitude)** — maximum displacement, set by initial conditions. Double the initial stretch → double the amplitude. ' +
-        '**ω (angular frequency)** — how fast it oscillates, set entirely by k and m: \\(\\omega = \\sqrt{k/m}\\). ' +
-        'Stiff spring (large k) → fast oscillation. Heavy mass (large m) → slow oscillation. ' +
-        '**φ (phase)** — where in the cycle you start. Released from rest at x = A gives φ = 0 (pure cosine). ' +
-        'Released from equilibrium moving right gives φ = −π/2 (pure sine).',
+      '**The three parameters:** **A (amplitude)** — maximum displacement, set by initial conditions. Double the initial stretch → double the amplitude. **ω (angular frequency)** — how fast it oscillates, set entirely by k and m: \\(\\omega = \\sqrt{k/m}\\). Stiff spring (large k) → fast oscillation. Heavy mass (large m) → slow oscillation. **φ (phase)** — where in the cycle you start. Released from rest at x = A gives φ = 0 (pure cosine). Released from equilibrium moving right gives φ = −π/2 (pure sine).',
 
-      '**Period and frequency:** One full oscillation takes \\(T = 2\\pi/\\omega = 2\\pi\\sqrt{m/k}\\) seconds. ' +
-        'Note what T does NOT depend on: amplitude. ' +
-        'A pendulum clock works because doubling the swing doesn\'t change the period. ' +
-        'This amplitude-independence is the defining property of SHM — and it\'s the reason pendulum clocks are accurate.',
+      '**Period and frequency:** One full oscillation takes \\(T = 2\\pi/\\omega = 2\\pi\\sqrt{m/k}\\) seconds. Note what T does NOT depend on: amplitude. A pendulum clock works because doubling the swing doesn\'t change the period. This amplitude-independence is the defining property of SHM — and it\'s the reason pendulum clocks are accurate.',
 
-      '**Energy in SHM:** The system constantly exchanges KE and PE. ' +
-        'At maximum displacement (x = ±A): v = 0, all energy is PE = ½kA². ' +
-        'At equilibrium (x = 0): maximum speed, all energy is KE = ½mv²_max. ' +
-        'Total energy E = ½kA² = constant throughout the oscillation.',
+      '**Energy in SHM:** The system constantly exchanges KE and PE. At maximum displacement (x = ±A): v = 0, all energy is PE = ½kA². At equilibrium (x = 0): maximum speed, all energy is KE = ½mv²_max. Total energy E = ½kA² = constant throughout the oscillation.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 2 of 4 — SHM: the motion that results from Hooke\'s Law',
         body:
-          '**Lesson 1:** F = −kx — the restoring force (Hooke\'s Law).\\n' +
-          '**This lesson:** x(t) = A cos(ωt + φ) — the motion that force produces.\\n' +
-          '**Next:** Wave properties — SHM in space, not just time.\\n' +
-          '**Chapter 9:** Thermodynamics — energy storage in molecular vibrations (quantum SHM).',
+          '**Lesson 1:** F = −kx — the restoring force (Hooke\'s Law).\\n**This lesson:** x(t) = A cos(ωt + φ) — the motion that force produces.\\n**Next:** Wave properties — SHM in space, not just time.\\n**Chapter 9:** Thermodynamics — energy storage in molecular vibrations (quantum SHM).',
       },
       {
         type: 'theorem',
         title: 'SHM position, velocity, and acceleration',
         body:
-          'x(t) = A\\cos(\\omega t + \\phi)\\\\' +
-          'v(t) = -A\\omega\\sin(\\omega t + \\phi)\\\\' +
-          'a(t) = -A\\omega^2\\cos(\\omega t + \\phi) = -\\omega^2 x',
+          'x(t) = A\\cos(\\omega t + \\phi)\\\\v(t) = -A\\omega\\sin(\\omega t + \\phi)\\\\a(t) = -A\\omega^2\\cos(\\omega t + \\phi) = -\\omega^2 x',
       },
       {
         type: 'definition',
         title: 'Angular frequency ω and period T',
         body:
-          '\\omega = \\sqrt{k/m} \\quad [\\text{rad/s}]\\\\' +
-          'T = \\frac{2\\pi}{\\omega} = 2\\pi\\sqrt{\\frac{m}{k}} \\quad [\\text{s}]\\\\' +
-          'f = \\frac{1}{T} = \\frac{\\omega}{2\\pi} \\quad [\\text{Hz}]',
+          '\\omega = \\sqrt{k/m} \\quad [\\text{rad/s}]\\\\T = \\frac{2\\pi}{\\omega} = 2\\pi\\sqrt{\\frac{m}{k}} \\quad [\\text{s}]\\\\f = \\frac{1}{T} = \\frac{\\omega}{2\\pi} \\quad [\\text{Hz}]',
       },
       {
         type: 'insight',
         title: 'Period is independent of amplitude',
         body:
-          'T = 2π√(m/k) contains no A. ' +
-          'A small oscillation and a large oscillation of the same spring take exactly the same time. ' +
-          'This is isochronism — discovered by Galileo watching a chandelier swing, ' +
-          'and exploited by every pendulum clock ever built.',
+          'T = 2π√(m/k) contains no A. A small oscillation and a large oscillation of the same spring take exactly the same time. This is isochronism — discovered by Galileo watching a chandelier swing, and exploited by every pendulum clock ever built.',
       },
       {
         type: 'theorem',
         title: 'Energy in SHM',
         body:
-          'E = \\tfrac{1}{2}kA^2 = \\tfrac{1}{2}mv_{\\text{max}}^2 = \\text{const}\\\\' +
-          'v_{\\text{max}} = A\\omega = A\\sqrt{k/m}\\\\' +
-          'v(x) = \\omega\\sqrt{A^2 - x^2}',
+          'E = \\tfrac{1}{2}kA^2 = \\tfrac{1}{2}mv_{\\text{max}}^2 = \\text{const}\\\\v_{\\text{max}} = A\\omega = A\\sqrt{k/m}\\\\v(x) = \\omega\\sqrt{A^2 - x^2}',
       },
       {
         type: 'connection',
         title: 'Calculus: SHM is the solution to a differential equation',
         body:
-          'Newton\'s 2nd: \\(ma = -kx\\), i.e., \\(\\ddot{x} = -\\frac{k}{m}x\\). ' +
-          'This is the **simple harmonic oscillator ODE**. ' +
-          'General solution: \\(x = A\\cos(\\omega t) + B\\sin(\\omega t)\\). ' +
-          'Initial conditions (x₀, v₀) determine A and B uniquely.',
+          'Newton\'s 2nd: \\(ma = -kx\\), i.e., \\(\\ddot{x} = -\\frac{k}{m}x\\). This is the **simple harmonic oscillator ODE**. General solution: \\(x = A\\cos(\\omega t) + B\\sin(\\omega t)\\). Initial conditions (x₀, v₀) determine A and B uniquely.',
       },
       {
         type: 'warning',
         title: 'ω is not the same as f',
         body:
-          'Angular frequency ω = 2πf (radians/second). ' +
-          'Frequency f = 1/T (cycles/second = Hz). ' +
-          'Confusing them by a factor of 2π is the most common SHM calculation error. ' +
-          'Rule: use ω inside cos/sin; use f or T for timing real oscillations.',
+          'Angular frequency ω = 2πf (radians/second). Frequency f = 1/T (cycles/second = Hz). Confusing them by a factor of 2π is the most common SHM calculation error. Rule: use ω inside cos/sin; use f or T for timing real oscillations.',
       },
     ],
     visualizations: [
@@ -118,10 +76,7 @@ export default {
         id: 'SpringOscillation',
         title: 'SHM live — position, velocity, and acceleration vs time',
         mathBridge:
-          'Watch x(t) trace out a cosine. ' +
-          'Note that v(t) = dx/dt is a sine — shifted 90° ahead of x. ' +
-          'a(t) = dv/dt is −cosine — always pointing opposite to x. ' +
-          'Change m or k: watch how ω = √(k/m) changes the frequency.',
+          'Watch x(t) trace out a cosine. Note that v(t) = dx/dt is a sine — shifted 90° ahead of x. a(t) = dv/dt is −cosine — always pointing opposite to x. Change m or k: watch how ω = √(k/m) changes the frequency.',
         caption: 'x = A cos(ωt): position, velocity, and acceleration are all sinusoidal, each shifted by 90°.',
         props: { showVelocity: true, showAcceleration: true, interactive: true },
       },
@@ -129,10 +84,7 @@ export default {
         id: 'UnitCircle',
         title: 'SHM as projection of circular motion',
         mathBridge:
-          'A point moving at constant speed around a circle of radius A projects a cosine onto the x-axis. ' +
-          'This is exactly x(t) = A cos(ωt). ' +
-          'SHM is one-dimensional circular motion. ' +
-          'The angular speed of the circular motion is ω — hence "angular frequency."',
+          'A point moving at constant speed around a circle of radius A projects a cosine onto the x-axis. This is exactly x(t) = A cos(ωt). SHM is one-dimensional circular motion. The angular speed of the circular motion is ω — hence "angular frequency."',
         caption: 'SHM is the shadow of uniform circular motion. ω is literally an angular velocity.',
         props: { showProjection: true },
       },
@@ -153,25 +105,19 @@ export default {
         type: 'theorem',
         title: 'Simple pendulum (small angle)',
         body:
-          '\\text{For small } \\theta: \\quad T = 2\\pi\\sqrt{\\frac{L}{g}}\\\\' +
-          '\\text{Same form as spring: substitute } L/g \\text{ for } m/k.\\\\' +
-          '\\text{Effective spring constant: } k_{\\text{eff}} = mg/L.',
+          '\\text{For small } \\theta: \\quad T = 2\\pi\\sqrt{\\frac{L}{g}}\\\\\\text{Same form as spring: substitute } L/g \\text{ for } m/k.\\\\\\text{Effective spring constant: } k_{\\text{eff}} = mg/L.',
       },
       {
         type: 'insight',
         title: 'Solving any SHM problem',
         body:
-          '1. Identify the restoring force F = −κx (find κ).\\n' +
-          '2. Write ω = √(κ/m) and T = 2π/ω.\\n' +
-          '3. Apply initial conditions to find A and φ.\\n' +
-          '4. Use energy E = ½κA² to find speeds without solving ODE.',
+          '1. Identify the restoring force F = −κx (find κ).\\n2. Write ω = √(κ/m) and T = 2π/ω.\\n3. Apply initial conditions to find A and φ.\\n4. Use energy E = ½κA² to find speeds without solving ODE.',
       },
       {
         type: 'mnemonic',
         title: 'The SHM recipe',
         body:
-          'Restoring force → find ω → find T → apply ICs → done.\\n' +
-          'Energy shortcut: v_max = Aω; v(x) = ω√(A² − x²).',
+          'Restoring force → find ω → find T → apply ICs → done.\\nEnergy shortcut: v_max = Aω; v(x) = ω√(A² − x²).',
       },
     ],
     visualizations: [
@@ -179,10 +125,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'x(t) = A cos(ωt): adjust A, ω, φ',
         mathBridge:
-          'Set A = 0.1 m, ω = 2π rad/s (T = 1 s). ' +
-          'Changing A changes the height but not the period. ' +
-          'Changing ω compresses or stretches the time axis. ' +
-          'Changing φ slides the curve left or right — same shape, different starting point.',
+          'Set A = 0.1 m, ω = 2π rad/s (T = 1 s). Changing A changes the height but not the period. Changing ω compresses or stretches the time axis. Changing φ slides the curve left or right — same shape, different starting point.',
         caption: 'Three parameters: amplitude (height), frequency (x-compression), phase (horizontal shift).',
         props: { expression: '0.1*cos(2*PI*x)', variable: 't', xMin: 0, xMax: 4, label: 'x (m)' },
       },
@@ -223,8 +166,7 @@ export default {
       id: 'ch8-002-ex1',
       title: 'Spring-mass: period, frequency, and position',
       problem:
-        '\\text{A 0.4 kg mass on a spring (k = 160 N/m) is displaced 5 cm and released from rest. ' +
-        'Find: (a) ω, (b) T, (c) x at t = 0.3 s.}',
+        '\\text{A 0.4 kg mass on a spring (k = 160 N/m) is displaced 5 cm and released from rest. Find: (a) ω, (b) T, (c) x at t = 0.3 s.}',
       steps: [
         {
           expression: '\\omega = \\sqrt{k/m} = \\sqrt{160/0.4} = \\sqrt{400} = 20\\,\\text{rad/s}',
@@ -245,8 +187,7 @@ export default {
       id: 'ch8-002-ex2',
       title: 'Maximum speed and speed at a given position',
       problem:
-        '\\text{Same system: k = 160 N/m, m = 0.4 kg, A = 0.05 m. ' +
-        'Find: (a) maximum speed, (b) speed when x = 3 cm.}',
+        '\\text{Same system: k = 160 N/m, m = 0.4 kg, A = 0.05 m. Find: (a) maximum speed, (b) speed when x = 3 cm.}',
       steps: [
         {
           expression: 'v_{\\text{max}} = A\\omega = (0.05)(20) = 1.0\\,\\text{m/s}',
@@ -280,8 +221,7 @@ export default {
       id: 'ch8-002-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A spring-mass system has A = 0.2 m, T = 1.0 s. ' +
-        'Write x(t) if at t = 0: x = 0 m, v = +1.26 m/s.}',
+        '\\text{A spring-mass system has A = 0.2 m, T = 1.0 s. Write x(t) if at t = 0: x = 0 m, v = +1.26 m/s.}',
       hint: 'x(0) = 0 → starts at equilibrium. v(0) > 0 → moving right. This gives a sine function.',
       walkthrough: [
         {
@@ -307,8 +247,7 @@ export default {
       id: 'ch8-002-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A pendulum of length L = 0.5 m swings with amplitude θ₀ = 0.1 rad. ' +
-        'Find: (a) the period, (b) the maximum speed of the bob, (c) the speed when θ = 0.06 rad.}',
+        '\\text{A pendulum of length L = 0.5 m swings with amplitude θ₀ = 0.1 rad. Find: (a) the period, (b) the maximum speed of the bob, (c) the speed when θ = 0.06 rad.}',
       hint: 'Small angle: T = 2π√(L/g). For the pendulum, the \"spring constant\" is k_eff = mg/L. Maximum arc displacement is s₀ = Lθ₀.',
       walkthrough: [
         {

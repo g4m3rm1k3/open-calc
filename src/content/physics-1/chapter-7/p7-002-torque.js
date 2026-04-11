@@ -9,45 +9,28 @@ export default {
 
   hook: {
     question:
-      'You need to loosen a very tight bolt. You have two wrenches: one with a 10 cm handle, one with a 40 cm handle. ' +
-      'You apply the same 50 N force to each. ' +
-      'Which wrench is more effective — and by exactly how much? ' +
-      'What physical quantity are you actually controlling?',
+      'You need to loosen a very tight bolt. You have two wrenches: one with a 10 cm handle, one with a 40 cm handle. You apply the same 50 N force to each. Which wrench is more effective — and by exactly how much? What physical quantity are you actually controlling?',
     realWorldContext:
-      'Torque is why door handles are on the far edge from the hinge, why steering wheels are large, ' +
-      'and why a longer wrench makes a mechanic\'s job easier. ' +
-      'It is also why the human forearm works the way it does: ' +
-      'the bicep attaches close to the elbow joint (short lever arm) but must support loads far from the joint. ' +
-      'Torque governs everything from opening a jar to the orbital mechanics of a spacecraft.',
+      'Torque is why door handles are on the far edge from the hinge, why steering wheels are large, and why a longer wrench makes a mechanic\'s job easier. It is also why the human forearm works the way it does: the bicep attaches close to the elbow joint (short lever arm) but must support loads far from the joint. Torque governs everything from opening a jar to the orbital mechanics of a spacecraft.',
     previewVisualizationId: 'SVGDiagram',
   },
 
   intuition: {
     prose: [
-      '**The answer:** The 40 cm wrench produces 4× more torque: \\(\\tau = r F = (0.40)(50) = 20\\) N·m vs \\((0.10)(50) = 5\\) N·m. ' +
-        'The quantity you\'re controlling is **torque** — the rotational effectiveness of a force.',
+      '**The answer:** The 40 cm wrench produces 4× more torque: \\(\\tau = r F = (0.40)(50) = 20\\) N·m vs \\((0.10)(50) = 5\\) N·m. The quantity you\'re controlling is **torque** — the rotational effectiveness of a force.',
 
-      '**Why distance matters:** A force applied at the rotation axis produces zero rotation — no lever arm means no torque. ' +
-        'Push on a door right at the hinge: nothing moves. Push at the far edge: easy rotation. ' +
-        'Same force, completely different effect. The perpendicular distance from the axis to the line of force — the **lever arm** — is what multiplies the force.',
+      '**Why distance matters:** A force applied at the rotation axis produces zero rotation — no lever arm means no torque. Push on a door right at the hinge: nothing moves. Push at the far edge: easy rotation. Same force, completely different effect. The perpendicular distance from the axis to the line of force — the **lever arm** — is what multiplies the force.',
 
-      '**The angle matters too:** If you push perpendicular to the wrench, all your force contributes to rotation. ' +
-        'If you push along the wrench (parallel to the handle), zero rotation — you\'re just pushing toward or away from the axis. ' +
-        'The effective component is \\(F\\sin\\theta\\), where \\(\\theta\\) is the angle between the force and the lever arm. ' +
-        'So the full formula is \\(\\tau = rF\\sin\\theta\\).',
+      '**The angle matters too:** If you push perpendicular to the wrench, all your force contributes to rotation. If you push along the wrench (parallel to the handle), zero rotation — you\'re just pushing toward or away from the axis. The effective component is \\(F\\sin\\theta\\), where \\(\\theta\\) is the angle between the force and the lever arm. So the full formula is \\(\\tau = rF\\sin\\theta\\).',
 
-      '**Torque is a vector (cross product):** \\(\\vec{\\tau} = \\vec{r} \\times \\vec{F}\\). ' +
-        'The direction is given by the right-hand rule: curl fingers from \\(\\vec{r}\\) toward \\(\\vec{F}\\), thumb points along the torque vector. ' +
-        'Counterclockwise torques are positive; clockwise are negative (by convention).',
+      '**Torque is a vector (cross product):** \\(\\vec{\\tau} = \\vec{r} \\times \\vec{F}\\). The direction is given by the right-hand rule: curl fingers from \\(\\vec{r}\\) toward \\(\\vec{F}\\), thumb points along the torque vector. Counterclockwise torques are positive; clockwise are negative (by convention).',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 2 of 4 — Torque: the cause of angular acceleration',
         body:
-          '**Lesson 1:** Angular kinematics describes HOW rotation happens (θ, ω, α).\n' +
-          '**This lesson:** Torque is WHY rotation happens — the rotational analogue of force.\n' +
-          '**Next:** Rotational dynamics: τ = Iα (Newton\'s Second Law for rotation).',
+          '**Lesson 1:** Angular kinematics describes HOW rotation happens (θ, ω, α).\n**This lesson:** Torque is WHY rotation happens — the rotational analogue of force.\n**Next:** Rotational dynamics: τ = Iα (Newton\'s Second Law for rotation).',
       },
       {
         type: 'definition',
@@ -63,27 +46,19 @@ export default {
         type: 'insight',
         title: 'Three equivalent interpretations of τ = rF sin θ',
         body:
-          '1. \\(\\tau = r \\cdot (F\\sin\\theta)\\) — full radius × perpendicular component of force.\n' +
-          '2. \\(\\tau = (r\\sin\\theta) \\cdot F\\) — perpendicular distance (lever arm) × full force.\n' +
-          '3. \\(\\tau = \\vec{r} \\times \\vec{F}\\) — cross product magnitude. All three are the same.',
+          '1. \\(\\tau = r \\cdot (F\\sin\\theta)\\) — full radius × perpendicular component of force.\n2. \\(\\tau = (r\\sin\\theta) \\cdot F\\) — perpendicular distance (lever arm) × full force.\n3. \\(\\tau = \\vec{r} \\times \\vec{F}\\) — cross product magnitude. All three are the same.',
       },
       {
         type: 'warning',
         title: 'Torque units look like energy — they are not the same',
         body:
-          'Work W = F·d has units N·m = J. Torque τ = rF has units N·m. ' +
-          'Numerically identical units, physically completely different. ' +
-          'Work is a dot product (scalar). Torque is a cross product (vector). ' +
-          'To avoid confusion, some texts write torque in N·m and energy in J.',
+          'Work W = F·d has units N·m = J. Torque τ = rF has units N·m. Numerically identical units, physically completely different. Work is a dot product (scalar). Torque is a cross product (vector). To avoid confusion, some texts write torque in N·m and energy in J.',
       },
       {
         type: 'connection',
         title: 'Calculus connection: work done by a torque',
         body:
-          'When a torque \\(\\tau\\) rotates an object by angle \\(d\\theta\\): \\(dW = \\tau\\,d\\theta\\). ' +
-          'For constant torque: \\(W = \\tau\\theta\\). ' +
-          'For variable torque: \\(W = \\int\\tau\\,d\\theta\\). ' +
-          'This mirrors \\(W = \\int F\\,dx\\) — the rotational version of work.',
+          'When a torque \\(\\tau\\) rotates an object by angle \\(d\\theta\\): \\(dW = \\tau\\,d\\theta\\). For constant torque: \\(W = \\tau\\theta\\). For variable torque: \\(W = \\int\\tau\\,d\\theta\\). This mirrors \\(W = \\int F\\,dx\\) — the rotational version of work.',
       },
     ],
     visualizations: [
@@ -92,17 +67,14 @@ export default {
         props: { type: 'torque-lever' },
         title: 'Lever arm and torque — drag the force position',
         caption:
-          'Drag the point where force is applied. Watch torque = r × F sin θ update. ' +
-          'At the hinge (r = 0): τ = 0. At the far edge (maximum r): maximum τ. ' +
-          'Change the angle θ: perpendicular gives maximum torque; parallel gives zero.',
+          'Drag the point where force is applied. Watch torque = r × F sin θ update. At the hinge (r = 0): τ = 0. At the far edge (maximum r): maximum τ. Change the angle θ: perpendicular gives maximum torque; parallel gives zero.',
       },
     ],
   },
 
   math: {
     prose: [
-      'Torque about an axis: \\(\\tau = rF\\sin\\theta\\), where \\(r\\) is the distance from axis to point of force application, ' +
-        '\\(F\\) is the force magnitude, and \\(\\theta\\) is the angle between \\(\\vec{r}\\) and \\(\\vec{F}\\).',
+      'Torque about an axis: \\(\\tau = rF\\sin\\theta\\), where \\(r\\) is the distance from axis to point of force application, \\(F\\) is the force magnitude, and \\(\\theta\\) is the angle between \\(\\vec{r}\\) and \\(\\vec{F}\\).',
       'For a system in **rotational equilibrium**, the net torque about any axis must be zero:',
       '\\(\\sum \\tau = 0 \\quad \\Leftrightarrow \\quad \\alpha = 0\\)',
       'This extends statics (Chapter 4) to rotating systems: a balanced seesaw or a horizontal beam has zero net torque.',
@@ -117,9 +89,7 @@ export default {
         type: 'mnemonic',
         title: 'Sign convention',
         body:
-          'Counterclockwise torques: positive (+τ).\n' +
-          'Clockwise torques: negative (−τ).\n' +
-          'Set this convention at the start of every statics problem and never switch mid-problem.',
+          'Counterclockwise torques: positive (+τ).\nClockwise torques: negative (−τ).\nSet this convention at the start of every statics problem and never switch mid-problem.',
       },
     ],
     visualizations: [
@@ -128,8 +98,7 @@ export default {
         props: { type: 'balanced-seesaw' },
         title: 'Seesaw balance — torque equilibrium',
         caption:
-          'Move the masses and their positions. The seesaw balances when the clockwise and counterclockwise torques about the pivot are equal. ' +
-          'A heavy child close to the pivot can be balanced by a lighter child far from it — the lever arm compensates for the mass difference.',
+          'Move the masses and their positions. The seesaw balances when the clockwise and counterclockwise torques about the pivot are equal. A heavy child close to the pivot can be balanced by a lighter child far from it — the lever arm compensates for the mass difference.',
       },
     ],
   },
@@ -161,8 +130,7 @@ export default {
       id: 'ch7-002-ex1',
       title: 'Opening a door — torque at different positions',
       problem:
-        '\\text{A door is 0.9 m wide. A force of 30 N is applied perpendicular to the door at: ' +
-        '(a) 0.9 m from hinge, (b) 0.3 m from hinge, (c) 0.9 m at 60° to the door plane.}',
+        '\\text{A door is 0.9 m wide. A force of 30 N is applied perpendicular to the door at: (a) 0.9 m from hinge, (b) 0.3 m from hinge, (c) 0.9 m at 60° to the door plane.}',
       steps: [
         { expression: '\\tau_a = (0.9)(30)\\sin 90° = 27\\,\\text{N·m}', annotation: 'Maximum torque at far edge.' },
         { expression: '\\tau_b = (0.3)(30)\\sin 90° = 9\\,\\text{N·m}', annotation: '3× less torque — 3× harder to open.' },
@@ -174,8 +142,7 @@ export default {
       id: 'ch7-002-ex2',
       title: 'Balanced beam — rotational equilibrium',
       problem:
-        '\\text{A uniform 5 m beam (mass 20 kg) is supported at its center. ' +
-        'A 40 kg weight hangs at 1 m from the left end. Where must a 50 kg weight hang to balance?}',
+        '\\text{A uniform 5 m beam (mass 20 kg) is supported at its center. A 40 kg weight hangs at 1 m from the left end. Where must a 50 kg weight hang to balance?}',
       steps: [
         {
           expression: '\\text{Pivot at center (2.5 m from each end). 40 kg is at }(2.5-1.0) = 1.5\\text{ m left of pivot.}',
@@ -209,8 +176,7 @@ export default {
       id: 'ch7-002-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A 3 m horizontal bar is supported at one end. A 200 N weight hangs at 2 m from the support. ' +
-        'A vertical cable at the far end holds the bar horizontal. Find the cable tension.}',
+        '\\text{A 3 m horizontal bar is supported at one end. A 200 N weight hangs at 2 m from the support. A vertical cable at the far end holds the bar horizontal. Find the cable tension.}',
       hint: 'Take torques about the support point (left end). The cable tension creates a counterclockwise torque; the weight creates a clockwise torque.',
       walkthrough: [
         {
@@ -228,8 +194,7 @@ export default {
       id: 'ch7-002-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A ladder (5 m, 30 kg) leans against a frictionless wall at 70° from horizontal. ' +
-        'A 70 kg person stands 3.5 m up the ladder. Find: (a) wall normal force, (b) floor friction force.}',
+        '\\text{A ladder (5 m, 30 kg) leans against a frictionless wall at 70° from horizontal. A 70 kg person stands 3.5 m up the ladder. Find: (a) wall normal force, (b) floor friction force.}',
       hint: 'Take torques about the base of the ladder. Wall normal force is horizontal at the top.',
       walkthrough: [
         {

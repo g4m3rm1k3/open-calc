@@ -12,7 +12,7 @@ export default {
     question: "How does initial downward speed change impact time to ground?",
     realWorldContext:
       "Drop tests and impact estimation often include nonzero initial downward speed.",
-    previewVisualizationId: "FreeFallIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -27,20 +27,21 @@ export default {
         caption: 'When throwing downward with +y upward: v₀ is negative, a = −g is negative. Both v and a point the same direction. The object accelerates continuously with no apex. Same equations — only the sign of v₀ differs from the upward case.',
       },
       {
-        id: "FreeFallIntuition",
+        id: 'VerticalThrow',
+        props: {},
         title: "Downward-launch comparison",
         mathBridge: "Compare rest-drop and downward-throw from same height.",
         caption: "Initial speed shifts both timing and impact velocity.",
       },
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
         title: "Impact-time explorer",
         mathBridge:
           "Set height and v0 to solve landing time and velocity with clear sign control.",
         caption: "A practical impact estimator.",
       },
       {
-        id: "CliffLaunchIntuition",
+        id: 'VerticalThrow',
         title: "Elevated launch and landing",
         mathBridge:
           "Extend downward-throw analysis to elevated launch scenarios solved by quadratic landing-time roots.",
@@ -54,7 +55,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "KinematicEquationSelector",
+        id: 'SVGDiagram',
         title: "Solve landing state",
         mathBridge:
           "Solve unknown time or impact speed from known height and initial velocity.",
@@ -64,7 +65,7 @@ export default {
   },
   rigor: {
     prose: ["The equations are identical to upward launch; only signs differ."],
-    visualizationId: "FreeFallExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

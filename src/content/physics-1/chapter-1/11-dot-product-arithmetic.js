@@ -12,7 +12,7 @@ export default {
     question: 'You have two 3D force vectors in component form. How do you find their dot product without ever needing the angle?',
     realWorldContext:
       `Computer programs, physics engines, and machine learning algorithms deal entirely in components — never angles. The component dot product formula $\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y + A_zB_z$ is the version that runs on every processor in the world.`,
-    previewVisualizationId: 'DotProductExampleIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [{
@@ -60,10 +60,10 @@ export default {
           `$\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y$ comes directly from projecting each component onto its matching axis. The geometric formula $|A||B|\\cos\\phi$ and the component formula always give the same number.`,
       },
       {
-        id: 'DotProductExampleIntuition',
-        title: 'Step-by-step dot product arithmetic',
-        mathBridge: 'Watch each component pair multiply and then sum.',
-        caption: 'Three multiplications + two additions = dot product.',
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Component arithmetic = geometric projection',
+        caption: `$A_xB_x + A_yB_y + A_zB_z$ is three multiplications and two additions. Each term is the contribution of one axis to the total "overlap" between the vectors.`,
       },
     ],
   },
@@ -91,10 +91,10 @@ export default {
       },
     ],
     visualizations: [{
-      id: 'DotProductCalculator',
-      title: 'Component/Magnitude-Angle Calculator',
-      mathBridge: 'Switch between 2D and 3D modes.',
-      caption: 'The ultimate vector scratchpad.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Dot product in 2D and 3D',
+      caption: `2D: $\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y$. 3D: add $A_zB_z$. The projection diagram extends to 3D — the same geometric interpretation holds in any dimension.`,
     }],
   },
 
@@ -133,10 +133,10 @@ export default {
     ],
     title: 'Formal Derivation of Component Addition',
     visualizations: [{
-      id: 'DotProductPatternSpotter',
-      title: 'Pattern Recognition Quiz',
-      mathBridge: 'Identify the correct component multiplication pattern for the dot product.',
-      caption: 'Precision requires practice.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Self-dot = magnitude squared',
+      caption: `$\\vec{A}\\cdot\\vec{A} = A_x^2+A_y^2+A_z^2 = |\\vec{A}|^2$. This connects the algebraic and geometric definitions: the Pythagorean theorem emerges from the dot product.`,
     }],
   },
 
@@ -296,7 +296,77 @@ export default {
         { expression: '\\cos\\phi = 9/(5\\times3) = 9/15 = 3/5', annotation: 'Divide dot product by product of magnitudes.' },
         { expression: '\\phi = \\arccos(3/5) = \\arccos(0.6) \\approx 53.1°', annotation: 'Positive cosine → acute angle, as expected (dot product was positive).' },
       ],
-      answer: '\\phi \\approx 53.1°',
+      answer: `\\phi \\approx 53.1°`,
+    },
+  ],
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-011-q1',
+      question: `$\\vec{A} = (1, 2, 3)$, $\\vec{B} = (4, 5, 6)$. What is $\\vec{A}\\cdot\\vec{B}$?`,
+      options: [`$15$`, `$32$`, `$90$`, `$27$`],
+      answer: 1,
+      explanation: `$(1)(4)+(2)(5)+(3)(6) = 4+10+18 = 32$.`,
+    },
+    {
+      id: 'p1-ch1-011-q2',
+      question: `$\\vec{A} = (3, 4)$. What is $\\vec{A}\\cdot\\vec{A}$?`,
+      options: [`$7$`, `$12$`, `$25$`, `$5$`],
+      answer: 2,
+      explanation: `$\\vec{A}\\cdot\\vec{A} = 3^2+4^2 = 9+16 = 25 = |\\vec{A}|^2$.`,
+    },
+    {
+      id: 'p1-ch1-011-q3',
+      question: `$(3\\vec{A})\\cdot\\vec{B}$ equals:`,
+      options: [`$3(\\vec{A}\\cdot\\vec{B})$`, `$\\vec{A}\\cdot(3\\vec{B})$`, `Both A and B`, `Neither`],
+      answer: 2,
+      explanation: `Scalar multiplication is associative with the dot product: $(c\\vec{A})\\cdot\\vec{B} = c(\\vec{A}\\cdot\\vec{B}) = \\vec{A}\\cdot(c\\vec{B})$. Both A and B are correct.`,
+    },
+    {
+      id: 'p1-ch1-011-q4',
+      question: `The dot product formula $\\vec{A}\\cdot\\vec{B} = A_xB_x+A_yB_y+A_zB_z$ works because:`,
+      options: [
+        `Vectors are always perpendicular`,
+        `Basis vectors $\\hat{i}, \\hat{j}, \\hat{k}$ are orthonormal: cross-terms vanish`,
+        `Components are always positive`,
+        `Addition is commutative`,
+      ],
+      answer: 1,
+      explanation: `The FOIL expansion produces 9 terms (in 3D). The 6 cross-terms ($\\hat{i}\\cdot\\hat{j}$ etc.) are zero because the basis is orthogonal. The 3 self-terms ($\\hat{i}\\cdot\\hat{i}=1$) give the matching component products.`,
+    },
+    {
+      id: 'p1-ch1-011-q5',
+      question: `$\\hat{i}\\cdot\\hat{j} = ?$`,
+      options: [`$1$`, `$0$`, `$-1$`, `$\\hat{k}$`],
+      answer: 1,
+      explanation: `$\\hat{i}$ and $\\hat{j}$ are perpendicular unit vectors. Their dot product is $|\\hat{i}||\\hat{j}|\\cos90° = 1\\cdot1\\cdot0 = 0$.`,
+    },
+    {
+      id: 'p1-ch1-011-q6',
+      question: `$\\vec{A}\\cdot(\\vec{B}+\\vec{C})$ equals:`,
+      options: [
+        `$(\\vec{A}\\cdot\\vec{B})(\\vec{A}\\cdot\\vec{C})$`,
+        `$\\vec{A}\\cdot\\vec{B} + \\vec{A}\\cdot\\vec{C}$`,
+        `$\\vec{A}\\cdot\\vec{B} - \\vec{A}\\cdot\\vec{C}$`,
+        `Undefined`,
+      ],
+      answer: 1,
+      explanation: `The dot product distributes over addition: $\\vec{A}\\cdot(\\vec{B}+\\vec{C}) = \\vec{A}\\cdot\\vec{B} + \\vec{A}\\cdot\\vec{C}$.`,
+    },
+    {
+      id: 'p1-ch1-011-q7',
+      question: `If $\\vec{A} = (1,0,0)$ and $\\vec{B} = (0,0,1)$, what is $\\vec{A}\\cdot\\vec{B}$?`,
+      options: [`$1$`, `$0$`, `$-1$`, `$\\sqrt{2}$`],
+      answer: 1,
+      explanation: `$(1)(0)+(0)(0)+(0)(1) = 0$. $\\hat{i}$ and $\\hat{k}$ are perpendicular — their dot product is zero.`,
+    },
+    {
+      id: 'p1-ch1-011-q8',
+      question: `A 3D vector has components $(2, -3, 6)$. What is its magnitude from the self-dot formula?`,
+      options: [`$5$`, `$7$`, `$11$`, `$49$`],
+      answer: 1,
+      explanation: `$|\\vec{A}| = \\sqrt{\\vec{A}\\cdot\\vec{A}} = \\sqrt{4+9+36} = \\sqrt{49} = 7$.`,
     },
   ],
 }

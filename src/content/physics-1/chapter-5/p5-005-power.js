@@ -9,48 +9,28 @@ export default {
 
   hook: {
     question:
-      'A sports car and a truck both climb a 100 m hill. They have the same mass. ' +
-      'They both do exactly the same work against gravity. ' +
-      'The sports car does it in 20 seconds; the truck takes 3 minutes. ' +
-      'In what way are they physically different? What quantity captures this difference?',
+      'A sports car and a truck both climb a 100 m hill. They have the same mass. They both do exactly the same work against gravity. The sports car does it in 20 seconds; the truck takes 3 minutes. In what way are they physically different? What quantity captures this difference?',
     realWorldContext:
-      'Power is what you pay for in an engine. ' +
-      'Two engines can do identical total work — but the one with more power gets it done faster. ' +
-      'A human climbing stairs does the same work per floor regardless of speed, ' +
-      'but sprinting up eight floors is exhausting while walking takes little effort. ' +
-      'Electric motors, turbines, and muscles are all rated in watts for this reason.',
+      'Power is what you pay for in an engine. Two engines can do identical total work — but the one with more power gets it done faster. A human climbing stairs does the same work per floor regardless of speed, but sprinting up eight floors is exhausting while walking takes little effort. Electric motors, turbines, and muscles are all rated in watts for this reason.',
     previewVisualizationId: 'FunctionPlotter',
   },
 
   intuition: {
     prose: [
-      '**The answer:** Work is the same — the difference is TIME. ' +
-        'The sports car transfers the same energy in 20 s that the truck transfers in 180 s. ' +
-        'Power is the rate of energy transfer: P = W/t. ' +
-        'The sports car has 9× the power of the truck for this task.',
+      '**The answer:** Work is the same — the difference is TIME. The sports car transfers the same energy in 20 s that the truck transfers in 180 s. Power is the rate of energy transfer: P = W/t. The sports car has 9× the power of the truck for this task.',
 
-      '**Why time matters:** You can always do more work if given more time. ' +
-        'Power tells you how much work you can do per second — it is the capability, not the total output. ' +
-        'A marathon runner and a sprinter both expend enormous energy, ' +
-        'but the sprinter\'s peak power output far exceeds the marathoner\'s sustained rate.',
+      '**Why time matters:** You can always do more work if given more time. Power tells you how much work you can do per second — it is the capability, not the total output. A marathon runner and a sprinter both expend enormous energy, but the sprinter\'s peak power output far exceeds the marathoner\'s sustained rate.',
 
-      '**The instant version:** Average power \\(P = W/\\Delta t\\) tells you the rate over a time interval. ' +
-        'Instantaneous power is the limit as \\(\\Delta t \\to 0\\): \\(P = dW/dt\\). ' +
-        'Since \\(dW = F\\,dx\\): \\(P = F(dx/dt) = F \\cdot v\\). ' +
-        'Power equals force times velocity — at every instant.',
+      '**The instant version:** Average power \\(P = W/\\Delta t\\) tells you the rate over a time interval. Instantaneous power is the limit as \\(\\Delta t \\to 0\\): \\(P = dW/dt\\). Since \\(dW = F\\,dx\\): \\(P = F(dx/dt) = F \\cdot v\\). Power equals force times velocity — at every instant.',
 
-      '**The practical form: P = Fv.** A car engine at constant speed produces exactly the power needed to overcome friction and air resistance at that speed. ' +
-        'As speed doubles, air drag quadruples (drag ∝ v²), so power required increases as v³. ' +
-        'This is why fuel economy drops sharply at highway speeds.',
+      '**The practical form: P = Fv.** A car engine at constant speed produces exactly the power needed to overcome friction and air resistance at that speed. As speed doubles, air drag quadruples (drag ∝ v²), so power required increases as v³. This is why fuel economy drops sharply at highway speeds.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 5 of 6 — Energy per unit time',
         body:
-          '**Lessons 1–4:** Work transfers energy; KE and PE are its two mechanical forms; total energy is conserved.\n' +
-          '**This lesson:** Power asks "how fast?" — the rate of energy transfer per second.\n' +
-          '**Next lesson:** Worked examples synthesizing the full chapter — work, energy, power in complex problems.',
+          '**Lessons 1–4:** Work transfers energy; KE and PE are its two mechanical forms; total energy is conserved.\n**This lesson:** Power asks "how fast?" — the rate of energy transfer per second.\n**Next lesson:** Worked examples synthesizing the full chapter — work, energy, power in complex problems.',
       },
       {
         type: 'definition',
@@ -66,17 +46,13 @@ export default {
         type: 'insight',
         title: 'Unit conversions worth knowing',
         body:
-          '1 kilowatt (kW) = 1000 W.\\\\' +
-          '1 horsepower (hp) ≈ 746 W.\\\\' +
-          '1 kilowatt-hour (kWh) = 3.6 × 10⁶ J — this is a unit of ENERGY, not power (power × time = energy).',
+          '1 kilowatt (kW) = 1000 W.\\\\1 horsepower (hp) ≈ 746 W.\\\\1 kilowatt-hour (kWh) = 3.6 × 10⁶ J — this is a unit of ENERGY, not power (power × time = energy).',
       },
       {
         type: 'warning',
         title: 'kWh is energy, W is power',
         body:
-          'Your electricity bill charges for kilowatt-hours (energy used). ' +
-          'Your appliances are rated in watts (power consumed). ' +
-          'Confusing these is one of the most common unit errors in physics.',
+          'Your electricity bill charges for kilowatt-hours (energy used). Your appliances are rated in watts (power consumed). Confusing these is one of the most common unit errors in physics.',
       },
     ],
     visualizations: [
@@ -85,10 +61,7 @@ export default {
         props: { type: 'power-time-work' },
         title: 'Power = slope of the W–t graph',
         caption:
-          'Plot cumulative work done vs time. The slope at any point is the instantaneous power. ' +
-          'A steep slope = high power (fast energy transfer). ' +
-          'A flat slope = low power (slow or no energy transfer). ' +
-          'Constant power appears as a straight line with slope = P.',
+          'Plot cumulative work done vs time. The slope at any point is the instantaneous power. A steep slope = high power (fast energy transfer). A flat slope = low power (slow or no energy transfer). Constant power appears as a straight line with slope = P.',
       },
     ],
   },
@@ -111,19 +84,13 @@ export default {
         type: 'insight',
         title: 'Why P = Fv matters for engine design',
         body:
-          'At low speed, high force with moderate v gives high power. ' +
-          'At high speed, even small forces require huge power to maintain. ' +
-          'Drag force \\(F_d \\propto v^2\\), so power to overcome drag \\(P = F_d v \\propto v^3\\). ' +
-          'This cubic relationship makes high-speed travel extremely power-hungry.',
+          'At low speed, high force with moderate v gives high power. At high speed, even small forces require huge power to maintain. Drag force \\(F_d \\propto v^2\\), so power to overcome drag \\(P = F_d v \\propto v^3\\). This cubic relationship makes high-speed travel extremely power-hungry.',
       },
       {
         type: 'mnemonic',
         title: 'Energy vs Power vs Time',
         body:
-          'Energy (J) = Power (W) × Time (s)\\\\' +
-          'Power (W) = Energy (J) ÷ Time (s)\\\\' +
-          'Time (s) = Energy (J) ÷ Power (W)\\\\' +
-          'Triangle rule: cover the unknown, multiply or divide the other two.',
+          'Energy (J) = Power (W) × Time (s)\\\\Power (W) = Energy (J) ÷ Time (s)\\\\Time (s) = Energy (J) ÷ Power (W)\\\\Triangle rule: cover the unknown, multiply or divide the other two.',
       },
     ],
     visualizations: [
@@ -131,9 +98,7 @@ export default {
         id: 'FunctionPlotter',
         title: 'Power to overcome drag ∝ v³',
         mathBridge:
-          'Drag force ∝ v². Power = F·v, so P ∝ v³. ' +
-          'Move the speed slider: doubling speed requires 8× the power against drag. ' +
-          'This is why fuel economy halves between 60 and 120 km/h.',
+          'Drag force ∝ v². Power = F·v, so P ∝ v³. Move the speed slider: doubling speed requires 8× the power against drag. This is why fuel economy halves between 60 and 120 km/h.',
         caption: 'The cubic growth of power-vs-speed is the physics behind fuel economy curves.',
         props: { expression: '0.5*x*x*x', variable: 'v', xMin: 0, xMax: 30, label: 'P (arbitrary units)' },
       },
@@ -163,8 +128,7 @@ export default {
       id: 'ch5-005-ex1',
       title: 'Engine power to maintain highway speed',
       problem:
-        '\\text{A 1500 kg car travels at 30 m/s on a level road. ' +
-        'Air resistance + rolling friction = 600 N. What engine power is required?}',
+        '\\text{A 1500 kg car travels at 30 m/s on a level road. Air resistance + rolling friction = 600 N. What engine power is required?}',
       steps: [
         {
           expression: 'P = F \\cdot v = 600 \\times 30 = 18{,}000\\,\\text{W} = 18\\,\\text{kW}',
@@ -207,8 +171,7 @@ export default {
       id: 'ch5-005-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A pump lifts 500 kg of water per minute to a height of 8 m. ' +
-        'What is the minimum power of the pump? (g = 9.8 m/s²)}',
+        '\\text{A pump lifts 500 kg of water per minute to a height of 8 m. What is the minimum power of the pump? (g = 9.8 m/s²)}',
       hint: 'Work per minute = mgh per minute. Divide by time in seconds.',
       walkthrough: [
         {
@@ -226,11 +189,9 @@ export default {
       id: 'ch5-005-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A 2000 kg car engine produces constant power } P = 40\\,\\text{kW}. ' +
-        '\\text{Starting from rest on a level frictionless road, find the speed at } t = 10\\,\\text{s.}',
+        '\\text{A 2000 kg car engine produces constant power } P = 40\\,\\text{kW}. \\text{Starting from rest on a level frictionless road, find the speed at } t = 10\\,\\text{s.}',
       hint:
-        'P = Fv = mav. This gives the ODE: m(dv/dt) = P/v. Separate variables and integrate. ' +
-        'Or use energy: W = Pt = ΔKE.',
+        'P = Fv = mav. This gives the ODE: m(dv/dt) = P/v. Separate variables and integrate. Or use energy: W = Pt = ΔKE.',
       walkthrough: [
         {
           expression: 'W = Pt = 40000 \\times 10 = 400{,}000\\,\\text{J}',

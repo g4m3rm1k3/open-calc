@@ -11,7 +11,7 @@ export default {
     question: "When do two moving objects occupy the same position?",
     realWorldContext:
       "Intercept, pursuit, and collision-avoidance systems all solve meeting-point equations continuously.",
-    previewVisualizationId: "TwoObjectsIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -26,20 +26,20 @@ export default {
         caption: 'Two objects meet when they occupy the same position at the same time: xₐ(t) = x_b(t). Write each position as a SUVAT equation, set them equal, solve for t. Pure algebra.',
       },
       {
-        id: "TwoObjectsIntuition",
+        id: 'SVGDiagram',
         title: "Dual-trajectory visual",
         mathBridge: "Track both x(t) curves and highlight intersection event.",
         caption: "Intersection in graph space is meeting in physical space.",
       },
       {
-        id: "TwoObjectsExplorer",
+        id: 'SVGDiagram',
         title: "Preset scenarios",
         mathBridge:
           "Solve chase, head-on, and same-direction problems with displayed algebra.",
         caption: "One framework, many contexts.",
       },
       {
-        id: "SlopeLandingIntuition",
+        id: 'SVGDiagram',
         title: "Trajectory-slope intersection",
         mathBridge:
           "Model landing on an incline by equating trajectory and slope equations to find their meeting point.",
@@ -51,7 +51,7 @@ export default {
     prose: ["Relative motion can reduce setup complexity: x_rel = x1 - x2."],
     visualizations: [
       {
-        id: "TwoObjectsPatternSpotter",
+        id: 'SVGDiagram',
         title: "Meeting-point quiz",
         mathBridge:
           "Identify equation setup and solve for physically valid meeting time.",
@@ -63,7 +63,7 @@ export default {
     prose: [
       "Meeting problems are root-finding tasks on the difference function f(t)=x1(t)-x2(t).",
     ],
-    visualizationId: "TwoObjectsExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       { expression: "x_1(t)-x_2(t)=0", annotation: "Meeting condition." },
       {

@@ -12,7 +12,7 @@ export default {
       "Why do students get different answers from the same equation set?",
     realWorldContext:
       "Most free-fall mistakes are sign mistakes, not algebra mistakes.",
-    previewVisualizationId: "FreeFallExplorer",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -28,14 +28,15 @@ export default {
         caption: 'The physics is axis-independent. Choosing +y upward makes a = −g (negative). Choosing +y downward makes a = +g (positive). Both give the same trajectory.',
       },
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
+        props: {},
         title: "Toggle sign conventions",
         mathBridge:
           "Switch conventions and verify physical outcomes remain identical when equations are applied consistently.",
         caption: "Convention changes symbols, not physics.",
       },
       {
-        id: "FreeFallPatternSpotter",
+        id: 'SVGDiagram',
         title: "Sign-consistency drill",
         mathBridge:
           "Classify scenarios by correct sign assignments for v0, a, and displacement.",
@@ -54,14 +55,14 @@ export default {
     ],
     visualizations: [
       {
-        id: "KinematicsFormRecogniser",
+        id: 'SVGDiagram',
         title: "Equation recall with signs",
         mathBridge:
           "Practice selecting formulas and assigning signs under both conventions.",
         caption: "Form + sign = correct model.",
       },
       {
-        id: "ProjectileFormRecogniser",
+        id: 'SVGDiagram',
         title: "Projectile form recogniser",
         mathBridge:
           "Reinforce correct formula-form and sign usage across horizontal and vertical projectile components.",
@@ -73,7 +74,7 @@ export default {
     prose: [
       "Coordinate transforms preserve solutions if all terms transform consistently.",
     ],
-    visualizationId: "FreeFallIntuition",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "x'=-x,\\,v'=-v,\\,a'=-a",

@@ -15,7 +15,7 @@ export default {
     question: 'A structural cable pulls at some angle in 3D space. You know its tension is 500 N — but in which direction exactly? How do you specify a 3D direction precisely?',
     realWorldContext:
       `In 2D, you can describe any direction with a single angle — "30° above horizontal." In 3D, one angle isn't enough. A satellite's orientation in orbit, a robot arm's end position in space, a cable's pull direction in a 3D bridge — these all need a systematic way to describe direction in three dimensions. The answer used by aerospace engineers, roboticists, and structural analysts worldwide is the **direction cosine**: the cosines of the three angles that a vector makes with the x-, y-, and z-axes. Three numbers, one identity connecting them, and any 3D direction pinned down exactly.`,
-    previewVisualizationId: 'DirectionCosineIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────
@@ -75,10 +75,10 @@ export default {
         caption: `In 2D, $A_x = |A|\\cos\\theta$ is the projection ("shadow") of the vector onto the x-axis. In 3D, the same idea applies separately to all three axes. Each direction cosine is the cosine of the angle to that axis — or equivalently, the component of the unit vector along that axis.`,
       },
       {
-        id: 'DirectionCosineIntuition',
-        title: 'Direction cosines — interactive exploration',
-        mathBridge: `Drag the 3D vector. Watch how $\\cos\\alpha$, $\\cos\\beta$, $\\cos\\gamma$ update as you rotate it. Verify that their squares always sum to 1, regardless of the direction.`,
-        caption: `As you rotate the vector toward any axis, the corresponding direction cosine approaches 1. Moving away from an axis makes that cosine approach 0 or −1.`,
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Direction cosines — projections onto all three axes',
+        caption: `Each direction cosine is the "shadow" of the unit vector onto one axis: cosα = A_x/|A|, cosβ = A_y/|A|, cosγ = A_z/|A|. Pointing toward an axis drives that cosine toward 1 and the others smaller. The three cosines always satisfy cos²α + cos²β + cos²γ = 1 — they are the x, y, z coordinates of a point on the unit sphere.`,
       },
     ],
   },
@@ -115,10 +115,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'DirectionCosineExplorer',
-        title: 'Explorer: compute direction cosines from components',
-        mathBridge: `Enter any 3D vector components. The explorer computes all three direction cosines, the corresponding angles, and verifies the identity. Try negative components to see angles greater than 90°.`,
-        caption: `The identity is always satisfied — it's a built-in check for whether your direction cosines are geometrically valid.`,
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Direction cosines from components — worked view',
+        caption: `Given components (A_x, A_y, A_z): compute |A| = √(A_x²+A_y²+A_z²), then divide each component by |A| to get cosα, cosβ, cosγ. Take arccos of each to get the angles α, β, γ in [0°, 180°]. Negative components give angles greater than 90° — that's valid. The identity cos²α + cos²β + cos²γ = 1 is an automatic check.`,
       },
     ],
   },
@@ -546,4 +546,104 @@ print("All validity checks passed ✓")`,
       },
     ],
   },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-017-q1',
+      question: `The direction angle $\\alpha$ is the angle between a vector $\\vec{A}$ and which axis?`,
+      options: [
+        `The $y$-axis`,
+        `The $z$-axis`,
+        `The $x$-axis`,
+        `The origin`,
+      ],
+      answer: 2,
+      explanation: `By convention: $\\alpha$ is the angle with the $x$-axis, $\\beta$ is the angle with the $y$-axis, and $\\gamma$ is the angle with the $z$-axis. So $\\cos\\alpha = A_x / |\\vec{A}|$.`,
+    },
+    {
+      id: 'p1-ch1-017-q2',
+      question: `For a vector $\\vec{A} = (3, 0, 0)$, what is $\\cos\\alpha$ (the direction cosine for the $x$-axis)?`,
+      options: [
+        `0`,
+        `3`,
+        `1`,
+        `$1/3$`,
+      ],
+      answer: 2,
+      explanation: `$|\\vec{A}| = 3$, so $\\cos\\alpha = A_x / |\\vec{A}| = 3/3 = 1$. The vector points entirely along $+x$, so it makes a 0° angle with the $x$-axis and $\\cos 0° = 1$.`,
+    },
+    {
+      id: 'p1-ch1-017-q3',
+      question: `The direction cosines of any vector always satisfy:`,
+      options: [
+        `$\\cos\\alpha + \\cos\\beta + \\cos\\gamma = 1$`,
+        `$\\cos\\alpha \\cdot \\cos\\beta \\cdot \\cos\\gamma = 1$`,
+        `$\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 1$`,
+        `$\\cos\\alpha = \\cos\\beta = \\cos\\gamma$`,
+      ],
+      answer: 2,
+      explanation: `The identity $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 1$ follows directly from the fact that the unit vector has magnitude 1: $(A_x/|A|)^2 + (A_y/|A|)^2 + (A_z/|A|)^2 = (A_x^2+A_y^2+A_z^2)/|A|^2 = 1$.`,
+    },
+    {
+      id: 'p1-ch1-017-q4',
+      question: `A vector has direction cosines $\\cos\\alpha = 0.6$ and $\\cos\\beta = 0.8$. What must $\\cos\\gamma$ equal (assuming the vector has a non-negative $z$-component)?`,
+      options: [
+        `0.2`,
+        `0`,
+        `0.6`,
+        `1`,
+      ],
+      answer: 1,
+      explanation: `From the identity: $\\cos^2\\gamma = 1 - 0.6^2 - 0.8^2 = 1 - 0.36 - 0.64 = 0$. So $\\cos\\gamma = 0$, meaning the vector lies in the $xy$-plane and makes a 90° angle with the $z$-axis.`,
+    },
+    {
+      id: 'p1-ch1-017-q5',
+      question: `Find $\\cos\\alpha$ for $\\vec{A} = (1, 1, 1)$.`,
+      options: [
+        `$1$`,
+        `$1/\\sqrt{3}$`,
+        `$1/3$`,
+        `$\\sqrt{3}$`,
+      ],
+      answer: 1,
+      explanation: `$|\\vec{A}| = \\sqrt{1^2+1^2+1^2} = \\sqrt{3}$. So $\\cos\\alpha = 1/\\sqrt{3} \\approx 0.577$. The vector makes equal angles with all three axes: $\\alpha = \\beta = \\gamma = \\arccos(1/\\sqrt{3}) \\approx 54.7°$.`,
+    },
+    {
+      id: 'p1-ch1-017-q6',
+      question: `Can a direction angle be greater than 90°?`,
+      options: [
+        `No — angles must be between 0° and 90°`,
+        `Yes — if the corresponding component is negative, the angle is between 90° and 180°`,
+        `Yes, but only for the $z$-angle $\\gamma$`,
+        `No — direction cosines are always positive`,
+      ],
+      answer: 1,
+      explanation: `A negative component gives a negative direction cosine, which corresponds to an obtuse angle (between 90° and 180°). For example, $\\vec{A} = (-1, 0, 0)$ has $\\cos\\alpha = -1$, so $\\alpha = 180°$. The range for all direction angles is $[0°, 180°]$.`,
+    },
+    {
+      id: 'p1-ch1-017-q7',
+      question: `How many direction cosines can you freely choose before the identity fixes the third?`,
+      options: [
+        `All three are independent`,
+        `Two — the third is determined (up to sign) by the identity`,
+        `Only one`,
+        `None — they are all determined by the magnitude`,
+      ],
+      answer: 1,
+      explanation: `Because $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 1$, specifying two direction cosines forces the squared value of the third: $\\cos^2\\gamma = 1 - \\cos^2\\alpha - \\cos^2\\beta$. The sign (+ or −) of $\\cos\\gamma$ is a separate choice. This reflects the fact that a direction in 3D has only 2 degrees of freedom.`,
+    },
+    {
+      id: 'p1-ch1-017-q8',
+      question: `The direction cosines $(\\cos\\alpha, \\cos\\beta, \\cos\\gamma)$ are the components of which vector?`,
+      options: [
+        `$\\vec{A}$ itself`,
+        `$2\\vec{A}$`,
+        `The unit vector $\\hat{A}$ in the direction of $\\vec{A}$`,
+        `The zero vector`,
+      ],
+      answer: 2,
+      explanation: `The direction cosines are exactly the $x$, $y$, $z$ components of the unit vector $\\hat{A} = \\vec{A}/|\\vec{A}|$. This is why they satisfy the unit-vector identity: $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = |\\hat{A}|^2 = 1$.`,
+    },
+  ],
 }

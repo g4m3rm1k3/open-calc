@@ -13,7 +13,7 @@ export default {
       "Car A is at x = 0 moving at 20 m/s. Car B is 100 m ahead moving at 15 m/s. When does A catch B?",
     realWorldContext:
       "Two-object problems appear in every physics exam. The trick: write x(t) for each object and set them equal.",
-    previewVisualizationId: "TwoObjectsIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   videos: [
     {
@@ -45,14 +45,14 @@ export default {
         caption: 'Two objects start at different positions moving toward each other. They meet when xₐ(t) = x_b(t). Solve that equation for t.',
       },
       {
-        id: "TwoObjectsIntuition",
+        id: 'SVGDiagram',
         title: "Dual-position meeting view",
         mathBridge:
           "Observe both x(t) curves and identify the intersection as the meeting event.",
         caption: "Intersection in x–t space equals same place at same time.",
       },
       {
-        id: "WallClearanceIntuition",
+        id: 'SVGDiagram',
         title: "Trajectory-wall intersection",
         mathBridge:
           "Treat clearance as a position-matching event at a fixed x-location, then compare y-positions.",
@@ -79,7 +79,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "TwoObjectsExplorer",
+        id: 'SVGDiagram',
         title: "Chase/head-on scenario explorer",
         mathBridge:
           "Test chase, head-on, and opposite-direction cases with algebra shown beside graphs.",
@@ -99,7 +99,7 @@ export default {
         body: "f(t)=x_A(t)-x_B(t);\\;\\text{meeting}\\iff f(t)=0",
       },
     ],
-    visualizationId: "TwoObjectsExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "x_A(t)=x_{A0}+v_A t,\\quad x_B(t)=x_{B0}+v_B t",

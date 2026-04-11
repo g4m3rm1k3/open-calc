@@ -9,67 +9,47 @@ export default {
 
   hook: {
     question:
-      'Two identical billiard balls: one is moving at 3 m/s east, the other is stationary. ' +
-      'They collide head-on. After the collision, predict what happens: ' +
-      '(a) both move east at 1.5 m/s, (b) the first stops and the second moves at 3 m/s, ' +
-      '(c) the first bounces back and both move. Which is correct — and what decides between them?',
+      'Two identical billiard balls: one is moving at 3 m/s east, the other is stationary. They collide head-on. After the collision, predict what happens: (a) both move east at 1.5 m/s, (b) the first stops and the second moves at 3 m/s, (c) the first bounces back and both move. Which is correct — and what decides between them?',
     realWorldContext:
-      'Collisions govern everything from particle physics experiments to car accident reconstruction. ' +
-      'The type of collision (elastic vs inelastic) determines how much kinetic energy is lost. ' +
-      'Forensic engineers use momentum conservation to reconstruct accidents — ' +
-      'the final positions of vehicles uniquely determine their pre-collision speeds.',
+      'Collisions govern everything from particle physics experiments to car accident reconstruction. The type of collision (elastic vs inelastic) determines how much kinetic energy is lost. Forensic engineers use momentum conservation to reconstruct accidents — the final positions of vehicles uniquely determine their pre-collision speeds.',
     previewVisualizationId: 'SVGDiagram',
   },
 
   intuition: {
     prose: [
-      '**The answer is (b)** — the moving ball stops and the stationary ball moves at the original speed. ' +
-        'This is the elastic collision between equal masses, and it is a striking result: the first ball completely transfers all its momentum. ' +
-        'It feels magical but follows directly from two conditions: conservation of momentum AND conservation of kinetic energy.',
+      '**The answer is (b)** — the moving ball stops and the stationary ball moves at the original speed. This is the elastic collision between equal masses, and it is a striking result: the first ball completely transfers all its momentum. It feels magical but follows directly from two conditions: conservation of momentum AND conservation of kinetic energy.',
 
       '**Three collision types — one conservation law:**',
-      '1. **Elastic:** Momentum conserved AND KE conserved. Atoms, billiard balls (approximately), Newton\'s cradle. ' +
-        'Objects bounce off with the same total energy.',
-      '2. **Inelastic:** Momentum conserved, KE partially lost. Most real-world collisions (cars, balls with deformation). ' +
-        'Energy goes to heat, sound, and deformation.',
-      '3. **Perfectly inelastic:** Objects stick together after collision. Maximum kinetic energy is lost (some must remain to conserve momentum). ' +
-        'A bullet embedding in a block, two cars latching bumpers.',
+      '1. **Elastic:** Momentum conserved AND KE conserved. Atoms, billiard balls (approximately), Newton\'s cradle. Objects bounce off with the same total energy.',
+      '2. **Inelastic:** Momentum conserved, KE partially lost. Most real-world collisions (cars, balls with deformation). Energy goes to heat, sound, and deformation.',
+      '3. **Perfectly inelastic:** Objects stick together after collision. Maximum kinetic energy is lost (some must remain to conserve momentum). A bullet embedding in a block, two cars latching bumpers.',
 
-      '**The key insight:** In ALL three types, momentum is conserved (as long as no external force acts). ' +
-        'What distinguishes them is what happens to kinetic energy. ' +
-        'You cannot conserve momentum and also lose all kinetic energy — some KE must survive to carry the momentum.',
+      '**The key insight:** In ALL three types, momentum is conserved (as long as no external force acts). What distinguishes them is what happens to kinetic energy. You cannot conserve momentum and also lose all kinetic energy — some KE must survive to carry the momentum.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 3 of 3 — Collisions: where momentum meets energy',
         body:
-          '**Chapter 5:** Energy is conserved in closed systems (KE + PE = const for conservative forces).\n' +
-          '**Chapter 6 so far:** Momentum is a vector conserved when net external force = 0.\n' +
-          '**This lesson:** Collisions combine both — momentum always conserved; energy conserved only in elastic collisions.\n' +
-          '**Chapter 7 next:** Rotation — the same laws of mechanics, but for spinning objects.',
+          '**Chapter 5:** Energy is conserved in closed systems (KE + PE = const for conservative forces).\n**Chapter 6 so far:** Momentum is a vector conserved when net external force = 0.\n**This lesson:** Collisions combine both — momentum always conserved; energy conserved only in elastic collisions.\n**Chapter 7 next:** Rotation — the same laws of mechanics, but for spinning objects.',
       },
       {
         type: 'definition',
         title: 'Three collision types',
         body:
-          '**Elastic:** \\(p_1 + p_2 = \\text{const}\\) AND \\(KE_1 + KE_2 = \\text{const}\\)\n' +
-          '**Inelastic:** \\(p_1 + p_2 = \\text{const}\\), \\(KE\\) decreases\n' +
-          '**Perfectly inelastic:** Objects stick: \\((m_1 + m_2)v_f = m_1v_{1i} + m_2v_{2i}\\)',
+          '**Elastic:** \\(p_1 + p_2 = \\text{const}\\) AND \\(KE_1 + KE_2 = \\text{const}\\)\n**Inelastic:** \\(p_1 + p_2 = \\text{const}\\), \\(KE\\) decreases\n**Perfectly inelastic:** Objects stick: \\((m_1 + m_2)v_f = m_1v_{1i} + m_2v_{2i}\\)',
       },
       {
         type: 'warning',
         title: 'Momentum is always conserved — energy may not be',
         body:
-          'Never apply energy conservation to a collision unless told it is elastic. ' +
-          'Most collisions are inelastic. Momentum conservation always holds; kinetic energy conservation does not.',
+          'Never apply energy conservation to a collision unless told it is elastic. Most collisions are inelastic. Momentum conservation always holds; kinetic energy conservation does not.',
       },
       {
         type: 'insight',
         title: 'Elastic collision formula for equal masses',
         body:
-          'Equal masses, elastic: \\(v_{1f} = v_{2i}\\) and \\(v_{2f} = v_{1i}\\). ' +
-          'The velocities exchange. This is Newton\'s cradle — each ball stops and passes its momentum to the next.',
+          'Equal masses, elastic: \\(v_{1f} = v_{2i}\\) and \\(v_{2f} = v_{1i}\\). The velocities exchange. This is Newton\'s cradle — each ball stops and passes its momentum to the next.',
       },
     ],
     visualizations: [
@@ -78,10 +58,7 @@ export default {
         props: { type: 'collision-types' },
         title: 'Three collision types — before and after',
         caption:
-          'Elastic: arrows swap (equal masses) or recalculate. ' +
-          'Inelastic: shorter arrows after (energy lost). ' +
-          'Perfectly inelastic: single combined arrow after. ' +
-          'In all cases, the vector sum of momentum arrows is the same before and after.',
+          'Elastic: arrows swap (equal masses) or recalculate. Inelastic: shorter arrows after (energy lost). Perfectly inelastic: single combined arrow after. In all cases, the vector sum of momentum arrows is the same before and after.',
       },
     ],
   },
@@ -106,9 +83,7 @@ export default {
         type: 'insight',
         title: 'Coefficient of restitution (elasticity measure)',
         body:
-          '\\(e = \\dfrac{v_{2f} - v_{1f}}{v_{1i} - v_{2i}}\\) where \\(0 \\leq e \\leq 1\\). ' +
-          '\\(e = 1\\): perfectly elastic. \\(e = 0\\): perfectly inelastic. ' +
-          'A rubber ball on concrete has \\(e \\approx 0.7\\); a clay ball has \\(e \\approx 0\\).',
+          '\\(e = \\dfrac{v_{2f} - v_{1f}}{v_{1i} - v_{2i}}\\) where \\(0 \\leq e \\leq 1\\). \\(e = 1\\): perfectly elastic. \\(e = 0\\): perfectly inelastic. A rubber ball on concrete has \\(e \\approx 0.7\\); a clay ball has \\(e \\approx 0\\).',
       },
     ],
     visualizations: [
@@ -117,8 +92,7 @@ export default {
         props: { type: 'elastic-head-on' },
         title: 'Elastic head-on: the velocity exchange formula',
         caption:
-          'Drag the mass ratio slider. When m₁ = m₂: velocities exchange (Newton\'s cradle). ' +
-          'When m₁ >> m₂: the heavy ball barely slows; the light ball flies off fast.',
+          'Drag the mass ratio slider. When m₁ = m₂: velocities exchange (Newton\'s cradle). When m₁ >> m₂: the heavy ball barely slows; the light ball flies off fast.',
       },
     ],
   },
@@ -162,8 +136,7 @@ export default {
       id: 'ch6-003-ex1',
       title: 'Perfectly inelastic — cars merge in collision',
       problem:
-        '\\text{Car A (1500 kg, 20 m/s east) rear-ends Car B (1200 kg, 10 m/s east, same direction). ' +
-        'They lock bumpers. Find final velocity and energy lost.}',
+        '\\text{Car A (1500 kg, 20 m/s east) rear-ends Car B (1200 kg, 10 m/s east, same direction). They lock bumpers. Find final velocity and energy lost.}',
       steps: [
         {
           expression: '(1500)(20) + (1200)(10) = (2700)v_f',
@@ -241,8 +214,7 @@ export default {
       id: 'ch6-003-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A 5 kg block at rest on a frictionless surface is hit by a 0.05 kg bullet at 600 m/s. ' +
-        'The bullet passes through, exiting at 200 m/s. Find the block\'s final speed, and check energy budget.}',
+        '\\text{A 5 kg block at rest on a frictionless surface is hit by a 0.05 kg bullet at 600 m/s. The bullet passes through, exiting at 200 m/s. Find the block\'s final speed, and check energy budget.}',
       hint: 'Momentum conservation for block speed. Then compare KE before and after.',
       walkthrough: [
         {

@@ -9,12 +9,9 @@ export default {
   aliases: 'component method vector sum adding analytically calculation',
 
   hook: {
-    question: 'Two forces: 40 N at 30° and 25 N at 145°. Graphical methods give only an estimate. How do you get the exact answer?',
-    realWorldContext:
-      'Every real engineering calculation — bridge loads, satellite trajectories, robot forces — ' +
-      'requires exact vector addition. ' +
-      'The numerical (component) method is the workhorse: decompose, sum, reconstruct. Four steps, always works.',
-    previewVisualizationId: 'NumericalAdditionWalkthrough',
+    question: `Two forces: 40 N at 30° and 25 N at 145°. Graphical methods give only an estimate. How do you get the exact answer?`,
+    realWorldContext: `Every real engineering calculation — bridge loads, satellite trajectories, robot forces — requires exact vector addition. The numerical (component) method is the workhorse: decompose, sum, reconstruct. Four steps, always works.`,
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [
@@ -34,10 +31,7 @@ export default {
     prose: [
       'The graphical method shows you *what* the answer looks like. The numerical method tells you *exactly* what it is.',
       'The four-step recipe never fails:',
-      '**Step 1 — Decompose** each vector into $x$- and $y$-components. ' +
-        '**Step 2 — Sum** all $x$-components; sum all $y$-components. ' +
-        '**Step 3 — Magnitude**: $|\\vec{R}| = \\sqrt{R_x^2 + R_y^2}$. ' +
-        '**Step 4 — Direction**: $\\theta = \\text{atan2}(R_y, R_x)$, then check the quadrant.',
+      '**Step 1 — Decompose** each vector into $x$- and $y$-components. **Step 2 — Sum** all $x$-components; sum all $y$-components. **Step 3 — Magnitude**: $|\\vec{R}| = \\sqrt{R_x^2 + R_y^2}$. **Step 4 — Direction**: $\\theta = \\text{atan2}(R_y, R_x)$, then check the quadrant.',
       'The method works because addition is done component-by-component, and components are just numbers — ordinary arithmetic applies.',
     ],
     callouts: [
@@ -45,18 +39,13 @@ export default {
         type: 'definition',
         title: 'The four-step method',
         body:
-          '1.\\;v_{kx}=|\\vec{v}_k|\\cos\\theta_k,\\;v_{ky}=|\\vec{v}_k|\\sin\\theta_k\\quad' +
-          '2.\\;R_x=\\sum v_{kx},\\;R_y=\\sum v_{ky}\\quad' +
-          '3.\\;|\\vec{R}|=\\sqrt{R_x^2+R_y^2}\\quad' +
-          '4.\\;\\theta=\\operatorname{atan2}(R_y,R_x)',
+          '1.\\;v_{kx}=|\\vec{v}_k|\\cos\\theta_k,\\;v_{ky}=|\\vec{v}_k|\\sin\\theta_k\\quad2.\\;R_x=\\sum v_{kx},\\;R_y=\\sum v_{ky}\\quad3.\\;|\\vec{R}|=\\sqrt{R_x^2+R_y^2}\\quad4.\\;\\theta=\\operatorname{atan2}(R_y,R_x)',
       },
       {
         type: 'warning',
         title: 'Check the quadrant every time',
         body:
-          'atan2 returns the correct quadrant automatically. Plain arctan does not — ' +
-          'it only covers $(-90°, 90°)$. ' +
-          'If $R_x < 0$, add $180°$ to the plain arctan result.',
+          'atan2 returns the correct quadrant automatically. Plain arctan does not — it only covers $(-90°, 90°)$. If $R_x < 0$, add $180°$ to the plain arctan result.',
       },
     ],
     visualizations: [
@@ -67,22 +56,17 @@ export default {
         caption: 'Before you can add vectors numerically, each one becomes a right triangle: Aₓ = |A|cosθ and Ay = |A|sinθ. Then you add x-components together and y-components together. Pure arithmetic.',
       },
       {
-        id: 'NumericalAdditionWalkthrough',
-        title: 'Step through the four stages for two live vectors',
-        mathBridge: 'Each stage of the four-step method is highlighted in sequence. Drag the vectors to see the steps update.',
-        caption: 'Decompose → sum → magnitude → direction. Four steps, exact answer.',
-        props: { showStepHighlight: true },
+        id: 'VectorKinematicsLab',
+        title: 'Two vectors — four steps live',
+        caption: `Decompose each vector into components. Sum $x$-components and $y$-components separately. Apply $|\\vec{R}| = \\sqrt{R_x^2+R_y^2}$ and $\\theta = \\text{atan2}(R_y, R_x)$.`,
       },
     ],
   },
 
   math: {
     prose: [
-      'The component table is the practical organiser for multi-vector problems. ' +
-        'Set up one row per vector, one column per component, and sum the bottom row.',
-      'A common exam trap: **sign errors in components**. ' +
-        'Always write $v_{kx} = |\\vec{v}_k|\\cos\\theta_k$ where $\\theta_k$ is the standard angle (from $+x$, counterclockwise). ' +
-        'If a problem gives "30° below the horizontal", convert to $\\theta = -30°$ before plugging in.',
+      'The component table is the practical organiser for multi-vector problems. Set up one row per vector, one column per component, and sum the bottom row.',
+      'A common exam trap: **sign errors in components**. Always write $v_{kx} = |\\vec{v}_k|\\cos\\theta_k$ where $\\theta_k$ is the standard angle (from $+x$, counterclockwise). If a problem gives "30° below the horizontal", convert to $\\theta = -30°$ before plugging in.',
     ],
     callouts: [
       {
@@ -99,40 +83,33 @@ export default {
     ],
     visualizations: [
       {
-        id: 'NumericalAdditionTable',
-        title: 'Live component table — drag vectors, see every cell update',
-        mathBridge: 'Each cell in the table corresponds to one step of DSMD.',
-        caption: 'The table makes sign errors visible before they propagate.',
-        props: { showTable: true },
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Component table — the DSMD organiser',
+        caption: `One row per vector, one column per component, sum the bottom row. Every sign error becomes visible before it propagates.`,
       },
     ],
   },
 
   rigor: {
     prose: [
-      'The numerical method is exact — not an approximation — because it is literally the definition of vector addition in $\\mathbb{R}^2$. ' +
-        'Any error is purely arithmetic, not methodological.',
-      'The only source of genuine imprecision is rounding during the trigonometric steps. ' +
-        'Carry at least 4 significant figures through intermediate calculations and round only at the final answer.',
+      'The numerical method is exact — not an approximation — because it is literally the definition of vector addition in $\\mathbb{R}^2$. Any error is purely arithmetic, not methodological.',
+      'The only source of genuine imprecision is rounding during the trigonometric steps. Carry at least 4 significant figures through intermediate calculations and round only at the final answer.',
     ],
     callouts: [
       {
         type: 'warning',
         title: 'Premature rounding',
         body:
-          'Rounding $\\cos 37° = 0.8$ (instead of $0.7986$) introduces a 0.17% error that compounds through every step. ' +
-          'Always use full calculator precision in intermediate steps.',
+          'Rounding $\\cos 37° = 0.8$ (instead of $0.7986$) introduces a 0.17% error that compounds through every step. Always use full calculator precision in intermediate steps.',
       },
       {
         type: 'insight',
         title: 'The method is definition, not approximation',
         body:
-          '$\\vec{A}+\\vec{B} \\equiv (A_x+B_x, A_y+B_y)$. ' +
-          'Decomposing and summing components is not an approximation of some exact geometric result — ' +
-          'it IS the exact geometric result expressed algebraically.',
+          '$\\vec{A}+\\vec{B} \\equiv (A_x+B_x, A_y+B_y)$. Decomposing and summing components is not an approximation of some exact geometric result — it IS the exact geometric result expressed algebraically.',
       },
     ],
-    visualizationId: 'NumericalMethodProof',
     proofSteps: [
       {
         title: "Input: magnitude-angle form",
@@ -168,10 +145,10 @@ export default {
     title: 'The four-step method — every step justified',
     visualizations: [
       {
-        id: 'NumericalMethodProof',
-        title: 'Each proof step lights up the corresponding diagram element',
-        mathBridge: 'Steps 1-2 are decomposition; steps 3-4 reconstruction. The diagram shows both original and resultant vector at each stage.',
-        caption: 'Proof and diagram in lockstep.',
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'DSMD proof — four steps, one diagram',
+        caption: `Steps 1–2: decompose and sum → $R_x, R_y$. Steps 3–4: Pythagorean theorem and atan2 → magnitude and direction. The method is exact because it is the definition of $\\mathbb{R}^2$ addition.`,
       },
     ],
   },
@@ -190,7 +167,7 @@ export default {
       ],
       conclusion: '$\\vec{R} \\approx 37.1\\,N$ at $67.6°$ from the positive $x$-axis.',
       visualizations: [
-        { id: 'NumericalAdditionWalkthrough', title: 'Set the example values and step through', caption: 'Watch each DSMD step produce one number.', props: { lockedA: { mag: 40, angle: 30 }, lockedB: { mag: 25, angle: 145 } } },
+        { id: 'SVGDiagram', props: { type: 'vector-addition-chain' }, title: '40 N at 30° + 25 N at 145°', caption: `$\\vec{A}$ in Quadrant I, $\\vec{B}$ in Quadrant II. Their sum $\\vec{R}$ is in Quadrant I with a positive $x$-component reduced by $\\vec{B}$'s negative contribution.` },
       ],
     },
     {
@@ -238,8 +215,7 @@ export default {
       id: 'ch1-006-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{Forces } \\vec{A}\\text{ at }\\alpha\\text{ and }\\vec{B}\\text{ at }-\\alpha\\text{ have equal magnitudes }F. ' +
-        '\\text{Show that }|\\vec{R}|=2F\\cos\\alpha\\text{ and that }\\vec{R}\\text{ points along the }x\\text{-axis.}',
+        '\\text{Forces } \\vec{A}\\text{ at }\\alpha\\text{ and }\\vec{B}\\text{ at }-\\alpha\\text{ have equal magnitudes }F. \\text{Show that }|\\vec{R}|=2F\\cos\\alpha\\text{ and that }\\vec{R}\\text{ points along the }x\\text{-axis.}',
       hint: 'By symmetry, the y-components cancel. Compute $R_x$ and use $\\cos(-\\alpha)=\\cos\\alpha$.',
       walkthrough: [
         { expression: 'A_x=F\\cos\\alpha,\\;A_y=F\\sin\\alpha', annotation: 'Decompose A⃗.' },
@@ -248,7 +224,193 @@ export default {
         { expression: 'R_x=F\\cos\\alpha+F\\cos\\alpha=2F\\cos\\alpha', annotation: 'x-components add.' },
         { expression: '|\\vec{R}|=\\sqrt{(2F\\cos\\alpha)^2+0^2}=2F\\cos\\alpha,\\;\\theta=0°', annotation: 'Resultant is purely horizontal with magnitude $2F\\cos\\alpha$.' },
       ],
-      answer: '|\\vec{R}|=2F\\cos\\alpha,\\text{ directed along }+x.',
+      answer: `|\\vec{R}|=2F\\cos\\alpha,\\text{ directed along }+x.`,
+    },
+  ],
+
+  // ── Python Notebook ──────────────────────────────────────────────────────
+  python: {
+    title: 'DSMD Method in Python — exact vector addition every time',
+    description: `Implement the four-step Decompose–Sum–Magnitude–Direction method in NumPy for any number of vectors.`,
+    placement: 'after_rigor',
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Numerical Addition Lab',
+        caption: 'Execute DSMD step by step, then run the three-force problem.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: '1 · DSMD: 40 N at 30° + 25 N at 145°',
+              prose: `The four-step method:\n1. **Decompose** each vector into components\n2. **Sum** the components\n3. **Magnitude** from Pythagorean theorem\n4. **Direction** from atan2`,
+              code: [
+                'import numpy as np',
+                '',
+                '# Input vectors (magnitude, angle in degrees)',
+                'vectors = [(40.0, 30.0), (25.0, 145.0)]',
+                '',
+                '# Step 1 — Decompose',
+                'components = [(m*np.cos(np.radians(a)), m*np.sin(np.radians(a))) for m, a in vectors]',
+                'for i, (vx, vy) in enumerate(components):',
+                '    print(f"v{i+1}: x={vx:.4f}  y={vy:.4f}")',
+                '',
+                '# Step 2 — Sum',
+                'Rx = sum(c[0] for c in components)',
+                'Ry = sum(c[1] for c in components)',
+                'print(f"\\nR_x = {Rx:.4f} N")',
+                'print(f"R_y = {Ry:.4f} N")',
+                '',
+                '# Step 3 — Magnitude',
+                'R_mag = np.sqrt(Rx**2 + Ry**2)',
+                'print(f"|R|  = {R_mag:.4f} N")',
+                '',
+                '# Step 4 — Direction',
+                'theta = np.degrees(np.arctan2(Ry, Rx))',
+                'print(f"θ    = {theta:.2f}°")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: '2 · Generalised: add any list of vectors',
+              prose: `Encapsulate DSMD as a reusable function that accepts a list of (magnitude, angle) tuples and returns the resultant.`,
+              code: [
+                'def add_vectors(mag_angle_list):',
+                '    """DSMD: add any number of vectors given as (magnitude, degrees) pairs."""',
+                '    xs = [m * np.cos(np.radians(a)) for m, a in mag_angle_list]',
+                '    ys = [m * np.sin(np.radians(a)) for m, a in mag_angle_list]',
+                '    Rx, Ry = sum(xs), sum(ys)',
+                '    mag = np.sqrt(Rx**2 + Ry**2)',
+                '    ang = np.degrees(np.arctan2(Ry, Rx))',
+                '    return mag, ang, Rx, Ry',
+                '',
+                '# Three forces from the challenge problem',
+                'result = add_vectors([(50, 0), (30, 120), (20, 240)])',
+                'print(f"|R| = {result[0]:.4f} N")',
+                'print(f"θ   = {result[1]:.2f}°")',
+                'print(f"Rx  = {result[2]:.4f} N")',
+                'print(f"Ry  = {result[3]:.4f} N")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: '3 · Challenge: satellite thruster problem',
+              challengeType: 'fill-in',
+              challengeNumber: 1,
+              challengeTitle: 'Satellite net force',
+              difficulty: 'medium',
+              prompt: `Three thrusters fire simultaneously: 120 N at 0°, 80 N at 120°, 60 N at 250°. Find the net force magnitude and direction.`,
+              starterBlock: [
+                'thrusters = [(___, ___), (___, ___), (___, ___)]  # (mag, angle)',
+                'net_mag, net_ang, Rx, Ry = add_vectors(___)',
+                'print(f"|F_net| = {net_mag:.4f} N")',
+                'print(f"θ       = {net_ang:.2f}°")',
+              ].join('\n'),
+              code: [
+                'thrusters = [(120, 0), (80, 120), (60, 250)]',
+                'net_mag, net_ang, Rx, Ry = add_vectors(thrusters)',
+                'print(f"|F_net| = {net_mag:.4f} N")',
+                'print(f"θ       = {net_ang:.2f}°")',
+                'print(f"Rx = {Rx:.4f} N,  Ry = {Ry:.4f} N")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+              testCode: [
+                'import numpy as np',
+                'assert "net_mag" in dir(), "Compute net_mag"',
+                'expected_rx = 120 + 80*np.cos(np.radians(120)) + 60*np.cos(np.radians(250))',
+                'expected_ry = 80*np.sin(np.radians(120)) + 60*np.sin(np.radians(250))',
+                'expected_mag = np.sqrt(expected_rx**2 + expected_ry**2)',
+                'assert np.isclose(net_mag, expected_mag, atol=0.1), f"|F_net| should be {expected_mag:.2f}, got {net_mag:.4f}"',
+                '"SUCCESS: net force computed correctly"',
+              ].join('\n'),
+              hint: `Use add_vectors([(120, 0), (80, 120), (60, 250)]). The function handles DSMD automatically.`,
+            },
+          ],
+        },
+      },
+    ],
+  },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-006-q1',
+      question: `What are the four steps of the DSMD method in order?`,
+      options: [
+        `Direction → Sum → Magnitude → Decompose`,
+        `Decompose → Sum → Magnitude → Direction`,
+        `Magnitude → Decompose → Direction → Sum`,
+        `Sum → Decompose → Direction → Magnitude`,
+      ],
+      answer: 1,
+      explanation: `Decompose each vector into components, Sum the components, find the Magnitude, find the Direction. DSMD.`,
+    },
+    {
+      id: 'p1-ch1-006-q2',
+      question: `A vector has magnitude 25 N at 145°. What is its $x$-component (to 2 d.p.)?`,
+      options: [`$+20.48$ N`, `$-20.48$ N`, `$+14.34$ N`, `$-14.34$ N`],
+      answer: 1,
+      explanation: `$A_x = 25\\cos145° = 25(-0.8192) \\approx -20.48$ N. The angle is in Quadrant II — negative $x$.`,
+    },
+    {
+      id: 'p1-ch1-006-q3',
+      question: `After decomposing three vectors, you get $R_x = -4$ N and $R_y = -3$ N. What is $|\\vec{R}|$?`,
+      options: [`$7$ N`, `$5$ N`, `$1$ N`, `$\\sqrt{7}$ N`],
+      answer: 1,
+      explanation: `$|\\vec{R}| = \\sqrt{(-4)^2+(-3)^2} = \\sqrt{25} = 5$ N. The 3-4-5 triple.`,
+    },
+    {
+      id: 'p1-ch1-006-q4',
+      question: `Why is atan2 preferred over plain arctan for finding the angle?`,
+      options: [
+        `atan2 gives the answer in radians`,
+        `arctan returns angles only in $(-90°, 90°)$; atan2 covers all four quadrants`,
+        `atan2 is more accurate for large numbers`,
+        `They give the same result always`,
+      ],
+      answer: 1,
+      explanation: `$\\arctan(R_y/R_x)$ cannot tell Quadrant I from III, or II from IV. atan2$(R_y, R_x)$ uses both signs separately to return the correct quadrant.`,
+    },
+    {
+      id: 'p1-ch1-006-q5',
+      question: `$\\vec{A} = (5, 3)$ and $\\vec{B} = (2, -1)$. What is $\\vec{A} - \\vec{B}$?`,
+      options: [`$(3, 4)$`, `$(7, 2)$`, `$(3, 2)$`, `$(7, 4)$`],
+      answer: 0,
+      explanation: `$\\vec{A} - \\vec{B} = (5-2, 3-(-1)) = (3, 4)$.`,
+    },
+    {
+      id: 'p1-ch1-006-q6',
+      question: `The numerical method for vector addition is:`,
+      options: [
+        `An approximation, accurate to 3 significant figures`,
+        `Exact — it is the definition of vector addition in $\\mathbb{R}^2$`,
+        `Only valid for right-angle problems`,
+        `Less accurate than the parallelogram method`,
+      ],
+      answer: 1,
+      explanation: `Component-wise addition is the formal definition of vector addition. Any error is purely from arithmetic rounding, not the method itself.`,
+    },
+    {
+      id: 'p1-ch1-006-q7',
+      question: `$\\vec{F}_1 = 50$ N at $0°$ and $\\vec{F}_2 = 50$ N at $180°$. What is the resultant?`,
+      options: [`$100$ N at $0°$`, `$0$ N`, `$50$ N at $90°$`, `$50\\sqrt{2}$ N`],
+      answer: 1,
+      explanation: `$R_x = 50\\cos0° + 50\\cos180° = 50 - 50 = 0$, $R_y = 0$. Anti-parallel equal forces cancel.`,
+    },
+    {
+      id: 'p1-ch1-006-q8',
+      question: `Two forces $\\vec{A}$ at $+\\alpha$ and $\\vec{B} = |\\vec{A}|$ at $-\\alpha$ from $+x$. What is the direction of $\\vec{A} + \\vec{B}$?`,
+      options: [`$\\alpha$`, `$-\\alpha$`, `$0°$ (along $+x$)`, `$90°$`],
+      answer: 2,
+      explanation: `By symmetry the $y$-components cancel ($\\sin\\alpha - \\sin\\alpha = 0$) and the $x$-components add ($2|A|\\cos\\alpha$). The resultant points along $+x$.`,
     },
   ],
 }

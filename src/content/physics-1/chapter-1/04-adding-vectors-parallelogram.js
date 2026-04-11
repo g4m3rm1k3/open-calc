@@ -9,12 +9,9 @@ export default {
   aliases: 'parallelogram law resultant sum of vectors graphical',
 
   hook: {
-    question: 'Two forces pull on a boat — one northeast, one northwest. What single force replaces them both?',
-    realWorldContext:
-      'Every time two forces act simultaneously — a kite in the wind, a ship fighting a current, ' +
-      'a joint in a truss — you need to find their combined effect. ' +
-      'The parallelogram method is the oldest and most visual way to do that.',
-    previewVisualizationId: 'ParallelogramIntuition',
+    question: `Two forces pull on a boat — one northeast, one northwest. What single force replaces them both?`,
+    realWorldContext: `Every time two forces act simultaneously — a kite in the wind, a ship fighting a current, a joint in a truss — you need to find their combined effect. The parallelogram method is the oldest and most visual way to do that.`,
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [
@@ -27,14 +24,9 @@ export default {
 
   intuition: {
     prose: [
-      'Place two vectors $\\vec{A}$ and $\\vec{B}$ so their **tails share the same point**. ' +
-        'Draw $\\vec{A}$ and $\\vec{B}$ as two sides of a shape. ' +
-        'Complete the parallelogram by copying each vector from the tip of the other. ' +
-        'The **diagonal** from the shared tail to the opposite corner is the resultant $\\vec{R} = \\vec{A} + \\vec{B}$.',
-      'The key insight is that this diagonal simultaneously captures both contributions. ' +
-        'It is the single vector that has exactly the same effect as applying $\\vec{A}$ and $\\vec{B}$ together.',
-      'Vector addition is **commutative**: $\\vec{A} + \\vec{B} = \\vec{B} + \\vec{A}$. ' +
-        'The parallelogram makes this obvious — the same diagonal results whether you call the sides $\\vec{A}$ and $\\vec{B}$ or $\\vec{B}$ and $\\vec{A}$.',
+      'Place two vectors $\\vec{A}$ and $\\vec{B}$ so their **tails share the same point**. Draw $\\vec{A}$ and $\\vec{B}$ as two sides of a shape. Complete the parallelogram by copying each vector from the tip of the other. The **diagonal** from the shared tail to the opposite corner is the resultant $\\vec{R} = \\vec{A} + \\vec{B}$.',
+      'The key insight is that this diagonal simultaneously captures both contributions. It is the single vector that has exactly the same effect as applying $\\vec{A}$ and $\\vec{B}$ together.',
+      'Vector addition is **commutative**: $\\vec{A} + \\vec{B} = \\vec{B} + \\vec{A}$. The parallelogram makes this obvious — the same diagonal results whether you call the sides $\\vec{A}$ and $\\vec{B}$ or $\\vec{B}$ and $\\vec{A}$.',
     ],
     callouts: [
       {
@@ -61,10 +53,9 @@ export default {
         caption: 'Place A⃗ and B⃗ tail-to-tail. Complete the parallelogram. The diagonal from the shared tail is R⃗ = A⃗ + B⃗. Components add axis-by-axis: Rₓ = Aₓ + Bₓ, Ry = Ay + By.',
       },
       {
-        id: 'ParallelogramIntuition',
-        title: 'Drag both vectors — watch the parallelogram build and the diagonal appear',
-        mathBridge: 'The diagonal is $\\vec{R}$. Its length and direction update as you reshape the parallelogram.',
-        caption: 'Both arrows share a tail. The diagonal is the sum.',
+        id: 'VectorKinematicsLab',
+        title: 'Two vectors, one resultant — interactive',
+        caption: `Both arrows share a tail. Complete the parallelogram. The diagonal from the shared tail is $\\vec{R} = \\vec{A} + \\vec{B}$.`,
         props: { interactive: true },
       },
     ],
@@ -72,14 +63,8 @@ export default {
 
   math: {
     prose: [
-      'The parallelogram method is geometric — it does not require any calculation. ' +
-        'But it is limited by the precision of your drawing. ' +
-        'For exact answers we always convert to components (Lesson 6). ' +
-        'The parallelogram tells you *what to expect* before you calculate.',
-      'A useful bound: the magnitude of the resultant satisfies ' +
-        '$\\bigl||\\vec{A}| - |\\vec{B}|\\bigr| \\le |\\vec{R}| \\le |\\vec{A}| + |\\vec{B}|$. ' +
-        'The maximum is reached when vectors are parallel (same direction); ' +
-        'the minimum when they are anti-parallel (opposite directions).',
+      'The parallelogram method is geometric — it does not require any calculation. But it is limited by the precision of your drawing. For exact answers we always convert to components (Lesson 6). The parallelogram tells you *what to expect* before you calculate.',
+      'A useful bound: the magnitude of the resultant satisfies $\\bigl||\\vec{A}| - |\\vec{B}|\\bigr| \\le |\\vec{R}| \\le |\\vec{A}| + |\\vec{B}|$. The maximum is reached when vectors are parallel (same direction); the minimum when they are anti-parallel (opposite directions).',
     ],
     callouts: [
       {
@@ -91,34 +76,28 @@ export default {
         type: 'warning',
         title: 'The resultant is usually NOT |A| + |B|',
         body:
-          '|\\vec{R}| = |\\vec{A}| + |\\vec{B}| only when both vectors point in exactly the same direction. ' +
-          'For any other angle, the resultant is shorter than this sum.',
+          '|\\vec{R}| = |\\vec{A}| + |\\vec{B}| only when both vectors point in exactly the same direction. For any other angle, the resultant is shorter than this sum.',
       },
       {
         type: 'mnemonic',
         title: 'Check with extreme cases',
         body:
-          'Same direction: $|\\vec{R}| = |\\vec{A}| + |\\vec{B}|$ (maximum). ' +
-          'Opposite: $|\\vec{R}| = \\bigl||\\vec{A}| - |\\vec{B}|\\bigr|$ (minimum). ' +
-          'Perpendicular: $|\\vec{R}| = \\sqrt{|\\vec{A}|^2 + |\\vec{B}|^2}$.',
+          'Same direction: $|\\vec{R}| = |\\vec{A}| + |\\vec{B}|$ (maximum). Opposite: $|\\vec{R}| = \\bigl||\\vec{A}| - |\\vec{B}|\\bigr|$ (minimum). Perpendicular: $|\\vec{R}| = \\sqrt{|\\vec{A}|^2 + |\\vec{B}|^2}$.',
       },
     ],
     visualizations: [
       {
-        id: 'ParallelogramAngleExplorer',
-        title: 'Rotate one vector — watch the resultant magnitude change',
-        mathBridge: 'The magnitude graph shows $|\\vec{R}|$ vs angle between the vectors. Maximum at 0°, minimum at 180°.',
-        caption: 'The angle between vectors controls everything about the resultant magnitude.',
-        props: { showMagnitudePlot: true },
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'Triangle inequality — extreme cases',
+        caption: `At $0°$ the resultant magnitude is $|\\vec{A}|+|\\vec{B}|$ (maximum). At $180°$ it is $\\bigl||\\vec{A}|-|\\vec{B}|\\bigr|$ (minimum). At $90°$ it is $\\sqrt{|\\vec{A}|^2+|\\vec{B}|^2}$.`,
       },
     ],
   },
 
   rigor: {
     prose: [
-      'The parallelogram law follows directly from the definition of vector addition in $\\mathbb{R}^n$: ' +
-        '$(A_x, A_y) + (B_x, B_y) = (A_x+B_x, A_y+B_y)$. ' +
-        'The geometric construction is simply a way of visualising this component-wise sum.',
+      'The parallelogram law follows directly from the definition of vector addition in $\\mathbb{R}^n$: $(A_x, A_y) + (B_x, B_y) = (A_x+B_x, A_y+B_y)$. The geometric construction is simply a way of visualising this component-wise sum.',
     ],
     callouts: [
       {
@@ -130,11 +109,9 @@ export default {
         type: 'insight',
         title: 'Why the diagonal?',
         body:
-          'The four vertices of the parallelogram are $\\mathbf{0}$, $\\vec{A}$, $\\vec{B}$, $\\vec{A}+\\vec{B}$. ' +
-          'The diagonal from $\\mathbf{0}$ to $\\vec{A}+\\vec{B}$ is exactly the component sum — the geometry reflects the algebra.',
+          'The four vertices of the parallelogram are $\\mathbf{0}$, $\\vec{A}$, $\\vec{B}$, $\\vec{A}+\\vec{B}$. The diagonal from $\\mathbf{0}$ to $\\vec{A}+\\vec{B}$ is exactly the component sum — the geometry reflects the algebra.',
       },
     ],
-    visualizationId: 'ParallelogramProof',
     proofSteps: [
       {
         expression: '\\vec{R} = \\vec{A} + \\vec{B}',
@@ -160,10 +137,10 @@ export default {
     title: 'Proof: parallelogram diagonal equals component sum',
     visualizations: [
       {
-        id: 'ParallelogramProof',
-        title: 'Watch the algebra and geometry sync step by step',
-        mathBridge: 'Each proof step highlights a different part of the parallelogram.',
-        caption: 'The diagonal IS the component sum — the geometry is not separate from the algebra.',
+        id: 'SVGDiagram',
+        props: { type: 'vector-addition-chain' },
+        title: 'Parallelogram diagonal = component sum',
+        caption: `Corners: $\\mathbf{0}$, $\\vec{A}$, $\\vec{B}$, $\\vec{A}+\\vec{B}$. The diagonal from origin to $\\vec{A}+\\vec{B}$ has components $R_x = A_x+B_x$ and $R_y = A_y+B_y$. Geometry and algebra are identical.`,
       },
     ],
   },
@@ -173,8 +150,7 @@ export default {
       id: 'ch1-004-ex1',
       title: 'Resultant of two perpendicular forces',
       problem:
-        '\\text{Force } \\vec{A} = 30\\,N \\text{ east and } \\vec{B} = 40\\,N \\text{ north act on an object. ' +
-        'Find } |\\vec{R}| \\text{ and its direction.}',
+        '\\text{Force } \\vec{A} = 30\\,N \\text{ east and } \\vec{B} = 40\\,N \\text{ north act on an object. Find } |\\vec{R}| \\text{ and its direction.}',
       steps: [
         { expression: 'R_x = A_x + B_x = 30 + 0 = 30\\,N', annotation: 'East component: A contributes 30, B contributes 0.' },
         { expression: 'R_y = A_y + B_y = 0 + 40 = 40\\,N', annotation: 'North component: A contributes 0, B contributes 40.' },
@@ -183,7 +159,12 @@ export default {
       ],
       conclusion: '$\\vec{R} = 50\\,N$ at $53.1°$ north of east. The parallelogram is a rectangle here because the vectors are perpendicular.',
       visualizations: [
-        { id: 'ParallelogramIntuition', title: 'Set A⃗ east, B⃗ north and see the rectangle', caption: 'Perpendicular vectors form a rectangle, not a general parallelogram.' },
+        {
+          id: 'SVGDiagram',
+          props: { type: 'vector-addition-chain' },
+          title: `A⃗ east + B⃗ north = rectangle`,
+          caption: `Perpendicular vectors form a rectangle. $R_x = 30$ N, $R_y = 40$ N, $|\\vec{R}| = 50$ N.`,
+        },
       ],
     },
     {
@@ -236,7 +217,211 @@ export default {
         { expression: '= |\\vec{A}|^2 + |\\vec{B}|^2 + 2(\\vec{A}\\cdot\\vec{B})', annotation: 'Recognise the dot product.' },
         { expression: '\\therefore\\;|\\vec{A}+\\vec{B}|^2 = |\\vec{A}|^2+|\\vec{B}|^2 \\iff \\vec{A}\\cdot\\vec{B}=0 \\iff \\vec{A}\\perp\\vec{B}', annotation: 'The Pythagorean theorem for vectors holds exactly when the dot product vanishes — i.e. when the vectors are perpendicular.' },
       ],
-      answer: 'The condition $|\\vec{A}+\\vec{B}|^2 = |\\vec{A}|^2 + |\\vec{B}|^2$ is equivalent to $\\vec{A}\\cdot\\vec{B}=0$, which means $\\vec{A}\\perp\\vec{B}$.',
+      answer: `The condition $|\\vec{A}+\\vec{B}|^2 = |\\vec{A}|^2 + |\\vec{B}|^2$ is equivalent to $\\vec{A}\\cdot\\vec{B}=0$, which means $\\vec{A}\\perp\\vec{B}$.`,
+    },
+  ],
+
+  // ── Python Notebook ──────────────────────────────────────────────────────
+  python: {
+    title: 'Vector Addition — parallelogram method in NumPy',
+    description: `Add vectors with NumPy arrays, verify the triangle inequality, and visualise the parallelogram with matplotlib.`,
+    placement: 'after_rigor',
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Parallelogram Addition Lab',
+        caption: 'Compute resultants and explore the triangle inequality numerically.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: '1 · Add two vectors component-wise',
+              prose: `Vector addition is just element-wise array addition. $\\vec{R} = \\vec{A} + \\vec{B}$ means $R_x = A_x+B_x$ and $R_y = A_y+B_y$.`,
+              code: [
+                'import numpy as np',
+                '',
+                'A = np.array([30.0, 0.0])    # 30 N east',
+                'B = np.array([0.0, 40.0])    # 40 N north',
+                '',
+                'R = A + B',
+                'R_mag = np.linalg.norm(R)',
+                'R_angle = np.degrees(np.arctan2(R[1], R[0]))',
+                '',
+                'print(f"A = {A}")',
+                'print(f"B = {B}")',
+                'print(f"R = A + B = {R}")',
+                'print(f"|R| = {R_mag:.4f} N")',
+                'print(f"θ  = {R_angle:.2f}°  (north of east)")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: '2 · Triangle inequality — verify numerically',
+              prose: `The triangle inequality says $\\bigl||\\vec{A}|-|\\vec{B}|\\bigr| \\le |\\vec{R}| \\le |\\vec{A}|+|\\vec{B}|$. Let us check it for three angle values: 0°, 90°, 180°.`,
+              code: [
+                'mag_A, mag_B = 40.0, 30.0',
+                '',
+                'for phi_deg in [0, 60, 90, 120, 180]:',
+                '    phi = np.radians(phi_deg)',
+                '    A = np.array([mag_A, 0.0])',
+                '    B = np.array([mag_B * np.cos(phi), mag_B * np.sin(phi)])',
+                '    R_mag = np.linalg.norm(A + B)',
+                '    lower = abs(mag_A - mag_B)',
+                '    upper = mag_A + mag_B',
+                '    print(f"φ={phi_deg:3d}°  |R|={R_mag:.2f}  [{lower:.0f}, {upper:.0f}]  in-bounds={lower <= R_mag <= upper}")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: '3 · Law of cosines verification',
+              prose: `For forces of 40 N and 30 N at 60°, the law of cosines gives $|\\vec{R}|^2 = 40^2 + 30^2 + 2(40)(30)\\cos60°$. Verify with both the formula and direct vector addition.`,
+              code: [
+                'A_mag, B_mag, phi_deg = 40.0, 30.0, 60.0',
+                'phi = np.radians(phi_deg)',
+                '',
+                '# Law of cosines formula',
+                'R_cos_law = np.sqrt(A_mag**2 + B_mag**2 + 2*A_mag*B_mag*np.cos(phi))',
+                '',
+                '# Direct component addition',
+                'A = np.array([A_mag, 0.0])',
+                'B = np.array([B_mag * np.cos(phi), B_mag * np.sin(phi)])',
+                'R_direct = np.linalg.norm(A + B)',
+                '',
+                'print(f"Law of cosines: |R| = {R_cos_law:.4f} N")',
+                'print(f"Direct method:  |R| = {R_direct:.4f} N")',
+                'print(f"Match: {np.isclose(R_cos_law, R_direct)}")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 4,
+              cellTitle: '4 · Challenge: boat with current',
+              challengeType: 'fill-in',
+              challengeNumber: 1,
+              challengeTitle: 'Resultant velocity — boat in a current',
+              difficulty: 'medium',
+              prompt: `A boat heads east at 5 m/s. A river current pushes it north at 3 m/s. Find the resultant speed and direction.`,
+              starterBlock: [
+                'boat = np.array([___, ___])   # east component, north component',
+                'current = np.array([___, ___])',
+                'R = ___ + ___',
+                'speed = np.linalg.norm(___)',
+                'angle = np.degrees(np.arctan2(___, ___))',
+                'print(f"Speed = {speed:.4f} m/s")',
+                'print(f"Angle = {angle:.2f}° from east")',
+              ].join('\n'),
+              code: [
+                'boat = np.array([5.0, 0.0])',
+                'current = np.array([0.0, 3.0])',
+                'R = boat + current',
+                'speed = np.linalg.norm(R)',
+                'angle = np.degrees(np.arctan2(R[1], R[0]))',
+                'print(f"Speed = {speed:.4f} m/s")',
+                'print(f"Angle = {angle:.2f}° from east")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+              testCode: [
+                'import numpy as np',
+                'assert "R" in dir(), "Define R"',
+                'assert "speed" in dir(), "Compute speed"',
+                'assert np.isclose(speed, np.sqrt(34), atol=0.01), f"speed should be sqrt(34)≈5.831, got {speed:.4f}"',
+                '"SUCCESS: speed = √34 ≈ 5.831 m/s, angle ≈ 30.96° north of east"',
+              ].join('\n'),
+              hint: `boat = np.array([5.0, 0.0]), current = np.array([0.0, 3.0]). R = boat + current = [5, 3]. speed = sqrt(25+9) = sqrt(34) ≈ 5.831 m/s.`,
+            },
+          ],
+        },
+      },
+    ],
+  },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-004-q1',
+      question: `In the parallelogram method, where must the tails of $\\vec{A}$ and $\\vec{B}$ be placed?`,
+      options: [
+        `Tip of $\\vec{A}$ at origin`,
+        `Both tails at the same point`,
+        `Tip of $\\vec{A}$ touching tail of $\\vec{B}$`,
+        `Anywhere — placement does not matter`,
+      ],
+      answer: 1,
+      explanation: `The parallelogram method requires the two vectors to share a common tail. The diagonal from that common tail is the resultant.`,
+    },
+    {
+      id: 'p1-ch1-004-q2',
+      question: `Forces 30 N east and 40 N north act on an object. What is the magnitude of the resultant?`,
+      options: [`$70$ N`, `$50$ N`, `$10$ N`, `$35$ N`],
+      answer: 1,
+      explanation: `$|\\vec{R}| = \\sqrt{30^2+40^2} = \\sqrt{2500} = 50$ N. The 3-4-5 triple scaled by 10.`,
+    },
+    {
+      id: 'p1-ch1-004-q3',
+      question: `Which statement about $|\\vec{A}+\\vec{B}|$ is ALWAYS true?`,
+      options: [
+        `$|\\vec{A}+\\vec{B}| = |\\vec{A}| + |\\vec{B}|$`,
+        `$|\\vec{A}+\\vec{B}| \\le |\\vec{A}| + |\\vec{B}|$`,
+        `$|\\vec{A}+\\vec{B}| = \\sqrt{|\\vec{A}|^2+|\\vec{B}|^2}$`,
+        `$|\\vec{A}+\\vec{B}| \\ge |\\vec{A}| + |\\vec{B}|$`,
+      ],
+      answer: 1,
+      explanation: `The triangle inequality: $|\\vec{A}+\\vec{B}| \\le |\\vec{A}|+|\\vec{B}|$ always. Equality only when they point in the same direction.`,
+    },
+    {
+      id: 'p1-ch1-004-q4',
+      question: `Two equal forces of 10 N act in exactly opposite directions. What is the resultant magnitude?`,
+      options: [`$20$ N`, `$10$ N`, `$0$ N`, `$14.1$ N`],
+      answer: 2,
+      explanation: `Anti-parallel equal forces cancel: $|\\vec{R}| = |10-10| = 0$ N.`,
+    },
+    {
+      id: 'p1-ch1-004-q5',
+      question: `$\\vec{A} + \\vec{B} = \\vec{B} + \\vec{A}$. What property is this?`,
+      options: [`Associativity`, `Distributivity`, `Commutativity`, `The zero-vector identity`],
+      answer: 2,
+      explanation: `Commutativity: the order of addition does not change the result. The parallelogram makes this geometric — the same diagonal regardless of labelling.`,
+    },
+    {
+      id: 'p1-ch1-004-q6',
+      question: `Two forces of 6 N and 8 N act at 90°. The resultant is:`,
+      options: [`$14$ N`, `$2$ N`, `$10$ N`, `$7$ N`],
+      answer: 2,
+      explanation: `Perpendicular vectors: $|\\vec{R}| = \\sqrt{6^2+8^2} = \\sqrt{100} = 10$ N. The 6-8-10 (3-4-5) triple.`,
+    },
+    {
+      id: 'p1-ch1-004-q7',
+      question: `The law of cosines for vectors states $|\\vec{R}|^2 = |\\vec{A}|^2 + |\\vec{B}|^2 + 2|\\vec{A}||\\vec{B}|\\cos\\phi$. What is $\\phi$?`,
+      options: [
+        `The angle $\\vec{R}$ makes with $+x$`,
+        `The angle between $\\vec{A}$ and $\\vec{B}$`,
+        `Always 90°`,
+        `The angle $\\vec{A}$ makes with $+x$`,
+      ],
+      answer: 1,
+      explanation: `$\\phi$ is the angle between the two vectors being added. At $\\phi = 0°$, $\\cos\\phi = 1$ and $|\\vec{R}| = |\\vec{A}|+|\\vec{B}|$ (maximum).`,
+    },
+    {
+      id: 'p1-ch1-004-q8',
+      question: `$|\\vec{A}+\\vec{B}|^2 = |\\vec{A}|^2+|\\vec{B}|^2$ holds only when:`,
+      options: [
+        `$\\vec{A}$ and $\\vec{B}$ are parallel`,
+        `$\\vec{A}$ and $\\vec{B}$ are perpendicular`,
+        `$|\\vec{A}| = |\\vec{B}|$`,
+        `One vector is zero`,
+      ],
+      answer: 1,
+      explanation: `Expanding the left side gives $|\\vec{A}|^2+|\\vec{B}|^2+2\\vec{A}\\cdot\\vec{B}$. This equals $|\\vec{A}|^2+|\\vec{B}|^2$ only when $\\vec{A}\\cdot\\vec{B} = 0$, i.e. $\\vec{A}\\perp\\vec{B}$.`,
     },
   ],
 }

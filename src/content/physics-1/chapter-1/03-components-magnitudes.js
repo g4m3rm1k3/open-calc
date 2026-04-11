@@ -12,15 +12,9 @@ export default {
 
   // ── Hook ─────────────────────────────────────────────────────────────────
   hook: {
-    question:
-      'A ball is kicked at 20 m/s at 35° above the ground. ' +
-      'How fast is it moving horizontally? How fast vertically? ' +
-      'You cannot answer either question without decomposing the vector.',
-    realWorldContext:
-      'Every projectile problem, every incline problem, every force analysis in physics ' +
-      'begins with the same move: split the vector into horizontal and vertical pieces. ' +
-      'Components are the fundamental tool of applied physics.',
-    previewVisualizationId: 'ComponentDecomposerLive',
+    question: `A ball is kicked at 20 m/s at 35° above the ground. How fast is it moving horizontally? How fast vertically? You cannot answer either question without decomposing the vector.`,
+    realWorldContext: `Every projectile problem, every incline problem, every force analysis in physics begins with the same move: split the vector into horizontal and vertical pieces. Components are the fundamental tool of applied physics.`,
+    previewVisualizationId: 'SVGDiagram',
   },
 
   // ── YouTube ───────────────────────────────────────────────────────────────
@@ -42,32 +36,22 @@ export default {
   // ── Intuition ─────────────────────────────────────────────────────────────
   intuition: {
     prose: [
-      'Picture walking from one corner of a city block to the diagonally opposite corner. ' +
-        'You cannot walk diagonally — the buildings are in the way. ' +
-        'Instead you walk some distance east, then some distance north. ' +
-        'Those two legs — the "east part" and the "north part" — are the *components* of your displacement.',
-      'Every vector in 2-D has exactly two components: the amount it reaches along $x$ and ' +
-        'the amount it reaches along $y$. The original vector is the hypotenuse; ' +
-        'the components are the two legs of a right triangle.',
-      'To find the components you need exactly one tool: trigonometry. ' +
-        'The angle $\\theta$ (measured from the positive $x$-axis) and the magnitude $|\\vec{A}|$ ' +
-        'are all the ingredients you need.',
+      'Picture walking from one corner of a city block to the diagonally opposite corner. You cannot walk diagonally — the buildings are in the way. Instead you walk some distance east, then some distance north. Those two legs — the "east part" and the "north part" — are the *components* of your displacement.',
+      'Every vector in 2-D has exactly two components: the amount it reaches along $x$ and the amount it reaches along $y$. The original vector is the hypotenuse; the components are the two legs of a right triangle.',
+      'To find the components you need exactly one tool: trigonometry. The angle $\\theta$ (measured from the positive $x$-axis) and the magnitude $|\\vec{A}|$ are all the ingredients you need.',
     ],
     callouts: [
       {
         type: 'definition',
         title: 'Components of a vector',
         body:
-          'For $\\vec{A}$ with magnitude $|\\vec{A}|$ at angle $\\theta$ from $+x$: ' +
-          'A_x = |\\vec{A}|\\cos\\theta,\\quad A_y = |\\vec{A}|\\sin\\theta.',
+          'For $\\vec{A}$ with magnitude $|\\vec{A}|$ at angle $\\theta$ from $+x$: A_x = |\\vec{A}|\\cos\\theta,\\quad A_y = |\\vec{A}|\\sin\\theta.',
       },
       {
         type: 'insight',
         title: 'The right-triangle picture',
         body:
-          'Draw $\\vec{A}$. Drop a perpendicular to the $x$-axis. ' +
-          'The hypotenuse is $|\\vec{A}|$, the adjacent leg is $A_x$, the opposite leg is $A_y$. ' +
-          'SOH-CAH-TOA does the rest.',
+          'Draw $\\vec{A}$. Drop a perpendicular to the $x$-axis. The hypotenuse is $|\\vec{A}|$, the adjacent leg is $A_x$, the opposite leg is $A_y$. SOH-CAH-TOA does the rest.',
       },
     ],
     visualizations: [
@@ -78,13 +62,9 @@ export default {
         caption: 'A vector at angle θ is the hypotenuse. Aₓ = |A|cosθ is the adjacent leg; Ay = |A|sinθ is the opposite leg. SOH-CAH-TOA gives you both components directly.',
       },
       {
-        // Pillar 1
-        id: 'ComponentDecomposerLive',
+        id: 'VectorKinematicsLab',
         title: 'Drag the vector — watch the right triangle appear',
-        mathBridge:
-          'As you drag the arrowhead, the $x$- and $y$-components update live. ' +
-          'The right triangle highlights the geometric meaning of $\\cos\\theta$ and $\\sin\\theta$.',
-        caption: 'Components are just shadows: $A_x$ is the shadow on the $x$-axis, $A_y$ on the $y$-axis.',
+        caption: `Components are just shadows: $A_x$ is the shadow on the $x$-axis, $A_y$ on the $y$-axis. Drag the arrowhead and watch how $\\cos\\theta$ and $\\sin\\theta$ scale with magnitude.`,
         props: { showRightTriangle: true, showLabels: true },
       },
     ],
@@ -93,16 +73,9 @@ export default {
   // ── Math ──────────────────────────────────────────────────────────────────
   math: {
     prose: [
-      'The two formulas for components come directly from the definitions of sine and cosine. ' +
-        'Here is the complete two-way conversion table:',
-      'A critical skill is recognising which angle to use. ' +
-        'The formulas $A_x = |\\vec{A}|\\cos\\theta$ and $A_y = |\\vec{A}|\\sin\\theta$ ' +
-        'assume $\\theta$ is measured **counterclockwise from the positive $x$-axis**. ' +
-        'If a problem gives you an angle measured from a different reference (e.g. from the $y$-axis, ' +
-        'or "below the horizontal"), convert to the standard angle first.',
-      'When recovering the angle from components, always sketch the vector to confirm the quadrant. ' +
-        'A calculator\'s $\\arctan$ only covers $(-90°, 90°)$, so you must manually ' +
-        'apply quadrant corrections.',
+      'The two formulas for components come directly from the definitions of sine and cosine. Here is the complete two-way conversion table:',
+      'A critical skill is recognising which angle to use. The formulas $A_x = |\\vec{A}|\\cos\\theta$ and $A_y = |\\vec{A}|\\sin\\theta$ assume $\\theta$ is measured **counterclockwise from the positive $x$-axis**. If a problem gives you an angle measured from a different reference (e.g. from the $y$-axis, or "below the horizontal"), convert to the standard angle first.',
+      'When recovering the angle from components, always sketch the vector to confirm the quadrant. A calculator\'s $\\arctan$ only covers $(-90°, 90°)$, so you must manually apply quadrant corrections.',
     ],
     callouts: [
       {
@@ -114,37 +87,27 @@ export default {
         type: 'theorem',
         title: 'Inverse: components → magnitude + angle',
         body:
-          '|\\vec{A}| = \\sqrt{A_x^2 + A_y^2} \\qquad ' +
-          '\\theta = \\operatorname{atan2}(A_y,\\, A_x)',
+          '|\\vec{A}| = \\sqrt{A_x^2 + A_y^2} \\qquad \\theta = \\operatorname{atan2}(A_y,\\, A_x)',
       },
       {
         type: 'definition',
         title: 'atan2 — the quadrant-aware arctangent',
         body:
-          '\\operatorname{atan2}(y, x) \\text{ returns the angle in } (-180°, 180°] ' +
-          '\\text{ by checking the signs of both arguments. Use this instead of plain } \\arctan ' +
-          '\\text{ whenever components can be negative.}',
+          '\\operatorname{atan2}(y, x) \\text{ returns the angle in } (-180°, 180°] \\text{ by checking the signs of both arguments. Use this instead of plain } \\arctan \\text{ whenever components can be negative.}',
       },
       {
         type: 'warning',
         title: 'Angle reference point matters',
         body:
-          'If a problem states "30° above the horizontal", $\\theta = 30°$ in the standard formulas. ' +
-          'If it states "30° from the vertical", $\\theta = 60°$ from the horizontal. ' +
-          'Always convert to "from the positive $x$-axis, counterclockwise" before plugging in.',
+          'If a problem states "30° above the horizontal", $\\theta = 30°$ in the standard formulas. If it states "30° from the vertical", $\\theta = 60°$ from the horizontal. Always convert to "from the positive $x$-axis, counterclockwise" before plugging in.',
       },
     ],
     visualizations: [
       {
-        // Pillar 4
-        id: 'ComponentConversionExplorer',
-        title: 'Forward and inverse conversion — two sliders, four numbers',
-        mathBridge:
-          'Left panel: set $|\\vec{A}|$ and $\\theta$, read off $A_x$ and $A_y$. ' +
-          'Right panel: set $A_x$ and $A_y$, read off $|\\vec{A}|$ and $\\theta$. ' +
-          'Change one panel and watch the other update.',
-        caption: 'Build fluency with both directions of the conversion.',
-        props: { showQuadrantHighlight: true },
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Forward and inverse conversion',
+        caption: `Left: given $|\\vec{A}|$ and $\\theta$, find $A_x = |\\vec{A}|\\cos\\theta$ and $A_y = |\\vec{A}|\\sin\\theta$. Right: given $A_x$ and $A_y$, find $|\\vec{A}| = \\sqrt{A_x^2+A_y^2}$ and $\\theta = \\text{atan2}(A_y, A_x)$. The diagram shows both conversions simultaneously.`,
       },
     ],
   },
@@ -152,20 +115,16 @@ export default {
   // ── Rigor ─────────────────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'The component formulas are consequences of the definitions of sine and cosine on the unit circle. ' +
-        'Here we derive them from first principles so the formulas are no longer "things to memorise" ' +
-        'but things you could re-derive on the spot.',
+      'The component formulas are consequences of the definitions of sine and cosine on the unit circle. Here we derive them from first principles so the formulas are no longer "things to memorise" but things you could re-derive on the spot.',
     ],
     callouts: [
       {
         type: 'insight',
         title: 'The unit circle is the bridge',
         body:
-          'Place a unit vector at angle $\\theta$. Its tip lands at $(\\cos\\theta, \\sin\\theta)$ by definition. ' +
-          'Scaling by $|\\vec{A}|$ gives $(|\\vec{A}|\\cos\\theta,\\; |\\vec{A}|\\sin\\theta)$ — those are the components.',
+          'Place a unit vector at angle $\\theta$. Its tip lands at $(\\cos\\theta, \\sin\\theta)$ by definition. Scaling by $|\\vec{A}|$ gives $(|\\vec{A}|\\cos\\theta,\\; |\\vec{A}|\\sin\\theta)$ — those are the components.',
       },
     ],
-    visualizationId: 'ComponentDerivationProof',
     proofSteps: [
       {
         expression: '\\vec{A} = (\\text{cos}\\theta, \\text{sin}\\theta) \\quad \\text{where } |\\vec{A}|=1',
@@ -191,10 +150,10 @@ export default {
     title: 'Derivation: component formulas from the unit circle',
     visualizations: [
       {
-        id: 'ComponentDerivationProof',
-        title: 'Unit circle → component formulas, step by step',
-        mathBridge: 'Each proof step is animated on the unit circle. The geometry makes the algebra inevitable.',
-        caption: 'Every component formula is just $\\cos$ or $\\sin$ scaled by the magnitude.',
+        id: 'SVGDiagram',
+        props: { type: 'slope-triangle' },
+        title: 'Unit circle → component formulas',
+        caption: `Place a unit vector at angle $\\theta$. Its tip lands at $(\\cos\\theta, \\sin\\theta)$. Scale by $|\\vec{A}|$: the components follow directly. Every component formula is just $\\cos$ or $\\sin$ scaled by the magnitude.`,
       },
     ],
   },
@@ -205,8 +164,7 @@ export default {
       id: 'ch1-003-ex1',
       title: 'Decomposing a velocity vector',
       problem:
-        '\\text{A ball is launched at } |\\vec{v}| = 20\\,m/s \\text{ at } \\theta = 35° ' +
-        '\\text{ above the horizontal. Find the horizontal and vertical components.}',
+        '\\text{A ball is launched at } |\\vec{v}| = 20\\,m/s \\text{ at } \\theta = 35° \\text{ above the horizontal. Find the horizontal and vertical components.}',
       steps: [
         {
           expression: 'v_x = |\\vec{v}|\\cos\\theta = 20\\cos35°',
@@ -232,10 +190,10 @@ export default {
       conclusion: '$v_x \\approx 16.4\\,m/s$ (horizontal), $v_y \\approx 11.5\\,m/s$ (vertical).',
       visualizations: [
         {
-          id: 'ComponentDecomposerLive',
-          title: 'Set magnitude = 20, angle = 35° and read off the components',
-          caption: 'The right triangle makes the result visible.',
-          props: { lockedMagnitude: 20, lockedAngle: 35 },
+          id: 'SVGDiagram',
+          props: { type: 'vector-components' },
+          title: 'magnitude = 20, angle = 35° — right triangle visible',
+          caption: `The right triangle shows $v_x = 20\\cos35° \\approx 16.4$ m/s and $v_y = 20\\sin35° \\approx 11.5$ m/s.`,
         },
       ],
     },
@@ -243,14 +201,12 @@ export default {
       id: 'ch1-003-ex2',
       title: 'Angle measured from the y-axis',
       problem:
-        '\\text{A force has magnitude } 50\\,N \\text{ at } 20° \\textit{ from the vertical } (y\\text{-axis}). ' +
-        '\\text{Find } F_x \\text{ and } F_y.',
+        '\\text{A force has magnitude } 50\\,N \\text{ at } 20° \\textit{ from the vertical } (y\\text{-axis}). \\text{Find } F_x \\text{ and } F_y.',
       steps: [
         {
           expression: '\\theta_{\\text{from}\\,x} = 90° - 20° = 70°',
           annotation:
-            '"20° from vertical" means 20° from the $y$-axis. ' +
-            'Convert to the standard angle (from $+x$): $90° - 20° = 70°$.',
+            '"20° from vertical" means 20° from the $y$-axis. Convert to the standard angle (from $+x$): $90° - 20° = 70°$.',
         },
         {
           expression: 'F_x = 50\\cos70° \\approx 50 \\times 0.342 = 17.1\\,N',
@@ -262,15 +218,13 @@ export default {
         },
       ],
       conclusion:
-        '$F_x \\approx 17.1\\,N$, $F_y \\approx 47.0\\,N$. ' +
-        'Always convert non-standard angles before applying the formulas.',
+        '$F_x \\approx 17.1\\,N$, $F_y \\approx 47.0\\,N$. Always convert non-standard angles before applying the formulas.',
     },
     {
       id: 'ch1-003-ex3',
       title: 'Component to magnitude and angle — Quadrant III',
       problem:
-        '\\text{An acceleration vector has components } a_x = -4.0\\,m/s^2,\\; a_y = -3.0\\,m/s^2. ' +
-        '\\text{Find the magnitude and direction.}',
+        '\\text{An acceleration vector has components } a_x = -4.0\\,m/s^2,\\; a_y = -3.0\\,m/s^2. \\text{Find the magnitude and direction.}',
       steps: [
         {
           expression: '|\\vec{a}| = \\sqrt{(-4)^2 + (-3)^2} = \\sqrt{16+9} = \\sqrt{25} = 5.0\\,m/s^2',
@@ -284,8 +238,7 @@ export default {
           expression:
             'a_x < 0\\;\\text{and}\\;a_y < 0 \\Rightarrow \\text{Quadrant III} \\Rightarrow \\theta = 180° + 36.9° = 216.9°',
           annotation:
-            'Both components negative → Quadrant III. Add 180° to the reference angle. ' +
-            'Could also be stated as "36.9° south of west" or "$-143.1°$" depending on convention.',
+            'Both components negative → Quadrant III. Add 180° to the reference angle. Could also be stated as "36.9° south of west" or "$-143.1°$" depending on convention.',
         },
       ],
       conclusion: '$|\\vec{a}| = 5.0\\,m/s^2$ at $\\theta \\approx 217°$ from the positive $x$-axis.',
@@ -339,11 +292,9 @@ export default {
       id: 'ch1-003-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{A pilot flies at } 200\\,km/h \\text{ on a bearing of N 30° E ' +
-        '(30° east of due north). Find the east and north components of velocity.}',
+        '\\text{A pilot flies at } 200\\,km/h \\text{ on a bearing of N 30° E (30° east of due north). Find the east and north components of velocity.}',
       hint:
-        'Bearing N 30° E means 30° measured from north toward east. ' +
-        'North is the $+y$ direction. The angle from the $+x$ (east) axis is $90° - 30° = 60°$.',
+        'Bearing N 30° E means 30° measured from north toward east. North is the $+y$ direction. The angle from the $+x$ (east) axis is $90° - 30° = 60°$.',
       walkthrough: [
         {
           expression: '\\theta_{\\text{from east}} = 90° - 30° = 60°',
@@ -367,114 +318,194 @@ export default {
     },
   ],
 
-  // ── Pillar 3 — Pattern recognition ───────────────────────────────────────
-  patternViz: {
-    id: 'ComponentPatternSpotter',
-    placement: 'math',
-    title: 'Spot the right formula — 8 scenarios',
-    mathBridge:
-      'Each scenario gives you an angle reference — identify whether you need $\\cos$ or $\\sin$ ' +
-      'for the horizontal component, and whether any angle conversion is needed.',
-    caption:
-      'The most common error in vector problems is using $\\sin$ when you need $\\cos$ and vice versa. ' +
-      'Drill this until it is reflexive.',
-    prerequisiteRecaps: [
+  // ── Python Notebook ──────────────────────────────────────────────────────
+  python: {
+    title: 'Components and Magnitudes in Python',
+    description: `NumPy makes vector decomposition and reconstruction one-liners. We will go both ways: magnitude+angle → components, and components → magnitude+angle.`,
+    placement: 'after_rigor',
+    visualizations: [
       {
-        concept: 'SOH-CAH-TOA',
-        summary:
-          '$\\sin = \\text{opp}/\\text{hyp}$, $\\cos = \\text{adj}/\\text{hyp}$. ' +
-          'The adjacent side is always the horizontal leg when $\\theta$ is from $+x$.',
-        lessonSlug: null,
+        id: 'PythonNotebook',
+        title: 'Component Lab — decompose and reconstruct vectors',
+        caption: 'Run each cell to see the full round-trip conversion.',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: '1 · Forward: magnitude + angle → components',
+              prose: `Given $|\\vec{v}| = 20$ m/s at $\\theta = 35°$ above the horizontal, find $v_x$ and $v_y$.\n\n$v_x = |\\vec{v}|\\cos\\theta$,  $v_y = |\\vec{v}|\\sin\\theta$`,
+              code: [
+                'import numpy as np',
+                '',
+                'mag = 20.0      # m/s',
+                'theta_deg = 35.0',
+                'theta = np.radians(theta_deg)',
+                '',
+                'vx = mag * np.cos(theta)',
+                'vy = mag * np.sin(theta)',
+                '',
+                'print(f"v_x = {vx:.4f} m/s  (horizontal)")',
+                'print(f"v_y = {vy:.4f} m/s  (vertical)")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 2,
+              cellTitle: '2 · Inverse: components → magnitude + angle',
+              prose: `Given $v_x = 16.383$ m/s and $v_y = 11.472$ m/s, recover the original magnitude and angle.\n\n$|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$,  $\\theta = \\text{atan2}(v_y, v_x)$`,
+              code: [
+                '# Use vx and vy from the previous cell',
+                'mag_check = np.linalg.norm([vx, vy])',
+                'theta_check = np.degrees(np.arctan2(vy, vx))',
+                '',
+                'print(f"|v| = {mag_check:.4f} m/s   (should be 20.0)")',
+                'print(f"θ   = {theta_check:.4f}°    (should be 35.0)")',
+                '',
+                '# atan2 handles all four quadrants correctly',
+                'print("\\nQuadrant test — vector pointing into Q3:")',
+                'ax, ay = -4.0, -3.0',
+                'print(f"  |a| = {np.linalg.norm([ax, ay]):.1f}")',
+                'print(f"  θ   = {np.degrees(np.arctan2(ay, ax)):.1f}°  (should be ~-143.1° or ~216.9°)")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 3,
+              cellTitle: '3 · Bearing to east/north components',
+              prose: `A pilot flies at 200 km/h on bearing N 30° E (30° east of due north).\n\nNorth is $+y$, East is $+x$. The angle from east ($+x$) is $90° - 30° = 60°$.`,
+              code: [
+                'speed = 200.0   # km/h',
+                'bearing = 30.0  # degrees east of north',
+                '',
+                '# Convert bearing to standard angle from +x (east)',
+                'theta_from_east = 90.0 - bearing',
+                '',
+                'v_east  = speed * np.cos(np.radians(theta_from_east))',
+                'v_north = speed * np.sin(np.radians(theta_from_east))',
+                '',
+                'print(f"East component:  {v_east:.2f} km/h")',
+                'print(f"North component: {v_north:.2f} km/h")',
+                'print(f"Check magnitude: {np.linalg.norm([v_east, v_north]):.2f} km/h")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+            },
+            {
+              id: 4,
+              cellTitle: '4 · Challenge: four-quadrant problem',
+              challengeType: 'fill-in',
+              challengeNumber: 1,
+              challengeTitle: 'Components of a Quadrant-IV vector',
+              difficulty: 'medium',
+              prompt: `A vector has magnitude 13 and points at 315° from $+x$ (Quadrant IV — right and downward). Find $A_x$ and $A_y$, then verify the magnitude round-trips.`,
+              starterBlock: [
+                'mag_A = ___',
+                'theta_A = np.radians(___)',
+                'Ax = mag_A * np.___(___)    # cos or sin?',
+                'Ay = mag_A * np.___(___)    # cos or sin?',
+                'print(f"Ax={Ax:.4f}, Ay={Ay:.4f}")',
+                'print(f"|A| check = {np.linalg.norm([Ax, Ay]):.4f}")',
+              ].join('\n'),
+              code: [
+                'mag_A = 13.0',
+                'theta_A = np.radians(315.0)',
+                'Ax = mag_A * np.cos(theta_A)',
+                'Ay = mag_A * np.sin(theta_A)',
+                'print(f"Ax = {Ax:.4f}")',
+                'print(f"Ay = {Ay:.4f}")',
+                'print(f"|A| check = {np.linalg.norm([Ax, Ay]):.4f}  (should be 13)")',
+              ].join('\n'),
+              output: '',
+              status: 'idle',
+              figureJson: null,
+              testCode: [
+                'import numpy as np',
+                'assert "Ax" in dir(), "Define Ax"',
+                'assert "Ay" in dir(), "Define Ay"',
+                'assert np.isclose(Ax, 13*np.cos(np.radians(315)), atol=0.01), f"Ax wrong, got {Ax:.4f}"',
+                'assert np.isclose(Ay, 13*np.sin(np.radians(315)), atol=0.01), f"Ay wrong, got {Ay:.4f}"',
+                '"SUCCESS: Ax ≈ 9.192, Ay ≈ -9.192. Quadrant IV: positive x, negative y."',
+              ].join('\n'),
+              hint: `theta_A = np.radians(315.0). Ax = 13*np.cos(theta_A) ≈ 9.19. Ay = 13*np.sin(theta_A) ≈ -9.19. Quadrant IV has positive x, negative y.`,
+            },
+          ],
+        },
       },
     ],
-    props: {
-      rounds: [
-        {
-          scenario: '|\\vec{v}| = 10\\,m/s\\text{ at }30°\\text{ from }+x',
-          question: 'What is $v_x$?',
-          answer: '10\\cos30°',
-          trap: '10\\sin30°',
-        },
-        {
-          scenario: '|\\vec{F}| = 20\\,N\\text{ at }50°\\text{ above horizontal}',
-          question: 'What is $F_y$?',
-          answer: '20\\sin50°',
-          trap: '20\\cos50°',
-        },
-        {
-          scenario: '|\\vec{d}| = 5\\,m\\text{ at }40°\\text{ from the vertical}',
-          question: 'What is $d_x$? (First convert angle.)',
-          answer: '5\\cos50°\\text{ (angle from }+x\\text{ is }90°-40°=50°)',
-          trap: '5\\cos40°',
-        },
-        {
-          scenario: 'A_x = 6,\\;A_y = 8',
-          question: 'What is $|\\vec{A}|$?',
-          answer: '\\sqrt{36+64}=10',
-          trap: '6+8=14',
-        },
-      ],
-    },
   },
 
-  // ── Pillar 5 — Exhaustive forms ───────────────────────────────────────────
-  recognitionViz: {
-    id: 'ComponentFormRecogniser',
-    placement: 'examples_end',
-    title: 'Every form of the component problem — recognition drill',
-    mathBridge: 'Vectors appear with different angle conventions. Recognise and handle each.',
-    caption:
-      'After this drill you should handle any angle specification without hesitation.',
-    prerequisiteRecaps: [
-      {
-        concept: 'Vector notation',
-        summary: '$\\vec{A}$, $(A_x, A_y)$, $A_x\\hat{i}+A_y\\hat{j}$ — all the same object.',
-        lessonSlug: 'vector-notation',
-      },
-      {
-        concept: 'What is a vector?',
-        summary: 'Magnitude and direction.',
-        lessonSlug: 'what-is-a-vector',
-      },
-    ],
-    props: {
-      forms: [
-        {
-          form: 'Standard angle from $+x$',
-          given: '|\\vec{A}|,\\;\\theta_{+x}',
-          horizontal: '|\\vec{A}|\\cos\\theta_{+x}',
-          vertical: '|\\vec{A}|\\sin\\theta_{+x}',
-          notes: 'The default convention. No conversion needed.',
-        },
-        {
-          form: 'Angle from $+y$ (from vertical / from north)',
-          given: '|\\vec{A}|,\\;\\phi_{+y}',
-          horizontal: '|\\vec{A}|\\sin\\phi_{+y}',
-          vertical: '|\\vec{A}|\\cos\\phi_{+y}',
-          notes: 'sin and cos swap because the reference axis has rotated 90°.',
-        },
-        {
-          form: 'Angle below the $+x$-axis (negative $y$-side)',
-          given: '|\\vec{A}|,\\;\\alpha\\text{ below }+x',
-          horizontal: '|\\vec{A}|\\cos\\alpha',
-          vertical: '-|\\vec{A}|\\sin\\alpha',
-          notes: '$y$-component is negative because the vector points downward.',
-        },
-        {
-          form: 'Given two components',
-          given: 'A_x,\\;A_y',
-          horizontal: 'A_x\\text{ (already done)}',
-          vertical: 'A_y\\text{ (already done)}',
-          notes: 'Use $\\sqrt{A_x^2+A_y^2}$ for magnitude; atan2$(A_y, A_x)$ for angle.',
-        },
-        {
-          form: 'Compass bearing N $\\alpha$° E',
-          given: '|\\vec{A}|,\\;\\alpha',
-          horizontal: '|\\vec{A}|\\sin\\alpha\\quad(\\text{east component})',
-          vertical: '|\\vec{A}|\\cos\\alpha\\quad(\\text{north component})',
-          notes: 'Bearing is from north; east = sin, north = cos.',
-        },
-      ],
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-003-q1',
+      question: `A vector has magnitude 10 at $\\theta = 30°$ from $+x$. What is $A_x$?`,
+      options: [`$5$`, `$5\\sqrt{3}$`, `$10$`, `$10\\sqrt{3}$`],
+      answer: 1,
+      explanation: `$A_x = 10\\cos30° = 10 \\times \\frac{\\sqrt{3}}{2} = 5\\sqrt{3} \\approx 8.66$.`,
     },
-  },
+    {
+      id: 'p1-ch1-003-q2',
+      question: `A vector has magnitude 10 at $\\theta = 30°$ from $+x$. What is $A_y$?`,
+      options: [`$5$`, `$5\\sqrt{3}$`, `$10$`, `$10\\sqrt{2}$`],
+      answer: 0,
+      explanation: `$A_y = 10\\sin30° = 10 \\times 0.5 = 5$.`,
+    },
+    {
+      id: 'p1-ch1-003-q3',
+      question: `A vector has $A_x = 6$ and $A_y = 8$. What is its magnitude?`,
+      options: [`$14$`, `$10$`, `$\\sqrt{28}$`, `$100$`],
+      answer: 1,
+      explanation: `$|\\vec{A}| = \\sqrt{6^2 + 8^2} = \\sqrt{36+64} = \\sqrt{100} = 10$.`,
+    },
+    {
+      id: 'p1-ch1-003-q4',
+      question: `A force is described as "50 N, 20° from the vertical." What is $\\theta$ measured from the $+x$-axis?`,
+      options: [`$20°$`, `$70°$`, `$160°$`, `$110°$`],
+      answer: 1,
+      explanation: `"From the vertical" means from the $y$-axis. Convert: $\\theta_{+x} = 90° - 20° = 70°$.`,
+    },
+    {
+      id: 'p1-ch1-003-q5',
+      question: `$A_x = -3$ and $A_y = -4$. Which quadrant is $\\vec{A}$ in?`,
+      options: [`Quadrant I`, `Quadrant II`, `Quadrant III`, `Quadrant IV`],
+      answer: 2,
+      explanation: `Both components negative means the vector points into Quadrant III (down-left).`,
+    },
+    {
+      id: 'p1-ch1-003-q6',
+      question: `Why should you use $\\text{atan2}(A_y, A_x)$ instead of $\\arctan(A_y/A_x)$ when finding angles?`,
+      options: [
+        `atan2 is faster to compute`,
+        `arctan only returns angles in $(-90°, 90°)$; atan2 gives the correct quadrant`,
+        `atan2 works in 3-D only`,
+        `They are identical`,
+      ],
+      answer: 1,
+      explanation: `$\\arctan$ cannot distinguish Quadrant I from III, or II from IV. atan2 uses the signs of both components to return the correct angle in $(-180°, 180°]$.`,
+    },
+    {
+      id: 'p1-ch1-003-q7',
+      question: `A vector has $A_x = 0$ and $A_y = -5$. What is its direction?`,
+      options: [`$90°$`, `$0°$`, `$270°$ (or $-90°$)`, `$180°$`],
+      answer: 2,
+      explanation: `Zero $x$-component, negative $y$ means the vector points straight down: $270°$ (or $-90°$) from $+x$.`,
+    },
+    {
+      id: 'p1-ch1-003-q8',
+      question: `The Pythagorean identity $\\cos^2\\theta + \\sin^2\\theta = 1$ guarantees which fact about components?`,
+      options: [
+        `$A_x$ always equals $A_y$`,
+        `$\\sqrt{A_x^2 + A_y^2} = |\\vec{A}|$ — the magnitude formula is consistent`,
+        `Components are always positive`,
+        `You can add components without considering angle`,
+      ],
+      answer: 1,
+      explanation: `$A_x^2 + A_y^2 = |\\vec{A}|^2(\\cos^2\\theta + \\sin^2\\theta) = |\\vec{A}|^2$. The identity proves the magnitude formula.`,
+    },
+  ],
 }

@@ -9,49 +9,28 @@ export default {
 
   hook: {
     question:
-      'Two cylinders — one solid, one hollow — have the same mass and radius. ' +
-      'Both roll from rest down the same ramp. Which reaches the bottom first? ' +
-      'Intuition says: same mass, same gravity, same ramp — they should tie. ' +
-      'They don\'t. One wins every time. Which one, and why?',
+      'Two cylinders — one solid, one hollow — have the same mass and radius. Both roll from rest down the same ramp. Which reaches the bottom first? Intuition says: same mass, same gravity, same ramp — they should tie. They don\'t. One wins every time. Which one, and why?',
     realWorldContext:
-      'Rotational dynamics governs every spinning system: flywheels in engines, ' +
-      'figure skaters pulling in their arms, a diver tucking into a somersault, ' +
-      'the wobble of a spinning top, and the torque specs for every bolt in a car engine. ' +
-      'The equation τ = Iα is Newton\'s Second Law dressed for rotation — same logic, same structure.',
+      'Rotational dynamics governs every spinning system: flywheels in engines, figure skaters pulling in their arms, a diver tucking into a somersault, the wobble of a spinning top, and the torque specs for every bolt in a car engine. The equation τ = Iα is Newton\'s Second Law dressed for rotation — same logic, same structure.',
     previewVisualizationId: 'OscillationViz',
   },
 
   intuition: {
     prose: [
-      '**The answer:** The solid cylinder wins. Both accelerate down the ramp under gravity, ' +
-        'but rotating objects have to "share" their energy between translational and rotational kinetic energy. ' +
-        'The hollow cylinder has more of its mass concentrated at the rim (larger moment of inertia I), ' +
-        'so it needs more energy to spin up — leaving less for translational speed. ' +
-        'Same mass, different distribution → different rotational inertia → different acceleration.',
+      '**The answer:** The solid cylinder wins. Both accelerate down the ramp under gravity, but rotating objects have to "share" their energy between translational and rotational kinetic energy. The hollow cylinder has more of its mass concentrated at the rim (larger moment of inertia I), so it needs more energy to spin up — leaving less for translational speed. Same mass, different distribution → different rotational inertia → different acceleration.',
 
-      '**Newton\'s Second Law for rotation:** Just as \\(F = ma\\) relates force to linear acceleration, ' +
-        '\\(\\tau = I\\alpha\\) relates torque to angular acceleration. ' +
-        'The mass \\(m\\) is replaced by the **moment of inertia** \\(I\\), ' +
-        'which measures not just how much mass but WHERE that mass is relative to the rotation axis.',
+      '**Newton\'s Second Law for rotation:** Just as \\(F = ma\\) relates force to linear acceleration, \\(\\tau = I\\alpha\\) relates torque to angular acceleration. The mass \\(m\\) is replaced by the **moment of inertia** \\(I\\), which measures not just how much mass but WHERE that mass is relative to the rotation axis.',
 
-      '**Why location matters:** A kilogram at the rim of a wheel is much harder to start spinning than a kilogram at the center. ' +
-        'The center mass barely moves when the wheel rotates; the rim mass has to travel a full circle. ' +
-        'Moment of inertia \\(I = \\sum m_i r_i^2\\) weights each bit of mass by its squared distance from the axis. ' +
-        'Double the distance → quadruple the contribution to rotational inertia.',
+      '**Why location matters:** A kilogram at the rim of a wheel is much harder to start spinning than a kilogram at the center. The center mass barely moves when the wheel rotates; the rim mass has to travel a full circle. Moment of inertia \\(I = \\sum m_i r_i^2\\) weights each bit of mass by its squared distance from the axis. Double the distance → quadruple the contribution to rotational inertia.',
 
-      '**The full analogy:** Linear: F → a → motion. Rotational: τ → α → rotation. ' +
-        'The mass m in linear is replaced by I in rotation. ' +
-        'KE = ½mv² in linear becomes ½Iω² in rotation. ' +
-        'Everything you know about linear dynamics translates — just swap the symbols.',
+      '**The full analogy:** Linear: F → a → motion. Rotational: τ → α → rotation. The mass m in linear is replaced by I in rotation. KE = ½mv² in linear becomes ½Iω² in rotation. Everything you know about linear dynamics translates — just swap the symbols.',
     ],
     callouts: [
       {
         type: 'sequencing',
         title: 'Lesson 3 of 4 — The rotational Newton\'s Second Law',
         body:
-          '**Lesson 2:** Torque τ = rF sin θ — the cause of rotational change.\n' +
-          '**This lesson:** τ = Iα — torque produces angular acceleration. I is the rotational inertia.\n' +
-          '**Next:** Moment of inertia — how to calculate I for different mass distributions.',
+          '**Lesson 2:** Torque τ = rF sin θ — the cause of rotational change.\n**This lesson:** τ = Iα — torque produces angular acceleration. I is the rotational inertia.\n**Next:** Moment of inertia — how to calculate I for different mass distributions.',
       },
       {
         type: 'theorem',
@@ -67,16 +46,13 @@ export default {
         type: 'insight',
         title: 'Rotational kinetic energy',
         body:
-          'KE_{\\text{rot}} = \\tfrac{1}{2}I\\omega^2 \\quad \\text{(mirrors } \\tfrac{1}{2}mv^2\\text{)}\n\n' +
-          'For a rolling object: \\(KE_{\\text{total}} = \\tfrac{1}{2}mv^2 + \\tfrac{1}{2}I\\omega^2\\)',
+          'KE_{\\text{rot}} = \\tfrac{1}{2}I\\omega^2 \\quad \\text{(mirrors } \\tfrac{1}{2}mv^2\\text{)}\n\nFor a rolling object: \\(KE_{\\text{total}} = \\tfrac{1}{2}mv^2 + \\tfrac{1}{2}I\\omega^2\\)',
       },
       {
         type: 'connection',
         title: 'Calculus: L = Iω and τ = dL/dt',
         body:
-          'Angular momentum \\(L = I\\omega\\). Newton\'s 2nd for rotation: \\(\\tau = dL/dt\\). ' +
-          'For constant I: \\(\\tau = I(d\\omega/dt) = I\\alpha\\). ' +
-          'Mirrors the linear \\(F = dp/dt = ma\\) structure exactly.',
+          'Angular momentum \\(L = I\\omega\\). Newton\'s 2nd for rotation: \\(\\tau = dL/dt\\). For constant I: \\(\\tau = I(d\\omega/dt) = I\\alpha\\). Mirrors the linear \\(F = dp/dt = ma\\) structure exactly.',
       },
     ],
     visualizations: [
@@ -84,8 +60,7 @@ export default {
         id: 'OscillationViz',
         title: 'Torque accelerates rotation',
         mathBridge:
-          'Apply a torque. Watch α = τ/I — larger I means smaller α for the same τ. ' +
-          'A hollow cylinder (I = mr²) accelerates slower than a solid cylinder (I = ½mr²) under equal torque.',
+          'Apply a torque. Watch α = τ/I — larger I means smaller α for the same τ. A hollow cylinder (I = mr²) accelerates slower than a solid cylinder (I = ½mr²) under equal torque.',
         caption: 'τ = Iα: more inertia → less angular acceleration for the same torque.',
         props: { showTorque: true },
       },
@@ -112,9 +87,7 @@ export default {
         type: 'insight',
         title: 'The parallel axis theorem',
         body:
-          'I about any axis = I about center of mass + Md²\\\\' +
-          '\\(I = I_{\\text{cm}} + Md^2\\)\\\\' +
-          'where d = distance from cm to the new axis. Rotating about a non-center axis always increases I.',
+          'I about any axis = I about center of mass + Md²\\\\\\(I = I_{\\text{cm}} + Md^2\\)\\\\where d = distance from cm to the new axis. Rotating about a non-center axis always increases I.',
       },
     ],
     visualizations: [
@@ -123,8 +96,7 @@ export default {
         props: { type: 'rolling-cylinder' },
         title: 'Rolling: translational + rotational energy',
         caption:
-          'Energy bar splits into translational (½mv²) and rotational (½Iω²) portions. ' +
-          'The hollow cylinder allocates more energy to rotation, leaving less for speed at the bottom.',
+          'Energy bar splits into translational (½mv²) and rotational (½Iω²) portions. The hollow cylinder allocates more energy to rotation, leaving less for speed at the bottom.',
       },
     ],
   },
@@ -156,8 +128,7 @@ export default {
       id: 'ch7-003-ex1',
       title: 'Disk accelerated by a torque',
       problem:
-        '\\text{A solid disk (m = 5 kg, r = 0.3 m) starts from rest and reaches ω = 40 rad/s in 8 s. ' +
-        'Find the net torque required.}',
+        '\\text{A solid disk (m = 5 kg, r = 0.3 m) starts from rest and reaches ω = 40 rad/s in 8 s. Find the net torque required.}',
       steps: [
         {
           expression: 'I = \\tfrac{1}{2}mr^2 = \\tfrac{1}{2}(5)(0.09) = 0.225\\,\\text{kg·m}^2',
@@ -178,8 +149,7 @@ export default {
       id: 'ch7-003-ex2',
       title: 'Rolling cylinder down a ramp — energy method',
       problem:
-        '\\text{A solid cylinder (m = 2 kg, r = 0.1 m) rolls without slipping from rest down a 0.5 m high ramp. ' +
-        'Find its speed at the bottom.}',
+        '\\text{A solid cylinder (m = 2 kg, r = 0.1 m) rolls without slipping from rest down a 0.5 m high ramp. Find its speed at the bottom.}',
       steps: [
         {
           expression: 'mgh = \\tfrac{1}{2}mv^2 + \\tfrac{1}{2}I\\omega^2',
@@ -217,8 +187,7 @@ export default {
       id: 'ch7-003-ch2',
       difficulty: 'medium',
       problem:
-        '\\text{A hollow sphere (I = ⅔mr²) and solid sphere (I = ⅖mr²) roll from rest down the same ramp. ' +
-        'Which is faster at the bottom? Find the ratio of their speeds.}',
+        '\\text{A hollow sphere (I = ⅔mr²) and solid sphere (I = ⅖mr²) roll from rest down the same ramp. Which is faster at the bottom? Find the ratio of their speeds.}',
       hint: 'Use energy conservation. v² = 2gh / (1 + I/(mr²)). Compare the denominators.',
       walkthrough: [
         {
@@ -244,8 +213,7 @@ export default {
       id: 'ch7-003-ch3',
       difficulty: 'hard',
       problem:
-        '\\text{An Atwood machine: two masses } m_1 = 3\\text{ kg and } m_2 = 5\\text{ kg hang over a solid disk pulley ' +
-        '(M = 2 kg, R = 0.1 m). Find the acceleration. (Hint: include pulley inertia.)}',
+        '\\text{An Atwood machine: two masses } m_1 = 3\\text{ kg and } m_2 = 5\\text{ kg hang over a solid disk pulley (M = 2 kg, R = 0.1 m). Find the acceleration. (Hint: include pulley inertia.)}',
       hint: 'Net force = (m₂ − m₁)g. Total "effective mass" includes pulley: m₁ + m₂ + I/R² = m₁ + m₂ + M/2.',
       walkthrough: [
         {

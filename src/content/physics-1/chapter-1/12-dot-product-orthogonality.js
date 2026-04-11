@@ -12,7 +12,7 @@ export default {
     question: 'Gravity pulls a block down the floor of a level table. How much work does gravity do? And why is the answer obvious once you think in vectors?',
     realWorldContext:
       `The normal force of a table always points perpendicular to the surface. The block's velocity along the surface is always perpendicular to the normal force. So the normal force does zero work — always — because perpendicular vectors have zero dot product. This is not a coincidence; it is a theorem. And the dot product test for perpendicularity is the simplest and most powerful tool for detecting it in any dimension.`,
-    previewVisualizationId: 'OrthogonalityIntuition',
+    previewVisualizationId: 'SVGDiagram',
   },
 
   videos: [{
@@ -73,11 +73,10 @@ export default {
           `When $\\phi = 90°$, the projection of $\\vec{B}$ onto $\\vec{A}$ has length zero. Dot product = (projection length) × |A| = 0. This is the exact algebraic test for perpendicularity.`,
       },
       {
-        id: 'OrthogonalityIntuition',
-        title: 'Drag vectors to zero — feel the perpendicularity',
-        mathBridge: 'Watch the dot product value hit zero exactly at 90°.',
-        caption:
-          `Rotate one vector slowly through 360°. The dot product crosses zero at exactly 90° and 270°.`,
+        id: 'SVGDiagram',
+        props: { type: 'dot-product-projection' },
+        title: 'Dot product crosses zero at 90°',
+        caption: `Rotate one vector slowly through 360°. The dot product crosses zero at exactly 90° and 270°.`,
       },
     ],
   },
@@ -103,10 +102,10 @@ export default {
       },
     ],
     visualizations: [{
-      id: 'DotProductExplorer',
-      title: 'Dot Product Geometric Explorer',
-      mathBridge: 'Observe how the dot product crosses zero as vectors rotate through 90°.',
-      caption: 'Zero crossing = perpendicular.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Orthogonality test — the zero dot product',
+      caption: `$\\vec{A}\\cdot\\vec{B} = 0$ if and only if $\\vec{A}\\perp\\vec{B}$ (assuming neither is the zero vector). The projection of one onto the other is exactly zero — no overlap.`,
     }],
   },
 
@@ -153,10 +152,10 @@ export default {
     ],
     title: 'Orthogonality: geometric fact, algebraic test',
     visualizations: [{
-      id: 'OrthogonalityPatternSpotter',
-      title: 'Orthogonality Detection Quiz',
-      mathBridge: 'Quick-fire: identify which vector pairs are orthogonal.',
-      caption: 'Build perpendicularity intuition.',
+      id: 'SVGDiagram',
+      props: { type: 'dot-product-projection' },
+      title: 'Orthonormality of basis vectors',
+      caption: `$\\hat{i}\\cdot\\hat{j} = 0$, $\\hat{i}\\cdot\\hat{k} = 0$, $\\hat{j}\\cdot\\hat{k} = 0$. The three basis vectors are mutually perpendicular — that is what "ortho-" means in orthonormal.`,
     }],
   },
 
@@ -324,7 +323,67 @@ export default {
         { expression: '\\hat{v}=(\\cos210°,\\sin210°)=(-0.866,\\;-0.5)', annotation: 'Unit velocity vector.' },
         { expression: '\\hat{n}\\cdot\\hat{v}=(-0.5)(-0.866)+(0.866)(-0.5)=0.433-0.433=0', annotation: 'Dot product = 0 → orthogonal → zero work.' },
       ],
-      answer: '\\vec{N}\\perp\\vec{v}\\Rightarrow W=0\\;\\forall\\text{ slopes}',
+      answer: `\\vec{N}\\perp\\vec{v}\\Rightarrow W=0\\;\\forall\\text{ slopes}`,
+    },
+  ],
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-012-q1',
+      question: `Two non-zero vectors are orthogonal if and only if:`,
+      options: [`Their magnitudes are equal`, `Their dot product is zero`, `They point in opposite directions`, `One is a unit vector`],
+      answer: 1,
+      explanation: `$\\vec{A}\\perp\\vec{B} \\iff \\vec{A}\\cdot\\vec{B} = 0$. This is both necessary and sufficient for non-zero vectors.`,
+    },
+    {
+      id: 'p1-ch1-012-q2',
+      question: `$\\vec{A} = (3, -4)$ and $\\vec{B} = (4, 3)$. Are they orthogonal?`,
+      options: [`No — their magnitudes are not equal`, `Yes — their dot product is zero`, `No — they are in Quadrant I`, `Yes — they are unit vectors`],
+      answer: 1,
+      explanation: `$\\vec{A}\\cdot\\vec{B} = (3)(4)+(-4)(3) = 12-12 = 0$. The vectors are perpendicular.`,
+    },
+    {
+      id: 'p1-ch1-012-q3',
+      question: `A table normal force $\\vec{N}$ acts perpendicular to a surface. A box slides along the surface with velocity $\\vec{v}$. How much work does $\\vec{N}$ do?`,
+      options: [`$|N||v|$`, `$-|N||v|$`, `$0$`, `Depends on the speed`],
+      answer: 2,
+      explanation: `$W = \\vec{N}\\cdot\\vec{v} = |N||v|\\cos90° = 0$. Perpendicular vectors always have zero dot product — regardless of magnitudes or speed.`,
+    },
+    {
+      id: 'p1-ch1-012-q4',
+      question: `The basis vectors $\\hat{i}$, $\\hat{j}$, $\\hat{k}$ are "orthonormal". What does "ortho" mean?`,
+      options: [`Each has magnitude 1`, `They are mutually perpendicular`, `They point along coordinate axes`, `They form a right-hand system`],
+      answer: 1,
+      explanation: `"Ortho" = perpendicular ($\\hat{i}\\cdot\\hat{j}=0$ etc.). "Normal" = unit magnitude ($|\\hat{i}|=1$ etc.). Both together = orthonormal.`,
+    },
+    {
+      id: 'p1-ch1-012-q5',
+      question: `For what value of $c$ is $(1, c)$ perpendicular to $(2, 3)$?`,
+      options: [`$c = 3/2$`, `$c = -2/3$`, `$c = 2/3$`, `$c = -3/2$`],
+      answer: 1,
+      explanation: `$(1)(2)+(c)(3) = 0 \\Rightarrow 2 + 3c = 0 \\Rightarrow c = -2/3$.`,
+    },
+    {
+      id: 'p1-ch1-012-q6',
+      question: `Circular motion: an object moves in a circle at constant speed. The velocity $\\vec{v}$ and centripetal acceleration $\\vec{a}_c$ are always:`,
+      options: [`Parallel`, `Antiparallel`, `Perpendicular`, `At 45°`],
+      answer: 2,
+      explanation: `The centripetal acceleration points toward the center (radially inward); the velocity is tangential (along the circle). They are perpendicular — so $\\vec{v}\\cdot\\vec{a}_c = 0$ and the centripetal force does zero work (speed does not change).`,
+    },
+    {
+      id: 'p1-ch1-012-q7',
+      question: `$\\vec{A}\\cdot\\vec{B} = 0$ and $\\vec{A} \\ne \\vec{0}$, $\\vec{B} \\ne \\vec{0}$. What can we conclude?`,
+      options: [`$\\vec{A}$ and $\\vec{B}$ are equal`, `$\\vec{A}$ and $\\vec{B}$ are perpendicular`, `One is a scalar multiple of the other`, `Their magnitudes are equal`],
+      answer: 1,
+      explanation: `Zero dot product (with both vectors non-zero) means $\\cos\\phi = 0$, so $\\phi = 90°$ — perpendicular.`,
+    },
+    {
+      id: 'p1-ch1-012-q8',
+      question: `In $n$-dimensional space, how many mutually orthogonal unit vectors can you have?`,
+      options: [`At most 2`, `Exactly $n$`, `At most $n$`, `Infinitely many`],
+      answer: 1,
+      explanation: `In $\\mathbb{R}^n$ you can have exactly $n$ mutually orthogonal unit vectors (an orthonormal basis). In $\\mathbb{R}^3$ that is exactly $\\{\\hat{i}, \\hat{j}, \\hat{k}\\}$.`,
     },
   ],
 }

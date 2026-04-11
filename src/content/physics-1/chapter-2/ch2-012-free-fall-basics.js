@@ -13,7 +13,7 @@ export default {
       "A feather and a hammer are dropped on the Moon. Which hits the ground first?",
     realWorldContext:
       "Free fall is the purest application of constant-acceleration kinematics. Galileo established that (without air resistance) all objects fall equally. This underpins every projectile calculation.",
-    previewVisualizationId: "FreeFallIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   videos: [
     {
@@ -49,14 +49,15 @@ export default {
         caption: 'g = 9.8 m/s² always points downward. When +y is upward, acceleration a = −g = −9.8 m/s². The trajectory y(t) curves downward because a is negative.',
       },
       {
-        id: "FreeFallIntuition",
+        id: 'VerticalThrow',
+        props: {},
         title: "Free-fall motion intuition",
         mathBridge:
           "Launch from different heights/velocities and observe how velocity changes linearly while position changes quadratically.",
         caption: "Same acceleration law, many scenarios.",
       },
       {
-        id: "IndependentMotionIntuition",
+        id: 'SVGDiagram',
         title: "Horizontal vs vertical independence",
         mathBridge:
           "Compare a dropped object with a horizontally launched object to see identical fall-time under the same vertical conditions.",
@@ -79,7 +80,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
         title: "Sign-convention explorer",
         mathBridge:
           "Toggle up-positive/down-positive and verify that physical predictions are identical when signs are applied consistently.",
@@ -99,7 +100,7 @@ export default {
         body: "a(t)=\\text{constant}=-g\;(\\text{or }+g\\text{ by axis choice})",
       },
     ],
-    visualizationId: "FreeFallExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "a=-g",

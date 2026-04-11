@@ -12,7 +12,7 @@ export default {
       "How far does an object fall in a given time if released from rest?",
     realWorldContext:
       "Drop-time estimates appear in safety checks, sports analysis, and instrument calibration.",
-    previewVisualizationId: "FreeFallExplorer",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -27,20 +27,21 @@ export default {
         caption: 'When v₀ = 0, the trapezoid ½(v₀+v)t collapses to a triangle: ½vt = ½(gt)t = ½gt². That\'s the SUVAT equation Δy = ½gt² — pure algebra from a triangle\'s area formula.',
       },
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
+        props: {},
         title: "Drop from rest calculator",
         mathBridge: "Slide time and observe quadratic growth in displacement.",
         caption: "A classic t² law in action.",
       },
       {
-        id: "FreeFallPatternSpotter",
+        id: 'SVGDiagram',
         title: "Free-fall pattern quiz",
         mathBridge:
           "Identify which graph/equation matches drop-from-rest behavior.",
         caption: "Reinforce qualitative recognition.",
       },
       {
-        id: "HorizontalLaunchIntuition",
+        id: 'VerticalThrow',
         title: "Horizontal launch from rest vertically",
         mathBridge:
           "Compare pure drop and horizontal launch to isolate unchanged vertical free-fall dynamics.",
@@ -53,7 +54,7 @@ export default {
     prose: ["For up-positive convention, use Δx = -1/2 g t² and v = -gt."],
     visualizations: [
       {
-        id: "KinematicsFormRecogniser",
+        id: 'SVGDiagram',
         title: "Equation recall",
         mathBridge: "Spot the v0=0 special-case forms quickly.",
         caption: "Special cases reduce cognitive load.",
@@ -62,7 +63,7 @@ export default {
   },
   rigor: {
     prose: ["Set v0=0 in the constant-acceleration formulas."],
-    visualizationId: "FreeFallExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

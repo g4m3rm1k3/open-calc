@@ -11,7 +11,7 @@ export default {
     question: "Can you identify a free-fall scenario in under 10 seconds?",
     realWorldContext:
       "Fast classification is crucial in timed assessments and rapid model selection workflows.",
-    previewVisualizationId: "FreeFallPatternSpotter",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -26,28 +26,29 @@ export default {
         caption: 'Every free-fall scenario is a SUVAT problem with a = −g (or +g depending on convention). Identify what\'s given, find the missing variable, read off the right equation. Pattern fluency = recognizing this instantly.',
       },
       {
-        id: "FreeFallPatternSpotter",
+        id: 'SVGDiagram',
         title: "Scenario quiz",
         mathBridge:
           "Classify upward launch, downward throw, and drop-from-rest signatures.",
         caption: "Recognition speeds solving.",
       },
       {
-        id: "FreeFallExplorer",
+        id: 'VerticalThrow',
+        props: {},
         title: "Verification sandbox",
         mathBridge:
           "Test your classification by running the corresponding simulation case.",
         caption: "Instant feedback loop.",
       },
       {
-        id: "ProjectilePatternSpotter",
+        id: 'SVGDiagram',
         title: "Projectile pattern spotter",
         mathBridge:
           "Generalize free-fall pattern recognition to full 2D projectile scenarios.",
         caption: "Pattern literacy transfers directly to projectile questions.",
       },
       {
-        id: "RangePatternSpotter",
+        id: 'SVGDiagram',
         title: "Range-pattern spotter",
         mathBridge:
           "Practice identifying symmetric-angle and range-scaling patterns quickly.",
@@ -66,7 +67,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "KinematicsPatternSpotter",
+        id: 'SVGDiagram',
         title: "General kinematics pattern drill",
         mathBridge:
           "Cross-train beyond free-fall to improve equation selection speed.",
@@ -78,7 +79,7 @@ export default {
     prose: [
       "Classification criteria come from the qualitative behavior of the governing equations.",
     ],
-    visualizationId: "FreeFallPatternSpotter",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "a=-g\\text{ (up-positive)}",

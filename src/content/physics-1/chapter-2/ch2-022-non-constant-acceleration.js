@@ -13,7 +13,7 @@ export default {
       "a(t) = 6t. What is the velocity at t = 3 s if v₀ = 2 m/s? What is the displacement from t = 0 to t = 3?",
     realWorldContext:
       "The kinematic equations assume constant acceleration. When a varies, integration is the only correct approach — and it gives exact answers without memorising new formulas.",
-    previewVisualizationId: "VariableAccelerationIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   videos: [
     {
@@ -50,14 +50,14 @@ export default {
         caption: 'For variable acceleration, SUVAT fails — it assumes constant a. Instead: integrate a(t) once to get v(t), integrate v(t) again to get x(t). The kinematic chain shows exactly this: go right with d/dt, go left with ∫dt.',
       },
       {
-        id: "VariableAccelerationIntuition",
+        id: 'SVGDiagram',
         title: "Integration chain intuition",
         mathBridge:
           "Switch acceleration presets and observe how integrating a(t) reshapes v(t), then how integrating v(t) reshapes x(t).",
         caption: "The shape of a(t) controls everything downstream.",
       },
       {
-        id: "CircularMotionIntuition",
+        id: 'SVGDiagram',
         title: "Direction-changing acceleration",
         mathBridge:
           "See how acceleration can remain nonzero even at constant speed when velocity direction changes continuously.",
@@ -79,7 +79,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "VariableAccelerationExplorer",
+        id: 'SVGDiagram',
         title: "Analytic vs numeric explorer",
         mathBridge:
           "Compare exact integration to Euler approximation and inspect error as timestep changes.",
@@ -106,7 +106,7 @@ export default {
         body: "\\frac{dv}{dt}=a(t),\\;v(0)=v_0;\\quad \\frac{dx}{dt}=v(t),\\;x(0)=x_0",
       },
     ],
-    visualizationId: "VariableAccelerationExplorer",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "\\frac{dv}{dt}=a(t)",

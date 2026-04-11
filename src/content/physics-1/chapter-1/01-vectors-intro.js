@@ -15,7 +15,7 @@ export default {
     question: 'Your GPS says you are 5 miles from home. Is that enough to get you there?',
     realWorldContext:
       `Of course not — you also need to know *which direction*. This single observation unlocks one of the most important ideas in all of physics. Some quantities — temperature, mass, time — are completely described by a single number. Others — force, velocity, acceleration — are completely *wrong* unless you also say which way. The mathematical object that carries both a size and a direction is called a **vector**, and from this lesson forward, almost everything you study in physics will be described by one.`,
-    previewVisualizationId: 'VectorArrowIntuition',
+    previewVisualizationId: 'VectorKinematicsLab',
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────
@@ -83,12 +83,9 @@ export default {
           `A vector has two parts: magnitude |A| (the arrow length) and direction θ (the angle from +x). The right triangle shows how magnitude and angle together determine the x- and y-components. A scalar has only the first — no arrow, no direction.`,
       },
       {
-        id: 'VectorArrowIntuition',
+        id: 'VectorKinematicsLab',
         title: 'Drag the arrow — feel magnitude and direction',
-        mathBridge:
-          `The arrow length represents magnitude $|\\vec{A}|$; the angle it makes with the positive $x$-axis is the direction $\\theta$.`,
-        caption:
-          `Click and drag the arrowhead. Watch magnitude and angle update live. Then drag the tail — the vector does not change (free vector rule).`,
+        caption: `The arrow length represents magnitude $|\\vec{A}|$; the angle it makes with the positive $x$-axis is the direction $\\theta$. Move the arrowhead and watch both values update. Move the tail — the vector is unchanged (free vector rule).`,
         props: { interactive: true, showComponents: false },
       },
     ],
@@ -144,12 +141,10 @@ export default {
     ],
     visualizations: [
       {
-        id: 'VectorComponentDecomposer',
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
         title: 'From arrow to components — and back',
-        mathBridge:
-          `Drag the vector. Watch $A_x$, $A_y$, $|\\vec{A}|$, and $\\theta$ update. Toggle "show trig" to see the right triangle that produces the components.`,
-        caption: 'Every vector hides a right triangle. Components are just the legs of that triangle.',
-        props: { showTrigOverlay: true, showUnitVectors: true },
+        caption: `Every vector hides a right triangle. $A_x = |\\vec{A}|\\cos\\theta$ is the horizontal leg; $A_y = |\\vec{A}|\\sin\\theta$ is the vertical leg. The hypotenuse is $|\\vec{A}|$. SOH-CAH-TOA converts between forms in both directions.`,
       },
     ],
   },
@@ -197,7 +192,6 @@ export default {
           `In Linear Algebra you'll generalise: a vector can live in $\\mathbb{R}^n$ for any $n$. A 3D force vector has components $(F_x, F_y, F_z)$. The rules you learn here — addition, scalar multiplication, dot product — all extend directly to $n$ dimensions without any new ideas.`,
       },
     ],
-    visualizationId: 'VectorEqualityProof',
     proofSteps: [
       {
         title: 'Define both vectors',
@@ -233,11 +227,10 @@ export default {
     title: 'Proof: vector equality is component-by-component',
     visualizations: [
       {
-        id: 'VectorEqualityProof',
-        title: 'Step through the equality proof',
-        mathBridge:
-          `Watch the geometric picture update as each algebraic step is applied. Step 4 highlights why linear independence of $\\hat{\\imath}$, $\\hat{\\jmath}$ forces each coefficient to zero.`,
-        caption: 'Geometry and algebra tell the same story — one step at a time.',
+        id: 'SVGDiagram',
+        props: { type: 'vector-components' },
+        title: 'Vector equality: component-by-component',
+        caption: `$\\vec{A} = \\vec{B}$ if and only if $A_x = B_x$ AND $A_y = B_y$. Two vectors can look different on the page but be equal — the free vector rule. Position does not matter; only magnitude and direction do.`,
       },
     ],
   },
@@ -812,6 +805,86 @@ export default {
       ],
     },
   },
+
+  // ── Quiz ─────────────────────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'p1-ch1-001-q1',
+      question: `Which of the following is a VECTOR quantity?`,
+      options: [`Temperature (°C)`, `Mass (kg)`, `Velocity (m/s)`, `Energy (J)`],
+      answer: 2,
+      explanation: `Velocity has both magnitude (speed) and direction. Temperature, mass, and energy are scalars — described by a single number with a unit.`,
+    },
+    {
+      id: 'p1-ch1-001-q2',
+      question: `What is the magnitude of $\\vec{A} = (3, 4)$ m?`,
+      options: [`$3$ m`, `$4$ m`, `$7$ m`, `$5$ m`],
+      answer: 3,
+      explanation: `$|\\vec{A}| = \\sqrt{3^2 + 4^2} = \\sqrt{9+16} = \\sqrt{25} = 5$ m. The 3-4-5 Pythagorean triple.`,
+    },
+    {
+      id: 'p1-ch1-001-q3',
+      question: `A vector is moved to a different location on the page without changing its length or direction. Which statement is true?`,
+      options: [
+        `The vector has changed`,
+        `The vector is the same (free vector rule)`,
+        `The components change when the position changes`,
+        `Only the direction changes`,
+      ],
+      answer: 1,
+      explanation: `Free vector rule: a vector is defined by its magnitude and direction only — position does not matter. Sliding a vector without rotating or stretching it leaves it unchanged.`,
+    },
+    {
+      id: 'p1-ch1-001-q4',
+      question: `$\\vec{A}$ has magnitude 10 and $\\theta = 30°$ from $+x$. What is $A_x$?`,
+      options: [`$5$`, `$5\\sqrt{3}$`, `$10$`, `$\\sqrt{3}/2$`],
+      answer: 1,
+      explanation: `$A_x = |\\vec{A}|\\cos30° = 10 \\times \\frac{\\sqrt{3}}{2} = 5\\sqrt{3} \\approx 8.66$.`,
+    },
+    {
+      id: 'p1-ch1-001-q5',
+      question: `Which best describes a scalar?`,
+      options: [
+        `A quantity with magnitude and direction`,
+        `A quantity with direction only`,
+        `A quantity with magnitude only, described by a single number`,
+        `A vector of magnitude 1`,
+      ],
+      answer: 2,
+      explanation: `A scalar is fully described by one number and a unit — no direction needed. Examples: mass, temperature, speed, energy.`,
+    },
+    {
+      id: 'p1-ch1-001-q6',
+      question: `A car travels 60 mph north, then 60 mph east. Which statement about the two velocities is correct?`,
+      options: [
+        `They are equal — same speed`,
+        `They are different vectors — same magnitude but different direction`,
+        `They are the same scalar`,
+        `The second velocity is twice the first`,
+      ],
+      answer: 1,
+      explanation: `Same speed (magnitude), different direction → different velocity vectors. This is why speed and velocity are distinct: speed is scalar, velocity is vector.`,
+    },
+    {
+      id: 'p1-ch1-001-q7',
+      question: `$\\vec{A} = (A_x, A_y)$ and $\\vec{B} = (B_x, B_y)$. When is $\\vec{A} = \\vec{B}$?`,
+      options: [
+        `When they have the same starting point`,
+        `When $A_x = B_x$ AND $A_y = B_y$`,
+        `When $|\\vec{A}| = |\\vec{B}|$`,
+        `When they point in the same direction`,
+      ],
+      answer: 1,
+      explanation: `Vector equality requires every component to match. Same magnitude but different direction = different vectors. Same direction but different magnitude = different vectors.`,
+    },
+    {
+      id: 'p1-ch1-001-q8',
+      question: `$\\vec{A} = (5, 0)$. What is the direction $\\theta$ of $\\vec{A}$ from the $+x$-axis?`,
+      options: [`$90°$`, `$45°$`, `$180°$`, `$0°$`],
+      answer: 3,
+      explanation: `$(5, 0)$ points along the positive $x$-axis — $\\theta = 0°$. A zero $y$-component means no "northward" tilt.`,
+    },
+  ],
 
   // ── Recognition/exhaustive-forms viz ────────────────────────────────────
   recognitionViz: {

@@ -12,7 +12,7 @@ export default {
       "How do you solve motion with acceleration changes between intervals?",
     realWorldContext:
       "Vehicles commonly have acceleration, cruise, and braking phases; each phase has different equations but shared state continuity.",
-    previewVisualizationId: "TwoPhaseMotionIntuition",
+    previewVisualizationId: 'SVGDiagram',
   },
   intuition: {
     prose: [
@@ -27,14 +27,14 @@ export default {
         caption: 'Two-phase problems are two separate constant-acceleration intervals. Solve each algebraically with its own SUVAT equations. The only bridge between phases: the final state of phase 1 is the initial state of phase 2.',
       },
       {
-        id: "TwoPhaseMotionIntuition",
+        id: 'SVGDiagram',
         title: "Phase handoff visual",
         mathBridge:
           "Watch phase-1 final conditions auto-feed into phase-2 initial conditions.",
         caption: "State continuity is the glue.",
       },
       {
-        id: "KinematicEquationSelector",
+        id: 'SVGDiagram',
         title: "Solve each phase",
         mathBridge:
           "Compute unknowns phase-by-phase with consistent carried values.",
@@ -53,7 +53,7 @@ export default {
     ],
     visualizations: [
       {
-        id: "KinematicsPatternSpotter",
+        id: 'SVGDiagram',
         title: "Phase-by-phase pattern quiz",
         mathBridge: "Choose the correct equation sequence for each phase.",
         caption: "Order of operations matters.",
@@ -64,7 +64,7 @@ export default {
     prose: [
       "Piecewise integration yields continuous state trajectories when boundary conditions are enforced.",
     ],
-    visualizationId: "TwoPhaseMotionIntuition",
+    visualizationId: 'SVGDiagram',
     proofSteps: [
       {
         expression: "x_1(t),v_1(t)\\text{ on phase 1}",
