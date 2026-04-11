@@ -7,6 +7,8 @@ import lesson2_0 from './lesson2-0.js'
 import lesson2_1 from './lesson2-1.js'
 import lesson2_2 from './lesson2-2.js'
 import lesson3_0 from './lesson3-0.js'
+import lesson3_1 from './lesson3-1.js'
+import lesson3_2 from './lesson3-2.js'
 
 const DF_CH1 = {
   title: 'Signals, Binary & Data',
@@ -32,7 +34,7 @@ const DF_CH3 = {
   slug: 'df-boolean-logic-and-gates',
   description: 'AND, OR, and NOT — the three primitive operations that underpin every digital circuit ever built.',
   course: 'digital-fundamentals',
-  lessons: [lesson3_0],
+  lessons: [lesson3_0, lesson3_1, lesson3_2],
 }
 
 export default [DF_CH1, DF_CH2, DF_CH3]

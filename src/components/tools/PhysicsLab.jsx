@@ -1,20 +1,17 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
-// ── CSS Styles ─────────────────────────────────────
-const styles = `
-/* ══════════════════════════════════════════
-   PHYSICS LAB STYLES
-   ══════════════════════════════════════════ */
+// ─────────────────────────────────────────────────────────────────
+//  STYLES
+// ─────────────────────────────────────────────────────────────────
+const STYLES = `
 :root {
-  /* Palette — precision instrument / oscilloscope */
   --bg:         #0b0e12;
   --surface:    #111520;
   --surface2:   #161c2a;
   --surface3:   #1c2435;
   --border:     #252e42;
   --border2:    #1e2738;
-
-  --phosphor:   #00e5a0;   /* main green */
+  --phosphor:   #00e5a0;
   --phosphor2:  #00b87a;
   --phosphor-d: rgba(0,229,160,0.08);
   --amber:      #f5a623;
@@ -23,2512 +20,1979 @@ const styles = `
   --blue:       #4da6ff;
   --blue-d:     rgba(77,166,255,0.1);
   --violet:     #a78bfa;
-
   --text:       #d4dde8;
   --text2:      #8a9ab5;
   --text3:      #4a5a72;
   --text-bright:#eef2f8;
-
-  /* Type */
-  --mono:  'JetBrains Mono', 'Fira Code', monospace;
-  --sans:  'Inter', system-ui, sans-serif;
-  --serif: 'Georgia', Cambria, serif;
-
-  /* Layout */
-  --header-h: 48px;
-  --sidebar-w: 220px;
-  --controls-h: 72px;
+  --mono:       'JetBrains Mono','Fira Code',monospace;
+  --sans:       'Inter',system-ui,sans-serif;
+  --serif:      'Georgia',Cambria,serif;
+  --header-h:   48px;
+  --sidebar-w:  240px;
+  --controls-h: 76px;
 }
+#physlab-root *, #physlab-root *::before, #physlab-root *::after { box-sizing: border-box; margin:0; padding:0; }
+#physlab-root { font-family: var(--mono); font-size:13px; line-height:1.5; }
+#physlab-root ::-webkit-scrollbar { width:4px; height:4px; }
+#physlab-root ::-webkit-scrollbar-track { background:var(--surface); }
+#physlab-root ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
 /* Header */
-#physlab-root > header {
-  grid-area: header;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0;
-  z-index: 10;
+#physlab-root .pl-header {
+  display:flex; align-items:center; gap:0;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:0; z-index:10; height:var(--header-h); flex-shrink:0;
 }
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-  height: 100%;
-  border-right: 1px solid var(--border);
-  flex-shrink: 0;
+#physlab-root .pl-logo {
+  display:flex; align-items:center; gap:10px;
+  padding:0 20px; height:100%; border-right:1px solid var(--border); flex-shrink:0;
 }
-.logo-mark {
-  width: 28px; height: 28px;
-  border: 2px solid var(--phosphor);
-  border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 600; color: var(--phosphor);
-  flex-shrink: 0;
+#physlab-root .pl-logo-mark {
+  width:28px; height:28px; border:2px solid var(--phosphor); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:600; color:var(--phosphor);
 }
-.logo-text {
-  font-family: var(--mono);
-  font-size: 13px; font-weight: 600;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--text-bright);
+#physlab-root .pl-logo-text {
+  font-size:13px; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--text-bright);
 }
+#physlab-root .pl-lab-tabs { display:flex; height:100%; flex:1; overflow-x:auto; }
+#physlab-root .pl-lab-tabs::-webkit-scrollbar { height:0; }
+#physlab-root .pl-lab-tab {
+  display:flex; align-items:center; gap:6px; padding:0 14px; height:100%;
+  cursor:pointer; font-size:10px; font-weight:500; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text3);
+  border-right:1px solid var(--border2); border-bottom:2px solid transparent;
+  white-space:nowrap; transition:color .15s,border-color .15s,background .15s;
+  user-select:none; border:none; background:transparent;
+}
+#physlab-root .pl-lab-tab:hover { color:var(--text); background:var(--surface2); }
+#physlab-root .pl-lab-tab.active {
+  color:var(--phosphor); border-bottom:2px solid var(--phosphor);
+  background:var(--phosphor-d);
+}
+#physlab-root .pl-tab-dot { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.4; }
+#physlab-root .pl-lab-tab.active .pl-tab-dot { opacity:1; }
+#physlab-root .pl-tab-cat {
+  font-size:9px; opacity:.5; margin-left:2px; font-weight:400;
+}
+#physlab-root .pl-header-actions {
+  display:flex; align-items:center; gap:8px; padding:0 16px;
+  height:100%; border-left:1px solid var(--border); flex-shrink:0;
+}
+#physlab-root .pl-hbtn {
+  font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase;
+  padding:6px 14px; border-radius:3px; border:1px solid var(--border);
+  background:transparent; color:var(--text2); cursor:pointer; transition:all .14s;
+  white-space:nowrap;
+}
+#physlab-root .pl-hbtn:hover { border-color:var(--text2); color:var(--text); }
+#physlab-root .pl-hbtn.run { border-color:var(--phosphor); color:var(--phosphor); }
+#physlab-root .pl-hbtn.run:hover, #physlab-root .pl-hbtn.run.active {
+  background:var(--phosphor); color:var(--bg);
+}
+#physlab-root .pl-hbtn.stop { border-color:var(--red); color:var(--red); }
+#physlab-root .pl-hbtn.stop:hover { background:var(--red); color:#fff; }
 
-/* Lab tabs in header */
-.lab-tabs {
-  display: flex;
-  height: 100%;
-  flex: 1;
-  overflow-x: auto;
-}
-.lab-tabs::-webkit-scrollbar { height: 0; }
-
-.lab-tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 18px;
-  height: 100%;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--text3);
-  border-right: 1px solid var(--border2);
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  transition: color .15s, border-color .15s, background .15s;
-  user-select: none;
-}
-.lab-tab:hover { color: var(--text); background: var(--surface2); }
-.lab-tab.active {
-  color: var(--phosphor);
-  border-bottom-color: var(--phosphor);
-  background: var(--phosphor-d);
-}
-.lab-tab .tab-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: .5;
-}
-.lab-tab.active .tab-dot { opacity: 1; }
-
-/* Header right actions */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-  height: 100%;
-  border-left: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.hbtn {
-  font-family: var(--mono);
-  font-size: 11px; font-weight: 500;
-  letter-spacing: .08em; text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all .14s;
-  white-space: nowrap;
-}
-.hbtn:hover { border-color: var(--text2); color: var(--text); }
-.hbtn.run { border-color: var(--phosphor); color: var(--phosphor); }
-.hbtn.run:hover, .hbtn.run.active { background: var(--phosphor); color: var(--bg); }
-.hbtn.stop { border-color: var(--red); color: var(--red); }
+/* Body */
+#physlab-root .pl-body { display:flex; flex:1; overflow:hidden; min-height:0; }
 
 /* Sidebar */
-#sidebar {
-  grid-area: sidebar;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  overflow: hidden;
+#physlab-root .pl-sidebar {
+  width:var(--sidebar-w); flex-shrink:0;
+  display:flex; flex-direction:column;
+  background:var(--surface); border-right:1px solid var(--border); overflow:hidden;
 }
+#physlab-root .pl-sb-section { padding:12px 14px 10px; border-bottom:1px solid var(--border2); }
+#physlab-root .pl-sb-label {
+  font-size:9px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--text3); margin-bottom:5px;
+}
+#physlab-root .pl-lab-name { font-size:12px; font-weight:600; color:var(--text-bright); margin-bottom:3px; }
+#physlab-root .pl-lab-obj { font-size:11px; color:var(--text2); line-height:1.45; }
+#physlab-root .pl-proc-scroll { flex:1; overflow-y:auto; padding:6px 0; }
+#physlab-root .pl-step {
+  display:flex; gap:9px; align-items:flex-start; padding:7px 12px;
+  cursor:pointer; transition:background .12s; border-left:2px solid transparent;
+}
+#physlab-root .pl-step:hover { background:var(--surface2); }
+#physlab-root .pl-step.active { background:rgba(0,229,160,0.06); border-left-color:var(--phosphor); }
+#physlab-root .pl-step.done .pl-step-n {
+  background:var(--phosphor2); color:var(--bg); border-color:var(--phosphor2);
+}
+#physlab-root .pl-step-n {
+  width:19px; height:19px; flex-shrink:0; border-radius:50%;
+  border:1px solid var(--border); display:flex; align-items:center;
+  justify-content:center; font-size:10px; color:var(--text3); margin-top:1px;
+}
+#physlab-root .pl-step-title { font-size:11px; font-weight:500; color:var(--text); margin-bottom:1px; }
+#physlab-root .pl-step-desc { font-size:10px; color:var(--text3); line-height:1.4; }
 
-.sidebar-section {
-  padding: 14px 16px 10px;
-  border-bottom: 1px solid var(--border2);
+/* Guided question callout */
+#physlab-root .pl-question {
+  margin:6px 12px; padding:8px 10px;
+  background:rgba(167,139,250,0.07); border:1px solid rgba(167,139,250,0.2);
+  border-radius:4px; font-size:10px; color:var(--violet); line-height:1.5;
 }
-.sidebar-label {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 6px;
-}
-.lab-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-bright);
-  margin-bottom: 2px;
-}
-.lab-objective {
-  font-size: 11px;
-  color: var(--text2);
-  line-height: 1.5;
-}
+#physlab-root .pl-question::before { content:"? "; font-weight:700; }
 
-/* Procedure steps */
-.proc-scroll { flex: 1; overflow-y: auto; padding: 8px 0; }
-.proc-step {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: background .12s;
-  border-left: 2px solid transparent;
+#physlab-root .pl-sb-status {
+  padding:9px 13px; border-top:1px solid var(--border2);
+  font-size:10px; color:var(--text3);
 }
-.proc-step:hover { background: var(--surface2); }
-.proc-step.active {
-  background: rgba(0,229,160,0.06);
-  border-left-color: var(--phosphor);
-}
-.proc-step.done .step-n { background: var(--phosphor2); color: var(--bg); border-color: var(--phosphor2); }
-.step-n {
-  width: 20px; height: 20px; flex-shrink: 0;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; color: var(--text3);
-  margin-top: 1px;
-}
-.step-body { flex: 1; }
-.step-title { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 1px; }
-.step-desc  { font-size: 10px; color: var(--text3); line-height: 1.4; }
+#physlab-root .pl-status-row { display:flex; justify-content:space-between; margin-bottom:3px; }
+#physlab-root .pl-status-val { color:var(--phosphor); font-weight:500; }
 
-/* Sidebar bottom status */
-.sidebar-status {
-  padding: 10px 14px;
-  border-top: 1px solid var(--border2);
-  font-size: 10px;
-  color: var(--text3);
-}
-.status-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
-.status-val { color: var(--phosphor); font-weight: 500; }
-
-/* Main area */
-#main {
-  grid-area: main;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--bg);
-}
+/* Main */
+#physlab-root .pl-main { display:flex; flex-direction:column; flex:1; overflow:hidden; background:var(--bg); }
 
 /* Panel tabs */
-.panel-tabs {
-  display: flex;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 16px;
-  flex-shrink: 0;
+#physlab-root .pl-panel-tabs {
+  display:flex; background:var(--surface);
+  border-bottom:1px solid var(--border); padding:0 16px; flex-shrink:0;
 }
-.ptab {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: 10px 14px;
-  cursor: pointer;
-  color: var(--text3);
-  border-bottom: 2px solid transparent;
-  transition: all .14s;
-  user-select: none;
+#physlab-root .pl-ptab {
+  font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase;
+  padding:10px 14px; cursor:pointer; color:var(--text3);
+  border-bottom:2px solid transparent; transition:all .14s;
+  user-select:none; border:none; background:transparent; border-bottom:2px solid transparent;
 }
-.ptab:hover { color: var(--text); }
-.ptab.active { color: var(--amber); border-bottom-color: var(--amber); }
+#physlab-root .pl-ptab:hover { color:var(--text); }
+#physlab-root .pl-ptab.active { color:var(--amber); border-bottom:2px solid var(--amber); }
 
-/* Panel container */
-.panels { flex: 1; overflow: hidden; position: relative; }
+/* Panels */
+#physlab-root .pl-panels { flex:1; overflow:hidden; position:relative; }
+#physlab-root .pl-panel { position:absolute; inset:0; overflow-y:auto; display:none; }
+#physlab-root .pl-panel.active { display:block; }
 
-/* Each panel */
-.panel {
-  position: absolute;
-  inset: 0;
-  overflow-y: auto;
-  display: none;
+/* Theory */
+#physlab-root .pl-theory-wrap { padding:24px 28px 36px; }
+#physlab-root .pl-theory-block { max-width:740px; margin:0 auto; }
+#physlab-root .pl-theory-h1 {
+  font-family:var(--serif); font-size:21px; font-weight:600;
+  color:var(--text-bright); margin-bottom:5px; letter-spacing:-.01em;
 }
-.panel.active { display: block; }
+#physlab-root .pl-theory-sub {
+  font-size:10px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase;
+  margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);
+}
+#physlab-root .pl-theory-section { margin-bottom:28px; }
+#physlab-root .pl-theory-h2 {
+  font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:10px;
+}
+#physlab-root .pl-theory-p {
+  font-family:var(--sans); font-size:14px; color:var(--text2);
+  line-height:1.8; margin-bottom:10px;
+}
+#physlab-root .pl-theory-p em { color:var(--text); font-style:italic; }
+#physlab-root .pl-theory-p strong { color:var(--text-bright); font-weight:500; }
 
-/* Theory panel */
-#panel-theory { padding: 28px 32px 40px; }
+#physlab-root .pl-eq {
+  background:var(--surface2); border:1px solid var(--border);
+  border-left:3px solid var(--amber); border-radius:0 4px 4px 0;
+  padding:12px 16px; margin:14px 0;
+}
+#physlab-root .pl-eq-tag {
+  font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text3); margin-bottom:7px;
+}
+#physlab-root .pl-eq-formula {
+  font-size:17px; font-weight:500; color:var(--text-bright);
+  letter-spacing:.04em; margin-bottom:8px;
+}
+#physlab-root .pl-eq-vars { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+#physlab-root .pl-eq-var {
+  font-size:11px; padding:3px 8px; background:var(--surface3);
+  border:1px solid var(--border); border-radius:3px; color:var(--text2);
+}
+#physlab-root .pl-eq-var b { color:var(--phosphor); }
 
-.theory-block { max-width: 760px; margin: 0 auto; }
+#physlab-root .pl-live {
+  background:var(--surface3); border:1px solid var(--border);
+  border-radius:4px; padding:12px 14px; margin:12px 0;
+  display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+}
+#physlab-root .pl-live-label {
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text3); width:100%; margin-bottom:-6px;
+}
+#physlab-root .pl-live-ctl { display:flex; align-items:center; gap:7px; }
+#physlab-root .pl-live-ctl span { font-size:11px; color:var(--text2); white-space:nowrap; }
+#physlab-root .pl-live-ctl input[type=range] { width:80px; accent-color:var(--phosphor); cursor:pointer; }
+#physlab-root .pl-live-ctl .pv { color:var(--phosphor); font-weight:500; min-width:50px; }
+#physlab-root .pl-live-result {
+  font-size:14px; font-weight:500; color:var(--amber);
+  padding:5px 12px; background:var(--amber-d);
+  border:1px solid rgba(245,166,35,.2); border-radius:3px; white-space:nowrap;
+}
+#physlab-root .pl-live-worked {
+  font-size:11px; color:var(--text2); padding:7px 10px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:3px; margin-top:6px; width:100%;
+}
+#physlab-root .pl-hl { color:var(--amber); }
 
-.theory-h1 {
-  font-family: var(--serif);
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text-bright);
-  margin-bottom: 6px;
-  letter-spacing: -.01em;
+#physlab-root .pl-insight {
+  background:rgba(0,229,160,0.05); border:1px solid rgba(0,229,160,0.2);
+  border-radius:4px; padding:11px 13px; margin:12px 0;
+  font-family:var(--sans); font-size:13px; color:var(--text2); line-height:1.7;
 }
-.theory-sub {
-  font-size: 11px;
-  color: var(--text3);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+#physlab-root .pl-insight-head {
+  font-size:9px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--phosphor); margin-bottom:4px; font-family:var(--mono);
 }
-
-.theory-section { margin-bottom: 32px; }
-.theory-h2 {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--amber);
-  margin-bottom: 12px;
+#physlab-root .pl-hypothesis {
+  background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.2);
+  border-radius:4px; padding:11px 13px; margin:12px 0;
+  font-family:var(--sans); font-size:13px; color:var(--violet); line-height:1.7;
 }
-.theory-p {
-  font-family: var(--sans);
-  font-size: 14px;
-  color: var(--text2);
-  line-height: 1.8;
-  margin-bottom: 12px;
-}
-.theory-p em { color: var(--text); font-style: italic; }
-.theory-p strong { color: var(--text-bright); font-weight: 500; }
-
-/* Equation block */
-.eq-block {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--amber);
-  border-radius: 0 4px 4px 0;
-  padding: 14px 18px;
-  margin: 16px 0;
-}
-.eq-tag {
-  font-size: 9px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 8px;
-}
-.eq-formula {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--text-bright);
-  letter-spacing: .04em;
-  margin-bottom: 10px;
-  font-family: var(--mono);
-}
-.eq-vars {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-.eq-var {
-  font-size: 11px;
-  padding: 3px 9px;
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  color: var(--text2);
-}
-.eq-var b { color: var(--phosphor); }
-
-/* Live equation row */
-.eq-live {
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 14px 16px;
-  margin: 14px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
-}
-.eq-live-label {
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text3);
-  width: 100%;
-  margin-bottom: -8px;
-}
-.eq-ctl {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.eq-ctl span { font-size: 11px; color: var(--text2); white-space: nowrap; }
-.eq-ctl input[type=range] {
-  width: 80px;
-  accent-color: var(--phosphor);
-  cursor: pointer;
-}
-.eq-ctl .val { color: var(--phosphor); font-weight: 500; min-width: 48px; }
-.eq-result {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--amber);
-  padding: 6px 14px;
-  background: rgba(245,166,35,0.1);
-  border: 1px solid rgba(245,166,35,0.2);
-  border-radius: 3px;
-  white-space: nowrap;
-}
-.eq-worked {
-  font-size: 12px;
-  color: var(--text2);
-  padding: 8px 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  margin-top: 8px;
-  width: 100%;
-  font-family: var(--mono);
-}
-.eq-worked .hl { color: var(--amber); }
-
-/* Insight */
-.insight {
-  background: rgba(0,229,160,0.05);
-  border: 1px solid rgba(0,229,160,0.2);
-  border-radius: 4px;
-  padding: 12px 14px;
-  margin: 14px 0;
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.7;
-}
-.insight-head {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--phosphor);
-  margin-bottom: 5px;
-  font-family: var(--mono);
+#physlab-root .pl-hypothesis-head {
+  font-size:9px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--violet); margin-bottom:4px; font-family:var(--mono);
 }
 
-/* Apparatus panel */
-#panel-apparatus {
-  display: none;
-  flex-direction: column;
-  padding: 0;
+/* Apparatus */
+#physlab-root .pl-apparatus { display:flex; flex-direction:column; height:100%; }
+#physlab-root .pl-canvas-wrap { flex:1; position:relative; overflow:hidden; min-height:0; }
+#physlab-root .pl-canvas-wrap canvas { position:absolute; inset:0; display:block; }
+#physlab-root .pl-controls {
+  flex-shrink:0; display:flex; align-items:center; gap:0;
+  background:var(--surface); border-top:1px solid var(--border);
+  height:var(--controls-h); overflow-x:auto; padding:0 14px;
 }
-#panel-apparatus.active { display: flex; }
+#physlab-root .pl-controls::-webkit-scrollbar { height:0; }
+#physlab-root .pl-ctrl-group {
+  display:flex; align-items:center; gap:7px; padding:0 14px;
+  border-right:1px solid var(--border2); height:100%; flex-shrink:0;
+}
+#physlab-root .pl-ctrl-group:last-child { border-right:none; }
+#physlab-root .pl-ctrl-label {
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text3); white-space:nowrap;
+}
+#physlab-root .pl-ctrl-val {
+  font-size:12px; font-weight:500; color:var(--phosphor);
+  min-width:46px; text-align:right; white-space:nowrap;
+}
+#physlab-root .pl-ctrl-group input[type=range] {
+  appearance:none; width:88px; height:3px;
+  background:var(--border); border-radius:2px; outline:none; cursor:pointer;
+}
+#physlab-root .pl-ctrl-group input[type=range]::-webkit-slider-thumb {
+  appearance:none; width:12px; height:12px;
+  border-radius:50%; background:var(--phosphor); cursor:pointer;
+}
+#physlab-root .pl-rec-btn {
+  font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  padding:6px 13px; border-radius:3px; border:1px solid var(--blue);
+  background:var(--blue-d); color:var(--blue); cursor:pointer;
+  transition:all .13s; white-space:nowrap; flex-shrink:0;
+}
+#physlab-root .pl-rec-btn:hover { background:var(--blue); color:var(--bg); }
 
-.apparatus-canvas-wrap {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
+/* Data */
+#physlab-root .pl-data-wrap { padding:22px 26px; }
+#physlab-root .pl-data-header {
+  display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px;
 }
-.apparatus-canvas-wrap canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+#physlab-root .pl-panel-title { font-size:14px; font-weight:600; color:var(--text-bright); }
+#physlab-root .pl-panel-sub {
+  font-size:10px; color:var(--text3); letter-spacing:.08em;
+  text-transform:uppercase; margin-top:2px;
+}
+#physlab-root .pl-data-actions { display:flex; gap:7px; }
+#physlab-root .pl-dbtn {
+  font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  padding:5px 11px; border-radius:3px; border:1px solid var(--border);
+  background:transparent; color:var(--text2); cursor:pointer; transition:all .13s;
+}
+#physlab-root .pl-dbtn:hover { border-color:var(--text2); color:var(--text); }
+#physlab-root .pl-dbtn.danger:hover { border-color:var(--red); color:var(--red); }
+#physlab-root .pl-tbl-wrap { overflow-x:auto; margin-bottom:14px; }
+#physlab-root .pl-tbl { width:100%; border-collapse:collapse; font-size:12px; }
+#physlab-root .pl-tbl thead tr { background:var(--surface2); border-bottom:1px solid var(--border); }
+#physlab-root .pl-tbl th {
+  padding:7px 12px; text-align:left; font-size:10px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--text3); white-space:nowrap;
+}
+#physlab-root .pl-tbl td {
+  padding:7px 12px; border-bottom:1px solid var(--border2); color:var(--text2);
+}
+#physlab-root .pl-tbl tr:hover td { background:var(--surface2); }
+#physlab-root .pl-tbl td.cm { color:var(--blue); }
+#physlab-root .pl-tbl td.cd { color:var(--amber); }
+#physlab-root .pl-tbl td.ci { color:var(--text3); }
+#physlab-root .pl-data-note {
+  font-size:11px; color:var(--text3); padding:9px 12px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:4px;
 }
 
-.apparatus-controls {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  height: var(--controls-h);
-  overflow-x: auto;
-  padding: 0 16px;
+/* Analysis */
+#physlab-root .pl-analysis-wrap { padding:22px 26px; }
+#physlab-root .pl-analysis-layout {
+  display:grid; grid-template-columns:1fr 300px; gap:18px; max-width:1060px;
 }
-.apparatus-controls::-webkit-scrollbar { height: 0; }
-
-.ctrl-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-  border-right: 1px solid var(--border2);
-  height: 100%;
-  flex-shrink: 0;
+#physlab-root .pl-plot-outer {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:4px; overflow:hidden; aspect-ratio:4/3; position:relative;
 }
-.ctrl-group:last-child { border-right: none; }
-.ctrl-label {
-  font-size: 10px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text3);
-  white-space: nowrap;
+#physlab-root .pl-plot-outer canvas { width:100%; height:100%; display:block; }
+#physlab-root .pl-analysis-right { display:flex; flex-direction:column; gap:12px; }
+#physlab-root .pl-result-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:4px; padding:13px 15px;
 }
-.ctrl-val {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--phosphor);
-  min-width: 44px;
-  text-align: right;
-  white-space: nowrap;
+#physlab-root .pl-result-title {
+  font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text3); margin-bottom:9px;
 }
-#physlab-root input[type=range] {
-  appearance: none;
-  width: 90px;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
+#physlab-root .pl-result-row {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:4px 0; border-bottom:1px solid var(--border2); font-size:12px;
 }
-#physlab-root input[type=range]::-webkit-slider-thumb {
-  appearance: none;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--phosphor);
-  cursor: pointer;
+#physlab-root .pl-result-row:last-child { border-bottom:none; }
+#physlab-root .pl-rk { color:var(--text2); }
+#physlab-root .pl-rv { color:var(--phosphor); font-weight:500; }
+#physlab-root .pl-rv.theory { color:var(--amber); }
+#physlab-root .pl-rv.good { color:var(--phosphor); }
+#physlab-root .pl-rv.warn { color:var(--red); }
+#physlab-root .pl-analysis-insight {
+  background:rgba(0,229,160,0.04); border:1px solid rgba(0,229,160,0.15);
+  border-radius:4px; padding:11px 13px;
+  font-family:var(--sans); font-size:12px; color:var(--text2); line-height:1.7;
 }
-.ctrl-record-btn {
-  font-family: var(--mono);
-  font-size: 10px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 3px;
-  border: 1px solid var(--blue);
-  background: var(--blue-d);
-  color: var(--blue);
-  cursor: pointer;
-  transition: all .13s;
-  white-space: nowrap;
-  flex-shrink: 0;
+#physlab-root .pl-analysis-insight strong { color:var(--phosphor); }
+#physlab-root .pl-plot-btn {
+  font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  padding:8px 16px; border-radius:3px; border:1px solid var(--phosphor);
+  background:var(--phosphor-d); color:var(--phosphor); cursor:pointer;
+  transition:all .13s; width:auto;
 }
-.ctrl-record-btn:hover { background: var(--blue); color: var(--bg); }
-
-/* Data panel */
-#panel-data { padding: 24px 28px; }
-
-.data-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 16px;
-}
-.panel-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-bright);
-  letter-spacing: -.01em;
-}
-.panel-sub {
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-.data-actions { display: flex; gap: 8px; }
-.dbtn {
-  font-family: var(--mono);
-  font-size: 10px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all .13s;
-}
-.dbtn:hover { border-color: var(--text2); color: var(--text); }
-.dbtn.danger:hover { border-color: var(--red); color: var(--red); }
-
-.data-table-wrap { overflow-x: auto; margin-bottom: 16px; }
-.dtable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-.dtable thead tr {
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-}
-.dtable th {
-  padding: 8px 14px;
-  text-align: left;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--text3);
-  white-space: nowrap;
-}
-.dtable td {
-  padding: 7px 14px;
-  border-bottom: 1px solid var(--border2);
-  color: var(--text2);
-  font-family: var(--mono);
-}
-.dtable tr:hover td { background: var(--surface2); }
-.dtable td.c-measured { color: var(--blue); }
-.dtable td.c-derived  { color: var(--amber); }
-.dtable td.c-index    { color: var(--text3); }
-
-.data-note {
-  font-size: 11px;
-  color: var(--text3);
-  padding: 10px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  line-height: 1.6;
-}
-.data-note .c-measured { color: var(--blue); }
-.data-note .c-derived  { color: var(--amber); }
-
-/* Analysis panel */
-#panel-analysis { padding: 24px 28px; }
-
-.analysis-layout {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 20px;
-  max-width: 1100px;
-}
-@media (max-width: 900px) { .analysis-layout { grid-template-columns: 1fr; } }
-
-.plot-wrap {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  aspect-ratio: 4/3;
-  position: relative;
-}
-.plot-wrap canvas { width: 100%; height: 100%; display: block; }
-
-.analysis-right { display: flex; flex-direction: column; gap: 14px; }
-
-.result-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 14px 16px;
-}
-.result-card-title {
-  font-size: 9px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 10px;
-}
-.result-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border2);
-  font-size: 12px;
-}
-.result-row:last-child { border-bottom: none; }
-.result-key { color: var(--text2); }
-.result-val { color: var(--phosphor); font-weight: 500; }
-.result-val.theory { color: var(--amber); }
-.result-val.good { color: var(--phosphor); }
-.result-val.warn { color: var(--red); }
-
-.analysis-insight {
-  background: rgba(0,229,160,0.04);
-  border: 1px solid rgba(0,229,160,0.15);
-  border-radius: 4px;
-  padding: 12px 14px;
-  font-family: var(--sans);
-  font-size: 12px;
-  color: var(--text2);
-  line-height: 1.7;
-}
-.analysis-insight strong { color: var(--phosphor); }
-
-.plot-btn {
-  font-family: var(--mono);
-  font-size: 11px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  padding: 8px 18px;
-  border-radius: 3px;
-  border: 1px solid var(--phosphor);
-  background: rgba(0,229,160,0.1);
-  color: var(--phosphor);
-  cursor: pointer;
-  transition: all .13s;
-  width: 100%;
-}
-.plot-btn:hover { background: var(--phosphor); color: var(--bg); }
-
-/* Utility */
-.gap { flex: 1; }
-.tag {
-  display: inline-block;
-  font-size: 9px; font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase;
-  padding: 2px 7px; border-radius: 2px;
-  background: var(--surface3); color: var(--text3);
-  margin-right: 4px; margin-bottom: 4px;
-  border: 1px solid var(--border);
-}
+#physlab-root .pl-plot-btn:hover { background:var(--phosphor); color:var(--bg); }
 `;
 
-// ── Lab Data ─────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+//  CANVAS DRAW HELPERS
+// ─────────────────────────────────────────────────────────────────
+function drawGrid(ctx, W, H) {
+  ctx.strokeStyle = "rgba(0,229,160,0.04)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+}
+
+function drawDRO(ctx, W, rows) {
+  const rowH = 20, pad = 14, boxW = 186, boxH = 14 + rows.length * rowH;
+  ctx.fillStyle = "rgba(11,14,18,0.88)";
+  ctx.fillRect(W - boxW - 4, 10, boxW, boxH);
+  rows.forEach(([k, v], i) => {
+    ctx.font = "11px 'JetBrains Mono',monospace";
+    ctx.fillStyle = "#4a5a72"; ctx.textAlign = "left";
+    ctx.fillText(k, W - boxW + pad - 4, 26 + i * rowH);
+    ctx.fillStyle = "#00e5a0"; ctx.textAlign = "right";
+    ctx.fillText(v, W - 12, 26 + i * rowH);
+  });
+  ctx.textAlign = "left";
+}
+
+function arrowHead(ctx, x1, y1, x2, y2, color, size = 11) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - size * Math.cos(a - 0.4), y2 - size * Math.sin(a - 0.4));
+  ctx.lineTo(x2 - size * Math.cos(a + 0.4), y2 - size * Math.sin(a + 0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  LAB DEFINITIONS
+//  Each lab is a self-contained object — add new labs here only.
+// ─────────────────────────────────────────────────────────────────
 const LABS = [
+
+  // ══ 1. FREE FALL ══════════════════════════════════════════════
   {
-    id: "pendulum",
-    name: "Simple Pendulum",
-    subtitle: "Measuring g via Period Analysis",
-    objective:
-      "Measure T for varying L. Plot T² vs L to extract g from the slope.",
-    category: "Mechanics",
+    id: "freefall", name: "Free Fall", category: "Mechanics",
+    subtitle: "Measuring g from Distance–Time Data",
+    objective: "Drop an object from various heights. Plot d vs t². Slope = g/2. Extract g.",
     steps: [
-      {
-        title: "Read theory",
-        desc: "Understand SHM and the period equation T = 2π√(L/g).",
-      },
-      {
-        title: "Set length",
-        desc: "Use the L slider in Apparatus to set the string length.",
-      },
-      {
-        title: "Measure period",
-        desc: "Run the simulation. Record T. The DRO shows the live value.",
-      },
-      {
-        title: "Vary length",
-        desc: "Change L across the full range. Record ≥6 data points.",
-      },
-      {
-        title: "Plot T² vs L",
-        desc: "Go to Analysis → Plot & Fit. Slope = 4π²/g.",
-      },
-      {
-        title: "Extract g",
-        desc: "Calculate g = 4π²/slope. Find % error vs 9.81 m/s².",
-      },
+      { title: "Read theory", desc: "Understand d = ½gt². See why plotting d vs t² gives a straight line.",
+        question: "If you double the drop height, how much longer does it take to fall? (Hint: solve for t)" },
+      { title: "Set height", desc: "Use the h slider to set drop height (0.2–3.0 m).",
+        question: "Before recording: predict the fall time using t = √(2h/g) with g ≈ 9.81 m/s²." },
+      { title: "Drop and record", desc: "Click Record to capture (h, t) with realistic timing noise.",
+        question: "Why does a real stopwatch give slightly different times each trial?" },
+      { title: "Vary height", desc: "Record 8–10 heights spread across the full range.",
+        question: "What pattern do you notice in the t² column as h increases?" },
+      { title: "Plot d vs t²", desc: "Analysis tab → Plot & Fit. The slope should equal g/2.",
+        question: "Why do we plot d vs t² and not d vs t?" },
+      { title: "Extract g", desc: "g = 2 × slope. Compare to 9.810 m/s². Calculate % error.",
+        question: "What sources of error are present? Would air resistance matter for a steel ball?" },
     ],
-    theory: () => `
-<div class="theory-block">
-  <div class="theory-h1">The Simple Pendulum</div>
-  <div class="theory-sub">Mechanics · Simple Harmonic Motion · Dimensional Analysis</div>
-
-  <div class="theory-section">
-    <div class="theory-h2">Background</div>
-    <p class="theory-p">A simple pendulum is a mass <em>m</em> on a string of length <em>L</em>, free to swing about a pivot. For small angles (θ &lt; 15°), the restoring force is approximately proportional to displacement — the defining condition of <em>Simple Harmonic Motion</em> (SHM).</p>
-    <p class="theory-p">Applying Newton's second law along the arc gives the equation of motion. The key result is that the <strong>period depends only on L and g</strong> — not on mass or amplitude.</p>
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Free Fall & Kinematics</div>
+  <div class="pl-theory-sub">Mechanics · Kinematics · Gravitational Acceleration</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Background</div>
+    <p class="pl-theory-p">Galileo (1589) showed that all objects fall with the same acceleration regardless of mass — a revolutionary result that contradicted 2,000 years of Aristotelian physics. He reportedly dropped cannonballs from the Leaning Tower of Pisa to demonstrate this.</p>
+    <p class="pl-theory-p">In free fall (no air resistance), an object released from rest accelerates uniformly downward at g ≈ 9.81 m/s². This is a <em>kinematic</em> problem: we know the acceleration and want to relate distance and time.</p>
   </div>
-
-  <div class="theory-section">
-    <div class="theory-h2">Derivation</div>
-    <p class="theory-p">The tangential restoring acceleration is a = −g sinθ ≈ −gθ (small angle). In terms of arc length s = Lθ:</p>
-    <div class="eq-block">
-      <div class="eq-tag">Equation of motion</div>
-      <div class="eq-formula">d²θ/dt² = −(g/L) · θ</div>
-      <div class="eq-vars">
-        <span class="eq-var"><b>θ</b> angular displacement</span>
-        <span class="eq-var"><b>g</b> 9.81 m/s²</span>
-        <span class="eq-var"><b>L</b> string length (m)</span>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Derivation</div>
+    <p class="pl-theory-p">Starting from Newton's second law with constant acceleration a = g (downward):</p>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Kinematic equation (v₀ = 0, starts from rest)</div>
+      <div class="pl-eq-formula">d = ½ g t²</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>d</b> distance fallen (m)</span>
+        <span class="pl-eq-var"><b>g</b> gravitational acceleration (m/s²)</span>
+        <span class="pl-eq-var"><b>t</b> fall time (s)</span>
       </div>
     </div>
-    <p class="theory-p">This ODE has solution θ(t) = θ₀·cos(ωt + φ), with angular frequency ω = √(g/L). The period T = 2π/ω:</p>
-    <div class="eq-block">
-      <div class="eq-tag">Period — the key result</div>
-      <div class="eq-formula">T = 2π √(L/g)</div>
+    <p class="pl-theory-p">This is <em>not</em> linear in t. But if we substitute u = t²:</p>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Linearized — the key to our experiment</div>
+      <div class="pl-eq-formula">d = (g/2) · t² &nbsp;→&nbsp; slope of d vs t² = g/2</div>
     </div>
-    <p class="theory-p">Squaring: T² = (4π²/g)·L. This is linear in L. The slope m = 4π²/g, so g = 4π²/m.</p>
+    <p class="pl-theory-p">A plot of d (y-axis) against t² (x-axis) is a straight line through the origin. The slope equals g/2, so g = 2 × slope. This is how we extract g from the experiment.</p>
   </div>
-
-  <div class="theory-section">
-    <div class="theory-h2">Live Calculator</div>
-    <div class="eq-live" id="pend-live">
-      <div class="eq-live-label">Adjust parameters to see the period update</div>
-      <div class="eq-ctl">
-        <span>L =</span>
-        <input type="range" min="0.1" max="2" step="0.01" value="1" oninput="LIVE.pendulum()" id="pLive-L">
-        <span class="val" id="pLive-Lv">1.00 m</span>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Predict the fall time for any height</div>
+      <div class="pl-live-ctl">
+        <span>h =</span>
+        <input type="range" min="0.1" max="5" step="0.05" value="1" oninput="PLLIVE.freefall()" id="ffL-h">
+        <span class="pv" id="ffL-hv">1.00 m</span>
       </div>
-      <div class="eq-ctl">
-        <span>g =</span>
-        <input type="range" min="1.62" max="24.8" step="0.01" value="9.81" oninput="LIVE.pendulum()" id="pLive-g">
-        <span class="val" id="pLive-gv">9.81 m/s²</span>
-      </div>
-      <div class="eq-result">T = <span id="pLive-T">2.006 s</span></div>
-      <div class="eq-worked" id="pLive-w">T = 2π √(1.00 / 9.81) = 2.006 s</div>
+      <div class="pl-live-result">t = <span id="ffL-t">0.452 s</span></div>
+      <div class="pl-live-worked" id="ffL-w">t = √(2×1.00/9.81) = 0.452 s · v_impact = g·t = 4.43 m/s</div>
     </div>
-    <p class="theory-p" style="font-size:12px;color:var(--text3)">Notice: doubling L increases T by √2 ≈ 1.41, not 2. The ½ power of L is why T is insensitive to large changes in length.</p>
+    <p class="pl-theory-p" style="font-size:12px;color:var(--text3)">Notice: quadrupling the height only doubles the time (square root relationship). A 4 m drop takes only twice as long as a 1 m drop.</p>
   </div>
-
-  <div class="theory-section">
-    <div class="theory-h2">Key Insights</div>
-    <div class="insight">
-      <div class="insight-head">Independence of mass</div>
-      Mass m appears in both the restoring force (F = mg sinθ) and Newton's second law (F = ma). They cancel exactly. A 1 g pendulum and a 1 kg pendulum of the same length have identical periods — confirmed to extraordinary precision.
-    </div>
-    <div class="insight">
-      <div class="insight-head">Why g varies with location</div>
-      Earth is oblate (flattened at the poles). At the poles, you are closer to Earth's center, so g ≈ 9.832 m/s². At the equator, g ≈ 9.780 m/s² — both centrifugal effects and the greater distance reduce g. Pendulum clocks must be recalibrated when moved to different latitudes.
-    </div>
-    <div class="insight">
-      <div class="insight-head">Small-angle limitation</div>
-      For θ₀ = 30°, the true period is about 2% longer than the small-angle formula predicts. For θ₀ = 60°, the error is ~7%. In this lab, keep θ₀ &lt; 15° for accurate results.
-    </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Key Insights</div>
+    <div class="pl-insight"><div class="pl-insight-head">Universality of free fall</div>
+    In vacuum, a feather and a hammer fall identically. On the Moon (no atmosphere), Apollo 15 astronaut David Scott famously demonstrated this in 1971. On Earth, air resistance is negligible for dense, compact objects over short falls.</div>
+    <div class="pl-insight"><div class="pl-insight-head">g varies with location</div>
+    g = 9.832 m/s² at the poles, 9.780 m/s² at the equator. At the top of Everest: 9.764 m/s². The variation is due to Earth's shape (oblate spheroid) and rotation.</div>
+    <div class="pl-hypothesis"><div class="pl-hypothesis-head">Your hypothesis</div>
+    Before running the experiment: write down your prediction for g and your main source of expected error. After, compare to your measurement. This is the scientific method.</div>
   </div>
 </div>`,
-    initState: () => ({ L: 1.0, theta0: 10, phase: 0, t: 0, omega: 0 }),
+    initState: () => ({ h: 1.0, falling: false, ballY: 0, startY: 0, dropH: 1.0, tDrop: 0 }),
     drawApparatus: (ctx, W, H, state, running, dt) => {
-      const g = 9.81;
-      state.omega = Math.sqrt(g / state.L);
-      if (running) state.phase += dt * state.omega;
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      drawGrid(ctx, W, H);
 
-      const theta = ((state.theta0 * Math.PI) / 180) * Math.cos(state.phase);
-      const pivX = W / 2,
-        pivY = H * 0.1;
-      const scale = Math.min(W, H) * 0.55;
-      const Lpx = state.L * scale;
-      const bx = pivX + Lpx * Math.sin(theta);
-      const by = pivY + Lpx * Math.cos(theta);
+      const scale = Math.min(H * 0.75, W * 0.35);
+      const groundY = H - 60, floorX = W * 0.45;
+      const maxH = 3.0;
+      const hPx = (h) => groundY - (h / maxH) * scale;
+      const startY = hPx(state.h);
 
-      // Background
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, W, H);
-      // Grid
-      ctx.strokeStyle = "rgba(0,229,160,0.04)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 40) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
-      }
-      for (let y = 0; y < H; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
+      // Ground platform
+      ctx.fillStyle = "#252e42"; ctx.fillRect(floorX - 40, groundY, 80, 8);
+      ctx.strokeStyle = "#4a5a72"; ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        ctx.beginPath(); ctx.moveTo(floorX - 40 + i * 10, groundY);
+        ctx.lineTo(floorX - 50 + i * 10, groundY + 8); ctx.stroke();
       }
 
-      // Support beam
-      ctx.fillStyle = "#252e42";
-      ctx.fillRect(pivX - 50, pivY - 18, 100, 18);
-      ctx.fillStyle = "#4a5a72";
-      ctx.fillRect(pivX - 3, pivY - 18, 6, 18);
-
-      // Angle arc
-      if (!running) {
-        ctx.beginPath();
-        const a0 = -Math.PI / 2,
-          a1 = a0 + (state.theta0 * Math.PI) / 180;
-        ctx.arc(pivX, pivY, 48, a0, a1);
-        ctx.strokeStyle = "rgba(245,166,35,0.5)";
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        ctx.fillStyle = "#f5a623";
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillText("θ₀=" + state.theta0 + "°", pivX + 52, pivY + 12);
+      // Height ruler
+      const rulerX = floorX + 30;
+      ctx.strokeStyle = "#4a5a72"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(rulerX, groundY); ctx.lineTo(rulerX, hPx(maxH)); ctx.stroke();
+      for (let hh = 0; hh <= maxH; hh += 0.5) {
+        const y = hPx(hh); const tickW = hh % 1 === 0 ? 12 : 6;
+        ctx.beginPath(); ctx.moveTo(rulerX, y); ctx.lineTo(rulerX + tickW, y); ctx.stroke();
+        if (hh % 1 === 0) {
+          ctx.fillStyle = "#4a5a72"; ctx.font = "10px JetBrains Mono,monospace";
+          ctx.fillText(hh.toFixed(0) + "m", rulerX + 15, y + 3);
+        }
       }
 
-      // Vertical reference
-      ctx.beginPath();
-      ctx.moveTo(pivX, pivY);
-      ctx.lineTo(pivX, pivY + Lpx + 30);
-      ctx.strokeStyle = "rgba(255,255,255,0.08)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([5, 5]);
-      ctx.stroke();
+      // Drop height bracket
+      ctx.strokeStyle = "rgba(245,166,35,0.5)"; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(floorX - 20, startY); ctx.lineTo(floorX - 20, groundY); ctx.stroke();
       ctx.setLineDash([]);
+      arrowHead(ctx, floorX - 20, startY + 10, floorX - 20, startY, "#f5a623");
+      arrowHead(ctx, floorX - 20, groundY - 10, floorX - 20, groundY, "#f5a623");
+      ctx.fillStyle = "#f5a623"; ctx.font = "11px JetBrains Mono,monospace"; ctx.textAlign = "right";
+      ctx.fillText("h = " + state.h.toFixed(2) + "m", floorX - 25, (startY + groundY) / 2 + 4);
+      ctx.textAlign = "left";
 
-      // String
-      ctx.beginPath();
-      ctx.moveTo(pivX, pivY);
-      ctx.lineTo(bx, by);
-      ctx.strokeStyle = "#4a5a72";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Length label
-      const mx = (pivX + bx) / 2 + 10,
-        my = (pivY + by) / 2;
-      ctx.fillStyle = "#4a5a72";
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillText("L=" + state.L.toFixed(2) + "m", mx, my);
-
-      // Pivot
-      ctx.beginPath();
-      ctx.arc(pivX, pivY, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#8a9ab5";
-      ctx.fill();
+      // Animate ball
+      let ballY;
+      if (running && state.falling) {
+        state.tDrop = (state.tDrop || 0) + dt;
+        const d = 0.5 * 9.81 * state.tDrop * state.tDrop;
+        if (d >= state.h) { state.falling = false; state.tDrop = Math.sqrt(2 * state.h / 9.81); }
+        ballY = startY + (d / state.h) * (groundY - startY);
+      } else if (running && !state.falling) {
+        state.falling = true; state.tDrop = 0;
+        ballY = startY;
+      } else {
+        ballY = startY;
+      }
 
       // Ball
-      const br = 14;
-      ctx.beginPath();
-      ctx.arc(bx, by, br, 0, Math.PI * 2);
-      const grad = ctx.createRadialGradient(
-        bx - br * 0.35,
-        by - br * 0.35,
-        1,
-        bx,
-        by,
-        br,
-      );
-      grad.addColorStop(0, "#a0c0e0");
-      grad.addColorStop(1, "#253550");
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.strokeStyle = "#4da6ff";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(floorX, ballY, 12, 0, Math.PI * 2);
+      const g2 = ctx.createRadialGradient(floorX - 4, ballY - 4, 1, floorX, ballY, 12);
+      g2.addColorStop(0, "#c0d8f0"); g2.addColorStop(1, "#1a3050");
+      ctx.fillStyle = g2; ctx.fill();
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 1.5; ctx.stroke();
 
-      // DRO readout
-      const T = (2 * Math.PI) / state.omega;
-      const T2 = T * T;
-      const dro = [
-        ["L (m)", state.L.toFixed(4)],
-        ["θ₀ (°)", state.theta0.toFixed(1)],
-        ["T (s)", T.toFixed(4)],
-        ["T² (s²)", T2.toFixed(4)],
-        ["ω (rad/s)", state.omega.toFixed(4)],
-      ];
-      ctx.fillStyle = "rgba(17,21,32,0.85)";
-      ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
-      dro.forEach(([k, v], i) => {
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillStyle = "#4a5a72";
-        ctx.fillText(k, W - 184, 30 + i * 20);
-        ctx.fillStyle = "#00e5a0";
-        ctx.textAlign = "right";
-        ctx.fillText(v, W - 18, 30 + i * 20);
-        ctx.textAlign = "left";
-      });
+      // Velocity vector when falling
+      if (state.falling && state.tDrop > 0) {
+        const v = 9.81 * state.tDrop;
+        const arrLen = Math.min(v * 6, 80);
+        ctx.strokeStyle = "#e05050"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(floorX + 18, ballY); ctx.lineTo(floorX + 18, ballY + arrLen); ctx.stroke();
+        arrowHead(ctx, floorX + 18, ballY, floorX + 18, ballY + arrLen, "#e05050");
+        ctx.fillStyle = "#e05050"; ctx.font = "10px JetBrains Mono,monospace";
+        ctx.fillText("v=" + v.toFixed(2) + "m/s", floorX + 22, ballY + arrLen / 2 + 4);
+      }
+
+      // Gravity arrow
+      ctx.strokeStyle = "rgba(0,229,160,0.4)"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(W * 0.12, H * 0.15); ctx.lineTo(W * 0.12, H * 0.15 + 50); ctx.stroke();
+      arrowHead(ctx, W * 0.12, H * 0.15, W * 0.12, H * 0.15 + 50, "#00e5a0");
+      ctx.fillStyle = "#00e5a0"; ctx.font = "10px JetBrains Mono,monospace";
+      ctx.fillText("g = 9.81 m/s²", W * 0.12 + 8, H * 0.15 + 26);
+
+      const t_theory = Math.sqrt(2 * state.h / 9.81);
+      drawDRO(ctx, W, [
+        ["h (m)",     state.h.toFixed(3)],
+        ["t (s)",     t_theory.toFixed(4)],
+        ["t² (s²)",   (t_theory * t_theory).toFixed(4)],
+        ["v_impact",  (9.81 * t_theory).toFixed(3) + " m/s"],
+        ["KE at hit", (0.5 * 9.81 * t_theory * t_theory * 9.81 / 2).toFixed(3) + " J/kg"],
+      ]);
     },
     controls: () => [
-      {
-        id: "c-L",
-        label: "Length L (m)",
-        min: 0.1,
-        max: 2.0,
-        step: 0.01,
-        init: 1.0,
-        stateKey: "L",
-        fmt: (v) => v.toFixed(2),
-      },
-      {
-        id: "c-A",
-        label: "Angle θ₀ (°)",
-        min: 2,
-        max: 14,
-        step: 1,
-        init: 10,
-        stateKey: "theta0",
-        fmt: (v) => v.toFixed(0),
-      },
+      { id: "ff-h", label: "Drop Height h (m)", min: 0.2, max: 3.0, step: 0.05, init: 1.0, stateKey: "h", fmt: (v) => v.toFixed(2) },
     ],
     recordPoint: (state) => {
-      const g = 9.81;
-      const omega = Math.sqrt(g / state.L);
-      const T = ((2 * Math.PI) / omega) * (1 + (Math.random() - 0.5) * 0.002);
-      const T2 = T * T;
-      const g_exp = (4 * Math.PI ** 2 * state.L) / T2;
-      return [
-        state.L.toFixed(3),
-        T.toFixed(4),
-        T2.toFixed(4),
-        g_exp.toFixed(4),
-      ];
+      const t_true = Math.sqrt(2 * state.h / 9.81);
+      const noise = 1 + (Math.random() - 0.5) * 0.018;
+      const t_meas = t_true * noise;
+      const t2 = t_meas * t_meas;
+      const g_point = 2 * state.h / t2;
+      return [state.h.toFixed(3), t_meas.toFixed(4), t2.toFixed(4), g_point.toFixed(4)];
     },
     dataSchema: {
-      cols: ["#", "L (m)", "T (s)", "T² (s²)", "g_exp (m/s²)"],
+      cols: ["#", "h (m)", "t (s)", "t² (s²)", "g_point (m/s²)"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: {
-      xi: 1,
-      yi: 3,
-      xLabel: "L (m)",
-      yLabel: "T² (s²)",
-      title: "T² vs L",
-    },
+    analyzeSetup: { xi: 1, yi: 3, xLabel: "t² (s²)", yLabel: "d (m)", title: "d vs t² — Free Fall" },
     analysisInsight: (slope, intercept, r2) => {
-      const g_exp = (4 * Math.PI ** 2) / slope;
-      const err = Math.abs(((g_exp - 9.81) / 9.81) * 100);
-      return `<strong>Extracted g = ${g_exp.toFixed(3)} m/s²</strong> — theoretical 9.810 m/s², error ${err.toFixed(2)}%. The slope of T² vs L equals 4π²/g, giving us g from a purely mechanical measurement. R² = ${r2.toFixed(5)} confirms the linear relationship predicted by theory.`;
+      const g_exp = 2 * slope;
+      const err = Math.abs((g_exp - 9.81) / 9.81 * 100);
+      return `<strong>g = 2 × slope = ${g_exp.toFixed(4)} m/s²</strong> — theory: 9.8100 m/s², error: ${err.toFixed(2)}%. The d vs t² plot is linear because d = (g/2)·t² is linear in t². R² = ${r2.toFixed(5)} confirms the parabolic free-fall law.`;
     },
     theoryResult: (slope) => ({
-      label: "g (measured)",
-      value: ((4 * Math.PI ** 2) / slope).toFixed(4),
-      unit: "m/s²",
-      theory: "9.8100",
-      pctError: Math.abs(
-        (((4 * Math.PI ** 2) / slope - 9.81) / 9.81) * 100,
-      ).toFixed(2),
+      label: "g (measured)", value: (2 * slope).toFixed(4),
+      unit: "m/s²", theory: "9.8100",
+      pctError: Math.abs((2 * slope - 9.81) / 9.81 * 100).toFixed(2),
     }),
   },
+
+  // ══ 2. AIR TRACK — INCLINED PLANE ════════════════════════════
   {
-    id: "snell",
-    name: "Snell's Law",
-    subtitle: "Refraction and Refractive Index",
-    objective:
-      "Measure θ₂ for multiple θ₁. Plot sin θ₂ vs sin θ₁. Slope = 1/n₂.",
-    category: "Optics",
+    id: "airtrack", name: "Air Track", category: "Mechanics",
+    subtitle: "Frictionless Inclined Plane & g",
+    objective: "Vary track angle θ. Measure cart acceleration a. Plot a vs sin θ. Slope = g.",
     steps: [
-      {
-        title: "Read theory",
-        desc: "Understand Snell's Law: n₁sinθ₁ = n₂sinθ₂.",
-      },
-      {
-        title: "Set medium",
-        desc: "Choose the refractive index n₂ (glass, water, diamond…).",
-      },
-      {
-        title: "Vary incident angle",
-        desc: "Change θ₁ from 10° to 70° in 10° steps.",
-      },
-      {
-        title: "Record θ₂",
-        desc: "Read the refracted angle from the diagram. Record both.",
-      },
-      {
-        title: "Plot sin θ₂ vs sin θ₁",
-        desc: "Slope = n₁/n₂ = 1/n₂ (if n₁=1).",
-      },
-      {
-        title: "Find critical angle",
-        desc: "Increase θ₁ until Total Internal Reflection occurs.",
-      },
+      { title: "Read theory", desc: "Study a = g sin θ. Understand why friction is eliminated by the air cushion.",
+        question: "What happens to the required force when θ → 90°? What familiar experiment is this?" },
+      { title: "Level the track", desc: "Start at θ = 2°. Observe the slow acceleration.",
+        question: "At θ = 0°, what is the predicted acceleration? Test this." },
+      { title: "Record at one angle", desc: "Click Record to capture (θ, a) from the simulation.",
+        question: "If you double the cart mass, what happens to acceleration? Why?" },
+      { title: "Vary angle 2°–60°", desc: "Record 8–10 angles across the range.",
+        question: "What is the maximum useful angle before the cart would slide off the end quickly?" },
+      { title: "Plot a vs sin θ", desc: "Analysis → Plot & Fit. Slope = g.",
+        question: "Why sin θ and not just θ? When is θ ≈ sin θ a reasonable approximation?" },
+      { title: "Extract g", desc: "g = slope. Find % error. Note systematic vs random errors.",
+        question: "In a real lab, what would cause a vs sin θ to curve rather than be linear?" },
     ],
-    theory: () => `
-<div class="theory-block">
-  <div class="theory-h1">Snell's Law & Refraction</div>
-  <div class="theory-sub">Optics · Wave Propagation · Refractive Index</div>
-  <div class="theory-section">
-    <div class="theory-h2">Background</div>
-    <p class="theory-p">When light crosses the boundary between two media, it changes speed. Since the wavefronts must remain continuous, the change in speed requires a change in direction — <em>refraction</em>. The relationship between angles is governed by Snell's Law (Willebrord Snell, 1621).</p>
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Frictionless Inclined Plane</div>
+  <div class="pl-theory-sub">Mechanics · Newton's Laws · Component Resolution</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">The Air Track</div>
+    <p class="pl-theory-p">An air track blows a cushion of air through thousands of tiny holes in a flat rail. The cart rides on this air film — friction is essentially zero. This isolates gravity as the only net force along the track direction, making it the ideal apparatus for measuring g.</p>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Snell's Law</div>
-    <div class="eq-block">
-      <div class="eq-tag">Snell's Law</div>
-      <div class="eq-formula">n₁ · sin θ₁ = n₂ · sin θ₂</div>
-      <div class="eq-vars">
-        <span class="eq-var"><b>n₁</b> index of incident medium</span>
-        <span class="eq-var"><b>n₂</b> index of refractive medium</span>
-        <span class="eq-var"><b>θ₁</b> angle of incidence (from normal)</span>
-        <span class="eq-var"><b>θ₂</b> angle of refraction (from normal)</span>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Force Analysis</div>
+    <p class="pl-theory-p">On a frictionless incline at angle θ, Newton's second law along the track gives:</p>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Acceleration on frictionless incline</div>
+      <div class="pl-eq-formula">a = g · sin θ</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>a</b> cart acceleration (m/s²)</span>
+        <span class="pl-eq-var"><b>g</b> 9.81 m/s²</span>
+        <span class="pl-eq-var"><b>θ</b> angle of incline (°)</span>
       </div>
     </div>
-    <p class="theory-p">The refractive index n = c/v, where c is the speed of light in vacuum and v in the medium. Glass has n ≈ 1.5, meaning light travels at c/1.5 ≈ 2×10⁸ m/s.</p>
+    <p class="pl-theory-p">Note: mass m cancels (m·a = m·g·sinθ). The acceleration is <em>independent of mass</em> — the same principle as free fall, generalised to an incline.</p>
+    <p class="pl-theory-p">A plot of a (y-axis) vs sin θ (x-axis) is a straight line through the origin with slope = g.</p>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Live Calculator</div>
-    <div class="eq-live">
-      <div class="eq-live-label">Adjust to see refraction in real time</div>
-      <div class="eq-ctl">
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Compute cart acceleration at any angle</div>
+      <div class="pl-live-ctl">
+        <span>θ =</span>
+        <input type="range" min="1" max="89" step="1" value="30" oninput="PLLIVE.airtrack()" id="atL-t">
+        <span class="pv" id="atL-tv">30°</span>
+      </div>
+      <div class="pl-live-result">a = <span id="atL-a">4.905 m/s²</span></div>
+      <div class="pl-live-worked" id="atL-w">a = 9.81 × sin(30°) = 9.81 × 0.500 = 4.905 m/s²</div>
+    </div>
+  </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Key Insights</div>
+    <div class="pl-insight"><div class="pl-insight-head">The incline as an "attenuator"</div>
+    The incline reduces the effective gravitational force by a factor of sinθ. At θ = 5°, the cart only experiences sinθ ≈ 0.087 of g — an acceleration of 0.85 m/s². This slows motion enough to measure precisely with simple timing equipment.</div>
+    <div class="pl-insight"><div class="pl-insight-head">Connection to free fall</div>
+    At θ = 90°, sinθ = 1 and a = g — vertical free fall. The inclined plane experiment is essentially a "diluted free fall." Galileo used inclined planes for this exact reason: to slow the motion enough to time it with a water clock.</div>
+    <div class="pl-hypothesis"><div class="pl-hypothesis-head">Before you start</div>
+    Predict the angle at which the cart will accelerate at exactly 5.00 m/s². Then verify in the simulation.</div>
+  </div>
+</div>`,
+    initState: () => ({ angle: 20, cartPos: 0, cartV: 0, running_: false }),
+    drawApparatus: (ctx, W, H, state, running, dt) => {
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      drawGrid(ctx, W, H);
+
+      const angleRad = state.angle * Math.PI / 180;
+      const a = 9.81 * Math.sin(angleRad) * (1 + (Math.random() - 0.5) * 0.001);
+
+      // Track geometry
+      const pivX = W * 0.12, pivY = H * 0.78;
+      const trackLen = W * 0.7;
+      const endX = pivX + trackLen * Math.cos(angleRad);
+      const endY = pivY - trackLen * Math.sin(angleRad);
+
+      // Track surface
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(pivX, pivY); ctx.lineTo(endX, endY); ctx.stroke();
+      ctx.strokeStyle = "#252e42"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pivX, pivY); ctx.lineTo(endX, endY + 6); ctx.stroke();
+
+      // Angle arc
+      ctx.beginPath();
+      ctx.arc(pivX, pivY, 50, -angleRad, 0);
+      ctx.strokeStyle = "rgba(245,166,35,0.5)"; ctx.lineWidth = 1.3; ctx.stroke();
+      ctx.fillStyle = "#f5a623"; ctx.font = "11px JetBrains Mono,monospace";
+      ctx.fillText("θ = " + state.angle + "°", pivX + 54, pivY - 14);
+
+      // Ground
+      ctx.strokeStyle = "#252e42"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(pivX - 20, pivY); ctx.lineTo(pivX + 80, pivY); ctx.stroke();
+      ctx.fillStyle = "#252e42";
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(pivX - 20 + i * 14, pivY);
+        ctx.lineTo(pivX - 30 + i * 14, pivY + 10);
+        ctx.stroke();
+      }
+
+      // Animate cart
+      if (running) {
+        state.cartPos = (state.cartPos || 0) + state.cartV * dt;
+        state.cartV = (state.cartV || 0) + a * dt;
+        if (state.cartPos > 0.8) { state.cartPos = 0; state.cartV = 0; }
+      }
+
+      const cp = Math.min(state.cartPos || 0, 0.75);
+      const cartX = pivX + cp * trackLen * Math.cos(angleRad) + 12;
+      const cartY = pivY - cp * trackLen * Math.sin(angleRad);
+
+      // Cart body
+      ctx.save();
+      ctx.translate(cartX, cartY);
+      ctx.rotate(-angleRad);
+      ctx.fillStyle = "#1c2435";
+      ctx.fillRect(-20, -10, 40, 14);
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 1.5;
+      ctx.strokeRect(-20, -10, 40, 14);
+      // Wheels
+      [-14, 10].forEach(wx => {
+        ctx.beginPath(); ctx.arc(wx, 4, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#252e42"; ctx.fill();
+        ctx.strokeStyle = "#4a5a72"; ctx.lineWidth = 1; ctx.stroke();
+      });
+      // Air holes indicator
+      for (let hx = -14; hx <= 14; hx += 7) {
+        ctx.beginPath(); ctx.arc(hx, -4, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#00e5a0"; ctx.fill();
+      }
+      ctx.restore();
+
+      // Acceleration arrow on cart
+      const accLen = Math.min(a * 12, 70);
+      const arrX1 = cartX, arrY1 = cartY - 20;
+      const arrX2 = arrX1 + accLen * Math.cos(angleRad), arrY2 = arrY1 - accLen * Math.sin(angleRad);
+      ctx.strokeStyle = "#e05050"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(arrX1, arrY1); ctx.lineTo(arrX2, arrY2); ctx.stroke();
+      arrowHead(ctx, arrX1, arrY1, arrX2, arrY2, "#e05050");
+      ctx.fillStyle = "#e05050"; ctx.font = "10px JetBrains Mono,monospace";
+      ctx.fillText("a", arrX2 + 4, arrY2 + 4);
+
+      // Component labels
+      const gCompX = endX + 20, gCompY = endY - 30;
+      ctx.fillStyle = "#4a5a72"; ctx.font = "10px JetBrains Mono,monospace";
+      ctx.fillText("mg·sinθ (along track)", gCompX - 60, gCompY - 20);
+      ctx.fillText("mg·cosθ (⊥ track)", gCompX - 60, gCompY - 6);
+
+      drawDRO(ctx, W, [
+        ["angle (°)",  state.angle.toFixed(1)],
+        ["sin θ",      Math.sin(angleRad).toFixed(5)],
+        ["a (m/s²)",   (9.81 * Math.sin(angleRad)).toFixed(4)],
+        ["v (m/s)",    ((state.cartV || 0)).toFixed(3)],
+        ["pos (m)",    ((state.cartPos || 0) * 2).toFixed(3)],
+      ]);
+    },
+    controls: () => [
+      { id: "at-a", label: "Angle θ (°)", min: 1, max: 60, step: 1, init: 20, stateKey: "angle", fmt: (v) => v.toFixed(0) },
+    ],
+    recordPoint: (state) => {
+      const angleRad = state.angle * Math.PI / 180;
+      const a_true = 9.81 * Math.sin(angleRad);
+      const noise = 1 + (Math.random() - 0.5) * 0.015;
+      const a_meas = a_true * noise;
+      const sinTheta = Math.sin(angleRad);
+      return [state.angle.toFixed(1), sinTheta.toFixed(5), a_meas.toFixed(4)];
+    },
+    dataSchema: {
+      cols: ["#", "θ (°)", "sin θ", "a (m/s²)"],
+      types: ["index", "measured", "derived", "measured"],
+    },
+    analyzeSetup: { xi: 2, yi: 3, xLabel: "sin θ", yLabel: "a (m/s²)", title: "a vs sin θ — Air Track" },
+    analysisInsight: (slope, intercept, r2) => {
+      const err = Math.abs((slope - 9.81) / 9.81 * 100);
+      return `<strong>g = slope = ${slope.toFixed(4)} m/s²</strong> — theory: 9.8100 m/s², error: ${err.toFixed(2)}%. Since a = g·sinθ, the slope of a vs sinθ is g directly. R² = ${r2.toFixed(5)}.`;
+    },
+    theoryResult: (slope) => ({
+      label: "g (measured)", value: slope.toFixed(4),
+      unit: "m/s²", theory: "9.8100",
+      pctError: Math.abs((slope - 9.81) / 9.81 * 100).toFixed(2),
+    }),
+  },
+
+  // ══ 3. HOOKE'S LAW ════════════════════════════════════════════
+  {
+    id: "hooke", name: "Hooke's Law", category: "Mechanics",
+    subtitle: "Spring Constant from F–x Data",
+    objective: "Hang masses on a spring. Measure extension x. Plot F vs x. Slope = k.",
+    steps: [
+      { title: "Read theory", desc: "Understand F = kx and the concept of spring constant.",
+        question: "If you need a spring that deflects 1 cm under a 10 N load, what k do you need?" },
+      { title: "Zero the spring", desc: "Observe the spring at rest with no load.",
+        question: "What does the equilibrium position represent physically?" },
+      { title: "Add masses", desc: "Use the mass slider. Record (F, x) for each mass.",
+        question: "At what point might a real spring stop obeying F = kx? What is this called?" },
+      { title: "Record 8+ points", desc: "Cover the full mass range for a reliable fit.",
+        question: "Why should you approach the maximum extension gradually?" },
+      { title: "Plot F vs x", desc: "Slope = spring constant k in N/m.",
+        question: "What is the elastic potential energy stored at your maximum extension?" },
+      { title: "Find k", desc: "Compare measured k to the set value.",
+        question: "How does k relate to the spring material and geometry?" },
+    ],
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Hooke's Law & Elasticity</div>
+  <div class="pl-theory-sub">Mechanics · Elasticity · Simple Harmonic Motion</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Hooke's Law</div>
+    <p class="pl-theory-p">Robert Hooke (1676) discovered that the extension of a spring is proportional to the applied force — provided the elastic limit is not exceeded. This is one of the oldest quantitative laws in mechanics.</p>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Hooke's Law</div>
+      <div class="pl-eq-formula">F = k · x</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>F</b> restoring force (N)</span>
+        <span class="pl-eq-var"><b>k</b> spring constant (N/m)</span>
+        <span class="pl-eq-var"><b>x</b> extension from equilibrium (m)</span>
+      </div>
+    </div>
+    <p class="pl-theory-p">The spring constant k measures stiffness: a larger k means a stiffer spring. Units of N/m. A car suspension spring has k ≈ 20,000 N/m; a mattress spring ≈ 1,000 N/m; a watch hairspring ≈ 0.001 N/m.</p>
+  </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Elastic Potential Energy</div>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Elastic PE stored in the spring</div>
+      <div class="pl-eq-formula">U = ½ k x²</div>
+    </div>
+    <p class="pl-theory-p">This energy is released when the spring returns to equilibrium — the basis of all spring-powered mechanisms, from clocks to catapults.</p>
+  </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Force and energy for a given spring and extension</div>
+      <div class="pl-live-ctl">
+        <span>k =</span>
+        <input type="range" min="10" max="500" step="10" value="100" oninput="PLLIVE.hooke()" id="hkL-k">
+        <span class="pv" id="hkL-kv">100 N/m</span>
+      </div>
+      <div class="pl-live-ctl">
+        <span>x =</span>
+        <input type="range" min="0" max="0.5" step="0.01" value="0.1" oninput="PLLIVE.hooke()" id="hkL-x">
+        <span class="pv" id="hkL-xv">0.10 m</span>
+      </div>
+      <div class="pl-live-result">F = <span id="hkL-F">10.0 N</span></div>
+      <div class="pl-live-worked" id="hkL-w">F = 100 × 0.10 = 10.0 N · U = ½×100×0.10² = 0.50 J</div>
+    </div>
+  </div>
+  <div class="pl-insight"><div class="pl-insight-head">Connection to SHM</div>
+  A mass on a spring oscillates in Simple Harmonic Motion with period T = 2π√(m/k). This is why Hooke's Law and the pendulum are closely related — both are SHM systems, just with different restoring mechanisms.</div>
+</div>`,
+    initState: () => ({ mass: 0.1, k: 80, naturalLen: 0.15 }),
+    drawApparatus: (ctx, W, H, state, running, dt) => {
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      drawGrid(ctx, W, H);
+
+      const cx = W / 2;
+      const ceilY = 60;
+      const F = state.mass * 9.81;
+      const x = F / state.k;
+      const naturalLen_px = 120;
+      const scale = 500; // px per meter
+      const x_px = x * scale;
+
+      const springTopY = ceilY + 10;
+      const springBotY = springTopY + naturalLen_px + x_px;
+
+      // Ceiling
+      ctx.fillStyle = "#252e42"; ctx.fillRect(cx - 50, ceilY - 10, 100, 10);
+      ctx.strokeStyle = "#4a5a72"; ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        ctx.beginPath(); ctx.moveTo(cx - 50 + i * 13, ceilY - 10);
+        ctx.lineTo(cx - 56 + i * 13, ceilY - 18); ctx.stroke();
+      }
+
+      // Spring coil
+      const coils = 10, totalH = springBotY - springTopY, coilH = totalH / coils;
+      const coilW = 18;
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx, springTopY);
+      for (let i = 0; i <= coils * 4; i++) {
+        const t = i / (coils * 4);
+        const fy = springTopY + t * totalH;
+        const fx = cx + coilW * Math.sin(i * Math.PI * 0.5);
+        ctx.lineTo(fx, fy);
+      }
+      ctx.stroke();
+
+      // Mass block
+      const mw = 50, mh = 30;
+      ctx.fillStyle = "#1c2435";
+      ctx.fillRect(cx - mw / 2, springBotY, mw, mh);
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx - mw / 2, springBotY, mw, mh);
+      ctx.fillStyle = "#8a9ab5"; ctx.font = "10px JetBrains Mono,monospace"; ctx.textAlign = "center";
+      ctx.fillText(state.mass.toFixed(2) + "kg", cx, springBotY + mh / 2 + 4);
+      ctx.textAlign = "left";
+
+      // Weight arrow
+      ctx.strokeStyle = "#e05050"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx, springBotY + mh);
+      ctx.lineTo(cx, springBotY + mh + 45); ctx.stroke();
+      arrowHead(ctx, cx, springBotY + mh, cx, springBotY + mh + 45, "#e05050");
+      ctx.fillStyle = "#e05050"; ctx.textAlign = "center";
+      ctx.fillText("W=" + F.toFixed(2) + "N", cx + 32, springBotY + mh + 28);
+
+      // Spring force arrow
+      ctx.strokeStyle = "#00e5a0"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx - 6, springBotY);
+      ctx.lineTo(cx - 6, springBotY - 40); ctx.stroke();
+      arrowHead(ctx, cx - 6, springBotY, cx - 6, springBotY - 40, "#00e5a0");
+      ctx.fillStyle = "#00e5a0"; ctx.textAlign = "right";
+      ctx.fillText("F_spring=kx", cx - 10, springBotY - 18);
+
+      // Extension label
+      ctx.strokeStyle = "rgba(245,166,35,0.4)"; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(cx + 45, springTopY + naturalLen_px);
+      ctx.lineTo(cx + 45, springBotY); ctx.stroke();
+      ctx.setLineDash([]);
+      arrowHead(ctx, cx + 45, springTopY + naturalLen_px + 10, cx + 45, springTopY + naturalLen_px, "#f5a623");
+      arrowHead(ctx, cx + 45, springBotY - 10, cx + 45, springBotY, "#f5a623");
+      ctx.fillStyle = "#f5a623"; ctx.textAlign = "left";
+      ctx.fillText("x=" + x.toFixed(3) + "m", cx + 50, (springTopY + naturalLen_px + springBotY) / 2 + 4);
+
+      ctx.textAlign = "left";
+      drawDRO(ctx, W, [
+        ["mass (kg)",  state.mass.toFixed(3)],
+        ["F = mg (N)", F.toFixed(4)],
+        ["x (m)",      x.toFixed(4)],
+        ["k (N/m)",    state.k.toFixed(1)],
+        ["U (J)",      (0.5 * state.k * x * x).toFixed(4)],
+      ]);
+    },
+    controls: () => [
+      { id: "hk-m", label: "Mass (kg)", min: 0.02, max: 1.0, step: 0.02, init: 0.1, stateKey: "mass", fmt: (v) => v.toFixed(2) },
+      { id: "hk-k", label: "Spring k (N/m)", min: 20, max: 300, step: 10, init: 80, stateKey: "k", fmt: (v) => v.toFixed(0) },
+    ],
+    recordPoint: (state) => {
+      const F = state.mass * 9.81;
+      const x_true = F / state.k;
+      const x_meas = x_true * (1 + (Math.random() - 0.5) * 0.012);
+      return [F.toFixed(4), x_meas.toFixed(4), (F / x_meas).toFixed(2)];
+    },
+    dataSchema: {
+      cols: ["#", "F (N)", "x (m)", "k_point (N/m)"],
+      types: ["index", "measured", "measured", "derived"],
+    },
+    analyzeSetup: { xi: 1, yi: 2, xLabel: "x (m)", yLabel: "F (N)", title: "F vs x — Hooke's Law" },
+    analysisInsight: (slope, intercept, r2, state) => {
+      const err = Math.abs((slope - state.k) / state.k * 100);
+      return `<strong>k = slope = ${slope.toFixed(2)} N/m</strong> — set: ${state.k} N/m, error: ${err.toFixed(2)}%. The y-intercept ${intercept.toFixed(4)} N should be ~0 (spring passes through origin). R² = ${r2.toFixed(5)}.`;
+    },
+    theoryResult: (slope, state) => ({
+      label: "k (measured)", value: slope.toFixed(2),
+      unit: "N/m", theory: state.k.toFixed(2),
+      pctError: Math.abs((slope - state.k) / state.k * 100).toFixed(2),
+    }),
+  },
+
+  // ══ 4. SIMPLE PENDULUM ═══════════════════════════════════════
+  {
+    id: "pendulum", name: "Pendulum", category: "Mechanics",
+    subtitle: "Measuring g via Period Analysis",
+    objective: "Measure T for varying L. Plot T² vs L. Slope = 4π²/g.",
+    steps: [
+      { title: "Read theory", desc: "Understand SHM and T = 2π√(L/g).",
+        question: "Predict: if you double L, by what factor does T change?" },
+      { title: "Set length", desc: "Use the L slider. Keep θ₀ < 15° for small-angle validity.",
+        question: "Why is the small-angle approximation sin θ ≈ θ important here?" },
+      { title: "Record period", desc: "Record a (L, T) pair. Repeat for 6+ lengths.",
+        question: "How many decimal places of precision do you need in T to get g within 1%?" },
+      { title: "Vary length", desc: "Cover 0.1 m to 2.0 m for best dynamic range.",
+        question: "What is the period of a 1 m pendulum on the Moon (g=1.62 m/s²)?" },
+      { title: "Plot T² vs L", desc: "Analysis → Plot & Fit. Slope = 4π²/g.",
+        question: "Why T² vs L and not T vs L?" },
+      { title: "Extract g", desc: "g = 4π²/slope. Find % error.",
+        question: "How would a systematic timing error (e.g., always 0.1s too long) affect the graph?" },
+    ],
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">The Simple Pendulum</div>
+  <div class="pl-theory-sub">Mechanics · Simple Harmonic Motion · Period Analysis</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Derivation</div>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Period equation</div>
+      <div class="pl-eq-formula">T = 2π √(L/g)</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>T</b> period (s)</span>
+        <span class="pl-eq-var"><b>L</b> length (m)</span>
+        <span class="pl-eq-var"><b>g</b> 9.81 m/s²</span>
+      </div>
+    </div>
+    <p class="pl-theory-p">Squaring: T² = (4π²/g)·L. A plot of T² vs L is linear with slope 4π²/g, giving g = 4π²/slope.</p>
+  </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Adjust L and g to see T</div>
+      <div class="pl-live-ctl">
+        <span>L =</span>
+        <input type="range" min="0.1" max="2" step="0.01" value="1" oninput="PLLIVE.pendulum()" id="pLive-L">
+        <span class="pv" id="pLive-Lv">1.00 m</span>
+      </div>
+      <div class="pl-live-ctl">
+        <span>g =</span>
+        <input type="range" min="1.62" max="24.8" step="0.01" value="9.81" oninput="PLLIVE.pendulum()" id="pLive-g">
+        <span class="pv" id="pLive-gv">9.81 m/s²</span>
+      </div>
+      <div class="pl-live-result">T = <span id="pLive-T">2.006 s</span></div>
+      <div class="pl-live-worked" id="pLive-w">T = 2π √(1.00/9.81) = 2.006 s</div>
+    </div>
+  </div>
+  <div class="pl-insight"><div class="pl-insight-head">Independence of mass</div>
+  m cancels in F=ma since restoring force ∝ m too. A 1g and 1kg pendulum of equal length have identical periods — Galileo reportedly verified this by observation.</div>
+  <div class="pl-insight"><div class="pl-insight-head">g varies with location</div>
+  Poles: g ≈ 9.832 m/s². Equator: g ≈ 9.780 m/s². Top of Everest: 9.764 m/s². Pendulum clocks drift when moved latitudinally.</div>
+</div>`,
+    initState: () => ({ L: 1.0, theta0: 10, phase: 0 }),
+    drawApparatus: (ctx, W, H, state, running, dt) => {
+      const g = 9.81, omega = Math.sqrt(g / state.L);
+      if (running) state.phase = (state.phase || 0) + dt * omega;
+      const theta = (state.theta0 * Math.PI / 180) * Math.cos(state.phase || 0);
+      const pivX = W / 2, pivY = H * 0.1;
+      const Lpx = state.L * Math.min(W, H) * 0.52;
+      const bx = pivX + Lpx * Math.sin(theta), by = pivY + Lpx * Math.cos(theta);
+
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      drawGrid(ctx, W, H);
+
+      ctx.fillStyle = "#252e42"; ctx.fillRect(pivX - 50, pivY - 18, 100, 18);
+      ctx.fillStyle = "#4a5a72"; ctx.fillRect(pivX - 3, pivY - 18, 6, 18);
+
+      if (!running) {
+        ctx.beginPath();
+        ctx.arc(pivX, pivY, 46, -Math.PI / 2, -Math.PI / 2 + state.theta0 * Math.PI / 180);
+        ctx.strokeStyle = "rgba(245,166,35,0.5)"; ctx.lineWidth = 1.4; ctx.stroke();
+        ctx.fillStyle = "#f5a623"; ctx.font = "11px JetBrains Mono,monospace";
+        ctx.fillText("θ₀=" + state.theta0 + "°", pivX + 50, pivY + 14);
+      }
+
+      ctx.beginPath(); ctx.moveTo(pivX, pivY); ctx.lineTo(pivX, pivY + Lpx + 28);
+      ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+
+      ctx.beginPath(); ctx.moveTo(pivX, pivY); ctx.lineTo(bx, by);
+      ctx.strokeStyle = "#4a5a72"; ctx.lineWidth = 1.5; ctx.stroke();
+
+      ctx.fillStyle = "#4a5a72"; ctx.font = "11px JetBrains Mono,monospace";
+      ctx.fillText("L=" + state.L.toFixed(2) + "m", (pivX + bx) / 2 + 8, (pivY + by) / 2);
+
+      ctx.beginPath(); ctx.arc(pivX, pivY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#8a9ab5"; ctx.fill();
+
+      ctx.beginPath(); ctx.arc(bx, by, 14, 0, Math.PI * 2);
+      const gr = ctx.createRadialGradient(bx - 5, by - 5, 1, bx, by, 14);
+      gr.addColorStop(0, "#a0c0e0"); gr.addColorStop(1, "#253550");
+      ctx.fillStyle = gr; ctx.fill();
+      ctx.strokeStyle = "#4da6ff"; ctx.lineWidth = 1.5; ctx.stroke();
+
+      const T = 2 * Math.PI / omega;
+      drawDRO(ctx, W, [
+        ["L (m)",    state.L.toFixed(4)],
+        ["θ₀ (°)",   state.theta0.toFixed(1)],
+        ["T (s)",    T.toFixed(4)],
+        ["T² (s²)",  (T * T).toFixed(4)],
+        ["ω (rad/s)", omega.toFixed(4)],
+      ]);
+    },
+    controls: () => [
+      { id: "pd-L", label: "Length L (m)", min: 0.1, max: 2.0, step: 0.01, init: 1.0, stateKey: "L", fmt: (v) => v.toFixed(2) },
+      { id: "pd-A", label: "Angle θ₀ (°)", min: 2, max: 14, step: 1, init: 10, stateKey: "theta0", fmt: (v) => v.toFixed(0) },
+    ],
+    recordPoint: (state) => {
+      const T = 2 * Math.PI * Math.sqrt(state.L / 9.81) * (1 + (Math.random() - 0.5) * 0.002);
+      return [state.L.toFixed(3), T.toFixed(4), (T * T).toFixed(4), (4 * Math.PI ** 2 * state.L / (T * T)).toFixed(4)];
+    },
+    dataSchema: {
+      cols: ["#", "L (m)", "T (s)", "T² (s²)", "g_point"],
+      types: ["index", "measured", "measured", "derived", "derived"],
+    },
+    analyzeSetup: { xi: 1, yi: 3, xLabel: "L (m)", yLabel: "T² (s²)", title: "T² vs L — Pendulum" },
+    analysisInsight: (slope, intercept, r2) => {
+      const g_exp = 4 * Math.PI ** 2 / slope;
+      const err = Math.abs((g_exp - 9.81) / 9.81 * 100);
+      return `<strong>g = 4π²/slope = ${g_exp.toFixed(4)} m/s²</strong> — theory: 9.8100, error: ${err.toFixed(2)}%. R² = ${r2.toFixed(5)}.`;
+    },
+    theoryResult: (slope) => ({
+      label: "g (measured)", value: (4 * Math.PI ** 2 / slope).toFixed(4),
+      unit: "m/s²", theory: "9.8100",
+      pctError: Math.abs((4 * Math.PI ** 2 / slope - 9.81) / 9.81 * 100).toFixed(2),
+    }),
+  },
+
+  // ══ 5. SNELL'S LAW ════════════════════════════════════════════
+  {
+    id: "snell", name: "Snell's Law", category: "Optics",
+    subtitle: "Refraction and Refractive Index",
+    objective: "Measure θ₂ for multiple θ₁. Plot sin θ₂ vs sin θ₁. Slope = 1/n₂.",
+    steps: [
+      { title: "Read theory", desc: "Understand n₁sinθ₁ = n₂sinθ₂.",
+        question: "Why do all angles in Snell's Law get measured from the normal, not the surface?" },
+      { title: "Set medium", desc: "Choose n₂ (glass ≈ 1.5, water ≈ 1.33, diamond ≈ 2.42).",
+        question: "Which medium bends light more: glass (1.5) or diamond (2.42)? Why?" },
+      { title: "Vary angle", desc: "Change θ₁ from 10° to 70° in steps.",
+        question: "Notice how θ₂ increases more slowly than θ₁. What mathematical relationship describes this?" },
+      { title: "Record 6+ points", desc: "Stop before total internal reflection.",
+        question: "At what θ₁ does TIR occur for your chosen medium?" },
+      { title: "Plot sin θ₂ vs sin θ₁", desc: "Linear — slope = 1/n₂.",
+        question: "Why does the graph pass through the origin?" },
+      { title: "Extract n₂", desc: "n₂ = 1/slope. Compare to set value.",
+        question: "How would you use this experiment to identify an unknown transparent material?" },
+    ],
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Snell's Law & Refraction</div>
+  <div class="pl-theory-sub">Optics · Wave Propagation · Refractive Index</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Snell's Law</div>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Snell's Law</div>
+      <div class="pl-eq-formula">n₁ · sin θ₁ = n₂ · sin θ₂</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>n₁</b> incident medium index</span>
+        <span class="pl-eq-var"><b>n₂</b> refractive medium index</span>
+        <span class="pl-eq-var"><b>θ₁</b> angle of incidence</span>
+        <span class="pl-eq-var"><b>θ₂</b> angle of refraction</span>
+      </div>
+    </div>
+  </div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Adjust angle and medium</div>
+      <div class="pl-live-ctl">
         <span>θ₁ =</span>
-        <input type="range" min="1" max="85" step="1" value="30" oninput="LIVE.snell()" id="sLive-t1">
-        <span class="val" id="sLive-t1v">30°</span>
+        <input type="range" min="1" max="85" step="1" value="30" oninput="PLLIVE.snell()" id="sLive-t1">
+        <span class="pv" id="sLive-t1v">30°</span>
       </div>
-      <div class="eq-ctl">
+      <div class="pl-live-ctl">
         <span>n₂ =</span>
-        <input type="range" min="1.0" max="2.5" step="0.05" value="1.5" oninput="LIVE.snell()" id="sLive-n2">
-        <span class="val" id="sLive-n2v">1.50</span>
+        <input type="range" min="1.0" max="2.5" step="0.05" value="1.5" oninput="PLLIVE.snell()" id="sLive-n2">
+        <span class="pv" id="sLive-n2v">1.50</span>
       </div>
-      <div class="eq-result">θ₂ = <span id="sLive-t2">19.5°</span></div>
-      <div class="eq-worked" id="sLive-w">1.00·sin(30°) = 1.50·sin(θ₂)  →  θ₂ = 19.5°</div>
+      <div class="pl-live-result">θ₂ = <span id="sLive-t2">19.5°</span></div>
+      <div class="pl-live-worked" id="sLive-w">sin(30°)/sin(θ₂) = 1.50</div>
     </div>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Total Internal Reflection</div>
-    <div class="eq-block">
-      <div class="eq-tag">Critical angle (n₁ > n₂)</div>
-      <div class="eq-formula">sin θ_c = n₂ / n₁</div>
-    </div>
-    <div class="insight">
-      <div class="insight-head">Optical fibres</div>
-      Total internal reflection keeps light trapped inside a glass fibre. With n_glass ≈ 1.46 and n_cladding ≈ 1.44, θ_c ≈ 80°. Any ray shallower than 10° from the axis is totally reflected — light travels around bends with virtually no loss.
-    </div>
+  <div class="pl-eq">
+    <div class="pl-eq-tag">Critical angle (TIR)</div>
+    <div class="pl-eq-formula">sin θ_c = n₂ / n₁</div>
   </div>
+  <div class="pl-insight"><div class="pl-insight-head">Optical fibres</div>
+  TIR traps light inside glass fibres (n≈1.46) surrounded by cladding (n≈1.44). θ_c ≈ 80° — rays within 10° of the axis are totally reflected. Used for internet, medical endoscopes, decorative lighting.</div>
 </div>`,
     initState: () => ({ theta1: 30, n2: 1.5 }),
     drawApparatus: (ctx, W, H, state) => {
-      const cx = W / 2,
-        cy = H / 2;
-      const t1r = (state.theta1 * Math.PI) / 180;
+      const cx = W / 2, cy = H / 2;
+      const t1r = state.theta1 * Math.PI / 180;
       const sinT2 = Math.sin(t1r) / state.n2;
       const TIR = sinT2 >= 1;
       const t2r = TIR ? 0 : Math.asin(sinT2);
       const rayLen = Math.min(W, H) * 0.38;
 
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, W, H);
-      // Medium 1 (air)
-      ctx.fillStyle = "rgba(77,166,255,0.03)";
-      ctx.fillRect(0, 0, W, cy);
-      // Medium 2
-      ctx.fillStyle = TIR ? "rgba(224,80,80,0.06)" : "rgba(0,229,160,0.05)";
-      ctx.fillRect(0, cy, W, H - cy);
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(77,166,255,0.03)"; ctx.fillRect(0, 0, W, cy);
+      ctx.fillStyle = TIR ? "rgba(224,80,80,0.06)" : "rgba(0,229,160,0.05)"; ctx.fillRect(0, cy, W, H - cy);
 
-      // Boundary
-      ctx.beginPath();
-      ctx.moveTo(0, cy);
-      ctx.lineTo(W, cy);
-      ctx.strokeStyle = "rgba(255,255,255,0.15)";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy);
+      ctx.strokeStyle = "rgba(255,255,255,0.14)"; ctx.lineWidth = 1.5; ctx.stroke();
 
-      // Labels
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillStyle = "rgba(77,166,255,0.6)";
-      ctx.fillText("n₁ = 1.00  (air)", 14, cy - 10);
+      ctx.font = "11px JetBrains Mono,monospace";
+      ctx.fillStyle = "rgba(77,166,255,0.6)"; ctx.fillText("n₁ = 1.00 (air)", 14, cy - 10);
       ctx.fillStyle = TIR ? "rgba(224,80,80,0.7)" : "rgba(0,229,160,0.5)";
       ctx.fillText("n₂ = " + state.n2.toFixed(2), 14, cy + 22);
 
-      // Normal
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - H * 0.42);
-      ctx.lineTo(cx, cy + H * 0.42);
-      ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([6, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.font = "10px JetBrains Mono, monospace";
-      ctx.textAlign = "center";
-      ctx.fillText("normal", cx, cy - H * 0.44);
-      ctx.textAlign = "left";
+      ctx.beginPath(); ctx.moveTo(cx, cy - H * 0.42); ctx.lineTo(cx, cy + H * 0.42);
+      ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth = 1; ctx.setLineDash([6,5]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.textAlign = "center";
+      ctx.fillText("normal", cx, cy - H * 0.44); ctx.textAlign = "left";
 
-      // Incident ray
-      const ix = -Math.sin(t1r) * rayLen,
-        iy = -Math.cos(t1r) * rayLen;
-      ctx.beginPath();
-      ctx.moveTo(cx + ix, cy + iy);
-      ctx.lineTo(cx, cy);
-      ctx.strokeStyle = "#f5a623";
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
+      const ix = -Math.sin(t1r) * rayLen, iy = -Math.cos(t1r) * rayLen;
+      ctx.beginPath(); ctx.moveTo(cx + ix, cy + iy); ctx.lineTo(cx, cy);
+      ctx.strokeStyle = "#f5a623"; ctx.lineWidth = 2.5; ctx.stroke();
+      arrowHead(ctx, cx + ix, cy + iy, cx, cy, "#f5a623");
 
-      // Angle arc + label
-      ctx.beginPath();
-      ctx.arc(cx, cy, 46, -Math.PI / 2, -Math.PI / 2 + t1r);
-      ctx.strokeStyle = "rgba(245,166,35,0.5)";
-      ctx.lineWidth = 1.3;
-      ctx.stroke();
-      ctx.fillStyle = "#f5a623";
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillText(
-        "θ₁=" + state.theta1 + "°",
-        cx + 50 * Math.sin(t1r / 2) + 4,
-        cy - 48 * Math.cos(t1r / 2) + 4,
-      );
+      ctx.beginPath(); ctx.arc(cx, cy, 46, -Math.PI / 2, -Math.PI / 2 + t1r);
+      ctx.strokeStyle = "rgba(245,166,35,0.5)"; ctx.lineWidth = 1.3; ctx.stroke();
+      ctx.fillStyle = "#f5a623"; ctx.font = "11px JetBrains Mono,monospace";
+      ctx.fillText("θ₁=" + state.theta1 + "°", cx + 50 * Math.sin(t1r / 2) + 4, cy - 48 * Math.cos(t1r / 2) + 4);
 
       if (!TIR) {
-        // Refracted ray
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.sin(t2r) * rayLen, cy + Math.cos(t2r) * rayLen);
-        ctx.strokeStyle = "#00e5a0";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(cx, cy, 46, Math.PI / 2, Math.PI / 2 + t2r);
-        ctx.strokeStyle = "rgba(0,229,160,0.5)";
-        ctx.lineWidth = 1.3;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.sin(t2r) * rayLen, cy + Math.cos(t2r) * rayLen);
+        ctx.strokeStyle = "#00e5a0"; ctx.lineWidth = 2.5; ctx.stroke();
+        arrowHead(ctx, cx, cy, cx + Math.sin(t2r) * rayLen, cy + Math.cos(t2r) * rayLen, "#00e5a0");
+        ctx.beginPath(); ctx.arc(cx, cy, 46, Math.PI / 2, Math.PI / 2 + t2r);
+        ctx.strokeStyle = "rgba(0,229,160,0.5)"; ctx.lineWidth = 1.3; ctx.stroke();
         ctx.fillStyle = "#00e5a0";
-        ctx.fillText(
-          "θ₂=" + ((t2r * 180) / Math.PI).toFixed(1) + "°",
-          cx + 50 * Math.sin(t2r / 2) + 4,
-          cy + 48 * Math.cos(t2r / 2) + 4,
-        );
+        ctx.fillText("θ₂=" + (t2r * 180 / Math.PI).toFixed(1) + "°", cx + 50 * Math.sin(t2r / 2) + 4, cy + 48 * Math.cos(t2r / 2) + 4);
       } else {
-        // TIR
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx - Math.sin(t1r) * rayLen, cy - Math.cos(t1r) * rayLen);
-        ctx.strokeStyle = "#e05050";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-        ctx.fillStyle = "#e05050";
-        ctx.font = "bold 13px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Total Internal Reflection", cx, cy + 38);
-        const tc = (Math.asin(1 / state.n2) * 180) / Math.PI;
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillText("θ_c = " + tc.toFixed(1) + "°   (θ₁ > θ_c)", cx, cy + 56);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx - Math.sin(t1r) * rayLen, cy - Math.cos(t1r) * rayLen);
+        ctx.strokeStyle = "#e05050"; ctx.lineWidth = 2.5; ctx.stroke();
+        arrowHead(ctx, cx, cy, cx - Math.sin(t1r) * rayLen, cy - Math.cos(t1r) * rayLen, "#e05050");
+        ctx.fillStyle = "#e05050"; ctx.textAlign = "center";
+        ctx.fillText("Total Internal Reflection", cx, cy + 36);
+        ctx.fillText("θ_c = " + (Math.asin(1 / state.n2) * 180 / Math.PI).toFixed(1) + "°", cx, cy + 52);
         ctx.textAlign = "left";
       }
 
-      // Verification
-      const lhs = Math.sin(t1r).toFixed(4);
-      const rhs = TIR ? "—" : (state.n2 * Math.sin(t2r)).toFixed(4);
-      ctx.fillStyle = "rgba(17,21,32,0.85)";
-      ctx.fillRect(14, H - 52, 260, 38);
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillStyle = "#4a5a72";
-      ctx.fillText("n₁ sin θ₁ =", 20, H - 36);
-      ctx.fillStyle = "#f5a623";
-      ctx.fillText(lhs, 118, H - 36);
-      ctx.fillStyle = "#4a5a72";
-      ctx.fillText("n₂ sin θ₂ =", 20, H - 18);
-      ctx.fillStyle = "#00e5a0";
-      ctx.fillText(rhs, 118, H - 18);
+      drawDRO(ctx, W, [
+        ["θ₁ (°)",    state.theta1.toFixed(1)],
+        ["n₂",        state.n2.toFixed(2)],
+        ["θ₂ (°)",    TIR ? "TIR" : (t2r * 180 / Math.PI).toFixed(3)],
+        ["sin θ₁",   Math.sin(t1r).toFixed(5)],
+        ["sin θ₂",   TIR ? "—" : Math.sin(t2r).toFixed(5)],
+      ]);
     },
     controls: () => [
-      {
-        id: "c-t1",
-        label: "Incident θ₁ (°)",
-        min: 5,
-        max: 85,
-        step: 1,
-        init: 30,
-        stateKey: "theta1",
-        fmt: (v) => v.toFixed(0),
-      },
-      {
-        id: "c-n2",
-        label: "Index n₂",
-        min: 1.05,
-        max: 2.5,
-        step: 0.05,
-        init: 1.5,
-        stateKey: "n2",
-        fmt: (v) => v.toFixed(2),
-      },
+      { id: "sn-t1", label: "Angle θ₁ (°)", min: 5, max: 85, step: 1, init: 30, stateKey: "theta1", fmt: (v) => v.toFixed(0) },
+      { id: "sn-n2", label: "Index n₂", min: 1.05, max: 2.5, step: 0.05, init: 1.5, stateKey: "n2", fmt: (v) => v.toFixed(2) },
     ],
     recordPoint: (state) => {
-      const t1r = (state.theta1 * Math.PI) / 180;
+      const t1r = state.theta1 * Math.PI / 180;
       const sinT2 = Math.sin(t1r) / state.n2;
       if (sinT2 >= 1) return null;
       const t2r = Math.asin(sinT2);
-      const t2 = (t2r * 180) / Math.PI + (Math.random() - 0.5) * 0.2;
-      return [
-        state.theta1.toFixed(1),
-        t2.toFixed(2),
-        Math.sin(t1r).toFixed(5),
-        Math.sin((t2 * Math.PI) / 180).toFixed(5),
-      ];
+      const t2 = t2r * 180 / Math.PI + (Math.random() - 0.5) * 0.2;
+      return [state.theta1.toFixed(1), t2.toFixed(2), Math.sin(t1r).toFixed(5), Math.sin(t2 * Math.PI / 180).toFixed(5)];
     },
     dataSchema: {
       cols: ["#", "θ₁ (°)", "θ₂ (°)", "sin θ₁", "sin θ₂"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: {
-      xi: 3,
-      yi: 4,
-      xLabel: "sin θ₁",
-      yLabel: "sin θ₂",
-      title: "sin θ₂ vs sin θ₁",
-    },
+    analyzeSetup: { xi: 3, yi: 4, xLabel: "sin θ₁", yLabel: "sin θ₂", title: "sin θ₂ vs sin θ₁" },
     analysisInsight: (slope, intercept, r2, state) => {
       const n2_exp = 1 / slope;
-      const err = Math.abs(((n2_exp - state.n2) / state.n2) * 100);
-      return `<strong>Measured n₂ = ${n2_exp.toFixed(3)}</strong> (set: ${state.n2.toFixed(2)}, error ${err.toFixed(2)}%). Slope = sin θ₂ / sin θ₁ = n₁/n₂ = 1/n₂ since n₁=1. R² = ${r2.toFixed(5)}.`;
+      const err = Math.abs((n2_exp - state.n2) / state.n2 * 100);
+      return `<strong>n₂ = 1/slope = ${n2_exp.toFixed(3)}</strong> (set: ${state.n2.toFixed(2)}, error: ${err.toFixed(2)}%). R² = ${r2.toFixed(5)}.`;
     },
     theoryResult: (slope, state) => ({
-      label: "n₂ (measured)",
-      value: (1 / slope).toFixed(4),
-      unit: "(dimensionless)",
-      theory: state.n2.toFixed(4),
-      pctError: Math.abs(((1 / slope - state.n2) / state.n2) * 100).toFixed(2),
+      label: "n₂ (measured)", value: (1 / slope).toFixed(4),
+      unit: "", theory: state.n2.toFixed(4),
+      pctError: Math.abs((1 / slope - state.n2) / state.n2 * 100).toFixed(2),
     }),
   },
+
+  // ══ 6. OHM'S LAW ═════════════════════════════════════════════
   {
-    id: "ohm",
-    name: "Ohm's Law",
+    id: "ohm", name: "Ohm's Law", category: "EM",
     subtitle: "I–V Characteristics & Resistance",
-    objective: "Plot I vs V for a resistor. Slope = 1/R = G. Verify Ohm's Law.",
-    category: "Electromagnetism",
+    objective: "Plot I vs V for a resistor. Slope = G = 1/R.",
     steps: [
-      {
-        title: "Read theory",
-        desc: "Understand V = IR and the I–V characteristic of an ohmic conductor.",
-      },
-      {
-        title: "Set resistance",
-        desc: "Choose a component resistance R. Note component tolerance (±5%).",
-      },
-      {
-        title: "Vary voltage",
-        desc: "Step V from 0 to 12 V. Record I from the ammeter at each step.",
-      },
-      {
-        title: "Record 8 points",
-        desc: "Use ≥8 voltage steps for a reliable linear fit.",
-      },
-      {
-        title: "Plot I vs V",
-        desc: "Slope = G = 1/R. Y-intercept should be ~0 (Ohmic).",
-      },
-      {
-        title: "Calculate R",
-        desc: "R = 1/slope. Compare to set value. Find % error.",
-      },
+      { title: "Read theory", desc: "Understand V = IR, conductance G, and ohmic behaviour.",
+        question: "At V = 0, what current flows? What does this tell you about the y-intercept?" },
+      { title: "Set resistance", desc: "Choose R. Component tolerance is ±5%.",
+        question: "A 100Ω resistor at 12V: predict I and power P = VI." },
+      { title: "Vary voltage", desc: "Step V from 0 to 12V. Record I.",
+        question: "If R doubled, how would the slope of your I–V graph change?" },
+      { title: "Record 8+ points", desc: "Cover the full voltage range.",
+        question: "Why does the graph start at the origin (0, 0) for an ohmic conductor?" },
+      { title: "Plot I vs V", desc: "Slope = G = 1/R. Y-intercept ≈ 0.",
+        question: "A non-ohmic bulb would show what type of curve? Why?" },
+      { title: "Extract R", desc: "R = 1/slope. Find % error vs set value.",
+        question: "What is the significance of the measured % error vs the 5% component tolerance?" },
     ],
-    theory: () => `
-<div class="theory-block">
-  <div class="theory-h1">Ohm's Law</div>
-  <div class="theory-sub">Electromagnetism · DC Circuits · Conductance</div>
-  <div class="theory-section">
-    <div class="theory-h2">Statement</div>
-    <p class="theory-p">Ohm's law states that the current through a conductor between two points is directly proportional to the voltage across the two points. This relationship is linear for many materials, particularly metals, and is expressed mathematically as:</p>
-    <div class="eq-block">
-      <div class="eq-tag">Ohm's Law</div>
-      <div class="eq-formula">V = I × R</div>
-      <div class="eq-vars">
-        <span class="eq-var"><b>V</b> voltage (volts)</span>
-        <span class="eq-var"><b>I</b> current (amperes)</span>
-        <span class="eq-var"><b>R</b> resistance (ohms)</span>
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Ohm's Law</div>
+  <div class="pl-theory-sub">Electromagnetism · DC Circuits · Resistance</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Statement</div>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Ohm's Law</div>
+      <div class="pl-eq-formula">V = I · R</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>V</b> voltage (V)</span>
+        <span class="pl-eq-var"><b>I</b> current (A)</span>
+        <span class="pl-eq-var"><b>R</b> resistance (Ω)</span>
       </div>
     </div>
-    <p class="theory-p">The constant of proportionality R is called the <em>resistance</em> of the conductor. Materials that obey Ohm's law are called <em>ohmic</em> conductors.</p>
+    <p class="pl-theory-p">G = 1/R is conductance (siemens). I = V·G. Slope of I vs V plot = G.</p>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Conductance</div>
-    <p class="theory-p">The reciprocal of resistance is called <em>conductance</em> (G):</p>
-    <div class="eq-block">
-      <div class="eq-tag">Conductance</div>
-      <div class="eq-formula">G = 1/R</div>
-    </div>
-    <p class="theory-p">From Ohm's law: I = V/R = G × V. So the slope of an I–V plot equals the conductance G.</p>
-  </div>
-  <div class="theory-section">
-    <div class="theory-h2">Live Calculator</div>
-    <div class="eq-live">
-      <div class="eq-live-label">Adjust voltage and resistance to see current</div>
-      <div class="eq-ctl">
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">Ohm's law in real time</div>
+      <div class="pl-live-ctl">
         <span>V =</span>
-        <input type="range" min="0" max="12" step="0.1" value="6" oninput="LIVE.ohm()" id="oLive-V">
-        <span class="val" id="oLive-Vv">6.0 V</span>
+        <input type="range" min="0" max="12" step="0.1" value="6" oninput="PLLIVE.ohm()" id="oLive-V">
+        <span class="pv" id="oLive-Vv">6.0 V</span>
       </div>
-      <div class="eq-ctl">
+      <div class="pl-live-ctl">
         <span>R =</span>
-        <input type="range" min="10" max="1000" step="10" value="100" oninput="LIVE.ohm()" id="oLive-R">
-        <span class="val" id="oLive-Rv">100 Ω</span>
+        <input type="range" min="10" max="1000" step="10" value="100" oninput="PLLIVE.ohm()" id="oLive-R">
+        <span class="pv" id="oLive-Rv">100 Ω</span>
       </div>
-      <div class="eq-result">I = <span id="oLive-I">0.060 A</span></div>
-      <div class="eq-worked" id="oLive-w">I = V/R = 6.0 / 100 = 0.060 A</div>
+      <div class="pl-live-result">I = <span id="oLive-I">60.0 mA</span></div>
+      <div class="pl-live-worked" id="oLive-w">I = 6.0/100 = 0.0600 A · P = 0.360 W</div>
     </div>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Key Insights</div>
-    <div class="insight">
-      <div class="insight-head">Ohmic vs Non-Ohmic</div>
-      Not all materials obey Ohm's law. For example, the resistance of a filament bulb increases with temperature, so its I–V characteristic is curved. The resistance of a diode depends on the direction of current flow.
-    </div>
-    <div class="insight">
-      <div class="insight-head">Superconductivity</div>
-      At very low temperatures, some materials exhibit zero resistance. This phenomenon, called superconductivity, was discovered by Heike Kamerlingh Onnes in 1911. Modern applications include MRI machines and particle accelerators.
-    </div>
-  </div>
+  <div class="pl-insight"><div class="pl-insight-head">Ohmic vs non-ohmic</div>
+  A resistor: straight I–V line. A bulb filament: curves upward (R rises with T). A diode: near-zero current below ~0.6V, then exponential rise. The I–V curve is the fingerprint of a component.</div>
 </div>`,
     initState: () => ({ V: 6, R: 100 }),
-    drawApparatus: (ctx, W, H, state) => {
-      const cx = W / 2,
-        cy = H / 2;
-      const I = state.V / state.R;
+    drawApparatus: (ctx, W, H, state, running) => {
+      const I = state.V / state.R * (running ? (1 + (Math.random() - 0.5) * 0.015) : 1);
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      drawGrid(ctx, W, H);
 
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2 - 10;
+      const bw = Math.min(W * 0.58, 340), bh = Math.min(H * 0.52, 210);
+      const lx = cx - bw/2, rx = cx + bw/2, ty = cy - bh/2, bot = cy + bh/2;
 
-      // Circuit diagram
-      const scale = Math.min(W, H) * 0.3;
+      const wire = (x1,y1,x2,y2) => {
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle="#4da6ff"; ctx.lineWidth=2; ctx.stroke();
+      };
+      wire(lx,ty,rx,ty); wire(lx,bot,rx,bot);
+      wire(lx,ty,lx,cy-28); wire(lx,cy+28,lx,bot);
+      wire(rx,ty,rx,cy-34); wire(rx,cy+34,rx,bot);
 
       // Battery
-      ctx.strokeStyle = "#4a5a72";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(
-        cx - scale * 0.8,
-        cy - scale * 0.3,
-        scale * 1.6,
-        scale * 0.6,
-      );
-      ctx.fillStyle = "#4a5a72";
-      ctx.font = "bold 14px JetBrains Mono, monospace";
-      ctx.textAlign = "center";
-      ctx.fillText("V = " + state.V.toFixed(1) + "V", cx, cy + scale * 0.8);
-
-      // Wires
-      ctx.beginPath();
-      ctx.moveTo(cx - scale * 2, cy);
-      ctx.lineTo(cx - scale * 0.8, cy);
-      ctx.moveTo(cx + scale * 0.8, cy);
-      ctx.lineTo(cx + scale * 2, cy);
-      ctx.stroke();
+      ctx.fillStyle="#1c2435"; ctx.fillRect(lx-12,cy-28,24,56);
+      ctx.strokeStyle="#252e42"; ctx.lineWidth=1; ctx.strokeRect(lx-12,cy-28,24,56);
+      ctx.strokeStyle="#f5a623"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(lx-7,cy-8); ctx.lineTo(lx+7,cy-8); ctx.stroke();
+      ctx.lineWidth=4;
+      ctx.beginPath(); ctx.moveTo(lx-4,cy+5); ctx.lineTo(lx+4,cy+5); ctx.stroke();
+      ctx.fillStyle="#f5a623"; ctx.font="10px JetBrains Mono,monospace"; ctx.textAlign="center";
+      ctx.fillText(state.V.toFixed(1)+"V", lx, cy-36);
 
       // Resistor
-      ctx.strokeStyle = "#e05050";
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(cx - scale * 0.6, cy);
-      for (let i = 0; i < 5; i++) {
-        const x = cx - scale * 0.6 + (i * scale * 1.2) / 5;
-        const y = cy + (i % 2 === 0 ? -scale * 0.1 : scale * 0.1);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      const rh=54, rw=22;
+      ctx.fillStyle="#1c2435"; ctx.fillRect(rx-rw/2,cy-rh/2,rw,rh);
+      ctx.strokeStyle="#f5a623"; ctx.lineWidth=1.2; ctx.strokeRect(rx-rw/2,cy-rh/2,rw,rh);
+      ctx.beginPath(); ctx.strokeStyle="#f5a623"; ctx.lineWidth=1.2;
+      ctx.moveTo(rx, cy-rh/2+4);
+      for (let i=0;i<7;i++) {
+        const yy = cy-rh/2+8+i*(rh-14)/7;
+        ctx.lineTo(rx+(i%2===0?rw/2-4:-rw/2+4), yy);
       }
-      ctx.lineTo(cx + scale * 0.6, cy);
-      ctx.stroke();
-      ctx.fillStyle = "#e05050";
-      ctx.font = "12px JetBrains Mono, monospace";
-      ctx.fillText("R = " + state.R + "Ω", cx, cy - scale * 0.5);
+      ctx.lineTo(rx, cy+rh/2-4); ctx.stroke();
+      ctx.fillStyle="#f5a623"; ctx.textAlign="center";
+      ctx.fillText(state.R+"Ω", rx, cy+rh/2+15);
 
       // Ammeter
-      ctx.strokeStyle = "#00e5a0";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx + scale * 1.5, cy, scale * 0.3, 0, 2 * Math.PI);
-      ctx.stroke();
-      ctx.fillStyle = "#00e5a0";
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillText("A", cx + scale * 1.5, cy + 3);
-      ctx.fillText(
-        "I = " + I.toFixed(3) + "A",
-        cx + scale * 1.5,
-        cy + scale * 0.6,
-      );
+      ctx.beginPath(); ctx.arc(cx,ty,15,0,Math.PI*2);
+      ctx.fillStyle="#161c2a"; ctx.fill(); ctx.strokeStyle="#4da6ff"; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.fillStyle="#4da6ff"; ctx.font="10px JetBrains Mono,monospace";
+      ctx.fillText("A", cx, ty+4);
 
-      // Voltmeter
-      ctx.strokeStyle = "#4da6ff";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - scale * 1.5, cy, scale * 0.3, 0, 2 * Math.PI);
-      ctx.stroke();
-      ctx.fillStyle = "#4da6ff";
-      ctx.font = "11px JetBrains Mono, monospace";
-      ctx.fillText("V", cx - scale * 1.5, cy + 3);
-      ctx.fillText(
-        "V = " + state.V.toFixed(1) + "V",
-        cx - scale * 1.5,
-        cy + scale * 0.6,
-      );
-
-      // I-V plot
-      const plotX = W * 0.75,
-        plotY = H * 0.2,
-        plotW = W * 0.2,
-        plotH = H * 0.4;
-      ctx.strokeStyle = "#334155";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(plotX, plotY, plotW, plotH);
-      ctx.fillStyle = "#4a5a72";
-      ctx.font = "10px JetBrains Mono, monospace";
-      ctx.textAlign = "center";
-      ctx.fillText("I vs V", plotX + plotW / 2, plotY - 5);
-      ctx.textAlign = "left";
+      ctx.textAlign="left";
+      drawDRO(ctx, W, [
+        ["V (V)",  state.V.toFixed(3)],
+        ["R (Ω)",  state.R.toFixed(0)],
+        ["I (mA)", (I*1000).toFixed(3)],
+        ["P (mW)", (state.V*I*1000).toFixed(2)],
+        ["G (mS)", (I/state.V*1000).toFixed(4)],
+      ]);
     },
     controls: () => [
-      {
-        id: "c-V",
-        label: "Voltage V (V)",
-        min: 0,
-        max: 12,
-        step: 0.1,
-        init: 6,
-        stateKey: "V",
-        fmt: (v) => v.toFixed(1),
-      },
-      {
-        id: "c-R",
-        label: "Resistance R (Ω)",
-        min: 10,
-        max: 1000,
-        step: 10,
-        init: 100,
-        stateKey: "R",
-        fmt: (v) => v.toFixed(0),
-      },
+      { id: "oh-V", label: "Voltage V (V)", min: 0, max: 12, step: 0.5, init: 6, stateKey: "V", fmt: (v) => v.toFixed(1) },
+      { id: "oh-R", label: "Resistance R (Ω)", min: 10, max: 1000, step: 10, init: 100, stateKey: "R", fmt: (v) => v.toFixed(0) },
     ],
     recordPoint: (state) => {
-      const I = state.V / state.R + (Math.random() - 0.5) * 0.001;
-      return [state.V.toFixed(2), I.toFixed(4)];
+      const I = state.V / state.R * (1 + (Math.random() - 0.5) * 0.018);
+      return [state.V.toFixed(3), (I * 1000).toFixed(4), (state.V / I).toFixed(2), (state.V * I * 1000).toFixed(3)];
     },
     dataSchema: {
-      cols: ["#", "V (V)", "I (A)"],
-      types: ["index", "measured", "measured"],
+      cols: ["#", "V (V)", "I (mA)", "R_meas (Ω)", "P (mW)"],
+      types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: {
-      xi: 1,
-      yi: 2,
-      xLabel: "V (V)",
-      yLabel: "I (A)",
-      title: "I vs V",
-    },
+    analyzeSetup: { xi: 1, yi: 2, xLabel: "V (V)", yLabel: "I (mA)", title: "I vs V — Ohm's Law" },
     analysisInsight: (slope, intercept, r2, state) => {
-      const R_exp = 1 / slope;
-      const err = Math.abs(((R_exp - state.R) / state.R) * 100);
-      return `<strong>Measured R = ${R_exp.toFixed(1)} Ω</strong> (set: ${state.R} Ω, error ${err.toFixed(2)}%). Slope = I/V = 1/R = G. Y-intercept = ${intercept.toFixed(4)} A (should be ~0 for ohmic conductor). R² = ${r2.toFixed(5)}.`;
+      const R_exp = 1000 / slope;
+      const err = Math.abs((R_exp - state.R) / state.R * 100);
+      return `<strong>R = 1/slope = ${R_exp.toFixed(1)} Ω</strong> (set: ${state.R} Ω, error: ${err.toFixed(2)}%). G = slope = ${slope.toFixed(4)} mA/V. R² = ${r2.toFixed(5)}.`;
     },
     theoryResult: (slope, state) => ({
-      label: "R (measured)",
-      value: (1 / slope).toFixed(1),
-      unit: "Ω",
-      theory: state.R.toFixed(1),
-      pctError: Math.abs(((1 / slope - state.R) / state.R) * 100).toFixed(2),
+      label: "R (measured)", value: (1000 / slope).toFixed(2),
+      unit: "Ω", theory: state.R.toFixed(2),
+      pctError: Math.abs((1000 / slope - state.R) / state.R * 100).toFixed(2),
     }),
   },
+
+  // ══ 7. NEWTON'S COOLING ═══════════════════════════════════════
   {
-    id: "cooling",
-    name: "Newton's Cooling",
+    id: "cooling", name: "Newton's Cooling", category: "Thermo",
     subtitle: "Exponential Decay & Time Constant",
     objective: "Record T(t). Plot ln(T−Tₐ) vs t. Slope = −k. Find τ = 1/k.",
-    category: "Thermodynamics",
     steps: [
-      {
-        title: "Read theory",
-        desc: "Understand dT/dt = −k(T−Tₐ) and exponential solution.",
-      },
-      { title: "Set conditions", desc: "Set initial T₀ and ambient Tₐ." },
-      {
-        title: "Start cooling",
-        desc: "Run. Temperature falls — record T every 10s.",
-      },
-      {
-        title: "Fill table",
-        desc: "Record ≥8 points spanning 2–3 time constants.",
-      },
-      { title: "Linearize", desc: "Plot ln(T−Tₐ) vs t. Slope = −k." },
-      {
-        title: "Find τ",
-        desc: "τ = 1/k. Verify T reaches Tₐ + ΔT/e at t = τ.",
-      },
+      { title: "Read theory", desc: "Understand dT/dt = −k(T−Tₐ) and its exponential solution.",
+        question: "What does the negative sign in dT/dt = −k(T−Tₐ) physically represent?" },
+      { title: "Set conditions", desc: "Set T₀ and ambient Tₐ. Note the starting ΔT.",
+        question: "If you double ΔT₀, how does the cooling curve shape change? Does k change?" },
+      { title: "Record cooling", desc: "Click Record Point every 15 s of simulated time.",
+        question: "After one time constant τ, what fraction of the original ΔT remains?" },
+      { title: "Record 8+ points", desc: "Span at least 3 time constants for reliable fit.",
+        question: "What would the temperature do if k were negative? Is this physical?" },
+      { title: "Plot ln(T−Tₐ) vs t", desc: "Slope = −k. This linearizes the exponential.",
+        question: "Why does taking the natural log of (T−Tₐ) linearize the equation?" },
+      { title: "Find k and τ", desc: "τ = 1/k. Compare to set value.",
+        question: "A mug of coffee with τ = 15 min: how long until it's within 5% of room temperature?" },
     ],
-    theory: () => `
-<div class="theory-block">
-  <div class="theory-h1">Newton's Law of Cooling</div>
-  <div class="theory-sub">Thermodynamics · Differential Equations · Linearization</div>
-  <div class="theory-section">
-    <div class="theory-h2">The Law</div>
-    <div class="eq-block">
-      <div class="eq-tag">Newton's Law of Cooling</div>
-      <div class="eq-formula">dT/dt = −k · (T − Tₐ)</div>
-      <div class="eq-vars">
-        <span class="eq-var"><b>T</b> object temperature (°C)</span>
-        <span class="eq-var"><b>Tₐ</b> ambient temperature</span>
-        <span class="eq-var"><b>k</b> cooling constant (s⁻¹)</span>
+    theory: () => `<div class="pl-theory-block">
+  <div class="pl-theory-h1">Newton's Law of Cooling</div>
+  <div class="pl-theory-sub">Thermodynamics · ODEs · Linearization</div>
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">The Law</div>
+    <div class="pl-eq">
+      <div class="pl-eq-tag">Newton's Law of Cooling</div>
+      <div class="pl-eq-formula">dT/dt = −k · (T − Tₐ)</div>
+      <div class="pl-eq-vars">
+        <span class="pl-eq-var"><b>T</b> temperature (°C)</span>
+        <span class="pl-eq-var"><b>Tₐ</b> ambient temperature</span>
+        <span class="pl-eq-var"><b>k</b> cooling constant (s⁻¹)</span>
       </div>
     </div>
-    <p class="theory-p">This first-order linear ODE has solution T(t) = Tₐ + (T₀ − Tₐ)·e<sup>−kt</sup>.</p>
+    <p class="pl-theory-p">Solution: T(t) = Tₐ + (T₀ − Tₐ)·e⁻ᵏᵗ. Linearization: ln(T−Tₐ) = ln(ΔT₀) − k·t. Slope = −k.</p>
   </div>
-  <div class="theory-section">
-    <div class="theory-h2">Linearization</div>
-    <p class="theory-p">Define excess temperature ΔT = T − Tₐ. Then taking ln(T−Tₐ):</p>
-    <div class="eq-block">
-      <div class="eq-tag">Linearized form — key for analysis</div>
-      <div class="eq-formula">ln(T − Tₐ) = ln(ΔT₀) − k·t</div>
-    </div>
-    <p class="theory-p">Plotting ln(T−Tₐ) vs t gives a straight line with <em>slope = −k</em>. This is the standard method used in real labs.</p>
-  </div>
-  <div class="theory-section">
-    <div class="theory-h2">Key Insights</div>
-    <div class="insight">
-      <div class="insight-head">Time constant τ</div>
-      At t = τ = 1/k, the excess temperature falls to ΔT₀/e ≈ 36.8%. After 5τ, it is within ~0.7% of ambient.
+  <div class="pl-theory-section">
+    <div class="pl-theory-h2">Live Calculator</div>
+    <div class="pl-live">
+      <div class="pl-live-label">See how k affects cooling</div>
+      <div class="pl-live-ctl">
+        <span>k =</span>
+        <input type="range" min="0.001" max="0.05" step="0.001" value="0.015" oninput="PLLIVE.cooling()" id="cLive-k">
+        <span class="pv" id="cLive-kv">0.015 s⁻¹</span>
+      </div>
+      <div class="pl-live-result">τ = <span id="cLive-tau">66.7 s</span></div>
+      <div class="pl-live-worked" id="cLive-w">τ = 1/0.015 = 66.7 s · 5τ = 333 s to within 1%</div>
     </div>
   </div>
+  <div class="pl-insight"><div class="pl-insight-head">Time constant τ = 1/k</div>
+  At t = τ, excess temperature falls to ΔT₀/e ≈ 36.8%. After 5τ, it's within 0.7% of ambient. A coffee mug: τ ≈ 10–20 min. A red-hot iron bar: τ ≈ 2–3 min.</div>
 </div>`,
     initState: () => ({ T0: 85, Ta: 20, k: 0.015, t: 0 }),
     drawApparatus: (ctx, W, H, state, running, dt) => {
       if (running) state.t = (state.t || 0) + dt * 6;
-      const T = state.Ta + (state.T0 - state.Ta) * Math.exp(-state.k * state.t);
-      const tMax = 6 / state.k;
-      const TMin = state.Ta - 3,
-        TMax = state.T0 + 5;
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, W, H);
-      const pad = { l: 60, r: 20, t: 20, b: 44 };
-      const aw = W - pad.l - pad.r,
-        ah = H - pad.t - pad.b;
-      const sx = (t) => pad.l + (t / tMax) * aw;
-      const sy = (T2) => pad.t + ah * (1 - (T2 - TMin) / (TMax - TMin));
-      ctx.strokeStyle = "rgba(0,229,160,0.05)";
-      ctx.lineWidth = 0.8;
-      for (let i = 0; i <= 6; i++) {
-        const x = sx((i * tMax) / 6);
-        ctx.beginPath();
-        ctx.moveTo(x, pad.t);
-        ctx.lineTo(x, pad.t + ah);
-        ctx.stroke();
-        ctx.fillStyle = "#4a5a72";
-        ctx.font = "10px JetBrains Mono, monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(Math.round((i * tMax) / 6) + "s", x, pad.t + ah + 18);
+      const T = state.Ta + (state.T0 - state.Ta) * Math.exp(-state.k * (state.t || 0));
+      const tMax = 6 / state.k, TMin = state.Ta - 3, TMax = state.T0 + 5;
+
+      ctx.fillStyle = "#0b0e12"; ctx.fillRect(0, 0, W, H);
+      const pad = { l:58, r:20, t:20, b:42 };
+      const aw = W-pad.l-pad.r, ah = H-pad.t-pad.b;
+      const sx = (t) => pad.l + (t/tMax)*aw;
+      const sy = (T2) => pad.t + ah*(1-(T2-TMin)/(TMax-TMin));
+
+      ctx.strokeStyle="rgba(0,229,160,0.05)"; ctx.lineWidth=0.8;
+      for (let i=0;i<=6;i++) {
+        const x=sx(i*tMax/6);
+        ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ah); ctx.stroke();
+        ctx.fillStyle="#4a5a72"; ctx.font="10px JetBrains Mono,monospace"; ctx.textAlign="center";
+        ctx.fillText(Math.round(i*tMax/6)+"s", x, pad.t+ah+18);
       }
-      for (let i = 0; i <= 5; i++) {
-        const TT = TMin + (i * (TMax - TMin)) / 5;
-        const y = sy(TT);
-        ctx.beginPath();
-        ctx.moveTo(pad.l, y);
-        ctx.lineTo(pad.l + aw, y);
-        ctx.stroke();
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#4a5a72";
-        ctx.fillText(TT.toFixed(0) + "°", pad.l - 5, y + 4);
+      for (let i=0;i<=5;i++) {
+        const TT=TMin+i*(TMax-TMin)/5;
+        ctx.beginPath(); ctx.moveTo(pad.l,sy(TT)); ctx.lineTo(pad.l+aw,sy(TT)); ctx.stroke();
+        ctx.textAlign="right"; ctx.fillStyle="#4a5a72";
+        ctx.fillText(TT.toFixed(0)+"°", pad.l-4, sy(TT)+4);
       }
+
+      ctx.beginPath(); ctx.moveTo(pad.l,sy(state.Ta)); ctx.lineTo(pad.l+aw,sy(state.Ta));
+      ctx.strokeStyle="rgba(77,166,255,0.4)"; ctx.lineWidth=1; ctx.setLineDash([6,5]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle="#4da6ff"; ctx.textAlign="left"; ctx.font="10px JetBrains Mono,monospace";
+      ctx.fillText("Tₐ="+state.Ta+"°C", pad.l+4, sy(state.Ta)-6);
+
+      const tCur = Math.min(state.t||0, tMax);
       ctx.beginPath();
-      ctx.moveTo(pad.l, sy(state.Ta));
-      ctx.lineTo(pad.l + aw, sy(state.Ta));
-      ctx.strokeStyle = "rgba(77,166,255,0.4)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([6, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#4da6ff";
-      ctx.font = "10px JetBrains Mono, monospace";
-      ctx.textAlign = "left";
-      ctx.fillText("Tₐ = " + state.Ta + "°C", pad.l + 4, sy(state.Ta) - 6);
-      ctx.beginPath();
-      const tCur = Math.min(state.t, tMax);
-      for (let ti = 0; ti <= tCur; ti += tMax / 300) {
-        const Tt = state.Ta + (state.T0 - state.Ta) * Math.exp(-state.k * ti);
-        ti === 0 ? ctx.moveTo(sx(ti), sy(Tt)) : ctx.lineTo(sx(ti), sy(Tt));
+      for (let ti=0;ti<=tCur;ti+=tMax/300) {
+        const Tt=state.Ta+(state.T0-state.Ta)*Math.exp(-state.k*ti);
+        ti===0?ctx.moveTo(sx(ti),sy(Tt)):ctx.lineTo(sx(ti),sy(Tt));
       }
-      ctx.strokeStyle = "#f5a623";
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(sx(tCur), sy(T), 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#f5a623";
-      ctx.fill();
-      ctx.strokeStyle = "#252e42";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, pad.t);
-      ctx.lineTo(pad.l, pad.t + ah);
-      ctx.lineTo(pad.l + aw, pad.t + ah);
-      ctx.stroke();
-      const tau = 1 / state.k;
-      const dro = [
+      ctx.strokeStyle="#f5a623"; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx(tCur),sy(T),5,0,Math.PI*2);
+      ctx.fillStyle="#f5a623"; ctx.fill();
+
+      ctx.strokeStyle="#252e42"; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ah); ctx.lineTo(pad.l+aw,pad.t+ah); ctx.stroke();
+      ctx.textAlign="left";
+
+      drawDRO(ctx, W, [
         ["T(t) (°C)", T.toFixed(2)],
-        ["t (s)", tCur.toFixed(1)],
-        ["ΔT (°C)", (T - state.Ta).toFixed(2)],
-        ["τ (s)", tau.toFixed(1)],
-        ["T₀ (°C)", state.T0.toFixed(0)],
-      ];
-      ctx.fillStyle = "rgba(11,14,18,0.9)";
-      ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
-      dro.forEach(([k, v], i) => {
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillStyle = "#4a5a72";
-        ctx.fillText(k, W - 184, 30 + i * 20);
-        ctx.fillStyle = "#00e5a0";
-        ctx.textAlign = "right";
-        ctx.fillText(v, W - 18, 30 + i * 20);
-        ctx.textAlign = "left";
-      });
+        ["t (s)",     tCur.toFixed(1)],
+        ["ΔT (°C)",   (T-state.Ta).toFixed(2)],
+        ["τ (s)",     (1/state.k).toFixed(1)],
+        ["T₀ (°C)",   state.T0.toFixed(0)],
+      ]);
     },
     controls: () => [
-      {
-        id: "c-T0",
-        label: "Initial T₀ (°C)",
-        min: 40,
-        max: 150,
-        step: 5,
-        init: 85,
-        stateKey: "T0",
-        fmt: (v) => v.toFixed(0),
-      },
-      {
-        id: "c-Ta",
-        label: "Ambient Tₐ (°C)",
-        min: 5,
-        max: 30,
-        step: 1,
-        init: 20,
-        stateKey: "Ta",
-        fmt: (v) => v.toFixed(0),
-      },
-      {
-        id: "c-k",
-        label: "Cooling k (s⁻¹)",
-        min: 0.002,
-        max: 0.04,
-        step: 0.001,
-        init: 0.015,
-        stateKey: "k",
-        fmt: (v) => v.toFixed(3),
-      },
+      { id: "cl-T0", label: "Initial T₀ (°C)", min: 40, max: 150, step: 5, init: 85, stateKey: "T0", fmt: (v) => v.toFixed(0) },
+      { id: "cl-Ta", label: "Ambient Tₐ (°C)", min: 5, max: 30, step: 1, init: 20, stateKey: "Ta", fmt: (v) => v.toFixed(0) },
+      { id: "cl-k",  label: "Cooling k (s⁻¹)", min: 0.002, max: 0.04, step: 0.001, init: 0.015, stateKey: "k", fmt: (v) => v.toFixed(3) },
     ],
     recordPoint: (state) => {
-      const T =
-        state.Ta +
-        (state.T0 - state.Ta) * Math.exp(-state.k * state.t) +
-        (Math.random() - 0.5) * 0.4;
-      const dT = Math.max(0.01, T - state.Ta);
-      state.t = (state.t || 0) + 15;
-      return [
-        state.t.toFixed(0),
-        T.toFixed(2),
-        dT.toFixed(2),
-        Math.log(dT).toFixed(4),
-      ];
+      const T = state.Ta + (state.T0-state.Ta)*Math.exp(-state.k*(state.t||0)) + (Math.random()-0.5)*0.4;
+      const dT = Math.max(0.01, T-state.Ta);
+      state.t = (state.t||0) + 15;
+      return [(state.t||0).toFixed(0), T.toFixed(2), dT.toFixed(2), Math.log(dT).toFixed(4)];
     },
     dataSchema: {
-      cols: ["#", "t (s)", "T (°C)", "T−Tₐ (°C)", "ln(T−Tₐ)"],
+      cols: ["#", "t (s)", "T (°C)", "T−Tₐ", "ln(T−Tₐ)"],
       types: ["index", "measured", "measured", "derived", "derived"],
     },
-    analyzeSetup: {
-      xi: 1,
-      yi: 4,
-      xLabel: "t (s)",
-      yLabel: "ln(T − Tₐ)",
-      title: "Linearized Cooling: ln(T−Tₐ) vs t",
-    },
+    analyzeSetup: { xi: 1, yi: 4, xLabel: "t (s)", yLabel: "ln(T−Tₐ)", title: "Linearized Cooling" },
     analysisInsight: (slope, intercept, r2, state) => {
-      const k_exp = -slope;
-      const tau = 1 / k_exp;
-      return `<strong>k = ${k_exp.toFixed(4)} s⁻¹, τ = ${tau.toFixed(1)} s</strong> (set k=${state.k.toFixed(3)}, τ=${(1 / state.k).toFixed(1)}s). R² = ${r2.toFixed(5)}.`;
+      const k_exp = -slope, tau = 1/k_exp;
+      return `<strong>k = ${k_exp.toFixed(4)} s⁻¹, τ = ${tau.toFixed(1)} s</strong> (set: k=${state.k.toFixed(3)}, τ=${(1/state.k).toFixed(1)}s). R² = ${r2.toFixed(5)}.`;
     },
     theoryResult: (slope, state) => ({
-      label: "k (measured)",
-      value: (-slope).toFixed(5),
-      unit: "s⁻¹",
-      theory: state.k.toFixed(5),
-      pctError: Math.abs(((-slope - state.k) / state.k) * 100).toFixed(2),
+      label: "k (measured)", value: (-slope).toFixed(5),
+      unit: "s⁻¹", theory: state.k.toFixed(5),
+      pctError: Math.abs((-slope-state.k)/state.k*100).toFixed(2),
     }),
-  },
-  {
-    id: "waves",
-    name: "Standing Waves",
-    subtitle: "Harmonics and Wave Speed",
-    objective:
-      "Find resonant frequencies for n = 1–5. Verify fₙ = n·f₁. Measure v.",
-    category: "Waves",
-    steps: [
-      {
-        title: "Read theory",
-        desc: "Understand standing waves, harmonics, and v = fλ.",
-      },
-      {
-        title: "Set string",
-        desc: "Choose length L and tension T. Observe wave.",
-      },
-      {
-        title: "Find harmonics",
-        desc: "Use n slider to select each harmonic. Record f.",
-      },
-      { title: "Record 5 points", desc: "Record f for n = 1, 2, 3, 4, 5." },
-      { title: "Plot f vs n", desc: "Slope = f₁. Intercept should be ~0." },
-      { title: "Find v", desc: "v = f₁ · 2L. Compare to √(T/μ)." },
-    ],
-    theory: () => `
-<div class="theory-block">
-  <div class="theory-h1">Standing Waves on a String</div>
-  <div class="theory-sub">Waves · Resonance · Superposition</div>
-  <div class="theory-section">
-    <div class="theory-h2">Formation</div>
-    <p class="theory-p">When a wave on a string fixed at both ends reflects, incident and reflected waves superpose. At certain frequencies, a <em>standing wave</em> pattern forms.</p>
-    <div class="eq-block">
-      <div class="eq-tag">Resonance condition</div>
-      <div class="eq-formula">L = n · λ/2 &nbsp;&nbsp; (n = 1, 2, 3, …)</div>
-    </div>
-    <div class="eq-block">
-      <div class="eq-tag">Harmonic frequencies</div>
-      <div class="eq-formula">fₙ = n · v / (2L) = n · f₁</div>
-      <div class="eq-vars">
-        <span class="eq-var"><b>v</b> wave speed = √(T/μ)</span>
-        <span class="eq-var"><b>T</b> string tension (N)</span>
-        <span class="eq-var"><b>μ</b> linear mass density (kg/m)</span>
-      </div>
-    </div>
-  </div>
-  <div class="insight">
-    <div class="insight-head">Harmonics and music</div>
-    The overtone series fₙ = n·f₁ is the physical basis of musical intervals. The octave (2:1), perfect fifth (3:2), and perfect fourth (4:3) all arise from integer ratios of standing wave frequencies.
-  </div>
-</div>`,
-    initState: () => ({ L: 1.0, tension: 40, mu: 0.01, n: 1, phase: 0 }),
-    drawApparatus: (ctx, W, H, state, running, dt) => {
-      const v = Math.sqrt(state.tension / state.mu);
-      const f1 = v / (2 * state.L);
-      const fn = state.n * f1;
-      if (running)
-        state.phase = (state.phase || 0) + dt * fn * 2 * Math.PI * 0.3;
-      ctx.fillStyle = "#0b0e12";
-      ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(0,229,160,0.04)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 40) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
-      }
-      for (let y = 0; y < H; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
-      }
-      const pad = 60,
-        cy = H / 2;
-      const sw = W - pad * 2;
-      ctx.fillStyle = "#252e42";
-      ctx.fillRect(pad - 14, cy - 50, 14, 100);
-      ctx.fillRect(W - pad, cy - 50, 14, 100);
-      ctx.beginPath();
-      ctx.moveTo(pad, cy);
-      ctx.lineTo(W - pad, cy);
-      ctx.strokeStyle = "rgba(255,255,255,0.07)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      const amp = Math.min(H * 0.2, 70);
-      ctx.beginPath();
-      for (let i = 0; i <= 500; i++) {
-        const x = i / 500;
-        const xp = pad + x * sw;
-        const y =
-          cy + amp * Math.sin(state.n * Math.PI * x) * Math.cos(state.phase);
-        i === 0 ? ctx.moveTo(xp, y) : ctx.lineTo(xp, y);
-      }
-      ctx.strokeStyle = "#00e5a0";
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-      for (let i = 0; i <= state.n; i++) {
-        const xp = pad + (i / state.n) * sw;
-        ctx.beginPath();
-        ctx.arc(xp, cy, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#8a9ab5";
-        ctx.fill();
-        ctx.fillStyle = "#4a5a72";
-        ctx.font = "10px JetBrains Mono, monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("N", xp, cy + 18);
-        ctx.textAlign = "left";
-      }
-      const dro = [
-        ["n", state.n.toFixed(0)],
-        ["f₁ (Hz)", f1.toFixed(2)],
-        ["fₙ (Hz)", fn.toFixed(2)],
-        ["λ (m)", (v / fn).toFixed(4)],
-        ["v (m/s)", v.toFixed(2)],
-      ];
-      ctx.fillStyle = "rgba(11,14,18,0.9)";
-      ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
-      dro.forEach(([k, val], i) => {
-        ctx.font = "11px JetBrains Mono, monospace";
-        ctx.fillStyle = "#4a5a72";
-        ctx.fillText(k, W - 184, 30 + i * 20);
-        ctx.fillStyle = "#00e5a0";
-        ctx.textAlign = "right";
-        ctx.fillText(val, W - 18, 30 + i * 20);
-        ctx.textAlign = "left";
-      });
-    },
-    controls: () => [
-      {
-        id: "c-wL",
-        label: "Length L (m)",
-        min: 0.3,
-        max: 3.0,
-        step: 0.1,
-        init: 1.0,
-        stateKey: "L",
-        fmt: (v) => v.toFixed(1),
-      },
-      {
-        id: "c-wT",
-        label: "Tension T (N)",
-        min: 5,
-        max: 100,
-        step: 5,
-        init: 40,
-        stateKey: "tension",
-        fmt: (v) => v.toFixed(0),
-      },
-      {
-        id: "c-wn",
-        label: "Harmonic n",
-        min: 1,
-        max: 5,
-        step: 1,
-        init: 1,
-        stateKey: "n",
-        fmt: (v) => v.toFixed(0),
-      },
-    ],
-    recordPoint: (state) => {
-      const v = Math.sqrt(state.tension / state.mu);
-      const f1 = v / (2 * state.L);
-      const fn = state.n * f1 * (1 + (Math.random() - 0.5) * 0.005);
-      return [
-        state.n.toFixed(0),
-        fn.toFixed(3),
-        (v / fn).toFixed(4),
-        (fn * (v / fn)).toFixed(3),
-      ];
-    },
-    dataSchema: {
-      cols: ["#", "n", "fₙ (Hz)", "λ (m)", "v = fλ (m/s)"],
-      types: ["index", "measured", "measured", "derived", "derived"],
-    },
-    analyzeSetup: {
-      xi: 1,
-      yi: 2,
-      xLabel: "Harmonic n",
-      yLabel: "fₙ (Hz)",
-      title: "Frequency vs Harmonic Number",
-    },
-    analysisInsight: (slope, intercept, r2, state) => {
-      const v = Math.sqrt(state.tension / state.mu);
-      const v_exp = slope * 2 * state.L;
-      return `<strong>f₁ = ${slope.toFixed(2)} Hz, v = 2L·f₁ = ${v_exp.toFixed(2)} m/s</strong> (theory: ${v.toFixed(2)} m/s). R² = ${r2.toFixed(5)}.`;
-    },
-    theoryResult: (slope, state) => {
-      const v = Math.sqrt(state.tension / state.mu);
-      return {
-        label: "v (measured)",
-        value: (slope * 2 * state.L).toFixed(3),
-        unit: "m/s",
-        theory: v.toFixed(3),
-        pctError: Math.abs(((slope * 2 * state.L - v) / v) * 100).toFixed(2),
-      };
-    },
   },
 ];
 
-// ── Physics Lab Component ─────────────────────────────────────
-export default function PhysicsLab({ onClose }) {
-  const [currentLabId, setCurrentLabId] = useState("pendulum");
-  const [currentPanel, setCurrentPanel] = useState("theory");
-  const [labState, setLabState] = useState(LABS[0].initState());
-  const [running, setRunning] = useState(false);
-  const [dataRows, setDataRows] = useState([]);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [regressionResults, setRegressionResults] = useState(null);
-
-  const canvasRef = useRef(null);
-  const animationRef = useRef(null);
-  const plotCanvasRef = useRef(null);
-
-  const currentLab = LABS.find((l) => l.id === currentLabId);
-
-  // Inject styles
-  useEffect(() => {
-    const styleElement = document.createElement("style");
-    styleElement.textContent = styles;
-    document.head.appendChild(styleElement);
-    return () => document.head.removeChild(styleElement);
-  }, []);
-
-  // Wire up inline oninput handlers for theory-panel live calculators
-  useEffect(() => {
-    window.LIVE = {
-      pendulum() {
-        const L = parseFloat(document.getElementById("pLive-L")?.value ?? 1);
-        const g = parseFloat(document.getElementById("pLive-g")?.value ?? 9.81);
-        const T = 2 * Math.PI * Math.sqrt(L / g);
-        const el = (id) => document.getElementById(id);
-        if (el("pLive-Lv")) el("pLive-Lv").textContent = `${L.toFixed(2)} m`;
-        if (el("pLive-gv")) el("pLive-gv").textContent = `${g.toFixed(2)} m/s²`;
-        if (el("pLive-T"))  el("pLive-T").textContent  = `${T.toFixed(3)} s`;
-        if (el("pLive-w"))  el("pLive-w").textContent  =
-          `T = 2π √(${L.toFixed(2)} / ${g.toFixed(2)}) = ${T.toFixed(3)} s`;
-      },
-      snell() {
-        const t1 = parseFloat(document.getElementById("sLive-t1")?.value ?? 30);
-        const n2 = parseFloat(document.getElementById("sLive-n2")?.value ?? 1.5);
-        const sinT2 = Math.sin((t1 * Math.PI) / 180) / n2;
-        const TIR = sinT2 >= 1;
-        const t2 = TIR ? null : (Math.asin(sinT2) * 180) / Math.PI;
-        const el = (id) => document.getElementById(id);
-        if (el("sLive-t1v")) el("sLive-t1v").textContent = `${t1}°`;
-        if (el("sLive-n2v")) el("sLive-n2v").textContent = n2.toFixed(2);
-        if (el("sLive-t2"))  el("sLive-t2").textContent  = TIR ? "TIR" : `${t2.toFixed(1)}°`;
-        if (el("sLive-w"))   el("sLive-w").textContent   = TIR
-          ? `1.00·sin(${t1}°) = ${sinT2.toFixed(3)} ≥ 1 → Total Internal Reflection`
-          : `1.00·sin(${t1}°) = ${n2.toFixed(2)}·sin(θ₂)  →  θ₂ = ${t2.toFixed(1)}°`;
-      },
-      ohm() {
-        const V = parseFloat(document.getElementById("oLive-V")?.value ?? 6);
-        const R = parseFloat(document.getElementById("oLive-R")?.value ?? 100);
-        const I = V / R;
-        const el = (id) => document.getElementById(id);
-        if (el("oLive-Vv")) el("oLive-Vv").textContent = `${V.toFixed(1)} V`;
-        if (el("oLive-Rv")) el("oLive-Rv").textContent = `${R} Ω`;
-        if (el("oLive-I"))  el("oLive-I").textContent  = `${I.toFixed(3)} A`;
-        if (el("oLive-w"))  el("oLive-w").textContent  =
-          `I = V/R = ${V.toFixed(1)} / ${R} = ${I.toFixed(3)} A`;
-      },
-    };
-    return () => { delete window.LIVE; };
-  }, []);
-
-  // Draw apparatus
-  const drawApparatus = () => {
-    if (!canvasRef.current || !currentLab) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    currentLab.drawApparatus(
-      ctx,
-      canvas.width,
-      canvas.height,
-      labState,
-      running,
-      0.05,
-    );
+// ─────────────────────────────────────────────────────────────────
+//  LIVE THEORY CALCULATOR FUNCTIONS
+// ─────────────────────────────────────────────────────────────────
+function registerLiveCalcs() {
+  window.PLLIVE = {
+    freefall() {
+      const h = +document.getElementById("ffL-h")?.value || 1;
+      const t = Math.sqrt(2*h/9.81);
+      const v = 9.81*t;
+      document.getElementById("ffL-hv").textContent = h.toFixed(2)+" m";
+      document.getElementById("ffL-t").textContent = t.toFixed(3)+" s";
+      document.getElementById("ffL-w").innerHTML =
+        `t = √(2×<span class="pl-hl">${h.toFixed(2)}</span>/9.81) = <span class="pl-hl">${t.toFixed(4)}</span> s · v_impact = g·t = <span class="pl-hl">${v.toFixed(3)}</span> m/s`;
+    },
+    airtrack() {
+      const t = +document.getElementById("atL-t")?.value || 30;
+      const a = 9.81*Math.sin(t*Math.PI/180);
+      document.getElementById("atL-tv").textContent = t+"°";
+      document.getElementById("atL-a").textContent = a.toFixed(3)+" m/s²";
+      document.getElementById("atL-w").innerHTML =
+        `a = 9.81 × sin(<span class="pl-hl">${t}°</span>) = 9.81 × <span class="pl-hl">${Math.sin(t*Math.PI/180).toFixed(4)}</span> = <span class="pl-hl">${a.toFixed(4)}</span> m/s²`;
+    },
+    hooke() {
+      const k = +document.getElementById("hkL-k")?.value || 100;
+      const x = +document.getElementById("hkL-x")?.value || 0.1;
+      const F = k*x, U = 0.5*k*x*x;
+      document.getElementById("hkL-kv").textContent = k+" N/m";
+      document.getElementById("hkL-xv").textContent = x.toFixed(2)+" m";
+      document.getElementById("hkL-F").textContent = F.toFixed(2)+" N";
+      document.getElementById("hkL-w").innerHTML =
+        `F = <span class="pl-hl">${k}</span> × <span class="pl-hl">${x.toFixed(2)}</span> = <span class="pl-hl">${F.toFixed(3)}</span> N · U = ½kx² = <span class="pl-hl">${U.toFixed(4)}</span> J`;
+    },
+    pendulum() {
+      const L = +document.getElementById("pLive-L")?.value || 1;
+      const g = +document.getElementById("pLive-g")?.value || 9.81;
+      const T = 2*Math.PI*Math.sqrt(L/g);
+      document.getElementById("pLive-Lv").textContent = L.toFixed(2)+" m";
+      document.getElementById("pLive-gv").textContent = g.toFixed(2)+" m/s²";
+      document.getElementById("pLive-T").textContent  = T.toFixed(3)+" s";
+      document.getElementById("pLive-w").innerHTML =
+        `T = 2π √(<span class="pl-hl">${L.toFixed(2)}</span>/<span class="pl-hl">${g.toFixed(2)}</span>) = <span class="pl-hl">${T.toFixed(4)}</span> s · T² = <span class="pl-hl">${(T*T).toFixed(4)}</span>`;
+    },
+    snell() {
+      const t1 = +document.getElementById("sLive-t1")?.value || 30;
+      const n2 = +document.getElementById("sLive-n2")?.value || 1.5;
+      const s2 = Math.sin(t1*Math.PI/180)/n2;
+      const t2 = s2>=1 ? "TIR" : (Math.asin(s2)*180/Math.PI).toFixed(2)+"°";
+      document.getElementById("sLive-t1v").textContent = t1+"°";
+      document.getElementById("sLive-n2v").textContent = n2.toFixed(2);
+      document.getElementById("sLive-t2").textContent  = t2;
+      document.getElementById("sLive-w").innerHTML =
+        `1.00·sin(<span class="pl-hl">${t1}°</span>) = <span class="pl-hl">${n2}</span>·sin(θ₂) → θ₂ = <span class="pl-hl">${t2}</span>`;
+    },
+    ohm() {
+      const V = +document.getElementById("oLive-V")?.value || 6;
+      const R = +document.getElementById("oLive-R")?.value || 100;
+      const I = V/R;
+      document.getElementById("oLive-Vv").textContent = V.toFixed(1)+" V";
+      document.getElementById("oLive-Rv").textContent = R+" Ω";
+      document.getElementById("oLive-I").textContent  = (I*1000).toFixed(2)+" mA";
+      document.getElementById("oLive-w").innerHTML =
+        `I = <span class="pl-hl">${V.toFixed(1)}</span>/<span class="pl-hl">${R}</span> = <span class="pl-hl">${I.toFixed(4)}</span> A · P = <span class="pl-hl">${(V*I).toFixed(4)}</span> W`;
+    },
+    cooling() {
+      const k = +document.getElementById("cLive-k")?.value || 0.015;
+      const tau = 1/k;
+      document.getElementById("cLive-kv").textContent  = k.toFixed(3)+" s⁻¹";
+      document.getElementById("cLive-tau").textContent = tau.toFixed(1)+" s";
+      document.getElementById("cLive-w").innerHTML =
+        `τ = 1/<span class="pl-hl">${k.toFixed(3)}</span> = <span class="pl-hl">${tau.toFixed(1)}</span> s · 5τ = <span class="pl-hl">${(5*tau).toFixed(0)}</span> s to &lt;1% of ambient`;
+    },
   };
+}
 
-  // Animation loop
+// ─────────────────────────────────────────────────────────────────
+//  LINEAR REGRESSION
+// ─────────────────────────────────────────────────────────────────
+function linReg(xs, ys) {
+  const n = Math.min(xs.length, ys.length);
+  const xm = xs.slice(0,n).reduce((a,b)=>a+b,0)/n;
+  const ym = ys.slice(0,n).reduce((a,b)=>a+b,0)/n;
+  let num=0, den=0;
+  for (let i=0;i<n;i++) { num+=(xs[i]-xm)*(ys[i]-ym); den+=(xs[i]-xm)**2; }
+  const slope = den>0 ? num/den : 0;
+  const intercept = ym - slope*xm;
+  const ss_res = ys.slice(0,n).reduce((s,y,i)=>s+(y-(slope*xs[i]+intercept))**2, 0);
+  const ss_tot = ys.slice(0,n).reduce((s,y)=>s+(y-ym)**2, 0);
+  const r2 = ss_tot>0 ? 1-ss_res/ss_tot : 1;
+  return { slope, intercept, r2 };
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────────
+export default function PhysicsLab({ onClose }) {
+  const [labIdx,   setLabIdx]   = useState(0);
+  const [panel,    setPanel]    = useState("theory");
+  const [state,    setState]    = useState(() => LABS[0].initState());
+  const [running,  setRunning]  = useState(false);
+  const [dataRows, setDataRows] = useState([]);
+  const [stepIdx,  setStepIdx]  = useState(0);
+  const [regResult,setRegResult]= useState(null);
+
+  const canvasRef  = useRef(null);
+  const plotRef    = useRef(null);
+  const animRef    = useRef(null);
+  const stateRef   = useRef(state);
+  const runningRef = useRef(running);
+  const lastTimeRef= useRef(null);
+
+  const lab = LABS[labIdx];
+  stateRef.current  = state;
+  runningRef.current= running;
+
+  // ── Inject CSS once ──────────────────────────────────────────
+  useEffect(() => {
+    const el = document.createElement("style");
+    el.id = "physlab-styles";
+    if (!document.getElementById("physlab-styles")) {
+      el.textContent = STYLES; document.head.appendChild(el);
+    }
+    registerLiveCalcs();
+    return () => { document.getElementById("physlab-styles")?.remove(); delete window.PLLIVE; };
+  }, []);
+
+  // ── Canvas sizing ────────────────────────────────────────────
+  const sizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    if (!wrap) return;
+    const { width, height } = wrap.getBoundingClientRect();
+    if (width > 0 && height > 0) {
+      canvas.width  = width;
+      canvas.height = height;
+    }
+  }, []);
+
+  // ── Draw one frame ───────────────────────────────────────────
+  const draw = useCallback((dt = 0) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    sizeCanvas();
+    const ctx = canvas.getContext("2d");
+    lab.drawApparatus(ctx, canvas.width, canvas.height, stateRef.current, runningRef.current, dt);
+  }, [lab, sizeCanvas]);
+
+  // ── Animation loop ───────────────────────────────────────────
   useEffect(() => {
     if (running) {
-      const animate = () => {
-        setLabState((prev) => ({ ...prev, t: prev.t + 0.016 }));
-        drawApparatus();
-        animationRef.current = requestAnimationFrame(animate);
+      lastTimeRef.current = null;
+      const loop = (ts) => {
+        if (!runningRef.current) return;
+        const dt = lastTimeRef.current ? Math.min((ts - lastTimeRef.current) / 1000, 0.05) : 0.016;
+        lastTimeRef.current = ts;
+        // Mutate stateRef directly for animation (avoid React batching overhead)
+        lab.drawApparatus(canvasRef.current?.getContext("2d"), canvasRef.current?.width || 800, canvasRef.current?.height || 500, stateRef.current, true, dt);
+        animRef.current = requestAnimationFrame(loop);
       };
-      animationRef.current = requestAnimationFrame(animate);
+      animRef.current = requestAnimationFrame(loop);
     } else {
-      drawApparatus();
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      draw(0);
     }
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [running, labState, currentLabId]);
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, [running, draw, lab]);
 
-  // Initial draw
+  // Draw on state change (when not animating)
+  useEffect(() => { if (!running) draw(0); }, [state, draw, running]);
+
+  // Resize observer
   useEffect(() => {
-    drawApparatus();
-  }, [currentLabId, labState]);
+    const obs = new ResizeObserver(() => { sizeCanvas(); if (!running) draw(0); });
+    if (canvasRef.current?.parentElement) obs.observe(canvasRef.current.parentElement);
+    return () => obs.disconnect();
+  }, [sizeCanvas, draw, running]);
 
-  const toggleRun = () => {
-    setRunning(!running);
-  };
+  // ── Switch lab ───────────────────────────────────────────────
+  const switchLab = useCallback((idx) => {
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    setLabIdx(idx);
+    const s = LABS[idx].initState();
+    stateRef.current = s;
+    setState(s);
+    setRunning(false); runningRef.current = false;
+    setDataRows([]); setStepIdx(0); setPanel("theory"); setRegResult(null);
+  }, []);
 
-  const resetLab = () => {
-    setLabState(currentLab.initState());
-    setRunning(false);
-    setDataRows([]);
-    setCurrentStep(0);
-  };
+  // ── Ctrl slider change ───────────────────────────────────────
+  const onSlider = useCallback((stateKey, value) => {
+    setState(prev => {
+      const next = { ...prev, [stateKey]: value };
+      stateRef.current = next;
+      return next;
+    });
+  }, []);
 
-  const recordPoint = () => {
-    const row = currentLab.recordPoint(labState);
-    if (row) {
-      setDataRows((prev) => [...prev, row]);
+  // ── Record point ─────────────────────────────────────────────
+  const recordPoint = useCallback(() => {
+    const row = lab.recordPoint(stateRef.current);
+    if (!row) return;
+    setDataRows(prev => [...prev, row]);
+    setStepIdx(s => Math.max(s, 3));
+  }, [lab]);
+
+  // ── Toggle run ───────────────────────────────────────────────
+  const toggleRun = useCallback(() => {
+    setRunning(r => { runningRef.current = !r; return !r; });
+  }, []);
+
+  // ── Reset ────────────────────────────────────────────────────
+  const resetLab = useCallback(() => {
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+    const s = lab.initState();
+    stateRef.current = s;
+    setState(s);
+    setRunning(false); runningRef.current = false;
+    setDataRows([]); setStepIdx(0); setRegResult(null);
+  }, [lab]);
+
+  // ── Plot ─────────────────────────────────────────────────────
+  const doPlot = useCallback(() => {
+    if (dataRows.length < 2 || !plotRef.current) return;
+    const setup = lab.analyzeSetup;
+    const xi = setup.xi - 1, yi = setup.yi - 1;
+    const xs = dataRows.map(r => parseFloat(r[xi])).filter(v => !isNaN(v));
+    const ys = dataRows.map(r => parseFloat(r[yi])).filter(v => !isNaN(v));
+    if (xs.length < 2) return;
+
+    const { slope, intercept, r2 } = linReg(xs, ys);
+    const res = lab.theoryResult(slope, stateRef.current);
+    setRegResult({ slope, intercept, r2, res });
+    setStepIdx(s => Math.max(s, 5));
+
+    // Draw plot
+    const canvas = plotRef.current;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    const pad = { l:60, r:18, t:22, b:46 };
+    const aw = W-pad.l-pad.r, ah = H-pad.t-pad.b;
+    const xMin=Math.min(...xs), xMax=Math.max(...xs);
+    const yMin=Math.min(...ys), yMax=Math.max(...ys);
+    const xR=xMax-xMin||1, yR=yMax-yMin||1;
+    const xP=xR*.1, yP=yR*.15;
+    const sx=x=>pad.l+(x-(xMin-xP))/(xR+xP*2)*aw;
+    const sy=y=>pad.t+(yMax+yP-y)/(yR+yP*2)*ah;
+
+    ctx.fillStyle="#111520"; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="rgba(0,229,160,0.06)"; ctx.lineWidth=0.8;
+    for (let i=0;i<=5;i++) {
+      const x=xMin-xP+i*(xR+xP*2)/5;
+      ctx.beginPath(); ctx.moveTo(sx(x),pad.t); ctx.lineTo(sx(x),pad.t+ah); ctx.stroke();
+      ctx.font="10px JetBrains Mono,monospace"; ctx.fillStyle="#4a5a72"; ctx.textAlign="center";
+      ctx.fillText(x.toFixed(x<1?3:x<10?2:1), sx(x), pad.t+ah+18);
+      const y=yMin-yP+i*(yR+yP*2)/5;
+      ctx.beginPath(); ctx.moveTo(pad.l,sy(y)); ctx.lineTo(pad.l+aw,sy(y)); ctx.stroke();
+      ctx.textAlign="right";
+      ctx.fillText(y.toFixed(y<1?3:y<10?2:1), pad.l-4, sy(y)+4);
     }
-  };
+    ctx.strokeStyle="#252e42"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ah); ctx.lineTo(pad.l+aw,pad.t+ah); ctx.stroke();
 
-  const doPlot = () => {
-    if (!currentLab || !plotCanvasRef.current || dataRows.length < 2) return;
+    const x1=xMin-xP, x2=xMax+xP;
+    ctx.beginPath(); ctx.moveTo(sx(x1),sy(slope*x1+intercept)); ctx.lineTo(sx(x2),sy(slope*x2+intercept));
+    ctx.strokeStyle="rgba(245,166,35,0.6)"; ctx.lineWidth=1.5; ctx.setLineDash([7,4]); ctx.stroke(); ctx.setLineDash([]);
 
-    const setup = currentLab.analyzeSetup;
-    const xi = setup.xi - 1;
-    const yi = setup.yi - 1;
-    const xs = dataRows.map((r) => parseFloat(r[xi])).filter((v) => !isNaN(v));
-    const ys = dataRows.map((r) => parseFloat(r[yi])).filter((v) => !isNaN(v));
-    const n = Math.min(xs.length, ys.length);
-
-    if (n < 2) return;
-
-    // Linear regression: y = slope*x + intercept
-    const xm = xs.slice(0, n).reduce((a, b) => a + b, 0) / n;
-    const ym = ys.slice(0, n).reduce((a, b) => a + b, 0) / n;
-    let num = 0,
-      den = 0;
-    for (let i = 0; i < n; i++) {
-      num += (xs[i] - xm) * (ys[i] - ym);
-      den += (xs[i] - xm) ** 2;
-    }
-    const slope = den > 0 ? num / den : 0;
-    const intercept = ym - slope * xm;
-    const ss_res = ys
-      .slice(0, n)
-      .reduce((s, y, i) => s + (y - (slope * xs[i] + intercept)) ** 2, 0);
-    const ss_tot = ys.slice(0, n).reduce((s, y) => s + (y - ym) ** 2, 0);
-    const r2 = ss_tot > 0 ? 1 - ss_res / ss_tot : 1;
-
-    // Store theory result
-    const res = currentLab.theoryResult(slope, labState);
-    const pct = parseFloat(res.pctError);
-
-    setRegressionResults({
-      slope,
-      intercept,
-      r2,
-      res,
-      pct,
+    xs.forEach((x,i) => {
+      ctx.beginPath(); ctx.arc(sx(x),sy(ys[i]),5,0,Math.PI*2);
+      ctx.fillStyle="#00e5a0"; ctx.fill();
+      ctx.strokeStyle="rgba(0,229,160,0.3)"; ctx.lineWidth=1; ctx.stroke();
     });
 
-    // Draw on canvas
-    const canvas = plotCanvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const W = canvas.width,
-      H = canvas.height;
-    const pad = { l: 64, r: 20, t: 24, b: 50 };
-    const aw = W - pad.l - pad.r,
-      ah = H - pad.t - pad.b;
+    ctx.fillStyle="#8a9ab5"; ctx.font="11px JetBrains Mono,monospace"; ctx.textAlign="center";
+    ctx.fillText(setup.xLabel, W/2, H-5);
+    ctx.save(); ctx.translate(13,(H+pad.t)/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(setup.yLabel,0,0); ctx.restore();
+    ctx.textAlign="left";
+  }, [dataRows, lab]);
 
-    const xMin = Math.min(...xs),
-      xMax = Math.max(...xs);
-    const yMin = Math.min(...ys),
-      yMax = Math.max(...ys);
-    const xRange = xMax - xMin || 1,
-      yRange = yMax - yMin || 1;
-    const xPad = xRange * 0.1,
-      yPad = yRange * 0.15;
-    const sx = (x) => pad.l + ((x - (xMin - xPad)) / (xRange + xPad * 2)) * aw;
-    const sy = (y) => pad.t + ((yMax + yPad - y) / (yRange + yPad * 2)) * ah;
-
-    ctx.fillStyle = "#111520";
-    ctx.fillRect(0, 0, W, H);
-
-    // Grid
-    ctx.strokeStyle = "rgba(0,229,160,0.06)";
-    ctx.lineWidth = 0.8;
-    for (let i = 0; i <= 5; i++) {
-      const x = xMin - xPad + (i * (xRange + xPad * 2)) / 5;
-      ctx.beginPath();
-      ctx.moveTo(sx(x), pad.t);
-      ctx.lineTo(sx(x), pad.t + ah);
-      ctx.stroke();
-      ctx.font = "10px JetBrains Mono, monospace";
-      ctx.fillStyle = "#4a5a72";
-      ctx.textAlign = "center";
-      ctx.fillText(
-        x.toFixed(x < 1 ? 3 : x < 10 ? 2 : 1),
-        sx(x),
-        pad.t + ah + 18,
-      );
-
-      const y = yMin - yPad + (i * (yRange + yPad * 2)) / 5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, sy(y));
-      ctx.lineTo(pad.l + aw, sy(y));
-      ctx.stroke();
-      ctx.textAlign = "right";
-      ctx.fillText(y.toFixed(y < 1 ? 3 : y < 10 ? 2 : 1), pad.l - 5, sy(y) + 4);
-    }
-
-    // Axes
-    ctx.strokeStyle = "#252e42";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, pad.t);
-    ctx.lineTo(pad.l, pad.t + ah);
-    ctx.lineTo(pad.l + aw, pad.t + ah);
-    ctx.stroke();
-
-    // Fit line
-    const x1 = xMin - xPad,
-      x2 = xMax + xPad;
-    ctx.beginPath();
-    ctx.moveTo(sx(x1), sy(slope * x1 + intercept));
-    ctx.lineTo(sx(x2), sy(slope * x2 + intercept));
-    ctx.strokeStyle = "rgba(245,166,35,0.6)";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([7, 4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Data points
-    for (let i = 0; i < n; i++) {
-      ctx.beginPath();
-      ctx.arc(sx(xs[i]), sy(ys[i]), 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#00e5a0";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(0,229,160,0.3)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    // Axis labels
-    ctx.fillStyle = "#8a9ab5";
-    ctx.font = "11px JetBrains Mono, monospace";
-    ctx.textAlign = "center";
-    ctx.fillText(setup.xLabel, W / 2, H - 5);
-    ctx.save();
-    ctx.translate(14, (H + pad.t) / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText(setup.yLabel, 0, 0);
-    ctx.restore();
-    ctx.textAlign = "left";
-  };
-
-  const switchLab = (labId) => {
-    setCurrentLabId(labId);
-    const newLab = LABS.find((l) => l.id === labId);
-    setLabState(newLab.initState());
-    setRunning(false);
-    setDataRows([]);
-    setCurrentStep(0);
-    setCurrentPanel("theory");
-  };
+  // ─────────────────────────────────────────────────────────────
+  //  RENDER
+  // ─────────────────────────────────────────────────────────────
+  const sch = lab.dataSchema;
 
   return (
-    <div
-      id="physlab-root"
-      style={{
-        display: "grid",
-        gridTemplateRows: "48px 1fr",
-        gridTemplateColumns: "280px 1fr",
-        gridTemplateAreas: '"header header" "sidebar main"',
-        width: "100vw",
-        height: "100vh",
-        background: "var(--bg)",
-        color: "var(--text)",
-        fontFamily: "var(--sans)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Header */}
-      <header id="header" style={{ gridArea: "header" }}>
-        <div className="logo">
-          <div className="logo-mark">φ</div>
-          <div className="logo-text">Physics Lab</div>
+    <div id="physlab-root" style={{
+      display:"flex", flexDirection:"column",
+      width:"100vw", height:"100vh",
+      background:"var(--bg)", color:"var(--text)", overflow:"hidden",
+    }}>
+      {/* ── HEADER ── */}
+      <div className="pl-header">
+        <div className="pl-logo">
+          <div className="pl-logo-mark">φ</div>
+          <div className="pl-logo-text">Physics Lab</div>
         </div>
-        <div className="lab-tabs">
-          {LABS.map((lab) => (
-            <button
-              key={lab.id}
-              className={`lab-tab ${currentLabId === lab.id ? "active" : ""}`}
-              onClick={() => switchLab(lab.id)}
-            >
-              <div className="tab-dot"></div>
-              {lab.name}
+        <div className="pl-lab-tabs">
+          {LABS.map((l, i) => (
+            <button key={l.id} className={`pl-lab-tab ${i===labIdx?"active":""}`} onClick={()=>switchLab(i)}>
+              <span className="pl-tab-dot" />
+              {l.name}
+              <span className="pl-tab-cat">{l.category}</span>
             </button>
           ))}
         </div>
-        <div className="header-actions">
-          <div
-            style={{
-              fontSize: "10px",
-              color: "var(--text3)",
-              marginRight: "4px",
-            }}
-          >
-            {running ? "Running" : "Idle"}
-          </div>
-          <button
-            className={`hbtn ${running ? "stop" : "run"}`}
-            onClick={toggleRun}
-          >
-            {running ? "Stop" : "Run"}
+        <div className="pl-header-actions">
+          <span style={{fontSize:"10px",color:"var(--text3)",marginRight:"2px"}}>{running?"Running":"Idle"}</span>
+          <button className={`pl-hbtn ${running?"stop":"run"}`} onClick={toggleRun}>
+            {running ? "⏹ Stop" : "▶ Run"}
           </button>
-          <button className="hbtn" onClick={resetLab}>
-            ↺ Reset
-          </button>
-          <button
-            className="hbtn"
-            onClick={onClose}
-            style={{ marginLeft: "8px" }}
-            title="Close"
-          >
-            ✕ Close
-          </button>
+          <button className="pl-hbtn" onClick={resetLab}>↺ Reset</button>
+          {onClose && <button className="pl-hbtn" onClick={onClose}>✕</button>}
         </div>
-      </header>
+      </div>
 
-      {/* Sidebar */}
-      <aside id="sidebar" style={{ gridArea: "sidebar" }}>
-        <div className="sidebar-section">
-          <div className="sidebar-label">Current Lab</div>
-          <div className="lab-name">{currentLab.name}</div>
-          <div className="lab-objective">{currentLab.objective}</div>
-        </div>
-        <div
-          className="sidebar-section"
-          style={{ paddingTop: "10px", paddingBottom: "8px" }}
-        >
-          <div className="sidebar-label">Procedure</div>
-        </div>
-        <div className="proc-scroll">
-          {currentLab.steps.map((step, i) => (
-            <div
-              key={i}
-              className={`proc-step ${currentStep === i ? "active" : ""} ${i < currentStep ? "done" : ""}`}
-              onClick={() => setCurrentStep(i)}
-            >
-              <div className="step-n">{i + 1}</div>
-              <div className="step-body">
-                <div className="step-title">{step.title}</div>
-                <div className="step-desc">{step.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="sidebar-status">
-          <div className="status-row">
-            <span>Data points</span>
-            <span className="status-val">{dataRows.length}</span>
+      {/* ── BODY ── */}
+      <div className="pl-body">
+
+        {/* ── SIDEBAR ── */}
+        <aside className="pl-sidebar">
+          <div className="pl-sb-section">
+            <div className="pl-sb-label">Current Lab</div>
+            <div className="pl-lab-name">{lab.name} — {lab.subtitle}</div>
+            <div className="pl-lab-obj">{lab.objective}</div>
           </div>
-          <div className="status-row">
-            <span>Run state</span>
-            <span className="status-val">{running ? "Running" : "Idle"}</span>
+          <div className="pl-sb-section" style={{paddingTop:"10px",paddingBottom:"6px"}}>
+            <div className="pl-sb-label">Procedure</div>
           </div>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main id="main" style={{ gridArea: "main" }}>
-        <div className="panel-tabs">
-          {["theory", "apparatus", "data", "analysis"].map((panel) => (
-            <button
-              key={panel}
-              className={`ptab ${currentPanel === panel ? "active" : ""}`}
-              onClick={() => setCurrentPanel(panel)}
-            >
-              {panel}
-            </button>
-          ))}
-        </div>
-
-        <div className="panels">
-          <div
-            className={`panel ${currentPanel === "theory" ? "active" : ""}`}
-            id="panel-theory"
-          >
-            <div dangerouslySetInnerHTML={{ __html: currentLab.theory() }} />
-          </div>
-
-          <div
-            className={`panel ${currentPanel === "apparatus" ? "active" : ""}`}
-            id="panel-apparatus"
-          >
-            <div className="apparatus-canvas-wrap">
-              <canvas ref={canvasRef} width={800} height={600} />
-            </div>
-            <div className="apparatus-controls">
-              {currentLab.controls().map((ctrl) => (
-                <div key={ctrl.id} className="ctrl-group">
-                  <span className="ctrl-label">{ctrl.label}</span>
-                  <input
-                    type="range"
-                    min={ctrl.min}
-                    max={ctrl.max}
-                    step={ctrl.step}
-                    value={labState[ctrl.stateKey]}
-                    onChange={(e) =>
-                      setLabState((prev) => ({
-                        ...prev,
-                        [ctrl.stateKey]: parseFloat(e.target.value),
-                      }))
-                    }
-                  />
-                  <span className="ctrl-val">
-                    {ctrl.fmt(labState[ctrl.stateKey])}
-                  </span>
-                </div>
-              ))}
-              <div className="gap"></div>
-              <button className="ctrl-record-btn" onClick={recordPoint}>
-                Record Point
-              </button>
-            </div>
-          </div>
-
-          <div
-            className={`panel ${currentPanel === "data" ? "active" : ""}`}
-            id="panel-data"
-          >
-            <div className="data-header">
-              <div>
-                <div className="panel-title">
-                  {currentLab.name} — Data Table
-                </div>
-                <div className="panel-sub">
-                  {dataRows.length} point{dataRows.length !== 1 ? "s" : ""}{" "}
-                  recorded · {Math.max(0, 6 - dataRows.length)} more recommended
-                </div>
-              </div>
-              <div className="data-actions">
-                <button className="dbtn" onClick={recordPoint}>
-                  ⊕ Record
-                </button>
-                <button className="dbtn danger" onClick={() => setDataRows([])}>
-                  ⊗ Clear
-                </button>
-              </div>
-            </div>
-            <div className="data-table-wrap">
-              <table className="dtable">
-                <thead>
-                  <tr>
-                    {currentLab.dataSchema.cols.map((col, i) => (
-                      <th key={i}>{col}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataRows.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={currentLab.dataSchema.cols.length}
-                        style={{
-                          color: "var(--text3)",
-                          textAlign: "center",
-                          padding: "20px",
-                        }}
-                      >
-                        No data recorded yet — go to Apparatus and click Record
-                        Point
-                      </td>
-                    </tr>
-                  ) : (
-                    dataRows.map((row, i) => (
-                      <tr key={i}>
-                        <td className="c-index">{i + 1}</td>
-                        {row.map((cell, j) => (
-                          <td
-                            key={j}
-                            className={
-                              currentLab.dataSchema.types[j + 1] === "measured"
-                                ? "c-measured"
-                                : currentLab.dataSchema.types[j + 1] ===
-                                    "derived"
-                                  ? "c-derived"
-                                  : ""
-                            }
-                          >
-                            {cell}
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <div className="data-note">
-              <span className="c-measured">
-                ■ Blue = measured directly from apparatus
-              </span>{" "}
-              &nbsp;·&nbsp;
-              <span className="c-derived">
-                ■ Amber = derived/calculated from measurements
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={`panel ${currentPanel === "analysis" ? "active" : ""}`}
-            id="panel-analysis"
-          >
-            <div className="data-header" style={{ marginBottom: "16px" }}>
-              <div>
-                <div className="panel-title">
-                  {currentLab.analyzeSetup.title}
-                </div>
-                <div className="panel-sub">
-                  {dataRows.length} data point{dataRows.length !== 1 ? "s" : ""}{" "}
-                  available
-                </div>
-              </div>
-              <button
-                className="plot-btn"
-                style={{ width: "auto", padding: "8px 20px" }}
-                onClick={doPlot}
-              >
-                Plot & Fit Linear Regression
-              </button>
-            </div>
-            <div className="analysis-layout">
-              <div className="plot-wrap">
-                <canvas
-                  ref={plotCanvasRef}
-                  width={600}
-                  height={450}
-                  style={{ display: "block" }}
-                />
-              </div>
-              <div className="analysis-right">
-                {regressionResults ? (
-                  <>
-                    <div className="result-card">
-                      <div className="result-card-title">
-                        Regression Results
-                      </div>
-                      <div className="result-row">
-                        <span className="result-key">Slope</span>
-                        <span className="result-val">
-                          {regressionResults.slope.toFixed(6)}
-                        </span>
-                      </div>
-                      <div className="result-row">
-                        <span className="result-key">Intercept</span>
-                        <span className="result-val">
-                          {regressionResults.intercept.toFixed(6)}
-                        </span>
-                      </div>
-                      <div className="result-row">
-                        <span
-                          className={`result-val ${
-                            regressionResults.r2 > 0.99 ? "good" : "warn"
-                          }`}
-                        >
-                          R² = {regressionResults.r2.toFixed(6)}
-                        </span>
-                      </div>
-                      <div className="result-row">
-                        <span className="result-key">
-                          {regressionResults.res.label}
-                        </span>
-                        <span className="result-val">
-                          {regressionResults.res.value}{" "}
-                          {regressionResults.res.unit}
-                        </span>
-                      </div>
-                      <div className="result-row">
-                        <span className="result-key">Theory</span>
-                        <span className="result-val theory">
-                          {regressionResults.res.theory}{" "}
-                          {regressionResults.res.unit}
-                        </span>
-                      </div>
-                      <div className="result-row">
-                        <span className="result-key">% Error</span>
-                        <span
-                          className={`result-val ${
-                            regressionResults.pct < 2
-                              ? "good"
-                              : regressionResults.pct < 5
-                                ? ""
-                                : "warn"
-                          }`}
-                        >
-                          {regressionResults.pct.toFixed(2)}%
-                        </span>
-                      </div>
-                    </div>
-                    <div
-                      className="analysis-insight"
-                      dangerouslySetInnerHTML={{
-                        __html: currentLab.analysisInsight(
-                          regressionResults.slope,
-                          regressionResults.intercept,
-                          regressionResults.r2,
-                          labState,
-                        ),
-                      }}
-                    />
-                  </>
-                ) : (
-                  <div className="result-card">
-                    <div className="result-card-title">Ready to Plot</div>
-                    <div style={{ color: "var(--text3)", fontSize: "12px" }}>
-                      {dataRows.length < 2
-                        ? "Record ≥2 data points to enable plotting"
-                        : "Click 'Plot & Fit' to start analysis"}
-                    </div>
+          <div className="pl-proc-scroll">
+            {lab.steps.map((s, i) => (
+              <div key={i}>
+                <div
+                  className={`pl-step ${i===stepIdx?"active":""} ${i<stepIdx?"done":""}`}
+                  onClick={()=>setStepIdx(i)}
+                >
+                  <div className="pl-step-n">{i+1}</div>
+                  <div>
+                    <div className="pl-step-title">{s.title}</div>
+                    <div className="pl-step-desc">{s.desc}</div>
                   </div>
+                </div>
+                {i===stepIdx && s.question && (
+                  <div className="pl-question">{s.question}</div>
                 )}
               </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </main>
+          <div className="pl-sb-status">
+            <div className="pl-status-row"><span>Data points</span><span className="pl-status-val">{dataRows.length}</span></div>
+            <div className="pl-status-row"><span>Run state</span><span className="pl-status-val">{running?"Running":"Idle"}</span></div>
+          </div>
+        </aside>
+
+        {/* ── MAIN ── */}
+        <div className="pl-main">
+          <div className="pl-panel-tabs">
+            {["theory","apparatus","data","analysis"].map(p => (
+              <button key={p} className={`pl-ptab ${panel===p?"active":""}`} onClick={()=>setPanel(p)}>{p}</button>
+            ))}
+          </div>
+
+          <div className="pl-panels">
+            {/* THEORY */}
+            <div className={`pl-panel ${panel==="theory"?"active":""}`}>
+              <div className="pl-theory-wrap">
+                <div dangerouslySetInnerHTML={{__html: lab.theory()}} />
+              </div>
+            </div>
+
+            {/* APPARATUS */}
+            <div className={`pl-panel ${panel==="apparatus"?"active":""}`}>
+              <div className="pl-apparatus">
+                <div className="pl-canvas-wrap">
+                  <canvas ref={canvasRef} />
+                </div>
+                <div className="pl-controls">
+                  {lab.controls().map(ctrl => (
+                    <div key={ctrl.id} className="pl-ctrl-group">
+                      <span className="pl-ctrl-label">{ctrl.label}</span>
+                      <input
+                        type="range" min={ctrl.min} max={ctrl.max} step={ctrl.step}
+                        value={state[ctrl.stateKey] ?? ctrl.init}
+                        onChange={e => onSlider(ctrl.stateKey, parseFloat(e.target.value))}
+                      />
+                      <span className="pl-ctrl-val">{ctrl.fmt(state[ctrl.stateKey] ?? ctrl.init)}</span>
+                    </div>
+                  ))}
+                  <div style={{flex:1}} />
+                  <div className="pl-ctrl-group">
+                    <button className="pl-rec-btn" onClick={recordPoint}>⊕ Record Point</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* DATA */}
+            <div className={`pl-panel ${panel==="data"?"active":""}`}>
+              <div className="pl-data-wrap">
+                <div className="pl-data-header">
+                  <div>
+                    <div className="pl-panel-title">{lab.name} — Data Table</div>
+                    <div className="pl-panel-sub">{dataRows.length} point{dataRows.length!==1?"s":""} · {Math.max(0,6-dataRows.length)} more recommended</div>
+                  </div>
+                  <div className="pl-data-actions">
+                    <button className="pl-dbtn" onClick={recordPoint}>⊕ Record</button>
+                    <button className="pl-dbtn danger" onClick={()=>setDataRows([])}>⊗ Clear</button>
+                  </div>
+                </div>
+                <div className="pl-tbl-wrap">
+                  <table className="pl-tbl">
+                    <thead>
+                      <tr>{sch.cols.map((c,i)=><th key={i}>{c}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {dataRows.length===0 ? (
+                        <tr><td colSpan={sch.cols.length} style={{textAlign:"center",color:"var(--text3)",padding:"20px"}}>
+                          No data recorded — go to Apparatus and click Record Point
+                        </td></tr>
+                      ) : dataRows.map((row,i)=>(
+                        <tr key={i}>
+                          <td className="ci">{i+1}</td>
+                          {row.map((cell,j)=>(
+                            <td key={j} className={sch.types[j+1]==="measured"?"cm":sch.types[j+1]==="derived"?"cd":""}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="pl-data-note">
+                  <span style={{color:"var(--blue)"}}>■ Blue = measured</span> &nbsp;·&nbsp;
+                  <span style={{color:"var(--amber)"}}>■ Amber = derived/calculated</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ANALYSIS */}
+            <div className={`pl-panel ${panel==="analysis"?"active":""}`}>
+              <div className="pl-analysis-wrap">
+                <div className="pl-data-header" style={{marginBottom:"16px"}}>
+                  <div>
+                    <div className="pl-panel-title">{lab.analyzeSetup.title}</div>
+                    <div className="pl-panel-sub">{dataRows.length} points available</div>
+                  </div>
+                  <button className="pl-plot-btn" onClick={doPlot}>Plot & Fit Linear Regression</button>
+                </div>
+                <div className="pl-analysis-layout">
+                  <div className="pl-plot-outer">
+                    <canvas ref={plotRef} width={600} height={450} />
+                  </div>
+                  <div className="pl-analysis-right">
+                    {regResult ? (
+                      <>
+                        <div className="pl-result-card">
+                          <div className="pl-result-title">Regression Results</div>
+                          <div className="pl-result-row"><span className="pl-rk">Slope</span><span className="pl-rv">{regResult.slope.toFixed(6)}</span></div>
+                          <div className="pl-result-row"><span className="pl-rk">Intercept</span><span className="pl-rv">{regResult.intercept.toFixed(6)}</span></div>
+                          <div className="pl-result-row"><span className="pl-rk">R²</span><span className={`pl-rv ${regResult.r2>0.99?"good":"warn"}`}>{regResult.r2.toFixed(6)}</span></div>
+                          <div className="pl-result-row"><span className="pl-rk">{regResult.res.label}</span><span className="pl-rv">{regResult.res.value} {regResult.res.unit}</span></div>
+                          <div className="pl-result-row"><span className="pl-rk">Theory</span><span className="pl-rv theory">{regResult.res.theory} {regResult.res.unit}</span></div>
+                          <div className="pl-result-row"><span className="pl-rk">% Error</span><span className={`pl-rv ${parseFloat(regResult.res.pctError)<2?"good":parseFloat(regResult.res.pctError)<5?"":"warn"}`}>{regResult.res.pctError}%</span></div>
+                        </div>
+                        <div className="pl-analysis-insight" dangerouslySetInnerHTML={{__html:lab.analysisInsight(regResult.slope,regResult.intercept,regResult.r2,state)}} />
+                      </>
+                    ) : (
+                      <div className="pl-result-card">
+                        <div className="pl-result-title">Ready to Plot</div>
+                        <div style={{color:"var(--text3)",fontSize:"12px"}}>
+                          {dataRows.length<2?"Record ≥2 data points first":"Click 'Plot & Fit' to run analysis"}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>{/* panels */}
+        </div>{/* main */}
+      </div>{/* body */}
     </div>
   );
 }
