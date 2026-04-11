@@ -77,7 +77,7 @@ display.innerHTML=html;`,
 const graph={'Math':['Algorithms'],'CS101':['Data Structures','Algorithms'],'Data Structures':['Algorithms'],'Algorithms':['Systems'],'Systems':[]};
 function topoSort(graph){const nodes=Object.keys(graph);const inDeg={};for(const n of nodes)inDeg[n]=0;for(const n of nodes)for(const dep of graph[n])inDeg[dep]=(inDeg[dep]||0)+1;const queue=nodes.filter(n=>inDeg[n]===0);const order=[];const steps=[];while(queue.length){const node=queue.shift();order.push(node);steps.push({processing:node,queue:[...queue]});for(const dep of graph[node]||[]){inDeg[dep]--;if(inDeg[dep]===0)queue.push(dep);}}return{order,steps,hasCycle:order.length!==nodes.length};}
 const{order,steps}=topoSort(graph);
-let html='<h3 style="color:#60a5fa;margin:0 0 12px">Kahn\'s Topological Sort</h3>';
+let html='<h3 style="color:#60a5fa;margin:0 0 12px">Kahn\\'s Topological Sort</h3>';
 steps.forEach((s,i)=>{html+='<div style="margin-bottom:5px;padding:6px 10px;background:#1e293b;border-radius:4px;font-size:13px">Step '+(i+1)+': <b style="color:#f59e0b">'+s.processing+'</b>'+(s.queue.length?' <span style="color:#64748b">→ queue: ['+s.queue.join(', ')+']</span>':'')+'</div>';});
 html+='<p style="color:#4ade80;margin-top:8px">Order: '+order.join(' → ')+'</p>';
 display.innerHTML=html;`,
