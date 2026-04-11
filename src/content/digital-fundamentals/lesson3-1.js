@@ -461,8 +461,8 @@ refresh();`,
 
 Augustus De Morgan gave us the two theorems that make NAND and NOR interchangeable with AND and OR:
 
-$$\\overline{A \\cdot B} = \\bar{A} + \\bar{B}$$
-$$\\overline{A + B} = \\bar{A} \\cdot \\bar{B}$$
+$\\overline{A \\cdot B} = \\bar{A} + \\bar{B}$
+$\\overline{A + B} = \\bar{A} \\cdot \\bar{B}$
 
 In English:
 - **Theorem 1**: NOT(A AND B) = NOT(A) OR NOT(B). A NAND gate equals an OR gate with inverted inputs.

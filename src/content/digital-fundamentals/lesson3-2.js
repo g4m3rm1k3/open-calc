@@ -204,24 +204,24 @@ refresh();`,
 
 Here is the key insight that makes XOR indispensable in arithmetic circuits:
 
-$$0 + 0 = 0 \\ (\\text{sum}=0, \\text{carry}=0)$$
-$$0 + 1 = 1 \\ (\\text{sum}=1, \\text{carry}=0)$$
-$$1 + 0 = 1 \\ (\\text{sum}=1, \\text{carry}=0)$$
-$$1 + 1 = 10_2 \\ (\\text{sum}=0, \\text{carry}=1)$$
+$0 + 0 = 0 \\ (\\text{sum}=0, \\text{carry}=0)$
+$0 + 1 = 1 \\ (\\text{sum}=1, \\text{carry}=0)$
+$1 + 0 = 1 \\ (\\text{sum}=1, \\text{carry}=0)$
+$1 + 1 = 10_2 \\ (\\text{sum}=0, \\text{carry}=1)$
 
 Compare the **sum bit** column (0, 1, 1, 0) to the XOR truth table (0, 1, 1, 0). They are identical. XOR computes the sum bit of single-bit binary addition.
 
 The **carry bit** column (0, 0, 0, 1) matches the AND truth table. AND computes the carry.
 
 This means a **half adder** — the circuit that adds two bits and produces a sum and carry — is just:
-$$\\text{Sum} = A \\oplus B$$
-$$\\text{Carry} = A \\cdot B$$
+$\\text{Sum} = A \\oplus B$
+$\\text{Carry} = A \\cdot B$
 
 One XOR gate and one AND gate. That is the complete circuit for adding two single bits.
 
 A **full adder** extends this to handle a carry-in bit (needed when chaining adders for multi-bit numbers). It adds three bits: A, B, and Carry-in, producing Sum and Carry-out:
-$$\\text{Sum} = A \\oplus B \\oplus C_{in}$$
-$$\\text{Carry}_{out} = (A \\cdot B) + (C_{in} \\cdot (A \\oplus B))$$
+$\\text{Sum} = A \\oplus B \\oplus C_{in}$
+$\\text{Carry}_{out} = (A \\cdot B) + (C_{in} \\cdot (A \\oplus B))$
 
 Two XOR gates, two AND gates, one OR gate. Chain 8 full adders together and you have an 8-bit adder. This is how every CPU adds numbers.`,
     },
@@ -463,7 +463,7 @@ A **parity bit** is an extra bit appended to a data word so that the total numbe
 
 XOR is the perfect tool for parity calculation. The XOR of all bits in a word equals 1 if the number of 1s is odd, and 0 if it is even:
 
-$$P = b_7 \\oplus b_6 \\oplus b_5 \\oplus b_4 \\oplus b_3 \\oplus b_2 \\oplus b_1 \\oplus b_0$$
+$P = b_7 \\oplus b_6 \\oplus b_5 \\oplus b_4 \\oplus b_3 \\oplus b_2 \\oplus b_1 \\oplus b_0$
 
 For **even parity**, append $P$ as the parity bit — then the total count of 1s (data + parity) is always even.
 For **odd parity**, append $\\bar{P}$ — then the total count is always odd.
@@ -635,10 +635,10 @@ refresh();`,
 Beyond arithmetic and error detection, XOR is the fundamental operation for several important programming and cryptography techniques.
 
 **Bit toggling**: XOR with 1 flips a bit; XOR with 0 leaves it unchanged. This makes XOR the tool for selectively toggling bits in a register without affecting others:
-$$\\text{result} = \\text{value} \\oplus \\text{mask}$$
+$\\text{result} = \\text{value} \\oplus \\text{mask}$
 
 **Swap without a temporary variable**: XOR has the property that $A \\oplus A = 0$ and $A \\oplus 0 = A$. This allows swapping two variables in three XOR operations:
-$$A = A \\oplus B \\ \\rightarrow \\ B = A \\oplus B \\ \\rightarrow \\ A = A \\oplus B$$
+$A = A \\oplus B \\ \\rightarrow \\ B = A \\oplus B \\ \\rightarrow \\ A = A \\oplus B$
 
 **One-time pad (perfect encryption)**: XOR a message with a truly random key of the same length. The result is indistinguishable from random noise. XOR with the same key again recovers the original message. This is the **one-time pad** — the only provably unbreakable cipher, used by intelligence agencies. All practical stream ciphers (RC4, ChaCha20) are approximations of this idea.
 
