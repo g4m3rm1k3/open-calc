@@ -73,8 +73,10 @@ export default {
       {
         id: "MaximaMinima",
         title: "Maxima and Minima",
-        mathBridge: "Classic fencing problem: you have 200 meters of fence and want to enclose a rectangle against a barn wall (so only 3 sides need fence). If the width is x, length is (200 − 2x)/1. Wait — draw it: width x, the two short sides cost 2x, the one long side costs 200 − 2x. Area = x(200 − 2x) = 200x − 2x². Take derivative: A'(x) = 200 − 4x. Set to zero: x = 50. Check: A(50) = 50·100 = 5000 m². Verify this is a maximum: A''(x) = −4 < 0. Drag the width slider to x = 50 and confirm maximum area.",
-        caption: "Optimization of rectangular area with 200 m of fence: critical point at x = 50 gives maximum area of 5000 m².",
+        mathBridge:
+          "Classic fencing problem: you have 200 meters of fence and want to enclose a rectangle against a barn wall (so only 3 sides need fence). If the width is x, length is (200 − 2x)/1. Wait — draw it: width x, the two short sides cost 2x, the one long side costs 200 − 2x. Area = x(200 − 2x) = 200x − 2x². Take derivative: A'(x) = 200 − 4x. Set to zero: x = 50. Check: A(50) = 50·100 = 5000 m². Verify this is a maximum: A''(x) = −4 < 0. Drag the width slider to x = 50 and confirm maximum area.",
+        caption:
+          "Optimization of rectangular area with 200 m of fence: critical point at x = 50 gives maximum area of 5000 m².",
       },
       {
         id: "Ch5_QuadraticShadow",
@@ -119,19 +121,21 @@ export default {
     ],
     visualizations: [
       {
-        id: 'PythonNotebook',
-        title: 'Python Lab: Solve & Verify Optimization Problems',
-        caption: 'Minimize/maximize numerically, then confirm your calculus answer. Visualize how objective functions behave across the domain.',
+        id: "PythonNotebook",
+        title: "Python Lab: Solve & Verify Optimization Problems",
+        caption:
+          "Minimize/maximize numerically, then confirm your calculus answer. Visualize how objective functions behave across the domain.",
         props: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'Fencing Problem: scan the domain, find the max',
+              cellTitle: "Fencing Problem: scan the domain, find the max",
               prose: [
-                '**Problem**: 100 m of fence. Maximize area $A = x(50-x)$.',
-                'Calculus says $x^* = 25$ m. Verify by plotting and checking nearby values.',
+                "**Problem**: 100 m of fence. Maximize area $A = x(50-x)$.",
+                "Calculus says $x^* = 25$ m. Verify by plotting and checking nearby values.",
               ],
-              instructions: 'Run this cell, then change P = 100 to 200 or 60 and watch x* = P/4 always.',
+              instructions:
+                "Run this cell, then change P = 100 to 200 or 60 and watch x* = P/4 always.",
               code: `from opencalc import Figure
 import math
 
@@ -158,16 +162,19 @@ fig.plot(A, color='blue', label='A(x)', width=2.5)
 fig.vline(x_star, color='amber', dashed=True)
 fig.point([x_star, A_max], color='red', label=f'max: ({x_star:.1f}, {A_max:.1f})', radius=7)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 2,
-              cellTitle: 'Tin Can: minimize surface area for fixed volume',
+              cellTitle: "Tin Can: minimize surface area for fixed volume",
               prose: [
-                '$SA(r) = 2\\pi r^2 + \\dfrac{2V}{r}$',
-                'Setting $SA\'(r) = 0$ gives $r^3 = V/(2\\pi)$, so $h = 2r$ at the optimum.',
+                "$SA(r) = 2\\pi r^2 + \\dfrac{2V}{r}$",
+                "Setting $SA'(r) = 0$ gives $r^3 = V/(2\\pi)$, so $h = 2r$ at the optimum.",
               ],
-              instructions: 'Change V to 1000 or 250 and verify h = 2r always holds.',
+              instructions:
+                "Change V to 1000 or 250 and verify h = 2r always holds.",
               code: `from opencalc import Figure
 import math
 
@@ -191,15 +198,17 @@ fig.vline(r_star, color='amber', dashed=True)
 fig.point([r_star, SA(r_star)], color='red',
     label=f'min: r={r_star:.2f}, h={h_star:.2f}', radius=7)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 3,
-              cellTitle: 'Open Box: visualize V(x) and locate the max',
+              cellTitle: "Open Box: visualize V(x) and locate the max",
               prose: [
-                'A 12\u00d78 in cardboard sheet. Cut corners of size $x$ and fold.',
-                '$V(x) = (12-2x)(8-2x)x$, $x \\in (0,4)$.',
-                'Calculus gives $x^* = (10-2\\sqrt{7})/3 \\approx 1.5685$ in.',
+                "A 12\u00d78 in cardboard sheet. Cut corners of size $x$ and fold.",
+                "$V(x) = (12-2x)(8-2x)x$, $x \\in (0,4)$.",
+                "Calculus gives $x^* = (10-2\\sqrt{7})/3 \\approx 1.5685$ in.",
               ],
               code: `from opencalc import Figure
 import math
@@ -223,15 +232,19 @@ fig.vline(x_star, color='amber', dashed=True)
 fig.point([x_star, V_max], color='red',
     label=f'max: x\u2248{x_star:.3f}, V\u2248{V_max:.1f}', radius=7)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 4,
-              challengeType: 'write',
-              challengeTitle: 'Your Turn: Nearest point on y = x\u00b2 to (0, 3)',
-              difficulty: 'medium',
-              prompt: 'Find the point on y = x\u00b2 closest to (0, 3).\n\nObjective: minimize D\u00b2 = x\u00b2 + (x\u00b2 - 3)\u00b2\nCalculus answer: x = \u00b1\u221a(5/2), y = 5/2, distance = \u221a(11)/2 \u2248 1.658',
-              hint: 'd(D\u00b2)/dx = 2x + 2(x\u00b2-3)(2x) = 2x(1 + 2x\u00b2 - 6) = 2x(2x\u00b2-5). Critical points: x=0 and x=\u00b1\u221a(5/2). Check which gives minimum.',
+              challengeType: "write",
+              challengeTitle:
+                "Your Turn: Nearest point on y = x\u00b2 to (0, 3)",
+              difficulty: "medium",
+              prompt:
+                "Find the point on y = x\u00b2 closest to (0, 3).\n\nObjective: minimize D\u00b2 = x\u00b2 + (x\u00b2 - 3)\u00b2\nCalculus answer: x = \u00b1\u221a(5/2), y = 5/2, distance = \u221a(11)/2 \u2248 1.658",
+              hint: "d(D\u00b2)/dx = 2x + 2(x\u00b2-3)(2x) = 2x(1 + 2x\u00b2 - 6) = 2x(2x\u00b2-5). Critical points: x=0 and x=\u00b1\u221a(5/2). Check which gives minimum.",
               code: `from opencalc import Figure
 import math
 
@@ -250,10 +263,12 @@ fig.grid().axes()
 fig.plot(D2, color='blue', label='D\u00b2(x)', width=2.5)
 fig.point([0, D2(0)], color='red', label='x=0 local MAX', radius=6)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
-          ]
-        }
+          ],
+        },
       },
     ],
   },
@@ -272,8 +287,7 @@ fig.show()`,
         body: "f(x) = x on (0,1): no max or min (open interval). f(x) = 1/x on [-1,1]: unbounded, no min (discontinuous). f(x) = tan(x) on [-π/2, π/2]: blows up at endpoints (not bounded on closed interval). All three conditions — continuous, closed, bounded — are necessary for the EVT.",
       },
     ],
-    visualizations: [
-          ],
+    visualizations: [],
   },
 
   examples: [
@@ -290,7 +304,8 @@ fig.show()`,
           annotation:
             "Draw a rectangle with sides x and y. Write the constraint from the fixed perimeter.",
           strategyTitle: "Identify the objective and constraint: draw it first",
-          checkpoint: "Before writing any formula — what quantity are you trying to maximize? Write its name (Area). What equation must always be true no matter what dimensions you choose?",
+          checkpoint:
+            "Before writing any formula — what quantity are you trying to maximize? Write its name (Area). What equation must always be true no matter what dimensions you choose?",
           hints: [
             "Level 1: Label every quantity in your picture. The constraint comes from the physical restriction — here, total fence length is fixed at 100 m.",
             "Level 2: You have two unknowns (x and y) and one constraint equation. That means you can eliminate one variable, leaving a single-variable problem.",
@@ -300,8 +315,10 @@ fig.show()`,
         {
           expression: "A = xy \\text{ (objective)}",
           annotation: "The area is the objective function.",
-          strategyTitle: "Identify the objective: what quantity to maximize/minimize",
-          checkpoint: "What quantity are you optimizing? Write it as a function name before writing any formula.",
+          strategyTitle:
+            "Identify the objective: what quantity to maximize/minimize",
+          checkpoint:
+            "What quantity are you optimizing? Write it as a function name before writing any formula.",
           hints: [
             "Level 1: The objective is the quantity the problem asks you to maximize or minimize. Here it's Area — write A = xy explicitly before doing anything else.",
             "Level 2: A = xy currently has two free variables. You need the constraint to reduce this to one variable before you can differentiate.",
@@ -312,7 +329,8 @@ fig.show()`,
           expression: "y = 50 - x \\Rightarrow A(x) = x(50-x) = 50x - x^2",
           annotation: "Substitute the constraint to eliminate y.",
           strategyTitle: "Use the constraint to eliminate a variable",
-          checkpoint: "How many free variables does A = xy have before substituting? How many after? You need exactly one.",
+          checkpoint:
+            "How many free variables does A = xy have before substituting? How many after? You need exactly one.",
           hints: [
             "Level 1: Solve the constraint x + y = 50 for y: y = 50 − x. Substitute into A = xy to get a function of x alone.",
             "Level 2: A(x) = x(50 − x) = 50x − x² is a downward-opening parabola on (0, 50). Its maximum is at the vertex, which calculus will find.",
@@ -323,7 +341,8 @@ fig.show()`,
           expression: "A'(x) = 50 - 2x = 0 \\Rightarrow x = 25",
           annotation: "Differentiate and set equal to zero.",
           strategyTitle: "Differentiate: find critical points",
-          checkpoint: "Before differentiating, what rule will you use on 50x − x²? Can you predict the form of the derivative?",
+          checkpoint:
+            "Before differentiating, what rule will you use on 50x − x²? Can you predict the form of the derivative?",
           hints: [
             "Level 1: Differentiate A(x) = 50x − x² using the power rule: A'(x) = 50 − 2x. Set A'(x) = 0 and solve for x.",
             "Level 2: x = 25 is the only critical point on (0, 50). Since the domain is an open interval, there are no endpoints to check — the maximum, if it exists, must be at this critical point.",
@@ -335,7 +354,8 @@ fig.show()`,
             "A''(x) = -2 < 0 \\Rightarrow \\text{local (global) maximum at } x = 25",
           annotation: "Second derivative confirms maximum.",
           strategyTitle: "First or second derivative test: max or min?",
-          checkpoint: "A''(x) = −2 everywhere — what does a constant negative second derivative tell you about the shape of A(x)?",
+          checkpoint:
+            "A''(x) = −2 everywhere — what does a constant negative second derivative tell you about the shape of A(x)?",
           hints: [
             "Level 1: Second derivative test: A''(25) = −2 < 0 means the function is concave down at x = 25, so x = 25 is a local maximum.",
             "Level 2: Because A''(x) = −2 < 0 everywhere (not just at x = 25), A is concave down on the entire domain. There is only one critical point, so x = 25 gives the global maximum.",
@@ -347,7 +367,8 @@ fig.show()`,
             "y = 50 - 25 = 25, \\quad A = 25 \\times 25 = 625 \\text{ m}^2",
           annotation: "Both sides are 25 m — a square. Maximum area is 625 m².",
           strategyTitle: "Interpret the answer in context",
-          checkpoint: "Does the answer have the right units? Does 625 m² make physical sense — is it larger than, say, A(20) = 20 × 30 = 600 m²?",
+          checkpoint:
+            "Does the answer have the right units? Does 625 m² make physical sense — is it larger than, say, A(20) = 20 × 30 = 600 m²?",
           hints: [
             "Level 1: Substitute x = 25 back into the constraint to get y = 25. Then compute A = 25 × 25 = 625 m². Report both the dimensions AND the maximum area.",
             "Level 2: Re-read the question — it asks for the maximum area AND the optimal dimensions. Report both: 25 m × 25 m square, area 625 m².",
@@ -368,8 +389,10 @@ fig.show()`,
           expression: "V(x) = (12-2x)(8-2x)x",
           annotation:
             "After cutting corners x × x, the box has dimensions (12-2x) × (8-2x) × x. Domain: x ∈ (0, 4) (need 8-2x > 0).",
-          strategyTitle: "Set up the objective function: Volume = length × width × height",
-          checkpoint: "What are the three dimensions of the box after folding? Write each dimension in terms of x before multiplying.",
+          strategyTitle:
+            "Set up the objective function: Volume = length × width × height",
+          checkpoint:
+            "What are the three dimensions of the box after folding? Write each dimension in terms of x before multiplying.",
           hints: [
             "Level 1: When you cut an x × x square from each corner and fold up the sides, the height becomes x, the length becomes 12 − 2x, and the width becomes 8 − 2x. Volume = length × width × height.",
             "Level 2: The domain constraint x ∈ (0, 4) comes from requiring all dimensions positive: x > 0 and 8 − 2x > 0. The shorter side (8 inches) sets the tighter constraint.",
@@ -380,8 +403,10 @@ fig.show()`,
           expression:
             "V(x) = x(96 - 24x - 16x + 4x^2) = x(96 - 40x + 4x^2) = 4x^3 - 40x^2 + 96x",
           annotation: "Expand the product.",
-          strategyTitle: "Expand to a standard polynomial form before differentiating",
-          checkpoint: "Could you differentiate V(x) = (12−2x)(8−2x)x directly using the product rule? Why might expanding first be safer?",
+          strategyTitle:
+            "Expand to a standard polynomial form before differentiating",
+          checkpoint:
+            "Could you differentiate V(x) = (12−2x)(8−2x)x directly using the product rule? Why might expanding first be safer?",
           hints: [
             "Level 1: Expand (12 − 2x)(8 − 2x) first, then multiply by x. Work carefully: 12·8 = 96, 12·(−2x) = −24x, (−2x)·8 = −16x, (−2x)(−2x) = +4x².",
             "Level 2: After expanding, V(x) = 4x³ − 40x² + 96x. This is a polynomial — easy to differentiate term by term using the power rule.",
@@ -391,8 +416,10 @@ fig.show()`,
         {
           expression: "V'(x) = 12x^2 - 80x + 96 = 4(3x^2 - 20x + 24)",
           annotation: "Differentiate.",
-          strategyTitle: "Differentiate: find critical points by solving V'(x) = 0",
-          checkpoint: "After differentiating, what type of equation do you need to solve? Can you factor out a common factor to simplify?",
+          strategyTitle:
+            "Differentiate: find critical points by solving V'(x) = 0",
+          checkpoint:
+            "After differentiating, what type of equation do you need to solve? Can you factor out a common factor to simplify?",
           hints: [
             "Level 1: Differentiate V(x) = 4x³ − 40x² + 96x term by term: V'(x) = 12x² − 80x + 96. Factor out 4 to get 4(3x² − 20x + 24).",
             "Level 2: Set V'(x) = 0 — since 4 ≠ 0, you only need 3x² − 20x + 24 = 0. This quadratic does not factor nicely, so use the quadratic formula.",
@@ -403,8 +430,10 @@ fig.show()`,
           expression:
             "3x^2 - 20x + 24 = 0 \\Rightarrow x = \\frac{20 \\pm \\sqrt{400 - 288}}{6} = \\frac{20 \\pm \\sqrt{112}}{6} = \\frac{20 \\pm 4\\sqrt{7}}{6} = \\frac{10 \\pm 2\\sqrt{7}}{3}",
           annotation: "Quadratic formula.",
-          strategyTitle: "Apply the quadratic formula and identify the domain-valid root",
-          checkpoint: "The quadratic formula gives two roots. Before computing decimals, can you tell which one will be inside (0, 4) and which will be outside?",
+          strategyTitle:
+            "Apply the quadratic formula and identify the domain-valid root",
+          checkpoint:
+            "The quadratic formula gives two roots. Before computing decimals, can you tell which one will be inside (0, 4) and which will be outside?",
           hints: [
             "Level 1: With a = 3, b = −20, c = 24: discriminant = 400 − 288 = 112 = 16·7, so √112 = 4√7 ≈ 10.58. The two roots are (20 ± 10.58)/6.",
             "Level 2: x₁ = (20 − 4√7)/3 ≈ 1.57 and x₂ = (20 + 4√7)/3 ≈ 5.10. Only x₁ ≈ 1.57 lies in (0, 4). Discard x₂ — it would require cutting more than half the 8-inch side, leaving negative width.",
@@ -417,7 +446,8 @@ fig.show()`,
           annotation:
             "The physically valid solution: x ≈ 1.570 in (the other root ≈ 5.097 is outside the domain (0,4)).",
           strategyTitle: "Confirm the domain-valid critical point numerically",
-          checkpoint: "x ≈ 1.570 is in (0, 4). What are the resulting box dimensions? Do they all come out positive?",
+          checkpoint:
+            "x ≈ 1.570 is in (0, 4). What are the resulting box dimensions? Do they all come out positive?",
           hints: [
             "Level 1: √7 ≈ 2.6458, so 2√7 ≈ 5.292. Then x = (10 − 5.292)/3 ≈ 4.708/3 ≈ 1.570 inches.",
             "Level 2: Check dimensions: 12 − 2(1.570) = 8.860 in, 8 − 2(1.570) = 4.860 in, height = 1.570 in. All positive — good.",
@@ -429,7 +459,8 @@ fig.show()`,
             "V(1.570) = (12 - 3.140)(8 - 3.140)(1.570) \\approx (8.860)(4.860)(1.570) \\approx 67.6 \\text{ in}^3",
           annotation: "Maximum volume is approximately 67.6 cubic inches.",
           strategyTitle: "Evaluate the objective at the critical point",
-          checkpoint: "Does 67.6 in³ make sense? What is V(0) and V(4)? Confirm the critical point gives a larger volume than the endpoints.",
+          checkpoint:
+            "Does 67.6 in³ make sense? What is V(0) and V(4)? Confirm the critical point gives a larger volume than the endpoints.",
           hints: [
             "Level 1: Substitute x ≈ 1.570 into V(x) = (12 − 2x)(8 − 2x)x. Multiply the three factors step by step.",
             "Level 2: Endpoint check: V(0) = 0 (no box height) and V(4) = 0 (8 − 2·4 = 0, zero width). V(1.570) ≈ 67.6 > 0, confirming the interior critical point gives the maximum.",
@@ -440,8 +471,10 @@ fig.show()`,
           expression: "V''(x) = 24x - 80 < 0 \\text{ at } x \\approx 1.570",
           annotation:
             "V''(1.570) ≈ 24(1.570) - 80 = 37.68 - 80 = -42.32 < 0. Maximum confirmed.",
-          strategyTitle: "Second derivative test confirms maximum; interpret in context",
-          checkpoint: "V''(1.570) ≈ −42.32. What does this negative value tell you about the concavity of V at the critical point? Is the answer physically reasonable?",
+          strategyTitle:
+            "Second derivative test confirms maximum; interpret in context",
+          checkpoint:
+            "V''(1.570) ≈ −42.32. What does this negative value tell you about the concavity of V at the critical point? Is the answer physically reasonable?",
           hints: [
             "Level 1: Second derivative test: V''(c) < 0 means the function is concave down at c, so c is a local maximum. V''(1.570) = 24(1.570) − 80 ≈ −42.32 < 0. Maximum confirmed.",
             "Level 2: The answer: cut squares of ≈ 1.570 inches from each corner. The resulting box has dimensions ≈ 8.86 × 4.86 × 1.57 inches and volume ≈ 67.6 in³.",
@@ -726,6 +759,154 @@ fig.show()`,
       conclusion:
         "45° gives maximum range of v₀²/g ≈ 91.8 m. The elegant result θ*=45° emerges because we are maximising sin(2θ), which peaks when 2θ=90°. Notice the symmetry: R(θ) = R(90°-θ), so 30° and 60° give the same range — the physics is symmetric about 45°. In reality, air resistance shifts the optimum below 45° (typically 30°-38° for bullets and baseballs), which requires a more complex model.",
     },
+    {
+      id: "ch3-004-ex7",
+      title: "Rectangle Optimization (Classic)",
+      problem: "\\text{Maximize area with perimeter 100.}",
+      steps: [
+        {
+          expression:
+            "\\text{Let } x, y \\text{ be sides. Constraint: } 2x + 2y = 100",
+          annotation: "Define variables and write constraint.",
+          strategyTitle: "Step 1: Define variables",
+        },
+        {
+          expression: "y = 50 - x",
+          annotation: "Solve constraint for y.",
+          strategyTitle: "Step 2: Write constraint equation",
+        },
+        {
+          expression: "A = xy",
+          annotation: "Objective function: area.",
+          strategyTitle: "Step 3: Write objective function",
+        },
+        {
+          expression: "A(x) = x(50 - x)",
+          annotation: "Substitute y into objective.",
+          strategyTitle: "Step 4: Substitute → ONE variable",
+        },
+        {
+          expression: "A(x) = 50x - x^2",
+          annotation: "Expand algebraically.",
+          strategyTitle: "Step 5: Expand (algebra step!)",
+        },
+        {
+          expression: "A'(x) = 50 - 2x",
+          annotation: "Differentiate.",
+          strategyTitle: "Step 6: Differentiate",
+        },
+        {
+          expression: "50 - 2x = 0 \\Rightarrow x = 25",
+          annotation: "Solve f'(x)=0.",
+          strategyTitle: "Step 7: Solve (f'(x)=0)",
+        },
+        {
+          expression: "y = 25, \\quad A = 25 \\times 25 = 625",
+          annotation: "Substitute back: square maximizes area.",
+          strategyTitle: "Step 8: Interpret result",
+        },
+      ],
+      conclusion:
+        "Square maximizes area with fixed perimeter. The calculus proves what intuition suggests.",
+    },
+    {
+      id: "ch3-004-ex8",
+      title: "Minimize Distance to Point",
+      problem: "\\text{Point (3,4), line x-axis. Minimize distance.}",
+      steps: [
+        {
+          expression: "d = \\sqrt{(x-3)^2 + (y-4)^2}",
+          annotation: "Distance formula.",
+          strategyTitle: "Step 1: Distance formula",
+        },
+        {
+          expression: "(x,0) \\text{ on x-axis}",
+          annotation: "Point on x-axis: (x,0).",
+          strategyTitle: "Step 2: Point on x-axis",
+        },
+        {
+          expression: "d = \\sqrt{(x-3)^2 + (0-4)^2}",
+          annotation: "Substitute y=0.",
+          strategyTitle: "Step 3: Substitute",
+        },
+        {
+          expression: "d = \\sqrt{(x-3)^2 + 16}",
+          annotation: "Simplify.",
+          strategyTitle: "Step 4: Simplify",
+        },
+        {
+          expression: "\\text{Minimize } (x-3)^2 + 16",
+          annotation: "Minimize inside square root.",
+          strategyTitle: "Step 5: Minimize WITHOUT square root trick",
+        },
+        {
+          expression: "\\frac{d}{dx}[(x-3)^2 + 16] = 2(x-3) = 0",
+          annotation: "Derivative.",
+          strategyTitle: "Step 6: Derivative",
+        },
+        {
+          expression: "x = 3",
+          annotation: "Solve: x=3.",
+          strategyTitle: "Step 7: Solve",
+        },
+        {
+          expression: "\\text{Closest point: } (3,0)",
+          annotation: "Directly below (3,4).",
+          strategyTitle: "Result",
+        },
+      ],
+      conclusion:
+        "Closest point is directly below: (3,0). The square root doesn't affect the minimum location.",
+    },
+    {
+      id: "ch3-004-ex9",
+      title: "Box Optimization",
+      problem: "\\text{Max volume from square sheet cutting corners.}",
+      steps: [
+        {
+          expression: "\\text{Let } x = \\text{cut size}",
+          annotation: "Define variable.",
+          strategyTitle: "Step 1: Variables",
+        },
+        {
+          expression: "\\text{Dimensions: } L-2x, W-2x, x",
+          annotation: "After cutting corners.",
+          strategyTitle: "Step 2: Dimensions",
+        },
+        {
+          expression: "V = x(L-2x)(W-2x)",
+          annotation: "Volume formula.",
+          strategyTitle: "Step 3: Volume",
+        },
+        {
+          expression: "(L-2x)(W-2x) = LW -2Lx -2Wx +4x^2",
+          annotation: "Expand first.",
+          strategyTitle: "Step 4: Expand (THIS is where algebra matters)",
+        },
+        {
+          expression: "V = x(LW -2Lx -2Wx +4x^2)",
+          annotation: "Multiply by x.",
+          strategyTitle: "Step 5: Multiply by x",
+        },
+        {
+          expression: "V = LWx -2Lx^2 -2Wx^2 +4x^3",
+          annotation: "Expand fully.",
+          strategyTitle: "Step 6: Expand fully",
+        },
+        {
+          expression: "V' = LW -4Lx -4Wx +12x^2",
+          annotation: "Derivative.",
+          strategyTitle: "Step 7: Derivative",
+        },
+        {
+          expression: "\\text{Solve } V'=0",
+          annotation: "Set equal to zero.",
+          strategyTitle: "Step 8: Solve (V'=0) — algebra-heavy step",
+        },
+      ],
+      conclusion:
+        "Box optimization requires careful algebraic expansion. The derivative step is algebra-heavy.",
+    },
   ],
 
   challenges: [
@@ -884,89 +1065,113 @@ fig.show()`,
     },
   ],
 
-
   // ─── Semantic Layer ───────────────────────────────────────────────────────
   semantics: {
-    "core": [
-        {
-            "symbol": "objective function",
-            "meaning": "the quantity you want to maximize or minimize — e.g., area, cost, time"
-        },
-        {
-            "symbol": "constraint",
-            "meaning": "the equation that limits your choices — e.g., fixed perimeter, fixed volume"
-        },
-        {
-            "symbol": "critical number",
-            "meaning": "where f'= 0 inside the feasible domain — an interior max/min candidate"
-        },
-        {
-            "symbol": "Extreme Value Theorem",
-            "meaning": "guarantees a max and min exist when f is continuous on a closed interval"
-        }
+    core: [
+      {
+        symbol: "objective function",
+        meaning:
+          "the quantity you want to maximize or minimize — e.g., area, cost, time",
+      },
+      {
+        symbol: "constraint",
+        meaning:
+          "the equation that limits your choices — e.g., fixed perimeter, fixed volume",
+      },
+      {
+        symbol: "critical number",
+        meaning:
+          "where f'= 0 inside the feasible domain — an interior max/min candidate",
+      },
+      {
+        symbol: "Extreme Value Theorem",
+        meaning:
+          "guarantees a max and min exist when f is continuous on a closed interval",
+      },
     ],
-    "rulesOfThumb": [
-        "5 steps: understand the problem → draw → label variables → write objective + constraint → use constraint to reduce to one variable → differentiate and solve.",
-        "Always verify your critical points are actually max/min using the second derivative test or endpoint comparison.",
-        "Check endpoints! On a closed interval, the global max/min might be at an endpoint, not a critical point.",
-        "If the domain is open or unbounded, use limits at the boundary to confirm the critical point is a global max/min."
-    ]
-},
+    rulesOfThumb: [
+      "5 steps: understand the problem → draw → label variables → write objective + constraint → use constraint to reduce to one variable → differentiate and solve.",
+      "Always verify your critical points are actually max/min using the second derivative test or endpoint comparison.",
+      "Check endpoints! On a closed interval, the global max/min might be at an endpoint, not a critical point.",
+      "If the domain is open or unbounded, use limits at the boundary to confirm the critical point is a global max/min.",
+    ],
+  },
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
-      { label: 'Critical Points (Ch. 2)', note: 'Every interior maximum or minimum satisfies f\'(c) = 0 — finding critical points is the heart of optimization' },
-      { label: 'Curve Sketching (Lesson 5)', note: 'Optimization is a focused version of curve sketching: you care only about the highest or lowest point, not the whole portrait' },
-      { label: 'Extreme Value Theorem (Calculus)', note: 'A continuous function on a closed interval [a, b] ALWAYS achieves its max and min — this guarantees the solution exists before you search for it' },
-      { label: 'Constraint Algebra', note: 'Most optimization problems have two equations: an objective function to maximize/minimize, and a constraint to eliminate one variable' },
+      {
+        label: "Critical Points (Ch. 2)",
+        note: "Every interior maximum or minimum satisfies f'(c) = 0 — finding critical points is the heart of optimization",
+      },
+      {
+        label: "Curve Sketching (Lesson 5)",
+        note: "Optimization is a focused version of curve sketching: you care only about the highest or lowest point, not the whole portrait",
+      },
+      {
+        label: "Extreme Value Theorem (Calculus)",
+        note: "A continuous function on a closed interval [a, b] ALWAYS achieves its max and min — this guarantees the solution exists before you search for it",
+      },
+      {
+        label: "Constraint Algebra",
+        note: "Most optimization problems have two equations: an objective function to maximize/minimize, and a constraint to eliminate one variable",
+      },
     ],
     futureLinks: [
-      { label: 'Related Rates (Lesson 4)', note: 'Related rates asks "how fast?" at a given instant; optimization asks "when is the rate zero?" — the extremum is where the rate of change of the objective is zero' },
-      { label: 'Multivariable Optimization (Calc 3)', note: 'With two variables, you set both partial derivatives to zero: ∂f/∂x = 0 and ∂f/∂y = 0 — same idea, more dimensions' },
-      { label: 'Lagrange Multipliers (Calc 3)', note: 'The constraint-substitution method here generalizes to Lagrange multipliers for constrained optimization in multiple dimensions' },
+      {
+        label: "Related Rates (Lesson 4)",
+        note: 'Related rates asks "how fast?" at a given instant; optimization asks "when is the rate zero?" — the extremum is where the rate of change of the objective is zero',
+      },
+      {
+        label: "Multivariable Optimization (Calc 3)",
+        note: "With two variables, you set both partial derivatives to zero: ∂f/∂x = 0 and ∂f/∂y = 0 — same idea, more dimensions",
+      },
+      {
+        label: "Lagrange Multipliers (Calc 3)",
+        note: "The constraint-substitution method here generalizes to Lagrange multipliers for constrained optimization in multiple dimensions",
+      },
     ],
   },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {
-    "questions": [
-        {
-            "id": "opt-assess-1",
-            "type": "choice",
-            "text": "After finding f'(c) = 0, how do you confirm c is a local maximum?",
-            "options": [
-                "f(c) > 0",
-                "f''(c) < 0",
-                "f''(c) > 0",
-                "f'(c) > 0 to the left"
-            ],
-            "answer": "f''(c) < 0",
-            "hint": "Second derivative test: f''< 0 → concave down → local max. f''> 0 → concave up → local min."
-        },
-        {
-            "id": "opt-assess-2",
-            "type": "choice",
-            "text": "On a closed interval [a,b], where can the global maximum occur?",
-            "options": [
-                "Only at critical points",
-                "Only at endpoints",
-                "At critical points OR endpoints",
-                "Only where f'' = 0"
-            ],
-            "answer": "At critical points OR endpoints",
-            "hint": "The Closed Interval Method: evaluate f at all critical points AND endpoints. The largest value is the global max."
-        }
-    ]
-},
+    questions: [
+      {
+        id: "opt-assess-1",
+        type: "choice",
+        text: "After finding f'(c) = 0, how do you confirm c is a local maximum?",
+        options: [
+          "f(c) > 0",
+          "f''(c) < 0",
+          "f''(c) > 0",
+          "f'(c) > 0 to the left",
+        ],
+        answer: "f''(c) < 0",
+        hint: "Second derivative test: f''< 0 → concave down → local max. f''> 0 → concave up → local min.",
+      },
+      {
+        id: "opt-assess-2",
+        type: "choice",
+        text: "On a closed interval [a,b], where can the global maximum occur?",
+        options: [
+          "Only at critical points",
+          "Only at endpoints",
+          "At critical points OR endpoints",
+          "Only where f'' = 0",
+        ],
+        answer: "At critical points OR endpoints",
+        hint: "The Closed Interval Method: evaluate f at all critical points AND endpoints. The largest value is the global max.",
+      },
+    ],
+  },
 
   // ─── Mental Model Compression ────────────────────────────────────────────
   mentalModel: [
     "Set up: objective function + constraint → one variable",
     "Solve: differentiate → set to zero → solve for critical point",
     "Verify: second derivative test or endpoint comparison",
-    "Check endpoints always on a closed interval"
-],
+    "Check endpoints always on a closed interval",
+  ],
 
   checkpoints: [
     "read-intuition",
@@ -986,115 +1191,108 @@ fig.show()`,
 
   quiz: [
     {
-      id: 'opt-q1',
-      type: 'choice',
-      text: 'What is the first step in solving an optimization problem with two variables and one constraint?',
+      id: "opt-q1",
+      type: "choice",
+      text: "What is the first step in solving an optimization problem with two variables and one constraint?",
       options: [
-        'Differentiate the constraint immediately',
-        'Use the constraint to eliminate one variable from the objective function',
-        'Set both partial derivatives equal to zero',
-        'Evaluate the objective at the endpoints only',
+        "Differentiate the constraint immediately",
+        "Use the constraint to eliminate one variable from the objective function",
+        "Set both partial derivatives equal to zero",
+        "Evaluate the objective at the endpoints only",
       ],
-      answer: 'Use the constraint to eliminate one variable from the objective function',
+      answer:
+        "Use the constraint to eliminate one variable from the objective function",
       hints: [
-        'Reducing to a single-variable function allows you to use single-variable calculus (set $f\'(x) = 0$).',
+        "Reducing to a single-variable function allows you to use single-variable calculus (set $f'(x) = 0$).",
       ],
-      reviewSection: 'Intuition — The optimization procedure',
+      reviewSection: "Intuition — The optimization procedure",
     },
     {
-      id: 'opt-q2',
-      type: 'input',
-      text: 'You have 100 m of fence for a rectangle. Constraint: $2x + 2y = 100$, so $y = 50 - x$. Write the area as a function of $x$ only: $A(x) = x(50-x)$. Find $A\'(x)$ and solve $A\'(x) = 0$. Enter the value of $x$ that maximizes area.',
-      answer: '25',
-      hints: [
-        "$A'(x) = 50 - 2x = 0 \\Rightarrow x = 25$.",
-      ],
-      reviewSection: 'Intuition — The fencing problem',
+      id: "opt-q2",
+      type: "input",
+      text: "You have 100 m of fence for a rectangle. Constraint: $2x + 2y = 100$, so $y = 50 - x$. Write the area as a function of $x$ only: $A(x) = x(50-x)$. Find $A'(x)$ and solve $A'(x) = 0$. Enter the value of $x$ that maximizes area.",
+      answer: "25",
+      hints: ["$A'(x) = 50 - 2x = 0 \\Rightarrow x = 25$."],
+      reviewSection: "Intuition — The fencing problem",
     },
     {
-      id: 'opt-q3',
-      type: 'input',
-      text: 'Continuing the fencing problem: at $x = 25$, compute $A\'\'(x)$. Enter the value (a constant).',
-      answer: '-2',
+      id: "opt-q3",
+      type: "input",
+      text: "Continuing the fencing problem: at $x = 25$, compute $A''(x)$. Enter the value (a constant).",
+      answer: "-2",
       hints: [
         "$A''(x) = -2$ for all $x$. Since $A''(25) = -2 < 0$, this is a local (and global) maximum.",
       ],
-      reviewSection: 'Intuition — The fencing problem',
+      reviewSection: "Intuition — The fencing problem",
     },
     {
-      id: 'opt-q4',
-      type: 'input',
-      text: 'What is the maximum area (in m²) for the 100-m four-sided fence enclosing a rectangle?',
-      answer: '625',
-      hints: [
-        '$A(25) = 25 \\times 25 = 625$ m².',
-      ],
-      reviewSection: 'Intuition — The fencing problem',
+      id: "opt-q4",
+      type: "input",
+      text: "What is the maximum area (in m²) for the 100-m four-sided fence enclosing a rectangle?",
+      answer: "625",
+      hints: ["$A(25) = 25 \\times 25 = 625$ m²."],
+      reviewSection: "Intuition — The fencing problem",
     },
     {
-      id: 'opt-q5',
-      type: 'input',
-      text: 'With one side along a river (no fence needed there), 100 m of fence covers three sides: $2x + y = 100$, so $y = 100 - 2x$. Area $A(x) = x(100-2x)$. Solve $A\'(x) = 0$ to find the optimal $x$ (in m).',
-      answer: '25',
-      hints: [
-        "$A'(x) = 100 - 4x = 0 \\Rightarrow x = 25$.",
-      ],
-      reviewSection: 'Intuition — River fence variation',
+      id: "opt-q5",
+      type: "input",
+      text: "With one side along a river (no fence needed there), 100 m of fence covers three sides: $2x + y = 100$, so $y = 100 - 2x$. Area $A(x) = x(100-2x)$. Solve $A'(x) = 0$ to find the optimal $x$ (in m).",
+      answer: "25",
+      hints: ["$A'(x) = 100 - 4x = 0 \\Rightarrow x = 25$."],
+      reviewSection: "Intuition — River fence variation",
     },
     {
-      id: 'opt-q6',
-      type: 'input',
-      text: 'For the river fence: $x = 25$ m, $y = 100 - 2(25) = 50$ m. What is the maximum enclosed area (m²)?',
-      answer: '1250',
-      hints: [
-        '$A = 25 \\times 50 = 1250$ m².',
-      ],
-      reviewSection: 'Intuition — River fence variation',
+      id: "opt-q6",
+      type: "input",
+      text: "For the river fence: $x = 25$ m, $y = 100 - 2(25) = 50$ m. What is the maximum enclosed area (m²)?",
+      answer: "1250",
+      hints: ["$A = 25 \\times 50 = 1250$ m²."],
+      reviewSection: "Intuition — River fence variation",
     },
     {
-      id: 'opt-q7',
-      type: 'choice',
-      text: 'The Extreme Value Theorem guarantees that a continuous function on $[a,b]$:',
+      id: "opt-q7",
+      type: "choice",
+      text: "The Extreme Value Theorem guarantees that a continuous function on $[a,b]$:",
       options: [
-        'Has exactly one local maximum and one local minimum',
+        "Has exactly one local maximum and one local minimum",
         "Attains both its global maximum and minimum on $[a,b]$",
-        'Is differentiable at every point in $(a,b)$',
-        'Has a critical point in $(a,b)$',
+        "Is differentiable at every point in $(a,b)$",
+        "Has a critical point in $(a,b)$",
       ],
       answer: "Attains both its global maximum and minimum on $[a,b]$",
       hints: [
-        'The EVT requires continuity on a closed, bounded interval. It guarantees existence of global max and min.',
+        "The EVT requires continuity on a closed, bounded interval. It guarantees existence of global max and min.",
       ],
-      reviewSection: 'Math — Extreme Value Theorem',
+      reviewSection: "Math — Extreme Value Theorem",
     },
     {
-      id: 'opt-q8',
-      type: 'input',
-      text: 'Find the global maximum of $f(x) = x^3 - 3x + 2$ on $[-2, 2]$ using the closed interval method. Candidates: endpoints $f(-2), f(2)$, and critical points where $f\'(x) = 3x^2 - 3 = 0$, i.e. $x = \\pm 1$. Compute all four values and enter the global maximum value.',
-      answer: '4',
+      id: "opt-q8",
+      type: "input",
+      text: "Find the global maximum of $f(x) = x^3 - 3x + 2$ on $[-2, 2]$ using the closed interval method. Candidates: endpoints $f(-2), f(2)$, and critical points where $f'(x) = 3x^2 - 3 = 0$, i.e. $x = \\pm 1$. Compute all four values and enter the global maximum value.",
+      answer: "4",
       hints: [
-        '$f(-2) = -8+6+2=0$, $f(2)=8-6+2=4$, $f(-1)=-1+3+2=4$, $f(1)=1-3+2=0$.',
-        'Global maximum is $4$, attained at both $x=2$ and $x=-1$.',
+        "$f(-2) = -8+6+2=0$, $f(2)=8-6+2=4$, $f(-1)=-1+3+2=4$, $f(1)=1-3+2=0$.",
+        "Global maximum is $4$, attained at both $x=2$ and $x=-1$.",
       ],
-      reviewSection: 'Math — Closed interval method',
+      reviewSection: "Math — Closed interval method",
     },
     {
-      id: 'opt-q9',
-      type: 'input',
-      text: 'A square piece of cardboard is 12 cm on each side. Squares of side $x$ are cut from each corner and the sides folded up to make an open box. Volume: $V(x) = x(12-2x)^2$. Find $V\'(x)$, set it to zero, and find the value of $x$ (in cm) that maximizes volume.',
-      answer: '2',
+      id: "opt-q9",
+      type: "input",
+      text: "A square piece of cardboard is 12 cm on each side. Squares of side $x$ are cut from each corner and the sides folded up to make an open box. Volume: $V(x) = x(12-2x)^2$. Find $V'(x)$, set it to zero, and find the value of $x$ (in cm) that maximizes volume.",
+      answer: "2",
       hints: [
-        '$V(x) = x(144 - 48x + 4x^2) = 144x - 48x^2 + 4x^3$.',
+        "$V(x) = x(144 - 48x + 4x^2) = 144x - 48x^2 + 4x^3$.",
         "$V'(x) = 144 - 96x + 12x^2 = 12(x^2 - 8x + 12) = 12(x-2)(x-6) = 0$.",
-        '$x = 2$ or $x = 6$. Since the box requires $x < 6$, and $V\'\'(2) < 0$, $x = 2$ gives the maximum.',
+        "$x = 2$ or $x = 6$. Since the box requires $x < 6$, and $V''(2) < 0$, $x = 2$ gives the maximum.",
       ],
-      reviewSection: 'Examples — Open box problem',
+      reviewSection: "Examples — Open box problem",
     },
     {
-      id: 'opt-q10',
-      type: 'input',
+      id: "opt-q10",
+      type: "input",
       text: 'Verify: for $f(x) = x^3$, $f\'(0) = 0$. Is $x = 0$ a local maximum, local minimum, or neither? Enter "max", "min", or "neither".',
-      answer: 'neither',
+      answer: "neither",
       hints: [
         "$f''(0) = 0$ (second derivative test inconclusive). Sign chart: $f'(x) = 3x^2 > 0$ for $x \\ne 0$ — no sign change. So $x=0$ is neither a max nor a min.",
       ],
