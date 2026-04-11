@@ -371,7 +371,7 @@ build();`,
 export default {
   id: 'df-1-2-hexadecimal',
   slug: 'hexadecimal',
-  chapter: 'df.1',
+  chapter: 'df.2',
   order: 2,
   title: 'Hexadecimal',
   subtitle: 'The shorthand that makes binary readable — every hex digit is exactly 4 bits.',
