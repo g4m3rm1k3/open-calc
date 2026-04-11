@@ -615,17 +615,28 @@ export default function MicroCycleLesson({ lesson }) {
       )}
       <MathBlock data={lesson.math} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
-      {lesson.python?.visualizations?.length > 0 && (
-        <div className="mb-8">
-          <SectionDivider icon="🐍" label={lesson.python.title ?? 'Python Lab'} color="brand" noteId={lesson.id ? `${lesson.id}:python` : undefined} />
-          {lesson.python.description && (
-            <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{lesson.python.description}</p>
-          )}
-          {lesson.python.visualizations.map((v, i) => (
-            <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined} borderColor="border-brand-200 dark:border-brand-900/60" />
-          ))}
-        </div>
-      )}
+      {(() => {
+        // Normalize python section: support python.visualizations, python.cells, and pythonLab formats
+        const pythonRaw = lesson.python ?? lesson.pythonLab
+        if (!pythonRaw) return null
+        const cells = pythonRaw.cells ?? pythonRaw.initialCells
+        let visualizations = pythonRaw.visualizations
+        if ((!visualizations || visualizations.length === 0) && cells?.length > 0) {
+          visualizations = [{ id: 'PythonNotebook', props: { initialCells: cells }, title: pythonRaw.title ?? 'Python Lab' }]
+        }
+        if (!visualizations?.length) return null
+        return (
+          <div className="mb-8">
+            <SectionDivider icon="🐍" label={pythonRaw.title ?? 'Python Lab'} color="brand" noteId={lesson.id ? `${lesson.id}:python` : undefined} />
+            {(pythonRaw.description ?? pythonRaw.intro) && (
+              <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{pythonRaw.description ?? pythonRaw.intro}</p>
+            )}
+            {visualizations.map((v, i) => (
+              <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined} borderColor="border-brand-200 dark:border-brand-900/60" />
+            ))}
+          </div>
+        )
+      })()}
       <UnifiedLearningDock lesson={lesson} />
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
       <SpiralBlock spiral={lesson.spiral} />

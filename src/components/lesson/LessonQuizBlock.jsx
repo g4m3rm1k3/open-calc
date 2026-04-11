@@ -39,7 +39,19 @@ function evaluateAnswer(userRaw, correctRaw) {
   return norm(user) === norm(correct)
 }
 
-function QuizQuestion({ q, index, onAnswer }) {
+function normalizeQuestion(q) {
+  // Support both legacy format (type/text/answer-as-string) and new format (question/answer-as-index/explanation)
+  const type = q.type ?? 'choice'
+  const text = q.text ?? q.question ?? ''
+  const answer = typeof q.answer === 'number' && Array.isArray(q.options)
+    ? q.options[q.answer]
+    : q.answer
+  const hints = q.hints ?? (q.explanation ? [q.explanation] : [])
+  return { ...q, type, text, answer, hints }
+}
+
+function QuizQuestion({ q: rawQ, index, onAnswer }) {
+  const q = normalizeQuestion(rawQ)
   const [selected, setSelected] = useState(null)
   const [inputVal, setInputVal] = useState('')
   const [hintLevel, setHintLevel] = useState(-1)
