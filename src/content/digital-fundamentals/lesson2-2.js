@@ -747,6 +747,47 @@ refresh();`,
       outputHeight: 300,
     },
 
+    // ── Key Terms ─────────────────────────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### Key Terms: BCD, Gray Code & ASCII`,
+      html: `<div style="padding:12px;font-family:sans-serif">
+  <input id="q" placeholder="Filter terms…" oninput="filter()" style="width:100%;margin-bottom:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1e293b);font-size:13px;box-sizing:border-box">
+  <div id="list"></div>
+</div>`,
+      css: `body{margin:0}.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:6px}`,
+      startCode: `var TERMS=[
+  {t:'BCD',d:'Binary Coded Decimal. Each decimal digit 0–9 is encoded in 4 bits (0000–1001). Not the same as binary — 99 in BCD is 1001 1001, not 1100011.'},
+  {t:'BCD digit',d:'A 4-bit group used in BCD. Valid values are 0000–1001. Patterns 1010–1111 are invalid and must be corrected after addition.'},
+  {t:'BCD correction',d:'After BCD addition, if a digit column > 9 or generated a carry, add 6 (0110) to skip the 6 invalid patterns and produce the correct BCD carry.'},
+  {t:'7-segment display',d:'A display device with 7 LED/LCD segments labelled a–g. BCD is often decoded to 7-segment in hardware for numeric readouts (e.g., calculators, clocks).'},
+  {t:'Gray code',d:'A binary sequence where consecutive values differ in exactly one bit. Eliminates multi-bit glitches in mechanical encoders and position sensors.'},
+  {t:'Unit distance code',d:'Any code (like Gray code) where adjacent codewords differ by exactly one bit. Minimises error during transitions.'},
+  {t:'Binary to Gray',d:'G = B XOR (B >> 1). Each Gray bit is computed from the corresponding binary bit and the next higher binary bit.'},
+  {t:'Gray to Binary',d:'B[n-1] = G[n-1]; B[i] = B[i+1] XOR G[i] for i from n-2 down to 0. Each binary bit depends on all higher Gray bits.'},
+  {t:'Rotary encoder',d:'A device that converts shaft rotation into a digital code. Gray code is used so only one bit changes per step, avoiding spurious intermediate values.'},
+  {t:'ASCII',d:'American Standard Code for Information Interchange. A 7-bit code mapping 128 characters (printable + control) to byte values 0–127.'},
+  {t:'Control character',d:'ASCII values 0–31 and 127. Non-printable codes used for device control: newline (10), tab (9), carriage return (13), escape (27).'},
+  {t:'Printable ASCII',d:'ASCII values 32–126. Includes space, digits 0–9 (48–57), uppercase A–Z (65–90), lowercase a–z (97–122), and punctuation.'},
+  {t:"Bit 5 / case bit",d:'In ASCII, bit 5 (value 32) toggles between upper and lowercase. OR 0x20 to lowercase; AND 0xDF to uppercase.'},
+  {t:'Code page',d:'An extension of ASCII mapping values 128–255 to a region-specific character set (e.g., Latin-1, Cyrillic). Not standardised across systems.'},
+  {t:'Unicode',d:'A universal character standard covering over 140,000 characters across all scripts and emoji. ASCII is a subset (code points U+0000 to U+007F).'},
+  {t:'UTF-8',d:'A variable-length Unicode encoding. ASCII characters encode as 1 byte (identical to ASCII). Other code points use 2–4 bytes. Backward-compatible with ASCII.'},
+  {t:'Hamming distance',d:'The number of bit positions where two codewords differ. BCD has many invalid codewords, providing error detection. Gray code adjacent pairs have Hamming distance 1.'},
+  {t:'Parity bit',d:'An extra bit appended to a codeword so the total number of 1s is even (even parity) or odd (odd parity). Detects single-bit errors.'},
+];
+function filter(){
+  var q=document.getElementById('q').value.toLowerCase();
+  var terms=q?TERMS.filter(function(x){return x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q);}):TERMS;
+  document.getElementById('list').innerHTML=terms.map(function(x){
+    return '<div class="card"><div style="font-size:13px;font-weight:500;color:#d97706;margin-bottom:3px">'+x.t+'</div>'+
+           '<div style="font-size:13px;color:var(--color-text-secondary,#64748b);line-height:1.6">'+x.d+'</div></div>';
+  }).join('');
+}
+filter();`,
+      outputHeight: 420,
+    },
+
     // ── Closing ───────────────────────────────────────────────────────────────
     {
       type: 'markdown',

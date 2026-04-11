@@ -543,6 +543,46 @@ refresh();`,
       outputHeight: 300,
     },
 
+    // ── Key Terms ─────────────────────────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### Key Terms: Logic Gates`,
+      html: `<div style="padding:12px;font-family:sans-serif">
+  <input id="q" placeholder="Filter terms…" oninput="filter()" style="width:100%;margin-bottom:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1e293b);font-size:13px;box-sizing:border-box">
+  <div id="list"></div>
+</div>`,
+      css: `body{margin:0}.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:6px}`,
+      startCode: `var TERMS=[
+  {t:'Abstraction layer',d:'A level of description that hides lower-level details. Logic gates are the abstraction above transistors — you work with truth tables, not voltages.'},
+  {t:'Logic gate',d:'A digital circuit with one or two binary inputs and one binary output, implementing a Boolean function. The basic building block of all digital systems.'},
+  {t:'Logic symbol',d:'A standardised graphical shape representing a gate in circuit diagrams (e.g., D-shape for AND, curved D for OR, circle for NOT/inversion).'},
+  {t:'Truth table',d:'A table listing every possible input combination and the corresponding output for a logic gate or Boolean expression.'},
+  {t:'Boolean expression',d:'A formula using variables and operators (AND ·, OR +, NOT ¬) that describes the logic of a circuit. E.g., F = A · B + ¬C.'},
+  {t:'NOT gate',d:'Output is the inverse of the single input. Symbol: triangle with a bubble. Boolean: Y = ¬A. Also called inverter.'},
+  {t:'AND gate',d:'Output is 1 only when ALL inputs are 1. Symbol: D-shape. Boolean: Y = A · B. Implements logical conjunction.'},
+  {t:'OR gate',d:'Output is 1 when ANY input is 1. Symbol: curved D-shape. Boolean: Y = A + B. Implements logical disjunction.'},
+  {t:'NAND gate',d:'NOT-AND. Output is 0 only when ALL inputs are 1; otherwise 1. Universal — any logic can be built from NAND alone. Boolean: Y = ¬(A·B).'},
+  {t:'NOR gate',d:'NOT-OR. Output is 1 only when ALL inputs are 0; otherwise 0. Universal — any logic can be built from NOR alone. Boolean: Y = ¬(A+B).'},
+  {t:'XOR gate',d:'Exclusive OR. Output is 1 when inputs differ. Boolean: Y = A ⊕ B = A·¬B + ¬A·B. Key component in adders and parity generators.'},
+  {t:'XNOR gate',d:'Exclusive NOR. Output is 1 when inputs are equal. Boolean: Y = ¬(A ⊕ B). Used in equality comparators.'},
+  {t:'Universal gate',d:'A single gate type from which any Boolean function can be implemented. NAND and NOR are universal; AND/OR/NOT together are also sufficient.'},
+  {t:'Propagation delay (t_pd)',d:'The time from when an input changes to when the output settles at its new stable value. Limits the maximum clock frequency of a digital circuit.'},
+  {t:'Critical path',d:'The longest combinational path through a circuit in terms of propagation delay. Determines the minimum clock period and maximum speed.'},
+  {t:'Fan-in',d:'The number of inputs to a single logic gate. High fan-in increases delay and physical size. Complex gates are often split into smaller stages.'},
+  {t:'Fan-out',d:'The number of gate inputs a single output drives. High fan-out increases capacitive load and propagation delay. Buffers are inserted to restore drive strength.'},
+];
+function filter(){
+  var q=document.getElementById('q').value.toLowerCase();
+  var terms=q?TERMS.filter(function(x){return x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q);}):TERMS;
+  document.getElementById('list').innerHTML=terms.map(function(x){
+    return '<div class="card"><div style="font-size:13px;font-weight:500;color:#0891b2;margin-bottom:3px">'+x.t+'</div>'+
+           '<div style="font-size:13px;color:var(--color-text-secondary,#64748b);line-height:1.6">'+x.d+'</div></div>';
+  }).join('');
+}
+filter();`,
+      outputHeight: 420,
+    },
+
     // ── Closing ───────────────────────────────────────────────────────────────
     {
       type: 'markdown',

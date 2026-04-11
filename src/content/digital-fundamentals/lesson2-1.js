@@ -473,6 +473,125 @@ convert();`,
       outputHeight: 300,
     },
 
+    // ── Section 4 — Why Base-2 ────────────────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Why Does Every Number System Work This Way?
+
+The number 3,742 in decimal means exactly:
+
+$3742 = 3 \\times 10^3 + 7 \\times 10^2 + 4 \\times 10^1 + 2 \\times 10^0$
+
+This is **positional notation** — the general formula works for any base B:
+
+$N = d_k \\times B^k + d_{k-1} \\times B^{k-1} + \\cdots + d_1 \\times B^1 + d_0 \\times B^0$
+
+Binary is just this same formula with B = 2. Each digit (bit) is 0 or 1 — you run out of single digits faster, so you carry sooner. The interactive below lets you explore the same rule in base 2, 8, 10, and 16 simultaneously.`,
+    },
+
+    // ── Visual 4 — Positional notation explorer ───────────────────────────────
+    {
+      type: 'js',
+      instruction: `**Select a base** and adjust the digits. Watch the decimal value update to see how the same positional rule produces the same result in every base.
+
+The key insight at the bottom explains why computers specifically chose base 2.`,
+      html: `<div id="root" style="padding:12px;font-family:sans-serif"></div>`,
+      css: `body{margin:0;background:var(--bg,#fff);color:var(--color-text-primary,#1e293b)}
+.btn{padding:5px 13px;border-radius:20px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:transparent;color:var(--color-text-secondary,#64748b)}
+.btn.active{font-weight:600}
+.dig{width:48px;height:44px;text-align:center;font-size:20px;font-weight:700;border-radius:8px;border:2px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-secondary,#f8fafc);color:var(--color-text-primary,#1e293b);font-family:monospace}
+.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:12px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:8px}
+.why{border-left:3px solid #7c3aed;border-radius:0;background:#eef2ff}`,
+      startCode: `var root=document.getElementById('root');
+var base=2,digits=[1,0,1,1];
+var BASES=[[2,'Binary'],[8,'Octal'],[10,'Decimal'],[16,'Hex']];
+
+function clamp(d){return Math.max(0,Math.min(base-1,d));}
+function value(){return digits.reduce(function(a,d,i){return a+d*Math.pow(base,digits.length-1-i);},0);}
+function setBase(b){
+  base=b;
+  digits=base===2?[1,0,1,1]:base===8?[1,3,5,2]:base===10?[1,7,4,2]:[1,10,3,14];
+  render();
+}
+function render(){
+  var v=value();
+  var baseRow=BASES.map(function(pair){
+    var b=pair[0],l=pair[1];
+    return '<button class="btn'+(base===b?' active':'')+'" onclick="setBase('+b+')" style="border-color:'+(base===b?'#7c3aed':'')+';">'+'Base '+b+' ('+l+')</button>';
+  }).join('');
+  var termParts=digits.map(function(d,i){
+    var exp=digits.length-1-i;
+    var contrib=d*Math.pow(base,exp);
+    return '<div style="text-align:center"><div style="font-size:10px;color:#94a3b8">'+base+'^'+exp+' = '+Math.pow(base,exp)+'</div>'+
+      '<input class="dig" type="number" min="0" max="'+(base-1)+'" value="'+d+'" onchange="digits['+i+']=Math.max(0,Math.min('+(base-1)+',parseInt(this.value)||0));render()">'+
+      '<div style="font-size:10px;color:#d97706;margin-top:2px">×'+Math.pow(base,exp)+'</div>'+
+      '<div style="font-size:11px;color:#059669;font-weight:500">'+contrib+'</div></div>';
+  }).join('');
+  var eqParts=digits.map(function(d,i){return d+'×'+base+'^'+(digits.length-1-i);}).join(' + ');
+  root.innerHTML=
+    '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">'+baseRow+'</div>'+
+    '<div class="card" style="background:var(--color-background-primary,#fff)">'+
+      '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+termParts+'</div>'+
+    '</div>'+
+    '<div class="card" style="text-align:center">'+
+      '<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Decimal value</div>'+
+      '<div style="font-size:32px;font-weight:500;color:#0891b2">'+v+'</div>'+
+      '<div style="font-size:12px;color:#64748b;margin-top:4px">'+eqParts+' = '+v+'</div>'+
+    '</div>'+
+    '<div class="card why">'+
+      '<div style="font-size:12px;font-weight:600;color:#7c3aed;margin-bottom:5px">Why computers use base 2, not base 10</div>'+
+      '<div style="font-size:13px;color:#3730a3;line-height:1.7">'+
+        '1. <strong>Physical reliability</strong> — a transistor has two stable states (on/off). Building a reliable 10-state device is dramatically harder.<br>'+
+        '2. <strong>Noise immunity</strong> — with only two levels, a signal can drift far before being misread.<br>'+
+        '3. <strong>Boolean algebra</strong> — binary arithmetic maps directly onto AND/OR/NOT gate operations. The same hardware that adds bits also evaluates conditions.'+
+      '</div>'+
+    '</div>';
+}
+render();`,
+      outputHeight: 400,
+    },
+
+    // ── Key Terms ─────────────────────────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### Key Terms: Binary Numbers
+
+Filter the glossary by typing any part of a term or its definition.`,
+      html: `<div style="padding:12px;font-family:sans-serif">
+  <input id="q" placeholder="Filter terms…" oninput="filter()" style="width:100%;margin-bottom:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1e293b);font-size:13px;box-sizing:border-box">
+  <div id="list"></div>
+</div>`,
+      css: `body{margin:0}.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:6px}`,
+      startCode: `var TERMS=[
+  {t:'Binary',d:'Base-2 number system. Each digit (bit) is 0 or 1. Each position is a power of 2.'},
+  {t:'Bit',d:'Binary digit. The smallest unit of information. Always 0 or 1.'},
+  {t:'Byte',d:'8 bits. Can represent 256 values (0–255). Standard unit of data storage.'},
+  {t:'Nibble',d:'4 bits. Half a byte. Represents 0–15. One hexadecimal digit.'},
+  {t:'MSB',d:'Most Significant Bit. The leftmost bit — has the greatest place value (2^(N-1) for an N-bit number).'},
+  {t:'LSB',d:'Least Significant Bit. The rightmost bit — has place value 2^0 = 1.'},
+  {t:'Positional notation',d:'A number system where each digit value depends on its position. Decimal uses base 10; binary uses base 2.'},
+  {t:'Place value',d:'The value of a digit determined by its position: bit position k has place value 2^k in binary.'},
+  {t:'2^N',d:'The number of distinct values an N-bit number can represent. 4 bits → 16 values, 8 bits → 256 values.'},
+  {t:'Unsigned integer',d:'A non-negative whole number stored in binary. An N-bit unsigned integer ranges from 0 to 2^N − 1.'},
+  {t:'Binary to decimal',d:'Multiply each bit by its place value (power of 2) and sum. Example: 1011₂ = 8+0+2+1 = 11₁₀'},
+  {t:'Decimal to binary',d:'Repeatedly divide by 2, record remainders. Read remainders bottom-to-top for the binary result.'},
+  {t:'Base (radix)',d:'The number of distinct symbols in a number system. Binary = base 2, decimal = base 10, hex = base 16.'},
+  {t:'Word',d:'A hardware-defined group of bits processed as a unit. Common word sizes: 8, 16, 32, 64 bits.'},
+  {t:'Overflow',d:'When the result of an arithmetic operation exceeds the maximum value representable in N bits. Wraps around to 0.'},
+  {t:'Weight',d:'Another term for place value — the contribution of a single bit to the total number. Bit k has weight 2^k.'},
+];
+function filter(){
+  var q=document.getElementById('q').value.toLowerCase();
+  var terms=q?TERMS.filter(function(x){return x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q);}):TERMS;
+  document.getElementById('list').innerHTML=terms.map(function(x){
+    return '<div class="card"><div style="font-size:13px;font-weight:500;color:#0891b2;margin-bottom:3px">'+x.t+'</div>'+
+           '<div style="font-size:13px;color:var(--color-text-secondary,#64748b);line-height:1.6">'+x.d+'</div></div>';
+  }).join('');
+}
+filter();`,
+      outputHeight: 420,
+    },
+
     // ── Closing ───────────────────────────────────────────────────────────────
     {
       type: 'markdown',

@@ -575,6 +575,136 @@ draw();updateDesc();`,
       outputHeight: 300,
     },
 
+    // ── Section 4 — Gates from Transistors ──────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Transistors → Logic Gates
+
+A single transistor is just a switch. Combine two or more and you get a **logic gate** — a circuit whose output is determined entirely by its inputs according to a truth table.
+
+**CMOS NOT (inverter)**: one PMOS (pull-up) + one NMOS (pull-down). When input = 0, PMOS on → output = 1. When input = 1, NMOS on → output = 0. No path from VDD to GND can exist simultaneously → zero static current.
+
+**CMOS NAND**: two PMOS in parallel (pull-up) + two NMOS in series (pull-down). Output is 0 only when *both* inputs are 1 (both pull-downs on, both pull-ups off). NAND is universal — any gate can be built from NAND alone.
+
+**CMOS NOR**: two PMOS in series (pull-up) + two NMOS in parallel (pull-down). Output is 1 only when *both* inputs are 0. NOR is also universal.`,
+    },
+
+    // ── Visual 4 — Gate truth-table explorer ─────────────────────────────────
+    {
+      type: 'js',
+      instruction: `Select a gate, then toggle the inputs to verify every row of the truth table. The circuit description updates to link the gate behaviour back to the transistor network.`,
+      html: `<div id="root" style="padding:12px;font-family:sans-serif"></div>`,
+      css: `body{margin:0;color:var(--color-text-primary,#1e293b)}
+.btn{padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:transparent;color:var(--color-text-secondary,#64748b)}
+.btn.active{background:#0891b2;color:#fff;border-color:#0891b2}
+.tbl td,.tbl th{padding:8px 12px;text-align:center;font-size:13px;border:0.5px solid var(--color-border-tertiary,#e2e8f0)}
+.tbl th{background:var(--color-background-secondary,#f8fafc);font-weight:600;font-size:11px;color:#64748b}
+.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-top:8px}
+.hi{color:#059669;font-weight:700}.lo{color:#ef4444;font-weight:700}`,
+      startCode: `var gate='NOT',a=0,b=0;
+var GATES={
+  NOT:{symbol:'NOT (¬A)',inputs:1,logic:function(a){return 1-a;},
+    transistors:'1 PMOS (pull-up) + 1 NMOS (pull-down). Complementary pair — exactly one is on for any input, so output is always the inverse.',
+    truth:[[0,1],[1,0]],headers:['A','Output']},
+  NAND:{symbol:'NAND (¬(A·B))',inputs:2,logic:function(a,b){return (a&b)^1;},
+    transistors:'2 PMOS in parallel (pull-up) + 2 NMOS in series (pull-down). Series pull-down requires BOTH inputs = 1 to pull output low.',
+    truth:[[0,0,1],[0,1,1],[1,0,1],[1,1,0]],headers:['A','B','Output']},
+  NOR:{symbol:'NOR (¬(A+B))',inputs:2,logic:function(a,b){return (a|b)^1;},
+    transistors:'2 PMOS in series (pull-up) + 2 NMOS in parallel (pull-down). Series pull-up requires BOTH inputs = 0 to pull output high.',
+    truth:[[0,0,1],[0,1,0],[1,0,0],[1,1,0]],headers:['A','B','Output']},
+};
+var root=document.getElementById('root');
+function render(){
+  var g=GATES[gate];
+  var out=g.inputs===1?g.logic(a):g.logic(a,b);
+  var rows=g.truth.map(function(r){
+    var highlight=g.inputs===1?(r[0]===a):(r[0]===a&&r[1]===b);
+    return '<tr'+(highlight?' style="background:rgba(8,145,178,0.08)"':'')+'>'+
+      r.map(function(v,i){return '<td class="'+(v?'hi':'lo')+'">'+v+'</td>';}).join('')+'</tr>';
+  }).join('');
+  root.innerHTML=
+    '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">'+
+      Object.keys(GATES).map(function(k){return '<button class="btn'+(k===gate?' active':'')+'" onclick="gate=\\''+k+'\\';render()">'+k+'</button>';}).join('')+
+    '</div>'+
+    '<div style="text-align:center;font-size:22px;font-weight:700;margin-bottom:10px;letter-spacing:1px;color:#0891b2">'+g.symbol+'</div>'+
+    (g.inputs===2?
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+        '<div><div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Input A</div>'+
+        '<div style="display:flex;gap:6px">'+
+          '<button class="btn'+(a===0?' active':'')+'" onclick="a=0;render()">0</button>'+
+          '<button class="btn'+(a===1?' active':'')+'" onclick="a=1;render()">1</button>'+
+        '</div></div>'+
+        '<div><div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Input B</div>'+
+        '<div style="display:flex;gap:6px">'+
+          '<button class="btn'+(b===0?' active':'')+'" onclick="b=0;render()">0</button>'+
+          '<button class="btn'+(b===1?' active':'')+'" onclick="b=1;render()">1</button>'+
+        '</div></div>'+
+      '</div>'
+    :
+      '<div style="margin-bottom:12px"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Input A</div>'+
+      '<div style="display:flex;gap:6px">'+
+        '<button class="btn'+(a===0?' active':'')+'" onclick="a=0;render()">0</button>'+
+        '<button class="btn'+(a===1?' active':'')+'" onclick="a=1;render()">1</button>'+
+      '</div></div>'
+    )+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
+      '<span style="font-size:13px;color:#64748b">Output:</span>'+
+      '<span style="font-size:28px;font-weight:700;color:'+(out?'#059669':'#ef4444')+'">'+out+'</span>'+
+    '</div>'+
+    '<table class="tbl" style="border-collapse:collapse;width:100%;margin-bottom:8px">'+
+      '<thead><tr>'+g.headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>'+
+    '<div class="card">'+
+      '<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Transistor network</div>'+
+      '<div style="font-size:13px;line-height:1.7;color:var(--color-text-secondary,#64748b)">'+g.transistors+'</div>'+
+    '</div>';
+}
+render();`,
+      outputHeight: 480,
+    },
+
+    // ── Key Terms ─────────────────────────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### Key Terms: Transistors & Switches`,
+      html: `<div style="padding:12px;font-family:sans-serif">
+  <input id="q" placeholder="Filter terms…" oninput="filter()" style="width:100%;margin-bottom:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1e293b);font-size:13px;box-sizing:border-box">
+  <div id="list"></div>
+</div>`,
+      css: `body{margin:0}.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:6px}`,
+      startCode: `var TERMS=[
+  {t:'Transistor',d:'A semiconductor switch controlled by an electrical signal. The fundamental building block of all digital logic circuits.'},
+  {t:'MOSFET',d:'Metal-Oxide-Semiconductor Field-Effect Transistor. Uses voltage on the Gate to control current flow between Drain and Source.'},
+  {t:'NMOS',d:'N-channel MOSFET. Turns ON (conducts) when gate voltage is HIGH. Used in the pull-down network of CMOS gates.'},
+  {t:'PMOS',d:'P-channel MOSFET. Turns ON (conducts) when gate voltage is LOW. Used in the pull-up network of CMOS gates.'},
+  {t:'Gate (transistor terminal)',d:'The control terminal of a MOSFET. Voltage applied here determines whether the channel between Drain and Source forms.'},
+  {t:'Drain',d:'The terminal current flows out of (NMOS) or into (PMOS) when the transistor is on.'},
+  {t:'Source',d:'The terminal current flows into (NMOS) or out of (PMOS). In NMOS it connects toward GND; in PMOS toward VDD.'},
+  {t:'Channel',d:'The conductive path between Drain and Source that forms when sufficient gate voltage attracts charge carriers to the semiconductor surface.'},
+  {t:'Inversion layer',d:'The thin layer of charge carriers induced at the semiconductor surface by the gate field. Its formation is what turns the MOSFET on.'},
+  {t:'Threshold voltage',d:'The minimum gate-to-source voltage required to form the inversion layer and turn the MOSFET on.'},
+  {t:'CMOS',d:'Complementary MOS. Uses paired PMOS and NMOS transistors. Key advantage: one transistor is always off, so no static current path from VDD to GND.'},
+  {t:'CMOS inverter',d:'The simplest CMOS gate: one PMOS (pull-up) + one NMOS (pull-down). Output is always the complement of input.'},
+  {t:'Pull-up network',d:'The PMOS portion of a CMOS gate. Connects output to VDD (logic 1) when the required input combination is LOW.'},
+  {t:'Pull-down network',d:'The NMOS portion of a CMOS gate. Connects output to GND (logic 0) when the required input combination is HIGH.'},
+  {t:'Static power',d:'Power consumed when inputs are stable. CMOS nearly eliminates static power because complementary networks ensure only one path is active at a time.'},
+  {t:'Dynamic power',d:'Power consumed during transitions as capacitances charge and discharge. Main source of power use in modern CMOS: P ∝ C·V²·f.'},
+  {t:'Universal gate',d:'A gate from which any Boolean function can be built. NAND and NOR are both universal; NOT, AND, and OR together are also universal.'},
+  {t:'BJT',d:'Bipolar Junction Transistor. Older transistor type controlled by base current rather than voltage. Used in TTL logic but mostly replaced by CMOS.'},
+];
+function filter(){
+  var q=document.getElementById('q').value.toLowerCase();
+  var terms=q?TERMS.filter(function(x){return x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q);}):TERMS;
+  document.getElementById('list').innerHTML=terms.map(function(x){
+    return '<div class="card"><div style="font-size:13px;font-weight:500;color:#0891b2;margin-bottom:3px">'+x.t+'</div>'+
+           '<div style="font-size:13px;color:var(--color-text-secondary,#64748b);line-height:1.6">'+x.d+'</div></div>';
+  }).join('');
+}
+filter();`,
+      outputHeight: 420,
+    },
+
     // ── Closing ───────────────────────────────────────────────────────────────
     {
       type: 'markdown',

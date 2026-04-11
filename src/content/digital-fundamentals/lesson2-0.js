@@ -557,6 +557,160 @@ refresh();`,
       outputHeight: 300,
     },
 
+    // ── Section 4 — Overflow ──────────────────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Overflow: When the Result Doesn't Fit
+
+Overflow happens when an arithmetic result is too large for the bit width. It means different things for signed and unsigned numbers, and the CPU detects each with a separate flag.
+
+**Unsigned overflow** — result exceeds $2^N - 1$ (e.g. > 255 for 8-bit). The carry-out of the MSB signals this. The **C (Carry) flag** is set.
+
+**Signed overflow** — result falls outside $[-2^{N-1},\\ 2^{N-1}-1]$ (e.g. outside −128…+127 for 8-bit). Occurs when two positives sum to a negative, or two negatives sum to a positive. The **V (oVerflow) flag** is set using:
+
+$V = C_{in,MSB} \\oplus C_{out,MSB}$
+
+where $C_{in,MSB}$ is the carry *into* bit 7 and $C_{out,MSB}$ is the carry *out of* bit 7.`,
+    },
+
+    // ── Visual 4 — Overflow detector ─────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `Toggle between **unsigned** and **signed** interpretation. Drag the sliders for A and B. Watch where the result lands on the number line, and see which CPU flags get set.`,
+      html: `<div id="root" style="padding:12px;font-family:sans-serif"></div>`,
+      css: `body{margin:0;color:var(--color-text-primary,#1e293b)}
+.btn{padding:7px;border-radius:8px;font-size:12px;cursor:pointer;flex:1;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:transparent;color:var(--color-text-secondary,#64748b)}
+.btn.active{font-weight:600}
+.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:8px}
+.ok{border-left:3px solid #059669;background:#ecfdf5}
+.err{border-left:3px solid #ef4444;background:#fef2f2}
+.flag{text-align:center;padding:10px 6px;border-radius:8px;border:0.5px solid var(--color-border-tertiary,#e2e8f0)}`,
+      startCode: `var root=document.getElementById('root');
+var signed=false,a=100,b=50;
+
+function toBits(n,bits){var r=[];for(var i=bits-1;i>=0;i--)r.push((n>>i)&1);return r;}
+function compute(){
+  var BITS=8;
+  var aBits=toBits(a,BITS),bBits=toBits(b,BITS);
+  var carries=new Array(BITS+1).fill(0);
+  var sumBits=new Array(BITS).fill(0);
+  for(var i=BITS-1;i>=0;i--){var t=aBits[i]+bBits[i]+carries[i+1];sumBits[i]=t%2;carries[i]=Math.floor(t/2);}
+  var sumRaw=parseInt(sumBits.join(''),2);
+  var carryOut=carries[0];
+  var carryIntoMSB=carries[1];
+  var vFlag=carryOut!==carryIntoMSB?1:0;
+  var nFlag=sumBits[0];
+  var aSign=a<128?a:a-256,bSign=b<128?b:b-256;
+  var sumSign=sumRaw<128?sumRaw:sumRaw-256;
+  var signedOvf=(aSign>=0&&bSign>=0&&sumSign<0)||(aSign<0&&bSign<0&&sumSign>=0)?1:0;
+  var unOvf=carryOut;
+  return {sumRaw,sumSign,aSign,bSign,carryOut,vFlag,nFlag,unOvf,signedOvf};
+}
+function pct(v,lo,hi){return Math.round((v-lo)/(hi-lo)*100);}
+function render(){
+  var c=compute();
+  var hasOvf=signed?c.signedOvf:c.unOvf;
+  var lo=signed?-128:0,hi=signed?127:255;
+  var aD=signed?c.aSign:a,bD=signed?c.bSign:b,rD=signed?c.sumSign:c.sumRaw;
+  root.innerHTML=
+    '<div style="display:flex;gap:6px;margin-bottom:12px">'+
+      '<button class="btn'+(signed?'':' active')+'" style="border-color:'+(signed?'':'#7c3aed')+';" onclick="signed=false;render()">Unsigned (0–255)</button>'+
+      '<button class="btn'+(signed?' active':'')+'" style="border-color:'+(signed?'#7c3aed':'')+';" onclick="signed=true;render()">Signed (−128 to +127)</button>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+      '<div><div style="font-size:11px;color:#94a3b8;margin-bottom:3px">A = '+a+' (signed: '+c.aSign+')</div><input type="range" min="0" max="255" value="'+a+'" oninput="a=parseInt(this.value);render()" style="width:100%;accent-color:#0891b2"></div>'+
+      '<div><div style="font-size:11px;color:#94a3b8;margin-bottom:3px">B = '+b+' (signed: '+c.bSign+')</div><input type="range" min="0" max="255" value="'+b+'" oninput="b=parseInt(this.value);render()" style="width:100%;accent-color:#d97706"></div>'+
+    '</div>'+
+    '<div class="card" style="background:var(--color-background-primary,#fff)">'+
+      '<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">'+(signed?'Signed number line (−128 to +127)':'Unsigned number line (0–255)')+'</div>'+
+      '<div style="position:relative;height:28px;background:var(--color-background-secondary,#f8fafc);border-radius:6px;overflow:hidden">'+
+        '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to right,#059669 0%,#059669 '+(signed?50:100)+'%,#ef4444 '+(signed?50:100)+'%,#ef4444 100%);opacity:.12"></div>'+
+        (signed?'<div style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:#94a3b8"></div>':'')+
+        '<div style="position:absolute;top:5px;transform:translateX(-50%);left:'+pct(aD,lo,hi)+'%;width:10px;height:10px;border-radius:50%;background:#0891b2"></div>'+
+        '<div style="position:absolute;top:13px;transform:translateX(-50%);left:'+pct(bD,lo,hi)+'%;width:10px;height:10px;border-radius:50%;background:#d97706"></div>'+
+        '<div style="position:absolute;top:8px;transform:translateX(-50%);left:'+pct(rD,lo,hi)+'%;width:14px;height:14px;border-radius:50%;border:2px solid white;background:'+(hasOvf?'#ef4444':'#059669')+'"></div>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:3px"><span>'+lo+'</span>'+(signed?'<span>0</span>':'' )+'<span>'+hi+'</span></div>'+
+    '</div>'+
+    '<div class="card '+(hasOvf?'err':'ok')+'">'+
+      '<div style="font-size:12px;font-weight:600;margin-bottom:5px;color:'+(hasOvf?'#ef4444':'#059669')+'">'+
+        (hasOvf?(signed?'Signed':'Unsigned')+' overflow!':'No overflow')+'</div>'+
+      '<div style="font-size:13px;line-height:1.7">'+
+        (signed
+          ? c.aSign+' + '+c.bSign+' = '+(c.aSign+c.bSign)+' (true). 8-bit signed result: '+c.sumSign+'.'+
+            (c.signedOvf?' Overflow: sign is wrong. V flag set.':' Result within −128…+127.')
+          : a+' + '+b+' = '+(a+b)+' (true). 8-bit result: '+c.sumRaw+' (carry-out: '+c.carryOut+').'+
+            (c.unOvf?' Overflow: exceed 255. C flag set.':' Result within 0…255.')
+        )+'</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+      '<div class="flag" style="border-color:'+(c.carryOut?'#d97706':'')+'"><div style="font-size:12px;font-weight:600;color:'+(c.carryOut?'#d97706':'#94a3b8')+'">C (Carry)</div><div style="font-size:18px;font-weight:700;color:'+(c.carryOut?'#d97706':'#94a3b8')+'">'+(c.carryOut?'SET':'clear')+'</div><div style="font-size:9px;color:#94a3b8;margin-top:3px">Unsigned overflow</div></div>'+
+      '<div class="flag" style="border-color:'+(c.vFlag?'#ef4444':'')+'"><div style="font-size:12px;font-weight:600;color:'+(c.vFlag?'#ef4444':'#94a3b8')+'">V (oVerflow)</div><div style="font-size:18px;font-weight:700;color:'+(c.vFlag?'#ef4444':'#94a3b8')+'">'+(c.vFlag?'SET':'clear')+'</div><div style="font-size:9px;color:#94a3b8;margin-top:3px">Carry-in XOR carry-out MSB</div></div>'+
+      '<div class="flag" style="border-color:'+(c.nFlag?'#7c3aed':'')+'"><div style="font-size:12px;font-weight:600;color:'+(c.nFlag?'#7c3aed':'#94a3b8')+'">N (Negative)</div><div style="font-size:18px;font-weight:700;color:'+(c.nFlag?'#7c3aed':'#94a3b8')+'">'+(c.nFlag?'SET':'clear')+'</div><div style="font-size:9px;color:#94a3b8;margin-top:3px">MSB of result = 1</div></div>'+
+    '</div>';
+}
+render();`,
+      outputHeight: 480,
+    },
+
+    // ── Challenge 3 ───────────────────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `In 8-bit signed arithmetic, **100 + 100 = ?** and does overflow occur?`,
+      options: [
+        { label: 'A', text: '200 — no overflow, 200 fits in 8-bit signed' },
+        { label: 'B', text: '−56 with overflow — 200 exceeds +127, V flag set' },
+        { label: 'C', text: '−56 with no overflow — the wraparound is normal modular behaviour' },
+        { label: 'D', text: '0 with carry — two values of 100 cancel out' },
+      ],
+      check: (label) => label === 'B',
+      successMessage: 'Correct! 100 + 100 = 200 in true arithmetic, but 8-bit signed range is −128 to +127. 200 in binary is 1100 1000 — MSB = 1 means the hardware interprets it as −56. Since two positives (100, 100) summed to a negative (−56), the V flag is set. Carry-into-MSB = 0, carry-out-of-MSB = 1 → V = 0 XOR 1 = 1.',
+      failMessage: '8-bit signed range is −128 to +127. 100 + 100 = 200 which exceeds +127. Binary 11001000 has MSB = 1 → hardware reads it as negative: 200 − 256 = −56. Since two positive numbers produced a negative, signed overflow occurred (V flag set).',
+      html: '', css: `body{margin:0;padding:0;font-family:sans-serif}`, startCode: '',
+      outputHeight: 300,
+    },
+
+    // ── Key Terms ─────────────────────────────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### Key Terms: Binary Arithmetic`,
+      html: `<div style="padding:12px;font-family:sans-serif">
+  <input id="q" placeholder="Filter terms…" oninput="filter()" style="width:100%;margin-bottom:10px;padding:8px 12px;border-radius:8px;border:0.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-primary,#fff);color:var(--color-text-primary,#1e293b);font-size:13px;box-sizing:border-box">
+  <div id="list"></div>
+</div>`,
+      css: `body{margin:0}.card{background:var(--color-background-secondary,#f8fafc);border-radius:8px;padding:10px 14px;border:0.5px solid var(--color-border-tertiary,#e2e8f0);margin-bottom:6px}`,
+      startCode: `var TERMS=[
+  {t:'Binary addition',d:'Add column by column right to left. Four cases: 0+0=0, 0+1=1, 1+0=1, 1+1=10 (sum 0, carry 1).'},
+  {t:'Carry',d:'A 1 propagated to the next column when a column sum reaches 2. Equivalent to decimal carrying when a column reaches 10.'},
+  {t:'Carry-out (C flag)',d:'A carry out of the MSB position. Indicates unsigned overflow — result exceeded the maximum representable value.'},
+  {t:'1\\'s complement',d:'Invert all bits. Useful as a step in computing 2\\'s complement. Not used standalone because it has two zeros (+0 and −0).'},
+  {t:'2\\'s complement',d:'Invert all bits then add 1. Standard representation of negative integers in hardware. One zero, simplifies subtraction.'},
+  {t:'Signed integer',d:'An integer that can be negative. 8-bit signed range: −128 to +127. MSB is the sign bit: 0 = positive, 1 = negative.'},
+  {t:'Unsigned integer',d:'A non-negative integer. 8-bit unsigned range: 0 to 255. All bits contribute to the magnitude.'},
+  {t:'Sign bit',d:'The MSB in a signed 2\\'s complement number. 0 means positive (or zero), 1 means negative.'},
+  {t:'Overflow',d:'When an arithmetic result exceeds the representable range for the chosen bit width and interpretation.'},
+  {t:'Unsigned overflow',d:'Result exceeds 2^N − 1. Indicated by the C (carry) flag. For 8-bit: result > 255.'},
+  {t:'Signed overflow',d:'Result outside −2^(N−1) to 2^(N−1)−1. Indicated by the V flag. Two positives give a negative, or two negatives give a positive.'},
+  {t:'V flag (overflow)',d:'Set when signed overflow occurs. Computed as: carry into MSB XOR carry out of MSB.'},
+  {t:'N flag (negative)',d:'Set when the MSB of the result is 1 — indicating a negative result in signed interpretation.'},
+  {t:'A − B = A + (−B)',d:'The key insight enabling hardware to subtract using only an adder: negate B using 2\\'s complement, then add.'},
+  {t:'Ripple carry adder',d:'A chain of full adders where each carry output feeds the next stage. Simple but slow — carry propagates through all N bits.'},
+  {t:'Full adder',d:'A circuit computing sum and carry-out from three inputs: A, B, and carry-in. The building block of all binary adders.'},
+  {t:'Sign extension',d:'Extending a signed number to more bits by copying the sign bit. 8-bit −3 (11111101) → 16-bit (1111111111111101).'},
+  {t:'Modular arithmetic',d:'N-bit arithmetic wraps around after 2^N. 255 + 1 = 0 in 8-bit unsigned. This is intentional and used in many algorithms.'},
+];
+function filter(){
+  var q=document.getElementById('q').value.toLowerCase();
+  var terms=q?TERMS.filter(function(x){return x.t.toLowerCase().includes(q)||x.d.toLowerCase().includes(q);}):TERMS;
+  document.getElementById('list').innerHTML=terms.map(function(x){
+    return '<div class="card"><div style="font-size:13px;font-weight:500;color:#0891b2;margin-bottom:3px">'+x.t+'</div>'+
+           '<div style="font-size:13px;color:var(--color-text-secondary,#64748b);line-height:1.6">'+x.d+'</div></div>';
+  }).join('');
+}
+filter();`,
+      outputHeight: 420,
+    },
+
     // ── Closing ───────────────────────────────────────────────────────────────
     {
       type: 'markdown',

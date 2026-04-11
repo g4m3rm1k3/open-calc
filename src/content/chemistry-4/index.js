@@ -7,7 +7,7 @@ import lesson4_4 from './lesson4-4.js'
 
 
 const CHEM_CH4 = {
-  title: ' Matter in Bulk',
+  title: ' Chemical Reactions',
   number: 'chem.4',
   slug: ': States of matter → Intermolecular forces → Solutions → Concentration',
   description: 'Discover why atoms bond, the difference between ionic and covalent bonds, and how electronegativity determines bond type.',
