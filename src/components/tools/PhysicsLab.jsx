@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 
 // ── CSS Styles ─────────────────────────────────────
 const styles = `
-<style>
 /* ══════════════════════════════════════════
    PHYSICS LAB STYLES
    ══════════════════════════════════════════ */
@@ -31,9 +30,9 @@ const styles = `
   --text-bright:#eef2f8;
 
   /* Type */
-  --mono:  'IBM Plex Mono', 'Courier New', monospace;
-  --sans:  'IBM Plex Sans', system-ui, sans-serif;
-  --serif: 'IBM Plex Serif', Georgia, serif;
+  --mono:  'JetBrains Mono', 'Fira Code', monospace;
+  --sans:  'Inter', system-ui, sans-serif;
+  --serif: 'Georgia', Cambria, serif;
 
   /* Layout */
   --header-h: 48px;
@@ -42,7 +41,7 @@ const styles = `
 }
 
 /* Header */
-header {
+#physlab-root > header {
   grid-area: header;
   display: flex;
   align-items: center;
@@ -480,7 +479,7 @@ header {
   text-align: right;
   white-space: nowrap;
 }
-input[type=range] {
+#physlab-root input[type=range] {
   appearance: none;
   width: 90px;
   height: 3px;
@@ -489,7 +488,7 @@ input[type=range] {
   outline: none;
   cursor: pointer;
 }
-input[type=range]::-webkit-slider-thumb {
+#physlab-root input[type=range]::-webkit-slider-thumb {
   appearance: none;
   width: 12px; height: 12px;
   border-radius: 50%;
@@ -682,7 +681,6 @@ input[type=range]::-webkit-slider-thumb {
   margin-right: 4px; margin-bottom: 4px;
   border: 1px solid var(--border);
 }
-</style>
 `;
 
 // ── Lab Data ─────────────────────────────────────
@@ -836,7 +834,7 @@ const LABS = [
         ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.fillStyle = "#f5a623";
-        ctx.font = "11px IBM Plex Mono, monospace";
+        ctx.font = "11px JetBrains Mono, monospace";
         ctx.fillText("θ₀=" + state.theta0 + "°", pivX + 52, pivY + 12);
       }
 
@@ -862,7 +860,7 @@ const LABS = [
       const mx = (pivX + bx) / 2 + 10,
         my = (pivY + by) / 2;
       ctx.fillStyle = "#4a5a72";
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillText("L=" + state.L.toFixed(2) + "m", mx, my);
 
       // Pivot
@@ -904,7 +902,7 @@ const LABS = [
       ctx.fillStyle = "rgba(17,21,32,0.85)";
       ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
       dro.forEach(([k, v], i) => {
-        ctx.font = "11px IBM Plex Mono, monospace";
+        ctx.font = "11px JetBrains Mono, monospace";
         ctx.fillStyle = "#4a5a72";
         ctx.fillText(k, W - 184, 30 + i * 20);
         ctx.fillStyle = "#00e5a0";
@@ -1087,7 +1085,7 @@ const LABS = [
       ctx.stroke();
 
       // Labels
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillStyle = "rgba(77,166,255,0.6)";
       ctx.fillText("n₁ = 1.00  (air)", 14, cy - 10);
       ctx.fillStyle = TIR ? "rgba(224,80,80,0.7)" : "rgba(0,229,160,0.5)";
@@ -1103,7 +1101,7 @@ const LABS = [
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.font = "10px IBM Plex Mono, monospace";
+      ctx.font = "10px JetBrains Mono, monospace";
       ctx.textAlign = "center";
       ctx.fillText("normal", cx, cy - H * 0.44);
       ctx.textAlign = "left";
@@ -1125,7 +1123,7 @@ const LABS = [
       ctx.lineWidth = 1.3;
       ctx.stroke();
       ctx.fillStyle = "#f5a623";
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillText(
         "θ₁=" + state.theta1 + "°",
         cx + 50 * Math.sin(t1r / 2) + 4,
@@ -1160,11 +1158,11 @@ const LABS = [
         ctx.lineWidth = 2.5;
         ctx.stroke();
         ctx.fillStyle = "#e05050";
-        ctx.font = "bold 13px IBM Plex Sans, sans-serif";
+        ctx.font = "bold 13px Inter, sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("Total Internal Reflection", cx, cy + 38);
         const tc = (Math.asin(1 / state.n2) * 180) / Math.PI;
-        ctx.font = "11px IBM Plex Mono, monospace";
+        ctx.font = "11px JetBrains Mono, monospace";
         ctx.fillText("θ_c = " + tc.toFixed(1) + "°   (θ₁ > θ_c)", cx, cy + 56);
         ctx.textAlign = "left";
       }
@@ -1174,7 +1172,7 @@ const LABS = [
       const rhs = TIR ? "—" : (state.n2 * Math.sin(t2r)).toFixed(4);
       ctx.fillStyle = "rgba(17,21,32,0.85)";
       ctx.fillRect(14, H - 52, 260, 38);
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillStyle = "#4a5a72";
       ctx.fillText("n₁ sin θ₁ =", 20, H - 36);
       ctx.fillStyle = "#f5a623";
@@ -1354,7 +1352,7 @@ const LABS = [
         scale * 0.6,
       );
       ctx.fillStyle = "#4a5a72";
-      ctx.font = "bold 14px IBM Plex Mono, monospace";
+      ctx.font = "bold 14px JetBrains Mono, monospace";
       ctx.textAlign = "center";
       ctx.fillText("V = " + state.V.toFixed(1) + "V", cx, cy + scale * 0.8);
 
@@ -1380,7 +1378,7 @@ const LABS = [
       ctx.lineTo(cx + scale * 0.6, cy);
       ctx.stroke();
       ctx.fillStyle = "#e05050";
-      ctx.font = "12px IBM Plex Mono, monospace";
+      ctx.font = "12px JetBrains Mono, monospace";
       ctx.fillText("R = " + state.R + "Ω", cx, cy - scale * 0.5);
 
       // Ammeter
@@ -1390,7 +1388,7 @@ const LABS = [
       ctx.arc(cx + scale * 1.5, cy, scale * 0.3, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.fillStyle = "#00e5a0";
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillText("A", cx + scale * 1.5, cy + 3);
       ctx.fillText(
         "I = " + I.toFixed(3) + "A",
@@ -1405,7 +1403,7 @@ const LABS = [
       ctx.arc(cx - scale * 1.5, cy, scale * 0.3, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.fillStyle = "#4da6ff";
-      ctx.font = "11px IBM Plex Mono, monospace";
+      ctx.font = "11px JetBrains Mono, monospace";
       ctx.fillText("V", cx - scale * 1.5, cy + 3);
       ctx.fillText(
         "V = " + state.V.toFixed(1) + "V",
@@ -1422,7 +1420,7 @@ const LABS = [
       ctx.lineWidth = 1;
       ctx.strokeRect(plotX, plotY, plotW, plotH);
       ctx.fillStyle = "#4a5a72";
-      ctx.font = "10px IBM Plex Mono, monospace";
+      ctx.font = "10px JetBrains Mono, monospace";
       ctx.textAlign = "center";
       ctx.fillText("I vs V", plotX + plotW / 2, plotY - 5);
       ctx.textAlign = "left";
@@ -1560,7 +1558,7 @@ const LABS = [
         ctx.lineTo(x, pad.t + ah);
         ctx.stroke();
         ctx.fillStyle = "#4a5a72";
-        ctx.font = "10px IBM Plex Mono, monospace";
+        ctx.font = "10px JetBrains Mono, monospace";
         ctx.textAlign = "center";
         ctx.fillText(Math.round((i * tMax) / 6) + "s", x, pad.t + ah + 18);
       }
@@ -1584,7 +1582,7 @@ const LABS = [
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = "#4da6ff";
-      ctx.font = "10px IBM Plex Mono, monospace";
+      ctx.font = "10px JetBrains Mono, monospace";
       ctx.textAlign = "left";
       ctx.fillText("Tₐ = " + state.Ta + "°C", pad.l + 4, sy(state.Ta) - 6);
       ctx.beginPath();
@@ -1618,7 +1616,7 @@ const LABS = [
       ctx.fillStyle = "rgba(11,14,18,0.9)";
       ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
       dro.forEach(([k, v], i) => {
-        ctx.font = "11px IBM Plex Mono, monospace";
+        ctx.font = "11px JetBrains Mono, monospace";
         ctx.fillStyle = "#4a5a72";
         ctx.fillText(k, W - 184, 30 + i * 20);
         ctx.fillStyle = "#00e5a0";
@@ -1803,7 +1801,7 @@ const LABS = [
         ctx.fillStyle = "#8a9ab5";
         ctx.fill();
         ctx.fillStyle = "#4a5a72";
-        ctx.font = "10px IBM Plex Mono, monospace";
+        ctx.font = "10px JetBrains Mono, monospace";
         ctx.textAlign = "center";
         ctx.fillText("N", xp, cy + 18);
         ctx.textAlign = "left";
@@ -1818,7 +1816,7 @@ const LABS = [
       ctx.fillStyle = "rgba(11,14,18,0.9)";
       ctx.fillRect(W - 190, 14, 176, 16 + dro.length * 20);
       dro.forEach(([k, val], i) => {
-        ctx.font = "11px IBM Plex Mono, monospace";
+        ctx.font = "11px JetBrains Mono, monospace";
         ctx.fillStyle = "#4a5a72";
         ctx.fillText(k, W - 184, 30 + i * 20);
         ctx.fillStyle = "#00e5a0";
@@ -1921,6 +1919,49 @@ export default function PhysicsLab({ onClose }) {
     styleElement.textContent = styles;
     document.head.appendChild(styleElement);
     return () => document.head.removeChild(styleElement);
+  }, []);
+
+  // Wire up inline oninput handlers for theory-panel live calculators
+  useEffect(() => {
+    window.LIVE = {
+      pendulum() {
+        const L = parseFloat(document.getElementById("pLive-L")?.value ?? 1);
+        const g = parseFloat(document.getElementById("pLive-g")?.value ?? 9.81);
+        const T = 2 * Math.PI * Math.sqrt(L / g);
+        const el = (id) => document.getElementById(id);
+        if (el("pLive-Lv")) el("pLive-Lv").textContent = `${L.toFixed(2)} m`;
+        if (el("pLive-gv")) el("pLive-gv").textContent = `${g.toFixed(2)} m/s²`;
+        if (el("pLive-T"))  el("pLive-T").textContent  = `${T.toFixed(3)} s`;
+        if (el("pLive-w"))  el("pLive-w").textContent  =
+          `T = 2π √(${L.toFixed(2)} / ${g.toFixed(2)}) = ${T.toFixed(3)} s`;
+      },
+      snell() {
+        const t1 = parseFloat(document.getElementById("sLive-t1")?.value ?? 30);
+        const n2 = parseFloat(document.getElementById("sLive-n2")?.value ?? 1.5);
+        const sinT2 = Math.sin((t1 * Math.PI) / 180) / n2;
+        const TIR = sinT2 >= 1;
+        const t2 = TIR ? null : (Math.asin(sinT2) * 180) / Math.PI;
+        const el = (id) => document.getElementById(id);
+        if (el("sLive-t1v")) el("sLive-t1v").textContent = `${t1}°`;
+        if (el("sLive-n2v")) el("sLive-n2v").textContent = n2.toFixed(2);
+        if (el("sLive-t2"))  el("sLive-t2").textContent  = TIR ? "TIR" : `${t2.toFixed(1)}°`;
+        if (el("sLive-w"))   el("sLive-w").textContent   = TIR
+          ? `1.00·sin(${t1}°) = ${sinT2.toFixed(3)} ≥ 1 → Total Internal Reflection`
+          : `1.00·sin(${t1}°) = ${n2.toFixed(2)}·sin(θ₂)  →  θ₂ = ${t2.toFixed(1)}°`;
+      },
+      ohm() {
+        const V = parseFloat(document.getElementById("oLive-V")?.value ?? 6);
+        const R = parseFloat(document.getElementById("oLive-R")?.value ?? 100);
+        const I = V / R;
+        const el = (id) => document.getElementById(id);
+        if (el("oLive-Vv")) el("oLive-Vv").textContent = `${V.toFixed(1)} V`;
+        if (el("oLive-Rv")) el("oLive-Rv").textContent = `${R} Ω`;
+        if (el("oLive-I"))  el("oLive-I").textContent  = `${I.toFixed(3)} A`;
+        if (el("oLive-w"))  el("oLive-w").textContent  =
+          `I = V/R = ${V.toFixed(1)} / ${R} = ${I.toFixed(3)} A`;
+      },
+    };
+    return () => { delete window.LIVE; };
   }, []);
 
   // Draw apparatus
@@ -2053,7 +2094,7 @@ export default function PhysicsLab({ onClose }) {
       ctx.moveTo(sx(x), pad.t);
       ctx.lineTo(sx(x), pad.t + ah);
       ctx.stroke();
-      ctx.font = "10px IBM Plex Mono, monospace";
+      ctx.font = "10px JetBrains Mono, monospace";
       ctx.fillStyle = "#4a5a72";
       ctx.textAlign = "center";
       ctx.fillText(
@@ -2105,7 +2146,7 @@ export default function PhysicsLab({ onClose }) {
 
     // Axis labels
     ctx.fillStyle = "#8a9ab5";
-    ctx.font = "11px IBM Plex Mono, monospace";
+    ctx.font = "11px JetBrains Mono, monospace";
     ctx.textAlign = "center";
     ctx.fillText(setup.xLabel, W / 2, H - 5);
     ctx.save();
@@ -2128,7 +2169,7 @@ export default function PhysicsLab({ onClose }) {
 
   return (
     <div
-      id="app"
+      id="physlab-root"
       style={{
         display: "grid",
         gridTemplateRows: "48px 1fr",
@@ -2180,20 +2221,12 @@ export default function PhysicsLab({ onClose }) {
             ↺ Reset
           </button>
           <button
+            className="hbtn"
             onClick={onClose}
-            style={{
-              fontSize: "13px",
-              padding: "4px 10px",
-              borderRadius: "8px",
-              border: "1px solid #334155",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              marginLeft: "8px",
-            }}
+            style={{ marginLeft: "8px" }}
             title="Close"
           >
-            ✕
+            ✕ Close
           </button>
         </div>
       </header>
