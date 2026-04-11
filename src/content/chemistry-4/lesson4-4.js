@@ -228,8 +228,8 @@ Not all acids donate protons equally readily. The strength of an acid is measure
 
 **Weak acids** only partially ionise — they establish an equilibrium. Acetic acid (vinegar), carbonic acid (fizzy drinks), phosphoric acid (cola), hydrofluoric acid (surprisingly weak despite being dangerous). The equilibrium constant for weak acid ionisation is called **Ka** (the acid dissociation constant):
 
-$$\text{HA} + \text{H}_2\text{O} \rightleftharpoons \text{H}_3\text{O}^+ + \text{A}^-$$
-$$K_a = \\frac{[\\text{H}_3\\text{O}^+][\\text{A}^-]}{[\\text{HA}]}$$
+$\text{HA} + \text{H}_2\text{O} \rightleftharpoons \text{H}_3\text{O}^+ + \text{A}^-$
+$K_a = \\frac{[\\text{H}_3\\text{O}^+][\\text{A}^-]}{[\\text{HA}]}$
 
 A large Ka means more dissociation (stronger acid). A small Ka means little dissociation (weaker acid). Ka values span many orders of magnitude, so we often use pKa = −log₁₀(Ka) for convenience. A lower pKa means a stronger acid.
 
@@ -237,7 +237,7 @@ A large Ka means more dissociation (stronger acid). A small Ka means little diss
 
 **Weak bases** partially accept protons. Ammonia (NH₃), the amine groups in amino acids, the imidazole ring in histidine. The equilibrium constant is Kb. The relationship between Ka of an acid and Kb of its conjugate base is:
 
-$$K_a \\times K_b = K_w = 1.0 \\times 10^{-14} \\text{ at 25°C}$$
+$K_a \\times K_b = K_w = 1.0 \\times 10^{-14} \\text{ at 25°C}$
 
 where Kw is the **ion product of water** — a fundamental constant we'll meet next.`,
     },
@@ -266,23 +266,23 @@ where Kw is the **ion product of water** — a fundamental constant we'll meet n
 
 Pure water is not entirely H₂O molecules. A tiny fraction of water molecules spontaneously transfer a proton to each other:
 
-$$\\text{H}_2\\text{O} + \\text{H}_2\\text{O} \\rightleftharpoons \\text{H}_3\\text{O}^+ + \\text{OH}^-$$
+$\\text{H}_2\\text{O} + \\text{H}_2\\text{O} \\rightleftharpoons \\text{H}_3\\text{O}^+ + \\text{OH}^-$
 
 The equilibrium constant for this **autoionisation of water** is:
 
-$$K_w = [\\text{H}_3\\text{O}^+][\\text{OH}^-] = 1.0 \\times 10^{-14} \\text{ at 25°C}$$
+$K_w = [\\text{H}_3\\text{O}^+][\\text{OH}^-] = 1.0 \\times 10^{-14} \\text{ at 25°C}$
 
 In pure water, [H₃O⁺] = [OH⁻] = 1.0 × 10⁻⁷ mol/L. The solution is neutral.
 
 The **pH scale** is a logarithmic measure of [H₃O⁺]:
 
-$$\\text{pH} = -\\log_{10}[\\text{H}_3\\text{O}^+]$$
+$\\text{pH} = -\\log_{10}[\\text{H}_3\\text{O}^+]$
 
 In pure water: pH = −log(1.0 × 10⁻⁷) = 7.0 (neutral).
 
 Because of Kw, [OH⁻] = Kw/[H₃O⁺], so:
 
-$$\\text{pOH} = -\\log[\\text{OH}^-] \\quad \\text{and} \\quad \\text{pH} + \\text{pOH} = 14$$
+$\\text{pOH} = -\\log[\\text{OH}^-] \\quad \\text{and} \\quad \\text{pH} + \\text{pOH} = 14$
 
 **Key pH values to know:**
 - pH < 7: acidic (more H₃O⁺ than OH⁻)
@@ -486,7 +486,7 @@ Both components are consumed, but the pH barely changes because the ratio [CH₃
 
 **The Henderson-Hasselbalch equation** gives the pH of a buffer directly:
 
-$$\\text{pH} = \\text{p}K_a + \\log\\left(\\frac{[\\text{A}^-]}{[\\text{HA}]}\\right)$$
+$\\text{pH} = \\text{p}K_a + \\log\\left(\\frac{[\\text{A}^-]}{[\\text{HA}]}\\right)$
 
 At equal concentrations of acid and conjugate base ([A⁻] = [HA]), log(1) = 0, so pH = pKa. A buffer works best when pH ≈ pKa and when [A⁻]/[HA] is between 0.1 and 10 (i.e., pH within ±1 of pKa).
 

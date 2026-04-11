@@ -204,7 +204,7 @@ Lavoisier solved the puzzle by carefully weighing everything — including the a
 His conclusion: **in any chemical reaction, the total mass of the reactants equals the total mass of the products.** Matter is neither created nor destroyed — only rearranged.
 
 In equation form:
-$$\\sum m_{\\text{reactants}} = \\sum m_{\\text{products}}$$
+$\\sum m_{\\text{reactants}} = \\sum m_{\\text{products}}$
 
 This law is the reason we **balance chemical equations**. A balanced equation has the same number of each type of atom on both sides — because atoms are conserved. If you write:
 

@@ -1,4 +1,4 @@
-// Digital Fundamentals · Chapter 1 · Lesson 2
+// Digital Fundamentals · Chapter 2 · Lesson 2
 // Hexadecimal
 // ScienceNotebook format — visuals + challenges
 

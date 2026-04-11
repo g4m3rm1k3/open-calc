@@ -23,7 +23,7 @@ Heat calcium carbonate: it decomposes to calcium oxide and carbon dioxide. But C
 
 These are **reversible reactions** — reactions that can proceed in both the forward and reverse directions. We write them with a double arrow:
 
-$$N_2 + 3H_2 \\rightleftharpoons 2NH_3$$
+$N_2 + 3H_2 \\rightleftharpoons 2NH_3$
 
 When the forward and reverse reaction rates become equal — when the system reaches a balance point where concentrations stop changing — we say the system is at **chemical equilibrium**.
 
@@ -38,10 +38,10 @@ Equilibrium is not static. Molecules are still reacting in both directions at eq
 At equilibrium, the concentrations of reactants and products are related by a fixed mathematical expression called the **equilibrium constant**, symbol K (or Keq).
 
 For the general reaction:
-$$aA + bB \\rightleftharpoons cC + dD$$
+$aA + bB \\rightleftharpoons cC + dD$
 
 The equilibrium constant expression is:
-$$K = \\frac{[C]^c[D]^d}{[A]^a[B]^b}$$
+$K = \\frac{[C]^c[D]^d}{[A]^a[B]^b}$
 
 where the brackets denote equilibrium molar concentrations and the exponents are the stoichiometric coefficients from the balanced equation.
 
@@ -448,7 +448,7 @@ The equilibrium constant K tells you where the system ends up. The **reaction qu
 
 Q has the same mathematical form as K, but uses current concentrations (not equilibrium concentrations):
 
-$$Q = \\frac{[C]^c[D]^d}{[A]^a[B]^b} \\quad \\text{(current concentrations)}$$
+$Q = \\frac{[C]^c[D]^d}{[A]^a[B]^b} \\quad \\text{(current concentrations)}$
 
 Comparing Q to K tells you the direction of spontaneous change:
 

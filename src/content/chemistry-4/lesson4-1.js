@@ -19,7 +19,7 @@ The answer is in the bonds. Specifically, in the difference between the energy s
 
 We established in the last lesson that breaking bonds requires energy and forming bonds releases energy. The **net energy change** of a reaction is the difference between these two:
 
-$$\\Delta H_{\\text{reaction}} = \\text{Energy released by forming bonds} - \\text{Energy required to break bonds}$$
+$\\Delta H_{\\text{reaction}} = \\text{Energy released by forming bonds} - \\text{Energy required to break bonds}$
 
 If more energy is released than consumed — if the products' bonds are stronger than the reactants' bonds — the reaction **releases energy** to the surroundings. The surroundings heat up. This is an **exothermic reaction** (exo = out, thermic = heat). Combustion, explosion, rusting iron, metabolising food — all exothermic.
 
@@ -450,7 +450,7 @@ draw();`,
 
 If you know the bond energies of all the bonds broken and formed in a reaction, you can estimate ΔH directly. Bond energy (also called bond dissociation energy) is the energy required to break one mole of a particular bond in the gas phase.
 
-$$\\Delta H \\approx \\sum (\\text{bond energies broken}) - \\sum (\\text{bond energies formed})$$
+$\\Delta H \\approx \\sum (\\text{bond energies broken}) - \\sum (\\text{bond energies formed})$
 
 Or equivalently: energy in (breaking bonds) minus energy out (forming bonds).
 
@@ -472,7 +472,7 @@ This method gives approximate ΔH values because bond energies are averages — 
 
 **Standard enthalpy of formation (ΔH°f):** The enthalpy change when 1 mole of a compound is formed from its elements in their standard states at 25°C and 1 atm. Elements in their standard states (H₂, O₂, Fe(s), C(graphite)) have ΔH°f = 0 by definition. From tables of ΔH°f values, you can calculate ΔH°rxn for any reaction:
 
-$$\\Delta H°_{rxn} = \\sum \\Delta H°_f(\\text{products}) - \\sum \\Delta H°_f(\\text{reactants})$$`,
+$\\Delta H°_{rxn} = \\sum \\Delta H°_f(\\text{products}) - \\sum \\Delta H°_f(\\text{reactants})$`,
     },
 
     // ── Visual 3 — Bond energy calculator ──────────────────────────────────────

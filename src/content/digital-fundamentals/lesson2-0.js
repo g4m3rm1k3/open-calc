@@ -279,7 +279,7 @@ function draw(){
   var steps=[
     {label:'Original (+'+num+')',bits:orig,color:'#38bdf8',note:'Positive '+num+' in 8-bit binary'},
     {label:'Invert all bits',bits:inv,color:'#fbbf24',note:'Flip every 0\u21921 and 1\u21920'},
-    {label:'Add 1',bits:negBin,color:'#a78bfa',note:'Adding 1 to the inverted value gives \u2212'+num+' in two\'s complement'},
+    {label:'Add 1',bits:negBin,color:'#a78bfa',note:'Adding 1 to the inverted value gives \u2212'+num+' in two\\'s complement'},
     {label:'Result = \u2212'+num,bits:negBin,color:'#4ade80',note:'MSB = 1 confirms this is negative. Decimal value: \u2212'+num},
   ];
 
@@ -332,7 +332,7 @@ function verify(){
     'Verification: '+num+' + (\u2212'+num+') = ?<br>'+
     toBin8(num)+' + '+toBin8(neg)+' = '+(carry?'1 ':'')+toBin8(sum)+
     (carry?' (carry-out discarded)':'')+
-    ' = 0 \u2713<br>The carry-out in 8-bit addition is discarded, leaving 0000\u20090000. Two\'s complement addition works identically with the same unsigned adder circuit.';
+    ' = 0 \u2713<br>The carry-out in 8-bit addition is discarded, leaving 0000\u20090000. Two\\'s complement addition works identically with the same unsigned adder circuit.';
 }
 
 draw();verify();`,
@@ -464,7 +464,7 @@ function refresh(){
 
   document.getElementById('subDesc').innerHTML=
     'Step 1 \u2014 Invert B: '+toBin8(bVal)+' \u2192 '+invertArr(B).join('')+'<br>'+
-    'Step 2 \u2014 Set C_in = 1 (the +1 from two\'s complement negation)<br>'+
+    'Step 2 \u2014 Set C_in = 1 (the +1 from two\\'s complement negation)<br>'+
     'Step 3 \u2014 Add: '+toBin8(aVal)+' + '+invertArr(B).join('')+' + C_in(1)<br>'+
     'Result: '+sums.join('')+' = '+result+' (signed: '+signedResult+')<br>'+
     (ovf?'<span style="color:#ef4444">OVERFLOW: carry-into-MSB='+cin_msb+', carry-out-of-MSB='+cout_msb+' \u2014 they differ, so sign bit is wrong.</span>':'No overflow (carry-in and carry-out of MSB match: '+cin_msb+')');

@@ -19,7 +19,7 @@ Rate matters enormously in practice. Industrial chemists optimize reaction rates
 
 The **rate of a reaction** is the speed at which reactants are consumed or products are formed. Formally:
 
-$$\\text{rate} = -\\frac{\\Delta[\\text{reactant}]}{\\Delta t} = +\\frac{\\Delta[\\text{product}]}{\\Delta t}$$
+$\\text{rate} = -\\frac{\\Delta[\\text{reactant}]}{\\Delta t} = +\\frac{\\Delta[\\text{product}]}{\\Delta t}$
 
 The brackets denote molar concentration, and the negative sign on the reactant side reflects that reactant concentration decreases over time. Rate has units of mol/L·s (or mol/L·min, etc.).
 
@@ -48,7 +48,7 @@ This third point is subtler than it seems. Consider HBr reacting with OH⁻ to g
 
 The rate of a reaction is therefore:
 
-$$\\text{rate} \\propto (\\text{collision frequency}) \\times (\\text{fraction with } E \\geq E_a) \\times (\\text{steric factor})$$
+$\\text{rate} \\propto (\\text{collision frequency}) \\times (\\text{fraction with } E \\geq E_a) \\times (\\text{steric factor})$
 
 Each of the four rate factors maps onto this framework:
 - **Concentration**: increases collision frequency — more particles per volume, more collisions per second
@@ -274,7 +274,7 @@ Collision theory tells us qualitatively that concentration affects rate. But the
 
 A **rate law** expresses the rate as a function of reactant concentrations:
 
-$$\\text{rate} = k[A]^m[B]^n$$
+$\\text{rate} = k[A]^m[B]^n$
 
 Where:
 - k is the **rate constant** — a proportionality constant that depends on temperature and the specific reaction
@@ -406,7 +406,7 @@ ctx.fillText('[A] doubles: 1\u21922 M',toScreen(1.5,0).x,chartY+chartH+48);
 
 We said that higher temperature increases the fraction of molecules with enough energy to react. Svante Arrhenius quantified this relationship in 1889:
 
-$$k = A \\cdot e^{-E_a/RT}$$
+$k = A \\cdot e^{-E_a/RT}$
 
 where:
 - k is the rate constant
@@ -421,7 +421,7 @@ The exponential term e^(−Eₐ/RT) is the fraction of molecules with enough ene
 
 **Comparing two temperatures:** Taking the logarithm of the Arrhenius equation gives:
 
-$$\\ln\\left(\\frac{k_2}{k_1}\\right) = \\frac{E_a}{R}\\left(\\frac{1}{T_1} - \\frac{1}{T_2}\\right)$$
+$\\ln\\left(\\frac{k_2}{k_1}\\right) = \\frac{E_a}{R}\\left(\\frac{1}{T_1} - \\frac{1}{T_2}\\right)$
 
 This lets you calculate Eₐ from two rate measurements at different temperatures, or predict the rate constant at any temperature given Eₐ.
 
