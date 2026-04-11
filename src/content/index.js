@@ -38,6 +38,7 @@ import git1 from './git-1/index.js'
 import dsa1 from './dsa-1/index.js'
 import dp1 from './dp-1/index.js'
 import design1 from './design-1/index.js'
+import threejs1 from './three-js-1/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
 const DISCRETE_CURRICULUM = [discrete1].map(ch => ({ ...ch, course: 'discrete' }))
@@ -58,6 +59,7 @@ const GIT_CURRICULUM = [git1].map(ch => ({ ...ch, course: 'git-logic' }))
 const DSA_CURRICULUM = dsa1.map(ch => ({ ...ch, course: 'dsa-1' }))
 const DP_CURRICULUM = dp1.map(ch => ({ ...ch, course: 'dp-1' }))
 const DESIGN_CURRICULUM = design1.map(ch => ({ ...ch, course: 'design-1' }))
+const THREEJS_CURRICULUM = threejs1.map(ch => ({ ...ch, course: 'three-js-1' }))
 
 export const CURRICULUM = [
   ...PRECALC_CURRICULUM, 
@@ -79,6 +81,7 @@ export const CURRICULUM = [
   ...DSA_CURRICULUM,
   ...DP_CURRICULUM,
   ...DESIGN_CURRICULUM,
+  ...THREEJS_CURRICULUM,
 ]
 
 // Flat map for O(1) lookup by slug within chapter

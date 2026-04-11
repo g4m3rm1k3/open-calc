@@ -132,4 +132,12 @@ export const COURSES = [
     desc: 'Visual Hierarchy, Spacing & Design Systems',
     color: 'pink'
   },
+  {
+    key: 'three-js-1',
+    label: '3D Graphics & Three.js',
+    path: '/course/three-js-1',
+    desc: 'GPU Pipeline, WebGL & Three.js Mastery',
+    color: 'violet'
+  },
 ];
+
