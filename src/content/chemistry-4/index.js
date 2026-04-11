@@ -7,12 +7,12 @@ import lesson4_4 from './lesson4-4.js'
 
 
 const CHEM_CH4 = {
-  title: ' Chemical Reactions',
+  title: 'Chemical Reactions',
   number: 'chem.4',
-  slug: ': States of matter → Intermolecular forces → Solutions → Concentration',
-  description: 'Discover why atoms bond, the difference between ionic and covalent bonds, and how electronegativity determines bond type.',
+  slug: 'chem-chemical-reactions',
+  description: 'Understand how atoms rearrange to form new substances, the role of energy in bond breaking and forming, and how to balance chemical equations.',
   course: 'chemistry-1',
-  lessons: [lesson4_0,lesson4_1,lesson4_2,lesson4_3,lesson4_4],
+  lessons: [lesson4_0, lesson4_1, lesson4_2, lesson4_3, lesson4_4],
 };
 
 export default [CHEM_CH4];

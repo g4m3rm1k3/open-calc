@@ -398,31 +398,261 @@ Gray codes are used in:
     // ── Visual 3 — Gray Code ──────────────────────────────────────────────────
     {
       type: 'js',
-      instruction: `### Gray code vs standard binary
+      instruction: `### Gray code encoder wheel
 
-Move the slider to step through values 0–15. For each step, the **Bits changed** column shows how many bits flip in standard binary vs Gray code. Standard binary can flip up to 4 bits at once (at 7→8). Gray code always flips exactly 1.`,
-      html: `<div style="padding:12px">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
-    <span style="font-size:12px;color:rgba(255,255,255,0.5)">Position:</span>
-    <strong id="posLabel" style="font-size:16px;color:#a78bfa;min-width:26px">6</strong>
+Drag the slider, click a sector on the wheel, or click any table row to select a position. Watch: the pointer always steps to an adjacent sector — only one segment boundary is ever crossed. The highlighted table row shows binary and Gray code bits with changed bits coloured. At 7→8 standard binary flips 4 bits at once (red); Gray code always flips exactly 1.`,
+      html: `<div style="padding:12px;font-family:monospace">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="font-size:11px;color:rgba(255,255,255,0.4)">Position:</span>
+    <strong id="posLabel" style="font-size:18px;color:#a78bfa;min-width:28px">6</strong>
     <input type="range" id="posSl" min="0" max="15" value="6" style="flex:1;min-width:140px;accent-color:#a78bfa">
+    <span style="font-size:10px;color:rgba(255,255,255,0.3)">(or click wheel / table)</span>
   </div>
-  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
-    <canvas id="cv" width="340" height="360"></canvas>
-    <div style="flex:1;min-width:180px">
-      <div id="convPanel" style="font-size:12px;line-height:2;color:rgba(255,255,255,0.6)"></div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:0 0 auto">
+      <canvas id="wheel" width="280" height="240" style="border-radius:8px;display:block;cursor:pointer"></canvas>
+      <div id="convPanel" style="margin-top:8px;font-size:12px;line-height:1.9;color:rgba(255,255,255,0.6);min-height:80px"></div>
+    </div>
+    <div style="flex:1;min-width:200px;overflow-x:auto">
+      <table id="tbl" style="border-collapse:collapse;font-size:12px;width:100%">
+        <thead>
+          <tr>
+            <th style="padding:4px 8px;color:rgba(255,255,255,0.4);font-weight:500;text-align:center">Dec</th>
+            <th style="padding:4px 8px;color:#38bdf8;font-weight:500;text-align:center">Binary</th>
+            <th style="padding:4px 8px;color:#a78bfa;font-weight:500;text-align:center">Gray</th>
+            <th style="padding:4px 8px;color:rgba(255,255,255,0.4);font-weight:500;text-align:center">Δbits</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>`,
+      css: `body{margin:0;background:#0a0f1e;color:#e2e8f0}canvas{display:block}
+tr.sel td{background:rgba(167,139,250,0.14)}
+tr:hover td{background:rgba(255,255,255,0.04);cursor:pointer}`,
+      startCode: `var pos=6;
+var N=16;
+
+function toGray(n){return n^(n>>1);}
+function bin4(n){return n.toString(2).padStart(4,'0');}
+function popcount(n){var c=0;while(n){c+=n&1;n>>>=1;}return c;}
+
+// ── wheel ────────────────────────────────────────────────────────────────
+var wheel=document.getElementById('wheel');
+var wctx=wheel.getContext('2d');
+
+function drawWheel(){
+  var WW=wheel.width,WH=wheel.height;
+  wctx.clearRect(0,0,WW,WH);
+  wctx.fillStyle='#0a0f1e';wctx.fillRect(0,0,WW,WH);
+  var cx=WW/2,cy=WH/2+4,R=Math.min(WW,WH)*0.42;
+  var sa=(2*Math.PI)/N;
+  for(var i=0;i<N;i++){
+    var a=i*sa-Math.PI/2;
+    var isSel=(i===pos);
+    wctx.beginPath();wctx.moveTo(cx,cy);
+    wctx.arc(cx,cy,R,a,a+sa);wctx.closePath();
+    wctx.fillStyle=isSel?'#7c3aed':(i%2===0?'#1e293b':'#0f172a');
+    wctx.fill();
+    wctx.strokeStyle='#334155';wctx.lineWidth=0.5;wctx.stroke();
+    var la=a+sa/2,lr=R*0.73;
+    wctx.fillStyle=isSel?'#fff':'#64748b';
+    wctx.font=(isSel?'bold ':'')+'9px monospace';
+    wctx.textAlign='center';wctx.textBaseline='middle';
+    wctx.fillText(i,cx+lr*Math.cos(la),cy+lr*Math.sin(la));
+  }
+  // hub
+  wctx.beginPath();wctx.arc(cx,cy,R*0.30,0,2*Math.PI);
+  wctx.fillStyle='#1e293b';wctx.fill();
+  wctx.strokeStyle='#334155';wctx.lineWidth=1;wctx.stroke();
+  // pointer
+  var pa=pos*sa+sa/2-Math.PI/2;
+  wctx.strokeStyle='#a78bfa';wctx.lineWidth=2.5;
+  wctx.beginPath();wctx.moveTo(cx,cy);
+  wctx.lineTo(cx+R*0.87*Math.cos(pa),cy+R*0.87*Math.sin(pa));wctx.stroke();
+  wctx.beginPath();wctx.arc(cx+R*0.87*Math.cos(pa),cy+R*0.87*Math.sin(pa),5,0,2*Math.PI);
+  wctx.fillStyle='#a78bfa';wctx.fill();
+  // hub text
+  var g=toGray(pos);
+  wctx.textAlign='center';wctx.textBaseline='middle';
+  wctx.fillStyle='#e2e8f0';wctx.font='bold 13px monospace';wctx.fillText(pos,cx,cy-10);
+  wctx.fillStyle='#a78bfa';wctx.font='10px monospace';wctx.fillText(bin4(g),cx,cy+4);
+  wctx.fillStyle='#38bdf8';wctx.font='9px monospace';wctx.fillText(bin4(pos),cx,cy+16);
+  // changed bit note at bottom
+  if(pos>0){
+    var prev=(pos-1+16)%16;
+    var diff=g^toGray(prev);
+    var cb=diff>0?Math.floor(Math.log2(diff)):0;
+    wctx.fillStyle='#4ade80';wctx.font='9px monospace';wctx.textBaseline='alphabetic';
+    wctx.fillText('\u2713 1 bit changed (bit '+cb+')',cx,WH-6);
+  }
+}
+
+// click a wheel sector to set position
+wheel.onclick=function(e){
+  var rect=wheel.getBoundingClientRect();
+  var cx=wheel.width/2,cy=wheel.height/2+4;
+  var dx=(e.clientX-rect.left)*(wheel.width/rect.width)-cx;
+  var dy=(e.clientY-rect.top)*(wheel.height/rect.height)-cy;
+  var R=Math.min(wheel.width,wheel.height)*0.42;
+  if(Math.sqrt(dx*dx+dy*dy)>R*0.30&&Math.sqrt(dx*dx+dy*dy)<R){
+    var angle=Math.atan2(dy,dx)+Math.PI/2;
+    if(angle<0)angle+=2*Math.PI;
+    var sector=Math.floor(angle/(2*Math.PI/N))%N;
+    setPos(sector);
+  }
+};
+
+// ── table ────────────────────────────────────────────────────────────────
+function buildTable(){
+  var tbody=document.getElementById('tbody');
+  var rows='';
+  for(var i=0;i<N;i++){
+    var g=toGray(i);
+    var prev=(i-1+N)%N, prevG=toGray(prev);
+    var binChange=i>0?popcount(i^(i-1)):0;
+    var grayChange=i>0?popcount(g^prevG):0;
+    // binary bits with changed bits highlighted
+    var binCells='';
+    bin4(i).split('').forEach(function(b,ci){
+      var changed=i>0&&(((i^(i-1))>>(3-ci))&1)===1;
+      var col=b==='1'?(changed?'#ef4444':'#38bdf8'):'rgba(255,255,255,0.15)';
+      binCells+='<span style="color:'+col+';font-weight:'+(b==='1'?600:400)+'">'+b+'</span>';
+    });
+    // gray bits with changed bit highlighted
+    var grayCells='';
+    bin4(g).split('').forEach(function(b,ci){
+      var changed=i>0&&(((g^prevG)>>(3-ci))&1)===1;
+      var col=b==='1'?(changed?'#fbbf24':'#a78bfa'):'rgba(255,255,255,0.15)';
+      grayCells+='<span style="color:'+col+';font-weight:'+(b==='1'?600:400)+'">'+b+'</span>';
+    });
+    var deltaCell=i===0?'<span style="color:rgba(255,255,255,0.2)">\u2014</span>':
+      '<span style="color:'+(binChange>1?'#ef4444':'#4ade80')+'">'+binChange+'</span>'+
+      '<span style="color:rgba(255,255,255,0.2)"> / </span>'+
+      '<span style="color:#4ade80">'+grayChange+'</span>';
+    rows+='<tr data-i="'+i+'" style="border-bottom:0.5px solid rgba(255,255,255,0.05);cursor:pointer">'+
+      '<td style="padding:3px 8px;text-align:center;color:rgba(255,255,255,0.5)">'+i+'</td>'+
+      '<td style="padding:3px 8px;text-align:center;font-family:monospace;letter-spacing:2px">'+binCells+'</td>'+
+      '<td style="padding:3px 8px;text-align:center;font-family:monospace;letter-spacing:2px">'+grayCells+'</td>'+
+      '<td style="padding:3px 8px;text-align:center;font-size:11px">'+deltaCell+'</td>'+
+    '</tr>';
+  }
+  tbody.innerHTML=rows;
+  Array.from(tbody.querySelectorAll('tr')).forEach(function(tr){
+    tr.onclick=function(){setPos(parseInt(this.dataset.i));};
+  });
+}
+
+function updateTableSel(){
+  Array.from(document.getElementById('tbody').querySelectorAll('tr')).forEach(function(tr){
+    tr.className=parseInt(tr.dataset.i)===pos?'sel':'';
+  });
+  // scroll selected row into view
+  var selRow=document.querySelector('#tbody tr.sel');
+  if(selRow)selRow.scrollIntoView({block:'nearest'});
+}
+
+// ── conversion panel ─────────────────────────────────────────────────────
+function updatePanel(){
+  var g=toGray(pos);
+  var prev=(pos-1+N)%N,prevG=toGray(prev);
+  var binDiff=pos>0?popcount(pos^(pos-1)):0;
+  var grayDiff=pos>0?popcount(g^prevG):0;
+  var html='<div style="margin-bottom:4px;color:#e2e8f0">Position <strong style="color:#a78bfa">'+pos+'</strong></div>';
+  html+='<div>Binary:&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;font-size:13px;font-weight:600">'+bin4(pos)+'</span></div>';
+  html+='<div>Gray code: <span style="color:#a78bfa;font-size:13px;font-weight:600">'+bin4(g)+'</span></div>';
+  if(pos>0){
+    html+='<div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,0.08)">'+
+      prev+'\u2192'+pos+':<br>'+
+      'Binary bits changed: <span style="color:'+(binDiff>1?'#ef4444':'#4ade80')+'">'+binDiff+'</span><br>'+
+      'Gray bits changed: <span style="color:#4ade80">'+grayDiff+'</span></div>';
+  }
+  html+='<div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.25)">'+
+    'G = B XOR (B &gt;&gt; 1)<br>'+pos+' XOR '+Math.floor(pos/2)+' = '+g+'</div>';
+  document.getElementById('convPanel').innerHTML=html;
+}
+
+// ── main update ───────────────────────────────────────────────────────────
+function setPos(n){
+  pos=n;
+  document.getElementById('posLabel').textContent=pos;
+  document.getElementById('posSl').value=pos;
+  drawWheel();
+  updateTableSel();
+  updatePanel();
+}
+
+document.getElementById('posSl').oninput=function(){setPos(parseInt(this.value));};
+
+buildTable();
+setPos(6);`,
+      outputHeight: 660,
+    },
+
+    // ── Challenge 2 ───────────────────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `A rotary encoder is at position 7 (standard binary: 0111). It moves one step to position 8 (standard binary: 1000). Why is this dangerous without Gray code?`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace;color:#e2e8f0}canvas{border-radius:8px;display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
+var wheel=document.getElementById('wheel');
+var wctx=wheel.getContext('2d');
 var pos=6;
 
 function toGray(n){return n^(n>>1);}
 function bin4(n){return n.toString(2).padStart(4,'0');}
 function popcount(n){var c=0;while(n){c+=n&1;n>>>=1;}return c;}
+
+function drawWheel(){
+  var WW=wheel.width,WH=wheel.height;
+  wctx.clearRect(0,0,WW,WH);
+  wctx.fillStyle='#0a0f1e';wctx.fillRect(0,0,WW,WH);
+  var N=16,cx=WW/2,cy=WH/2+6,R=Math.min(WW,WH)*0.40;
+  var sa=(2*Math.PI)/N;
+  for(var i=0;i<N;i++){
+    var a=i*sa-Math.PI/2;
+    var isSel=(i===pos);
+    wctx.beginPath();wctx.moveTo(cx,cy);
+    wctx.arc(cx,cy,R,a,a+sa);wctx.closePath();
+    wctx.fillStyle=isSel?'#7c3aed':(i%2===0?'#1e293b':'#0f172a');
+    wctx.fill();
+    wctx.strokeStyle='#334155';wctx.lineWidth=0.5;wctx.stroke();
+    var la=a+sa/2,lr=R*0.72;
+    wctx.fillStyle=isSel?'#fff':'#64748b';
+    wctx.font=(isSel?'bold ':'')+' 9px monospace';
+    wctx.textAlign='center';wctx.textBaseline='middle';
+    wctx.fillText(i,cx+lr*Math.cos(la),cy+lr*Math.sin(la));
+  }
+  // inner hub
+  wctx.beginPath();wctx.arc(cx,cy,R*0.28,0,2*Math.PI);
+  wctx.fillStyle='#1e293b';wctx.fill();
+  wctx.strokeStyle='#334155';wctx.lineWidth=1;wctx.stroke();
+  // pointer arrow
+  var pa=pos*sa+sa/2-Math.PI/2;
+  wctx.strokeStyle='#a78bfa';wctx.lineWidth=2.5;
+  wctx.beginPath();wctx.moveTo(cx,cy);
+  wctx.lineTo(cx+R*0.86*Math.cos(pa),cy+R*0.86*Math.sin(pa));wctx.stroke();
+  wctx.beginPath();wctx.arc(cx+R*0.86*Math.cos(pa),cy+R*0.86*Math.sin(pa),5,0,2*Math.PI);
+  wctx.fillStyle='#a78bfa';wctx.fill();
+  // hub label
+  var g=toGray(pos);
+  wctx.fillStyle='#e2e8f0';wctx.font='bold 11px monospace';wctx.textAlign='center';wctx.textBaseline='middle';
+  wctx.fillText(pos,cx,cy-8);
+  wctx.fillStyle='#a78bfa';wctx.font='10px monospace';
+  wctx.fillText(bin4(g),cx,cy+6);
+  wctx.fillStyle='#38bdf8';wctx.font='9px monospace';
+  wctx.fillText(bin4(pos),cx,cy+18);
+  // changed-bit note
+  if(pos>0){
+    var prev=(pos-1+16)%16;
+    var changedBit=Math.round(Math.log2(g^toGray(prev)));
+    wctx.fillStyle='#4ade80';wctx.font='9px monospace';wctx.textAlign='center';wctx.textBaseline='alphabetic';
+    wctx.fillText('1 bit changed (bit '+changedBit+')',cx,WH-6);
+  }
+}
 
 function refresh(){
   document.getElementById('posLabel').textContent=pos;
@@ -443,6 +673,7 @@ function refresh(){
   }
   html+='<div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3)">Binary\u2192Gray formula:<br>G = B XOR (B &gt;&gt; 1)<br>'+pos+' XOR '+Math.floor(pos/2)+' = '+g+'</div>';
   document.getElementById('convPanel').innerHTML=html;
+  drawWheel();
   draw();
 }
 
@@ -529,7 +760,7 @@ function draw(){
 
 document.getElementById('posSl').oninput=function(){pos=parseInt(this.value);refresh();};
 refresh();`,
-      outputHeight: 420,
+      outputHeight: 660,
     },
 
     // ── Challenge 2 ───────────────────────────────────────────────────────────
