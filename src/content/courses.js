@@ -125,4 +125,11 @@ export const COURSES = [
     desc: 'Overlapping Subproblems, Optimal Substructure & Classic Patterns',
     color: 'fuchsia'
   },
+  {
+    key: 'design-1',
+    label: 'Interface Design',
+    path: '/course/design-1',
+    desc: 'Visual Hierarchy, Spacing & Design Systems',
+    color: 'pink'
+  },
 ];
