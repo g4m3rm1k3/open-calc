@@ -1,4 +1,6 @@
 import lesson1_1 from './lesson1-1.js'
+import lesson1_2 from './lesson1-2.js'
+
 
 const DESIGN_CH1 = {
   title: 'Interface Design Systems',
@@ -7,7 +9,7 @@ const DESIGN_CH1 = {
   description: 'Visual hierarchy, spacing, colour, and the engineering principles behind clear UI.',
   course: 'design-1',
   lessons: [
-    lesson1_1,
+    lesson1_1, lesson1_2,
   ],
 };
 
