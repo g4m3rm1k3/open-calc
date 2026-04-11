@@ -1,63 +1,64 @@
-const lesson = {
+export default {
   id: 'dsa7-001',
+  slug: 'algorithmic-paradigms',
+  chapter: 'dsa7',
+  order: 1,
   title: 'Algorithmic Paradigms',
   subtitle: 'Divide & Conquer, Greedy, and Dynamic Programming — the three master patterns',
-  course: 'dsa-1',
-  chapter: 'dsa7',
+  tags: ['divide and conquer', 'greedy', 'dynamic programming', 'DP', 'paradigms'],
+  aliases: ['D&C', 'memoization', 'tabulation', 'knapsack', 'coin change'],
 
-  scienceNotebook: {
-    title: 'Three Ways to Think About Hard Problems',
-    subtitle: 'Each paradigm is a mental framework — learn when to reach for each one',
-    sequential: true,
-    cells: [
+  hook: {
+    title: 'Three lenses for hard problems',
+    body: 'Most algorithm problems fit one of three mental models: split and conquer independent subproblems (Divide & Conquer), always grab the locally best option (Greedy), or cache overlapping subproblem results (Dynamic Programming). Recognising which lens applies is often the entire skill.',
+  },
+
+  intuition: {
+    prose: 'D&C works when subproblems are independent — merge sort, quicksort, max subarray. Greedy works when a locally optimal choice is globally optimal — activity selection, jump game, Dijkstra. DP works when subproblems overlap and re-solving them is wasteful — coin change, knapsack, longest common subsequence.',
+    callouts: [
+      { kind: 'sequencing', body: 'Learn the D&C max-subarray pattern first (it illustrates the template), then Greedy jump game, then DP coin change and knapsack.' },
+    ],
+    visualizations: [
       {
-        id: 'paradigm-overview',
-        title: 'The Three Paradigms',
-        type: 'js',
-        code: `
-const display = document.getElementById('display');
-display.innerHTML = \`
-<div style="color:#e2e8f0;font-size:13px;line-height:1.8">
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-    <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #60a5fa">
-      <h3 style="color:#60a5fa;margin:0 0 8px;font-size:14px">Divide & Conquer</h3>
-      <p style="color:#94a3b8;margin:0 0 8px;font-size:12px">Split the problem into independent subproblems, solve each, combine results.</p>
-      <p style="color:#64748b;font-size:12px">Examples: merge sort, quicksort, binary search, max subarray</p>
-    </div>
-    <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #4ade80">
-      <h3 style="color:#4ade80;margin:0 0 8px;font-size:14px">Greedy</h3>
-      <p style="color:#94a3b8;margin:0 0 8px;font-size:12px">Always make the locally optimal choice. Works when local optimal = global optimal.</p>
-      <p style="color:#64748b;font-size:12px">Examples: coin change (certain denominations), activity selection, Huffman coding, Dijkstra</p>
-    </div>
-    <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #f59e0b">
-      <h3 style="color:#f59e0b;margin:0 0 8px;font-size:14px">Dynamic Programming</h3>
-      <p style="color:#94a3b8;margin:0 0 8px;font-size:12px">Break into overlapping subproblems. Cache results (memoization or tabulation).</p>
-      <p style="color:#64748b;font-size:12px">Examples: fibonacci, knapsack, longest common subsequence, edit distance</p>
-    </div>
+        type: 'ScienceNotebook',
+        cells: [
+          {
+            type: 'js',
+            title: 'The Three Paradigms',
+            instruction: 'Each paradigm is a mental framework. The key question is which one applies to your problem.',
+            html: '<div id="d" style="padding:12px"></div>',
+            css: '',
+            startCode: `document.getElementById('d').innerHTML = \`
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:13px">
+  <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #60a5fa">
+    <div style="color:#60a5fa;font-weight:bold;margin-bottom:6px">Divide &amp; Conquer</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Split into <i>independent</i> subproblems, solve each, combine results.</div>
+    <div style="color:#64748b;font-size:11px">merge sort · quicksort · binary search · max subarray</div>
   </div>
-  <div style="background:#0f172a;border-radius:6px;padding:10px;margin-top:12px;font-size:12px;color:#94a3b8">
-    <b style="color:#e2e8f0">How to choose:</b> Can I solve subproblems independently? → D&C.
-    Does a local greedy choice always lead to global optimum? → Greedy.
-    Do subproblems overlap and need caching? → DP.
+  <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #4ade80">
+    <div style="color:#4ade80;font-weight:bold;margin-bottom:6px">Greedy</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Always make the locally optimal choice. Works when local optimal = global optimal.</div>
+    <div style="color:#64748b;font-size:11px">activity selection · jump game · Dijkstra · Huffman</div>
+  </div>
+  <div style="background:#1e293b;border-radius:8px;padding:12px;border-top:3px solid #f59e0b">
+    <div style="color:#f59e0b;font-weight:bold;margin-bottom:6px">Dynamic Programming</div>
+    <div style="color:#94a3b8;font-size:12px;margin-bottom:6px">Overlapping subproblems — cache results (memoization or tabulation).</div>
+    <div style="color:#64748b;font-size:11px">fibonacci · coin change · knapsack · LCS · edit distance</div>
   </div>
 </div>
-\`;
-        `,
-        html: '<div id="display" style="padding:12px"></div>',
-      },
-
-      {
-        id: 'dc-max-subarray',
-        title: 'Divide & Conquer — Maximum Subarray',
-        type: 'js',
-        code: `
-const display = document.getElementById('display');
-
-// Maximum subarray via divide and conquer.
-// The max subarray either:
-//  (a) lies entirely in the left half
-//  (b) lies entirely in the right half
-//  (c) crosses the midpoint
+<div style="background:#0f172a;border-radius:6px;padding:10px;margin-top:12px;font-size:12px;color:#94a3b8">
+  <b style="color:#e2e8f0">How to choose:</b> Subproblems independent? → D&amp;C. Local greedy = global optimal? → Greedy. Subproblems overlap? → DP.
+</div>
+\`;`,
+            outputHeight: 240,
+          },
+          {
+            type: 'js',
+            title: 'Divide & Conquer — Maximum Subarray',
+            instruction: 'The max subarray either lies in the left half, right half, or crosses the midpoint. D&C handles all three cases recursively.',
+            html: '<div id="d" style="padding:12px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `const d = document.getElementById('d');
 const log = [];
 
 function maxCrossing(arr, lo, mid, hi) {
@@ -75,144 +76,112 @@ function maxSubarrayDC(arr, lo, hi) {
   const right = maxSubarrayDC(arr, mid+1, hi);
   const cross = maxCrossing(arr, lo, mid, hi);
   const result = Math.max(left, right, cross);
-  log.push({ lo, hi, mid, left, right, cross, result });
+  log.push({ lo, hi, left, right, cross, result });
   return result;
 }
 
 const arr = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
 const answer = maxSubarrayDC(arr, 0, arr.length - 1);
 
-let html = '<h3 style="color:#60a5fa;margin:0 0 4px">Max Subarray D&C: ' + JSON.stringify(arr) + '</h3>';
-html += '<p style="color:#94a3b8;margin:0 0 12px;font-size:13px">Answer: <b style="color:#4ade80">' + answer + '</b> (subarray [4,-1,2,1])</p>';
+let html = '<div style="color:#60a5fa;margin-bottom:6px">arr=' + JSON.stringify(arr) + '</div>';
+html += '<div style="color:#94a3b8;font-size:12px;margin-bottom:10px">Answer: <b style="color:#4ade80">' + answer + '</b> — subarray [4,-1,2,1]</div>';
 log.slice(-5).forEach(e => {
-  html += '<div style="font-size:12px;margin-bottom:5px;padding:5px 8px;background:#1e293b;border-radius:4px">' +
+  html += '<div style="padding:5px 8px;margin-bottom:4px;background:#1e293b;border-radius:3px;font-size:12px">' +
     'arr[' + e.lo + '..' + e.hi + ']: left=' + e.left + ' right=' + e.right + ' cross=' + e.cross +
     ' → <b style="color:#4ade80">max=' + e.result + '</b></div>';
 });
-display.innerHTML = html;
-        `,
-        html: '<div id="display" style="padding:12px"></div>',
-      },
-
-      {
-        id: 'greedy-demo',
-        title: 'Greedy — Activity Selection',
-        type: 'js',
-        code: `
-const display = document.getElementById('display');
-
-// Activity selection: given activities with start/end times,
-// pick the maximum number of non-overlapping activities.
-// Greedy: always pick the activity that ends earliest.
+d.innerHTML = html;`,
+            outputHeight: 260,
+          },
+          {
+            type: 'js',
+            title: 'Greedy — Activity Selection',
+            instruction: 'Always pick the activity that ends earliest. This greedy choice is provably optimal — choosing the earliest end leaves the most room for future activities.',
+            html: '<div id="d" style="padding:12px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `const d = document.getElementById('d');
 
 function activitySelection(activities) {
   const sorted = [...activities].sort((a, b) => a.end - b.end);
   const selected = [sorted[0]];
-  const steps = [{ activity: sorted[0], reason: 'First pick: earliest end time', selected: true }];
-
+  const steps = [{ act: sorted[0], reason: 'First: earliest end time', ok: true }];
   for (let i = 1; i < sorted.length; i++) {
     const last = selected[selected.length - 1];
     if (sorted[i].start >= last.end) {
       selected.push(sorted[i]);
-      steps.push({ activity: sorted[i], reason: 'Start ' + sorted[i].start + ' >= last end ' + last.end + ' → select', selected: true });
+      steps.push({ act: sorted[i], reason: 'start ' + sorted[i].start + ' >= last end ' + last.end + ' → select', ok: true });
     } else {
-      steps.push({ activity: sorted[i], reason: 'Start ' + sorted[i].start + ' < last end ' + last.end + ' → skip', selected: false });
+      steps.push({ act: sorted[i], reason: 'start ' + sorted[i].start + ' < last end ' + last.end + ' → skip', ok: false });
     }
   }
   return { selected, steps };
 }
 
 const activities = [
-  {name:'A', start:1, end:4},
-  {name:'B', start:3, end:5},
-  {name:'C', start:0, end:6},
-  {name:'D', start:5, end:7},
-  {name:'E', start:3, end:9},
-  {name:'F', start:5, end:9},
-  {name:'G', start:6, end:10},
-  {name:'H', start:8, end:11},
-  {name:'I', start:8, end:12},
+  {name:'A',start:1,end:4},{name:'B',start:3,end:5},{name:'C',start:0,end:6},
+  {name:'D',start:5,end:7},{name:'E',start:3,end:9},{name:'F',start:5,end:9},
+  {name:'G',start:6,end:10},{name:'H',start:8,end:11},{name:'I',start:8,end:12},
 ];
-
 const { selected, steps } = activitySelection(activities);
 
-let html = '<h3 style="color:#60a5fa;margin:0 0 12px">Activity Selection (Greedy: earliest end first)</h3>';
+let html = '<div style="color:#60a5fa;margin-bottom:8px">Activity Selection (greedy: earliest end first)</div>';
 steps.forEach(s => {
-  const c = s.selected ? '#4ade80' : '#f87171';
-  const icon = s.selected ? '✓' : '✗';
-  html += '<div style="margin-bottom:5px;padding:6px 10px;background:#1e293b;border-radius:4px;font-size:13px">' +
-    '<span style="color:' + c + '">' + icon + '</span> ' +
-    '<b>' + s.activity.name + '</b> [' + s.activity.start + '-' + s.activity.end + '] — <span style="color:#94a3b8">' + s.reason + '</span></div>';
+  const c = s.ok ? '#4ade80' : '#f87171';
+  html += '<div style="padding:4px 8px;margin-bottom:3px;background:#1e293b;border-radius:3px">' +
+    '<span style="color:' + c + '">' + (s.ok?'✓':'✗') + '</span> ' +
+    '<b>' + s.act.name + '</b> [' + s.act.start + '-' + s.act.end + '] — <span style="color:#94a3b8">' + s.reason + '</span></div>';
 });
-html += '<p style="color:#4ade80;margin-top:8px">Selected: ' + selected.map(a => a.name).join(', ') + ' (' + selected.length + ' activities)</p>';
-display.innerHTML = html;
-        `,
-        html: '<div id="display" style="padding:12px"></div>',
-      },
-
-      {
-        id: 'dp-tabulation-demo',
-        title: 'Dynamic Programming — Coin Change (Tabulation)',
-        type: 'js',
-        code: `
-const display = document.getElementById('display');
-
-// Coin change: minimum number of coins to make amount.
-// Greedy FAILS here (e.g., coins=[1,3,4], amount=6: greedy gives 4+1+1=3 but 3+3=2).
-// DP solution: dp[i] = min coins to make amount i.
+html += '<div style="color:#4ade80;margin-top:8px">Selected: ' + selected.map(a=>a.name).join(', ') + ' (' + selected.length + ' activities)</div>';
+d.innerHTML = html;`,
+            outputHeight: 340,
+          },
+          {
+            type: 'js',
+            title: 'Dynamic Programming — Coin Change (Tabulation)',
+            instruction: 'dp[i] = minimum coins to make amount i. Greedy fails here — [1,3,4] amount=6: greedy picks 4+1+1=3 but 3+3=2 is better.',
+            html: '<div id="d" style="padding:12px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `const d = document.getElementById('d');
 
 function coinChange(coins, amount) {
   const dp = new Array(amount + 1).fill(Infinity);
   dp[0] = 0;
-  const steps = [];
-  for (let i = 1; i <= amount; i++) {
-    for (const c of coins) {
-      if (c <= i && dp[i-c] + 1 < dp[i]) {
-        dp[i] = dp[i-c] + 1;
-      }
-    }
-    steps.push({ i, val: dp[i] });
-  }
-  return { dp, steps };
+  for (let i = 1; i <= amount; i++)
+    for (const c of coins)
+      if (c <= i && dp[i-c] + 1 < dp[i]) dp[i] = dp[i-c] + 1;
+  return dp;
 }
 
-const coins = [1, 3, 4];
-const amount = 6;
-const { dp, steps } = coinChange(coins, amount);
+const coins = [1, 3, 4], amount = 6;
+const dp = coinChange(coins, amount);
 
-let html = '<h3 style="color:#60a5fa;margin:0 0 4px">Coin Change DP: coins=[1,3,4], amount=' + amount + '</h3>';
-html += '<p style="color:#94a3b8;font-size:13px;margin:0 0 12px">dp[i] = min coins to make i</p>';
+let html = '<div style="color:#60a5fa;margin-bottom:4px">Coin Change DP: coins=' + JSON.stringify(coins) + ', amount=' + amount + '</div>';
+html += '<div style="color:#94a3b8;font-size:12px;margin-bottom:10px">dp[i] = min coins to make i</div>';
 html += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
 dp.forEach((v, i) => {
   const color = v === Infinity ? '#475569' : i === amount ? '#f59e0b' : '#4ade80';
-  html += '<div style="text-align:center"><div style="background:#1e293b;border:1px solid #334155;border-radius:4px;padding:6px 10px;color:' + color + ';font-weight:bold">' + (v === Infinity ? '∞' : v) + '</div><div style="color:#64748b;font-size:11px;margin-top:2px">i=' + i + '</div></div>';
+  html += '<div style="text-align:center">' +
+    '<div style="background:#1e293b;border-radius:4px;padding:6px 10px;color:' + color + ';font-weight:bold">' + (v===Infinity?'∞':v) + '</div>' +
+    '<div style="color:#64748b;font-size:11px;margin-top:2px">i=' + i + '</div></div>';
 });
 html += '</div>';
-html += '<p style="color:#4ade80;margin-top:12px">dp[' + amount + '] = <b>' + dp[amount] + '</b> coins (3+3)</p>';
-html += '<p style="color:#f87171;font-size:12px;margin-top:4px">Greedy would give: 4+1+1 = 3 coins — wrong!</p>';
-display.innerHTML = html;
-        `,
-        html: '<div id="display" style="padding:12px"></div>',
-      },
-    ],
-  },
-
-  jsNotebook: {
-    title: 'Algorithmic Paradigms — JavaScript',
-    subtitle: 'Implement D&C, Greedy, and DP patterns step by step',
-    cells: [
-      {
-        id: 'paradigm-js-dc',
-        title: 'Step 1 — Divide & Conquer: Maximum Subarray',
-        prose: [
-          'Kadane\'s algorithm (linear scan) is simpler, but D&C teaches the pattern.',
-          'The max subarray crossing the midpoint must include arr[mid] and arr[mid+1]. Scan outward from mid in both directions to find the best crossing sum.',
+html += '<div style="color:#4ade80;margin-top:10px">dp[6] = <b>2</b> coins (3+3)</div>';
+html += '<div style="color:#f87171;font-size:12px;margin-top:4px">Greedy gives 4+1+1 = 3 — wrong!</div>';
+d.innerHTML = html;`,
+            outputHeight: 200,
+          },
         ],
-        instructions: 'Implement maxCrossing() and maxSubarray(). Return the maximum subarray sum.',
-        startCode: `// Find the maximum sum of any subarray crossing the midpoint.
-// Scan left from mid to lo, track running sum and best leftSum.
-// Scan right from mid+1 to hi, track running sum and best rightSum.
-// Return leftSum + rightSum.
+      },
+
+      {
+        type: 'JSNotebook',
+        cells: [
+          {
+            type: 'js',
+            instruction: '**Step 1 — Divide & Conquer: Maximum Subarray**\n\nThe max subarray crossing the midpoint must include `arr[mid]` and `arr[mid+1]`. Scan outward from mid in both directions — track the running sum and keep the best left-half sum and right-half sum separately. Return `leftSum + rightSum`.',
+            html: '<style>.pass{color:#4ade80}.fail{color:#f87171}</style><div id="out" style="padding:10px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `// Find the max subarray sum that crosses the midpoint.
 function maxCrossing(arr, lo, mid, hi) {
   let leftSum = -Infinity, sum = 0;
   // TODO: for i from mid down to lo: sum += arr[i]; leftSum = max(leftSum, sum)
@@ -227,16 +196,20 @@ function maxCrossing(arr, lo, mid, hi) {
 function maxSubarray(arr, lo = 0, hi = arr.length - 1) {
   // TODO: base case — if lo === hi, return arr[lo]
   // TODO: mid = Math.floor((lo + hi) / 2)
-  // TODO: return Math.max(maxSubarray(arr, lo, mid), maxSubarray(arr, mid+1, hi), maxCrossing(arr, lo, mid, hi))
+  // TODO: return Math.max(maxSubarray left, maxSubarray right, maxCrossing)
 }
 
-// --- Tests ---
-console.log('test 1:', maxSubarray([-2,1,-3,4,-1,2,1,-5,4])); // 6  ([4,-1,2,1])
-console.log('test 2:', maxSubarray([1]));                       // 1
-console.log('test 3:', maxSubarray([-1,-2,-3]));                // -1
-console.log('test 4:', maxSubarray([5,4,-1,7,8]));              // 23
-`,
-        solutionCode: `function maxCrossing(arr, lo, mid, hi) {
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
+
+test('basic [-2,1,-3,4,-1,2,1,-5,4]', maxSubarray([-2,1,-3,4,-1,2,1,-5,4]), 6);
+test('single element [1]',            maxSubarray([1]), 1);
+test('all negative [-1,-2,-3]',       maxSubarray([-1,-2,-3]), -1);
+test('all positive [5,4,-1,7,8]',     maxSubarray([5,4,-1,7,8]), 23);`,
+            solutionCode: `function maxCrossing(arr, lo, mid, hi) {
   let leftSum = -Infinity, sum = 0;
   for (let i = mid; i >= lo; i--) { sum += arr[i]; leftSum = Math.max(leftSum, sum); }
   let rightSum = -Infinity; sum = 0;
@@ -250,30 +223,25 @@ function maxSubarray(arr, lo = 0, hi = arr.length - 1) {
   return Math.max(maxSubarray(arr, lo, mid), maxSubarray(arr, mid+1, hi), maxCrossing(arr, lo, mid, hi));
 }
 
-console.log('test 1:', maxSubarray([-2,1,-3,4,-1,2,1,-5,4]));
-console.log('test 2:', maxSubarray([1]));
-console.log('test 3:', maxSubarray([-1,-2,-3]));
-console.log('test 4:', maxSubarray([5,4,-1,7,8]));
-`,
-        check: (output) => {
-          return output.includes('test 1: 6') &&
-                 output.includes('test 2: 1') &&
-                 output.includes('test 3: -1') &&
-                 output.includes('test 4: 23');
-        },
-      },
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
 
-      {
-        id: 'paradigm-js-greedy',
-        title: 'Step 2 — Greedy: Jump Game',
-        prose: [
-          'Jump Game: given an array where each element is your maximum jump length from that position, can you reach the last index?',
-          'Greedy approach: track the farthest position reachable so far. If you\'re ever at a position beyond farthest, you\'re stuck.',
-        ],
-        instructions: 'Implement canJump() and also jumpGameII() — the minimum number of jumps to reach the end.',
-        startCode: `// Can you reach the last index?
-// Greedy: track 'maxReach' — the farthest index reachable so far.
-// If i ever exceeds maxReach, return false.
+test('basic [-2,1,-3,4,-1,2,1,-5,4]', maxSubarray([-2,1,-3,4,-1,2,1,-5,4]), 6);
+test('single element [1]',            maxSubarray([1]), 1);
+test('all negative [-1,-2,-3]',       maxSubarray([-1,-2,-3]), -1);
+test('all positive [5,4,-1,7,8]',     maxSubarray([5,4,-1,7,8]), 23);`,
+            outputHeight: 140,
+          },
+
+          {
+            type: 'js',
+            instruction: '**Step 2 — Greedy: Jump Game**\n\nTrack `maxReach` — the farthest index reachable so far. If you ever reach a position `i > maxReach`, you\'re stuck and must return false. For the minimum jumps variant, treat each jump range as a "level" — increment jumps when you exhaust the current level.',
+            html: '<style>.pass{color:#4ade80}.fail{color:#f87171}</style><div id="out" style="padding:10px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `// Can you reach the last index?
 function canJump(nums) {
   let maxReach = 0;
   for (let i = 0; i < nums.length; i++) {
@@ -283,9 +251,7 @@ function canJump(nums) {
   // TODO: return true
 }
 
-// Minimum jumps to reach the end.
-// Greedy: at each "level" (current jump range), find the farthest
-// you can reach. When you exhaust the current level, increment jumps.
+// Minimum number of jumps to reach the end.
 function jumpGameII(nums) {
   let jumps = 0, currentEnd = 0, farthest = 0;
   for (let i = 0; i < nums.length - 1; i++) {
@@ -295,13 +261,17 @@ function jumpGameII(nums) {
   return jumps;
 }
 
-// --- Tests ---
-console.log('canJump [2,3,1,1,4]:', canJump([2,3,1,1,4]));  // true
-console.log('canJump [3,2,1,0,4]:', canJump([3,2,1,0,4]));  // false
-console.log('minJumps [2,3,1,1,4]:', jumpGameII([2,3,1,1,4])); // 2
-console.log('minJumps [2,3,0,1,4]:', jumpGameII([2,3,0,1,4])); // 2
-`,
-        solutionCode: `function canJump(nums) {
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
+
+test('canJump reachable [2,3,1,1,4]',  canJump([2,3,1,1,4]),    true);
+test('canJump stuck    [3,2,1,0,4]',   canJump([3,2,1,0,4]),    false);
+test('minJumps [2,3,1,1,4]',           jumpGameII([2,3,1,1,4]), 2);
+test('minJumps [2,3,0,1,4]',           jumpGameII([2,3,0,1,4]), 2);`,
+            solutionCode: `function canJump(nums) {
   let maxReach = 0;
   for (let i = 0; i < nums.length; i++) {
     if (i > maxReach) return false;
@@ -319,29 +289,25 @@ function jumpGameII(nums) {
   return jumps;
 }
 
-console.log('canJump [2,3,1,1,4]:', canJump([2,3,1,1,4]));
-console.log('canJump [3,2,1,0,4]:', canJump([3,2,1,0,4]));
-console.log('minJumps [2,3,1,1,4]:', jumpGameII([2,3,1,1,4]));
-console.log('minJumps [2,3,0,1,4]:', jumpGameII([2,3,0,1,4]));
-`,
-        check: (output) => {
-          return output.includes('canJump [2,3,1,1,4]: true') &&
-                 output.includes('canJump [3,2,1,0,4]: false') &&
-                 output.includes('minJumps [2,3,1,1,4]: 2') &&
-                 output.includes('minJumps [2,3,0,1,4]: 2');
-        },
-      },
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
 
-      {
-        id: 'paradigm-js-dp',
-        title: 'Step 3 — Dynamic Programming: Coin Change and Knapsack',
-        prose: [
-          'Coin change: dp[i] = minimum coins to make amount i. For each amount, try every coin — if coin c fits, dp[i] = min(dp[i], dp[i-c] + 1).',
-          '0/1 Knapsack: dp[i][w] = maximum value using items 0..i with weight capacity w. Either skip item i, or include it (if it fits).',
-        ],
-        instructions: 'Implement coinChange() and knapsack(). Both use bottom-up tabulation.',
-        startCode: `// Minimum coins to make 'amount' using given coin denominations.
-// dp[0] = 0; dp[i] = min over all coins c where c<=i of dp[i-c]+1
+test('canJump reachable [2,3,1,1,4]',  canJump([2,3,1,1,4]),    true);
+test('canJump stuck    [3,2,1,0,4]',   canJump([3,2,1,0,4]),    false);
+test('minJumps [2,3,1,1,4]',           jumpGameII([2,3,1,1,4]), 2);
+test('minJumps [2,3,0,1,4]',           jumpGameII([2,3,0,1,4]), 2);`,
+            outputHeight: 140,
+          },
+
+          {
+            type: 'js',
+            instruction: '**Step 3 — Dynamic Programming: Coin Change and Knapsack**\n\n`coinChange`: `dp[i]` = minimum coins to make amount `i`. For each amount, try every coin — if coin `c` fits, `dp[i] = min(dp[i], dp[i-c] + 1)`.\n\n`knapsack`: `dp[i][w]` = max value using items `0..i` with capacity `w`. Either skip item `i`, or include it (if it fits).',
+            html: '<style>.pass{color:#4ade80}.fail{color:#f87171}</style><div id="out" style="padding:10px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `// Minimum coins to make 'amount'. Return -1 if impossible.
 function coinChange(coins, amount) {
   const dp = new Array(amount + 1).fill(Infinity);
   dp[0] = 0;
@@ -353,72 +319,68 @@ function coinChange(coins, amount) {
   return dp[amount] === Infinity ? -1 : dp[amount];
 }
 
-// 0/1 Knapsack: items have weights[] and values[]. Capacity = W.
-// dp[i][w] = max value using items 0..i-1 with capacity w
-// Either skip item i: dp[i][w] = dp[i-1][w]
-// Or include item i (if weights[i-1] <= w): dp[i][w] = values[i-1] + dp[i-1][w - weights[i-1]]
+// 0/1 Knapsack: max value with capacity W.
 function knapsack(weights, values, W) {
   const n = weights.length;
   const dp = Array.from({length: n+1}, () => new Array(W+1).fill(0));
   for (let i = 1; i <= n; i++) {
     for (let w = 0; w <= W; w++) {
-      // TODO: dp[i][w] = dp[i-1][w]  (skip item)
+      // TODO: dp[i][w] = dp[i-1][w]  (skip item i)
       // TODO: if weights[i-1] <= w: dp[i][w] = Math.max(dp[i][w], values[i-1] + dp[i-1][w - weights[i-1]])
     }
   }
   return dp[n][W];
 }
 
-// --- Tests ---
-console.log('coinChange [1,3,4] 6:', coinChange([1,3,4], 6));   // 2  (3+3)
-console.log('coinChange [2] 3:', coinChange([2], 3));             // -1 (impossible)
-console.log('coinChange [1,2,5] 11:', coinChange([1,2,5], 11));  // 3  (5+5+1)
-console.log('knapsack:', knapsack([2,3,4,5],[3,4,5,6], 5));       // 7  (items 0+1: w=2+3, v=3+4)
-`,
-        solutionCode: `function coinChange(coins, amount) {
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
+
+test('coinChange [1,3,4] 6',    coinChange([1,3,4], 6),    2);
+test('coinChange [2] 3',        coinChange([2], 3),         -1);
+test('coinChange [1,2,5] 11',   coinChange([1,2,5], 11),   3);
+test('knapsack w=[2,3,4,5] W=5', knapsack([2,3,4,5],[3,4,5,6], 5), 7);`,
+            solutionCode: `function coinChange(coins, amount) {
   const dp = new Array(amount + 1).fill(Infinity);
   dp[0] = 0;
-  for (let i = 1; i <= amount; i++) {
-    for (const c of coins) {
+  for (let i = 1; i <= amount; i++)
+    for (const c of coins)
       if (c <= i && dp[i-c] + 1 < dp[i]) dp[i] = dp[i-c] + 1;
-    }
-  }
   return dp[amount] === Infinity ? -1 : dp[amount];
 }
 
 function knapsack(weights, values, W) {
   const n = weights.length;
   const dp = Array.from({length: n+1}, () => new Array(W+1).fill(0));
-  for (let i = 1; i <= n; i++) {
+  for (let i = 1; i <= n; i++)
     for (let w = 0; w <= W; w++) {
       dp[i][w] = dp[i-1][w];
       if (weights[i-1] <= w) dp[i][w] = Math.max(dp[i][w], values[i-1] + dp[i-1][w - weights[i-1]]);
     }
-  }
   return dp[n][W];
 }
 
-console.log('coinChange [1,3,4] 6:', coinChange([1,3,4], 6));
-console.log('coinChange [2] 3:', coinChange([2], 3));
-console.log('coinChange [1,2,5] 11:', coinChange([1,2,5], 11));
-console.log('knapsack:', knapsack([2,3,4,5],[3,4,5,6], 5));
-`,
-        check: (output) => {
-          return output.includes('coinChange [1,3,4] 6: 2') &&
-                 output.includes('coinChange [2] 3: -1') &&
-                 output.includes('coinChange [1,2,5] 11: 3') &&
-                 output.includes('knapsack: 7');
-        },
-      },
+const out = document.getElementById('out');
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}, want \${JSON.stringify(e)}</div>\`;
+}
 
-      {
-        id: 'paradigm-js-scratch',
-        title: 'From Scratch — All Three Paradigms',
-        prose: [
-          'Write all five functions from memory: maxSubarray (D&C), canJump + jumpGameII (Greedy), coinChange + knapsack (DP).',
-        ],
-        instructions: 'Empty shells — type every algorithm. 11 tests verify all three paradigms.',
-        startCode: `// Divide & Conquer
+test('coinChange [1,3,4] 6',    coinChange([1,3,4], 6),    2);
+test('coinChange [2] 3',        coinChange([2], 3),         -1);
+test('coinChange [1,2,5] 11',   coinChange([1,2,5], 11),   3);
+test('knapsack w=[2,3,4,5] W=5', knapsack([2,3,4,5],[3,4,5,6], 5), 7);`,
+            outputHeight: 140,
+          },
+
+          {
+            type: 'js',
+            instruction: '**From Scratch — All Three Paradigms**\n\nWrite all six functions from memory: `maxCrossing` + `maxSubarray` (D&C), `canJump` + `jumpGameII` (Greedy), `coinChange` + `knapsack` (DP). 11 tests verify correctness.',
+            html: '<style>.pass{color:#4ade80}.fail{color:#f87171}</style><div id="out" style="padding:10px;font-family:monospace;font-size:13px"></div>',
+            css: '',
+            startCode: `// Divide & Conquer
 function maxCrossing(arr, lo, mid, hi) { /* your code */ }
 function maxSubarray(arr, lo = 0, hi = arr.length - 1) { /* your code */ }
 
@@ -431,33 +393,30 @@ function coinChange(coins, amount) { /* your code */ }
 function knapsack(weights, values, W) { /* your code */ }
 
 // --- Test Suite ---
+const out = document.getElementById('out');
 let pass = 0, fail = 0;
-function test(desc, got, expected) {
-  const g = JSON.stringify(got), e = JSON.stringify(expected);
-  if (g === e) { console.log('✓', desc); pass++; }
-  else { console.log('✗', desc, '| expected:', e, '| got:', g); fail++; }
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}</div>\`;
+  p ? pass++ : fail++;
 }
 
-// D&C
 test('maxSubarray basic',    maxSubarray([-2,1,-3,4,-1,2,1,-5,4]), 6);
 test('maxSubarray all neg',  maxSubarray([-1,-2,-3]),               -1);
 test('maxSubarray all pos',  maxSubarray([5,4,-1,7,8]),             23);
 
-// Greedy
-test('canJump reachable',    canJump([2,3,1,1,4]),   true);
-test('canJump stuck',        canJump([3,2,1,0,4]),   false);
-test('jumpGameII 2 jumps',   jumpGameII([2,3,1,1,4]), 2);
-test('jumpGameII 2 jumps 2', jumpGameII([2,3,0,1,4]), 2);
+test('canJump reachable',    canJump([2,3,1,1,4]),    true);
+test('canJump stuck',        canJump([3,2,1,0,4]),    false);
+test('jumpGameII 1',         jumpGameII([2,3,1,1,4]), 2);
+test('jumpGameII 2',         jumpGameII([2,3,0,1,4]), 2);
 
-// DP
 test('coinChange 2 coins',   coinChange([1,3,4], 6),    2);
-test('coinChange impossible', coinChange([2], 3),         -1);
-test('coinChange 3 coins',   coinChange([1,2,5], 11),    3);
-test('knapsack optimal',     knapsack([2,3,4,5],[3,4,5,6], 5), 7);
+test('coinChange impossible', coinChange([2], 3),        -1);
+test('coinChange 3 coins',   coinChange([1,2,5], 11),   3);
+test('knapsack',             knapsack([2,3,4,5],[3,4,5,6], 5), 7);
 
-console.log('\\n' + pass + '/' + (pass+fail) + ' tests passed');
-`,
-        solutionCode: `function maxCrossing(arr, lo, mid, hi) {
+out.innerHTML += \`<div style="margin-top:8px;color:\${fail===0?'#4ade80':'#f59e0b'}">\${pass}/\${pass+fail} tests passed</div>\`;`,
+            solutionCode: `function maxCrossing(arr, lo, mid, hi) {
   let leftSum = -Infinity, sum = 0;
   for (let i = mid; i >= lo; i--) { sum += arr[i]; leftSum = Math.max(leftSum, sum); }
   let rightSum = -Infinity; sum = 0;
@@ -506,46 +465,45 @@ function knapsack(weights, values, W) {
   return dp[n][W];
 }
 
+const out = document.getElementById('out');
 let pass = 0, fail = 0;
-function test(desc, got, expected) {
-  const g = JSON.stringify(got), e = JSON.stringify(expected);
-  if (g === e) { console.log('✓', desc); pass++; }
-  else { console.log('✗', desc, '| expected:', e, '| got:', g); fail++; }
+function test(l, g, e) {
+  const p = JSON.stringify(g) === JSON.stringify(e);
+  out.innerHTML += \`<div class="\${p?'pass':'fail'}">\${p?'✓':'✗'} \${l}: got \${JSON.stringify(g)}</div>\`;
+  p ? pass++ : fail++;
 }
 
 test('maxSubarray basic',    maxSubarray([-2,1,-3,4,-1,2,1,-5,4]), 6);
 test('maxSubarray all neg',  maxSubarray([-1,-2,-3]),               -1);
 test('maxSubarray all pos',  maxSubarray([5,4,-1,7,8]),             23);
-test('canJump reachable',    canJump([2,3,1,1,4]),   true);
-test('canJump stuck',        canJump([3,2,1,0,4]),   false);
-test('jumpGameII 2 jumps',   jumpGameII([2,3,1,1,4]), 2);
-test('jumpGameII 2 jumps 2', jumpGameII([2,3,0,1,4]), 2);
+test('canJump reachable',    canJump([2,3,1,1,4]),    true);
+test('canJump stuck',        canJump([3,2,1,0,4]),    false);
+test('jumpGameII 1',         jumpGameII([2,3,1,1,4]), 2);
+test('jumpGameII 2',         jumpGameII([2,3,0,1,4]), 2);
 test('coinChange 2 coins',   coinChange([1,3,4], 6),    2);
-test('coinChange impossible', coinChange([2], 3),         -1);
-test('coinChange 3 coins',   coinChange([1,2,5], 11),    3);
-test('knapsack optimal',     knapsack([2,3,4,5],[3,4,5,6], 5), 7);
+test('coinChange impossible', coinChange([2], 3),        -1);
+test('coinChange 3 coins',   coinChange([1,2,5], 11),   3);
+test('knapsack',             knapsack([2,3,4,5],[3,4,5,6], 5), 7);
 
-console.log('\\n' + pass + '/' + (pass+fail) + ' tests passed');
-`,
-        check: (output) => {
-          return output.includes('11/11 tests passed');
-        },
-      },
-    ],
-  },
-
-  pythonNotebook: {
-    title: 'Algorithmic Paradigms — Python',
-    subtitle: 'D&C, Greedy, and DP in Python with DP table visualization',
-    cells: [
-      {
-        id: 'paradigm-py-dc-greedy',
-        cellTitle: 'Step 1 — D&C (max subarray) and Greedy (jump game)',
-        prose: [
-          'max_subarray uses divide & conquer. can_jump and jump_game_ii use greedy — no cache, just track reachability.',
+out.innerHTML += \`<div style="margin-top:8px;color:\${fail===0?'#4ade80':'#f59e0b'}">\${pass}/\${pass+fail} tests passed</div>\`;`,
+            outputHeight: 340,
+          },
         ],
-        instructions: 'Fill in all four functions.',
-        code: `def max_crossing(arr, lo, mid, hi):
+      },
+
+      {
+        type: 'PythonNotebook',
+        props: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Step 1 — D&C (max subarray) and Greedy (jump game)',
+              prose: [
+                'max_subarray uses divide & conquer — split at mid, recurse both halves, find best crossing sum.',
+                'can_jump and jump_game_ii use greedy — no cache, just track how far you can reach.',
+              ],
+              instructions: 'Fill in max_subarray(), can_jump(), and jump_game_ii().',
+              code: `def max_crossing(arr, lo, mid, hi):
     left_sum, total = float('-inf'), 0
     for i in range(mid, lo - 1, -1):
         total += arr[i]
@@ -559,9 +517,9 @@ console.log('\\n' + pass + '/' + (pass+fail) + ' tests passed');
 # TODO: fill in max_subarray (divide & conquer)
 def max_subarray(arr, lo=0, hi=None):
     if hi is None: hi = len(arr) - 1
-    # base case: if lo == hi: return arr[lo]
+    # if lo == hi: return arr[lo]
     # mid = (lo + hi) // 2
-    # return max(max_subarray(...left...), max_subarray(...right...), max_crossing(...))
+    # return max(max_subarray(arr, lo, mid), max_subarray(arr, mid+1, hi), max_crossing(arr, lo, mid, hi))
     pass
 
 # TODO: fill in can_jump (greedy)
@@ -573,25 +531,26 @@ def jump_game_ii(nums):
     pass
 
 print('max_subarray:', max_subarray([-2,1,-3,4,-1,2,1,-5,4]))  # 6
-print('can_jump T:', can_jump([2,3,1,1,4]))   # True
-print('can_jump F:', can_jump([3,2,1,0,4]))   # False
-print('min jumps:', jump_game_ii([2,3,1,1,4])) # 2
-`,
-        output: `max_subarray: 6
+print('can_jump T:', can_jump([2,3,1,1,4]))    # True
+print('can_jump F:', can_jump([3,2,1,0,4]))    # False
+print('min jumps:', jump_game_ii([2,3,1,1,4])) # 2`,
+              output: `max_subarray: 6
 can_jump T: True
 can_jump F: False
 min jumps: 2`,
-        status: 'incomplete',
-      },
+              status: 'idle',
+              figureJson: null,
+            },
 
-      {
-        id: 'paradigm-py-dp',
-        cellTitle: 'Step 2 — DP: Coin Change and Knapsack',
-        prose: [
-          'Both use bottom-up tabulation. coin_change builds a 1D dp array. knapsack builds a 2D dp table.',
-        ],
-        instructions: 'Fill in coin_change() and knapsack().',
-        code: `# TODO: fill in coin_change
+            {
+              id: 2,
+              cellTitle: 'Step 2 — DP: Coin Change and Knapsack',
+              prose: [
+                'coin_change builds a 1D dp array. knapsack builds a 2D dp table — rows are items, columns are capacity.',
+                'Both use bottom-up tabulation — no recursion needed.',
+              ],
+              instructions: 'Fill in coin_change() and knapsack().',
+              code: `# TODO: fill in coin_change
 def coin_change(coins, amount):
     # dp = [float('inf')] * (amount + 1); dp[0] = 0
     # for i in range(1, amount + 1):
@@ -615,23 +574,23 @@ def knapsack(weights, values, W):
 print('coin [1,3,4] 6:', coin_change([1,3,4], 6))     # 2
 print('coin [2] 3:', coin_change([2], 3))              # -1
 print('coin [1,2,5] 11:', coin_change([1,2,5], 11))   # 3
-print('knapsack:', knapsack([2,3,4,5],[3,4,5,6], 5))   # 7
-`,
-        output: `coin [1,3,4] 6: 2
+print('knapsack:', knapsack([2,3,4,5],[3,4,5,6], 5))   # 7`,
+              output: `coin [1,3,4] 6: 2
 coin [2] 3: -1
 coin [1,2,5] 11: 3
 knapsack: 7`,
-        status: 'incomplete',
-      },
+              status: 'idle',
+              figureJson: null,
+            },
 
-      {
-        id: 'paradigm-py-scratch',
-        cellTitle: 'From Scratch — All Paradigms + DP Table Visualization',
-        prose: [
-          'Write every function from memory. When assertions pass, opencalc draws the coin change DP table as a bar chart — each bar shows dp[i], the minimum coins needed to make that amount.',
-        ],
-        instructions: 'Fill in all six functions. The figure visualizes the DP array.',
-        code: `from opencalc import Figure
+            {
+              id: 3,
+              cellTitle: 'From Scratch — All Paradigms + DP Table Visualization',
+              prose: [
+                'Write every function from memory. When assertions pass, opencalc draws the coin change DP array as a bar chart — each bar is dp[i], the minimum coins to make amount i.',
+              ],
+              instructions: 'Fill in all six functions. The figure visualizes the DP array.',
+              code: `from opencalc import Figure
 
 def max_crossing(arr, lo, mid, hi):
     pass  # your code
@@ -680,14 +639,14 @@ for i, v in enumerate(dp):
     val = v if v != float('inf') else 0
     color = "#f59e0b" if i == amount else "#60a5fa"
     fig.bar(i, val, label=f"{i}:{val}", color=color)
-fig.show()
-`,
-        output: `All assertions passed!`,
-        status: 'incomplete',
-        figureJson: null,
+fig.show()`,
+              output: `All assertions passed!`,
+              status: 'idle',
+              figureJson: null,
+            },
+          ],
+        },
       },
     ],
   },
 };
-
-export default lesson;
