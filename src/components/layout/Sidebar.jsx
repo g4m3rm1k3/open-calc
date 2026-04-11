@@ -40,6 +40,11 @@ const COURSE_TEXT_COLORS = {
   sky:     'text-sky-600 dark:text-sky-400',
   cyan:    'text-cyan-600 dark:text-cyan-400',
   rose:    'text-rose-600 dark:text-rose-400',
+  pink:    'text-pink-600 dark:text-pink-400',
+  violet:  'text-violet-600 dark:text-violet-400',
+  lime:    'text-lime-600 dark:text-lime-400',
+  fuchsia: 'text-fuchsia-600 dark:text-fuchsia-400',
+  slate:   'text-slate-600 dark:text-slate-400',
 }
 
 export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, onSearchOpen }) {
@@ -59,24 +64,26 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
 
   // Determine which course we are in based on active chapter
   const coursePageMatch = location.pathname.match(/^\/course\/([^/]+)/)
-  let activeCourse = 'calc'
+  let activeCourse = null
   if (activeChapter) {
     const chObj = CURRICULUM.find(c => String(c.number) === activeChapter)
     if (chObj) activeCourse = chObj.course
   } else if (coursePageMatch?.[1]) {
     activeCourse = coursePageMatch[1]
-  } else {
-    // Heuristic for landing pages (paths that don't have chapterId yet)
+  } else if (location.pathname !== '/' && location.pathname !== '/courses') {
+    // Heuristic for other landing pages (e.g. /course/calc direct)
     const match = COURSES.find(c => location.pathname.includes(c.key))
     if (match) activeCourse = match.key
   }
 
-  const visibleChapters = CURRICULUM.filter(c => c.course === activeCourse)
-  const activeCourseObj = COURSES.find(c => c.key === activeCourse) || COURSES.find(c => c.key === 'calc')
+  const showAllCourses = activeCourse === null
+
+  const visibleChapters = activeCourse ? CURRICULUM.filter(c => c.course === activeCourse) : []
+  const activeCourseObj = COURSES.find(c => c.key === activeCourse)
   
-  const courseName = activeCourseObj.label === 'Calculus' ? 'OpenCalc' : activeCourseObj.label === 'Physics' ? 'OpenPhysics' : `Open${activeCourseObj.label}`
-  const courseDesc = activeCourseObj.desc
-  const courseHomePath = activeCourseObj.path
+  const courseName = !activeCourseObj ? 'OpenCalc' : activeCourseObj.label === 'Calculus' ? 'OpenCalc' : activeCourseObj.label === 'Physics' ? 'OpenPhysics' : `Open${activeCourseObj.label}`
+  const courseDesc = activeCourseObj?.desc ?? 'All Courses'
+  const courseHomePath = activeCourseObj?.path ?? '/courses'
 
   // Auto-scroll to active lesson on route change and initial mount
   useEffect(() => {
@@ -170,7 +177,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
             <span className="text-2xl font-bold text-brand-600 dark:text-brand-400">∂</span>
             <div className="min-w-0">
               <div className="font-bold text-slate-900 dark:text-slate-100 leading-tight truncate">{courseName}</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest">{courseDesc}</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest">{showAllCourses ? 'All Courses' : courseDesc}</div>
             </div>
           </Link>
           <button 
@@ -182,7 +189,30 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
           </button>
         </div>
 
-        {visibleChapters.map((chapter) => {
+        {/* All-courses panel — shown when not inside a specific course */}
+        {showAllCourses && (
+          <div className="px-3">
+            {COURSES.map(c => (
+              <Link
+                key={c.key}
+                to={c.path}
+                onClick={onNavigate}
+                className={`flex items-center justify-between px-3 py-2.5 mb-0.5 rounded-lg transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 group`}
+              >
+                <div className="min-w-0">
+                  <div className={`text-sm font-semibold leading-tight ${COURSE_TEXT_COLORS[c.color] ?? 'text-slate-700 dark:text-slate-300'}`}>
+                    {c.label}
+                  </div>
+                  <div className="text-xs text-slate-400 dark:text-slate-500 truncate">{c.desc}</div>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 shrink-0 ml-2" />
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Per-course chapter/lesson tree — shown when inside a specific course */}
+        {!showAllCourses && visibleChapters.map((chapter) => {
           const isActiveChapter = activeChapter === String(chapter.number)
           return (
             <div key={`chapter-${chapter.number}-${chapter.id || chapter.title}`} className="mb-1">
@@ -229,6 +259,18 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
             </div>
           )
         })}
+        {!showAllCourses && activeCourse && (
+          <div className="px-4 pt-3">
+            <Link
+              to="/courses"
+              onClick={onNavigate}
+              className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              <ChevronLeft className="w-3 h-3" />
+              All courses
+            </Link>
+          </div>
+        )}
 
         <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 px-5">
           <Link

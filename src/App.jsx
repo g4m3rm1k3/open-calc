@@ -21,6 +21,7 @@ const CoursePage = lazy(() => import("./pages/CoursePage.jsx"));
 const LogicSimPage = lazy(() => import("./pages/LogicSimPage.jsx"));
 const ChemistryPage = lazy(() => import("./pages/ChemistryPage.jsx"));
 const PhysicsPage = lazy(() => import("./pages/PhysicsPage.jsx"));
+const AllCoursesPage = lazy(() => import("./pages/AllCoursesPage.jsx"));
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -67,6 +68,7 @@ export default function App() {
                     <Route path="logic-sim" element={<LogicSimPage />} />
                     <Route path="chemistry" element={<ChemistryPage />} />
                     <Route path="physics" element={<PhysicsPage />} />
+                    <Route path="courses" element={<AllCoursesPage />} />
                   </Routes>
                 </Suspense>
               </AppShell>
