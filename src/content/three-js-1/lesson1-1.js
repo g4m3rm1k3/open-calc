@@ -8,6 +8,215 @@ const LESSON_3JS_1_1 = {
 
   cells: [
 
+    // ── Cell 0a: Prerequisites & Local Setup ──────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Prerequisites & Local Setup
+
+**All you need:** Basic JavaScript — variables, arrays, functions. No graphics knowledge required.
+
+Every code cell in this lesson runs live in your browser. No installations needed.
+
+**Run locally:** Save this as \`triangle.html\` and open it in Chrome or Firefox — it is the complete program you will build, all in one file:
+
+\`\`\`html
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>First Triangle</title></head>
+<body style="margin:0;background:#0a0f1e">
+  <canvas id="cv" width="600" height="400"></canvas>
+  <script>
+    var canvas = document.getElementById('cv');
+    var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.05, 0.07, 0.12, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    var positions = new Float32Array([0.0, 0.6,  -0.5, -0.5,  0.5, -0.5]);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+    var vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, 'attribute vec2 aPosition; void main() { gl_Position = vec4(aPosition, 0.0, 1.0); }');
+    gl.compileShader(vs);
+    var fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, 'precision mediump float; void main() { gl_FragColor = vec4(1.0, 0.4, 0.1, 1.0); }');
+    gl.compileShader(fs);
+
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs);
+    gl.linkProgram(prog); gl.useProgram(prog);
+
+    var loc = gl.getAttribLocation(prog, 'aPosition');
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(loc);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  </script>
+</body>
+</html>
+\`\`\`
+
+By the end of this lesson you will understand every single line above.`,
+    },
+
+    // ── Cell 0b: Learning Objectives + WebGL/GLSL Primer ─────────────────────
+    {
+      type: 'markdown',
+      instruction: `### What You Will Learn
+
+By the end of this masterclass you will be able to:
+- Write a complete WebGL program from scratch — 7 steps, nothing missing
+- Explain what a vertex shader and a fragment shader do in plain English
+- Read and fix the 4 most common "blank canvas" bugs
+- Map every raw WebGL call to its Three.js equivalent
+
+---
+
+### What Is WebGL?
+
+WebGL is a JavaScript API that gives you **direct access to the GPU** from the browser. It is not a 3D engine — there are no scenes, cameras, or lights built in. You describe triangles, and the GPU draws them.
+
+When you call \`gl.drawArrays(gl.TRIANGLES, 0, 3)\`, your GPU executes your code on dedicated graphics silicon — thousands of calculations running in parallel in under a millisecond.
+
+**Three.js is a wrapper around WebGL.** Every \`THREE.Mesh\` you add to a scene eventually results in exactly the raw calls you write today. Three.js generates them automatically — understanding the raw API lets you *debug, optimise, and extend* Three.js, not just use it.
+
+---
+
+### What Is GLSL?
+
+GLSL (OpenGL Shading Language) is the language that **runs on the GPU**. It looks like C. You write two small GLSL programs called *shaders*:
+
+| Shader | Runs once per... | Your job | Output |
+|--------|-----------------|----------|--------|
+| **Vertex shader** | Vertex (corner of a triangle) | Where does this corner land on screen? | \`gl_Position\` — a vec4 |
+| **Fragment shader** | Pixel covered by the triangle | What colour is this pixel? | \`gl_FragColor\` — a vec4 |
+
+A **vec4** is four floats packed together: \`vec4(x, y, z, w)\`. For colours the four values are Red, Green, Blue, Alpha — each 0.0 to 1.0.
+
+---
+
+### The Coordinate System — NDC
+
+WebGL does not think in pixels. It uses **Normalised Device Coordinates (NDC)**:
+
+\`\`\`
+(-1, +1) ─────────── (+1, +1)   ← top edge
+    │         (0,0)         │   ← centre
+(-1, -1) ─────────── (+1, -1)   ← bottom edge
+\`\`\`
+
+Anything outside ±1 on either axis is **clipped** — invisible. A common first bug: passing pixel coordinates like \`(300, 200)\` instead of NDC \`(0.0, 0.0)\` — the triangle vanishes with no error. Chapter 2 introduces the matrices that convert from world space to NDC automatically.`,
+    },
+
+    // ── Cell 0c: Graphics Pipeline Visual ─────────────────────────────────────
+    {
+      type: 'js',
+      instruction: `### The Graphics Pipeline
+
+Before writing a single line of WebGL, understand the pipeline your code drives. Each stage has a distinct job — **click a stage** to see what happens there.`,
+      html: `<canvas id="cv" width="660" height="220" style="display:block;width:100%;border-radius:8px"></canvas>`,
+      css: `body{margin:0;background:#0a0f1e}`,
+      startCode: `var canvas = document.getElementById('cv');
+var ctx = canvas.getContext('2d');
+var W = canvas.width, H = canvas.height;
+
+var STAGES = [
+  { names: ['CPU'], subs: ['Float32Array', 'JS Memory'], col: '#60a5fa',
+    detail: 'Your JavaScript builds a Float32Array of vertex positions and calls gl.bufferData() to copy it over the PCIe bus onto GPU memory. After this the CPU is done — the GPU takes over.' },
+  { names: ['Vertex', 'Shader'], subs: ['Runs x3', 'per vertex'], col: '#a78bfa',
+    detail: 'GLSL code YOU write. The GPU runs it once per vertex — 3 times for our triangle, all in parallel. It reads each vertex position from the buffer and outputs gl_Position in clip space.' },
+  { names: ['Primitive', 'Assembly'], subs: ['Winding', 'Cull check'], col: '#34d399',
+    detail: 'Groups every 3 vertices into a triangle. Checks winding order: CCW = front face. With gl.enable(gl.CULL_FACE), back-facing triangles are discarded here — before any pixels are touched.' },
+  { names: ['Rasterizer'], subs: ['Fill pixels', 'Interpolate'], col: '#fbbf24',
+    detail: 'Pure GPU hardware — no code you write. Determines which screen pixels fall inside the triangle and generates a fragment (a candidate pixel) for each one. A 200x200 triangle produces ~40,000 fragments.' },
+  { names: ['Fragment', 'Shader'], subs: ['Runs xN', 'per pixel'], col: '#f87171',
+    detail: 'GLSL code YOU write. Runs once per fragment — potentially thousands of times in parallel. Outputs gl_FragColor: the final RGBA colour of that pixel. This is where colour, lighting, and texture effects happen.' },
+  { names: ['Canvas'], subs: ['Framebuffer', 'Screen pixels'], col: '#94a3b8',
+    detail: 'Fragment colours are written to the framebuffer, which maps directly to the pixels on your canvas element. gl.clear() resets it each frame. gl.drawArrays() fills it.' },
+];
+
+var sel = -1;
+var BW = 88, BH = 56, GAP = 12;
+var totalW = STAGES.length * BW + (STAGES.length - 1) * (GAP + 16);
+var ox = (W - totalW) / 2;
+var oy = 16;
+
+function bx(i) { return ox + i * (BW + GAP + 16); }
+
+canvas.addEventListener('click', function(e) {
+  var r = canvas.getBoundingClientRect();
+  var mx = (e.clientX - r.left) * (W / r.width);
+  var my = (e.clientY - r.top) * (H / r.height);
+  var hit = -1;
+  STAGES.forEach(function(_, i) {
+    var x = bx(i);
+    if (mx >= x && mx <= x + BW && my >= oy && my <= oy + BH) hit = i;
+  });
+  sel = (hit === sel) ? -1 : hit;
+  draw();
+});
+
+function wrap(text, x, y, maxW, lh) {
+  var words = text.split(' '), line = '';
+  words.forEach(function(w) {
+    var t = line ? line + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x, y); y += lh; line = w; }
+    else { line = t; }
+  });
+  if (line) ctx.fillText(line, x, y);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+
+  STAGES.forEach(function(s, i) {
+    var x = bx(i), active = i === sel;
+
+    if (i > 0) {
+      var ax = x - GAP - 16, mid = oy + BH / 2;
+      ctx.beginPath(); ctx.moveTo(ax, mid); ctx.lineTo(ax + GAP + 10, mid);
+      ctx.strokeStyle = active ? s.col : '#334155'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(ax + GAP + 4, mid - 4); ctx.lineTo(ax + GAP + 10, mid); ctx.lineTo(ax + GAP + 4, mid + 4);
+      ctx.strokeStyle = active ? s.col : '#334155'; ctx.stroke();
+    }
+
+    ctx.fillStyle = active ? s.col + '22' : '#0f172a';
+    ctx.strokeStyle = active ? s.col : (sel >= 0 ? '#1e293b' : '#334155');
+    ctx.lineWidth = active ? 2 : 1;
+    ctx.beginPath(); ctx.roundRect(x, oy, BW, BH, 6); ctx.fill(); ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = active ? s.col : '#94a3b8';
+    ctx.font = 'bold 10px monospace';
+    s.names.forEach(function(l, li) { ctx.fillText(l, x + BW / 2, oy + 16 + li * 12); });
+
+    ctx.fillStyle = active ? s.col + 'bb' : '#475569';
+    ctx.font = '8px monospace';
+    s.subs.forEach(function(l, li) { ctx.fillText(l, x + BW / 2, oy + BH - 14 + li * 10); });
+  });
+
+  var py = oy + BH + 14;
+  if (sel >= 0) {
+    var s = STAGES[sel];
+    ctx.fillStyle = '#0f172a'; ctx.strokeStyle = s.col; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(10, py, W - 20, H - py - 10, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = s.col; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'left';
+    ctx.fillText(s.names.join(' '), 22, py + 18);
+    ctx.fillStyle = '#94a3b8'; ctx.font = '10px monospace';
+    wrap(s.detail, 22, py + 34, W - 44, 14);
+  } else {
+    ctx.fillStyle = '#334155'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('Click any stage to see what happens there', W / 2, py + 22);
+  }
+}
+draw();`,
+      outputHeight: 240,
+    },
+
     // ── Cell 1: Why triangles + winding order ─────────────────────────────────
     {
       type: 'markdown',
@@ -36,7 +245,7 @@ When back-face culling is enabled (\`gl.enable(gl.CULL_FACE)\`), back-facing tri
 
 **The 7 steps to your first triangle:**
 
-1. Create a \`Float32Array\` of 9 values (3 vertices × XYZ)
+1. Create a \`Float32Array\` of 6 values (3 vertices × XY) — we work in 2D in this lesson; the vertex shader pads Z=0.0 automatically
 2. Create a GPU buffer with \`gl.createBuffer()\`, bind, upload with \`gl.bufferData()\`
 3. Write a **vertex shader** (GLSL source string) that passes positions through
 4. Write a **fragment shader** (GLSL source string) that outputs a colour
@@ -718,6 +927,162 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);`,
       outputHeight: 280,
     },
 
+    // ── Cell 10: Extension Challenge — Uniform Animation ──────────────────────
+    {
+      type: 'coding',
+      instruction: `### 🎯 Extension: Animate the Triangle with a Uniform
+
+A **uniform** is a value you pass from JavaScript into a shader — it stays the same for every vertex/pixel in one draw call (unlike an attribute, which differs per vertex).
+
+The shaders below already declare \`uniform float uTime\`. Your task:
+
+1. After \`gl.useProgram(prog)\`, get the uniform location: \`gl.getUniformLocation(prog, 'uTime')\`
+2. Inside \`render(t)\`, set it before drawing: \`gl.uniform1f(uTimeLoc, t * 0.001)\`
+3. Replace the final \`render(0)\` call with \`requestAnimationFrame(render)\`, and add \`requestAnimationFrame(render)\` at the end of \`render()\` to loop
+
+The triangle should pulse in size and shift colour when working.`,
+      html: `<canvas id="cv" width="560" height="320" style="display:block;border-radius:8px;width:100%;max-width:560px"></canvas>`,
+      css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center;padding:10px}`,
+      startCode: `var canvas = document.getElementById('cv');
+var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+var vsSource = 'attribute vec2 aPosition; uniform float uTime; void main() { float s = 0.5 + 0.5 * sin(uTime); gl_Position = vec4(aPosition * s, 0.0, 1.0); }';
+var fsSource = 'precision mediump float; uniform float uTime; void main() { float r = 0.5 + 0.5 * sin(uTime); gl_FragColor = vec4(r, 0.4, 1.0 - r, 1.0); }';
+
+var vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vsSource); gl.compileShader(vs);
+var fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, fsSource); gl.compileShader(fs);
+var prog = gl.createProgram();
+gl.attachShader(prog, vs); gl.attachShader(prog, fs);
+gl.linkProgram(prog); gl.useProgram(prog);
+
+// TODO 1: var uTimeLoc = gl.getUniformLocation(prog, 'uTime');
+
+var positions = new Float32Array([0.0, 0.6, -0.5, -0.5, 0.5, -0.5]);
+var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+var loc = gl.getAttribLocation(prog, 'aPosition');
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(loc);
+
+function render(t) {
+  gl.clearColor(0.05, 0.07, 0.12, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  // TODO 2: gl.uniform1f(uTimeLoc, t * 0.001);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // TODO 3: requestAnimationFrame(render);
+}
+
+render(0); // TODO 3: replace with requestAnimationFrame(render)`,
+      solutionCode: `var canvas = document.getElementById('cv');
+var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+var vsSource = 'attribute vec2 aPosition; uniform float uTime; void main() { float s = 0.5 + 0.5 * sin(uTime); gl_Position = vec4(aPosition * s, 0.0, 1.0); }';
+var fsSource = 'precision mediump float; uniform float uTime; void main() { float r = 0.5 + 0.5 * sin(uTime); gl_FragColor = vec4(r, 0.4, 1.0 - r, 1.0); }';
+
+var vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vsSource); gl.compileShader(vs);
+var fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, fsSource); gl.compileShader(fs);
+var prog = gl.createProgram();
+gl.attachShader(prog, vs); gl.attachShader(prog, fs);
+gl.linkProgram(prog); gl.useProgram(prog);
+
+var uTimeLoc = gl.getUniformLocation(prog, 'uTime');
+
+var positions = new Float32Array([0.0, 0.6, -0.5, -0.5, 0.5, -0.5]);
+var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+var loc = gl.getAttribLocation(prog, 'aPosition');
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(loc);
+
+function render(t) {
+  gl.clearColor(0.05, 0.07, 0.12, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform1f(uTimeLoc, t * 0.001);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  requestAnimationFrame(render);
+}
+
+requestAnimationFrame(render);`,
+      check: (code) => {
+        const hasLoc = /getUniformLocation/.test(code);
+        const hasUniform = /uniform1f/.test(code);
+        const hasRAF = /requestAnimationFrame/.test(code);
+        return hasLoc && hasUniform && hasRAF;
+      },
+      successMessage: 'Your triangle is alive! You just used a uniform — the most important bridge between JavaScript and GLSL. Uniforms are how you pass time, camera position, and transformation matrices into shaders. Every Three.js material property (color, opacity, map) eventually becomes a uniform.',
+      failMessage: 'Three things needed: 1) gl.getUniformLocation(prog, "uTime") to get a handle on the uniform. 2) gl.uniform1f(uTimeLoc, t * 0.001) inside render() before the draw call. 3) requestAnimationFrame(render) both inside render() to continue the loop and outside to start it.',
+      outputHeight: 340,
+    },
+
+    // ── Cell 11: Recap & Mental Model ─────────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Recap — The Complete Picture
+
+#### The 7 Steps
+
+| Step | Call | What it does |
+|------|------|-------------|
+| 1 | \`new Float32Array([...])\` | Vertex XY positions in NDC, ready on the CPU |
+| 2 | \`createBuffer / bindBuffer / bufferData\` | Upload vertex data to GPU memory |
+| 3 | \`createShader(VERTEX_SHADER) + shaderSource + compileShader\` | Compile vertex shader on the GPU |
+| 4 | \`createShader(FRAGMENT_SHADER) + shaderSource + compileShader\` | Compile fragment shader on the GPU |
+| 5 | \`createProgram + attachShader×2 + linkProgram + useProgram\` | Link shaders into an executable GPU pipeline |
+| 6 | \`getAttribLocation + vertexAttribPointer + enableVertexAttribArray\` | Tell the vertex shader where to find vertex data |
+| 7 | \`drawArrays(TRIANGLES, 0, 3)\` | Fire the GPU — rasterise 3 vertices into pixels |
+
+#### Raw WebGL vs Three.js
+
+| Raw WebGL (~60 lines) | Three.js equivalent |
+|-----------------------|--------------------|
+| \`new Float32Array([...])\` + buffer upload | \`geo.setAttribute('position', new THREE.BufferAttribute(arr, 3))\` |
+| Vertex + fragment shader GLSL strings | \`new THREE.MeshBasicMaterial({ color: 0xff4400 })\` |
+| \`createProgram + linkProgram + useProgram\` | Handled internally by Three.js renderer |
+| \`vertexAttribPointer + enableVertexAttribArray\` | Handled internally by Three.js renderer |
+| \`drawArrays(TRIANGLES, 0, 3)\` | \`renderer.render(scene, camera)\` |
+
+Three.js does not skip any of these steps — it executes every one, every frame. Now you know what is happening underneath every \`renderer.render()\` call.
+
+#### Four Core Mental Models
+
+1. **Triangle = 3 CCW vertices.** The GPU knows only triangles. All 3D geometry is triangles. Winding order determines which side is front.
+2. **Vertex shader = position calculator.** Runs on the GPU once per vertex. Input: your buffer. Output: \`gl_Position\` in clip space.
+3. **Fragment shader = pixel painter.** Runs once per covered pixel, potentially millions of times per frame, all in parallel.
+4. **WebGL never throws for rendering bugs.** Always check \`gl.getShaderInfoLog()\` and \`gl.getProgramInfoLog()\` — a blank canvas is always a code problem, never a mystery.`,
+    },
+
+    // ── Cell 12: Next Lesson Teaser ────────────────────────────────────────────
+    {
+      type: 'markdown',
+      instruction: `### Why This Matters — and What's Next
+
+Every 3D model in every game you have played, every Blender render you have seen, every AR filter on your phone — they all begin exactly here: a triangle with two shaders.
+
+The only difference between this triangle and a character in a AAA game is:
+- More vertices (millions instead of 3)
+- More complex shaders (lighting models, textures, normal maps)
+- More draw calls per frame (hundreds instead of one)
+- Transformation matrices that convert from world space to NDC (so geometry can live anywhere, not just in -1 to +1 space)
+
+The 7-step pipeline you learned today handles all of it the same way.
+
+---
+
+### Lesson 1-2 — Per-Vertex Colour, Varyings & Index Buffers
+
+In the next lesson you will extend this program:
+
+| Concept | What you will learn |
+|---------|---------------------|
+| **Varyings** | Pass data from the vertex shader to the fragment shader — interpolated across the triangle surface. Each corner gets its own colour; the GPU blends between them automatically. |
+| **Index buffer** | Draw a quad with 4 vertices instead of 6 — stop duplicating shared corners using \`gl.ELEMENT_ARRAY_BUFFER\` and \`gl.drawElements\`. |
+| **Colour attribute** | A second attribute alongside position — teaching \`vertexAttribPointer\` with stride and offset for interleaved vertex data. |
+
+*Up next: per-vertex colour gradients, and why your quad only needs 4 vertices even though a triangle has 3.*`,
+    },
+
   ],
 };
 
@@ -756,7 +1121,52 @@ export default {
     'Three.js: geometry.setAttribute("position", attr) + MeshBasicMaterial = this entire lesson',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      question: 'You call gl.drawArrays(gl.TRIANGLES, 0, 3). How many times does the vertex shader execute?',
+      options: [
+        'Once — it processes all 3 vertices in a single batched call.',
+        'Three times — once per vertex, potentially in parallel on the GPU.',
+        'Nine times — once per float in the Float32Array.',
+        'Zero times if no pixels are covered by the triangle.',
+      ],
+      answer: 1,
+      explanation: 'The vertex shader runs once per vertex. With 3 vertices and mode TRIANGLES it runs 3 times, all in parallel on dedicated GPU cores. Nine would be wrong — the GPU sees whole vertices as described by vertexAttribPointer, not individual floats.',
+    },
+    {
+      question: 'What coordinate system does WebGL use for vertex positions, and what is at the canvas centre?',
+      options: [
+        'Pixel coordinates. Centre = (width/2, height/2).',
+        'UV coordinates (0 to 1). Centre = (0.5, 0.5).',
+        'NDC (Normalised Device Coordinates). Centre = (0.0, 0.0), edges = ±1.',
+        'World space. Centre depends on the camera position.',
+      ],
+      answer: 2,
+      explanation: 'WebGL vertex shaders output NDC. The canvas centre is always (0, 0); edges are ±1 on both axes. Anything outside ±1 is clipped. Pixel coordinates, UV, and world space all exist in 3D pipelines but are not what gl_Position expects directly.',
+    },
+    {
+      question: 'A triangle renders with no JavaScript exceptions but the canvas is completely black. What is your first diagnostic step?',
+      options: [
+        'Restart the browser — WebGL context errors reset on a fresh tab.',
+        'Call gl.getShaderInfoLog(vs) and gl.getShaderInfoLog(fs) to check for GLSL compile errors.',
+        'Add console.log(gl) — the context object exposes all rendering errors.',
+        'Increase the canvas CSS size — small canvases clip triangles.',
+      ],
+      answer: 1,
+      explanation: 'WebGL never throws exceptions for rendering bugs. The first tool is gl.getShaderInfoLog() for both shaders, then gl.getProgramInfoLog(). A failed shader compile or link silently produces a null program, leaving the canvas black. Restarting (A) fixes nothing — the code is the same. console.log(gl) (C) shows no rendering errors.',
+    },
+    {
+      question: 'Which Three.js call is the direct equivalent of gl.createBuffer() + gl.bindBuffer() + gl.bufferData()?',
+      options: [
+        'new THREE.Mesh(geometry, material)',
+        'renderer.render(scene, camera)',
+        'geometry.setAttribute(\'position\', new THREE.BufferAttribute(positions, 3))',
+        'scene.add(mesh)',
+      ],
+      answer: 2,
+      explanation: 'geometry.setAttribute(\'position\', new THREE.BufferAttribute(positions, 3)) stores the Float32Array and declares the item size (3 floats = XYZ per vertex). Three.js uploads it to the GPU lazily on the first render call — executing exactly what createBuffer + bindBuffer + bufferData does. The \'3\' maps to the \'size\' argument in vertexAttribPointer.',
+    },
+  ],
 };
 
 export { LESSON_3JS_1_1 };
