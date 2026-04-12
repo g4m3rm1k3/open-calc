@@ -67,27 +67,253 @@ export default {
 
       "**Chain rule with exponentials — the most important application:** The formula d/dx[e^x] = e^x extends immediately to composites via the chain rule: d/dx[e^(g(x))] = e^(g(x))·g'(x). The outer derivative of e^(·) is just e^(·) unchanged, and then we multiply by g'(x) as the chain rule demands. Example: d/dx[e^(3x²)] — here g(x) = 3x², so g'(x) = 6x. Therefore d/dx[e^(3x²)] = e^(3x²)·6x = 6x·e^(3x²). The same pattern extends to other bases: d/dx[a^(g(x))] = a^(g(x))·ln(a)·g'(x). Forgetting the inner derivative g'(x) is the chain-trap in exponential form.",
 
-      "**The natural logarithm: complete theory from first principles** The natural logarithm, written ln(x) (or sometimes log(x) or log_e(x)), is the logarithm with base e ≈ 2.718281828.... Yes, the property ln(a^b) = b ln a holds exactly for any a > 0 and any real number b. This is one of the core logarithm rules, derived rigorously from first principles below. The same rules apply to any base, but the natural log is special because it arises directly from the most fundamental operation in calculus: integration of 1/x.",
+      "**The natural logarithm: complete theory from first principles** The natural logarithm, written $\\ln(x)$ (or sometimes $\\log(x)$ or $\\log_e(x)$), is the logarithm with base $e \\approx 2.718281828\\ldots$. Yes, the property $\\ln(a^b) = b \\ln a$ holds exactly for any $a > 0$ and any real number $b$. This is one of the core logarithm rules, derived rigorously from first principles below. The same rules apply to any base, but the natural log is special because it arises directly from the most fundamental operation in calculus: integration of $1/x$.",
 
-      "**Step 1: What is a logarithm in general?** Start with exponentiation: if b^c = a where b > 0, b ≠ 1, and a > 0, then we define the logarithm as the exponent c: log_b(a) = c means exactly b^c = a. This is the definition. It turns multiplication of powers into addition of exponents: log_b(ab) = log_b a + log_b b (because b^{c+d} = b^c · b^d), log_b(a^d) = d log_b a (because (b^c)^d = b^{c d}), log_b(1) = 0 (because b^0 = 1). These are not assumptions—they follow directly from the definition of exponents. Any base works, but different bases just rescale the numbers (change-of-base formula: log_b a = ln a / ln b for any convenient k).",
+      "**The natural logarithm: complete theory from first principles** The natural logarithm, written $\\ln(x)$ (or sometimes $\\log(x)$ or $\\log_e(x)$), is the logarithm with base $e \\approx 2.718281828\\ldots$.",
 
-      '**Step 2: Why do we need a "natural" base?** Most early logarithms (invented by John Napier in 1614) were created purely for practical calculation: multiplying huge numbers is tedious, but adding is easy. If you have a table of log_10 values, then log_10(a · b) = log_10 a + log_10 b, so you look up two values, add them, and look up the antilog. This revolutionized astronomy and navigation. But mathematicians noticed something deeper when they studied curves whose slope is proportional to their height (exponential growth/decay) and the area under the hyperbola y = 1/x. The logarithm that makes the calculus cleanest has a special base e, and we call it ln(x) = log_e(x).',
+      "Yes, the property $\\ln(a^b) = b \\ln a$ holds exactly for any $a > 0$ and any real number $b$.",
 
-      '**Step 3: First-principles definition of ln(x) using the integral** We define the natural logarithm directly as a definite integral. This is not circular—it is the starting point. Definition: For any x > 0, ln x ≜ ∫₁ˣ 1/t dt. Geometrically, ln(x) is exactly the signed area under the curve y = 1/t from t = 1 to t = x. If x > 1, the area is positive → ln x > 0. If 0 < x < 1, the area is negative → ln x < 0. At x = 1, ln 1 = 0. This definition is chosen because the Fundamental Theorem of Calculus immediately gives its derivative for free: d/dx[ln x] = d/dx[∫₁ˣ 1/t dt] = 1/x. No other base gives this simple derivative. That is why it is "natural."',
+      "This is one of the core logarithm rules, derived rigorously from first principles below.",
 
-      "**Step 4: Prove that ln(x) really is a logarithm** We must prove it satisfies the logarithm property ln(xy) = ln x + ln y. This is not obvious from the integral, so we derive it rigorously. Let x > 0, y > 0. Then ln(xy) = ∫₁ˣʸ 1/t dt. Split the integral at t = x: ∫₁ˣʸ 1/t dt = ∫₁ˣ 1/t dt + ∫_xˣʸ 1/t dt. For the second integral, use substitution: let u = t/x, so t = x u, dt = x du. When t = x, u = 1; when t = x y, u = y. Thus ∫_xˣʸ 1/t dt = ∫₁ʸ 1/(x u) · x du = ∫₁ʸ 1/u du = ln y. Therefore ln(xy) = ln x + ln y. All other log properties follow immediately: ln(a^b) = b ln a, ln(1/x) = -ln x, ln(x/y) = ln x - ln y. So yes—by construction, ln is a genuine logarithm.",
+      "The same rules apply to any base, but the natural log is special because it arises directly from the most fundamental operation in calculus: integration of $1/x$.",
 
-      "**Step 5: Where does the number e come from?** e is defined as the unique number such that ln e = 1: ∫₁ᵉ 1/t dt = 1 ⇒ e ≈ 2.718281828.... (We can compute e to any precision by numerically integrating 1/t or using its series below.) The exponential function is the inverse: exp(x) ≜ the number whose natural log is x, so ln(exp(x)) = x and exp(ln x) = x. We prove exp(x) = e^x by showing both satisfy the same differential equation y' = y with y(0) = 1, but that is for later in calculus.",
+      "**Step 1: What is a logarithm in general?**",
 
-      '**Step 6: Is ln(x) like a trigonometric ratio?** No—fundamentally different, though they share some similarities. Trig ratios come from geometry (right triangles or unit circle). sin(θ) is the y-coordinate after rotating by θ radians. ln(x) comes from the hyperbola y = 1/x (area), not a circle. It is not periodic; it grows to +∞ (slowly) as x → ∞ and goes to -∞ as x → 0⁺. Both are transcendental (cannot be expressed with finite algebraic operations) and have infinite series, but the series are different. Similarities are superficial: both are defined by integrals/series and appear in many differential equations. But ln is the "hyperbolic" analogue of the circular trig functions (hence "hyperbolic sine/cosine" sinh x = (e^x - e^{-x})/2, which involve ln indirectly).',
+      "**Definition:** Start with exponentiation: if $b^c = a$ where $b > 0$, $b \\neq 1$, and $a > 0$, then we define the logarithm as the exponent $c$.",
 
-      "**Step 7: How does a calculator actually compute ln(x)?** Calculators do not store infinite tables or magically know the integral. They use a finite algorithm based on the Taylor (Maclaurin) series. First, reduce the argument to a convenient range using the property ln(x) = ln(2^k · m) = k ln 2 + ln m, where m is chosen so 1/√2 ≤ m ≤ √2 (very fast with bit shifts in binary floating-point). Then compute ln(1 + z) where |z| < 1 using the infinite series (derived by integrating the geometric series 1/(1+t) = ∑ (-1)^n t^n): ln(1 + z) = z - z²/2 + z³/3 - z⁴/4 + z⁵/5 - ⋯ (|z| < 1). How it works in practice: the CPU/FPU reduces x to ln(1+z). It sums the first 10-20 terms (enough for double-precision ~15 decimal digits). Convergence is fast near z=0; for larger z it uses argument reduction or other accelerations. Hardware often implements a fused multiply-add (FMA) instruction so each term is computed with a single rounding error. For very high precision, libraries use minimax polynomials or table-driven methods, but the core is always this series or an equivalent rational approximation. You can see it yourself: the partial sum s_n = ∑_{k=1}^n (-1)^{k+1} z^k/k gets arbitrarily close to ln(1+z).",
+      "$\\log_b(a) = c$ means exactly $b^c = a$.",
 
-      "**Step 8: Usefulness of ln (why it is everywhere)** Historical computation: Before calculators, ln tables let engineers multiply/divide huge numbers by adding/subtracting logs. Exponential growth/decay: Any quantity whose rate of change is proportional to itself satisfies dy/dt = k y. The solution is y = C e^{k t}. To solve for time or rate, you take ln: t = (1/k) ln(y/C). This models population, radioactive decay, cooling, compound interest, voltage in capacitors, etc. Information theory & probability: Entropy (average surprise) is -∑ p_i ln p_i. Scaling: Many physical laws are multiplicative; logs turn them additive (e.g., decibels = 10 log_10, but natural log appears in continuous versions). Simplifies equations: a^x = b ⇒ x = ln b / ln a.",
+      "**Key Properties:** It turns multiplication of powers into addition of exponents.",
 
-      "**Step 9: How to use ln in calculus (core techniques)** Because d/dx[ln x] = 1/x, integration gives the reverse: ∫ 1/x dx = ln |x| + C (x ≠ 0). Derivative rules (chain rule): d/dx[ln u(x)] = u'(x)/u(x), u(x) > 0. Integration by parts or substitution often produces ln: ∫ f'(x)/f(x) dx = ln |f(x)| + C (recognize the derivative in the numerator). Limits (L'Hôpital's rule): When you get 0/0 or ∞/∞, take derivatives of numerator and denominator. Logs appear constantly because lim_{x→∞} ln x / x^p = 0 for any p > 0 (log grows slower than any positive power). Series expansions: ln(1 + x) = ∑_{n=1}^∞ (-1)^{n+1} x^n/n, |x| < 1 (derived exactly as above). At x=1 this gives the famous alternating harmonic series for ln 2. Change of base in calculus: log_b x = ln x / ln b. Example walkthrough: Solve ∫ 2x/(x² + 1) dx. Let u = x² + 1, then du = 2x dx. So the integral is exactly ∫ 1/u du = ln |u| + C = ln(x² + 1) + C. Another example: Find the derivative of f(x) = ln(sin x). f'(x) = 1/sin x · cos x = cot x. That is the complete picture. ln x is not an arbitrary function—it is the unique antiderivative of 1/x (shifted so ln 1 = 0) that satisfies the multiplicative property of logarithms. Once you have this definition, every property, every calculator algorithm, and every calculus application follows mechanically. You now have it from the ground up.",
+      "$\\log_b(ab) = \\log_b a + \\log_b b$",
 
-      "**Where this is heading:** Notice that we derived the derivative of ln(x) by using the fact that it is the inverse of e^x. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of arcsin, arccos, and arctan.",
+      "(because $b^{c+d} = b^c \\cdot b^d$)",
+
+      "$\\log_b(a^d) = d \\log_b a$",
+
+      "(because $(b^c)^d = b^{c d}$)",
+
+      "$\\log_b(1) = 0$",
+
+      "(because $b^0 = 1$)",
+
+      "These are not assumptions—they follow directly from the definition of exponents.",
+
+      "**Change-of-base:** Any base works, but different bases just rescale the numbers.",
+
+      "$\\log_b a = \\ln a / \\ln b$ for any convenient $k$.",
+
+      '**Step 2: Why do we need a \\"natural\\" base?**',
+
+      "**Historical context:** Most early logarithms (invented by John Napier in 1614) were created purely for practical calculation.",
+
+      "Multiplying huge numbers is tedious, but adding is easy.",
+
+      "If you have a table of $\\log_{10}$ values, then $\\log_{10}(a \\cdot b) = \\log_{10} a + \\log_{10} b$.",
+
+      "You look up two values, add them, and look up the antilog.",
+
+      "This revolutionized astronomy and navigation.",
+
+      "**Mathematical motivation:** But mathematicians noticed something deeper.",
+
+      "They studied curves whose slope is proportional to their height (exponential growth/decay).",
+
+      "And the area under the hyperbola $y = 1/x$.",
+
+      "The logarithm that makes the calculus cleanest has a special base $e$.",
+
+      "We call it $\\ln(x) = \\log_e(x)$.",
+
+      "**Step 3: First-principles definition of $\\ln(x)$ using the integral**",
+
+      "**The definition:** We define the natural logarithm directly as a definite integral.",
+
+      "This is not circular—it is the starting point.",
+
+      "For any $x > 0$: $\\ln x \\doteq \\int_1^x \\frac{1}{t} \\, dt$",
+
+      "**Geometric interpretation:** $\\ln(x)$ is exactly the signed area under the curve $y = 1/t$ from $t = 1$ to $t = x$.",
+
+      "If $x > 1$, the area is positive $\\rightarrow \\ln x > 0$.",
+
+      "If $0 < x < 1$, the area is negative $\\rightarrow \\ln x < 0$.",
+
+      "At $x = 1$, $\\ln 1 = 0$.",
+
+      "**Why this definition?** This definition is chosen because the Fundamental Theorem of Calculus immediately gives its derivative for free.",
+
+      "$\\frac{d}{dx}[\\ln x] = \\frac{d}{dx}\\left[\\int_1^x \\frac{1}{t} \\, dt\\right] = \\frac{1}{x}$",
+
+      "No other base gives this simple derivative.",
+
+      'That is why it is \\"natural.\\"',
+
+      "**Step 4: Prove that $\\ln(x)$ really is a logarithm**",
+
+      "**The property to prove:** We must prove it satisfies $\\ln(xy) = \\ln x + \\ln y$.",
+
+      "This is not obvious from the integral, so we derive it rigorously.",
+
+      "**Setup:** Let $x > 0$, $y > 0$.",
+
+      "Then $\\ln(xy) = \\int_1^{xy} \\frac{1}{t} \\, dt$",
+
+      "**Split the integral:** $\\int_1^{xy} \\frac{1}{t} \\, dt = \\int_1^x \\frac{1}{t} \\, dt + \\int_x^{xy} \\frac{1}{t} \\, dt$",
+
+      "**Substitution for the second integral:** Let $u = t/x$, so $t = x u$, $dt = x \\, du$.",
+
+      "When $t = x$, $u = 1$; when $t = x y$, $u = y$.",
+
+      "Thus $\\int_x^{xy} \\frac{1}{t} \\, dt = \\int_1^y \\frac{1}{x u} \\cdot x \\, du = \\int_1^y \\frac{1}{u} \\, du = \\ln y$",
+
+      "**Conclusion:** Therefore $\\ln(xy) = \\ln x + \\ln y$.",
+
+      "All other log properties follow immediately:",
+
+      "$\\ln(a^b) = b \\ln a$",
+
+      "$\\ln(1/x) = -\\ln x$",
+
+      "$\\ln(x/y) = \\ln x - \\ln y$",
+
+      "So yes—by construction, $\\ln$ is a genuine logarithm.",
+
+      "**Step 5: Where does the number $e$ come from?**",
+
+      "**Definition of $e$:** $e$ is defined as the unique number such that $\\ln e = 1$.",
+
+      "$\\int_1^e \\frac{1}{t} \\, dt = 1 \\implies e \\approx 2.718281828\\ldots$",
+
+      "(We can compute $e$ to any precision by numerically integrating $1/t$ or using its series below.)",
+
+      "**The exponential function:** The exponential function is the inverse.",
+
+      "$\\exp(x) \\doteq$ the number whose natural log is $x$.",
+
+      "So $\\ln(\\exp(x)) = x$ and $\\exp(\\ln x) = x$.",
+
+      "We prove $\\exp(x) = e^x$ by showing both satisfy the same differential equation $y' = y$ with $y(0) = 1$, but that is for later in calculus.",
+
+      "**Step 6: Is $\\ln(x)$ like a trigonometric ratio?**",
+
+      "**Fundamental difference:** No—fundamentally different, though they share some similarities.",
+
+      "**Trig ratios:** Come from geometry (right triangles or unit circle).",
+
+      "$\\sin(\\theta)$ is the y-coordinate after rotating by $\\theta$ radians.",
+
+      "**Natural log:** Comes from the hyperbola $y = 1/x$ (area), not a circle.",
+
+      "**Key differences:** It is not periodic.",
+
+      "It grows to $+\\infty$ (slowly) as $x \\to \\infty$.",
+
+      "And goes to $-\\infty$ as $x \\to 0^+$.",
+
+      "Both are transcendental (cannot be expressed with finite algebraic operations) and have infinite series, but the series are different.",
+
+      "**Similarities:** Are superficial.",
+
+      "Both are defined by integrals/series and appear in many differential equations.",
+
+      'But $\\ln$ is the \\"hyperbolic\\" analogue of the circular trig functions.',
+
+      '(Hence \\"hyperbolic sine/cosine\\" $\\sinh x = (e^x - e^{-x})/2$, which involve $\\ln$ indirectly).',
+
+      "**Step 7: How does a calculator actually compute $\\ln(x)$?**",
+
+      "**The algorithm:** Calculators do not store infinite tables or magically know the integral.",
+
+      "They use a finite algorithm based on the Taylor (Maclaurin) series.",
+
+      "**Range reduction:** First, reduce the argument to a convenient range.",
+
+      "$\\ln(x) = \\ln(2^k \\cdot m) = k \\ln 2 + \\ln m$",
+
+      "Where $m$ is chosen so $1/\\sqrt{2} \\leq m \\leq \\sqrt{2}$ (very fast with bit shifts in binary floating-point).",
+
+      "**Series computation:** Then compute $\\ln(1 + z)$ where $|z| < 1$.",
+
+      "Using the infinite series (derived by integrating the geometric series $1/(1+t) = \\sum (-1)^n t^n$):",
+
+      "$\\ln(1 + z) = z - z^2/2 + z^3/3 - z^4/4 + z^5/5 - \\cdots$ ($|z| < 1$)",
+
+      "**Practical implementation:** The CPU/FPU reduces $x$ to $\\ln(1+z)$.",
+
+      "It sums the first 10-20 terms (enough for double-precision $\\sim$15 decimal digits).",
+
+      "Convergence is fast near $z=0$; for larger $z$ it uses argument reduction or other accelerations.",
+
+      "Hardware often implements a fused multiply-add (FMA) instruction so each term is computed with a single rounding error.",
+
+      "**High precision:** For very high precision, libraries use minimax polynomials or table-driven methods.",
+
+      "But the core is always this series or an equivalent rational approximation.",
+
+      "You can see it yourself: the partial sum $s_n = \\sum_{k=1}^n (-1)^{k+1} z^k/k$ gets arbitrarily close to $\\ln(1+z)$.",
+
+      "**Step 8: Usefulness of $\\ln$ (why it is everywhere)**",
+
+      "**Historical computation:** Before calculators, $\\ln$ tables let engineers multiply/divide huge numbers by adding/subtracting logs.",
+
+      "**Exponential growth/decay:** Any quantity whose rate of change is proportional to itself satisfies $dy/dt = k y$.",
+
+      "The solution is $y = C e^{k t}$.",
+
+      "To solve for time or rate, you take $\\ln$: $t = (1/k) \\ln(y/C)$.",
+
+      "This models population, radioactive decay, cooling, compound interest, voltage in capacitors, etc.",
+
+      "**Information theory & probability:** Entropy (average surprise) is $-\\sum p_i \\ln p_i$.",
+
+      "**Scaling:** Many physical laws are multiplicative; logs turn them additive.",
+
+      "(e.g., decibels = $10 \\log_{10}$, but natural log appears in continuous versions)",
+
+      "**Equation solving:** Simplifies equations: $a^x = b \\implies x = \\ln b / \\ln a$.",
+
+      "**Step 9: How to use $\\ln$ in calculus (core techniques)**",
+
+      "**Integration:** Because $\\frac{d}{dx}[\\ln x] = \\frac{1}{x}$, integration gives the reverse.",
+
+      "$\\int \\frac{1}{x} \\, dx = \\ln |x| + C$ ($x \\neq 0$)",
+
+      "**Derivative rules (chain rule):** $\\frac{d}{dx}[\\ln u(x)] = \\frac{u'(x)}{u(x)}$ where $u(x) > 0$.",
+
+      "**Integration techniques:** Integration by parts or substitution often produces $\\ln$.",
+
+      "$\\int \\frac{f'(x)}{f(x)} \\, dx = \\ln |f(x)| + C$ (recognize the derivative in the numerator)",
+
+      "**Limits:** (L\\'Hopital\\'s rule) When you get $0/0$ or $\\infty/\\infty$, take derivatives of numerator and denominator.",
+
+      "**Growth comparison:** Logs appear constantly because $\\lim_{x\\to\\infty} \\ln x / x^p = 0$ for any $p > 0$.",
+
+      "(Log grows slower than any positive power)",
+
+      "**Series expansions:** $\\ln(1 + x) = \\sum_{n=1}^\\infty (-1)^{n+1} x^n/n$, $|x| < 1$.",
+
+      "(Derived exactly as above. At $x=1$ this gives the famous alternating harmonic series for $\\ln 2$)",
+
+      "**Change of base in calculus:** $\\log_b x = \\ln x / \\ln b$.",
+
+      "**Example walkthrough:** Solve $\\int \\frac{2x}{x^2 + 1} \\, dx$.",
+
+      "Let $u = x^2 + 1$, then $du = 2x \\, dx$.",
+
+      "So the integral is exactly $\\int \\frac{1}{u} \\, du = \\ln |u| + C = \\ln(x^2 + 1) + C$.",
+
+      "**Another example:** Find the derivative of $f(x) = \\ln(\\sin x)$.",
+
+      "$f'(x) = \\frac{1}{\\sin x} \\cdot \\cos x = \\cot x$.",
+
+      "**The complete picture:** $\\ln x$ is not an arbitrary function—it is the unique antiderivative of $1/x$ (shifted so $\\ln 1 = 0$) that satisfies the multiplicative property of logarithms.",
+
+      "Once you have this definition, every property, every calculator algorithm, and every calculus application follows mechanically.",
+
+      "You now have it from the ground up.",
+
+      "**Where this is heading:** Notice that we derived the derivative of $\\ln(x)$ by using the fact that it is the inverse of $e^x$. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of $\\arcsin$, $\\arccos$, and $\\arctan$.",
     ],
     callouts: [
       {
