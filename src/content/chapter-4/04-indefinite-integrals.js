@@ -8,6 +8,37 @@ export default {
   subtitle: 'Building the antiderivative toolkit — the power rule reversed, and the essential +C',
   tags: ['indefinite integrals', 'antiderivatives', 'power rule', 'integration rules', 'initial value problems', '+C constant', 'trig integrals', 'exponential integral', 'differential equations'],
 
+  learningObjectives: [
+    'Define an antiderivative, state the indefinite integral notation $\\int f(x)\\,dx = F(x)+C$, and explain every symbol.',
+    'Explain why $+C$ is required and prove that two antiderivatives of the same function differ by a constant.',
+    'Apply the power rule for integration to polynomial, fractional, and negative-exponent expressions — and explain from scratch why it works.',
+    'Use the antiderivative table (trig, exponential, logarithm) fluently, verifying each entry by differentiating the result.',
+    'Apply linearity to integrate any linear combination of tabulated functions.',
+    'Solve initial value problems by integrating and applying given conditions to determine $C$.',
+  ],
+
+  warmup: {
+    title: 'Warm-Up: Check Your Starting Point',
+    instructions: 'Before starting, confirm you can do these from memory. Antidifferentiation is the reverse of differentiation, so you need both directions fluent.',
+    problems: [
+      {
+        prompt: 'Compute $\\frac{d}{dx}[x^5]$ using the power rule.',
+        answer: '$5x^4$',
+        hint: 'Power rule: $\\frac{d}{dx}[x^n] = nx^{n-1}$. Here $n = 5$.',
+      },
+      {
+        prompt: 'Name one function $F(x)$ whose derivative is $6x^2$.',
+        answer: '$F(x) = 2x^3$ (since $\\frac{d}{dx}[2x^3] = 6x^2$). Also valid: $2x^3 + 7$, $2x^3 - \\pi$, etc.',
+        hint: 'Think: differentiating $x^3$ gives $3x^2$. How can you adjust to get $6x^2$?',
+      },
+      {
+        prompt: 'True or false: if $F\'(x) = G\'(x)$ for all $x$ on an interval, then $F(x) = G(x)$ for all $x$.',
+        answer: 'False. They can differ by any constant: $F(x) = G(x) + C$. Example: $F(x) = x^2 + 5$, $G(x) = x^2$.',
+        hint: 'What does the derivative of a constant equal?',
+      },
+    ],
+  },
+
   hook: {
     question: 'FTC Part 2 says ∫ₐᵇ f(x) dx = F(b) − F(a) where F\' = f. Great — but how do we FIND F? Given f(x) = 3x² − 4x + 7, what is F? Given f(x) = cos(x), what is F? Given f(x) = 1/x, what is F? This lesson systematizes the process of "working derivatives backward," building an integration table from the differentiation table you already know.',
     realWorldContext: 'Antiderivatives are the computational backbone of applied mathematics. Every solution to a differential equation involves finding an antiderivative. In physics, finding position from velocity (x = ∫v dt) and velocity from acceleration (v = ∫a dt) are antiderivative problems. In electrical engineering, finding charge from current (q = ∫i dt) and magnetic flux from EMF are antiderivative problems. In biology, population growth models, epidemic spread, and pharmacokinetics all require integrating rate equations. In economics, finding total cost from marginal cost (TC = ∫MC dq) and consumer surplus from demand curves are antiderivative problems. The indefinite integral is perhaps the single most-computed mathematical object in applied science.',
@@ -16,12 +47,46 @@ export default {
 
   intuition: {
     prose: [
+      'A **derivative** answers one question: **"How fast is this changing?"** Given a function $f(x)$, the derivative $f\'(x)$ is the instantaneous rate of change — the slope of the tangent line at every point. For example, $\\frac{d}{dx}[x^3] = 3x^2$ means $x^3$ is growing at rate $3x^2$ at every point $x$.',
+      'An **antiderivative** reverses that question: **"What function was changing at this rate?"** Given a known rate $f(x)$, you want the original function $F(x)$ such that $F\'(x) = f(x)$. Ask: *what function has derivative $3x^2$?* Answer: $x^3$ (since $\\frac{d}{dx}[x^3] = 3x^2$). That makes $x^3$ an antiderivative of $3x^2$.',
+      '$$F\'(x) = f(x)$$',
+      'This equation is the entire definition. On the left is the **known rate of change**; on the right is the **unknown original function**. Antidifferentiation is the art of recovering $F$ from $f$.',
+      '**Integral notation** packages this into a single symbol:',
+      '$$\\int f(x)\\,dx = F(x) + C$$',
+      'Every piece of this notation carries a meaning:',
+      '— $\\int$ is the **integral sign**, an elongated "S" chosen by Leibniz in 1675 for *summa* (Latin: sum). It means "find an antiderivative."',
+      '— $f(x)$ is the **integrand** — the function whose antiderivative you want.',
+      '— $dx$ is the **variable label** — mandatory, it tells you the variable of integration.',
+      '— $F(x)$ is the **antiderivative** — any function satisfying $F\'(x) = f(x)$.',
+      '— $+C$ is the **constant of integration** — not optional. Omitting it is a mathematical error.',
+      '**Why $+C$? (This is critical — not bookkeeping.)** Differentiating destroys constant information. $\\frac{d}{dx}[x^2] = 2x$, but also $\\frac{d}{dx}[x^2 + 5] = 2x$, and $\\frac{d}{dx}[x^2 - 100] = 2x$. The constant vanishes every time. So when you reverse differentiation, you cannot know which constant was originally there:',
+      '$$\\int 2x\\,dx = x^2 + C$$',
+      'This means: the answer is not *one function* but an **entire family** — $x^2$, $x^2 + 1$, $x^2 - 7$, $x^2 + \\pi$, all with the same derivative. The $+C$ names the family. An initial condition (e.g., $F(0) = 3$) pins down exactly which member.',
+      '**Proof that two antiderivatives always differ by a constant:** suppose $F\'(x) = f(x)$ and $G\'(x) = f(x)$ on an interval. Let $H = G - F$. Then $H\' = G\' - F\' = 0$. By the Mean Value Theorem, a function with zero derivative on an interval is constant. So $H = C$, i.e., $G(x) = F(x) + C$. The $+C$ captures all possibilities.',
+      '**The core idea that replaces memorization:** every antiderivative rule is a derivative rule read right-to-left. You already know every derivative rule. Reversing them:',
+      '— Since $\\frac{d}{dx}[x^3] = 3x^2$, we have $\\int 3x^2\\,dx = x^3 + C$.',
+      '— Since $\\frac{d}{dx}[\\sin x] = \\cos x$, we have $\\int \\cos x\\,dx = \\sin x + C$.',
+      '— Since $\\frac{d}{dx}[e^x] = e^x$, we have $\\int e^x\\,dx = e^x + C$.',
+      'No new concept is needed — only the ability to read derivative rules backward.',
+      '▶ **Pause and verify:** Before reading on, check two antiderivatives from memory. **(1)** Write $\\int e^x\\,dx$. **(2)** Write $\\int \\cos x\\,dx$. Then differentiate each answer and confirm it returns the original integrand. If it checks out — you used the core idea correctly.',
       'An antiderivative of f(x) is any function F(x) with F\'(x) = f(x). The process is differentiation run backwards. Since d/dx[x³] = 3x², the antiderivative of 3x² is x³. Since d/dx[sin(x)] = cos(x), the antiderivative of cos(x) is sin(x). Since d/dx[eˣ] = eˣ, the antiderivative of eˣ is eˣ. Every entry in the differentiation table can be read backwards to give an antiderivative rule.',
       'The critical new feature is the constant of integration, written +C. If F(x) is one antiderivative of f(x), then F(x)+5, F(x)−π, and F(x)+C for any constant C are also antiderivatives, because d/dx[F(x)+C] = F\'(x)+0 = f(x). Conversely, any two antiderivatives of the same function differ by a constant (proved using the MVT: if G\'=F\'=f, then (G−F)\'=0, so G−F=constant). The indefinite integral ∫f(x)dx denotes the entire family of antiderivatives: ∫f(x)dx = F(x)+C. Forgetting the +C is a mathematical error — the antiderivative is a family of functions, not a single function.',
       'The power rule for integration inverts the power rule for differentiation. Since d/dx[xⁿ⁺¹/(n+1)] = xⁿ (for n ≠ −1), we have ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The exception n = −1 is special: x⁻¹ = 1/x has antiderivative ln|x|, not x⁰/0 (which is undefined). The power rule covers polynomials, roots (fractional powers), and negative powers — a vast class of functions. Any polynomial ∫(aₙxⁿ + ··· + a₁x + a₀) dx is computed term by term.',
+      '**Why the power rule works — derived in three lines, no memorization required:** you want a function whose derivative is $x^n$. Start with a guess: try $x^{n+1}$. Differentiating gives $(n+1)x^n$ — nearly right, but there is an extra factor of $(n+1)$. Fix it by dividing:',
+      '$$\\frac{x^{n+1}}{n+1}$$',
+      'Now differentiate again to check:',
+      '$$\\frac{d}{dx}\\left[\\frac{x^{n+1}}{n+1}\\right] = \\frac{(n+1)x^n}{n+1} = x^n \\checkmark$$',
+      'Every step is algebra. The rule is not a fact to memorize — it is a two-step argument: guess a higher power, correct for the extra derivative factor.',
+      '**Why $n = -1$ is the exception:** try applying the formula with $n = -1$: you get $x^{-1+1}/(-1+1) = x^0/0$ — division by zero, which is undefined. The power rule physically breaks at $n = -1$. A completely different function is needed. We ask: what function has derivative $1/x$? For $x > 0$: $\\frac{d}{dx}[\\ln x] = 1/x$. For $x < 0$: $\\frac{d}{dx}[\\ln(-x)] = \\frac{-1}{-x} = 1/x$. The absolute value patches both cases:',
+      '$$\\int \\frac{1}{x}\\,dx = \\ln|x| + C$$',
+      'The logarithm appears here not by convention — it is the unique elementary function with this derivative. This is also why logarithms are so closely connected to areas under hyperbolas in the history of calculus.',
+      '▶ **Try it now:** Using the "guess → check → fix" method, derive $\\int x^7\\,dx$ from scratch. Do not use the formula — start with the guess $x^8$, differentiate, identify the extra factor, divide to correct it, verify. Write every step.',
       'The linearity of differentiation — d/dx[cf+g] = cf\'+g\' — runs backwards to give linearity of integration: ∫[cf(x)+g(x)]dx = c∫f(x)dx + ∫g(x)dx. This means integrals split across addition and constants factor out. To integrate a sum, integrate each term separately. To integrate a constant multiple, factor it out. Combined with the power rule, this handles any polynomial. The only restriction is that the split must happen BEFORE integrating — you cannot factor or split after integration without reintroducing constants.',
+      '▶ **Apply linearity:** integrate $\\int(4x^3 - 6x + 2)\\,dx$. Write out three explicit steps: (1) split into three integrals, (2) factor out the constants, (3) apply the power rule to each. Verify your answer by differentiating.',
       'Initial value problems (IVPs) pin down the arbitrary constant C using an extra condition — typically a value of the function at a specific point. The procedure: integrate to find F(x) = G(x)+C (the general antiderivative), substitute the given condition F(x₀) = y₀ to find C, and write the specific solution F(x) = G(x) + (y₀ − G(x₀)). IVPs are ubiquitous in physics: "a ball is thrown upward at 20 m/s from a height of 5 m" gives both the initial velocity and initial position, which together determine the height function x(t) = 5 + 20t − 4.9t² completely.',
       'The integration table is finite and exact for elementary functions, but many seemingly simple functions have no elementary antiderivative. The function eˣ² has no antiderivative expressible in terms of polynomials, trig functions, exponentials, and logarithms — despite being smooth and rapidly computable numerically. The same is true for sin(x)/x, √(1−x⁴), and many others. This is not a temporary gap in our knowledge — it was proved rigorously by Liouville in 1835 using what is now called "differential Galois theory." For functions without elementary antiderivatives, Riemann sums or Taylor series must be used. FTC Part 1 still applies: d/dx[∫₀ˣ eᵗ² dt] = eˣ² even though the antiderivative has no closed form.',
+      'The complete **pattern-recognition guide** for choosing an antiderivative technique: see $x^n$ → power rule. See $1/x$ → $\\ln|x|$. See $e^x$, $\\sin x$, $\\cos x$ → use the table directly. See a polynomial → split term by term. See a **composition** $f(g(x))$ (a function inside a function, like $(2x+3)^5$ or $\\sin(x^2)$) → that is the chain rule in reverse, which is **u-substitution** (Lesson 6). See a **product** like $x \\cdot e^x$ or $x \\cdot \\ln x$ → that is the product rule in reverse, which is **integration by parts** (Lesson 7). See a **rational function** → factor the denominator and use **partial fractions** (Lesson 10). Recognizing the pattern correctly is the real skill; the algebra that follows is mechanical.',
+      '▶ **Pattern recognition drill:** for each integral below, name the technique you would use — *do not integrate yet*. **(1)** $\\int x^{10}\\,dx$. **(2)** $\\int \\frac{1}{x}\\,dx$. **(3)** $\\int (5x^2 + \\cos x)\\,dx$. **(4)** $\\int (3x-1)^8\\,dx$. **(5)** $\\int x \\ln x\\,dx$. **(6)** $\\int \\frac{x}{x^2 + 1}\\,dx$.',
     ],
     callouts: [
       {
@@ -49,6 +114,21 @@ export default {
         title: "Leibniz's ∫ Notation (1675)",
         body: "Gottfried Wilhelm Leibniz chose the symbol ∫ as an elongated 'S' for 'summa' (Latin for sum), recording it in his notebooks on October 29, 1675. The dx indicates 'an infinitely small piece of x.' Thus ∫f(x)dx literally reads 'the sum of all the infinitely thin rectangles f(x)·dx.' Leibniz's notation has endured for 350 years because it encodes the limit-of-Riemann-sums idea directly in the symbolism.",
       },
+      {
+        type: 'mistake',
+        title: 'Common Mistake #1: Forgetting the +C',
+        body: 'Writing $\\int x^2\\,dx = \\frac{x^3}{3}$ is **incomplete**. The correct answer is $\\frac{x^3}{3} + C$. The $+C$ is not optional notation — it is part of the answer, because the antiderivative is a **family** of functions, not a single function. Missing $+C$ is penalized on every exam and in every application, because without it you cannot solve initial value problems. Always write $+C$. Always.',
+      },
+      {
+        type: 'mistake',
+        title: 'Common Mistake #2: Applying the Power Rule to n = −1',
+        body: 'The power rule $\\int x^n\\,dx = x^{n+1}/(n+1) + C$ requires $n \\neq -1$. Attempting $n = -1$ gives $x^0/0$ — division by zero, which is undefined. The antiderivative of $1/x$ is $\\ln|x| + C$, not a power of $x$ at all. If you ever see $\\int x^{-1}\\,dx$ or $\\int \\frac{1}{x}\\,dx$, do not use the power rule. The logarithm is the answer.',
+      },
+      {
+        type: 'mistake',
+        title: 'Common Mistake #3: Assuming a Product Rule for Integrals',
+        body: '**There is no product rule for integration.** $\\int f(x) \\cdot g(x)\\,dx \\neq \\left(\\int f\\,dx\\right) \\cdot \\left(\\int g\\,dx\\right)$. This is one of the most common errors in calculus. The derivative product rule $(fg)\' = f\'g + fg\'$ does not reverse into a simple multiplication of antiderivatives. When you see a product, your options are: expand it algebraically (if possible), use u-substitution (if one factor is the derivative of the other\'s inner function), or use integration by parts (Lesson 7). Never just multiply the antiderivatives.',
+      },
     ],
     visualizations: [
                                                         {
@@ -65,6 +145,8 @@ export default {
       'Linearity of integration: ∫[αf(x) + βg(x)] dx = α∫f(x) dx + β∫g(x) dx. This follows because differentiation is linear: d/dx[αF(x)+βG(x)] = αF\'(x)+βG\'(x) = αf(x)+βg(x) whenever F\' = f and G\' = g. Combined with the table, linearity allows integration of any linear combination of tabulated functions — which includes all polynomials, all linear combinations of trig functions, all polynomial-exponential sums.',
       'Differential equations of the form dy/dx = f(x) are solved directly by integration: y = ∫f(x) dx = F(x)+C. The general solution has one free parameter C; an initial condition y(x₀) = y₀ gives one equation for C, determining the unique particular solution. Higher-order DEs (e.g., d²y/dx² = f(x)) require two integrations, introducing two constants C₁ and C₂, determined by two conditions (typically the value and the derivative at a point). This structure — general solution = homogeneous solution + particular solution — extends throughout differential equations.',
       'A common technique is algebraic manipulation before integration: expand products, separate fractions, complete the square, or use trig identities. For example, ∫(x+1)² dx = ∫(x²+2x+1) dx = x³/3 + x² + x + C (expand before integrating). Or ∫(x³+x)/x dx = ∫(x²+1) dx = x³/3+x+C (divide through first). These algebraic pre-processing steps are not integration techniques per se — they are arithmetic that converts non-standard forms into the standard table forms.',
+      'The complete hierarchy of integration techniques, in order of complexity: **(1) Table lookup** — recognize a standard form. **(2) Algebra first** — expand, simplify, divide, or apply a trig identity. **(3) U-substitution** (Lesson 6) — integrand is a composition $f(g(x)) \\cdot g\'(x)$; reverse the chain rule. **(4) Integration by parts** (Lesson 7) — integrand is a product of different types; reverse the product rule. **(5) Trig integrals** (Lesson 8) — powers of sin/cos/tan using Pythagorean and half-angle identities. **(6) Trig substitution** (Lesson 9) — integrand contains $\\sqrt{a^2-x^2}$, $\\sqrt{x^2+a^2}$, or $\\sqrt{x^2-a^2}$. **(7) Partial fractions** (Lesson 10) — rational functions. Most Calc 1 integrals use only techniques 1–3.',
+      'The **universal verification step**: after computing any antiderivative $F(x) + C$, differentiate $F(x)$ and confirm you recover $f(x)$. This takes 10 seconds and catches every algebraic mistake. There is no excuse for submitting an antiderivative you have not verified — the check is built into the definition.',
     ],
     callouts: [
       {
@@ -81,6 +163,11 @@ export default {
         type: 'theorem',
         title: 'Key Antiderivative Table',
         body: '\\(\\int e^x\\,dx = e^x + C\\)\n\\(\\int \\sin x\\,dx = -\\cos x + C\\)\n\\(\\int \\cos x\\,dx = \\sin x + C\\)\n\\(\\int \\sec^2 x\\,dx = \\tan x + C\\)\n\\(\\int \\frac{1}{1+x^2}\\,dx = \\arctan x + C\\)\n\\(\\int \\frac{1}{\\sqrt{1-x^2}}\\,dx = \\arcsin x + C\\)',
+      },
+      {
+        type: 'self-diagnostic',
+        title: 'Self-Diagnostic: Is Your Antiderivative Correct?',
+        body: "After computing $\\int f(x)\\,dx = F(x) + C$, run this quick 3-step check:\n\n**1. Differentiate your answer.** Compute $F'(x)$ and confirm it equals $f(x)$. This takes 10 seconds and is the definition. If it doesn't match, your answer is wrong.\n\n**2. Is the $+C$ present?** For an indefinite integral, the answer must include $+C$. Missing it is an error.\n\n**3. Check the three most common algebra slips:** (a) Power rule: new exponent is $n+1$, you divide by $n+1$. (b) Sign: $\\int \\sin x\\,dx = \\mathbf{-}\\cos x + C$, not $+\\cos x$. (c) The $n = -1$ case: $\\int 1/x\\,dx = \\ln|x| + C$, never a power of $x$.",
       },
     ],
     visualizations: [
@@ -195,6 +282,34 @@ export default {
       ],
       conclusion: '∫(x+1)² dx = x³/3 + x² + x + C. Expanding before integrating is the easiest approach for polynomial expressions. Note: (x+1)³/3 + C would be WRONG — the chain rule would add a factor of 1 in this case (since (d/dx)(x+1) = 1), making it accidentally correct here, but this coincidence breaks for (ax+b)².',
     },
+    {
+      id: 'ch4-004-ex8',
+      title: 'Deriving the Power Rule from Scratch (Guess → Check → Fix)',
+      problem: '\\text{Without using the formula, derive } \\int x^4\\,dx \\text{ from first principles using the "guess, check, fix" method.}',
+      steps: [
+        { expression: '\\text{Goal: find } F(x) \\text{ such that } F\'(x) = x^4.', annotation: 'We want a function whose derivative is x⁴. No formula used yet.' },
+        { expression: '\\text{Guess: try } x^5.', annotation: 'The power rule for derivatives raises the exponent by 1, so going backward we guess the exponent should drop by 1. Equivalently: if the answer involves x⁵, its derivative will involve x⁴.' },
+        { expression: '\\frac{d}{dx}[x^5] = 5x^4', annotation: 'Differentiate the guess. We get 5x⁴ — correct shape, wrong coefficient.' },
+        { expression: '\\text{Problem: extra factor of 5. Fix: divide by 5.}', annotation: 'We need to cancel the 5 that appeared. Divide the guess by 5: try x⁵/5 instead.' },
+        { expression: '\\frac{d}{dx}\\left[\\frac{x^5}{5}\\right] = \\frac{5x^4}{5} = x^4 \\checkmark', annotation: 'Differentiate the corrected guess. We recover x⁴ exactly.' },
+        { expression: '\\therefore \\int x^4\\,dx = \\frac{x^5}{5} + C', annotation: 'Add +C for the full family of antiderivatives. The derivation is complete.' },
+      ],
+      conclusion: '∫x⁴ dx = x⁵/5 + C. The method: guess xⁿ⁺¹ → differentiate → extra factor is n+1 → divide by n+1 to correct. This derives the power rule in two lines and works for any n ≠ −1. The "guess → check → fix" approach also works for trig, exponential, and more complex functions.',
+    },
+    {
+      id: 'ch4-004-ex9',
+      title: 'Why 1/x → ln|x|: The n = −1 Special Case',
+      problem: '\\text{Explain why the power rule fails for } \\int \\frac{1}{x}\\,dx, \\text{ and derive its antiderivative from scratch.}',
+      steps: [
+        { expression: '\\text{Attempt power rule with } n = -1: \\quad \\frac{x^{-1+1}}{-1+1} = \\frac{x^0}{0}', annotation: 'Substituting n = −1 into the formula gives division by zero — undefined. The power rule physically breaks here.' },
+        { expression: '\\text{Ask: what function has derivative } \\frac{1}{x}? \\text{ For } x > 0:', annotation: 'We need to find F(x) with F\'(x) = 1/x. The power rule gives no answer, so we need a different function family.' },
+        { expression: '\\frac{d}{dx}[\\ln x] = \\frac{1}{x} \\quad (x > 0)', annotation: 'The natural logarithm has exactly this derivative. Verify by definition of derivative or recall from Chapter 2.' },
+        { expression: '\\text{For } x < 0: \\quad \\frac{d}{dx}[\\ln(-x)] = \\frac{1}{-x} \\cdot (-1) = \\frac{1}{x}', annotation: 'For negative x, ln(x) is undefined, but ln(−x) is defined. Chain rule: derivative of ln(−x) is 1/(−x)·(−1) = 1/x. ✓' },
+        { expression: '\\text{Combine both cases: } \\frac{d}{dx}[\\ln|x|] = \\frac{1}{x} \\quad \\text{for all } x \\neq 0', annotation: 'The absolute value |x| patches both x > 0 and x < 0 into one formula.' },
+        { expression: '\\therefore \\int \\frac{1}{x}\\,dx = \\ln|x| + C', annotation: 'Full antiderivative with constant of integration.' },
+      ],
+      conclusion: '∫(1/x) dx = ln|x| + C. The power rule fails at n = −1 because division by zero occurs. The antiderivative is the natural logarithm — not because of convention, but because it is the unique elementary function with derivative 1/x. This connection between the logarithm and the area under 1/x was historically discovered before calculus was formalized.',
+    },
   ],
 
   challenges: [
@@ -240,6 +355,24 @@ export default {
         { expression: '\\text{The MVT requires an INTERVAL — it cannot be applied across the gap at } x=0.', annotation: 'The key: MVT requires the function to be continuous on a closed connected interval. D has a gap, so the MVT cannot connect the two components.' },
       ],
       answer: '\\text{On a connected interval: } F\'=0 \\Rightarrow F = C. \\text{ On disconnected domains, different constants on each component are possible.}',
+    },
+    {
+      id: 'ch4-004-ch4',
+      difficulty: 'capstone',
+      title: 'Capstone: Build the Position Function for a Skydiver',
+      problem: "A skydiver jumps from a helicopter hovering at 3000 m. At $t = 0$: position $h(0) = 3000$ m, velocity $v(0) = 0$ m/s. For the first 15 seconds (free fall, ignoring air resistance), acceleration is $a(t) = -9.8$ m/s².\n\n**(a)** Starting from $a(t) = -9.8$, integrate **twice** — showing every algebra step, applying each initial condition immediately after integration — to find the exact height function $h(t)$.\n\n**(b)** At what time does the skydiver reach terminal velocity $v = -53$ m/s? (Solve algebraically.)\n\n**(c)** Suppose instead the skydiver jumps from rest at $t = 0$ and is at height $h_0 = 3000$ m. At $t = 5$ s, the parachute deploys and the velocity is suddenly $v(5) = -49$ m/s. **After** deployment ($t > 5$), the acceleration changes to $a_2(t) = -9.8 + 0.5v$ (air resistance term). Write the new velocity ODE and note that it is **not** solvable by simple integration — this is the boundary of the antiderivative technique.",
+      hint: 'For (a): the two initial conditions are $v(0) = 0$ and $h(0) = 3000$. Integrate $a(t)$ to get $v(t)$, apply $v(0)=0$ to find $C_1$; integrate $v(t)$ to get $h(t)$, apply $h(0)=3000$ to find $C_2$. For (b): set $v(t) = -53$ and solve for $t$. For (c): recognize that $a_2 = -9.8 + 0.5v$ makes the ODE $dv/dt = 0.5v - 9.8$, which is a **separable first-order ODE** — antiderivative techniques alone are insufficient; separation of variables is needed.',
+      walkthrough: [
+        { expression: 'v(t) = \\int a(t)\\,dt = \\int (-9.8)\\,dt = -9.8t + C_1', annotation: 'Integrate constant acceleration.' },
+        { expression: 'v(0) = 0 \\Rightarrow -9.8(0) + C_1 = 0 \\Rightarrow C_1 = 0', annotation: 'Initial condition v(0) = 0 pins C₁ = 0.' },
+        { expression: 'v(t) = -9.8t', annotation: 'Specific velocity function during free fall.' },
+        { expression: 'h(t) = \\int v(t)\\,dt = \\int (-9.8t)\\,dt = -4.9t^2 + C_2', annotation: 'Integrate velocity to get height.' },
+        { expression: 'h(0) = 3000 \\Rightarrow -4.9(0)^2 + C_2 = 3000 \\Rightarrow C_2 = 3000', annotation: 'Initial height condition determines C₂.' },
+        { expression: 'h(t) = -4.9t^2 + 3000', annotation: 'Complete height function. Verify: h\'(t) = -9.8t = v(t) ✓' },
+        { expression: 'v(t) = -53 \\Rightarrow -9.8t = -53 \\Rightarrow t = \\frac{53}{9.8} \\approx 5.41 \\text{ s}', annotation: 'Terminal velocity reached at ~5.4 seconds.' },
+        { expression: '\\text{Part (c): } \\frac{dv}{dt} = -9.8 + 0.5v \\quad \\Rightarrow \\quad \\text{separable ODE, not solvable by antiderivatives alone}', annotation: 'The right side depends on v, not just t. Integration ∫(...)dt requires the right side to be a function of t only. This ODE requires separation of variables (differential equations technique).' },
+      ],
+      answer: 'h(t) = -4.9t^2 + 3000 \\text{ m}. \\quad \\text{Terminal velocity reached at } t = 53/9.8 \\approx 5.41 \\text{ s}. \\quad \\text{The ODE in part (c) is separable and is beyond simple antidifferentiation.}',
     },
   ],
 
@@ -352,5 +485,98 @@ export default {
       hints: ['Power rule: \\(n = 1/2\\), new exponent = \\(3/2\\), coefficient = \\(\\frac{1}{3/2} = \\frac{2}{3}\\).'],
       reviewSection: 'Math — Power rule (fractional exponent)',
     },
+    {
+      id: 'indef-q11',
+      type: 'choice',
+      text: 'Someone writes $\\int \\frac{1}{x}\\,dx = \\frac{x^0}{0} + C$. What is wrong?',
+      options: [
+        'Nothing — that is correct',
+        'The exponent should be $-2$, not $0$',
+        'Division by zero: the power rule does not apply when $n = -1$. The correct answer is $\\ln|x| + C$',
+        'The $+C$ should not be there for this integral',
+      ],
+      answer: 'Division by zero: the power rule does not apply when $n = -1$. The correct answer is $\\ln|x| + C$',
+      hints: ['Try substituting $n = -1$ into $\\frac{x^{n+1}}{n+1}$. What is the denominator?'],
+      reviewSection: 'Intuition — Why 1/x → ln|x|',
+    },
+    {
+      id: 'indef-q12',
+      type: 'choice',
+      text: 'Which technique would you use to evaluate $\\int (2x-5)^9\\,dx$?',
+      options: [
+        'Expand $(2x-5)^9$ and use the power rule term by term',
+        'U-substitution with $u = 2x - 5$',
+        'Integration by parts',
+        'It cannot be integrated in closed form',
+      ],
+      answer: 'U-substitution with $u = 2x - 5$',
+      hints: ['Expanding $(2x-5)^9$ would take 10 terms. Look for a composition pattern: outer function is $u^9$, inner function is $2x-5$.'],
+      reviewSection: 'Intuition — Pattern recognition guide',
+    },
+    {
+      id: 'indef-q13',
+      type: 'input',
+      text: 'Given $F\'(x) = 4x^3 - 6x$ and $F(1) = 2$, find $F(x)$.',
+      answer: 'x^4 - 3x^2 + 4',
+      hints: [
+        'Integrate to get the general antiderivative: $F(x) = x^4 - 3x^2 + C$.',
+        'Apply $F(1) = 2$: $1 - 3 + C = 2$, so $C = 4$.',
+      ],
+      reviewSection: 'Intuition — Initial value problems',
+    },
+    {
+      id: 'indef-q14',
+      type: 'choice',
+      text: 'You compute $\\int \\cos x\\,dx$ and get $\\sin x + C$. Before writing the final answer, what should you always do?',
+      options: [
+        'Nothing — the power rule guarantees the answer is right',
+        'Differentiate $\\sin x$ and verify it equals $\\cos x$',
+        'Check that the exponent is $n+1$',
+        'Make sure $+C$ is included and move on',
+      ],
+      answer: 'Differentiate $\\sin x$ and verify it equals $\\cos x$',
+      hints: ['The definition of antiderivative is $F\'(x) = f(x)$. Every antiderivative should be verified by differentiating.'],
+      reviewSection: 'Math — Universal verification step',
+    },
   ],
+
+  spiral: {
+    recoveryPoints: [
+      { label: 'Derivative Rules (Chapter 2)', note: "Every antiderivative rule is a derivative rule read right-to-left. If you forget ∫cos x, ask: what function differentiates to cos x? That function is sin x." },
+      { label: 'Chain Rule (Chapter 2)', note: "The chain rule [f(g(x))]' = f'(g(x))·g'(x) reverses into u-substitution (Lesson 6). When you see a composition f(g(x)) times g'(x), you can collapse it." },
+      { label: 'Product Rule (Chapter 2)', note: "The product rule (uv)' = u'v + uv' reverses into integration by parts (Lesson 7): ∫u dv = uv − ∫v du. Every product you cannot expand algebraically will eventually use this." },
+      { label: 'Limits and Riemann Sums (Chapter 4 Lessons 1–3)', note: "Antiderivatives connect to definite integrals via FTC: ∫ₐᵇf = F(b)−F(a). The techniques here are the computational face of that theorem." },
+    ],
+    futureLinks: [
+      { label: 'U-Substitution (Lesson 6)', note: 'Reverses the chain rule — the single most powerful technique for non-table integrals. Allows integrating any composition f(g(x))·g\'(x) by letting u = g(x).' },
+      { label: 'Integration by Parts (Lesson 7)', note: 'Reverses the product rule — handles products like xeˣ, x ln x, and eˣ sin x. Formula: ∫u dv = uv − ∫v du.' },
+      { label: 'Differential Equations (Chapter 5+)', note: "Every IVP here is a differential equation y' = f(x). When the right side depends on y as well (y' = ky), simple antidifferentiation fails and more advanced ODE techniques are needed." },
+    ],
+  },
+
+  masteryChecklist: [
+    'I can explain what an antiderivative is in plain words — "the function whose derivative is..." — and write the integral notation $\\int f(x)\\,dx = F(x) + C$ with every symbol defined.',
+    'I can prove why $+C$ is required, using a concrete example and the MVT argument.',
+    'I can derive the power rule from scratch using the "guess → check → fix" method, without consulting a formula sheet.',
+    'I can explain why the power rule fails at $n = -1$ and derive $\\int 1/x\\,dx = \\ln|x| + C$ from scratch.',
+    'I can integrate any polynomial, any linear combination of trig functions, $e^x$, and $a^x$ using the table and linearity.',
+    'I can solve initial value problems by integrating and applying the given condition to determine $C$.',
+    "I can look at any integrand and name the correct technique (table, algebra first, u-sub, IBP, partial fractions) from the integrand's pattern.",
+    'I always verify antiderivatives by differentiating before writing the final answer.',
+  ],
+
+  summary: {
+    headline: 'You now know how to run differentiation in reverse — the foundation of all of integration.',
+    estimatedTime: '60–90 minutes',
+    keyIdeas: [
+      'An antiderivative $F(x)$ of $f(x)$ is any function with $F\'(x) = f(x)$. The indefinite integral $\\int f(x)\\,dx = F(x) + C$ represents the entire family.',
+      'The $+C$ is not optional: derivatives destroy constants, so recovering $F$ from $f$ always has one degree of freedom.',
+      'Every antiderivative rule is a reversed derivative rule. The power rule $\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C$ follows by "guess $x^{n+1}$, find the extra factor $n+1$, divide to correct."',
+      'The $n = -1$ exception: the power rule breaks (division by zero), and $\\int 1/x\\,dx = \\ln|x| + C$ — the logarithm appears as the unique elementary function with derivative $1/x$.',
+      'Initial value problems pin down $C$ using extra conditions — one integration introduces one constant, one condition solves for it.',
+      'Coming up: u-substitution (chain rule in reverse) and integration by parts (product rule in reverse) push the toolkit far beyond the basic table.',
+    ],
+    spacedRepetitionPrompt: "Come back in one week and, without notes: (1) derive $\\int x^n\\,dx$ from scratch by the 'guess → check → fix' method, and (2) explain why $\\int 1/x\\,dx = \\ln|x|$. If you can do both in under 3 minutes from scratch, you own the foundations of antidifferentiation.",
+  },
 }
+

@@ -22,6 +22,23 @@ export default {
       'This limit of sums is the definite integral, written ∫ₐᵇ f(x) dx. The elongated S symbol (∫) stands for "sum" — Leibniz chose it to emphasize that the integral is a limiting summation. The symbol dx represents the infinitesimal width of each slice. The limits a and b mark the start and end of the interval. The entire expression means: "sum up f(x) · dx for every x from a to b." This is the most compact and powerful notation ever invented for an accumulation process.',
       'The connection between area and accumulation has a directional aspect: signed area. If a velocity is negative (moving backward), the contribution to displacement is negative. If a rate function dips below the t-axis, the integral subtracts that portion. The definite integral computes net accumulation — positive contributions minus negative contributions. For total accumulation (ignoring direction), you integrate the absolute value |f(x)|. This signed vs. unsigned distinction is important in applications: displacement (net change in position) uses the signed integral, while total distance traveled uses the integral of |v(t)|.',
       'The historical roots of integration go back to Archimedes, who computed the area of a parabolic segment around 250 BC by exhausting it with triangles — a method strikingly close to modern Riemann sums. Cavalieri in the 1630s summed infinitesimal slices to compute volumes. But the real leap came from Newton and Leibniz in the 1660s–1680s: they independently discovered that the process of accumulation is the inverse of the process of differentiation. This Fundamental Theorem of Calculus — which we develop in Lesson 3 — transforms integration from a geometric puzzle into an algebraic calculation.',
+      '**The accumulation function: a new idea.** So far, the definite integral $\\int_a^b f(t)\\,dt$ has been a fixed number — you pin down both limits and get one answer. But now ask a different question: *what if the upper limit is a variable?* Define a new function:',
+      '$A(x) = \\int_0^x r(t)\\,dt$',
+      'For the water-tank example, $A(x)$ is the total water accumulated from time $0$ up to time $x$. It is not a single number — it changes as $x$ changes. As $x$ increases by a tiny $\\Delta x$, the tank gains approximately $r(x) \\cdot \\Delta x$ more litres (rate times tiny time step). So:',
+      '$A(x + \\Delta x) - A(x) \\approx r(x) \\cdot \\Delta x$',
+      'Divide both sides by $\\Delta x$ and take the limit as $\\Delta x \\to 0$:',
+      '$A\'(x) = r(x)$',
+      'The **derivative of the accumulation function is the original rate**. This is the central insight of the Fundamental Theorem of Calculus. In plain language: the rate at which area accumulates at any point is exactly the height of the function at that point. If the water is flowing in fast, the total is growing fast. If the flow slows, the total grows slowly.',
+      '**What this means for antiderivatives.** $A(x)$ is a function whose derivative is $r(x)$. That is the definition of an antiderivative. So the accumulation function $A(x) = \\int_0^x r(t)\\,dt$ *is* an antiderivative of $r$ — not an abstract algebraic construct, but a physically meaningful running total.',
+      'Conversely, if $F(x)$ is any function with $F\'(x) = r(x)$, then $F$ is also an antiderivative of $r$. Different antiderivatives of the same function differ only by a constant. You can see why: $A(x)$ starts accumulating from $t = 0$, so $A(0) = 0$. If instead you started accumulating from $t = 1$, you would get $B(x) = \\int_1^x r(t)\\,dt = A(x) - A(1)$ — the same function shifted down by a constant $A(1)$. Different starting points give the same shape, offset vertically by a constant.',
+      '**Indefinite integral notation.** Because there are infinitely many antiderivatives (one for each starting point, or equivalently one for each vertical shift), we write:',
+      '$\\int r(t)\\,dt = F(t) + C$',
+      'This is called the **indefinite integral**. The absence of limits means "find any antiderivative." The $+C$ captures all possible vertical shifts — all functions you could get by choosing different starting points for accumulation. This is not mathematical pedantry: the constant $C$ carries real physical information. For the water tank, $C$ is the initial amount already in the tank at $t = 0$. For the car, $C$ is the starting position.',
+      '**Three faces of the same idea** (keep these distinct):',
+      '— **Definite integral** $\\int_a^b r(t)\\,dt$: a **number** — the total accumulation from $a$ to $b$. Result has units (litres, metres, etc.).',
+      '— **Accumulation function** $A(x) = \\int_0^x r(t)\\,dt$: a **specific function** — the running total starting from $0$. Satisfies $A\'(x) = r(x)$ and $A(0) = 0$.',
+      '— **Indefinite integral** $\\int r(t)\\,dt = F(t) + C$: a **family of functions** — all antiderivatives, differing by a constant. No starting point is fixed.',
+      'The connection between definite and indefinite integrals is the payoff of Lesson 3 (FTC Part 2): once you know any antiderivative $F$, you compute $\\int_a^b r = F(b) - F(a)$. That is why finding antiderivatives (Lesson 4) is the work that makes definite integrals computable by algebra rather than by drawing rectangles.',
     ],
     callouts: [
       {
@@ -59,6 +76,21 @@ export default {
         title: 'Archimedes and the Quadrature of the Parabola (250 BC)',
         body: "Archimedes proved that the area under a parabola from 0 to 1 is exactly 1/3 of the enclosing rectangle — the same result we get from ∫₀¹ x² dx = 1/3. He did this without calculus, using an infinite geometric series of inscribed triangles. His proof was one of the earliest uses of the 'method of exhaustion,' the ancient precursor to taking limits of Riemann sums.",
       },
+      {
+        type: 'definition',
+        title: 'The Accumulation Function A(x)',
+        body: 'Let $f$ be a continuous rate function. The **accumulation function** is:\n$A(x) = \\int_0^x f(t)\\,dt$\nThis is a **function of the upper limit** $x$ — it gives the running total of $f$ from $0$ to $x$. Key fact: $A\'(x) = f(x)$. The rate at which area accumulates equals the height of the curve. This is FTC Part 1.',
+      },
+      {
+        type: 'definition',
+        title: 'Antiderivative and Indefinite Integral',
+        body: 'A function $F(x)$ is an **antiderivative** of $f(x)$ if $F\'(x) = f(x)$. Because the accumulation function $A(x) = \\int_0^x f(t)\\,dt$ satisfies $A\'(x) = f(x)$, it is one antiderivative. All others differ from it by a constant.\n\nThe **indefinite integral** collects all antiderivatives into one family:\n$\\int f(x)\\,dx = F(x) + C$\nNo limits means "no starting point fixed." The $+C$ represents the unknown initial amount — the constant information that the derivative cannot tell you.',
+      },
+      {
+        type: 'warning',
+        title: 'Three Very Different Things That Look Similar',
+        body: '**Definite integral** $\\int_a^b f(x)\\,dx$ → a **number** (7, 25, −3.14…). Both limits are fixed.\n\n**Accumulation function** $A(x) = \\int_0^x f(t)\\,dt$ → a **specific function** of $x$. Lower limit is fixed (0), upper is variable.\n\n**Indefinite integral** $\\int f(x)\\,dx = F(x) + C$ → a **family of functions**. No limits at all.\n\nThe $\\int$ symbol appears in all three, but means something different each time. Context — specifically, the presence or absence of limits — determines which one you are dealing with.',
+      },
     ],
     visualizations: [
                                             {
@@ -76,6 +108,8 @@ export default {
       'Three basic properties follow immediately from the signed-area interpretation. First, ∫ₐᵃ f(x) dx = 0: integrating over a zero-width interval accumulates nothing. Second, ∫ₐᵇ f(x) dx = − ∫ᵦᵃ f(x) dx: reversing the limits of integration changes the sign, because we are now "sweeping" in the opposite direction. Third, linearity: ∫ₐᵇ [c·f(x) + g(x)] dx = c·∫ₐᵇ f(x) dx + ∫ₐᵇ g(x) dx for any constants c. These properties let us split, reverse, and scale integrals algebraically.',
       'The additive interval property is essential in applications: ∫ₐᵇ f(x) dx + ∫ᵦᶜ f(x) dx = ∫ₐᶜ f(x) dx. Total accumulation from a to c equals accumulation from a to b plus accumulation from b to c, regardless of where b falls (even outside [a, c]). This property allows us to break complex intervals into simpler pieces and reassemble the result.',
       'Two comparison properties complete the foundation. If f(x) ≥ 0 on [a, b], then ∫ₐᵇ f(x) dx ≥ 0 (the area of a non-negative function is non-negative). If f(x) ≥ g(x) on [a, b], then ∫ₐᵇ f ≥ ∫ₐᵇ g. These allow bounding integrals without computing them exactly: if m ≤ f(x) ≤ M on [a, b], then m(b−a) ≤ ∫ₐᵇ f ≤ M(b−a). This sandwich estimate is useful in numerical analysis and in proving convergence of approximation methods.',
+      'The connection between accumulation and antiderivatives gives us a practical method for computing definite integrals. Instead of summing infinitely many rectangles, we look for a function $F$ with $F\'= f$ and compute $F(b) - F(a)$. The simplest cases come directly from reversing the derivative rules you already know. For a constant rate $r(t) = k$: the accumulation from $0$ to $t$ is $kt$, so the antiderivative is $F(t) = kt$ (a rectangle). For a linearly growing rate $r(t) = mt$: the accumulation is a triangle of area $\\frac{1}{2}mt^2$, so $F(t) = \\frac{1}{2}mt^2$. Differentiating confirms: $\\frac{d}{dt}[\\frac{1}{2}mt^2] = mt$. These two cases — which you have been computing geometrically throughout this lesson — are precisely the power rule for integration at $n=0$ and $n=1$.',
+      'In general, the **power rule for antidifferentiation** says: if $f(t) = t^n$ ($n \\neq -1$), then $F(t) = \\frac{t^{n+1}}{n+1}$ because $F\'(t) = \\frac{(n+1)t^n}{n+1} = t^n$. This works for any power — including fractional and negative ones. The full toolkit of antiderivative rules is developed in Lesson 4. For this lesson, the key insight is that computing a definite integral $\\int_a^b f(t)\\,dt$ is equivalent to finding any $F$ with $F\' = f$, then computing $F(b) - F(a)$. Every example in this lesson that uses "antiderivative verification" is a preview of exactly that process.',
     ],
     callouts: [
       {
@@ -92,6 +126,21 @@ export default {
         type: 'theorem',
         title: 'Bounds on Integrals',
         body: 'If \\(m \\leq f(x) \\leq M\\) for all \\(x \\in [a,b]\\), then\n\\[m(b-a) \\leq \\int_a^b f(x)\\,dx \\leq M(b-a).\\]',
+      },
+      {
+        type: 'theorem',
+        title: 'FTC Part 1 (Preview): The Accumulation Function',
+        body: 'If $f$ is continuous on $[a, b]$, the accumulation function\n$A(x) = \\int_a^x f(t)\\,dt$\nis differentiable and $A\'(x) = f(x)$. In words: **differentiating the running total gives back the rate**. This will be proved rigorously in Lesson 3.',
+      },
+      {
+        type: 'theorem',
+        title: 'FTC Part 2 (Preview): Evaluating via Antiderivatives',
+        body: 'If $F\'= f$ on $[a,b]$ (i.e., $F$ is any antiderivative of $f$), then\n$\\int_a^b f(x)\\,dx = F(b) - F(a)$\nThis converts area computation into pure algebra: find $F$, plug in the endpoints, subtract. Every "antiderivative verification" step in this lesson\'s examples is using this formula.',
+      },
+      {
+        type: 'tip',
+        title: 'The Simplest Antiderivatives Come From This Lesson',
+        body: 'Every constant-rate and linear-rate problem in this lesson already uses antiderivatives:\n\n— Constant $r = k$: antiderivative is $F(t) = kt$. Area = rectangle.\n\n— Linear $r = mt$: antiderivative is $F(t) = \\frac{1}{2}mt^2$. Area = triangle.\n\n— Quadratic $r = at^2$: antiderivative is $F(t) = \\frac{a}{3}t^3$. These all follow the **power rule**: $\\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C$. The full table is in Lesson 4.',
       },
     ],
     visualizations: [],
@@ -195,6 +244,38 @@ export default {
         { expression: '\\text{Similarly, velocity = } \\int a\\,dt \\text{ (momentum accumulates from force: } p = \\int F\\,dt \\text{)}', annotation: 'The same logic gives: velocity = integral of acceleration; momentum = integral of force (impulse-momentum theorem).' },
       ],
       conclusion: 'Displacement = ∫v dt is not a formula imposed from outside — it follows directly from the definition v = dx/dt. The integral undoes the derivative. This is the Fundamental Theorem of Calculus in physical disguise, and it motivates the entire development in Lesson 3.',
+    },
+    {
+      id: 'ch4-000-ex7',
+      title: 'The Accumulation Function: Area as a Function of the Upper Limit',
+      problem: 'The water tank from Example 2 fills at $r(t) = 10 - 2t$ L/min. Instead of asking "how much water after 5 minutes?", ask: **how much water has entered the tank by time $x$?** Build the accumulation function $A(x) = \\int_0^x (10-2t)\\,dt$ and explore what it tells us.',
+      steps: [
+        {
+          expression: 'A(x) = \\int_0^x (10 - 2t)\\,dt',
+          annotation: 'We have turned the upper limit into a variable $x$. Now $A$ is a **function** of $x$, not just a single number. This is the key conceptual shift: area as a machine that accepts a time and returns total volume.',
+        },
+        {
+          expression: 'A(x) = \\left[10t - t^2\\right]_0^x = (10x - x^2) - (0 - 0) = 10x - x^2',
+          annotation: 'The antiderivative of $10-2t$ is $10t - t^2$ (power rule: $\\int 2t\\,dt = t^2$). Evaluate from $0$ to $x$ by plugging $t=x$ into the antiderivative and subtracting the value at $t=0$ (which is zero).',
+        },
+        {
+          expression: 'A(0) = 10(0) - 0^2 = 0',
+          annotation: 'The tank starts empty — no surprise. But notice: this is built into the formula automatically because we chose the lower limit to be 0. The initial condition $A(0) = 0$ is satisfied by construction.',
+        },
+        {
+          expression: "A'(x) = \\frac{d}{dx}(10x - x^2) = 10 - 2x = r(x)",
+          annotation: '**The accumulation function differentiates back to the rate.** This is the FTC Part 1 — differentiate the area function and you recover the integrand. The rate of change of the running total is the current rate. Geometrically: as $x$ increases by a sliver $dx$, the new area added is approximately $r(x)\\cdot dx$.',
+        },
+        {
+          expression: 'A(5) = 10(5) - 5^2 = 50 - 25 = 25 \\text{ L}',
+          annotation: 'Recover the answer from Example 2 instantly. No integral to compute — just evaluate $A(5)$. This is the power of the antiderivative: you do the calculus **once** (find $F$ with $F\'=r$), then answer any "total by time $x$" question by simple substitution.',
+        },
+        {
+          expression: 'V(x) = 10x - x^2 + C, \\quad C = V_0 \\text{ (initial water in tank)}',
+          annotation: 'If the tank starts with $V_0$ liters already inside, the total volume at time $x$ is $A(x) + V_0 = 10x - x^2 + V_0$. The constant $C$ encodes the initial condition. Every function of the form $10x - x^2 + C$ has the same derivative $10-2x$ — that is the whole family of antiderivatives, and the $+C$ is the mathematical trace of "which starting amount."',
+        },
+      ],
+      conclusion: 'This example makes the leap from "the definite integral is a number" to "the indefinite integral is a family of functions." The formula $A(x) = 10x - x^2$ is one member of that family — the one with $A(0) = 0$. Every member differs only in how full the tank was at $t=0$. Lesson 4 will build the full toolkit for finding antiderivatives of any rate function.',
     },
   ],
 
@@ -418,6 +499,35 @@ export default {
       answer: '18',
       hints: ['The area is a right triangle with base 6 and height v(6) = 6.', 'Area = ½ × 6 × 6 = 18.'],
       reviewSection: 'Intuition — Triangle area for linear velocity',
+    },
+    {
+      id: 'area-accum-q11',
+      type: 'choice',
+      text: 'The accumulation function \\(A(x) = \\int_0^x r(t)\\,dt\\) measures the total amount accumulated by time \\(x\\). Which of the following is true?',
+      options: [
+        '\\(A\'(x) = A(x)\\) — the accumulation function equals its own derivative',
+        '\\(A\'(x) = r(x)\\) — the derivative of the running total is the current rate',
+        '\\(A\'(x) = \\int_0^x r\'(t)\\,dt\\) — you differentiate inside the integral',
+        '\\(A\'(x) = r(0)\\) — the derivative equals the initial rate',
+      ],
+      answer: '\\(A\'(x) = r(x)\\) — the derivative of the running total is the current rate',
+      hints: [
+        'Think physically: if water is entering at rate $r(x)$ right now, how fast is the total volume growing at this moment?',
+        'The rate of change of accumulated amount equals the current rate. This is FTC Part 1.',
+      ],
+      reviewSection: 'Math — Accumulation function and FTC Part 1',
+    },
+    {
+      id: 'area-accum-q12',
+      type: 'input',
+      text: 'The water tank from Example 2 has inflow rate \\(r(t) = 10 - 2t\\) L/min. The antiderivative is \\(F(t) = 10t - t^2\\). Use the FTC formula \\(\\int_a^b r(t)\\,dt = F(b) - F(a)\\) to compute \\(\\int_0^5 (10-2t)\\,dt\\).',
+      answer: '25',
+      hints: [
+        'Compute $F(5) = 10(5) - 5^2 = 50 - 25 = 25$.',
+        'Compute $F(0) = 10(0) - 0^2 = 0$.',
+        'Answer: $F(5) - F(0) = 25 - 0 = 25$.',
+      ],
+      reviewSection: 'Math — FTC Part 2 preview (evaluating via antiderivatives)',
     },
   ],
 }
