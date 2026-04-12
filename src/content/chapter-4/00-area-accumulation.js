@@ -9,7 +9,7 @@ export default {
   tags: ['accumulation', 'area under curve', 'rate functions', 'signed area', 'integral notation', 'velocity', 'displacement', 'net change'],
 
   hook: {
-    question: 'A factory pump pushes water into a tank at a rate that varies over time: r(t) = 20 − 3t litres per minute. How much total water enters the tank over the first 6 minutes? You cannot simply multiply rate × time because the rate is changing at every moment. Yet the answer is completely determined by the function r(t). How do we find it?',
+    question: 'A factory pump pushes water into a tank at a rate that varies over time: r(t) = 20 − 3t litres per minute.\nHow much total water enters the tank over the first 6 minutes?\nYou cannot simply multiply rate × time because the rate is changing at every moment.\n Yet the answer is completely determined by the function r(t).\nHow do we find it?',
     realWorldContext: 'Accumulation from a varying rate is everywhere in science and engineering. Your electricity meter integrates power (watts) over time to give energy consumed (watt-hours) — every utility bill is an integral. GPS odometers integrate velocity to compute distance traveled. Medical devices integrate blood flow rate to compute total volume delivered. Climate scientists integrate CO₂ emission rates over decades to compute total atmospheric accumulation. A rocket\'s fuel consumption rate is a function of time; total fuel burned is the integral of that rate. Wherever a quantity builds up continuously from a rate that changes, the integral is the tool that computes the total.',
     previewVisualizationId: 'WaterTank',
   },
