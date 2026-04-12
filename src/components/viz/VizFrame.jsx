@@ -15,7 +15,9 @@ const VIZ_REGISTRY = {
   CNCDialectTable: lazy(() => import("./cnc/CNCDialectTable.jsx")),
   CNCHistoryTimeline: lazy(() => import("./cnc/CNCHistoryTimeline.jsx")),
   CNCMachineTypes: lazy(() => import("./cnc/CNCMachineTypes.jsx")),
-  LinearInterpolationViz: lazy(() => import("./cnc/LinearInterpolationViz.jsx")),
+  LinearInterpolationViz: lazy(
+    () => import("./cnc/LinearInterpolationViz.jsx"),
+  ),
   GitLab: lazy(() => import("./git/GitLab.jsx")),
   VideoCarousel: lazy(() => import("./react/VideoCarousel.jsx")),
   NumberLine: lazy(() => import("./d3/NumberLine.jsx")),
@@ -122,18 +124,18 @@ const VIZ_REGISTRY = {
   IntegrationMethodLab: lazy(() => import("./d3/IntegrationMethodLab.jsx")),
   // ── Chapter Review Boards (end-of-chapter summary + bridge panels) ─────────
   // Order: Ch2–Ch6 map to project chapters 1–6 (OpenStax Calc Vol 1 numbering)
-  Ch1Review: lazy(() => import("./react/Ch1Review.jsx")),  // Functions & Graphs (Ch0 prereq review)
-  Ch2Review: lazy(() => import("./react/Ch2Review.jsx")),  // Limits & Continuity  → chapter-1
-  Ch3Review: lazy(() => import("./react/Ch3Review.jsx")),  // Derivatives          → chapter-2
-  Ch4Review: lazy(() => import("./react/Ch4Review.jsx")),  // Applications (Optim) → chapter-3
-  Ch5Review: lazy(() => import("./react/Ch5Review.jsx")),  // Integration          → chapter-4
-  Ch6Review: lazy(() => import("./react/Ch6Review.jsx")),  // Applications of Int  → chapter-5/6
+  Ch1Review: lazy(() => import("./react/Ch1Review.jsx")), // Functions & Graphs (Ch0 prereq review)
+  Ch2Review: lazy(() => import("./react/Ch2Review.jsx")), // Limits & Continuity  → chapter-1
+  Ch3Review: lazy(() => import("./react/Ch3Review.jsx")), // Derivatives          → chapter-2
+  Ch4Review: lazy(() => import("./react/Ch4Review.jsx")), // Applications (Optim) → chapter-3
+  Ch5Review: lazy(() => import("./react/Ch5Review.jsx")), // Integration          → chapter-4
+  Ch6Review: lazy(() => import("./react/Ch6Review.jsx")), // Applications of Int  → chapter-5/6
   // ── Chapter Applied Problem Sets (real-world capstone beside each review) ──
-  Ch1Applied: lazy(() => import("./react/Ch1Applied.jsx")),  // Domain, composition, demand
-  Ch2Applied: lazy(() => import("./react/Ch2Applied.jsx")),  // Drug clearance, avg cost, continuity
-  Ch3Applied: lazy(() => import("./react/Ch3Applied.jsx")),  // Marginal analysis, motion, rates
-  Ch4Applied: lazy(() => import("./react/Ch4Applied.jsx")),  // Box, cylinder, 5-step optimisation
-  Ch5Applied: lazy(() => import("./react/Ch5Applied.jsx")),  // Series applications (Taylor bounds, etc.)
+  Ch1Applied: lazy(() => import("./react/Ch1Applied.jsx")), // Domain, composition, demand
+  Ch2Applied: lazy(() => import("./react/Ch2Applied.jsx")), // Drug clearance, avg cost, continuity
+  Ch3Applied: lazy(() => import("./react/Ch3Applied.jsx")), // Marginal analysis, motion, rates
+  Ch4Applied: lazy(() => import("./react/Ch4Applied.jsx")), // Box, cylinder, 5-step optimisation
+  Ch5Applied: lazy(() => import("./react/Ch5Applied.jsx")), // Series applications (Taylor bounds, etc.)
   // Physics — Interactive Simulations (Matter.js / canvas)
   ForceBlockSim: lazy(() => import("./matter/ForceBlockSim.jsx")),
   InclinedPlaneSim: lazy(() => import("./matter/InclinedPlaneSim.jsx")),
@@ -164,48 +166,90 @@ const VIZ_REGISTRY = {
   // Web Development Module
   WebLesson01_DOMTree: lazy(() => import("./react/WebLesson01_DOMTree.jsx")),
   WebLesson02_HTML: lazy(() => import("./react/WebLesson02_HTML.jsx")),
-  WebLesson03_CSSCascade: lazy(() => import("./react/WebLesson03_CSSCascade.jsx")),
+  WebLesson03_CSSCascade: lazy(
+    () => import("./react/WebLesson03_CSSCascade.jsx"),
+  ),
   WebLesson04_Layout: lazy(() => import("./react/WebLesson04_Layout.jsx")),
-  WebLesson05_Variables: lazy(() => import("./react/WebLesson05_Variables.jsx")),
-  WebLesson06_Functions: lazy(() => import("./react/WebLesson06_Functions.jsx")),
+  WebLesson05_Variables: lazy(
+    () => import("./react/WebLesson05_Variables.jsx"),
+  ),
+  WebLesson06_Functions: lazy(
+    () => import("./react/WebLesson06_Functions.jsx"),
+  ),
   WebLesson07_Events: lazy(() => import("./react/WebLesson07_Events.jsx")),
   WebLesson08_DOM: lazy(() => import("./react/WebLesson08_DOM.jsx")),
-  WebLesson09_EventLoop: lazy(() => import("./react/WebLesson09_EventLoop.jsx")),
+  WebLesson09_EventLoop: lazy(
+    () => import("./react/WebLesson09_EventLoop.jsx"),
+  ),
   WebLesson10_Async: lazy(() => import("./react/WebLesson10_Async.jsx")),
   WebLesson11_StateUI: lazy(() => import("./react/WebLesson11_StateUI.jsx")),
-  WebLesson12_Components: lazy(() => import("./react/WebLesson12_Components.jsx")),
+  WebLesson12_Components: lazy(
+    () => import("./react/WebLesson12_Components.jsx"),
+  ),
   WebLesson13_Reactive: lazy(() => import("./react/WebLesson13_Reactive.jsx")),
   WebLesson14_APIs: lazy(() => import("./react/WebLesson14_APIs.jsx")),
-  WebLesson15_StateAsync: lazy(() => import("./react/WebLesson15_StateAsync.jsx")),
-  WebLesson16_Performance: lazy(() => import("./react/WebLesson16_Performance.jsx")),
-  WebLesson17_Abstraction: lazy(() => import("./react/WebLesson17_Abstraction.jsx")),
-  WebLesson18_Architecture: lazy(() => import("./react/WebLesson18_Architecture.jsx")),
+  WebLesson15_StateAsync: lazy(
+    () => import("./react/WebLesson15_StateAsync.jsx"),
+  ),
+  WebLesson16_Performance: lazy(
+    () => import("./react/WebLesson16_Performance.jsx"),
+  ),
+  WebLesson17_Abstraction: lazy(
+    () => import("./react/WebLesson17_Abstraction.jsx"),
+  ),
+  WebLesson18_Architecture: lazy(
+    () => import("./react/WebLesson18_Architecture.jsx"),
+  ),
   WebLesson19_Capstone: lazy(() => import("./react/WebLesson19_Capstone.jsx")),
   // Linear Algebra Module
   LALesson01_Vectors: lazy(() => import("./react/LALesson01_Vectors.jsx")),
-  LALesson02_Combinations: lazy(() => import("./react/LALesson02_Combinations.jsx")),
+  LALesson02_Combinations: lazy(
+    () => import("./react/LALesson02_Combinations.jsx"),
+  ),
   LALesson03_DotCross: lazy(() => import("./react/LALesson03_DotCross.jsx")),
   LALesson04_Matrices: lazy(() => import("./react/LALesson04_Matrices.jsx")),
-  LALesson05_MatrixMult: lazy(() => import("./react/LALesson05_MatrixMult.jsx")),
+  LALesson05_MatrixMult: lazy(
+    () => import("./react/LALesson05_MatrixMult.jsx"),
+  ),
   LALesson06_Inverses: lazy(() => import("./react/LALesson06_Inverses.jsx")),
   LALesson07_NullSpace: lazy(() => import("./react/LALesson07_NullSpace.jsx")),
   LALesson08_Eigen: lazy(() => import("./react/LALesson08_Eigen.jsx")),
-  LALesson09_Diagonalization: lazy(() => import("./react/LALesson09_Diagonalization.jsx")),
-  LALesson10_ComplexEigen: lazy(() => import("./react/LALesson10_ComplexEigen.jsx")),
-  LALesson11_OrthogonalProjections: lazy(() => import("./react/LALesson11_OrthogonalProjectionsFull.jsx")),
+  LALesson09_Diagonalization: lazy(
+    () => import("./react/LALesson09_Diagonalization.jsx"),
+  ),
+  LALesson10_ComplexEigen: lazy(
+    () => import("./react/LALesson10_ComplexEigen.jsx"),
+  ),
+  LALesson11_OrthogonalProjections: lazy(
+    () => import("./react/LALesson11_OrthogonalProjectionsFull.jsx"),
+  ),
   LALesson12_SVD: lazy(() => import("./react/LALesson12_SVD.jsx")),
   // Linear Algebra secondary vizzes
-  MagnitudeAndDirectionViz: lazy(() => import("./react/MagnitudeAndDirectionViz.jsx")),
+  MagnitudeAndDirectionViz: lazy(
+    () => import("./react/MagnitudeAndDirectionViz.jsx"),
+  ),
   LinearDependenceViz: lazy(() => import("./react/LinearDependenceViz.jsx")),
   CrossProductViz: lazy(() => import("./react/CrossProductViz.jsx")),
-  GaussianEliminationStepper: lazy(() => import("./react/GaussianEliminationStepper.jsx")),
-  CharacteristicPolynomialViz: lazy(() => import("./react/CharacteristicPolynomialViz.jsx")),
-  DiagonalizationStepperViz: lazy(() => import("./react/DiagonalizationStepperViz.jsx")),
-  ComplexPlaneEigenvalueViz: lazy(() => import("./react/ComplexPlaneEigenvalueViz.jsx")),
+  GaussianEliminationStepper: lazy(
+    () => import("./react/GaussianEliminationStepper.jsx"),
+  ),
+  CharacteristicPolynomialViz: lazy(
+    () => import("./react/CharacteristicPolynomialViz.jsx"),
+  ),
+  DiagonalizationStepperViz: lazy(
+    () => import("./react/DiagonalizationStepperViz.jsx"),
+  ),
+  ComplexPlaneEigenvalueViz: lazy(
+    () => import("./react/ComplexPlaneEigenvalueViz.jsx"),
+  ),
   ProjectionMatrixViz: lazy(() => import("./react/ProjectionMatrixViz.jsx")),
   QRDecompositionViz: lazy(() => import("./react/QRDecompositionViz.jsx")),
-  LeastSquaresProjectionViz: lazy(() => import("./react/LeastSquaresProjectionViz.jsx")),
-  LowRankApproximationViz: lazy(() => import("./react/LowRankApproximationViz.jsx")),
+  LeastSquaresProjectionViz: lazy(
+    () => import("./react/LeastSquaresProjectionViz.jsx"),
+  ),
+  LowRankApproximationViz: lazy(
+    () => import("./react/LowRankApproximationViz.jsx"),
+  ),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
@@ -216,7 +260,9 @@ const VIZ_REGISTRY = {
   // Digital Fundamentals lessons
   AnalogVsDigital: lazy(() => import("./react/AnalogVsDigital.jsx")),
   BinaryAndWaveforms: lazy(() => import("./react/BinaryAndWaveforms.jsx")),
-  DF_L3_1_ANDORNOTGates: lazy(() => import("./react/DF_L3_1_ANDORNOTGates.jsx")),
+  DF_L3_1_ANDORNOTGates: lazy(
+    () => import("./react/DF_L3_1_ANDORNOTGates.jsx"),
+  ),
   JS1_DomIntro: lazy(() => import("./react/JS1_DomIntro.jsx")),
   // Chapter 2 — Additions
   DualGraphSync: lazy(() => import("./react/DualGraphSync.jsx")),
@@ -230,10 +276,16 @@ const VIZ_REGISTRY = {
   Ch2_6_EchoProblem: lazy(() => import("./react/Ch2_6_EchoProblem.jsx")),
   Ch3_1_HowFastWasIt: lazy(() => import("./react/Ch3_1_HowFastWasIt.jsx")),
   Ch3_2_GettingCloser: lazy(() => import("./react/Ch3_2_GettingCloser.jsx")),
-  Ch3_3_InfiniteStaircase: lazy(() => import("./react/Ch3_3_InfiniteStaircase.jsx")),
-  Ch3_4_SineOfAlmostNothing: lazy(() => import("./react/Ch3_4_SineOfAlmostNothing.jsx")),
+  Ch3_3_InfiniteStaircase: lazy(
+    () => import("./react/Ch3_3_InfiniteStaircase.jsx"),
+  ),
+  Ch3_4_SineOfAlmostNothing: lazy(
+    () => import("./react/Ch3_4_SineOfAlmostNothing.jsx"),
+  ),
   Ch3_5_BrokenFunction: lazy(() => import("./react/Ch3_5_BrokenFunction.jsx")),
-  Ch3_6_BridgeToCalculus: lazy(() => import("./react/Ch3_6_BridgeToCalculus.jsx")),
+  Ch3_6_BridgeToCalculus: lazy(
+    () => import("./react/Ch3_6_BridgeToCalculus.jsx"),
+  ),
   PascalsTriangle: lazy(() => import("./react/PascalsTriangle.jsx")),
   // Chapter 4 — Volumes of Revolution
   VolumesOfRevolution: lazy(() => import("./d3/VolumesOfRevolution.jsx")),
@@ -274,6 +326,14 @@ const VIZ_REGISTRY = {
   TruthTableBuilderDemo: lazy(
     () => import("./react/TruthTableBuilderDemo.jsx"),
   ),
+  TruthTableViz: lazy(() => import("./react/TruthTableViz.jsx")),
+  LogicConnectiveBuilder: lazy(
+    () => import("./react/LogicConnectiveBuilder.jsx"),
+  ),
+  ImplicationExplorer: lazy(() => import("./react/ImplicationExplorer.jsx")),
+  DeMorganViz: lazy(() => import("./react/DeMorganViz.jsx")),
+  QuantifierExplorer: lazy(() => import("./react/QuantifierExplorer.jsx")),
+  ProofStrategyChooser: lazy(() => import("./react/ProofStrategyChooser.jsx")),
   DiscreteDependencyMap: lazy(
     () => import("./react/DiscreteDependencyMap.jsx"),
   ),
@@ -292,6 +352,13 @@ const VIZ_REGISTRY = {
   ),
   VennDiagram: lazy(() => import("./react/VennDiagram.jsx")),
   QuantifierGridLab: lazy(() => import("./react/QuantifierGridLab.jsx")),
+  InductionFailureViz: lazy(() => import("./react/InductionFailureViz.jsx")),
+  DominoInductionLab: lazy(() => import("./react/DominoInductionLab.jsx")),
+  RecursionTreeViz: lazy(() => import("./react/RecursionTreeViz.jsx")),
+  StrongInductionPuzzle: lazy(
+    () => import("./react/StrongInductionPuzzle.jsx"),
+  ),
+  RecursionStackViz: lazy(() => import("./react/RecursionStackViz.jsx")),
   BipartiteQuantifierViz: lazy(
     () => import("./react/BipartiteQuantifierViz.jsx"),
   ),
@@ -825,8 +892,12 @@ const VIZ_REGISTRY = {
   ),
   VideoLauncher: lazy(() => import("./react/VideoLauncher.jsx")),
   // Chapter 3 — Applications of Derivatives (self-contained lesson components)
-  HigherOrderDerivatives: lazy(() => import("./react/HigherOrderDerivatives.jsx")),
-  DerivativesRatesOfChange: lazy(() => import("./react/DerivativesRatesOfChange.jsx")),
+  HigherOrderDerivatives: lazy(
+    () => import("./react/HigherOrderDerivatives.jsx"),
+  ),
+  DerivativesRatesOfChange: lazy(
+    () => import("./react/DerivativesRatesOfChange.jsx"),
+  ),
   MotionAlongLine: lazy(() => import("./react/MotionAlongLine.jsx")),
   MaximaMinima: lazy(() => import("./react/MaximaMinima.jsx")),
   ImplicitDiffReal: lazy(() => import("./react/ImplicitDiffReal.jsx")),
@@ -837,28 +908,42 @@ const VIZ_REGISTRY = {
   G1_1_FivePostulates: lazy(() => import("./geometry/G1_1_FivePostulates.jsx")),
   G1_2_AnglesAtAPoint: lazy(() => import("./geometry/G1_2_AnglesAtAPoint.jsx")),
   G1_3_ParallelLines: lazy(() => import("./geometry/G1_3_ParallelLines.jsx")),
-  G1_4_TriangleAngleSum: lazy(() => import("./geometry/G1_4_TriangleAngleSum.jsx")),
+  G1_4_TriangleAngleSum: lazy(
+    () => import("./geometry/G1_4_TriangleAngleSum.jsx"),
+  ),
   G1_5_Congruence: lazy(() => import("./geometry/G1_5_Congruence.jsx")),
   G1_6_Pythagorean: lazy(() => import("./geometry/G1_6_Pythagorean.jsx")),
 
   // Geometry Book 2
-  G2_1_CircleTheorems1: lazy(() => import("./geometry/G2_1_CircleTheorems1.jsx")),
-  G2_2_CircleTheorems2: lazy(() => import("./geometry/G2_2_CircleTheorems2.jsx")),
+  G2_1_CircleTheorems1: lazy(
+    () => import("./geometry/G2_1_CircleTheorems1.jsx"),
+  ),
+  G2_2_CircleTheorems2: lazy(
+    () => import("./geometry/G2_2_CircleTheorems2.jsx"),
+  ),
   G2_3_Constructions: lazy(() => import("./geometry/G2_3_Constructions.jsx")),
-  G2_4_SimilarTriangles: lazy(() => import("./geometry/G2_4_SimilarTriangles.jsx")),
+  G2_4_SimilarTriangles: lazy(
+    () => import("./geometry/G2_4_SimilarTriangles.jsx"),
+  ),
   G2_5_AreaFormulas: lazy(() => import("./geometry/G2_5_AreaFormulas.jsx")),
   G2_6_ArcSectorPi: lazy(() => import("./geometry/G2_6_ArcSectorPi.jsx")),
 
   // Geometry Book 3
-  G3_1_CoordinatePlane: lazy(() => import("./geometry/G3_1_CoordinatePlane.jsx")),
+  G3_1_CoordinatePlane: lazy(
+    () => import("./geometry/G3_1_CoordinatePlane.jsx"),
+  ),
   G3_2_LinesInPlane: lazy(() => import("./geometry/G3_2_LinesInPlane.jsx")),
   G3_3_CircleEquation: lazy(() => import("./geometry/G3_3_CircleEquation.jsx")),
-  G3_4_Transformations: lazy(() => import("./geometry/G3_4_Transformations.jsx")),
+  G3_4_Transformations: lazy(
+    () => import("./geometry/G3_4_Transformations.jsx"),
+  ),
   G3_5_ConicSections: lazy(() => import("./geometry/G3_5_ConicSections.jsx")),
   G3_6_Vectors: lazy(() => import("./geometry/G3_6_Vectors.jsx")),
 
   // Geometry Book 4
-  G4_1_PrismsCylinders: lazy(() => import("./geometry/G4_1_PrismsCylinders.jsx")),
+  G4_1_PrismsCylinders: lazy(
+    () => import("./geometry/G4_1_PrismsCylinders.jsx"),
+  ),
   G4_2_PyramidsCones: lazy(() => import("./geometry/G4_2_PyramidsCones.jsx")),
   G4_3_Sphere: lazy(() => import("./geometry/G4_3_Sphere.jsx")),
   G4_4_CrossSections: lazy(() => import("./geometry/G4_4_CrossSections.jsx")),
@@ -870,8 +955,8 @@ const VIZ_REGISTRY = {
   LogicSim: lazy(() => import("./react/LogicSim.jsx")),
 
   // ─── Chemistry ────────────────────────────────────────────────────────────
-  PeriodicTable:    lazy(() => import("./react/PeriodicTable.jsx")),
-  MoleculeBuilder:  lazy(() => import("./react/MoleculeBuilder.jsx")),
+  PeriodicTable: lazy(() => import("./react/PeriodicTable.jsx")),
+  MoleculeBuilder: lazy(() => import("./react/MoleculeBuilder.jsx")),
 
   // ─── Physics Chapter 3: Forces & Newton's Laws ───────────────────────────
   FBDIntuition: lazy(() => import("./react/FBDIntuition.jsx")),
@@ -888,38 +973,60 @@ const VIZ_REGISTRY = {
   // ─── Physics Chapter 4: Projectile & Circular Motion (additional) ────────
   ProjectileBasicsViz: lazy(() => import("./react/ProjectileBasicsViz.jsx")),
   WaveformViz: lazy(() => import("./react/WaveformViz.jsx")),
-  IndependenceIntuition: lazy(() => import("./react/IndependenceIntuition.jsx")),
-  IndependenceDerivation: lazy(() => import("./react/IndependenceDerivation.jsx")),
+  IndependenceIntuition: lazy(
+    () => import("./react/IndependenceIntuition.jsx"),
+  ),
+  IndependenceDerivation: lazy(
+    () => import("./react/IndependenceDerivation.jsx"),
+  ),
   TrajectoryDerivation: lazy(() => import("./react/TrajectoryDerivation.jsx")),
   MaxHeightViz: lazy(() => import("./react/MaxHeightViz.jsx")),
   MaxHeightDerivation: lazy(() => import("./react/MaxHeightDerivation.jsx")),
   RangeDerivation: lazy(() => import("./react/RangeDerivation.jsx")),
-  ProjectileExamplesViz: lazy(() => import("./react/ProjectileExamplesViz.jsx")),
+  ProjectileExamplesViz: lazy(
+    () => import("./react/ProjectileExamplesViz.jsx"),
+  ),
   ProjectileSymmetry: lazy(() => import("./react/ProjectileSymmetry.jsx")),
   CentripetalViz: lazy(() => import("./react/CentripetalViz.jsx")),
-  CentripetalDerivation: lazy(() => import("./react/CentripetalDerivation.jsx")),
-  CircularMotionDerivation: lazy(() => import("./react/CircularMotionDerivation.jsx")),
+  CentripetalDerivation: lazy(
+    () => import("./react/CentripetalDerivation.jsx"),
+  ),
+  CircularMotionDerivation: lazy(
+    () => import("./react/CircularMotionDerivation.jsx"),
+  ),
 
   // ─── Precalc / Algebra additional vizzes ─────────────────────────────────
-  SystemsOfEquationsGeometric: lazy(() => import("./react/SystemsOfEquationsGeometric.jsx")),
+  SystemsOfEquationsGeometric: lazy(
+    () => import("./react/SystemsOfEquationsGeometric.jsx"),
+  ),
   GramSchmidtProcess: lazy(() => import("./react/GramSchmidtProcess.jsx")),
   SecantLineViz: lazy(() => import("./react/SecantLineViz.jsx")),
   SymmetryViz: lazy(() => import("./react/SymmetryViz.jsx")),
-  InequalityGeometryViz: lazy(() => import("./react/InequalityGeometryViz.jsx")),
+  InequalityGeometryViz: lazy(
+    () => import("./react/InequalityGeometryViz.jsx"),
+  ),
   CeilingFunctionViz: lazy(() => import("./react/CeilingFunctionViz.jsx")),
   BlindChainRuleLab: lazy(() => import("./react/BlindChainRuleLab.jsx")),
   LeastSquaresFit: lazy(() => import("./react/LeastSquaresFit.jsx")),
 
   // ─── Discrete Math additional vizzes ─────────────────────────────────────
-  ProofStrategySelector: lazy(() => import("./react/ProofStrategySelector.jsx")),
-  QuantifierNegationPusher: lazy(() => import("./react/QuantifierNegationPusher.jsx")),
+  ProofStrategySelector: lazy(
+    () => import("./react/ProofStrategySelector.jsx"),
+  ),
+  QuantifierNegationPusher: lazy(
+    () => import("./react/QuantifierNegationPusher.jsx"),
+  ),
 };
 
 // Vizzes that work fine on a phone-sized screen
 const PHONE_OK = new Set([
-  'PythonNotebook', 'JSNotebook', 'ScienceNotebook',
-  'VideoEmbed', 'VideoCarousel', 'VideoLauncher',
-])
+  "PythonNotebook",
+  "JSNotebook",
+  "ScienceNotebook",
+  "VideoEmbed",
+  "VideoCarousel",
+  "VideoLauncher",
+]);
 
 function VizSkeleton() {
   return (
@@ -951,8 +1058,8 @@ export default function VizFrame({ id, initialProps = {}, title }) {
 
   useEffect(() => {
     const h = () => setIsPhone(window.innerWidth < 640);
-    window.addEventListener('resize', h);
-    return () => window.removeEventListener('resize', h);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
   }, []);
 
   if (!VizComponent) {
@@ -960,7 +1067,10 @@ export default function VizFrame({ id, initialProps = {}, title }) {
       return (
         <div className="my-4 rounded-lg border-2 border-dashed border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-4 text-center">
           <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">
-            ⚠ Unknown viz id: <span className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">{id}</span>
+            ⚠ Unknown viz id:{" "}
+            <span className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">
+              {id}
+            </span>
           </p>
           <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">
             Register it in VizFrame.jsx → VIZ_REGISTRY
@@ -978,8 +1088,12 @@ export default function VizFrame({ id, initialProps = {}, title }) {
       <div id={`viz-${id}`} className="viz-frame rounded-xl overflow-hidden">
         <div className="flex flex-col items-center justify-center py-8 px-4 text-center bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl">
           <span className="text-3xl mb-2">🖥️</span>
-          <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Desktop &amp; tablet only</p>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">This interactive works best on a larger screen</p>
+          <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
+            Desktop &amp; tablet only
+          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+            This interactive works best on a larger screen
+          </p>
         </div>
       </div>
     );
@@ -1038,7 +1152,9 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     >
       {/* ── Dev Mode Label — hidden until html.dev-mode is toggled via Shift+D ── */}
       <div className="dev-viz-label absolute top-0 left-0 z-[9999] items-center gap-1.5 px-2 py-1 rounded-br-lg rounded-tl-xl bg-amber-400 text-slate-900 pointer-events-none select-none">
-        <span className="text-[10px] font-black uppercase tracking-widest">VIZ</span>
+        <span className="text-[10px] font-black uppercase tracking-widest">
+          VIZ
+        </span>
         <span className="text-xs font-mono font-bold">{id}</span>
       </div>
       {title && (
