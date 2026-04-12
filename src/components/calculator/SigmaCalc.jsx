@@ -16,7 +16,8 @@ function safeEval(expr, vars) {
   if (!/^[\d\s+\-*/().Math,a-z_]+$/i.test(s)) return NaN;
   try {
     // eslint-disable-next-line no-new-func
-    return Function('"use strict"; return (' + s + ')')();
+    const result = Function('"use strict"; return (' + s + ')')();
+    return typeof result === 'number' ? result : NaN;
   } catch {
     return NaN;
   }
@@ -102,10 +103,16 @@ const PRESETS = [
 // ─── inner panel ──────────────────────────────────────────────────────────────
 function SigmaPanel({ dark }) {
   const [expr, setExpr]   = useState('i^2');
+  const [debouncedExpr, setDebouncedExpr] = useState('i^2');
   const [loStr, setLoStr] = useState('1');
   const [hiStr, setHiStr] = useState('n');
   const [nStr,  setNStr]  = useState('4');
   const [focus, setFocus] = useState(null); // highlighted term index
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedExpr(expr), 500);
+    return () => clearTimeout(id);
+  }, [expr]);
 
   const n   = parseInt(nStr, 10);
   const lo  = parseInt(loStr, 10);
@@ -123,26 +130,26 @@ function SigmaPanel({ dark }) {
            : 'bg-white border-slate-300 text-slate-800 focus:border-violet-400 placeholder:text-slate-400'}`;
 
   const terms = useMemo(() => {
-    if (!expr.trim() || isNaN(lo) || isNaN(n) || n < 1 || n > 50 || lo < 0 || lo > hiN) return [];
+    if (!debouncedExpr.trim() || isNaN(lo) || isNaN(n) || n < 1 || n > 50 || lo < 0 || lo > hiN) return [];
     const out = [];
     for (let i = lo; i <= hiN; i++) {
-      const val = safeEval(expr, { i, n });
+      const val = safeEval(debouncedExpr, { i, n });
       out.push({ i, val });
     }
     return out;
-  }, [expr, lo, hiN, n]);
+  }, [debouncedExpr, lo, hiN, n]);
 
   const total = useMemo(() => terms.reduce((s, t) => s + t.val, 0), [terms]);
   const closedForm = useMemo(
-    () => isNaN(n) ? null : matchClosedForm(expr, loStr, hi, n),
-    [expr, loStr, hi, n],
+    () => isNaN(n) ? null : matchClosedForm(debouncedExpr, loStr, hi, n),
+    [debouncedExpr, loStr, hi, n],
   );
   const hasError = terms.some((t) => isNaN(t.val));
   const maxAbs = Math.max(1, ...terms.map((t) => Math.abs(t.val)));
   const fmtVal = (v) => Number.isInteger(v) ? String(v) : v.toFixed(4);
 
   const sumLatex = `\\displaystyle\\sum_{i=${lo}}^{${hi === 'n' ? 'n' : hiN}} \\!\\left(${
-    expr.replace(/\*/g, '\\cdot ').replace(/\^(\d+)/g, '^{$1}')
+    debouncedExpr.replace(/\*/g, '\\cdot ').replace(/\^(\d+)/g, '^{$1}')
   }\\right) = ${fmtVal(total)}`;
 
   function applyPreset(p) {
