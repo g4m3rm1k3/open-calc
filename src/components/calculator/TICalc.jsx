@@ -17,7 +17,11 @@ function useIsDark() {
 // ─── Math utilities ───────────────────────────────────────────────────────────
 
 function buildScope(angleMode, ans, memory) {
-  const scope = { ans, Ans: ans, pi: Math.PI, e: Math.E, ...memory }
+  // Only spread numeric memory values; formula strings are kept separate
+  const numericMem = Object.fromEntries(
+    Object.entries(memory).filter(([, v]) => typeof v === 'number')
+  )
+  const scope = { ans, Ans: ans, pi: Math.PI, e: Math.E, ...numericMem }
   if (angleMode === 'DEG') {
     const d = Math.PI / 180
     scope.sin  = a => Math.sin(a * d)
@@ -258,11 +262,16 @@ export default function TICalc({ onClose }) {
   const [result, setResult]   = useState('')
   const [error, setError]     = useState('')
   const [history, setHistory] = useState([])
-  const [memory, setMemory]   = useState({})
+  const [memory, setMemory]     = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oc_memory') ?? '{}') } catch { return {} }
+  })  // { A: 5, B: 3.14, ... } — numbers only
+  const [formulas, setFormulas] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oc_formulas') ?? '{}') } catch { return {} }
+  })  // { f1: 'x^2-3x', f2: 'sin(x)', ... } — f1–f10 slots
   const [angleMode, setAngleMode] = useState('RAD')
   const [ans, setAns]         = useState(0)
   const [second, setSecond]   = useState(false)
-  const [stoMode, setStoMode] = useState(false)
+  const [stoMode, setStoMode] = useState(false)   // false | 'num' | 'formula'
   const [histIdx, setHistIdx] = useState(-1)
 
   // ── Graph tab state ──
@@ -319,6 +328,10 @@ export default function TICalc({ onClose }) {
     return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up) }
   }, [])
 
+  // ── Persist memory + formulas to localStorage ──
+  useEffect(() => { localStorage.setItem('oc_memory', JSON.stringify(memory)) }, [memory])
+  useEffect(() => { localStorage.setItem('oc_formulas', JSON.stringify(formulas)) }, [formulas])
+
   // ── Auto-focus input when on calc tab ──
   useEffect(() => {
     if (tab === 'calc' && inputRef.current) inputRef.current.focus()
@@ -369,21 +382,59 @@ export default function TICalc({ onClose }) {
 
   // ── Button press ──
   const press = useCallback((val) => {
-    if (stoMode) {
-      if (/^[A-Z]$/.test(val)) {
-        const n = parseFloat(result)
-        if (!isNaN(n)) setMemory(prev => ({ ...prev, [val]: n }))
+    // Handle STO mode: letter = store number, fN = store formula
+    if (stoMode === 'num' && /^[A-Z]$/.test(val)) {
+      // Evaluate current expr if present, otherwise fall back to ans
+      let storeVal = ans
+      if (expr.trim()) {
+        try {
+          const s = buildScope(angleMode, ans, memory)
+          const r = Number(calcEval(expr.trim(), s))
+          if (isFinite(r)) storeVal = r
+        } catch {}
+      }
+      if (isFinite(storeVal)) {
+        setMemory(prev => ({ ...prev, [val]: storeVal }))
+        setResult(fmtNum(storeVal))
+        setExpr('')
+        setHistIdx(-1)
       }
       setStoMode(false)
+      setTimeout(() => inputRef.current?.focus(), 20)
       return
     }
+    if (stoMode === 'formula' && /^f([1-9]|10)$/.test(val)) {
+      if (expr.trim()) {
+        setFormulas(prev => ({ ...prev, [val]: expr.trim() }))
+        setExpr('')
+        setResult('')
+      }
+      setStoMode(false)
+      setTimeout(() => inputRef.current?.focus(), 20)
+      return
+    }
+    if (stoMode) { setStoMode(false); return }  // Cancel on anything else
+
+    // f1-f10: load formula (when not in stoMode)
+    if (/^f([1-9]|10)$/.test(val)) {
+      if (formulas[val]) { setExpr(formulas[val]); setTimeout(() => inputRef.current?.focus(), 20) }
+      return
+    }
+
     setSecond(false)
+    // Operator after result seeds 'ans'
+    const OPS = ['+', '-', '×', '÷', '−', '*', '/', '^']
+    if (!expr.trim() && result && OPS.includes(val)) {
+      setExpr('ans' + val)
+      return
+    }
     switch (val) {
       case '=':      execute(); break
       case 'DEL':    setExpr(p => p.slice(0, -1)); break
-      case 'AC':     setExpr(''); setResult(''); setError(''); break
+      case 'AC':     setExpr(''); setResult(''); setError(''); setStoMode(false); break
       case 'ANS':    setExpr(p => p + 'ans'); break
-      case 'STO→':   setStoMode(true); break
+      case 'STO→':  setStoMode('num'); break
+      case 'STOƒ':  if (expr.trim()) setStoMode('formula'); break
       case '2ND':    setSecond(s => !s); return
       case 'π':      setExpr(p => p + 'pi'); break
       case 'ℇ':      setExpr(p => p + 'e'); break
@@ -392,6 +443,13 @@ export default function TICalc({ onClose }) {
       case 'eˣ':     setExpr(p => p + 'e^('); break
       case '1/x':    setExpr(p => p + '1/('); break
       case '(−)':    setExpr(p => p + '(-'); break
+      case ')': {
+        // Auto-balance: if no unmatched '(' in expr, insert '(' first
+        const open  = (expr.match(/\(/g) || []).length
+        const close = (expr.match(/\)/g) || []).length
+        setExpr(p => (open <= close ? p + '(' : p) + ')')
+        break
+      }
       // auto-open-paren functions
       default:
         if (['sin','cos','tan','asin','acos','atan','ln','log','sqrt','abs','floor','ceil','round'].includes(val)) {
@@ -400,7 +458,7 @@ export default function TICalc({ onClose }) {
           setExpr(p => p + val)
         }
     }
-  }, [stoMode, result, execute])
+  }, [stoMode, expr, result, execute, formulas])
 
   // ── History key navigation ──
   const handleInputKey = useCallback((e) => {
@@ -518,16 +576,44 @@ export default function TICalc({ onClose }) {
     )
   }
 
-  // STO mode — show A-Z pad
-  const stoOverlay = stoMode && (
-    <div className={`absolute inset-x-0 bottom-0 ${bg0} border-t ${bdr} p-3 z-10`}>
-      <p className={`text-[10px] font-bold ${muted} mb-2`}>Store {result || '(no result)'} to variable:</p>
-      <div className="grid grid-cols-9 gap-1">
-        {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l =>
-          mkBtn(l, 'fn', () => press(l))
-        )}
-        {mkBtn('Cancel', 'ctrl', () => setStoMode(false), 'col-span-8')}
-      </div>
+  // Letter rows for always-visible A-Z pad
+  const LETTER_ROWS = ['ABCDEFG', 'HIJKLMN', 'OPQRSTU', 'VWXYZ']
+  const renderLetterPad = () => (
+    <div className={`border-t ${bdr} pt-1 pb-0.5 px-2 ${bg2}`}>
+      {/* STO num mode banner */}
+      {stoMode === 'num' && (
+        <div className={`flex items-center justify-between mb-1 px-1 py-0.5 rounded-lg bg-teal-500/20`}>
+          <span className="text-[9px] font-bold text-teal-400">
+            ▶ Tap a letter to store {isFinite(ans) ? ans : '(calc first)'}
+          </span>
+          <button onMouseDown={e=>{e.preventDefault();setStoMode(false)}} className={`text-[9px] ${muted} hover:text-rose-400`}>✕</button>
+        </div>
+      )}
+      {LETTER_ROWS.map((row, ri) => (
+        <div key={ri} className="flex gap-0.5 mb-0.5 justify-center">
+          {row.split('').map(l => {
+            const hasNum = memory[l] !== undefined
+            const tip = hasNum ? `${l} = ${fmtNum(memory[l],5)} — click to insert` : l
+            return (
+              <button
+                key={l}
+                title={tip}
+                onMouseDown={e => { e.preventDefault(); press(l) }}
+                className={`flex-1 flex items-center justify-center rounded font-bold
+                  cursor-pointer active:scale-90 transition-all duration-75 text-[11px] leading-none
+                  ${stoMode === 'num' ? 'bg-indigo-500 hover:bg-indigo-400 text-white' :
+                    dark ? 'bg-[#30363d] hover:bg-[#3d444d] text-slate-200'
+                         : 'bg-slate-200 hover:bg-slate-300 text-slate-800'}
+                  ${hasNum ? 'ring-1 ring-teal-500' : ''}`}
+                style={{ minHeight: 28 }}
+              >
+                {l}
+                {hasNum && <span className="text-[6px] leading-none ml-px opacity-60">▴</span>}
+              </button>
+            )
+          })}
+        </div>
+      ))}
     </div>
   )
 
@@ -636,23 +722,72 @@ export default function TICalc({ onClose }) {
             </div>
           )}
 
-          {/* Memory readout */}
+          {/* Variables table */}
           {Object.keys(memory).length > 0 && (
-            <div className={`flex flex-wrap gap-x-3 gap-y-0.5 px-4 py-1.5 border-b ${bdr} ${bg0}`}>
-              {Object.entries(memory).map(([k, v]) => (
-                <span key={k}
-                  className="text-[10px] font-mono text-teal-400 cursor-pointer hover:text-teal-300"
-                  onClick={() => setExpr(p => p + k)}
-                  title={`Click to insert ${k}`}
-                >
-                  {k}={fmtNum(v, 5)}
-                </span>
-              ))}
+            <div className={`border-b ${bdr} ${bg0}`}>
+              <div className={`text-[8px] font-bold uppercase tracking-widest ${muted} px-3 pt-1.5 pb-0.5`}>Variables</div>
+              <table className="w-full text-[10px] font-mono">
+                <tbody>
+                  {Object.entries(memory).map(([k, v]) => (
+                    <tr key={k}
+                      className="cursor-pointer hover:bg-indigo-500/10"
+                      onClick={() => setExpr(p => p + k)}
+                      title={`Insert ${k}`}
+                    >
+                      <td className="text-teal-400 font-bold py-0.5 pl-3 pr-1 w-8">{k}</td>
+                      <td className={`text-right py-0.5 px-2 flex-1 ${txt}`}>{fmtNum(v, 8)}</td>
+                      <td className="py-0.5 pr-2 text-right w-6">
+                        <button
+                          onMouseDown={e => { e.preventDefault(); e.stopPropagation(); setMemory(prev => { const n={...prev}; delete n[k]; return n }) }}
+                          className={`${muted} hover:text-rose-400 leading-none`}
+                          title={`Delete ${k}`}
+                        >×</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Formulas table */}
+          {Object.keys(formulas).length > 0 && (
+            <div className={`border-b ${bdr} ${bg0}`}>
+              <div className={`text-[8px] font-bold uppercase tracking-widest ${muted} px-3 pt-1.5 pb-0.5`}>Formulas</div>
+              <table className="w-full text-[10px] font-mono">
+                <tbody>
+                  {['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10']
+                    .filter(k => formulas[k])
+                    .map(k => (
+                      <tr key={k} className="group">
+                        <td className="text-amber-400 font-bold py-0.5 pl-3 pr-1 w-8">{k}</td>
+                        <td className={`py-0.5 px-2 ${muted} max-w-0`}>
+                          <span className="block truncate">{formulas[k]}</span>
+                        </td>
+                        <td className="py-0.5 pr-1 text-right w-14">
+                          <span className="inline-flex gap-1 items-center">
+                            <button
+                              onMouseDown={e => { e.preventDefault(); setExpr(formulas[k]); setTimeout(()=>inputRef.current?.focus(),20) }}
+                              className="text-amber-400 hover:text-white"
+                              title={`Load ${k}`}
+                            >▶</button>
+                            <button
+                              onMouseDown={e => { e.preventDefault(); setFormulas(prev => { const n={...prev}; delete n[k]; return n }) }}
+                              className={`${muted} hover:text-rose-400`}
+                              title={`Delete ${k}`}
+                            >×</button>
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
             </div>
           )}
 
           {/* Button grid */}
-          <div className={`p-2 ${bg2} space-y-1`}>
+          <div className={`px-2 pt-2 pb-1 ${bg2} space-y-1`}>
             {/* Row 0: 2ND · DEL · AC · ( · ) */}
             <div className="grid grid-cols-5 gap-1">
               {mkBtn(second ? '2ND✓' : '2ND', second ? 'op' : 'mode', () => setSecond(s => !s))}
@@ -672,16 +807,16 @@ export default function TICalc({ onClose }) {
               {FN_ROW.map(([l, v]) => mkBtn(l, v, () => press(l)))}
             </div>
 
-            {/* Number/op rows */}
+            {/* Number rows: ops on right, + and − in column */}
             <div className="grid grid-cols-5 gap-1">
               {[
                 ['7','num'],['8','num'],['9','num'],['÷','op'],['^','op'],
-                ['4','num'],['5','num'],['6','num'],['×','op'],['ANS','mode'],
-                ['1','num'],['2','num'],['3','num'],['−','op'],['STO→','special'],
+                ['4','num'],['5','num'],['6','num'],['×','op'],['x²','fn'],
+                ['1','num'],['2','num'],['3','num'],['−','op'],['+','op'],
               ].map(([l, v]) => mkBtn(l, v, () => press(l)))}
             </div>
 
-            {/* Last row: 0 · . · + · ►Frac · = */}
+            {/* Bottom row: 0 · . · ANS · ►Frac · = */}
             <div className="grid grid-cols-6 gap-1">
               <button
                 onMouseDown={(e) => { e.preventDefault(); press('0') }}
@@ -691,7 +826,7 @@ export default function TICalc({ onClose }) {
                 style={{ minHeight: 34 }}
               >0</button>
               {mkBtn('.', 'num', () => press('.'))}
-              {mkBtn('+', 'op',  () => press('+'))}
+              {mkBtn('ANS', 'mode', () => press('ANS'))}
               {mkBtn('►Frac', 'special', handleFrac)}
               <button
                 onMouseDown={(e) => { e.preventDefault(); execute() }}
@@ -701,10 +836,46 @@ export default function TICalc({ onClose }) {
                 style={{ minHeight: 34 }}
               >=</button>
             </div>
+
+            {/* STO row */}
+            <div className="grid grid-cols-2 gap-1">
+              {mkBtn('STO→', stoMode === 'num' ? 'op' : 'special', () => press('STO→'))}
+              {mkBtn('STOƒ', stoMode === 'formula' ? 'fn' : 'special', () => press('STOƒ'))}
+            </div>
+
+            {/* f1–f5 / f6–f10 row */}
+            <div className="grid grid-cols-5 gap-1">
+              {(second
+                ? ['f6','f7','f8','f9','f10']
+                : ['f1','f2','f3','f4','f5']
+              ).map(fk => {
+                const stored = formulas[fk]
+                const isActive = stoMode === 'formula'
+                return (
+                  <button
+                    key={fk}
+                    onMouseDown={e => { e.preventDefault(); press(fk) }}
+                    title={stored ? (isActive ? `Save to ${fk}` : `Load: ${stored}`) : `Save to ${fk}`}
+                    className={`flex flex-col items-center justify-center rounded-lg font-bold cursor-pointer
+                      active:scale-90 transition-all duration-75 text-[10px] leading-tight
+                      ${isActive
+                        ? 'bg-amber-500 hover:bg-amber-400 text-white'
+                        : stored
+                          ? dark ? 'bg-amber-700/60 hover:bg-amber-600/80 text-amber-200' : 'bg-amber-100 hover:bg-amber-200 text-amber-800'
+                          : dark ? 'bg-[#30363d] hover:bg-[#3d444d] text-slate-500' : 'bg-slate-200 hover:bg-slate-300 text-slate-400'
+                      }`}
+                    style={{ minHeight: 34 }}
+                  >
+                    <span>{fk}</span>
+                    {stored && !isActive && <span className={`text-[7px] opacity-60 truncate w-full text-center px-0.5`}>{stored.length > 7 ? stored.slice(0,7)+'…' : stored}</span>}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
-          {/* STO overlay */}
-          {stoOverlay}
+          {/* Always-visible A–Z letter pad */}
+          {renderLetterPad()}
         </div>
       )}
 
