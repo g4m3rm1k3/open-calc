@@ -1,23 +1,17 @@
 /**
  * ScienceNotebook.jsx
- * Clean, no-code lesson viewer for science courses.
- * Based on JSNotebook but removes all editor UI.
+ * Clean lesson viewer for science / graphics courses.
  *
- * Visual cells (type:'js') auto-run on mount — student sees only the preview.
- * Challenge cells (type:'challenge') render question + answer options as
- * proper UI buttons inside the iframe — no code editing required.
- *
- * Lesson cell format differences from JSNotebook:
- *   - type:'js'        same html/css/startCode fields, runs silently on load
- *   - type:'markdown'  identical
- *   - type:'challenge' adds:
- *       options: [{ label:'A', text:'...' }, { label:'B', text:'...' }, ...]
- *       check: (selectedLabel) => boolean   ← receives 'A','B','C' not code
- *       (startCode/html/css still used to build the iframe background, but
- *        answer buttons are injected on top automatically)
+ * Cell types:
+ *   type:'js'          — auto-run canvas / animation preview (read-only)
+ *   type:'markdown'    — rich markdown prose
+ *   type:'challenge'   — multiple-choice question with A/B/C/D buttons
+ *   type:'coding'      — Monaco editor + Run + solutionCode reveal + check(code)→bool
+ *   type:'walkthrough' — numbered steps with a live preview the learner follows
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Editor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -430,6 +424,315 @@ function MarkdownCell({ cell, T }) {
   )
 }
 
+// ── Coding cell — Monaco editor + Run + check() ───────────────────────────────
+function CodingCell({ cell, cellIndex, T, dark, onPass }) {
+  const iframeRef = useRef(null)
+  const [code, setCode]         = useState(cell.startCode || '')
+  const [logs, setLogs]         = useState([])
+  const [hasRun, setHasRun]     = useState(false)
+  const [result, setResult]     = useState(null) // null | 'pass' | 'fail'
+  const [showSolution, setShowSolution] = useState(false)
+  const [showConsole, setShowConsole]   = useState(false)
+  const [height, setHeight]     = useState(cell.outputHeight || 220)
+  const manualRef = useRef(false)
+
+  // Console messages from iframe
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || e.data.type !== 'jsnb_console') return
+      if (e.data.cellIndex !== cellIndex) return
+      setLogs(prev => [...prev, { level: e.data.level, msg: e.data.msg }])
+      setShowConsole(true)
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [cellIndex])
+
+  // Auto-resize from iframe
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || e.data.type !== 'sn_resize') return
+      if (e.source !== iframeRef.current?.contentWindow) return
+      if (!manualRef.current) setHeight(Math.max(80, e.data.h + 4))
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
+  function startResize(e) {
+    e.preventDefault()
+    manualRef.current = true
+    const startY = e.clientY, startH = height
+    const onMove = (ev) => setHeight(Math.max(80, startH + ev.clientY - startY))
+    const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
+  const activeCode = showSolution ? (cell.solutionCode || code) : code
+
+  // Build an iframe doc that also pipes console to parent
+  function buildCodingDoc(html, css, js) {
+    const escaped = js.replace(/<\/script>/gi, '<\\/script>')
+    const iframeBg   = dark ? '#0f1923' : '#ffffff'
+    const iframeText = dark ? '#e2e8f0' : '#1e293b'
+    return `<!DOCTYPE html><html class="${dark?'dark':''}"><head><meta charset="utf-8">
+<style>:root{${iframeThemeVars(dark)}}*,*::before,*::after{box-sizing:border-box}
+body{margin:0;padding:14px;font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;background:${iframeBg};color:${iframeText}}
+${css || ''}</style></head><body>${html || ''}
+<script>
+window.__cellId='coding-${cellIndex}';
+(function(){
+  var _l=console.log.bind(console),_e=console.error.bind(console),_w=console.warn.bind(console);
+  function post(lv,args){var msg=args.map(function(a){try{return typeof a==='object'?JSON.stringify(a,null,2):String(a);}catch(_){return String(a);}}).join(' ');
+    window.parent.postMessage({type:'jsnb_console',level:lv,msg:msg,cellIndex:${cellIndex}},'*');}
+  console.log=function(){_l.apply(console,arguments);post('log',[].slice.call(arguments));};
+  console.error=function(){_e.apply(console,arguments);post('error',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(console,arguments);post('warn',[].slice.call(arguments));};
+  window.addEventListener('error',function(ev){if(ev.error)post('error',[ev.message]);ev.preventDefault();},true);
+})();
+try{(function(){\n${escaped}\n})();}catch(e){console.error('Error: '+e.message);}
+;(function(){function r(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}r();
+if(window.ResizeObserver){new ResizeObserver(r).observe(document.body)}else{window.addEventListener('load',r);
+}})();<\/script></body></html>`
+  }
+
+  const run = useCallback(() => {
+    setLogs([])
+    setHasRun(true)
+    setShowConsole(true)
+    if (iframeRef.current) {
+      iframeRef.current.srcdoc = buildCodingDoc(cell.html || '', cell.css || '', activeCode)
+    }
+    if (cell.check) {
+      try {
+        const passed = cell.check(activeCode)
+        setResult(passed ? 'pass' : 'fail')
+        if (passed && onPass) onPass(cellIndex)
+      } catch (_) { setResult('fail') }
+    }
+  }, [activeCode, cell, cellIndex, dark, onPass])
+
+  const reset = () => {
+    setCode(cell.startCode || '')
+    setLogs([])
+    setHasRun(false)
+    setResult(null)
+    setShowSolution(false)
+    if (iframeRef.current) iframeRef.current.srcdoc = ''
+  }
+
+  const lineCount = activeCode.split('\n').length
+  const editorH   = Math.min(400, Math.max(120, lineCount * 20 + 28))
+  const logColor  = { log: T.text, error: T.red, warn: T.yellow }
+  const logIcon   = { log: '>', error: '✗', warn: '⚠' }
+
+  const accentBorder = result === 'pass' ? T.greenBd : result === 'fail' ? T.redBd : T.accent
+
+  return (
+    <div style={{ marginBottom: 24, borderRadius: 12, border: `1.5px solid ${accentBorder}`, overflow: 'hidden', background: T.panel }}>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 18px', borderBottom:`1px solid ${T.border}`, background: T.panel2 }}>
+        <div style={{ width:26, height:26, borderRadius:'50%', background:T.accent+'22', border:`1.5px solid ${T.accent}`, color:T.accent, fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>✎</div>
+        <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.accent }}>Coding Challenge</span>
+        {result==='pass' && <span style={{ marginLeft:'auto', fontSize:11, color:T.green, fontWeight:600 }}>✓ Passed</span>}
+        {result==='fail' && <span style={{ marginLeft:'auto', fontSize:11, color:T.red }}>✗ Try again</span>}
+      </div>
+
+      {/* Instruction */}
+      {cell.instruction && (
+        <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}` }}>
+          <MDText text={cell.instruction} T={T} />
+        </div>
+      )}
+
+      {/* Preview pane */}
+      {hasRun && (
+        <div style={{ background: T.iframeBg, borderBottom:`1px solid ${T.border}` }}>
+          <div style={{ fontSize:9, fontWeight:700, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', padding:'6px 14px 0' }}>Output</div>
+          <iframe ref={iframeRef} sandbox="allow-scripts"
+            style={{ width:'100%', height, border:'none', display:'block' }}
+            title={`coding-${cellIndex}`}
+          />
+          <div onMouseDown={startResize} title="Drag to resize"
+            style={{ height:8, cursor:'ns-resize', background:T.border, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ width:32, height:3, borderRadius:2, background:T.muted, opacity:.5 }} />
+          </div>
+        </div>
+      )}
+
+      {/* Toolbar */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:T.panel2, borderBottom:`1px solid ${T.border}`, padding:'0 10px' }}>
+        <span style={{ fontSize:11, color:T.muted, fontFamily:'monospace' }}>JavaScript</span>
+        <div style={{ display:'flex', gap:6, padding:'6px 0' }}>
+          {cell.solutionCode && (
+            <button onClick={() => setShowSolution(s => !s)} style={{ padding:'4px 11px', borderRadius:6, border:`0.5px solid ${T.muted}`, background:'transparent', color:T.muted, fontSize:11, cursor:'pointer' }}>
+              {showSolution ? 'Hide solution' : 'Show solution'}
+            </button>
+          )}
+          <button onClick={reset} style={{ padding:'4px 11px', borderRadius:6, border:`0.5px solid ${T.border}`, background:'transparent', color:T.muted, fontSize:11, cursor:'pointer' }}>Reset</button>
+          <button onClick={run} style={{ padding:'5px 16px', borderRadius:6, border:'none', background:'#0ea5e9', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>▶ Run</button>
+        </div>
+      </div>
+
+      {/* Monaco editor */}
+      <div style={{ background: dark ? '#0c1222' : '#f8fafc' }}>
+        <Editor
+          key={`coding-${cellIndex}-${dark}`}
+          height={editorH}
+          language={cell.language || 'javascript'}
+          value={showSolution ? (cell.solutionCode || code) : code}
+          onChange={(val='') => { if (!showSolution) setCode(val) }}
+          theme={dark ? 'vs-dark' : 'light'}
+          options={{ fontSize:13, lineHeight:20, minimap:{enabled:false}, scrollBeyondLastLine:false, wordWrap:'on', tabSize:2, readOnly:showSolution, renderLineHighlight:'none', overviewRulerLanes:0, folding:false, lineDecorationsWidth:6, lineNumbersMinChars:3, padding:{top:10,bottom:10} }}
+        />
+      </div>
+
+      {/* Console */}
+      {showConsole && (
+        <div style={{ background:T.panel2, borderTop:`1px solid ${T.border}`, padding:'8px 14px', maxHeight:150, overflowY:'auto' }}>
+          <div style={{ fontSize:10, fontWeight:600, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', marginBottom:5 }}>Console</div>
+          {logs.length === 0
+            ? <div style={{ fontFamily:'monospace', fontSize:12, color:T.muted }}>Run the cell to see output.</div>
+            : logs.map((l,i) => <div key={i} style={{ fontFamily:'monospace', fontSize:12, color:logColor[l.level]||T.text, display:'flex', gap:8 }}><span style={{color:T.muted}}>{logIcon[l.level]}</span><span style={{wordBreak:'break-all'}}>{l.msg}</span></div>)
+          }
+        </div>
+      )}
+
+      {/* Feedback */}
+      {hasRun && result && (
+        <div style={{ padding:'10px 18px', borderTop:`1px solid ${T.border}`, fontSize:13, fontWeight:500,
+          background: result==='pass' ? T.greenBg : T.redBg,
+          color: result==='pass' ? T.green : T.red }}>
+          {result === 'pass' ? (cell.successMessage || '✓ Challenge complete!') : (cell.failMessage || '✗ Not quite — try again.')}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Walkthrough cell — numbered steps + read-only preview ─────────────────────
+function WalkthroughCell({ cell, cellIndex, T, dark }) {
+  const [step, setStep] = useState(0)
+  const iframeRef = useRef(null)
+  const [height, setHeight] = useState(cell.outputHeight || 280)
+  const manualRef = useRef(false)
+  const steps = cell.steps || []
+  const currentStep = steps[step] || {}
+
+  // Build cumulative code up to current step
+  const cumulativeCode = steps.slice(0, step + 1).map(s => s.code || '').join('\n')
+
+  useEffect(() => {
+    if (iframeRef.current) {
+      iframeRef.current.srcdoc = buildDoc(cell.html || '', cell.css || '', cumulativeCode, dark)
+    }
+  }, [step, dark])
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.data || e.data.type !== 'sn_resize') return
+      if (e.source !== iframeRef.current?.contentWindow) return
+      if (!manualRef.current) setHeight(Math.max(80, e.data.h + 4))
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [])
+
+  function startResize(e) {
+    e.preventDefault()
+    manualRef.current = true
+    const startY = e.clientY, startH = height
+    const onMove = (ev) => setHeight(Math.max(80, startH + ev.clientY - startY))
+    const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
+  return (
+    <div style={{ marginBottom: 24, borderRadius: 12, border:`1.5px solid ${T.accent}`, overflow:'hidden', background:T.panel }}>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 18px', borderBottom:`1px solid ${T.border}`, background:T.panel2 }}>
+        <div style={{ width:26, height:26, borderRadius:'50%', background:T.accent+'22', border:`1.5px solid ${T.accent}`, color:T.accent, fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>⟳</div>
+        <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.accent }}>Walkthrough</span>
+        <span style={{ marginLeft:'auto', fontSize:11, color:T.muted }}>Step {step+1} of {steps.length}</span>
+      </div>
+
+      {/* Top prose instruction */}
+      {cell.instruction && (
+        <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}` }}>
+          <MDText text={cell.instruction} T={T} />
+        </div>
+      )}
+
+      <div style={{ display:'flex', gap:0, minHeight:400 }}>
+        {/* Step list sidebar */}
+        <div style={{ width:220, borderRight:`1px solid ${T.border}`, background:T.panel2, padding:'10px 0', flexShrink:0 }}>
+          {steps.map((s, i) => (
+            <button key={i} onClick={() => setStep(i)} style={{
+              display:'flex', alignItems:'flex-start', gap:10, width:'100%', padding:'10px 14px',
+              background: i===step ? T.accent+'18' : 'transparent',
+              borderLeft: i===step ? `3px solid ${T.accent}` : '3px solid transparent',
+              border:'none', borderRight:'none', borderTop:'none', borderBottom:'none',
+              cursor:'pointer', textAlign:'left',
+            }}>
+              <span style={{ width:20, height:20, borderRadius:'50%', background:i<=step?T.accent:T.border, color:i<=step?'#fff':T.muted, fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+                {i < step ? '✓' : i+1}
+              </span>
+              <span style={{ fontSize:11, color:i===step?T.accent:T.muted, fontWeight:i===step?600:400, lineHeight:1.4 }}>{s.title || `Step ${i+1}`}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Right panel: explanation + code snippet + preview */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+          {/* Step explanation */}
+          <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}` }}>
+            {currentStep.title && <div style={{ fontSize:13, fontWeight:700, color:T.accent, marginBottom:8 }}>{currentStep.title}</div>}
+            {currentStep.explanation && <MDText text={currentStep.explanation} T={T} />}
+          </div>
+
+          {/* Code snippet (read-only, syntax highlighted) */}
+          {currentStep.code && (
+            <div style={{ background:dark?'#0c1222':'#f8fafc', borderBottom:`1px solid ${T.border}` }}>
+              <div style={{ fontSize:9, fontWeight:700, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', padding:'6px 14px 0' }}>New code this step</div>
+              <Editor
+                key={`wt-${cellIndex}-${step}-${dark}`}
+                height={Math.min(300, Math.max(60, (currentStep.code.split('\n').length)*20+20))}
+                language={cell.language || 'javascript'}
+                value={currentStep.code}
+                theme={dark ? 'vs-dark' : 'light'}
+                options={{ readOnly:true, fontSize:12, lineHeight:19, minimap:{enabled:false}, scrollBeyondLastLine:false, wordWrap:'on', renderLineHighlight:'none', overviewRulerLanes:0, folding:false, lineDecorationsWidth:6, lineNumbersMinChars:3, padding:{top:8,bottom:8}, domReadOnly:true }}
+              />
+            </div>
+          )}
+
+          {/* Live preview of cumulative code */}
+          <div style={{ background:T.iframeBg, flex:1 }}>
+            <div style={{ fontSize:9, fontWeight:700, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', padding:'6px 14px 2px' }}>Live result (cumulative)</div>
+            <iframe ref={iframeRef} sandbox="allow-scripts"
+              style={{ width:'100%', height, border:'none', display:'block' }}
+              title={`walkthrough-${cellIndex}`}
+            />
+            <div onMouseDown={startResize} title="Drag to resize"
+              style={{ height:8, cursor:'ns-resize', background:T.border, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ width:32, height:3, borderRadius:2, background:T.muted, opacity:.5 }} />
+            </div>
+          </div>
+
+          {/* Prev / Next */}
+          <div style={{ display:'flex', gap:8, padding:'10px 16px', borderTop:`1px solid ${T.border}`, background:T.panel2 }}>
+            <button onClick={() => setStep(s => Math.max(0,s-1))} disabled={step===0}
+              style={{ padding:'5px 16px', borderRadius:6, border:`1px solid ${T.border}`, background:'transparent', color:step===0?T.muted:T.text, cursor:step===0?'default':'pointer', fontSize:12 }}>← Prev</button>
+            <button onClick={() => setStep(s => Math.min(steps.length-1,s+1))} disabled={step===steps.length-1}
+              style={{ padding:'5px 16px', borderRadius:6, border:'none', background:step===steps.length-1?T.border:'#0ea5e9', color:step===steps.length-1?T.muted:'#fff', cursor:step===steps.length-1?'default':'pointer', fontSize:12, fontWeight:600 }}>Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Progress bar ──────────────────────────────────────────────────────────────
 function ProgressBar({ cells, passedSet, T }) {
   const visualCells    = cells.filter(c => c.type !== 'markdown').length
@@ -490,13 +793,11 @@ export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
 
       {/* Cells */}
       {cells.map((cell, i) => {
-        if (cell.type === 'markdown') {
-          return <MarkdownCell key={i} cell={cell} T={T} />
-        }
-        if (cell.type === 'challenge') {
-          return <ChallengeCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
-        }
-        // type:'js' and anything else = visual cell
+        if (cell.type === 'markdown')    return <MarkdownCell key={i} cell={cell} T={T} />
+        if (cell.type === 'challenge')   return <ChallengeCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
+        if (cell.type === 'coding')      return <CodingCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
+        if (cell.type === 'walkthrough') return <WalkthroughCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} />
+        // type:'js' and anything else = auto-run visual preview
         return <VisualCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} />
       })}
     </div>

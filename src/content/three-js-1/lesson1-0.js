@@ -115,6 +115,67 @@ update();`,
       outputHeight: 300,
     },
 
+    // ── Cell 3b: Walkthrough — build a resize-aware render loop ───────────────
+    {
+      type: 'walkthrough',
+      instruction: `### Build a Production WebGL Setup — Step by Step\n\nWork through 4 steps to build a complete, resize-aware, animated WebGL canvas. Each step shows the new code added and updates the live canvas on the right.`,
+      html: `<canvas id="cv" style="display:block;width:100%;height:100%"></canvas>`,
+      css: `body{margin:0;background:#0a0f1e;overflow:hidden}`,
+      outputHeight: 280,
+      steps: [
+        {
+          title: 'Step 1 — Get the context & set size',
+          explanation: `Open the WebGL bridge and size the canvas to fill its container.\n\n\`canvas.getContext('webgl2')\` creates the GPU connection. We then set \`canvas.width/height\` to the window's dimensions so the drawing surface matches the CSS layout area, and issue a first clear to paint the background.`,
+          code: `var canvas = document.getElementById('cv');
+var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+gl.viewport(0, 0, canvas.width, canvas.height);
+gl.clearColor(0.05, 0.08, 0.15, 1.0);
+gl.clear(gl.COLOR_BUFFER_BIT);`,
+        },
+        {
+          title: 'Step 2 — Handle resize',
+          explanation: `When the window resizes, the CSS layout updates but the drawing surface (canvas.width / canvas.height) stays the same. We listen, update both, and re-call gl.viewport() to match.\n\nWithout this your scene renders into a stale rectangle and gets stretched or clipped.`,
+          code: `window.addEventListener('resize', function() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+});`,
+        },
+        {
+          title: 'Step 3 — The render loop with deltaTime',
+          explanation: `\`requestAnimationFrame\` fires before each screen repaint (~60x/sec). The callback receives a high-resolution timestamp.\n\n\`dt\` = elapsed time in seconds. Multiplying movement by \`dt\` makes animations frame-rate independent — the same speed at 30 Hz or 144 Hz.`,
+          code: `var prevTime = 0;
+var angle = 0;
+function loop(now) {
+  var dt = prevTime > 0 ? Math.min((now - prevTime) / 1000, 0.05) : 0.016;
+  prevTime = now;
+  angle += dt * 90;
+  gl.clearColor(
+    0.05 + 0.04 * Math.sin(angle * 0.017),
+    0.08,
+    0.15 + 0.08 * Math.cos(angle * 0.013),
+    1.0
+  );
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);`,
+        },
+        {
+          title: 'Step 4 — Add devicePixelRatio',
+          explanation: `On Retina/4K screens, \`devicePixelRatio >= 2\`. Rendering at CSS pixel resolution and scaling up causes blur.\n\nMultiply canvas dimensions by DPR for the physical drawing surface; keep CSS size at 1x. Pass physical pixels to \`gl.viewport()\`.\n\nThis is exactly what \`renderer.setPixelRatio(window.devicePixelRatio)\` does in Three.js.`,
+          code: `var dpr = window.devicePixelRatio || 1;
+canvas.width  = window.innerWidth  * dpr;
+canvas.height = window.innerHeight * dpr;
+canvas.style.width  = window.innerWidth  + 'px';
+canvas.style.height = window.innerHeight + 'px';
+gl.viewport(0, 0, canvas.width, canvas.height);`,
+        },
+      ],
+    },
+
     // ── Cell 4: The Render Loop ───────────────────────────────────────────────
     {
       type: 'markdown',
@@ -382,6 +443,63 @@ document.getElementById('sl-zoom').oninput = function() {
       css: `body{margin:0;padding:0}`,
       startCode: '',
       outputHeight: 300,
+    },
+
+    // ── Cell 10: Coding Challenge — write the full animated render loop ────────
+    {
+      type: 'coding',
+      instruction: `### 🎯 Challenge: Write the Animated Render Loop\n\nComplete the three \`// TODO\` lines to build a working animated WebGL canvas.\n\n**Requirements:**\n1. Call \`gl.clearColor()\` with values that **change over time** using \`Math.sin(t)\` or \`Math.cos(t)\`\n2. Call \`gl.clear(gl.COLOR_BUFFER_BIT)\` to wipe the frame\n3. Call \`requestAnimationFrame(loop)\` to keep the animation running\n\nThe check passes when all three are present.`,
+      html: `<canvas id="cv" width="560" height="300" style="display:block;width:100%;border-radius:8px"></canvas>`,
+      css: `body{margin:0;background:#0a0f1e;padding:10px}`,
+      startCode: `var canvas = document.getElementById('cv');
+var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+var startTime = performance.now();
+
+function loop(now) {
+  var t = (now - startTime) / 1000;  // time in seconds
+
+  // TODO 1: gl.clearColor() — use Math.sin(t) or Math.cos(t) so the colour animates
+  //         Tip: Math.sin(t) * 0.5 + 0.5 maps the -1..1 range to 0..1
+
+  // TODO 2: gl.clear() — clear the colour buffer each frame
+
+  // TODO 3: requestAnimationFrame — keep the loop running
+}
+
+requestAnimationFrame(loop);`,
+      solutionCode: `var canvas = document.getElementById('cv');
+var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+var startTime = performance.now();
+
+function loop(now) {
+  var t = (now - startTime) / 1000;
+
+  gl.clearColor(
+    Math.sin(t * 0.7) * 0.5 + 0.5,
+    Math.sin(t * 0.4 + 2.0) * 0.3 + 0.2,
+    Math.cos(t * 0.5) * 0.5 + 0.5,
+    1.0
+  );
+
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);`,
+      check: (code) => {
+        const hasRAF   = /requestAnimationFrame/.test(code)
+        const hasClear = /gl\.clear\s*\(/.test(code)
+        const hasAnim  = /Math\.(sin|cos)/.test(code)
+        return hasRAF && hasClear && hasAnim
+      },
+      successMessage: '✓ Animated render loop complete! Your canvas runs at ~60fps with an animated colour driven by elapsed time. This pattern — requestAnimationFrame → clear → draw → repeat — is the heartbeat of every Three.js scene.',
+      failMessage: 'Check all three TODOs: 1) gl.clearColor(...Math.sin(t)...) 2) gl.clear(gl.COLOR_BUFFER_BIT) 3) requestAnimationFrame(loop) inside the loop function.',
+      outputHeight: 320,
     },
 
   ],
