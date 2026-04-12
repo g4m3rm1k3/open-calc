@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'Seismologists read earthquake waves from time-series graphs. Doctors read heart rhythms from ECGs. Engineers read stress vs. time from structural monitoring. Physicists read particle trajectories from detector readouts. In all of these: understanding what slopes and areas mean is the fundamental skill. This lesson makes you fluent in the visual language of physics.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'xt-vt-graphs' },
   },
 
   intuition: {

@@ -73,6 +73,7 @@ const VIZ_REGISTRY = {
   // Chapter 1 — Physics examples
   ShrinkingInterval: lazy(() => import("./d3/ShrinkingInterval.jsx")),
   // Chapter 2 — Physics examples
+  DisplacementVsDistance: lazy(() => import("./d3/DisplacementVsDistance.jsx")),
   VerticalThrow: lazy(() => import("./d3/VerticalThrow.jsx")),
   // PhysicsNext — Projectile & circular motion
   AngledLaunchIntuition: lazy(

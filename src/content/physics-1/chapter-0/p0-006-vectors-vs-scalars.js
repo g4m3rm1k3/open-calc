@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'Airplane navigation uses vectors for velocity — direction and speed both matter. Structural engineers use force vectors — the direction of a force determines whether a beam holds or buckles. GPS systems compute displacement vectors. Projectile motion, Newton\'s laws, electric fields, magnetic forces — all vectors. In Chapter 1 of this course you will add force vectors to determine net force on objects. This lesson is the foundation for all of that.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-components' },
   },
 
   intuition: {
@@ -67,20 +68,27 @@ export default {
     ],
     visualizations: [
       {
+        id: 'VectorBuilder',
+        title: 'Drag the tip — watch vx, vy, magnitude, and angle update live',
+        mathBridge:
+          'Drag the blue dot (the tip of the vector) anywhere on the grid. Watch: vx is the horizontal reach, vy is the vertical reach. The magnitude |v| is the straight-line distance from origin to tip — always longer than either component alone. The angle is measured from the +x axis. Now test: drag the tip straight right → vy = 0, |v| = vx. Drag it straight up → vx = 0, |v| = vy. Drag diagonally at 45° → vx = vy, |v| = √2 × vx. These are not formulas — they are geometry you can see.',
+        caption: 'Every vector is just two perpendicular scalars. The right triangle connecting them is always there.',
+      },
+      {
         id: 'SVGDiagram',
         props: { type: 'vector-components' },
-        title: 'Vector component decomposition — the right-triangle picture',
+        title: 'Component decomposition — the algebra behind the triangle',
         mathBridge:
-          'A vector \\(\\vec{A}\\) at angle θ above the x-axis forms a right triangle. The horizontal leg is A_x = A·cosθ. The vertical leg is A_y = A·sinθ.The hypotenuse is |A|.This is not a formula to memorize — it is just trigonometry (opposite = hyp·sinθ, adjacent = hyp·cosθ).',
-        caption: 'Every 2D vector = two scalars (components). The right triangle connects them.',
+          'A vector \\(\\vec{A}\\) at angle θ above the x-axis forms a right triangle. The horizontal leg is A_x = A·cosθ. The vertical leg is A_y = A·sinθ. The hypotenuse is |A|. This is not a formula to memorize — it is just trigonometry (opposite = hyp·sinθ, adjacent = hyp·cosθ).',
+        caption: 'The decomposition formulas are the component drill: A_x = A cosθ, A_y = A sinθ.',
       },
       {
         id: 'SVGDiagram',
         props: { type: 'vector-addition-chain' },
         title: 'Head-to-tail vector addition',
         mathBridge:
-          'To add three vectors: place the second arrow at the tip of the first,the third at the tip of the second. The resultant goes from the tail of the first to the tip of the last. Alternatively: add all x-components and all y-components separately.',
-        caption: 'Head-to-tail addition = tip-to-tail addition. The resultant closes the polygon.',
+          'To add three vectors: place the second arrow at the tip of the first, the third at the tip of the second. The resultant goes from the tail of the first to the tip of the last. Alternatively: add all x-components and all y-components separately — same answer, less drawing.',
+        caption: 'Head-to-tail addition closes the polygon. The resultant is the shortcut from start to finish.',
       },
     ],
   },

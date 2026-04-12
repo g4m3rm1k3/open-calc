@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'Orbital mechanics, electromagnetic fields, fluid dynamics, thermodynamics, quantum mechanics — none of these use constant acceleration. All of them use differential equations. The transition from algebra to calculus is the transition from toy problemsto the full power of physics. But here is the key insight: calculus is not a replacement for algebra. It is algebra extended — the same rules, applied to infinitely small changes. If you understand algebra deeply, calculus will feel natural.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'kinematic-chain' },
   },
 
   intuition: {
@@ -67,20 +68,17 @@ export default {
     ],
     visualizations: [
       {
-        id: 'SVGDiagram',
-        props: { type: 'kinematic-chain' },
-        title: 'The full kinematic chain — differentiate right, integrate left',
-        mathBridge:
-          'This diagram shows the complete connection. Going right (d/dt): differentiate position to get velocity; differentiate velocity to get acceleration. Going left (∫ dt): integrate acceleration to get velocity; integrate velocity to get position. The SUVAT equations are what you get when you do these integrals with a = constant.',
-        caption: 'Every kinematics problem is a navigation problem on this chain.',
+        id: 'PositionVelocityAcceleration',
+        title: 'Constant vs variable acceleration — see why SUVAT fails',
+        mathBridge: 'Use the "Braking" preset: the acceleration graph is a flat horizontal line (constant a = −2 m/s²). This is exactly when SUVAT works — constant a means v(t) is linear and x(t) is a parabola, matching SUVAT equations 1 and 3 exactly. Now switch to "Smooth cruise": the acceleration is a sine wave, constantly changing. The x-t and v-t curves are no longer simple shapes. SUVAT cannot describe this — you need to integrate a(t) directly. That is calculus. This is the dividing line: constant a → algebra (SUVAT). Variable a → calculus.',
+        caption: 'Braking: flat a(t) → SUVAT works. Smooth cruise: wavy a(t) → must use ∫a dt. The shape of the bottom graph tells you which tool to reach for.',
       },
       {
         id: 'SVGDiagram',
-        props: { type: 'slope-triangle' },
-        title: 'Derivative as shrinking secant — the limit we\'ve been building toward',
-        mathBridge:
-          'This is the seventh time you\'ve seen a version of this picture. Lesson 4 introduced the secant/tangent idea. This lesson names it: the limit of the secant slope IS the derivative dx/dt. Chapter 1 will compute it formally.',
-        caption: 'You already know what a derivative is. Chapter 1 gives you the formula.',
+        props: { type: 'kinematic-chain' },
+        title: 'The kinematic chain — algebra vs calculus on the same diagram',
+        mathBridge: 'The arrows tell the full story. Going right (d/dt): this is calculus — differentiate x(t) to get v(t), differentiate v(t) to get a(t). These always work, for any motion. Going left (∫ dt): integrate a(t) to get v(t), integrate v(t) to get x(t). When a is constant, these integrals give the SUVAT equations. When a varies, the integrals still work — but they give different, more complex functions. Same chain, same operations, different difficulty.',
+        caption: 'SUVAT is the special case of this chain where a = constant. Calculus is the general case.',
       },
     ],
   },

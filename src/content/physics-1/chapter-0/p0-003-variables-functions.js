@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'GPS systems track your position as a function of time. Heart monitors track voltage as a function of time. Weather models predict temperature as a function of location and time. The stock market is price as a function of time. Every time something *changes*, physics describes it with a function. Understanding what x(t) means is not algebra for its own sake — it is the key to reading every physics equation you will ever encounter.',
     previewVisualizationId: 'FunctionPlotter',
+    previewVisualizationProps: { expression: '0.5*9.8*x*x', xMin: 0, xMax: 3, label: 'x(t) = ½·9.8·t²' },
   },
 
   intuition: {

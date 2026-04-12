@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'Every speedometer in every car reads instantaneous speed, not average speed. Every radar speed gun measures instantaneous speed. Traffic tickets are issued based on instantaneous speed. But calculating instantaneous speed from a position-time record requires a mathematical ideathat took humanity 2,000 years to develop: the limit. This lesson is where algebra ends and calculus begins.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'slope-triangle' },
   },
 
   intuition: {
@@ -59,20 +60,17 @@ export default {
     ],
     visualizations: [
       {
-        id: 'SVGDiagram',
-        props: { type: 'slope-triangle' },
-        title: 'Secant approaches tangent as Δt shrinks',
-        mathBridge:
-          'Look at the diagram. The red secant line connects two points on the x–t curve. Its slope is the average velocity over Δt. Now imagine moving the right point closer to the left — Δt gets smaller. The secant rotates. As Δt → 0, it approaches a fixed limiting direction: the tangent. That tangent\'s slope is the instantaneous velocity.',
-        caption: 'Average velocity = slope of secant. Instantaneous velocity = slope of tangent = limit as Δt → 0.',
+        id: 'SecantToTangent',
+        title: 'Drag Δt to zero — watch average velocity become instantaneous velocity',
+        mathBridge: 'The purple curve is x(t). The orange line is the secant connecting x(t₀) and x(t₀ + h). Its slope is the average velocity over the interval h. Drag the "interval h" slider toward zero. Watch the secant rotate and collapse onto the tangent line. The moment h = 0, the secant IS the tangent — and its slope is the instantaneous velocity at that point. You just watched the limit happen. This is not a formula trick — it is a geometric fact about curves.',
+        caption: 'Slider h = Δt. As h → 0, the secant slope (average velocity) converges to the tangent slope (instantaneous velocity). This convergence IS the derivative.',
       },
       {
         id: 'SVGDiagram',
         props: { type: 'algebra-avg-velocity' },
-        title: 'Δx/Δt — two labeled points on the x–t graph',
-        mathBridge:
-          'Read off the rise (Δx) and run (Δt) from the graph. The slope Δx/Δt is the average velocity between the two times. For free fall x = ½gt², pick two times and compute this ratio — then compare to the formula.',
-        caption: 'Average velocity over any interval is readable directly from the x–t graph.',
+        title: 'Average velocity: Δx/Δt as rise over run',
+        mathBridge: 'Before the limit: average velocity is just rise/run on the x–t graph. Pick any two points, read off Δx (rise) and Δt (run), divide. This diagram shows that computation explicitly with labeled values. The secant above shows what happens when you shrink this interval to zero.',
+        caption: 'Average velocity = Δx/Δt = rise/run. This is the slope of the secant between two points on the x–t graph.',
       },
     ],
   },

@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'GPS uses a coordinate system where (0,0,0) is the Earth\'s center. Aviation uses a system where altitude is measured up from sea level. Video game physics engines use y-down coordinates (screen coordinates). Structural engineers use a coordinate system aligned with the beam. The coordinate system is a choice — but once chosen, every equation in the problem must use it consistently. Most physics errors in beginning students come not from the wrong equationbut from inconsistent sign conventions within the same problem.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'free-fall-axes' },
   },
 
   intuition: {

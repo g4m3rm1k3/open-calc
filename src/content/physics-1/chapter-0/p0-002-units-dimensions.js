@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       `Units are not administrative overhead. They are physical reality encoded in mathematics. Every number in physics is incomplete without a unit — "9.8" means nothing; "9.8 m/s²" is a specific claim about the universe. Dimensional analysis — tracking units through every calculation — is the single fastest way to find algebra errors, check whether an equation could possibly be right, and convert between measurement systems. Engineers, physicists, chemists, and pharmacists all use it daily. You will use it in every chapter of this course.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'dimensions-equation' },
   },
 
   intuition: {
@@ -66,6 +67,13 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'UnitValidator',
+        title: 'Build a dimensionally valid equation — click to compose',
+        mathBridge:
+          'Choose a target dimension on the left (e.g. [L] for length). Then click dimension tokens on the right to build the right-hand side. The checker tells you whether your combination is physically valid. Try: [L] = [L]/[T] × [T] — that is displacement = velocity × time. Try: [L] = [L] alone. Try adding [M] to [L] — notice that\'s rejected. You cannot add apples to oranges, and you cannot add meters to kilograms.',
+        caption: 'Dimensional analysis is the first sanity check on every physics equation.',
+      },
       {
         id: 'SVGDiagram',
         props: { type: 'dimensions-equation' },
