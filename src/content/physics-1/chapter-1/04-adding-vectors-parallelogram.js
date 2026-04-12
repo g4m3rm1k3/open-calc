@@ -12,6 +12,7 @@ export default {
     question: `Two forces pull on a boat — one northeast, one northwest. What single force replaces them both?`,
     realWorldContext: `Every time two forces act simultaneously — a kite in the wind, a ship fighting a current, a joint in a truss — you need to find their combined effect. The parallelogram method is the oldest and most visual way to do that.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-addition-chain' },
   },
 
   videos: [

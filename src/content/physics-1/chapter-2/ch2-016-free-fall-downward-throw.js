@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       "Drop tests and impact estimation often include nonzero initial downward speed.",
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'free-fall-axes' },
   },
   intuition: {
     prose: [
@@ -56,6 +57,7 @@ export default {
     visualizations: [
       {
         id: 'SVGDiagram',
+        props: { type: 'suvat-map' },
         title: "Solve landing state",
         mathBridge:
           "Solve unknown time or impact speed from known height and initial velocity.",
@@ -66,6 +68,7 @@ export default {
   rigor: {
     prose: ["The equations are identical to upward launch; only signs differ."],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-fall-axes' },
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

@@ -16,6 +16,7 @@ export default {
     realWorldContext:
       `Every 3D rendering engine, robotics controller, and physics simulation that deals with rotation, surface orientation, or magnetic forces needs to compute cross products from raw components. The determinant expansion is the formula those systems use. It looks intimidating at first — a 3×3 grid of numbers with alternating signs — but there is a completely regular pattern that you can learn to execute flawlessly in under a minute once you've practiced it a few times. This lesson is dedicated to mastering that calculation: reading components in, applying the pattern, and reading the perpendicular vector out.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'cross-product-rhr' },
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────

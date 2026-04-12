@@ -75,6 +75,7 @@ export default {
       "Coordinate transforms preserve solutions if all terms transform consistently.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-fall-axes' },
     proofSteps: [
       {
         expression: "x'=-x,\\,v'=-v,\\,a'=-a",

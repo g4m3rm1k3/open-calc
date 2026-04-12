@@ -124,6 +124,7 @@ export default {
       "For x(t) = tⁿ, the derivative is directly computable from the definition using the binomial theorem: [x(t+h)−x(t)]/h = [(t+h)ⁿ − tⁿ]/h = ntⁿ⁻¹ + terms in h. As h → 0, only the first term survives, giving x'(t) = ntⁿ⁻¹. This is the power rule, proved from first principles. Differentiation rules (product, chain, quotient) are all theorems derived from this limit definition.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'slope-triangle' },
     proofSteps: [
       {
         expression:

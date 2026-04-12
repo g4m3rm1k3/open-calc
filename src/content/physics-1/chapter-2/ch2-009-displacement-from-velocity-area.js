@@ -117,6 +117,7 @@ export default {
       "The FTC Part 1 gives the inverse direction: if A(t) = ∫_{t₀}^{t} v(τ) dτ (accumulated area from t₀ to t), then dA/dt = v(t). The rate of change of accumulated displacement is velocity. This is obvious physically: the 'area counter' grows at rate v(t) at each moment, exactly as expected.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'algebra-trapezoid' },
     proofSteps: [
       {
         expression: "v(t) = \\frac{dx}{dt}",

@@ -12,6 +12,7 @@ export default {
     question: `A ball moves from velocity 4 m/s east to 3 m/s north. What is the change in velocity — and why is it not simply 1 m/s?`,
     realWorldContext: `Acceleration is defined as change in velocity: $\\vec{a} = \\Delta\\vec{v}/\\Delta t = (\\vec{v}_f - \\vec{v}_i)/\\Delta t$. Every acceleration, every force diagram, every relative velocity problem uses vector subtraction. Getting the direction of $\\vec{A} - \\vec{B}$ wrong is one of the most common physics errors.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-addition-chain' },
   },
 
   videos: [

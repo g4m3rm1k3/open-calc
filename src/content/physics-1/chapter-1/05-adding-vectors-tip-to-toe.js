@@ -12,6 +12,7 @@ export default {
     question: `You walk 3 km east, then 4 km north, then 2 km at 30°. What single displacement takes you from start to finish?`,
     realWorldContext: `Navigation, animation rigs, robot arm kinematics — any time you chain a sequence of moves, you need the tip-to-toe method. It scales to any number of vectors, unlike the parallelogram which only handles two at a time.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-addition-chain' },
   },
 
   videos: [

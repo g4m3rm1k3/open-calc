@@ -64,6 +64,7 @@ export default {
       "Meeting problems are root-finding tasks on the difference function f(t)=x1(t)-x2(t).",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'two-objects-line' },
     proofSteps: [
       { expression: "x_1(t)-x_2(t)=0", annotation: "Meeting condition." },
       {

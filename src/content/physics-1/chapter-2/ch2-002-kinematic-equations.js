@@ -45,6 +45,7 @@ export const ch2_002 = {
     prose: ['All five equations follow from two fundamental relations: $v = v_0 + at$ and $\\Delta x = v_0 t + \\frac{1}{2}at^2$. The other three are algebraic rearrangements.'],
     callouts: [{ type: 'insight', title: 'Only two are independent', body: 'Equations 1 and 3 are the two primary equations. Equations 2, 4, and 5 are derived by combining them. You only ever need to memorise two.' }],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'suvat-map' },
     proofSteps: [
       { expression: 'a = \\text{const} \\implies v(t) = v_0 + at', annotation: 'Integrate constant acceleration. This is equation 1.' },
       { expression: '\\Delta x = \\int_0^t v\\,dt = v_0t + \\tfrac{1}{2}at^2', annotation: 'Integrate velocity. This is equation 3.' },

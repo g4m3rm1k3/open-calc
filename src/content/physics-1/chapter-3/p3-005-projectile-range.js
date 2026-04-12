@@ -85,6 +85,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'projectile-arc' },
     proofSteps: [
       {
         title: 'Set y = 0 (landing condition)',

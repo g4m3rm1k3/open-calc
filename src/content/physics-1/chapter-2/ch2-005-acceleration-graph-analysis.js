@@ -113,6 +113,7 @@ export default {
       "For constant acceleration a, the double integration produces SUVAT exactly: v(t) = v₀ + at (integrate a), then x(t) = x₀ + ∫(v₀ + at)dt = x₀ + v₀t + ½at² (integrate v). The kinematic equations are not empirical rules — they are antiderivatives of the constant-acceleration definition. Every SUVAT equation is a theorem in calculus.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'kinematic-chain' },
     proofSteps: [
       {
         expression: "a(t) = \\frac{dv}{dt}",

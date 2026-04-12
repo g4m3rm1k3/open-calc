@@ -100,6 +100,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'two-objects-line' },
     proofSteps: [
       {
         expression: "x_A(t)=x_{A0}+v_A t,\\quad x_B(t)=x_{B0}+v_B t",

@@ -127,6 +127,7 @@ export default {
       "For a formal derivation, Riemann sums make the connection explicit: divide [t₁, t₂] into n equal subintervals of width Δt. On each subinterval, approximate velocity as constant at v(tₖ). Displacement contribution from each piece ≈ v(tₖ)·Δt. Total displacement ≈ Σ v(tₖ)Δt. As n → ∞ (Δt → 0), this Riemann sum converges to the definite integral ∫v dt. This is exactly how integrals are defined in Calculus Chapter 4.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'riemann-rect' },
     proofSteps: [
       {
         expression: "a(t) = \\frac{dv}{dt}",

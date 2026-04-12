@@ -55,6 +55,7 @@ export default {
       "Every selected equation traces back to the constant-acceleration derivation.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'suvat-map' },
     proofSteps: [
       { expression: "v=v_0+at", annotation: "Primary equation." },
       {

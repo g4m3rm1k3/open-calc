@@ -92,6 +92,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'circular-motion' },
     proofSteps: [
       {
         title: 'Arc length formula',

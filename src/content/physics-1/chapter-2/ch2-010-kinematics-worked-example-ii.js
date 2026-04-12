@@ -58,6 +58,7 @@ export default {
       "Correct solving is constrained by equation domain assumptions (constant acceleration).",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'suvat-map' },
     proofSteps: [
       { expression: "a=\\text{const}", annotation: "Required precondition." },
       { expression: "v=v_0+at", annotation: "Linear velocity evolution." },

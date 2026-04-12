@@ -65,6 +65,7 @@ export default {
       "Piecewise integration yields continuous state trajectories when boundary conditions are enforced.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'xt-vt-graphs' },
     proofSteps: [
       {
         expression: "x_1(t),v_1(t)\\text{ on phase 1}",

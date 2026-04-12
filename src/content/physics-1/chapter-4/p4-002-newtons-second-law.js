@@ -117,6 +117,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'kinematic-chain' },
     proofSteps: [
       {
         title: 'State the Second Law',

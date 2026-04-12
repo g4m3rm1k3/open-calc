@@ -15,6 +15,7 @@ export default {
     question: `You open three different physics textbooks. One writes $\\vec{F}$, one writes $\\mathbf{F}$, one writes $F_x\\hat{i} + F_y\\hat{j}$. Are they talking about the same thing?`,
     realWorldContext: `Physics uses several notational systems for vectors — each invented for a different context. Handwriting uses arrows, print uses bold, engineering uses unit-vector notation. Not knowing the equivalences leads to confusion on every exam and in every textbook.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-components' },
   },
 
   // ── YouTube ─────────────────────────────────────────────────────────────

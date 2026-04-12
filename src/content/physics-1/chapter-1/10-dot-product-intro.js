@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       `This is the core question behind the concept of **work** in physics. Only the component of force in the direction of motion does useful work. If you push perpendicular to the motion, you do zero work — no matter how hard you push. The dot product is the mathematical tool that extracts exactly this "component in a given direction." It appears in work ($W = \\vec{F}\\cdot\\vec{d}$), power ($P = \\vec{F}\\cdot\\vec{v}$), electric potential, magnetic flux, and almost every other "how much overlap is there?" question in physics.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'dot-product-projection' },
   },
 
   videos: [{

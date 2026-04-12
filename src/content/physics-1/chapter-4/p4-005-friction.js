@@ -107,6 +107,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-body-diagram' },
     proofSteps: [
       {
         title: 'Identify the regime',

@@ -15,6 +15,7 @@ export default {
     question: `A ball is kicked at 20 m/s at 35° above the ground. How fast is it moving horizontally? How fast vertically? You cannot answer either question without decomposing the vector.`,
     realWorldContext: `Every projectile problem, every incline problem, every force analysis in physics begins with the same move: split the vector into horizontal and vertical pieces. Components are the fundamental tool of applied physics.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-components' },
   },
 
   // ── YouTube ───────────────────────────────────────────────────────────────

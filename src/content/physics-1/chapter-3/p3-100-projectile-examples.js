@@ -80,6 +80,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'projectile-arc' },
     proofSteps: [
       {
         title: 'Write final vertical velocity at t_land',

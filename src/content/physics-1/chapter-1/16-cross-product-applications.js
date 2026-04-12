@@ -16,6 +16,7 @@ export default {
     realWorldContext:
       `They all involve a force or momentum that acts at an angle to a pivot, and the physical effect depends critically on BOTH the magnitude of that force AND the geometry of where it's applied. A door closes faster when you push far from the hinge, not near it. A magnetic compass needle swings because the magnetic force on moving charges acts perpendicular to both the velocity and the field. A spinning top precesses because gravity's torque acts perpendicular to the angular momentum. In every case, the answer is a cross product: $\\vec{\\tau}=\\vec{r}\\times\\vec{F}$, $\\vec{F}=q\\vec{v}\\times\\vec{B}$, $\\vec{L}=\\vec{r}\\times\\vec{p}$. These aren't abstract formulas — they're the three most important equations in classical mechanics and electromagnetism, and they all share the same mathematical structure.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'cross-product-rhr' },
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────

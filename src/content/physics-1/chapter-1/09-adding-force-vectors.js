@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       `This is the central calculation of structural engineering. Every bridge truss, every crane cable, every airplane in level flight is held in equilibrium by forces that vector-cancel to exactly zero. The moment that cancellation fails, the structure accelerates — or fails. Learning to add force vectors numerically gives you the single most powerful tool in applied physics.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'free-body-diagram' },
   },
 
   videos: [{

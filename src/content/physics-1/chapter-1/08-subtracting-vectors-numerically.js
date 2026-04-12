@@ -12,6 +12,7 @@ export default {
     question: `Force A⃗ = 60 N at 20° and force B⃗ = 45 N at 110°. What is A⃗ − B⃗ exactly?`,
     realWorldContext: `Relative velocity, net force, change in momentum — all are vector differences. The graphical method gives a rough answer. The numerical method gives the exact one. DSMD with negation handles every case.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-addition-chain' },
   },
 
   videos: [

@@ -12,6 +12,7 @@ export default {
     question: `Two forces: 40 N at 30° and 25 N at 145°. Graphical methods give only an estimate. How do you get the exact answer?`,
     realWorldContext: `Every real engineering calculation — bridge loads, satellite trajectories, robot forces — requires exact vector addition. The numerical (component) method is the workhorse: decompose, sum, reconstruct. Four steps, always works.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-addition-chain' },
   },
 
   videos: [

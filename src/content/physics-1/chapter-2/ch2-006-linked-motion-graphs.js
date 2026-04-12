@@ -110,6 +110,7 @@ export default {
       "The uniqueness of the reconstruction (given initial conditions) follows from the uniqueness theorem for antiderivatives: if two functions have the same derivative everywhere, they differ by at most a constant. So there is exactly one velocity function consistent with a given acceleration function AND a given v₀.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'xt-vt-graphs' },
     proofSteps: [
       {
         expression: "v(t) = \\frac{dx}{dt}",

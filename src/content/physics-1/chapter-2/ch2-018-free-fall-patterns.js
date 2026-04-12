@@ -80,6 +80,7 @@ export default {
       "Classification criteria come from the qualitative behavior of the governing equations.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-fall-axes' },
     proofSteps: [
       {
         expression: "a=-g\\text{ (up-positive)}",

@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       'This is a real robotics problem. Every robot joint angle, every molecular bond angle in chemistry, every lighting angle in 3D graphics — all are computed using the same formula: $\\phi = \\arccos\\!\\left(\\frac{\\vec{A}\\cdot\\vec{B}}{|\\vec{A}||\\vec{B}|}\\right)$. This single equation is one of the most-used formulas in all of computational physics.',
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'dot-product-projection' },
   },
 
   videos: [{

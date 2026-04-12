@@ -64,6 +64,7 @@ export default {
   rigor: {
     prose: ["Set v0=0 in the constant-acceleration formulas."],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-fall-axes' },
     proofSteps: [
       {
         expression: "\\Delta x=v_0t+\\frac12at^2",

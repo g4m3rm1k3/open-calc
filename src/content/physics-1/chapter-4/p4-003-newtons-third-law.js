@@ -109,6 +109,7 @@ Third Law pair: the action and reaction forces always act on DIFFERENT objects. 
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'action-reaction' },
     proofSteps: [
       {
         title: 'State the Third Law',

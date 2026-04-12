@@ -92,6 +92,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'vector-components' },
     proofSteps: [
       {
         title: "Apply Newton's 2nd Law — x direction",

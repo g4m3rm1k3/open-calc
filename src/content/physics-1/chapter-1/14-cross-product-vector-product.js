@@ -16,6 +16,7 @@ export default {
     realWorldContext:
       `Picture a bolt you're trying to loosen. You grab the wrench handle and pull. If you pull straight toward the bolt, nothing happens — the force goes through the pivot and produces zero rotation. If you pull perpendicular to the handle, you get maximum turning effect. Somewhere in between, the result is proportional to the "crosswise" part of the force. And there's a direction to the torque too: the bolt either spins clockwise or counterclockwise. This is exactly what the **cross product** captures — it measures how much two vectors are "crossing" each other, produces a magnitude that tells you how strong the effect is, and a direction that tells you which way it acts. Torque, angular momentum, magnetic force on a moving charge, and the normal to a surface — all are cross products.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'cross-product-rhr' },
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────

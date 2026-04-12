@@ -115,6 +115,7 @@ export default {
       "This is why calculus was invented. Newton wanted to define velocity at an instant — a quantity that Zeno's paradoxes seemed to make impossible. The answer was the limit definition of the derivative. Every speedometer, GPS, and physics simulation computes velocity as dx/dt, whether using calculus analytically or numerical differentiation computationally.",
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'xt-vt-graphs' },
     proofSteps: [
       {
         expression: "\\bar{v} = \\frac{x(t+\\Delta t) - x(t)}{\\Delta t}",

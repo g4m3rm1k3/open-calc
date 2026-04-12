@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       `Computer programs, physics engines, and machine learning algorithms deal entirely in components — never angles. The component dot product formula $\\vec{A}\\cdot\\vec{B} = A_xB_x + A_yB_y + A_zB_z$ is the version that runs on every processor in the world.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'dot-product-projection' },
   },
 
   videos: [{

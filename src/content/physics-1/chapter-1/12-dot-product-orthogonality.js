@@ -13,6 +13,7 @@ export default {
     realWorldContext:
       `The normal force of a table always points perpendicular to the surface. The block's velocity along the surface is always perpendicular to the normal force. So the normal force does zero work — always — because perpendicular vectors have zero dot product. This is not a coincidence; it is a theorem. And the dot product test for perpendicularity is the simplest and most powerful tool for detecting it in any dimension.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'dot-product-projection' },
   },
 
   videos: [{

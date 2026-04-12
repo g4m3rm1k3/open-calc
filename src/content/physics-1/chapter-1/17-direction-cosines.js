@@ -16,6 +16,7 @@ export default {
     realWorldContext:
       `In 2D, you can describe any direction with a single angle — "30° above horizontal." In 3D, one angle isn't enough. A satellite's orientation in orbit, a robot arm's end position in space, a cable's pull direction in a 3D bridge — these all need a systematic way to describe direction in three dimensions. The answer used by aerospace engineers, roboticists, and structural analysts worldwide is the **direction cosine**: the cosines of the three angles that a vector makes with the x-, y-, and z-axes. Three numbers, one identity connecting them, and any 3D direction pinned down exactly.`,
     previewVisualizationId: 'SVGDiagram',
+    previewVisualizationProps: { type: 'vector-components' },
   },
 
   // ── Videos ──────────────────────────────────────────────────────────────

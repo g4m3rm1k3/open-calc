@@ -91,6 +91,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'circular-motion' },
     proofSteps: [
       {
         title: 'Draw velocity vectors at two nearby points',

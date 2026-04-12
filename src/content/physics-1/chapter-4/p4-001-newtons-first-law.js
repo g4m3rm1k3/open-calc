@@ -105,6 +105,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'kinematic-chain' },
   },
 
   python: {

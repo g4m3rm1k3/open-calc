@@ -85,6 +85,7 @@ export default {
       },
     ],
     visualizationId: 'SVGDiagram',
+    visualizationProps: { type: 'free-fall-axes' },
     proofSteps: [
       {
         title: 'Write vertical velocity equation',
