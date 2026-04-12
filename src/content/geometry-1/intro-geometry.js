@@ -514,7 +514,7 @@ export default {
     callouts: [
       { type: 'important', title: 'The axiomatic method', body: 'Start with the smallest possible set of accepted assumptions (postulates). Derive everything else by pure logic. This produces absolute certainty — not empirical probability, not expert consensus, but logical necessity.' },
     ],
-    visualizations: [{ id: 'G1_1_FivePostulates', title: "Euclid's Five Postulates" }],
+    visualizations: [{ id: 'ScienceNotebook', title: 'Foundations of Everything', props: { lesson: LESSON_GEO_1_1 } }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

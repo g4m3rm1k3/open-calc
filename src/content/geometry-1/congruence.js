@@ -320,7 +320,7 @@ var criteria=[
       ctx.fillStyle='#374151';ctx.font='bold 14px Georgia';ctx.textAlign='center';
       ctx.fillText('~',350,200);ctx.fillText('(similar, NOT ≅)',350,218);
       ctx.fillStyle='#92400e';ctx.font='13px Georgia';
-      ctx.fillText('AAA only proves similarity — angles don\'t determine size. AAA ✗',W/2,H-10);
+      ctx.fillText('AAA only proves similarity — angles don\\'t determine size. AAA ✗',W/2,H-10);
     }
   }
 ];
@@ -615,7 +615,7 @@ export default {
       { type: 'important', title: 'Why SSA fails', body: 'Given two sides and a non-included angle, the second side can "swing" to two positions. Two different triangles can satisfy the same SSA conditions. This is the ambiguous case. Always check that your angle is INCLUDED (between the two sides) when using SAS.' },
       { type: 'definition', title: 'CPCTC', body: 'Corresponding Parts of Congruent Triangles are Congruent. Once you prove △ABC ≅ △DEF by any criterion, you automatically know AB = DE, BC = EF, CA = FD, ∠A = ∠D, ∠B = ∠E, ∠C = ∠F.' },
     ],
-    visualizations: [{ id: 'G1_5_Congruence', title: 'Congruence Criteria: SAS, SSS, and More' }],
+    visualizations: [{ id: 'ScienceNotebook', title: 'Congruence: Identical Shapes', props: { lesson: LESSON_GEO_1_6 } }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

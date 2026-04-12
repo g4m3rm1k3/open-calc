@@ -258,7 +258,7 @@ function draw(){
   // Arc for angle 2 (right side)
   ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
   ctx.beginPath();
-  ctx.arc(vertexX,lineY,-a2*Math.PI/180,0,false);
+  ctx.arc(vertexX,lineY,38,-a2*Math.PI/180,0,false);
   ctx.stroke();
 
   // Ray (going up at angle based on position)
@@ -665,6 +665,7 @@ export default {
     question: 'How do you prove that vertical angles are equal — without measuring?',
     realWorldContext: 'The vertical angles theorem is proved in two steps using only the fact that a straight line is 180°. This proof is your introduction to the power of deductive reasoning: deriving certain truth from minimal assumptions.',
     previewVisualizationId: 'G1_2_AnglesAtAPoint',
+    previewVisualizationProps: { lesson: LESSON_GEO_1_3 },
   },
   intuition: {
     prose: [
@@ -677,7 +678,7 @@ export default {
     callouts: [
       { type: 'important', title: 'The structure of a proof', body: 'Every step must have a justification: Given, Definition, Postulate, Theorem, or Algebraic Property. "It looks equal" is never a justification.' },
     ],
-    visualizations: [{ id: 'G1_2_AnglesAtAPoint', title: 'Vertical Angles and Two-Step Proofs' }],
+    visualizations: [{ id: 'ScienceNotebook', title: 'Angles and Segments', props: { lesson: LESSON_GEO_1_3 } }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },
