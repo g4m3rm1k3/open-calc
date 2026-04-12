@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
+import PolyCalc from "../calculator/PolyCalc.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
@@ -204,6 +205,8 @@ function TopBar({
   calcOpen,
   onSigmaToggle,
   sigmaOpen,
+  onPolyToggle,
+  polyOpen,
   onPythonToggle,
   pythonOpen,
   onJsToggle,
@@ -394,6 +397,13 @@ function TopBar({
             title="Sigma Evaluator (Z)"
           >
             <span className="text-sm font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>Σ</span>
+          </button>
+          <button
+            onClick={onPolyToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${polyOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
+            title="Polynomial Solver (Q)"
+          >
+            <span className="text-[10px] font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>P(x)</span>
           </button>
           <button
             onClick={onPythonToggle}
@@ -617,6 +627,7 @@ export default function AppShell({ children }) {
   const [physicsOpen, setPhysicsOpen] = useState(false);
   const [basketOpen, setBasketOpen] = useState(false);
   const [golfOpen, setGolfOpen] = useState(false);
+  const [polyOpen, setPolyOpen] = useState(false);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
     setGraph3DOpen(false);
@@ -624,6 +635,7 @@ export default function AppShell({ children }) {
     setScratchOpen(false);
     setCalcOpen(false);
     setSigmaOpen(false);
+    setPolyOpen(false);
     setPythonOpen(false);
     setJsOpen(false);
     setPoolOpen(false);
@@ -711,6 +723,10 @@ export default function AppShell({ children }) {
       if (e.key.toLowerCase() === "z") {
         setSigmaOpen((prev) => !prev);
       }
+      // 'q' key for Polynomial Solver
+      if (e.key.toLowerCase() === "q") {
+        setPolyOpen((prev) => !prev);
+      }
       // 'p' key for Python sandbox
       if (e.key.toLowerCase() === "p") {
         setPythonOpen((prev) => !prev);
@@ -736,6 +752,7 @@ export default function AppShell({ children }) {
         setScratchOpen(false);
         setCalcOpen(false);
         setSigmaOpen(false);
+        setPolyOpen(false);
         setPythonOpen(false);
         setJsOpen(false);
         setHelpOpen(false);
@@ -768,6 +785,8 @@ export default function AppShell({ children }) {
           calcOpen={calcOpen}
           onSigmaToggle={() => setSigmaOpen((prev) => !prev)}
           sigmaOpen={sigmaOpen}
+          onPolyToggle={() => setPolyOpen((prev) => !prev)}
+          polyOpen={polyOpen}
           onPythonToggle={() => setPythonOpen((prev) => !prev)}
           pythonOpen={pythonOpen}
           onJsToggle={() => setJsOpen((prev) => !prev)}
@@ -1026,6 +1045,7 @@ export default function AppShell({ children }) {
 
         {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
         {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
+        {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
         <PinsPanel />
         <NotesPanel />
         <WelcomeModal />

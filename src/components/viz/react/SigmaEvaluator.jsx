@@ -223,7 +223,7 @@ export default function SigmaEvaluator() {
       {/* ── display sum notation ── */}
       {!hasError && terms.length > 0 && (
         <div className="bg-slate-800 rounded-lg px-4 py-3 text-center overflow-x-auto">
-          <KatexBlock math={`${sumLatex} \\;=\\; ${total % 1 === 0 ? total : total.toFixed(4)}`} />
+          <KatexBlock expr={`${sumLatex} \\;=\\; ${total % 1 === 0 ? total : total.toFixed(4)}`} />
         </div>
       )}
 
@@ -341,12 +341,12 @@ export default function SigmaEvaluator() {
                 <span className="text-violet-300 font-semibold text-sm">Closed-Form Formula Detected</span>
               </div>
               <div className="overflow-x-auto">
-                <KatexBlock math={closedForm.label} />
+                <KatexBlock expr={closedForm.label} />
               </div>
               <p className="text-slate-400 text-sm">{closedForm.explanation}</p>
               <div className="bg-slate-900 rounded-md px-3 py-2 overflow-x-auto">
                 <p className="text-slate-400 text-xs mb-1">With n = {n}:</p>
-                <KatexBlock math={closedForm.latexResult} />
+                <KatexBlock expr={closedForm.latexResult} />
               </div>
               <div className={`text-sm font-semibold ${Math.abs(closedForm.value - total) < 0.001 ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {Math.abs(closedForm.value - total) < 0.001
@@ -365,7 +365,7 @@ export default function SigmaEvaluator() {
 
           {/* ── result banner ── */}
           <div className="bg-slate-800 rounded-lg px-4 py-3 text-center border border-slate-600">
-            <KatexBlock math={`${sumLatex} = ${Number.isInteger(total) ? total : total.toFixed(4)}`} />
+            <KatexBlock expr={`${sumLatex} = ${Number.isInteger(total) ? total : total.toFixed(4)}`} />
           </div>
         </>
       )}

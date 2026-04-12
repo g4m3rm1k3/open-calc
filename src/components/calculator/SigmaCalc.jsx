@@ -196,7 +196,7 @@ function SigmaPanel({ dark }) {
       {/* notation + result */}
       {!hasError && terms.length > 0 && (
         <div className={`rounded-lg px-3 py-2 overflow-x-auto text-center ${bg0}`}>
-          <KatexBlock math={sumLatex} />
+          <KatexBlock expr={sumLatex} />
         </div>
       )}
       {hasError && <p className="text-rose-400 text-xs text-center">Expression error — check syntax.</p>}
@@ -278,11 +278,11 @@ function SigmaPanel({ dark }) {
               <span className="text-violet-400">✦</span>
               <span className={`text-xs font-semibold ${dark ? 'text-violet-300' : 'text-violet-700'}`}>Closed-Form Formula</span>
             </div>
-            <div className="overflow-x-auto"><KatexBlock math={closedForm.label} /></div>
+            <div className="overflow-x-auto"><KatexBlock expr={closedForm.label} /></div>
             <p className={`text-[11px] ${muted}`}>{closedForm.explanation}</p>
             <div className={`rounded px-2 py-1 overflow-x-auto ${bg0}`}>
               <p className={`text-[10px] ${muted} mb-0.5`}>With n = {n}:</p>
-              <KatexBlock math={closedForm.resultLatex} />
+              <KatexBlock expr={closedForm.resultLatex} />
             </div>
             <p className={`text-xs font-semibold ${Math.abs(closedForm.value - total) < 0.001 ? 'text-emerald-400' : 'text-rose-400'}`}>
               {Math.abs(closedForm.value - total) < 0.001
