@@ -17,6 +17,7 @@ import ChallengeBlock from './ChallengeBlock.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
+import MarkdownProse from '../math/MarkdownProse.jsx'
 import KatexBlock from '../math/KatexBlock.jsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import StickyNote from '../ui/StickyNote.jsx'
@@ -27,7 +28,7 @@ export { parseProse } from '../math/parseProse.jsx'
 // ─── Shared prose utilities ────────────────────────────────────────────────
 
 function ProseParagraph({ text }) {
-  return <p className="mb-4 leading-relaxed last:mb-0 text-slate-700 dark:text-slate-300">{parseProse(text)}</p>
+  return <MarkdownProse text={text} className="mb-4 last:mb-0" />
 }
 
 const BULLET_RE = /^[•\-*]\s+/

@@ -79,6 +79,29 @@ function scanBareLatex(text, i) {
   return j
 }
 
+/**
+ * After any inline math expression ends, if the very next characters are '. '
+ * (period + whitespace or period + another math delimiter), emit the period and
+ * a <br> so each sentence/step in a worked example starts on its own line.
+ * This fires globally for every $…$ and \(…\) — no per-lesson changes needed.
+ *
+ * keyNext is a thunk () => number so we can increment the shared keyIdx counter.
+ */
+function eatPostMathBreak(text, i, parts, keyNext) {
+  if (i >= text.length || text[i] !== '.') return i
+  const after = i + 1 < text.length ? text[i + 1] : ''
+  // Only break when the period genuinely ends a sentence:
+  // followed by space, another math delimiter, or end of string.
+  const isSentenceEnd = after === ' ' || after === '\n' || after === '$' ||
+    text.startsWith('\\(', i + 1) || text.startsWith('\\[', i + 1) || after === ''
+  if (!isSentenceEnd) return i
+  parts.push(<span key={`sep${keyNext()}`}>.</span>)
+  parts.push(<br key={`br${keyNext()}`} />)
+  i++ // consume the period
+  while (i < text.length && text[i] === ' ') i++ // consume trailing spaces
+  return i
+}
+
 export function parseProse(text) {
   if (!text) return []
   const parts = []
@@ -131,6 +154,16 @@ export function parseProse(text) {
       }
     }
 
+    // *italic* — single asterisk, not part of **bold**
+    if (text[i] === '*' && text[i + 1] !== '*') {
+      const end = text.indexOf('*', i + 1)
+      if (end !== -1 && text[end + 1] !== '*') {
+        parts.push(<em key={`em${keyIdx++}`}>{parseProse(text.slice(i + 1, end))}</em>)
+        i = end + 1
+        continue
+      }
+    }
+
     // \[...\] display math — render as block KaTeX
     if (text.startsWith('\\[', i)) {
       const end = text.indexOf('\\]', i + 2)
@@ -158,6 +191,7 @@ export function parseProse(text) {
           </span>
         )
         i = end + 2
+        i = eatPostMathBreak(text, i, parts, () => keyIdx++)
         continue
       }
     }
@@ -174,6 +208,7 @@ export function parseProse(text) {
             </span>
           )
           i = end + 1
+          i = eatPostMathBreak(text, i, parts, () => keyIdx++)
           continue
         }
       }
@@ -224,6 +259,7 @@ export function parseProse(text) {
 
     // Plain text — scan to next special marker
     const nextBold      = text.indexOf('**', i)
+    const nextAsterisk  = text.indexOf('*', i)
     const nextDollar    = text.indexOf('$', i)
     const nextAlg       = text.indexOf('{{algebra:', i)
     const nextDisplay   = text.indexOf('\\[', i)
@@ -231,7 +267,7 @@ export function parseProse(text) {
     const nextBackslash = text.indexOf('\\', i)
     const nextTooltip   = text.indexOf('<span class="tooltip" data-tooltip="', i)
     const nextNewline   = text.indexOf('\n', i)
-    const candidates = [nextBold, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash, nextTooltip, nextNewline].filter(v => v !== -1)
+    const candidates = [nextBold, nextAsterisk, nextDollar, nextAlg, nextDisplay, nextInline, nextBackslash, nextTooltip, nextNewline].filter(v => v !== -1)
     const stop = candidates.length ? Math.min(...candidates) : text.length
     if (stop > i) {
       parts.push(<span key={`t${keyIdx++}`}>{text.slice(i, stop)}</span>)
