@@ -179,6 +179,14 @@ export default {
     visualizations: [
       {
         vizId: "SVGDiagram",
+        vizProps: { type: "rolles-statement" },
+        mathBridge:
+          "A single-curve Rolle diagram: the endpoints have equal height, the function is smooth on [a,b], and there must be some c in between where the tangent is horizontal.",
+        caption:
+          "Rolle's Theorem guarantee: equal endpoint heights plus smoothness force a horizontal tangent somewhere in the interior.",
+      },
+      {
+        vizId: "SVGDiagram",
         vizProps: { type: "rolles-mvt-proof" },
         mathBridge:
           "Left panel: f(x) with its secant line L(x) from (a,f(a)) to (b,f(b)). Right panel: g(x) = f(x) − L(x) — the function you get after subtracting the secant. Crucially, g(a) = g(b) = 0 (amber dots), so Rolle's Theorem applies to g. The green horizontal tangent at c shows g′(c) = 0, which translates directly to f′(c) = slope of the secant. That is the entire MVT proof in one picture.",
@@ -192,6 +200,14 @@ export default {
           "Select a function with equal endpoint heights and see the guaranteed horizontal tangent(s) appear between a and b. The green flat segments mark the points c where f′(c) = 0.",
         caption:
           "Rolle’s Theorem guarantees at least one horizontal tangent between equal endpoint values.",
+      },
+      {
+        id: "RolleGuideViz",
+        title: "Rolle walkthrough problems",
+        mathBridge:
+          "Step through concrete Rolle examples with endpoint checks, derivative solving, and the visual discovery of c in each case.",
+        caption:
+          "A guided Rolle walkthrough with multiple example functions and step-by-step visual reasoning.",
       },
     ],
   },

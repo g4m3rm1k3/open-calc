@@ -158,6 +158,7 @@ const VIZ_REGISTRY = {
   RolleViz: lazy(() => import("./d3/RolleViz.jsx")),
   RolleExplorer: lazy(() => import("./react/RolleExplorer.jsx")),
   RolleProofViz: lazy(() => import("./d3/RolleProofViz.jsx")),
+  RolleGuideViz: lazy(() => import("./d3/RolleGuideViz.jsx")),
   CurveSketchingBoard: lazy(() => import("./d3/CurveSketchingBoard.jsx")),
   SignChartBuilder: lazy(() => import("./d3/SignChartBuilder.jsx")),
   ChainRulePeeler: lazy(() => import("./react/ChainRulePeeler.jsx")),
