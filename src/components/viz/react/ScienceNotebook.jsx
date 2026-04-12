@@ -112,6 +112,58 @@ ${escapedJs}
 </html>`
 }
 
+// ── Build iframe srcdoc with console interception ─────────────────────────────
+function buildDocWithConsole(html = '', css = '', js = '', dark, cellId = '') {
+  const escapedJs  = js.replace(/<\/script>/gi, '<\\/script>')
+  const iframeBg   = dark ? '#0f1923' : '#ffffff'
+  const iframeText = dark ? '#e2e8f0' : '#1e293b'
+
+  return `<!DOCTYPE html>
+<html class="${dark ? 'dark' : ''}">
+<head>
+<meta charset="utf-8">
+<style>
+:root { ${iframeThemeVars(dark)} }
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;padding:14px;font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;background:${iframeBg};color:${iframeText}}
+html.dark .burns{background:#451a03!important;color:#fbbf24!important}
+html.dark .stable{background:#052e16!important;color:#4ade80!important}
+html.dark .dissolves{background:#052e16!important;color:#4ade80!important}
+html.dark .separates{background:#450a0a!important;color:#f87171!important}
+html.dark .atom-card,.fact-card,.result-box,.comp-item,.demo{background:#1e293b!important;border-color:#334155!important}
+${css}
+</style>
+</head>
+<body>
+${html}
+<script>
+window.__snCellId='${cellId}';
+(function(){
+  var _l=console.log.bind(console),_e=console.error.bind(console),_w=console.warn.bind(console);
+  function post(lv,args){
+    var msg=args.map(function(a){try{return typeof a==='object'?JSON.stringify(a,null,2):String(a);}catch(_){return String(a);}}).join(' ');
+    window.parent.postMessage({type:'sn_console',level:lv,msg:msg,cellId:'${cellId}'},'*');
+  }
+  console.log=function(){_l.apply(console,arguments);post('log',[].slice.call(arguments));};
+  console.error=function(){_e.apply(console,arguments);post('error',[].slice.call(arguments));};
+  console.warn=function(){_w.apply(console,arguments);post('warn',[].slice.call(arguments));};
+  window.addEventListener('error',function(ev){post('error',[ev.message||'Runtime error']);ev.preventDefault();},true);
+})();
+(function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
+try{(function(){
+${escapedJs}
+})()}catch(e){console.error(e.message)}
+;(function(){
+  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  report();
+  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  else{window.addEventListener('load',report)}
+})();
+<\/script>
+</body>
+</html>`
+}
+
 // ── Challenge iframe — question + answer buttons injected into preview ─────────
 function buildChallengeDoc(html = '', css = '', js = '', options = [], dark) {
   const iframeBg   = dark ? '#0f1923' : '#ffffff'
@@ -219,22 +271,21 @@ function MDText({ text, T }) {
 }
 
 // ── Visual cell (type:'js') — auto-runs, no editor shown ──────────────────────
-function VisualCell({ cell, cellIndex, T, dark }) {
-  const iframeRef = useRef(null)
-  const [loaded, setLoaded] = useState(false)
-  const [height, setHeight] = useState(cell.outputHeight || 160)
-  const manualRef = useRef(false)
+function VisualCell({ cell, cellIndex, T, dark, forceCodeOpen }) {
+  const iframeRef  = useRef(null)
+  const [height, setHeight]     = useState(cell.outputHeight || 160)
+  const [showCode, setShowCode] = useState(false)
+  const [activeTab, setActiveTab] = useState('js')
+  const manualRef  = useRef(false)
 
   useEffect(() => {
     if (iframeRef.current) {
-      iframeRef.current.srcdoc = buildDoc(
-        cell.html || '', cell.css || '', cell.startCode || '', dark
-      )
-      setLoaded(true)
+      iframeRef.current.srcdoc = buildDoc(cell.html || '', cell.css || '', cell.startCode || '', dark)
       manualRef.current = false
     }
   }, [cell.html, cell.css, cell.startCode, dark])
 
+  // Auto-resize
   useEffect(() => {
     const handler = (e) => {
       if (!e.data || e.data.type !== 'sn_resize') return
@@ -244,6 +295,11 @@ function VisualCell({ cell, cellIndex, T, dark }) {
     window.addEventListener('message', handler)
     return () => window.removeEventListener('message', handler)
   }, [])
+
+  // Sync with global Ctrl+Shift+C toggle
+  useEffect(() => {
+    if (forceCodeOpen !== undefined) setShowCode(forceCodeOpen)
+  }, [forceCodeOpen])
 
   function startResize(e) {
     e.preventDefault()
@@ -255,19 +311,73 @@ function VisualCell({ cell, cellIndex, T, dark }) {
     window.addEventListener('mouseup', onUp)
   }
 
+  const tabs = [
+    { key: 'js',   lang: 'javascript', label: 'JS',   code: cell.startCode || '' },
+    { key: 'html', lang: 'html',       label: 'HTML', code: cell.html      || '' },
+    { key: 'css',  lang: 'css',        label: 'CSS',  code: cell.css       || '' },
+  ].filter(t => t.code.trim())
+
+  const currentTab = tabs.find(t => t.key === activeTab) || tabs[0] || { code: '', lang: 'javascript' }
+
   return (
-    <div style={{
-      marginBottom: 20, borderRadius: 12,
-      border: `1px solid ${T.border}`, background: T.panel,
-    }}>
-      {/* Instruction prose */}
+    <div style={{ marginBottom: 20, borderRadius: 12, border: `1px solid ${T.border}`, background: T.panel }}>
+      {/* Instruction + source toggle */}
       {cell.instruction && (
-        <div style={{ padding: '18px 22px', borderBottom: `1px solid ${T.border}` }}>
-          <MDText text={cell.instruction} T={T} />
+        <div style={{ padding: '18px 22px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+          <div style={{ flex: 1 }}><MDText text={cell.instruction} T={T} /></div>
+          <button
+            onClick={() => setShowCode(v => !v)}
+            title="View source code (Ctrl+Shift+C)"
+            style={{
+              padding: '3px 10px', borderRadius: 5, flexShrink: 0, marginTop: 2,
+              border: `1px solid ${showCode ? T.accent : T.border}`,
+              background: showCode ? T.accent + '22' : 'transparent',
+              color: showCode ? T.accent : T.muted,
+              fontSize: 10, fontFamily: 'monospace', cursor: 'pointer', whiteSpace: 'nowrap',
+            }}>
+            {showCode ? '▼' : '▶'} {'{ }'} Source
+          </button>
         </div>
       )}
-      {/* Preview — auto-sized to content */}
-      <div style={{ background: T.iframeBg, borderRadius: '0 0 10px 10px', overflow: 'hidden' }}>
+
+      {/* Source code viewer */}
+      {showCode && tabs.length > 0 && (
+        <div style={{ borderBottom: `1px solid ${T.border}` }}>
+          {/* Tab bar */}
+          <div style={{ display: 'flex', gap: 4, padding: '6px 12px', background: T.panel2, borderBottom: `1px solid ${T.border}` }}>
+            {tabs.map(t => (
+              <button key={t.key} onClick={() => setActiveTab(t.key)} style={{
+                padding: '3px 14px', borderRadius: 5, border: 'none', cursor: 'pointer',
+                background: activeTab === t.key ? T.accent : 'transparent',
+                color: activeTab === t.key ? '#fff' : T.muted,
+                fontSize: 11, fontFamily: 'monospace', fontWeight: 600,
+              }}>{t.label}</button>
+            ))}
+            <span style={{ marginLeft: 'auto', fontSize: 10, color: T.muted, alignSelf: 'center', fontFamily: 'monospace' }}>
+              read-only · Ctrl+Shift+C to close
+            </span>
+          </div>
+          {/* Monaco editor (read-only — syntax errors highlighted in gutter) */}
+          <Editor
+            key={`src-${cellIndex}-${activeTab}-${dark}`}
+            height={Math.min(420, Math.max(80, currentTab.code.split('\n').length * 19 + 24))}
+            language={currentTab.lang}
+            value={currentTab.code}
+            theme={dark ? 'vs-dark' : 'light'}
+            options={{
+              readOnly: true, fontSize: 12, lineHeight: 19,
+              minimap: { enabled: false }, scrollBeyondLastLine: false,
+              wordWrap: 'off', renderLineHighlight: 'none',
+              overviewRulerLanes: 0, folding: true,
+              lineDecorationsWidth: 6, lineNumbersMinChars: 3,
+              padding: { top: 8, bottom: 8 }, domReadOnly: true,
+            }}
+          />
+        </div>
+      )}
+
+      {/* Preview iframe */}
+      <div style={{ background: T.iframeBg, overflow: 'hidden' }}>
         <iframe
           ref={iframeRef}
           sandbox="allow-scripts"
@@ -276,15 +386,8 @@ function VisualCell({ cell, cellIndex, T, dark }) {
         />
       </div>
       {/* Resize handle */}
-      <div
-        onMouseDown={startResize}
-        title="Drag to resize"
-        style={{
-          height: 8, cursor: 'ns-resize', background: T.border,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '0 0 12px 12px',
-        }}
-      >
+      <div onMouseDown={startResize} title="Drag to resize"
+        style={{ height: 8, cursor: 'ns-resize', background: T.border, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0 0 12px 12px' }}>
         <div style={{ width: 32, height: 3, borderRadius: 2, background: T.muted, opacity: 0.5 }} />
       </div>
     </div>
@@ -619,14 +722,11 @@ function WalkthroughCell({ cell, cellIndex, T, dark }) {
   const manualRef = useRef(false)
   const steps = cell.steps || []
   const currentStep = steps[step] || {}
-
-  // Build cumulative code up to current step
   const cumulativeCode = steps.slice(0, step + 1).map(s => s.code || '').join('\n')
 
   useEffect(() => {
-    if (iframeRef.current) {
+    if (iframeRef.current)
       iframeRef.current.srcdoc = buildDoc(cell.html || '', cell.css || '', cumulativeCode, dark)
-    }
   }, [step, dark])
 
   useEffect(() => {
@@ -644,90 +744,91 @@ function WalkthroughCell({ cell, cellIndex, T, dark }) {
     manualRef.current = true
     const startY = e.clientY, startH = height
     const onMove = (ev) => setHeight(Math.max(80, startH + ev.clientY - startY))
-    const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
   }
 
   return (
-    <div style={{ marginBottom: 24, borderRadius: 12, border:`1.5px solid ${T.accent}`, overflow:'hidden', background:T.panel }}>
-      {/* Header */}
-      <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 18px', borderBottom:`1px solid ${T.border}`, background:T.panel2 }}>
-        <div style={{ width:26, height:26, borderRadius:'50%', background:T.accent+'22', border:`1.5px solid ${T.accent}`, color:T.accent, fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center' }}>⟳</div>
-        <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.accent }}>Walkthrough</span>
-        <span style={{ marginLeft:'auto', fontSize:11, color:T.muted }}>Step {step+1} of {steps.length}</span>
+    <div style={{ marginBottom: 24, borderRadius: 12, border: `1.5px solid ${T.accent}`, overflow: 'hidden', background: T.panel }}>
+
+      {/* Header: icon + label + step dots + counter */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderBottom: `1px solid ${T.border}`, background: T.panel2, flexWrap: 'wrap' }}>
+        <div style={{ width: 26, height: 26, borderRadius: '50%', background: T.accent + '22', border: `1.5px solid ${T.accent}`, color: T.accent, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>⟳</div>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: T.accent }}>Walkthrough</span>
+
+        {/* Compact step dots — click any to jump */}
+        <div style={{ display: 'flex', gap: 5, marginLeft: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          {steps.map((s, i) => (
+            <button key={i} onClick={() => setStep(i)} title={s.title || `Step ${i + 1}`} style={{
+              width: 26, height: 26, borderRadius: '50%', border: 'none', cursor: 'pointer', flexShrink: 0,
+              background: i < step ? T.green : i === step ? T.accent : T.border,
+              color: i <= step ? '#fff' : T.muted,
+              fontSize: 10, fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'background .15s',
+              outline: i === step ? `2px solid ${T.accent}` : 'none',
+              outlineOffset: 1,
+            }}>
+              {i < step ? '✓' : i + 1}
+            </button>
+          ))}
+        </div>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: T.muted, whiteSpace: 'nowrap' }}>Step {step + 1} / {steps.length}</span>
       </div>
 
-      {/* Top prose instruction */}
+      {/* Lesson instruction */}
       {cell.instruction && (
-        <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}` }}>
+        <div style={{ padding: '14px 20px', borderBottom: `1px solid ${T.border}` }}>
           <MDText text={cell.instruction} T={T} />
         </div>
       )}
 
-      <div style={{ display:'flex', gap:0, minHeight:400 }}>
-        {/* Step list sidebar */}
-        <div style={{ width:220, borderRight:`1px solid ${T.border}`, background:T.panel2, padding:'10px 0', flexShrink:0 }}>
-          {steps.map((s, i) => (
-            <button key={i} onClick={() => setStep(i)} style={{
-              display:'flex', alignItems:'flex-start', gap:10, width:'100%', padding:'10px 14px',
-              background: i===step ? T.accent+'18' : 'transparent',
-              borderLeft: i===step ? `3px solid ${T.accent}` : '3px solid transparent',
-              border:'none', borderRight:'none', borderTop:'none', borderBottom:'none',
-              cursor:'pointer', textAlign:'left',
-            }}>
-              <span style={{ width:20, height:20, borderRadius:'50%', background:i<=step?T.accent:T.border, color:i<=step?'#fff':T.muted, fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
-                {i < step ? '✓' : i+1}
-              </span>
-              <span style={{ fontSize:11, color:i===step?T.accent:T.muted, fontWeight:i===step?600:400, lineHeight:1.4 }}>{s.title || `Step ${i+1}`}</span>
-            </button>
-          ))}
+      {/* Current step: explanation */}
+      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.border}`, minHeight: 80 }}>
+        {currentStep.title && (
+          <div style={{ fontSize: 13, fontWeight: 700, color: T.accent, marginBottom: 8 }}>{currentStep.title}</div>
+        )}
+        {currentStep.explanation && <MDText text={currentStep.explanation} T={T} />}
+      </div>
+
+      {/* Current step: new code */}
+      {currentStep.code && (
+        <div style={{ background: dark ? '#0c1222' : '#f8fafc', borderBottom: `1px solid ${T.border}` }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: T.muted, letterSpacing: '.08em', textTransform: 'uppercase', padding: '6px 14px 0' }}>New code this step</div>
+          <Editor
+            key={`wt-${cellIndex}-${step}-${dark}`}
+            height={Math.min(280, Math.max(60, currentStep.code.split('\n').length * 20 + 20))}
+            language={cell.language || 'javascript'}
+            value={currentStep.code}
+            theme={dark ? 'vs-dark' : 'light'}
+            options={{ readOnly: true, fontSize: 12, lineHeight: 19, minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', renderLineHighlight: 'none', overviewRulerLanes: 0, folding: false, lineDecorationsWidth: 6, lineNumbersMinChars: 3, padding: { top: 8, bottom: 8 }, domReadOnly: true }}
+          />
         </div>
+      )}
 
-        {/* Right panel: explanation + code snippet + preview */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
-          {/* Step explanation */}
-          <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}` }}>
-            {currentStep.title && <div style={{ fontSize:13, fontWeight:700, color:T.accent, marginBottom:8 }}>{currentStep.title}</div>}
-            {currentStep.explanation && <MDText text={currentStep.explanation} T={T} />}
-          </div>
-
-          {/* Code snippet (read-only, syntax highlighted) */}
-          {currentStep.code && (
-            <div style={{ background:dark?'#0c1222':'#f8fafc', borderBottom:`1px solid ${T.border}` }}>
-              <div style={{ fontSize:9, fontWeight:700, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', padding:'6px 14px 0' }}>New code this step</div>
-              <Editor
-                key={`wt-${cellIndex}-${step}-${dark}`}
-                height={Math.min(300, Math.max(60, (currentStep.code.split('\n').length)*20+20))}
-                language={cell.language || 'javascript'}
-                value={currentStep.code}
-                theme={dark ? 'vs-dark' : 'light'}
-                options={{ readOnly:true, fontSize:12, lineHeight:19, minimap:{enabled:false}, scrollBeyondLastLine:false, wordWrap:'on', renderLineHighlight:'none', overviewRulerLanes:0, folding:false, lineDecorationsWidth:6, lineNumbersMinChars:3, padding:{top:8,bottom:8}, domReadOnly:true }}
-              />
-            </div>
-          )}
-
-          {/* Live preview of cumulative code */}
-          <div style={{ background:T.iframeBg, flex:1 }}>
-            <div style={{ fontSize:9, fontWeight:700, color:T.muted, letterSpacing:'.08em', textTransform:'uppercase', padding:'6px 14px 2px' }}>Live result (cumulative)</div>
-            <iframe ref={iframeRef} sandbox="allow-scripts"
-              style={{ width:'100%', height, border:'none', display:'block' }}
-              title={`walkthrough-${cellIndex}`}
-            />
-            <div onMouseDown={startResize} title="Drag to resize"
-              style={{ height:8, cursor:'ns-resize', background:T.border, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <div style={{ width:32, height:3, borderRadius:2, background:T.muted, opacity:.5 }} />
-            </div>
-          </div>
-
-          {/* Prev / Next */}
-          <div style={{ display:'flex', gap:8, padding:'10px 16px', borderTop:`1px solid ${T.border}`, background:T.panel2 }}>
-            <button onClick={() => setStep(s => Math.max(0,s-1))} disabled={step===0}
-              style={{ padding:'5px 16px', borderRadius:6, border:`1px solid ${T.border}`, background:'transparent', color:step===0?T.muted:T.text, cursor:step===0?'default':'pointer', fontSize:12 }}>← Prev</button>
-            <button onClick={() => setStep(s => Math.min(steps.length-1,s+1))} disabled={step===steps.length-1}
-              style={{ padding:'5px 16px', borderRadius:6, border:'none', background:step===steps.length-1?T.border:'#0ea5e9', color:step===steps.length-1?T.muted:'#fff', cursor:step===steps.length-1?'default':'pointer', fontSize:12, fontWeight:600 }}>Next →</button>
-          </div>
+      {/* Live preview */}
+      <div style={{ background: T.iframeBg }}>
+        <div style={{ fontSize: 9, fontWeight: 700, color: T.muted, letterSpacing: '.08em', textTransform: 'uppercase', padding: '5px 14px 2px' }}>Live result (cumulative through step {step + 1})</div>
+        <iframe ref={iframeRef} sandbox="allow-scripts"
+          style={{ width: '100%', height, border: 'none', display: 'block' }}
+          title={`walkthrough-${cellIndex}`}
+        />
+        <div onMouseDown={startResize} title="Drag to resize"
+          style={{ height: 8, cursor: 'ns-resize', background: T.border, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 32, height: 3, borderRadius: 2, background: T.muted, opacity: .5 }} />
         </div>
+      </div>
+
+      {/* Prev / Next navigation */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${T.border}`, background: T.panel2 }}>
+        <button onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0}
+          style={{ padding: '5px 16px', borderRadius: 6, border: `1px solid ${T.border}`, background: 'transparent', color: step === 0 ? T.muted : T.text, cursor: step === 0 ? 'default' : 'pointer', fontSize: 12 }}>← Prev</button>
+        <button onClick={() => setStep(s => Math.min(steps.length - 1, s + 1))} disabled={step === steps.length - 1}
+          style={{ padding: '5px 18px', borderRadius: 6, border: 'none', background: step === steps.length - 1 ? T.border : T.accent, color: step === steps.length - 1 ? T.muted : '#fff', cursor: step === steps.length - 1 ? 'default' : 'pointer', fontSize: 12, fontWeight: 600 }}>Next →</button>
+        {step === steps.length - 1 && (
+          <span style={{ fontSize: 12, color: T.green, marginLeft: 8 }}>✓ All steps complete</span>
+        )}
       </div>
     </div>
   )
@@ -766,6 +867,19 @@ export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
   const dark   = useIsDark()
   const T      = makeT(dark)
   const [passedChallenges, setPassedChallenges] = useState(new Set())
+  const [globalConsoleOpen, setGlobalConsoleOpen] = useState(false)
+
+  // Ctrl+Shift+C toggles console panel on all js cells
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault()
+        setGlobalConsoleOpen(v => !v)
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
 
   const handlePass = useCallback((idx) => {
     setPassedChallenges(prev => new Set([...prev, idx]))
@@ -798,7 +912,7 @@ export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
         if (cell.type === 'coding')      return <CodingCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
         if (cell.type === 'walkthrough') return <WalkthroughCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} />
         // type:'js' and anything else = auto-run visual preview
-        return <VisualCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} />
+        return <VisualCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} forceCodeOpen={globalConsoleOpen} />
       })}
     </div>
   )

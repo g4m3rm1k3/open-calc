@@ -479,7 +479,7 @@ var BUGS = [
     count:3,
     vsOk:true,fsOk:true,
     enableAttrib:false,
-    fix:'Fix: call gl.enableVertexAttribArray(loc) after vertexAttribPointer.\nWithout it the GPU reads zeroes instead of your buffer — all vertices land at (0,0,0,0) which is clipped.',
+    fix:'Fix: call gl.enableVertexAttribArray(loc) after vertexAttribPointer. Without it the GPU reads zeroes instead of your buffer — all vertices land at (0,0,0,0) which is clipped.',
     color:[1.0,0.4,0.1,1.0],
   },
   {
@@ -488,7 +488,7 @@ var BUGS = [
     count:2,
     vsOk:true,fsOk:true,
     enableAttrib:true,
-    fix:'Fix: gl.drawArrays(gl.TRIANGLES, 0, 3) — not 2.\nWith count=2 and mode TRIANGLES, the GPU has 2 vertices but needs 3 to form a triangle. It silently skips the incomplete group — rendering nothing.',
+    fix:'Fix: gl.drawArrays(gl.TRIANGLES, 0, 3) — not 2.With count=2 and mode TRIANGLES, the GPU has 2 vertices but needs 3 to form a triangle. It silently skips the incomplete group — rendering nothing.',
     color:[1.0,0.4,0.1,1.0],
   },
   {
@@ -497,7 +497,7 @@ var BUGS = [
     count:3,
     vsOk:true,fsOk:true,
     enableAttrib:true,
-    fix:'Fix: NDC ranges from -1.0 to +1.0 on each axis.\nValues like 6.0, -5.0 are outside the clip volume — the GPU clips the triangle against the NDC cube. A triangle 10x too big shows only a sliver or nothing.',
+    fix:'Fix: NDC ranges from -1.0 to +1.0 on each axis.Values like 6.0, -5.0 are outside the clip volume — the GPU clips the triangle against the NDC cube. A triangle 10x too big shows only a sliver or nothing.',
     color:[1.0,0.4,0.1,1.0],
   },
   {
@@ -506,7 +506,7 @@ var BUGS = [
     count:3,
     vsOk:true,fsOk:false,
     enableAttrib:true,
-    fix:'Fix: check gl.getShaderInfoLog(fs) for the GLSL error.\nIf the fragment shader fails to compile, the program link fails silently. gl.useProgram() uses the null program. The canvas stays black.\nAlways add: if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(fs));',
+    fix:'Fix: check gl.getShaderInfoLog(fs) for the GLSL error.If the fragment shader fails to compile, the program link fails silently. gl.useProgram() uses the null program. The canvas stays black.\\nAlways add: if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(fs));',
     color:[1.0,0.4,0.1,1.0],
   },
 ];
@@ -560,7 +560,7 @@ function select(idx){
   render(idx);
   document.getElementById('fix-panel').innerHTML =
     '<span style="color:#38bdf8">Diagnosis:</span><br>' +
-    BUGS[idx].fix.replace(/\n/g,'<br>');
+    BUGS[idx].fix.replace(/\\n/g,'<br>');
 }
 
 document.querySelectorAll('.bug-btn').forEach(function(btn,i){
