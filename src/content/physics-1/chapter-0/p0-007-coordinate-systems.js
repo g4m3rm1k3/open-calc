@@ -70,11 +70,11 @@ export default {
         caption: 'Two conventions, one physics. The sign of g flips when you flip the positive direction.',
       },
       {
-        id: 'NumberLine',
-        title: 'Interactive number line — drag the origin, flip the positive direction',
+        id: 'SignConventionExplorer',
+        title: 'Interactive sign convention — flip the axis, move the origin, watch the equations change',
         mathBridge:
-          'Set the origin at the launch point. Place the positive direction upward. Now observe where positions are: above origin = positive, below = negative. Flip the positive direction: everything swaps sign, but the geometry doesn\'t change.',
-        caption: 'The coordinate system is your ruler. Physics doesn\'t care where you put the zero.',
+          'A ball is thrown upward at 15 m/s. Toggle between "Upward +" and "Downward +" using the buttons. Watch: a flips from −9.8 to +9.8. v₀ flips sign. x₀ and x(t) change when you move the origin. But the blue ball\'s arc never changes — it follows the same physical path regardless of your labels. Drag the origin up to the peak: x₀ becomes negative (you are below the peak), and x(t) at the peak is zero. This is exactly what "the coordinate system is arbitrary" means.',
+        caption: 'Two conventions, one trajectory. Every number changes when you change the convention — the physics does not.',
       },
     ],
   },

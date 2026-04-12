@@ -72,6 +72,8 @@ const VIZ_REGISTRY = {
   GraphMorph: lazy(() => import("./d3/GraphMorph.jsx")),
   // Chapter 1 — Physics examples
   ShrinkingInterval: lazy(() => import("./d3/ShrinkingInterval.jsx")),
+  // Chapter 0 — Physics orientation
+  SignConventionExplorer: lazy(() => import("./d3/SignConventionExplorer.jsx")),
   // Chapter 2 — Physics examples
   DisplacementVsDistance: lazy(() => import("./d3/DisplacementVsDistance.jsx")),
   VerticalThrow: lazy(() => import("./d3/VerticalThrow.jsx")),

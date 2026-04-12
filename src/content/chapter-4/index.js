@@ -3,6 +3,7 @@ import riemannSums from './01-riemann-sums.js'
 import definiteIntegral from './02-definite-integral.js'
 import fundamentalTheorem from './03-fundamental-theorem.js'
 import indefiniteIntegrals from './04-indefinite-integrals.js'
+import initialValueProblems from './04b-initial-value-problems.js'
 import applications from './05-applications.js'
 import uSubstitution from './06-u-substitution.js'
 import volumesOfRevolution from './06b-volumes-of-revolution.js'
@@ -31,6 +32,7 @@ export default {
     definiteIntegral,
     fundamentalTheorem,
     indefiniteIntegrals,
+    initialValueProblems,
     applications,
     uSubstitution,
     volumesOfRevolution,
