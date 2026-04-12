@@ -282,7 +282,7 @@ const PROBLEMS = [
 ];
 
 function drawGraph(svg, problem, step) {
-  const { f, a, b, domain, yDomain, roots } = problem;
+  const { f, fPrime, a, b, domain, yDomain, roots } = problem;
   svg.selectAll("* ").remove();
 
   const xSc = d3

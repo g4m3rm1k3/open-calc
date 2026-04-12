@@ -209,6 +209,14 @@ export default {
         caption:
           "A guided Rolle walkthrough with multiple example functions and step-by-step visual reasoning.",
       },
+      {
+        id: "RolleProblemStepper",
+        title: "One complete Rolle problem",
+        mathBridge:
+          "Walk all the way through a Rolle's Theorem problem from hypothesis checks to solving f'(x)=0 and verifying the interior solutions.",
+        caption:
+          "A step-by-step Rolle's Theorem problem walkthrough with visual endpoint checks and derivative root confirmation.",
+      },
     ],
   },
 

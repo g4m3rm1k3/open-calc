@@ -4385,7 +4385,7 @@ export default function SVGDiagram({ params = {} }) {
 
   return (
     <div style={{ background: C.bg, borderRadius: 12, overflow: "hidden" }}>
-      <Diagram C={C} />
+      <Diagram C={C} {...params} />
     </div>
   );
 }
