@@ -97,6 +97,77 @@ const RULE_LIBRARY = {
   },
 }
 
+const INTEGRAL_RULE_LIBRARY = {
+  'int-power': {
+    label: 'Power Rule (∫)',
+    formula: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)',
+    why: {
+      tag: 'Why power rule for integrals?',
+      explanation: 'Integration is the inverse of differentiation. The derivative of x^(n+1)/(n+1) is x^n, so we reverse it: add 1 to the exponent and divide by the new exponent.',
+      why: {
+        tag: 'Verify by differentiating',
+        explanation: 'Check: d/dx[x^(n+1)/(n+1)] = (n+1)x^n/(n+1) = x^n. ✓',
+      },
+    },
+  },
+  'int-constant': {
+    label: 'Constant Rule (∫)',
+    formula: '\\int k\\,dx = kx + C',
+    why: {
+      tag: 'Why does ∫k dx = kx?',
+      explanation: 'A constant k = k·x^0, so by power rule at n=0: x^(0+1)/(0+1) = x. With coefficient k we get kx.',
+    },
+  },
+  'int-constant-multiple': {
+    label: 'Constant Multiple Rule (∫)',
+    formula: '\\int k\\cdot f(x)\\,dx = k\\int f(x)\\,dx',
+    why: {
+      tag: 'Why factor constants out?',
+      explanation: 'Integration is linear. A constant scale factor does not affect the shape of the antiderivative, only its vertical scale. Formally: the integral of a limit of sums is the limit of scaled sums.',
+    },
+  },
+  'int-sum': {
+    label: 'Sum/Difference Rule (∫)',
+    formula: '\\int (f \\pm g)\\,dx = \\int f\\,dx \\pm \\int g\\,dx',
+    why: {
+      tag: 'Why split sums?',
+      explanation: 'Each term accumulates independently. This is the integral form of linearity: limits distribute over addition.',
+    },
+  },
+  'int-trig': {
+    label: 'Basic Trig Antiderivatives',
+    formula: '\\int \\sin x\\,dx = -\\cos x + C,\\quad \\int \\cos x\\,dx = \\sin x + C',
+    why: {
+      tag: 'Why these trig antiderivatives?',
+      explanation: 'Verified by differentiating: d/dx[−cos x] = sin x ✓ and d/dx[sin x] = cos x ✓. We are searching for a function whose derivative is the integrand.',
+    },
+  },
+  'int-exp': {
+    label: 'Exponential Antiderivative',
+    formula: '\\int e^x\\,dx = e^x + C',
+    why: {
+      tag: 'Why is e^x its own antiderivative?',
+      explanation: 'Because d/dx[e^x] = e^x. The exponential function is the unique function (up to constant) equal to its own derivative — that defining property makes it its own antiderivative too.',
+    },
+  },
+  'int-log': {
+    label: 'Log Antiderivative (1/x)',
+    formula: '\\int \\frac{1}{x}\\,dx = \\ln|x| + C',
+    why: {
+      tag: 'Why absolute value in ln|x|?',
+      explanation: 'd/dx[ln|x|] = 1/x for all x ≠ 0. The absolute value extends validity to x < 0, where ln(x) is undefined but 1/x is still defined.',
+    },
+  },
+  'int-substitution': {
+    label: 'u-Substitution (Reverse Chain Rule)',
+    formula: '\\int f(g(x))\\,g\'(x)\\,dx = F(g(x)) + C',
+    why: {
+      tag: 'Why u-substitution?',
+      explanation: 'When the integrand contains a composite function f(g(x)) and its inner derivative g\'(x), substituting u = g(x) simplifies ∫f(g(x))g\'(x)dx into ∫f(u)du — a basic integral. This is the chain rule run backwards.',
+    },
+  },
+}
+
 const LOCAL_SNAPSHOT_STORE_KEY = 'universal-calc-snapshots-v1'
 
 function loadLocalSnapshotStore() {
@@ -1374,6 +1445,372 @@ function buildExplanation(input) {
     steps: stepsWithContext,
     finalLatex: chosenFinalLatex,
     finalExpr: chosenFinalNode.toString(),
+    mode: 'derivative',
+  }
+}
+
+// ─── Integral explainer engine ────────────────────────────────────────────────
+
+function makeIntegrator(varName = 'x') {
+  let seq = 0
+  const nextId = (prefix) => `${prefix}-${++seq}`
+
+  function safeTex(node) {
+    return toLatex(node)
+  }
+
+  function isConstant(node) {
+    return !nodeHasX(node)
+  }
+
+  function trace(node, path = 'root') {
+    const steps = []
+
+    if (node?.isParenthesisNode && node.content) {
+      return trace(node.content, `${path}-paren`)
+    }
+
+    // ── Constant: ∫k dx = kx ────────────────────────────────────────────────
+    if (isConstant(node)) {
+      const result = parse(`(${node.toString()}) * x`)
+      steps.push({
+        id: nextId(`${path}-const`),
+        tag: 'Constant Rule',
+        title: 'Integral of a constant',
+        math: `\\int ${safeTex(node)}\\,dx = ${safeTex(node)} x + C`,
+        activeExpr: safeTex(node),
+        note: 'A constant integrates to that constant times x.',
+        currentDerivativePreview: `${safeTex(node)} x`,
+        ruleCodes: ['int-constant'],
+        why: INTEGRAL_RULE_LIBRARY['int-constant'].why,
+        isIntegral: true,
+      })
+      return { antiderivativeNode: result, steps }
+    }
+
+    // ── Variable x: ∫x dx = x²/2 ────────────────────────────────────────────
+    if (node.isSymbolNode && node.name === varName) {
+      const result = parse('x^2 / 2')
+      steps.push({
+        id: nextId(`${path}-x`),
+        tag: 'Power Rule (n=1)',
+        title: 'Integral of x',
+        math: `\\int x\\,dx = \\frac{x^{2}}{2} + C`,
+        activeExpr: 'x',
+        note: 'Power rule with n=1: add 1 to get x², divide by 2.',
+        currentDerivativePreview: '\\frac{x^{2}}{2}',
+        ruleCodes: ['int-power'],
+        why: INTEGRAL_RULE_LIBRARY['int-power'].why,
+        isIntegral: true,
+      })
+      return { antiderivativeNode: result, steps }
+    }
+
+    // ── Sum / Difference ─────────────────────────────────────────────────────
+    if (node.isOperatorNode && (node.op === '+' || node.op === '-') && node.args.length === 2) {
+      const [left, right] = node.args
+      const leftRes = trace(left, `${path}-sum-left`)
+      const rightRes = trace(right, `${path}-sum-right`)
+      const result = parse(`(${wrapIfNeeded(leftRes.antiderivativeNode)}) ${node.op} (${wrapIfNeeded(rightRes.antiderivativeNode)})`)
+      steps.push({
+        id: nextId(`${path}-sum-rule`),
+        tag: 'Sum/Difference Rule',
+        title: `Split integral across ${node.op === '+' ? 'sum' : 'difference'}`,
+        math: `\\int \\left(${safeTex(left)} ${node.op} ${safeTex(right)}\\right)dx = \\int ${safeTex(left)}\\,dx ${node.op} \\int ${safeTex(right)}\\,dx`,
+        activeExpr: safeTex(node),
+        note: 'Integration is linear — each term can be integrated independently.',
+        ruleCodes: ['int-sum'],
+        why: INTEGRAL_RULE_LIBRARY['int-sum'].why,
+        isIntegral: true,
+      })
+      steps.push(...leftRes.steps)
+      steps.push(...rightRes.steps)
+      steps.push({
+        id: nextId(`${path}-sum-merge`),
+        tag: 'Combine antiderivatives',
+        title: 'Recombine into single expression',
+        math: `F(x) = ${safeTex(result)} + C`,
+        activeExpr: safeTex(node),
+        note: 'One +C covers the whole expression.',
+        currentDerivativePreview: safeTex(result),
+        ruleCodes: [],
+        isIntegral: true,
+      })
+      return { antiderivativeNode: result, steps }
+    }
+
+    // ── Constant multiple: ∫k·f dx = k·∫f dx ────────────────────────────────
+    if (node.isOperatorNode && node.op === '*' && node.args.length === 2) {
+      const [left, right] = node.args
+      const handleConstMul = (constNode, varNode, innerPath) => {
+        const innerRes = trace(varNode, innerPath)
+        const result = parse(`(${wrapIfNeeded(constNode)}) * (${wrapIfNeeded(innerRes.antiderivativeNode)})`)
+        steps.push({
+          id: nextId(`${path}-constmul-rule`),
+          tag: 'Constant Multiple Rule',
+          title: 'Factor constant outside integral',
+          math: `\\int ${safeTex(constNode)}\\cdot ${safeTex(varNode)}\\,dx = ${safeTex(constNode)}\\cdot\\int ${safeTex(varNode)}\\,dx`,
+          activeExpr: safeTex(node),
+          note: 'Constants factor out of integrals unchanged.',
+          ruleCodes: ['int-constant-multiple'],
+          why: INTEGRAL_RULE_LIBRARY['int-constant-multiple'].why,
+          isIntegral: true,
+        })
+        steps.push(...innerRes.steps)
+        steps.push({
+          id: nextId(`${path}-constmul-merge`),
+          tag: 'Combine',
+          title: 'Scale antiderivative by constant',
+          math: `F(x) = ${safeTex(result)} + C`,
+          currentDerivativePreview: safeTex(result),
+          ruleCodes: [],
+          isIntegral: true,
+        })
+        return { antiderivativeNode: algebraicSimplify(result), steps }
+      }
+      if (isConstant(left) && !isConstant(right)) return handleConstMul(left, right, `${path}-constmul-right`)
+      if (!isConstant(left) && isConstant(right)) return handleConstMul(right, left, `${path}-constmul-left`)
+    }
+
+    // ── x^n power rule ───────────────────────────────────────────────────────
+    if (node.isOperatorNode && node.op === '^' && node.args?.length === 2) {
+      const base = node.args[0]
+      const exp = node.args[1]
+      if (base.isSymbolNode && base.name === varName && isConstant(exp)) {
+        const nVal = Number(exp.toString())
+        if (!isNaN(nVal) && nVal === -1) {
+          // ∫x^(-1) = ln|x|
+          steps.push({
+            id: nextId(`${path}-log`),
+            tag: 'Log Rule',
+            title: 'Integral of x^(−1) = 1/x',
+            math: `\\int x^{-1}\\,dx = \\int \\frac{1}{x}\\,dx = \\ln|x| + C`,
+            activeExpr: safeTex(node),
+            note: 'The power rule breaks at n=−1 (would give 1/0). The antiderivative is ln|x| instead.',
+            currentDerivativePreview: '\\ln|x|',
+            ruleCodes: ['int-log'],
+            why: INTEGRAL_RULE_LIBRARY['int-log'].why,
+            isIntegral: true,
+          })
+          return { antiderivativeNode: parse('log(x)'), steps }
+        }
+        // General: ∫x^n = x^(n+1)/(n+1)
+        const nPlus1 = !isNaN(nVal) ? nVal + 1 : null
+        const resultTex = nPlus1 !== null ? `\\frac{x^{${nPlus1}}}{${nPlus1}}` : `\\frac{x^{n+1}}{n+1}`
+        const resultNode = nPlus1 !== null
+          ? algebraicSimplify(parse(`x^${nPlus1} / ${nPlus1}`))
+          : parse(`x^(${exp.toString()} + 1) / (${exp.toString()} + 1)`)
+        steps.push({
+          id: nextId(`${path}-power`),
+          tag: 'Power Rule',
+          title: `Integral of x^${safeTex(exp)}`,
+          math: `\\int x^{${safeTex(exp)}}\\,dx = \\frac{x^{${safeTex(exp)}+1}}{${safeTex(exp)}+1} + C`,
+          activeExpr: safeTex(node),
+          note: `Add 1 to the exponent (${safeTex(exp)} → ${nPlus1 ?? safeTex(exp)+'+1'}), then divide by the new exponent.`,
+          currentDerivativePreview: resultTex,
+          ruleCodes: ['int-power'],
+          why: INTEGRAL_RULE_LIBRARY['int-power'].why,
+          isIntegral: true,
+        })
+        return { antiderivativeNode: resultNode, steps }
+      }
+    }
+
+    // ── 1/x written as division ──────────────────────────────────────────────
+    if (node.isOperatorNode && node.op === '/' && node.args.length === 2) {
+      const [num, den] = node.args
+      if (num.isConstantNode && Number(num.value) === 1 && den.isSymbolNode && den.name === varName) {
+        steps.push({
+          id: nextId(`${path}-log`),
+          tag: 'Log Rule',
+          title: 'Integral of 1/x',
+          math: `\\int \\frac{1}{x}\\,dx = \\ln|x| + C`,
+          activeExpr: safeTex(node),
+          note: 'The antiderivative of 1/x is the natural log (absolute value for full domain).',
+          currentDerivativePreview: '\\ln|x|',
+          ruleCodes: ['int-log'],
+          why: INTEGRAL_RULE_LIBRARY['int-log'].why,
+          isIntegral: true,
+        })
+        return { antiderivativeNode: parse('log(x)'), steps }
+      }
+    }
+
+    // ── Trig and exp functions ───────────────────────────────────────────────
+    if (node.isFunctionNode && node.args.length === 1) {
+      const name = node.fn?.name?.toLowerCase()
+      const arg = node.args[0]
+      const argStr = arg.toString()
+      const argIsX = arg.isSymbolNode && arg.name === varName
+
+      // Check for linear arg: a*x (e.g. 2*x)
+      const linearMatch = !argIsX && argStr.match(/^(-?[\d.]+)\s*\*\s*x$/)
+      const aVal = linearMatch ? Number(linearMatch[1]) : null
+      const aLatex = aVal === null ? '' : (aVal === 1 ? '' : aVal === -1 ? '-' : String(aVal))
+
+      if (argIsX || linearMatch) {
+        const divBy = aVal !== null ? ` / ${aVal}` : ''
+        const divLatexStr = aVal !== null ? `{${aVal}}` : ''
+
+        if (name === 'sin') {
+          const resultNode = aVal !== null ? parse(`-cos(${argStr}) / ${aVal}`) : parse('-cos(x)')
+          const resultTex = aVal !== null ? `-\\frac{\\cos(${aLatex}x)}{${divLatexStr}}` : '-\\cos(x)'
+          steps.push({
+            id: nextId(`${path}-sin`),
+            tag: aVal !== null ? 'Trig + Substitution' : 'Trig Rule',
+            title: `Integral of sin(${aLatex}x)`,
+            math: aVal !== null
+              ? `\\int \\sin(${aLatex}x)\\,dx = -\\frac{\\cos(${aLatex}x)}{${divLatexStr}} + C`
+              : `\\int \\sin(x)\\,dx = -\\cos(x) + C`,
+            activeExpr: safeTex(node),
+            note: aVal !== null
+              ? `Let u = ${aLatex}x, du = ${aVal}·dx → divide result by ${aVal} (reverse chain rule).`
+              : 'The antiderivative of sin is −cos. Verify: d/dx[−cos x] = sin x.',
+            currentDerivativePreview: resultTex,
+            ruleCodes: aVal !== null ? ['int-trig', 'int-substitution'] : ['int-trig'],
+            why: aVal !== null ? INTEGRAL_RULE_LIBRARY['int-substitution'].why : INTEGRAL_RULE_LIBRARY['int-trig'].why,
+            isIntegral: true,
+          })
+          return { antiderivativeNode: algebraicSimplify(resultNode), steps }
+        }
+
+        if (name === 'cos') {
+          const resultNode = aVal !== null ? parse(`sin(${argStr}) / ${aVal}`) : parse('sin(x)')
+          const resultTex = aVal !== null ? `\\frac{\\sin(${aLatex}x)}{${divLatexStr}}` : '\\sin(x)'
+          steps.push({
+            id: nextId(`${path}-cos`),
+            tag: aVal !== null ? 'Trig + Substitution' : 'Trig Rule',
+            title: `Integral of cos(${aLatex}x)`,
+            math: aVal !== null
+              ? `\\int \\cos(${aLatex}x)\\,dx = \\frac{\\sin(${aLatex}x)}{${divLatexStr}} + C`
+              : `\\int \\cos(x)\\,dx = \\sin(x) + C`,
+            activeExpr: safeTex(node),
+            note: aVal !== null
+              ? `u = ${aLatex}x, du = ${aVal}·dx → divide by ${aVal}.`
+              : 'The antiderivative of cos is sin. Verify: d/dx[sin x] = cos x.',
+            currentDerivativePreview: resultTex,
+            ruleCodes: aVal !== null ? ['int-trig', 'int-substitution'] : ['int-trig'],
+            why: aVal !== null ? INTEGRAL_RULE_LIBRARY['int-substitution'].why : INTEGRAL_RULE_LIBRARY['int-trig'].why,
+            isIntegral: true,
+          })
+          return { antiderivativeNode: algebraicSimplify(resultNode), steps }
+        }
+
+        if (name === 'exp') {
+          const resultNode = aVal !== null ? parse(`exp(${argStr}) / ${aVal}`) : parse('exp(x)')
+          const resultTex = aVal !== null ? `\\frac{e^{${aLatex}x}}{${divLatexStr}}` : 'e^{x}'
+          steps.push({
+            id: nextId(`${path}-exp`),
+            tag: aVal !== null ? 'Exponential + Substitution' : 'Exponential Rule',
+            title: `Integral of e^(${aLatex}x)`,
+            math: aVal !== null
+              ? `\\int e^{${aLatex}x}\\,dx = \\frac{e^{${aLatex}x}}{${divLatexStr}} + C`
+              : `\\int e^{x}\\,dx = e^{x} + C`,
+            activeExpr: safeTex(node),
+            note: aVal !== null
+              ? `e^x is its own antiderivative. With inner coefficient ${aVal}, divide by ${aVal}.`
+              : 'e^x is its own antiderivative — the unique function equal to its own derivative.',
+            currentDerivativePreview: resultTex,
+            ruleCodes: aVal !== null ? ['int-exp', 'int-substitution'] : ['int-exp'],
+            why: aVal !== null ? INTEGRAL_RULE_LIBRARY['int-substitution'].why : INTEGRAL_RULE_LIBRARY['int-exp'].why,
+            isIntegral: true,
+          })
+          return { antiderivativeNode: algebraicSimplify(resultNode), steps }
+        }
+      }
+    }
+
+    // ── Fallback ─────────────────────────────────────────────────────────────
+    steps.push({
+      id: nextId(`${path}-fallback`),
+      tag: 'Advanced Technique Required',
+      title: 'Cannot apply elementary rules directly',
+      math: `\\int ${safeTex(node)}\\,dx \\;\\text{— requires substitution, parts, or a special formula}`,
+      activeExpr: safeTex(node),
+      note: 'The basic rules (power, trig, exp, sum, constant multiple) do not apply here. This likely requires u-substitution or integration by parts — techniques in Lessons 5 and 6.',
+      currentDerivativePreview: '?',
+      ruleCodes: [],
+      why: {
+        tag: 'Why no direct rule?',
+        explanation: 'Elementary integration rules only cover polynomial, trig, and exponential building blocks combined by sums and constant multiples. Compositions, products of different families, and other structures require dedicated techniques.',
+      },
+      isIntegral: true,
+    })
+    return { antiderivativeNode: node, steps }
+  }
+
+  return { trace }
+}
+
+function buildIntegralExplanation(input) {
+  const normalized = preprocessFriendlyInput(input)
+  const exprNode = friendlyParse(normalized)
+  const steps = []
+
+  steps.push({
+    id: 'identify',
+    tag: 'Identify structure',
+    title: 'Detect integration strategy',
+    math: `\\int ${toLatex(exprNode)}\\,dx`,
+    activeExpr: toLatex(exprNode),
+    currentDerivativePreview: '?',
+    note: 'Scanning for: sums to split, constants to factor, power-rule candidates, trig/exp lookup rules.',
+    ruleCodes: [],
+    why: {
+      tag: 'How is the strategy chosen?',
+      explanation: 'Integration strategy follows a priority order: (1) split sums/differences, (2) factor constant multiples, (3) apply lookup rules (power, trig, exp, log). If none apply, substitution or parts is signaled.',
+    },
+    isIntegral: true,
+  })
+
+  const integrator = makeIntegrator('x')
+  const { antiderivativeNode: rawNode, steps: intSteps } = integrator.trace(exprNode, 'root')
+  steps.push(...intSteps)
+
+  const simplifiedNode = algebraicSimplify(rawNode)
+  const rawLatex = cleanupLatexExpression(toLatex(rawNode))
+  const simplifiedLatex = cleanupLatexExpression(toLatex(simplifiedNode))
+
+  if (compactLatex(simplifiedLatex) !== compactLatex(rawLatex)) {
+    steps.push({
+      id: 'simplify-final',
+      tag: 'Simplify',
+      title: 'Simplify antiderivative',
+      math: `F(x) = ${simplifiedLatex} + C`,
+      currentDerivativePreview: simplifiedLatex,
+      note: 'Collect like terms and simplify numeric coefficients.',
+      ruleCodes: [],
+      isIntegral: true,
+    })
+  }
+
+  const finalLatex = simplifiedLatex || rawLatex
+  const finalNode = compactLatex(simplifiedLatex) !== compactLatex(rawLatex) ? simplifiedNode : rawNode
+
+  let rollingPreview = ''
+  const stepsWithContext = steps.map((s) => {
+    const nextPreview = s.currentDerivativePreview || rollingPreview || '?'
+    rollingPreview = nextPreview
+    return {
+      ...s,
+      focusPath: describeFocusFromStepId(s.id),
+      activeSubExpr: s.activeExpr || '',
+      prevDerivativePreview: rollingPreview,
+      currentDerivativePreview: nextPreview,
+      globalBefore: `\\int ${toLatex(exprNode)}\\,dx`,
+      globalAfter: nextPreview && nextPreview !== '?' ? `F(x) = ${nextPreview}` : `\\int ${toLatex(exprNode)}\\,dx`,
+    }
+  })
+
+  return {
+    inputLatex: toLatex(exprNode),
+    inputExpr: exprNode.toString(),
+    rawLatex,
+    rawExpr: rawNode.toString(),
+    steps: stepsWithContext,
+    finalLatex,
+    finalExpr: finalNode.toString(),
+    mode: 'integral',
   }
 }
 
@@ -1498,6 +1935,7 @@ export default function UniversalCalcExplainer() {
   const [importText, setImportText] = useState('')
   const [toast, setToast] = useState('')
   const [showSimplificationPath, setShowSimplificationPath] = useState(true)
+  const [mode, setMode] = useState('derivative') // 'derivative' | 'integral'
   const [recentInputs, setRecentInputs] = useState(() => {
     try {
       const raw = localStorage.getItem('universal-calc-recent-inputs')
@@ -1510,17 +1948,23 @@ export default function UniversalCalcExplainer() {
 
   const { explanation, error } = useMemo(() => {
     try {
-      return { explanation: buildExplanation(submitted), error: '' }
+      const result = mode === 'integral'
+        ? buildIntegralExplanation(submitted)
+        : buildExplanation(submitted)
+      return { explanation: result, error: '' }
     } catch (e) {
       return {
         explanation: null,
-        error: e?.message || 'Could not parse expression. Use mathjs style, e.g. sin(x^3) * (x^2 + 1).',
+        error: e?.message || 'Could not parse expression. Use mathjs style, e.g. x^3 + sin(x).',
       }
     }
-  }, [submitted])
+  }, [submitted, mode])
 
   const dynamicSnapshot = useMemo(() => {
     if (!explanation) return null
+
+    const isIntegral = explanation.mode === 'integral'
+    const prefix = isIntegral ? 'F(x)' : "f'(x)"
 
     const filtered = explanation.steps.filter((step) => {
       const tag = String(step.tag || '').toLowerCase()
@@ -1531,13 +1975,15 @@ export default function UniversalCalcExplainer() {
       return true
     })
 
-    let rollingExpr = `\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`
+    let rollingExpr = isIntegral
+      ? `\\int ${explanation.inputLatex}\\,dx`
+      : `\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`
     const rootByBranch = new Map()
     const steps = filtered.map((step) => {
       const stepId = String(step.id || '')
       const primaryRule = step.ruleCodes?.[0]
-      const ruleUsed = primaryRule && RULE_LIBRARY[primaryRule]
-        ? RULE_LIBRARY[primaryRule].label
+      const ruleUsed = primaryRule && (RULE_LIBRARY[primaryRule] || INTEGRAL_RULE_LIBRARY[primaryRule])
+        ? (RULE_LIBRARY[primaryRule] || INTEGRAL_RULE_LIBRARY[primaryRule]).label
         : (step.tag || 'Custom Step')
 
       const localEq = extractPrimaryEquality(step.math)
@@ -1547,8 +1993,6 @@ export default function UniversalCalcExplainer() {
       let beforeExpr = step.globalBefore || rollingExpr
       let outcomeExpr = step.globalAfter || rollingExpr
 
-      // If global replacement failed for a step, fallback to local equation sides
-      // so each line still reflects a real transformation.
       if (compactLatex(beforeExpr) === compactLatex(outcomeExpr)) {
         if (localEq.before && localEq.after && compactLatex(localEq.before) !== compactLatex(localEq.after)) {
           beforeExpr = tidyDisplayLatex(localEq.before)
@@ -1556,7 +2000,6 @@ export default function UniversalCalcExplainer() {
         }
       }
 
-      // If the global stitched expression becomes malformed, fall back to local step equality.
       beforeExpr = pickRenderableLatex(beforeExpr, fallbackApplied)
       outcomeExpr = pickRenderableLatex(outcomeExpr, fallbackOutcome)
 
@@ -1574,32 +2017,40 @@ export default function UniversalCalcExplainer() {
       return {
         ruleUsed,
         stepId,
-        applied: `f'(x)=${beforeExpr}`,
-        outcome: `f'(x)=${outcomeExpr}`,
-        fallbackApplied: fallbackApplied ? `f'(x)=${fallbackApplied}` : '',
-        fallbackOutcome: fallbackOutcome ? `f'(x)=${fallbackOutcome}` : '',
+        applied: `${prefix}=${beforeExpr}`,
+        outcome: `${prefix}=${outcomeExpr}`,
+        fallbackApplied: fallbackApplied ? `${prefix}=${fallbackApplied}` : '',
+        fallbackOutcome: fallbackOutcome ? `${prefix}=${fallbackOutcome}` : '',
         rootBranchKey: branchKey,
         rootBranchLabel: getRootBranchLabel(branchKey),
         rootSubExpr,
         commentary: '',
         note: step.note || '',
         why: step.why || null,
+        isIntegral: step.isIntegral || false,
       }
     })
 
     return {
-      equation: `f(x) = ${explanation.inputLatex}`,
+      equation: isIntegral
+        ? `\\int ${explanation.inputLatex}\\,dx`
+        : `f(x) = ${explanation.inputLatex}`,
       steps,
       finalLatex: explanation.finalLatex,
       inputExpr: explanation.inputExpr,
       finalExpr: explanation.finalExpr,
-      derivativeStart: `f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`,
+      derivativeStart: isIntegral
+        ? `\\int ${explanation.inputLatex}\\,dx`
+        : `f'(x)=\\frac{d}{dx}\\left(${explanation.inputLatex}\\right)`,
+      isIntegral,
     }
   }, [explanation])
 
   const simplificationPath = useMemo(() => {
     if (!explanation) return []
 
+    const isIntegral = explanation.mode === 'integral'
+    const prefix = isIntegral ? 'F(x)' : "f'(x)"
     const rows = []
     const seen = new Set()
 
@@ -1611,16 +2062,16 @@ export default function UniversalCalcExplainer() {
       seen.add(key)
       rows.push({
         label,
-        expr: `f'(x)=${cleaned}`,
+        expr: `${prefix}=${cleaned}`,
         note,
         why,
       })
     }
 
     pushRow(
-      'Unsimplified combined derivative',
+      isIntegral ? 'Unsimplified antiderivative' : 'Unsimplified combined derivative',
       explanation.rawLatex,
-      'Direct result after rule application, before algebraic cleanup.'
+      isIntegral ? 'Direct antiderivative from rule application, before cleanup.' : 'Direct result after rule application, before algebraic cleanup.'
     )
 
     explanation.steps
@@ -1631,7 +2082,10 @@ export default function UniversalCalcExplainer() {
         pushRow(step.title || 'Simplify', candidate, step.note || '', step.why || null)
       })
 
-    pushRow('Final simplified / factored derivative', explanation.finalLatex)
+    pushRow(
+      isIntegral ? 'Final simplified antiderivative' : 'Final simplified / factored derivative',
+      explanation.finalLatex
+    )
 
     return rows
   }, [explanation])
@@ -1880,15 +2334,41 @@ export default function UniversalCalcExplainer() {
     <section className="max-w-[2200px] mx-auto px-2 sm:px-4 lg:px-8">
       <div className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Universal Calc Explainer (Beta)</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
           Sequential proof stepper with progressive disclosure. Each step opens only when you navigate to it.
         </p>
+
+        {/* Mode selector */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {[
+            { key: 'derivative', label: 'Derivative', hint: 'e.g. sin(x^3) * (x^2 + 1)' },
+            { key: 'integral', label: 'Antiderivative (∫)', hint: 'e.g. x^3 + sin(x)' },
+          ].map(({ key, label, hint }) => (
+            <button
+              key={key}
+              onClick={() => setMode(key)}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                mode === key
+                  ? 'bg-brand-600 text-white border-brand-600'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:border-brand-400'
+              }`}
+            >
+              {label}
+              <span className={`ml-2 text-xs font-normal ${mode === key ? 'text-white/70' : 'text-slate-400 dark:text-slate-500'}`}>
+                {hint}
+              </span>
+            </button>
+          ))}
+        </div>
 
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="w-full min-h-[86px] rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-3 font-mono text-sm text-slate-800 dark:text-slate-100"
-          placeholder="Examples: sin(x^3), (2*x+1)^5*(3*x-2)^7, exp(x^2)/x"
+          placeholder={mode === 'integral'
+            ? 'Examples: x^3 + 2*x, sin(x) + cos(x), x^2 - 1/x, 3*exp(x)'
+            : 'Examples: sin(x^3), (2*x+1)^5*(3*x-2)^7, exp(x^2)/x'
+          }
         />
 
         {recentInputs.length > 0 && (
@@ -1917,9 +2397,13 @@ export default function UniversalCalcExplainer() {
             onClick={handleExplain}
             className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold"
           >
-            Start Sequential Proof
+            {mode === 'integral' ? 'Show Antiderivative Steps' : 'Start Sequential Proof'}
           </button>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Supported: +, -, *, /, ^, sin, cos, tan, exp, log (variable x)</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {mode === 'integral'
+              ? 'Supported: +, -, constants, x^n, sin, cos, exp, 1/x (variable x)'
+              : 'Supported: +, -, *, /, ^, sin, cos, tan, exp, log (variable x)'}
+          </p>
         </div>
 
         <div className="mt-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 p-3 space-y-3">
@@ -2034,7 +2518,9 @@ export default function UniversalCalcExplainer() {
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-3">Solution</h2>
             <p className="text-base text-slate-700 dark:text-slate-300 mb-6">
-              Problem, then alternating lines: apply a rule, then show the resulting expression.
+              {dynamicSnapshot?.isIntegral
+                ? 'Antiderivative built step by step. Each rule is applied and explained in sequence.'
+                : 'Problem, then alternating lines: apply a rule, then show the resulting expression.'}
             </p>
 
             <div className="space-y-5">
@@ -2048,7 +2534,8 @@ export default function UniversalCalcExplainer() {
               {displayedSteps.map((step, i) => {
                 const ruleLabel = step.ruleUsed || 'Custom Step'
                 const customCommentary = String(step.commentary || '').trim()
-                const defaultCommentary = buildDefaultCommentary(step)
+                const isIntegralStep = step.isIntegral || step.ruleCodes?.some(c => String(c).startsWith('int-'))
+                const defaultCommentary = isIntegralStep ? '' : buildDefaultCommentary(step)
                 const effectiveCommentary = customCommentary || defaultCommentary
                 const isDefaultCommentary = !customCommentary
 
@@ -2185,26 +2672,42 @@ export default function UniversalCalcExplainer() {
 
           {dynamicSnapshot && (
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">Final simplified derivative</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-2">
+              {dynamicSnapshot.isIntegral ? 'Final antiderivative' : 'Final simplified derivative'}
+            </h2>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Simplified / factored</p>
-              <KatexBlock expr={`f'(x) = ${dynamicSnapshot.finalLatex}`} className="text-slate-900 dark:text-slate-100" />
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                {dynamicSnapshot.isIntegral ? 'Simplified antiderivative' : 'Simplified / factored'}
+              </p>
+              <KatexBlock
+                expr={dynamicSnapshot.isIntegral
+                  ? `F(x) = ${dynamicSnapshot.finalLatex} + C`
+                  : `f'(x) = ${dynamicSnapshot.finalLatex}`}
+                className="text-slate-900 dark:text-slate-100"
+              />
             </div>
             <div className="mt-4">
               <OpenInGrapher
                 variant="button"
-                label="Open f(x) and f'(x) in Grapher"
+                label={dynamicSnapshot.isIntegral ? 'Open f(x) and F(x) in Grapher' : "Open f(x) and f'(x) in Grapher"}
                 config={{
                   mode: 'pro',
                   replace: true,
-                  functions: [
-                    { expr: dynamicSnapshot.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
-                    { expr: dynamicSnapshot.finalExpr, type: 'explicit', color: '#ec4899', label: "f'(x)" },
-                  ],
+                  functions: dynamicSnapshot.isIntegral
+                    ? [
+                        { expr: dynamicSnapshot.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
+                        { expr: dynamicSnapshot.finalExpr, type: 'explicit', color: '#10b981', label: 'F(x)' },
+                      ]
+                    : [
+                        { expr: dynamicSnapshot.inputExpr, type: 'explicit', color: '#6366f1', label: 'f(x)' },
+                        { expr: dynamicSnapshot.finalExpr, type: 'explicit', color: '#ec4899', label: "f'(x)" },
+                      ],
                 }}
               />
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Grapher opens with a snapshot of the current function pair. Click Explain again after edits to refresh the plotted derivative.
+                {dynamicSnapshot.isIntegral
+                  ? 'Grapher shows the original function and its antiderivative family (at C=0). Notice the antiderivative is always "one degree smoother" than f(x).'
+                  : 'Grapher opens with a snapshot of the current function pair. Click Explain again after edits to refresh the plotted derivative.'}
               </p>
             </div>
           </div>

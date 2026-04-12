@@ -139,7 +139,6 @@ export default {
       title: "Distance from a Triangular Velocity Profile",
       problem:
         "\\text{A car accelerates from rest with velocity } v(t) = 3t \\text{ m/s for } t \\in [0, 4]. \\text{ Find the total distance traveled.}",
-      visualizationId: "WaterTank",
       steps: [
         {
           expression:
