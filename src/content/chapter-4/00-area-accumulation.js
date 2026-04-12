@@ -18,6 +18,7 @@ export default {
     prose: [
       'The simplest accumulation problem is constant rate: if water flows at a steady 5 litres per minute for 3 minutes, the total is 5 × 3 = 15 litres. On a graph of rate r versus time t, the rate is a horizontal line at r = 5. The total accumulated quantity is the area of the rectangle under that line: width 3 (time interval) times height 5 (rate) equals 15. This geometric observation — area under the rate curve equals total accumulated quantity — is the seed of integration.',
       'Now suppose the rate is not constant but changes linearly: r(t) = 3t m/s (a car accelerating from rest). In the first 4 seconds, the rate rises from 0 to 12 m/s. The velocity-time graph is a straight line through the origin. The region under the graph from t = 0 to t = 4 is a right triangle with base 4 and height 12. Its area is ½ × 4 × 12 = 24. The car travels 24 metres. This is not a coincidence — it is the same logic. Distance is area under the velocity curve, because each thin vertical strip of the graph has width dt (a tiny time interval) and height v(t) (speed at that instant), contributing v(t) dt metres to the total.',
+      '**One more step before curved functions: a stepped rate.** Suppose water flows at 8 L/min for the first 2 minutes, then 5 L/min for the next 2 minutes, then 2 L/min for the final 2 minutes. You can handle this with pure arithmetic — three rectangles: (8×2) + (5×2) + (2×2) = 16 + 10 + 4 = 30 L. Now imagine the same idea with 10 steps instead of 3: each step narrower, each height matching the actual rate more closely. Then 100 steps. Then 1000. The approximation improves each time. The limit of this process — infinitely many infinitely thin rectangles, each with width dt and height r(t) — is the exact total. That limit is the definite integral. The stepped example is not a warm-up we discard; it is the integral itself, with the slice count taken to infinity.',
       'For curved rate functions, the triangle and rectangle formulas no longer apply directly. But the underlying logic is unchanged. Slice the time axis into many small intervals. In each tiny interval [tᵢ, tᵢ₊₁] of width Δt, the rate barely changes — it is approximately r(tᵢ). The amount accumulated in that slice is approximately r(tᵢ) · Δt, the area of a thin rectangle. Sum all these rectangles, and you have an approximation to the total. The more slices you use, the finer the approximation and the closer you get to the true total. In the limit as the slice width approaches zero, the sum of rectangles becomes the area under the curve exactly.',
       'This limit of sums is the definite integral, written ∫ₐᵇ f(x) dx. The elongated S symbol (∫) stands for "sum" — Leibniz chose it to emphasize that the integral is a limiting summation. The symbol dx represents the infinitesimal width of each slice. The limits a and b mark the start and end of the interval. The entire expression means: "sum up f(x) · dx for every x from a to b." This is the most compact and powerful notation ever invented for an accumulation process.',
       'The connection between area and accumulation has a directional aspect: signed area. If a velocity is negative (moving backward), the contribution to displacement is negative. If a rate function dips below the t-axis, the integral subtracts that portion. The definite integral computes net accumulation — positive contributions minus negative contributions. For total accumulation (ignoring direction), you integrate the absolute value |f(x)|. This signed vs. unsigned distinction is important in applications: displacement (net change in position) uses the signed integral, while total distance traveled uses the integral of |v(t)|.',
@@ -41,6 +42,21 @@ export default {
       'The connection between definite and indefinite integrals is the payoff of Lesson 3 (FTC Part 2): once you know any antiderivative $F$, you compute $\\int_a^b r = F(b) - F(a)$. That is why finding antiderivatives (Lesson 4) is the work that makes definite integrals computable by algebra rather than by drawing rectangles.',
     ],
     callouts: [
+      {
+        type: 'definition',
+        title: 'Reading the ∫ Symbol for the First Time',
+        body: 'The elongated S, $\\int$, is Leibniz\'s shorthand for *summa* (Latin: sum). The full notation\n$$\\int_a^b r(t)\\,dt$$\nis read **"the integral from $a$ to $b$ of $r(t)$ dt"** and means:\n\n> Add up $r(t) \\cdot dt$ for every infinitesimal thin slice from $t=a$ to $t=b$.\n\n**$a$, $b$** — the *limits of integration*: where accumulation starts and stops.\n\n**$r(t)$** — the *integrand*: the height of the rectangle at position $t$ (the rate at that instant).\n\n**$dt$** — the *infinitesimal width* of each slice. This is not a number to substitute; it is a signal that $t$ is the variable being summed over.\n\n**The letter $t$** — a *dummy variable*. $\\int_a^b r(t)\\,dt$ and $\\int_a^b r(x)\\,dx$ and $\\int_a^b r(u)\\,du$ all mean the exact same thing. The letter vanishes after integration.',
+      },
+      {
+        type: 'warning',
+        title: 'What "dt" (or "dx") Actually Means',
+        body: '$dt$ is **not a number** you can cancel, move across an equal sign, or substitute a value into. It carries two pieces of information:\n\n1. **Which variable is being summed** — $\\int r(t)\\,dt$ accumulates over $t$; $\\int r(x)\\,dx$ accumulates over $x$.\n2. **The infinitesimal slice width** in the limit — each rectangle has width $dt$, height $r(t)$, and contributes area $r(t)\\cdot dt$.\n\nLater you will see expressions like $du = 2x\\,dx$ in the substitution rule. That notation works for a precise reason — but at this stage, treat $dt$ as a label for the variable, not as arithmetic.',
+      },
+      {
+        type: 'tip',
+        title: 'Units: The Integral Is Dimensionally Meaningful',
+        body: 'The result of an integral inherits units by multiplication — *integrand units × variable units*:\n\n— $\\int r(t)\\,dt$ with $r$ in L/min and $t$ in min → **(L/min) × min = L** ✓\n\n— $\\int v(t)\\,dt$ with $v$ in m/s and $t$ in s → **(m/s) × s = m** ✓\n\n— $\\int P(t)\\,dt$ with $P$ in watts and $t$ in hours → **watt·hours** (energy) ✓\n\nThis is a quick sanity check: if the units of your integral don\'t make physical sense, recheck the setup before computing.',
+      },
       {
         type: 'prior-knowledge',
         title: 'You Already Know Area Formulas',
@@ -141,6 +157,11 @@ export default {
         type: 'tip',
         title: 'The Simplest Antiderivatives Come From This Lesson',
         body: 'Every constant-rate and linear-rate problem in this lesson already uses antiderivatives:\n\n— Constant $r = k$: antiderivative is $F(t) = kt$. Area = rectangle.\n\n— Linear $r = mt$: antiderivative is $F(t) = \\frac{1}{2}mt^2$. Area = triangle.\n\n— Quadratic $r = at^2$: antiderivative is $F(t) = \\frac{a}{3}t^3$. These all follow the **power rule**: $\\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C$. The full table is in Lesson 4.',
+      },
+      {
+        type: 'warning',
+        title: 'The Integral Is Not the Antiderivative',
+        body: 'Three related but distinct objects — keep them separate:\n\n**Antiderivative**: a function $F$ satisfying $F\'(x) = f(x)$. It exists on its own, with no integral symbol in sight.\n\n**Definite integral** $\\int_a^b f(x)\\,dx$: a **number** — the signed area. FTC Part 2 (Lesson 3) says you *use* an antiderivative to *compute* it via $F(b) - F(a)$. The antiderivative is the tool; the definite integral is the result.\n\n**Indefinite integral** $\\int f(x)\\,dx = F(x) + C$: shorthand for the entire *family* of antiderivatives — no specific number, no specific starting point.\n\nThe imprecise phrase "the integral of $f$ is $F$" conflates all three. Precise language: *"An antiderivative of $f$ is $F$; the definite integral of $f$ from $a$ to $b$ is $F(b)-F(a)$."*',
       },
     ],
     visualizations: [],
@@ -423,7 +444,7 @@ export default {
     {
       id: 'area-accum-q2',
       type: 'input',
-      text: 'A car accelerates from rest with velocity \\(v(t) = 6t\\) m/s. The velocity–time graph is a straight line through the origin. Use geometry (triangle area) to find the total displacement from \\(t = 0\\) to \\(t = 4\\).',
+      text: 'A car accelerates from rest with velocity \\(v(t) = 6t\\) m/s. The velocity–time graph is a straight line through the origin. Use geometry (triangle area) to find the total displacement from \\(t = 0\\) to \\(t = 4\\). Enter your answer in metres (just the number).',
       answer: '48',
       hints: ['The region under \\(v(t)=6t\\) on [0,4] is a right triangle.', 'Area = ½ × base × height. Height = v(4) = 24.'],
       reviewSection: 'Intuition — Triangular area for linear rate',
@@ -495,7 +516,7 @@ export default {
     {
       id: 'area-accum-q10',
       type: 'input',
-      text: 'A velocity function is \\(v(t) = t\\) on \\([0, 6]\\). The car travels from \\(t=0\\) to \\(t=6\\). Use the triangle area formula to find the total displacement.',
+      text: 'A velocity function is \\(v(t) = t\\) on \\([0, 6]\\). The car travels from \\(t=0\\) to \\(t=6\\). Use the triangle area formula to find the total displacement. Enter your answer in metres (just the number).',
       answer: '18',
       hints: ['The area is a right triangle with base 6 and height v(6) = 6.', 'Area = ½ × 6 × 6 = 18.'],
       reviewSection: 'Intuition — Triangle area for linear velocity',
