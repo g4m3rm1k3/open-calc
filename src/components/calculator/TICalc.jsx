@@ -383,6 +383,7 @@ export default function TICalc({ onClose }) {
 
   // ── Button press ──
   const press = useCallback((val) => {
+    if (isMobile) inputRef.current?.blur()
     // Handle STO mode: letter = store number, fN = store formula
     if (stoMode === 'num' && /^[A-Z]$/.test(val)) {
       // Evaluate current expr if present, otherwise fall back to ans
