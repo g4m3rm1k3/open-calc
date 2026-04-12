@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import DEFAULT_NOTES from '../../content/default-notes.json'
@@ -347,7 +348,7 @@ export default function StickyNote({ noteId }) {
                   }}>
                   {text.trim()
                     ? <ReactMarkdown
-                        remarkPlugins={[remarkMath]}
+                        remarkPlugins={[remarkGfm, remarkMath]}
                         rehypePlugins={[rehypeKatex]}
                         components={{
                           h1: ({children}) => <h1 style={{fontSize:'1.3em',fontWeight:700,margin:'0.4em 0'}}>{children}</h1>,
