@@ -70,6 +70,50 @@ export default {
     ],
   },
 
+  applications: {
+    prose: [
+      "Rolle's Theorem is not a computation tool — it is a **logic tool**. You use it when you need to prove something *must* happen between two points where a function takes the same value. The theorem does three jobs: it proves a derivative must vanish somewhere, it limits how many roots a function can have, and it is the one-line proof engine behind uniqueness arguments.",
+
+      "**When you should think 'Rolle's Theorem'.** The trigger is always the same: two distinct inputs with equal outputs. In practice this shows up as two roots \\(f(a) = 0\\) and \\(f(b) = 0\\), two endpoints with equal height \\(f(a) = f(b)\\), or algebra that forces \\(f(x_1) = f(x_2)\\). Once you see equal outputs at distinct inputs, check whether the function is continuous and differentiable on that interval — if yes, Rolle's applies.",
+
+      "**The 4-step application workflow.** Every Rolle's argument follows the same skeleton. *Step 1*: identify the two points with equal function values — this is the trigger that tells you Rolle's is the right tool. *Step 2*: verify the three hypotheses — continuity on \\([a,b]\\), differentiability on \\((a,b)\\), and \\(f(a) = f(b)\\). For polynomials, exponentials, and trig functions (with no holes in the interval), steps 1 and 2 of the hypotheses are automatic. *Step 3*: invoke the theorem — conclude that \\(\\exists\\, c \\in (a,b)\\) with \\(f'(c) = 0\\). This is purely existential: you are not computing \\(c\\), only asserting it exists. *Step 4*: use the existence of \\(c\\) to prove the real goal — derive a contradiction, bound the number of roots, prove uniqueness, establish monotonicity, or show two functions differ by a constant. Step 4 is where the theorem actually does work; Steps 1–3 just set it up.",
+
+      "**Pattern 1 — At most \\(n\\) real roots (the root-counting argument).** This is the most important application of Rolle's Theorem in algebra. Suppose a degree-\\(n\\) polynomial \\(p(x)\\) had \\(n+1\\) distinct roots \\(r_1 < r_2 < \\cdots < r_{n+1}\\). Between each consecutive pair \\((r_k, r_{k+1})\\), Rolle's Theorem gives a point \\(c_k\\) with \\(p'(c_k) = 0\\). That produces \\(n\\) distinct roots of \\(p'(x)\\). But \\(p'\\) has degree \\(n-1\\) and can have at most \\(n-1\\) roots — contradiction. Therefore \\(p(x)\\) has at most \\(n\\) real roots. This argument works for any differentiable function, not just polynomials.",
+
+      "**Pattern 2 — Exactly one real root (existence + uniqueness).** Use two theorems in sequence. First, use the Intermediate Value Theorem to show *at least* one root exists (find sign change). Second, assume for contradiction that two roots \\(r_1 < r_2\\) exist. Rolle's Theorem gives \\(c \\in (r_1, r_2)\\) with \\(f'(c) = 0\\). If you can show \\(f'(x) \\neq 0\\) everywhere (for example, \\(f'(x) > 0\\) everywhere), you have a contradiction — so no second root can exist. IVT gives existence; Rolle gives uniqueness. Together: exactly one root.",
+
+      "**Pattern 3 — Strictly increasing via positive derivative.** If \\(f'(x) > 0\\) on \\((a,b)\\), then \\(f\\) is strictly increasing on \\([a,b]\\): for any \\(x_1 < x_2\\) in \\([a,b]\\), the MVT (proved from Rolle's) gives \\(f(x_2) - f(x_1) = f'(c)(x_2 - x_1) > 0\\). This is used constantly in optimization and curve sketching to argue a function has no repeated values — and therefore at most one zero, no backtracking, etc.",
+
+      "**Pattern 4 — Two functions with equal derivatives differ by a constant.** If \\(f'(x) = g'(x)\\) on an interval, set \\(h(x) = f(x) - g(x)\\). Then \\(h'(x) = 0\\) everywhere. By the MVT corollary (derived from Rolle's), \\(h\\) must be constant. This is the foundation of antiderivative theory: the general antiderivative of a function is *any* particular antiderivative plus an arbitrary constant \\(C\\).",
+
+      "**Pattern 5 — Bounding oscillations.** Rolle's Theorem limits how many times a function can change direction. Each direction change requires a horizontal tangent, which is a root of \\(f'\\). Since \\(f'\\) has bounded degree (or bounded number of roots for analytic functions), the original function can only change direction a bounded number of times. This appears in numerical analysis (bounding interpolation error), stability analysis (counting oscillations of a solution), and uniqueness proofs for ODEs.",
+
+      "**The workflow in action: \\(f(x) = x^3 - 13x^2 + 50x - 56\\) on \\([2, 7]\\).** *Step 1*: Check endpoints. \\(f(2) = 8 - 52 + 100 - 56 = 0\\) and \\(f(7) = 343 - 637 + 350 - 56 = 0\\). Equal — Rolle's applies. *Step 2*: Polynomial, so continuous and differentiable everywhere. All three hypotheses hold. *Step 3*: Rolle's guarantees \\(\\exists\\, c \\in (2,7)\\) with \\(f'(c) = 0\\). *Step 4*: Compute \\(f'(x) = 3x^2 - 26x + 50\\). Quadratic formula: \\(c = \\frac{26 \\pm \\sqrt{676 - 600}}{6} = \\frac{26 \\pm \\sqrt{76}}{6}\\). The two values are approximately \\(c \\approx 2.91\\) and \\(c \\approx 5.75\\), both inside \\((2,7)\\). Rolle's guaranteed at least one; we found two.",
+    ],
+    callouts: [
+      {
+        type: 'tip',
+        title: "Trigger: When to Think 'Rolle's Theorem'",
+        body: "Use Rolle's whenever you see: (1) two points with equal function values (two roots, two equal endpoint heights, algebraic equality forced), (2) a need to prove a derivative must be zero somewhere, (3) a root-counting or uniqueness argument. The trigger is always equal outputs at distinct inputs.",
+      },
+      {
+        type: 'definition',
+        title: 'The 4-Step Application Skeleton',
+        body: "Step 1 — Find the two points with \\(f(a) = f(b)\\). Step 2 — Verify continuity on \\([a,b]\\), differentiability on \\((a,b)\\), equal values. Step 3 — Invoke Rolle's: conclude \\(\\exists\\, c \\in (a,b)\\) with \\(f'(c) = 0\\). Step 4 — Use the guaranteed \\(c\\) to finish the proof: contradiction, uniqueness, monotonicity, or constant-difference argument. Steps 1–3 set up; Step 4 is where the work happens.",
+      },
+      {
+        type: 'warning',
+        title: "Rolle's Gives Existence, Not Location",
+        body: "Step 3 is purely existential. You conclude that \\(c\\) exists — you do NOT compute it in this step. If the problem asks you to find \\(c\\), that is a separate task: solve \\(f'(x) = 0\\) and check which solutions lie in \\((a,b)\\). Many proofs never need the actual value of \\(c\\) at all.",
+      },
+      {
+        type: 'tip',
+        title: 'The Test-Ready Checklist',
+        body: "Before invoking Rolle's, ask: (1) Do I have two points with \\(f(a) = f(b)\\)? (2) Is \\(f\\) continuous on \\([a,b]\\)? (3) Is \\(f\\) differentiable on \\((a,b)\\)? (4) What does the existence of \\(c\\) with \\(f'(c) = 0\\) let me prove? If all four line up, Rolle's is the right tool.",
+      },
+    ],
+  },
+
   math: {
     prose: [
       "**Rolle's Theorem (Formal Statement).** Let $f$ be a function satisfying: (i) $f$ is continuous on the closed interval $[a, b]$, (ii) $f$ is differentiable on the open interval $(a, b)$, and (iii) $f(a) = f(b)$. Then there exists at least one point $c \\in (a, b)$ such that $f'(c) = 0$.",

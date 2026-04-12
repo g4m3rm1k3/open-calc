@@ -614,6 +614,15 @@ export default function MicroCycleLesson({ lesson }) {
             </div>
          </div>
       )}
+      {lesson.applications && (
+        <div className="mb-8">
+          <SectionDivider icon="🧩" label="Applying the Theorem" color="emerald" noteId={lesson.id ? `${lesson.id}:applications` : undefined} />
+          <SectionContent data={lesson.applications} />
+          {getSectionVizzes(lesson.applications).map((viz, i) => (
+            <VizCard key={`app-viz-${i}`} viz={viz} borderColor="border-emerald-200 dark:border-emerald-800" />
+          ))}
+        </div>
+      )}
       <MathBlock data={lesson.math} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
       {(() => {
