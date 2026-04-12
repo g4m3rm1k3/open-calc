@@ -234,7 +234,7 @@ function draw(){
   ctx.fillText(s.note,CW/2,42);
 
   // Info panel update
-  document.getElementById('info').textContent=s.name+'\n'+s.coords+(selMat>=0?'\n\nMatrix: '+matrices[selMat].name+'\n'+matrices[selMat].desc:'');
+  document.getElementById('info').textContent = s.name+'\n'+s.coords+(selMat>=0?'\n\nMatrix: '+matrices[selMat].name+'\n'+matrices[selMat].desc:'');
 }
 
 buildStack();draw();`,
