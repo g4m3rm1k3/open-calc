@@ -61,7 +61,13 @@ export default {
         body: "Ironically, Michel Rolle was a vocal critic of calculus who considered infinitesimals to be logically unsound. His theorem, published in 1691, was originally stated only for polynomials. The modern version for differentiable functions came later, after the foundations of calculus were made rigorous by Cauchy and Weierstrass.",
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        vizId: 'RolleExplorer',
+        mathBridge: "Type any function you want — polynomial, trig, anything. Set an interval [a, b]. The explorer checks whether f(a) = f(b) (green badge = Rolle's applies, red badge = it doesn't). If the conditions are met, enter your guess for where f′(c) = 0 before hitting 'Reveal answer'. Try breaking the theorem deliberately: use f(x) = x on [0, 1] (f(0) ≠ f(1)) or f(x) = abs(x) on [-1, 1] (corner at 0 means no derivative, Rolle's still doesn't apply — but the explorer will still find the c numerically, which shows why the hypothesis matters).",
+        caption: "Enter any f(x) and interval, guess where the horizontal tangent is, then reveal the exact answer.",
+      },
+    ],
   },
 
   math: {

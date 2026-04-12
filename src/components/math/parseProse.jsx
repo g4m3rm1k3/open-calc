@@ -121,11 +121,11 @@ export function parseProse(text) {
       }
     }
 
-    // **bold**
+    // **bold** — recursively parse inner content so $math$ and \(...\) render
     if (text.startsWith('**', i)) {
       const end = text.indexOf('**', i + 2)
       if (end !== -1) {
-        parts.push(<strong key={`b${keyIdx++}`}>{text.slice(i + 2, end)}</strong>)
+        parts.push(<strong key={`b${keyIdx++}`}>{parseProse(text.slice(i + 2, end))}</strong>)
         i = end + 2
         continue
       }
