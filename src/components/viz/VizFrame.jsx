@@ -155,6 +155,7 @@ const VIZ_REGISTRY = {
   RocketCamera: lazy(() => import("./react/RocketCamera.jsx")),
   LinearApproximation: lazy(() => import("./d3/LinearApproximation.jsx")),
   MVTViz: lazy(() => import("./d3/MVTViz.jsx")),
+  RolleViz: lazy(() => import("./d3/RolleViz.jsx")),
   CurveSketchingBoard: lazy(() => import("./d3/CurveSketchingBoard.jsx")),
   SignChartBuilder: lazy(() => import("./d3/SignChartBuilder.jsx")),
   ChainRulePeeler: lazy(() => import("./react/ChainRulePeeler.jsx")),

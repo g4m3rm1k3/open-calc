@@ -1557,6 +1557,159 @@ function ActionReactionDiagram({ C }) {
   )
 }
 
+// ─── Rolle's → MVT proof construction ────────────────────────────────────────
+//
+//  Two-panel diagram.
+//  LEFT:  f(x) = x² − x on [0.2, 2.8] with secant line L(x)
+//  RIGHT: g(x) = f(x) − L(x), showing g(a) = g(b) = 0 and horizontal tangent at c
+//  Arrow between panels labels the operation: "subtract secant → g(a)=g(b)=0"
+
+function RollesMVTProof({ C }) {
+  const W = 560, H = 260
+  const pad = { t: 28, b: 44, l: 44, r: 20 }
+  const panelW = (W - pad.l - pad.r - 40) / 2   // 40px gap between panels
+  const panelH = H - pad.t - pad.b
+
+  // f(x) = x² − x,  L(x) = secant from (0.5, f(0.5)) to (2.5, f(2.5))
+  const f = (x) => x * x - x
+  const a = 0.5, b = 2.5
+  const fa = f(a), fb = f(b)
+  const secSlope = (fb - fa) / (b - a)
+  const L = (x) => fa + secSlope * (x - a)
+  const g = (x) => f(x) - L(x)
+
+  const xMin = 0.1, xMax = 2.9
+  const yMin = -0.7, yMax = 2.0
+  const gyMin = -0.8, gyMax = 0.5
+
+  // c where g'(x)=0: f'(x)=secSlope → 2x−1=secSlope → x=(1+secSlope)/2
+  const cG = (1 + secSlope) / 2
+
+  function toL(x, panel = 'left') {
+    const xOff = panel === 'left' ? pad.l : pad.l + panelW + 40
+    const px = xOff + ((x - xMin) / (xMax - xMin)) * panelW
+    return px
+  }
+  function toT(y, ylo, yhi) {
+    return pad.t + panelH - ((y - ylo) / (yhi - ylo)) * panelH
+  }
+
+  // Build polyline points for a function over N steps
+  function pts(fn, ylo, yhi, panel, steps = 120) {
+    const result = []
+    for (let i = 0; i <= steps; i++) {
+      const x = xMin + (i / steps) * (xMax - xMin)
+      const y = fn(x)
+      if (y < ylo - 0.3 || y > yhi + 0.3) continue
+      result.push(`${toL(x, panel).toFixed(1)},${toT(y, ylo, yhi).toFixed(1)}`)
+    }
+    return result.join(' ')
+  }
+
+  // Axis helpers
+  const axisY_left   = toT(0, yMin, yMax)
+  const axisX_left   = toL(xMin, 'left')
+  const axisX_left2  = toL(xMax, 'left')
+  const axisX_right  = toL(xMin, 'right')
+  const axisX_right2 = toL(xMax, 'right')
+
+  // Key points — left panel
+  const lax   = toL(a, 'left'), lay = toT(fa, yMin, yMax)
+  const lbx   = toL(b, 'left'), lby = toT(fb, yMin, yMax)
+  const secY1 = toT(L(xMin), yMin, yMax)
+  const secY2 = toT(L(xMax), yMin, yMax)
+
+  // Key points — right panel
+  const rax  = toL(a, 'right'),    ray  = toT(g(a), gyMin, gyMax)
+  const rbx  = toL(b, 'right'),    rby  = toT(g(b), gyMin, gyMax)
+  const rcx  = toL(cG, 'right'),   rcy  = toT(g(cG), gyMin, gyMax)
+  const rBaseY = toT(0, gyMin, gyMax)
+
+  // Arrow between panels: midpoint
+  const arrowX1 = pad.l + panelW + 2
+  const arrowX2 = pad.l + panelW + 38
+  const arrowMY = H / 2
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      {/* ── Panel titles ─────────────────────────────────────────────── */}
+      <text x={pad.l + panelW / 2} y={pad.t - 10} textAnchor="middle" fill={C.brand} fontSize={11} fontFamily="monospace" fontWeight="700">f (x) with secant L(x)</text>
+      <text x={pad.l + panelW + 40 + panelW / 2} y={pad.t - 10} textAnchor="middle" fill={C.emerald} fontSize={11} fontFamily="monospace" fontWeight="700">g(x) = f(x) − L(x)</text>
+
+      {/* ── LEFT panel: f(x) curve + secant ─────────────────────────── */}
+      {/* Axis lines */}
+      <line x1={axisX_left} y1={axisY_left} x2={axisX_left2} y2={axisY_left} stroke={C.border} strokeWidth={1} />
+      <line x1={axisX_left} y1={pad.t} x2={axisX_left} y2={pad.t + panelH} stroke={C.border} strokeWidth={1} />
+
+      {/* Secant line (amber) */}
+      <line x1={toL(xMin, 'left')} y1={secY1} x2={toL(xMax, 'left')} y2={secY2}
+        stroke={C.amber} strokeWidth={2} strokeDasharray="7,4" />
+
+      {/* f(x) curve (brand/indigo) */}
+      <polyline points={pts(f, yMin, yMax, 'left')} fill="none" stroke={C.brand} strokeWidth={2.5} />
+
+      {/* Endpoint dots on f */}
+      <circle cx={lax} cy={lay} r={5} fill={C.amber} />
+      <circle cx={lbx} cy={lby} r={5} fill={C.amber} />
+      <text x={lax - 4} y={lay - 9} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">(a, f(a))</text>
+      <text x={lbx + 4} y={lby - 9} textAnchor="start" fill={C.amber} fontSize={10} fontFamily="monospace">(b, f(b))</text>
+
+      {/* Secant slope label */}
+      <text x={toL(1.75, 'left')} y={toT(L(1.75), yMin, yMax) - 8} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">
+        slope = (f(b)−f(a))/(b−a)
+      </text>
+
+      {/* ── Arrow between panels ──────────────────────────────────────── */}
+      <line x1={arrowX1} y1={arrowMY} x2={arrowX2 - 7} y2={arrowMY} stroke={C.muted} strokeWidth={1.5} />
+      <polygon points={`${arrowX2},${arrowMY} ${arrowX2 - 9},${arrowMY - 5} ${arrowX2 - 9},${arrowMY + 5}`} fill={C.muted} />
+      <text x={(arrowX1 + arrowX2) / 2} y={arrowMY - 7} textAnchor="middle" fill={C.muted} fontSize={8} fontFamily="sans-serif">subtract</text>
+      <text x={(arrowX1 + arrowX2) / 2} y={arrowMY + 3} textAnchor="middle" fill={C.muted} fontSize={8} fontFamily="sans-serif">secant</text>
+
+      {/* ── RIGHT panel: g(x) ────────────────────────────────────────── */}
+      {/* Axis lines */}
+      <line x1={axisX_right} y1={rBaseY} x2={axisX_right2} y2={rBaseY} stroke={C.border} strokeWidth={1} />
+      <line x1={axisX_right} y1={pad.t} x2={axisX_right} y2={pad.t + panelH} stroke={C.border} strokeWidth={1} />
+
+      {/* Shaded region between g and x-axis */}
+      <polygon
+        points={[a, ...Array.from({ length: 60 }, (_, i) => a + i * (b - a) / 59), b]
+          .map((x) => `${toL(x, 'right').toFixed(1)},${toT(g(x), gyMin, gyMax).toFixed(1)}`).join(' ')
+          .concat(` ${rbx.toFixed(1)},${rBaseY.toFixed(1)} ${rax.toFixed(1)},${rBaseY.toFixed(1)}`)}
+        fill={C.emerald} opacity={0.12} />
+
+      {/* g(x) curve (emerald) */}
+      <polyline points={pts(g, gyMin, gyMax, 'right')} fill="none" stroke={C.emerald} strokeWidth={2.5} />
+
+      {/* g(a) = g(b) = 0 dots and labels */}
+      <circle cx={rax} cy={ray} r={5} fill={C.amber} />
+      <circle cx={rbx} cy={rby} r={5} fill={C.amber} />
+      <text x={rax} y={ray + 14} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">g(a)=0</text>
+      <text x={rbx} y={rby + 14} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">g(b)=0</text>
+
+      {/* c point with horizontal tangent */}
+      <circle cx={rcx} cy={rcy} r={6} fill={C.emerald} />
+      <line x1={rcx - 22} y1={rcy} x2={rcx + 22} y2={rcy}
+        stroke={C.emerald} strokeWidth={2.5} />
+      <line x1={rcx} y1={rcy} x2={rcx} y2={rBaseY}
+        stroke={C.emerald} strokeWidth={1.3} strokeDasharray="4,3" />
+      <text x={rcx} y={rcy - 10} textAnchor="middle" fill={C.emerald} fontSize={10} fontFamily="monospace">g′(c)=0</text>
+      <text x={rcx} y={rBaseY + 13} textAnchor="middle" fill={C.emerald} fontSize={10} fontFamily="monospace">c</text>
+
+      {/* Rolle's applies label */}
+      <text x={axisX_right + panelW / 2} y={pad.t + panelH - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Rolle's applies to g → g′(c)=0 → f′(c)= secant slope (QED)
+      </text>
+
+      {/* Bottom footnote */}
+      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Define g(x) = f(x) − L(x) where L is the secant line.  Then g(a) = g(b) = 0.  Rolle's Theorem gives g′(c) = 0, i.e. f′(c) = slope of secant.
+      </text>
+    </svg>
+  )
+}
+
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
@@ -1588,6 +1741,8 @@ const DIAGRAMS = {
   'inclined-plane':          InclinedPlaneDiagram,
   'pulley-system':           PulleySystemDiagram,
   'action-reaction':         ActionReactionDiagram,
+  // Calculus Ch3 — Applications of Derivatives
+  'rolles-mvt-proof':        RollesMVTProof,
 }
 
 export default function SVGDiagram({ params = {} }) {

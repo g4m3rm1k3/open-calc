@@ -10,26 +10,35 @@ export default {
 
   hook: {
     question: "If you drive from your house to a friend's house and back home again, must there be a moment during the trip when your velocity is exactly zero? Why?",
-    realWorldContext: "Imagine tossing a ball straight up. It leaves your hand going upward and returns to your hand going downward. At some instant in between, the ball's velocity must have been exactly zero — the peak of the trajectory. This is Rolle's Theorem in action: whenever a continuous quantity starts and ends at the same value, its rate of change must hit zero at some intermediate point. This principle underlies root-counting arguments in algebra, stability analysis in engineering, and error bounds in numerical analysis. Rolle's Theorem is also the stepping stone to the Mean Value Theorem, one of the most powerful results in all of calculus.",
-    previewVisualizationId: 'MVTViz',
+    realWorldContext: "Imagine tossing a ball straight up. It leaves your hand going upward and returns to your hand going downward. At some instant in between, the ball's velocity must have been exactly zero — the peak of the trajectory. This is Rolle's Theorem in action: whenever a continuous quantity starts and ends at the same value, its rate of change must hit zero at some intermediate point. This principle underlies root-counting arguments in algebra, stability analysis in engineering, and error bounds in numerical analysis. Rolle's Theorem is also the stepping stone to the Mean Value Theorem — one of the most powerful results in all of calculus — which we prove directly from it in the Math section below.",
+    previewVisualizationId: 'RolleViz',
   },
 
   intuition: {
     prose: [
-      "You have spent all of Chapter 2 building the derivative — limit definitions, power rule, chain rule, implicit differentiation. But so far, derivatives have been about computing. Chapter 3 is about what derivatives TELL you. We start with the simplest possible question: if a function starts and ends at the same height, what must be true between those endpoints? The answer — Rolle's Theorem — looks almost obvious when you draw a picture, but its proof requires everything you learned about continuity and differentiability in Chapters 1 and 2. More importantly, it is the foundation for the Mean Value Theorem in the very next lesson, which in turn unlocks every application in this chapter.",
-      "Rolle's Theorem makes a beautifully simple claim: if a function starts and ends at the same height on some interval, and if the function is smooth enough (continuous on the closed interval, differentiable on the open interval), then somewhere in between there must be a point where the tangent line is perfectly horizontal. The derivative is zero at that point.",
-      "Think about it graphically. You are drawing a curve that starts at the point $(a, f(a))$ and must end at the point $(b, f(b))$ where $f(a) = f(b)$. The curve must be unbroken (continuous) and smooth (differentiable). If the curve goes up at any point, it must eventually come back down to meet the same height at $b$ — and that means there is a peak somewhere with a horizontal tangent. If it goes down first, there must be a valley. If it stays perfectly flat, then $f'(c) = 0$ everywhere. No matter what path the curve takes, a horizontal tangent is unavoidable.",
-      "The ball-tossing analogy is the most natural example. Let $f(t)$ be the height of a ball at time $t$. You throw it at time $a$ and catch it at time $b$ at the same height: $f(a) = f(b)$. The height function is continuous and differentiable (we ignore air resistance). Therefore, there exists some time $c$ between $a$ and $b$ where $f'(c) = 0$ — the ball is momentarily stationary at its peak. You do not need to solve any equations to know this; Rolle's Theorem guarantees it purely from the boundary conditions.",
-      "Why do we need the hypotheses? Continuity is essential: if the function can jump, it could leap from $f(a)$ up to some value and then jump back down to $f(b) = f(a)$ without ever having a horizontal tangent. Differentiability is also needed: the function $f(x) = |x|$ on $[-1, 1]$ has $f(-1) = f(1) = 1$ and is continuous, but its only candidate for a horizontal tangent is $x = 0$, where the function has a corner and is not differentiable. The minimum at $x = 0$ exists, but there is no derivative there — so Rolle's Theorem does not apply (and indeed $f'(c) = 0$ has no solution).",
-      "Rolle's Theorem is actually a special case of the Mean Value Theorem. The MVT says that for any continuous, differentiable function on $[a, b]$, there exists $c$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. When $f(a) = f(b)$, the right-hand side becomes zero, and the MVT reduces exactly to Rolle's Theorem. Historically, however, Rolle's Theorem came first, and the MVT is proved using Rolle's Theorem — so the logical order is reversed from the historical order.",
-      "One of the most elegant applications of Rolle's Theorem is proving bounds on the number of roots a function can have. If a polynomial $p(x)$ of degree $n$ had $n + 1$ roots, then between each consecutive pair of roots Rolle's Theorem would give a root of $p'(x)$. That produces $n$ roots of $p'(x)$, which is a polynomial of degree $n - 1$. But a degree $n - 1$ polynomial can have at most $n - 1$ roots — contradiction. Therefore $p(x)$ has at most $n$ roots. This argument generalizes to any sufficiently smooth function.",
-      "Rolle's Theorem is an existence theorem: it tells you that a point $c$ with $f'(c) = 0$ exists, but it does not tell you what $c$ is or how to find it. This is a common pattern in analysis — many of the deepest results guarantee existence without providing a formula. To actually locate $c$, you must solve $f'(x) = 0$ by other means (algebra, Newton's method, etc.).",
+      "You have spent all of Chapter 2 building the derivative — limit definitions, power rule, chain rule, implicit differentiation. But so far, derivatives have been about computing. Chapter 3 is about what derivatives TELL you. We start with the simplest possible question: if a function starts and ends at the same height, what must be true between those endpoints? The answer — Rolle's Theorem — looks almost obvious when you draw a picture, but its proof requires everything you learned about continuity and differentiability in Chapters 1 and 2.",
+
+      "**Prerequisites you need (review them now if shaky).** (1) *Continuity on a closed interval*: $f$ is continuous on $[a,b]$ if it has no breaks, jumps, or holes. (2) *Differentiability on an open interval*: the derivative $f'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$ exists at every interior point — no corners, cusps, or vertical tangents. (3) *Extreme Value Theorem (EVT)*: if $f$ is continuous on $[a,b]$, it attains both a global maximum $M$ and global minimum $m$ on $[a,b]$. This is the key engine inside the proof. (4) *Fermat's Interior Extremum Theorem*: if $f$ has a local max or min at an interior point $c$ and $f'(c)$ exists, then $f'(c) = 0$. Quick sketch of why: at a local max, the difference quotient is $\\leq 0$ from the right and $\\geq 0$ from the left, so the limit (the derivative) must be exactly $0$. (5) *Secant slope* (the average rate of change): $\\frac{f(b)-f(a)}{b-a}$.",
+
+      "**The core idea, in plain language.** Rolle's Theorem makes a beautifully simple claim: if a function starts and ends at the same height on some interval, and if the function is smooth enough (continuous on the closed interval, differentiable on the open interval), then somewhere in between there must be a point where the tangent line is perfectly horizontal — the derivative is zero at that point.",
+
+      "Think about it graphically. You are drawing a curve that starts at $(a, f(a))$ and must end at $(b, f(b))$ where $f(a) = f(b)$. The curve must be unbroken and smooth. If the curve goes up at any point, it must eventually come back down to the same height at $b$ — meaning there is a peak somewhere with a horizontal tangent. If it goes down first, there must be a valley. If it stays perfectly flat, then $f'(c) = 0$ everywhere. No matter what, a horizontal tangent is unavoidable.",
+
+      "**The ball-tossing example.** Let $f(t)$ be the height of a ball at time $t$. You throw it at time $a$ and catch it at time $b$ at the same height: $f(a) = f(b)$. The height function is continuous and differentiable. Therefore, there exists some time $c$ between $a$ and $b$ where $f'(c) = 0$ — the ball is momentarily stationary at its peak. You do not need to solve any equation to know this; Rolle's Theorem guarantees it purely from the boundary conditions.",
+
+      "**Why every hypothesis is needed.** Continuity: if the function can jump, it could leap from $f(a)$ up to some value and then jump back down to $f(b)$ without ever having a horizontal tangent. Differentiability: the function $f(x) = |x|$ on $[-1, 1]$ has $f(-1) = f(1) = 1$ and is continuous, but its only candidate for a horizontal tangent is $x = 0$, where the function has a corner and is not differentiable — so Rolle's Theorem does not apply and indeed no $c$ with $f'(c) = 0$ exists. Equal endpoints: without $f(a) = f(b)$ the curve can slope straight through from one height to another, never flattening.",
+
+      "**Rolle's Theorem is an existence theorem.** It tells you that a point $c$ with $f'(c) = 0$ exists, but it does not tell you what $c$ is or how to find it. This is a common pattern in analysis — many of the deepest results guarantee existence without providing a formula. To actually locate $c$, you must solve $f'(x) = 0$ by other means (algebra, Newton's method, etc.).",
+
+      "**Connection to the Mean Value Theorem.** Rolle's Theorem is actually a special case of the MVT. The MVT says: for any continuous, differentiable function on $[a, b]$, there exists $c$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. When $f(a) = f(b)$, the right-hand side is zero, and the MVT reduces exactly to Rolle's Theorem. Historically, however, Rolle's Theorem came first, and the MVT is proved using Rolle's Theorem — the logical order is the reverse of the historical order.",
+
+      "**Root-counting application.** One of the most elegant uses of Rolle's Theorem is proving bounds on the number of roots a function can have. If a polynomial $p(x)$ of degree $n$ had $n + 1$ roots, then between each consecutive pair Rolle's would give a root of $p'(x)$, producing $n$ roots of $p'$. But $p'$ has degree $n-1$ and can have at most $n-1$ roots — contradiction. Therefore $p(x)$ has at most $n$ roots.",
     ],
     callouts: [
       {
         type: 'prior-knowledge',
-        title: 'Extreme Value Theorem Connection',
-        body: "Rolle's Theorem relies on the Extreme Value Theorem: a continuous function on a closed interval $[a, b]$ attains its maximum and minimum. If the max or min occurs in the interior and the function is differentiable there, Fermat's Theorem says the derivative is zero.",
+        title: 'Extreme Value Theorem + Fermat — The Proof Engine',
+        body: "The proof of Rolle's Theorem relies on two earlier results working together. The EVT (continuity on a closed interval → max and min exist) hands you a candidate interior point. Fermat's Interior Extremum Theorem (differentiability at that interior extremum → derivative = 0) hands you the conclusion. Neither result alone is sufficient.",
       },
       {
         type: 'warning',
@@ -39,31 +48,45 @@ export default {
       {
         type: 'geometric',
         title: 'The Mountain Pass Analogy',
-        body: 'Imagine hiking from a trailhead at elevation $h$ to another trailhead at the same elevation $h$, following a continuous smooth path. If you go uphill at any point, you must come back down — and at the highest point of your hike, the trail is momentarily flat (horizontal tangent). If you go downhill, the lowest point is flat. Either way, a flat point exists.',
+        body: 'Imagine hiking from a trailhead at elevation $h$ to another trailhead at the same elevation $h$, following a continuous smooth path. If you go uphill at any point, you must come back down — and at the highest point your trail is momentarily flat (horizontal tangent). If you go downhill first, the lowest point is flat. Either way, a flat point exists.',
       },
       {
         type: 'tip',
-        title: 'Multiple Horizontal Tangents',
-        body: "Rolle's Theorem guarantees at least one $c$ with $f'(c) = 0$, but there may be many. The function $f(x) = \\sin(x)$ on $[0, 2\\pi]$ has $f(0) = f(2\\pi) = 0$ and two points where $f'(c) = \\cos(c) = 0$: $c = \\pi/2$ and $c = 3\\pi/2$.",
+        title: 'Multiple Horizontal Tangents Are Fine',
+        body: "Rolle's Theorem guarantees at least one $c$ with $f'(c) = 0$, but there may be many. $f(x) = \\sin(x)$ on $[0, 2\\pi]$ has $f(0) = f(2\\pi) = 0$ and two such points: $c = \\pi/2$ and $c = 3\\pi/2$. The theorem guarantees a minimum of one — finding all of them requires solving $f'(x) = 0$.",
       },
       {
         type: 'history',
-        title: 'Michel Rolle (1652-1719)',
+        title: 'Michel Rolle (1652–1719)',
         body: "Ironically, Michel Rolle was a vocal critic of calculus who considered infinitesimals to be logically unsound. His theorem, published in 1691, was originally stated only for polynomials. The modern version for differentiable functions came later, after the foundations of calculus were made rigorous by Cauchy and Weierstrass.",
       },
     ],
-    visualizations: [
-                    { vizId: 'MVTViz', mathBridge: "Set f(a) = f(b) by dragging the right endpoint up or down until both endpoints match height. Then drag the interior slider — the theorem guarantees you will find a point where the tangent is perfectly horizontal. Notice: no matter what continuous differentiable curve shape you choose, the flat tangent always exists.", caption: "Verify Rolle's Theorem: match the endpoint heights, then locate the horizontal tangent the theorem guarantees." },
-    ],
+    visualizations: [],
   },
 
   math: {
     prose: [
       "**Rolle's Theorem (Formal Statement).** Let $f$ be a function satisfying: (i) $f$ is continuous on the closed interval $[a, b]$, (ii) $f$ is differentiable on the open interval $(a, b)$, and (iii) $f(a) = f(b)$. Then there exists at least one point $c \\in (a, b)$ such that $f'(c) = 0$.",
-      "The proof uses the Extreme Value Theorem. Since $f$ is continuous on the closed interval $[a, b]$, it attains its absolute maximum value $M$ and absolute minimum value $m$ on $[a, b]$. Case 1: if $M = m$, then $f$ is constant on $[a, b]$, so $f'(c) = 0$ for every $c$ in $(a, b)$. Case 2: if $M \\neq m$, then at least one of $M m$ differs from $f(a) = f(b)$. The extreme value that differs from the endpoint value must be attained at an interior point $c \\in (a, b)$ (since both endpoints give the same value). At an interior extremum of a differentiable function, Fermat's Theorem gives $f'(c) = 0$.",
-      "The relationship between Rolle's Theorem and the Mean Value Theorem is precise. The MVT states: if $f$ is continuous on $[a, b]$ and differentiable on $(a, b)$, then there exists $c \\in (a, b)$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. To prove the MVT from Rolle's Theorem, define the auxiliary function $g(x) = f(x) - \\left[f(a) + \\frac{f(b) - f(a)}{b - a}(x - a)\\right]$. This $g$ subtracts the secant line from $f$, so $g(a) = 0$ and $g(b) = 0$. Applying Rolle's Theorem to $g$ gives a point $c$ with $g'(c) = 0$, which yields $f'(c) = \\frac{f(b) - f(a)}{b - a}$.",
-      "**Root-counting application.** If $p(x)$ is a polynomial of degree $n$, then $p$ has at most $n$ real roots. Proof by contradiction: suppose $p$ has $n + 1$ distinct roots $r_1 < r_2 < \\cdots < r_{n+1}$. Between consecutive roots $r_k$ and $r_{k+1}$, we have $p(r_k) = p(r_{k+1}) = 0$, so Rolle's Theorem gives a point $c_k$ with $p'(c_k) = 0$. This produces $n$ distinct roots $c_1, c_2, \\ldots, c_n$ of $p'(x)$. But $p'(x)$ is a polynomial of degree $n - 1$, which can have at most $n - 1$ roots — a contradiction.",
-      "**Generalized Rolle's Theorem.** If $f$ vanishes at $n + 1$ distinct points, then $f'$ vanishes at $n$ distinct points (between consecutive roots of $f$), $f''$ vanishes at $n - 1$ points, and by induction $f^{(n)}$ vanishes at least once. This is used to prove error bounds in polynomial interpolation and Taylor's theorem with remainder.",
+
+      "**Proof (every step).** By the Extreme Value Theorem — which requires continuity on a closed bounded interval — $f$ attains its absolute maximum $M$ at some point $x_M \\in [a, b]$ and its absolute minimum $m$ at some point $x_m \\in [a, b]$. Case 1: $M = m$. Then $f$ is constant on $[a, b]$, so $f'(c) = 0$ for every $c \\in (a, b)$. Done. Case 2: $M > m$. Since $f(a) = f(b)$, the two endpoints give the same function value. If $M = f(a) = f(b)$ then $m < M = f(a)$, so the minimum is attained at some interior $c \\in (a, b)$. If $m = f(a) = f(b)$ then $M > m = f(a)$, so the maximum is attained at some interior $c \\in (a, b)$. In either sub-case, $c$ is an interior local extremum. Since $f$ is differentiable at $c$, Fermat's Theorem gives $f'(c) = 0$. $\\square$",
+
+      "**Canonical example: $f(x) = x^2$ on $[-1, 1]$.** $f$ is a polynomial — continuous and differentiable everywhere. $f(-1) = (-1)^2 = 1$ and $f(1) = 1^2 = 1$, so $f(-1) = f(1)$. By Rolle's, there exists $c \\in (-1, 1)$ with $f'(c) = 0$. Compute: $f'(x) = 2x$. Set $2c = 0 \\Rightarrow c = 0$. Check: $0 \\in (-1, 1)$. The horizontal tangent is at the vertex of the parabola.",
+
+      "**Working example 1: $f(x) = x^3 - 4x$ on $[-2, 2]$.** Continuous and differentiable everywhere. $f(-2) = -8 + 8 = 0$ and $f(2) = 8 - 8 = 0$. Equal. $f'(x) = 3x^2 - 4$. Set $3x^2 - 4 = 0 \\Rightarrow x^2 = \\frac{4}{3} \\Rightarrow x = \\pm \\frac{2}{\\sqrt{3}} \\approx \\pm 1.155$. Both values lie in $(-2, 2)$. Rolle's guarantees at least one; we found two. (Multiple roots are allowed.)",
+
+      "**Working example 2: $f(x) = \\sin x$ on $[0, 2\\pi]$.** $f(0) = 0$, $f(2\\pi) = 0$. $f'(x) = \\cos x = 0 \\Rightarrow x = \\frac{\\pi}{2}, \\frac{3\\pi}{2}$ (both in $(0, 2\\pi)$). Shows Rolle's works for trig functions.",
+
+      "**Proof of the Mean Value Theorem from Rolle's.** The MVT states: if $f$ is continuous on $[a, b]$ and differentiable on $(a, b)$, then there exists $c \\in (a, b)$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. We reduce this to Rolle's with a clever auxiliary function. Define $g(x) = f(x) - f(a) - \\frac{f(b)-f(a)}{b-a}(x - a)$. This subtracts the secant line (the straight line through $(a, f(a))$ and $(b, f(b))$) from $f(x)$. Step 1: Check $g$ satisfies Rolle's hypotheses. $g$ is continuous on $[a,b]$ and differentiable on $(a,b)$ (same as $f$). $g(a) = f(a) - f(a) - 0 = 0$ and $g(b) = f(b) - f(a) - (f(b)-f(a)) = 0$. So $g(a) = g(b)$. Step 2: Apply Rolle's to $g$: there exists $c \\in (a,b)$ with $g'(c) = 0$. Step 3: Compute $g'(x) = f'(x) - \\frac{f(b)-f(a)}{b-a}$. Step 4: $g'(c) = 0$ gives $f'(c) = \\frac{f(b)-f(a)}{b-a}$. $\\square$ The auxiliary $g(x)$ is designed so the secant term cancels exactly at both endpoints — no extra terms survive.",
+
+      "**Canonical MVT example: $f(x) = x^2$ on $[0, 2]$.** Average slope: $\\frac{f(2)-f(0)}{2-0} = \\frac{4}{2} = 2$. By MVT, exists $c \\in (0,2)$ with $f'(c) = 2$. $f'(x) = 2x = 2 \\Rightarrow c = 1 \\in (0,2)$. The tangent at $x = 1$ is parallel to the secant from $(0,0)$ to $(2,4)$.",
+
+      "**MVT working example 1: $f(x) = \\frac{1}{x}$ on $[1, 2]$.** Average slope: $\\frac{1/2 - 1}{1} = -\\frac{1}{2}$. $f'(x) = -\\frac{1}{x^2}$. Set $-\\frac{1}{c^2} = -\\frac{1}{2} \\Rightarrow c^2 = 2 \\Rightarrow c = \\sqrt{2} \\approx 1.414 \\in (1,2)$.",
+
+      "**MVT working example 2: $f(x) = x^3 - 3x + 2$ on $[0, 3]$.** Average slope: $\\frac{(27-9+2)-2}{3} = \\frac{20}{3}$. $f'(x) = 3x^2 - 3$. Set $3x^2 - 3 = \\frac{20}{3}$. Multiply by 3: $9x^2 - 9 = 20$, so $x^2 = \\frac{29}{9}$, $x = \\frac{\\sqrt{29}}{3} \\approx 1.795 \\in (0,3)$ (positive root; negative discarded).",
+
+      "**Root-counting application.** If $p(x)$ is a polynomial of degree $n$, then $p$ has at most $n$ real roots. Proof by contradiction: suppose $p$ has $n + 1$ distinct roots $r_1 < r_2 < \\cdots < r_{n+1}$. Between consecutive roots $r_k$ and $r_{k+1}$, Rolle's Theorem gives a point $c_k$ with $p'(c_k) = 0$. This produces $n$ distinct roots of $p'(x)$. But $p'(x)$ has degree $n - 1$ and can have at most $n - 1$ roots — contradiction.",
+
+      "**Key corollaries (what builds on Rolle's and MVT).** (1) Constant functions: if $f'(x) = 0$ for all $x \\in (a,b)$, then $f$ is constant. (Apply MVT on any sub-interval; slope $= 0$ forces $f(x_2) = f(x_1)$.) (2) Functions with equal derivatives: if $f'(x) = g'(x)$ on an interval, then $f(x) = g(x) + C$. (3) Increasing/Decreasing Test: if $f'(x) > 0$ on $(a,b)$, then $f$ is strictly increasing there. These are the bridge to the First Derivative Test, the Fundamental Theorem of Calculus, and Taylor's Theorem.",
     ],
     callouts: [
       {
@@ -72,39 +95,58 @@ export default {
         body: "If $f$ is continuous on $[a, b]$, differentiable on $(a, b)$, and $f(a) = f(b)$, then there exists $c \\in (a, b)$ with $f'(c) = 0$.",
       },
       {
+        type: 'theorem',
+        title: 'Mean Value Theorem',
+        body: "If $f$ is continuous on $[a, b]$ and differentiable on $(a, b)$, then there exists $c \\in (a, b)$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. Rolle's Theorem is the special case $f(a) = f(b)$.",
+      },
+      {
         type: 'definition',
-        title: 'From Rolle to MVT',
-        body: "Define $g(x) = f(x) - f(a) - \\frac{f(b) - f(a)}{b - a}(x - a)$. Then $g(a) = g(b) = 0$, so by Rolle's Theorem there exists $c$ with $g'(c) = 0$, giving $f'(c) = \\frac{f(b) - f(a)}{b - a}$.",
+        title: 'The MVT Auxiliary Function',
+        body: "Define $g(x) = f(x) - f(a) - \\frac{f(b) - f(a)}{b - a}(x - a)$. Then $g(a) = g(b) = 0$. Rolle's Theorem gives $c$ with $g'(c) = 0$, and since $g'(x) = f'(x) - \\frac{f(b)-f(a)}{b-a}$, this yields $f'(c) = \\frac{f(b)-f(a)}{b-a}$.",
       },
       {
         type: 'warning',
         title: 'Rolle Does Not Find the Point',
-        body: "Rolle's Theorem is purely existential. It guarantees $c$ exists but gives no formula for it. To locate $c$, solve $f'(x) = 0$ explicitly.",
+        body: "Rolle's Theorem is purely existential. It guarantees $c$ exists but gives no formula. To locate $c$, solve $f'(x) = 0$ (Rolle's) or $f'(x) = \\frac{f(b)-f(a)}{b-a}$ (MVT) explicitly.",
+      },
+      {
+        type: 'tip',
+        title: 'Key Corollaries to Memorize',
+        body: "From MVT: (1) $f'=0$ everywhere $\\Rightarrow$ $f$ constant. (2) $f'=g'$ everywhere $\\Rightarrow$ $f - g$ is constant. (3) $f'>0$ on $(a,b)$ $\\Rightarrow$ $f$ strictly increasing. These are used in every proof in the rest of this chapter.",
       },
     ],
     visualizations: [
-      { vizId: 'MVTViz', mathBridge: "This is the same viz, now used rigorously. Set up f(x) = x³ − x on [−1, 1]: f(−1) = 0 = f(1). Find all points where f'(x) = 3x² − 1 = 0. Compute: x = ±1/√3 ≈ ±0.577. Both lie in (−1, 1). Confirm visually that the tangent is horizontal at both points.", caption: "Rolle's Theorem applied to f(x) = x³ − x on [−1, 1]: two horizontal tangents guaranteed, both at x = ±1/√3." },
+      {
+        vizId: 'SVGDiagram',
+        vizProps: { type: 'rolles-mvt-proof' },
+        mathBridge: "Left panel: f(x) with its secant line L(x) from (a,f(a)) to (b,f(b)). Right panel: g(x) = f(x) − L(x) — the function you get after subtracting the secant. Crucially, g(a) = g(b) = 0 (amber dots), so Rolle's Theorem applies to g. The green horizontal tangent at c shows g′(c) = 0, which translates directly to f′(c) = slope of the secant. That is the entire MVT proof in one picture.",
+        caption: "The MVT auxiliary function construction: subtract the secant from f to get g with equal endpoints, then apply Rolle's to g.",
+      },
     ],
   },
 
   rigor: {
     prose: [
-      "**Proof of Rolle's Theorem.** Assume $f$ is continuous on $[a, b]$, differentiable on $(a, b)$, and $f(a) = f(b)$. By the Extreme Value Theorem (which requires continuity on a closed bounded interval), $f$ attains an absolute maximum $M$ at some point $x_M \\in [a, b]$ and an absolute minimum $m$ at some point $x_m \\in [a, b]$.",
+      "**Proof of Rolle's Theorem (complete).** Assume $f$ is continuous on $[a, b]$, differentiable on $(a, b)$, and $f(a) = f(b)$. By the Extreme Value Theorem (which requires only continuity on a closed bounded interval), $f$ attains its absolute maximum $M$ at some $x_M \\in [a, b]$ and its absolute minimum $m$ at some $x_m \\in [a, b]$.",
       "If $M = m$, then $f$ is constant on $[a, b]$. Every point $c \\in (a, b)$ satisfies $f'(c) = 0$, and the theorem holds trivially.",
-      "If $M \\neq m$, then at least one of $\\mathrm{M, m}$ is not equal to $f(a) = f(b)$. Without loss of generality, suppose $M \\neq f(a)$. Then the maximum is not attained at $a$, and since $f(a) = f(b)$, the maximum is not attained at $b$ either. So $x_M \\in (a, b)$. Since $f$ is differentiable at $x_M$ and $x_M$ is an interior maximum, Fermat's Theorem gives $f'(x_M) = 0$. Set $c = x_M$.",
-      "**Fermat's Theorem (used above).** If $f$ has a local extremum at an interior point $c$ and $f'(c)$ exists, then $f'(c) = 0$. Proof: Suppose $c$ is a local maximum. For small $h > 0$, $f(c + h) \\leq f(c)$, so $\\frac{f(c+h) - f(c)}{h} \\leq 0$. Taking $h \\to 0^+$ gives $f'(c) \\leq 0$. For small $h < 0$, $f(c + h) \\leq f(c)$, so $\\frac{f(c+h) - f(c)}{h} \\geq 0$ (the denominator is negative). Taking $h \\to 0^-$ gives $f'(c) \\geq 0$. Together: $f'(c) = 0$.",
-      "**Why the hypotheses cannot be weakened.** (1) Continuity failure: define $f(x) = x$ for $x \\in [0, 1)$ and $f(1) = 0$. Then $f(0) = f(1) = 0$ but $f'(x) = 1 \\neq 0$ for all $x \\in (0, 1)$. The jump at $x = 1$ breaks the Extreme Value Theorem. (2) Differentiability failure: $f(x) = 1 - |x|$ on $[-1, 1]$ has $f(-1) = f(1) = 0$, is continuous, but has a corner at $x = 0$ (the maximum) where $f'$ does not exist. The derivative is $-1$ for $x > 0$ and $+1$ for $x < 0$, never zero.",
+      "If $M \\neq m$, then at least one of $M, m$ differs from $f(a) = f(b)$. Without loss of generality, suppose $M \\neq f(a)$. Then the maximum is not attained at $a$, and since $f(a) = f(b)$, it is not attained at $b$ either. So $x_M \\in (a, b)$. Since $f$ is differentiable at $x_M$ and $x_M$ is an interior maximum, Fermat's Theorem gives $f'(x_M) = 0$. Set $c = x_M$. $\\square$",
+
+      "**Fermat's Theorem (used above).** If $f$ has a local extremum at an interior point $c$ and $f'(c)$ exists, then $f'(c) = 0$. Proof: Suppose $c$ is a local maximum. For small $h > 0$, $f(c + h) \\leq f(c)$, so $\\frac{f(c+h) - f(c)}{h} \\leq 0$. Taking $h \\to 0^+$: $f'(c) \\leq 0$. For small $h < 0$, $f(c + h) \\leq f(c)$, but now the denominator $h$ is negative, so $\\frac{f(c+h) - f(c)}{h} \\geq 0$. Taking $h \\to 0^-$: $f'(c) \\geq 0$. Together: $f'(c) = 0$. (Symmetric argument for local minimum.) $\\square$",
+
+      "**Why the hypotheses cannot be weakened.** (1) Continuity failure: define $f(x) = x$ for $x \\in [0, 1)$ and $f(1) = 0$. Then $f(0) = f(1) = 0$ but $f'(x) = 1 \\neq 0$ for all $x \\in (0, 1)$. The jump at $x = 1$ breaks the Extreme Value Theorem. (2) Differentiability failure: $f(x) = 1 - |x|$ on $[-1, 1]$ has $f(-1) = f(1) = 0$, is continuous, but has a corner at $x = 0$ (the maximum) where $f'$ does not exist. The derivative is $-1$ for $x > 0$ and $+1$ for $x < 0$ — never zero.",
+
+      "**Generalized Rolle's Theorem.** If $f$ vanishes at $n + 1$ distinct points, then $f'$ vanishes at $n$ distinct points (between consecutive roots of $f$), $f''$ vanishes at $n - 1$ points, and by induction $f^{(n)}$ vanishes at least once. This is used to prove error bounds in polynomial interpolation and Taylor's Theorem with remainder — topics we reach shortly.",
     ],
     callouts: [
       {
         type: 'theorem',
         title: "Fermat's Theorem (Interior Extrema)",
-        body: "If $f$ has a local extremum at $c$ and $f$ is differentiable at $c$, then $f'(c) = 0$. This does NOT say that $f'(c) = 0$ implies a local extremum — that is the converse, which is false.",
+        body: "If $f$ has a local extremum at $c$ and $f$ is differentiable at $c$, then $f'(c) = 0$. WARNING: the converse is false. $f'(c) = 0$ does NOT imply $c$ is a local extremum — consider $f(x) = x^3$ at $c = 0$.",
       },
       {
         type: 'warning',
         title: 'Counterexamples When Hypotheses Fail',
-        body: "Continuity dropped: $f(x) = x$ for $x \\in [0,1)$ and $f(1) = 0$. Then $f(0) = f(1) = 0$ but $f'(x) = 1 \\neq 0$. Differentiability dropped: $f(x) = 1 - |x|$ on $[-1,1]$ has $f(-1) = f(1) = 0$ but the maximum at $x = 0$ is a corner.",
+        body: "Continuity dropped: $f(x) = x$ for $x \\in [0,1)$ and $f(1) = 0$. Then $f(0) = f(1) = 0$ but $f'(x) = 1 \\neq 0$. Differentiability dropped: $f(x) = 1 - |x|$ on $[-1,1]$ has $f(-1) = f(1) = 0$ but the maximum at $x = 0$ is a corner — no derivative exists there.",
       },
     ],
     visualizations: [],
@@ -126,6 +168,19 @@ export default {
     },
     {
       id: 'ch3-025-ex2',
+      title: "Canonical Example: Rolle's on the Parabola",
+      problem: "\\text{Verify Rolle's Theorem for the canonical case } f(x) = x^2 \\text{ on } [-1, 1] \\text{ and find } c.",
+      steps: [
+        { expression: 'f(-1) = (-1)^2 = 1, \\quad f(1) = 1^2 = 1', annotation: 'Check condition (iii): $f(-1) = f(1) = 1$. Equal.', strategyTitle: "Canonical Rolle's: symmetric parabola on [-1,1]", checkpoint: "This is the textbook picture-perfect case. The endpoint height is 1 (not 0) — make sure you verify the actual computed values, not just assume.", hints: ["Evaluate f at both endpoints directly.", "Polynomials are always continuous and differentiable everywhere — conditions (i) and (ii) require no further work."] },
+        { expression: 'f(x) = x^2 \\text{ is a polynomial} \\Rightarrow \\text{continuous on } [-1,1], \\text{ differentiable on } (-1,1)', annotation: 'Conditions (i) and (ii) hold automatically.' },
+        { expression: "f'(x) = 2x", annotation: 'Power rule.' },
+        { expression: "2c = 0 \\Rightarrow c = 0", annotation: "Set $f'(c) = 0$. The only solution is $c = 0$." },
+        { expression: "c = 0 \\in (-1, 1) \\; \\checkmark", annotation: 'Check: $0$ is strictly inside $(-1, 1)$. This is the vertex of the parabola — the horizontal tangent at the bottom.' },
+      ],
+      conclusion: "The canonical Rolle's example. $c = 0$ is the vertex where the tangent is horizontal. Graphically: a symmetric bowl shape with equal endpoint heights, one flat point at the bottom.",
+    },
+    {
+      id: 'ch3-025-ex3',
       title: "Rolle's Theorem with a Trigonometric Function",
       problem: "\\text{Show that } f(x) = \\sin(x) \\text{ on } [0, \\pi] \\text{ satisfies Rolle's Theorem and find all values of } c.",
       steps: [
@@ -138,7 +193,7 @@ export default {
       conclusion: "The unique value is $c = \\pi/2$. This is the peak of the sine arch — exactly where the sine function changes from increasing to decreasing, with a horizontal tangent at its crest.",
     },
     {
-      id: 'ch3-025-ex3',
+      id: 'ch3-025-ex4',
       title: 'Why Rolle Fails Without Differentiability',
       problem: "\\text{Show that } f(x) = |x| \\text{ on } [-1, 1] \\text{ does NOT satisfy the conclusion of Rolle's Theorem, and identify which hypothesis fails.}",
       steps: [
@@ -151,7 +206,7 @@ export default {
       conclusion: "The absolute value function satisfies conditions (i) and (iii) but not (ii) — it is not differentiable at $x = 0$. This single point of non-differentiability is enough to break Rolle's Theorem.",
     },
     {
-      id: 'ch3-025-ex4',
+      id: 'ch3-025-ex5',
       title: 'Using Rolle to Prove a Polynomial Has Exactly One Real Root',
       problem: "\\text{Prove that } p(x) = x^3 + 3x + 1 \\text{ has exactly one real root.}",
       steps: [
@@ -165,7 +220,7 @@ export default {
       conclusion: "The polynomial $p(x) = x^3 + 3x + 1$ has exactly one real root (in $(-1, 0)$). The IVT gives existence, and Rolle's Theorem (via the contrapositive) gives uniqueness.",
     },
     {
-      id: 'ch3-025-ex5',
+      id: 'ch3-025-ex6',
       title: "Rolle's Theorem with Multiple Interior Zeros",
       problem: "\\text{Find all values of } c \\text{ satisfying Rolle's Theorem for } f(x) = \\sin(2\\pi x) \\text{ on } [0, 1].",
       steps: [
@@ -176,6 +231,32 @@ export default {
         { expression: 'c \\in (0, 1): \\quad c = \\frac{1}{4} \\;(n=0), \\quad c = \\frac{3}{4} \\;(n=1)', annotation: 'Keep only values in the open interval $(0, 1)$.', hints: ['Select values within the domain.'] },
       ],
       conclusion: "There are two values: $c = 1/4$ and $c = 3/4$. Rolle's Theorem guarantees at least one, but this function — a complete period of a sine wave — has two horizontal tangents: a maximum at $x = 1/4$ and a minimum at $x = 3/4$.",
+    },
+    {
+      id: 'ch3-025-ex7',
+      title: 'Canonical MVT Example',
+      problem: "\\text{Apply the Mean Value Theorem to } f(x) = x^2 \\text{ on } [0, 2] \\text{ and find the guaranteed } c.",
+      steps: [
+        { expression: 'f(0) = 0, \\quad f(2) = 4', annotation: 'Compute endpoint values.', hints: ['Evaluate f at both endpoints.'] },
+        { expression: '\\text{Average slope} = \\frac{f(2) - f(0)}{2 - 0} = \\frac{4 - 0}{2} = 2', annotation: 'Compute the secant slope.', hints: ['The secant slope is (f(b)-f(a))/(b-a).'] },
+        { expression: "f'(x) = 2x", annotation: 'Differentiate.', hints: ['Power rule.'] },
+        { expression: "2c = 2 \\Rightarrow c = 1", annotation: "Set $f'(c) = $ average slope. Solve for $c$.", hints: ['Set the derivative equal to the secant slope.'] },
+        { expression: "c = 1 \\in (0, 2) \\; \\checkmark", annotation: 'Check that $c$ is inside the interval. At $x=1$, the tangent slope equals 2 = the secant slope.' },
+      ],
+      conclusion: "The MVT guarantees $c = 1$. At this point the tangent line to $f(x) = x^2$ is parallel to the secant from $(0,0)$ to $(2,4)$. Both have slope 2.",
+    },
+    {
+      id: 'ch3-025-ex8',
+      title: 'MVT with a Rational Function',
+      problem: "\\text{Apply the MVT to } f(x) = \\frac{1}{x} \\text{ on } [1, 2].",
+      steps: [
+        { expression: 'f(1) = 1, \\quad f(2) = \\tfrac{1}{2}', annotation: 'Evaluate endpoints.', hints: ['Plug in.'] },
+        { expression: '\\text{Average slope} = \\frac{1/2 - 1}{2 - 1} = -\\frac{1}{2}', annotation: 'The secant slope is negative — $f$ is decreasing on $[1,2]$.', hints: ['(f(b)-f(a))/(b-a).'] },
+        { expression: "f'(x) = -\\frac{1}{x^2}", annotation: 'Differentiate using the power rule ($f(x) = x^{-1}$).', hints: ['Power rule: d/dx [x^{-1}] = -x^{-2}.'] },
+        { expression: "-\\frac{1}{c^2} = -\\frac{1}{2} \\Rightarrow c^2 = 2 \\Rightarrow c = \\sqrt{2}", annotation: 'Set $f\'(c) = $ secant slope. Take positive root since $c \\in (1,2) > 0$.', hints: ['Cross-multiply, then take the positive square root.'] },
+        { expression: "c = \\sqrt{2} \\approx 1.414 \\in (1, 2) \\; \\checkmark", annotation: '$\\sqrt{2} \\approx 1.414$ lies strictly between 1 and 2. MVT verified.' },
+      ],
+      conclusion: "The MVT guarantees $c = \\sqrt{2}$. At this point the tangent to $y = 1/x$ is parallel to the secant from $(1,1)$ to $(2,1/2)$. Both have slope $-1/2$.",
     },
   ],
 
@@ -188,7 +269,7 @@ export default {
       walkthrough: [
         { expression: "f(x) = x^5 + 10x + 3 \\Rightarrow f'(x) = 5x^4 + 10", annotation: 'Differentiate the polynomial.', hints: ['Find the derivative.'] },
         { expression: "5x^4 + 10 \\geq 10 > 0 \\text{ for all } x", annotation: "Since $x^4 \\geq 0$, we have $f'(x) \\geq 10 > 0$ everywhere.", hints: ['Observe that the derivative is always positive.'] },
-        { expression: "\\text{If } f \\text{ had two roots } r_1 < r_2, \\text{ Rolle's gives } c \\in (r_1, r_2) \\text{ with } f'(c) = 0", annotation: "Apply Rolle's Theorem to the interval $[r_1, r_2]$. ", hints: ['Connect the roots via Rolle\'s.'] },
+        { expression: "\\text{If } f \\text{ had two roots } r_1 < r_2, \\text{ Rolle's gives } c \\in (r_1, r_2) \\text{ with } f'(c) = 0", annotation: "Apply Rolle's Theorem to the interval $[r_1, r_2]$.", hints: ['Connect the roots via Rolle\'s.'] },
         { expression: "f'(c) \\geq 10 > 0 — contradiction", annotation: "No such $c$ exists since $f'$ is always positive.", hints: ['Contrast the theorem\'s requirement with the actual derivative.'] },
       ],
       answer: "\\text{Since } f'(x) = 5x^4 + 10 > 0 \\text{ for all } x, \\text{ Rolle's Theorem precludes two or more roots.}",
@@ -202,7 +283,7 @@ export default {
         { expression: 'f(0) = 0 \\cdot (-2) \\cdot 1 = 0, \\quad f(2) = 2 \\cdot 0 \\cdot e^2 = 0', annotation: 'Verify $f(0) = f(2) = 0$.', hints: ['Plug in the endpoints.'] },
         { expression: "f(x) = (x^2 - 2x)e^x \\Rightarrow f'(x) = (2x - 2)e^x + (x^2 - 2x)e^x = (x^2 - 2)e^x", annotation: "Product rule: combine $(2x-2) + (x^2 - 2x) = x^2 - 2$.", hints: ['Apply the product rule.'] },
         { expression: "(c^2 - 2)e^c = 0 \\Rightarrow c^2 = 2 \\Rightarrow c = \\pm\\sqrt{2}", annotation: "Since $e^c > 0$ always, we need $c^2 - 2 = 0$.", hints: ['Solve for g\'(c) = 0.'] },
-        { expression: 'c = \\sqrt{2} \\approx 1.414 \\in (0, 2) \\; \\checkmark', annotation: "Only $c = \\sqrt{2}$ lies in $(0, 2)$. ", hints: ['Which root is in the interval?'] },
+        { expression: 'c = \\sqrt{2} \\approx 1.414 \\in (0, 2) \\; \\checkmark', annotation: "Only $c = \\sqrt{2}$ lies in $(0, 2)$.", hints: ['Which root is in the interval?'] },
       ],
       answer: "c = \\sqrt{2} \\approx 1.414",
     },
@@ -222,21 +303,24 @@ export default {
   ],
 
   crossRefs: [
-    { lessonSlug: 'mean-value-theorem', label: 'Mean Value Theorem', context: "The MVT generalizes Rolle's Theorem by dropping the requirement $f(a) = f(b)$. Rolle's Theorem is used to prove the MVT." },
+    { lessonSlug: 'mean-value-theorem', label: 'Mean Value Theorem', context: "The MVT generalizes Rolle's Theorem by dropping the requirement $f(a) = f(b)$. Rolle's Theorem is used to prove the MVT — the auxiliary function $g(x) = f(x) - L(x)$ trick reduces MVT directly to Rolle's." },
     { lessonSlug: 'curve-sketching', label: 'Curve Sketching', context: "Rolle's Theorem explains why between consecutive zeros of $f$, the derivative $f'$ must vanish — a fact used when analyzing the shape of graphs." },
     { lessonSlug: 'optimization', label: 'Optimization', context: "Rolle's Theorem guarantees critical points exist under the right conditions, which is foundational for optimization problems." },
   ],
 
   spiral: {
     recoveryPoints: [
-      { label: 'Continuity (Ch. 1)', note: "Rolle's requires f continuous on [a,b] — a single hole or jump breaks the guarantee" },
-      { label: 'Differentiability (Ch. 2)', note: 'f must be differentiable on the open interval (a,b); corners and cusps disqualify' },
-      { label: 'Critical Points (Ch. 2)', note: "The guaranteed point c where f'(c)=0 is a critical point — you already know how to find these" },
+      { label: 'Continuity (Ch. 1)', note: "Rolle's requires f continuous on [a,b] — a single hole or jump breaks the guarantee. The EVT (which the proof uses) also needs continuity." },
+      { label: 'Differentiability (Ch. 2)', note: 'f must be differentiable on the open interval (a,b); corners and cusps disqualify. Fermat\'s theorem (the other piece of the proof) requires differentiability at the extremum.' },
+      { label: 'Critical Points (Ch. 2)', note: "The guaranteed point c where f'(c)=0 is a critical point — you already know how to find these by solving f'(x)=0." },
+      { label: 'Extreme Value Theorem', note: "The proof of Rolle's Theorem passes directly through the EVT: continuity on [a,b] → max and min exist → one must be interior → Fermat gives f'(c)=0." },
     ],
     futureLinks: [
-      { label: 'Mean Value Theorem (Lesson 1)', note: "Rolle's Theorem IS the MVT with equal endpoints — you will prove MVT using Rolle's in the very next lesson" },
-      { label: 'Optimization (Lesson 6)', note: 'Every interior maximum and minimum satisfies the Rolle\'s-style condition f\'(c)=0; this is why critical points matter' },
-      { label: 'Root Counting', note: "Rolle's Theorem proves that between any two roots of f, there must be a root of f' — limiting how many zeros a function can have" },
+      { label: 'Mean Value Theorem (Lesson 1)', note: "Rolle's Theorem IS the MVT with equal endpoints. You prove MVT from Rolle's using the auxiliary g(x)=f(x)-L(x) trick covered here." },
+      { label: 'Optimization (Lesson 6)', note: 'Every interior maximum and minimum satisfies the Rolle\'s-style condition f\'(c)=0; this is why critical points matter for optimization.' },
+      { label: 'First Derivative Test', note: "The increasing/decreasing corollary of MVT (f'>0 → increasing) is the engine of the First Derivative Test for classifying extrema." },
+      { label: "Taylor's Theorem with Remainder", note: "The Generalized Rolle's Theorem (iterated to the n-th derivative) is the core of Taylor's remainder proof." },
+      { label: 'Root Counting', note: "Rolle's Theorem proves that between any two roots of f, there must be a root of f' — limiting how many zeros a function can have (fundamental for algebra and numerical methods)." },
     ],
   },
 
@@ -249,6 +333,9 @@ export default {
     'completed-example-3',
     'completed-example-4',
     'completed-example-5',
+    'completed-example-6',
+    'completed-example-7',
+    'completed-example-8',
     'attempted-challenge-hard',
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
@@ -372,13 +459,19 @@ export default {
     },
     {
       id: 'rolle-q10',
-      type: 'input',
-      text: 'For $f(x) = e^x - e$ on $[0, 1]$: compute $f(0)$ and $f(1)$. Do they satisfy $f(0) = f(1)$? If not, can you apply Rolle\'s Theorem? Enter $f(0)$ (just a number).',
-      answer: '1 - e',
-      hints: [
-        '$f(0) = 1 - e \\approx -1.718$ and $f(1) = e - e = 0$. Since $f(0) \\ne f(1)$, Rolle\'s Theorem does not apply.',
+      type: 'choice',
+      text: "The proof of Rolle's Theorem uses the Extreme Value Theorem to guarantee that the max $M$ and min $m$ exist on $[a,b]$. In the case $M = m$, what can you conclude?",
+      options: [
+        '$f$ has a zero somewhere in $(a,b)$',
+        "$f$ is constant on $[a,b]$, so $f'(c) = 0$ for every $c \\in (a,b)$",
+        '$c$ must be the midpoint of $[a,b]$',
+        "The theorem fails in this case",
       ],
-      reviewSection: "Intuition — Checking the hypothesis $f(a) = f(b)$",
+      answer: "$f$ is constant on $[a,b]$, so $f'(c) = 0$ for every $c \\in (a,b)$",
+      hints: [
+        "If max = min, then all values of $f$ on $[a,b]$ are equal — the function is constant. The derivative of a constant is 0 everywhere.",
+      ],
+      reviewSection: "Math — Proof of Rolle's, Case 1",
     },
   ],
 }
