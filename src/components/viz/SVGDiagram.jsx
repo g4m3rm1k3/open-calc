@@ -34,225 +34,506 @@
  *   xt-vt-graphs          — twin panels: slope=v on x–t, area=Δx on v–t
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 // ─── Theme hook ──────────────────────────────────────────────────────────────
 
 function useIsDark() {
-  const [dark, setDark] = useState(
-    () => document.documentElement.classList.contains('dark')
-  )
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
   useEffect(() => {
-    const el = document.documentElement
+    const el = document.documentElement;
     const obs = new MutationObserver(() =>
-      setDark(el.classList.contains('dark'))
-    )
-    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return dark
+      setDark(el.classList.contains("dark")),
+    );
+    obs.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+  return dark;
 }
 
 // ─── Color palettes ──────────────────────────────────────────────────────────
 
 const DARK = {
-  bg:       '#0f172a',
-  surface:  '#1e293b',
-  border:   '#334155',
-  text:     '#e2e8f0',
-  muted:    '#94a3b8',
-  brand:    '#6366f1',
-  emerald:  '#10b981',
-  amber:    '#f59e0b',
-  rose:     '#f43f5e',
-  sky:      '#38bdf8',
-}
+  bg: "#0f172a",
+  surface: "#1e293b",
+  border: "#334155",
+  text: "#e2e8f0",
+  muted: "#94a3b8",
+  brand: "#6366f1",
+  emerald: "#10b981",
+  amber: "#f59e0b",
+  rose: "#f43f5e",
+  sky: "#38bdf8",
+};
 
 const LIGHT = {
-  bg:       '#f8fafc',
-  surface:  '#ffffff',
-  border:   '#cbd5e1',
-  text:     '#0f172a',
-  muted:    '#64748b',
-  brand:    '#4f46e5',
-  emerald:  '#059669',
-  amber:    '#d97706',
-  rose:     '#e11d48',
-  sky:      '#0284c7',
-}
+  bg: "#f8fafc",
+  surface: "#ffffff",
+  border: "#cbd5e1",
+  text: "#0f172a",
+  muted: "#64748b",
+  brand: "#4f46e5",
+  emerald: "#059669",
+  amber: "#d97706",
+  rose: "#e11d48",
+  sky: "#0284c7",
+};
 
 // ─── Algebra: Rectangle (constant velocity) ──────────────────────────────────
 
 function AlgebraRectangle({ C }) {
-  const W = 480, H = 200
-  const PL = 60, PB = 44, PT = 20, PR = 20
-  const GW = W - PL - PR, GH = H - PT - PB
+  const W = 480,
+    H = 200;
+  const PL = 60,
+    PB = 44,
+    PT = 20,
+    PR = 20;
+  const GW = W - PL - PR,
+    GH = H - PT - PB;
 
-  const v = 2.5
-  const vMax = 4
-  const tMax = 4
-  const t1 = 1, t2 = 3.2
+  const v = 2.5;
+  const vMax = 4;
+  const tMax = 4;
+  const t1 = 1,
+    t2 = 3.2;
 
   function toSVG(t, vv) {
-    return [PL + (t / tMax) * GW, PT + GH - (vv / vMax) * GH]
+    return [PL + (t / tMax) * GW, PT + GH - (vv / vMax) * GH];
   }
 
-  const [rx, ] = toSVG(t1, 0)
-  const [rx2, ry] = toSVG(t2, v)
-  const [, ry0] = toSVG(0, 0)
-  const rw = rx2 - rx
-  const rh = ry0 - ry
+  const [rx] = toSVG(t1, 0);
+  const [rx2, ry] = toSVG(t2, v);
+  const [, ry0] = toSVG(0, 0);
+  const rw = rx2 - rx;
+  const rh = ry0 - ry;
 
-  const [ox, oy] = toSVG(0, 0)
-  const [endX] = toSVG(tMax, 0)
+  const [ox, oy] = toSVG(0, 0);
+  const [endX] = toSVG(tMax, 0);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Rectangle fill */}
-      <rect x={rx} y={ry} width={rw} height={rh}
-        fill={C.brand} opacity={0.2} />
-      <rect x={rx} y={ry} width={rw} height={rh}
-        fill="none" stroke={C.brand} strokeWidth={2} />
+      <rect x={rx} y={ry} width={rw} height={rh} fill={C.brand} opacity={0.2} />
+      <rect
+        x={rx}
+        y={ry}
+        width={rw}
+        height={rh}
+        fill="none"
+        stroke={C.brand}
+        strokeWidth={2}
+      />
 
       {/* Velocity line */}
-      <line x1={PL} y1={ry} x2={endX} y2={ry}
-        stroke={C.emerald} strokeWidth={2.5} />
+      <line
+        x1={PL}
+        y1={ry}
+        x2={endX}
+        y2={ry}
+        stroke={C.emerald}
+        strokeWidth={2.5}
+      />
 
       {/* Axes */}
       <line x1={ox} y1={PT} x2={ox} y2={oy} stroke={C.border} strokeWidth={1} />
-      <line x1={ox} y1={oy} x2={endX + 10} y2={oy} stroke={C.border} strokeWidth={1} />
-      <text x={ox - 8} y={PT + 10} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">v</text>
-      <text x={endX + 14} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">t</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={endX + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={ox - 8}
+        y={PT + 10}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        v
+      </text>
+      <text
+        x={endX + 14}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
 
       {/* v label */}
-      <line x1={ox} y1={ry} x2={rx - 4} y2={ry} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
-      <text x={ox - 6} y={ry + 4} textAnchor="end" fill={C.emerald} fontSize={11} fontFamily="monospace" fontWeight="700">v</text>
+      <line
+        x1={ox}
+        y1={ry}
+        x2={rx - 4}
+        y2={ry}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <text
+        x={ox - 6}
+        y={ry + 4}
+        textAnchor="end"
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        v
+      </text>
 
       {/* Δt brace */}
-      <line x1={rx} y1={oy + 10} x2={rx2} y2={oy + 10} stroke={C.amber} strokeWidth={1.5} />
-      <line x1={rx} y1={oy + 6} x2={rx} y2={oy + 14} stroke={C.amber} strokeWidth={1.5} />
-      <line x1={rx2} y1={oy + 6} x2={rx2} y2={oy + 14} stroke={C.amber} strokeWidth={1.5} />
-      <text x={(rx + rx2) / 2} y={oy + 24} textAnchor="middle" fill={C.amber} fontSize={11} fontFamily="monospace">Δt</text>
+      <line
+        x1={rx}
+        y1={oy + 10}
+        x2={rx2}
+        y2={oy + 10}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={rx}
+        y1={oy + 6}
+        x2={rx}
+        y2={oy + 14}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={rx2}
+        y1={oy + 6}
+        x2={rx2}
+        y2={oy + 14}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <text
+        x={(rx + rx2) / 2}
+        y={oy + 24}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        Δt
+      </text>
 
       {/* Area label */}
-      <text x={rx + rw / 2} y={ry + rh / 2 - 6} textAnchor="middle" fill={C.brand} fontSize={13} fontFamily="monospace" fontWeight="700">Δx = v · Δt</text>
-      <text x={rx + rw / 2} y={ry + rh / 2 + 10} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">area of rectangle</text>
+      <text
+        x={rx + rw / 2}
+        y={ry + rh / 2 - 6}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        Δx = v · Δt
+      </text>
+      <text
+        x={rx + rw / 2}
+        y={ry + rh / 2 + 10}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        area of rectangle
+      </text>
 
       {/* Legend */}
-      <text x={PL} y={H - 6} fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Requires: constant velocity. Works purely with algebra — no calculus needed.
+      <text
+        x={PL}
+        y={H - 6}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Requires: constant velocity. Works purely with algebra — no calculus
+        needed.
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Algebra: Trapezoid (constant acceleration) ──────────────────────────────
 
 function AlgebraTrapezoid({ C }) {
-  const W = 480, H = 210
-  const PL = 60, PB = 44, PT = 20, PR = 20
-  const GW = W - PL - PR, GH = H - PT - PB
+  const W = 480,
+    H = 210;
+  const PL = 60,
+    PB = 44,
+    PT = 20,
+    PR = 20;
+  const GW = W - PL - PR,
+    GH = H - PT - PB;
 
-  const v0 = 1.0, v1 = 3.2
-  const tMax = 4, vMax = 4.5
-  const t1 = 0.8, t2 = 3.4
+  const v0 = 1.0,
+    v1 = 3.2;
+  const tMax = 4,
+    vMax = 4.5;
+  const t1 = 0.8,
+    t2 = 3.4;
 
   function toSVG(t, vv) {
-    return [PL + (t / tMax) * GW, PT + GH - (vv / vMax) * GH]
+    return [PL + (t / tMax) * GW, PT + GH - (vv / vMax) * GH];
   }
 
-  const [rx1, ry1] = toSVG(t1, v0)
-  const [rx2, ry2] = toSVG(t2, v1)
-  const [, ry0] = toSVG(0, 0)
+  const [rx1, ry1] = toSVG(t1, v0);
+  const [rx2, ry2] = toSVG(t2, v1);
+  const [, ry0] = toSVG(0, 0);
 
   const trapezoidPts = [
     [rx1, ry0],
     [rx1, ry1],
     [rx2, ry2],
     [rx2, ry0],
-  ].map(p => p.join(',')).join(' ')
+  ]
+    .map((p) => p.join(","))
+    .join(" ");
 
-  const [ox, oy] = toSVG(0, 0)
-  const [endX] = toSVG(tMax, 0)
+  const [ox, oy] = toSVG(0, 0);
+  const [endX] = toSVG(tMax, 0);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Trapezoid fill */}
       <polygon points={trapezoidPts} fill={C.brand} opacity={0.2} />
-      <polygon points={trapezoidPts} fill="none" stroke={C.brand} strokeWidth={2} />
+      <polygon
+        points={trapezoidPts}
+        fill="none"
+        stroke={C.brand}
+        strokeWidth={2}
+      />
 
       {/* Velocity line (v(t) = v0 + at — a straight line for constant a) */}
-      <line x1={rx1} y1={ry1} x2={rx2} y2={ry2} stroke={C.emerald} strokeWidth={2.5} />
+      <line
+        x1={rx1}
+        y1={ry1}
+        x2={rx2}
+        y2={ry2}
+        stroke={C.emerald}
+        strokeWidth={2.5}
+      />
 
       {/* v₀ and v labels */}
-      <line x1={ox} y1={ry1} x2={rx1 - 4} y2={ry1} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={ox} y1={ry2} x2={rx2 + 4} y2={ry2} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
-      <text x={ox - 6} y={ry1 + 4} textAnchor="end" fill={C.emerald} fontSize={11} fontFamily="monospace">v₀</text>
-      <text x={rx2 + 8} y={ry2 + 4} fill={C.emerald} fontSize={11} fontFamily="monospace">v</text>
+      <line
+        x1={ox}
+        y1={ry1}
+        x2={rx1 - 4}
+        y2={ry1}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={ox}
+        y1={ry2}
+        x2={rx2 + 4}
+        y2={ry2}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <text
+        x={ox - 6}
+        y={ry1 + 4}
+        textAnchor="end"
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        v₀
+      </text>
+      <text
+        x={rx2 + 8}
+        y={ry2 + 4}
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        v
+      </text>
 
       {/* Axes */}
       <line x1={ox} y1={PT} x2={ox} y2={oy} stroke={C.border} strokeWidth={1} />
-      <line x1={ox} y1={oy} x2={endX + 10} y2={oy} stroke={C.border} strokeWidth={1} />
-      <text x={ox - 8} y={PT + 10} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">v</text>
-      <text x={endX + 14} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">t</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={endX + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={ox - 8}
+        y={PT + 10}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        v
+      </text>
+      <text
+        x={endX + 14}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
 
       {/* Δt brace */}
-      <line x1={rx1} y1={oy + 10} x2={rx2} y2={oy + 10} stroke={C.amber} strokeWidth={1.5} />
-      <line x1={rx1} y1={oy + 6} x2={rx1} y2={oy + 14} stroke={C.amber} strokeWidth={1.5} />
-      <line x1={rx2} y1={oy + 6} x2={rx2} y2={oy + 14} stroke={C.amber} strokeWidth={1.5} />
-      <text x={(rx1 + rx2) / 2} y={oy + 24} textAnchor="middle" fill={C.amber} fontSize={11} fontFamily="monospace">t</text>
+      <line
+        x1={rx1}
+        y1={oy + 10}
+        x2={rx2}
+        y2={oy + 10}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={rx1}
+        y1={oy + 6}
+        x2={rx1}
+        y2={oy + 14}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={rx2}
+        y1={oy + 6}
+        x2={rx2}
+        y2={oy + 14}
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <text
+        x={(rx1 + rx2) / 2}
+        y={oy + 24}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        t
+      </text>
 
       {/* Parallel sides label */}
-      <text x={(rx1 + rx2) / 2 - 10} y={(ry1 + ry0) / 2 + 4} textAnchor="end" fill={C.brand} fontSize={11} fontFamily="monospace">v₀</text>
-      <text x={(rx1 + rx2) / 2 + 10} y={(ry2 + ry0) / 2 + 4} fill={C.brand} fontSize={11} fontFamily="monospace">v</text>
+      <text
+        x={(rx1 + rx2) / 2 - 10}
+        y={(ry1 + ry0) / 2 + 4}
+        textAnchor="end"
+        fill={C.brand}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        v₀
+      </text>
+      <text
+        x={(rx1 + rx2) / 2 + 10}
+        y={(ry2 + ry0) / 2 + 4}
+        fill={C.brand}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        v
+      </text>
 
       {/* Area formula */}
-      <text x={(rx1 + rx2) / 2} y={(ry1 + ry0) / 2 + 4} textAnchor="middle" fill={C.brand} fontSize={13} fontFamily="monospace" fontWeight="700">Δx = ½(v₀ + v)·t</text>
-      <text x={(rx1 + rx2) / 2} y={(ry1 + ry0) / 2 + 20} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">area of trapezoid</text>
+      <text
+        x={(rx1 + rx2) / 2}
+        y={(ry1 + ry0) / 2 + 4}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        Δx = ½(v₀ + v)·t
+      </text>
+      <text
+        x={(rx1 + rx2) / 2}
+        y={(ry1 + ry0) / 2 + 20}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        area of trapezoid
+      </text>
 
       {/* Legend */}
-      <text x={PL} y={H - 6} fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Requires: constant acceleration. Still pure algebra — this IS the SUVAT equation Δx = ½(v₀+v)t.
+      <text
+        x={PL}
+        y={H - 6}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Requires: constant acceleration. Still pure algebra — this IS the SUVAT
+        equation Δx = ½(v₀+v)t.
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Algebra: Average velocity ────────────────────────────────────────────────
 
 function AlgebraAvgVelocity({ C }) {
-  const W = 480, H = 200
-  const PL = 50, PB = 36, PT = 20, PR = 20
-  const GW = W - PL - PR, GH = H - PT - PB
+  const W = 480,
+    H = 200;
+  const PL = 50,
+    PB = 36,
+    PT = 20,
+    PR = 20;
+  const GW = W - PL - PR,
+    GH = H - PT - PB;
 
-  const tMax = 5, xMax = 12
-  function xFn(t) { return 0.5 * t * t }
+  const tMax = 5,
+    xMax = 12;
+  function xFn(t) {
+    return 0.5 * t * t;
+  }
   function toSVG(t, x) {
-    return [PL + (t / tMax) * GW, PT + GH - (x / xMax) * GH]
+    return [PL + (t / tMax) * GW, PT + GH - (x / xMax) * GH];
   }
 
   const curvePts = Array.from({ length: 50 }, (_, i) => {
-    const t = (i / 49) * tMax
-    return toSVG(t, xFn(t))
-  })
-  const curveD = curvePts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
+    const t = (i / 49) * tMax;
+    return toSVG(t, xFn(t));
+  });
+  const curveD = curvePts
+    .map(
+      ([x, y], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`,
+    )
+    .join(" ");
 
-  const tA = 1.2, tB = 3.6
-  const [pAx, pAy] = toSVG(tA, xFn(tA))
-  const [pBx, pBy] = toSVG(tB, xFn(tB))
-  const [ox, oy] = toSVG(0, 0)
-  const [endX] = toSVG(tMax, 0)
-  const secantSlope = (xFn(tB) - xFn(tA)) / (tB - tA)
-  const ext = 0.25
-  const [sx0, sy0] = toSVG(tA - ext, xFn(tA) - ext * secantSlope)
-  const [sx1, sy1] = toSVG(tB + ext, xFn(tB) + ext * secantSlope)
+  const tA = 1.2,
+    tB = 3.6;
+  const [pAx, pAy] = toSVG(tA, xFn(tA));
+  const [pBx, pBy] = toSVG(tB, xFn(tB));
+  const [ox, oy] = toSVG(0, 0);
+  const [endX] = toSVG(tMax, 0);
+  const secantSlope = (xFn(tB) - xFn(tA)) / (tB - tA);
+  const ext = 0.25;
+  const [sx0, sy0] = toSVG(tA - ext, xFn(tA) - ext * secantSlope);
+  const [sx1, sy1] = toSVG(tB + ext, xFn(tB) + ext * secantSlope);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Curve */}
@@ -260,450 +541,1232 @@ function AlgebraAvgVelocity({ C }) {
 
       {/* Secant */}
       <line
-        x1={sx0} y1={sy0} x2={sx1} y2={sy1}
-        stroke={C.amber} strokeWidth={2} strokeDasharray="5,3"
+        x1={sx0}
+        y1={sy0}
+        x2={sx1}
+        y2={sy1}
+        stroke={C.amber}
+        strokeWidth={2}
+        strokeDasharray="5,3"
       />
 
       {/* Δx and Δt legs */}
-      <line x1={pAx} y1={pAy} x2={pBx} y2={pAy} stroke={C.sky} strokeWidth={1.5} strokeDasharray="3,2" />
-      <line x1={pBx} y1={pAy} x2={pBx} y2={pBy} stroke={C.rose} strokeWidth={1.5} strokeDasharray="3,2" />
+      <line
+        x1={pAx}
+        y1={pAy}
+        x2={pBx}
+        y2={pAy}
+        stroke={C.sky}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={pBx}
+        y1={pAy}
+        x2={pBx}
+        y2={pBy}
+        stroke={C.rose}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
 
       {/* Points */}
       <circle cx={pAx} cy={pAy} r={5} fill={C.amber} />
       <circle cx={pBx} cy={pBy} r={5} fill={C.amber} />
 
       {/* Labels */}
-      <text x={pAx - 10} y={pAy - 8} textAnchor="end" fill={C.text} fontSize={11} fontFamily="monospace">(t₁, x₁)</text>
-      <text x={pBx + 6} y={pBy - 8} fill={C.text} fontSize={11} fontFamily="monospace">(t₂, x₂)</text>
-      <text x={(pAx + pBx) / 2} y={pAy - 6} textAnchor="middle" fill={C.sky} fontSize={11} fontFamily="monospace">Δt = t₂ − t₁</text>
-      <text x={pBx + 6} y={(pAy + pBy) / 2 + 4} fill={C.rose} fontSize={11} fontFamily="monospace">Δx = x₂ − x₁</text>
+      <text
+        x={pAx - 10}
+        y={pAy - 8}
+        textAnchor="end"
+        fill={C.text}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        (t₁, x₁)
+      </text>
+      <text
+        x={pBx + 6}
+        y={pBy - 8}
+        fill={C.text}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        (t₂, x₂)
+      </text>
+      <text
+        x={(pAx + pBx) / 2}
+        y={pAy - 6}
+        textAnchor="middle"
+        fill={C.sky}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        Δt = t₂ − t₁
+      </text>
+      <text
+        x={pBx + 6}
+        y={(pAy + pBy) / 2 + 4}
+        fill={C.rose}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        Δx = x₂ − x₁
+      </text>
 
       {/* Formula box */}
-      <rect x={PL} y={PT + 2} width={160} height={28} rx={6} fill={C.surface} stroke={C.border} strokeWidth={1} />
-      <text x={PL + 80} y={PT + 12} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">AVERAGE VELOCITY</text>
-      <text x={PL + 80} y={PT + 25} textAnchor="middle" fill={C.amber} fontSize={13} fontFamily="monospace" fontWeight="700">v̄ = Δx / Δt</text>
+      <rect
+        x={PL}
+        y={PT + 2}
+        width={160}
+        height={28}
+        rx={6}
+        fill={C.surface}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={PL + 80}
+        y={PT + 12}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        AVERAGE VELOCITY
+      </text>
+      <text
+        x={PL + 80}
+        y={PT + 25}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        v̄ = Δx / Δt
+      </text>
 
       {/* Axes */}
       <line x1={ox} y1={PT} x2={ox} y2={oy} stroke={C.border} strokeWidth={1} />
-      <line x1={ox} y1={oy} x2={endX + 10} y2={oy} stroke={C.border} strokeWidth={1} />
-      <text x={ox - 8} y={PT + 10} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">x</text>
-      <text x={endX + 14} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">t</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={endX + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={ox - 8}
+        y={PT + 10}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        x
+      </text>
+      <text
+        x={endX + 14}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
 
       {/* Legend */}
-      <text x={PL} y={H - 6} fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Pure algebra: subtract, divide. No limits required — but gives only the average, not the instantaneous rate.
+      <text
+        x={PL}
+        y={H - 6}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Pure algebra: subtract, divide. No limits required — but gives only the
+        average, not the instantaneous rate.
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Kinematic Chain ─────────────────────────────────────────────────────────
 
 function KinematicChain({ C }) {
-  const W = 520, H = 140
+  const W = 520,
+    H = 140;
   const boxes = [
-    { x: 30,  label: 'x(t)', sub: 'position',     color: C.emerald },
-    { x: 200, label: 'v(t)', sub: 'velocity',      color: C.brand },
-    { x: 370, label: 'a(t)', sub: 'acceleration',  color: C.amber },
-  ]
-  const BW = 110, BH = 60, cy = H / 2
+    { x: 30, label: "x(t)", sub: "position", color: C.emerald },
+    { x: 200, label: "v(t)", sub: "velocity", color: C.brand },
+    { x: 370, label: "a(t)", sub: "acceleration", color: C.amber },
+  ];
+  const BW = 110,
+    BH = 60,
+    cy = H / 2;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <defs>
-        <marker id="kc-sky" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <marker
+          id="kc-sky"
+          markerWidth="6"
+          markerHeight="6"
+          refX="5"
+          refY="3"
+          orient="auto"
+        >
           <path d="M0,0 L6,3 L0,6 Z" fill={C.sky} />
         </marker>
-        <marker id="kc-rose" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto">
+        <marker
+          id="kc-rose"
+          markerWidth="6"
+          markerHeight="6"
+          refX="1"
+          refY="3"
+          orient="auto"
+        >
           <path d="M6,0 L0,3 L6,6 Z" fill={C.rose} />
         </marker>
       </defs>
       <rect width={W} height={H} fill={C.bg} rx={12} />
       {boxes.slice(0, 2).map((b, i) => {
-        const x1 = b.x + BW, x2 = boxes[i + 1].x
-        const mx = (x1 + x2) / 2
+        const x1 = b.x + BW,
+          x2 = boxes[i + 1].x;
+        const mx = (x1 + x2) / 2;
         return (
           <g key={`fwd-${i}`}>
-            <line x1={x1} y1={cy - 10} x2={x2 - 4} y2={cy - 10} stroke={C.sky} strokeWidth={1.5} markerEnd="url(#kc-sky)" />
-            <text x={mx} y={cy - 16} textAnchor="middle" fill={C.sky} fontSize={9} fontFamily="monospace">d/dt</text>
+            <line
+              x1={x1}
+              y1={cy - 10}
+              x2={x2 - 4}
+              y2={cy - 10}
+              stroke={C.sky}
+              strokeWidth={1.5}
+              markerEnd="url(#kc-sky)"
+            />
+            <text
+              x={mx}
+              y={cy - 16}
+              textAnchor="middle"
+              fill={C.sky}
+              fontSize={9}
+              fontFamily="monospace"
+            >
+              d/dt
+            </text>
           </g>
-        )
+        );
       })}
       {boxes.slice(0, 2).map((b, i) => {
-        const x1 = boxes[i + 1].x, x2 = b.x + BW
-        const mx = (x1 + x2) / 2
+        const x1 = boxes[i + 1].x,
+          x2 = b.x + BW;
+        const mx = (x1 + x2) / 2;
         return (
           <g key={`bwd-${i}`}>
-            <line x1={x1} y1={cy + 10} x2={x2 + 4} y2={cy + 10} stroke={C.rose} strokeWidth={1.5} markerEnd="url(#kc-rose)" />
-            <text x={mx} y={cy + 22} textAnchor="middle" fill={C.rose} fontSize={9} fontFamily="monospace">∫ dt</text>
+            <line
+              x1={x1}
+              y1={cy + 10}
+              x2={x2 + 4}
+              y2={cy + 10}
+              stroke={C.rose}
+              strokeWidth={1.5}
+              markerEnd="url(#kc-rose)"
+            />
+            <text
+              x={mx}
+              y={cy + 22}
+              textAnchor="middle"
+              fill={C.rose}
+              fontSize={9}
+              fontFamily="monospace"
+            >
+              ∫ dt
+            </text>
           </g>
-        )
+        );
       })}
       {boxes.map((b) => (
         <g key={b.label}>
-          <rect x={b.x} y={cy - BH / 2} width={BW} height={BH} rx={8} fill={C.surface} stroke={b.color} strokeWidth={1.5} />
-          <text x={b.x + BW / 2} y={cy - 6} textAnchor="middle" fill={b.color} fontSize={18} fontFamily="monospace" fontWeight="700">{b.label}</text>
-          <text x={b.x + BW / 2} y={cy + 14} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">{b.sub}</text>
+          <rect
+            x={b.x}
+            y={cy - BH / 2}
+            width={BW}
+            height={BH}
+            rx={8}
+            fill={C.surface}
+            stroke={b.color}
+            strokeWidth={1.5}
+          />
+          <text
+            x={b.x + BW / 2}
+            y={cy - 6}
+            textAnchor="middle"
+            fill={b.color}
+            fontSize={18}
+            fontFamily="monospace"
+            fontWeight="700"
+          >
+            {b.label}
+          </text>
+          <text
+            x={b.x + BW / 2}
+            y={cy + 14}
+            textAnchor="middle"
+            fill={C.muted}
+            fontSize={10}
+            fontFamily="sans-serif"
+          >
+            {b.sub}
+          </text>
         </g>
       ))}
     </svg>
-  )
+  );
 }
 
 // ─── Slope Triangle ──────────────────────────────────────────────────────────
 
 function SlopeTriangle({ C }) {
-  const W = 480, H = 220
-  const PL = 50, PB = 40, PT = 16, PR = 20
-  const GW = W - PL - PR, GH = H - PT - PB
+  const W = 480,
+    H = 220;
+  const PL = 50,
+    PB = 40,
+    PT = 16,
+    PR = 20;
+  const GW = W - PL - PR,
+    GH = H - PT - PB;
 
-  const T = 3
-  function xFn(t) { return t * t * 0.8 }
+  const T = 3;
+  function xFn(t) {
+    return t * t * 0.8;
+  }
   function toSVG(t, x) {
-    return [PL + (t / T) * GW, PT + GH - (x / (T * T * 0.8)) * GH]
+    return [PL + (t / T) * GW, PT + GH - (x / (T * T * 0.8)) * GH];
   }
 
   const curvePts = Array.from({ length: 40 }, (_, i) => {
-    const t = (i / 39) * T
-    return toSVG(t, xFn(t))
-  })
-  const curveD = curvePts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
+    const t = (i / 39) * T;
+    return toSVG(t, xFn(t));
+  });
+  const curveD = curvePts
+    .map(
+      ([x, y], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`,
+    )
+    .join(" ");
 
-  const T0 = 1.2, DT = 1.0, T1 = T0 + DT
-  const [px0, py0] = toSVG(T0, xFn(T0))
-  const [px1, py1] = toSVG(T1, xFn(T1))
-  const slope = (xFn(T1) - xFn(T0)) / DT
-  const tangSlope = 2 * T0 * 0.8
+  const T0 = 1.2,
+    DT = 1.0,
+    T1 = T0 + DT;
+  const [px0, py0] = toSVG(T0, xFn(T0));
+  const [px1, py1] = toSVG(T1, xFn(T1));
+  const slope = (xFn(T1) - xFn(T0)) / DT;
+  const tangSlope = 2 * T0 * 0.8;
 
-  const ext = 0.3
-  const [sx0, sy0] = toSVG(T0 - ext, xFn(T0) - ext * slope)
-  const [sx1, sy1] = toSVG(T1 + ext, xFn(T1) + ext * slope)
-  const [tx0, ty0] = toSVG(T0 - 0.5, xFn(T0) - 0.5 * tangSlope)
-  const [tx1, ty1] = toSVG(T0 + 1.2, xFn(T0) + 1.2 * tangSlope)
-  const [ox, oy] = toSVG(0, 0)
-  const [endX] = toSVG(T, 0)
+  const ext = 0.3;
+  const [sx0, sy0] = toSVG(T0 - ext, xFn(T0) - ext * slope);
+  const [sx1, sy1] = toSVG(T1 + ext, xFn(T1) + ext * slope);
+  const [tx0, ty0] = toSVG(T0 - 0.5, xFn(T0) - 0.5 * tangSlope);
+  const [tx1, ty1] = toSVG(T0 + 1.2, xFn(T0) + 1.2 * tangSlope);
+  const [ox, oy] = toSVG(0, 0);
+  const [endX] = toSVG(T, 0);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
       <line x1={ox} y1={PT} x2={ox} y2={oy} stroke={C.border} strokeWidth={1} />
-      <line x1={ox} y1={oy} x2={endX + 10} y2={oy} stroke={C.border} strokeWidth={1} />
-      <text x={ox - 8} y={PT + 10} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">x</text>
-      <text x={endX + 14} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">t</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={endX + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={ox - 8}
+        y={PT + 10}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        x
+      </text>
+      <text
+        x={endX + 14}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
       <path d={curveD} fill="none" stroke={C.emerald} strokeWidth={2} />
-      <line x1={sx0} y1={sy0} x2={sx1} y2={sy1} stroke={C.amber} strokeWidth={1.5} strokeDasharray="5,3" />
-      <line x1={px0} y1={py0} x2={px1} y2={py0} stroke={C.amber} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={px1} y1={py0} x2={px1} y2={py1} stroke={C.amber} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={tx0} y1={ty0} x2={tx1} y2={ty1} stroke={C.sky} strokeWidth={2} />
+      <line
+        x1={sx0}
+        y1={sy0}
+        x2={sx1}
+        y2={sy1}
+        stroke={C.amber}
+        strokeWidth={1.5}
+        strokeDasharray="5,3"
+      />
+      <line
+        x1={px0}
+        y1={py0}
+        x2={px1}
+        y2={py0}
+        stroke={C.amber}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={px1}
+        y1={py0}
+        x2={px1}
+        y2={py1}
+        stroke={C.amber}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={tx0}
+        y1={ty0}
+        x2={tx1}
+        y2={ty1}
+        stroke={C.sky}
+        strokeWidth={2}
+      />
       <circle cx={px0} cy={py0} r={4} fill={C.amber} />
       <circle cx={px1} cy={py1} r={4} fill={C.amber} />
-      <text x={(px0 + px1) / 2} y={py0 - 6} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">Δt → 0</text>
-      <text x={px1 + 8} y={(py0 + py1) / 2} fill={C.amber} fontSize={10} fontFamily="monospace">Δx</text>
-      <text x={sx1 + 4} y={sy1 - 4} fill={C.amber} fontSize={10} fontFamily="monospace">Δx/Δt  (algebra)</text>
-      <text x={tx1 + 4} y={ty1} fill={C.sky} fontSize={10} fontFamily="monospace">dx/dt  (calculus)</text>
+      <text
+        x={(px0 + px1) / 2}
+        y={py0 - 6}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        Δt → 0
+      </text>
+      <text
+        x={px1 + 8}
+        y={(py0 + py1) / 2}
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        Δx
+      </text>
+      <text
+        x={sx1 + 4}
+        y={sy1 - 4}
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        Δx/Δt (algebra)
+      </text>
+      <text
+        x={tx1 + 4}
+        y={ty1}
+        fill={C.sky}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        dx/dt (calculus)
+      </text>
       <rect x={PL} y={PT + 2} width={8} height={2} fill={C.amber} />
-      <text x={PL + 12} y={PT + 10} fill={C.amber} fontSize={9} fontFamily="sans-serif">secant — average rate (algebra)</text>
+      <text
+        x={PL + 12}
+        y={PT + 10}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        secant — average rate (algebra)
+      </text>
       <rect x={PL} y={PT + 14} width={8} height={2} fill={C.sky} />
-      <text x={PL + 12} y={PT + 22} fill={C.sky} fontSize={9} fontFamily="sans-serif">tangent — instantaneous rate (calculus)</text>
+      <text
+        x={PL + 12}
+        y={PT + 22}
+        fill={C.sky}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        tangent — instantaneous rate (calculus)
+      </text>
     </svg>
-  )
+  );
 }
 
 // ─── Riemann Rectangles ──────────────────────────────────────────────────────
 
 function RiemannRect({ C }) {
-  const W = 480, H = 200
-  const PL = 48, PB = 36, PT = 16, PR = 16
-  const GW = W - PL - PR, GH = H - PT - PB
-  const T = 4
+  const W = 480,
+    H = 200;
+  const PL = 48,
+    PB = 36,
+    PT = 16,
+    PR = 16;
+  const GW = W - PL - PR,
+    GH = H - PT - PB;
+  const T = 4;
 
-  function v(t) { return 1.2 + 0.6 * t - 0.08 * t * t }
-  const vMax = 3.2
+  function v(t) {
+    return 1.2 + 0.6 * t - 0.08 * t * t;
+  }
+  const vMax = 3.2;
 
   function toSVG(t, vv) {
-    return [PL + (t / T) * GW, PT + GH - (vv / vMax) * GH]
+    return [PL + (t / T) * GW, PT + GH - (vv / vMax) * GH];
   }
 
-  const n = 8
-  const dt = T / n
+  const n = 8;
+  const dt = T / n;
   const rects = Array.from({ length: n }, (_, i) => {
-    const t = i * dt
-    const vv = v(t + dt / 2)
-    const [rx] = toSVG(t, 0)
-    const [, ry] = toSVG(0, vv)
-    const [, ry0] = toSVG(0, 0)
-    return { x: rx, y: ry, w: GW / n, h: ry0 - ry }
-  })
+    const t = i * dt;
+    const vv = v(t + dt / 2);
+    const [rx] = toSVG(t, 0);
+    const [, ry] = toSVG(0, vv);
+    const [, ry0] = toSVG(0, 0);
+    return { x: rx, y: ry, w: GW / n, h: ry0 - ry };
+  });
 
   const curvePts = Array.from({ length: 60 }, (_, i) => {
-    const t = (i / 59) * T
-    return toSVG(t, v(t))
-  })
-  const curveD = curvePts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
+    const t = (i / 59) * T;
+    return toSVG(t, v(t));
+  });
+  const curveD = curvePts
+    .map(
+      ([x, y], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`,
+    )
+    .join(" ");
 
-  const [ox, oy] = toSVG(0, 0)
-  const [endX] = toSVG(T, 0)
+  const [ox, oy] = toSVG(0, 0);
+  const [endX] = toSVG(T, 0);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
       {rects.map((r, i) => (
-        <rect key={i} x={r.x} y={r.y} width={r.w - 1} height={r.h}
-          fill={C.brand} opacity={0.25} stroke={C.brand} strokeWidth={0.8} />
+        <rect
+          key={i}
+          x={r.x}
+          y={r.y}
+          width={r.w - 1}
+          height={r.h}
+          fill={C.brand}
+          opacity={0.25}
+          stroke={C.brand}
+          strokeWidth={0.8}
+        />
       ))}
       <path d={curveD} fill="none" stroke={C.emerald} strokeWidth={2.5} />
       <line x1={ox} y1={PT} x2={ox} y2={oy} stroke={C.border} strokeWidth={1} />
-      <line x1={ox} y1={oy} x2={endX + 10} y2={oy} stroke={C.border} strokeWidth={1} />
-      <text x={ox - 6} y={PT + 10} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">v</text>
-      <text x={endX + 14} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">t</text>
-      <text x={W / 2} y={H - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Σ v(tᵢ)·Δt  →  ∫v dt = exact displacement   (algebra sum → calculus limit)
+      <line
+        x1={ox}
+        y1={oy}
+        x2={endX + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <text
+        x={ox - 6}
+        y={PT + 10}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        v
+      </text>
+      <text
+        x={endX + 14}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
+      <text
+        x={W / 2}
+        y={H - 4}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Σ v(tᵢ)·Δt → ∫v dt = exact displacement (algebra sum → calculus limit)
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── SUVAT Map ────────────────────────────────────────────────────────────────
 
 function SuvatMap({ C }) {
-  const W = 520, H = 200
-  const cx = 185, cy = H / 2, R = 72
+  const W = 520,
+    H = 200;
+  const cx = 185,
+    cy = H / 2,
+    R = 72;
   const nodes = [
-    { label: 'v₀', angle: -90 },
-    { label: 'v',  angle: -18 },
-    { label: 'a',  angle:  54 },
-    { label: 'Δx', angle: 126 },
-    { label: 't',  angle: 198 },
-  ].map(n => ({
+    { label: "v₀", angle: -90 },
+    { label: "v", angle: -18 },
+    { label: "a", angle: 54 },
+    { label: "Δx", angle: 126 },
+    { label: "t", angle: 198 },
+  ].map((n) => ({
     ...n,
-    x: cx + R * Math.cos(n.angle * Math.PI / 180),
-    y: cy + R * Math.sin(n.angle * Math.PI / 180),
-  }))
+    x: cx + R * Math.cos((n.angle * Math.PI) / 180),
+    y: cy + R * Math.sin((n.angle * Math.PI) / 180),
+  }));
 
   const equations = [
-    { omit: 'Δx', label: 'v = v₀ + at',       color: C.brand },
-    { omit: 'a',  label: 'Δx = ½(v₀+v)t',     color: C.emerald },
-    { omit: 'v',  label: 'Δx = v₀t + ½at²',   color: C.amber },
-    { omit: 'v₀', label: 'Δx = vt − ½at²',    color: C.rose },
-    { omit: 't',  label: 'v² = v₀² + 2aΔx',   color: C.sky },
-  ]
+    { omit: "Δx", label: "v = v₀ + at", color: C.brand },
+    { omit: "a", label: "Δx = ½(v₀+v)t", color: C.emerald },
+    { omit: "v", label: "Δx = v₀t + ½at²", color: C.amber },
+    { omit: "v₀", label: "Δx = vt − ½at²", color: C.rose },
+    { omit: "t", label: "v² = v₀² + 2aΔx", color: C.sky },
+  ];
 
-  const edges = []
-  equations.forEach(eq => {
-    const active = nodes.filter(n => n.label !== eq.omit)
+  const edges = [];
+  equations.forEach((eq) => {
+    const active = nodes.filter((n) => n.label !== eq.omit);
     for (let i = 0; i < active.length; i++)
       for (let j = i + 1; j < active.length; j++)
-        edges.push({ x1: active[i].x, y1: active[i].y, x2: active[j].x, y2: active[j].y, color: eq.color })
-  })
+        edges.push({
+          x1: active[i].x,
+          y1: active[i].y,
+          x2: active[j].x,
+          y2: active[j].y,
+          color: eq.color,
+        });
+  });
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
       {equations.map((eq, i) => (
         <g key={i}>
-          <rect x={W - 175} y={14 + i * 35} width={10} height={10} rx={2} fill={eq.color} />
-          <text x={W - 160} y={23 + i * 35} fill={eq.color} fontSize={11} fontFamily="monospace">{eq.label}</text>
-          <text x={W - 160} y={35 + i * 35} fill={C.muted} fontSize={9} fontFamily="sans-serif">omits {eq.omit}</text>
+          <rect
+            x={W - 175}
+            y={14 + i * 35}
+            width={10}
+            height={10}
+            rx={2}
+            fill={eq.color}
+          />
+          <text
+            x={W - 160}
+            y={23 + i * 35}
+            fill={eq.color}
+            fontSize={11}
+            fontFamily="monospace"
+          >
+            {eq.label}
+          </text>
+          <text
+            x={W - 160}
+            y={35 + i * 35}
+            fill={C.muted}
+            fontSize={9}
+            fontFamily="sans-serif"
+          >
+            omits {eq.omit}
+          </text>
         </g>
       ))}
       {edges.map((e, i) => (
-        <line key={i} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
-          stroke={e.color} strokeWidth={1} opacity={0.3} />
+        <line
+          key={i}
+          x1={e.x1}
+          y1={e.y1}
+          x2={e.x2}
+          y2={e.y2}
+          stroke={e.color}
+          strokeWidth={1}
+          opacity={0.3}
+        />
       ))}
-      {nodes.map(n => (
+      {nodes.map((n) => (
         <g key={n.label}>
-          <circle cx={n.x} cy={n.y} r={22} fill={C.surface} stroke={C.border} strokeWidth={1.5} />
-          <text x={n.x} y={n.y + 5} textAnchor="middle" fill={C.text} fontSize={14} fontFamily="monospace" fontWeight="700">{n.label}</text>
+          <circle
+            cx={n.x}
+            cy={n.y}
+            r={22}
+            fill={C.surface}
+            stroke={C.border}
+            strokeWidth={1.5}
+          />
+          <text
+            x={n.x}
+            y={n.y + 5}
+            textAnchor="middle"
+            fill={C.text}
+            fontSize={14}
+            fontFamily="monospace"
+            fontWeight="700"
+          >
+            {n.label}
+          </text>
         </g>
       ))}
-      <text x={16} y={16} fill={C.muted} fontSize={10} fontFamily="sans-serif">Each equation links 4 of the 5 quantities — choose by what's missing</text>
+      <text x={16} y={16} fill={C.muted} fontSize={10} fontFamily="sans-serif">
+        Each equation links 4 of the 5 quantities — choose by what's missing
+      </text>
     </svg>
-  )
+  );
 }
 
 // ─── Free-Fall Axes ───────────────────────────────────────────────────────────
 
 function FreeFallAxes({ C }) {
-  const W = 420, H = 220
-  const axX = 90, top = 30, bot = H - 30
+  const W = 420,
+    H = 220;
+  const axX = 90,
+    top = 30,
+    bot = H - 30;
 
-  const tMax = 3
-  const yScale = (bot - top) / (0.5 * 9.8 * tMax * tMax)
+  const tMax = 3;
+  const yScale = (bot - top) / (0.5 * 9.8 * tMax * tMax);
   const curvePts = Array.from({ length: 40 }, (_, i) => {
-    const t = (i / 39) * tMax
-    return [axX + 80 + (t / tMax) * 180, top + 0.5 * 9.8 * t * t * yScale]
-  })
-  const curveD = curvePts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
+    const t = (i / 39) * tMax;
+    return [axX + 80 + (t / tMax) * 180, top + 0.5 * 9.8 * t * t * yScale];
+  });
+  const curveD = curvePts
+    .map(
+      ([x, y], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`,
+    )
+    .join(" ");
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <defs>
-        <marker id="ff-fall" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+        <marker
+          id="ff-fall"
+          markerWidth="6"
+          markerHeight="6"
+          refX="3"
+          refY="6"
+          orient="auto"
+        >
           <path d="M0,0 L3,6 L6,0 Z" fill={C.rose} />
         </marker>
       </defs>
       <rect width={W} height={H} fill={C.bg} rx={12} />
-      <line x1={axX} y1={top} x2={axX} y2={bot} stroke={C.border} strokeWidth={1.5} />
-      <polygon points={`${axX},${top - 2} ${axX - 5},${top + 10} ${axX + 5},${top + 10}`} fill={C.emerald} />
-      <text x={axX - 14} y={top + 22} fill={C.emerald} fontSize={11} fontFamily="monospace" fontWeight="700">+y</text>
-      <text x={axX + 8} y={top + 12} fill={C.emerald} fontSize={9} fontFamily="sans-serif">positive upward</text>
-      <line x1={axX + 24} y1={bot - 50} x2={axX + 24} y2={bot - 12} stroke={C.rose} strokeWidth={2} markerEnd="url(#ff-fall)" />
-      <text x={axX + 32} y={bot - 28} fill={C.rose} fontSize={13} fontFamily="monospace" fontWeight="700">g</text>
-      <text x={axX + 32} y={bot - 16} fill={C.rose} fontSize={9} fontFamily="sans-serif">9.8 m/s²</text>
-      <text x={axX + 32} y={bot - 4} fill={C.rose} fontSize={9} fontFamily="sans-serif">a = −g (upward +)</text>
-      <line x1={axX - 5} y1={(top + bot) / 2} x2={axX + 5} y2={(top + bot) / 2} stroke={C.muted} strokeWidth={1} />
-      <text x={axX - 8} y={(top + bot) / 2 + 4} textAnchor="end" fill={C.muted} fontSize={9} fontFamily="monospace">y₀</text>
-      <path d={curveD} fill="none" stroke={C.amber} strokeWidth={2} strokeDasharray="5,3" />
-      <text x={curvePts[curvePts.length - 1][0] + 4} y={curvePts[curvePts.length - 1][1] - 4}
-        fill={C.amber} fontSize={9} fontFamily="monospace">y(t) = y₀ + v₀t − ½gt²</text>
-      <text x={axX + 80} y={top + 14} fill={C.muted} fontSize={9} fontFamily="sans-serif">t →</text>
+      <line
+        x1={axX}
+        y1={top}
+        x2={axX}
+        y2={bot}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <polygon
+        points={`${axX},${top - 2} ${axX - 5},${top + 10} ${axX + 5},${top + 10}`}
+        fill={C.emerald}
+      />
+      <text
+        x={axX - 14}
+        y={top + 22}
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        +y
+      </text>
+      <text
+        x={axX + 8}
+        y={top + 12}
+        fill={C.emerald}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        positive upward
+      </text>
+      <line
+        x1={axX + 24}
+        y1={bot - 50}
+        x2={axX + 24}
+        y2={bot - 12}
+        stroke={C.rose}
+        strokeWidth={2}
+        markerEnd="url(#ff-fall)"
+      />
+      <text
+        x={axX + 32}
+        y={bot - 28}
+        fill={C.rose}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        g
+      </text>
+      <text
+        x={axX + 32}
+        y={bot - 16}
+        fill={C.rose}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        9.8 m/s²
+      </text>
+      <text
+        x={axX + 32}
+        y={bot - 4}
+        fill={C.rose}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        a = −g (upward +)
+      </text>
+      <line
+        x1={axX - 5}
+        y1={(top + bot) / 2}
+        x2={axX + 5}
+        y2={(top + bot) / 2}
+        stroke={C.muted}
+        strokeWidth={1}
+      />
+      <text
+        x={axX - 8}
+        y={(top + bot) / 2 + 4}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        y₀
+      </text>
+      <path
+        d={curveD}
+        fill="none"
+        stroke={C.amber}
+        strokeWidth={2}
+        strokeDasharray="5,3"
+      />
+      <text
+        x={curvePts[curvePts.length - 1][0] + 4}
+        y={curvePts[curvePts.length - 1][1] - 4}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        y(t) = y₀ + v₀t − ½gt²
+      </text>
+      <text
+        x={axX + 80}
+        y={top + 14}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        t →
+      </text>
     </svg>
-  )
+  );
 }
 
 // ─── Two-Objects Line ─────────────────────────────────────────────────────────
 
 function TwoObjectsLine({ C }) {
-  const W = 480, H = 160
-  const y1 = 58, y2 = 105
-  const x0 = 50, x1 = W - 40
-  const posA = 80, posB = 380, meet = 240
+  const W = 480,
+    H = 160;
+  const y1 = 58,
+    y2 = 105;
+  const x0 = 50,
+    x1 = W - 40;
+  const posA = 80,
+    posB = 380,
+    meet = 240;
 
-  function xPos(val) { return x0 + ((val - 50) / 350) * (x1 - x0) }
-  const pA = xPos(posA), pB = xPos(posB), pM = xPos(meet)
-  const lineY = H / 2
+  function xPos(val) {
+    return x0 + ((val - 50) / 350) * (x1 - x0);
+  }
+  const pA = xPos(posA),
+    pB = xPos(posB),
+    pM = xPos(meet);
+  const lineY = H / 2;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <defs>
-        <marker id="to-a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <marker
+          id="to-a"
+          markerWidth="6"
+          markerHeight="6"
+          refX="5"
+          refY="3"
+          orient="auto"
+        >
           <path d="M0,0 L6,3 L0,6 Z" fill={C.brand} />
         </marker>
-        <marker id="to-b" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto">
+        <marker
+          id="to-b"
+          markerWidth="6"
+          markerHeight="6"
+          refX="1"
+          refY="3"
+          orient="auto"
+        >
           <path d="M6,0 L0,3 L6,6 Z" fill={C.rose} />
         </marker>
       </defs>
       <rect width={W} height={H} fill={C.bg} rx={12} />
-      <line x1={x0} y1={lineY} x2={x1} y2={lineY} stroke={C.border} strokeWidth={1.5} />
-      {[0, 1, 2, 3, 4].map(i => {
-        const tx = x0 + i * (x1 - x0) / 4
-        return <line key={i} x1={tx} y1={lineY - 5} x2={tx} y2={lineY + 5} stroke={C.border} strokeWidth={1} />
+      <line
+        x1={x0}
+        y1={lineY}
+        x2={x1}
+        y2={lineY}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      {[0, 1, 2, 3, 4].map((i) => {
+        const tx = x0 + (i * (x1 - x0)) / 4;
+        return (
+          <line
+            key={i}
+            x1={tx}
+            y1={lineY - 5}
+            x2={tx}
+            y2={lineY + 5}
+            stroke={C.border}
+            strokeWidth={1}
+          />
+        );
       })}
       <circle cx={pA} cy={y1} r={14} fill={C.brand} opacity={0.9} />
-      <text x={pA} y={y1 + 5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="sans-serif" fontWeight="700">A</text>
-      <line x1={pA} y1={y1 + 14} x2={pA} y2={lineY} stroke={C.brand} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={pA + 14} y1={y1} x2={pA + 46} y2={y1} stroke={C.brand} strokeWidth={2} markerEnd="url(#to-a)" />
-      <text x={pA + 30} y={y1 - 6} textAnchor="middle" fill={C.brand} fontSize={9} fontFamily="monospace">vₐ →</text>
+      <text
+        x={pA}
+        y={y1 + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={12}
+        fontFamily="sans-serif"
+        fontWeight="700"
+      >
+        A
+      </text>
+      <line
+        x1={pA}
+        y1={y1 + 14}
+        x2={pA}
+        y2={lineY}
+        stroke={C.brand}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={pA + 14}
+        y1={y1}
+        x2={pA + 46}
+        y2={y1}
+        stroke={C.brand}
+        strokeWidth={2}
+        markerEnd="url(#to-a)"
+      />
+      <text
+        x={pA + 30}
+        y={y1 - 6}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        vₐ →
+      </text>
       <circle cx={pB} cy={y2} r={14} fill={C.rose} opacity={0.9} />
-      <text x={pB} y={y2 + 5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="sans-serif" fontWeight="700">B</text>
-      <line x1={pB} y1={lineY} x2={pB} y2={y2 - 14} stroke={C.rose} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={pB - 14} y1={y2} x2={pB - 46} y2={y2} stroke={C.rose} strokeWidth={2} markerEnd="url(#to-b)" />
-      <text x={pB - 30} y={y2 - 6} textAnchor="middle" fill={C.rose} fontSize={9} fontFamily="monospace">← v_b</text>
-      <line x1={pM} y1={lineY - 18} x2={pM} y2={lineY + 18} stroke={C.emerald} strokeWidth={2} strokeDasharray="4,2" />
-      <text x={pM} y={lineY - 22} textAnchor="middle" fill={C.emerald} fontSize={10} fontFamily="monospace" fontWeight="700">x_meet</text>
-      <text x={W / 2} y={H - 10} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={pB}
+        y={y2 + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={12}
+        fontFamily="sans-serif"
+        fontWeight="700"
+      >
+        B
+      </text>
+      <line
+        x1={pB}
+        y1={lineY}
+        x2={pB}
+        y2={y2 - 14}
+        stroke={C.rose}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={pB - 14}
+        y1={y2}
+        x2={pB - 46}
+        y2={y2}
+        stroke={C.rose}
+        strokeWidth={2}
+        markerEnd="url(#to-b)"
+      />
+      <text
+        x={pB - 30}
+        y={y2 - 6}
+        textAnchor="middle"
+        fill={C.rose}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        ← v_b
+      </text>
+      <line
+        x1={pM}
+        y1={lineY - 18}
+        x2={pM}
+        y2={lineY + 18}
+        stroke={C.emerald}
+        strokeWidth={2}
+        strokeDasharray="4,2"
+      />
+      <text
+        x={pM}
+        y={lineY - 22}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        x_meet
+      </text>
+      <text
+        x={W / 2}
+        y={H - 10}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         Meet when xₐ(t) = x_b(t) → set equal and solve algebraically for t
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Vector Components (right triangle decomposition) ────────────────────────
 
 function VectorComponents({ C }) {
-  const W = 420, H = 220
-  const ox = 60, oy = H - 40
-  const ax = 310, ay = H - 40   // tip of Ax (horizontal)
-  const bx = 310, by = 50       // tip of A (diagonal)
+  const W = 420,
+    H = 220;
+  const ox = 60,
+    oy = H - 40;
+  const ax = 310,
+    ay = H - 40; // tip of Ax (horizontal)
+  const bx = 310,
+    by = 50; // tip of A (diagonal)
 
   function arrow(x1, y1, x2, y2, color, id) {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    const ux = dx / len, uy = dy / len
-    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len,
+      uy = dy / len;
+    const hx = x2 - ux * 10,
+      hy = y2 - uy * 10;
     return (
       <g key={id}>
-        <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
-        <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+        <line
+          x1={x1}
+          y1={y1}
+          x2={hx}
+          y2={hy}
+          stroke={color}
+          strokeWidth={2.5}
+        />
+        <polygon
+          points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`}
+          fill={color}
+        />
       </g>
-    )
+    );
   }
 
-  const angle = Math.atan2(oy - by, bx - ox) * 180 / Math.PI
-  const arcR = 36
+  const angle = (Math.atan2(oy - by, bx - ox) * 180) / Math.PI;
+  const arcR = 36;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Grid suggestion lines */}
-      <line x1={ax} y1={ay} x2={bx} y2={by} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
-      <line x1={ox} y1={by} x2={bx} y2={by} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+      <line
+        x1={ax}
+        y1={ay}
+        x2={bx}
+        y2={by}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="4,3"
+      />
+      <line
+        x1={ox}
+        y1={by}
+        x2={bx}
+        y2={by}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="4,3"
+      />
 
       {/* Right angle marker */}
-      <rect x={bx - 12} y={ay - 12} width={12} height={12} fill="none" stroke={C.muted} strokeWidth={1} />
+      <rect
+        x={bx - 12}
+        y={ay - 12}
+        width={12}
+        height={12}
+        fill="none"
+        stroke={C.muted}
+        strokeWidth={1}
+      />
 
       {/* Component arrows */}
-      {arrow(ox, oy, ax, ay, C.sky, 'ax')}
-      {arrow(ax, ay, bx, by, C.rose, 'ay')}
+      {arrow(ox, oy, ax, ay, C.sky, "ax")}
+      {arrow(ax, ay, bx, by, C.rose, "ay")}
       {/* Main vector */}
-      {arrow(ox, oy, bx, by, C.emerald, 'a')}
+      {arrow(ox, oy, bx, by, C.emerald, "a")}
 
       {/* Angle arc */}
       <path
-        d={`M ${ox + arcR} ${oy} A ${arcR} ${arcR} 0 0 0 ${ox + arcR * Math.cos(-angle * Math.PI / 180)} ${oy + arcR * Math.sin(-angle * Math.PI / 180)}`}
-        fill="none" stroke={C.amber} strokeWidth={1.5}
+        d={`M ${ox + arcR} ${oy} A ${arcR} ${arcR} 0 0 0 ${ox + arcR * Math.cos((-angle * Math.PI) / 180)} ${oy + arcR * Math.sin((-angle * Math.PI) / 180)}`}
+        fill="none"
+        stroke={C.amber}
+        strokeWidth={1.5}
       />
-      <text x={ox + arcR + 6} y={oy - 10} fill={C.amber} fontSize={12} fontFamily="monospace">θ</text>
+      <text
+        x={ox + arcR + 6}
+        y={oy - 10}
+        fill={C.amber}
+        fontSize={12}
+        fontFamily="monospace"
+      >
+        θ
+      </text>
 
       {/* Labels */}
-      <text x={(ox + ax) / 2} y={oy + 16} textAnchor="middle" fill={C.sky} fontSize={13} fontFamily="monospace" fontWeight="700">Aₓ = A cos θ</text>
-      <text x={bx + 10} y={(ay + by) / 2} fill={C.rose} fontSize={13} fontFamily="monospace" fontWeight="700">A_y = A sin θ</text>
-      <text x={(ox + bx) / 2 - 24} y={(oy + by) / 2 - 8} fill={C.emerald} fontSize={14} fontFamily="monospace" fontWeight="700">A</text>
+      <text
+        x={(ox + ax) / 2}
+        y={oy + 16}
+        textAnchor="middle"
+        fill={C.sky}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        Aₓ = A cos θ
+      </text>
+      <text
+        x={bx + 10}
+        y={(ay + by) / 2}
+        fill={C.rose}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A_y = A sin θ
+      </text>
+      <text
+        x={(ox + bx) / 2 - 24}
+        y={(oy + by) / 2 - 8}
+        fill={C.emerald}
+        fontSize={14}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A
+      </text>
 
       {/* Magnitude recovery */}
-      <text x={W - 16} y={30} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">|A| = √(Aₓ² + A_y²)</text>
-      <text x={W - 16} y={44} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">θ = atan2(A_y, Aₓ)</text>
+      <text
+        x={W - 16}
+        y={30}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        |A| = √(Aₓ² + A_y²)
+      </text>
+      <text
+        x={W - 16}
+        y={44}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        θ = atan2(A_y, Aₓ)
+      </text>
     </svg>
-  )
+  );
 }
 
 // ─── Vector Addition Chain ────────────────────────────────────────────────────
 
 function VectorAdditionChain({ C }) {
-  const W = 480, H = 210
+  const W = 480,
+    H = 210;
 
   // Three vectors tip-to-tail, then resultant from origin
   const vecs = [
-    { dx: 120, dy: -30,  color: C.brand,   label: 'A' },
-    { dx: 80,  dy: -90,  color: C.emerald, label: 'B' },
-    { dx: -40, dy: -60,  color: C.amber,   label: 'C' },
-  ]
+    { dx: 120, dy: -30, color: C.brand, label: "A" },
+    { dx: 80, dy: -90, color: C.emerald, label: "B" },
+    { dx: -40, dy: -60, color: C.amber, label: "C" },
+  ];
 
-  let cx = 60, cy = H - 40
-  const start = { x: cx, y: cy }
-  const segments = vecs.map(v => {
-    const x1 = cx, y1 = cy
-    cx += v.dx; cy += v.dy
-    return { x1, y1, x2: cx, y2: cy, color: v.color, label: v.label }
-  })
-  const end = { x: cx, y: cy }
+  let cx = 60,
+    cy = H - 40;
+  const start = { x: cx, y: cy };
+  const segments = vecs.map((v) => {
+    const x1 = cx,
+      y1 = cy;
+    cx += v.dx;
+    cy += v.dy;
+    return { x1, y1, x2: cx, y2: cy, color: v.color, label: v.label };
+  });
+  const end = { x: cx, y: cy };
 
   function arrowHead(x1, y1, x2, y2, color) {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    const ux = dx / len, uy = dy / len
-    const hx = x2 - ux * 10, hy = y2 - uy * 10
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len,
+      uy = dy / len;
+    const hx = x2 - ux * 10,
+      hy = y2 - uy * 10;
     return (
       <>
-        <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
-        <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
+        <line
+          x1={x1}
+          y1={y1}
+          x2={hx}
+          y2={hy}
+          stroke={color}
+          strokeWidth={2.5}
+        />
+        <polygon
+          points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`}
+          fill={color}
+        />
       </>
-    )
+    );
   }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Chain vectors */}
@@ -713,131 +1776,296 @@ function VectorAdditionChain({ C }) {
           <text
             x={(s.x1 + s.x2) / 2 + (s.y2 - s.y1 > 0 ? 10 : -10)}
             y={(s.y1 + s.y2) / 2 + (s.x2 - s.x1 > 0 ? -8 : 8)}
-            fill={s.color} fontSize={14} fontFamily="monospace" fontWeight="700"
-          >{s.label}</text>
+            fill={s.color}
+            fontSize={14}
+            fontFamily="monospace"
+            fontWeight="700"
+          >
+            {s.label}
+          </text>
         </g>
       ))}
 
       {/* Resultant */}
       {arrowHead(start.x, start.y, end.x, end.y, C.rose)}
-      <text x={(start.x + end.x) / 2 - 20} y={(start.y + end.y) / 2 + 16}
-        fill={C.rose} fontSize={13} fontFamily="monospace" fontWeight="700">R = A+B+C</text>
+      <text
+        x={(start.x + end.x) / 2 - 20}
+        y={(start.y + end.y) / 2 + 16}
+        fill={C.rose}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        R = A+B+C
+      </text>
 
       {/* Dots at joints */}
-      {[start, ...segments.map(s => ({ x: s.x2, y: s.y2 }))].map((p, i) => (
+      {[start, ...segments.map((s) => ({ x: s.x2, y: s.y2 }))].map((p, i) => (
         <circle key={i} cx={p.x} cy={p.y} r={3} fill={C.muted} />
       ))}
 
-      <text x={W / 2} y={H - 8} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Tip-to-tail: place each vector's tail at the previous tip. Resultant = tail of first → tip of last.
+      <text
+        x={W / 2}
+        y={H - 8}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Tip-to-tail: place each vector's tail at the previous tip. Resultant =
+        tail of first → tip of last.
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Dot Product Projection ───────────────────────────────────────────────────
 
 function DotProductProjection({ C }) {
-  const W = 460, H = 200
-  const ox = 60, oy = H - 50
+  const W = 460,
+    H = 200;
+  const ox = 60,
+    oy = H - 50;
 
   // Vector A along x-ish, vector B at an angle
-  const Ax = 260                 // A is horizontal (Ay = 0, shares oy baseline)
-  const angle = 38 * Math.PI / 180
-  const Blen = 170
-  const Bx = Blen * Math.cos(angle), By = -Blen * Math.sin(angle)
+  const Ax = 260; // A is horizontal (Ay = 0, shares oy baseline)
+  const angle = (38 * Math.PI) / 180;
+  const Blen = 170;
+  const Bx = Blen * Math.cos(angle),
+    By = -Blen * Math.sin(angle);
 
   // Projection of B onto A: scalar = B·Â = Blen*cos(angle)
-  const projLen = Blen * Math.cos(angle)
-  const projX = ox + projLen, projY = oy   // projection foot
+  const projLen = Blen * Math.cos(angle);
+  const projX = ox + projLen,
+    projY = oy; // projection foot
 
   function arr(x1, y1, x2, y2, color) {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    const ux = dx / len, uy = dy / len
-    const hx = x2 - ux * 9, hy = y2 - uy * 9
-    return <>
-      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
-      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
-    </>
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len,
+      uy = dy / len;
+    const hx = x2 - ux * 9,
+      hy = y2 - uy * 9;
+    return (
+      <>
+        <line
+          x1={x1}
+          y1={y1}
+          x2={hx}
+          y2={hy}
+          stroke={color}
+          strokeWidth={2.5}
+        />
+        <polygon
+          points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`}
+          fill={color}
+        />
+      </>
+    );
   }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Drop line from B tip to projection */}
-      <line x1={ox + Bx} y1={oy + By} x2={projX} y2={projY}
-        stroke={C.muted} strokeWidth={1.5} strokeDasharray="4,3" />
+      <line
+        x1={ox + Bx}
+        y1={oy + By}
+        x2={projX}
+        y2={projY}
+        stroke={C.muted}
+        strokeWidth={1.5}
+        strokeDasharray="4,3"
+      />
       {/* Right angle mark at foot */}
-      <rect x={projX - 8} y={projY - 8} width={8} height={8} fill="none" stroke={C.muted} strokeWidth={1} />
+      <rect
+        x={projX - 8}
+        y={projY - 8}
+        width={8}
+        height={8}
+        fill="none"
+        stroke={C.muted}
+        strokeWidth={1}
+      />
 
       {/* Projection segment on A-axis */}
-      <line x1={ox} y1={oy} x2={projX} y2={projY}
-        stroke={C.sky} strokeWidth={4} opacity={0.5} />
-      <text x={(ox + projX) / 2} y={oy + 20} textAnchor="middle"
-        fill={C.sky} fontSize={11} fontFamily="monospace">B cos θ = A⃗·B⃗ / |A⃗|</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={projX}
+        y2={projY}
+        stroke={C.sky}
+        strokeWidth={4}
+        opacity={0.5}
+      />
+      <text
+        x={(ox + projX) / 2}
+        y={oy + 20}
+        textAnchor="middle"
+        fill={C.sky}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        B cos θ = A⃗·B⃗ / |A⃗|
+      </text>
 
       {/* Vectors */}
       {arr(ox, oy, ox + Ax, oy, C.emerald)}
       {arr(ox, oy, ox + Bx, oy + By, C.amber)}
 
       {/* Angle arc */}
-      <path d={`M ${ox + 40} ${oy} A 40 40 0 0 0 ${ox + 40 * Math.cos(angle)} ${oy - 40 * Math.sin(angle)}`}
-        fill="none" stroke={C.amber} strokeWidth={1.5} />
-      <text x={ox + 48} y={oy - 16} fill={C.amber} fontSize={12} fontFamily="monospace">θ</text>
+      <path
+        d={`M ${ox + 40} ${oy} A 40 40 0 0 0 ${ox + 40 * Math.cos(angle)} ${oy - 40 * Math.sin(angle)}`}
+        fill="none"
+        stroke={C.amber}
+        strokeWidth={1.5}
+      />
+      <text
+        x={ox + 48}
+        y={oy - 16}
+        fill={C.amber}
+        fontSize={12}
+        fontFamily="monospace"
+      >
+        θ
+      </text>
 
       {/* Labels */}
-      <text x={ox + Ax / 2} y={oy - 10} textAnchor="middle" fill={C.emerald} fontSize={14} fontFamily="monospace" fontWeight="700">A⃗</text>
-      <text x={ox + Bx / 2 - 12} y={oy + By / 2} fill={C.amber} fontSize={14} fontFamily="monospace" fontWeight="700">B⃗</text>
+      <text
+        x={ox + Ax / 2}
+        y={oy - 10}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={14}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A⃗
+      </text>
+      <text
+        x={ox + Bx / 2 - 12}
+        y={oy + By / 2}
+        fill={C.amber}
+        fontSize={14}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        B⃗
+      </text>
 
       {/* Formula */}
-      <text x={W - 16} y={24} textAnchor="end" fill={C.text} fontSize={13} fontFamily="monospace" fontWeight="700">A⃗·B⃗ = |A||B| cos θ</text>
-      <text x={W - 16} y={42} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="sans-serif">= (projection of B onto A) × |A|</text>
+      <text
+        x={W - 16}
+        y={24}
+        textAnchor="end"
+        fill={C.text}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A⃗·B⃗ = |A||B| cos θ
+      </text>
+      <text
+        x={W - 16}
+        y={42}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        = (projection of B onto A) × |A|
+      </text>
     </svg>
-  )
+  );
 }
 
 // ─── Cross Product Right-Hand Rule ────────────────────────────────────────────
 
 function CrossProductRHR({ C }) {
-  const W = 480, H = 220
+  const W = 480,
+    H = 220;
   // Show A×B=C with arrows in 3D-ish perspective, plus formula
   // Use a simple 2D oblique projection
 
   // Origin
-  const ox = 120, oy = 140
+  const ox = 120,
+    oy = 140;
 
   // A vector (along "x" direction with slight up-right tilt)
-  const Ax = 140, Ay = -20
+  const Ax = 140,
+    Ay = -20;
   // B vector (up-left, into screen)
-  const Bx = -30, By = -100
+  const Bx = -30,
+    By = -100;
   // C = A×B (out of screen = upward in our 2D view, perpendicular to both)
-  const Cx = 0, Cy = -90   // drawn perpendicular-ish
+  const Cx = 0,
+    Cy = -90; // drawn perpendicular-ish
 
   // Project "out of screen" axis (z) slightly right-down
-  const Zx = 60, Zy = 30
+  const Zx = 60,
+    Zy = 30;
 
   function arr(x1, y1, x2, y2, color, width = 2.5) {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    if (len < 1) return null
-    const ux = dx / len, uy = dy / len
-    const hx = x2 - ux * 10, hy = y2 - uy * 10
-    return <>
-      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={width} />
-      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
-    </>
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 1) return null;
+    const ux = dx / len,
+      uy = dy / len;
+    const hx = x2 - ux * 10,
+      hy = y2 - uy * 10;
+    return (
+      <>
+        <line
+          x1={x1}
+          y1={y1}
+          x2={hx}
+          y2={hy}
+          stroke={color}
+          strokeWidth={width}
+        />
+        <polygon
+          points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`}
+          fill={color}
+        />
+      </>
+    );
   }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Axes hint */}
-      <text x={ox + Ax + 8} y={oy + Ay + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">x</text>
-      <text x={ox + Bx - 10} y={oy + By - 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">y</text>
-      <text x={ox + Zx + 4} y={oy + Zy + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">z</text>
+      <text
+        x={ox + Ax + 8}
+        y={oy + Ay + 4}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        x
+      </text>
+      <text
+        x={ox + Bx - 10}
+        y={oy + By - 4}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        y
+      </text>
+      <text
+        x={ox + Zx + 4}
+        y={oy + Zy + 4}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        z
+      </text>
       {arr(ox, oy, ox + Ax * 0.4, oy + Ay * 0.4, C.muted, 1)}
       {arr(ox, oy, ox + Bx * 0.4, oy + By * 0.4, C.muted, 1)}
       {arr(ox, oy, ox + Zx * 0.5, oy + Zy * 0.5, C.muted, 1)}
@@ -849,156 +2077,390 @@ function CrossProductRHR({ C }) {
       {arr(ox, oy, ox + Cx, oy + Cy, C.rose, 3)}
 
       {/* Labels */}
-      <text x={ox + Ax + 6} y={oy + Ay} fill={C.brand} fontSize={15} fontFamily="monospace" fontWeight="700">A⃗</text>
-      <text x={ox + Bx - 20} y={oy + By - 4} fill={C.emerald} fontSize={15} fontFamily="monospace" fontWeight="700">B⃗</text>
-      <text x={ox + Cx + 8} y={oy + Cy} fill={C.rose} fontSize={15} fontFamily="monospace" fontWeight="700">A⃗×B⃗</text>
+      <text
+        x={ox + Ax + 6}
+        y={oy + Ay}
+        fill={C.brand}
+        fontSize={15}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A⃗
+      </text>
+      <text
+        x={ox + Bx - 20}
+        y={oy + By - 4}
+        fill={C.emerald}
+        fontSize={15}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        B⃗
+      </text>
+      <text
+        x={ox + Cx + 8}
+        y={oy + Cy}
+        fill={C.rose}
+        fontSize={15}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A⃗×B⃗
+      </text>
 
       {/* Curved arrow showing curl from A to B */}
-      <path d={`M ${ox + 50} ${oy - 14} Q ${ox + 20} ${oy - 60} ${ox - 16} ${oy - 60}`}
-        fill="none" stroke={C.amber} strokeWidth={2} strokeDasharray="5,3" />
-      <text x={ox + 16} y={oy - 64} textAnchor="middle" fill={C.amber} fontSize={9} fontFamily="sans-serif">curl fingers A→B</text>
+      <path
+        d={`M ${ox + 50} ${oy - 14} Q ${ox + 20} ${oy - 60} ${ox - 16} ${oy - 60}`}
+        fill="none"
+        stroke={C.amber}
+        strokeWidth={2}
+        strokeDasharray="5,3"
+      />
+      <text
+        x={ox + 16}
+        y={oy - 64}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        curl fingers A→B
+      </text>
 
       {/* Right panel: formula and rule */}
-      <text x={280} y={36} fill={C.text} fontSize={13} fontFamily="monospace" fontWeight="700">A⃗ × B⃗ = |A||B| sin θ n̂</text>
-      <text x={280} y={56} fill={C.muted} fontSize={9} fontFamily="sans-serif">n̂ = unit normal (right-hand rule)</text>
-      <text x={280} y={80} fill={C.sky} fontSize={11} fontFamily="monospace">Right-hand rule:</text>
-      <text x={280} y={96} fill={C.muted} fontSize={9} fontFamily="sans-serif">1. Point fingers along A⃗</text>
-      <text x={280} y={110} fill={C.muted} fontSize={9} fontFamily="sans-serif">2. Curl toward B⃗</text>
-      <text x={280} y={124} fill={C.muted} fontSize={9} fontFamily="sans-serif">3. Thumb points along A⃗×B⃗</text>
-      <text x={280} y={146} fill={C.rose} fontSize={10} fontFamily="monospace">B⃗×A⃗ = −(A⃗×B⃗)</text>
-      <text x={280} y={160} fill={C.muted} fontSize={9} fontFamily="sans-serif">Anti-commutative — order matters!</text>
+      <text
+        x={280}
+        y={36}
+        fill={C.text}
+        fontSize={13}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        A⃗ × B⃗ = |A||B| sin θ n̂
+      </text>
+      <text x={280} y={56} fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        n̂ = unit normal (right-hand rule)
+      </text>
+      <text x={280} y={80} fill={C.sky} fontSize={11} fontFamily="monospace">
+        Right-hand rule:
+      </text>
+      <text x={280} y={96} fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        1. Point fingers along A⃗
+      </text>
+      <text x={280} y={110} fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        2. Curl toward B⃗
+      </text>
+      <text x={280} y={124} fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        3. Thumb points along A⃗×B⃗
+      </text>
+      <text x={280} y={146} fill={C.rose} fontSize={10} fontFamily="monospace">
+        B⃗×A⃗ = −(A⃗×B⃗)
+      </text>
+      <text x={280} y={160} fill={C.muted} fontSize={9} fontFamily="sans-serif">
+        Anti-commutative — order matters!
+      </text>
 
-      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={W / 2}
+        y={H - 6}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         |A⃗×B⃗| = area of parallelogram spanned by A⃗ and B⃗
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Free Body Diagram ────────────────────────────────────────────────────────
 
 function FreeBodyDiagram({ C }) {
-  const W = 420, H = 220
-  const cx = 180, cy = 120
-  const r = 28
+  const W = 420,
+    H = 220;
+  const cx = 180,
+    cy = 120;
+  const r = 28;
 
   const forces = [
-    { label: 'N (normal)',  dx: 0,    dy: -90, color: C.emerald },
-    { label: 'W = mg',     dx: 0,    dy: 80,  color: C.rose },
-    { label: 'F (applied)',dx: 100,  dy: -20, color: C.brand },
-    { label: 'f (friction)',dx: -80, dy: 0,   color: C.amber },
-  ]
+    { label: "N (normal)", dx: 0, dy: -90, color: C.emerald },
+    { label: "W = mg", dx: 0, dy: 80, color: C.rose },
+    { label: "F (applied)", dx: 100, dy: -20, color: C.brand },
+    { label: "f (friction)", dx: -80, dy: 0, color: C.amber },
+  ];
 
   function arr(x1, y1, x2, y2, color) {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    const ux = dx / len, uy = dy / len
-    const hx = x2 - ux * 10, hy = y2 - uy * 10
-    return <>
-      <line x1={x1} y1={y1} x2={hx} y2={hy} stroke={color} strokeWidth={2.5} />
-      <polygon points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`} fill={color} />
-    </>
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len,
+      uy = dy / len;
+    const hx = x2 - ux * 10,
+      hy = y2 - uy * 10;
+    return (
+      <>
+        <line
+          x1={x1}
+          y1={y1}
+          x2={hx}
+          y2={hy}
+          stroke={color}
+          strokeWidth={2.5}
+        />
+        <polygon
+          points={`${x2},${y2} ${hx - uy * 5},${hy + ux * 5} ${hx + uy * 5},${hy - ux * 5}`}
+          fill={color}
+        />
+      </>
+    );
   }
 
   // Edge point of circle in direction of force
   function edgePoint(dx, dy) {
-    const len = Math.sqrt(dx * dx + dy * dy)
-    return [cx + (dx / len) * r, cy + (dy / len) * r]
+    const len = Math.sqrt(dx * dx + dy * dy);
+    return [cx + (dx / len) * r, cy + (dy / len) * r];
   }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Object */}
-      <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} rx={4}
-        fill={C.surface} stroke={C.border} strokeWidth={1.5} />
-      <text x={cx} y={cy + 5} textAnchor="middle" fill={C.muted} fontSize={11} fontFamily="sans-serif">m</text>
+      <rect
+        x={cx - r}
+        y={cy - r}
+        width={r * 2}
+        height={r * 2}
+        rx={4}
+        fill={C.surface}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <text
+        x={cx}
+        y={cy + 5}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={11}
+        fontFamily="sans-serif"
+      >
+        m
+      </text>
 
       {/* Forces */}
       {forces.map((f, i) => {
-        const [ex, ey] = edgePoint(f.dx, f.dy)
-        return <g key={i}>{arr(ex, ey, ex + f.dx, ey + f.dy, f.color)}</g>
+        const [ex, ey] = edgePoint(f.dx, f.dy);
+        return <g key={i}>{arr(ex, ey, ex + f.dx, ey + f.dy, f.color)}</g>;
       })}
 
       {/* Labels on the right */}
       {forces.map((f, i) => (
         <g key={i}>
-          <rect x={W - 130} y={20 + i * 44} width={8} height={8} rx={2} fill={f.color} />
-          <text x={W - 118} y={29 + i * 44} fill={f.color} fontSize={11} fontFamily="monospace">{f.label}</text>
+          <rect
+            x={W - 130}
+            y={20 + i * 44}
+            width={8}
+            height={8}
+            rx={2}
+            fill={f.color}
+          />
+          <text
+            x={W - 118}
+            y={29 + i * 44}
+            fill={f.color}
+            fontSize={11}
+            fontFamily="monospace"
+          >
+            {f.label}
+          </text>
         </g>
       ))}
 
-      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={W / 2}
+        y={H - 6}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         F_net = ΣF = ma — isolate the object, draw every force acting ON it
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Dimensions Equation (Ch0) ────────────────────────────────────────────────
 // Shows x = v₀t + ½at² with dimension labels — teaches dimensional homogeneity.
 
 function DimensionsEquation({ C }) {
-  const W = 460, H = 210
+  const W = 460,
+    H = 210;
 
   // Three columns: term, raw dimension, simplified
   const terms = [
-    { cx: 80,  term: 'x',    raw: '[L]',          simp: '[L]' },
-    { cx: 230, term: 'v₀·t', raw: '[L/T] · [T]',  simp: '[L]' },
-    { cx: 375, term: '½a·t²',raw: '[L/T²] · [T²]',simp: '[L]' },
-  ]
+    { cx: 80, term: "x", raw: "[L]", simp: "[L]" },
+    { cx: 230, term: "v₀·t", raw: "[L/T] · [T]", simp: "[L]" },
+    { cx: 375, term: "½a·t²", raw: "[L/T²] · [T²]", simp: "[L]" },
+  ];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Title */}
-      <text x={W / 2} y={22} textAnchor="middle" fill={C.label} fontSize={12} fontWeight="700" fontFamily="sans-serif">
+      <text
+        x={W / 2}
+        y={22}
+        textAnchor="middle"
+        fill={C.label}
+        fontSize={12}
+        fontWeight="700"
+        fontFamily="sans-serif"
+      >
         Dimensional homogeneity: x = v₀t + ½at²
       </text>
 
       {/* Operator symbols between columns */}
-      <text x={150} y={72} textAnchor="middle" fill={C.muted} fontSize={18} fontFamily="monospace">=</text>
-      <text x={300} y={72} textAnchor="middle" fill={C.muted} fontSize={18} fontFamily="monospace">+</text>
+      <text
+        x={150}
+        y={72}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={18}
+        fontFamily="monospace"
+      >
+        =
+      </text>
+      <text
+        x={300}
+        y={72}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={18}
+        fontFamily="monospace"
+      >
+        +
+      </text>
 
       {/* Per-term columns */}
       {terms.map(({ cx, term, raw, simp }, i) => (
         <g key={i}>
           {/* Term box */}
-          <rect x={cx - 40} y={44} width={80} height={28} rx={6}
-            fill={C.surface} stroke={C.border} strokeWidth={1} />
-          <text x={cx} y={63} textAnchor="middle" fill={C.brand} fontSize={13}
-            fontWeight="700" fontFamily="monospace">{term}</text>
+          <rect
+            x={cx - 40}
+            y={44}
+            width={80}
+            height={28}
+            rx={6}
+            fill={C.surface}
+            stroke={C.border}
+            strokeWidth={1}
+          />
+          <text
+            x={cx}
+            y={63}
+            textAnchor="middle"
+            fill={C.brand}
+            fontSize={13}
+            fontWeight="700"
+            fontFamily="monospace"
+          >
+            {term}
+          </text>
 
           {/* Arrow down */}
-          <line x1={cx} y1={73} x2={cx} y2={88} stroke={C.muted} strokeWidth={1.5} />
-          <polygon points={`${cx},${92} ${cx - 4},${87} ${cx + 4},${87}`} fill={C.muted} />
+          <line
+            x1={cx}
+            y1={73}
+            x2={cx}
+            y2={88}
+            stroke={C.muted}
+            strokeWidth={1.5}
+          />
+          <polygon
+            points={`${cx},${92} ${cx - 4},${87} ${cx + 4},${87}`}
+            fill={C.muted}
+          />
 
           {/* Raw dimension */}
-          <text x={cx} y={110} textAnchor="middle" fill={C.sky} fontSize={10} fontFamily="monospace">{raw}</text>
+          <text
+            x={cx}
+            y={110}
+            textAnchor="middle"
+            fill={C.sky}
+            fontSize={10}
+            fontFamily="monospace"
+          >
+            {raw}
+          </text>
 
           {/* Arrow down */}
-          <line x1={cx} y1={115} x2={cx} y2={130} stroke={C.muted} strokeWidth={1.5} />
-          <polygon points={`${cx},${134} ${cx - 4},${129} ${cx + 4},${129}`} fill={C.muted} />
+          <line
+            x1={cx}
+            y1={115}
+            x2={cx}
+            y2={130}
+            stroke={C.muted}
+            strokeWidth={1.5}
+          />
+          <polygon
+            points={`${cx},${134} ${cx - 4},${129} ${cx + 4},${129}`}
+            fill={C.muted}
+          />
 
           {/* Simplified dimension */}
-          <rect x={cx - 20} y={136} width={40} height={20} rx={4}
-            fill={C.emerald} opacity={0.15} stroke={C.emerald} strokeWidth={1} />
-          <text x={cx} y={151} textAnchor="middle" fill={C.emerald} fontSize={12}
-            fontWeight="700" fontFamily="monospace">{simp}</text>
+          <rect
+            x={cx - 20}
+            y={136}
+            width={40}
+            height={20}
+            rx={4}
+            fill={C.emerald}
+            opacity={0.15}
+            stroke={C.emerald}
+            strokeWidth={1}
+          />
+          <text
+            x={cx}
+            y={151}
+            textAnchor="middle"
+            fill={C.emerald}
+            fontSize={12}
+            fontWeight="700"
+            fontFamily="monospace"
+          >
+            {simp}
+          </text>
 
           {/* Checkmark */}
-          <text x={cx} y={173} textAnchor="middle" fill={C.emerald} fontSize={14}>✓</text>
+          <text
+            x={cx}
+            y={173}
+            textAnchor="middle"
+            fill={C.emerald}
+            fontSize={14}
+          >
+            ✓
+          </text>
         </g>
       ))}
 
       {/* Footer rule */}
-      <text x={W / 2} y={198} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Every term must reduce to the same dimension — if not, the equation is physically impossible
+      <text
+        x={W / 2}
+        y={198}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Every term must reduce to the same dimension — if not, the equation is
+        physically impossible
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── X–t and V–t Twin Graphs (Ch0) ────────────────────────────────────────────
@@ -1007,182 +2469,435 @@ function DimensionsEquation({ C }) {
 // Teaches: graphs encode physics — slope and area carry real meaning.
 
 function XtVtGraphs({ C }) {
-  const W = 460, H = 210
-  const pad = 32
+  const W = 460,
+    H = 210;
+  const pad = 32;
 
   // Left panel: x-t graph (parabola, slope triangle at t=3)
-  const lx0 = pad, lx1 = 210
-  const ly0 = H - pad, ly1 = pad
-  const lW = lx1 - lx0, lH = ly0 - ly1
+  const lx0 = pad,
+    lx1 = 210;
+  const ly0 = H - pad,
+    ly1 = pad;
+  const lW = lx1 - lx0,
+    lH = ly0 - ly1;
 
   function xtToSVG(t, x, tMax, xMax) {
-    return [lx0 + (t / tMax) * lW, ly0 - (x / xMax) * lH]
+    return [lx0 + (t / tMax) * lW, ly0 - (x / xMax) * lH];
   }
-  const tMax = 4, xMax = 16
+  const tMax = 4,
+    xMax = 16;
   // parabola x = t²
-  const xtPts = []
-  for (let t = 0; t <= tMax; t += 0.2) xtPts.push(xtToSVG(t, t * t, tMax, xMax))
-  const xtPath = 'M ' + xtPts.map(p => p.join(',')).join(' L ')
+  const xtPts = [];
+  for (let t = 0; t <= tMax; t += 0.2)
+    xtPts.push(xtToSVG(t, t * t, tMax, xMax));
+  const xtPath = "M " + xtPts.map((p) => p.join(",")).join(" L ");
 
   // Slope triangle at t=2 to t=3: x goes from 4 to 9, Δx=5, Δt=1
-  const [sx0, sy0] = xtToSVG(2, 4, tMax, xMax)
-  const [sx1, sy1] = xtToSVG(3, 4, tMax, xMax)
-  const [tx1, ty1] = xtToSVG(3, 9, tMax, xMax)
+  const [sx0, sy0] = xtToSVG(2, 4, tMax, xMax);
+  const [sx1, sy1] = xtToSVG(3, 4, tMax, xMax);
+  const [tx1, ty1] = xtToSVG(3, 9, tMax, xMax);
 
   // Right panel: v-t graph (linear v = 2t)
-  const rx0 = 250, rx1 = W - pad
-  const ry0 = H - pad, ry1 = pad
-  const rW = rx1 - rx0, rH = ry0 - ry1
+  const rx0 = 250,
+    rx1 = W - pad;
+  const ry0 = H - pad,
+    ry1 = pad;
+  const rW = rx1 - rx0,
+    rH = ry0 - ry1;
 
   function vtToSVG(t, v, tMax, vMax) {
-    return [rx0 + (t / tMax) * rW, ry0 - (v / vMax) * rH]
+    return [rx0 + (t / tMax) * rW, ry0 - (v / vMax) * rH];
   }
-  const vMax = 8
-  const vtPts = []
-  for (let t = 0; t <= tMax; t += 0.2) vtPts.push(vtToSVG(t, 2 * t, tMax, vMax))
-  const vtPath = 'M ' + vtPts.map(p => p.join(',')).join(' L ')
+  const vMax = 8;
+  const vtPts = [];
+  for (let t = 0; t <= tMax; t += 0.2)
+    vtPts.push(vtToSVG(t, 2 * t, tMax, vMax));
+  const vtPath = "M " + vtPts.map((p) => p.join(",")).join(" L ");
 
   // Shaded area: t=1 to t=3
-  const [ar0x, ar0y] = vtToSVG(1, 0, tMax, vMax)
-  const [ar1x, ar1y] = vtToSVG(3, 0, tMax, vMax)
-  const [ar2x, ar2y] = vtToSVG(3, 6, tMax, vMax)
-  const [ar3x, ar3y] = vtToSVG(1, 2, tMax, vMax)
-  const areaPath = `M ${ar0x},${ar0y} L ${ar1x},${ar1y} L ${ar2x},${ar2y} L ${ar3x},${ar3y} Z`
+  const [ar0x, ar0y] = vtToSVG(1, 0, tMax, vMax);
+  const [ar1x, ar1y] = vtToSVG(3, 0, tMax, vMax);
+  const [ar2x, ar2y] = vtToSVG(3, 6, tMax, vMax);
+  const [ar3x, ar3y] = vtToSVG(1, 2, tMax, vMax);
+  const areaPath = `M ${ar0x},${ar0y} L ${ar1x},${ar1y} L ${ar2x},${ar2y} L ${ar3x},${ar3y} Z`;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Panel titles */}
-      <text x={(lx0 + lx1) / 2} y={14} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+      <text
+        x={(lx0 + lx1) / 2}
+        y={14}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
         position–time (x–t)
       </text>
-      <text x={(rx0 + rx1) / 2} y={14} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+      <text
+        x={(rx0 + rx1) / 2}
+        y={14}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
         velocity–time (v–t)
       </text>
 
       {/* Left axes */}
-      <line x1={lx0} y1={ly0} x2={lx1 + 10} y2={ly0} stroke={C.border} strokeWidth={1.5} />
-      <line x1={lx0} y1={ly0} x2={lx0} y2={ly1 - 10} stroke={C.border} strokeWidth={1.5} />
-      <text x={lx1 + 12} y={ly0 + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">t</text>
-      <text x={lx0 - 6} y={ly1 - 12} fill={C.muted} fontSize={9} fontFamily="sans-serif">x</text>
+      <line
+        x1={lx0}
+        y1={ly0}
+        x2={lx1 + 10}
+        y2={ly0}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={lx0}
+        y1={ly0}
+        x2={lx0}
+        y2={ly1 - 10}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <text
+        x={lx1 + 12}
+        y={ly0 + 4}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
+      <text
+        x={lx0 - 6}
+        y={ly1 - 12}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        x
+      </text>
 
       {/* Right axes */}
-      <line x1={rx0} y1={ry0} x2={rx1 + 10} y2={ry0} stroke={C.border} strokeWidth={1.5} />
-      <line x1={rx0} y1={ry0} x2={rx0} y2={ry1 - 10} stroke={C.border} strokeWidth={1.5} />
-      <text x={rx1 + 12} y={ry0 + 4} fill={C.muted} fontSize={9} fontFamily="sans-serif">t</text>
-      <text x={rx0 - 6} y={ry1 - 12} fill={C.muted} fontSize={9} fontFamily="sans-serif">v</text>
+      <line
+        x1={rx0}
+        y1={ry0}
+        x2={rx1 + 10}
+        y2={ry0}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={rx0}
+        y1={ry0}
+        x2={rx0}
+        y2={ry1 - 10}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <text
+        x={rx1 + 12}
+        y={ry0 + 4}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        t
+      </text>
+      <text
+        x={rx0 - 6}
+        y={ry1 - 12}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        v
+      </text>
 
       {/* Left: parabola */}
       <path d={xtPath} stroke={C.brand} strokeWidth={2} fill="none" />
 
       {/* Slope triangle */}
-      <polygon points={`${sx0},${sy0} ${sx1},${sy1} ${tx1},${ty1}`}
-        fill={C.amber} opacity={0.25} />
-      <line x1={sx0} y1={sy0} x2={sx1} y2={sy1} stroke={C.amber} strokeWidth={1.5} strokeDasharray="3,2" />
-      <line x1={sx1} y1={sy1} x2={tx1} y2={ty1} stroke={C.amber} strokeWidth={1.5} strokeDasharray="3,2" />
-      <line x1={sx0} y1={sy0} x2={tx1} y2={ty1} stroke={C.amber} strokeWidth={2} />
-      <text x={(sx0 + tx1) / 2 - 28} y={(sy0 + ty1) / 2} fill={C.amber} fontSize={9} fontFamily="monospace">slope</text>
-      <text x={(sx0 + tx1) / 2 - 22} y={(sy0 + ty1) / 2 + 11} fill={C.amber} fontSize={9} fontFamily="monospace">= v</text>
+      <polygon
+        points={`${sx0},${sy0} ${sx1},${sy1} ${tx1},${ty1}`}
+        fill={C.amber}
+        opacity={0.25}
+      />
+      <line
+        x1={sx0}
+        y1={sy0}
+        x2={sx1}
+        y2={sy1}
+        stroke={C.amber}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={sx1}
+        y1={sy1}
+        x2={tx1}
+        y2={ty1}
+        stroke={C.amber}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={sx0}
+        y1={sy0}
+        x2={tx1}
+        y2={ty1}
+        stroke={C.amber}
+        strokeWidth={2}
+      />
+      <text
+        x={(sx0 + tx1) / 2 - 28}
+        y={(sy0 + ty1) / 2}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        slope
+      </text>
+      <text
+        x={(sx0 + tx1) / 2 - 22}
+        y={(sy0 + ty1) / 2 + 11}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        = v
+      </text>
 
       {/* Right: area fill */}
       <path d={areaPath} fill={C.emerald} opacity={0.2} />
       <path d={vtPath} stroke={C.brand} strokeWidth={2} fill="none" />
       {/* Vertical lines for area bounds */}
-      <line x1={ar0x} y1={ar0y} x2={ar3x} y2={ar3y} stroke={C.emerald} strokeWidth={1.5} strokeDasharray="3,2" />
-      <line x1={ar1x} y1={ar1y} x2={ar2x} y2={ar2y} stroke={C.emerald} strokeWidth={1.5} strokeDasharray="3,2" />
-      <text x={(ar0x + ar1x) / 2} y={(ar0y + ar2y) / 2 + 4} textAnchor="middle"
-        fill={C.emerald} fontSize={9} fontFamily="monospace">area</text>
-      <text x={(ar0x + ar1x) / 2} y={(ar0y + ar2y) / 2 + 15} textAnchor="middle"
-        fill={C.emerald} fontSize={9} fontFamily="monospace">= Δx</text>
+      <line
+        x1={ar0x}
+        y1={ar0y}
+        x2={ar3x}
+        y2={ar3y}
+        stroke={C.emerald}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={ar1x}
+        y1={ar1y}
+        x2={ar2x}
+        y2={ar2y}
+        stroke={C.emerald}
+        strokeWidth={1.5}
+        strokeDasharray="3,2"
+      />
+      <text
+        x={(ar0x + ar1x) / 2}
+        y={(ar0y + ar2y) / 2 + 4}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        area
+      </text>
+      <text
+        x={(ar0x + ar1x) / 2}
+        y={(ar0y + ar2y) / 2 + 15}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        = Δx
+      </text>
 
       {/* Panel divider */}
-      <line x1={225} y1={ly1} x2={225} y2={ly0} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+      <line
+        x1={225}
+        y1={ly1}
+        x2={225}
+        y2={ly0}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="4,3"
+      />
 
       {/* Footer */}
-      <text x={W / 2} y={H - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Slope of x–t = velocity  |  Area under v–t = displacement
+      <text
+        x={W / 2}
+        y={H - 4}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Slope of x–t = velocity | Area under v–t = displacement
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Projectile Arc (Ch3) ────────────────────────────────────────────────────
 // θ=45°, v₀=20 m/s, g=10 m/s² → R=40, hmax=10 (normalised units)
 
 function ProjectileArc({ C }) {
-  const W = 460, H = 220
-  const padL = 36, padR = 24, padT = 28, padB = 36
-  const plotW = W - padL - padR
-  const plotH = H - padT - padB
+  const W = 460,
+    H = 220;
+  const padL = 36,
+    padR = 24,
+    padT = 28,
+    padB = 36;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
 
-  const R = 40, hmax = 10          // domain: x in [0,40], y in [0,10]
-  const xMax = 42, yMax = 13       // a little headroom
-  const ox = padL, oy = H - padB
+  const R = 40,
+    hmax = 10; // domain: x in [0,40], y in [0,10]
+  const xMax = 42,
+    yMax = 13; // a little headroom
+  const ox = padL,
+    oy = H - padB;
 
-  const toSVG = (x, y) => [ox + (x / xMax) * plotW, oy - (y / yMax) * plotH]
+  const toSVG = (x, y) => [ox + (x / xMax) * plotW, oy - (y / yMax) * plotH];
 
   // Parabola: y = x(R-x)*4hmax/R²
-  const arc = []
+  const arc = [];
   for (let x = 0; x <= R; x += 0.4) {
-    arc.push(toSVG(x, (4 * hmax / (R * R)) * x * (R - x)))
+    arc.push(toSVG(x, ((4 * hmax) / (R * R)) * x * (R - x)));
   }
-  const arcPath = 'M ' + arc.map(p => p.join(',')).join(' L ')
+  const arcPath = "M " + arc.map((p) => p.join(",")).join(" L ");
 
   // Key points
-  const [lx, ly] = toSVG(0, 0)          // launch
-  const [px, py] = toSVG(R / 2, hmax)   // peak
-  const [rx, ry] = toSVG(R, 0)          // landing
+  const [lx, ly] = toSVG(0, 0); // launch
+  const [px, py] = toSVG(R / 2, hmax); // peak
+  const [rx, ry] = toSVG(R, 0); // landing
 
   // Launch velocity arrows (45°: vx=vy in length, each 34px)
-  const vLen = 36
-  const vxEnd = [lx + vLen, ly]
-  const vyEnd = [lx, ly - vLen]
-  const v0End = [lx + vLen, ly - vLen]
+  const vLen = 36;
+  const vxEnd = [lx + vLen, ly];
+  const vyEnd = [lx, ly - vLen];
+  const v0End = [lx + vLen, ly - vLen];
 
   // Peak: only horizontal vx arrow
-  const pvxEnd = [px + vLen * 0.8, py]
+  const pvxEnd = [px + vLen * 0.8, py];
 
   // hmax vertical dashed line (base x only — y is always oy)
-  const [hmx0] = toSVG(R / 2, 0)
+  const [hmx0] = toSVG(R / 2, 0);
 
   // Arrow helper: tiny triangle head
   const arrow = (x1, y1, x2, y2, col, w = 1.8) => {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy) || 1
-    const ux = dx / len, uy = dy / len
-    const px1 = x2 - ux * 8 - uy * 4
-    const py1 = y2 - uy * 8 + ux * 4
-    const px2 = x2 - ux * 8 + uy * 4
-    const py2 = y2 - uy * 8 - ux * 4
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const ux = dx / len,
+      uy = dy / len;
+    const px1 = x2 - ux * 8 - uy * 4;
+    const py1 = y2 - uy * 8 + ux * 4;
+    const px2 = x2 - ux * 8 + uy * 4;
+    const py2 = y2 - uy * 8 - ux * 4;
     return (
       <>
         <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={col} strokeWidth={w} />
-        <polygon points={`${x2},${y2} ${px1},${py1} ${px2},${py2}`} fill={col} />
+        <polygon
+          points={`${x2},${y2} ${px1},${py1} ${px2},${py2}`}
+          fill={col}
+        />
       </>
-    )
-  }
+    );
+  };
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Axes */}
-      <line x1={ox} y1={oy} x2={ox + plotW + 10} y2={oy} stroke={C.border} strokeWidth={1.5} />
-      <line x1={ox} y1={oy} x2={ox} y2={padT - 8} stroke={C.border} strokeWidth={1.5} />
-      <text x={ox + plotW + 13} y={oy + 4} fill={C.muted} fontSize={10} fontFamily="sans-serif">x</text>
-      <text x={ox - 4} y={padT - 10} fill={C.muted} fontSize={10} fontFamily="sans-serif">y</text>
+      <line
+        x1={ox}
+        y1={oy}
+        x2={ox + plotW + 10}
+        y2={oy}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={ox}
+        y1={oy}
+        x2={ox}
+        y2={padT - 8}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
+      <text
+        x={ox + plotW + 13}
+        y={oy + 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        x
+      </text>
+      <text
+        x={ox - 4}
+        y={padT - 10}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        y
+      </text>
 
       {/* Range label on x-axis */}
-      <line x1={lx} y1={oy + 8} x2={rx} y2={oy + 8} stroke={C.muted} strokeWidth={1} />
-      <text x={(lx + rx) / 2} y={oy + 20} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="monospace">
+      <line
+        x1={lx}
+        y1={oy + 8}
+        x2={rx}
+        y2={oy + 8}
+        stroke={C.muted}
+        strokeWidth={1}
+      />
+      <text
+        x={(lx + rx) / 2}
+        y={oy + 20}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="monospace"
+      >
         R = v₀²sin(2θ)/g
       </text>
 
       {/* hmax dashed vertical */}
-      <line x1={hmx0} y1={oy} x2={hmx0} y2={py} stroke={C.amber} strokeWidth={1.2} strokeDasharray="4,3" />
-      <text x={hmx0 + 5} y={(oy + py) / 2 + 4} fill={C.amber} fontSize={9} fontFamily="monospace">h</text>
-      <text x={hmx0 + 5} y={(oy + py) / 2 + 14} fill={C.amber} fontSize={9} fontFamily="monospace">max</text>
+      <line
+        x1={hmx0}
+        y1={oy}
+        x2={hmx0}
+        y2={py}
+        stroke={C.amber}
+        strokeWidth={1.2}
+        strokeDasharray="4,3"
+      />
+      <text
+        x={hmx0 + 5}
+        y={(oy + py) / 2 + 4}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        h
+      </text>
+      <text
+        x={hmx0 + 5}
+        y={(oy + py) / 2 + 14}
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        max
+      </text>
 
       {/* Parabola */}
       <path d={arcPath} stroke={C.brand} strokeWidth={2.5} fill="none" />
@@ -1192,22 +2907,89 @@ function ProjectileArc({ C }) {
       {arrow(lx, ly, ...vxEnd, C.emerald, 1.8)}
       {arrow(lx, ly, ...vyEnd, C.rose, 1.8)}
       {/* Dashed box */}
-      <line x1={lx} y1={vyEnd[1]} x2={v0End[0]} y2={v0End[1]} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
-      <line x1={vxEnd[0]} y1={vxEnd[1]} x2={v0End[0]} y2={v0End[1]} stroke={C.border} strokeWidth={1} strokeDasharray="3,2" />
+      <line
+        x1={lx}
+        y1={vyEnd[1]}
+        x2={v0End[0]}
+        y2={v0End[1]}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
+      <line
+        x1={vxEnd[0]}
+        y1={vxEnd[1]}
+        x2={v0End[0]}
+        y2={v0End[1]}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="3,2"
+      />
 
       {/* Labels at launch */}
-      <text x={lx + vLen / 2} y={ly + 14} textAnchor="middle" fill={C.emerald} fontSize={9} fontFamily="monospace">vₓ = v₀cosθ</text>
-      <text x={lx - 6} y={ly - vLen / 2} textAnchor="end" fill={C.rose} fontSize={9} fontFamily="monospace">vᵧ = v₀sinθ</text>
-      <text x={v0End[0] + 5} y={v0End[1] - 4} fill={C.text} fontSize={10} fontFamily="monospace">v₀</text>
+      <text
+        x={lx + vLen / 2}
+        y={ly + 14}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        vₓ = v₀cosθ
+      </text>
+      <text
+        x={lx - 6}
+        y={ly - vLen / 2}
+        textAnchor="end"
+        fill={C.rose}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        vᵧ = v₀sinθ
+      </text>
+      <text
+        x={v0End[0] + 5}
+        y={v0End[1] - 4}
+        fill={C.text}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        v₀
+      </text>
       {/* θ label */}
-      <text x={lx + 14} y={ly - 8} fill={C.muted} fontSize={10} fontFamily="monospace">θ</text>
+      <text
+        x={lx + 14}
+        y={ly - 8}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        θ
+      </text>
 
       {/* Peak vx arrow */}
       {arrow(px, py, ...pvxEnd, C.emerald, 1.8)}
-      <text x={pvxEnd[0] + 5} y={py + 4} fill={C.emerald} fontSize={9} fontFamily="monospace">vₓ (const)</text>
+      <text
+        x={pvxEnd[0] + 5}
+        y={py + 4}
+        fill={C.emerald}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        vₓ (const)
+      </text>
       {/* Peak dot */}
       <circle cx={px} cy={py} r={3} fill={C.amber} />
-      <text x={px} y={py - 8} textAnchor="middle" fill={C.amber} fontSize={9} fontFamily="monospace">vᵧ = 0</text>
+      <text
+        x={px}
+        y={py - 8}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        vᵧ = 0
+      </text>
 
       {/* Landing dot */}
       <circle cx={rx} cy={ry} r={3} fill={C.brand} />
@@ -1216,237 +2998,563 @@ function ProjectileArc({ C }) {
       <circle cx={lx} cy={ly} r={3} fill={C.brand} />
 
       {/* Footer */}
-      <text x={W / 2} y={H - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={W / 2}
+        y={H - 4}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         x and y motions are independent — time t is the shared parameter
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Circular Motion (Ch3) ───────────────────────────────────────────────────
 
 function CircularMotionDiagram({ C }) {
-  const W = 460, H = 220
-  const cx = 180, cy = 110, r = 75   // circle center and radius
+  const W = 460,
+    H = 220;
+  const cx = 180,
+    cy = 110,
+    r = 75; // circle center and radius
 
   // Point P at 45° (upper-right of circle)
-  const angle = -Math.PI / 4   // -45° from x-axis → upper right in SVG (y inverts)
-  const px = cx + r * Math.cos(angle)
-  const py = cy + r * Math.sin(angle)
+  const angle = -Math.PI / 4; // -45° from x-axis → upper right in SVG (y inverts)
+  const px = cx + r * Math.cos(angle);
+  const py = cy + r * Math.sin(angle);
 
   // Velocity vector: tangent to circle, perpendicular to radius, CCW direction
   // Tangent direction (CCW): (-sin(angle), cos(angle))  → in SVG (sin flipped for y)
-  const vLen = 54
-  const tvx = -Math.sin(angle)  // tangent x component
-  const tvy = Math.cos(angle)   // tangent y component (SVG y-down)
-  const vex = px + tvx * vLen
-  const vey = py + tvy * vLen
+  const vLen = 54;
+  const tvx = -Math.sin(angle); // tangent x component
+  const tvy = Math.cos(angle); // tangent y component (SVG y-down)
+  const vex = px + tvx * vLen;
+  const vey = py + tvy * vLen;
 
   // Centripetal acceleration: from P toward center
-  const acLen = 44
-  const acx = px + (cx - px) / r * acLen
-  const acy = py + (cy - py) / r * acLen
+  const acLen = 44;
+  const acx = px + ((cx - px) / r) * acLen;
+  const acy = py + ((cy - py) / r) * acLen;
 
   // Radius line
   const arrow = (x1, y1, x2, y2, col, w = 2) => {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy) || 1
-    const ux = dx / len, uy = dy / len
-    const p1x = x2 - ux * 9 - uy * 4
-    const p1y = y2 - uy * 9 + ux * 4
-    const p2x = x2 - ux * 9 + uy * 4
-    const p2y = y2 - uy * 9 - ux * 4
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const ux = dx / len,
+      uy = dy / len;
+    const p1x = x2 - ux * 9 - uy * 4;
+    const p1y = y2 - uy * 9 + ux * 4;
+    const p2x = x2 - ux * 9 + uy * 4;
+    const p2y = y2 - uy * 9 - ux * 4;
     return (
       <>
         <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={col} strokeWidth={w} />
-        <polygon points={`${x2},${y2} ${p1x},${p1y} ${p2x},${p2y}`} fill={col} />
+        <polygon
+          points={`${x2},${y2} ${p1x},${p1y} ${p2x},${p2y}`}
+          fill={col}
+        />
       </>
-    )
-  }
+    );
+  };
 
   // ω arc indicator (small arc in upper-left quadrant of circle)
-  const arcR = 22
-  const omegaArc = `M ${cx + arcR} ${cy} A ${arcR} ${arcR} 0 0 0 ${cx} ${cy - arcR}`
+  const arcR = 22;
+  const omegaArc = `M ${cx + arcR} ${cy} A ${arcR} ${arcR} 0 0 0 ${cx} ${cy - arcR}`;
 
   // Period arc + right-side info panel
-  const infoX = 300
+  const infoX = 300;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Circle */}
-      <circle cx={cx} cy={cy} r={r} stroke={C.border} strokeWidth={1.8} fill="none" />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        stroke={C.border}
+        strokeWidth={1.8}
+        fill="none"
+      />
 
       {/* Center dot */}
       <circle cx={cx} cy={cy} r={3} fill={C.muted} />
-      <text x={cx - 8} y={cy + 14} fill={C.muted} fontSize={9} fontFamily="monospace">O</text>
+      <text
+        x={cx - 8}
+        y={cy + 14}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        O
+      </text>
 
       {/* Radius line */}
-      <line x1={cx} y1={cy} x2={px} y2={py} stroke={C.muted} strokeWidth={1.2} strokeDasharray="5,3" />
-      <text x={(cx + px) / 2 - 14} y={(cy + py) / 2 - 4} fill={C.muted} fontSize={10} fontFamily="monospace">r</text>
+      <line
+        x1={cx}
+        y1={cy}
+        x2={px}
+        y2={py}
+        stroke={C.muted}
+        strokeWidth={1.2}
+        strokeDasharray="5,3"
+      />
+      <text
+        x={(cx + px) / 2 - 14}
+        y={(cy + py) / 2 - 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        r
+      </text>
 
       {/* ω rotation arc */}
-      <path d={omegaArc} stroke={C.amber} strokeWidth={1.5} fill="none" strokeDasharray="3,2" />
-      <text x={cx - 12} y={cy - arcR - 4} fill={C.amber} fontSize={10} fontFamily="monospace">ω</text>
+      <path
+        d={omegaArc}
+        stroke={C.amber}
+        strokeWidth={1.5}
+        fill="none"
+        strokeDasharray="3,2"
+      />
+      <text
+        x={cx - 12}
+        y={cy - arcR - 4}
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        ω
+      </text>
 
       {/* Velocity arrow (tangent) */}
       {arrow(px, py, vex, vey, C.emerald)}
-      <text x={vex + 5} y={vey - 4} fill={C.emerald} fontSize={10} fontFamily="monospace">v</text>
+      <text
+        x={vex + 5}
+        y={vey - 4}
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        v
+      </text>
 
       {/* Centripetal acceleration arrow */}
       {arrow(px, py, acx, acy, C.rose)}
-      <text x={acx + 5} y={acy + 4} fill={C.rose} fontSize={9} fontFamily="monospace">aᶜ</text>
+      <text
+        x={acx + 5}
+        y={acy + 4}
+        fill={C.rose}
+        fontSize={9}
+        fontFamily="monospace"
+      >
+        aᶜ
+      </text>
 
       {/* Point P */}
       <circle cx={px} cy={py} r={4} fill={C.brand} />
-      <text x={px + 6} y={py - 8} fill={C.brand} fontSize={10} fontFamily="monospace">P</text>
+      <text
+        x={px + 6}
+        y={py - 8}
+        fill={C.brand}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        P
+      </text>
 
       {/* Info panel */}
-      <line x1={infoX - 12} y1={28} x2={infoX - 12} y2={H - 28} stroke={C.border} strokeWidth={1} strokeDasharray="4,3" />
+      <line
+        x1={infoX - 12}
+        y1={28}
+        x2={infoX - 12}
+        y2={H - 28}
+        stroke={C.border}
+        strokeWidth={1}
+        strokeDasharray="4,3"
+      />
 
-      <text x={infoX} y={44} fill={C.text} fontSize={10} fontFamily="monospace" fontWeight="bold">Key formulas</text>
-      <text x={infoX} y={64} fill={C.emerald} fontSize={10} fontFamily="monospace">v = 2πr / T = ωr</text>
-      <text x={infoX} y={82} fill={C.rose} fontSize={10} fontFamily="monospace">aᶜ = v²/r = ω²r</text>
-      <text x={infoX} y={100} fill={C.amber} fontSize={10} fontFamily="monospace">ω = 2π / T</text>
-      <text x={infoX} y={118} fill={C.muted} fontSize={10} fontFamily="monospace">T = period (s)</text>
-      <text x={infoX} y={136} fill={C.muted} fontSize={10} fontFamily="monospace">f = 1/T (Hz)</text>
+      <text
+        x={infoX}
+        y={44}
+        fill={C.text}
+        fontSize={10}
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        Key formulas
+      </text>
+      <text
+        x={infoX}
+        y={64}
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        v = 2πr / T = ωr
+      </text>
+      <text x={infoX} y={82} fill={C.rose} fontSize={10} fontFamily="monospace">
+        aᶜ = v²/r = ω²r
+      </text>
+      <text
+        x={infoX}
+        y={100}
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        ω = 2π / T
+      </text>
+      <text
+        x={infoX}
+        y={118}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        T = period (s)
+      </text>
+      <text
+        x={infoX}
+        y={136}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        f = 1/T (Hz)
+      </text>
 
-      <text x={infoX} y={160} fill={C.muted} fontSize={9} fontFamily="sans-serif">Direction of v: tangent</text>
-      <text x={infoX} y={174} fill={C.muted} fontSize={9} fontFamily="sans-serif">Direction of aᶜ: toward O</text>
+      <text
+        x={infoX}
+        y={160}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Direction of v: tangent
+      </text>
+      <text
+        x={infoX}
+        y={174}
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Direction of aᶜ: toward O
+      </text>
 
       {/* Footer */}
-      <text x={cx} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={cx}
+        y={H - 6}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         |v| is constant; direction changes → centripetal acceleration
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Inclined Plane (Ch4) ────────────────────────────────────────────────────
 
 function InclinedPlaneDiagram({ C }) {
-  const W = 500, H = 260
-  const θ = 32 * Math.PI / 180
-  const sinθ = Math.sin(θ), cosθ = Math.cos(θ)
+  const W = 500,
+    H = 260;
+  const θ = (32 * Math.PI) / 180;
+  const sinθ = Math.sin(θ),
+    cosθ = Math.cos(θ);
   // Slope base: ox,oy to ox+L,oy; apex at ox,oy-L*tanθ
-  const ox = 55, oy = H - 50, L = 320
-  const tx = ox + L, ty = oy
-  const apx = ox, apy = oy - L * Math.tan(θ)
+  const ox = 55,
+    oy = H - 50,
+    L = 320;
+  const tx = ox + L,
+    ty = oy;
+  const apx = ox,
+    apy = oy - L * Math.tan(θ);
   // Block sits 55% up slope
-  const t = 0.52
-  const bsx = ox + t * L, bsy = oy - t * L * Math.tan(θ)
-  const bHalf = 18
+  const t = 0.52;
+  const bsx = ox + t * L,
+    bsy = oy - t * L * Math.tan(θ);
+  const bHalf = 18;
   // Block center offset perpendicular to slope (outward)
-  const bcx = bsx - bHalf * sinθ, bcy = bsy - bHalf * cosθ
+  const bcx = bsx - bHalf * sinθ,
+    bcy = bsy - bHalf * cosθ;
 
   const arrow = (x1, y1, x2, y2, color, label, lx = 0, ly = -10) => {
-    const dx = x2 - x1, dy = y2 - y1
-    const len = Math.sqrt(dx * dx + dy * dy)
-    if (len < 3) return null
-    const ux = dx / len, uy = dy / len
-    const h = 9
-    const tip1x = x2 - h * ux + h * 0.4 * uy, tip1y = y2 - h * uy - h * 0.4 * ux
-    const tip2x = x2 - h * ux - h * 0.4 * uy, tip2y = y2 - h * uy + h * 0.4 * ux
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 3) return null;
+    const ux = dx / len,
+      uy = dy / len;
+    const h = 9;
+    const tip1x = x2 - h * ux + h * 0.4 * uy,
+      tip1y = y2 - h * uy - h * 0.4 * ux;
+    const tip2x = x2 - h * ux - h * 0.4 * uy,
+      tip2y = y2 - h * uy + h * 0.4 * ux;
     return (
       <g key={label}>
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
-        <polygon points={`${x2},${y2} ${tip1x},${tip1y} ${tip2x},${tip2y}`} fill={color} />
-        {label && <text x={(x1+x2)/2+lx} y={(y1+y2)/2+ly} textAnchor="middle" fill={color} fontSize={10} fontFamily="monospace">{label}</text>}
+        <line
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke={color}
+          strokeWidth={2.5}
+          strokeLinecap="round"
+        />
+        <polygon
+          points={`${x2},${y2} ${tip1x},${tip1y} ${tip2x},${tip2y}`}
+          fill={color}
+        />
+        {label && (
+          <text
+            x={(x1 + x2) / 2 + lx}
+            y={(y1 + y2) / 2 + ly}
+            textAnchor="middle"
+            fill={color}
+            fontSize={10}
+            fontFamily="monospace"
+          >
+            {label}
+          </text>
+        )}
       </g>
-    )
-  }
+    );
+  };
 
-  const forceScale = 36
-  const W_mag = forceScale
+  const forceScale = 36;
+  const W_mag = forceScale;
   // W_par = sinθ * forceScale (down slope)
   // W_perp = cosθ * forceScale (into slope)
   // N = cosθ * forceScale (out of slope)
 
   // Down-slope unit vector: (cosθ, sinθ) in screen coords (y flipped)
-  const dsux = cosθ, dsuy = sinθ  // screen: y increases downward
+  const dsux = cosθ,
+    dsuy = sinθ; // screen: y increases downward
   // Into-slope unit: (sinθ, -cosθ) pointing into slope (screen)
   // Normal: (-sinθ, cosθ) pointing away from slope (screen)
-  const normX = -sinθ, normY = cosθ   // screen-space normal (upward from slope)
+  const normX = -sinθ,
+    normY = cosθ; // screen-space normal (upward from slope)
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 260 }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Slope triangle */}
-      <polygon points={`${ox},${apy} ${tx},${ty} ${ox},${ty}`} fill={C.surface} stroke={C.border} strokeWidth={1.5} />
+      <polygon
+        points={`${ox},${apy} ${tx},${ty} ${ox},${ty}`}
+        fill={C.surface}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
       {/* Slope surface (highlighted) */}
       <line x1={ox} y1={apy} x2={tx} y2={ty} stroke={C.muted} strokeWidth={2} />
 
       {/* Angle arc + label */}
-      <path d={`M ${tx-36},${ty} A 36,36 0 0,0 ${tx - 36*cosθ},${ty - 36*sinθ}`} fill="none" stroke={C.muted} strokeWidth={1.5} />
-      <text x={tx - 50} y={ty - 10} fill={C.muted} fontSize={11} fontFamily="monospace">θ=32°</text>
+      <path
+        d={`M ${tx - 36},${ty} A 36,36 0 0,0 ${tx - 36 * cosθ},${ty - 36 * sinθ}`}
+        fill="none"
+        stroke={C.muted}
+        strokeWidth={1.5}
+      />
+      <text
+        x={tx - 50}
+        y={ty - 10}
+        fill={C.muted}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        θ=32°
+      </text>
 
       {/* Ground hatching */}
       {[...Array(12)].map((_, i) => (
-        <line key={i} x1={ox + i*22} y1={ty} x2={ox + i*22 - 10} y2={ty + 12} stroke={C.border} strokeWidth={1} />
+        <line
+          key={i}
+          x1={ox + i * 22}
+          y1={ty}
+          x2={ox + i * 22 - 10}
+          y2={ty + 12}
+          stroke={C.border}
+          strokeWidth={1}
+        />
       ))}
-      <line x1={ox} y1={ty} x2={tx+8} y2={ty} stroke={C.border} strokeWidth={1.5} />
+      <line
+        x1={ox}
+        y1={ty}
+        x2={tx + 8}
+        y2={ty}
+        stroke={C.border}
+        strokeWidth={1.5}
+      />
 
       {/* Block */}
-      <g transform={`translate(${bcx},${bcy}) rotate(${-θ * 180/Math.PI})`}>
-        <rect x={-bHalf} y={-bHalf} width={bHalf*2} height={bHalf*2} fill={C.brand} rx={3} />
-        <text x={0} y={4} textAnchor="middle" fill="#fff" fontSize={10} fontFamily="monospace" fontWeight="bold">m</text>
+      <g transform={`translate(${bcx},${bcy}) rotate(${(-θ * 180) / Math.PI})`}>
+        <rect
+          x={-bHalf}
+          y={-bHalf}
+          width={bHalf * 2}
+          height={bHalf * 2}
+          fill={C.brand}
+          rx={3}
+        />
+        <text
+          x={0}
+          y={4}
+          textAnchor="middle"
+          fill="#fff"
+          fontSize={10}
+          fontFamily="monospace"
+          fontWeight="bold"
+        >
+          m
+        </text>
       </g>
 
       {/* Weight arrow (straight down) */}
-      {arrow(bcx, bcy, bcx, bcy + W_mag, C.rose, 'W=mg', 16, 0)}
+      {arrow(bcx, bcy, bcx, bcy + W_mag, C.rose, "W=mg", 16, 0)}
 
       {/* Normal force (perpendicular out of slope, cyan) */}
-      {arrow(bcx, bcy, bcx + normX * W_mag * cosθ, bcy + normY * W_mag * cosθ, C.sky, 'N', -20, -6)}
+      {arrow(
+        bcx,
+        bcy,
+        bcx + normX * W_mag * cosθ,
+        bcy + normY * W_mag * cosθ,
+        C.sky,
+        "N",
+        -20,
+        -6,
+      )}
 
       {/* W_parallel (down slope, dashed, amber) */}
-      <line x1={bcx} y1={bcy} x2={bcx + dsux * W_mag * sinθ} y2={bcy + dsuy * W_mag * sinθ}
-        stroke={C.amber} strokeWidth={2} strokeDasharray="5,3" />
-      <text x={bcx + dsux * W_mag * sinθ * 0.5 + 12} y={bcy + dsuy * W_mag * sinθ * 0.5 + 10}
-        fill={C.amber} fontSize={10} fontFamily="monospace">W∥=mg sinθ</text>
+      <line
+        x1={bcx}
+        y1={bcy}
+        x2={bcx + dsux * W_mag * sinθ}
+        y2={bcy + dsuy * W_mag * sinθ}
+        stroke={C.amber}
+        strokeWidth={2}
+        strokeDasharray="5,3"
+      />
+      <text
+        x={bcx + dsux * W_mag * sinθ * 0.5 + 12}
+        y={bcy + dsuy * W_mag * sinθ * 0.5 + 10}
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        W∥=mg sinθ
+      </text>
 
       {/* W_perp (into slope, dashed, muted) */}
-      <line x1={bcx} y1={bcy} x2={bcx - normX * W_mag * cosθ} y2={bcy - normY * W_mag * cosθ}
-        stroke={C.muted} strokeWidth={2} strokeDasharray="5,3" />
-      <text x={bcx - normX * W_mag * cosθ * 0.5 - 28} y={bcy - normY * W_mag * cosθ * 0.5 - 4}
-        fill={C.muted} fontSize={10} fontFamily="monospace">W⊥=mg cosθ</text>
+      <line
+        x1={bcx}
+        y1={bcy}
+        x2={bcx - normX * W_mag * cosθ}
+        y2={bcy - normY * W_mag * cosθ}
+        stroke={C.muted}
+        strokeWidth={2}
+        strokeDasharray="5,3"
+      />
+      <text
+        x={bcx - normX * W_mag * cosθ * 0.5 - 28}
+        y={bcy - normY * W_mag * cosθ * 0.5 - 4}
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        W⊥=mg cosθ
+      </text>
 
       {/* Friction arrow (up slope, orange) */}
-      {arrow(bcx, bcy, bcx - dsux * W_mag * sinθ * 0.55, bcy - dsuy * W_mag * sinθ * 0.55, C.amber, 'f', -12, -6)}
+      {arrow(
+        bcx,
+        bcy,
+        bcx - dsux * W_mag * sinθ * 0.55,
+        bcy - dsuy * W_mag * sinθ * 0.55,
+        C.amber,
+        "f",
+        -12,
+        -6,
+      )}
 
       {/* Footer formula */}
-      <text x={W/2} y={H-8} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="monospace">
-        a = g(sinθ − μcosθ)   ·   N = mg cosθ
+      <text
+        x={W / 2}
+        y={H - 8}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        a = g(sinθ − μcosθ) · N = mg cosθ
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Pulley / Atwood Machine (Ch4) ───────────────────────────────────────────
 
 function PulleySystemDiagram({ C }) {
-  const W = 400, H = 300
-  const px = W / 2, py = 52   // pulley center
-  const pR = 20                 // pulley radius
-  const ropeY = py + pR
-  const lx = px - 38, rx = px + 38  // rope x coords left/right
-  const m1y = ropeY + 120, m2y = ropeY + 80  // block centers
-  const bW = 50, bH = 34
+  const W = 400,
+    H = 300;
+  const px = W / 2,
+    py = 52; // pulley center
+  const pR = 20; // pulley radius
+  const ropeY = py + pR;
+  const lx = px - 38,
+    rx = px + 38; // rope x coords left/right
+  const m1y = ropeY + 120,
+    m2y = ropeY + 80; // block centers
+  const bW = 50,
+    bH = 34;
 
   const arrow = (x1, y1, x2, y2, color, label, above = true) => {
-    const dx = x2-x1, dy = y2-y1
-    const len = Math.sqrt(dx*dx+dy*dy)
-    if (len < 3) return null
-    const ux = dx/len, uy = dy/len, h = 9
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 3) return null;
+    const ux = dx / len,
+      uy = dy / len,
+      h = 9;
     return (
       <g key={label}>
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round"/>
-        <polygon points={`${x2},${y2} ${x2-h*ux+h*0.4*uy},${y2-h*uy-h*0.4*ux} ${x2-h*ux-h*0.4*uy},${y2-h*uy+h*0.4*ux}`} fill={color}/>
-        {label && <text x={(x1+x2)/2+(above?-14:14)} y={(y1+y2)/2+(above?-5:12)} fill={color} fontSize={10} fontFamily="monospace">{label}</text>}
+        <line
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke={color}
+          strokeWidth={2.5}
+          strokeLinecap="round"
+        />
+        <polygon
+          points={`${x2},${y2} ${x2 - h * ux + h * 0.4 * uy},${y2 - h * uy - h * 0.4 * ux} ${x2 - h * ux - h * 0.4 * uy},${y2 - h * uy + h * 0.4 * ux}`}
+          fill={color}
+        />
+        {label && (
+          <text
+            x={(x1 + x2) / 2 + (above ? -14 : 14)}
+            y={(y1 + y2) / 2 + (above ? -5 : 12)}
+            fill={color}
+            fontSize={10}
+            fontFamily="monospace"
+          >
+            {label}
+          </text>
+        )}
       </g>
-    )
-  }
+    );
+  };
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 300 }}>
@@ -1454,107 +3562,407 @@ function PulleySystemDiagram({ C }) {
 
       {/* Ceiling */}
       <rect x={0} y={0} width={W} height={18} fill={C.surface} />
-      {[...Array(10)].map((_,i) => (
-        <line key={i} x1={10+i*36} y1={18} x2={10+i*36-10} y2={28} stroke={C.border} strokeWidth={1} />
+      {[...Array(10)].map((_, i) => (
+        <line
+          key={i}
+          x1={10 + i * 36}
+          y1={18}
+          x2={10 + i * 36 - 10}
+          y2={28}
+          stroke={C.border}
+          strokeWidth={1}
+        />
       ))}
 
       {/* Pulley axle */}
-      <line x1={px} y1={18} x2={px} y2={py} stroke={C.muted} strokeWidth={2}/>
+      <line x1={px} y1={18} x2={px} y2={py} stroke={C.muted} strokeWidth={2} />
       {/* Pulley wheel */}
-      <circle cx={px} cy={py} r={pR} fill={C.surface} stroke={C.muted} strokeWidth={3}/>
-      <circle cx={px} cy={py} r={6} fill={C.border}/>
+      <circle
+        cx={px}
+        cy={py}
+        r={pR}
+        fill={C.surface}
+        stroke={C.muted}
+        strokeWidth={3}
+      />
+      <circle cx={px} cy={py} r={6} fill={C.border} />
 
       {/* Ropes */}
-      <line x1={lx} y1={ropeY} x2={lx} y2={m1y - bH/2} stroke={C.muted} strokeWidth={2.5}/>
-      <line x1={rx} y1={ropeY} x2={rx} y2={m2y - bH/2} stroke={C.muted} strokeWidth={2.5}/>
+      <line
+        x1={lx}
+        y1={ropeY}
+        x2={lx}
+        y2={m1y - bH / 2}
+        stroke={C.muted}
+        strokeWidth={2.5}
+      />
+      <line
+        x1={rx}
+        y1={ropeY}
+        x2={rx}
+        y2={m2y - bH / 2}
+        stroke={C.muted}
+        strokeWidth={2.5}
+      />
 
       {/* m1 (heavier, indigo) */}
-      <rect x={lx-bW/2} y={m1y-bH/2} width={bW} height={bH} fill={C.brand} rx={4}/>
-      <text x={lx} y={m1y+5} textAnchor="middle" fill="#fff" fontSize={11} fontFamily="monospace" fontWeight="bold">m₁</text>
+      <rect
+        x={lx - bW / 2}
+        y={m1y - bH / 2}
+        width={bW}
+        height={bH}
+        fill={C.brand}
+        rx={4}
+      />
+      <text
+        x={lx}
+        y={m1y + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        m₁
+      </text>
       {/* m2 (lighter, emerald) */}
-      <rect x={rx-bW/2} y={m2y-bH/2} width={bW} height={bH} fill={C.emerald} rx={4}/>
-      <text x={rx} y={m2y+5} textAnchor="middle" fill="#fff" fontSize={11} fontFamily="monospace" fontWeight="bold">m₂</text>
+      <rect
+        x={rx - bW / 2}
+        y={m2y - bH / 2}
+        width={bW}
+        height={bH}
+        fill={C.emerald}
+        rx={4}
+      />
+      <text
+        x={rx}
+        y={m2y + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        m₂
+      </text>
 
       {/* Forces on m1 */}
-      {arrow(lx, m1y-bH/2, lx, m1y-bH/2-38, C.sky, 'T', true)}
-      {arrow(lx, m1y+bH/2, lx, m1y+bH/2+38, C.rose, 'W₁', false)}
+      {arrow(lx, m1y - bH / 2, lx, m1y - bH / 2 - 38, C.sky, "T", true)}
+      {arrow(lx, m1y + bH / 2, lx, m1y + bH / 2 + 38, C.rose, "W₁", false)}
 
       {/* Forces on m2 */}
-      {arrow(rx, m2y-bH/2, rx, m2y-bH/2-38, C.sky, 'T', true)}
-      {arrow(rx, m2y+bH/2, rx, m2y+bH/2+30, C.rose, 'W₂', false)}
+      {arrow(rx, m2y - bH / 2, rx, m2y - bH / 2 - 38, C.sky, "T", true)}
+      {arrow(rx, m2y + bH / 2, rx, m2y + bH / 2 + 30, C.rose, "W₂", false)}
 
       {/* m1 label (heavier) */}
-      <text x={lx-bW/2-4} y={m1y+4} textAnchor="end" fill={C.muted} fontSize={10} fontFamily="monospace">(heavier)</text>
+      <text
+        x={lx - bW / 2 - 4}
+        y={m1y + 4}
+        textAnchor="end"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        (heavier)
+      </text>
 
       {/* Footer formulas */}
-      <text x={W/2} y={H-22} textAnchor="middle" fill={C.brand} fontSize={10} fontFamily="monospace">
+      <text
+        x={W / 2}
+        y={H - 22}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={10}
+        fontFamily="monospace"
+      >
         a = (m₁−m₂)g/(m₁+m₂)
       </text>
-      <text x={W/2} y={H-7} textAnchor="middle" fill={C.sky} fontSize={10} fontFamily="monospace">
+      <text
+        x={W / 2}
+        y={H - 7}
+        textAnchor="middle"
+        fill={C.sky}
+        fontSize={10}
+        fontFamily="monospace"
+      >
         T = 2m₁m₂g/(m₁+m₂)
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Action-Reaction (Ch4) ────────────────────────────────────────────────────
 
 function ActionReactionDiagram({ C }) {
-  const W = 500, H = 200
+  const W = 500,
+    H = 200;
   // Two blocks pressing against each other
-  const cx = W / 2, cy = H / 2
-  const bW = 80, bH = 50
+  const cx = W / 2,
+    cy = H / 2;
+  const bW = 80,
+    bH = 50;
 
   const arrow = (x1, y1, x2, y2, color, label) => {
-    const dx = x2-x1, dy = y2-y1
-    const len = Math.sqrt(dx*dx+dy*dy)
-    if (len < 3) return null
-    const ux = dx/len, uy = dy/len, h = 10
+    const dx = x2 - x1,
+      dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 3) return null;
+    const ux = dx / len,
+      uy = dy / len,
+      h = 10;
     return (
       <g key={`${x1}${y1}${label}`}>
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2.5} strokeLinecap="round"/>
-        <polygon points={`${x2},${y2} ${x2-h*ux+h*0.38*uy},${y2-h*uy-h*0.38*ux} ${x2-h*ux-h*0.38*uy},${y2-h*uy+h*0.38*ux}`} fill={color}/>
-        {label && <text x={(x1+x2)/2} y={(y1+y2)/2-8} textAnchor="middle" fill={color} fontSize={11} fontFamily="monospace">{label}</text>}
+        <line
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke={color}
+          strokeWidth={2.5}
+          strokeLinecap="round"
+        />
+        <polygon
+          points={`${x2},${y2} ${x2 - h * ux + h * 0.38 * uy},${y2 - h * uy - h * 0.38 * ux} ${x2 - h * ux - h * 0.38 * uy},${y2 - h * uy + h * 0.38 * ux}`}
+          fill={color}
+        />
+        {label && (
+          <text
+            x={(x1 + x2) / 2}
+            y={(y1 + y2) / 2 - 8}
+            textAnchor="middle"
+            fill={color}
+            fontSize={11}
+            fontFamily="monospace"
+          >
+            {label}
+          </text>
+        )}
       </g>
-    )
-  }
+    );
+  };
 
-  const gap = 4
-  const L_right = cx - gap / 2  // right edge of left block
-  const R_left  = cx + gap / 2  // left edge of right block
-  const aLen = 68
+  const gap = 4;
+  const L_right = cx - gap / 2; // right edge of left block
+  const R_left = cx + gap / 2; // left edge of right block
+  const aLen = 68;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxHeight: 200 }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* Left block (indigo) */}
-      <rect x={L_right-bW} y={cy-bH/2} width={bW} height={bH} fill={C.brand} rx={5}/>
-      <text x={L_right-bW/2} y={cy+5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="monospace" fontWeight="bold">A</text>
+      <rect
+        x={L_right - bW}
+        y={cy - bH / 2}
+        width={bW}
+        height={bH}
+        fill={C.brand}
+        rx={5}
+      />
+      <text
+        x={L_right - bW / 2}
+        y={cy + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={12}
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        A
+      </text>
 
       {/* Right block (emerald) */}
-      <rect x={R_left} y={cy-bH/2} width={bW} height={bH} fill={C.emerald} rx={5}/>
-      <text x={R_left+bW/2} y={cy+5} textAnchor="middle" fill="#fff" fontSize={12} fontFamily="monospace" fontWeight="bold">B</text>
+      <rect
+        x={R_left}
+        y={cy - bH / 2}
+        width={bW}
+        height={bH}
+        fill={C.emerald}
+        rx={5}
+      />
+      <text
+        x={R_left + bW / 2}
+        y={cy + 5}
+        textAnchor="middle"
+        fill="#fff"
+        fontSize={12}
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        B
+      </text>
 
       {/* Applied force on A (pushing right) */}
-      {arrow(L_right-bW-aLen, cy, L_right-bW, cy, C.amber, 'F applied')}
+      {arrow(L_right - bW - aLen, cy, L_right - bW, cy, C.amber, "F applied")}
 
       {/* A pushes B (action, right, indigo) */}
-      {arrow(R_left, cy-10, R_left+aLen, cy-10, C.brand, 'F_AB')}
+      {arrow(R_left, cy - 10, R_left + aLen, cy - 10, C.brand, "F_AB")}
       {/* B pushes A (reaction, left, emerald) */}
-      {arrow(L_right, cy+10, L_right-aLen, cy+10, C.emerald, 'F_BA')}
+      {arrow(L_right, cy + 10, L_right - aLen, cy + 10, C.emerald, "F_BA")}
 
       {/* Equal & opposite label */}
-      <text x={cx} y={cy+bH/2+22} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="monospace">
-        |F_AB| = |F_BA|  ·  opposite directions  ·  act on DIFFERENT objects
+      <text
+        x={cx}
+        y={cy + bH / 2 + 22}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        |F_AB| = |F_BA| · opposite directions · act on DIFFERENT objects
       </text>
 
       {/* Newton's 3rd statement */}
-      <text x={W/2} y={H-6} textAnchor="middle" fill={C.muted} fontSize={10} fontFamily="sans-serif">
+      <text
+        x={W / 2}
+        y={H - 6}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
         Newton's 3rd Law: every action has an equal and opposite reaction
       </text>
     </svg>
-  )
+  );
+}
+
+// ─── Rolle statement diagram ───────────────────────────────────────────────
+//
+//  Single-panel demonstration of a smooth function with equal endpoint heights
+//  and a guaranteed horizontal tangent somewhere in between.
+
+function RollesStatementDiagram({ C }) {
+  const W = 560;
+  const H = 260;
+  const pad = { t: 28, b: 42, l: 42, r: 24 };
+  const xMin = 0.4;
+  const xMax = 2.6;
+  const yMin = -0.4;
+  const yMax = 1.6;
+  const f = (x) => 1.4 - (x - 1.5) * (x - 1.5);
+  const a = 0.5;
+  const b = 2.5;
+  const c = 1.5;
+
+  const xScale = (x) =>
+    pad.l + ((x - xMin) / (xMax - xMin)) * (W - pad.l - pad.r);
+  const yScale = (y) =>
+    pad.t + (H - pad.t - pad.b) * (1 - (y - yMin) / (yMax - yMin));
+
+  const line = (points) =>
+    points.map(([x, y]) => `${xScale(x)},${yScale(y)}`).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
+      <rect width={W} height={H} fill={C.bg} rx={12} />
+
+      <line
+        x1={xScale(xMin)}
+        y1={yScale(0)}
+        x2={xScale(xMax)}
+        y2={yScale(0)}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <line
+        x1={xScale(0.85)}
+        y1={yScale(yMin)}
+        x2={xScale(0.85)}
+        y2={yScale(yMax)}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+
+      <polyline
+        points={line(
+          Array.from({ length: 120 }, (_, i) => {
+            const x = xMin + (i / 119) * (xMax - xMin);
+            return [x, f(x)];
+          }),
+        )}
+        fill="none"
+        stroke={C.brand}
+        strokeWidth={2.5}
+      />
+
+      <circle cx={xScale(a)} cy={yScale(f(a))} r={6} fill={C.amber} />
+      <circle cx={xScale(b)} cy={yScale(f(b))} r={6} fill={C.amber} />
+      <text
+        x={xScale(a)}
+        y={yScale(f(a)) - 12}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        (a, f(a))
+      </text>
+      <text
+        x={xScale(b)}
+        y={yScale(f(b)) - 12}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        (b, f(b))
+      </text>
+
+      <line
+        x1={xScale(c) - 60}
+        y1={yScale(f(c))}
+        x2={xScale(c) + 60}
+        y2={yScale(f(c))}
+        stroke={C.emerald}
+        strokeWidth={2.5}
+      />
+      <circle cx={xScale(c)} cy={yScale(f(c))} r={6} fill={C.emerald} />
+      <text
+        x={xScale(c)}
+        y={yScale(f(c)) - 14}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+      >
+        c
+      </text>
+      <text
+        x={xScale(c)}
+        y={yScale(f(c)) + 22}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        f'(c) = 0
+      </text>
+
+      <text
+        x={W / 2}
+        y={pad.t - 8}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={12}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        Rolle's Theorem guarantee
+      </text>
+      <text
+        x={W / 2}
+        y={H - 12}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={10}
+        fontFamily="sans-serif"
+      >
+        If f(a)=f(b) and f is smooth on [a,b], then some c in (a,b) has a
+        horizontal tangent.
+      </text>
+    </svg>
+  );
 }
 
 // ─── Rolle's → MVT proof construction ────────────────────────────────────────
@@ -1565,206 +3973,419 @@ function ActionReactionDiagram({ C }) {
 //  Arrow between panels labels the operation: "subtract secant → g(a)=g(b)=0"
 
 function RollesMVTProof({ C }) {
-  const W = 560, H = 260
-  const pad = { t: 28, b: 44, l: 44, r: 20 }
-  const panelW = (W - pad.l - pad.r - 40) / 2   // 40px gap between panels
-  const panelH = H - pad.t - pad.b
+  const W = 560,
+    H = 260;
+  const pad = { t: 28, b: 44, l: 44, r: 20 };
+  const panelW = (W - pad.l - pad.r - 40) / 2; // 40px gap between panels
+  const panelH = H - pad.t - pad.b;
 
   // f(x) = x² − x,  L(x) = secant from (0.5, f(0.5)) to (2.5, f(2.5))
-  const f = (x) => x * x - x
-  const a = 0.5, b = 2.5
-  const fa = f(a), fb = f(b)
-  const secSlope = (fb - fa) / (b - a)
-  const L = (x) => fa + secSlope * (x - a)
-  const g = (x) => f(x) - L(x)
+  const f = (x) => x * x - x;
+  const a = 0.5,
+    b = 2.5;
+  const fa = f(a),
+    fb = f(b);
+  const secSlope = (fb - fa) / (b - a);
+  const L = (x) => fa + secSlope * (x - a);
+  const g = (x) => f(x) - L(x);
 
-  const xMin = 0.1, xMax = 2.9
-  const yMin = -0.7, yMax = 2.0
-  const gyMin = -0.8, gyMax = 0.5
+  const xMin = 0.1,
+    xMax = 2.9;
+  const yMin = -0.7,
+    yMax = 2.0;
+  const gyMin = -0.8,
+    gyMax = 0.5;
 
   // c where g'(x)=0: f'(x)=secSlope → 2x−1=secSlope → x=(1+secSlope)/2
-  const cG = (1 + secSlope) / 2
+  const cG = (1 + secSlope) / 2;
 
-  function toL(x, panel = 'left') {
-    const xOff = panel === 'left' ? pad.l : pad.l + panelW + 40
-    const px = xOff + ((x - xMin) / (xMax - xMin)) * panelW
-    return px
+  function toL(x, panel = "left") {
+    const xOff = panel === "left" ? pad.l : pad.l + panelW + 40;
+    const px = xOff + ((x - xMin) / (xMax - xMin)) * panelW;
+    return px;
   }
   function toT(y, ylo, yhi) {
-    return pad.t + panelH - ((y - ylo) / (yhi - ylo)) * panelH
+    return pad.t + panelH - ((y - ylo) / (yhi - ylo)) * panelH;
   }
 
   // Build polyline points for a function over N steps
   function pts(fn, ylo, yhi, panel, steps = 120) {
-    const result = []
+    const result = [];
     for (let i = 0; i <= steps; i++) {
-      const x = xMin + (i / steps) * (xMax - xMin)
-      const y = fn(x)
-      if (y < ylo - 0.3 || y > yhi + 0.3) continue
-      result.push(`${toL(x, panel).toFixed(1)},${toT(y, ylo, yhi).toFixed(1)}`)
+      const x = xMin + (i / steps) * (xMax - xMin);
+      const y = fn(x);
+      if (y < ylo - 0.3 || y > yhi + 0.3) continue;
+      result.push(`${toL(x, panel).toFixed(1)},${toT(y, ylo, yhi).toFixed(1)}`);
     }
-    return result.join(' ')
+    return result.join(" ");
   }
 
   // Axis helpers
-  const axisY_left   = toT(0, yMin, yMax)
-  const axisX_left   = toL(xMin, 'left')
-  const axisX_left2  = toL(xMax, 'left')
-  const axisX_right  = toL(xMin, 'right')
-  const axisX_right2 = toL(xMax, 'right')
+  const axisY_left = toT(0, yMin, yMax);
+  const axisX_left = toL(xMin, "left");
+  const axisX_left2 = toL(xMax, "left");
+  const axisX_right = toL(xMin, "right");
+  const axisX_right2 = toL(xMax, "right");
 
   // Key points — left panel
-  const lax   = toL(a, 'left'), lay = toT(fa, yMin, yMax)
-  const lbx   = toL(b, 'left'), lby = toT(fb, yMin, yMax)
-  const secY1 = toT(L(xMin), yMin, yMax)
-  const secY2 = toT(L(xMax), yMin, yMax)
+  const lax = toL(a, "left"),
+    lay = toT(fa, yMin, yMax);
+  const lbx = toL(b, "left"),
+    lby = toT(fb, yMin, yMax);
+  const secY1 = toT(L(xMin), yMin, yMax);
+  const secY2 = toT(L(xMax), yMin, yMax);
 
   // Key points — right panel
-  const rax  = toL(a, 'right'),    ray  = toT(g(a), gyMin, gyMax)
-  const rbx  = toL(b, 'right'),    rby  = toT(g(b), gyMin, gyMax)
-  const rcx  = toL(cG, 'right'),   rcy  = toT(g(cG), gyMin, gyMax)
-  const rBaseY = toT(0, gyMin, gyMax)
+  const rax = toL(a, "right"),
+    ray = toT(g(a), gyMin, gyMax);
+  const rbx = toL(b, "right"),
+    rby = toT(g(b), gyMin, gyMax);
+  const rcx = toL(cG, "right"),
+    rcy = toT(g(cG), gyMin, gyMax);
+  const rBaseY = toT(0, gyMin, gyMax);
 
   // Arrow between panels: midpoint
-  const arrowX1 = pad.l + panelW + 2
-  const arrowX2 = pad.l + panelW + 38
-  const arrowMY = H / 2
+  const arrowX1 = pad.l + panelW + 2;
+  const arrowX2 = pad.l + panelW + 38;
+  const arrowMY = H / 2;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
       <rect width={W} height={H} fill={C.bg} rx={12} />
 
       {/* ── Panel titles ─────────────────────────────────────────────── */}
-      <text x={pad.l + panelW / 2} y={pad.t - 10} textAnchor="middle" fill={C.brand} fontSize={11} fontFamily="monospace" fontWeight="700">f (x) with secant L(x)</text>
-      <text x={pad.l + panelW + 40 + panelW / 2} y={pad.t - 10} textAnchor="middle" fill={C.emerald} fontSize={11} fontFamily="monospace" fontWeight="700">g(x) = f(x) − L(x)</text>
+      <text
+        x={pad.l + panelW / 2}
+        y={pad.t - 10}
+        textAnchor="middle"
+        fill={C.brand}
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        f (x) with secant L(x)
+      </text>
+      <text
+        x={pad.l + panelW + 40 + panelW / 2}
+        y={pad.t - 10}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={11}
+        fontFamily="monospace"
+        fontWeight="700"
+      >
+        g(x) = f(x) − L(x)
+      </text>
 
       {/* ── LEFT panel: f(x) curve + secant ─────────────────────────── */}
       {/* Axis lines */}
-      <line x1={axisX_left} y1={axisY_left} x2={axisX_left2} y2={axisY_left} stroke={C.border} strokeWidth={1} />
-      <line x1={axisX_left} y1={pad.t} x2={axisX_left} y2={pad.t + panelH} stroke={C.border} strokeWidth={1} />
+      <line
+        x1={axisX_left}
+        y1={axisY_left}
+        x2={axisX_left2}
+        y2={axisY_left}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <line
+        x1={axisX_left}
+        y1={pad.t}
+        x2={axisX_left}
+        y2={pad.t + panelH}
+        stroke={C.border}
+        strokeWidth={1}
+      />
 
       {/* Secant line (amber) */}
-      <line x1={toL(xMin, 'left')} y1={secY1} x2={toL(xMax, 'left')} y2={secY2}
-        stroke={C.amber} strokeWidth={2} strokeDasharray="7,4" />
+      <line
+        x1={toL(xMin, "left")}
+        y1={secY1}
+        x2={toL(xMax, "left")}
+        y2={secY2}
+        stroke={C.amber}
+        strokeWidth={2}
+        strokeDasharray="7,4"
+      />
 
       {/* f(x) curve (brand/indigo) */}
-      <polyline points={pts(f, yMin, yMax, 'left')} fill="none" stroke={C.brand} strokeWidth={2.5} />
+      <polyline
+        points={pts(f, yMin, yMax, "left")}
+        fill="none"
+        stroke={C.brand}
+        strokeWidth={2.5}
+      />
 
       {/* Endpoint dots on f */}
       <circle cx={lax} cy={lay} r={5} fill={C.amber} />
       <circle cx={lbx} cy={lby} r={5} fill={C.amber} />
-      <text x={lax - 4} y={lay - 9} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">(a, f(a))</text>
-      <text x={lbx + 4} y={lby - 9} textAnchor="start" fill={C.amber} fontSize={10} fontFamily="monospace">(b, f(b))</text>
+      <text
+        x={lax - 4}
+        y={lay - 9}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        (a, f(a))
+      </text>
+      <text
+        x={lbx + 4}
+        y={lby - 9}
+        textAnchor="start"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        (b, f(b))
+      </text>
 
       {/* Secant slope label */}
-      <text x={toL(1.75, 'left')} y={toT(L(1.75), yMin, yMax) - 8} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">
+      <text
+        x={toL(1.75, "left")}
+        y={toT(L(1.75), yMin, yMax) - 8}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
         slope = (f(b)−f(a))/(b−a)
       </text>
 
       {/* ── Arrow between panels ──────────────────────────────────────── */}
-      <line x1={arrowX1} y1={arrowMY} x2={arrowX2 - 7} y2={arrowMY} stroke={C.muted} strokeWidth={1.5} />
-      <polygon points={`${arrowX2},${arrowMY} ${arrowX2 - 9},${arrowMY - 5} ${arrowX2 - 9},${arrowMY + 5}`} fill={C.muted} />
-      <text x={(arrowX1 + arrowX2) / 2} y={arrowMY - 7} textAnchor="middle" fill={C.muted} fontSize={8} fontFamily="sans-serif">subtract</text>
-      <text x={(arrowX1 + arrowX2) / 2} y={arrowMY + 3} textAnchor="middle" fill={C.muted} fontSize={8} fontFamily="sans-serif">secant</text>
+      <line
+        x1={arrowX1}
+        y1={arrowMY}
+        x2={arrowX2 - 7}
+        y2={arrowMY}
+        stroke={C.muted}
+        strokeWidth={1.5}
+      />
+      <polygon
+        points={`${arrowX2},${arrowMY} ${arrowX2 - 9},${arrowMY - 5} ${arrowX2 - 9},${arrowMY + 5}`}
+        fill={C.muted}
+      />
+      <text
+        x={(arrowX1 + arrowX2) / 2}
+        y={arrowMY - 7}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={8}
+        fontFamily="sans-serif"
+      >
+        subtract
+      </text>
+      <text
+        x={(arrowX1 + arrowX2) / 2}
+        y={arrowMY + 3}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={8}
+        fontFamily="sans-serif"
+      >
+        secant
+      </text>
 
       {/* ── RIGHT panel: g(x) ────────────────────────────────────────── */}
       {/* Axis lines */}
-      <line x1={axisX_right} y1={rBaseY} x2={axisX_right2} y2={rBaseY} stroke={C.border} strokeWidth={1} />
-      <line x1={axisX_right} y1={pad.t} x2={axisX_right} y2={pad.t + panelH} stroke={C.border} strokeWidth={1} />
+      <line
+        x1={axisX_right}
+        y1={rBaseY}
+        x2={axisX_right2}
+        y2={rBaseY}
+        stroke={C.border}
+        strokeWidth={1}
+      />
+      <line
+        x1={axisX_right}
+        y1={pad.t}
+        x2={axisX_right}
+        y2={pad.t + panelH}
+        stroke={C.border}
+        strokeWidth={1}
+      />
 
       {/* Shaded region between g and x-axis */}
       <polygon
-        points={[a, ...Array.from({ length: 60 }, (_, i) => a + i * (b - a) / 59), b]
-          .map((x) => `${toL(x, 'right').toFixed(1)},${toT(g(x), gyMin, gyMax).toFixed(1)}`).join(' ')
-          .concat(` ${rbx.toFixed(1)},${rBaseY.toFixed(1)} ${rax.toFixed(1)},${rBaseY.toFixed(1)}`)}
-        fill={C.emerald} opacity={0.12} />
+        points={[
+          a,
+          ...Array.from({ length: 60 }, (_, i) => a + (i * (b - a)) / 59),
+          b,
+        ]
+          .map(
+            (x) =>
+              `${toL(x, "right").toFixed(1)},${toT(g(x), gyMin, gyMax).toFixed(1)}`,
+          )
+          .join(" ")
+          .concat(
+            ` ${rbx.toFixed(1)},${rBaseY.toFixed(1)} ${rax.toFixed(1)},${rBaseY.toFixed(1)}`,
+          )}
+        fill={C.emerald}
+        opacity={0.12}
+      />
 
       {/* g(x) curve (emerald) */}
-      <polyline points={pts(g, gyMin, gyMax, 'right')} fill="none" stroke={C.emerald} strokeWidth={2.5} />
+      <polyline
+        points={pts(g, gyMin, gyMax, "right")}
+        fill="none"
+        stroke={C.emerald}
+        strokeWidth={2.5}
+      />
 
       {/* g(a) = g(b) = 0 dots and labels */}
       <circle cx={rax} cy={ray} r={5} fill={C.amber} />
       <circle cx={rbx} cy={rby} r={5} fill={C.amber} />
-      <text x={rax} y={ray + 14} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">g(a)=0</text>
-      <text x={rbx} y={rby + 14} textAnchor="middle" fill={C.amber} fontSize={10} fontFamily="monospace">g(b)=0</text>
+      <text
+        x={rax}
+        y={ray + 14}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        g(a)=0
+      </text>
+      <text
+        x={rbx}
+        y={rby + 14}
+        textAnchor="middle"
+        fill={C.amber}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        g(b)=0
+      </text>
 
       {/* c point with horizontal tangent */}
       <circle cx={rcx} cy={rcy} r={6} fill={C.emerald} />
-      <line x1={rcx - 22} y1={rcy} x2={rcx + 22} y2={rcy}
-        stroke={C.emerald} strokeWidth={2.5} />
-      <line x1={rcx} y1={rcy} x2={rcx} y2={rBaseY}
-        stroke={C.emerald} strokeWidth={1.3} strokeDasharray="4,3" />
-      <text x={rcx} y={rcy - 10} textAnchor="middle" fill={C.emerald} fontSize={10} fontFamily="monospace">g′(c)=0</text>
-      <text x={rcx} y={rBaseY + 13} textAnchor="middle" fill={C.emerald} fontSize={10} fontFamily="monospace">c</text>
+      <line
+        x1={rcx - 22}
+        y1={rcy}
+        x2={rcx + 22}
+        y2={rcy}
+        stroke={C.emerald}
+        strokeWidth={2.5}
+      />
+      <line
+        x1={rcx}
+        y1={rcy}
+        x2={rcx}
+        y2={rBaseY}
+        stroke={C.emerald}
+        strokeWidth={1.3}
+        strokeDasharray="4,3"
+      />
+      <text
+        x={rcx}
+        y={rcy - 10}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        g′(c)=0
+      </text>
+      <text
+        x={rcx}
+        y={rBaseY + 13}
+        textAnchor="middle"
+        fill={C.emerald}
+        fontSize={10}
+        fontFamily="monospace"
+      >
+        c
+      </text>
 
       {/* Rolle's applies label */}
-      <text x={axisX_right + panelW / 2} y={pad.t + panelH - 4} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
+      <text
+        x={axisX_right + panelW / 2}
+        y={pad.t + panelH - 4}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
         Rolle's applies to g → g′(c)=0 → f′(c)= secant slope (QED)
       </text>
 
       {/* Bottom footnote */}
-      <text x={W / 2} y={H - 6} textAnchor="middle" fill={C.muted} fontSize={9} fontFamily="sans-serif">
-        Define g(x) = f(x) − L(x) where L is the secant line.  Then g(a) = g(b) = 0.  Rolle's Theorem gives g′(c) = 0, i.e. f′(c) = slope of secant.
+      <text
+        x={W / 2}
+        y={H - 6}
+        textAnchor="middle"
+        fill={C.muted}
+        fontSize={9}
+        fontFamily="sans-serif"
+      >
+        Define g(x) = f(x) − L(x) where L is the secant line. Then g(a) = g(b) =
+        0. Rolle's Theorem gives g′(c) = 0, i.e. f′(c) = slope of secant.
       </text>
     </svg>
-  )
+  );
 }
 
 // ─── Registry + export ────────────────────────────────────────────────────────
 
 const DIAGRAMS = {
   // Algebra-first (kinematics)
-  'algebra-rectangle':    AlgebraRectangle,
-  'algebra-trapezoid':    AlgebraTrapezoid,
-  'algebra-avg-velocity': AlgebraAvgVelocity,
+  "algebra-rectangle": AlgebraRectangle,
+  "algebra-trapezoid": AlgebraTrapezoid,
+  "algebra-avg-velocity": AlgebraAvgVelocity,
   // Bridge: algebra → calculus
-  'slope-triangle':       SlopeTriangle,
-  'riemann-rect':         RiemannRect,
+  "slope-triangle": SlopeTriangle,
+  "riemann-rect": RiemannRect,
   // Kinematics reference
-  'kinematic-chain':      KinematicChain,
-  'suvat-map':            SuvatMap,
-  'free-fall-axes':       FreeFallAxes,
-  'two-objects-line':     TwoObjectsLine,
+  "kinematic-chain": KinematicChain,
+  "suvat-map": SuvatMap,
+  "free-fall-axes": FreeFallAxes,
+  "two-objects-line": TwoObjectsLine,
   // Vectors (Ch1)
-  'vector-components':       VectorComponents,
-  'vector-addition-chain':   VectorAdditionChain,
-  'dot-product-projection':  DotProductProjection,
-  'cross-product-rhr':       CrossProductRHR,
-  'free-body-diagram':       FreeBodyDiagram,
+  "vector-components": VectorComponents,
+  "vector-addition-chain": VectorAdditionChain,
+  "dot-product-projection": DotProductProjection,
+  "cross-product-rhr": CrossProductRHR,
+  "free-body-diagram": FreeBodyDiagram,
   // Orientation / Ch0
-  'dimensions-equation':     DimensionsEquation,
-  'xt-vt-graphs':            XtVtGraphs,
+  "dimensions-equation": DimensionsEquation,
+  "xt-vt-graphs": XtVtGraphs,
   // 2D Motion / Ch3
-  'projectile-arc':          ProjectileArc,
-  'circular-motion':         CircularMotionDiagram,
+  "projectile-arc": ProjectileArc,
+  "circular-motion": CircularMotionDiagram,
   // Newton's Laws / Ch4
-  'inclined-plane':          InclinedPlaneDiagram,
-  'pulley-system':           PulleySystemDiagram,
-  'action-reaction':         ActionReactionDiagram,
+  "inclined-plane": InclinedPlaneDiagram,
+  "pulley-system": PulleySystemDiagram,
+  "action-reaction": ActionReactionDiagram,
   // Calculus Ch3 — Applications of Derivatives
-  'rolles-mvt-proof':        RollesMVTProof,
-}
+  "rolles-statement": RollesStatementDiagram,
+  "rolles-mvt-proof": RollesMVTProof,
+};
 
 export default function SVGDiagram({ params = {} }) {
-  const dark = useIsDark()
-  const C = dark ? DARK : LIGHT
-  const type = params.type ?? ''
-  const Diagram = DIAGRAMS[type]
+  const dark = useIsDark();
+  const C = dark ? DARK : LIGHT;
+  const type = params.type ?? "";
+  const Diagram = DIAGRAMS[type];
 
   if (!Diagram) {
     return (
-      <div style={{
-        background: C.bg, borderRadius: 12, padding: '20px',
-        color: C.muted, fontFamily: 'monospace', fontSize: 12,
-      }}>
-        Unknown diagram type: "{type}". Available: {Object.keys(DIAGRAMS).join(', ')}
+      <div
+        style={{
+          background: C.bg,
+          borderRadius: 12,
+          padding: "20px",
+          color: C.muted,
+          fontFamily: "monospace",
+          fontSize: 12,
+        }}
+      >
+        Unknown diagram type: "{type}". Available:{" "}
+        {Object.keys(DIAGRAMS).join(", ")}
       </div>
-    )
+    );
   }
 
   return (
-    <div style={{ background: C.bg, borderRadius: 12, overflow: 'hidden' }}>
-      <Diagram C={C} />
+    <div style={{ background: C.bg, borderRadius: 12, overflow: "hidden" }}>
+      <Diagram C={C} {...params} />
     </div>
-  )
+  );
 }
