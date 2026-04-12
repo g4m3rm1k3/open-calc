@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
-import { evaluate as mathEval } from 'mathjs'
+import { evaluate as mathEval, fraction as mathFraction } from 'mathjs'
 
 // ─── Dark mode hook ───────────────────────────────────────────────────────────
 
@@ -185,6 +185,68 @@ function FunctionPlotter({ expressions, xMin, xMax, yMin, yMax, angleMode, memor
   )
 }
 
+// ─── Formula library data ───────────────────────────────────────────────────────
+const FORMULA_LIBRARY = {
+  machinist: [
+    { name: 'SFM (Surface Feet/Min)', formula: '(pi * D * RPM) / 12', desc: 'D=diameter(in), RPM=spindle speed' },
+    { name: 'RPM from SFM', formula: '(SFM * 12) / (pi * D)', desc: 'SFM=cutting speed, D=diameter(in)' },
+    { name: 'Feed Rate (in/min)', formula: 'RPM * FPT * Z', desc: 'FPT=feed per tooth, Z=flute count' },
+    { name: 'Metric Cutting Speed', formula: '(pi * D * RPM) / 1000', desc: 'D=diameter(mm), result in m/min' },
+    { name: 'Taper per Foot', formula: '(D1 - D2) / L * 12', desc: 'D1,D2=diameters(in), L=length(in)' },
+    { name: 'Thread Pitch', formula: '1 / TPI', desc: 'TPI=threads per inch' },
+    { name: 'Tap Drill Diameter', formula: 'D - (1 / TPI)', desc: 'D=major diameter(in), TPI=threads/in' },
+    { name: 'Bolt Circle X', formula: 'BCR * cos(2*pi*k/n)', desc: 'BCR=radius, k=hole index (0-based), n=total holes' },
+    { name: 'Bolt Circle Y', formula: 'BCR * sin(2*pi*k/n)', desc: 'BCR=radius, k=hole index (0-based), n=total holes' },
+    { name: 'Drill Point Length', formula: 'D / (2 * tan(59 * pi/180))', desc: 'D=drill diameter (118° point angle)' },
+    { name: 'Dovetail Width (top)', formula: 'W + 2 * D * (1 / tan(A * pi/180))', desc: 'W=slot bottom, D=depth, A=angle(deg)' },
+    { name: 'Material Removal Rate', formula: 'DOC * WOC * FR', desc: 'DOC=depth, WOC=width, FR=feed rate (in³/min)' },
+  ],
+  math: [
+    { name: 'Quadratic (+)', formula: '(-B + sqrt(B^2 - 4*A*C)) / (2*A)', desc: 'Ax²+Bx+C=0' },
+    { name: 'Quadratic (−)', formula: '(-B - sqrt(B^2 - 4*A*C)) / (2*A)', desc: 'Ax²+Bx+C=0' },
+    { name: 'Distance (2D)', formula: 'sqrt((x2-x1)^2 + (y2-y1)^2)', desc: '' },
+    { name: 'Midpoint X', formula: '(x1 + x2) / 2', desc: '' },
+    { name: 'Midpoint Y', formula: '(y1 + y2) / 2', desc: '' },
+    { name: 'Slope', formula: '(y2 - y1) / (x2 - x1)', desc: '' },
+    { name: 'Circle Area', formula: 'pi * r^2', desc: '' },
+    { name: 'Circle Circumference', formula: '2 * pi * r', desc: '' },
+    { name: 'Sphere Volume', formula: '(4/3) * pi * r^3', desc: '' },
+    { name: 'Triangle Area', formula: '(b * h) / 2', desc: 'base × height ÷ 2' },
+    { name: "Heron's Formula", formula: 'sqrt(s*(s-a)*(s-b)*(s-c))', desc: 's=(a+b+c)/2' },
+    { name: 'Compound Interest', formula: 'P * (1 + r/n)^(n*t)', desc: 'P=principal, r=annual rate, n=periods/yr, t=years' },
+    { name: 'Logarithm Change of Base', formula: 'ln(x) / ln(b)', desc: 'log_b(x)' },
+    { name: 'Permutations nPr', formula: 'factorial(n) / factorial(n - r)', desc: 'ordered selections' },
+    { name: 'Combinations nCr', formula: 'factorial(n) / (factorial(r) * factorial(n-r))', desc: 'unordered selections' },
+  ],
+  trig: [
+    { name: 'Hypotenuse', formula: 'sqrt(a^2 + b^2)', desc: 'Pythagorean theorem' },
+    { name: 'Sine Rule: side b', formula: 'a * sin(B) / sin(A)', desc: 'a/sinA = b/sinB (angles in rad)' },
+    { name: 'Cosine Rule: side c', formula: 'sqrt(a^2 + b^2 - 2*a*b*cos(C))', desc: 'C in radians' },
+    { name: 'Angle from 3 sides', formula: 'acos((a^2 + b^2 - c^2) / (2*a*b))', desc: 'angle C opposite side c' },
+    { name: 'Opposite from angle+hyp', formula: 'H * sin(A)', desc: 'H=hypotenuse, A in radians' },
+    { name: 'Adjacent from angle+hyp', formula: 'H * cos(A)', desc: 'H=hypotenuse, A in radians' },
+    { name: 'Arc Length', formula: 'r * theta', desc: 'r=radius, theta in radians' },
+    { name: 'Sector Area', formula: '0.5 * r^2 * theta', desc: 'theta in radians' },
+    { name: 'Degrees → Radians', formula: 'deg * pi / 180', desc: '' },
+    { name: 'Radians → Degrees', formula: 'rad * 180 / pi', desc: '' },
+    { name: 'sin²+cos²=1 (check)', formula: 'sin(x)^2 + cos(x)^2', desc: 'should equal 1 for any x' },
+  ],
+  physics: [
+    { name: 'Force', formula: 'm * a', desc: 'F=ma, m=kg, a=m/s²' },
+    { name: 'Kinetic Energy', formula: '0.5 * m * v^2', desc: 'J, m=kg, v=m/s' },
+    { name: 'Potential Energy', formula: 'm * 9.81 * h', desc: 'J, m=kg, h=m' },
+    { name: 'Final Velocity', formula: 'v0 + a * t', desc: 'v=v0+at' },
+    { name: 'Displacement', formula: 'v0 * t + 0.5 * a * t^2', desc: 's=v₀t+½at²' },
+    { name: 'Velocity² (no time)', formula: 'sqrt(v0^2 + 2 * a * s)', desc: 'v²=v₀²+2as' },
+    { name: "Ohm's Law: Voltage", formula: 'I * R', desc: 'V=IR, I=amps, R=ohms' },
+    { name: 'Electric Power', formula: 'V * I', desc: 'W=V·I' },
+    { name: 'Ideal Gas Law: Pressure', formula: '(n * 8.314 * T) / V', desc: 'n=mol, T=Kelvin, V=m³, R=8.314' },
+    { name: 'Wave Speed', formula: 'freq * wavelength', desc: 'v=fλ' },
+    { name: 'Gravitational Force', formula: '(6.674e-11 * m1 * m2) / r^2', desc: 'Newton gravity law' },
+    { name: 'Pressure', formula: 'F / A', desc: 'Pa, F=N, A=m²' },
+  ],
+}
+
 // ─── TI Calc main component ───────────────────────────────────────────────────
 
 export default function TICalc({ onClose }) {
@@ -201,6 +263,7 @@ export default function TICalc({ onClose }) {
   const [ans, setAns]         = useState(0)
   const [second, setSecond]   = useState(false)
   const [stoMode, setStoMode] = useState(false)
+  const [histIdx, setHistIdx] = useState(-1)
 
   // ── Graph tab state ──
   const [yExprs, setYExprs] = useState(['', '', ''])
@@ -221,6 +284,9 @@ export default function TICalc({ onClose }) {
   const [toolResult, setToolResult] = useState('')
   const [toolError, setToolError]   = useState('')
 
+  // ── Forms tab state ──
+  const [formsSubTab, setFormsSubTab] = useState('machinist')
+
   // ── Draggable position (desktop only) ──
   const [pos, setPos] = useState(() => ({
     x: Math.max(16, window.innerWidth - 400),
@@ -229,6 +295,7 @@ export default function TICalc({ onClose }) {
   const isMobile = window.innerWidth < 640
   const dragging   = useRef(false)
   const dragOrigin = useRef({ mx: 0, my: 0, px: 0, py: 0 })
+  const inputRef   = useRef(null)
 
   const startDrag = (e) => {
     e.preventDefault()
@@ -251,6 +318,11 @@ export default function TICalc({ onClose }) {
     window.addEventListener('mouseup', up)
     return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up) }
   }, [])
+
+  // ── Auto-focus input when on calc tab ──
+  useEffect(() => {
+    if (tab === 'calc' && inputRef.current) inputRef.current.focus()
+  }, [tab])
 
   // ── Keyboard input while calc is focused ──
   const calcRef = useRef(null)
@@ -287,6 +359,8 @@ export default function TICalc({ onClose }) {
       setError('')
       if (isFinite(rNum)) setAns(rNum)
       setHistory(prev => [{ expr, result: rStr }, ...prev].slice(0, 30))
+      setExpr('')
+      setHistIdx(-1)
     } catch {
       setError('Syntax Error')
       setResult('')
@@ -327,6 +401,47 @@ export default function TICalc({ onClose }) {
         }
     }
   }, [stoMode, result, execute])
+
+  // ── History key navigation ──
+  const handleInputKey = useCallback((e) => {
+    if (e.key === 'Enter') { e.preventDefault(); execute(); return }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const next = Math.min(histIdx + 1, history.length - 1)
+      setHistIdx(next)
+      if (next >= 0 && history[next]) setExpr(history[next].expr)
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      const next = Math.max(histIdx - 1, -1)
+      setHistIdx(next)
+      if (next >= 0 && history[next]) setExpr(history[next].expr)
+      else setExpr('')
+      return
+    }
+  }, [execute, history, histIdx])
+
+  // ── Fraction ↔ Decimal toggle ──
+  const handleFrac = useCallback(() => {
+    if (!result) return
+    try {
+      if (result.includes('/')) {
+        const parts = result.split('/')
+        const num = parseFloat(parts[0])
+        const den = parseFloat(parts[1])
+        if (!isNaN(num) && !isNaN(den) && den !== 0) setResult(fmtNum(num / den))
+      } else {
+        const n = parseFloat(result)
+        if (isNaN(n)) return
+        const f = mathFraction(n)
+        if (f.d === 1) return // already integer
+        if (f.d > 9999) { setResult('No simple fraction'); return }
+        const sign = f.s < 0 ? '-' : ''
+        setResult(`${sign}${f.n}/${f.d}`)
+      }
+    } catch {}
+  }, [result])
 
   // ── Table rows ──
   const tableRows = useMemo(() => {
@@ -462,7 +577,7 @@ export default function TICalc({ onClose }) {
 
       {/* ── Tab bar ────────────────────────────────────────────────────── */}
       <div className={`flex border-b ${bdr} ${bg0}`}>
-        {[['calc','Calc'],['graph','Graph'],['table','Table'],['tools','Tools']].map(([t, l]) => (
+        {[['calc','Calc'],['graph','Graph'],['table','Table'],['tools','Tools'],['forms','Forms']].map(([t, l]) => (
           <button key={t} onClick={() => setTab(t)}
             className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${
               tab === t
@@ -479,11 +594,30 @@ export default function TICalc({ onClose }) {
         <div className="relative flex flex-col">
           {/* Display */}
           <div className={`${bg0} px-4 pt-3 pb-2 border-b ${bdr}`}>
-            <div className={`font-mono text-xs ${muted} min-h-[16px] truncate mb-1`}>{expr || '\u00a0'}</div>
-            {error
-              ? <div className="font-mono text-lg font-bold text-rose-400">{error}</div>
-              : <div className={`font-mono text-2xl font-bold ${txt} text-right`}>{result || '\u00a0'}</div>
-            }
+            <input
+              ref={inputRef}
+              type="text"
+              value={expr}
+              onChange={e => setExpr(e.target.value)}
+              onKeyDown={handleInputKey}
+              className={`w-full bg-transparent font-mono text-xs outline-none mb-1 ${muted} placeholder:opacity-40`}
+              placeholder="Type, paste, or use buttons below…"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <div className="flex items-end">
+              {error
+                ? <div className="font-mono text-lg font-bold text-rose-400 flex-1">{error}</div>
+                : <div className={`font-mono text-2xl font-bold ${txt} flex-1 text-right`}>{result || '\u00a0'}</div>
+              }
+              {result && !error && (
+                <button
+                  onMouseDown={e => { e.preventDefault(); navigator.clipboard?.writeText(result) }}
+                  className={`ml-2 text-base ${muted} hover:text-indigo-400 pb-0.5 shrink-0 leading-none`}
+                  title="Copy result to clipboard"
+                >⎘</button>
+              )}
+            </div>
           </div>
 
           {/* History */}
@@ -547,8 +681,8 @@ export default function TICalc({ onClose }) {
               ].map(([l, v]) => mkBtn(l, v, () => press(l)))}
             </div>
 
-            {/* Last row: 0 · . · + · = */}
-            <div className="grid grid-cols-5 gap-1">
+            {/* Last row: 0 · . · + · ►Frac · = */}
+            <div className="grid grid-cols-6 gap-1">
               <button
                 onMouseDown={(e) => { e.preventDefault(); press('0') }}
                 className={`col-span-2 flex items-center justify-center rounded-lg font-bold text-[11px]
@@ -558,6 +692,7 @@ export default function TICalc({ onClose }) {
               >0</button>
               {mkBtn('.', 'num', () => press('.'))}
               {mkBtn('+', 'op',  () => press('+'))}
+              {mkBtn('►Frac', 'special', handleFrac)}
               <button
                 onMouseDown={(e) => { e.preventDefault(); execute() }}
                 className="col-span-1 flex items-center justify-center rounded-lg font-bold text-sm
@@ -763,6 +898,48 @@ export default function TICalc({ onClose }) {
             <div className="mt-1">π → <span className="text-indigo-400">pi</span> &nbsp;
               e → <span className="text-indigo-400">e</span> &nbsp;
               last → <span className="text-indigo-400">ans</span></div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ FORMS TAB ══════════════════════════════════════════════════════ */}
+      {tab === 'forms' && (
+        <div className={`${bg2} flex flex-col`}>
+          {/* Sub-tab bar */}
+          <div className={`flex border-b ${bdr} ${bg0}`}>
+            {[['machinist','Machinist'],['math','Math'],['trig','Trig'],['physics','Physics']].map(([k,l]) => (
+              <button key={k} onClick={() => setFormsSubTab(k)}
+                className={`flex-1 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-colors ${
+                  formsSubTab === k
+                    ? 'text-indigo-400 border-b-2 border-indigo-500'
+                    : `${muted} hover:text-indigo-300`
+                }`}>
+                {l}
+              </button>
+            ))}
+          </div>
+          {/* Formula list */}
+          <div className="overflow-y-auto" style={{ maxHeight: 360 }}>
+            {(FORMULA_LIBRARY[formsSubTab] || []).map((item, i) => (
+              <div key={i} className={`flex items-center gap-2 px-3 py-2 border-b ${bdr} last:border-b-0`}>
+                <div className="flex-1 min-w-0">
+                  <div className={`text-[10px] font-bold ${txt} leading-tight`}>{item.name}</div>
+                  <div className="text-[10px] font-mono text-indigo-400 leading-tight truncate">{item.formula}</div>
+                  {item.desc && <div className={`text-[9px] ${muted} leading-tight`}>{item.desc}</div>}
+                </div>
+                <button
+                  onMouseDown={e => {
+                    e.preventDefault()
+                    setExpr(item.formula)
+                    setTab('calc')
+                    setTimeout(() => inputRef.current?.focus(), 50)
+                  }}
+                  className="shrink-0 text-[9px] px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
