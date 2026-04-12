@@ -216,7 +216,7 @@ function draw() {
     ctx.fillStyle = g.col; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'left';
     ctx.fillText(selectedAttr, 22, panelY + 18);
     ctx.fillStyle = '#94a3b8'; ctx.font = '10px monospace';
-    ctx.fillText('var loc = gl.getAttribLocation(prog, \'' + selectedAttr + '\');', 22, panelY + 34);
+    ctx.fillText('var loc = gl.getAttribLocation(prog, \' + selectedAttr + \');', 22, panelY + 34);
     ctx.fillText('gl.vertexAttribPointer(loc, ' + size + ', gl.FLOAT, false, ' + stride + ', ' + offset_bytes + ');', 22, panelY + 48);
     ctx.fillText('//                           ^size    ^type        ^stride  ^byteOffset', 22, panelY + 62);
     ctx.fillStyle = '#475569'; ctx.font = '9px monospace';
