@@ -319,6 +319,8 @@ const VIZ_REGISTRY = {
   SpaceTimeRibbon: lazy(() => import("./react/SpaceTimeRibbon.jsx")),
   BrakeOrCrashSim: lazy(() => import("./react/BrakeOrCrashSim.jsx")),
   MasterLimitGraph: lazy(() => import("./react/MasterLimitGraph.jsx")),
+  // Sigma / summation tools
+  SigmaEvaluator: lazy(() => import("./react/SigmaEvaluator.jsx")),
   // Chapter 5 — New additions
   BisectionMethod: lazy(() => import("./d3/BisectionMethod.jsx")),
   ShellMethod: lazy(() => import("./d3/ShellMethod.jsx")),

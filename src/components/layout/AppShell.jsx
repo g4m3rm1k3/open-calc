@@ -34,6 +34,7 @@ import {
   Calculator,
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
+import SigmaCalc from "../calculator/SigmaCalc.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
@@ -201,6 +202,8 @@ function TopBar({
   scratchOpen,
   onCalcToggle,
   calcOpen,
+  onSigmaToggle,
+  sigmaOpen,
   onPythonToggle,
   pythonOpen,
   onJsToggle,
@@ -384,6 +387,13 @@ function TopBar({
             title="TI Calculator (C)"
           >
             <Calculator className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onSigmaToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${sigmaOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
+            title="Sigma Evaluator (Z)"
+          >
+            <span className="text-sm font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>Σ</span>
           </button>
           <button
             onClick={onPythonToggle}
@@ -598,6 +608,7 @@ export default function AppShell({ children }) {
   const [graphJSXOpen, setGraphJSXOpen] = useState(false);
   const [scratchOpen, setScratchOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
+  const [sigmaOpen, setSigmaOpen] = useState(false);
   const [pythonOpen, setPythonOpen] = useState(false);
   const [jsOpen, setJsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -612,6 +623,7 @@ export default function AppShell({ children }) {
     setGraphJSXOpen(false);
     setScratchOpen(false);
     setCalcOpen(false);
+    setSigmaOpen(false);
     setPythonOpen(false);
     setJsOpen(false);
     setPoolOpen(false);
@@ -695,6 +707,10 @@ export default function AppShell({ children }) {
       if (e.key.toLowerCase() === "c") {
         setCalcOpen((prev) => !prev);
       }
+      // 'z' key for Sigma Evaluator
+      if (e.key.toLowerCase() === "z") {
+        setSigmaOpen((prev) => !prev);
+      }
       // 'p' key for Python sandbox
       if (e.key.toLowerCase() === "p") {
         setPythonOpen((prev) => !prev);
@@ -719,6 +735,7 @@ export default function AppShell({ children }) {
         setGraphJSXOpen(false);
         setScratchOpen(false);
         setCalcOpen(false);
+        setSigmaOpen(false);
         setPythonOpen(false);
         setJsOpen(false);
         setHelpOpen(false);
@@ -749,6 +766,8 @@ export default function AppShell({ children }) {
           scratchOpen={scratchOpen}
           onCalcToggle={() => setCalcOpen((prev) => !prev)}
           calcOpen={calcOpen}
+          onSigmaToggle={() => setSigmaOpen((prev) => !prev)}
+          sigmaOpen={sigmaOpen}
           onPythonToggle={() => setPythonOpen((prev) => !prev)}
           pythonOpen={pythonOpen}
           onJsToggle={() => setJsOpen((prev) => !prev)}
@@ -1006,6 +1025,7 @@ export default function AppShell({ children }) {
         />
 
         {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
+        {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
         <PinsPanel />
         <NotesPanel />
         <WelcomeModal />
