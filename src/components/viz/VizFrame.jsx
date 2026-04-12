@@ -386,6 +386,37 @@ const VIZ_REGISTRY = {
   EquivalenceDecoderLab: lazy(
     () => import("./react/EquivalenceDecoderLab.jsx"),
   ),
+  DivisibilityExplorer: lazy(() => import("./react/DivisibilityExplorer.jsx")),
+  PrimeFactorizationViz: lazy(
+    () => import("./react/PrimeFactorizationViz.jsx"),
+  ),
+  EuclideanAlgorithmViz: lazy(
+    () => import("./react/EuclideanAlgorithmViz.jsx"),
+  ),
+  ModularArithmeticGrid: lazy(
+    () => import("./react/ModularArithmeticGrid.jsx"),
+  ),
+  ExtendedEuclideanViz: lazy(() => import("./react/ExtendedEuclideanViz.jsx")),
+  ModularInverseExplorer: lazy(
+    () => import("./react/ModularInverseExplorer.jsx"),
+  ),
+  FermatTheoremViz: lazy(() => import("./react/FermatTheoremViz.jsx")),
+  RSAMiniDemo: lazy(() => import("./react/RSAMiniDemo.jsx")),
+  MultiplicationRuleTree: lazy(
+    () => import("./react/MultiplicationRuleTree.jsx"),
+  ),
+  SlotMachineCounter: lazy(() => import("./react/SlotMachineCounter.jsx")),
+  FactorialExplorer: lazy(() => import("./react/FactorialExplorer.jsx")),
+  PermutationVsCombinationAnimator: lazy(
+    () => import("./react/PermutationVsCombinationAnimator.jsx"),
+  ),
+  ComplementaryCountingViz: lazy(
+    () => import("./react/ComplementaryCountingViz.jsx"),
+  ),
+  InclusionExclusionAnimator: lazy(
+    () => import("./react/InclusionExclusionAnimator.jsx"),
+  ),
+  StateExplosionViz: lazy(() => import("./react/StateExplosionViz.jsx")),
   DominoInductionLab: lazy(() => import("./react/DominoInductionLab.jsx")),
   RecursiveStackLab: lazy(() => import("./react/RecursiveStackLab.jsx")),
   InductionGrowthExplorer: lazy(
