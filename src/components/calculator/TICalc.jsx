@@ -332,8 +332,9 @@ export default function TICalc({ onClose }) {
   useEffect(() => { localStorage.setItem('oc_memory', JSON.stringify(memory)) }, [memory])
   useEffect(() => { localStorage.setItem('oc_formulas', JSON.stringify(formulas)) }, [formulas])
 
-  // ── Auto-focus input when on calc tab ──
+  // ── Auto-focus input when on calc tab (desktop only) ──
   useEffect(() => {
+    if (isMobile) return
     if (tab === 'calc' && inputRef.current) inputRef.current.focus()
   }, [tab])
 
@@ -400,7 +401,7 @@ export default function TICalc({ onClose }) {
         setHistIdx(-1)
       }
       setStoMode(false)
-      setTimeout(() => inputRef.current?.focus(), 20)
+      if (!isMobile) setTimeout(() => inputRef.current?.focus(), 20)
       return
     }
     if (stoMode === 'formula' && /^f([1-9]|10)$/.test(val)) {
@@ -410,14 +411,14 @@ export default function TICalc({ onClose }) {
         setResult('')
       }
       setStoMode(false)
-      setTimeout(() => inputRef.current?.focus(), 20)
+      if (!isMobile) setTimeout(() => inputRef.current?.focus(), 20)
       return
     }
     if (stoMode) { setStoMode(false); return }  // Cancel on anything else
 
     // f1-f10: load formula (when not in stoMode)
     if (/^f([1-9]|10)$/.test(val)) {
-      if (formulas[val]) { setExpr(formulas[val]); setTimeout(() => inputRef.current?.focus(), 20) }
+      if (formulas[val]) { setExpr(formulas[val]); if (!isMobile) setTimeout(() => inputRef.current?.focus(), 20) }
       return
     }
 
@@ -767,7 +768,7 @@ export default function TICalc({ onClose }) {
                         <td className="py-0.5 pr-1 text-right w-14">
                           <span className="inline-flex gap-1 items-center">
                             <button
-                              onMouseDown={e => { e.preventDefault(); setExpr(formulas[k]); setTimeout(()=>inputRef.current?.focus(),20) }}
+                              onMouseDown={e => { e.preventDefault(); setExpr(formulas[k]); if (!isMobile) setTimeout(()=>inputRef.current?.focus(),20) }}
                               className="text-amber-400 hover:text-white"
                               title={`Load ${k}`}
                             >▶</button>
