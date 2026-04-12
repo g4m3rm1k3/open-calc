@@ -64,6 +64,9 @@ const VIZ_REGISTRY = {
   ArcChordLimit: lazy(() => import("./d3/ArcChordLimit.jsx")),
   ProductRuleRectangle: lazy(() => import("./d3/ProductRuleRectangle.jsx")),
   SlopeField: lazy(() => import("./d3/SlopeField.jsx")),
+  IVPFamilyCurves: lazy(() => import("./d3/IVPFamilyCurves.jsx")),
+  EulerMethodStepper: lazy(() => import("./d3/EulerMethodStepper.jsx")),
+  IntegratingFactorViz: lazy(() => import("./d3/IntegratingFactorViz.jsx")),
   TangentPlane3D: lazy(() => import("./three/TangentPlane3D.jsx")),
   ParametricCurve3D: lazy(() => import("./three/ParametricCurve3D.jsx")),
   // Chapter 0 — Pre-Calc additions
@@ -419,12 +422,6 @@ const VIZ_REGISTRY = {
     () => import("./react/InclusionExclusionAnimator.jsx"),
   ),
   StateExplosionViz: lazy(() => import("./react/StateExplosionViz.jsx")),
-  DominoInductionLab: lazy(() => import("./react/DominoInductionLab.jsx")),
-  RecursiveStackLab: lazy(() => import("./react/RecursiveStackLab.jsx")),
-  InductionGrowthExplorer: lazy(
-    () => import("./react/InductionGrowthExplorer.jsx"),
-  ),
-  InductionStairCase: lazy(() => import("./react/InductionStairCase.jsx")),
   InductionAlgebraDecoderLab: lazy(
     () => import("./react/InductionAlgebraDecoderLab.jsx"),
   ),
@@ -572,7 +569,6 @@ const VIZ_REGISTRY = {
   CircleUnrollViz: lazy(() => import("./d3/CircleAreaProof.jsx")),
   TriangleAreaViz: lazy(() => import("./d3/TriangleAreaProof.jsx")),
   AlgebraSquareViz: lazy(() => import("./d3/PythagoreanProof.jsx")),
-  TruthTableViz: lazy(() => import("./react/TruthTableLab.jsx")),
   // Precalc 3 — Trig identities
   UnitCircleIdentityViz: lazy(() => import("./d3/UnitCircleIdentityViz.jsx")),
   DoubleAngleViz: lazy(() => import("./d3/DoubleAngleViz.jsx")),
