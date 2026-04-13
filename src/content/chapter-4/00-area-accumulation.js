@@ -362,15 +362,49 @@ export default {
       hint: "The velocity-time graph is a horizontal line at v = 30. Area = base × height. The antiderivative of a constant v is vt.",
       walkthrough: [
         {
-          expression:
-            "\\text{(a) Rectangle: area} = \\text{base} \\times \\text{height} = 5 \\times 30 = 150 \\text{ m}",
-          annotation: "Simple rectangle: width 5 seconds, height 30 m/s.",
+          expression: "\\text{Prerequisite recall: Displacement } \\Delta x = x(5) - x(0) \\text{ equals the area under the velocity-time graph}",
+          annotation: "Velocity is defined as v(t) = dx/dt. By the Fundamental Theorem of Calculus (Part 2), integrating velocity from t=0 to t=5 recovers the exact net change in position: \\Delta x = \\int_0^5 v(t)\\,dt. This holds even if you have never seen integrals before — it is the precise definition that turns 'how fast' into 'how far'."
         },
         {
-          expression:
-            "\\text{(b) } \\int_0^5 30\\,dt = \\left[30t\\right]_0^5 = 150 - 0 = 150 \\text{ m}",
-          annotation: "The antiderivative of 30 is 30t. Evaluate from 0 to 5.",
+          expression: "\\text{For constant velocity } v(t) = 30 \\text{ (no t dependence), the integral simplifies to multiplication}",
+          annotation: "When v is constant, \\int_a^b c\\,dt = c(b - a). Why? The area is literally a rectangle, and we are about to prove it both geometrically and with calculus so you see why they agree."
         },
+        {
+          expression: "\\text{(a) Rectangle formula: base = time interval = 5 - 0 = 5\\,\\text{s}, height = velocity = 30\\,\\text{m/s}}",
+          annotation: "Draw the v-t graph: a perfectly flat horizontal line at 30 m/s from t=0 to t=5. The region under the curve (above the t-axis) is a rectangle. Area under v-t graph = displacement when v ≥ 0."
+        },
+        {
+          expression: "\\text{Area} = \\text{base} \\times \\text{height} = 5 \\times 30",
+          annotation: "No skipping: base is the width along the time axis (Δt), height is the constant height along the velocity axis. Multiplication is allowed because every tiny vertical strip has exactly the same height."
+        },
+        {
+          expression: "5 \\times 30 = 150\\,\\text{m}",
+          annotation: "Units check: (seconds) × (meters/second) = meters. This is the physical displacement. We have now solved part (a) completely using pure geometry — no calculus yet."
+        },
+        {
+          expression: "\\text{(b) Write the same quantity as a definite integral: } \\int_0^5 30\\,dt",
+          annotation: "We are now using the exact definition of displacement. The number 30 is the constant function v(t). The dt tells us we are integrating with respect to time. This must equal the rectangle answer if calculus is consistent."
+        },
+        {
+          expression: "\\text{Prerequisite: Find the antiderivative (indefinite integral) of the constant 30}",
+          annotation: "We need a function F(t) whose derivative is exactly 30: F'(t) = 30. You already know d/dt (kt) = k, so the simplest antiderivative is 30t (the +C constant cancels in the definite integral and can be ignored here)."
+        },
+        {
+          expression: "\\int 30\\,dt = 30t \\quad \\text{(power rule with exponent 0)}",
+          annotation: "Power rule reminder: \\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C for n ≠ -1. Here n = 0 (because 30 = 30·t^0), so \\frac{t^1}{1} = t, multiplied by 30 gives 30t. This is why the antiderivative of any constant is constant × t."
+        },
+        {
+          expression: "\\text{Definite integral by Fundamental Theorem of Calculus: } \\left[30t\\right]_0^5",
+          annotation: "FTC Part 2 says \\int_a^b f(t)\\,dt = F(b) - F(a), where F is any antiderivative. We evaluate at the upper limit first, then subtract the value at the lower limit. This is the precise rule — no magic."
+        },
+        {
+          expression: "30 \\cdot 5 - 30 \\cdot 0",
+          annotation: "Plug in: at t=5 we get 150; at t=0 we get 0. Subtraction is required by the theorem."
+        },
+        {
+          expression: "150 - 0 = 150\\,\\text{m}",
+          annotation: "Both methods (rectangle geometry and antiderivative) give exactly the same 150 m. This verifies consistency and shows why the 'magic' of the integral works — it is just the area rule made rigorous."
+        }
       ],
       answer: "\\text{Displacement} = 150 \\text{ m}",
     },
@@ -382,21 +416,73 @@ export default {
       hint: "v(0) = 0 and v(6) = 0. Maximum velocity at t = 3: v(3) = 9 m/s. The antiderivative of 6t−t² is 3t²−t³/3.",
       walkthrough: [
         {
-          expression: "v(t) = 6t - t^2 = t(6-t)",
-          annotation:
-            "Factor: v = 0 at t = 0 and t = 6. Maximum at t = 3 where v(3) = 18 − 9 = 9 m/s.",
+          expression: "\\text{Prerequisite: v(t) = 6t - t^2 is a quadratic (parabola opening downward)}",
+          annotation: "Standard form at² + bt + c with a = -1, b = 6, c = 0. The graph starts at (0,0), rises, then falls back to zero. Since velocity is positive throughout the interval, distance traveled equals displacement = area under the curve."
         },
         {
-          expression:
-            "\\int_0^6 (6t - t^2)\\,dt = \\left[3t^2 - \\frac{t^3}{3}\\right]_0^6",
-          annotation: "Antiderivative: ∫6t dt = 3t², ∫t² dt = t³/3.",
+          expression: "\\text{(a) Find when v = 0 by solving 6t - t^2 = 0}",
+          annotation: "Factor completely so we can see the roots (where the graph crosses the t-axis). Factoring is the simplest algebraic technique here."
         },
         {
-          expression:
-            "= \\left(3(36) - \\frac{216}{3}\\right) - 0 = 108 - 72 = 36 \\text{ m}",
-          annotation:
-            "Evaluate at t=6: 3×36 = 108, 216/3 = 72. Subtract: 36 m.",
+          expression: "t(6 - t) = 0",
+          annotation: "Factor out the common t. Set each factor to zero using the zero-product property (if ab=0 then a=0 or b=0)."
         },
+        {
+          expression: "t = 0 \\quad \\text{or} \\quad t = 6",
+          annotation: "The cyclist starts from rest at t=0 and comes to rest again at t=6. These are the exact times v=0."
+        },
+        {
+          expression: "\\text{Find maximum velocity (vertex of parabola)}",
+          annotation: "For ax² + bx + c the vertex is at t = -b/(2a). Here a = -1, b = 6, so t = -6/(2·(-1)) = 3 s. This is where the slope of v(t) is zero (peak speed)."
+        },
+        {
+          expression: "v(3) = 6·3 - 3^2 = 18 - 9 = 9\\,\\text{m/s}",
+          annotation: "Plug t=3 into original equation. Maximum speed is 9 m/s at the midpoint — symmetric parabola."
+        },
+        {
+          expression: "\\text{(b) Geometric estimate: approximate area under parabola as triangle with base 6 s and height 9 m/s}",
+          annotation: "A quick estimate before exact calculus: inscribed triangle touching the three points (0,0), (3,9), (6,0). Area of triangle = (1/2)·base·height. This underestimates the true parabolic area because the curve bulges above the straight lines."
+        },
+        {
+          expression: "\\frac{1}{2} \\times 6 \\times 9 = 27\\,\\text{m (estimate)}",
+          annotation: "We expect the real answer to be larger than 27 m. This is the geometric estimate requested. Now we compute the exact value."
+        },
+        {
+          expression: "\\text{Exact area = } \\int_0^6 (6t - t^2)\\,dt",
+          annotation: "By definition, net displacement (and distance, since v ≥ 0) is the definite integral of v(t)."
+        },
+        {
+          expression: "\\text{Find antiderivative term by term}",
+          annotation: "Split the integral: \\int (6t - t^2)\\,dt = \\int 6t\\,dt - \\int t^2\\,dt. We integrate each power separately using the power rule."
+        },
+        {
+          expression: "\\int 6t\\,dt = 6 \\cdot \\frac{t^2}{2} = 3t^2",
+          annotation: "Power rule: \\int t^1\\,dt = t^2/2, then multiply by coefficient 6. Derivative check: d/dt(3t²) = 6t — correct."
+        },
+        {
+          expression: "\\int t^2\\,dt = \\frac{t^3}{3}",
+          annotation: "Power rule: n=2 → t^{3}/3. So the negative term becomes -t³/3. Derivative check: d/dt(-t³/3) = -t² — correct."
+        },
+        {
+          expression: "\\text{Antiderivative F(t) = } 3t^2 - \\frac{t^3}{3}",
+          annotation: "Combine both pieces. This F(t) satisfies F'(t) = 6t - t² exactly."
+        },
+        {
+          expression: "\\left[3t^2 - \\frac{t^3}{3}\\right]_0^6",
+          annotation: "Apply FTC: evaluate F at upper limit minus F at lower limit."
+        },
+        {
+          expression: "\\text{At t=6: } 3(6)^2 - \\frac{(6)^3}{3} = 3\\cdot 36 - \\frac{216}{3} = 108 - 72",
+          annotation: "Compute each part separately: 6²=36, times 3=108. 6³=216, divided by 3=72. Subtraction is exact arithmetic."
+        },
+        {
+          expression: "\\text{At t=0: } 3(0)^2 - \\frac{0^3}{3} = 0",
+          annotation: "Every term vanishes at zero — lower limit contribution is always zero here."
+        },
+        {
+          expression: "108 - 72 - 0 = 36\\,\\text{m}",
+          annotation: "Exact distance traveled is 36 m. Note that the triangle estimate (27 m) was indeed lower, as expected for a concave-down parabola."
+        }
       ],
       answer: "\\displaystyle\\int_0^6 (6t-t^2)\\,dt = 36 \\text{ m}",
     },
@@ -408,23 +494,49 @@ export default {
       hint: "The antiderivative of e^(−t) is −e^(−t). As b→∞, e^(−b)→0. The velocity decays exponentially — the particle slows down so rapidly that it only ever travels a finite total distance.",
       walkthrough: [
         {
-          expression:
-            "\\int_0^b e^{-t}\\,dt = \\left[-e^{-t}\\right]_0^b = -e^{-b} + e^0 = 1 - e^{-b}",
-          annotation:
-            "Antiderivative of e^{−t} is −e^{−t}. Evaluate from 0 to b.",
+          expression: "\\text{Prerequisite: This is an improper integral because the upper limit is ∞}",
+          annotation: "We cannot plug ∞ directly into the antiderivative. Instead, we replace ∞ with a finite b and take the limit as b → ∞. This is the official definition of ∫_0^∞ f(t)\\,dt = lim_{b→∞} ∫_0^b f(t)\\,dt (provided the limit exists)."
         },
         {
-          expression:
-            "\\lim_{b \\to \\infty}(1 - e^{-b}) = 1 - 0 = 1 \\text{ m}",
-          annotation:
-            "As b → ∞, e^{−b} → 0. The total area under the curve is exactly 1.",
+          expression: "\\text{(a) Why is total distance finite even though time is infinite?}",
+          annotation: "Velocity v(t) = e^{-t} decays exponentially to zero. Exponential decay is faster than any polynomial growth, so the area under the curve 'tails off' quickly enough that the infinite sum of shrinking strips still adds to a finite number. Analogy: the infinite geometric series 1 + 1/2 + 1/4 + 1/8 + … = 2 (finite)."
         },
         {
-          expression:
-            "\\text{Physical interpretation: the particle starts at } v = 1 \\text{ m/s and decelerates exponentially. It travels exactly 1 m total, forever asymptotically approaching a fixed point.}",
-          annotation:
-            "Even though time is infinite, the total distance is finite because the velocity decays fast enough. This is analogous to the geometric series: 1 + 1/2 + 1/4 + ... = 2 (finite sum of infinitely many terms).",
+          expression: "\\text{(b) First compute the proper integral from 0 to b: } \\int_0^b e^{-t}\\,dt",
+          annotation: "Treat b as a large but finite number for now. We will let b grow later."
         },
+        {
+          expression: "\\text{Antiderivative of } e^{-t}",
+          annotation: "Let u = -t, then du = -dt so dt = -du. The integral becomes -∫e^u du = -e^u = -e^{-t}. Derivative check: d/dt(-e^{-t}) = e^{-t} — correct."
+        },
+        {
+          expression: "\\left[-e^{-t}\\right]_0^b = -e^{-b} - (-e^0)",
+          annotation: "FTC: upper minus lower. At t=b: -e^{-b}. At t=0: -e^0 = -1, so we subtract (-1) which is +1."
+        },
+        {
+          expression: "-e^{-b} + 1",
+          annotation: "Simplified: 1 - e^{-b}. This is the exact displacement up to any finite time b."
+        },
+        {
+          expression: "\\lim_{b \\to \\infty} (1 - e^{-b})",
+          annotation: "Now take the limit. As b becomes arbitrarily large, what happens to e^{-b}?"
+        },
+        {
+          expression: "e^{-b} \\to 0 \\quad \\text{(exponential decay property)}",
+          annotation: "Any positive number raised to a larger and larger negative power gets smaller and smaller, approaching zero. This is a standard limit you can prove with L'Hôpital or just by knowing exponential behavior."
+        },
+        {
+          expression: "1 - 0 = 1\\,\\text{m}",
+          annotation: "The improper integral converges to exactly 1 meter. The infinite area is finite!"
+        },
+        {
+          expression: "\\text{(c) Physical interpretation}",
+          annotation: "The particle starts at v(0) = 1 m/s. Its speed decreases exponentially fast (halving roughly every 0.693 s). Even though it never quite stops and time goes on forever, the distances it covers in later and later seconds become vanishingly small. Total distance traveled is exactly 1 m; it asymptotically approaches a fixed position 1 m ahead."
+        },
+        {
+          expression: "\\text{Analogy to geometric series: each second the distance covered is roughly half the previous}",
+          annotation: "The continuous version of 1 + 1/2 + 1/4 + … sums to a finite total, just like the integral here. This shows how 'infinite time' can still produce finite displacement when deceleration is strong enough."
+        }
       ],
       answer: "\\displaystyle\\int_0^\\infty e^{-t}\\,dt = 1 \\text{ m}",
     },
