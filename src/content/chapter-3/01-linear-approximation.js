@@ -55,6 +55,11 @@ export default {
         title: 'Napier and the Age of Computation',
         body: "Before calculators, navigators and astronomers needed to compute sin, cos, √, and log to many decimal places. John Napier (1614) invented logarithms partly to turn multiplication into addition. But for other functions, linearization was the primary tool: sin(31°) = sin(30° + 1°) ≈ sin(30°) + cos(30°)·(π/180). These calculations guided ships across oceans.",
       },
+      {
+        type: 'strategy',
+        title: 'Masterclass: Four-Step Linearization Method — All Definitions From Scratch',
+        body: 'This is the complete procedure, every term defined when it first appears.\n\n**Key Definitions**\n• **Linearization** (a.k.a. linear approximation, tangent-line approximation): the straight line that best matches f(x) very close to a chosen anchor point x = a. It is the unique line touching the curve at (a, f(a)) with slope f\'(a).\n• **Anchor point a**: the x-value where we pin the approximation. We need f(a) (exact height) and f\'(a) (exact slope) — nothing else.\n• **Local linearity**: any differentiable curve zoomed in far enough looks perfectly straight. The linearization captures that straightness mathematically.\n• **Differential dy ≈ f\'(a) dx**: a tiny output change equals slope × tiny input change. This is the shorthand version of linearization.\n• **Error**: the gap f(x) − L(x). Grows roughly as (x − a)² — quadratic in the distance from the anchor.\n\n**The Master Formula** (memorize this one line):\nL(x) = f(a) + f\'(a)(x − a)\n\n---\n\n**Step 1 — Gather the two numbers at the anchor**\nYou need exactly two things: f(a) and f\'(a). If given a formula, compute both algebraically. If given a table or graph, read them directly. Do this before anything else.\n\n**Step 2 — Write the linearization (leave it in point-slope form first)**\nStart: L(x) = f(a) + f\'(a)(x − a)\nDerived from point-slope: y − y₁ = m(x − x₁), with (x₁, y₁) = (a, f(a)) and m = f\'(a). Substitute, do NOT simplify yet — the anchor point stays visible.\n\n**Step 3 — Use it for approximations**\n1. Find the deviation: Δx = x − a.\n2. Plug in: L(x) = f(a) + f\'(a) · Δx.\n3. The closer x is to a, the better the estimate.\nDifferential shortcut (same result, different notation): dy ≈ f\'(a) dx → f(a + dx) ≈ f(a) + dy.\n\n**Step 4 — Know when and why it works**\n• L(a) = f(a) exactly (perfect at the anchor).\n• L\'(x) = f\'(a) exactly (perfect slope at the anchor).\n• Error ≈ f\'\'(a)(x−a)²/2 (quadratic — halve the distance, quarter the error).\n• Rule of thumb: |x − a| < 0.1 → excellent. |x − a| > 0.5 → check the error bound.\n\n**Verification Checklist** (run after every linearization):\n□ Did I correctly compute f(a) AND f\'(a)?\n□ Does L(a) = f(a)? (plug in x = a and confirm)\n□ Does L\'(x) = f\'(a)? (differentiate your L — it should be a constant equal to f\'(a))\n□ Is |x − a| small enough to trust the result?\n□ Optional error bound: ½|f\'\'(c)|(x−a)² for c between a and x (from Taylor\'s theorem).',
+      },
     ],
     visualizations: [
       {
@@ -346,6 +351,64 @@ fig.show()`,
         { expression: '\\text{Relative error} = \\frac{|dV|}{V} = \\frac{20\\pi}{\\frac{4}{3}\\pi(1000)} = \\frac{20}{\\frac{4000}{3}} = \\frac{60}{4000} = 1.5\\%', annotation: 'The relative error in V is 3 times the relative error in r (0.5%). This factor of 3 comes from the exponent 3 in V = (4/3)πr³.', hints: ['Divide the error by the total volume.', 'Observe how original percentage error scales.'] },
       ],
       conclusion: 'A 0.5% error in radius (0.05 cm out of 10 cm) produces approximately a 1.5% error in volume — exactly 3× the relative radius error, as expected from the differential of r³. This factor-of-exponent rule generalizes: if V = r^n, then dV/V = n·(dr/r).',
+    },
+    {
+      id: 'ch3-001-ex8',
+      title: 'Four-Step Method Applied: Approximate √9.1',
+      problem: 'Use the four-step linearization method to approximate $\\sqrt{9.1}$. Show all algebra, verify with the checklist, and confirm using the differential shortcut. No calculator.',
+      steps: [
+        {
+          expression: 'f(x) = \\sqrt{x} = x^{1/2}, \\quad a = 9',
+          annotation: 'Step 1 — Choose the anchor. We pick a = 9 because f(9) = √9 = 3 exactly, and the derivative is easy to compute. The target x = 9.1 is only 0.1 away — a small deviation, so the approximation will be accurate.',
+          hints: ['The anchor must be a point where you know f(a) and f\'(a) exactly.', 'Choose the nearest perfect square to the target.'],
+        },
+        {
+          expression: 'f(9) = 9^{1/2} = 3',
+          annotation: 'Step 1 continued — Evaluate f(a). The height of the curve at the anchor is exactly 3. This will be the y-intercept of our tangent line.',
+          hints: ['√9 = 3 since 3² = 9.'],
+        },
+        {
+          expression: "f'(x) = \\frac{1}{2}x^{-1/2} = \\frac{1}{2\\sqrt{x}}, \\quad f'(9) = \\frac{1}{2\\sqrt{9}} = \\frac{1}{2 \\cdot 3} = \\frac{1}{6}",
+          annotation: 'Step 1 continued — Evaluate f\'(a). Power rule: d/dx[x^{1/2}] = (1/2)x^{-1/2}. At x = 9: 1/(2·3) = 1/6. This is the slope of the tangent line at (9, 3).',
+          hints: ['Use the power rule: d/dx[xⁿ] = n·xⁿ⁻¹.', 'Substitute x = 9 into 1/(2√x).'],
+        },
+        {
+          expression: 'L(x) = f(9) + f\'(9)(x - 9) = 3 + \\frac{1}{6}(x - 9)',
+          annotation: 'Step 2 — Write the linearization. Plug into L(x) = f(a) + f\'(a)(x − a). Keep it in point-slope form so the anchor (9, 3) and slope (1/6) are visible. The linearization is the tangent line at (9, 3).',
+          hints: ['Substitute a = 9, f(9) = 3, f\'(9) = 1/6 into the master formula.', 'Do not simplify yet — keep the anchor visible.'],
+        },
+        {
+          expression: '\\Delta x = 9.1 - 9 = 0.1',
+          annotation: 'Step 3 — Find the deviation. We are moving 0.1 units to the right of the anchor. This is small (|Δx| < 0.1), which means the approximation will be excellent.',
+          hints: ['Δx = target x minus anchor a.'],
+        },
+        {
+          expression: 'L(9.1) = 3 + \\frac{1}{6}(0.1) = 3 + \\frac{0.1}{6} = 3 + 0.01\\overline{6} \\approx 3.0167',
+          annotation: 'Step 3 continued — Plug in. Compute 0.1/6 = 1/60 ≈ 0.016667. The linear approximation gives √9.1 ≈ 3.0167. Actual calculator value: ≈ 3.01662 — error of only 0.000046, or 0.0015%.',
+          hints: ['0.1 ÷ 6 = 1/60 ≈ 0.01667.', 'Add to the anchor height: 3 + 0.01667.'],
+        },
+        {
+          expression: 'dy = f\'(9) \\cdot dx = \\frac{1}{6} \\cdot 0.1 = \\frac{1}{60} \\approx 0.01667',
+          annotation: 'Differential shortcut (Step 3b) — Same answer, different notation. Let dx = 0.1. Then dy ≈ f\'(a)·dx = (1/6)(0.1) = 1/60. So f(9 + 0.1) ≈ f(9) + dy = 3 + 0.01667 = 3.01667. Identical result — the differential is just the linearization written in dy/dx form.',
+          hints: ['dy = f\'(a)·dx — the output change along the tangent line.', 'f(a + dx) ≈ f(a) + dy is the differential-notation version of L(x).'],
+        },
+        {
+          expression: 'L(9) = 3 + \\frac{1}{6}(9 - 9) = 3 + 0 = 3 = f(9) \\checkmark',
+          annotation: 'Verification checklist — Check 1: L(a) = f(a)? Plugging x = 9 back in: L(9) = 3 = f(9). ✔ The linearization is exact at the anchor.',
+          hints: ['Always plug x = a back in as a sanity check.'],
+        },
+        {
+          expression: "L'(x) = \\frac{d}{dx}\\left[3 + \\frac{1}{6}(x-9)\\right] = \\frac{1}{6} = f'(9) \\checkmark",
+          annotation: 'Verification checklist — Check 2: L\'(x) = f\'(a)? Differentiating L(x): d/dx[3 + (1/6)(x−9)] = 1/6 = f\'(9). ✔ The slope of L matches the slope of f at the anchor. Both checks pass — the linearization is correct.',
+          hints: ['Differentiate your L(x) — for a linear function this is just its slope coefficient.'],
+        },
+        {
+          expression: '\\text{Error} \\approx \\frac{1}{2}|f\'\'(9)|(0.1)^2 = \\frac{1}{2} \\cdot \\frac{1}{4 \\cdot 9^{3/2}} \\cdot 0.01 = \\frac{0.01}{2 \\cdot 4 \\cdot 27} \\approx 0.0000463',
+          annotation: 'Verification checklist — Optional error bound. f\'\'(x) = −(1/4)x^{−3/2}, so |f\'\'(9)| = 1/(4·27) ≈ 0.00926. Error ≤ (1/2)(0.00926)(0.01) ≈ 0.0000463. This confirms our estimate is accurate to about 5 parts in 100,000.',
+          hints: ['f\'\'(x) = d/dx[(1/2)x^{−1/2}] = −(1/4)x^{−3/2}.', 'Error bound: ½|f\'\'(c)|·(Δx)² for some c between 9 and 9.1.'],
+        },
+      ],
+      conclusion: 'Result: √9.1 ≈ 3.0167 (actual: 3.01662, error < 0.00005). The four-step method: (1) gather f(a) = 3 and f\'(a) = 1/6 at anchor a = 9; (2) write L(x) = 3 + (1/6)(x − 9); (3) evaluate at x = 9.1 with Δx = 0.1; (4) verify L(a) = f(a) and L\'(a) = f\'(a). The differential shortcut dy = f\'(a)·dx gives the same answer. The error bound from Taylor\'s theorem confirms the tiny approximation error. This method works for ANY differentiable function — choose an anchor with known values, build the tangent line, use it as a calculator.',
     },
     {
       id: 'ch3-001-ex6',
