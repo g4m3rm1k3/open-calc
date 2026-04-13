@@ -163,6 +163,7 @@ const VIZ_REGISTRY = {
   CurveSketchingBoard: lazy(() => import("./d3/CurveSketchingBoard.jsx")),
   SignChartBuilder: lazy(() => import("./d3/SignChartBuilder.jsx")),
   DerivativeSketchWalkthrough: lazy(() => import("./react/DerivativeSketchWalkthrough.jsx")),
+  SignDataSketchLab: lazy(() => import("./react/SignDataSketchLab.jsx")),
   ChainRulePeeler: lazy(() => import("./react/ChainRulePeeler.jsx")),
   PolynomialScrubber: lazy(() => import("./d3/PolynomialScrubber.jsx")),
   PolarCoordinateMorph: lazy(() => import("./d3/PolarCoordinateMorph.jsx")),

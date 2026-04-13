@@ -79,6 +79,12 @@ export default {
         mathBridge: "Work through three complete examples of reconstructing a qualitative graph from only f' and f'' information — no formula for f required. Each step progressively reveals: monotonicity shading from the f' sign chart, critical point classification (local max, local min, or neither), concavity shading from the f'' sign chart, confirmed inflection points, and finally the full curve. The third example (h, given by table) is the most instructive: it shows a critical point where f' does NOT change sign (horizontal tangent that is NOT an extremum) and inflection points at both x = −⅓ and x = 3 (the latter coinciding with the flat tangent). Use the sign chart strips below the graph to read off the full + / − pattern for f' and f'' as you click through steps.",
         caption: 'Multi-example interactive walkthrough: step-by-step graph construction from f\' and f\'\' data. Three preset examples with sign chart strips, shaded monotonicity/concavity regions, classified critical and inflection points, and a verification checklist.',
       },
+      {
+        id: 'SignDataSketchLab',
+        title: 'Sketch from Conditions Only — Exam Justification Guide',
+        mathBridge: "Practice the exact skill tested on exams: given only a list of derivative and concavity conditions (no formula), construct the qualitative graph and write a formal justification. Two examples: (1) a classic function with a local max, local min, and single inflection; (2) a function with the horizontal-inflection trap — where f\'(c) = 0 but there is NO extremum at c because f\' does not change sign. Each step shows both the mathematical action AND a template for how to phrase that step in a written justification. The final step provides a complete exam-quality justification paragraph you can use as a model.",
+        caption: 'Exam-prep lab: build a qualitative sketch and write a justification from conditions alone. Includes the First Derivative Test reasoning, inflection point confirmation, segment-by-segment assembly, and a model justification paragraph for each example.',
+      },
     ],
   },
 
