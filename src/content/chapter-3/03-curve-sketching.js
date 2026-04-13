@@ -73,6 +73,12 @@ export default {
         title: 'Interactive Sign Chart Builder',
         caption: 'Adjust polynomial coefficients and watch f\' and f\'\' sign charts update instantly. This makes first/second derivative tests procedural and visual.',
       },
+      {
+        id: 'DerivativeSketchWalkthrough',
+        title: 'Sketch from Derivative Data — Step-by-Step Walkthrough',
+        mathBridge: "Work through three complete examples of reconstructing a qualitative graph from only f' and f'' information — no formula for f required. Each step progressively reveals: monotonicity shading from the f' sign chart, critical point classification (local max, local min, or neither), concavity shading from the f'' sign chart, confirmed inflection points, and finally the full curve. The third example (h, given by table) is the most instructive: it shows a critical point where f' does NOT change sign (horizontal tangent that is NOT an extremum) and inflection points at both x = −⅓ and x = 3 (the latter coinciding with the flat tangent). Use the sign chart strips below the graph to read off the full + / − pattern for f' and f'' as you click through steps.",
+        caption: 'Multi-example interactive walkthrough: step-by-step graph construction from f\' and f\'\' data. Three preset examples with sign chart strips, shaded monotonicity/concavity regions, classified critical and inflection points, and a verification checklist.',
+      },
     ],
   },
 
