@@ -161,9 +161,10 @@ export default function ScrubbableExample({ example, number, lessonId }) {
 
   if (steps.length === 0) return null;
 
+  const hasMounted = useRef(false);
   useEffect(() => {
+    if (!hasMounted.current) { hasMounted.current = true; return; }
     setShowHint(false);
-    // Scroll active card into view so Prev/Next stays visible without hunting
     if (activeCardRef.current) {
       activeCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
