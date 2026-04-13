@@ -796,47 +796,57 @@ print(f"z (current gap) = {z} mi")
       hint: "Let L = string length (the hypotenuse), x = horizontal distance (one leg), height = 100 m (the other leg, fixed). Use x² + 100² = L². Differentiate and substitute.",
       walkthrough: [
         {
-          expression: "x^2 + 100^2 = L^2",
-          annotation:
-            "The kite string, horizontal distance, and fixed height form a right triangle. L is the hypotenuse (string length).",
-          hints: [
-            "The height of the kite is constant (100).",
-            "The horizontal distance (x) and rope length (L) are variables.",
-            "Apply the Pythagorean theorem.",
-          ],
+          expression: "\\text{Definition and setup: Related rates problems involve quantities that change with time and are related by an equation (usually geometric).}",
+          annotation: "Here, the kite forms a right triangle with the flier: vertical leg = fixed height 100 m, horizontal leg = x(t), hypotenuse = string length L(t). The goal is to find dx/dt when L = 200 m and dL/dt = 5 m/s."
         },
         {
-          expression: "2x\\,\\frac{dx}{dt} = 2L\\,\\frac{dL}{dt}",
-          annotation:
-            "Differentiate with respect to t. The height 100 is constant, so d/dt[100²] = 0.",
-          hints: [
-            "Differentiate with respect to time.",
-            "The constant 100² drops out.",
-            "Keep the 2x dx/dt and 2L dL/dt terms.",
-          ],
+          expression: "\\text{Pythagorean theorem (constraint equation): } x^2 + 100^2 = L^2",
+          annotation: "This equation relates the three sides at every instant of time. 100 is constant, while x and L are functions of t. Thought process: start with the geometric relationship that must hold for all t."
         },
         {
-          expression:
-            "L = 200 \\Rightarrow x = \\sqrt{200^2 - 100^2} = \\sqrt{30000} = 100\\sqrt{3}",
-          annotation: "Find x when L = 200 using the Pythagorean theorem.",
-          hints: ["Find the horizontal distance at the specific moment L=200."],
+          expression: "\\text{Differentiate both sides with respect to time t (implicit differentiation)}",
+          annotation: "We differentiate the entire equation because we care about how the variables change over time, not their static values."
         },
         {
-          expression: "2(100\\sqrt{3})\\,\\frac{dx}{dt} = 2(200)(5)",
-          annotation: "Substitute x = 100√3, L = 200, dL/dt = 5.",
-          hints: [
-            "Plug in all known values: position (x, L) and rate (dL/dt).",
-          ],
+          expression: "\\frac{d}{dt}(x^2) + \\frac{d}{dt}(100^2) = \\frac{d}{dt}(L^2)",
+          annotation: "Apply the derivative operator to each term separately."
         },
         {
-          expression:
-            "\\frac{dx}{dt} = \\frac{10\\sqrt{3}}{3} \\approx 5.77 \\text{ m/s}",
-          annotation: "Solve for dx/dt and rationalize.",
-          hints: [
-            "Simplify the equation and isolate dx/dt.",
-            "The result is the horizontal speed.",
-          ],
+          expression: "2x \\cdot \\frac{dx}{dt} + 0 = 2L \\cdot \\frac{dL}{dt}",
+          annotation: "Chain rule: d/dt(x²) = 2x · (dx/dt). The constant 100² has derivative zero. Same for L². This is the key related-rates equation."
         },
+        {
+          expression: "\\text{Simplify by dividing both sides by 2 (optional but clean): } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
+          annotation: "We can keep the 2's or divide — both are fine. The equation now relates the two rates dx/dt and dL/dt."
+        },
+        {
+          expression: "\\text{Find the horizontal distance x when L = 200 m}",
+          annotation: "We need the specific geometry at the moment of interest."
+        },
+        {
+          expression: "x = \\sqrt{L^2 - 100^2} = \\sqrt{200^2 - 100^2} = \\sqrt{40000 - 10000} = \\sqrt{30000} = \\sqrt{10000 \\cdot 3} = 100\\sqrt{3} \\text{ m}",
+          annotation: "Exact value: 100√3 ≈ 173.205 m. Units check: meters. Note x is positive since distance."
+        },
+        {
+          expression: "\\text{Substitute known values into the differentiated equation}",
+          annotation: "We know L = 200, dL/dt = 5 m/s (string is let out, so positive), x = 100√3."
+        },
+        {
+          expression: "2 \\cdot (100\\sqrt{3}) \\cdot \\frac{dx}{dt} = 2 \\cdot 200 \\cdot 5",
+          annotation: "Plug in carefully. Left side has the unknown dx/dt; right side is all numbers."
+        },
+        {
+          expression: "200\\sqrt{3} \\cdot \\frac{dx}{dt} = 2000",
+          annotation: "Simplify: 2·100√3 = 200√3 on left; 2·200·5 = 2000 on right."
+        },
+        {
+          expression: "\\frac{dx}{dt} = \\frac{2000}{200\\sqrt{3}} = \\frac{10}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3} \\text{ m/s}",
+          annotation: "Rationalize denominator: multiply numerator and denominator by √3. Approximate value ≈ 5.77 m/s. The horizontal distance increases at about 5.77 m/s."
+        },
+        {
+          expression: "\\text{Aha insight: The horizontal speed (5.77 m/s) is greater than the string speed (5 m/s) because the string is not vertical — part of the motion is 'wasted' on the angle.}",
+          annotation: "When the kite is high and far, letting out string moves the kite more horizontally than vertically."
+        }
       ],
       answer:
         "\\dfrac{dx}{dt} = \\dfrac{10\\sqrt{3}}{3} \\approx 5.77 \\text{ m/s}",
@@ -849,46 +859,45 @@ print(f"z (current gap) = {z} mi")
       hint: "Write V in terms of h alone using r = h/2. Then differentiate.",
       walkthrough: [
         {
-          expression: "r = \\frac{h}{2}",
-          annotation: "h = 2r means r = h/2. Use this to eliminate r.",
-          hints: [
-            "The problem gives a constant ratio between r and h.",
-            "Solve for r in terms of h since we want dh/dt.",
-          ],
+          expression: "\\text{Definition: Volume of a cone is } V = \\frac{1}{3} \\pi r^2 h",
+          annotation: "This is the standard formula. Here both r and h change with time, but they are related by the fixed ratio h = 2r."
         },
         {
-          expression:
-            "V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi \\left(\frac{h}{2}\\right)^2 h = \\frac{\\pi h^3}{12}",
-          annotation: "Substitute r = h/2 into the cone volume formula.",
-          hints: [
-            "Replace r in the volume formula.",
-            "Simplify to get V as a function of only h.",
-          ],
+          expression: "\\text{Given relation: } h = 2r \\implies r = \\frac{h}{2}",
+          annotation: "The pile maintains a constant shape (similar cones). We want dh/dt, so eliminate r in favor of h."
         },
         {
-          expression: "\\frac{dV}{dt} = \\frac{\\pi h^2}{4}\\,\\frac{dh}{dt}",
-          annotation:
-            "Differentiate V = πh³/12 with respect to t: (π/12)·3h²·(dh/dt) = (πh²/4)·(dh/dt).",
-          hints: [
-            "Apply the power rule to h³.",
-            "Don't forget the chain rule term dh/dt.",
-          ],
+          expression: "\\text{Substitute into volume: } V = \\frac{1}{3} \\pi \\left(\\frac{h}{2}\\right)^2 h = \\frac{1}{3} \\pi \\cdot \\frac{h^2}{4} \\cdot h = \\frac{\\pi h^3}{12}",
+          annotation: "Careful algebra: (h/2)² = h²/4, then times h = h³/4, then 1/3 π gives π h³ / 12. Now V depends only on h."
         },
         {
-          expression:
-            "30 = \\frac{\\pi(10)^2}{4}\\,\\frac{dh}{dt} = 25\\pi\\,\\frac{dh}{dt}",
-          annotation: "Substitute dV/dt = 30 and h = 10.",
-          hints: ["Plug in the dumping rate (dV/dt) and target height (h)."],
+          expression: "\\text{Differentiate both sides with respect to t: } \\frac{dV}{dt} = \\frac{d}{dt} \\left( \\frac{\\pi}{12} h^3 \right)",
+          annotation: "Chain rule will appear because h = h(t)."
         },
         {
-          expression:
-            "\\frac{dh}{dt} = \\frac{6}{5\\pi} \\approx 0.382 \\text{ ft/min}",
-          annotation: "Solve for dh/dt.",
-          hints: [
-            "Isolate dh/dt.",
-            "Check units: ft/min because volume was ft³ and time was min.",
-          ],
+          expression: "\\frac{dV}{dt} = \\frac{\\pi}{12} \\cdot 3 h^2 \\cdot \\frac{dh}{dt} = \\frac{\\pi h^2}{4} \\cdot \\frac{dh}{dt}",
+          annotation: "Power rule on h³ gives 3h², then multiply by π/12 and dh/dt. Simplified coefficient: 3π/12 = π/4."
         },
+        {
+          expression: "\\text{We know } \\frac{dV}{dt} = 30 \\text{ ft³/min (gravel added at constant rate)}",
+          annotation: "Positive because volume is increasing."
+        },
+        {
+          expression: "30 = \\frac{\\pi (10)^2}{4} \\cdot \\frac{dh}{dt}",
+          annotation: "Plug in h = 10 ft at the moment of interest."
+        },
+        {
+          expression: "30 = \\frac{\\pi \\cdot 100}{4} \\cdot \\frac{dh}{dt} = 25\\pi \\cdot \\frac{dh}{dt}",
+          annotation: "100/4 = 25, times π."
+        },
+        {
+          expression: "\\frac{dh}{dt} = \\frac{30}{25\\pi} = \\frac{6}{5\\pi} \\text{ ft/min}",
+          annotation: "Simplify fraction: divide numerator and denominator by 5. Approximate ≈ 0.382 ft/min. The height rises slowly because the pile is getting wider as it grows."
+        },
+        {
+          expression: "\\text{Aha insight: Even though volume increases at constant rate, dh/dt decreases as h grows because the cone is spreading out — more volume is needed to raise the height the same amount later.}",
+          annotation: "This is why the rate is smaller at larger heights."
+        }
       ],
       answer:
         "\\dfrac{dh}{dt} = \\dfrac{6}{5\\pi} \\approx 0.382 \\text{ ft/min}",
@@ -901,48 +910,49 @@ print(f"z (current gap) = {z} mi")
       hint: "Let x = horizontal distance of boat from the dock, L = length of rope from pulley to boat. These satisfy x² + 12² = L². Differentiate. Note: the boat moves horizontally, not along the rope.",
       walkthrough: [
         {
-          expression: "x^2 + 144 = L^2",
-          annotation:
-            "The pulley is 12 ft above water (constant). x is the boat's horizontal distance from below the pulley, L is the rope length. Pythagorean theorem.",
-          hints: [
-            "Identify the constant vertical distance (12) and the variable horizontal distance (x).",
-            "The rope length L is the hypotenuse.",
-          ],
+          expression: "\\text{Setup: The pulley is 12 ft above the water (fixed vertical distance).}",
+          annotation: "The rope goes from boat to pulley (length L), then presumably to the person pulling. We care about the segment from pulley to boat."
         },
         {
-          expression: "2x\\,\\frac{dx}{dt} = 2L\\,\\frac{dL}{dt}",
-          annotation: "Differentiate with respect to t.",
-          hints: [
-            "Differentiate both sides.",
-            "The constant 144 derivative is 0.",
-          ],
+          expression: "\\text{Pythagorean relation: } x^2 + 12^2 = L^2 \\quad \\text{or} \\quad x^2 + 144 = L^2",
+          annotation: "x is the horizontal distance from the point directly below the pulley to the boat. L is the slant length of the rope."
         },
         {
-          expression:
-            "L = 15 \\Rightarrow x = \\sqrt{225 - 144} = 9 \\text{ ft}",
-          annotation: "Find x when L = 15.",
-          hints: ["Calculate the horizontal distance at the specific moment."],
+          expression: "\\text{Differentiate with respect to t: } 2x \\frac{dx}{dt} + 0 = 2L \\frac{dL}{dt}",
+          annotation: "Chain rule again. Constant 144 drops out."
         },
         {
-          expression: "\\frac{dL}{dt} = -3 \\text{ ft/s}",
-          annotation:
-            "The rope is being pulled IN, so L decreases: dL/dt = -3.",
-          hints: [
-            "The rate dL/dt must be negative because the rope is shortening.",
-          ],
+          expression: "\\text{Simplify: } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
+          annotation: "Divided by 2 for cleanliness."
         },
         {
-          expression:
-            "2(9)\\,\\frac{dx}{dt} = 2(15)(-3) \\Rightarrow 18\\,\\frac{dx}{dt} = -90",
-          annotation: "Substitute into the rate equation.",
-          hints: ["Substitute all positional and rate data."],
+          expression: "\\text{At the instant of interest: L = 15 ft}",
+          annotation: "Given directly."
         },
         {
-          expression: "\\frac{dx}{dt} = -5 \\text{ ft/s}",
-          annotation:
-            "The boat moves toward the dock at 5 ft/s. The negative sign confirms x is decreasing.",
-          hints: ["Solve for the boat's horizontal velocity."],
+          expression: "x = \\sqrt{L^2 - 144} = \\sqrt{225 - 144} = \\sqrt{81} = 9 \\text{ ft}",
+          annotation: "Positive root because distance."
         },
+        {
+          expression: "\\text{Rate at which rope is pulled: } \\frac{dL}{dt} = -3 \\text{ ft/s}",
+          annotation: "Important: pulled in means the length L is decreasing, so negative sign. This is a common source of sign errors in related rates."
+        },
+        {
+          expression: "\\text{Substitute into the rate equation: } 9 \\cdot \\frac{dx}{dt} = 15 \\cdot (-3)",
+          annotation: "x = 9, L = 15, dL/dt = -3."
+        },
+        {
+          expression: "9 \\frac{dx}{dt} = -45 \\implies \\frac{dx}{dt} = -5 \\text{ ft/s}",
+          annotation: "Solve for dx/dt. The negative sign means x is decreasing — the boat is moving toward the dock."
+        },
+        {
+          expression: "\\text{Interpretation: The boat approaches the dock at 5 ft/s (speed is the absolute value).}",
+          annotation: "The question asks 'how fast is the boat moving toward the dock' — so we report the positive speed 5 ft/s, but the signed rate is -5 ft/s."
+        },
+        {
+          expression: "\\text{Aha insight: When the rope is steeper (smaller x), pulling the rope moves the boat faster horizontally. Here at L=15, x=9, the boat moves faster (5 ft/s) than the rope is pulled (3 ft/s).}",
+          annotation: "The angle converts the rope speed into a larger horizontal component."
+        }
       ],
       answer: "\\text{The boat approaches the dock at } 5 \\text{ ft/s.}",
     },

@@ -296,7 +296,6 @@ fig.show()`,
       title: "Fencing Problem: Maximize Rectangular Area",
       problem:
         "\\text{You have 100 m of fence. Maximize the enclosed rectangular area.}",
-      visualizationId: "OptimizationViz",
       steps: [
         {
           expression:
@@ -711,7 +710,6 @@ fig.show()`,
       title: "Optimal Launch Angle for Maximum Range (Physics)",
       problem:
         "A projectile is launched from ground level at speed $v_0 = 30$ m/s and angle $\\theta \\in (0°, 90°)$. The horizontal range is $R(\\theta) = \\frac{v_0^2 \\sin(2\\theta)}{g} = \\frac{900 \\sin(2\\theta)}{9.8}$ metres. Find the launch angle that maximises range.",
-      visualizationId: "ProjectileMotion",
       steps: [
         {
           expression:

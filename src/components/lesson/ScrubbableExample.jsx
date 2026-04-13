@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react'; // useRef kept for activeCardRef
 import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from '../math/parseProse.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
@@ -161,13 +161,8 @@ export default function ScrubbableExample({ example, number, lessonId }) {
 
   if (steps.length === 0) return null;
 
-  const hasMounted = useRef(false);
   useEffect(() => {
-    if (!hasMounted.current) { hasMounted.current = true; return; }
     setShowHint(false);
-    if (activeCardRef.current) {
-      activeCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
   }, [currentStep]);
 
   const markHintUsed = () => {
