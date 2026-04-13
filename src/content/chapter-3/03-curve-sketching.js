@@ -269,6 +269,210 @@ export default {
     },
   ],
 
+  story: {
+    title: 'The Portrait of a Function',
+    subtitle: 'How to read the complete life story of f(x) = x⁴ − 4x³ without plotting a single point.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'What Is a Graph, Really?',
+        content: `You have a formula: $f(x) = x^4 - 4x^3$.
+
+Most people's instinct is to grab a calculator, plug in a hundred values of $x$, plot a hundred dots, and connect them. That works. But it tells you almost nothing. You get a picture — you don't get understanding.
+
+**What we're going to do instead is read the function's entire life story from its formula alone.** No calculator. No plotting. Pure reasoning.
+
+First, let's agree on what a graph actually is.
+
+A **function** is a machine: you feed it a number $x$, it spits out a number $f(x)$. The **graph** is the complete visual record of every $(x, f(x))$ pair — every input and its corresponding output, drawn as a point in a plane where left-right is $x$ and up-down is $f(x)$.
+
+The plane has two axes:
+- The **horizontal axis** ($x$-axis) represents the input.
+- The **vertical axis** ($y$-axis) represents the output.
+
+When we sketch a curve, we're not drawing random squiggles. We're drawing the precise trail left by a point $(x, f(x))$ as $x$ moves from left to right.
+
+The question is: **what does that trail look like, and why?**`,
+      },
+      {
+        label: 'Act I',
+        title: 'The First Layer — The Function Itself',
+        content: `Before we touch a derivative, we read the function itself for basic facts.
+
+**Domain: where is the function defined?**
+
+$f(x) = x^4 - 4x^3$ is a polynomial. Polynomials are defined for every real number — you can plug in any $x$ and get a finite answer. So the domain is all real numbers, written $(-\\infty, +\\infty)$.
+
+Some functions aren't so generous. A fraction like $\\frac{1}{x}$ explodes at $x = 0$ (division by zero). A square root $\\sqrt{x}$ only works for $x \\geq 0$. Always check domain first.
+
+**The $y$-intercept: what is $f(0)$?**
+
+Plug in $x = 0$:
+\\[f(0) = 0^4 - 4(0^3) = 0\\]
+The graph crosses the vertical axis at the origin $(0, 0)$.
+
+**The $x$-intercepts: where does $f(x) = 0$?**
+
+Set $f(x) = 0$ and solve:
+\\[x^4 - 4x^3 = 0\\]
+\\[x^3(x - 4) = 0\\]
+
+This is zero when $x^3 = 0$ (so $x = 0$) or when $x - 4 = 0$ (so $x = 4$). The graph touches or crosses the $x$-axis at $x = 0$ and $x = 4$.
+
+**End behavior: what happens as $x \\to \\pm\\infty$?**
+
+For large $|x|$, the highest-power term dominates — $x^4$ dwarfs $4x^3$. Since the leading term is $x^4$ with a **positive** coefficient, the function grows toward $+\\infty$ in **both** directions. The graph goes up steeply on both the far left and far right.
+
+We've already learned: the curve starts high on the left, comes down through $(0,0)$, reaches $(4,0)$ somewhere in the middle, and climbs back up on the right.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Derivative — Pressing Play on the Graph',
+        content: `Now we unlock the first derivative. This is where calculus begins.
+
+**What the derivative actually means**
+
+The derivative $f'(x)$ is the *instantaneous rate of change* of $f$ at any point $x$. Geometrically, it is the **slope of the tangent line** to the graph at that point.
+
+Slope tells you direction:
+- **Positive slope ($f'(x) > 0$):** the function is rising — moving left to right, the graph goes uphill.
+- **Negative slope ($f'(x) < 0$):** the function is falling — moving left to right, the graph goes downhill.
+- **Zero slope ($f'(x) = 0$):** the function is momentarily flat — a potential peak or valley.
+
+**Computing $f'(x)$**
+
+We use the **Power Rule**: to differentiate $x^n$, bring the exponent down as a coefficient and reduce the exponent by one. $\\frac{d}{dx}[x^n] = nx^{n-1}$.
+
+Term by term:
+- $\\frac{d}{dx}[x^4] = 4x^3$
+- $\\frac{d}{dx}[-4x^3] = -12x^2$
+
+So:
+\\[f'(x) = 4x^3 - 12x^2\\]
+
+**Finding critical points**
+
+A **critical point** is any $x$ where $f'(x) = 0$ or $f'(x)$ is undefined. These are the candidates for peaks and valleys.
+
+Set $f'(x) = 0$:
+\\[4x^3 - 12x^2 = 0\\]
+\\[4x^2(x - 3) = 0\\]
+
+So $f'(x) = 0$ when $x = 0$ or $x = 3$.
+
+These two values divide the number line into three regions. We don't yet know if they're peaks, valleys, or neither — we need the sign chart for that.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Sign Chart — Reading Rising and Falling',
+        content: `A **sign chart** is the single most important tool in curve sketching. It turns the abstract derivative into a concrete story about motion.
+
+**How to build one**
+
+The critical points $x = 0$ and $x = 3$ divide the number line into three intervals:
+
+| Interval | Test point | $f'(\\text{test})$ | Sign | Meaning |
+|---|---|---|---|---|
+| $x < 0$ | $x = -1$ | $4(-1)^2(-1-3) = 4(1)(-4) = -16$ | $-$ | Falling |
+| $0 < x < 3$ | $x = 1$ | $4(1)^2(1-3) = 4(-2) = -8$ | $-$ | Falling |
+| $x > 3$ | $x = 4$ | $4(16)(1) = 64$ | $+$ | Rising |
+
+**Reading the story**
+
+- For $x < 0$: the function is **falling**. Coming from the far left (where it was high due to end behavior), the graph descends.
+- At $x = 0$: $f'$ goes from $-$ to $-$ — **no sign change**. The function is still falling on both sides. This is NOT a peak or valley — it's a pause, a momentary flat spot where the graph flattens out then continues downward. (This is sometimes called a **saddle point**.)
+- For $0 < x < 3$: the function continues **falling**.
+- At $x = 3$: $f'$ goes from $-$ to $+$ — a sign change from falling to rising. This IS a valley — a **local minimum**.
+- For $x > 3$: the function is **rising**.
+
+So the function falls the entire way from $-\\infty$ down to $x = 3$, with a brief flat pause at $x = 0$, then rises from $x = 3$ onward.
+
+The value at the local minimum: $f(3) = 3^4 - 4(3^3) = 81 - 108 = -27$.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'The Second Derivative — The Shape of the Curve',
+        content: `The first derivative told us where the function rises and falls. The second derivative tells us **how it bends**.
+
+**What concavity means**
+
+Imagine driving along the graph from left to right. The first derivative is your speedometer. The second derivative is whether you're steering the wheel left or right — curving upward or downward.
+
+- **Concave up ($f''(x) > 0$):** the curve bends upward, like the inside of a bowl. Tangent lines lie *below* the curve.
+- **Concave down ($f''(x) < 0$):** the curve bends downward, like the top of a hill. Tangent lines lie *above* the curve.
+
+**Computing $f''(x)$**
+
+Differentiate $f'(x) = 4x^3 - 12x^2$ again:
+\\[f''(x) = 12x^2 - 24x\\]
+
+**Finding inflection point candidates**
+
+An **inflection point** is where the concavity changes — where the curve switches from bowing upward to bowing downward, or vice versa. These occur where $f''(x) = 0$ *and* $f''$ changes sign.
+
+Set $f''(x) = 0$:
+\\[12x^2 - 24x = 0\\]
+\\[12x(x - 2) = 0\\]
+
+Candidates: $x = 0$ and $x = 2$.
+
+**Sign chart for $f''$**
+
+| Interval | Test point | $f''(\\text{test})$ | Sign | Concavity |
+|---|---|---|---|---|
+| $x < 0$ | $x = -1$ | $12(1) - 24(-1) = 12 + 24 = 36$ | $+$ | Up (bowl) |
+| $0 < x < 2$ | $x = 1$ | $12(1) - 24(1) = -12$ | $-$ | Down (hill) |
+| $x > 2$ | $x = 3$ | $12(9) - 24(3) = 108 - 72 = 36$ | $+$ | Up (bowl) |
+
+Sign changes at both $x = 0$ and $x = 2$ — both are **inflection points**.
+
+Values: $f(0) = 0$ and $f(2) = 2^4 - 4(2^3) = 16 - 32 = -16$.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Assembling the Portrait',
+        content: `We now have every piece. Let's assemble the complete picture.
+
+**Key points to plot:**
+
+| Point | Coordinates | What it is |
+|---|---|---|
+| $x = 0$ | $(0, 0)$ | $x$ and $y$ intercept, saddle point, inflection point |
+| $x = 2$ | $(2, -16)$ | Inflection point |
+| $x = 3$ | $(3, -27)$ | Local minimum |
+| $x = 4$ | $(4, 0)$ | $x$-intercept |
+
+**The complete story, left to right:**
+
+1. Far left ($x \\to -\\infty$): the graph comes from **high up** (positive leading term $x^4$).
+2. Falls continuously, curving **upward like a bowl** ($f'' > 0$ for $x < 0$).
+3. At $x = 0$: passes through the origin, flattens momentarily (saddle), concavity flips to **downward**.
+4. Continues falling, now curving **downward like a hill** ($f'' < 0$ for $0 < x < 2$).
+5. At $x = 2$: inflection point at $(2, -16)$, concavity flips back to **upward**.
+6. Continues falling, curving **upward like a bowl** — getting ready to turn around.
+7. At $x = 3$: hits the local minimum at $(3, -27)$. Turns around. Starts rising.
+8. Rises through $(4, 0)$ — crosses the $x$-axis again.
+9. Far right ($x \\to +\\infty$): climbs steeply **upward** forever.
+
+**The payoff:** we drew a complete, accurate, labeled graph — with every peak, valley, inflection point, intercept, and end behavior — without plotting a single arbitrary point. We built the picture from mathematical reasoning alone.
+
+This is what curve sketching actually is: not drawing, but *reading*.`,
+      },
+    ],
+    resolution: `**What we built from scratch — the complete procedure:**
+
+1. **Domain** — where is $f$ defined? (Polynomials: everywhere. Fractions/roots: check.)
+2. **Intercepts** — where does $f$ cross the axes? (Plug in $x=0$; set $f=0$ and solve.)
+3. **End behavior** — where does $f$ go as $x \\to \\pm\\infty$? (Leading term dominates.)
+4. **First derivative $f'$** — compute it, find critical points ($f' = 0$ or undefined).
+5. **Sign chart for $f'$** — test each interval, read rising $(+)$ and falling $(-)$, classify critical points by sign change.
+6. **Second derivative $f''$** — compute it, find inflection candidates ($f'' = 0$).
+7. **Sign chart for $f''$** — test each interval, read concave up $(+)$ and concave down $(-)$, confirm inflection points by sign change.
+8. **Assemble** — plot the key points (intercepts, critical points, inflection points), connect with a smooth curve that obeys every rule you found.
+
+**The deeper truth:** $f'$ is the function's velocity — the rate at which height changes. $f''$ is the function's acceleration — the rate at which velocity changes. Curve sketching is kinematics. You are reading motion from a formula.`,
+  },
+
   challenges: [
     {
       id: 'ch3-003-ch1',

@@ -14,6 +14,7 @@ import StepThrough from './StepThrough.jsx'
 import DynamicProof from './DynamicProof.jsx'
 import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
+import NarrativeStory from './NarrativeStory.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
@@ -648,6 +649,7 @@ export default function MicroCycleLesson({ lesson }) {
         )
       })()}
       <UnifiedLearningDock lesson={lesson} />
+      {lesson.story && <NarrativeStory story={lesson.story} />}
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
       <SpiralBlock spiral={lesson.spiral} />
       {lesson.assessment?.questions?.length > 0 && (

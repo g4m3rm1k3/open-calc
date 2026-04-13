@@ -787,6 +787,144 @@ print(f"z (current gap) = {z} mi")
     },
   ],
 
+  story: {
+    title: "The Descent: A Calculus Thriller",
+    subtitle: "A 13-foot ladder. A rain-slicked alley. One question calculus was born to answer.",
+    acts: [
+      {
+        label: "The Scene",
+        title: "A Dark Alley, a Perfect Corner",
+        content: `Imagine a dark, rain-slicked alleyway in the dead of night. A towering, unforgiving brick wall plunges straight down, meeting the flat concrete ground. Because the builders used a plumb line (perfectly straight up) and a level (perfectly flat across), the wall and the floor meet at exactly a **90-degree angle**.
+
+Think of a full circle as a pie cut into 360 tiny, equal slices called degrees. If you stand facing perfectly forward and turn exactly one-quarter of the way around, you have turned 90 degrees. This creates a sharp, perfect corner — what mathematicians call a **right angle**.
+
+Resting against this wall is a pristine aluminum ladder, exactly **13 feet long**.
+
+Everything is completely still. But the concrete is slick with rain, and suddenly, the bottom of the ladder begins to slide away from the wall. It doesn't slip chaotically; it slides outward into the alley at a steady, relentless pace of **2 feet per second**.
+
+Up at the top of the ladder, gravity demands its due. As the bottom slides out, the top *must* slide down.
+
+**The central mystery:** At the exact, freeze-frame moment when the bottom of the ladder is exactly **5 feet** away from the wall, how fast is the top of the ladder plummeting downward?
+
+This is not a static picture. Geometry deals with frozen shapes. Our world is **moving**. To solve this mystery, we need the mathematics of motion — **Calculus** — and we will build every piece of that machinery right here, from scratch.`,
+      },
+      {
+        label: "Act I",
+        title: "The Ancient Law of the Crime Scene",
+        content: `Before we can track the motion, we must understand the unbreakable physical laws of the alleyway.
+
+Whenever a straight line (the floor) meets another straight line (the wall) at a perfect 90-degree right angle, and you connect them with a third straight line (the ladder), you create a shape called a **right triangle**.
+
+- One leg runs along the floor. Call its length $x$.
+- One leg runs up the wall. Call its length $y$.
+- The ladder itself is the longest side, slanting between them — the **hypotenuse**.
+
+Over 2,000 years ago, Pythagoras proved an absolute truth about *every* right triangle: the lengths of the sides are locked together in a permanent mathematical embrace.
+
+Imagine drawing a square attached to the bottom leg — $x$ wide and $x$ tall. Its area is $x^2$. Draw a square attached to the wall leg: area $y^2$. Pythagoras proved that these two areas *always* perfectly equal the area of a square built on the hypotenuse.
+
+Our ladder is a constant 13 feet long. A square built on it has area $13^2 = 169$. Therefore, our unchanging law of the alleyway is:
+
+\\[x^2 + y^2 = 169\\]
+
+This equation is a cosmic handcuff. If the ladder slides outward ($x$ gets bigger), the top *must* slide downward ($y$ gets smaller) by the exact amount required to keep the sum at 169.`,
+      },
+      {
+        label: "Act II",
+        title: "The Paradox of the Freeze-Frame",
+        content: `We know *where* the ladder is. But our mystery asks *how fast* it is moving.
+
+Speed is simply a distance traveled divided by the time it took. But here we face a profound paradox. We want the speed at an *exact, frozen instant* — the moment $x = 5$. But in a frozen instant, zero time passes. The ladder moves zero feet. Speed is $\\frac{0}{0}$, which breaks all of algebra.
+
+To solve this, mathematicians invented **Calculus** — specifically, the **derivative**.
+
+Instead of freezing time completely, a derivative looks at an infinitely microscopic sliver of time, called $dt$. During that microscopic $dt$, the bottom of the ladder moves a microscopic distance $dx$.
+
+- $\\frac{dx}{dt}$ = the tiny change in $x$ divided by the tiny change in time = **instantaneous speed of the bottom**
+- $\\frac{dy}{dt}$ = the tiny change in $y$ over time = **instantaneous speed of the top**
+
+The problem gives us a massive clue. The bottom slides outward at 2 feet per second:
+
+\\[\\frac{dx}{dt} = 2\\]
+
+Our mission is to find the downward speed:
+
+\\[\\frac{dy}{dt} = ?\\]`,
+      },
+      {
+        label: "Act III",
+        title: "The Machinery of Change",
+        content: `We have a static geometric equation: $x^2 + y^2 = 169$. We need a dynamic motion equation. To get it, we mathematically "press play" — we take the **derivative of both sides with respect to time** $t$.
+
+**Piece 1: the floor square $x^2$**
+
+Use the **Power Rule**: pull the exponent down to the front, giving $2x$. But $x$ is a moving physical object — it has its own internal speed. When a moving quantity is trapped inside another operation, the **Chain Rule** says to multiply the outer change by the inner speed:
+
+\\[\\frac{d}{dt}(x^2) = 2x\\,\\frac{dx}{dt}\\]
+
+**Piece 2: the wall square $y^2$**
+
+By identical logic:
+
+\\[\\frac{d}{dt}(y^2) = 2y\\,\\frac{dy}{dt}\\]
+
+**Piece 3: the constant 169**
+
+The ladder never stretches. The rate of change of a constant is **0**.
+
+Putting it all together — our motion equation:
+
+\\[2x\\,\\frac{dx}{dt} + 2y\\,\\frac{dy}{dt} = 0\\]
+
+This says the motion of the bottom and the motion of the top, when combined, cancel to zero. They are forever linked.`,
+      },
+      {
+        label: "Act IV",
+        title: "The Interrogation",
+        content: `The scene freezes at $x = 5$. We need to find $y$ at this moment.
+
+Plug $x = 5$ into the original static equation:
+
+\\[5^2 + y^2 = 169\\]
+\\[25 + y^2 = 169\\]
+\\[y^2 = 144\\]
+\\[y = 12\\]
+
+*(We take the positive root — the ladder hasn't phased through the concrete!)*
+
+We now have all the evidence:
+- $x = 5$
+- $y = 12$
+- $\\frac{dx}{dt} = 2$`,
+      },
+      {
+        label: "Act V",
+        title: "The Confession",
+        content: `Substitute into our motion equation:
+
+\\[2(5)(2) + 2(12)\\,\\frac{dy}{dt} = 0\\]
+\\[20 + 24\\,\\frac{dy}{dt} = 0\\]
+\\[24\\,\\frac{dy}{dt} = -20\\]
+\\[\\frac{dy}{dt} = -\\frac{20}{24} = -\\frac{5}{6}\\]
+
+The answer is $-\\frac{5}{6}$ feet per second.
+
+The **negative sign** is the storyteller. A positive rate means a quantity is growing (the bottom was sliding *out* at $+2$). A negative rate means a quantity is shrinking — the top is sliding *down*.
+
+At the exact instant the bottom is 5 feet from the wall, the top is plunging downward at $\\frac{5}{6}$ of a foot per second.`,
+      },
+    ],
+    resolution: `The mystery is solved — not by magic, but by the unbreakable laws of geometry and the precise machinery of calculus.
+
+**What we built from scratch:**
+- The Pythagorean constraint $x^2 + y^2 = 169$ — the static law of the scene
+- Implicit differentiation with respect to time — pressing play on the geometry
+- The Chain Rule — connecting the speed of $x$ to the speed of $y$
+- Algebraic substitution — plugging in the freeze-frame values to extract the answer
+
+Every related rates problem follows this exact structure: find the geometric constraint, differentiate it with respect to time, substitute known values, solve for the unknown rate. No leaps. No hidden assumptions. Just pure, rigorous truth.`,
+  },
+
   challenges: [
     {
       id: "ch3-000-ch1",
