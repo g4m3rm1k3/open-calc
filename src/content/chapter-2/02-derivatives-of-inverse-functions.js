@@ -829,6 +829,236 @@ export default {
     },
   ],
 
+  story: {
+    title: "The Mirror Rule",
+    subtitle: 'How reversing a relationship turns every slope upside down — and why that single fact unlocks arcsin, arctan, and every inverse calculus tool.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Machine Running Backwards',
+        content: `Imagine a perfectly calibrated weighing machine in a factory. You drop in a cylindrical block of steel, and the machine — knowing the density and the formula $V = \\pi r^2 h$ — spits out the mass.
+
+You feed it a radius, it gives you a mass. It does this flawlessly.
+
+Now a problem: a block falls off the line and the label falls off. You have a scale — you can weigh it — but you need the radius. The machine only goes one way.
+
+You need the machine to run **backwards**: feed in the mass, get out the radius.
+
+This is the fundamental idea of an **inverse function**. Every function is a one-way machine — input goes in, output comes out. An inverse function runs that machine in reverse: the output becomes a new input, and you recover the original.
+
+Most of this is familiar from algebra. What calculus adds is the question: **if you know how fast the forward machine is running, how fast is the reverse machine running?**
+
+The answer is the **Mirror Rule** — one of the most elegant and useful results in all of calculus.`,
+      },
+      {
+        label: 'Act I',
+        title: 'What Makes a Function Reversible',
+        content: `Not every machine can run backwards. To see why, think about the squaring machine:
+
+$$f(x) = x^2$$
+
+Feed it $3$: output $9$. Feed it $-3$: also output $9$.
+
+Now run it backwards: feed in $9$. Which output do you produce — $3$ or $-3$? The machine is confused. Two inputs produced the same output, so the reverse machine cannot give a unique answer. **This machine is not reversible on all of $\\mathbb{R}$.**
+
+The precise requirement for a machine to be reversible is called **one-to-one** (or injective): every output must come from exactly one input. Equivalently, different inputs always produce different outputs.
+
+**The visual test:** draw your graph and run a horizontal line through it. If any horizontal line hits the curve more than once, the function is not one-to-one — two inputs give the same height, so the reverse is undefined.
+
+$f(x) = x^2$ fails this test: the horizontal line $y = 9$ hits the parabola at both $x = 3$ and $x = -3$.
+
+$f(x) = x^3$ passes: no horizontal line hits a cubic more than once (it is always increasing or always decreasing).
+
+**Monotonicity is the key.** If a function is either strictly increasing everywhere or strictly decreasing everywhere — never turning around — it is one-to-one. And you can check this with the derivative:
+
+- If $f'(x) > 0$ throughout an interval $\Rightarrow$ $f$ is strictly increasing $\Rightarrow$ one-to-one $\Rightarrow$ **invertible there**.
+- If $f'(x) < 0$ throughout an interval $\Rightarrow$ strictly decreasing $\Rightarrow$ one-to-one $\Rightarrow$ **invertible there**.
+
+For $x^2$: $f'(x) = 2x$, which is negative for $x < 0$ and positive for $x > 0$. On all of $\\mathbb{R}$ it changes sign — not monotone. But if we restrict to $[0, \\infty)$, the derivative is $\\geq 0$ throughout, so the machine is reversible on that piece. That piece gives us $f^{-1}(x) = \\sqrt{x}$.
+
+**Restricting the domain** is how we rescue functions that are not globally one-to-one. We cut the domain to a piece where the function is monotone, and on that piece we get an invertible machine.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Mirror — Graphs of a Function and Its Inverse',
+        content: `Here is the geometric heart of the whole lesson.
+
+Take any point $(a, b)$ on the graph of $f$. It says: "input $a$ gives output $b$." The inverse function reverses that: "input $b$ gives output $a$." So $(b, a)$ is the corresponding point on the graph of $f^{-1}$.
+
+Every point on $f$ becomes a point on $f^{-1}$ with the two coordinates **swapped**.
+
+What does swapping coordinates do to a graph? It is exactly a **reflection across the line $y = x$** — the diagonal line through the origin at 45°. Hold a piece of paper to a mirror at that angle and any function's graph reflects into its inverse's graph.
+
+This is not a metaphor. It is literally true. The graph of $f^{-1}$ is the mirror image of the graph of $f$ across the line $y = x$.
+
+**Now comes the key question:** what happens to the slope?
+
+On the graph of $f$, the slope at $(a, b)$ is:
+$$\\text{slope of } f = \\frac{\\text{rise}}{\\text{run}} = \\frac{\\Delta y}{\\Delta x}$$
+
+When we reflect across $y = x$, the axes swap. What was the $y$-axis (vertical) becomes the $x$-axis (horizontal), and vice versa. Rise becomes run, and run becomes rise.
+
+The slope at the reflected point $(b, a)$ on $f^{-1}$ is therefore:
+$$\\text{slope of } f^{-1} = \\frac{\\text{new rise}}{\\text{new run}} = \\frac{\\Delta x}{\\Delta y} = \\frac{1}{\\Delta y / \\Delta x} = \\frac{1}{\\text{slope of } f}$$
+
+**The slope of the inverse is the reciprocal of the slope of the original.** This is the Mirror Rule.
+
+Written precisely: if $f(a) = b$ and $f'(a)$ exists and is nonzero, then:
+$$\\boxed{(f^{-1})'(b) = \\frac{1}{f'(a)}}$$
+
+Notice the requirement that $f'(a) \\neq 0$. If the original function has a horizontal tangent at the point (slope = 0), the reflected tangent on the inverse would need to be vertical — slope undefined, no derivative. The mirror of a flat line is a vertical wall.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Proof — Deriving the Mirror Rule from the Chain Rule',
+        content: `The geometric argument is convincing, but calculus demands a proof. Here it is, step by step.
+
+**Starting point:** the defining equation of an inverse function.
+
+If $f$ and $f^{-1}$ are true inverses, then applying $f$ and then $f^{-1}$ gets you back to where you started:
+$$f^{-1}(f(x)) = x \\quad \\text{for every } x \\text{ in the domain of } f$$
+
+This equation is just a statement of fact about what "inverse" means. Now we differentiate both sides with respect to $x$.
+
+**Right side:** $\\dfrac{d}{dx}[x] = 1$.
+
+**Left side:** $f^{-1}(f(x))$ is a composition — $f^{-1}$ applied to $f(x)$. We need the **Chain Rule**.
+
+The Chain Rule says: to differentiate a composition $g(h(x))$, multiply the derivative of the outer function (evaluated at the inner function) by the derivative of the inner function:
+$$\\frac{d}{dx}[g(h(x))] = g'(h(x)) \\cdot h'(x)$$
+
+Here the outer function is $f^{-1}$ and the inner function is $f(x)$:
+$$\\frac{d}{dx}[f^{-1}(f(x))] = (f^{-1})'(f(x)) \\cdot f'(x)$$
+
+Setting left side equal to right side:
+$$(f^{-1})'(f(x)) \\cdot f'(x) = 1$$
+
+Divide both sides by $f'(x)$ — this is legal as long as $f'(x) \\neq 0$:
+$$(f^{-1})'(f(x)) = \\frac{1}{f'(x)}$$
+
+Now substitute $b = f(x)$ (so $x = f^{-1}(b)$):
+$$(f^{-1})'(b) = \\frac{1}{f'(f^{-1}(b))}$$
+
+Or written with $x$ as the input variable:
+$$\\boxed{\\frac{d}{dx}[f^{-1}(x)] = \\frac{1}{f'(f^{-1}(x))}}$$
+
+**Reading the formula:** to find the derivative of the inverse at a point $x = b$, first find which input $a = f^{-1}(b)$ maps to $b$ under $f$. Then evaluate $f'$ at that input $a$. Take the reciprocal.
+
+The most common mistake: evaluating $f'$ at $b$ instead of at $a = f^{-1}(b)$. You must go back to the original function's input, not the inverse's input.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Arctan — Deriving a Famous Formula from Scratch',
+        content: `The most important application of the Mirror Rule is deriving the derivatives of the inverse trig functions. We will do $\\arctan$ in full detail — every prerequisite made explicit.
+
+**Prerequisites you need to know:**
+- $\\tan(y) = \\sin(y)/\\cos(y)$ — the definition of tangent.
+- The derivative of tangent: $\\dfrac{d}{dy}[\\tan(y)] = \\sec^2(y) = \\dfrac{1}{\\cos^2(y)}$. (This is derived from the quotient rule on $\\sin/\\cos$, or accepted as a standard formula.)
+- The Pythagorean identity: $\\sin^2(y) + \\cos^2(y) = 1$.
+- Dividing by $\\cos^2(y)$: $\\tan^2(y) + 1 = \\sec^2(y)$. (This is just the Pythagorean identity rearranged.)
+
+**Setting up:**
+
+The function $\\tan(y)$ is not one-to-one on all of $\\mathbb{R}$ — it has period $\\pi$ and repeats forever. We restrict to $y \\in (-\\pi/2, +\\pi/2)$, on which $\\tan$ is strictly increasing (its derivative $\\sec^2(y) > 0$ there). On this interval, $\\tan$ is one-to-one and invertible.
+
+The inverse is $\\arctan$: the function that takes a number $x$ and returns the angle $y \\in (-\\pi/2, +\\pi/2)$ whose tangent equals $x$.
+
+$$y = \\arctan(x) \\iff \\tan(y) = x, \\quad y \\in \\left(-\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right)$$
+
+**Step 1:** Differentiate both sides of $\\tan(y) = x$ with respect to $x$.
+
+The right side: $\\dfrac{d}{dx}[x] = 1$.
+
+The left side: $\\tan(y)$ is a function of $y$, and $y$ is a function of $x$ (it equals $\\arctan(x)$). This is another composition, so we use the Chain Rule:
+$$\\frac{d}{dx}[\\tan(y)] = \\frac{d}{dy}[\\tan(y)] \\cdot \\frac{dy}{dx} = \\sec^2(y) \\cdot \\frac{dy}{dx}$$
+
+Setting equal:
+$$\\sec^2(y) \\cdot \\frac{dy}{dx} = 1$$
+
+**Step 2:** Solve for $dy/dx$.
+
+$$\\frac{dy}{dx} = \\frac{1}{\\sec^2(y)}$$
+
+**Step 3:** Express this in terms of $x$, not $y$.
+
+We know $\\tan(y) = x$ (that was our starting equation). Now use $\\sec^2(y) = 1 + \\tan^2(y)$:
+$$\\sec^2(y) = 1 + \\tan^2(y) = 1 + x^2$$
+
+**Step 4:** Substitute.
+
+$$\\frac{dy}{dx} = \\frac{1}{1 + x^2}$$
+
+Since $y = \\arctan(x)$, this says:
+$$\\boxed{\\frac{d}{dx}[\\arctan(x)] = \\frac{1}{1 + x^2}}$$
+
+**Why this formula is remarkable:** the right side, $\\dfrac{1}{1+x^2}$, involves no trigonometry at all. A pure algebraic expression is the derivative of this transcendental function. And as $x \\to \\pm\\infty$, this approaches 0 — reflecting the fact that $\\arctan$ flattens out and saturates at $\\pm\\pi/2$.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Arcsin — A Triangle Tells the Story',
+        content: `Now we derive the derivative of $\\arcsin$ using the same implicit differentiation technique. The new ingredient is a unit-circle triangle that converts $\\cos(y)$ into an expression involving $x$.
+
+**Setup:** $\\sin$ restricted to $y \\in [-\\pi/2, +\\pi/2]$ is strictly increasing (derivative $\\cos(y) \\geq 0$ there — actually $> 0$ on the open interval). So on that interval $\\sin$ is invertible.
+
+$$y = \\arcsin(x) \\iff \\sin(y) = x, \\quad y \\in \\left[-\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right]$$
+
+**Step 1:** Differentiate both sides of $\\sin(y) = x$ with respect to $x$, using the Chain Rule on the left:
+$$\\cos(y) \\cdot \\frac{dy}{dx} = 1$$
+
+**Step 2:** Solve for $dy/dx$:
+$$\\frac{dy}{dx} = \\frac{1}{\\cos(y)}$$
+
+**Step 3:** Convert $\\cos(y)$ into an expression in $x$.
+
+From the Pythagorean identity $\\sin^2(y) + \\cos^2(y) = 1$, and since $\\sin(y) = x$:
+$$x^2 + \\cos^2(y) = 1 \\implies \\cos^2(y) = 1 - x^2 \\implies \\cos(y) = \\pm\\sqrt{1 - x^2}$$
+
+Which sign? Since $y \\in [-\\pi/2, +\\pi/2]$, the cosine is **non-negative** on this interval (both endpoints give $\\cos(\\pm\\pi/2) = 0$, and the interior gives positive cosine). So we take the **positive** square root:
+$$\\cos(y) = \\sqrt{1 - x^2}$$
+
+**Step 4:** Substitute:
+$$\\frac{dy}{dx} = \\frac{1}{\\sqrt{1 - x^2}}$$
+
+$$\\boxed{\\frac{d}{dx}[\\arcsin(x)] = \\frac{1}{\\sqrt{1-x^2}}, \\quad -1 < x < 1}$$
+
+**Domain:** the formula requires $x^2 < 1$, i.e., $|x| < 1$. At $x = \\pm 1$ the denominator is zero — the tangent to $\\arcsin$ is vertical at the endpoints. This makes geometric sense: $\\arcsin$ climbs steeply and then shoots straight up at its domain boundary.
+
+**The triangle trick (a different way to see Step 3):**
+
+Draw a right triangle with angle $y$ at the base. Since $\\sin(y) = x$, label the opposite side $x$ and the hypotenuse $1$ (a unit-circle triangle). Then the adjacent side is $\\sqrt{1 - x^2}$ by the Pythagorean theorem. And $\\cos(y) = \\text{adjacent}/\\text{hypotenuse} = \\sqrt{1-x^2}/1 = \\sqrt{1-x^2}$.
+
+This triangle trick appears in every inverse trig derivation. It turns abstract identities into a picture you can draw.`,
+      },
+    ],
+    resolution: `**The complete procedure — three situations, one underlying idea:**
+
+**Situation 1: You have f(a) = b and f'(a), and want (f⁻¹)'(b).**
+1. Identify which input $a$ maps to the output $b$: find $a$ such that $f(a) = b$.
+2. Evaluate $f'$ at that input: compute $f'(a)$.
+3. Take the reciprocal: $(f^{-1})'(b) = 1/f'(a)$.
+You never need an explicit formula for $f^{-1}$.
+
+**Situation 2: You have an explicit formula for f⁻¹ and want its derivative.**
+Use the theorem: $(f^{-1})'(x) = 1/f'(f^{-1}(x))$. Plug in $f^{-1}(x)$ for the argument of $f'$.
+
+**Situation 3: f⁻¹ is an inverse trig function — derive its derivative from scratch.**
+1. Write $y = f^{-1}(x)$ and rewrite as $f(y) = x$ (e.g., $\\arctan(x) \\to \\tan(y) = x$).
+2. Differentiate both sides with respect to $x$ — Chain Rule on the left gives $f'(y) \\cdot dy/dx = 1$.
+3. Solve: $dy/dx = 1/f'(y)$.
+4. Convert $f'(y)$ to an expression in $x$ using the original equation $f(y) = x$ and a Pythagorean identity.
+5. The result is the derivative formula, always written purely in terms of $x$.
+
+**The results to commit to memory:**
+
+| Inverse function | Derivative | Domain |
+|---|---|---|
+| $\\arcsin(x)$ | $\\dfrac{1}{\\sqrt{1-x^2}}$ | $(-1, 1)$ |
+| $\\arccos(x)$ | $-\\dfrac{1}{\\sqrt{1-x^2}}$ | $(-1, 1)$ |
+| $\\arctan(x)$ | $\\dfrac{1}{1+x^2}$ | $(-\\infty, \\infty)$ |
+
+**The deeper truth:** inverting a function is like running time backwards. The forward machine converts a small change $\\Delta x$ into a change $\\Delta y = f'(a) \\cdot \\Delta x$. The reverse machine converts a small change $\\Delta y$ back into $\\Delta x = (1/f'(a)) \\cdot \\Delta y$. Rates invert when you flip direction. That single geometric fact — slopes are reciprocals across the mirror $y = x$ — is all you need to remember. Everything else follows.`,
+  },
+
   crossRefs: [
     { lessonSlug: 'chain-rule', label: 'Chain Rule', context: 'Used in both the formal proof and inverse trig compositions.' },
     { lessonSlug: 'implicit-differentiation', label: 'Implicit Differentiation', context: 'Primary method to derive arcsin/arccos/arctan formulas.' },
