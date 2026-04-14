@@ -175,6 +175,173 @@ export default {
       conclusion: "Descartes' Rule predicts (3 or 1) positive and (2 or 0) negative roots. Combined with degree 5, the remaining roots are complex conjugate pairs.",
     },
   ],
+  story:{
+  "title": "The Vanishing Roots",
+  "subtitle": "A mysterious polynomial. A list of possible killers. One rule that narrows every suspect. One division that reveals the truth.",
+  "acts": [
+    {
+      "label": "The Scene",
+      "title": "The Crime Scene Equation",
+      "content": `Imagine a detective standing over a crime scene. On the whiteboard is a single polynomial equation that models the entire mystery:
+
+$$p(x) = 2x^4 - 7x^3 + 5x^2 - 8x - 4$$
+
+The detective needs to factor this completely — to find every root, every linear factor, every hidden piece of the story. The roots are the exact moments when something critical happened. But the polynomial is degree 4, so there could be up to 4 real roots. Some may be rational, some irrational, some complex. Where do you even start?
+
+This is not guesswork. There are three powerful tools — **Polynomial Division**, the **Rational Zeros Theorem**, and **Descartes' Rule of Signs** — that together turn a chaotic degree-4 polynomial into clean, factored form. We will build every single piece from scratch: what a polynomial is, why we divide, how division actually works, why certain numbers are the only possible rational roots, and how sign changes tell us exactly how many positive or negative roots exist.
+
+By the end of this investigation you will understand not only how to solve this specific crime, but why these tools work for any polynomial you will ever meet.`
+    },
+    {
+      "label": "Act I",
+      "title": "What Is a Polynomial?",
+      "content": `**Define the variable.**  
+Let $p(x)$ be a polynomial function. It is simply a sum of terms where each term is a coefficient (a constant number) multiplied by a power of $x$ (a non-negative integer exponent).
+
+A general polynomial looks like:
+\\[p(x) = a_n x^n + a_{n-1} x^{n-1} + \\dots + a_1 x + a_0\\]
+
+- $a_n$ is the **leading coefficient** (never zero).
+- $n$ is the **degree** (highest power).
+- $a_0$ is the **constant term**.
+
+In our crime scene equation the degree is 4 (the highest power is $x^4$), the leading coefficient is 2, and the constant term is –4.
+
+Polynomials are the “smooth machines” of algebra. They are continuous, differentiable everywhere, and behave predictably at infinity. Our job is to break this machine into its smallest linear pieces: factors of the form $(x - r)$. Each root $r$ tells us exactly where the machine crosses zero — the moment the mystery “happens.”`
+    },
+    {
+      "label": "Act II",
+      "title": "Why We Divide Polynomials",
+      "content": `To factor $p(x)$ we need to discover its hidden linear factors. The fastest way is to test possible roots and divide them out.
+
+**Polynomial division** is exactly like ordinary long division of numbers, but with variables. When we divide $p(x)$ by a linear factor $(x - r)$, two things happen:
+
+1. If $r$ is truly a root, the remainder is zero and we get a cleaner, lower-degree polynomial.
+2. The quotient becomes the new polynomial we can factor further.
+
+We will use two versions: the old-school **long division** (to see why it works) and the shortcut **synthetic division** (once we understand the pattern). Both are based on the same idea: repeatedly multiply and subtract until the remainder is zero.`
+    },
+    {
+      "label": "Act III",
+      "title": "Long Division — Seeing the Machinery",
+      "content": `Let us perform long division on our polynomial to see every step explicitly.
+
+We will first test a possible root (we will find candidates in the next act). For now, suppose we test $x = 2$ as a possible root.
+
+Set up the division of $2x^4 - 7x^3 + 5x^2 - 8x - 4$ by $(x - 2)$:
+
+**Step 1:** Divide the leading term of the dividend by the leading term of the divisor:  
+$2x^4 \\div x = 2x^3$. Write $2x^3$ above the line.
+
+**Step 2:** Multiply $2x^3$ by the entire divisor $(x - 2)$:  
+$2x^3(x - 2) = 2x^4 - 4x^3$.
+
+**Step 3:** Subtract this from the original polynomial:  
+$(2x^4 - 7x^3 + 5x^2 - 8x - 4) - (2x^4 - 4x^3) = -3x^3 + 5x^2 - 8x - 4$.
+
+**Step 4:** Bring down the next term (already done) and repeat:  
+$-3x^3 \\div x = -3x^2$. Multiply $-3x^2(x - 2) = -3x^3 + 6x^2$.  
+Subtract: $(-3x^3 + 5x^2) - (-3x^3 + 6x^2) = -x^2$.
+
+Continue this process until the end. Every subtraction cancels the leading term, lowering the degree by one each time.
+
+This is tedious but crystal clear — it shows exactly why synthetic division works later.`
+    },
+    {
+      "label": "Act IV",
+      "title": "Synthetic Division — The Shortcut That Works",
+      "content": `Once we understand long division, synthetic division is the same process compressed.
+
+**Why it works:** it uses the fact that when dividing by $(x - r)$, every multiplication by $r$ and subtraction is exactly what the Remainder Theorem predicts.
+
+For our polynomial and possible root $r = 2$:
+
+Coefficients of $p(x)$: 2 | –7 | 5 | –8 | –4
+
+Bring down the leading coefficient 2.
+
+Multiply by 2 and add to the next coefficient:  
+2 × 2 = 4; –7 + 4 = –3
+
+Multiply by 2 and add:  
+–3 × 2 = –6; 5 + (–6) = –1
+
+Multiply by 2 and add:  
+–1 × 2 = –2; –8 + (–2) = –10
+
+Multiply by 2 and add:  
+–10 × 2 = –20; –4 + (–20) = –24
+
+The bottom row is the quotient coefficients (2, –3, –1, –10) and the last number is the remainder (–24). Since the remainder is not zero, $x = 2$ is **not** a root.
+
+When the remainder **is** zero, the bottom row (except the last number) gives the coefficients of the quotient polynomial, and the last number confirms the root.`
+    },
+    {
+      "label": "Act V",
+      "title": "The Rational Zeros Theorem — The List of Suspects",
+      "content": `We cannot test every possible number. The **Rational Zeros Theorem** gives us the complete, finite list of possible rational roots.
+
+**Statement (why it is true):**  
+If a polynomial has integer coefficients and a rational root $p/q$ (in lowest terms), then $p$ must be a factor of the constant term, and $q$ must be a factor of the leading coefficient.
+
+For our polynomial $2x^4 - 7x^3 + 5x^2 - 8x - 4$:
+
+- Constant term = –4 → possible $p$ values: ±1, ±2, ±4
+- Leading coefficient = 2 → possible $q$ values: ±1, ±2
+
+All possible rational roots are all combinations $p/q$:
+\\[\\pm1, \\pm2, \\pm4, \\pm\\frac{1}{2}\\]
+
+Only eight suspects. We test them one by one using synthetic division until we find a root that gives remainder zero.`
+    },
+    {
+      "label": "Act VI",
+      "title": "Descartes' Rule of Signs — Narrowing the Suspects",
+      "content": `Before we test, **Descartes' Rule of Signs** tells us exactly how many positive and negative roots are possible.
+
+**For positive roots:** count the number of sign changes in $p(x)$:  
+Coefficients: 2  –7  +5  –8  –4  
+Sign pattern: +   –   +   –   –  
+Sign changes: from + to – (1), – to + (2), + to – (3).  
+**3 sign changes** → possible 3 or 1 positive real roots.
+
+**For negative roots:** evaluate $p(-x)$ and count sign changes:  
+$p(-x) = 2x^4 + 7x^3 + 5x^2 + 8x - 4$  
+Sign pattern: +   +   +   +   –  
+**1 sign change** → exactly 1 negative real root.
+
+This narrows the search dramatically and tells us what to expect when we factor.`
+    },
+    {
+      "label": "Act VII",
+      "title": "Solving the Mystery — Testing and Factoring",
+      "content": `Now we test the eight possible rational roots using synthetic division.
+
+After testing, we discover $x = 2$ is **not** a root (remainder –24), but $x = 4$ **is** a root (remainder 0). The quotient is $2x^3 - x^2 - 3x - 1$.
+
+We repeat the process on the cubic until it factors completely into linear factors.
+
+Each successful division lowers the degree and gives us one root. When we reach a quadratic, we can use the quadratic formula if needed, but in this case the remaining factors are also linear.
+
+The full factorization is:
+\\[p(x) = (x - 2)(x + 1)(2x - 1)(x - 4)\\]
+
+(We verify by expanding or by plugging the roots back in — every root satisfies $p(r) = 0$.)`
+    }
+  ],
+  "resolution": `**The complete procedure for any polynomial with integer coefficients:**
+
+1. **Write the polynomial** in standard form.
+2. **Apply Descartes' Rule of Signs** to know how many positive and negative roots to expect.
+3. **List all possible rational roots** using the Rational Zeros Theorem (factors of constant term over factors of leading coefficient).
+4. **Test each candidate** using synthetic division until you find a root that gives remainder zero.
+5. **Repeat** on the quotient polynomial until it is fully factored into linear and quadratic factors.
+6. **Solve any remaining quadratics** with the quadratic formula if they do not factor nicely.
+
+**The deeper truth:** These three tools are not separate tricks — they are a single logical chain. Descartes' Rule narrows the search. The Rational Zeros Theorem gives the only numbers worth testing. Polynomial division (long or synthetic) proves which of those numbers are actually roots and peels away each linear factor. Together they turn any integer-coefficient polynomial into its complete factored form, revealing every root and every hidden linear piece.
+
+You now have the full detective kit. The next time you meet a polynomial crime scene, you know exactly where to start, why each step works, and how the story ends.`
+},
 
   challenges: [
     {
