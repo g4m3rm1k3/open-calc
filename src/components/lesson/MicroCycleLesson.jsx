@@ -651,11 +651,11 @@ export default function MicroCycleLesson({ lesson }) {
       })()}
       <UnifiedLearningDock lesson={lesson} />
       {lesson.discovery && (
-        <FirstPrinciplesLesson key={lesson.id} discovery={lesson.discovery} />
+        <FirstPrinciplesLesson key={`${lesson.id}-discovery`} discovery={lesson.discovery} />
       )}
       {lesson.story && (Array.isArray(lesson.story)
         ? lesson.story.map((s, i) => <NarrativeStory key={`${lesson.id}-story-${i}`} story={s} />)
-        : <NarrativeStory key={lesson.id} story={lesson.story} />
+        : <NarrativeStory key={`${lesson.id}-story`} story={lesson.story} />
       )}
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
       <SpiralBlock spiral={lesson.spiral} />

@@ -925,6 +925,234 @@ At the exact instant the bottom is 5 feet from the wall, the top is plunging dow
 Every related rates problem follows this exact structure: find the geometric constraint, differentiate it with respect to time, substitute known values, solve for the unknown rate. No leaps. No hidden assumptions. Just pure, rigorous truth.`,
   },
 
+  discovery: {
+    title: `Why Is My Shadow Running Away From Me?`,
+    persona: `It's late. I just left a restaurant and I'm walking home along an empty sidewalk. There's a single streetlight behind me, casting my shadow ahead of me on the pavement. I notice something strange: my shadow seems to be racing ahead. The faster I walk, the faster the tip of my shadow moves — but the tip seems to be moving *faster than I am*. How is that possible? And exactly how fast is it moving?`,
+    steps: [
+      {
+        phase: 'need',
+        title: `What I already know how to do`,
+        content: `I know how to handle things that change at constant rates. If I walk at 4 feet per second, then after $t$ seconds my position is $x = 4t$. Done.
+
+I also know how to use the derivative. If my position is some function $f(t)$, then $f'(t)$ gives my velocity at any moment.
+
+And I know the geometry of similar triangles — two triangles that have the same angles have sides in the same ratio.
+
+These are the tools I have. Let me try to use them to answer the shadow question.`,
+      },
+      {
+        phase: 'need',
+        title: `Setting up the geometry — two quantities I can measure`,
+        content: `Here's the scene from above. The streetlight is a pole of height $H = 16$ feet, standing at the origin. I am 6 feet tall, walking away from the pole.
+
+At any moment, let:
+- $x$ = my distance from the base of the pole (feet)
+- $y$ = the distance from the pole to the **tip** of my shadow (feet)
+
+I can track both of these quantities over time. They are both functions of time: $x(t)$ and $y(t)$.
+
+The shadow tip is always farther than me: $y > x$. My shadow's length is $y - x$.
+
+I know my walking speed: $\dfrac{dx}{dt} = 4$ ft/s.
+
+The question: what is $\dfrac{dy}{dt}$? How fast is the shadow tip moving?`,
+      },
+      {
+        phase: 'need',
+        title: `The breakdown — I have one equation, but both variables are moving`,
+        content: `The geometry gives me a relationship between $x$ and $y$. The lamppost, my head, and the shadow tip form two similar triangles:
+
+- The large triangle: base $y$, height $H = 16$ (from ground to lamp)
+- The small triangle: base $y - x$, height $h = 6$ (from ground to my head)
+
+Similar triangles: corresponding sides are proportional.
+
+$$\\frac{H}{y} = \\frac{h}{y - x} \implies \\frac{16}{y} = \\frac{6}{y - x}$$
+
+Cross-multiply:
+
+$$16(y - x) = 6y \implies 16y - 16x = 6y \implies 10y = 16x \implies y = \\frac{8}{5}x$$
+
+This is a clean, exact equation. It tells me: **at every moment**, the shadow tip is always $\\frac{8}{5}$ times as far from the lamp as I am.
+
+But here's the problem. I know $\dfrac{dx}{dt}$. I want $\dfrac{dy}{dt}$. The equation $y = \\frac{8}{5}x$ relates **positions**, not **rates**. I have no formula that gives me $\dfrac{dy}{dt}$ directly.
+
+I could try to substitute $x = 4t$ to get $y = \\frac{8}{5}(4t) = \\frac{32}{5}t$ and then differentiate $y$ with respect to $t$. That works here — but only because this problem was simple enough to solve for $y$ explicitly. What if the equation relating $x$ and $y$ couldn't be solved for one variable? What if it was something like $x^2 + xy + y^2 = 100$? There's no way to isolate $y$ cleanly.
+
+I need a method that works whether or not I can isolate variables.`,
+      },
+      {
+        phase: 'discovery',
+        title: `Key insight — both sides of an equation can be differentiated`,
+        content: `Here is the equation I have:
+
+$$10y = 16x$$
+
+Both sides are equal. They are equal at every instant in time. So they must be changing at the same rate over time.
+
+Think of it this way: if two quantities are always equal, then their rates of change must also always be equal. If they ever diverged even slightly, they wouldn't be equal anymore.
+
+This means I can **differentiate both sides with respect to time $t$** and the equation will still hold:
+
+$$\\frac{d}{dt}[10y] = \\frac{d}{dt}[16x]$$
+
+Now I apply the rules I know:
+- On the left: $\\frac{d}{dt}[10y] = 10\\frac{dy}{dt}$ (constant multiple rule)
+- On the right: $\\frac{d}{dt}[16x] = 16\\frac{dx}{dt}$ (constant multiple rule)
+
+So:
+
+$$10\\frac{dy}{dt} = 16\\frac{dx}{dt}$$
+
+Solve for $\dfrac{dy}{dt}$:
+
+$$\\frac{dy}{dt} = \\frac{16}{10}\\frac{dx}{dt} = \\frac{8}{5}\\frac{dx}{dt}$$
+
+The rates are related by **the same fraction** as the positions. That's not a coincidence — it follows directly from differentiating the relationship.`,
+      },
+      {
+        phase: 'discovery',
+        title: `Plug in what I know — get the answer`,
+        content: `I know: $\dfrac{dx}{dt} = 4$ ft/s (my walking speed).
+
+$$\\frac{dy}{dt} = \\frac{8}{5} \\times 4 = \\frac{32}{5} = 6.4 \\text{ ft/s}$$
+
+The shadow tip is moving at **6.4 ft/s** — even though I'm only walking at 4 ft/s.
+
+The shadow tip is moving **faster than I am** by a factor of $\\frac{8}{5}$. That same factor shows up three different ways:
+- In the positions: $y = \\frac{8}{5}x$
+- In the rates: $\\frac{dy}{dt} = \\frac{8}{5}\\frac{dx}{dt}$
+- In the geometry: lamp height $16$, my height $6$, ratio $\\frac{16}{16-6} = \\frac{16}{10} = \\frac{8}{5}$
+
+They're all the same statement — just evaluated at different moments. The derivative converted the static geometry into a live relationship between rates.
+
+**Bonus — how fast is the shadow itself growing?**
+
+Shadow length $= y - x$. So:
+
+$$\\frac{d}{dt}[y - x] = \\frac{dy}{dt} - \\frac{dx}{dt} = 6.4 - 4 = 2.4 \\text{ ft/s}$$
+
+My shadow grows 2.4 ft longer every second. The tip races ahead at 6.4 ft/s because it picks up both my walking speed (4 ft/s) and the shadow's own growth (2.4 ft/s).`,
+      },
+      {
+        phase: 'discovery',
+        title: `What if the relationship wasn't linear? Try a harder case`,
+        content: `The shadow problem worked out cleanly because the geometric relationship $10y = 16x$ was linear — differentiating it was trivial.
+
+Now try a case that isn't linear. I'm at the same streetlight, but now I care about the **distance** $D$ from the lamp directly to my head (not along the ground — the straight-line, slant distance through the air).
+
+By the Pythagorean theorem (my head is at coordinates $(x, 6)$, the lamp is at $(0, 16)$):
+
+$$D^2 = x^2 + (16 - 6)^2 = x^2 + 100$$
+
+Differentiate both sides with respect to $t$. The left side: $\\frac{d}{dt}[D^2]$. Here $D$ is a function of $t$, so I need the **chain rule**:
+
+$$\\frac{d}{dt}[D^2] = 2D \cdot \\frac{dD}{dt}$$
+
+The right side: $\\frac{d}{dt}[x^2 + 100] = 2x\\frac{dx}{dt} + 0 = 2x\\frac{dx}{dt}$
+
+So:
+
+$$2D\\frac{dD}{dt} = 2x\\frac{dx}{dt}$$
+
+$$\\frac{dD}{dt} = \\frac{x}{D}\\frac{dx}{dt}$$
+
+At the moment $x = 8$ ft: $D = \sqrt{64 + 100} = \sqrt{164} \approx 12.8$ ft.
+
+$$\\frac{dD}{dt} = \\frac{8}{12.8} \\times 4 \approx 2.5 \\text{ ft/s}$$
+
+The straight-line distance from the lamp to my head grows at 2.5 ft/s — even though I'm walking at 4 ft/s. The slant distance grows more slowly because part of my walking motion is "sideways" relative to the lamp direction.
+
+This step required the chain rule to differentiate $D^2$. That is the heart of related rates: **the chain rule, applied to both sides of a geometric constraint, with respect to time**.`,
+      },
+      {
+        phase: 'formalization',
+        title: `Name the method: differentiating a constraint with respect to time`,
+        content: `What we just did has a name: **related rates**.
+
+The method in full generality:
+
+Two quantities $u$ and $v$ are related by a constraint equation:
+
+$$F(u, v) = \\text{constant} \quad \\text{or} \quad G(u, v) = H(u, v)$$
+
+Both $u$ and $v$ are functions of time $t$. Differentiating both sides with respect to $t$ — and applying the chain rule wherever a variable appears — gives a new equation:
+
+$$\\frac{d}{dt}[F(u, v)] = 0 \quad \\text{or} \quad \\frac{d}{dt}[G(u, v)] = \\frac{d}{dt}[H(u, v)]$$
+
+This new equation relates the **rates** $\dfrac{du}{dt}$ and $\dfrac{dv}{dt}$.
+
+**The chain rule is what makes this work.** When you differentiate $u^2$ with respect to $t$:
+
+$$\\frac{d}{dt}[u^2] = 2u \cdot \\frac{du}{dt}$$
+
+The $\dfrac{du}{dt}$ appears because $u$ is a function of $t$, not a constant. Every time you differentiate a variable with respect to $t$, its rate $\dfrac{d(\cdot)}{dt}$ appears. This is the chain rule: $\dfrac{d}{dt}[f(u(t))] = f'(u) \cdot \dfrac{du}{dt}$.
+
+This is also called **implicit differentiation with respect to time** — the same technique from Chapter 2 (implicit differentiation), but with $t$ playing the role of $x$.`,
+      },
+      {
+        phase: 'formalization',
+        title: `The four-step procedure — same structure every time`,
+        content: `Every related rates problem, regardless of how it's dressed up, follows the same four steps:
+
+---
+
+**Step 1 — Draw and label.**
+
+Define variables for every changing quantity. Label all fixed quantities as constants. Draw the scene if it helps. Be explicit: name $x(t)$, $y(t)$, $D(t)$, etc.
+
+**Step 2 — Write the constraint.**
+
+Find the geometric or physical law that links your variables at every instant:
+- Similar triangles → ratios of sides
+- Pythagorean theorem → $a^2 + b^2 = c^2$
+- Area or volume formula → $V = \\frac{4}{3}\pi r^3$, $A = \pi r^2$, etc.
+- Any other equation that's always true during the problem
+
+**Step 3 — Differentiate both sides with respect to $t$.**
+
+Apply chain rule to every term containing a variable. Every variable $u$ that changes in time produces a $\dfrac{du}{dt}$:
+
+$$\\frac{d}{dt}[u^n] = nu^{n-1}\\frac{du}{dt}, \qquad \\frac{d}{dt}[uv] = \\frac{du}{dt} \cdot v + u \cdot \\frac{dv}{dt}, \qquad \\frac{d}{dt}[c] = 0$$
+
+**Step 4 — Substitute and solve.**
+
+Plug in the values of all known quantities (positions, lengths) and all known rates at the specific instant in question. Solve for the unknown rate.
+
+---
+
+**Our shadow problem, in the template:**
+
+| Step | Work |
+|---|---|
+| Label | $x(t)$: my position; $y(t)$: shadow tip; $H=16$, $h=6$ |
+| Constraint | $\\frac{H}{y} = \\frac{h}{y-x} \Rightarrow 10y = 16x$ |
+| Differentiate | $10\\frac{dy}{dt} = 16\\frac{dx}{dt}$ |
+| Substitute | $\\frac{dx}{dt} = 4 \Rightarrow \\frac{dy}{dt} = \\frac{16}{10}(4) = 6.4$ ft/s |
+
+The template never changes. Only the constraint equation changes from problem to problem.`,
+      },
+    ],
+    resolution: `**Related Rates — the complete method:**
+
+Two quantities changing in time are linked by a geometric constraint. Differentiate both sides of the constraint with respect to $t$ (applying the chain rule), then substitute known values to find the unknown rate.
+
+**The four steps:**
+
+1. **Label** every changing quantity as a function of $t$; mark all constants
+2. **Constraint** — find the equation that links them (similar triangles, Pythagorean theorem, area/volume formula)
+3. **Differentiate** both sides with respect to $t$ — every variable $u$ produces a $\\dfrac{du}{dt}$ via the chain rule
+4. **Substitute** known positions and known rates at the instant in question; solve for the unknown rate
+
+**Why the chain rule is the engine:**
+
+$$\\frac{d}{dt}[u^2] = 2u\\frac{du}{dt} \\qquad \\frac{d}{dt}[uv] = \\frac{du}{dt} v + u \\frac{dv}{dt} \\qquad \\frac{d}{dt}[c] = 0$$
+
+**The shadow result:** if you are $h$ feet tall and a lamp is $H$ feet tall, the shadow tip always moves at $\\dfrac{H}{H - h}$ times your walking speed — regardless of where you are. The ratio is locked in by the geometry, and the derivative transmits that ratio directly to the rates.
+
+**What you discovered:** differentiating a geometric relationship with respect to time converts a static picture into a live equation between rates. The math that described the shape of the scene now describes how the scene is moving. That is the full power of the derivative — not just "slope of a curve," but *the rate of any changing quantity linked by any equation*.`,
+  },
+
   challenges: [
     {
       id: "ch3-000-ch1",
