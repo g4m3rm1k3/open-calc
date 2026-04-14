@@ -603,47 +603,74 @@ The skeptic can demand any precision. You can always deliver it. **The limit is 
       },
       {
         label: 'Act III',
-        title: 'The Cheat Code — Why δ = ε/2 Always Works',
-        content: `You won every round by halving the skeptic's number. But *why* does cutting in half always work? Here is the algebra behind it — the "cheat code."
+        title: 'The Gear Ratio — Why δ Depends on the Machine',
+        content: `You won every round by halving the skeptic's number. But don't let that trick you into thinking $\\delta$ is always $\\epsilon/2$. That fraction is the **gear ratio of your specific machine** — and it changes with every function.
 
-**The gear ratio insight:**
+---
 
-Think of $f(x) = 2x + 1$ as a machine with a **2:1 gear ratio**. For every 1 step you take on the $x$-axis (input), the output moves 2 steps on the $y$-axis. The function stretches distances by a factor of 2.
+**The machine analogy:**
 
-That means: if the output must stay within $\\epsilon$, the input must stay within $\\epsilon/2$ — half as much room, because the machine doubles every move.
+Think of $f(x) = 2x + 1$ as a mechanical assembly. The coefficient $2$ tells you the gear ratio. For every $1$ unit you move the input dial ($x$), the output needle ($f(x)$) jumps $2$ units. It's a high-speed setup — the output is faster than the input.
 
-**The algebra that proves it:**
+Because the output moves **twice as fast** as your hand, you have to be **twice as steady**. If the skeptic demands the needle stay within $\\pm\\epsilon$, you must restrict your hand to $\\pm\\epsilon/2$.
 
-We want to connect the output error $|f(x) - 7|$ to the input error $|x - 3|$.
+---
 
-**Step 1:** Substitute $f(x) = 2x + 1$ into the output error:
-\\[|f(x) - 7| = |(2x + 1) - 7|\\]
+**What changes when the machine changes:**
 
-**Step 2:** Simplify inside the absolute value:
-\\[|(2x + 1) - 7| = |2x - 6|\\]
+| Machine | Gear ratio | Strategy |
+|---|---|---|
+| $f(x) = 2x$ | $2:1$ (output 2× faster) | $\\delta = \\epsilon/2$ (be twice as precise) |
+| $f(x) = 10x$ | $10:1$ (output 10× faster) | $\\delta = \\epsilon/10$ (be ten times as precise) |
+| $f(x) = 0.1x$ | $1:10$ (reduction gear) | $\\delta = 10\\epsilon$ (you can be sloppier than the skeptic) |
+| $f(x) = x^2$ near $x=3$ | roughly $6:1$ (varies!) | $\\delta$ depends on where you are on the curve |
 
-**Step 3:** Factor out 2 using the rule $|ab| = |a| \\cdot |b|$:
-\\[|2x - 6| = |2(x - 3)| = 2 \\cdot |x - 3|\\]
+The last row is the key insight: **for a curve, the gear ratio shifts as you move**. Near $x = 3$, the slope of $x^2$ is $2(3) = 6$, so the output moves about 6 times faster than the input near that point. The gear ratio is the derivative — that is not a coincidence.
 
-**Result:**
-\\[\\underbrace{|f(x) - 7|}_{\\text{output error}} = 2 \\cdot \\underbrace{|x - 3|}_{\\text{input error}}\\]
-
-Output error is exactly 2 times input error. The gear ratio is confirmed.
-
-**Now solve for the required input restriction:**
-
-We need output error $< \\epsilon$:
-\\[2|x - 3| < \\epsilon\\]
-
-Divide both sides by 2:
-\\[|x - 3| < \\frac{\\epsilon}{2}\\]
-
-So: set $\\delta = \\dfrac{\\epsilon}{2}$. Restrict input to within $\\delta$ of 3. Output is guaranteed within $\\epsilon$ of 7.
-
-This is not a coincidence — it is the gear ratio. The 2 in $f(x) = 2x + 1$ caused the 2 in $\\delta = \\epsilon/2$.`,
+The gear ratio is the derivative — that connection runs through all of calculus.`,
       },
       {
         label: 'Act IV',
+        title: 'The Algebra Cheat Code — Reverse-Engineering Any Machine',
+        content: `Now that you know the gear ratio is the key, here is the algebra procedure that finds it for **any** machine the skeptic throws at you.
+
+The four steps are always the same — only the function changes.
+
+---
+
+**Step 1 — Start at the goal** (what the skeptic demands):
+\\[|f(x) - L| < \\epsilon\\]
+
+This is the finish line. Everything else is working backwards to find the starting condition.
+
+**Step 2 — Open the hood** (substitute the actual formula for $f(x)$):
+\\[|(2x + 1) - 7| < \\epsilon\\]
+
+Replace the abstract $f(x)$ with the concrete machine. Now the algebra can begin.
+
+**Step 3 — Simplify until the input error $|x - c|$ appears**:
+\\[|2x - 6| < \\epsilon\\]
+\\[2|x - 3| < \\epsilon\\]
+
+First we simplified $2x + 1 - 7 = 2x - 6$ inside the absolute value. Then we factored using $|ab| = |a||b|$: $|2(x-3)| = 2|x-3|$. The gear ratio — the $2$ out front — is now visible.
+
+**Step 4 — Isolate the input error** (divide by the gear ratio):
+\\[|x - 3| < \\frac{\\epsilon}{2}\\]
+
+The number you divide by is the gear ratio. That quotient is your $\\delta$.
+
+---
+
+**The result:** $\\delta = \\dfrac{\\epsilon}{2}$.
+
+For a 10-speed machine ($f(x) = 10x$), step 3 would give $10|x - c| < \\epsilon$, so step 4 gives $\\delta = \\epsilon/10$.
+
+For a reduction gear ($f(x) = 0.1x$), step 3 gives $0.1|x - c| < \\epsilon$, so $\\delta = 10\\epsilon$ — you can be ten times sloppier than the skeptic.
+
+The four steps are always the same. The gear ratio is whatever coefficient falls out in step 3.`,
+      },
+      {
+        label: 'Act V',
         title: 'The Formal Definition — Every Word Earns Its Place',
         content: `Now write the game as a single precise statement.
 
@@ -668,7 +695,7 @@ Every word carries weight:
 The definition says nothing about infinity, motion, or time. It is a statement about numbers and inequalities — checkable, algebraic, airtight.`,
       },
       {
-        label: 'Act V',
+        label: 'Act VI',
         title: 'Writing the Proof — Two Phases, Every Step Shown',
         content: `**Claim:** $\\lim_{x \\to 3}(2x + 1) = 7$.
 
@@ -720,7 +747,7 @@ start from $|x - c| < \\delta$ $\\longrightarrow$ algebra $\\longrightarrow$ arr
 Phase 1 is doing that chain in reverse to find $\\delta$. Phase 2 runs it forward as a clean proof.`,
       },
       {
-        label: 'Act VI',
+        label: 'Act VII',
         title: 'Why the Definition Requires 0 < |x − c| — and What It Means',
         content: `One detail of the definition is subtle enough to deserve its own act.
 
