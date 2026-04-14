@@ -191,6 +191,187 @@ export default {
     },
   ],
 
+  story: {
+    title: 'The Measurement Error',
+    subtitle: 'A spherical tank has a radius measured to ±0.05 m. How wrong is the calculated volume? Differentials turn this engineering question into a calculus problem — and the answer reveals a pattern that appears in every science.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Tank, a Ruler, and an Uncertainty',
+        content: `An engineer measures the radius of a spherical storage tank and gets $r = 10$ meters, with a measurement precision of $\\pm 0.05$ meters. (Every physical measurement has uncertainty — no ruler is perfect.)
+
+The volume of a sphere is $V = \\frac{4}{3}\\pi r^3$. The engineer plugs in $r = 10$ and reports $V = \\frac{4}{3}\\pi(1000) \\approx 4188.8$ cubic meters.
+
+But if the actual radius could be anywhere from $9.95$ to $10.05$ meters, how much error is there in the reported volume? Is it 10 cubic meters? 100? 1000?
+
+The engineer cannot recalculate the volume for every possible radius. Instead, they use **differentials** — a tool that turns "how does a small change in input change the output?" into a single multiplication.
+
+The answer will reveal something deeper: for a function $f(x) = x^n$, a small relative error in $x$ produces $n$ times that relative error in $f$. The exponent is an error amplifier. Understanding this protects engineers, chemists, and physicists from misreporting their results.`,
+      },
+      {
+        label: 'Act I',
+        title: 'The Function V(r) — Input, Output, and What the Derivative Means',
+        content: `Let us be precise about what we are working with.
+
+**The function:**
+\\[V(r) = \\frac{4}{3}\\pi r^3\\]
+
+$r$ is the input (the radius, in meters). $V$ is the output (the volume, in cubic meters). This function is a rule: give it any radius, it returns the corresponding sphere volume.
+
+**The domain:** $r > 0$ — radii must be positive.
+
+**What does the derivative $\\frac{dV}{dr}$ mean?**
+
+The derivative is the *instantaneous rate of change* of $V$ with respect to $r$. Specifically: if the radius changes by a tiny amount, $\\frac{dV}{dr}$ tells you how many cubic meters of volume change occur per meter of radius change.
+
+**Compute $\\frac{dV}{dr}$ using the Power Rule.**
+
+The Power Rule: $\\dfrac{d}{dr}[r^n] = n r^{n-1}$.
+
+The constant $\\frac{4}{3}\\pi$ is a coefficient — it passes through differentiation unchanged.
+
+Apply:
+- $n = 3$
+- Bring exponent down: $\\frac{4}{3}\\pi \\cdot 3 \\cdot r^3$
+- Reduce exponent: $3 - 1 = 2$
+
+\\[\\frac{dV}{dr} = \\frac{4}{3}\\pi \\cdot 3 r^2 = 4\\pi r^2\\]
+
+Notice: $4\\pi r^2$ is the **surface area** of a sphere. This makes geometric sense — adding a thin shell of thickness $dr$ to a sphere adds volume $\\approx \\text{surface area} \\times dr$.
+
+At $r = 10$: $\\dfrac{dV}{dr}\\bigg|_{r=10} = 4\\pi(100) = 400\\pi \\approx 1256.6 \\text{ m}^2$.`,
+      },
+      {
+        label: 'Act II',
+        title: 'Linear Approximation for Changes — From ΔV to dV',
+        content: `We know $V(r) = \\frac{4}{3}\\pi r^3$ and $V'(r) = 4\\pi r^2$. Now we use linear approximation to estimate how much $V$ changes when $r$ changes by a small amount.
+
+**Linear approximation:**
+
+For any differentiable function $f$, a small change $\\Delta x$ in the input produces a change $\\Delta y$ in the output of approximately:
+\\[\\Delta y \\approx f'(x) \\cdot \\Delta x\\]
+
+This is the tangent line approximation: the actual change follows the curve, but for small $\\Delta x$, the curve and the tangent line are nearly identical.
+
+**Apply to our problem:**
+
+- Function: $V(r) = \\frac{4}{3}\\pi r^3$
+- Derivative: $V'(r) = 4\\pi r^2$
+- Input change: $\\Delta r = \\pm 0.05$ meters
+- Approximate output change: $\\Delta V \\approx V'(r) \\cdot \\Delta r$
+
+At $r = 10$:
+\\[\\Delta V \\approx 4\\pi(10)^2 \\cdot (0.05) = 400\\pi \\cdot 0.05 = 20\\pi \\approx 62.8 \\text{ m}^3\\]
+
+A $\\pm 0.05$ meter error in radius produces approximately $\\pm 62.8$ cubic meters of error in volume.
+
+**Verification:** Exact values: $V(10.05) = \\frac{4}{3}\\pi(10.05)^3 \\approx 4252.0$ m³, $V(10) \\approx 4188.8$ m³. Actual $\\Delta V \\approx 63.2$ m³. Our approximation $62.8$ m³ is accurate to within 1%.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Differential — Formal Names for the Pieces',
+        content: `The linear approximation $\\Delta y \\approx f'(x) \\cdot \\Delta x$ is so useful that mathematicians give its pieces formal names.
+
+**Definition of $dx$:** an **independent variable** representing an arbitrary (small) change in $x$. Unlike $\\Delta x$ (which is a specific measured change), $dx$ is a variable you can set to any value.
+
+**Definition of $dy$:** the **differential** of $y$, defined as:
+\\[dy = f'(x) \\, dx\\]
+
+$dy$ is the change in $y$ along the **tangent line** — not along the actual curve. When $dx$ is small, the tangent line and the curve stay close, so $dy \\approx \\Delta y$.
+
+**For our sphere:** with $y = V$ and $x = r$:
+\\[dV = V'(r) \\, dr = 4\\pi r^2 \\, dr\\]
+
+Plug in $r = 10$ and $dr = 0.05$:
+\\[dV = 4\\pi(100)(0.05) = 20\\pi \\approx 62.8 \\text{ m}^3\\]
+
+**Why Leibniz notation is so powerful:**
+
+Notice that $\\frac{dV}{dr} = 4\\pi r^2$. Multiply both sides by $dr$:
+\\[dV = 4\\pi r^2 \\, dr\\]
+
+This algebraic manipulation — treating $\\frac{dV}{dr}$ like a fraction and "multiplying by $dr$" — is precisely valid in differential notation. Differentials are designed so that this manipulation works. This is the same reason the Chain Rule looks like a fraction cancellation: $\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}$.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Relative Error — Why the Exponent Is an Amplifier',
+        content: `**Absolute error** is the size of the uncertainty: $|dV| \\approx 62.8$ m³.
+
+**Relative error** (also called fractional or percentage error) compares the error to the quantity itself:
+\\[\\text{relative error in } V = \\frac{|dV|}{V}\\]
+
+At $r = 10$:
+\\[V = \\frac{4}{3}\\pi(1000) = \\frac{4000\\pi}{3}\\]
+
+\\[\\frac{|dV|}{V} = \\frac{4\\pi r^2 \\, |dr|}{\\frac{4}{3}\\pi r^3} = \\frac{4\\pi r^2}{\\frac{4}{3}\\pi r^3} \\cdot |dr| = \\frac{3}{r} \\cdot |dr|\\]
+
+Simplify: $\\dfrac{|dV|}{V} = 3 \\cdot \\dfrac{|dr|}{r}$.
+
+This says: the relative error in $V$ is **3 times** the relative error in $r$.
+
+In our case: $\\dfrac{|dr|}{r} = \\dfrac{0.05}{10} = 0.5\\%$.
+
+So $\\dfrac{|dV|}{V} = 3 \\times 0.5\\% = 1.5\\%$.
+
+**Why the factor 3?** It is the exponent in $V \\propto r^3$.
+
+**The general rule:** for $y = x^n$:
+\\[\\frac{dy}{y} = \\frac{nx^{n-1} \\, dx}{x^n} = n \\cdot \\frac{dx}{x}\\]
+
+The relative error in $x^n$ equals $n$ times the relative error in $x$. The exponent amplifies errors.
+
+- Square root ($n = \\frac{1}{2}$): a 2% error in $x$ gives a 1% error in $\\sqrt{x}$. Halved.
+- Square ($n = 2$): a 1% error in $x$ gives a 2% error in $x^2$. Doubled.
+- Cube ($n = 3$): a 1% error in $x$ gives a 3% error in $x^3$. Tripled.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Adding Multiple Errors — The Total Differential',
+        content: `What if a computed quantity depends on multiple measurements, each with its own error?
+
+**Example:** The area of a rectangle is $A = xy$ where both $x$ and $y$ are measured with errors $dx$ and $dy$.
+
+When a function depends on multiple variables, the **total differential** is:
+\\[dA = \\frac{\\partial A}{\\partial x} \\, dx + \\frac{\\partial A}{\\partial y} \\, dy\\]
+
+where $\\frac{\\partial A}{\\partial x}$ means "the partial derivative of $A$ with respect to $x$" — differentiate $A$ treating $y$ as a constant.
+
+For $A = xy$:
+- $\\frac{\\partial A}{\\partial x} = y$ (treat $y$ as constant, differentiate $xy$ with respect to $x$)
+- $\\frac{\\partial A}{\\partial y} = x$ (treat $x$ as constant, differentiate $xy$ with respect to $y$)
+
+Total differential:
+\\[dA = y \\, dx + x \\, dy\\]
+
+**Worst-case error** (errors add, not cancel):
+\\[|dA| \\leq |y| \\cdot |dx| + |x| \\cdot |dy|\\]
+
+**Relative error:**
+\\[\\frac{|dA|}{A} = \\frac{|y| \\cdot |dx| + |x| \\cdot |dy|}{xy} = \\frac{|dx|}{x} + \\frac{|dy|}{y}\\]
+
+The relative error in a product is the **sum** of the individual relative errors. Multiply two quantities, and their percentage errors add. This is why scientists work hard to reduce errors in every measurement — they accumulate.
+
+**Connection to integration:** the equation $dV = 4\\pi r^2 \\, dr$ says the total volume is the sum of infinitely many thin shells of area $4\\pi r^2$ and thickness $dr$. Summing all these shells from $r = 0$ to $r = R$ gives $\\int_0^R 4\\pi r^2 \\, dr = \\frac{4}{3}\\pi R^3$. The differential is the integrand.`,
+      },
+    ],
+    resolution: `**The differential formula and procedure:**
+
+For $y = f(x)$: define $dy = f'(x) \\, dx$.
+
+**To estimate error propagation:**
+1. **Identify the function** $y = f(x)$ connecting input measurement to output quantity.
+2. **Differentiate** using Power Rule, Chain Rule, etc. to get $f'(x)$.
+3. **Write the differential:** $dy = f'(x) \\, dx$.
+4. **Substitute** the known value of $x$ and the measurement uncertainty $dx = \\pm \\delta x$.
+5. **Compute $|dy|$** — this is the approximate absolute error in $y$.
+6. **Compute $|dy|/|y|$** — this is the approximate relative (percentage) error in $y$.
+
+**The exponent amplification rule:** for $y = cx^n$, the relative error in $y$ is $|n|$ times the relative error in $x$:
+\\[\\frac{|dy|}{|y|} = |n| \\cdot \\frac{|dx|}{|x|}\\]
+
+**The bridge to integration:** the equation $dy = f'(x)\\,dx$ says that the total change in $y$ from $a$ to $b$ is the accumulated sum of all the tiny changes $f'(x)\\,dx$. Summing infinitely many of these gives the integral $\\int_a^b f'(x)\\,dx = f(b) - f(a)$ — the Fundamental Theorem of Calculus. The $dx$ in the integral symbol is the same $dx$ as in the differential. It is not decoration — it is the width of an infinitesimal slice.`,
+  },
+
   challenges: [
     {
       id: 'ch3-070-ch1',

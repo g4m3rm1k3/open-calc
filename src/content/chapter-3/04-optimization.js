@@ -907,6 +907,184 @@ fig.show()`,
     },
   ],
 
+  story: {
+    title: 'The Fencing Problem',
+    subtitle: 'You have 100 meters of fence and want the largest possible rectangular enclosure. Intuition says a square. Calculus proves it — and shows exactly what changes when the rules change.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Field, a Fence, and a Question',
+        content: `You own a rectangular plot of land and have exactly 100 meters of fencing. You want to enclose the largest possible area.
+
+You can make the rectangle tall and narrow, short and wide, or anything in between — as long as the total fence used is 100 meters. The question is: which shape gives the most area?
+
+Intuition might say a square. But intuition is not proof. And intuition breaks down fast when the problem changes slightly — what if you have a river on one side so you only need fence on three sides? Does the square answer still hold?
+
+Calculus gives a systematic, complete procedure for answering both questions — and every optimization question like them. The strategy: name the quantities, write what must stay fixed (the **constraint**), write what you want to maximize (the **objective**), eliminate one variable using the constraint, then use the derivative to find the optimal value.
+
+This procedure works whether you are maximizing area, minimizing cost, finding the angle that maximizes a projectile's range, or training a neural network. The geometry changes. The strategy never does.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Naming the Variables — What Are We Working With?',
+        content: `The first step in any optimization problem is to name all quantities with symbols.
+
+**Draw the rectangle.** Label the two dimensions:
+- $x$ = the width (one pair of parallel sides), in meters
+- $y$ = the height (the other pair), in meters
+
+Both $x$ and $y$ are positive real numbers — a degenerate rectangle with a side of length zero encloses no area and is not a valid solution.
+
+**The area** of a rectangle is:
+\\[A = x \\cdot y\\]
+
+This is the quantity we want to maximize. It is called the **objective function** — the thing we are optimizing.
+
+**The constraint** is the total fencing used. Each of the four sides uses some fencing:
+- Two sides of length $x$: contributes $2x$ meters
+- Two sides of length $y$: contributes $2y$ meters
+
+Total: $2x + 2y$ meters.
+
+We have exactly 100 meters available:
+\\[2x + 2y = 100\\]
+
+This is the **constraint equation** — the rule that must always be satisfied. It links $x$ and $y$: you cannot choose them independently. If you make $x$ larger, $y$ must shrink to keep the perimeter at 100.
+
+At this point we have one equation ($2x + 2y = 100$) and two unknowns ($x$ and $y$). To optimize, we need to reduce everything to one variable.`,
+      },
+      {
+        label: 'Act II',
+        title: 'Substitution — Reducing to One Variable',
+        content: `We have two variables $x$ and $y$, but they are linked by the constraint $2x + 2y = 100$. Solve for one in terms of the other.
+
+**Solve the constraint for $y$:**
+\\[2x + 2y = 100\\]
+\\[2y = 100 - 2x\\]
+\\[y = 50 - x\\]
+
+Now $y$ is not a free variable — it is completely determined by $x$.
+
+**Substitute into the objective function:**
+\\[A = x \\cdot y = x(50 - x)\\]
+
+Expand:
+\\[A(x) = 50x - x^2\\]
+
+This is now a single-variable function. We want to find the value of $x$ that makes $A(x)$ as large as possible.
+
+**Domain:** both dimensions must be positive.
+- $x > 0$ (width must be positive)
+- $y = 50 - x > 0 \\Rightarrow x < 50$
+
+So the domain is $x \\in (0, 50)$. This is an open interval — no fence wasted on zero-length sides.
+
+We have reduced the original two-variable problem to: maximize $A(x) = 50x - x^2$ on $(0, 50)$.
+
+This is now a standard single-variable calculus problem. The derivative will find the critical points.`,
+      },
+      {
+        label: 'Act III',
+        title: 'Differentiating and Finding the Critical Point',
+        content: `To find the maximum of $A(x) = 50x - x^2$, we find where $A'(x) = 0$.
+
+**Differentiate $A(x) = 50x - x^2$ using the Power Rule:**
+
+The Power Rule: $\\dfrac{d}{dx}[x^n] = nx^{n-1}$.
+
+Apply term by term:
+- $\\dfrac{d}{dx}[50x] = \\dfrac{d}{dx}[50 x^1] = 50 \\cdot 1 \\cdot x^{1-1} = 50 \\cdot x^0 = 50$
+- $\\dfrac{d}{dx}[-x^2] = -1 \\cdot 2 \\cdot x^{2-1} = -2x$
+
+So:
+\\[A'(x) = 50 - 2x\\]
+
+**Set $A'(x) = 0$ and solve for the critical point:**
+\\[50 - 2x = 0\\]
+\\[2x = 50\\]
+\\[x = 25\\]
+
+There is exactly one critical point: $x = 25$.
+
+**Find $y$ from the constraint:**
+\\[y = 50 - x = 50 - 25 = 25\\]
+
+So both dimensions are 25 meters — a square. Area:
+\\[A = 25 \\times 25 = 625 \\text{ m}^2\\]
+
+But we have only found a *candidate* for the maximum. A critical point where $A' = 0$ could be a maximum, minimum, or saddle point. We must verify which.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Confirming the Maximum — Second Derivative Test',
+        content: `We need to confirm that $x = 25$ is a maximum, not a minimum or saddle.
+
+**The Second Derivative Test:** if $f'(c) = 0$ and $f''(c) < 0$, then $f$ has a **local maximum** at $c$. If $f''(c) > 0$, it is a local minimum.
+
+The intuition: $f''$ measures how the slope is changing. If $f''(c) < 0$, the slope is decreasing through zero — the function was rising, peaked, and is now falling — a maximum. If $f''(c) > 0$, the slope is increasing through zero — a minimum.
+
+**Compute $A''(x)$:** differentiate $A'(x) = 50 - 2x$ using the Power Rule:
+\\[A''(x) = -2\\]
+
+At $x = 25$: $A''(25) = -2 < 0$.
+
+Since $A''(25) < 0$, the area function is **concave down** at $x = 25$. The critical point is a **local maximum**.
+
+Because this is the only critical point on the open interval $(0, 50)$, and because $A(x) \\to 0$ as $x \\to 0^+$ or $x \\to 50^-$ (degenerate rectangles with zero area), this local maximum is also the **global maximum**.
+
+**Conclusion:** the maximum area of $625 \\text{ m}^2$ is achieved by the $25 \\text{ m} \\times 25 \\text{ m}$ square.
+
+The square is optimal — not by intuition, but by calculus.`,
+      },
+      {
+        label: 'Act V',
+        title: 'The River Variant — When the Rules Change',
+        content: `Now suppose one side of the enclosure borders a river. You do not need fence along the river — you only need fence on three sides.
+
+**Re-name:** let $x$ be the two parallel sides perpendicular to the river, $y$ be the single side parallel to the river.
+
+**New constraint** (three sides of fence totaling 100 m):
+\\[2x + y = 100\\]
+
+Solve for $y$:
+\\[y = 100 - 2x\\]
+
+**New objective** (same: maximize area):
+\\[A = x \\cdot y = x(100 - 2x) = 100x - 2x^2\\]
+
+**Domain:** $x > 0$ and $y = 100 - 2x > 0 \\Rightarrow x < 50$. Domain: $(0, 50)$.
+
+**Differentiate using Power Rule:**
+\\[A'(x) = 100 - 4x\\]
+
+Set $A'(x) = 0$:
+\\[100 - 4x = 0 \\Rightarrow x = 25\\]
+
+Then $y = 100 - 2(25) = 50$.
+
+**Check second derivative:**
+\\[A''(x) = -4 < 0 \\quad \\Rightarrow \\text{ maximum confirmed}\\]
+
+**Maximum area:** $A = 25 \\times 50 = 1250 \\text{ m}^2$ — *twice* the four-sided answer.
+
+The river gives you a free side, so the optimal rectangle is **not** a square: it is 25 m × 50 m. The asymmetry in the constraint breaks the square's symmetry. Calculus adapts automatically; intuition alone would fail here.`,
+      },
+    ],
+    resolution: `**The seven-step optimization procedure:**
+
+1. **Draw a picture** and label all relevant quantities with variables.
+2. **Identify the objective:** what are you maximizing or minimizing? Write a formula.
+3. **Identify the constraint:** what fixed relationship must always hold? Write an equation.
+4. **Eliminate one variable:** solve the constraint for one variable and substitute into the objective.
+5. **Differentiate** the single-variable objective and set equal to zero to find critical points.
+6. **Verify** the critical point is a max or min — use the second derivative test ($f'' < 0$ → max, $f'' > 0$ → min) or compare values at all candidates.
+7. **Answer the question** — report both the optimal input value and the optimal output value, with units.
+
+**The Extreme Value Theorem:** on a *closed* interval $[a, b]$, the global max/min is guaranteed to exist (by continuity) and occurs at a critical point or endpoint. On an open interval (as in these word problems), if only one critical point exists and the objective goes to zero (or $\\infty$) at the boundary, the critical point gives the global answer.
+
+**The deeper truth:** every "best" question — minimum cost, maximum efficiency, optimal angle — is an optimization problem. The derivative finds where the rate of improvement drops to zero. That zero is always where the best value lives.`,
+  },
+
   challenges: [
     {
       id: "ch3-004-ch1",

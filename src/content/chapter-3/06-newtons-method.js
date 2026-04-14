@@ -678,6 +678,190 @@ print(f"Repeated cosine: {y:.15f}  (same number, much slower convergence)")`,
     },
   ],
 
+  story: {
+    title: 'Hunting √2',
+    subtitle: 'Your calculator shows √2 = 1.41421356... How does it know? The answer is Newton\'s Method — a tangent-line trick that doubles correct digits with every step.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Number Your Calculator Knows But Cannot Explain',
+        content: `Type $\\sqrt{2}$ into a calculator. It instantly returns $1.41421356237...$
+
+How does it compute that? The calculator has no square root button in its core arithmetic circuits — it can only add, subtract, multiply, and divide. Yet it finds $\\sqrt{2}$ to ten decimal places in microseconds.
+
+The answer: Newton's Method. A procedure that uses tangent lines to hunt down the root of an equation with extraordinary efficiency.
+
+The idea: write "find $\\sqrt{2}$" as "solve the equation $x^2 - 2 = 0$." Start with any rough guess — say $x_0 = 2$ (too high, but close). Draw the tangent line to the curve $f(x) = x^2 - 2$ at the point $(2, f(2))$. Find where that tangent line crosses zero. Use that crossing point as your next, better guess. Repeat.
+
+Each iteration roughly **doubles** the number of correct decimal digits. After 4 iterations from the rough guess $x_0 = 2$, you have $\sqrt{2}$ correct to 10+ decimal places.
+
+Understanding this requires three things: knowing what a root is, knowing how to write the tangent line, and knowing how to find where the tangent line crosses zero. We build each from scratch.`,
+      },
+      {
+        label: 'Act I',
+        title: 'What Is a Root — and What Does It Mean Geometrically?',
+        content: `A **root** (or **zero**) of a function $f$ is any input $x$ where $f(x) = 0$.
+
+Geometrically: the points where the graph of $f$ crosses (or touches) the horizontal axis.
+
+**Our target:** find $\\sqrt{2}$.
+
+We reframe this as a root-finding problem. Define:
+\\[f(x) = x^2 - 2\\]
+
+If $x = \\sqrt{2}$, then $f(\\sqrt{2}) = (\\sqrt{2})^2 - 2 = 2 - 2 = 0$.
+
+So $\\sqrt{2}$ is a root of $f(x) = x^2 - 2$. We have converted "compute a square root" into "find where a parabola crosses the $x$-axis."
+
+**Does this equation definitely have a root between 1 and 2?**
+
+$f(1) = 1 - 2 = -1 < 0$. The parabola is below the axis at $x = 1$.
+$f(2) = 4 - 2 = +2 > 0$. The parabola is above the axis at $x = 2$.
+
+Since $f$ is continuous (polynomials are always continuous) and the sign changes from negative to positive, the **Intermediate Value Theorem** guarantees a root somewhere in $(1, 2)$. We know $\sqrt{2}$ exists in that interval.
+
+Now we need to *find* it — and tangent lines are our tool.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Tangent Line at a Guess Point',
+        content: `The tangent line at any point on a differentiable curve gives us a linear approximation to the function there.
+
+**Our function:** $f(x) = x^2 - 2$.
+
+**Differentiate using the Power Rule** to find the slope at any $x$:
+
+The Power Rule: $\\dfrac{d}{dx}[x^n] = nx^{n-1}$.
+
+Apply term by term:
+- $\\dfrac{d}{dx}[x^2] = 2x^{2-1} = 2x$
+- $\\dfrac{d}{dx}[-2] = 0$ (constants have zero derivative)
+
+So $f'(x) = 2x$.
+
+**Write the tangent line at a starting guess $x_0$.**
+
+At the point $(x_0, f(x_0))$ with slope $f'(x_0) = 2x_0$, the **point-slope form** of the tangent line is:
+\\[y - f(x_0) = f'(x_0)(x - x_0)\\]
+
+Solve for $y$:
+\\[y = f(x_0) + f'(x_0)(x - x_0)\\]
+
+This tangent line is a linear function of $x$. It passes through $(x_0, f(x_0))$ and has slope $2x_0$.
+
+The idea: this straight line is a good local approximation to the curve near $x_0$. The root of the straight line — where it crosses zero — will be a good approximation to the root of the curve.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Newton Formula — Deriving It from the Tangent Line',
+        content: `We want the $x$-value where the tangent line equals zero — that is the next guess $x_1$.
+
+Set $y = 0$ in the tangent line equation:
+\\[0 = f(x_0) + f'(x_0)(x - x_0)\\]
+
+Solve for $x$:
+\\[f'(x_0)(x - x_0) = -f(x_0)\\]
+\\[x - x_0 = \\frac{-f(x_0)}{f'(x_0)}\\]
+\\[x = x_0 - \\frac{f(x_0)}{f'(x_0)}\\]
+
+This value of $x$ is our improved guess. Call it $x_1$:
+\\[\\boxed{x_1 = x_0 - \\frac{f(x_0)}{f'(x_0)}}\\]
+
+Repeat the process from $x_1$ to get $x_2$, and so on. The general iteration is:
+\\[x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}\\]
+
+**What does the formula mean geometrically?** At $x_n$, the function value is $f(x_n)$ (how far above or below the axis we are) and the slope is $f'(x_n)$ (how fast we are moving toward the axis). The ratio $f(x_n)/f'(x_n)$ is "how far to slide along $x$ to reach zero on the tangent line." We subtract it from $x_n$ to get the tangent line's zero.
+
+**For $f(x) = x^2 - 2$:** $f'(x) = 2x$, so:
+\\[x_{n+1} = x_n - \\frac{x_n^2 - 2}{2x_n} = \\frac{2x_n^2 - (x_n^2 - 2)}{2x_n} = \\frac{x_n^2 + 2}{2x_n}\\]
+
+This is the classical formula for computing square roots.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Iterating — Watching the Digits Appear',
+        content: `Start with the rough guess $x_0 = 2$. Apply the formula $x_{n+1} = x_n - \\dfrac{f(x_n)}{f'(x_n)}$ where $f(x) = x^2 - 2$ and $f'(x) = 2x$.
+
+**Iteration 1:** $x_0 = 2$
+
+$f(2) = 4 - 2 = 2$
+
+$f'(2) = 2 \\cdot 2 = 4$
+
+$x_1 = 2 - \\dfrac{2}{4} = 2 - 0.5 = 1.5$
+
+**Iteration 2:** $x_1 = 1.5$
+
+$f(1.5) = 2.25 - 2 = 0.25$
+
+$f'(1.5) = 3$
+
+$x_2 = 1.5 - \\dfrac{0.25}{3} = 1.5 - 0.08333... = 1.41\\overline{6}$
+
+**Iteration 3:** $x_2 = 1.41\\overline{6}$
+
+$f(x_2) = (1.41\\overline{6})^2 - 2 \\approx 2.00694... - 2 = 0.00694...$
+
+$f'(x_2) \\approx 2.833...$
+
+$x_3 \\approx 1.41\\overline{6} - 0.00245... = 1.41421568...$
+
+**Actual $\\sqrt{2} = 1.41421356...$**
+
+After just 3 steps from the crude guess $x_0 = 2$, we have 5 correct decimal places.
+
+**Iteration 4** produces 10+ correct digits.
+
+| Step | $x_n$ | Correct digits |
+|------|--------|---------------|
+| $x_0 = 2$ | $2.000000$ | 0 |
+| $x_1$ | $1.5$ | 1 |
+| $x_2$ | $1.41\\overline{6}$ | 2 |
+| $x_3$ | $1.41421568...$ | 5 |
+| $x_4$ | $1.41421356...$ | 10+ |
+
+The pattern: correct digits roughly double each step.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Why Digits Double — and When It Fails',
+        content: `**Why does Newton's Method converge so fast?**
+
+Near the true root $r$, the tangent line is almost parallel to the curve. The tangent crosses zero very close to where the curve crosses zero. The distance from $x_{n+1}$ to $r$ is roughly proportional to the *square* of the distance from $x_n$ to $r$:
+\\[|x_{n+1} - r| \\approx C \\cdot |x_n - r|^2\\]
+
+where $C = \\dfrac{|f''(r)|}{2|f'(r)|}$ is a constant depending on the curvature. This is called **quadratic convergence**. If your current error is $\\epsilon$, the next error is roughly $C\\epsilon^2$. If $C\\epsilon < 1$, errors shrink rapidly — and once they start shrinking, they shrink very fast.
+
+By contrast, simpler methods like bisection have *linear* convergence: each step halves the error. After 10 bisection steps, you gain 3 decimal places. After 10 Newton steps from a good start, you may gain 1000+ decimal places.
+
+**Three failure modes:**
+
+1. **$f'(x_n) = 0$:** the tangent line is horizontal and never crosses zero. The formula $x_{n+1} = x_n - f(x_n)/f'(x_n)$ has zero in the denominator. Pick a different starting point.
+
+2. **Bad starting guess:** if $x_0$ is too far from the root, the tangent line may overshoot into a region with a different root or cycle endlessly. Always start near the root — use the Intermediate Value Theorem to bracket it first.
+
+3. **Oscillation / cycling:** some functions produce guesses that alternate between two values, never converging. Recognizable as a loop where $x_{n+2} = x_n$.`,
+      },
+    ],
+    resolution: `**The Newton's Method algorithm:**
+
+Given: equation $f(x) = 0$, starting guess $x_0$.
+
+**Step 1:** Compute $f'(x)$ — differentiate once, keep the formula.
+
+**Repeat until converged:**
+- Compute $f(x_n)$ — the function value at the current guess.
+- Compute $f'(x_n)$ — the slope at the current guess.
+- Check: if $f'(x_n) = 0$, pick a new starting point.
+- Update: $x_{n+1} = x_n - \\dfrac{f(x_n)}{f'(x_n)}$
+
+**Stop** when $|x_{n+1} - x_n|$ is smaller than your required precision, or when $|f(x_n)|$ is smaller than your tolerance.
+
+**Convergence is quadratic** — correct digits double each step — once the iteration is near the root.
+
+**The deeper truth:** Newton's Method is linear approximation used backwards. Instead of "given $x$, approximate $f(x)$," we ask: "given that $f(x)$ should be zero, what $x$ does the tangent line predict?" The derivative is the slope of the tangent line; the Newton step is the horizontal distance from current position to where that tangent line hits zero. The entire power of the method flows from the derivative.`,
+  },
+
   challenges: [
     {
       id: 'ch3-060-ch1',

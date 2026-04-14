@@ -437,6 +437,204 @@ fig.show()`,
     },
   ],
 
+  story: {
+    title: "The Navigator's Shortcut",
+    subtitle: 'How to compute √26 to three decimal places with nothing but arithmetic — and the mathematics that makes it work.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'An Ocean, a Square Root, and No Calculator',
+        content: `The year is 1620. You are a navigator on a merchant ship crossing the Atlantic. You need $\\sqrt{26}$ to complete a triangulation calculation for your position.
+
+You have pencil and paper. That is it.
+
+You know $\\sqrt{25} = 5$ exactly — it is a perfect square. But $\\sqrt{26}$? The actual value is $5.09901951...$, an irrational number that goes on forever with no repeating pattern. There is no algebraic formula that produces it in a finite sequence of steps.
+
+What you do have: you know exactly how the function $f(x) = \\sqrt{x}$ behaves *near* $x = 25$. You know its value there. And if you know calculus, you know how fast it is changing there.
+
+**The key insight:** near any known point, every smooth curve looks like a straight line. Find that line and use it as a calculator.
+
+This is **linear approximation** — replacing a curve with its tangent line near a known point. NASA used it for Apollo trajectories. Your phone's processor uses it for every trig and log computation. Engineers use it to simplify nonlinear systems into solvable linear ones. It is one of the most practically powerful ideas in all of mathematics.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Functions and Derivatives — the Two Ingredients',
+        content: `Two things are needed before we can approximate anything: a function and its derivative.
+
+**What is a function?**
+
+A **function** $f$ is a rule: give it an input $x$, it returns an output $f(x)$. For $f(x) = \\sqrt{x}$: input 25, output 5. Input 26, output $\\sqrt{26}$ (unknown). The **graph** is the collection of all points $(x, f(x))$ plotted on a plane — horizontal axis is the input, vertical axis is the output.
+
+**What is the derivative?**
+
+The derivative $f'(x)$ measures the *instantaneous rate of change* of $f$ at the input $x$. Geometrically it is the slope of the curve at the point $(x, f(x))$.
+
+It is defined as a limit — the slope of a secant line taken as the gap shrinks to zero:
+\\[f'(x) = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}\\]
+
+As $h \\to 0$, the secant line through $(x, f(x))$ and $(x+h, f(x+h))$ rotates toward the **tangent line** at $x$.
+
+**Computing $f'(x)$ for $f(x) = \\sqrt{x} = x^{1/2}$**
+
+We use the **Power Rule**: to differentiate $x^n$, multiply by the exponent and reduce the exponent by one.
+\\[\\frac{d}{dx}[x^n] = nx^{n-1}\\]
+
+Here $n = \\tfrac{1}{2}$. Step by step:
+- Bring exponent down as coefficient: $\\tfrac{1}{2} \\cdot x^{1/2}$
+- Reduce exponent by 1: new exponent is $\\tfrac{1}{2} - 1 = -\\tfrac{1}{2}$
+
+\\[f'(x) = \\frac{1}{2} x^{-1/2} = \\frac{1}{2\\sqrt{x}}\\]
+
+At our base point $a = 25$:
+\\[f'(25) = \\frac{1}{2\\sqrt{25}} = \\frac{1}{2 \\cdot 5} = \\frac{1}{10}\\]
+
+The square root function is increasing at a rate of $\\frac{1}{10}$ output-units per input-unit at $x = 25$.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Tangent Line — the Curve\'s Local Substitute',
+        content: `At any differentiable point, a curve has a **tangent line** — the unique line that matches both the curve's value and slope at that point.
+
+At the point $(25, 5)$ on the graph of $\\sqrt{x}$:
+- Point: $(x_1, y_1) = (25, 5)$
+- Slope: $m = f'(25) = \\frac{1}{10}$
+
+From algebra, the **point-slope form** of a line through $(x_1, y_1)$ with slope $m$ is:
+\\[y - y_1 = m(x - x_1)\\]
+
+Substituting our values:
+\\[y - 5 = \\frac{1}{10}(x - 25)\\]
+\\[y = 5 + \\frac{1}{10}(x - 25)\\]
+
+We call this $L(x)$, the **linearization** of $f$ at $a = 25$:
+\\[L(x) = f(a) + f'(a)(x - a)\\]
+
+This formula works for any differentiable function at any base point $a$.
+
+**Why does $L(x)$ approximate $\\sqrt{x}$ near 25?**
+
+At $x = 25$: $L(25) = f(25) = 5$. Both outputs agree. ✓
+Both slopes equal $\\frac{1}{10}$ at $x = 25$. Both directions agree. ✓
+
+They match in both value and slope at the base point. Because the curve is smooth, a small move away from 25 keeps them close. Think of zooming in on the graph of $\\sqrt{x}$ at $(25, 5)$: at high enough magnification, the curve becomes indistinguishable from a straight line — the tangent. This zoom-in property is exactly what **differentiability** means geometrically. Non-differentiable points (like the corner of $|x|$ at $x = 0$) stay sharp no matter how much you zoom.`,
+      },
+      {
+        label: 'Act III',
+        title: 'Computing the Estimate and Measuring the Error',
+        content: `Now we use it.
+
+**Estimating $\\sqrt{26}$** — plug $x = 26$ into $L(x) = 5 + \\frac{1}{10}(x - 25)$:
+\\[L(26) = 5 + \\frac{1}{10}(26 - 25) = 5 + \\frac{1}{10}(1) = 5 + 0.1 = 5.1\\]
+
+Actual value: $\\sqrt{26} = 5.09901951...$
+
+Error: $|5.1 - 5.0990...| \\approx 0.00098$ — less than one thousandth.
+
+**Estimating $\\sqrt{24}$** — plug $x = 24$:
+\\[L(24) = 5 + \\frac{1}{10}(24 - 25) = 5 + \\frac{1}{10}(-1) = 5 - 0.1 = 4.9\\]
+
+Actual: $\\sqrt{24} = 4.89897...$. Error $\\approx 0.001$.
+
+**Where does the error come from?**
+
+The tangent line is straight; the curve bends. The gap between them grows with curvature. By **Taylor's theorem**, the error in the linearization is approximately:
+\\[\\text{error} \\approx \\frac{f''(a)}{2}(x - a)^2\\]
+
+We need $f''(25)$. Differentiate $f'(x) = \\frac{1}{2}x^{-1/2}$ again with the Power Rule:
+- Bring exponent down as coefficient: $\\frac{1}{2} \\cdot (-\\frac{1}{2}) \\cdot x^{-1/2}$
+- Reduce exponent by 1: new exponent is $-\\frac{1}{2} - 1 = -\\frac{3}{2}$
+
+\\[f''(x) = -\\frac{1}{4}x^{-3/2} = -\\frac{1}{4x^{3/2}}\\]
+
+At $a = 25$: $f''(25) = -\\dfrac{1}{4 \\cdot 125} = -\\dfrac{1}{500}$.
+
+Predicted error: $\\dfrac{1/500}{2} \\cdot (1)^2 = \\dfrac{1}{1000} = 0.001$. Matches.
+
+**Critical fact:** error $\\propto (x - a)^2$. Move twice as far from the base point and the error quadruples — not doubles.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'The Five Approximations Every Scientist Knows',
+        content: `The most important linearizations are taken at $a = 0$. The procedure: compute $f(0)$ and $f'(0)$, then $L(x) = f(0) + f'(0) \\cdot x$.
+
+**1. $\\sin x \\approx x$ near $x = 0$**
+
+$f(x) = \\sin x$. $f(0) = 0$. The derivative of sine is cosine (a fundamental trig derivative): $f'(x) = \\cos x$, $f'(0) = \\cos 0 = 1$.
+$L(x) = 0 + 1 \\cdot x = x$.
+
+This is the **small-angle approximation** — the reason simple pendulum clocks keep accurate time.
+
+**2. $\\cos x \\approx 1$ near $x = 0$**
+
+$f(0) = 1$. The derivative of cosine is negative sine: $f'(x) = -\\sin x$, $f'(0) = 0$.
+$L(x) = 1$. So flat at the origin that the tangent is horizontal.
+
+**3. $e^x \\approx 1 + x$ near $x = 0$**
+
+$f(x) = e^x$. The exponential function is its own derivative: $f'(x) = e^x$. So $f'(0) = e^0 = 1$.
+$L(x) = 1 + x$.
+
+**4. $\\ln(1 + x) \\approx x$ near $x = 0$**
+
+$f(x) = \\ln(1+x)$. $f(0) = \\ln 1 = 0$. The derivative of $\\ln u$ is $\\frac{1}{u}$; by the Chain Rule, $f'(x) = \\frac{1}{1+x}$, $f'(0) = 1$.
+$L(x) = x$.
+
+**5. $(1 + x)^n \\approx 1 + nx$ near $x = 0$**
+
+$f(0) = 1$. By Power Rule: $f'(x) = n(1+x)^{n-1}$, $f'(0) = n$.
+$L(x) = 1 + nx$. The **binomial approximation** — used in relativity, optics, and compound interest.
+
+All five are valid for $|x| \\ll 1$. Each has error $O(x^2)$ — proportional to the square of $x$.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Differentials — Naming the Pieces',
+        content: `The linear approximation says: when input $x$ changes by a small amount, the output changes by approximately $f'(x)$ times that amount. Differentials give formal names to these pieces.
+
+Let $y = f(x)$.
+
+- **$dx$** is an independent variable representing a small (but finite) change in $x$.
+- The **differential** $dy$ is defined as $dy = f'(x) \\, dx$.
+
+$dy$ is the change in output along the **tangent line** — not along the actual curve. The actual change along the curve is:
+\\[\\Delta y = f(x + dx) - f(x)\\]
+
+The approximation $\\Delta y \\approx dy$ holds when $dx$ is small, with error $\\approx \\frac{f''(x)}{2}(dx)^2$.
+
+**Error propagation — the practical payoff:**
+
+Suppose you measure $x$ with possible error $\\pm \\Delta x$. The resulting error in $y = f(x)$ is approximately:
+\\[|\\Delta y| \\approx |dy| = |f'(x)| \\cdot |\\Delta x|\\]
+
+The derivative is the **error amplification factor**.
+
+**Example:** A sphere has volume $V = \\frac{4}{3}\\pi r^3$. You measure radius $r = 10$ m with error $\\pm 0.05$ m.
+
+Differentiate using the Power Rule ($n = 3$): $\\frac{dV}{dr} = 4\\pi r^2$.
+
+The differential: $dV = 4\\pi r^2 \\, dr$.
+
+Plug in $r = 10$, $dr = 0.05$:
+\\[dV = 4\\pi (100)(0.05) = 20\\pi \\approx 62.8 \\text{ m}^3\\]
+
+**Relative error:** $\\dfrac{|dV|}{V} = \\dfrac{4\\pi r^2 \\, dr}{\\frac{4}{3}\\pi r^3} = \\dfrac{3 \\, dr}{r} = 3 \\cdot \\dfrac{0.05}{10} = 1.5\\%$.
+
+A 0.5% error in radius produces a 1.5% error in volume — multiplied by 3, the exponent in $V \\propto r^3$. This factor comes directly from the Power Rule and is not a coincidence.`,
+      },
+    ],
+    resolution: `**The complete linear approximation procedure:**
+
+1. **Choose a base point $a$** close to your target — a value where $f(a)$ is known exactly.
+2. **Compute $f(a)$** — the output at the base point.
+3. **Differentiate** to find $f'(x)$ — use Power Rule, trig rules, Chain Rule as needed.
+4. **Evaluate $f'(a)$** — the slope of the tangent line at the base point.
+5. **Write the linearization:** $L(x) = f(a) + f'(a)(x - a)$.
+6. **Plug in your target $x$** and compute $L(x)$.
+7. **Estimate error if needed:** $|\\text{error}| \\approx \\frac{|f''(a)|}{2}(x - a)^2$.
+
+**The deeper truth:** differentiability is exactly the property that makes a curve look like a straight line when zoomed in far enough. The tangent line is the universal local approximation. Every calculator, physics simulation, and engineering model exploits this. Linear approximation is calculus wearing a hard hat.`,
+  },
+
   challenges: [
     {
       id: 'ch3-001-ch1',

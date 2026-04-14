@@ -714,6 +714,196 @@ print()
     },
   ],
 
+  story: {
+    title: "The Forbidden Division",
+    subtitle: "Computing lim sin(x)/x as x → 0 produces 0/0. That expression is undefined. Yet the limit exists and equals 1. Here is why — and the rule that makes all such limits systematic.",
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Limit That Should Not Exist',
+        content: `Consider the limit:
+\\[\\lim_{x \\to 0} \\frac{\\sin x}{x}\\]
+
+Try to evaluate it by direct substitution: plug in $x = 0$.
+
+Numerator: $\\sin 0 = 0$.
+Denominator: $0$.
+
+The expression becomes $\\dfrac{0}{0}$.
+
+Division by zero is undefined. So this limit is... undefined?
+
+No. Try computing $\\dfrac{\\sin x}{x}$ for small values of $x$:
+- $x = 0.1$: $\\dfrac{\\sin 0.1}{0.1} \\approx \\dfrac{0.09983}{0.1} = 0.9983$
+- $x = 0.01$: $\\dfrac{\\sin 0.01}{0.01} \\approx \\dfrac{0.009999}{0.01} = 0.9999$
+- $x = 0.001$: ratio $\\approx 0.999999$
+
+The ratio is clearly approaching 1. The limit exists — it is just that plugging in $x = 0$ cannot reveal it.
+
+This is the hallmark of an **indeterminate form**: a limit where direct substitution gives $\\frac{0}{0}$ (or $\\frac{\\infty}{\\infty}$) — meaningless as an arithmetic expression, but potentially meaningful as a limiting process. L'Hôpital's Rule resolves all such cases.`,
+      },
+      {
+        label: 'Act I',
+        title: 'What a Limit Is — Approached, Not Reached',
+        content: `Before we can handle indeterminate forms, we need a precise definition of what a limit means.
+
+**Definition:** $\\displaystyle\\lim_{x \\to c} f(x) = L$ means: as $x$ gets arbitrarily close to $c$ (but never equal to $c$), $f(x)$ gets arbitrarily close to $L$.
+
+The key word is **never equal to $c$**. The limit describes what the function *approaches*, not what it *equals* at $c$. The value $f(c)$ is irrelevant — or $f$ might not even be defined at $c$.
+
+**Direct substitution** works when $f$ is continuous at $c$ (no jumps or holes): then $\lim_{x\to c} f(x) = f(c)$. But it fails when:
+1. $f(c)$ is undefined (like $\frac{\sin x}{x}$ at $x = 0$)
+2. $f(c)$ exists but $\lim_{x \to c} f(x) \neq f(c)$ (a removable discontinuity)
+
+**Why is $\frac{0}{0}$ indeterminate?**
+
+$\dfrac{0}{0}$ has no arithmetic meaning — division by zero is undefined. But as a *limit*, the numerator and denominator both approach zero simultaneously. Their *ratio* could approach anything: 1, 3, 0, $\infty$, or not exist at all. The form $\frac{0}{0}$ tells you direct substitution failed — it says nothing about the actual limit value.
+
+For example:
+- $\lim_{x \to 0} \dfrac{x}{x} = 1$ ($0/0$ form, limit is 1)
+- $\lim_{x \to 0} \dfrac{x^2}{x} = 0$ ($0/0$ form, limit is 0)
+- $\lim_{x \to 0} \dfrac{x}{x^2}$ does not exist ($0/0$ form, blows up)
+
+Same form, completely different answers. This is why $\frac{0}{0}$ is "indeterminate" — it does not determine the limit.`,
+      },
+      {
+        label: 'Act II',
+        title: 'Why the Rule Works — Linear Approximation Near a Zero',
+        content: `L'Hôpital's Rule is not magic. It follows from linear approximation, which you already know.
+
+**Recall:** near any differentiable point $c$, a function looks like its tangent line. Specifically, if $f(c) = 0$, then near $x = c$:
+\\[f(x) \\approx f'(c)(x - c)\\]
+
+Why? The linearization is $f(x) \\approx f(c) + f'(c)(x - c)$. When $f(c) = 0$, the constant term vanishes, leaving only the slope term.
+
+**Now consider the ratio $\dfrac{f(x)}{g(x)}$ where both $f(c) = 0$ and $g(c) = 0$.**
+
+Near $x = c$, both functions look like their derivatives times $(x - c)$:
+\\[f(x) \\approx f'(c)(x - c)\\]
+\\[g(x) \\approx g'(c)(x - c)\\]
+
+Divide:
+\\[\\frac{f(x)}{g(x)} \\approx \\frac{f'(c)(x - c)}{g'(c)(x - c)}\\]
+
+The factor $(x - c)$ appears in both numerator and denominator. **Cancel it:**
+\\[\\frac{f(x)}{g(x)} \\approx \\frac{f'(c)}{g'(c)}\\]
+
+Taking the limit as $x \\to c$: if $f'(c)$ and $g'(c)$ exist and $g'(c) \\neq 0$:
+\\[\\lim_{x \\to c} \\frac{f(x)}{g(x)} = \\frac{f'(c)}{g'(c)}\\]
+
+This is L'Hôpital's Rule. It works because both functions, near their shared zero, are proportional to $(x - c)$ — and that common factor cancels in the ratio.`,
+      },
+      {
+        label: 'Act III',
+        title: 'Applying the Rule — Step by Step',
+        content: `Now we apply L'Hôpital's Rule to actual problems. The key requirement: **verify the indeterminate form first**.
+
+**Always write the form check before applying the rule.**
+
+---
+
+**Example 1:** $\\displaystyle\\lim_{x \\to 0} \\dfrac{\\sin x}{x}$
+
+Check: $\\sin 0 = 0$ and denominator $= 0$. **Form: $0/0$. ✓**
+
+Differentiate numerator: $\\dfrac{d}{dx}[\\sin x] = \\cos x$.
+Differentiate denominator: $\\dfrac{d}{dx}[x] = 1$.
+
+Apply rule:
+\\[\\lim_{x \\to 0} \\frac{\\sin x}{x} = \\lim_{x \\to 0} \\frac{\\cos x}{1} = \\frac{\\cos 0}{1} = \\frac{1}{1} = 1\\]
+
+---
+
+**Example 2:** $\\displaystyle\\lim_{x \\to 0} \\dfrac{e^x - 1}{x}$
+
+Check: $e^0 - 1 = 0$ and denominator $= 0$. **Form: $0/0$. ✓**
+
+Differentiate numerator: $\\dfrac{d}{dx}[e^x - 1] = e^x$.
+Differentiate denominator: $\\dfrac{d}{dx}[x] = 1$.
+
+\\[\\lim_{x \\to 0} \\frac{e^x - 1}{x} = \\lim_{x \\to 0} \\frac{e^x}{1} = e^0 = 1\\]
+
+---
+
+**Example 3: applying twice.** $\\displaystyle\\lim_{x \\to 0} \\dfrac{x - \\sin x}{x^3}$
+
+Check: numerator $= 0 - 0 = 0$, denominator $= 0$. **Form: $0/0$. ✓**
+
+First application: $\\dfrac{1 - \\cos x}{3x^2}$. Check again: $1 - \\cos 0 = 0$, denominator $= 0$. Still $0/0$. Apply again:
+$\\dfrac{\\sin x}{6x}$. Still $0/0$ at $x = 0$. Apply once more: $\\dfrac{\\cos x}{6}$.
+
+At $x = 0$: $\\dfrac{\\cos 0}{6} = \\dfrac{1}{6}$.
+
+Each application is valid because the form was verified at each step.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'The ∞/∞ Form and Chaining',
+        content: `L'Hôpital's Rule also applies when both numerator and denominator approach $\\pm\\infty$.
+
+**Formal statement (both forms):**
+
+If $\\lim_{x \\to c} f(x) = 0$ and $\\lim_{x \\to c} g(x) = 0$, **or** if both limits are $\\pm\\infty$, and if $g'(x) \\neq 0$ near $c$, and if $\\lim_{x \\to c} \\frac{f'(x)}{g'(x)}$ exists (or is $\\pm\\infty$), then:
+\\[\\lim_{x \\to c} \\frac{f(x)}{g(x)} = \\lim_{x \\to c} \\frac{f'(x)}{g'(x)}\\]
+
+The rule also applies for one-sided limits and for $x \\to \\pm\\infty$.
+
+**Example:** $\\displaystyle\\lim_{x \\to \\infty} \\dfrac{\\ln x}{x}$
+
+Check: $\\ln x \\to \\infty$ and $x \\to \\infty$. **Form: $\\infty/\\infty$. ✓**
+
+Differentiate: $\\dfrac{1/x}{1} = \\dfrac{1}{x} \\to 0$.
+
+So $\\lim_{x \\to \\infty} \\dfrac{\\ln x}{x} = 0$. Logarithm grows far slower than $x$.
+
+**Critical warning:** verify the form **every time**, including after each application. If the form is not $0/0$ or $\\infty/\\infty$, L'Hôpital's Rule does not apply. Applying it to a non-indeterminate limit can give a wrong answer.
+
+**Example of misuse:** $\\displaystyle\\lim_{x \\to 0} \\dfrac{x + 1}{x - 1}$. Numerator $\\to 1 \\neq 0$. This is NOT $0/0$ form. The correct limit is $\\frac{1}{-1} = -1$. Applying L'Hôpital would give $\\frac{1}{1} = 1$ — wrong.`,
+      },
+      {
+        label: 'Act V',
+        title: 'The Seven Indeterminate Forms',
+        content: `L'Hôpital's Rule directly handles $0/0$ and $\\infty/\\infty$. Five other forms — $0 \\cdot \\infty$, $\\infty - \\infty$, $1^\\infty$, $0^0$, $\\infty^0$ — all convert to one of those two through algebra.
+
+**Form $0 \\cdot \\infty$:** write as a fraction.
+
+$\\lim f(x) \\cdot g(x)$ where $f \\to 0$ and $g \\to \\infty$. Rewrite as $\\dfrac{f(x)}{1/g(x)}$ (now $0/0$) or $\\dfrac{g(x)}{1/f(x)}$ (now $\\infty/\\infty$). Choose whichever fraction differentiates more simply.
+
+**Form $\\infty - \\infty$:** find a common denominator or factor.
+
+$\\lim (f(x) - g(x))$ where both $\\to \\infty$. Algebraically combine into one fraction, then check for $0/0$ or $\\infty/\\infty$.
+
+**Forms $1^\\infty$, $0^0$, $\\infty^0$:** take the logarithm.
+
+If $L = \\lim f(x)^{g(x)}$, then $\\ln L = \\lim g(x) \\cdot \\ln f(x)$. The exponent is now a product — apply the $0 \\cdot \\infty$ conversion, then L'Hôpital. Once you find $\\ln L = K$, conclude $L = e^K$.
+
+**Example:** $\\displaystyle\\lim_{x \\to 0^+} x^x$ — form $0^0$.
+
+Let $L = \\lim x^x$. Then $\\ln L = \\lim x \\ln x$ — form $0 \\cdot (-\\infty)$.
+
+Rewrite: $\\dfrac{\\ln x}{1/x}$ — form $-\\infty/\\infty$. Apply L'Hôpital:
+\\[\\frac{1/x}{-1/x^2} = \\frac{1/x \\cdot x^2}{-1} = \\frac{x}{-1} = -x \\to 0\\]
+
+So $\\ln L = 0$, which gives $L = e^0 = 1$.`,
+      },
+    ],
+    resolution: `**L'Hôpital's Rule — formal statement:**
+
+If $\\lim_{x \\to c} f(x) = \\lim_{x \\to c} g(x) = 0$ or both $= \\pm\\infty$, and $g'(x) \\neq 0$ near $c$, and $\\lim_{x \\to c} f'(x)/g'(x)$ exists, then:
+\\[\\lim_{x \\to c} \\frac{f(x)}{g(x)} = \\lim_{x \\to c} \\frac{f'(x)}{g'(x)}\\]
+
+**The six-step procedure:**
+
+1. **Substitute** to identify the form. Write "form: $0/0$" or "form: $\\infty/\\infty$" explicitly.
+2. **If not one of those two forms**, do not apply L'Hôpital. Use algebra or direct evaluation.
+3. **Differentiate** numerator and denominator **separately** (NOT the quotient rule).
+4. **Check the new limit** — if still $0/0$ or $\\infty/\\infty$, apply again.
+5. **Verify** that $g'(x) \\neq 0$ near $c$.
+6. **Evaluate** the final limit by substitution.
+
+**The most important distinction:** L'Hôpital is $\\lim f/g = \\lim f'/g'$. The quotient rule is $(f/g)' = (f'g - fg')/g^2$. They look similar and compute completely different things. L'Hôpital applies to **limits**. The quotient rule applies to **derivatives**. Confusing them is catastrophic.`,
+  },
+
   challenges: [
     {
       id: "ch3-005-ch1",

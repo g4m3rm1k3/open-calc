@@ -597,6 +597,163 @@ export default {
     },
   ],
 
+  story: {
+    title: 'The Ball That Must Stop',
+    subtitle: 'Throw a ball straight up and catch it at the same height. At the peak its velocity was exactly zero. Here is the proof that this was never a coincidence — it was inevitable.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'An Inevitable Pause',
+        content: `You throw a ball straight up. It leaves your hand going upward, gravity slows it, it reaches a peak, then falls back. You catch it at the same height you released it.
+
+Question: must the ball's velocity have been exactly zero at some instant?
+
+Intuitively, yes — at the peak it is momentarily suspended. But "intuitively, yes" is not mathematics.
+
+Let $f(t)$ be the height of the ball at time $t$. You release at time $a$, catch at time $b$, and $f(a) = f(b)$ — same height. Velocity is $f'(t)$, the derivative.
+
+**Claim:** there exists some time $c$ strictly between $a$ and $b$ where $f'(c) = 0$.
+
+This is **Rolle's Theorem**. Proving it requires building three precise tools from the ground up: a definition of "smooth" (continuity and differentiability), a theorem guaranteeing that maxima and minima are actually attained, and a result connecting extrema to zero derivatives. We build each one from scratch.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Continuity — No Teleportation Allowed',
+        content: `The first requirement is continuity — the function must have no sudden jumps or gaps.
+
+**Formal definition:** $f$ is **continuous at $a$** if:
+\\[\\lim_{x \\to a} f(x) = f(a)\\]
+
+Three things must all hold:
+1. $f(a)$ exists — the function is defined at $a$.
+2. The limit $\\lim_{x \\to a} f(x)$ exists — the function approaches a single finite value as $x \\to a$.
+3. The limit equals the function value — no gap between the limit and what the function actually outputs there.
+
+**What does this mean in plain language?** No sudden jumps. No teleportation. As the input $x$ creeps toward $a$ from either side, the output $f(x)$ creeps toward $f(a)$. You can draw the graph through $(a, f(a))$ without lifting your pen.
+
+**Continuity on a closed interval $[a, b]$** means the function is continuous at every point in the interval (using one-sided limits at the endpoints).
+
+**Why is continuity required for Rolle's Theorem?**
+
+Without it, a function could start at $f(a)$, jump discontinuously up to some high value, then jump back down to $f(b) = f(a)$ — all without its *slope* ever being zero. Continuity forces the function to travel smoothly between its values, preventing this kind of cheating.
+
+**Counterexample without continuity:** define $f(x) = x$ on $[0, 1]$ except $f(0.5) = 10$. Then $f(0) = f(1) = $ their values, but the spike at $0.5$ has infinite slope on both sides. Rolle's fails.`,
+      },
+      {
+        label: 'Act II',
+        title: 'Differentiability — No Sharp Corners',
+        content: `The second requirement is differentiability — the function must be smooth enough to have a well-defined slope at every interior point.
+
+**Formal definition:** $f$ is **differentiable at $x$** if the following limit exists:
+\\[f'(x) = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}\\]
+
+This limit must be the same value whether $h$ approaches 0 from the positive side or the negative side.
+
+**What can go wrong? Corners.**
+
+Consider $f(x) = |x|$ at $x = 0$. Compute the limit from each side:
+- From the **right** ($h > 0$): $\\dfrac{|0+h| - |0|}{h} = \\dfrac{h}{h} = +1$
+- From the **left** ($h < 0$): $\\dfrac{|0+h| - |0|}{h} = \\dfrac{-h}{h} = -1$
+
+Right limit is $+1$, left limit is $-1$. They disagree — no derivative at $x = 0$.
+
+**Why this matters for Rolle's Theorem:**
+
+Consider $f(x) = |x|$ on $[-1, 1]$. We have $f(-1) = f(1) = 1$ — same endpoints. The function is continuous. The only candidate for a horizontal tangent is near $x = 0$, but $f'(0)$ does not exist.
+
+Indeed: $f'(x) = -1$ for $x < 0$ and $f'(x) = +1$ for $x > 0$. There is no $c \\in (-1, 1)$ with $f'(c) = 0$.
+
+Rolle's Theorem only requires differentiability on the **open** interval $(a, b)$ — not at the endpoints themselves. Corners at the endpoints are fine; corners inside are not.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Extreme Value Theorem — Maxima Must Be Reached',
+        content: `We need to know that the function actually *achieves* its highest and lowest values — they are not just limits that the function approaches but never reaches.
+
+**Extreme Value Theorem (EVT):** If $f$ is continuous on a closed interval $[a, b]$, then $f$ attains both its global maximum and global minimum on $[a, b]$.
+
+That means: there exist specific points $c_{\\max}$ and $c_{\\min}$ in $[a, b]$ where $f(c_{\\max})$ equals the largest value $f$ takes and $f(c_{\\min})$ equals the smallest.
+
+**Why is this non-trivial?**
+
+The theorem fails on open intervals. Consider $f(x) = x$ on $(0, 1)$ — the function approaches 1 as $x \\to 1$ but never equals 1 (since $x = 1$ is not in the domain). No maximum is attained.
+
+It also fails for discontinuous functions. A jump discontinuity allows the function to "skip over" the would-be maximum.
+
+**The EVT relies on the completeness of the real numbers** — the fact that the real line has no gaps. This is a deep theorem; we accept it here.
+
+**What the EVT gives us for Rolle's Theorem:**
+
+We know $f(a) = f(b)$. The EVT guarantees the maximum and minimum are each attained at *some specific point* in $[a, b]$. We do not need to find those points — we just need to know they exist. They are our candidates for zero-derivative locations.`,
+      },
+      {
+        label: 'Act IV',
+        title: "Fermat's Theorem — Extrema Have Zero Derivatives",
+        content: `The final ingredient connects interior maxima and minima to zero derivatives.
+
+**Fermat's Interior Extremum Theorem:** If $f$ has a local maximum or local minimum at an interior point $c \\in (a, b)$, and $f'(c)$ exists, then $f'(c) = 0$.
+
+**Proof for a local maximum:**
+
+At a local maximum at $c$: for small $|h|$, $f(c + h) \\leq f(c)$. So the numerator of the difference quotient $f(c+h) - f(c) \\leq 0$.
+
+Look at the sign of the difference quotient from each side:
+- **From the right** ($h > 0$): numerator $\\leq 0$, denominator $> 0$. Ratio $\\leq 0$.
+- **From the left** ($h < 0$): numerator $\\leq 0$, denominator $< 0$. Ratio $\\geq 0$.
+
+Taking $h \\to 0^+$: the right-hand derivative $\\leq 0$.
+Taking $h \\to 0^-$: the left-hand derivative $\\geq 0$.
+
+Since $f'(c)$ exists, both one-sided limits must equal the same value $f'(c)$.
+
+The only value that is simultaneously $\\leq 0$ and $\\geq 0$ is zero:
+\\[f'(c) = 0\\]
+
+An identical argument with reversed inequalities proves $f'(c) = 0$ at a local minimum.
+
+**The key message:** at any interior point where $f$ achieves a maximum or minimum and where $f$ is differentiable, the tangent line is horizontal. The derivative is zero.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Assembling the Proof',
+        content: `We now have every ingredient. Here is the full proof.
+
+**Rolle's Theorem:** If $f$ is continuous on $[a, b]$, differentiable on $(a, b)$, and $f(a) = f(b)$, then there exists $c \\in (a, b)$ with $f'(c) = 0$.
+
+**Proof:**
+
+*Case 1: $f$ is constant on $[a, b]$.*
+
+Then $f'(x) = 0$ everywhere on $(a, b)$. Any $c$ in $(a, b)$ works. $\\square$
+
+*Case 2: $f$ is not constant.*
+
+Since $f$ is not constant, it takes at least one value different from $f(a)$ somewhere in the interval.
+
+**Step 1 — EVT.** Since $f$ is continuous on $[a, b]$, the Extreme Value Theorem guarantees that $f$ attains its maximum $M$ at some point and its minimum $m$ at some point in $[a, b]$.
+
+**Step 2 — Interior extremum.** Since $f$ is not constant, at least one of $M$ or $m$ differs from $f(a) = f(b)$. That extremum cannot be attained only at the endpoints (since both endpoints have value $f(a)$). Therefore it must be attained at some interior point $c \\in (a, b)$.
+
+**Step 3 — Fermat.** Since $f$ is differentiable on $(a, b)$ and $c$ is an interior point where $f$ attains a local extremum, Fermat's theorem gives:
+\\[f'(c) = 0 \\quad \\square\\]
+
+**The logical chain:** Continuity $\\to$ EVT $\\to$ interior extremum exists. Differentiability at that point $\\to$ Fermat $\\to$ derivative is zero.
+
+The ball at its peak: $f(a) = f(b)$ forces the maximum or minimum to be achieved at an interior point. Fermat forces the derivative to be zero there. The pause was never a coincidence — the mathematics made it inevitable.`,
+      },
+    ],
+    resolution: `**How to apply Rolle's Theorem in four steps:**
+
+1. **Verify continuity** on $[a, b]$ — no jumps, holes, or vertical asymptotes.
+2. **Verify differentiability** on $(a, b)$ — no corners or cusps at interior points.
+3. **Verify equal endpoints:** check that $f(a) = f(b)$.
+4. **Conclude:** there exists $c \\in (a, b)$ with $f'(c) = 0$. To find $c$, solve $f'(x) = 0$.
+
+**The root-counting application:** if a polynomial $p(x)$ of degree $n$ had $n + 1$ roots, Rolle's Theorem would supply $n$ roots of $p'(x)$. But $p'$ has degree $n - 1$ and can have at most $n - 1$ roots — a contradiction. Therefore any degree-$n$ polynomial has at most $n$ real roots.
+
+**Connection to the MVT:** Rolle's Theorem is the special case of the Mean Value Theorem where $f(a) = f(b)$. Historically, Rolle came first; the MVT is proved by applying Rolle's to a cleverly tilted function. The logical dependency runs: Rolle's → MVT, even though MVT is the more general result.`,
+  },
+
   challenges: [
     {
       id: "ch3-025-ch1",
