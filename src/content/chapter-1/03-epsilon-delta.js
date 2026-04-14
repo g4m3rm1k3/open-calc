@@ -501,6 +501,270 @@ export default {
     },
   ],
 
+  story: {
+    title: 'The Skeptic\'s Game',
+    subtitle: 'For 150 years, calculus worked but nobody could prove why. The ε-δ definition fixed that — by turning "getting close" into a game you can always win.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Challenge That Broke Mathematics',
+        content: `The year is 1734. Calculus has been around for 60 years. Newton used it to predict planetary orbits. Leibniz used it to solve curves no one had solved before. Engineers are building things with it.
+
+And a bishop named George Berkeley publishes a pamphlet that breaks everything.
+
+He asks: what exactly is $dx$? When you compute a derivative, you write $\\frac{dy}{dx}$ and treat $dx$ as a tiny number — small enough to ignore when convenient, but nonzero when you need to divide by it. Berkeley calls this contradictory. He writes:
+
+> *"And what are these fluxions? The velocities of evanescent increments. And what are these same evanescent increments? They are neither finite quantities, nor quantities infinitely small, nor yet nothing. May we not call them the ghosts of departed quantities?"*
+
+He is right. Nobody can answer him. For 90 years, the foundation of calculus is officially a mystery.
+
+Then in 1821, a French mathematician named Augustin-Louis Cauchy publishes a textbook. He does not use infinitesimals. He does not appeal to motion or intuition. He uses only two numbers — which we now call $\\epsilon$ and $\\delta$ — and rewrites the entire definition of a limit as a game you play with a skeptic. A game you can always win, if the limit is real.
+
+Berkeley's ghost was finally caught.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Translating "Close" into Numbers — Error and Tolerance',
+        content: `Before the definition, we need one tool: **absolute value as distance (error)**.
+
+The **absolute value** of a number $a$, written $|a|$, is its distance from zero on the number line.
+- $|3| = 3$ — three steps from zero
+- $|-3| = 3$ — also three steps from zero, in the other direction
+- $|0| = 0$ — already at zero
+
+**The distance (or error) between two numbers** $a$ and $b$ is $|a - b|$.
+- Error between 5 and 3: $|5 - 3| = 2$
+- Error between 3 and 5: $|3 - 5| = |-2| = 2$
+
+Same answer either way — distance does not have a direction.
+
+---
+
+**Translating "close" into a checkable inequality:**
+
+When we say "$x$ is close to 3," we mean the input error $|x - 3|$ (the distance from $x$ to 3) is small.
+
+When we say "$f(x)$ is close to 7," we mean the output error $|f(x) - 7|$ (the distance from the output to the target) is small.
+
+The $\\epsilon$-$\\delta$ definition replaces every fuzzy word — "close," "approaching," "nearly" — with a precise inequality:
+
+| Fuzzy language | Precise meaning |
+|---|---|
+| "$x$ is close to 3" | input error $\\|x - 3\\| < \\delta$ |
+| "$f(x)$ is close to 7" | output error $\\|f(x) - 7\\| < \\epsilon$ |
+| "as close as you want" | for any tolerance $\\epsilon > 0$ you name |
+| "I can guarantee it" | I can find a $\\delta$ that makes it true |
+
+**The key rule for solving these inequalities:** $|A| < r$ means the same thing as $-r < A < r$.
+
+Why? $|A|$ is the distance from $A$ to zero. Saying that distance is less than $r$ means $A$ is inside the window $(-r, r)$ — between $-r$ and $r$.
+
+**Example:** $|x - 3| < 0.25$ means $-0.25 < x - 3 < 0.25$. Add 3 to all parts: $2.75 < x < 3.25$. So $x$ is within 0.25 of 3.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Game — Play It First, Understand It After',
+        content: `You claim: $\\lim_{x \\to 3}(2x + 1) = 7$.
+
+A skeptic does not believe you. They challenge you with an **output tolerance** $\\epsilon$ — how close the output must be to 7. You respond with an **input tolerance** $\\delta$ — how close you will keep $x$ to 3. If your $\\delta$ works, you win the round.
+
+**The rules:**
+- Skeptic picks $\\epsilon$ (output demand). You have no say.
+- You pick $\\delta$ (input restriction). You respond to $\\epsilon$.
+- You win if: restricting input to within $\\delta$ of 3 forces output within $\\epsilon$ of 7.
+
+---
+
+**Round 1**
+
+> **Skeptic:** "I bet $f(x)$ won't stay within $\\pm 0.5$ of 7. Prove it does."
+> **You:** "Fine. Keep $x$ within $\\pm 0.25$ of 3."
+> **Check:** output error $= 2 \\times 0.25 = 0.5$. ✓ You win.
+
+**Round 2**
+
+> **Skeptic:** "Tighter. Stay within $\\pm 0.01$ of 7."
+> **You:** "Keep $x$ within $\\pm 0.005$ of 3."
+> **Check:** output error $= 2 \\times 0.005 = 0.01$. ✓ You win.
+
+**Round 3**
+
+> **Skeptic:** "Within $\\pm 0.000001$ of 7."
+> **You:** "Keep $x$ within $\\pm 0.0000005$ of 3."
+> **Check:** $2 \\times 0.0000005 = 0.000001$. ✓ You win.
+
+---
+
+**The pattern:** every time, you just cut the skeptic's number in half. Output moves twice as fast as input, so you need half the input room to match the output demand.
+
+**The microscope view:** think of the skeptic handing you a more and more powerful microscope — $10\\times$, $1{,}000\\times$, $1{,}000{,}000\\times$. No matter how much they zoom in on the output, you can always zoom in twice as much on the input and the function stays right on target. That is what "$\\lim_{x \\to 3} f(x) = 7$" really means: the limit survives any level of magnification.
+
+The skeptic can demand any precision. You can always deliver it. **The limit is real.**`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Cheat Code — Why δ = ε/2 Always Works',
+        content: `You won every round by halving the skeptic's number. But *why* does cutting in half always work? Here is the algebra behind it — the "cheat code."
+
+**The gear ratio insight:**
+
+Think of $f(x) = 2x + 1$ as a machine with a **2:1 gear ratio**. For every 1 step you take on the $x$-axis (input), the output moves 2 steps on the $y$-axis. The function stretches distances by a factor of 2.
+
+That means: if the output must stay within $\\epsilon$, the input must stay within $\\epsilon/2$ — half as much room, because the machine doubles every move.
+
+**The algebra that proves it:**
+
+We want to connect the output error $|f(x) - 7|$ to the input error $|x - 3|$.
+
+**Step 1:** Substitute $f(x) = 2x + 1$ into the output error:
+\\[|f(x) - 7| = |(2x + 1) - 7|\\]
+
+**Step 2:** Simplify inside the absolute value:
+\\[|(2x + 1) - 7| = |2x - 6|\\]
+
+**Step 3:** Factor out 2 using the rule $|ab| = |a| \\cdot |b|$:
+\\[|2x - 6| = |2(x - 3)| = 2 \\cdot |x - 3|\\]
+
+**Result:**
+\\[\\underbrace{|f(x) - 7|}_{\\text{output error}} = 2 \\cdot \\underbrace{|x - 3|}_{\\text{input error}}\\]
+
+Output error is exactly 2 times input error. The gear ratio is confirmed.
+
+**Now solve for the required input restriction:**
+
+We need output error $< \\epsilon$:
+\\[2|x - 3| < \\epsilon\\]
+
+Divide both sides by 2:
+\\[|x - 3| < \\frac{\\epsilon}{2}\\]
+
+So: set $\\delta = \\dfrac{\\epsilon}{2}$. Restrict input to within $\\delta$ of 3. Output is guaranteed within $\\epsilon$ of 7.
+
+This is not a coincidence — it is the gear ratio. The 2 in $f(x) = 2x + 1$ caused the 2 in $\\delta = \\epsilon/2$.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'The Formal Definition — Every Word Earns Its Place',
+        content: `Now write the game as a single precise statement.
+
+**The $\\epsilon$-$\\delta$ definition of a limit:**
+
+$\\lim_{x \\to c} f(x) = L$ means:
+
+> For every $\\epsilon > 0$, there exists $\\delta > 0$ such that: if $0 < |x - c| < \\delta$, then $|f(x) - L| < \\epsilon$.
+
+Every word carries weight:
+
+**"For every $\\epsilon > 0$"** — the skeptic moves first. They pick any positive tolerance, no matter how small. You have no say in what $\\epsilon$ is.
+
+**"there exists $\\delta > 0$"** — you respond. You must produce a specific positive $\\delta$ that works for the $\\epsilon$ you were given. You cannot pick $\\epsilon$; you respond to it.
+
+**"such that"** — your $\\delta$ must make the following guarantee true.
+
+**"if $0 < |x - c| < \\delta$"** — $x$ is within $\\delta$ of $c$, AND $x \\neq c$. Translated using our absolute value rule: $c - \\delta < x < c + \\delta$ with $x \\neq c$. The strict $0 < |x - c|$ excludes the point $x = c$ itself — the limit describes approach, not arrival.
+
+**"then $|f(x) - L| < \\epsilon$"** — the output lands within $\\epsilon$ of $L$. This is the guarantee you must deliver.
+
+The definition says nothing about infinity, motion, or time. It is a statement about numbers and inequalities — checkable, algebraic, airtight.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Writing the Proof — Two Phases, Every Step Shown',
+        content: `**Claim:** $\\lim_{x \\to 3}(2x + 1) = 7$.
+
+Every $\\epsilon$-$\\delta$ proof has two phases. Phase 1 is private scratch work — you find what $\\delta$ needs to be. Phase 2 is the public proof — you use that $\\delta$ to deliver the guarantee. The audience only sees Phase 2, but Phase 1 is where the real thinking happens.
+
+---
+
+**Phase 1 — Scratch work (work backwards from the goal).**
+
+Goal: make $|f(x) - 7| < \\epsilon$.
+
+**Step 1:** Expand $|f(x) - 7|$ completely.
+\\[|f(x) - 7| = |(2x + 1) - 7|\\]
+
+**Step 2:** Simplify inside the absolute value.
+\\[|(2x + 1) - 7| = |2x - 6|\\]
+
+**Step 3:** Factor out the constant using $|ab| = |a||b|$.
+\\[|2x - 6| = |2(x - 3)| = |2| \\cdot |x - 3| = 2|x - 3|\\]
+
+**Step 4:** Now we have $|f(x) - 7| = 2|x - 3|$. We need this to be $< \\epsilon$:
+\\[2|x - 3| < \\epsilon\\]
+
+**Step 5:** Divide both sides by 2:
+\\[|x - 3| < \\frac{\\epsilon}{2}\\]
+
+This tells us: if we restrict $|x - 3| < \\dfrac{\\epsilon}{2}$, the output error will be $< \\epsilon$.
+
+**Choose:** $\\delta = \\dfrac{\\epsilon}{2}$.
+
+---
+
+**Phase 2 — The formal proof (write it forward, cleanly).**
+
+*Proof.* Let $\\epsilon > 0$ be given. Set $\\delta = \\dfrac{\\epsilon}{2}$.
+
+Suppose $0 < |x - 3| < \\delta$. Then:
+
+\\[|f(x) - 7| = |(2x+1) - 7| = |2x - 6| = 2|x - 3| < 2\\delta = 2 \\cdot \\frac{\\epsilon}{2} = \\epsilon\\]
+
+Therefore $|f(x) - 7| < \\epsilon$. $\\square$
+
+---
+
+**The structure of Phase 2 is always the same chain:**
+
+start from $|x - c| < \\delta$ $\\longrightarrow$ algebra $\\longrightarrow$ arrive at $|f(x) - L| < \\epsilon$.
+
+Phase 1 is doing that chain in reverse to find $\\delta$. Phase 2 runs it forward as a clean proof.`,
+      },
+      {
+        label: 'Act VI',
+        title: 'Why the Definition Requires 0 < |x − c| — and What It Means',
+        content: `One detail of the definition is subtle enough to deserve its own act.
+
+The condition is $0 < |x - c| < \\delta$, not just $|x - c| < \\delta$.
+
+The $0 < |x - c|$ part means $x \\neq c$. We explicitly exclude the point $x = c$ itself.
+
+**Why?**
+
+Because a limit describes what $f(x)$ approaches as $x$ gets close to $c$ — it says nothing about $f(c)$. This matters in three important cases:
+
+**Case 1: $f(c)$ is undefined.**
+
+$f(x) = \\dfrac{x^2 - 9}{x - 3}$ is undefined at $x = 3$ (division by zero). But:
+\\[\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3} = \\lim_{x \\to 3} \\frac{(x-3)(x+3)}{x-3} = \\lim_{x \\to 3}(x + 3) = 6\\]
+
+The limit is 6 even though $f(3)$ does not exist. The $\\epsilon$-$\\delta$ definition handles this correctly because it only talks about $x$ values near $c$, never $x = c$.
+
+**Case 2: $f(c)$ exists but does not equal the limit.**
+
+Define $f(x) = 2x + 1$ for $x \\neq 3$ and $f(3) = 100$. The limit is still 7 — the spike at $x = 3$ is irrelevant because the definition excludes it.
+
+**Case 3: $f(c)$ exists and equals the limit.** This is the continuous case — the "nice" situation. But the definition does not require it.
+
+This is why the limit and the function value are separate concepts. Continuity is the special case where they agree: $f$ is continuous at $c$ if and only if $\\lim_{x \\to c} f(x) = f(c)$.`,
+      },
+    ],
+    resolution: `**The $\\epsilon$-$\\delta$ definition:**
+
+$\\lim_{x \\to c} f(x) = L$ if and only if: for every $\\epsilon > 0$, there exists $\\delta > 0$ such that $0 < |x - c| < \\delta$ implies $|f(x) - L| < \\epsilon$.
+
+**The two-phase proof template:**
+
+1. **Scratch work** — work backwards from $|f(x) - L| < \\epsilon$. Use $|ab| = |a||b|$ to factor $|f(x) - L|$ into a constant times $|x - c|$. Divide $\\epsilon$ by that constant to get $\\delta$.
+2. **Formal proof** — let $\\epsilon > 0$ be given. State your $\\delta$. Assume $0 < |x - c| < \\delta$. Chain forward: expand $|f(x) - L|$, simplify, substitute $\\delta$, arrive at $\\epsilon$.
+
+**The vocabulary:**
+- $\\epsilon$ (epsilon): the output tolerance — how close $f(x)$ must be to $L$
+- $\\delta$ (delta): the input tolerance — how close $x$ must be to $c$
+- $|A| < r$ always means $-r < A < r$ — translate every absolute value inequality this way
+
+**Why this matters:** every theorem in calculus that says "continuous functions do X" or "differentiable functions do Y" ultimately rests on this definition. The Intermediate Value Theorem, the Extreme Value Theorem, the Mean Value Theorem — all their proofs come back to $\\epsilon$ and $\\delta$. The definition did not change a single answer Newton computed. It proved that his answers were right.`,
+  },
+
   challenges: [
     {
       id: "ch1-ed-c1",
