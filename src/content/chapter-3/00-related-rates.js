@@ -925,7 +925,8 @@ At the exact instant the bottom is 5 feet from the wall, the top is plunging dow
 Every related rates problem follows this exact structure: find the geometric constraint, differentiate it with respect to time, substitute known values, solve for the unknown rate. No leaps. No hidden assumptions. Just pure, rigorous truth.`,
   },
 
-  discovery: {
+  discovery: [
+  {
     title: `Why Is My Shadow Running Away From Me?`,
     persona: `It's late. I just left a restaurant and I'm walking home along an empty sidewalk. There's a single streetlight behind me, casting my shadow ahead of me on the pavement. I notice something strange: my shadow seems to be racing ahead. The faster I walk, the faster the tip of my shadow moves — but the tip seems to be moving *faster than I am*. How is that possible? And exactly how fast is it moving?`,
     steps: [
@@ -1152,6 +1153,209 @@ $$\\frac{d}{dt}[u^2] = 2u\\frac{du}{dt} \\qquad \\frac{d}{dt}[uv] = \\frac{du}{d
 
 **What you discovered:** differentiating a geometric relationship with respect to time converts a static picture into a live equation between rates. The math that described the shape of the scene now describes how the scene is moving. That is the full power of the derivative — not just "slope of a curve," but *the rate of any changing quantity linked by any equation*.`,
   },
+  {
+    title: `The Chain and the Cloud`,
+    persona: `I'm learning that calculus isn't really about slopes on a graph — it's about **coupled systems**. Pull a string here, something moves over there. Add users to an app, the server load explodes. I want to understand: when one quantity changes, how fast does a linked quantity have to change? And why does the answer depend on *where you are*, not just *how fast you're going*?`,
+    steps: [
+      {
+        phase: 'need',
+        title: `What I already know — and where it stops working`,
+        content: `I can compute derivatives. I can differentiate $f(t) = t^2$ and get $f'(t) = 2t$. I know what that means: at any moment $t$, the function is changing at rate $2t$.
+
+What I haven't done yet is handle a situation where **two different quantities are linked**, and I know the rate of one but need the rate of the other.
+
+Here's the question that comes up constantly in real engineering:
+
+> You're adding users to an app at 10 per day. How fast is the server load growing?
+
+The server load is not the same thing as the number of users. They're connected by a formula. But if I want the **rate** the load is growing, I can't just plug in a number — I need to know how the rates themselves are linked.
+
+This is the core problem of related rates: **two quantities are locked together by an equation. One rate is known. Find the other.**`,
+      },
+      {
+        phase: 'need',
+        title: `The simplest locked system — a bicycle chain`,
+        content: `Before apps and servers, start with something mechanical. A 10-speed bicycle.
+
+Your feet drive the **front chainring** (50 teeth). The chain connects it to the **rear cog** (25 teeth) on the back wheel. The chain physically locks the two gears together — they cannot move independently.
+
+Define:
+- $P(t)$ = pedaling speed in RPM at time $t$
+- $W(t)$ = wheel speed in RPM at time $t$
+
+The gear ratio is fixed: for every tooth on the front that moves, one tooth on the back must move. The front has 50 teeth, the back has 25, so:
+
+$$W = \\frac{50}{25} P = 2P$$
+
+This equation is always true — at every instant. It's the **constraint**. The chain enforces it.
+
+Now I know one rate: $\\dfrac{dP}{dt} = 5$ RPM/s (I'm spinning up). What's $\\dfrac{dW}{dt}$?
+
+I'm stuck. I know how positions relate ($W = 2P$), but I want how **rates** relate.`,
+      },
+      {
+        phase: 'discovery',
+        title: `Differentiate the constraint — the rates fall out`,
+        content: `The equation $W = 2P$ holds at every instant. So both sides are changing together — I can differentiate both sides with respect to time:
+
+$$\\frac{d}{dt}[W] = \\frac{d}{dt}[2P]$$
+
+$$\\frac{dW}{dt} = 2 \\cdot \\frac{dP}{dt}$$
+
+The rates obey the **same ratio** as the quantities. If the gear ratio says the wheel spins twice as fast as the pedals, it also says the wheel *accelerates* twice as fast as the pedals.
+
+Plug in $\\dfrac{dP}{dt} = 5$:
+
+$$\\frac{dW}{dt} = 2 \\times 5 = 10 \\text{ RPM/s}$$
+
+The wheel is spinning up at 10 RPM per second.
+
+---
+
+**This makes physical sense.** The chain is rigid. If your feet speed up by 5 RPM, the chain has to deliver that change to the wheel immediately. The wheel can't decide to speed up less — the hardware locks the rates together.
+
+**Key observation:** for this linear constraint ($W = 2P$), differentiating is trivial. The rate equation looks exactly like the position equation. That won't always be the case.`,
+      },
+      {
+        phase: 'discovery',
+        title: `A nonlinear constraint — the network app`,
+        content: `Now something that matters. You're building a group chat app. Every user can connect to every other user. Count the total possible connections:
+
+- 2 users: 1 connection
+- 3 users: 3 connections
+- 4 users: 6 connections
+- 10 users: 45 connections
+- 100 users: 4,950 connections
+
+The pattern: with $U$ users, there are $\\dfrac{U(U-1)}{2}$ connections. For large $U$, this is approximately:
+
+$$C \\approx \\frac{1}{2}U^2$$
+
+This is the **constraint** — the formula that locks connections to users.
+
+Your marketing team is adding users at a steady rate: $\\dfrac{dU}{dt} = 10$ users/day. How fast is the connection count (and therefore the server load) growing?
+
+Same process: differentiate the constraint with respect to time.
+
+$$\\frac{d}{dt}\\left[C\\right] = \\frac{d}{dt}\\left[\\frac{1}{2}U^2\\right]$$
+
+The right side requires the **chain rule** — $U$ is a function of $t$:
+
+$$\\frac{dC}{dt} = \\frac{1}{2} \\cdot 2U \\cdot \\frac{dU}{dt} = U \\cdot \\frac{dU}{dt}$$
+
+This is the rate equation. Now plug in:`,
+      },
+      {
+        phase: 'discovery',
+        title: `The revelation — the same input causes wildly different outputs`,
+        content: `The rate equation is $\\dfrac{dC}{dt} = U \\cdot \\dfrac{dU}{dt}$.
+
+Your marketing team holds $\\dfrac{dU}{dt} = 10$ users/day constant. But what happens to $\\dfrac{dC}{dt}$ as the app grows?
+
+| Users $U$ | $\\dfrac{dU}{dt}$ | $\\dfrac{dC}{dt} = U \\cdot \\dfrac{dU}{dt}$ |
+|---|---|---|
+| $10$ | $10$/day | $100$ connections/day |
+| $100$ | $10$/day | $1{,}000$ connections/day |
+| $1{,}000$ | $10$/day | $10{,}000$ connections/day |
+| $10{,}000$ | $10$/day | $100{,}000$ connections/day |
+
+The marketing team is doing the exact same work every day. The user growth rate is constant. But the **server load growth rate is exploding** — it's proportional to $U$.
+
+This is what the rate equation $\\dfrac{dC}{dt} = U \\cdot \\dfrac{dU}{dt}$ tells you: the "gear ratio" between user growth and connection growth is not fixed. It's $U$ itself — it grows with the system. The bigger the network, the harder it is to absorb each new user.
+
+This is why apps that feel fast at launch start lagging at scale. The constraint was nonlinear. That nonlinearity transmits directly into the rates.
+
+---
+
+**Compare the two systems:**
+
+| System | Constraint | Rate equation | Gear ratio |
+|---|---|---|---|
+| Bicycle | $W = 2P$ | $\\dfrac{dW}{dt} = 2\\dfrac{dP}{dt}$ | Fixed: always $2$ |
+| Network | $C = \\frac{1}{2}U^2$ | $\\dfrac{dC}{dt} = U\\dfrac{dU}{dt}$ | Variable: grows with $U$ |
+
+Linear constraint → constant gear ratio. Nonlinear constraint → variable gear ratio. The nonlinearity in the position equation becomes a nonlinearity in the rate equation.`,
+      },
+      {
+        phase: 'formalization',
+        title: `The method: differentiate the constraint with respect to time`,
+        content: `Both problems — the bicycle and the network — used the same procedure. Now name it.
+
+**Related rates** is the technique of differentiating a constraint equation with respect to time to find how the rates of change of two coupled quantities are related.
+
+**The general setup:**
+
+Two quantities $A(t)$ and $B(t)$ are linked by a constraint:
+
+$$F(A, B) = k \quad \text{(some constant or fixed equation)}$$
+
+Differentiate both sides with respect to $t$. The chain rule gives a rate of $\\dfrac{dA}{dt}$ or $\\dfrac{dB}{dt}$ wherever $A$ or $B$ appears:
+
+$$\\frac{d}{dt}[F(A, B)] = 0$$
+
+This produces a new equation relating $\\dfrac{dA}{dt}$ and $\\dfrac{dB}{dt}$. If you know one, you can find the other.
+
+---
+
+**Why the chain rule is unavoidable:**
+
+When you differentiate $A^2$ with respect to $t$, you get $2A \\cdot \\dfrac{dA}{dt}$ — not just $2A$. The $\\dfrac{dA}{dt}$ appears because $A$ is a function of $t$. Every term containing a variable picks up a rate factor. This is the chain rule:
+
+$$\\frac{d}{dt}[A^n] = nA^{n-1} \\cdot \\frac{dA}{dt}$$
+
+For the network: $\\dfrac{d}{dt}\\left[\\frac{1}{2}U^2\\right] = U \\cdot \\dfrac{dU}{dt}$. The $U$ out front is the current "gear ratio" — it came from the power rule applied via the chain rule.`,
+      },
+      {
+        phase: 'formalization',
+        title: `The four-step template — every related rates problem`,
+        content: `Whether it's gears, networks, tanks draining, or shadows moving, the structure never changes:
+
+**Step 1 — Identify the constraint.**
+What equation links the two quantities at every moment? This is the "hardware" of the problem — the chain, the formula, the geometry. Write it down.
+
+**Step 2 — Differentiate both sides with respect to $t$.**
+Apply the chain rule to every term that contains a variable (something that changes in time). Constants stay constant — their derivatives are zero.
+
+**Step 3 — Substitute the known rate.**
+Plug in the rate you were given ($\\dfrac{dP}{dt}$, $\\dfrac{dU}{dt}$, etc.) and any known values of the variables at the instant you care about.
+
+**Step 4 — Solve for the unknown rate.**
+The unknown rate ($\\dfrac{dW}{dt}$, $\\dfrac{dC}{dt}$, etc.) is the only thing left. Solve for it.
+
+---
+
+**The two problems in the template:**
+
+| | Bicycle | Network |
+|---|---|---|
+| Constraint | $W = 2P$ | $C = \\frac{1}{2}U^2$ |
+| Differentiate | $\\dfrac{dW}{dt} = 2\\dfrac{dP}{dt}$ | $\\dfrac{dC}{dt} = U\\dfrac{dU}{dt}$ |
+| Substitute | $\\dfrac{dP}{dt} = 5$ | $\\dfrac{dU}{dt} = 10$, $U = 1000$ |
+| Solve | $\\dfrac{dW}{dt} = 10$ RPM/s | $\\dfrac{dC}{dt} = 10{,}000$ connections/day |
+
+The same four steps. The same chain rule. Only the constraint changes.`,
+      },
+    ],
+    resolution: `**Related Rates — the complete method:**
+
+Two quantities changing in time are locked together by a constraint equation. Differentiating both sides with respect to $t$ converts the position constraint into a rate constraint.
+
+**The four steps:**
+1. **Constraint** — write the equation that links the two quantities at every moment
+2. **Differentiate** both sides with respect to $t$; every variable picks up a $\\dfrac{d(\\cdot)}{dt}$ via the chain rule
+3. **Substitute** known rates and known values at the instant in question
+4. **Solve** for the unknown rate
+
+**Linear vs. nonlinear constraints:**
+
+| Constraint type | Rate equation | What it means |
+|---|---|---|
+| Linear: $B = kA$ | $\\dfrac{dB}{dt} = k\\dfrac{dA}{dt}$ | Fixed gear ratio — rates scale the same way as positions |
+| Nonlinear: $C = \\frac{1}{2}U^2$ | $\\dfrac{dC}{dt} = U\\dfrac{dU}{dt}$ | Variable gear ratio — the rate relationship depends on where you are |
+
+**The deeper insight:** a nonlinear constraint means the "gear ratio" between two rates is not a constant — it's a function of the current state. The bicycle feels the same on every hill. The network gets harder to manage the bigger it gets. The derivative of the constraint equation tells you exactly how much harder, at every moment.`,
+  },
+  ],
 
   challenges: [
     {
