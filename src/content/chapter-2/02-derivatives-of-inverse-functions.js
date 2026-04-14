@@ -835,20 +835,28 @@ export default {
     acts: [
       {
         label: 'The Scene',
-        title: 'A Machine Running Backwards',
-        content: `Imagine a perfectly calibrated weighing machine in a factory. You drop in a cylindrical block of steel, and the machine — knowing the density and the formula $V = \\pi r^2 h$ — spits out the mass.
+        title: 'A Lead Screw Running Backwards',
+        content: `Picture the lead screw on a manual lathe.
 
-You feed it a radius, it gives you a mass. It does this flawlessly.
+Turn the handwheel one full revolution. The tool post advances exactly 2 mm toward the part. That is the **forward machine**: one revolution of input gives 2 mm of output. The "rate" of the forward machine is 2 mm/rev — what machinists call the **lead** of the screw.
 
-Now a problem: a block falls off the line and the label falls off. You have a scale — you can weigh it — but you need the radius. The machine only goes one way.
+Now the question flips. The engineer gives you a print that says "move the tool 2 mm." How many turns of the handwheel do you need?
 
-You need the machine to run **backwards**: feed in the mass, get out the radius.
+$$\\text{turns needed} = \\frac{2 \\text{ mm}}{2 \\text{ mm/rev}} = 1 \\text{ turn}$$
 
-This is the fundamental idea of an **inverse function**. Every function is a one-way machine — input goes in, output comes out. An inverse function runs that machine in reverse: the output becomes a new input, and you recover the original.
+But what if you need to move only 1 mm?
 
-Most of this is familiar from algebra. What calculus adds is the question: **if you know how fast the forward machine is running, how fast is the reverse machine running?**
+$$\\text{turns needed} = \\frac{1 \\text{ mm}}{2 \\text{ mm/rev}} = 0.5 \\text{ turns}$$
 
-The answer is the **Mirror Rule** — one of the most elegant and useful results in all of calculus.`,
+The rate of the **reverse machine** — how many turns per mm of travel — is $\\frac{1}{2}$ rev/mm. It is the **reciprocal** of the forward rate.
+
+This is not a coincidence. It is a universal law of inverse relationships:
+
+> **If the forward machine has rate $m$ (output per input), the reverse machine has rate $\\frac{1}{m}$ (input per output).**
+
+The same principle applies to gear ratios, voltage dividers, gearing in a mill, and — this is the calculus lesson — to **any differentiable function and its inverse**. If $f$ converts input change $\\Delta x$ into output change $\\Delta y = f'(a) \\cdot \\Delta x$, then the inverse converts that output change back: $\\Delta x = \\frac{1}{f'(a)} \\cdot \\Delta y$.
+
+The derivative of the inverse is the reciprocal of the derivative of the original — at the **corresponding point**. That is the whole theorem. The rest of this lesson is making it precise and applying it to the inverse trig functions.`,
       },
       {
         label: 'Act I',
@@ -887,26 +895,31 @@ Take any point $(a, b)$ on the graph of $f$. It says: "input $a$ gives output $b
 
 Every point on $f$ becomes a point on $f^{-1}$ with the two coordinates **swapped**.
 
-What does swapping coordinates do to a graph? It is exactly a **reflection across the line $y = x$** — the diagonal line through the origin at 45°. Hold a piece of paper to a mirror at that angle and any function's graph reflects into its inverse's graph.
+What does swapping coordinates do to a graph? It is exactly a **reflection across the line $y = x$** — the diagonal line through the origin at 45°.
 
-This is not a metaphor. It is literally true. The graph of $f^{-1}$ is the mirror image of the graph of $f$ across the line $y = x$.
+**Make it concrete.** Take a piece of graph paper and draw the curve $y = x^2$ (for $x \\geq 0$). Now take a small mirror and stand it on edge, tilted at 45°, along the line $y = x$. Look at the reflection. That curved ghost you see in the mirror — rising steeply at first, then flattening out — *is* $y = \\sqrt{x}$, the inverse of $x^2$.
 
-**Now comes the key question:** what happens to the slope?
+Notice two things in the mirror:
 
-On the graph of $f$, the slope at $(a, b)$ is:
+1. **Where the real curve lies nearly flat** (near the vertex of the parabola, slope close to zero), **the mirror image stands nearly vertical** (slope close to infinity). A shallow curve reflects into a steep one.
+2. **Where the real curve climbs steeply**, **the mirror image lies nearly flat**. A steep curve reflects into a shallow one.
+
+Flat becomes vertical. Vertical becomes flat. In between, slopes exchange reciprocals. This is not a visual trick — it is the algebra of swapped axes made visible.
+
+**Now the algebra:** on the graph of $f$, the slope at $(a, b)$ is:
 $$\\text{slope of } f = \\frac{\\text{rise}}{\\text{run}} = \\frac{\\Delta y}{\\Delta x}$$
 
-When we reflect across $y = x$, the axes swap. What was the $y$-axis (vertical) becomes the $x$-axis (horizontal), and vice versa. Rise becomes run, and run becomes rise.
+When we stand the mirror along $y = x$, every point $(x, y)$ becomes $(y, x)$ — the axes swap. What was the $y$-axis (vertical) becomes the $x$-axis (horizontal), and vice versa. Rise becomes run, and run becomes rise.
 
 The slope at the reflected point $(b, a)$ on $f^{-1}$ is therefore:
 $$\\text{slope of } f^{-1} = \\frac{\\text{new rise}}{\\text{new run}} = \\frac{\\Delta x}{\\Delta y} = \\frac{1}{\\Delta y / \\Delta x} = \\frac{1}{\\text{slope of } f}$$
 
-**The slope of the inverse is the reciprocal of the slope of the original.** This is the Mirror Rule.
+**The slope of the inverse is the reciprocal of the slope of the original.** This is the Mirror Rule. Back to the lead screw: the forward rate was 2 mm/rev; the reverse rate is 1/2 rev/mm. Same principle.
 
 Written precisely: if $f(a) = b$ and $f'(a)$ exists and is nonzero, then:
 $$\\boxed{(f^{-1})'(b) = \\frac{1}{f'(a)}}$$
 
-Notice the requirement that $f'(a) \\neq 0$. If the original function has a horizontal tangent at the point (slope = 0), the reflected tangent on the inverse would need to be vertical — slope undefined, no derivative. The mirror of a flat line is a vertical wall.`,
+**The wall warning:** notice the requirement $f'(a) \\neq 0$. If the original curve has a flat tangent (slope = 0), the mirror image has a *vertical* tangent — no slope at all. The mirror of a lying-flat line is a vertical wall — perfectly upright, infinite slope, undefined derivative. At those points the inverse simply is not differentiable.`,
       },
       {
         label: 'Act III',
@@ -944,7 +957,20 @@ $$\\boxed{\\frac{d}{dx}[f^{-1}(x)] = \\frac{1}{f'(f^{-1}(x))}}$$
 
 **Reading the formula:** to find the derivative of the inverse at a point $x = b$, first find which input $a = f^{-1}(b)$ maps to $b$ under $f$. Then evaluate $f'$ at that input $a$. Take the reciprocal.
 
-The most common mistake: evaluating $f'$ at $b$ instead of at $a = f^{-1}(b)$. You must go back to the original function's input, not the inverse's input.`,
+**The Shop Floor Rule (read this before every problem):**
+
+> *"Find the slope of the original guy at the original spot — then flip it."*
+
+Here is how to apply it without getting confused:
+1. You are asked for $(f^{-1})'(b)$ — the rate of the reverse machine at output value $b$.
+2. Ask: *which spot on the forward machine produced output $b$?* That spot is $a = f^{-1}(b)$.
+3. Evaluate the forward machine's rate there: $f'(a)$.
+4. Flip it: $(f^{-1})'(b) = 1/f'(a)$.
+
+Do not try to find the slope of the inverse directly if you do not have its formula. The forward machine already knows everything you need — you just have to ask it at the right spot and take the reciprocal. Think of it like the lead screw: you do not need to study the reverse mechanism separately. You already know the thread pitch of the forward screw. Just invert the units.
+
+The common mistake — evaluating $f'$ at $b$ instead of $a$ — is like reading the gear ratio of the wrong gear. The formula is $f'(a)$ where $a$ is the **input** on the forward side. Never $b$.`,
+
       },
       {
         label: 'Act IV',
@@ -984,6 +1010,21 @@ $$\\frac{dy}{dx} = \\frac{1}{\\sec^2(y)}$$
 We know $\\tan(y) = x$ (that was our starting equation). Now use $\\sec^2(y) = 1 + \\tan^2(y)$:
 $$\\sec^2(y) = 1 + \\tan^2(y) = 1 + x^2$$
 
+**Machinist's Note — Where This Identity Comes From:**
+
+The step $\\sec^2(y) = 1 + \\tan^2(y)$ looks like memorized magic. It is not — it is the **Pythagorean theorem in disguise**.
+
+Draw a right triangle with angle $y$ at the base corner. Label the opposite side $x$ (because $\\tan(y) = x$) and the adjacent side $1$. The hypotenuse is then $\\sqrt{1 + x^2}$ by the Pythagorean theorem: $1^2 + x^2 = h^2$.
+
+Now read off the trig ratios directly from the triangle:
+- $\\tan(y) = \\text{opposite}/\\text{adjacent} = x/1 = x$ ✓
+- $\\sec(y) = \\text{hypotenuse}/\\text{adjacent} = \\sqrt{1+x^2}/1 = \\sqrt{1+x^2}$
+- $\\sec^2(y) = 1 + x^2$ ✓
+
+The identity is not a trig formula you memorize separately — it is just geometry reading from the correct triangle. Once you draw that triangle, $\\sec^2 = 1 + \\tan^2$ is as obvious as the Pythagorean theorem itself. This same triangle-reading technique appears in the arcsin derivation (Act V), where the triangle is slightly different but the logic is identical.
+
+This is why the final answer, $1/(1+x^2)$, looks so clean: the messy trig has been replaced by pure algebra, because the trig was always just hiding a triangle.
+
 **Step 4:** Substitute.
 
 $$\\frac{dy}{dx} = \\frac{1}{1 + x^2}$$
@@ -991,7 +1032,8 @@ $$\\frac{dy}{dx} = \\frac{1}{1 + x^2}$$
 Since $y = \\arctan(x)$, this says:
 $$\\boxed{\\frac{d}{dx}[\\arctan(x)] = \\frac{1}{1 + x^2}}$$
 
-**Why this formula is remarkable:** the right side, $\\dfrac{1}{1+x^2}$, involves no trigonometry at all. A pure algebraic expression is the derivative of this transcendental function. And as $x \\to \\pm\\infty$, this approaches 0 — reflecting the fact that $\\arctan$ flattens out and saturates at $\\pm\\pi/2$.`,
+**Why this formula is remarkable:** the right side, $\\dfrac{1}{1+x^2}$, involves no trigonometry at all. A pure algebraic fraction is the derivative of this transcendental inverse trig function. The triangle absorbed all the trig and handed back clean algebra. And as $x \\to \\pm\\infty$, the denominator blows up, so the derivative approaches 0 — reflecting the fact that $\\arctan$ flattens out and saturates at $\\pm\\pi/2$ like a machine hitting its hard stop.`,
+
       },
       {
         label: 'Act V',
