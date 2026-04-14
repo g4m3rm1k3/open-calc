@@ -613,6 +613,174 @@ export default {
     },
   ],
 
+  story: {
+    title: 'The Slope the Circle Refused to Give',
+    subtitle: 'x² + y² = 25 is a circle. There is no single formula y = f(x) for it. Yet the slope at any point exists — and the Chain Rule is the key to finding it.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Circle and a Problem',
+        content: `Consider the equation:
+\\[x^2 + y^2 = 25\\]
+
+This is a circle — centered at the origin with radius 5. Every point $(x, y)$ on the circle satisfies it. For example: $(3, 4)$ because $9 + 16 = 25$. Also $(-3, 4)$, $(0, 5)$, $(5, 0)$.
+
+You want the slope of the circle at the point $(3, 4)$. You know from geometry that the tangent to a circle is perpendicular to the radius at that point — so you could compute the slope that way. But what you want is a **calculus method** that works for any equation, not just circles.
+
+Your first instinct: solve for $y$ and differentiate.
+
+Try it: $y^2 = 25 - x^2$, so $y = \\pm\\sqrt{25 - x^2}$.
+
+Problem: this is **two** functions, not one. The circle is not a function — it fails the vertical line test (one $x$ value gives two $y$ values). You could differentiate the top half and the bottom half separately, but that splits the circle into pieces and breaks down at $(\\pm 5, 0)$ where both halves meet.
+
+There is a better way — one that treats the equation $x^2 + y^2 = 25$ as a whole, never solving for $y$ at all. That method is **implicit differentiation**.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Explicit vs Implicit — and Why y Is Still a Function of x',
+        content: `Two ways a relationship between $x$ and $y$ can be expressed:
+
+**Explicit:** $y$ is written directly as a formula in $x$.
+- Example: $y = x^2 + 3$ tells you exactly what $y$ is for every $x$.
+
+**Implicit:** $x$ and $y$ appear together in an equation, and $y$ is NOT isolated.
+- Example: $x^2 + y^2 = 25$ — both variables are mixed together. No single formula for $y$.
+
+In the explicit case, differentiating is straightforward: apply the rules you know to $f(x)$ and get $f'(x)$.
+
+In the implicit case, it seems impossible — how do you differentiate an equation that you cannot solve?
+
+**The key insight:** even though we have not solved for $y$, we know that somewhere along the circle, $y$ depends on $x$. If you walk along the top half of the circle from $(−5, 0)$ to $(5, 0)$, $y$ changes as $x$ changes — it is behaving like a function, even if we do not have a formula for it.
+
+We write this as: $y$ is a **function of $x$**, denoted $y(x)$, even though we cannot write a formula.
+
+**What this unlocks:** once we accept that $y$ is a function of $x$, we can differentiate expressions involving $y$ using the **Chain Rule** — the same rule you have been using all along, now applied deliberately to this hidden function $y(x)$.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Chain Rule Applied to y — Every y-Term Gets a dy/dx',
+        content: `Recall the **Chain Rule**: to differentiate a composite function $f(g(x))$ with respect to $x$:
+\\[\\frac{d}{dx}[f(g(x))] = f'(g(x)) \\cdot g'(x)\\]
+
+In words: differentiate the outer function (leaving the inner alone), then multiply by the derivative of the inner function.
+
+Now: when we differentiate any expression involving $y$ with respect to $x$, $y$ is the **inner function** and $x$ is the outer variable. So:
+
+**Example: differentiate $y^2$ with respect to $x$.**
+
+Think of it as $f(g(x))$ where $f(u) = u^2$ and $g(x) = y(x)$.
+- Outer derivative: $f'(u) = 2u$, evaluated at $u = y$: gives $2y$
+- Inner derivative: $g'(x) = \\frac{dy}{dx}$
+- Chain Rule: multiply them together
+
+\\[\\frac{d}{dx}[y^2] = 2y \\cdot \\frac{dy}{dx}\\]
+
+This is the rule: **every time you differentiate a $y$-expression with respect to $x$, a $\\frac{dy}{dx}$ factor appears** — because $y$ is the inner function.
+
+More examples:
+- $\\dfrac{d}{dx}[y^3] = 3y^2 \\cdot \\dfrac{dy}{dx}$
+- $\\dfrac{d}{dx}[\\sin(y)] = \\cos(y) \\cdot \\dfrac{dy}{dx}$
+- $\\dfrac{d}{dx}[e^y] = e^y \\cdot \\dfrac{dy}{dx}$
+
+Compare to differentiating $x$-expressions — those produce no extra factor because $\\frac{dx}{dx} = 1$.`,
+      },
+      {
+        label: 'Act III',
+        title: 'Differentiating Both Sides — the Circle Equation',
+        content: `Now apply this to the circle equation $x^2 + y^2 = 25$.
+
+**Step: differentiate both sides with respect to $x$.**
+
+Left side — differentiate term by term:
+
+**Term $x^2$:** this is a pure $x$-expression. Power Rule: bring exponent down, reduce by one.
+\\[\\frac{d}{dx}[x^2] = 2x\\]
+
+**Term $y^2$:** this is a $y$-expression. Chain Rule: Power Rule on the outside, then multiply by $\\frac{dy}{dx}$.
+\\[\\frac{d}{dx}[y^2] = 2y \\cdot \\frac{dy}{dx}\\]
+
+**Right side — differentiate the constant 25:**
+
+The rate of change of a constant is zero:
+\\[\\frac{d}{dx}[25] = 0\\]
+
+**Putting both sides together:**
+\\[2x + 2y \\cdot \\frac{dy}{dx} = 0\\]
+
+This is the differentiated form of the circle equation. It is an equation relating $x$, $y$, $\\frac{dy}{dx}$, and the constant structure of the original. We have not solved for $y$ at any point — we just differentiated through the equation, term by term.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Solving for dy/dx — Pure Algebra',
+        content: `We have:
+\\[2x + 2y \\cdot \\frac{dy}{dx} = 0\\]
+
+We want $\\frac{dy}{dx}$ by itself. This is algebra — $\\frac{dy}{dx}$ is just an unknown; isolate it.
+
+**Step 1: move the $2x$ term to the right side.**
+
+Subtract $2x$ from both sides:
+\\[2y \\cdot \\frac{dy}{dx} = -2x\\]
+
+**Step 2: divide both sides by $2y$.**
+\\[\\frac{dy}{dx} = \\frac{-2x}{2y}\\]
+
+**Step 3: simplify — cancel the factor of 2.**
+\\[\\frac{dy}{dx} = -\\frac{x}{y}\\]
+
+This is the slope formula for the circle $x^2 + y^2 = 25$ at any point $(x, y)$.
+
+Notice it contains **both $x$ and $y$** — not just $x$. This is normal and expected. The slope of a circle depends on where you are on it, and to specify a location on the circle you need both coordinates.
+
+You can verify this makes sense: at the rightmost point $(5, 0)$ the formula gives $-5/0$ — undefined. The circle has a vertical tangent there, which is consistent with the geometry.`,
+      },
+      {
+        label: 'Act V',
+        title: 'Evaluating at a Point — the Tangent Line at (3, 4)',
+        content: `We want the slope at the specific point $(3, 4)$.
+
+**Check that the point is on the circle:**
+\\[3^2 + 4^2 = 9 + 16 = 25 \\checkmark\\]
+
+**Evaluate $\\frac{dy}{dx} = -\\frac{x}{y}$ at $(x, y) = (3, 4)$:**
+
+Substitute $x = 3$ and $y = 4$:
+\\[\\frac{dy}{dx}\\bigg|_{(3,4)} = -\\frac{3}{4}\\]
+
+The slope of the circle at $(3, 4)$ is $-\\frac{3}{4}$.
+
+**Write the tangent line** using point-slope form: $y - y_1 = m(x - x_1)$
+
+- Point: $(x_1, y_1) = (3, 4)$
+- Slope: $m = -\\frac{3}{4}$
+
+\\[y - 4 = -\\frac{3}{4}(x - 3)\\]
+\\[y = 4 - \\frac{3}{4}x + \\frac{9}{4}\\]
+\\[y = -\\frac{3}{4}x + \\frac{25}{4}\\]
+
+**Geometry check:** the radius to $(3, 4)$ goes from $(0, 0)$ to $(3, 4)$, so its slope is $\\frac{4}{3}$. The tangent at that point should be perpendicular — slope $-\\frac{3}{4}$. That matches exactly. ✓
+
+We found the slope of the whole, unbroken circle at a specific point, without ever splitting it into two halves or writing $y$ as a formula.`,
+      },
+    ],
+    resolution: `**The five-step implicit differentiation procedure:**
+
+1. **Differentiate both sides** of the equation with respect to $x$.
+2. **Apply the Chain Rule to every $y$-term:** differentiate with respect to $y$, then multiply by $\\frac{dy}{dx}$.
+3. **Apply standard rules to every $x$-term** — no extra factor needed.
+4. **Gather all $\\frac{dy}{dx}$ terms** on one side; move everything else to the other.
+5. **Factor out $\\frac{dy}{dx}$ and divide** to isolate it.
+
+**The general formula:** for any equation $F(x, y) = 0$:
+\\[\\frac{dy}{dx} = -\\frac{F_x}{F_y}\\]
+
+where $F_x$ means "differentiate $F$ treating $y$ as constant" and $F_y$ means "differentiate $F$ treating $x$ as constant." For the circle, $F = x^2 + y^2 - 25$, so $F_x = 2x$ and $F_y = 2y$, giving $dy/dx = -2x/2y = -x/y$.
+
+**The connection to related rates:** if both $x$ and $y$ depend on time $t$, differentiate the same equation with respect to $t$ instead of $x$. Every term gets a $\\frac{dx}{dt}$ or $\\frac{dy}{dt}$ factor from the Chain Rule. That is exactly the related rates technique — implicit differentiation with $t$ as the variable. Same method, different outer variable.
+
+**The deeper truth:** the derivative $\\frac{dy}{dx}$ exists at a point on an implicit curve whenever the curve looks like a smooth function near that point — even if it is not a function globally. The only time implicit differentiation breaks down is when $F_y = 0$ (the denominator vanishes), which geometrically corresponds to a vertical tangent or a self-intersection where the curve fails to look like a function locally.`,
+  },
+
   challenges: [
     {
       id: 'ch2-005-ch1',

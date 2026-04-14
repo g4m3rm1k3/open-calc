@@ -418,6 +418,235 @@ export default {
     },
   ],
 
+  story: [
+  {
+    title: 'The Cooling Coffee',
+    subtitle: 'A cup of coffee sits on a desk. Physics says it cools at a rate proportional to how much hotter it is than the room. One differential equation. One initial condition. One exact answer.',
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'A Cup Left to Cool',
+        content: `You pour a fresh cup of coffee. The thermometer reads $90°C$. The room around you is a steady $20°C$.
+
+You walk away. When you return 10 minutes later, the coffee has cooled to $70°C$.
+
+You want to know: when will it reach a drinkable $60°C$?
+
+Intuition says the cooling should slow down over time — a very hot cup cools faster than a barely-warm one. The bigger the gap between the coffee's temperature and the room, the faster heat escapes. This is **Newton's Law of Cooling**, and it turns the physics into a mathematical sentence:
+
+> *The rate at which the temperature changes is proportional to the gap between the current temperature and the room temperature.*
+
+Written in calculus notation, this sentence becomes a **differential equation** — an equation that relates a function to its own derivative.
+
+Solving it will require integration, an initial condition, and one key algebraic insight about the exponential function. Every single step is built from scratch right here.`,
+      },
+      {
+        label: 'Act I',
+        title: 'Setting Up the Differential Equation',
+        content: `**Define the variable.**
+
+Let $T(t)$ be the temperature of the coffee (in °C) at time $t$ minutes after you poured it.
+
+$T$ is the **unknown function** we are trying to find — not a number, a function. That is the fundamental shift in an IVP: we solve for an entire curve, not a single point.
+
+**The room temperature** is a constant: $T_{\\text{room}} = 20°C$.
+
+**The temperature gap** between coffee and room at time $t$:
+\\[T(t) - T_{\\text{room}} = T(t) - 20\\]
+
+**Newton's Law of Cooling in words:** the rate of change of temperature is proportional to this gap.
+
+**Rate of change of temperature** means $\\frac{dT}{dt}$ — the derivative of $T$ with respect to time.
+
+**"Proportional to the gap"** means $= k \\cdot (T - 20)$ for some constant $k$.
+
+**The full differential equation:**
+\\[\\frac{dT}{dt} = k(T - 20)\\]
+
+The negative sign is implicit: the coffee is cooling, so $\\frac{dT}{dt} < 0$ and $T - 20 > 0$, which means $k$ must be **negative**. We will determine $k$ from the data.
+
+**The initial condition** — the temperature at $t = 0$:
+\\[T(0) = 90\\]
+
+This is the IVP. We have the differential equation and the initial condition. Together, they uniquely determine $T(t)$.`,
+      },
+      {
+        label: 'Act II',
+        title: 'Separating Variables — Moving All T to One Side',
+        content: `The equation $\\dfrac{dT}{dt} = k(T - 20)$ has two variables: $T$ and $t$. The technique of **separation of variables** moves all the $T$ terms to one side and all the $t$ terms to the other, so we can integrate each side independently.
+
+**Step 1: Isolate $dT$ and $dt$.**
+
+Divide both sides by $(T - 20)$:
+\\[\\frac{1}{T - 20} \\, dT = k \\, dt\\]
+
+Now the left side involves only $T$ and $dT$. The right side involves only $k$ and $dt$. The variables are separated.
+
+**Step 2: Integrate both sides.**
+
+Left side: $\\displaystyle\\int \\frac{1}{T - 20} \\, dT$
+
+This is a standard antiderivative. Recall: $\\dfrac{d}{du}[\\ln|u|] = \\dfrac{1}{u}$, so reading backwards: $\\displaystyle\\int \\frac{1}{u} \\, du = \\ln|u| + C$.
+
+Here $u = T - 20$:
+\\[\\int \\frac{1}{T - 20} \\, dT = \\ln|T - 20| + C_1\\]
+
+Right side: $\\displaystyle\\int k \\, dt = kt + C_2$
+
+**Step 3: Combine constants.**
+
+\\[\\ln|T - 20| + C_1 = kt + C_2\\]
+\\[\\ln|T - 20| = kt + C_2 - C_1\\]
+
+Write $C = C_2 - C_1$ (one constant, since constants combine into constants):
+\\[\\ln|T - 20| = kt + C\\]`,
+      },
+      {
+        label: 'Act III',
+        title: 'Solving for T — Undoing the Logarithm',
+        content: `We have $\\ln|T - 20| = kt + C$. We need $T$ by itself.
+
+**Undo the natural log by exponentiating both sides.**
+
+If $\\ln(A) = B$, then $A = e^B$. Apply this:
+\\[|T - 20| = e^{kt + C}\\]
+
+**Use a property of exponents** — split the right side:
+\\[e^{kt + C} = e^{kt} \\cdot e^C\\]
+
+Since $e^C$ is just a positive constant, call it $A$ (where $A = e^C > 0$):
+\\[|T - 20| = A e^{kt}\\]
+
+**Remove the absolute value.** Since the coffee starts at $90°C$ and the room is $20°C$, we have $T - 20 > 0$ throughout the cooling (the coffee never goes below room temperature). So $|T - 20| = T - 20$:
+\\[T - 20 = A e^{kt}\\]
+
+**Solve for $T$:**
+\\[T(t) = 20 + A e^{kt}\\]
+
+This is the **general solution** — a family of exponential curves, one for each choice of $A$ and $k$. The initial condition and the data point will determine both constants.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'Applying Initial Conditions — Pinning Down A and k',
+        content: `We have two unknowns: $A$ and $k$. We have two pieces of information: $T(0) = 90$ and $T(10) = 70$.
+
+**Use $T(0) = 90$ to find $A$.**
+
+Substitute $t = 0$ into $T(t) = 20 + Ae^{kt}$:
+\\[90 = 20 + A e^{k \\cdot 0}\\]
+\\[90 = 20 + A \\cdot 1\\]
+\\[A = 70\\]
+
+The solution now reads: $T(t) = 20 + 70 e^{kt}$.
+
+**Use $T(10) = 70$ to find $k$.**
+
+Substitute $t = 10$:
+\\[70 = 20 + 70 e^{10k}\\]
+\\[50 = 70 e^{10k}\\]
+\\[e^{10k} = \\frac{50}{70} = \\frac{5}{7}\\]
+
+Take the natural log of both sides — to undo $e^{\\,\\cdot\\,}$, apply $\\ln$:
+\\[10k = \\ln\\!\\left(\\frac{5}{7}\\right)\\]
+\\[k = \\frac{1}{10}\\ln\\!\\left(\\frac{5}{7}\\right)\\]
+
+Since $\\frac{5}{7} < 1$, $\\ln(5/7) < 0$, so $k < 0$ — confirming the coffee is cooling.
+
+**The particular solution:**
+\\[T(t) = 20 + 70\\, e^{\\,\\frac{t}{10}\\ln(5/7)}\\]
+
+Or equivalently, using $e^{\\ln(5/7)} = 5/7$:
+\\[T(t) = 20 + 70\\left(\\frac{5}{7}\\right)^{t/10}\\]`,
+      },
+      {
+        label: 'Act V',
+        title: 'Answering the Question — When Does It Reach 60°C?',
+        content: `We want the time $t$ when $T(t) = 60$.
+
+**Set up the equation:**
+\\[60 = 20 + 70\\left(\\frac{5}{7}\\right)^{t/10}\\]
+
+**Isolate the exponential — one operation at a time:**
+
+Subtract 20 from both sides:
+\\[40 = 70\\left(\\frac{5}{7}\\right)^{t/10}\\]
+
+Divide both sides by 70:
+\\[\\frac{40}{70} = \\left(\\frac{5}{7}\\right)^{t/10}\\]
+\\[\\frac{4}{7} = \\left(\\frac{5}{7}\\right)^{t/10}\\]
+
+**Take the natural log of both sides** to bring the exponent down:
+\\[\\ln\\!\\left(\\frac{4}{7}\\right) = \\frac{t}{10} \\cdot \\ln\\!\\left(\\frac{5}{7}\\right)\\]
+
+**Solve for $t$ — divide both sides by $\\ln(5/7)$:**
+\\[\\frac{t}{10} = \\frac{\\ln(4/7)}{\\ln(5/7)}\\]
+\\[t = 10 \\cdot \\frac{\\ln(4/7)}{\\ln(5/7)}\\]
+
+**Compute numerically:**
+- $\\ln(4/7) = \\ln(0.5714...) \\approx -0.5596$
+- $\\ln(5/7) = \\ln(0.7143...) \\approx -0.3365$
+
+\\[t = 10 \\cdot \\frac{-0.5596}{-0.3365} \\approx 10 \\cdot 1.663 \\approx 16.6 \\text{ minutes}\\]
+
+The coffee reaches $60°C$ approximately **16.6 minutes** after it was poured — about 6.6 minutes after you came back and measured it at $70°C$.
+
+The negative signs cancel (both logs are negative), giving a positive time. This is a sign check you should always do: the answer must be after $t = 0$ and make physical sense.`,
+      },
+    ],
+    resolution: `**The complete IVP procedure for Newton's Law of Cooling:**
+
+1. **Define the variable** — $T(t)$, the temperature as a function of time. State the room temperature $T_{\\text{room}}$.
+2. **Write the differential equation:** $\\dfrac{dT}{dt} = k(T - T_{\\text{room}})$.
+3. **State the initial condition:** $T(0) = T_0$ (the known starting temperature).
+4. **Separate variables:** $\\dfrac{dT}{T - T_{\\text{room}}} = k \\, dt$.
+5. **Integrate both sides:** $\\ln|T - T_{\\text{room}}| = kt + C$.
+6. **Exponentiate:** $T(t) = T_{\\text{room}} + A e^{kt}$.
+7. **Apply $T(0) = T_0$** to find $A = T_0 - T_{\\text{room}}$.
+8. **Apply a second data point** $T(t_1) = T_1$ to solve for $k$ using logarithms.
+9. **Answer the question** — set $T(t) = $ target temperature and solve for $t$.
+
+**The deeper truth:** Newton's Law of Cooling is identical in structure to radioactive decay, drug clearance, population decline, and capacitor discharge. They all say: *rate of change is proportional to current amount (or gap)*. That single sentence always produces a separable ODE, whose solution is always exponential. The IVP turns the physics sentence into a number — a time, a concentration, a half-life. This is what integration is actually for.`,
+  },
+
+{
+  "title": "The Silent Poison: A Calculus Thriller",
+  "subtitle": "A single injection. A beating heart. One initial moment that decides life or death.",
+  "acts": [
+    {
+      "label": "The Scene",
+      "title": "Room 13 at Midnight",
+      "content": "Imagine a quiet hospital room at midnight. The only sound is the steady beep of a heart monitor. A patient lies in the bed after receiving a single injection of a powerful medicine. The doctors know this medicine breaks down inside the body. The rate at which the medicine disappears is always proportional to how much medicine is still present at that exact moment.\n\nEverything in the room is still. The lights are low. The air is calm. But inside the patient's bloodstream, an invisible process is happening.\n\nAt the exact instant the injection finishes — call this moment time equals zero minutes — the doctors measure that there are exactly two hundred milligrams of the medicine in the blood.\n\nThe central mystery: How much medicine remains in the blood at any later time? How fast is it disappearing right at the start? This is not a frozen chemistry snapshot. Quantities are changing every instant. To solve this mystery we need the mathematics of continuous change — differential equations — and specifically an Initial-Value Problem. We will build every piece of the machinery right here, from scratch, with nothing assumed and no steps hidden."
+    },
+    {
+      "label": "Act I",
+      "title": "The Unbreakable Law of the Bloodstream",
+      "content": "**Define the variable.**\nLet A(t) be the amount of medicine (in milligrams) still in the blood at time t minutes after the injection.\nA(t) is the unknown function we are trying to find — not a number, a function. That is the fundamental shift in an IVP: we solve for an entire curve, not a single point.\n\nThe law of decay says this: the rate at which the amount changes — that is, the instantaneous rate of change of A with respect to t — is equal to a negative constant number k multiplied by the current amount A(t).\n\n**Rate of change** means dA/dt — the derivative of A with respect to time.\n\n**Proportional** means multiplied by k (a positive constant). The negative sign tells us the amount is decreasing.\n\nThe full differential equation that must be true at every moment is:\n\\[\\frac{dA}{dt} = -k A\\]\n\nThis equation is the cosmic handcuff of the story. It locks the rate of change to the current amount forever.\n\n**The initial condition** — the amount at t = 0:\n\\[A(0) = 200\\]\n\nThis is the complete Initial-Value Problem. The differential equation plus the starting condition together uniquely determine A(t)."
+    },
+    {
+      "label": "Act II",
+      "title": "Separating Variables — Moving All A to One Side",
+      "content": "The equation \\dfrac{dA}{dt} = -k A has two variables: A and t. The technique of **separation of variables** moves all the A terms to the left side and all the t terms to the right side, so we can integrate each side independently.\n\n**Step 1: Isolate dA and dt.**\nAssuming A is not zero, divide both sides by A:\n\\[\\frac{1}{A} \\, dA = -k \\, dt\\]\nNow the left side involves only A and dA. The right side involves only k and dt. The variables are separated.\n\n**Step 2: Integrate both sides.**\nLeft side: \\displaystyle\\int \\frac{1}{A} \\, dA\nThis is a standard antiderivative. Recall: \\dfrac{d}{du}[\\ln|u|] = \\dfrac{1}{u}, so reading backwards: \\displaystyle\\int \\frac{1}{u} \\, du = \\ln|u| + C.\nHere u = A:\n\\[\\int \\frac{1}{A} \\, dA = \\ln|A| + C_1\\]\n\nRight side: \\displaystyle\\int -k \\, dt = -kt + C_2\n\n**Step 3: Combine constants.**\n\\[\\ln|A| + C_1 = -kt + C_2\\]\n\\[\\ln|A| = -kt + C_2 - C_1\\]\nWrite C = C_2 - C_1 (one constant, since constants combine into constants):\n\\[\\ln|A| = -kt + C\\]"
+    },
+    {
+      "label": "Act III",
+      "title": "Solving for A — Undoing the Logarithm",
+      "content": "We have \\ln|A| = -kt + C. We need A by itself.\n\n**Undo the natural log by exponentiating both sides.**\nIf \\ln(B) = D, then B = e^D. Apply this:\n\\[|A| = e^{-kt + C}\\]\n\n**Use a property of exponents** — split the right side:\n\\[e^{-kt + C} = e^{-kt} \\cdot e^C\\]\nSince e^C is just a positive constant, call it B (where B = e^C > 0):\n\\[|A| = B e^{-kt}\\]\n\n**Remove the absolute value.** Since the amount of medicine is always positive, |A| = A:\n\\[A = B e^{-kt}\\]\n\n**Solve for A:**\n\\[A(t) = B e^{-kt}\\]\nThis is the **general solution** — a family of exponential decay curves, one for each choice of B. The initial condition will determine B."
+    },
+    {
+      "label": "Act IV",
+      "title": "The Interrogation — Applying the Initial Condition",
+      "content": "We have one unknown: B. We have one piece of information: A(0) = 200.\n\n**Use A(0) = 200 to find B.**\nSubstitute t = 0 into A(t) = B e^{-kt}:\n\\[200 = B e^{-k \\cdot 0}\\]\n\\[200 = B \\cdot 1\\]\n\\[B = 200\\]\n\nThe particular solution for this patient is:\n\\[A(t) = 200 e^{-k t}\\]"
+    },
+    {
+      "label": "Act V",
+      "title": "The Confession — Full Verification",
+      "content": "Let us verify that this solution satisfies both the original differential equation and the initial condition. We do this step by step with nothing skipped.\n\n**Compute the derivative.**\nA(t) = 200 e^{-k t}. Use the chain rule: the outer function is e^u where u = -k t. The derivative of the outer function is e^u multiplied by the derivative of the inner function (-k).\n\nSo:\n\\[\\frac{dA}{dt} = 200 \\times (-k) \\times e^{-k t} = -200 k e^{-k t}\\]\n\n**Substitute into the original DE.**\nLeft side (the rate of change):\n\\[\\frac{dA}{dt} = -200 k e^{-k t}\\]\n\nRight side (-k times current amount):\n\\[-k \\times A(t) = -k \\times (200 e^{-k t}) = -200 k e^{-k t}\\]\n\nBoth sides are identical. The differential equation is satisfied.\n\n**Check the initial condition:**\n\\[A(0) = 200 e^{-k \\cdot 0} = 200 e^0 = 200 \\times 1 = 200\\]\n\nIt matches exactly.\n\nThe negative exponent tells the full story: the amount starts at two hundred milligrams and decays smoothly toward zero as time increases. The larger the value of k, the faster the medicine disappears from the blood."
+    }
+  ],
+  "resolution": "**The complete IVP procedure for exponential decay (drug clearance, radioactive decay, etc.):**\n1. **Define the variable** — A(t), the amount as a function of time.\n2. **Write the differential equation:** \\dfrac{dA}{dt} = -k A.\n3. **State the initial condition:** A(0) = A_0.\n4. **Separate variables:** \\dfrac{dA}{A} = -k dt.\n5. **Integrate both sides:** \\ln|A| = -kt + C.\n6. **Exponentiate:** A(t) = B e^{-kt}.\n7. **Apply A(0) = A_0** to find B = A_0.\n8. **Verify** by substituting the derivative back into the original DE and checking the initial condition.\n\n**The deeper truth:** This same structure applies to radioactive decay, drug clearance in the body, population decline under limited resources, and capacitor discharge. They all say: the rate of change is proportional to the current amount (with a negative sign for decay). That single sentence always produces a separable ODE whose solution is always exponential decay. The Initial-Value Problem turns the physical sentence into a precise, predictable curve. This is what integration is actually for."
+}
+],
+
   challenges: [
     {
       id: 'chal-ivp-1',
