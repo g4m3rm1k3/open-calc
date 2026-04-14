@@ -222,6 +222,360 @@ export default {
     },
   ],
 
+  story: {
+    title: `Archimedes' Trap`,
+    subtitle: `When you can't evaluate a limit directly, trap it — squeeze it between two functions you can control, and it has nowhere else to go.`,
+    acts: [
+      {
+        label: 'The Scene',
+        title: 'The Man Who Trapped π',
+        content: `The year is 250 BC. Archimedes wants to know the area of a circle with radius $r$.
+
+He knows the answer is $\\pi r^2$. But what is $\\pi$, exactly? You cannot compute it by arithmetic. You cannot factor it. You cannot "simplify" it into something nicer. It is an irrational number hiding inside the circle, and there is no formula that spits it out directly.
+
+So Archimedes does something that seems obvious in hindsight: he draws polygons.
+
+He draws a regular hexagon **inside** the circle — all six corners touching the circle. He can compute the hexagon's area exactly: it is $3r^2$. The circle is definitely larger. He draws a regular hexagon **outside** the circle — all six sides tangent to the circle. That area is $2\\sqrt{3} \\, r^2 \\approx 3.46r^2$. The circle is definitely smaller. So:
+
+$$3r^2 < \\pi r^2 < 3.46r^2$$
+
+That is a rough bound. He switches to 96-sided polygons. Now the trap has tight jaws:
+
+$$3.1408r^2 < \\pi r^2 < 3.1429r^2$$
+
+He never "computes" $\\pi$. He squeezes it.
+
+Two thousand years later, Cauchy and Weierstrass would turn this geometric instinct into a theorem. The Squeeze Theorem is Archimedes' method, promoted to limits. The strategy is always the same: when you cannot evaluate something directly, trap it between two things you can evaluate. If both traps close to the same value, the thing in between has nowhere else to go.
+
+The most important application — the one every trig derivative depends on — is proving $\\lim_{x \\to 0} \\dfrac{\\sin x}{x} = 1$. That limit cannot be proved by substitution, by algebra, or by L'Hôpital's rule. It requires Archimedes' trap. We will build it, step by step.`,
+      },
+      {
+        label: 'Act I',
+        title: 'When Direct Evaluation Fails — Bounded vs. Convergent',
+        content: `Before we can trap anything, we need to understand why some functions resist direct evaluation.
+
+**The limit laws** — substitution, product, quotient — let you evaluate most limits by plugging in $x = c$ and simplifying. They fail when:
+
+1. The function is **undefined** at $x = c$ (numerator and denominator both zero)
+2. The function **oscillates infinitely fast** as $x \\to c$
+
+The second case is the new one. Let's look at it.
+
+---
+
+**$\\sin(1/x)$ near $x = 0$:**
+
+As $x$ shrinks toward 0, the argument $1/x$ explodes:
+
+| $x$ | $1/x$ |
+|---|---|
+| $0.1$ | $10$ |
+| $0.01$ | $100$ |
+| $0.001$ | $1{,}000$ |
+| $0.0001$ | $10{,}000$ |
+
+And $\\sin$ of a very large number keeps oscillating back and forth between $-1$ and $+1$. The function $\\sin(1/x)$ never settles — it completes infinitely many full cycles as $x \\to 0$. **$\\lim_{x \\to 0} \\sin(1/x)$ does not exist.**
+
+---
+
+**Bounded ≠ convergent.** This is the critical distinction.
+
+- **Bounded** means the function stays inside some fixed interval: $|f(x)| \\leq M$ for all $x$.
+- **Convergent** means the function approaches a specific value.
+
+$\\sin(1/x)$ is bounded ($|\\sin(1/x)| \\leq 1$ always) but **not** convergent as $x \\to 0$.
+
+However — and this is the key insight — **a bounded function multiplied by a factor that goes to zero is a different story**. The wildness gets crushed. The factor going to zero is stronger than the oscillation. That is what the Squeeze Theorem captures precisely.
+
+---
+
+**The one bound you need to memorize:**
+
+For every real number $\\theta$ (in any units):
+
+$$|\\sin \\theta| \\leq 1 \\qquad \\text{and} \\qquad |\\cos \\theta| \\leq 1$$
+
+This comes from the unit circle: $\\sin$ and $\\cos$ are coordinates on a circle of radius 1. No coordinate on a unit circle can exceed 1 in absolute value. These two inequalities are the raw material for nearly every Squeeze Theorem argument you will ever write.`,
+      },
+      {
+        label: 'Act II',
+        title: 'The Trap — Bounding a Function from Both Sides',
+        content: `The core idea is simple: if something is stuck between two walls, and both walls close in on the same point, the thing between them is forced to that point too.
+
+**Setup:** Suppose we can find functions $g(x)$ and $h(x)$ such that:
+
+$$g(x) \\leq f(x) \\leq h(x) \\quad \\text{for all } x \\text{ near } c \\text{ (except possibly at } c)$$
+
+This says $f$ is trapped. It cannot get above $h$ or below $g$. Now suppose both walls converge to the same limit:
+
+$$\\lim_{x \\to c} g(x) = L \\qquad \\text{and} \\qquad \\lim_{x \\to c} h(x) = L$$
+
+Where can $f$ go? It is below $h$, which is heading to $L$. It is above $g$, which is also heading to $L$. As $x \\to c$, the gap between the walls shrinks to zero. There is no room left for $f$ to be anywhere but $L$.
+
+$$\\therefore \\quad \\lim_{x \\to c} f(x) = L$$
+
+---
+
+**First example: $\\lim_{x \\to 0} x \\sin(1/x)$.**
+
+$f(x) = x \\sin(1/x)$ is undefined at $x = 0$, and $\\sin(1/x)$ oscillates wildly. Direct evaluation is impossible.
+
+But we know $|\\sin(1/x)| \\leq 1$. So:
+
+$$-1 \\leq \\sin(1/x) \\leq 1$$
+
+Multiply all three parts by $x$. **Careful**: the direction of the inequalities flips when $x < 0$. The safe move is to use absolute value:
+
+$$|x \\cdot \\sin(1/x)| = |x| \\cdot |\\sin(1/x)| \\leq |x| \\cdot 1 = |x|$$
+
+Which gives us:
+
+$$-|x| \\leq x \\sin(1/x) \\leq |x|$$
+
+The two bounding functions are $g(x) = -|x|$ and $h(x) = |x|$. Both satisfy:
+
+$$\\lim_{x \\to 0}(-|x|) = 0 \\qquad \\text{and} \\qquad \\lim_{x \\to 0} |x| = 0$$
+
+Same limit on both sides. The trap closes. By the Squeeze Theorem:
+
+$$\\lim_{x \\to 0} x \\sin(1/x) = 0$$
+
+The infinitely oscillating $\\sin(1/x)$ was completely irrelevant. The factor $x$ crushed it.
+
+---
+
+**The pattern to recognize** — bounded times vanishing:
+
+If $|q(x)| \\leq M$ for some constant $M$ (the function is bounded), and $\\lim_{x \\to c} p(x) = 0$ (the other factor vanishes), then:
+
+$$\\lim_{x \\to c} p(x) \\cdot q(x) = 0$$
+
+This handles $x^2 \\cos(1/x)$, $\\sqrt{x} \\sin x$, $e^{-x} \\sin x$ (as $x \\to \\infty$), and dozens more. Spot the bounded part, spot the vanishing part, conclude zero.`,
+      },
+      {
+        label: 'Act III',
+        title: 'The Central Result — Why $\\lim_{x \\to 0} \\sin(x)/x = 1$ (Geometric Proof)',
+        content: `This is the most important limit in trigonometry. Every derivative formula for $\\sin$ and $\\cos$ depends on it. And it cannot be proved by substitution, algebra tricks, or L'Hôpital's rule (using L'Hôpital here would be circular — you need this limit first, before you can differentiate $\\sin$). It requires a geometric squeeze.
+
+We will build the proof from scratch, one piece at a time.
+
+---
+
+**Setup: the unit circle.**
+
+Draw a unit circle (radius = 1) centered at the origin. Fix an angle $x$ with $0 < x < \\pi/2$ (first quadrant). Mark three points:
+
+- $O = (0, 0)$ — the origin
+- $A = (1, 0)$ — the right end of the horizontal radius
+- $P = (\\cos x,\\, \\sin x)$ — the point on the circle at angle $x$
+- $T = (1,\\, \\tan x)$ — where the ray at angle $x$ hits the vertical line $x = 1$
+
+---
+
+**Three regions, nested inside each other:**
+
+**Region 1 — Triangle $OAP$**: the triangle with vertices at $O$, $A$, and $P$.
+
+- Base: $OA = 1$ (the horizontal leg)
+- Height: the $y$-coordinate of $P = \\sin x$
+- Area: $\\dfrac{1}{2} \\cdot 1 \\cdot \\sin x = \\dfrac{\\sin x}{2}$
+
+**Region 2 — Sector $OAP$**: the pie-slice of the unit circle between angle $0$ and angle $x$.
+
+- A full circle (angle $2\\pi$) has area $\\pi r^2 = \\pi$ (since $r=1$).
+- Sector is the fraction $\\dfrac{x}{2\\pi}$ of the full circle.
+- Area: $\\dfrac{x}{2\\pi} \\cdot \\pi = \\dfrac{x}{2}$
+
+**Region 3 — Triangle $OAT$**: the larger triangle with vertices at $O$, $A$, and $T = (1, \\tan x)$.
+
+- Base: $OA = 1$
+- Height: $\\tan x$
+- Area: $\\dfrac{1}{2} \\cdot 1 \\cdot \\tan x = \\dfrac{\\tan x}{2}$
+
+---
+
+**The nesting:** Triangle $OAP$ fits inside the sector. The sector fits inside triangle $OAT$. (You can see this geometrically: $P$ is on the arc, and $T$ is outside the circle.) So:
+
+$$\\frac{\\sin x}{2} \\leq \\frac{x}{2} \\leq \\frac{\\tan x}{2}$$
+
+Multiply through by $\\dfrac{2}{\\sin x}$ (positive since $0 < x < \\pi/2$):
+
+$$1 \\leq \\frac{x}{\\sin x} \\leq \\frac{1}{\\cos x}$$
+
+Take reciprocals — **this flips all inequalities**:
+
+$$\\cos x \\leq \\frac{\\sin x}{x} \\leq 1$$
+
+Now apply the Squeeze Theorem. As $x \\to 0^+$:
+
+- Lower bound: $\\lim_{x \\to 0^+} \\cos x = \\cos 0 = 1$
+- Upper bound: $\\lim_{x \\to 0^+} 1 = 1$
+
+Both walls close to $1$. Therefore:
+
+$$\\lim_{x \\to 0^+} \\frac{\\sin x}{x} = 1$$
+
+**Left-hand limit (symmetry):** For $x < 0$, let $x = -t$ where $t > 0$. Then $\\sin(x)/x = \\sin(-t)/(-t) = (-\\sin t)/(-t) = \\sin(t)/t$. Same expression. So the left-hand limit is also $1$.
+
+$$\\boxed{\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1}$$
+
+---
+
+**What this says geometrically**: for very small angles (in radians), the arc length $x$ and the chord $\\sin x$ are nearly equal. The ratio is almost exactly 1. This is why engineers use $\\sin \\theta \\approx \\theta$ for small $\\theta$ — it is not an approximation by choice, it is a theorem.`,
+      },
+      {
+        label: 'Act IV',
+        title: 'The Companion Limit — $\\lim_{x \\to 0}(1 - \\cos x)/x = 0$',
+        content: `Once we have $\\lim_{x \\to 0} \\dfrac{\\sin x}{x} = 1$, a second fundamental limit follows from it by algebra. This companion shows up in the derivative of $\\cos x$.
+
+**Compute $\\lim_{x \\to 0} \\dfrac{1 - \\cos x}{x}$.**
+
+Direct substitution: $\\dfrac{1 - \\cos 0}{0} = \\dfrac{0}{0}$. Indeterminate. Cannot simplify by factoring or L'Hôpital (same circularity problem).
+
+**The trick**: multiply numerator and denominator by the conjugate $(1 + \\cos x)$.
+
+$$\\frac{1 - \\cos x}{x} \\cdot \\frac{1 + \\cos x}{1 + \\cos x} = \\frac{(1 - \\cos x)(1 + \\cos x)}{x(1 + \\cos x)} = \\frac{1 - \\cos^2 x}{x(1 + \\cos x)}$$
+
+Apply the Pythagorean identity $\\sin^2 x + \\cos^2 x = 1$, so $1 - \\cos^2 x = \\sin^2 x$:
+
+$$= \\frac{\\sin^2 x}{x(1 + \\cos x)} = \\frac{\\sin x}{x} \\cdot \\frac{\\sin x}{1 + \\cos x}$$
+
+Now take the limit — both factors are separable:
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} \\cdot \\lim_{x \\to 0} \\frac{\\sin x}{1 + \\cos x} = 1 \\cdot \\frac{\\sin 0}{1 + \\cos 0} = 1 \\cdot \\frac{0}{2} = 0$$
+
+$$\\boxed{\\lim_{x \\to 0} \\frac{1 - \\cos x}{x} = 0}$$
+
+---
+
+**Why these two limits run the show:**
+
+When you compute $\\dfrac{d}{dx}[\\sin x]$ from the limit definition of the derivative:
+
+$$\\frac{d}{dx}[\\sin x] = \\lim_{h \\to 0} \\frac{\\sin(x+h) - \\sin x}{h}$$
+
+Expand $\\sin(x+h)$ with the angle addition formula $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$:
+
+$$= \\lim_{h \\to 0} \\frac{\\sin x \\cos h + \\cos x \\sin h - \\sin x}{h} = \\lim_{h \\to 0} \\left[ \\sin x \\cdot \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\frac{\\sin h}{h} \\right]$$
+
+$$= \\sin x \\cdot \\lim_{h \\to 0} \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\lim_{h \\to 0} \\frac{\\sin h}{h}$$
+
+$$= \\sin x \\cdot 0 + \\cos x \\cdot 1 = \\cos x$$
+
+The two Squeeze Theorem limits — $\\lim \\sin(h)/h = 1$ and $\\lim (1 - \\cos h)/h = 0$ — appear directly. Without them, the derivative of $\\sin$ is unknowable. The entire tower of trig calculus stands on Archimedes' trap.`,
+      },
+      {
+        label: 'Act V',
+        title: 'The Formal Theorem — Every Word Earns Its Place',
+        content: `Here is the Squeeze Theorem in full formal language, and an ε-δ proof sketch showing why it is logically airtight.
+
+---
+
+**Theorem (Squeeze / Sandwich / Pinching Theorem):**
+
+Suppose $g(x) \\leq f(x) \\leq h(x)$ for all $x$ in some open interval containing $c$, except possibly at $c$ itself. If:
+
+$$\\lim_{x \\to c} g(x) = L \\quad \\text{and} \\quad \\lim_{x \\to c} h(x) = L$$
+
+then $\\lim_{x \\to c} f(x) = L$.
+
+---
+
+**Every clause matters:**
+
+**"$g(x) \\leq f(x) \\leq h(x)$ for all $x$ near $c$"** — the inequalities must hold in a neighborhood of $c$ (not just at isolated points). The function $f$ must be genuinely trapped, not just touching the bounds occasionally.
+
+**"except possibly at $c$ itself"** — same as in the limit definition: we never care what happens at exactly $x = c$. The limit is about approach, not arrival. Both $f$ and the bounds are allowed to be undefined at $c$.
+
+**"the same $L$"** — this is the non-negotiable condition. If $g \\to 2$ and $h \\to 5$, you know $f$'s limit is somewhere between 2 and 5, but you cannot determine it. The theorem only works when both walls meet at a single point.
+
+---
+
+**Proof sketch (using ε-δ):**
+
+We need to show: given any $\\epsilon > 0$, we can find $\\delta > 0$ such that $|f(x) - L| < \\epsilon$ whenever $0 < |x - c| < \\delta$.
+
+Since $g(x) \\to L$: there exists $\\delta_1 > 0$ such that $|g(x) - L| < \\epsilon$ for $0 < |x - c| < \\delta_1$.
+That means $L - \\epsilon < g(x) < L + \\epsilon$.
+
+Since $h(x) \\to L$: there exists $\\delta_2 > 0$ with the same guarantee for $h$.
+
+Let $\\delta = \\min(\\delta_1, \\delta_2)$. For any $x$ with $0 < |x - c| < \\delta$:
+
+$$L - \\epsilon < g(x) \\leq f(x) \\leq h(x) < L + \\epsilon$$
+
+The first inequality comes from $g(x) \\to L$. The last from $h(x) \\to L$. The two middle inequalities come from the trap $g \\leq f \\leq h$. Chaining them all:
+
+$$L - \\epsilon < f(x) < L + \\epsilon \\implies |f(x) - L| < \\epsilon \\quad \\square$$
+
+The limits of $g$ and $h$ forced $f$ into the $\\epsilon$-band around $L$ from both sides simultaneously. There was nowhere else for $f$ to go.`,
+      },
+      {
+        label: 'Act VI',
+        title: 'The Pattern Library — Recognizing When to Squeeze',
+        content: `The Squeeze Theorem is not just for exotic oscillating functions. It is a general strategy: when you cannot evaluate a limit directly, look for bounds.
+
+---
+
+**The main pattern: bounded × vanishing → 0**
+
+If $|q(x)| \\leq M$ (bounded) and $p(x) \\to 0$ (vanishing), then $p(x)q(x) \\to 0$.
+
+Bounds: $-M \\cdot |p(x)| \\leq p(x)q(x) \\leq M \\cdot |p(x)|$. Both go to 0.
+
+| Limit | Bounded part | Vanishing part | Result |
+|---|---|---|---|
+| $\\lim_{x \\to 0} x \\sin(1/x)$ | $\\|\\sin(1/x)\\| \\leq 1$ | $x \\to 0$ | $0$ |
+| $\\lim_{x \\to 0} x^2 \\cos(1/x^2)$ | $\\|\\cos(1/x^2)\\| \\leq 1$ | $x^2 \\to 0$ | $0$ |
+| $\\lim_{x \\to 0} \\sqrt{x} \\sin x$ | $\\|\\sin x\\| \\leq 1$ | $\\sqrt{x} \\to 0$ | $0$ |
+| $\\lim_{x \\to \\infty} e^{-x} \\sin x$ | $\\|\\sin x\\| \\leq 1$ | $e^{-x} \\to 0$ | $0$ |
+
+---
+
+**The $\\sin x / x$ pattern: ratios near zero**
+
+More generally, any "small-angle" ratio has limit 1:
+
+$$\\lim_{x \\to 0} \\frac{\\sin(kx)}{kx} = 1 \\quad \\text{for any constant } k \\neq 0$$
+
+This means you can rewrite: $\\lim_{x \\to 0} \\dfrac{\\sin(5x)}{x} = \\lim_{x \\to 0} 5 \\cdot \\dfrac{\\sin(5x)}{5x} = 5 \\cdot 1 = 5$.
+
+The trick is always to manufacture the form $\\sin(\\text{something})/(\\text{same something})$ — then the limit is 1.
+
+---
+
+**When squeezing with non-zero limits:**
+
+The theorem is not restricted to limits of 0. Archimedes squeezed $\\pi$ between polygon bounds converging to the same value. The same idea applies in limits: if you can trap $f$ between $g$ and $h$ that both converge to $L$ (any $L$), the conclusion holds.
+
+Example: $\\lim_{x \\to \\infty} \\dfrac{\\sin x}{x}$. Here $|\\sin x| \\leq 1$, so:
+
+$$\\frac{-1}{x} \\leq \\frac{\\sin x}{x} \\leq \\frac{1}{x}$$
+
+Both bounds go to 0. Therefore $\\lim_{x \\to \\infty} \\dfrac{\\sin x}{x} = 0$. Even though $\\sin x$ never converges, dividing by $x$ (which grows without bound) crushes it to zero.`,
+      },
+    ],
+    resolution: `**The Squeeze Theorem:**
+
+If $g(x) \\leq f(x) \\leq h(x)$ near $c$ (except possibly at $c$), and $\\lim_{x \\to c} g(x) = \\lim_{x \\to c} h(x) = L$, then $\\lim_{x \\to c} f(x) = L$.
+
+**The three-step procedure:**
+
+1. **Identify why direct evaluation fails** — substitution gives $0/0$, or the function oscillates (e.g. $\\sin(1/x)$)
+2. **Find the bounds** — use $|\\sin \\theta| \\leq 1$, $|\\cos \\theta| \\leq 1$, or geometric area inequalities to write $g(x) \\leq f(x) \\leq h(x)$
+3. **Verify the limits agree** — compute $\\lim g$ and $\\lim h$ and confirm they equal the same $L$; conclude $\\lim f = L$
+
+**The two fundamental trig limits** (both proved by the Squeeze Theorem):
+
+$$\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\qquad \\lim_{x \\to 0} \\frac{1 - \\cos x}{x} = 0$$
+
+**The standard pattern** — bounded × vanishing:
+
+If $|q(x)| \\leq M$ and $p(x) \\to 0$, then $p(x) \\cdot q(x) \\to 0$. Bounds: $-M|p| \\leq pq \\leq M|p|$, both sides go to 0.
+
+**Why it matters:** $\\lim_{x \\to 0} \\dfrac{\\sin x}{x} = 1$ is the reason $\\dfrac{d}{dx}[\\sin x] = \\cos x$ and not something else. The entire tower of trig derivatives and integrals rests on Archimedes' geometric trap from 250 BC.`,
+  },
+
   challenges: [
     {
       id: 'ch1-sq-c1',
