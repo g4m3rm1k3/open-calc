@@ -322,7 +322,19 @@ The relative error in $x^n$ equals $n$ times the relative error in $x$. The expo
 
 - Square root ($n = \\frac{1}{2}$): a 2% error in $x$ gives a 1% error in $\\sqrt{x}$. Halved.
 - Square ($n = 2$): a 1% error in $x$ gives a 2% error in $x^2$. Doubled.
-- Cube ($n = 3$): a 1% error in $x$ gives a 3% error in $x^3$. Tripled.`,
+- Cube ($n = 3$): a 1% error in $x$ gives a 3% error in $x^3$. Tripled.
+
+**The 5-second shortcut: logarithmic differentiation.**
+
+Instead of differentiating $V = \\frac{4}{3}\\pi r^3$ and then dividing by $V$, take the natural log of both sides first:
+\\[\\ln V = \\ln\\!\\left(\\frac{4}{3}\\pi\\right) + 3\\ln r\\]
+
+Now differentiate both sides. The derivative of $\\ln V$ with respect to $r$ is $\\frac{1}{V}\\frac{dV}{dr}$, which in differential form is $\\frac{dV}{V}$. The constant $\\ln(\\frac{4}{3}\\pi)$ vanishes. The term $3\\ln r$ differentiates to $\\frac{3\\,dr}{r}$:
+\\[\\frac{dV}{V} = 3 \\cdot \\frac{dr}{r}\\]
+
+Done — in one line, no substitution required. The exponent 3 falls straight out of the logarithm.
+
+This trick works for any product, quotient, or power. When your formula looks like $y = \\frac{x^a \\cdot z^b}{w^c}$, taking the log converts it to $\\ln y = a\\ln x + b\\ln z - c\\ln w$, and differentiating gives $\\frac{dy}{y} = a\\frac{dx}{x} + b\\frac{dz}{z} - c\\frac{dw}{w}$. Relative errors read off instantly from the exponents — no algebra required.`,
       },
       {
         label: 'Act V',
@@ -351,7 +363,10 @@ Total differential:
 
 The relative error in a product is the **sum** of the individual relative errors. Multiply two quantities, and their percentage errors add. This is why scientists work hard to reduce errors in every measurement — they accumulate.
 
-**Connection to integration:** the equation $dV = 4\\pi r^2 \\, dr$ says the total volume is the sum of infinitely many thin shells of area $4\\pi r^2$ and thickness $dr$. Summing all these shells from $r = 0$ to $r = R$ gives $\\int_0^R 4\\pi r^2 \\, dr = \\frac{4}{3}\\pi R^3$. The differential is the integrand.`,
+**Connection to integration:** so far we have used $dV = 4\\pi r^2 \\, dr$ as an error estimate — a single small slice. But notice what it is geometrically: a thin spherical shell of surface area $4\\pi r^2$ and thickness $dr$. If you start at $r = 0$ and keep adding shells outward, each of thickness $dr$, you eventually build the entire sphere. **Integration is exactly that process — adding up infinitely many $dV$'s.** Each $dV = 4\\pi r^2 \\, dr$ is one shell; summing all shells from $r = 0$ to $r = R$ gives the total volume:
+\\[\\int_0^R 4\\pi r^2 \\, dr = \\frac{4}{3}\\pi R^3\\]
+
+The $dr$ inside the integral is the same $dr$ from the differential — it is the thickness of each infinitesimal slice, not decoration. The differential $dV$ is the building block; integration assembles the whole.`,
       },
     ],
     resolution: `**The differential formula and procedure:**
