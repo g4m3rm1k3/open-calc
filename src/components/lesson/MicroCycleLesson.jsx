@@ -15,6 +15,7 @@ import DynamicProof from './DynamicProof.jsx'
 import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
 import NarrativeStory from './NarrativeStory.jsx'
+import FirstPrinciplesLesson from './FirstPrinciplesLesson.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
@@ -649,6 +650,9 @@ export default function MicroCycleLesson({ lesson }) {
         )
       })()}
       <UnifiedLearningDock lesson={lesson} />
+      {lesson.discovery && (
+        <FirstPrinciplesLesson key={lesson.id} discovery={lesson.discovery} />
+      )}
       {lesson.story && (Array.isArray(lesson.story)
         ? lesson.story.map((s, i) => <NarrativeStory key={`${lesson.id}-story-${i}`} story={s} />)
         : <NarrativeStory key={lesson.id} story={lesson.story} />

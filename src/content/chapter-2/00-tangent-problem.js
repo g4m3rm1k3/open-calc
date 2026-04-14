@@ -521,6 +521,204 @@ export default {
     },
   ],
 
+  discovery: {
+    title: `How Fast Is My Driver Going Right Now?`,
+    persona: `I'm a race engineer for a NASCAR team at Talladega Superspeedway. My driver is 3 laps from the finish, locked in a drafting battle for second place. I have a GPS unit that gives me his exact position at any moment. I need to know his speed at the exact instant he exits Turn 4 — because that's when the slingshot draft window opens. Not his average lap speed. Not his speed "around" that point. His speed at that exact instant.`,
+    steps: [
+      {
+        phase: 'need',
+        title: `The tool I have: average speed`,
+        content: `The formula every engineer knows:
+
+$$\\text{average speed} = \\frac{\\text{distance traveled}}{\\text{time elapsed}} = \\frac{\\Delta p}{\\Delta t}$$
+
+where $\\Delta p$ is the change in position and $\\Delta t$ is the time interval.
+
+I have GPS data so I can read off position $p$ at any moment $t$. If I pick two moments — say $t_1 = 46$ seconds and $t_2 = 47$ seconds — I can compute:
+
+$$\\text{average speed} = \\frac{p(47) - p(46)}{47 - 46} = \\frac{p(47) - p(46)}{1 \\text{ second}}$$
+
+This formula is clean, exact, and requires nothing more than subtraction and division. I've been using it my whole career.`,
+      },
+      {
+        phase: 'need',
+        title: `Why average speed isn't enough`,
+        content: `The problem: in the last 2 seconds before Turn 4 exit, my driver braked to hit the apex, then floored the throttle coming out. That 2-second window contains braking, coasting, and full acceleration.
+
+If I compute average speed over that 2 seconds and get 192 mph, that number is a blend. He might have been going 175 mph at the apex and 209 mph at exit. The average hides the real value.
+
+The draft window opens **exactly** at the exit point. I need to know his speed at **exactly** $t = 47$ seconds — the moment the GPS marks the exit line.
+
+Not "between $t = 46$ and $t = 48$." Not "around $t = 47$." The exact instant $t = 47$.`,
+      },
+      {
+        phase: 'need',
+        title: `My formula collapses at a single instant`,
+        content: `So I try to apply the average speed formula at exactly $t = 47$:
+
+$$\\text{speed at } t = 47 = \\frac{p(47) - p(47)}{47 - 47} = \\frac{0}{0}$$
+
+Zero divided by zero. Undefined. My formula gives no answer.
+
+This isn't a rounding error or a data problem. It's a fundamental breakdown: **the average speed formula requires an interval.** A "speed at a single point in time" has no change in position and no change in time. There is nothing to divide.
+
+For 2,000 years, this was the state of things. You could measure average speed. You could not, in any rigorous sense, measure speed at an instant. Aristotle even argued that motion at an instant was a contradiction in terms.
+
+I need a new tool. My current one literally cannot answer the question.`,
+      },
+      {
+        phase: 'discovery',
+        title: `Try a smaller window — does the average get more accurate?`,
+        content: `If I can't use an interval of zero length, what about a very *small* interval?
+
+Instead of measuring from $t = 46$ to $t = 47$, I measure from $t = 46.9$ to $t = 47$. A tenth of a second. Much less time for braking and acceleration to distort the reading.
+
+My GPS gives position as $p(t) = 290t - 15t^2$ (feet from the reference line, $t$ in seconds from the start of the run). Let's compute average speed over progressively shorter windows ending at $t = 0$ (I'll reset my clock so "Turn 4 exit" is $t = 0$):
+
+$$\\text{average speed} = \\frac{p(h) - p(0)}{h} \\quad \\text{for smaller and smaller } h$$
+
+where $h$ is the window length in seconds.
+
+| Window $h$ | $p(h)$ (feet) | $p(0)$ (feet) | Average speed (ft/s) | mph |
+|---|---|---|---|---|
+| $h = 1$ s | $275$ | $0$ | $275$ ft/s | 188 mph |
+| $h = 0.1$ s | $28.85$ | $0$ | $288.5$ ft/s | 197 mph |
+| $h = 0.01$ s | $2.8985$ | $0$ | $289.85$ ft/s | 198 mph |
+| $h = 0.001$ s | $0.28999$ | $0$ | $289.99$ ft/s | 198 mph |
+
+The numbers are changing. But they're not jumping around randomly — **they're converging.**`,
+      },
+      {
+        phase: 'discovery',
+        title: `I see the pattern — write the algebra`,
+        content: `The convergence isn't a coincidence. Let me write the average speed formula **algebraically** and see what's happening:
+
+$$\\frac{p(h) - p(0)}{h}$$
+
+Substitute $p(t) = 290t - 15t^2$:
+
+$$p(h) = 290h - 15h^2 \\qquad p(0) = 290(0) - 15(0)^2 = 0$$
+
+So:
+
+$$\\frac{p(h) - p(0)}{h} = \\frac{290h - 15h^2 - 0}{h} = \\frac{h(290 - 15h)}{h}$$
+
+As long as $h \\neq 0$, I can cancel the $h$:
+
+$$= 290 - 15h$$
+
+Now I can see exactly why the table converged:
+
+| $h$ | $290 - 15h$ | ft/s |
+|---|---|---|
+| $1$ | $290 - 15 = 275$ | 188 mph |
+| $0.1$ | $290 - 1.5 = 288.5$ | 197 mph |
+| $0.01$ | $290 - 0.15 = 289.85$ | 198 mph |
+| $0.001$ | $290 - 0.015 = 289.985$ | 198 mph |
+
+The $-15h$ term is the source of all the "blending" — the contamination from the braking phase. As $h$ shrinks, that contamination shrinks too. It approaches zero. What's left is $290$.`,
+      },
+      {
+        phase: 'discovery',
+        title: `The answer appears — without ever dividing by zero`,
+        content: `The expression $290 - 15h$ approaches $290$ as $h$ gets small. I never need $h$ to actually equal zero. I just need to ask: **what value does the expression approach?**
+
+$$\\text{As } h \\to 0: \\quad 290 - 15h \\to 290 - 15(0) = 290 \\text{ ft/s}$$
+
+That is the instantaneous speed at $t = 0$: **290 ft/s**, which converts to:
+
+$$290 \\frac{\\text{ft}}{\\text{s}} \\times \\frac{3600 \\text{ s}}{1 \\text{ hr}} \\times \\frac{1 \\text{ mile}}{5280 \\text{ ft}} \\approx 197.7 \\text{ mph}$$
+
+I avoided $0/0$ entirely. The key move was:
+1. Expand the numerator
+2. Factor out $h$
+3. Cancel $h$ (legal since $h \\neq 0$)
+4. Ask what the result approaches as $h \\to 0$
+
+Step 4 is the limit. I used it in Chapter 1 to resolve $0/0$ fractions. This is the same tool — here it's resolving "the speed at an instant."
+
+My driver is hitting the Turn 4 exit line at **197.7 mph**. The draft window is open.`,
+      },
+      {
+        phase: 'formalization',
+        title: `Name the process: Newton's difference quotient`,
+        content: `What I just did has a name. For any function $f$ (position, temperature, profit — anything), the expression:
+
+$$\\frac{f(t + h) - f(t)}{h}$$
+
+is called the **difference quotient** (Newton called it the "method of fluxions" in the 1660s; Leibniz independently called his version "differentials").
+
+The limit of the difference quotient as $h \\to 0$ is the **derivative** of $f$ at $t$:
+
+$$f'(t) = \\lim_{h \\to 0} \\frac{f(t+h) - f(t)}{h}$$
+
+This is the formal definition of the derivative. In our case:
+- $f(t) = 290t - 15t^2$ (position)
+- $f'(t)$ = instantaneous speed (velocity) at time $t$
+
+The difference quotient is the average speed over a window of width $h$. The derivative is what that average stabilizes to as the window collapses to a point.
+
+**Notation:** mathematicians use several equivalent symbols for the derivative:
+
+$$f'(t) = \\frac{df}{dt} = \\frac{dp}{dt} = \\dot{f}(t)$$
+
+All mean the same thing: the instantaneous rate of change of $f$ with respect to $t$.`,
+      },
+      {
+        phase: 'formalization',
+        title: `Compute $p'(t)$ — not just at one moment, but at every moment`,
+        content: `The big payoff: I don't have to repeat the whole process every time. Let me compute $p'(t)$ for a **general** time $t$ (not just $t = 0$):
+
+$$p(t) = 290t - 15t^2$$
+
+**Step 1 — Write the difference quotient:**
+
+$$\\frac{p(t+h) - p(t)}{h}$$
+
+**Step 2 — Expand $p(t+h)$:**
+
+$$p(t+h) = 290(t+h) - 15(t+h)^2 = 290t + 290h - 15t^2 - 30th - 15h^2$$
+
+**Step 3 — Subtract $p(t)$ and simplify:**
+
+$$p(t+h) - p(t) = 290h - 30th - 15h^2 = h(290 - 30t - 15h)$$
+
+**Step 4 — Divide by $h$ (cancel, since $h \\neq 0$):**
+
+$$\\frac{p(t+h) - p(t)}{h} = 290 - 30t - 15h$$
+
+**Step 5 — Take the limit as $h \\to 0$:**
+
+$$p'(t) = \\lim_{h \\to 0}(290 - 30t - 15h) = 290 - 30t$$
+
+**The velocity function:** $p'(t) = 290 - 30t$ ft/s.
+
+This single formula gives my driver's speed at **every** moment $t$:
+- At $t = 0$ (Turn 4 exit): $290 - 0 = 290$ ft/s = 197.7 mph ✓
+- At $t = 5$ s (mid-straightaway): $290 - 150 = 140$ ft/s = 95 mph (braking for Turn 1)
+- At $t = 9.67$ s: $290 - 290 = 0$ ft/s (momentarily stopped, deepest brake point)
+
+What started as a single unanswerable question — "how fast at one instant?" — became a machine that answers it for every instant at once.`,
+      },
+    ],
+    resolution: `**The derivative, rebuilt from one question:**
+
+$$f'(t) = \\lim_{h \\to 0} \\frac{f(t+h) - f(t)}{h}$$
+
+**The four-step process (always the same):**
+
+1. Write $\\dfrac{f(t+h) - f(t)}{h}$
+2. Expand $f(t+h)$ by substituting $(t+h)$ everywhere $t$ appears
+3. Simplify — every term without an $h$ will cancel; factor $h$ from what remains
+4. Cancel $h$ from numerator and denominator, then take the limit as $h \\to 0$
+
+**What we avoided:** we never divided by zero. We divided by $h$ while $h \\neq 0$, then asked what value the result *approaches*. That is exactly the limit from Chapter 1 — same idea, new application.
+
+**What it gives you:** not a single speed at a single moment, but a new function $f'(t)$ — the velocity function — that answers the question for every moment simultaneously.
+
+Newton invented this in 1666 to describe planetary motion. You just re-invented it to solve a NASCAR drafting problem. The question was different; the math was identical.`,
+  },
+
   challenges: [
     {
       id: 'ch2-000-ch1',
