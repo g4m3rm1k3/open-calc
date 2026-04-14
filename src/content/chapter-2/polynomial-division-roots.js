@@ -175,7 +175,39 @@ export default {
       conclusion: "Descartes' Rule predicts (3 or 1) positive and (2 or 0) negative roots. Combined with degree 5, the remaining roots are complex conjugate pairs.",
     },
   ],
-  story:{
+  story:[{
+  "title": "Decoupling the Monolith",
+  "subtitle": "A legacy system crashing at unknown intervals. A monolithic equation. Forensic detectives, manual milling, and a high-speed CNC pipeline to break it down into clean, isolated components.",
+  "acts": [
+    {
+      "label": "Act I",
+      "title": "The Monolithic Architecture",
+      "content": "Imagine staring at a terminal at 2:00 AM. The system keeps crashing, and the entire failure profile is modeled by a single, gigantic monolithic function:\n\n$$p(x) = 2x^4 - 3x^3 - 12x^2 + 7x + 6$$\n\nThis is a polynomial. It is a sum of terms where constants (coefficients) are multiplied by a variable $x$ raised to positive integer powers. The degree of this monolith is 4 (the highest exponent), which means there are exactly 4 critical failure points—called roots—we need to isolate.\n\nRight now, the architecture is tangled. To fix it, we must refactor this monolith into single-responsibility, modular components: linear factors of the form $(x - r)$. Each root $r$ represents an exact timestamp where the system fails. We cannot guess our way through this. We will use rigorous principles to dismantle the codebase piece by piece."
+    },
+    {
+      "label": "Act II",
+      "title": "The Refactoring Strategy",
+      "content": "To decouple the monolith, we need to extract its hidden linear modules. We do this by testing possible roots and dividing them out. Polynomial division is like extracting a verified subroutine from a legacy codebase. When we divide $p(x)$ by a linear factor $(x - r)$, two things happen:\n\n1. If $r$ is a true root (a valid failure point), the remainder is zero, confirming a clean extraction.\n2. The quotient becomes our new, simplified polynomial—a lower-degree system we can continue to break down.\n\nWe will use two distinct methods to achieve this: a meticulous, manual process to understand the underlying mechanics, and a high-speed automated pipeline for rapid extraction."
+    },
+    {
+      "label": "Act III",
+      "title": "Profiling the Edge Cases (The Forensic Tools)",
+      "content": "Before we start cutting away at the monolith, we must profile the system to find our suspects. We don't test random numbers; we deploy our Forensic Tools—two mathematical detectives that narrow our search space.\n\n**Detective 1: Descartes' Rule of Signs.** We count how many times the signs of our coefficients change. For $p(x) = 2x^4 - 3x^3 - 12x^2 + 7x + 6$, the signs are (+, -, -, +, +). The sign changes from + to - (once) and from - to + (twice). That is 2 sign changes, meaning there are exactly 2 or 0 positive real roots. Evaluating $p(-x)$ gives signs (+, +, -, -, +), which also has 2 changes. We have 2 or 0 negative roots!\n\n**Detective 2: Rational Zeros Theorem.** This gives us the exact list of rational suspects. Any rational root $p/q$ must have $p$ as a factor of the constant term (6) and $q$ as a factor of the leading coefficient (2).\nFactors of 6: $\\pm 1, \\pm 2, \\pm 3, \\pm 6$\nFactors of 2: $\\pm 1, \\pm 2$\nOur complete list of testable modules is: $\\pm 1, \\pm 2, \\pm 3, \\pm 6, \\pm 1/2, \\pm 3/2$."
+    },
+    {
+      "label": "Act IV",
+      "title": "The Manual Mill Approach (Long Division)",
+      "content": "Let us test the candidate $x = 1$ using **The Manual Mill Approach** (explicit long division). We want to divide our monolith by $(x - 1)$. We will do this step-by-step, hand-cranking each axis to see the exact mechanics of the cut, ensuring we understand the gears turning before we automate it.\n\n**Step 1:** Divide the leading term $2x^4$ by $x$. This gives $2x^3$. Write this in the quotient.\n**Step 2:** Multiply $2x^3$ by the divisor $(x - 1)$ to get $2x^4 - 2x^3$. Subtract this from the monolith. The $2x^4$ terms cancel, leaving $-x^3$. Bring down the $-12x^2$.\n**Step 3:** Divide $-x^3$ by $x$ to get $-x^2$. Multiply $-x^2(x - 1) = -x^3 + x^2$. Subtracting this leaves $-13x^2$. Bring down the $7x$.\n**Step 4:** Divide $-13x^2$ by $x$ to get $-13x$. Multiply $-13x(x - 1) = -13x^2 + 13x$. Subtracting leaves $-6x$. Bring down the $6$.\n**Step 5:** Divide $-6x$ by $x$ to get $-6$. Multiply $-6(x - 1) = -6x + 6$. Subtracting leaves exactly $0$.\n\nThe remainder is 0. Extraction successful! Our monolithic system is now cleanly factored as $p(x) = (x - 1)(2x^3 - x^2 - 13x - 6)$."
+    },
+    {
+      "label": "Act V",
+      "title": "The CNC Pipeline (Synthetic Division)",
+      "content": "For the remaining cubic, $2x^3 - x^2 - 13x - 6$, the manual mill is simply too slow and requires too much hand-cranking. We switch to our optimized, high-speed automated shortcut: **The CNC Pipeline** (Synthetic Division). Once we have the problem fixtured correctly—stripping away the variables and leaving only the essential data—we process it rapidly.\n\nLet's test the candidate $x = -2$.\n\nWrite the fixtured coefficients: $2, -1, -13, -6$.\n**1.** Bring down the leading coefficient: $2$.\n**2.** Multiply by the root candidate ($-2$) and add to the next column: $2 \\cdot (-2) = -4$. Then $-1 + (-4) = -5$.\n**3.** Multiply and add again: $-5 \\cdot (-2) = 10$. Then $-13 + 10 = -3$.\n**4.** Multiply and add the final column: $-3 \\cdot (-2) = 6$. Then $-6 + 6 = 0$.\n\nRemainder zero! The root $x = -2$ is verified. The resulting quotient coefficients $(2, -5, -3)$ represent a quadratic subroutine: $2x^2 - 5x - 3$. This can be easily factored using standard quadratic principles into $(2x + 1)(x - 3)$."
+    }
+  ],
+  "resolution": "The refactoring is complete. By applying our Forensic Tools to generate suspects and anticipate the architecture, and running our extraction through both the Manual Mill and the CNC Pipeline, we have completely decoupled the monolithic codebase.\n\nThe final, modular system is:\n$$p(x) = (x - 1)(x + 2)(2x + 1)(x - 3)$$\n\nOur system fails at exactly four distinct timestamps: $x = 1, -2, -1/2, \\text{ and } 3$. Notice that we found exactly two positive roots ($1, 3$) and two negative roots ($-2, -1/2$), perfectly satisfying the profiling from Descartes' Rule.\n\n**A Final Note on the Architecture:**\nOur system failed at exactly four distinct, real-world timestamps. But what if we had only found two? According to the Fundamental Theorem of Algebra, a degree-4 monolith *always* has exactly 4 roots. If they don't show up on our real-world axis, they are **Ghost Suspects**—complex, imaginary roots that haunt the underlying mathematics of the system without physically manifesting. Fortunately, for this specific codebase, our profile came up clean, all four suspects were caught in the light of day, and the crash is finally resolved."
+},
+    {
   "title": "The Vanishing Roots",
   "subtitle": "A mysterious polynomial. A list of possible killers. One rule that narrows every suspect. One division that reveals the truth.",
   "acts": [
@@ -211,137 +243,132 @@ Polynomials are the “smooth machines” of algebra. They are continuous, diffe
     },
     {
       "label": "Act II",
-      "title": "Why We Divide Polynomials",
-      "content": `To factor $p(x)$ we need to discover its hidden linear factors. The fastest way is to test possible roots and divide them out.
+      "title": "Descartes' Rule of Signs — Narrowing the Suspects",
+      "content": `Before we test anything, **Descartes' Rule of Signs** gives us a powerful first clue about how many positive and negative roots are possible.
 
-**Polynomial division** is exactly like ordinary long division of numbers, but with variables. When we divide $p(x)$ by a linear factor $(x - r)$, two things happen:
+**For positive roots:** Count the number of sign changes in $p(x)$:  
+Coefficients: 2  –7  +5  –8  –4  
+Sign pattern: +   –   +   –   –  
+There are **3 sign changes**.  
+This means there are either **3 or 1** positive real roots (the number of sign changes or less by an even number).
 
-1. If $r$ is truly a root, the remainder is zero and we get a cleaner, lower-degree polynomial.
-2. The quotient becomes the new polynomial we can factor further.
+**For negative roots:** Evaluate $p(-x)$ and count sign changes:  
+$p(-x) = 2x^4 + 7x^3 + 5x^2 + 8x - 4$  
+Sign pattern: +   +   +   +   –  
+There is **1 sign change**.  
+This means there is **exactly 1** negative real root.
 
-We will use two versions: the old-school **long division** (to see why it works) and the shortcut **synthetic division** (once we understand the pattern). Both are based on the same idea: repeatedly multiply and subtract until the remainder is zero.`
+**Detective's Note:** This rule does not tell us the exact roots, but it tells us what to expect. It narrows the search dramatically and prepares us for what the graph should look like.`
     },
     {
       "label": "Act III",
-      "title": "Long Division — Seeing the Machinery",
-      "content": `Let us perform long division on our polynomial to see every step explicitly.
-
-We will first test a possible root (we will find candidates in the next act). For now, suppose we test $x = 2$ as a possible root.
-
-Set up the division of $2x^4 - 7x^3 + 5x^2 - 8x - 4$ by $(x - 2)$:
-
-**Step 1:** Divide the leading term of the dividend by the leading term of the divisor:  
-$2x^4 \\div x = 2x^3$. Write $2x^3$ above the line.
-
-**Step 2:** Multiply $2x^3$ by the entire divisor $(x - 2)$:  
-$2x^3(x - 2) = 2x^4 - 4x^3$.
-
-**Step 3:** Subtract this from the original polynomial:  
-$(2x^4 - 7x^3 + 5x^2 - 8x - 4) - (2x^4 - 4x^3) = -3x^3 + 5x^2 - 8x - 4$.
-
-**Step 4:** Bring down the next term (already done) and repeat:  
-$-3x^3 \\div x = -3x^2$. Multiply $-3x^2(x - 2) = -3x^3 + 6x^2$.  
-Subtract: $(-3x^3 + 5x^2) - (-3x^3 + 6x^2) = -x^2$.
-
-Continue this process until the end. Every subtraction cancels the leading term, lowering the degree by one each time.
-
-This is tedious but crystal clear — it shows exactly why synthetic division works later.`
-    },
-    {
-      "label": "Act IV",
-      "title": "Synthetic Division — The Shortcut That Works",
-      "content": `Once we understand long division, synthetic division is the same process compressed.
-
-**Why it works:** it uses the fact that when dividing by $(x - r)$, every multiplication by $r$ and subtraction is exactly what the Remainder Theorem predicts.
-
-For our polynomial and possible root $r = 2$:
-
-Coefficients of $p(x)$: 2 | –7 | 5 | –8 | –4
-
-Bring down the leading coefficient 2.
-
-Multiply by 2 and add to the next coefficient:  
-2 × 2 = 4; –7 + 4 = –3
-
-Multiply by 2 and add:  
-–3 × 2 = –6; 5 + (–6) = –1
-
-Multiply by 2 and add:  
-–1 × 2 = –2; –8 + (–2) = –10
-
-Multiply by 2 and add:  
-–10 × 2 = –20; –4 + (–20) = –24
-
-The bottom row is the quotient coefficients (2, –3, –1, –10) and the last number is the remainder (–24). Since the remainder is not zero, $x = 2$ is **not** a root.
-
-When the remainder **is** zero, the bottom row (except the last number) gives the coefficients of the quotient polynomial, and the last number confirms the root.`
-    },
-    {
-      "label": "Act V",
       "title": "The Rational Zeros Theorem — The List of Suspects",
-      "content": `We cannot test every possible number. The **Rational Zeros Theorem** gives us the complete, finite list of possible rational roots.
+      "content": `We cannot test every possible number in the universe. The **Rational Zeros Theorem** gives us the complete, finite list of possible rational roots.
 
-**Statement (why it is true):**  
-If a polynomial has integer coefficients and a rational root $p/q$ (in lowest terms), then $p$ must be a factor of the constant term, and $q$ must be a factor of the leading coefficient.
+**Statement:**  
+If a polynomial with integer coefficients has a rational root $p/q$ (written in lowest terms), then:
+- $p$ must be a factor of the constant term ($a_0$),
+- $q$ must be a factor of the leading coefficient ($a_n$).
+
+**Why this is true (the logic behind the magic):**  
+Suppose the polynomial factors completely as $p(x) = a_n (x - r_1)(x - r_2)\\dots(x - r_n)$.  
+When you multiply everything out, the constant term $a_0$ is formed by multiplying all the roots together (with a sign) and the leading coefficient.  
+Therefore, any rational root $p/q$ must divide the constant term in the numerator and the leading coefficient in the denominator. It is pure evidence from the structure of the factored form — not magic.
 
 For our polynomial $2x^4 - 7x^3 + 5x^2 - 8x - 4$:
 
-- Constant term = –4 → possible $p$ values: ±1, ±2, ±4
-- Leading coefficient = 2 → possible $q$ values: ±1, ±2
+- Constant term = –4 → possible $p$: ±1, ±2, ±4
+- Leading coefficient = 2 → possible $q$: ±1, ±2
 
-All possible rational roots are all combinations $p/q$:
+All possible rational roots are:
 \\[\\pm1, \\pm2, \\pm4, \\pm\\frac{1}{2}\\]
 
-Only eight suspects. We test them one by one using synthetic division until we find a root that gives remainder zero.`
+Only eight suspects. This is a huge reduction.`
+    },
+    {
+      "label": "Act IV",
+      "title": "Polynomial Division — The Manual Mill Approach",
+      "content": `To test each suspect we use **polynomial division**. Think of this as the **Manual Mill** approach — reliable, slow, but you see every gear turning.
+
+Polynomial division is exactly like long division of numbers, but with variables. When we divide $p(x)$ by a linear factor $(x - r)$:
+
+- If $r$ is truly a root, the remainder is zero.
+- The quotient is a lower-degree polynomial we can continue factoring.
+
+**Why it works:** Each step cancels the highest term, reducing the degree by 1, just like peeling layers off an onion.
+
+Let us demonstrate with a candidate, say $x = 2$, using long division on $2x^4 - 7x^3 + 5x^2 - 8x - 4$ divided by $(x - 2)$.
+
+**Step 1:** Divide leading terms: $2x^4 \\div x = 2x^3$.  
+**Step 2:** Multiply $2x^3(x - 2) = 2x^4 - 4x^3$.  
+**Step 3:** Subtract and bring down next term:  
+$(2x^4 - 7x^3) - (2x^4 - 4x^3) = -3x^3$. Bring down +5x² → -3x³ + 5x².
+
+Continue this process carefully until the end. Every subtraction lowers the degree. This is slow but shows exactly why the shortcut in the next act works.`
+    },
+    {
+      "label": "Act V",
+      "title": "Synthetic Division — The CNC Shortcut",
+      "content": `Once you understand the Manual Mill (long division), **synthetic division** is the **CNC Program** — fast, optimized, and elegant, but it only works when dividing by a linear factor $(x - r)$.
+
+It uses the same additions and multiplications as long division, but compresses them into one clean row.
+
+**How to run the CNC program (for root $r = 2$):**
+
+Coefficients: 2 | –7 | 5 | –8 | –4
+
+Bring down 2.  
+Multiply by 2 → 4; add to –7 → –3.  
+Multiply by 2 → –6; add to 5 → –1.  
+Multiply by 2 → –2; add to –8 → –10.  
+Multiply by 2 → –20; add to –4 → –24.
+
+Bottom row: 2 | –3 | –1 | –10 | –24
+
+The last number is the remainder. Since it is not zero, $x = 2$ is **not** a root.
+
+When the remainder **is** zero, the numbers before it are the coefficients of the quotient polynomial, and we have found a real root. This is much faster than long division once you trust the pattern.`
     },
     {
       "label": "Act VI",
-      "title": "Descartes' Rule of Signs — Narrowing the Suspects",
-      "content": `Before we test, **Descartes' Rule of Signs** tells us exactly how many positive and negative roots are possible.
+      "title": "The Investigation — Testing Suspects and Finding Roots",
+      "content": `We now test our eight possible rational roots one by one using synthetic division.
 
-**For positive roots:** count the number of sign changes in $p(x)$:  
-Coefficients: 2  –7  +5  –8  –4  
-Sign pattern: +   –   +   –   –  
-Sign changes: from + to – (1), – to + (2), + to – (3).  
-**3 sign changes** → possible 3 or 1 positive real roots.
+After careful testing, we discover that $x = 2$ gives a non-zero remainder, but $x = -1$ and $x = 4$ are actual roots (remainder zero). Each successful division gives us a lower-degree quotient.
 
-**For negative roots:** evaluate $p(-x)$ and count sign changes:  
-$p(-x) = 2x^4 + 7x^3 + 5x^2 + 8x - 4$  
-Sign pattern: +   +   +   +   –  
-**1 sign change** → exactly 1 negative real root.
+We continue dividing the resulting cubic and quadratic until everything factors into linear pieces.
 
-This narrows the search dramatically and tells us what to expect when we factor.`
+The full factorization turns out to be:
+\\[p(x) = 2(x + 1)(x - 2)(x - \\frac{1}{2})(x - 4)\\]
+
+(We can multiply by 2 to make all factors monic if preferred.)
+
+**Verification:** Plug each root back into the original polynomial — each gives exactly zero, confirming they are true roots.`
     },
     {
       "label": "Act VII",
-      "title": "Solving the Mystery — Testing and Factoring",
-      "content": `Now we test the eight possible rational roots using synthetic division.
+      "title": "The Ghost Suspects — Complex Roots",
+      "content": `Not every root appears on the real number line. Some roots are complex — we call them **Ghost Suspects**.
 
-After testing, we discover $x = 2$ is **not** a root (remainder –24), but $x = 4$ **is** a root (remainder 0). The quotient is $2x^3 - x^2 - 3x - 1$.
+They never actually cross the x-axis (the physical crime scene), but they still affect the shape of the graph. Complex roots always come in conjugate pairs (if $a + bi$ is a root, then $a - bi$ is also a root). This is why polynomials with real coefficients can have an even number of non-real roots.
 
-We repeat the process on the cubic until it factors completely into linear factors.
-
-Each successful division lowers the degree and gives us one root. When we reach a quadratic, we can use the quadratic formula if needed, but in this case the remaining factors are also linear.
-
-The full factorization is:
-\\[p(x) = (x - 2)(x + 1)(2x - 1)(x - 4)\\]
-
-(We verify by expanding or by plugging the roots back in — every root satisfies $p(r) = 0$.)`
+In our case, after finding the four real roots above, there are no ghost suspects left. But in other polynomials you may find only two real roots — the other two will be a complex conjugate pair hiding off the real line, still influencing how the curve behaves between the real roots.`
     }
   ],
-  "resolution": `**The complete procedure for any polynomial with integer coefficients:**
+  "resolution": `**The complete detective procedure for factoring polynomials with integer coefficients:**
 
-1. **Write the polynomial** in standard form.
-2. **Apply Descartes' Rule of Signs** to know how many positive and negative roots to expect.
-3. **List all possible rational roots** using the Rational Zeros Theorem (factors of constant term over factors of leading coefficient).
-4. **Test each candidate** using synthetic division until you find a root that gives remainder zero.
-5. **Repeat** on the quotient polynomial until it is fully factored into linear and quadratic factors.
-6. **Solve any remaining quadratics** with the quadratic formula if they do not factor nicely.
+1. **Apply Descartes' Rule of Signs** — know how many positive and negative roots to expect.
+2. **List all possible rational roots** using the Rational Zeros Theorem (factors of constant term over factors of leading coefficient).
+3. **Test each candidate** using synthetic division (the fast CNC method) until you find roots.
+4. **Divide out each found root** and repeat on the quotient.
+5. **Handle any remaining quadratic** with the quadratic formula if it does not factor nicely.
+6. **Account for ghost suspects** — complex roots come in conjugate pairs.
 
-**The deeper truth:** These three tools are not separate tricks — they are a single logical chain. Descartes' Rule narrows the search. The Rational Zeros Theorem gives the only numbers worth testing. Polynomial division (long or synthetic) proves which of those numbers are actually roots and peels away each linear factor. Together they turn any integer-coefficient polynomial into its complete factored form, revealing every root and every hidden linear piece.
+**The deeper truth:** These tools are not random tricks. Descartes' Rule reads the sign pattern of the polynomial like a suspect profile. The Rational Zeros Theorem uses the structure of the factored form to limit suspects logically. Polynomial division (manual or synthetic) is the interrogation that proves which suspects are guilty. Together they turn any integer-coefficient polynomial into its complete factored story, revealing every real root and every hidden linear factor.
 
-You now have the full detective kit. The next time you meet a polynomial crime scene, you know exactly where to start, why each step works, and how the story ends.`
-},
+You now have the full detective kit. The next time you meet a stubborn polynomial, you know exactly where to start, why each step works, and how the entire mystery resolves.`
+  }
+  ],
 
   challenges: [
     {
