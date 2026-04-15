@@ -913,6 +913,51 @@ Newton invented this in 1666 to describe planetary motion. You just re-invented 
       resolution:
         '**The derivative — earned from first principles**\n\nWe started with the real problem a NASCAR driver actually faces: average speed is not enough when you need the speed **right now**. We tried smaller and smaller intervals, computed average rates manually, watched the numbers stabilize, and discovered the limit process. Only then did we give it the name and notation "derivative."\n\n**The four-step discovery process we just used (and will use for every calculus concept):**\n1. **Need** — show where everyday algebra or averages fail.\n2. **Discovery** — build the answer with finite, measurable steps and repeated calculations.\n3. **Limit behavior** — watch what happens as the interval shrinks.\n4. **Formalization** — compress the repeated process into clean notation.\n\nThis is how calculus is born on the track: not from definitions first, but from a problem that demands an instantaneous rate. The derivative is the tool we invented to answer that demand.\n\nNow every time you see $\\dfrac{ds}{dt}$ you will remember: it is the limiting value of $\\dfrac{\\Delta s}{\\Delta t}$ as $\\Delta t \\to 0$ — the exact speed at one frozen moment.',
     },
+    {
+      title: "How Fast Is My Battery Dying?",
+      persona:
+        "I'm sitting in a long meeting with 28% battery left on my phone. I need to know: will it last until the end of the meeting, or should I start looking for a charger right now? The phone says '2 hours 10 minutes remaining,' but that number keeps changing. I want to know the **real rate** at which my battery is draining **right now**, not an average guess. How can I figure that out from the data I actually have?",
+      steps: [
+        {
+          phase: "need",
+          title: "What I already know — and why it fails me",
+          content:
+            "I know how to calculate average battery drain. If my phone went from 100% to 28% in 4 hours, the average drain rate is:\n\n$$\\text{average rate} = \\frac{100 - 28}{4} = 18\\% \\text{ per hour}$$\n\nThat's simple subtraction and division. But right now I need something more precise. The '2 hours 10 minutes remaining' estimate keeps jumping around — sometimes it says 2 hours 30 minutes, sometimes 1 hour 50 minutes. That tells me the drain rate is **not constant**. It changes depending on what I'm doing (screen brightness, apps running, signal strength).\n\nAverage rate over the whole day doesn't help me decide whether I’ll make it through the next 90 minutes. I need the **instantaneous drain rate** at this exact moment. My old algebra tools give me averages over intervals, but they break when I need the rate right now.",
+        },
+        {
+          phase: "need",
+          title: "Trying smaller time windows",
+          content:
+            "I start recording the battery percentage every few minutes during the meeting:\n\n| Time elapsed (minutes) | Battery % left | Average drain rate over this interval |\n|---|---|---|\n| 0 | 28% | — |\n| 5 | 26.8% | 1.2% per 5 min = 14.4%/hour |\n| 10 | 25.5% | 1.3% per 5 min = 15.6%/hour |\n| 15 | 24.1% | 1.4% per 5 min = 16.8%/hour |\n| 20 | 22.6% | 1.5% per 5 min = 18%/hour |\n\nAs I look at shorter and shorter time windows, the calculated average drain rate is increasing. It seems to be heading toward something around 20% per hour. But I still only have averages — never the exact rate at one single moment.",
+        },
+        {
+          phase: "discovery",
+          title: "Building the rate manually with tiny slices",
+          content:
+            "I realize I can write the average drain rate over any small time interval h as:\n\n$$\\text{average drain rate over } h = \\frac{B(t) - B(t + h)}{h}$$\n\nwhere B(t) is the battery percentage at time t. (Note the negative sign will appear naturally because battery is decreasing.)\n\nI keep taking smaller slices:\n\n- Over 5 minutes: ≈ 14.4 %/hour\n- Over 2 minutes: ≈ 16.8 %/hour\n- Over 1 minute: ≈ 18.6 %/hour\n- Over 30 seconds: ≈ 19.6 %/hour\n- Over 10 seconds: ≈ 19.92 %/hour\n\nThe numbers are clearly approaching 20 % per hour as the time slice gets smaller. I can't make the interval zero (that would divide by zero), but the pattern is unmistakable: there is a definite rate at which the battery is draining **right now**.",
+        },
+        {
+          phase: "discovery",
+          title: "The key insight — the limit of shrinking intervals",
+          content:
+            "Even though I can never reach a time interval of exactly zero, I can get as close as my phone’s update rate allows. As the interval shrinks toward zero, the average drain rate over that tiny slice stabilizes at a single value.\n\nThat stable value is the **instantaneous drain rate** at this exact moment.\n\nI can write it formally as:\n\n$$\\text{instantaneous drain rate at time } t = \\lim_{h \\to 0} \\frac{B(t) - B(t + h)}{h}$$\n\nThis is the number I actually need. If it’s 20 % per hour right now, then in the next 90 minutes (1.5 hours) I should expect to lose about 30 % battery — meaning I’ll be down to roughly –2 % (i.e., dead) before the meeting ends. Time to find a charger.",
+        },
+        {
+          phase: "formalization",
+          title: "Compressing the idea — the derivative",
+          content:
+            "We have rebuilt the concept from real measurements and repeated calculations. Now we give it a clean name and symbol so we can use it efficiently.\n\nThe expression we constructed is called the **derivative** of the battery function B(t) at time t. We write it:\n\n$$B'(t) = \\lim_{h \\to 0} \\frac{B(t) - B(t + h)}{h}$$\n\nor, using the common rate-of-change notation:\n\n$$\\frac{dB}{dt} = \\lim_{h \\to 0} \\frac{\\Delta B}{\\Delta t}$$\n\nThe negative value (–20 %/hour) tells us the battery is decreasing. The derivative is not a mysterious new invention — it is simply the precise way to capture the instantaneous rate we already discovered by shrinking the time slices.",
+        },
+        {
+          phase: "formalization",
+          title: "Why this matters in everyday life",
+          content:
+            "This same limiting process applies to any quantity that changes over time:\n- How fast is my gas tank emptying while driving?\n- How quickly is the temperature rising in the oven?\n- How fast is traffic speed changing on my commute?\n- How rapidly is my bank account balance changing with spending?\n\nWhenever we need the rate **at one exact instant** instead of an average over a period, we use the same construction: take smaller and smaller intervals, compute the average rate over each, and take the limit as the interval shrinks to zero.\n\nThat limit is the derivative.",
+        },
+      ],
+      resolution:
+        "**The derivative — earned from real life**\n\nWe started with a practical problem almost everyone faces: the phone’s 'remaining time' estimate is unreliable because drain rate changes. We tried smaller time windows, computed average rates manually, watched the numbers stabilize, and discovered the limit process. Only then did we name it the derivative.\n\n**The discovery process we just used:**\n1. **Need** — Show where averages fail for decisions that need the current rate.\n2. **Discovery** — Compute average rates over smaller and smaller finite intervals.\n3. **Limit behavior** — Observe the numbers approaching a stable value.\n4. **Formalization** — Compress the repeated process into the notation $\\dfrac{dB}{dt}$.\n\nThis is how calculus concepts should be born: from a real question we actually care about, rebuilt step by step, with symbols introduced only as useful compression at the end.\n\nNext time your phone says '2 hours remaining,' you’ll know what question to ask: what is the **instantaneous** drain rate right now?",
+    },
   ],
 
   challenges: [

@@ -22,7 +22,6 @@ export default {
       "A 10-foot ladder is leaning against a wall. The base slides away from the wall at 2 ft/s. How fast is the top of the ladder sliding DOWN the wall at the moment the base is 6 feet from the wall? At that same moment, is the top sliding down faster or slower than the base is sliding out?",
     realWorldContext:
       "Air traffic controllers face this problem every second: a radar system tracks an aircraft's slant range (the straight-line distance from the antenna to the plane) and the angle of elevation. The rate of change of slant range and the rate of change of angle are different quantities, linked through trigonometry. Neither one directly gives the aircraft's speed, but together they do. The same mathematics governs water draining from conical tanks (a classic engineering problem), balloons inflating, shadows lengthening as the sun moves, and the distances between moving vehicles on a highway. Whenever two geometric quantities are constrained by a relationship — a fixed triangle, a fixed volume, similar triangles — differentiating that constraint with respect to time gives you a new equation linking their rates.",
-
   },
 
   intuition: {
@@ -77,20 +76,26 @@ export default {
       {
         id: "RelatedRatesLadder",
         title: "Sliding Ladder: Live Rate Animation",
-        mathBridge: "The ladder is 10 ft long. Set x = 6 ft (base from wall). By Pythagorean theorem, y = √(100 − 36) = 8 ft. The rate equation from differentiating x² + y² = 100 is 2x(dx/dt) + 2y(dy/dt) = 0. Plug in: 2(6)(2) + 2(8)(dy/dt) = 0. Solve: dy/dt = −24/16 = −1.5 ft/s. The top drops slower than the base slides out. Verify with the animation.",
-        caption: "Watch the ladder slide and observe how dy/dt changes as x grows — the top accelerates as the ladder approaches horizontal.",
+        mathBridge:
+          "The ladder is 10 ft long. Set x = 6 ft (base from wall). By Pythagorean theorem, y = √(100 − 36) = 8 ft. The rate equation from differentiating x² + y² = 100 is 2x(dx/dt) + 2y(dy/dt) = 0. Plug in: 2(6)(2) + 2(8)(dy/dt) = 0. Solve: dy/dt = −24/16 = −1.5 ft/s. The top drops slower than the base slides out. Verify with the animation.",
+        caption:
+          "Watch the ladder slide and observe how dy/dt changes as x grows — the top accelerates as the ladder approaches horizontal.",
       },
       {
         id: "RelatedRatesBalloon",
         title: "Balloon Problem: How Radius Speed Shrinks as Volume Grows",
-        mathBridge: "V = (4/3)πr³ → dV/dt = 4πr²·(dr/dt). Solve for dr/dt = dV/dt / (4πr²). As r increases, the denominator 4πr² grows — so dr/dt shrinks even though dV/dt is constant. Drag the sliders to see this live.",
-        caption: "Sets dV/dt and observe how dr/dt (green arrow) shrinks as the balloon grows. The surface area is the 'spreading factor' that slows the radius.",
+        mathBridge:
+          "V = (4/3)πr³ → dV/dt = 4πr²·(dr/dt). Solve for dr/dt = dV/dt / (4πr²). As r increases, the denominator 4πr² grows — so dr/dt shrinks even though dV/dt is constant. Drag the sliders to see this live.",
+        caption:
+          "Sets dV/dt and observe how dr/dt (green arrow) shrinks as the balloon grows. The surface area is the 'spreading factor' that slows the radius.",
       },
       {
         id: "RelatedRatesRocket",
         title: "The Premier Related Rates Lab: Rocket & Plane",
-        mathBridge: "Two classic problems in one tool. 🚀 Rocket: A camera d ft away tracks a rising rocket (tan θ = h/d). ✈️ Plane: An observer tracks a plane flying at altitude H (x² + H² = s²). Both use the chain rule to link the measurable rate to the unknown rate. Use the 'Math' tab to see step-by-step symbolic and numeric derivations for both scenarios side-by-side.",
-        caption: "Explore two different geometric constraints (triangles) and see how their rate equations are derived through implicit differentiation.",
+        mathBridge:
+          "Two classic problems in one tool. 🚀 Rocket: A camera d ft away tracks a rising rocket (tan θ = h/d). ✈️ Plane: An observer tracks a plane flying at altitude H (x² + H² = s²). Both use the chain rule to link the measurable rate to the unknown rate. Use the 'Math' tab to see step-by-step symbolic and numeric derivations for both scenarios side-by-side.",
+        caption:
+          "Explore two different geometric constraints (triangles) and see how their rate equations are derived through implicit differentiation.",
       },
       {
         id: "Ch6_TwoTanks",
@@ -103,14 +108,18 @@ export default {
       {
         id: "SlidingLadder",
         title: "Sliding Ladder: Premium Interaction",
-        mathBridge: "A premium 13ft ladder model. Features live dx/dt and dy/dt panels and a dark-mode optimized interface. Notice how the top speed accelerates as it approach the floor.",
-        caption: "Explore the nonlinear relationship x² + y² = 13² in this hifi lab.",
+        mathBridge:
+          "A premium 13ft ladder model. Features live dx/dt and dy/dt panels and a dark-mode optimized interface. Notice how the top speed accelerates as it approach the floor.",
+        caption:
+          "Explore the nonlinear relationship x² + y² = 13² in this hifi lab.",
       },
       {
         id: "RocketCamera",
         title: "Rocket Camera: Derivation Engine",
-        mathBridge: "Step through the 5 logical stages of related rates derivation: from variable setup to the 'Master Formula' θ' = D·h'/s². This lab proves that trig identities can sometimes hide the underlying simplicity.",
-        caption: "Click through the steps 1-5 to see the math evolve alongside the rising rocket.",
+        mathBridge:
+          "Step through the 5 logical stages of related rates derivation: from variable setup to the 'Master Formula' θ' = D·h'/s². This lab proves that trig identities can sometimes hide the underlying simplicity.",
+        caption:
+          "Click through the steps 1-5 to see the math evolve alongside the rising rocket.",
       },
     ],
   },
@@ -150,29 +159,33 @@ export default {
       {
         id: "RelatedRatesEngine",
         title: "The Machine Behind Every Related Rates Problem",
-        mathBridge: "The gear animation shows the abstract structure: two quantities locked by a geometric equation, the chain rule as the transmitting gear. The Anatomy tab shows the same three-step structure across four different problem types simultaneously. The Scenarios tab shows five classic problems reduced to their geometric equation and rates equation. Use the 'Which equation?' decision guide when you are stuck on step 1.",
-        caption: "Use the Anatomy and Scenarios tabs to see that every related rates problem — balloon, ladder, plane, cone, shadow — is the same three-step structure. Only the geometric equation changes.",
+        mathBridge:
+          "The gear animation shows the abstract structure: two quantities locked by a geometric equation, the chain rule as the transmitting gear. The Anatomy tab shows the same three-step structure across four different problem types simultaneously. The Scenarios tab shows five classic problems reduced to their geometric equation and rates equation. Use the 'Which equation?' decision guide when you are stuck on step 1.",
+        caption:
+          "Use the Anatomy and Scenarios tabs to see that every related rates problem — balloon, ladder, plane, cone, shadow — is the same three-step structure. Only the geometric equation changes.",
       },
       {
-        id: 'PythonNotebook',
-        title: 'Python Lab: Compute & Visualize Related Rates',
-        caption: 'Run each cell to numerically verify the classic related-rates results. Modify parameters and re-run to build intuition for how geometry drives the rates.',
+        id: "PythonNotebook",
+        title: "Python Lab: Compute & Visualize Related Rates",
+        caption:
+          "Run each cell to numerically verify the classic related-rates results. Modify parameters and re-run to build intuition for how geometry drives the rates.",
         props: {
           initialCells: [
             {
               id: 1,
-              cellTitle: 'The 5-Step Method — Ladder Problem',
+              cellTitle: "The 5-Step Method — Ladder Problem",
               prose: [
-                '**The Setup**: A 10-ft ladder leans against a wall. The base slides away at $dx/dt = 2$ ft/s.',
-                'We want $dy/dt$ when $x = 6$ ft.',
-                '## The 5 Steps',
-                '- **Step 1** — Constraint: $x^2 + y^2 = 100$',
-                '- **Step 2** — Differentiate: $2x\\dot{x} + 2y\\dot{y} = 0$',
-                '- **Step 3** — Find y at $x=6$: $y = \\sqrt{100 - 36} = 8$',
-                '- **Step 4** — Substitute: $2(6)(2) + 2(8)\\dot{y} = 0$',
-                '- **Step 5** — Solve: $\\dot{y} = -3/2$ ft/s',
+                "**The Setup**: A 10-ft ladder leans against a wall. The base slides away at $dx/dt = 2$ ft/s.",
+                "We want $dy/dt$ when $x = 6$ ft.",
+                "## The 5 Steps",
+                "- **Step 1** — Constraint: $x^2 + y^2 = 100$",
+                "- **Step 2** — Differentiate: $2x\\dot{x} + 2y\\dot{y} = 0$",
+                "- **Step 3** — Find y at $x=6$: $y = \\sqrt{100 - 36} = 8$",
+                "- **Step 4** — Substitute: $2(6)(2) + 2(8)\\dot{y} = 0$",
+                "- **Step 5** — Solve: $\\dot{y} = -3/2$ ft/s",
               ],
-              instructions: 'Change `x0` to 3, 8, or 9.9 and re-run. Watch dy_dt blow up as the ladder approaches the floor!',
+              instructions:
+                "Change `x0` to 3, 8, or 9.9 and re-run. Watch dy_dt blow up as the ladder approaches the floor!",
               code: `import math
 
 # ── Ladder parameters (try changing x0) ──
@@ -193,15 +206,17 @@ print(f"dx/dt = {dx} ft/s  (base sliding out)")
 print(f"dy/dt = {dy:.4f} ft/s  (top sliding down)")
 print()
 print(f"Ratio |dy/dt| / dx/dt = {abs(dy/dx):.4f}  (= x/y = {x0/y0:.4f})")`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 2,
-              cellTitle: 'Visualize how dy/dt changes across all positions',
+              cellTitle: "Visualize how dy/dt changes across all positions",
               prose: [
-                'The rate equation is $dy/dt = -(x/y) \\cdot dx/dt$.',
-                'As the ladder approaches horizontal ($y \\to 0$), the ratio $x/y \\to \\infty$, so $|dy/dt| \\to \\infty$.',
-                'This singularity is **physical**, not a math artifact.',
+                "The rate equation is $dy/dt = -(x/y) \\cdot dx/dt$.",
+                "As the ladder approaches horizontal ($y \\to 0$), the ratio $x/y \\to \\infty$, so $|dy/dt| \\to \\infty$.",
+                "This singularity is **physical**, not a math artifact.",
               ],
               code: `from opencalc import Figure
 import math
@@ -226,17 +241,20 @@ fig.text([6.2, -3], 'x = 6 ft', color='amber', size=11)
 fig.hline(-2, color='blue', dashed=True)
 fig.text([1, -2.5], 'dx/dt = 2 ft/s', color='blue', size=10)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 3,
-              cellTitle: 'Balloon: dV/dt = 100 cm³/s, find dr/dt when r = 5',
+              cellTitle: "Balloon: dV/dt = 100 cm³/s, find dr/dt when r = 5",
               prose: [
-                'For a sphere: $V = \\tfrac{4}{3}\\pi r^3$ → $\\dfrac{dV}{dt} = 4\\pi r^2 \\dfrac{dr}{dt}$.',
-                'The factor $4\\pi r^2$ is the **surface area** — new volume is added in a thin shell.',
-                'As $r$ grows, the same $dV/dt$ produces a smaller $dr/dt$.',
+                "For a sphere: $V = \\tfrac{4}{3}\\pi r^3$ → $\\dfrac{dV}{dt} = 4\\pi r^2 \\dfrac{dr}{dt}$.",
+                "The factor $4\\pi r^2$ is the **surface area** — new volume is added in a thin shell.",
+                "As $r$ grows, the same $dV/dt$ produces a smaller $dr/dt$.",
               ],
-              instructions: 'Change `dV_dt` or `r_target` and re-run to see how the radius growth rate depends on size.',
+              instructions:
+                "Change `dV_dt` or `r_target` and re-run to see how the radius growth rate depends on size.",
               code: `from opencalc import Figure
 import math
 
@@ -263,15 +281,18 @@ fig.plot(lambda r: dV_dt/(4*math.pi*r**2) if r > 0 else None,
 fig.point([r_target, dr_dt], color='amber',
     label=f'r={r_target}: dr/dt≈{dr_dt:.3f}', radius=7)
 fig.show()`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
             {
               id: 4,
-              challengeType: 'write',
-              challengeTitle: 'Your Turn: Two Cars at an Intersection',
-              difficulty: 'medium',
-              prompt: 'Car A heads north at 60 mph, Car B heads west at 80 mph, both toward an intersection.\nWhen A is 5 mi away and B is 12 mi away, find dz/dt (how fast the gap is closing).\n\nConstraint: z² = x² + y²\nDiff: 2z dz/dt = 2x dx/dt + 2y dy/dt\nNote: dx/dt and dy/dt are NEGATIVE (cars approach).',
-              hint: 'z = √(5² + 12²) = 13. dx/dt = -80, dy/dt = -60. Plug into 2z dz/dt = 2x dx/dt + 2y dy/dt and solve.',
+              challengeType: "write",
+              challengeTitle: "Your Turn: Two Cars at an Intersection",
+              difficulty: "medium",
+              prompt:
+                "Car A heads north at 60 mph, Car B heads west at 80 mph, both toward an intersection.\nWhen A is 5 mi away and B is 12 mi away, find dz/dt (how fast the gap is closing).\n\nConstraint: z² = x² + y²\nDiff: 2z dz/dt = 2x dx/dt + 2y dy/dt\nNote: dx/dt and dy/dt are NEGATIVE (cars approach).",
+              hint: "z = √(5² + 12²) = 13. dx/dt = -80, dy/dt = -60. Plug into 2z dz/dt = 2x dx/dt + 2y dy/dt and solve.",
               code: `import math
 
 # ── Fill in the values ──
@@ -287,10 +308,12 @@ print(f"z (current gap) = {z} mi")
 # YOUR CODE: solve for dz/dt using 2z*dz_dt = 2x*dx + 2y*dy
 # dz_dt = ???
 # print(f"dz/dt = {dz_dt:.4f} mph")`,
-              output: '', status: 'idle', figureJson: null,
+              output: "",
+              status: "idle",
+              figureJson: null,
             },
-          ]
-        }
+          ],
+        },
       },
     ],
   },
@@ -323,7 +346,7 @@ print(f"z (current gap) = {z} mi")
       title: "Ladder Sliding Down a Wall",
       problem:
         "\\text{A 10-ft ladder leans against a wall. The base slides away at } \\frac{dx}{dt} = 2 \\text{ ft/s. Find } \\frac{dy}{dt} \\text{ when } x = 6 \\text{ ft.}",
-  
+
       steps: [
         {
           expression: "x^2 + y^2 = 100",
@@ -383,7 +406,8 @@ print(f"z (current gap) = {z} mi")
         {
           expression: "24 + 16\\,\\frac{dy}{dt} = 0",
           annotation: "Simplify the left side.",
-          strategyTitle: "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
+          strategyTitle:
+            "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
           checkpoint:
             "Have all the known numerical values been correctly substituted? Check each term: 2·6·2 = 24 and 2·8 = 16.",
           hints: ["Perform the multiplication: 2 × 6 × 2 = 24 and 2 × 8 = 16."],
@@ -393,7 +417,8 @@ print(f"z (current gap) = {z} mi")
             "\\frac{dy}{dt} = -\\frac{24}{16} = -\\frac{3}{2} \\text{ ft/s}",
           annotation:
             "Solve for dy/dt. The negative sign means y is decreasing — the top slides DOWN. At this moment the top drops at 3/2 ft/s while the base slides out at 2 ft/s — the top moves slower than the base because the ladder is more horizontal than vertical (x > y).",
-          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          strategyTitle:
+            "Step 5 of 5: Solve algebraically for the unknown rate",
           checkpoint:
             "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
@@ -455,17 +480,21 @@ print(f"z (current gap) = {z} mi")
           expression:
             "100 = 4\\pi(25)\\,\\frac{dr}{dt} = 100\\pi\\,\\frac{dr}{dt}",
           annotation: "Simplify: 4π·25 = 100π.",
-          strategyTitle: "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
+          strategyTitle:
+            "Step 4b of 5: Simplify arithmetic before isolating the unknown rate",
           checkpoint:
             "Have all known values been substituted correctly? Verify: 4π·(5)² = 4π·25 = 100π.",
-          hints: ["Square the radius: (5)² = 25. Then multiply: 4π × 25 = 100π."],
+          hints: [
+            "Square the radius: (5)² = 25. Then multiply: 4π × 25 = 100π.",
+          ],
         },
         {
           expression:
             "\\frac{dr}{dt} = \\frac{100}{100\\pi} = \\frac{1}{\\pi} \\approx 0.318 \\text{ cm/s}",
           annotation:
             "Solve for dr/dt. The radius grows at 1/π cm/s at this moment.",
-          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          strategyTitle:
+            "Step 5 of 5: Solve algebraically for the unknown rate",
           checkpoint:
             "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
@@ -545,7 +574,8 @@ print(f"z (current gap) = {z} mi")
           expression:
             "\\frac{dh}{dt} = \\frac{-2 \\cdot 4}{9\\pi} = \\frac{-8}{9\\pi} \\approx -0.283 \\text{ m/min}",
           annotation: "Solve for dh/dt. The water level drops at 8/(9π) m/min.",
-          strategyTitle: "Step 5 of 5: Solve algebraically for the unknown rate",
+          strategyTitle:
+            "Step 5 of 5: Solve algebraically for the unknown rate",
           checkpoint:
             "Verify the sign of your answer makes physical sense — should this rate be positive (increasing) or negative (decreasing)?",
           hints: [
@@ -789,7 +819,8 @@ print(f"z (current gap) = {z} mi")
 
   story: {
     title: "The Descent: A Calculus Thriller",
-    subtitle: "A 13-foot ladder. A rain-slicked alley. One question calculus was born to answer.",
+    subtitle:
+      "A 13-foot ladder. A rain-slicked alley. One question calculus was born to answer.",
     acts: [
       {
         label: "The Scene",
@@ -926,25 +957,25 @@ Every related rates problem follows this exact structure: find the geometric con
   },
 
   discovery: [
-  {
-    title: `Why Is My Shadow Running Away From Me?`,
-    persona: `It's late. I just left a restaurant and I'm walking home along an empty sidewalk. There's a single streetlight behind me, casting my shadow ahead of me on the pavement. I notice something strange: my shadow seems to be racing ahead. The faster I walk, the faster the tip of my shadow moves — but the tip seems to be moving *faster than I am*. How is that possible? And exactly how fast is it moving?`,
-    steps: [
-      {
-        phase: 'need',
-        title: `What I already know how to do`,
-        content: `I know how to handle things that change at constant rates. If I walk at 4 feet per second, then after $t$ seconds my position is $x = 4t$. Done.
+    {
+      title: `Why Is My Shadow Running Away From Me?`,
+      persona: `It's late. I just left a restaurant and I'm walking home along an empty sidewalk. There's a single streetlight behind me, casting my shadow ahead of me on the pavement. I notice something strange: my shadow seems to be racing ahead. The faster I walk, the faster the tip of my shadow moves — but the tip seems to be moving *faster than I am*. How is that possible? And exactly how fast is it moving?`,
+      steps: [
+        {
+          phase: "need",
+          title: `What I already know how to do`,
+          content: `I know how to handle things that change at constant rates. If I walk at 4 feet per second, then after $t$ seconds my position is $x = 4t$. Done.
 
 I also know how to use the derivative. If my position is some function $f(t)$, then $f'(t)$ gives my velocity at any moment.
 
 And I know the geometry of similar triangles — two triangles that have the same angles have sides in the same ratio.
 
 These are the tools I have. Let me try to use them to answer the shadow question.`,
-      },
-      {
-        phase: 'need',
-        title: `Setting up the geometry — two quantities I can measure`,
-        content: `Here's the scene from above. The streetlight is a pole of height $H = 16$ feet, standing at the origin. I am 6 feet tall, walking away from the pole.
+        },
+        {
+          phase: "need",
+          title: `Setting up the geometry — two quantities I can measure`,
+          content: `Here's the scene from above. The streetlight is a pole of height $H = 16$ feet, standing at the origin. I am 6 feet tall, walking away from the pole.
 
 At any moment, let:
 - $x$ = my distance from the base of the pole (feet)
@@ -957,11 +988,11 @@ The shadow tip is always farther than me: $y > x$. My shadow's length is $y - x$
 I know my walking speed: $\dfrac{dx}{dt} = 4$ ft/s.
 
 The question: what is $\dfrac{dy}{dt}$? How fast is the shadow tip moving?`,
-      },
-      {
-        phase: 'need',
-        title: `The breakdown — I have one equation, but both variables are moving`,
-        content: `The geometry gives me a relationship between $x$ and $y$. The lamppost, my head, and the shadow tip form two similar triangles:
+        },
+        {
+          phase: "need",
+          title: `The breakdown — I have one equation, but both variables are moving`,
+          content: `The geometry gives me a relationship between $x$ and $y$. The lamppost, my head, and the shadow tip form two similar triangles:
 
 - The large triangle: base $y$, height $H = 16$ (from ground to lamp)
 - The small triangle: base $y - x$, height $h = 6$ (from ground to my head)
@@ -981,11 +1012,11 @@ But here's the problem. I know $\dfrac{dx}{dt}$. I want $\dfrac{dy}{dt}$. The eq
 I could try to substitute $x = 4t$ to get $y = \\frac{8}{5}(4t) = \\frac{32}{5}t$ and then differentiate $y$ with respect to $t$. That works here — but only because this problem was simple enough to solve for $y$ explicitly. What if the equation relating $x$ and $y$ couldn't be solved for one variable? What if it was something like $x^2 + xy + y^2 = 100$? There's no way to isolate $y$ cleanly.
 
 I need a method that works whether or not I can isolate variables.`,
-      },
-      {
-        phase: 'discovery',
-        title: `Key insight — both sides of an equation can be differentiated`,
-        content: `Here is the equation I have:
+        },
+        {
+          phase: "discovery",
+          title: `Key insight — both sides of an equation can be differentiated`,
+          content: `Here is the equation I have:
 
 $$10y = 16x$$
 
@@ -1010,11 +1041,11 @@ Solve for $\dfrac{dy}{dt}$:
 $$\\frac{dy}{dt} = \\frac{16}{10}\\frac{dx}{dt} = \\frac{8}{5}\\frac{dx}{dt}$$
 
 The rates are related by **the same fraction** as the positions. That's not a coincidence — it follows directly from differentiating the relationship.`,
-      },
-      {
-        phase: 'discovery',
-        title: `Plug in what I know — get the answer`,
-        content: `I know: $\dfrac{dx}{dt} = 4$ ft/s (my walking speed).
+        },
+        {
+          phase: "discovery",
+          title: `Plug in what I know — get the answer`,
+          content: `I know: $\dfrac{dx}{dt} = 4$ ft/s (my walking speed).
 
 $$\\frac{dy}{dt} = \\frac{8}{5} \\times 4 = \\frac{32}{5} = 6.4 \\text{ ft/s}$$
 
@@ -1034,11 +1065,11 @@ Shadow length $= y - x$. So:
 $$\\frac{d}{dt}[y - x] = \\frac{dy}{dt} - \\frac{dx}{dt} = 6.4 - 4 = 2.4 \\text{ ft/s}$$
 
 My shadow grows 2.4 ft longer every second. The tip races ahead at 6.4 ft/s because it picks up both my walking speed (4 ft/s) and the shadow's own growth (2.4 ft/s).`,
-      },
-      {
-        phase: 'discovery',
-        title: `What if the relationship wasn't linear? Try a harder case`,
-        content: `The shadow problem worked out cleanly because the geometric relationship $10y = 16x$ was linear — differentiating it was trivial.
+        },
+        {
+          phase: "discovery",
+          title: `What if the relationship wasn't linear? Try a harder case`,
+          content: `The shadow problem worked out cleanly because the geometric relationship $10y = 16x$ was linear — differentiating it was trivial.
 
 Now try a case that isn't linear. I'm at the same streetlight, but now I care about the **distance** $D$ from the lamp directly to my head (not along the ground — the straight-line, slant distance through the air).
 
@@ -1065,11 +1096,11 @@ $$\\frac{dD}{dt} = \\frac{8}{12.8} \\times 4 \approx 2.5 \\text{ ft/s}$$
 The straight-line distance from the lamp to my head grows at 2.5 ft/s — even though I'm walking at 4 ft/s. The slant distance grows more slowly because part of my walking motion is "sideways" relative to the lamp direction.
 
 This step required the chain rule to differentiate $D^2$. That is the heart of related rates: **the chain rule, applied to both sides of a geometric constraint, with respect to time**.`,
-      },
-      {
-        phase: 'formalization',
-        title: `Name the method: differentiating a constraint with respect to time`,
-        content: `What we just did has a name: **related rates**.
+        },
+        {
+          phase: "formalization",
+          title: `Name the method: differentiating a constraint with respect to time`,
+          content: `What we just did has a name: **related rates**.
 
 The method in full generality:
 
@@ -1090,11 +1121,11 @@ $$\\frac{d}{dt}[u^2] = 2u \cdot \\frac{du}{dt}$$
 The $\dfrac{du}{dt}$ appears because $u$ is a function of $t$, not a constant. Every time you differentiate a variable with respect to $t$, its rate $\dfrac{d(\cdot)}{dt}$ appears. This is the chain rule: $\dfrac{d}{dt}[f(u(t))] = f'(u) \cdot \dfrac{du}{dt}$.
 
 This is also called **implicit differentiation with respect to time** — the same technique from Chapter 2 (implicit differentiation), but with $t$ playing the role of $x$.`,
-      },
-      {
-        phase: 'formalization',
-        title: `The four-step procedure — same structure every time`,
-        content: `Every related rates problem, regardless of how it's dressed up, follows the same four steps:
+        },
+        {
+          phase: "formalization",
+          title: `The four-step procedure — same structure every time`,
+          content: `Every related rates problem, regardless of how it's dressed up, follows the same four steps:
 
 ---
 
@@ -1132,9 +1163,9 @@ Plug in the values of all known quantities (positions, lengths) and all known ra
 | Substitute | $\\frac{dx}{dt} = 4 \Rightarrow \\frac{dy}{dt} = \\frac{16}{10}(4) = 6.4$ ft/s |
 
 The template never changes. Only the constraint equation changes from problem to problem.`,
-      },
-    ],
-    resolution: `**Related Rates — the complete method:**
+        },
+      ],
+      resolution: `**Related Rates — the complete method:**
 
 Two quantities changing in time are linked by a geometric constraint. Differentiate both sides of the constraint with respect to $t$ (applying the chain rule), then substitute known values to find the unknown rate.
 
@@ -1152,15 +1183,15 @@ $$\\frac{d}{dt}[u^2] = 2u\\frac{du}{dt} \\qquad \\frac{d}{dt}[uv] = \\frac{du}{d
 **The shadow result:** if you are $h$ feet tall and a lamp is $H$ feet tall, the shadow tip always moves at $\\dfrac{H}{H - h}$ times your walking speed — regardless of where you are. The ratio is locked in by the geometry, and the derivative transmits that ratio directly to the rates.
 
 **What you discovered:** differentiating a geometric relationship with respect to time converts a static picture into a live equation between rates. The math that described the shape of the scene now describes how the scene is moving. That is the full power of the derivative — not just "slope of a curve," but *the rate of any changing quantity linked by any equation*.`,
-  },
-  {
-    title: `The Chain and the Cloud`,
-    persona: `I'm learning that calculus isn't really about slopes on a graph — it's about **coupled systems**. Pull a string here, something moves over there. Add users to an app, the server load explodes. I want to understand: when one quantity changes, how fast does a linked quantity have to change? And why does the answer depend on *where you are*, not just *how fast you're going*?`,
-    steps: [
-      {
-        phase: 'need',
-        title: `What I already know — and where it stops working`,
-        content: `I can compute derivatives. I can differentiate $f(t) = t^2$ and get $f'(t) = 2t$. I know what that means: at any moment $t$, the function is changing at rate $2t$.
+    },
+    {
+      title: `The Chain and the Cloud`,
+      persona: `I'm learning that calculus isn't really about slopes on a graph — it's about **coupled systems**. Pull a string here, something moves over there. Add users to an app, the server load explodes. I want to understand: when one quantity changes, how fast does a linked quantity have to change? And why does the answer depend on *where you are*, not just *how fast you're going*?`,
+      steps: [
+        {
+          phase: "need",
+          title: `What I already know — and where it stops working`,
+          content: `I can compute derivatives. I can differentiate $f(t) = t^2$ and get $f'(t) = 2t$. I know what that means: at any moment $t$, the function is changing at rate $2t$.
 
 What I haven't done yet is handle a situation where **two different quantities are linked**, and I know the rate of one but need the rate of the other.
 
@@ -1171,11 +1202,11 @@ Here's the question that comes up constantly in real engineering:
 The server load is not the same thing as the number of users. They're connected by a formula. But if I want the **rate** the load is growing, I can't just plug in a number — I need to know how the rates themselves are linked.
 
 This is the core problem of related rates: **two quantities are locked together by an equation. One rate is known. Find the other.**`,
-      },
-      {
-        phase: 'need',
-        title: `The simplest locked system — a bicycle chain`,
-        content: `Before apps and servers, start with something mechanical. A 10-speed bicycle.
+        },
+        {
+          phase: "need",
+          title: `The simplest locked system — a bicycle chain`,
+          content: `Before apps and servers, start with something mechanical. A 10-speed bicycle.
 
 Your feet drive the **front chainring** (50 teeth). The chain connects it to the **rear cog** (25 teeth) on the back wheel. The chain physically locks the two gears together — they cannot move independently.
 
@@ -1192,11 +1223,11 @@ This equation is always true — at every instant. It's the **constraint**. The 
 Now I know one rate: $\\dfrac{dP}{dt} = 5$ RPM/s (I'm spinning up). What's $\\dfrac{dW}{dt}$?
 
 I'm stuck. I know how positions relate ($W = 2P$), but I want how **rates** relate.`,
-      },
-      {
-        phase: 'discovery',
-        title: `Differentiate the constraint — the rates fall out`,
-        content: `The equation $W = 2P$ holds at every instant. So both sides are changing together — I can differentiate both sides with respect to time:
+        },
+        {
+          phase: "discovery",
+          title: `Differentiate the constraint — the rates fall out`,
+          content: `The equation $W = 2P$ holds at every instant. So both sides are changing together — I can differentiate both sides with respect to time:
 
 $$\\frac{d}{dt}[W] = \\frac{d}{dt}[2P]$$
 
@@ -1215,11 +1246,11 @@ The wheel is spinning up at 10 RPM per second.
 **This makes physical sense.** The chain is rigid. If your feet speed up by 5 RPM, the chain has to deliver that change to the wheel immediately. The wheel can't decide to speed up less — the hardware locks the rates together.
 
 **Key observation:** for this linear constraint ($W = 2P$), differentiating is trivial. The rate equation looks exactly like the position equation. That won't always be the case.`,
-      },
-      {
-        phase: 'discovery',
-        title: `A nonlinear constraint — the network app`,
-        content: `Now something that matters. You're building a group chat app. Every user can connect to every other user. Count the total possible connections:
+        },
+        {
+          phase: "discovery",
+          title: `A nonlinear constraint — the network app`,
+          content: `Now something that matters. You're building a group chat app. Every user can connect to every other user. Count the total possible connections:
 
 - 2 users: 1 connection
 - 3 users: 3 connections
@@ -1244,11 +1275,11 @@ The right side requires the **chain rule** — $U$ is a function of $t$:
 $$\\frac{dC}{dt} = \\frac{1}{2} \\cdot 2U \\cdot \\frac{dU}{dt} = U \\cdot \\frac{dU}{dt}$$
 
 This is the rate equation. Now plug in:`,
-      },
-      {
-        phase: 'discovery',
-        title: `The revelation — the same input causes wildly different outputs`,
-        content: `The rate equation is $\\dfrac{dC}{dt} = U \\cdot \\dfrac{dU}{dt}$.
+        },
+        {
+          phase: "discovery",
+          title: `The revelation — the same input causes wildly different outputs`,
+          content: `The rate equation is $\\dfrac{dC}{dt} = U \\cdot \\dfrac{dU}{dt}$.
 
 Your marketing team holds $\\dfrac{dU}{dt} = 10$ users/day constant. But what happens to $\\dfrac{dC}{dt}$ as the app grows?
 
@@ -1275,11 +1306,11 @@ This is why apps that feel fast at launch start lagging at scale. The constraint
 | Network | $C = \\frac{1}{2}U^2$ | $\\dfrac{dC}{dt} = U\\dfrac{dU}{dt}$ | Variable: grows with $U$ |
 
 Linear constraint → constant gear ratio. Nonlinear constraint → variable gear ratio. The nonlinearity in the position equation becomes a nonlinearity in the rate equation.`,
-      },
-      {
-        phase: 'formalization',
-        title: `The method: differentiate the constraint with respect to time`,
-        content: `Both problems — the bicycle and the network — used the same procedure. Now name it.
+        },
+        {
+          phase: "formalization",
+          title: `The method: differentiate the constraint with respect to time`,
+          content: `Both problems — the bicycle and the network — used the same procedure. Now name it.
 
 **Related rates** is the technique of differentiating a constraint equation with respect to time to find how the rates of change of two coupled quantities are related.
 
@@ -1304,11 +1335,11 @@ When you differentiate $A^2$ with respect to $t$, you get $2A \\cdot \\dfrac{dA}
 $$\\frac{d}{dt}[A^n] = nA^{n-1} \\cdot \\frac{dA}{dt}$$
 
 For the network: $\\dfrac{d}{dt}\\left[\\frac{1}{2}U^2\\right] = U \\cdot \\dfrac{dU}{dt}$. The $U$ out front is the current "gear ratio" — it came from the power rule applied via the chain rule.`,
-      },
-      {
-        phase: 'formalization',
-        title: `The four-step template — every related rates problem`,
-        content: `Whether it's gears, networks, tanks draining, or shadows moving, the structure never changes:
+        },
+        {
+          phase: "formalization",
+          title: `The four-step template — every related rates problem`,
+          content: `Whether it's gears, networks, tanks draining, or shadows moving, the structure never changes:
 
 **Step 1 — Identify the constraint.**
 What equation links the two quantities at every moment? This is the "hardware" of the problem — the chain, the formula, the geometry. Write it down.
@@ -1334,9 +1365,9 @@ The unknown rate ($\\dfrac{dW}{dt}$, $\\dfrac{dC}{dt}$, etc.) is the only thing 
 | Solve | $\\dfrac{dW}{dt} = 10$ RPM/s | $\\dfrac{dC}{dt} = 10{,}000$ connections/day |
 
 The same four steps. The same chain rule. Only the constraint changes.`,
-      },
-    ],
-    resolution: `**Related Rates — the complete method:**
+        },
+      ],
+      resolution: `**Related Rates — the complete method:**
 
 Two quantities changing in time are locked together by a constraint equation. Differentiating both sides with respect to $t$ converts the position constraint into a rate constraint.
 
@@ -1354,7 +1385,52 @@ Two quantities changing in time are locked together by a constraint equation. Di
 | Nonlinear: $C = \\frac{1}{2}U^2$ | $\\dfrac{dC}{dt} = U\\dfrac{dU}{dt}$ | Variable gear ratio — the rate relationship depends on where you are |
 
 **The deeper insight:** a nonlinear constraint means the "gear ratio" between two rates is not a constant — it's a function of the current state. The bicycle feels the same on every hill. The network gets harder to manage the bigger it gets. The derivative of the constraint equation tells you exactly how much harder, at every moment.`,
-  },
+    },
+    {
+      title: "The Winch Crank",
+      persona:
+        "I'm using a manual winch to haul a heavy anchor up onto the dock. I turn the crank at a steady 30 revolutions per minute. The drum starts with a small radius and gets thicker as rope winds on. I can feel the load getting harder to turn, but I need to know: exactly how fast is the anchor rising **right now**? My turning speed is constant, but the effective pulling speed changes because the radius is growing. One mechanical action (my crank) drives another (the rope moving). I want to see the exact relationship between my rotation and the anchor's speed — and why the chain rule shows up naturally when things are linked.",
+      steps: [
+        {
+          phase: "need",
+          title: "The mechanical constraint I can measure",
+          content:
+            "The winch has a drum. Let:\n\n- $\\theta(t)$ = angle the crank has turned (in radians) at time $t$\n- $r(t)$ = current radius of the wound rope on the drum (in feet)\n- $s(t)$ = length of rope that has been wound in (so the anchor rises by $s(t)$)\n\nThe key relationship is simple geometry: the length of rope wound equals the angle turned times the current radius:\n\n$$s = r \\cdot \\theta$$\n\nThis equation must be true at **every instant**. It is the mechanical constraint — the rope is physically wrapped around the drum, so the two quantities are locked together. I know my crank speed (I can count turns), and I can measure the current radius, but I need the **speed** of the anchor right now, not just the total length wound.",
+        },
+        {
+          phase: "need",
+          title: "Why my old tools fail",
+          content:
+            "If the radius were constant, it would be easy:\n\n$$\\text{anchor speed} = r \\times \\text{crank speed}$$\n\nBut the radius $r$ is **changing** as more rope winds on. My crank angular speed is constant:\n\n$$\\frac{d\\theta}{dt} = 30 \\text{ rev/min} = \\pi \\text{ rad/s}$$\n\nI know $\\frac{d\\theta}{dt}$, I know the current $r$, but I cannot just multiply because $r$ itself is a function of time. The simple product rule I learned in algebra doesn't directly give me the rate of $s$. I need a way to handle the fact that **both** $r$ and $\\theta$ are changing at the same time.",
+        },
+        {
+          phase: "discovery",
+          title: "Building the rate with finite slices",
+          content:
+            "I break time into tiny intervals of length $\\Delta t$. In one small slice:\n\n- The crank turns an extra $\\Delta \\theta$\n- The radius grows by a tiny $\\Delta r$ (because more rope is wound on)\n\nThe extra rope length wound in that slice is approximately:\n\n$$\\Delta s \\approx r \\cdot \\Delta \\theta + \\theta \\cdot \\Delta r$$\n\n(This is the finite version of the product rule — I add the two contributions separately.)\n\nThe average speed of the anchor over that tiny interval is:\n\n$$\\frac{\\Delta s}{\\Delta t} \\approx r \\cdot \\frac{\\Delta \\theta}{\\Delta t} + \\theta \\cdot \\frac{\\Delta r}{\\Delta t}$$\n\nAs I make $\\Delta t$ smaller and smaller, the approximation gets better. The terms $\\frac{\\Delta \\theta}{\\Delta t}$ and $\\frac{\\Delta r}{\\Delta t}$ become the instantaneous rates $\\frac{d\\theta}{dt}$ and $\\frac{d r}{dt}$. So the instantaneous speed of the anchor must be:\n\n$$\\frac{ds}{dt} = r \\cdot \\frac{d\\theta}{dt} + \\theta \\cdot \frac{dr}{dt}$$\n\nThis is the exact relationship I need.",
+        },
+        {
+          phase: "discovery",
+          title: "Plugging in real numbers at one moment",
+          content:
+            "Right now:\n- Crank speed $\\frac{d\\theta}{dt} = \\pi$ rad/s (30 rpm)\n- Current radius $r = 0.5$ ft\n- The rate at which the radius is growing $\\frac{dr}{dt} = 0.02$ ft/s (I measured how fast the rope layer is building up)\n- Current angle $\\theta = 20$ radians (about 3 full turns already wound)\n\nSubstitute into the relationship:\n\n$$\\frac{ds}{dt} = (0.5) \\cdot (\\pi) + (20) \\cdot (0.02)$$\n\n$$\\frac{ds}{dt} = 1.57 + 0.4 = 1.97 \\text{ ft/s}$$\n\nThe anchor is rising at almost 2 feet per second right now — faster than the simple $r \\times$ crank speed would suggest, because the growing radius is adding extra speed.",
+        },
+        {
+          phase: "formalization",
+          title: "The chain rule appears naturally",
+          content:
+            "We have reconstructed the exact rate using only measurable quantities and finite slices. Now we compress it into clean notation.\n\nThe length $s = r \\cdot \\theta$ is a **product** of two functions that both depend on time. The rate of change of a product is:\n\n$$\\frac{d}{dt}(r \\cdot \\theta) = r \\cdot \\frac{d\\theta}{dt} + \\theta \\cdot \\frac{dr}{dt}$$\n\nThis is the **product rule**. It is the chain rule in disguise when one quantity drives another through a changing relationship.\n\nIn mechanical terms, the crank (angular motion) drives the rope (linear motion), but the effective “gear ratio” is the current radius $r$, which itself is changing. The product rule captures exactly how those two linked motions combine.",
+        },
+        {
+          phase: "formalization",
+          title: "Why this is the chain rule in mechanical form",
+          content:
+            "Think of it as gears: the crank is one gear, the drum radius is the effective size of the second “gear.” Because the radius changes, it is like a continuously variable transmission. The chain rule (or product rule here) is the mathematical way of saying “the total output speed is the sum of the direct drive plus the effect of the changing ratio.”\n\nIn any mechanical system where one motion drives another through a changing dimension (cams, belts with stretch, screws with varying pitch, winches with winding rope), the same structure appears: you end up with a product or composition that requires the chain rule to get the true output speed.",
+        },
+      ],
+      resolution:
+        "**The mechanical chain rule — earned from the winch**\n\nWe started with a real mechanical constraint ($s = r \\cdot \\theta$). We built the rate using finite slices and the product of two changing quantities. Only at the end did we name it the product rule / chain rule.\n\n**The four-step process for any linked mechanical system:**\n1. **Write the constraint** — the physical relationship that locks the two quantities together at every instant.\n2. **Differentiate the constraint** — allow both quantities to be functions of time and apply the product/chain rule term by term.\n3. **Substitute known rates and current values** — plug in the driving speed and the current state.\n4. **Interpret the result** — the output rate tells you exactly how fast the driven part is moving right now.\n\nThe chain rule is not an abstract formula — it is the natural description of how one mechanical motion drives another when the connection itself is changing. Next time you turn a crank, pull a rope, or shift gears, you’ll see the same relationship at work.",
+    },
   ],
 
   challenges: [
@@ -1366,57 +1442,79 @@ Two quantities changing in time are locked together by a constraint equation. Di
       hint: "Let L = string length (the hypotenuse), x = horizontal distance (one leg), height = 100 m (the other leg, fixed). Use x² + 100² = L². Differentiate and substitute.",
       walkthrough: [
         {
-          expression: "\\text{Definition and setup: Related rates problems involve quantities that change with time and are related by an equation (usually geometric).}",
-          annotation: "Here, the kite forms a right triangle with the flier: vertical leg = fixed height 100 m, horizontal leg = x(t), hypotenuse = string length L(t). The goal is to find dx/dt when L = 200 m and dL/dt = 5 m/s."
+          expression:
+            "\\text{Definition and setup: Related rates problems involve quantities that change with time and are related by an equation (usually geometric).}",
+          annotation:
+            "Here, the kite forms a right triangle with the flier: vertical leg = fixed height 100 m, horizontal leg = x(t), hypotenuse = string length L(t). The goal is to find dx/dt when L = 200 m and dL/dt = 5 m/s.",
         },
         {
-          expression: "\\text{Pythagorean theorem (constraint equation): } x^2 + 100^2 = L^2",
-          annotation: "This equation relates the three sides at every instant of time. 100 is constant, while x and L are functions of t. Thought process: start with the geometric relationship that must hold for all t."
+          expression:
+            "\\text{Pythagorean theorem (constraint equation): } x^2 + 100^2 = L^2",
+          annotation:
+            "This equation relates the three sides at every instant of time. 100 is constant, while x and L are functions of t. Thought process: start with the geometric relationship that must hold for all t.",
         },
         {
-          expression: "\\text{Differentiate both sides with respect to time t (implicit differentiation)}",
-          annotation: "We differentiate the entire equation because we care about how the variables change over time, not their static values."
+          expression:
+            "\\text{Differentiate both sides with respect to time t (implicit differentiation)}",
+          annotation:
+            "We differentiate the entire equation because we care about how the variables change over time, not their static values.",
         },
         {
-          expression: "\\frac{d}{dt}(x^2) + \\frac{d}{dt}(100^2) = \\frac{d}{dt}(L^2)",
-          annotation: "Apply the derivative operator to each term separately."
+          expression:
+            "\\frac{d}{dt}(x^2) + \\frac{d}{dt}(100^2) = \\frac{d}{dt}(L^2)",
+          annotation: "Apply the derivative operator to each term separately.",
         },
         {
           expression: "2x \\cdot \\frac{dx}{dt} + 0 = 2L \\cdot \\frac{dL}{dt}",
-          annotation: "Chain rule: d/dt(x²) = 2x · (dx/dt). The constant 100² has derivative zero. Same for L². This is the key related-rates equation."
+          annotation:
+            "Chain rule: d/dt(x²) = 2x · (dx/dt). The constant 100² has derivative zero. Same for L². This is the key related-rates equation.",
         },
         {
-          expression: "\\text{Simplify by dividing both sides by 2 (optional but clean): } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
-          annotation: "We can keep the 2's or divide — both are fine. The equation now relates the two rates dx/dt and dL/dt."
+          expression:
+            "\\text{Simplify by dividing both sides by 2 (optional but clean): } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
+          annotation:
+            "We can keep the 2's or divide — both are fine. The equation now relates the two rates dx/dt and dL/dt.",
         },
         {
           expression: "\\text{Find the horizontal distance x when L = 200 m}",
-          annotation: "We need the specific geometry at the moment of interest."
+          annotation:
+            "We need the specific geometry at the moment of interest.",
         },
         {
-          expression: "x = \\sqrt{L^2 - 100^2} = \\sqrt{200^2 - 100^2} = \\sqrt{40000 - 10000} = \\sqrt{30000} = \\sqrt{10000 \\cdot 3} = 100\\sqrt{3} \\text{ m}",
-          annotation: "Exact value: 100√3 ≈ 173.205 m. Units check: meters. Note x is positive since distance."
+          expression:
+            "x = \\sqrt{L^2 - 100^2} = \\sqrt{200^2 - 100^2} = \\sqrt{40000 - 10000} = \\sqrt{30000} = \\sqrt{10000 \\cdot 3} = 100\\sqrt{3} \\text{ m}",
+          annotation:
+            "Exact value: 100√3 ≈ 173.205 m. Units check: meters. Note x is positive since distance.",
         },
         {
-          expression: "\\text{Substitute known values into the differentiated equation}",
-          annotation: "We know L = 200, dL/dt = 5 m/s (string is let out, so positive), x = 100√3."
+          expression:
+            "\\text{Substitute known values into the differentiated equation}",
+          annotation:
+            "We know L = 200, dL/dt = 5 m/s (string is let out, so positive), x = 100√3.",
         },
         {
-          expression: "2 \\cdot (100\\sqrt{3}) \\cdot \\frac{dx}{dt} = 2 \\cdot 200 \\cdot 5",
-          annotation: "Plug in carefully. Left side has the unknown dx/dt; right side is all numbers."
+          expression:
+            "2 \\cdot (100\\sqrt{3}) \\cdot \\frac{dx}{dt} = 2 \\cdot 200 \\cdot 5",
+          annotation:
+            "Plug in carefully. Left side has the unknown dx/dt; right side is all numbers.",
         },
         {
           expression: "200\\sqrt{3} \\cdot \\frac{dx}{dt} = 2000",
-          annotation: "Simplify: 2·100√3 = 200√3 on left; 2·200·5 = 2000 on right."
+          annotation:
+            "Simplify: 2·100√3 = 200√3 on left; 2·200·5 = 2000 on right.",
         },
         {
-          expression: "\\frac{dx}{dt} = \\frac{2000}{200\\sqrt{3}} = \\frac{10}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3} \\text{ m/s}",
-          annotation: "Rationalize denominator: multiply numerator and denominator by √3. Approximate value ≈ 5.77 m/s. The horizontal distance increases at about 5.77 m/s."
+          expression:
+            "\\frac{dx}{dt} = \\frac{2000}{200\\sqrt{3}} = \\frac{10}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3} \\text{ m/s}",
+          annotation:
+            "Rationalize denominator: multiply numerator and denominator by √3. Approximate value ≈ 5.77 m/s. The horizontal distance increases at about 5.77 m/s.",
         },
         {
-          expression: "\\text{Aha insight: The horizontal speed (5.77 m/s) is greater than the string speed (5 m/s) because the string is not vertical — part of the motion is 'wasted' on the angle.}",
-          annotation: "When the kite is high and far, letting out string moves the kite more horizontally than vertically."
-        }
+          expression:
+            "\\text{Aha insight: The horizontal speed (5.77 m/s) is greater than the string speed (5 m/s) because the string is not vertical — part of the motion is 'wasted' on the angle.}",
+          annotation:
+            "When the kite is high and far, letting out string moves the kite more horizontally than vertically.",
+        },
       ],
       answer:
         "\\dfrac{dx}{dt} = \\dfrac{10\\sqrt{3}}{3} \\approx 5.77 \\text{ m/s}",
@@ -1429,45 +1527,59 @@ Two quantities changing in time are locked together by a constraint equation. Di
       hint: "Write V in terms of h alone using r = h/2. Then differentiate.",
       walkthrough: [
         {
-          expression: "\\text{Definition: Volume of a cone is } V = \\frac{1}{3} \\pi r^2 h",
-          annotation: "This is the standard formula. Here both r and h change with time, but they are related by the fixed ratio h = 2r."
+          expression:
+            "\\text{Definition: Volume of a cone is } V = \\frac{1}{3} \\pi r^2 h",
+          annotation:
+            "This is the standard formula. Here both r and h change with time, but they are related by the fixed ratio h = 2r.",
         },
         {
-          expression: "\\text{Given relation: } h = 2r \\implies r = \\frac{h}{2}",
-          annotation: "The pile maintains a constant shape (similar cones). We want dh/dt, so eliminate r in favor of h."
+          expression:
+            "\\text{Given relation: } h = 2r \\implies r = \\frac{h}{2}",
+          annotation:
+            "The pile maintains a constant shape (similar cones). We want dh/dt, so eliminate r in favor of h.",
         },
         {
-          expression: "\\text{Substitute into volume: } V = \\frac{1}{3} \\pi \\left(\\frac{h}{2}\\right)^2 h = \\frac{1}{3} \\pi \\cdot \\frac{h^2}{4} \\cdot h = \\frac{\\pi h^3}{12}",
-          annotation: "Careful algebra: (h/2)² = h²/4, then times h = h³/4, then 1/3 π gives π h³ / 12. Now V depends only on h."
+          expression:
+            "\\text{Substitute into volume: } V = \\frac{1}{3} \\pi \\left(\\frac{h}{2}\\right)^2 h = \\frac{1}{3} \\pi \\cdot \\frac{h^2}{4} \\cdot h = \\frac{\\pi h^3}{12}",
+          annotation:
+            "Careful algebra: (h/2)² = h²/4, then times h = h³/4, then 1/3 π gives π h³ / 12. Now V depends only on h.",
         },
         {
-          expression: "\\text{Differentiate both sides with respect to t: } \\frac{dV}{dt} = \\frac{d}{dt} \\left( \\frac{\\pi}{12} h^3 \right)",
-          annotation: "Chain rule will appear because h = h(t)."
+          expression:
+            "\\text{Differentiate both sides with respect to t: } \\frac{dV}{dt} = \\frac{d}{dt} \\left( \\frac{\\pi}{12} h^3 \right)",
+          annotation: "Chain rule will appear because h = h(t).",
         },
         {
-          expression: "\\frac{dV}{dt} = \\frac{\\pi}{12} \\cdot 3 h^2 \\cdot \\frac{dh}{dt} = \\frac{\\pi h^2}{4} \\cdot \\frac{dh}{dt}",
-          annotation: "Power rule on h³ gives 3h², then multiply by π/12 and dh/dt. Simplified coefficient: 3π/12 = π/4."
+          expression:
+            "\\frac{dV}{dt} = \\frac{\\pi}{12} \\cdot 3 h^2 \\cdot \\frac{dh}{dt} = \\frac{\\pi h^2}{4} \\cdot \\frac{dh}{dt}",
+          annotation:
+            "Power rule on h³ gives 3h², then multiply by π/12 and dh/dt. Simplified coefficient: 3π/12 = π/4.",
         },
         {
-          expression: "\\text{We know } \\frac{dV}{dt} = 30 \\text{ ft³/min (gravel added at constant rate)}",
-          annotation: "Positive because volume is increasing."
+          expression:
+            "\\text{We know } \\frac{dV}{dt} = 30 \\text{ ft³/min (gravel added at constant rate)}",
+          annotation: "Positive because volume is increasing.",
         },
         {
           expression: "30 = \\frac{\\pi (10)^2}{4} \\cdot \\frac{dh}{dt}",
-          annotation: "Plug in h = 10 ft at the moment of interest."
+          annotation: "Plug in h = 10 ft at the moment of interest.",
         },
         {
-          expression: "30 = \\frac{\\pi \\cdot 100}{4} \\cdot \\frac{dh}{dt} = 25\\pi \\cdot \\frac{dh}{dt}",
-          annotation: "100/4 = 25, times π."
+          expression:
+            "30 = \\frac{\\pi \\cdot 100}{4} \\cdot \\frac{dh}{dt} = 25\\pi \\cdot \\frac{dh}{dt}",
+          annotation: "100/4 = 25, times π.",
         },
         {
-          expression: "\\frac{dh}{dt} = \\frac{30}{25\\pi} = \\frac{6}{5\\pi} \\text{ ft/min}",
-          annotation: "Simplify fraction: divide numerator and denominator by 5. Approximate ≈ 0.382 ft/min. The height rises slowly because the pile is getting wider as it grows."
+          expression:
+            "\\frac{dh}{dt} = \\frac{30}{25\\pi} = \\frac{6}{5\\pi} \\text{ ft/min}",
+          annotation:
+            "Simplify fraction: divide numerator and denominator by 5. Approximate ≈ 0.382 ft/min. The height rises slowly because the pile is getting wider as it grows.",
         },
         {
-          expression: "\\text{Aha insight: Even though volume increases at constant rate, dh/dt decreases as h grows because the cone is spreading out — more volume is needed to raise the height the same amount later.}",
-          annotation: "This is why the rate is smaller at larger heights."
-        }
+          expression:
+            "\\text{Aha insight: Even though volume increases at constant rate, dh/dt decreases as h grows because the cone is spreading out — more volume is needed to raise the height the same amount later.}",
+          annotation: "This is why the rate is smaller at larger heights.",
+        },
       ],
       answer:
         "\\dfrac{dh}{dt} = \\dfrac{6}{5\\pi} \\approx 0.382 \\text{ ft/min}",
@@ -1480,49 +1592,64 @@ Two quantities changing in time are locked together by a constraint equation. Di
       hint: "Let x = horizontal distance of boat from the dock, L = length of rope from pulley to boat. These satisfy x² + 12² = L². Differentiate. Note: the boat moves horizontally, not along the rope.",
       walkthrough: [
         {
-          expression: "\\text{Setup: The pulley is 12 ft above the water (fixed vertical distance).}",
-          annotation: "The rope goes from boat to pulley (length L), then presumably to the person pulling. We care about the segment from pulley to boat."
+          expression:
+            "\\text{Setup: The pulley is 12 ft above the water (fixed vertical distance).}",
+          annotation:
+            "The rope goes from boat to pulley (length L), then presumably to the person pulling. We care about the segment from pulley to boat.",
         },
         {
-          expression: "\\text{Pythagorean relation: } x^2 + 12^2 = L^2 \\quad \\text{or} \\quad x^2 + 144 = L^2",
-          annotation: "x is the horizontal distance from the point directly below the pulley to the boat. L is the slant length of the rope."
+          expression:
+            "\\text{Pythagorean relation: } x^2 + 12^2 = L^2 \\quad \\text{or} \\quad x^2 + 144 = L^2",
+          annotation:
+            "x is the horizontal distance from the point directly below the pulley to the boat. L is the slant length of the rope.",
         },
         {
-          expression: "\\text{Differentiate with respect to t: } 2x \\frac{dx}{dt} + 0 = 2L \\frac{dL}{dt}",
-          annotation: "Chain rule again. Constant 144 drops out."
+          expression:
+            "\\text{Differentiate with respect to t: } 2x \\frac{dx}{dt} + 0 = 2L \\frac{dL}{dt}",
+          annotation: "Chain rule again. Constant 144 drops out.",
         },
         {
           expression: "\\text{Simplify: } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
-          annotation: "Divided by 2 for cleanliness."
+          annotation: "Divided by 2 for cleanliness.",
         },
         {
           expression: "\\text{At the instant of interest: L = 15 ft}",
-          annotation: "Given directly."
+          annotation: "Given directly.",
         },
         {
-          expression: "x = \\sqrt{L^2 - 144} = \\sqrt{225 - 144} = \\sqrt{81} = 9 \\text{ ft}",
-          annotation: "Positive root because distance."
+          expression:
+            "x = \\sqrt{L^2 - 144} = \\sqrt{225 - 144} = \\sqrt{81} = 9 \\text{ ft}",
+          annotation: "Positive root because distance.",
         },
         {
-          expression: "\\text{Rate at which rope is pulled: } \\frac{dL}{dt} = -3 \\text{ ft/s}",
-          annotation: "Important: pulled in means the length L is decreasing, so negative sign. This is a common source of sign errors in related rates."
+          expression:
+            "\\text{Rate at which rope is pulled: } \\frac{dL}{dt} = -3 \\text{ ft/s}",
+          annotation:
+            "Important: pulled in means the length L is decreasing, so negative sign. This is a common source of sign errors in related rates.",
         },
         {
-          expression: "\\text{Substitute into the rate equation: } 9 \\cdot \\frac{dx}{dt} = 15 \\cdot (-3)",
-          annotation: "x = 9, L = 15, dL/dt = -3."
+          expression:
+            "\\text{Substitute into the rate equation: } 9 \\cdot \\frac{dx}{dt} = 15 \\cdot (-3)",
+          annotation: "x = 9, L = 15, dL/dt = -3.",
         },
         {
-          expression: "9 \\frac{dx}{dt} = -45 \\implies \\frac{dx}{dt} = -5 \\text{ ft/s}",
-          annotation: "Solve for dx/dt. The negative sign means x is decreasing — the boat is moving toward the dock."
+          expression:
+            "9 \\frac{dx}{dt} = -45 \\implies \\frac{dx}{dt} = -5 \\text{ ft/s}",
+          annotation:
+            "Solve for dx/dt. The negative sign means x is decreasing — the boat is moving toward the dock.",
         },
         {
-          expression: "\\text{Interpretation: The boat approaches the dock at 5 ft/s (speed is the absolute value).}",
-          annotation: "The question asks 'how fast is the boat moving toward the dock' — so we report the positive speed 5 ft/s, but the signed rate is -5 ft/s."
+          expression:
+            "\\text{Interpretation: The boat approaches the dock at 5 ft/s (speed is the absolute value).}",
+          annotation:
+            "The question asks 'how fast is the boat moving toward the dock' — so we report the positive speed 5 ft/s, but the signed rate is -5 ft/s.",
         },
         {
-          expression: "\\text{Aha insight: When the rope is steeper (smaller x), pulling the rope moves the boat faster horizontally. Here at L=15, x=9, the boat moves faster (5 ft/s) than the rope is pulled (3 ft/s).}",
-          annotation: "The angle converts the rope speed into a larger horizontal component."
-        }
+          expression:
+            "\\text{Aha insight: When the rope is steeper (smaller x), pulling the rope moves the boat faster horizontally. Here at L=15, x=9, the boat moves faster (5 ft/s) than the rope is pulled (3 ft/s).}",
+          annotation:
+            "The angle converts the rope speed into a larger horizontal component.",
+        },
       ],
       answer: "\\text{The boat approaches the dock at } 5 \\text{ ft/s.}",
     },
@@ -1549,83 +1676,95 @@ Two quantities changing in time are locked together by a constraint equation. Di
     },
   ],
 
-
   // ─── Semantic Layer ───────────────────────────────────────────────────────
   semantics: {
-    "core": [
-        {
-            "symbol": "dx/dt",
-            "meaning": "rate of change of x with respect to time — how fast x is changing right now"
-        },
-        {
-            "symbol": "d/dt[x²]",
-            "meaning": "2x·(dx/dt), NOT just 2x — the chain rule factor dx/dt is mandatory"
-        },
-        {
-            "symbol": "geometric constraint",
-            "meaning": "an equation that links the changing quantities — e.g., x²+y²=L² for a right triangle with fixed hypotenuse"
-        }
+    core: [
+      {
+        symbol: "dx/dt",
+        meaning:
+          "rate of change of x with respect to time — how fast x is changing right now",
+      },
+      {
+        symbol: "d/dt[x²]",
+        meaning:
+          "2x·(dx/dt), NOT just 2x — the chain rule factor dx/dt is mandatory",
+      },
+      {
+        symbol: "geometric constraint",
+        meaning:
+          "an equation that links the changing quantities — e.g., x²+y²=L² for a right triangle with fixed hypotenuse",
+      },
     ],
-    "rulesOfThumb": [
-        "NEVER substitute numbers before differentiating. Differentiate with variables, then substitute.",
-        "Identify which quantities are constant (they disappear when differentiated) and which vary (they generate rate terms).",
-        "The 5-step method: diagram → constraint equation → differentiate → substitute → solve.",
-        "Draw the diagram. Most setup errors are geometry errors, not calculus errors."
-    ]
-},
+    rulesOfThumb: [
+      "NEVER substitute numbers before differentiating. Differentiate with variables, then substitute.",
+      "Identify which quantities are constant (they disappear when differentiated) and which vary (they generate rate terms).",
+      "The 5-step method: diagram → constraint equation → differentiate → substitute → solve.",
+      "Draw the diagram. Most setup errors are geometry errors, not calculus errors.",
+    ],
+  },
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
-      { label: 'Implicit Differentiation (Ch. 2)', note: 'Related rates IS implicit differentiation with time as the variable — every variable in your equation is a function of t' },
-      { label: 'Chain Rule (Ch. 2)', note: 'd/dt[f(x(t))] = f\'(x)·(dx/dt) — the chain rule is why every term picks up a (d/dt) factor' },
-      { label: 'Pythagorean Theorem / Geometry', note: 'Most related-rates diagrams produce geometric constraints (x² + y² = L², similar triangles, volume = (1/3)πr²h) — draw first, always' },
+      {
+        label: "Implicit Differentiation (Ch. 2)",
+        note: "Related rates IS implicit differentiation with time as the variable — every variable in your equation is a function of t",
+      },
+      {
+        label: "Chain Rule (Ch. 2)",
+        note: "d/dt[f(x(t))] = f'(x)·(dx/dt) — the chain rule is why every term picks up a (d/dt) factor",
+      },
+      {
+        label: "Pythagorean Theorem / Geometry",
+        note: "Most related-rates diagrams produce geometric constraints (x² + y² = L², similar triangles, volume = (1/3)πr²h) — draw first, always",
+      },
     ],
     futureLinks: [
-      { label: 'Optimization (Lesson 6)', note: 'Optimization asks: at what INSTANT is the rate zero? Related rates asks: what IS the rate at a given instant? Same tools, different question' },
-      { label: 'Parametric Equations (Ch. 6)', note: 'In parametric curves, x(t) and y(t) are exactly the time-dependent quantities of related rates — dy/dx = (dy/dt)/(dx/dt)' },
+      {
+        label: "Optimization (Lesson 6)",
+        note: "Optimization asks: at what INSTANT is the rate zero? Related rates asks: what IS the rate at a given instant? Same tools, different question",
+      },
+      {
+        label: "Parametric Equations (Ch. 6)",
+        note: "In parametric curves, x(t) and y(t) are exactly the time-dependent quantities of related rates — dy/dx = (dy/dt)/(dx/dt)",
+      },
     ],
   },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {
-    "questions": [
-        {
-            "id": "rr-assess-1",
-            "type": "choice",
-            "text": "In related rates, d/dt[r²] equals:",
-            "options": [
-                "2r",
-                "2r·(dr/dt)",
-                "2r + dr/dt",
-                "r²·(dr/dt)"
-            ],
-            "answer": "2r·(dr/dt)",
-            "hint": "Chain rule: outer derivative 2r, multiplied by the inner derivative dr/dt."
-        },
-        {
-            "id": "rr-assess-2",
-            "type": "choice",
-            "text": "When should you substitute the specific numerical values into a related rates equation?",
-            "options": [
-                "Before differentiating",
-                "After differentiating and collecting rates",
-                "At any point — order doesn't matter",
-                "Never"
-            ],
-            "answer": "After differentiating and collecting rates",
-            "hint": "Substituting before differentiating replaces variables with constants, destroying all rate information. Always differentiate first."
-        }
-    ]
-},
+    questions: [
+      {
+        id: "rr-assess-1",
+        type: "choice",
+        text: "In related rates, d/dt[r²] equals:",
+        options: ["2r", "2r·(dr/dt)", "2r + dr/dt", "r²·(dr/dt)"],
+        answer: "2r·(dr/dt)",
+        hint: "Chain rule: outer derivative 2r, multiplied by the inner derivative dr/dt.",
+      },
+      {
+        id: "rr-assess-2",
+        type: "choice",
+        text: "When should you substitute the specific numerical values into a related rates equation?",
+        options: [
+          "Before differentiating",
+          "After differentiating and collecting rates",
+          "At any point — order doesn't matter",
+          "Never",
+        ],
+        answer: "After differentiating and collecting rates",
+        hint: "Substituting before differentiating replaces variables with constants, destroying all rate information. Always differentiate first.",
+      },
+    ],
+  },
 
   // ─── Mental Model Compression ────────────────────────────────────────────
   mentalModel: [
     "d/dt[f(x(t))] = f'(x)·(dx/dt) (chain rule in t)",
     "5 steps: diagram → constraint → differentiate → substitute → solve",
     "Constant quantities vanish; variable quantities generate rate factors",
-    "Substitute numbers AFTER differentiating — never before"
-],
+    "Substitute numbers AFTER differentiating — never before",
+  ],
 
   checkpoints: [
     "read-intuition",
@@ -1645,121 +1784,122 @@ Two quantities changing in time are locked together by a constraint equation. Di
 
   quiz: [
     {
-      id: 'rr-q1',
-      type: 'input',
-      text: 'A spherical balloon is being inflated. Its volume is $V = \\frac{4}{3}\\pi r^3$. Differentiate both sides with respect to time $t$ to find $\\frac{dV}{dt}$ in terms of $r$ and $\\frac{dr}{dt}$. If $r = 5$ cm and $\\frac{dr}{dt} = 2$ cm/s, what is $\\frac{dV}{dt}$ (in cm³/s)? Enter a number.',
-      answer: '200*pi',
+      id: "rr-q1",
+      type: "input",
+      text: "A spherical balloon is being inflated. Its volume is $V = \\frac{4}{3}\\pi r^3$. Differentiate both sides with respect to time $t$ to find $\\frac{dV}{dt}$ in terms of $r$ and $\\frac{dr}{dt}$. If $r = 5$ cm and $\\frac{dr}{dt} = 2$ cm/s, what is $\\frac{dV}{dt}$ (in cm³/s)? Enter a number.",
+      answer: "200*pi",
       hints: [
-        'Differentiate $V = \\frac{4}{3}\\pi r^3$ w.r.t. $t$ using the chain rule: $\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$.',
-        'Substitute $r = 5$ and $\\frac{dr}{dt} = 2$: $4\\pi(25)(2) = 200\\pi$.',
+        "Differentiate $V = \\frac{4}{3}\\pi r^3$ w.r.t. $t$ using the chain rule: $\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$.",
+        "Substitute $r = 5$ and $\\frac{dr}{dt} = 2$: $4\\pi(25)(2) = 200\\pi$.",
       ],
-      reviewSection: 'Intuition — Setting up the rate equation',
+      reviewSection: "Intuition — Setting up the rate equation",
     },
     {
-      id: 'rr-q2',
-      type: 'choice',
-      text: 'In a related rates problem, when must you substitute known numerical values for position (e.g. $x = 6$)?',
+      id: "rr-q2",
+      type: "choice",
+      text: "In a related rates problem, when must you substitute known numerical values for position (e.g. $x = 6$)?",
       options: [
-        'Before differentiating, to simplify the equation',
-        'After differentiating, into the rate equation',
-        'It does not matter — substituting before or after gives the same result',
-        'You never substitute; you always keep everything symbolic',
+        "Before differentiating, to simplify the equation",
+        "After differentiating, into the rate equation",
+        "It does not matter — substituting before or after gives the same result",
+        "You never substitute; you always keep everything symbolic",
       ],
-      answer: 'After differentiating, into the rate equation',
+      answer: "After differentiating, into the rate equation",
       hints: [
-        'Substituting a position value before differentiating turns a variable into a constant, destroying its rate $dx/dt$.',
+        "Substituting a position value before differentiating turns a variable into a constant, destroying its rate $dx/dt$.",
       ],
-      reviewSection: 'Intuition — Do NOT substitute before differentiating',
+      reviewSection: "Intuition — Do NOT substitute before differentiating",
     },
     {
-      id: 'rr-q3',
-      type: 'input',
-      text: 'A 10-ft ladder leans against a wall. Its base slides away at $\\frac{dx}{dt} = 2$ ft/s. The constraint is $x^2 + y^2 = 100$. Differentiating w.r.t. $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$. At the instant $x = 6$ ft, what is $y$ (in ft)?',
-      answer: '8',
+      id: "rr-q3",
+      type: "input",
+      text: "A 10-ft ladder leans against a wall. Its base slides away at $\\frac{dx}{dt} = 2$ ft/s. The constraint is $x^2 + y^2 = 100$. Differentiating w.r.t. $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$. At the instant $x = 6$ ft, what is $y$ (in ft)?",
+      answer: "8",
       hints: [
-        'Use $x^2 + y^2 = 100$ with $x = 6$: $36 + y^2 = 100$, so $y^2 = 64$.',
+        "Use $x^2 + y^2 = 100$ with $x = 6$: $36 + y^2 = 100$, so $y^2 = 64$.",
       ],
-      reviewSection: 'Intuition — The sliding ladder geometry',
+      reviewSection: "Intuition — The sliding ladder geometry",
     },
     {
-      id: 'rr-q4',
-      type: 'input',
-      text: 'Continuing the ladder problem: $x = 6$ ft, $y = 8$ ft, $\\frac{dx}{dt} = 2$ ft/s. Using $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$, find $\\frac{dy}{dt}$ (in ft/s). Enter a signed number (negative = sliding down).',
-      answer: '-3/2',
+      id: "rr-q4",
+      type: "input",
+      text: "Continuing the ladder problem: $x = 6$ ft, $y = 8$ ft, $\\frac{dx}{dt} = 2$ ft/s. Using $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$, find $\\frac{dy}{dt}$ (in ft/s). Enter a signed number (negative = sliding down).",
+      answer: "-3/2",
       hints: [
-        'Solve for $\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt} = -\\frac{6}{8}\\cdot 2 = -\\frac{3}{2}$.',
+        "Solve for $\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt} = -\\frac{6}{8}\\cdot 2 = -\\frac{3}{2}$.",
       ],
-      reviewSection: 'Intuition — The sliding ladder geometry',
+      reviewSection: "Intuition — The sliding ladder geometry",
     },
     {
-      id: 'rr-q5',
-      type: 'input',
-      text: 'Water drains from a conical tank (apex down) of fixed proportions so that $V = \\frac{\\pi}{3}h^3$ (already simplified using similar triangles). If $\\frac{dV}{dt} = -2\\pi$ m³/min, find $\\frac{dh}{dt}$ when $h = 3$ m. Enter the value in m/min.',
-      answer: '-2/9',
+      id: "rr-q5",
+      type: "input",
+      text: "Water drains from a conical tank (apex down) of fixed proportions so that $V = \\frac{\\pi}{3}h^3$ (already simplified using similar triangles). If $\\frac{dV}{dt} = -2\\pi$ m³/min, find $\\frac{dh}{dt}$ when $h = 3$ m. Enter the value in m/min.",
+      answer: "-2/9",
       hints: [
-        'Differentiate $V = \\frac{\\pi}{3}h^3$ w.r.t. $t$: $\\frac{dV}{dt} = \\pi h^2 \\frac{dh}{dt}$.',
-        'Substitute: $-2\\pi = \\pi(9)\\frac{dh}{dt}$, so $\\frac{dh}{dt} = -\\frac{2}{9}$.',
+        "Differentiate $V = \\frac{\\pi}{3}h^3$ w.r.t. $t$: $\\frac{dV}{dt} = \\pi h^2 \\frac{dh}{dt}$.",
+        "Substitute: $-2\\pi = \\pi(9)\\frac{dh}{dt}$, so $\\frac{dh}{dt} = -\\frac{2}{9}$.",
       ],
-      reviewSection: 'Examples — Conical tank',
+      reviewSection: "Examples — Conical tank",
     },
     {
-      id: 'rr-q6',
-      type: 'choice',
-      text: 'Related rates problems use implicit differentiation with respect to which variable?',
-      options: ['$x$', '$y$', '$t$ (time)', '$r$ (radius)'],
-      answer: '$t$ (time)',
+      id: "rr-q6",
+      type: "choice",
+      text: "Related rates problems use implicit differentiation with respect to which variable?",
+      options: ["$x$", "$y$", "$t$ (time)", "$r$ (radius)"],
+      answer: "$t$ (time)",
       hints: [
-        'All quantities in a related rates problem are functions of time $t$, so you differentiate the geometric equation w.r.t. $t$.',
+        "All quantities in a related rates problem are functions of time $t$, so you differentiate the geometric equation w.r.t. $t$.",
       ],
-      reviewSection: 'Intuition — Related rates is implicit differentiation in $t$',
+      reviewSection:
+        "Intuition — Related rates is implicit differentiation in $t$",
     },
     {
-      id: 'rr-q7',
-      type: 'input',
-      text: 'Two cars start at the same intersection. Car A travels east at 60 mph; Car B travels north at 80 mph. Let $z$ be the distance between them. The constraint is $z^2 = x^2 + y^2$. After 1 hour, $x = 60$, $y = 80$, $z = 100$. Find $\\frac{dz}{dt}$ (mph) at that moment.',
-      answer: '100',
+      id: "rr-q7",
+      type: "input",
+      text: "Two cars start at the same intersection. Car A travels east at 60 mph; Car B travels north at 80 mph. Let $z$ be the distance between them. The constraint is $z^2 = x^2 + y^2$. After 1 hour, $x = 60$, $y = 80$, $z = 100$. Find $\\frac{dz}{dt}$ (mph) at that moment.",
+      answer: "100",
       hints: [
-        'Differentiate: $2z\\frac{dz}{dt} = 2x\\frac{dx}{dt} + 2y\\frac{dy}{dt}$.',
-        '$\\frac{dz}{dt} = \\frac{60\\cdot60 + 80\\cdot80}{100} = \\frac{3600+6400}{100} = 100$.',
+        "Differentiate: $2z\\frac{dz}{dt} = 2x\\frac{dx}{dt} + 2y\\frac{dy}{dt}$.",
+        "$\\frac{dz}{dt} = \\frac{60\\cdot60 + 80\\cdot80}{100} = \\frac{3600+6400}{100} = 100$.",
       ],
-      reviewSection: 'Examples — Two moving vehicles',
+      reviewSection: "Examples — Two moving vehicles",
     },
     {
-      id: 'rr-q8',
-      type: 'input',
-      text: 'A streetlight is 15 ft high. A 6-ft-tall person walks away from the base at 4 ft/s. Let $s$ be the length of the shadow. By similar triangles, $\\frac{15}{6} = \\frac{x+s}{s}$, giving $s = \\frac{6}{9}x = \\frac{2}{3}x$. Find $\\frac{ds}{dt}$ (ft/s).',
-      answer: '8/3',
+      id: "rr-q8",
+      type: "input",
+      text: "A streetlight is 15 ft high. A 6-ft-tall person walks away from the base at 4 ft/s. Let $s$ be the length of the shadow. By similar triangles, $\\frac{15}{6} = \\frac{x+s}{s}$, giving $s = \\frac{6}{9}x = \\frac{2}{3}x$. Find $\\frac{ds}{dt}$ (ft/s).",
+      answer: "8/3",
       hints: [
-        'Differentiate $s = \\frac{2}{3}x$ w.r.t. $t$: $\\frac{ds}{dt} = \\frac{2}{3}\\frac{dx}{dt} = \\frac{2}{3}(4) = \\frac{8}{3}$.',
+        "Differentiate $s = \\frac{2}{3}x$ w.r.t. $t$: $\\frac{ds}{dt} = \\frac{2}{3}\\frac{dx}{dt} = \\frac{2}{3}(4) = \\frac{8}{3}$.",
       ],
-      reviewSection: 'Examples — Shadow problem',
+      reviewSection: "Examples — Shadow problem",
     },
     {
-      id: 'rr-q9',
-      type: 'choice',
-      text: 'For the ladder problem, as $y \\to 0$ (the top nears the ground), what happens to $|dy/dt|$?',
+      id: "rr-q9",
+      type: "choice",
+      text: "For the ladder problem, as $y \\to 0$ (the top nears the ground), what happens to $|dy/dt|$?",
       options: [
-        'It approaches 0 — the top slows down',
-        'It stays constant',
-        'It grows without bound — the top falls faster and faster',
-        'It equals $dx/dt$ exactly',
+        "It approaches 0 — the top slows down",
+        "It stays constant",
+        "It grows without bound — the top falls faster and faster",
+        "It equals $dx/dt$ exactly",
       ],
-      answer: 'It grows without bound — the top falls faster and faster',
+      answer: "It grows without bound — the top falls faster and faster",
       hints: [
-        '$\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt}$. As $y \\to 0$ with $x \\to L$, the ratio $x/y \\to \\infty$.',
+        "$\\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt}$. As $y \\to 0$ with $x \\to L$, the ratio $x/y \\to \\infty$.",
       ],
-      reviewSection: 'Intuition — The sliding ladder geometry',
+      reviewSection: "Intuition — The sliding ladder geometry",
     },
     {
-      id: 'rr-q10',
-      type: 'input',
-      text: 'A point moves along the curve $y = x^2$. If $\\frac{dx}{dt} = 3$ units/s when $x = 2$, find $\\frac{dy}{dt}$ at that instant.',
-      answer: '12',
+      id: "rr-q10",
+      type: "input",
+      text: "A point moves along the curve $y = x^2$. If $\\frac{dx}{dt} = 3$ units/s when $x = 2$, find $\\frac{dy}{dt}$ at that instant.",
+      answer: "12",
       hints: [
-        'Differentiate $y = x^2$ w.r.t. $t$: $\\frac{dy}{dt} = 2x\\frac{dx}{dt}$.',
-        'At $x = 2$: $\\frac{dy}{dt} = 2(2)(3) = 12$.',
+        "Differentiate $y = x^2$ w.r.t. $t$: $\\frac{dy}{dt} = 2x\\frac{dx}{dt}$.",
+        "At $x = 2$: $\\frac{dy}{dt} = 2(2)(3) = 12$.",
       ],
-      reviewSection: 'Examples — Point on a curve',
+      reviewSection: "Examples — Point on a curve",
     },
   ],
 };
