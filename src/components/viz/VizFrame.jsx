@@ -156,6 +156,8 @@ const VIZ_REGISTRY = {
   ForceBlockSim: lazy(() => import("./matter/ForceBlockSim.jsx")),
   InclinedPlaneSim: lazy(() => import("./matter/InclinedPlaneSim.jsx")),
   AtwoodMachineSim: lazy(() => import("./matter/AtwoodMachineSim.jsx")),
+  // Football Calculus Game — Integration, Optimization, Related Rates
+  FootballCalculus: lazy(() => import("./react/FootballCalculus.jsx")),
   // Chapter 3 — Applications of Derivatives
   NewtonsMethod: lazy(() => import("./d3/NewtonsMethod.jsx")),
   SpringOscillation: lazy(() => import("./d3/SpringOscillation.jsx")),

@@ -46,6 +46,7 @@ import { useVideoPlayer } from "../../context/VideoPlayerContext.jsx";
 import PhysicsPoolLab from "../tools/PhysicsPoolLab.jsx";
 import BasketballLab from "../tools/BasketballLab.jsx";
 import MiniGolfGame from "../tools/MiniGolfGame.jsx";
+import FootballCalculus from "../viz/react/FootballCalculus.jsx";
 import ChemistryPage from "../../pages/ChemistryPage.jsx";
 import PhysicsPage from "../../pages/PhysicsPage.jsx";
 
@@ -223,6 +224,8 @@ function TopBar({
   basketOpen,
   onGolfToggle,
   golfOpen,
+  onFootballToggle,
+  footballOpen,
 }) {
   const { openSearch } = useSearchContext();
   const {
@@ -486,6 +489,18 @@ function TopBar({
               ⛳
             </span>
           </button>
+          <button
+            onClick={onFootballToggle}
+            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${footballOpen ? "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30" : "text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30"}`}
+            title="Football Calculus"
+          >
+            <span
+              className="text-base leading-none"
+              style={{ lineHeight: "16px", display: "block" }}
+            >
+              🏈
+            </span>
+          </button>
         </div>
       </div>
 
@@ -627,6 +642,7 @@ export default function AppShell({ children }) {
   const [physicsOpen, setPhysicsOpen] = useState(false);
   const [basketOpen, setBasketOpen] = useState(false);
   const [golfOpen, setGolfOpen] = useState(false);
+  const [footballOpen, setFootballOpen] = useState(false);
   const [polyOpen, setPolyOpen] = useState(false);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
@@ -643,6 +659,7 @@ export default function AppShell({ children }) {
     setPhysicsOpen(false);
     setBasketOpen(false);
     setGolfOpen(false);
+    setFootballOpen(false);
   }, []);
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null);
   const { openSearch } = useSearchContext();
@@ -803,6 +820,8 @@ export default function AppShell({ children }) {
           basketOpen={basketOpen}
           onGolfToggle={() => setGolfOpen((prev) => !prev)}
           golfOpen={golfOpen}
+          onFootballToggle={() => setFootballOpen((prev) => !prev)}
+          footballOpen={footballOpen}
         />
 
         {/* Mobile sidebar/tools backdrop */}
@@ -1111,6 +1130,26 @@ export default function AppShell({ children }) {
         {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
         {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
         {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
+        {footballOpen && (
+          <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🏈</span>
+                <span className="font-bold text-white text-sm">Football Calculus</span>
+                <span className="text-xs text-slate-500 ml-2">Integration · Optimization · Related Rates</span>
+              </div>
+              <button
+                onClick={() => setFootballOpen(false)}
+                className="text-slate-400 hover:text-white p-1.5 rounded hover:bg-slate-800 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 p-4 overflow-auto">
+              <FootballCalculus />
+            </div>
+          </div>
+        )}
         {chemOpen && (
           <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
             <ChemistryPage onClose={() => setChemOpen(false)} />
