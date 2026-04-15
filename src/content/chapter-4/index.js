@@ -1,3 +1,4 @@
+import antiderivatives from './00-antiderivatives.js'
 import areaAccumulation from './00-area-accumulation.js'
 import riemannSums from './01-riemann-sums.js'
 import definiteIntegral from './02-definite-integral.js'
@@ -27,6 +28,7 @@ export default {
   description: 'The second pillar of calculus: accumulation, area, and the Fundamental Theorem that links differentiation and integration as inverse operations. From Riemann sums to antiderivatives — with all the integration techniques you need for Calc 2, plus applications in physics, economics, and engineering.',
   color: 'sky',
   lessons: [
+    antiderivatives,
     areaAccumulation,
     riemannSums,
     definiteIntegral,
