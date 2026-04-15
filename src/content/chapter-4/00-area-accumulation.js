@@ -362,49 +362,68 @@ export default {
       hint: "The velocity-time graph is a horizontal line at v = 30. Area = base × height. The antiderivative of a constant v is vt.",
       walkthrough: [
         {
-          expression: "\\text{Prerequisite recall: Displacement } \\Delta x = x(5) - x(0) \\text{ equals the area under the velocity-time graph}",
-          annotation: "Velocity is defined as v(t) = dx/dt. By the Fundamental Theorem of Calculus (Part 2), integrating velocity from t=0 to t=5 recovers the exact net change in position: \\Delta x = \\int_0^5 v(t)\\,dt. This holds even if you have never seen integrals before — it is the precise definition that turns 'how fast' into 'how far'."
+          expression:
+            "\\text{Prerequisite recall: Displacement } \\Delta x = x(5) - x(0) \\text{ equals the area under the velocity-time graph}",
+          annotation:
+            "Velocity is defined as v(t) = dx/dt. By the Fundamental Theorem of Calculus (Part 2), integrating velocity from t=0 to t=5 recovers the exact net change in position: \\Delta x = \\int_0^5 v(t)\\,dt. This holds even if you have never seen integrals before — it is the precise definition that turns 'how fast' into 'how far'.",
         },
         {
-          expression: "\\text{For constant velocity } v(t) = 30 \\text{ (no t dependence), the integral simplifies to multiplication}",
-          annotation: "When v is constant, \\int_a^b c\\,dt = c(b - a). Why? The area is literally a rectangle, and we are about to prove it both geometrically and with calculus so you see why they agree."
+          expression:
+            "\\text{For constant velocity } v(t) = 30 \\text{ (no t dependence), the integral simplifies to multiplication}",
+          annotation:
+            "When v is constant, \\int_a^b c\\,dt = c(b - a). Why? The area is literally a rectangle, and we are about to prove it both geometrically and with calculus so you see why they agree.",
         },
         {
-          expression: "\\text{(a) Rectangle formula: base = time interval = 5 - 0 = 5\\,\\text{s}, height = velocity = 30\\,\\text{m/s}}",
-          annotation: "Draw the v-t graph: a perfectly flat horizontal line at 30 m/s from t=0 to t=5. The region under the curve (above the t-axis) is a rectangle. Area under v-t graph = displacement when v ≥ 0."
+          expression:
+            "\\text{(a) Rectangle formula: base = time interval = 5 - 0 = 5\\,\\text{s}, height = velocity = 30\\,\\text{m/s}}",
+          annotation:
+            "Draw the v-t graph: a perfectly flat horizontal line at 30 m/s from t=0 to t=5. The region under the curve (above the t-axis) is a rectangle. Area under v-t graph = displacement when v ≥ 0.",
         },
         {
-          expression: "\\text{Area} = \\text{base} \\times \\text{height} = 5 \\times 30",
-          annotation: "No skipping: base is the width along the time axis (Δt), height is the constant height along the velocity axis. Multiplication is allowed because every tiny vertical strip has exactly the same height."
+          expression:
+            "\\text{Area} = \\text{base} \\times \\text{height} = 5 \\times 30",
+          annotation:
+            "No skipping: base is the width along the time axis (Δt), height is the constant height along the velocity axis. Multiplication is allowed because every tiny vertical strip has exactly the same height.",
         },
         {
           expression: "5 \\times 30 = 150\\,\\text{m}",
-          annotation: "Units check: (seconds) × (meters/second) = meters. This is the physical displacement. We have now solved part (a) completely using pure geometry — no calculus yet."
+          annotation:
+            "Units check: (seconds) × (meters/second) = meters. This is the physical displacement. We have now solved part (a) completely using pure geometry — no calculus yet.",
         },
         {
-          expression: "\\text{(b) Write the same quantity as a definite integral: } \\int_0^5 30\\,dt",
-          annotation: "We are now using the exact definition of displacement. The number 30 is the constant function v(t). The dt tells us we are integrating with respect to time. This must equal the rectangle answer if calculus is consistent."
+          expression:
+            "\\text{(b) Write the same quantity as a definite integral: } \\int_0^5 30\\,dt",
+          annotation:
+            "We are now using the exact definition of displacement. The number 30 is the constant function v(t). The dt tells us we are integrating with respect to time. This must equal the rectangle answer if calculus is consistent.",
         },
         {
-          expression: "\\text{Prerequisite: Find the antiderivative (indefinite integral) of the constant 30}",
-          annotation: "We need a function F(t) whose derivative is exactly 30: F'(t) = 30. You already know d/dt (kt) = k, so the simplest antiderivative is 30t (the +C constant cancels in the definite integral and can be ignored here)."
+          expression:
+            "\\text{Prerequisite: Find the antiderivative (indefinite integral) of the constant 30}",
+          annotation:
+            "We need a function F(t) whose derivative is exactly 30: F'(t) = 30. You already know d/dt (kt) = k, so the simplest antiderivative is 30t (the +C constant cancels in the definite integral and can be ignored here).",
         },
         {
-          expression: "\\int 30\\,dt = 30t \\quad \\text{(power rule with exponent 0)}",
-          annotation: "Power rule reminder: \\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C for n ≠ -1. Here n = 0 (because 30 = 30·t^0), so \\frac{t^1}{1} = t, multiplied by 30 gives 30t. This is why the antiderivative of any constant is constant × t."
+          expression:
+            "\\int 30\\,dt = 30t \\quad \\text{(power rule with exponent 0)}",
+          annotation:
+            "Power rule reminder: \\int t^n\\,dt = \\frac{t^{n+1}}{n+1} + C for n ≠ -1. Here n = 0 (because 30 = 30·t^0), so \\frac{t^1}{1} = t, multiplied by 30 gives 30t. This is why the antiderivative of any constant is constant × t.",
         },
         {
-          expression: "\\text{Definite integral by Fundamental Theorem of Calculus: } \\left[30t\\right]_0^5",
-          annotation: "FTC Part 2 says \\int_a^b f(t)\\,dt = F(b) - F(a), where F is any antiderivative. We evaluate at the upper limit first, then subtract the value at the lower limit. This is the precise rule — no magic."
+          expression:
+            "\\text{Definite integral by Fundamental Theorem of Calculus: } \\left[30t\\right]_0^5",
+          annotation:
+            "FTC Part 2 says \\int_a^b f(t)\\,dt = F(b) - F(a), where F is any antiderivative. We evaluate at the upper limit first, then subtract the value at the lower limit. This is the precise rule — no magic.",
         },
         {
           expression: "30 \\cdot 5 - 30 \\cdot 0",
-          annotation: "Plug in: at t=5 we get 150; at t=0 we get 0. Subtraction is required by the theorem."
+          annotation:
+            "Plug in: at t=5 we get 150; at t=0 we get 0. Subtraction is required by the theorem.",
         },
         {
           expression: "150 - 0 = 150\\,\\text{m}",
-          annotation: "Both methods (rectangle geometry and antiderivative) give exactly the same 150 m. This verifies consistency and shows why the 'magic' of the integral works — it is just the area rule made rigorous."
-        }
+          annotation:
+            "Both methods (rectangle geometry and antiderivative) give exactly the same 150 m. This verifies consistency and shows why the 'magic' of the integral works — it is just the area rule made rigorous.",
+        },
       ],
       answer: "\\text{Displacement} = 150 \\text{ m}",
     },
@@ -416,73 +435,94 @@ export default {
       hint: "v(0) = 0 and v(6) = 0. Maximum velocity at t = 3: v(3) = 9 m/s. The antiderivative of 6t−t² is 3t²−t³/3.",
       walkthrough: [
         {
-          expression: "\\text{Prerequisite: v(t) = 6t - t^2 is a quadratic (parabola opening downward)}",
-          annotation: "Standard form at² + bt + c with a = -1, b = 6, c = 0. The graph starts at (0,0), rises, then falls back to zero. Since velocity is positive throughout the interval, distance traveled equals displacement = area under the curve."
+          expression:
+            "\\text{Prerequisite: v(t) = 6t - t^2 is a quadratic (parabola opening downward)}",
+          annotation:
+            "Standard form at² + bt + c with a = -1, b = 6, c = 0. The graph starts at (0,0), rises, then falls back to zero. Since velocity is positive throughout the interval, distance traveled equals displacement = area under the curve.",
         },
         {
           expression: "\\text{(a) Find when v = 0 by solving 6t - t^2 = 0}",
-          annotation: "Factor completely so we can see the roots (where the graph crosses the t-axis). Factoring is the simplest algebraic technique here."
+          annotation:
+            "Factor completely so we can see the roots (where the graph crosses the t-axis). Factoring is the simplest algebraic technique here.",
         },
         {
           expression: "t(6 - t) = 0",
-          annotation: "Factor out the common t. Set each factor to zero using the zero-product property (if ab=0 then a=0 or b=0)."
+          annotation:
+            "Factor out the common t. Set each factor to zero using the zero-product property (if ab=0 then a=0 or b=0).",
         },
         {
           expression: "t = 0 \\quad \\text{or} \\quad t = 6",
-          annotation: "The cyclist starts from rest at t=0 and comes to rest again at t=6. These are the exact times v=0."
+          annotation:
+            "The cyclist starts from rest at t=0 and comes to rest again at t=6. These are the exact times v=0.",
         },
         {
           expression: "\\text{Find maximum velocity (vertex of parabola)}",
-          annotation: "For ax² + bx + c the vertex is at t = -b/(2a). Here a = -1, b = 6, so t = -6/(2·(-1)) = 3 s. This is where the slope of v(t) is zero (peak speed)."
+          annotation:
+            "For ax² + bx + c the vertex is at t = -b/(2a). Here a = -1, b = 6, so t = -6/(2·(-1)) = 3 s. This is where the slope of v(t) is zero (peak speed).",
         },
         {
           expression: "v(3) = 6·3 - 3^2 = 18 - 9 = 9\\,\\text{m/s}",
-          annotation: "Plug t=3 into original equation. Maximum speed is 9 m/s at the midpoint — symmetric parabola."
+          annotation:
+            "Plug t=3 into original equation. Maximum speed is 9 m/s at the midpoint — symmetric parabola.",
         },
         {
-          expression: "\\text{(b) Geometric estimate: approximate area under parabola as triangle with base 6 s and height 9 m/s}",
-          annotation: "A quick estimate before exact calculus: inscribed triangle touching the three points (0,0), (3,9), (6,0). Area of triangle = (1/2)·base·height. This underestimates the true parabolic area because the curve bulges above the straight lines."
+          expression:
+            "\\text{(b) Geometric estimate: approximate area under parabola as triangle with base 6 s and height 9 m/s}",
+          annotation:
+            "A quick estimate before exact calculus: inscribed triangle touching the three points (0,0), (3,9), (6,0). Area of triangle = (1/2)·base·height. This underestimates the true parabolic area because the curve bulges above the straight lines.",
         },
         {
-          expression: "\\frac{1}{2} \\times 6 \\times 9 = 27\\,\\text{m (estimate)}",
-          annotation: "We expect the real answer to be larger than 27 m. This is the geometric estimate requested. Now we compute the exact value."
+          expression:
+            "\\frac{1}{2} \\times 6 \\times 9 = 27\\,\\text{m (estimate)}",
+          annotation:
+            "We expect the real answer to be larger than 27 m. This is the geometric estimate requested. Now we compute the exact value.",
         },
         {
           expression: "\\text{Exact area = } \\int_0^6 (6t - t^2)\\,dt",
-          annotation: "By definition, net displacement (and distance, since v ≥ 0) is the definite integral of v(t)."
+          annotation:
+            "By definition, net displacement (and distance, since v ≥ 0) is the definite integral of v(t).",
         },
         {
           expression: "\\text{Find antiderivative term by term}",
-          annotation: "Split the integral: \\int (6t - t^2)\\,dt = \\int 6t\\,dt - \\int t^2\\,dt. We integrate each power separately using the power rule."
+          annotation:
+            "Split the integral: \\int (6t - t^2)\\,dt = \\int 6t\\,dt - \\int t^2\\,dt. We integrate each power separately using the power rule.",
         },
         {
           expression: "\\int 6t\\,dt = 6 \\cdot \\frac{t^2}{2} = 3t^2",
-          annotation: "Power rule: \\int t^1\\,dt = t^2/2, then multiply by coefficient 6. Derivative check: d/dt(3t²) = 6t — correct."
+          annotation:
+            "Power rule: \\int t^1\\,dt = t^2/2, then multiply by coefficient 6. Derivative check: d/dt(3t²) = 6t — correct.",
         },
         {
           expression: "\\int t^2\\,dt = \\frac{t^3}{3}",
-          annotation: "Power rule: n=2 → t^{3}/3. So the negative term becomes -t³/3. Derivative check: d/dt(-t³/3) = -t² — correct."
+          annotation:
+            "Power rule: n=2 → t^{3}/3. So the negative term becomes -t³/3. Derivative check: d/dt(-t³/3) = -t² — correct.",
         },
         {
           expression: "\\text{Antiderivative F(t) = } 3t^2 - \\frac{t^3}{3}",
-          annotation: "Combine both pieces. This F(t) satisfies F'(t) = 6t - t² exactly."
+          annotation:
+            "Combine both pieces. This F(t) satisfies F'(t) = 6t - t² exactly.",
         },
         {
           expression: "\\left[3t^2 - \\frac{t^3}{3}\\right]_0^6",
-          annotation: "Apply FTC: evaluate F at upper limit minus F at lower limit."
+          annotation:
+            "Apply FTC: evaluate F at upper limit minus F at lower limit.",
         },
         {
-          expression: "\\text{At t=6: } 3(6)^2 - \\frac{(6)^3}{3} = 3\\cdot 36 - \\frac{216}{3} = 108 - 72",
-          annotation: "Compute each part separately: 6²=36, times 3=108. 6³=216, divided by 3=72. Subtraction is exact arithmetic."
+          expression:
+            "\\text{At t=6: } 3(6)^2 - \\frac{(6)^3}{3} = 3\\cdot 36 - \\frac{216}{3} = 108 - 72",
+          annotation:
+            "Compute each part separately: 6²=36, times 3=108. 6³=216, divided by 3=72. Subtraction is exact arithmetic.",
         },
         {
           expression: "\\text{At t=0: } 3(0)^2 - \\frac{0^3}{3} = 0",
-          annotation: "Every term vanishes at zero — lower limit contribution is always zero here."
+          annotation:
+            "Every term vanishes at zero — lower limit contribution is always zero here.",
         },
         {
           expression: "108 - 72 - 0 = 36\\,\\text{m}",
-          annotation: "Exact distance traveled is 36 m. Note that the triangle estimate (27 m) was indeed lower, as expected for a concave-down parabola."
-        }
+          annotation:
+            "Exact distance traveled is 36 m. Note that the triangle estimate (27 m) was indeed lower, as expected for a concave-down parabola.",
+        },
       ],
       answer: "\\displaystyle\\int_0^6 (6t-t^2)\\,dt = 36 \\text{ m}",
     },
@@ -494,49 +534,65 @@ export default {
       hint: "The antiderivative of e^(−t) is −e^(−t). As b→∞, e^(−b)→0. The velocity decays exponentially — the particle slows down so rapidly that it only ever travels a finite total distance.",
       walkthrough: [
         {
-          expression: "\\text{Prerequisite: This is an improper integral because the upper limit is ∞}",
-          annotation: "We cannot plug ∞ directly into the antiderivative. Instead, we replace ∞ with a finite b and take the limit as b → ∞. This is the official definition of ∫_0^∞ f(t)\\,dt = lim_{b→∞} ∫_0^b f(t)\\,dt (provided the limit exists)."
+          expression:
+            "\\text{Prerequisite: This is an improper integral because the upper limit is ∞}",
+          annotation:
+            "We cannot plug ∞ directly into the antiderivative. Instead, we replace ∞ with a finite b and take the limit as b → ∞. This is the official definition of ∫_0^∞ f(t)\\,dt = lim_{b→∞} ∫_0^b f(t)\\,dt (provided the limit exists).",
         },
         {
-          expression: "\\text{(a) Why is total distance finite even though time is infinite?}",
-          annotation: "Velocity v(t) = e^{-t} decays exponentially to zero. Exponential decay is faster than any polynomial growth, so the area under the curve 'tails off' quickly enough that the infinite sum of shrinking strips still adds to a finite number. Analogy: the infinite geometric series 1 + 1/2 + 1/4 + 1/8 + … = 2 (finite)."
+          expression:
+            "\\text{(a) Why is total distance finite even though time is infinite?}",
+          annotation:
+            "Velocity v(t) = e^{-t} decays exponentially to zero. Exponential decay is faster than any polynomial growth, so the area under the curve 'tails off' quickly enough that the infinite sum of shrinking strips still adds to a finite number. Analogy: the infinite geometric series 1 + 1/2 + 1/4 + 1/8 + … = 2 (finite).",
         },
         {
-          expression: "\\text{(b) First compute the proper integral from 0 to b: } \\int_0^b e^{-t}\\,dt",
-          annotation: "Treat b as a large but finite number for now. We will let b grow later."
+          expression:
+            "\\text{(b) First compute the proper integral from 0 to b: } \\int_0^b e^{-t}\\,dt",
+          annotation:
+            "Treat b as a large but finite number for now. We will let b grow later.",
         },
         {
           expression: "\\text{Antiderivative of } e^{-t}",
-          annotation: "Let u = -t, then du = -dt so dt = -du. The integral becomes -∫e^u du = -e^u = -e^{-t}. Derivative check: d/dt(-e^{-t}) = e^{-t} — correct."
+          annotation:
+            "Let u = -t, then du = -dt so dt = -du. The integral becomes -∫e^u du = -e^u = -e^{-t}. Derivative check: d/dt(-e^{-t}) = e^{-t} — correct.",
         },
         {
           expression: "\\left[-e^{-t}\\right]_0^b = -e^{-b} - (-e^0)",
-          annotation: "FTC: upper minus lower. At t=b: -e^{-b}. At t=0: -e^0 = -1, so we subtract (-1) which is +1."
+          annotation:
+            "FTC: upper minus lower. At t=b: -e^{-b}. At t=0: -e^0 = -1, so we subtract (-1) which is +1.",
         },
         {
           expression: "-e^{-b} + 1",
-          annotation: "Simplified: 1 - e^{-b}. This is the exact displacement up to any finite time b."
+          annotation:
+            "Simplified: 1 - e^{-b}. This is the exact displacement up to any finite time b.",
         },
         {
           expression: "\\lim_{b \\to \\infty} (1 - e^{-b})",
-          annotation: "Now take the limit. As b becomes arbitrarily large, what happens to e^{-b}?"
+          annotation:
+            "Now take the limit. As b becomes arbitrarily large, what happens to e^{-b}?",
         },
         {
-          expression: "e^{-b} \\to 0 \\quad \\text{(exponential decay property)}",
-          annotation: "Any positive number raised to a larger and larger negative power gets smaller and smaller, approaching zero. This is a standard limit you can prove with L'Hôpital or just by knowing exponential behavior."
+          expression:
+            "e^{-b} \\to 0 \\quad \\text{(exponential decay property)}",
+          annotation:
+            "Any positive number raised to a larger and larger negative power gets smaller and smaller, approaching zero. This is a standard limit you can prove with L'Hôpital or just by knowing exponential behavior.",
         },
         {
           expression: "1 - 0 = 1\\,\\text{m}",
-          annotation: "The improper integral converges to exactly 1 meter. The infinite area is finite!"
+          annotation:
+            "The improper integral converges to exactly 1 meter. The infinite area is finite!",
         },
         {
           expression: "\\text{(c) Physical interpretation}",
-          annotation: "The particle starts at v(0) = 1 m/s. Its speed decreases exponentially fast (halving roughly every 0.693 s). Even though it never quite stops and time goes on forever, the distances it covers in later and later seconds become vanishingly small. Total distance traveled is exactly 1 m; it asymptotically approaches a fixed position 1 m ahead."
+          annotation:
+            "The particle starts at v(0) = 1 m/s. Its speed decreases exponentially fast (halving roughly every 0.693 s). Even though it never quite stops and time goes on forever, the distances it covers in later and later seconds become vanishingly small. Total distance traveled is exactly 1 m; it asymptotically approaches a fixed position 1 m ahead.",
         },
         {
-          expression: "\\text{Analogy to geometric series: each second the distance covered is roughly half the previous}",
-          annotation: "The continuous version of 1 + 1/2 + 1/4 + … sums to a finite total, just like the integral here. This shows how 'infinite time' can still produce finite displacement when deceleration is strong enough."
-        }
+          expression:
+            "\\text{Analogy to geometric series: each second the distance covered is roughly half the previous}",
+          annotation:
+            "The continuous version of 1 + 1/2 + 1/4 + … sums to a finite total, just like the integral here. This shows how 'infinite time' can still produce finite displacement when deceleration is strong enough.",
+        },
       ],
       answer: "\\displaystyle\\int_0^\\infty e^{-t}\\,dt = 1 \\text{ m}",
     },
@@ -629,6 +685,61 @@ export default {
       },
     ],
   },
+
+  // ─── Discoveries ─────────────────────────────────────────────────────────
+  discovery: [
+    {
+      title: "Why Braking Distance Explodes With Speed",
+      persona:
+        "I'm driving at 60 mph when something suddenly appears ahead. I slam the brakes. The car doesn't stop instantly — my speed drops gradually: 60 → 50 → 40 → 20 → 0 mph. From experience I know that stopping from 60 mph takes way more than twice the distance it takes from 30 mph. It feels like four times as far. I also notice that when the car is heavier (full of passengers or cargo), it takes even longer to stop. I want to understand exactly why distance grows so fast with speed, and why adding weight makes it worse — using only what I can actually measure and calculate step by step.",
+      steps: [
+        {
+          phase: "need",
+          title: "The observation that breaks my intuition",
+          content:
+            "I know a simple rule: distance = speed × time. But when I brake, speed is constantly dropping, so there is no single speed I can plug in.\n\nI try using the average of starting and ending speed:\n\n- From 30 mph → average 15 mph → stops in about 50 feet\n- From 60 mph → average 30 mph → should stop in about 100 feet\n\nBut real measurements show it takes closer to 200 feet at 60 mph. That's not double — it's roughly four times farther. My simple average-speed method fails badly.\n\nI also notice that when the car is heavier (more passengers or cargo), the stopping distance gets noticeably longer even at the same speed. Something is causing distance to grow much faster than I expect, and mass is making it worse.",
+        },
+        {
+          phase: "need",
+          title: "Trying to fix it with smaller pieces",
+          content:
+            "I break the stop into small time chunks and calculate the distance traveled in each chunk using the speed during that chunk.\n\nHere's what the data looks like (speed in mph, converted to ft/s for distance):\n\n| Time chunk | Speed at start of chunk | Approximate distance in that chunk |\n|---|---|---|\n| 0–0.5 s | 88 ft/s | ~41 ft |\n| 0.5–1.0 s | 76 ft/s | ~35 ft |\n| 1.0–1.5 s | 64 ft/s | ~29 ft |\n| 1.5–2.0 s | 51 ft/s | ~22 ft |\n| 2.0–2.5 s | 37 ft/s | ~14 ft |\n| 2.5–3.0 s | 18 ft/s | ~6 ft |\n\nWhen I add all these small distances, I get roughly 147 feet total. But this is still only an approximation because I used the speed at the beginning of each chunk. If I make the chunks smaller, the total changes slightly. I'm getting closer, but I still don't have an exact method.",
+        },
+        {
+          phase: "discovery",
+          title: "Building the total distance from tiny slices",
+          content:
+            "In any tiny time interval Δt, the distance traveled is roughly the speed during that interval times the length of the interval:\n\nΔs ≈ v × Δt\n\nTo get the total stopping distance I add up all these tiny pieces from the moment I hit the brakes until the car stops (speed = 0):\n\ntotal distance ≈ sum of (v × Δt) over all small intervals\n\nThe smaller I make each Δt, the more accurate the sum becomes. If I could make the intervals infinitely small, the sum would give the exact distance. I don't need any fancy formulas yet — I'm just adding up measurable pieces of distance, each one calculated from the speed at that moment.",
+        },
+        {
+          phase: "discovery",
+          title: "Why the distance grows with the square of speed",
+          content:
+            "I notice something important when I compare two stops at different starting speeds:\n\n- At 30 mph the speed drops steadily to zero\n- At 60 mph the speed also drops steadily to zero, but it starts twice as high and therefore takes roughly twice as long to reach zero (assuming the brakes can slow it at the same rate)\n\nDuring the longer stop, the car is traveling at higher speeds for more of the time. The early part of the stop (when speed is highest) contributes a lot more distance.\n\nIf I double the starting speed:\n- The time to stop roughly doubles\n- But during that extra time the car is moving at higher average speeds\n\nThe extra time + the higher speeds together cause the distance to increase by roughly four times, not two. The distance depends on speed multiplied by time, and both time and average speed scale with starting speed — so distance ends up scaling with speed × speed.",
+        },
+        {
+          phase: "discovery",
+          title: "Why mass makes it worse",
+          content:
+            'When the car is heavier, the brakes have to work against more "motion." The tires can only push back with a limited force (the friction limit of the road). A heavier car has more motion to remove but the same maximum pushing force from the tires.\n\nSo the speed drops more slowly. The time to stop gets longer. And because the time is longer, the car travels farther during that extra time.\n\nHeavier car → longer stopping time → more distance traveled. The effect is linear with mass (double mass → double distance), but the speed effect is much stronger (double speed → roughly four times distance).',
+        },
+        {
+          phase: "formalization",
+          title: "Compressing what we built — the calculus view",
+          content:
+            "We have now built the full picture using only measurable pieces and repeated addition.\n\nThe total distance is the accumulation of speed over time:\n\nstopping distance = sum of (speed × tiny time interval) over the whole stop\n\nAs the intervals become infinitesimally small, this sum becomes the integral of velocity with respect to time:\n\n\\[ d = \\int_{0}^{T} v(t) \\, dt \\]\n\nwhere T is the time when speed reaches zero.\n\nThe rate at which speed itself is changing is the derivative of velocity (acceleration):\n\n\\[ a = \\frac{dv}{dt} \\]\n\n(negative because speed is decreasing).\n\nIf the braking force is roughly constant, acceleration is roughly constant, and the integral gives the clean formula we can now derive:\n\n\\[ d = \\frac{v_0^2}{2 |a|} \\]\n\nThis shows mathematically why distance scales with the square of speed.",
+        },
+        {
+          phase: "formalization",
+          title: "The mass and force relationship",
+          content:
+            "From physics we know the braking force F is limited by tire friction. Force = mass × acceleration, so:\n\n\\[ |a| = \\frac{F}{m} \\]\n\nSubstitute into the distance formula:\n\n\\[ d = \\frac{v_0^2}{2 \\cdot (F/m)} = \\frac{m v_0^2}{2 F} \\]\n\nNow we see both effects clearly:\n- Distance grows with v₀² (speed squared)\n- Distance grows linearly with m (mass)\n\nEverything we discovered by adding small pieces now has a clean, compressed form.",
+        },
+      ],
+      resolution:
+        "**Stopping distance — earned from first principles**\n\nWe started with the real observation that bothered us: stopping distance grows much faster than speed itself. We refused to accept average-speed shortcuts. Instead we broke the motion into tiny measurable pieces, added up the distances traveled in each piece, and watched the pattern emerge: distance scales with speed squared and with mass.\n\nOnly after we had built the full picture did we compress it into the symbols and formulas of calculus:\n- Integral of velocity gives total distance\n- Derivative of velocity gives acceleration\n\nThe squared danger of speed and the linear penalty of mass are not mysterious — they are direct consequences of how distance accumulates when speed is changing. This is why safe following distance, speed limits, and vehicle weight matter so much.\n\nNext time you brake hard, you'll know exactly why the car travels so much farther at higher speeds — and why calculus is the natural language for describing it.",
+    },
+  ],
 
   // ─── Mental Model Compression ────────────────────────────────────────────
   mentalModel: [
