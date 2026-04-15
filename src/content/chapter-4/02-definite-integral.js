@@ -1,119 +1,132 @@
 // FILE: src/content/chapter-4/02-definite-integral.js
 export default {
-  id: 'ch4-002',
-  slug: 'definite-integral',
+  id: "ch4-002",
+  slug: "definite-integral",
   chapter: 4,
   order: 2,
-  title: 'The Definite Integral',
-  subtitle: 'A single number encoding signed area — properties, geometry, and the average value of a function',
-  tags: ['definite integral', 'signed area', 'properties of integrals', 'average value', 'mean value theorem for integrals', 'linearity', 'additivity', 'odd functions', 'even functions'],
+  title: "The Definite Integral",
+  subtitle:
+    "A single number encoding signed area — properties, geometry, and the average value of a function",
+  tags: [
+    "definite integral",
+    "signed area",
+    "properties of integrals",
+    "average value",
+    "mean value theorem for integrals",
+    "linearity",
+    "additivity",
+    "odd functions",
+    "even functions",
+  ],
 
   hook: {
-    question: 'The limit of Riemann sums as n → ∞ gives us a number. For ∫₀¹ x² dx, each Rₙ = (n+1)(2n+1)/(6n²), and as n → ∞ this converges to exactly 1/3. This is the definite integral — not an approximation, but an exact real number. Now: what does the definite integral of ∫₋₁¹ x³ dx equal? Do you need to compute anything? Think about symmetry.',
-    realWorldContext: 'The definite integral as a number appears constantly in physics and engineering. The average temperature in a room over 24 hours is an integral divided by time. The center of mass of an irregular solid is a ratio of two integrals. The probability that a random variable falls in an interval is an integral of the probability density function. In signal processing, the "DC component" of a periodic signal is its average value — an integral over one period. In structural engineering, the bending moment at a point in a beam is the integral of the distributed load. Understanding the definite integral as a number with specific algebraic properties allows these calculations to be systematized.',
-    previewVisualizationId: 'SignedArea',
+    question:
+      "The limit of Riemann sums as n → ∞ gives us a number. For ∫₀¹ x² dx, each Rₙ = (n+1)(2n+1)/(6n²), and as n → ∞ this converges to exactly 1/3. This is the definite integral — not an approximation, but an exact real number. Now: what does the definite integral of ∫₋₁¹ x³ dx equal? Do you need to compute anything? Think about symmetry.",
+    realWorldContext:
+      'The definite integral as a number appears constantly in physics and engineering. The average temperature in a room over 24 hours is an integral divided by time. The center of mass of an irregular solid is a ratio of two integrals. The probability that a random variable falls in an interval is an integral of the probability density function. In signal processing, the "DC component" of a periodic signal is its average value — an integral over one period. In structural engineering, the bending moment at a point in a beam is the integral of the distributed load. Understanding the definite integral as a number with specific algebraic properties allows these calculations to be systematized.',
+    previewVisualizationId: "SignedArea",
   },
 
   intuition: {
     prose: [
       'The definite integral ∫ₐᵇ f(x) dx is a single real number. It measures signed area: regions where f > 0 contribute positively, regions where f < 0 contribute negatively. The "signed" aspect is essential for physics — velocity can be negative (motion in the opposite direction), and the signed area gives displacement (net change in position), not total distance. Keeping track of signs is not a complication; it is the feature that makes the integral physically meaningful.',
       'Linearity is the most useful property in practice. ∫ₐᵇ [c·f(x) + g(x)] dx = c·∫ₐᵇ f(x) dx + ∫ₐᵇ g(x) dx. This means you can split a complicated integral into simpler pieces. To compute ∫₀² (3x² + 5√x) dx, you can compute ∫₀² 3x² dx and ∫₀² 5√x dx separately and add. Any polynomial, any sum of trigonometric functions, any linear combination of integrable functions can be integrated piece by piece. Linearity is the reason integration is "not that hard" for elementary functions.',
-      'The interval additivity property ∫ₐᶜ f = ∫ₐᵇ f + ∫ᵦᶜ f allows you to break the domain of integration anywhere. To compute ∫₋₂⁵ f, split at x = 0: ∫₋₂⁰ f + ∫₀⁵ f. This is powerful when f behaves differently on different sub-intervals (for example, if f has a corner at 0, or changes sign at 0). For |f(x)| dx (total area), split at every zero of f and negate the negative pieces: ∫|f| = ∫₍positive regions₎ f − ∫₍negative regions₎ f.',
-      'Symmetry is the most elegant shortcut for computing integrals. For an ODD function — one satisfying f(−x) = −f(x) — the graph is symmetric about the origin. The area above the x-axis on [0, b] is exactly canceled by the equal-and-opposite area below the x-axis on [−b, 0]. Therefore ∫₋ₐᵃ f(x) dx = 0 for any odd function integrated over a symmetric interval. For an EVEN function — f(−x) = f(x), symmetric about the y-axis — the areas on [−a, 0] and [0, a] are equal, so ∫₋ₐᵃ f(x) dx = 2∫₀ᵃ f(x) dx. These shortcuts save enormous computational effort.',
+      "The interval additivity property ∫ₐᶜ f = ∫ₐᵇ f + ∫ᵦᶜ f allows you to break the domain of integration anywhere. To compute ∫₋₂⁵ f, split at x = 0: ∫₋₂⁰ f + ∫₀⁵ f. This is powerful when f behaves differently on different sub-intervals (for example, if f has a corner at 0, or changes sign at 0). For |f(x)| dx (total area), split at every zero of f and negate the negative pieces: ∫|f| = ∫₍positive regions₎ f − ∫₍negative regions₎ f.",
+      "Symmetry is the most elegant shortcut for computing integrals. For an ODD function — one satisfying f(−x) = −f(x) — the graph is symmetric about the origin. The area above the x-axis on [0, b] is exactly canceled by the equal-and-opposite area below the x-axis on [−b, 0]. Therefore ∫₋ₐᵃ f(x) dx = 0 for any odd function integrated over a symmetric interval. For an EVEN function — f(−x) = f(x), symmetric about the y-axis — the areas on [−a, 0] and [0, a] are equal, so ∫₋ₐᵃ f(x) dx = 2∫₀ᵃ f(x) dx. These shortcuts save enormous computational effort.",
       'The average value of f on [a, b] is defined as f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx. This is the continuous analog of the arithmetic mean (average) of a list of numbers: instead of summing n values and dividing by n, we integrate the function and divide by the interval length. Geometrically, f_avg is the height of the rectangle with base [a, b] that has exactly the same area as the region under f. The rectangle is the "flattened-out" version of f.',
-      'The Mean Value Theorem for Integrals guarantees that f_avg is actually attained by f somewhere in (a, b), not just an abstract average. If f is continuous, then there exists at least one point c ∈ (a, b) where f(c) = f_avg. This is deeply intuitive: the continuous function must pass through its average. For f(x) = x² on [0, 3], f_avg = (1/3)∫₀³ x² dx = (1/3)(9) = 3. The equation f(c) = 3 gives c² = 3, so c = √3 ≈ 1.73. The function x² takes the value 3 at x = √3, which is inside (0, 3), exactly as the theorem predicts.',
+      "The Mean Value Theorem for Integrals guarantees that f_avg is actually attained by f somewhere in (a, b), not just an abstract average. If f is continuous, then there exists at least one point c ∈ (a, b) where f(c) = f_avg. This is deeply intuitive: the continuous function must pass through its average. For f(x) = x² on [0, 3], f_avg = (1/3)∫₀³ x² dx = (1/3)(9) = 3. The equation f(c) = 3 gives c² = 3, so c = √3 ≈ 1.73. The function x² takes the value 3 at x = √3, which is inside (0, 3), exactly as the theorem predicts.",
     ],
     callouts: [
       {
-        type: 'geometric',
-        title: 'Signed Area: Positive Above, Negative Below',
-        body: 'The integral ∫₀^(2π) sin(x) dx = 0, even though the graph of sin(x) is never zero except at 0, π, 2π. The positive area on [0, π] equals 2, and the negative area on [π, 2π] equals −2. They cancel exactly. This is not a coincidence — it reflects the perfect symmetry of sine. The displacement of a particle moving with v(t)=sin(t) over a full period is zero: it returns to its starting position.',
+        type: "geometric",
+        title: "Signed Area: Positive Above, Negative Below",
+        body: "The integral ∫₀^(2π) sin(x) dx = 0, even though the graph of sin(x) is never zero except at 0, π, 2π. The positive area on [0, π] equals 2, and the negative area on [π, 2π] equals −2. They cancel exactly. This is not a coincidence — it reflects the perfect symmetry of sine. The displacement of a particle moving with v(t)=sin(t) over a full period is zero: it returns to its starting position.",
       },
       {
-        type: 'real-world',
-        title: 'Average Value in Physics and Engineering',
-        body: 'The average value formula f_avg = (1/(b−a))∫ₐᵇ f has direct applications: average temperature over a day (used by HVAC systems), average power over a cycle (determines RMS voltage in AC circuits), average velocity over a time interval (used in GPS), average force over a displacement (gives work via W = F_avg × d). In every case, the continuous average replaces the discrete mean, and the definite integral plays the role of the sum.',
+        type: "real-world",
+        title: "Average Value in Physics and Engineering",
+        body: "The average value formula f_avg = (1/(b−a))∫ₐᵇ f has direct applications: average temperature over a day (used by HVAC systems), average power over a cycle (determines RMS voltage in AC circuits), average velocity over a time interval (used in GPS), average force over a displacement (gives work via W = F_avg × d). In every case, the continuous average replaces the discrete mean, and the definite integral plays the role of the sum.",
       },
       {
-        type: 'prior-knowledge',
-        title: 'Symmetry: Odd and Even Functions',
-        body: 'You already know that polynomial terms xⁿ are odd when n is odd and even when n is even. More generally: sin(x), x³, x⁵ are odd; cos(x), x², x⁴ are even. Sums and products follow rules: (even)×(odd) = odd; (odd)×(odd) = even. Use these to instantly identify integrals that are zero over symmetric intervals without computing anything.',
+        type: "prior-knowledge",
+        title: "Symmetry: Odd and Even Functions",
+        body: "You already know that polynomial terms xⁿ are odd when n is odd and even when n is even. More generally: sin(x), x³, x⁵ are odd; cos(x), x², x⁴ are even. Sums and products follow rules: (even)×(odd) = odd; (odd)×(odd) = even. Use these to instantly identify integrals that are zero over symmetric intervals without computing anything.",
       },
       {
-        type: 'warning',
-        title: 'Average Value ≠ Average of Endpoints',
-        body: 'The average value of f on [a,b] is (1/(b−a))∫ₐᵇ f dx — NOT (f(a)+f(b))/2. The endpoint average is a crude approximation (the trapezoidal rule with n=1). For f(x)=x² on [0,3]: endpoint average = (0+9)/2 = 4.5. True average = 3. The correct formula integrates the function, capturing its full behavior over the interval.',
+        type: "warning",
+        title: "Average Value ≠ Average of Endpoints",
+        body: "The average value of f on [a,b] is (1/(b−a))∫ₐᵇ f dx — NOT (f(a)+f(b))/2. The endpoint average is a crude approximation (the trapezoidal rule with n=1). For f(x)=x² on [0,3]: endpoint average = (0+9)/2 = 4.5. True average = 3. The correct formula integrates the function, capturing its full behavior over the interval.",
       },
       {
-        type: 'misconception',
-        title: '∫ₐᵇ f(x) dx Is a Number, Not a Function',
+        type: "misconception",
+        title: "∫ₐᵇ f(x) dx Is a Number, Not a Function",
         body: "The definite integral ∫₀³ x² dx = 9 is a NUMBER (9), not a function of x. The variable x is a 'dummy variable' — ∫₀³ t² dt = ∫₀³ u² du = 9. Do not confuse the definite integral (a number) with the indefinite integral ∫x² dx = x³/3 + C (a family of functions). The definite integral has limits; the indefinite integral does not.",
       },
       {
-        type: 'history',
+        type: "history",
         title: "Cavalieri's Method of Indivisibles (1635)",
         body: "Bonaventura Cavalieri imagined a plane region as composed of infinitely many parallel lines — 'indivisibles.' By comparing the indivisibles of two regions line by line, he could prove they had equal areas without computing either area directly. His principle is the ancestor of ∫ₐᵇ [f(x)−g(x)] dx. It was logically incomplete (what IS an indivisible?) but profoundly influential, motivating both Newton and Leibniz.",
       },
     ],
     visualizations: [
-                                                        {
-        id: 'SignedArea',
-        title: 'Signed Area: Positive and Negative Regions',
-        caption: 'The shaded area above the x-axis is positive (green) and below is negative (red). The definite integral is the net signed area. Drag the endpoints to explore how the integral changes when more positive or negative region is included.',
+      {
+        id: "SignedArea",
+        title: "Signed Area: Positive and Negative Regions",
+        caption:
+          "The shaded area above the x-axis is positive (green) and below is negative (red). The definite integral is the net signed area. Drag the endpoints to explore how the integral changes when more positive or negative region is included.",
       },
     ],
   },
 
   math: {
     prose: [
-      'The formal properties of the definite integral follow from the limit-of-Riemann-sums definition. Linearity: for constants c, d and integrable functions f, g on [a, b], ∫ₐᵇ [c·f(x) + d·g(x)] dx = c·∫ₐᵇ f(x) dx + d·∫ₐᵇ g(x) dx. Proof sketch: the Riemann sums for cf + dg are exactly c times the sums for f plus d times the sums for g, and limits preserve linear combinations.',
-      'Comparison properties: (1) if f(x) ≥ 0 on [a, b], then ∫ₐᵇ f ≥ 0; (2) if f(x) ≥ g(x) on [a, b], then ∫ₐᵇ f ≥ ∫ₐᵇ g; (3) the absolute value inequality: |∫ₐᵇ f(x) dx| ≤ ∫ₐᵇ |f(x)| dx. Property (3) is the integral analog of the triangle inequality for sums: |Σaᵢ| ≤ Σ|aᵢ|. It is used to bound integrals without computing them: if |f(x)| ≤ M on [a, b], then |∫ₐᵇ f| ≤ M(b−a).',
-      'Mean Value Theorem for Integrals: if f is continuous on [a, b], then there exists c ∈ (a, b) such that ∫ₐᵇ f(x) dx = f(c)(b−a). The proof uses the EVT: f attains its minimum m and maximum M on [a, b]. The bound m(b−a) ≤ ∫ₐᵇ f ≤ M(b−a) gives m ≤ (1/(b−a))∫ₐᵇ f ≤ M. By the Intermediate Value Theorem (f is continuous and attains m and M), f must take every value between m and M, including the average value. So there exists c with f(c) = (1/(b−a))∫ₐᵇ f.',
-      'Symmetry properties: if f is integrable and odd on [−a, a], then ∫₋ₐᵃ f(x) dx = 0. If f is even, ∫₋ₐᵃ f(x) dx = 2∫₀ᵃ f(x) dx. Proof for the odd case: substitute u = −x in ∫₋ₐ⁰ f(x) dx to get −∫₀ᵃ f(−u)(−du) = −∫₀ᵃ f(u) du = −∫₀ᵃ f (since f is odd). So ∫₋ₐ⁰ f = −∫₀ᵃ f, and ∫₋ₐᵃ f = ∫₋ₐ⁰ f + ∫₀ᵃ f = −∫₀ᵃ f + ∫₀ᵃ f = 0.',
+      "The formal properties of the definite integral follow from the limit-of-Riemann-sums definition. Linearity: for constants c, d and integrable functions f, g on [a, b], ∫ₐᵇ [c·f(x) + d·g(x)] dx = c·∫ₐᵇ f(x) dx + d·∫ₐᵇ g(x) dx. Proof sketch: the Riemann sums for cf + dg are exactly c times the sums for f plus d times the sums for g, and limits preserve linear combinations.",
+      "Comparison properties: (1) if f(x) ≥ 0 on [a, b], then ∫ₐᵇ f ≥ 0; (2) if f(x) ≥ g(x) on [a, b], then ∫ₐᵇ f ≥ ∫ₐᵇ g; (3) the absolute value inequality: |∫ₐᵇ f(x) dx| ≤ ∫ₐᵇ |f(x)| dx. Property (3) is the integral analog of the triangle inequality for sums: |Σaᵢ| ≤ Σ|aᵢ|. It is used to bound integrals without computing them: if |f(x)| ≤ M on [a, b], then |∫ₐᵇ f| ≤ M(b−a).",
+      "Mean Value Theorem for Integrals: if f is continuous on [a, b], then there exists c ∈ (a, b) such that ∫ₐᵇ f(x) dx = f(c)(b−a). The proof uses the EVT: f attains its minimum m and maximum M on [a, b]. The bound m(b−a) ≤ ∫ₐᵇ f ≤ M(b−a) gives m ≤ (1/(b−a))∫ₐᵇ f ≤ M. By the Intermediate Value Theorem (f is continuous and attains m and M), f must take every value between m and M, including the average value. So there exists c with f(c) = (1/(b−a))∫ₐᵇ f.",
+      "Symmetry properties: if f is integrable and odd on [−a, a], then ∫₋ₐᵃ f(x) dx = 0. If f is even, ∫₋ₐᵃ f(x) dx = 2∫₀ᵃ f(x) dx. Proof for the odd case: substitute u = −x in ∫₋ₐ⁰ f(x) dx to get −∫₀ᵃ f(−u)(−du) = −∫₀ᵃ f(u) du = −∫₀ᵃ f (since f is odd). So ∫₋ₐ⁰ f = −∫₀ᵃ f, and ∫₋ₐᵃ f = ∫₋ₐ⁰ f + ∫₀ᵃ f = −∫₀ᵃ f + ∫₀ᵃ f = 0.",
     ],
     callouts: [
       {
-        type: 'theorem',
-        title: 'Properties of the Definite Integral',
-        body: '\\[\\int_a^b [c\\,f(x)+d\\,g(x)]\\,dx = c\\!\\int_a^b\\!f\\,dx + d\\!\\int_a^b\\!g\\,dx \\quad \\text{(linearity)}\\]\n\\[\\int_a^b f = \\int_a^c f + \\int_c^b f \\quad \\text{(interval additivity)}\\]\n\\[\\left|\\int_a^b f(x)\\,dx\\right| \\leq \\int_a^b |f(x)|\\,dx \\quad \\text{(triangle inequality)}\\]',
+        type: "theorem",
+        title: "Properties of the Definite Integral",
+        body: "\\[\\int_a^b [c\\,f(x)+d\\,g(x)]\\,dx = c\\!\\int_a^b\\!f\\,dx + d\\!\\int_a^b\\!g\\,dx \\quad \\text{(linearity)}\\]\n\\[\\int_a^b f = \\int_a^c f + \\int_c^b f \\quad \\text{(interval additivity)}\\]\n\\[\\left|\\int_a^b f(x)\\,dx\\right| \\leq \\int_a^b |f(x)|\\,dx \\quad \\text{(triangle inequality)}\\]",
       },
       {
-        type: 'definition',
-        title: 'Average Value of a Function',
-        body: 'The average value of \\(f\\) on \\([a,b]\\) is\n\\[f_{\\text{avg}} = \\frac{1}{b-a}\\int_a^b f(x)\\,dx.\\]\nGeometrically, \\(f_{\\text{avg}}\\) is the height of the rectangle with base \\(b-a\\) that has the same area as the region under \\(f\\).',
+        type: "definition",
+        title: "Average Value of a Function",
+        body: "The average value of \\(f\\) on \\([a,b]\\) is\n\\[f_{\\text{avg}} = \\frac{1}{b-a}\\int_a^b f(x)\\,dx.\\]\nGeometrically, \\(f_{\\text{avg}}\\) is the height of the rectangle with base \\(b-a\\) that has the same area as the region under \\(f\\).",
       },
       {
-        type: 'theorem',
-        title: 'Mean Value Theorem for Integrals',
-        body: 'If \\(f\\) is continuous on \\([a,b]\\), there exists \\(c \\in (a,b)\\) such that\n\\[\\int_a^b f(x)\\,dx = f(c)(b-a).\\]\nEquivalently, \\(f(c) = f_{\\text{avg}}\\) — a continuous function attains its average value.',
+        type: "theorem",
+        title: "Mean Value Theorem for Integrals",
+        body: "If \\(f\\) is continuous on \\([a,b]\\), there exists \\(c \\in (a,b)\\) such that\n\\[\\int_a^b f(x)\\,dx = f(c)(b-a).\\]\nEquivalently, \\(f(c) = f_{\\text{avg}}\\) — a continuous function attains its average value.",
       },
       {
-        type: 'theorem',
-        title: 'Symmetry Shortcuts',
-        body: 'If \\(f\\) is odd \\((f(-x) = -f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 0.\\]\nIf \\(f\\) is even \\((f(-x) = f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 2\\int_0^a f(x)\\,dx.\\]',
+        type: "theorem",
+        title: "Symmetry Shortcuts",
+        body: "If \\(f\\) is odd \\((f(-x) = -f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 0.\\]\nIf \\(f\\) is even \\((f(-x) = f(x))\\):\n\\[\\int_{-a}^{a} f(x)\\,dx = 2\\int_0^a f(x)\\,dx.\\]",
       },
     ],
-    visualizations: [
-      ],
+    visualizations: [],
   },
 
   rigor: {
     prose: [
-      'The comparison property |∫ₐᵇ f| ≤ ∫ₐᵇ |f| deserves a careful proof, since it is used repeatedly in analysis. For any Riemann sum: |Σf(cᵢ)Δx| ≤ Σ|f(cᵢ)|Δx by the triangle inequality for finite sums. Taking the limit as n → ∞: the left side converges to |∫ₐᵇ f| and the right side to ∫ₐᵇ |f| (assuming both f and |f| are integrable, which follows from f being integrable — since |f| is integrable whenever f is). The inequality is preserved in the limit, giving the result.',
-      'The MVT for integrals requires both the Extreme Value Theorem and the Intermediate Value Theorem. The EVT guarantees f attains m = min f and M = max f on [a, b] (requiring continuity + closed bounded interval). The bound m ≤ f_avg ≤ M follows from the comparison property. The IVT guarantees f takes every value between m and M on [a, b] (requiring continuity). Since m ≤ f_avg ≤ M, f must take the value f_avg somewhere — call it c. Thus f(c) = f_avg. The careful reader will note that the IVT gives c in [a, b], not necessarily the open interval (a, b). The strict interior can be guaranteed if f_avg is not equal to m or M (which holds when f is non-constant), by a sharper application of the IVT.',
-      'The symmetry properties give a window into the general technique of change of variables for integrals. The substitution u = −x transforms ∫₋ₐ⁰ f(x) dx as follows: when x = −a, u = a; when x = 0, u = 0; dx = −du. So ∫₋ₐ⁰ f(x) dx = ∫ₐ⁰ f(−u)(−du) = ∫₀ᵃ f(−u) du. For an odd function, f(−u) = −f(u), so this equals −∫₀ᵃ f(u) du. Adding ∫₀ᵃ f(u) du gives zero. This is a special case of the general substitution rule for definite integrals: ∫ₐᵇ f(g(x))g′(x) dx = ∫_{g(a)}^{g(b)} f(u) du, valid whenever g is differentiable and f is continuous. This rule (the integral version of the chain rule) is the theoretical basis for the substitution technique in antiderivative computation.',
-      'The definite integral over a point ∫ₐᵃ f = 0 deserves a moment\'s attention. In measure theory, the integral is defined as ∫ f dμ where μ is a measure. For the Lebesgue measure on ℝ, a single point {a} has measure zero, so ∫_{a}^{a} f = 0 regardless of f(a) — even if f has a spike at a. This reflects the fact that a single point contributes nothing to the Riemann integral either: in any Riemann sum, the subinterval containing a can be taken to have arbitrarily small width, and f(a)·Δx → 0. The measure-zero sets play the same role in the Lebesgue theory that single points play here.',
+      "The comparison property |∫ₐᵇ f| ≤ ∫ₐᵇ |f| deserves a careful proof, since it is used repeatedly in analysis. For any Riemann sum: |Σf(cᵢ)Δx| ≤ Σ|f(cᵢ)|Δx by the triangle inequality for finite sums. Taking the limit as n → ∞: the left side converges to |∫ₐᵇ f| and the right side to ∫ₐᵇ |f| (assuming both f and |f| are integrable, which follows from f being integrable — since |f| is integrable whenever f is). The inequality is preserved in the limit, giving the result.",
+      "The MVT for integrals requires both the Extreme Value Theorem and the Intermediate Value Theorem. The EVT guarantees f attains m = min f and M = max f on [a, b] (requiring continuity + closed bounded interval). The bound m ≤ f_avg ≤ M follows from the comparison property. The IVT guarantees f takes every value between m and M on [a, b] (requiring continuity). Since m ≤ f_avg ≤ M, f must take the value f_avg somewhere — call it c. Thus f(c) = f_avg. The careful reader will note that the IVT gives c in [a, b], not necessarily the open interval (a, b). The strict interior can be guaranteed if f_avg is not equal to m or M (which holds when f is non-constant), by a sharper application of the IVT.",
+      "The symmetry properties give a window into the general technique of change of variables for integrals. The substitution u = −x transforms ∫₋ₐ⁰ f(x) dx as follows: when x = −a, u = a; when x = 0, u = 0; dx = −du. So ∫₋ₐ⁰ f(x) dx = ∫ₐ⁰ f(−u)(−du) = ∫₀ᵃ f(−u) du. For an odd function, f(−u) = −f(u), so this equals −∫₀ᵃ f(u) du. Adding ∫₀ᵃ f(u) du gives zero. This is a special case of the general substitution rule for definite integrals: ∫ₐᵇ f(g(x))g′(x) dx = ∫_{g(a)}^{g(b)} f(u) du, valid whenever g is differentiable and f is continuous. This rule (the integral version of the chain rule) is the theoretical basis for the substitution technique in antiderivative computation.",
+      "The definite integral over a point ∫ₐᵃ f = 0 deserves a moment's attention. In measure theory, the integral is defined as ∫ f dμ where μ is a measure. For the Lebesgue measure on ℝ, a single point {a} has measure zero, so ∫_{a}^{a} f = 0 regardless of f(a) — even if f has a spike at a. This reflects the fact that a single point contributes nothing to the Riemann integral either: in any Riemann sum, the subinterval containing a can be taken to have arbitrarily small width, and f(a)·Δx → 0. The measure-zero sets play the same role in the Lebesgue theory that single points play here.",
     ],
     callouts: [
       {
-        type: 'theorem',
-        title: 'Integral Triangle Inequality (Proof Sketch)',
-        body: 'For any Riemann sum: \\(|\\sum f(c_i)\\Delta x| \\leq \\sum |f(c_i)|\\Delta x\\) by the finite triangle inequality. Taking limits (both sides converge): \\(|\\int_a^b f| \\leq \\int_a^b |f|\\).',
+        type: "theorem",
+        title: "Integral Triangle Inequality (Proof Sketch)",
+        body: "For any Riemann sum: \\(|\\sum f(c_i)\\Delta x| \\leq \\sum |f(c_i)|\\Delta x\\) by the finite triangle inequality. Taking limits (both sides converge): \\(|\\int_a^b f| \\leq \\int_a^b |f|\\).",
       },
       {
-        type: 'warning',
-        title: 'MVT for Integrals ≠ MVT for Derivatives',
-        body: 'The Mean Value Theorem for Derivatives says f\'(c) = (f(b)−f(a))/(b−a) for some c. The Mean Value Theorem for Integrals says f(c) = (1/(b−a))∫ₐᵇ f for some c. These are different statements about different quantities. The integral MVT requires only that f is continuous; the derivative MVT requires f to be differentiable. The Fundamental Theorem of Calculus connects the two in the proof of FTC Part 1.',
+        type: "warning",
+        title: "MVT for Integrals ≠ MVT for Derivatives",
+        body: "The Mean Value Theorem for Derivatives says f'(c) = (f(b)−f(a))/(b−a) for some c. The Mean Value Theorem for Integrals says f(c) = (1/(b−a))∫ₐᵇ f for some c. These are different statements about different quantities. The integral MVT requires only that f is continuous; the derivative MVT requires f to be differentiable. The Fundamental Theorem of Calculus connects the two in the proof of FTC Part 1.",
       },
     ],
     visualizations: [],
@@ -121,259 +134,767 @@ export default {
 
   examples: [
     {
-      id: 'ch4-002-ex1',
-      title: '∫₀³ (2x+1) dx by Geometry',
-      problem: '\\text{Compute } \\int_0^3 (2x+1)\\,dx \\text{ using the geometric interpretation (area of a trapezoid).}',
+      id: "ch4-002-ex1",
+      title: "∫₀³ (2x+1) dx by Geometry",
+      problem:
+        "\\text{Compute } \\int_0^3 (2x+1)\\,dx \\text{ using the geometric interpretation (area of a trapezoid).}",
       steps: [
-        { expression: 'f(x) = 2x+1 \\text{ is a straight line.} \\quad f(0) = 1, \\quad f(3) = 7', annotation: 'The integrand is linear. The region under the graph from x=0 to x=3 is a trapezoid.' },
-        { expression: '\\text{Trapezoid: two parallel sides } f(0)=1 \\text{ and } f(3)=7, \\text{ width (height of trapezoid)} = 3.', annotation: 'The "parallel sides" are the vertical heights at x=0 and x=3; the width is the length of the interval.' },
-        { expression: '\\text{Area} = \\frac{1}{2}(\\text{side}_1 + \\text{side}_2) \\times \\text{width} = \\frac{1}{2}(1+7) \\times 3 = \\frac{1}{2}(8)(3) = 12', annotation: 'Trapezoid area formula: average of parallel sides times width.' },
-        { expression: '\\int_0^3 (2x+1)\\,dx = 12', annotation: 'Confirmed: the definite integral equals the geometric area of the trapezoid.' },
+        {
+          expression:
+            "f(x) = 2x+1 \\text{ is a straight line.} \\quad f(0) = 1, \\quad f(3) = 7",
+          annotation:
+            "The integrand is linear. The region under the graph from x=0 to x=3 is a trapezoid.",
+        },
+        {
+          expression:
+            "\\text{Trapezoid: two parallel sides } f(0)=1 \\text{ and } f(3)=7, \\text{ width (height of trapezoid)} = 3.",
+          annotation:
+            'The "parallel sides" are the vertical heights at x=0 and x=3; the width is the length of the interval.',
+        },
+        {
+          expression:
+            "\\text{Area} = \\frac{1}{2}(\\text{side}_1 + \\text{side}_2) \\times \\text{width} = \\frac{1}{2}(1+7) \\times 3 = \\frac{1}{2}(8)(3) = 12",
+          annotation:
+            "Trapezoid area formula: average of parallel sides times width.",
+        },
+        {
+          expression: "\\int_0^3 (2x+1)\\,dx = 12",
+          annotation:
+            "Confirmed: the definite integral equals the geometric area of the trapezoid.",
+        },
       ],
-      conclusion: '∫₀³ (2x+1) dx = 12. For any linear function, the integral equals the trapezoid area — no calculus machinery needed. This confirms our geometric intuition and sets up a check for Lesson 3 (FTC Part 2 will give the same answer: [x²+x]₀³ = 9+3−0 = 12).',
+      conclusion:
+        "∫₀³ (2x+1) dx = 12. For any linear function, the integral equals the trapezoid area — no calculus machinery needed. This confirms our geometric intuition and sets up a check for Lesson 3 (FTC Part 2 will give the same answer: [x²+x]₀³ = 9+3−0 = 12).",
     },
     {
-      id: 'ch4-002-ex2',
-      title: '∫₀² √(4−x²) dx = π Using Geometry',
-      problem: '\\text{Evaluate } \\int_0^2 \\sqrt{4-x^2}\\,dx \\text{ without computing an antiderivative.}',
+      id: "ch4-002-ex2",
+      title: "∫₀² √(4−x²) dx = π Using Geometry",
+      problem:
+        "\\text{Evaluate } \\int_0^2 \\sqrt{4-x^2}\\,dx \\text{ without computing an antiderivative.}",
       steps: [
-        { expression: 'y = \\sqrt{4-x^2} \\Rightarrow y^2 = 4 - x^2 \\Rightarrow x^2 + y^2 = 4', annotation: 'The equation y = √(4−x²) with y ≥ 0 describes the upper semicircle of radius 2 centered at the origin.' },
-        { expression: '\\text{The region under } y = \\sqrt{4-x^2} \\text{ from } x=0 \\text{ to } x=2 \\text{ is a quarter-disk of radius } 2.', annotation: 'On [0,2], the curve goes from (0,2) to (2,0), tracing a quarter-circle in the first quadrant.' },
-        { expression: '\\text{Area of quarter-disk} = \\frac{1}{4}\\pi r^2 = \\frac{1}{4}\\pi(4) = \\pi', annotation: 'Area = πr²/4 = 4π/4 = π.' },
-        { expression: '\\int_0^2 \\sqrt{4-x^2}\\,dx = \\pi \\approx 3.14159', annotation: 'The definite integral equals the area of the quarter-disk: exactly π.' },
+        {
+          expression:
+            "y = \\sqrt{4-x^2} \\Rightarrow y^2 = 4 - x^2 \\Rightarrow x^2 + y^2 = 4",
+          annotation:
+            "The equation y = √(4−x²) with y ≥ 0 describes the upper semicircle of radius 2 centered at the origin.",
+        },
+        {
+          expression:
+            "\\text{The region under } y = \\sqrt{4-x^2} \\text{ from } x=0 \\text{ to } x=2 \\text{ is a quarter-disk of radius } 2.",
+          annotation:
+            "On [0,2], the curve goes from (0,2) to (2,0), tracing a quarter-circle in the first quadrant.",
+        },
+        {
+          expression:
+            "\\text{Area of quarter-disk} = \\frac{1}{4}\\pi r^2 = \\frac{1}{4}\\pi(4) = \\pi",
+          annotation: "Area = πr²/4 = 4π/4 = π.",
+        },
+        {
+          expression: "\\int_0^2 \\sqrt{4-x^2}\\,dx = \\pi \\approx 3.14159",
+          annotation:
+            "The definite integral equals the area of the quarter-disk: exactly π.",
+        },
       ],
-      conclusion: '∫₀²√(4−x²)dx = π. This elegant result requires no antiderivative (the antiderivative of √(4−x²) involves arcsin, which is not yet available). Geometric reasoning gives the exact answer immediately. This illustrates the power of the area interpretation.',
+      conclusion:
+        "∫₀²√(4−x²)dx = π. This elegant result requires no antiderivative (the antiderivative of √(4−x²) involves arcsin, which is not yet available). Geometric reasoning gives the exact answer immediately. This illustrates the power of the area interpretation.",
     },
     {
-      id: 'ch4-002-ex3',
-      title: '∫₋₁¹ x³ dx = 0 by Symmetry',
-      problem: '\\text{Evaluate } \\int_{-1}^{1} x^3\\,dx \\text{ using symmetry, without computing.}',
+      id: "ch4-002-ex3",
+      title: "∫₋₁¹ x³ dx = 0 by Symmetry",
+      problem:
+        "\\text{Evaluate } \\int_{-1}^{1} x^3\\,dx \\text{ using symmetry, without computing.}",
       steps: [
-        { expression: 'f(x) = x^3 \\text{ is an odd function: } f(-x) = (-x)^3 = -x^3 = -f(x)', annotation: 'Verify odd symmetry: f(−x) = −f(x) for all x.' },
-        { expression: '\\text{Odd function on symmetric interval} \\Rightarrow \\int_{-1}^{1} x^3\\,dx = 0', annotation: 'By the symmetry theorem: ∫₋ₐᵃ (odd function) dx = 0. The positive area on [0,1] is exactly canceled by the negative area on [−1,0].' },
-        { expression: '\\text{Verification: } \\int_{-1}^{1} x^3\\,dx = \\left[\\frac{x^4}{4}\\right]_{-1}^{1} = \\frac{1}{4} - \\frac{1}{4} = 0', annotation: 'The antiderivative of x³ is x⁴/4. Both endpoints give 1/4, so the difference is 0.' },
+        {
+          expression:
+            "f(x) = x^3 \\text{ is an odd function: } f(-x) = (-x)^3 = -x^3 = -f(x)",
+          annotation: "Verify odd symmetry: f(−x) = −f(x) for all x.",
+        },
+        {
+          expression:
+            "\\text{Odd function on symmetric interval} \\Rightarrow \\int_{-1}^{1} x^3\\,dx = 0",
+          annotation:
+            "By the symmetry theorem: ∫₋ₐᵃ (odd function) dx = 0. The positive area on [0,1] is exactly canceled by the negative area on [−1,0].",
+        },
+        {
+          expression:
+            "\\text{Verification: } \\int_{-1}^{1} x^3\\,dx = \\left[\\frac{x^4}{4}\\right]_{-1}^{1} = \\frac{1}{4} - \\frac{1}{4} = 0",
+          annotation:
+            "The antiderivative of x³ is x⁴/4. Both endpoints give 1/4, so the difference is 0.",
+        },
       ],
-      conclusion: '∫₋₁¹ x³ dx = 0 by symmetry. No computation required — recognizing the odd function on a symmetric interval gives the answer instantly. This is one of the most powerful time-saving tricks in integral calculus.',
+      conclusion:
+        "∫₋₁¹ x³ dx = 0 by symmetry. No computation required — recognizing the odd function on a symmetric interval gives the answer instantly. This is one of the most powerful time-saving tricks in integral calculus.",
     },
     {
-      id: 'ch4-002-ex4',
-      title: 'Using Additivity: Finding ∫₃⁵ f from Partial Information',
-      problem: '\\text{Given } \\int_0^3 f(x)\\,dx = 5 \\text{ and } \\int_0^5 f(x)\\,dx = 12, \\text{ find } \\int_3^5 f(x)\\,dx.',
+      id: "ch4-002-ex4",
+      title: "Using Additivity: Finding ∫₃⁵ f from Partial Information",
+      problem:
+        "\\text{Given } \\int_0^3 f(x)\\,dx = 5 \\text{ and } \\int_0^5 f(x)\\,dx = 12, \\text{ find } \\int_3^5 f(x)\\,dx.",
       steps: [
-        { expression: '\\int_0^5 f = \\int_0^3 f + \\int_3^5 f', annotation: 'Interval additivity: the integral from 0 to 5 splits at x=3.' },
-        { expression: '12 = 5 + \\int_3^5 f', annotation: 'Substitute the known values.' },
-        { expression: '\\int_3^5 f(x)\\,dx = 12 - 5 = 7', annotation: 'Solve for the unknown integral.' },
+        {
+          expression: "\\int_0^5 f = \\int_0^3 f + \\int_3^5 f",
+          annotation:
+            "Interval additivity: the integral from 0 to 5 splits at x=3.",
+        },
+        {
+          expression: "12 = 5 + \\int_3^5 f",
+          annotation: "Substitute the known values.",
+        },
+        {
+          expression: "\\int_3^5 f(x)\\,dx = 12 - 5 = 7",
+          annotation: "Solve for the unknown integral.",
+        },
       ],
-      conclusion: '∫₃⁵ f = 7. The additivity property lets us extract partial integrals from known combinations — like solving an equation. This technique is essential whenever you only have access to aggregate data.',
+      conclusion:
+        "∫₃⁵ f = 7. The additivity property lets us extract partial integrals from known combinations — like solving an equation. This technique is essential whenever you only have access to aggregate data.",
     },
     {
-      id: 'ch4-002-ex5',
-      title: 'Average Value and the MVT for Integrals',
-      problem: '\\text{Find the average value of } f(x) = x^2 \\text{ on } [0,3]. \\text{ Then find } c \\in (0,3) \\text{ where } f(c) = f_{\\text{avg}}.',
+      id: "ch4-002-ex5",
+      title: "Average Value and the MVT for Integrals",
+      problem:
+        "\\text{Find the average value of } f(x) = x^2 \\text{ on } [0,3]. \\text{ Then find } c \\in (0,3) \\text{ where } f(c) = f_{\\text{avg}}.",
       steps: [
-        { expression: 'f_{\\text{avg}} = \\frac{1}{3-0}\\int_0^3 x^2\\,dx', annotation: 'Average value formula: (1/(b−a)) × integral.' },
-        { expression: '\\int_0^3 x^2\\,dx = \\left[\\frac{x^3}{3}\\right]_0^3 = \\frac{27}{3} - 0 = 9', annotation: 'Antiderivative of x² is x³/3. Evaluate at 3 and 0.' },
-        { expression: 'f_{\\text{avg}} = \\frac{1}{3} \\cdot 9 = 3', annotation: 'Average value of x² on [0,3] is 3.' },
-        { expression: 'f(c) = f_{\\text{avg}} \\Rightarrow c^2 = 3 \\Rightarrow c = \\sqrt{3} \\approx 1.73', annotation: 'Solve f(c) = 3 for c. Since c must be in (0,3), we take the positive root c = √3.' },
-        { expression: '\\sqrt{3} \\in (0,3) \\checkmark', annotation: 'Confirmed: c = √3 ≈ 1.73 is in the open interval (0,3), as the MVT for integrals guarantees.' },
+        {
+          expression: "f_{\\text{avg}} = \\frac{1}{3-0}\\int_0^3 x^2\\,dx",
+          annotation: "Average value formula: (1/(b−a)) × integral.",
+        },
+        {
+          expression:
+            "\\int_0^3 x^2\\,dx = \\left[\\frac{x^3}{3}\\right]_0^3 = \\frac{27}{3} - 0 = 9",
+          annotation: "Antiderivative of x² is x³/3. Evaluate at 3 and 0.",
+        },
+        {
+          expression: "f_{\\text{avg}} = \\frac{1}{3} \\cdot 9 = 3",
+          annotation: "Average value of x² on [0,3] is 3.",
+        },
+        {
+          expression:
+            "f(c) = f_{\\text{avg}} \\Rightarrow c^2 = 3 \\Rightarrow c = \\sqrt{3} \\approx 1.73",
+          annotation:
+            "Solve f(c) = 3 for c. Since c must be in (0,3), we take the positive root c = √3.",
+        },
+        {
+          expression: "\\sqrt{3} \\in (0,3) \\checkmark",
+          annotation:
+            "Confirmed: c = √3 ≈ 1.73 is in the open interval (0,3), as the MVT for integrals guarantees.",
+        },
       ],
-      conclusion: 'The average value of x² on [0,3] is 3. The function achieves this average at c = √3 ≈ 1.73, which lies inside (0,3) as the Mean Value Theorem for Integrals guarantees.',
+      conclusion:
+        "The average value of x² on [0,3] is 3. The function achieves this average at c = √3 ≈ 1.73, which lies inside (0,3) as the Mean Value Theorem for Integrals guarantees.",
     },
     {
-      id: 'ch4-002-ex6',
-      title: '∫₋₂² |x| dx Using Geometry',
-      problem: '\\text{Evaluate } \\int_{-2}^{2} |x|\\,dx \\text{ using the geometric area interpretation.}',
+      id: "ch4-002-ex6",
+      title: "∫₋₂² |x| dx Using Geometry",
+      problem:
+        "\\text{Evaluate } \\int_{-2}^{2} |x|\\,dx \\text{ using the geometric area interpretation.}",
       steps: [
-        { expression: '|x| = \\begin{cases} -x & x < 0 \\\\ x & x \\geq 0 \\end{cases}', annotation: 'The absolute value function forms a "V" shape with vertex at the origin.' },
-        { expression: '\\int_{-2}^{2} |x|\\,dx = \\int_{-2}^{0} (-x)\\,dx + \\int_0^2 x\\,dx', annotation: 'Split at x=0 where the behavior changes. On [−2,0], |x| = −x; on [0,2], |x| = x.' },
-        { expression: '\\text{Each piece is a right triangle with base 2 and height 2.}', annotation: '|x| on [−2,0] is a line from 2 to 0 (height at x=−2 is 2, at x=0 is 0). Same on [0,2].' },
-        { expression: '\\int_{-2}^{0} (-x)\\,dx = \\frac{1}{2}(2)(2) = 2 \\quad \\int_0^2 x\\,dx = \\frac{1}{2}(2)(2) = 2', annotation: 'Each triangle has area ½ × 2 × 2 = 2.' },
-        { expression: '\\int_{-2}^{2} |x|\\,dx = 2 + 2 = 4', annotation: 'Total area = 4.' },
-        { expression: '\\text{Or by even symmetry: } \\int_{-2}^{2} |x|\\,dx = 2\\int_0^2 x\\,dx = 2 \\cdot 2 = 4', annotation: 'Since |x| is even, we can use the symmetry shortcut: double the [0,2] piece.' },
+        {
+          expression:
+            "|x| = \\begin{cases} -x & x < 0 \\\\ x & x \\geq 0 \\end{cases}",
+          annotation:
+            'The absolute value function forms a "V" shape with vertex at the origin.',
+        },
+        {
+          expression:
+            "\\int_{-2}^{2} |x|\\,dx = \\int_{-2}^{0} (-x)\\,dx + \\int_0^2 x\\,dx",
+          annotation:
+            "Split at x=0 where the behavior changes. On [−2,0], |x| = −x; on [0,2], |x| = x.",
+        },
+        {
+          expression:
+            "\\text{Each piece is a right triangle with base 2 and height 2.}",
+          annotation:
+            "|x| on [−2,0] is a line from 2 to 0 (height at x=−2 is 2, at x=0 is 0). Same on [0,2].",
+        },
+        {
+          expression:
+            "\\int_{-2}^{0} (-x)\\,dx = \\frac{1}{2}(2)(2) = 2 \\quad \\int_0^2 x\\,dx = \\frac{1}{2}(2)(2) = 2",
+          annotation: "Each triangle has area ½ × 2 × 2 = 2.",
+        },
+        {
+          expression: "\\int_{-2}^{2} |x|\\,dx = 2 + 2 = 4",
+          annotation: "Total area = 4.",
+        },
+        {
+          expression:
+            "\\text{Or by even symmetry: } \\int_{-2}^{2} |x|\\,dx = 2\\int_0^2 x\\,dx = 2 \\cdot 2 = 4",
+          annotation:
+            "Since |x| is even, we can use the symmetry shortcut: double the [0,2] piece.",
+        },
       ],
-      conclusion: '∫₋₂² |x| dx = 4. The absolute value function is even, so we can double the integral over [0,2]. Geometrically, the "V" shape creates two triangles with total area 4.',
+      conclusion:
+        '∫₋₂² |x| dx = 4. The absolute value function is even, so we can double the integral over [0,2]. Geometrically, the "V" shape creates two triangles with total area 4.',
     },
     {
-      id: 'ch4-002-ex7',
-      title: 'Displacement vs. Distance: Signed vs. Unsigned Integral',
-      problem: '\\text{A particle moves with } v(t) = \\sin(t). \\text{ Find displacement and total distance over } [0, 2\\pi].',
-      visualizationId: 'SignedArea',
+      id: "ch4-002-ex7",
+      title: "Displacement vs. Distance: Signed vs. Unsigned Integral",
+      problem:
+        "\\text{A particle moves with } v(t) = \\sin(t). \\text{ Find displacement and total distance over } [0, 2\\pi].",
+      visualizationId: "SignedArea",
       steps: [
-        { expression: '\\text{Displacement} = \\int_0^{2\\pi} \\sin(t)\\,dt', annotation: 'Displacement is the signed integral of velocity.' },
-        { expression: '= [-\\cos(t)]_0^{2\\pi} = -\\cos(2\\pi) + \\cos(0) = -1 + 1 = 0', annotation: 'Antiderivative of sin(t) is −cos(t). Evaluate from 0 to 2π.' },
-        { expression: '\\text{The particle returns to its starting point after one full period.}', annotation: 'Displacement = 0 means net change in position is zero — it started and ended at the same place.' },
-        { expression: '\\text{Total distance} = \\int_0^{2\\pi} |\\sin(t)|\\,dt', annotation: 'Distance ignores direction — integrate the absolute value.' },
-        { expression: '= \\int_0^{\\pi} \\sin(t)\\,dt + \\int_{\\pi}^{2\\pi} (-\\sin(t))\\,dt', annotation: 'sin(t) ≥ 0 on [0,π]; sin(t) ≤ 0 on [π,2π] so |sin| = −sin there. Split at the zero.' },
-        { expression: '= [-\\cos(t)]_0^{\\pi} + [\\cos(t)]_{\\pi}^{2\\pi} = (1+1) + (-1-(-1)) = 2 + 2 = 4', annotation: 'First piece: −cos(π)+cos(0) = 1+1=2. Second piece: cos(2π)−cos(π) = 1−(−1)=2.' },
-        { expression: '\\text{Displacement} = 0, \\quad \\text{Total distance} = 4.', annotation: 'The particle traveled 4 units total but ended where it started.' },
+        {
+          expression: "\\text{Displacement} = \\int_0^{2\\pi} \\sin(t)\\,dt",
+          annotation: "Displacement is the signed integral of velocity.",
+        },
+        {
+          expression:
+            "= [-\\cos(t)]_0^{2\\pi} = -\\cos(2\\pi) + \\cos(0) = -1 + 1 = 0",
+          annotation:
+            "Antiderivative of sin(t) is −cos(t). Evaluate from 0 to 2π.",
+        },
+        {
+          expression:
+            "\\text{The particle returns to its starting point after one full period.}",
+          annotation:
+            "Displacement = 0 means net change in position is zero — it started and ended at the same place.",
+        },
+        {
+          expression:
+            "\\text{Total distance} = \\int_0^{2\\pi} |\\sin(t)|\\,dt",
+          annotation:
+            "Distance ignores direction — integrate the absolute value.",
+        },
+        {
+          expression:
+            "= \\int_0^{\\pi} \\sin(t)\\,dt + \\int_{\\pi}^{2\\pi} (-\\sin(t))\\,dt",
+          annotation:
+            "sin(t) ≥ 0 on [0,π]; sin(t) ≤ 0 on [π,2π] so |sin| = −sin there. Split at the zero.",
+        },
+        {
+          expression:
+            "= [-\\cos(t)]_0^{\\pi} + [\\cos(t)]_{\\pi}^{2\\pi} = (1+1) + (-1-(-1)) = 2 + 2 = 4",
+          annotation:
+            "First piece: −cos(π)+cos(0) = 1+1=2. Second piece: cos(2π)−cos(π) = 1−(−1)=2.",
+        },
+        {
+          expression:
+            "\\text{Displacement} = 0, \\quad \\text{Total distance} = 4.",
+          annotation:
+            "The particle traveled 4 units total but ended where it started.",
+        },
       ],
-      conclusion: 'Displacement = 0 (returns to start) but total distance = 4 (traveled 2 units forward and 2 units back). This distinction is fundamental in physics: displacement is a vector (signed); distance is a scalar (unsigned).',
+      conclusion:
+        "Displacement = 0 (returns to start) but total distance = 4 (traveled 2 units forward and 2 units back). This distinction is fundamental in physics: displacement is a vector (signed); distance is a scalar (unsigned).",
     },
   ],
 
   challenges: [
     {
-      id: 'ch4-002-ch1',
-      difficulty: 'medium',
-      problem: 'Given ∫₋₃³ f(x) dx = 10 and ∫₋₃³ g(x) dx = 6, evaluate: (a) ∫₋₃³ [2f(x) − 3g(x)] dx. (b) If f is even and ∫₀³ f = 7, what is ∫₋₃⁰ f?',
-      hint: 'Use linearity for part (a). For part (b), use the even-function symmetry: ∫₋₃³ f = 2∫₀³ f. Then use additivity to find ∫₋₃⁰ f.',
+      id: "ch4-002-ch1",
+      difficulty: "medium",
+      problem:
+        "Given ∫₋₃³ f(x) dx = 10 and ∫₋₃³ g(x) dx = 6, evaluate: (a) ∫₋₃³ [2f(x) − 3g(x)] dx. (b) If f is even and ∫₀³ f = 7, what is ∫₋₃⁰ f?",
+      hint: "Use linearity for part (a). For part (b), use the even-function symmetry: ∫₋₃³ f = 2∫₀³ f. Then use additivity to find ∫₋₃⁰ f.",
       walkthrough: [
-        { expression: '\\text{(a) } \\int_{-3}^3 [2f-3g]\\,dx = 2\\int_{-3}^3 f - 3\\int_{-3}^3 g = 2(10) - 3(6) = 20 - 18 = 2', annotation: 'Linearity: pull out constants and split the integral.' },
-        { expression: '\\text{(b) } f \\text{ even} \\Rightarrow \\int_{-3}^3 f = 2\\int_0^3 f', annotation: 'For even f on symmetric interval: ∫₋ₐᵃ f = 2∫₀ᵃ f.' },
-        { expression: '\\int_{-3}^3 f = 2(7) = 14', annotation: 'Since ∫₀³ f = 7, the full symmetric integral is 14.' },
-        { expression: '\\int_{-3}^3 f = \\int_{-3}^0 f + \\int_0^3 f \\Rightarrow 14 = \\int_{-3}^0 f + 7 \\Rightarrow \\int_{-3}^0 f = 7', annotation: 'Split by additivity. Subtract ∫₀³ f = 7 from both sides. By symmetry, ∫₋₃⁰ f = ∫₀³ f = 7, as expected for an even function.' },
+        {
+          expression:
+            "\\text{(a) } \\int_{-3}^3 [2f-3g]\\,dx = 2\\int_{-3}^3 f - 3\\int_{-3}^3 g = 2(10) - 3(6) = 20 - 18 = 2",
+          annotation: "Linearity: pull out constants and split the integral.",
+        },
+        {
+          expression:
+            "\\text{(b) } f \\text{ even} \\Rightarrow \\int_{-3}^3 f = 2\\int_0^3 f",
+          annotation: "For even f on symmetric interval: ∫₋ₐᵃ f = 2∫₀ᵃ f.",
+        },
+        {
+          expression: "\\int_{-3}^3 f = 2(7) = 14",
+          annotation: "Since ∫₀³ f = 7, the full symmetric integral is 14.",
+        },
+        {
+          expression:
+            "\\int_{-3}^3 f = \\int_{-3}^0 f + \\int_0^3 f \\Rightarrow 14 = \\int_{-3}^0 f + 7 \\Rightarrow \\int_{-3}^0 f = 7",
+          annotation:
+            "Split by additivity. Subtract ∫₀³ f = 7 from both sides. By symmetry, ∫₋₃⁰ f = ∫₀³ f = 7, as expected for an even function.",
+        },
       ],
-      answer: '\\text{(a) } 2 \\qquad \\text{(b) } \\int_{-3}^0 f = 7',
+      answer: "\\text{(a) } 2 \\qquad \\text{(b) } \\int_{-3}^0 f = 7",
     },
     {
-      id: 'ch4-002-ch2',
-      difficulty: 'medium',
-      problem: 'Find the average value of f(x) = sin(x) on [0, π]. Then find all c ∈ (0, π) where f(c) = f_avg.',
-      hint: 'Compute ∫₀^π sin(x) dx using the antiderivative −cos(x). Divide by the interval length π. Then solve sin(c) = f_avg.',
+      id: "ch4-002-ch2",
+      difficulty: "medium",
+      problem:
+        "Find the average value of f(x) = sin(x) on [0, π]. Then find all c ∈ (0, π) where f(c) = f_avg.",
+      hint: "Compute ∫₀^π sin(x) dx using the antiderivative −cos(x). Divide by the interval length π. Then solve sin(c) = f_avg.",
       walkthrough: [
-        { expression: '\\int_0^{\\pi} \\sin(x)\\,dx = [-\\cos(x)]_0^{\\pi} = -\\cos(\\pi)+\\cos(0) = -(-1)+1 = 2', annotation: 'Antiderivative of sin is −cos.' },
-        { expression: 'f_{\\text{avg}} = \\frac{1}{\\pi - 0} \\cdot 2 = \\frac{2}{\\pi} \\approx 0.637', annotation: 'Average value = integral / interval length = 2/π.' },
-        { expression: '\\sin(c) = \\frac{2}{\\pi} \\Rightarrow c = \\arcsin\\!\\left(\\frac{2}{\\pi}\\right) \\approx 0.690 \\text{ or } c = \\pi - \\arcsin\\!\\left(\\frac{2}{\\pi}\\right) \\approx 2.452', annotation: 'On [0,π], sin(c) = 2/π has two solutions (sin is positive throughout). Both c ≈ 0.690 and c ≈ 2.452 are in (0,π).' },
+        {
+          expression:
+            "\\int_0^{\\pi} \\sin(x)\\,dx = [-\\cos(x)]_0^{\\pi} = -\\cos(\\pi)+\\cos(0) = -(-1)+1 = 2",
+          annotation: "Antiderivative of sin is −cos.",
+        },
+        {
+          expression:
+            "f_{\\text{avg}} = \\frac{1}{\\pi - 0} \\cdot 2 = \\frac{2}{\\pi} \\approx 0.637",
+          annotation: "Average value = integral / interval length = 2/π.",
+        },
+        {
+          expression:
+            "\\sin(c) = \\frac{2}{\\pi} \\Rightarrow c = \\arcsin\\!\\left(\\frac{2}{\\pi}\\right) \\approx 0.690 \\text{ or } c = \\pi - \\arcsin\\!\\left(\\frac{2}{\\pi}\\right) \\approx 2.452",
+          annotation:
+            "On [0,π], sin(c) = 2/π has two solutions (sin is positive throughout). Both c ≈ 0.690 and c ≈ 2.452 are in (0,π).",
+        },
       ],
-      answer: 'f_{\\text{avg}} = 2/\\pi \\approx 0.637. \\text{ Achieved at } c \\approx 0.690 \\text{ and } c \\approx 2.452.',
+      answer:
+        "f_{\\text{avg}} = 2/\\pi \\approx 0.637. \\text{ Achieved at } c \\approx 0.690 \\text{ and } c \\approx 2.452.",
     },
     {
-      id: 'ch4-002-ch3',
-      difficulty: 'hard',
-      problem: 'Prove the Mean Value Theorem for Integrals from scratch using only the Extreme Value Theorem and Intermediate Value Theorem. Be explicit about where each theorem is used.',
-      hint: 'Step 1: EVT gives min m and max M of f on [a,b]. Step 2: Comparison inequalities give m ≤ (1/(b−a))∫ₐᵇf ≤ M. Step 3: IVT gives a point where f equals this average value.',
+      id: "ch4-002-ch3",
+      difficulty: "hard",
+      problem:
+        "Prove the Mean Value Theorem for Integrals from scratch using only the Extreme Value Theorem and Intermediate Value Theorem. Be explicit about where each theorem is used.",
+      hint: "Step 1: EVT gives min m and max M of f on [a,b]. Step 2: Comparison inequalities give m ≤ (1/(b−a))∫ₐᵇf ≤ M. Step 3: IVT gives a point where f equals this average value.",
       walkthrough: [
-        { expression: '\\text{Since } f \\text{ is continuous on } [a,b], \\text{ the EVT guarantees } m = \\min f \\text{ and } M = \\max f \\text{ both exist.}', annotation: 'EVT: continuous function on closed bounded interval attains its extrema.' },
-        { expression: 'm \\leq f(x) \\leq M \\text{ for all } x \\in [a,b]', annotation: 'Definition of min and max.' },
-        { expression: 'm(b-a) \\leq \\int_a^b f(x)\\,dx \\leq M(b-a)', annotation: 'Comparison property: integrating an inequality over [a,b] preserves it (and multiplies by width b−a).' },
-        { expression: 'm \\leq \\frac{1}{b-a}\\int_a^b f(x)\\,dx \\leq M', annotation: 'Divide through by (b−a) > 0.' },
-        { expression: '\\text{Let } \\mu = \\frac{1}{b-a}\\int_a^b f\\,dx. \\text{ Then } m \\leq \\mu \\leq M.', annotation: 'The average value μ lies between the minimum and maximum of f.' },
-        { expression: 'f \\text{ is continuous and } m = f(d), M = f(e) \\text{ for some } d, e \\in [a,b]. \\text{ By IVT, } \\exists c \\in [a,b]: f(c) = \\mu.', annotation: 'IVT: a continuous function takes all intermediate values between any two values it attains. Since f(d)=m ≤ μ ≤ M=f(e), there exists c between d and e (hence in [a,b]) with f(c)=μ. ∎' },
+        {
+          expression:
+            "\\text{Since } f \\text{ is continuous on } [a,b], \\text{ the EVT guarantees } m = \\min f \\text{ and } M = \\max f \\text{ both exist.}",
+          annotation:
+            "EVT: continuous function on closed bounded interval attains its extrema.",
+        },
+        {
+          expression: "m \\leq f(x) \\leq M \\text{ for all } x \\in [a,b]",
+          annotation: "Definition of min and max.",
+        },
+        {
+          expression: "m(b-a) \\leq \\int_a^b f(x)\\,dx \\leq M(b-a)",
+          annotation:
+            "Comparison property: integrating an inequality over [a,b] preserves it (and multiplies by width b−a).",
+        },
+        {
+          expression: "m \\leq \\frac{1}{b-a}\\int_a^b f(x)\\,dx \\leq M",
+          annotation: "Divide through by (b−a) > 0.",
+        },
+        {
+          expression:
+            "\\text{Let } \\mu = \\frac{1}{b-a}\\int_a^b f\\,dx. \\text{ Then } m \\leq \\mu \\leq M.",
+          annotation:
+            "The average value μ lies between the minimum and maximum of f.",
+        },
+        {
+          expression:
+            "f \\text{ is continuous and } m = f(d), M = f(e) \\text{ for some } d, e \\in [a,b]. \\text{ By IVT, } \\exists c \\in [a,b]: f(c) = \\mu.",
+          annotation:
+            "IVT: a continuous function takes all intermediate values between any two values it attains. Since f(d)=m ≤ μ ≤ M=f(e), there exists c between d and e (hence in [a,b]) with f(c)=μ. ∎",
+        },
       ],
-      answer: '\\text{MVT for Integrals proved: } \\exists c \\in [a,b]: f(c) = \\frac{1}{b-a}\\int_a^b f\\,dx.',
+      answer:
+        "\\text{MVT for Integrals proved: } \\exists c \\in [a,b]: f(c) = \\frac{1}{b-a}\\int_a^b f\\,dx.",
     },
   ],
 
   crossRefs: [
-    { lessonSlug: 'riemann-sums', label: 'Riemann Sums', context: 'The definite integral\'s properties (linearity, comparison) all follow from the limit-of-Riemann-sums definition established in Lesson 1.' },
-    { lessonSlug: 'fundamental-theorem', label: 'Fundamental Theorem of Calculus', context: 'Lesson 3 shows how to COMPUTE definite integrals efficiently using antiderivatives. The properties in this lesson remain the foundation for understanding what we are computing.' },
-    { lessonSlug: 'applications', label: 'Applications of Integration', context: 'Area between curves, net displacement, and average value — all developed in Lesson 5 — rely on the properties and signed-area interpretation built here.' },
+    {
+      lessonSlug: "riemann-sums",
+      label: "Riemann Sums",
+      context:
+        "The definite integral's properties (linearity, comparison) all follow from the limit-of-Riemann-sums definition established in Lesson 1.",
+    },
+    {
+      lessonSlug: "fundamental-theorem",
+      label: "Fundamental Theorem of Calculus",
+      context:
+        "Lesson 3 shows how to COMPUTE definite integrals efficiently using antiderivatives. The properties in this lesson remain the foundation for understanding what we are computing.",
+    },
+    {
+      lessonSlug: "applications",
+      label: "Applications of Integration",
+      context:
+        "Area between curves, net displacement, and average value — all developed in Lesson 5 — rely on the properties and signed-area interpretation built here.",
+    },
   ],
 
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'completed-example-3',
-    'completed-example-4',
-    'completed-example-5',
-    'completed-example-6',
-    'completed-example-7',
-    'attempted-challenge-medium-1',
-    'attempted-challenge-medium-2',
-    'attempted-challenge-hard',
+    "read-intuition",
+    "read-math",
+    "read-rigor",
+    "completed-example-1",
+    "completed-example-2",
+    "completed-example-3",
+    "completed-example-4",
+    "completed-example-5",
+    "completed-example-6",
+    "completed-example-7",
+    "attempted-challenge-medium-1",
+    "attempted-challenge-medium-2",
+    "attempted-challenge-hard",
   ],
 
   quiz: [
     {
-      id: 'def-int-q1',
-      type: 'input',
-      text: 'Use the property \\(\\int_a^a f(x)\\,dx = 0\\). Evaluate \\(\\int_3^3 (x^5 + \\sin x)\\,dx\\).',
-      answer: '0',
-      hints: ['Any integral with equal limits equals zero, regardless of the integrand.'],
-      reviewSection: 'Math — Properties of the definite integral',
-    },
-    {
-      id: 'def-int-q2',
-      type: 'choice',
-      text: 'Which property states \\(\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx\\)?',
-      options: [
-        'Linearity of the integral',
-        'Additivity over intervals',
-        'Reversal of limits',
-        'Comparison theorem',
+      id: "def-int-q1",
+      type: "input",
+      text: "Use the property \\(\\int_a^a f(x)\\,dx = 0\\). Evaluate \\(\\int_3^3 (x^5 + \\sin x)\\,dx\\).",
+      answer: "0",
+      hints: [
+        "Any integral with equal limits equals zero, regardless of the integrand.",
       ],
-      answer: 'Reversal of limits',
-      hints: ['Swapping the limits of integration changes the sign.'],
-      reviewSection: 'Math — Properties: reversal of limits',
+      reviewSection: "Math — Properties of the definite integral",
     },
     {
-      id: 'def-int-q3',
-      type: 'input',
-      text: 'Given \\(\\int_0^5 f(x)\\,dx = 10\\) and \\(\\int_0^5 g(x)\\,dx = 3\\), evaluate \\(\\int_0^5 [2f(x) - g(x)]\\,dx\\).',
-      answer: '17',
-      hints: ['Use linearity: \\(2\\int f - \\int g\\).', '= 2(10) − 3 = 17.'],
-      reviewSection: 'Math — Linearity',
-    },
-    {
-      id: 'def-int-q4',
-      type: 'input',
-      text: 'Given \\(\\int_0^5 f(x)\\,dx = 10\\) and \\(\\int_0^3 f(x)\\,dx = 4\\), find \\(\\int_3^5 f(x)\\,dx\\).',
-      answer: '6',
-      hints: ['Additivity: \\(\\int_0^5 = \\int_0^3 + \\int_3^5\\).', '10 = 4 + \\(\\int_3^5\\), so \\(\\int_3^5 = 6\\).'],
-      reviewSection: 'Math — Additivity over intervals',
-    },
-    {
-      id: 'def-int-q5',
-      type: 'choice',
-      text: 'If \\(f(x) \\leq g(x)\\) for all \\(x\\) in \\([a,b]\\), then which inequality holds?',
+      id: "def-int-q2",
+      type: "choice",
+      text: "Which property states \\(\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx\\)?",
       options: [
-        '\\(\\int_a^b f\\,dx \\geq \\int_a^b g\\,dx\\)',
-        '\\(\\int_a^b f\\,dx \\leq \\int_a^b g\\,dx\\)',
-        '\\(\\int_a^b f\\,dx = \\int_a^b g\\,dx\\)',
-        'No conclusion can be drawn',
+        "Linearity of the integral",
+        "Additivity over intervals",
+        "Reversal of limits",
+        "Comparison theorem",
       ],
-      answer: '\\(\\int_a^b f\\,dx \\leq \\int_a^b g\\,dx\\)',
-      hints: ['The comparison (monotonicity) property: larger integrand gives larger integral.'],
-      reviewSection: 'Math — Comparison theorem',
+      answer: "Reversal of limits",
+      hints: ["Swapping the limits of integration changes the sign."],
+      reviewSection: "Math — Properties: reversal of limits",
     },
     {
-      id: 'def-int-q6',
-      type: 'input',
-      text: 'Evaluate \\(\\int_0^4 3\\,dx\\) using the property \\(\\int_a^b c\\,dx = c(b-a)\\).',
-      answer: '12',
-      hints: ['c = 3, b − a = 4 − 0 = 4.'],
-      reviewSection: 'Math — Integral of a constant',
+      id: "def-int-q3",
+      type: "input",
+      text: "Given \\(\\int_0^5 f(x)\\,dx = 10\\) and \\(\\int_0^5 g(x)\\,dx = 3\\), evaluate \\(\\int_0^5 [2f(x) - g(x)]\\,dx\\).",
+      answer: "17",
+      hints: ["Use linearity: \\(2\\int f - \\int g\\).", "= 2(10) − 3 = 17."],
+      reviewSection: "Math — Linearity",
     },
     {
-      id: 'def-int-q7',
-      type: 'input',
-      text: 'Using geometry, evaluate \\(\\int_0^3 (1 + x)\\,dx\\). The region under \\(y = 1+x\\) on \\([0,3]\\) is a trapezoid.',
-      answer: '7.5',
-      hints: ['Trapezoid area = ½(f(0)+f(3)) × base = ½(1+4)×3 = 7.5.'],
-      reviewSection: 'Math — Geometric evaluation',
+      id: "def-int-q4",
+      type: "input",
+      text: "Given \\(\\int_0^5 f(x)\\,dx = 10\\) and \\(\\int_0^3 f(x)\\,dx = 4\\), find \\(\\int_3^5 f(x)\\,dx\\).",
+      answer: "6",
+      hints: [
+        "Additivity: \\(\\int_0^5 = \\int_0^3 + \\int_3^5\\).",
+        "10 = 4 + \\(\\int_3^5\\), so \\(\\int_3^5 = 6\\).",
+      ],
+      reviewSection: "Math — Additivity over intervals",
     },
     {
-      id: 'def-int-q8',
-      type: 'input',
-      text: 'Given \\(\\int_1^4 f(x)\\,dx = 7\\), evaluate \\(\\int_4^1 f(x)\\,dx\\).',
-      answer: '-7',
-      hints: ['Reversing limits negates the integral.'],
-      reviewSection: 'Math — Reversal of limits',
-    },
-    {
-      id: 'def-int-q9',
-      type: 'input',
-      text: 'Evaluate \\(\\int_0^5 f(x)\\,dx\\) if you know \\(\\int_0^2 f(x)\\,dx = 3\\), \\(\\int_2^4 f(x)\\,dx = 5\\), and \\(\\int_4^5 f(x)\\,dx = -1\\).',
-      answer: '7',
-      hints: ['Use additivity: total = 3 + 5 + (−1) = 7.'],
-      reviewSection: 'Math — Additivity over intervals',
-    },
-    {
-      id: 'def-int-q10',
-      type: 'choice',
-      text: 'Which of the following is the correct additivity property of definite integrals?',
+      id: "def-int-q5",
+      type: "choice",
+      text: "If \\(f(x) \\leq g(x)\\) for all \\(x\\) in \\([a,b]\\), then which inequality holds?",
       options: [
-        '\\(\\int_a^b f + \\int_a^b g = \\int_a^b (f+g)\\)',
-        '\\(\\int_a^b f = \\int_a^c f + \\int_b^c f\\)',
-        '\\(\\int_a^b f = \\int_a^c f + \\int_c^b f\\) for any \\(c\\)',
-        '\\(\\int_a^b f \\cdot g = \\int_a^b f \\cdot \\int_a^b g\\)',
+        "\\(\\int_a^b f\\,dx \\geq \\int_a^b g\\,dx\\)",
+        "\\(\\int_a^b f\\,dx \\leq \\int_a^b g\\,dx\\)",
+        "\\(\\int_a^b f\\,dx = \\int_a^b g\\,dx\\)",
+        "No conclusion can be drawn",
       ],
-      answer: '\\(\\int_a^b f = \\int_a^c f + \\int_c^b f\\) for any \\(c\\)',
-      hints: ['The interval can be split at any interior point c.'],
-      reviewSection: 'Math — Additivity over intervals',
+      answer: "\\(\\int_a^b f\\,dx \\leq \\int_a^b g\\,dx\\)",
+      hints: [
+        "The comparison (monotonicity) property: larger integrand gives larger integral.",
+      ],
+      reviewSection: "Math — Comparison theorem",
+    },
+    {
+      id: "def-int-q6",
+      type: "input",
+      text: "Evaluate \\(\\int_0^4 3\\,dx\\) using the property \\(\\int_a^b c\\,dx = c(b-a)\\).",
+      answer: "12",
+      hints: ["c = 3, b − a = 4 − 0 = 4."],
+      reviewSection: "Math — Integral of a constant",
+    },
+    {
+      id: "def-int-q7",
+      type: "input",
+      text: "Using geometry, evaluate \\(\\int_0^3 (1 + x)\\,dx\\). The region under \\(y = 1+x\\) on \\([0,3]\\) is a trapezoid.",
+      answer: "7.5",
+      hints: ["Trapezoid area = ½(f(0)+f(3)) × base = ½(1+4)×3 = 7.5."],
+      reviewSection: "Math — Geometric evaluation",
+    },
+    {
+      id: "def-int-q8",
+      type: "input",
+      text: "Given \\(\\int_1^4 f(x)\\,dx = 7\\), evaluate \\(\\int_4^1 f(x)\\,dx\\).",
+      answer: "-7",
+      hints: ["Reversing limits negates the integral."],
+      reviewSection: "Math — Reversal of limits",
+    },
+    {
+      id: "def-int-q9",
+      type: "input",
+      text: "Evaluate \\(\\int_0^5 f(x)\\,dx\\) if you know \\(\\int_0^2 f(x)\\,dx = 3\\), \\(\\int_2^4 f(x)\\,dx = 5\\), and \\(\\int_4^5 f(x)\\,dx = -1\\).",
+      answer: "7",
+      hints: ["Use additivity: total = 3 + 5 + (−1) = 7."],
+      reviewSection: "Math — Additivity over intervals",
+    },
+    {
+      id: "def-int-q10",
+      type: "choice",
+      text: "Which of the following is the correct additivity property of definite integrals?",
+      options: [
+        "\\(\\int_a^b f + \\int_a^b g = \\int_a^b (f+g)\\)",
+        "\\(\\int_a^b f = \\int_a^c f + \\int_b^c f\\)",
+        "\\(\\int_a^b f = \\int_a^c f + \\int_c^b f\\) for any \\(c\\)",
+        "\\(\\int_a^b f \\cdot g = \\int_a^b f \\cdot \\int_a^b g\\)",
+      ],
+      answer: "\\(\\int_a^b f = \\int_a^c f + \\int_c^b f\\) for any \\(c\\)",
+      hints: ["The interval can be split at any interior point c."],
+      reviewSection: "Math — Additivity over intervals",
     },
   ],
-}
+
+  discovery: {
+    title:
+      "How to Find Exact Area Under a Curve: From Approximation to the Limit",
+    persona:
+      "I'm a land surveyor in ancient times. I need to measure the area of an irregular field bounded by a curved fence on one side. I can measure rectangles easily, but the curve makes it impossible to use a simple formula. Can I approximate the area? And is there a way to get the exact value?",
+    steps: [
+      {
+        phase: "need",
+        title:
+          "The problem: irregular boundaries can't be measured with one formula",
+        content: `I have a field bounded by:
+- Left: a straight edge at x = 0
+- Right: a straight edge at x = 2
+- Bottom: the x-axis
+- Top: a curved fence that follows $y = x$
+
+The shape is a curved triangle. I can measure trapezoids and rectangles easily, but this curved boundary defeats simple formulas.
+
+**The question:** What is the exact area?`,
+      },
+      {
+        phase: "need",
+        title: "Approximation 1: Use two rectangles",
+        content: `If I divide the field from x = 0 to x = 2 into two equal sections, each of width 1:
+
+**Left rectangles (underestimate):**
+- Interval [0, 1]: height = f(0) = 0, area = 0 × 1 = 0
+- Interval [1, 2]: height = f(1) = 1, area = 1 × 1 = 1
+- Total: 0 + 1 = 1
+
+**Right rectangles (overestimate):**
+- Interval [0, 1]: height = f(1) = 1, area = 1 × 1 = 1
+- Interval [1, 2]: height = f(2) = 2, area = 2 × 1 = 2
+- Total: 1 + 2 = 3
+
+So the true area is **between 1 and 3**.
+
+But that's a huge range! I need a better approximation.`,
+      },
+      {
+        phase: "need",
+        title: "Approximation 2: Use four rectangles for better accuracy",
+        content: `Now I divide into four equal sections, each of width 0.5:
+
+**Left rectangles:**
+- [0, 0.5]: height = 0, area = 0
+- [0.5, 1]: height = 0.5, area = 0.5 × 0.5 = 0.25
+- [1, 1.5]: height = 1, area = 1 × 0.5 = 0.5
+- [1.5, 2]: height = 1.5, area = 1.5 × 0.5 = 0.75
+- Total: 0 + 0.25 + 0.5 + 0.75 = 1.5
+
+**Right rectangles:**
+- [0, 0.5]: height = 0.5, area = 0.25
+- [0.5, 1]: height = 1, area = 0.5
+- [1, 1.5]: height = 1.5, area = 0.75
+- [1.5, 2]: height = 2, area = 1
+- Total: 0.25 + 0.5 + 0.75 + 1 = 2.5
+
+Now: **1.5 < area < 2.5**
+
+Better, but still uncertain. The left estimate was 1.5, the right was 2.5. Average: 1.75.`,
+      },
+      {
+        phase: "discovery",
+        title: "Build a table: see the pattern as n increases",
+        content: `Let me compute with more and more rectangles. Let n = number of rectangles, and let $L_n$ = left rectangle sum, $R_n$ = right rectangle sum.
+
+| n | Width | $L_n$ | $R_n$ | Average |
+|---|---|---|---|---|
+| 1 | 2.0 | 0 | 4 | 2.0 |
+| 2 | 1.0 | 1 | 3 | 2.0 |
+| 4 | 0.5 | 1.5 | 2.5 | 2.0 |
+| 8 | 0.25 | 1.75 | 2.25 | 2.0 |
+| 16 | 0.125 | 1.875 | 2.125 | 2.0 |
+| 100 | 0.02 | 1.98 | 2.02 | 2.0 |
+| 1000 | 0.002 | 1.998 | 2.002 | 2.0 |
+
+**The pattern is unmistakable:** As n increases, both $L_n$ and $R_n$ are converging to **2.0**.
+
+Between the under- and over-estimates, the true area appears to be exactly **2**.
+
+But I'm using rectangles—they have straight edges, not curves. The rectangles leave gaps or overhang. As n → ∞, these gaps shrink to nothing, and both approximations converge to the same value.`,
+      },
+      {
+        phase: "discovery",
+        title: "Discover what the limit actually is",
+        content: `What is special about the number 2?
+
+For $y = x$ on [0, 2], the region is actually a triangle with:
+- Base = 2
+- Height = f(2) = 2
+- Area = ½ × base × height = ½ × 2 × 2 = **2**
+
+So the limiting value of the rectangle sums equals the geometric area of the triangle!
+
+This is not a coincidence. As I use more and more rectangles:
+- Left rectangles approach from below
+- Right rectangles approach from above
+- Both converge to the same limit
+- That limit **is** the true area
+
+**The discovery:** The exact area under the curve equals the limit of rectangle sums:
+
+$$\\text{Area} = \\lim_{n \\to \\infty} \\text{(sum of n rectangles)}$$
+
+This is the **definite integral**.`,
+      },
+      {
+        phase: "formalization",
+        title: "Define the Riemann sum and the definite integral",
+        content: `The formal setup: divide [a, b] into n equal subintervals of width $\\Delta x = \\frac{b-a}{n}$.
+
+In each subinterval $[x_{i-1}, x_i]$, choose a point $x_i^*$ and form a rectangle of height $f(x_i^*)$.
+
+The **Riemann sum** is:
+
+$$R_n = \\sum_{i=1}^{n} f(x_i^*) \\Delta x$$
+
+This is the total area of all n rectangles.
+
+**The actual area** is the limit as rectangles become infinitely thin:
+
+$$\\int_a^b f(x)\\,dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(x_i^*) \\Delta x$$
+
+This limit is called the **definite integral** of f from a to b.
+
+**Key insight:** The integral exists if this limit is **the same value regardless of which points $x_i^*$ you choose in each subinterval**. For continuous functions (and many others), this is guaranteed.`,
+      },
+    ],
+    resolution: `**The definite integral emerges from the limit of approximations:**
+
+$$\\int_a^b f(x)\\,dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(x_i^*) \\Delta x$$
+
+**The pathway:**
+1. Start with a concrete problem: find exact area
+2. Approximate with rectangles (imperfect, but computable)
+3. Use more rectangles to get better approximations
+4. Observe convergence: the approximations stabilize
+5. Recognize that they converge to a single limit
+6. Define that limit to be the definite integral
+
+**Why this matters:** The definite integral is not just "area" — it's the precise mathematical answer to "what value does this accumulation process converge to?" For motion, accumulation is displacement. For density, accumulation is total mass. For probability, accumulation is likelihood. The definite integral is the universal language of accumulation.`,
+  },
+
+  story: {
+    title: "The Problem That Predates Calculus: From Archimedes to Riemann",
+    subtitle:
+      "How mathematicians solved the impossible problem of finding exact areas under curves, centuries before Newton and Leibniz invented the methods we use.",
+    acts: [
+      {
+        label: "Act I",
+        title: "The Impossible Question (Ancient Greece)",
+        content: `It is 250 BC. You are a Greek mathematician in Syracuse, Sicily. Your name is Archimedes.
+
+The problem obsesses you: **how do you find the exact area of a curved region?**
+
+You can find the area of any polygon — triangle, rectangle, hexagon — using formulas. But curves defeat you. The circle is the worst: you can inscribe and circumscribe polygons, and their areas bound the circle's area, but you never reach it exactly.
+
+No formula works for curves.
+
+You spend years on this. You fill scroll after scroll with geometry. You develop a technique you call the **Method of Exhaustion**:
+
+1. Inscribe a polygon inside the curve (under-approximation)
+2. Circumscribe a polygon outside the curve (over-approximation)
+3. Increase the number of sides until the two polygons collapse to the same area
+
+When the inscribed and circumscribed shapes have exactly the same area, the curved region must have that same area too. The curved region is "exhausted" — there's no room left between the approximations.
+
+This method is brilliant but laborious. Archimedes proves that the area of a circle is πr². But each proof takes dozens of pages of careful geometry. There is no general method — each problem requires new ingenuity.
+
+**The fundamental question remains unanswered:** Is there a systematic way to handle all curves — not just circles?`,
+      },
+      {
+        label: "Act II",
+        title: "The Reawakening (1600s)",
+        content: `1635: Bonaventura Cavalieri has an audacious idea. He imagines a region as composed of infinitely many parallel lines stacked atop each other — "indivisibles."
+
+By comparing the indivisibles of two regions, he can show they have equal areas without computing either area directly. This is revolutionary thinking but logically vague. **What exactly is an indivisible?** A thin sliver? A line with thickness? His method works but feels suspicious to rigorous thinkers.
+
+Still, the seed is planted: perhaps areas can be found by ... *thinking about infinity*. Summing infinitely many infinitesimal pieces.
+
+1670: Isaac Newton reads Cavalieri. He is inspired.
+
+Newton realizes that if you can find a function $F$ such that $F'(x) = f(x)$, then the area under $f$ is $F(b) - F(a)$.
+
+This is magic. From the derivative, you can retrieve the area. The area problem and the rate-of-change problem are inverses of each other.
+
+But Newton doesn't publish. He keeps his methods private, working in the plague years of Cambridge.
+
+1686: Gottfried Leibniz publishes his calculus. He introduces the integral sign ∫ (an elongated S for "sum"), and states the Fundamental Theorem of Calculus.
+
+The world finally has a systematic method for finding areas.
+
+But there is a gap in the logic: **the definitions are vague. No one has rigorously defined what "infinitely many infinitesimal pieces" actually means.** The answer works, but the mathematical foundation is shaky.`,
+      },
+      {
+        label: "Act III",
+        title: "The Rigorization (1850s - 1890s)",
+        content: `Two hundred years pass. Calculus is applied everywhere — physics, engineering, astronomy — and it works. But mathematicians are growing uncomfortable.
+
+**Cauchy, Bolzano, Weierstrass, and Riemann are asking: can we make this rigorous without infinitesimals?**
+
+Bernhard Riemann attacks the problem head-on. In 1854, he defines the integral precisely using finite mathematics:
+
+1. Divide [a, b] into n subintervals of width $\\Delta x = \\frac{b-a}{n}$.
+2. In each subinterval, form a rectangle of height $f(x_i^*)$ for any chosen point $x_i^*$.
+3. Sum all rectangles: $\\sum f(x_i^*) \\Delta x$.
+4. As $n \\to \\infty$, if this sum converges to a single value (regardless of which points $x_i^*$ you choose), that value is the definite integral.
+
+No infinitesimals. No vague talk about "indivisibles." Just the rigorous limit of a finite process.
+
+**The Riemann integral is born.** It makes precise what physicists and engineers have been using intuitively for two centuries.
+
+For the first time in mathematical history, "area under a curve" has a completely rigorous definition.`,
+      },
+      {
+        label: "Act IV",
+        title: "From Intuition to Formalism",
+        content: `What Riemann gave us is this: the definite integral is not a mystical object. It is simply **the limit of Riemann sums**.
+
+For $y = x$ on [0, 2]:
+
+$$\\int_0^2 x\\,dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} x_i^* \\Delta x$$
+
+where $\\Delta x = \\frac{2}{n}$ and $x_i^*$ is any point in the $i$-th subinterval.
+
+The limit exists. The value is 2. This is the definite integral — no handwaving, no infinity, just limits and sums.
+
+The power: because the limit is the same **regardless of which points** $x_i^*$ you choose in each interval, you have freedom. You can choose left endpoints, right endpoints, midpoints, or any other points. The limit always converges to the same value.
+
+And through the Fundamental Theorem, you can compute this limit without doing the limit at all: find an antiderivative $F$ and compute $F(b) - F(a)$.
+
+**The ancient dream is finally realized:** a systematic, rigorous method for finding exact areas.`,
+      },
+      {
+        label: "Act V",
+        title: "Why This Matters Today",
+        content: `Riemann's definition looks simple now, but it was revolutionary. It transformed calculus from a powerful tool with hidden doubts into a rigorous mathematical framework.
+
+Today, when physicists compute the displacement of a moving particle, they use:
+
+$$\\text{displacement} = \\int_0^{10} v(t)\\,dt = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} v(t_i^*) \\Delta t$$
+
+When engineers calculate the center of mass of an irregular object, they use integrals.
+
+When statisticians compute probabilities, they integrate probability density functions.
+
+Every time, beneath the surface, is Riemann's limit of sums. We don't usually compute it that way (antiderivatives are faster), but the conceptual foundation is Riemann's definition.
+
+**The lesson:** Sometimes the shortest path is not the simplest. Archimedes exhausted geometry for two millennia. Newton and Leibniz invented powerful rules. But only when Riemann went back to basics — defining the integral as a limit of sums — did the true foundation emerge.
+
+The deepest mathematics often comes from asking: "What do I really mean by this?" and answering with absolute precision.`,
+      },
+    ],
+    resolution: `**The definite integral journeyed from intuition to rigor:**
+
+- **Ancient times:** Archimedes uses the Method of Exhaustion — ingenious but case-by-case
+- **1600s:** Cavalieri and Newton glimpse infinitesimals; Leibniz publishes calculus
+- **1850s:** Riemann defines the integral rigorously using limits of sums
+- **Today:** Every application of integration rests on Riemann's foundation
+
+**The transforming insight:** The definite integral is not a magic tool or a theoretical abstraction. It is simply **the limit that Riemann sums converge to as rectangles become infinitely thin.**
+
+This definition serves as the foundation for:
+- Physics (displacement, work, flux)
+- Probability (cumulative distribution functions)
+- Engineering (center of mass, moment of inertia)
+- Economics (consumer surplus, total revenue)
+- Statistics (expected values, confidence intervals)
+
+By understanding where this definition came from — from the solving of an ancient problem using modern rigor — you understand that mathematics is not handed down from the gods. It is built, refined, and perfected by humans asking better and better questions.`,
+  },
+};
