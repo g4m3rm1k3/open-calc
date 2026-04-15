@@ -37,6 +37,12 @@ const VIZ_REGISTRY = {
   AntiderivativeFamilyViz: lazy(
     () => import("./d3/AntiderivativeFamilyViz.jsx"),
   ),
+  AntiderivativeDefinitionLesson: lazy(
+    () => import("./d3/AntiderivativeDefinitionLesson.jsx"),
+  ),
+  ConstantDifferenceTheoremLesson: lazy(
+    () => import("./d3/ConstantDifferenceTheoremLesson.jsx"),
+  ),
   PowerRuleDerivationViz: lazy(() => import("./d3/PowerRuleDerivationViz.jsx")),
   CompositionVisualization: lazy(
     () => import("./d3/CompositionVisualization.jsx"),

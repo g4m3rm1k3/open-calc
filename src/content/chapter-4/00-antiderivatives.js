@@ -128,16 +128,16 @@ export default {
     ],
     visualizations: [
       {
-        id: "AntiderivativeFamilyViz",
-        title: "Reverse Engineering: From Rate to Function",
+        id: "AntiderivativeDefinitionLesson",
+        title: "What is an Antiderivative?",
         caption:
-          "Interactive lesson showing how antiderivatives work backwards from derivatives. Given a rate of change (the derivative), find the original function that was changing at that rate. Explore multiple examples and see how every derivative rule can be read backwards to give an antiderivative rule.",
+          "Complete lesson explaining the fundamental relationship between functions and their rates of change. Learn why antidifferentiation is differentiation read backwards, and understand the precise mathematical definition.",
       },
       {
-        id: "PowerRuleDerivationViz",
+        id: "ConstantDifferenceTheoremLesson",
         title: "Why Antiderivatives Differ by Constants",
         caption:
-          "Mathematical proof that any two antiderivatives of the same function differ by a constant. Explore different functions and see the theorem in action — the foundation of the +C in ∫f(x) dx = F(x) + C. Includes slope field visualization to show why functions with the same derivative can only differ vertically.",
+          "Comprehensive explanation of why +C is mathematically necessary. Includes the formal proof, geometric intuition, and examples showing how functions with the same derivative can only differ by vertical shifts.",
       },
     ],
   },

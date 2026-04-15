@@ -1,534 +1,684 @@
 // FILE: src/content/chapter-2/00-tangent-problem.js
 export default {
-  id: 'ch2-000',
-  slug: 'tangent-problem',
+  id: "ch2-000",
+  slug: "tangent-problem",
   chapter: 2,
   order: 1,
-  title: 'The Derivative — From Average to Instantaneous Change',
-  subtitle: 'How a single limiting process unlocks the instantaneous rate of change of any function',
-  tags: ['derivative', 'limit definition', 'difference quotient', 'tangent line', 'instantaneous rate of change', 'differentiability', 'notation'],
+  title: "The Derivative — From Average to Instantaneous Change",
+  subtitle:
+    "How a single limiting process unlocks the instantaneous rate of change of any function",
+  tags: [
+    "derivative",
+    "limit definition",
+    "difference quotient",
+    "tangent line",
+    "instantaneous rate of change",
+    "differentiability",
+    "notation",
+  ],
 
   // ─── Semantic Layer ───────────────────────────────────────────────
   semantics: {
     core: [
-      { symbol: 'h', meaning: 'the width of the interval, the probe distance (h \u2260 0 in the limit)' },
-      { symbol: 'f(x+h) - f(x)', meaning: 'the change in output when input shifts by h (the "rise")' },
-      { symbol: 'h', meaning: 'the change in input (the "run")' },
-      { symbol: '[f(x+h)-f(x)]/h', meaning: 'the difference quotient — slope of the secant line' },
-      { symbol: 'f\'(x)', meaning: 'the derivative — slope of the tangent line at x (the limit of the quotient)' },
-      { symbol: 'dy/dx', meaning: 'Leibniz notation for the derivative (not a fraction, but behaves like one)' },
+      {
+        symbol: "h",
+        meaning:
+          "the width of the interval, the probe distance (h \u2260 0 in the limit)",
+      },
+      {
+        symbol: "f(x+h) - f(x)",
+        meaning: 'the change in output when input shifts by h (the "rise")',
+      },
+      { symbol: "h", meaning: 'the change in input (the "run")' },
+      {
+        symbol: "[f(x+h)-f(x)]/h",
+        meaning: "the difference quotient — slope of the secant line",
+      },
+      {
+        symbol: "f'(x)",
+        meaning:
+          "the derivative — slope of the tangent line at x (the limit of the quotient)",
+      },
+      {
+        symbol: "dy/dx",
+        meaning:
+          "Leibniz notation for the derivative (not a fraction, but behaves like one)",
+      },
     ],
     rulesOfThumb: [
-      'The difference quotient is average rate of change. The derivative is instantaneous rate of change.',
-      '0/0 in the difference quotient is the SAME indeterminate form from Chapter 1. The algebra is the same: factor, cancel, then substitute.',
-      'The derivative is a NEW function, not just a number. At each x, it tells you the slope of the original at that x.',
-      'Differentiable always implies continuous. Continuous does NOT always imply differentiable (corners, cusps).',
-    ]
+      "The difference quotient is average rate of change. The derivative is instantaneous rate of change.",
+      "0/0 in the difference quotient is the SAME indeterminate form from Chapter 1. The algebra is the same: factor, cancel, then substitute.",
+      "The derivative is a NEW function, not just a number. At each x, it tells you the slope of the original at that x.",
+      "Differentiable always implies continuous. Continuous does NOT always imply differentiable (corners, cusps).",
+    ],
   },
 
   grapher: {
-    mode: 'pro',
-    label: 'Explore the Derivative',
+    mode: "pro",
+    label: "Explore the Derivative",
     functions: [
-      { expr: 'x^2', type: 'explicit', color: '#6366f1', label: 'f(x) = x²' },
-      { expr: '2*x', type: 'explicit', color: '#ec4899', label: "f'(x) = 2x" },
+      { expr: "x^2", type: "explicit", color: "#6366f1", label: "f(x) = x²" },
+      { expr: "2*x", type: "explicit", color: "#ec4899", label: "f'(x) = 2x" },
     ],
-    sliders: [
-      { name: 'a', min: -3, max: 3, value: 1 },
-    ],
+    sliders: [{ name: "a", min: -3, max: 3, value: 1 }],
     replace: true,
   },
 
-
   hook: {
-    question: 'Your GPS app tells you that your current speed is 62 mph. But speed is distance divided by time — if the measurement takes zero time, you travel zero distance. Zero divided by zero is undefined. So how can your speed be anything at all at a single instant?',
-    realWorldContext: 'Every speedometer, every radar gun, every GPS velocity readout faces this paradox. We want to know how fast something is changing right now, not averaged over an interval. Yet the very formula for rate of change — distance over time — seems to require an interval of nonzero length. The derivative is the mathematical resolution of this paradox. It is the tool that makes instantaneous change not only meaningful but computable, and it is arguably the central idea of all of calculus.',
-    previewVisualizationId: 'SecantToTangent',
+    question:
+      "Your GPS app tells you that your current speed is 62 mph. But speed is distance divided by time — if the measurement takes zero time, you travel zero distance. Zero divided by zero is undefined. So how can your speed be anything at all at a single instant?",
+    realWorldContext:
+      "Every speedometer, every radar gun, every GPS velocity readout faces this paradox. We want to know how fast something is changing right now, not averaged over an interval. Yet the very formula for rate of change — distance over time — seems to require an interval of nonzero length. The derivative is the mathematical resolution of this paradox. It is the tool that makes instantaneous change not only meaningful but computable, and it is arguably the central idea of all of calculus.",
+    previewVisualizationId: "SecantToTangent",
   },
 
   intuition: {
     prose: [
-      '**Let\'s place you exactly where you are in the course.** In Chapter 0, you learned that the slope of a line between two points is \u0394y/\u0394x. In Chapter 1, you learned that a limit is what a function approaches as its input gets close to a value. Both of those ideas were preparation for this exact moment. The derivative IS the limit of the slope formula. That’s it. The difference quotient [f(x+h) - f(x)] / h is \u0394y/\u0394x with \u0394x = h. The derivative is what that ratio approaches as h \u2192 0. You already know both halves — this lesson puts them together.',
+      "**Let's place you exactly where you are in the course.** In Chapter 0, you learned that the slope of a line between two points is \u0394y/\u0394x. In Chapter 1, you learned that a limit is what a function approaches as its input gets close to a value. Both of those ideas were preparation for this exact moment. The derivative IS the limit of the slope formula. That’s it. The difference quotient [f(x+h) - f(x)] / h is \u0394y/\u0394x with \u0394x = h. The derivative is what that ratio approaches as h \u2192 0. You already know both halves — this lesson puts them together.",
 
-      'Start with something we already understand: average rate of change. If you drive 120 miles in 2 hours, your average speed is 60 mph. If a population grows from 1,000 to 1,500 individuals over 5 years, the average growth rate is 100 individuals per year. In each case, we compute (change in output) divided by (change in input). This is the slope of the line connecting two points on the graph — called a secant line.',
-      'Formally, the average rate of change of a function f over the interval from x = a to x = a + h is the slope of the secant line through the points (a, f(a)) and (a+h, f(a+h)). We write this as [f(a+h) - f(a)] / h. This expression has a name: the difference quotient. It is the single most important formula in differential calculus.',
-      'Now ask: what happens as h gets smaller and smaller? The second point (a+h, f(a+h)) slides along the curve toward (a, f(a)). The secant line that once crossed the curve at two distinct points begins to rotate. In the limit, as h approaches 0, the secant line approaches a unique limiting position — the tangent line. The slope of that tangent line is the derivative.',
-      'Here is why we cannot simply plug in h = 0 directly. At h = 0, the difference quotient becomes [f(a) - f(a)] / 0 = 0/0, which is the indeterminate form from Chapter 1. This is not a number — it is a failure of division. But taking the LIMIT as h approaches 0 is something entirely different from evaluating AT h = 0. The limit asks: what value does the expression approach as h gets arbitrarily close to 0? That question has a perfectly well-defined, finite answer for most functions.',
-      'Think about what the difference quotient measures geometrically. The numerator f(a+h) - f(a) is the vertical rise from one point to the other. The denominator h is the horizontal run. So the ratio is rise over run — the slope of the secant line. As h shrinks, the two points get closer and closer together, but the slope of the line between them settles into a limiting value. That limiting slope is the derivative.',
-      'The derivative tells us two things simultaneously, and they are really the same thing: (1) it is the slope of the curve at the point x = a, meaning the slope of the tangent line to the graph there, and (2) it is the instantaneous rate of change of the function at x = a. If f(t) is position, the derivative is instantaneous velocity. If f(x) is a population, the derivative is the instantaneous growth rate. If f(x) is profit as a function of units sold, the derivative is marginal profit.',
-      'Mathematicians have invented several notations for the derivative, each with its own strengths. If y = f(x), then the derivative can be written as f\'(x) (read "f prime of x", due to Lagrange), or as dy/dx (Leibniz notation, emphasizing the ratio of infinitesimal changes), or as d/dx[f(x)] (operator notation), or as Df(x) (operator notation due to Euler), or even as y\u0307 (Newton\'s dot notation, used in physics for time derivatives). All of these mean exactly the same thing: the limit of the difference quotient. Leibniz notation dy/dx is especially useful when doing related rates and chain rule problems, because it behaves somewhat like a fraction (though it is not exactly one). Lagrange notation f\'(x) is compact and convenient for most algebraic work.',
+      "Start with something we already understand: average rate of change. If you drive 120 miles in 2 hours, your average speed is 60 mph. If a population grows from 1,000 to 1,500 individuals over 5 years, the average growth rate is 100 individuals per year. In each case, we compute (change in output) divided by (change in input). This is the slope of the line connecting two points on the graph — called a secant line.",
+      "Formally, the average rate of change of a function f over the interval from x = a to x = a + h is the slope of the secant line through the points (a, f(a)) and (a+h, f(a+h)). We write this as [f(a+h) - f(a)] / h. This expression has a name: the difference quotient. It is the single most important formula in differential calculus.",
+      "Now ask: what happens as h gets smaller and smaller? The second point (a+h, f(a+h)) slides along the curve toward (a, f(a)). The secant line that once crossed the curve at two distinct points begins to rotate. In the limit, as h approaches 0, the secant line approaches a unique limiting position — the tangent line. The slope of that tangent line is the derivative.",
+      "Here is why we cannot simply plug in h = 0 directly. At h = 0, the difference quotient becomes [f(a) - f(a)] / 0 = 0/0, which is the indeterminate form from Chapter 1. This is not a number — it is a failure of division. But taking the LIMIT as h approaches 0 is something entirely different from evaluating AT h = 0. The limit asks: what value does the expression approach as h gets arbitrarily close to 0? That question has a perfectly well-defined, finite answer for most functions.",
+      "Think about what the difference quotient measures geometrically. The numerator f(a+h) - f(a) is the vertical rise from one point to the other. The denominator h is the horizontal run. So the ratio is rise over run — the slope of the secant line. As h shrinks, the two points get closer and closer together, but the slope of the line between them settles into a limiting value. That limiting slope is the derivative.",
+      "The derivative tells us two things simultaneously, and they are really the same thing: (1) it is the slope of the curve at the point x = a, meaning the slope of the tangent line to the graph there, and (2) it is the instantaneous rate of change of the function at x = a. If f(t) is position, the derivative is instantaneous velocity. If f(x) is a population, the derivative is the instantaneous growth rate. If f(x) is profit as a function of units sold, the derivative is marginal profit.",
+      "Mathematicians have invented several notations for the derivative, each with its own strengths. If y = f(x), then the derivative can be written as f'(x) (read \"f prime of x\", due to Lagrange), or as dy/dx (Leibniz notation, emphasizing the ratio of infinitesimal changes), or as d/dx[f(x)] (operator notation), or as Df(x) (operator notation due to Euler), or even as y\u0307 (Newton's dot notation, used in physics for time derivatives). All of these mean exactly the same thing: the limit of the difference quotient. Leibniz notation dy/dx is especially useful when doing related rates and chain rule problems, because it behaves somewhat like a fraction (though it is not exactly one). Lagrange notation f'(x) is compact and convenient for most algebraic work.",
 
-      '**Where this is heading:** You now have the definition of the derivative and you can compute it for simple functions using the limit process. But computing (x+h)^100 - x^100 from scratch every time would be unbearable. The next lesson gives you the shortcut rules — proved from limits once, then used freely. After that, every derivative you compute will take seconds instead of pages.',
+      "**Where this is heading:** You now have the definition of the derivative and you can compute it for simple functions using the limit process. But computing (x+h)^100 - x^100 from scratch every time would be unbearable. The next lesson gives you the shortcut rules — proved from limits once, then used freely. After that, every derivative you compute will take seconds instead of pages.",
 
       'Not every function has a derivative everywhere, and it is important to understand exactly when and why the derivative fails. There are three geometric failure modes for a continuous function. A corner is a point where the left-hand and right-hand difference quotients both converge but to different values — the classic example is f(x) = |x| at x = 0, where the left limit gives -1 and the right limit gives +1. A cusp is sharper than a corner: one or both one-sided difference quotients blow up to infinity, giving the graph a pointed tip — f(x) = x^(2/3) at x = 0 is the textbook example, where the tangent line would be vertical. A vertical tangent is a subtler case: the slope grows without bound in the same direction from both sides, so the "tangent line" would be a vertical line, which has undefined slope — f(x) = x^(1/3) at x = 0 exhibits this. In all three cases, the function is continuous but the limit of the difference quotient fails to be a finite real number, so f\'(a) does not exist.',
 
-      'There is a profound and one-directional relationship between differentiability and continuity: differentiability always implies continuity, but continuity does NOT always imply differentiability. The proof that differentiability implies continuity is short: write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). As x approaches a, the first factor approaches f\'(a) (a finite number, since f is differentiable), and the second factor approaches 0. Their product approaches f\'(a) times 0 = 0, so f(x) approaches f(a), which is exactly the definition of continuity. The converse fails because continuity only requires that the function has no jumps or holes — it says nothing about whether the graph has a well-defined direction (slope) at each point. The absolute value function |x| is the standard counterexample: perfectly continuous on all of R, but non-differentiable at x = 0 because of the corner.',
+      "There is a profound and one-directional relationship between differentiability and continuity: differentiability always implies continuity, but continuity does NOT always imply differentiability. The proof that differentiability implies continuity is short: write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). As x approaches a, the first factor approaches f'(a) (a finite number, since f is differentiable), and the second factor approaches 0. Their product approaches f'(a) times 0 = 0, so f(x) approaches f(a), which is exactly the definition of continuity. The converse fails because continuity only requires that the function has no jumps or holes — it says nothing about whether the graph has a well-defined direction (slope) at each point. The absolute value function |x| is the standard counterexample: perfectly continuous on all of R, but non-differentiable at x = 0 because of the corner.",
 
-      'A practical checklist for differentiability: before computing a derivative, ask three questions. (1) Is the function continuous at the point? If not, it cannot be differentiable. (2) Is there a corner, cusp, or vertical tangent? If so, the derivative does not exist there. (3) Is the function defined by cases (piecewise)? At the boundary between pieces, you must check that the one-sided derivatives match. Only if all three checks pass can you proceed to compute the derivative using the limit definition or the shortcut rules.',
+      "A practical checklist for differentiability: before computing a derivative, ask three questions. (1) Is the function continuous at the point? If not, it cannot be differentiable. (2) Is there a corner, cusp, or vertical tangent? If so, the derivative does not exist there. (3) Is the function defined by cases (piecewise)? At the boundary between pieces, you must check that the one-sided derivatives match. Only if all three checks pass can you proceed to compute the derivative using the limit definition or the shortcut rules.",
     ],
     callouts: [
       {
-        type: 'sequencing',
-        title: 'Lesson 2 of 10 — Act 1: The Question',
-        body: '**Previous:** Lesson 1 introduced the four perspectives on the derivative (geometric, physical, algebraic, computational) and the chapter roadmap.\n**This lesson:** We build the derivative rigorously from limits — the difference quotient made precise.\n**Next:** Lesson 3 gives you the shortcut rules (power, product, quotient) so you never have to grind through limits again.',
+        type: "sequencing",
+        title: "Lesson 2 of 10 — Act 1: The Question",
+        body: "**Previous:** Lesson 1 introduced the four perspectives on the derivative (geometric, physical, algebraic, computational) and the chapter roadmap.\n**This lesson:** We build the derivative rigorously from limits — the difference quotient made precise.\n**Next:** Lesson 3 gives you the shortcut rules (power, product, quotient) so you never have to grind through limits again.",
       },
       {
-        type: 'prior-knowledge',
-        title: 'You may have computed average speed before',
-        body: 'Average speed = Δposition / Δtime = (x(t+h) - x(t)) / h. This is exactly the difference quotient! The derivative is what you get when you take h → 0, turning average speed into instantaneous speed. Your speedometer computes a limit thousands of times per second.',
+        type: "prior-knowledge",
+        title: "You may have computed average speed before",
+        body: "Average speed = Δposition / Δtime = (x(t+h) - x(t)) / h. This is exactly the difference quotient! The derivative is what you get when you take h → 0, turning average speed into instantaneous speed. Your speedometer computes a limit thousands of times per second.",
       },
       {
-        type: 'real-world',
-        title: 'Three interpretations of the same derivative',
-        body: 'If s(t) is position: s′(t) is velocity (instantaneous speed). If C(x) is cost of producing x units: C′(x) is marginal cost (cost of one more unit). If P(t) is population: P′(t) is the growth rate (people per year at that moment). Same math, three different worlds.',
+        type: "real-world",
+        title: "Three interpretations of the same derivative",
+        body: "If s(t) is position: s′(t) is velocity (instantaneous speed). If C(x) is cost of producing x units: C′(x) is marginal cost (cost of one more unit). If P(t) is population: P′(t) is the growth rate (people per year at that moment). Same math, three different worlds.",
       },
       {
-        type: 'definition',
-        title: 'The Difference Quotient',
-        body: '\\dfrac{f(a+h) - f(a)}{h}',
+        type: "definition",
+        title: "The Difference Quotient",
+        body: "\\dfrac{f(a+h) - f(a)}{h}",
       },
       {
-        type: 'intuition',
-        title: 'The Core Idea',
-        body: 'The derivative is NOT the difference quotient. The derivative is the LIMIT of the difference quotient as h → 0. The difference quotient is the slope of a secant line; the derivative is the slope of the tangent line.',
+        type: "intuition",
+        title: "The Core Idea",
+        body: "The derivative is NOT the difference quotient. The derivative is the LIMIT of the difference quotient as h → 0. The difference quotient is the slope of a secant line; the derivative is the slope of the tangent line.",
       },
       {
-        type: 'definition',
-        title: 'Five Equivalent Notations',
+        type: "definition",
+        title: "Five Equivalent Notations",
         body: "f'(x) = \\frac{dy}{dx} = \\frac{d}{dx}[f(x)] = Df(x) = \\dot{y}",
       },
       {
-        type: 'misconception',
-        title: 'dy/dx is NOT a Fraction',
+        type: "misconception",
+        title: "dy/dx is NOT a Fraction",
         body: "Leibniz notation dy/dx LOOKS like a fraction and often BEHAVES like one (especially in the chain rule), but it is defined as a LIMIT, not a ratio. You cannot, in general, 'cancel' the dx. The notation is brilliantly suggestive, but it is notation — not algebra.",
       },
       {
-        type: 'history',
-        title: 'Newton vs. Leibniz: The Calculus Priority Dispute',
+        type: "history",
+        title: "Newton vs. Leibniz: The Calculus Priority Dispute",
         body: "Newton developed calculus in the 1660s using 'fluxions' (rates of change). Leibniz independently developed it in the 1670s-80s using infinitesimals. The resulting priority dispute was one of the bitterest in the history of science. Today, we use Leibniz's notation (dy/dx) because it is more versatile, but Newton's dot notation (ẏ) survives in physics.",
       },
       {
-        type: 'tip',
-        title: 'Physics Application: Kinematics is Derivatives in Action',
+        type: "tip",
+        title: "Physics Application: Kinematics is Derivatives in Action",
         body: "Everything in this lesson has a direct physical counterpart. Position x(t) is the function; velocity v = dx/dt is its derivative; acceleration a = dv/dt = d²x/dt² is the second derivative. The x–t graph you see in Physics Ch2 is exactly the graph of f; its slope at each point is exactly f′(x). See Physics Ch2 (Position, Velocity, and Acceleration Graphs) to watch this abstract limit definition become a speedometer reading in real time.",
       },
     ],
     visualizations: [
-                                                                                {
-        id: 'SecantToTangent',
-        title: 'Secant Line → Tangent Line',
-        mathBridge: 'Step 1: Set the point $a$ using the slider and notice the two points on the curve. Step 2: Drag $h$ from 1 down to 0.1, then 0.01. Watch the displayed slope value in the box — it is computing $[f(a+h)-f(a)]/h$ live. Step 3: Notice that the slope is settling toward a specific number before you even reach $h=0$. That settled value IS the derivative $f\'(a)$. Step 4: Now try to set $h$ exactly to 0. The display shows "undefined" — because $0/0$ is not a number. The key insight: the derivative exists at the limit, not at $h=0$ itself. The secant becomes the tangent in the limiting position, not by ever touching it.',
-        caption: 'Drag h from 1 down toward 0. Watch the secant slope number stabilize — that limiting value is f\'(a). Notice that "undefined" appears at h=0 exactly, confirming why we need a limit rather than direct substitution.',
+      {
+        id: "SecantToTangent",
+        title: "Secant Line → Tangent Line",
+        mathBridge:
+          'Step 1: Set the point $a$ using the slider and notice the two points on the curve. Step 2: Drag $h$ from 1 down to 0.1, then 0.01. Watch the displayed slope value in the box — it is computing $[f(a+h)-f(a)]/h$ live. Step 3: Notice that the slope is settling toward a specific number before you even reach $h=0$. That settled value IS the derivative $f\'(a)$. Step 4: Now try to set $h$ exactly to 0. The display shows "undefined" — because $0/0$ is not a number. The key insight: the derivative exists at the limit, not at $h=0$ itself. The secant becomes the tangent in the limiting position, not by ever touching it.',
+        caption:
+          'Drag h from 1 down toward 0. Watch the secant slope number stabilize — that limiting value is f\'(a). Notice that "undefined" appears at h=0 exactly, confirming why we need a limit rather than direct substitution.',
       },
       {
-        id: 'PositionVelocityAcceleration',
-        title: 'Position, Velocity, and Acceleration — Live',
-        mathBridge: 'Do this in sequence. First, pause the animation and drag the time slider slowly. Watch the position graph: when it slopes upward, the car moves forward. Now look at the velocity graph directly below it — notice it is POSITIVE during those upward-sloping stretches. Step 2: Find the moment the position graph peaks (changes from rising to falling). What is the velocity at that exact instant? It is zero — because the slope of the tangent at a maximum is horizontal. Step 3: Now watch the acceleration graph. When velocity is increasing, acceleration is positive. When velocity decreases (even if positive), acceleration is negative. The acceleration graph is the derivative of velocity, which is the second derivative of position. Every relationship between these three graphs is a derivative relationship.',
-        caption: 'Pause and drag the time slider. At every moment, the velocity graph value equals the slope of the position curve above it. At every position peak, velocity is zero. At every velocity peak, acceleration is zero.',
+        id: "PositionVelocityAcceleration",
+        title: "Position, Velocity, and Acceleration — Live",
+        mathBridge:
+          "Do this in sequence. First, pause the animation and drag the time slider slowly. Watch the position graph: when it slopes upward, the car moves forward. Now look at the velocity graph directly below it — notice it is POSITIVE during those upward-sloping stretches. Step 2: Find the moment the position graph peaks (changes from rising to falling). What is the velocity at that exact instant? It is zero — because the slope of the tangent at a maximum is horizontal. Step 3: Now watch the acceleration graph. When velocity is increasing, acceleration is positive. When velocity decreases (even if positive), acceleration is negative. The acceleration graph is the derivative of velocity, which is the second derivative of position. Every relationship between these three graphs is a derivative relationship.",
+        caption:
+          "Pause and drag the time slider. At every moment, the velocity graph value equals the slope of the position curve above it. At every position peak, velocity is zero. At every velocity peak, acceleration is zero.",
       },
       {
-        id: 'LimitBridgeLab',
-        title: 'Instantaneous Change Bridge Lab',
-        mathBridge: 'This lab has three columns: the $h$ value you set, the computed difference quotient $[f(a+h)-f(a)]/h$, and the error compared to the true derivative. Here is what to do: (1) Start with $h = 1$ — the difference quotient is a rough average over a wide interval. (2) Halve $h$ repeatedly: 0.5, 0.25, 0.1, 0.01, 0.001. Watch the middle column converge to a fixed number. That number is $f\'(a)$. (3) Notice the error column shrinks proportionally to $h$ — this is called first-order convergence and it confirms the limit exists. (4) Try a different function using the dropdown and repeat. Every function that is differentiable at $a$ will show the same convergence behavior. Functions with corners (like $|x|$ at 0) will NOT converge — they will show the left and right averages converging to different values.',
-        caption: 'Choose a function and shrink h from 1 to 0.001. The middle column converges to f\'(a) — that convergence IS the definition of the derivative. Functions with corners will show the column failing to settle.',
+        id: "LimitBridgeLab",
+        title: "Instantaneous Change Bridge Lab",
+        mathBridge:
+          "This lab has three columns: the $h$ value you set, the computed difference quotient $[f(a+h)-f(a)]/h$, and the error compared to the true derivative. Here is what to do: (1) Start with $h = 1$ — the difference quotient is a rough average over a wide interval. (2) Halve $h$ repeatedly: 0.5, 0.25, 0.1, 0.01, 0.001. Watch the middle column converge to a fixed number. That number is $f'(a)$. (3) Notice the error column shrinks proportionally to $h$ — this is called first-order convergence and it confirms the limit exists. (4) Try a different function using the dropdown and repeat. Every function that is differentiable at $a$ will show the same convergence behavior. Functions with corners (like $|x|$ at 0) will NOT converge — they will show the left and right averages converging to different values.",
+        caption:
+          "Choose a function and shrink h from 1 to 0.001. The middle column converges to f'(a) — that convergence IS the definition of the derivative. Functions with corners will show the column failing to settle.",
       },
     ],
   },
 
   math: {
     prose: [
-      'We are now ready to state the formal definition. There are two closely related versions: the derivative at a specific point a, and the derivative as a function of x.',
-      'The derivative of f at the specific point x = a is the number f\'(a) defined by the limit of the difference quotient as h approaches 0. If this limit exists (is a finite real number), we say f is differentiable at a. The notation f\'(a) emphasizes that the derivative at a point is a single number — the slope at that point.',
-      'The derivative function f\'(x) is obtained by letting a vary. Instead of computing the slope at one specific point, we compute it at every point where the limit exists. The result is a new function whose output at any x is the slope of the original function at that x.',
-      'There is an alternative but equivalent form of the derivative at a point a, using x directly as the variable that approaches a: the limit as x approaches a of [f(x) - f(a)] / (x - a). This form is sometimes cleaner algebraically — you can factor (x - a) out of the numerator.',
-      'Once we know the derivative f\'(a), we can write the equation of the tangent line to the graph of f at the point (a, f(a)). The tangent line passes through (a, f(a)) with slope f\'(a), so its equation is y - f(a) = f\'(a)(x - a). This is simply the point-slope form of a line.',
-      'We also define one-sided derivatives, called the left-hand derivative and the right-hand derivative. The left-hand derivative at a is the limit of the difference quotient as h approaches 0 from the negative side (h → 0⁻). The right-hand derivative is the limit as h → 0⁺. The derivative f\'(a) exists if and only if both one-sided derivatives exist and are equal. One-sided derivatives are essential for analyzing functions defined by cases or functions with corners.',
-      'A function is called differentiable on an open interval (c, d) if it is differentiable at every point in that interval. It is differentiable on a closed interval [c, d] if it is differentiable on the open interior (c, d) and both one-sided derivatives exist at the endpoints.',
+      "We are now ready to state the formal definition. There are two closely related versions: the derivative at a specific point a, and the derivative as a function of x.",
+      "The derivative of f at the specific point x = a is the number f'(a) defined by the limit of the difference quotient as h approaches 0. If this limit exists (is a finite real number), we say f is differentiable at a. The notation f'(a) emphasizes that the derivative at a point is a single number — the slope at that point.",
+      "The derivative function f'(x) is obtained by letting a vary. Instead of computing the slope at one specific point, we compute it at every point where the limit exists. The result is a new function whose output at any x is the slope of the original function at that x.",
+      "There is an alternative but equivalent form of the derivative at a point a, using x directly as the variable that approaches a: the limit as x approaches a of [f(x) - f(a)] / (x - a). This form is sometimes cleaner algebraically — you can factor (x - a) out of the numerator.",
+      "Once we know the derivative f'(a), we can write the equation of the tangent line to the graph of f at the point (a, f(a)). The tangent line passes through (a, f(a)) with slope f'(a), so its equation is y - f(a) = f'(a)(x - a). This is simply the point-slope form of a line.",
+      "We also define one-sided derivatives, called the left-hand derivative and the right-hand derivative. The left-hand derivative at a is the limit of the difference quotient as h approaches 0 from the negative side (h → 0⁻). The right-hand derivative is the limit as h → 0⁺. The derivative f'(a) exists if and only if both one-sided derivatives exist and are equal. One-sided derivatives are essential for analyzing functions defined by cases or functions with corners.",
+      "A function is called differentiable on an open interval (c, d) if it is differentiable at every point in that interval. It is differentiable on a closed interval [c, d] if it is differentiable on the open interior (c, d) and both one-sided derivatives exist at the endpoints.",
     ],
     callouts: [
       {
-        type: 'definition',
-        title: 'Derivative at a Point',
+        type: "definition",
+        title: "Derivative at a Point",
         body: "f'(a) = \\lim_{h \\to 0} \\frac{f(a+h) - f(a)}{h}",
       },
       {
-        type: 'definition',
-        title: 'Derivative as a Function',
+        type: "definition",
+        title: "Derivative as a Function",
         body: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
       },
       {
-        type: 'definition',
-        title: 'Alternative Form (Point Version)',
+        type: "definition",
+        title: "Alternative Form (Point Version)",
         body: "f'(a) = \\lim_{x \\to a} \\frac{f(x) - f(a)}{x - a}",
       },
       {
-        type: 'definition',
-        title: 'Tangent Line at (a, f(a))',
-        body: 'y - f(a) = f\'(a)(x - a)',
+        type: "definition",
+        title: "Tangent Line at (a, f(a))",
+        body: "y - f(a) = f'(a)(x - a)",
       },
       {
-        type: 'definition',
-        title: 'One-Sided Derivatives',
+        type: "definition",
+        title: "One-Sided Derivatives",
         body: "f'_-(a) = \\lim_{h \\to 0^-} \\frac{f(a+h)-f(a)}{h}, \\quad f'_+(a) = \\lim_{h \\to 0^+} \\frac{f(a+h)-f(a)}{h}",
       },
     ],
     visualizations: [
-            {
-        id: 'TangentLineConstructor',
+      {
+        id: "TangentLineConstructor",
         props: { showPointSlope: true, showDifferenceQuotientLabels: true },
-        title: 'Secant → Tangent: Limit of Difference Quotient',
-        mathBridge: 'The labels show the rise $f(a+h)-f(a)$ and run $h$ directly on the graph. Their ratio is the difference quotient $\\frac{\\Delta y}{\\Delta x}$. Watch the labeled slope value update in real time as $h \\to 0$ — that converging number is the derivative $f\'(a)$ at that point.',
-        caption: 'Drag h toward 0. The secant line approaches the tangent line — and the slope approaches the derivative.',
+        title: "Secant → Tangent: Limit of Difference Quotient",
+        mathBridge:
+          "The labels show the rise $f(a+h)-f(a)$ and run $h$ directly on the graph. Their ratio is the difference quotient $\\frac{\\Delta y}{\\Delta x}$. Watch the labeled slope value update in real time as $h \\to 0$ — that converging number is the derivative $f'(a)$ at that point.",
+        caption:
+          "Drag h toward 0. The secant line approaches the tangent line — and the slope approaches the derivative.",
       },
       {
-        id: 'DerivativeBuilder',
-        title: 'Build the Derivative Graph',
-        mathBridge: 'At each point $x$, the derivative $f\'(x)$ is a number — the slope of $f$ there. Collecting those slopes across all $x$ values produces a new function $f\'(x)$. Where $f$ rises steeply, $f\'$ is large and positive. Where $f$ has a peak, $f\'$ is zero. Where $f$ falls, $f\'$ is negative. This is what it means for $f\'$ to be a function.',
-        caption: 'Drag the slider across f(x). The green dots you leave behind trace out f\'(x). Toggle "Show f\'(x)" to check your work. This is what the derivative function really means.',
+        id: "DerivativeBuilder",
+        title: "Build the Derivative Graph",
+        mathBridge:
+          "At each point $x$, the derivative $f'(x)$ is a number — the slope of $f$ there. Collecting those slopes across all $x$ values produces a new function $f'(x)$. Where $f$ rises steeply, $f'$ is large and positive. Where $f$ has a peak, $f'$ is zero. Where $f$ falls, $f'$ is negative. This is what it means for $f'$ to be a function.",
+        caption:
+          "Drag the slider across f(x). The green dots you leave behind trace out f'(x). Toggle \"Show f'(x)\" to check your work. This is what the derivative function really means.",
       },
     ],
   },
 
   rigor: {
     prose: [
-      'There is a profound relationship between differentiability and continuity. Intuitively, if a function has a well-defined tangent slope at a point, it cannot have a jump or hole there — a broken function cannot have a smooth tangent. This is made precise by an important theorem.',
-      'THEOREM (Differentiability Implies Continuity): If f is differentiable at a, then f is continuous at a.',
-      'PROOF: We want to show that the limit of f(x) as x approaches a equals f(a), or equivalently that the limit of [f(x) - f(a)] as x approaches a is 0. We write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). The first factor, [f(x)-f(a)]/(x-a), approaches f\'(a) as x → a (by the alternative definition of the derivative). The second factor, (x - a), approaches 0. By the product law for limits, the product approaches f\'(a) · 0 = 0. Therefore f(x) - f(a) → 0, which means f(x) → f(a). This proves continuity.',
+      "There is a profound relationship between differentiability and continuity. Intuitively, if a function has a well-defined tangent slope at a point, it cannot have a jump or hole there — a broken function cannot have a smooth tangent. This is made precise by an important theorem.",
+      "THEOREM (Differentiability Implies Continuity): If f is differentiable at a, then f is continuous at a.",
+      "PROOF: We want to show that the limit of f(x) as x approaches a equals f(a), or equivalently that the limit of [f(x) - f(a)] as x approaches a is 0. We write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). The first factor, [f(x)-f(a)]/(x-a), approaches f'(a) as x → a (by the alternative definition of the derivative). The second factor, (x - a), approaches 0. By the product law for limits, the product approaches f'(a) · 0 = 0. Therefore f(x) - f(a) → 0, which means f(x) → f(a). This proves continuity.",
       'The converse of this theorem is FALSE. A function can be continuous at a point without being differentiable there. The classic example is f(x) = |x| at x = 0. This function is continuous everywhere — there are no jumps or holes. But it has a "corner" at x = 0 where the graph changes direction sharply, and at that corner the derivative does not exist.',
-      'PROOF that |x| is not differentiable at 0: We compute the left and right derivatives. From the right (h → 0⁺): [|0+h| - |0|] / h = |h|/h = h/h = 1, so the right-hand derivative is 1. From the left (h → 0⁻): [|0+h| - |0|] / h = |h|/h = (-h)/h = -1, so the left-hand derivative is -1. Since 1 ≠ -1, the two-sided limit does not exist, and f is not differentiable at 0.',
-      'There are exactly three geometric ways a function can fail to be differentiable at a point, even while remaining continuous there. First: a corner, where the left and right derivatives both exist but are unequal (example: |x| at 0). Second: a cusp, where one or both one-sided derivatives are infinite but with opposite signs, causing the curve to come to a sharp pointed tip (example: x^(2/3) at 0 — the tangent line becomes vertical). Third: a vertical tangent, where the difference quotient grows without bound as h → 0, meaning the tangent line would be vertical (example: x^(1/3) at 0). In all three cases, the function is continuous but the limit of the difference quotient fails to be a finite real number.',
-      'A function can also fail to be differentiable at a point of discontinuity, of course — but that failure is less subtle, since differentiability requires continuity.',
+      "PROOF that |x| is not differentiable at 0: We compute the left and right derivatives. From the right (h → 0⁺): [|0+h| - |0|] / h = |h|/h = h/h = 1, so the right-hand derivative is 1. From the left (h → 0⁻): [|0+h| - |0|] / h = |h|/h = (-h)/h = -1, so the left-hand derivative is -1. Since 1 ≠ -1, the two-sided limit does not exist, and f is not differentiable at 0.",
+      "There are exactly three geometric ways a function can fail to be differentiable at a point, even while remaining continuous there. First: a corner, where the left and right derivatives both exist but are unequal (example: |x| at 0). Second: a cusp, where one or both one-sided derivatives are infinite but with opposite signs, causing the curve to come to a sharp pointed tip (example: x^(2/3) at 0 — the tangent line becomes vertical). Third: a vertical tangent, where the difference quotient grows without bound as h → 0, meaning the tangent line would be vertical (example: x^(1/3) at 0). In all three cases, the function is continuous but the limit of the difference quotient fails to be a finite real number.",
+      "A function can also fail to be differentiable at a point of discontinuity, of course — but that failure is less subtle, since differentiability requires continuity.",
     ],
     callouts: [
       {
-        type: 'theorem',
-        title: 'Differentiability Implies Continuity',
-        body: '\\text{If } f \\text{ is differentiable at } a, \\text{ then } f \\text{ is continuous at } a.',
+        type: "theorem",
+        title: "Differentiability Implies Continuity",
+        body: "\\text{If } f \\text{ is differentiable at } a, \\text{ then } f \\text{ is continuous at } a.",
       },
       {
-        type: 'warning',
-        title: 'The Converse is False',
-        body: 'f(x) = |x| \\text{ is continuous at } 0 \\text{ but } f\'(0) \\text{ does not exist.}',
+        type: "warning",
+        title: "The Converse is False",
+        body: "f(x) = |x| \\text{ is continuous at } 0 \\text{ but } f'(0) \\text{ does not exist.}",
       },
       {
-        type: 'insight',
-        title: 'Three Ways to Fail Differentiability',
-        body: '\\text{(1) Corner: } f\'_-(a) \\neq f\'_+(a) \\\\ \\text{(2) Cusp: one-sided derivatives are } \\pm\\infty \\\\ \\text{(3) Vertical tangent: } \\left|\\frac{f(a+h)-f(a)}{h}\\right| \\to \\infty',
+        type: "insight",
+        title: "Three Ways to Fail Differentiability",
+        body: "\\text{(1) Corner: } f'_-(a) \\neq f'_+(a) \\\\ \\text{(2) Cusp: one-sided derivatives are } \\pm\\infty \\\\ \\text{(3) Vertical tangent: } \\left|\\frac{f(a+h)-f(a)}{h}\\right| \\to \\infty",
       },
     ],
     visualizations: [
-                  {
-        id: 'AbsoluteValueDiffViz',
-        title: 'The Corner: Why |x| Fails at x = 0',
-        mathBridge: 'The rigor section proves this algebraically: $(|0+h| - 0)/h = |h|/h$, which equals $+1$ when $h > 0$ and $-1$ when $h < 0$. The visualization makes the algebra geometric — both secant lines are shown simultaneously. No matter how small $h$ gets, the green (right) secant locks at slope $+1$ and the red (left) at slope $-1$. That immovable mismatch is exactly what the limit calculation says. Compare this to the smooth $x^2$ example where both secants converge to the same slope as $h \\to 0$.',
-        caption: 'Slide h all the way to 0 — the slopes never converge. The corner means two incompatible tangent slopes fight for the same point.',
+      {
+        id: "AbsoluteValueDiffViz",
+        title: "The Corner: Why |x| Fails at x = 0",
+        mathBridge:
+          "The rigor section proves this algebraically: $(|0+h| - 0)/h = |h|/h$, which equals $+1$ when $h > 0$ and $-1$ when $h < 0$. The visualization makes the algebra geometric — both secant lines are shown simultaneously. No matter how small $h$ gets, the green (right) secant locks at slope $+1$ and the red (left) at slope $-1$. That immovable mismatch is exactly what the limit calculation says. Compare this to the smooth $x^2$ example where both secants converge to the same slope as $h \\to 0$.",
+        caption:
+          "Slide h all the way to 0 — the slopes never converge. The corner means two incompatible tangent slopes fight for the same point.",
       },
     ],
   },
 
   examples: [
     {
-      id: 'ch2-000-ex1',
-      title: 'Derivative of x\u00b2 from the Definition',
-      problem: '\\text{Let } f(x) = x^2. \\text{ Use the limit definition to find } f\'(x). \\text{ Then find the slope at } x=3 \\text{ and the equation of the tangent line at } (3, 9).',
+      id: "ch2-000-ex1",
+      title: "Derivative of x\u00b2 from the Definition",
+      problem:
+        "\\text{Let } f(x) = x^2. \\text{ Use the limit definition to find } f'(x). \\text{ Then find the slope at } x=3 \\text{ and the equation of the tangent line at } (3, 9).",
       steps: [
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
-          annotation: 'Write the limit definition of the derivative. We want to find the slope of the tangent to y = x\u00b2 at a general point x.',
+          annotation:
+            "Write the limit definition of the derivative. We want to find the slope of the tangent to y = x\u00b2 at a general point x.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}",
-          annotation: 'Substitute f(x+h) = (x+h)\u00b2 and f(x) = x\u00b2 into the definition.',
+          annotation:
+            "Substitute f(x+h) = (x+h)\u00b2 and f(x) = x\u00b2 into the definition.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{x^2 + 2xh + h^2 - x^2}{h}",
-          annotation: 'Expand (x+h)\u00b2 using the binomial formula (a+b)\u00b2 = a\u00b2 + 2ab + b\u00b2. This is the key algebraic step.',
+          annotation:
+            "Expand (x+h)\u00b2 using the binomial formula (a+b)\u00b2 = a\u00b2 + 2ab + b\u00b2. This is the key algebraic step.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{2xh + h^2}{h}",
-          annotation: 'The x\u00b2 terms cancel: x\u00b2 - x\u00b2 = 0. We now have a polynomial in h in the numerator, which allows us to factor.',
+          annotation:
+            "The x\u00b2 terms cancel: x\u00b2 - x\u00b2 = 0. We now have a polynomial in h in the numerator, which allows us to factor.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{h(2x + h)}{h}",
-          annotation: 'Factor h out of the numerator. This is the crucial factoring step that cancels the problematic h in the denominator.',
+          annotation:
+            "Factor h out of the numerator. This is the crucial factoring step that cancels the problematic h in the denominator.",
         },
         {
           expression: "= \\lim_{h \\to 0} (2x + h)",
-          annotation: 'Cancel the common factor of h. This is valid because in a limit as h \u2192 0, we require h \u2260 0, so division by h is legal.',
+          annotation:
+            "Cancel the common factor of h. This is valid because in a limit as h \u2192 0, we require h \u2260 0, so division by h is legal.",
         },
         {
           expression: "= 2x + 0 = 2x",
-          annotation: 'Now we can safely substitute h = 0, since the indeterminate form 0/0 has been resolved by the algebraic simplification. The derivative is 2x.',
+          annotation:
+            "Now we can safely substitute h = 0, since the indeterminate form 0/0 has been resolved by the algebraic simplification. The derivative is 2x.",
         },
         {
           expression: "f'(3) = 2(3) = 6",
-          annotation: 'To find the slope at x = 3, substitute x = 3 into the derivative function f\'(x) = 2x.',
+          annotation:
+            "To find the slope at x = 3, substitute x = 3 into the derivative function f'(x) = 2x.",
         },
         {
           expression: "y - 9 = 6(x - 3)",
-          annotation: 'Use point-slope form of a line: y - y\u2080 = m(x - x\u2080), with the point (3, 9) and slope m = 6.',
+          annotation:
+            "Use point-slope form of a line: y - y\u2080 = m(x - x\u2080), with the point (3, 9) and slope m = 6.",
         },
         {
           expression: "y = 6x - 18 + 9 = 6x - 9",
-          annotation: 'Distribute the 6 and simplify to get the slope-intercept form of the tangent line.',
+          annotation:
+            "Distribute the 6 and simplify to get the slope-intercept form of the tangent line.",
         },
       ],
-      conclusion: 'The derivative of x\u00b2 is 2x. At x = 3, the curve has slope 6, and the tangent line is y = 6x - 9. Notice the pattern: the exponent 2 came down as a coefficient, and the new exponent is 2 - 1 = 1. This is a preview of the power rule.',
+      conclusion:
+        "The derivative of x\u00b2 is 2x. At x = 3, the curve has slope 6, and the tangent line is y = 6x - 9. Notice the pattern: the exponent 2 came down as a coefficient, and the new exponent is 2 - 1 = 1. This is a preview of the power rule.",
     },
     {
-      id: 'ch2-000-ex2',
-      title: 'Derivative of x\u00b3 from the Definition',
-      problem: '\\text{Let } f(x) = x^3. \\text{ Use the limit definition to find } f\'(x).',
+      id: "ch2-000-ex2",
+      title: "Derivative of x\u00b3 from the Definition",
+      problem:
+        "\\text{Let } f(x) = x^3. \\text{ Use the limit definition to find } f'(x).",
       steps: [
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^3 - x^3}{h}",
-          annotation: 'Write the difference quotient. We need to expand (x+h)\u00b3, which requires the full binomial expansion.',
+          annotation:
+            "Write the difference quotient. We need to expand (x+h)\u00b3, which requires the full binomial expansion.",
         },
         {
           expression: "(x+h)^3 = x^3 + 3x^2h + 3xh^2 + h^3",
-          annotation: 'Expand (x+h)\u00b3 using the binomial theorem or repeated multiplication: (x+h)\u00b3 = (x+h)(x+h)(x+h). Each term is identified: the leading x\u00b3, three terms with one factor of h (giving 3x\u00b2h), three terms with two factors of h (giving 3xh\u00b2), and one term with three factors of h (giving h\u00b3).',
+          annotation:
+            "Expand (x+h)\u00b3 using the binomial theorem or repeated multiplication: (x+h)\u00b3 = (x+h)(x+h)(x+h). Each term is identified: the leading x\u00b3, three terms with one factor of h (giving 3x\u00b2h), three terms with two factors of h (giving 3xh\u00b2), and one term with three factors of h (giving h\u00b3).",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{x^3 + 3x^2 h + 3xh^2 + h^3 - x^3}{h}",
-          annotation: 'Substitute the expanded form of (x+h)\u00b3 into the difference quotient.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{x^3 + 3x^2 h + 3xh^2 + h^3 - x^3}{h}",
+          annotation:
+            "Substitute the expanded form of (x+h)\u00b3 into the difference quotient.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{3x^2 h + 3xh^2 + h^3}{h}",
-          annotation: 'Cancel x\u00b3 - x\u00b3 = 0 in the numerator. We are left with only terms containing h.',
+          annotation:
+            "Cancel x\u00b3 - x\u00b3 = 0 in the numerator. We are left with only terms containing h.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{h(3x^2 + 3xh + h^2)}{h}",
-          annotation: 'Factor out h from every term in the numerator. This is possible because every remaining term has at least one factor of h.',
+          annotation:
+            "Factor out h from every term in the numerator. This is possible because every remaining term has at least one factor of h.",
         },
         {
           expression: "= \\lim_{h \\to 0} (3x^2 + 3xh + h^2)",
-          annotation: 'Cancel the common h. Now the expression is a polynomial in h with no division, so we can directly substitute h = 0.',
+          annotation:
+            "Cancel the common h. Now the expression is a polynomial in h with no division, so we can directly substitute h = 0.",
         },
         {
           expression: "= 3x^2 + 3x(0) + (0)^2 = 3x^2",
-          annotation: 'Substitute h = 0. The terms containing h vanish, leaving only 3x\u00b2.',
+          annotation:
+            "Substitute h = 0. The terms containing h vanish, leaving only 3x\u00b2.",
         },
       ],
-      conclusion: 'The derivative of x\u00b3 is 3x\u00b2. The exponent 3 dropped down as a coefficient, and the new exponent is 3 - 1 = 2. The pattern x\u00b2 \u2192 2x and x\u00b3 \u2192 3x\u00b2 strongly suggests the general power rule: d/dx[x\u207f] = nx\u207f\u207b\u00b9.',
+      conclusion:
+        "The derivative of x\u00b3 is 3x\u00b2. The exponent 3 dropped down as a coefficient, and the new exponent is 3 - 1 = 2. The pattern x\u00b2 \u2192 2x and x\u00b3 \u2192 3x\u00b2 strongly suggests the general power rule: d/dx[x\u207f] = nx\u207f\u207b\u00b9.",
     },
     {
-      id: 'ch2-000-ex3',
-      title: 'Derivative of \u221ax from the Definition',
-      problem: 'f(x) = \\sqrt{x}. \\text{ Use the limit definition to find } f\'(x) \\text{ for } x > 0.',
+      id: "ch2-000-ex3",
+      title: "Derivative of \u221ax from the Definition",
+      problem:
+        "f(x) = \\sqrt{x}. \\text{ Use the limit definition to find } f'(x) \\text{ for } x > 0.",
       steps: [
         {
-          expression: "f'(x) = \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h}",
-          annotation: 'Set up the difference quotient. The numerator is the difference of two square roots, which creates an indeterminate form 0/0 as h \u2192 0.',
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h}",
+          annotation:
+            "Set up the difference quotient. The numerator is the difference of two square roots, which creates an indeterminate form 0/0 as h \u2192 0.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h} \\cdot \\frac{\\sqrt{x+h} + \\sqrt{x}}{\\sqrt{x+h} + \\sqrt{x}}",
-          annotation: 'Multiply the numerator and denominator by the conjugate of the numerator: \u221a(x+h) + \u221ax. This is the key technique for dealing with square root differences. Multiplying by the conjugate uses the identity (a - b)(a + b) = a\u00b2 - b\u00b2.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h} \\cdot \\frac{\\sqrt{x+h} + \\sqrt{x}}{\\sqrt{x+h} + \\sqrt{x}}",
+          annotation:
+            "Multiply the numerator and denominator by the conjugate of the numerator: \u221a(x+h) + \u221ax. This is the key technique for dealing with square root differences. Multiplying by the conjugate uses the identity (a - b)(a + b) = a\u00b2 - b\u00b2.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{(\\sqrt{x+h})^2 - (\\sqrt{x})^2}{h(\\sqrt{x+h} + \\sqrt{x})}",
-          annotation: 'Apply the difference of squares identity to the numerator. The conjugate multiplication eliminates the square roots in the numerator.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{(\\sqrt{x+h})^2 - (\\sqrt{x})^2}{h(\\sqrt{x+h} + \\sqrt{x})}",
+          annotation:
+            "Apply the difference of squares identity to the numerator. The conjugate multiplication eliminates the square roots in the numerator.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{(x + h) - x}{h(\\sqrt{x+h} + \\sqrt{x})}",
-          annotation: 'Simplify the numerator: (\u221a(x+h))\u00b2 = x+h and (\u221ax)\u00b2 = x.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{(x + h) - x}{h(\\sqrt{x+h} + \\sqrt{x})}",
+          annotation:
+            "Simplify the numerator: (\u221a(x+h))\u00b2 = x+h and (\u221ax)\u00b2 = x.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{h}{h(\\sqrt{x+h} + \\sqrt{x})}",
-          annotation: 'Simplify (x + h) - x = h in the numerator. We now have h in both numerator and denominator.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{h}{h(\\sqrt{x+h} + \\sqrt{x})}",
+          annotation:
+            "Simplify (x + h) - x = h in the numerator. We now have h in both numerator and denominator.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{1}{\\sqrt{x+h} + \\sqrt{x}}",
-          annotation: 'Cancel the common factor of h (valid since h \u2260 0 in the limit). The indeterminate form has been resolved.',
+          annotation:
+            "Cancel the common factor of h (valid since h \u2260 0 in the limit). The indeterminate form has been resolved.",
         },
         {
-          expression: "= \\frac{1}{\\sqrt{x + 0} + \\sqrt{x}} = \\frac{1}{\\sqrt{x} + \\sqrt{x}} = \\frac{1}{2\\sqrt{x}}",
-          annotation: 'Now we can substitute h = 0 safely, since there is no longer any division by h. The result is 1/(2\u221ax).',
+          expression:
+            "= \\frac{1}{\\sqrt{x + 0} + \\sqrt{x}} = \\frac{1}{\\sqrt{x} + \\sqrt{x}} = \\frac{1}{2\\sqrt{x}}",
+          annotation:
+            "Now we can substitute h = 0 safely, since there is no longer any division by h. The result is 1/(2\u221ax).",
         },
       ],
-      conclusion: 'The derivative of \u221ax = x^(1/2) is 1/(2\u221ax) = (1/2)x^(-1/2). This again follows the power rule pattern: the exponent 1/2 came down as a coefficient, and the new exponent is 1/2 - 1 = -1/2.',
+      conclusion:
+        "The derivative of \u221ax = x^(1/2) is 1/(2\u221ax) = (1/2)x^(-1/2). This again follows the power rule pattern: the exponent 1/2 came down as a coefficient, and the new exponent is 1/2 - 1 = -1/2.",
     },
     {
-      id: 'ch2-000-ex4',
-      title: 'Derivative of 1/x from the Definition',
-      problem: 'f(x) = \\dfrac{1}{x}. \\text{ Use the limit definition to find } f\'(x) \\text{ for } x \\neq 0.',
+      id: "ch2-000-ex4",
+      title: "Derivative of 1/x from the Definition",
+      problem:
+        "f(x) = \\dfrac{1}{x}. \\text{ Use the limit definition to find } f'(x) \\text{ for } x \\neq 0.",
       steps: [
         {
-          expression: "f'(x) = \\lim_{h \\to 0} \\frac{\\dfrac{1}{x+h} - \\dfrac{1}{x}}{h}",
-          annotation: 'Write the difference quotient. We have a compound fraction (a fraction within a fraction), which we need to simplify.',
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{\\dfrac{1}{x+h} - \\dfrac{1}{x}}{h}",
+          annotation:
+            "Write the difference quotient. We have a compound fraction (a fraction within a fraction), which we need to simplify.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{1}{h} \\left( \\frac{1}{x+h} - \\frac{1}{x} \\right)",
-          annotation: 'Rewrite the compound fraction by pulling 1/h out front. Now we need to combine the two fractions in the parentheses.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{1}{h} \\left( \\frac{1}{x+h} - \\frac{1}{x} \\right)",
+          annotation:
+            "Rewrite the compound fraction by pulling 1/h out front. Now we need to combine the two fractions in the parentheses.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - (x+h)}{x(x+h)}",
-          annotation: 'Combine the fractions with a common denominator of x(x+h): the first fraction becomes x/[x(x+h)] and the second becomes (x+h)/[x(x+h)]. Subtract numerators.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - (x+h)}{x(x+h)}",
+          annotation:
+            "Combine the fractions with a common denominator of x(x+h): the first fraction becomes x/[x(x+h)] and the second becomes (x+h)/[x(x+h)]. Subtract numerators.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - x - h}{x(x+h)}",
-          annotation: 'Distribute the negative sign in the numerator: x - (x + h) = x - x - h = -h.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - x - h}{x(x+h)}",
+          annotation:
+            "Distribute the negative sign in the numerator: x - (x + h) = x - x - h = -h.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{-h}{x(x+h)}",
-          annotation: 'Simplify: x - x - h = -h.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{-h}{x(x+h)}",
+          annotation: "Simplify: x - x - h = -h.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{-h}{h \\cdot x(x+h)}",
-          annotation: 'Combine into a single fraction.',
+          annotation: "Combine into a single fraction.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{-1}{x(x+h)}",
-          annotation: 'Cancel the common factor of h (valid since h \u2260 0 in the limit). The -h/h cancels to give -1.',
+          annotation:
+            "Cancel the common factor of h (valid since h \u2260 0 in the limit). The -h/h cancels to give -1.",
         },
         {
           expression: "= \\frac{-1}{x(x + 0)} = \\frac{-1}{x^2}",
-          annotation: 'Substitute h = 0. The denominator becomes x\u00b7x = x\u00b2.',
+          annotation:
+            "Substitute h = 0. The denominator becomes x\u00b7x = x\u00b2.",
         },
       ],
-      conclusion: 'The derivative of 1/x = x^(-1) is -1/x\u00b2 = -x^(-2). Once again, the power rule pattern: exponent -1 comes down as coefficient, new exponent is -1 - 1 = -2.',
+      conclusion:
+        "The derivative of 1/x = x^(-1) is -1/x\u00b2 = -x^(-2). Once again, the power rule pattern: exponent -1 comes down as coefficient, new exponent is -1 - 1 = -2.",
     },
     {
-      id: 'ch2-000-ex5',
-      title: 'Derivative of a Linear Function',
-      problem: 'f(x) = 3x + 5. \\text{ Use the limit definition to find } f\'(x) \\text{ and verify it equals the slope.}',
+      id: "ch2-000-ex5",
+      title: "Derivative of a Linear Function",
+      problem:
+        "f(x) = 3x + 5. \\text{ Use the limit definition to find } f'(x) \\text{ and verify it equals the slope.}",
       steps: [
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
-          annotation: 'Write the limit definition.',
+          annotation: "Write the limit definition.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{[3(x+h)+5] - [3x+5]}{h}",
-          annotation: 'Substitute f(x+h) = 3(x+h) + 5 and f(x) = 3x + 5.',
+          annotation: "Substitute f(x+h) = 3(x+h) + 5 and f(x) = 3x + 5.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{3x + 3h + 5 - 3x - 5}{h}",
-          annotation: 'Distribute the 3 and expand the brackets.',
+          annotation: "Distribute the 3 and expand the brackets.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{3h}{h}",
-          annotation: 'Simplify: 3x - 3x = 0 and 5 - 5 = 0, leaving only 3h in the numerator.',
+          annotation:
+            "Simplify: 3x - 3x = 0 and 5 - 5 = 0, leaving only 3h in the numerator.",
         },
         {
           expression: "= \\lim_{h \\to 0} 3 = 3",
-          annotation: 'Cancel h/h = 1. The resulting expression is the constant 3, which equals 3 regardless of how h approaches 0.',
+          annotation:
+            "Cancel h/h = 1. The resulting expression is the constant 3, which equals 3 regardless of how h approaches 0.",
         },
       ],
-      conclusion: 'The derivative of 3x + 5 is 3, which is exactly the slope of the line. This makes perfect sense: a straight line has a constant slope at every point, so its derivative (the instantaneous slope) is that same constant everywhere. The +5 intercept term disappeared because it shifts the line up and down but does not affect its steepness.',
+      conclusion:
+        "The derivative of 3x + 5 is 3, which is exactly the slope of the line. This makes perfect sense: a straight line has a constant slope at every point, so its derivative (the instantaneous slope) is that same constant everywhere. The +5 intercept term disappeared because it shifts the line up and down but does not affect its steepness.",
     },
     {
-      id: 'ch2-000-ex6',
-      title: 'Is |x| Differentiable at x = 0?',
-      problem: '\\text{Determine whether } f(x) = |x| \\text{ is differentiable at } x = 0 \\text{ by computing the left and right derivatives.}',
+      id: "ch2-000-ex6",
+      title: "Is |x| Differentiable at x = 0?",
+      problem:
+        "\\text{Determine whether } f(x) = |x| \\text{ is differentiable at } x = 0 \\text{ by computing the left and right derivatives.}",
       steps: [
         {
-          expression: "f'_+(0) = \\lim_{h \\to 0^+} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^+} \\frac{|h|}{h}",
-          annotation: 'Set up the right-hand derivative: h approaches 0 from the positive side, meaning h > 0 throughout.',
+          expression:
+            "f'_+(0) = \\lim_{h \\to 0^+} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^+} \\frac{|h|}{h}",
+          annotation:
+            "Set up the right-hand derivative: h approaches 0 from the positive side, meaning h > 0 throughout.",
         },
         {
-          expression: "= \\lim_{h \\to 0^+} \\frac{h}{h} = \\lim_{h \\to 0^+} 1 = 1",
-          annotation: 'When h > 0, |h| = h, so |h|/h = h/h = 1. The right-hand derivative is 1.',
+          expression:
+            "= \\lim_{h \\to 0^+} \\frac{h}{h} = \\lim_{h \\to 0^+} 1 = 1",
+          annotation:
+            "When h > 0, |h| = h, so |h|/h = h/h = 1. The right-hand derivative is 1.",
         },
         {
-          expression: "f'_-(0) = \\lim_{h \\to 0^-} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^-} \\frac{|h|}{h}",
-          annotation: 'Set up the left-hand derivative: h approaches 0 from the negative side, meaning h < 0 throughout.',
+          expression:
+            "f'_-(0) = \\lim_{h \\to 0^-} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^-} \\frac{|h|}{h}",
+          annotation:
+            "Set up the left-hand derivative: h approaches 0 from the negative side, meaning h < 0 throughout.",
         },
         {
-          expression: "= \\lim_{h \\to 0^-} \\frac{-h}{h} = \\lim_{h \\to 0^-} (-1) = -1",
-          annotation: 'When h < 0, |h| = -h (the negative of h, which is positive), so |h|/h = -h/h = -1. The left-hand derivative is -1.',
+          expression:
+            "= \\lim_{h \\to 0^-} \\frac{-h}{h} = \\lim_{h \\to 0^-} (-1) = -1",
+          annotation:
+            "When h < 0, |h| = -h (the negative of h, which is positive), so |h|/h = -h/h = -1. The left-hand derivative is -1.",
         },
         {
           expression: "f'_+(0) = 1 \\neq -1 = f'_-(0)",
-          annotation: 'The right-hand derivative (1) and left-hand derivative (-1) are not equal.',
+          annotation:
+            "The right-hand derivative (1) and left-hand derivative (-1) are not equal.",
         },
         {
-          expression: "\\therefore \\lim_{h \\to 0} \\frac{|h|}{h} \\text{ does not exist}",
-          annotation: 'Since the one-sided limits are different, the two-sided limit does not exist. Therefore f\'(0) does not exist.',
+          expression:
+            "\\therefore \\lim_{h \\to 0} \\frac{|h|}{h} \\text{ does not exist}",
+          annotation:
+            "Since the one-sided limits are different, the two-sided limit does not exist. Therefore f'(0) does not exist.",
         },
       ],
-      conclusion: 'f(x) = |x| is NOT differentiable at x = 0. The graph has a sharp corner there — the slope jumps from -1 (for x < 0) to +1 (for x > 0) with no smooth transition. There is no single well-defined tangent line at the origin. This is the canonical example of a function that is continuous but not differentiable.',
+      conclusion:
+        "f(x) = |x| is NOT differentiable at x = 0. The graph has a sharp corner there — the slope jumps from -1 (for x < 0) to +1 (for x > 0) with no smooth transition. There is no single well-defined tangent line at the origin. This is the canonical example of a function that is continuous but not differentiable.",
       visualizations: [
         {
-          id: 'AbsoluteValueDiffViz',
-          title: 'See the Calculation on the Graph',
-          mathBridge: 'Each step in the worked example corresponds to something visible here. Step 1–2: the green secant from $(0,0)$ to $(+h, h)$ — its slope $h/h = 1$ is the right-hand derivative. Step 3–4: the red secant to $(-h, h)$ — its slope $-h/(-h)$ ... wait, we divide by $h$ (not $-h$): $|-h|/(-h) = h/(-h) = -1$. That is the left-hand difference quotient with $h < 0$. Slide $h$ all the way down to confirm both secants are frozen at their respective slopes regardless of how close $h$ gets to 0.',
-          caption: 'The two secants never converge — they are locked at +1 and −1 forever. That is why the limit does not exist and f is not differentiable at 0.',
+          id: "AbsoluteValueDiffViz",
+          title: "See the Calculation on the Graph",
+          mathBridge:
+            "Each step in the worked example corresponds to something visible here. Step 1–2: the green secant from $(0,0)$ to $(+h, h)$ — its slope $h/h = 1$ is the right-hand derivative. Step 3–4: the red secant to $(-h, h)$ — its slope $-h/(-h)$ ... wait, we divide by $h$ (not $-h$): $|-h|/(-h) = h/(-h) = -1$. That is the left-hand difference quotient with $h < 0$. Slide $h$ all the way down to confirm both secants are frozen at their respective slopes regardless of how close $h$ gets to 0.",
+          caption:
+            "The two secants never converge — they are locked at +1 and −1 forever. That is why the limit does not exist and f is not differentiable at 0.",
         },
       ],
     },
     {
-      id: 'ch2-000-ex7',
-      title: 'Instantaneous Velocity from the Definition',
-      problem: '\\text{A particle\'s position is given by } s(t) = 4t^2 + 3t \\text{ (in meters, t in seconds). Find its instantaneous velocity at } t = 2.',
+      id: "ch2-000-ex7",
+      title: "Instantaneous Velocity from the Definition",
+      problem:
+        "\\text{A particle's position is given by } s(t) = 4t^2 + 3t \\text{ (in meters, t in seconds). Find its instantaneous velocity at } t = 2.",
       steps: [
         {
-          expression: "v(t) = s'(t) = \\lim_{h \\to 0} \\frac{s(t+h) - s(t)}{h}",
-          annotation: 'Instantaneous velocity is the derivative of position with respect to time. Set up the difference quotient.',
+          expression:
+            "v(t) = s'(t) = \\lim_{h \\to 0} \\frac{s(t+h) - s(t)}{h}",
+          annotation:
+            "Instantaneous velocity is the derivative of position with respect to time. Set up the difference quotient.",
         },
         {
           expression: "s(t+h) = 4(t+h)^2 + 3(t+h)",
-          annotation: 'Compute s(t+h) by replacing t with t+h in the position formula.',
+          annotation:
+            "Compute s(t+h) by replacing t with t+h in the position formula.",
         },
         {
           expression: "= 4(t^2 + 2th + h^2) + 3t + 3h",
-          annotation: 'Expand (t+h)\u00b2 = t\u00b2 + 2th + h\u00b2 and distribute the 4 and 3.',
+          annotation:
+            "Expand (t+h)\u00b2 = t\u00b2 + 2th + h\u00b2 and distribute the 4 and 3.",
         },
         {
           expression: "= 4t^2 + 8th + 4h^2 + 3t + 3h",
-          annotation: 'Distribute to get the fully expanded form of s(t+h).',
+          annotation: "Distribute to get the fully expanded form of s(t+h).",
         },
         {
-          expression: "s(t+h) - s(t) = (4t^2 + 8th + 4h^2 + 3t + 3h) - (4t^2 + 3t)",
-          annotation: 'Form the difference s(t+h) - s(t) by subtracting the original position.',
+          expression:
+            "s(t+h) - s(t) = (4t^2 + 8th + 4h^2 + 3t + 3h) - (4t^2 + 3t)",
+          annotation:
+            "Form the difference s(t+h) - s(t) by subtracting the original position.",
         },
         {
           expression: "= 8th + 4h^2 + 3h",
-          annotation: 'Simplify: 4t\u00b2 - 4t\u00b2 = 0 and 3t - 3t = 0. Only the h-containing terms remain.',
+          annotation:
+            "Simplify: 4t\u00b2 - 4t\u00b2 = 0 and 3t - 3t = 0. Only the h-containing terms remain.",
         },
         {
           expression: "\\frac{s(t+h)-s(t)}{h} = \\frac{8th + 4h^2 + 3h}{h}",
-          annotation: 'Divide by h to form the difference quotient.',
+          annotation: "Divide by h to form the difference quotient.",
         },
         {
           expression: "= \\frac{h(8t + 4h + 3)}{h} = 8t + 4h + 3",
-          annotation: 'Factor h from the numerator and cancel with the denominator h.',
+          annotation:
+            "Factor h from the numerator and cancel with the denominator h.",
         },
         {
           expression: "v(t) = \\lim_{h \\to 0} (8t + 4h + 3) = 8t + 3",
-          annotation: 'Take the limit as h \u2192 0. The term 4h vanishes, leaving the instantaneous velocity function v(t) = 8t + 3.',
+          annotation:
+            "Take the limit as h \u2192 0. The term 4h vanishes, leaving the instantaneous velocity function v(t) = 8t + 3.",
         },
         {
           expression: "v(2) = 8(2) + 3 = 16 + 3 = 19 \\text{ m/s}",
-          annotation: 'Substitute t = 2 to find the instantaneous velocity at t = 2 seconds. The particle is moving at exactly 19 meters per second at that moment.',
+          annotation:
+            "Substitute t = 2 to find the instantaneous velocity at t = 2 seconds. The particle is moving at exactly 19 meters per second at that moment.",
         },
       ],
-      conclusion: 'The instantaneous velocity at t = 2 is 19 m/s. The general velocity function v(t) = 8t + 3 shows that the particle is accelerating — its speed increases linearly with time. For comparison, the average velocity over [1, 3] would be [s(3)-s(1)]/(3-1) = [45 - 7]/2 = 19 m/s. This agreement is not a coincidence — the midpoint of [1, 3] is t = 2, and for a quadratic position function (uniform acceleration), the average velocity over any interval equals the instantaneous velocity at the midpoint.',
+      conclusion:
+        "The instantaneous velocity at t = 2 is 19 m/s. The general velocity function v(t) = 8t + 3 shows that the particle is accelerating — its speed increases linearly with time. For comparison, the average velocity over [1, 3] would be [s(3)-s(1)]/(3-1) = [45 - 7]/2 = 19 m/s. This agreement is not a coincidence — the midpoint of [1, 3] is t = 2, and for a quadratic position function (uniform acceleration), the average velocity over any interval equals the instantaneous velocity at the midpoint.",
     },
     {
-      id: 'ch2-000-ex8',
-      title: 'Galileo\'s Falling Ball: Derivative from First Principles (Physics)',
-      problem: 'Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s². Use the limit definition to find the velocity $v(t) = y\'(t)$, then evaluate at $t = 3$ s. Interpret the result.',
-      visualizationId: 'ProjectileMotion',
+      id: "ch2-000-ex8",
+      title:
+        "Galileo's Falling Ball: Derivative from First Principles (Physics)",
+      problem:
+        "Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s². Use the limit definition to find the velocity $v(t) = y'(t)$, then evaluate at $t = 3$ s. Interpret the result.",
+      visualizationId: "ProjectileMotion",
       steps: [
-        { expression: "v(t) = \\lim_{h \\to 0} \\frac{y(t+h) - y(t)}{h}", annotation: 'The velocity at time t is the derivative of position — defined as the limit of average velocities.' },
-        { expression: "y(t+h) = \\frac{1}{2}g(t+h)^2 = \\frac{g}{2}(t^2 + 2th + h^2)", annotation: 'Expand (t+h)².' },
-        { expression: "y(t+h) - y(t) = \\frac{g}{2}(t^2 + 2th + h^2) - \\frac{g}{2}t^2 = \\frac{g}{2}(2th + h^2)", annotation: 'Subtract y(t). The t² terms cancel.' },
-        { expression: "\\frac{y(t+h)-y(t)}{h} = \\frac{\\frac{g}{2}h(2t+h)}{h} = \\frac{g}{2}(2t+h)", annotation: 'Divide by h (cancel for h ≠ 0).' },
-        { expression: "v(t) = \\lim_{h \\to 0} \\frac{g}{2}(2t + h) = \\frac{g}{2}(2t) = gt", annotation: 'Take the limit: h → 0 eliminates the h term.' },
-        { expression: "v(t) = gt", annotation: 'The velocity increases linearly with time — uniform acceleration.' },
-        { expression: "v(3) = 9.8 \\times 3 = 29.4 \\text{ m/s}", annotation: 'At t=3 s, the ball is falling at 29.4 m/s ≈ 106 km/h.' },
+        {
+          expression: "v(t) = \\lim_{h \\to 0} \\frac{y(t+h) - y(t)}{h}",
+          annotation:
+            "The velocity at time t is the derivative of position — defined as the limit of average velocities.",
+        },
+        {
+          expression:
+            "y(t+h) = \\frac{1}{2}g(t+h)^2 = \\frac{g}{2}(t^2 + 2th + h^2)",
+          annotation: "Expand (t+h)².",
+        },
+        {
+          expression:
+            "y(t+h) - y(t) = \\frac{g}{2}(t^2 + 2th + h^2) - \\frac{g}{2}t^2 = \\frac{g}{2}(2th + h^2)",
+          annotation: "Subtract y(t). The t² terms cancel.",
+        },
+        {
+          expression:
+            "\\frac{y(t+h)-y(t)}{h} = \\frac{\\frac{g}{2}h(2t+h)}{h} = \\frac{g}{2}(2t+h)",
+          annotation: "Divide by h (cancel for h ≠ 0).",
+        },
+        {
+          expression:
+            "v(t) = \\lim_{h \\to 0} \\frac{g}{2}(2t + h) = \\frac{g}{2}(2t) = gt",
+          annotation: "Take the limit: h → 0 eliminates the h term.",
+        },
+        {
+          expression: "v(t) = gt",
+          annotation:
+            "The velocity increases linearly with time — uniform acceleration.",
+        },
+        {
+          expression: "v(3) = 9.8 \\times 3 = 29.4 \\text{ m/s}",
+          annotation: "At t=3 s, the ball is falling at 29.4 m/s ≈ 106 km/h.",
+        },
       ],
-      conclusion: 'The velocity v(t) = gt says: velocity grows linearly with time, at rate g = 9.8 m/s per second. This is uniform (constant) acceleration. In the limit definition, the key step is canceling h to remove the 0/0 indeterminate form — identical algebra to the tangent line problem. Galileo discovered this law experimentally in 1604; Newton\'s calculus gave it a mathematical foundation 60 years later.',
+      conclusion:
+        "The velocity v(t) = gt says: velocity grows linearly with time, at rate g = 9.8 m/s per second. This is uniform (constant) acceleration. In the limit definition, the key step is canceling h to remove the 0/0 indeterminate form — identical algebra to the tangent line problem. Galileo discovered this law experimentally in 1604; Newton's calculus gave it a mathematical foundation 60 years later.",
     },
   ],
 
-  discovery: {
-    title: `How Fast Is My Driver Going Right Now?`,
-    persona: `I'm a race engineer for a NASCAR team at Talladega Superspeedway. My driver is 3 laps from the finish, locked in a drafting battle for second place. I have a GPS unit that gives me his exact position at any moment. I need to know his speed at the exact instant he exits Turn 4 — because that's when the slingshot draft window opens. Not his average lap speed. Not his speed "around" that point. His speed at that exact instant.`,
-    steps: [
-      {
-        phase: 'need',
-        title: `The tool I have: average speed`,
-        content: `The formula every engineer knows:
+  discovery: [
+    {
+      title: `How Fast Is My Driver Going Right Now?`,
+      persona: `I'm a race engineer for a NASCAR team at Talladega Superspeedway. My driver is 3 laps from the finish, locked in a drafting battle for second place. I have a GPS unit that gives me his exact position at any moment. I need to know his speed at the exact instant he exits Turn 4 — because that's when the slingshot draft window opens. Not his average lap speed. Not his speed "around" that point. His speed at that exact instant.`,
+      steps: [
+        {
+          phase: "need",
+          title: `The tool I have: average speed`,
+          content: `The formula every engineer knows:
 
 $$\\text{average speed} = \\frac{\\text{distance traveled}}{\\text{time elapsed}} = \\frac{\\Delta p}{\\Delta t}$$
 
@@ -539,22 +689,22 @@ I have GPS data so I can read off position $p$ at any moment $t$. If I pick two 
 $$\\text{average speed} = \\frac{p(47) - p(46)}{47 - 46} = \\frac{p(47) - p(46)}{1 \\text{ second}}$$
 
 This formula is clean, exact, and requires nothing more than subtraction and division. I've been using it my whole career.`,
-      },
-      {
-        phase: 'need',
-        title: `Why average speed isn't enough`,
-        content: `The problem: in the last 2 seconds before Turn 4 exit, my driver braked to hit the apex, then floored the throttle coming out. That 2-second window contains braking, coasting, and full acceleration.
+        },
+        {
+          phase: "need",
+          title: `Why average speed isn't enough`,
+          content: `The problem: in the last 2 seconds before Turn 4 exit, my driver braked to hit the apex, then floored the throttle coming out. That 2-second window contains braking, coasting, and full acceleration.
 
 If I compute average speed over that 2 seconds and get 192 mph, that number is a blend. He might have been going 175 mph at the apex and 209 mph at exit. The average hides the real value.
 
 The draft window opens **exactly** at the exit point. I need to know his speed at **exactly** $t = 47$ seconds — the moment the GPS marks the exit line.
 
 Not "between $t = 46$ and $t = 48$." Not "around $t = 47$." The exact instant $t = 47$.`,
-      },
-      {
-        phase: 'need',
-        title: `My formula collapses at a single instant`,
-        content: `So I try to apply the average speed formula at exactly $t = 47$:
+        },
+        {
+          phase: "need",
+          title: `My formula collapses at a single instant`,
+          content: `So I try to apply the average speed formula at exactly $t = 47$:
 
 $$\\text{speed at } t = 47 = \\frac{p(47) - p(47)}{47 - 47} = \\frac{0}{0}$$
 
@@ -565,11 +715,11 @@ This isn't a rounding error or a data problem. It's a fundamental breakdown: **t
 For 2,000 years, this was the state of things. You could measure average speed. You could not, in any rigorous sense, measure speed at an instant. Aristotle even argued that motion at an instant was a contradiction in terms.
 
 I need a new tool. My current one literally cannot answer the question.`,
-      },
-      {
-        phase: 'discovery',
-        title: `Try a smaller window — does the average get more accurate?`,
-        content: `If I can't use an interval of zero length, what about a very *small* interval?
+        },
+        {
+          phase: "discovery",
+          title: `Try a smaller window — does the average get more accurate?`,
+          content: `If I can't use an interval of zero length, what about a very *small* interval?
 
 Instead of measuring from $t = 46$ to $t = 47$, I measure from $t = 46.9$ to $t = 47$. A tenth of a second. Much less time for braking and acceleration to distort the reading.
 
@@ -587,11 +737,11 @@ where $h$ is the window length in seconds.
 | $h = 0.001$ s | $0.28999$ | $0$ | $289.99$ ft/s | 198 mph |
 
 The numbers are changing. But they're not jumping around randomly — **they're converging.**`,
-      },
-      {
-        phase: 'discovery',
-        title: `I see the pattern — write the algebra`,
-        content: `The convergence isn't a coincidence. Let me write the average speed formula **algebraically** and see what's happening:
+        },
+        {
+          phase: "discovery",
+          title: `I see the pattern — write the algebra`,
+          content: `The convergence isn't a coincidence. Let me write the average speed formula **algebraically** and see what's happening:
 
 $$\\frac{p(h) - p(0)}{h}$$
 
@@ -617,11 +767,11 @@ Now I can see exactly why the table converged:
 | $0.001$ | $290 - 0.015 = 289.985$ | 198 mph |
 
 The $-15h$ term is the source of all the "blending" — the contamination from the braking phase. As $h$ shrinks, that contamination shrinks too. It approaches zero. What's left is $290$.`,
-      },
-      {
-        phase: 'discovery',
-        title: `The answer appears — without ever dividing by zero`,
-        content: `The expression $290 - 15h$ approaches $290$ as $h$ gets small. I never need $h$ to actually equal zero. I just need to ask: **what value does the expression approach?**
+        },
+        {
+          phase: "discovery",
+          title: `The answer appears — without ever dividing by zero`,
+          content: `The expression $290 - 15h$ approaches $290$ as $h$ gets small. I never need $h$ to actually equal zero. I just need to ask: **what value does the expression approach?**
 
 $$\\text{As } h \\to 0: \\quad 290 - 15h \\to 290 - 15(0) = 290 \\text{ ft/s}$$
 
@@ -638,11 +788,11 @@ I avoided $0/0$ entirely. The key move was:
 Step 4 is the limit. I used it in Chapter 1 to resolve $0/0$ fractions. This is the same tool — here it's resolving "the speed at an instant."
 
 My driver is hitting the Turn 4 exit line at **197.7 mph**. The draft window is open.`,
-      },
-      {
-        phase: 'formalization',
-        title: `Name the process: Newton's difference quotient`,
-        content: `What I just did has a name. For any function $f$ (position, temperature, profit — anything), the expression:
+        },
+        {
+          phase: "formalization",
+          title: `Name the process: Newton's difference quotient`,
+          content: `What I just did has a name. For any function $f$ (position, temperature, profit — anything), the expression:
 
 $$\\frac{f(t + h) - f(t)}{h}$$
 
@@ -663,11 +813,11 @@ The difference quotient is the average speed over a window of width $h$. The der
 $$f'(t) = \\frac{df}{dt} = \\frac{dp}{dt} = \\dot{f}(t)$$
 
 All mean the same thing: the instantaneous rate of change of $f$ with respect to $t$.`,
-      },
-      {
-        phase: 'formalization',
-        title: `Compute $p'(t)$ — not just at one moment, but at every moment`,
-        content: `The big payoff: I don't have to repeat the whole process every time. Let me compute $p'(t)$ for a **general** time $t$ (not just $t = 0$):
+        },
+        {
+          phase: "formalization",
+          title: `Compute $p'(t)$ — not just at one moment, but at every moment`,
+          content: `The big payoff: I don't have to repeat the whole process every time. Let me compute $p'(t)$ for a **general** time $t$ (not just $t = 0$):
 
 $$p(t) = 290t - 15t^2$$
 
@@ -699,9 +849,9 @@ This single formula gives my driver's speed at **every** moment $t$:
 - At $t = 9.67$ s: $290 - 290 = 0$ ft/s (momentarily stopped, deepest brake point)
 
 What started as a single unanswerable question — "how fast at one instant?" — became a machine that answers it for every instant at once.`,
-      },
-    ],
-    resolution: `**The derivative, rebuilt from one question:**
+        },
+      ],
+      resolution: `**The derivative, rebuilt from one question:**
 
 $$f'(t) = \\lim_{h \\to 0} \\frac{f(t+h) - f(t)}{h}$$
 
@@ -717,359 +867,498 @@ $$f'(t) = \\lim_{h \\to 0} \\frac{f(t+h) - f(t)}{h}$$
 **What it gives you:** not a single speed at a single moment, but a new function $f'(t)$ — the velocity function — that answers the question for every moment simultaneously.
 
 Newton invented this in 1666 to describe planetary motion. You just re-invented it to solve a NASCAR drafting problem. The question was different; the math was identical.`,
-  },
+    },
+    {
+      title: "The Overtake: Discovering Instantaneous Speed",
+      persona:
+        "I'm a NASCAR driver on the final lap at Daytona. I'm running side-by-side with the leader, but I have to decide in the next half-second whether to pull out and go for the pass. The spotter just gave me my average speed over the last 2 seconds (198 mph), but that's not enough. I need to know my exact speed **right now** — at this precise instant — because if I'm still accelerating, I have more speed coming; if I'm already at the limit, I don't. Average speed tells me what happened in the past. I need the speed at one frozen moment. How do I get it from the data I actually have?",
+      steps: [
+        {
+          phase: "need",
+          title: "What I already know — and why it fails me at 200 mph",
+          content:
+            "I know how to calculate average speed. If I travel 396 feet in 2 seconds, my average speed is 198 mph. That's simple division:\n\n$$\\text{average speed} = \\frac{\\text{distance}}{\\text{time}}$$\n\nBut right now I need the speed **at one exact instant** — the moment I decide to pull out. If I use the 2-second average, I'm basing my decision on data from the past 2 seconds, not on what my car is doing **right now**. The car could be speeding up or slowing down inside that interval. Average speed hides the truth at the exact moment I need it.\n\nThis is the gap: algebra gives me averages over intervals, but racing demands the rate of change at a single point. My existing tools break here.",
+        },
+        {
+          phase: "need",
+          title: "Trying smaller intervals — the first hint",
+          content:
+            "I ask the spotter for shorter intervals. Here's what we get for my position data around the critical moment (t = 0 is right now):\n\n| Interval length | Time interval | Distance traveled | Average speed |\n|---|---|---|---|\n| 2.0 s | –1 to +1 s | 396 ft | 198 mph |\n| 1.0 s | –0.5 to +0.5 s | 198.5 ft | 198.5 mph |\n| 0.5 s | –0.25 to +0.25 s | 99.4 ft | 198.8 mph |\n| 0.1 s | –0.05 to +0.05 s | 19.92 ft | 199.2 mph |\n\nThe numbers are getting closer and closer to 200 mph as the interval shrinks. But I still don't have the speed at the exact instant — only averages over smaller and smaller slices of time. How small does the slice have to be before I can trust the number as the true speed right now?",
+        },
+        {
+          phase: "discovery",
+          title: "Building the rate manually — finite differences",
+          content:
+            "I realize I can write the average speed over any tiny interval of length h as:\n\n$$\\text{average speed over } h = \\frac{s(t + h) - s(t)}{h}$$\n\nwhere s(t) is my position at time t. This is just the old distance-over-time formula, but now applied to a tiny slice.\n\nI don't know s(t) exactly, but I can measure it at many points. So I compute this expression for smaller and smaller h:\n\n- h = 1.0 s → 198.5 mph\n- h = 0.5 s → 198.8 mph\n- h = 0.1 s → 199.2 mph\n- h = 0.01 s → 199.92 mph\n- h = 0.001 s → 199.992 mph\n\nThe values are clearly approaching 200 mph. No matter how small I make the interval, the number stabilizes at 200. This is not coincidence — it's the car telling me its true speed at that exact moment.",
+        },
+        {
+          phase: "discovery",
+          title: "The breakthrough — what if the interval never reaches zero?",
+          content:
+            "I can't actually make h = 0 (that would be dividing by zero). But I can make h as small as my measurement equipment allows. The pattern is clear: as h gets closer to zero, the average speed over that tiny interval gets closer and closer to a single fixed number.\n\nThat fixed number is the **instantaneous speed** at the exact moment t. It is the limit of the average speeds as the time slice shrinks to nothing.\n\nI write it as:\n\n$$\\text{instantaneous speed at } t = \\lim_{h \\to 0} \\frac{s(t + h) - s(t)}{h}$$\n\nThis is the quantity I actually need on the track. It tells me my true speed right now, not an average from the recent past.",
+        },
+        {
+          phase: "formalization",
+          title: "Compressing the idea — the derivative is born",
+          content:
+            "We have reconstructed the idea from raw measurements and repeated calculations. Now we give it a name and a symbol so we can use it quickly.\n\nThe expression we built is called the **derivative** of the position function s(t) at the point t. We write it:\n\n$$s'(t) = \\lim_{h \\to 0} \\frac{s(t + h) - s(t)}{h}$$\n\nor, using the common notation for instantaneous rate of change:\n\n$$\\frac{ds}{dt} = \\lim_{h \\to 0} \\frac{\\Delta s}{\\Delta t}$$\n\nThis single symbol $s'(t)$ or $\\dfrac{ds}{dt}$ is just a compressed way of saying \"the limiting value of the average speed as the time interval shrinks to zero.\"\n\nThe derivative is not a new invention — it is the precise mathematical way to capture the instantaneous rate we already discovered on the track.",
+        },
+        {
+          phase: "formalization",
+          title: "Why this matters on the track — and everywhere else",
+          content:
+            "Back on the Daytona straightaway, I now have a tool. My position function (from the car's sensors) gives me s(t). I compute s'(t) at the critical moment and get exactly 200 mph. That tells me I am still accelerating and will have more speed in the next half-second — enough to complete the pass safely.\n\nThe same limiting process works for any changing quantity:\n- speed from position\n- population growth rate from population data\n- inflation rate from price data\n- voltage change from a sensor reading\n\nWhenever we need the rate at one exact instant, we use the same limit-of-average-rates construction we just rebuilt.",
+        },
+      ],
+      resolution:
+        '**The derivative — earned from first principles**\n\nWe started with the real problem a NASCAR driver actually faces: average speed is not enough when you need the speed **right now**. We tried smaller and smaller intervals, computed average rates manually, watched the numbers stabilize, and discovered the limit process. Only then did we give it the name and notation "derivative."\n\n**The four-step discovery process we just used (and will use for every calculus concept):**\n1. **Need** — show where everyday algebra or averages fail.\n2. **Discovery** — build the answer with finite, measurable steps and repeated calculations.\n3. **Limit behavior** — watch what happens as the interval shrinks.\n4. **Formalization** — compress the repeated process into clean notation.\n\nThis is how calculus is born on the track: not from definitions first, but from a problem that demands an instantaneous rate. The derivative is the tool we invented to answer that demand.\n\nNow every time you see $\\dfrac{ds}{dt}$ you will remember: it is the limiting value of $\\dfrac{\\Delta s}{\\Delta t}$ as $\\Delta t \\to 0$ — the exact speed at one frozen moment.',
+    },
+  ],
 
   challenges: [
     {
-      id: 'ch2-000-ch1',
-      difficulty: 'easy',
-      problem: 'Use the limit definition of the derivative to find the equation of the tangent line to f(x) = 2x^2 - 3x at x = 1.',
-      hint: 'First find f\'(x) using the definition, then evaluate at x = 1 to get the slope. Use f(1) for the y-coordinate of the point.',
+      id: "ch2-000-ch1",
+      difficulty: "easy",
+      problem:
+        "Use the limit definition of the derivative to find the equation of the tangent line to f(x) = 2x^2 - 3x at x = 1.",
+      hint: "First find f'(x) using the definition, then evaluate at x = 1 to get the slope. Use f(1) for the y-coordinate of the point.",
       walkthrough: [
         {
-          expression: "f'(x) = \\lim_{h \\to 0} \\frac{[2(x+h)^2 - 3(x+h)] - [2x^2 - 3x]}{h}",
-          annotation: 'Set up the difference quotient for f(x) = 2x\u00b2 - 3x.',
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{[2(x+h)^2 - 3(x+h)] - [2x^2 - 3x]}{h}",
+          annotation:
+            "Set up the difference quotient for f(x) = 2x\u00b2 - 3x.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{2(x^2+2xh+h^2) - 3x - 3h - 2x^2 + 3x}{h}",
-          annotation: 'Expand (x+h)\u00b2 = x\u00b2+2xh+h\u00b2 and distribute the 2 and -3.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{2(x^2+2xh+h^2) - 3x - 3h - 2x^2 + 3x}{h}",
+          annotation:
+            "Expand (x+h)\u00b2 = x\u00b2+2xh+h\u00b2 and distribute the 2 and -3.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{2x^2 + 4xh + 2h^2 - 3x - 3h - 2x^2 + 3x}{h}",
-          annotation: 'Distribute fully.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{2x^2 + 4xh + 2h^2 - 3x - 3h - 2x^2 + 3x}{h}",
+          annotation: "Distribute fully.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{4xh + 2h^2 - 3h}{h}",
-          annotation: 'Cancel: 2x\u00b2 - 2x\u00b2 = 0 and -3x + 3x = 0.',
+          annotation: "Cancel: 2x\u00b2 - 2x\u00b2 = 0 and -3x + 3x = 0.",
         },
         {
           expression: "= \\lim_{h \\to 0} (4x + 2h - 3) = 4x - 3",
-          annotation: 'Factor h and cancel, then let h \u2192 0.',
+          annotation: "Factor h and cancel, then let h \u2192 0.",
         },
         {
           expression: "f'(1) = 4(1) - 3 = 1, \\quad f(1) = 2(1)^2 - 3(1) = -1",
-          annotation: 'Evaluate slope f\'(1) = 1 and y-coordinate f(1) = -1.',
+          annotation: "Evaluate slope f'(1) = 1 and y-coordinate f(1) = -1.",
         },
         {
           expression: "y - (-1) = 1 \\cdot (x - 1) \\implies y = x - 2",
-          annotation: 'Use point-slope form with point (1, -1) and slope 1.',
+          annotation: "Use point-slope form with point (1, -1) and slope 1.",
         },
       ],
-      answer: 'y = x - 2',
+      answer: "y = x - 2",
     },
     {
-      id: 'ch2-000-ch2',
-      difficulty: 'medium',
-      problem: 'Prove from the limit definition that \\dfrac{d}{dx}[x^4] = 4x^3. You will need the expansion (x+h)^4 = x^4 + 4x^3h + 6x^2h^2 + 4xh^3 + h^4.',
-      hint: 'Expand (x+h)^4 using the given binomial expansion, subtract x^4, divide by h, then let h\u21920. Identify which terms survive after h\u21920.',
+      id: "ch2-000-ch2",
+      difficulty: "medium",
+      problem:
+        "Prove from the limit definition that \\dfrac{d}{dx}[x^4] = 4x^3. You will need the expansion (x+h)^4 = x^4 + 4x^3h + 6x^2h^2 + 4xh^3 + h^4.",
+      hint: "Expand (x+h)^4 using the given binomial expansion, subtract x^4, divide by h, then let h\u21920. Identify which terms survive after h\u21920.",
       walkthrough: [
         {
-          expression: "\\frac{d}{dx}[x^4] = \\lim_{h \\to 0} \\frac{(x+h)^4 - x^4}{h}",
-          annotation: 'Apply the limit definition.',
+          expression:
+            "\\frac{d}{dx}[x^4] = \\lim_{h \\to 0} \\frac{(x+h)^4 - x^4}{h}",
+          annotation: "Apply the limit definition.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{(x^4 + 4x^3 h + 6x^2 h^2 + 4xh^3 + h^4) - x^4}{h}",
-          annotation: 'Substitute the binomial expansion of (x+h)^4.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{(x^4 + 4x^3 h + 6x^2 h^2 + 4xh^3 + h^4) - x^4}{h}",
+          annotation: "Substitute the binomial expansion of (x+h)^4.",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{4x^3 h + 6x^2 h^2 + 4xh^3 + h^4}{h}",
-          annotation: 'Cancel x^4 - x^4 = 0.',
+          expression:
+            "= \\lim_{h \\to 0} \\frac{4x^3 h + 6x^2 h^2 + 4xh^3 + h^4}{h}",
+          annotation: "Cancel x^4 - x^4 = 0.",
         },
         {
           expression: "= \\lim_{h \\to 0} (4x^3 + 6x^2 h + 4xh^2 + h^3)",
-          annotation: 'Divide every term in the numerator by h. Every term had at least one factor of h.',
+          annotation:
+            "Divide every term in the numerator by h. Every term had at least one factor of h.",
         },
         {
           expression: "= 4x^3 + 0 + 0 + 0 = 4x^3",
-          annotation: 'Let h \u2192 0. Every term containing h vanishes. Only 4x\u00b3 survives.',
+          annotation:
+            "Let h \u2192 0. Every term containing h vanishes. Only 4x\u00b3 survives.",
         },
       ],
-      answer: '\\dfrac{d}{dx}[x^4] = 4x^3',
+      answer: "\\dfrac{d}{dx}[x^4] = 4x^3",
     },
     {
-      id: 'ch2-000-ch3',
-      difficulty: 'hard',
-      problem: 'Let f(x) = x\\sin(1/x) for x \\neq 0 and f(0) = 0. Prove that f is differentiable at x = 0 by evaluating the limit definition directly. Use the Squeeze Theorem.',
-      hint: 'Set up the difference quotient at a = 0. You will have [f(h) - f(0)] / h = h\u00b7sin(1/h) / h = sin(1/h). But sin(1/h) oscillates wildly — think about what bounds sin always satisfies, then squeeze.',
+      id: "ch2-000-ch3",
+      difficulty: "hard",
+      problem:
+        "Let f(x) = x\\sin(1/x) for x \\neq 0 and f(0) = 0. Prove that f is differentiable at x = 0 by evaluating the limit definition directly. Use the Squeeze Theorem.",
+      hint: "Set up the difference quotient at a = 0. You will have [f(h) - f(0)] / h = h\u00b7sin(1/h) / h = sin(1/h). But sin(1/h) oscillates wildly — think about what bounds sin always satisfies, then squeeze.",
       walkthrough: [
         {
-          expression: "f'(0) = \\lim_{h \\to 0} \\frac{f(0+h) - f(0)}{h} = \\lim_{h \\to 0} \\frac{f(h) - 0}{h}",
-          annotation: 'Write the derivative at x = 0 using f(0) = 0.',
+          expression:
+            "f'(0) = \\lim_{h \\to 0} \\frac{f(0+h) - f(0)}{h} = \\lim_{h \\to 0} \\frac{f(h) - 0}{h}",
+          annotation: "Write the derivative at x = 0 using f(0) = 0.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{h \\sin(1/h)}{h}",
-          annotation: 'Substitute f(h) = h\u00b7sin(1/h) (valid for h \u2260 0, which is exactly what the limit requires).',
+          annotation:
+            "Substitute f(h) = h\u00b7sin(1/h) (valid for h \u2260 0, which is exactly what the limit requires).",
         },
         {
           expression: "= \\lim_{h \\to 0} \\sin\\left(\\frac{1}{h}\\right)",
-          annotation: 'Cancel h/h. Now we have the limit of sin(1/h) as h \u2192 0. This limit does NOT exist in the ordinary sense — sin(1/h) oscillates infinitely often near h = 0.',
+          annotation:
+            "Cancel h/h. Now we have the limit of sin(1/h) as h \u2192 0. This limit does NOT exist in the ordinary sense — sin(1/h) oscillates infinitely often near h = 0.",
         },
         {
-          expression: "-1 \\leq \\sin\\left(\\frac{1}{h}\\right) \\leq 1 \\quad \\text{for all } h \\neq 0",
-          annotation: 'Wait — we made an error above. We should NOT have canceled so quickly. Let us restart from the difference quotient before canceling.',
+          expression:
+            "-1 \\leq \\sin\\left(\\frac{1}{h}\\right) \\leq 1 \\quad \\text{for all } h \\neq 0",
+          annotation:
+            "Wait — we made an error above. We should NOT have canceled so quickly. Let us restart from the difference quotient before canceling.",
         },
         {
-          expression: "\\frac{f(h) - f(0)}{h} = \\frac{h \\sin(1/h)}{h} = \\sin(1/h)? \\quad \\text{Hmm — but this limit does not exist!}",
-          annotation: 'This seems to show f is NOT differentiable at 0. But wait — go back to the un-canceled form: f(h)/h = sin(1/h). Indeed this has no limit. So... is f differentiable?',
+          expression:
+            "\\frac{f(h) - f(0)}{h} = \\frac{h \\sin(1/h)}{h} = \\sin(1/h)? \\quad \\text{Hmm — but this limit does not exist!}",
+          annotation:
+            "This seems to show f is NOT differentiable at 0. But wait — go back to the un-canceled form: f(h)/h = sin(1/h). Indeed this has no limit. So... is f differentiable?",
         },
         {
-          expression: "\\text{Reconsider: } \\frac{f(h)}{h} = \\frac{h\\sin(1/h)}{h} = \\sin(1/h)",
-          annotation: 'The cancellation is correct. The issue is that sin(1/h) does NOT have a limit as h\u21920. Therefore f\'(0) does not exist for f(x) = x\u00b7sin(1/x). This function is actually NOT differentiable at 0.',
+          expression:
+            "\\text{Reconsider: } \\frac{f(h)}{h} = \\frac{h\\sin(1/h)}{h} = \\sin(1/h)",
+          annotation:
+            "The cancellation is correct. The issue is that sin(1/h) does NOT have a limit as h\u21920. Therefore f'(0) does not exist for f(x) = x\u00b7sin(1/x). This function is actually NOT differentiable at 0.",
         },
         {
           expression: "\\text{Compare with } g(x) = x^2 \\sin(1/x),\\; g(0)=0",
-          annotation: 'The function x\u00b7sin(1/x) is NOT differentiable at 0. The differentiable version requires the extra factor of x. With g(x) = x\u00b2\u00b7sin(1/x), the difference quotient becomes h\u00b7sin(1/h), which DOES go to 0 by the Squeeze Theorem.',
+          annotation:
+            "The function x\u00b7sin(1/x) is NOT differentiable at 0. The differentiable version requires the extra factor of x. With g(x) = x\u00b2\u00b7sin(1/x), the difference quotient becomes h\u00b7sin(1/h), which DOES go to 0 by the Squeeze Theorem.",
         },
         {
-          expression: "g'(0) = \\lim_{h\\to 0} \\frac{h^2 \\sin(1/h)}{h} = \\lim_{h\\to 0} h\\sin(1/h)",
-          annotation: 'For g(x) = x\u00b2 sin(1/x), the difference quotient reduces to h\u00b7sin(1/h).',
+          expression:
+            "g'(0) = \\lim_{h\\to 0} \\frac{h^2 \\sin(1/h)}{h} = \\lim_{h\\to 0} h\\sin(1/h)",
+          annotation:
+            "For g(x) = x\u00b2 sin(1/x), the difference quotient reduces to h\u00b7sin(1/h).",
         },
         {
           expression: "-|h| \\leq h\\sin(1/h) \\leq |h|",
-          annotation: 'Since |sin(1/h)| \u2264 1 for all h \u2260 0, we have |h\u00b7sin(1/h)| \u2264 |h|, giving the squeeze inequality.',
+          annotation:
+            "Since |sin(1/h)| \u2264 1 for all h \u2260 0, we have |h\u00b7sin(1/h)| \u2264 |h|, giving the squeeze inequality.",
         },
         {
-          expression: "\\lim_{h\\to 0}(-|h|) = 0 \\leq \\lim_{h\\to 0} h\\sin(1/h) \\leq \\lim_{h\\to 0}|h| = 0",
-          annotation: 'Both bounding functions approach 0 as h \u2192 0. By the Squeeze Theorem, the middle term also approaches 0.',
+          expression:
+            "\\lim_{h\\to 0}(-|h|) = 0 \\leq \\lim_{h\\to 0} h\\sin(1/h) \\leq \\lim_{h\\to 0}|h| = 0",
+          annotation:
+            "Both bounding functions approach 0 as h \u2192 0. By the Squeeze Theorem, the middle term also approaches 0.",
         },
         {
           expression: "\\therefore g'(0) = 0",
-          annotation: 'The Squeeze Theorem gives g\'(0) = 0. So g(x) = x\u00b2\u00b7sin(1/x) IS differentiable at 0, with derivative 0.',
+          annotation:
+            "The Squeeze Theorem gives g'(0) = 0. So g(x) = x\u00b2\u00b7sin(1/x) IS differentiable at 0, with derivative 0.",
         },
       ],
-      answer: "f(x) = x\\sin(1/x) \\text{ is NOT differentiable at } 0. \\text{ The correct differentiable version is } g(x) = x^2\\sin(1/x),\\text{ for which } g'(0) = 0 \\text{ by the Squeeze Theorem.}",
+      answer:
+        "f(x) = x\\sin(1/x) \\text{ is NOT differentiable at } 0. \\text{ The correct differentiable version is } g(x) = x^2\\sin(1/x),\\text{ for which } g'(0) = 0 \\text{ by the Squeeze Theorem.}",
     },
     {
-      id: 'ch2-000-ch4',
-      difficulty: 'hard',
-      problem: 'Let $f(x) = \\begin{cases} x^2 & x \\leq 1 \\\\ 2x - 1 & x > 1 \\end{cases}$. Is $f$ differentiable at $x = 1$? Compute both one-sided difference quotients.',
-      hint: 'Compute the left-hand and right-hand limits of [f(1+h)−f(1)]/h separately. For h<0, use the x² branch; for h>0, use the 2x−1 branch. Check if they agree.',
+      id: "ch2-000-ch4",
+      difficulty: "hard",
+      problem:
+        "Let $f(x) = \\begin{cases} x^2 & x \\leq 1 \\\\ 2x - 1 & x > 1 \\end{cases}$. Is $f$ differentiable at $x = 1$? Compute both one-sided difference quotients.",
+      hint: "Compute the left-hand and right-hand limits of [f(1+h)−f(1)]/h separately. For h<0, use the x² branch; for h>0, use the 2x−1 branch. Check if they agree.",
       walkthrough: [
-        { expression: 'f(1) = 1^2 = 1', annotation: 'At x=1 we use the left branch: f(1)=1.' },
-        { expression: 'f\'_-(1) = \\lim_{h \\to 0^-}\\frac{(1+h)^2 - 1}{h} = \\lim_{h \\to 0^-}\\frac{1+2h+h^2-1}{h} = \\lim_{h \\to 0^-}(2+h) = 2', annotation: 'For h<0, 1+h<1 so use the x² branch. Factor and cancel h.' },
-        { expression: 'f\'_+(1) = \\lim_{h \\to 0^+}\\frac{[2(1+h)-1] - 1}{h} = \\lim_{h \\to 0^+}\\frac{2h}{h} = 2', annotation: 'For h>0, 1+h>1 so use the 2x−1 branch. f(1+h)=2(1+h)−1=1+2h.' },
-        { expression: 'f\'_-(1) = 2 = f\'_+(1)', annotation: 'Both one-sided derivatives agree.' },
-        { expression: 'f\'(1) = 2', annotation: 'Since the one-sided limits match, f is differentiable at x=1 with derivative 2.' },
+        {
+          expression: "f(1) = 1^2 = 1",
+          annotation: "At x=1 we use the left branch: f(1)=1.",
+        },
+        {
+          expression:
+            "f'_-(1) = \\lim_{h \\to 0^-}\\frac{(1+h)^2 - 1}{h} = \\lim_{h \\to 0^-}\\frac{1+2h+h^2-1}{h} = \\lim_{h \\to 0^-}(2+h) = 2",
+          annotation:
+            "For h<0, 1+h<1 so use the x² branch. Factor and cancel h.",
+        },
+        {
+          expression:
+            "f'_+(1) = \\lim_{h \\to 0^+}\\frac{[2(1+h)-1] - 1}{h} = \\lim_{h \\to 0^+}\\frac{2h}{h} = 2",
+          annotation:
+            "For h>0, 1+h>1 so use the 2x−1 branch. f(1+h)=2(1+h)−1=1+2h.",
+        },
+        {
+          expression: "f'_-(1) = 2 = f'_+(1)",
+          annotation: "Both one-sided derivatives agree.",
+        },
+        {
+          expression: "f'(1) = 2",
+          annotation:
+            "Since the one-sided limits match, f is differentiable at x=1 with derivative 2.",
+        },
       ],
-      answer: "f is differentiable at x=1 with f'(1)=2. Both pieces meet smoothly: the parabola's slope at x=1 is 2x|_{x=1}=2, which matches the linear piece's slope of 2.",
+      answer:
+        "f is differentiable at x=1 with f'(1)=2. Both pieces meet smoothly: the parabola's slope at x=1 is 2x|_{x=1}=2, which matches the linear piece's slope of 2.",
     },
   ],
 
   crossRefs: [
-    { lessonSlug: 'continuity', label: 'Limits and Continuity', context: 'The derivative is defined as a limit; the limit laws and squeeze theorem are essential tools.' },
-    { lessonSlug: 'differentiation-rules', label: 'Differentiation Rules', context: 'The limit definition motivates and proves the power rule and other shortcuts.' },
-    { lessonSlug: 'linear-approximation', label: 'Linear Approximation', context: 'The tangent line at a point is the best linear approximation to the function near that point.' },
+    {
+      lessonSlug: "continuity",
+      label: "Limits and Continuity",
+      context:
+        "The derivative is defined as a limit; the limit laws and squeeze theorem are essential tools.",
+    },
+    {
+      lessonSlug: "differentiation-rules",
+      label: "Differentiation Rules",
+      context:
+        "The limit definition motivates and proves the power rule and other shortcuts.",
+    },
+    {
+      lessonSlug: "linear-approximation",
+      label: "Linear Approximation",
+      context:
+        "The tangent line at a point is the best linear approximation to the function near that point.",
+    },
   ],
 
   // ─── Spiral Learning ───────────────────────────────────────────────
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'ch0-lines',
-        label: 'Slope formula (Chapter 0)',
-        note: 'The difference quotient [f(x+h)-f(x)]/h IS the slope formula \u0394y/\u0394x with \u0394x = h. \u0394y/\u0394x is the slope of a line through two points — the derivative is that formula with h \u2192 0. If slope between two points feels rusty, review it now: lines have constant slope, curves need a limit because slope changes at every point.'
+        lessonId: "ch0-lines",
+        label: "Slope formula (Chapter 0)",
+        note: "The difference quotient [f(x+h)-f(x)]/h IS the slope formula \u0394y/\u0394x with \u0394x = h. \u0394y/\u0394x is the slope of a line through two points — the derivative is that formula with h \u2192 0. If slope between two points feels rusty, review it now: lines have constant slope, curves need a limit because slope changes at every point.",
       },
       {
-        lessonId: 'ch1-limits-intro',
-        label: 'Limits (Chapter 1)',
-        note: 'The derivative is defined as a limit. The 0/0 indeterminate form and the algebra of cancelling h in the difference quotient are the exact same techniques from Chapter 1. If you feel shaky on limits, revisit them now — you will use them in every derivative calculation in this lesson.'
+        lessonId: "ch1-limits-intro",
+        label: "Limits (Chapter 1)",
+        note: "The derivative is defined as a limit. The 0/0 indeterminate form and the algebra of cancelling h in the difference quotient are the exact same techniques from Chapter 1. If you feel shaky on limits, revisit them now — you will use them in every derivative calculation in this lesson.",
       },
       {
-        lessonId: 'ch1-continuity',
-        label: 'Chapter 1: Continuity',
-        note: 'We now prove (not just assume) that differentiable \u21d2 continuous. The theorem is short: if the limit of the difference quotient exists and is finite, the function cannot have a jump. Understanding why requires the limit product rule you learned in Chapter 1.'
-      }
+        lessonId: "ch1-continuity",
+        label: "Chapter 1: Continuity",
+        note: "We now prove (not just assume) that differentiable \u21d2 continuous. The theorem is short: if the limit of the difference quotient exists and is finite, the function cannot have a jump. Understanding why requires the limit product rule you learned in Chapter 1.",
+      },
     ],
     futureLinks: [
       {
-        lessonId: 'ch2-differentiation-rules',
-        label: 'Differentiation rules (next lesson)',
-        note: 'Every shortcut rule (power, product, quotient) is a theorem proved exactly once from the limit definition you learn here, then used freely ever after. Computing (x+h)^100 from scratch would take a page; the power rule makes it three seconds.'
+        lessonId: "ch2-differentiation-rules",
+        label: "Differentiation rules (next lesson)",
+        note: "Every shortcut rule (power, product, quotient) is a theorem proved exactly once from the limit definition you learn here, then used freely ever after. Computing (x+h)^100 from scratch would take a page; the power rule makes it three seconds.",
       },
       {
-        lessonId: 'ch5-integration-intro',
-        label: 'Chain rule',
-        note: 'The chain rule depends on understanding that the limit process is the foundation of every derivative — knowing why the definition works makes the chain rule proof transparent. The limit definition you master here is the starting point for every derivative rule in the course.'
-      }
-    ]
+        lessonId: "ch5-integration-intro",
+        label: "Chain rule",
+        note: "The chain rule depends on understanding that the limit process is the foundation of every derivative — knowing why the definition works makes the chain rule proof transparent. The limit definition you master here is the starting point for every derivative rule in the course.",
+      },
+    ],
   },
 
   // ─── Assessment: Mastery Check ────────────────────────────────────────────
   assessment: {
     questions: [
       {
-        id: 'deriv-assess-1',
-        type: 'input',
-        text: 'The difference quotient [f(x+h)-f(x)]/h represents the slope of what kind of line?',
-        answer: 'secant',
-        hint: 'It passes through TWO points on the curve. As h\u21920, this line approaches the tangent.'
+        id: "deriv-assess-1",
+        type: "input",
+        text: "The difference quotient [f(x+h)-f(x)]/h represents the slope of what kind of line?",
+        answer: "secant",
+        hint: "It passes through TWO points on the curve. As h\u21920, this line approaches the tangent.",
       },
       {
-        id: 'deriv-assess-2',
-        type: 'input',
-        text: 'Using the limit definition, what is d/dx[x\u00b2]?',
-        answer: '2x',
-        hint: 'Expand (x+h)\u00b2, subtract x\u00b2, divide by h, cancel h, then let h\u21920.'
+        id: "deriv-assess-2",
+        type: "input",
+        text: "Using the limit definition, what is d/dx[x\u00b2]?",
+        answer: "2x",
+        hint: "Expand (x+h)\u00b2, subtract x\u00b2, divide by h, cancel h, then let h\u21920.",
       },
       {
-        id: 'deriv-assess-3',
-        type: 'choice',
-        text: 'If f is differentiable at a, then f is:',
-        options: ['Necessarily continuous at a', 'Necessarily discontinuous at a', 'May or may not be continuous', 'Continuous everywhere except a'],
-        answer: 'Necessarily continuous at a',
-        hint: 'Differentiability \u21d2 Continuity (proven in the Rigor section). The converse is false: |x| is continuous but not differentiable at 0.'
-      },
-      {
-        id: 'deriv-assess-4',
-        type: 'input',
-        text: 'What is the equation of the tangent line to f(x) = x\u00b2 at the point (3, 9)?',
-        answer: 'y=6x-9',
-        hint: "f'(3) = 2(3) = 6. Then use point-slope: y - 9 = 6(x - 3), simplify to y = 6x - 9."
-      },
-      {
-        id: 'deriv-assess-5',
-        type: 'choice',
-        text: 'The function f(x) = |x| is NOT differentiable at x=0 because:',
+        id: "deriv-assess-3",
+        type: "choice",
+        text: "If f is differentiable at a, then f is:",
         options: [
-          'It is discontinuous at x=0',
-          'The left and right-hand derivatives are unequal (+1 and -1)',
-          'The limit does not exist',
-          'The function is undefined at x=0'
+          "Necessarily continuous at a",
+          "Necessarily discontinuous at a",
+          "May or may not be continuous",
+          "Continuous everywhere except a",
         ],
-        answer: 'The left and right-hand derivatives are unequal (+1 and -1)',
-        hint: 'It is continuous (no hole), but it has a CORNER. From the right, slope = +1. From the left, slope = -1. They disagree, so no derivative exists.'
-      }
-    ]
+        answer: "Necessarily continuous at a",
+        hint: "Differentiability \u21d2 Continuity (proven in the Rigor section). The converse is false: |x| is continuous but not differentiable at 0.",
+      },
+      {
+        id: "deriv-assess-4",
+        type: "input",
+        text: "What is the equation of the tangent line to f(x) = x\u00b2 at the point (3, 9)?",
+        answer: "y=6x-9",
+        hint: "f'(3) = 2(3) = 6. Then use point-slope: y - 9 = 6(x - 3), simplify to y = 6x - 9.",
+      },
+      {
+        id: "deriv-assess-5",
+        type: "choice",
+        text: "The function f(x) = |x| is NOT differentiable at x=0 because:",
+        options: [
+          "It is discontinuous at x=0",
+          "The left and right-hand derivatives are unequal (+1 and -1)",
+          "The limit does not exist",
+          "The function is undefined at x=0",
+        ],
+        answer: "The left and right-hand derivatives are unequal (+1 and -1)",
+        hint: "It is continuous (no hole), but it has a CORNER. From the right, slope = +1. From the left, slope = -1. They disagree, so no derivative exists.",
+      },
+    ],
   },
 
   // ─── Mental Model Compression ─────────────────────────────────────────────
   mentalModel: [
-    'Derivative = Limit of (\u0394y / \u0394x) as \u0394x \u2192 0',
-    'Tangent Slope = Instantaneous Rate of Change',
-    'Corner = Continuous + Not Differentiable',
-    'f\u2019(x) = new function (slope at every point of f)',
+    "Derivative = Limit of (\u0394y / \u0394x) as \u0394x \u2192 0",
+    "Tangent Slope = Instantaneous Rate of Change",
+    "Corner = Continuous + Not Differentiable",
+    "f\u2019(x) = new function (slope at every point of f)",
   ],
 
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'completed-example-3',
-    'completed-example-4',
-    'completed-example-5',
-    'completed-example-6',
-    'completed-example-7',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
-    'attempted-challenge-hard',
+    "read-intuition",
+    "read-math",
+    "read-rigor",
+    "completed-example-1",
+    "completed-example-2",
+    "completed-example-3",
+    "completed-example-4",
+    "completed-example-5",
+    "completed-example-6",
+    "completed-example-7",
+    "attempted-challenge-easy",
+    "attempted-challenge-medium",
+    "attempted-challenge-hard",
   ],
 
   quiz: [
     {
-      id: 'tangent-q1',
-      type: 'choice',
-      text: 'What is the difference quotient for a function $f$ at $x$?',
+      id: "tangent-q1",
+      type: "choice",
+      text: "What is the difference quotient for a function $f$ at $x$?",
       options: [
-        '$f(x+h) \\cdot f(x) / h$',
-        '$\\dfrac{f(x+h) - f(x)}{h}$',
-        '$\\dfrac{f(x) - f(x+h)}{x}$',
-        '$f\'(x+h)$',
+        "$f(x+h) \\cdot f(x) / h$",
+        "$\\dfrac{f(x+h) - f(x)}{h}$",
+        "$\\dfrac{f(x) - f(x+h)}{x}$",
+        "$f'(x+h)$",
       ],
-      answer: '$\\dfrac{f(x+h) - f(x)}{h}$',
-      hints: ['It is rise over run between two points on the curve separated by h.'],
-      reviewSection: 'Intuition tab — difference quotient definition',
+      answer: "$\\dfrac{f(x+h) - f(x)}{h}$",
+      hints: [
+        "It is rise over run between two points on the curve separated by h.",
+      ],
+      reviewSection: "Intuition tab — difference quotient definition",
     },
     {
-      id: 'tangent-q2',
-      type: 'choice',
-      text: 'When you plug $h = 0$ directly into the difference quotient you get $0/0$. Why does the derivative still exist?',
+      id: "tangent-q2",
+      type: "choice",
+      text: "When you plug $h = 0$ directly into the difference quotient you get $0/0$. Why does the derivative still exist?",
       options: [
-        'Because $0/0 = 0$ by convention',
-        'Because we take the limit as $h \\to 0$, which is different from evaluating at $h = 0$',
-        'Because we use L\'Hôpital\'s Rule immediately',
-        'Because the function must be linear near $x$',
+        "Because $0/0 = 0$ by convention",
+        "Because we take the limit as $h \\to 0$, which is different from evaluating at $h = 0$",
+        "Because we use L'Hôpital's Rule immediately",
+        "Because the function must be linear near $x$",
       ],
-      answer: 'Because we take the limit as $h \\to 0$, which is different from evaluating at $h = 0$',
-      hints: ['Recall from Ch.1: a limit asks what the expression approaches, not its value at the point.'],
-      reviewSection: 'Intuition tab — why the limit resolves the 0/0 form',
+      answer:
+        "Because we take the limit as $h \\to 0$, which is different from evaluating at $h = 0$",
+      hints: [
+        "Recall from Ch.1: a limit asks what the expression approaches, not its value at the point.",
+      ],
+      reviewSection: "Intuition tab — why the limit resolves the 0/0 form",
     },
     {
-      id: 'tangent-q3',
-      type: 'input',
-      text: 'Use the limit definition to find $f\'(x)$ for $f(x) = x^2$. Simplify the difference quotient and evaluate the limit.',
-      answer: '2*x',
-      hints: ['Expand $(x+h)^2 = x^2 + 2xh + h^2$, subtract $x^2$, divide by $h$, then let $h \\to 0$.'],
-      reviewSection: 'Math tab — limit definition examples',
+      id: "tangent-q3",
+      type: "input",
+      text: "Use the limit definition to find $f'(x)$ for $f(x) = x^2$. Simplify the difference quotient and evaluate the limit.",
+      answer: "2*x",
+      hints: [
+        "Expand $(x+h)^2 = x^2 + 2xh + h^2$, subtract $x^2$, divide by $h$, then let $h \\to 0$.",
+      ],
+      reviewSection: "Math tab — limit definition examples",
     },
     {
-      id: 'tangent-q4',
-      type: 'input',
-      text: 'Use the limit definition to find $f\'(x)$ for $f(x) = 3x + 5$.',
-      answer: '3',
-      hints: ['$f(x+h) = 3(x+h)+5 = 3x+3h+5$. Subtract $f(x)$, divide by $h$, take limit.'],
-      reviewSection: 'Math tab — constant and linear functions',
+      id: "tangent-q4",
+      type: "input",
+      text: "Use the limit definition to find $f'(x)$ for $f(x) = 3x + 5$.",
+      answer: "3",
+      hints: [
+        "$f(x+h) = 3(x+h)+5 = 3x+3h+5$. Subtract $f(x)$, divide by $h$, take limit.",
+      ],
+      reviewSection: "Math tab — constant and linear functions",
     },
     {
-      id: 'tangent-q5',
-      type: 'input',
-      text: 'Use the limit definition to find $f\'(x)$ for $f(x) = x^3$.',
-      answer: '3*x^2',
-      hints: ['Expand $(x+h)^3 = x^3 + 3x^2h + 3xh^2 + h^3$, cancel $x^3$, divide by $h$, then let $h \\to 0$.'],
-      reviewSection: 'Math tab — limit definition with cubic',
+      id: "tangent-q5",
+      type: "input",
+      text: "Use the limit definition to find $f'(x)$ for $f(x) = x^3$.",
+      answer: "3*x^2",
+      hints: [
+        "Expand $(x+h)^3 = x^3 + 3x^2h + 3xh^2 + h^3$, cancel $x^3$, divide by $h$, then let $h \\to 0$.",
+      ],
+      reviewSection: "Math tab — limit definition with cubic",
     },
     {
-      id: 'tangent-q6',
-      type: 'input',
-      text: 'Find the slope of the tangent line to $f(x) = x^2$ at $x = 3$ using the derivative.',
-      answer: '6',
-      hints: ['First find $f\'(x) = 2x$ from the limit definition, then evaluate at $x = 3$.'],
-      reviewSection: 'Intuition tab — tangent line slope equals derivative value',
+      id: "tangent-q6",
+      type: "input",
+      text: "Find the slope of the tangent line to $f(x) = x^2$ at $x = 3$ using the derivative.",
+      answer: "6",
+      hints: [
+        "First find $f'(x) = 2x$ from the limit definition, then evaluate at $x = 3$.",
+      ],
+      reviewSection:
+        "Intuition tab — tangent line slope equals derivative value",
     },
     {
-      id: 'tangent-q7',
-      type: 'input',
-      text: 'Use the limit definition to find $f\'(x)$ for $f(x) = \\dfrac{1}{x}$.',
-      answer: '-1/x^2',
-      hints: ['$f(x+h) - f(x) = \\frac{1}{x+h} - \\frac{1}{x}$. Find a common denominator, simplify, divide by $h$, take the limit.'],
-      reviewSection: 'Math tab — limit definition with rational functions',
+      id: "tangent-q7",
+      type: "input",
+      text: "Use the limit definition to find $f'(x)$ for $f(x) = \\dfrac{1}{x}$.",
+      answer: "-1/x^2",
+      hints: [
+        "$f(x+h) - f(x) = \\frac{1}{x+h} - \\frac{1}{x}$. Find a common denominator, simplify, divide by $h$, take the limit.",
+      ],
+      reviewSection: "Math tab — limit definition with rational functions",
     },
     {
-      id: 'tangent-q8',
-      type: 'input',
-      text: 'For $f(x) = x^2 - 4x$, the difference quotient simplifies to $2x + h - 4$. What is $f\'(x)$?',
-      answer: '2*x - 4',
-      hints: ['Let $h \\to 0$ in the simplified difference quotient.'],
-      reviewSection: 'Math tab — evaluating the limit of a difference quotient',
+      id: "tangent-q8",
+      type: "input",
+      text: "For $f(x) = x^2 - 4x$, the difference quotient simplifies to $2x + h - 4$. What is $f'(x)$?",
+      answer: "2*x - 4",
+      hints: ["Let $h \\to 0$ in the simplified difference quotient."],
+      reviewSection: "Math tab — evaluating the limit of a difference quotient",
     },
     {
-      id: 'tangent-q9',
-      type: 'choice',
-      text: 'Which of the following is true about a function that is differentiable at $x = a$?',
+      id: "tangent-q9",
+      type: "choice",
+      text: "Which of the following is true about a function that is differentiable at $x = a$?",
       options: [
-        'It may be discontinuous at $x = a$',
-        'It must be continuous at $x = a$',
-        'It must be a polynomial near $x = a$',
-        'Its graph must be a straight line near $x = a$',
+        "It may be discontinuous at $x = a$",
+        "It must be continuous at $x = a$",
+        "It must be a polynomial near $x = a$",
+        "Its graph must be a straight line near $x = a$",
       ],
-      answer: 'It must be continuous at $x = a$',
-      hints: ['Differentiability implies continuity — but the converse is not always true.'],
-      reviewSection: 'Rigor tab — differentiability implies continuity',
+      answer: "It must be continuous at $x = a$",
+      hints: [
+        "Differentiability implies continuity — but the converse is not always true.",
+      ],
+      reviewSection: "Rigor tab — differentiability implies continuity",
     },
     {
-      id: 'tangent-q10',
-      type: 'choice',
-      text: 'Why is $f(x) = |x|$ not differentiable at $x = 0$, even though it is continuous there?',
+      id: "tangent-q10",
+      type: "choice",
+      text: "Why is $f(x) = |x|$ not differentiable at $x = 0$, even though it is continuous there?",
       options: [
-        'Because $f(0) = 0$',
-        'Because the left-hand and right-hand limits of the difference quotient disagree ($-1$ vs $+1$)',
-        'Because the function has a jump discontinuity at $0$',
-        'Because the limit definition gives $0/0$ with no resolution',
+        "Because $f(0) = 0$",
+        "Because the left-hand and right-hand limits of the difference quotient disagree ($-1$ vs $+1$)",
+        "Because the function has a jump discontinuity at $0$",
+        "Because the limit definition gives $0/0$ with no resolution",
       ],
-      answer: 'Because the left-hand and right-hand limits of the difference quotient disagree ($-1$ vs $+1$)',
-      hints: ['Approach $x=0$ from the right: slope = +1. From the left: slope = -1. They must agree for the derivative to exist.'],
-      reviewSection: 'Rigor tab — corner at the origin',
+      answer:
+        "Because the left-hand and right-hand limits of the difference quotient disagree ($-1$ vs $+1$)",
+      hints: [
+        "Approach $x=0$ from the right: slope = +1. From the left: slope = -1. They must agree for the derivative to exist.",
+      ],
+      reviewSection: "Rigor tab — corner at the origin",
     },
   ],
 };
