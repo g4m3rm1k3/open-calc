@@ -326,9 +326,9 @@ export default {
         },
         {
           expression:
-            "\\left|\\frac{1}{x} - \frac{1}{2}\\right| = \\left|\\frac{2 - x}{2x}\\right| = \\frac{|x-2|}{2|x|}",
+            "\\left|\\frac{1}{x} - \\frac{1}{2}\\right| = \\left|\\frac{2 - x}{2x}\\right| = \\frac{|x-2|}{2|x|}",
           annotation:
-            "Here is the exact algebra you asked for, step by step (no skipping!):\\n1. Common denominator: \\frac{1}{x} - \\frac{1}{2} = \\frac{2}{2x} - \\frac{x}{2x} = \\frac{2 - x}{2x}.\\n2. Absolute value: \\left|\\frac{2-x}{2x}\\right| = \\frac{|2-x|}{2|x|} (since 2 is positive).\\n3. |2-x| = |x-2| (absolute value property).\\nGotcha: many students forget to flip 2-x to |x-2| or drop the 2 in the denominator. This simplification is why we can proceed.",
+            "**Step 1 — common denominator:** $\\frac{1}{x} - \\frac{1}{2} = \\frac{2}{2x} - \\frac{x}{2x} = \\frac{2-x}{2x}$. **Step 2 — absolute value:** $\\left|\\frac{2-x}{2x}\\right| = \\frac{|2-x|}{2|x|}$ (the denominator $2|x|$ is positive so it comes straight out). **Step 3:** $|2-x| = |x-2|$ by the symmetry property of absolute values. **Gotcha:** many students drop the 2 in the denominator or forget to flip $2-x$ to $|x-2|$. This simplification is what lets us proceed.",
         },
         {
           expression:
@@ -412,12 +412,12 @@ export default {
         },
         {
           expression:
-            "Apply the supposed δ to x₁: |1 - L| < 1/2 \\implies L > 1/2.",
+            "\\text{Apply the supposed } \\delta \\text{ to } x_1\\text{: } |1 - L| < \\tfrac{1}{2} \\implies L > \\tfrac{1}{2}.",
           annotation: "",
         },
         {
           expression:
-            "Apply the supposed δ to x₂: |-1 - L| < 1/2 \\implies L < -1/2.",
+            "\\text{Apply the supposed } \\delta \\text{ to } x_2\\text{: } |-1 - L| < \\tfrac{1}{2} \\implies L < -\\tfrac{1}{2}.",
           annotation: "",
         },
         {

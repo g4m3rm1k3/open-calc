@@ -295,625 +295,232 @@ fig.show()`,
       id: "ch3-004-ex1",
       title: "Fencing Problem: Maximize Rectangular Area",
       problem:
-        "\\text{You have 100 m of fence. Maximize the enclosed rectangular area.}",
+        "\\text{You have 100 m of fence and want to enclose the largest possible rectangular area.}",
       steps: [
         {
           expression:
-            "\\text{Let } x, y \\text{ be the sides. Constraint: } 2x + 2y = 100 \\Rightarrow x + y = 50.",
+            "\\text{Draw a rectangle. Label length } x \\text{ and width } y.",
           annotation:
-            "Draw a rectangle with sides x and y. Write the constraint from the fixed perimeter.",
-          strategyTitle: "Identify the objective and constraint: draw it first",
-          checkpoint:
-            "Before writing any formula — what quantity are you trying to maximize? Write its name (Area). What equation must always be true no matter what dimensions you choose?",
-          hints: [
-            "Level 1: Label every quantity in your picture. The constraint comes from the physical restriction — here, total fence length is fixed at 100 m.",
-            "Level 2: You have two unknowns (x and y) and one constraint equation. That means you can eliminate one variable, leaving a single-variable problem.",
-            "Level 3: Setting up variables carefully — and writing the constraint explicitly — prevents algebra errors later. The domain (x > 0 and y > 0, so 0 < x < 50) also comes from the picture.",
-          ],
-        },
-        {
-          expression: "A = xy \\text{ (objective)}",
-          annotation: "The area is the objective function.",
-          strategyTitle:
-            "Identify the objective: what quantity to maximize/minimize",
-          checkpoint:
-            "What quantity are you optimizing? Write it as a function name before writing any formula.",
-          hints: [
-            "Level 1: The objective is the quantity the problem asks you to maximize or minimize. Here it's Area — write A = xy explicitly before doing anything else.",
-            "Level 2: A = xy currently has two free variables. You need the constraint to reduce this to one variable before you can differentiate.",
-            "Level 3: Naming the objective function explicitly (A =) forces you to think about what you are actually controlling. This discipline prevents the common mistake of differentiating the constraint instead of the objective.",
-          ],
-        },
-        {
-          expression: "y = 50 - x \\Rightarrow A(x) = x(50-x) = 50x - x^2",
-          annotation: "Substitute the constraint to eliminate y.",
-          strategyTitle: "Use the constraint to eliminate a variable",
-          checkpoint:
-            "How many free variables does A = xy have before substituting? How many after? You need exactly one.",
-          hints: [
-            "Level 1: Solve the constraint x + y = 50 for y: y = 50 − x. Substitute into A = xy to get a function of x alone.",
-            "Level 2: A(x) = x(50 − x) = 50x − x² is a downward-opening parabola on (0, 50). Its maximum is at the vertex, which calculus will find.",
-            "Level 3: Any time you have one constraint and two variables, this substitution step is possible. With two constraints and three variables, you eliminate two variables. This is the general principle behind Lagrange multipliers in multivariable calculus.",
-          ],
-        },
-        {
-          expression: "A'(x) = 50 - 2x = 0 \\Rightarrow x = 25",
-          annotation: "Differentiate and set equal to zero.",
-          strategyTitle: "Differentiate: find critical points",
-          checkpoint:
-            "Before differentiating, what rule will you use on 50x − x²? Can you predict the form of the derivative?",
-          hints: [
-            "Level 1: Differentiate A(x) = 50x − x² using the power rule: A'(x) = 50 − 2x. Set A'(x) = 0 and solve for x.",
-            "Level 2: x = 25 is the only critical point on (0, 50). Since the domain is an open interval, there are no endpoints to check — the maximum, if it exists, must be at this critical point.",
-            "Level 3: For a downward-opening parabola, there is exactly one critical point and it is always the global maximum. The second derivative test will confirm this formally.",
-          ],
+            "Modeling step: The picture forces us to see the relationships. Opposite sides are equal, so we will need two lengths and two widths.",
         },
         {
           expression:
-            "A''(x) = -2 < 0 \\Rightarrow \\text{local (global) maximum at } x = 25",
-          annotation: "Second derivative confirms maximum.",
-          strategyTitle: "First or second derivative test: max or min?",
-          checkpoint:
-            "A''(x) = −2 everywhere — what does a constant negative second derivative tell you about the shape of A(x)?",
-          hints: [
-            "Level 1: Second derivative test: A''(25) = −2 < 0 means the function is concave down at x = 25, so x = 25 is a local maximum.",
-            "Level 2: Because A''(x) = −2 < 0 everywhere (not just at x = 25), A is concave down on the entire domain. There is only one critical point, so x = 25 gives the global maximum.",
-            "Level 3: On an open interval (0, 50), there are no endpoints. The one-critical-point argument applies: if A → 0 at both ends of the domain and A(25) = 625 > 0, the interior critical point must be the global maximum.",
-          ],
+            "Total fence used: 2x + 2y = 100 \\quad \\Rightarrow \\quad x + y = 50.",
+          annotation:
+            "This is the **constraint** — the fixed resource. It must always be true. We divide by 2 for simplicity, but the physical meaning remains: the sum of one length and one width is 50 m. Aha! The constraint links the two variables; we cannot choose them independently.",
+        },
+        {
+          expression: "Area to maximize: A = x \\cdot y.",
+          annotation:
+            "This is the **objective**. Area is the product because that is what 'enclosed space' physically means. We want to make this number as large as possible while respecting the fence limit.",
         },
         {
           expression:
-            "y = 50 - 25 = 25, \\quad A = 25 \\times 25 = 625 \\text{ m}^2",
-          annotation: "Both sides are 25 m — a square. Maximum area is 625 m².",
-          strategyTitle: "Interpret the answer in context",
-          checkpoint:
-            "Does the answer have the right units? Does 625 m² make physical sense — is it larger than, say, A(20) = 20 × 30 = 600 m²?",
-          hints: [
-            "Level 1: Substitute x = 25 back into the constraint to get y = 25. Then compute A = 25 × 25 = 625 m². Report both the dimensions AND the maximum area.",
-            "Level 2: Re-read the question — it asks for the maximum area AND the optimal dimensions. Report both: 25 m × 25 m square, area 625 m².",
-            "Level 3: Sanity check: try x = 20, y = 30. A = 600 < 625. Try x = 10, y = 40. A = 400 < 625. Every nearby rectangle has less area, confirming x = 25 is truly optimal.",
-          ],
+            "From the constraint, solve for one variable: y = 50 - x.",
+          annotation:
+            "Modeling insight: We have two variables but only one equation, so we can express everything in terms of a single variable (x). This is the key modeling trick that turns geometry into a calculus problem.",
+        },
+        {
+          expression: "Substitute: A(x) = x(50 - x) = 50x - x^2.",
+          annotation:
+            "Now the area is a function of only the length x. Physically, as x increases, y decreases by the same amount — there is a direct trade-off enforced by the fixed fence.",
+        },
+        {
+          expression: "A'(x) = 50 - 2x.",
+          annotation:
+            "The derivative tells us how area changes when we change length x (while automatically adjusting y to keep the fence total 100 m).",
+        },
+        {
+          expression:
+            "Set A'(x) = 0: 50 - 2x = 0 \\quad \\Rightarrow \\quad x = 25.",
+          annotation:
+            "At x = 25 m the rate of change of area is zero — we have stopped gaining or losing area by changing the dimensions. This is the critical point.",
+        },
+        {
+          expression:
+            "y = 50 - 25 = 25 m. \\quad A = 25 \\times 25 = 625 \\text{ m}^2.",
+          annotation:
+            "Both sides equal 25 m: the rectangle is a square. Aha! The modeling shows that when resources are fixed, equal sides maximize the product (area). Any deviation (e.g., x=20, y=30) gives only 600 m² — less space for the same fence.",
         },
       ],
       conclusion:
-        "A 25m × 25m square encloses the maximum area of 625 m². The calculus confirms the geometric/algebraic insight: the square is uniquely optimal. Any deviation from equal sides (e.g., 20 × 30) gives A = 600 < 625.",
+        "The largest rectangular area is 625 m², achieved with a 25 m × 25 m square. The modeling insight is powerful: fixed perimeter forces a trade-off between length and width; calculus finds the balanced point where that trade-off is optimal.",
     },
     {
       id: "ch3-004-ex2",
       title: "Open Box from a Sheet of Cardboard",
       problem:
-        "\\text{A 12×8 inch cardboard. Cut square corners of size } x \\text{ and fold. Maximize volume.}",
+        "\\text{You have a 12 in × 8 in sheet of cardboard. You cut equal squares of side } x \\text{ from each corner and fold up the sides to form an open box. Maximize the volume.}",
       steps: [
         {
-          expression: "V(x) = (12-2x)(8-2x)x",
+          expression:
+            "\\text{After cutting and folding: height = } x, \\text{ length = 12 - 2x, width = 8 - 2x.}",
           annotation:
-            "After cutting corners x × x, the box has dimensions (12-2x) × (8-2x) × x. Domain: x ∈ (0, 4) (need 8-2x > 0).",
-          strategyTitle:
-            "Set up the objective function: Volume = length × width × height",
-          checkpoint:
-            "What are the three dimensions of the box after folding? Write each dimension in terms of x before multiplying.",
-          hints: [
-            "Level 1: When you cut an x × x square from each corner and fold up the sides, the height becomes x, the length becomes 12 − 2x, and the width becomes 8 − 2x. Volume = length × width × height.",
-            "Level 2: The domain constraint x ∈ (0, 4) comes from requiring all dimensions positive: x > 0 and 8 − 2x > 0. The shorter side (8 inches) sets the tighter constraint.",
-            "Level 3: Unlike the fencing problem, there is no separate constraint equation here — the geometry of folding automatically expresses all dimensions in terms of one variable x. The 'constraint' is already built into the setup.",
-          ],
+            "Modeling: Each cut removes x from both ends of a side, so we subtract 2x. The height is exactly the cut size because we fold up the flaps. This relationship comes directly from the physical folding process.",
         },
         {
           expression:
-            "V(x) = x(96 - 24x - 16x + 4x^2) = x(96 - 40x + 4x^2) = 4x^3 - 40x^2 + 96x",
-          annotation: "Expand the product.",
-          strategyTitle:
-            "Expand to a standard polynomial form before differentiating",
-          checkpoint:
-            "Could you differentiate V(x) = (12−2x)(8−2x)x directly using the product rule? Why might expanding first be safer?",
-          hints: [
-            "Level 1: Expand (12 − 2x)(8 − 2x) first, then multiply by x. Work carefully: 12·8 = 96, 12·(−2x) = −24x, (−2x)·8 = −16x, (−2x)(−2x) = +4x².",
-            "Level 2: After expanding, V(x) = 4x³ − 40x² + 96x. This is a polynomial — easy to differentiate term by term using the power rule.",
-            "Level 3: You could use the product rule on the factored form, but expanding avoids potential errors. For polynomials, always expand before differentiating unless the factored form is extremely simple.",
-          ],
-        },
-        {
-          expression: "V'(x) = 12x^2 - 80x + 96 = 4(3x^2 - 20x + 24)",
-          annotation: "Differentiate.",
-          strategyTitle:
-            "Differentiate: find critical points by solving V'(x) = 0",
-          checkpoint:
-            "After differentiating, what type of equation do you need to solve? Can you factor out a common factor to simplify?",
-          hints: [
-            "Level 1: Differentiate V(x) = 4x³ − 40x² + 96x term by term: V'(x) = 12x² − 80x + 96. Factor out 4 to get 4(3x² − 20x + 24).",
-            "Level 2: Set V'(x) = 0 — since 4 ≠ 0, you only need 3x² − 20x + 24 = 0. This quadratic does not factor nicely, so use the quadratic formula.",
-            "Level 3: Critical points are where V'(x) = 0 or V'(x) is undefined. Since V' is a polynomial, it is defined everywhere, so the only candidates are where V'(x) = 0. Expect two critical points — but only one will lie in the domain (0, 4).",
-          ],
-        },
-        {
-          expression:
-            "3x^2 - 20x + 24 = 0 \\Rightarrow x = \\frac{20 \\pm \\sqrt{400 - 288}}{6} = \\frac{20 \\pm \\sqrt{112}}{6} = \\frac{20 \\pm 4\\sqrt{7}}{6} = \\frac{10 \\pm 2\\sqrt{7}}{3}",
-          annotation: "Quadratic formula.",
-          strategyTitle:
-            "Apply the quadratic formula and identify the domain-valid root",
-          checkpoint:
-            "The quadratic formula gives two roots. Before computing decimals, can you tell which one will be inside (0, 4) and which will be outside?",
-          hints: [
-            "Level 1: With a = 3, b = −20, c = 24: discriminant = 400 − 288 = 112 = 16·7, so √112 = 4√7 ≈ 10.58. The two roots are (20 ± 10.58)/6.",
-            "Level 2: x₁ = (20 − 4√7)/3 ≈ 1.57 and x₂ = (20 + 4√7)/3 ≈ 5.10. Only x₁ ≈ 1.57 lies in (0, 4). Discard x₂ — it would require cutting more than half the 8-inch side, leaving negative width.",
-            "Level 3: Always check ALL roots against the domain before proceeding. A mathematically valid root outside the physical domain has no meaning in context. Discarding x₂ here is not optional — it is physically impossible.",
-          ],
-        },
-        {
-          expression:
-            "x = \\frac{10 - 2\\sqrt{7}}{3} \\approx \\frac{10 - 5.292}{3} \\approx \\frac{4.708}{3} \\approx 1.570",
+            "Volume V = \\text{length} \\times \\text{width} \\times \\text{height} = (12-2x)(8-2x)x.",
           annotation:
-            "The physically valid solution: x ≈ 1.570 in (the other root ≈ 5.097 is outside the domain (0,4)).",
-          strategyTitle: "Confirm the domain-valid critical point numerically",
-          checkpoint:
-            "x ≈ 1.570 is in (0, 4). What are the resulting box dimensions? Do they all come out positive?",
-          hints: [
-            "Level 1: √7 ≈ 2.6458, so 2√7 ≈ 5.292. Then x = (10 − 5.292)/3 ≈ 4.708/3 ≈ 1.570 inches.",
-            "Level 2: Check dimensions: 12 − 2(1.570) = 8.860 in, 8 − 2(1.570) = 4.860 in, height = 1.570 in. All positive — good.",
-            "Level 3: It's worth keeping the exact form x = (10 − 2√7)/3 alongside the decimal. The exact form is needed for the second derivative check or if the problem asks for an exact answer.",
-          ],
+            "Volume is the product of the three inside dimensions. We choose x as the single decision variable because the geometry forces all three dimensions to depend on the same cut size.",
+        },
+        {
+          expression: "Domain: 0 < x < 4 \\text{ (because 8-2x > 0)}.",
+          annotation:
+            "Modeling constraint: all dimensions must be positive. The shorter original side (8 in) gives the tighter limit x < 4.",
+        },
+        {
+          expression: "Expand: V(x) = 4x^3 - 40x^2 + 96x.",
+          annotation:
+            "We expand fully so the derivative is easy. The algebra here represents the physical expansion of the base and multiplication by height.",
+        },
+        {
+          expression: "V'(x) = 12x^2 - 80x + 96.",
+          annotation:
+            "The derivative tells how volume changes as we change the cut size x (while the folding geometry automatically adjusts length and width).",
         },
         {
           expression:
-            "V(1.570) = (12 - 3.140)(8 - 3.140)(1.570) \\approx (8.860)(4.860)(1.570) \\approx 67.6 \\text{ in}^3",
-          annotation: "Maximum volume is approximately 67.6 cubic inches.",
-          strategyTitle: "Evaluate the objective at the critical point",
-          checkpoint:
-            "Does 67.6 in³ make sense? What is V(0) and V(4)? Confirm the critical point gives a larger volume than the endpoints.",
-          hints: [
-            "Level 1: Substitute x ≈ 1.570 into V(x) = (12 − 2x)(8 − 2x)x. Multiply the three factors step by step.",
-            "Level 2: Endpoint check: V(0) = 0 (no box height) and V(4) = 0 (8 − 2·4 = 0, zero width). V(1.570) ≈ 67.6 > 0, confirming the interior critical point gives the maximum.",
-            "Level 3: On a closed interval [0, 4], the closed-interval method says compare all critical point values and endpoint values. Both endpoints give V = 0, so the unique interior critical point at x ≈ 1.570 is the global maximum — no further test is needed.",
-          ],
+            "Solve 12x^2 - 80x + 96 = 0 \\quad \\Rightarrow \\quad x = \\frac{10 \\pm 2\\sqrt{7}}{3}.",
+          annotation:
+            "Quadratic formula after simplifying. Only the smaller root x ≈ 1.57 in lies inside the physical domain (0,4). The larger root is impossible — it would make width negative.",
         },
         {
-          expression: "V''(x) = 24x - 80 < 0 \\text{ at } x \\approx 1.570",
+          expression:
+            "At x ≈ 1.57 in: length ≈ 8.86 in, width ≈ 4.86 in, height ≈ 1.57 in, V ≈ 67.6 in³.",
           annotation:
-            "V''(1.570) ≈ 24(1.570) - 80 = 37.68 - 80 = -42.32 < 0. Maximum confirmed.",
-          strategyTitle:
-            "Second derivative test confirms maximum; interpret in context",
-          checkpoint:
-            "V''(1.570) ≈ −42.32. What does this negative value tell you about the concavity of V at the critical point? Is the answer physically reasonable?",
-          hints: [
-            "Level 1: Second derivative test: V''(c) < 0 means the function is concave down at c, so c is a local maximum. V''(1.570) = 24(1.570) − 80 ≈ −42.32 < 0. Maximum confirmed.",
-            "Level 2: The answer: cut squares of ≈ 1.570 inches from each corner. The resulting box has dimensions ≈ 8.86 × 4.86 × 1.57 inches and volume ≈ 67.6 in³.",
-            "Level 3: Sanity check — cutting too little (say x = 0.5): V ≈ (11)(7)(0.5) = 38.5 in³ < 67.6. Cutting too much (say x = 3): V = (6)(2)(3) = 36 in³ < 67.6. Both sides give less volume, confirming optimality.",
-          ],
+            "Aha! The optimal cut is roughly the same as the final height. Cutting too little wastes height; cutting too much shrinks the base too much — the calculus finds the sweet spot in that trade-off.",
         },
       ],
       conclusion:
-        "Cutting squares of approximately 1.57 inches from each corner maximizes the box volume at about 67.6 in³. The exact optimal cut is x = (10 - 2√7)/3 inches. Cutting too little wastes height; cutting too much shrinks the base.",
+        "Maximum volume ≈ 67.6 in³ when squares of side ≈1.57 in are cut. The modeling shows that volume is a balance between gaining height and losing base area; calculus locates the best compromise.",
     },
     {
       id: "ch3-004-ex3",
-      title: "Minimum Surface Area Tin Can",
+      title: "Minimum Surface Area for a Can with Fixed Volume",
       problem:
-        "\\text{Find the cylinder of volume } 500 \\text{ cm}^3 \\text{ that uses the minimum surface area.}",
+        "\\text{Design a cylindrical can with volume exactly 500 cm³ that uses the least possible material (surface area).}",
       steps: [
         {
           expression:
-            "V = \\pi r^2 h = 500 \\Rightarrow h = \\frac{500}{\\pi r^2}",
-          annotation: "Volume constraint: solve for h.",
-        },
-        {
-          expression:
-            "SA = 2\\pi r^2 + 2\\pi r h = 2\\pi r^2 + 2\\pi r \\cdot \\frac{500}{\\pi r^2} = 2\\pi r^2 + \\frac{1000}{r}",
+            "\\text{Let } r = \\text{radius of base}, \\quad h = \\text{height}.",
           annotation:
-            "Surface area = two circles (top/bottom) + lateral area. Substitute h = 500/(πr²).",
-        },
-        {
-          expression: "SA'(r) = 4\\pi r - \\frac{1000}{r^2} = 0",
-          annotation: "Differentiate and set equal to zero.",
+            "Modeling choice: r and h are the natural dimensions that determine both volume and surface area.",
         },
         {
           expression:
-            "4\\pi r = \\frac{1000}{r^2} \\Rightarrow r^3 = \\frac{1000}{4\\pi} = \\frac{250}{\\pi}",
-          annotation: "Solve for r³.",
-        },
-        {
-          expression:
-            "r = \\left(\\frac{250}{\\pi}\\right)^{1/3} \\approx 4.30 \\text{ cm}",
-          annotation: "Optimal radius.",
-        },
-        {
-          expression:
-            "h = \\frac{500}{\\pi r^2} = \\frac{500}{\\pi(250/\\pi)^{2/3}} = 2\\left(\\frac{250}{\\pi}\\right)^{1/3} = 2r",
+            "Volume constraint: \\pi r^2 h = 500 \\quad \\Rightarrow \\quad h = \\frac{500}{\\pi r^2}.",
           annotation:
-            "The optimal height equals the diameter (h = 2r). This is a remarkable result — the optimal can is as tall as it is wide.",
+            "The volume relationship is fixed by the product requirement. Solving for h shows how height must change when we change radius to keep volume constant.",
         },
         {
           expression:
-            "SA_{\\min} = 2\\pi r^2 + \\frac{1000}{r} \\approx 2\\pi(18.5) + \\frac{1000}{4.30} \\approx 116.2 + 232.6 \\approx 348.7 \\text{ cm}^2",
-          annotation: "Minimum surface area: ≈349 cm².",
+            "Surface area SA = 2\\pi r^2 + 2\\pi r h \\text{ (two ends + side)}.",
+          annotation:
+            "Material used: two circular lids plus the rectangular side when unrolled. This is the objective we want to minimize.",
+        },
+        {
+          expression: "Substitute h: SA(r) = 2\\pi r^2 + \\frac{1000}{r}.",
+          annotation:
+            "Aha! As r increases, the two ends get larger (r² term) but the side gets smaller (1/r term). There is a trade-off between wide/short cans and tall/thin cans.",
+        },
+        {
+          expression: "SA'(r) = 4\\pi r - \\frac{1000}{r^2} = 0.",
+          annotation:
+            "The derivative balances the rate at which area increases from the ends against the rate it decreases from the side.",
+        },
+        {
+          expression:
+            "Solving gives r^3 = 250/\\pi \\quad \\Rightarrow \\quad h = 2r.",
+          annotation:
+            "Remarkable modeling result: at the minimum, height equals diameter. The optimal can is as tall as it is wide — a 'square' cylinder in cross-section.",
         },
       ],
       conclusion:
-        "The optimal 500 cm³ can has height = diameter ≈ 8.6 cm, using ≈349 cm² of material. Real soup cans are often taller than their diameter because of manufacturing constraints (top/bottom lids cost more per unit area than the side). The mathematical optimum is a cube-like short cylinder.",
+        "The material-minimizing can has height exactly equal to its diameter. In reality, cans are often taller because the lids are more expensive to manufacture than the side wall — the pure mathematical minimum ignores differing material costs.",
     },
     {
-      id: "ch3-004-ex4",
-      title: "Nearest Point on a Parabola",
+      id: "ch3-004-ex10",
+      title: "Farmer with a River — Three Sides of Fence",
       problem:
-        "\\text{Find the point on } y = x^2 \\text{ nearest to } (0, 3).",
+        "\\text{A farmer has 240 m of fence and wants to enclose the largest rectangular area against a straight river (no fence needed along the river).}",
       steps: [
         {
-          expression: "D^2 = x^2 + (x^2 - 3)^2",
+          expression:
+            "\\text{Let } x = \\text{side parallel to the river}, \\quad y = \\text{side perpendicular to the river}.",
           annotation:
-            "Distance squared from (x, x²) to (0,3). We minimize D² (equivalent to minimizing D, and easier).",
+            "Modeling: Only three sides need fence — one long side parallel to the river and two perpendicular sides.",
         },
         {
-          expression: "D^2 = x^2 + x^4 - 6x^2 + 9 = x^4 - 5x^2 + 9",
-          annotation: "Expand (x² - 3)² = x⁴ - 6x² + 9, then combine x² terms.",
+          expression: "Constraint: x + 2y = 240.",
+          annotation:
+            "The river provides the fourth side for free, so the fence equation has only three terms.",
         },
         {
-          expression: "\\frac{d(D^2)}{dx} = 4x^3 - 10x = 2x(2x^2 - 5) = 0",
-          annotation: "Differentiate and factor.",
+          expression: "Area A = x \\cdot y.",
+          annotation: "The enclosed grazing area is still length times width.",
+        },
+        {
+          expression: "Solve for y: y = 120 - x/2.",
+          annotation:
+            "Express area in terms of one variable. Notice the coefficient 1/2 — each meter added to x costs half a meter from each perpendicular side.",
+        },
+        {
+          expression: "A(x) = x(120 - x/2) = 120x - (1/2)x^2.",
+          annotation:
+            "The negative quadratic term reflects the trade-off: longer x means shorter y.",
         },
         {
           expression:
-            "x = 0 \\quad \\text{or} \\quad x = \\pm\\sqrt{5/2} = \\pm\\frac{\\sqrt{10}}{2}",
+            "A'(x) = 120 - x = 0 \\quad \\Rightarrow \\quad x = 120 \\text{ m}, \\quad y = 60 \\text{ m}.",
           annotation:
-            "Three critical points. The solutions ±√(5/2) are the meaningful candidates.",
-        },
-        {
-          expression:
-            "D^2(0) = 9, \\quad D^2(\\pm\\sqrt{5/2}) = (5/2)^2 - 5(5/2) + 9 = 25/4 - 25/2 + 9 = 25/4 - 50/4 + 36/4 = 11/4",
-          annotation:
-            "Evaluate D² at each critical point. D²(0) = 9 (point (0,0), distance 3). D²(±√(5/2)) = 11/4 (smaller!).",
-        },
-        {
-          expression:
-            "D_{\\min} = \\sqrt{11/4} = \\frac{\\sqrt{11}}{2} \\approx 1.658",
-          annotation: "Minimum distance.",
-        },
-        {
-          expression: "x = \\pm\\sqrt{5/2}, \\quad y = x^2 = 5/2",
-          annotation: "Nearest points: (±√(5/2), 5/2) ≈ (±1.581, 2.5).",
+            "Aha! The optimal shape has the side parallel to the river twice as long as the perpendicular sides. This is a classic modeling result when one side is free.",
         },
       ],
       conclusion:
-        "The nearest points to (0,3) on y = x² are (±√(10)/2, 5/2), at distance √11/2 ≈ 1.66. The point (0,0) on the parabola is actually farther from (0,3) than the two optimal points — the parabola curves away from the y-axis faster than the straight-line distance decreases.",
+        "Maximum area is 7200 m² with dimensions 120 m (parallel to river) by 60 m. The modeling insight: when one boundary is free, the optimal rectangle is twice as wide as it is deep.",
     },
     {
-      id: "ch3-004-ex5",
-      title: "Snell's Law from Fermat's Principle",
+      id: "ch3-004-ex11",
+      title: "Rectangle Inscribed in a Semicircle",
       problem:
-        "\\text{A lifeguard at } (0, 3) \\text{ runs at 8 m/s and swims at 2 m/s. Swimmer is at } (4, -2). \\text{ Find the optimal crossing point on the beach (x-axis).}",
+        "\\text{Maximize the area of a rectangle inscribed in a semicircle of radius 5 cm with base on the diameter.}",
       steps: [
         {
           expression:
-            "T(x) = \\frac{\\sqrt{x^2 + 9}}{8} + \\frac{\\sqrt{(4-x)^2 + 4}}{2}",
+            "\\text{Let } x = \\text{half the base}, \\quad y = \\text{height of rectangle}.",
           annotation:
-            "Total time = (running distance)/8 + (swimming distance)/2. Running along the beach to point (x,0), then swimming to (4,-2).",
+            "Modeling: Symmetry suggests using half the base. The corner of the rectangle lies on the semicircle.",
         },
         {
           expression:
-            "T'(x) = \\frac{x}{8\\sqrt{x^2+9}} - \\frac{4-x}{2\\sqrt{(4-x)^2+4}} = 0",
-          annotation: "Differentiate and set equal to zero.",
+            "Relationship from geometry: x^2 + y^2 = 25 \\quad \\Rightarrow \\quad y = \\sqrt{25 - x^2}.",
+          annotation:
+            "Pythagorean theorem on the right triangle formed by radius, half-base, and height. This is the key modeling constraint.",
+        },
+        {
+          expression: "Area A = 2x \\cdot y = 2x \\sqrt{25 - x^2}.",
+          annotation: "Full base is 2x, so area is base times height.",
         },
         {
           expression:
-            "\\frac{x}{8\\sqrt{x^2+9}} = \\frac{4-x}{2\\sqrt{(4-x)^2+4}}",
-          annotation: "Rearrange.",
-        },
-        {
-          expression:
-            "\\frac{\\sin(\\theta_1)}{v_1} = \\frac{\\sin(\\theta_2)}{v_2}",
+            "After differentiation and solving: x = \\frac{5}{\\sqrt{2}} \\approx 3.535 \\text{ cm}, \\quad y = \\frac{5}{\\sqrt{2}} \\text{ cm}.",
           annotation:
-            "If θ₁ is the angle the running path makes with the normal to the beach and θ₂ is the angle the swimming path makes: sin(θ₁) = x/√(x²+9) and sin(θ₂) = (4-x)/√((4-x)²+4). The condition T'= 0 becomes sin(θ₁)/8 = sin(θ₂)/2. This is Snell's Law of refraction: sin(θ₁)/v₁ = sin(θ₂)/v₂.",
-        },
-        {
-          expression: "\\text{Solve numerically: } x \\approx 0.5 \\text{ m}",
-          annotation:
-            "The optimal crossing point is about 0.5 m along the beach. The lifeguard runs mostly to the water's edge quickly, then swims at an angle to the swimmer.",
+            "Aha! At the maximum, height equals half-base, so the rectangle is actually a square inscribed in the semicircle.",
         },
       ],
       conclusion:
-        "Fermat's Principle (light takes the path of minimum time) and Snell's Law of optics are the same calculation: minimizing total travel time across two media. The lifeguard problem is physically identical to a light ray crossing from air to water. Calculus unifies optics, swimming, and running under the same optimization principle.",
-    },
-    {
-      id: "ch3-004-ex6",
-      title: "Economic Order Quantity",
-      problem:
-        "\\text{A store sells 1200 units/year. Each order costs \\$50. Storage costs \\$2/unit/year. Find optimal order quantity.}",
-      steps: [
-        {
-          expression: "\\text{Number of orders per year} = 1200/Q",
-          annotation:
-            "If Q units are ordered each time, the number of orders per year is 1200/Q.",
-        },
-        {
-          expression: "\\text{Average inventory} = Q/2",
-          annotation:
-            "Inventory decreases linearly from Q to 0 between orders, so average is Q/2.",
-        },
-        {
-          expression:
-            "C(Q) = 50 \\cdot \\frac{1200}{Q} + 2 \\cdot \\frac{Q}{2} = \\frac{60000}{Q} + Q",
-          annotation: "Total annual cost = order costs + storage costs.",
-        },
-        {
-          expression:
-            "C'(Q) = -\\frac{60000}{Q^2} + 1 = 0 \\Rightarrow Q^2 = 60000 \\Rightarrow Q = \\sqrt{60000} \\approx 245 \\text{ units}",
-          annotation: "Set C'= 0 and solve.",
-        },
-        {
-          expression:
-            "C''(Q) = \\frac{120000}{Q^3} > 0 \\Rightarrow \\text{minimum}",
-          annotation: "C'' > 0 confirms this is a minimum.",
-        },
-        {
-          expression:
-            "C(245) = \\frac{60000}{245} + 245 \\approx 244.9 + 244.9 \\approx \\$489.9/\\text{year}",
-          annotation:
-            "Minimum cost. Note: at the optimum, ordering cost = storage cost (both ≈ $245). This is always true for the EOQ model: C is minimized when the two costs are equal.",
-        },
-      ],
-      conclusion:
-        "The optimal order quantity is Q* = √(60000) ≈ 245 units, ordered about 5 times per year. The minimum annual cost is about $490. The general formula Q* = √(2DS/H) (where D = annual demand, S = setup cost, H = holding cost per unit per year) is the famous Economic Order Quantity formula, used in supply chain management worldwide.",
-    },
-    {
-      id: "ch3-004-ex7",
-      title: "Maximize the Area of a Norman Window",
-      problem:
-        "\\text{A Norman window (rectangle with semicircle on top) has perimeter 10 m. Maximize the area.}",
-      steps: [
-        {
-          expression:
-            "\\text{Let } r = \\text{radius of semicircle}, h = \\text{height of rectangle.}",
-          annotation:
-            "The window width = 2r. The rectangle has width 2r and height h. The semicircle has radius r.",
-        },
-        {
-          expression: "\\text{Perimeter} = 2h + 2r + \\pi r = 10",
-          annotation:
-            "Perimeter consists of: two vertical sides (height h each), the bottom edge (2r), and the semicircle (πr). Note: no top side — the semicircle replaces it.",
-        },
-        {
-          expression:
-            "h = \\frac{10 - 2r - \\pi r}{2} = 5 - r - \\frac{\\pi r}{2}",
-          annotation: "Solve for h.",
-        },
-        {
-          expression: "A = 2rh + \\frac{\\pi r^2}{2}",
-          annotation: "Area = rectangle (2r × h) + semicircle (πr²/2).",
-        },
-        {
-          expression:
-            "A(r) = 2r\\left(5 - r - \\frac{\\pi r}{2}\\right) + \\frac{\\pi r^2}{2} = 10r - 2r^2 - \\pi r^2 + \\frac{\\pi r^2}{2}",
-          annotation: "Substitute h.",
-        },
-        {
-          expression: "A(r) = 10r - 2r^2 - \\frac{\\pi r^2}{2}",
-          annotation: "Simplify: -πr² + πr²/2 = -πr²/2.",
-        },
-        {
-          expression: "A'(r) = 10 - 4r - \\pi r = 10 - r(4 + \\pi) = 0",
-          annotation: "Differentiate and set equal to zero.",
-        },
-        {
-          expression:
-            "r = \\frac{10}{4 + \\pi} \\approx \\frac{10}{7.14} \\approx 1.40 \\text{ m}",
-          annotation: "Optimal radius.",
-        },
-        {
-          expression:
-            "h = 5 - r - \\pi r/2 = 5 - r(1 + \\pi/2) \\approx 5 - 1.40(2.571) \\approx 5 - 3.60 \\approx 1.40 \\text{ m}",
-          annotation: "Optimal height ≈ 1.40 m. Notice h ≈ r at the optimum.",
-        },
-      ],
-      conclusion:
-        "The maximum area Norman window with perimeter 10 m has r ≈ 1.40 m and h ≈ 1.40 m. At the optimum, h = r: the rectangle height equals the semicircle radius. This is a general result for Norman windows — the optimal shape always satisfies h = r.",
-    },
-    {
-      id: "ch3-004-ex8",
-      title: "Optimal Launch Angle for Maximum Range (Physics)",
-      problem:
-        "A projectile is launched from ground level at speed $v_0 = 30$ m/s and angle $\\theta \\in (0°, 90°)$. The horizontal range is $R(\\theta) = \\frac{v_0^2 \\sin(2\\theta)}{g} = \\frac{900 \\sin(2\\theta)}{9.8}$ metres. Find the launch angle that maximises range.",
-      steps: [
-        {
-          expression:
-            "R(\\theta) = \\frac{900}{9.8}\\sin(2\\theta) \\approx 91.8 \\sin(2\\theta)",
-          annotation:
-            "The range formula from projectile kinematics. Note R depends only on sin(2θ) — all the physics is packed into this trig function.",
-        },
-        {
-          expression:
-            "R'(\\theta) = 91.8 \\cdot 2\\cos(2\\theta) = 183.6 \\cos(2\\theta)",
-          annotation:
-            "Differentiate with respect to θ. d/dθ[sin(2θ)] = 2cos(2θ) by the chain rule.",
-        },
-        {
-          expression:
-            "R'(\\theta) = 0 \\Rightarrow \\cos(2\\theta) = 0 \\Rightarrow 2\\theta = \\frac{\\pi}{2}",
-          annotation:
-            "Set derivative = 0. cos(2θ)=0 when 2θ=π/2 (in the interval 0 < 2θ < π).",
-        },
-        {
-          expression: "\\theta^* = \\frac{\\pi}{4} = 45°",
-          annotation:
-            "45° maximises range. This is the famous result — every cannon ever built was aimed at 45° for maximum distance (ignoring air resistance).",
-        },
-        {
-          expression: "R''(\\theta) = -183.6 \\cdot 2\\sin(2\\theta)",
-          annotation: "Second derivative for verification.",
-        },
-        {
-          expression: "R''(45°) = -367.2 \\sin(90°) = -367.2 < 0",
-          annotation: "R''(45°) < 0 confirms this is a maximum, not a minimum.",
-        },
-        {
-          expression: "R_{\\max} = 91.8 \\sin(90°) = 91.8 \\text{ m}",
-          annotation:
-            "Maximum range ≈ 91.8 m. This equals v₀²/g = 900/9.8 — the range formula's prefactor.",
-        },
-        {
-          expression:
-            "R(0°) = 91.8\\sin(0°) = 0, \\quad R(90°) = 91.8\\sin(180°) = 0",
-          annotation:
-            "Boundary check: R=0 at both endpoints. Launching horizontally (0°) or straight up (90°) gives zero range — physically correct!",
-        },
-      ],
-      conclusion:
-        "45° gives maximum range of v₀²/g ≈ 91.8 m. The elegant result θ*=45° emerges because we are maximising sin(2θ), which peaks when 2θ=90°. Notice the symmetry: R(θ) = R(90°-θ), so 30° and 60° give the same range — the physics is symmetric about 45°. In reality, air resistance shifts the optimum below 45° (typically 30°-38° for bullets and baseballs), which requires a more complex model.",
-    },
-    {
-      id: "ch3-004-ex7",
-      title: "Rectangle Optimization (Classic)",
-      problem: "\\text{Maximize area with perimeter 100.}",
-      steps: [
-        {
-          expression:
-            "\\text{Let } x, y \\text{ be sides. Constraint: } 2x + 2y = 100",
-          annotation: "Define variables and write constraint.",
-          strategyTitle: "Step 1: Define variables",
-        },
-        {
-          expression: "y = 50 - x",
-          annotation: "Solve constraint for y.",
-          strategyTitle: "Step 2: Write constraint equation",
-        },
-        {
-          expression: "A = xy",
-          annotation: "Objective function: area.",
-          strategyTitle: "Step 3: Write objective function",
-        },
-        {
-          expression: "A(x) = x(50 - x)",
-          annotation: "Substitute y into objective.",
-          strategyTitle: "Step 4: Substitute → ONE variable",
-        },
-        {
-          expression: "A(x) = 50x - x^2",
-          annotation: "Expand algebraically.",
-          strategyTitle: "Step 5: Expand (algebra step!)",
-        },
-        {
-          expression: "A'(x) = 50 - 2x",
-          annotation: "Differentiate.",
-          strategyTitle: "Step 6: Differentiate",
-        },
-        {
-          expression: "50 - 2x = 0 \\Rightarrow x = 25",
-          annotation: "Solve f'(x)=0.",
-          strategyTitle: "Step 7: Solve (f'(x)=0)",
-        },
-        {
-          expression: "y = 25, \\quad A = 25 \\times 25 = 625",
-          annotation: "Substitute back: square maximizes area.",
-          strategyTitle: "Step 8: Interpret result",
-        },
-      ],
-      conclusion:
-        "Square maximizes area with fixed perimeter. The calculus proves what intuition suggests.",
-    },
-    {
-      id: "ch3-004-ex8",
-      title: "Minimize Distance to Point",
-      problem: "\\text{Point (3,4), line x-axis. Minimize distance.}",
-      steps: [
-        {
-          expression: "d = \\sqrt{(x-3)^2 + (y-4)^2}",
-          annotation: "Distance formula.",
-          strategyTitle: "Step 1: Distance formula",
-        },
-        {
-          expression: "(x,0) \\text{ on x-axis}",
-          annotation: "Point on x-axis: (x,0).",
-          strategyTitle: "Step 2: Point on x-axis",
-        },
-        {
-          expression: "d = \\sqrt{(x-3)^2 + (0-4)^2}",
-          annotation: "Substitute y=0.",
-          strategyTitle: "Step 3: Substitute",
-        },
-        {
-          expression: "d = \\sqrt{(x-3)^2 + 16}",
-          annotation: "Simplify.",
-          strategyTitle: "Step 4: Simplify",
-        },
-        {
-          expression: "\\text{Minimize } (x-3)^2 + 16",
-          annotation: "Minimize inside square root.",
-          strategyTitle: "Step 5: Minimize WITHOUT square root trick",
-        },
-        {
-          expression: "\\frac{d}{dx}[(x-3)^2 + 16] = 2(x-3) = 0",
-          annotation: "Derivative.",
-          strategyTitle: "Step 6: Derivative",
-        },
-        {
-          expression: "x = 3",
-          annotation: "Solve: x=3.",
-          strategyTitle: "Step 7: Solve",
-        },
-        {
-          expression: "\\text{Closest point: } (3,0)",
-          annotation: "Directly below (3,4).",
-          strategyTitle: "Result",
-        },
-      ],
-      conclusion:
-        "Closest point is directly below: (3,0). The square root doesn't affect the minimum location.",
-    },
-    {
-      id: "ch3-004-ex9",
-      title: "Box Optimization",
-      problem: "\\text{Max volume from square sheet cutting corners.}",
-      steps: [
-        {
-          expression: "\\text{Let } x = \\text{cut size}",
-          annotation: "Define variable.",
-          strategyTitle: "Step 1: Variables",
-        },
-        {
-          expression: "\\text{Dimensions: } L-2x, W-2x, x",
-          annotation: "After cutting corners.",
-          strategyTitle: "Step 2: Dimensions",
-        },
-        {
-          expression: "V = x(L-2x)(W-2x)",
-          annotation: "Volume formula.",
-          strategyTitle: "Step 3: Volume",
-        },
-        {
-          expression: "(L-2x)(W-2x) = LW -2Lx -2Wx +4x^2",
-          annotation: "Expand first.",
-          strategyTitle: "Step 4: Expand (THIS is where algebra matters)",
-        },
-        {
-          expression: "V = x(LW -2Lx -2Wx +4x^2)",
-          annotation: "Multiply by x.",
-          strategyTitle: "Step 5: Multiply by x",
-        },
-        {
-          expression: "V = LWx -2Lx^2 -2Wx^2 +4x^3",
-          annotation: "Expand fully.",
-          strategyTitle: "Step 6: Expand fully",
-        },
-        {
-          expression: "V' = LW -4Lx -4Wx +12x^2",
-          annotation: "Derivative.",
-          strategyTitle: "Step 7: Derivative",
-        },
-        {
-          expression: "\\text{Solve } V'=0",
-          annotation: "Set equal to zero.",
-          strategyTitle: "Step 8: Solve (V'=0) — algebra-heavy step",
-        },
-      ],
-      conclusion:
-        "Box optimization requires careful algebraic expansion. The derivative step is algebra-heavy.",
+        "Even when forced to fit inside a curved boundary, the maximum-area rectangle turns out to be a square. The modeling relationship (Pythagorean) combined with calculus reveals this hidden symmetry.",
     },
   ],
-
   story: {
-    title: 'The Fencing Problem',
-    subtitle: 'You have 100 meters of fence and want the largest possible rectangular enclosure. Intuition says a square. Calculus proves it — and shows exactly what changes when the rules change.',
+    title: "The Fencing Problem",
+    subtitle:
+      "You have 100 meters of fence and want the largest possible rectangular enclosure. Intuition says a square. Calculus proves it — and shows exactly what changes when the rules change.",
     acts: [
       {
-        label: 'The Scene',
-        title: 'A Field, a Fence, and a Question',
+        label: "The Scene",
+        title: "A Field, a Fence, and a Question",
         content: `You own a rectangular plot of land and have exactly 100 meters of fencing. You want to enclose the largest possible area.
 
 You can make the rectangle tall and narrow, short and wide, or anything in between — as long as the total fence used is 100 meters. The question is: which shape gives the most area?
@@ -925,8 +532,8 @@ Calculus gives a systematic, complete procedure for answering both questions —
 This procedure works whether you are maximizing area, minimizing cost, finding the angle that maximizes a projectile's range, or training a neural network. The geometry changes. The strategy never does.`,
       },
       {
-        label: 'Act I',
-        title: 'Naming the Variables — What Are We Working With?',
+        label: "Act I",
+        title: "Naming the Variables — What Are We Working With?",
         content: `The first step in any optimization problem is to name all quantities with symbols.
 
 **Draw the rectangle.** Label the two dimensions:
@@ -954,8 +561,8 @@ This is the **constraint equation** — the rule that must always be satisfied. 
 At this point we have one equation ($2x + 2y = 100$) and two unknowns ($x$ and $y$). To optimize, we need to reduce everything to one variable.`,
       },
       {
-        label: 'Act II',
-        title: 'Substitution — Reducing to One Variable',
+        label: "Act II",
+        title: "Substitution — Reducing to One Variable",
         content: `We have two variables $x$ and $y$, but they are linked by the constraint $2x + 2y = 100$. Solve for one in terms of the other.
 
 **Solve the constraint for $y$:**
@@ -984,8 +591,8 @@ We have reduced the original two-variable problem to: maximize $A(x) = 50x - x^2
 This is now a standard single-variable calculus problem. The derivative will find the critical points.`,
       },
       {
-        label: 'Act III',
-        title: 'Differentiating and Finding the Critical Point',
+        label: "Act III",
+        title: "Differentiating and Finding the Critical Point",
         content: `To find the maximum of $A(x) = 50x - x^2$, we find where $A'(x) = 0$.
 
 **Differentiate $A(x) = 50x - x^2$ using the Power Rule:**
@@ -1015,8 +622,8 @@ So both dimensions are 25 meters — a square. Area:
 But we have only found a *candidate* for the maximum. A critical point where $A' = 0$ could be a maximum, minimum, or saddle point. We must verify which.`,
       },
       {
-        label: 'Act IV',
-        title: 'Confirming the Maximum — Second Derivative Test',
+        label: "Act IV",
+        title: "Confirming the Maximum — Second Derivative Test",
         content: `We need to confirm that $x = 25$ is a maximum, not a minimum or saddle.
 
 **The Second Derivative Test:** if $f'(c) = 0$ and $f''(c) < 0$, then $f$ has a **local maximum** at $c$. If $f''(c) > 0$, it is a local minimum.
@@ -1037,8 +644,8 @@ Because this is the only critical point on the open interval $(0, 50)$, and beca
 The square is optimal — not by intuition, but by calculus.`,
       },
       {
-        label: 'Act V',
-        title: 'The River Variant — When the Rules Change',
+        label: "Act V",
+        title: "The River Variant — When the Rules Change",
         content: `Now suppose one side of the enclosure borders a river. You do not need fence along the river — you only need fence on three sides.
 
 **Re-name:** let $x$ be the two parallel sides perpendicular to the river, $y$ be the single side parallel to the river.
@@ -1094,73 +701,101 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: 'Think of "breaking the symmetry." If x and y differ, you can always nudge them closer together to improve the objective function while keeping the constraint. The calculus confirms that the perfect balance point (x=y) is the only critical point.',
       walkthrough: [
         {
-          expression: "\\text{Definition: Perimeter } P = 2x + 2y \\text{ is fixed. Area to maximize: } A = x \\cdot y",
-          annotation: "We have a constraint (fixed perimeter) and an objective function (area). This is a classic constrained optimization problem. We will use substitution to turn it into a single-variable calculus problem."
+          expression:
+            "\\text{Definition: Perimeter } P = 2x + 2y \\text{ is fixed. Area to maximize: } A = x \\cdot y",
+          annotation:
+            "We have a constraint (fixed perimeter) and an objective function (area). This is a classic constrained optimization problem. We will use substitution to turn it into a single-variable calculus problem.",
         },
         {
-          expression: "\\text{Solve the constraint for one variable: } 2x + 2y = P \\implies y = \\frac{P}{2} - x",
-          annotation: "We express y in terms of x. This is valid as long as x is between 0 and P/2 (so y stays non-negative). Thought process: eliminate one variable using the constraint so we can differentiate with respect to only one variable."
+          expression:
+            "\\text{Solve the constraint for one variable: } 2x + 2y = P \\implies y = \\frac{P}{2} - x",
+          annotation:
+            "We express y in terms of x. This is valid as long as x is between 0 and P/2 (so y stays non-negative). Thought process: eliminate one variable using the constraint so we can differentiate with respect to only one variable.",
         },
         {
-          expression: "\\text{Substitute into area: } A(x) = x \\left( \\frac{P}{2} - x \right) = \\frac{P}{2}x - x^2",
-          annotation: "Now A is a function of x only. This is a quadratic that opens downward (coefficient of x² is negative), so it has a maximum."
+          expression:
+            "\\text{Substitute into area: } A(x) = x \\left( \\frac{P}{2} - x \right) = \\frac{P}{2}x - x^2",
+          annotation:
+            "Now A is a function of x only. This is a quadratic that opens downward (coefficient of x² is negative), so it has a maximum.",
         },
         {
           expression: "\\text{Take derivative: } A'(x) = \\frac{P}{2} - 2x",
-          annotation: "Power rule: derivative of (P/2)x is P/2; derivative of -x² is -2x. This derivative represents the rate of change of area with respect to x."
+          annotation:
+            "Power rule: derivative of (P/2)x is P/2; derivative of -x² is -2x. This derivative represents the rate of change of area with respect to x.",
         },
         {
-          expression: "\\text{Set derivative to zero for critical points: } \\frac{P}{2} - 2x = 0 \\implies 2x = \\frac{P}{2} \\implies x = \\frac{P}{4}",
-          annotation: "Solve the equation. At this point the slope is zero — the area stops increasing and starts decreasing."
+          expression:
+            "\\text{Set derivative to zero for critical points: } \\frac{P}{2} - 2x = 0 \\implies 2x = \\frac{P}{2} \\implies x = \\frac{P}{4}",
+          annotation:
+            "Solve the equation. At this point the slope is zero — the area stops increasing and starts decreasing.",
         },
         {
-          expression: "\\text{Then } y = \\frac{P}{2} - \\frac{P}{4} = \\frac{P}{4}",
-          annotation: "So x = y = P/4. This means the rectangle is actually a square. Aha moment: the maximum occurs exactly when the two sides are equal (perfect symmetry)."
+          expression:
+            "\\text{Then } y = \\frac{P}{2} - \\frac{P}{4} = \\frac{P}{4}",
+          annotation:
+            "So x = y = P/4. This means the rectangle is actually a square. Aha moment: the maximum occurs exactly when the two sides are equal (perfect symmetry).",
         },
         {
-          expression: "\\text{Second derivative test: } A''(x) = -2 < 0 \\implies \\text{concave down, so maximum}",
-          annotation: "The second derivative is constant and negative, confirming we have a global maximum for rectangles."
+          expression:
+            "\\text{Second derivative test: } A''(x) = -2 < 0 \\implies \\text{concave down, so maximum}",
+          annotation:
+            "The second derivative is constant and negative, confirming we have a global maximum for rectangles.",
         },
         {
-          expression: "\\text{Maximum area: } A_{\\max} = \\left(\\frac{P}{4}\\right) \\left(\\frac{P}{4}\\right) = \\frac{P^2}{16}",
-          annotation: "Plug the optimal dimensions back in. This proves part (1)."
+          expression:
+            "\\text{Maximum area: } A_{\\max} = \\left(\\frac{P}{4}\\right) \\left(\\frac{P}{4}\\right) = \\frac{P^2}{16}",
+          annotation:
+            "Plug the optimal dimensions back in. This proves part (1).",
         },
         {
-          expression: "\\text{Part (2): Now fix area } A = xy \\text{ and minimize perimeter } P = 2x + 2y",
-          annotation: "This is the dual problem. We swap what is fixed and what we optimize. Interesting symmetry between the two problems."
+          expression:
+            "\\text{Part (2): Now fix area } A = xy \\text{ and minimize perimeter } P = 2x + 2y",
+          annotation:
+            "This is the dual problem. We swap what is fixed and what we optimize. Interesting symmetry between the two problems.",
         },
         {
           expression: "\\text{Solve constraint for y: } y = \\frac{A}{x}",
-          annotation: "Express y in terms of x (x > 0)."
+          annotation: "Express y in terms of x (x > 0).",
         },
         {
-          expression: "\\text{Perimeter as function of x: } P(x) = 2x + 2\\left(\\frac{A}{x}\\right) = 2x + \\frac{2A}{x}",
-          annotation: "Now minimize this function. Note the 1/x term — this will create a minimum rather than a maximum."
+          expression:
+            "\\text{Perimeter as function of x: } P(x) = 2x + 2\\left(\\frac{A}{x}\\right) = 2x + \\frac{2A}{x}",
+          annotation:
+            "Now minimize this function. Note the 1/x term — this will create a minimum rather than a maximum.",
         },
         {
           expression: "\\text{Differentiate: } P'(x) = 2 - \\frac{2A}{x^2}",
-          annotation: "Derivative of 2x is 2; derivative of 2A x^{-1} is -2A x^{-2} (power rule with negative exponent)."
+          annotation:
+            "Derivative of 2x is 2; derivative of 2A x^{-1} is -2A x^{-2} (power rule with negative exponent).",
         },
         {
-          expression: "\\text{Set to zero: } 2 - \\frac{2A}{x^2} = 0 \\implies \\frac{2A}{x^2} = 2 \\implies x^2 = A \\implies x = \\sqrt{A} \\quad (x > 0)",
-          annotation: "Solve carefully. We discard the negative root because length cannot be negative."
+          expression:
+            "\\text{Set to zero: } 2 - \\frac{2A}{x^2} = 0 \\implies \\frac{2A}{x^2} = 2 \\implies x^2 = A \\implies x = \\sqrt{A} \\quad (x > 0)",
+          annotation:
+            "Solve carefully. We discard the negative root because length cannot be negative.",
         },
         {
-          expression: "\\text{Then } y = \\frac{A}{x} = \\frac{A}{\\sqrt{A}} = \\sqrt{A}",
-          annotation: "Again x = y = √A. The optimal rectangle is a square! This is the beautiful duality: the square is optimal in both directions."
+          expression:
+            "\\text{Then } y = \\frac{A}{x} = \\frac{A}{\\sqrt{A}} = \\sqrt{A}",
+          annotation:
+            "Again x = y = √A. The optimal rectangle is a square! This is the beautiful duality: the square is optimal in both directions.",
         },
         {
-          expression: "\\text{Second derivative: } P''(x) = \\frac{d}{dx}\\left(-\\frac{2A}{x^2}\\right) = \\frac{4A}{x^3} > 0 \\text{ for } x > 0",
-          annotation: "Positive second derivative confirms we have a minimum."
+          expression:
+            "\\text{Second derivative: } P''(x) = \\frac{d}{dx}\\left(-\\frac{2A}{x^2}\\right) = \\frac{4A}{x^3} > 0 \\text{ for } x > 0",
+          annotation: "Positive second derivative confirms we have a minimum.",
         },
         {
-          expression: "\\text{Minimum perimeter: } P_{\\min} = 2\\sqrt{A} + 2\\sqrt{A} = 4\\sqrt{A}",
-          annotation: "Plug optimal values back in. This completes part (2)."
+          expression:
+            "\\text{Minimum perimeter: } P_{\\min} = 2\\sqrt{A} + 2\\sqrt{A} = 4\\sqrt{A}",
+          annotation: "Plug optimal values back in. This completes part (2).",
         },
         {
-          expression: "\\text{Aha insight: Symmetry breaking argument (no calculus)}",
-          annotation: "Suppose x ≠ y. Without loss of generality let x > y. Then you can move a little length from the longer side to the shorter side. The area xy increases while perimeter stays the same (or vice versa for the other problem). The only point where you cannot improve further is when x = y. Calculus simply locates that balance point rigorously."
-        }
+          expression:
+            "\\text{Aha insight: Symmetry breaking argument (no calculus)}",
+          annotation:
+            "Suppose x ≠ y. Without loss of generality let x > y. Then you can move a little length from the longer side to the shorter side. The area xy increases while perimeter stays the same (or vice versa for the other problem). The only point where you cannot improve further is when x = y. Calculus simply locates that balance point rigorously.",
+        },
       ],
       answer:
         "In both directions — fixed perimeter maximizes area as a square, fixed area minimizes perimeter as a square. These are dual optimization problems with the same geometric answer. The isoperimetric inequality (circle maximizes area for fixed perimeter among all shapes, not just rectangles) generalizes this result.",
@@ -1174,41 +809,57 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: "Use the sphere constraint r² + h² = R², where h is the half-height. Substitute r² = R² - h² into V = 2πh r², then differentiate the resulting one-variable function in h.",
       walkthrough: [
         {
-          expression: "\\text{Visualize: A cylinder inside a sphere. The top and bottom circles of the cylinder touch the sphere along a circle of radius r, and the half-height of the cylinder is h.}",
-          annotation: "By Pythagoras in the right triangle formed by the center of the sphere, the center of the cylinder's top, and the edge: r² + h² = R²."
+          expression:
+            "\\text{Visualize: A cylinder inside a sphere. The top and bottom circles of the cylinder touch the sphere along a circle of radius r, and the half-height of the cylinder is h.}",
+          annotation:
+            "By Pythagoras in the right triangle formed by the center of the sphere, the center of the cylinder's top, and the edge: r² + h² = R².",
         },
         {
-          expression: "\\text{Constraint: } r^2 + h^2 = R^2 \\implies r^2 = R^2 - h^2",
-          annotation: "Solve for r² so we can substitute into volume. h must be between 0 and R."
+          expression:
+            "\\text{Constraint: } r^2 + h^2 = R^2 \\implies r^2 = R^2 - h^2",
+          annotation:
+            "Solve for r² so we can substitute into volume. h must be between 0 and R.",
         },
         {
-          expression: "\\text{Volume of cylinder: } V = \\pi r^2 \\cdot (2h) = 2\\pi h r^2",
-          annotation: "Full height is 2h. Substitute the constraint: V(h) = 2\\pi h (R^2 - h^2) = 2\\pi R^2 h - 2\\pi h^3"
+          expression:
+            "\\text{Volume of cylinder: } V = \\pi r^2 \\cdot (2h) = 2\\pi h r^2",
+          annotation:
+            "Full height is 2h. Substitute the constraint: V(h) = 2\\pi h (R^2 - h^2) = 2\\pi R^2 h - 2\\pi h^3",
         },
         {
-          expression: "\\text{Differentiate with respect to h: } V'(h) = 2\\pi R^2 - 6\\pi h^2",
-          annotation: "Derivative of 2πR²h is 2πR²; derivative of -2πh³ is -6πh². Factor out 2π: 2π(R² - 3h²)."
+          expression:
+            "\\text{Differentiate with respect to h: } V'(h) = 2\\pi R^2 - 6\\pi h^2",
+          annotation:
+            "Derivative of 2πR²h is 2πR²; derivative of -2πh³ is -6πh². Factor out 2π: 2π(R² - 3h²).",
         },
         {
-          expression: "\\text{Set derivative = 0: } 2\\pi (R^2 - 3h^2) = 0 \\implies R^2 - 3h^2 = 0 \\implies h^2 = \\frac{R^2}{3} \\implies h = \\frac{R}{\\sqrt{3}} \\quad (h > 0)",
-          annotation: "Critical point found. Only one in (0, R)."
+          expression:
+            "\\text{Set derivative = 0: } 2\\pi (R^2 - 3h^2) = 0 \\implies R^2 - 3h^2 = 0 \\implies h^2 = \\frac{R^2}{3} \\implies h = \\frac{R}{\\sqrt{3}} \\quad (h > 0)",
+          annotation: "Critical point found. Only one in (0, R).",
         },
         {
-          expression: "\\text{Find corresponding r: } r^2 = R^2 - \\frac{R^2}{3} = \\frac{2R^2}{3} \\implies r = R \\sqrt{\\frac{2}{3}}",
-          annotation: "Optimal radius is larger than the optimal half-height (√(2/3) ≈ 0.816 R vs 0.577 R)."
+          expression:
+            "\\text{Find corresponding r: } r^2 = R^2 - \\frac{R^2}{3} = \\frac{2R^2}{3} \\implies r = R \\sqrt{\\frac{2}{3}}",
+          annotation:
+            "Optimal radius is larger than the optimal half-height (√(2/3) ≈ 0.816 R vs 0.577 R).",
         },
         {
-          expression: "\\text{Maximum volume: } V_{\\max} = 2\\pi \\cdot \\frac{R}{\\sqrt{3}} \\cdot \\frac{2R^2}{3} = \\frac{4\\pi R^3}{3\\sqrt{3}}",
-          annotation: "Simplify: multiply, then rationalize denominator if desired: \\frac{4\\pi R^3 \\sqrt{3}}{9}."
+          expression:
+            "\\text{Maximum volume: } V_{\\max} = 2\\pi \\cdot \\frac{R}{\\sqrt{3}} \\cdot \\frac{2R^2}{3} = \\frac{4\\pi R^3}{3\\sqrt{3}}",
+          annotation:
+            "Simplify: multiply, then rationalize denominator if desired: \\frac{4\\pi R^3 \\sqrt{3}}{9}.",
         },
         {
-          expression: "\\text{Compare to sphere volume } \\frac{4}{3}\\pi R^3: \\quad \\frac{V_{\\max}}{V_{\\text{sphere}}} = \\frac{4\\pi R^3 /(3\\sqrt{3}) }{4\\pi R^3 / 3} = \\frac{1}{\\sqrt{3}} \\approx 0.577",
-          annotation: "The best cylinder fills about 57.7% of the sphere. Aha: even the optimal inscribed cylinder leaves a significant portion of the sphere empty — the sphere is 'more efficient' at enclosing volume."
+          expression:
+            "\\text{Compare to sphere volume } \\frac{4}{3}\\pi R^3: \\quad \\frac{V_{\\max}}{V_{\\text{sphere}}} = \\frac{4\\pi R^3 /(3\\sqrt{3}) }{4\\pi R^3 / 3} = \\frac{1}{\\sqrt{3}} \\approx 0.577",
+          annotation:
+            "The best cylinder fills about 57.7% of the sphere. Aha: even the optimal inscribed cylinder leaves a significant portion of the sphere empty — the sphere is 'more efficient' at enclosing volume.",
         },
         {
-          expression: "\\text{Second derivative test: } V''(h) = -12\\pi h < 0 \\text{ at } h = R/\\sqrt{3} > 0 \\implies \\text{maximum}",
-          annotation: "Confirms it is a maximum."
-        }
+          expression:
+            "\\text{Second derivative test: } V''(h) = -12\\pi h < 0 \\text{ at } h = R/\\sqrt{3} > 0 \\implies \\text{maximum}",
+          annotation: "Confirms it is a maximum.",
+        },
       ],
       answer:
         "Optimal inscribed cylinder: r = R√(2/3), full height = 2h = 2R/√3 = 2R√3/3. Maximum volume = 4πR³/(3√3). The cylinder uses about 57.7% of the sphere volume.",
@@ -1222,53 +873,69 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: 'This "h = r" result is a beautiful symmetry. Try writing the area as a function of r, then find the critical radius r*. When you plug r* back into the height equation, the complicated-looking pi terms will perfectly cancel out.',
       walkthrough: [
         {
-          expression: "\\text{Perimeter constraint: rectangle sides 2r (width) + h (height) + semicircle arc \\pi r = 10}",
-          annotation: "The semicircle arc length is half the circumference: πr. Total perimeter: 2r + h + πr = 10."
+          expression:
+            "\\text{Perimeter constraint: rectangle sides 2r (width) + h (height) + semicircle arc \\pi r = 10}",
+          annotation:
+            "The semicircle arc length is half the circumference: πr. Total perimeter: 2r + h + πr = 10.",
         },
         {
           expression: "\\text{Solve for h: } h = 10 - r(2 + \\pi)",
-          annotation: "This is the height of the rectangular part."
+          annotation: "This is the height of the rectangular part.",
         },
         {
-          expression: "\\text{Area: rectangle } 2r \\cdot h \\text{ plus semicircle area } \\frac{1}{2} \\pi r^2",
-          annotation: "Total A = 2r h + (π r²)/2"
+          expression:
+            "\\text{Area: rectangle } 2r \\cdot h \\text{ plus semicircle area } \\frac{1}{2} \\pi r^2",
+          annotation: "Total A = 2r h + (π r²)/2",
         },
         {
-          expression: "\\text{Substitute h: } A(r) = 2r [10 - r(2+\\pi)] + \\frac{\\pi r^2}{2} = 20r - 2r^2(2+\\pi) + \\frac{\\pi r^2}{2}",
-          annotation: "Expand carefully. Combine like terms later when differentiating."
+          expression:
+            "\\text{Substitute h: } A(r) = 2r [10 - r(2+\\pi)] + \\frac{\\pi r^2}{2} = 20r - 2r^2(2+\\pi) + \\frac{\\pi r^2}{2}",
+          annotation:
+            "Expand carefully. Combine like terms later when differentiating.",
         },
         {
-          expression: "\\text{Simplified form often written as: } A(r) = 10r - 2(2+\\frac{\\pi}{2})r^2 \\text{ or equivalent}",
-          annotation: "The exact coefficients may vary slightly depending on how you group, but the derivative is what matters."
+          expression:
+            "\\text{Simplified form often written as: } A(r) = 10r - 2(2+\\frac{\\pi}{2})r^2 \\text{ or equivalent}",
+          annotation:
+            "The exact coefficients may vary slightly depending on how you group, but the derivative is what matters.",
         },
         {
-          expression: "\\text{Differentiate: } A'(r) = 10 - 4r - \\pi r = 10 - r(4 + \\pi)",
-          annotation: "Derivative of 20r term gives 20? Wait — careful algebra in original walkthrough was adjusted; the key is the critical point equation 10 = r(4 + π)."
+          expression:
+            "\\text{Differentiate: } A'(r) = 10 - 4r - \\pi r = 10 - r(4 + \\pi)",
+          annotation:
+            "Derivative of 20r term gives 20? Wait — careful algebra in original walkthrough was adjusted; the key is the critical point equation 10 = r(4 + π).",
         },
         {
-          expression: "\\text{Set A'(r)=0: } 10 - r(4 + \\pi) = 0 \\implies r^* = \\frac{10}{4 + \\pi}",
-          annotation: "Optimal radius."
+          expression:
+            "\\text{Set A'(r)=0: } 10 - r(4 + \\pi) = 0 \\implies r^* = \\frac{10}{4 + \\pi}",
+          annotation: "Optimal radius.",
         },
         {
           expression: "\\text{Now compute h at r^*: } h = 10 - r^*(2 + \\pi)",
-          annotation: "Substitute the optimal r."
+          annotation: "Substitute the optimal r.",
         },
         {
-          expression: "\\text{From critical point: } 10 = r^*(4 + \\pi) \\implies \\frac{10}{2} = r^* \\cdot \\frac{4 + \\pi}{2} \\implies 5 = r^* \\cdot \\frac{4 + \\pi}{2}",
-          annotation: "Useful identity we will subtract from."
+          expression:
+            "\\text{From critical point: } 10 = r^*(4 + \\pi) \\implies \\frac{10}{2} = r^* \\cdot \\frac{4 + \\pi}{2} \\implies 5 = r^* \\cdot \\frac{4 + \\pi}{2}",
+          annotation: "Useful identity we will subtract from.",
         },
         {
-          expression: "\\text{h} = 5 - r^* \\cdot \\frac{2 + \\pi}{2} \\quad \\text{(since } 10 - r^*(2+\\pi) = 2\\cdot5 - r^*(2+\\pi))",
-          annotation: "Rewrite h expression to match the form."
+          expression:
+            "\\text{h} = 5 - r^* \\cdot \\frac{2 + \\pi}{2} \\quad \\text{(since } 10 - r^*(2+\\pi) = 2\\cdot5 - r^*(2+\\pi))",
+          annotation: "Rewrite h expression to match the form.",
         },
         {
-          expression: "\\text{Subtract: } h = r^* \\cdot \\frac{4+\\pi}{2} - r^* \\cdot \\frac{2+\\pi}{2} = r^* \\cdot \\frac{(4+\\pi) - (2+\\pi)}{2} = r^* \\cdot \\frac{2}{2} = r^*",
-          annotation: "The π terms and constants cancel beautifully! So h = r^* exactly. This is the elegant symmetry — the optimal Norman window always has rectangle height equal to the semicircle radius, independent of the total perimeter value."
+          expression:
+            "\\text{Subtract: } h = r^* \\cdot \\frac{4+\\pi}{2} - r^* \\cdot \\frac{2+\\pi}{2} = r^* \\cdot \\frac{(4+\\pi) - (2+\\pi)}{2} = r^* \\cdot \\frac{2}{2} = r^*",
+          annotation:
+            "The π terms and constants cancel beautifully! So h = r^* exactly. This is the elegant symmetry — the optimal Norman window always has rectangle height equal to the semicircle radius, independent of the total perimeter value.",
         },
         {
-          expression: "\\text{Aha moment: The pi terms canceled perfectly, revealing a universal geometric ratio h = r.}",
-          annotation: "This shows how optimization can uncover hidden geometric relationships that are not obvious from the setup."
-        }
+          expression:
+            "\\text{Aha moment: The pi terms canceled perfectly, revealing a universal geometric ratio h = r.}",
+          annotation:
+            "This shows how optimization can uncover hidden geometric relationships that are not obvious from the setup.",
+        },
       ],
       answer:
         "At the optimum, h = r* = 10/(4+π). This result (h = r) is independent of the perimeter length — it is a universal property of the optimal Norman window shape.",
@@ -1282,23 +949,28 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: "AM-GM says (x + y)/2 ≥ √(xy), with equality iff x = y.",
       walkthrough: [
         {
-          expression: "\\text{Perimeter fixed: } 2x + 2y = P \\implies x + y = \\frac{P}{2}",
-          annotation: "Average of x and y is P/4."
+          expression:
+            "\\text{Perimeter fixed: } 2x + 2y = P \\implies x + y = \\frac{P}{2}",
+          annotation: "Average of x and y is P/4.",
         },
         {
-          expression: "\\text{AM-GM: } \\frac{x + y}{2} \\ge \\sqrt{xy} \\implies \\frac{P}{4} \\ge \\sqrt{xy}",
-          annotation: "This gives an upper bound on √(xy), hence on area xy."
+          expression:
+            "\\text{AM-GM: } \\frac{x + y}{2} \\ge \\sqrt{xy} \\implies \\frac{P}{4} \\ge \\sqrt{xy}",
+          annotation: "This gives an upper bound on √(xy), hence on area xy.",
         },
         {
-          expression: "\\text{Square both sides: } xy \\le \\left(\\frac{P}{4}\\right)^2 = \\frac{P^2}{16}",
-          annotation: "Maximum area is P²/16."
+          expression:
+            "\\text{Square both sides: } xy \\le \\left(\\frac{P}{4}\\right)^2 = \\frac{P^2}{16}",
+          annotation: "Maximum area is P²/16.",
         },
         {
           expression: "\\text{Equality when } x = y = \\frac{P}{4}",
-          annotation: "AM-GM equality holds precisely when the sides are equal — the square. Aha: no derivatives needed; arithmetic mean–geometric mean inequality directly proves the square is best."
-        }
+          annotation:
+            "AM-GM equality holds precisely when the sides are equal — the square. Aha: no derivatives needed; arithmetic mean–geometric mean inequality directly proves the square is best.",
+        },
       ],
-      answer: "By AM-GM, A = xy ≤ (P/4)² = P²/16 with equality iff x = y (square). This gives a calculus-free proof and deep insight into why equality cases matter."
+      answer:
+        "By AM-GM, A = xy ≤ (P/4)² = P²/16 with equality iff x = y (square). This gives a calculus-free proof and deep insight into why equality cases matter.",
     },
 
     {
@@ -1309,27 +981,34 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: "Let original length = x+1, width = x-1 or similar. The area is unchanged under this swap.",
       walkthrough: [
         {
-          expression: "\\text{Let original length = l, width = w. Then } 2l + 2w = 20 \\implies l + w = 10",
-          annotation: "Constraint."
+          expression:
+            "\\text{Let original length = l, width = w. Then } 2l + 2w = 20 \\implies l + w = 10",
+          annotation: "Constraint.",
         },
         {
-          expression: "\\text{New length = l + 1, new width = w - 1, area same: } (l+1)(w-1) = l w",
-          annotation: "Set up the condition."
+          expression:
+            "\\text{New length = l + 1, new width = w - 1, area same: } (l+1)(w-1) = l w",
+          annotation: "Set up the condition.",
         },
         {
-          expression: "\\text{Expand: } lw - l + w + 1 = lw \\implies -l + w + 1 = 0 \\implies w - l = -1",
-          annotation: "Simplify."
+          expression:
+            "\\text{Expand: } lw - l + w + 1 = lw \\implies -l + w + 1 = 0 \\implies w - l = -1",
+          annotation: "Simplify.",
         },
         {
-          expression: "\\text{Now solve system: } l + w = 10, \\quad w - l = -1",
-          annotation: "Add the two equations: 2w = 9 ⇒ w = 4.5, l = 5.5"
+          expression:
+            "\\text{Now solve system: } l + w = 10, \\quad w - l = -1",
+          annotation: "Add the two equations: 2w = 9 ⇒ w = 4.5, l = 5.5",
         },
         {
-          expression: "\\text{Aha insight: The change 'trades' 1 m from width to length but keeps area constant. This shows how area is sensitive to the product, and the square is the point where small trades no longer help or hurt.}",
-          annotation: "This concrete numerical example makes the earlier optimization feel tangible."
-        }
+          expression:
+            "\\text{Aha insight: The change 'trades' 1 m from width to length but keeps area constant. This shows how area is sensitive to the product, and the square is the point where small trades no longer help or hurt.}",
+          annotation:
+            "This concrete numerical example makes the earlier optimization feel tangible.",
+        },
       ],
-      answer: "Original dimensions: 5.5 m by 4.5 m. The symmetry insight is that only when l = w can you no longer trade length and width to improve (or keep) the area while holding perimeter fixed."
+      answer:
+        "Original dimensions: 5.5 m by 4.5 m. The symmetry insight is that only when l = w can you no longer trade length and width to improve (or keep) the area while holding perimeter fixed.",
     },
 
     {
@@ -1340,20 +1019,26 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
       hint: "Think about the 'cost' of perimeter: straight sides cost 1 unit per meter, the curved part costs π/2 effectively in the area trade-off.",
       walkthrough: [
         {
-          expression: "\\text{Intuition: At the optimum, the 'marginal' area gained per unit perimeter should be equal for the straight parts and the curved part.}",
-          annotation: "This is like equating marginal returns — a deep economic/optimization idea."
+          expression:
+            "\\text{Intuition: At the optimum, the 'marginal' area gained per unit perimeter should be equal for the straight parts and the curved part.}",
+          annotation:
+            "This is like equating marginal returns — a deep economic/optimization idea.",
         },
         {
-          expression: "\\text{The semicircle 'costs' πr in perimeter but adds (π r²)/2 area. The rectangle sides cost 2 in perimeter per unit height but add 2r area per unit height.}",
-          annotation: "Balancing these efficiencies leads to h = r."
+          expression:
+            "\\text{The semicircle 'costs' πr in perimeter but adds (π r²)/2 area. The rectangle sides cost 2 in perimeter per unit height but add 2r area per unit height.}",
+          annotation: "Balancing these efficiencies leads to h = r.",
         },
         {
-          expression: "\\text{When h = r, the rectangle height matches the radius, creating a pleasing visual and mathematical balance.}",
-          annotation: "Many optimal shapes exhibit such equalities (square, equilateral triangle in certain problems, etc.)."
-        }
+          expression:
+            "\\text{When h = r, the rectangle height matches the radius, creating a pleasing visual and mathematical balance.}",
+          annotation:
+            "Many optimal shapes exhibit such equalities (square, equilateral triangle in certain problems, etc.).",
+        },
       ],
-      answer: "Intuitively, at optimum the marginal area per perimeter dollar is the same for straight and curved portions, leading to h = r. Algebra confirms it exactly as shown earlier."
-    }
+      answer:
+        "Intuitively, at optimum the marginal area per perimeter dollar is the same for straight and curved portions, leading to h = r. Algebra confirms it exactly as shown earlier.",
+    },
   ],
 
   crossRefs: [
