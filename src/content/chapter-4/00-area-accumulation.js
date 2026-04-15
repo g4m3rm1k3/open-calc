@@ -691,53 +691,65 @@ export default {
     {
       title: "Why Braking Distance Explodes With Speed",
       persona:
-        "I'm driving at 60 mph when something suddenly appears ahead. I slam the brakes. The car doesn't stop instantly — my speed drops gradually: 60 → 50 → 40 → 20 → 0 mph. From experience I know that stopping from 60 mph takes way more than twice the distance it takes from 30 mph. It feels like four times as far. I also notice that when the car is heavier (full of passengers or cargo), it takes even longer to stop. I want to understand exactly why distance grows so fast with speed, and why adding weight makes it worse — using only what I can actually measure and calculate step by step.",
+        "I'm driving at 60 mph when something suddenly appears ahead. I slam the brakes. The car slows gradually: 60 → 50 → 40 → 20 → 0 mph. From experience I know stopping from 60 mph takes way more than twice the distance it takes from 30 mph — it feels like about four times farther. I also notice that when the car is heavier (passengers or cargo), it takes even longer to stop. I want to understand exactly why distance grows so fast with speed and why adding weight makes it worse — building everything from what I can actually measure and calculate step by step.",
       steps: [
         {
           phase: "need",
           title: "The observation that breaks my intuition",
           content:
-            "I know a simple rule: distance = speed × time. But when I brake, speed is constantly dropping, so there is no single speed I can plug in.\n\nI try using the average of starting and ending speed:\n\n- From 30 mph → average 15 mph → stops in about 50 feet\n- From 60 mph → average 30 mph → should stop in about 100 feet\n\nBut real measurements show it takes closer to 200 feet at 60 mph. That's not double — it's roughly four times farther. My simple average-speed method fails badly.\n\nI also notice that when the car is heavier (more passengers or cargo), the stopping distance gets noticeably longer even at the same speed. Something is causing distance to grow much faster than I expect, and mass is making it worse.",
+            "I know the simple rule distance = speed × time. But when I brake, my speed is constantly dropping. There is no single “speed” I can plug in.\n\nIf I try using the average of the starting speed and zero:\n\n- From 30 mph → average 15 mph → roughly 50 feet to stop\n- From 60 mph → average 30 mph → I expect roughly 100 feet\n\nBut real measurements show nearly 200 feet at 60 mph. That’s four times farther, not two. My simple method fails badly.\n\nHeavier car also makes stopping distance noticeably longer. Something is causing distance to grow much faster than speed itself, and mass is making it worse.",
         },
         {
-          phase: "need",
+          phase: "discovery",
           title: "Trying to fix it with smaller pieces",
           content:
-            "I break the stop into small time chunks and calculate the distance traveled in each chunk using the speed during that chunk.\n\nHere's what the data looks like (speed in mph, converted to ft/s for distance):\n\n| Time chunk | Speed at start of chunk | Approximate distance in that chunk |\n|---|---|---|\n| 0–0.5 s | 88 ft/s | ~41 ft |\n| 0.5–1.0 s | 76 ft/s | ~35 ft |\n| 1.0–1.5 s | 64 ft/s | ~29 ft |\n| 1.5–2.0 s | 51 ft/s | ~22 ft |\n| 2.0–2.5 s | 37 ft/s | ~14 ft |\n| 2.5–3.0 s | 18 ft/s | ~6 ft |\n\nWhen I add all these small distances, I get roughly 147 feet total. But this is still only an approximation because I used the speed at the beginning of each chunk. If I make the chunks smaller, the total changes slightly. I'm getting closer, but I still don't have an exact method.",
+            "I break the stop into small time chunks and calculate the distance traveled in each chunk using the speed during that chunk.\n\nHere’s what the data looks like:\n\n| Time chunk | Speed at middle of chunk (ft/s) | Distance in that chunk (ft) |\n|---|---|---|\n| 0–0.5 s | 82 | 41 |\n| 0.5–1.0 s | 70 | 35 |\n| 1.0–1.5 s | 58 | 29 |\n| 1.5–2.0 s | 44 | 22 |\n| 2.0–2.5 s | 28 | 14 |\n| 2.5–3.0 s | 9 | 4.5 |\n\nI add these numbers: 41 + 35 + 29 + 22 + 14 + 4.5 = 145.5 feet. This is better than the crude average, but still rough because I used one speed per chunk.",
         },
         {
           phase: "discovery",
-          title: "Building the total distance from tiny slices",
+          title: "What I am actually doing in each small chunk",
           content:
-            "In any tiny time interval Δt, the distance traveled is roughly the speed during that interval times the length of the interval:\n\nΔs ≈ v × Δt\n\nTo get the total stopping distance I add up all these tiny pieces from the moment I hit the brakes until the car stops (speed = 0):\n\ntotal distance ≈ sum of (v × Δt) over all small intervals\n\nThe smaller I make each Δt, the more accurate the sum becomes. If I could make the intervals infinitely small, the sum would give the exact distance. I don't need any fancy formulas yet — I'm just adding up measurable pieces of distance, each one calculated from the speed at that moment.",
+            "In any tiny time interval Δt, the distance traveled is approximately the speed during that interval times the length of the interval.\n\nI write it as:\n\nΔs ≈ v × Δt\n\nThis is just the old distance = speed × time applied to one tiny slice.",
         },
         {
           phase: "discovery",
-          title: "Why the distance grows with the square of speed",
+          title: "Repeating the process for the whole stop",
           content:
-            "I notice something important when I compare two stops at different starting speeds:\n\n- At 30 mph the speed drops steadily to zero\n- At 60 mph the speed also drops steadily to zero, but it starts twice as high and therefore takes roughly twice as long to reach zero (assuming the brakes can slow it at the same rate)\n\nDuring the longer stop, the car is traveling at higher speeds for more of the time. The early part of the stop (when speed is highest) contributes a lot more distance.\n\nIf I double the starting speed:\n- The time to stop roughly doubles\n- But during that extra time the car is moving at higher average speeds\n\nThe extra time + the higher speeds together cause the distance to increase by roughly four times, not two. The distance depends on speed multiplied by time, and both time and average speed scale with starting speed — so distance ends up scaling with speed × speed.",
+            "I repeat the same tiny calculation for every slice from the moment I hit the brakes until the car stops.\n\nI write them all out:\n\nd₁ + d₂ + d₃ + … + dₙ\n\nwhere each dᵢ = vᵢ × Δtᵢ.\n\nThis is repeated addition. We can call repeated addition a **sum** and write it compactly as:\n\n\\[ \\sum v_i \\Delta t \\]\n\nNow I can talk about the total distance using this sum notation.",
         },
         {
           phase: "discovery",
-          title: "Why mass makes it worse",
+          title: "Watching what happens when I refine the slices",
           content:
-            'When the car is heavier, the brakes have to work against more "motion." The tires can only push back with a limited force (the friction limit of the road). A heavier car has more motion to remove but the same maximum pushing force from the tires.\n\nSo the speed drops more slowly. The time to stop gets longer. And because the time is longer, the car travels farther during that extra time.\n\nHeavier car → longer stopping time → more distance traveled. The effect is linear with mass (double mass → double distance), but the speed effect is much stronger (double speed → roughly four times distance).',
+            "I now compute the sum using smaller and smaller Δt and watch what happens:\n\n- Using Δt = 0.5 s → sum ≈ 145.5 ft\n- Using Δt = 0.25 s → sum ≈ 151.2 ft\n- Using Δt = 0.1 s → sum ≈ 154.8 ft\n- Using Δt = 0.05 s → sum ≈ 155.9 ft\n- Using Δt = 0.01 s → sum ≈ 156.5 ft\n- Using Δt = 0.001 s → sum ≈ 156.7 ft\n\nThe numbers are changing, but the changes are getting smaller. The total is approaching a single stable value around 157 feet.",
+        },
+        {
+          phase: "discovery",
+          title: "Why the stable value is meaningful",
+          content:
+            "When I make the slices smaller, each individual error per slice gets smaller. The total error across all slices shrinks. Because the error shrinks as I refine, the stable value the sum approaches is not an accident — it is the true total distance traveled while braking.\n\nWe call this stable value the **limit** of the sums as the time slices get arbitrarily small.",
         },
         {
           phase: "formalization",
-          title: "Compressing what we built — the calculus view",
+          title: "Compressing the process — the integral",
           content:
-            "We have now built the full picture using only measurable pieces and repeated addition.\n\nThe total distance is the accumulation of speed over time:\n\nstopping distance = sum of (speed × tiny time interval) over the whole stop\n\nAs the intervals become infinitesimally small, this sum becomes the integral of velocity with respect to time:\n\n\\[ d = \\int_{0}^{T} v(t) \\, dt \\]\n\nwhere T is the time when speed reaches zero.\n\nThe rate at which speed itself is changing is the derivative of velocity (acceleration):\n\n\\[ a = \\frac{dv}{dt} \\]\n\n(negative because speed is decreasing).\n\nIf the braking force is roughly constant, acceleration is roughly constant, and the integral gives the clean formula we can now derive:\n\n\\[ d = \\frac{v_0^2}{2 |a|} \\]\n\nThis shows mathematically why distance scales with the square of speed.",
+            "We have now built the full picture using only addition of tiny measurable pieces and observed that the sums converge to a definite value.\n\nWe give this limiting sum a name and a compact symbol:\n\n\\[ d = \\int_{0}^{T} v(t) \\, dt \\]\n\nwhere T is the time when speed reaches zero.\n\nThe integral is simply the name we give to the limiting value of all those sums of (v × Δt) as Δt gets smaller and smaller.",
         },
         {
           phase: "formalization",
-          title: "The mass and force relationship",
+          title: "Using the integral on a simple case",
           content:
-            "From physics we know the braking force F is limited by tire friction. Force = mass × acceleration, so:\n\n\\[ |a| = \\frac{F}{m} \\]\n\nSubstitute into the distance formula:\n\n\\[ d = \\frac{v_0^2}{2 \\cdot (F/m)} = \\frac{m v_0^2}{2 F} \\]\n\nNow we see both effects clearly:\n- Distance grows with v₀² (speed squared)\n- Distance grows linearly with m (mass)\n\nEverything we discovered by adding small pieces now has a clean, compressed form.",
+            "Now that we have the integral as a tool, let’s use it on a simple situation where the brakes provide roughly constant deceleration (speed drops in a straight line over time).\n\nAssume speed decreases linearly:\n\nv(t) = v₀ + a t\n\n(with a negative).\n\nThe time to stop is when v(T) = 0:\n\nT = –v₀ / a\n\nThe total distance is the integral of speed over time:\n\n\\[ d = \\int_{0}^{T} (v_0 + a t) \\, dt \\]\n\nWe can compute this integral directly (or recognize it geometrically as the area of a triangle under the straight line from (0, v₀) to (T, 0)). Either way we get:\n\n\\[ d = \\frac{v_0^2}{2 |a|} \\]\n\nThis shows mathematically why distance scales with the square of the starting speed.",
+        },
+        {
+          phase: "formalization",
+          title: "The mass effect",
+          content:
+            "The maximum braking force F from the tires is limited by friction. Acceleration a = –F / m, so |a| = F / m.\n\nSubstitute into the distance formula:\n\n\\[ d = \\frac{v_0^2 m}{2 F} \\]\n\nNow both effects are clear and rigorous:\n- Distance grows with v₀² (speed squared)\n- Distance grows linearly with m (mass)\n\nDouble the speed → roughly 4× distance. Double the mass → 2× distance (with the same braking force).",
         },
       ],
       resolution:
-        "**Stopping distance — earned from first principles**\n\nWe started with the real observation that bothered us: stopping distance grows much faster than speed itself. We refused to accept average-speed shortcuts. Instead we broke the motion into tiny measurable pieces, added up the distances traveled in each piece, and watched the pattern emerge: distance scales with speed squared and with mass.\n\nOnly after we had built the full picture did we compress it into the symbols and formulas of calculus:\n- Integral of velocity gives total distance\n- Derivative of velocity gives acceleration\n\nThe squared danger of speed and the linear penalty of mass are not mysterious — they are direct consequences of how distance accumulates when speed is changing. This is why safe following distance, speed limits, and vehicle weight matter so much.\n\nNext time you brake hard, you'll know exactly why the car travels so much farther at higher speeds — and why calculus is the natural language for describing it.",
+        "**Stopping distance — earned rigorously from first principles**\n\nWe started with the real observation that bothered us: stopping distance grows much faster than speed. We refused to accept crude averages. Instead we broke the motion into tiny measurable pieces, added up the distances using v × Δt, refined the slices repeatedly, and explicitly showed that the sums converge to a stable value.\n\nWe introduced tools only when they became useful: first the sum to talk about repeated addition, then the limit to talk about the settling value, then the integral to compactly name that limit. Each tool was used immediately after it was introduced.\n\nThis is true rigor in reordered calculus: every step was forced by the failure of simpler methods, and every formal object was introduced and then used as part of the ongoing reasoning.\n\nNext time you brake hard, you’ll know exactly why the car travels so much farther at higher speeds — and why calculus had to be invented to describe it properly.",
     },
   ],
 

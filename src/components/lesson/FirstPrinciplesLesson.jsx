@@ -41,6 +41,7 @@ const PHASES = {
     dividerBg: 'bg-amber-500/10 dark:bg-amber-500/5 border-amber-200 dark:border-amber-800/50',
     dividerIcon: '⚠',
     dividerText: 'text-amber-700 dark:text-amber-400',
+    dot: 'bg-amber-400',
   },
   discovery: {
     label: 'DISCOVERY',
@@ -55,6 +56,22 @@ const PHASES = {
     dividerBg: 'bg-indigo-500/10 dark:bg-indigo-500/5 border-indigo-200 dark:border-indigo-800/50',
     dividerIcon: '🔧',
     dividerText: 'text-indigo-700 dark:text-indigo-400',
+    dot: 'bg-indigo-400',
+  },
+  convergence: {
+    label: 'CONVERGENCE',
+    tagline: 'Watching the sums settle to one value',
+    color: 'violet',
+    bg: 'bg-violet-50 dark:bg-violet-950/20',
+    border: 'border-violet-400 dark:border-violet-500',
+    text: 'text-violet-700 dark:text-violet-400',
+    badge: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300',
+    pill: 'bg-violet-500 text-white',
+    pillInactive: 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
+    dividerBg: 'bg-violet-500/10 dark:bg-violet-500/5 border-violet-200 dark:border-violet-800/50',
+    dividerIcon: '≈',
+    dividerText: 'text-violet-700 dark:text-violet-400',
+    dot: 'bg-violet-400',
   },
   formalization: {
     label: 'FORMALIZATION',
@@ -69,21 +86,43 @@ const PHASES = {
     dividerBg: 'bg-emerald-500/10 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-800/50',
     dividerIcon: '∑',
     dividerText: 'text-emerald-700 dark:text-emerald-400',
+    dot: 'bg-emerald-400',
   },
 }
 
-const PHASE_ORDER = ['need', 'discovery', 'formalization']
+const DEFAULT_PHASE_META = {
+  label: 'STEP',
+  tagline: 'Continue the investigation',
+  color: 'slate',
+  bg: 'bg-slate-50 dark:bg-slate-900/40',
+  border: 'border-slate-400 dark:border-slate-500',
+  text: 'text-slate-700 dark:text-slate-300',
+  badge: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+  pill: 'bg-slate-500 text-white',
+  pillInactive: 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
+  dividerBg: 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700',
+  dividerIcon: '•',
+  dividerText: 'text-slate-700 dark:text-slate-300',
+  dot: 'bg-slate-400',
+}
+
+function getPhaseMeta(phase) {
+  return PHASES[phase] ?? {
+    ...DEFAULT_PHASE_META,
+    label: String(phase ?? 'step').toUpperCase(),
+  }
+}
 
 // ─── Phase Progress Bar ───────────────────────────────────────────────────────
 
-function PhaseProgress({ currentPhase, reachedPhases }) {
+function PhaseProgress({ phaseOrder, currentPhase, reachedPhases }) {
   return (
     <div className="flex items-center gap-0 w-full">
-      {PHASE_ORDER.map((phase, idx) => {
-        const meta = PHASES[phase]
+      {phaseOrder.map((phase, idx) => {
+        const meta = getPhaseMeta(phase)
         const isActive = currentPhase === phase
         const isReached = reachedPhases.has(phase)
-        const isLast = idx === PHASE_ORDER.length - 1
+        const isLast = idx === phaseOrder.length - 1
 
         return (
           <div key={phase} className="flex items-center flex-1 min-w-0">
@@ -113,7 +152,7 @@ function PhaseProgress({ currentPhase, reachedPhases }) {
 // ─── Phase Transition Banner ──────────────────────────────────────────────────
 
 function PhaseTransition({ phase }) {
-  const meta = PHASES[phase]
+  const meta = getPhaseMeta(phase)
   return (
     <div className={`my-4 px-5 py-3 rounded-xl border flex items-center gap-3 ${meta.dividerBg}`}>
       <span className={`text-lg leading-none ${meta.dividerText}`}>{meta.dividerIcon}</span>
@@ -128,7 +167,7 @@ function PhaseTransition({ phase }) {
 // ─── Individual Step ──────────────────────────────────────────────────────────
 
 function Step({ step, stepNumber, totalSteps, isCurrent, isCompleted, isExpanded, onToggle, onContinue, nextStep }) {
-  const meta = PHASES[step.phase]
+  const meta = getPhaseMeta(step.phase)
 
   return (
     <div className={`rounded-xl overflow-hidden border transition-all
@@ -174,7 +213,7 @@ function Step({ step, stepNumber, totalSteps, isCurrent, isCompleted, isExpanded
         )}
         {isCurrent && (
           <span className={`ml-auto w-2 h-2 rounded-full flex-shrink-0 animate-pulse
-            ${step.phase === 'need' ? 'bg-amber-400' : step.phase === 'discovery' ? 'bg-indigo-400' : 'bg-emerald-400'}
+            ${meta.dot}
           `} />
         )}
       </button>
@@ -233,15 +272,24 @@ export default function FirstPrinciplesLesson({ discovery }) {
   const steps = discovery.steps
   const isDone = revealed > steps.length
 
+  const phaseOrder = []
+  for (const step of steps) {
+    if (step?.phase && !phaseOrder.includes(step.phase)) {
+      phaseOrder.push(step.phase)
+    }
+  }
+
   const currentStep = steps[revealed - 1]
-  const currentPhase = isDone ? 'formalization' : currentStep?.phase ?? 'need'
+  const currentPhase = isDone
+    ? steps[steps.length - 1]?.phase ?? phaseOrder[phaseOrder.length - 1] ?? 'need'
+    : currentStep?.phase ?? phaseOrder[0] ?? 'need'
 
   // Track which phases have been reached
   const reachedPhases = new Set()
   for (let i = 0; i < Math.min(revealed, steps.length); i++) {
     reachedPhases.add(steps[i].phase)
   }
-  if (isDone) reachedPhases.add('formalization')
+  if (isDone && steps[steps.length - 1]?.phase) reachedPhases.add(steps[steps.length - 1].phase)
 
   const toggleExpanded = (idx) => {
     setExpandedCompleted(prev => {
@@ -306,7 +354,7 @@ export default function FirstPrinciplesLesson({ discovery }) {
 
       {/* Phase progress bar */}
       <div className="bg-slate-900 px-6 py-3 border-b border-slate-700">
-        <PhaseProgress currentPhase={currentPhase} reachedPhases={reachedPhases} />
+        <PhaseProgress phaseOrder={phaseOrder} currentPhase={currentPhase} reachedPhases={reachedPhases} />
       </div>
 
       {/* Steps */}
