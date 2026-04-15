@@ -34,6 +34,10 @@ const VIZ_REGISTRY = {
   ContinuityViz: lazy(() => import("./d3/ContinuityViz.jsx")),
   RiemannSum: lazy(() => import("./d3/RiemannSum.jsx")),
   PowerRulePattern: lazy(() => import("./d3/PowerRulePattern.jsx")),
+  AntiderivativeFamilyViz: lazy(
+    () => import("./d3/AntiderivativeFamilyViz.jsx"),
+  ),
+  PowerRuleDerivationViz: lazy(() => import("./d3/PowerRuleDerivationViz.jsx")),
   CompositionVisualization: lazy(
     () => import("./d3/CompositionVisualization.jsx"),
   ),
@@ -162,7 +166,9 @@ const VIZ_REGISTRY = {
   RolleProblemStepper: lazy(() => import("./d3/RolleProblemStepper.jsx")),
   CurveSketchingBoard: lazy(() => import("./d3/CurveSketchingBoard.jsx")),
   SignChartBuilder: lazy(() => import("./d3/SignChartBuilder.jsx")),
-  DerivativeSketchWalkthrough: lazy(() => import("./react/DerivativeSketchWalkthrough.jsx")),
+  DerivativeSketchWalkthrough: lazy(
+    () => import("./react/DerivativeSketchWalkthrough.jsx"),
+  ),
   SignDataSketchLab: lazy(() => import("./react/SignDataSketchLab.jsx")),
   ChainRulePeeler: lazy(() => import("./react/ChainRulePeeler.jsx")),
   PolynomialScrubber: lazy(() => import("./d3/PolynomialScrubber.jsx")),
