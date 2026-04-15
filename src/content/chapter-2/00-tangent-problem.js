@@ -269,61 +269,96 @@ export default {
       id: "ch2-000-ex1",
       title: "Derivative of x\u00b2 from the Definition",
       problem:
-        "\\text{Let } f(x) = x^2. \\text{ Use the limit definition to find } f'(x). \\text{ Then find the slope at } x=3 \\text{ and the equation of the tangent line at } (3, 9).",
+        "\\text{Let } f(x) = x^2. \\text{ Use the limit definition to find } f'(x). \\text{ Then find the slope at } x=3 \\text{ and write the equation of the tangent line at } (3, 9).",
       steps: [
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
           annotation:
-            "Write the limit definition of the derivative. We want to find the slope of the tangent to y = x\u00b2 at a general point x.",
+            "Always start by writing the limit definition. This is the algorithm — do not skip it. Every derivative we compute follows these exact steps.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{(x+h)^2 - x^2}{h}",
           annotation:
-            "Substitute f(x+h) = (x+h)\u00b2 and f(x) = x\u00b2 into the definition.",
+            "Substitute f(x) = x^2. To find f(x+h): wherever x appears in the formula x^2, replace it with the quantity (x+h). So f(x+h) = (x+h)^2. Gotcha: this is NOT x^2 + h^2. You cannot distribute a square across a sum — that is one of the most common algebra mistakes in calculus.",
+        },
+        {
+          expression: "(x+h)^2 = (x+h)(x+h)",
+          annotation:
+            "Prerequisite algebra — what squaring means: raising a quantity to the power 2 means multiplying it by itself. We must expand this product before we can simplify anything.",
+        },
+        {
+          expression: "= x \\cdot x + x \\cdot h + h \\cdot x + h \\cdot h",
+          annotation:
+            "Prerequisite algebra — FOIL method for multiplying two binomials: multiply EVERY term in the first factor by EVERY term in the second. Four products total. First: x times x. Outer: x times h. Inner: h times x. Last: h times h. Write all four products before combining anything. Do not skip steps here.",
+        },
+        {
+          expression: "= x^2 + xh + xh + h^2 = x^2 + 2xh + h^2",
+          annotation:
+            "Combine like terms: the outer and inner products are both xh, so xh + xh = 2xh. Final rule to know: (a+b)^2 = a^2 + 2ab + b^2. The 2ab middle term is what everyone drops. It is not optional — if you omit it, your derivative will be wrong.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{x^2 + 2xh + h^2 - x^2}{h}",
           annotation:
-            "Expand (x+h)\u00b2 using the binomial formula (a+b)\u00b2 = a\u00b2 + 2ab + b\u00b2. This is the key algebraic step.",
+            "Substitute the full expansion back into the difference quotient numerator.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{2xh + h^2}{h}",
           annotation:
-            "The x\u00b2 terms cancel: x\u00b2 - x\u00b2 = 0. We now have a polynomial in h in the numerator, which allows us to factor.",
+            "Cancel x^2 and -x^2 in the numerator: x^2 - x^2 = 0. This cancellation always happens in a derivative — the original function terms subtract away, leaving only terms that contain h. If any term without h survives after this step, you made an expansion error. Go back and check.",
+        },
+        {
+          expression: "2xh + h^2 = h \\cdot 2x + h \\cdot h = h(2x + h)",
+          annotation:
+            "Prerequisite algebra — factoring using the distributive property in reverse: the rule ab + ac = a(b + c) says that if EVERY term in an expression shares a common factor, you can pull that factor out front. Check: does 2xh contain h? Yes — it equals h times 2x. Does h^2 contain h? Yes — it equals h times h. Since both terms share h as a factor, we factor h out. Verify by expanding back: h(2x + h) = h times 2x plus h times h = 2xh + h^2. Correct.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{h(2x + h)}{h}",
           annotation:
-            "Factor h out of the numerator. This is the crucial factoring step that cancels the problematic h in the denominator.",
+            "Substitute the factored numerator. Now h appears explicitly in both numerator and denominator.",
         },
         {
           expression: "= \\lim_{h \\to 0} (2x + h)",
           annotation:
-            "Cancel the common factor of h. This is valid because in a limit as h \u2192 0, we require h \u2260 0, so division by h is legal.",
+            "Prerequisite algebra — why canceling h/h is legal here: for any nonzero number k, k divided by k = 1. In the limit process, h is approaching zero but is NEVER actually zero. So at every stage, h is a nonzero quantity, and h/h = 1 is a perfectly valid cancellation. We are not dividing by zero. We are dividing by a nonzero number that happens to be getting very small. This distinction — approaching zero versus equaling zero — is the conceptual core of the entire limit idea.",
         },
         {
           expression: "= 2x + 0 = 2x",
           annotation:
-            "Now we can safely substitute h = 0, since the indeterminate form 0/0 has been resolved by the algebraic simplification. The derivative is 2x.",
+            "Now, and only now, substitute h = 0. The denominator is completely gone, so there is no risk of division by zero. Replace every h with 0: 2x + h becomes 2x + 0 = 2x.",
+        },
+        {
+          expression: "f'(x) = 2x",
+          annotation:
+            "The derivative of x^2 is 2x. This is a function, not a single number. At any x it gives the slope of the parabola at that point. At x = 0 the slope is 0 (the vertex is flat). At x = 1 the slope is 2. At x = -3 the slope is -6.",
         },
         {
           expression: "f'(3) = 2(3) = 6",
           annotation:
-            "To find the slope at x = 3, substitute x = 3 into the derivative function f'(x) = 2x.",
+            "Evaluate the derivative function at x = 3. Plugging x = 3 into f'(x) = 2x gives 6. That is the slope of the tangent line at the point (3, 9).",
+        },
+        {
+          expression: "\\text{Point-slope form: } y - y_1 = m(x - x_1)",
+          annotation:
+            "Prerequisite algebra — point-slope form: the equation of any line through a known point (x_1, y_1) with known slope m. We know slope m = f'(3) = 6. We need the point. The point lies on the ORIGINAL curve, so the y-coordinate is f(3) = 3^2 = 9. Point: (3, 9). Do not use f'(3) = 6 as the y-coordinate — that is the slope, not the height.",
         },
         {
           expression: "y - 9 = 6(x - 3)",
           annotation:
-            "Use point-slope form of a line: y - y\u2080 = m(x - x\u2080), with the point (3, 9) and slope m = 6.",
+            "Substitute point (3, 9) and slope 6 into point-slope form.",
+        },
+        {
+          expression: "y - 9 = 6x - 18",
+          annotation:
+            "Distribute 6 across (x - 3): 6 times x = 6x, 6 times -3 = -18.",
         },
         {
           expression: "y = 6x - 18 + 9 = 6x - 9",
           annotation:
-            "Distribute the 6 and simplify to get the slope-intercept form of the tangent line.",
+            "Add 9 to both sides to isolate y. Verification: plug x = 3 back in: y = 6(3) - 9 = 18 - 9 = 9. The line passes through (3, 9) as required.",
         },
       ],
       conclusion:
-        "The derivative of x\u00b2 is 2x. At x = 3, the curve has slope 6, and the tangent line is y = 6x - 9. Notice the pattern: the exponent 2 came down as a coefficient, and the new exponent is 2 - 1 = 1. This is a preview of the power rule.",
+        "f'(x) = 2x. At x = 3, slope = 6, tangent line y = 6x - 9. Algebra keys: (a+b)^2 = a^2 + 2ab + b^2 (NOT a^2 + b^2); factor h by the distributive law in reverse; cancel h/h because h is nonzero during the limit process.",
     },
     {
       id: "ch2-000-ex2",
@@ -334,46 +369,76 @@ export default {
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^3 - x^3}{h}",
           annotation:
-            "Write the difference quotient. We need to expand (x+h)\u00b3, which requires the full binomial expansion.",
+            "Write the definition and substitute f(x) = x^3. This example forces you to expand a cube — a step that causes more errors than almost anything else in early calculus.",
         },
         {
-          expression: "(x+h)^3 = x^3 + 3x^2h + 3xh^2 + h^3",
+          expression: "(x+h)^3 = (x+h)^2 \\cdot (x+h)",
           annotation:
-            "Expand (x+h)\u00b3 using the binomial theorem or repeated multiplication: (x+h)\u00b3 = (x+h)(x+h)(x+h). Each term is identified: the leading x\u00b3, three terms with one factor of h (giving 3x\u00b2h), three terms with two factors of h (giving 3xh\u00b2), and one term with three factors of h (giving h\u00b3).",
+            "Prerequisite algebra — strategy for a cube: x^3 means x times x times x, so (x+h)^3 = (x+h)(x+h)(x+h). A practical two-step approach: use the result we proved in ex1 — (x+h)^2 = x^2 + 2xh + h^2 — and then multiply that result by (x+h) once more. Splitting into two steps makes the expansion manageable and checkable.",
+        },
+        {
+          expression: "= (x^2 + 2xh + h^2)(x+h)",
+          annotation:
+            "Substitute the known expansion of (x+h)^2. We now need to multiply a trinomial (three terms) by a binomial (two terms).",
+        },
+        {
+          expression: "= x^2(x+h) + 2xh(x+h) + h^2(x+h)",
+          annotation:
+            "Prerequisite algebra — distributing a trinomial: multiply EACH of the three terms in the first factor by the COMPLETE second factor (x+h). The distributive law is the same rule used for binomials; it just has to be applied three times instead of twice.",
+        },
+        {
+          expression: "= (x^3 + x^2 h) + (2x^2 h + 2xh^2) + (xh^2 + h^3)",
+          annotation:
+            "Expand each pair. x^2 times x = x^3, x^2 times h = x^2 h. Then 2xh times x = 2x^2 h, 2xh times h = 2xh^2. Then h^2 times x = xh^2, h^2 times h = h^3. Six terms total.",
+        },
+        {
+          expression: "= x^3 + 3x^2 h + 3xh^2 + h^3",
+          annotation:
+            "Collect like terms: x^2 h + 2x^2 h = 3x^2 h. And 2xh^2 + xh^2 = 3xh^2. Final expansion: (x+h)^3 = x^3 + 3x^2 h + 3xh^2 + h^3. Gotcha: the most common mistake here is writing only x^3 + h^3 and omitting both middle terms. Both 3x^2 h and 3xh^2 are real — confirm by multiplying back.",
         },
         {
           expression:
             "= \\lim_{h \\to 0} \\frac{x^3 + 3x^2 h + 3xh^2 + h^3 - x^3}{h}",
           annotation:
-            "Substitute the expanded form of (x+h)\u00b3 into the difference quotient.",
+            "Substitute the full expansion into the difference quotient numerator.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{3x^2 h + 3xh^2 + h^3}{h}",
           annotation:
-            "Cancel x\u00b3 - x\u00b3 = 0 in the numerator. We are left with only terms containing h.",
+            "Cancel x^3 - x^3 = 0. Three terms remain; every one of them contains h.",
+        },
+        {
+          expression:
+            "3x^2 h + 3xh^2 + h^3 = h \\cdot 3x^2 + h \\cdot 3xh + h \\cdot h^2 = h(3x^2 + 3xh + h^2)",
+          annotation:
+            "Prerequisite algebra — factoring h from three terms: check that each term contains h as a factor. 3x^2 h = h times 3x^2. 3xh^2 = h times 3xh. h^3 = h times h^2. All three have h, so apply the distributive law in reverse: ab + ac + ad = a(b + c + d). Factor h out of all three at once.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{h(3x^2 + 3xh + h^2)}{h}",
-          annotation:
-            "Factor out h from every term in the numerator. This is possible because every remaining term has at least one factor of h.",
+          annotation: "Rewrite the numerator with h factored out.",
         },
         {
           expression: "= \\lim_{h \\to 0} (3x^2 + 3xh + h^2)",
           annotation:
-            "Cancel the common h. Now the expression is a polynomial in h with no division, so we can directly substitute h = 0.",
+            "Cancel h/h = 1. Legal because h is nonzero in the limit process. Denominator is gone.",
         },
         {
           expression: "= 3x^2 + 3x(0) + (0)^2 = 3x^2",
           annotation:
-            "Substitute h = 0. The terms containing h vanish, leaving only 3x\u00b2.",
+            "Substitute h = 0 safely. Both 3xh and h^2 contain h and become zero. Only 3x^2 — the constant-in-h term — survives.",
+        },
+        {
+          expression: "f'(x) = 3x^2",
+          annotation:
+            "Pattern check: for x^2 the derivative was 2x. For x^3 it is 3x^2. In each case the exponent dropped down as the coefficient and the power decreased by one. You are watching the power rule emerge from first principles.",
         },
       ],
       conclusion:
-        "The derivative of x\u00b3 is 3x\u00b2. The exponent 3 dropped down as a coefficient, and the new exponent is 3 - 1 = 2. The pattern x\u00b2 \u2192 2x and x\u00b3 \u2192 3x\u00b2 strongly suggests the general power rule: d/dx[x\u207f] = nx\u207f\u207b\u00b9.",
+        "f'(x^3) = 3x^2. Critical step: expand (x+h)^3 into all four terms. Dropping the middle terms 3x^2 h and 3xh^2 is the most common error.",
     },
     {
       id: "ch2-000-ex3",
-      title: "Derivative of \u221ax from the Definition",
+      title: "Derivative of \\sqrt{x} from the Definition",
       problem:
         "f(x) = \\sqrt{x}. \\text{ Use the limit definition to find } f'(x) \\text{ for } x > 0.",
       steps: [
@@ -381,46 +446,56 @@ export default {
           expression:
             "f'(x) = \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h}",
           annotation:
-            "Set up the difference quotient. The numerator is the difference of two square roots, which creates an indeterminate form 0/0 as h \u2192 0.",
+            "Write the definition. Substituting h = 0 immediately gives 0/0. But unlike polynomials, there is no h to factor out of a square root. A completely different algebraic technique is needed: the conjugate method.",
+        },
+        {
+          expression:
+            "\\text{Prerequisite: difference of squares — } (a-b)(a+b) = a^2 - b^2",
+          annotation:
+            "This identity is the key. Reading it left-to-right: multiplying a difference by its conjugate gives a difference of squares. Reading it right-to-left: a difference of squares factors into a product of a sum and difference. We want to use it right-to-left on the numerator: we will force the numerator into the form a^2 - b^2 to eliminate the square roots.",
         },
         {
           expression:
             "= \\lim_{h \\to 0} \\frac{\\sqrt{x+h} - \\sqrt{x}}{h} \\cdot \\frac{\\sqrt{x+h} + \\sqrt{x}}{\\sqrt{x+h} + \\sqrt{x}}",
           annotation:
-            "Multiply the numerator and denominator by the conjugate of the numerator: \u221a(x+h) + \u221ax. This is the key technique for dealing with square root differences. Multiplying by the conjugate uses the identity (a - b)(a + b) = a\u00b2 - b\u00b2.",
+            "Multiply the entire expression by the conjugate fraction. The conjugate of (a - b) is (a + b) — same two terms, but with the sign between them flipped. Multiplying by (conjugate)/(conjugate) equals 1, so the value is unchanged. This is called rationalizing the numerator.",
         },
         {
           expression:
-            "= \\lim_{h \\to 0} \\frac{(\\sqrt{x+h})^2 - (\\sqrt{x})^2}{h(\\sqrt{x+h} + \\sqrt{x})}",
+            "\\text{Numerator: }(\\sqrt{x+h} - \\sqrt{x})(\\sqrt{x+h} + \\sqrt{x}) = (\\sqrt{x+h})^2 - (\\sqrt{x})^2",
           annotation:
-            "Apply the difference of squares identity to the numerator. The conjugate multiplication eliminates the square roots in the numerator.",
+            "Apply the difference of squares identity directly: (a - b)(a + b) = a^2 - b^2, where a = sqrt(x+h) and b = sqrt(x).",
         },
         {
-          expression:
-            "= \\lim_{h \\to 0} \\frac{(x + h) - x}{h(\\sqrt{x+h} + \\sqrt{x})}",
+          expression: "= (x+h) - x = h",
           annotation:
-            "Simplify the numerator: (\u221a(x+h))\u00b2 = x+h and (\u221ax)\u00b2 = x.",
+            "Prerequisite algebra — square root and squaring are inverse operations: by the definition of square root, (sqrt(A))^2 = A. So (sqrt(x+h))^2 = x+h and (sqrt(x))^2 = x. After subtracting: (x+h) - x = h. The radical signs are completely eliminated from the numerator.",
         },
         {
           expression:
             "= \\lim_{h \\to 0} \\frac{h}{h(\\sqrt{x+h} + \\sqrt{x})}",
           annotation:
-            "Simplify (x + h) - x = h in the numerator. We now have h in both numerator and denominator.",
+            "The numerator is now simply h. The denominator is the original h multiplied by the conjugate factor.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{1}{\\sqrt{x+h} + \\sqrt{x}}",
           annotation:
-            "Cancel the common factor of h (valid since h \u2260 0 in the limit). The indeterminate form has been resolved.",
+            "Cancel h/h = 1 (h nonzero in the limit). After canceling, h appears only inside the square root in the denominator — it is safe to take the limit now.",
         },
         {
           expression:
-            "= \\frac{1}{\\sqrt{x + 0} + \\sqrt{x}} = \\frac{1}{\\sqrt{x} + \\sqrt{x}} = \\frac{1}{2\\sqrt{x}}",
+            "= \\frac{1}{\\sqrt{x+0} + \\sqrt{x}} = \\frac{1}{\\sqrt{x} + \\sqrt{x}} = \\frac{1}{2\\sqrt{x}}",
           annotation:
-            "Now we can substitute h = 0 safely, since there is no longer any division by h. The result is 1/(2\u221ax).",
+            "Substitute h = 0. sqrt(x+0) = sqrt(x). The denominator becomes sqrt(x) + sqrt(x) = 2 sqrt(x). Domain requirement: x > 0 is needed to ensure sqrt(x) is a real number and the denominator is nonzero.",
+        },
+        {
+          expression: "f'(x) = \\frac{1}{2\\sqrt{x}}",
+          annotation:
+            "Equivalently written as (1/2) x^{-1/2}. Power rule verification: x^{1/2} should give (1/2) x^{1/2 - 1} = (1/2) x^{-1/2} = 1/(2 sqrt(x)). Confirmed — the power rule works for fractional exponents too.",
         },
       ],
       conclusion:
-        "The derivative of \u221ax = x^(1/2) is 1/(2\u221ax) = (1/2)x^(-1/2). This again follows the power rule pattern: the exponent 1/2 came down as a coefficient, and the new exponent is 1/2 - 1 = -1/2.",
+        "f'(sqrt(x)) = 1/(2 sqrt(x)) for x > 0. Technique: multiply numerator and denominator by the conjugate to eliminate the radical difference. The difference of squares identity produces a plain h in the numerator that cancels the denominator h.",
     },
     {
       id: "ch2-000-ex4",
@@ -432,241 +507,846 @@ export default {
           expression:
             "f'(x) = \\lim_{h \\to 0} \\frac{\\dfrac{1}{x+h} - \\dfrac{1}{x}}{h}",
           annotation:
-            "Write the difference quotient. We have a compound fraction (a fraction within a fraction), which we need to simplify.",
+            "Write the definition and substitute. The numerator is now a difference of two fractions — a compound fraction. Strategy: simplify the top fraction first, before dividing by h.",
         },
         {
           expression:
-            "= \\lim_{h \\to 0} \\frac{1}{h} \\left( \\frac{1}{x+h} - \\frac{1}{x} \\right)",
+            "\\text{Focus on the numerator: } \\frac{1}{x+h} - \\frac{1}{x}",
           annotation:
-            "Rewrite the compound fraction by pulling 1/h out front. Now we need to combine the two fractions in the parentheses.",
+            "Prerequisite algebra — subtracting fractions with unlike denominators: you cannot subtract fractions unless they share a common denominator. The denominators are (x+h) and x. These are different expressions (h makes them different), so we must convert both to a common denominator first.",
         },
         {
-          expression:
-            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - (x+h)}{x(x+h)}",
+          expression: "\\text{Least common denominator (LCD)} = x(x+h)",
           annotation:
-            "Combine the fractions with a common denominator of x(x+h): the first fraction becomes x/[x(x+h)] and the second becomes (x+h)/[x(x+h)]. Subtract numerators.",
+            "Prerequisite algebra — finding the LCD: when two denominators share no common factor, their LCD is simply their product. x and (x+h) share no common factor (h is nonzero), so LCD = x times (x+h) = x(x+h).",
         },
         {
           expression:
-            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{x - x - h}{x(x+h)}",
+            "\\frac{1}{x+h} = \\frac{1 \\cdot x}{(x+h) \\cdot x} = \\frac{x}{x(x+h)}",
           annotation:
-            "Distribute the negative sign in the numerator: x - (x + h) = x - x - h = -h.",
+            "Convert the first fraction: multiply top and bottom by x. Multiplying by x/x = 1 does not change the value, only the form.",
         },
         {
           expression:
-            "= \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{-h}{x(x+h)}",
-          annotation: "Simplify: x - x - h = -h.",
+            "\\frac{1}{x} = \\frac{1 \\cdot (x+h)}{x \\cdot (x+h)} = \\frac{x+h}{x(x+h)}",
+          annotation:
+            "Convert the second fraction: multiply top and bottom by (x+h).",
         },
         {
-          expression: "= \\lim_{h \\to 0} \\frac{-h}{h \\cdot x(x+h)}",
-          annotation: "Combine into a single fraction.",
+          expression:
+            "\\frac{1}{x+h} - \\frac{1}{x} = \\frac{x}{x(x+h)} - \\frac{x+h}{x(x+h)} = \\frac{x - (x+h)}{x(x+h)}",
+          annotation:
+            "Prerequisite algebra — subtracting fractions with the same denominator: a/c - b/c = (a - b)/c. Combine into one fraction. CRITICAL: keep the parentheses around (x+h) in the numerator. If you write x - x + h instead of x - (x+h), you get the wrong sign on h and your answer will have the wrong sign.",
+        },
+        {
+          expression: "= \\frac{x - x - h}{x(x+h)}",
+          annotation:
+            "Prerequisite algebra — distributing a negative sign: -(x+h) = -x - h. The minus sign distributes to every term inside the parentheses. x becomes -x and h becomes -h.",
+        },
+        {
+          expression: "= \\frac{-h}{x(x+h)}",
+          annotation:
+            "Simplify the numerator: x - x = 0, leaving -h. This negative sign is important — it is why the derivative of 1/x is negative.",
+        },
+        {
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{1}{h} \\cdot \\frac{-h}{x(x+h)} = \\lim_{h \\to 0} \\frac{-h}{h \\cdot x(x+h)}",
+          annotation:
+            "The full difference quotient: the fraction difference is divided by h, meaning multiply by 1/h. Combine h terms together.",
         },
         {
           expression: "= \\lim_{h \\to 0} \\frac{-1}{x(x+h)}",
           annotation:
-            "Cancel the common factor of h (valid since h \u2260 0 in the limit). The -h/h cancels to give -1.",
+            "Cancel -h/h = -1 (h is nonzero in the limit). The negative sign carries through.",
         },
         {
-          expression: "= \\frac{-1}{x(x + 0)} = \\frac{-1}{x^2}",
+          expression:
+            "= \\frac{-1}{x(x+0)} = \\frac{-1}{x \\cdot x} = -\\frac{1}{x^2}",
+          annotation: "Substitute h = 0. Denominator becomes x times x = x^2.",
+        },
+        {
+          expression: "f'(x) = -\\dfrac{1}{x^2}",
           annotation:
-            "Substitute h = 0. The denominator becomes x\u00b7x = x\u00b2.",
+            "Power rule verification: 1/x = x^{-1}. Power rule gives (-1) x^{-1 - 1} = -x^{-2} = -1/x^2. Confirmed.",
         },
       ],
       conclusion:
-        "The derivative of 1/x = x^(-1) is -1/x\u00b2 = -x^(-2). Once again, the power rule pattern: exponent -1 comes down as coefficient, new exponent is -1 - 1 = -2.",
+        "f'(1/x) = -1/x^2. Key algebra: convert the fraction subtraction to a common denominator x(x+h), distribute the minus sign carefully, then cancel -h/h. The sign on h is the most frequent error.",
     },
     {
       id: "ch2-000-ex5",
       title: "Derivative of a Linear Function",
       problem:
-        "f(x) = 3x + 5. \\text{ Use the limit definition to find } f'(x) \\text{ and verify it equals the slope.}",
+        "f(x) = 3x + 5. \\text{ Find } f'(x) \\text{ from the limit definition. Explain why the constant term disappears.}",
       steps: [
         {
           expression: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
-          annotation: "Write the limit definition.",
-        },
-        {
-          expression: "= \\lim_{h \\to 0} \\frac{[3(x+h)+5] - [3x+5]}{h}",
-          annotation: "Substitute f(x+h) = 3(x+h) + 5 and f(x) = 3x + 5.",
-        },
-        {
-          expression: "= \\lim_{h \\to 0} \\frac{3x + 3h + 5 - 3x - 5}{h}",
-          annotation: "Distribute the 3 and expand the brackets.",
-        },
-        {
-          expression: "= \\lim_{h \\to 0} \\frac{3h}{h}",
           annotation:
-            "Simplify: 3x - 3x = 0 and 5 - 5 = 0, leaving only 3h in the numerator.",
+            "Start from the definition. Even for a simple function, writing this out explicitly keeps you from making sign errors.",
         },
         {
-          expression: "= \\lim_{h \\to 0} 3 = 3",
+          expression: "f(x+h) = 3(x+h) + 5",
           annotation:
-            "Cancel h/h = 1. The resulting expression is the constant 3, which equals 3 regardless of how h approaches 0.",
+            "Substitute (x+h) wherever x appears in 3x + 5. Replace the x in '3x' with (x+h). The constant 5 does not change because it does not depend on x at all.",
+        },
+        {
+          expression: "= 3x + 3h + 5",
+          annotation:
+            "Prerequisite algebra — distribute 3 over (x+h): 3 times x = 3x, 3 times h = 3h. The constant 5 is unchanged.",
+        },
+        {
+          expression: "f(x+h) - f(x) = (3x + 3h + 5) - (3x + 5)",
+          annotation:
+            "Write the subtraction with brackets around both expressions. This protects you from forgetting to distribute the minus sign.",
+        },
+        {
+          expression: "= 3x + 3h + 5 - 3x - 5",
+          annotation:
+            "Prerequisite algebra — distributing a minus sign: -(3x + 5) = -3x - 5. Every term inside the parentheses gets its sign flipped. This is the step where sign errors most often happen.",
+        },
+        {
+          expression: "= 3h",
+          annotation:
+            "Collect like terms: 3x and -3x cancel. 5 and -5 cancel. Only 3h survives. Why does 5 disappear? Because 5 is a constant — it appears identically in both f(x) and f(x+h). When you subtract them, the 5s cancel. The intercept tells you WHERE the line is vertically, but it does not affect the steepness. Steepness — slope — depends only on the coefficient of x.",
+        },
+        {
+          expression: "\\frac{f(x+h)-f(x)}{h} = \\frac{3h}{h} = 3",
+          annotation:
+            "Prerequisite algebra — cancel h/h = 1 (h nonzero). The entire difference quotient equals the constant 3 for every nonzero value of h. There is nothing left to take a limit of.",
+        },
+        {
+          expression: "f'(x) = \\lim_{h \\to 0} 3 = 3",
+          annotation:
+            "Prerequisite: the limit of a constant is that constant. No matter how h changes, the value 3 never moves. So the limit is 3.",
+        },
+        {
+          expression: "f'(x) = 3",
+          annotation:
+            "Geometric meaning: y = 3x + 5 is a straight line with constant slope 3 everywhere. The tangent line at any point IS the line itself. The derivative is the same at every x because a line has the same steepness everywhere.",
+        },
+        {
+          expression:
+            "\\text{General rule: if } f(x) = mx + b \\text{ then } f'(x) = m",
+          annotation:
+            "Proof of the general rule: f(x+h) - f(x) = [m(x+h) + b] - [mx + b] = mx + mh + b - mx - b = mh. Dividing by h and taking the limit gives m. The intercept b always cancels.",
         },
       ],
       conclusion:
-        "The derivative of 3x + 5 is 3, which is exactly the slope of the line. This makes perfect sense: a straight line has a constant slope at every point, so its derivative (the instantaneous slope) is that same constant everywhere. The +5 intercept term disappeared because it shifts the line up and down but does not affect its steepness.",
+        "f'(3x+5) = 3. The constant 5 cancels because it appears identically in both f(x) and f(x+h). Only the slope coefficient 3 survives the subtraction.",
     },
     {
       id: "ch2-000-ex6",
       title: "Is |x| Differentiable at x = 0?",
       problem:
-        "\\text{Determine whether } f(x) = |x| \\text{ is differentiable at } x = 0 \\text{ by computing the left and right derivatives.}",
+        "\\text{Determine whether } f(x) = |x| \\text{ is differentiable at } x = 0 \\text{ by computing left and right-hand derivatives.}",
       steps: [
         {
           expression:
-            "f'_+(0) = \\lim_{h \\to 0^+} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^+} \\frac{|h|}{h}",
+            "f'(0) = \\lim_{h \\to 0} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0} \\frac{|h|}{h}",
           annotation:
-            "Set up the right-hand derivative: h approaches 0 from the positive side, meaning h > 0 throughout.",
+            "Write the limit definition at x = 0. Since |0| = 0, the numerator simplifies to |h|. The problem: |h| behaves differently depending on whether h is positive or negative. We cannot evaluate this limit without splitting into cases.",
+        },
+        {
+          expression:
+            "|h| = \\begin{cases} h & \\text{if } h > 0 \\\\ -h & \\text{if } h < 0 \\end{cases}",
+          annotation:
+            "Prerequisite algebra — definition of absolute value: absolute value returns the non-negative version of a number. For a positive input, return it unchanged. For a negative input, negate it to make it positive. Example: |-5| = -(-5) = 5. This piecewise definition forces us to analyze from the left and from the right separately.",
+        },
+        {
+          expression: "f'_+(0) = \\lim_{h \\to 0^+} \\frac{|h|}{h}",
+          annotation:
+            "Right-hand derivative: h approaches 0 from the positive side, so h > 0 the whole time. Apply the h > 0 branch of the absolute value: |h| = h.",
         },
         {
           expression:
             "= \\lim_{h \\to 0^+} \\frac{h}{h} = \\lim_{h \\to 0^+} 1 = 1",
           annotation:
-            "When h > 0, |h| = h, so |h|/h = h/h = 1. The right-hand derivative is 1.",
+            "For h > 0: |h| = h, so the ratio is h/h = 1. Limit of the constant 1 is 1. Right-hand derivative = +1.",
         },
         {
-          expression:
-            "f'_-(0) = \\lim_{h \\to 0^-} \\frac{|0 + h| - |0|}{h} = \\lim_{h \\to 0^-} \\frac{|h|}{h}",
+          expression: "f'_-(0) = \\lim_{h \\to 0^-} \\frac{|h|}{h}",
           annotation:
-            "Set up the left-hand derivative: h approaches 0 from the negative side, meaning h < 0 throughout.",
+            "Left-hand derivative: h approaches 0 from the negative side, so h < 0 the whole time. Apply the h < 0 branch: |h| = -h.",
         },
         {
           expression:
             "= \\lim_{h \\to 0^-} \\frac{-h}{h} = \\lim_{h \\to 0^-} (-1) = -1",
           annotation:
-            "When h < 0, |h| = -h (the negative of h, which is positive), so |h|/h = -h/h = -1. The left-hand derivative is -1.",
+            "For h < 0: |h| = -h. So the ratio is (-h)/h = -1. Gotcha: h itself is negative here, which means -h is a positive number. But the RATIO (-h)/h simplifies to -1 for all h, positive or negative. The left-hand derivative = -1.",
         },
         {
           expression: "f'_+(0) = 1 \\neq -1 = f'_-(0)",
-          annotation:
-            "The right-hand derivative (1) and left-hand derivative (-1) are not equal.",
+          annotation: "The two one-sided derivatives are not equal.",
         },
         {
           expression:
-            "\\therefore \\lim_{h \\to 0} \\frac{|h|}{h} \\text{ does not exist}",
+            "\\text{Prerequisite: two-sided limit exists} \\iff \\lim_{h \\to 0^-} = \\lim_{h \\to 0^+}",
           annotation:
-            "Since the one-sided limits are different, the two-sided limit does not exist. Therefore f'(0) does not exist.",
+            "Rule from Chapter 1: a two-sided limit exists if and only if both one-sided limits exist AND have the same value. Here the left limit is -1 and the right limit is +1. They disagree, so the two-sided limit does not exist.",
+        },
+        {
+          expression: "\\therefore f'(0) \\text{ does not exist}",
+          annotation:
+            "The derivative at x = 0 does not exist. Geometrically: the graph of |x| has a corner at the origin. The left branch has slope -1; the right branch has slope +1. There is no single tangent line at a corner — two different lines are competing for the same point.",
+        },
+        {
+          expression:
+            "\\lim_{x \\to 0} |x| = 0 = f(0), \\text{ so } f \\text{ is continuous at } 0",
+          annotation:
+            "By contrast: is |x| at least continuous at 0? Yes — the limit equals the function value (both are 0). This confirms the one-way relationship: differentiability implies continuity, but continuity does NOT imply differentiability. |x| is the standard counterexample.",
         },
       ],
       conclusion:
-        "f(x) = |x| is NOT differentiable at x = 0. The graph has a sharp corner there — the slope jumps from -1 (for x < 0) to +1 (for x > 0) with no smooth transition. There is no single well-defined tangent line at the origin. This is the canonical example of a function that is continuous but not differentiable.",
+        "|x| is continuous everywhere but not differentiable at x = 0. One-sided derivatives exist but disagree: +1 from the right, -1 from the left. The corner kills the derivative.",
       visualizations: [
         {
           id: "AbsoluteValueDiffViz",
           title: "See the Calculation on the Graph",
           mathBridge:
-            "Each step in the worked example corresponds to something visible here. Step 1–2: the green secant from $(0,0)$ to $(+h, h)$ — its slope $h/h = 1$ is the right-hand derivative. Step 3–4: the red secant to $(-h, h)$ — its slope $-h/(-h)$ ... wait, we divide by $h$ (not $-h$): $|-h|/(-h) = h/(-h) = -1$. That is the left-hand difference quotient with $h < 0$. Slide $h$ all the way down to confirm both secants are frozen at their respective slopes regardless of how close $h$ gets to 0.",
+            "Each step in the worked example corresponds to something visible here. Steps 3-4: the green secant from $(0,0)$ to $(+h, h)$ has slope $h/h = 1$ — this is the right-hand derivative. Steps 5-6: the red secant to $(-h, h)$ has slope $|{-h}|/(-h) = h/(-h) = -1$ — this is the left-hand derivative. Slide $h$ all the way down to confirm both secants stay frozen at their slopes regardless of how small $h$ gets.",
           caption:
-            "The two secants never converge — they are locked at +1 and −1 forever. That is why the limit does not exist and f is not differentiable at 0.",
+            "The two secants never converge — they are locked at +1 and -1 forever. That is why the limit does not exist and f is not differentiable at 0.",
         },
       ],
     },
     {
       id: "ch2-000-ex7",
-      title: "Instantaneous Velocity from the Definition",
+      title: "Instantaneous Velocity from First Principles",
       problem:
-        "\\text{A particle's position is given by } s(t) = 4t^2 + 3t \\text{ (in meters, t in seconds). Find its instantaneous velocity at } t = 2.",
+        "\\text{A particle's position is } s(t) = 4t^2 + 3t \\text{ meters, } t \\text{ in seconds. Find its instantaneous velocity at } t = 2 \\text{ s.}",
       steps: [
         {
           expression:
             "v(t) = s'(t) = \\lim_{h \\to 0} \\frac{s(t+h) - s(t)}{h}",
           annotation:
-            "Instantaneous velocity is the derivative of position with respect to time. Set up the difference quotient.",
+            "Physical setup: instantaneous velocity is the derivative of position with respect to time. The same limit-of-difference-quotient formula applies — we just interpret the result as meters per second.",
         },
         {
           expression: "s(t+h) = 4(t+h)^2 + 3(t+h)",
           annotation:
-            "Compute s(t+h) by replacing t with t+h in the position formula.",
+            "Substitute (t+h) everywhere t appears in s(t) = 4t^2 + 3t. Two substitution sites: in the squared term and in the linear term.",
         },
         {
-          expression: "= 4(t^2 + 2th + h^2) + 3t + 3h",
+          expression: "4(t+h)^2 = 4(t^2 + 2th + h^2)",
           annotation:
-            "Expand (t+h)\u00b2 = t\u00b2 + 2th + h\u00b2 and distribute the 4 and 3.",
+            "Expand (t+h)^2 using (a+b)^2 = a^2 + 2ab + b^2, with a = t and b = h.",
         },
         {
-          expression: "= 4t^2 + 8th + 4h^2 + 3t + 3h",
-          annotation: "Distribute to get the fully expanded form of s(t+h).",
+          expression: "= 4t^2 + 8th + 4h^2",
+          annotation:
+            "Distribute 4 to each term: 4 times t^2 = 4t^2, 4 times 2th = 8th, 4 times h^2 = 4h^2.",
+        },
+        {
+          expression: "3(t+h) = 3t + 3h",
+          annotation: "Distribute 3: 3 times t = 3t, 3 times h = 3h.",
+        },
+        {
+          expression: "s(t+h) = 4t^2 + 8th + 4h^2 + 3t + 3h",
+          annotation:
+            "Combine the two expanded pieces into the full expression for s(t+h).",
         },
         {
           expression:
             "s(t+h) - s(t) = (4t^2 + 8th + 4h^2 + 3t + 3h) - (4t^2 + 3t)",
           annotation:
-            "Form the difference s(t+h) - s(t) by subtracting the original position.",
+            "Subtract s(t) = 4t^2 + 3t. Use parentheses around s(t) to protect every sign inside.",
+        },
+        {
+          expression: "= 4t^2 + 8th + 4h^2 + 3t + 3h - 4t^2 - 3t",
+          annotation: "Distribute the minus sign: -(4t^2 + 3t) = -4t^2 - 3t.",
         },
         {
           expression: "= 8th + 4h^2 + 3h",
           annotation:
-            "Simplify: 4t\u00b2 - 4t\u00b2 = 0 and 3t - 3t = 0. Only the h-containing terms remain.",
+            "Collect like terms: 4t^2 - 4t^2 = 0, 3t - 3t = 0. Three h-terms remain. Every surviving term contains h, as expected.",
         },
         {
-          expression: "\\frac{s(t+h)-s(t)}{h} = \\frac{8th + 4h^2 + 3h}{h}",
-          annotation: "Divide by h to form the difference quotient.",
-        },
-        {
-          expression: "= \\frac{h(8t + 4h + 3)}{h} = 8t + 4h + 3",
+          expression: "8th + 4h^2 + 3h = h(8t + 4h + 3)",
           annotation:
-            "Factor h from the numerator and cancel with the denominator h.",
+            "Prerequisite: factor h from all three terms. 8th = h times 8t. 4h^2 = h times 4h. 3h = h times 3. All three terms have h as a factor. Apply distributive law in reverse: h(8t + 4h + 3).",
         },
         {
-          expression: "v(t) = \\lim_{h \\to 0} (8t + 4h + 3) = 8t + 3",
+          expression:
+            "\\frac{s(t+h)-s(t)}{h} = \\frac{h(8t + 4h + 3)}{h} = 8t + 4h + 3",
           annotation:
-            "Take the limit as h \u2192 0. The term 4h vanishes, leaving the instantaneous velocity function v(t) = 8t + 3.",
+            "Cancel h/h (legal: h is nonzero in the limit process). The simplified difference quotient is 8t + 4h + 3.",
+        },
+        {
+          expression:
+            "v(t) = \\lim_{h \\to 0}(8t + 4h + 3) = 8t + 3 \\text{ m/s}",
+          annotation:
+            "Take h to 0. The 4h term vanishes. Velocity function: v(t) = 8t + 3 m/s.",
         },
         {
           expression: "v(2) = 8(2) + 3 = 16 + 3 = 19 \\text{ m/s}",
           annotation:
-            "Substitute t = 2 to find the instantaneous velocity at t = 2 seconds. The particle is moving at exactly 19 meters per second at that moment.",
+            "Evaluate at t = 2 s. Instantaneous velocity at exactly 2 seconds is 19 m/s.",
+        },
+        {
+          expression:
+            "\\text{Units check: } \\frac{d}{dt}[\\text{meters}] = \\frac{\\text{meters}}{\\text{seconds}} = \\text{m/s}",
+          annotation:
+            "Units: the derivative of position (meters) with respect to time (seconds) always has units m/s. If you get different units, recheck your setup.",
         },
       ],
       conclusion:
-        "The instantaneous velocity at t = 2 is 19 m/s. The general velocity function v(t) = 8t + 3 shows that the particle is accelerating — its speed increases linearly with time. For comparison, the average velocity over [1, 3] would be [s(3)-s(1)]/(3-1) = [45 - 7]/2 = 19 m/s. This agreement is not a coincidence — the midpoint of [1, 3] is t = 2, and for a quadratic position function (uniform acceleration), the average velocity over any interval equals the instantaneous velocity at the midpoint.",
+        "Instantaneous velocity at t = 2 s is 19 m/s. The algebra is identical to ex1 — expand (t+h)^2, cancel terms, factor h, cancel h/h, substitute h = 0. Only the interpretation changes.",
     },
     {
       id: "ch2-000-ex8",
       title:
-        "Galileo's Falling Ball: Derivative from First Principles (Physics)",
+        "Galileo's Falling Ball: Velocity and Acceleration from First Principles",
       problem:
-        "Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s². Use the limit definition to find the velocity $v(t) = y'(t)$, then evaluate at $t = 3$ s. Interpret the result.",
+        "Galileo showed that objects fall with position $y(t) = \\frac{1}{2}g t^2$ (measured downward from rest), where $g \\approx 9.8$ m/s\\textsuperscript{2}. Use the limit definition to find velocity $v(t) = y'(t)$, then find acceleration $a(t) = v'(t)$. Evaluate velocity at $t = 3$ s.",
       visualizationId: "ProjectileMotion",
       steps: [
         {
           expression: "v(t) = \\lim_{h \\to 0} \\frac{y(t+h) - y(t)}{h}",
           annotation:
-            "The velocity at time t is the derivative of position — defined as the limit of average velocities.",
+            "Write the definition. Treat g as a constant (about 9.8) throughout — it is a fixed number, not a variable.",
         },
         {
-          expression:
-            "y(t+h) = \\frac{1}{2}g(t+h)^2 = \\frac{g}{2}(t^2 + 2th + h^2)",
-          annotation: "Expand (t+h)².",
-        },
-        {
-          expression:
-            "y(t+h) - y(t) = \\frac{g}{2}(t^2 + 2th + h^2) - \\frac{g}{2}t^2 = \\frac{g}{2}(2th + h^2)",
-          annotation: "Subtract y(t). The t² terms cancel.",
-        },
-        {
-          expression:
-            "\\frac{y(t+h)-y(t)}{h} = \\frac{\\frac{g}{2}h(2t+h)}{h} = \\frac{g}{2}(2t+h)",
-          annotation: "Divide by h (cancel for h ≠ 0).",
-        },
-        {
-          expression:
-            "v(t) = \\lim_{h \\to 0} \\frac{g}{2}(2t + h) = \\frac{g}{2}(2t) = gt",
-          annotation: "Take the limit: h → 0 eliminates the h term.",
-        },
-        {
-          expression: "v(t) = gt",
+          expression: "y(t+h) = \\frac{1}{2}g(t+h)^2",
           annotation:
-            "The velocity increases linearly with time — uniform acceleration.",
+            "Substitute (t+h) for t. The factor (1/2)g is a constant multiplier that passes through the expansion unchanged.",
+        },
+        {
+          expression: "(t+h)^2 = t^2 + 2th + h^2",
+          annotation:
+            "Expand using (a+b)^2 = a^2 + 2ab + b^2 with a = t, b = h. Same rule as ex1.",
+        },
+        {
+          expression:
+            "y(t+h) = \\frac{g}{2}(t^2 + 2th + h^2) = \\frac{g}{2}t^2 + \\frac{g}{2} \\cdot 2th + \\frac{g}{2}h^2",
+          annotation: "Distribute g/2 to each of the three terms.",
+        },
+        {
+          expression: "= \\frac{g}{2}t^2 + gth + \\frac{g}{2}h^2",
+          annotation:
+            "Simplify the middle term: (g/2) times 2th = gth (the 2s cancel).",
+        },
+        {
+          expression:
+            "y(t+h) - y(t) = \\frac{g}{2}t^2 + gth + \\frac{g}{2}h^2 - \\frac{g}{2}t^2",
+          annotation: "Subtract y(t) = (g/2)t^2. The (g/2)t^2 terms cancel.",
+        },
+        {
+          expression: "= gth + \\frac{g}{2}h^2",
+          annotation:
+            "Two h-terms remain: gth and (g/2)h^2. Check: both contain h.",
+        },
+        {
+          expression:
+            "gth + \\frac{g}{2}h^2 = h \\cdot gt + h \\cdot \\frac{g}{2}h = h\\left(gt + \\frac{g}{2}h\\right)",
+          annotation:
+            "Factor h: gth = h times gt, and (g/2)h^2 = h times (g/2)h. Both terms contain h, apply the distributive law in reverse.",
+        },
+        {
+          expression:
+            "\\frac{y(t+h)-y(t)}{h} = \\frac{h(gt + \\frac{g}{2}h)}{h} = gt + \\frac{g}{2}h",
+          annotation:
+            "Cancel h/h (h is nonzero). Difference quotient equals gt + (g/2)h.",
+        },
+        {
+          expression:
+            "v(t) = \\lim_{h \\to 0}\\left(gt + \\frac{g}{2}h\\right) = gt",
+          annotation:
+            "Take h to 0. The (g/2)h term vanishes. Velocity function: v(t) = gt.",
         },
         {
           expression: "v(3) = 9.8 \\times 3 = 29.4 \\text{ m/s}",
-          annotation: "At t=3 s, the ball is falling at 29.4 m/s ≈ 106 km/h.",
+          annotation:
+            "At t = 3 s, the object is falling at 29.4 m/s. Plug in g = 9.8 and t = 3.",
+        },
+        {
+          expression:
+            "a(t) = v'(t) = \\lim_{h \\to 0} \\frac{v(t+h) - v(t)}{h} = \\lim_{h \\to 0} \\frac{g(t+h) - gt}{h}",
+          annotation:
+            "Find acceleration by differentiating velocity. v(t) = gt is a linear function — use the same definition.",
+        },
+        {
+          expression:
+            "= \\lim_{h \\to 0} \\frac{gt + gh - gt}{h} = \\lim_{h \\to 0} \\frac{gh}{h} = \\lim_{h \\to 0} g = g",
+          annotation:
+            "The gt terms cancel. gh/h = g (cancel h/h). Limit of constant g is g.",
+        },
+        {
+          expression: "a(t) = g \\approx 9.8 \\text{ m/s}^2",
+          annotation:
+            "Acceleration is constant — the same 9.8 m/s^2 regardless of how long the object has been falling. Gotcha: constant acceleration does NOT mean constant velocity. Velocity v(t) = gt increases linearly with time. Constant acceleration means velocity increases by g every second — the change in velocity is steady, not the velocity itself.",
         },
       ],
       conclusion:
-        "The velocity v(t) = gt says: velocity grows linearly with time, at rate g = 9.8 m/s per second. This is uniform (constant) acceleration. In the limit definition, the key step is canceling h to remove the 0/0 indeterminate form — identical algebra to the tangent line problem. Galileo discovered this law experimentally in 1604; Newton's calculus gave it a mathematical foundation 60 years later.",
+        "From y(t) = (1/2)gt^2: v(t) = gt, v(3) = 29.4 m/s, a(t) = g (constant). Galileo proved that all objects fall with the same constant acceleration regardless of mass — and here you derived it algebraically.",
+    },
+    {
+      id: "ch2-000-ex9",
+      title: "Full Quadratic — Profit Function",
+      problem:
+        "A company's weekly profit from selling $x$ units is $P(x) = -2x^2 + 120x - 500$ dollars. Find $P'(x)$ from first principles. Evaluate at $x = 20$ units and find the unit count that maximizes profit.",
+      steps: [
+        {
+          expression: "P'(x) = \\lim_{h \\to 0} \\frac{P(x+h) - P(x)}{h}",
+          annotation:
+            "Write the definition. In economics, P'(x) is called marginal profit — the rate at which profit changes per additional unit sold.",
+        },
+        {
+          expression: "P(x+h) = -2(x+h)^2 + 120(x+h) - 500",
+          annotation:
+            "Substitute (x+h) wherever x appears. Three terms: quadratic, linear, and constant.",
+        },
+        {
+          expression: "-2(x+h)^2 = -2(x^2 + 2xh + h^2)",
+          annotation: "Expand (x+h)^2 first using (a+b)^2 = a^2 + 2ab + b^2.",
+        },
+        {
+          expression: "= -2x^2 - 4xh - 2h^2",
+          annotation:
+            "Distribute -2 to every term: -2 times x^2 = -2x^2, -2 times 2xh = -4xh, -2 times h^2 = -2h^2. The negative coefficient distributes to all three.",
+        },
+        {
+          expression: "120(x+h) = 120x + 120h",
+          annotation: "Distribute 120.",
+        },
+        {
+          expression: "P(x+h) = -2x^2 - 4xh - 2h^2 + 120x + 120h - 500",
+          annotation: "Combine all expanded pieces.",
+        },
+        {
+          expression:
+            "P(x+h) - P(x) = (-2x^2 - 4xh - 2h^2 + 120x + 120h - 500) - (-2x^2 + 120x - 500)",
+          annotation:
+            "Subtract P(x) with parentheses. The entire expression (-2x^2 + 120x - 500) gets negated.",
+        },
+        {
+          expression:
+            "= -2x^2 - 4xh - 2h^2 + 120x + 120h - 500 + 2x^2 - 120x + 500",
+          annotation:
+            "Prerequisite: distribute the minus sign. -(-2x^2 + 120x - 500) = +2x^2 - 120x + 500. Every sign inside the parentheses flips.",
+        },
+        {
+          expression: "= -4xh - 2h^2 + 120h",
+          annotation:
+            "Collect like terms: -2x^2 + 2x^2 = 0, 120x - 120x = 0, -500 + 500 = 0. Three h-terms survive. Good — every remaining term has h.",
+        },
+        {
+          expression: "-4xh - 2h^2 + 120h = h(-4x - 2h + 120)",
+          annotation:
+            "Factor h: -4xh = h times (-4x), -2h^2 = h times (-2h), 120h = h times 120. All three terms share h as a factor. Apply distributive law in reverse.",
+        },
+        {
+          expression: "\\frac{P(x+h)-P(x)}{h} = -4x - 2h + 120",
+          annotation: "Cancel h/h (h nonzero in the limit).",
+        },
+        {
+          expression: "P'(x) = \\lim_{h \\to 0}(-4x - 2h + 120) = -4x + 120",
+          annotation: "Take h to 0. The -2h term vanishes.",
+        },
+        {
+          expression:
+            "P'(20) = -4(20) + 120 = -80 + 120 = \\$40 \\text{ per unit}",
+          annotation:
+            "Marginal profit at x = 20 is $40 per unit. If you sell the 21st unit, profit increases by approximately $40.",
+        },
+        {
+          expression: "P'(x) = 0 \\Rightarrow -4x + 120 = 0",
+          annotation:
+            "Prerequisite algebra — finding a zero of a linear expression: set P'(x) = 0 and solve.",
+        },
+        {
+          expression: "4x = 120 \\Rightarrow x = 30",
+          annotation:
+            "Add 4x to both sides: 4x = 120. Divide both sides by 4: x = 30. At x = 30, slope of the profit curve is zero — the profit is at its peak. Below 30 units, P'(x) > 0 (profit growing). Above 30, P'(x) < 0 (profit shrinking). This is a preview of optimization — finding maximum/minimum values using derivatives.",
+        },
+        {
+          expression:
+            "P(30) = -2(30)^2 + 120(30) - 500 = -1800 + 3600 - 500 = \\$1300",
+          annotation:
+            "Maximum weekly profit is $1,300, achieved at exactly 30 units.",
+        },
+      ],
+      conclusion:
+        "P'(x) = -4x + 120. Marginal profit at x = 20 is $40/unit. Maximum profit ($1300) occurs at x = 30 units where P'(30) = 0.",
+    },
+    {
+      id: "ch2-000-ex10",
+      title: "Rational Function — Dose-Response Model",
+      problem:
+        "The fraction of drug receptors activated at dose $x$ follows $f(x) = \\dfrac{x}{x+1}$. Find $f'(x)$ from the limit definition. This tells a pharmacologist how sensitive receptor activation is to a small change in dose.",
+      steps: [
+        {
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{\\dfrac{x+h}{x+h+1} - \\dfrac{x}{x+1}}{h}",
+          annotation:
+            "Write the definition and substitute. f(x+h) means replace x with (x+h) in x/(x+1): get (x+h)/((x+h)+1) = (x+h)/(x+h+1). The result is a compound fraction whose numerator is a difference of two rational expressions.",
+        },
+        {
+          expression:
+            "\\text{LCD of } (x+h+1) \\text{ and } (x+1) \\text{ is } (x+h+1)(x+1)",
+          annotation:
+            "Prerequisite: to subtract rational expressions, convert both to a common denominator. These two denominators share no common factor (h makes them different), so the LCD is their product.",
+        },
+        {
+          expression:
+            "\\frac{x+h}{x+h+1} - \\frac{x}{x+1} = \\frac{(x+h)(x+1) - x(x+h+1)}{(x+h+1)(x+1)}",
+          annotation:
+            "Convert both fractions to the LCD and combine into one fraction by subtracting the numerators.",
+        },
+        {
+          expression: "(x+h)(x+1) = x^2 + x + xh + h",
+          annotation:
+            "Expand using FOIL: x times x = x^2, x times 1 = x, h times x = xh, h times 1 = h.",
+        },
+        {
+          expression: "x(x+h+1) = x^2 + xh + x",
+          annotation:
+            "Distribute x: x times x = x^2, x times h = xh, x times 1 = x.",
+        },
+        {
+          expression:
+            "(x+h)(x+1) - x(x+h+1) = (x^2 + x + xh + h) - (x^2 + xh + x)",
+          annotation: "Write the subtraction of both expanded numerators.",
+        },
+        {
+          expression: "= x^2 + x + xh + h - x^2 - xh - x = h",
+          annotation:
+            "Distribute the minus sign and collect like terms: x^2 - x^2 = 0, x - x = 0, xh - xh = 0. Only h remains. The numerator collapses to a single h.",
+        },
+        {
+          expression:
+            "\\frac{f(x+h)-f(x)}{h} = \\frac{1}{h} \\cdot \\frac{h}{(x+h+1)(x+1)} = \\frac{1}{(x+h+1)(x+1)}",
+          annotation:
+            "The full difference quotient: divide the fraction difference by h. The h from the numerator cancels the h we are dividing by.",
+        },
+        {
+          expression:
+            "f'(x) = \\lim_{h \\to 0} \\frac{1}{(x+h+1)(x+1)} = \\frac{1}{(x+1)^2}",
+          annotation:
+            "Substitute h = 0: (x+h+1) becomes (x+1). Denominator becomes (x+1)^2.",
+        },
+        {
+          expression: "f'(x) = \\frac{1}{(x+1)^2}",
+          annotation:
+            "The derivative is always positive — receptor activation always increases with dose. But f'(x) shrinks as x grows. At dose 0: f'(0) = 1 (steep response, each extra unit of drug has big effect). At dose 9: f'(9) = 1/100 (nearly saturated, extra drug has tiny effect). This is diminishing returns — a universal biological pattern.",
+        },
+      ],
+      conclusion:
+        "f'(x/(x+1)) = 1/(x+1)^2. Key algebra: combine the fraction difference using LCD, let the numerator simplify to h, then cancel h with the division by h.",
+    },
+    {
+      id: "ch2-000-ex11",
+      title: "Marginal Cost and the Approximation Error",
+      problem:
+        "A factory's total daily cost is $C(x) = 0.02x^2 + 40x + 300$ dollars to produce $x$ units. Find marginal cost $C'(x)$ from first principles. Evaluate at $x = 100$ and compute the actual cost of the 101st unit to see how close the derivative approximation is.",
+      steps: [
+        {
+          expression: "C'(x) = \\lim_{h \\to 0} \\frac{C(x+h) - C(x)}{h}",
+          annotation:
+            "Marginal cost is the derivative of total cost. Economic interpretation: C'(x) is the approximate cost of producing one more unit when already producing x.",
+        },
+        {
+          expression: "C(x+h) = 0.02(x+h)^2 + 40(x+h) + 300",
+          annotation: "Substitute (x+h) wherever x appears.",
+        },
+        {
+          expression:
+            "0.02(x+h)^2 = 0.02(x^2 + 2xh + h^2) = 0.02x^2 + 0.04xh + 0.02h^2",
+          annotation:
+            "Expand (x+h)^2, then distribute 0.02: 0.02 times x^2 = 0.02x^2, 0.02 times 2xh = 0.04xh, 0.02 times h^2 = 0.02h^2.",
+        },
+        {
+          expression: "40(x+h) = 40x + 40h",
+          annotation: "Distribute 40.",
+        },
+        {
+          expression: "C(x+h) - C(x) = 0.04xh + 0.02h^2 + 40h",
+          annotation:
+            "Subtract C(x) = 0.02x^2 + 40x + 300. All non-h terms cancel: 0.02x^2 - 0.02x^2 = 0, 40x - 40x = 0, 300 - 300 = 0. Three h-terms remain.",
+        },
+        {
+          expression: "= h(0.04x + 0.02h + 40)",
+          annotation:
+            "Factor h: 0.04xh = h times 0.04x, 0.02h^2 = h times 0.02h, 40h = h times 40. Apply distributive law in reverse.",
+        },
+        {
+          expression:
+            "C'(x) = \\lim_{h \\to 0}(0.04x + 0.02h + 40) = 0.04x + 40",
+          annotation:
+            "Cancel h/h, take h to 0. Marginal cost function: C'(x) = 0.04x + 40.",
+        },
+        {
+          expression:
+            "C'(100) = 0.04(100) + 40 = 4 + 40 = \\$44 \\text{ per unit}",
+          annotation: "Derivative says the 101st unit costs approximately $44.",
+        },
+        {
+          expression: "C(101) = 0.02(101)^2 + 40(101) + 300",
+          annotation:
+            "Now compute the exact cost at 101 units to verify the approximation.",
+        },
+        {
+          expression: "101^2 = (100+1)^2 = 10000 + 200 + 1 = 10201",
+          annotation:
+            "Prerequisite: expand 101^2 using (a+b)^2 = a^2 + 2ab + b^2 with a = 100, b = 1.",
+        },
+        {
+          expression:
+            "C(101) = 0.02(10201) + 40(101) + 300 = 204.02 + 4040 + 300 = 4544.02",
+          annotation:
+            "Arithmetic: 0.02 times 10201 = 204.02, 40 times 101 = 4040.",
+        },
+        {
+          expression:
+            "C(100) = 0.02(10000) + 4000 + 300 = 200 + 4000 + 300 = 4500.00",
+          annotation: "Cost at exactly 100 units.",
+        },
+        {
+          expression: "C(101) - C(100) = 4544.02 - 4500.00 = \\$44.02",
+          annotation: "Exact cost of producing the 101st unit: $44.02.",
+        },
+        {
+          expression: "C'(100) = \\$44 \\approx \\$44.02 = C(101) - C(100)",
+          annotation:
+            "The derivative approximation ($44) is very close to the exact discrete cost ($44.02). The $0.02 error exists because the derivative measures the instantaneous rate at x = 100, but the actual question asks about a finite step from 100 to 101. As the step size shrinks (say, a half unit instead of a full unit), the approximation error also shrinks. This is the fundamental link between derivatives and differences.",
+        },
+      ],
+      conclusion:
+        "C'(x) = 0.04x + 40. At x = 100, C'(100) = $44/unit. Actual cost of 101st unit = $44.02. The derivative gives a linear approximation; the error of $0.02 comes from the quadratic term.",
+    },
+    {
+      id: "ch2-000-ex12",
+      title: "Rate of Cooling — Newton's Law Word Problem",
+      problem:
+        "A casserole at 400\\textdegree{}F cools after removal from the oven. Its temperature model is $T(t) = 400 - 150t + 20t^2$ (degrees F, $t$ in hours, $0 \\leq t \\leq 4$). Find $T'(t)$ from first principles. Evaluate at $t = 1$ hr and find when cooling is fastest.",
+      steps: [
+        {
+          expression: "T'(t) = \\lim_{h \\to 0} \\frac{T(t+h) - T(t)}{h}",
+          annotation:
+            "T'(t) gives instantaneous rate of temperature change in degrees F per hour. A negative value means the temperature is dropping.",
+        },
+        {
+          expression: "T(t+h) = 400 - 150(t+h) + 20(t+h)^2",
+          annotation: "Substitute (t+h) for t. Three terms need expansion.",
+        },
+        {
+          expression: "-150(t+h) = -150t - 150h",
+          annotation:
+            "Distribute -150. Note: -150 times h = -150h (negative coefficient, so h-term is negative).",
+        },
+        {
+          expression: "20(t+h)^2 = 20(t^2 + 2th + h^2) = 20t^2 + 40th + 20h^2",
+          annotation: "Expand (t+h)^2 then distribute 20.",
+        },
+        {
+          expression: "T(t+h) = 400 - 150t - 150h + 20t^2 + 40th + 20h^2",
+          annotation: "Assemble the full expansion.",
+        },
+        {
+          expression:
+            "T(t+h) - T(t) = (400 - 150t - 150h + 20t^2 + 40th + 20h^2) - (400 - 150t + 20t^2)",
+          annotation: "Subtract T(t) = 400 - 150t + 20t^2 with parentheses.",
+        },
+        {
+          expression: "= -150h + 40th + 20h^2",
+          annotation:
+            "Collect like terms: 400 - 400 = 0, -150t + 150t = 0, 20t^2 - 20t^2 = 0. Three h-terms remain.",
+        },
+        {
+          expression: "-150h + 40th + 20h^2 = h(-150 + 40t + 20h)",
+          annotation:
+            "Factor h: -150h = h times (-150), 40th = h times 40t, 20h^2 = h times 20h. All three share h.",
+        },
+        {
+          expression: "T'(t) = \\lim_{h \\to 0}(-150 + 40t + 20h) = -150 + 40t",
+          annotation: "Cancel h/h, take h to 0.",
+        },
+        {
+          expression: "T'(1) = -150 + 40(1) = -110 \\;{^\\circ}\\text{F/hr}",
+          annotation:
+            "At t = 1 hour, temperature is dropping at 110 degrees F per hour. Negative sign confirms cooling.",
+        },
+        {
+          expression:
+            "\\text{Units: } T \\text{ in }^\\circ\\text{F},\\; t \\text{ in hours} \\Rightarrow T'(t) \\text{ in }^\\circ\\text{F/hr}",
+          annotation:
+            "Units check: derivative of temperature (degrees F) with respect to time (hours) must be degrees-F per hour.",
+        },
+        {
+          expression:
+            "T'(t) = -150 + 40t \\text{ is an increasing function of } t",
+          annotation:
+            "The cooling rate T'(t) has slope +40 with respect to t. As t increases, T'(t) becomes less negative — the food cools more slowly over time. This matches Newton's law of cooling: cooling rate is proportional to the temperature difference from the surroundings.",
+        },
+        {
+          expression:
+            "T'(0) = -150 \\;{^\\circ}\\text{F/hr} \\text{ (fastest cooling)}",
+          annotation:
+            "Cooling is fastest at t = 0, the moment the casserole is removed. The temperature difference from room temperature is greatest then. As it cools, the difference shrinks and the rate of cooling slows.",
+        },
+      ],
+      conclusion:
+        "T'(t) = -150 + 40t deg-F/hr. At t = 1 hr, T'(1) = -110 deg-F/hr. Fastest cooling is at t = 0: T'(0) = -150 deg-F/hr.",
+    },
+    {
+      id: "ch2-000-ex13",
+      title: "Building the Power Rule: f(x) = x\\u2074",
+      problem:
+        "f(x) = x^4. \\text{ Find } f'(x) \\text{ from the limit definition. Then compare your results from ex1, ex2, and this example to state the general power rule pattern.}",
+      steps: [
+        {
+          expression: "f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^4 - x^4}{h}",
+          annotation:
+            "Set up the definition. The challenge: expand (x+h)^4 completely.",
+        },
+        {
+          expression: "(x+h)^4 = [(x+h)^2]^2",
+          annotation:
+            "Prerequisite strategy: do not expand (x+h)^4 all at once. Instead, rewrite it as [(x+h)^2]^2, use the result (x+h)^2 = x^2 + 2xh + h^2 from ex1, then square that result. Breaking into two steps makes the algebra manageable.",
+        },
+        {
+          expression: "= (x^2 + 2xh + h^2)^2",
+          annotation:
+            "Substitute (x+h)^2 = x^2 + 2xh + h^2. Now we need to square this trinomial.",
+        },
+        {
+          expression: "= (x^2 + 2xh + h^2)(x^2 + 2xh + h^2)",
+          annotation: "Write it as the trinomial times itself.",
+        },
+        {
+          expression:
+            "= x^2(x^2 + 2xh + h^2) + 2xh(x^2 + 2xh + h^2) + h^2(x^2 + 2xh + h^2)",
+          annotation:
+            "Prerequisite: distribute each of the three terms in the first factor across the entire second factor. Three groups — one per term.",
+        },
+        {
+          expression:
+            "= (x^4 + 2x^3 h + x^2 h^2) + (2x^3 h + 4x^2 h^2 + 2xh^3) + (x^2 h^2 + 2xh^3 + h^4)",
+          annotation:
+            "Expand each group. x^2 times x^2 = x^4, x^2 times 2xh = 2x^3 h, x^2 times h^2 = x^2 h^2. Then 2xh times each term. Then h^2 times each term.",
+        },
+        {
+          expression: "= x^4 + 4x^3 h + 6x^2 h^2 + 4xh^3 + h^4",
+          annotation:
+            "Collect like terms: 2x^3 h + 2x^3 h = 4x^3 h. x^2 h^2 + 4x^2 h^2 + x^2 h^2 = 6x^2 h^2. 2xh^3 + 2xh^3 = 4xh^3. The coefficients 1, 4, 6, 4, 1 match row 4 of Pascal's triangle — this is the binomial theorem.",
+        },
+        {
+          expression:
+            "= \\lim_{h \\to 0} \\frac{4x^3 h + 6x^2 h^2 + 4xh^3 + h^4}{h}",
+          annotation:
+            "Substitute into the difference quotient. Cancel x^4 - x^4 = 0. Four h-terms remain.",
+        },
+        {
+          expression:
+            "= \\lim_{h \\to 0} \\frac{h(4x^3 + 6x^2 h + 4xh^2 + h^3)}{h}",
+          annotation:
+            "Factor h from all four terms: 4x^3 h = h(4x^3), 6x^2 h^2 = h(6x^2 h), 4xh^3 = h(4xh^2), h^4 = h(h^3).",
+        },
+        {
+          expression: "= \\lim_{h \\to 0}(4x^3 + 6x^2 h + 4xh^2 + h^3) = 4x^3",
+          annotation:
+            "Cancel h/h, take h to 0. The three h-containing terms vanish. Only 4x^3 survives.",
+        },
+        {
+          expression: "f(x) = x^2 \\Rightarrow f'(x) = 2x^1",
+          annotation:
+            "Pattern review — n = 2: exponent 2 became coefficient 2, new power is 1.",
+        },
+        {
+          expression: "f(x) = x^3 \\Rightarrow f'(x) = 3x^2",
+          annotation: "n = 3: exponent 3 became coefficient 3, new power is 2.",
+        },
+        {
+          expression: "f(x) = x^4 \\Rightarrow f'(x) = 4x^3",
+          annotation: "n = 4: exponent 4 became coefficient 4, new power is 3.",
+        },
+        {
+          expression: "\\frac{d}{dx}[x^n] = nx^{n-1}",
+          annotation:
+            "Power rule — observed pattern: the exponent drops down as the leading coefficient, and the new exponent is n - 1. You have now confirmed this for n = 2, 3, and 4 by grinding through the limit definition. The next lesson proves this for all n using the binomial theorem. Once proved, you will never have to repeat this process — you will just use the rule instantly. But you needed to see where it comes from.",
+        },
+      ],
+      conclusion:
+        "f'(x^4) = 4x^3. Confirmed: the power rule pattern d/dx[x^n] = nx^{n-1} holds for n = 2, 3, 4. The next lesson proves it for all n.",
+    },
+    {
+      id: "ch2-000-ex14",
+      title: "Derivative of a Quadratic with Linear Term: x² + 3x",
+      problem:
+        "\\text{Let } f(x) = x^2 + 3x. \\text{ Use the limit definition to find } f'(x). \\text{ Then evaluate } f'(2) \\text{ and interpret the result as slope and marginal change.}",
+      steps: [
+        {
+          expression: "f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
+          annotation:
+            "Always begin with the exact limit definition. This is the fundamental algorithm for every derivative we compute from first principles. Never skip it — it keeps sign errors and algebra mistakes visible.",
+        },
+        {
+          expression: "f(x+h) = (x+h)^2 + 3(x+h)",
+          annotation:
+            "Substitute (x+h) for every occurrence of x in the original function. There are two places: inside the square and in the linear term.",
+        },
+        {
+          expression: "(x+h)^2 = x^2 + 2xh + h^2",
+          annotation:
+            "Prerequisite algebra from ex1: expand the square using (a+b)^2 = a^2 + 2ab + b^2. Do not write (x+h)^2 as x^2 + h^2 — the middle term 2xh is essential and is the most common early mistake.",
+        },
+        {
+          expression: "3(x+h) = 3x + 3h",
+          annotation:
+            "Distribute the 3. The coefficient 3 multiplies both x and h.",
+        },
+        {
+          expression: "f(x+h) = x^2 + 2xh + h^2 + 3x + 3h",
+          annotation: "Combine both expanded pieces.",
+        },
+        {
+          expression:
+            "f(x+h) - f(x) = (x^2 + 2xh + h^2 + 3x + 3h) - (x^2 + 3x)",
+          annotation:
+            "Write the subtraction with full parentheses around f(x) to protect every sign when distributing the negative.",
+        },
+        {
+          expression: "= x^2 + 2xh + h^2 + 3x + 3h - x^2 - 3x",
+          annotation:
+            "Distribute the minus: every term in f(x) flips sign. This is another high-error step — forgetting to change the sign of 3x is common.",
+        },
+        {
+          expression: "= 2xh + h^2 + 3h",
+          annotation:
+            "Cancel like terms: x^2 - x^2 = 0 and 3x - 3x = 0. Only terms containing h survive — this is the expected pattern in any derivative calculation.",
+        },
+        {
+          expression: "2xh + h^2 + 3h = h(2x + h + 3)",
+          annotation:
+            "Factor h out of every term using the distributive property in reverse: each piece contains h (2xh = h·2x, h^2 = h·h, 3h = h·3). Verify by distributing back if needed.",
+        },
+        {
+          expression: "= \\lim_{h \\to 0} \\frac{h(2x + h + 3)}{h}",
+          annotation:
+            "Substitute the factored form back into the difference quotient.",
+        },
+        {
+          expression: "= \\lim_{h \\to 0} (2x + h + 3)",
+          annotation:
+            "Cancel h/h = 1. This cancellation is valid because h approaches 0 but is never actually zero during the process — we are not dividing by zero.",
+        },
+        {
+          expression: "= 2x + 0 + 3 = 2x + 3",
+          annotation:
+            "Now safely substitute h = 0. The h term disappears, leaving the derivative function.",
+        },
+        {
+          expression: "f'(x) = 2x + 3",
+          annotation:
+            "The derivative is 2x + 3. Pattern check: the derivative of x^2 is 2x (from ex1), the derivative of 3x is 3 (from the linear case in ex5), and constants would give 0. The operations are linear — derivatives respect addition.",
+        },
+        {
+          expression: "f'(2) = 2(2) + 3 = 7",
+          annotation:
+            "Evaluate at x = 2. This is the slope of the tangent line to the curve at the point where x = 2 (the point itself is (2, f(2)) = (2, 4 + 6) = (2, 10)).",
+        },
+      ],
+      conclusion:
+        "f'(x) = 2x + 3. At x = 2 the slope is 7. This example shows how the derivative of a sum is the sum of the derivatives — a preview of the linearity of differentiation that we will prove formally later. Algebra keys: always expand fully before subtracting, factor h completely, and remember why h/h cancellation is legal in the limit.",
     },
   ],
 

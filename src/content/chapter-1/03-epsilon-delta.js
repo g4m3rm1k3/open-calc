@@ -66,7 +66,7 @@ export default {
       },
     ],
     visualizations: [
-                  {
+      {
         id: "EpsilonDelta",
         props: { fn: "2*x + 1", c: 3, L: 7 },
         title: "The ε-δ Game — Interactive",
@@ -196,247 +196,286 @@ export default {
   examples: [
     {
       id: "ex-ed-linear",
-      title: "ε-δ Proof for a Linear Function (Scratchwork + Proof)",
+      title: "ε-δ Proof for a Linear Function (Scratchwork + Formal Proof)",
       problem:
-        "Prove using ε-δ that \\displaystyle\\lim_{x \\to 4} (3x - 5) = 7.",
+        "Prove using the ε-δ definition that \\displaystyle\\lim_{x \\to 4} (3x - 5) = 7.",
       steps: [
         {
-          expression: "\\textbf{Phase 1 — Scratch work:}",
+          expression: "\\textbf{Reminder: ε-δ Definition}",
           annotation:
-            "Figure out what δ should be before writing the formal proof.",
+            "To prove \\lim_{x \\to c} f(x) = L we must show: for every ε > 0 there exists δ > 0 such that if 0 < |x - c| < δ then |f(x) - L| < ε. Every proof follows this exact template.",
         },
         {
-          expression: "|(3x-5) - 7| = |3x - 12| = 3|x - 4|",
+          expression: "\\textbf{Phase 1 — Scratch Work (Planning)}",
           annotation:
-            "Simplify the output error. It factors as 3 times the input error.",
+            "We first simplify |f(x) - L| algebraically and solve for the required |x - c| in terms of ε. This tells us exactly what δ must be.",
+        },
+        {
+          expression: "|(3x - 5) - 7| = |3x - 12| = 3|x - 4|",
+          annotation:
+            "Prerequisite algebra: distribute and combine constants inside the absolute value. The output error factors perfectly as the constant 3 (the slope) times the input error |x - 4|. Gotcha: never drop the absolute value — it is required by the definition.",
         },
         {
           expression:
-            "\\text{Need: } 3|x-4| < \\varepsilon \\iff |x-4| < \\frac{\\varepsilon}{3}",
-          annotation: "So δ = ε/3 should work. Now write the formal proof.",
-        },
-        { expression: "\\textbf{Phase 2 — Formal proof:}", annotation: "" },
-        {
-          expression:
-            "\\text{Given } \\varepsilon > 0. \\text{ Let } \\delta = \\frac{\\varepsilon}{3}.",
-          annotation: "State your choice of δ upfront.",
-        },
-        {
-          expression: "\\text{Suppose } 0 < |x-4| < \\delta.",
-          annotation: "Assume x is within δ of 4 (but x ≠ 4).",
-        },
-        {
-          expression:
-            "|(3x-5) - 7| = 3|x-4| < 3\\delta = 3 \\cdot \\frac{\\varepsilon}{3} = \\varepsilon.\\;\\blacksquare",
+            "We need 3|x - 4| < \\varepsilon \\quad \\iff \\quad |x - 4| < \\frac{\\varepsilon}{3}",
           annotation:
-            "The chain: output error = 3·(input error) < 3·δ = 3·(ε/3) = ε.",
+            "Solve the inequality. The 3 scales the error, so to keep output error below ε we must make input error smaller than ε/3. This is why the slope |m| appears in every linear proof: δ = ε/|m|.",
+        },
+        {
+          expression: "\\textbf{Phase 2 — Formal Proof}",
+          annotation:
+            "Now we write the proof using the δ we discovered. Every line must be justified.",
+        },
+        {
+          expression:
+            "\\text{Let } \\varepsilon > 0 \\text{ be given. Choose } \\delta = \\frac{\\varepsilon}{3}.",
+          annotation:
+            "We declare δ explicitly in terms of ε. This choice is not magic — it came directly from the scratch-work inequality.",
+        },
+        {
+          expression: "\\text{Assume } 0 < |x - 4| < \\delta.",
+          annotation:
+            "This is the hypothesis: x is close to 4 (but not equal). We must now prove that this forces |f(x) - L| < ε.",
+        },
+        {
+          expression:
+            "|(3x - 5) - 7| = 3|x - 4| < 3 \\cdot \\delta = 3 \\cdot \\frac{\\varepsilon}{3} = \\varepsilon.",
+          annotation:
+            "Chain of equalities and inequalities: output error = 3 × input error < 3δ (by hypothesis) = ε (by our choice of δ). Every step is reversible algebra. \\blacksquare",
         },
       ],
       conclusion:
-        "For linear functions f(x) = mx + b with m ≠ 0, δ = ε/|m| always works. The proof is essentially one line: |f(x)−L| = |m|·|x−c| < |m|·δ = ε. The scaling factor is the slope.",
+        "Aha! For any linear function the proof is always one clean line because the error scales exactly by the slope |m|. No restrictions or min tricks are needed — linearity makes life easy. This is why linear functions are continuous everywhere.",
     },
     {
       id: "ex-ed-quadratic",
-      title: "ε-δ Proof for a Quadratic (The min Trick)",
-      problem: "Prove that \\displaystyle\\lim_{x \\to 3} x^2 = 9.",
+      title:
+        "ε-δ Proof for a Quadratic — Why We Choose δ ≤ 1 and the min Trick",
+      problem:
+        "Prove using the ε-δ definition that \\displaystyle\\lim_{x \\to 3} x^2 = 9.",
       steps: [
         {
-          expression: "|x^2 - 9| = |x-3|\\cdot|x+3|",
+          expression: "\\textbf{Reminder: ε-δ Definition}",
           annotation:
-            "Factor the output error using the difference of squares.",
+            "We must control |f(x) - L| no matter how small ε is. For nonlinear functions we need extra planning.",
+        },
+        {
+          expression: "|x^2 - 9| = |x - 3| \\cdot |x + 3|",
+          annotation:
+            "Difference of squares (prerequisite algebra). We have separated the controllable factor |x-3| from the troublesome |x+3| that changes with x.",
         },
         {
           expression:
-            "\\text{Problem: } |x+3| \\text{ is not a constant — it depends on } x.",
+            "\\text{Problem: } |x+3| \\text{ is not constant — it grows as x moves away from 3.}",
           annotation:
-            "Unlike the linear case, we can't immediately solve for δ.",
+            "If we tried δ = ε/|x+3| we couldn't, because |x+3| depends on the unknown x. This is the exact reason nonlinear proofs are harder.",
         },
         {
           expression:
-            "\\text{Trick: restrict } \\delta \\leq 1, \\text{ so } |x-3| < 1 \\implies 2 < x < 4.",
+            "\\textbf{Why we choose δ ≤ 1 (the restriction trick)}: If we force |x-3| < 1, then x is trapped in (2,4). On this tiny interval |x+3| is bounded above by 7 (a constant).",
           annotation:
-            "By keeping x within 1 of 3, we bound the variable factor.",
-        },
-        {
-          expression: "\\text{Then } 5 < x+3 < 7, \\text{ so } |x+3| < 7.",
-          annotation: "Now |x+3| has a constant upper bound on this interval.",
-        },
-        {
-          expression: "|x^2-9| = |x-3|\\cdot|x+3| < 7|x-3|",
-          annotation: "Substitute the bound.",
+            "We pick 1 arbitrarily — any positive number works, but 1 is simple and keeps the interval symmetric and easy to calculate. Without this restriction |x+3| could be arbitrarily large and we could never guarantee the product is small. Aha! The restriction 'cages' the variable factor so it behaves like a constant.",
         },
         {
           expression:
-            "\\text{Need: } 7|x-3| < \\varepsilon \\iff |x-3| < \\varepsilon/7.",
+            "|x-3| < 1 \\implies 2 < x < 4 \\implies 5 < x+3 < 7 \\implies |x+3| < 7.",
+          annotation:
+            "Explicit interval arithmetic. Now |x+3| ≤ 7 no matter where x is inside the cage.",
+        },
+        {
+          expression: "|x^2 - 9| < 7 |x - 3|",
+          annotation:
+            "Substitute the bound. The error is now controlled by a single factor |x-3| multiplied by the constant 7.",
+        },
+        {
+          expression:
+            "We need 7|x - 3| < \\varepsilon \\quad \\iff \\quad |x - 3| < \\frac{\\varepsilon}{7}.",
           annotation: "",
         },
         {
           expression:
-            "\\text{Choose } \\delta = \\min\\!\\left(1,\\; \\frac{\\varepsilon}{7}\\right).",
+            "\\text{Therefore choose } \\delta = \\min\\left(1, \\frac{\\varepsilon}{7}\\right).",
           annotation:
-            "The min ensures BOTH conditions: δ ≤ 1 (so the bound holds) AND δ ≤ ε/7 (so the product is small).",
+            "Aha! The min does two jobs at once: it keeps δ ≤ 1 (cage stays closed, bound |x+3| < 7 remains true) AND it keeps δ ≤ ε/7 (error stays below ε). This is the genius of the technique.",
         },
         {
           expression:
-            "\\textbf{Proof: } \\text{Given } \\varepsilon > 0, \\text{ let } \\delta = \\min(1, \\varepsilon/7).",
+            "\\textbf{Formal Proof: } \\text{Let } \\varepsilon > 0. \\text{ Choose } \\delta = \\min\\left(1, \\frac{\\varepsilon}{7}\\right).",
           annotation: "",
         },
         {
           expression:
-            "\\text{If } 0 < |x-3| < \\delta:\\quad |x^2-9| = |x-3||x+3| < \\delta \\cdot 7 \\leq \\frac{\\varepsilon}{7} \\cdot 7 = \\varepsilon.\\;\\blacksquare",
-          annotation: "",
+            "\\text{Assume } 0 < |x - 3| < \\delta.\\quad \\text{Then } |x^2 - 9| = |x-3||x+3| < \\delta \\cdot 7 \\leq \\frac{\\varepsilon}{7} \\cdot 7 = \\varepsilon.\\;\\blacksquare",
+          annotation:
+            "Full chain: the first inequality uses the bound we proved with the restriction; the second uses the min choice. Every step is justified algebra.",
         },
       ],
       conclusion:
-        "The min(1, ε/7) trick is the standard technique for nonlinear ε-δ proofs: restrict δ once to bound variable factors, then solve. This method works for any polynomial — the only change is the specific bound M for the variable factor.",
+        "The min(1, ε/M) trick is the universal weapon for polynomials. The '1' is just a convenient cage size — you could choose 0.5 or 2; the proof still works. Aha! Without the restriction the variable factor would ruin the inequality. This is why quadratic (and higher) functions still satisfy the ε-δ definition and are continuous.",
     },
     {
       id: "ex-ed-rational",
-      title: "ε-δ Proof for 1/x (Bounding Away from Zero)",
+      title: "ε-δ Proof for 1/x — Full Algebraic Breakdown of the Difference",
       problem:
-        "Prove that \\displaystyle\\lim_{x \\to 2} \\frac{1}{x} = \\frac{1}{2}.",
+        "Prove using the ε-δ definition that \\displaystyle\\lim_{x \\to 2} \\frac{1}{x} = \\frac{1}{2}.",
       steps: [
         {
-          expression:
-            "\\left|\\frac{1}{x} - \\frac{1}{2}\\right| = \\left|\\frac{2-x}{2x}\\right| = \\frac{|x-2|}{2|x|}",
+          expression: "\\textbf{Reminder: ε-δ Definition}",
           annotation:
-            "Combine fractions and simplify. The output error involves 1/|x|, which blows up near 0.",
+            "We must make |f(x) - L| < ε whenever x is close to 2. Rational functions add the danger that the denominator can approach zero.",
         },
         {
           expression:
-            "\\text{Restrict: } \\delta \\leq 1, \\text{ so } |x-2| < 1 \\implies 1 < x < 3.",
+            "\\left|\\frac{1}{x} - \frac{1}{2}\\right| = \\left|\\frac{2 - x}{2x}\\right| = \\frac{|x-2|}{2|x|}",
           annotation:
-            "This keeps x away from 0, preventing 1/|x| from exploding.",
+            "Here is the exact algebra you asked for, step by step (no skipping!):\\n1. Common denominator: \\frac{1}{x} - \\frac{1}{2} = \\frac{2}{2x} - \\frac{x}{2x} = \\frac{2 - x}{2x}.\\n2. Absolute value: \\left|\\frac{2-x}{2x}\\right| = \\frac{|2-x|}{2|x|} (since 2 is positive).\\n3. |2-x| = |x-2| (absolute value property).\\nGotcha: many students forget to flip 2-x to |x-2| or drop the 2 in the denominator. This simplification is why we can proceed.",
         },
         {
-          expression: "\\text{Then } |x| > 1, \\text{ so } \\frac{1}{|x|} < 1.",
-          annotation: "On (1,3), the factor 1/|x| is bounded by 1.",
+          expression:
+            "\\text{Problem: the factor } \\frac{1}{|x|} \\text{ blows up as x approaches 0. We must keep x away from zero.}",
+          annotation:
+            "If x gets too close to 0 the error could become huge even if |x-2| is small. This is the new difficulty compared to polynomials.",
+        },
+        {
+          expression:
+            "\\textbf{Why we choose δ ≤ 1}: Force |x-2| < 1 so x is trapped in (1,3). Then |x| > 1, which means \\frac{1}{|x|} < 1 (a safe constant bound).",
+          annotation:
+            "Again, 1 is arbitrary but convenient — it guarantees x stays at least distance 1 from 0. Any number < 2 would work, but 1 is simplest. Without this cage, 1/|x| could be arbitrarily large and ruin the proof.",
+        },
+        {
+          expression:
+            "|x-2| < 1 \\implies 1 < x < 3 \\implies |x| > 1 \\implies \\frac{1}{|x|} < 1.",
+          annotation:
+            "Explicit interval check. Now the dangerous factor is bounded above by 1.",
         },
         {
           expression:
             "\\frac{|x-2|}{2|x|} < \\frac{|x-2|}{2 \\cdot 1} = \\frac{|x-2|}{2}",
+          annotation:
+            "Substitute the bound we just proved. The error is now controlled by |x-2|/2.",
+        },
+        {
+          expression:
+            "We need \\frac{|x-2|}{2} < \\varepsilon \\quad \\iff \\quad |x-2| < 2\\varepsilon.",
           annotation: "",
         },
         {
           expression:
-            "\\text{Need: } \\frac{|x-2|}{2} < \\varepsilon \\iff |x-2| < 2\\varepsilon.",
-          annotation: "",
+            "\\text{Therefore choose } \\delta = \\min\\left(1, 2\\varepsilon\\right).",
+          annotation:
+            "The min keeps the cage closed (δ ≤ 1) AND makes the error < ε (δ ≤ 2ε).",
         },
         {
-          expression: "\\text{Choose } \\delta = \\min(1, 2\\varepsilon).",
+          expression:
+            "\\textbf{Formal Proof: } \\text{Let } \\varepsilon > 0.\\text{ Choose } \\delta = \\min(1, 2\\varepsilon).",
           annotation: "",
         },
         {
           expression:
-            "\\textbf{Proof: } \\text{Given } \\varepsilon > 0, \\delta = \\min(1, 2\\varepsilon). \\text{ If } 0 < |x-2| < \\delta:",
-          annotation: "",
-        },
-        {
-          expression:
-            "\\left|\\frac{1}{x}-\\frac{1}{2}\\right| = \\frac{|x-2|}{2|x|} < \\frac{\\delta}{2} \\leq \\frac{2\\varepsilon}{2} = \\varepsilon.\\;\\blacksquare",
-          annotation: "",
+            "\\text{If } 0 < |x-2| < \\delta, \\text{ then } \\left|\\frac{1}{x}-\\frac{1}{2}\\right| = \\frac{|x-2|}{2|x|} < \\frac{\\delta}{2} \\leq \\frac{2\\varepsilon}{2} = \\varepsilon.\\;\\blacksquare",
+          annotation:
+            "Full chain: the middle inequality uses the bound |x| > 1 that came from the restriction. Every algebraic step above is now justified.",
         },
       ],
       conclusion:
-        "For rational functions, the extra challenge is keeping the denominator away from zero. The first restriction (δ ≤ 1) solves this. Once you have a lower bound on |x|, the rest follows the same pattern.",
+        "Aha! The restriction δ ≤ 1 is not arbitrary — it is the only way to prevent 1/|x| from exploding. The full algebraic simplification of the difference is the key that lets us reduce the problem to controlling |x-2|. Rational functions are continuous wherever defined precisely because we can always build such a cage.",
     },
     {
       id: "ex-ed-disprove",
-      title: "Using ε-δ to Prove a Limit Does NOT Exist",
+      title: "Using ε-δ to Prove a Limit Does NOT Exist (Oscillating Wildly)",
       problem:
-        "Prove that \\displaystyle\\lim_{x \\to 0} \\sin\\!\\left(\\frac{1}{x}\\right) does not exist.",
+        "Prove that \\displaystyle\\lim_{x \\to 0} \\sin\\left(\\frac{1}{x}\\right) does not exist.",
       steps: [
         {
           expression:
-            "\\text{Suppose for contradiction: } \\lim_{x \\to 0} \\sin(1/x) = L \\text{ for some } L.",
-          annotation: "Try to derive a contradiction from the ε-δ definition.",
-        },
-        {
-          expression:
-            "\\text{Take } \\varepsilon = \\frac{1}{2}. \\text{ Then } \\exists\\, \\delta > 0 \\text{ s.t. } 0 < |x| < \\delta \\implies |\\sin(1/x) - L| < \\frac{1}{2}.",
-          annotation: "If the limit existed, we could satisfy this tolerance.",
-        },
-        {
-          expression:
-            "\\text{Choose } x_1 = \\frac{1}{2n\\pi + \\pi/2} \\text{ (so } \\sin(1/x_1) = 1\\text{)}",
-          annotation: "For large enough n, x₁ is within δ of 0.",
-        },
-        {
-          expression:
-            "\\text{Choose } x_2 = \\frac{1}{2n\\pi - \\pi/2} \\text{ (so } \\sin(1/x_2) = -1\\text{)}",
-          annotation: "x₂ is also within δ of 0 (for large n).",
-        },
-        {
-          expression:
-            "|\\sin(1/x_1) - L| < 1/2 \\implies |1 - L| < 1/2 \\implies L > 1/2",
-          annotation: "From the ε-δ condition applied to x₁.",
-        },
-        {
-          expression:
-            "|\\sin(1/x_2) - L| < 1/2 \\implies |-1 - L| < 1/2 \\implies L < -1/2",
-          annotation: "From the ε-δ condition applied to x₂.",
-        },
-        {
-          expression:
-            "L > 1/2 \\text{ AND } L < -1/2 \\quad \\Rightarrow\\!\\Leftarrow",
+            "\\text{Assume for contradiction that the limit equals some L.}",
           annotation:
-            "Contradiction. No single L can be within 1/2 of both 1 and −1.",
+            "We will show this assumption leads to an impossible statement.",
+        },
+        {
+          expression:
+            "\\text{Let } \\varepsilon = \\frac{1}{2}. \\text{ If the limit existed, there would be a } \\delta > 0 \\text{ such that } 0 < |x| < \\delta \\implies \\left|\\sin(1/x) - L\\right| < \\frac{1}{2}.",
+          annotation:
+            "Pick a fixed ε = 1/2 (any positive number works; 1/2 makes the contradiction obvious).",
+        },
+        {
+          expression:
+            "\\text{Choose sequence } x_1 = \\frac{1}{2n\\pi + \\pi/2} \\text{ for large integer } n \\text{ so that } \\sin(1/x_1) = 1 \\text{ and } 0 < x_1 < \\delta.",
+          annotation:
+            "As n → ∞, x₁ → 0. At these points the function hits its maximum +1.",
+        },
+        {
+          expression:
+            "\\text{Choose sequence } x_2 = \\frac{1}{2n\\pi - \\pi/2} \\text{ for large integer } n \\text{ so that } \\sin(1/x_2) = -1 \\text{ and } 0 < x_2 < \\delta.",
+          annotation:
+            "Same n works for both; x₂ → 0 and the function hits its minimum -1.",
+        },
+        {
+          expression:
+            "Apply the supposed δ to x₁: |1 - L| < 1/2 \\implies L > 1/2.",
+          annotation: "",
+        },
+        {
+          expression:
+            "Apply the supposed δ to x₂: |-1 - L| < 1/2 \\implies L < -1/2.",
+          annotation: "",
+        },
+        {
+          expression:
+            "L > 1/2 and L < -1/2 is impossible for any real number L. Contradiction.\\;\\blacksquare",
+          annotation:
+            "Aha! The function keeps jumping between values that are distance 2 apart, no matter how small the neighborhood around 0. No single L can stay within ½ of both.",
         },
       ],
       conclusion:
-        'The function oscillates between −1 and +1 infinitely often near x=0, so no single value L can satisfy the ε-δ condition. This is the formal version of "the function has no settling point." The key technique: finding two sequences approaching 0 whose function values disagree by more than 2ε.',
+        "The ε-δ definition fails because we can always find points arbitrarily close to 0 where the function values differ by more than any fixed ε. This is the rigorous way to say 'the function oscillates infinitely often and never settles.'",
     },
     {
       id: "ex-ed-absolute-value",
-      title: "Physics: Precision Measurement as an ε-δ Problem",
+      title: "Real-World ε-δ: How Precisely Must a Sensor Be Calibrated?",
       problem:
-        "A thermometer measures temperature T(x) = 100 + 0.3x − 0.01x² degrees Celsius, where x is the sensor voltage in millivolts. To guarantee the temperature reading is within ε = 0.5°C of the true value T(10) = 102°C, how precisely must the voltage be controlled?",
+        "A thermometer reads T(x) = 100 + 0.3x − 0.01x² °C (x = voltage in mV). At x = 10 mV the true temperature is 102°C. To guarantee the reading stays within ±0.5°C of 102°C, how precisely must the voltage be controlled?",
       steps: [
         {
-          expression: "|T(x) - 102| = |100 + 0.3x - 0.01x^2 - 102|",
+          expression:
+            "|T(x) - 102| = |−0.01x² + 0.3x − 2| = 0.01 |x² - 30x + 200|",
           annotation:
-            "The output error: how far is the reading from the true value?",
-        },
-        { expression: "= |-0.01x^2 + 0.3x - 2|", annotation: "Simplify." },
-        {
-          expression: "= 0.01|x^2 - 30x + 200| = 0.01|(x-10)(x-20)|",
-          annotation: "Factor: x²−30x+200 = (x−10)(x−20).",
+            "Output error (temperature reading error). Factor the quadratic.",
         },
         {
-          expression: "= 0.01|x-10|\\cdot|x-20|",
+          expression: "= 0.01 |(x-10)(x-20)| = 0.01 |x-10| \\cdot |x-20|",
           annotation:
-            "The error is proportional to |x−10| (the input deviation).",
-        },
-        {
-          expression: "\\text{Restrict: } |x-10| < 1, \\text{ so } 9 < x < 11.",
-          annotation: "Bound the variable factor |x−20|.",
+            "Completely factored. Error is proportional to input deviation |x-10| times the variable |x-20|.",
         },
         {
           expression:
-            "\\text{Then } |x-20| \\in (9, 11), \\text{ so } |x-20| < 11.",
+            "\\text{Restrict } |x-10| < 1 \\implies 9 < x < 11 \\implies |x-20| < 11.",
+          annotation:
+            "Why 1? It creates a tiny safe interval around the operating point x=10 so |x-20| cannot get larger than 11. Any positive number < 10 would work; 1 is convenient.",
+        },
+        {
+          expression: "|T(x)-102| < 0.01 \\cdot |x-10| \\cdot 11 = 0.11 |x-10|",
+          annotation: "Substitute the bound we just created.",
+        },
+        {
+          expression: "We need 0.11 |x-10| < 0.5 \\implies |x-10| < 4.55.",
           annotation: "",
         },
         {
-          expression: "|T(x)-102| < 0.01 \\cdot |x-10| \\cdot 11 = 0.11|x-10|",
-          annotation: "",
-        },
-        {
-          expression: "\\text{Need: } 0.11|x-10| < 0.5 \\implies |x-10| < 4.55",
-          annotation: "",
-        },
-        {
-          expression: "\\delta = \\min(1, 4.55) = 1 \\text{ mV}",
-          annotation: "The restriction δ ≤ 1 is the binding constraint.",
+          expression:
+            "\\text{Therefore } \\delta = \\min(1, 4.55) = 1 \\text{ mV}.",
+          annotation:
+            "The binding constraint is the cage δ ≤ 1. Voltage must stay within ±1 mV of 10 mV.",
         },
       ],
       conclusion:
-        "The voltage must be controlled within ±1 mV of 10 mV to guarantee the temperature reading is within ±0.5°C. This is a real engineering ε-δ problem: given an output tolerance, find the required input precision. Every calibration procedure in science and manufacturing follows this pattern.",
+        "Aha! This is exactly how every sensor, scale, or medical device is calibrated in the real world. Given an allowed output error ε, we solve for the required input precision δ using the same ε-δ logic. The restriction step ensures the model stays well-behaved near the operating point.",
     },
     {
       id: "ex-ed-graph-delta",
-      title: "Graph-First ε-δ Extraction (From the Calc Problem Lab)",
+      title: "Graph-First Method — Why the min Appears Visually",
       problem:
-        "For f(x)=\\sqrt{x+1} at a=3 and L=2, find a valid δ when ε=0.5 using the graph-box method.",
+        "For f(x) = \\sqrt{x+1} at a = 3, L = 2, ε = 0.5, use the graph-box method to discover a valid δ.",
       visualizationId: "EpsilonDelta",
       params: {
         fn: "Math.sqrt(x+1)",
@@ -448,66 +487,90 @@ export default {
       steps: [
         {
           expression:
-            "L\\pm\\varepsilon: \\ y=2\\pm0.5 \\Rightarrow y=2.5,\\ 1.5",
-          annotation: "Draw horizontal bounds of the epsilon-strip.",
+            "Draw the horizontal ε-strip: y = 2 ± 0.5 (i.e., y = 1.5 and y = 2.5).",
+          annotation:
+            "These lines represent every y-value we are willing to accept as 'close enough' to L.",
         },
         {
           expression:
-            "\\sqrt{x+1}=2.5 \\Rightarrow x=5.25, \\quad \\sqrt{x+1}=1.5 \\Rightarrow x=1.25",
+            "Find intersection points: \\sqrt{x+1}=2.5 \\implies x=5.25; \\quad \\sqrt{x+1}=1.5 \\implies x=1.25.",
           annotation:
-            "Read/solve x exit points where graph meets strip boundaries.",
+            "Where the graph crosses the top and bottom of the strip.",
         },
         {
-          expression: "|5.25-3|=2.25,\\quad |1.25-3|=1.75",
-          annotation: "Measure both horizontal distances from a.",
+          expression:
+            "Right distance: |5.25 - 3| = 2.25. Left distance: |1.25 - 3| = 1.75.",
+          annotation: "",
         },
         {
-          expression: "\\delta=\\min(2.25,1.75)=1.75",
-          annotation: "Take the smaller side so both directions stay in-band.",
+          expression: "\\delta = \\min(2.25, 1.75) = 1.75.",
+          annotation:
+            "Aha! The graph itself forces us to take the smaller distance. This is exactly why the min appears in every algebraic proof — it guarantees the entire interval around a stays inside the ε-strip on both sides.",
         },
       ],
       conclusion:
-        "The graph method and formal definition agree: choosing δ=1.75 guarantees |f(x)-2|<0.5 whenever 0<|x-3|<δ.",
+        "The graph method and the algebraic min-trick are two views of the same idea. The smaller side always wins so both left and right approaches stay inside the tolerance band.",
     },
     {
       id: "ex-ed-proof-workflow",
-      title: "Scratch-Then-Formal Workflow (From the Calc Problem Lab)",
-      problem: "Prove with full workflow that lim_{x->2} x^2 = 4.",
+      title:
+        "The Universal Scratch-Then-Formal ε-δ Workflow (Template for All Nonlinear Proofs)",
+      problem:
+        "Prove \\displaystyle\\lim_{x \\to 2} x^2 = 4 using the complete workflow.",
       steps: [
         {
-          expression: "\\textbf{Scratch: } |x^2-4|=|x-2||x+2|",
-          annotation: "Start by isolating the controllable factor |x-2|.",
+          expression: "\\textbf{Scratch Work Phase (Planning)}",
+          annotation:
+            "We always start here to discover δ before writing the formal proof.",
         },
         {
-          expression: "|x-2|<1 \\Rightarrow 1<x<3 \\Rightarrow |x+2|<5",
-          annotation: "Local cage to bound the uncontrolled factor.",
+          expression: "|x^2 - 4| = |x-2| \\cdot |x+2|",
+          annotation: "Factor to isolate the controllable piece.",
         },
         {
-          expression: "|x^2-4|<5|x-2|",
-          annotation: "Now only one controllable factor remains.",
+          expression: "|x-2| < 1 \\implies 1 < x < 3 \\implies |x+2| < 5.",
+          annotation:
+            "Restriction cage (δ ≤ 1) — this is the step that bounds the variable factor. Why 1? Simple symmetric interval that works.",
         },
         {
-          expression: "\\delta=\\min(1,\\varepsilon/5)",
-          annotation: "One part keeps the cage valid, one part hits epsilon.",
+          expression: "|x^2 - 4| < 5 |x - 2|",
+          annotation: "Now the error is 5 times the controllable factor.",
         },
         {
           expression:
-            "0<|x-2|<\\delta \\Rightarrow |x^2-4|<5\\delta\\le 5(\\varepsilon/5)=\\varepsilon",
-          annotation: "Formal proof chain.",
+            "\\delta = \\min\\left(1, \\frac{\\varepsilon}{5}\\right).",
+          annotation: "Min keeps the cage closed AND makes error < ε.",
+        },
+        {
+          expression: "\\textbf{Formal Proof Phase}",
+          annotation:
+            "Now we write the clean version using what we discovered.",
+        },
+        {
+          expression:
+            "Let ε > 0. Choose δ = min(1, ε/5). Assume 0 < |x-2| < δ.",
+          annotation: "",
+        },
+        {
+          expression:
+            "Then |x^2-4| = |x-2||x+2| < δ · 5 ≤ (ε/5)·5 = ε.\\;\\blacksquare",
+          annotation:
+            "Full chain. Every inequality is justified by either the restriction or the min choice.",
         },
       ],
       conclusion:
-        "This two-phase pattern is the stable template for nearly every nonlinear ε-δ proof.",
+        "This two-phase workflow (scratch → formal) is the reliable template you can use for any polynomial, rational, or root function. The restriction step and the min are not optional — they are what make the proof work when the function is nonlinear. Master this pattern and every ε-δ proof becomes straightforward.",
     },
   ],
 
   story: {
-    title: 'The Skeptic\'s Game',
-    subtitle: 'For 150 years, calculus worked but nobody could prove why. The ε-δ definition fixed that — by turning "getting close" into a game you can always win.',
+    title: "The Skeptic's Game",
+    subtitle:
+      'For 150 years, calculus worked but nobody could prove why. The ε-δ definition fixed that — by turning "getting close" into a game you can always win.',
     acts: [
       {
-        label: 'The Scene',
-        title: 'A Challenge That Broke Mathematics',
+        label: "The Scene",
+        title: "A Challenge That Broke Mathematics",
         content: `The year is 1734. Calculus has been around for 60 years. Newton used it to predict planetary orbits. Leibniz used it to solve curves no one had solved before. Engineers are building things with it.
 
 And a bishop named George Berkeley publishes a pamphlet that breaks everything.
@@ -523,7 +586,7 @@ Then in 1821, a French mathematician named Augustin-Louis Cauchy publishes a tex
 Berkeley's ghost was finally caught.`,
       },
       {
-        label: 'Act I',
+        label: "Act I",
         title: 'Translating "Close" into Numbers — Error and Tolerance',
         content: `Before the definition, we need one tool: **absolute value as distance (error)**.
 
@@ -562,8 +625,8 @@ Why? $|A|$ is the distance from $A$ to zero. Saying that distance is less than $
 **Example:** $|x - 3| < 0.25$ means $-0.25 < x - 3 < 0.25$. Add 3 to all parts: $2.75 < x < 3.25$. So $x$ is within 0.25 of 3.`,
       },
       {
-        label: 'Act II',
-        title: 'The Game — Play It First, Understand It After',
+        label: "Act II",
+        title: "The Game — Play It First, Understand It After",
         content: `You claim: $\\lim_{x \\to 3}(2x + 1) = 7$.
 
 A skeptic does not believe you. They challenge you with an **output tolerance** $\\epsilon$ — how close the output must be to 7. You respond with an **input tolerance** $\\delta$ — how close you will keep $x$ to 3. If your $\\delta$ works, you win the round.
@@ -602,8 +665,8 @@ A skeptic does not believe you. They challenge you with an **output tolerance** 
 The skeptic can demand any precision. You can always deliver it. **The limit is real.**`,
       },
       {
-        label: 'Act III',
-        title: 'The Gear Ratio — Why δ Depends on the Machine',
+        label: "Act III",
+        title: "The Gear Ratio — Why δ Depends on the Machine",
         content: `You won every round by halving the skeptic's number. But don't let that trick you into thinking $\\delta$ is always $\\epsilon/2$. That fraction is the **gear ratio of your specific machine** — and it changes with every function.
 
 ---
@@ -630,8 +693,8 @@ The last row is the key insight: **for a curve, the gear ratio shifts as you mov
 The gear ratio is the derivative — that connection runs through all of calculus.`,
       },
       {
-        label: 'Act IV',
-        title: 'The Algebra Cheat Code — Reverse-Engineering Any Machine',
+        label: "Act IV",
+        title: "The Algebra Cheat Code — Reverse-Engineering Any Machine",
         content: `Now that you know the gear ratio is the key, here is the algebra procedure that finds it for **any** machine the skeptic throws at you.
 
 The four steps are always the same — only the function changes.
@@ -670,8 +733,8 @@ For a reduction gear ($f(x) = 0.1x$), step 3 gives $0.1|x - c| < \\epsilon$, so 
 The four steps are always the same. The gear ratio is whatever coefficient falls out in step 3.`,
       },
       {
-        label: 'Act V',
-        title: 'The Formal Definition — Every Word Earns Its Place',
+        label: "Act V",
+        title: "The Formal Definition — Every Word Earns Its Place",
         content: `Now write the game as a single precise statement.
 
 **The $\\epsilon$-$\\delta$ definition of a limit:**
@@ -695,8 +758,8 @@ Every word carries weight:
 The definition says nothing about infinity, motion, or time. It is a statement about numbers and inequalities — checkable, algebraic, airtight.`,
       },
       {
-        label: 'Act VI',
-        title: 'Writing the Proof — Two Phases, Every Step Shown',
+        label: "Act VI",
+        title: "Writing the Proof — Two Phases, Every Step Shown",
         content: `**Claim:** $\\lim_{x \\to 3}(2x + 1) = 7$.
 
 Every $\\epsilon$-$\\delta$ proof has two phases. Phase 1 is private scratch work — you find what $\\delta$ needs to be. Phase 2 is the public proof — you use that $\\delta$ to deliver the guarantee. The audience only sees Phase 2, but Phase 1 is where the real thinking happens.
@@ -747,8 +810,8 @@ start from $|x - c| < \\delta$ $\\longrightarrow$ algebra $\\longrightarrow$ arr
 Phase 1 is doing that chain in reverse to find $\\delta$. Phase 2 runs it forward as a clean proof.`,
       },
       {
-        label: 'Act VII',
-        title: 'Why the Definition Requires 0 < |x − c| — and What It Means',
+        label: "Act VII",
+        title: "Why the Definition Requires 0 < |x − c| — and What It Means",
         content: `One detail of the definition is subtle enough to deserve its own act.
 
 The condition is $0 < |x - c| < \\delta$, not just $|x - c| < \\delta$.
@@ -937,96 +1000,96 @@ $\\lim_{x \\to c} f(x) = L$ if and only if: for every $\\epsilon > 0$, there exi
     },
   ],
 
-
   // ─── Semantic Layer ───────────────────────────────────────────────────────
   semantics: {
-    "core": [
-        {
-            "symbol": "ε (epsilon)",
-            "meaning": "the output tolerance — how close f(x) must stay to L"
-        },
-        {
-            "symbol": "δ (delta)",
-            "meaning": "the input radius you choose — if x stays within δ of c, then f(x) stays within ε of L"
-        },
-        {
-            "symbol": "0 < |x-c| < δ",
-            "meaning": "x is close to c but not equal to c (strict inequality)"
-        },
-        {
-            "symbol": "|f(x) - L| < ε",
-            "meaning": "the output f(x) is within ε of L"
-        }
+    core: [
+      {
+        symbol: "ε (epsilon)",
+        meaning: "the output tolerance — how close f(x) must stay to L",
+      },
+      {
+        symbol: "δ (delta)",
+        meaning:
+          "the input radius you choose — if x stays within δ of c, then f(x) stays within ε of L",
+      },
+      {
+        symbol: "0 < |x-c| < δ",
+        meaning: "x is close to c but not equal to c (strict inequality)",
+      },
+      {
+        symbol: "|f(x) - L| < ε",
+        meaning: "the output f(x) is within ε of L",
+      },
     ],
-    "rulesOfThumb": [
-        "The ε-δ game: your opponent picks ε (any positive number). You must respond with a δ that works.",
-        "For polynomials: start by factoring |f(x)-L|. Bound the extra factor near c, then choose δ = min(1, ε/bound).",
-        "The phrase \"for all ε>0 there exists δ>0\" is the formal structure of every limit proof.",
-        "Direct substitution is the informal version of ε-δ for continuous functions."
-    ]
-},
+    rulesOfThumb: [
+      "The ε-δ game: your opponent picks ε (any positive number). You must respond with a δ that works.",
+      "For polynomials: start by factoring |f(x)-L|. Bound the extra factor near c, then choose δ = min(1, ε/bound).",
+      'The phrase "for all ε>0 there exists δ>0" is the formal structure of every limit proof.',
+      "Direct substitution is the informal version of ε-δ for continuous functions.",
+    ],
+  },
 
   // ─── Spiral Learning ─────────────────────────────────────────────────────
   spiral: {
-    "recoveryPoints": [
-        {
-            "lessonId": "ch1-intro-limits",
-            "label": "Ch. 1: Introduction to Limits (informal)",
-            "note": "You met the intuition: the limit is what f(x) approaches. ε-δ is the same idea made mathematically rigorous. Epsilon is the output tolerance; delta is the input radius that guarantees it."
-        },
-        {
-            "lessonId": "ch0-inequalities",
-            "label": "Ch. 0: Inequalities",
-            "note": "The triangle inequality |a+b| ≤ |a|+|b| appears in every ε-δ proof. Reviewing it now will make the proofs flow naturally."
-        }
+    recoveryPoints: [
+      {
+        lessonId: "ch1-intro-limits",
+        label: "Ch. 1: Introduction to Limits (informal)",
+        note: "You met the intuition: the limit is what f(x) approaches. ε-δ is the same idea made mathematically rigorous. Epsilon is the output tolerance; delta is the input radius that guarantees it.",
+      },
+      {
+        lessonId: "ch0-inequalities",
+        label: "Ch. 0: Inequalities",
+        note: "The triangle inequality |a+b| ≤ |a|+|b| appears in every ε-δ proof. Reviewing it now will make the proofs flow naturally.",
+      },
     ],
-    "futureLinks": [
-        {
-            "lessonId": "ch2-tangent-problem",
-            "label": "Ch. 2: Derivative Definition",
-            "note": "The derivative is defined as a limit. The ε-δ definition ensures that limit is unambiguously defined. If you ever need to rigorously prove a derivative, ε-δ is the foundation."
-        },
-        {
-            "lessonId": "ch1-continuity",
-            "label": "Ch. 1: Continuity",
-            "note": "The ε-δ definition of continuity is: for every ε>0 there exists δ>0 such that |x-c|<δ implies |f(x)-f(c)|<ε. This is the same structure, applied directly at c (not just near c)."
-        }
-    ]
-},
+    futureLinks: [
+      {
+        lessonId: "ch2-tangent-problem",
+        label: "Ch. 2: Derivative Definition",
+        note: "The derivative is defined as a limit. The ε-δ definition ensures that limit is unambiguously defined. If you ever need to rigorously prove a derivative, ε-δ is the foundation.",
+      },
+      {
+        lessonId: "ch1-continuity",
+        label: "Ch. 1: Continuity",
+        note: "The ε-δ definition of continuity is: for every ε>0 there exists δ>0 such that |x-c|<δ implies |f(x)-f(c)|<ε. This is the same structure, applied directly at c (not just near c).",
+      },
+    ],
+  },
 
   // ─── Assessment ──────────────────────────────────────────────────────────
   assessment: {
-    "questions": [
-        {
-            "id": "ed-assess-1",
-            "type": "choice",
-            "text": "In the ε-δ definition, who chooses ε first?",
-            "options": [
-                "You (the prover)",
-                "Your opponent (the challenger)",
-                "Both simultaneously",
-                "Neither — it is given by the problem"
-            ],
-            "answer": "Your opponent (the challenger)",
-            "hint": "The definition says \"for ALL ε > 0\" — meaning ε is arbitrary, chosen by a challenger. You must respond with a δ that works for that ε."
-        },
-        {
-            "id": "ed-assess-2",
-            "type": "input",
-            "text": "To prove lim(x→2) x² = 4 via ε-δ, we need δ = min(1, ε/?). What is the missing number?",
-            "answer": "5",
-            "hint": "Near x=2, |x+2| < 5 when δ ≤ 1. So |x²-4| = |x-2||x+2| < δ·5. Set δ = min(1, ε/5)."
-        }
-    ]
-},
+    questions: [
+      {
+        id: "ed-assess-1",
+        type: "choice",
+        text: "In the ε-δ definition, who chooses ε first?",
+        options: [
+          "You (the prover)",
+          "Your opponent (the challenger)",
+          "Both simultaneously",
+          "Neither — it is given by the problem",
+        ],
+        answer: "Your opponent (the challenger)",
+        hint: 'The definition says "for ALL ε > 0" — meaning ε is arbitrary, chosen by a challenger. You must respond with a δ that works for that ε.',
+      },
+      {
+        id: "ed-assess-2",
+        type: "input",
+        text: "To prove lim(x→2) x² = 4 via ε-δ, we need δ = min(1, ε/?). What is the missing number?",
+        answer: "5",
+        hint: "Near x=2, |x+2| < 5 when δ ≤ 1. So |x²-4| = |x-2||x+2| < δ·5. Set δ = min(1, ε/5).",
+      },
+    ],
+  },
 
   // ─── Mental Model Compression ────────────────────────────────────────────
   mentalModel: [
     "ε = output tolerance (any positive, chosen adversarially)",
     "δ = input radius (you choose this in response to ε)",
     "Proof structure: Given ε>0, let δ = …, then |x-c|<δ ⟹ |f(x)-L|<ε",
-    "Every limit you know informally has an ε-δ proof behind it"
-],
+    "Every limit you know informally has an ε-δ proof behind it",
+  ],
 
   checkpoints: [
     "read-intuition",
@@ -1040,92 +1103,111 @@ $\\lim_{x \\to c} f(x) = L$ if and only if: for every $\\epsilon > 0$, there exi
 
   quiz: [
     {
-      id: 'eps-delta-q1',
-      type: 'choice',
-      text: 'In the $\\varepsilon$-$\\delta$ definition, which quantity is chosen first by the challenger?',
-      options: ['$\\delta$', '$\\varepsilon$', 'Both simultaneously', 'Neither — the limit $L$ is chosen first'],
-      answer: '$\\varepsilon$',
-      hints: ['The definition says "for every $\\varepsilon > 0$" — the challenger picks $\\varepsilon$, then you find $\\delta$.'],
-      reviewSection: 'Intuition tab — the ε-δ game',
-    },
-    {
-      id: 'eps-delta-q2',
-      type: 'choice',
-      text: 'The formal $\\varepsilon$-$\\delta$ definition requires $0 < |x - c| < \\delta$. Why the strict inequality $0 < |x - c|$?',
+      id: "eps-delta-q1",
+      type: "choice",
+      text: "In the $\\varepsilon$-$\\delta$ definition, which quantity is chosen first by the challenger?",
       options: [
-        'To ensure $x$ is greater than $c$',
-        'To exclude $x = c$ — the limit only depends on what happens near $c$, not at $c$',
-        'To guarantee $\\delta$ is positive',
-        'To prevent division by zero',
+        "$\\delta$",
+        "$\\varepsilon$",
+        "Both simultaneously",
+        "Neither — the limit $L$ is chosen first",
       ],
-      answer: 'To exclude $x = c$ — the limit only depends on what happens near $c$, not at $c$',
-      hints: ['Limits can exist even where the function is undefined.'],
-      reviewSection: 'Math tab — ε-δ formal definition',
+      answer: "$\\varepsilon$",
+      hints: [
+        'The definition says "for every $\\varepsilon > 0$" — the challenger picks $\\varepsilon$, then you find $\\delta$.',
+      ],
+      reviewSection: "Intuition tab — the ε-δ game",
     },
     {
-      id: 'eps-delta-q3',
-      type: 'input',
-      text: 'For $f(x) = 2x + 1$ at $c = 3$, $L = 7$: compute $|f(x) - 7|$ in terms of $|x - 3|$. If the answer is $k|x-3|$, what is $k$?',
-      answer: '2',
-      hints: ['$|f(x) - 7| = |2x + 1 - 7| = |2x - 6| = 2|x - 3|$.'],
-      reviewSection: 'Intuition tab — the ε-δ game for a linear function',
+      id: "eps-delta-q2",
+      type: "choice",
+      text: "The formal $\\varepsilon$-$\\delta$ definition requires $0 < |x - c| < \\delta$. Why the strict inequality $0 < |x - c|$?",
+      options: [
+        "To ensure $x$ is greater than $c$",
+        "To exclude $x = c$ — the limit only depends on what happens near $c$, not at $c$",
+        "To guarantee $\\delta$ is positive",
+        "To prevent division by zero",
+      ],
+      answer:
+        "To exclude $x = c$ — the limit only depends on what happens near $c$, not at $c$",
+      hints: ["Limits can exist even where the function is undefined."],
+      reviewSection: "Math tab — ε-δ formal definition",
     },
     {
-      id: 'eps-delta-q4',
-      type: 'input',
-      text: 'For $\\lim_{x \\to 3}(2x+1) = 7$, the valid choice of $\\delta$ given $\\varepsilon$ is $\\delta = \\varepsilon / k$. What is $k$?',
-      answer: '2',
-      hints: ['From $|2x+1-7| = 2|x-3| < \\varepsilon$, you need $|x-3| < \\varepsilon/2$.'],
-      reviewSection: 'Math tab — finding δ for a linear function',
+      id: "eps-delta-q3",
+      type: "input",
+      text: "For $f(x) = 2x + 1$ at $c = 3$, $L = 7$: compute $|f(x) - 7|$ in terms of $|x - 3|$. If the answer is $k|x-3|$, what is $k$?",
+      answer: "2",
+      hints: ["$|f(x) - 7| = |2x + 1 - 7| = |2x - 6| = 2|x - 3|$."],
+      reviewSection: "Intuition tab — the ε-δ game for a linear function",
     },
     {
-      id: 'eps-delta-q5',
-      type: 'input',
-      text: 'For $\\lim_{x \\to 5}(4x+1) = 21$, compute $|(4x+1) - 21|$ in terms of $|x-5|$. The answer is $k|x-5|$; what is $k$?',
-      answer: '4',
-      hints: ['$|(4x+1)-21| = |4x-20| = 4|x-5|$.'],
-      reviewSection: 'Challenges tab — Challenge 1',
+      id: "eps-delta-q4",
+      type: "input",
+      text: "For $\\lim_{x \\to 3}(2x+1) = 7$, the valid choice of $\\delta$ given $\\varepsilon$ is $\\delta = \\varepsilon / k$. What is $k$?",
+      answer: "2",
+      hints: [
+        "From $|2x+1-7| = 2|x-3| < \\varepsilon$, you need $|x-3| < \\varepsilon/2$.",
+      ],
+      reviewSection: "Math tab — finding δ for a linear function",
     },
     {
-      id: 'eps-delta-q6',
-      type: 'input',
-      text: 'To prove $\\lim_{x \\to 5}(4x+1) = 21$ via $\\varepsilon$-$\\delta$, the correct choice is $\\delta = \\varepsilon / k$. What is $k$?',
-      answer: '4',
-      hints: ['Need $4|x-5| < \\varepsilon$, so $|x-5| < \\varepsilon/4$.'],
-      reviewSection: 'Challenges tab — Challenge 1',
+      id: "eps-delta-q5",
+      type: "input",
+      text: "For $\\lim_{x \\to 5}(4x+1) = 21$, compute $|(4x+1) - 21|$ in terms of $|x-5|$. The answer is $k|x-5|$; what is $k$?",
+      answer: "4",
+      hints: ["$|(4x+1)-21| = |4x-20| = 4|x-5|$."],
+      reviewSection: "Challenges tab — Challenge 1",
     },
     {
-      id: 'eps-delta-q7',
-      type: 'input',
-      text: 'For $f(x) = x^2$ near $c = 2$: factor $|x^2 - 4| = |x-2| \\cdot |x+2|$. If we restrict $\\delta \\leq 1$ so $x \\in (1, 3)$, what is the maximum value of $|x + 2|$ on this interval?',
-      answer: '5',
-      hints: ['On $(1, 3)$: $x + 2 \\in (3, 5)$, so $|x+2| < 5$.'],
-      reviewSection: 'Math tab — ε-δ for f(x) = x² at c = 2',
+      id: "eps-delta-q6",
+      type: "input",
+      text: "To prove $\\lim_{x \\to 5}(4x+1) = 21$ via $\\varepsilon$-$\\delta$, the correct choice is $\\delta = \\varepsilon / k$. What is $k$?",
+      answer: "4",
+      hints: ["Need $4|x-5| < \\varepsilon$, so $|x-5| < \\varepsilon/4$."],
+      reviewSection: "Challenges tab — Challenge 1",
     },
     {
-      id: 'eps-delta-q8',
-      type: 'input',
-      text: 'Using the result that $|x^2 - 4| < 5|x-2|$ near $c=2$, what is the correct choice of $\\delta$ to prove $\\lim_{x \\to 2} x^2 = 4$? Express as $\\min(1, \\varepsilon/k)$ — what is $k$?',
-      answer: '5',
-      hints: ['Need $5|x-2| < \\varepsilon$, so $|x-2| < \\varepsilon/5$. Use $\\delta = \\min(1, \\varepsilon/5)$.'],
-      reviewSection: 'Math tab — ε-δ for nonlinear functions (min trick)',
+      id: "eps-delta-q7",
+      type: "input",
+      text: "For $f(x) = x^2$ near $c = 2$: factor $|x^2 - 4| = |x-2| \\cdot |x+2|$. If we restrict $\\delta \\leq 1$ so $x \\in (1, 3)$, what is the maximum value of $|x + 2|$ on this interval?",
+      answer: "5",
+      hints: ["On $(1, 3)$: $x + 2 \\in (3, 5)$, so $|x+2| < 5$."],
+      reviewSection: "Math tab — ε-δ for f(x) = x² at c = 2",
     },
     {
-      id: 'eps-delta-q9',
-      type: 'choice',
-      text: 'For $f(x) = mx + b$ (a linear function), the correct $\\delta$ to prove $\\lim_{x \\to c} f(x) = mc + b$ is:',
-      options: ['$\\delta = \\varepsilon$', '$\\delta = \\varepsilon / |m|$', '$\\delta = |m| \\cdot \\varepsilon$', '$\\delta = \\varepsilon / b$'],
-      answer: '$\\delta = \\varepsilon / |m|$',
-      hints: ['$|f(x) - L| = |m(x-c)| = |m||x-c| < \\varepsilon$ requires $|x-c| < \\varepsilon/|m|$.'],
-      reviewSection: 'Math tab — two-phase ε-δ strategy',
+      id: "eps-delta-q8",
+      type: "input",
+      text: "Using the result that $|x^2 - 4| < 5|x-2|$ near $c=2$, what is the correct choice of $\\delta$ to prove $\\lim_{x \\to 2} x^2 = 4$? Express as $\\min(1, \\varepsilon/k)$ — what is $k$?",
+      answer: "5",
+      hints: [
+        "Need $5|x-2| < \\varepsilon$, so $|x-2| < \\varepsilon/5$. Use $\\delta = \\min(1, \\varepsilon/5)$.",
+      ],
+      reviewSection: "Math tab — ε-δ for nonlinear functions (min trick)",
     },
     {
-      id: 'eps-delta-q10',
-      type: 'input',
-      text: 'To prove $\\lim_{x \\to 1}(x^2 + 2x) = 3$, factor $|x^2+2x-3| = |x-1||x+3|$. Restricting $\\delta \\leq 1$ gives $x \\in (0, 2)$, so $|x+3| < k$. What is $k$?',
-      answer: '5',
-      hints: ['On $(0,2)$: $x + 3 \\in (3, 5)$, so $|x+3| < 5$.'],
-      reviewSection: 'Challenges tab — Challenge 2',
+      id: "eps-delta-q9",
+      type: "choice",
+      text: "For $f(x) = mx + b$ (a linear function), the correct $\\delta$ to prove $\\lim_{x \\to c} f(x) = mc + b$ is:",
+      options: [
+        "$\\delta = \\varepsilon$",
+        "$\\delta = \\varepsilon / |m|$",
+        "$\\delta = |m| \\cdot \\varepsilon$",
+        "$\\delta = \\varepsilon / b$",
+      ],
+      answer: "$\\delta = \\varepsilon / |m|$",
+      hints: [
+        "$|f(x) - L| = |m(x-c)| = |m||x-c| < \\varepsilon$ requires $|x-c| < \\varepsilon/|m|$.",
+      ],
+      reviewSection: "Math tab — two-phase ε-δ strategy",
+    },
+    {
+      id: "eps-delta-q10",
+      type: "input",
+      text: "To prove $\\lim_{x \\to 1}(x^2 + 2x) = 3$, factor $|x^2+2x-3| = |x-1||x+3|$. Restricting $\\delta \\leq 1$ gives $x \\in (0, 2)$, so $|x+3| < k$. What is $k$?",
+      answer: "5",
+      hints: ["On $(0,2)$: $x + 3 \\in (3, 5)$, so $|x+3| < 5$."],
+      reviewSection: "Challenges tab — Challenge 2",
     },
   ],
 };
