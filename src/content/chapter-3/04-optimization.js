@@ -295,222 +295,199 @@ fig.show()`,
       id: "ch3-004-ex1",
       title: "Fencing Problem: Maximize Rectangular Area",
       problem:
-        "\\text{You have 100 m of fence and want to enclose the largest possible rectangular area.}",
+        "\\text{You have exactly 100 meters of fencing and want to enclose the largest possible rectangular area.}",
       steps: [
         {
           expression:
-            "\\text{Draw a rectangle. Label length } x \\text{ and width } y.",
+            "\\text{Draw a rectangle and label one side length } x \\text{ meters, the adjacent side width } y \\text{ meters.}",
           annotation:
-            "Modeling step: The picture forces us to see the relationships. Opposite sides are equal, so we will need two lengths and two widths.",
+            "Modeling foundation: We must decide what to call the variables. Choosing x and y as adjacent sides is natural because opposite sides are equal. This choice immediately reveals the key relationship we will use.",
         },
         {
           expression:
-            "Total fence used: 2x + 2y = 100 \\quad \\Rightarrow \\quad x + y = 50.",
+            "Total fencing used = 2x + 2y = 100 \\quad \\text{or simplified: } x + y = 50.",
           annotation:
-            "This is the **constraint** — the fixed resource. It must always be true. We divide by 2 for simplicity, but the physical meaning remains: the sum of one length and one width is 50 m. Aha! The constraint links the two variables; we cannot choose them independently.",
-        },
-        {
-          expression: "Area to maximize: A = x \\cdot y.",
-          annotation:
-            "This is the **objective**. Area is the product because that is what 'enclosed space' physically means. We want to make this number as large as possible while respecting the fence limit.",
+            "This is the **constraint equation**. It represents the fixed resource: no matter how we choose the dimensions, the total length of fence must always be exactly 100 m. The factor of 2 appears because we need two lengths and two widths. The simplified form x + y = 50 means 'one length plus one width is always 50 m' — this is the core relationship that links x and y.",
         },
         {
           expression:
-            "From the constraint, solve for one variable: y = 50 - x.",
+            "The quantity we want to maximize is the enclosed area: A = x \\cdot y.",
           annotation:
-            "Modeling insight: We have two variables but only one equation, so we can express everything in terms of a single variable (x). This is the key modeling trick that turns geometry into a calculus problem.",
+            "Modeling the objective: Area is the product of length and width because that is the geometric definition of rectangular area. We are trying to make this product as large as possible while respecting the fixed-perimeter constraint.",
         },
         {
-          expression: "Substitute: A(x) = x(50 - x) = 50x - x^2.",
+          expression: "From the constraint, solve for y: y = 50 - x.",
           annotation:
-            "Now the area is a function of only the length x. Physically, as x increases, y decreases by the same amount — there is a direct trade-off enforced by the fixed fence.",
+            "Key modeling step: We have two variables but only one equation (the constraint). To turn this into a single-variable calculus problem, we express y in terms of x. Physically this says: 'If I make the length longer, I must make the width shorter by exactly the same amount to keep the total fence fixed.' This reveals the direct trade-off.",
+        },
+        {
+          expression: "Substitute into the area: A(x) = x(50 - x) = 50x - x^2.",
+          annotation:
+            "Now the area is a function of only x. The term −x² captures the penalty: as x increases, the loss in y hurts the product more and more (quadratic penalty).",
         },
         {
           expression: "A'(x) = 50 - 2x.",
           annotation:
-            "The derivative tells us how area changes when we change length x (while automatically adjusting y to keep the fence total 100 m).",
+            "The derivative tells us the rate at which area changes when we change length x (while y automatically adjusts to keep the fence total 100 m).",
         },
         {
           expression:
             "Set A'(x) = 0: 50 - 2x = 0 \\quad \\Rightarrow \\quad x = 25.",
           annotation:
-            "At x = 25 m the rate of change of area is zero — we have stopped gaining or losing area by changing the dimensions. This is the critical point.",
+            "At x = 25 m, the instantaneous rate of change of area is zero. This is the balance point where increasing x any further would decrease area as much as it increases it.",
         },
         {
           expression:
-            "y = 50 - 25 = 25 m. \\quad A = 25 \\times 25 = 625 \\text{ m}^2.",
+            "Then y = 50 - 25 = 25 m, \\quad A = 25 \\times 25 = 625 \\text{ m}^2.",
           annotation:
-            "Both sides equal 25 m: the rectangle is a square. Aha! The modeling shows that when resources are fixed, equal sides maximize the product (area). Any deviation (e.g., x=20, y=30) gives only 600 m² — less space for the same fence.",
+            "Both dimensions are equal: we get a square. Aha! When the total perimeter is fixed, the rectangle that maximizes area is always a square. Any deviation (e.g., 20 m by 30 m) gives only 600 m² — less enclosed space for the same fence.",
         },
       ],
       conclusion:
-        "The largest rectangular area is 625 m², achieved with a 25 m × 25 m square. The modeling insight is powerful: fixed perimeter forces a trade-off between length and width; calculus finds the balanced point where that trade-off is optimal.",
+        "The modeling insight is that a fixed resource (fence) creates a strict trade-off between length and width. Calculus finds the point where that trade-off is perfectly balanced — resulting in a square of area 625 m².",
     },
+
     {
       id: "ch3-004-ex2",
       title: "Open Box from a Sheet of Cardboard",
       problem:
-        "\\text{You have a 12 in × 8 in sheet of cardboard. You cut equal squares of side } x \\text{ from each corner and fold up the sides to form an open box. Maximize the volume.}",
+        "\\text{You have a 12 in × 8 in sheet of cardboard. Cut equal squares of side length } x \\text{ from each corner and fold up the sides to form an open box. Maximize the volume of the box.}",
       steps: [
         {
           expression:
-            "\\text{After cutting and folding: height = } x, \\text{ length = 12 - 2x, width = 8 - 2x.}",
+            "\\text{After cutting squares of side } x \\text{ from each corner and folding:}",
           annotation:
-            "Modeling: Each cut removes x from both ends of a side, so we subtract 2x. The height is exactly the cut size because we fold up the flaps. This relationship comes directly from the physical folding process.",
+            "Modeling the physical process: Cutting removes material from both ends of each side, so we subtract 2x from the original dimensions.",
+        },
+        {
+          expression:
+            "\\text{Height of box} = x, \\quad \\text{Length} = 12 - 2x, \\quad \\text{Width} = 8 - 2x.",
+          annotation:
+            "These three relationships come directly from the geometry of folding. Notice that all three dimensions depend on the single decision variable x — the cut size.",
         },
         {
           expression:
             "Volume V = \\text{length} \\times \\text{width} \\times \\text{height} = (12-2x)(8-2x)x.",
           annotation:
-            "Volume is the product of the three inside dimensions. We choose x as the single decision variable because the geometry forces all three dimensions to depend on the same cut size.",
+            "Volume is the product of the three inside dimensions. This is the objective we want to maximize.",
         },
         {
-          expression: "Domain: 0 < x < 4 \\text{ (because 8-2x > 0)}.",
+          expression:
+            "Domain: 0 < x < 4 \\text{ inches (because width 8-2x must stay positive)}.",
           annotation:
-            "Modeling constraint: all dimensions must be positive. The shorter original side (8 in) gives the tighter limit x < 4.",
+            "Modeling constraint from reality: all dimensions must be positive. The shorter original side (8 in) gives the stricter upper limit on x.",
         },
         {
           expression: "Expand: V(x) = 4x^3 - 40x^2 + 96x.",
           annotation:
-            "We expand fully so the derivative is easy. The algebra here represents the physical expansion of the base and multiplication by height.",
+            "We expand so the derivative is simple. The cubic term comes from height × the x² part of the base expansion.",
         },
         {
           expression: "V'(x) = 12x^2 - 80x + 96.",
           annotation:
-            "The derivative tells how volume changes as we change the cut size x (while the folding geometry automatically adjusts length and width).",
+            "The derivative shows how volume changes as we change the cut size x. Positive derivative means increasing x still increases volume; negative means it decreases volume.",
         },
         {
           expression:
-            "Solve 12x^2 - 80x + 96 = 0 \\quad \\Rightarrow \\quad x = \\frac{10 \\pm 2\\sqrt{7}}{3}.",
+            "Solve V'(x) = 0 to get x = \\frac{10 - 2\\sqrt{7}}{3} \\approx 1.57 \\text{ in (the only root in (0,4))}.",
           annotation:
-            "Quadratic formula after simplifying. Only the smaller root x ≈ 1.57 in lies inside the physical domain (0,4). The larger root is impossible — it would make width negative.",
+            "Only one physically meaningful solution. The other root is invalid because it would make width negative.",
         },
         {
           expression:
             "At x ≈ 1.57 in: length ≈ 8.86 in, width ≈ 4.86 in, height ≈ 1.57 in, V ≈ 67.6 in³.",
           annotation:
-            "Aha! The optimal cut is roughly the same as the final height. Cutting too little wastes height; cutting too much shrinks the base too much — the calculus finds the sweet spot in that trade-off.",
+            "Aha! At the optimum, the cut size x is roughly equal to the final height. Increasing x gains height but loses base area; the calculus finds where these two effects exactly balance.",
         },
       ],
       conclusion:
-        "Maximum volume ≈ 67.6 in³ when squares of side ≈1.57 in are cut. The modeling shows that volume is a balance between gaining height and losing base area; calculus locates the best compromise.",
+        "The modeling shows volume is a compromise between gaining height and losing base area. The optimal cut size balances that compromise, giving maximum volume ≈67.6 in³.",
     },
+
     {
       id: "ch3-004-ex3",
-      title: "Minimum Surface Area for a Can with Fixed Volume",
+      title: "Minimum Surface Area Tin Can",
       problem:
-        "\\text{Design a cylindrical can with volume exactly 500 cm³ that uses the least possible material (surface area).}",
+        "\\text{Design a cylindrical can that holds exactly 500 cm³ of soup while using the least possible amount of metal (surface area).}",
       steps: [
         {
           expression:
-            "\\text{Let } r = \\text{radius of base}, \\quad h = \\text{height}.",
+            "\\text{Let } r = \\text{radius of the circular base}, \\quad h = \\text{height of the cylinder}.",
           annotation:
-            "Modeling choice: r and h are the natural dimensions that determine both volume and surface area.",
+            "Modeling choice: These two dimensions completely determine both volume and surface area.",
+        },
+        {
+          expression: "Fixed volume relationship: \\pi r^2 h = 500.",
+          annotation:
+            "This equation encodes the customer requirement: the can must hold exactly 500 cm³. It links r and h — if you make the can wider (larger r), you must make it shorter (smaller h) to keep volume constant.",
+        },
+        {
+          expression: "Solve for h: h = \\frac{500}{\\pi r^2}.",
+          annotation:
+            "This shows the direct inverse-square relationship: doubling radius requires dividing height by 4 to keep volume the same.",
         },
         {
           expression:
-            "Volume constraint: \\pi r^2 h = 500 \\quad \\Rightarrow \\quad h = \\frac{500}{\\pi r^2}.",
+            "Surface area (material used): SA = 2\\pi r^2 + 2\\pi r h \\text{ (two lids + side wall)}.",
           annotation:
-            "The volume relationship is fixed by the product requirement. Solving for h shows how height must change when we change radius to keep volume constant.",
-        },
-        {
-          expression:
-            "Surface area SA = 2\\pi r^2 + 2\\pi r h \\text{ (two ends + side)}.",
-          annotation:
-            "Material used: two circular lids plus the rectangular side when unrolled. This is the objective we want to minimize.",
+            "Objective: minimize total metal. The 2πr² term is the two circular ends; 2πrh is the rectangular side when unrolled.",
         },
         {
           expression: "Substitute h: SA(r) = 2\\pi r^2 + \\frac{1000}{r}.",
           annotation:
-            "Aha! As r increases, the two ends get larger (r² term) but the side gets smaller (1/r term). There is a trade-off between wide/short cans and tall/thin cans.",
+            "Aha! Trade-off appears clearly: larger r makes the lids more expensive (r² term grows), but makes the side wall cheaper (1/r term shrinks).",
         },
         {
-          expression: "SA'(r) = 4\\pi r - \\frac{1000}{r^2} = 0.",
+          expression: "At the minimum we find h = 2r.",
           annotation:
-            "The derivative balances the rate at which area increases from the ends against the rate it decreases from the side.",
-        },
-        {
-          expression:
-            "Solving gives r^3 = 250/\\pi \\quad \\Rightarrow \\quad h = 2r.",
-          annotation:
-            "Remarkable modeling result: at the minimum, height equals diameter. The optimal can is as tall as it is wide — a 'square' cylinder in cross-section.",
+            "Remarkable modeling result: the can that uses least material has height exactly equal to its diameter — it is 'square' in side view.",
         },
       ],
       conclusion:
-        "The material-minimizing can has height exactly equal to its diameter. In reality, cans are often taller because the lids are more expensive to manufacture than the side wall — the pure mathematical minimum ignores differing material costs.",
+        "The modeling reveals a clear trade-off between lid area and side area. Calculus finds the perfect balance where height equals diameter.",
     },
+
     {
       id: "ch3-004-ex10",
       title: "Farmer with a River — Three Sides of Fence",
       problem:
-        "\\text{A farmer has 240 m of fence and wants to enclose the largest rectangular area against a straight river (no fence needed along the river).}",
+        "\\text{A farmer has 240 m of fence and a straight river. Maximize the rectangular grazing area using the river as one side (no fence needed along the river).}",
       steps: [
         {
           expression:
-            "\\text{Let } x = \\text{side parallel to the river}, \\quad y = \\text{side perpendicular to the river}.",
+            "\\text{Let } x = \\text{length parallel to the river}, \\quad y = \\text{depth perpendicular to the river}.",
           annotation:
-            "Modeling: Only three sides need fence — one long side parallel to the river and two perpendicular sides.",
+            "Modeling: Only three sides need fence — one long side parallel to river and two short sides perpendicular to it.",
         },
         {
-          expression: "Constraint: x + 2y = 240.",
+          expression: "Fence constraint: x + 2y = 240.",
           annotation:
-            "The river provides the fourth side for free, so the fence equation has only three terms.",
+            "The river provides the fourth side for free, so the equation has only three fence segments.",
         },
         {
-          expression: "Area A = x \\cdot y.",
-          annotation: "The enclosed grazing area is still length times width.",
+          expression: "Area to maximize: A = x \\cdot y.",
+          annotation: "Grazing area is still length times width.",
         },
         {
-          expression: "Solve for y: y = 120 - x/2.",
+          expression: "Solve constraint for y: y = 120 - \\frac{x}{2}.",
           annotation:
-            "Express area in terms of one variable. Notice the coefficient 1/2 — each meter added to x costs half a meter from each perpendicular side.",
+            "Each extra meter of x costs half a meter from each perpendicular side — the trade-off coefficient is 1/2.",
         },
         {
-          expression: "A(x) = x(120 - x/2) = 120x - (1/2)x^2.",
+          expression:
+            "A(x) = x\\left(120 - \\frac{x}{2}\\right) = 120x - \\frac{1}{2}x^2.",
           annotation:
-            "The negative quadratic term reflects the trade-off: longer x means shorter y.",
+            "The negative quadratic term reflects the penalty of making x too large.",
         },
         {
           expression:
             "A'(x) = 120 - x = 0 \\quad \\Rightarrow \\quad x = 120 \\text{ m}, \\quad y = 60 \\text{ m}.",
           annotation:
-            "Aha! The optimal shape has the side parallel to the river twice as long as the perpendicular sides. This is a classic modeling result when one side is free.",
+            "Aha! Optimal shape has the side parallel to the river twice as long as the perpendicular sides. When one side is free, the rectangle becomes twice as wide as it is deep.",
         },
       ],
       conclusion:
-        "Maximum area is 7200 m² with dimensions 120 m (parallel to river) by 60 m. The modeling insight: when one boundary is free, the optimal rectangle is twice as wide as it is deep.",
-    },
-    {
-      id: "ch3-004-ex11",
-      title: "Rectangle Inscribed in a Semicircle",
-      problem:
-        "\\text{Maximize the area of a rectangle inscribed in a semicircle of radius 5 cm with base on the diameter.}",
-      steps: [
-        {
-          expression:
-            "\\text{Let } x = \\text{half the base}, \\quad y = \\text{height of rectangle}.",
-          annotation:
-            "Modeling: Symmetry suggests using half the base. The corner of the rectangle lies on the semicircle.",
-        },
-        {
-          expression:
-            "Relationship from geometry: x^2 + y^2 = 25 \\quad \\Rightarrow \\quad y = \\sqrt{25 - x^2}.",
-          annotation:
-            "Pythagorean theorem on the right triangle formed by radius, half-base, and height. This is the key modeling constraint.",
-        },
-        {
-          expression: "Area A = 2x \\cdot y = 2x \\sqrt{25 - x^2}.",
-          annotation: "Full base is 2x, so area is base times height.",
-        },
-        {
-          expression:
-            "After differentiation and solving: x = \\frac{5}{\\sqrt{2}} \\approx 3.535 \\text{ cm}, \\quad y = \\frac{5}{\\sqrt{2}} \\text{ cm}.",
-          annotation:
-            "Aha! At the maximum, height equals half-base, so the rectangle is actually a square inscribed in the semicircle.",
-        },
-      ],
-      conclusion:
-        "Even when forced to fit inside a curved boundary, the maximum-area rectangle turns out to be a square. The modeling relationship (Pythagorean) combined with calculus reveals this hidden symmetry.",
+        "Maximum area is 7200 m². The modeling insight: a free boundary changes the optimal proportions dramatically.",
     },
   ],
   story: {

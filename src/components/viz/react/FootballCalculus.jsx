@@ -1,14 +1,27 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
+function useIsDark() {
+  const [dark, setDark] = useState(
+    () => window.matchMedia("(prefers-color-scheme: dark)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e) => setDark(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return dark;
+}
+
 // ─── Isometric 2.5D projection ───────────────────────────────────────────────
-const W = 820,
-  H = 480;
+const W = 1000,
+  H = 600;
 const ISO = {
-  originX: 60,
-  originY: 340,
-  xScale: 6.2,
-  yScale: 2.8,
-  zScale: 28,
+  originX: 80,
+  originY: 450,
+  xScale: 8.0,
+  yScale: 3.2,
+  zScale: 8,
   tilt: 0.42,
 };
 
@@ -91,7 +104,13 @@ function ballArc(t, tThrow, tLand, peakZ = 3.5) {
 // ─── Canvas drawing ───────────────────────────────────────────────────────────
 function drawIsoField(ctx) {
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = "#0a1628";
+  // Sky gradient — more dramatic with larger canvas
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, "#060e18");
+  sky.addColorStop(0.45, "#0a1a2e");
+  sky.addColorStop(0.7, "#0d2035");
+  sky.addColorStop(1, "#112840");
+  ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
 
   const c1 = proj(0, -26.5),
@@ -125,10 +144,11 @@ function drawIsoField(ctx) {
     ctx.fill();
   }
 
+  // Endzones with richer colors and labels
   [
-    [0, 10, "#7f1d1d"],
-    [90, 100, "#1e3a5f"],
-  ].forEach(([x0, x1, col]) => {
+    [0, 10, "#7c1d1d", "HOME"],
+    [90, 100, "#1a3a6e", "AWAY"],
+  ].forEach(([x0, x1, col, label]) => {
     const a = proj(x0, -26.5),
       b = proj(x1, -26.5),
       c = proj(x1, 26.5),
@@ -140,9 +160,18 @@ function drawIsoField(ctx) {
     ctx.lineTo(d.cx, d.cy);
     ctx.closePath();
     ctx.fillStyle = col;
-    ctx.globalAlpha = 0.75;
+    ctx.globalAlpha = 0.88;
     ctx.fill();
     ctx.globalAlpha = 1;
+    // Endzone label
+    const mid = proj((x0 + x1) / 2, 0);
+    ctx.save();
+    ctx.font = "bold 11px sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, mid.cx, mid.cy);
+    ctx.restore();
   });
 
   for (let yd = 10; yd <= 90; yd += 10) {
@@ -352,6 +381,35 @@ function drawLeadPoint(ctx, fdx, fdy, color) {
   ctx.stroke();
 }
 
+// ─── Position jitter (re-randomized each play/remix) ─────────────────────────
+// Applies ±3 yd offsets to defender starting positions so every attempt is
+// slightly different. Offense/QB positions stay fixed so the math is consistent.
+function makeJitter(play) {
+  const offsets = {};
+  play.players.forEach((p) => {
+    if (!p.offense && !p.controlled && !p.dynamic) {
+      // Random offset: ±2.5 yards in x, ±2.5 yards in y
+      offsets[p.id] = {
+        dx: (Math.random() - 0.5) * 5,
+        dy: (Math.random() - 0.5) * 5,
+      };
+    }
+  });
+  return offsets;
+}
+
+function applyJitter(play, offsets) {
+  if (!offsets || Object.keys(offsets).length === 0) return play;
+  return {
+    ...play,
+    players: play.players.map((p) => {
+      const o = offsets[p.id];
+      if (!o) return p;
+      return { ...p, x0: p.x0 + o.dx, y0: p.y0 + o.dy };
+    }),
+  };
+}
+
 // ─── PLAYS ────────────────────────────────────────────────────────────────────
 const PLAYS = [
   // ══════════════════════════════════════════════════════════════════════
@@ -368,38 +426,40 @@ const PLAYS = [
     concept: "Integration · x(t) = x₀ + ∫v dt",
     color: "#22c55e",
     description:
-      "WR1 runs a slant. Write x_r(t) and y_r(t), then find throw time T so the ball arrives WHERE THE RECEIVER WILL BE — not where he is now. Ball speed = 28 yd/s.",
+      "WR1 runs a slant at 10 yd/s. Write x_r(t) and y_r(t), then find throw time T so the ball arrives WHERE THE RECEIVER WILL BE — not where he is now. Ball speed = 30 yd/s.",
     theory: [
       "CONCEPT: Integration gives position from velocity.",
-      "WR1 starts at (30, 10). Velocity: vx=5, vy=−3 yd/s.",
-      "x_r(t) = 30 + ∫₀ᵗ 5 dτ = 30 + 5t",
-      "y_r(t) = 10 + ∫₀ᵗ (−3) dτ = 10 − 3t",
-      "QB at (28, 0). Ball speed v_b = 28 yd/s.",
-      "At throw T: WR1 is at (x_r(T), y_r(T)).",
-      "Flight time: t_f = dist(QB, WR1(T)) / 28",
-      "Ball lands at T + t_f. WR1 also moves during t_f!",
-      "True target = WR1(T + t_f), NOT WR1(T).",
-      "Iterate: guess T, compute t_f, check WR1(T+t_f).",
-      "Try T ≈ 0.8s. Hint: at T=1.0, WR1 = (35, 7).",
+      "WHY: If you know how fast a receiver moves each instant (velocity), you can add up all those tiny displacements to find where he ends up — that's what an integral does.",
+      "WR1 runs at constant velocity: vx=10, vy=−6 yd/s.",
+      "DERIVE: x_r(t) = x₀ + ∫₀ᵗ vx dτ = 30 + 10t",
+      "       y_r(t) = y₀ + ∫₀ᵗ vy dτ = 10 − 6t",
+      "KEY INSIGHT: Don't throw to where WR is — throw to where he'll BE when the ball arrives.",
+      "STEP 1: Write x_r(t) and y_r(t) using integration.",
+      "STEP 2: Pick throw time T. Compute WR1 position at T.",
+      "STEP 3: t_f = dist(QB → WR1(T)) / 30. Ball arrives at T + t_f.",
+      "STEP 4: WR1 is still moving! True target = WR1(T + t_f).",
+      "STEP 5: Adjust T until ball meets receiver.",
+      "CHECK: At T=0.5s → WR1 at (35, 7). Ball flight ≈ 0.3s.",
+      "→ Target WR at t=0.8s = (38, 5.2). Try T=0.5.",
     ],
     inputs: [
       {
         id: "rx",
         label: "x_r(t) — WR1 downfield position (yd):",
-        placeholder: "30 + 5*t",
-        hint: "Starts 30 yd, runs 5 yd/s downfield",
+        placeholder: "30 + 10*t",
+        hint: "Starts 30 yd, runs 10 yd/s downfield",
       },
       {
         id: "ry",
         label: "y_r(t) — WR1 lateral position (yd from center):",
-        placeholder: "10 - 3*t",
-        hint: "Starts +10 yd, cuts inside at 3 yd/s",
+        placeholder: "10 - 6*t",
+        hint: "Starts +10 yd, cuts inside at 6 yd/s",
       },
       {
         id: "T",
         label: "Throw at time T (seconds after snap):",
         placeholder: "1.0",
-        hint: "Ball must reach WR1's FUTURE position. Try T = 0.5 to 1.5",
+        hint: "Ball must reach WR1's FUTURE position. Try T = 0.3 to 1.0",
       },
     ],
     players: [
@@ -418,7 +478,7 @@ const PLAYS = [
         y0: 10,
         color: "#f97316",
         label: "WR1",
-        segs: [{ vx: 5, vy: -3 }],
+        segs: [{ vx: 10, vy: -6 }],
         offense: true,
       },
       {
@@ -427,7 +487,7 @@ const PLAYS = [
         y0: 22,
         color: "#fb923c",
         label: "WR2",
-        segs: [{ vx: 5, vy: 0 }],
+        segs: [{ vx: 10, vy: 0 }],
         offense: true,
       },
       {
@@ -436,7 +496,7 @@ const PLAYS = [
         y0: 11,
         color: "#f87171",
         label: "CB",
-        segs: [{ vx: 4.5, vy: -2.5 }],
+        segs: [{ vx: 9, vy: -5 }],
         offense: false,
       },
       {
@@ -445,7 +505,7 @@ const PLAYS = [
         y0: 23,
         color: "#fca5a5",
         label: "CB2",
-        segs: [{ vx: 5, vy: 0 }],
+        segs: [{ vx: 10, vy: 0 }],
         offense: false,
       },
       {
@@ -455,8 +515,8 @@ const PLAYS = [
         color: "#c084fc",
         label: "LB",
         segs: [
-          { dur: 0.8, vx: -1, vy: 3 },
-          { vx: -0.5, vy: 0 },
+          { dur: 0.8, vx: -2, vy: 6 },
+          { vx: -1, vy: 0 },
         ],
         offense: false,
       },
@@ -466,16 +526,16 @@ const PLAYS = [
         y0: 8,
         color: "#a855f7",
         label: "S",
-        segs: [{ vx: -2, vy: -3 }],
+        segs: [{ vx: -4, vy: -6 }],
         offense: false,
       },
     ],
     qbId: "QB",
     targetId: "WR1",
     coverId: "CB1",
-    vBall: 28,
+    vBall: 30,
     catchR: 1.8,
-    peakZ: 4,
+    peakZ: 3,
     run(inputs) {
       const rx_fn = parseExpr(inputs.rx, ["t"]);
       const ry_fn = parseExpr(inputs.ry, ["t"]);
@@ -628,7 +688,8 @@ const PLAYS = [
       "dD/dt = [(x_d−x_c)vdx + (y_d−y_c)vdy] / D",
       "Negative dD/dt = window closing.",
       "t_close = D₀ / |dD/dt|  (time to close)",
-      "Ball flight time: t_f = dist(QB→catch) / 28",
+      "Ball flight time: t_f = dist(QB→catch) / 30",
+      ,
       "Throw at T where: T + t_f < t_close",
       "WR1 seam at (50, 12). CB1 closing fast.",
       "WR2 cross at (46, −10). Safety closing slow.",
@@ -644,7 +705,7 @@ const PLAYS = [
       {
         id: "dD2",
         label: "Closure rate on WR2 catch pt — dD₂/dt (yd/s):",
-        placeholder: "-3.5",
+        placeholder: "-5",
         hint: "Safety approaches WR2 catch pt. Should be less negative = window open longer.",
       },
       {
@@ -676,7 +737,7 @@ const PLAYS = [
         y0: 12,
         color: "#f97316",
         label: "WR1",
-        segs: [{ vx: 6, vy: 0 }],
+        segs: [{ vx: 10, vy: 0 }],
         offense: true,
       },
       {
@@ -685,7 +746,7 @@ const PLAYS = [
         y0: -10,
         color: "#fb923c",
         label: "WR2",
-        segs: [{ vx: 5, vy: -1 }],
+        segs: [{ vx: 9, vy: -2 }],
         offense: true,
       },
       {
@@ -694,7 +755,7 @@ const PLAYS = [
         y0: 17,
         color: "#f87171",
         label: "CB1",
-        segs: [{ vx: 5, vy: -3 }],
+        segs: [{ vx: 9, vy: -5 }],
         offense: false,
       },
       {
@@ -703,7 +764,7 @@ const PLAYS = [
         y0: 3,
         color: "#a855f7",
         label: "S",
-        segs: [{ vx: 3, vy: -5 }],
+        segs: [{ vx: 5, vy: -2 }],
         offense: false,
       },
       {
@@ -712,16 +773,16 @@ const PLAYS = [
         y0: -3,
         color: "#c084fc",
         label: "LB",
-        segs: [{ vx: 2, vy: -2 }],
+        segs: [{ vx: 4, vy: -3 }],
         offense: false,
       },
     ],
     catchPts: { WR1: { x: 50, y: 12 }, WR2: { x: 46, y: -10 } },
     coverIds: { WR1: "CB1", WR2: "S" },
     qbId: "QB",
-    vBall: 28,
+    vBall: 30,
     catchR: 2,
-    peakZ: 5,
+    peakZ: 4,
     run(inputs) {
       const dD1 = parseFloat(inputs.dD1),
         dD2 = parseFloat(inputs.dD2);
@@ -869,31 +930,33 @@ const PLAYS = [
     description:
       "The offense threw a pass. YOU control CB★ with velocity equations vx(t) and vy(t). Reach the ball's position before the WR does. Speed cap: 12 yd/s.",
     theory: [
-      "CONCEPT: Two parametric paths, find intersection.",
-      "Ball thrown t=1.2s from QB(28,0) toward WR future pos.",
-      "WR runs: vx=6, vy=1 yd/s from (30,12).",
-      "WR at catch t≈2.5s: (39, 13.5).",
-      "Ball path: x_b(t) = 28 + vbx·(t−1.2)",
-      "           y_b(t) = 0  + vby·(t−1.2)",
-      "Your CB★ starts at (55, −14):",
+      "CONCEPT: Parametric paths — two curves that may intersect at time t*.",
+      "WHY: Both you (CB) and the ball trace paths parameterized by time. Finding t* where your path meets the ball's path is the interception problem.",
+      "Ball path (thrown at t=1.2s):",
+      "x_b(t) = 28 + vbx·(t−1.2)",
+      "y_b(t) = 0  + vby·(t−1.2)",
+      "Your CB path:",
       "x_cb(t) = 55 + ∫₀ᵗ vx(τ) dτ",
       "y_cb(t) = −14 + ∫₀ᵗ vy(τ) dτ",
-      "Intercept: find t* where |CB(t*) − ball(t*)| < 2.5",
-      "AND CB must arrive BEFORE WR arrives.",
-      "Hint: ball peaks around (39,13). Run at vy ≈ 10–12.",
+      "INTERCEPT CONDITION: |CB(t*) − ball(t*)| < 2.5 yd",
+      "AND you must arrive BEFORE the WR (at t ≈ 2.5s).",
+      "STEP 1: Find where ball is headed — WR catches near (42, 16).",
+      "STEP 2: You're at (55, −14). You need ~30 yd lateral in ~1.5s.",
+      "STEP 3: vy ≈ 30/1.5 ≈ 12 yd/s. vx ≈ −5 to −6 yd/s.",
+      "STEP 4: Adjust until your path intersects ball path first.",
     ],
     inputs: [
       {
         id: "vx",
         label: "CB★ vx(t) — downfield velocity (yd/s, can use t):",
         placeholder: "-4",
-        hint: "CB at x=55, ball near x=39. Need to move left (negative). Try: −4 or −5+t",
+        hint: "CB at x=55, ball near x=42. Need to move left (negative). Try: −5 or −6+t",
       },
       {
         id: "vy",
         label: "CB★ vy(t) — lateral velocity (yd/s, can use t):",
         placeholder: "11",
-        hint: "CB at y=−14, ball near y=13. Need ~27 yd laterally. At 11 yd/s → ≈2.5s.",
+        hint: "CB at y=−14, ball near y=16. Need ~30 yd laterally. At 12 yd/s → ≈2.5s.",
       },
     ],
     players: [
@@ -912,7 +975,7 @@ const PLAYS = [
         y0: 12,
         color: "#f97316",
         label: "WR",
-        segs: [{ vx: 6, vy: 1 }],
+        segs: [{ vx: 10, vy: 2 }],
         offense: true,
       },
       {
@@ -931,15 +994,15 @@ const PLAYS = [
         y0: 5,
         color: "#a855f7",
         label: "S",
-        segs: [{ vx: -2, vy: 4 }],
+        segs: [{ vx: -4, vy: 4 }],
         offense: false,
       },
     ],
     throwT: 1.2,
     throwFrom: { x: 28, y: 0 },
-    vBall: 28,
+    vBall: 30,
     catchR: 2.5,
-    peakZ: 6,
+    peakZ: 4,
     run(inputs) {
       const vx_fn = parseExpr(inputs.vx, ["t"]);
       const vy_fn = parseExpr(inputs.vy, ["t"]);
@@ -1079,24 +1142,26 @@ const PLAYS = [
     description:
       "RB charges at 6 yd/s. Your blocker applies force F(t) to the LB. Compute impulse J = ∫F dt and neutralize the LB's momentum before he reaches the RB.",
     theory: [
-      "CONCEPT: Impulse = change in momentum.",
-      "Momentum: p = m·v",
+      "CONCEPT: Impulse = integral of force over time = change in momentum.",
+      "WHY: A force applied over time changes momentum (mass × velocity). To stop the LB you must reduce his momentum to near zero.",
+      "Momentum: p = m·v    (lb·yd/s)",
       "Impulse: J(t) = ∫₀ᵗ F(τ) dτ",
-      "Newton 2: J = Δp = m·Δv",
+      "Newton 2: J = Δp  →  J reduces LB momentum.",
       "LB: mass = 230 lb, initial speed = 5 yd/s.",
-      "p_LB = 230 × 5 = 1150 lb·yd/s",
-      "v_LB(t) = (p_LB − J(t)) / 230",
+      "p_LB = 230 × 5 = 1150 lb·yd/s  (must be neutralized)",
+      "DERIVE: v_LB(t) = (1150 − J(t)) / 230",
       "LB stops when J(t) ≥ 1150 lb·yd/s.",
-      "RB reaches LB in ≈ 1.3 s — stop him first!",
-      "Constant F: J = F·t. Need F × 1.3 ≥ 1150.",
-      "→ F ≥ 885 lb. Try F = 900 or F = 600 + 300*t.",
+      "STEP 1: For constant F: J = F·t. Need J ≥ 1150 in ~0.9s.",
+      "→ F ≥ 1150/0.9 ≈ 1280 lb. Try F = 1300.",
+      "STEP 2: Try time-varying: F(t) = 900 + 400*t gives more impulse as block develops.",
+      "STEP 3: Watch the impulse bar — keep it filling before LB reaches RB.",
     ],
     inputs: [
       {
         id: "F",
         label: "Blocker force F(t) in lb (can be function of t):",
-        placeholder: "900",
-        hint: "J = ∫₀ᵗ F dτ must reach 1150 lb·yd/s within ~1.3s. Try: 900  or  600 + 300*t  or  1200*exp(-t/2)",
+        placeholder: "1300",
+        hint: "J = ∫₀ᵗ F dτ must reach 1150 lb·yd/s within ~0.9s. Try: 1300  or  900 + 400*t  or  2000*exp(-t/2)",
       },
     ],
     players: [
@@ -1106,7 +1171,7 @@ const PLAYS = [
         y0: 2,
         color: "#f97316",
         label: "RB",
-        segs: [{ vx: 6, vy: 0 }],
+        segs: [{ vx: 9, vy: 0 }],
         offense: true,
         hasBall: true,
       },
@@ -1116,7 +1181,7 @@ const PLAYS = [
         y0: -2,
         color: "#38bdf8",
         label: "OL",
-        segs: [{ vx: 4, vy: 1 }],
+        segs: [{ vx: 6, vy: 2 }],
         offense: true,
       },
       {
@@ -1125,7 +1190,7 @@ const PLAYS = [
         y0: 18,
         color: "#fb923c",
         label: "WR1",
-        segs: [{ vx: 5, vy: 0 }],
+        segs: [{ vx: 10, vy: 0 }],
         offense: true,
       },
       {
@@ -1144,7 +1209,7 @@ const PLAYS = [
         y0: -8,
         color: "#fca5a5",
         label: "DE",
-        segs: [{ vx: -3, vy: 3 }],
+        segs: [{ vx: -5, vy: 5 }],
         offense: false,
       },
       {
@@ -1153,7 +1218,7 @@ const PLAYS = [
         y0: -5,
         color: "#a855f7",
         label: "S",
-        segs: [{ vx: -3, vy: 2 }],
+        segs: [{ vx: -5, vy: 3 }],
         offense: false,
       },
     ],
@@ -1238,25 +1303,27 @@ const PLAYS = [
     description:
       "Last play. Find angle θ that maximizes range AND clears two safeties. R(θ) = v₀²sin(2θ)/g. Set dR/dθ = 0 to find optimal θ, then check if it fits through the gap.",
     theory: [
-      "CONCEPT: Optimization — find critical points.",
+      "CONCEPT: Optimization — find where the derivative equals zero to maximize a function.",
+      "WHY: Range R(θ) depends on launch angle. We want to find the θ that makes R as large as possible.",
       "Projectile range: R(θ) = v₀²·sin(2θ) / g",
-      "Maximize: dR/dθ = 2v₀²·cos(2θ) / g = 0",
+      "DERIVE maximum: take dR/dθ and set to zero.",
+      "dR/dθ = 2v₀²·cos(2θ) / g = 0",
       "→ cos(2θ) = 0  →  2θ = 90°  →  θ = 45°",
-      "d²R/dθ² = −4v₀²·sin(2θ)/g < 0 → confirmed max.",
-      "v₀ = 28 yd/s, g = 9.8 yd/s².",
-      "R_max = v₀²/g = 784/9.8 ≈ 80 yd.",
-      "But safeties spread at T seconds — they create a gap.",
-      "Find θ where ball flies BETWEEN the safeties.",
-      "The throw direction is straight downfield (y=0 aim).",
-      "sin(2×45°) = 1.0 → maximum range.",
-      "sin(2×30°) = 0.866 → R = 69.4 yd.",
+      "Verify it's a MAX: d²R/dθ² = −4v₀²·sin(2θ)/g < 0 ✓",
+      "v₀ = 30 yd/s, g = 10.72 yd/s² (= 9.8 m/s² converted).",
+      "R_max = v₀²/g = 900/10.72 ≈ 84 yd.",
+      "STEP 1: Plug θ=45° and verify R_max ≈ 84 yd.",
+      "STEP 2: Check if ball clears the safety gap — it depends on timing.",
+      "STEP 3: If 45° overshoots, try θ < 45° to reduce range.",
+      "STEP 4: Use sin(2θ) = 1 at θ=45° → maximum dart throw.",
+      "INSIGHT: Any other angle gives less range — θ=45° is uniquely optimal.",
     ],
     inputs: [
       {
         id: "theta",
         label: "Launch angle θ (degrees, 0–90):",
         placeholder: "45",
-        hint: "θ=45° maximizes range. Compute R(θ) = 28²·sin(2θ)/9.8. Compare to needed distance.",
+        hint: "θ=45° maximizes range. Compute R(θ) = 30²·sin(2θ)/10.72. Compare to needed distance.",
       },
       {
         id: "T",
@@ -1281,7 +1348,7 @@ const PLAYS = [
         y0: 10,
         color: "#f97316",
         label: "WR1",
-        segs: [{ vx: 7, vy: 0 }],
+        segs: [{ vx: 11, vy: 0 }],
         offense: true,
       },
       {
@@ -1290,7 +1357,7 @@ const PLAYS = [
         y0: -10,
         color: "#fb923c",
         label: "WR2",
-        segs: [{ vx: 7, vy: 0 }],
+        segs: [{ vx: 11, vy: 0 }],
         offense: true,
       },
       {
@@ -1299,7 +1366,7 @@ const PLAYS = [
         y0: 8,
         color: "#f87171",
         label: "S1",
-        segs: [{ vx: 1, vy: 3 }],
+        segs: [{ vx: 2, vy: 1.5 }],
         offense: false,
       },
       {
@@ -1308,7 +1375,7 @@ const PLAYS = [
         y0: -8,
         color: "#fca5a5",
         label: "S2",
-        segs: [{ vx: 1, vy: -3 }],
+        segs: [{ vx: 2, vy: -1.5 }],
         offense: false,
       },
       {
@@ -1317,12 +1384,12 @@ const PLAYS = [
         y0: 0,
         color: "#c084fc",
         label: "CB",
-        segs: [{ vx: 2, vy: 0 }],
+        segs: [{ vx: 4, vy: 0 }],
         offense: false,
       },
     ],
-    vBall: 28,
-    g: 9.8,
+    vBall: 30,
+    g: 10.72,
     catchR: 3,
     peakZ: 0,
     run(inputs) {
@@ -1621,6 +1688,7 @@ function drawSetup(ctx, play) {
 
 // ─── Live stats panel — reactive equations ────────────────────────────────────
 function LiveStats({ frame, playIdx }) {
+  const dark = useIsDark();
   if (!frame) return null;
   const rows = [{ label: "t", val: `${frame.t.toFixed(2)} s`, col: "#e2e8f0" }];
 
@@ -1796,22 +1864,24 @@ function LiveStats({ frame, playIdx }) {
   return (
     <div
       style={{
-        background: "#0f172a",
+        background: dark ? "#0f172a" : "#eaf4ea",
         borderRadius: 8,
         padding: "10px 12px",
-        border: "1px solid #334155",
+        border: `1px solid ${dark ? "#334155" : "#c8dcc8"}`,
         marginTop: 8,
       }}
     >
       <div
         style={{
           fontSize: 11,
-          color: "#64748b",
+          color: dark ? "#64748b" : "#5a7a5a",
           marginBottom: 6,
-          fontWeight: 500,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
         }}
       >
-        live values
+        Live Values
       </div>
       {rows.map((r) => (
         <div
@@ -1823,7 +1893,11 @@ function LiveStats({ frame, playIdx }) {
           }}
         >
           <span
-            style={{ fontFamily: "monospace", fontSize: 11, color: "#7dd3fc" }}
+            style={{
+              fontFamily: "monospace",
+              fontSize: 11,
+              color: dark ? "#7dd3fc" : "#1e40af",
+            }}
           >
             {r.label}
           </span>
@@ -1866,6 +1940,7 @@ export default function FootballCalculus() {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
   const simRef = useRef(null);
+  const dark = useIsDark();
   const [playIdx, setPlayIdx] = useState(0);
   const [inputs, setInputs] = useState({});
   const [inputErrs, setInputErrs] = useState({});
@@ -1877,15 +1952,32 @@ export default function FootballCalculus() {
   const [liveFrame, setLiveFrame] = useState(null);
   const [scrubIdx, setScrubIdx] = useState(0);
   const [showVecs, setShowVecs] = useState(true);
+  const [jitter, setJitter] = useState(() => makeJitter(PLAYS[0]));
 
   const play = PLAYS[playIdx];
+  const livePlay = applyJitter(play, jitter);
+
+  const remix = useCallback(() => {
+    setJitter(makeJitter(PLAYS[playIdx]));
+    setHasFrames(false);
+    setResult(null);
+    setMsg("");
+    setWarning("");
+    setLiveFrame(null);
+    setPlaying(false);
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    simRef.current = null;
+  }, [playIdx]);
 
   useEffect(() => {
     if (hasFrames) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    drawSetup(canvas.getContext("2d"), PLAYS[playIdx]);
-  }, [playIdx, hasFrames]);
+    drawSetup(canvas.getContext("2d"), livePlay);
+  }, [playIdx, hasFrames, livePlay]);
 
   useEffect(
     () => () => {
@@ -1915,7 +2007,7 @@ export default function FootballCalculus() {
       drawFrame(
         canvas.getContext("2d"),
         frames[fi],
-        PLAYS[pIdx],
+        simRef.current.livePlay || PLAYS[pIdx],
         simRef.current.showVecs,
       );
     simRef.current.frameIdx = fi + 1;
@@ -1929,7 +2021,7 @@ export default function FootballCalculus() {
       cancelAnimationFrame(animRef.current);
       animRef.current = null;
     }
-    const res = PLAYS[playIdx].run(inputs);
+    const res = livePlay.run.call(livePlay, inputs);
     if (res.error) {
       setInputErrs({ [res.error]: res.msg });
       setWarning("");
@@ -1952,9 +2044,15 @@ export default function FootballCalculus() {
     setLiveFrame(null);
     setScrubIdx(0);
     setPlaying(true);
-    simRef.current = { frames: res.frames, frameIdx: 0, playIdx, showVecs };
+    simRef.current = {
+      frames: res.frames,
+      frameIdx: 0,
+      playIdx,
+      showVecs,
+      livePlay,
+    };
     animRef.current = requestAnimationFrame(tick);
-  }, [playIdx, inputs, showVecs, tick]);
+  }, [playIdx, inputs, showVecs, tick, livePlay]);
 
   const resetSim = useCallback(() => {
     if (animRef.current) {
@@ -1978,6 +2076,7 @@ export default function FootballCalculus() {
     }
     simRef.current = null;
     setPlayIdx(idx);
+    setJitter(makeJitter(PLAYS[idx]));
     setInputs({});
     setInputErrs({});
     setWarning("");
@@ -2001,7 +2100,7 @@ export default function FootballCalculus() {
         drawFrame(
           canvas.getContext("2d"),
           frames[fi],
-          PLAYS[simRef.current.playIdx],
+          simRef.current.livePlay || PLAYS[simRef.current.playIdx],
           showVecs,
         );
     },
@@ -2014,89 +2113,162 @@ export default function FootballCalculus() {
     setWarning("");
   }, []);
 
+  const T = {
+    bg: dark ? "#0c1a10" : "#f0f4f0",
+    surface: dark ? "#132016" : "#ffffff",
+    border: dark ? "#1e3a2e" : "#c8dcc8",
+    text: dark ? "#e8f5e9" : "#1a2e1a",
+    muted: dark ? "#6b8f71" : "#5a7a5a",
+    inputBg: dark ? "#0a160c" : "#f8fbf8",
+    inputBorder: dark ? "#2d4a33" : "#aacbaa",
+    inputText: dark ? "#e8f5e9" : "#1a2e1a",
+    cardBg: dark ? "#0f1e12" : "#eaf4ea",
+    mathBg: dark ? "#1a2e1e" : "#d4ecd4",
+    mathText: dark ? "#86efac" : "#1a5c1a",
+    btnRun: "#166534",
+    btnRunText: "#ffffff",
+    btnStop: dark ? "#374151" : "#9ca3af",
+    warnBg: dark ? "#1e3a5f" : "#dbeafe",
+    warnText: dark ? "#93c5fd" : "#1e40af",
+    winBg: dark ? "#14532d" : "#dcfce7",
+    winText: dark ? "#4ade80" : "#166534",
+    loseBg: dark ? "#450a0a" : "#fee2e2",
+    loseText: dark ? "#fca5a5" : "#991b1b",
+  };
+
   return (
     <div
       style={{
-        color: "#f1f5f9",
-        maxWidth: 980,
+        color: T.text,
+        maxWidth: 1100,
         margin: "0 auto",
         padding: 12,
-        fontFamily: "sans-serif",
-        background: "#020617",
-        borderRadius: 12,
+        fontFamily: "'Segoe UI', system-ui, sans-serif",
+        background: T.bg,
+        borderRadius: 14,
+        boxShadow: dark
+          ? "0 4px 32px rgba(0,0,0,0.6)"
+          : "0 2px 16px rgba(0,80,0,0.12)",
       }}
     >
+      {/* Header */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 10,
-          marginBottom: 12,
+          marginBottom: 14,
+          padding: "10px 14px",
+          borderRadius: 10,
+          background: dark ? "#0a1e0e" : "#1a5c2a",
+          border: `1px solid ${dark ? "#1e4a24" : "#14532d"}`,
         }}
       >
-        <div style={{ fontSize: 18, fontWeight: 700 }}>Football Calculus</div>
-        <div style={{ fontSize: 11, color: "#64748b", marginLeft: 4 }}>
-          2.5D isometric · formula-driven · real projectile physics
+        <span style={{ fontSize: 22 }}>🏈</span>
+        <div>
+          <div
+            style={{
+              fontSize: 17,
+              fontWeight: 800,
+              color: dark ? "#bbf7d0" : "#ffffff",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Football Calculus
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              color: dark ? "#6b8f71" : "#a7f3d0",
+              marginTop: 1,
+            }}
+          >
+            Real physics · Real speeds · Real calculus
+          </div>
         </div>
         <button
           onClick={() => setShowVecs((v) => !v)}
           style={{
             marginLeft: "auto",
-            padding: "5px 12px",
-            borderRadius: 6,
+            padding: "5px 13px",
+            borderRadius: 20,
             cursor: "pointer",
             fontSize: 11,
-            border: "1px solid #334155",
-            background: showVecs ? "#1e293b" : "transparent",
-            color: showVecs ? "#7dd3fc" : "#64748b",
+            fontWeight: 600,
+            border: `1px solid ${dark ? "#2d5a38" : "#4ade80"}`,
+            background: showVecs
+              ? dark
+                ? "#1a4a24"
+                : "#16a34a"
+              : "transparent",
+            color: showVecs
+              ? dark
+                ? "#86efac"
+                : "#ffffff"
+              : dark
+                ? "#6b8f71"
+                : "#a7f3d0",
+            transition: "all 0.15s",
           }}
         >
-          {showVecs ? "vectors on" : "vectors off"}
+          {showVecs ? "Vectors ON" : "Vectors OFF"}
         </button>
       </div>
 
+      {/* Play selector */}
       <div
-        style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}
+        style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}
       >
         {PLAYS.map((p, i) => (
           <button
             key={p.id}
             onClick={() => selectPlay(i)}
             style={{
-              padding: "6px 12px",
-              borderRadius: 6,
+              padding: "7px 13px",
+              borderRadius: 8,
               cursor: "pointer",
               fontSize: 11,
-              border: `1px solid ${i === playIdx ? p.color + "66" : "#334155"}`,
-              background: i === playIdx ? p.color + "18" : "transparent",
-              color: i === playIdx ? p.color : "#94a3b8",
-              fontWeight: i === playIdx ? 600 : 400,
+              border: `2px solid ${i === playIdx ? p.color : dark ? "#2d4a33" : "#c8dcc8"}`,
+              background:
+                i === playIdx ? p.color + (dark ? "22" : "18") : T.surface,
+              color: i === playIdx ? p.color : T.muted,
+              fontWeight: i === playIdx ? 700 : 400,
               textAlign: "left",
+              transition: "all 0.12s",
             }}
           >
-            <div style={{ fontSize: 12 }}>{p.name}</div>
-            <div style={{ fontSize: 9, opacity: 0.75 }}>
+            <div
+              style={{ fontSize: 12, fontWeight: i === playIdx ? 700 : 500 }}
+            >
+              {p.name}
+            </div>
+            <div style={{ fontSize: 9, opacity: 0.8, marginTop: 1 }}>
               {p.down} · {p.concept.split("·")[0].trim()}
             </div>
           </button>
         ))}
       </div>
 
+      {/* Play description banner */}
       <div
         style={{
-          borderLeft: `3px solid ${play.color}`,
-          borderRadius: "0 6px 6px 0",
-          padding: "7px 12px",
-          marginBottom: 10,
-          background: play.color + "11",
-          color: play.color,
+          borderLeft: `4px solid ${play.color}`,
+          borderRadius: "0 8px 8px 0",
+          padding: "8px 14px",
+          marginBottom: 12,
+          background: play.color + (dark ? "15" : "12"),
           fontSize: 12,
+          lineHeight: 1.5,
         }}
       >
-        <strong>{play.concept}</strong> — {play.description}
+        <span style={{ fontWeight: 700, color: play.color }}>
+          {play.concept}
+        </span>
+        <span style={{ color: T.muted }}> — {play.description}</span>
       </div>
 
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+        {/* Left: canvas + inputs */}
         <div style={{ flex: 1, minWidth: 320 }}>
           <canvas
             ref={canvasRef}
@@ -2104,8 +2276,8 @@ export default function FootballCalculus() {
             height={H}
             style={{
               width: "100%",
-              borderRadius: 8,
-              border: "2px solid #1e3a2e",
+              borderRadius: 10,
+              border: `2px solid ${dark ? "#1e3a2e" : "#4a7c59"}`,
               display: "block",
             }}
           />
@@ -2120,10 +2292,10 @@ export default function FootballCalculus() {
 
           <div
             style={{
-              marginTop: 10,
+              marginTop: 12,
               display: "flex",
               flexDirection: "column",
-              gap: 9,
+              gap: 10,
             }}
           >
             {play.inputs.map((inp) => (
@@ -2131,9 +2303,10 @@ export default function FootballCalculus() {
                 <label
                   style={{
                     fontSize: 11,
-                    color: "#94a3b8",
+                    fontWeight: 600,
+                    color: T.muted,
                     display: "block",
-                    marginBottom: 3,
+                    marginBottom: 4,
                   }}
                 >
                   {inp.label}
@@ -2142,15 +2315,16 @@ export default function FootballCalculus() {
                   type="text"
                   style={{
                     width: "100%",
-                    padding: "9px 11px",
-                    borderRadius: 6,
+                    padding: "9px 12px",
+                    borderRadius: 7,
                     boxSizing: "border-box",
-                    border: `1.5px solid ${inputErrs[inp.id] ? "#ef4444" : "#334155"}`,
-                    background: "#0f172a",
-                    color: "#f1f5f9",
-                    fontFamily: "monospace",
+                    border: `1.5px solid ${inputErrs[inp.id] ? "#ef4444" : T.inputBorder}`,
+                    background: T.inputBg,
+                    color: T.inputText,
+                    fontFamily: "'Courier New', monospace",
                     fontSize: 14,
                     outline: "none",
+                    transition: "border-color 0.15s",
                   }}
                   value={inputs[inp.id] || ""}
                   placeholder={inp.placeholder}
@@ -2160,97 +2334,119 @@ export default function FootballCalculus() {
                   }}
                 />
                 {inputErrs[inp.id] && (
-                  <div style={{ fontSize: 11, color: "#f87171", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: "#f87171", marginTop: 3 }}>
                     {inputErrs[inp.id]}
                   </div>
                 )}
                 <div
                   style={{
                     fontSize: 10,
-                    color: "#60a5fa",
+                    color: dark ? "#60a5fa" : "#2563eb",
                     fontFamily: "monospace",
-                    marginTop: 2,
+                    marginTop: 3,
+                    opacity: 0.9,
                   }}
                 >
-                  {inp.hint}
+                  💡 {inp.hint}
                 </div>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
               {!playing ? (
                 <button
                   onClick={runSim}
                   style={{
-                    padding: "8px 20px",
-                    borderRadius: 6,
+                    padding: "9px 22px",
+                    borderRadius: 8,
                     border: "none",
                     cursor: "pointer",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontSize: 13,
-                    color: "white",
-                    background: "#3b82f6",
+                    color: "#ffffff",
+                    background: "#15803d",
+                    letterSpacing: "0.03em",
                   }}
                 >
-                  Run Play
+                  ▶ Run Play
                 </button>
               ) : (
                 <button
                   onClick={stopAnim}
                   style={{
-                    padding: "8px 20px",
-                    borderRadius: 6,
+                    padding: "9px 22px",
+                    borderRadius: 8,
                     border: "none",
                     cursor: "pointer",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontSize: 13,
-                    color: "white",
+                    color: "#ffffff",
                     background: "#6b7280",
                   }}
                 >
-                  Stop
+                  ⏹ Stop
                 </button>
               )}
               {hasFrames && (
                 <button
                   onClick={resetSim}
                   style={{
-                    padding: "8px 18px",
-                    borderRadius: 6,
+                    padding: "9px 18px",
+                    borderRadius: 8,
                     border: "none",
                     cursor: "pointer",
                     fontWeight: 600,
                     fontSize: 13,
-                    color: "white",
-                    background: "#374151",
+                    color: dark ? "#e8f5e9" : "#374151",
+                    background: dark ? "#1e3a2e" : "#d1fae5",
                   }}
                 >
-                  Reset
+                  ↺ Reset
                 </button>
               )}
+              <button
+                onClick={remix}
+                title="Randomly shift defender starting positions"
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: 8,
+                  border: `1px solid ${dark ? "#2d4a33" : "#86c997"}`,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 12,
+                  color: dark ? "#86efac" : "#15803d",
+                  background: "transparent",
+                }}
+              >
+                🔀 New Setup
+              </button>
             </div>
             {warning && (
               <div
                 style={{
-                  padding: "9px 13px",
-                  borderRadius: 7,
+                  padding: "10px 14px",
+                  borderRadius: 8,
                   fontSize: 12,
                   fontWeight: 500,
-                  background: "#1e3a5f",
-                  color: "#93c5fd",
+                  background: T.warnBg,
+                  color: T.warnText,
+                  lineHeight: 1.5,
+                  borderLeft: "3px solid #3b82f6",
                 }}
               >
-                {warning}
+                ⚠ {warning}
               </div>
             )}
             {result && !playing && (
               <div
                 style={{
-                  padding: "9px 13px",
-                  borderRadius: 7,
+                  padding: "10px 14px",
+                  borderRadius: 8,
                   fontSize: 13,
-                  fontWeight: 600,
-                  background: result === "win" ? "#14532d" : "#450a0a",
-                  color: result === "win" ? "#4ade80" : "#fca5a5",
+                  fontWeight: 700,
+                  lineHeight: 1.5,
+                  background: result === "win" ? T.winBg : T.loseBg,
+                  color: result === "win" ? T.winText : T.loseText,
+                  borderLeft: `3px solid ${result === "win" ? "#16a34a" : "#dc2626"}`,
                 }}
               >
                 {result === "win" ? "✓ " : "✗ "}
@@ -2260,42 +2456,91 @@ export default function FootballCalculus() {
           </div>
         </div>
 
-        <div style={{ width: 220, flexShrink: 0 }}>
+        {/* Right: theory panel */}
+        <div style={{ width: 240, flexShrink: 0 }}>
           <div
             style={{
-              background: "#0f172a",
+              background: T.cardBg,
               borderRadius: 10,
-              padding: 12,
-              border: "1px solid #1e293b",
+              padding: 14,
+              border: `1px solid ${dark ? "#1e3a2e" : "#c8dcc8"}`,
             }}
           >
             <div
               style={{
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 800,
                 color: play.color,
-                marginBottom: 8,
+                marginBottom: 10,
+                paddingBottom: 6,
+                borderBottom: `1px solid ${dark ? "#1e3a2e" : "#c8dcc8"}`,
+                letterSpacing: "0.02em",
               }}
             >
-              {play.concept}
+              📐 {play.concept}
             </div>
             {play.theory.map((line, i) => {
-              const isHeader = line.startsWith("CONCEPT:");
+              const isConceptHeader = line.startsWith("CONCEPT:");
+              const isStepOrKey =
+                line.startsWith("STEP") ||
+                line.startsWith("KEY") ||
+                line.startsWith("WHY") ||
+                line.startsWith("DERIVE") ||
+                line.startsWith("INSIGHT") ||
+                line.startsWith("CHECK") ||
+                line.startsWith("SETUP") ||
+                line.startsWith("VERIFY") ||
+                line.startsWith("HINT");
+              const isArrow = line.startsWith("→") || line.startsWith("⟹");
               const isMath =
-                !isHeader &&
-                (/[=·∫√≥≤→]/.test(line) || /^[xyvDJpRθ]/.test(line));
-              if (isHeader)
+                !isConceptHeader &&
+                !isStepOrKey &&
+                !isArrow &&
+                (/[=·∫√≥≤→×]/.test(line) || /^[xyvDJpRθd]/.test(line));
+              if (isConceptHeader)
                 return (
                   <div
                     key={i}
                     style={{
-                      margin: "0 0 6px",
-                      padding: "4px 8px",
+                      margin: "0 0 8px",
+                      padding: "5px 9px",
                       background: play.color + "22",
-                      borderRadius: 4,
+                      borderRadius: 5,
                       fontSize: 11,
                       color: play.color,
-                      fontWeight: 600,
+                      fontWeight: 700,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {line}
+                  </div>
+                );
+              if (isStepOrKey)
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      margin: "5px 0 2px",
+                      fontSize: 11,
+                      color: dark ? "#fbbf24" : "#92400e",
+                      fontWeight: 700,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {line}
+                  </div>
+                );
+              if (isArrow)
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      margin: "2px 0",
+                      paddingLeft: 8,
+                      fontSize: 11,
+                      color: dark ? "#4ade80" : "#166534",
+                      fontFamily: "monospace",
+                      lineHeight: 1.4,
                     }}
                   >
                     {line}
@@ -2306,12 +2551,13 @@ export default function FootballCalculus() {
                   key={i}
                   style={{
                     margin: "3px 0",
-                    padding: "3px 7px",
-                    background: "#1e293b",
+                    padding: "3px 8px",
+                    background: T.mathBg,
                     borderRadius: 4,
-                    fontFamily: "monospace",
+                    fontFamily: "'Courier New', monospace",
                     fontSize: 11,
-                    color: "#a5f3fc",
+                    color: T.mathText,
+                    lineHeight: 1.5,
                   }}
                 >
                   {line}
@@ -2319,7 +2565,12 @@ export default function FootballCalculus() {
               ) : (
                 <div
                   key={i}
-                  style={{ fontSize: 11, color: "#64748b", margin: "4px 0" }}
+                  style={{
+                    fontSize: 11,
+                    color: T.muted,
+                    margin: "3px 0",
+                    lineHeight: 1.4,
+                  }}
                 >
                   {line}
                 </div>
@@ -2334,10 +2585,11 @@ export default function FootballCalculus() {
 
       <div
         style={{
-          marginTop: 10,
+          marginTop: 12,
           fontSize: 10,
-          color: "#334155",
+          color: T.muted,
           textAlign: "center",
+          opacity: 0.7,
         }}
       >
         2.5D isometric · ball height = real projectile arc (z = v₀sinθ·t − ½gt²)
