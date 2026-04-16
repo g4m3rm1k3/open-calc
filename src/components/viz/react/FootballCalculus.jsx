@@ -1,767 +1,2348 @@
-// FootballCalculus.jsx — Top-down, multi-player, formula-driven football calculus
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from "react";
 
-// ─── Field geometry ───────────────────────────────────────────────────────────
-const W = 780, H = 380
-const EZ = 48              // endzone px
-const FW = W - 2 * EZ     // 684px = 100 yards
-const PY = FW / 100        // 6.84 px/yard (both axes, square grid)
-const CY = H / 2           // 190px = lateral center of field
+// ─── Isometric 2.5D projection ───────────────────────────────────────────────
+const W = 820,
+  H = 480;
+const ISO = {
+  originX: 60,
+  originY: 340,
+  xScale: 6.2,
+  yScale: 2.8,
+  zScale: 28,
+  tilt: 0.42,
+};
 
-const fx = x => EZ + x * PY          // downfield yards → pixel x
-const fy = y => CY - y * PY          // lateral yards from center → pixel y (+ = top)
+function proj(fdx, fdy, fz = 0) {
+  const cx = ISO.originX + fdx * ISO.xScale + fdy * ISO.yScale * ISO.tilt;
+  const cy = ISO.originY - fdy * ISO.yScale - fz * ISO.zScale;
+  return { cx, cy };
+}
 
 // ─── Formula parser ───────────────────────────────────────────────────────────
-function parseExpr(expr, vars = {}) {
-  if (!expr || !expr.trim()) return null
+function parseExpr(expr, varNames = ["t"]) {
+  if (!expr || !expr.trim()) return null;
   try {
-    const js = expr.trim()
-      .replace(/\^/g, '**')
-      .replace(/\bsqrt\b/g, 'Math.sqrt').replace(/\bsin\b/g, 'Math.sin')
-      .replace(/\bcos\b/g, 'Math.cos').replace(/\btan\b/g, 'Math.tan')
-      .replace(/\batan\b/g, 'Math.atan').replace(/\batan2\b/g, 'Math.atan2')
-      .replace(/\babs\b/g, 'Math.abs').replace(/\bpi\b/g, 'Math.PI')
-      .replace(/\be\b/g, 'Math.E').replace(/\bln\b/g, 'Math.log')
-      .replace(/\bexp\b/g, 'Math.exp')
-    const args = Object.keys(vars)
-    // eslint-disable-next-line no-new-func
-    const fn = new Function(...args, `"use strict"; return (${js});`)
+    const js = expr
+      .trim()
+      .replace(/\^/g, "**")
+      .replace(/\bsqrt\b/g, "Math.sqrt")
+      .replace(/\bsin\b/g, "Math.sin")
+      .replace(/\bcos\b/g, "Math.cos")
+      .replace(/\btan\b/g, "Math.tan")
+      .replace(/\babs\b/g, "Math.abs")
+      .replace(/\bpi\b/g, "Math.PI")
+      .replace(/\be\b/g, "Math.E")
+      .replace(/\bln\b/g, "Math.log")
+      .replace(/\bexp\b/g, "Math.exp")
+      .replace(/\batan\b/g, "Math.atan");
+    const fn = new Function(...varNames, `"use strict"; return (${js});`);
     return (...vals) => {
-      try { const r = fn(...vals); return (typeof r === 'number' && isFinite(r)) ? r : null }
-      catch { return null }
-    }
-  } catch { return null }
+      try {
+        const r = fn(...vals);
+        return typeof r === "number" && isFinite(r) ? r : null;
+      } catch {
+        return null;
+      }
+    };
+  } catch {
+    return null;
+  }
 }
 
-// ─── Player route engine ──────────────────────────────────────────────────────
-// segs: [{dur (s, omit = forever), vx (yd/s), vy (yd/s)}]
+// ─── Route engine ─────────────────────────────────────────────────────────────
 function posAt(player, t) {
-  let x = player.x0, y = player.y0, rem = t
-  for (const s of player.segs) {
-    const dur = s.dur ?? Infinity
-    const dt = isFinite(dur) ? Math.min(rem, dur) : rem
-    x += (s.vx ?? 0) * dt
-    y += (s.vy ?? 0) * dt
-    rem -= dt
-    if (rem <= 0) break
+  let x = player.x0,
+    y = player.y0,
+    rem = t;
+  for (const s of player.segs || []) {
+    const dur = s.dur ?? Infinity;
+    const dt = isFinite(dur) ? Math.min(rem, dur) : rem;
+    x += (s.vx ?? 0) * dt;
+    y += (s.vy ?? 0) * dt;
+    rem -= dt;
+    if (rem <= 0) break;
   }
-  return { x, y }
+  return { x, y };
 }
+
 function velAt(player, t) {
-  let rem = t
-  for (const s of player.segs) {
-    rem -= (s.dur ?? Infinity)
-    if (rem <= 0) return { vx: s.vx ?? 0, vy: s.vy ?? 0 }
+  let rem = t;
+  for (const s of player.segs || []) {
+    rem -= s.dur ?? Infinity;
+    if (rem <= 0) return { vx: s.vx ?? 0, vy: s.vy ?? 0 };
   }
-  const last = player.segs[player.segs.length - 1]
-  return { vx: last?.vx ?? 0, vy: last?.vy ?? 0 }
+  const last = player.segs?.[player.segs.length - 1];
+  return { vx: last?.vx ?? 0, vy: last?.vy ?? 0 };
 }
 
-// ─── Plays ────────────────────────────────────────────────────────────────────
-const PLAYS = [
-  // ── P1: Slant Route — WALKTHROUGH ─────────────────────────────────────────
-  {
-    id: 'P1', name: 'Slant Route', down: '2nd & 8',
-    concept: 'Integration · x(t) = x₀ + v·t',
-    color: '#22c55e',
-    description: 'WALKTHROUGH — WR1 runs a slant at constant velocity. Write both position equations, then find throw time T so the ball meets WR1 where he WILL BE, not where he is now.',
-    theory: [
-      'Step 1 — WR1 starts at (30 yd, 10 yd lateral) running:',
-      'vx = 5 yd/s downfield,  vy = −3 yd/s (cutting inside)',
-      'x_r(t) = 30 + 5·t        y_r(t) = 10 − 3·t',
-      'Step 2 — QB at (28, 0), ball speed v_b = 28 yd/s.',
-      'At throw time T ball flies straight to WR1\'s spot at T.',
-      'Step 3 — While ball travels (t_f sec) WR1 keeps moving.',
-      'A catch needs ball to arrive at WR1\'s actual position.',
-      'Too early: WR1 runs past the ball. Too late: CB recovers.',
-      'Find T where ball meets WR1 before CB closes the gap.',
-    ],
-    inputs: [
-      { id: 'rx', label: 'WR1 downfield position x_r(t) — yards:', placeholder: '30 + 5*t', hint: 'WR1 starts at 30 yd downfield, runs at 5 yd/s' },
-      { id: 'ry', label: 'WR1 lateral position y_r(t) — yards from center:', placeholder: '10 - 3*t', hint: 'Starts 10 yd from center, cuts inside at 3 yd/s (negative = toward center)' },
-      { id: 'T',  label: 'Throw at time T (seconds after snap):', placeholder: 'e.g.  1.2', hint: 'Hint: compute dist from QB to WR1 at T, then t_flight = dist / 28' },
-    ],
-    players: [
-      { id: 'QB',  x0: 28, y0:  0, color: '#38bdf8', label: 'QB',  segs: [{ vx: 0,   vy: 0   }], offense: true  },
-      { id: 'WR1', x0: 30, y0: 10, color: '#f97316', label: 'WR1', segs: [{ vx: 5,   vy: -3  }], offense: true  },
-      { id: 'WR2', x0: 30, y0: 22, color: '#fb923c', label: 'WR2', segs: [{ vx: 5,   vy: 0   }], offense: true  },
-      { id: 'CB1', x0: 33, y0: 11, color: '#f87171', label: 'CB',  segs: [{ vx: 4.5, vy: -2.5}], offense: false },
-      { id: 'CB2', x0: 33, y0: 23, color: '#fca5a5', label: 'CB2', segs: [{ vx: 5,   vy: 0   }], offense: false },
-      { id: 'LB',  x0: 38, y0:  2, color: '#c084fc', label: 'LB',  segs: [{ dur: 0.8, vx: -1, vy: 3 }, { vx: -0.5, vy: 0 }], offense: false },
-      { id: 'S',   x0: 48, y0:  8, color: '#a855f7', label: 'S',   segs: [{ vx: -2,  vy: -3  }], offense: false },
-    ],
-    qbId: 'QB', targetId: 'WR1', coverId: 'CB1', vBall: 28, catchR: 2,
-    run(inputs) {
-      const rx_fn = parseExpr(inputs.rx, { t: 0 })
-      const ry_fn = parseExpr(inputs.ry, { t: 0 })
-      const T = parseFloat(inputs.T)
-      if (!rx_fn) return { error: 'rx', msg: 'Invalid — try: 30 + 5*t' }
-      if (!ry_fn) return { error: 'ry', msg: 'Invalid — try: 10 - 3*t' }
-      if (isNaN(T) || T < 0 || T > 6) return { error: 'T', msg: 'T must be 0–6 s' }
-      const wr1 = this.players.find(p => p.id === 'WR1')
-      for (const ta of [0, 0.5, 1, 2]) {
-        const act = posAt(wr1, ta)
-        const gx = rx_fn(ta), gy = ry_fn(ta)
-        if (gx === null || Math.abs(gx - act.x) > 1.5)
-          return { warning: `x_r(${ta}s) = ${gx?.toFixed(1) ?? '?'} yd, but WR1 is at x = ${act.x.toFixed(1)} yd. Check x₀ or vx.` }
-        if (gy === null || Math.abs(gy - act.y) > 1.5)
-          return { warning: `y_r(${ta}s) = ${gy?.toFixed(1) ?? '?'} yd, but WR1 is at y = ${act.y.toFixed(1)} yd. Check y₀ or vy.` }
-      }
-      const DT = 1 / 60
-      const qb  = this.players.find(p => p.id === this.qbId)
-      const tgt = this.players.find(p => p.id === this.targetId)
-      const cb  = this.players.find(p => p.id === this.coverId)
-      let thrown = false, bx = qb.x0, by = qb.y0, bvx = 0, bvy = 0
-      let throwDist = 0
-      const trail = []
-      const frames = []
-      for (let i = 0; i < 600; i++) {
-        const t = i * DT
-        const players = this.players.map(p => {
-          const pos = posAt(p, t), vel = velAt(p, t)
-          return { ...p, ...pos, ...vel }
-        })
-        if (!thrown && t >= T) {
-          thrown = true
-          const tgtPos = posAt(tgt, T), qbPos = posAt(qb, T)
-          const dx = tgtPos.x - qbPos.x, dy = tgtPos.y - qbPos.y
-          throwDist = Math.sqrt(dx * dx + dy * dy)
-          bvx = (dx / throwDist) * this.vBall
-          bvy = (dy / throwDist) * this.vBall
-        }
-        let alt = 0
-        if (thrown) {
-          bx += bvx * DT; by += bvy * DT
-          const traveled = Math.sqrt((bx - posAt(qb, T).x) ** 2 + (by - posAt(qb, T).y) ** 2)
-          alt = Math.max(0, Math.sin(Math.min(traveled / throwDist, 1) * Math.PI))
-          trail.push({ x: bx, y: by })
-        }
-        const tgtNow = posAt(tgt, t), cbNow = posAt(cb, t)
-        const catchDist = Math.sqrt((bx - tgtNow.x) ** 2 + (by - tgtNow.y) ** 2)
-        const cbBallDist = Math.sqrt((bx - cbNow.x) ** 2 + (by - cbNow.y) ** 2)
-        frames.push({ t, players, bx, by, alt, thrown, trail: [...trail], catchDist, cbBallDist })
-        if (thrown && catchDist < this.catchR) {
-          return { frames, result: 'win', analytical: `Caught at t=${t.toFixed(2)}s! WR1 at (${tgtNow.x.toFixed(1)}, ${tgtNow.y.toFixed(1)}) yd. Ball on target.` }
-        }
-        if (thrown && cbBallDist < 1.5 && alt < 0.25) {
-          return { frames, result: 'loss', analytical: `Tipped by CB! Throw a bit earlier — CB recovered in the window. Try T ≈ ${(T - 0.2).toFixed(1)}–${(T + 0.15).toFixed(1)} s.` }
-        }
-        if (t > 6 || bx > 75) break
-      }
-      const last = frames[frames.length - 1]
-      const tgtLast = last?.players?.find(p => p.id === this.targetId)
-      const over = tgtLast && last.bx > tgtLast.x
-      return { frames, result: 'loss', analytical: `Incomplete — ball ${(last?.catchDist || 99).toFixed(1)} yd from WR1. ${over ? 'Overthrown — decrease T.' : 'Underthrown — increase T.'}` }
-    },
-  },
-
-  // ── P2: Seam Route — Related Rates ────────────────────────────────────────
-  {
-    id: 'P2', name: 'Seam Route', down: '3rd & 5',
-    concept: 'Related Rates · dD/dt',
-    color: '#f59e0b',
-    description: 'Two receivers, two defenders closing. Write dD/dt (closure rate) for each option. Calculate which window stays open longer — then throw before it closes.',
-    theory: [
-      'For each receiver, track D(t) = defender distance to catch point.',
-      'dD/dt = rate window closes (negative = closing fast)',
-      'Time window closes: t_close = (D₀ − 2) / |dD/dt|',
-      'Ball flight time: t_f = dist(QB, catch_point) / 28',
-      'Throw at time T if: T + t_f < t_close',
-      'WR1 catch at (50, 12). CB1 starts 14 yd from that point.',
-      'WR2 catch at (46, −10). Safety starts 19 yd from that point.',
-      'Use geometry: D₀ = √(Δx²+Δy²). Estimate dD/dt from speed.',
-    ],
-    inputs: [
-      { id: 'dD1', label: 'Closure rate on WR1 (dD₁/dt in yd/s, must be negative):', placeholder: 'e.g.  -5', hint: 'CB1 moves ~5 yd/s toward WR1\'s catch point (50, 12). D₀ ≈ 14 yd.' },
-      { id: 'dD2', label: 'Closure rate on WR2 (dD₂/dt in yd/s, must be negative):', placeholder: 'e.g.  -3.5', hint: 'Safety moves ~3.5 yd/s toward WR2\'s catch point (46, −10). D₀ ≈ 19 yd.' },
-      { id: 'choice', label: 'Which receiver? (1 or 2):', placeholder: '1  or  2', hint: 'Calculate t_close for each. Pick the one with more time.' },
-      { id: 'T', label: 'Throw at time T (seconds):', placeholder: 'e.g.  1.5', hint: 'Ball speed 28 yd/s from QB at (28, 0). Must arrive before window closes.' },
-    ],
-    players: [
-      { id: 'QB',  x0: 28, y0:   0, color: '#38bdf8', label: 'QB',  segs: [{ vx: 0, vy: 0  }], offense: true  },
-      { id: 'WR1', x0: 30, y0:  12, color: '#f97316', label: 'WR1', segs: [{ vx: 6, vy:  0  }], offense: true  },
-      { id: 'WR2', x0: 30, y0: -10, color: '#fb923c', label: 'WR2', segs: [{ vx: 5, vy: -1  }], offense: true  },
-      { id: 'CB1', x0: 38, y0:  17, color: '#f87171', label: 'CB1', segs: [{ vx: 5, vy: -3  }], offense: false },
-      { id: 'S',   x0: 44, y0:   3, color: '#a855f7', label: 'S',   segs: [{ vx: 3, vy: -5  }], offense: false },
-      { id: 'LB',  x0: 36, y0:  -3, color: '#c084fc', label: 'LB',  segs: [{ vx: 2, vy: -2  }], offense: false },
-    ],
-    catchPts: { WR1: { x: 50, y: 12 }, WR2: { x: 46, y: -10 } },
-    coverIds: { WR1: 'CB1', WR2: 'S' },
-    qbId: 'QB', vBall: 28, catchR: 2,
-    run(inputs) {
-      const dD1 = parseFloat(inputs.dD1), dD2 = parseFloat(inputs.dD2)
-      const choice = parseInt(inputs.choice), T = parseFloat(inputs.T)
-      if (isNaN(dD1) || dD1 >= 0) return { error: 'dD1', msg: 'Must be a negative number (window closing toward WR1)' }
-      if (isNaN(dD2) || dD2 >= 0) return { error: 'dD2', msg: 'Must be a negative number (window closing toward WR2)' }
-      if (choice !== 1 && choice !== 2) return { error: 'choice', msg: 'Enter 1 or 2' }
-      if (isNaN(T) || T < 0 || T > 6) return { error: 'T', msg: 'T must be 0–6 s' }
-      const cb1 = this.players.find(p => p.id === 'CB1')
-      const s   = this.players.find(p => p.id === 'S')
-      const cp1 = this.catchPts.WR1, cp2 = this.catchPts.WR2
-      const qb  = this.players.find(p => p.id === this.qbId)
-      const trueD1_0 = Math.sqrt((posAt(cb1, 0).x - cp1.x) ** 2 + (posAt(cb1, 0).y - cp1.y) ** 2)
-      const trueD1_1 = Math.sqrt((posAt(cb1, 1).x - cp1.x) ** 2 + (posAt(cb1, 1).y - cp1.y) ** 2)
-      const trueRate1 = trueD1_1 - trueD1_0
-      if (Math.abs(dD1 - trueRate1) > 2)
-        return { warning: `dD₁/dt ≈ ${trueRate1.toFixed(1)} yd/s (CB1 goes from ${trueD1_0.toFixed(1)} to ${trueD1_1.toFixed(1)} yd from catch point in 1s). You entered ${dD1.toFixed(1)}.` }
-      const trueD2_0 = Math.sqrt((posAt(s, 0).x - cp2.x) ** 2 + (posAt(s, 0).y - cp2.y) ** 2)
-      const trueD2_1 = Math.sqrt((posAt(s, 1).x - cp2.x) ** 2 + (posAt(s, 1).y - cp2.y) ** 2)
-      const trueRate2 = trueD2_1 - trueD2_0
-      if (Math.abs(dD2 - trueRate2) > 2)
-        return { warning: `dD₂/dt ≈ ${trueRate2.toFixed(1)} yd/s (Safety goes from ${trueD2_0.toFixed(1)} to ${trueD2_1.toFixed(1)} yd in 1s). You entered ${dD2.toFixed(1)}.` }
-      const tClose1 = (trueD1_0 - this.catchR) / Math.abs(trueRate1)
-      const tClose2 = (trueD2_0 - this.catchR) / Math.abs(trueRate2)
-      const cp = choice === 1 ? cp1 : cp2
-      const defId = this.coverIds[choice === 1 ? 'WR1' : 'WR2']
-      const defPlayer = this.players.find(p => p.id === defId)
-      const dx = cp.x - qb.x0, dy = cp.y - qb.y0
-      const throwDist = Math.sqrt(dx * dx + dy * dy)
-      const bvx = (dx / throwDist) * this.vBall, bvy = (dy / throwDist) * this.vBall
-      let thrown = false, bx = qb.x0, by = qb.y0
-      const trail = [], frames = []
-      const DT = 1 / 60
-      for (let i = 0; i < 600; i++) {
-        const t = i * DT
-        const players = this.players.map(p => {
-          const pos = posAt(p, t), vel = velAt(p, t)
-          return { ...p, ...pos, ...vel }
-        })
-        if (!thrown && t >= T) thrown = true
-        let alt = 0
-        if (thrown) {
-          bx += bvx * DT; by += bvy * DT
-          const traveled = Math.sqrt((bx - qb.x0) ** 2 + (by - qb.y0) ** 2)
-          alt = Math.max(0, Math.sin(Math.min(traveled / throwDist, 1) * Math.PI))
-          trail.push({ x: bx, y: by })
-        }
-        const defNow = posAt(defPlayer, t)
-        const defDist = Math.sqrt((defNow.x - cp.x) ** 2 + (defNow.y - cp.y) ** 2)
-        const ballNear = Math.sqrt((bx - cp.x) ** 2 + (by - cp.y) ** 2)
-        frames.push({ t, players, bx, by, alt, thrown, trail: [...trail], defDist, ballNear, catchPts: this.catchPts, tClose1, tClose2 })
-        if (thrown && ballNear < this.catchR) {
-          if (defDist > this.catchR) return { frames, result: 'win', analytical: `Complete! WR${choice} open — window ${defDist.toFixed(1)} yd. t_close1=${tClose1.toFixed(1)}s, t_close2=${tClose2.toFixed(1)}s.` }
-          return { frames, result: 'loss', analytical: `Defended! Window had closed (D=${defDist.toFixed(1)} yd < 2 yd). Throw before t=${(choice===1?tClose1:tClose2).toFixed(1)}s.` }
-        }
-        if (t > 6 || bx > 80) break
-      }
-      return { frames, result: 'loss', analytical: 'Ball went out of bounds. Adjust T.' }
-    },
-  },
-
-  // ── P3: Pick Six — Parametric Intersection ────────────────────────────────
-  {
-    id: 'P3', name: 'Pick Six', down: 'Defense',
-    concept: 'Parametric Paths · find t* where paths intersect',
-    color: '#a78bfa',
-    description: 'The offense threw a pass. You control the CB★. Write velocity components vx(t) and vy(t) to intercept the ball — reach it before the receiver does.',
-    theory: [
-      'Ball thrown at t=1.2s from QB (28, 0) toward (55, 16):',
-      'x_ball(t) = 28 + vbx·(t − 1.2)   for t ≥ 1.2',
-      'y_ball(t) = 0  + vby·(t − 1.2)',
-      'Your CB★ starts at (55, −14):',
-      'x_cb(t) = 55 + ∫vx dt,   y_cb(t) = −14 + ∫vy dt',
-      'Intercept: |CB(t*) − ball(t*)| < 2 yd',
-      'Hint: find where ball will be at t*, then aim there.',
-      't* ≈ dist(CB, intercept_pt) / |v_cb|',
-      'Speed cap: √(vx²+vy²) ≤ 12 yd/s.',
-    ],
-    inputs: [
-      { id: 'vx', label: 'CB horizontal velocity vx(t) — yd/s (+ = downfield):', placeholder: 'e.g.  -3', hint: 'CB starts at (55, −14). Ball heading to ≈(55, 16) at 28 yd/s.' },
-      { id: 'vy', label: 'CB lateral velocity vy(t) — yd/s (+ = toward top of screen):', placeholder: 'e.g.  11', hint: 'Compute: intercept_y − (−14) = how far to travel laterally. Speed ≤ 12 yd/s.' },
-    ],
-    players: [
-      { id: 'QB',  x0: 28, y0:   0, color: '#38bdf8', label: 'QB', segs: [{ vx: 0, vy: 0 }], offense: true  },
-      { id: 'WR',  x0: 30, y0:  12, color: '#f97316', label: 'WR', segs: [{ vx: 6, vy: 1 }], offense: true  },
-      { id: 'CB',  x0: 55, y0: -14, color: '#818cf8', label: 'CB★',segs: [], offense: false, controlled: true },
-      { id: 'S',   x0: 48, y0:   5, color: '#a855f7', label: 'S',  segs: [{ vx: -2, vy: 4 }], offense: false },
-    ],
-    throwT: 1.2, throwFrom: { x: 28, y: 0 }, throwTo: { x: 55, y: 16 }, vBall: 28, catchR: 2.5,
-    run(inputs) {
-      const vx_fn = parseExpr(inputs.vx, { t: 0 })
-      const vy_fn = parseExpr(inputs.vy, { t: 0 })
-      if (!vx_fn) return { error: 'vx', msg: 'Invalid vx — try: -3' }
-      if (!vy_fn) return { error: 'vy', msg: 'Invalid vy — try: 11' }
-      const DT = 1 / 60
-      const { throwT, throwFrom, throwTo, vBall } = this
-      const dx = throwTo.x - throwFrom.x, dy = throwTo.y - throwFrom.y
-      const throwDist = Math.sqrt(dx * dx + dy * dy)
-      const bvx = (dx / throwDist) * vBall, bvy = (dy / throwDist) * vBall
-      let cbX = 55, cbY = -14
-      const trail_cb = [], trail_ball = [], frames = []
-      const wr = this.players.find(p => p.id === 'WR')
-      const s  = this.players.find(p => p.id === 'S')
-      for (let i = 0; i < 540; i++) {
-        const t = i * DT
-        const thrown = t >= throwT
-        const bx = thrown ? throwFrom.x + bvx * (t - throwT) : throwFrom.x
-        const by = thrown ? throwFrom.y + bvy * (t - throwT) : throwFrom.y
-        const prog = thrown ? Math.min(Math.sqrt((bx - throwFrom.x) ** 2 + (by - throwFrom.y) ** 2) / throwDist, 1) : 0
-        const alt = thrown ? Math.max(0, Math.sin(prog * Math.PI)) : 0
-        const rawVx = vx_fn(t) ?? 0, rawVy = vy_fn(t) ?? 0
-        const speed = Math.sqrt(rawVx * rawVx + rawVy * rawVy)
-        const scale = speed > 12 ? 12 / speed : 1
-        cbX += rawVx * scale * DT; cbY += rawVy * scale * DT
-        if (thrown) { trail_ball.push({ x: bx, y: by }); trail_cb.push({ x: cbX, y: cbY }) }
-        const wrNow = posAt(wr, t), sNow = posAt(s, t)
-        const players = [
-          { ...this.players.find(p => p.id === 'QB'), ...posAt(this.players.find(p => p.id === 'QB'), t), ...velAt(this.players.find(p => p.id === 'QB'), t) },
-          { ...wr, ...wrNow, ...velAt(wr, t) },
-          { id: 'CB', x: cbX, y: cbY, vx: rawVx * scale, vy: rawVy * scale, color: '#818cf8', label: 'CB★', offense: false, controlled: true },
-          { ...s, ...sNow, ...velAt(s, t) },
-        ]
-        const cbBall = Math.sqrt((cbX - bx) ** 2 + (cbY - by) ** 2)
-        const wrBall = Math.sqrt((wrNow.x - bx) ** 2 + (wrNow.y - by) ** 2)
-        frames.push({ t, players, bx, by, alt, thrown, trail_cb: [...trail_cb], trail_ball: [...trail_ball], cbBall, wrBall })
-        if (thrown && cbBall < this.catchR && cbBall < wrBall) {
-          return { frames, result: 'win', analytical: `INTERCEPTION at t=${t.toFixed(2)}s! CB beat WR by ${(wrBall - cbBall).toFixed(1)} yd. At (${bx.toFixed(1)}, ${by.toFixed(1)}).` }
-        }
-        if (thrown && wrBall < this.catchR) {
-          return { frames, result: 'loss', analytical: `WR caught it — CB was ${cbBall.toFixed(1)} yd away. Adjust vx/vy to reach the ball's path earlier.` }
-        }
-        if (bx > 90 || t > 8) break
-      }
-      return { frames, result: 'loss', analytical: 'Ball went incomplete. Adjust velocity direction.' }
-    },
-  },
-
-  // ── P4: Power Run — Impulse ───────────────────────────────────────────────
-  {
-    id: 'P4', name: 'Power Run', down: '4th & 1',
-    concept: 'Impulse · J = ∫F(t) dt = Δp',
-    color: '#ef4444',
-    description: 'RB charges at 6 yd/s (momentum = 1200 lb·yd/s). Your blocker applies force F(t). The system integrates it — does your impulse stop the LB before the RB is tackled?',
-    theory: [
-      'RB: mass 200 lb, speed 6 yd/s → p_RB = 1200 lb·yd/s',
-      'LB: mass 230 lb, speed 5 yd/s toward RB → p_LB = 1150',
-      'Your blocker applies force F(t) to the LB (in lb):',
-      'Impulse: J(t) = ∫₀ᵗ F(τ) dτ',
-      'LB speed: v_LB(t) = (p_LB − J(t)) / m_LB',
-      'LB stops when J(t) ≥ p_LB = 1150 lb·yd/s',
-      'Constant force F: J = F·t, so F × T = 1150 → F = 1150/T',
-      'RB reaches LB in ≈ 1.3 s — stop LB before then!',
-    ],
-    inputs: [
-      { id: 'F', label: 'Blocker force function F(t) in lb:', placeholder: 'e.g.  900   or   500 + 400*t', hint: 'Need ∫F dt ≥ 1150 within ~1.3 s. Constant 900 lb → J = 900×1.3 = 1170. Try it.' },
-    ],
-    players: [
-      { id: 'RB',  x0: 24, y0:   2, color: '#f97316', label: 'RB',  segs: [{ vx: 6, vy: 0  }], offense: true,  hasBall: true },
-      { id: 'OL',  x0: 26, y0:  -2, color: '#38bdf8', label: 'OL',  segs: [{ vx: 4, vy: 1  }], offense: true  },
-      { id: 'WR1', x0: 24, y0:  18, color: '#fb923c', label: 'WR1', segs: [{ vx: 5, vy: 0  }], offense: true  },
-      { id: 'LB',  x0: 32, y0:   0, color: '#f87171', label: 'LB',  segs: [], offense: false, dynamic: true },
-      { id: 'DE',  x0: 33, y0:  -8, color: '#fca5a5', label: 'DE',  segs: [{ vx: -3, vy: 3 }], offense: false },
-      { id: 'S',   x0: 44, y0:  -5, color: '#a855f7', label: 'S',   segs: [{ vx: -3, vy: 2 }], offense: false },
-    ],
-    LB_MASS: 230, LB_P: 1150, RB_P: 1200,
-    run(inputs) {
-      const F_fn = parseExpr(inputs.F, { t: 0 })
-      if (!F_fn) return { error: 'F', msg: 'Invalid — try: 900  or  500 + 400*t' }
-      const DT = 1 / 60
-      let lbX = 32, impulse = 0
-      const frames = []
-      const rb  = this.players.find(p => p.id === 'RB')
-      const lb  = this.players.find(p => p.id === 'LB')
-      for (let i = 0; i < 480; i++) {
-        const t = i * DT
-        const F = Math.max(0, F_fn(t) ?? 0)
-        impulse += F * DT
-        const lbMomRemaining = Math.max(0, this.LB_P - impulse)
-        const lbSpeed = lbMomRemaining / this.LB_MASS
-        lbX -= lbSpeed * DT
-        const rbNow = posAt(rb, t)
-        const players = this.players.filter(p => !p.dynamic).map(p => {
-          const pos = posAt(p, t), vel = velAt(p, t)
-          return { ...p, ...pos, ...vel }
-        })
-        players.push({ ...lb, x: lbX, y: 0, vx: -lbSpeed, vy: 0 })
-        frames.push({ t, players, bx: null, by: null, alt: 0, thrown: false, trail: [], impulse, lbSpeed, lbX, rbX: rbNow.x, F })
-        if (rbNow.x >= lbX) {
-          if (lbSpeed < 1.5) return { frames, result: 'win', analytical: `TD! RB broke through at t=${t.toFixed(2)}s. J=${impulse.toFixed(0)} lb·yd/s (needed 1150). LB stopped cold.` }
-          return { frames, result: 'loss', analytical: `Stuffed! LB still had speed ${lbSpeed.toFixed(1)} yd/s at contact. J=${impulse.toFixed(0)} lb·yd/s — need 1150. Increase F.` }
-        }
-        if (t > 8) break
-      }
-      return { frames, result: 'loss', analytical: `Time expired. Accumulated J = ${impulse.toFixed(0)} lb·yd/s (need 1150).` }
-    },
-  },
-]
+// ─── Ball arc (projectile physics, real z in yards) ──────────────────────────
+// Peak height peakZ yards at midpoint of flight
+function ballArc(t, tThrow, tLand, peakZ = 3.5) {
+  if (t < tThrow || t > tLand) return 0;
+  const tf = tLand - tThrow;
+  if (tf <= 0) return 0;
+  const tp = tf / 2;
+  const g = (2 * peakZ) / (tp * tp);
+  const v0z = g * tp;
+  const dt = t - tThrow;
+  return Math.max(0, v0z * dt - 0.5 * g * dt * dt);
+}
 
 // ─── Canvas drawing ───────────────────────────────────────────────────────────
-function drawField(ctx) {
-  ctx.clearRect(0, 0, W, H)
+function drawIsoField(ctx) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#0a1628";
+  ctx.fillRect(0, 0, W, H);
+
+  const c1 = proj(0, -26.5),
+    c2 = proj(100, -26.5);
+  const c3 = proj(100, 26.5),
+    c4 = proj(0, 26.5);
+  ctx.beginPath();
+  ctx.moveTo(c1.cx, c1.cy);
+  ctx.lineTo(c2.cx, c2.cy);
+  ctx.lineTo(c3.cx, c3.cy);
+  ctx.lineTo(c4.cx, c4.cy);
+  ctx.closePath();
+  ctx.fillStyle = "#15803d";
+  ctx.fill();
+
   for (let i = 0; i < 10; i++) {
-    ctx.fillStyle = i % 2 === 0 ? '#166534' : '#15803d'
-    ctx.fillRect(EZ + i * (FW / 10), 0, FW / 10, H)
+    if (i % 2 === 0) continue;
+    const x0 = i * 10,
+      x1 = x0 + 10;
+    const a = proj(x0, -26.5),
+      b = proj(x1, -26.5);
+    const c = proj(x1, 26.5),
+      d = proj(x0, 26.5);
+    ctx.beginPath();
+    ctx.moveTo(a.cx, a.cy);
+    ctx.lineTo(b.cx, b.cy);
+    ctx.lineTo(c.cx, c.cy);
+    ctx.lineTo(d.cx, d.cy);
+    ctx.closePath();
+    ctx.fillStyle = "#166534";
+    ctx.fill();
   }
-  ctx.fillStyle = '#7f1d1d'; ctx.fillRect(0, 0, EZ, H)
-  ctx.fillStyle = '#1e3a5f'; ctx.fillRect(W - EZ, 0, EZ, H)
-  // Hash marks
-  const hash1 = fy(18.5), hash2 = fy(-18.5)
-  ;[10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(yd => {
-    const x = fx(yd)
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8
-    ctx.beginPath(); ctx.moveTo(x, 4); ctx.lineTo(x, H - 4); ctx.stroke()
-    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center'
-    ctx.fillText(yd, x, 10)
-    // Hash marks at NFL hash positions
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1
-    ctx.beginPath(); ctx.moveTo(x - 4, hash1); ctx.lineTo(x + 4, hash1); ctx.stroke()
-    ctx.beginPath(); ctx.moveTo(x - 4, hash2); ctx.lineTo(x + 4, hash2); ctx.stroke()
-  })
-  // Sidelines
-  ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1
-  ctx.beginPath(); ctx.moveTo(EZ, 2); ctx.lineTo(W - EZ, 2); ctx.stroke()
-  ctx.beginPath(); ctx.moveTo(EZ, H - 2); ctx.lineTo(W - EZ, H - 2); ctx.stroke()
-  // LOS hint at 30
-  ctx.strokeStyle = 'rgba(251,191,36,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4])
-  ctx.beginPath(); ctx.moveTo(fx(30), 2); ctx.lineTo(fx(30), H - 2); ctx.stroke()
-  ctx.setLineDash([])
-  ctx.fillStyle = 'rgba(251,191,36,0.5)'; ctx.font = '7px sans-serif'; ctx.textAlign = 'left'
-  ctx.fillText('LOS', fx(30) + 2, 10)
-}
 
-function drawArrow(ctx, x1, y1, x2, y2, color, width = 1.5) {
-  const dx = x2 - x1, dy = y2 - y1
-  const len = Math.sqrt(dx * dx + dy * dy)
-  if (len < 3) return
-  ctx.strokeStyle = color; ctx.lineWidth = width
-  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke()
-  const angle = Math.atan2(dy, dx)
-  ctx.fillStyle = color
-  ctx.beginPath()
-  ctx.moveTo(x2, y2)
-  ctx.lineTo(x2 - 9 * Math.cos(angle - 0.4), y2 - 9 * Math.sin(angle - 0.4))
-  ctx.lineTo(x2 - 9 * Math.cos(angle + 0.4), y2 - 9 * Math.sin(angle + 0.4))
-  ctx.closePath(); ctx.fill()
-}
+  [
+    [0, 10, "#7f1d1d"],
+    [90, 100, "#1e3a5f"],
+  ].forEach(([x0, x1, col]) => {
+    const a = proj(x0, -26.5),
+      b = proj(x1, -26.5),
+      c = proj(x1, 26.5),
+      d = proj(x0, 26.5);
+    ctx.beginPath();
+    ctx.moveTo(a.cx, a.cy);
+    ctx.lineTo(b.cx, b.cy);
+    ctx.lineTo(c.cx, c.cy);
+    ctx.lineTo(d.cx, d.cy);
+    ctx.closePath();
+    ctx.fillStyle = col;
+    ctx.globalAlpha = 0.75;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
 
-function drawPlayer(ctx, px, py, color, label, r = 11) {
-  ctx.fillStyle = color; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 1.5
-  ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
-  ctx.fillStyle = 'white'; ctx.font = `bold ${label.length > 2 ? 6 : 7}px sans-serif`
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText(label, px, py); ctx.textBaseline = 'alphabetic'
-}
-
-function drawBall(ctx, px, py, alt) {
-  const r = 4 + alt * 7
-  if (alt > 0.05) {
-    // Shadow at ground
-    ctx.fillStyle = 'rgba(0,0,0,0.3)'
-    ctx.beginPath(); ctx.ellipse(px, py, 4, 2.5, 0, 0, Math.PI * 2); ctx.fill()
-    // Shadow line
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 0.7; ctx.setLineDash([2, 2])
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - alt * 20); ctx.stroke(); ctx.setLineDash([])
-    // Ball floating up
-    ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.arc(px, py - alt * 20, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
-  } else {
-    ctx.fillStyle = '#b45309'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.5
-    ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+  for (let yd = 10; yd <= 90; yd += 10) {
+    const a = proj(yd, -26.5),
+      b = proj(yd, 26.5);
+    ctx.beginPath();
+    ctx.moveTo(a.cx, a.cy);
+    ctx.lineTo(b.cx, b.cy);
+    ctx.strokeStyle =
+      yd === 50 ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.25)";
+    ctx.lineWidth = yd === 50 ? 1.5 : 0.8;
+    ctx.stroke();
+    const lbl = proj(yd, -23);
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "bold 8px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(yd, lbl.cx, lbl.cy);
   }
-}
 
-function drawRoutePreview(ctx, player, color) {
-  if (!player.segs || player.segs.length === 0) return
-  ctx.strokeStyle = color + '55'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
-  ctx.beginPath()
-  ctx.moveTo(fx(player.x0), fy(player.y0))
-  let t = 0
-  for (let i = 0; i < 60; i++) {
-    t += 0.1
-    const pos = posAt(player, t)
-    const px = fx(pos.x), py = fy(pos.y)
-    if (px < 0 || px > W || py < 0 || py > H) break
-    ctx.lineTo(px, py)
+  for (let yd = 10; yd <= 90; yd += 5) {
+    [-3.5, 3.5].forEach((hy) => {
+      const a = proj(yd, hy - 1),
+        b = proj(yd, hy + 1);
+      ctx.beginPath();
+      ctx.moveTo(a.cx, a.cy);
+      ctx.lineTo(b.cx, b.cy);
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    });
   }
-  ctx.stroke(); ctx.setLineDash([])
+
+  [-26.5, 26.5].forEach((fy) => {
+    const a = proj(10, fy),
+      b = proj(90, fy);
+    ctx.beginPath();
+    ctx.moveTo(a.cx, a.cy);
+    ctx.lineTo(b.cx, b.cy);
+    ctx.strokeStyle = "rgba(255,255,255,0.4)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  const los1 = proj(30, -26.5),
+    los2 = proj(30, 26.5);
+  ctx.beginPath();
+  ctx.moveTo(los1.cx, los1.cy);
+  ctx.lineTo(los2.cx, los2.cy);
+  ctx.strokeStyle = "rgba(251,191,36,0.35)";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  const losLbl = proj(30, -24);
+  ctx.fillStyle = "rgba(251,191,36,0.6)";
+  ctx.font = "7px sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("LOS", losLbl.cx + 2, losLbl.cy);
 }
 
-const V_SCALE = 7 // pixels per yd/s for vectors
+function drawPlayer(ctx, fdx, fdy, color, label, fz = 0, r = 8) {
+  const { cx, cy } = proj(fdx, fdy, fz);
+  const sh = proj(fdx, fdy, 0);
+  ctx.beginPath();
+  ctx.ellipse(sh.cx, sh.cy, r * 1.4, r * 0.6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.7)";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+  ctx.fillStyle = "white";
+  ctx.font = `bold ${label.length > 2 ? 6 : 7}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, cx, cy);
+  ctx.textBaseline = "alphabetic";
+}
 
-function drawVelocityVector(ctx, px, py, vx, vy, color) {
-  if (Math.sqrt(vx * vx + vy * vy) < 0.3) return
-  drawArrow(ctx, px, py, px + vx * V_SCALE, py - vy * V_SCALE, color, 1.2)
+function drawBallFull(ctx, fdx, fdy, fz) {
+  const { cx, cy } = proj(fdx, fdy, fz);
+  const sh = proj(fdx, fdy, 0);
+  const r = 4 + fz * 1.2;
+  ctx.beginPath();
+  ctx.ellipse(
+    sh.cx,
+    sh.cy,
+    Math.max(3, r * 0.9),
+    Math.max(1.5, r * 0.4),
+    0,
+    0,
+    Math.PI * 2,
+  );
+  ctx.fillStyle = `rgba(0,0,0,${Math.max(0.1, 0.4 - fz * 0.06)})`;
+  ctx.fill();
+  if (fz > 0.3) {
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(sh.cx, sh.cy);
+    ctx.lineTo(cx, cy);
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = fz > 0.2 ? "#f59e0b" : "#b45309";
+  ctx.fill();
+  ctx.strokeStyle = "#78350f";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+}
+
+function drawVelArrow(ctx, fdx, fdy, vx, vy, color, scale = 1.0) {
+  if (!vx && !vy) return;
+  const from = proj(fdx, fdy, 0);
+  const to = proj(fdx + vx * scale, fdy + vy * scale, 0);
+  const dx = to.cx - from.cx,
+    dy = to.cy - from.cy;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len < 3) return;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(from.cx, from.cy);
+  ctx.lineTo(to.cx, to.cy);
+  ctx.stroke();
+  const angle = Math.atan2(dy, dx);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(to.cx, to.cy);
+  ctx.lineTo(
+    to.cx - 8 * Math.cos(angle - 0.4),
+    to.cy - 8 * Math.sin(angle - 0.4),
+  );
+  ctx.lineTo(
+    to.cx - 8 * Math.cos(angle + 0.4),
+    to.cy - 8 * Math.sin(angle + 0.4),
+  );
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawRoute(ctx, player, color) {
+  if (!player.segs?.length) return;
+  ctx.setLineDash([3, 3]);
+  ctx.strokeStyle = color + "55";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  let x = player.x0,
+    y = player.y0;
+  const p0 = proj(x, y);
+  ctx.moveTo(p0.cx, p0.cy);
+  for (const s of player.segs) {
+    const dur = s.dur ?? 3;
+    x += (s.vx ?? 0) * (isFinite(dur) ? dur : 3);
+    y += (s.vy ?? 0) * (isFinite(dur) ? dur : 3);
+    const p = proj(x, y);
+    ctx.lineTo(p.cx, p.cy);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
 }
 
 function drawImpulseBar(ctx, impulse, needed) {
-  const bx = 10, by = H - 26, bw = 140, bh = 14
-  ctx.fillStyle = 'rgba(0,0,0,0.5)'
-  ctx.fillRect(bx, by, bw, bh)
-  const pct = Math.min(impulse / needed, 1)
-  ctx.fillStyle = pct >= 1 ? '#4ade80' : pct > 0.6 ? '#fbbf24' : '#f87171'
-  ctx.fillRect(bx, by, bw * pct, bh)
-  ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1
-  ctx.strokeRect(bx, by, bw, bh)
-  ctx.fillStyle = 'white'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(`J = ${impulse.toFixed(0)} / ${needed} lb·yd/s`, bx + bw / 2, by + bh / 2)
-  ctx.textBaseline = 'alphabetic'
+  const bx = 10,
+    by = H - 28,
+    bw = 150,
+    bh = 14;
+  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.fillRect(bx, by, bw, bh);
+  const pct = Math.min(impulse / needed, 1);
+  ctx.fillStyle = pct >= 1 ? "#4ade80" : pct > 0.6 ? "#fbbf24" : "#f87171";
+  ctx.fillRect(bx, by, bw * pct, bh);
+  ctx.strokeStyle = "rgba(255,255,255,0.3)";
+  ctx.lineWidth = 0.8;
+  ctx.strokeRect(bx, by, bw, bh);
+  ctx.fillStyle = "white";
+  ctx.font = "8px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    `J = ${impulse.toFixed(0)} / ${needed} lb·yd/s`,
+    bx + bw / 2,
+    by + bh / 2,
+  );
+  ctx.textBaseline = "alphabetic";
 }
 
-function drawFrame(ctx, frame, play, showVectors) {
-  drawField(ctx)
-  if (!frame) return
-  const { players, bx, by, alt, thrown, trail, trail_cb, trail_ball, impulse } = frame
-  // Trails
-  const allTrail = trail || trail_ball || []
-  allTrail.forEach((pt, i) => {
-    ctx.fillStyle = '#fbbf24'; ctx.globalAlpha = 0.06 + (i / allTrail.length) * 0.3
-    ctx.beginPath(); ctx.arc(fx(pt.x), fy(pt.y), 2, 0, Math.PI * 2); ctx.fill()
-  })
+// Draw a "lead point" X marker on the field
+function drawLeadPoint(ctx, fdx, fdy, color) {
+  const { cx, cy } = proj(fdx, fdy, 0);
+  const s = 6;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - s, cy - s);
+  ctx.lineTo(cx + s, cy + s);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + s, cy - s);
+  ctx.lineTo(cx - s, cy + s);
+  ctx.stroke();
+}
+
+// ─── PLAYS ────────────────────────────────────────────────────────────────────
+const PLAYS = [
+  // ══════════════════════════════════════════════════════════════════════
+  // P1 — Slant Route: Integration
+  // KEY FIX: Ball correctly leads to where WR WILL BE (future position).
+  // The run() validates user's equations against actual kinematics.
+  // Ball is aimed at WR1's position at (T + flight_time), not just T.
+  // This makes it a true lead-pass problem: integrate to find future pos.
+  // ══════════════════════════════════════════════════════════════════════
+  {
+    id: "P1",
+    name: "Slant Route",
+    down: "2nd & 8",
+    concept: "Integration · x(t) = x₀ + ∫v dt",
+    color: "#22c55e",
+    description:
+      "WR1 runs a slant. Write x_r(t) and y_r(t), then find throw time T so the ball arrives WHERE THE RECEIVER WILL BE — not where he is now. Ball speed = 28 yd/s.",
+    theory: [
+      "CONCEPT: Integration gives position from velocity.",
+      "WR1 starts at (30, 10). Velocity: vx=5, vy=−3 yd/s.",
+      "x_r(t) = 30 + ∫₀ᵗ 5 dτ = 30 + 5t",
+      "y_r(t) = 10 + ∫₀ᵗ (−3) dτ = 10 − 3t",
+      "QB at (28, 0). Ball speed v_b = 28 yd/s.",
+      "At throw T: WR1 is at (x_r(T), y_r(T)).",
+      "Flight time: t_f = dist(QB, WR1(T)) / 28",
+      "Ball lands at T + t_f. WR1 also moves during t_f!",
+      "True target = WR1(T + t_f), NOT WR1(T).",
+      "Iterate: guess T, compute t_f, check WR1(T+t_f).",
+      "Try T ≈ 0.8s. Hint: at T=1.0, WR1 = (35, 7).",
+    ],
+    inputs: [
+      {
+        id: "rx",
+        label: "x_r(t) — WR1 downfield position (yd):",
+        placeholder: "30 + 5*t",
+        hint: "Starts 30 yd, runs 5 yd/s downfield",
+      },
+      {
+        id: "ry",
+        label: "y_r(t) — WR1 lateral position (yd from center):",
+        placeholder: "10 - 3*t",
+        hint: "Starts +10 yd, cuts inside at 3 yd/s",
+      },
+      {
+        id: "T",
+        label: "Throw at time T (seconds after snap):",
+        placeholder: "1.0",
+        hint: "Ball must reach WR1's FUTURE position. Try T = 0.5 to 1.5",
+      },
+    ],
+    players: [
+      {
+        id: "QB",
+        x0: 28,
+        y0: 0,
+        color: "#38bdf8",
+        label: "QB",
+        segs: [{ vx: 0, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR1",
+        x0: 30,
+        y0: 10,
+        color: "#f97316",
+        label: "WR1",
+        segs: [{ vx: 5, vy: -3 }],
+        offense: true,
+      },
+      {
+        id: "WR2",
+        x0: 30,
+        y0: 22,
+        color: "#fb923c",
+        label: "WR2",
+        segs: [{ vx: 5, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "CB1",
+        x0: 33,
+        y0: 11,
+        color: "#f87171",
+        label: "CB",
+        segs: [{ vx: 4.5, vy: -2.5 }],
+        offense: false,
+      },
+      {
+        id: "CB2",
+        x0: 33,
+        y0: 23,
+        color: "#fca5a5",
+        label: "CB2",
+        segs: [{ vx: 5, vy: 0 }],
+        offense: false,
+      },
+      {
+        id: "LB",
+        x0: 38,
+        y0: 2,
+        color: "#c084fc",
+        label: "LB",
+        segs: [
+          { dur: 0.8, vx: -1, vy: 3 },
+          { vx: -0.5, vy: 0 },
+        ],
+        offense: false,
+      },
+      {
+        id: "S",
+        x0: 48,
+        y0: 8,
+        color: "#a855f7",
+        label: "S",
+        segs: [{ vx: -2, vy: -3 }],
+        offense: false,
+      },
+    ],
+    qbId: "QB",
+    targetId: "WR1",
+    coverId: "CB1",
+    vBall: 28,
+    catchR: 1.8,
+    peakZ: 4,
+    run(inputs) {
+      const rx_fn = parseExpr(inputs.rx, ["t"]);
+      const ry_fn = parseExpr(inputs.ry, ["t"]);
+      const T = parseFloat(inputs.T);
+      if (!rx_fn) return { error: "rx", msg: "Invalid — try: 30 + 5*t" };
+      if (!ry_fn) return { error: "ry", msg: "Invalid — try: 10 - 3*t" };
+      if (isNaN(T) || T < 0 || T > 6)
+        return { error: "T", msg: "T must be 0–6 s" };
+
+      // Validate equations match actual kinematics
+      const wr1 = this.players.find((p) => p.id === "WR1");
+      for (const ta of [0, 0.5, 1.0, 1.5]) {
+        const act = posAt(wr1, ta);
+        const gx = rx_fn(ta),
+          gy = ry_fn(ta);
+        if (gx === null || Math.abs(gx - act.x) > 1.5)
+          return {
+            warning: `x_r(${ta}s) = ${gx?.toFixed(1) ?? "?"} yd, but WR1 is actually at x = ${act.x.toFixed(1)} yd. Check your x equation.`,
+          };
+        if (gy === null || Math.abs(gy - act.y) > 1.5)
+          return {
+            warning: `y_r(${ta}s) = ${gy?.toFixed(1) ?? "?"} yd, but WR1 is actually at y = ${act.y.toFixed(1)} yd. Check your y equation.`,
+          };
+      }
+
+      const DT = 1 / 60;
+      const qb = this.players.find((p) => p.id === this.qbId);
+      const tgt = this.players.find((p) => p.id === this.targetId);
+      const cb = this.players.find((p) => p.id === this.coverId);
+
+      // CORRECT PHYSICS: Aim ball at WR1's position WHEN IT ARRIVES, not just at T.
+      // At throw time T, compute WR1 pos. Estimate flight time. Then target WR1 at T+tFlight.
+      // One iteration is sufficient since velocities are constant.
+      const qbPos = posAt(qb, T);
+      const wrAtT = posAt(tgt, T);
+      const estDist = Math.sqrt(
+        (wrAtT.x - qbPos.x) ** 2 + (wrAtT.y - qbPos.y) ** 2,
+      );
+      const estFlight = estDist / this.vBall;
+      // Lead target: where WR1 will be when ball arrives
+      const wrLead = posAt(tgt, T + estFlight);
+      // Refine once
+      const leadDist = Math.sqrt(
+        (wrLead.x - qbPos.x) ** 2 + (wrLead.y - qbPos.y) ** 2,
+      );
+      const tFlight = leadDist / this.vBall;
+      const wrFinal = posAt(tgt, T + tFlight);
+      const actualLeadDist = Math.sqrt(
+        (wrFinal.x - qbPos.x) ** 2 + (wrFinal.y - qbPos.y) ** 2,
+      );
+      const tLand = T + actualLeadDist / this.vBall;
+
+      const dx = wrFinal.x - qbPos.x,
+        dy = wrFinal.y - qbPos.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      const bvx = (dx / d) * this.vBall,
+        bvy = (dy / d) * this.vBall;
+
+      let thrown = false,
+        bx = qbPos.x,
+        by = qbPos.y;
+      const trail = [],
+        frames = [];
+
+      for (let i = 0; i < 720; i++) {
+        const t = i * DT;
+        const players = this.players.map((p) => ({
+          ...p,
+          ...posAt(p, t),
+          ...velAt(p, t),
+        }));
+        if (!thrown && t >= T) {
+          thrown = true;
+        }
+        if (thrown) {
+          bx += bvx * DT;
+          by += bvy * DT;
+          trail.push({ x: bx, y: by });
+        }
+        const fz = ballArc(t, T, tLand, this.peakZ);
+        const tgtNow = posAt(tgt, t),
+          cbNow = posAt(cb, t);
+        const catchDist = Math.sqrt(
+          (bx - tgtNow.x) ** 2 + (by - tgtNow.y) ** 2,
+        );
+        const cbBallDist = Math.sqrt((bx - cbNow.x) ** 2 + (by - cbNow.y) ** 2);
+        // Lead point for visualization
+        const leadX = wrFinal.x,
+          leadY = wrFinal.y;
+        frames.push({
+          t,
+          players,
+          bx,
+          by,
+          fz,
+          thrown,
+          trail: [...trail],
+          catchDist,
+          cbBallDist,
+          leadX,
+          leadY,
+          tLand,
+          T,
+          flightTime: tFlight,
+        });
+        if (thrown && catchDist < this.catchR && fz < 1.5) {
+          return {
+            frames,
+            result: "win",
+            msg: `Caught! t=${t.toFixed(2)}s — WR1 at (${tgtNow.x.toFixed(1)}, ${tgtNow.y.toFixed(1)}) yd. You led him perfectly by ${actualLeadDist.toFixed(1)} yd.`,
+          };
+        }
+        if (thrown && cbBallDist < 1.8 && fz < 1.2 && t > T + 0.2) {
+          return {
+            frames,
+            result: "loss",
+            msg: `Tipped by CB at t=${t.toFixed(2)}s! CB closed to ${cbBallDist.toFixed(1)} yd. Try T ≈ ${(T - 0.2).toFixed(2)}s to beat the coverage.`,
+          };
+        }
+        if (t > 7 || bx > 85) break;
+      }
+      const last = frames[frames.length - 1];
+      const tgtLast = last?.players?.find((p) => p.id === this.targetId);
+      const over = tgtLast && last.bx > tgtLast.x;
+      return {
+        frames,
+        result: "loss",
+        msg: `Incomplete — ${(last?.catchDist || 99).toFixed(1)} yd off target. ${over ? "Overthrown — decrease T." : "Underthrown — increase T."}`,
+      };
+    },
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // P2 — Seam Route: Related Rates
+  // KEY FIX: dD/dt validated against actual simulation, t_close shown live,
+  // window open/closed indicator draws on canvas.
+  // ══════════════════════════════════════════════════════════════════════
+  {
+    id: "P2",
+    name: "Seam Route",
+    down: "3rd & 5",
+    concept: "Related Rates · dD/dt",
+    color: "#f59e0b",
+    description:
+      "Two windows, two defenders closing at different rates. Calculate dD/dt (closure rate) for each. The window that stays open longer is your safe throw. Time it.",
+    theory: [
+      "CONCEPT: Related rates link changing quantities.",
+      "D(t) = distance from defender to catch point.",
+      "D(t) = √[(x_d(t)−x_c)² + (y_d(t)−y_c)²]",
+      "dD/dt = [(x_d−x_c)vdx + (y_d−y_c)vdy] / D",
+      "Negative dD/dt = window closing.",
+      "t_close = D₀ / |dD/dt|  (time to close)",
+      "Ball flight time: t_f = dist(QB→catch) / 28",
+      "Throw at T where: T + t_f < t_close",
+      "WR1 seam at (50, 12). CB1 closing fast.",
+      "WR2 cross at (46, −10). Safety closing slow.",
+      "Compare t_close for each. Pick the open window.",
+    ],
+    inputs: [
+      {
+        id: "dD1",
+        label: "Closure rate on WR1 catch pt — dD₁/dt (yd/s):",
+        placeholder: "-5",
+        hint: "CB1 approaches catch pt. dD/dt is negative (closing). Estimate from CB1 speed and angle.",
+      },
+      {
+        id: "dD2",
+        label: "Closure rate on WR2 catch pt — dD₂/dt (yd/s):",
+        placeholder: "-3.5",
+        hint: "Safety approaches WR2 catch pt. Should be less negative = window open longer.",
+      },
+      {
+        id: "choice",
+        label: "Throw to WR1 or WR2? (enter 1 or 2):",
+        placeholder: "2",
+        hint: "t_close = D₀/|dD/dt|. Larger t_close = safer window.",
+      },
+      {
+        id: "T",
+        label: "Throw at time T (seconds after snap):",
+        placeholder: "1.5",
+        hint: "Ball must arrive before t_close. t_f = dist/28 ≈ 0.8s.",
+      },
+    ],
+    players: [
+      {
+        id: "QB",
+        x0: 28,
+        y0: 0,
+        color: "#38bdf8",
+        label: "QB",
+        segs: [{ vx: 0, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR1",
+        x0: 30,
+        y0: 12,
+        color: "#f97316",
+        label: "WR1",
+        segs: [{ vx: 6, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR2",
+        x0: 30,
+        y0: -10,
+        color: "#fb923c",
+        label: "WR2",
+        segs: [{ vx: 5, vy: -1 }],
+        offense: true,
+      },
+      {
+        id: "CB1",
+        x0: 38,
+        y0: 17,
+        color: "#f87171",
+        label: "CB1",
+        segs: [{ vx: 5, vy: -3 }],
+        offense: false,
+      },
+      {
+        id: "S",
+        x0: 44,
+        y0: 3,
+        color: "#a855f7",
+        label: "S",
+        segs: [{ vx: 3, vy: -5 }],
+        offense: false,
+      },
+      {
+        id: "LB",
+        x0: 36,
+        y0: -3,
+        color: "#c084fc",
+        label: "LB",
+        segs: [{ vx: 2, vy: -2 }],
+        offense: false,
+      },
+    ],
+    catchPts: { WR1: { x: 50, y: 12 }, WR2: { x: 46, y: -10 } },
+    coverIds: { WR1: "CB1", WR2: "S" },
+    qbId: "QB",
+    vBall: 28,
+    catchR: 2,
+    peakZ: 5,
+    run(inputs) {
+      const dD1 = parseFloat(inputs.dD1),
+        dD2 = parseFloat(inputs.dD2);
+      const choice = parseInt(inputs.choice),
+        T = parseFloat(inputs.T);
+      if (isNaN(dD1) || dD1 >= 0)
+        return {
+          error: "dD1",
+          msg: "Must be negative (window is closing). Try −5.",
+        };
+      if (isNaN(dD2) || dD2 >= 0)
+        return { error: "dD2", msg: "Must be negative. Try −3.5." };
+      if (choice !== 1 && choice !== 2)
+        return { error: "choice", msg: "Enter 1 or 2" };
+      if (isNaN(T) || T < 0 || T > 6)
+        return { error: "T", msg: "T must be 0–6 s" };
+
+      const cb1 = this.players.find((p) => p.id === "CB1");
+      const s = this.players.find((p) => p.id === "S");
+      const cp1 = this.catchPts.WR1,
+        cp2 = this.catchPts.WR2;
+      const qb = this.players.find((p) => p.id === this.qbId);
+
+      // Compute true closure rates using actual kinematics
+      const computeRate = (defPlayer, catchPt, t0) => {
+        const d0 = posAt(defPlayer, t0);
+        const d1 = posAt(defPlayer, t0 + 0.5);
+        const D0 = Math.sqrt((d0.x - catchPt.x) ** 2 + (d0.y - catchPt.y) ** 2);
+        const D1 = Math.sqrt((d1.x - catchPt.x) ** 2 + (d1.y - catchPt.y) ** 2);
+        return (D1 - D0) / 0.5; // yd/s
+      };
+      const trueRate1 = computeRate(cb1, cp1, 0);
+      const trueRate2 = computeRate(s, cp2, 0);
+      const trueD1_0 = Math.sqrt(
+        (posAt(cb1, 0).x - cp1.x) ** 2 + (posAt(cb1, 0).y - cp1.y) ** 2,
+      );
+      const trueD2_0 = Math.sqrt(
+        (posAt(s, 0).x - cp2.x) ** 2 + (posAt(s, 0).y - cp2.y) ** 2,
+      );
+
+      if (Math.abs(dD1 - trueRate1) > 2.0)
+        return {
+          warning: `dD₁/dt ≈ ${trueRate1.toFixed(1)} yd/s (CB1 at ${trueD1_0.toFixed(1)} yd from catch pt, closing at that rate). You entered ${dD1.toFixed(1)} — off by ${Math.abs(dD1 - trueRate1).toFixed(1)}.`,
+        };
+      if (Math.abs(dD2 - trueRate2) > 2.0)
+        return {
+          warning: `dD₂/dt ≈ ${trueRate2.toFixed(1)} yd/s (Safety at ${trueD2_0.toFixed(1)} yd, closing at that rate). You entered ${dD2.toFixed(1)} — off by ${Math.abs(dD2 - trueRate2).toFixed(1)}.`,
+        };
+
+      const tClose1 = (trueD1_0 - this.catchR) / Math.abs(trueRate1);
+      const tClose2 = (trueD2_0 - this.catchR) / Math.abs(trueRate2);
+
+      // Which was the right choice?
+      const cp = choice === 1 ? cp1 : cp2;
+      const defId = this.coverIds[choice === 1 ? "WR1" : "WR2"];
+      const defPlayer = this.players.find((p) => p.id === defId);
+      const dx = cp.x - qb.x0,
+        dy = cp.y - qb.y0;
+      const throwDist = Math.sqrt(dx * dx + dy * dy);
+      const bvx = (dx / throwDist) * this.vBall,
+        bvy = (dy / throwDist) * this.vBall;
+      const tLand = T + throwDist / this.vBall;
+
+      let thrown = false,
+        bx = qb.x0,
+        by = qb.y0;
+      const trail = [],
+        frames = [];
+
+      for (let i = 0; i < 720; i++) {
+        const t = i * DT;
+        const players = this.players.map((p) => ({
+          ...p,
+          ...posAt(p, t),
+          ...velAt(p, t),
+        }));
+        if (!thrown && t >= T) {
+          thrown = true;
+        }
+        if (thrown) {
+          bx += bvx * DT;
+          by += bvy * DT;
+          trail.push({ x: bx, y: by });
+        }
+        const fz = ballArc(t, T, tLand, this.peakZ);
+        const defNow = posAt(defPlayer, t);
+        const defDist = Math.sqrt(
+          (defNow.x - cp.x) ** 2 + (defNow.y - cp.y) ** 2,
+        );
+        const ballNear = Math.sqrt((bx - cp.x) ** 2 + (by - cp.y) ** 2);
+        // Live D values for both windows
+        const cb1Now = posAt(cb1, t),
+          sNow = posAt(s, t);
+        const D1live = Math.sqrt(
+          (cb1Now.x - cp1.x) ** 2 + (cb1Now.y - cp1.y) ** 2,
+        );
+        const D2live = Math.sqrt((sNow.x - cp2.x) ** 2 + (sNow.y - cp2.y) ** 2);
+        frames.push({
+          t,
+          players,
+          bx,
+          by,
+          fz,
+          thrown,
+          trail: [...trail],
+          defDist,
+          ballNear,
+          catchPts: this.catchPts,
+          tClose1,
+          tClose2,
+          D1live,
+          D2live,
+          choice,
+        });
+        if (thrown && ballNear < this.catchR && fz < 1.5) {
+          if (defDist > this.catchR)
+            return {
+              frames,
+              result: "win",
+              msg: `Complete to WR${choice}! ${defDist.toFixed(1)} yd clearance at arrival. t_close1=${tClose1.toFixed(1)}s, t_close2=${tClose2.toFixed(1)}s — you chose correctly.`,
+            };
+          return {
+            frames,
+            result: "loss",
+            msg: `Defended! Window had closed (D=${defDist.toFixed(1)} yd < ${this.catchR} needed). Throw before t=${(choice === 1 ? tClose1 : tClose2).toFixed(1)}s.`,
+          };
+        }
+        if (t > 7 || bx > 85) break;
+      }
+      return { frames, result: "loss", msg: "Ball out of range. Adjust T." };
+    },
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // P3 — Pick Six: Parametric Intersection
+  // KEY FIX: Ball is thrown toward WR's ACTUAL FUTURE position (correctly
+  // leads the WR). CB must reach ball BEFORE WR does. Speed cap enforced.
+  // ══════════════════════════════════════════════════════════════════════
+  {
+    id: "P3",
+    name: "Pick Six",
+    down: "Defense — YOU are CB",
+    concept: "Parametric Paths · find t* where paths cross",
+    color: "#a78bfa",
+    description:
+      "The offense threw a pass. YOU control CB★ with velocity equations vx(t) and vy(t). Reach the ball's position before the WR does. Speed cap: 12 yd/s.",
+    theory: [
+      "CONCEPT: Two parametric paths, find intersection.",
+      "Ball thrown t=1.2s from QB(28,0) toward WR future pos.",
+      "WR runs: vx=6, vy=1 yd/s from (30,12).",
+      "WR at catch t≈2.5s: (39, 13.5).",
+      "Ball path: x_b(t) = 28 + vbx·(t−1.2)",
+      "           y_b(t) = 0  + vby·(t−1.2)",
+      "Your CB★ starts at (55, −14):",
+      "x_cb(t) = 55 + ∫₀ᵗ vx(τ) dτ",
+      "y_cb(t) = −14 + ∫₀ᵗ vy(τ) dτ",
+      "Intercept: find t* where |CB(t*) − ball(t*)| < 2.5",
+      "AND CB must arrive BEFORE WR arrives.",
+      "Hint: ball peaks around (39,13). Run at vy ≈ 10–12.",
+    ],
+    inputs: [
+      {
+        id: "vx",
+        label: "CB★ vx(t) — downfield velocity (yd/s, can use t):",
+        placeholder: "-4",
+        hint: "CB at x=55, ball near x=39. Need to move left (negative). Try: −4 or −5+t",
+      },
+      {
+        id: "vy",
+        label: "CB★ vy(t) — lateral velocity (yd/s, can use t):",
+        placeholder: "11",
+        hint: "CB at y=−14, ball near y=13. Need ~27 yd laterally. At 11 yd/s → ≈2.5s.",
+      },
+    ],
+    players: [
+      {
+        id: "QB",
+        x0: 28,
+        y0: 0,
+        color: "#38bdf8",
+        label: "QB",
+        segs: [{ vx: 0, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR",
+        x0: 30,
+        y0: 12,
+        color: "#f97316",
+        label: "WR",
+        segs: [{ vx: 6, vy: 1 }],
+        offense: true,
+      },
+      {
+        id: "CB",
+        x0: 55,
+        y0: -14,
+        color: "#818cf8",
+        label: "CB★",
+        segs: [],
+        offense: false,
+        controlled: true,
+      },
+      {
+        id: "S",
+        x0: 48,
+        y0: 5,
+        color: "#a855f7",
+        label: "S",
+        segs: [{ vx: -2, vy: 4 }],
+        offense: false,
+      },
+    ],
+    throwT: 1.2,
+    throwFrom: { x: 28, y: 0 },
+    vBall: 28,
+    catchR: 2.5,
+    peakZ: 6,
+    run(inputs) {
+      const vx_fn = parseExpr(inputs.vx, ["t"]);
+      const vy_fn = parseExpr(inputs.vy, ["t"]);
+      if (!vx_fn) return { error: "vx", msg: "Invalid — try: -4  or  -3 + t" };
+      if (!vy_fn) return { error: "vy", msg: "Invalid — try: 11  or  8 + 2*t" };
+
+      const DT = 1 / 60;
+      const { throwT, throwFrom, vBall } = this;
+      const wr = this.players.find((p) => p.id === "WR");
+
+      // CORRECT: Aim ball at WR's future position (lead pass)
+      const wrAtThrow = posAt(wr, throwT);
+      const estDist = Math.sqrt(
+        (wrAtThrow.x - throwFrom.x) ** 2 + (wrAtThrow.y - throwFrom.y) ** 2,
+      );
+      const estFlight = estDist / vBall;
+      const wrLead = posAt(wr, throwT + estFlight);
+      const leadDist = Math.sqrt(
+        (wrLead.x - throwFrom.x) ** 2 + (wrLead.y - throwFrom.y) ** 2,
+      );
+      const tFlight = leadDist / vBall;
+      const wrFinal = posAt(wr, throwT + tFlight);
+      const throwTo = wrFinal;
+      const finalDist = Math.sqrt(
+        (throwTo.x - throwFrom.x) ** 2 + (throwTo.y - throwFrom.y) ** 2,
+      );
+      const bvx = ((throwTo.x - throwFrom.x) / finalDist) * vBall;
+      const bvy = ((throwTo.y - throwFrom.y) / finalDist) * vBall;
+      const tLand = throwT + finalDist / vBall;
+
+      let cbX = 55,
+        cbY = -14;
+      const trail_cb = [],
+        trail_ball = [],
+        frames = [];
+      const s = this.players.find((p) => p.id === "S");
+
+      for (let i = 0; i < 600; i++) {
+        const t = i * DT;
+        const thrown = t >= throwT;
+        const bx = thrown ? throwFrom.x + bvx * (t - throwT) : throwFrom.x;
+        const by = thrown ? throwFrom.y + bvy * (t - throwT) : throwFrom.y;
+        const fz = ballArc(t, throwT, tLand, this.peakZ);
+        const rawVx = vx_fn(t) ?? 0,
+          rawVy = vy_fn(t) ?? 0;
+        const spd = Math.sqrt(rawVx * rawVx + rawVy * rawVy);
+        const sc = spd > 12 ? 12 / spd : 1;
+        cbX += rawVx * sc * DT;
+        cbY += rawVy * sc * DT;
+        cbX = Math.max(10, Math.min(90, cbX));
+        cbY = Math.max(-26, Math.min(26, cbY));
+        if (thrown) {
+          trail_ball.push({ x: bx, y: by });
+          trail_cb.push({ x: cbX, y: cbY });
+        }
+        const wrNow = posAt(wr, t),
+          sNow = posAt(s, t);
+        const qbNow = posAt(
+          this.players.find((p) => p.id === "QB"),
+          t,
+        );
+        const players = [
+          {
+            ...this.players.find((p) => p.id === "QB"),
+            ...qbNow,
+            ...velAt(
+              this.players.find((p) => p.id === "QB"),
+              t,
+            ),
+          },
+          { ...wr, ...wrNow, ...velAt(wr, t) },
+          {
+            id: "CB",
+            x: cbX,
+            y: cbY,
+            vx: rawVx * sc,
+            vy: rawVy * sc,
+            color: "#818cf8",
+            label: "CB★",
+            offense: false,
+            controlled: true,
+          },
+          { ...s, ...sNow, ...velAt(s, t) },
+        ];
+        const cbBall = Math.sqrt((cbX - bx) ** 2 + (cbY - by) ** 2);
+        const wrBall = Math.sqrt((wrNow.x - bx) ** 2 + (wrNow.y - by) ** 2);
+        frames.push({
+          t,
+          players,
+          bx,
+          by,
+          fz,
+          thrown,
+          trail_cb: [...trail_cb],
+          trail_ball: [...trail_ball],
+          cbBall,
+          wrBall,
+          cbSpd: spd * sc,
+          leadX: throwTo.x,
+          leadY: throwTo.y,
+        });
+        if (thrown && cbBall < this.catchR && cbBall <= wrBall && fz < 2) {
+          return {
+            frames,
+            result: "win",
+            msg: `INTERCEPTION at t=${t.toFixed(2)}s! CB beat WR by ${(wrBall - cbBall).toFixed(1)} yd. Parametric paths crossed at (${bx.toFixed(1)}, ${by.toFixed(1)}).`,
+          };
+        }
+        if (thrown && wrBall < this.catchR && fz < 2) {
+          return {
+            frames,
+            result: "loss",
+            msg: `WR caught it — CB was ${cbBall.toFixed(1)} yd away at arrival. Adjust direction or speed.`,
+          };
+        }
+        if (bx > 92 || t > 9) break;
+      }
+      return {
+        frames,
+        result: "loss",
+        msg: "Ball incomplete — check direction.",
+      };
+    },
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // P4 — Power Run: Impulse-Momentum
+  // Physics accurate. LB decelerates as impulse accumulates.
+  // RB contact triggers win/loss based on LB remaining speed.
+  // ══════════════════════════════════════════════════════════════════════
+  {
+    id: "P4",
+    name: "Power Run",
+    down: "4th & 1",
+    concept: "Impulse · J = ∫F(t) dt = Δp",
+    color: "#ef4444",
+    description:
+      "RB charges at 6 yd/s. Your blocker applies force F(t) to the LB. Compute impulse J = ∫F dt and neutralize the LB's momentum before he reaches the RB.",
+    theory: [
+      "CONCEPT: Impulse = change in momentum.",
+      "Momentum: p = m·v",
+      "Impulse: J(t) = ∫₀ᵗ F(τ) dτ",
+      "Newton 2: J = Δp = m·Δv",
+      "LB: mass = 230 lb, initial speed = 5 yd/s.",
+      "p_LB = 230 × 5 = 1150 lb·yd/s",
+      "v_LB(t) = (p_LB − J(t)) / 230",
+      "LB stops when J(t) ≥ 1150 lb·yd/s.",
+      "RB reaches LB in ≈ 1.3 s — stop him first!",
+      "Constant F: J = F·t. Need F × 1.3 ≥ 1150.",
+      "→ F ≥ 885 lb. Try F = 900 or F = 600 + 300*t.",
+    ],
+    inputs: [
+      {
+        id: "F",
+        label: "Blocker force F(t) in lb (can be function of t):",
+        placeholder: "900",
+        hint: "J = ∫₀ᵗ F dτ must reach 1150 lb·yd/s within ~1.3s. Try: 900  or  600 + 300*t  or  1200*exp(-t/2)",
+      },
+    ],
+    players: [
+      {
+        id: "RB",
+        x0: 24,
+        y0: 2,
+        color: "#f97316",
+        label: "RB",
+        segs: [{ vx: 6, vy: 0 }],
+        offense: true,
+        hasBall: true,
+      },
+      {
+        id: "OL",
+        x0: 26,
+        y0: -2,
+        color: "#38bdf8",
+        label: "OL",
+        segs: [{ vx: 4, vy: 1 }],
+        offense: true,
+      },
+      {
+        id: "WR1",
+        x0: 24,
+        y0: 18,
+        color: "#fb923c",
+        label: "WR1",
+        segs: [{ vx: 5, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "LB",
+        x0: 32,
+        y0: 0,
+        color: "#f87171",
+        label: "LB",
+        segs: [],
+        offense: false,
+        dynamic: true,
+      },
+      {
+        id: "DE",
+        x0: 33,
+        y0: -8,
+        color: "#fca5a5",
+        label: "DE",
+        segs: [{ vx: -3, vy: 3 }],
+        offense: false,
+      },
+      {
+        id: "S",
+        x0: 44,
+        y0: -5,
+        color: "#a855f7",
+        label: "S",
+        segs: [{ vx: -3, vy: 2 }],
+        offense: false,
+      },
+    ],
+    LB_MASS: 230,
+    LB_P: 1150,
+    peakZ: 0,
+    run(inputs) {
+      const F_fn = parseExpr(inputs.F, ["t"]);
+      if (!F_fn)
+        return { error: "F", msg: "Invalid — try: 900  or  600 + 300*t" };
+      const DT = 1 / 60;
+      let lbX = 32,
+        lbY = 0,
+        impulse = 0;
+      const frames = [];
+      const rb = this.players.find((p) => p.id === "RB");
+      const lb = this.players.find((p) => p.id === "LB");
+
+      for (let i = 0; i < 540; i++) {
+        const t = i * DT;
+        const F = Math.max(0, F_fn(t) ?? 0);
+        impulse += F * DT;
+        const lbMom = Math.max(0, this.LB_P - impulse);
+        const lbSpeed = lbMom / this.LB_MASS;
+        // LB moves toward RB (downfield = left in this setup, negative x direction)
+        lbX -= lbSpeed * DT;
+        const rbNow = posAt(rb, t);
+        const staticPlayers = this.players
+          .filter((p) => !p.dynamic)
+          .map((p) => ({ ...p, ...posAt(p, t), ...velAt(p, t) }));
+        staticPlayers.push({ ...lb, x: lbX, y: lbY, vx: -lbSpeed, vy: 0 });
+        frames.push({
+          t,
+          players: staticPlayers,
+          bx: null,
+          by: null,
+          fz: 0,
+          thrown: false,
+          trail: [],
+          impulse,
+          lbSpeed,
+          lbX,
+          rbX: rbNow.x,
+          F,
+        });
+        if (rbNow.x >= lbX - 0.3) {
+          if (lbSpeed < 1.5)
+            return {
+              frames,
+              result: "win",
+              msg: `TD! LB neutralized at t=${t.toFixed(2)}s. J=${impulse.toFixed(0)} lb·yd/s (needed ${this.LB_P}). LB speed at contact: ${lbSpeed.toFixed(1)} yd/s.`,
+            };
+          return {
+            frames,
+            result: "loss",
+            msg: `Stuffed! LB still had ${lbSpeed.toFixed(1)} yd/s at contact. J=${impulse.toFixed(0)} lb·yd/s — need ${this.LB_P}. Increase F.`,
+          };
+        }
+        if (t > 9) break;
+      }
+      return {
+        frames,
+        result: "loss",
+        msg: `Time ran out. J=${impulse.toFixed(0)} lb·yd/s — need ${this.LB_P}.`,
+      };
+    },
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // P5 — Hail Mary: Optimization
+  // KEY FIX: Ball now has correct lateral component based on theta in the
+  // 3D iso projection. y_ball is no longer constant — the angle determines
+  // both the downfield range AND where it lands laterally.
+  // dR/dθ shown live as learner changes angle.
+  // ══════════════════════════════════════════════════════════════════════
+  {
+    id: "P5",
+    name: "Hail Mary",
+    down: "4th & Long — 0:00",
+    concept: "Optimization · maximize R(θ)",
+    color: "#06b6d4",
+    description:
+      "Last play. Find angle θ that maximizes range AND clears two safeties. R(θ) = v₀²sin(2θ)/g. Set dR/dθ = 0 to find optimal θ, then check if it fits through the gap.",
+    theory: [
+      "CONCEPT: Optimization — find critical points.",
+      "Projectile range: R(θ) = v₀²·sin(2θ) / g",
+      "Maximize: dR/dθ = 2v₀²·cos(2θ) / g = 0",
+      "→ cos(2θ) = 0  →  2θ = 90°  →  θ = 45°",
+      "d²R/dθ² = −4v₀²·sin(2θ)/g < 0 → confirmed max.",
+      "v₀ = 28 yd/s, g = 9.8 yd/s².",
+      "R_max = v₀²/g = 784/9.8 ≈ 80 yd.",
+      "But safeties spread at T seconds — they create a gap.",
+      "Find θ where ball flies BETWEEN the safeties.",
+      "The throw direction is straight downfield (y=0 aim).",
+      "sin(2×45°) = 1.0 → maximum range.",
+      "sin(2×30°) = 0.866 → R = 69.4 yd.",
+    ],
+    inputs: [
+      {
+        id: "theta",
+        label: "Launch angle θ (degrees, 0–90):",
+        placeholder: "45",
+        hint: "θ=45° maximizes range. Compute R(θ) = 28²·sin(2θ)/9.8. Compare to needed distance.",
+      },
+      {
+        id: "T",
+        label: "Throw at time T (seconds after snap):",
+        placeholder: "0.5",
+        hint: "Safeties spread over time. Earlier = smaller gap. Later = more spread but shorter sim time.",
+      },
+    ],
+    players: [
+      {
+        id: "QB",
+        x0: 28,
+        y0: 0,
+        color: "#38bdf8",
+        label: "QB",
+        segs: [{ vx: 0, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR1",
+        x0: 30,
+        y0: 10,
+        color: "#f97316",
+        label: "WR1",
+        segs: [{ vx: 7, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "WR2",
+        x0: 30,
+        y0: -10,
+        color: "#fb923c",
+        label: "WR2",
+        segs: [{ vx: 7, vy: 0 }],
+        offense: true,
+      },
+      {
+        id: "S1",
+        x0: 60,
+        y0: 8,
+        color: "#f87171",
+        label: "S1",
+        segs: [{ vx: 1, vy: 3 }],
+        offense: false,
+      },
+      {
+        id: "S2",
+        x0: 60,
+        y0: -8,
+        color: "#fca5a5",
+        label: "S2",
+        segs: [{ vx: 1, vy: -3 }],
+        offense: false,
+      },
+      {
+        id: "CB",
+        x0: 55,
+        y0: 0,
+        color: "#c084fc",
+        label: "CB",
+        segs: [{ vx: 2, vy: 0 }],
+        offense: false,
+      },
+    ],
+    vBall: 28,
+    g: 9.8,
+    catchR: 3,
+    peakZ: 0,
+    run(inputs) {
+      const theta = parseFloat(inputs.theta),
+        T = parseFloat(inputs.T);
+      if (isNaN(theta) || theta < 0 || theta > 90)
+        return { error: "theta", msg: "θ must be 0–90 degrees" };
+      if (isNaN(T) || T < 0 || T > 4)
+        return { error: "T", msg: "T must be 0–4 s" };
+
+      const th = (theta * Math.PI) / 180;
+      const v0 = this.vBall,
+        g = this.g;
+      // Horizontal (downfield) and vertical components
+      const vHoriz = v0 * Math.cos(th); // speed along ground plane (yd/s)
+      const vVert = v0 * Math.sin(th); // speed upward (yd/s)
+      const tFlight = (2 * vVert) / g; // total flight time
+      const range = (v0 * v0 * Math.sin(2 * th)) / g;
+      const maxRange = (v0 * v0) / g;
+
+      const qb = this.players.find((p) => p.id === "QB");
+      const DT = 1 / 60;
+      const frames = [],
+        trail = [];
+      let thrown = false,
+        bx = qb.x0,
+        by = qb.y0;
+
+      // Aim straight downfield (toward endzone, y=0 lateral)
+      // Ball lands at (QB.x + range, QB.y)
+      const targetX = qb.x0 + range;
+
+      for (let i = 0; i < 720; i++) {
+        const t = i * DT;
+        const players = this.players.map((p) => ({
+          ...p,
+          ...posAt(p, t),
+          ...velAt(p, t),
+        }));
+        if (!thrown && t >= T) {
+          thrown = true;
+        }
+
+        let fz = 0;
+        if (thrown) {
+          const dt = t - T;
+          // Correct physics: downfield only, lateral = 0 (aimed straight)
+          bx = qb.x0 + vHoriz * dt;
+          by = qb.y0; // straight downfield
+          fz = Math.max(0, vVert * dt - 0.5 * g * dt * dt);
+          trail.push({ x: bx, y: by, z: fz });
+        }
+
+        const s1 = posAt(
+          this.players.find((p) => p.id === "S1"),
+          t,
+        );
+        const s2 = posAt(
+          this.players.find((p) => p.id === "S2"),
+          t,
+        );
+        // Collision check: ball (in 3D) near a safety who is near the ground
+        const ballToS1 = Math.sqrt((bx - s1.x) ** 2 + (by - s1.y) ** 2);
+        const ballToS2 = Math.sqrt((bx - s2.x) ** 2 + (by - s2.y) ** 2);
+
+        // Derivative: dR/dθ for live display
+        const dRdTheta = (2 * v0 * v0 * Math.cos(2 * th)) / g;
+
+        frames.push({
+          t,
+          players,
+          bx,
+          by,
+          fz,
+          thrown,
+          trail: [...trail],
+          range,
+          maxRange,
+          theta,
+          ballToS1,
+          ballToS2,
+          dRdTheta,
+          targetX,
+        });
+
+        if (thrown && fz <= 0 && t > T + 0.1) {
+          const landX = bx;
+          const wr1Now = posAt(
+            this.players.find((p) => p.id === "WR1"),
+            t,
+          );
+          const wr2Now = posAt(
+            this.players.find((p) => p.id === "WR2"),
+            t,
+          );
+          const distWR = Math.min(
+            Math.sqrt((bx - wr1Now.x) ** 2 + (by - wr1Now.y) ** 2),
+            Math.sqrt((bx - wr2Now.x) ** 2 + (by - wr2Now.y) ** 2),
+          );
+          const nearest = Math.min(ballToS1, ballToS2);
+          if (distWR < this.catchR && nearest > 3.5) {
+            return {
+              frames,
+              result: "win",
+              msg: `TOUCHDOWN! θ=${theta}°, R=${range.toFixed(1)} yd (max=${maxRange.toFixed(1)} yd at 45°). sin(2×${theta}°)=${Math.sin(2 * th).toFixed(3)} vs sin(90°)=1.`,
+            };
+          }
+          if (nearest <= 3.5)
+            return {
+              frames,
+              result: "loss",
+              msg: `Knocked down! Defender ${nearest.toFixed(1)} yd from ball. Try different T to let safeties spread, or adjust θ.`,
+            };
+          return {
+            frames,
+            result: "loss",
+            msg: `Incomplete — ${distWR.toFixed(1)} yd from nearest WR. R=${range.toFixed(1)} yd. ${theta < 45 ? "Increase θ for more range." : "θ near optimal — check T."}`,
+          };
+        }
+        if (bx > 96 || t > 12) break;
+      }
+      return { frames, result: "loss", msg: "Ball still airborne at limit." };
+    },
+  },
+];
+
+const DT = 1 / 60; // global timestep
+
+// ─── Draw full frame ──────────────────────────────────────────────────────────
+function drawFrame(ctx, frame, play, showVecs) {
+  drawIsoField(ctx);
+  if (!frame) return;
+
+  const { players, bx, by, fz, thrown, trail, trail_cb, trail_ball, impulse } =
+    frame;
+
+  // Ball trail
+  const ballTrail = trail || trail_ball || [];
+  ballTrail.forEach((pt, i) => {
+    ctx.globalAlpha = 0.05 + (i / ballTrail.length) * 0.35;
+    const p = proj(pt.x, pt.y, pt.z || 0);
+    ctx.beginPath();
+    ctx.arc(p.cx, p.cy, 2, 0, Math.PI * 2);
+    ctx.fillStyle = "#fbbf24";
+    ctx.fill();
+  });
   if (trail_cb) {
     trail_cb.forEach((pt, i) => {
-      ctx.fillStyle = '#818cf8'; ctx.globalAlpha = 0.06 + (i / trail_cb.length) * 0.25
-      ctx.beginPath(); ctx.arc(fx(pt.x), fy(pt.y), 2, 0, Math.PI * 2); ctx.fill()
-    })
+      ctx.globalAlpha = 0.04 + (i / trail_cb.length) * 0.25;
+      const p = proj(pt.x, pt.y, 0);
+      ctx.beginPath();
+      ctx.arc(p.cx, p.cy, 2, 0, Math.PI * 2);
+      ctx.fillStyle = "#818cf8";
+      ctx.fill();
+    });
   }
-  ctx.globalAlpha = 1
-  // Players
-  players.forEach(p => {
-    drawPlayer(ctx, fx(p.x), fy(p.y), p.color, p.label)
-    if (showVectors && (p.vx || p.vy)) {
-      const arrowColor = p.offense ? '#86efac' : '#fca5a5'
-      drawVelocityVector(ctx, fx(p.x), fy(p.y), p.vx || 0, p.vy || 0, arrowColor)
-    }
-  })
-  // Ball
-  if (thrown && bx !== null) {
-    drawBall(ctx, fx(bx), fy(by), alt)
-  }
-  // Impulse meter for P4
-  if (impulse !== undefined) {
-    drawImpulseBar(ctx, impulse, play.LB_P)
-  }
-  // Catch point circles for P2
+  ctx.globalAlpha = 1;
+
+  // Catch-point rings (P2)
   if (frame.catchPts) {
-    Object.entries(frame.catchPts).forEach(([, cp]) => {
-      ctx.strokeStyle = 'rgba(251,191,36,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2])
-      ctx.beginPath(); ctx.arc(fx(cp.x), fy(cp.y), 2 * PY, 0, Math.PI * 2); ctx.stroke()
-      ctx.setLineDash([])
-    })
+    Object.values(frame.catchPts).forEach((cp) => {
+      const p = proj(cp.x, cp.y, 0);
+      ctx.beginPath();
+      ctx.arc(p.cx, p.cy, 10, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(251,191,36,0.5)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    // Window open/closed indicator per window
+    if (frame.D1live !== undefined) {
+      const cp1 = frame.catchPts.WR1,
+        cp2 = frame.catchPts.WR2;
+      const p1 = proj(cp1.x, cp1.y, 0),
+        p2 = proj(cp2.x, cp2.y, 0);
+      const open1 = frame.D1live > 2,
+        open2 = frame.D2live > 2;
+      ctx.font = "8px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = open1 ? "#4ade80" : "#f87171";
+      ctx.fillText(
+        open1 ? `W1 OPEN ${frame.D1live.toFixed(1)}yd` : `W1 CLOSED`,
+        p1.cx,
+        p1.cy - 14,
+      );
+      ctx.fillStyle = open2 ? "#4ade80" : "#f87171";
+      ctx.fillText(
+        open2 ? `W2 OPEN ${frame.D2live.toFixed(1)}yd` : `W2 CLOSED`,
+        p2.cx,
+        p2.cy - 14,
+      );
+    }
+  }
+
+  // Lead-point X (P1 and P3)
+  if (frame.leadX !== undefined) {
+    drawLeadPoint(ctx, frame.leadX, frame.leadY, "#fbbf2488");
+    const lp = proj(frame.leadX, frame.leadY, 0);
+    ctx.fillStyle = "rgba(251,191,36,0.6)";
+    ctx.font = "8px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("lead", lp.cx, lp.cy - 10);
+  }
+
+  // Range arc annotation (P5)
+  if (frame.targetX !== undefined && !frame.thrown) {
+    const tgt = proj(frame.targetX, 0, 0);
+    ctx.beginPath();
+    ctx.arc(tgt.cx, tgt.cy, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = "#06b6d4";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#06b6d4";
+    ctx.font = "8px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`land ${frame.range?.toFixed(0)} yd`, tgt.cx, tgt.cy - 12);
+  }
+
+  // Sort players by y (depth sort for iso)
+  const sorted = [...players].sort((a, b) => (a.y ?? 0) - (b.y ?? 0));
+  sorted.forEach((p) => {
+    drawPlayer(ctx, p.x, p.y, p.color, p.label, 0);
+    if (showVecs && (p.vx || p.vy)) {
+      drawVelArrow(
+        ctx,
+        p.x,
+        p.y,
+        p.vx ?? 0,
+        p.vy ?? 0,
+        p.offense ? "#86efac" : "#fca5a5",
+        1.0,
+      );
+    }
+  });
+
+  // Ball with real 3D arc
+  if (thrown && bx !== null) {
+    drawBallFull(ctx, bx, by, fz || 0);
+  }
+
+  // Impulse bar (P4)
+  if (impulse !== undefined) {
+    drawImpulseBar(ctx, impulse, play.LB_P || 1150);
+  }
+
+  // dR/dθ annotation (P5)
+  if (frame.dRdTheta !== undefined) {
+    const lbl = proj(28, 26);
+    ctx.fillStyle = "rgba(6,182,212,0.85)";
+    ctx.font = "9px monospace";
+    ctx.textAlign = "left";
+    ctx.fillText(
+      `θ=${frame.theta}° | R=${frame.range?.toFixed(1)} yd | dR/dθ=${frame.dRdTheta?.toFixed(2)} ${frame.dRdTheta > 0 ? "↑" : frame.dRdTheta < -0.1 ? "↓" : "=0✓"}`,
+      lbl.cx,
+      lbl.cy - 6,
+    );
   }
 }
 
 function drawSetup(ctx, play) {
-  drawField(ctx)
-  play.players.forEach(p => {
-    if (!p.controlled && !p.dynamic) drawRoutePreview(ctx, p, p.color)
-  })
-  play.players.forEach(p => {
-    drawPlayer(ctx, fx(p.x0), fy(p.y0), p.color, p.label)
-    const vel = velAt(p, 0)
-    if (vel.vx || vel.vy) {
-      const arrowColor = p.offense ? '#86efac' : '#fca5a5'
-      drawVelocityVector(ctx, fx(p.x0), fy(p.y0), vel.vx, vel.vy, arrowColor)
-    }
-  })
+  drawIsoField(ctx);
+  play.players.forEach((p) => {
+    if (!p.controlled && !p.dynamic) drawRoute(ctx, p, p.color);
+  });
+  const sorted = [...play.players].sort((a, b) => a.y0 - b.y0);
+  sorted.forEach((p) => {
+    drawPlayer(ctx, p.x0, p.y0, p.color, p.label, 0);
+    const v = velAt(p, 0);
+    if (v.vx || v.vy)
+      drawVelArrow(
+        ctx,
+        p.x0,
+        p.y0,
+        v.vx,
+        v.vy,
+        p.offense ? "#86efac" : "#fca5a5",
+        1.0,
+      );
+  });
   if (play.catchPts) {
-    Object.entries(play.catchPts).forEach(([key, cp]) => {
-      ctx.strokeStyle = 'rgba(251,191,36,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2])
-      ctx.beginPath(); ctx.arc(fx(cp.x), fy(cp.y), 2 * PY, 0, Math.PI * 2); ctx.stroke()
-      ctx.setLineDash([])
-      ctx.fillStyle = '#fbbf24'; ctx.font = '7px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText(key, fx(cp.x), fy(cp.y) - 2 * PY - 3)
-    })
+    Object.values(play.catchPts).forEach((cp) => {
+      const p = proj(cp.x, cp.y, 0);
+      ctx.beginPath();
+      ctx.arc(p.cx, p.cy, 10, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(251,191,36,0.5)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
   }
 }
 
-// ─── Live values ──────────────────────────────────────────────────────────────
-function LiveValues({ frame, playIdx }) {
-  if (!frame) return null
-  const rows = [{ label: 't', value: `${frame.t.toFixed(2)} s`, color: '#e2e8f0' }]
+// ─── Live stats panel — reactive equations ────────────────────────────────────
+function LiveStats({ frame, playIdx }) {
+  if (!frame) return null;
+  const rows = [{ label: "t", val: `${frame.t.toFixed(2)} s`, col: "#e2e8f0" }];
+
   if (playIdx === 0) {
-    if (frame.catchDist != null) rows.push({ label: 'gap to WR1', value: `${frame.catchDist.toFixed(1)} yd`, color: frame.catchDist < 3 ? '#4ade80' : '#f87171' })
-    if (frame.cbBallDist != null) rows.push({ label: 'CB dist', value: `${frame.cbBallDist.toFixed(1)} yd`, color: '#e2e8f0' })
+    if (frame.leadX !== undefined) {
+      rows.push({
+        label: "lead target x",
+        val: `${frame.leadX.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
+      rows.push({
+        label: "lead target y",
+        val: `${frame.leadY.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
+    }
+    if (frame.T !== undefined)
+      rows.push({
+        label: "throw time T",
+        val: `${frame.T.toFixed(2)} s`,
+        col: "#94a3b8",
+      });
+    if (frame.flightTime !== undefined)
+      rows.push({
+        label: "flight time t_f",
+        val: `${frame.flightTime.toFixed(2)} s`,
+        col: "#94a3b8",
+      });
+    if (frame.catchDist != null)
+      rows.push({
+        label: "|ball − WR1|",
+        val: `${frame.catchDist.toFixed(2)} yd`,
+        col: frame.catchDist < 2 ? "#4ade80" : "#f87171",
+      });
+    if (frame.cbBallDist != null)
+      rows.push({
+        label: "CB distance",
+        val: `${frame.cbBallDist.toFixed(1)} yd`,
+        col: "#e2e8f0",
+      });
+    if (frame.fz != null)
+      rows.push({
+        label: "ball height z",
+        val: `${frame.fz.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
   } else if (playIdx === 1) {
-    if (frame.defDist != null) rows.push({ label: 'window', value: `${frame.defDist.toFixed(1)} yd`, color: frame.defDist > 2 ? '#4ade80' : '#f87171' })
-    if (frame.tClose1 != null) rows.push({ label: 't_close1', value: `${frame.tClose1.toFixed(1)} s`, color: '#7dd3fc' })
-    if (frame.tClose2 != null) rows.push({ label: 't_close2', value: `${frame.tClose2.toFixed(1)} s`, color: '#7dd3fc' })
+    if (frame.tClose1 != null)
+      rows.push({
+        label: "t_close WR1",
+        val: `${frame.tClose1.toFixed(2)} s`,
+        col: "#f87171",
+      });
+    if (frame.tClose2 != null)
+      rows.push({
+        label: "t_close WR2",
+        val: `${frame.tClose2.toFixed(2)} s`,
+        col: "#4ade80",
+      });
+    if (frame.D1live != null)
+      rows.push({
+        label: "D₁(t) WR1 window",
+        val: `${frame.D1live.toFixed(1)} yd`,
+        col: frame.D1live > 2 ? "#4ade80" : "#f87171",
+      });
+    if (frame.D2live != null)
+      rows.push({
+        label: "D₂(t) WR2 window",
+        val: `${frame.D2live.toFixed(1)} yd`,
+        col: frame.D2live > 2 ? "#4ade80" : "#f87171",
+      });
+    if (frame.defDist != null)
+      rows.push({
+        label: "chosen window",
+        val: `${frame.defDist.toFixed(1)} yd`,
+        col: frame.defDist > 2 ? "#4ade80" : "#f87171",
+      });
+    if (frame.fz != null)
+      rows.push({
+        label: "ball height z",
+        val: `${frame.fz.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
   } else if (playIdx === 2) {
-    if (frame.cbBall != null) rows.push({ label: 'CB→ball', value: `${frame.cbBall.toFixed(1)} yd`, color: frame.cbBall < 4 ? '#4ade80' : '#f87171' })
-    if (frame.wrBall != null) rows.push({ label: 'WR→ball', value: `${frame.wrBall.toFixed(1)} yd`, color: '#e2e8f0' })
+    if (frame.cbBall != null)
+      rows.push({
+        label: "|CB − ball|",
+        val: `${frame.cbBall.toFixed(2)} yd`,
+        col: frame.cbBall < 4 ? "#4ade80" : "#f87171",
+      });
+    if (frame.wrBall != null)
+      rows.push({
+        label: "|WR − ball|",
+        val: `${frame.wrBall.toFixed(2)} yd`,
+        col: "#e2e8f0",
+      });
+    if (frame.cbSpd != null)
+      rows.push({
+        label: "CB speed",
+        val: `${frame.cbSpd.toFixed(1)} yd/s`,
+        col: "#a78bfa",
+      });
+    if (frame.fz != null)
+      rows.push({
+        label: "ball height z",
+        val: `${frame.fz.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
   } else if (playIdx === 3) {
-    if (frame.impulse != null) rows.push({ label: 'J (impulse)', value: `${frame.impulse.toFixed(0)} lb·yd/s`, color: frame.impulse > 1150 ? '#4ade80' : '#f87171' })
-    if (frame.lbSpeed != null) rows.push({ label: 'LB speed', value: `${frame.lbSpeed.toFixed(1)} yd/s`, color: '#e2e8f0' })
-    if (frame.F != null) rows.push({ label: 'F(t)', value: `${frame.F.toFixed(0)} lb`, color: '#fbbf24' })
+    if (frame.impulse != null)
+      rows.push({
+        label: "J(t) = ∫F dτ",
+        val: `${frame.impulse.toFixed(0)} lb·yd/s`,
+        col: frame.impulse > 1150 ? "#4ade80" : "#f87171",
+      });
+    if (frame.lbSpeed != null)
+      rows.push({
+        label: "v_LB(t)",
+        val: `${frame.lbSpeed.toFixed(2)} yd/s`,
+        col: frame.lbSpeed < 1.5 ? "#4ade80" : "#f87171",
+      });
+    if (frame.F != null)
+      rows.push({
+        label: "F(t)",
+        val: `${frame.F.toFixed(0)} lb`,
+        col: "#fbbf24",
+      });
+    if (frame.rbX != null && frame.lbX != null)
+      rows.push({
+        label: "gap RB→LB",
+        val: `${(frame.lbX - frame.rbX).toFixed(1)} yd`,
+        col: "#e2e8f0",
+      });
+  } else if (playIdx === 4) {
+    if (frame.range != null)
+      rows.push({
+        label: "R(θ)",
+        val: `${frame.range.toFixed(1)} yd`,
+        col: "#06b6d4",
+      });
+    if (frame.maxRange != null)
+      rows.push({
+        label: "R_max (θ=45°)",
+        val: `${frame.maxRange.toFixed(1)} yd`,
+        col: "#94a3b8",
+      });
+    if (frame.dRdTheta != null)
+      rows.push({
+        label: "dR/dθ",
+        val: `${frame.dRdTheta.toFixed(3)}`,
+        col: Math.abs(frame.dRdTheta) < 0.1 ? "#4ade80" : "#94a3b8",
+      });
+    if (frame.theta != null)
+      rows.push({
+        label: "sin(2θ)",
+        val: `${Math.sin((2 * frame.theta * Math.PI) / 180).toFixed(4)}`,
+        col: "#e2e8f0",
+      });
+    if (frame.fz != null)
+      rows.push({
+        label: "height z(t)",
+        val: `${frame.fz.toFixed(1)} yd`,
+        col: "#fbbf24",
+      });
+    if (frame.ballToS1 != null)
+      rows.push({
+        label: "dist to S1",
+        val: `${frame.ballToS1.toFixed(1)} yd`,
+        col: frame.ballToS1 > 4 ? "#4ade80" : "#f87171",
+      });
   }
+
   return (
-    <div style={{ background: '#0f172a', borderRadius: 8, padding: '10px 12px', border: '1px solid #334155', marginTop: 8 }}>
-      <div style={{ fontSize: 11, color: '#64748b', marginBottom: 6, fontWeight: 500 }}>live values</div>
-      {rows.map(r => (
-        <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#7dd3fc' }}>{r.label}</span>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, color: r.color }}>{r.value}</span>
+    <div
+      style={{
+        background: "#0f172a",
+        borderRadius: 8,
+        padding: "10px 12px",
+        border: "1px solid #334155",
+        marginTop: 8,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          color: "#64748b",
+          marginBottom: 6,
+          fontWeight: 500,
+        }}
+      >
+        live values
+      </div>
+      {rows.map((r) => (
+        <div
+          key={r.label}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 3,
+          }}
+        >
+          <span
+            style={{ fontFamily: "monospace", fontSize: 11, color: "#7dd3fc" }}
+          >
+            {r.label}
+          </span>
+          <span style={{ fontFamily: "monospace", fontSize: 11, color: r.col }}>
+            {r.val}
+          </span>
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Scrubber ─────────────────────────────────────────────────────────────────
+function Scrubber({ frames, frameIdx, onChange }) {
+  if (!frames?.length) return null;
+  return (
+    <div
+      style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}
+    >
+      <span style={{ fontSize: 10, color: "#64748b", whiteSpace: "nowrap" }}>
+        t={(frameIdx / 60 || 0).toFixed(2)}s
+      </span>
+      <input
+        type="range"
+        min={0}
+        max={frames.length - 1}
+        value={frameIdx}
+        onChange={(e) => onChange(+e.target.value)}
+        style={{ flex: 1, accentColor: "#60a5fa", height: 4 }}
+      />
+      <span style={{ fontSize: 10, color: "#64748b", whiteSpace: "nowrap" }}>
+        {(frames.length / 60).toFixed(1)}s
+      </span>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function FootballCalculus() {
-  const canvasRef = useRef(null)
-  const animRef   = useRef(null)
-  const simRef    = useRef(null)
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const simRef = useRef(null);
+  const [playIdx, setPlayIdx] = useState(0);
+  const [inputs, setInputs] = useState({});
+  const [inputErrs, setInputErrs] = useState({});
+  const [warning, setWarning] = useState("");
+  const [result, setResult] = useState(null);
+  const [msg, setMsg] = useState("");
+  const [playing, setPlaying] = useState(false);
+  const [hasFrames, setHasFrames] = useState(false);
+  const [liveFrame, setLiveFrame] = useState(null);
+  const [scrubIdx, setScrubIdx] = useState(0);
+  const [showVecs, setShowVecs] = useState(true);
 
-  const [playIdx, setPlayIdx]       = useState(0)
-  const [inputs, setInputs]         = useState({})
-  const [inputErrors, setInputErrors] = useState({})
-  const [warning, setWarning]       = useState('')
-  const [result, setResult]         = useState(null)
-  const [analytical, setAnalytical] = useState('')
-  const [playing, setPlaying]       = useState(false)
-  const [hasFrames, setHasFrames]   = useState(false)
-  const [liveFrame, setLiveFrame]   = useState(null)
-  const [showVectors, setShowVectors] = useState(true)
-
-  const play = PLAYS[playIdx]
+  const play = PLAYS[playIdx];
 
   useEffect(() => {
-    if (hasFrames) return
-    const canvas = canvasRef.current
-    if (!canvas) return
-    drawSetup(canvas.getContext('2d'), PLAYS[playIdx])
-  }, [playIdx, hasFrames])
+    if (hasFrames) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    drawSetup(canvas.getContext("2d"), PLAYS[playIdx]);
+  }, [playIdx, hasFrames]);
 
-  useEffect(() => () => { if (animRef.current) cancelAnimationFrame(animRef.current) }, [])
+  useEffect(
+    () => () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    },
+    [],
+  );
 
   const stopAnim = useCallback(() => {
-    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
-    setPlaying(false)
-    if (simRef.current?.frames?.length) setLiveFrame(simRef.current.frames[simRef.current.frames.length - 1])
-  }, [])
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    setPlaying(false);
+  }, []);
 
   const tick = useCallback(() => {
-    if (!simRef.current) return
-    const { frames, playIdx: pIdx } = simRef.current
-    const fi = simRef.current.frameIdx
-    if (fi >= frames.length) { setPlaying(false); setLiveFrame(frames[frames.length - 1]); return }
-    const canvas = canvasRef.current
-    if (canvas) drawFrame(canvas.getContext('2d'), frames[fi], PLAYS[pIdx], simRef.current.showVectors)
-    simRef.current.frameIdx = fi + 1
-    if (fi % 6 === 0) setLiveFrame(frames[fi])
-    animRef.current = requestAnimationFrame(tick)
-  }, [])
+    if (!simRef.current) return;
+    const { frames, playIdx: pIdx } = simRef.current;
+    const fi = simRef.current.frameIdx;
+    if (fi >= frames.length) {
+      setPlaying(false);
+      return;
+    }
+    const canvas = canvasRef.current;
+    if (canvas)
+      drawFrame(
+        canvas.getContext("2d"),
+        frames[fi],
+        PLAYS[pIdx],
+        simRef.current.showVecs,
+      );
+    simRef.current.frameIdx = fi + 1;
+    setScrubIdx(fi);
+    if (fi % 4 === 0) setLiveFrame(frames[fi]);
+    animRef.current = requestAnimationFrame(tick);
+  }, []);
 
   const runSim = useCallback(() => {
-    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
-    const res = PLAYS[playIdx].run(inputs)
-    if (res.error) { setInputErrors({ [res.error]: res.msg }); setWarning(''); setHasFrames(false); setResult(null); return }
-    if (res.warning) { setWarning(res.warning); setInputErrors({}); setHasFrames(false); setResult(null); return }
-    setInputErrors({}); setWarning('')
-    setResult(res.result); setAnalytical(res.analytical || '')
-    setHasFrames(true); setLiveFrame(null); setPlaying(true)
-    simRef.current = { frames: res.frames, frameIdx: 0, playIdx, showVectors }
-    animRef.current = requestAnimationFrame(tick)
-  }, [playIdx, inputs, showVectors, tick])
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    const res = PLAYS[playIdx].run(inputs);
+    if (res.error) {
+      setInputErrs({ [res.error]: res.msg });
+      setWarning("");
+      setHasFrames(false);
+      setResult(null);
+      return;
+    }
+    if (res.warning) {
+      setWarning(res.warning);
+      setInputErrs({});
+      setHasFrames(false);
+      setResult(null);
+      return;
+    }
+    setInputErrs({});
+    setWarning("");
+    setResult(res.result);
+    setMsg(res.msg || "");
+    setHasFrames(true);
+    setLiveFrame(null);
+    setScrubIdx(0);
+    setPlaying(true);
+    simRef.current = { frames: res.frames, frameIdx: 0, playIdx, showVecs };
+    animRef.current = requestAnimationFrame(tick);
+  }, [playIdx, inputs, showVecs, tick]);
 
   const resetSim = useCallback(() => {
-    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
-    simRef.current = null
-    setHasFrames(false); setResult(null); setAnalytical(''); setWarning('')
-    setLiveFrame(null); setPlaying(false)
-  }, [])
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    simRef.current = null;
+    setHasFrames(false);
+    setResult(null);
+    setMsg("");
+    setWarning("");
+    setLiveFrame(null);
+    setPlaying(false);
+    setScrubIdx(0);
+  }, []);
 
-  const selectPlay = useCallback(idx => {
-    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
-    simRef.current = null
-    setPlayIdx(idx); setInputs({}); setInputErrors({}); setWarning('')
-    setResult(null); setAnalytical(''); setHasFrames(false); setLiveFrame(null); setPlaying(false)
-  }, [])
+  const selectPlay = useCallback((idx) => {
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    simRef.current = null;
+    setPlayIdx(idx);
+    setInputs({});
+    setInputErrs({});
+    setWarning("");
+    setResult(null);
+    setMsg("");
+    setHasFrames(false);
+    setLiveFrame(null);
+    setPlaying(false);
+    setScrubIdx(0);
+  }, []);
+
+  const onScrub = useCallback(
+    (fi) => {
+      stopAnim();
+      const frames = simRef.current?.frames;
+      if (!frames) return;
+      setScrubIdx(fi);
+      setLiveFrame(frames[fi]);
+      const canvas = canvasRef.current;
+      if (canvas)
+        drawFrame(
+          canvas.getContext("2d"),
+          frames[fi],
+          PLAYS[simRef.current.playIdx],
+          showVecs,
+        );
+    },
+    [stopAnim, showVecs],
+  );
 
   const setInput = useCallback((id, val) => {
-    setInputs(prev => ({ ...prev, [id]: val }))
-    setInputErrors({}); setWarning('')
-  }, [])
+    setInputs((p) => ({ ...p, [id]: val }));
+    setInputErrs({});
+    setWarning("");
+  }, []);
 
   return (
-    <div style={{ color: '#f1f5f9', maxWidth: 960, margin: '0 auto', padding: 12, fontFamily: 'sans-serif' }}>
-      <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 10 }}>Football Calculus</div>
-
-      {/* Play tabs */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-        {PLAYS.map((p, i) => (
-          <button key={p.id} onClick={() => selectPlay(i)} style={{
-            padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12,
-            border: `1px solid ${i === playIdx ? p.color + '66' : '#334155'}`,
-            background: i === playIdx ? p.color + '22' : 'transparent',
-            color: i === playIdx ? p.color : '#94a3b8', fontWeight: i === playIdx ? 600 : 400,
-          }}>
-            <div>{p.name}</div>
-            <div style={{ fontSize: 10, opacity: 0.7 }}>{p.down} · {p.concept.split('·')[0].trim()}</div>
-          </button>
-        ))}
-        <button onClick={() => setShowVectors(v => !v)} style={{
-          padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 11,
-          border: '1px solid #334155', background: showVectors ? '#1e293b' : 'transparent',
-          color: showVectors ? '#7dd3fc' : '#64748b', marginLeft: 'auto',
-        }}>
-          {showVectors ? '▶ vectors on' : '▶ vectors off'}
+    <div
+      style={{
+        color: "#f1f5f9",
+        maxWidth: 980,
+        margin: "0 auto",
+        padding: 12,
+        fontFamily: "sans-serif",
+        background: "#020617",
+        borderRadius: 12,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ fontSize: 18, fontWeight: 700 }}>Football Calculus</div>
+        <div style={{ fontSize: 11, color: "#64748b", marginLeft: 4 }}>
+          2.5D isometric · formula-driven · real projectile physics
+        </div>
+        <button
+          onClick={() => setShowVecs((v) => !v)}
+          style={{
+            marginLeft: "auto",
+            padding: "5px 12px",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontSize: 11,
+            border: "1px solid #334155",
+            background: showVecs ? "#1e293b" : "transparent",
+            color: showVecs ? "#7dd3fc" : "#64748b",
+          }}
+        >
+          {showVecs ? "vectors on" : "vectors off"}
         </button>
       </div>
 
-      {/* Concept bar */}
-      <div style={{ borderLeft: `3px solid ${play.color}`, borderRadius: '0 6px 6px 0', padding: '7px 12px', marginBottom: 10, background: play.color + '11', color: play.color, fontSize: 12 }}>
+      <div
+        style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}
+      >
+        {PLAYS.map((p, i) => (
+          <button
+            key={p.id}
+            onClick={() => selectPlay(i)}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              cursor: "pointer",
+              fontSize: 11,
+              border: `1px solid ${i === playIdx ? p.color + "66" : "#334155"}`,
+              background: i === playIdx ? p.color + "18" : "transparent",
+              color: i === playIdx ? p.color : "#94a3b8",
+              fontWeight: i === playIdx ? 600 : 400,
+              textAlign: "left",
+            }}
+          >
+            <div style={{ fontSize: 12 }}>{p.name}</div>
+            <div style={{ fontSize: 9, opacity: 0.75 }}>
+              {p.down} · {p.concept.split("·")[0].trim()}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div
+        style={{
+          borderLeft: `3px solid ${play.color}`,
+          borderRadius: "0 6px 6px 0",
+          padding: "7px 12px",
+          marginBottom: 10,
+          background: play.color + "11",
+          color: play.color,
+          fontSize: 12,
+        }}
+      >
         <strong>{play.concept}</strong> — {play.description}
       </div>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        {/* Left: canvas + inputs */}
-        <div style={{ flex: 1, minWidth: 340 }}>
-          <canvas ref={canvasRef} width={W} height={H}
-            style={{ width: '100%', borderRadius: 8, border: '2px solid #1e3a2e', display: 'block' }} />
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 320 }}>
+          <canvas
+            ref={canvasRef}
+            width={W}
+            height={H}
+            style={{
+              width: "100%",
+              borderRadius: 8,
+              border: "2px solid #1e3a2e",
+              display: "block",
+            }}
+          />
 
-          <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {play.inputs.map(inp => (
+          {hasFrames && (
+            <Scrubber
+              frames={simRef.current?.frames}
+              frameIdx={scrubIdx}
+              onChange={onScrub}
+            />
+          )}
+
+          <div
+            style={{
+              marginTop: 10,
+              display: "flex",
+              flexDirection: "column",
+              gap: 9,
+            }}
+          >
+            {play.inputs.map((inp) => (
               <div key={inp.id}>
-                <label style={{ fontSize: 11, color: '#94a3b8', display: 'block', marginBottom: 3 }}>{inp.label}</label>
-                <input
+                <label
                   style={{
-                    width: '100%', padding: '9px 11px', borderRadius: 6, boxSizing: 'border-box',
-                    border: `1.5px solid ${inputErrors[inp.id] ? '#ef4444' : '#334155'}`,
-                    background: '#0f172a', color: '#f1f5f9', fontFamily: 'monospace', fontSize: 14, outline: 'none',
+                    fontSize: 11,
+                    color: "#94a3b8",
+                    display: "block",
+                    marginBottom: 3,
                   }}
-                  value={inputs[inp.id] || ''}
+                >
+                  {inp.label}
+                </label>
+                <input
+                  type="text"
+                  style={{
+                    width: "100%",
+                    padding: "9px 11px",
+                    borderRadius: 6,
+                    boxSizing: "border-box",
+                    border: `1.5px solid ${inputErrs[inp.id] ? "#ef4444" : "#334155"}`,
+                    background: "#0f172a",
+                    color: "#f1f5f9",
+                    fontFamily: "monospace",
+                    fontSize: 14,
+                    outline: "none",
+                  }}
+                  value={inputs[inp.id] || ""}
                   placeholder={inp.placeholder}
-                  onChange={e => setInput(inp.id, e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') runSim() }}
+                  onChange={(e) => setInput(inp.id, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") runSim();
+                  }}
                 />
-                {inputErrors[inp.id] && <div style={{ fontSize: 11, color: '#f87171', marginTop: 2 }}>{inputErrors[inp.id]}</div>}
-                <div style={{ fontSize: 10, color: '#60a5fa', fontFamily: 'monospace', marginTop: 2 }}>{inp.hint}</div>
+                {inputErrs[inp.id] && (
+                  <div style={{ fontSize: 11, color: "#f87171", marginTop: 2 }}>
+                    {inputErrs[inp.id]}
+                  </div>
+                )}
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: "#60a5fa",
+                    fontFamily: "monospace",
+                    marginTop: 2,
+                  }}
+                >
+                  {inp.hint}
+                </div>
               </div>
             ))}
-
-            <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-              {!playing
-                ? <button onClick={runSim} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#3b82f6' }}>Run Play</button>
-                : <button onClick={stopAnim} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#6b7280' }}>Stop</button>
-              }
-              {hasFrames && <button onClick={resetSim} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#374151' }}>Reset</button>}
+            <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+              {!playing ? (
+                <button
+                  onClick={runSim}
+                  style={{
+                    padding: "8px 20px",
+                    borderRadius: 6,
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "white",
+                    background: "#3b82f6",
+                  }}
+                >
+                  Run Play
+                </button>
+              ) : (
+                <button
+                  onClick={stopAnim}
+                  style={{
+                    padding: "8px 20px",
+                    borderRadius: 6,
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "white",
+                    background: "#6b7280",
+                  }}
+                >
+                  Stop
+                </button>
+              )}
+              {hasFrames && (
+                <button
+                  onClick={resetSim}
+                  style={{
+                    padding: "8px 18px",
+                    borderRadius: 6,
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "white",
+                    background: "#374151",
+                  }}
+                >
+                  Reset
+                </button>
+              )}
             </div>
-
-            {warning && <div style={{ padding: '9px 13px', borderRadius: 7, fontSize: 12, fontWeight: 500, background: '#1e3a5f', color: '#93c5fd' }}>{warning}</div>}
+            {warning && (
+              <div
+                style={{
+                  padding: "9px 13px",
+                  borderRadius: 7,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background: "#1e3a5f",
+                  color: "#93c5fd",
+                }}
+              >
+                {warning}
+              </div>
+            )}
             {result && !playing && (
-              <div style={{ padding: '9px 13px', borderRadius: 7, fontSize: 13, fontWeight: 500, background: result === 'win' ? '#14532d' : '#450a0a', color: result === 'win' ? '#4ade80' : '#fca5a5' }}>
-                {analytical}
+              <div
+                style={{
+                  padding: "9px 13px",
+                  borderRadius: 7,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  background: result === "win" ? "#14532d" : "#450a0a",
+                  color: result === "win" ? "#4ade80" : "#fca5a5",
+                }}
+              >
+                {result === "win" ? "✓ " : "✗ "}
+                {msg}
               </div>
             )}
           </div>
         </div>
 
-        {/* Right: theory + live values */}
         <div style={{ width: 220, flexShrink: 0 }}>
-          <div style={{ background: '#0f172a', borderRadius: 10, padding: 12, border: '1px solid #1e293b' }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: play.color, marginBottom: 8 }}>{play.concept}</div>
+          <div
+            style={{
+              background: "#0f172a",
+              borderRadius: 10,
+              padding: 12,
+              border: "1px solid #1e293b",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: play.color,
+                marginBottom: 8,
+              }}
+            >
+              {play.concept}
+            </div>
             {play.theory.map((line, i) => {
-              const isMath = /[=·∫√]/.test(line) || line.startsWith('x') || line.startsWith('y') || line.startsWith('v') || line.startsWith('D') || line.startsWith('J') || line.startsWith('p')
-              return isMath
-                ? <div key={i} style={{ margin: '3px 0', padding: '3px 7px', background: '#1e293b', borderRadius: 4, fontFamily: 'monospace', fontSize: 11, color: '#a5f3fc' }}>{line}</div>
-                : <div key={i} style={{ fontSize: 11, color: '#64748b', margin: '4px 0' }}>{line}</div>
+              const isHeader = line.startsWith("CONCEPT:");
+              const isMath =
+                !isHeader &&
+                (/[=·∫√≥≤→]/.test(line) || /^[xyvDJpRθ]/.test(line));
+              if (isHeader)
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      margin: "0 0 6px",
+                      padding: "4px 8px",
+                      background: play.color + "22",
+                      borderRadius: 4,
+                      fontSize: 11,
+                      color: play.color,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {line}
+                  </div>
+                );
+              return isMath ? (
+                <div
+                  key={i}
+                  style={{
+                    margin: "3px 0",
+                    padding: "3px 7px",
+                    background: "#1e293b",
+                    borderRadius: 4,
+                    fontFamily: "monospace",
+                    fontSize: 11,
+                    color: "#a5f3fc",
+                  }}
+                >
+                  {line}
+                </div>
+              ) : (
+                <div
+                  key={i}
+                  style={{ fontSize: 11, color: "#64748b", margin: "4px 0" }}
+                >
+                  {line}
+                </div>
+              );
             })}
           </div>
-          {(hasFrames || liveFrame) && <LiveValues frame={liveFrame} playIdx={playIdx} />}
+          {(hasFrames || liveFrame) && (
+            <LiveStats frame={liveFrame} playIdx={playIdx} />
+          )}
         </div>
       </div>
+
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 10,
+          color: "#334155",
+          textAlign: "center",
+        }}
+      >
+        2.5D isometric · ball height = real projectile arc (z = v₀sinθ·t − ½gt²)
+        · shadow shows ground position · scrub to review
+      </div>
     </div>
-  )
+  );
 }
