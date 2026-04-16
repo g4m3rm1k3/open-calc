@@ -1,1074 +1,800 @@
-// FootballCalculus.jsx
-// A multi-level football simulation that teaches core Calc 1 concepts.
-//
-// Level 1 — Lead Pass        → Integration (position = ∫ velocity dt)
-// Level 2 — Best Angle       → Optimization (maximize range via dR/dθ = 0)
-// Level 3 — Defender Chase   → Related Rates (multiple changing quantities linked through time)
-//
-// Register in VizFrame.jsx as: FootballCalculus
+// FootballCalculus.jsx — Football Calculus game, 6 levels, formula input required
+// Converted from user's HTML starter. Canvas-based, top-down for L1-L5, side-view for L6.
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 
-// ─── Field geometry (SVG pixel space) ────────────────────────────────────────
-const W = 700, H = 320
-const EZ = 50          // endzone width in px
-const FW = W - 2 * EZ  // playing field width = 600px
-const PY = FW / 100    // 6 px per yard
-const CY = H / 2       // vertical center = 160
+// ─── Field geometry ───────────────────────────────────────────────────────────
+const W = 700, H = 240, EZ = 40, FW = W - 2 * EZ, PY = FW / 100, CY = H / 2
+const yd = y => EZ + y * PY
+const px2yd = x => ((x - EZ) / PY).toFixed(1)
 
-const yd = y => EZ + y * PY            // yards → pixel x
-const px2yd = x => (x - EZ) / PY      // pixel x → yards (for display)
-
-// ─── Safe velocity formula evaluator (supports t, math ops) ──────────────────
-function makeVFunc(expr) {
-  const clean = expr.trim()
-  if (!clean) return null
-  // Sanitise: only allow digits, operators, t, math functions
-  const safe = clean
-    .replace(/\bMath\./g, '')
-    .replace(/[^0-9t+\-*/^(). ]/g, c => ['s','i','n','c','o','q','r','t','a','b','e','p'].includes(c) ? c : '?')
-  if (safe.includes('?')) return null
+// ─── Safe formula evaluator ───────────────────────────────────────────────────
+function parseExpr(expr, vars = {}) {
+  if (!expr || !expr.trim()) return null
   try {
-    // Rewrite to JS: ^ → **, trig / sqrt
-    const js = clean
+    const js = expr.trim()
       .replace(/\^/g, '**')
       .replace(/\bsqrt\b/g, 'Math.sqrt')
       .replace(/\bsin\b/g, 'Math.sin')
       .replace(/\bcos\b/g, 'Math.cos')
       .replace(/\babs\b/g, 'Math.abs')
       .replace(/\bpi\b/g, 'Math.PI')
+      .replace(/\be\b/g, 'Math.E')
+      .replace(/\btan\b/g, 'Math.tan')
+      .replace(/\bln\b/g, 'Math.log')
+      .replace(/\bexp\b/g, 'Math.exp')
+      .replace(/\batan\b/g, 'Math.atan')
+      .replace(/\batan2\b/g, 'Math.atan2')
+    const args = Object.keys(vars)
     // eslint-disable-next-line no-new-func
-    const fn = new Function('t', `"use strict"; return (${js});`)
-    const test = fn(0)
-    if (typeof test !== 'number') return null
-    return fn
+    const fn = new Function(...args, `"use strict"; return (${js});`)
+    return (...vals) => {
+      const r = fn(...vals)
+      return (typeof r === 'number' && isFinite(r)) ? r : null
+    }
   } catch { return null }
 }
 
-// ─── SVG Football Field (shared across all levels) ───────────────────────────
-function FieldSVG({ children, height = H }) {
-  const YDLINES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-  const HASHES  = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${height}`}
-      style={{ width: '100%', display: 'block', borderRadius: 8,
-        border: '2px solid #14532d', background: '#15803d' }}
-    >
-      {/* Alternating green stripes */}
-      {[0,1,2,3,4,5,6,7,8,9].map(i => (
-        <rect key={i} x={yd(i * 10)} y={0}
-          width={FW / 10} height={height}
-          fill={i % 2 === 0 ? '#16a34a' : '#15803d'} />
-      ))}
-      {/* Endzones */}
-      <rect x={0} y={0} width={EZ} height={height} fill="#991b1b" opacity={0.85} />
-      <rect x={W - EZ} y={0} width={EZ} height={height} fill="#1d4ed8" opacity={0.75} />
-      <text x={EZ / 2} y={height / 2} fill="white" fontSize={10} fontWeight="bold"
-        textAnchor="middle" dominantBaseline="middle"
-        transform={`rotate(-90,${EZ / 2},${height / 2})`}>ENDZONE</text>
-      <text x={W - EZ / 2} y={height / 2} fill="white" fontSize={10} fontWeight="bold"
-        textAnchor="middle" dominantBaseline="middle"
-        transform={`rotate(90,${W - EZ / 2},${height / 2})`}>ENDZONE</text>
-      {/* Yard lines */}
-      {YDLINES.map(y => (
-        <g key={y}>
-          <line x1={yd(y)} y1={22} x2={yd(y)} y2={height - 22}
-            stroke="white" strokeWidth={y === 50 ? 2.5 : 1} strokeOpacity={0.45} />
-          {y > 0 && y < 100 && (
-            <text x={yd(y)} y={14} fill="white" fontSize={8} fontWeight="bold"
-              textAnchor="middle" opacity={0.8}>{y}</text>
-          )}
-        </g>
-      ))}
-      {/* Hash marks */}
-      {HASHES.map(y => (
-        <line key={y} x1={yd(y)} y1={height / 2 - 10} x2={yd(y)} y2={height / 2 + 10}
-          stroke="white" strokeWidth={1} strokeOpacity={0.35} />
-      ))}
-      {children}
-    </svg>
-  )
-}
-
-// ─── Player circle sprite ─────────────────────────────────────────────────────
-function Player({ x, y, color, label, sub, r = 14 }) {
-  return (
-    <g>
-      <circle cx={x} cy={y} r={r} fill={color} stroke="white" strokeWidth={2} />
-      <text x={x} y={y} fill="white" fontSize={9} textAnchor="middle"
-        dominantBaseline="middle" fontWeight="bold">{label}</text>
-      {sub && (
-        <text x={x} y={y - r - 5} fill="white" fontSize={7.5}
-          textAnchor="middle" opacity={0.85}>{sub}</text>
-      )}
-    </g>
-  )
-}
-
-// ─── Math panel wrapper ───────────────────────────────────────────────────────
-function MathPanel({ title, color = '#60a5fa', children }) {
-  return (
-    <div style={{ width: 210, flexShrink: 0, background: '#0f172a', borderRadius: 8,
-      padding: 14, border: `1px solid ${color}33`, fontSize: 11,
-      color: '#94a3b8', fontFamily: 'monospace', lineHeight: 1.55 }}>
-      <div style={{ color, fontWeight: 'bold', marginBottom: 10, fontSize: 12 }}>{title}</div>
-      {children}
-    </div>
-  )
-}
-
-function MathSection({ label, color = '#fbbf24', children }) {
-  return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ color, marginBottom: 3, fontSize: 10 }}>{label}</div>
-      <div style={{ paddingLeft: 6, borderLeft: `2px solid ${color}44` }}>{children}</div>
-    </div>
-  )
-}
-
-function MathRow({ label, val, color = '#e2e8f0' }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
-      <span style={{ color: '#64748b' }}>{label}</span>
-      <span style={{ color }}>{val}</span>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LEVEL 1: LEAD PASS — Integration
-//
-// Concept: x_b(t) = x₀ + ∫₀ᵗ v_ball(τ)dτ  (Euler-integrated each frame)
-//          x_r(t) = x₀ + v₀t + ½at²        (kinematic equation)
-// Player enters v_ball(t). Ball position is numerically integrated.
-// Win: |x_ball(t) − x_receiver(t)| < tolerance at some t.
-// ─────────────────────────────────────────────────────────────────────────────
-const L1 = {
-  QB_YD: 12,   // quarterback yard line
-  REC_YD0: 35, // receiver starting yard line
-  REC_V0: 48,  // receiver initial velocity (px/s)
-  REC_A: 16,   // receiver acceleration (px/s²)
-  GRAVITY: 320, // vertical gravity px/s² (cosmetic arc)
-  CATCH_R: 28, // catch tolerance radius (px)
-  MAX_T: 5.5,  // max simulation time (s)
-}
-
-function LeadPassLevel() {
-  const rafRef = useRef(null)
-  const physRef = useRef(null)
-  const [expr, setExpr] = useState('55')
-  const [exprErr, setExprErr] = useState('')
-  const [disp, setDisp] = useState({
-    t: 0, status: 'idle', message: '',
-    ballX: yd(L1.QB_YD), ballY: CY,
-    recX: yd(L1.REC_YD0), trail: [],
-    vball: 0, dist: null,
-  })
-
-  function initPhys(vFunc) {
-    physRef.current = {
-      t: 0, vFunc,
-      ballX: yd(L1.QB_YD), ballY: CY,
-      ballVy: -L1.GRAVITY * 0.35, // upward launch
-      recX: yd(L1.REC_YD0),
-      trail: [], frameCount: 0,
-    }
-  }
-
-  const stop = useCallback(() => {
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-  }, [])
-
-  function throwBall() {
-    const fn = makeVFunc(expr)
-    if (!fn) { setExprErr('Cannot parse. Try: 55  or  45 + 4*t'); return }
-    setExprErr('')
-    stop()
-    initPhys(fn)
-
-    const DT = 1 / 60
-    function step() {
-      const p = physRef.current
-      if (!p) return
-      p.t += DT
-      const t = p.t
-
-      // Receiver: kinematic position
-      p.recX = yd(L1.REC_YD0) + L1.REC_V0 * t + 0.5 * L1.REC_A * t * t
-
-      // Ball horizontal: Euler integration of user's v(t)
-      let vb = 0
-      try { vb = Number(p.vFunc(t)); if (!isFinite(vb)) vb = 0 } catch {}
-      p.ballX += vb * DT
-
-      // Ball vertical: realistic arc (goes up then falls)
-      p.ballVy += L1.GRAVITY * DT
-      p.ballY += p.ballVy * DT
-      // Bounce on ground (cosmetic — shouldn't reach ground normally)
-      if (p.ballY > CY + 10) { p.ballY = CY + 10; p.ballVy *= -0.4 }
-
-      // Trail
-      p.frameCount++
-      if (p.frameCount % 2 === 0) {
-        p.trail.push({ x: p.ballX, y: p.ballY })
-        if (p.trail.length > 30) p.trail.shift()
-      }
-
-      const dist = Math.abs(p.ballX - p.recX)
-      const inField = p.ballX > EZ && p.ballX < W - EZ
-      const recInField = p.recX < W - EZ
-
-      // Win
-      if (dist < L1.CATCH_R && inField && recInField && t > 0.5) {
-        stop()
-        setDisp({ t, status: 'win', ballX: p.ballX, ballY: p.ballY,
-          recX: p.recX, trail: [...p.trail], vball: vb, dist,
-          message: `🏈 CATCH! At t=${t.toFixed(2)}s — ${px2yd(p.recX).toFixed(0)}-yard line. Perfect lead!` })
-        return
-      }
-
-      // Loss
-      if (!inField || !recInField || t > L1.MAX_T) {
-        stop()
-        const hint = dist < 80
-          ? `Close! Off by ${dist.toFixed(0)}px at t=${t.toFixed(1)}s. Adjust slightly.`
-          : vb < 40
-            ? `Ball too slow — try a larger value for v_ball(t).`
-            : `Ball overshot — try a smaller value or add a negative slope term like 70 - 4*t.`
-        setDisp({ t, status: 'loss', ballX: p.ballX, ballY: p.ballY,
-          recX: p.recX, trail: [...p.trail], vball: vb, dist, message: hint })
-        return
-      }
-
-      setDisp({ t, status: 'running', ballX: p.ballX, ballY: p.ballY,
-        recX: p.recX, trail: [...p.trail], vball: vb, dist })
-      rafRef.current = requestAnimationFrame(step)
-    }
-    setDisp(d => ({ ...d, status: 'running', message: '' }))
-    rafRef.current = requestAnimationFrame(step)
-  }
-
-  function reset() {
-    stop()
-    setExprErr('')
-    setDisp({ t: 0, status: 'idle', message: '',
-      ballX: yd(L1.QB_YD), ballY: CY, recX: yd(L1.REC_YD0),
-      trail: [], vball: 0, dist: null })
-  }
-
-  useEffect(() => () => stop(), [stop])
-
-  const { t, status, message, ballX, ballY, recX, trail, vball, dist } = disp
-  const running = status === 'running'
-
-  // Analytical: if v_ball is constant c, solve 0.5*A*t² + (V0-c)*t + (X0-QB) = 0
-  const V0px = L1.REC_V0, Apx = L1.REC_A
-  const X0px = yd(L1.REC_YD0), QBpx = yd(L1.QB_YD)
-  function hintVelocity() {
-    // At some time t, c*t = X0 + V0*t + 0.5*A*t² - QB
-    // Guess t=1.5s as typical flight time → c ≈ (X0 - QB + V0*1.5 + 0.5*A*1.5²) / 1.5
-    const tg = 1.5
-    const c = (X0px - QBpx + V0px * tg + 0.5 * Apx * tg * tg) / tg
-    return c.toFixed(0)
-  }
-
-  return (
-    <div style={{ display: 'flex', gap: 14 }}>
-      <div style={{ flex: 1 }}>
-        <FieldSVG>
-          {/* Ball trail */}
-          {trail.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y}
-              r={2.5 + (i / trail.length) * 3}
-              fill="#fbbf24"
-              opacity={0.15 + (i / trail.length) * 0.65} />
-          ))}
-          {/* Gap indicator while running */}
-          {running && dist !== null && (
-            <>
-              <line x1={ballX} y1={CY + 25} x2={recX} y2={CY + 25}
-                stroke="#f43f5e" strokeWidth={1.5} strokeDasharray="4,3" />
-              <text x={(ballX + recX) / 2} y={CY + 38}
-                fill="#fda4af" fontSize={9} textAnchor="middle">
-                {dist.toFixed(0)}px gap
-              </text>
-            </>
-          )}
-          {/* Receiver */}
-          <Player x={recX} y={CY} color="#f97316" label="WR"
-            sub={running ? `→ ${px2yd(recX).toFixed(0)} yd` : 'accelerating →'} />
-          {/* QB */}
-          <Player x={yd(L1.QB_YD)} y={CY} color="#0ea5e9" label="QB" sub="YOU" />
-          {/* Ball */}
-          <circle cx={ballX} cy={ballY} r={9}
-            fill="#fbbf24" stroke="#92400e" strokeWidth={2} />
-          {/* Win burst */}
-          {status === 'win' && (
-            <g>
-              {[...Array(8)].map((_, i) => {
-                const ang = (i / 8) * Math.PI * 2
-                return <line key={i}
-                  x1={ballX} y1={ballY}
-                  x2={ballX + Math.cos(ang) * 30} y2={ballY + Math.sin(ang) * 30}
-                  stroke="#fbbf24" strokeWidth={2} opacity={0.8} />
-              })}
-            </g>
-          )}
-        </FieldSVG>
-
-        {/* Controls */}
-        <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontSize: 11, color: '#94a3b8', marginBottom: 4 }}>
-              v_ball(t) — horizontal ball speed in px/s (try a constant, or a function of t):
-            </label>
-            <input
-              value={expr}
-              onChange={e => setExpr(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !running && throwBall()}
-              disabled={running}
-              style={{ width: '100%', padding: '8px 10px', borderRadius: 6,
-                border: `1px solid ${exprErr ? '#ef4444' : '#374151'}`,
-                background: '#1f2937', color: '#f9fafb',
-                fontFamily: 'monospace', fontSize: 14, boxSizing: 'border-box' }}
-              placeholder="e.g.  55   or   40 + 5*t   or   70 - 3*t"
-            />
-            {exprErr && <div style={{ color: '#f87171', fontSize: 11, marginTop: 3 }}>{exprErr}</div>}
-          </div>
-          <button
-            onClick={running ? reset : throwBall}
-            style={{ marginTop: 19, padding: '8px 20px', borderRadius: 6, border: 'none',
-              cursor: 'pointer', fontWeight: 'bold', fontSize: 14, color: 'white',
-              background: running ? '#6b7280' : '#22c55e' }}>
-            {running ? '⏹ Stop' : '🏈 Throw'}
-          </button>
-          {!running && status !== 'idle' && (
-            <button onClick={reset}
-              style={{ marginTop: 19, padding: '8px 16px', borderRadius: 6,
-                border: 'none', cursor: 'pointer', fontSize: 14, color: 'white',
-                background: '#374151' }}>
-              Reset
-            </button>
-          )}
-        </div>
-
-        {/* Feedback */}
-        {message && (
-          <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 6, fontSize: 13,
-            fontWeight: 'bold', background: status === 'win' ? '#14532d' : '#7f1d1d',
-            color: status === 'win' ? '#4ade80' : '#fca5a5' }}>
-            {message}
-          </div>
-        )}
-      </div>
-
-      {/* Math Panel */}
-      <MathPanel title="∫ Integration in Action" color="#22c55e">
-        <MathSection label="Receiver position (kinematic eq.):" color="#f97316">
-          <div style={{ color: '#fed7aa', fontSize: 10 }}>x_r(t) = x₀ + v₀·t + ½a·t²</div>
-          <div style={{ color: '#fb923c', marginTop: 3 }}>
-            x₀ ≈ {px2yd(X0px).toFixed(0)} yd, v₀={V0px}px/s, a={Apx}px/s²
-          </div>
-        </MathSection>
-
-        <MathSection label="Ball position (your integral):" color="#fbbf24">
-          <div style={{ fontSize: 10 }}>x_b(t) = x_QB + ∫₀ᵗ v_ball(τ)dτ</div>
-          <div style={{ fontSize: 10, color: '#a3e635', marginTop: 3 }}>
-            Each frame: Δx = v(t)·Δt, Δt = 1/60s
-          </div>
-        </MathSection>
-
-        {(running || status !== 'idle') && (
-          <MathSection label={`Live at t = ${t.toFixed(2)}s:`} color="#a78bfa">
-            <MathRow label="x_receiver" val={`${px2yd(recX).toFixed(1)} yd`} color="#fb923c" />
-            <MathRow label="x_ball" val={`${px2yd(ballX).toFixed(1)} yd`} color="#fbbf24" />
-            <MathRow label="v_ball(t)" val={`${vball?.toFixed(1)} px/s`} color="#a3e635" />
-            {dist !== null && (
-              <MathRow label="gap |x_b − x_r|"
-                val={`${dist.toFixed(1)}px`}
-                color={dist < L1.CATCH_R ? '#4ade80' : '#f87171'} />
-            )}
-          </MathSection>
-        )}
-
-        {status === 'idle' && (
-          <div style={{ color: '#475569', fontSize: 10, marginTop: 6 }}>
-            <div style={{ color: '#64748b', marginBottom: 4 }}>Win condition:</div>
-            |x_ball(t) − x_r(t)| {'<'} {L1.CATCH_R}px<br /><br />
-            <div style={{ color: '#60a5fa' }}>Hint: start with</div>
-            v_ball ≈ {hintVelocity()} px/s<br />
-            then tune it.
-          </div>
-        )}
-
-        <div style={{ marginTop: 10, padding: 8, background: '#1e293b',
-          borderRadius: 6, fontSize: 10, color: '#64748b' }}>
-          <div style={{ color: '#22c55e', marginBottom: 3 }}>Why this is integration:</div>
-          Euler step: x += v(t)·dt<br />
-          Sum of all steps:<br />
-          x(T) = x₀ + Σ v(tᵢ)·Δt<br />
-          → x₀ + ∫₀ᵀ v(τ)dτ as dt→0<br />
-          <br />
-          This is the Fundamental Theorem connecting v(t) and x(t).
-        </div>
-      </MathPanel>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LEVEL 2: BEST ANGLE — Optimization
-//
-// Concept: Range R(θ) = v₀²sin(2θ)/g (projectile on flat ground)
-//          dR/dθ = 2v₀²cos(2θ)/g = 0  →  θ = 45° maximises range
-// Player adjusts angle with a slider. Ball follows parabolic arc.
-// Visual shows R(θ) curve and the current operating point.
-// ─────────────────────────────────────────────────────────────────────────────
-const L2 = {
-  QB_YD: 8,      // quarterback position
-  V0: 280,       // ball speed magnitude (px/s)
-  G: 420,        // gravity (px/s²) — tuned so 45° flies across field nicely
-  GOAL_YD: 62,   // target yard line
-  GOAL_TOL: 18,  // hit tolerance (px)
-}
-
-function bestAngleLevel() {
-  const rafRef = useRef(null)
-  const physRef = useRef(null)
-  const [angle, setAngle] = useState(30)
-  const [disp, setDisp] = useState({
-    ballX: yd(L2.QB_YD), ballY: CY,
-    trail: [], status: 'idle', message: '', t: 0,
-  })
-
-  const stop = useCallback(() => {
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-  }, [])
-
-  // Analytical range in pixels for given angle
-  function rangeAt(deg) {
-    const th = deg * Math.PI / 180
-    return (L2.V0 * L2.V0 * Math.sin(2 * th)) / L2.G
-  }
-
-  // dR/dθ (analytical) — for display
-  function dRdTheta(deg) {
-    const th = deg * Math.PI / 180
-    return (2 * L2.V0 * L2.V0 * Math.cos(2 * th)) / L2.G * (Math.PI / 180)
-  }
-
-  function throwBall() {
-    stop()
-    const th = angle * Math.PI / 180
-    const vx = L2.V0 * Math.cos(th)
-    const vy = -L2.V0 * Math.sin(th) // upward = negative y in SVG
-
-    physRef.current = {
-      t: 0, ballX: yd(L2.QB_YD), ballY: CY,
-      vx, vy, trail: [], frameCount: 0,
-    }
-
-    const DT = 1 / 60
-    function step() {
-      const p = physRef.current
-      if (!p) return
-      p.t += DT
-      p.vx += 0  // no horizontal drag
-      p.vy += L2.G * DT  // gravity pulls down (positive y = down in SVG)
-      p.ballX += p.vx * DT
-      p.ballY += p.vy * DT
-
-      p.frameCount++
-      if (p.frameCount % 2 === 0) {
-        p.trail.push({ x: p.ballX, y: p.ballY })
-        if (p.trail.length > 35) p.trail.shift()
-      }
-
-      const goalX = yd(L2.GOAL_YD)
-      const hitGround = p.ballY >= CY
-
-      if (hitGround) {
-        const dx = Math.abs(p.ballX - goalX)
-        stop()
-        if (dx < L2.GOAL_TOL) {
-          setDisp({ ballX: p.ballX, ballY: CY, trail: [...p.trail],
-            status: 'win', t: p.t,
-            message: `🎯 Perfect! ${angle}° → landed at ${px2yd(p.ballX).toFixed(1)}-yd line. Range = ${(px2yd(rangeAt(angle))).toFixed(1)} yds.` })
-        } else {
-          const R = rangeAt(angle)
-          const Rpx = yd(L2.QB_YD) + R
-          setDisp({ ballX: p.ballX, ballY: CY, trail: [...p.trail],
-            status: 'loss', t: p.t,
-            message: `Landed at ${px2yd(p.ballX).toFixed(1)} yds, need ${L2.GOAL_YD} yds. ${angle < 45 ? 'Increase' : 'Decrease'} the angle.` })
-        }
-        return
-      }
-
-      if (p.ballX > W + 20) { stop(); return }
-
-      setDisp({ ballX: p.ballX, ballY: p.ballY, trail: [...p.trail],
-        status: 'running', t: p.t, message: '' })
-      rafRef.current = requestAnimationFrame(step)
-    }
-    setDisp(d => ({ ...d, status: 'running', message: '' }))
-    rafRef.current = requestAnimationFrame(step)
-  }
-
-  function reset() {
-    stop()
-    setDisp({ ballX: yd(L2.QB_YD), ballY: CY, trail: [], status: 'idle', message: '', t: 0 })
-  }
-
-  useEffect(() => () => stop(), [stop])
-
-  const { ballX, ballY, trail, status, message } = disp
-  const running = status === 'running'
-  const R = rangeAt(angle)
-  const dR = dRdTheta(angle)
-  const R_yds = (R / PY).toFixed(1)
-  const landX = yd(L2.QB_YD) + R
-
-  // Build R(θ) mini-graph points (0..80°)
-  const GRAPH_W = 180, GRAPH_H = 55
-  const maxR = rangeAt(45)
-  const graphPts = Array.from({ length: 81 }, (_, i) => {
-    const r = rangeAt(i)
-    return {
-      x: (i / 80) * GRAPH_W,
-      y: GRAPH_H - (r / maxR) * (GRAPH_H - 6),
-    }
-  })
-  const pathD = graphPts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-  const curX = (angle / 80) * GRAPH_W
-  const curY = GRAPH_H - (R / maxR) * (GRAPH_H - 6)
-
-  return (
-    <div style={{ display: 'flex', gap: 14 }}>
-      <div style={{ flex: 1 }}>
-        <FieldSVG>
-          {/* Trail */}
-          {trail.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y}
-              r={2 + (i / trail.length) * 4}
-              fill="#a78bfa"
-              opacity={0.15 + (i / trail.length) * 0.7} />
-          ))}
-          {/* Landing zone target */}
-          <rect x={yd(L2.GOAL_YD) - L2.GOAL_TOL} y={CY - 6}
-            width={L2.GOAL_TOL * 2} height={12} rx={4}
-            fill="#facc15" opacity={0.3} stroke="#facc15" strokeWidth={1} />
-          <text x={yd(L2.GOAL_YD)} y={CY + 24} fill="#facc15" fontSize={9}
-            textAnchor="middle">TARGET ({L2.GOAL_YD} yd)</text>
-
-          {/* Predicted landing indicator (thin dashed line) when idle */}
-          {status === 'idle' && landX > EZ && landX < W - EZ && (
-            <>
-              <line x1={landX} y1={CY - 20} x2={landX} y2={CY + 20}
-                stroke="#c084fc" strokeWidth={1.5} strokeDasharray="3,3" />
-              <text x={landX} y={CY - 26} fill="#c084fc" fontSize={8}
-                textAnchor="middle">predicted</text>
-            </>
-          )}
-
-          {/* Angle arc indicator */}
-          {status === 'idle' && (() => {
-            const qbX = yd(L2.QB_YD), arcR = 35
-            const th = angle * Math.PI / 180
-            const ax = qbX + arcR * Math.cos(-th)
-            const ay = CY + arcR * Math.sin(-th)
-            return (
-              <g>
-                <line x1={qbX} y1={CY} x2={ax} y2={ay}
-                  stroke="#a78bfa" strokeWidth={2} />
-                <path d={`M ${qbX + arcR} ${CY} A ${arcR} ${arcR} 0 0 0 ${ax} ${ay}`}
-                  fill="none" stroke="#a78bfa" strokeWidth={1} strokeDasharray="3,2" />
-                <text x={qbX + arcR + 5} y={CY - 4} fill="#a78bfa" fontSize={9}>{angle}°</text>
-              </g>
-            )
-          })()}
-
-          {/* QB */}
-          <Player x={yd(L2.QB_YD)} y={CY} color="#0ea5e9" label="QB" sub="YOU" />
-          {/* Ball */}
-          <circle cx={ballX} cy={ballY} r={9} fill="#a78bfa" stroke="#6d28d9" strokeWidth={2} />
-        </FieldSVG>
-
-        {/* Angle slider */}
-        <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center' }}>
-          <label style={{ color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>
-            Launch angle θ:
-          </label>
-          <input type="range" min={5} max={80} value={angle}
-            onChange={e => { setAngle(+e.target.value); if (status !== 'idle') reset() }}
-            disabled={running}
-            style={{ flex: 1, accentColor: '#a78bfa' }} />
-          <span style={{ color: '#c084fc', fontWeight: 'bold', minWidth: 32 }}>{angle}°</span>
-          <button onClick={running ? reset : throwBall}
-            style={{ padding: '7px 18px', borderRadius: 6, border: 'none', cursor: 'pointer',
-              fontWeight: 'bold', fontSize: 13, color: 'white',
-              background: running ? '#6b7280' : '#7c3aed' }}>
-            {running ? '⏹' : '🏈 Throw'}
-          </button>
-          {!running && status !== 'idle' && (
-            <button onClick={reset}
-              style={{ padding: '7px 14px', borderRadius: 6, border: 'none',
-                cursor: 'pointer', fontSize: 13, color: 'white', background: '#374151' }}>
-              Reset
-            </button>
-          )}
-        </div>
-
-        {message && (
-          <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 6,
-            fontWeight: 'bold', fontSize: 13, background: status === 'win' ? '#14532d' : '#7f1d1d',
-            color: status === 'win' ? '#4ade80' : '#fca5a5' }}>
-            {message}
-          </div>
-        )}
-      </div>
-
-      {/* Math Panel */}
-      <MathPanel title="⬆ Optimization" color="#a78bfa">
-        <MathSection label="Range formula:" color="#c084fc">
-          <div style={{ fontSize: 10 }}>R(θ) = v₀²sin(2θ) / g</div>
-          <div style={{ fontSize: 10, marginTop: 2, color: '#94a3b8' }}>
-            v₀={L2.V0}px/s, g={L2.G}px/s²
-          </div>
-        </MathSection>
-
-        <MathSection label={`At θ = ${angle}°:`} color="#fbbf24">
-          <MathRow label="R(θ)" val={`${R.toFixed(0)}px ≈ ${R_yds} yd`} color="#fbbf24" />
-          <MathRow label="sin(2θ)" val={Math.sin(2 * angle * Math.PI / 180).toFixed(3)} />
-          <MathRow label="dR/dθ" val={dR.toFixed(2)}
-            color={Math.abs(dR) < 0.1 ? '#4ade80' : dR > 0 ? '#60a5fa' : '#f87171'} />
-          <div style={{ fontSize: 9, color: '#64748b', marginTop: 4 }}>
-            {Math.abs(dR) < 0.1
-              ? '✓ dR/dθ ≈ 0 — at maximum!'
-              : dR > 0
-                ? '↑ Range still increasing — try larger θ'
-                : '↓ Range decreasing — try smaller θ'}
-          </div>
-        </MathSection>
-
-        {/* Mini R(θ) graph */}
-        <div style={{ marginTop: 6 }}>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 4 }}>
-            R(θ) curve (θ = 0° to 80°):
-          </div>
-          <svg viewBox={`0 0 ${GRAPH_W} ${GRAPH_H + 12}`}
-            style={{ width: '100%', background: '#1e293b', borderRadius: 4 }}>
-            <path d={pathD} fill="none" stroke="#a78bfa" strokeWidth={1.5} />
-            {/* 45° marker */}
-            <line x1={(45 / 80) * GRAPH_W} y1={0}
-              x2={(45 / 80) * GRAPH_W} y2={GRAPH_H}
-              stroke="#22c55e" strokeWidth={1} strokeDasharray="3,2" />
-            <text x={(45 / 80) * GRAPH_W + 2} y={10} fill="#22c55e" fontSize={7}>45°=max</text>
-            {/* Current point */}
-            <circle cx={curX} cy={curY} r={4} fill="#fbbf24" />
-            {/* Axes labels */}
-            <text x={0} y={GRAPH_H + 11} fill="#64748b" fontSize={7}>0°</text>
-            <text x={GRAPH_W - 12} y={GRAPH_H + 11} fill="#64748b" fontSize={7}>80°</text>
-          </svg>
-        </div>
-
-        <div style={{ marginTop: 8, padding: 8, background: '#1e293b',
-          borderRadius: 6, fontSize: 10, color: '#64748b' }}>
-          <div style={{ color: '#a78bfa', marginBottom: 3 }}>The calculus:</div>
-          dR/dθ = 0 at θ=45°<br />
-          ⟹ maximum range.<br />
-          d²R/dθ² {'<'} 0 confirms max.<br />
-          This is optimization: critical points of R(θ).
-        </div>
-      </MathPanel>
-    </div>
-  )
-}
-
-// Because it's defined as an arrow-style const above to keep JSX consistent,
-// rename to a proper function component for React:
-const OptimalAngleLevel = bestAngleLevel
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LEVEL 3: DEFENDER CHASE — Related Rates
-//
-// Concept: multiple quantities changing simultaneously and linked.
-// Receiver runs a route. Defender closes in. Distance D(t) between
-// defender and catch point changes at rate dD/dt. Player must throw while
-// the window is open (D > threshold).
-//
-// The math: if defender at (xd, yd) moves toward catch point (xc, yc) at speed s,
-//   D(t) = √((xc−xd)² + (yc−yd)²)
-//   dD/dt = −s (constant closing rate for simplicity, or full formula)
-// ─────────────────────────────────────────────────────────────────────────────
-const L3 = {
-  QB_YD: 10,
-  REC_YD0: 30,
-  REC_SPEED: 55,      // receiver horizontal speed px/s
-  CATCH_YD: 60,       // expected catch point yard line
-  DEF_START_YD: 65,   // defender starting yard line
-  DEF_START_Y: CY - 85, // defender starts high (approaching from corner)
-  DEF_SPEED: 62,      // defender speed px/s
-  BALL_SPEED: 250,    // ball speed when thrown
-  THROW_OPEN: 50,     // must throw while defender dist > this (px)
-  CATCH_TRIG: 30,     // catch trigger radius
-}
-
-function DefenderPursuitLevel() {
-  const rafRef = useRef(null)
-  const physRef = useRef(null)
-  const [disp, setDisp] = useState({
-    recX: yd(L3.REC_YD0), recY: CY,
-    defX: yd(L3.DEF_START_YD), defY: L3.DEF_START_Y,
-    ballX: yd(L3.QB_YD), ballY: CY,
-    catchX: yd(L3.CATCH_YD),
-    defDist: null, trail: [],
-    status: 'idle', message: '', t: 0, thrown: false,
-  })
-
-  const stop = useCallback(() => {
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-  }, [])
-
-  function startPlay() {
-    stop()
-    const catchX = yd(L3.CATCH_YD)
-    physRef.current = {
-      t: 0,
-      recX: yd(L3.REC_YD0), recY: CY,
-      defX: yd(L3.DEF_START_YD), defY: L3.DEF_START_Y,
-      ballX: yd(L3.QB_YD), ballY: CY,
-      ballVx: 0, ballVy: 0,
-      catchX, thrown: false,
-      trail: [], frameCount: 0,
-    }
-    setDisp(d => ({ ...d, status: 'running', message: '', thrown: false,
-      ballX: yd(L3.QB_YD), ballY: CY, defX: yd(L3.DEF_START_YD), defY: L3.DEF_START_Y }))
-
-    const DT = 1 / 60
-    function step() {
-      const p = physRef.current
-      if (!p) return
-      p.t += DT
-
-      // Receiver moves horizontally toward catch point
-      if (p.recX < p.catchX) p.recX += L3.REC_SPEED * DT
-      if (p.recX > p.catchX) p.recX = p.catchX
-
-      // Defender moves toward catch point
-      const ddx = p.catchX - p.defX, ddy = CY - p.defY
-      const ddist = Math.sqrt(ddx * ddx + ddy * ddy)
-      if (ddist > 3) {
-        p.defX += (ddx / ddist) * L3.DEF_SPEED * DT
-        p.defY += (ddy / ddist) * L3.DEF_SPEED * DT
-      }
-      const defDist = Math.sqrt((p.catchX - p.defX) ** 2 + (CY - p.defY) ** 2)
-
-      // Ball movement (after throw)
-      if (p.thrown) {
-        p.ballX += p.ballVx * DT
-        p.ballY += p.ballVy * DT
-        // Simple arc — gravity
-        p.ballVy += 280 * DT
-        p.frameCount++
-        if (p.frameCount % 2 === 0) {
-          p.trail.push({ x: p.ballX, y: p.ballY })
-          if (p.trail.length > 25) p.trail.shift()
-        }
-
-        // Ball reached catch zone (x within tolerance, near center y)
-        const nearRec = Math.abs(p.ballX - p.recX) < L3.CATCH_TRIG &&
-                        Math.abs(p.ballY - CY) < 30
-
-        if (nearRec) {
-          // Was window open?
-          const windowWasOpen = defDist > L3.THROW_OPEN
-          stop()
-          if (windowWasOpen) {
-            setDisp({ recX: p.recX, recY: CY, defX: p.defX, defY: p.defY,
-              ballX: p.ballX, ballY: CY, catchX: p.catchX,
-              defDist, trail: [...p.trail], t: p.t, thrown: true,
-              status: 'win', message: `🏈 Touchdown! Threw with D=${defDist.toFixed(0)}px clearance — window was open!` })
-          } else {
-            setDisp({ recX: p.recX, recY: CY, defX: p.defX, defY: p.defY,
-              ballX: p.ballX, ballY: CY, catchX: p.catchX,
-              defDist, trail: [...p.trail], t: p.t, thrown: true,
-              status: 'loss', message: `Ball caught but defender was too close (D=${defDist.toFixed(0)}px). Throw earlier!` })
-          }
-          return
-        }
-
-        if (p.ballX > W + 20 || p.ballY > H + 20) {
-          stop()
-          setDisp(d => ({ ...d, defX: p.defX, defY: p.defY,
-            ballX: p.ballX, ballY: p.ballY, defDist, t: p.t, thrown: true,
-            status: 'loss', message: 'Ball missed receiver.' }))
-          return
-        }
-      }
-
-      // Defender closed window
-      if (defDist < 15 && !p.thrown) {
-        stop()
-        setDisp(d => ({ ...d, recX: p.recX, defX: p.defX, defY: p.defY,
-          defDist, t: p.t, status: 'loss', message: `Too late! Defender covered the catch point (D=${defDist.toFixed(0)}px). Throw earlier!` }))
-        return
-      }
-
-      setDisp({ recX: p.recX, recY: CY, defX: p.defX, defY: p.defY,
-        ballX: p.ballX, ballY: p.ballY, catchX: p.catchX,
-        defDist, trail: [...p.trail], t: p.t, thrown: p.thrown,
-        status: 'running', message: '' })
-      rafRef.current = requestAnimationFrame(step)
-    }
-    rafRef.current = requestAnimationFrame(step)
-  }
-
-  function throwNow() {
-    const p = physRef.current
-    if (!p || p.thrown) return
-    // Compute ball velocity toward receiver current position
-    const dx = p.recX - yd(L3.QB_YD)
-    const dy = CY - yd(L3.QB_YD) // horizontal throw, dy ≈ 0
-    const dist = Math.sqrt(dx * dx + 0.01)
-    p.ballVx = (dx / dist) * L3.BALL_SPEED
-    p.ballVy = -80 // slight upward
-    p.thrown = true
-  }
-
-  function reset() {
-    stop()
-    setDisp({ recX: yd(L3.REC_YD0), recY: CY,
-      defX: yd(L3.DEF_START_YD), defY: L3.DEF_START_Y,
-      ballX: yd(L3.QB_YD), ballY: CY,
-      catchX: yd(L3.CATCH_YD), defDist: null, trail: [],
-      status: 'idle', message: '', t: 0, thrown: false })
-  }
-
-  useEffect(() => () => stop(), [stop])
-
-  const { recX, recY, defX, defY, ballX, ballY, catchX, defDist,
-    trail, status, message, t, thrown } = disp
-  const running = status === 'running'
-
-  // dD/dt estimate (closing rate)
-  const closingRate = defDist !== null ? -L3.DEF_SPEED : null  // simplified constant closing
-
-  return (
-    <div style={{ display: 'flex', gap: 14 }}>
-      <div style={{ flex: 1 }}>
-        <FieldSVG>
-          {/* Trail */}
-          {trail.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y}
-              r={2 + (i / trail.length) * 4}
-              fill="#fbbf24"
-              opacity={0.1 + (i / trail.length) * 0.7} />
-          ))}
-
-          {/* Catch point zone */}
-          <circle cx={catchX} cy={CY} r={L3.THROW_OPEN}
-            fill="none" stroke="#22c55e" strokeWidth={1}
-            strokeDasharray="4,3" opacity={0.5} />
-          <text x={catchX} y={CY + L3.THROW_OPEN + 14} fill="#4ade80" fontSize={8}
-            textAnchor="middle">catch zone</text>
-
-          {/* Defender threat radius */}
-          {defDist !== null && defDist < L3.THROW_OPEN + 30 && (
-            <circle cx={defX} cy={defY} r={15}
-              fill="#ef4444" opacity={0.15} />
-          )}
-
-          {/* Closing distance line */}
-          {running && (
-            <>
-              <line x1={defX} y1={defY} x2={catchX} y2={CY}
-                stroke="#ef4444" strokeWidth={1} strokeDasharray="3,3" opacity={0.6} />
-              {defDist !== null && (
-                <text x={(defX + catchX) / 2 + 8} y={(defY + CY) / 2 - 6}
-                  fill="#fca5a5" fontSize={8}>D={defDist.toFixed(0)}</text>
-              )}
-            </>
-          )}
-
-          {/* Receiver */}
-          <Player x={recX} y={CY} color="#f97316" label="WR" sub="→ route" />
-          {/* Defender */}
-          <Player x={defX} y={defY} color="#ef4444" label="CB" sub="closing!" r={13} />
-          {/* QB */}
-          <Player x={yd(L3.QB_YD)} y={CY} color="#0ea5e9" label="QB" sub="YOU" />
-          {/* Ball */}
-          <circle cx={ballX} cy={ballY} r={9}
-            fill="#fbbf24" stroke="#92400e" strokeWidth={2} />
-        </FieldSVG>
-
-        <div style={{ marginTop: 12, display: 'flex', gap: 10, alignItems: 'center' }}>
-          {status === 'idle' && (
-            <button onClick={startPlay}
-              style={{ padding: '8px 22px', borderRadius: 6, border: 'none',
-                cursor: 'pointer', fontWeight: 'bold', fontSize: 14, color: 'white',
-                background: '#0ea5e9' }}>
-              ▶ Snap Ball
-            </button>
-          )}
-          {running && !thrown && (
-            <button onClick={throwNow}
-              style={{ padding: '8px 22px', borderRadius: 6, border: 'none',
-                cursor: 'pointer', fontWeight: 'bold', fontSize: 14, color: 'white',
-                background: defDist > L3.THROW_OPEN ? '#22c55e' : '#ef4444',
-                animation: defDist > L3.THROW_OPEN ? 'none' : 'none' }}>
-              🏈 THROW NOW!
-              {defDist !== null && ` (D=${defDist.toFixed(0)})`}
-            </button>
-          )}
-          {running && thrown && (
-            <span style={{ color: '#94a3b8', fontSize: 13 }}>Ball in the air…</span>
-          )}
-          {!running && status !== 'idle' && (
-            <button onClick={reset}
-              style={{ padding: '8px 18px', borderRadius: 6, border: 'none',
-                cursor: 'pointer', fontSize: 14, color: 'white', background: '#374151' }}>
-              Reset
-            </button>
-          )}
-          {defDist !== null && running && (
-            <div style={{
-              padding: '6px 12px', borderRadius: 6, fontSize: 12,
-              background: defDist > L3.THROW_OPEN ? '#14532d' : '#7f1d1d',
-              color: defDist > L3.THROW_OPEN ? '#4ade80' : '#fca5a5',
-            }}>
-              {defDist > L3.THROW_OPEN ? '✓ Window OPEN' : '✗ Window CLOSING'}
-              {' — '}D = {defDist.toFixed(0)}px
-            </div>
-          )}
-        </div>
-
-        {message && (
-          <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 6,
-            fontWeight: 'bold', fontSize: 13, background: status === 'win' ? '#14532d' : '#7f1d1d',
-            color: status === 'win' ? '#4ade80' : '#fca5a5' }}>
-            {message}
-          </div>
-        )}
-      </div>
-
-      {/* Math Panel */}
-      <MathPanel title="⇄ Related Rates" color="#f43f5e">
-        <MathSection label="Defender–catchpoint distance:" color="#f87171">
-          <div style={{ fontSize: 10 }}>
-            D(t) = √((x_c−x_d)² + (y_c−y_d)²)
-          </div>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            All three variables change with t simultaneously
-          </div>
-        </MathSection>
-
-        <MathSection label="Closing rate (dD/dt):" color="#fbbf24">
-          <div style={{ fontSize: 10 }}>dD/dt = −s_def = −{L3.DEF_SPEED}px/s</div>
-          <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
-            Defender closes at constant speed → dD/dt is constant
-          </div>
-        </MathSection>
-
-        {defDist !== null && (
-          <MathSection label={`Live at t = ${t.toFixed(2)}s:`} color="#a78bfa">
-            <MathRow label="D(t)" val={`${defDist.toFixed(1)}px`}
-              color={defDist > L3.THROW_OPEN ? '#4ade80' : '#f87171'} />
-            <MathRow label="dD/dt" val={`−${L3.DEF_SPEED}px/s`} color="#fbbf24" />
-            <MathRow label="Time to close" val={`${(defDist / L3.DEF_SPEED).toFixed(2)}s`} />
-            <MathRow label="Window open?" val={defDist > L3.THROW_OPEN ? 'YES' : 'NO'}
-              color={defDist > L3.THROW_OPEN ? '#4ade80' : '#f87171'} />
-          </MathSection>
-        )}
-
-        <div style={{ marginTop: 8, padding: 8, background: '#1e293b',
-          borderRadius: 6, fontSize: 10, color: '#64748b' }}>
-          <div style={{ color: '#f43f5e', marginBottom: 3 }}>Related rates principle:</div>
-          D, x_c, x_d, y_d all depend on t.<br />
-          dD/dt relates their rates:<br />
-          dD/dt = −(x_c−x_d)vx + (y_c−y_d)vy / D<br />
-          <br />
-          <div style={{ color: '#94a3b8' }}>Multiple moving quantities, one time parameter — that's related rates.</div>
-        </div>
-      </MathPanel>
-    </div>
-  )
-}
-
-// ─── Level tab config ─────────────────────────────────────────────────────────
+// ─── Level definitions ────────────────────────────────────────────────────────
 const LEVELS = [
   {
-    id: 0, name: 'Lead Pass', concept: 'Integration',
-    color: '#22c55e', emoji: '🏈',
-    desc: 'x(t) = x₀ + ∫₀ᵗ v(τ)dτ — throw where the receiver will be',
+    id: 'L1', name: 'Lead Pass', concept: 'Integration / Position from velocity',
+    color: '#22c55e',
+    description: 'A receiver runs downfield at constant speed. Write the equation for where the receiver will be at time t, then find the right throw time T so the ball meets the receiver in stride.',
+    theory: [
+      'If a player has constant velocity v, their position is:',
+      'x(t) = x₀ + v·t',
+      'This is the integral of velocity over time.',
+      'You need to find T such that x_ball(t*) = x_receiver(t*)',
+      'where t* is when the ball arrives.',
+    ],
+    inputs: [
+      { id: 'rec_eq', label: 'Receiver position equation x_r(t) — in yards:', placeholder: 'e.g.  20 + 5*t', hint: 'WR starts at yard 20, runs at 5 yd/s' },
+      { id: 'throw_t', label: 'Throw at time T (seconds after snap):', placeholder: 'e.g.  1.4', hint: 'Ball speed is 25 yd/s from yard 5' },
+    ],
+    params: { QB_YD: 5, REC_YD0: 20, V_REC_YDS: 5, V_BALL_YDS: 25, CATCH_R_YD: 1.5 },
+    run(inputs) {
+      const rec_fn = parseExpr(inputs.rec_eq, { t: 0 })
+      const T = parseFloat(inputs.throw_t)
+      if (!rec_fn) return { error: 'rec_eq', msg: 'Invalid receiver equation' }
+      if (isNaN(T) || T < 0 || T > 8) return { error: 'throw_t', msg: 'T must be 0–8 seconds' }
+      const p = this.params
+      const recVal0 = rec_fn(0)
+      if (Math.abs(recVal0 - p.REC_YD0) > 2) return { warning: `Your equation gives x_r(0) = ${recVal0.toFixed(1)}, but WR starts at yard ${p.REC_YD0}. Check your x₀.` }
+      const frames = []
+      const DT = 1 / 60
+      let bx = yd(p.QB_YD), by = CY, thrown = false, t = 0
+      const trail = []
+      for (let i = 0; i < 600; i++) {
+        t += DT
+        const recYd = rec_fn(t)
+        const rx = yd(Math.min(recYd !== null ? recYd : p.REC_YD0 + p.V_REC_YDS * t, 100))
+        if (!thrown && t >= T) thrown = true
+        if (thrown) { bx += p.V_BALL_YDS * PY * DT; trail.push({ x: bx, y: by }) }
+        const dist = Math.abs(bx - rx) / PY
+        const prog = thrown ? Math.min((bx - yd(p.QB_YD)) / (rx - yd(p.QB_YD) + 0.01), 1) : 0
+        const alt = thrown ? Math.max(0, Math.sin(Math.max(0, prog) * Math.PI)) : 0
+        frames.push({ t, bx, by, rx, ry: CY, alt, thrown, trail: [...trail], dist })
+        if (thrown && dist < p.CATCH_R_YD) {
+          return { frames, result: 'win', catchTime: t, analytical: `x_r(${t.toFixed(2)}) = ${recYd ? recYd.toFixed(1) : '?'} yd, ball at ${px2yd(bx)} yd — caught!` }
+        }
+        if (bx > W + 30 || t > 9) break
+      }
+      const last = frames[frames.length - 1] || {}
+      const over = last.bx > last.rx
+      return { frames, result: 'loss', analytical: `Ball and receiver were ${(last.dist || 99).toFixed(1)} yd apart — ${over ? 'ball overshot (increase T)' : 'ball undershot (decrease T)'}` }
+    },
   },
   {
-    id: 1, name: 'Best Angle', concept: 'Optimization',
-    color: '#a78bfa', emoji: '🎯',
-    desc: 'R(θ) = v₀²sin(2θ)/g — maximize range, dR/dθ = 0 at θ = 45°',
+    id: 'L2', name: 'Accelerating Route', concept: 'Kinematics / x(t) with acceleration',
+    color: '#f59e0b',
+    description: "The receiver accelerates off the line. Write the kinematic equation for the receiver's position — including acceleration — then solve for the optimal throw time.",
+    theory: [
+      'With initial velocity v₀ and constant acceleration a:',
+      'x(t) = x₀ + v₀·t + ½·a·t²',
+      'The velocity at time t is: v(t) = v₀ + a·t',
+      'Ball travel time = (x_r(T) - x_QB) / v_ball',
+      'Catch: x_r(T + flight) = x_ball(T + flight)',
+    ],
+    inputs: [
+      { id: 'rec_eq', label: 'Receiver position x_r(t) in yards — include acceleration:', placeholder: 'e.g.  15 + 2*t + 0.5*3*t^2', hint: 'WR starts at 15 yd, v₀=2 yd/s, a=3 yd/s²' },
+      { id: 'throw_t', label: 'Throw at time T (seconds):', placeholder: 'e.g.  1.0', hint: 'Ball speed 30 yd/s from yard 8' },
+    ],
+    params: { QB_YD: 8, REC_YD0: 15, V0_REC: 2, A_REC: 3, V_BALL_YDS: 30, CATCH_R_YD: 1.5 },
+    run(inputs) {
+      const rec_fn = parseExpr(inputs.rec_eq, { t: 0 })
+      const T = parseFloat(inputs.throw_t)
+      if (!rec_fn) return { error: 'rec_eq', msg: 'Invalid equation — try: 15 + 2*t + 0.5*3*t^2' }
+      if (isNaN(T) || T < 0 || T > 8) return { error: 'throw_t', msg: 'T must be 0–8 s' }
+      const p = this.params
+      if (Math.abs(rec_fn(0) - p.REC_YD0) > 2) return { warning: `x_r(0) = ${rec_fn(0).toFixed(1)}, but WR starts at ${p.REC_YD0} yd. Fix x₀.` }
+      const frames = []
+      const DT = 1 / 60
+      let bx = yd(p.QB_YD), by = CY, thrown = false, t = 0
+      const trail = []
+      for (let i = 0; i < 600; i++) {
+        t += DT
+        const recYd = rec_fn(t)
+        const rx = yd(Math.min(recYd !== null ? Math.max(recYd, p.REC_YD0) : p.REC_YD0 + p.V0_REC * t + 0.5 * p.A_REC * t * t, 100))
+        if (!thrown && t >= T) thrown = true
+        if (thrown) { bx += p.V_BALL_YDS * PY * DT; trail.push({ x: bx, y: by }) }
+        const dist = Math.abs(bx - rx) / PY
+        const prog = thrown ? Math.min((bx - yd(p.QB_YD)) / Math.max(rx - yd(p.QB_YD), 1), 1) : 0
+        const alt = thrown ? Math.max(0, Math.sin(Math.max(0, prog) * Math.PI)) : 0
+        frames.push({ t, bx, by, rx, ry: CY, alt, thrown, trail: [...trail], dist })
+        if (thrown && dist < p.CATCH_R_YD) return { frames, result: 'win', catchTime: t, analytical: `Caught! Receiver at ${recYd ? recYd.toFixed(1) : '?'} yd at t=${t.toFixed(2)}s` }
+        if (bx > W + 30 || t > 9) break
+      }
+      const last = frames[frames.length - 1] || {}
+      return { frames, result: 'loss', analytical: `Gap was ${(last.dist || 99).toFixed(1)} yd — your equation gave x_r(T)=${rec_fn(T) ? rec_fn(T).toFixed(1) : '?'} yd at throw time T=${T}` }
+    },
   },
   {
-    id: 2, name: 'Defender Chase', concept: 'Related Rates',
-    color: '#f43f5e', emoji: '🏃',
-    desc: 'dD/dt links defender, receiver, and catch point — throw in the window',
+    id: 'L3', name: 'Interception Angle', concept: 'Optimization / dR/dθ = 0',
+    color: '#a78bfa',
+    description: 'A pass is in the air. You are the defender. Find the angle θ that lets you reach the interception point. Calculate it from the geometry — use atan(Δy/Δx).',
+    theory: [
+      'A body launched at angle θ with speed v₀:',
+      'x(θ) = v₀·cos(θ)·t_flight',
+      'y(θ) = v₀·sin(θ)·t_flight - ½g·t_flight²',
+      'For horizontal range: R(θ) = v₀²·sin(2θ)/g',
+      'dR/dθ = 2v₀²·cos(2θ)/g = 0  →  θ* = 45°',
+      'But here you want the angle that intercepts a MOVING target.',
+      'Set your x(θ,t) = target_x(t) and solve for θ.',
+    ],
+    inputs: [
+      { id: 'angle_eq', label: 'Your intercept angle θ in degrees — as a function or constant:', placeholder: 'e.g.  35   or   atan(40/60)*180/pi', hint: 'Target is at (60 yd downfield, 8 yd off-center). Your speed: 22 yd/s.' },
+    ],
+    params: { DEF_YD: 45, DEF_Y_OFFSET: 50, TARGET_YD: 60, TARGET_Y_OFFSET: -8, V_DEF_YDS: 22, CATCH_R_YD: 2 },
+    run(inputs) {
+      const angle_fn = parseExpr(inputs.angle_eq, { t: 0 })
+      if (!angle_fn) return { error: 'angle_eq', msg: 'Invalid — try: 35  or  atan(8/15)*180/pi' }
+      const theta_deg = angle_fn(0)
+      if (theta_deg === null || theta_deg < -90 || theta_deg > 90) return { error: 'angle_eq', msg: 'Angle must be between -90 and 90 degrees' }
+      const p = this.params
+      const defX = yd(p.DEF_YD), defY = CY + p.DEF_Y_OFFSET
+      const tgtX = yd(p.TARGET_YD), tgtY = CY + p.TARGET_Y_OFFSET
+      const theta_rad = theta_deg * Math.PI / 180
+      const vx = p.V_DEF_YDS * PY * Math.cos(theta_rad)
+      const vy = -p.V_DEF_YDS * PY * Math.sin(theta_rad)
+      const frames = []
+      const DT = 1 / 60
+      let dx = defX, dy = defY, t = 0
+      const trail = []
+      for (let i = 0; i < 480; i++) {
+        t += DT
+        dx += vx * DT; dy += vy * DT
+        trail.push({ x: dx, y: dy })
+        const dist = Math.sqrt((dx - tgtX) ** 2 + (dy - tgtY) ** 2) / PY
+        frames.push({ t, dx, dy, tgtX, tgtY, dist, trail: [...trail] })
+        if (dist < p.CATCH_R_YD) {
+          const optTheta = Math.atan2(defY - tgtY, tgtX - defX) * 180 / Math.PI
+          return { frames, result: 'win', analytical: `θ=${theta_deg.toFixed(1)}° worked! Optimal was ≈${optTheta.toFixed(1)}°. Reached in ${t.toFixed(2)}s.` }
+        }
+        if (t > 8) break
+      }
+      const optTheta = Math.atan2(defY - tgtY, tgtX - defX) * 180 / Math.PI
+      const last = frames[frames.length - 1] || {}
+      return { frames, result: 'loss', analytical: `At θ=${theta_deg.toFixed(1)}° you missed by ${(last.dist || 99).toFixed(1)} yd. Optimal angle ≈ ${optTheta.toFixed(1)}°. Hint: atan(Δy/Δx)*180/pi` }
+    },
+  },
+  {
+    id: 'L4', name: 'Closing Window', concept: 'Related rates / dD/dt',
+    color: '#ef4444',
+    description: 'A defender is closing on your receiver. Write the equation for how fast the window is closing (dD/dt), then find the latest time you can throw and still complete the pass.',
+    theory: [
+      'Defender position: x_d(t), y_d(t)',
+      'Distance to catch point: D(t) = √(Δx²+Δy²)',
+      'By the chain rule (related rates):',
+      'dD/dt = (Δx·(dx_d/dt) + Δy·(dy_d/dt)) / D',
+      'Window "closes" when D(t) < coverage_radius.',
+      'Find the latest T where D(T + flight_time) > R_coverage.',
+      'The throw must arrive BEFORE the window closes!',
+    ],
+    inputs: [
+      { id: 'dDdt_eq', label: 'Rate of window closure dD/dt (yd/s) — write as function of D:', placeholder: 'e.g.  -6   or   -4.5   or   -3*D/10', hint: 'Defender moves at 6 yd/s toward catch point. Coverage radius = 3 yd.' },
+      { id: 'throw_t', label: 'Throw at time T (seconds) — before window closes:', placeholder: 'e.g.  1.8', hint: 'Ball travels at 28 yd/s. Window closes when D < 3 yd.' },
+    ],
+    params: { QB_YD: 10, REC_YD0: 25, CATCH_YD: 55, CATCH_Y_OFFSET: -35, DEF_YD: 65, DEF_Y_OFFSET: -75, V_DEF_YDS: 6, V_BALL_YDS: 28, COV_RADIUS_YD: 3 },
+    run(inputs) {
+      const dDdt_fn = parseExpr(inputs.dDdt_eq, { D: 0, t: 0 })
+      const T = parseFloat(inputs.throw_t)
+      if (!dDdt_fn) return { error: 'dDdt_eq', msg: 'Invalid — try: -6  or  -4.5*D/10' }
+      if (isNaN(T) || T < 0 || T > 8) return { error: 'throw_t', msg: 'T must be 0–8 s' }
+      const p = this.params
+      const catchX = yd(p.CATCH_YD), catchY = CY + p.CATCH_Y_OFFSET
+      let defX = yd(p.DEF_YD), defY = CY + p.DEF_Y_OFFSET
+      let D = Math.sqrt((defX - catchX) ** 2 + (defY - catchY) ** 2) / PY
+      const dDdt_actual = -p.V_DEF_YDS
+      const frames = []
+      const DT = 1 / 60
+      let t = 0, bx = yd(p.QB_YD), by = CY, thrown = false
+      const trail = []
+      for (let i = 0; i < 600; i++) {
+        t += DT
+        const ddx = catchX - defX, ddy = catchY - defY, dd = Math.sqrt(ddx ** 2 + ddy ** 2)
+        if (dd > 1) { defX += (ddx / dd) * p.V_DEF_YDS * PY * DT; defY += (ddy / dd) * p.V_DEF_YDS * PY * DT }
+        D = Math.sqrt((defX - catchX) ** 2 + (defY - catchY) ** 2) / PY
+        const userRate = dDdt_fn(D, t)
+        if (!thrown && t >= T) thrown = true
+        if (thrown) {
+          const bvx = catchX - yd(p.QB_YD), bvy = catchY - by
+          const bd = Math.sqrt(bvx ** 2 + bvy ** 2)
+          bx += (bvx / bd) * p.V_BALL_YDS * PY * DT
+          by += (bvy / bd) * p.V_BALL_YDS * PY * DT
+          trail.push({ x: bx, y: by })
+        }
+        const prog = thrown ? Math.min(Math.sqrt((bx - yd(p.QB_YD)) ** 2 + (by - CY) ** 2) / Math.sqrt((catchX - yd(p.QB_YD)) ** 2 + (catchY - CY) ** 2), 1) : 0
+        const alt = thrown ? Math.max(0, Math.sin(Math.max(0, prog) * Math.PI)) : 0
+        frames.push({ t, bx, by, defX, defY, catchX, catchY, D, userRate: userRate || 0, actualRate: dDdt_actual, thrown, trail: [...trail], alt })
+        const ballNearCatch = Math.sqrt((bx - catchX) ** 2 + (by - catchY) ** 2) / PY
+        if (thrown && ballNearCatch < 2) {
+          if (D > p.COV_RADIUS_YD) return { frames, result: 'win', analytical: `Complete! D=${D.toFixed(1)} yd at arrival — window was open. Your dD/dt model: ${userRate ? userRate.toFixed(2) : '?'} yd/s (actual: ${dDdt_actual} yd/s)` }
+          else return { frames, result: 'loss', analytical: `Defended! D=${D.toFixed(1)} yd at arrival — window closed. Actual dD/dt was ${dDdt_actual} yd/s. Throw earlier.` }
+        }
+        if (t > 9) break
+      }
+      return { frames, result: 'loss', analytical: `Ball didn't reach target in time. Check T and dD/dt model.` }
+    },
+  },
+  {
+    id: 'L5', name: 'Pursuit Curve', concept: 'Derivatives / tangent direction',
+    color: '#06b6d4',
+    description: "You are the defender. The ball carrier's position is given by parametric equations. Write the derivative dx/dt and dy/dt to find the tangent direction, then write your pursuit velocity.",
+    theory: [
+      'Ball carrier runs a curved route:',
+      'x_b(t) = 20 + 8t  (downfield)',
+      'y_b(t) = CY + 7·sin(t)  (lateral, in yards)',
+      'The tangent (direction of motion) at time t:',
+      'dx_b/dt = 8  (constant)',
+      'dy_b/dt = 7·cos(t)',
+      'Your velocity components must intercept x_b, y_b.',
+      'Enter v_x(t) and v_y(t) to chase the ball carrier.',
+    ],
+    inputs: [
+      { id: 'vx_eq', label: 'Your horizontal speed v_x(t) in yd/s:', placeholder: 'e.g.  8   or   6 + 2*t', hint: 'Ball carrier: x_b(t)=20+8t, y_b=CY_yd+7·sin(t), dx/dt=8, dy/dt=7·cos(t)' },
+      { id: 'vy_eq', label: 'Your lateral speed v_y(t) in yd/s:', placeholder: 'e.g.  7*cos(t)', hint: "Match or exceed the ball carrier's rate of change in each direction" },
+    ],
+    params: { DEF_YD: 30, DEF_Y_OFFSET: 55, V_CARRIER_X: 8, A_CARRIER_Y: 7, CATCH_R_YD: 2 },
+    run(inputs) {
+      const vx_fn = parseExpr(inputs.vx_eq, { t: 0 })
+      const vy_fn = parseExpr(inputs.vy_eq, { t: 0 })
+      if (!vx_fn) return { error: 'vx_eq', msg: 'Invalid v_x — try: 8  or  6+2*t' }
+      if (!vy_fn) return { error: 'vy_eq', msg: 'Invalid v_y — try: 7*cos(t)' }
+      const p = this.params
+      const frames = []
+      const DT = 1 / 60
+      let t = 0
+      let dx = yd(p.DEF_YD), dy = CY + p.DEF_Y_OFFSET
+      const trail_d = [], trail_b = []
+      for (let i = 0; i < 600; i++) {
+        t += DT
+        const cbx = yd(Math.min(20 + p.V_CARRIER_X * t, 95))
+        const cby = CY + p.A_CARRIER_Y * Math.sin(t) * PY
+        const vx = vx_fn(t) || 0, vy = vy_fn(t) || 0
+        dx += vx * PY * DT; dy -= vy * PY * DT
+        trail_d.push({ x: dx, y: dy }); trail_b.push({ x: cbx, y: cby })
+        const dist = Math.sqrt((dx - cbx) ** 2 + (dy - cby) ** 2) / PY
+        frames.push({ t, dx, dy, cbx, cby, dist, trail_d: [...trail_d], trail_b: [...trail_b], vx, vy })
+        if (dist < p.CATCH_R_YD) return { frames, result: 'win', analytical: `Tackle at t=${t.toFixed(2)}s! v_x(${t.toFixed(1)})=${vx.toFixed(1)}, v_y(${t.toFixed(1)})=${vy.toFixed(1)} yd/s matched the carrier's tangent direction.` }
+        if (cbx > W - EZ - 10 || t > 10) break
+      }
+      const last = frames[frames.length - 1] || {}
+      return { frames, result: 'loss', analytical: `Missed by ${(last.dist || 99).toFixed(1)} yd. Carrier dx/dt=8, dy/dt=7·cos(t). Match those components.` }
+    },
+  },
+  {
+    id: 'L6', name: 'Fourth-Down Kick', concept: 'Calculus of variations / trajectory optimization',
+    color: '#ec4899',
+    description: "You need a field goal. Find the angle that clears the crossbar at the right distance. This is a SIDE VIEW — y axis is height.",
+    theory: [
+      'Projectile trajectory (ignoring air resistance):',
+      'x(t) = v₀·cos(θ)·t',
+      'y(t) = v₀·sin(θ)·t - ½·g·t²',
+      'Crossbar height h at distance d:',
+      'At t* where x(t*) = d:  t* = d/(v₀·cos(θ))',
+      'y(t*) = d·tan(θ) - g·d²/(2·v₀²·cos²(θ))',
+      'Set y(t*) ≥ crossbar height (10 yd)',
+      'Maximize clearance by solving dy(t*)/dθ = 0',
+    ],
+    inputs: [
+      { id: 'theta_eq', label: 'Launch angle θ in degrees:', placeholder: 'e.g.  45   or   atan(10/35)*180/pi + 5', hint: 'Target: 35 yd away, crossbar at 10 yd height. v₀ = 28 yd/s, g = 10 yd/s².' },
+      { id: 'v0_eq', label: 'Initial speed v₀ in yd/s:', placeholder: 'e.g.  28', hint: 'Must clear crossbar AND land beyond uprights (within ±5.6 yd of center)' },
+    ],
+    params: { GOAL_YD: 35, BAR_HEIGHT_YD: 10, G_YDS: 10, UPRIGHT_HALF: 5.6 },
+    run(inputs) {
+      const th_fn = parseExpr(inputs.theta_eq, { t: 0 })
+      const v0_fn = parseExpr(inputs.v0_eq, { t: 0 })
+      if (!th_fn) return { error: 'theta_eq', msg: 'Invalid angle' }
+      if (!v0_fn) return { error: 'v0_eq', msg: 'Invalid speed' }
+      const theta_deg = th_fn(0), v0 = v0_fn(0)
+      if (!theta_deg || theta_deg < 5 || theta_deg > 85) return { error: 'theta_eq', msg: 'Angle must be 5–85°' }
+      if (!v0 || v0 < 5 || v0 > 60) return { error: 'v0_eq', msg: 'Speed must be 5–60 yd/s' }
+      const p = this.params
+      const theta = theta_deg * Math.PI / 180
+      const vx = v0 * Math.cos(theta), vy = v0 * Math.sin(theta)
+      const t_goal = p.GOAL_YD / vx
+      const y_at_goal = vy * t_goal - 0.5 * p.G_YDS * t_goal * t_goal
+      const frames = []
+      const DT = 1 / 60
+      let t = 0
+      const trail = []
+      for (let i = 0; i < 480; i++) {
+        t += DT
+        const bx = vx * t
+        const by_yd = vy * t - 0.5 * p.G_YDS * t * t
+        trail.push({ x: yd(bx), y: CY - by_yd * PY })
+        frames.push({ t, bx, by_yd, trail: [...trail] })
+        if (by_yd < -2 || t > 10) break
+      }
+      const clearance = y_at_goal - p.BAR_HEIGHT_YD
+      if (clearance >= 0) return { frames, result: 'win', analytical: `GOOD! Cleared by ${clearance.toFixed(2)} yd. At d=${p.GOAL_YD} yd: y(t*)=${y_at_goal.toFixed(2)} yd ≥ ${p.BAR_HEIGHT_YD} yd crossbar. θ=${theta_deg.toFixed(1)}°, v₀=${v0.toFixed(1)} yd/s.` }
+      return { frames, result: 'loss', analytical: `No good — ${Math.abs(clearance).toFixed(2)} yd short of crossbar. y(t*) = ${y_at_goal.toFixed(2)} yd, needed ${p.BAR_HEIGHT_YD} yd. Adjust θ or v₀.` }
+    },
   },
 ]
 
-// ─── Main exported component ──────────────────────────────────────────────────
+// ─── Canvas drawing functions (module-level, pure) ────────────────────────────
+function drawField(ctx) {
+  ctx.clearRect(0, 0, W, H)
+  for (let i = 0; i < 10; i++) {
+    ctx.fillStyle = i % 2 === 0 ? '#166534' : '#15803d'
+    ctx.fillRect(EZ + i * (FW / 10), 0, FW / 10, H)
+  }
+  ctx.fillStyle = '#991b1b'; ctx.fillRect(0, 0, EZ, H)
+  ctx.fillStyle = '#1d4ed8'; ctx.fillRect(W - EZ, 0, EZ, H)
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center'
+  ;[10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(y => {
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 0.7
+    ctx.beginPath(); ctx.moveTo(yd(y), 8); ctx.lineTo(yd(y), H - 8); ctx.stroke()
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillText(y, yd(y), 9)
+  })
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 0.5
+  ;[0, 100].forEach(y => { ctx.beginPath(); ctx.moveTo(yd(y), 8); ctx.lineTo(yd(y), H - 8); ctx.stroke() })
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 8px sans-serif'
+  ctx.save(); ctx.translate(EZ / 2, H / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('END ZONE', 0, 0); ctx.restore()
+  ctx.save(); ctx.translate(W - EZ / 2, H / 2); ctx.rotate(Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('END ZONE', 0, 0); ctx.restore()
+}
+
+function drawBall(ctx, x, y, alt, inAir) {
+  const r = 5 + alt * 6
+  if (inAir && alt > 0.05) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 2])
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - alt * 18); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.arc(x, y - alt * 18, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+  } else {
+    ctx.fillStyle = '#b45309'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+  }
+}
+
+function drawPlayer(ctx, x, y, color, label, r = 11) {
+  ctx.fillStyle = color; ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+  ctx.fillStyle = 'white'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'; ctx.fillText(label, x, y); ctx.textBaseline = 'alphabetic'
+}
+
+function drawTrail(ctx, trail, color) {
+  trail.forEach((pt, i) => {
+    ctx.fillStyle = color; ctx.globalAlpha = 0.08 + (i / trail.length) * 0.35
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2); ctx.fill()
+  })
+  ctx.globalAlpha = 1
+}
+
+function drawFrame(ctx, frame, lvlIdx) {
+  drawField(ctx)
+  const level = LEVELS[lvlIdx]
+  if (!frame) return
+  if (lvlIdx === 0 || lvlIdx === 1) {
+    const p = level.params
+    if (frame.trail) drawTrail(ctx, frame.trail, '#fbbf24')
+    drawBall(ctx, frame.bx, frame.by, frame.alt, frame.thrown && frame.alt > 0.05)
+    drawPlayer(ctx, frame.rx, frame.ry, '#ea580c', 'WR')
+    drawPlayer(ctx, yd(p.QB_YD), CY, '#0284c7', 'QB')
+    if (frame.dist !== null && frame.thrown) {
+      ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+      ctx.beginPath(); ctx.moveTo(frame.bx, CY + 28); ctx.lineTo(frame.rx, CY + 28); ctx.stroke()
+      ctx.setLineDash([]); ctx.fillStyle = '#fda4af'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillText(`${frame.dist.toFixed(1)} yd`, (frame.bx + frame.rx) / 2, CY + 40)
+    }
+  } else if (lvlIdx === 2) {
+    const p = level.params
+    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.arc(frame.tgtX, frame.tgtY, p.CATCH_R_YD * PY, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([])
+    if (frame.trail) drawTrail(ctx, frame.trail, '#818cf8')
+    drawPlayer(ctx, frame.dx, frame.dy, '#7c3aed', 'CB')
+    ctx.fillStyle = '#fbbf24'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillText('target', frame.tgtX, frame.tgtY - p.CATCH_R_YD * PY - 5)
+    ctx.fillStyle = 'rgba(251,191,36,0.15)'; ctx.beginPath()
+    ctx.arc(frame.tgtX, frame.tgtY, p.CATCH_R_YD * PY * 3, 0, Math.PI * 2); ctx.fill()
+  } else if (lvlIdx === 3) {
+    const p = level.params
+    const catchX = frame.catchX, catchY = frame.catchY
+    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.arc(catchX, catchY, p.COV_RADIUS_YD * PY, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([])
+    const wOpen = frame.D > p.COV_RADIUS_YD
+    ctx.fillStyle = wOpen ? '#4ade80' : '#f87171'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillText(wOpen ? 'OPEN' : 'CLOSED', catchX, catchY + p.COV_RADIUS_YD * PY + 12)
+    if (frame.trail) drawTrail(ctx, frame.trail, '#fbbf24')
+    drawBall(ctx, frame.bx, frame.by, frame.alt, frame.thrown && frame.alt > 0.05)
+    drawPlayer(ctx, frame.defX, frame.defY, '#dc2626', 'CB')
+    drawPlayer(ctx, catchX, catchY, '#ea580c', 'WR')
+    drawPlayer(ctx, yd(p.QB_YD), CY, '#0284c7', 'QB')
+    ctx.strokeStyle = 'rgba(239,68,68,0.4)'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 3])
+    ctx.beginPath(); ctx.moveTo(frame.defX, frame.defY); ctx.lineTo(catchX, catchY); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = '#fca5a5'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillText(`D=${frame.D.toFixed(1)}yd`, (frame.defX + catchX) / 2 + 10, (frame.defY + catchY) / 2 - 5)
+  } else if (lvlIdx === 4) {
+    if (frame.trail_b) drawTrail(ctx, frame.trail_b, '#ea580c')
+    if (frame.trail_d) drawTrail(ctx, frame.trail_d, '#818cf8')
+    drawPlayer(ctx, frame.cbx, frame.cby, '#ea580c', 'BC')
+    drawPlayer(ctx, frame.dx, frame.dy, '#7c3aed', 'CB')
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillText(`dist=${frame.dist.toFixed(1)}yd`, frame.dx, frame.dy - 15)
+  } else if (lvlIdx === 5) {
+    const p = level.params
+    // Crossbar
+    ctx.strokeStyle = 'rgba(251,191,36,0.3)'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 2])
+    ctx.beginPath(); ctx.moveTo(yd(0), CY - p.BAR_HEIGHT_YD * PY); ctx.lineTo(yd(p.GOAL_YD + 5), CY - p.BAR_HEIGHT_YD * PY); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = '#fbbf24'; ctx.font = '8px sans-serif'; ctx.textAlign = 'left'
+    ctx.fillText(`crossbar (${p.BAR_HEIGHT_YD} yd)`, yd(p.GOAL_YD + 1), CY - p.BAR_HEIGHT_YD * PY - 4)
+    // Goal post
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(yd(p.GOAL_YD), CY); ctx.lineTo(yd(p.GOAL_YD), CY - (p.BAR_HEIGHT_YD + 5) * PY); ctx.stroke()
+    const uw = p.UPRIGHT_HALF * PY
+    ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(yd(p.GOAL_YD) - uw, CY - p.BAR_HEIGHT_YD * PY); ctx.lineTo(yd(p.GOAL_YD) + uw, CY - p.BAR_HEIGHT_YD * PY); ctx.stroke()
+    // Ground line
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(yd(0), CY); ctx.lineTo(yd(p.GOAL_YD + 10), CY); ctx.stroke()
+    // Ball trail and ball
+    if (frame.trail && frame.trail.length > 1) {
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5
+      ctx.beginPath(); ctx.moveTo(frame.trail[0].x, frame.trail[0].y)
+      frame.trail.forEach(pt => ctx.lineTo(pt.x, pt.y)); ctx.stroke()
+    }
+    const bx = yd(frame.bx), by_screen = CY - frame.by_yd * PY
+    drawBall(ctx, bx, by_screen, Math.max(0, frame.by_yd / 20), frame.by_yd > 0.5)
+  }
+}
+
+function drawStaticSetup(ctx, lvlIdx) {
+  const level = LEVELS[lvlIdx]
+  const p = level.params
+  if (lvlIdx === 0) {
+    drawPlayer(ctx, yd(p.QB_YD), CY, '#0284c7', 'QB')
+    drawPlayer(ctx, yd(p.REC_YD0), CY, '#ea580c', 'WR')
+    drawBall(ctx, yd(p.QB_YD), CY, 0, false)
+  } else if (lvlIdx === 1) {
+    drawPlayer(ctx, yd(p.QB_YD), CY, '#0284c7', 'QB')
+    drawPlayer(ctx, yd(p.REC_YD0), CY, '#ea580c', 'WR')
+    drawBall(ctx, yd(p.QB_YD), CY, 0, false)
+  } else if (lvlIdx === 2) {
+    drawPlayer(ctx, yd(p.DEF_YD), CY + p.DEF_Y_OFFSET, '#7c3aed', 'CB')
+    ctx.strokeStyle = 'rgba(251,191,36,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.arc(yd(p.TARGET_YD), CY + p.TARGET_Y_OFFSET, p.CATCH_R_YD * PY, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = '#fbbf24'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillText('intercept zone', yd(p.TARGET_YD), CY + p.TARGET_Y_OFFSET - p.CATCH_R_YD * PY - 5)
+  } else if (lvlIdx === 3) {
+    const catchX = yd(p.CATCH_YD), catchY = CY + p.CATCH_Y_OFFSET
+    drawPlayer(ctx, yd(p.QB_YD), CY, '#0284c7', 'QB')
+    drawPlayer(ctx, catchX, catchY, '#ea580c', 'WR')
+    drawPlayer(ctx, yd(p.DEF_YD), CY + p.DEF_Y_OFFSET, '#dc2626', 'CB')
+    ctx.strokeStyle = 'rgba(239,68,68,0.5)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.arc(catchX, catchY, p.COV_RADIUS_YD * PY, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([])
+    ctx.strokeStyle = 'rgba(234,88,12,0.3)'; ctx.lineWidth = 0.8; ctx.setLineDash([4, 3])
+    ctx.beginPath(); ctx.moveTo(yd(p.QB_YD), CY); ctx.lineTo(catchX, catchY); ctx.stroke(); ctx.setLineDash([])
+  } else if (lvlIdx === 4) {
+    drawPlayer(ctx, yd(p.DEF_YD), CY + p.DEF_Y_OFFSET, '#7c3aed', 'CB')
+    drawPlayer(ctx, yd(20), CY, '#ea580c', 'BC')
+    ctx.strokeStyle = 'rgba(234,88,12,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.moveTo(yd(20), CY)
+    for (let t2 = 0; t2 <= 3; t2 += 0.1) {
+      ctx.lineTo(yd(Math.min(20 + p.V_CARRIER_X * t2, 95)), CY + p.A_CARRIER_Y * Math.sin(t2) * PY)
+    }
+    ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = 'rgba(234,88,12,0.4)'; ctx.font = '8px sans-serif'; ctx.textAlign = 'left'
+    ctx.fillText('carrier route (known)', yd(22), CY - 10)
+  } else if (lvlIdx === 5) {
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2
+    ctx.beginPath(); ctx.moveTo(yd(p.GOAL_YD), CY); ctx.lineTo(yd(p.GOAL_YD), CY - (p.BAR_HEIGHT_YD + 5) * PY); ctx.stroke()
+    const uw = p.UPRIGHT_HALF * PY
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(yd(p.GOAL_YD) - uw, CY - p.BAR_HEIGHT_YD * PY); ctx.lineTo(yd(p.GOAL_YD) + uw, CY - p.BAR_HEIGHT_YD * PY); ctx.stroke()
+    ctx.strokeStyle = 'rgba(251,191,36,0.4)'; ctx.lineWidth = 0.8; ctx.setLineDash([2, 2])
+    ctx.beginPath(); ctx.moveTo(yd(0), CY - p.BAR_HEIGHT_YD * PY); ctx.lineTo(yd(p.GOAL_YD), CY - p.BAR_HEIGHT_YD * PY); ctx.stroke(); ctx.setLineDash([])
+    ctx.fillStyle = '#fbbf24'; ctx.font = '8px sans-serif'; ctx.textAlign = 'left'
+    ctx.fillText(`crossbar: ${p.BAR_HEIGHT_YD} yd high`, yd(1), CY - p.BAR_HEIGHT_YD * PY - 4)
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1
+    ctx.beginPath(); ctx.moveTo(yd(0), CY); ctx.lineTo(yd(p.GOAL_YD + 10), CY); ctx.stroke()
+    drawBall(ctx, yd(0) + 5, CY - 2, 0, false)
+  }
+}
+
+// ─── Live values for current frame ───────────────────────────────────────────
+function LiveValues({ frame, lvlIdx }) {
+  if (!frame) return null
+  const rows = []
+  rows.push({ label: 't', value: `${frame.t.toFixed(2)}s`, color: '#e2e8f0' })
+  if (lvlIdx === 0 || lvlIdx === 1) {
+    if (frame.rx !== undefined) rows.push({ label: 'x_r(t)', value: `${px2yd(frame.rx)} yd`, color: '#ea580c' })
+    if (frame.bx !== undefined) rows.push({ label: 'x_b(t)', value: `${px2yd(frame.bx)} yd`, color: '#fbbf24' })
+    if (frame.dist != null) rows.push({ label: 'gap', value: `${frame.dist.toFixed(2)} yd`, color: frame.dist < 2 ? '#4ade80' : '#f87171' })
+  } else if (lvlIdx === 3) {
+    rows.push({ label: 'D(t)', value: `${frame.D.toFixed(2)} yd`, color: frame.D > 3 ? '#4ade80' : '#f87171' })
+    rows.push({ label: 'actual dD/dt', value: `${frame.actualRate != null ? frame.actualRate.toFixed(2) : '?'} yd/s`, color: '#e2e8f0' })
+    rows.push({ label: 'your model', value: `${frame.userRate != null ? frame.userRate.toFixed(2) : '?'} yd/s`, color: '#e2e8f0' })
+  } else if (lvlIdx === 4) {
+    rows.push({ label: 'v_x(t)', value: frame.vx != null ? frame.vx.toFixed(2) : '?', color: '#e2e8f0' })
+    rows.push({ label: 'v_y(t)', value: frame.vy != null ? frame.vy.toFixed(2) : '?', color: '#e2e8f0' })
+    rows.push({ label: 'dist', value: `${frame.dist.toFixed(2)} yd`, color: frame.dist < 3 ? '#4ade80' : '#f87171' })
+  } else if (lvlIdx === 5) {
+    rows.push({ label: 'x(t)', value: `${frame.bx.toFixed(2)} yd`, color: '#e2e8f0' })
+    rows.push({ label: 'y(t)', value: `${frame.by_yd.toFixed(2)} yd`, color: '#e2e8f0' })
+  }
+  return (
+    <div className="rounded-lg p-3 border mt-2" style={{ background: '#161628', borderColor: '#333' }}>
+      <div className="text-xs font-medium mb-2" style={{ color: '#94a3b8' }}>live values</div>
+      {rows.map(r => (
+        <div key={r.label} className="flex justify-between mb-1">
+          <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#7dd3fc' }}>{r.label}</span>
+          <span style={{ fontFamily: 'monospace', fontSize: 12, color: r.color }}>{r.value}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function FootballCalculus() {
-  const [level, setLevel] = useState(0)
+  const canvasRef = useRef(null)
+  const animRef = useRef(null)
+  const simRef = useRef(null) // { frames, frameIdx, levelIdx }
+
+  const [levelIdx, setLevelIdx] = useState(0)
+  const [inputs, setInputs] = useState({})
+  const [inputErrors, setInputErrors] = useState({})
+  const [warning, setWarning] = useState('')
+  const [result, setResult] = useState(null)
+  const [analytical, setAnalytical] = useState('')
+  const [playing, setPlaying] = useState(false)
+  const [hasFrames, setHasFrames] = useState(false)
+  const [liveFrame, setLiveFrame] = useState(null)
+
+  const level = LEVELS[levelIdx]
+
+  // Draw static setup whenever not playing and no frames
+  useEffect(() => {
+    if (hasFrames) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    drawField(ctx)
+    drawStaticSetup(ctx, levelIdx)
+  }, [levelIdx, hasFrames])
+
+  // Cleanup animation on unmount
+  useEffect(() => () => { if (animRef.current) cancelAnimationFrame(animRef.current) }, [])
+
+  const stopAnim = useCallback(() => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
+    setPlaying(false)
+    if (simRef.current) {
+      const { frames } = simRef.current
+      if (frames && frames.length > 0) setLiveFrame(frames[frames.length - 1])
+    }
+  }, [])
+
+  const tick = useCallback(() => {
+    if (!simRef.current) return
+    const { frames, levelIdx: lvl } = simRef.current
+    const fi = simRef.current.frameIdx
+    if (fi >= frames.length) {
+      setPlaying(false)
+      setLiveFrame(frames[frames.length - 1])
+      simRef.current.frameIdx = frames.length
+      return
+    }
+    const canvas = canvasRef.current
+    if (canvas) drawFrame(canvas.getContext('2d'), frames[fi], lvl)
+    simRef.current.frameIdx = fi + 1
+    if (fi % 6 === 0) setLiveFrame(frames[fi])
+    animRef.current = requestAnimationFrame(tick)
+  }, [])
+
+  const runSimulation = useCallback(() => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
+    const res = LEVELS[levelIdx].run(inputs)
+    if (res.error) {
+      setInputErrors({ [res.error]: res.msg })
+      setWarning('')
+      setHasFrames(false)
+      setResult(null)
+      return
+    }
+    if (res.warning) {
+      setWarning(res.warning)
+      setInputErrors({})
+      setHasFrames(false)
+      setResult(null)
+      return
+    }
+    setInputErrors({})
+    setWarning('')
+    setResult(res.result)
+    setAnalytical(res.analytical || '')
+    setHasFrames(true)
+    setLiveFrame(null)
+    setPlaying(true)
+    simRef.current = { frames: res.frames, frameIdx: 0, levelIdx }
+    animRef.current = requestAnimationFrame(tick)
+  }, [levelIdx, inputs, tick])
+
+  const resetSim = useCallback(() => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
+    simRef.current = null
+    setHasFrames(false)
+    setResult(null)
+    setAnalytical('')
+    setWarning('')
+    setLiveFrame(null)
+    setPlaying(false)
+  }, [])
+
+  const selectLevel = useCallback((idx) => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = null }
+    simRef.current = null
+    setLevelIdx(idx)
+    setInputs({})
+    setInputErrors({})
+    setWarning('')
+    setResult(null)
+    setAnalytical('')
+    setHasFrames(false)
+    setLiveFrame(null)
+    setPlaying(false)
+  }, [])
+
+  const setInput = useCallback((id, val) => {
+    setInputs(prev => ({ ...prev, [id]: val }))
+    setInputErrors({})
+    setWarning('')
+  }, [])
 
   return (
-    <div style={{ background: '#0f172a', borderRadius: 12, padding: 16, color: '#f8fafc' }}>
+    <div style={{ color: '#f0f0f0', maxWidth: 900, margin: '0 auto', padding: 12, fontFamily: 'sans-serif' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <div style={{ fontSize: 22 }}>🏈</div>
-        <div>
-          <div style={{ fontWeight: 'bold', fontSize: 16 }}>Football Calculus</div>
-          <div style={{ fontSize: 11, color: '#64748b' }}>
-            Three plays. Three Calc 1 concepts. Real physics — you control the math.
-          </div>
-        </div>
-      </div>
+      <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 10, color: '#f0f0f0' }}>Football Calculus</div>
 
       {/* Level tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {LEVELS.map(lv => (
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+        {LEVELS.map((l, i) => (
           <button
-            key={lv.id}
-            onClick={() => setLevel(lv.id)}
+            key={l.id}
+            onClick={() => selectLevel(i)}
             style={{
-              padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
-              background: level === lv.id ? lv.color + '22' : '#1e293b',
-              color: level === lv.id ? lv.color : '#94a3b8',
-              borderLeft: `3px solid ${level === lv.id ? lv.color : 'transparent'}`,
-              fontWeight: level === lv.id ? 'bold' : 'normal',
-              fontSize: 12, textAlign: 'left',
-              transition: 'all 0.15s',
+              padding: '7px 13px', border: `1px solid ${i === levelIdx ? l.color + '55' : '#333'}`,
+              borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: i === levelIdx ? 500 : 400,
+              background: i === levelIdx ? l.color + '22' : 'transparent',
+              color: i === levelIdx ? l.color : '#94a3b8', transition: 'all .15s',
             }}
           >
-            <div>{lv.emoji} {lv.name}</div>
-            <div style={{ fontSize: 10, opacity: 0.75 }}>{lv.concept}</div>
+            <div>{l.name}</div>
+            <div style={{ fontSize: 10, opacity: 0.7 }}>{l.concept.split('/')[0].trim()}</div>
           </button>
         ))}
       </div>
 
-      {/* Active level description strip */}
-      <div style={{ padding: '7px 12px', borderRadius: 6, marginBottom: 14,
-        background: LEVELS[level].color + '15',
-        borderLeft: `3px solid ${LEVELS[level].color}`,
-        fontSize: 11, color: LEVELS[level].color }}>
-        <strong>{LEVELS[level].concept}:</strong> {LEVELS[level].desc}
+      {/* Concept bar */}
+      <div style={{
+        borderLeft: `3px solid ${level.color}`, borderRadius: '0 6px 6px 0',
+        padding: '8px 12px', marginBottom: 12, fontSize: 12,
+        background: level.color + '11', color: level.color,
+      }}>
+        <strong>{level.concept}</strong> — {level.description}
       </div>
 
-      {/* Level content */}
-      {level === 0 && <LeadPassLevel key="l1" />}
-      {level === 1 && <OptimalAngleLevel key="l2" />}
-      {level === 2 && <DefenderPursuitLevel key="l3" />}
+      {/* Main layout */}
+      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+        {/* Left: canvas + inputs */}
+        <div style={{ flex: 1, minWidth: 300 }}>
+          <canvas
+            ref={canvasRef}
+            width={W}
+            height={H}
+            style={{ width: '100%', borderRadius: 8, border: '2px solid #14532d', display: 'block' }}
+          />
 
-      {/* Footer */}
-      <div style={{ marginTop: 16, fontSize: 10, color: '#334155', textAlign: 'center' }}>
-        Each play is calculus made executable: define motion via derivatives → integrate forward → validate against constraints
+          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {level.inputs.map(inp => (
+              <div key={inp.id}>
+                <label style={{ fontSize: 12, color: '#aaa', display: 'block', marginBottom: 4 }}>{inp.label}</label>
+                <input
+                  style={{
+                    width: '100%', padding: '10px 12px', borderRadius: 6,
+                    border: `1.5px solid ${inputErrors[inp.id] ? '#e05555' : '#555'}`,
+                    background: '#1a1a2e', color: '#f0f0f0',
+                    fontFamily: 'monospace', fontSize: 15, boxSizing: 'border-box',
+                    outline: 'none',
+                  }}
+                  value={inputs[inp.id] || ''}
+                  placeholder={inp.placeholder}
+                  onChange={e => setInput(inp.id, e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') runSimulation() }}
+                />
+                {inputErrors[inp.id] && (
+                  <div style={{ fontSize: 11, color: '#f87171', marginTop: 3 }}>{inputErrors[inp.id]}</div>
+                )}
+                <div style={{ fontSize: 11, color: '#60a5fa', fontFamily: 'monospace', marginTop: 3 }}>{inp.hint}</div>
+              </div>
+            ))}
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              {!playing ? (
+                <button
+                  onClick={runSimulation}
+                  style={{ padding: '9px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#3b82f6' }}
+                >
+                  Run Simulation
+                </button>
+              ) : (
+                <button
+                  onClick={stopAnim}
+                  style={{ padding: '9px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#6b7280' }}
+                >
+                  Stop
+                </button>
+              )}
+              {hasFrames && (
+                <button
+                  onClick={resetSim}
+                  style={{ padding: '9px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 500, fontSize: 13, color: 'white', background: '#555' }}
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+
+            {warning && (
+              <div style={{ padding: '10px 14px', borderRadius: 7, fontWeight: 500, fontSize: 13, background: '#1e3a5f', color: '#93c5fd' }}>
+                {warning}
+              </div>
+            )}
+            {result && !playing && (
+              <div style={{
+                padding: '10px 14px', borderRadius: 7, fontWeight: 500, fontSize: 13,
+                background: result === 'win' ? '#14532d' : '#450a0a',
+                color: result === 'win' ? '#4ade80' : '#fca5a5',
+              }}>
+                {analytical}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: theory + live values */}
+        <div style={{ width: 210, flexShrink: 0 }}>
+          <div style={{ background: '#161628', borderRadius: 10, padding: 14, border: '1px solid #333', marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, color: level.color, marginBottom: 8 }}>{level.concept}</div>
+            {level.theory.map((line, i) => {
+              const isMath = line.includes('=') || line.includes('→') || line.startsWith('x(') || line.startsWith('y(') || line.startsWith('v(') || line.startsWith('R(') || line.startsWith('D(') || line.startsWith('d')
+              return isMath ? (
+                <div key={i} style={{ margin: '3px 0', padding: '4px 7px', background: '#0f172a', borderRadius: 4, fontFamily: 'monospace', fontSize: 11, color: '#a5f3fc' }}>
+                  {line}
+                </div>
+              ) : (
+                <div key={i} style={{ fontSize: 11, color: '#94a3b8', margin: '4px 0' }}>{line}</div>
+              )
+            })}
+          </div>
+
+          {(hasFrames || liveFrame) && (
+            <LiveValues frame={liveFrame} lvlIdx={levelIdx} />
+          )}
+        </div>
       </div>
     </div>
   )
