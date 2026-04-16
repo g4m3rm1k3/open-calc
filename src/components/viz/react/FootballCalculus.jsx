@@ -284,37 +284,59 @@ const LEVELS = [
     },
   },
   {
-    id: 'L6', name: 'Fourth-Down Kick', concept: 'Calculus of variations / trajectory optimization',
+    id: 'L6', name: 'Fourth-Down Kick', concept: 'Optimization / projectile calculus',
     color: '#ec4899',
-    description: "You need a field goal. Find the angle that clears the crossbar at the right distance. This is a SIDE VIEW — y axis is height.",
+    description: 'SIDE VIEW. v₀ = 28 yd/s is fixed. First derive the formula for height at the crossbar as a function of θ, then use it to find the angle that just clears.',
     theory: [
-      'Projectile trajectory (ignoring air resistance):',
-      'x(t) = v₀·cos(θ)·t',
-      'y(t) = v₀·sin(θ)·t - ½·g·t²',
-      'Crossbar height h at distance d:',
-      'At t* where x(t*) = d:  t* = d/(v₀·cos(θ))',
-      'y(t*) = d·tan(θ) - g·d²/(2·v₀²·cos²(θ))',
-      'Set y(t*) ≥ crossbar height (10 yd)',
-      'Maximize clearance by solving dy(t*)/dθ = 0',
+      'Given v₀=28 yd/s, g=10 yd/s², d=35 yd:',
+      'Eliminate t: at the crossbar, t* = d/(v₀·cos θ)',
+      'Substitute into y(t):',
+      'y(θ) = d·tan θ − g·d²/(2·v₀²·cos²θ)',
+      'Need: y(θ) ≥ 10 yd',
+      'To find the optimal θ set dy/dθ = 0:',
+      'dy/dθ = d·sec²θ − g·d²·sin θ/(v₀²·cos³θ) = 0',
+      '→ solve numerically or try θ near 30–50°',
     ],
     inputs: [
-      { id: 'theta_eq', label: 'Launch angle θ in degrees:', placeholder: 'e.g.  45   or   atan(10/35)*180/pi + 5', hint: 'Target: 35 yd away, crossbar at 10 yd height. v₀ = 28 yd/s, g = 10 yd/s².' },
-      { id: 'v0_eq', label: 'Initial speed v₀ in yd/s:', placeholder: 'e.g.  28', hint: 'Must clear crossbar AND land beyond uprights (within ±5.6 yd of center)' },
+      {
+        id: 'y_eq',
+        label: 'Height at the crossbar y(θ) — write the formula, θ in degrees:',
+        placeholder: 'e.g.  35*tan(theta*pi/180) - 10*35^2/(2*28^2*cos(theta*pi/180)^2)',
+        hint: 'Variables: theta (degrees). Constants: d=35, v₀=28, g=10. Derive from projectile equations above.',
+      },
+      {
+        id: 'theta_val',
+        label: 'Launch angle θ in degrees — found from your formula:',
+        placeholder: 'e.g.  38',
+        hint: 'Plug θ into your formula above — does y(θ) ≥ 10? That\'s your check.',
+      },
     ],
-    params: { GOAL_YD: 35, BAR_HEIGHT_YD: 10, G_YDS: 10, UPRIGHT_HALF: 5.6 },
+    params: { GOAL_YD: 35, BAR_HEIGHT_YD: 10, G_YDS: 10, V0: 28, UPRIGHT_HALF: 5.6 },
     run(inputs) {
-      const th_fn = parseExpr(inputs.theta_eq, { t: 0 })
-      const v0_fn = parseExpr(inputs.v0_eq, { t: 0 })
-      if (!th_fn) return { error: 'theta_eq', msg: 'Invalid angle' }
-      if (!v0_fn) return { error: 'v0_eq', msg: 'Invalid speed' }
-      const theta_deg = th_fn(0), v0 = v0_fn(0)
-      if (!theta_deg || theta_deg < 5 || theta_deg > 85) return { error: 'theta_eq', msg: 'Angle must be 5–85°' }
-      if (!v0 || v0 < 5 || v0 > 60) return { error: 'v0_eq', msg: 'Speed must be 5–60 yd/s' }
+      const y_fn = parseExpr(inputs.y_eq, { theta: 0 })
+      const theta_deg = parseFloat(inputs.theta_val)
+      if (!y_fn) return { error: 'y_eq', msg: 'Invalid formula — use variable theta (in degrees). Try: 35*tan(theta*pi/180) - 10*35^2/(2*28^2*cos(theta*pi/180)^2)' }
+      if (isNaN(theta_deg) || theta_deg < 5 || theta_deg > 85) return { error: 'theta_val', msg: 'Angle must be 5–85°' }
       const p = this.params
-      const theta = theta_deg * Math.PI / 180
-      const vx = v0 * Math.cos(theta), vy = v0 * Math.sin(theta)
+      // Check formula correctness against true formula at 3 test angles
+      const trueY = th => {
+        const r = th * Math.PI / 180
+        return p.GOAL_YD * Math.tan(r) - p.G_YDS * p.GOAL_YD ** 2 / (2 * p.V0 ** 2 * Math.cos(r) ** 2)
+      }
+      const testAngles = [30, 45, 60]
+      for (const ta of testAngles) {
+        const got = y_fn(ta), expected = trueY(ta)
+        if (got === null) return { warning: `Your formula returned null at θ=${ta}°. Check for division by zero or trig issues.` }
+        if (Math.abs(got - expected) > 1.0) {
+          return { warning: `Your formula gives y(${ta}°) = ${got.toFixed(2)} yd, but the correct value is ${expected.toFixed(2)} yd. Re-derive: substitute t* = d/(v₀·cos θ) into y(t) = v₀·sin(θ)·t - ½·g·t².` }
+        }
+      }
+      // Formula is correct — now animate with their angle
+      const theta_rad = theta_deg * Math.PI / 180
+      const vx = p.V0 * Math.cos(theta_rad), vy = p.V0 * Math.sin(theta_rad)
       const t_goal = p.GOAL_YD / vx
       const y_at_goal = vy * t_goal - 0.5 * p.G_YDS * t_goal * t_goal
+      const y_formula = y_fn(theta_deg)
       const frames = []
       const DT = 1 / 60
       let t = 0
@@ -323,13 +345,14 @@ const LEVELS = [
         t += DT
         const bx = vx * t
         const by_yd = vy * t - 0.5 * p.G_YDS * t * t
-        trail.push({ x: yd(bx), y: CY - by_yd * PY })
+        trail.push({ x: EZ + bx * PY, y: CY - by_yd * PY })
         frames.push({ t, bx, by_yd, trail: [...trail] })
         if (by_yd < -2 || t > 10) break
       }
       const clearance = y_at_goal - p.BAR_HEIGHT_YD
-      if (clearance >= 0) return { frames, result: 'win', analytical: `GOOD! Cleared by ${clearance.toFixed(2)} yd. At d=${p.GOAL_YD} yd: y(t*)=${y_at_goal.toFixed(2)} yd ≥ ${p.BAR_HEIGHT_YD} yd crossbar. θ=${theta_deg.toFixed(1)}°, v₀=${v0.toFixed(1)} yd/s.` }
-      return { frames, result: 'loss', analytical: `No good — ${Math.abs(clearance).toFixed(2)} yd short of crossbar. y(t*) = ${y_at_goal.toFixed(2)} yd, needed ${p.BAR_HEIGHT_YD} yd. Adjust θ or v₀.` }
+      const formulaMatch = `Your formula: y(${theta_deg}°) = ${y_formula !== null ? y_formula.toFixed(2) : '?'} yd`
+      if (clearance >= 0) return { frames, result: 'win', analytical: `GOOD! ${formulaMatch}. Cleared crossbar by ${clearance.toFixed(2)} yd.` }
+      return { frames, result: 'loss', analytical: `No good — ${formulaMatch}. Need y ≥ ${p.BAR_HEIGHT_YD} yd, got ${y_at_goal.toFixed(2)} yd. Adjust θ.` }
     },
   },
 ]
@@ -384,8 +407,44 @@ function drawTrail(ctx, trail, color) {
   ctx.globalAlpha = 1
 }
 
+function drawSideViewBg(ctx) {
+  ctx.clearRect(0, 0, W, H)
+  // Sky
+  ctx.fillStyle = '#0c1a2e'; ctx.fillRect(0, 0, W, H)
+  // Ground strip below CY
+  ctx.fillStyle = '#166534'; ctx.fillRect(0, CY, W, H - CY)
+  ctx.fillStyle = '#15803d'; ctx.fillRect(0, CY, W, 3)
+  // Distance-from-kicker markers (kicker at x=EZ, each yard = PY px)
+  // Show 0, 5, 10 ... 45 yd from kicker
+  ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center'
+  for (let d = 0; d <= 45; d += 5) {
+    const xx = EZ + d * PY
+    if (xx > W - 5) break
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 0.7
+    ctx.beginPath(); ctx.moveTo(xx, 4); ctx.lineTo(xx, H - 4); ctx.stroke()
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
+    ctx.fillText(d === 0 ? '0' : d + ' yd', xx, CY + 13)
+  }
+  // Height markers (horizontal grid lines above ground)
+  ctx.font = '7px sans-serif'; ctx.textAlign = 'right'
+  ;[5, 10, 15, 20].forEach(h => {
+    const yy = CY - h * PY
+    if (yy < 5) return
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 0.5
+    ctx.beginPath(); ctx.moveTo(EZ, yy); ctx.lineTo(W - 10, yy); ctx.stroke()
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.fillText(h + ' yd', EZ - 2, yy + 3)
+  })
+  // Axis label
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '8px sans-serif'; ctx.textAlign = 'left'
+  ctx.fillText('height →', 4, CY - 4)
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.textAlign = 'center'
+  ctx.fillText('distance from kicker (yd)', EZ + 20 * PY, H - 3)
+}
+
 function drawFrame(ctx, frame, lvlIdx) {
-  drawField(ctx)
+  if (lvlIdx === 5) { drawSideViewBg(ctx) }
+  else { drawField(ctx) }
   const level = LEVELS[lvlIdx]
   if (!frame) return
   if (lvlIdx === 0 || lvlIdx === 1) {
@@ -572,7 +631,8 @@ export default function FootballCalculus() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    drawField(ctx)
+    if (levelIdx === 5) drawSideViewBg(ctx)
+    else drawField(ctx)
     drawStaticSetup(ctx, levelIdx)
   }, [levelIdx, hasFrames])
 
