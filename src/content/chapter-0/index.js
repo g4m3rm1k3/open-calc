@@ -1,3 +1,4 @@
+import rosettaStone from './00-rosetta-stone.js'
 import realNumbers from './00-real-numbers.js'
 import setsAndLogic from './00a-sets-and-logic.js'
 import geometryReview from './00b-geometry-review.js'
@@ -27,6 +28,7 @@ export default {
   description: 'The mathematical toolkit you need before calculus — real numbers, functions, trigonometry, and exponentials. Even if you\'ve seen these before, the intuition here will make calculus smoother.',
   color: 'slate',
   lessons: [
+    rosettaStone,
     realNumbers,
     setsAndLogic,
     geometryReview,
