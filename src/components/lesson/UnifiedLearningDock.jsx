@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import KatexBlock from '../math/KatexBlock.jsx';
-import { parseProse } from '../math/parseProse.jsx';
+import MarkdownProse from '../math/MarkdownProse.jsx';
 
 function pickGameQuestion(lesson) {
   const examples = Array.isArray(lesson?.examples) ? lesson.examples : [];
@@ -47,26 +47,26 @@ export default function UnifiedLearningDock({ lesson }) {
   return (
     <section className="mt-10 rounded-2xl border border-sky-200 dark:border-sky-900/50 bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-950/20 dark:to-cyan-950/20 p-5">
       <p className="text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-300 mb-2">Unified Learning Dock</p>
-      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Connect Visual, Algebra, and Intent</h3>
+      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Connect Visual, Algebra, and Intent</h3>
       {missionPack && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <div className="rounded-lg border border-sky-200 dark:border-sky-900 bg-white dark:bg-slate-900 p-3">
-            <p className="text-[11px] uppercase tracking-wide font-semibold text-sky-600 dark:text-sky-300">Topic Mission</p>
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mt-1">{missionPack.label}</p>
-            <p className="text-sm text-slate-700 dark:text-slate-300 mt-2">{parseProse(missionPack.visualMission)}</p>
+            <p className="text-[11px] uppercase tracking-wide font-semibold text-sky-600 dark:text-sky-400">Topic Mission</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">{missionPack.label}</p>
+            <MarkdownProse text={missionPack.visualMission} className="mt-2 [&_p]:text-sm [&_p]:text-slate-700 [&_p]:dark:text-slate-400" />
           </div>
           <div className="rounded-lg border border-cyan-200 dark:border-cyan-900 bg-white dark:bg-slate-900 p-3">
-            <p className="text-[11px] uppercase tracking-wide font-semibold text-cyan-600 dark:text-cyan-300">Math Translation</p>
-            <p className="text-sm text-slate-700 dark:text-slate-300 mt-2">{parseProse(missionPack.mathMission)}</p>
+            <p className="text-[11px] uppercase tracking-wide font-semibold text-cyan-600 dark:text-cyan-400">Math Translation</p>
+            <MarkdownProse text={missionPack.mathMission} className="mt-2 [&_p]:text-sm [&_p]:text-slate-700 [&_p]:dark:text-slate-400" />
           </div>
           <div className="rounded-lg border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-slate-900 p-3">
-            <p className="text-[11px] uppercase tracking-wide font-semibold text-emerald-600 dark:text-emerald-300">Real-World Example</p>
-            <p className="text-sm text-slate-700 dark:text-slate-300 mt-2">{parseProse(missionPack.realWorldExample)}</p>
+            <p className="text-[11px] uppercase tracking-wide font-semibold text-emerald-600 dark:text-emerald-400">Real-World Example</p>
+            <MarkdownProse text={missionPack.realWorldExample} className="mt-2 [&_p]:text-sm [&_p]:text-slate-700 [&_p]:dark:text-slate-400" />
           </div>
           <div className="rounded-lg border border-amber-200 dark:border-amber-900 bg-white dark:bg-slate-900 p-3">
-            <p className="text-[11px] uppercase tracking-wide font-semibold text-amber-600 dark:text-amber-300">Mini-Game + Puzzle</p>
-            <p className="text-sm text-slate-700 dark:text-slate-300 mt-2"><strong>Game:</strong> {parseProse(missionPack.miniGame)}</p>
-            <p className="text-sm text-slate-700 dark:text-slate-300 mt-2"><strong>Puzzle:</strong> {parseProse(missionPack.puzzle)}</p>
+            <p className="text-[11px] uppercase tracking-wide font-semibold text-amber-600 dark:text-amber-400">Mini-Game + Puzzle</p>
+            {missionPack.miniGame && <MarkdownProse text={`**Game:** ${missionPack.miniGame}`} className="mt-2 [&_p]:text-sm [&_p]:text-slate-700 [&_p]:dark:text-slate-400" />}
+            {missionPack.puzzle && <MarkdownProse text={`**Puzzle:** ${missionPack.puzzle}`} className="mt-1 [&_p]:text-sm [&_p]:text-slate-700 [&_p]:dark:text-slate-400" />}
           </div>
         </div>
       )}
@@ -97,7 +97,7 @@ export default function UnifiedLearningDock({ lesson }) {
                   }}
                   className={`w-full text-left rounded-lg border px-3 py-2 text-sm transition ${good ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' : ''} ${bad ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/20' : ''} ${!selected ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 hover:border-sky-300 dark:hover:border-sky-700' : ''}`}
                 >
-                  {parseProse(opt)}
+                  <MarkdownProse text={opt} className="[&_p]:text-sm [&_p]:mb-0" />
                 </button>
               );
             })}

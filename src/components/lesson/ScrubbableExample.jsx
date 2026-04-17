@@ -246,11 +246,15 @@ export default function ScrubbableExample({ example, number, lessonId }) {
       </div>
 
       <div className="p-6">
-        {/* Problem Statement — wraps on overflow, no scrollbar */}
-        <div className="mb-5 p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-100 rounded-lg border border-brand-100 dark:border-brand-800 font-medium break-words">
+        {/* Problem Statement */}
+        <div className="mb-5 p-4 bg-brand-50 dark:bg-brand-900/20 rounded-lg border border-brand-100 dark:border-brand-800 min-w-0">
           {/^\\[a-zA-Z[(]/.test(example.problem?.trimStart() ?? '') && !example.problem?.includes('$')
             ? <div className="overflow-x-auto"><KatexBlock expr={example.problem} /></div>
-            : <span className="leading-relaxed">{parseProse(example.problem)}</span>}
+            : <MarkdownProse
+                text={example.problem}
+                className="[&_p]:font-medium [&_p]:text-brand-900 [&_p]:dark:text-brand-200 [&_p]:leading-7 [&_p]:break-words [&_p]:overflow-wrap-anywhere"
+              />
+          }
         </div>
 
         {/* Active step card — always at top, Next button never moves */}
@@ -259,7 +263,7 @@ export default function ScrubbableExample({ example, number, lessonId }) {
             /* Conclusion fills the active card — no step expression, just text */
             <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-3 mb-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">✓ Conclusion</p>
-              <p className="text-sm text-emerald-900 dark:text-emerald-100 leading-relaxed">{parseProse(example.conclusion)}</p>
+              <MarkdownProse text={example.conclusion} className="[&_p]:text-sm [&_p]:text-emerald-900 [&_p]:dark:text-emerald-300 [&_p]:leading-relaxed" />
             </div>
           ) : (
             <>

@@ -105,8 +105,10 @@ function preprocess(text) {
     // {{algebra:topicId|linkText}} → **linkText**  (preserves visible text)
     .replace(/\{\{algebra:[^|]+\|([^}]+)\}\}/g, '**$1**')
     // "Step N:" mid-sentence → new paragraph with bold label.
-    // Matches ". Step 1:" / ". Step 2:" etc. appearing after prior sentence ends.
     .replace(/\.\s+(Step\s+\d+:)/g, '.\n\n**$1**')
+    // "(1) ... (2) ..." inline numbered steps → new paragraphs.
+    // Matches a period/em-dash followed by a space then "(N)" at start of a new step.
+    .replace(/[.—]\s+(\(\d+\))\s+/g, '.\n\n$1 ')
     // Sentence break after inline math: "$math$. Next sentence" → hard line break.
     .replace(/(\$[^$\n]+\$)\.\s+(?=\S)/g, '$1.  \n')
 }
