@@ -302,51 +302,96 @@ fig.show()`,
             "\\text{Draw a rectangle and label one side length } x \\text{ meters, the adjacent side width } y \\text{ meters.}",
           annotation:
             "Modeling foundation: We must decide what to call the variables. Choosing x and y as adjacent sides is natural because opposite sides are equal. This choice immediately reveals the key relationship we will use.",
+          hints: [
+            "FIRST: sketch the situation. Draw a rectangle with four sides. Label two adjacent sides x (length) and y (width). The other two sides are also x and y respectively — a rectangle has two pairs of equal parallel sides.",
+            "WHY name variables at all? Calculus operates on formulas. We need to translate the word problem ('maximize area with fixed fence') into algebraic expressions. Naming variables is STEP 1 of every optimization.",
+            "Domain awareness: both x and y must be positive (you can't have a rectangle with zero-length sides). This gives the initial domain restriction: x > 0, y > 0.",
+          ],
         },
         {
           expression:
             "Total fencing used = 2x + 2y = 100 \\quad \\text{or simplified: } x + y = 50.",
           annotation:
             "This is the **constraint equation**. It represents the fixed resource: no matter how we choose the dimensions, the total length of fence must always be exactly 100 m. The factor of 2 appears because we need two lengths and two widths. The simplified form x + y = 50 means 'one length plus one width is always 50 m' — this is the core relationship that links x and y.",
+          hints: [
+            "PREREQUISITE — What is a constraint? A constraint is a condition that must always be satisfied. Here: total fence = 100 m is the constraint. No matter what x and y are, they must always satisfy 2x + 2y = 100.",
+            "How to build the equation: perimeter of a rectangle = 2(length) + 2(width) = 2x + 2y. Set equal to the available resource: 2x + 2y = 100. Simplify ÷ 2: x + y = 50.",
+            "The constraint LINKS x and y together. This means they are NOT independent — once you choose x, the value of y is forced: y = 50 − x. This is why optimization starts by eliminating one variable using the constraint.",
+          ],
         },
         {
           expression:
             "The quantity we want to maximize is the enclosed area: A = x \\cdot y.",
           annotation:
             "Modeling the objective: Area is the product of length and width because that is the geometric definition of rectangular area. We are trying to make this product as large as possible while respecting the fixed-perimeter constraint.",
+          hints: [
+            "PREREQUISITE — Area of a rectangle: A = length × width = x · y. If x = 3 m and y = 4 m, A = 12 m². The formula comes from counting unit squares: a 3×4 rectangle contains exactly 12 unit squares.",
+            "This is the OBJECTIVE FUNCTION — the quantity we want to maximize. We call it A(x,y) = xy. Currently it has two variables, so we cannot differentiate it yet. We need to express A as a function of ONE variable using the constraint.",
+            "KEY INSIGHT: the problem is now: maximize A = xy subject to x + y = 50. The constraint forces a trade-off: increase x → must decrease y → xy may increase, decrease, or stay the same. Calculus finds the exact balance.",
+          ],
         },
         {
           expression: "From the constraint, solve for y: y = 50 - x.",
           annotation:
             "Key modeling step: We have two variables but only one equation (the constraint). To turn this into a single-variable calculus problem, we express y in terms of x. Physically this says: 'If I make the length longer, I must make the width shorter by exactly the same amount to keep the total fence fixed.' This reveals the direct trade-off.",
+          hints: [
+            "PREREQUISITE — Solving a linear equation for one variable. From x + y = 50: subtract x from both sides → y = 50 − x. Now y is completely determined by x — it is no longer an independent variable.",
+            "Physically: if x = 10 m, then y = 50 − 10 = 40 m. If x = 25 m, then y = 50 − 25 = 25 m. If x = 48 m, then y = 50 − 48 = 2 m — a very long but narrow rectangle.",
+            "Domain update: y > 0 requires 50 − x > 0, so x < 50. Combined with x > 0: the domain is 0 < x < 50. Both endpoints give zero area (degenerate rectangles), so the maximum must occur at an interior point.",
+          ],
         },
         {
           expression: "Substitute into the area: A(x) = x(50 - x) = 50x - x^2.",
           annotation:
             "Now the area is a function of only x. The term −x² captures the penalty: as x increases, the loss in y hurts the product more and more (quadratic penalty).",
+          hints: [
+            "Substitute y = 50 − x into A = xy: A(x) = x · (50 − x). Expand using the distributive property: x · 50 − x · x = 50x − x².",
+            "Recognize the shape: A(x) = −x² + 50x is a DOWNWARD PARABOLA (leading coefficient is negative). Downward parabolas have a single maximum at the vertex. Since we're on an open interval (0, 50) and the parabola opens down, the vertex IS the global maximum.",
+            "Verify dimensions: A(10) = 50(10) − (10)² = 500 − 100 = 400 m². A(25) = 50(25) − (25)² = 1250 − 625 = 625 m². A(48) = 50(48) − (48)² = 2400 − 2304 = 96 m². Already we see A(25) is the largest of these — calculus will prove it's the GLOBAL maximum.",
+          ],
         },
         {
           expression: "A'(x) = 50 - 2x.",
           annotation:
             "The derivative tells us the rate at which area changes when we change length x (while y automatically adjusts to keep the fence total 100 m).",
+          hints: [
+            "PREREQUISITE — Power Rule: d/dx[xⁿ] = nxⁿ⁻¹. Apply term by term to A(x) = 50x − x²:",
+            "d/dx[50x] = 50 · 1 · x⁰ = 50 (constant coefficient times x¹: power rule gives 1·x⁰ = 1).",
+            "d/dx[−x²] = −1 · 2 · x¹ = −2x. So A'(x) = 50 − 2x. This is the MARGINAL AREA — how much extra area we gain per extra meter of x-dimension (with y adjusting to compensate).",
+          ],
         },
         {
           expression:
             "\\text{Set } A'(x) = 0: \\quad 50 - 2x = 0 \\quad \\Rightarrow \\quad x = 25 \\text{ m.}",
           annotation:
             "At x = 25 m the rate of change of area is exactly zero — the balance point where gaining one more meter of length costs exactly one meter of width, and the net effect on the product is zero.",
+          hints: [
+            "PREREQUISITE — Why set A'(x) = 0? At the maximum (or minimum), the function momentarily stops increasing and starts decreasing. This means the derivative = 0 at that point. Such points are called CRITICAL POINTS.",
+            "Solve: 50 − 2x = 0. Add 2x to both sides: 50 = 2x. Divide by 2: x = 25.",
+            "Interpretation: A'(25) = 50 − 2(25) = 50 − 50 = 0. At x = 25, A is momentarily flat — the rate of increase has dropped to zero. Going left (x < 25): A' = 50 − 2x > 0 (area is increasing). Going right (x > 25): A' = 50 − 2x < 0 (area is decreasing). This confirms x = 25 is a MAXIMUM, not a minimum.",
+          ],
         },
         {
           expression:
             "A''(x) = -2 < 0 \\quad \\Rightarrow \\quad x = 25 \\text{ is a maximum (concave down).}",
           annotation:
             "The second derivative test: A''(x) = -2 is negative everywhere, so the parabola A(x) = 50x - x² opens downward. The single critical point x = 25 must be a global maximum, not a saddle point or minimum.",
+          hints: [
+            "PREREQUISITE — Second Derivative Test: if f'(c) = 0 and f''(c) < 0, then c is a LOCAL MAXIMUM. If f''(c) > 0, it's a local minimum. If f''(c) = 0, the test is inconclusive.",
+            "Differentiate A'(x) = 50 − 2x using the Power Rule: A''(x) = d/dx[50] − d/dx[2x] = 0 − 2 = −2.",
+            "A''(25) = −2 < 0: confirms maximum. Physically: A'' = −2 < 0 means 'as x increases, the rate of improvement A' is always DECREASING' — the area was getting better faster, gets better slower, then starts getting worse. The function is bowed downward everywhere — a concave down parabola with a single peak.",
+          ],
         },
         {
           expression:
             "y = 50 - 25 = 25 \\text{ m}, \\quad A_{\\max} = 25 \\times 25 = 625 \\text{ m}^2.",
           annotation:
             "Aha! Both dimensions are equal — the optimal shape is a square. Any deviation loses area: 20 m × 30 m = 600 m², 10 m × 40 m = 400 m². The square is the unique maximum, confirmed by calculus.",
+          hints: [
+            "Recover y: y = 50 − x = 50 − 25 = 25 m. Both dimensions equal 25 m — a square.",
+            "Maximum area: A = x · y = 25 × 25 = 625 m².",
+            "Verification: try nearby rectangles. A(24) = 50(24) − 576 = 1200 − 576 = 624 m². A(26) = 1300 − 676 = 624 m². Both give 624 m² < 625 m². ✓ The square is strictly larger than neighboring rectangles, confirming x = 25 is a maximum.",
+          ],
         },
       ],
       conclusion:
@@ -364,46 +409,86 @@ fig.show()`,
             "\\text{After cutting squares of side } x \\text{ from each corner and folding:}",
           annotation:
             "Modeling the physical process: Cutting removes material from both ends of each side, so we subtract 2x from the original dimensions.",
+          hints: [
+            "VISUALIZATION: draw the 12×8 sheet flat. Mark corners of size x×x to cut away. When you fold the four flaps up 90°, the cut squares become the four corners of the box. The flap height equals x.",
+            "WHY 2x subtracted from each dimension? Cutting removes x from BOTH ends of each original dimension. The 12-inch side loses x on the left AND x on the right → length = 12 − 2x. The 8-inch side loses x on the top AND bottom → width = 8 − 2x.",
+            "This is the critical geometric insight: always ask 'how many corners affect each dimension?' For a rectangular sheet, each original dimension has 2 cut corners, so we subtract 2x.",
+          ],
         },
         {
           expression:
             "\\text{Height of box} = x, \\quad \\text{Length} = 12 - 2x, \\quad \\text{Width} = 8 - 2x.",
           annotation:
             "These three relationships come directly from the geometry of folding. Notice that all three dimensions depend on the single decision variable x — the cut size.",
+          hints: [
+            "PREREQUISITE — Three dimensions of the folded box: (1) HEIGHT = x (the fold-up flap height equals the cut size). (2) LENGTH = 12 − 2x (original 12 in minus two corner cuts). (3) WIDTH = 8 − 2x (original 8 in minus two corner cuts).",
+            "All three dimensions must be positive: x > 0 (meaningful cut), 12 − 2x > 0 → x < 6, 8 − 2x > 0 → x < 4. The strictest constraint is x < 4. DOMAIN: 0 < x < 4 inches.",
+            "Check boundary behavior: at x → 0, the box becomes a flat sheet with no height and zero volume. At x → 4, the width shrinks to zero and volume → 0. So a maximum volume must occur somewhere inside (0, 4).",
+          ],
         },
         {
           expression:
             "Volume V = \\text{length} \\times \\text{width} \\times \\text{height} = (12-2x)(8-2x)x.",
           annotation:
             "Volume is the product of the three inside dimensions. This is the objective we want to maximize.",
+          hints: [
+            "PREREQUISITE — Volume of a rectangular box (cuboid): V = length × width × height. This counts the number of unit cubes that fit inside the box.",
+            "Write it out: V = (12 − 2x)(8 − 2x)(x). Each factor must be positive for the box to exist, which is guaranteed by our domain 0 < x < 4.",
+            "This is a single-variable function of x — the OBJECTIVE FUNCTION. We will differentiate it to find the value of x that maximizes V.",
+          ],
         },
         {
           expression:
             "Domain: 0 < x < 4 \\text{ inches (because width 8-2x must stay positive)}.",
           annotation:
             "Modeling constraint from reality: all dimensions must be positive. The shorter original side (8 in) gives the stricter upper limit on x.",
+          hints: [
+            "From 12 − 2x > 0: x < 6. From 8 − 2x > 0: x < 4. From x > 0: x > 0. The binding constraint (strictest upper limit) is x < 4.",
+            "Physical meaning: if x = 4, we'd cut 4-inch squares from an 8-inch side, consuming the entire side. Nothing left to form walls or base.",
+            "Domain (0, 4) is an OPEN interval: the endpoints x = 0 and x = 4 give degenerate boxes with zero volume. The maximum must be at an interior point where V'(x) = 0.",
+          ],
         },
         {
           expression: "Expand: V(x) = 4x^3 - 40x^2 + 96x.",
           annotation:
             "We expand so the derivative is simple. The cubic term comes from height × the x² part of the base expansion.",
+          hints: [
+            "Expand (12 − 2x)(8 − 2x) first: (12)(8) + (12)(−2x) + (−2x)(8) + (−2x)(−2x) = 96 − 24x − 16x + 4x² = 96 − 40x + 4x².",
+            "Then multiply by x: V(x) = x·(96 − 40x + 4x²) = 96x − 40x² + 4x³.",
+            "Rewrite in standard form (highest power first): V(x) = 4x³ − 40x² + 96x. Every term is a monomial (a single power of x), which is exactly what the Power Rule needs.",
+          ],
         },
         {
           expression: "V'(x) = 12x^2 - 80x + 96.",
           annotation:
             "The derivative shows how volume changes as we change the cut size x. Positive derivative means increasing x still increases volume; negative means it decreases volume.",
+          hints: [
+            "PREREQUISITE — Power Rule for each term: d/dx[4x³] = 4·3·x² = 12x². d/dx[−40x²] = −40·2·x = −80x. d/dx[96x] = 96·1·x⁰ = 96.",
+            "Combine: V'(x) = 12x² − 80x + 96. This is a quadratic — it will have 0, 1, or 2 roots. We want roots in (0, 4) to find critical points.",
+            "Factor out the GCF: V'(x) = 4(3x² − 20x + 24). Solve 3x² − 20x + 24 = 0 using the quadratic formula: x = (20 ± √(400 − 288))/6 = (20 ± √112)/6 = (20 ± 4√7)/6 = (10 ± 2√7)/3.",
+          ],
         },
         {
           expression:
             "Solve V'(x) = 0 to get x = \\frac{10 - 2\\sqrt{7}}{3} \\approx 1.57 \\text{ in (the only root in (0,4))}.",
           annotation:
             "Only one physically meaningful solution. The other root is invalid because it would make width negative.",
+          hints: [
+            "PREREQUISITE — Quadratic formula: for ax² + bx + c = 0, the solutions are x = (−b ± √(b²−4ac))/(2a).",
+            "Apply to 3x² − 20x + 24 = 0: a=3, b=−20, c=24. Discriminant: b²−4ac = 400 − 288 = 112. √112 = √(16·7) = 4√7 ≈ 4(2.6458) ≈ 10.583.",
+            "Two solutions: x₁ = (20 − 10.583)/6 ≈ 9.417/6 ≈ 1.57 and x₂ = (20 + 10.583)/6 ≈ 30.583/6 ≈ 5.10. Check domain (0,4): x₁ ≈ 1.57 ✓, x₂ ≈ 5.10 ✗ (outside). So only x ≈ 1.57 is valid.",
+          ],
         },
         {
           expression:
             "At x ≈ 1.57 in: length ≈ 8.86 in, width ≈ 4.86 in, height ≈ 1.57 in, V ≈ 67.6 in³.",
           annotation:
             "Aha! At the optimum, the cut size x is roughly equal to the final height. Increasing x gains height but loses base area; the calculus finds where these two effects exactly balance.",
+          hints: [
+            "Length: 12 − 2(1.57) = 12 − 3.14 = 8.86 in. Width: 8 − 2(1.57) = 8 − 3.14 = 4.86 in. Height: x = 1.57 in.",
+            "Volume: 8.86 × 4.86 × 1.57 ≈ 43.06 × 1.57 ≈ 67.6 in³.",
+            "V''(x) = 24x − 80. At x = 1.57: V''(1.57) = 24(1.57) − 80 = 37.68 − 80 = −42.32 < 0. Negative second derivative confirms this critical point is a MAXIMUM. ✓",
+          ],
         },
       ],
       conclusion:
