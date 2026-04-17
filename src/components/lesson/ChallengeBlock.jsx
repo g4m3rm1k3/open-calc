@@ -1,8 +1,35 @@
+import { useState } from 'react'
 import KatexBlock from '../math/KatexBlock.jsx'
 import KatexInline from '../math/KatexInline.jsx'
 import MathStep from '../math/MathStep.jsx'
+import MarkdownProse from '../math/MarkdownProse.jsx'
 import Spoiler from '../ui/Spoiler.jsx'
 import { parseProse } from '../math/parseProse.jsx'
+
+function PrereqBox({ prereq }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mb-2 rounded-lg border border-violet-200 dark:border-violet-800/60 overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-2 px-3 py-2 bg-violet-50 dark:bg-violet-950/40 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors text-left"
+      >
+        <span className="text-violet-500 text-xs">📖</span>
+        <span className="flex-1 text-[10px] font-black uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">
+          Don&apos;t know how to do this step? Open prereq
+        </span>
+        <span className="text-[10px] font-semibold text-violet-500 dark:text-violet-400">
+          {open ? 'Close ▲' : 'Open ▼'}
+        </span>
+      </button>
+      {open && (
+        <div className="px-4 py-3 bg-white dark:bg-slate-900 border-t border-violet-100 dark:border-violet-900/40">
+          <MarkdownProse text={prereq} />
+        </div>
+      )}
+    </div>
+  )
+}
 
 function isLikelyInlineMath(expr) {
   const t = expr.trim()
@@ -98,7 +125,10 @@ export default function ChallengeBlock({ challenge, number }) {
       <Spoiler label="Show full walkthrough">
         <div className="divide-y divide-slate-100 dark:divide-slate-800 mb-3">
           {normalizedWalkthrough.map((step, i) => (
-            <MathStep key={i} step={step} stepNumber={step.expression ? i + 1 : undefined} />
+            <div key={i}>
+              <MathStep step={step} stepNumber={step.expression ? i + 1 : undefined} />
+              {step.prereq && <PrereqBox prereq={step.prereq} />}
+            </div>
           ))}
         </div>
         <div className="bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 rounded-lg p-3">

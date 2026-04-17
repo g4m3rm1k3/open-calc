@@ -1442,78 +1442,172 @@ Two quantities changing in time are locked together by a constraint equation. Di
       hint: "Let L = string length (the hypotenuse), x = horizontal distance (one leg), height = 100 m (the other leg, fixed). Use x² + 100² = L². Differentiate and substitute.",
       walkthrough: [
         {
-          expression:
-            "\\text{Definition and setup: Related rates problems involve quantities that change with time and are related by an equation (usually geometric).}",
-          annotation:
-            "Here, the kite forms a right triangle with the flier: vertical leg = fixed height 100 m, horizontal leg = x(t), hypotenuse = string length L(t). The goal is to find dx/dt when L = 200 m and dL/dt = 5 m/s.",
+          expression: "\\text{Step 1: Read the problem and name every quantity}",
+          annotation: "Before touching any math, list what changes, what is fixed, what rate you know, and what rate you need.",
+          prereq: `**How to read a related rates problem:**
+
+Every related rates problem gives you:
+- Quantities that **change over time** — give each a letter ($x$, $L$, $r$, $h$)
+- Quantities that are **fixed (constant)** — their derivative is zero
+- A **known rate** — a $\\dfrac{d(\\cdot)}{dt}$ value given to you
+- An **unknown rate** — the $\\dfrac{d(\\cdot)}{dt}$ you must find
+
+For this problem:
+
+| Quantity | Type | Given? |
+|---|---|---|
+| $x$ = horizontal distance from flier to point below kite | changes | No — must compute |
+| $L$ = total string let out | changes | $L = 200$ m at the moment we care about |
+| Height $= 100$ m | fixed | Yes — always 100 m |
+| $\\dfrac{dL}{dt} = 5$ m/s | known rate | Yes |
+| $\\dfrac{dx}{dt}$ = how fast $x$ grows | unknown rate | This is what we find |`,
         },
         {
-          expression:
-            "\\text{Pythagorean theorem (constraint equation): } x^2 + 100^2 = L^2",
-          annotation:
-            "This equation relates the three sides at every instant of time. 100 is constant, while x and L are functions of t. Thought process: start with the geometric relationship that must hold for all t.",
+          expression: "x^2 + 100^2 = L^2",
+          annotation: "The Pythagorean theorem is the constraint — true at every instant. Both $x$ and $L$ are functions of time. The 100 is a constant.",
+          prereq: `**What is a constraint equation, and why the Pythagorean theorem?**
+
+A **constraint** is an equation that is always true — not just at one moment, but at every moment in time.
+
+The kite, the string, and the ground form a right triangle at every instant:
+- Horizontal leg = $x$ (changes)
+- Vertical leg = 100 m (fixed — kite stays at constant height)
+- Hypotenuse = string $L$ (changes)
+
+For any right triangle: leg² + leg² = hypotenuse²:
+$$x^2 + 100^2 = L^2$$
+
+This is the constraint. Differentiating it converts it from a position equation into a rate equation.`,
         },
         {
-          expression:
-            "\\text{Differentiate both sides with respect to time t (implicit differentiation)}",
-          annotation:
-            "We differentiate the entire equation because we care about how the variables change over time, not their static values.",
+          expression: "\\frac{d}{dt}[x^2 + 100^2] = \\frac{d}{dt}[L^2]",
+          annotation: "Differentiate both sides with respect to $t$.",
+          prereq: `**Why can we differentiate both sides of an equation?**
+
+If $A(t) = B(t)$ for all $t$, then both sides must be changing at the same rate — otherwise they would stop being equal.
+
+So: $\\dfrac{dA}{dt} = \\dfrac{dB}{dt}$.
+
+We differentiate both sides of $x^2 + 100^2 = L^2$ with respect to $t$:
+$$\\frac{d}{dt}[x^2 + 100^2] = \\frac{d}{dt}[L^2]$$
+
+This is always legal when both sides are equal. It turns the static constraint into a live equation between rates.`,
         },
         {
-          expression:
-            "\\frac{d}{dt}(x^2) + \\frac{d}{dt}(100^2) = \\frac{d}{dt}(L^2)",
-          annotation: "Apply the derivative operator to each term separately.",
+          expression: "2x\\,\\frac{dx}{dt} + 0 = 2L\\,\\frac{dL}{dt}",
+          annotation: "Each variable picks up a rate factor via the chain rule. The constant $100^2$ differentiates to zero.",
+          prereq: `**How to differentiate $x^2$ with respect to $t$ — why the answer is NOT just $2x$:**
+
+This is the most common stumbling point.
+
+$x$ is a function of $t$. The **chain rule** says: $\\dfrac{d}{dt}[f(x(t))] = f'(x) \\cdot \\dfrac{dx}{dt}$
+
+Here $f(x) = x^2$, so $f'(x) = 2x$. Multiply by $\\dfrac{dx}{dt}$:
+$$\\frac{d}{dt}[x^2] = 2x \\cdot \\frac{dx}{dt}$$
+
+**Same for $L^2$:**
+$$\\frac{d}{dt}[L^2] = 2L \\cdot \\frac{dL}{dt}$$
+
+**What about $100^2$?** It equals 10000 — a constant. Constants never change:
+$$\\frac{d}{dt}[10000] = 0$$
+
+**The pattern:** every variable produces a rate factor $\\dfrac{d(\\cdot)}{dt}$. Every constant produces zero.`,
         },
         {
-          expression: "2x \\cdot \\frac{dx}{dt} + 0 = 2L \\cdot \\frac{dL}{dt}",
-          annotation:
-            "Chain rule: d/dt(x²) = 2x · (dx/dt). The constant 100² has derivative zero. Same for L². This is the key related-rates equation.",
+          expression: "x\\,\\frac{dx}{dt} = L\\,\\frac{dL}{dt}",
+          annotation: "Divide both sides by 2. Optional cleanup — makes the next substitution slightly less cluttered.",
+          prereq: `**Dividing both sides of an equation by the same number:**
+
+If $2A = 2B$, then $A = B$.
+
+Starting from $2x\\,\\dfrac{dx}{dt} = 2L\\,\\dfrac{dL}{dt}$, divide every term by 2:
+$$x\\,\\frac{dx}{dt} = L\\,\\frac{dL}{dt}$$
+
+Nothing changed mathematically. This is the rate equation we substitute known values into.`,
         },
         {
-          expression:
-            "\\text{Simplify by dividing both sides by 2 (optional but clean): } x \\frac{dx}{dt} = L \\frac{dL}{dt}",
-          annotation:
-            "We can keep the 2's or divide — both are fine. The equation now relates the two rates dx/dt and dL/dt.",
+          expression: "x = \\sqrt{L^2 - 100^2}",
+          annotation: "We need the value of $x$ at the moment $L = 200$. Solve the constraint for $x$.",
+          prereq: `**Why do we need to find $x$ separately?**
+
+The rate equation is $x\\,\\dfrac{dx}{dt} = L\\,\\dfrac{dL}{dt}$.
+
+To solve for $\\dfrac{dx}{dt}$ we must know the current value of $x$. We were not given $x$ — so we find it from the original constraint at the instant $L = 200$.
+
+Solve $x^2 + 100^2 = L^2$ for $x$:
+$$x^2 = L^2 - 100^2 \\implies x = \\sqrt{L^2 - 100^2}$$
+
+Positive root because $x$ is a distance.`,
         },
         {
-          expression: "\\text{Find the horizontal distance x when L = 200 m}",
-          annotation:
-            "We need the specific geometry at the moment of interest.",
+          expression: "x = \\sqrt{200^2 - 100^2} = \\sqrt{40000 - 10000} = \\sqrt{30000}",
+          annotation: "Substitute $L = 200$, compute $200^2 = 40000$ and $100^2 = 10000$, subtract.",
+          prereq: `**Computing $200^2$ and $100^2$:**
+
+$200^2 = 200 \\times 200 = 40{,}000$
+
+$100^2 = 100 \\times 100 = 10{,}000$
+
+$40{,}000 - 10{,}000 = 30{,}000$
+
+So $x = \\sqrt{30{,}000}$. Next: simplify the square root.`,
         },
         {
-          expression:
-            "x = \\sqrt{L^2 - 100^2} = \\sqrt{200^2 - 100^2} = \\sqrt{40000 - 10000} = \\sqrt{30000} = \\sqrt{10000 \\cdot 3} = 100\\sqrt{3} \\text{ m}",
-          annotation:
-            "Exact value: 100√3 ≈ 173.205 m. Units check: meters. Note x is positive since distance.",
+          expression: "x = \\sqrt{10000 \\cdot 3} = 100\\sqrt{3} \\approx 173.2 \\text{ m}",
+          annotation: "Factor $30000 = 10000 \\times 3$, then pull out $\\sqrt{10000} = 100$.",
+          prereq: `**How to simplify a square root by factoring:**
+
+Rule: $\\sqrt{a \\cdot b} = \\sqrt{a} \\cdot \\sqrt{b}$ when $a, b \\geq 0$.
+
+Find the largest perfect square dividing 30000:
+$$30000 = 10000 \\times 3 \\qquad \\sqrt{10000} = 100$$
+
+So:
+$$\\sqrt{30000} = 100\\sqrt{3} \\approx 173.2 \\text{ m}$$
+
+**Why keep the exact form $100\\sqrt{3}$?** Decimals introduce rounding error. The exact form carries cleanly into the next calculation.`,
         },
         {
-          expression:
-            "\\text{Substitute known values into the differentiated equation}",
-          annotation:
-            "We know L = 200, dL/dt = 5 m/s (string is let out, so positive), x = 100√3.",
+          expression: "(100\\sqrt{3})\\,\\frac{dx}{dt} = (200)(5)",
+          annotation: "Substitute all known values into $x\\,\\frac{dx}{dt} = L\\,\\frac{dL}{dt}$.",
+          prereq: `**What goes where — the substitution table:**
+
+| Variable | Value | Source |
+|---|---|---|
+| $x$ | $100\\sqrt{3}$ | just computed |
+| $L$ | $200$ m | given |
+| $\\dfrac{dL}{dt}$ | $5$ m/s | given |
+| $\\dfrac{dx}{dt}$ | **unknown** | solve for this |
+
+Substitute into $x\\,\\dfrac{dx}{dt} = L\\,\\dfrac{dL}{dt}$:
+$$(100\\sqrt{3}) \\cdot \\frac{dx}{dt} = (200)(5)$$
+
+Right side is all numbers. Left side has the unknown.`,
         },
         {
-          expression:
-            "2 \\cdot (100\\sqrt{3}) \\cdot \\frac{dx}{dt} = 2 \\cdot 200 \\cdot 5",
-          annotation:
-            "Plug in carefully. Left side has the unknown dx/dt; right side is all numbers.",
+          expression: "\\frac{dx}{dt} = \\frac{1000}{100\\sqrt{3}} = \\frac{10}{\\sqrt{3}}",
+          annotation: "Right side: $200 \\times 5 = 1000$. Divide both sides by $100\\sqrt{3}$ to isolate $\\frac{dx}{dt}$.",
+          prereq: `**Isolating the unknown by dividing:**
+
+$(100\\sqrt{3}) \\cdot \\dfrac{dx}{dt} = 1000$
+
+Divide both sides by $100\\sqrt{3}$:
+$$\\frac{dx}{dt} = \\frac{1000}{100\\sqrt{3}} = \\frac{10}{\\sqrt{3}}$$
+
+$\\dfrac{1000}{100} = 10$ — the 100s cancel. The $\\sqrt{3}$ stays for now.`,
         },
         {
-          expression: "200\\sqrt{3} \\cdot \\frac{dx}{dt} = 2000",
-          annotation:
-            "Simplify: 2·100√3 = 200√3 on left; 2·200·5 = 2000 on right.",
-        },
-        {
-          expression:
-            "\\frac{dx}{dt} = \\frac{2000}{200\\sqrt{3}} = \\frac{10}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3} \\text{ m/s}",
-          annotation:
-            "Rationalize denominator: multiply numerator and denominator by √3. Approximate value ≈ 5.77 m/s. The horizontal distance increases at about 5.77 m/s.",
-        },
-        {
-          expression:
-            "\\text{Aha insight: The horizontal speed (5.77 m/s) is greater than the string speed (5 m/s) because the string is not vertical — part of the motion is 'wasted' on the angle.}",
-          annotation:
-            "When the kite is high and far, letting out string moves the kite more horizontally than vertically.",
+          expression: "\\frac{dx}{dt} = \\frac{10}{\\sqrt{3}} \\cdot \\frac{\\sqrt{3}}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3} \\approx 5.77 \\text{ m/s}",
+          annotation: "Rationalize the denominator by multiplying by $\\frac{\\sqrt{3}}{\\sqrt{3}} = 1$.",
+          prereq: `**How to rationalize a denominator:**
+
+$\\dfrac{10}{\\sqrt{3}}$ has a square root in the denominator. Multiply top and bottom by $\\sqrt{3}$ (= multiplying by 1, so the value is unchanged):
+
+$$\\frac{10}{\\sqrt{3}} \\cdot \\frac{\\sqrt{3}}{\\sqrt{3}} = \\frac{10\\sqrt{3}}{3}$$
+
+**Why $\\sqrt{3} \\cdot \\sqrt{3} = 3$?** Because $\\sqrt{a} \\cdot \\sqrt{a} = a$.
+
+Decimal: $\\dfrac{10\\sqrt{3}}{3} \\approx \\dfrac{17.32}{3} \\approx 5.77$ m/s.`,
         },
       ],
       answer:

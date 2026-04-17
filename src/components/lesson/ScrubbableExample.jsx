@@ -3,6 +3,38 @@ import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from '../math/parseProse.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
 import StickyNote from '../ui/StickyNote.jsx';
+import MarkdownProse from '../math/MarkdownProse.jsx';
+
+// ─── Prereq box ───────────────────────────────────────────────────────────────
+// Shown below the step expression when step.prereq is set.
+// Starts collapsed. User opens it when they don't recognise the move.
+
+function PrereqBox({ prereq }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mb-3 rounded-lg border border-violet-200 dark:border-violet-800/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-2 px-3 py-2 bg-violet-50 dark:bg-violet-950/30 hover:bg-violet-100 dark:hover:bg-violet-950/50 transition-colors text-left"
+      >
+        <span className="text-[10px]">📖</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-700 dark:text-violet-400 flex-1">
+          Don't know how to do this step? Open prereq
+        </span>
+        <span className="text-[10px] text-violet-500 dark:text-violet-500 font-semibold">
+          {open ? 'Close ▲' : 'Open ▼'}
+        </span>
+      </button>
+      {open && (
+        <div className="px-4 py-3 bg-white dark:bg-slate-900 border-t border-violet-100 dark:border-violet-900/40">
+          <MarkdownProse text={prereq} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 function buildVisualizations(example, currentStep) {
   const items = [];
@@ -247,6 +279,9 @@ export default function ScrubbableExample({ example, number, lessonId }) {
                   </p>
                 )}
               </div>
+              {activeStep.prereq && (
+                <PrereqBox prereq={activeStep.prereq} />
+              )}
               <div className="flex flex-wrap gap-2 mb-3">
                 <button onClick={markHintUsed} className="px-3 py-1.5 rounded bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 text-xs font-semibold transition-colors">
                   Show hint
