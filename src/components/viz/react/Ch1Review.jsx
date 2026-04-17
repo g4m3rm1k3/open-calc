@@ -10,29 +10,15 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+// Drop-in replacement — uses the app's bundled KaTeX, no CDN needed
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── Interactive: show secant → tangent approaching a point (limit preview) ─
@@ -93,7 +79,7 @@ function LimitPreviewViz() {
 
 const SECTIONS = [
   {
-    id: "functions", color: "#7F77DD", bg: "#EEEDFE",
+    id: "functions", color: "#7F77DD", bg: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))",
     title: "1.1–1.2 Functions & Their Families",
     keyIdeas: [
       { term: "Function", def: "A rule f: A→B where every input has exactly one output. Vertical line test." },
@@ -106,7 +92,7 @@ const SECTIONS = [
     bridgeNote: null,
   },
   {
-    id: "trig", color: "#1D9E75", bg: "#E1F5EE",
+    id: "trig", color: "#1D9E75", bg: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))",
     title: "1.3 Trigonometric Functions",
     keyIdeas: [
       { term: "Unit circle", def: "sin(θ) = y-coordinate, cos(θ) = x-coordinate of point at angle θ on the unit circle." },
@@ -119,7 +105,7 @@ const SECTIONS = [
     bridgeNote: "lim(x→0) sin(x)/x = 1",
   },
   {
-    id: "inverse", color: "#0891b2", bg: "#ecfeff",
+    id: "inverse", color: "#0891b2", bg: "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))",
     title: "1.4 Inverse Functions",
     keyIdeas: [
       { term: "Inverse exists iff", def: "f is one-to-one (monotone on the relevant interval). Restrict domain if needed." },
@@ -132,7 +118,7 @@ const SECTIONS = [
     bridgeNote: null,
   },
   {
-    id: "explog", color: "#BA7517", bg: "#FAEEDA",
+    id: "explog", color: "#BA7517", bg: "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))",
     title: "1.5 Exponential & Logarithmic Functions",
     keyIdeas: [
       { term: "eˣ and ln(x)", def: "Inverse pair. e^(ln x) = x for x>0. ln(eˣ) = x for all x." },
@@ -148,8 +134,7 @@ const SECTIONS = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch1Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch1Review({ params = {} }) {
   const [tab, setTab] = useState("map");
   const [secIdx, setSecIdx] = useState(0);
 
@@ -158,10 +143,10 @@ export default function Ch1Review({ params = {} }) {
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
       {/* Chapter header */}
-      <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#534AB7", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 1 Review — OpenStax Calc Vol 1</div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#26215C", marginBottom: 4 }}>Functions & Graphs</div>
-        <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>Functions & Graphs</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
           This chapter is the vocabulary of calculus. Every concept in Chapters 2–6 lives inside a function. The more fluently you read and compose functions, the faster limits and derivatives will click.
         </div>
       </div>
@@ -169,7 +154,7 @@ export default function Ch1Review({ params = {} }) {
       {/* Tabs */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["map", "Chapter map"], ["review", "Section by section"], ["bridge", "Bridge → Ch 2: Limits"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#7F77DD" : "var(--color-border-secondary)"}`, background: tab === k ? "#EEEDFE" : "transparent", color: tab === k ? "#534AB7" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#7F77DD" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#534AB7" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
@@ -227,7 +212,7 @@ export default function Ch1Review({ params = {} }) {
                   </div>
                 ))}
                 <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center" }}>
-                  <M t={s.formula} display ready={ready} />
+                  <M t={s.formula} display />
                 </div>
                 <div style={{ ...card, borderLeft: "3px solid #d97706", borderRadius: 0, background: "var(--color-background-warning)" }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-warning)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".06em" }}>Common trap</div>
@@ -247,9 +232,9 @@ export default function Ch1Review({ params = {} }) {
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #059669", borderRadius: 0, background: "#E1F5EE", marginBottom: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#085041", marginBottom: 6 }}>Chapter 1 → Chapter 2: The Central Question</div>
-            <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #059669", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 14 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>Chapter 1 → Chapter 2: The Central Question</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               Chapter 1 defined functions. Chapter 2 asks: what happens to f(x) as x approaches (but never reaches) some value? This is a limit — and it is built entirely on your understanding of functions. The secant line below is a function of h. As h→0, it approaches the tangent. That is your first real limit.
             </div>
           </div>

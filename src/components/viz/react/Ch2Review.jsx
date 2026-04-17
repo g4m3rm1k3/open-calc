@@ -8,29 +8,14 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── ε-δ visualiser ───────────────────────────────────────────────────────────
@@ -140,8 +125,7 @@ const TECHNIQUES = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch2Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch2Review({ params = {} }) {
   const [tab, setTab] = useState("map");
   const [techIdx, setTechIdx] = useState(0);
 
@@ -149,17 +133,17 @@ export default function Ch2Review({ params = {} }) {
     <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#1D9E75", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 2 Review</div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#085041", marginBottom: 4 }}>Limits</div>
-        <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>Limits</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
           Limits are the engine of calculus. Every derivative is a limit. Every integral is a limit. The ε-δ definition makes "approaching" rigorous. Chapter 2 asks: what value does f(x) approach as x approaches a?
         </div>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["map", "Chapter map"], ["epsdelta", "ε-δ definition"], ["techniques", "Limit techniques"], ["bridge", "Bridge → Ch 3: Derivatives"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#1D9E75" : "var(--color-border-secondary)"}`, background: tab === k ? "#E1F5EE" : "transparent", color: tab === k ? "#085041" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#1D9E75" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#085041" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
@@ -183,7 +167,7 @@ export default function Ch2Review({ params = {} }) {
             <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 8 }}>The three special limits to memorise cold</div>
             {["\\lim_{x\\to 0}\\frac{\\sin x}{x} = 1", "\\lim_{x\\to 0}\\frac{1-\\cos x}{x} = 0", "\\lim_{x\\to 0}(1+x)^{1/x} = e"].map((f, i) => (
               <div key={i} style={{ background: "var(--color-background-primary)", borderRadius: 6, padding: "8px 12px", marginBottom: 4, textAlign: "center" }}>
-                <M t={f} display ready={ready} />
+                <M t={f} display />
               </div>
             ))}
           </div>
@@ -192,10 +176,10 @@ export default function Ch2Review({ params = {} }) {
 
       {tab === "epsdelta" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "#FAEEDA", marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#412402", marginBottom: 6 }}>The ε-δ definition — what it actually says</div>
-            <M t={"\\lim_{x\\to a}f(x) = L \\iff \\forall\\,\\varepsilon>0,\\;\\exists\\,\\delta>0: \\; 0<|x-a|<\\delta \\Rightarrow |f(x)-L|<\\varepsilon"} display ready={ready} />
-            <div style={{ fontSize: 13, color: "#633806", lineHeight: 1.7, marginTop: 8 }}>
+          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))", marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>The ε-δ definition — what it actually says</div>
+            <M t={"\\lim_{x\\to a}f(x) = L \\iff \\forall\\,\\varepsilon>0,\\;\\exists\\,\\delta>0: \\; 0<|x-a|<\\delta \\Rightarrow |f(x)-L|<\\varepsilon"} display />
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7, marginTop: 8 }}>
               Translation: You name any tolerance ε on the output. I can find a window δ on the input so that all x within δ of a produce f(x) within ε of L. This works for every ε you could possibly name.
             </div>
           </div>
@@ -216,13 +200,13 @@ export default function Ch2Review({ params = {} }) {
             const t = TECHNIQUES[techIdx];
             return (
               <div style={{ animation: "sd .16s ease-out" }}>
-                <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE" }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: "#085041", marginBottom: 4 }}>{t.name}</div>
-                  <div style={{ fontSize: 13, color: "#0F6E56", marginBottom: 4 }}><strong>When to use:</strong> {t.when}</div>
+                <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))" }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>{t.name}</div>
+                  <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 4 }}><strong>When to use:</strong> {t.when}</div>
                   <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>{t.example}</div>
                 </div>
                 <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center" }}>
-                  <M t={t.formula} display ready={ready} />
+                  <M t={t.formula} display />
                 </div>
               </div>
             );
@@ -232,10 +216,10 @@ export default function Ch2Review({ params = {} }) {
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 12 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#26215C", marginBottom: 6 }}>The derivative is a limit — the bridge to Chapter 3</div>
-            <M t={"f'(x) = \\lim_{h\\to 0}\\frac{f(x+h)-f(x)}{h}"} display ready={ready} />
-            <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7, marginTop: 8 }}>
+          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>The derivative is a limit — the bridge to Chapter 3</div>
+            <M t={"f'(x) = \\lim_{h\\to 0}\\frac{f(x+h)-f(x)}{h}"} display />
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7, marginTop: 8 }}>
               Every differentiation rule in Chapter 3 is derived by evaluating this limit. The power rule, product rule, chain rule — all proofs start here. Chapter 2 gave you the tools (factoring, conjugates, special limits). Chapter 3 uses them.
             </div>
           </div>

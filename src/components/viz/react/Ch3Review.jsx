@@ -10,33 +10,18 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── Rule decision tree visual ────────────────────────────────────────────────
-function RuleDecisionTree({ ready }) {
+function RuleDecisionTree() {
   const steps = [
     { q: "What is the OUTERMOST structure?", opts: ["Sum / Difference", "Product f·g", "Quotient f/g", "Composition f(g(x))"] },
     { q: "Sum/Difference → split and differentiate each term separately.", formula: "(f \\pm g)' = f' \\pm g'", color: "#7F77DD" },
@@ -51,7 +36,7 @@ function RuleDecisionTree({ ready }) {
         <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 10 }}>{steps[0].q}</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
           {steps[0].opts.map((opt, i) => (
-            <button key={i} onClick={() => setSel(i + 1)} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${sel === i + 1 ? ["#7F77DD", "#1D9E75", "#0891b2", "#BA7517"][i] : "var(--color-border-secondary)"}`, background: sel === i + 1 ? ["#EEEDFE", "#E1F5EE", "#ecfeff", "#FAEEDA"][i] : "transparent", color: sel === i + 1 ? ["#7F77DD", "#1D9E75", "#0891b2", "#BA7517"][i] : "var(--color-text-secondary)", cursor: "pointer", fontSize: 13, textAlign: "left" }}>
+            <button key={i} onClick={() => setSel(i + 1)} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${sel === i + 1 ? ["#7F77DD", "#1D9E75", "#0891b2", "#BA7517"][i] : "var(--color-border-secondary)"}`, background: sel === i + 1 ? ["color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))", "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))"][i] : "transparent", color: sel === i + 1 ? ["#7F77DD", "#1D9E75", "#0891b2", "#BA7517"][i] : "var(--color-text-secondary)", cursor: "pointer", fontSize: 13, textAlign: "left" }}>
               {opt}
             </button>
           ))}
@@ -60,7 +45,7 @@ function RuleDecisionTree({ ready }) {
       {sel && (
         <div style={{ background: "var(--color-background-primary)", border: `1.5px solid ${steps[sel].color}`, borderRadius: 8, padding: "12px 14px", animation: "sd .16s ease-out" }}>
           <div style={{ fontSize: 13, color: steps[sel].color, marginBottom: 8 }}>{steps[sel].q}</div>
-          <M t={steps[sel].formula} display ready={ready} />
+          <M t={steps[sel].formula} display />
         </div>
       )}
     </div>
@@ -126,8 +111,7 @@ const RULES = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch3Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch3Review({ params = {} }) {
   const [tab, setTab] = useState("rules");
   const [ruleIdx, setRuleIdx] = useState(0);
 
@@ -135,17 +119,17 @@ export default function Ch3Review({ params = {} }) {
     <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: "#ecfeff", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#0891b2", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 3 Review</div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#0e7490", marginBottom: 4 }}>Derivatives</div>
-        <div style={{ fontSize: 13, color: "#0e7490", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-info)", marginBottom: 4 }}>Derivatives</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-info)", lineHeight: 1.7 }}>
           Chapter 3 is the computational engine of calculus. You learned rules for differentiating every function you know. Chapter 4 uses those rules to answer real questions: where are maxima? When is a curve concave up? What is the optimal solution?
         </div>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["rules", "Differentiation rules"], ["decision", "Which rule to use"], ["higher", "f, f′, f″"], ["bridge", "Bridge → Ch 4: Applications"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#0891b2" : "var(--color-border-secondary)"}`, background: tab === k ? "#ecfeff" : "transparent", color: tab === k ? "#0e7490" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#0891b2" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#0e7490" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
@@ -157,7 +141,7 @@ export default function Ch3Review({ params = {} }) {
             ))}
           </div>
           <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginBottom: 8 }}>
-            <M t={RULES[ruleIdx].formula} display ready={ready} />
+            <M t={RULES[ruleIdx].formula} display />
           </div>
           <div style={{ ...card }}>
             <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{RULES[ruleIdx].note}</div>
@@ -167,12 +151,12 @@ export default function Ch3Review({ params = {} }) {
 
       {tab === "decision" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "#FAEEDA", marginBottom: 10 }}>
-            <div style={{ fontSize: 13, color: "#412402", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.7 }}>
               The decision is always: look at the OUTERMOST structure. That determines which rule applies first. Then recurse inward. This is the "PEMDAS" of differentiation.
             </div>
           </div>
-          <RuleDecisionTree ready={ready} />
+          <RuleDecisionTree />
         </div>
       )}
 
@@ -190,7 +174,7 @@ export default function Ch3Review({ params = {} }) {
               { cond: "f″ = 0, changes sign", meaning: "Inflection point — concavity switches" },
             ].map((row, i) => (
               <div key={i} style={{ display: "flex", gap: 12, padding: "6px 0", borderBottom: i < 5 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
-                <div style={{ minWidth: 100, fontSize: 13, fontFamily: "var(--font-serif)" }}><M t={row.cond} ready={ready} /></div>
+                <div style={{ minWidth: 100, fontSize: 13, fontFamily: "var(--font-serif)" }}><M t={row.cond} /></div>
                 <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{row.meaning}</div>
               </div>
             ))}
@@ -200,7 +184,7 @@ export default function Ch3Review({ params = {} }) {
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: "#FCEBEB", marginBottom: 12 }}>
+          <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: "color-mix(in srgb, #A32D2D 14%, var(--color-background-secondary))", marginBottom: 12 }}>
             <div style={{ fontSize: 14, fontWeight: 500, color: "#501313", marginBottom: 6 }}>Chapter 3 → Chapter 4: Using derivatives to analyse functions</div>
             <div style={{ fontSize: 13, color: "#791F1F", lineHeight: 1.7 }}>
               Chapter 3 taught you how to compute f′(x). Chapter 4 teaches you what to do with it: find where a function is largest or smallest, sketch curves precisely, and solve real-world optimisation problems.
@@ -217,11 +201,11 @@ export default function Ch3Review({ params = {} }) {
             ].map((row, i) => (
               <div key={i} style={{ padding: "8px 0", borderBottom: i < 4 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#ecfeff", color: "#0891b2", fontWeight: 600, flexShrink: 0 }}>Ch 3</span>
+                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))", color: "#0891b2", fontWeight: 600, flexShrink: 0 }}>Ch 3</span>
                   <span style={{ fontSize: 13 }}>{row.ch3}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
-                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#FCEBEB", color: "#A32D2D", fontWeight: 600, flexShrink: 0 }}>Ch 4</span>
+                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "color-mix(in srgb, #A32D2D 14%, var(--color-background-secondary))", color: "#A32D2D", fontWeight: 600, flexShrink: 0 }}>Ch 4</span>
                   <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{row.ch4}</span>
                 </div>
               </div>

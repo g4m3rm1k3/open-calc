@@ -9,29 +9,14 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── Area between curves interactive ─────────────────────────────────────────
@@ -110,8 +95,7 @@ const APPLICATIONS = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch6Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch6Review({ params = {} }) {
   const [tab, setTab] = useState("applications");
   const [appIdx, setAppIdx] = useState(0);
   const app = APPLICATIONS[appIdx];
@@ -120,17 +104,17 @@ export default function Ch6Review({ params = {} }) {
     <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#534AB7", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 6 Review — Final Chapter of Calc 1</div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#26215C", marginBottom: 4 }}>Applications of Integration</div>
-        <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>Applications of Integration</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
           Chapter 6 is integration put to work. Areas, volumes, arc lengths, centres of mass, exponential models — all use the definite integral as a measurement tool. The pattern is always the same: slice into infinitely thin pieces, integrate the pieces.
         </div>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["applications", "Applications"], ["area", "Area between curves"], ["strategy", "Problem strategy"], ["bridge", "Bridge → Calc 2"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#7F77DD" : "var(--color-border-secondary)"}`, background: tab === k ? "#EEEDFE" : "transparent", color: tab === k ? "#534AB7" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#7F77DD" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#534AB7" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
@@ -145,7 +129,7 @@ export default function Ch6Review({ params = {} }) {
             <div style={{ fontSize: 14, fontWeight: 500, color: app.color, marginBottom: 6 }}>{app.name}</div>
           </div>
           <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center" }}>
-            <M t={app.formula} display ready={ready} />
+            <M t={app.formula} display />
           </div>
           <div style={{ ...card }}>
             {app.steps.map((step, i) => (
@@ -166,7 +150,7 @@ export default function Ch6Review({ params = {} }) {
         <div style={{ animation: "sd .2s ease-out" }}>
           <AreaViz />
           <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center", marginTop: 10 }}>
-            <M t={"\\int_{-1}^{2}[x-(x^2-2)]\\,dx = \\int_{-1}^{2}(-x^2+x+2)\\,dx = \\left[-\\frac{x^3}{3}+\\frac{x^2}{2}+2x\\right]_{-1}^{2} = \\frac{9}{2}"} display ready={ready} />
+            <M t={"\\int_{-1}^{2}[x-(x^2-2)]\\,dx = \\int_{-1}^{2}(-x^2+x+2)\\,dx = \\left[-\\frac{x^3}{3}+\\frac{x^2}{2}+2x\\right]_{-1}^{2} = \\frac{9}{2}"} display />
           </div>
         </div>
       )}
@@ -191,10 +175,10 @@ export default function Ch6Review({ params = {} }) {
             ].map((row, i) => (
               <div key={i} style={{ padding: "8px 0", borderBottom: i < 2 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#EEEDFE", color: "#7F77DD", fontWeight: 600 }}>{row.method}</span>
+                  <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", color: "#7F77DD", fontWeight: 600 }}>{row.method}</span>
                   <span style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>{row.when}</span>
                 </div>
-                <div style={{ marginTop: 4, overflowX: "auto" }}><M t={row.formula} ready={ready} /></div>
+                <div style={{ marginTop: 4, overflowX: "auto" }}><M t={row.formula} /></div>
               </div>
             ))}
           </div>
@@ -203,9 +187,9 @@ export default function Ch6Review({ params = {} }) {
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 12 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#085041", marginBottom: 6 }}>The end of Calc 1 — and the start of Calc 2</div>
-            <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>The end of Calc 1 — and the start of Calc 2</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               You have now covered the complete foundation: functions, limits, derivatives, and integrals. Calc 2 extends each of these in power and depth. The tools stay the same; the problems get harder.
             </div>
           </div>
@@ -224,13 +208,13 @@ export default function Ch6Review({ params = {} }) {
               </div>
             ))}
           </div>
-          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE" }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#26215C", marginBottom: 6 }}>The single most important thing to carry into Calc 2</div>
-            <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))" }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>The single most important thing to carry into Calc 2</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               The Fundamental Theorem of Calculus is still true. Differentiation and integration are inverse operations. Every technique in Calc 2 is built on that foundation. If you understand why FTC works (not just that it does), Calc 2 will feel like extensions — not new territory.
             </div>
             <div style={{ background: "var(--color-background-primary)", borderRadius: 6, padding: "10px 14px", textAlign: "center", marginTop: 8 }}>
-              <M t={"\\frac{d}{dx}\\int_a^x f(t)\\,dt = f(x) \\qquad \\int_a^b f'(x)\\,dx = f(b)-f(a)"} display ready={ready} />
+              <M t={"\\frac{d}{dx}\\int_a^x f(t)\\,dt = f(x) \\qquad \\int_a^b f'(x)\\,dx = f(b)-f(a)"} display />
             </div>
           </div>
         </div>

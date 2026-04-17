@@ -9,29 +9,14 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── Riemann sums interactive ─────────────────────────────────────────────────
@@ -100,9 +85,9 @@ function RiemannViz() {
 }
 
 const FTC_STEPS = [
-  { tag: "Part 1", tagStyle: { bg: "#E1F5EE", text: "#085041", border: "#1D9E75" }, instruction: "Define g(x) = ∫ₐˣ f(t) dt. This is an accumulation function — it accumulates area from a to x.", math: "g(x) = \\int_a^x f(t)\\,dt \\quad\\Rightarrow\\quad g'(x) = f(x)" },
-  { tag: "Part 2", tagStyle: { bg: "#ecfeff", text: "#0e7490", border: "#0891b2" }, instruction: "If F is any antiderivative of f (F′=f), then the definite integral equals F(b)−F(a).", math: "\\int_a^b f(x)\\,dx = F(b) - F(a) \\quad \\text{where } F' = f" },
-  { tag: "Why it connects", tagStyle: { bg: "#FAEEDA", text: "#412402", border: "#BA7517" }, instruction: "FTC unifies the area problem (integration) and the tangent problem (differentiation). They are inverse operations.", math: "\\text{Differentiation and integration are inverses: } \\frac{d}{dx}\\int_a^x f(t)\\,dt = f(x)" },
+  { tag: "Part 1", tagStyle: { bg: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", text: "#085041", border: "#1D9E75" }, instruction: "Define g(x) = ∫ₐˣ f(t) dt. This is an accumulation function — it accumulates area from a to x.", math: "g(x) = \\int_a^x f(t)\\,dt \\quad\\Rightarrow\\quad g'(x) = f(x)" },
+  { tag: "Part 2", tagStyle: { bg: "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))", text: "#0e7490", border: "#0891b2" }, instruction: "If F is any antiderivative of f (F′=f), then the definite integral equals F(b)−F(a).", math: "\\int_a^b f(x)\\,dx = F(b) - F(a) \\quad \\text{where } F' = f" },
+  { tag: "Why it connects", tagStyle: { bg: "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))", text: "#412402", border: "#BA7517" }, instruction: "FTC unifies the area problem (integration) and the tangent problem (differentiation). They are inverse operations.", math: "\\text{Differentiation and integration are inverses: } \\frac{d}{dx}\\int_a^x f(t)\\,dt = f(x)" },
 ];
 
 const INTEGRALS = [
@@ -116,8 +101,7 @@ const INTEGRALS = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch5Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch5Review({ params = {} }) {
   const [tab, setTab] = useState("riemann");
   const [ftcStep, setFtcStep] = useState(0);
   const [intIdx, setIntIdx] = useState(0);
@@ -126,27 +110,27 @@ export default function Ch5Review({ params = {} }) {
     <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#1D9E75", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 5 Review</div>
-        <div style={{ fontSize: 16, fontWeight: 500, color: "#085041", marginBottom: 4 }}>Integration</div>
-        <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>Integration</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
           Chapter 5 closes the loop. Derivatives describe rates of change. Integrals accumulate those rates back into totals. The Fundamental Theorem of Calculus (FTC) proves they are inverse operations — the most important result in the entire course.
         </div>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["riemann", "Riemann sums"], ["ftc", "FTC — the big theorem"], ["integrals", "Antiderivative formulas"], ["sub", "u-substitution"], ["bridge", "Bridge → Ch 6: Applications"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#1D9E75" : "var(--color-border-secondary)"}`, background: tab === k ? "#E1F5EE" : "transparent", color: tab === k ? "#085041" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#1D9E75" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#085041" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
       {tab === "riemann" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 10 }}>
-            <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               A definite integral is defined as the limit of Riemann sums. We chop [a,b] into n subintervals, multiply each height f(xᵢ) by the width Δx, and sum. As n→∞, Δx→0, and the sum → the area exactly.
             </div>
-            <M t={"\\int_a^b f(x)\\,dx = \\lim_{n\\to\\infty}\\sum_{i=1}^n f(x_i^*)\\,\\Delta x"} display ready={ready} />
+            <M t={"\\int_a^b f(x)\\,dx = \\lim_{n\\to\\infty}\\sum_{i=1}^n f(x_i^*)\\,\\Delta x"} display />
           </div>
           <RiemannViz />
         </div>
@@ -169,7 +153,7 @@ export default function Ch5Review({ params = {} }) {
                 <div style={{ padding: "16px 18px" }}>
                   <p style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>{s.instruction}</p>
                   <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, padding: "16px", textAlign: "center", overflowX: "auto" }}>
-                    <M t={s.math} display ready={ready} />
+                    <M t={s.math} display />
                   </div>
                 </div>
               </div>
@@ -177,7 +161,7 @@ export default function Ch5Review({ params = {} }) {
           })()}
           <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
             <button onClick={() => setFtcStep(s => Math.max(0, s - 1))} disabled={ftcStep === 0} style={{ flex: 1, padding: 8, borderRadius: 8, border: "0.5px solid var(--color-border-secondary)", background: "transparent", color: ftcStep === 0 ? "var(--color-text-tertiary)" : "var(--color-text-secondary)", cursor: ftcStep === 0 ? "not-allowed" : "pointer", fontSize: 13 }}>← Back</button>
-            <button onClick={() => setFtcStep(s => Math.min(2, s + 1))} disabled={ftcStep === 2} style={{ flex: 1, padding: 8, borderRadius: 8, border: "0.5px solid #1D9E75", background: ftcStep === 2 ? "transparent" : "#E1F5EE", color: ftcStep === 2 ? "var(--color-text-tertiary)" : "#085041", cursor: ftcStep === 2 ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 500 }}>Next →</button>
+            <button onClick={() => setFtcStep(s => Math.min(2, s + 1))} disabled={ftcStep === 2} style={{ flex: 1, padding: 8, borderRadius: 8, border: "0.5px solid #1D9E75", background: ftcStep === 2 ? "transparent" : "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", color: ftcStep === 2 ? "var(--color-text-tertiary)" : "#085041", cursor: ftcStep === 2 ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 500 }}>Next →</button>
           </div>
         </div>
       )}
@@ -190,7 +174,7 @@ export default function Ch5Review({ params = {} }) {
             ))}
           </div>
           <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center" }}>
-            <M t={INTEGRALS[intIdx].formula} display ready={ready} />
+            <M t={INTEGRALS[intIdx].formula} display />
           </div>
           <div style={{ ...card }}><div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{INTEGRALS[intIdx].note}</div></div>
         </div>
@@ -198,9 +182,9 @@ export default function Ch5Review({ params = {} }) {
 
       {tab === "sub" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: "#ecfeff", marginBottom: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#0e7490", marginBottom: 6 }}>u-Substitution — the chain rule in reverse</div>
-            <M t={"\\int f(g(x))g'(x)\\,dx = \\int f(u)\\,du \\quad\\text{where } u=g(x)"} display ready={ready} />
+          <div style={{ ...card, borderLeft: "3px solid #0891b2", borderRadius: 0, background: "color-mix(in srgb, #0891b2 14%, var(--color-background-secondary))", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-info)", marginBottom: 6 }}>u-Substitution — the chain rule in reverse</div>
+            <M t={"\\int f(g(x))g'(x)\\,dx = \\int f(u)\\,du \\quad\\text{where } u=g(x)"} display />
           </div>
           <div style={{ ...card }}>
             <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 8 }}>The four-step algorithm</div>
@@ -212,16 +196,16 @@ export default function Ch5Review({ params = {} }) {
             ))}
           </div>
           <div style={{ ...card, background: "var(--color-background-primary)", textAlign: "center" }}>
-            <M t={"\\int 2x\\cos(x^2)\\,dx \\xrightarrow{u=x^2} \\int \\cos(u)\\,du = \\sin(u)+C = \\sin(x^2)+C"} display ready={ready} />
+            <M t={"\\int 2x\\cos(x^2)\\,dx \\xrightarrow{u=x^2} \\int \\cos(u)\\,du = \\sin(u)+C = \\sin(x^2)+C"} display />
           </div>
         </div>
       )}
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "#EEEDFE", marginBottom: 12 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#26215C", marginBottom: 6 }}>Chapter 5 → Chapter 6: What integrals can compute</div>
-            <div style={{ fontSize: 13, color: "#3C3489", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #7F77DD", borderRadius: 0, background: "color-mix(in srgb, #7F77DD 14%, var(--color-background-secondary))", marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>Chapter 5 → Chapter 6: What integrals can compute</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               Chapter 5 defined the integral and gave you the tools to compute it. Chapter 6 uses the definite integral to calculate real quantities: areas between curves, volumes of solids, arc lengths, work, and probability. The integral is a measurement machine.
             </div>
           </div>
@@ -234,7 +218,7 @@ export default function Ch5Review({ params = {} }) {
             ].map((row, i) => (
               <div key={i} style={{ padding: "8px 0", borderBottom: i < 3 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: "#7F77DD", marginBottom: 4 }}>{row.app}</div>
-                <div style={{ overflowX: "auto", marginBottom: 4 }}><M t={row.formula} display ready={ready} /></div>
+                <div style={{ overflowX: "auto", marginBottom: 4 }}><M t={row.formula} display /></div>
                 <div style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>{row.note}</div>
               </div>
             ))}

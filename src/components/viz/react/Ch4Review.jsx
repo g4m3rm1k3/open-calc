@@ -9,29 +9,14 @@
  */
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
+import KatexBlock from "../../math/KatexBlock.jsx";
+import KatexInline from "../../math/KatexInline.jsx";
 
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const l = document.createElement("link"); l.rel = "stylesheet";
-    l.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(l);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true); document.head.appendChild(s);
-  }, []);
-  return ready;
-}
-function M({ t, display = false, ready }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ready || !ref.current || !t) return;
-    try { window.katex.render(t, ref.current, { throwOnError: false, displayMode: display }); }
-    catch (_) { if (ref.current) ref.current.textContent = t; }
-  }, [t, display, ready]);
+function M({ t, display = false }) {
   if (!t) return null;
-  return <span ref={ref} style={{ display: display ? "block" : "inline" }} />;
+  return display
+    ? <div style={{ overflowX: "auto", textAlign: "center", margin: "4px 0" }}><KatexBlock expr={t} /></div>
+    : <KatexInline expr={t} />;
 }
 
 // ── Curve sketching interactive ──────────────────────────────────────────────
@@ -141,8 +126,7 @@ const CH4_SECTIONS = [
 
 const card = { background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)", padding: "12px 14px", border: "0.5px solid var(--color-border-tertiary)", marginBottom: 8 };
 
-export default function Ch4Review({ params = {} }) {
-  const ready = useMath();
+export default function Ch4Review({ params = {} }) {
   const [tab, setTab] = useState("map");
   const [secIdx, setSecIdx] = useState(0);
 
@@ -150,7 +134,7 @@ export default function Ch4Review({ params = {} }) {
     <div style={{ fontFamily: "var(--font-sans)", padding: "4px 0" }}>
       <style>{`@keyframes sd{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}`}</style>
 
-      <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: "#FCEBEB", marginBottom: 14 }}>
+      <div style={{ ...card, borderLeft: "3px solid #A32D2D", borderRadius: 0, background: "color-mix(in srgb, #A32D2D 14%, var(--color-background-secondary))", marginBottom: 14 }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: "#A32D2D", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Chapter 4 Review</div>
         <div style={{ fontSize: 16, fontWeight: 500, color: "#501313", marginBottom: 4 }}>Applications of Derivatives</div>
         <div style={{ fontSize: 13, color: "#791F1F", lineHeight: 1.7 }}>
@@ -160,7 +144,7 @@ export default function Ch4Review({ params = {} }) {
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
         {[["map", "Section map"], ["sketch", "Curve sketching"], ["mvt", "Mean Value Theorem"], ["bridge", "Bridge → Ch 5: Integration"]].map(([k, l]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#A32D2D" : "var(--color-border-secondary)"}`, background: tab === k ? "#FCEBEB" : "transparent", color: tab === k ? "#791F1F" : "var(--color-text-secondary)" }}>{l}</button>
+          <button key={k} onClick={() => setTab(k)} style={{ padding: "5px 13px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontWeight: tab === k ? 500 : 400, border: `0.5px solid ${tab === k ? "#A32D2D" : "var(--color-border-secondary)"}`, background: tab === k ? "color-mix(in srgb, #A32D2D 14%, var(--color-background-secondary))" : "transparent", color: tab === k ? "#791F1F" : "var(--color-text-secondary)" }}>{l}</button>
         ))}
       </div>
 
@@ -204,10 +188,10 @@ export default function Ch4Review({ params = {} }) {
 
       {tab === "mvt" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "#FAEEDA", marginBottom: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "#412402", marginBottom: 6 }}>Mean Value Theorem</div>
-            <M t={"\\text{If } f \\in C[a,b] \\text{ and differentiable on } (a,b) \\Rightarrow \\exists c: f'(c) = \\frac{f(b)-f(a)}{b-a}"} display ready={ready} />
-            <div style={{ fontSize: 13, color: "#633806", lineHeight: 1.7, marginTop: 8 }}>
+          <div style={{ ...card, borderLeft: "3px solid #BA7517", borderRadius: 0, background: "color-mix(in srgb, #BA7517 14%, var(--color-background-secondary))", marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>Mean Value Theorem</div>
+            <M t={"\\text{If } f \\in C[a,b] \\text{ and differentiable on } (a,b) \\Rightarrow \\exists c: f'(c) = \\frac{f(b)-f(a)}{b-a}"} display />
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7, marginTop: 8 }}>
               The instantaneous rate somewhere equals the average rate over the whole interval. Real meaning: if you average 60 mph over a trip, at some exact moment you were going exactly 60 mph.
             </div>
           </div>
@@ -217,9 +201,9 @@ export default function Ch4Review({ params = {} }) {
 
       {tab === "bridge" && (
         <div style={{ animation: "sd .2s ease-out" }}>
-          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "#E1F5EE", marginBottom: 12 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "#085041", marginBottom: 6 }}>Chapter 4 → Chapter 5: The anti-problem</div>
-            <div style={{ fontSize: 13, color: "#0F6E56", lineHeight: 1.7 }}>
+          <div style={{ ...card, borderLeft: "3px solid #1D9E75", borderRadius: 0, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 6 }}>Chapter 4 → Chapter 5: The anti-problem</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
               Chapter 4 used derivatives to understand functions. Chapter 5 asks the reverse: given f′(x), what is f(x)? This is antidifferentiation — and it leads to the integral, the area problem, and the most beautiful theorem in calculus.
             </div>
           </div>
@@ -233,11 +217,11 @@ export default function Ch4Review({ params = {} }) {
             ].map((row, i) => (
               <div key={i} style={{ padding: "8px 0", borderBottom: i < 3 ? "0.5px solid var(--color-border-tertiary)" : "none" }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: "#FCEBEB", color: "#A32D2D", fontWeight: 600, flexShrink: 0, marginTop: 1 }}>Ch 4</span>
+                  <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: "color-mix(in srgb, #A32D2D 14%, var(--color-background-secondary))", color: "#A32D2D", fontWeight: 600, flexShrink: 0, marginTop: 1 }}>Ch 4</span>
                   <span style={{ fontSize: 13 }}>{row.ch4}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 4 }}>
-                  <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: "#E1F5EE", color: "#1D9E75", fontWeight: 600, flexShrink: 0 }}>Ch 5</span>
+                  <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 6, background: "color-mix(in srgb, #1D9E75 14%, var(--color-background-secondary))", color: "#1D9E75", fontWeight: 600, flexShrink: 0 }}>Ch 5</span>
                   <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{row.ch5}</span>
                 </div>
               </div>
