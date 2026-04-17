@@ -293,7 +293,7 @@ function WalkthroughBody({ wt }) {
       {/* Optional viz — rendered once above steps */}
       {wt.svgId && (
         <div className="mb-5 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
-          <VizFrame id={wt.svgId} initialProps={{}} />
+          <VizFrame id={wt.svgId} initialProps={wt.vizProps ?? {}} />
         </div>
       )}
 

@@ -523,7 +523,8 @@ export default {
       id: 'wt-defint-basic-poly',
       title: 'Basic Polynomial',
       prereqs: ['Power Rule antiderivative', 'FTC Part 1'],
-      svgId: 'AreaAccumulator',
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'integral', fn: 'x*x + 2*x', a: 1, b: 3, xMin: 0, xMax: 3.6, label: 'f(x) = x\u00B2 + 2x' },
       problem: 'Evaluate $\\displaystyle\\int_1^3 (x^2 + 2x)\\,dx$.',
       steps: [
         {
@@ -569,7 +570,8 @@ export default {
       id: 'wt-defint-signed-area',
       title: 'Signed Area',
       prereqs: ['Definite integral definition', 'Basic antiderivatives'],
-      svgId: 'SignedArea',
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'signed-area', fn: 'x', a: -1, b: 2, xMin: -1.5, xMax: 2.5, label: 'f(x) = x' },
       problem: 'Evaluate $\\displaystyle\\int_{-1}^{2} x\\,dx$ and interpret both the net signed area and the total (unsigned) area.',
       steps: [
         {
@@ -623,6 +625,8 @@ export default {
       id: 'wt-defint-u-sub',
       title: 'u-Substitution',
       prereqs: ['Indefinite u-substitution', 'Chain rule'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'integral', fn: '2*x*Math.pow(x*x+1,3)', a: 0, b: 2, xMin: -0.2, xMax: 2.3, label: 'f(x) = 2x(x\u00B2+1)\u00B3' },
       problem: 'Evaluate $\\displaystyle\\int_0^2 2x(x^2+1)^3\\,dx$.',
       steps: [
         {
@@ -668,6 +672,8 @@ export default {
       id: 'wt-defint-split-interval',
       title: 'Split Interval',
       prereqs: ['Signed area', 'Piecewise functions'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'split-integral', fn: 'Math.abs(x-1)', a: -2, b: 3, split: 1, xMin: -2.5, xMax: 3.5, label: 'f(x) = |x \u2212 1|' },
       problem: 'Evaluate $\\displaystyle\\int_{-2}^{3}|x-1|\\,dx$.',
       steps: [
         {
@@ -714,6 +720,8 @@ export default {
       id: 'wt-defint-trig',
       title: 'Trig Functions',
       prereqs: ['Trig antiderivatives', 'Special angle values'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'integral', fn: 'Math.sin(x)+Math.cos(x)', a: 0, b: Math.PI/2, xMin: -0.3, xMax: Math.PI/2 + 0.5, label: 'f(x) = sin x + cos x' },
       problem: 'Evaluate $\\displaystyle\\int_0^{\\pi/2}(\\sin x + \\cos x)\\,dx$.',
       steps: [
         {
@@ -751,6 +759,8 @@ export default {
       id: 'wt-defint-avg-value',
       title: 'Average Value',
       prereqs: ['Definite integral', 'FTC'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'integral', fn: 'x*x', a: 1, b: 4, xMin: 0, xMax: 4.6, showAvg: true, avgValue: 7, label: 'f(x) = x\u00B2' },
       problem: 'Find the average value of $f(x) = x^2$ on $[1,4]$.',
       steps: [
         {
@@ -792,7 +802,8 @@ export default {
       id: 'wt-defint-area-between',
       title: 'Area Between Curves',
       prereqs: ['Definite integral', 'Solving equations for intersections'],
-      svgId: 'AreaBetweenCurves',
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'area-between', fn1: 'x+2', fn2: 'x*x', a: -1, b: 2, xMin: -1.6, xMax: 2.6, intersections: [-1, 2], label1: 'f(x) = x+2', label2: 'g(x) = x\u00B2' },
       problem: 'Find the area enclosed between $f(x) = x+2$ and $g(x) = x^2$ from their intersection points.',
       steps: [
         {
@@ -837,7 +848,8 @@ export default {
       id: 'wt-defint-ftc2',
       title: 'FTC Part 2',
       prereqs: ['FTC Part 1', 'Chain rule'],
-      svgId: 'FTCGeometricProof',
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'integral', fn: 'Math.sqrt(x*x*x+1)', a: 1, b: 4, xMin: 0, xMax: 4.5, label: 'f(t) = \u221a(t\u00B3+1)' },
       problem: 'Find $\\dfrac{d}{dx}\\displaystyle\\int_1^{x^2} \\sqrt{t^3+1}\\,dt$.',
       steps: [
         {
@@ -883,7 +895,8 @@ export default {
       id: 'wt-defint-comparison',
       title: 'Comparing Integrals',
       prereqs: ['Definite integral definition', 'Comparison property'],
-      svgId: 'AreaBetweenCurves',
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'comparison', fn1: 'Math.sqrt(1+x*x)', fn2: 'Math.sqrt(1+x)', a: 0, b: 1, xMin: -0.15, xMax: 1.3, label1: 'f(x) = \u221a(1+x\u00B2)', label2: 'g(x) = \u221a(1+x)' },
       problem: 'Compare $f(x) = \\sqrt{1+x^2}$ and $g(x) = \\sqrt{1+x}$ over the interval $[0,1]$. Which integral is larger?',
       steps: [
         {

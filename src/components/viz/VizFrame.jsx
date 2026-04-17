@@ -133,6 +133,7 @@ const VIZ_REGISTRY = {
   // Chapter 2 — Derivatives additions
   DerivativeBuilder: lazy(() => import("./d3/DerivativeBuilder.jsx")),
   // Chapter 4 — Integration
+  WalkthroughViz: lazy(() => import("./d3/WalkthroughViz.jsx")),
   AreaAccumulator: lazy(() => import("./d3/AreaAccumulator.jsx")),
   FTCLink: lazy(() => import("./d3/FTCLink.jsx")),
   WaterTank: lazy(() => import("./d3/WaterTank.jsx")),
