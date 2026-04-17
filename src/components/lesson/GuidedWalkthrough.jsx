@@ -78,6 +78,39 @@
  *   }
  *
  *
+ * EXPLANATION PROSE — THE INNER MONOLOGUE RULE
+ * ──────────────────────────────────────────────
+ * The `explanation` field is the teacher's inner monologue spoken aloud.
+ * It must do all three of the following, in order:
+ *
+ *   1. START WITH OBSERVATION — what do you see or notice before computing?
+ *      "Look at the graph before touching any algebra."
+ *      "At first glance this looks harder than it is."
+ *      "Notice that $2x$ is sitting right beside $(x^2+1)^3$ — that is not a
+ *      coincidence."
+ *
+ *   2. NARRATE THE SURPRISE OR NON-OBVIOUS THING — the moment a student
+ *      would stop and think "wait, why?". Surface it explicitly rather than
+ *      silently skipping it.
+ *      "Here is the surprise hidden in the answer $\\frac{3}{2}$: that is not
+ *      the geometric area — it is the algebraic balance after cancellation."
+ *      "The global graph and the local $[0,1]$ picture tell opposite stories."
+ *
+ *   3. CONNECT THE VISUAL TO THE ALGEBRAIC MOVE — why does the picture
+ *      justify this specific step?
+ *      "Both regions are triangles — we can verify the integral geometrically."
+ *      "The strip height is $f(x) - g(x)$ — that expression stays positive
+ *      throughout $[-1,2]$, confirming we never need to split."
+ *
+ * What to avoid:
+ *   ✗  "Apply the power rule."                    ← instruction, not narration
+ *   ✗  "Substitute $x=3$ and $x=1$ and subtract." ← mechanical, no inner life
+ *   ✗  "The antiderivative of $x$ is $x^2/2$."    ← table lookup, not thought
+ *
+ * The test: could this explanation be the voiceover for someone watching a
+ * worked solution video? If yes, it is rich enough.
+ *
+ *
  * DISPLAY RULES
  * ─────────────
  * • All steps are visible at once — scroll straight through like a book.
