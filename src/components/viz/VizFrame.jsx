@@ -343,6 +343,10 @@ const VIZ_REGISTRY = {
   MasterLimitGraph: lazy(() => import("./react/MasterLimitGraph.jsx")),
   // Sigma / summation tools
   SigmaEvaluator: lazy(() => import("./react/SigmaEvaluator.jsx")),
+  GaussSumProof: lazy(() => import("./react/GaussSumProof.jsx")),
+  RiemannSumFromSigma: lazy(() => import("./react/RiemannSumFromSigma.jsx")),
+  SequenceExplorer: lazy(() => import("./react/SequenceExplorer.jsx")),
+  SeriesPartialSums: lazy(() => import("./react/SeriesPartialSums.jsx")),
   // Chapter 5 — New additions
   BisectionMethod: lazy(() => import("./d3/BisectionMethod.jsx")),
   ShellMethod: lazy(() => import("./d3/ShellMethod.jsx")),

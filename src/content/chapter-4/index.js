@@ -1,5 +1,6 @@
 import antiderivatives from './00-antiderivatives.js'
 import areaAccumulation from './00-area-accumulation.js'
+import summationNotation from './00c-summation-notation.js'
 import riemannSums from './01-riemann-sums.js'
 import definiteIntegral from './02-definite-integral.js'
 import fundamentalTheorem from './03-fundamental-theorem.js'
@@ -30,6 +31,7 @@ export default {
   lessons: [
     antiderivatives,
     areaAccumulation,
+    summationNotation,
     riemannSums,
     definiteIntegral,
     fundamentalTheorem,
