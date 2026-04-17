@@ -5,6 +5,7 @@ import { useProgress } from '../hooks/useProgress.js'
 import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
 import CrossRef from '../components/lesson/CrossRef.jsx'
 import VizFrame from '../components/viz/VizFrame.jsx'
+import MarkdownProse from '../components/math/MarkdownProse.jsx'
 import { parseProse } from '../components/math/parseProse.jsx'
 import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLessonEnhancer.js'
 import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
@@ -123,7 +124,7 @@ export default function LessonPage() {
             )
           })()}
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{lesson.title}</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-sky-100 mb-2">{lesson.title}</h1>
         {lesson.subtitle && (
           <p className="text-lg text-slate-500 dark:text-slate-400 italic">{lesson.subtitle}</p>
         )}
@@ -138,8 +139,10 @@ export default function LessonPage() {
       {lesson.hook && (
         <section className="mb-10 bg-gradient-to-br from-brand-50 to-slate-50 dark:from-brand-950/30 dark:to-slate-900/30 rounded-2xl p-6 border border-brand-100 dark:border-brand-900/30">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-500 dark:text-brand-400 mb-2">Why This Matters</p>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-3 leading-relaxed">{parseProse(lesson.hook.question)}</h2>
-          <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{parseProse(lesson.hook.realWorldContext)}</p>
+          <div className="mb-3">
+            <MarkdownProse text={lesson.hook.question} className="[&_p]:text-[16px] [&_p]:font-semibold [&_p]:text-slate-800 [&_p]:dark:text-sky-100 [&_p]:leading-7" />
+          </div>
+          <MarkdownProse text={lesson.hook.realWorldContext} />
           {lesson.hook.visualizations?.length > 0 ? (
             lesson.hook.visualizations.map((viz, i) => (
               <div key={i} className="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">

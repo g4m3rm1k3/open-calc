@@ -2,11 +2,33 @@ import React, { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import StepThrough from './StepThrough.jsx'
+import MarkdownProse from '../math/MarkdownProse.jsx'
 export { parseProse } from '../math/parseProse.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 
-function ProseParagraph({ text }) {
-  return <p className="mb-4 leading-relaxed last:mb-0">{parseProse(text)}</p>
+// Matches prose items that open with a **bold label** (used as a section sub-heading).
+// e.g. "**What is a sequence?** A sequence is …"
+const HEADING_PREFIX = /^\*\*([^*\n]+)\*\*\s*/
+
+function ProseParagraph({ text, isFirst }) {
+  const match = text.match(HEADING_PREFIX)
+  if (match) {
+    const heading = match[1]
+    const body = text.slice(match[0].length).trim()
+    return (
+      <div className={`${isFirst ? '' : 'pt-6 border-t border-slate-100 dark:border-slate-800'} pb-2 last:pb-0`}>
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-brand-600 dark:text-sky-400 mb-2">
+          {heading}
+        </p>
+        {body && <MarkdownProse text={body} />}
+      </div>
+    )
+  }
+  return (
+    <div className={`${isFirst ? '' : 'pt-5 border-t border-slate-100 dark:border-slate-800'} last:pb-0`}>
+      <MarkdownProse text={text} />
+    </div>
+  )
 }
 
 function normalizeProseParagraphs(paragraphs = []) {
@@ -46,7 +68,7 @@ function SectionContent({ data }) {
         if (block.type === 'prose') {
           return (
             <div key={i} className="prose-content text-slate-700 dark:text-slate-300">
-              {block.paragraphs.map((p, j) => <ProseParagraph key={j} text={p} />)}
+              {block.paragraphs.map((p, j) => <ProseParagraph key={j} text={p} isFirst={j === 0} />)}
             </div>
           )
         }
@@ -114,7 +136,7 @@ export default function IntegratedLesson({ lesson }) {
         
         {/* Intuition Block */}
         <div className="bg-surface rounded-xl p-6 border border-border shadow-sm">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-sky-100">
             <span>🧠</span> Concept Intuition
           </h2>
           <SectionContent data={lesson.intuition} />

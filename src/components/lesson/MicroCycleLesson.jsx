@@ -193,8 +193,8 @@ function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slat
         {noteId && <StickyNote noteId={noteId} />}
       </div>
       {viz.mathBridge && (
-        <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50">
-          <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">{parseProse(viz.mathBridge)}</p>
+        <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
+          <MarkdownProse text={viz.mathBridge} />
         </div>
       )}
       <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
