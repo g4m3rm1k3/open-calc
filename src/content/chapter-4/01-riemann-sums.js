@@ -66,10 +66,15 @@ export default {
       },
     ],
     visualizations: [
-                                                                {
+      {
         id: 'RiemannSum',
         title: 'Left, Right, and Midpoint Riemann Sums',
         caption: 'Drag the slider to increase n, the number of rectangles. Observe how the left sum (red, underestimating), right sum (blue, overestimating), and midpoint sum (green, most accurate) all converge to the true area as n → ∞. Toggle between sum types to compare their accuracy.',
+      },
+      {
+        id: 'RiemannSumFromSigma',
+        title: 'The Canonical Algorithm: "Infinite Accumulation"',
+        caption: 'A step-by-step masterclass revealing the logic behind the Riemann Sum algorithm, translating the abstract Σ and lim symbols into physical shop-floor intuition: breaking apart resolution, probes, slices, and infinite accumulation.',
       },
     ],
   },

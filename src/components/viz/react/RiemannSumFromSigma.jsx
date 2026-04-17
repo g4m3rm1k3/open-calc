@@ -1,365 +1,394 @@
-import { useState, useMemo } from 'react';
-import KatexBlock from '../../math/KatexBlock.jsx';
-import KatexInline from '../../math/KatexInline.jsx';
+import { useState, useRef, useEffect } from 'react'
 
-// ─── Riemann Sum Builder ──────────────────────────────────────────────────────
-// Teaches how sigma notation becomes a Riemann sum, step by step.
-// No prerequisites assumed. Every symbol is explained before it is used.
-
-const FUNCTIONS = [
-  { label: 'x²',    fn: x => x * x,            tex: 'x^2',           color: '#a78bfa' },
-  { label: 'x',     fn: x => x,                 tex: 'x',             color: '#38bdf8' },
-  { label: '2x+1',  fn: x => 2 * x + 1,         tex: '2x+1',          color: '#34d399' },
-  { label: 'x³/4',  fn: x => x * x * x / 4,     tex: 'x^3/4',         color: '#fb923c' },
-];
-
-const PHASES = [
-  { id: 'setup',      label: 'Pick a function',  color: 'violet' },
-  { id: 'deltax',     label: 'Δx — slice width', color: 'sky'    },
-  { id: 'endpoints',  label: 'Right endpoints',  color: 'amber'  },
-  { id: 'rectangles', label: 'Rectangle areas',  color: 'emerald'},
-  { id: 'sigma',      label: 'Sigma sum',         color: 'rose'   },
-  { id: 'limit',      label: 'Take n → ∞',        color: 'teal'   },
-];
-
-const COLOR = {
-  violet: { bg: 'bg-violet-950/60', border: 'border-violet-600', text: 'text-violet-300', btn: 'bg-violet-600 hover:bg-violet-500' },
-  sky:    { bg: 'bg-sky-950/60',    border: 'border-sky-600',    text: 'text-sky-300',    btn: 'bg-sky-600 hover:bg-sky-500'    },
-  amber:  { bg: 'bg-amber-950/60',  border: 'border-amber-600',  text: 'text-amber-300',  btn: 'bg-amber-600 hover:bg-amber-500' },
-  emerald:{ bg: 'bg-emerald-950/60',border: 'border-emerald-600',text: 'text-emerald-300',btn: 'bg-emerald-600 hover:bg-emerald-500' },
-  rose:   { bg: 'bg-rose-950/60',   border: 'border-rose-600',   text: 'text-rose-300',   btn: 'bg-rose-600 hover:bg-rose-500'   },
-  teal:   { bg: 'bg-teal-950/60',   border: 'border-teal-600',   text: 'text-teal-300',   btn: 'bg-teal-600 hover:bg-teal-500'   },
-};
-
-// ─── SVG graph with rectangles ────────────────────────────────────────────────
-function Graph({ fn, a, b, n, phase, fColor }) {
-  const W = 300, H = 180, PAD = 28;
-  const innerW = W - PAD * 2;
-  const innerH = H - PAD * 2;
-
-  // scale helpers
-  const xs = x => PAD + ((x - a) / (b - a)) * innerW;
-  const maxY = useMemo(() => {
-    let m = 0.1;
-    for (let i = 0; i <= 100; i++) m = Math.max(m, fn(a + (b - a) * i / 100));
-    return m * 1.1;
-  }, [fn, a, b]);
-  const ys = y => PAD + innerH - (y / maxY) * innerH;
-
-  const dx = (b - a) / n;
-  const rects = useMemo(() => Array.from({ length: n }, (_, i) => {
-    const xi = a + (i + 1) * dx; // right endpoint
-    return { x1: a + i * dx, x2: xi, h: fn(xi) };
-  }), [fn, a, b, n, dx]);
-
-  // curve path
-  const curvePts = Array.from({ length: 200 }, (_, i) => {
-    const x = a + (b - a) * i / 199;
-    return `${xs(x)},${ys(fn(x))}`;
-  }).join(' ');
-
-  const showRects = ['rectangles', 'sigma', 'limit'].includes(phase);
-  const showEndpoints = ['endpoints', 'rectangles', 'sigma', 'limit'].includes(phase);
-  const showSlices = ['deltax', 'endpoints', 'rectangles', 'sigma', 'limit'].includes(phase);
-
-  return (
-    <svg width={W} height={H} className="w-full rounded-lg bg-slate-950 border border-slate-700">
-      {/* axes */}
-      <line x1={PAD} y1={H - PAD} x2={W - PAD + 4} y2={H - PAD} stroke="#475569" strokeWidth={1.5} />
-      <line x1={PAD} y1={PAD - 4} x2={PAD} y2={H - PAD} stroke="#475569" strokeWidth={1.5} />
-      <text x={W - PAD + 6} y={H - PAD + 4} fill="#64748b" fontSize={10}>x</text>
-      <text x={PAD - 4} y={PAD - 6} fill="#64748b" fontSize={10}>y</text>
-
-      {/* a and b labels */}
-      <text x={xs(a)} y={H - PAD + 14} fill="#94a3b8" fontSize={9} textAnchor="middle">a={a}</text>
-      <text x={xs(b)} y={H - PAD + 14} fill="#94a3b8" fontSize={9} textAnchor="middle">b={b}</text>
-
-      {/* vertical slice lines */}
-      {showSlices && Array.from({ length: n + 1 }, (_, i) => {
-        const x = a + i * dx;
-        return (
-          <line key={i} x1={xs(x)} y1={H - PAD} x2={xs(x)} y2={PAD}
-            stroke="#334155" strokeWidth={1} strokeDasharray="3,3" />
-        );
-      })}
-
-      {/* Δx brace on first slice (only in deltax phase) */}
-      {phase === 'deltax' && (
-        <>
-          <line x1={xs(a)} y1={H - PAD + 10} x2={xs(a + dx)} y2={H - PAD + 10} stroke="#38bdf8" strokeWidth={2} />
-          <line x1={xs(a)} y1={H - PAD + 7} x2={xs(a)} y2={H - PAD + 13} stroke="#38bdf8" strokeWidth={2} />
-          <line x1={xs(a + dx)} y1={H - PAD + 7} x2={xs(a + dx)} y2={H - PAD + 13} stroke="#38bdf8" strokeWidth={2} />
-          <text x={(xs(a) + xs(a + dx)) / 2} y={H - PAD + 22} fill="#38bdf8" fontSize={9} textAnchor="middle">Δx</text>
-        </>
-      )}
-
-      {/* rectangles */}
-      {showRects && rects.map((r, i) => (
-        <rect
-          key={i}
-          x={xs(r.x1) + 0.5}
-          y={ys(r.h)}
-          width={Math.max(1, xs(r.x2) - xs(r.x1) - 1)}
-          height={Math.max(0, H - PAD - ys(r.h))}
-          fill={fColor}
-          fillOpacity={0.25}
-          stroke={fColor}
-          strokeOpacity={0.7}
-          strokeWidth={1}
-        />
-      ))}
-
-      {/* right endpoint dots */}
-      {showEndpoints && rects.map((r, i) => (
-        <circle key={i} cx={xs(r.x2)} cy={ys(r.h)} r={3} fill={fColor} />
-      ))}
-
-      {/* function curve — drawn last so it's on top */}
-      <polyline points={curvePts} fill="none" stroke={fColor} strokeWidth={2} />
-
-      {/* curve label */}
-      <text x={xs(b) - 2} y={ys(fn(b)) - 6} fill={fColor} fontSize={10} textAnchor="end">y = f(x)</text>
-    </svg>
-  );
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const C = {
+  bg:        '#0f172a',
+  surface:   '#1e293b',
+  border:    '#334155',
+  axis:      '#475569',
+  grid:      '#152033',
+  text:      '#e2e8f0',
+  muted:     '#94a3b8',
+  faint:     '#475569',
+  cyan:      '#22d3ee',
+  emerald:   '#4ade80',
+  rose:      '#fb7185',
+  gold:      '#fbbf24',
+  violet:    '#a78bfa',
+  rectFill:  'rgba(34,211,238,0.2)',
+  rectStroke: 'rgba(34,211,238,0.8)',
 }
 
-export default function RiemannSumFromSigma() {
-  const [phase, setPhase]   = useState(0);
-  const [fIdx, setFIdx]     = useState(0);
-  const [n, setN]           = useState(4);
-  const [a]                 = useState(0);
-  const [b]                 = useState(2);
+// ─── Glossary Tooltips ────────────────────────────────────────────────────────
+const GLOSSARY = {
+  "Δx": { math: "Width / Resolution", human: "How coarse or fine your slices are." },
+  "x_i": { math: "Iterator Position", human: "The exact x-coordinate where you take a measurement." },
+  "f(x_i)": { math: "Probe Depth", human: "The height of the part at the probe location." },
+  "Σ": { math: "Summation Loop", human: "Execute a for-loop accumulating all individual units." },
+}
 
-  const f     = FUNCTIONS[fIdx];
-  const dx    = (b - a) / n;
-  const phaseId    = PHASES[phase].id;
-  const phaseColor = PHASES[phase].color;
-  const c     = COLOR[phaseColor];
+function Tip({ term, children }) {
+  const [open, setOpen] = useState(false)
+  const entry = GLOSSARY[term]
+  if (!entry) return <span>{children}</span>
+  return (
+    <span style={{ position: 'relative', display: 'inline' }}>
+      <span
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        tabIndex={0}
+        style={{ borderBottom: `1px dashed ${C.gold}`, cursor: 'help', color: C.gold, fontWeight: 600 }}
+      >
+        {children}
+      </span>
+      {open && (
+        <div style={{
+          position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+          marginBottom: 6, background: '#1e293b', border: `1px solid ${C.gold}`, borderRadius: 8,
+          padding: '8px 12px', width: 240, zIndex: 100, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', pointerEvents: 'none',
+        }}>
+          <div style={{ fontSize: 11, color: C.gold, fontWeight: 700, marginBottom: 4 }}>{entry.math}</div>
+          <div style={{ fontSize: 11, color: C.muted }}>{entry.human}</div>
+        </div>
+      )}
+    </span>
+  )
+}
 
-  const rects = useMemo(() =>
-    Array.from({ length: n }, (_, i) => {
-      const xi = a + (i + 1) * dx;
-      return { i: i + 1, xi: +xi.toFixed(4), height: +f.fn(xi).toFixed(4), area: +(f.fn(xi) * dx).toFixed(4) };
-    }), [f, a, b, n, dx]);
-
-  const Rn = rects.reduce((s, r) => s + r.area, 0);
-
-  // Compute higher-n approximation for limit phase
-  const bigN = 1000;
-  const bigDx = (b - a) / bigN;
-  const bigRn = Array.from({ length: bigN }, (_, i) => f.fn(a + (i + 1) * bigDx) * bigDx).reduce((s, v) => s + v, 0);
+// ─── Step Card ────────────────────────────────────────────────────────────────
+function StepCard({ step: s, isLatest, stepNumber }) {
+  const stageColors = [C.emerald, C.cyan, C.gold, C.rose, C.violet, C.emerald]
+  const color = stageColors[s.stage] ?? C.muted
 
   return (
-    <div className="w-full bg-slate-900 rounded-xl border border-slate-700 shadow-lg p-5 space-y-5 select-none">
-
-      {/* header */}
-      <div className="text-center">
-        <h3 className="text-white font-bold text-xl mb-1 mt-0">Building a Riemann Sum from Sigma Notation</h3>
-        <p className="text-slate-400 text-sm">Every symbol explained from scratch — no prior knowledge needed.</p>
+    <div style={{
+      borderLeft: `3px solid ${isLatest ? color : C.border}`,
+      borderRadius: '0 8px 8px 0',
+      background: isLatest ? `${color}08` : 'transparent',
+      padding: '12px 14px',
+      transition: 'all 0.3s',
+      opacity: isLatest ? 1 : 0.65,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color, background: `${color}20`, padding: '2px 8px', borderRadius: 4 }}>
+          STEP {stepNumber}
+        </span>
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 8 }}>
+        {s.title}
+      </div>
+      
+      <div style={{ fontSize: 13, color: C.muted, margin: '0 0 10px 0', lineHeight: 1.5 }}>
+        {s.description}
       </div>
 
-      {/* controls */}
-      <div className="flex flex-wrap gap-4 items-center justify-center">
-        <div className="flex gap-2">
-          {FUNCTIONS.map((fn, i) => (
-            <button
-              key={i}
-              onClick={() => setFIdx(i)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
-                fIdx === i ? 'text-white border-transparent' : 'border-slate-600 text-slate-400 hover:text-white'
-              }`}
-              style={fIdx === i ? { background: fn.color, borderColor: fn.color } : {}}
-            >
-              {fn.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-slate-400 text-sm">n =</span>
-          <input
-            type="range" min={1} max={16} value={n}
-            onChange={e => setN(+e.target.value)}
-            className="w-32 accent-violet-500"
-          />
-          <span className="text-white font-bold w-4">{n}</span>
-        </div>
-      </div>
+      <pre style={{
+        background: C.grid, border: `1px solid ${C.border}`, borderRadius: 6, padding: '8px 10px',
+        fontSize: 14, color: C.text, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: 'monospace',
+      }}>
+        {s.math}
+      </pre>
 
-      {/* graph */}
-      <Graph fn={f.fn} a={a} b={b} n={n} phase={phaseId} fColor={f.color} />
-
-      {/* phase progress */}
-      <div className="flex gap-1">
-        {PHASES.map((p, i) => {
-          const cc = COLOR[p.color];
-          const done = i <= phase;
-          return (
-            <button
-              key={p.id}
-              onClick={() => setPhase(i)}
-              className={`flex-1 py-1.5 rounded text-[10px] font-bold uppercase tracking-wide transition-all ${
-                done ? `${cc.btn} text-white` : 'bg-slate-800 text-slate-500'
-              }`}
-            >
-              {i + 1}
-            </button>
-          );
-        })}
-      </div>
-      <p className="text-center text-xs text-slate-500">
-        Step {phase + 1}/{PHASES.length} — <span className={c.text}>{PHASES[phase].label}</span>
-      </p>
-
-      {/* ── phase content ────────────────────────────────────────────────── */}
-      <div className={`rounded-xl border ${c.border} ${c.bg} p-4 space-y-3 min-h-[140px]`}>
-
-        {phaseId === 'setup' && (
-          <>
-            <p className="text-white font-bold text-base">We want the area under <KatexInline expr={`f(x) = ${f.tex}`} /> from <KatexInline expr={`x = ${a}`} /> to <KatexInline expr={`x = ${b}`} />.</p>
-            <p className="text-slate-300 text-sm">
-              The curve is not a straight line — geometry has no formula for this shape. Our strategy: fill the area with <strong className="text-white">{n} thin rectangles</strong> and add their areas.
-            </p>
-            <p className="text-slate-300 text-sm">
-              Choose different functions above with the buttons. Change <strong className="text-white">n</strong> with the slider to see more or fewer rectangles appear in the graph as you progress.
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`\\text{Goal: find } \\int_{${a}}^{${b}} ${f.tex}\\,dx`} />
-            </div>
-          </>
-        )}
-
-        {phaseId === 'deltax' && (
-          <>
-            <p className="text-white font-bold">Δx — the width of each rectangle</p>
-            <p className="text-slate-300 text-sm">
-              We cut the interval <KatexInline expr={`[${a}, ${b}]`} /> into <KatexInline expr={`n = ${n}`} /> equal pieces. Each piece has width:
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`\\Delta x = \\frac{b - a}{n} = \\frac{${b} - ${a}}{${n}} = \\frac{${b-a}}{${n}} = ${dx.toFixed(4)}`} />
-            </div>
-            <p className="text-slate-300 text-sm">
-              The graph shows the <span style={{ color: '#38bdf8' }} className="font-bold">Δx brace</span> on the first slice. Every rectangle has this same width.
-            </p>
-          </>
-        )}
-
-        {phaseId === 'endpoints' && (
-          <>
-            <p className="text-white font-bold">Right endpoints — the height of each rectangle</p>
-            <p className="text-slate-300 text-sm">
-              For the <em>right</em>-endpoint rule, the height of rectangle <KatexInline expr="i" /> is the function value at the right edge of that slice:
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`x_i = a + i \\cdot \\Delta x = ${a} + i \\cdot ${dx.toFixed(3)}`} />
-            </div>
-            <div className="overflow-x-auto max-h-32 overflow-y-auto space-y-1 mt-2">
-              {rects.map(r => (
-                <div key={r.i} className="flex items-center gap-3 text-xs font-mono text-slate-300">
-                  <span className="w-12 text-right" style={{ color: f.color }}>i = {r.i}</span>
-                  <span>x_{r.i} = {r.xi}</span>
-                  <span>→ f({r.xi}) = <strong className="text-white">{r.height}</strong></span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {phaseId === 'rectangles' && (
-          <>
-            <p className="text-white font-bold">Rectangle area = height × width</p>
-            <p className="text-slate-300 text-sm">
-              Each rectangle has height <KatexInline expr="f(x_i)" /> and width <KatexInline expr="\Delta x" />:
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`A_i = f(x_i) \\cdot \\Delta x`} />
-            </div>
-            <div className="overflow-x-auto max-h-32 overflow-y-auto space-y-1 mt-2">
-              {rects.map(r => (
-                <div key={r.i} className="flex items-center gap-3 text-xs font-mono text-slate-300">
-                  <span className="w-12 text-right" style={{ color: f.color }}>i = {r.i}</span>
-                  <span>{r.height} × {dx.toFixed(3)} = <strong className="text-white">{r.area}</strong></span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {phaseId === 'sigma' && (
-          <>
-            <p className="text-white font-bold">The Riemann sum — sigma notation</p>
-            <p className="text-slate-300 text-sm">
-              Add up all <KatexInline expr="n" /> rectangle areas using sigma notation:
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`R_n = \\sum_{i=1}^{${n}} f(x_i)\\,\\Delta x = \\sum_{i=1}^{${n}} f\\!\\left(${a} + i \\cdot \\frac{${b-a}}{${n}}\\right) \\cdot \\frac{${b-a}}{${n}}`} />
-            </div>
-            <p className="text-slate-300 text-sm">Term by term:</p>
-            <div className="text-xs font-mono text-slate-400 flex flex-wrap gap-1">
-              {rects.map((r, i) => (
-                <span key={i}>
-                  <span style={{ color: f.color }}>{r.area}</span>
-                  {i < rects.length - 1 ? <span className="text-slate-600"> + </span> : ''}
-                </span>
-              ))}
-              <span className="text-white font-bold"> = {Rn.toFixed(4)}</span>
-            </div>
-          </>
-        )}
-
-        {phaseId === 'limit' && (
-          <>
-            <p className="text-white font-bold">As n → ∞, the approximation becomes exact</p>
-            <p className="text-slate-300 text-sm">
-              With more rectangles, each slice is thinner and the sum gets closer to the true area. The definite integral is this limit:
-            </p>
-            <div className="overflow-x-auto">
-              <KatexBlock expr={`\\int_{${a}}^{${b}} ${f.tex}\\,dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(x_i)\\,\\Delta x`} />
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-3 text-center text-xs">
-              {[4, 20, 1000].map(k => {
-                const kDx = (b - a) / k;
-                const kRn = Array.from({ length: k }, (_, i) => f.fn(a + (i + 1) * kDx) * kDx).reduce((s, v) => s + v, 0);
-                return (
-                  <div key={k} className={`rounded-lg border ${c.border} p-2`}>
-                    <p className="text-slate-400">n = {k}</p>
-                    <p className={`font-bold ${c.text} text-base`}>{kRn.toFixed(4)}</p>
-                  </div>
-                );
-              })}
-            </div>
-            <p className={`text-sm font-semibold ${c.text} text-center mt-2`}>
-              Drag the slider to n = 16 in the graph and watch the rectangles fill the area tightly.
-            </p>
-          </>
-        )}
-
-      </div>
-
-      {/* nav */}
-      <div className="flex gap-3">
-        <button
-          disabled={phase === 0}
-          onClick={() => setPhase(p => p - 1)}
-          className="flex-1 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold disabled:opacity-30 transition-colors"
-        >
-          ← Back
-        </button>
-        <button
-          disabled={phase === PHASES.length - 1}
-          onClick={() => setPhase(p => p + 1)}
-          className={`flex-1 py-2 rounded-lg text-white font-semibold disabled:opacity-30 transition-colors ${c.btn}`}
-        >
-          Next →
-        </button>
-      </div>
-
-      {phase === PHASES.length - 1 && (
-        <div className="text-center">
-          <button onClick={() => setPhase(0)} className="text-xs text-slate-500 hover:text-slate-300 underline">
-            Restart
-          </button>
+      {/* Why it matters / Physical Intuition */}
+      {isLatest && s.human && (
+        <div style={{
+          background: 'rgba(251,191,36,0.06)',
+          border: `1px solid ${C.gold}22`,
+          borderRadius: 6,
+          padding: '7px 10px',
+          marginTop: 8,
+          display: 'flex',
+          gap: 8,
+          alignItems: 'flex-start',
+        }}>
+          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>🔧</span>
+          <div style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+            <span style={{ color: C.gold, fontWeight: 700 }}>Shop Floor Logic: </span>
+            {s.human}
+          </div>
         </div>
       )}
     </div>
-  );
+  )
+}
+
+const STEPS = [
+  {
+    stage: 0,
+    title: 'The Resolution (Width)',
+    description: 'You decide how "granular" your measurement is. Take your total distance (b - a) and divide it by n slices.',
+    math: "Δx = (b - a) / n",
+    human: 'Think of this like setting the step-over size on a milling tool path. Coarse step-over = wide slices. Fine step-over = thin slices.',
+    n: 4,
+    focus: 'width'
+  },
+  {
+    stage: 1,
+    title: 'The Probe Position (Iterator)',
+    description: 'You need to know where the "probe" is touching the part for each slice. Start at the beginning (a) and take i steps of your width.',
+    math: "x_i = a + i(Δx)",
+    human: 'If you are probing a part, you don\'t probe randomly. You zero at "a" and step over by your set resolution "i" times to take your i-th measurement.',
+    n: 4,
+    focus: 'x_i'
+  },
+  {
+    stage: 2,
+    title: 'The Measurement (Height)',
+    description: 'You plug that position into your function to see how "tall" the part is at that exact spot.',
+    math: "Height = f(x_i) = f(a + iΔx)",
+    human: 'The function is literally just your digital indicator showing the depth or height at that exact x_i coordinate.',
+    n: 4,
+    focus: 'height'
+  },
+  {
+    stage: 3,
+    title: 'The Individual Slice (Area of one unit)',
+    description: 'You multiply the height you just found by the width of the slice. This is the area of a single thin rectangle.',
+    math: "Area_i = f(x_i) · Δx",
+    human: 'You just calculated a single chunk of material. You assumed the height stayed flat for that small step-over width. It\'s an approximation.',
+    n: 4,
+    focus: 'slice'
+  },
+  {
+    stage: 4,
+    title: 'The Loop (Summation)',
+    description: 'You "add them all up" from the 1st slice to the n-th slice. This is where you use the Big Swap formulas to turn the "for loop" into algebra.',
+    math: "Sum = Σ (from i=1 to n) [ f(x_i) · Δx ]",
+    human: 'In a program, this is just a For-Loop adding to a total counter. In math, Sigma is the loop. It means "run through every single slice and tally the area."',
+    n: 16,
+    focus: 'sum'
+  },
+  {
+    stage: 5,
+    title: 'The Perfect Finish (The Limit)',
+    description: 'You see what happens to that total sum as the number of slices (n) goes to Infinity.',
+    math: "Area = lim(n→∞) Σ [ f(x_i) · Δx ]\n     = ∫(a to b) f(x) dx",
+    human: 'The "gaps" or "steps" in your approximation disappear. Like filing away the ridges left by a coarse tool path until you have a perfectly smooth, exact surface. The Summation becomes a solid Integral.',
+    n: 120,
+    focus: 'limit'
+  }
+]
+
+export default function RiemannSumFromSigma() {
+  const [stepIdx, setStepIdx] = useState(0)
+  const containerRef = useRef(null)
+  const [width, setWidth] = useState(600)
+
+  useEffect(() => {
+    const ro = new ResizeObserver(e => setWidth(e[0].contentRect.width))
+    if (containerRef.current) ro.observe(containerRef.current)
+    return () => ro.disconnect()
+  }, [])
+
+  const currentStep = STEPS[stepIdx]
+  const { n, focus } = currentStep
+
+  // SVG Layout
+  const W = Math.max(width, 300)
+  const H = Math.round(W * 0.45)
+  const PAD = { l: 40, r: 30, t: 40, b: 30 }
+  const pw = W - PAD.l - PAD.r
+  const ph = H - PAD.t - PAD.b
+
+  // Coordinate mapping
+  // Let the interval be [1, 5], mapped to pw. Curve is generic.
+  const a = 1
+  const b = 5
+  const domainW = b - a
+
+  const xs = x => PAD.l + ((x - a) / domainW) * pw
+  
+  // Generic smooth curve y = f(x). Say it starts low, goes up, then a bit down.
+  // We'll define a simple function in math-space: f(x) = sin(x/1.5) * 2 + 3
+  const f = (x) => Math.sin(x / 1.5) * 2 + 3
+  
+  // y domain roughly [0, 6]
+  const yDomainTop = 6
+  const ys = y => PAD.t + ph - (y / yDomainTop) * ph
+
+  // Elements to draw
+  const dxAmount = domainW / n
+  
+  // Specifically pick out the 3rd slice for highlighting the "probe" (i=3) for early steps
+  const targetI = 3
+  const targetX = a + targetI * dxAmount
+  const prevX = a + (targetI - 1) * dxAmount
+  const hDist = f(targetX)
+
+  const rects = []
+  for (let i = 1; i <= n; i++) {
+    const xEdge = a + i * dxAmount
+    const xPrev = a + (i-1) * dxAmount
+    const h = f(xEdge)
+    
+    // Determine style based on focus
+    let isHighlighted = false
+    let isFaded = false
+    
+    if (focus === 'width' || focus === 'x_i' || focus === 'height' || focus === 'slice') {
+       if (i === targetI) isHighlighted = true
+       else isFaded = true
+    }
+
+    rects.push({
+      i,
+      x1: xs(xPrev),
+      x2: xs(xEdge),
+      y1: ys(h),
+      y2: ys(0),
+      isHighlighted,
+      isFaded
+    })
+  }
+
+  // Curve
+  let dCurve = `M ${xs(a)} ${ys(f(a))}`
+  for(let x=a; x<=b; x+=0.05) {
+    dCurve += ` L ${xs(x)} ${ys(f(x))}`
+  }
+
+  return (
+    <div ref={containerRef} style={{ background: C.bg, borderRadius: 14, border: `1px solid ${C.border}`, overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      {/* Header */}
+      <div style={{ padding: '12px 16px 10px', borderBottom: `1px solid ${C.border}` }}>
+         <span style={{ color: C.cyan, fontWeight: 700, fontSize: 12, letterSpacing: 1 }}>
+              THE CANONICAL ALGORITHM: "INFINITE ACCUMULATION"
+         </span>
+      </div>
+
+      {/* SVG Graph */}
+      <div style={{ position: 'relative' }}>
+         <svg width={W} height={H} style={{ display: 'block' }}>
+            <rect width={W} height={H} fill={C.bg} />
+            <rect x={PAD.l} y={PAD.t} width={pw} height={ph} fill={C.surface} rx={3} />
+
+            {/* Axes */}
+            <line x1={PAD.l} y1={ys(0)} x2={W-PAD.r+20} y2={ys(0)} stroke={C.axis} strokeWidth={1.5} />
+            
+            {/* a and b markers */}
+            <line x1={xs(a)} y1={ys(0)} x2={xs(a)} y2={ys(0)+8} stroke={C.axis} strokeWidth={2}/>
+            <text x={xs(a)} y={ys(0)+22} fontSize={12} fill={C.muted} textAnchor="middle" fontWeight="bold">a</text>
+            
+            <line x1={xs(b)} y1={ys(0)} x2={xs(b)} y2={ys(0)+8} stroke={C.axis} strokeWidth={2}/>
+            <text x={xs(b)} y={ys(0)+22} fontSize={12} fill={C.muted} textAnchor="middle" fontWeight="bold">b</text>
+
+            <text x={W-PAD.r+20} y={ys(0)+14} fontSize={12} fill={C.muted} fontStyle="italic">x</text>
+
+            {/* The Curve (background) */}
+            {(focus === 'sum' || focus === 'limit') && 
+               <path d={dCurve} fill="none" stroke={C.gold} strokeWidth={2} opacity={0.3} />
+            }
+            
+            {/* Region shading for Limit */}
+            {focus === 'limit' && 
+               <path d={`${dCurve} L ${xs(b)} ${ys(0)} L ${xs(a)} ${ys(0)} Z`} fill={C.cyan} opacity={0.3} />
+            }
+
+            {/* Rectangles */}
+            {rects.map((r) => {
+               if (focus === 'limit') return null; // Don't draw discrete rects in limit
+               if (r.isFaded && (focus === 'width' || focus === 'x_i' || focus === 'height')) return null; // Only show one slice early on
+
+               const opacity = r.isHighlighted ? 0.9 : r.isFaded ? 0 : 0.6;
+               const fill = r.isHighlighted ? C.cyan : C.rectFill;
+               const stroke = r.isHighlighted ? C.cyan : C.rectStroke;
+               const dash = r.isHighlighted && focus === 'width' ? "2 2" : "0";
+               
+               if (focus === 'width') {
+                  // Only draw the base width
+                  return (
+                     <g key={r.i}>
+                        <rect x={r.x1} y={ys(0)-3} width={r.x2 - r.x1} height={6} fill={C.emerald} opacity={0.8} />
+                     </g>
+                  )
+               }
+               
+               if (focus === 'x_i' || focus === 'height') {
+                  // Draw x_i point, maybe probe line
+                  return (
+                     <g key={r.i}>
+                        <line x1={r.x2} y1={ys(0)} x2={r.x2} y2={focus === 'height' ? r.y1 : ys(0)} stroke={C.gold} strokeWidth={2} strokeDasharray="4 4" />
+                        <circle cx={r.x2} cy={ys(0)} r={4} fill={C.emerald} />
+                        {focus === 'height' && <circle cx={r.x2} cy={r.y1} r={4} fill={C.gold} />}
+                     </g>
+                  )
+               }
+
+               return (
+                  <rect key={r.i} x={r.x1} y={r.y1} width={r.x2 - r.x1} height={Math.max(0, r.y2 - r.y1)} 
+                        fill={fill} stroke={stroke} strokeWidth={n < 50 ? 1 : 0.2} opacity={opacity} strokeDasharray={dash} />
+               )
+            })}
+
+            {/* Annotations */}
+            {focus === 'width' && (
+               <g>
+                   <text x={xs((prevX + targetX) / 2)} y={ys(0) - 10} fontSize={14} fill={C.emerald} textAnchor="middle" fontWeight="bold">Δx</text>
+                   <text x={W/2} y={PAD.t} fontSize={14} fill={C.emerald} textAnchor="middle">Divide total distance into n chunks</text>
+               </g>
+            )}
+
+            {focus === 'x_i' && (
+               <g>
+                   <text x={xs(targetX)} y={ys(0) + 20} fontSize={14} fill={C.emerald} textAnchor="middle" fontWeight="bold">x_i</text>
+                   <path d={`M ${xs(a)} ${ys(0)-15} Q ${xs((a+targetX)/2)} ${ys(0)-40} ${xs(targetX)-5} ${ys(0)-18}`} fill="none" stroke={C.emerald} strokeWidth={1.5} strokeDasharray="3 3"/>
+                   <polygon points={`${xs(targetX)},${ys(0)-15} ${xs(targetX)-8},${ys(0)-20} ${xs(targetX)-4},${ys(0)-25}`} fill={C.emerald} />
+                   <text x={xs((a+targetX)/2)} y={ys(0)-35} fontSize={12} fill={C.emerald} textAnchor="middle">i steps of Δx</text>
+               </g>
+            )}
+
+            {focus === 'height' && (
+               <g>
+                   <text x={xs(targetX) + 8} y={(ys(0) + ys(hDist))/2} fontSize={14} fill={C.gold} fontWeight="bold">f(x_i)</text>
+                   <text x={xs(targetX)} y={ys(0) + 20} fontSize={14} fill={C.emerald} textAnchor="middle" fontWeight="bold">x_i</text>
+               </g>
+            )}
+
+            {focus === 'slice' && (
+               <g>
+                   <text x={xs(targetX) + 8} y={(ys(0) + ys(hDist))/2} fontSize={12} fill={C.gold} opacity={0.8}>Height</text>
+                   <text x={xs((prevX + targetX) / 2)} y={ys(0) + 16} fontSize={12} fill={C.emerald} textAnchor="middle">Width</text>
+                   
+                   <text x={W/2} y={PAD.t/2 + 10} fontSize={15} fill={C.cyan} textAnchor="middle" fontWeight="bold">Area_i = f(x_i) · Δx</text>
+               </g>
+            )}
+
+             {/* The Curve (Foreground, full) */}
+             {(focus === 'width' || focus === 'x_i' || focus === 'height' || focus === 'slice' || focus === 'limit') && 
+               <path d={dCurve} fill="none" stroke={C.gold} strokeWidth={2} />
+            }
+
+         </svg>
+      </div>
+
+      {/* Navigation */}
+      <div style={{ padding: '8px 16px', borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+          {STEPS.map((_, i) => {
+            const isActive = i === stepIdx
+            return (
+              <div key={i} onClick={() => setStepIdx(i)}
+                   style={{ width: isActive ? 9 : 7, height: isActive ? 9 : 7, borderRadius: '50%', background: isActive ? C.cyan : C.border, cursor: 'pointer', outline: isActive ? `2px solid ${C.cyan}` : 'none', outlineOffset: 2 }} />
+            )
+          })}
+        </div>
+        <span style={{ color: C.muted, fontSize: 11 }}>Step <span style={{ color: C.text, fontWeight: 700 }}>{stepIdx + 1}</span> / {STEPS.length}</span>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={() => setStepIdx(s => Math.max(0, s - 1))} disabled={stepIdx === 0}
+                  style={{ padding: '5px 14px', borderRadius: 6, fontSize: 12, border: `1px solid ${C.border}`, background: 'transparent', color: stepIdx === 0 ? C.faint : C.muted, cursor: stepIdx === 0 ? 'default' : 'pointer' }}>← Back</button>
+          <button onClick={() => setStepIdx(s => Math.min(STEPS.length - 1, s + 1))} disabled={stepIdx === STEPS.length - 1}
+                  style={{ padding: '5px 14px', borderRadius: 6, fontSize: 12, border: `1px solid ${stepIdx === STEPS.length - 1 ? C.border : C.cyan}`, background: stepIdx === STEPS.length - 1 ? 'transparent' : `${C.cyan}18`, color: stepIdx === STEPS.length - 1 ? C.faint : C.cyan, cursor: stepIdx === STEPS.length - 1 ? 'default' : 'pointer' }}>Next →</button>
+        </div>
+      </div>
+
+      {/* Step Log */}
+      <div style={{ padding: '12px 12px 60px', display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 400, overflowY: 'auto' }}>
+        {[...STEPS.slice(0, stepIdx + 1)].reverse().map((s, i) => (
+          <StepCard key={s.title} step={s} isLatest={i === 0} stepNumber={stepIdx - i + 1} />
+        ))}
+      </div>
+    </div>
+  )
 }
