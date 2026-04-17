@@ -332,19 +332,25 @@ fig.show()`,
         },
         {
           expression:
-            "Set A'(x) = 0: 50 - 2x = 0 \\quad \\Rightarrow \\quad x = 25.",
+            "\\text{Set } A'(x) = 0: \\quad 50 - 2x = 0 \\quad \\Rightarrow \\quad x = 25 \\text{ m.}",
           annotation:
-            "At x = 25 m, the instantaneous rate of change of area is zero. This is the balance point where increasing x any further would decrease area as much as it increases it.",
+            "At x = 25 m the rate of change of area is exactly zero — the balance point where gaining one more meter of length costs exactly one meter of width, and the net effect on the product is zero.",
         },
         {
           expression:
-            "Then y = 50 - 25 = 25 m, \\quad A = 25 \\times 25 = 625 \\text{ m}^2.",
+            "A''(x) = -2 < 0 \\quad \\Rightarrow \\quad x = 25 \\text{ is a maximum (concave down).}",
           annotation:
-            "Both dimensions are equal: we get a square. Aha! When the total perimeter is fixed, the rectangle that maximizes area is always a square. Any deviation (e.g., 20 m by 30 m) gives only 600 m² — less enclosed space for the same fence.",
+            "The second derivative test: A''(x) = -2 is negative everywhere, so the parabola A(x) = 50x - x² opens downward. The single critical point x = 25 must be a global maximum, not a saddle point or minimum.",
+        },
+        {
+          expression:
+            "y = 50 - 25 = 25 \\text{ m}, \\quad A_{\\max} = 25 \\times 25 = 625 \\text{ m}^2.",
+          annotation:
+            "Aha! Both dimensions are equal — the optimal shape is a square. Any deviation loses area: 20 m × 30 m = 600 m², 10 m × 40 m = 400 m². The square is the unique maximum, confirmed by calculus.",
         },
       ],
       conclusion:
-        "The modeling insight is that a fixed resource (fence) creates a strict trade-off between length and width. Calculus finds the point where that trade-off is perfectly balanced — resulting in a square of area 625 m².",
+        "A fixed perimeter creates an exact trade-off between length and width. Calculus finds the balance point — a square with area 625 m² — and the second derivative confirms it is a maximum, not just a critical point.",
     },
 
     {
@@ -433,18 +439,43 @@ fig.show()`,
             "Objective: minimize total metal. The 2πr² term is the two circular ends; 2πrh is the rectangular side when unrolled.",
         },
         {
-          expression: "Substitute h: SA(r) = 2\\pi r^2 + \\frac{1000}{r}.",
+          expression: "\\text{Substitute } h: \\quad SA(r) = 2\\pi r^2 + \\frac{1000}{r}, \\quad r > 0.",
           annotation:
-            "Aha! Trade-off appears clearly: larger r makes the lids more expensive (r² term grows), but makes the side wall cheaper (1/r term shrinks).",
+            "Aha! The trade-off is now visible in a single formula: larger r makes the lid term 2πr² grow (more lid metal), but shrinks the side term 1000/r (less side metal). The minimum balances these two competing effects.",
         },
         {
-          expression: "At the minimum we find h = 2r.",
+          expression:
+            "SA'(r) = 4\\pi r - \\frac{1000}{r^2}.",
           annotation:
-            "Remarkable modeling result: the can that uses least material has height exactly equal to its diameter — it is 'square' in side view.",
+            "Differentiate using the power rule: d/dr[2πr²] = 4πr and d/dr[1000r⁻¹] = -1000r⁻². The positive term 4πr is the marginal cost of increasing lid area; the negative term -1000/r² is the marginal saving on side area. Setting them equal locates the optimum.",
+        },
+        {
+          expression:
+            "\\text{Set } SA'(r) = 0: \\quad 4\\pi r = \\frac{1000}{r^2} \\quad \\Rightarrow \\quad r^3 = \\frac{1000}{4\\pi} = \\frac{250}{\\pi}.",
+          annotation:
+            "Multiply both sides by r² to clear the fraction: 4πr³ = 1000. Solving for r³ gives the exact form. The cube root will give the optimal radius.",
+        },
+        {
+          expression:
+            "r = \\sqrt[3]{\\frac{250}{\\pi}} \\approx 3.41 \\text{ cm}, \\quad h = \\frac{500}{\\pi r^2} \\approx \\frac{500}{\\pi (3.41)^2} \\approx 6.83 \\text{ cm.}",
+          annotation:
+            "Numerically: r ≈ 3.41 cm and h ≈ 6.83 cm. Notice that h ≈ 2r — the height is approximately twice the radius, which equals the diameter. This is not a coincidence.",
+        },
+        {
+          expression:
+            "\\text{Verify: } h = \\frac{500}{\\pi r^2} = \\frac{500}{\\pi \\cdot \\frac{250}{\\pi}} = \\frac{500 \\cdot \\pi}{250\\pi} = 2 \\quad \\Rightarrow \\quad h = 2r \\text{ exactly.}",
+          annotation:
+            "Aha! Substituting r³ = 250/π back into the expression for h gives h = 2r exactly — not approximately. The optimal can has height equal to its diameter for ANY fixed volume V, not just 500 cm³.",
+        },
+        {
+          expression:
+            "SA''(r) = 4\\pi + \\frac{2000}{r^3} > 0 \\text{ for all } r > 0 \\quad \\Rightarrow \\quad \\text{confirmed global minimum.}",
+          annotation:
+            "The second derivative is always positive, so SA(r) is concave up everywhere — the single critical point r = ∛(250/π) is the global minimum. The minimum surface area is SA ≈ 2π(3.41)² + 1000/3.41 ≈ 73.4 + 293.2 ≈ 219.7 cm².",
         },
       ],
       conclusion:
-        "The modeling reveals a clear trade-off between lid area and side area. Calculus finds the perfect balance where height equals diameter.",
+        "The tin-can problem reveals a universal design principle: the minimum-material cylinder (for any fixed volume) has height equal to diameter. This h = 2r rule follows directly from setting SA'(r) = 0 and is confirmed by the positive second derivative.",
     },
 
     {
@@ -475,21 +506,40 @@ fig.show()`,
         },
         {
           expression:
-            "A(x) = x\\left(120 - \\frac{x}{2}\\right) = 120x - \\frac{1}{2}x^2.",
+            "A(x) = x\\left(120 - \\frac{x}{2}\\right) = 120x - \\frac{x^2}{2}, \\quad x \\in (0,\\, 240).",
           annotation:
-            "The negative quadratic term reflects the penalty of making x too large.",
+            "The domain is 0 < x < 240 because both x and y = 120 - x/2 must be positive. As x → 0 or x → 240, area → 0, so the maximum must be interior.",
         },
         {
           expression:
-            "A'(x) = 120 - x = 0 \\quad \\Rightarrow \\quad x = 120 \\text{ m}, \\quad y = 60 \\text{ m}.",
+            "A'(x) = 120 - x.",
           annotation:
-            "Aha! Optimal shape has the side parallel to the river twice as long as the perpendicular sides. When one side is free, the rectangle becomes twice as wide as it is deep.",
+            "Power rule on each term: d/dx[120x] = 120 and d/dx[x²/2] = x. The derivative is linear, so there is exactly one critical point.",
+        },
+        {
+          expression:
+            "\\text{Set } A'(x) = 0: \\quad 120 - x = 0 \\quad \\Rightarrow \\quad x = 120 \\text{ m.}",
+          annotation:
+            "At x = 120 m the marginal gain from widening the parallel side exactly equals the marginal loss from shortening the two perpendicular sides.",
+        },
+        {
+          expression:
+            "A''(x) = -1 < 0 \\quad \\Rightarrow \\quad x = 120 \\text{ m is the global maximum.}",
+          annotation:
+            "The parabola opens downward everywhere, so the single critical point is the global maximum. No endpoint check is needed since area → 0 at both endpoints.",
+        },
+        {
+          expression:
+            "y = 120 - \\frac{120}{2} = 60 \\text{ m}, \\quad A_{\\max} = 120 \\times 60 = 7200 \\text{ m}^2.",
+          annotation:
+            "Aha! The optimal rectangle is 120 m wide (parallel to river) and 60 m deep — width is twice the depth. Compare to the four-sided problem (x = y = square): the free river side shifts the optimum dramatically. The fence is now split as 120 m along the river side and 2 × 60 = 120 m on the two perpendicular sides — a perfect 50/50 split of the total 240 m.",
         },
       ],
       conclusion:
-        "Maximum area is 7200 m². The modeling insight: a free boundary changes the optimal proportions dramatically.",
+        "Maximum area 7200 m² at dimensions 120 m × 60 m. The free river boundary breaks the square's optimality: the river-parallel side gets twice the length of each perpendicular side. The second derivative A''= −1 < 0 confirms the global maximum.",
     },
   ],
+  
   story: {
     title: "The Fencing Problem",
     subtitle:
