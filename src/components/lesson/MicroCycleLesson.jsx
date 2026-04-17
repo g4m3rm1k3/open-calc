@@ -624,16 +624,20 @@ export default function MicroCycleLesson({ lesson }) {
     <div className="w-full">
       <IntuitionBlock data={lesson.intuition} lesson={lesson} />
       {lesson.mentalModel?.length > 0 && (
-         <div className="mb-10 p-5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-transparent border-b-4 border-b-brand-500 shadow-md dark:shadow-2xl">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400 mb-4 text-center">Final Mental Model Compression</p>
-            <div className="flex flex-col sm:flex-row items-center justify-around gap-6">
-               {lesson.mentalModel.map((item, i) => (
-                 <div key={i} className="text-center">
-                    <p className="text-base font-bold text-slate-800 dark:text-transparent dark:bg-gradient-to-r dark:from-brand-300 dark:to-emerald-300 dark:bg-clip-text">{item}</p>
-                 </div>
-               ))}
-            </div>
-         </div>
+        <div className="mb-10 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 border-b-4 border-b-brand-500 shadow-md dark:shadow-2xl overflow-hidden">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400 pt-5 pb-4 text-center">Final Mental Model Compression</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y divide-slate-200 dark:divide-slate-800 sm:divide-y-0 sm:divide-x border-t border-slate-200 dark:border-slate-800">
+            {lesson.mentalModel.map((item, i) => (
+              <div key={i} className={`px-5 py-4 ${i > 0 ? 'sm:border-t-0' : ''}`}>
+                <span className="text-[10px] font-black uppercase tracking-widest text-brand-400 dark:text-brand-500 block mb-1.5">{String(i + 1).padStart(2, '0')}</span>
+                <MarkdownProse
+                  text={item}
+                  className="[&_p]:text-sm [&_p]:font-semibold [&_p]:leading-snug [&_p]:text-slate-800 [&_p]:dark:text-slate-300 [&_p]:mb-0"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
       {lesson.applications && (
         <div className="mb-8">
