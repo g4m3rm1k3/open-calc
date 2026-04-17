@@ -1101,6 +1101,221 @@ $\\lim_{x \\to c} f(x) = L$ if and only if: for every $\\epsilon > 0$, there exi
     "solved-challenge",
   ],
 
+  walkthroughs: [
+  {
+    id: 'wt-epsdelta-linear-full',
+    title: 'Epsilon–Delta (Linear, Fully Narrated)',
+    prereqs: ['Limit definition', 'Absolute value properties'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: '2*x+1', a: 3, xMin: 1, xMax: 5, label: 'f(x)=2x+1' },
+    problem: 'Prove from first principles that $\\lim_{x\\to 3}(2x+1)=7$.',
+
+    steps: [
+      {
+        label: 'Start with the *definition*, not the function',
+        visualNote: 'A horizontal band of height $\\varepsilon$ appears around $y=7$. A vertical band of width $\\delta$ appears around $x=3$.',
+        strategy: 'We do NOT start by manipulating the function randomly. We start from the epsilon–delta definition and work backward from what we must guarantee.',
+        explanation: 'Before touching any algebra, pause and look at what the definition is asking. The graph shows the line $2x+1$ passing through the point $(3,7)$. The epsilon–delta definition does not ask us to compute anything — it asks us to *control behavior*. Specifically: if $x$ stays close enough to 3, then $f(x)$ must stay close to 7. The vertical band (epsilon) is fixed first — we are *given* how tight we want the output. Our job is to figure out how small the horizontal window (delta) must be to force the graph to stay inside that band.',
+        math: '0 < |x-3| < \\delta \\;\\Rightarrow\\; |(2x+1)-7| < \\varepsilon',
+        conceptRef: 'Formal definition of limit',
+      },
+
+      {
+        label: 'Translate the problem into a single expression',
+        visualNote: 'The vertical distance from the graph to $y=7$ is highlighted as a segment.',
+        strategy: 'Everything reduces to controlling ONE quantity: $|f(x)-L|$. If we can rewrite it in terms of $|x-3|$, the problem is solved.',
+        explanation: 'The definition tells us exactly what to study: the expression $|f(x)-7|$. This is the vertical distance from the graph to the horizontal line $y=7$. If we can make this distance small by forcing $x$ near 3, we win. So the entire proof becomes an algebra problem: take $|(2x+1)-7|$ and rewrite it until it depends directly on $|x-3|$.',
+        math: '|(2x+1)-7|',
+      },
+
+      {
+        label: 'Simplify — expose the hidden structure',
+        visualNote: 'The vertical segment morphs into a scaled horizontal segment.',
+        strategy: 'Factor aggressively. Linear functions always collapse into a constant multiple of $|x-a|$.',
+        explanation: 'Now we perform the algebra — but notice what we are *looking for*. We want $|x-3|$ to appear. Subtracting 7 from $2x+1$ gives $2x-6$. That may not look helpful yet, but factor out the 2: $2(x-3)$. This is the key moment. The vertical error is not arbitrary — it is exactly twice the horizontal error. The graph confirms this: the slope is 2, so vertical change is 2× horizontal change.',
+        math: '|(2x+1)-7| = |2(x-3)| = 2|x-3|',
+        gotcha: 'Do not stop at $2x-6$. The factorization is what reveals the relationship to $|x-3|$.',
+        conceptRef: 'Absolute value and factoring',
+      },
+
+      {
+        label: 'Now solve the *inequality*, not the limit',
+        visualNote: 'The vertical band is fixed; the horizontal band shrinks in response.',
+        strategy: 'We now reverse-engineer $\\delta$. Ask: how small must $|x-3|$ be to force $2|x-3| < \\varepsilon$?',
+        explanation: 'At this point, the problem has quietly changed. We are no longer thinking about limits — we are solving an inequality. We need $2|x-3| < \\varepsilon$. The only variable we control is $|x-3|$, so isolate it. Dividing both sides by 2 gives $|x-3| < \\varepsilon/2$. This tells us exactly how tight the horizontal window must be. There is no guesswork here — the algebra dictates the choice.',
+        math: '|x-3| < \\frac{\\varepsilon}{2}',
+      },
+
+      {
+        label: 'Choose $\\delta$ and close the loop',
+        visualNote: 'The horizontal band locks to exactly half the vertical tolerance.',
+        strategy: 'We define $\\delta$ to be the quantity that guarantees the inequality. Then explicitly verify the implication chain.',
+        explanation: 'We now commit: choose $\\delta = \\varepsilon/2$. This is not arbitrary — it is the exact threshold that makes the inequality work. Now we check the logic forward, as the definition requires. Assume $0 < |x-3| < \\delta$. Then $|x-3| < \\varepsilon/2$. Multiply both sides by 2: $2|x-3| < \\varepsilon$. But we already showed $|(2x+1)-7| = 2|x-3|$, so this gives $|(2x+1)-7| < \\varepsilon$. That completes the proof. Notice the structure: we worked backward to find $\\delta$, then forward to verify it.',
+        math: '\\delta = \\frac{\\varepsilon}{2}',
+        sandbox: {
+          value: '\\varepsilon = 0.2',
+          rows: [
+            { label: '$\\delta$', expr: '0.1' },
+            { label: '$2|x-3|$', expr: '< 2(0.1)=0.2\\;\\checkmark' },
+          ],
+          conclusion: 'The forward check confirms the construction works.',
+        },
+        conceptRef: 'Structure of epsilon–delta proofs',
+      },
+
+      {
+        label: 'Interpret what just happened (the missing intuition)',
+        visualNote: 'The graph shows a fixed vertical band and a matching horizontal squeeze.',
+        strategy: 'Close the abstraction gap — connect algebra back to geometry explicitly.',
+        explanation: 'Step back and interpret the result. The entire proof rests on one geometric fact: the line has slope 2. That means any horizontal error is doubled vertically. So to keep the vertical error within $\\varepsilon$, we must restrict the horizontal error to half that size. That is why $\\delta = \\varepsilon/2$. The epsilon–delta definition is not mysterious — it is just a precise way of encoding how steep the graph is near the point.',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What changes if $f(x)=5x+1$ at $x=3$?',
+        hint: 'The slope becomes 5, so the vertical error is $5|x-3|$. You will get $\\delta=\\varepsilon/5$.'
+      },
+      {
+        question: 'What if the slope were negative, like $f(x)=-3x+1$?',
+        hint: 'Absolute value removes the sign. You still get $3|x-3|$, so $\\delta=\\varepsilon/3$.'
+      },
+    ],
+  },
+  {
+    id: 'wt-epsdelta-linear',
+    title: 'Epsilon–Delta: Linear Function',
+    prereqs: ['Limit definition', 'Absolute value manipulation'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: '2*x+1', a: 3, xMin: 1, xMax: 5, label: 'f(x)=2x+1' },
+    problem: 'Prove that $\\lim_{x\\to 3}(2x+1)=7$ using the epsilon–delta definition.',
+    steps: [
+      {
+        label: 'State the epsilon–delta target',
+        visualNote: 'A band of height $\\varepsilon$ appears around $y=7$, and a horizontal window $\\delta$ around $x=3$.',
+        strategy: 'Start from the definition: we must control $|f(x)-L|$ using $|x-a|$. Everything reduces to rewriting this expression.',
+        explanation: 'Look at the graph first. Near $x=3$, the line $2x+1$ passes through $y=7$. The epsilon–delta definition asks: how small must we force $x$ to stay near 3 so that the output stays within a vertical band around 7? This becomes an algebra problem: make $|f(x)-7|$ small by controlling $|x-3|$.',
+        math: '|(2x+1)-7| < \\varepsilon',
+      },
+      {
+        label: 'Simplify the expression',
+        visualNote: 'The vertical distance collapses into a scaled horizontal distance.',
+        strategy: 'Factor the expression to isolate $|x-3|$. Linear functions reduce cleanly with no extra bounding.',
+        explanation: 'Now simplify the expression inside the absolute value. The goal is to rewrite everything in terms of $|x-3|$. Subtracting 7 from $2x+1$ gives $2x-6$, which factors cleanly as $2(x-3)$. This is the key moment: the vertical error is exactly 2 times the horizontal error.',
+        math: '|(2x+1)-7| = |2(x-3)| = 2|x-3|',
+      },
+      {
+        label: 'Choose $\\delta$ in terms of $\\varepsilon$',
+        visualNote: 'The horizontal band shrinks to match the vertical tolerance.',
+        strategy: 'Solve $2|x-3| < \\varepsilon$ for $|x-3|$ to determine the correct $\\delta$.',
+        explanation: 'We now translate the condition $2|x-3| < \\varepsilon$ into a requirement on $|x-3|$. Dividing both sides by 2 gives $|x-3| < \\varepsilon/2$. This tells us exactly how small the horizontal window must be. So we choose $\\delta = \\varepsilon/2$. This guarantees the vertical error stays within $\\varepsilon$.',
+        math: '\\delta = \\frac{\\varepsilon}{2}',
+        sandbox: {
+          value: '\\varepsilon = 0.1',
+          rows: [
+            { label: '$\\delta$', expr: '0.05' },
+            { label: '$2|x-3|$', expr: '2(0.05)=0.1\\;\\checkmark' },
+          ],
+          conclusion: 'The bound works exactly as designed.',
+        },
+        conceptRef: 'Linear scaling of absolute value',
+      },
+    ],
+    variations: [
+      { question: 'What if $f(x)=5x-4$ at $x=2$?', hint: 'You will get $|f(x)-6|=5|x-2|$, so $\\delta=\\varepsilon/5$.' },
+    ],
+  },
+
+  {
+    id: 'wt-epsdelta-quadratic',
+    title: 'Epsilon–Delta: Quadratic',
+    prereqs: ['Factoring', 'Bounding techniques'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: 'x*x', a: 2, xMin: 0, xMax: 4, label: 'f(x)=x^2' },
+    problem: 'Prove that $\\lim_{x\\to 2}x^2=4$ using the epsilon–delta definition.',
+    steps: [
+      {
+        label: 'Rewrite the difference',
+        visualNote: 'The vertical gap becomes a product involving $(x-2)$.',
+        strategy: 'Factor first — quadratics do not reduce directly to a multiple of $|x-a|$.',
+        explanation: 'Start by expanding the difference $|x^2-4|$. This factors as $(x-2)(x+2)$. The key observation is that only one factor matches $|x-2|$ directly — the other must be controlled separately.',
+        math: '|x^2-4| = |x-2||x+2|',
+      },
+      {
+        label: 'Bound the extra factor',
+        visualNote: 'A horizontal restriction around $x=2$ limits how large $x+2$ can be.',
+        strategy: 'Impose a temporary restriction like $|x-2|<1$ to bound $x$ numerically.',
+        explanation: 'Here is the subtle step textbooks skip: we cannot directly control $|x+2|$, so we artificially restrict $x$ to stay near 2. If $|x-2|<1$, then $1<x<3$, which means $x+2$ lies between 3 and 5. So $|x+2|<5$. This converts the messy product into something manageable.',
+        math: '|x+2| < 5',
+        gotcha: 'You must impose a bound before choosing $\\delta$. Otherwise the expression is uncontrollable.',
+      },
+      {
+        label: 'Combine bounds and choose $\\delta$',
+        visualNote: 'The vertical band is controlled by shrinking the horizontal window.',
+        strategy: 'Use the bound to reduce everything to a multiple of $|x-2|$.',
+        explanation: 'Now combine everything: $|x^2-4| = |x-2||x+2| < 5|x-2|$. To ensure this is less than $\\varepsilon$, we need $5|x-2| < \\varepsilon$, or $|x-2| < \\varepsilon/5$. But we must also respect our earlier restriction $|x-2|<1$. So we take the minimum of both conditions.',
+        math: '\\delta = \\min\\left(1, \\frac{\\varepsilon}{5}\\right)',
+        sandbox: {
+          value: '\\varepsilon=0.2',
+          rows: [
+            { label: '$\\varepsilon/5$', expr: '0.04' },
+            { label: '$\\delta$', expr: '0.04' },
+          ],
+          conclusion: 'Both constraints are satisfied simultaneously.',
+        },
+        conceptRef: 'Bounding technique for nonlinear limits',
+      },
+    ],
+    variations: [
+      { question: 'What if $x^2$ were replaced with $x^2+3x$?', hint: 'Factor the difference and bound the extra term again.' },
+    ],
+  },
+
+  {
+    id: 'wt-epsdelta-rational',
+    title: 'Epsilon–Delta: Rational Function',
+    prereqs: ['Factoring', 'Inequalities'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: '(x*x-1)/(x-1)', a: 1, xMin: 0, xMax: 2, label: 'f(x)=(x^2-1)/(x-1)' },
+    problem: 'Prove that $\\lim_{x\\to 1}\\frac{x^2-1}{x-1}=2$ using the epsilon–delta definition.',
+    steps: [
+      {
+        label: 'Simplify the function',
+        visualNote: 'The curve behaves like a line with a hole at $x=1$.',
+        strategy: 'Factor first — rational expressions often simplify before applying epsilon–delta.',
+        explanation: 'At first glance the function looks complicated, but factoring reveals the structure. The numerator $x^2-1$ factors as $(x-1)(x+1)$, and for $x\\ne1$ the expression simplifies to $x+1$. So the limit problem reduces to a linear function with a removable hole.',
+        math: '\\frac{x^2-1}{x-1} = x+1',
+      },
+      {
+        label: 'Rewrite the difference',
+        visualNote: 'The vertical error becomes a simple shift of $|x-1|$.',
+        strategy: 'Reduce to absolute value form like the linear case.',
+        explanation: 'Now compute the difference from the limit value 2. Substituting gives $|(x+1)-2| = |x-1|$. This is the simplest possible structure — the vertical error equals the horizontal error exactly.',
+        math: '|(x+1)-2| = |x-1|',
+      },
+      {
+        label: 'Choose $\\delta$',
+        visualNote: 'The horizontal and vertical bands match exactly.',
+        strategy: 'Direct comparison — no scaling factor required.',
+        explanation: 'Since $|f(x)-2| = |x-1|$, we can guarantee $|f(x)-2| < \\varepsilon$ simply by requiring $|x-1| < \\varepsilon$. No extra constants, no bounding tricks — the structure collapses perfectly.',
+        math: '\\delta = \\varepsilon',
+        sandbox: {
+          value: '\\varepsilon=0.05',
+          rows: [
+            { label: '$\\delta$', expr: '0.05' },
+            { label: '$|x-1|$', expr: '<0.05\\;\\checkmark' },
+          ],
+          conclusion: 'The function behaves exactly like a line near the hole.',
+        },
+        conceptRef: 'Limit of simplified rational functions',
+      },
+    ],
+    variations: [
+      { question: 'What if the function did not simplify cleanly?', hint: 'You would need bounding like in the quadratic case.' },
+    ],
+  },
+],
+
   quiz: [
     {
       id: "eps-delta-q1",

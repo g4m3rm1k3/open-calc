@@ -803,4 +803,148 @@ If $|q(x)| \\leq M$ and $p(x) \\to 0$, then $p(x) \\cdot q(x) \\to 0$. Bounds: $
       reviewSection: 'Math tab — scaling the fundamental trig limit',
     },
   ],
+
+  walkthroughs: [
+  {
+    id: 'wt-squeeze-basic-poly',
+    title: 'Squeeze Theorem — Warmup (Direct Bounding)',
+    prereqs: ['Limit laws', 'Inequalities'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: 'x*Math.sin(x)', a: 0, xMin: -1, xMax: 1, label: 'f(x)=x sin x' },
+    problem: 'Evaluate $\\lim_{x\\to 0} x\\sin x$ using the Squeeze Theorem.',
+    steps: [
+      {
+        label: 'Recognize the structure before computing',
+        visualNote: 'The oscillating sine wave is trapped between $-1$ and $1$, scaled by $x$.',
+        strategy: 'Squeeze only works if you can trap the function between two simpler ones with the same limit.',
+        explanation: 'Look at the function before doing anything symbolic. The term $\\sin x$ oscillates between $-1$ and $1$ forever — that is a global fact. Multiplying by $x$ shrinks those oscillations as $x$ approaches 0. The question is: can we turn that intuition into inequalities?',
+        math: '-1 \\leq \\sin x \\leq 1',
+      },
+      {
+        label: 'Multiply the inequality correctly',
+        visualNote: 'The bounds tilt inward as they are scaled by $x$.',
+        strategy: 'Multiply all parts by $x$, but be mindful of sign — near 0, $x$ can be positive or negative.',
+        explanation: 'Here is the subtlety: when multiplying inequalities by a variable, the direction can flip if the variable is negative. Instead of splitting cases, we use absolute value to avoid that headache. The clean move is to say $|\\sin x| \\leq 1$, then multiply safely.',
+        math: '|x\\sin x| \\leq |x|',
+        gotcha: 'Do NOT multiply $-1 \\leq \\sin x \\leq 1$ by $x$ directly without handling sign changes.',
+      },
+      {
+        label: 'Convert into squeeze form',
+        visualNote: 'The graph of $x\\sin x$ sits between $- |x|$ and $|x|$.',
+        strategy: 'We need explicit lower and upper bounds with the same limit.',
+        explanation: 'From $|x\\sin x| \\leq |x|$, we rewrite this as a two-sided inequality: $-|x| \\leq x\\sin x \\leq |x|$. Now we have a proper squeeze: a function trapped between two simpler ones.',
+        math: '-|x| \\leq x\\sin x \\leq |x|',
+      },
+      {
+        label: 'Evaluate the outer limits',
+        visualNote: 'Both bounding functions collapse to 0 at the origin.',
+        strategy: 'If both outer functions approach the same value, the middle must follow.',
+        explanation: 'Now comes the key observation: as $x \\to 0$, both $-|x|$ and $|x|$ approach 0. The graph shows both bounds collapsing inward symmetrically. There is nowhere else for $x\\sin x$ to go — it is forced to 0.',
+        math: '\\lim_{x\\to 0} -|x| = 0 = \\lim_{x\\to 0} |x|',
+      },
+      {
+        label: 'Conclude via squeeze',
+        explanation: 'Because $x\\sin x$ is trapped between two functions that both approach 0, the Squeeze Theorem guarantees that $x\\sin x$ also approaches 0.',
+        math: '\\lim_{x\\to 0} x\\sin x = 0',
+        conceptRef: 'Squeeze Theorem',
+      },
+    ],
+    variations: [
+      {
+        question: 'What if the function were $x^2 \\sin x$?',
+        hint: 'You would get $|x^2\\sin x| \\leq x^2$, which goes to 0 even faster.',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-squeeze-classic',
+    title: 'Squeeze Theorem — Classic Trig Limit',
+    prereqs: ['Unit circle inequalities', 'Basic trig limits'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: 'Math.sin(x)/x', a: 0, xMin: -1, xMax: 1, label: 'f(x)=sin x / x' },
+    problem: 'Evaluate $\\lim_{x\\to 0} \\frac{\\sin x}{x}$.',
+    steps: [
+      {
+        label: 'Start from geometric truth',
+        visualNote: 'Unit circle sectors and triangles illustrate $\\sin x < x < \\tan x$.',
+        strategy: 'This limit is not algebraic — it comes from geometry.',
+        explanation: 'This is the most famous squeeze theorem example, and it does not start with algebra. It starts with geometry on the unit circle. For small positive angles, the arc length $x$ sits between the sine and tangent values: $\\sin x < x < \\tan x$. This is not obvious unless you see the diagram — it comes from comparing areas of sectors and triangles.',
+        math: '\\sin x < x < \\tan x',
+      },
+      {
+        label: 'Normalize the inequality',
+        visualNote: 'Everything is divided by $\\sin x$ and $x$ to isolate the ratio.',
+        strategy: 'We want $\\sin x / x$ in the middle — so we manipulate the inequality toward that form.',
+        explanation: 'We now reshape the inequality to isolate $\\frac{\\sin x}{x}$. Dividing everything carefully gives: $\\cos x \\leq \\frac{\\sin x}{x} \\leq 1$. This is the squeeze form we need.',
+        math: '\\cos x \\leq \\frac{\\sin x}{x} \\leq 1',
+      },
+      {
+        label: 'Evaluate the bounds',
+        visualNote: 'The cosine curve approaches 1 at 0.',
+        strategy: 'Both bounding functions must approach the same value.',
+        explanation: 'As $x \\to 0$, $\\cos x \\to 1$ and the constant 1 stays at 1. The two outer functions meet at the same limit.',
+        math: '\\lim_{x\\to 0} \\cos x = 1',
+      },
+      {
+        label: 'Apply squeeze',
+        explanation: 'Since $\\frac{\\sin x}{x}$ is trapped between two functions both approaching 1, it must also approach 1.',
+        math: '\\lim_{x\\to 0} \\frac{\\sin x}{x} = 1',
+      },
+    ],
+    variations: [
+      {
+        question: 'What about $\\lim_{x\\to 0} \\frac{\\tan x}{x}$?',
+        hint: 'Rewrite as $\\frac{\\sin x}{x\\cos x}$ and use the known limits.',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-squeeze-hard',
+    title: 'Squeeze Theorem — Oscillation vs Growth',
+    prereqs: ['Absolute value', 'Limit comparison'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'limit', fn: 'x*x*Math.cos(1/x)', a: 0, xMin: -1, xMax: 1, label: 'f(x)=x^2 cos(1/x)' },
+    problem: 'Evaluate $\\lim_{x\\to 0} x^2\\cos\\left(\\frac{1}{x}\\right)$.',
+    steps: [
+      {
+        label: 'Identify the difficulty',
+        visualNote: 'The function oscillates infinitely near 0.',
+        strategy: 'When direct substitution fails, look for bounded oscillation.',
+        explanation: 'The expression $\\cos(1/x)$ is chaotic near 0 — it oscillates infinitely fast and has no limit. So direct evaluation is impossible. But the key observation is that cosine is always bounded between -1 and 1.',
+        math: '-1 \\leq \\cos\\left(\\frac{1}{x}\\right) \\leq 1',
+      },
+      {
+        label: 'Scale the inequality',
+        visualNote: 'The oscillation is squeezed by $x^2$ shrinking to 0.',
+        strategy: 'Multiply through by $x^2$, which goes to 0.',
+        explanation: 'Multiplying by $x^2$ gives $-x^2 \\leq x^2\\cos(1/x) \\leq x^2$. This is the key transformation: the wild oscillation is now trapped inside a shrinking envelope.',
+        math: '-x^2 \\leq x^2\\cos\\left(\\frac{1}{x}\\right) \\leq x^2',
+      },
+      {
+        label: 'Evaluate bounds',
+        visualNote: 'Both outer curves collapse to the x-axis.',
+        strategy: 'Check limits of bounding functions.',
+        explanation: 'As $x \\to 0$, both $-x^2$ and $x^2$ approach 0. The oscillation has nowhere to go — it is squeezed into a single value.',
+        math: '\\lim_{x\\to 0} x^2 = 0',
+      },
+      {
+        label: 'Conclude',
+        explanation: 'Despite the inner chaos of $\\cos(1/x)$, the shrinking factor $x^2$ dominates. The entire expression is forced to 0.',
+        math: '\\lim_{x\\to 0} x^2\\cos\\left(\\frac{1}{x}\\right) = 0',
+      },
+    ],
+    variations: [
+      {
+        question: 'What if the function were $x\\cos(1/x)$?',
+        hint: 'Still works — bounded by $|x|$. Limit is 0.',
+      },
+      {
+        question: 'What if it were just $\\cos(1/x)$?',
+        hint: 'No squeezing factor → no limit.',
+      },
+    ],
+  },
+],
 }

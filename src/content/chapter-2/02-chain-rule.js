@@ -1189,4 +1189,188 @@ export default {
       reviewSection: 'Intuition tab — rates multiply along a chain (gear analogy)',
     },
   ],
+  walkthroughs: [
+  {
+    id: 'wt-chainrule-basic',
+    title: 'Chain Rule — Seeing the Composition',
+    prereqs: ['Derivative of powers', 'Function composition'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'derivative', fn: '(x*x+1)*(x*x+1)', xMin: -2, xMax: 2, label: 'f(x)=(x^2+1)^2' },
+    problem: 'Differentiate $f(x) = (x^2+1)^2$.',
+
+    steps: [
+      {
+        label: 'Look for structure before differentiating',
+        visualNote: 'The expression $(x^2+1)$ is highlighted as a single unit.',
+        strategy: 'Chain rule only activates when we see a function inside another function. We must identify that layering first.',
+        explanation: 'At first glance this looks like a power function, but pause. The base is not just $x$ — it is $x^2+1$. That entire expression is being squared. So this is not a simple power rule problem; it is a function *inside* another function. The outer function is “square something,” and the inner function is $x^2+1$.',
+        math: 'f(x) = (\\text{inner})^2, \\quad \\text{inner} = x^2+1',
+      },
+
+      {
+        label: 'Name the inner function explicitly',
+        visualNote: 'A substitution label $u = x^2+1$ appears.',
+        strategy: 'We isolate the inner function so we can apply the chain rule cleanly.',
+        explanation: 'Instead of juggling everything at once, we give the inner function a name. Let $u = x^2+1$. This is not required, but it clarifies the structure: the entire function becomes $u^2$. Now the layers are visible — we have an outer function acting on $u$, and $u$ itself depends on $x$.',
+        math: 'u = x^2+1 \\quad \\Rightarrow \\quad f(x) = u^2',
+      },
+
+      {
+        label: 'Differentiate the outer function first',
+        visualNote: 'Only the exponent is acted on; the inside remains untouched.',
+        strategy: 'Chain rule says: differentiate the outside, keep the inside frozen.',
+        explanation: 'Here is the most common mistake students make: they try to differentiate everything at once. The chain rule deliberately separates the process. First, pretend the inside is just a variable. The derivative of $u^2$ is $2u$. Notice what did NOT happen — we did not touch $x^2+1$ yet.',
+        math: '\\frac{d}{dx}(u^2) = 2u',
+        gotcha: 'Do not differentiate $x^2+1$ yet — that comes in the next step.',
+      },
+
+      {
+        label: 'Multiply by the derivative of the inner function',
+        visualNote: 'The inner function now “activates” and contributes its slope.',
+        strategy: 'Chain rule completes by multiplying by the derivative of the inner function.',
+        explanation: 'Now we account for the fact that $u$ itself is changing with $x$. The derivative of $u = x^2+1$ is $2x$. This is the “hidden slope” inside the function. Chain rule says we must multiply by this rate of change.',
+        math: '\\frac{du}{dx} = 2x',
+      },
+
+      {
+        label: 'Combine the pieces',
+        visualNote: 'The full derivative assembles from outer × inner.',
+        strategy: 'Final answer is outer derivative evaluated at inner × inner derivative.',
+        explanation: 'Now we combine both layers: the outer derivative $2u$ and the inner derivative $2x$. Substituting back $u = x^2+1$, we get the final result. This multiplication is not optional — it encodes how the inner function stretches the input.',
+        math: 'f\'(x) = 2(x^2+1) \\cdot 2x = 4x(x^2+1)',
+      },
+
+      {
+        label: 'Interpret the result (the missing intuition)',
+        visualNote: 'The slope steepens faster away from 0 due to the $x$ factor.',
+        strategy: 'Tie algebra back to geometry: why is there an extra factor?',
+        explanation: 'Why did we get an extra $2x$? Because the input to the squaring function is not changing at a constant rate — it accelerates as $x$ moves away from 0. The chain rule is correcting for that distortion. The outer function measures change assuming steady input; the inner function tells us the input is not steady.',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What if the exponent were 3 instead of 2?',
+        hint: 'You would get $3(x^2+1)^2 \\cdot 2x$. Outer changes, inner stays the same.',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-chainrule-trig',
+    title: 'Chain Rule — Trig Composition',
+    prereqs: ['Trig derivatives', 'Chain rule basics'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'derivative', fn: 'Math.sin(x*x)', xMin: -2, xMax: 2, label: 'f(x)=sin(x^2)' },
+    problem: 'Differentiate $f(x) = \\sin(x^2)$.',
+
+    steps: [
+      {
+        label: 'Identify outer vs inner',
+        visualNote: 'The sine function wraps around $x^2$.',
+        strategy: 'Always ask: what is the outermost operation?',
+        explanation: 'The outer function is sine — it takes an input and outputs a wave. The inner function is $x^2$. This layering is subtle because the expression is short, but it is still composition: sine of something.',
+        math: '\\text{outer} = \\sin(u), \\quad \\text{inner} = x^2',
+      },
+
+      {
+        label: 'Differentiate the outer function',
+        visualNote: 'Sine becomes cosine, but the inside is untouched.',
+        strategy: 'Derivative of $\\sin(u)$ is $\\cos(u)$.',
+        explanation: 'We apply the derivative rule for sine, but treat the inside as a single unit. So $\\sin(u)$ becomes $\\cos(u)$. We have not yet accounted for how $u$ changes — that comes next.',
+        math: '\\frac{d}{dx}\\sin(u) = \\cos(u)',
+      },
+
+      {
+        label: 'Multiply by inner derivative',
+        visualNote: 'The $x^2$ contributes a scaling factor.',
+        strategy: 'Chain rule completes with inner derivative.',
+        explanation: 'The inner function $x^2$ changes at rate $2x$. That rate must scale the output of the outer derivative. This is the mechanism that adjusts the frequency of the sine wave as $x$ changes.',
+        math: '\\frac{d}{dx}(x^2) = 2x',
+      },
+
+      {
+        label: 'Assemble final answer',
+        explanation: 'Putting it together: cosine of the inside, multiplied by the derivative of the inside.',
+        math: 'f\'(x) = \\cos(x^2) \\cdot 2x',
+      },
+
+      {
+        label: 'Interpretation',
+        explanation: 'The $2x$ factor means the oscillation speeds up as $|x|$ increases. The sine wave is being “stretched” non-uniformly — that is exactly what the chain rule captures.',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What if $f(x)=\\cos(x^2)$?',
+        hint: 'Derivative becomes $-\\sin(x^2)\\cdot 2x$. Watch the sign.',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-chainrule-nested',
+    title: 'Chain Rule — Nested Composition (Multiple Layers)',
+    prereqs: ['Chain rule', 'Exponential functions'],
+    svgId: 'WalkthroughViz',
+    vizProps: { type: 'derivative', fn: 'Math.exp(Math.sin(x*x))', xMin: -2, xMax: 2, label: 'f(x)=e^{sin(x^2)}' },
+    problem: 'Differentiate $f(x)=e^{\\sin(x^2)}$.',
+
+    steps: [
+      {
+        label: 'Identify ALL layers (not just one)',
+        visualNote: 'Three nested layers are highlighted: $e^{(\\cdot)}$, $\\sin(\\cdot)$, and $x^2$.',
+        strategy: 'Chain rule must be applied repeatedly — one layer at a time.',
+        explanation: 'This is where many students collapse. There are not two layers — there are three. The outermost function is exponential. Inside that is sine. Inside that is $x^2$. If you skip identifying one layer, the derivative will be incomplete.',
+        math: 'e^{\\sin(x^2)}',
+      },
+
+      {
+        label: 'Differentiate outermost layer',
+        visualNote: 'Exponential stays itself.',
+        strategy: 'Derivative of $e^u$ is $e^u$.',
+        explanation: 'Start from the outside: the derivative of $e^u$ is $e^u$. Notice the pattern — exponential functions reproduce themselves. We keep the inside unchanged for now.',
+        math: '\\frac{d}{dx}e^u = e^u',
+      },
+
+      {
+        label: 'Move one layer inward (sine)',
+        visualNote: 'Sine becomes cosine.',
+        strategy: 'Now differentiate the next layer.',
+        explanation: 'Now we differentiate $\\sin(x^2)$, treating $x^2$ as its input. The derivative of sine is cosine, so we get $\\cos(x^2)$. But we are still not finished — one more layer remains.',
+        math: '\\frac{d}{dx}\\sin(x^2) = \\cos(x^2)',
+      },
+
+      {
+        label: 'Differentiate innermost layer',
+        visualNote: '$x^2$ contributes its slope.',
+        strategy: 'Final inner derivative.',
+        explanation: 'The innermost function is $x^2$, whose derivative is $2x$. This is the final scaling factor.',
+        math: '\\frac{d}{dx}(x^2)=2x',
+      },
+
+      {
+        label: 'Multiply ALL layers together',
+        visualNote: 'The full derivative unfolds as a product of three factors.',
+        strategy: 'Chain rule stacks multiplicatively.',
+        explanation: 'Now we combine every layer: the exponential, the cosine, and the $2x$. Each layer contributes one factor. Missing even one of them breaks the derivative.',
+        math: 'f\'(x)=e^{\\sin(x^2)}\\cdot \\cos(x^2)\\cdot 2x',
+        gotcha: 'Forgetting one layer is the #1 error in nested chain rule problems.',
+      },
+
+      {
+        label: 'Interpretation',
+        explanation: 'This derivative is a cascade of effects: exponential growth modulated by oscillation, scaled by polynomial growth. The chain rule is literally tracking how each transformation distorts the input.',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What if the inside were $x^3$ instead of $x^2$?',
+        hint: 'Replace $2x$ with $3x^2$ — everything else stays the same.',
+      },
+    ],
+  },
+],
 };

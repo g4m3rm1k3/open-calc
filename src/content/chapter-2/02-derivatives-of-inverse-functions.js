@@ -1216,4 +1216,110 @@ Use the theorem: $(f^{-1})'(x) = 1/f'(f^{-1}(x))$. Plug in $f^{-1}(x)$ for the a
       reviewSection: 'Intuition tab — why one-to-one is required for an inverse',
     },
   ],
+  walkthroughs: [
+  {
+    id: 'wt-deriv-inverse-basic',
+    title: 'Derivative of an Inverse Function (Direct Formula)',
+    prereqs: ['Chain rule', 'Implicit differentiation', 'Inverse functions'],
+    problem: 'Given $f(x) = x^3 + x$, find $(f^{-1})\'(2)$.',
+    steps: [
+      {
+        label: 'Recognize the structure — inverse derivative',
+        visualNote: 'Imagine the graph of $f$ and its inverse reflected across $y=x$. The slope at corresponding points is reciprocal.',
+        strategy: 'We do NOT invert the function explicitly. Use the inverse derivative formula directly.',
+        explanation: 'At first glance, this problem looks like it wants you to find $f^{-1}(x)$ explicitly—but that is a trap. The function $f(x) = x^3 + x$ does not have a simple closed-form inverse. The key observation is this: we are not being asked for the inverse itself, only its derivative at a specific point. That changes everything. Instead of solving for $f^{-1}$, we use the relationship between a function and its inverse: their slopes at corresponding points are reciprocals. So rather than going backwards explicitly, we evaluate the forward derivative and flip it.',
+        math: '(f^{-1})\'(a) = \\frac{1}{f\'(f^{-1}(a))}',
+        conceptRef: 'Derivative of inverse function formula',
+      },
+      {
+        label: 'Find the corresponding input value',
+        visualNote: 'We locate the point on $f$ whose output is 2 — this maps to the inverse input.',
+        strategy: 'We need $x$ such that $f(x) = 2$. This gives the input where we evaluate $f\'$.',
+        explanation: 'Here is the subtle but critical move: the formula requires $f^{-1}(2)$, which is the input value that produces output 2 under $f$. So instead of thinking about the inverse directly, we solve the equation $f(x) = 2$. This is just a root-finding step. Trying small values, we see that $x=1$ works because $1^3 + 1 = 2$. That means $f^{-1}(2) = 1$. This is the bridge between the inverse world and the original function—we have translated the problem entirely into the domain of $f$.',
+        math: 'f(x) = 2 \\Rightarrow x^3 + x = 2 \\Rightarrow x = 1',
+        gotcha: 'Do NOT attempt to algebraically invert $f(x)$ — it is unnecessary and often impossible in closed form.',
+      },
+      {
+        label: 'Differentiate $f(x)$',
+        visualNote: 'The slope of $f$ at $x=1$ is highlighted on the graph.',
+        strategy: 'Compute $f\'(x)$ normally, then evaluate at the point found.',
+        explanation: 'Now we return to familiar territory: differentiation. The function $f(x) = x^3 + x$ is straightforward to differentiate using the power rule. This gives $f\'(x) = 3x^2 + 1$. The important thing is not just computing this derivative, but understanding what it represents: it is the slope of the original function at any point $x$. Since we found that $f^{-1}(2) = 1$, we evaluate this slope at $x=1$.',
+        math: 'f\'(x) = 3x^2 + 1',
+      },
+      {
+        label: 'Apply the inverse derivative formula',
+        explanation: 'Now everything comes together. The derivative of the inverse at 2 is the reciprocal of the derivative of the original function at the corresponding input. We already found that input to be 1, and the derivative there is $3(1)^2 + 1 = 4$. Taking the reciprocal gives the final answer. This reciprocal relationship reflects the geometric symmetry: inverse functions reflect across $y=x$, which flips slopes.',
+        math: '(f^{-1})\'(2) = \\frac{1}{f\'(1)} = \\frac{1}{4}',
+        sandbox: {
+          value: 'x=1',
+          rows: [
+            { label: '$f(1)$', expr: '1^3 + 1 = 2' },
+            { label: '$f\'(1)$', expr: '3(1)^2 + 1 = 4' },
+            { label: 'Inverse slope', expr: '1/4' },
+          ],
+          conclusion: 'The slope of the inverse at output 2 is the reciprocal of the slope of $f$ at input 1.',
+        },
+        conceptRef: 'Reciprocal slope relationship of inverse functions',
+      },
+    ],
+    variations: [
+      {
+        question: 'Find $(f^{-1})\'(0)$ for $f(x) = x^3 + x$.',
+        hint: 'Solve $x^3 + x = 0$ → $x=0$, then compute $1/f\'(0)$.',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-deriv-inverse-implicit',
+    title: 'Derivative of Inverse via Implicit Differentiation',
+    prereqs: ['Implicit differentiation', 'Chain rule'],
+    problem: 'Find $\\dfrac{d}{dx}(\\arcsin x)$.',
+    steps: [
+      {
+        label: 'Rewrite using inverse relationship',
+        visualNote: 'We reinterpret $y = \\arcsin x$ as $x = \\sin y$.',
+        strategy: 'Convert inverse trig into an implicit equation we can differentiate.',
+        explanation: 'Inverse trig functions are often easier to differentiate indirectly. Instead of trying to differentiate $\\arcsin x$ directly, we rewrite the relationship in its original form: if $y = \\arcsin x$, then by definition $\\sin y = x$. This reframing is powerful—it converts an unfamiliar derivative into one involving a basic trig function we already know how to differentiate. This is the essence of implicit differentiation: trade a difficult expression for a familiar relationship.',
+        math: 'y = \\arcsin x \\quad \\Rightarrow \\quad \\sin y = x',
+        conceptRef: 'Definition of inverse functions',
+      },
+      {
+        label: 'Differentiate both sides implicitly',
+        visualNote: 'The derivative propagates through $\\sin y$ using chain rule.',
+        strategy: 'Differentiate with respect to $x$, treating $y$ as a function of $x$.',
+        explanation: 'Now we differentiate both sides with respect to $x$. The right side is simple: derivative of $x$ is 1. The left side requires the chain rule because $y$ depends on $x$. The derivative of $\\sin y$ is $\\cos y \\cdot \\frac{dy}{dx}$. This is where many students hesitate—the key is to remember that $y$ is not independent; it is a function of $x$. So every time we differentiate a function of $y$, we multiply by $dy/dx$.',
+        math: '\\cos y \\cdot \\frac{dy}{dx} = 1',
+        gotcha: 'Forgetting the chain rule factor $dy/dx$ is the most common mistake here.',
+      },
+      {
+        label: 'Solve for $dy/dx$',
+        visualNote: 'We isolate the slope of the inverse function.',
+        strategy: 'Algebraically isolate the derivative term.',
+        explanation: 'We now solve for $\\frac{dy}{dx}$ by dividing both sides by $\\cos y$. This gives $\\frac{dy}{dx} = \\frac{1}{\\cos y}$. But we are not done—this answer is still in terms of $y$, and we need everything in terms of $x$. This is the second subtle step in implicit differentiation: after differentiating, we must translate back to the original variable.',
+        math: '\\frac{dy}{dx} = \\frac{1}{\\cos y}',
+      },
+      {
+        label: 'Rewrite in terms of $x$',
+        explanation: 'To convert $\\cos y$ into an expression involving $x$, we use the identity $\\sin^2 y + \\cos^2 y = 1$. Since $\\sin y = x$, we substitute and get $\\cos^2 y = 1 - x^2$. Taking the positive square root (because $\\arcsin x$ is defined on $[-\\pi/2, \\pi/2]$ where cosine is positive), we get $\\cos y = \\sqrt{1 - x^2}$. Substituting back gives the final derivative entirely in terms of $x$.',
+        math: '\\frac{d}{dx}(\\arcsin x) = \\frac{1}{\\sqrt{1 - x^2}}',
+        sandbox: {
+          value: 'x = 0',
+          rows: [
+            { label: '$\\arcsin(0)$', expr: '0' },
+            { label: 'Derivative', expr: '1/\\sqrt{1-0} = 1' },
+          ],
+          conclusion: 'At $x=0$, the slope is 1 — consistent with the graph of $\\arcsin x$.',
+        },
+        conceptRef: 'Pythagorean identity and inverse trig domains',
+      },
+    ],
+    variations: [
+      {
+        question: 'Find $\\dfrac{d}{dx}(\\arccos x)$.',
+        hint: 'Start with $y = \\arccos x \\Rightarrow \\cos y = x$, then differentiate.',
+      },
+    ],
+  },
+],
 }
