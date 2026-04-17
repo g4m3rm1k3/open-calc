@@ -1298,6 +1298,149 @@ The river gives you a free side, so the optimal rectangle is **not** a square: i
     "attempted-challenge-medium",
   ],
 
+  walkthroughs: [
+    {
+      id: 'wt-opt-fencing',
+      title: 'Fencing Problem — Step by Step',
+      prereqs: [
+        'Know how to find a derivative using the power rule',
+        'Understand that $A\'(x) = 0$ locates critical points',
+        'Know the difference between a constraint and an objective',
+      ],
+      problem: 'You have 100 m of fencing and want to enclose the largest possible rectangle. What dimensions maximize the area?',
+      steps: [
+        {
+          label: 'Name the unknowns and draw a picture',
+          explanation: '**Before any algebra, draw and label.** Let $x$ = the width (meters) and $y$ = the length. You have two widths and two lengths of fence, so the perimeter constraint is:\n\n$2x + 2y = 100$\n\nThe area you want to maximize is $A = xy$. These two equations — the **constraint** and the **objective** — are the only things that matter. Everything else follows from them.',
+          math: '2x + 2y = 100, \\quad A = xy',
+          gotcha: 'The constraint and the objective are different equations. Students often mix them up. The constraint limits you; the objective is what you\'re optimizing.',
+        },
+        {
+          label: 'Eliminate one variable using the constraint',
+          explanation: 'Solve the constraint for $y$:\n\n$y = 50 - x$\n\nNow substitute into the objective so that $A$ is a function of **one variable only**:\n\n$A(x) = x(50 - x) = 50x - x^2$\n\nThis is the step that turns a two-variable geometry problem into a single-variable calculus problem. The domain is $x \\in (0, 50)$ — both dimensions must be positive.',
+          math: 'A(x) = 50x - x^2, \\quad x \\in (0,\\, 50)',
+          gotcha: 'Always state the domain. Without it you might find a critical point outside the valid range.',
+          conceptRef: 'Constraint → single-variable reduction',
+        },
+        {
+          label: 'Differentiate and set equal to zero',
+          explanation: 'Take the derivative and find where it equals zero — that is where the rate of change of area is zero, meaning we\'re at a peak or a valley:\n\n$A\'(x) = 50 - 2x$\n\nSet $A\'(x) = 0$:\n\n$50 - 2x = 0 \\implies x = 25$\n\nSo the critical point is at $x = 25$ m. This is a candidate for the maximum — but we still need to confirm it\'s a maximum and not a minimum.',
+          math: "A'(x) = 50 - 2x = 0 \\implies x = 25",
+          conceptRef: "Fermat's Theorem — critical points",
+        },
+        {
+          label: 'Confirm it\'s a maximum (second derivative test)',
+          explanation: 'Take the second derivative:\n\n$A\'\'(x) = -2$\n\nSince $A\'\'(25) = -2 < 0$, the graph of $A(x)$ is **concave down** at $x = 25$. Concave down at a critical point means it\'s a local maximum. Since there\'s only one critical point in the domain, this is also the **global maximum**.',
+          math: "A''(x) = -2 < 0 \\implies \\text{concave down} \\implies \\text{maximum}",
+          gotcha: 'One critical point in an open interval does NOT automatically mean it\'s the global max — you need either the second derivative test or a sign chart for $A\'$.',
+        },
+        {
+          label: 'Find both dimensions and state the answer',
+          explanation: 'With $x = 25$, use the constraint to find $y$:\n\n$y = 50 - 25 = 25$ m\n\nBoth dimensions are equal — the optimal rectangle is a **square**. The maximum area is:\n\n$A_{\\max} = 25 \\times 25 = 625 \\text{ m}^2$\n\n**Why a square?** Any deviation from a square — say, 20 m × 30 m — gives area 600 m², less than 625. The square distributes perimeter most efficiently. This result holds for any fixed perimeter.',
+          math: 'x = y = 25 \\text{ m}, \\quad A_{\\max} = 625 \\text{ m}^2',
+          conceptRef: 'Geometric intuition — square maximizes area for fixed perimeter',
+        },
+      ],
+      variations: [
+        {
+          question: 'What if the fence costs $3/m for the two widths and $5/m for the two lengths? Same 100 m total budget — now what are the optimal dimensions?',
+          hint: 'The constraint changes: $3(2x) + 5(2y) = 100$. The objective $A = xy$ stays the same. Redo the substitution.',
+        },
+        {
+          question: 'What if one side is a river, so you only need 3 sides of fence? Does the square still win?',
+          hint: 'New constraint: $2x + y = 100$. Spoiler: the optimal shape is now 2:1 (width:length), not a square.',
+        },
+      ],
+    },
+    {
+      id: 'wt-opt-tincan',
+      title: 'Tin Can — Minimizing Surface Area',
+      prereqs: [
+        'Volume of a cylinder: $V = \\pi r^2 h$',
+        'Surface area of a cylinder: $SA = 2\\pi r^2 + 2\\pi r h$',
+        'Negative exponents: $\\frac{1}{r} = r^{-1}$, so $\\frac{d}{dr}[r^{-1}] = -r^{-2}$',
+      ],
+      problem: 'Design a cylindrical can that holds exactly $500\\text{ cm}^3$ using the least possible material. Find the radius and height that minimize surface area.',
+      steps: [
+        {
+          label: 'Identify the objective and the constraint',
+          visualNote: 'A cylinder with labeled top disc, bottom disc, and curved side wall. Each piece corresponds to one term in the SA formula.',
+          explanation: 'Every optimization problem has exactly two equations: what you\'re **optimizing** (the objective) and what limits you (the constraint).\n\nThe **objective** is the surface area — the total material used. A closed cylinder has two circular ends and one rectangular side (unrolled, it\'s a rectangle of width $2\\pi r$ and height $h$):\n\n$SA = 2\\pi r^2 + 2\\pi r h$\n\nThe two $\\pi r^2$ terms are the top and bottom discs. The $2\\pi r h$ term is the curved side.\n\nThe **constraint** is the fixed volume:\n\n$\\pi r^2 h = 500$\n\nTwo equations, two unknowns ($r$ and $h$). The strategy is to use the constraint to eliminate one unknown, leaving a single-variable calculus problem.',
+          math: 'SA = 2\\pi r^2 + 2\\pi r h, \\qquad \\pi r^2 h = 500',
+          sandbox: {
+            value: 'r = 5, \\; h = 6.366',
+            rows: [
+              { label: 'Volume check', expr: '\\pi(5)^2(6.366) = \\pi \\cdot 159.15 \\approx 500 \\text{ cm}^3 \\checkmark' },
+              { label: 'SA at this point', expr: '2\\pi(25) + 2\\pi(5)(6.366) \\approx 157.1 + 200 = 357 \\text{ cm}^2' },
+            ],
+            conclusion: 'These numbers confirm the setup. We\'re looking for the $r$ and $h$ that bring that 357 down to its minimum.',
+          },
+        },
+        {
+          label: 'Eliminate $h$ — reduce to one variable',
+          visualNote: 'The $h$ dimension on the cylinder fades and is replaced by the expression $500/(\\pi r^2)$, showing that height is now determined entirely by radius.',
+          strategy: 'We solve the constraint for $h$ (not $r$) because $h$ appears to the first power — isolating it is one clean division. Solving for $r$ would require a square root, which would make the subsequent algebra messier.',
+          explanation: 'Solve the volume constraint for $h$:\n\n$h = \\dfrac{500}{\\pi r^2}$\n\nNow substitute this into the SA formula. The $\\pi$ in the denominator of $h$ cancels with the $\\pi$ in $2\\pi r$:\n\n$SA(r) = 2\\pi r^2 + 2\\pi r \\cdot \\dfrac{500}{\\pi r^2} = 2\\pi r^2 + \\dfrac{1000}{r}$\n\nSurface area is now a function of **one variable only**. Domain: $r > 0$ (radius must be positive).',
+          math: 'SA(r) = 2\\pi r^2 + \\frac{1000}{r}, \\quad r > 0',
+          sandbox: {
+            value: 'r = 5',
+            rows: [
+              { label: '$h$ from constraint', expr: 'h = \\dfrac{500}{\\pi(25)} = \\dfrac{500}{78.54} \\approx 6.366 \\text{ cm}' },
+              { label: 'SA with raw $h$', expr: '2\\pi(25) + 2\\pi(5)(6.366) \\approx 157.1 + 200.0 = 357 \\text{ cm}^2' },
+              { label: 'SA with formula', expr: '2\\pi(25) + \\dfrac{1000}{5} = 157.1 + 200.0 = 357 \\text{ cm}^2 \\checkmark' },
+            ],
+            conclusion: 'Both routes give the same answer. The substitution is correct — the formula captures the exact same geometry.',
+          },
+          gotcha: 'Before differentiating, rewrite $\\dfrac{1000}{r}$ as $1000r^{-1}$. The power rule works on negative exponents: $\\dfrac{d}{dr}[r^{-1}] = -r^{-2} = -\\dfrac{1}{r^2}$.',
+        },
+        {
+          label: 'Differentiate and find the critical point',
+          visualNote: 'A graph of $SA(r)$ appears — a curve that swoops down from high values near $r=0$, reaches a minimum, then rises as $r$ grows large. The minimum is marked.',
+          explanation: 'Differentiate term by term using the power rule:\n\n$\\dfrac{d}{dr}[2\\pi r^2] = 4\\pi r$ (standard power rule)\n\n$\\dfrac{d}{dr}\\left[\\dfrac{1000}{r}\\right] = \\dfrac{d}{dr}[1000r^{-1}] = -1000r^{-2} = -\\dfrac{1000}{r^2}$\n\nSo: $SA\'(r) = 4\\pi r - \\dfrac{1000}{r^2}$\n\nA critical point occurs where $SA\'(r) = 0$. Set the two terms equal:\n\n$4\\pi r = \\dfrac{1000}{r^2}$\n\nMultiply both sides by $r^2$ to clear the denominator:\n\n$4\\pi r^3 = 1000 \\implies r^3 = \\dfrac{250}{\\pi} \\implies r = \\sqrt[3]{\\dfrac{250}{\\pi}} \\approx 3.41 \\text{ cm}$',
+          math: "SA'(r) = 4\\pi r - \\frac{1000}{r^2} = 0 \\implies r = \\sqrt[3]{\\frac{250}{\\pi}} \\approx 3.41 \\text{ cm}",
+          sandbox: {
+            value: 'r = 3.41',
+            rows: [
+              { label: "$SA'$ at $r=3$", expr: "SA'(3) = 4\\pi(3) - \\dfrac{1000}{9} \\approx 37.7 - 111.1 = -73.4 < 0 \\text{ (still decreasing)}" },
+              { label: "$SA'$ at $r=3.41$", expr: "SA'(3.41) \\approx 4\\pi(3.41) - \\dfrac{1000}{11.63} \\approx 42.8 - 86.0 \\approx 0 \\checkmark" },
+              { label: "$SA'$ at $r=4$", expr: "SA'(4) = 4\\pi(4) - \\dfrac{1000}{16} \\approx 50.3 - 62.5 = -12.2 < 0" },
+            ],
+            conclusion: '$SA\'$ changes sign from negative to positive around $r \\approx 3.41$, confirming this is a minimum.',
+          },
+          conceptRef: 'Power rule with negative exponents',
+        },
+        {
+          label: 'Confirm it\'s a minimum and find $h$',
+          visualNote: 'The optimal cylinder appears — noticeably "squat." Its height visually equals its diameter ($h = 2r$), the most efficient shape.',
+          strategy: 'We use the second derivative test: if $SA\'\'(r) > 0$ at the critical point, the curve is concave up there, confirming a local minimum. Since there\'s only one critical point in $(0, \\infty)$, local = global.',
+          explanation: 'Take the second derivative:\n\n$SA\'\'(r) = 4\\pi + \\dfrac{2000}{r^3}$\n\nEvery term is positive for $r > 0$, so $SA\'\'(r) > 0$ everywhere — the SA curve is always concave up. The single critical point must be a global minimum.\n\nNow find $h$ at $r \\approx 3.41$:\n\n$h = \\dfrac{500}{\\pi r^2} = \\dfrac{500}{\\pi(3.41)^2} \\approx 13.72 \\text{ cm}$\n\nWait — check the ratio: $h/r \\approx 13.72/3.41 \\approx ?$ Let\'s be exact. We have $r^3 = 250/\\pi$, so:\n\n$\\dfrac{h}{r} = \\dfrac{500}{\\pi r^3} = \\dfrac{500}{\\pi \\cdot 250/\\pi} = \\dfrac{500}{250} = 2$\n\nSo $h = 2r$ **exactly** — the optimal height equals the diameter. This elegant result holds for any fixed volume.',
+          math: 'h = 2r \\approx 6.83 \\text{ cm}, \\quad SA_{\\min} = 3\\pi r^2 \\approx 219.7 \\text{ cm}^2',
+          sandbox: {
+            value: 'r = 3.41, \\; h = 6.83',
+            rows: [
+              { label: 'Volume check', expr: '\\pi(3.41)^2(6.83) \\approx \\pi(11.63)(6.83) \\approx 500 \\text{ cm}^3 \\checkmark' },
+              { label: '$SA_{\\min}$', expr: '2\\pi(11.63) + \\dfrac{1000}{3.41} \\approx 73.1 + 293.3 \\approx 219.7 \\text{ cm}^2' },
+              { label: 'Compare: $r=5$', expr: 'SA(5) = 357 \\text{ cm}^2 \\text{ vs } SA(3.41) = 219.7 \\text{ cm}^2 \\text{ — saves } 38\\%' },
+            ],
+            conclusion: 'The optimal can uses 38% less material than a can with $r = 5$ cm at the same volume. The math delivers a real engineering gain.',
+          },
+          gotcha: 'Real soup cans are taller than $h = 2r$ because manufacturers prioritize stackability and label space. The math gives the material-minimum; engineering constraints shift the actual design.',
+          conceptRef: 'Second derivative test — concave up confirms minimum',
+        },
+      ],
+      variations: [
+        {
+          question: 'What if the can has no top (like a paper cup)? How does the optimal ratio change?',
+          hint: 'Remove one $\\pi r^2$ from SA. The constraint is the same. Redo — the optimal ratio becomes $h = r$, not $h = 2r$.',
+        },
+        {
+          question: 'What if the bottom material costs twice as much as the side material? Now the objective has different coefficients for each term.',
+          hint: 'SA cost = $2(2\\pi r^2) + 2\\pi r h$ (bottom costs double). Same constraint. The critical point shifts.',
+        },
+      ],
+    },
+  ],
+
   quiz: [
     {
       id: "opt-q1",

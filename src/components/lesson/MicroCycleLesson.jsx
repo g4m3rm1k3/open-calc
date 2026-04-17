@@ -16,6 +16,7 @@ import ScrubbableExample from './ScrubbableExample.jsx'
 import ChallengeBlock from './ChallengeBlock.jsx'
 import NarrativeStory from './NarrativeStory.jsx'
 import FirstPrinciplesLesson from './FirstPrinciplesLesson.jsx'
+import GuidedWalkthrough from './GuidedWalkthrough.jsx'
 import UnifiedLearningDock from './UnifiedLearningDock.jsx'
 import AssessmentBlock from './AssessmentBlock.jsx'
 import { parseProse } from '../math/parseProse.jsx'
@@ -650,6 +651,12 @@ export default function MicroCycleLesson({ lesson }) {
       )}
       <MathBlock data={lesson.math} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
+      {lesson.walkthroughs?.length > 0 && (
+        <div className="mb-2">
+          <SectionDivider icon="🗺" label="Guided Walkthroughs" color="brand" noteId={lesson.id ? `${lesson.id}:walkthroughs` : undefined} />
+          <GuidedWalkthrough walkthroughs={lesson.walkthroughs} />
+        </div>
+      )}
       {(() => {
         // Normalize python section: support python.visualizations, python.cells, and pythonLab formats
         const pythonRaw = lesson.python ?? lesson.pythonLab
