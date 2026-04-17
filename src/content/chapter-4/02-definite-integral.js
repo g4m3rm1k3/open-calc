@@ -517,6 +517,364 @@ export default {
     "attempted-challenge-hard",
   ],
 
+  walkthroughs: [
+    // ─── 1. Basic Polynomial — FTC direct application ───────────────────────
+    {
+      id: 'wt-defint-basic-poly',
+      title: 'Basic Polynomial',
+      prereqs: ['Power Rule antiderivative', 'FTC Part 1'],
+      problem: 'Evaluate $\\displaystyle\\int_1^3 (x^2 + 2x)\\,dx$.',
+      steps: [
+        {
+          label: 'Identify the antiderivative',
+          visualNote: 'The curve $f(x) = x^2 + 2x$ is drawn over $[1,3]$; the shaded region beneath it is the area we are about to measure.',
+          strategy: 'Before touching the limits, find $F(x)$ — the function whose derivative is $f(x)$. We do this first because the limits are just plug-in values; the hard work is reversing differentiation.',
+          explanation: 'Apply the **power rule in reverse**: raise each exponent by 1, then divide by the new exponent. The constant of integration $+C$ cancels when we subtract $F(a)$ from $F(b)$, so we omit it here.',
+          math: 'F(x) = \\frac{x^3}{3} + x^2',
+          gotcha: 'Do NOT add $+C$ at this stage. In a definite integral $C$ cancels: $[F(x)+C]_a^b = F(b)-F(a)$. Writing it just clutters the work.',
+          conceptRef: 'Power rule antiderivative: $\\int x^n\\,dx = \\frac{x^{n+1}}{n+1}$',
+        },
+        {
+          label: 'Apply the Evaluation Theorem — plug in the limits',
+          visualNote: 'Two vertical lines appear at $x=1$ and $x=3$, marking the boundary of the shaded region.',
+          strategy: 'FTC says the net signed area equals $F(b) - F(a)$. We always subtract $F(\\text{lower})$ from $F(\\text{upper})$ — order matters for sign.',
+          explanation: 'Substitute $x=3$ and $x=1$ into $F(x)$, then subtract. Use the bracket notation $\\Big[F(x)\\Big]_1^3$ to signal this two-step evaluation.',
+          math: '\\Big[\\tfrac{x^3}{3} + x^2\\Big]_1^3 = \\Bigl(\\tfrac{27}{3}+9\\Bigr) - \\Bigl(\\tfrac{1}{3}+1\\Bigr)',
+          sandbox: {
+            value: 'b=3,\\; a=1',
+            rows: [
+              { label: '$F(3)$', expr: '\\frac{27}{3} + 9 = 9 + 9 = 18' },
+              { label: '$F(1)$', expr: '\\frac{1}{3} + 1 = \\frac{4}{3}' },
+              { label: '$F(3)-F(1)$', expr: '18 - \\frac{4}{3} = \\frac{54-4}{3} = \\frac{50}{3} \\approx 16.67' },
+            ],
+            conclusion: 'The exact area under $x^2+2x$ from 1 to 3 is $\\frac{50}{3}$.',
+          },
+          gotcha: 'Evaluate the upper limit first, then subtract the lower. Reversing gives the wrong sign.',
+        },
+        {
+          label: 'State the result',
+          explanation: 'Combine the arithmetic into a single exact value.',
+          math: '\\int_1^3(x^2+2x)\\,dx = 18 - \\tfrac{4}{3} = \\frac{50}{3}',
+        },
+      ],
+      variations: [
+        { question: 'What if the lower limit were $0$ instead of $1$?', hint: '$F(0) = 0$, so the answer is just $F(3) = 18$. Lower limit of 0 is a free simplification.' },
+        { question: 'What changes if the integrand were $x^2 - 2x$?', hint: 'Only $F(x)$ changes to $\\frac{x^3}{3} - x^2$. Re-evaluate — the shaded area shrinks because $f$ dips below zero near $x=1$.' },
+      ],
+    },
+
+    // ─── 2. Signed Area — net vs total ──────────────────────────────────────
+    {
+      id: 'wt-defint-signed-area',
+      title: 'Signed Area',
+      prereqs: ['Definite integral definition', 'Basic antiderivatives'],
+      problem: 'Evaluate $\\displaystyle\\int_{-1}^{2} x\\,dx$ and interpret both the net signed area and the total (unsigned) area.',
+      steps: [
+        {
+          label: 'Find the antiderivative and apply FTC',
+          visualNote: 'The line $f(x)=x$ is drawn over $[-1,2]$. Below the $x$-axis ($-1$ to $0$) the shading is red (negative area); above ($0$ to $2$) it is blue (positive area).',
+          strategy: 'Start with the mechanical computation — FTC gives net signed area automatically. Geometric interpretation comes after.',
+          explanation: 'The antiderivative of $x$ is $\\frac{x^2}{2}$.',
+          math: '\\int_{-1}^{2} x\\,dx = \\Big[\\tfrac{x^2}{2}\\Big]_{-1}^{2} = \\tfrac{4}{2} - \\tfrac{1}{2} = \\tfrac{3}{2}',
+          sandbox: {
+            value: 'b=2,\\; a=-1',
+            rows: [
+              { label: '$F(2)$', expr: '\\frac{4}{2} = 2' },
+              { label: '$F(-1)$', expr: '\\frac{1}{2}' },
+              { label: 'Net area', expr: '2 - \\frac{1}{2} = \\frac{3}{2}' },
+            ],
+            conclusion: 'FTC delivers the net signed area: $\\frac{3}{2}$.',
+          },
+        },
+        {
+          label: 'Identify where $f$ crosses zero',
+          visualNote: 'A dot appears at $x=0$ — the crossing point that separates negative from positive area.',
+          strategy: 'To find total (unsigned) area we must split the integral wherever $f(x)$ changes sign. Otherwise negative contributions cancel positive ones — the integral underreports the geometric area.',
+          explanation: '$f(x) = x = 0$ at $x = 0$, which lies inside $[-1,2]$. Split there.',
+          math: '\\text{Total area} = \\int_{-1}^{0}|x|\\,dx + \\int_{0}^{2}|x|\\,dx',
+          gotcha: 'On $[-1,0]$, $f(x) < 0$ so $|f(x)| = -f(x) = -x$. You must negate the integrand on negative pieces, not just the limits.',
+        },
+        {
+          label: 'Compute each piece and add',
+          explanation: 'Integrate $-x$ on $[-1,0]$ and $x$ on $[0,2]$, then sum the absolute values.',
+          math: '\\int_{-1}^{0}(-x)\\,dx + \\int_{0}^{2} x\\,dx = \\tfrac{1}{2} + 2 = \\tfrac{5}{2}',
+          sandbox: {
+            value: 'split at $x=0$',
+            rows: [
+              { label: 'Left piece $(-x)$', expr: '\\Big[-\\tfrac{x^2}{2}\\Big]_{-1}^{0} = 0 - (-\\tfrac{1}{2}) = \\tfrac{1}{2}' },
+              { label: 'Right piece $(x)$', expr: '\\Big[\\tfrac{x^2}{2}\\Big]_{0}^{2} = 2 - 0 = 2' },
+              { label: 'Total (geometric)', expr: '\\tfrac{1}{2} + 2 = \\tfrac{5}{2}' },
+            ],
+            conclusion: 'Net signed area $\\frac{3}{2}$ ≠ total geometric area $\\frac{5}{2}$. The crossing point is the culprit.',
+          },
+          conceptRef: 'Net vs total area: $\\int_a^b f\\,dx$ counts cancellation; $\\int_a^b |f|\\,dx$ does not.',
+        },
+      ],
+      variations: [
+        { question: 'What if we asked for $\\int_{-1}^{2}|x|\\,dx$ directly?', hint: 'That\'s the total area $\\frac{5}{2}$ — the $|\\cdot|$ inside the integral forces the split.' },
+        { question: 'What if $f(x) = \\sin x$ on $[0, 2\\pi]$?', hint: 'Net area is 0 (symmetric above/below). Total area is 4. Always split at $\\sin x = 0$, i.e., $x = \\pi$.' },
+      ],
+    },
+
+    // ─── 3. u-Substitution with Limit Change ────────────────────────────────
+    {
+      id: 'wt-defint-u-sub',
+      title: 'u-Substitution',
+      prereqs: ['Indefinite u-substitution', 'Chain rule'],
+      problem: 'Evaluate $\\displaystyle\\int_0^2 2x(x^2+1)^3\\,dx$.',
+      steps: [
+        {
+          label: 'Choose $u$ — spot the inside function',
+          visualNote: 'The expression $(x^2+1)^3$ is highlighted; $2x$ is its derivative sitting beside it.',
+          strategy: 'We look for a composite structure: a function raised to a power with its derivative nearby. Here $u = x^2+1$ because $du = 2x\\,dx$ appears exactly in the integrand — zero algebra tax.',
+          explanation: 'Let $u = x^2 + 1$. Differentiate to get $du = 2x\\,dx$. Notice $2x\\,dx$ is exactly the factor sitting to the left of $(x^2+1)^3$ — the substitution is "clean."',
+          math: 'u = x^2+1 \\quad\\Rightarrow\\quad du = 2x\\,dx',
+          gotcha: 'If the derivative were $3x$ instead of $2x$, you\'d need to force a factor: $du = 2x\\,dx \\Rightarrow x\\,dx = du/2$. Always match exactly.',
+          conceptRef: 'u-substitution: reverse chain rule',
+        },
+        {
+          label: 'Change the limits from $x$-values to $u$-values',
+          visualNote: 'The $x$-axis labels "0" and "2" transform into "$u=1$" and "$u=5$" on the $u$-axis.',
+          strategy: 'We change limits now — not at the end — so we never need to back-substitute. Keeping everything in $u$ is cleaner and avoids the error-prone step of converting $F(u)$ back to $F(x)$ before evaluating.',
+          explanation: 'Substitute the original $x$-limits into $u = x^2+1$.',
+          math: 'x=0 \\Rightarrow u=1 \\qquad x=2 \\Rightarrow u=5',
+        },
+        {
+          label: 'Rewrite and integrate in $u$',
+          explanation: 'Replace everything: the integrand becomes $u^3$, $2x\\,dx$ becomes $du$, and the limits are now $1$ to $5$.',
+          math: '\\int_1^5 u^3\\,du = \\Big[\\tfrac{u^4}{4}\\Big]_1^5',
+          sandbox: {
+            value: 'u=1$ to $u=5',
+            rows: [
+              { label: '$F(5)$', expr: '\\frac{625}{4}' },
+              { label: '$F(1)$', expr: '\\frac{1}{4}' },
+              { label: 'Result', expr: '\\frac{625-1}{4} = \\frac{624}{4} = 156' },
+            ],
+            conclusion: 'Verify: plug $x=2$ into $(x^2+1)^4/4$ minus at $x=0$: $\\frac{5^4}{4}-\\frac{1^4}{4} = 156\\,\\checkmark$',
+          },
+          conceptRef: 'Power rule antiderivative after substitution',
+        },
+      ],
+      variations: [
+        { question: 'What if the limits were $-1$ to $2$?', hint: '$u(-1) = 2$, $u(2) = 5$. New limits $[2,5]$. Same integrand.' },
+        { question: 'What if you forgot to change the limits and back-substituted instead?', hint: 'You\'d get $\\frac{(x^2+1)^4}{4}\\Big|_0^2$ — same answer, but the two-step back-sub is where errors sneak in.' },
+      ],
+    },
+
+    // ─── 4. Split Interval — piecewise / absolute value ─────────────────────
+    {
+      id: 'wt-defint-split-interval',
+      title: 'Split Interval',
+      prereqs: ['Signed area', 'Piecewise functions'],
+      problem: 'Evaluate $\\displaystyle\\int_{-2}^{3}|x-1|\\,dx$.',
+      steps: [
+        {
+          label: 'Remove the absolute value — find the split point',
+          visualNote: 'The V-shaped graph of $|x-1|$ is drawn. The vertex (the kink) at $x=1$ divides the interval into two pieces.',
+          strategy: '$|x-1|$ changes definition at $x=1$. We must split there because the antiderivative formula is different on each side — a single FTC application cannot straddle a sign change.',
+          explanation: '$x - 1 < 0$ when $x < 1$, so $|x-1| = -(x-1) = 1-x$ on $[-2,1]$. When $x \\geq 1$, $|x-1| = x-1$ on $[1,3]$.',
+          math: '\\int_{-2}^{3}|x-1|\\,dx = \\int_{-2}^{1}(1-x)\\,dx + \\int_{1}^{3}(x-1)\\,dx',
+        },
+        {
+          label: 'Evaluate the left piece',
+          explanation: 'Antiderivative of $(1-x)$ is $x - \\frac{x^2}{2}$.',
+          math: '\\Big[x - \\tfrac{x^2}{2}\\Big]_{-2}^{1} = \\Bigl(1-\\tfrac{1}{2}\\Bigr)-\\Bigl(-2-2\\Bigr) = \\tfrac{1}{2}+4 = \\tfrac{9}{2}',
+          sandbox: {
+            value: 'a=-2,\\; b=1',
+            rows: [
+              { label: '$F(1)$', expr: '1 - \\frac{1}{2} = \\frac{1}{2}' },
+              { label: '$F(-2)$', expr: '-2 - \\frac{4}{2} = -4' },
+              { label: 'Left piece', expr: '\\frac{1}{2} - (-4) = \\frac{9}{2}' },
+            ],
+            conclusion: 'The left triangular region has area $\\frac{9}{2}$.',
+          },
+        },
+        {
+          label: 'Evaluate the right piece and sum',
+          explanation: 'Antiderivative of $(x-1)$ is $\\frac{x^2}{2}-x$.',
+          math: '\\Big[\\tfrac{x^2}{2}-x\\Big]_{1}^{3} = \\Bigl(\\tfrac{9}{2}-3\\Bigr)-\\Bigl(\\tfrac{1}{2}-1\\Bigr) = \\tfrac{3}{2}+\\tfrac{1}{2} = 2',
+          gotcha: 'On the right piece $f(x)=x-1 \\geq 0$, so no sign flip needed. Only negate where the original expression is negative.',
+          conceptRef: 'Additivity of integrals: $\\int_a^c = \\int_a^b + \\int_b^c$',
+        },
+        {
+          label: 'Add the two pieces',
+          explanation: 'Both pieces are positive areas — add them directly.',
+          math: '\\int_{-2}^{3}|x-1|\\,dx = \\tfrac{9}{2} + 2 = \\tfrac{13}{2}',
+        },
+      ],
+      variations: [
+        { question: 'What if the integrand were $|x^2 - 1|$?', hint: 'Now find where $x^2-1=0$: $x=\\pm 1$. Three pieces: $[-2,-1]$, $[-1,1]$, $[1,3]$.' },
+      ],
+    },
+
+    // ─── 5. Trig Functions ───────────────────────────────────────────────────
+    {
+      id: 'wt-defint-trig',
+      title: 'Trig Functions',
+      prereqs: ['Trig antiderivatives', 'Special angle values'],
+      problem: 'Evaluate $\\displaystyle\\int_0^{\\pi/2}(\\sin x + \\cos x)\\,dx$.',
+      steps: [
+        {
+          label: 'Find the antiderivative term by term',
+          visualNote: 'The curve $\\sin x + \\cos x$ oscillates over $[0, \\pi/2]$, staying positive throughout — shading is entirely above the axis.',
+          strategy: 'Apply the trig antiderivative table to each term. Remember the sign: $\\int \\sin x\\,dx = -\\cos x$ (not $+\\cos x$). The minus is the most common sign error here.',
+          explanation: '$\\int \\sin x\\,dx = -\\cos x$ and $\\int \\cos x\\,dx = \\sin x$. Combine.',
+          math: 'F(x) = -\\cos x + \\sin x',
+          gotcha: '$\\int \\sin x\\,dx = -\\cos x$, NOT $+\\cos x$. Verify: $\\frac{d}{dx}(-\\cos x) = \\sin x\\,\\checkmark$',
+          conceptRef: 'Trig antiderivatives: $\\int\\sin = -\\cos$, $\\int\\cos = \\sin$',
+        },
+        {
+          label: 'Evaluate at the limits',
+          explanation: 'Plug in $x = \\pi/2$ and $x = 0$, recalling $\\cos(\\pi/2)=0$, $\\sin(\\pi/2)=1$, $\\cos 0=1$, $\\sin 0=0$.',
+          math: '\\Big[-\\cos x + \\sin x\\Big]_0^{\\pi/2} = (-\\cos\\tfrac{\\pi}{2}+\\sin\\tfrac{\\pi}{2})-(-\\cos 0+\\sin 0)',
+          sandbox: {
+            value: 'x=\\pi/2$ and $x=0',
+            rows: [
+              { label: '$F(\\pi/2)$', expr: '-0 + 1 = 1' },
+              { label: '$F(0)$', expr: '-1 + 0 = -1' },
+              { label: 'Result', expr: '1 - (-1) = 2' },
+            ],
+            conclusion: 'The area under $\\sin x + \\cos x$ over the first quarter-period is exactly 2.',
+          },
+        },
+      ],
+      variations: [
+        { question: 'What if the upper limit were $\\pi$ instead of $\\pi/2$?', hint: '$F(\\pi) = -\\cos\\pi + \\sin\\pi = 1 + 0 = 1$. Result: $1-(-1) = 2$. Same answer — the curve dips and rises symmetrically.' },
+        { question: 'Evaluate $\\int_0^{\\pi} \\sin x\\,dx$. Geometric meaning?', hint: 'Result is 2. The arch of $\\sin$ over $[0,\\pi]$ has area exactly 2 — a famous benchmark value.' },
+      ],
+    },
+
+    // ─── 6. Average Value of a Function ─────────────────────────────────────
+    {
+      id: 'wt-defint-avg-value',
+      title: 'Average Value',
+      prereqs: ['Definite integral', 'FTC'],
+      problem: 'Find the average value of $f(x) = x^2$ on $[1,4]$.',
+      steps: [
+        {
+          label: 'Apply the average value formula',
+          visualNote: 'The parabola $x^2$ is drawn over $[1,4]$. A horizontal dashed line at height $f_{\\text{avg}}$ is shown — it slices the parabola so the area above equals the area below.',
+          strategy: 'The average value formula $\\frac{1}{b-a}\\int_a^b f(x)\\,dx$ is just the integral divided by the width of the interval. Think of it as: if you replaced the curve with a rectangle of the same area, what height would the rectangle have?',
+          explanation: 'With $a=1$, $b=4$, the formula gives $\\frac{1}{3}\\int_1^4 x^2\\,dx$.',
+          math: 'f_{\\text{avg}} = \\frac{1}{b-a}\\int_a^b f(x)\\,dx = \\frac{1}{3}\\int_1^4 x^2\\,dx',
+          conceptRef: 'Average value: $f_{\\text{avg}} = \\frac{1}{b-a}\\int_a^b f\\,dx$',
+        },
+        {
+          label: 'Evaluate the integral',
+          explanation: 'Antiderivative of $x^2$ is $\\frac{x^3}{3}$.',
+          math: '\\int_1^4 x^2\\,dx = \\Big[\\tfrac{x^3}{3}\\Big]_1^4 = \\tfrac{64}{3} - \\tfrac{1}{3} = 21',
+          sandbox: {
+            value: 'b=4,\\; a=1',
+            rows: [
+              { label: '$F(4)$', expr: '\\frac{64}{3}' },
+              { label: '$F(1)$', expr: '\\frac{1}{3}' },
+              { label: '$\\int_1^4 x^2\\,dx$', expr: '\\frac{63}{3} = 21' },
+            ],
+            conclusion: 'The area under $x^2$ from 1 to 4 is 21 square units.',
+          },
+        },
+        {
+          label: 'Divide by the interval width',
+          explanation: 'The interval $[1,4]$ has width $b-a = 3$. Divide the integral.',
+          math: 'f_{\\text{avg}} = \\frac{21}{3} = 7',
+          gotcha: 'Do NOT forget to divide by $(b-a)$. Many students compute the integral correctly and forget the $\\frac{1}{b-a}$ factor — they report 21 instead of 7.',
+        },
+      ],
+      variations: [
+        { question: 'Find the value $c \\in [1,4]$ where $f(c) = f_{\\text{avg}} = 7$.', hint: '$c^2 = 7 \\Rightarrow c = \\sqrt{7} \\approx 2.65$. This is the Mean Value Theorem for integrals.' },
+      ],
+    },
+
+    // ─── 7. Area Between Two Curves ─────────────────────────────────────────
+    {
+      id: 'wt-defint-area-between',
+      title: 'Area Between Curves',
+      prereqs: ['Definite integral', 'Solving equations for intersections'],
+      problem: 'Find the area enclosed between $f(x) = x+2$ and $g(x) = x^2$ from their intersection points.',
+      steps: [
+        {
+          label: 'Find intersection points — the limits of integration',
+          visualNote: 'The line $y=x+2$ and the parabola $y=x^2$ are drawn. Two crossing points appear — these become the limits $a$ and $b$.',
+          strategy: 'We never guess the limits for area-between problems. Set the curves equal and solve. The intersection points are always the natural limits when finding the enclosed area.',
+          explanation: 'Set $f(x) = g(x)$: $x+2 = x^2 \\Rightarrow x^2-x-2=0 \\Rightarrow (x-2)(x+1)=0$.',
+          math: 'x = -1 \\quad\\text{and}\\quad x = 2',
+          gotcha: 'Always verify which function is on top by testing a point between the intersections. Here $x=0$: $f(0)=2 > g(0)=0$, so $f$ is on top.',
+        },
+        {
+          label: 'Set up the integral as (top) minus (bottom)',
+          visualNote: 'The vertical strip between the two curves is highlighted. Its height is $f(x)-g(x)$.',
+          strategy: 'Area between curves is always $\\int[f_{\\text{top}} - f_{\\text{bottom}}]\\,dx$. The sign of this difference is positive on $[-1,2]$ (we just verified). If the curves cross again inside, we\'d need to split.',
+          explanation: 'Subtract $g$ from $f$ inside the integral.',
+          math: 'A = \\int_{-1}^{2}[(x+2)-x^2]\\,dx = \\int_{-1}^{2}(-x^2+x+2)\\,dx',
+        },
+        {
+          label: 'Evaluate the integral',
+          explanation: 'Antiderivative: $-\\frac{x^3}{3} + \\frac{x^2}{2} + 2x$.',
+          math: '\\Big[-\\tfrac{x^3}{3}+\\tfrac{x^2}{2}+2x\\Big]_{-1}^{2}',
+          sandbox: {
+            value: 'b=2,\\; a=-1',
+            rows: [
+              { label: '$F(2)$', expr: '-\\frac{8}{3}+2+4 = -\\frac{8}{3}+6 = \\frac{10}{3}' },
+              { label: '$F(-1)$', expr: '\\frac{1}{3}+\\frac{1}{2}-2 = \\frac{2+3-12}{6} = -\\frac{7}{6}' },
+              { label: 'Area', expr: '\\frac{10}{3}+\\frac{7}{6} = \\frac{20+7}{6} = \\frac{27}{6} = \\frac{9}{2}' },
+            ],
+            conclusion: 'The enclosed region has area $\\frac{9}{2}$ square units.',
+          },
+          conceptRef: 'Area between curves: $\\int_a^b[f_{\\text{top}}-f_{\\text{bot}}]\\,dx$',
+        },
+      ],
+      variations: [
+        { question: 'What if $g(x) = x$ instead of $x^2$?', hint: 'Solve $x+2=x$ → no solution. The curves never intersect — area is infinite or you need given bounds.' },
+        { question: 'What if you integrated with $g - f$ by mistake?', hint: 'You\'d get $-\\frac{9}{2}$. The negative answer is a signal that you put top and bottom backwards — flip the subtraction.' },
+      ],
+    },
+
+    // ─── 8. FTC Part 2 — derivative of an integral ──────────────────────────
+    {
+      id: 'wt-defint-ftc2',
+      title: 'FTC Part 2',
+      prereqs: ['FTC Part 1', 'Chain rule'],
+      problem: 'Find $\\dfrac{d}{dx}\\displaystyle\\int_1^{x^2} \\sqrt{t^3+1}\\,dt$.',
+      steps: [
+        {
+          label: 'Recognize the FTC Part 2 pattern',
+          visualNote: 'The upper limit "$x^2$" is highlighted in red — it is a function of $x$, not a constant. This is what makes it FTC Part 2, not Part 1.',
+          strategy: 'FTC Part 2 says: $\\frac{d}{dx}\\int_a^{g(x)} f(t)\\,dt = f(g(x))\\cdot g\'(x)$. The key move is: plug the upper limit into $f$, then multiply by the derivative of the upper limit. No antiderivative is ever computed.',
+          explanation: 'Here $f(t) = \\sqrt{t^3+1}$ and $g(x) = x^2$. We will apply the pattern directly — no need to find $F(t)$.',
+          math: '\\frac{d}{dx}\\int_a^{g(x)} f(t)\\,dt = f(g(x))\\cdot g\'(x)',
+          conceptRef: 'FTC Part 2: differentiation undoes integration (with chain rule for composite upper limit)',
+        },
+        {
+          label: 'Plug the upper limit into $f(t)$',
+          visualNote: 'The "$t$" inside $\\sqrt{t^3+1}$ is replaced by "$x^2$."',
+          strategy: 'Substitute $t = g(x) = x^2$ into $f(t)$. This is the "evaluate at upper limit" step. It feels mechanical once you see the pattern.',
+          explanation: 'Replace $t$ with $x^2$ inside $\\sqrt{t^3+1}$.',
+          math: 'f(g(x)) = \\sqrt{(x^2)^3+1} = \\sqrt{x^6+1}',
+          gotcha: 'Do NOT differentiate $f(t)$ — you are evaluating it, not differentiating it. The chain rule factor comes next, separately.',
+        },
+        {
+          label: 'Multiply by $g\'(x)$ — the chain rule factor',
+          explanation: 'Since the upper limit is $g(x) = x^2$, we need $g\'(x) = 2x$ and multiply.',
+          math: '\\frac{d}{dx}\\int_1^{x^2}\\sqrt{t^3+1}\\,dt = \\sqrt{x^6+1}\\cdot 2x',
+          sandbox: {
+            value: 'x=1$ (sanity check)',
+            rows: [
+              { label: 'Upper limit at $x=1$', expr: 'g(1) = 1^2 = 1' },
+              { label: 'Integral from 1 to 1', expr: '\\int_1^1 \\sqrt{t^3+1}\\,dt = 0' },
+              { label: 'Derivative at $x=1$', expr: '\\sqrt{1+1}\\cdot 2 = 2\\sqrt{2} \\approx 2.83' },
+            ],
+            conclusion: 'The integral collapses to 0 at $x=1$ but its rate of change there is $2\\sqrt{2}$ — the upper-limit motion drives the growth.',
+          },
+          gotcha: 'If the upper limit were just $x$ (not $x^2$), the chain rule factor would be 1 and we\'d skip this step.',
+        },
+      ],
+      variations: [
+        { question: 'What if the upper limit were $x^3$ instead of $x^2$?', hint: '$g\'(x) = 3x^2$. Answer: $\\sqrt{x^9+1}\\cdot 3x^2$.' },
+        { question: 'What if the variable limit were on the bottom instead: $\\int_x^1 \\sqrt{t^3+1}\\,dt$?', hint: 'Flip limits to get $-\\int_1^x \\sqrt{t^3+1}\\,dt$. Chain rule factor is 1, but the answer is negated: $-\\sqrt{x^3+1}$.' },
+      ],
+    },
+  ],
+
   quiz: [
     {
       id: "def-int-q1",
