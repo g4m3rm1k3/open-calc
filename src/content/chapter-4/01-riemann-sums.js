@@ -113,7 +113,12 @@ export default {
       },
     ],
     visualizations: [
-      ],
+      {
+        id: 'RiemannSumDefinitionWalkthrough',
+        title: 'Limit Definition of Integral Walkthrough',
+        caption: 'A step-by-step rigorous walkthrough for finding the exact area under the curve y=x² using the definition of a definite integral as the limit of Riemann sums.',
+      },
+    ],
   },
 
   rigor: {
