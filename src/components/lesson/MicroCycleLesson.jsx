@@ -29,8 +29,27 @@ export { parseProse } from '../math/parseProse.jsx'
 
 // ─── Shared prose utilities ────────────────────────────────────────────────
 
-function ProseParagraph({ text }) {
-  return <MarkdownProse text={text} className="mb-4 last:mb-0" />
+const HEADING_PREFIX = /^\*\*([^*\n]+)\*\*\s*/
+
+function ProseParagraph({ text, isFirst }) {
+  const match = text.match(HEADING_PREFIX)
+  if (match) {
+    const heading = match[1]
+    const body = text.slice(match[0].length).trim()
+    return (
+      <div className={`${isFirst ? '' : 'pt-6 border-t border-slate-100 dark:border-slate-800'} pb-2 last:pb-0`}>
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-brand-600 dark:text-sky-400 mb-2">
+          {heading}
+        </p>
+        {body && <MarkdownProse text={body} />}
+      </div>
+    )
+  }
+  return (
+    <div className={`${isFirst ? '' : 'pt-5 border-t border-slate-100 dark:border-slate-800'} last:pb-0`}>
+      <MarkdownProse text={text} />
+    </div>
+  )
 }
 
 const BULLET_RE = /^[•\-*]\s+/
@@ -68,7 +87,7 @@ function renderMixedProse(prose) {
         </ol>
       )
     } else {
-      out.push(<ProseParagraph key={`p-${i}`} text={p} />)
+      out.push(<ProseParagraph key={`p-${i}`} text={p} isFirst={out.length === 0} />)
       i++
     }
   }

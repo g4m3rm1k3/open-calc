@@ -1,5 +1,5 @@
 import KatexBlock from '../math/KatexBlock.jsx'
-import { parseProse } from '../math/parseProse.jsx'
+import MarkdownProse from '../math/MarkdownProse.jsx'
 
 const ICONS = {
   definition: '📐',
@@ -44,12 +44,17 @@ const LABELS = {
 function renderBody(body) {
   if (!body) return null
   // Pure LaTeX expression (no text, no \[...\] wrappers, no $ markers)
-  // e.g. "\frac{d}{dx}[\sin x] = \cos x" — send straight to KatexBlock
   if (!body.includes('$') && !body.includes('\\[') && !body.includes('\\(') && /^\\/.test(body.trim())) {
     return <KatexBlock expr={body} />
   }
-  // Everything else — parseProse handles $...$, \[...\], \(...\), **bold**, and plain text
-  return <div className="text-sm leading-relaxed">{parseProse(body)}</div>
+  // MarkdownProse with color inheritance — paragraph and strong colors defer to
+  // the parent .callout-* class so each callout type keeps its tint in both modes.
+  return (
+    <MarkdownProse
+      text={body}
+      className="[&_p]:text-inherit [&_p]:text-sm [&_p]:leading-relaxed [&_strong]:text-inherit [&_strong]:font-bold [&_em]:text-inherit [&_li]:text-inherit [&_ul]:text-inherit [&_ol]:text-inherit"
+    />
+  )
 }
 
 export default function Callout({ type = 'tip', title, body }) {
