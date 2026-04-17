@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import KatexBlock from '../../math/KatexBlock.jsx';
 
 // Geometric proof: d/dx[arctan(x)] = 1/(1 + x²)
 //
@@ -82,7 +83,7 @@ export default function ArcTanDerivationLab() {
   const f4 = (n) => n.toFixed(4);
 
   return (
-    <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+    <div>
       <h3 className="text-base font-semibold mb-1">arctan Derivative: Geometric Proof</h3>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
         The right triangle shows exactly where <span className="font-mono">1/(1+x²)</span> comes from.
@@ -168,7 +169,9 @@ export default function ArcTanDerivationLab() {
                 <span className="font-mono text-xs text-slate-400">{i + 1}.</span>
                 <span className="font-semibold text-xs">{s.label}</span>
               </div>
-              <p className="font-mono text-xs mt-0.5" style={{ color: s.color }}>{s.formula}</p>
+              <div className="mt-0.5 overflow-x-auto" style={{ color: s.color }}>
+                <KatexBlock expr={s.formula} />
+              </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.note}</p>
             </div>
           ))}
