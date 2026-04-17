@@ -377,6 +377,211 @@ export default {
     'attempted-challenge-hard',
   ],
 
+      walkthroughs: [
+    {
+      id: 'wt-summation-basic-riemann-left',
+      title: 'Left Riemann Sum',
+      prereqs: ['Summation notation', 'Riemann sum definition'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'left', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      problem: 'Approximate $\\displaystyle\\int_1^3 x^2\\,dx$ using a left Riemann sum with $n=4$ subintervals.',
+      steps: [
+        {
+          label: 'Partition the interval and compute Δx',
+          visualNote: 'The interval [1,3] is divided into 4 equal rectangles. Vertical lines appear at x=1, 1.5, 2, 2.5, 3.',
+          strategy: 'First compute the width of each subinterval. The total length is b−a = 2, divided by n = 4, so each rectangle has width Δx = 0.5. This width is constant for equal partitions.',
+          explanation: 'Look at the graph before any algebra. The curve f(x) = x² starts at height 1 and rises to height 9 over [1,3]. We are going to cover this region with 4 rectangles. The total width is 3−1 = 2. Divide by 4 rectangles: Δx = 2/4 = 0.5. This Δx will be the base of every rectangle and the multiplier in front of the sum.',
+          math: '\\Delta x = \\frac{3-1}{4} = 0.5',
+          sandbox: {
+            value: 'interval length = 2',
+            rows: [
+              { label: 'Δx calculation', expr: '2 ÷ 4 = 0.5' }
+            ],
+            conclusion: 'Each rectangle has base 0.5.'
+          }
+        },
+        {
+          label: 'Choose left endpoints for each subinterval',
+          visualNote: 'The left edge of each rectangle is highlighted. Heights are taken at x=1, 1.5, 2, 2.5.',
+          strategy: 'For a left Riemann sum we evaluate f at the left endpoint of each subinterval. This choice is systematic and easy to write as a summation.',
+          explanation: 'The left endpoint rule means we sample the function at the very beginning of each little interval. The first subinterval is [1,1.5], so we use x₁ = 1. The second is [1.5,2], so x₂ = 1.5, and so on. These points form an arithmetic sequence: 1, 1.5, 2, 2.5. This pattern lets us write the sum compactly with sigma notation.',
+          math: 'x_i = 1 + (i-1)\\Delta x \\quad i=1\\text{ to }4',
+          gotcha: 'Left endpoints always use the starting x of each subinterval — never the midpoint or right edge.'
+        },
+        {
+          label: 'Evaluate f at each left endpoint',
+          visualNote: 'Four vertical bars rise from the left edges to the curve heights: f(1)=1, f(1.5)=2.25, f(2)=4, f(2.5)=6.25.',
+          strategy: 'Compute f(x_i) for each of the four points. These heights become the heights of our approximating rectangles.',
+          explanation: 'Now plug each left-endpoint x-value into the function. At x=1 we get 1² = 1. At x=1.5 we get (1.5)² = 2.25. At x=2 we get 4. At x=2.5 we get 6.25. These four numbers are the heights of the rectangles that will cover the area under the curve. Notice they are increasing because the function is increasing on [1,3].',
+          math: 'f(1)=1, \\quad f(1.5)=2.25, \\quad f(2)=4, \\quad f(2.5)=6.25'
+        },
+        {
+          label: 'Form the Riemann sum and compute the total',
+          visualNote: 'The four rectangles are filled in. Their combined area is shaded in light blue.',
+          strategy: 'Multiply each height by Δx and add them up. This is the left Riemann sum approximation.',
+          explanation: 'Each rectangle’s area is height × width. The width is the same Δx = 0.5 for all four, so we factor it out: 0.5 × (f(1) + f(1.5) + f(2) + f(2.5)). Adding the heights gives 1 + 2.25 + 4 + 6.25 = 13.5. Multiply by Δx: 0.5 × 13.5 = 6.75. This is our approximation to the true area under the curve.',
+          math: '\\sum_{i=1}^{4} f(x_i)\\Delta x = 0.5(1 + 2.25 + 4 + 6.25) = 6.75',
+          sandbox: {
+            value: 'n=4 left sum',
+            rows: [
+              { label: 'Sum of heights', expr: '1 + 2.25 + 4 + 6.25 = 13.5' },
+              { label: '× Δx', expr: '13.5 × 0.5 = 6.75' }
+            ],
+            conclusion: 'Left Riemann sum approximation = 6.75.'
+          }
+        }
+      ],
+      variations: [
+        { question: 'What if we used n=8 instead of n=4?', hint: 'Δx becomes 0.25. Recompute the 8 left-endpoint heights and sum. The approximation gets closer to the true value 50/3 ≈ 16.67.' },
+        { question: 'What changes if we switch to right endpoints?', hint: 'Right endpoints would be x=1.5,2,2.5,3. Heights become 2.25,4,6.25,9. Sum = 0.5×21.5 = 10.75 (larger overestimate).' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-right-vs-left',
+      title: 'Right vs Left Riemann Sum',
+      prereqs: ['Left Riemann sum', 'Increasing/decreasing functions'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'right', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      problem: 'Compare the left and right Riemann sums for $\\int_1^3 x^2\\,dx$ with n=4. Which is larger and why?',
+      steps: [
+        {
+          label: 'Recall the left sum we already computed',
+          visualNote: 'The previous left-rectangle diagram is shown side-by-side with an empty right-rectangle outline.',
+          strategy: 'We already have the left sum value. Now compute the right sum using the same partition and compare.',
+          explanation: 'From the previous example we know the left Riemann sum is 6.75. For the right Riemann sum we evaluate f at the right endpoint of each subinterval instead. The right endpoints are 1.5, 2, 2.5, and 3.',
+          math: 'Left sum = 6.75 (from previous)',
+          sandbox: {
+            value: 'left sum recall',
+            rows: [{ label: 'Left sum', expr: '6.75' }]
+          }
+        },
+        {
+          label: 'Compute the right endpoints and heights',
+          visualNote: 'The right edges of each rectangle are highlighted. Heights: f(1.5)=2.25, f(2)=4, f(2.5)=6.25, f(3)=9.',
+          strategy: 'Right endpoints are simply the left endpoints shifted forward by Δx.',
+          explanation: 'Right endpoints are the ending x of each subinterval: 1.5, 2, 2.5, 3. Plug into f(x) = x²: 2.25, 4, 6.25, 9. Notice these heights are all larger than the left-endpoint heights because the function is increasing.',
+          math: 'Right heights: 2.25 + 4 + 6.25 + 9 = 21.5'
+        },
+        {
+          label: 'Form the right Riemann sum',
+          visualNote: 'The right rectangles are now filled in. Their total area is visibly larger than the left rectangles.',
+          strategy: 'Same Δx multiplier, but using the larger heights.',
+          explanation: 'Multiply the sum of the right heights by Δx: 0.5 × 21.5 = 10.75. This is the right Riemann sum.',
+          math: 'Right sum = 0.5 × 21.5 = 10.75',
+          sandbox: {
+            value: 'right sum',
+            rows: [
+              { label: 'Sum of right heights', expr: '21.5' },
+              { label: 'Right sum', expr: '10.75' }
+            ],
+            conclusion: 'Right sum (10.75) > Left sum (6.75).'
+          }
+        },
+        {
+          label: 'Explain why the right sum is larger',
+          visualNote: 'Both sets of rectangles are shown overlaid. The right rectangles clearly overshoot the curve more than the left ones undershoot.',
+          strategy: 'Because f is increasing, right endpoints always give taller rectangles and therefore a larger sum.',
+          explanation: 'Since f(x) = x² is an increasing function on [1,3], every right endpoint is to the right of the left endpoint in the same subinterval. Higher x means higher f(x), so the right rectangles are taller and capture extra area above the curve. The left rectangles sit below the curve. Therefore the right Riemann sum overestimates the true area while the left underestimates it.',
+          math: 'f increasing \\implies \\text{right sum} > \\text{true area} > \\text{left sum}'
+        }
+      ],
+      variations: [
+        { question: 'What happens if the function is decreasing instead?', hint: 'Left sum would then be larger than the right sum (reverse the inequality).' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-midpoint',
+      title: 'Midpoint Riemann Sum',
+      prereqs: ['Left/right Riemann sums'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'mid', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      problem: 'Approximate $\\int_1^3 x^2\\,dx$ using a midpoint Riemann sum with n=4.',
+      steps: [
+        {
+          label: 'Find the midpoint of each subinterval',
+          visualNote: 'Midpoints are marked at the center of each subinterval: 1.25, 1.75, 2.25, 2.75.',
+          strategy: 'Midpoint rule samples the function at the center of each subinterval. This often gives a better approximation than left or right because it averages the behavior across the whole rectangle.',
+          explanation: 'The midpoint of the first subinterval [1,1.5] is (1+1.5)/2 = 1.25. Continue for each: 1.75, 2.25, 2.75. These are the x-values where we evaluate f(x).',
+          math: 'Midpoints: 1.25, 1.75, 2.25, 2.75'
+        },
+        {
+          label: 'Evaluate f at each midpoint and form the sum',
+          visualNote: 'Rectangles are drawn with heights taken at the midpoints.',
+          strategy: 'Same formula as before, just different sample points.',
+          explanation: 'f(1.25) = 1.5625, f(1.75) = 3.0625, f(2.25) = 5.0625, f(2.75) = 7.5625. Sum of heights = 17.25. Multiply by Δx = 0.5: 0.5 × 17.25 = 8.625.',
+          math: '\\sum f(\\text{midpoint}) \\Delta x = 8.625',
+          sandbox: {
+            value: 'midpoint sum',
+            rows: [
+              { label: 'Sum of midpoint heights', expr: '17.25' },
+              { label: 'Midpoint sum', expr: '8.625' }
+            ],
+            conclusion: 'Midpoint approximation = 8.625 (closer to true 50/3 ≈ 16.67 than left or right).'
+          }
+        }
+      ],
+      variations: [
+        { question: 'How does the midpoint sum compare to left (6.75) and right (10.75)?', hint: 'It sits between them and is usually the most accurate of the three for the same n.' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-limit-to-integral',
+      title: 'Limit of Riemann Sums',
+      prereqs: ['Riemann sums', 'Sigma notation'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'limit-riemann', fn: 'x*x', a: 1, b: 3, n: '∞', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      problem: 'Show that $\\displaystyle\\lim_{n\\to\\infty} \\sum_{i=1}^n f(x_i^*)\\Delta x = \\int_1^3 x^2\\,dx$.',
+      steps: [
+        {
+          label: 'Write the general Riemann sum',
+          visualNote: 'As n increases, more and more thin rectangles appear, hugging the curve tighter.',
+          strategy: 'Any Riemann sum (left, right, midpoint) approaches the same limit as n → ∞.',
+          explanation: 'The general form is \\sum_{i=1}^n f(x_i^*) \\Delta x where \\Delta x = (b-a)/n and x_i^* is any sample point in the i-th subinterval. As n grows, the rectangles become infinitesimally thin and their total area approaches the true area under the curve.',
+          math: '\\lim_{n\\to\\infty} \\sum_{i=1}^n f(x_i^*) \\Delta x'
+        },
+        {
+          label: 'Recognize the definition of the definite integral',
+          visualNote: 'The rectangles shrink to zero width; the jagged top becomes the smooth curve.',
+          strategy: 'This limit is the definition of the definite integral.',
+          explanation: 'By definition, the definite integral \\int_a^b f(x)\\,dx is precisely the limit of Riemann sums as the number of subintervals goes to infinity. Therefore the limit equals the integral.',
+          math: '\\lim_{n\\to\\infty} \\sum_{i=1}^n f(x_i^*) \\Delta x = \\int_1^3 x^2\\,dx = \\frac{50}{3}'
+        }
+      ],
+      variations: [
+        { question: 'Does the choice of left/right/midpoint matter in the limit?', hint: 'No — all three converge to the same definite integral as n → ∞.' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-closed-form',
+      title: 'Closed-Form Summation',
+      prereqs: ['Summation properties', 'Power sum formulas'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'summation-formula', fn: 'i*i', n: 10, label: '\\sum_{i=1}^n i^2' },
+      problem: 'Evaluate \\(\\sum_{i=1}^{10} i^2\\) using the closed-form formula.',
+      steps: [
+        {
+          label: 'Recall the power-sum formula',
+          visualNote: 'The formula \\sum i^2 = n(n+1)(2n+1)/6 is displayed prominently.',
+          strategy: 'Instead of adding 1 + 4 + 9 + … + 100 term by term, use the known closed-form formula.',
+          explanation: 'The formula for the sum of squares is a standard result derived from induction or other methods. For n=10 we plug in directly.',
+          math: '\\sum_{i=1}^n i^2 = \\frac{n(n+1)(2n+1)}{6}'
+        },
+        {
+          label: 'Substitute n=10 and simplify',
+          explanation: 'Plug in n=10: 10×11×21 = 2310. Divide by 6: 2310/6 = 385. This is the exact value of the sum.',
+          math: '\\frac{10\\times11\\times21}{6} = 385'
+        }
+      ],
+      variations: [
+        { question: 'What is \\sum_{i=1}^{100} i^2?', hint: 'Plug n=100 into the formula: 100×101×201/6 = 338350.' }
+      ]
+    }
+  ],
+
   quiz: [
     {
       id: 'riemann-q1',

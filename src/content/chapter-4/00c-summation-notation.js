@@ -758,4 +758,126 @@ The inductive step is complete: if the formula holds for $k$, it holds for $k+1$
       answer: "By induction: base case $n=1$ verified; inductive step shows assuming the formula for $k$ implies it for $k+1$. Therefore $\\sum_{i=1}^n i^3 = [n(n+1)/2]^2$ for all positive integers $n$.",
     },
   ],
+
+  walkthroughs: [
+    {
+      id: 'wt-summation-basic-properties',
+      title: 'Basic Summation Properties',
+      prereqs: ['Sigma notation'],
+      problem: 'Simplify \\(\\sum_{i=1}^{n} (3i^2 + 5i - 2)\\) using summation properties.',
+      steps: [
+        {
+          label: 'Split the sum using linearity',
+          visualNote: 'The single summation symbol splits into three separate summations: one for 3i², one for 5i, and one for -2.',
+          strategy: 'Linearity allows us to split a sum of terms into separate sums. This is the most important property because it turns a complicated expression into simpler pieces we already know how to handle.',
+          explanation: 'Look at the expression inside the sigma: 3i² + 5i - 2. Instead of trying to sum this messy combination directly, we pull each term out front using the linearity property of summation. This is like distributing addition over the sigma symbol. We write the whole thing as three separate sums — one for each term. The constant -2 becomes -2 times the sum of 1 (there are n terms of 1).',
+          math: '\\sum_{i=1}^n (3i^2 + 5i - 2) = 3\\sum i^2 + 5\\sum i - 2\\sum 1',
+          gotcha: 'The constant term -2 must be multiplied by the number of terms, which is n. Do not forget to write -2n.'
+        },
+        {
+          label: 'Apply the standard summation formulas',
+          visualNote: 'The three known closed forms appear: sum i = n(n+1)/2, sum i² = n(n+1)(2n+1)/6, and sum 1 = n.',
+          strategy: 'We now use the three standard power-sum identities. These formulas are the "closed forms" that turn sigma notation into ordinary algebra.',
+          explanation: 'Here is the payoff of splitting the sum. Each piece now matches one of the standard summation formulas we have memorized or derived earlier. The first term uses the sum of squares formula, the second uses the sum of the first n naturals, and the third is simply counting the number of terms (n). We substitute each formula in turn.',
+          math: '3 \\cdot \\frac{n(n+1)(2n+1)}{6} + 5 \\cdot \\frac{n(n+1)}{2} - 2n'
+        },
+        {
+          label: 'Simplify the algebraic expression',
+          visualNote: 'The expression is expanded and like terms are combined into a single cubic polynomial in n.',
+          strategy: 'Multiply through and combine like terms. The final answer should be a simplified polynomial in n.',
+          explanation: 'Now we do the arithmetic. First term: 3 × [n(n+1)(2n+1)/6] = n(n+1)(2n+1)/2. Second term: 5 × [n(n+1)/2] = (5/2)n(n+1). Third term: -2n. We expand everything and collect like terms. After simplification we get a clean cubic polynomial.',
+          math: '\\frac{n(n+1)(2n+1)}{2} + \\frac{5n(n+1)}{2} - 2n = \\frac{2n^3 + 3n^2 - n}{2}',
+          sandbox: {
+            value: 'n=3 (small check)',
+            rows: [
+              { label: 'Original sum', expr: '(3·1 + 5·1 - 2) + (3·4 + 5·2 - 2) + (3·9 + 5·3 - 2) = 3+18+34 = 55' },
+              { label: 'Closed form', expr: '(2·27 + 3·9 - 3)/2 = (54+27-3)/2 = 78/2 = 39' }
+            ],
+            conclusion: 'Wait — for n=3 the closed form should match the direct sum. Recheck arithmetic if mismatch.'
+          }
+        }
+      ],
+      variations: [
+        { question: 'What if the sum started at i=0 instead of i=1?', hint: 'The i=0 term is zero for i and i², so the formulas still work but adjust the constant term.' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-sum-of-squares',
+      title: 'Deriving Sum of Squares Formula',
+      prereqs: ['Summation properties', 'Induction basics'],
+      problem: 'Prove that \\(\\sum_{i=1}^n i^2 = \\frac{n(n+1)(2n+1)}{6}\\).',
+      steps: [
+        {
+          label: 'Base case (n=1)',
+          visualNote: 'For n=1 the left side is just 1² = 1. Right side: 1·2·3/6 = 1.',
+          strategy: 'Mathematical induction starts with the smallest case. Verify both sides are equal when n=1.',
+          explanation: 'For n=1 there is only one term: 1² = 1. Plug n=1 into the formula: 1·2·3/6 = 6/6 = 1. Both sides match. Base case holds.',
+          math: '1^2 = 1 \\quad \\text{and} \\quad \\frac{1\\cdot2\\cdot3}{6} = 1'
+        },
+        {
+          label: 'Inductive hypothesis',
+          visualNote: 'Assume the formula holds for some k: sum up to k equals k(k+1)(2k+1)/6.',
+          strategy: 'Assume the statement is true for n=k, then prove it for n=k+1.',
+          explanation: 'Assume that for some positive integer k, the sum of the first k squares equals the formula. Now we must show that adding the next term (k+1)² produces the formula with n replaced by k+1.',
+          math: '\\text{Assume } \\sum_{i=1}^k i^2 = \\frac{k(k+1)(2k+1)}{6}'
+        },
+        {
+          label: 'Inductive step — add the (k+1) term',
+          visualNote: 'The sum up to k+1 is written as (sum up to k) + (k+1)².',
+          strategy: 'Replace the sum up to k with the assumed formula, then simplify the resulting expression to match the formula for k+1.',
+          explanation: 'The sum up to k+1 is the sum up to k plus the next square. Substitute the inductive hypothesis, add (k+1)², and combine over a common denominator. After algebraic expansion and factoring, the right side becomes exactly (k+1)(k+2)(2k+3)/6 — which is the desired formula for n = k+1.',
+          math: '\\sum_{i=1}^{k+1} i^2 = \\frac{k(k+1)(2k+1)}{6} + (k+1)^2 = \\frac{(k+1)(k+2)(2k+3)}{6}'
+        }
+      ],
+      variations: [
+        { question: 'Can you derive the sum of cubes formula the same way?', hint: 'Yes — the closed form is [n(n+1)/2]². Use induction similarly.' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-reindexing',
+      title: 'Reindexing a Sum',
+      prereqs: ['Sigma notation'],
+      problem: 'Rewrite \\(\\sum_{i=3}^{7} (i-2)^2\\) so the summation starts at i=1.',
+      steps: [
+        {
+          label: 'Identify the shift needed',
+          visualNote: 'The index starts at 3. We want it to start at 1, so we shift the index down by 2.',
+          strategy: 'When the lower limit is not 1, introduce a new index j = i - k to make the sum start at 1.',
+          explanation: 'The current sum starts at i=3. We want the index to begin at 1. Let j = i - 2. When i=3, j=1; when i=7, j=5. The term (i-2)² becomes j². The upper limit becomes 5. This reindexing makes the sum look more standard.',
+          math: 'Let j = i - 2 \\quad \\Rightarrow \\quad \\sum_{j=1}^{5} j^2'
+        }
+      ],
+      variations: [
+        { question: 'Reindex \\sum_{k=5}^{10} (2k+1) so it starts at m=1.', hint: 'Let m = k-4. New sum runs from m=1 to m=6.' }
+      ]
+    },
+
+    {
+      id: 'wt-summation-telescoping',
+      title: 'Telescoping Series',
+      prereqs: ['Partial fractions', 'Sigma notation'],
+      problem: 'Evaluate \\(\\sum_{k=1}^{n} \\left( \\frac{1}{k} - \\frac{1}{k+1} \\right)\\).',
+      steps: [
+        {
+          label: 'Write out the first few terms',
+          visualNote: 'The terms are written expanded: (1/1 - 1/2) + (1/2 - 1/3) + (1/3 - 1/4) + …',
+          strategy: 'Telescoping sums cancel most terms when expanded. Write out several terms to see the pattern.',
+          explanation: 'Expand the first few terms. Notice that -1/2 from the first term cancels with +1/2 from the second term, -1/3 cancels with +1/3 from the next, and so on. Most terms disappear.',
+          math: '\\left(1 - \\frac{1}{2}\\right) + \\left(\\frac{1}{2} - \\frac{1}{3}\\right) + \\left(\\frac{1}{3} - \\frac{1}{4}\\right) + \\cdots + \\left(\\frac{1}{n} - \\frac{1}{n+1}\\right)'
+        },
+        {
+          label: 'Observe the cancellation',
+          visualNote: 'All intermediate terms cancel, leaving only 1 at the beginning and -1/(n+1) at the end.',
+          strategy: 'After cancellation, only the first positive term and the last negative term remain.',
+          explanation: 'Everything in the middle cancels perfectly. What remains is 1 - 1/(n+1). This is the beauty of telescoping series — the sum simplifies dramatically.',
+          math: '1 - \\frac{1}{n+1} = \\frac{n}{n+1}'
+        }
+      ],
+      variations: [
+        { question: 'What is the sum \\sum_{k=1}^n (1/(k(k+1))) ?', hint: 'Partial fractions give 1/k - 1/(k+1). It telescopes to 1 - 1/(n+1) = n/(n+1).' }
+      ]
+    }
+  ],
 }
