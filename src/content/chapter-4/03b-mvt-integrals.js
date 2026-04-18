@@ -23,7 +23,7 @@ export default {
       "If temperature over a 12-hour period traces a smooth curve T(t), is there necessarily some exact moment when the temperature equals the daily average? Make a guess. What property of T would guarantee it? What if T had a sudden jump at noon — would the guarantee still hold?",
     realWorldContext:
       "Engineers, meteorologists, and physicists routinely need the average value of a continuously varying quantity: average power output of a turbine over a cycle, average drug concentration in the bloodstream over a dosing interval, average voltage of an AC signal. The Mean Value Theorem for Integrals guarantees this average is always achieved at some actual moment — not just as a mathematical abstraction but as a value the function genuinely attains. It also forms the logical bridge between FTC Part 1 and the concept of instantaneous rate equaling accumulated change. The theorem seems obvious, but it requires a careful assembly of the Extreme Value Theorem, the Intermediate Value Theorem, and the definition of the definite integral to make it rigorous.",
-    previewVisualizationId: "MVTIntegralExplorer",
+    previewVisualizationId: "GeometricIntuitionMVT",
   },
 
   intuition: {
@@ -64,6 +64,18 @@ export default {
     visualizations: [
       {
         id: "MVTIntegralExplorer",
+        title: "Average Value and the Equal-Area Rectangle",
+        caption:
+          "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",
+      },
+            {
+        id: "CounterexampleMVT",
+        title: "Average Value and the Equal-Area Rectangle",
+        caption:
+          "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",
+      },
+                  {
+        id: "RealWorldMVT",
         title: "Average Value and the Equal-Area Rectangle",
         caption:
           "The blue shaded region is the area under f(x) on [a, b]. The orange rectangle has height f_avg = (1/(b−a)) ∫ₐᵇ f dx and the same base — equal area. The red dot marks c, the point where f(c) = f_avg. Drag a and b to change the interval and watch c shift.",

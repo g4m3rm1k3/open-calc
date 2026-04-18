@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { usePins } from "../../context/PinsContext.jsx";
+
 const VIZ_REGISTRY = {
   MiniGolfGame: lazy(() => import("./react/MiniGolfGame.jsx")),
   VideoEmbed: lazy(() => import("./react/VideoEmbed.jsx")),
@@ -1072,6 +1073,12 @@ const VIZ_REGISTRY = {
   BlindChainRuleLab: lazy(() => import("./react/BlindChainRuleLab.jsx")),
   LeastSquaresFit: lazy(() => import("./react/LeastSquaresFit.jsx")),
   MVTIntegralExplorer: lazy(() => import("./d3/MVTIntegralExplorer.jsx")),
+  AverageValueExplorerMVT: lazy(() => import("./d3/AverageValueExplorerMVT.jsx")),
+  CounterexampleMVT: lazy(() => import("./d3/CounterexampleMVT.jsx")),
+  RealWorldMVT: lazy(() => import("./d3/RealWorldMVT.jsx")),
+  GeometricIntuitionMVT: lazy(() => import("./d3/GeometricIntuitionMVT.jsx")),
+
+
 
   // ─── Discrete Math additional vizzes ─────────────────────────────────────
   ProofStrategySelector: lazy(
