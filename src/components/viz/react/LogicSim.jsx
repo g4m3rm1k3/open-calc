@@ -103,7 +103,9 @@ function propagate(nodes, wires) {
 
   wires.forEach(w => {
     const v = values[`${w.fromNode}-out-${w.fromPort}`] || false;
-    inValues[`${w.toNode}-in-${w.toPort}`] = v;
+    const key = `${w.toNode}-in-${w.toPort}`;
+    if (v) inValues[key] = true;
+    else if (inValues[key] === undefined) inValues[key] = false;
   });
 
   for (let pass = 0; pass < 3; pass++) {
@@ -119,7 +121,9 @@ function propagate(nodes, wires) {
     });
     wires.forEach(w => {
       const v = values[`${w.fromNode}-out-${w.fromPort}`] || false;
-      inValues[`${w.toNode}-in-${w.toPort}`] = v;
+      const key = `${w.toNode}-in-${w.toPort}`;
+      if (v) inValues[key] = true;
+      else if (inValues[key] === undefined) inValues[key] = false;
     });
   }
 
@@ -227,9 +231,10 @@ function LogicSimContent({ params = {} }) {
     nodes: [], wires: [],
     draggingWire: null,
     selected: null,
+    hoverNode: null, hoverWire: null,
     mouseX: 0, mouseY: 0,
     signals: { values:{}, inValues:{} },
-    panX: 0, panY: 0,
+    panX: 0, panY: 0, zoom: 1,
     _clickStart: null,
   });
 
@@ -237,6 +242,7 @@ function LogicSimContent({ params = {} }) {
   const [chalIdx, setChalIdx]   = useState(0);
   const [success, setSuccess]   = useState(false);
   const [hint, setHint]         = useState(false);
+  const [tool, setTool]         = useState("wire");
   const [, forceRender]         = useState(0);
 
   const dark = useIsDark();
@@ -305,16 +311,17 @@ function LogicSimContent({ params = {} }) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
-    const { nodes, wires, draggingWire, selected, signals, panX, panY } = stateRef.current;
+    const { nodes, wires, draggingWire, selected, signals, hoverNode, hoverWire, panX, panY, zoom } = stateRef.current;
     ctx.clearRect(0, 0, W, H);
 
     ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = C.grid; ctx.lineWidth = 0.5;
-    for (let x = (Math.floor(panX) % CELL); x < W; x += CELL) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y = (Math.floor(panY) % CELL); y < H; y += CELL) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    const sC = CELL * zoom;
+    for (let x = (Math.floor(panX) % sC); x < W; x += sC) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = (Math.floor(panY) % sC); y < H; y += sC) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-    const tx = x => x * CELL + panX;
-    const ty = y => y * CELL + panY;
+    const tx = x => x * sC + panX;
+    const ty = y => y * sC + panY;
 
     wires.forEach(w => {
       const fn = nodes.find(n => n.id === w.fromNode);
@@ -324,8 +331,9 @@ function LogicSimContent({ params = {} }) {
       const fp = getPortPos({...fn, gx:fn.gx, gy:fn.gy}, "out", w.fromPort, fromDef.outs);
       const tp = getPortPos({...tn, gx:tn.gx, gy:tn.gy}, "in",  w.toPort,  toDef.ins);
       const on = signals.values[`${w.fromNode}-out-${w.fromPort}`] || false;
-      ctx.strokeStyle = on ? C.wireOn : C.wireOff;
-      ctx.lineWidth = on ? 3 : 2;
+      const isHovDel = tool === "delete" && hoverWire && hoverWire.id === w.id;
+      ctx.strokeStyle = isHovDel ? "#ef4444" : (on ? C.wireOn : C.wireOff);
+      ctx.lineWidth = ((on ? 3 : 2) + (isHovDel ? 2 : 0)) * zoom;
       ctx.beginPath();
       ctx.moveTo(tx(fp.x/CELL), ty(fp.y/CELL));
       const mx = (tx(fp.x/CELL) + tx(tp.x/CELL)) / 2;
@@ -346,9 +354,10 @@ function LogicSimContent({ params = {} }) {
 
     nodes.forEach(n => {
       const def = NODE_DEFS[n.type];
-      const nw = def.w * CELL, nh = def.h * CELL;
+      const nw = def.w * sC, nh = def.h * sC;
       const nx = tx(n.gx), ny = ty(n.gy);
       const isSelected = selected === n.id;
+      const isHovDel = tool === "delete" && hoverNode && hoverNode.id === n.id;
 
       const isLamp = n.type === "LAMP";
       const lampOn = isLamp && (signals.inValues[`${n.id}-in-0`] || false);
@@ -358,9 +367,9 @@ function LogicSimContent({ params = {} }) {
 
       ctx.beginPath();
       if (isLamp) {
-        ctx.arc(nx + nw/2, ny + nh/2, Math.min(nw,nh)/2 - 6, 0, 2*Math.PI);
+        ctx.arc(nx + nw/2, ny + nh/2, Math.min(nw,nh)/2 - 6 * zoom, 0, 2*Math.PI);
       } else {
-        ctx.roundRect(nx, ny, nw, nh, 8);
+        ctx.roundRect(nx, ny, nw, nh, 8 * zoom);
       }
       ctx.fillStyle = isLamp ? (lampOn ? C.lamp : C.lampOff)
                     : isPower ? C.power+"33"
@@ -368,34 +377,34 @@ function LogicSimContent({ params = {} }) {
                     : isSwitch ? (n.state?.on ? C.portOn+"33" : C.nodeBg)
                     : (C.gateFill[n.type] || C.nodeBg);
       ctx.fill();
-      ctx.strokeStyle = isSelected ? C.sel : (isLamp && lampOn ? C.lamp : isSwitch && n.state?.on ? C.portOn : C.nodeBdr);
-      ctx.lineWidth = isSelected ? 3 : 1.5;
+      ctx.strokeStyle = isHovDel ? "#ef4444" : isSelected ? C.sel : (isLamp && lampOn ? C.lamp : isSwitch && n.state?.on ? C.portOn : C.nodeBdr);
+      ctx.lineWidth = (isSelected || isHovDel ? 3 : 1.5) * zoom;
       ctx.stroke();
 
       ctx.fillStyle = isLamp ? (lampOn ? "#fff" : C.nodeText)
                     : isPower ? C.power
                     : isSwitch ? (n.state?.on ? C.portOn : C.nodeText)
                     : C.nodeText;
-      ctx.font = `bold ${isLamp?14:13}px system-ui`;
+      ctx.font = `bold ${(isLamp?14:13)*zoom}px system-ui`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(isSwitch ? (n.state?.on?"ON":"OFF") : def.label, nx + nw/2, ny + nh/2);
 
       for (let i = 0; i < def.ins; i++) {
         const p = getPortPos(n, "in", i, def.ins);
         const on = signals.inValues[`${n.id}-in-${i}`] || false;
-        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), PORT_R, 0, 2*Math.PI);
+        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), Math.max(2, PORT_R*zoom), 0, 2*Math.PI);
         ctx.fillStyle = on ? C.portOn : C.portOff; ctx.fill();
-        ctx.strokeStyle = C.bg; ctx.lineWidth = 2; ctx.stroke();
+        ctx.strokeStyle = C.bg; ctx.lineWidth = Math.max(1, 2*zoom); ctx.stroke();
       }
       for (let i = 0; i < def.outs; i++) {
         const p = getPortPos(n, "out", i, def.outs);
         const on = signals.values[`${n.id}-out-${i}`] || false;
-        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), PORT_R, 0, 2*Math.PI);
+        ctx.beginPath(); ctx.arc(tx(p.x/CELL), ty(p.y/CELL), Math.max(2, PORT_R*zoom), 0, 2*Math.PI);
         ctx.fillStyle = on ? C.portOn : C.portOff; ctx.fill();
-        ctx.strokeStyle = C.bg; ctx.lineWidth = 2; ctx.stroke();
+        ctx.strokeStyle = C.bg; ctx.lineWidth = Math.max(1, 2*zoom); ctx.stroke();
       }
     });
-  }, [C]);
+  }, [C, tool]);
 
   const animRef = useRef(null);
   useEffect(() => {
@@ -416,32 +425,59 @@ function LogicSimContent({ params = {} }) {
   }, []);
 
   const hitPort = useCallback((mx, my) => {
-    const { nodes, signals, panX, panY } = stateRef.current;
-    const tx = gx => gx * CELL + panX;
-    const ty = gy => gy * CELL + panY;
+    const { nodes, signals, panX, panY, zoom } = stateRef.current;
+    const sC = CELL * zoom;
+    const tx = gx => gx * sC + panX;
+    const ty = gy => gy * sC + panY;
     for (const n of nodes) {
       const def = NODE_DEFS[n.type];
       for (let i = 0; i < def.ins; i++) {
         const p = getPortPos(n, "in", i, def.ins);
         const dx = mx - tx(p.x/CELL), dy = my - ty(p.y/CELL);
-        if (Math.hypot(dx,dy) < PORT_R + 5) return { nodeId:n.id, port:i, side:"in" };
+        if (Math.hypot(dx,dy) < Math.max(6, PORT_R*zoom) + 5) return { nodeId:n.id, port:i, side:"in" };
       }
       for (let i = 0; i < def.outs; i++) {
         const p = getPortPos(n, "out", i, def.outs);
         const dx = mx - tx(p.x/CELL), dy = my - ty(p.y/CELL);
-        if (Math.hypot(dx,dy) < PORT_R + 5) return { nodeId:n.id, port:i, side:"out" };
+        if (Math.hypot(dx,dy) < Math.max(6, PORT_R*zoom) + 5) return { nodeId:n.id, port:i, side:"out" };
       }
     }
     return null;
   }, []);
 
   const hitNode = useCallback((mx, my) => {
-    const { nodes, panX, panY } = stateRef.current;
+    const { nodes, panX, panY, zoom } = stateRef.current;
     for (const n of [...nodes].reverse()) {
       const def = NODE_DEFS[n.type];
-      const nw = def.w * CELL, nh = def.h * CELL;
-      const nx = n.gx * CELL + panX, ny = n.gy * CELL + panY;
+      const nw = def.w * CELL * zoom, nh = def.h * CELL * zoom;
+      const nx = n.gx * CELL * zoom + panX, ny = n.gy * CELL * zoom + panY;
       if (mx>=nx && mx<=nx+nw && my>=ny && my<=ny+nh) return n;
+    }
+    return null;
+  }, []);
+
+  const hitWire = useCallback((mx, my) => {
+    const { nodes, wires, panX, panY, zoom } = stateRef.current;
+    const tx = x => x * CELL * zoom + panX;
+    const ty = y => y * CELL * zoom + panY;
+    for (const w of wires) {
+      const fn = nodes.find(n => n.id === w.fromNode);
+      const tn = nodes.find(n => n.id === w.toNode);
+      if (!fn || !tn) continue;
+      const fromDef = NODE_DEFS[fn.type], toDef = NODE_DEFS[tn.type];
+      const fp = getPortPos({...fn, gx:fn.gx, gy:fn.gy}, "out", w.fromPort, fromDef.outs);
+      const tp = getPortPos({...tn, gx:tn.gx, gy:tn.gy}, "in",  w.toPort,  toDef.ins);
+      const p0 = { x: tx(fp.x/CELL), y: ty(fp.y/CELL) };
+      const p3 = { x: tx(tp.x/CELL), y: ty(tp.y/CELL) };
+      const midX = (p0.x + p3.x) / 2;
+      const p1 = { x: midX, y: p0.y };
+      const p2 = { x: midX, y: p3.y };
+      for (let t = 0; t <= 1; t += 0.05) {
+        const u = 1 - t;
+        const x = u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x;
+        const y = u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y;
+        if (Math.hypot(mx - x, my - y) < 10) return w;
+      }
     }
     return null;
   }, []);
@@ -453,6 +489,29 @@ function LogicSimContent({ params = {} }) {
 
     st._clickStart = { x: mx, y: my };
 
+    if (e.button === 1 || e.button === 4) {
+      st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY;
+      return;
+    }
+
+    if (tool === "delete") {
+      const node = hitNode(mx, my);
+      if (node) {
+        st.wires = st.wires.filter(w => w.fromNode!==node.id && w.toNode!==node.id);
+        st.nodes = st.nodes.filter(n => n.id!==node.id);
+        st.signals = propagate(st.nodes, st.wires);
+        st.hoverNode = null; forceRender(r=>r+1);
+      } else {
+        const wire = hitWire(mx, my);
+        if (wire) {
+          st.wires = st.wires.filter(w => w.id !== wire.id);
+          st.signals = propagate(st.nodes, st.wires);
+          st.hoverWire = null; forceRender(r=>r+1);
+        }
+      }
+      return;
+    }
+
     const port = hitPort(mx, my);
     if (port) {
       st.draggingWire = { fromNode: port.nodeId, fromPort: port.port, fromSide: port.side, mouseX: mx, mouseY: my };
@@ -463,8 +522,8 @@ function LogicSimContent({ params = {} }) {
     if (node) {
       st.selected = node.id;
       st._dragNode = node;
-      st._dragOffX = mx - node.gx * CELL - st.panX;
-      st._dragOffY = my - node.gy * CELL - st.panY;
+      st._dragOffX = mx - node.gx * CELL * st.zoom - st.panX;
+      st._dragOffY = my - node.gy * CELL * st.zoom - st.panY;
       forceRender(r=>r+1);
       return;
     }
@@ -472,7 +531,7 @@ function LogicSimContent({ params = {} }) {
     st.selected = null;
     st._panning = true; st._panStartX = mx - st.panX; st._panStartY = my - st.panY;
     forceRender(r => r+1);
-  }, [hitPort, hitNode]);
+  }, [hitPort, hitNode, hitWire, tool]);
 
   const onMouseMove = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -480,16 +539,24 @@ function LogicSimContent({ params = {} }) {
     const st = stateRef.current;
     st.mouseX = mx; st.mouseY = my;
 
+    if (st._panning) { st.panX = mx - st._panStartX; st.panY = my - st._panStartY; forceRender(r=>r+1); return; }
+
+    if (tool === "delete") {
+      st.hoverNode = hitNode(mx, my);
+      st.hoverWire = st.hoverNode ? null : hitWire(mx, my);
+      forceRender(r=>r+1);
+      return;
+    }
+
     if (st.draggingWire) { st.draggingWire.mouseX = mx; st.draggingWire.mouseY = my; return; }
     if (st._dragNode) {
-      const gx = Math.round((mx - st._dragOffX - st.panX) / CELL);
-      const gy = Math.round((my - st._dragOffY - st.panY) / CELL);
+      const gx = Math.round((mx - st._dragOffX - st.panX) / (CELL * st.zoom));
+      const gy = Math.round((my - st._dragOffY - st.panY) / (CELL * st.zoom));
       st._dragNode.gx = gx; st._dragNode.gy = gy;
       st.signals = propagate(st.nodes, st.wires);
       return;
     }
-    if (st._panning) { st.panX = mx - st._panStartX; st.panY = my - st._panStartY; }
-  }, []);
+  }, [hitNode, hitWire, tool]);
 
   const onMouseUp = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -511,7 +578,7 @@ function LogicSimContent({ params = {} }) {
           fromNode=port.nodeId; fromPort=port.port; toNode=dw.fromNode; toPort=dw.fromPort;
         }
         if (fromNode) {
-          st.wires = st.wires.filter(w => !(w.toNode===toNode && w.toPort===toPort));
+          // Allow multi! We removed the destination filter.
           st.wires.push({ id:"w"+Date.now(), fromNode, fromPort, toNode, toPort });
           st.signals = propagate(st.nodes, st.wires);
           if (mode === "challenge") {
@@ -548,8 +615,8 @@ function LogicSimContent({ params = {} }) {
     
     // snap to grid
     const def = NODE_DEFS[type];
-    const dropGx = Math.round((mx - st.panX) / CELL) - Math.floor(def.w / 2);
-    const dropGy = Math.round((my - st.panY) / CELL) - Math.floor(def.h / 2);
+    const dropGx = Math.round((mx - st.panX) / (CELL * st.zoom)) - Math.floor(def.w / 2);
+    const dropGy = Math.round((my - st.panY) / (CELL * st.zoom)) - Math.floor(def.h / 2);
 
     const id = "n" + Date.now();
     st.nodes.push({ id, type, gx: dropGx, gy: dropGy, state: type==="SWITCH"?{on:false}:{} });
@@ -636,8 +703,11 @@ function LogicSimContent({ params = {} }) {
         {/* Components Library */}
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <div className="flex justify-between items-center mb-3">
-             <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm uppercase tracking-wider">Components</h3>
-             <button onClick={() => { stateRef.current.wires=[]; stateRef.current.signals=propagate(stateRef.current.nodes,[]); forceRender(r=>r+1); }} className="text-xs text-red-500 hover:text-red-700 hover:underline">Clear Wires</button>
+             <div className="flex gap-1 bg-slate-200 dark:bg-slate-800 p-1 rounded-lg">
+                <button onClick={() => setTool("wire")} className={`px-3 py-1 text-xs font-bold rounded ${tool==="wire" ? "bg-white dark:bg-slate-700 shadow" : "text-slate-500"}`}>Wire</button>
+                <button onClick={() => setTool("delete")} className={`px-3 py-1 text-xs font-bold rounded ${tool==="delete" ? "bg-white dark:bg-slate-700 text-red-500 shadow" : "text-slate-500 hover:text-red-400"}`}>Delete</button>
+             </div>
+             <button onClick={() => { stateRef.current.wires=[]; stateRef.current.signals=propagate(stateRef.current.nodes,[]); forceRender(r=>r+1); }} className="text-xs text-red-500 hover:text-red-700 hover:underline">Clear</button>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 bg-slate-100 dark:bg-slate-800 p-2 rounded">
             Drag items onto the grid. Click a placed node and press <kbd className="font-mono bg-slate-200 dark:bg-slate-700 px-1 rounded">Del</kbd> to remove.
@@ -681,8 +751,25 @@ function LogicSimContent({ params = {} }) {
           onMouseLeave={onMouseUp}
           onWheel={(e) => {
             e.preventDefault();
-            stateRef.current.panX -= e.deltaX;
-            stateRef.current.panY -= e.deltaY;
+            const st = stateRef.current;
+            const rect = canvasRef.current.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            
+            // If deltaY is vertical scroll
+            if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+              const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05;
+              const newZoom = Math.max(0.2, Math.min(3.0, st.zoom * zoomDelta));
+              const worldX = (mx - st.panX) / st.zoom;
+              const worldY = (my - st.panY) / st.zoom;
+              st.panX = mx - worldX * newZoom;
+              st.panY = my - worldY * newZoom;
+              st.zoom = newZoom;
+              forceRender(r=>r+1);
+            } else {
+              st.panX -= e.deltaX;
+              st.panY -= e.deltaY;
+            }
           }}
         />
         
@@ -691,7 +778,8 @@ function LogicSimContent({ params = {} }) {
           <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Signal ON</div>
           <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></span> Signal OFF</div>
           <hr className="my-1 border-slate-200 dark:border-slate-700" />
-          <div>Drag empty space / wheel to pan</div>
+          <div>Middle-click empty space to pan</div>
+          <div>Scroll to zoom, or Shift+Scroll to pan</div>
           <div>Drag ports to wire</div>
         </div>
       </div>
