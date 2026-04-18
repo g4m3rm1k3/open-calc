@@ -976,5 +976,74 @@ export default {
         },
       ],
     },
+      {
+    id: 'wt-ftc-two-variable-limits',
+    title: 'FTC with Two Variable Limits',
+    prereqs: ['FTC Part 2', 'Chain rule', 'Properties of definite integrals'],
+    problem: 'Let $F(x)=\\displaystyle\\int_{2x}^{x} t^3\\,dt$. Find $F\'(x)$.',
+    steps: [
+      {
+        label: 'Recognize the structural problem — both limits move',
+        visualNote: 'The shaded region stretches from $t=2x$ (left boundary) to $t=x$ (right boundary). As $x$ changes, BOTH boundaries slide.',
+        strategy: 'FTC Part 2 handles ONE moving boundary cleanly. With two, we must separate their effects.',
+        explanation: 'Look at the integral before doing anything algebraic. The lower limit is $2x$ and the upper limit is $x$. That means the region we are measuring is not anchored — both ends are moving as $x$ changes. This is exactly why the problem feels confusing: FTC Part 2 gives a clean rule when only one limit depends on $x$, but here we have two competing motions. One boundary is moving right at speed 1, the other is moving right at speed 2. The derivative must account for both contributions separately. That is why we do not differentiate this in one step—we first restructure it so each moving part is isolated.',
+      },
+
+      {
+        label: 'Split the integral to isolate each moving boundary',
+        visualNote: 'The region is broken into two pieces: from $0$ to $x$, and from $0$ to $2x$.',
+        strategy: 'Rewrite everything so each integral has a constant lower limit (0). This lets FTC Part 2 apply cleanly.',
+        explanation: 'This is the step textbooks usually skip too quickly. We introduce an anchor point—typically 0—so we can rewrite the integral as a difference of two simpler integrals. Think of this as measuring two areas from the same baseline, then subtracting. The identity we use is: $\\int_a^b f = \\int_0^b f - \\int_0^a f$. Applying that here: the upper limit $x$ becomes one integral, and the lower limit $2x$ becomes another. The original integral is the difference between them.',
+        math: 'F(x) = \\int_{2x}^{x} t^3\\,dt = \\int_0^{x} t^3\\,dt - \\int_0^{2x} t^3\\,dt',
+        gotcha: 'Do NOT try to differentiate $\\int_{2x}^{x}$ directly. FTC Part 2 does not apply cleanly until you separate the limits.',
+        conceptRef: 'Additivity: $\\int_a^b = \\int_0^b - \\int_0^a$',
+      },
+
+      {
+        label: 'Differentiate the first term',
+        visualNote: 'Only the right boundary $x$ moves; the left boundary is fixed at 0.',
+        strategy: 'Apply FTC Part 2 directly: plug in the upper limit.',
+        explanation: 'Now we have a clean setup. The first integral has a constant lower limit (0) and a variable upper limit ($x$). This is exactly the FTC Part 2 pattern. The rule says: evaluate the integrand at the upper limit. Since the integrand is $t^3$, we simply plug in $t = x$. No chain rule factor appears here because the upper limit is just $x$, whose derivative is 1.',
+        math: '\\frac{d}{dx}\\int_0^{x} t^3\\,dt = x^3',
+        conceptRef: 'FTC Part 2 (simple upper limit)',
+      },
+
+      {
+        label: 'Differentiate the second term (chain rule appears)',
+        visualNote: 'The boundary $2x$ moves faster — twice the speed of $x$.',
+        strategy: 'Apply FTC Part 2 AND chain rule: plug in $2x$, then multiply by derivative of $2x$.',
+        explanation: 'The second integral looks similar, but there is a crucial difference: the upper limit is $2x$, not just $x$. That means when we apply FTC Part 2, we must also account for how fast that upper limit is changing. First, plug $t = 2x$ into the integrand, giving $(2x)^3$. Then multiply by the derivative of $2x$, which is 2. This is the chain rule in action—outer function is the accumulation of area, inner function is the moving boundary.',
+        math: '\\frac{d}{dx}\\int_0^{2x} t^3\\,dt = (2x)^3 \\cdot 2 = 16x^3',
+        gotcha: 'Forgetting the chain rule factor (the derivative of $2x$) is the #1 error here.',
+        conceptRef: 'FTC Part 2 + Chain Rule',
+      },
+
+      {
+        label: 'Combine both pieces carefully (sign matters)',
+        explanation: 'Now we combine the derivatives. The original expression was a difference: first integral minus second integral. That subtraction carries through differentiation. So we take the derivative of the first piece ($x^3$) and subtract the derivative of the second piece ($16x^3$). This is where many sign errors happen—the structure you built in Step 2 must be preserved exactly.',
+        math: 'F\'(x) = x^3 - 16x^3 = -15x^3',
+        sandbox: {
+          value: 'x = 1',
+          rows: [
+            { label: 'Original integral', expr: '\\int_2^1 t^3 dt = -\\int_1^2 t^3 dt = -(\\tfrac{16}{4}-\\tfrac{1}{4}) = -\\tfrac{15}{4}' },
+            { label: 'Derivative prediction', expr: '-15(1)^3 = -15' },
+          ],
+          conclusion: 'Negative sign makes sense: the left boundary moves faster than the right, shrinking the region.',
+        },
+        conceptRef: 'Linearity of differentiation',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What if the limits were reversed: $\\int_x^{2x} t^3 dt$?',
+        hint: 'You will get the opposite sign: $+15x^3$. Order of limits controls the sign.',
+      },
+      {
+        question: 'What if the integrand were $t^2$ instead?',
+        hint: 'Same structure: plug in limits and apply chain rule. Only the power changes.',
+      },
+    ],
+  },
   ],
 };
