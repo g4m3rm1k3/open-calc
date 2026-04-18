@@ -1044,4 +1044,140 @@ export default {
       reviewSection: 'Intuition tab — quotient rule mnemonic',
     },
   ],
+  walkthroughs: [
+  // ───────────────────────────────────────────────────────────────────────────
+  // PRODUCT RULE — DERIVATION + EXAMPLES
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    id: 'wt-product-rule-derivation',
+    title: 'Product Rule — Why it Exists (Derivation)',
+    prereqs: ['Limit definition of derivative', 'Algebraic manipulation'],
+    problem: 'Derive the formula for $\\dfrac{d}{dx}[f(x)g(x)]$.',
+    steps: [
+      {
+        label: 'Start from the definition of the derivative',
+        visualNote: 'We zoom into a tiny interval around $x$, comparing $f(x)g(x)$ and $f(x+h)g(x+h)$.',
+        strategy: 'All derivative rules come from the limit definition — no exceptions.',
+        explanation: 'Before memorizing any rule, we need to see where it comes from. The derivative is fundamentally a limit — the rate of change over an infinitesimally small step. So instead of guessing a rule for products, we build it from scratch. We start with the definition of the derivative applied to the product $f(x)g(x)$. This is the only place the rule can legitimately come from.',
+        math: '\\frac{d}{dx}[f(x)g(x)] = \\lim_{h\\to 0} \\frac{f(x+h)g(x+h) - f(x)g(x)}{h}',
+      },
+      {
+        label: 'Add and subtract a strategic term',
+        visualNote: 'We split the difference into two pieces by inserting $f(x+h)g(x)$.',
+        strategy: 'We create two differences we know how to handle separately.',
+        explanation: 'This is the “magic step” that textbooks often skip too quickly. The expression $f(x+h)g(x+h) - f(x)g(x)$ is too tangled to simplify directly. So we insert a carefully chosen term: $f(x+h)g(x)$. This allows us to split the expression into two pieces — one that isolates the change in $g$, and one that isolates the change in $f$. This is not random — it is a surgical move to separate variables.',
+        math: '\\frac{f(x+h)g(x+h) - f(x+h)g(x) + f(x+h)g(x) - f(x)g(x)}{h}',
+        gotcha: 'Students often think this step is arbitrary — it is not. It is designed to factor differences.',
+      },
+      {
+        label: 'Group and factor each piece',
+        visualNote: 'Two groups emerge: one tracking change in $g$, the other in $f$.',
+        strategy: 'Factor each group to expose derivative-like expressions.',
+        explanation: 'Now we group the terms: the first two involve $g(x+h) - g(x)$, and the second two involve $f(x+h) - f(x)$. Factoring gives us expressions that resemble the derivative definition for each function individually. This is the key moment — we are converting a product problem into two single-function derivative problems.',
+        math: '\\frac{f(x+h)[g(x+h)-g(x)]}{h} + \\frac{g(x)[f(x+h)-f(x)]}{h}',
+      },
+      {
+        label: 'Take the limit',
+        visualNote: 'Each term collapses into a familiar derivative.',
+        strategy: 'Apply the limit separately to each term.',
+        explanation: 'As $h \\to 0$, each fraction becomes a derivative. The first term becomes $f(x)g\'(x)$ because $f(x+h) \\to f(x)$ and the difference quotient becomes $g\'(x)$. The second term becomes $g(x)f\'(x)$. This is where the product rule emerges naturally — not memorized, but derived.',
+        math: '(f g)\' = f(x)g\'(x) + g(x)f\'(x)',
+        conceptRef: 'Limit definition of derivative',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-product-rule-examples',
+    title: 'Product Rule — Worked Examples',
+    prereqs: ['Product rule', 'Basic derivatives'],
+    problem: 'Differentiate the following using the product rule.',
+    steps: [
+      {
+        label: 'Example 1: $x^2 \\cdot \\sin x$',
+        explanation: 'We identify two functions: $f=x^2$ and $g=\\sin x$. The product rule says: derivative = first times derivative of second PLUS second times derivative of first. This order matters. Many students try to differentiate both at once — that does not work.',
+        math: '\\frac{d}{dx}(x^2 \\sin x) = x^2 \\cos x + 2x \\sin x',
+      },
+      {
+        label: 'Example 2: $e^x \\cdot x^3$',
+        explanation: 'Again, treat each piece separately. The exponential stays as-is when differentiated, while $x^3$ becomes $3x^2$. The structure remains identical — only the derivatives change.',
+        math: '\\frac{d}{dx}(e^x x^3) = e^x x^3 + 3x^2 e^x',
+      },
+      {
+        label: 'Example 3: $(x^2+1)(x-4)$',
+        explanation: 'Even though both are polynomials, we still apply the product rule — do NOT expand unless explicitly told. Keeping structure avoids algebra mistakes.',
+        math: '(x^2+1)\'(x-4) + (x^2+1)(x-4)\' = 2x(x-4) + (x^2+1)(1)',
+      },
+      {
+        label: 'Example 4: $\\ln x \\cdot x^2$',
+        explanation: 'This mixes logarithmic and polynomial functions. The derivative of $\\ln x$ is $1/x$, and of $x^2$ is $2x$. Apply the rule carefully.',
+        math: '\\frac{d}{dx}(\\ln x \\cdot x^2) = \\frac{1}{x}x^2 + 2x \\ln x = x + 2x\\ln x',
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // QUOTIENT RULE — DERIVATION + EXAMPLES
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    id: 'wt-quotient-rule-derivation',
+    title: 'Quotient Rule — Why it Exists (Derivation)',
+    prereqs: ['Product rule', 'Chain rule'],
+    problem: 'Derive the formula for $\\dfrac{d}{dx}\\left[\\frac{f(x)}{g(x)}\\right]$.',
+    steps: [
+      {
+        label: 'Rewrite as a product',
+        visualNote: 'We reinterpret division as multiplication by an inverse.',
+        strategy: 'Turn the quotient into something we already know how to differentiate.',
+        explanation: 'The quotient rule is not independent — it is built from the product rule. Instead of memorizing a new rule, we rewrite the fraction $f(x)/g(x)$ as $f(x) \\cdot g(x)^{-1}$. This transforms the problem into a product, which we already know how to differentiate.',
+        math: '\\frac{f(x)}{g(x)} = f(x) \\cdot g(x)^{-1}',
+      },
+      {
+        label: 'Apply the product rule',
+        explanation: 'Using the product rule: derivative = first times derivative of second plus second times derivative of first. The only new challenge is differentiating $g(x)^{-1}$.',
+        math: 'f\'(x)g(x)^{-1} + f(x)\\frac{d}{dx}[g(x)^{-1}]',
+      },
+      {
+        label: 'Differentiate $g(x)^{-1}$ using chain rule',
+        explanation: 'The derivative of $g(x)^{-1}$ is $-g(x)^{-2}g\'(x)$. This comes from the power rule combined with the chain rule. This is the step that introduces the negative sign in the quotient rule.',
+        math: '\\frac{d}{dx}[g(x)^{-1}] = -\\frac{g\'(x)}{g(x)^2}',
+      },
+      {
+        label: 'Combine into a single fraction',
+        explanation: 'Substituting back and combining terms over a common denominator $g(x)^2$, we arrive at the standard quotient rule formula. Notice the structure: numerator is “low d high minus high d low”.',
+        math: '\\left(\\frac{f}{g}\\right)\' = \\frac{f\'g - fg\'}{g^2}',
+        conceptRef: 'Product rule + chain rule',
+      },
+    ],
+  },
+
+  {
+    id: 'wt-quotient-rule-examples',
+    title: 'Quotient Rule — Worked Examples',
+    prereqs: ['Quotient rule'],
+    problem: 'Differentiate the following using the quotient rule.',
+    steps: [
+      {
+        label: 'Example 1: $\\frac{x^2}{x+1}$',
+        explanation: 'Identify numerator and denominator clearly. Apply formula carefully: derivative of top times bottom minus top times derivative of bottom, all over bottom squared.',
+        math: '\\frac{2x(x+1) - x^2(1)}{(x+1)^2}',
+      },
+      {
+        label: 'Example 2: $\\frac{\\sin x}{x}$',
+        explanation: 'Derivative of $\\sin x$ is $\\cos x$, derivative of $x$ is 1. Plug into formula directly.',
+        math: '\\frac{x\\cos x - \\sin x}{x^2}',
+      },
+      {
+        label: 'Example 3: $\\frac{e^x}{x^2}$',
+        explanation: 'Keep structure clear — do not simplify prematurely. Apply rule step by step.',
+        math: '\\frac{x^2 e^x - e^x(2x)}{x^4}',
+      },
+      {
+        label: 'Example 4: $\\frac{\\ln x}{x}$',
+        explanation: 'Derivative of $\\ln x$ is $1/x$. Carefully substitute into quotient formula.',
+        math: '\\frac{x(1/x) - \\ln x(1)}{x^2} = \\frac{1 - \\ln x}{x^2}',
+      },
+    ],
+  },
+]
 };

@@ -1077,6 +1077,8 @@ const VIZ_REGISTRY = {
   CounterexampleMVT: lazy(() => import("./d3/CounterexampleMVT.jsx")),
   RealWorldMVT: lazy(() => import("./d3/RealWorldMVT.jsx")),
   GeometricIntuitionMVT: lazy(() => import("./d3/GeometricIntuitionMVT.jsx")),
+  MVTIntegralProof: lazy(() => import("./d3/MVTIntegralProof.jsx")),
+
 
 
 
