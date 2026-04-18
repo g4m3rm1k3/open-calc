@@ -1195,7 +1195,7 @@ export default {
     title: 'Chain Rule — Seeing the Composition',
     prereqs: ['Derivative of powers', 'Function composition'],
     svgId: 'WalkthroughViz',
-    vizProps: { type: 'derivative', fn: '(x*x+1)*(x*x+1)', xMin: -2, xMax: 2, label: 'f(x)=(x^2+1)^2' },
+    vizProps: { fn: '(x*x+1)*(x*x+1)', xMin: -2, xMax: 2, label: 'f(x) = (x\u00B2+1)\u00B2' },
     problem: 'Differentiate $f(x) = (x^2+1)^2$.',
 
     steps: [
@@ -1261,7 +1261,7 @@ export default {
     title: 'Chain Rule — Trig Composition',
     prereqs: ['Trig derivatives', 'Chain rule basics'],
     svgId: 'WalkthroughViz',
-    vizProps: { type: 'derivative', fn: 'Math.sin(x*x)', xMin: -2, xMax: 2, label: 'f(x)=sin(x^2)' },
+    vizProps: { fn: 'Math.sin(x*x)', xMin: -2, xMax: 2, label: 'f(x) = sin(x\u00B2)' },
     problem: 'Differentiate $f(x) = \\sin(x^2)$.',
 
     steps: [
@@ -1314,7 +1314,7 @@ export default {
     title: 'Chain Rule — Nested Composition (Multiple Layers)',
     prereqs: ['Chain rule', 'Exponential functions'],
     svgId: 'WalkthroughViz',
-    vizProps: { type: 'derivative', fn: 'Math.exp(Math.sin(x*x))', xMin: -2, xMax: 2, label: 'f(x)=e^{sin(x^2)}' },
+    vizProps: { fn: 'Math.exp(Math.sin(x*x))', xMin: -2, xMax: 2, label: 'f(x) = e^{sin(x\u00B2)}' },
     problem: 'Differentiate $f(x)=e^{\\sin(x^2)}$.',
 
     steps: [

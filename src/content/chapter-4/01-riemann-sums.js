@@ -383,7 +383,7 @@ export default {
       title: 'Left Riemann Sum',
       prereqs: ['Summation notation', 'Riemann sum definition'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'left', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      vizProps: { fn: 'x*x', a: 1, b: 3, rects: 4, method: 'left', xMin: 0, xMax: 3.6, label: 'f(x) = x\u00B2' },
       problem: 'Approximate $\\displaystyle\\int_1^3 x^2\\,dx$ using a left Riemann sum with $n=4$ subintervals.',
       steps: [
         {
@@ -442,7 +442,7 @@ export default {
       title: 'Right vs Left Riemann Sum',
       prereqs: ['Left Riemann sum', 'Increasing/decreasing functions'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'right', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      vizProps: { fn: 'x*x', a: 1, b: 3, rects: 4, method: 'right', xMin: 0, xMax: 3.6, label: 'f(x) = x\u00B2' },
       problem: 'Compare the left and right Riemann sums for $\\int_1^3 x^2\\,dx$ with n=4. Which is larger and why?',
       steps: [
         {
@@ -496,7 +496,7 @@ export default {
       title: 'Midpoint Riemann Sum',
       prereqs: ['Left/right Riemann sums'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'riemann-sum', fn: 'x*x', a: 1, b: 3, n: 4, endpoint: 'mid', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      vizProps: { fn: 'x*x', a: 1, b: 3, rects: 4, method: 'midpoint', xMin: 0, xMax: 3.6, label: 'f(x) = x\u00B2' },
       problem: 'Approximate $\\int_1^3 x^2\\,dx$ using a midpoint Riemann sum with n=4.',
       steps: [
         {
@@ -532,7 +532,7 @@ export default {
       title: 'Limit of Riemann Sums',
       prereqs: ['Riemann sums', 'Sigma notation'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'limit-riemann', fn: 'x*x', a: 1, b: 3, n: '∞', xMin: 0, xMax: 3.6, label: 'f(x) = x²' },
+      vizProps: { fn: 'x*x', a: 1, b: 3, rects: 20, method: 'right', xMin: 0, xMax: 3.6, label: 'f(x) = x\u00B2 — dense sum \u2192 exact area' },
       problem: 'Show that $\\displaystyle\\lim_{n\\to\\infty} \\sum_{i=1}^n f(x_i^*)\\Delta x = \\int_1^3 x^2\\,dx$.',
       steps: [
         {
@@ -560,7 +560,7 @@ export default {
       title: 'Closed-Form Summation',
       prereqs: ['Summation properties', 'Power sum formulas'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'summation-formula', fn: 'i*i', n: 10, label: '\\sum_{i=1}^n i^2' },
+      vizProps: { fn: 'x*x', a: 1, b: 10, rects: 10, method: 'left', xMin: 0, xMax: 11, label: 'f(x) = x\u00B2 — \u03A3i\u00B2 as Riemann rectangles' },
       problem: 'Evaluate \\(\\sum_{i=1}^{10} i^2\\) using the closed-form formula.',
       steps: [
         {

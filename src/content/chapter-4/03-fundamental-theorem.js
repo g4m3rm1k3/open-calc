@@ -792,7 +792,7 @@ export default {
         "Chain rule",
       ],
       svgId: "WalkthroughViz",
-      vizProps: { type: "ftc-dual", label: "FTC Parts 1 & 2" },
+      vizProps: { fn: 'x*x', a: 1, b: 3, xMin: 0, xMax: 3.5, label: 'f(x) = x\u00B2 — FTC: area = F(b) \u2212 F(a)' },
       problem:
         "Explain both parts of the Fundamental Theorem of Calculus, prove the key ideas intuitively, and apply them to evaluate integrals and differentiate accumulation functions.",
       steps: [
@@ -900,7 +900,7 @@ export default {
         "Continuity",
       ],
       svgId: "WalkthroughViz",
-      vizProps: { type: "ftc-proof", label: "Proof of FTC Part 2" },
+      vizProps: { fn: 'Math.sqrt(x)', a: 1, b: 4, xMin: 0, xMax: 4.5, label: 'f(t) = \u221At — shaded area = F(x) = \u222B\u2081\u02E3 \u221At dt' },
       problem:
         "Prove that if \\( F(x) = \\int_a^x f(t)\\,dt \\) where \\( f \) is continuous, then \\( F'(x) = f(x) \).",
       steps: [

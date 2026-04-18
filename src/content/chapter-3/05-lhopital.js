@@ -1220,7 +1220,7 @@ If $\\lim_{x \\to c} f(x) = \\lim_{x \\to c} g(x) = 0$ or both $= \\pm\\infty$, 
       title: "L'Hôpital's Rule – When Limits Fight Back",
       prereqs: ['Limits at infinity', 'Derivatives as rates', 'Indeterminate forms'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'lhopital', label: "L'Hôpital's Rule" },
+      vizProps: { fn1: 'Math.sin(x)', fn2: 'x', comparison: true, a: -1.5, b: 1.5, xMin: -2, xMax: 2, label1: 'f(x) = sin x', label2: 'g(x) = x — both \u2192 0 as x \u2192 0' },
       problem: "State, prove intuitively, and apply L'Hôpital's Rule to resolve indeterminate forms of type 0/0 and ∞/∞.",
       steps: [
         {

@@ -531,7 +531,7 @@ export default {
       title: 'Mean Value Theorem for Integrals – The Average Value Theorem',
       prereqs: ['Continuity', 'Definite integral as net area', 'Intermediate Value Theorem'],
       svgId: 'WalkthroughViz',
-      vizProps: { type: 'mvt-integrals', label: 'Mean Value Theorem for Integrals' },
+      vizProps: { fn: 'x*x', a: 0, b: 2, avgValue: 4/3, xMin: -0.3, xMax: 2.5, label: 'f(x) = x\u00B2 on [0,2] — average value \u2248 1.33' },
       problem: 'State, prove, and apply the Mean Value Theorem for Integrals: If \\( f \\) is continuous on \\([a,b]\\), then there exists some \\( c \\) in \\([a,b]\\) such that \\( \\int_a^b f(x)\\,dx = f(c)(b-a) \\).',
       steps: [
         {
