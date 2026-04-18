@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel, 
@@ -15,12 +16,13 @@ import {
 
 function ParallelCanvas({ transAngle, highlight }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
+
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const muted = isDark ? "#6b7280" : "#94a3b8";
     const rad = (transAngle * Math.PI) / 180;
@@ -57,7 +59,7 @@ function ParallelCanvas({ transAngle, highlight }) {
       ctx.fillStyle = highlightColor; ctx.textAlign = "center";
       ctx.fillText(notes[highlight], W / 2, H - 10);
     }
-  }, [transAngle, highlight]);
+  }, [transAngle, highlight, isDark]);
   return <canvas ref={ref} width={520} height={230} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
@@ -65,19 +67,22 @@ export default function G1_3_ParallelLines({ params = {} }) {
   const [transAngle, setTransAngle] = useState(55);
   const [highlight, setHighlight] = useState("corr");
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {mkBadge(3)}
       {mkHook("Mic is checking whether two walls at the workshop are truly parallel. Albert draws a line crossing both — a transversal — and explains that parallel lines create three distinct angle relationships at the crossings. Recognising the pattern is faster than measuring every angle.")}
       <div style={mkPanel}>
-        {mkHdr("Story", { background: "#ede9fe", color: "#4f46e5" }, "Parallel lines and transversals")}
+        {mkHdr("Story", storyTagStyle, "Parallel lines and transversals")}
         <div style={{ ...mkBody, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"If the walls are parallel,"</em> <span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> said, drawing a diagonal, <em style={{ color: "var(--color-text-secondary)" }}>"then this crossing line creates the same angle at both walls. Measure one angle — you know them all."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> counted the angles. <em style={{ color: "var(--color-text-secondary)" }}>"There are eight of them."</em> <em style={{ color: "var(--color-text-secondary)" }}>"But only two distinct values. And they're related in three ways — corresponding, alternate, and co-interior. Each relationship is a theorem, not a coincidence."</em></p>
+          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"If the walls are parallel,"</em> <span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> said, drawing a diagonal, <em style={{ color: "var(--color-text-secondary)" }}>"then this crossing line creates the same angle at both walls. Measure one angle — you know them all."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> counted the angles. <em style={{ color: "var(--color-text-secondary)" }}>"There are eight of them."</em> <em style={{ color: "var(--color-text-secondary)" }}>"But only two distinct values. And they're related in three ways — corresponding, alternate, and co-interior. Each relationship is a theorem, not a coincidence."</em></p>
         </div>
       </div>
       <div style={mkPanel}>
-        {mkHdr("Discovery", { background: "#ede9fe", color: "#4f46e5" }, "Three angle relationships from one transversal")}
+        {mkHdr("Discovery", storyTagStyle, "Three angle relationships from one transversal")}
         <div style={mkBody}>
           <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 12 }}><ParallelCanvas transAngle={transAngle} highlight={highlight} /></div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>

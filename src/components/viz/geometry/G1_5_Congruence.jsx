@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel, 
   mkHdr, 
@@ -14,6 +15,9 @@ import {
 export default function G1_5_Congruence({ params = {} }) {
   const [criterion, setCriterion] = useState("SSS");
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
+
   const criteria = {
     SSS: { works: true, desc: "Side-Side-Side", why: "Three sides fix the shape uniquely. Given a, b, c, the triangle can only close in one way (up to reflection). Proof: by rigidity — three fixed rods form a unique triangle.", example: "a=5, b=7, c=6 → exactly one triangle." },
     SAS: { works: true, desc: "Side-Angle-Side", why: "Two sides and the included angle between them fix the triangle. The third side and remaining angles are forced by these three values.", example: "a=5, ∠C=60°, b=7 → exactly one triangle." },
@@ -23,29 +27,38 @@ export default function G1_5_Congruence({ params = {} }) {
     AAA: { works: false, desc: "Angle-Angle-Angle (similarity only!)", why: "Three angles determine the shape but not the size. Any scale of the same triangle satisfies AAA. This gives similarity, not congruence.", example: "40°, 70°, 70° → infinitely many triangles of different sizes." },
   };
   const c = criteria[criterion];
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {mkBadge(5)}
       {mkHook("Mic needs to cut two identical triangular braces for the boat hull. How many measurements does he need to ensure they're identical? Albert says three — but not any three. Two triangles are congruent (identical) only when the right combination of sides and angles match.")}
       <div style={mkPanel}>
-        {mkHdr("Story", { background: "#ede9fe", color: "#4f46e5" }, "Congruence")}
+        {mkHdr("Story", storyTagStyle, "Congruence")}
         <div style={{ ...mkBody, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> had six measurements for a triangle: three sides and three angles. <em style={{ color: "var(--color-text-secondary)" }}>"I only need to give the factory three of these to guarantee a matching piece?"</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> nodded. <em style={{ color: "var(--color-text-secondary)" }}>"Three — if they're the right three. And two of the six combinations don't work at all. One gives infinitely many non-matching triangles. One gives zero, one, or two possibilities. You need to know which combinations are safe."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> had six measurements for a triangle: three sides and three angles. <em style={{ color: "var(--color-text-secondary)" }}>"I only need to give the factory three of these to guarantee a matching piece?"</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> nodded. <em style={{ color: "var(--color-text-secondary)" }}>"Three — if they're the right three. And two of the six combinations don't work at all. One gives infinitely many non-matching triangles. One gives zero, one, or two possibilities. You need to know which combinations are safe."</em></p>
         </div>
       </div>
       <div style={mkPanel}>
-        {mkHdr("Discovery", { background: "#ede9fe", color: "#4f46e5" }, "Which three measurements guarantee congruence?")}
+        {mkHdr("Discovery", storyTagStyle, "Which three measurements guarantee congruence?")}
         <div style={mkBody}>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-            {Object.keys(criteria).map(key => (
-              <button key={key} onClick={() => setCriterion(key)} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)", border: `1px solid ${key === criterion ? (criteria[key].works ? "#059669" : "#dc2626") : "var(--color-border-tertiary)"}`, background: key === criterion ? (criteria[key].works ? "#ecfdf5" : "#fef2f2") : "transparent", color: key === criterion ? (criteria[key].works ? "#065f46" : "#991b1b") : "var(--color-text-secondary)" }}>
-                {key}
-              </button>
-            ))}
+            {Object.keys(criteria).map(key => {
+              const works = criteria[key].works;
+              const isActive = key === criterion;
+              const activeBg = isDark ? (works ? "#064e3b" : "#450a0a") : (works ? "#ecfdf5" : "#fef2f2");
+              const activeText = isDark ? (works ? "#34d399" : "#f87171") : (works ? "#065f46" : "#991b1b");
+              const activeBdr = isDark ? (works ? "#059669" : "#dc2626") : (works ? "#059669" : "#dc2626");
+              
+              return (
+                <button key={key} onClick={() => setCriterion(key)} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)", border: `1px solid ${isActive ? activeBdr : "var(--color-border-tertiary)"}`, background: isActive ? activeBg : "transparent", color: isActive ? activeText : "var(--color-text-secondary)", transition: "all 0.2s" }}>
+                  {key}
+                </button>
+              );
+            })}
           </div>
-          <div style={{ background: c.works ? "#ecfdf5" : "#fef2f2", border: `1px solid ${c.works ? "#6ee7b7" : "#fca5a5"}`, borderRadius: 10, padding: "14px 16px", marginBottom: 10 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: c.works ? "#065f46" : "#991b1b", marginBottom: 6 }}>{criterion}: {c.desc} — {c.works ? "✓ Guarantees congruence" : "✗ Does NOT guarantee congruence"}</div>
+          <div style={{ background: isDark ? (c.works ? "#064e3b33" : "#450a0a33") : (c.works ? "#ecfdf5" : "#fef2f2"), border: `1px solid ${c.works ? (isDark ? "#059669" : "#6ee7b7") : (isDark ? "#dc2626" : "#fca5a5")}`, borderRadius: 10, padding: "14px 16px", marginBottom: 10 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: c.works ? (isDark ? "#34d399" : "#065f46") : (isDark ? "#f87171" : "#991b1b"), marginBottom: 6 }}>{criterion}: {c.desc} — {c.works ? "✓ Guarantees congruence" : "✗ Does NOT guarantee congruence"}</div>
             <p style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: 6 }}>{c.why}</p>
             <p style={{ fontSize: 12, color: "var(--color-text-secondary)", fontStyle: "italic" }}>Example: {c.example}</p>
           </div>

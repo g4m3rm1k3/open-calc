@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel as P, 
   mkHdr as H, 
@@ -14,23 +15,27 @@ import {
 export default function G2_2_CircleTheorems2({ params = {} }) {
   const [extX, setExtX] = useState(350);
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   const cx = 200, cy = 130, r = 90;
   const dx = extX - cx, dy = 0;
   const dist = Math.hypot(dx, dy);
   const tangentLen = dist > r ? Math.sqrt(dist * dist - r * r).toFixed(2) : "N/A";
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {BDG(2)}
       {HK("Albert needs to draw a line from a point outside the sundial circle that just touches the circle — a tangent. He finds something remarkable: two tangent lines from the same external point are always exactly the same length. He proves it using congruent triangles.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Tangents and secants")}
+        {H("Story", storyTagStyle, "Tangents and secants")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> measured the two tangent lines from the same point: 14.2 cm and 14.2 cm. <em style={{ color: "var(--color-text-secondary)" }}>"That's suspicious."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> looked at the diagram. <em style={{ color: "var(--color-text-secondary)" }}>"It's not suspicious. It's a theorem. Two tangents from an external point are always equal. I'll prove it with congruent triangles — using the fact that a tangent is perpendicular to the radius."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> measured the two tangent lines from the same point: 14.2 cm and 14.2 cm. <em style={{ color: "var(--color-text-secondary)" }}>"That's suspicious."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> looked at the diagram. <em style={{ color: "var(--color-text-secondary)" }}>"It's not suspicious. It's a theorem. Two tangents from an external point are always equal. I'll prove it with congruent triangles — using the fact that a tangent is perpendicular to the radius."</em></p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "Two tangents from an external point are equal")}
+        {H("Discovery", storyTagStyle, "Two tangents from an external point are equal")}
         <div style={B}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>External point distance</span>

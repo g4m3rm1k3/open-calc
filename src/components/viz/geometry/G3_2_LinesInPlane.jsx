@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as GP, 
@@ -18,21 +19,23 @@ export default function G3_2_LinesInPlane({ params = {} }) {
   const [intercept, setIntercept] = useState(1);
   const [showPerp, setShowPerp] = useState(false);
   const ready = useMath();
+  const isDark = useIsDark();
   const perpSlope = slope !== 0 ? (-1 / slope) : Infinity;
+  const storyTagStyle = isDark ? { background: "#164e63", color: "#22d3ee" } : { background: "#ecfeff", color: "#155e75" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
-      <style>{`@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {GBG(2)}
       {GHK("Mic needs dock beams parallel to each other and perpendicular to the shoreline. Albert translates these geometric conditions into slope algebra: parallel lines have equal slopes, perpendicular lines have slopes that multiply to −1. Both conditions are proved geometrically.")}
       <div style={GP}>
-        {GH("Story", { background: "#ecfeff", color: "#155e75" }, "Lines in the plane")}
+        {GH("Story", storyTagStyle, "Lines in the plane")}
         <div style={{ ...GB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> drew two lines. <em style={{ color: "var(--color-text-secondary)" }}>"How do I know if these are parallel without measuring every point?"</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> looked at the slopes. <em style={{ color: "var(--color-text-secondary)" }}>"Same slope, different intercept — parallel. And perpendicular: the slopes multiply to negative one. Not approximately — exactly negative one. I'll prove both from similar triangles."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> drew two lines. <em style={{ color: "var(--color-text-secondary)" }}>"How do I know if these are parallel without measuring every point?"</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> looked at the slopes. <em style={{ color: "var(--color-text-secondary)" }}>"Same slope, different intercept — parallel. And perpendicular: the slopes multiply to negative one. Not approximately — exactly negative one. I'll prove both from similar triangles."</em></p>
         </div>
       </div>
       <div style={GP}>
-        {GH("Discovery", { background: "#ecfeff", color: "#155e75" }, "Slope conditions for parallel and perpendicular lines")}
+        {GH("Discovery", storyTagStyle, "Slope conditions for parallel and perpendicular lines")}
         <div style={GB}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
             {[["Slope m", slope, -3, 3, 0.1, setSlope], ["y-intercept b", intercept, -4, 4, 0.5, setIntercept]].map(([label, val, min, max, step, setter]) => (
@@ -43,7 +46,7 @@ export default function G3_2_LinesInPlane({ params = {} }) {
               </div>
             ))}
           </div>
-          <button onClick={() => setShowPerp(p => !p)} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", border: "1px solid #0891b2", background: showPerp ? "#ecfeff" : "transparent", color: "#0891b2", marginBottom: 12 }}>
+          <button onClick={() => setShowPerp(p => !p)} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", border: "1px solid #0891b2", background: showPerp ? (isDark ? "#164e63" : "#ecfeff") : "transparent", color: "#0891b2", marginBottom: 12 }}>
             {showPerp ? "Hide perpendicular" : "Show perpendicular line"}
           </button>
           {ready && <div style={GMB}><M t={`y = ${slope.toFixed(1)}x + ${intercept.toFixed(1)} \\qquad ${showPerp ? `\\text{Perp: } y = ${perpSlope === Infinity ? "\\text{vertical}" : perpSlope.toFixed(2) + "x"}` : "\\text{Parallel: same slope, different intercept}"}`} display ready={ready} /></div>}

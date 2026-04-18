@@ -10,6 +10,18 @@ export function useMath() {
   return ready;
 }
 
+export function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 export function M({ t, display = false, ready }) {
   const ref = useRef(null);
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as P, 
@@ -16,22 +17,25 @@ import {
 export default function G2_4_SimilarTriangles({ params = {} }) {
   const [scale, setScale] = useState(1.8);
   const ready = useMath();
+  const isDark = useIsDark();
   const a1 = 5, b1 = 7, c1 = 8;
   const a2 = (a1 * scale).toFixed(2), b2 = (b1 * scale).toFixed(2), c2 = (c1 * scale).toFixed(2);
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       <style>{`@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {BDG(4)}
       {HK("Mic needs to find the height of the lighthouse without climbing it. He measures its shadow (14m) and his own shadow (1.4m) at the same time. He is 1.8m tall. Albert says two similar triangles will solve it — and shows why similar triangles always have proportional sides.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Similar triangles and proportion")}
+        {H("Story", storyTagStyle, "Similar triangles and proportion")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> stood next to the lighthouse. His shadow was 1.4m, the lighthouse shadow was 14m. <em style={{ color: "var(--color-text-secondary)" }}>"The sun angle is the same for both. So the triangle formed by me, my shadow, and the sun ray is similar to the triangle formed by the lighthouse, its shadow, and the same sun ray."</em></p>
-          <p style={{ marginBottom: 0 }}><em style={{ color: "var(--color-text-secondary)" }}>"Lighthouse height / 14m = 1.8m / 1.4m,"</em> <span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"So the lighthouse is 18 metres tall. But why do similar triangles have proportional sides? That requires a proof."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> stood next to the lighthouse. His shadow was 1.4m, the lighthouse shadow was 14m. <em style={{ color: "var(--color-text-secondary)" }}>"The sun angle is the same for both. So the triangle formed by me, my shadow, and the sun ray is similar to the triangle formed by the lighthouse, its shadow, and the same sun ray."</em></p>
+          <p style={{ marginBottom: 0 }}><em style={{ color: "var(--color-text-secondary)" }}>"Lighthouse height / 14m = 1.8m / 1.4m,"</em> <span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"So the lighthouse is 18 metres tall. But why do similar triangles have proportional sides? That requires a proof."</em></p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "AA similarity — same angles, proportional sides")}
+        {H("Discovery", storyTagStyle, "AA similarity — same angles, proportional sides")}
         <div style={B}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Scale factor</span>

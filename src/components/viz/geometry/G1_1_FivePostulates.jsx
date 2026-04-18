@@ -1,24 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-
-function useMath() {
-  const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
-  useEffect(() => {
-    if (window.katex) { setReady(true); return; }
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
-    document.head.appendChild(link);
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload = () => setReady(true);
-    document.head.appendChild(s);
-  }, []);
-  return ready;
-}
+import { useMath, useIsDark } from "./GeometryHelpers.jsx";
 
 function WhyPanel({ depth = 0, tag, children }) {
   const [open, setOpen] = useState(false);
-  const colors = [
+  const isDark = useIsDark();
+  const colors = isDark ? [
+    { border: "#818cf8", bg: "#1e1b4b", text: "#c7d2fe" },
+    { border: "#22d3ee", bg: "#083344", text: "#a5f3fc" },
+    { border: "#34d399", bg: "#064e3b", text: "#a7f3d0" },
+    { border: "#fbbf24", bg: "#451a03", text: "#fde68a" },
+  ] : [
     { border: "#4f46e5", bg: "#eef2ff", text: "#3730a3" },
     { border: "#0891b2", bg: "#ecfeff", text: "#0e7490" },
     { border: "#059669", bg: "#ecfdf5", text: "#047857" },
@@ -27,7 +18,7 @@ function WhyPanel({ depth = 0, tag, children }) {
   const c = colors[Math.min(depth, colors.length - 1)];
   return (
     <div style={{ marginLeft: depth * 14, marginTop: 10 }}>
-      <button onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: open ? c.bg : "transparent", border: `1px solid ${c.border}`, borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 500, color: c.border, cursor: "pointer", fontFamily: "var(--font-sans)" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: open ? c.bg : "transparent", border: `1px solid ${c.border}`, borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 500, color: open ? c.text : c.border, cursor: "pointer", fontFamily: "var(--font-sans)", transition: "all 0.2s" }}>
         <span style={{ width: 15, height: 15, borderRadius: "50%", background: c.border, color: "#fff", fontSize: 10, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{open ? "−" : "?"}</span>
         {open ? "Close" : tag}
       </button>
@@ -42,13 +33,14 @@ function WhyPanel({ depth = 0, tag, children }) {
 
 function PostulateCanvas({ active, showParallel }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
+  
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const muted = isDark ? "#6b7280" : "#94a3b8";
     const accent = "#4f46e5";
@@ -123,7 +115,7 @@ function PostulateCanvas({ active, showParallel }) {
         ctx.fillText("Without P5: many parallel lines possible!", 60, H - 20);
       }
     }
-  }, [active, showParallel]);
+  }, [active, showParallel, isDark]);
   return <canvas ref={ref} width={520} height={200} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
@@ -138,6 +130,7 @@ const POSTULATES = [
 export default function G1_1_FivePostulates({ params = {} }) {
   const [active, setActive] = useState(0);
   const [showParallel, setShowParallel] = useState(false);
+  const isDark = useIsDark();
 
   const S = { fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 };
   const panel = { background: "var(--color-background-primary)", border: "0.5px solid var(--color-border-tertiary)", borderRadius: 12, overflow: "hidden", marginBottom: 14 };
@@ -146,6 +139,8 @@ export default function G1_1_FivePostulates({ params = {} }) {
   const insight = (col = "#4f46e5") => ({ padding: "12px 14px", borderLeft: `3px solid ${col}`, background: "var(--color-background-secondary)", borderRadius: "0 8px 8px 0", fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, margin: "10px 0" });
 
   const p = POSTULATES[active];
+
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
 
   return (
     <div style={S}>
@@ -158,23 +153,23 @@ export default function G1_1_FivePostulates({ params = {} }) {
       </div>
 
       <div style={panel}>
-        {hdr("Story", { background: "#ede9fe", color: "#4f46e5" }, "The five postulates")}
+        {hdr("Story", storyTagStyle, "The five postulates")}
         <div style={{ ...body, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> set the book on the workbench. <em style={{ color: "var(--color-text-secondary)" }}>"Euclid wrote this in 300 BC. Every theorem in here — hundreds of them — follows from five statements that he simply declares to be true."</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> picked it up. <em style={{ color: "var(--color-text-secondary)" }}>"Why five? Why not prove everything?"</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> set the book on the workbench. <em style={{ color: "var(--color-text-secondary)" }}>"Euclid wrote this in 300 BC. Every theorem in here — hundreds of them — follows from five statements that he simply declares to be true."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> picked it up. <em style={{ color: "var(--color-text-secondary)" }}>"Why five? Why not prove everything?"</em></p>
           <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"You can't prove everything. At some point you have to start somewhere. You choose the smallest set of assumptions you can, and prove everything else from them. Those assumptions are called axioms or postulates."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> looked at the first page. <em style={{ color: "var(--color-text-secondary)" }}>"And nobody's proved these from something even simpler?"</em> <span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> shook his head. <em style={{ color: "var(--color-text-secondary)" }}>"The first four, people tried. The fifth — that one broke all of mathematics when someone finally gave up trying."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> looked at the first page. <em style={{ color: "var(--color-text-secondary)" }}>"And nobody's proved these from something even simpler?"</em> <span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> shook his head. <em style={{ color: "var(--color-text-secondary)" }}>"The first four, people tried. The fifth — that one broke all of mathematics when someone finally gave up trying."</em></p>
         </div>
       </div>
 
       <div style={panel}>
-        {hdr("Discovery", { background: "#ede9fe", color: "#4f46e5" }, "Euclid's five postulates — what geometry is built on")}
+        {hdr("Discovery", storyTagStyle, "Euclid's five postulates — what geometry is built on")}
         <div style={body}>
           <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, marginBottom: 14 }}>Select each postulate. The diagram shows what it says. The fifth postulate reveals why it's different from the others.</p>
 
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
             {POSTULATES.map((po, i) => (
-              <button key={i} onClick={() => { setActive(i); setShowParallel(false); }} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", border: `1px solid ${i === active ? "#4f46e5" : "var(--color-border-tertiary)"}`, background: i === active ? "#ede9fe" : "transparent", color: i === active ? "#3730a3" : "var(--color-text-secondary)" }}>
+              <button key={i} onClick={() => { setActive(i); setShowParallel(false); }} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", border: `1px solid ${i === active ? "#4f46e5" : "var(--color-border-tertiary)"}`, background: i === active ? (isDark ? "#312e81" : "#ede9fe") : "transparent", color: i === active ? (isDark ? "#c7d2fe" : "#3730a3") : "var(--color-text-secondary)" }}>
                 P{i + 1}
               </button>
             ))}

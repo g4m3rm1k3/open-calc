@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as GP, 
@@ -15,12 +16,12 @@ import {
 
 function CoordCanvas({ x1, y1, x2, y2 }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const muted = isDark ? "#374151" : "#e5e7eb";
     const sc = 35, ox = W / 2, oy = H / 2;
@@ -51,7 +52,7 @@ function CoordCanvas({ x1, y1, x2, y2 }) {
     ctx.fillStyle = "#d97706"; ctx.textAlign = "left";
     ctx.fillText(`Δx=${dx}`, (px1 + px2) / 2, py1 + 16);
     ctx.fillText(`Δy=${dy}`, px2 + 6, (py1 + py2) / 2);
-  }, [x1, y1, x2, y2]);
+  }, [x1, y1, x2, y2, isDark]);
   return <canvas ref={ref} width={500} height={280} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
@@ -59,21 +60,24 @@ export default function G3_1_CoordinatePlane({ params = {} }) {
   const [x1, setX1] = useState(1); const [y1, setY1] = useState(2);
   const [x2, setX2] = useState(5); const [y2, setY2] = useState(5);
   const ready = useMath();
+  const isDark = useIsDark();
   const dist = Math.hypot(x2 - x1, y2 - y1);
   const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  const storyTagStyle = isDark ? { background: "#164e63", color: "#22d3ee" } : { background: "#ecfeff", color: "#155e75" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {GBG(1)}
       {GHK("Mic is designing the harbor extension on a coordinate grid. He needs to find exact distances between dock posts and the midpoint of each beam. Albert shows him that the distance formula is just the Pythagorean theorem in disguise — and placing geometry on a grid connects every shape to an algebraic equation.")}
       <div style={GP}>
-        {GH("Story", { background: "#ecfeff", color: "#155e75" }, "The coordinate plane")}
+        {GH("Story", storyTagStyle, "The coordinate plane")}
         <div style={{ ...GB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> had the dock plan on graph paper. <em style={{ color: "var(--color-text-secondary)" }}>"How far is post A from post B?"</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> pointed to the grid. <em style={{ color: "var(--color-text-secondary)" }}>"Draw the horizontal and vertical distances between them. You've made a right triangle. The distance is the hypotenuse — Pythagoras."</em> Mic stared. <em style={{ color: "var(--color-text-secondary)" }}>"That's the distance formula?"</em> <em style={{ color: "var(--color-text-secondary)" }}>"That IS the distance formula."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> had the dock plan on graph paper. <em style={{ color: "var(--color-text-secondary)" }}>"How far is post A from post B?"</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> pointed to the grid. <em style={{ color: "var(--color-text-secondary)" }}>"Draw the horizontal and vertical distances between them. You've made a right triangle. The distance is the hypotenuse — Pythagoras."</em> Mic stared. <em style={{ color: "var(--color-text-secondary)" }}>"That's the distance formula?"</em> <em style={{ color: "var(--color-text-secondary)" }}>"That IS the distance formula."</em></p>
         </div>
       </div>
       <div style={GP}>
-        {GH("Discovery", { background: "#ecfeff", color: "#155e75" }, "Distance = Pythagoras on a grid")}
+        {GH("Discovery", storyTagStyle, "Distance = Pythagoras on a grid")}
         <div style={GB}>
           <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 12 }}><CoordCanvas x1={x1} y1={y1} x2={x2} y2={y2} /></div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>

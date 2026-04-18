@@ -10,27 +10,31 @@ import {
   mkBadge as FBG, 
   mkHook as FHK, 
   mkSeed as FSD, 
-  mkMbox as FMB
+  mkMbox as FMB,
+  useIsDark
 } from "./GeometryHelpers.jsx";
 
 export default function G4_2_PyramidsCones({ params = {} }) {
   const [r, setR] = useState(4); const [h, setH] = useState(7);
   const ready = useMath();
+  const isDark = useIsDark();
   const vol = ((1 / 3) * Math.PI * r * r * h).toFixed(2);
   const cylVol = (Math.PI * r * r * h).toFixed(2);
+  const storyTagStyle = isDark ? { background: "#450a0a", color: "#f87171" } : { background: "#fef2f2", color: "#991b1b" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {FBG(2)}
-      {FHK("Mic's uncle needs to know why the cone volume formula has ⅓ in it. John says 'it's just the formula.' Albert says the ⅓ is a geometric fact — provable by splitting a cube into exactly three congruent pyramids, each with the same base and height as the cube.")}
+      {FHK("Mic's uncle needs to know why the cone volume formula has ⅓ in it. John says 'it's just the formula.' Albert says the ⅓ is a geometric fact — provable by splitting a cube into exactly three equal pyramids, each with the same base and height as the cube.")}
       <div style={FP}>
-        {FH("Story", { background: "#fef2f2", color: "#991b1b" }, "Pyramids and cones — the ⅓ factor")}
+        {FH("Story", storyTagStyle, "Pyramids and cones — the ⅓ factor")}
         <div style={{ ...FB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span>: <em style={{ color: "var(--color-text-secondary)" }}>"V = (1/3)πr²h. The one-third is just the formula."</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span>: <em style={{ color: "var(--color-text-secondary)" }}>"The one-third is a theorem. Take a cube. Cut it into three pieces. Each piece is a pyramid with the same base and height as the cube. Since three equal pyramids fill the cube, each is one-third. The factor isn't chosen — it's forced by geometry."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span>: <em style={{ color: "var(--color-text-secondary)" }}>"V = (1/3)πr²h. The one-third is just the formula."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span>: <em style={{ color: "var(--color-text-secondary)" }}>"The one-third is a theorem. Take a cube. Cut it into three pieces. Each piece is a pyramid with the same base and height as the cube. Since three equal pyramids fill the cube, each is one-third. The factor isn't chosen — it's forced by geometry."</em></p>
         </div>
       </div>
       <div style={FP}>
-        {FH("Discovery", { background: "#fef2f2", color: "#991b1b" }, "V = ⅓Bh — proved by dissecting a cube into 3 pyramids")}
+        {FH("Discovery", storyTagStyle, "V = ⅓Bh — proved by dissecting a cube into 3 pyramids")}
         <div style={FB}>
           <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
             {[["Radius r", r, 1, 8, setR], ["Height h", h, 1, 12, setH]].map(([label, val, min, max, setter]) => (

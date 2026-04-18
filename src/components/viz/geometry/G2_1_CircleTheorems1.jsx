@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel as P, 
   mkHdr as H, 
@@ -13,12 +14,12 @@ import {
 
 function InscribedAngleCanvas({ pointAngle }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const cx = W / 2, cy = H / 2, r = 110;
     const arcStart = 0.3, arcEnd = 2.4;
@@ -39,26 +40,29 @@ function InscribedAngleCanvas({ pointAngle }) {
     ctx.fillText(`Central ∠AOB = ${centralAngle}°`, cx, cy + r + 22);
     ctx.fillStyle = "#d97706";
     ctx.fillText(`Inscribed ∠APB = ${inscribed}° = ½ × ${centralAngle}°`, cx, cy + r + 40);
-  }, [pointAngle]);
+  }, [pointAngle, isDark]);
   return <canvas ref={ref} width={500} height={280} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
 export default function G2_1_CircleTheorems1({ params = {} }) {
   const [ptAngle, setPtAngle] = useState(210);
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {BDG(1)}
       {HK("Albert is building a sundial. He needs to divide a circle into equal arcs for the hour markers. While measuring, he notices something strange: whenever he stands at the edge of the circle and looks at any two points on the opposite arc, the angle at his eye is always the same — no matter where he stands on the arc.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Circle theorems I")}
+        {H("Story", storyTagStyle, "Circle theorems I")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> moved the sundial gnomon to three different positions on the circle's edge and measured the angle to the same two arc endpoints. <em style={{ color: "var(--color-text-secondary)" }}>"26.5 degrees. 26.5 degrees. 26.5 degrees. Every time."</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> looked at the measurements. <em style={{ color: "var(--color-text-secondary)" }}>"That can't be a coincidence."</em> <em style={{ color: "var(--color-text-secondary)" }}>"It isn't,"</em> Albert said. <em style={{ color: "var(--color-text-secondary)" }}>"It's a theorem. The inscribed angle is always exactly half the central angle. And I can prove it."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> moved the sundial gnomon to three different positions on the circle's edge and measured the angle to the same two arc endpoints. <em style={{ color: "var(--color-text-secondary)" }}>"26.5 degrees. 26.5 degrees. 26.5 degrees. Every time."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> looked at the measurements. <em style={{ color: "var(--color-text-secondary)" }}>"That can't be a coincidence."</em> <em style={{ color: "var(--color-text-secondary)" }}>"It isn't,"</em> Albert said. <em style={{ color: "var(--color-text-secondary)" }}>"It's a theorem. The inscribed angle is always exactly half the central angle. And I can prove it."</em></p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "Inscribed angle = ½ central angle — drag the point")}
+        {H("Discovery", storyTagStyle, "Inscribed angle = ½ central angle — drag the point")}
         <div style={B}>
           <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, marginBottom: 12 }}>Move the point P around the circle. The inscribed angle (orange) stays exactly half the central angle (blue), no matter where P is on the major arc.</p>
           <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 12 }}><InscribedAngleCanvas pointAngle={ptAngle} /></div>

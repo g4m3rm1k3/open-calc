@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as GP, 
@@ -17,23 +18,26 @@ export default function G3_6_Vectors({ params = {} }) {
   const [ax, setAx] = useState(3); const [ay, setAy] = useState(4);
   const [bx, setBx] = useState(2); const [by, setBy] = useState(-1);
   const ready = useMath();
+  const isDark = useIsDark();
   const dot = ax * bx + ay * by;
   const magA = Math.hypot(ax, ay).toFixed(3);
   const magB = Math.hypot(bx, by).toFixed(3);
   const angle = (Math.acos(Math.max(-1, Math.min(1, dot / (parseFloat(magA) * parseFloat(magB))))) * 180 / Math.PI).toFixed(1);
+  const storyTagStyle = isDark ? { background: "#164e63", color: "#22d3ee" } : { background: "#ecfeff", color: "#155e75" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {GBG(6)}
       {GHK("Mic needs to find the net force on a mooring rope from two cables pulling at different angles. Albert introduces vectors as arrows with direction and magnitude, shows how to add them geometrically, and proves that the dot product of two vectors equals zero if and only if they are perpendicular.")}
       <div style={GP}>
-        {GH("Story", { background: "#ecfeff", color: "#155e75" }, "Vectors")}
+        {GH("Story", storyTagStyle, "Vectors")}
         <div style={{ ...GB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> had two force vectors and needed to know their combined effect and the angle between them. <em style={{ color: "var(--color-text-secondary)" }}>"Are they pulling in roughly the same direction or opposing each other?"</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> wrote the dot product formula. <em style={{ color: "var(--color-text-secondary)" }}>"The dot product tells you everything about the angle between them. Zero means perpendicular. Positive means acute. Negative means obtuse. One number, three cases."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> had two force vectors and needed to know their combined effect and the angle between them. <em style={{ color: "var(--color-text-secondary)" }}>"Are they pulling in roughly the same direction or opposing each other?"</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> wrote the dot product formula. <em style={{ color: "var(--color-text-secondary)" }}>"The dot product tells you everything about the angle between them. Zero means perpendicular. Positive means acute. Negative means obtuse. One number, three cases."</em></p>
         </div>
       </div>
       <div style={GP}>
-        {GH("Discovery", { background: "#ecfeff", color: "#155e75" }, "Dot product — the algebraic measure of angle between vectors")}
+        {GH("Discovery", storyTagStyle, "Dot product — the algebraic measure of angle between vectors")}
         <div style={GB}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             {[["ax", ax, -6, 6, setAx], ["ay", ay, -6, 6, setAy], ["bx", bx, -6, 6, setBx], ["by", by, -6, 6, setBy]].map(([label, val, min, max, setter]) => (

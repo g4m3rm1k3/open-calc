@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel, 
   mkHdr, 
@@ -14,12 +15,13 @@ import {
 
 function AngleCanvas({ angleDeg }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
+
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const cx = W / 2, cy = H / 2;
     const r = 140;
     const a1 = (angleDeg * Math.PI) / 180;
@@ -43,26 +45,29 @@ function AngleCanvas({ angleDeg }) {
     const alpha = angleDeg.toFixed(0), beta = (180 - angleDeg).toFixed(0);
     ctx.fillStyle = col; ctx.font = "12px var(--font-sans,sans-serif)"; ctx.textAlign = "center";
     ctx.fillText(`α = ${alpha}°   β = ${beta}°   vertical angles equal   α + β = 180°`, cx, H - 12);
-  }, [angleDeg]);
+  }, [angleDeg, isDark]);
   return <canvas ref={ref} width={500} height={240} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
 export default function G1_2_AnglesAtAPoint({ params = {} }) {
   const [angle, setAngle] = useState(55);
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {mkBadge(2)}
       {mkHook("John looks at two crossing lines and says vertical angles are obviously equal. Albert says 'obviously' is not a proof. Mic agrees with Albert. They have to derive the equality from the postulates — and find it takes only two steps.")}
       <div style={mkPanel}>
-        {mkHdr("Story", { background: "#ede9fe", color: "#4f46e5" }, "The angles at a point")}
+        {mkHdr("Story", storyTagStyle, "The angles at a point")}
         <div style={{ ...mkBody, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> drew two intersecting lines. <em style={{ color: "var(--color-text-secondary)" }}>"Obviously the opposite angles are the same. Look at them."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> didn't look. <em style={{ color: "var(--color-text-secondary)" }}>"Obviously is not a proof. Prove it from the postulates."</em> John picked up a pen. Two steps later, he had proved it — and found himself slightly surprised that two steps was all it took.</p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> drew two intersecting lines. <em style={{ color: "var(--color-text-secondary)" }}>"Obviously the opposite angles are the same. Look at them."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> didn't look. <em style={{ color: "var(--color-text-secondary)" }}>"Obviously is not a proof. Prove it from the postulates."</em> John picked up a pen. Two steps later, he had proved it — and find himself slightly surprised that two steps was all it took.</p>
         </div>
       </div>
       <div style={mkPanel}>
-        {mkHdr("Discovery", { background: "#ede9fe", color: "#4f46e5" }, "Vertical angles are equal — proved in two steps")}
+        {mkHdr("Discovery", storyTagStyle, "Vertical angles are equal — proved in two steps")}
         <div style={mkBody}>
           <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 14 }}><AngleCanvas angleDeg={angle} /></div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>

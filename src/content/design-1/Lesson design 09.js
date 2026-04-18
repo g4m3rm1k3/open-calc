@@ -1992,7 +1992,7 @@ console.log('Zero violations across all eight = production ready.');`,
 export default {
   id: 'design-09-accessibility-systems',
   slug: 'accessibility-systems',
-  chapter: 'design.2',
+  chapter: 'design.1',
   order: 4,
   title: 'Accessibility Systems',
   subtitle: 'Every element makes a contract with assistive technology. Use semantic HTML to get it for free. Manage focus. Announce changes.',

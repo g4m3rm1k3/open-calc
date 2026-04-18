@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as P, 
@@ -17,24 +18,26 @@ export default function G2_6_ArcSectorPi({ params = {} }) {
   const [angleDeg, setAngleDeg] = useState(120);
   const [r, setR] = useState(8);
   const ready = useMath();
+  const isDark = useIsDark();
   const rad = (angleDeg * Math.PI) / 180;
   const arcLen = (r * rad).toFixed(3);
   const sector = (0.5 * r * r * rad).toFixed(3);
   const arcDeg = ((angleDeg / 360) * 2 * Math.PI * r).toFixed(3);
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
-      <style>{`@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {BDG(6)}
       {HK("Albert is marking the hour lines on his sundial. He needs to divide the circle arc into 12 equal parts. The formula for arc length looks different depending on whether you use degrees or radians — and one formula is much cleaner than the other. This is the geometric reason why all of calculus uses radians.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Arc length, sector area, and π")}
+        {H("Story", storyTagStyle, "Arc length, sector area, and π")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"In degrees, arc length = (θ/360) × 2πr,"</em> <span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"In radians, arc length = rθ. Look at those two formulas."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> looked. <em style={{ color: "var(--color-text-secondary)" }}>"The radian one is shorter."</em> <em style={{ color: "var(--color-text-secondary)" }}>"It's not just shorter. It's the definition. One radian IS the angle where arc = radius. So arc = r × (number of radii that fit in the arc). That's what rθ means — it's built into the unit. Degrees are arbitrary. Radians are the geometry."</em></p>
+          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"In degrees, arc length = (θ/360) × 2πr,"</em> <span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"In radians, arc length = rθ. Look at those two formulas."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> looked. <em style={{ color: "var(--color-text-secondary)" }}>"The radian one is shorter."</em> <em style={{ color: "var(--color-text-secondary)" }}>"It's not just shorter. It's the definition. One radian IS the angle where arc = radius. So arc = r × (number of radii that fit in the arc). That's what rθ means — it's built into the unit. Degrees are arbitrary. Radians are the geometry."</em></p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "Arc = rθ, Sector = ½r²θ — and why radians make them clean")}
+        {H("Discovery", storyTagStyle, "Arc = rθ, Sector = ½r²θ — and why radians make them clean")}
         <div style={B}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
             {[["Angle (°)", angleDeg, 5, 355, 5, setAngleDeg], ["Radius r", r, 1, 15, 1, setR]].map(([label, val, min, max, step, setter]) => (

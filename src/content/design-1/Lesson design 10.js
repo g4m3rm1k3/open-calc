@@ -1612,7 +1612,7 @@ console.log('  auditTransfer()      — platform-independent spec compliance');`
 export default {
   id: 'design-10-domain-transfer',
   slug: 'domain-transfer',
-  chapter: 'design.3',
+  chapter: 'design.1',
   order: 1,
   title: 'Domain Transfer',
   subtitle: 'Nine systems, any platform. Qt layouts, Unity RectTransforms, data visualisation. The principles are invariant. Only the syntax changes.',

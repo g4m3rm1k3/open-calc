@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel, 
@@ -15,12 +16,13 @@ import {
 
 function PythagorasCanvas({ proof, a, b }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
+
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const scale = Math.min(W, H) / (a + b + 10) * 0.55;
     const A = a * scale, B = b * scale, C = Math.hypot(a, b) * scale;
@@ -36,9 +38,9 @@ function PythagorasCanvas({ proof, a, b }) {
       const tris = [[sx, sy + B, sx, sy + B + A, sx + A, sy + B], [sx, sy, sx + B, sy, sx, sy + B], [sx + A, sy + B + A, sx + sz, sy + B + A, sx + sz, sy + B], [sx + B, sy, sx + sz, sy, sx + sz, sy + A]];
       tris.forEach(([x1, y1, x2, y2, x3, y3]) => {
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineTo(x3, y3); ctx.closePath();
-        ctx.fillStyle = isDark ? "rgba(79,70,229,0.3)" : "rgba(79,70,229,0.2)"; ctx.fill(); ctx.stroke();
+        ctx.fillStyle = isDark ? "rgba(79,70,229,0.35)" : "rgba(79,70,229,0.2)"; ctx.fill(); ctx.stroke();
       });
-      ctx.fillStyle = isDark ? "rgba(5,150,105,0.3)" : "rgba(5,150,105,0.2)";
+      ctx.fillStyle = isDark ? "rgba(5,150,105,0.4)" : "rgba(5,150,105,0.2)";
       ctx.beginPath(); ctx.moveTo(sx, sy + B); ctx.lineTo(sx + B, sy); ctx.lineTo(sx + sz, sy + A); ctx.lineTo(sx + A, sy + B + A); ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.fillStyle = col; ctx.font = "12px var(--font-sans,sans-serif)"; ctx.textAlign = "center";
       ctx.fillText("c²", W / 2, H / 2 + 5);
@@ -47,14 +49,14 @@ function PythagorasCanvas({ proof, a, b }) {
       const ox = 80, oy = H - 50;
       const bx = ox + B * 2, by = oy, cx2 = ox + (A * A / (A + B)) * 2, cy = oy - (A * B / (A + B)) * 2;
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(bx, by); ctx.lineTo(cx2, cy); ctx.closePath();
-      ctx.fillStyle = isDark ? "rgba(79,70,229,0.15)" : "rgba(79,70,229,0.1)"; ctx.fill();
+      ctx.fillStyle = isDark ? "rgba(79,70,229,0.2)" : "rgba(79,70,229,0.1)"; ctx.fill();
       ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.beginPath(); ctx.moveTo(cx2, cy); ctx.lineTo(cx2, oy);
       ctx.strokeStyle = "#d97706"; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = col; ctx.font = "11px var(--font-sans,sans-serif)"; ctx.textAlign = "center";
       ctx.fillText("Similar triangles: a/c = p/a  →  a²=cp, b²=cq, a²+b²=c(p+q)=c²", W / 2, H - 10);
     }
-  }, [proof, a, b]);
+  }, [proof, a, b, isDark]);
   return <canvas ref={ref} width={520} height={240} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
@@ -63,7 +65,9 @@ export default function G1_6_Pythagorean({ params = {} }) {
   const [a, setA] = useState(3);
   const [b, setB] = useState(4);
   const ready = useMath();
+  const isDark = useIsDark();
   const c = Math.hypot(a, b);
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
 
   const proofs = {
     rearrange: { name: "Bhaskara's rearrangement", desc: "Arrange four copies of the right triangle inside a big square (a+b)². The remaining shape is a square of side c. Area equation: (a+b)² = 4·(½ab) + c². Expand: a²+2ab+b² = 2ab+c². Subtract 2ab: a²+b² = c²." },

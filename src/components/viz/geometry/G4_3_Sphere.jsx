@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as FP, 
@@ -16,22 +17,25 @@ import {
 export default function G4_3_Sphere({ params = {} }) {
   const [r, setR] = useState(5);
   const ready = useMath();
+  const isDark = useIsDark();
   const vol = ((4 / 3) * Math.PI * r * r * r).toFixed(2);
   const sa = (4 * Math.PI * r * r).toFixed(2);
   const cylVol = (Math.PI * r * r * 2 * r).toFixed(2);
+  const storyTagStyle = isDark ? { background: "#450a0a", color: "#f87171" } : { background: "#fef2f2", color: "#991b1b" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {FBG(3)}
       {FHK("Archimedes (287–212 BC) discovered that a sphere fits inside a cylinder of the same radius and height, and the sphere occupies exactly ⅔ of the cylinder's volume. He was so proud of this result that he asked for a sphere-in-cylinder to be carved on his tombstone. The proof uses cross-sections — the idea that becomes calculus.")}
       <div style={FP}>
-        {FH("Story", { background: "#fef2f2", color: "#991b1b" }, "The sphere")}
+        {FH("Story", storyTagStyle, "The sphere")}
         <div style={{ ...FB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> placed a ball inside a cylindrical container. <em style={{ color: "var(--color-text-secondary)" }}>"Archimedes proved the sphere is exactly ⅔ of this cylinder — 2200 years before calculus was invented. He used the same idea Cavalieri would formalize later: compare cross-sections at every height."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span>: <em style={{ color: "var(--color-text-secondary)" }}>"He derived the formula without integration?"</em> <em style={{ color: "var(--color-text-secondary)" }}>"He invented integration. He just didn't have the notation."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> placed a ball inside a cylindrical container. <em style={{ color: "var(--color-text-secondary)" }}>"Archimedes proved the sphere is exactly ⅔ of this cylinder — 2200 years before calculus was invented. He used the same idea Cavalieri would formalize later: compare cross-sections at every height."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span>: <em style={{ color: "var(--color-text-secondary)" }}>"He derived the formula without integration?"</em> <em style={{ color: "var(--color-text-secondary)" }}>"He invented integration. He just didn't have the notation."</em></p>
         </div>
       </div>
       <div style={FP}>
-        {FH("Discovery", { background: "#fef2f2", color: "#991b1b" }, "V = (4/3)πr³, SA = 4πr² — Archimedes' method")}
+        {FH("Discovery", storyTagStyle, "V = (4/3)πr³, SA = 4πr² — Archimedes' method")}
         <div style={FB}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Radius r</span>

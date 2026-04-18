@@ -1,5 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 
+export function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 export function useMath() {
   const [ready, setReady] = useState(typeof window !== "undefined" && !!window.katex);
   useEffect(() => {
@@ -22,7 +34,13 @@ export function M({ t, display = false, ready }) {
 
 export function WhyPanel({ depth = 0, tag, children }) {
   const [open, setOpen] = useState(false);
-  const colors = [
+  const isDark = useIsDark();
+  const colors = isDark ? [
+    { border: "#818cf8", bg: "#1e1b4b", text: "#c7d2fe" },
+    { border: "#22d3ee", bg: "#083344", text: "#a5f3fc" },
+    { border: "#34d399", bg: "#064e3b", text: "#a7f3d0" },
+    { border: "#fbbf24", bg: "#451a03", text: "#fde68a" },
+  ] : [
     { border: "#4f46e5", bg: "#eef2ff", text: "#3730a3" },
     { border: "#0891b2", bg: "#ecfeff", text: "#0e7490" },
     { border: "#059669", bg: "#ecfdf5", text: "#047857" },
@@ -31,7 +49,7 @@ export function WhyPanel({ depth = 0, tag, children }) {
   const c = colors[Math.min(depth, colors.length - 1)];
   return (
     <div style={{ marginLeft: depth * 14, marginTop: 10 }}>
-      <button onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: open ? c.bg : "transparent", border: `1px solid ${c.border}`, borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 500, color: c.border, cursor: "pointer", fontFamily: "var(--font-sans)" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: open ? c.bg : "transparent", border: `1px solid ${c.border}`, borderRadius: 6, padding: "4px 12px", fontSize: 12, fontWeight: 500, color: open ? c.text : c.border, cursor: "pointer", fontFamily: "var(--font-sans)", transition: "all 0.2s" }}>
         <span style={{ width: 15, height: 15, borderRadius: "50%", background: c.border, color: "#fff", fontSize: 10, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{open ? "−" : "?"}</span>
         {open ? "Close" : tag}
       </button>

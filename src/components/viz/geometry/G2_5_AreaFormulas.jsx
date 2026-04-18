@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as P, 
@@ -19,6 +20,9 @@ export default function G2_5_AreaFormulas({ params = {} }) {
   const [height, setHeight] = useState(5);
   const [top, setTop] = useState(4);
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   const areas = { triangle: base * height / 2, parallelogram: base * height, trapezoid: (base + top) / 2 * height };
   const formulas = { triangle: `\\frac{1}{2} \\times ${base} \\times ${height} = ${areas.triangle}`, parallelogram: `${base} \\times ${height} = ${areas.parallelogram}`, trapezoid: `\\frac{(${base}+${top})}{2} \\times ${height} = ${areas.trapezoid.toFixed(1)}` };
   const derivations = {
@@ -31,18 +35,18 @@ export default function G2_5_AreaFormulas({ params = {} }) {
       {BDG(5)}
       {HK("Mic is calculating how much floor tile he needs for different shaped sections of the workshop. Every shape has a formula — but Albert insists they derive each one from the rectangle. No formula should be memorised without knowing where it comes from.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Area formulas")}
+        {H("Story", storyTagStyle, "Area formulas")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> rattled off the formulas: <em style={{ color: "var(--color-text-secondary)" }}>"Triangle: half base times height. Parallelogram: base times height. Trapezoid: average of parallel sides times height."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> stopped him. <em style={{ color: "var(--color-text-secondary)" }}>"Where do they come from?"</em> Mic stared. <em style={{ color: "var(--color-text-secondary)" }}>"They're formulas."</em> <em style={{ color: "var(--color-text-secondary)" }}>"They're theorems. Each one is derived from the rectangle. If you know the derivation, you'll never forget the formula — and you'll understand why they work."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> rattled off the formulas: <em style={{ color: "var(--color-text-secondary)" }}>"Triangle: half base times height. Parallelogram: base times height. Trapezoid: average of parallel sides times height."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> stopped him. <em style={{ color: "var(--color-text-secondary)" }}>"Where do they come from?"</em> Mic stared. <em style={{ color: "var(--color-text-secondary)" }}>"They're formulas."</em> <em style={{ color: "var(--color-text-secondary)" }}>"They're theorems. Each one is derived from the rectangle. If you know the derivation, you'll never forget the formula — and you'll understand why they work."</em></p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "Every area formula comes from the rectangle")}
+        {H("Discovery", storyTagStyle, "Every area formula comes from the rectangle")}
         <div style={B}>
           <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
             {["triangle", "parallelogram", "trapezoid"].map(s => (
-              <button key={s} onClick={() => setShape(s)} style={{ flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", textTransform: "capitalize", border: `1px solid ${shape === s ? "#059669" : "var(--color-border-tertiary)"}`, background: shape === s ? "#ecfdf5" : "transparent", color: shape === s ? "#065f46" : "var(--color-text-secondary)" }}>{s}</button>
+              <button key={s} onClick={() => setShape(s)} style={{ flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", textTransform: "capitalize", border: `1px solid ${shape === s ? "#059669" : "var(--color-border-tertiary)"}`, background: shape === s ? (isDark ? "#064e3b" : "#ecfdf5") : "transparent", color: shape === s ? (isDark ? "#34d399" : "#065f46") : "var(--color-text-secondary)" }}>{s}</button>
             ))}
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>

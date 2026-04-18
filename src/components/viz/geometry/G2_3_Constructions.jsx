@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel as P, 
   mkHdr as H, 
@@ -14,6 +15,10 @@ import {
 export default function G2_3_Constructions({ params = {} }) {
   const [step, setStep] = useState(0);
   const [type, setType] = useState("bisect");
+  const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#064e3b", color: "#34d399" } : { background: "#ecfdf5", color: "#065f46" };
+
   const constructions = {
     bisect: {
       title: "Bisect a line segment",
@@ -34,14 +39,14 @@ export default function G2_3_Constructions({ params = {} }) {
       {BDG(3)}
       {HK("John wants to cut a plank perfectly in half with only a compass — he's lost his ruler. Albert shows him three classical constructions: bisecting a segment, drawing a perpendicular, and bisecting an angle. Each uses only compass and straightedge, and each has a proof.")}
       <div style={P}>
-        {H("Story", { background: "#ecfdf5", color: "#065f46" }, "Compass and straightedge constructions")}
+        {H("Story", storyTagStyle, "Compass and straightedge constructions")}
         <div style={{ ...B, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"Why only compass and straightedge?"</em> <span style={{ color: "#065f46", fontWeight: 500 }}>John</span> asked. <em style={{ color: "var(--color-text-secondary)" }}>"Why not use a ruler with marks?"</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> explained: the ancient Greeks were trying to find what geometry could prove from its axioms alone — without measurement. A compass implements P3 (draw a circle). A straightedge (unmarked ruler) implements P1 and P2 (draw a line). Measurement introduces numbers — which is a different system. Pure construction uses only the axioms.</p>
+          <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"Why only compass and straightedge?"</em> <span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> asked. <em style={{ color: "var(--color-text-secondary)" }}>"Why not use a ruler with marks?"</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> explained: the ancient Greeks were trying to find what geometry could prove from its axioms alone — without measurement. A compass implements P3 (draw a circle). A straightedge (unmarked ruler) implements P1 and P2 (draw a line). Measurement introduces numbers — which is a different system. Pure construction uses only the axioms.</p>
         </div>
       </div>
       <div style={P}>
-        {H("Discovery", { background: "#ecfdf5", color: "#065f46" }, "Three classical constructions — step by step")}
+        {H("Discovery", storyTagStyle, "Three classical constructions — step by step")}
         <div style={B}>
           <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
             {Object.entries(constructions).map(([key, val]) => (

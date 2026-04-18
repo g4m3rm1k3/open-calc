@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as GP, 
@@ -18,7 +19,10 @@ export default function G3_4_Transformations({ params = {} }) {
   const [angle, setAngle] = useState(45);
   const [tx, setTx] = useState(2); const [ty, setTy] = useState(1);
   const ready = useMath();
+  const isDark = useIsDark();
   const rad = (angle * Math.PI) / 180;
+  const storyTagStyle = isDark ? { background: "#164e63", color: "#22d3ee" } : { background: "#ecfeff", color: "#155e75" };
+
   const formulas = {
     translation: `(x, y) \\to (x + ${tx},\\; y + ${ty})`,
     rotation: `(x, y) \\to (x\\cos ${angle}° - y\\sin ${angle}°,\\; x\\sin ${angle}° + y\\cos ${angle}°)`,
@@ -34,18 +38,18 @@ export default function G3_4_Transformations({ params = {} }) {
       {GBG(4)}
       {GHK("John needs to rotate the dock layout by 30° to align with the new harbour entrance. Albert shows that every geometric transformation is a function on coordinates — and that rotation specifically requires sin and cos, connecting geometry to trigonometry in the most direct way possible.")}
       <div style={GP}>
-        {GH("Story", { background: "#ecfeff", color: "#155e75" }, "Transformations")}
+        {GH("Story", storyTagStyle, "Transformations")}
         <div style={{ ...GB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#065f46", fontWeight: 500 }}>John</span> rotated the drawing by hand. <em style={{ color: "var(--color-text-secondary)" }}>"Is there a formula? So I can just calculate the new coordinates without redrawing everything?"</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> wrote it on the board. <em style={{ color: "var(--color-text-secondary)" }}>"Every transformation is a function: you put in (x,y), you get out (x′,y′). Translation is addition. Rotation uses sin and cos — because rotation is exactly what the unit circle describes."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#34d399" : "#065f46", fontWeight: 500 }}>John</span> rotated the drawing by hand. <em style={{ color: "var(--color-text-secondary)" }}>"Is there a formula? So I can just calculate the new coordinates without redrawing everything?"</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> wrote it on the board. <em style={{ color: "var(--color-text-secondary)" }}>"Every transformation is a function: you put in (x,y), you get out (x′,y′). Translation is addition. Rotation uses sin and cos — because rotation is exactly what the unit circle describes."</em></p>
         </div>
       </div>
       <div style={GP}>
-        {GH("Discovery", { background: "#ecfeff", color: "#155e75" }, "Translation, rotation, reflection as coordinate functions")}
+        {GH("Discovery", storyTagStyle, "Translation, rotation, reflection as coordinate functions")}
         <div style={GB}>
           <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
             {["translation", "rotation", "reflection"].map(t => (
-              <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", textTransform: "capitalize", border: `1px solid ${type === t ? "#0891b2" : "var(--color-border-tertiary)"}`, background: type === t ? "#ecfeff" : "transparent", color: type === t ? "#0e7490" : "var(--color-text-secondary)" }}>{t}</button>
+              <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-sans)", textTransform: "capitalize", border: `1px solid ${type === t ? "#0891b2" : "var(--color-border-tertiary)"}`, background: type === t ? (isDark ? "#164e63" : "#ecfeff") : "transparent", color: type === t ? "#0e7490" : "var(--color-text-secondary)" }}>{t}</button>
             ))}
           </div>
           {type === "translation" && (

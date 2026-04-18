@@ -18,6 +18,8 @@ export default function SlopeField({ params }) {
   const [density, setDensity] = useState(12)
   const [showCurve, setShowCurve] = useState(true)
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
   useEffect(() => {
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
@@ -26,13 +28,19 @@ export default function SlopeField({ params }) {
     const xSc = d3.scaleLinear().domain([-3, 3]).range([M.left, W - M.right])
     const ySc = d3.scaleLinear().domain([-3, 3]).range([H - M.bottom, M.top])
 
+    const C = {
+      grid: isDark ? '#1e293b' : '#f1f5f9',
+      axis: isDark ? '#475569' : '#94a3b8',
+      text: isDark ? '#94a3b8' : '#64748b'
+    }
+
     // Grid
-    xSc.ticks(6).forEach((t) => svg.append('line').attr('x1', xSc(t)).attr('x2', xSc(t)).attr('y1', M.top).attr('y2', H - M.bottom).attr('stroke', '#f1f5f9').attr('stroke-width', 1))
-    ySc.ticks(6).forEach((t) => svg.append('line').attr('x1', M.left).attr('x2', W - M.right).attr('y1', ySc(t)).attr('y2', ySc(t)).attr('stroke', '#f1f5f9').attr('stroke-width', 1))
+    xSc.ticks(6).forEach((t) => svg.append('line').attr('x1', xSc(t)).attr('x2', xSc(t)).attr('y1', M.top).attr('y2', H - M.bottom).attr('stroke', C.grid).attr('stroke-width', 1))
+    ySc.ticks(6).forEach((t) => svg.append('line').attr('x1', M.left).attr('x2', W - M.right).attr('y1', ySc(t)).attr('y2', ySc(t)).attr('stroke', C.grid).attr('stroke-width', 1))
 
     // Axes
-    svg.append('g').attr('transform', `translate(0,${ySc(0)})`).call(d3.axisBottom(xSc).ticks(6)).attr('color', '#94a3b8')
-    svg.append('g').attr('transform', `translate(${xSc(0)},0)`).call(d3.axisLeft(ySc).ticks(6)).attr('color', '#94a3b8')
+    svg.append('g').attr('transform', `translate(0,${ySc(0)})`).call(d3.axisBottom(xSc).ticks(6)).attr('color', C.axis)
+    svg.append('g').attr('transform', `translate(${xSc(0)},0)`).call(d3.axisLeft(ySc).ticks(6)).attr('color', C.axis)
 
     // Slope field: small line segments
     const step = 6 / density
@@ -73,9 +81,9 @@ export default function SlopeField({ params }) {
 
     // Title
     svg.append('text').attr('x', W / 2).attr('y', 15).attr('text-anchor', 'middle')
-      .attr('font-size', 12).attr('fill', '#64748b').text(`Slope Field for ${label} — each line shows f'(x) at that point`)
+      .attr('font-size', 12).attr('fill', C.text).text(`Slope Field for ${label} — each line shows f'(x) at that point`)
 
-  }, [fnIdx, density, showCurve])
+  }, [fnIdx, density, showCurve, isDark])
 
   return (
     <div>

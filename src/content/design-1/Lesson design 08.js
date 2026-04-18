@@ -1877,7 +1877,7 @@ console.log('ARIA roles, semantic HTML, focus management, screen reader contract
 export default {
   id: 'design-08-systems-design',
   slug: 'systems-design',
-  chapter: 'design.2',
+  chapter: 'design.1',
   order: 3,
   title: 'Systems Design',
   subtitle: 'Ten engineers, one consistent interface. Token governance, naming conventions, and the practices that prevent drift.',

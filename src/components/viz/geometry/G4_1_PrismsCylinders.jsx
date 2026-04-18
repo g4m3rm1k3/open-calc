@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as FP, 
@@ -16,22 +17,25 @@ import {
 export default function G4_1_PrismsCylinders({ params = {} }) {
   const [r, setR] = useState(4); const [h, setH] = useState(7);
   const ready = useMath();
+  const isDark = useIsDark();
   const baseArea = (Math.PI * r * r).toFixed(2);
   const vol = (Math.PI * r * r * h).toFixed(2);
   const sa = (2 * Math.PI * r * r + 2 * Math.PI * r * h).toFixed(2);
+  const storyTagStyle = isDark ? { background: "#450a0a", color: "#f87171" } : { background: "#fef2f2", color: "#991b1b" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {FBG(1)}
       {FHK("Mic's uncle needs to order the correct amount of fibreglass for a new cylindrical fuel tank. He knows the radius and height, but the volume formula — πr²h — is something he memorised in school without understanding where it comes from. Albert proves it using Cavalieri's principle.")}
       <div style={FP}>
-        {FH("Story", { background: "#fef2f2", color: "#991b1b" }, "Prisms and cylinders")}
+        {FH("Story", storyTagStyle, "Prisms and cylinders")}
         <div style={{ ...FB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
           <p style={{ marginBottom: 12 }}><em style={{ color: "var(--color-text-secondary)" }}>"The tank volume formula is πr²h,"</em> Mic's uncle said. <em style={{ color: "var(--color-text-secondary)" }}>"Where does the h come from?"</em></p>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> stacked a pile of coins. <em style={{ color: "var(--color-text-secondary)" }}>"Each coin is a thin circle — base area πr². Stack h coins of thickness 1: total volume = πr² × h. The cylinder is just infinitely many coins stacked up. This is Cavalieri's principle."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> stacked a pile of coins. <em style={{ color: "var(--color-text-secondary)" }}>"Each coin is a thin circle — base area πr². Stack h coins of thickness 1: total volume = πr² × h. The cylinder is just infinitely many coins stacked up. This is Cavalieri's principle."</em></p>
         </div>
       </div>
       <div style={FP}>
-        {FH("Discovery", { background: "#fef2f2", color: "#991b1b" }, "Volume = base area × height — Cavalieri's principle")}
+        {FH("Discovery", storyTagStyle, "Volume = base area × height — Cavalieri's principle")}
         <div style={FB}>
           <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
             {[["Radius r", r, 1, 8, setR], ["Height h", h, 1, 12, setH]].map(([label, val, min, max, setter]) => (

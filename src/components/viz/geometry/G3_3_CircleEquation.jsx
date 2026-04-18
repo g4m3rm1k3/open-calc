@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   M,
   WhyPanel, 
   mkPanel as GP, 
@@ -16,18 +17,21 @@ import {
 export default function G3_3_CircleEquation({ params = {} }) {
   const [h, setH] = useState(1); const [k, setK] = useState(2); const [r, setR] = useState(5);
   const ready = useMath();
+  const isDark = useIsDark();
+  const storyTagStyle = isDark ? { background: "#164e63", color: "#22d3ee" } : { background: "#ecfeff", color: "#155e75" };
+
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: ".5rem 0", maxWidth: 740 }}>
       {GBG(3)}
       {GHK("Mic receives the engineering specification for the circular dock boundary as an expanded equation: x²+y²−4x−8y−5=0. He needs the centre and radius. Albert shows that completing the square converts expanded form to standard form — and derives the circle equation from the distance formula.")}
       <div style={GP}>
-        {GH("Story", { background: "#ecfeff", color: "#155e75" }, "The circle equation")}
+        {GH("Story", storyTagStyle, "The circle equation")}
         <div style={{ ...GB, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 0 }}><em style={{ color: "var(--color-text-secondary)" }}>"The equation of a circle is every point equidistant from the centre,"</em> <span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"Distance from (x,y) to (h,k) equals r. Square both sides of the distance formula: that's the circle equation. Standard form makes the centre and radius visible at a glance."</em></p>
+          <p style={{ marginBottom: 0 }}><em style={{ color: "var(--color-text-secondary)" }}>"The equation of a circle is every point equidistant from the centre,"</em> <span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> said. <em style={{ color: "var(--color-text-secondary)" }}>"Distance from (x,y) to (h,k) equals r. Square both sides of the distance formula: that's the circle equation. Standard form makes the centre and radius visible at a glance."</em></p>
         </div>
       </div>
       <div style={GP}>
-        {GH("Discovery", { background: "#ecfeff", color: "#155e75" }, "(x−h)²+(y−k)²=r² — derived from distance")}
+        {GH("Discovery", storyTagStyle, "(x−h)²+(y−k)²=r² — derived from distance")}
         <div style={GB}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
             {[["Centre h", h, -5, 5, 1, setH], ["Centre k", k, -5, 5, 1, setK], ["Radius r", r, 1, 10, 1, setR]].map(([label, val, min, max, step, setter]) => (

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   useMath, 
+  useIsDark,
   WhyPanel, 
   mkPanel, 
   mkHdr, 
@@ -14,12 +15,12 @@ import {
 
 function TriangleSumCanvas({ ax, ay, bx, by, cx, cy }) {
   const ref = useRef(null);
+  const isDark = useIsDark();
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const col = isDark ? "#e2e8f0" : "#1e293b";
     const A = [ax, ay], B = [bx, by], C = [cx, cy];
     const ang = (p1, v, p2) => {
@@ -40,9 +41,9 @@ function TriangleSumCanvas({ ax, ay, bx, by, cx, cy }) {
     ctx.fillText(`∠A=${aA}°`, A[0] - 20, A[1] + 16);
     ctx.fillText(`∠B=${aB}°`, B[0] + 24, B[1] + 16);
     ctx.fillText(`∠C=${aC}°`, C[0], C[1] - 14);
-    ctx.fillStyle = "#059669"; ctx.font = "bold 12px var(--font-sans,sans-serif)";
+    ctx.fillStyle = isDark ? "#34d399" : "#059669"; ctx.font = "bold 12px var(--font-sans,sans-serif)";
     ctx.fillText(`∠A + ∠B + ∠C = ${(aA + aB + aC).toFixed(1)}°`, W / 2, H - 10);
-  }, [ax, ay, bx, by, cx, cy]);
+  }, [ax, ay, bx, by, cx, cy, isDark]);
   return <canvas ref={ref} width={520} height={240} style={{ width: "100%", borderRadius: 8, display: "block" }} />;
 }
 
@@ -50,7 +51,9 @@ export default function G1_4_TriangleAngleSum({ params = {} }) {
   const [cx, setCx] = useState(260);
   const [cy, setCy] = useState(60);
   const ready = useMath();
+  const isDark = useIsDark();
   const ax = 80, ay = 200, bx = 440, by = 200;
+  const storyTagStyle = isDark ? { background: "#2e1065", color: "#c084fc" } : { background: "#ede9fe", color: "#4f46e5" };
   const steps = [
     { label: "Draw line l through C parallel to AB", tex: "l \\parallel AB", note: "By P5, exactly one such line exists." },
     { label: "Alternate interior angles: ∠CAl = ∠A", tex: "\\angle CAl = \\angle A \\quad (\\text{AB} \\parallel l, \\text{ alternate interior})", note: "From Chapter 3: when a transversal (AC) crosses parallel lines (AB and l), alternate interior angles are equal." },
@@ -63,14 +66,14 @@ export default function G1_4_TriangleAngleSum({ params = {} }) {
       {mkBadge(4)}
       {mkHook("No matter what triangle Mic draws — obtuse, right, acute, flat, pointy — the three angles always sum to 180°. He's measured hundreds. Albert says measuring isn't enough: a proof shows why it's always true and cannot be otherwise.")}
       <div style={mkPanel}>
-        {mkHdr("Story", { background: "#ede9fe", color: "#4f46e5" }, "The triangle angle sum")}
+        {mkHdr("Story", storyTagStyle, "The triangle angle sum")}
         <div style={{ ...mkBody, fontSize: 14, lineHeight: 1.8, color: "var(--color-text-primary)" }}>
-          <p style={{ marginBottom: 12 }}><span style={{ color: "#1e40af", fontWeight: 500 }}>Mic</span> had measured 47 triangles and every one summed to 180°. <em style={{ color: "var(--color-text-secondary)" }}>"I'm confident."</em></p>
-          <p style={{ marginBottom: 0 }}><span style={{ color: "#6b21a8", fontWeight: 500 }}>Albert</span> shook his head. <em style={{ color: "var(--color-text-secondary)" }}>"Measurement is evidence. Proof is certainty. Draw any triangle. I'll show you why it's 180° — using one parallel line and the result from last chapter."</em></p>
+          <p style={{ marginBottom: 12 }}><span style={{ color: isDark ? "#60a5fa" : "#1e40af", fontWeight: 500 }}>Mic</span> had measured 47 triangles and every one summed to 180°. <em style={{ color: "var(--color-text-secondary)" }}>"I'm confident."</em></p>
+          <p style={{ marginBottom: 0 }}><span style={{ color: isDark ? "#c084fc" : "#6b21a8", fontWeight: 500 }}>Albert</span> shook his head. <em style={{ color: "var(--color-text-secondary)" }}>"Measurement is evidence. Proof is certainty. Draw any triangle. I'll show you why it's 180° — using one parallel line and the result from last chapter."</em></p>
         </div>
       </div>
       <div style={mkPanel}>
-        {mkHdr("Discovery", { background: "#ede9fe", color: "#4f46e5" }, "Proved from the parallel postulate — drag the apex")}
+        {mkHdr("Discovery", storyTagStyle, "Proved from the parallel postulate — drag the apex")}
         <div style={mkBody}>
           <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, marginBottom: 12 }}>Drag the top vertex left and right. The angles change — but their sum is always exactly 180°. The orange dashed line is the key to the proof.</p>
           <div style={{ background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 12 }}><TriangleSumCanvas ax={ax} ay={ay} bx={bx} by={by} cx={cx} cy={cy} /></div>
