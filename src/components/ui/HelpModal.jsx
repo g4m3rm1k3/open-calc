@@ -26,6 +26,9 @@ import {
   Wrench,
   RotateCcw,
   RefreshCw,
+  Heart,
+  Shield,
+  Github,
 } from "lucide-react";
 
 // ─── TEMPLATE STRINGS ────────────────────────────────────────────────────────
@@ -3120,6 +3123,86 @@ is found by factoring, even though direct substitution gives $\\\\frac{0}{0}$.\`
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
 
+// ─── SECTION: ABOUT ──────────────────────────────────────────────────────────
+function SectionAbout() {
+  return (
+    <div className="space-y-8 max-w-2xl">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">About OpenCalc</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Project info, license, and how to contribute</p>
+      </div>
+
+      {/* Created by */}
+      <section className="flex items-start gap-4 p-5 rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/20">
+        <div className="p-2.5 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-500 dark:text-rose-400 shrink-0">
+          <Heart className="w-5 h-5" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Created By</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            OpenCalc was created by <strong>Michael McLean</strong>, combining a passion for
+            rigorous mathematical pedagogy with interactive web technology. Built to be free
+            for students everywhere.
+          </p>
+        </div>
+      </section>
+
+      {/* License */}
+      <section className="flex items-start gap-4 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20">
+        <div className="p-2.5 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-500 dark:text-indigo-400 shrink-0">
+          <Shield className="w-5 h-5" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Open Source License — Non-Commercial</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            This project is provided freely to advance mathematics education. It is licensed
+            strictly for <strong>non-commercial use</strong>. You may not use this software,
+            its content, or its visualizations for any form of monetary gain, commercial
+            hosting, or paid product integration.
+          </p>
+        </div>
+      </section>
+
+      {/* Contributing */}
+      <section className="flex items-start gap-4 p-5 rounded-2xl border border-amber-100 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20">
+        <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 shrink-0">
+          <Github className="w-5 h-5" />
+        </div>
+        <div className="space-y-3 w-full">
+          <div>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How to Contribute</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Content is stored as plain JavaScript files — easy to contribute lessons, fix
+              errors, or add visualizations via pull request. No special build tools required.
+            </p>
+          </div>
+          <a
+            href="https://github.com/g4m3rm1k3/open-calc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-300 hover:underline"
+          >
+            <Github className="w-4 h-4" />
+            github.com/g4m3rm1k3/open-calc
+          </a>
+        </div>
+      </section>
+
+      {/* Dev mode tip */}
+      <section className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">Shift</kbd>
+          <span className="text-slate-400 text-xs">+</span>
+          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">D</kbd>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Toggle <strong>Dev Mode</strong> — shows the component name on every visualization to help you find the right file to edit.
+        </p>
+      </section>
+    </div>
+  );
+}
+
 const NAV = [
   {
     group: "Start Here",
@@ -3157,7 +3240,10 @@ const NAV = [
   },
   {
     group: "Help",
-    items: [{ id: "troubleshooting", label: "Troubleshooting", Icon: Wrench }],
+    items: [
+      { id: "troubleshooting", label: "Troubleshooting", Icon: Wrench },
+      { id: "about", label: "About", Icon: Heart },
+    ],
   },
 ];
 
@@ -3173,6 +3259,7 @@ const SECTION_MAP = {
   standards: SectionStandards,
   "ai-prompts": SectionAIPrompts,
   troubleshooting: SectionTroubleshooting,
+  about: SectionAbout,
 };
 
 // ─── MAIN MODAL ──────────────────────────────────────────────────────────────
