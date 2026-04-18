@@ -626,7 +626,7 @@ export default {
       title: 'u-Substitution',
       prereqs: ['Indefinite u-substitution', 'Chain rule'],
       svgId: 'WalkthroughViz',
-      vizProps: { fn: '2*x*Math.pow(x*x+1,3)', a: 0, b: 2, xMin: -0.2, xMax: 2.3, label: 'f(x) = 2x(x\u00B2+1)\u00B3' },
+      vizProps: { fn: '2*x*Math.pow(x*x+1,3)', a: 0, b: 2, xMin: -0.2, xMax: 2.3, yMax: 40, label: 'f(x) = 2x(x\u00B2+1)\u00B3' },
       problem: 'Evaluate $\\displaystyle\\int_0^2 2x(x^2+1)^3\\,dx$.',
       steps: [
         {

@@ -149,7 +149,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import KatexBlock from '../math/KatexBlock.jsx'
 import KatexInline from '../math/KatexInline.jsx'
 import VizFrame from '../viz/VizFrame.jsx'
@@ -333,9 +333,16 @@ function WalkthroughBody({ wt }) {
 export default function GuidedWalkthrough({ walkthroughs = [] }) {
   const [wtIdx, setWtIdx] = useState(0)
 
+  // Reset index when navigating to a new lesson (new walkthroughs reference)
+  useEffect(() => { setWtIdx(0) }, [walkthroughs])
+
   if (!walkthroughs.length) return null
 
-  const wt = walkthroughs[wtIdx]
+  // Clamp in case the effect hasn't fired yet (stale idx from previous lesson)
+  const safeIdx = Math.min(wtIdx, walkthroughs.length - 1)
+  const wt = walkthroughs[safeIdx]
+  if (!wt) return null
+
   const hasMultiple = walkthroughs.length > 1
 
   return (
@@ -352,7 +359,7 @@ export default function GuidedWalkthrough({ walkthroughs = [] }) {
                 key={i}
                 onClick={() => setWtIdx(i)}
                 className={`px-3 py-0.5 rounded-full text-xs font-semibold transition-colors ${
-                  i === wtIdx
+                  i === safeIdx
                     ? 'bg-brand-500 text-white'
                     : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-50 border border-brand-200 dark:border-brand-700'
                 }`}

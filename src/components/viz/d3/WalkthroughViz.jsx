@@ -148,8 +148,8 @@ export default function WalkthroughViz({ params = {} }) {
     if (!allY.length) return
     const [ylo, yhi] = d3.extent(allY)
     const pad = Math.max((yhi - ylo) * 0.18, 0.5)
-    const yMin = Math.min(ylo - pad * 0.25, -pad * 0.25)
-    const yMax = yhi + pad
+    const yMin = params.yMin ?? Math.min(ylo - pad * 0.25, -pad * 0.25)
+    const yMax = params.yMax ?? (yhi + pad)
 
     // ── scales ────────────────────────────────────────────────────────────────
     const xSc = d3.scaleLinear().domain([xl, xr]).range([M.left, W - M.right])
