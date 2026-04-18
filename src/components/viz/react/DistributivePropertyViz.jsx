@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 
-const C = {
+const lightColors = {
+  bg: '#ffffff',
+  surface: '#f8fafc',
+  border: '#e2e8f0',
+  text: '#1e293b',
+  muted: '#64748b',
+  cyan: '#06b6d4',
+  emerald: '#10b981',
+  rose: '#f43f5e',
+  gold: '#f59e0b',
+  violet: '#8b5cf6',
+};
+
+const darkColors = {
   bg: '#0f172a',
   surface: '#1e293b',
   border: '#334155',
@@ -13,7 +26,22 @@ const C = {
   violet: '#a78bfa',
 };
 
+function useIsDark() {
+  const [isDark, setIsDark] = React.useState(true);
+  React.useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 export default function DistributivePropertyViz() {
+  const isDark = useIsDark();
+  const C = isDark ? darkColors : lightColors;
+
   const [step, setStep] = useState(0);
 
   // Geometric values
