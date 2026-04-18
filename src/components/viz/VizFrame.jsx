@@ -1071,6 +1071,7 @@ const VIZ_REGISTRY = {
   CeilingFunctionViz: lazy(() => import("./react/CeilingFunctionViz.jsx")),
   BlindChainRuleLab: lazy(() => import("./react/BlindChainRuleLab.jsx")),
   LeastSquaresFit: lazy(() => import("./react/LeastSquaresFit.jsx")),
+  MVTIntegralExplorer: lazy(() => import("./d3/MVTIntegralExplorer.jsx")),
 
   // ─── Discrete Math additional vizzes ─────────────────────────────────────
   ProofStrategySelector: lazy(
