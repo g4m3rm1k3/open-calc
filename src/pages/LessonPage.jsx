@@ -11,6 +11,7 @@ import { enhanceLessonForUnifiedLearning } from '../content/enhancers/unifiedLes
 import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
 import LessonQuizBlock from '../components/lesson/LessonQuizBlock.jsx'
 import { useVideoPlayer } from '../context/VideoPlayerContext.jsx'
+import TutorPanel from '../components/tutor/TutorPanel.jsx'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
@@ -84,6 +85,7 @@ export default function LessonPage() {
 
   return (
     <article className="max-w-4xl mx-auto pb-20">
+      <TutorPanel lesson={lesson} />
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800 z-[10001] pointer-events-none">
         <div 
