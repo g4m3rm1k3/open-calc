@@ -1214,6 +1214,71 @@ If $\\lim_{x \\to c} f(x) = \\lim_{x \\to c} g(x) = 0$ or both $= \\pm\\infty$, 
       reviewSection: "Rigor — Three applications of L'Hôpital",
     },
   ],
+    walkthroughs: [
+    {
+      id: 'wt-lhopital-ultimate',
+      title: "L'Hôpital's Rule – When Limits Fight Back",
+      prereqs: ['Limits at infinity', 'Derivatives as rates', 'Indeterminate forms'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'lhopital', label: "L'Hôpital's Rule" },
+      problem: "State, prove intuitively, and apply L'Hôpital's Rule to resolve indeterminate forms of type 0/0 and ∞/∞.",
+      steps: [
+        {
+          label: 'REGISTRY – The Players',
+          visualNote: 'Two functions f(x) and g(x) approaching the same point. Their graphs get closer and closer, creating a 0/0 or ∞/∞ stalemate.',
+          strategy: 'Name the combatants clearly before the battle begins.',
+          explanation: 'We have two functions f(x) and g(x). As x approaches some value a (or infinity), both f(x) and g(x) approach either 0 or infinity at the same time. This creates an indeterminate form 0/0 or ∞/∞ — the limit "fights back" and refuses to give a clear answer. L\'Hôpital\'s Rule is the referee that breaks the tie by looking at the derivatives instead of the original functions.',
+          math: '\\lim_{x \\to a} \\frac{f(x)}{g(x)} \\quad \\text{where it is 0/0 or } \\infty/\\infty'
+        },
+        {
+          label: 'The Rule Itself',
+          visualNote: 'The original fraction f/g is crossed out and replaced by f\'/g\'.',
+          strategy: 'Replace the original limit with the limit of the derivatives — but only when the conditions are met.',
+          explanation: 'If the limit of f/g is indeterminate (0/0 or ∞/∞) and if the limit of f\'/g\' exists, then the original limit equals the new one. This works because near the trouble point, the behavior of f and g is dominated by how fast they are changing — their derivatives. The rule essentially says: when the functions themselves are tied, look at their rates of change to break the tie.',
+          math: '\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f\'(x)}{g\'(x)} \\quad \\text{(when conditions hold)}'
+        },
+        {
+          label: 'Why does it work? Intuitive proof sketch',
+          visualNote: 'A small secant line on f and on g. Their slopes (derivatives) are shown as the "local behavior".',
+          strategy: 'Think in terms of local linear approximations (tangent lines).',
+          explanation: 'Near the point a, both f and g can be approximated by their tangent lines: f(x) ≈ f(a) + f\'(a)(x-a) and same for g. When f(a) = g(a) = 0 (the 0/0 case), the ratio f(x)/g(x) ≈ [f\'(a)(x-a)] / [g\'(a)(x-a)] = f\'(a)/g\'(a). The (x-a) terms cancel, leaving the ratio of the derivatives. This is why the rule works — we are replacing the functions with their best linear approximations, and the ratio simplifies beautifully.',
+          math: '\\frac{f(x)}{g(x)} \\approx \\frac{f\'(a)(x-a)}{g\'(a)(x-a)} = \\frac{f\'(a)}{g\'(a)}'
+        },
+        {
+          label: 'Example 1 – Classic 0/0 form (polynomial)',
+          visualNote: 'f(x) = x² - 1, g(x) = x - 1 as x→1. Both go to 0.',
+          strategy: 'Direct substitution gives 0/0 → apply L\'Hôpital once.',
+          explanation: 'Plug in x=1: numerator 1-1=0, denominator 1-1=0 — stalemate. Differentiate top and bottom: 2x / 1. Now plug in x=1: 2/1 = 2. The limit is 2. Notice how simple the derivatives made it — no factoring needed.',
+          math: '\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1} = \\lim_{x \\to 1} \\frac{2x}{1} = 2'
+        },
+        {
+          label: 'Example 2 – ∞/∞ form (exponential vs polynomial)',
+          visualNote: 'f(x) = e^x, g(x) = x^3 as x→∞. Both go to infinity.',
+          strategy: 'Apply L\'Hôpital repeatedly until the form is resolved.',
+          explanation: 'As x→∞, e^x and x^3 both race to infinity — indeterminate ∞/∞. Differentiate: e^x / 3x² — still ∞/∞. Again: e^x / 6x — still ∞/∞. Again: e^x / 6 → ∞. So the original limit is infinity. Exponential growth beats any polynomial, and L\'Hôpital reveals this after three applications.',
+          math: '\\lim_{x \\to \\infty} \\frac{e^x}{x^3} = \\lim_{x \\to \\infty} \\frac{e^x}{3x^2} = \\lim_{x \\to \\infty} \\frac{e^x}{6x} = \\lim_{x \\to \\infty} \\frac{e^x}{6} = \\infty'
+        },
+        {
+          label: 'Example 3 – trigonometric 0/0',
+          visualNote: 'f(x) = sin x, g(x) = x as x→0.',
+          strategy: 'Classic limit that students usually memorize — now justified by L\'Hôpital.',
+          explanation: 'Direct substitution: sin(0)/0 = 0/0. Derivatives: cos x / 1. At x=0: 1/1 = 1. This proves the famous limit lim_{x→0} sin x / x = 1 without using geometric arguments or squeeze theorem.',
+          math: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = \\lim_{x \\to 0} \\frac{\\cos x}{1} = 1'
+        },
+        {
+          label: 'When NOT to use L\'Hôpital (common pitfalls)',
+          visualNote: 'A red "X" over a case where the limit of derivatives does not exist or is not indeterminate.',
+          strategy: 'The rule only applies to 0/0 and ∞/∞. If the limit of f\'/g\' does not exist, the original limit may still exist or may not.',
+          explanation: 'L\'Hôpital is not a magic wand. If after differentiating you still have indeterminate form, keep going. If the derivatives’ limit does not exist, you cannot conclude anything about the original limit. Always check the conditions first.',
+          gotcha: 'Never apply L\'Hôpital to limits that are not 0/0 or ∞/∞ (e.g., 1/∞ or 5/2).'
+        }
+      ],
+      variations: [
+        { question: 'What is lim_{x→0} (1 - cos x)/x² ?', hint: '0/0 form. Apply L\'Hôpital twice: first sin x / 2x, then cos x / 2 → 1/2.' },
+        { question: 'Why can we apply L\'Hôpital multiple times?', hint: 'As long as each new ratio is still indeterminate, the conditions remain satisfied.' }
+      ]
+    }
+  ],
 
   spiral: {
     recoveryPoints: [

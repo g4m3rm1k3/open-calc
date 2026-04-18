@@ -4,6 +4,7 @@ import summationNotation from './00c-summation-notation.js'
 import riemannSums from './01-riemann-sums.js'
 import definiteIntegral from './02-definite-integral.js'
 import fundamentalTheorem from './03-fundamental-theorem.js'
+import mvtIntegrals from './03b-mvt-integrals.js'
 import indefiniteIntegrals from './04-indefinite-integrals.js'
 import initialValueProblems from './04b-initial-value-problems.js'
 import applications from './05-applications.js'
@@ -35,6 +36,7 @@ export default {
     riemannSums,
     definiteIntegral,
     fundamentalTheorem,
+    mvtIntegrals,
     indefiniteIntegrals,
     initialValueProblems,
     applications,
