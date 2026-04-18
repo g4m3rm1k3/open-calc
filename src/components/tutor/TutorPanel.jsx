@@ -175,11 +175,30 @@ function renderKatex(expr, display) {
 }
 
 // Parse AI message text into segments: plain text, inline math, display math, bold, inline code
+// Handles both $...$ / $$...$$ and \(...\) / \[...\] delimiter styles
 function parseMessage(text) {
   const segments = []
   let i = 0
 
   while (i < text.length) {
+    // Display math \[...\]
+    if (text[i] === '\\' && text[i + 1] === '[') {
+      const end = text.indexOf('\\]', i + 2)
+      if (end !== -1) {
+        segments.push({ type: 'display-math', content: text.slice(i + 2, end) })
+        i = end + 2
+        continue
+      }
+    }
+    // Inline math \(...\)
+    if (text[i] === '\\' && text[i + 1] === '(') {
+      const end = text.indexOf('\\)', i + 2)
+      if (end !== -1) {
+        segments.push({ type: 'inline-math', content: text.slice(i + 2, end) })
+        i = end + 2
+        continue
+      }
+    }
     // Display math $$...$$
     if (text[i] === '$' && text[i + 1] === '$') {
       const end = text.indexOf('$$', i + 2)
@@ -189,12 +208,14 @@ function parseMessage(text) {
         continue
       }
     }
-    // Inline math $...$
+    // Inline math $...$ (must not span a newline)
     if (text[i] === '$' && text[i + 1] !== '$') {
-      const end = text.indexOf('$', i + 1)
-      if (end !== -1 && end > i + 1) {
-        segments.push({ type: 'inline-math', content: text.slice(i + 1, end) })
-        i = end + 1
+      const rest = text.slice(i + 1)
+      const nl = rest.indexOf('\n')
+      const closing = rest.indexOf('$')
+      if (closing > 0 && (nl === -1 || closing < nl)) {
+        segments.push({ type: 'inline-math', content: rest.slice(0, closing) })
+        i = i + 1 + closing + 1
         continue
       }
     }
