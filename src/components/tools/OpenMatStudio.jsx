@@ -384,6 +384,60 @@ function formatValue(value) {
   }
 }
 
+function inferClass(value) {
+  const plain = toPlain(value);
+  if (plain == null) return "null";
+  if (typeof plain === "number") return Number.isInteger(plain) ? "double" : "double";
+  if (typeof plain === "string") return "char";
+  if (typeof plain === "boolean") return "logical";
+  if (isComplexLike(plain)) return "complex double";
+  if (Array.isArray(plain)) return "double array";
+  if (plain?.__multi) return "tuple";
+  return typeof plain;
+}
+
+function inferSize(value) {
+  const plain = toPlain(value);
+  if (plain == null) return [0, 0];
+  if (!Array.isArray(plain)) return [1, 1];
+  if (!plain.length) return [0, 0];
+  if (Array.isArray(plain[0])) {
+    return [plain.length, Math.max(...plain.map((row) => row.length), 0)];
+  }
+  return [1, plain.length];
+}
+
+function estimateBytes(value) {
+  const plain = toPlain(value);
+  try {
+    return new Blob([JSON.stringify(plain)]).size;
+  } catch {
+    return 0;
+  }
+}
+
+function summarizeValue(value) {
+  const text = formatValue(value).replace(/\s+/g, " ").trim();
+  return text.length > 90 ? `${text.slice(0, 87)}...` : text || "(empty)";
+}
+
+function buildWorkspaceSnapshot(parser, variables) {
+  return Array.from(variables)
+    .sort((a, b) => a.localeCompare(b))
+    .map((name) => {
+      const value = toPlain(parser.get(name));
+      const size = inferSize(value);
+      return {
+        name,
+        className: inferClass(value),
+        size,
+        bytes: estimateBytes(value),
+        preview: summarizeValue(value),
+        value,
+      };
+    });
+}
+
 function buildFigureFromPlotState(plotState) {
   if (plotState.series.length === 0) return null;
 
@@ -814,6 +868,7 @@ function executeScript(source) {
   return {
     output: outputBlocks.filter(Boolean).join("\n\n") || (figureJson ? "Plot rendered." : "No output."),
     figureJson,
+    workspace: buildWorkspaceSnapshot(parser, variables),
   };
 }
 
@@ -825,6 +880,8 @@ export default function OpenMatStudio() {
   const [output, setOutput] = useState("");
   const [figureJson, setFigureJson] = useState(null);
   const [normalizedPreview, setNormalizedPreview] = useState("");
+  const [workspaceItems, setWorkspaceItems] = useState([]);
+  const [selectedVariable, setSelectedVariable] = useState(null);
   const [workspaceTab, setWorkspaceTab] = useLocalStorage("openmat-workspace-tab", "plot");
   const [browserTab, setBrowserTab] = useLocalStorage("openmat-browser-tab", "examples");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -839,6 +896,7 @@ export default function OpenMatStudio() {
   const workspaceTabs = [
     { id: "plot", label: "Figure", icon: LineChart },
     { id: "console", label: "Console", icon: Rows3 },
+    { id: "workspace", label: "Workspace", icon: Waves },
     { id: "reference", label: "Reference", icon: Sigma },
     { id: "normalized", label: "Normalized", icon: Cpu },
   ];
@@ -868,10 +926,20 @@ export default function OpenMatStudio() {
       const result = executeScript(code);
       setOutput(result.output);
       setFigureJson(result.figureJson);
-      setWorkspaceTab(result.figureJson ? "plot" : "console");
+      setWorkspaceItems(result.workspace || []);
+      setSelectedVariable((current) =>
+        result.workspace?.find((item) => item.name === current?.name) ||
+        result.workspace?.[0] ||
+        null,
+      );
+      setWorkspaceTab(
+        result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console",
+      );
     } catch (error) {
       setOutput(`Error: ${error.message}`);
       setFigureJson(null);
+      setWorkspaceItems([]);
+      setSelectedVariable(null);
       setWorkspaceTab("console");
     } finally {
       setRunning(false);
@@ -886,6 +954,8 @@ export default function OpenMatStudio() {
     setOutput("");
     setFigureJson(null);
     setNormalizedPreview("");
+    setWorkspaceItems([]);
+    setSelectedVariable(null);
   }, [setCode]);
 
   const loadExample = useCallback(
@@ -932,6 +1002,8 @@ export default function OpenMatStudio() {
         setOutput("");
         setFigureJson(null);
         setNormalizedPreview("");
+        setWorkspaceItems([]);
+        setSelectedVariable(null);
       } catch (error) {
         setOutput(`Error: Could not import workspace. ${error.message}`);
         setWorkspaceTab("console");
@@ -1305,6 +1377,78 @@ export default function OpenMatStudio() {
                 >
                   {output || "Run a script to see matrix output, variables, or plots here."}
                 </pre>
+              </div>
+            )}
+
+            {workspaceTab === "workspace" && (
+              <div className="grid gap-3">
+                <div
+                  className="rounded-2xl border p-3"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                    Workspace
+                  </div>
+                  {workspaceItems.length ? (
+                    <div className="space-y-2">
+                      {workspaceItems.map((item) => {
+                        const active = selectedVariable?.name === item.name;
+                        return (
+                          <button
+                            key={item.name}
+                            type="button"
+                            onClick={() => setSelectedVariable(item)}
+                            className="block w-full rounded-xl border px-3 py-2 text-left"
+                            style={{
+                              borderColor: active ? C.blue : C.border,
+                              background: active ? C.surface2 : C.surface,
+                            }}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="font-mono text-sm font-semibold">{item.name}</span>
+                              <span className="text-[11px]" style={{ color: C.muted }}>
+                                {item.size.join("x")}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-[11px]" style={{ color: C.muted }}>
+                              {item.className} • {item.bytes} bytes
+                            </div>
+                            <div className="mt-1 text-xs" style={{ color: C.text }}>
+                              {item.preview}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border px-3 py-6 text-center text-sm" style={{ borderColor: C.border, color: C.muted }}>
+                      Run a script to populate the workspace browser.
+                    </div>
+                  )}
+                </div>
+
+                {selectedVariable && (
+                  <div
+                    className="rounded-2xl border p-3"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <div className="font-mono text-sm font-semibold">{selectedVariable.name}</div>
+                      <div className="text-[11px]" style={{ color: C.muted }}>
+                        {selectedVariable.className}
+                      </div>
+                    </div>
+                    <div className="mb-2 text-[11px]" style={{ color: C.muted }}>
+                      Size {selectedVariable.size.join(" x ")} • {selectedVariable.bytes} bytes
+                    </div>
+                    <pre
+                      className="max-h-[240px] overflow-auto rounded-xl border p-3 text-xs leading-6"
+                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                    >
+                      {formatValue(selectedVariable.value)}
+                    </pre>
+                  </div>
+                )}
               </div>
             )}
 
