@@ -17,7 +17,7 @@ export default function LogicSimPage() {
   if (window.innerWidth < 640) return <PhoneGuard name="Logic Gate Simulator" />
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-[1600px] w-full px-4 md:px-8 mx-auto pb-12">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">Logic Gate Simulator</h1>
         <p className="text-slate-500 dark:text-slate-400">
