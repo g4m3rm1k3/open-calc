@@ -1918,7 +1918,7 @@ console.log('UI as a finite state machine. Affordances. Hit targets. Feedback sy
 export default {
   id: 'design-06-component-composition',
   slug: 'component-composition',
-  chapter: 'design.2',
+  chapter: 'design.1',
   order: 1,
   title: 'Component Composition',
   subtitle: 'Four layers, applied in order. Anatomy → Structure → Rhythm → Surface. A process that produces consistent components every time.',

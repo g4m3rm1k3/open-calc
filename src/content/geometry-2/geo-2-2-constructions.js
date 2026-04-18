@@ -646,7 +646,10 @@ export default {
     callouts: [
       { type: 'important', title: 'Impossibility is provable', body: 'The three classical problems are not unsolved — they are proven impossible. Wantzel (1837) proved trisection and cube-doubling impossible. Lindemann (1882) proved squaring the circle impossible. These are not "too hard" — they are structurally unreachable by compass and straightedge.' },
     ],
-    visualizations: [{ id: 'G2_3_Constructions', title: 'Step-by-Step Classical Constructions' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Classical Constructions', props: { lesson: LESSON_GEO_2_2 } },
+      { id: 'G2_3_Constructions', title: 'Step-by-Step Classical Constructions' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

@@ -639,7 +639,9 @@ export const GEO_2_PARALLEL_DEFAULT = {
     callouts: [
       { type: 'definition', title: 'Regular polygon interior angle', body: 'Each interior angle = (n−2)×180°/n. For n=6 (hexagon): 120°. For n=12 (dodecagon): 150°. As n→∞, approaches 180°.' },
     ],
-    visualizations: [],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Parallel Lines: Deeper Applications', props: { lesson: LESSON_GEO_2_PARALLEL } }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },
@@ -678,7 +680,10 @@ export const GEO_2_SIMILARITY_DEFAULT = {
     callouts: [
       { type: 'important', title: 'Why trig works', body: 'All right triangles with the same acute angle θ are similar (AA). Therefore the ratio opposite/hypotenuse is the same for all of them — it depends only on θ. That ratio is sin(θ). Without similarity, trigonometry would not exist.' },
     ],
-    visualizations: [{ id: 'G2_4_SimilarTriangles', title: 'Similarity Scaling Demonstration' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Similarity and Proportion', props: { lesson: LESSON_GEO_2_SIMILARITY } },
+      { id: 'G2_4_SimilarTriangles', title: 'Similarity Scaling Demonstration' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

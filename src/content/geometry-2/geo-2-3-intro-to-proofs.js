@@ -506,7 +506,9 @@ export default {
     callouts: [
       { type: 'important', title: 'The test for a complete proof', body: 'A valid proof must convince a logically perfect reader who knows all relevant definitions and theorems but assumes nothing not explicitly stated. Every step needs a reason. Any gap — however small — makes the proof incomplete.' },
     ],
-    visualizations: [],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Introduction to Proofs', props: { lesson: LESSON_GEO_2_3 } }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

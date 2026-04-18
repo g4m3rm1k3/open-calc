@@ -596,7 +596,10 @@ export default {
     callouts: [
       { type: 'definition', title: 'Pythagorean Triple', body: 'Three positive integers a, b, c satisfying a²+b²=c². Examples: (3,4,5), (5,12,13), (8,15,17). The 3-4-5 triple is used in construction to check for right angles.' },
     ],
-    visualizations: [{ id: 'G1_6_Pythagorean', title: 'Three Independent Proofs of Pythagoras' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'The Pythagorean Theorem: Three Proofs', props: { lesson: LESSON_GEO_1_7 } },
+      { id: 'G1_6_Pythagorean', title: 'Three Independent Proofs of Pythagoras' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

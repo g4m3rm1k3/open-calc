@@ -604,8 +604,9 @@ export default {
       { type: 'definition', title: 'Radian', body: 'The angle subtended at the center by an arc equal in length to the radius. 2π radians = 360°. Arc length = rθ; sector area = ½r²θ. These formulas only work with θ in radians.' },
     ],
     visualizations: [
+      { id: 'ScienceNotebook', title: 'Areas, Arcs, and Archimedes', props: { lesson: LESSON_GEO_2_4 } },
       { id: 'G2_5_AreaFormulas', title: 'Polygonal Area Formula Derivations' },
-      { id: 'G2_6_ArcSectorPi', title: 'Arc Lengths and Radian Efficiency' },
+      { id: 'G2_6_ArcSectorPi', title: 'Arc Lengths and Radian Efficiency' }
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },

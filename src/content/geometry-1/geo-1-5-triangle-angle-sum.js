@@ -338,7 +338,10 @@ export default {
     callouts: [
       { type: 'important', title: 'Why the parallel line is essential', body: 'The auxiliary parallel line through C does two things: creates a 180° straight-angle container at C, and creates transversal relationships that transport ∠A and ∠B to C. Without it, there is no proof.' },
     ],
-    visualizations: [{ id: 'G1_4_TriangleAngleSum', title: 'Proving the 180 Degree Fact' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'The Triangle Angle Sum', props: { lesson: LESSON_GEO_1_5 } },
+      { id: 'G1_4_TriangleAngleSum', title: 'Proving the 180 Degree Fact' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

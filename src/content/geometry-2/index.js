@@ -1,7 +1,9 @@
-import circletheorems from './circle-theorems.js';
-import constructions from './constructions.js';
-import similarity from './similarity.js';
-import areasarcs from './areas-arcs.js';
+import logicStatements from './geo-2-1-logic-statements.js';
+import circleTheorems from './geo-2-1-circle-theorems.js';
+import constructions from './geo-2-2-constructions.js';
+import introProofs from './geo-2-3-intro-to-proofs.js';
+import { GEO_2_PARALLEL_DEFAULT as parallelDeeps, GEO_2_SIMILARITY_DEFAULT as similarity } from './geo-2-parallel-and-similarity.js';
+import areasArcs from './geo-2-4-areas-arcs.js';
 
 export default {
   id: 'geometry-2',
@@ -10,9 +12,12 @@ export default {
   slug: 'geometry-2',
   color: 'indigo',
   lessons: [
-    circletheorems,
+    logicStatements,
+    circleTheorems,
     constructions,
+    introProofs,
+    parallelDeeps,
     similarity,
-    areasarcs
+    areasArcs
   ]
 };

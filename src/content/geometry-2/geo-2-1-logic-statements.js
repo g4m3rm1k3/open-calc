@@ -537,7 +537,9 @@ export default {
     callouts: [
       { type: 'important', title: 'Converse ≠ Original', body: 'The converse of a true theorem is NOT automatically true. It requires a separate proof. If both directions are true, the theorem is a biconditional (P iff Q). A rhombus disproves "perpendicular diagonals iff square."' },
     ],
-    visualizations: [],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Logic and Statements', props: { lesson: LESSON_GEO_2_1_LOGIC } }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

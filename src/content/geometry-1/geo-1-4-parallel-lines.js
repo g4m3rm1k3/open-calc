@@ -434,7 +434,10 @@ export default {
     callouts: [
       { type: 'important', title: 'Alternate vs. Co-interior', body: 'Alternate interior angles (Z-shape, opposite sides): EQUAL. Co-interior angles (C-shape, same side): SUPPLEMENTARY (sum to 180°). Students frequently confuse these — the shape memory helps.' },
     ],
-    visualizations: [{ id: 'G1_3_ParallelLines', title: 'Transversals and Parallel Patterns' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Parallel Lines and Transversals', props: { lesson: LESSON_GEO_1_4 } },
+      { id: 'G1_3_ParallelLines', title: 'Transversals and Parallel Patterns' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

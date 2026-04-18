@@ -1998,7 +1998,7 @@ console.log('Design tokens at scale. Component governance. Preventing drift.');`
 export default {
   id: 'design-07-interaction-design',
   slug: 'interaction-design',
-  chapter: 'design.2',
+  chapter: 'design.1',
   order: 2,
   title: 'Interaction Design',
   subtitle: 'Model every possible state. Make things obviously interactive. Feedback in 100ms. Every target hittable.',

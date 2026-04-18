@@ -592,8 +592,9 @@ export default {
       { type: 'important', title: 'The master relationship', body: 'Inscribed angle = ½ arc = ½ central angle. This single formula drives all four circle angle theorems.' },
     ],
     visualizations: [
+      { id: 'ScienceNotebook', title: 'Circle Theorems', props: { lesson: LESSON_GEO_2_1 } },
       { id: 'G2_1_CircleTheorems1', title: 'The Inscribed Angle Theorem' },
-      { id: 'G2_2_CircleTheorems2', title: 'Tangents and the Power of a Point' },
+      { id: 'G2_2_CircleTheorems2', title: 'Tangents and the Power of a Point' }
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },

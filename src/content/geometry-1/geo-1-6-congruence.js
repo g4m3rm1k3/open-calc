@@ -615,7 +615,10 @@ export default {
       { type: 'important', title: 'Why SSA fails', body: 'Given two sides and a non-included angle, the second side can "swing" to two positions. Two different triangles can satisfy the same SSA conditions. This is the ambiguous case. Always check that your angle is INCLUDED (between the two sides) when using SAS.' },
       { type: 'definition', title: 'CPCTC', body: 'Corresponding Parts of Congruent Triangles are Congruent. Once you prove △ABC ≅ △DEF by any criterion, you automatically know AB = DE, BC = EF, CA = FD, ∠A = ∠D, ∠B = ∠E, ∠C = ∠F.' },
     ],
-    visualizations: [{ id: 'G1_5_Congruence', title: 'Congruence Criteria: SAS, SSS, and More' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Congruence: Identical Shapes', props: { lesson: LESSON_GEO_1_6 } },
+      { id: 'G1_5_Congruence', title: 'Congruence Criteria: SAS, SSS, and More' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },

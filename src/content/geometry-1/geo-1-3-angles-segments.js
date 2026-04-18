@@ -677,7 +677,10 @@ export default {
     callouts: [
       { type: 'important', title: 'The structure of a proof', body: 'Every step must have a justification: Given, Definition, Postulate, Theorem, or Algebraic Property. "It looks equal" is never a justification.' },
     ],
-    visualizations: [{ id: 'G1_2_AnglesAtAPoint', title: 'Vertical Angles and Two-Step Proofs' }],
+    visualizations: [
+      { id: 'ScienceNotebook', title: 'Angles and Segments', props: { lesson: LESSON_GEO_1_3 } },
+      { id: 'G1_2_AnglesAtAPoint', title: 'Vertical Angles and Two-Step Proofs' }
+    ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
   rigor: { prose: [], callouts: [], visualizations: [] },
