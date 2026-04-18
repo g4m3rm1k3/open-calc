@@ -60,7 +60,24 @@ export default function FigureRenderer({ figureJson, C }) {
       const ih = canvasH - pt - pb
 
       // Data range
-      const { xmin, xmax, ymin, ymax } = fig
+      let { xmin, xmax, ymin, ymax } = fig
+      if (fig.axisMode === 'equal') {
+        const xRange = xmax - xmin || 1
+        const yRange = ymax - ymin || 1
+        const xCenter = (xmin + xmax) / 2
+        const yCenter = (ymin + ymax) / 2
+        const plotAspect = iw / Math.max(ih, 1)
+        const dataAspect = xRange / yRange
+        if (dataAspect > plotAspect) {
+          const nextYRange = xRange / plotAspect
+          ymin = yCenter - nextYRange / 2
+          ymax = yCenter + nextYRange / 2
+        } else {
+          const nextXRange = yRange * plotAspect
+          xmin = xCenter - nextXRange / 2
+          xmax = xCenter + nextXRange / 2
+        }
+      }
 
       // Coordinate transform functions
       const toX = dx => pl + ((dx - xmin) / (xmax - xmin)) * iw

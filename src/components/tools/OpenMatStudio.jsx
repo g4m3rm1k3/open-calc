@@ -12,6 +12,10 @@ import {
   Waves,
   Download,
   Upload,
+  ZoomIn,
+  ZoomOut,
+  Scan,
+  Grid3X3,
 } from "lucide-react";
 import FigureRenderer from "../viz/react/FigureRenderer.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
@@ -145,7 +149,7 @@ const HELP_TEXT = [
   "[V, D] = eig(A)",
   "[Q, R] = qr(A)",
   "plot, scatter, bar, stem, area, hold on/off, clf",
-  "title, xlabel, ylabel, legend, grid on/off, xlim, ylim",
+  "title, xlabel, ylabel, legend, grid on/off, xlim, ylim, axis tight/equal/auto",
   "zeros, ones, eye, rand, linspace, logspace, meshgrid",
   "polyfit, polyval, diff, cumsum, cumprod, dot, cross",
   "det, inv, pinv, fft, ifft, norm, trace, diag",
@@ -364,6 +368,9 @@ function preprocessLine(line, variables) {
   output = output.replace(/^hold\s+off$/i, "hold('off')");
   output = output.replace(/^grid\s+on$/i, "grid('on')");
   output = output.replace(/^grid\s+off$/i, "grid('off')");
+  output = output.replace(/^axis\s+tight$/i, "axis('tight')");
+  output = output.replace(/^axis\s+equal$/i, "axis('equal')");
+  output = output.replace(/^axis\s+auto$/i, "axis('auto')");
   output = normalizeMatrixSyntax(output);
   output = replaceIndexing(output, variables);
   output = replaceBackslash(output);
@@ -438,6 +445,73 @@ function buildWorkspaceSnapshot(parser, variables) {
     });
 }
 
+function parseFigureJson(figureJson) {
+  if (!figureJson) return null;
+  try {
+    return typeof figureJson === "string" ? JSON.parse(figureJson) : figureJson;
+  } catch {
+    return null;
+  }
+}
+
+function stringifyFigure(fig) {
+  return JSON.stringify(fig);
+}
+
+function updateFigureBounds(figureJson, updater) {
+  const fig = parseFigureJson(figureJson);
+  if (!fig) return figureJson;
+  const nextBounds = updater({
+    xmin: fig.xmin,
+    xmax: fig.xmax,
+    ymin: fig.ymin,
+    ymax: fig.ymax,
+  });
+  if (!nextBounds) return figureJson;
+  return stringifyFigure({ ...fig, ...nextBounds });
+}
+
+function scaleFigureBounds(figureJson, factor) {
+  return updateFigureBounds(figureJson, ({ xmin, xmax, ymin, ymax }) => {
+    const xCenter = (xmin + xmax) / 2;
+    const yCenter = (ymin + ymax) / 2;
+    const xHalf = ((xmax - xmin) * factor) / 2;
+    const yHalf = ((ymax - ymin) * factor) / 2;
+    return {
+      xmin: xCenter - xHalf,
+      xmax: xCenter + xHalf,
+      ymin: yCenter - yHalf,
+      ymax: yCenter + yHalf,
+    };
+  });
+}
+
+function toggleFigureGrid(figureJson) {
+  const fig = parseFigureJson(figureJson);
+  if (!fig) return figureJson;
+  const hasGrid = fig.elements?.some((element) => element.type === "grid");
+  const elements = hasGrid
+    ? fig.elements.filter((element) => element.type !== "grid")
+    : [
+        {
+          type: "grid",
+          step: Math.max((fig.xmax - fig.xmin) / 8, 1e-6),
+          color: "border",
+        },
+        ...(fig.elements || []),
+      ];
+  return stringifyFigure({ ...fig, elements });
+}
+
+function extractFigureMeta(figureJson) {
+  const fig = parseFigureJson(figureJson);
+  if (!fig) return { axisMode: "auto", hasGrid: true };
+  return {
+    axisMode: fig.axisMode || "auto",
+    hasGrid: fig.elements?.some((element) => element.type === "grid") ?? true,
+  };
+}
+
 function buildFigureFromPlotState(plotState) {
   if (plotState.series.length === 0) return null;
 
@@ -468,8 +542,9 @@ function buildFigureFromPlotState(plotState) {
     ymax += 1;
   }
 
-  const padX = (xmax - xmin) * 0.08;
-  const padY = (ymax - ymin) * 0.15;
+  const isTight = plotState.axisMode === "tight";
+  const padX = (xmax - xmin) * (isTight ? 0.02 : 0.08);
+  const padY = (ymax - ymin) * (isTight ? 0.02 : 0.15);
   const xBounds =
     plotState.xlim?.length === 2 ? plotState.xlim : [xmin - padX, xmax + padX];
   const yBounds =
@@ -574,6 +649,7 @@ function buildFigureFromPlotState(plotState) {
     ymin: yBounds[0],
     ymax: yBounds[1],
     height: 340,
+    axisMode: plotState.axisMode,
     elements,
   });
 }
@@ -592,6 +668,7 @@ function createExecutionEngine() {
     grid: true,
     xlim: null,
     ylim: null,
+    axisMode: "auto",
   };
 
   const clearPlots = () => {
@@ -603,6 +680,7 @@ function createExecutionEngine() {
     plotState.legend = [];
     plotState.xlim = null;
     plotState.ylim = null;
+    plotState.axisMode = "auto";
   };
 
   const registerPlot = (kind, first, second) => {
@@ -743,6 +821,27 @@ function createExecutionEngine() {
     plotState.ylim = normalizeVector(range).slice(0, 2);
     return plotState.ylim;
   });
+  parser.set("axis", (mode) => {
+    if (typeof mode === "string") {
+      const normalized = mode.toLowerCase();
+      if (["equal", "tight", "auto"].includes(normalized)) {
+        plotState.axisMode = normalized;
+        if (normalized === "auto") {
+          plotState.xlim = null;
+          plotState.ylim = null;
+        }
+        return normalized;
+      }
+    }
+    const bounds = normalizeVector(mode).slice(0, 4);
+    if (bounds.length === 4) {
+      plotState.xlim = bounds.slice(0, 2);
+      plotState.ylim = bounds.slice(2, 4);
+      plotState.axisMode = "manual";
+      return bounds;
+    }
+    return plotState.axisMode;
+  });
   parser.set("legend", (...labels) => {
     plotState.legend = labels.map(String);
     plotState.series.forEach((series, index) => {
@@ -876,17 +975,21 @@ export default function OpenMatStudio() {
   const C = useColors();
   const { openGrapher } = useGrapher();
   const [code, setCode] = useLocalStorage("openmat-code", DEFAULT_CODE);
+  const [rightPaneWidth, setRightPaneWidth] = useLocalStorage("openmat-right-pane-width", 390);
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState("");
   const [figureJson, setFigureJson] = useState(null);
+  const [baseFigureJson, setBaseFigureJson] = useState(null);
   const [normalizedPreview, setNormalizedPreview] = useState("");
   const [workspaceItems, setWorkspaceItems] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState(null);
   const [workspaceTab, setWorkspaceTab] = useLocalStorage("openmat-workspace-tab", "plot");
   const [browserTab, setBrowserTab] = useLocalStorage("openmat-browser-tab", "examples");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isResizingRightPane, setIsResizingRightPane] = useState(false);
   const outputRef = useRef(null);
   const importRef = useRef(null);
+  const shellRef = useRef(null);
 
   const exampleMap = useMemo(
     () => Object.fromEntries(EXAMPLES.map((example) => [example.id, example])),
@@ -909,7 +1012,7 @@ export default function OpenMatStudio() {
     "Matrices: [1 2; 3 4], A', A \\\\ b, inv(A), det(A)",
     "Ranges: x = 0:0.1:2*pi, linspace, logspace, meshgrid",
     "Plots: plot, scatter, bar, stem, area, hold on/off, clf",
-    "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim",
+    "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
     "Signals: sin, cos, tan, exp, log, fft, ifft, abs, real, imag",
     "Polynomials: polyfit, polyval, diff, cumsum, cumprod",
   ];
@@ -926,6 +1029,7 @@ export default function OpenMatStudio() {
       const result = executeScript(code);
       setOutput(result.output);
       setFigureJson(result.figureJson);
+      setBaseFigureJson(result.figureJson);
       setWorkspaceItems(result.workspace || []);
       setSelectedVariable((current) =>
         result.workspace?.find((item) => item.name === current?.name) ||
@@ -938,6 +1042,7 @@ export default function OpenMatStudio() {
     } catch (error) {
       setOutput(`Error: ${error.message}`);
       setFigureJson(null);
+      setBaseFigureJson(null);
       setWorkspaceItems([]);
       setSelectedVariable(null);
       setWorkspaceTab("console");
@@ -953,6 +1058,7 @@ export default function OpenMatStudio() {
     setCode(DEFAULT_CODE);
     setOutput("");
     setFigureJson(null);
+    setBaseFigureJson(null);
     setNormalizedPreview("");
     setWorkspaceItems([]);
     setSelectedVariable(null);
@@ -965,6 +1071,7 @@ export default function OpenMatStudio() {
       setCode(example.code);
       setOutput("");
       setFigureJson(null);
+      setBaseFigureJson(null);
       setNormalizedPreview("");
     },
     [exampleMap, setCode],
@@ -1001,6 +1108,7 @@ export default function OpenMatStudio() {
         if (typeof parsed.workspaceTab === "string") setWorkspaceTab(parsed.workspaceTab);
         setOutput("");
         setFigureJson(null);
+        setBaseFigureJson(null);
         setNormalizedPreview("");
         setWorkspaceItems([]);
         setSelectedVariable(null);
@@ -1013,8 +1121,40 @@ export default function OpenMatStudio() {
     event.target.value = "";
   }, [setBrowserTab, setCode, setWorkspaceTab]);
 
+  const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
+
+  useEffect(() => {
+    if (!isResizingRightPane) return undefined;
+
+    const handleMove = (event) => {
+      const shellRect = shellRef.current?.getBoundingClientRect();
+      if (!shellRect) return;
+      const nextWidth = shellRect.right - event.clientX;
+      const clamped = Math.max(300, Math.min(820, nextWidth));
+      setRightPaneWidth(Math.round(clamped));
+    };
+
+    const handleUp = () => {
+      setIsResizingRightPane(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, [isResizingRightPane, setRightPaneWidth]);
+
   return (
     <div
+      ref={shellRef}
       className="flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border"
       style={{
         background: C.surface,
@@ -1298,8 +1438,27 @@ export default function OpenMatStudio() {
         </div>
 
         <div
-          className="flex w-full min-w-0 shrink-0 flex-col border-t lg:w-[360px] lg:border-l lg:border-t-0 xl:w-[390px]"
-          style={{ borderColor: C.border, background: C.surface2 }}
+          className="hidden w-2 shrink-0 cursor-ew-resize border-l border-r lg:flex lg:items-center lg:justify-center"
+          style={{ borderColor: C.border, background: C.surface3 }}
+          onMouseDown={(event) => {
+            event.preventDefault();
+            setIsResizingRightPane(true);
+          }}
+          title="Drag to resize workspace pane"
+        >
+          <div
+            className="h-12 w-1 rounded-full"
+            style={{ background: C.border }}
+          />
+        </div>
+
+        <div
+          className="flex w-full min-w-0 shrink-0 flex-col border-t lg:border-t-0"
+          style={{
+            borderColor: C.border,
+            background: C.surface2,
+            width: `min(100%, ${rightPaneWidth}px)`,
+          }}
         >
           <div
             className="flex items-center gap-1 border-b px-3 py-2"
@@ -1338,7 +1497,55 @@ export default function OpenMatStudio() {
                     Figure
                   </div>
                   {figureJson ? (
-                    <FigureRenderer figureJson={figureJson} C={C} />
+                    <>
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setFigureJson((current) => scaleFigureBounds(current, 0.8))}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          <ZoomIn className="h-3.5 w-3.5" />
+                          Zoom In
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFigureJson((current) => scaleFigureBounds(current, 1.25))}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          <ZoomOut className="h-3.5 w-3.5" />
+                          Zoom Out
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFigureJson(baseFigureJson)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          <Scan className="h-3.5 w-3.5" />
+                          Reset View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFigureJson((current) => toggleFigureGrid(current))}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{
+                            borderColor: figureMeta.hasGrid ? C.blue : C.border,
+                            background: figureMeta.hasGrid ? C.surface : C.surface2,
+                            color: figureMeta.hasGrid ? C.blue : C.text,
+                          }}
+                        >
+                          <Grid3X3 className="h-3.5 w-3.5" />
+                          Grid
+                        </button>
+                      </div>
+                      <div className="mb-2 flex items-center justify-between gap-3 text-[11px]" style={{ color: C.muted }}>
+                        <span>Axis mode: {figureMeta.axisMode}</span>
+                        <span>Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts.</span>
+                      </div>
+                      <FigureRenderer figureJson={figureJson} C={C} />
+                    </>
                   ) : (
                     <div
                       className="rounded-xl border px-3 py-10 text-center text-sm"

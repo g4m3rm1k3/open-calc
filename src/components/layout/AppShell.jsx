@@ -804,6 +804,54 @@ export default function AppShell({ children }) {
             {children ?? <Outlet />}
           </div>
           <SearchModal />
+          <GlobalGrapher
+            isOpen={graphOpen}
+            launchConfig={graphOpen ? grapherLaunchConfig : null}
+            onClose={() => {
+              setGraphOpen(false);
+              setGrapherLaunchConfig(null);
+            }}
+            onSwitchTo3D={() => {
+              setGraphOpen(false);
+              setGraph3DOpen(true);
+            }}
+            onSwitchToJSX={() => {
+              setGraphOpen(false);
+              setGraphJSXOpen(true);
+            }}
+          />
+          <GlobalGrapher3D
+            isOpen={graph3DOpen}
+            launchConfig={graph3DOpen ? grapherLaunchConfig : null}
+            onClose={() => {
+              setGraph3DOpen(false);
+              setGrapherLaunchConfig(null);
+            }}
+            onSwitchTo2D={() => {
+              setGraph3DOpen(false);
+              setGraphOpen(true);
+            }}
+            onSwitchToJSX={() => {
+              setGraph3DOpen(false);
+              setGraphJSXOpen(true);
+            }}
+          />
+          <GlobalGrapherJSX
+            isOpen={graphJSXOpen}
+            launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
+            onClose={() => {
+              setGraphJSXOpen(false);
+              setGrapherLaunchConfig(null);
+            }}
+            onSwitchTo2D={() => {
+              setGraphJSXOpen(false);
+              setGraphOpen(true);
+            }}
+            onSwitchTo3D={() => {
+              setGraphJSXOpen(false);
+              setGraph3DOpen(true);
+            }}
+          />
         </div>
       </GrapherContext.Provider>
     );
