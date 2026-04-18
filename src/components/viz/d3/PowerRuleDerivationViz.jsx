@@ -1,6 +1,18 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 const W = 600,
   H = 450;
 const MARGIN = { top: 20, right: 20, bottom: 80, left: 60 };
@@ -34,8 +46,20 @@ export default function ConstantDifferenceProof({ params }) {
   const [functionIdx, setFunctionIdx] = useState(0);
   const [showDifference, setShowDifference] = useState(false);
   const [showProof, setShowProof] = useState(false);
+  const isDark = useIsDark();
 
   const func = FUNCTIONS[functionIdx];
+
+  const C = {
+    text: isDark ? "#94a3b8" : "#64748b",
+    grid: isDark ? "#334155" : "#e2e8f0",
+    blue: isDark ? "#60a5fa" : "#3b82f6",
+    purple: isDark ? "#a78bfa" : "#8b5cf6",
+    red: isDark ? "#f87171" : "#ef4444",
+    emerald: isDark ? "#34d399" : "#10b981",
+    bg: isDark ? "#0f172a" : "#ffffff",
+    border: isDark ? "#1e293b" : "#e5e7eb"
+  };
 
   const makeFn = (expr) => {
     try {
@@ -109,7 +133,7 @@ export default function ConstantDifferenceProof({ params }) {
         .attr("x2", xScale(tick))
         .attr("y1", MARGIN.top)
         .attr("y2", H - MARGIN.bottom)
-        .attr("stroke", "#e2e8f0")
+        .attr("stroke", C.grid)
         .attr("stroke-dasharray", "2,2");
     });
 
@@ -121,7 +145,7 @@ export default function ConstantDifferenceProof({ params }) {
         .attr("x2", W - MARGIN.right)
         .attr("y1", yScale(tick))
         .attr("y2", yScale(tick))
-        .attr("stroke", "#e2e8f0")
+        .attr("stroke", C.grid)
         .attr("stroke-dasharray", "2,2");
     });
 
@@ -130,13 +154,13 @@ export default function ConstantDifferenceProof({ params }) {
       .append("g")
       .attr("transform", `translate(0,${yScale(0)})`)
       .call(d3.axisBottom(xScale).ticks(6))
-      .attr("color", "#64748b");
+      .attr("color", C.text);
 
     svg
       .append("g")
       .attr("transform", `translate(${xScale(0)},0)`)
       .call(d3.axisLeft(yScale).ticks(6))
-      .attr("color", "#64748b");
+      .attr("color", C.text);
 
     const line = d3
       .line()
@@ -178,7 +202,7 @@ export default function ConstantDifferenceProof({ params }) {
               .attr("x2", xScale(x + dx / 2))
               .attr("y1", yScale(y - dy / 2))
               .attr("y2", yScale(y + dy / 2))
-              .attr("stroke", "#10b981")
+              .attr("stroke", C.emerald)
               .attr("stroke-width", 1);
           }
         }
@@ -190,7 +214,7 @@ export default function ConstantDifferenceProof({ params }) {
       .append("path")
       .datum(F1Points)
       .attr("fill", "none")
-      .attr("stroke", "#3b82f6")
+      .attr("stroke", C.blue)
       .attr("stroke-width", 3)
       .attr("d", line);
 
@@ -198,7 +222,7 @@ export default function ConstantDifferenceProof({ params }) {
       .append("path")
       .datum(F2Points)
       .attr("fill", "none")
-      .attr("stroke", "#8b5cf6")
+      .attr("stroke", C.purple)
       .attr("stroke-width", 3)
       .attr("d", line);
 
@@ -208,7 +232,7 @@ export default function ConstantDifferenceProof({ params }) {
         .append("path")
         .datum(diffPoints)
         .attr("fill", "none")
-        .attr("stroke", "#ef4444")
+        .attr("stroke", C.red)
         .attr("stroke-width", 2)
         .attr("stroke-dasharray", "6,3")
         .attr("d", line);
@@ -224,7 +248,7 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("x2", W - MARGIN.right - 120)
       .attr("y1", legendY + legendItem * 20)
       .attr("y2", legendY + legendItem * 20)
-      .attr("stroke", "#3b82f6")
+      .attr("stroke", C.blue)
       .attr("stroke-width", 3);
 
     svg
@@ -232,7 +256,7 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("x", W - MARGIN.right - 115)
       .attr("y", legendY + legendItem * 20 + 4)
       .attr("font-size", 12)
-      .attr("fill", "#3b82f6")
+      .attr("fill", C.blue)
       .text("F₁(x) - one antiderivative");
 
     legendItem++;
@@ -243,7 +267,7 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("x2", W - MARGIN.right - 120)
       .attr("y1", legendY + legendItem * 20)
       .attr("y2", legendY + legendItem * 20)
-      .attr("stroke", "#8b5cf6")
+      .attr("stroke", C.purple)
       .attr("stroke-width", 3);
 
     svg
@@ -251,7 +275,7 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("x", W - MARGIN.right - 115)
       .attr("y", legendY + legendItem * 20 + 4)
       .attr("font-size", 12)
-      .attr("fill", "#8b5cf6")
+      .attr("fill", C.purple)
       .text("F₂(x) - another antiderivative");
 
     if (showDifference) {
@@ -262,7 +286,7 @@ export default function ConstantDifferenceProof({ params }) {
         .attr("x2", W - MARGIN.right - 120)
         .attr("y1", legendY + legendItem * 20)
         .attr("y2", legendY + legendItem * 20)
-        .attr("stroke", "#ef4444")
+        .attr("stroke", C.red)
         .attr("stroke-width", 2)
         .attr("stroke-dasharray", "6,3");
 
@@ -271,7 +295,7 @@ export default function ConstantDifferenceProof({ params }) {
         .attr("x", W - MARGIN.right - 115)
         .attr("y", legendY + legendItem * 20 + 4)
         .attr("font-size", 12)
-        .attr("fill", "#ef4444")
+        .attr("fill", C.red)
         .text("F₂(x) - F₁(x) = constant");
     }
 
@@ -282,7 +306,7 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("y", H - 10)
       .attr("text-anchor", "middle")
       .attr("font-size", 12)
-      .attr("fill", "#64748b")
+      .attr("fill", C.text)
       .text("x");
 
     svg
@@ -292,9 +316,9 @@ export default function ConstantDifferenceProof({ params }) {
       .attr("y", 15)
       .attr("text-anchor", "middle")
       .attr("font-size", 12)
-      .attr("fill", "#64748b")
+      .attr("fill", C.text)
       .text("y");
-  }, [functionIdx, showDifference, showProof]);
+  }, [functionIdx, showDifference, showProof, isDark]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -302,24 +326,25 @@ export default function ConstantDifferenceProof({ params }) {
         ref={svgRef}
         width={W}
         height={H}
-        className="border border-gray-200 rounded"
+        className="border transition-colors duration-300 rounded"
+        style={{ backgroundColor: C.bg, borderColor: C.border }}
       ></svg>
 
-      <div className="flex flex-col gap-4 w-full max-w-2xl">
+      <div className="flex flex-col gap-4 w-full max-w-2xl px-4">
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">
+          <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">
             Why Antiderivatives Differ by Constants
           </h3>
-          <p className="text-gray-700 mb-4">
+          <p className="text-slate-700 dark:text-slate-300 mb-4">
             If two functions have the same derivative, they can only differ by a{" "}
             <strong>constant</strong>. This is the mathematical foundation of the
             +C in ∫f(x) dx = F(x) + C.
           </p>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg">
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-800">
           <div className="flex items-center gap-4 mb-3">
-            <label className="text-sm font-medium">Choose function:</label>
+            <label className="text-sm font-semibold text-green-900 dark:text-green-200">Choose function:</label>
             <select
               value={functionIdx}
               onChange={(e) => {
@@ -327,7 +352,7 @@ export default function ConstantDifferenceProof({ params }) {
                 setShowDifference(false);
                 setShowProof(false);
               }}
-              className="px-3 py-1 border border-gray-300 rounded"
+              className="px-3 py-1 bg-white dark:bg-slate-800 border border-green-200 dark:border-green-700 rounded text-slate-900 dark:text-slate-100"
             >
               {FUNCTIONS.map((fn, i) => (
                 <option key={i} value={i}>
@@ -337,47 +362,50 @@ export default function ConstantDifferenceProof({ params }) {
             </select>
           </div>
 
-          <p className="text-green-700 mb-3">{func.description}</p>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-green-800 dark:text-green-300 mb-3 font-medium">{func.description}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 bg-white/50 dark:bg-slate-800/50 p-3 rounded-lg border border-green-100 dark:border-green-900/50">
             Both functions have the same derivative: F₁'(x) = F₂'(x) ={" "}
-            {func.f.replace("Math.", "").replace("*", "")}
+            <span className="font-mono text-green-700 dark:text-green-400 font-bold">{func.f.replace("Math.", "").replace("*", "")}</span>
           </p>
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-lg shadow-sm border border-green-100 dark:border-green-900/50">
               <input
                 type="checkbox"
                 id="show-difference"
                 checked={showDifference}
                 onChange={(e) => setShowDifference(e.target.checked)}
-                className="rounded"
+                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
               />
-              <label htmlFor="show-difference" className="text-sm">
-                Show F₂(x) - F₁(x) (should be constant)
+              <label htmlFor="show-difference" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+                Show F₂(x) - F₁(x)
               </label>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-lg shadow-sm border border-green-100 dark:border-green-900/50">
               <input
                 type="checkbox"
                 id="show-proof"
                 checked={showProof}
                 onChange={(e) => setShowProof(e.target.checked)}
-                className="rounded"
+                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
               />
-              <label htmlFor="show-proof" className="text-sm">
-                Show slope field (derivative visualization)
+              <label htmlFor="show-proof" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+                Show slope field
               </label>
             </div>
           </div>
 
           {showDifference && (
-            <div className="mt-3 p-3 bg-white rounded border">
-              <p className="text-sm text-red-700">
-                <strong>Red dashed line:</strong> F₂(x) - F₁(x) ={" "}
-                {Math.round(difference(1) * 100) / 100} (constant!)
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
+            <div className="mt-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-red-200 dark:border-red-900/50 animate-in fade-in slide-in-from-top-2">
+              <p className="text-sm text-red-700 dark:text-red-400 font-bold mb-1 uppercase tracking-tight">Constant Difference:</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-mono text-slate-900 dark:text-white">
+                  {Math.round(difference(1) * 100) / 100}
+                </p>
+                <span className="text-xs text-slate-500 dark:text-slate-400 tracking-tighter">(constant along whole domain)</span>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 italic">
                 This proves the theorem: any two antiderivatives differ by a
                 constant.
               </p>
@@ -385,28 +413,26 @@ export default function ConstantDifferenceProof({ params }) {
           )}
 
           {showProof && (
-            <div className="mt-3 p-3 bg-white rounded border">
-              <p className="text-sm text-green-700">
-                <strong>Green lines:</strong> Slope field showing the derivative
-                at each point.
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                Both F₁ and F₂ follow the same slope field everywhere — they
-                just start at different heights.
+            <div className="mt-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-emerald-900/50 animate-in fade-in slide-in-from-top-2">
+              <p className="text-sm text-emerald-700 dark:text-emerald-400 font-bold mb-1 uppercase tracking-tight">Slope Field:</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Both curves follow the <span className="text-emerald-600 font-bold dark:text-emerald-400 uppercase text-xs">same paths</span> locally. Their shapes are rigid copies of each other, shifted vertically.
               </p>
             </div>
           )}
         </div>
 
-        <div className="text-sm text-gray-600 text-center max-w-lg">
-          <p>
-            <strong>Theorem:</strong> If F'(x) = G'(x) for all x in an interval,
-            then F(x) = G(x) + C for some constant C.
-          </p>
-          <p className="mt-2">
-            <strong>Proof:</strong> Let H(x) = G(x) - F(x). Then H'(x) = 0, so H
-            is constant by the Mean Value Theorem.
-          </p>
+        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="mb-2">
+              <strong className="text-slate-900 dark:text-slate-200">Theorem:</strong> If F'(x) = G'(x) for all x in an interval,
+              then F(x) = G(x) + C for some constant C.
+            </p>
+            <p>
+              <strong className="text-slate-900 dark:text-slate-200">Proof Sketch:</strong> Let H(x) = G(x) - F(x). Then H'(x) = 0, so H
+              is constant by the Mean Value Theorem.
+            </p>
+          </div>
         </div>
       </div>
     </div>

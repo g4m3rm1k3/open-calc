@@ -1,6 +1,18 @@
 import * as d3 from 'd3'
 import { useRef, useEffect, useState, useCallback } from 'react'
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 const W = 580
 const ROAD_H = 80
 const GRAPH_H = 110
@@ -32,11 +44,22 @@ const PRESETS = [
   },
 ]
 
-const COLORS = { s: '#6470f1', v: '#10b981', a: '#f59e0b' }
+const COLORS = { s: '#6470f1', v: '#10b981', a: '#f89b29' }
 
 export default function PositionVelocityAcceleration({ params }) {
   const svgRef = useRef(null)
   const intervalRef = useRef(null)
+  const isDark = useIsDark()
+
+  const C = {
+    road: isDark ? '#0f172a' : '#1e293b',
+    roadLine: isDark ? '#334155' : '#f8fafc',
+    graphBg: isDark ? '#1e293b' : '#f8fafc',
+    zeroLine: isDark ? '#475569' : '#475569',
+    text: isDark ? '#94a3b8' : '#64748b',
+    axis: isDark ? '#334155' : '#475569',
+    labelMuted: isDark ? '#4b5563' : '#94a3b8'
+  }
 
   // New: Handle params for custom functions
   const hasParams = params && params.s && params.v && params.a
@@ -79,13 +102,13 @@ export default function PositionVelocityAcceleration({ params }) {
     roadG.append('rect')
       .attr('x', 0).attr('y', 0)
       .attr('width', W).attr('height', ROAD_H)
-      .attr('fill', '#1e293b')
+      .attr('fill', C.road)
 
     // Dashed center line
     roadG.append('line')
       .attr('x1', 0).attr('y1', ROAD_H / 2)
       .attr('x2', W).attr('y2', ROAD_H / 2)
-      .attr('stroke', '#f8fafc').attr('stroke-width', 2).attr('stroke-dasharray', '20,14')
+      .attr('stroke', C.roadLine).attr('stroke-width', 2).attr('stroke-dasharray', '20,14')
 
     // Car position: map t to [60, W-60]
     const tNorm = Math.min(t / tMax, 1)
@@ -119,7 +142,8 @@ export default function PositionVelocityAcceleration({ params }) {
     // Speed text
     roadG.append('text')
       .attr('x', W - 12).attr('y', ROAD_H - 8)
-      .attr('text-anchor', 'end').attr('font-size', 11).attr('fill', '#94a3b8')
+      .attr('text-anchor', 'end').attr('font-size', 11).attr('fill', C.text)
+      .attr('font-weight', 'bold')
       .text(`v = ${curV.toFixed(2)}`)
 
     // ── Helper to draw a mini-graph ────────────────────────────────────────
@@ -133,21 +157,21 @@ export default function PositionVelocityAcceleration({ params }) {
       g.append('rect')
         .attr('x', GM.left).attr('y', yOffset + GM.top)
         .attr('width', graphW).attr('height', GRAPH_H - GM.top - GM.bottom)
-        .attr('fill', '#f8fafc').attr('fill-opacity', 0.03)
+        .attr('fill', C.graphBg).attr('fill-opacity', isDark ? 0.3 : 0.03)
 
       // Zero line
       if (dMin < 0 && dMax > 0) {
         g.append('line')
           .attr('x1', GM.left).attr('x2', W - GM.right)
           .attr('y1', ySc(0)).attr('y2', ySc(0))
-          .attr('stroke', '#475569').attr('stroke-width', 0.8).attr('stroke-dasharray', '4,4')
+          .attr('stroke', C.zeroLine).attr('stroke-width', 0.8).attr('stroke-dasharray', '4,4')
       }
 
       // Full curve (light)
       const line = d3.line().x((_d, i) => xSc(ts[i])).y(d => ySc(d)).curve(d3.curveCatmullRom)
       g.append('path')
         .datum(data)
-        .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 1.5).attr('opacity', 0.25)
+        .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 1.5).attr('opacity', 0.2)
         .attr('d', line)
 
       // "Filled-in-so-far" portion
@@ -172,29 +196,29 @@ export default function PositionVelocityAcceleration({ params }) {
       // Current value dot
       g.append('circle')
         .attr('cx', curX).attr('cy', ySc(curVal))
-        .attr('r', 4).attr('fill', color).attr('stroke', '#fff').attr('stroke-width', 1.5)
+        .attr('r', 4).attr('fill', color).attr('stroke', isDark ? '#000' : '#fff').attr('stroke-width', 1.5)
 
       // Y-axis ticks
       ySc.ticks(3).forEach(tick => {
         g.append('text')
           .attr('x', GM.left - 5).attr('y', ySc(tick) + 4)
-          .attr('text-anchor', 'end').attr('font-size', 9).attr('fill', '#94a3b8')
+          .attr('text-anchor', 'end').attr('font-size', 9).attr('fill', C.text)
           .text(tick.toFixed(1))
         g.append('line')
           .attr('x1', GM.left - 3).attr('x2', GM.left)
           .attr('y1', ySc(tick)).attr('y2', ySc(tick))
-          .attr('stroke', '#94a3b8').attr('stroke-width', 1)
+          .attr('stroke', C.axis).attr('stroke-width', 1)
       })
 
       // Axes
       g.append('line')
         .attr('x1', GM.left).attr('x2', GM.left)
         .attr('y1', yOffset + GM.top).attr('y2', yOffset + GRAPH_H - GM.bottom)
-        .attr('stroke', '#475569').attr('stroke-width', 1)
+        .attr('stroke', C.axis).attr('stroke-width', 1)
       g.append('line')
         .attr('x1', GM.left).attr('x2', W - GM.right)
         .attr('y1', yOffset + GRAPH_H - GM.bottom).attr('y2', yOffset + GRAPH_H - GM.bottom)
-        .attr('stroke', '#475569').attr('stroke-width', 1)
+        .attr('stroke', C.axis).attr('stroke-width', 1)
 
       // Label
       g.append('text')
@@ -206,6 +230,7 @@ export default function PositionVelocityAcceleration({ params }) {
       g.append('text')
         .attr('x', W - GM.right - 4).attr('y', yOffset + GM.top + 13)
         .attr('text-anchor', 'end').attr('font-size', 11).attr('fill', color)
+        .attr('font-weight', 'bold')
         .text(`${curVal.toFixed(3)}`)
     }
 
@@ -221,10 +246,10 @@ export default function PositionVelocityAcceleration({ params }) {
     // Time label on last graph
     svg.append('text')
       .attr('x', W / 2).attr('y', g3Y + GRAPH_H - 2)
-      .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#64748b')
+      .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', C.text)
       .text(`t = ${tC.toFixed(2)} / ${tMax.toFixed(2)} s`)
 
-  }, [t, preset, hasParams, tMax, s, v, a, sVals, vVals, aVals, sMin, sMax, vMin, vMax, aMin, aMax])
+  }, [t, preset, hasParams, tMax, s, v, a, sVals, vVals, aVals, sMin, sMax, vMin, vMax, aMin, aMax, isDark])
 
   // Timer
   useEffect(() => {
@@ -248,27 +273,27 @@ export default function PositionVelocityAcceleration({ params }) {
   }, [])
 
   return (
-    <div>
+    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 transition-colors">
       <svg ref={svgRef} width="100%" viewBox={"0 0 " + W + " " + TOTAL_H} className="overflow-visible" />
-      <div className="flex flex-wrap items-center justify-center gap-2 mt-3 px-4">
+      <div className="flex flex-wrap items-center justify-center gap-2 mt-4 px-4">
         {!hasParams && PRESETS.map((p, i) => (
           <button
             key={i}
             onClick={() => { setPreset(i); reset() }}
-            className={`px-3 py-1 rounded text-sm transition ${preset === i ? 'bg-brand-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600'}`}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${preset === i ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             {p.label}
           </button>
         ))}
         <button
           onClick={() => setPlaying(p => !p)}
-          className="px-4 py-1 rounded bg-brand-500 text-white text-sm hover:bg-brand-600 transition"
+          className="px-6 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-bold shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 transition-all active:scale-95 ml-2"
         >
-          {playing ? '⏸ Pause' : t > 0 ? '▶ Resume' : '▶ Play'}
+          {playing ? '⏸ Pause' : t > 0 ? '▶ Resume' : '▶ Start Animation'}
         </button>
         <button
           onClick={reset}
-          className="px-3 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition"
+          className="px-4 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
         >
           ↺ Reset
         </button>

@@ -2,6 +2,18 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import * as d3 from 'd3'
 import SliderControl from '../SliderControl.jsx'
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 const SVG_W = 580
 const SVG_H = 400
 
@@ -34,6 +46,7 @@ export default function VerticalThrow() {
   const rafRef = useRef(null)
   const startTimeRef = useRef(null)
   const playingRef = useRef(false)
+  const isDark = useIsDark()
 
   const [v0, setV0] = useState(64)
   const [playing, setPlaying] = useState(false)
@@ -42,6 +55,18 @@ export default function VerticalThrow() {
   const tFlight = (2 * v0) / 32    // time when ball lands
   const tPeak = v0 / 32             // time of max height
   const hMax = hFn(tPeak, v0)       // max height
+
+  const C = {
+    panelBg: isDark ? '#0f172a' : '#f8fafc',
+    ground: isDark ? '#1e293b' : '#e2e8f0',
+    grid: isDark ? '#1e293b' : '#e2e8f0',
+    textMuted: isDark ? '#475569' : '#94a3b8',
+    textMain: isDark ? '#94a3b8' : '#64748b',
+    axis: isDark ? '#334155' : '#64748b',
+    ball: '#6470f1',
+    velocity: '#f59e0b',
+    peak: '#ef4444'
+  }
 
   // Map height in feet to pixel y inside the left track
   const heightToY = useCallback(
@@ -65,7 +90,7 @@ export default function VerticalThrow() {
       .attr('y', CEILING_Y)
       .attr('width', TRACK_W)
       .attr('height', GROUND_Y - CEILING_Y)
-      .attr('fill', '#f8fafc')
+      .attr('fill', C.panelBg)
 
     // Ground
     svg
@@ -74,7 +99,7 @@ export default function VerticalThrow() {
       .attr('y', GROUND_Y)
       .attr('width', TRACK_W)
       .attr('height', SVG_H - GROUND_Y)
-      .attr('fill', '#e2e8f0')
+      .attr('fill', C.ground)
 
     svg
       .append('line')
@@ -82,7 +107,7 @@ export default function VerticalThrow() {
       .attr('x2', TRACK_W)
       .attr('y1', GROUND_Y)
       .attr('y2', GROUND_Y)
-      .attr('stroke', '#64748b')
+      .attr('stroke', C.axis)
       .attr('stroke-width', 2)
 
     // Ruler on left edge
@@ -93,7 +118,7 @@ export default function VerticalThrow() {
       .attr('x2', rulerX)
       .attr('y1', CEILING_Y)
       .attr('y2', GROUND_Y)
-      .attr('stroke', '#94a3b8')
+      .attr('stroke', C.textMuted)
       .attr('stroke-width', 1.5)
 
     const tickStep = hMax > 80 ? 20 : 10
@@ -105,7 +130,7 @@ export default function VerticalThrow() {
         .attr('x2', rulerX + 5)
         .attr('y1', ty)
         .attr('y2', ty)
-        .attr('stroke', '#94a3b8')
+        .attr('stroke', C.textMuted)
         .attr('stroke-width', 1)
 
       svg
@@ -114,7 +139,7 @@ export default function VerticalThrow() {
         .attr('y', ty + 4)
         .attr('text-anchor', 'end')
         .attr('font-size', 10)
-        .attr('fill', '#94a3b8')
+        .attr('fill', C.textMuted)
         .text(h)
     }
 
@@ -125,7 +150,7 @@ export default function VerticalThrow() {
       .attr('y', CEILING_Y - 6)
       .attr('text-anchor', 'end')
       .attr('font-size', 10)
-      .attr('fill', '#94a3b8')
+      .attr('fill', C.textMuted)
       .text('ft')
 
     // Peak dashed line
@@ -137,7 +162,7 @@ export default function VerticalThrow() {
       .attr('x2', TRACK_W)
       .attr('y1', peakY)
       .attr('y2', peakY)
-      .attr('stroke', '#ef4444')
+      .attr('stroke', C.peak)
       .attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '5,3')
 
@@ -147,7 +172,7 @@ export default function VerticalThrow() {
       .attr('y', peakY - 5)
       .attr('text-anchor', 'end')
       .attr('font-size', 10)
-      .attr('fill', '#ef4444')
+      .attr('fill', C.peak)
       .text(`hₘₐₓ = ${hMax.toFixed(0)} ft`)
 
     // Ball (will be repositioned in animation)
@@ -157,8 +182,8 @@ export default function VerticalThrow() {
       .attr('r', 10)
       .attr('cx', TRACK_W / 2)
       .attr('cy', GROUND_Y)
-      .attr('fill', '#6470f1')
-      .attr('stroke', '#4f46e5')
+      .attr('fill', C.ball)
+      .attr('stroke', isDark ? '#fff' : '#4f46e5')
       .attr('stroke-width', 1.5)
 
     // Peak flash label (hidden initially)
@@ -169,7 +194,7 @@ export default function VerticalThrow() {
       .attr('y', peakY - 14)
       .attr('font-size', 11)
       .attr('font-weight', 'bold')
-      .attr('fill', '#ef4444')
+      .attr('fill', C.peak)
       .attr('opacity', 0)
       .text('Max height! v = 0')
 
@@ -190,7 +215,7 @@ export default function VerticalThrow() {
       .attr('y', GRAPH_Y1)
       .attr('width', GRAPH_X2 - GRAPH_X1)
       .attr('height', GRAPH_Y2 - GRAPH_Y1)
-      .attr('fill', '#f8fafc')
+      .attr('fill', C.panelBg)
 
     // Grid
     tScaleFn.ticks(5).forEach((tv) => {
@@ -200,7 +225,7 @@ export default function VerticalThrow() {
         .attr('x2', tScaleFn(tv))
         .attr('y1', innerT)
         .attr('y2', innerB)
-        .attr('stroke', '#e2e8f0')
+        .attr('stroke', C.grid)
         .attr('stroke-width', 1)
     })
     hScaleFn.ticks(5).forEach((hv) => {
@@ -210,7 +235,7 @@ export default function VerticalThrow() {
         .attr('x2', innerR)
         .attr('y1', hScaleFn(hv))
         .attr('y2', hScaleFn(hv))
-        .attr('stroke', '#e2e8f0')
+        .attr('stroke', C.grid)
         .attr('stroke-width', 1)
     })
 
@@ -221,7 +246,7 @@ export default function VerticalThrow() {
       .attr('x2', innerR)
       .attr('y1', hScaleFn(0))
       .attr('y2', hScaleFn(0))
-      .attr('stroke', '#94a3b8')
+      .attr('stroke', C.textMuted)
       .attr('stroke-width', 1.5)
 
     // Axes
@@ -231,7 +256,7 @@ export default function VerticalThrow() {
       .attr('x2', innerR)
       .attr('y1', innerB)
       .attr('y2', innerB)
-      .attr('stroke', '#64748b')
+      .attr('stroke', C.axis)
       .attr('stroke-width', 1.5)
 
     svg
@@ -240,7 +265,7 @@ export default function VerticalThrow() {
       .attr('x2', innerL)
       .attr('y1', innerT)
       .attr('y2', innerB)
-      .attr('stroke', '#64748b')
+      .attr('stroke', C.axis)
       .attr('stroke-width', 1.5)
 
     // Right y-axis for v(t)
@@ -250,7 +275,7 @@ export default function VerticalThrow() {
       .attr('x2', innerR)
       .attr('y1', innerT)
       .attr('y2', innerB)
-      .attr('stroke', '#f59e0b')
+      .attr('stroke', C.velocity)
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '4,3')
 
@@ -262,7 +287,7 @@ export default function VerticalThrow() {
         .attr('y', innerB + 16)
         .attr('text-anchor', 'middle')
         .attr('font-size', 10)
-        .attr('fill', '#64748b')
+        .attr('fill', C.textMain)
         .text(tv.toFixed(1))
     })
 
@@ -272,7 +297,7 @@ export default function VerticalThrow() {
       .attr('y', innerB + 28)
       .attr('text-anchor', 'middle')
       .attr('font-size', 11)
-      .attr('fill', '#64748b')
+      .attr('fill', C.textMain)
       .text('t (seconds)')
 
     // H-axis ticks (left)
@@ -283,7 +308,7 @@ export default function VerticalThrow() {
         .attr('y', hScaleFn(hv) + 4)
         .attr('text-anchor', 'end')
         .attr('font-size', 10)
-        .attr('fill', '#64748b')
+        .attr('fill', C.textMain)
         .text(hv)
     })
 
@@ -294,7 +319,7 @@ export default function VerticalThrow() {
       .attr('y', GRAPH_X1 + 10)
       .attr('text-anchor', 'middle')
       .attr('font-size', 11)
-      .attr('fill', '#6470f1')
+      .attr('fill', C.ball)
       .text('h (ft)')
 
     // V-axis ticks (right)
@@ -305,7 +330,7 @@ export default function VerticalThrow() {
         .attr('y', vScaleFn(vv) + 4)
         .attr('text-anchor', 'start')
         .attr('font-size', 10)
-        .attr('fill', '#f59e0b')
+        .attr('fill', C.velocity)
         .text(vv)
     })
 
@@ -316,7 +341,7 @@ export default function VerticalThrow() {
       .attr('y', -(GRAPH_X2 - 8))
       .attr('text-anchor', 'middle')
       .attr('font-size', 11)
-      .attr('fill', '#f59e0b')
+      .attr('fill', C.velocity)
       .text('v (ft/s)')
 
     // Parabola h(t)
@@ -336,7 +361,7 @@ export default function VerticalThrow() {
       .datum(parabolaData)
       .attr('d', parabolaLine)
       .attr('fill', 'none')
-      .attr('stroke', '#6470f1')
+      .attr('stroke', C.ball)
       .attr('stroke-width', 2.5)
 
     // Velocity line v(t)
@@ -354,7 +379,7 @@ export default function VerticalThrow() {
       .datum(velData)
       .attr('d', velLine)
       .attr('fill', 'none')
-      .attr('stroke', '#f59e0b')
+      .attr('stroke', C.velocity)
       .attr('stroke-width', 2)
       .attr('stroke-dasharray', '6,3')
 
@@ -366,7 +391,7 @@ export default function VerticalThrow() {
       .attr('x2', tPeakX)
       .attr('y1', innerT)
       .attr('y2', innerB)
-      .attr('stroke', '#ef4444')
+      .attr('stroke', C.peak)
       .attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '5,3')
 
@@ -375,7 +400,7 @@ export default function VerticalThrow() {
       .attr('x', tPeakX + 4)
       .attr('y', innerT + 14)
       .attr('font-size', 10)
-      .attr('fill', '#ef4444')
+      .attr('fill', C.peak)
       .text(`t* = v₀/32`)
 
     svg
@@ -383,7 +408,7 @@ export default function VerticalThrow() {
       .attr('x', tPeakX + 4)
       .attr('y', innerT + 26)
       .attr('font-size', 10)
-      .attr('fill', '#ef4444')
+      .attr('fill', C.peak)
       .text('v = 0 here')
 
     // X-intercept dots (t=0 and t=tFlight)
@@ -414,7 +439,7 @@ export default function VerticalThrow() {
       .attr('y', hScaleFn(hFn(tFlight * 0.15, v0)) - 10)
       .attr('font-size', 11)
       .attr('font-style', 'italic')
-      .attr('fill', '#6470f1')
+      .attr('fill', C.ball)
       .text('h(t) = v₀t − 16t²')
 
     svg
@@ -423,7 +448,7 @@ export default function VerticalThrow() {
       .attr('y', vScaleFn(vFn(tFlight * 0.1, v0)) - 8)
       .attr('font-size', 11)
       .attr('font-style', 'italic')
-      .attr('fill', '#f59e0b')
+      .attr('fill', C.velocity)
       .text('v(t) = v₀ − 32t')
 
     // Animated dot on curve
@@ -433,12 +458,10 @@ export default function VerticalThrow() {
       .attr('r', 5)
       .attr('cx', tScaleFn(0))
       .attr('cy', hScaleFn(0))
-      .attr('fill', '#6470f1')
+      .attr('fill', C.ball)
       .attr('opacity', 0)
 
-  }, [v0, tFlight, tPeak, hMax, heightToY])
-
-  const ANIM_DURATION_S = tFlight * 1.0
+  }, [v0, tFlight, tPeak, hMax, heightToY, isDark])
 
   const animate = useCallback(
     (timestamp) => {
@@ -514,18 +537,18 @@ export default function VerticalThrow() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center gap-3 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-      <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">Vertical Throw — Height & Velocity</h3>
+    <div className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors shadow-sm">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tight">Vertical Throw: Height & Velocity</h3>
 
       <svg
         ref={svgRef}
         width={SVG_W}
         height={SVG_H}
-        className="rounded-lg border border-slate-100 dark:border-slate-800"
-        style={{ maxWidth: '100%' }}
+        className="rounded-xl border border-slate-100 dark:border-slate-800 shadow-inner"
+        style={{ maxWidth: '100%', backgroundColor: C.panelBg }}
       />
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
         <SliderControl
           label={`v₀ (initial velocity)`}
           min={32}
@@ -539,15 +562,21 @@ export default function VerticalThrow() {
 
       <button
         onClick={handlePlayPause}
-        className="px-5 py-1.5 rounded-lg text-white text-sm font-medium transition-colors"
-        style={{ backgroundColor: playing ? '#64748b' : '#6470f1' }}
+        className="px-8 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg transition-all active:scale-95 flex items-center gap-2"
+        style={{ background: playing ? '#64748b' : 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' }}
       >
-        {playing ? 'Pause' : 'Play'}
+        {playing ? (
+          <><span>⏸</span> Pause</>
+        ) : (
+          <><span>▶</span> {tPeak > 0 ? 'Restart' : 'Launch Simulation'}</>
+        )}
       </button>
 
-      <p className="text-xs text-slate-500 dark:text-slate-400 text-center max-w-lg leading-relaxed">
-        The ball reaches maximum height when v(t) = v₀ − 32t = 0, i.e., t = v₀/32. At the peak, the derivative is zero — this is a critical point.
-      </p>
+      <div className="p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-100/50 dark:border-blue-900/30 max-w-lg">
+        <p className="text-xs text-slate-600 dark:text-slate-400 text-center leading-relaxed italic">
+          The ball reaches maximum height when <span className="font-bold text-blue-600 dark:text-blue-400">v(t) = v₀ − 32t = 0</span>, i.e., t = v₀/32. At the peak, the derivative of height is zero.
+        </p>
+      </div>
     </div>
-  )
+  );
 }

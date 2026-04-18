@@ -1,6 +1,18 @@
 import * as d3 from "d3";
 import { useRef, useEffect, useState } from "react";
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const ob = new MutationObserver(update);
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => ob.disconnect();
+  }, []);
+  return isDark;
+}
+
 const W = 600,
   H = 450;
 const MARGIN = { top: 20, right: 20, bottom: 80, left: 60 };
@@ -44,8 +56,18 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
   const svgRef = useRef();
   const [exampleIdx, setExampleIdx] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const isDark = useIsDark();
 
   const example = EXAMPLES[exampleIdx];
+
+  const C = {
+    text: isDark ? "#94a3b8" : "#64748b",
+    grid: isDark ? "#334155" : "#e2e8f0",
+    red: isDark ? "#f87171" : "#ef4444",
+    blue: isDark ? "#60a5fa" : "#3b82f6",
+    bg: isDark ? "#0f172a" : "#ffffff",
+    border: isDark ? "#1e293b" : "#e5e7eb"
+  };
 
   const makeFn = (expr) => {
     try {
@@ -108,13 +130,13 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
       .append("g")
       .attr("transform", `translate(0,${H - MARGIN.bottom})`)
       .call(d3.axisBottom(xScale).ticks(6))
-      .attr("color", "#64748b");
+      .attr("color", C.text);
 
     svg
       .append("g")
       .attr("transform", `translate(${MARGIN.left},0)`)
       .call(d3.axisLeft(yScale).ticks(6))
-      .attr("color", "#64748b");
+      .attr("color", C.text);
 
     // Plot derivative function (red)
     const line = d3
@@ -127,7 +149,7 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
       .append("path")
       .datum(fPoints)
       .attr("fill", "none")
-      .attr("stroke", "#ef4444")
+      .attr("stroke", C.red)
       .attr("stroke-width", 3)
       .attr("d", line);
 
@@ -137,7 +159,7 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
         .append("path")
         .datum(FPoints)
         .attr("fill", "none")
-        .attr("stroke", "#3b82f6")
+        .attr("stroke", C.blue)
         .attr("stroke-width", 3)
         .attr("d", line);
     }
@@ -149,7 +171,7 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
       .attr("y", MARGIN.top + 20)
       .attr("font-size", 14)
       .attr("font-weight", "bold")
-      .attr("fill", "#ef4444")
+      .attr("fill", C.red)
       .text(`f(x) = ${example.f.replace("Math.", "")}`);
 
     if (showAnswer) {
@@ -159,7 +181,7 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
         .attr("y", MARGIN.top + 40)
         .attr("font-size", 14)
         .attr("font-weight", "bold")
-        .attr("fill", "#3b82f6")
+        .attr("fill", C.blue)
         .text(`F(x) = ${example.F.replace("Math.", "")}`);
     }
 
@@ -170,7 +192,7 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
       .attr("y", H - 10)
       .attr("text-anchor", "middle")
       .attr("font-size", 12)
-      .attr("fill", "#64748b")
+      .attr("fill", C.text)
       .text("x");
 
     svg
@@ -180,9 +202,9 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
       .attr("y", 15)
       .attr("text-anchor", "middle")
       .attr("font-size", 12)
-      .attr("fill", "#64748b")
+      .attr("fill", C.text)
       .text("y");
-  }, [exampleIdx, showAnswer]);
+  }, [exampleIdx, showAnswer, isDark]);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -190,36 +212,37 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
         ref={svgRef}
         width={W}
         height={H}
-        className="border border-gray-200 rounded"
+        className="border rounded transition-colors duration-300"
+        style={{ backgroundColor: C.bg, borderColor: C.border }}
       ></svg>
 
-      <div className="flex flex-col gap-4 w-full max-w-2xl">
+      <div className="flex flex-col gap-4 w-full max-w-2xl px-4">
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">
+          <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100">
             Reverse Engineering: From Rate to Function
           </h3>
-          <p className="text-gray-700 mb-4">
+          <p className="text-slate-700 dark:text-slate-300 mb-4">
             Antiderivatives are about working backwards. Given a{" "}
             <strong>rate of change</strong> (the derivative), find the{" "}
             <strong>original function</strong> that was changing at that rate.
           </p>
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-blue-800 mb-2">
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800 transition-colors">
+          <h4 className="font-bold text-blue-900 dark:text-blue-300 mb-2 text-lg">
             {example.name} Example
           </h4>
-          <p className="text-blue-700 mb-3">{example.description}</p>
+          <p className="text-blue-800 dark:text-blue-400 mb-4">{example.description}</p>
 
-          <div className="flex items-center gap-4 mb-3">
-            <label className="text-sm font-medium">Choose example:</label>
+          <div className="flex items-center gap-4 mb-6">
+            <label className="text-sm font-semibold text-blue-900 dark:text-blue-200 uppercase tracking-wider">Example:</label>
             <select
               value={exampleIdx}
               onChange={(e) => {
                 setExampleIdx(Number(e.target.value));
                 setShowAnswer(false);
               }}
-              className="px-3 py-1 border border-gray-300 rounded"
+              className="px-4 py-2 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none"
             >
               {EXAMPLES.map((ex, i) => (
                 <option key={i} value={i}>
@@ -230,48 +253,56 @@ export default function ReverseEngineeringAntiderivatives({ params }) {
           </div>
 
           {!showAnswer && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-600">
-                <strong>Red curve:</strong> The rate of change f(x) ={" "}
-                {example.f.replace("Math.", "")}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Question:</strong> What function F(x) has derivative f(x)?
-              </p>
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-white dark:bg-slate-800/50 rounded-lg">
+                  <span className="text-xs font-bold text-red-500 uppercase">Rate (f)</span>
+                  <p className="font-mono text-slate-900 dark:text-slate-100">{example.f.replace("Math.", "")}</p>
+                </div>
+                <div className="p-3 bg-white/50 dark:bg-slate-800/20 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-lg flex items-center justify-center">
+                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400">???</span>
+                </div>
+              </div>
               <button
                 onClick={() => setShowAnswer(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-200 dark:shadow-none transition-all active:scale-95"
               >
-                Reveal Answer
+                Reveal Original Function
               </button>
             </div>
           )}
 
           {showAnswer && (
-            <div className="space-y-3">
-              <p className="text-sm text-green-700">
-                <strong>Answer:</strong> {example.answer}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Blue curve:</strong> The antiderivative F(x) ={" "}
-                {example.F.replace("Math.", "")}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Verification:</strong> d/dx[F(x)] = f(x) ✓
-              </p>
+            <div className="space-y-4 animate-in zoom-in-95 duration-500">
+               <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-white dark:bg-slate-800/50 rounded-lg">
+                  <span className="text-xs font-bold text-red-500 uppercase">Rate (f)</span>
+                  <p className="font-mono text-slate-900 dark:text-slate-100">{example.f.replace("Math.", "")}</p>
+                </div>
+                <div className="p-3 bg-blue-600 dark:bg-blue-500 rounded-lg">
+                  <span className="text-xs font-bold text-blue-100 uppercase">Original (F)</span>
+                  <p className="font-mono text-white font-bold">{example.F.replace("Math.", "")}</p>
+                </div>
+              </div>
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-sm">
+                <p className="text-green-800 dark:text-green-300 leading-relaxed font-medium">
+                  <strong className="block text-xs uppercase mb-1">Observation:</strong>
+                  {example.answer}
+                </p>
+              </div>
               <button
                 onClick={() => setShowAnswer(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                className="w-full px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold rounded-lg transition-colors"
               >
-                Try Another Example
+                Reset Example
               </button>
             </div>
           )}
         </div>
 
-        <div className="text-sm text-gray-600 text-center max-w-lg">
-          <p>
-            <strong>Key Insight:</strong> Every derivative rule can be read
+        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong className="text-slate-900 dark:text-slate-200">Key Insight:</strong> Every derivative rule can be read
             backwards to give an antiderivative rule. This is why you already
             know every antiderivative rule — you just need to reverse your
             differentiation knowledge!
