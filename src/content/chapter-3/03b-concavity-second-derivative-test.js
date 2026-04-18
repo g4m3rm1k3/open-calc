@@ -8,15 +8,8 @@ export default {
   tags: ['concavity', 'second-derivative-test', 'inflection-points', 'concave-up', 'concave-down', 'f-double-prime', 'curve-analysis'],
 
   hook: {
-    question: 'Unemployment is falling — is that good news? It depends on whether it\'s falling faster or slower.',
-    realWorldContext:
-      'If unemployment is falling but falling more slowly each month, the derivative of the unemployment rate is negative (good) ' +
-      'but the second derivative is positive (slowing down — less good). ' +
-      'Economists call this "disinflation" vs. "deflation." ' +
-      'In physics, an object slowing down as it lands is near a minimum of velocity — f\' = 0, f\'\' > 0. ' +
-      'The second derivative tells you not just where a quantity is, ' +
-      'but whether its CHANGE is itself accelerating or decelerating. ' +
-      'It\'s the difference between "recovering" and "recovering faster" — a critical distinction.',
+    question: 'Unemployment is falling — is that good news? It depends on whether it is falling faster or slower.',
+    realWorldContext: 'If unemployment is falling but falling more slowly each month, the unemployment rate has a negative derivative (it is decreasing — good), but a POSITIVE second derivative (the rate of decrease is itself slowing down — less good). In physics, an object landing softly is near the minimum of its velocity — the derivative is zero and the second derivative is positive. The second derivative tells you not just where a quantity is, but whether its rate of change is speeding up or slowing down. It is the difference between recovering and recovering faster.',
     previewVisualizationId: '',
   },
 
@@ -25,40 +18,33 @@ export default {
       {
         type: 'prose',
         paragraphs: [
-          'Concavity describes the shape of a curve — specifically, which way it "bends."',
-          '**Concave up** (∪ shape): the function curves upward. Tangent lines are BELOW the curve. ' +
-          'Think of a bowl: water collects in the bottom. The slope (f\') is increasing from left to right.',
-          '**Concave down** (∩ shape): the function curves downward. Tangent lines are ABOVE the curve. ' +
-          'Think of a hill: the slope (f\') is decreasing from left to right.',
+          'We already know: f\'(x) is the slope of f at each point. The sign of f\'(x) tells us whether f is rising or falling.',
+          'The second derivative f\'\'(x) is the slope of f\'(x) — it tells us whether the SLOPE ITSELF is increasing or decreasing.',
+          '**Concave up (∪ shape)**: the slope is getting MORE positive from left to right. Think of a bowl — as you move right, the sides tilt more steeply upward. Tangent lines are all BELOW the curve.',
+          '**Concave down (∩ shape)**: the slope is getting LESS positive (more negative). Think of a hill — as you move right, the sides tilt more steeply downward. Tangent lines are all ABOVE the curve.',
         ],
       },
       {
         type: 'callout',
         callout: {
           type: 'intuition',
-          title: 'f\'\' Controls Concavity',
-          body: 'f\'\'(x) > 0  →  f\' is increasing  →  concave UP  (slope tilting more positive)\n' +
-                'f\'\'(x) < 0  →  f\' is decreasing  →  concave DOWN  (slope tilting more negative)\n\n' +
-                'Memory trick: f\'\' looks like "two frowns → concave down" or think: positive = happy = U-shaped (concave up).',
+          title: 'f\'\' Controls Concavity — The Connection',
+          body: 'f\'\'(x) > 0  →  f\'(x) is increasing  →  slope tilts more upward  →  CONCAVE UP  (∪)\nf\'\'(x) < 0  →  f\'(x) is decreasing  →  slope tilts more downward  →  CONCAVE DOWN  (∩)\n\nMemory: positive second derivative = happy face 😊 = bowl shape (∪).\nNegative second derivative = sad face 🙁 = dome shape (∩).',
         },
       },
       {
         type: 'viz',
         id: '',
         title: 'Concavity and the Second Derivative',
-        mathBridge:
-          'Where f\'\' > 0, the curve bends upward. Where f\'\' < 0, it bends downward. ' +
-          'Where f\'\' changes sign, there is an inflection point.',
-        caption: 'Drag along the curve. The sign of f\'\' controls the concavity in each region. ' +
-                 'Yellow region = concave up, blue = concave down.',
+        mathBridge: 'Where f\'\' > 0, the curve bends upward. Where f\'\' < 0, it bends downward. The sign of f\'\' is a concavity map for f.',
+        caption: 'Yellow = concave up (f\'\' > 0). Blue = concave down (f\'\' < 0). The boundary between regions is an inflection point.',
       },
       {
         type: 'callout',
         callout: {
           type: 'definition',
           title: 'Inflection Point',
-          body: 'A point $(c, f(c))$ is an **inflection point** if $f$ is continuous at $c$ AND the concavity changes at $c$ (from up to down, or from down to up).\n\n' +
-                'Necessary (but not sufficient) condition: $f\'\'(c) = 0$ or $f\'\'(c)$ DNE.',
+          body: 'A point $(c, f(c))$ is an **inflection point** if:\n1. $f$ is continuous at $c$, AND\n2. The concavity CHANGES at $c$ (from ∪ to ∩, or from ∩ to ∪)\n\nA necessary condition: $f\'\'(c) = 0$ or $f\'\'(c)$ does not exist.\nBut this is NOT sufficient — $f\'\'(c) = 0$ alone does not guarantee an inflection point.\nYou must verify that the concavity actually changes.',
         },
       },
     ],
@@ -71,53 +57,78 @@ export default {
         callout: {
           type: 'theorem',
           title: 'Concavity Test',
-          body: '\\text{If } f\'\'(x) > 0 \\text{ on } (a,b) \\Rightarrow f \\text{ is concave UP on } (a,b) \\\\ \\text{If } f\'\'(x) < 0 \\text{ on } (a,b) \\Rightarrow f \\text{ is concave DOWN on } (a,b)',
+          body: 'If $f\'\'(x) > 0$ for all $x \\in (a,b)$: $f$ is concave UP on $(a,b)$ \\\\ If $f\'\'(x) < 0$ for all $x \\in (a,b)$: $f$ is concave DOWN on $(a,b)$',
+        },
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**How to compute f\'\'(x) — you differentiate f\'(x) using the same rules:**',
+          '',
+          'Here is a complete example. Let f(x) = x³ − 3x.',
+          '',
+          '**Step 1: Compute f\'(x).**',
+          'Power rule (d/dx[xⁿ] = nxⁿ⁻¹ on each term):',
+          '  f\'(x) = 3x² − 3',
+          '',
+          '**Step 2: Compute f\'\'(x) by differentiating f\'(x).**',
+          'f\'(x) = 3x² − 3. Apply the power rule again:',
+          '  f\'\'(x) = 6x − 0 = 6x',
+          '',
+          '**Step 3: Analyze the sign of f\'\'(x).**',
+          '  f\'\'(x) = 6x > 0 when x > 0  →  concave UP on (0, ∞)',
+          '  f\'\'(x) = 6x < 0 when x < 0  →  concave DOWN on (−∞, 0)',
+          '  f\'\'(0) = 0 and concavity changes at x = 0  →  inflection point at (0, 0)',
+        ],
+      },
+      {
+        type: 'callout',
+        callout: {
+          type: 'insight',
+          title: 'Computing f\'\' When f\' Involves a Product — Use the Product Rule Again',
+          body: 'If f\'(x) is a product (something)·(something else), differentiate it using the product rule: d/dx[u·v] = u\'v + uv\'.\n\nExample: find f\'\'(x) for f(x) = x·sin x\n  f\'(x) = sin x + x·cos x   [product rule: (x)\'·sin x + x·(sin x)\']\n  f\'\'(x) = d/dx[sin x + x cos x]\n         = cos x + (cos x + x·(−sin x))\n         = cos x + cos x − x sin x\n         = 2cos x − x sin x\n\nThe same rules apply every time — just applied to f\'(x) instead of f(x).',
         },
       },
       {
         type: 'callout',
         callout: {
           type: 'theorem',
-          title: 'Second Derivative Test',
-          body: '\\text{Let } f\'(c) = 0 \\text{ (c is a critical point).} \\\\ f\'\'(c) > 0 \\Rightarrow \\text{local MINIMUM at } c \\text{ (concave up = bowl)} \\\\ f\'\'(c) < 0 \\Rightarrow \\text{local MAXIMUM at } c \\text{ (concave down = dome)} \\\\ f\'\'(c) = 0 \\Rightarrow \\text{INCONCLUSIVE — use the First Derivative Test}',
+          title: 'Second Derivative Test (SDT)',
+          body: 'Let $c$ be a critical point where $f\'(c) = 0$.\n\n• $f\'\'(c) > 0$: the graph is a **bowl** at $c$ → **local MINIMUM**\n• $f\'\'(c) < 0$: the graph is a **dome** at $c$ → **local MAXIMUM**\n• $f\'\'(c) = 0$: the test is **INCONCLUSIVE** — use the First Derivative Test instead',
         },
       },
       {
         type: 'callout',
         callout: {
           type: 'insight',
-          title: 'Why the Second Derivative Test Makes Sense',
-          body: 'At a critical point c (f\'(c) = 0, tangent line is horizontal):\n' +
-                '• If f\'\'(c) > 0: the function is concave UP here. A bowl with a horizontal tangent at the bottom must be a LOCAL MIN.\n' +
-                '• If f\'\'(c) < 0: concave DOWN. A dome with a horizontal tangent at the top must be a LOCAL MAX.\n' +
-                '• If f\'\'(c) = 0: could be an inflection point, or a max/min — more information needed.',
+          title: 'Why the SDT Makes Sense — Visualized',
+          body: 'At a critical point c, f\'(c) = 0 — the tangent line is horizontal.\n\nCase f\'\'(c) > 0: the graph bends upward (concave up) at that point.\nA horizontal tangent at the bottom of a bowl = local MINIMUM.\n\nCase f\'\'(c) < 0: the graph bends downward (concave down) at that point.\nA horizontal tangent at the top of a dome = local MAXIMUM.\n\nImagine balancing a ball on the curve: at a local min (bowl), the ball stays. At a local max (dome), it rolls off.',
         },
       },
       {
         type: 'callout',
         callout: {
           type: 'tip',
-          title: 'First vs. Second Derivative Test — When to Use Each',
-          body: '**Use the Second Derivative Test when:**\n' +
-                '• f\'\' is easy to compute\n' +
-                '• f\'\'(c) ≠ 0 at your critical point (gives a definitive answer)\n\n' +
-                '**Use the First Derivative Test when:**\n' +
-                '• f\'\' is messy or hard to compute\n' +
-                '• f\'\'(c) = 0 (SDT is inconclusive)\n' +
-                '• You need intervals of increase/decrease anyway (like for curve sketching)\n\n' +
-                'Both tests answer the same question: is a critical point a max, min, or neither?',
+          title: 'SDT vs. FDT — Choose the Right Tool',
+          body: 'Use the SDT when:\n• f\'\' is easy to compute (most polynomial and trig functions)\n• f\'\'(c) ≠ 0 at the critical point (gives a definitive answer quickly)\n\nFall back to the FDT when:\n• f\'\' is hard to compute (messy rational or implicit functions)\n• f\'\'(c) = 0 (SDT fails → sign chart is the only reliable tool)\n\nBoth answer the same question, but the SDT is often a faster check.',
         },
       },
       {
         type: 'prose',
         paragraphs: [
-          '**Procedure for Finding Inflection Points:**',
+          '**Inflection point checklist — always verify the SIGN CHANGE:**',
           '1. Compute f\'\'(x)',
-          '2. Find candidates: all x where f\'\'(x) = 0 or f\'\'(x) DNE (and f is continuous there)',
-          '3. Test concavity on each side of each candidate',
-          '4. If f\'\' changes sign: inflection point. If not: no inflection point.',
-          '**Warning**: f\'\'(c) = 0 does NOT automatically mean inflection point. ' +
-          'f(x) = x⁴ has f\'\'(0) = 0 but x = 0 is a local minimum (concave up on both sides — no sign change).',
+          '2. Solve f\'\'(x) = 0 and find where f\'\'(x) DNE → these are inflection CANDIDATES',
+          '3. At each candidate c, test the sign of f\'\' on each side:',
+          '   • If f\'\' goes + → −: concavity changes (concave up → down) → inflection point ✓',
+          '   • If f\'\' goes − → +: concavity changes (concave down → up) → inflection point ✓',
+          '   • If f\'\' keeps the same sign: NOT an inflection point ✗',
+          '4. Find the y-coordinate: compute f(c)',
+          '',
+          '**The counterexample everyone gets wrong:** f(x) = x⁴',
+          'f\'(x) = 4x³, f\'\'(x) = 12x². At x = 0: f\'\'(0) = 0.',
+          'But 12x² ≥ 0 for ALL x. The sign NEVER changes — f is concave up everywhere.',
+          'x = 0 is a local MINIMUM, not an inflection point.',
         ],
       },
     ],
@@ -125,21 +136,19 @@ export default {
 
   rigor: {
     prose: [
-      '**Counterexample to "f\'\'(c) = 0 → inflection point":**',
-      'f(x) = x⁴. f\'(x) = 4x³, f\'\'(x) = 12x². f\'\'(0) = 0. ' +
-      'But f\'\'(x) = 12x² ≥ 0 for ALL x. Concavity never changes sign. ' +
-      'f is concave up everywhere — x = 0 is an absolute minimum, not an inflection point.',
-      '**The full SDT proof:** At c with f\'(c) = 0 and f\'\'(c) > 0:',
-      'By definition of f\'\'(c): f\'\'(c) = lim(h→0) [f\'(c+h) − f\'(c)] / h = lim(h→0) f\'(c+h) / h (since f\'(c) = 0). ' +
-      'If f\'\'(c) > 0, then for small h, f\'(c+h)/h > 0. ' +
-      'For h > 0 (right): f\'(c+h) > 0. For h < 0 (left): f\'(c+h) < 0. ' +
-      'So f\' changes from − to + at c → local minimum by the First Derivative Test. ■',
+      '**Full proof of the Second Derivative Test (case f\'\'(c) > 0 → local min):**',
+      'Suppose f\'(c) = 0 and f\'\'(c) > 0. By the definition of f\'\'(c):',
+      'f\'\'(c) = lim(h→0) [f\'(c+h) − f\'(c)] / h = lim(h→0) f\'(c+h) / h  (since f\'(c) = 0)',
+      'Since this limit is f\'\'(c) > 0, for all sufficiently small h:  f\'(c+h)/h > 0.',
+      '• For h > 0 (just right of c): f\'(c+h) > 0  →  f is increasing just right of c',
+      '• For h < 0 (just left of c):  f\'(c+h) < 0  →  f is decreasing just left of c',
+      'So f\' changes from − to + at c → by the First Derivative Test → local minimum. ■',
     ],
     callouts: [
       {
         type: 'tip',
-        title: 'Key Summary Table',
-        body: '\\begin{array}{cc|cc} f\'(c) & f\'\'(c) & \\text{Conclusion} \\\\ \\hline 0 & > 0 & \\text{Local min} \\\\ 0 & < 0 & \\text{Local max} \\\\ 0 & 0 & \\text{Inconclusive} \\\\ \\neq 0 & \\text{any} & \\text{Not an extremum} \\end{array}',
+        title: 'Summary Table',
+        body: '\\begin{array}{c|c|l} f\'(c) & f\'\'(c) & \\text{Conclusion} \\\\ \\hline 0 & > 0 & \\text{Local minimum (bowl)} \\\\ 0 & < 0 & \\text{Local maximum (dome)} \\\\ 0 & 0 & \\text{Inconclusive — use FDT} \\\\ \\neq 0 & \\text{any} & \\text{Not an extremum} \\end{array}',
       },
     ],
     visualizationId: null,
@@ -147,104 +156,132 @@ export default {
 
   examples: [
     {
-      id: 'ex-concavity-cubic',
-      title: 'Concavity and Inflection Points',
-      problem: 'Find all intervals where $f(x) = x^4 - 6x^2 + 1$ is concave up/down, and all inflection points.',
+      id: 'ex-concavity-full',
+      title: 'Complete Concavity Analysis — Inflection Points Step by Step',
+      problem: 'Find all intervals of concavity and all inflection points for f(x) = x⁴ − 6x² + 1.',
       steps: [
         {
-          expression: 'f\'(x) = 4x^3 - 12x \\qquad f\'\'(x) = 12x^2 - 12 = 12(x^2-1) = 12(x-1)(x+1)',
-          annotation: 'Compute the second derivative and factor.',
+          expression: 'f\'(x) = 4x^3 - 12x',
+          annotation: 'Power rule on each term: d/dx[x⁴] = 4x³, d/dx[−6x²] = −12x, d/dx[1] = 0.',
+        },
+        {
+          expression: 'f\'\'(x) = 12x^2 - 12',
+          annotation: 'Differentiate f\'(x) with the power rule: d/dx[4x³] = 12x², d/dx[−12x] = −12.',
+        },
+        {
+          expression: 'f\'\'(x) = 12(x^2 - 1) = 12(x-1)(x+1)',
+          annotation: 'Factor out 12 and then factor the difference of squares: x² − 1 = (x−1)(x+1).',
         },
         {
           expression: 'f\'\'(x) = 0 \\implies x = \\pm 1',
-          annotation: 'Two candidates for inflection points.',
+          annotation: '12(x−1)(x+1) = 0 when x = 1 or x = −1. These are the inflection candidates.',
         },
         {
-          expression: 'x < -1: \\text{test } x=-2: f\'\'(-2) = 12(4-1) = 36 > 0 \\implies \\text{concave UP}',
-          annotation: '',
+          expression: '\\textbf{Three intervals: } (-\\infty,-1),\\;(-1,1),\\;(1,\\infty)',
+          annotation: 'The two candidates split the line into three regions.',
         },
         {
-          expression: '-1 < x < 1: \\text{test } x=0: f\'\'(0) = -12 < 0 \\implies \\text{concave DOWN}',
-          annotation: '',
+          expression: 'x < -1: \\text{test } x=-2: f\'\'(-2) = 12(4-1) = 36 > 0 \\;\\to\\; \\text{concave UP}',
+          annotation: 'Both factors (x−1) and (x+1) are negative at x = −2 → product is positive.',
         },
         {
-          expression: 'x > 1: \\text{test } x=2: f\'\'(2) = 12(4-1) = 36 > 0 \\implies \\text{concave UP}',
-          annotation: '',
+          expression: '-1 < x < 1: \\text{test } x=0: f\'\'(0) = 12(0-1) = -12 < 0 \\;\\to\\; \\text{concave DOWN}',
+          annotation: '(x−1) = −1 < 0, (x+1) = 1 > 0 → product is negative.',
         },
         {
-          expression: 'f\'\' \\text{ changes sign at } x=-1 \\text{ and } x=1 \\implies \\text{both are inflection points}',
-          annotation: '',
+          expression: 'x > 1: \\text{test } x=2: f\'\'(2) = 12(4-1) = 36 > 0 \\;\\to\\; \\text{concave UP}',
+          annotation: 'Both factors positive → product positive.',
         },
         {
-          expression: 'f(-1) = 1 - 6 + 1 = -4 \\qquad f(1) = 1 - 6 + 1 = -4',
-          annotation: 'Inflection points: (−1, −4) and (1, −4).',
+          expression: 'f\'\' \\text{ changes sign at } x = -1 \\text{ and } x = 1 \\implies \\text{both ARE inflection points}',
+          annotation: 'At x = −1: concavity goes UP → DOWN. At x = 1: DOWN → UP. Both confirmed.',
+        },
+        {
+          expression: 'f(-1) = (-1)^4 - 6(-1)^2 + 1 = 1 - 6 + 1 = -4',
+          annotation: 'Compute the y-coordinates. (−1)⁴ = 1, (−1)² = 1.',
+        },
+        {
+          expression: 'f(1) = 1 - 6 + 1 = -4',
+          annotation: 'By symmetry (f is even), f(1) = f(−1) = −4.',
         },
       ],
-      conclusion: 'Concave up on (−∞, −1) and (1, ∞). Concave down on (−1, 1). Inflection points at (±1, −4). The function forms a "W" shape with two local minima.',
+      conclusion: 'Concave up on (−∞, −1) and (1, ∞). Concave down on (−1, 1). Inflection points at (−1, −4) and (1, −4). The graph has a "W" shape — two local minima connected by an arch.',
     },
     {
       id: 'ex-sdt-classify',
-      title: 'Using the Second Derivative Test to Classify Critical Points',
-      problem: 'Find and classify all critical points of $f(x) = x^3 - 3x + 2$ using the Second Derivative Test.',
+      title: 'Using the SDT to Classify Critical Points — Full Walkthrough',
+      problem: 'Find and classify all critical points of f(x) = x³ − 3x + 2 using the Second Derivative Test.',
       steps: [
         {
-          expression: 'f\'(x) = 3x^2 - 3 = 3(x-1)(x+1) = 0 \\implies x = \\pm 1',
-          annotation: 'Two critical points.',
+          expression: 'f\'(x) = 3x^2 - 3',
+          annotation: 'Power rule: d/dx[x³] = 3x², d/dx[−3x] = −3, d/dx[2] = 0.',
+        },
+        {
+          expression: '3x^2 - 3 = 0 \\implies x^2 = 1 \\implies x = \\pm 1',
+          annotation: 'Add 3 to both sides, divide by 3, take square root. Two critical points.',
         },
         {
           expression: 'f\'\'(x) = 6x',
-          annotation: 'Compute the second derivative.',
+          annotation: 'Differentiate f\'(x) = 3x² − 3: d/dx[3x²] = 6x, d/dx[−3] = 0.',
         },
         {
-          expression: 'f\'\'(-1) = 6(-1) = -6 < 0 \\implies \\text{local MAXIMUM at } x = -1',
-          annotation: 'Concave down at the critical point → dome → local max.',
+          expression: 'f\'\'(-1) = 6(-1) = -6 < 0',
+          annotation: 'Plug x = −1 into f\'\'(x) = 6x. Negative → SDT says local MAXIMUM.',
         },
         {
           expression: 'f(-1) = (-1)^3 - 3(-1) + 2 = -1 + 3 + 2 = 4',
-          annotation: 'Value at the local max.',
+          annotation: 'Find the y-value: compute f at the critical point. Local max at (−1, 4).',
         },
         {
-          expression: 'f\'\'(1) = 6(1) = 6 > 0 \\implies \\text{local MINIMUM at } x = 1',
-          annotation: 'Concave up → bowl → local min.',
+          expression: 'f\'\'(1) = 6(1) = 6 > 0',
+          annotation: 'Plug x = 1 into f\'\'(x) = 6x. Positive → SDT says local MINIMUM.',
         },
         {
           expression: 'f(1) = 1 - 3 + 2 = 0',
-          annotation: '',
-        },
-        {
-          expression: '\\text{Local max: } (-1, 4) \\qquad \\text{Local min: } (1, 0)',
-          annotation: '',
+          annotation: 'Local min at (1, 0).',
         },
       ],
-      conclusion: 'Local maximum of 4 at x = −1; local minimum of 0 at x = 1. The SDT gave definitive answers here because f\'\'(±1) ≠ 0.',
+      conclusion: 'Local maximum at (−1, 4) — f\'\' is negative (dome shape). Local minimum at (1, 0) — f\'\' is positive (bowl shape). The SDT worked cleanly here because f\'\'(±1) ≠ 0.',
     },
     {
       id: 'ex-sdt-inconclusive',
-      title: 'When the Second Derivative Test Fails',
-      problem: 'Apply the Second Derivative Test to $f(x) = x^4$ at $x = 0$. What happens? Then classify correctly.',
+      title: 'When the SDT Fails — Falling Back to the Sign Chart',
+      problem: 'Classify the critical point of f(x) = x⁴ at x = 0. Show that the SDT fails, then use the FDT.',
       steps: [
         {
-          expression: 'f\'(x) = 4x^3 = 0 \\implies x = 0 \\text{ (only critical point)}',
+          expression: 'f\'(x) = 4x^3',
+          annotation: 'Power rule.',
+        },
+        {
+          expression: '4x^3 = 0 \\implies x = 0 \\quad\\text{(only critical point)}',
           annotation: '',
         },
         {
-          expression: 'f\'\'(x) = 12x^2 \\qquad f\'\'(0) = 0',
-          annotation: 'The Second Derivative Test is INCONCLUSIVE.',
+          expression: 'f\'\'(x) = 12x^2',
+          annotation: 'Differentiate f\'(x) = 4x³: power rule gives 12x².',
         },
         {
-          expression: '\\text{Use First Derivative Test: sign of } f\'(x) = 4x^3',
-          annotation: '',
+          expression: 'f\'\'(0) = 12(0)^2 = 0',
+          annotation: 'SDT is INCONCLUSIVE. f\'\' = 0 at the critical point — the test cannot tell us anything. We need the sign chart.',
         },
         {
-          expression: 'x < 0: 4x^3 < 0 \\;(\\downarrow) \\qquad x > 0: 4x^3 > 0 \\;(\\uparrow)',
-          annotation: '',
+          expression: '\\textbf{Sign chart for } f\'(x) = 4x^3:',
+          annotation: 'Test the sign of f\'(x) on each side of x = 0.',
         },
         {
-          expression: 'f\' \\text{ changes } - \\to + \\implies \\text{local MINIMUM at } x = 0',
-          annotation: 'Fall then rise → valley → local min. (It\'s also the absolute minimum: f(x) ≥ 0 = f(0).)',
+          expression: 'x < 0: f\'(x) = 4x^3 < 0 \\;(\\downarrow) \\qquad x > 0: f\'(x) = 4x^3 > 0 \\;(\\uparrow)',
+          annotation: 'For x < 0: x³ is negative, so 4x³ < 0. For x > 0: x³ is positive, so 4x³ > 0.',
+        },
+        {
+          expression: 'f\' \\text{ changes } - \\to + \\text{ at } x=0 \\implies \\textbf{local MINIMUM}',
+          annotation: 'Falling before c, rising after c → valley → local minimum.',
+        },
+        {
+          expression: 'f(0) = 0^4 = 0 \\implies \\text{local (and absolute) min at } (0, 0)',
+          annotation: 'x⁴ ≥ 0 for all x, confirming this is also the global minimum.',
         },
       ],
-      conclusion: 'When f\'\'(c) = 0, always fall back to the First Derivative Test. Here x = 0 is a local (and absolute) minimum even though f\'\' = 0 there. Concavity is positive on both sides — a "flat bottom" bowl.',
+      conclusion: 'The SDT gave f\'\'(0) = 0 — inconclusive. But the sign chart confirmed x = 0 is a local minimum. When the SDT fails, always reach for the sign chart. The two methods are complementary, not competing.',
     },
   ],
 
@@ -252,39 +289,39 @@ export default {
     {
       id: 'ch3-sdt-c1',
       difficulty: 'easy',
-      problem: 'Find the inflection point(s) of $f(x) = xe^{-x}$.',
-      hint: 'Compute f\'\' and find where it changes sign.',
+      problem: 'Find the inflection point(s) of f(x) = xe^{−x}.',
+      hint: 'Use the product rule to get f\', then the product rule again to get f\'\'. Set f\'\' = 0 and check the sign change.',
       walkthrough: [
-        { expression: 'f\'(x) = e^{-x} - xe^{-x} = e^{-x}(1-x)', annotation: 'Product rule.' },
-        { expression: 'f\'\'(x) = -e^{-x}(1-x) + e^{-x}(-1) = e^{-x}(x-2)', annotation: '' },
-        { expression: 'f\'\'(x) = 0 \\implies x = 2 \\quad (e^{-x} > 0 \\text{ always})', annotation: '' },
-        { expression: 'x < 2: f\'\' < 0 \\;(\\text{concave down}) \\qquad x > 2: f\'\' > 0 \\;(\\text{concave up})', annotation: 'Sign changes → inflection point.' },
-        { expression: 'f(2) = 2e^{-2} \\qquad \\text{Inflection point: } (2, 2e^{-2})', annotation: '' },
+        { expression: 'f\'(x) = (x)\'e^{-x} + x(e^{-x})\' = e^{-x} + x(-e^{-x}) = e^{-x}(1-x)', annotation: 'Product rule with u = x, v = e^{−x}. Derivative of e^{−x}: chain rule gives e^{−x}·(−1) = −e^{−x}.' },
+        { expression: 'f\'\'(x) = (e^{-x})\'(1-x) + e^{-x}(1-x)\'', annotation: 'Product rule on f\'(x) = e^{−x}(1−x). Now u = e^{−x}, v = (1−x).' },
+        { expression: '= (-e^{-x})(1-x) + e^{-x}(-1) = e^{-x}[-(1-x)-1] = e^{-x}(x-2)', annotation: 'Factor out e^{−x}. Simplify: −(1−x)−1 = −1+x−1 = x−2.' },
+        { expression: 'f\'\'(x) = 0 \\implies x = 2 \\quad (e^{-x} > 0 \\text{ always})', annotation: 'e^{−x} is never zero, so x − 2 = 0 → x = 2.' },
+        { expression: 'x < 2: f\'\' < 0 \\;(\\cap) \\qquad x > 2: f\'\' > 0 \\;(\\cup)', annotation: 'Sign changes → inflection point confirmed.' },
+        { expression: 'f(2) = 2e^{-2} \\qquad \\text{Inflection point: }(2,\\;2e^{-2}) \\approx (2,\\;0.27)', annotation: '' },
       ],
-      answer: 'Inflection point at (2, 2e⁻²) ≈ (2, 0.27)',
+      answer: 'Inflection point at (2, 2e⁻²)',
     },
     {
       id: 'ch3-sdt-c2',
       difficulty: 'hard',
-      problem: 'Construct a function (with a formula) that has inflection points at $x = 0$ and $x = 2$, a local minimum at $x = 1$, and is continuous everywhere.',
-      hint: 'Design f\'\'(x) to change at 0 and 2. Then integrate twice.',
+      problem: 'Build a function with inflection points at x = 0 and x = 2, and a local minimum at x = 1.',
+      hint: 'Design f\'\'(x) so it changes sign at x = 0 and x = 2. Then integrate twice to recover f.',
       walkthrough: [
-        { expression: '\\text{Want } f\'\'(x) = 0 \\text{ at } x=0,2 \\text{ with sign changes.}', annotation: '' },
-        { expression: '\\text{Try: } f\'\'(x) = x(x-2) = x^2-2x', annotation: 'Changes sign at 0 (from − to +) and at 2 (from + to −).' },
-        { expression: 'f\'(x) = \\int f\'\'\\,dx = \\frac{x^3}{3} - x^2 + C', annotation: '' },
-        { expression: 'f\'(1) = 0 \\text{ (local min)}: \\frac{1}{3}-1+C=0 \\Rightarrow C = \\frac{2}{3}', annotation: '' },
-        { expression: 'f\'(x) = \\frac{x^3}{3} - x^2 + \\frac{2}{3}', annotation: '' },
-        { expression: 'f(x) = \\frac{x^4}{12} - \\frac{x^3}{3} + \\frac{2x}{3} + D', annotation: 'D can be any constant.' },
+        { expression: '\\text{Goal: } f\'\' \\text{ changes sign at } 0 \\text{ and } 2.', annotation: '' },
+        { expression: '\\text{Try: } f\'\'(x) = x(x-2) = x^2-2x', annotation: 'A parabola that crosses zero at 0 and 2 and changes sign at each. For x < 0: (neg)(neg) > 0. For 0 < x < 2: (pos)(neg) < 0. For x > 2: (pos)(pos) > 0. Concavity changes at both points. ✓' },
+        { expression: 'f\'(x) = \\int (x^2 - 2x)\\,dx = \\frac{x^3}{3} - x^2 + C', annotation: 'Integrate term by term using the power rule for integrals: ∫xⁿ dx = xⁿ⁺¹/(n+1).' },
+        { expression: 'f\'(1) = 0 \\text{ (want local min at } x=1\\text{)}: \\frac{1}{3} - 1 + C = 0 \\implies C = \\frac{2}{3}', annotation: 'Set f\'(1) = 0 and solve for C.' },
+        { expression: 'f(x) = \\int f\'\\,dx = \\frac{x^4}{12} - \\frac{x^3}{3} + \\frac{2x}{3} + D', annotation: 'Integrate again. D is a free constant — any value works.' },
       ],
-      answer: 'f(x) = x⁴/12 − x³/3 + 2x/3 + D (any D). Inflection at x = 0 and x = 2; local min at x = 1.',
+      answer: 'f(x) = x⁴/12 − x³/3 + 2x/3 + D for any constant D.',
     },
   ],
 
   crossRefs: [
-    { lessonSlug: 'first-derivative-test', label: 'Prerequisite: First Derivative Test', context: 'Understand how signs of f\' determine increase/decrease first.' },
-    { lessonSlug: 'higher-order-derivatives', label: 'Prerequisite: Higher-Order Derivatives', context: 'Need to compute f\'\'.' },
-    { lessonSlug: 'curve-sketching', label: 'Next: Curve Sketching', context: 'f\'\' analysis (concavity + inflection) is step 4 of full curve sketching.' },
-    { lessonSlug: 'optimization', label: 'Applied in: Optimization', context: 'SDT used to confirm minimizers/maximizers.' },
+    { lessonSlug: 'first-derivative-test', label: 'Prerequisite & Fallback: First Derivative Test', context: 'When the SDT gives f\'\'(c) = 0, you MUST use the FDT sign chart.' },
+    { lessonSlug: 'higher-order-derivatives', label: 'Prerequisite: Higher-Order Derivatives', context: 'Concavity requires computing f\'\'(x) — the second derivative.' },
+    { lessonSlug: 'curve-sketching', label: 'Next: Full Curve Sketching', context: 'Concavity analysis (SDT + inflection points) is step 4 of the complete curve-sketching process.' },
+    { lessonSlug: 'optimization', label: 'Applied: Optimization', context: 'The SDT is often the fastest way to confirm a critical point is a minimum in applied problems.' },
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],

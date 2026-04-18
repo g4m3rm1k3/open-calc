@@ -1045,5 +1045,100 @@ export default {
       },
     ],
   },
+    {
+    id: 'wt-ftc-part1-deep-proof',
+    title: 'The Fundamental Theorem of Calculus — From Geometry to Formula',
+    prereqs: [
+      'Area as accumulation',
+      'Limit definition of derivative',
+      'Mean Value Theorem',
+      'Riemann sums'
+    ],
+    problem: 'Explain and justify why $F(b) - F(a) = \\displaystyle\\int_a^b f(x)\\,dx$ when $F\' = f$.',
+    steps: [
+      {
+        label: 'Start with the real question — what are we even trying to connect?',
+        visualNote: 'A curve $y=f(x)$ sits above the interval $[a,b]$. The shaded region underneath represents accumulated area.',
+        strategy: 'Before touching symbols, identify the two worlds being connected: accumulation (area) and change (derivative).',
+        explanation: 'Look at the picture first. There is a curve $f(x)$ and a shaded region underneath it from $a$ to $b$. That shaded region is something geometric — an area. Now separately, there is a function $F(x)$ whose derivative is $f(x)$. That means $F$ is tracking *accumulated change*. The shocking claim of calculus is that these two completely different ideas — area and accumulated rate of change — are actually the same thing. This theorem is the bridge. Everything that follows is about proving that this bridge is real, not just a coincidence.',
+      },
+
+      {
+        label: 'Break the interval into small pieces (the Riemann mindset)',
+        visualNote: 'The interval $[a,b]$ is chopped into many tiny subintervals: $x_0, x_1, ..., x_n$.',
+        strategy: 'If we cannot measure the whole region directly, we approximate it with many small, manageable pieces.',
+        explanation: 'Here is the core historical idea: we cannot measure curved area directly, so we approximate it. Imagine slicing the interval $[a,b]$ into many tiny pieces. On each tiny piece, the function does not change much, so we can approximate that slice as a rectangle. Add up all those rectangles, and we get an approximation of the total area. The more slices we use, the better the approximation. This is the birth of the Riemann sum.',
+        math: 'P = \\{x_0, x_1, ..., x_n\\}, \\quad a = x_0 < x_1 < ... < x_n = b',
+      },
+
+      {
+        label: 'Track how $F$ changes across the interval',
+        visualNote: 'We compare $F(a)$ at the start and $F(b)$ at the end, then break that change into increments.',
+        strategy: 'Rewrite the total change as a sum of small changes.',
+        explanation: 'Instead of thinking about area for a moment, shift your attention to $F$. What is $F(b) - F(a)$? It is the total change in $F$ over the interval. Now here is a powerful idea: any total change can be broken into a sum of smaller changes. If we move from $x_0$ to $x_1$, then $x_1$ to $x_2$, and so on, we can add all those tiny changes together. This turns one big jump into many small ones.',
+        math: 'F(b) - F(a) = \\sum_{i=1}^{n} [F(x_i) - F(x_{i-1})]',
+      },
+
+      {
+        label: 'Zoom into one tiny piece — what does $F(x_i) - F(x_{i-1})$ mean?',
+        visualNote: 'One subinterval $[x_{i-1}, x_i]$ is highlighted.',
+        strategy: 'Use the Mean Value Theorem to translate change into slope.',
+        explanation: 'This is the moment everything clicks. On a tiny interval, how does a function change? The Mean Value Theorem tells us that the total change over an interval equals the derivative at some point times the width of the interval. That means each small change $F(x_i) - F(x_{i-1})$ behaves like a rectangle: height = slope, width = interval length. This is where geometry sneaks back in.',
+        math: 'F(x_i) - F(x_{i-1}) = F\'(c_i)(x_i - x_{i-1})',
+        conceptRef: 'Mean Value Theorem',
+      },
+
+      {
+        label: 'Replace derivative with $f(x)$',
+        visualNote: 'Each small rectangle now has height $f(c_i)$.',
+        strategy: 'Use the fact that $F\' = f$.',
+        explanation: 'We were told that $F$ is an antiderivative of $f$, meaning $F\'(x) = f(x)$. So every slope value becomes $f(c_i)$. Now look at what we have: each tiny change in $F$ is equal to $f(c_i)$ times the width of the interval. That is exactly the area of a rectangle with height $f(c_i)$ and width $\\Delta x$.',
+        math: 'F(x_i) - F(x_{i-1}) = f(c_i)\\Delta x',
+      },
+
+      {
+        label: 'Substitute back into the total sum',
+        visualNote: 'All the small rectangles are summed together across the interval.',
+        strategy: 'Turn the sum of changes into a Riemann sum.',
+        explanation: 'Now we substitute this rectangle expression back into our sum. The total change in $F$ becomes a sum of many tiny rectangle areas. This is no longer abstract — it is literally the same structure we used to approximate area earlier. The algebra and the geometry have merged.',
+        math: 'F(b) - F(a) = \\sum_{i=1}^{n} f(c_i)\\Delta x',
+      },
+
+      {
+        label: 'Take the limit — turn approximation into exact area',
+        visualNote: 'The rectangles become infinitely thin; the approximation becomes exact.',
+        strategy: 'Let the partition get infinitely fine.',
+        explanation: 'Up to now, everything has been an approximation — many rectangles approximating a curved region. But calculus takes one final step: let the number of rectangles go to infinity, and their width go to zero. In that limit, the approximation becomes exact. The Riemann sum becomes the definite integral. This is the precise definition of area under a curve.',
+        math: '\\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(c_i)\\Delta x = \\int_a^b f(x)\\,dx',
+      },
+
+      {
+        label: 'Final realization — the bridge is complete',
+        explanation: 'Now step back and look at what just happened. We started with the change in $F$: $F(b) - F(a)$. We broke it into small pieces. Each piece turned into a rectangle using the Mean Value Theorem. Adding them gave a Riemann sum. Taking the limit turned that sum into an integral. That means the total change in an antiderivative is exactly equal to the area under the original function. This is not a trick — it is a structural identity built from limits. This is the Fundamental Theorem of Calculus.',
+        math: 'F(b) - F(a) = \\int_a^b f(x)\\,dx',
+        sandbox: {
+          value: 'f(x)=x^2, a=0, b=2',
+          rows: [
+            { label: 'Antiderivative', expr: 'F(x)=\\frac{x^3}{3}' },
+            { label: 'Change in $F$', expr: '\\frac{8}{3} - 0 = \\frac{8}{3}' },
+            { label: 'Integral', expr: '\\int_0^2 x^2 dx = \\frac{8}{3}' },
+          ],
+          conclusion: 'Both routes match — area and accumulated change are the same quantity.',
+        },
+        conceptRef: 'Fundamental Theorem of Calculus',
+      },
+    ],
+
+    variations: [
+      {
+        question: 'What if $f(x)$ is sometimes negative?',
+        hint: 'Then the integral represents net signed area — regions below the axis subtract.',
+      },
+      {
+        question: 'What if we reverse the limits?',
+        hint: '$\\int_b^a f(x)dx = -\\int_a^b f(x)dx$ — direction matters.',
+      },
+    ],
+  },
   ],
 };
