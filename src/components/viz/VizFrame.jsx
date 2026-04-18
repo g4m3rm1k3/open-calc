@@ -37,6 +37,7 @@ const VIZ_REGISTRY = {
   ContinuityViz: lazy(() => import("./d3/ContinuityViz.jsx")),
   RiemannSum: lazy(() => import("./d3/RiemannSum.jsx")),
   RiemannSumDefinitionWalkthrough: lazy(() => import("./react/RiemannSumDefinitionWalkthrough.jsx")),
+  FTCProofWalkthrough: lazy(() => import("./react/FTCProofWalkthrough.jsx")),
   PowerRulePattern: lazy(() => import("./d3/PowerRulePattern.jsx")),
   AntiderivativeFamilyViz: lazy(
     () => import("./d3/AntiderivativeFamilyViz.jsx"),
