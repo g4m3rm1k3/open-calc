@@ -8,6 +8,7 @@ import mvtIntegrals from './03b-mvt-integrals.js'
 import indefiniteIntegrals from './04-indefinite-integrals.js'
 import initialValueProblems from './04b-initial-value-problems.js'
 import applications from './05-applications.js'
+import averageValue from './05b-average-value.js'
 import uSubstitution from './06-u-substitution.js'
 import volumesOfRevolution from './06b-volumes-of-revolution.js'
 import integrationByParts from './07-integration-by-parts.js'
@@ -40,6 +41,7 @@ export default {
     indefiniteIntegrals,
     initialValueProblems,
     applications,
+    averageValue,
     uSubstitution,
     volumesOfRevolution,
     integrationByParts,

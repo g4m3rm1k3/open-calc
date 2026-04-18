@@ -20,12 +20,15 @@
 //   Lesson 8: Newton's Method   — use tangent lines to hunt roots quadratically fast
 // ============================================================
 
+import extremeValueTheorem from './00a-extreme-value-theorem.js'
 import rollesTheorem from './02a-rolles-theorem.js'
 import meanValueTheorem from './02-mean-value-theorem.js'
 import linearApproximation from './01-linear-approximation.js'
 import differentials from './07-differentials.js'
 import relatedRates from './00-related-rates.js'
 import curveSketching from './03-curve-sketching.js'
+import firstDerivativeTest from './03a-first-derivative-test.js'
+import concavitySecondDerivativeTest from './03b-concavity-second-derivative-test.js'
 import optimization from './04-optimization.js'
 import lhopital from './05-lhopital.js'
 import newtonsMethod from './06-newtons-method.js'
@@ -39,7 +42,8 @@ export default {
   color: 'emerald',
   lessons: [
     // ACT 1 — FOUNDATIONS
-    rollesTheorem,       // order 0 — proves MVT; must come first
+    extremeValueTheorem, // order 0a — guarantees extrema exist on closed intervals; sets up optimization
+    rollesTheorem,       // order 0b — proves MVT; must come first
     meanValueTheorem,    // order 1 — uses Rolle's; unlocks all applications
 
     // ACT 2 — APPROXIMATION
@@ -48,7 +52,9 @@ export default {
     relatedRates,        // order 4 — chain rule in time
 
     // ACT 3 — ANALYSIS
-    curveSketching,      // order 5 — reading f shape from f', f''
+    firstDerivativeTest, // order 5a — sign charts, increasing/decreasing, local extrema via f'
+    concavitySecondDerivativeTest, // order 5b — concavity, inflection points, SDT
+    curveSketching,      // order 5c — full synthesis: shape of f from f', f''
     optimization,        // order 6 — the "why calculus was invented" lesson
 
     // ACT 4 — SPECIAL TECHNIQUES

@@ -1,5 +1,6 @@
 import tangentProblem from './00-tangent-problem.js'
 import differentiationRules from './01-differentiation-rules.js'
+import differentiabilityVsContinuity from './01a-differentiability-vs-continuity.js'
 import chainRule from './02-chain-rule.js'
 import derivativesOfInverseFunctions from './02-derivatives-of-inverse-functions.js'
 import trigDerivatives from './03-trig-derivatives.js'
@@ -7,6 +8,7 @@ import expLogDerivatives from './04-exp-log-derivatives.js'
 import productRuleChainTrap from './04b-product-rule-chain-trap.js'
 import implicitDifferentiation from './05-implicit-differentiation.js'
 import readingDerivatives from './06-reading-derivatives.js'
+import higherOrderDerivatives from './07-higher-order-derivatives.js'
 import derivativesIntroduction from './10-derivatives-introduction.js'
 import polynomialDivisionRoots from './polynomial-division-roots.js'
 import absoluteValueRadicals from './absolute-value-radicals.js'
@@ -66,6 +68,7 @@ export default {
 
     // ── Act 2: The Toolkit ──────────────────────────────────────────────────
     differentiationRules,         // 2 — Power, product, quotient rules (shortcuts proved from limits)
+    differentiabilityVsContinuity, // 2a — Corners, cusps, vertical tangents; differentiable → continuous
     chainRule,                    // 3 — Chain rule: differentiating compositions
     productRuleChainTrap,         // 4 — Common mistake: incomplete inner derivatives (drill it now)
 
@@ -77,6 +80,7 @@ export default {
     // ── Act 4: Synthesis ────────────────────────────────────────────────────
     implicitDifferentiation,      // 8 — When y is not solved explicitly (chain rule in disguise)
     readingDerivatives,           // 9 — Reading f, f', f'', f''' from graphs (visual language)
+    higherOrderDerivatives,       // 10 — f'', f''', notation, physical meaning, concavity preview
 
     // ── Appendix: Prerequisite Tools ────────────────────────────────────────
     polynomialDivisionRoots,      // 10 — Polynomial division, rational zeros (algebra review)
