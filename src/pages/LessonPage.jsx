@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from '../content/index.js'
 import { useProgress } from '../hooks/useProgress.js'
 import MicroCycleLesson from '../components/lesson/MicroCycleLesson.jsx'
@@ -17,7 +17,10 @@ export default function LessonPage() {
   const slug = lessonSlug + (rest ? `/${rest}` : '')
   const key = `${chapterId}/${slug}`
   const rawLesson = LESSON_MAP[key]
-  const lesson = rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null
+  const lesson = useMemo(
+    () => rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null,
+    [rawLesson]
+  )
   const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus, setReadingProgress, getReadingProgress } = useProgress()
   const { setLessonId } = useVideoPlayer()
   const activeTab = getActiveTab(lesson?.id ?? '')
