@@ -307,6 +307,14 @@ function TopBar({
           Universal Calc
         </NavLink>
         <NavLink
+          to="/openmat"
+          className={({ isActive }) =>
+            `text-sm font-bold transition-colors ${isActive ? "text-cyan-600 dark:text-cyan-400" : "text-slate-800 dark:text-slate-100 hover:text-cyan-600"}`
+          }
+        >
+          OpenMAT
+        </NavLink>
+        <NavLink
           to="/logic-sim"
           className={({ isActive }) =>
             `text-sm font-bold transition-colors ${isActive ? "text-violet-600 dark:text-violet-400" : "text-slate-800 dark:text-slate-100 hover:text-violet-600"}`
@@ -608,6 +616,7 @@ export default function AppShell({ children }) {
   const location = useLocation();
   const isUniversalCalcRoute = location.pathname.startsWith("/universal-calc");
   const isChemistryRoute = location.pathname.startsWith("/chemistry");
+  const isOpenMatRoute = location.pathname.startsWith("/openmat");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -787,6 +796,21 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("keydown", handler);
   }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen, pythonOpen]);
 
+  if (isOpenMatRoute) {
+    return (
+      <GrapherContext.Provider value={{ openGrapher }}>
+        <div className="h-screen overflow-hidden bg-slate-950">
+          <div className="h-full w-full overflow-hidden">
+            {children ?? <Outlet />}
+          </div>
+          <PinsPanel />
+          <NotesPanel />
+          <SearchModal />
+        </div>
+      </GrapherContext.Provider>
+    );
+  }
+
   return (
     <GrapherContext.Provider value={{ openGrapher }}>
       <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -871,12 +895,14 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 ${isChemistryRoute ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"}`}
+          className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"}`}
         >
           <div
             className={
               isChemistryRoute
                 ? "w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden"
+                : isOpenMatRoute
+                  ? "w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden"
                 : isUniversalCalcRoute
                   ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
                   : `${sidebarPinned ? "max-w-4xl" : "max-w-6xl"} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`
