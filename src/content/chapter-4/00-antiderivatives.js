@@ -327,4 +327,117 @@ export default {
       answer: 0,
     },
   ],
+    walkthroughs: [
+    {
+      id: 'wt-antiderivative-master',
+      title: 'Mastering Antiderivatives – All Techniques in One Place',
+      prereqs: ['Power rule', 'Chain rule', 'Product rule', 'Trig derivatives', 'Partial fractions'],
+      svgId: 'WalkthroughViz',
+      vizProps: { type: 'antiderivative-master', label: 'Antiderivative Techniques Overview' },
+      problem: 'Build a complete mental toolbox for finding antiderivatives of every type you will encounter in Calculus 1 and 2. We will cover every major technique with deep intuition, strategy, and verification.',
+      steps: [
+        {
+          label: 'REGISTRY – The Antiderivative Toolbox',
+          visualNote: 'A large toolbox icon appears with 8 labeled drawers: Power Rule, Trig, Exponential/Log, Substitution, Parts, Trig Powers, Partial Fractions, Trig Sub.',
+          strategy: 'Before computing anything, know what tools exist and when to reach for each.',
+          explanation: 'An antiderivative F(x) is any function whose derivative is the original f(x). The definite integral will later use F(b) – F(a), but first we must find F(x). The key is pattern recognition: look at the integrand and ask “which tool reverses this?” We will now open every drawer in the toolbox.',
+          math: '\\int f(x)\\,dx = F(x) + C \\quad \\text{where } F\'(x) = f(x)'
+        },
+
+        {
+          label: 'Power Rule & Polynomials (the foundation)',
+          visualNote: 'A polynomial integrand x^5 + 3x^2 – 7 is shown. Each term gains +1 in the exponent and is divided by the new exponent.',
+          strategy: 'If the integrand is a polynomial or single power of x, the power rule is the only tool needed.',
+          explanation: 'Start simple. The derivative of x^n is n x^{n-1}, so the antiderivative must reverse that: add 1 to the exponent and divide by the new exponent. For constants, divide by the power. This is the most mechanical rule — but also the one that appears inside every other technique later.',
+          math: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)',
+          sandbox: {
+            value: '\\int (x^5 + 3x^2 - 7)\\,dx',
+            rows: [
+              { label: 'Term 1', expr: '\\frac{x^6}{6}' },
+              { label: 'Term 2', expr: 'x^3' },
+              { label: 'Term 3', expr: '-7x' },
+              { label: 'Result', expr: '\\frac{x^6}{6} + x^3 - 7x + C' }
+            ],
+            conclusion: 'Every polynomial has an antiderivative that is another polynomial of one higher degree.'
+          }
+        },
+
+        {
+          label: 'Exponential & Logarithmic Functions',
+          visualNote: 'e^x and 1/x are highlighted. Their antiderivatives are themselves (up to constants).',
+          strategy: 'When you see e^x or 1/x, you are done — they are their own antiderivatives.',
+          explanation: 'The derivative of e^x is e^x, so the antiderivative of e^x is e^x. The derivative of ln|x| is 1/x, so the antiderivative of 1/x is ln|x|. These two functions are the only ones that are their own antiderivatives (up to constants). This is why they appear everywhere in calculus.',
+          math: '\\int e^x\\,dx = e^x + C \\qquad \\int \\frac{1}{x}\\ dx = \\ln|x| + C'
+        },
+
+        {
+          label: 'Trigonometric Functions',
+          visualNote: 'The six basic trig functions cycle in pairs: sin ↔ –cos, cos ↔ sin, etc.',
+          strategy: 'Memorize the six trig antiderivatives as a closed cycle.',
+          explanation: 'Differentiating sin gives cos, cos gives –sin, etc. So the antiderivatives simply rotate backward in the cycle. Notice the signs alternate. These six facts cover every pure trig integral you will see before powers or products appear.',
+          math: '\\int \\sin x\\,dx = -\\cos x + C \\qquad \\int \\cos x\\,dx = \\sin x + C \\\\ \\int \\sec^2 x\\,dx = \\tan x + C \\qquad \\int \\csc^2 x\\,dx = -\\cot x + C \\\\ \\int \\sec x \\tan x\\,dx = \\sec x + C \\qquad \\int \\csc x \\cot x\\,dx = -\\csc x + C'
+        },
+
+        {
+          label: 'u-Substitution (reverse chain rule)',
+          visualNote: 'A composite function like (x²+1)^5 · 2x is shown. The 2x is highlighted as “the derivative that is already there.”',
+          strategy: 'When you see a function raised to a power multiplied by (or hiding) its own derivative, substitute u = inside function.',
+          explanation: 'The chain rule says d/dx [u^n] = n u^{n-1} u\'. In reverse, if you see n u^{n-1} u\' dx, it becomes u^n. The key skill is spotting the hidden u\' inside the integrand. If it is exactly there (or a constant multiple), substitution works perfectly.',
+          math: '\\int f(g(x)) g\'(x)\\,dx \\quad \\text{let } u = g(x) \\quad \\Rightarrow \\quad \\int f(u)\\,du'
+        },
+
+        {
+          label: 'Integration by Parts (reverse product rule)',
+          visualNote: 'Two functions u and dv are chosen. The formula ∫ u dv = uv – ∫ v du is shown with the “derivative side” and “integral side” labeled.',
+          strategy: 'When you see a product of two different types (e.g., polynomial × exponential), choose u = the part that simplifies when differentiated.',
+          explanation: 'The product rule says d/dx (uv) = u\'v + uv\'. In reverse, ∫ u dv = uv – ∫ v du. The art is choosing which function to call u (the one that gets simpler when differentiated) and which to call dv (the one that is easy to integrate). LIATE order (Log, Inverse trig, Algebraic, Trig, Exponential) is a reliable guide.',
+          math: '\\int u\\,dv = uv - \\int v\\,du'
+        },
+
+        {
+          label: 'Trigonometric Integrals – Powers of sin and cos',
+          visualNote: '∫ sin^m x cos^n x dx with different cases highlighted: odd power of sin, odd power of cos, even powers (use identities).',
+          strategy: 'Save one sin or cos for du and convert the rest using Pythagorean identities.',
+          explanation: 'If at least one power is odd, save that factor for du and express the rest in terms of the other function. If both powers are even, use the power-reduction identities (half-angle formulas). This turns every trig power integral into a polynomial in sin or cos that we already know how to integrate.',
+          math: '\\text{Odd power of sin: save one sin for du, rest → cos² = 1 – sin²} \\\\ \\text{Even powers: use } \\sin^2 = \\frac{1-\\cos 2x}{2}, \\cos^2 = \\frac{1+\\cos 2x}{2}'
+        },
+
+        {
+          label: 'Partial Fractions (rational functions)',
+          visualNote: 'A rational function (x+3)/((x-1)(x+2)^2) is decomposed into A/(x-1) + (Bx+C)/(x+2)^2.',
+          strategy: 'When the integrand is a ratio of polynomials and the denominator factors, decompose into simpler fractions.',
+          explanation: 'If the degree of the numerator is less than the denominator, factor the denominator completely and write the fraction as a sum of simpler fractions whose denominators are the factors. Solve for the constants A, B, C by clearing the denominator or using the cover-up method. Each term then integrates with logs or arctangents.',
+          math: '\\frac{P(x)}{Q(x)} = \\frac{A}{x-1} + \\frac{Bx+C}{(x+2)^2} \\quad \\text{(then integrate each piece)}'
+        },
+
+        {
+          label: 'Trigonometric Substitution (for √(a² – x²), √(x² – a²), √(x² + a²))',
+          visualNote: 'Three classic forms are shown with their substitutions: x = a sin θ for √(a² – x²), x = a tan θ for √(x² + a²), x = a sec θ for √(x² – a²).',
+          strategy: 'When you see a square root of a quadratic that matches one of the three Pythagorean forms, substitute the matching trig function.',
+          explanation: 'Each radical hides a Pythagorean identity. Choosing x = a sin θ turns √(a² – x²) into a cos θ, which is much simpler. After integration in θ, back-substitute using a reference triangle to return to x. This technique turns ugly square-root integrals into standard trig integrals we already know.',
+          math: '\\sqrt{a^2 - x^2} \\to x = a \\sin \\theta \\qquad \\sqrt{x^2 + a^2} \\to x = a \\tan \\theta \\qquad \\sqrt{x^2 - a^2} \\to x = a \\sec \\theta'
+        },
+
+        {
+          label: 'Recognizing the Derivative of Common Functions (the “look-up” table)',
+          visualNote: 'A table appears showing the most common antiderivatives: arcsin, arctan, sec, etc.',
+          strategy: 'When none of the above techniques seem to fit, ask “is this the derivative of some known function?”',
+          explanation: 'Many integrals are simply the derivative of arcsin, arctan, or other inverse functions in disguise. Training your eye to spot these patterns saves enormous time. If you see 1/√(1 – x²), it is arcsin. If you see 1/(1 + x²), it is arctan. This is the “final boss” skill — recognizing the answer instantly.',
+          math: '\\int \\frac{1}{\\sqrt{1-x^2}}\\,dx = \\arcsin x + C \\qquad \\int \\frac{1}{1+x^2}\\ dx = \\arctan x + C'
+        },
+
+        {
+          label: 'Putting it all together – choosing the right tool',
+          visualNote: 'A decision tree appears: “Is it a polynomial?” → Power Rule. “Product of different types?” → Parts. “Rational?” → Partial fractions, etc.',
+          strategy: 'The real skill is deciding which technique to reach for first.',
+          explanation: 'Every integral has a best tool. The decision tree is your mental map: start with the simplest (power rule), then substitution, parts, trig identities, partial fractions, trig sub, or recognition. If nothing works, it may be non-elementary — but for Calculus 1–2, one of these will always succeed.',
+          math: '\\text{Decision tree: Power → Sub → Parts → Trig powers → Partial fractions → Trig sub → Recognition}'
+        }
+      ],
+      variations: [
+        { question: 'Mix techniques: evaluate ∫ x² √(1 – x²) dx', hint: 'Trig sub first (x = sin θ), then power rule on the resulting polynomial in sin and cos.' },
+        { question: 'What if the integral cannot be expressed in elementary functions?', hint: 'Some integrals (e.g., ∫ e^{-x²} dx) have no elementary antiderivative — we leave them as definite integrals or use numerical methods.' }
+      ]
+    }
+  ],
 };

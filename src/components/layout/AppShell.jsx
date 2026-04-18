@@ -799,12 +799,10 @@ export default function AppShell({ children }) {
   if (isOpenMatRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className="h-screen overflow-hidden bg-slate-950">
+        <div className="h-screen overflow-hidden bg-white dark:bg-slate-950">
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>
-          <PinsPanel />
-          <NotesPanel />
           <SearchModal />
         </div>
       </GrapherContext.Provider>
