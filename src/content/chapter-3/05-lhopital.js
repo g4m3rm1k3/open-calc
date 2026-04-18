@@ -543,7 +543,7 @@ print()
         "lim(x→∞)(1+1/x)^x = e. This is one of the most important limits in mathematics — it is sometimes taken as the definition of e. L'Hôpital makes the proof systematic. The limit (1+r/n)^n → e^r as n → ∞ is the basis of continuous compounding in finance.",
     },
     {
-      id: "ch3-005-ex6",
+      id: "ch3-005-ex8",
       title: "Classic (0/0): lim(x→2) (x²-4)/(x-2)",
       problem: "\\text{Evaluate } \\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}",
       steps: [
@@ -581,7 +581,7 @@ print()
         "The limit is 4. Notice: No L'Hôpital needed — algebra solved it. This is the key insight: indeterminate forms often hide algebraic simplifications.",
     },
     {
-      id: "ch3-005-ex7",
+      id: "ch3-005-ex9",
       title: "Radical (∞-∞): lim(x→∞) (√(x²+5x) - x)",
       problem:
         "\\text{Evaluate } \\lim_{x \\to \\infty} \\left( \\sqrt{x^2 + 5x} - x \\right)",
@@ -631,7 +631,7 @@ print()
         "The limit is 5/2. The key algebraic step (factoring x from the radical) is often skipped in textbooks, leaving students confused.",
     },
     {
-      id: "ch3-005-ex8",
+      id: "ch3-005-ex10",
       title: "(0·∞): lim(x→0⁺) x·ln(x)",
       problem: "\\text{Evaluate } \\lim_{x \\to 0^+} x \\ln(x)",
       steps: [
@@ -667,7 +667,7 @@ print()
         "The limit is 0. Rewriting products as fractions is a critical algebraic skill for indeterminate forms.",
     },
     {
-      id: "ch3-005-ex9",
+      id: "ch3-005-ex11",
       title: "Exponential (1^∞): lim(x→∞) (1+2/x)^x",
       problem:
         "\\text{Evaluate } \\lim_{x \\to \\infty} \\left(1 + \\frac{2}{x}\\right)^x",
