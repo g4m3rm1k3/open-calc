@@ -16,8 +16,11 @@ import {
   ZoomOut,
   Scan,
   Grid3X3,
+  Maximize2,
+  X,
 } from "lucide-react";
 import FigureRenderer from "../viz/react/FigureRenderer.jsx";
+import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";
 
@@ -221,6 +224,27 @@ hist(data, 5)
 title('Data Distribution')
 `,
   },
+  {
+    id: "anonymous-3d",
+    label: "Anonymous + 3D",
+    icon: Waves,
+    description: "Use anonymous functions, roots, integration, and launch a surface into the 3D grapher.",
+    code: `f = @(x) x.^3 - 4*x + 1;
+x = linspace(-3, 3, 200);
+y = f(x);
+plot(x, y)
+grid on
+title('Anonymous function')
+
+coeffs = [1 0 -4 1];
+roots(coeffs)
+trapz(x, y)
+
+[X, Y] = meshgrid(-4:0.4:4, -4:0.4:4);
+Z = sin(sqrt(X.^2 + Y.^2));
+surf(X, Y, Z)
+`,
+  },
 ];
 
 const HELP_TEXT = [
@@ -251,18 +275,40 @@ const HELP_TEXT = [
   "  out1 = a + b;",
   "  out2 = a * b;",
   "end",
+  "f = @(x) x.^2 - 1",
   "",
   "── Plotting ──",
   "plot, scatter, bar, stem, area, hist, hold on/off, clf",
   "title, xlabel, ylabel, legend, grid on/off, xlim, ylim",
   "axis tight/equal/auto/[xmin xmax ymin ymax]",
+  "surf(X,Y,Z)   mesh(X,Y,Z) -> opens the 3D Grapher",
   "",
   "── Output ──",
   "disp(x)   sprintf('%g', x)   fprintf('val = %f\\n', x)",
   "num2str(x)   who   clear   clc",
+  "",
+  "── Extensions ──",
+  "window.OpenMAT.registerExtension(name, { functions, onRun })",
 ].join("\n");
 
 const SERIES_COLORS = ["teal", "blue", "amber", "purple", "red", "green"];
+const OPENMAT_EXTENSION_REGISTRY = new Map();
+
+function registerOpenMatExtension(name, extension) {
+  if (!name || typeof name !== "string") {
+    throw new Error("OpenMAT extensions require a string name.");
+  }
+  OPENMAT_EXTENSION_REGISTRY.set(name, { name, ...extension });
+  return name;
+}
+
+function unregisterOpenMatExtension(name) {
+  OPENMAT_EXTENSION_REGISTRY.delete(name);
+}
+
+function listOpenMatExtensions() {
+  return Array.from(OPENMAT_EXTENSION_REGISTRY.values());
+}
 
 function toPlain(value) {
   if (value && typeof value.valueOf === "function") {
@@ -495,6 +541,131 @@ function interp1Array(x, y, xi) {
     return yv[lo] + t * (yv[lo + 1] - yv[lo]);
   });
 }
+function trapzArray(x, y = null) {
+  const xv = y == null ? null : normalizeVector(x);
+  const yv = normalizeVector(y == null ? x : y);
+  if (yv.length < 2) return 0;
+  let total = 0;
+  for (let i = 0; i < yv.length - 1; i += 1) {
+    const dx = xv ? xv[i + 1] - xv[i] : 1;
+    total += dx * (yv[i] + yv[i + 1]) / 2;
+  }
+  return total;
+}
+function gradientArray(value, spacing = 1) {
+  const v = normalizeVector(value);
+  if (v.length <= 1) return v.map(() => 0);
+  const h = Number(spacing) || 1;
+  return v.map((entry, index) => {
+    if (index === 0) return (v[1] - v[0]) / h;
+    if (index === v.length - 1) return (v[index] - v[index - 1]) / h;
+    return (v[index + 1] - v[index - 1]) / (2 * h);
+  });
+}
+function companionRoots(coefficients) {
+  const coeffs = normalizeVector(coefficients).map(Number);
+  while (coeffs.length > 1 && Math.abs(coeffs[0]) < 1e-12) coeffs.shift();
+  const degree = coeffs.length - 1;
+  if (degree <= 0) return [];
+  if (degree === 1) return [-coeffs[1] / coeffs[0]];
+  const lead = coeffs[0];
+  const companion = Array.from({ length: degree }, (_, row) =>
+    Array.from({ length: degree }, (_, col) => {
+      if (row === 0) return -(coeffs[col + 1] ?? 0) / lead;
+      return col === row - 1 ? 1 : 0;
+    }),
+  );
+  const eigen = math.eigs(companion);
+  return toPlain(eigen.values ?? []);
+}
+function singularValues(A) {
+  const result = math.svd(A);
+  const raw = Array.isArray(result.S?.[0]) ? math.diag(result.S) : result.S;
+  return normalizeVector(raw).map((entry) => Math.abs(Number(entry)));
+}
+function matrixRank(A, tolerance = null) {
+  const s = singularValues(A);
+  const max = Math.max(...s, 0);
+  const tol = tolerance == null ? max * Math.max(inferSize(A)[0], inferSize(A)[1]) * 1e-10 : Number(tolerance);
+  return s.filter((entry) => entry > tol).length;
+}
+function conditionNumber(A) {
+  const s = singularValues(A).filter((entry) => entry > 1e-12);
+  if (!s.length) return Infinity;
+  return Math.max(...s) / Math.min(...s);
+}
+function orthonormalBasis(A, mode = "orth") {
+  const { U, V, S } = math.svd(A);
+  const singular = normalizeVector(Array.isArray(S?.[0]) ? math.diag(S) : S).map((entry) => Math.abs(Number(entry)));
+  const tol = Math.max(...singular, 0) * Math.max(inferSize(A)[0], inferSize(A)[1]) * 1e-10;
+  const source = mode === "null" ? toPlain(V) : toPlain(U);
+  const columns = math.transpose(source);
+  const keep = columns.filter((_, index) =>
+    mode === "null" ? singular[index] <= tol : singular[index] > tol,
+  );
+  return keep.length ? math.transpose(keep) : [];
+}
+function normalizeSurfaceMatrices(x, y, z) {
+  const Z = toPlain(z);
+  const rows = Array.isArray(Z) ? Z.length : 0;
+  const cols = rows ? Math.max(...Z.map((row) => row.length), 0) : 0;
+  const defaultX = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => c - (cols - 1) / 2),
+  );
+  const defaultY = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => r - (rows - 1) / 2),
+  );
+  const expandGrid = (value, fallback) => {
+    const plain = toPlain(value);
+    if (!Array.isArray(plain)) return fallback;
+    if (Array.isArray(plain[0])) return plain;
+    if (plain.length === cols) {
+      return Array.from({ length: rows }, () => [...plain]);
+    }
+    if (plain.length === rows) {
+      return plain.map((entry) => Array.from({ length: cols }, () => entry));
+    }
+    return fallback;
+  };
+  return {
+    X: x == null ? defaultX : expandGrid(x, defaultX),
+    Y: y == null ? defaultY : expandGrid(y, defaultY),
+    Z,
+  };
+}
+function convertSurfaceTo3DConfig(kind, args, plotState) {
+  let X;
+  let Y;
+  let Z;
+  if (args.length === 1) {
+    Z = args[0];
+  } else if (args.length >= 3) {
+    [X, Y, Z] = args;
+  } else {
+    Z = args[args.length - 1];
+  }
+  const surfaceData = normalizeSurfaceMatrices(X, Y, Z);
+  return {
+    mode: "3d",
+    title: plotState.title || `OpenMAT ${kind === "mesh" ? "Mesh" : "Surface"} Lab`,
+    replace: true,
+    functions: [
+      {
+        id: Date.now(),
+        latex: kind === "mesh" ? "mesh data" : "surface data",
+        color: "#6366f1",
+        visible: true,
+        wireframe: kind === "mesh",
+        opacity: kind === "mesh" ? 1 : 0.82,
+        surfaceData,
+      },
+    ],
+    settings: {
+      range: Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 10),
+      resolution: Math.min(128, Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 32)),
+    },
+  };
+}
 function svdDecomp(A) {
   const result = math.svd(A);
   const U = toPlain(result.U), S = toPlain(result.S), V = toPlain(result.V);
@@ -649,10 +820,10 @@ function normalizeMatrixSyntax(line) {
   });
 }
 
-function replaceIndexing(line, variables) {
+function replaceIndexing(line, variables, functionNames = new Set()) {
   if (variables.size === 0) return line;
   return line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
-    if (!variables.has(name)) return match;
+    if (!variables.has(name) || functionNames.has(name)) return match;
     return `${name}[${inner}]`;
   });
 }
@@ -672,7 +843,7 @@ function replaceBackslash(expr) {
   return expr;
 }
 
-function preprocessLine(line, variables) {
+function preprocessLine(line, variables, functionNames = new Set()) {
   let output = line.replace(/%.*$/, "").trim();
   if (!output) return "";
   output = output.replace(/^hold\s+on$/i, "hold('on')");
@@ -683,7 +854,7 @@ function preprocessLine(line, variables) {
   output = output.replace(/^axis\s+equal$/i, "axis('equal')");
   output = output.replace(/^axis\s+auto$/i, "axis('auto')");
   output = normalizeMatrixSyntax(output);
-  output = replaceIndexing(output, variables);
+  output = replaceIndexing(output, variables, functionNames);
   output = replaceBackslash(output);
   return output;
 }
@@ -821,6 +992,97 @@ function extractFigureMeta(figureJson) {
     axisMode: fig.axisMode || "auto",
     hasGrid: fig.elements?.some((element) => element.type === "grid") ?? true,
   };
+}
+
+function renderOpenMatFigure(figureJson, C, emptyHeight = 180) {
+  const parsed = parseFigureJson(figureJson);
+  if (parsed?.type === "opencalc_subplots") {
+    const { cols, panels } = parsed;
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gap: 8,
+        }}
+      >
+        {panels.map((panel, idx) => (
+          <div key={idx} style={{ minWidth: 0 }}>
+            {panel ? (
+              <FigureRenderer figureJson={panel} C={C} />
+            ) : (
+              <div
+                style={{
+                  height: emptyHeight,
+                  borderRadius: 8,
+                  background: C.surface2,
+                  border: `1px solid ${C.border}`,
+                }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <FigureRenderer figureJson={figureJson} C={C} />;
+}
+
+function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
+  if (!isOpen || !figureJson) return null;
+
+  return (
+    <div className="fixed inset-0 z-[90] bg-slate-950/55 backdrop-blur-md">
+      <div
+        className="flex h-full w-full flex-col"
+        style={{ background: C.pageBg }}
+      >
+        <div
+          className="flex items-center justify-between border-b px-4 py-3"
+          style={{ borderColor: C.border, background: C.surface }}
+        >
+          <div>
+            <div className="text-sm font-semibold" style={{ color: C.text }}>
+              OpenMAT Plot Window
+            </div>
+            <div className="text-xs" style={{ color: C.muted }}>
+              Larger figure view for dense plots and subplot layouts.
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden text-xs md:block" style={{ color: C.muted }}>
+              Axis mode: {figureMeta.axisMode}
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold"
+              style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+            >
+              <X className="h-4 w-4" />
+              Close
+            </button>
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
+          <div
+            className="min-h-full rounded-3xl border p-4 md:p-6"
+            style={{ borderColor: C.border, background: C.surface }}
+          >
+            {renderOpenMatFigure(figureJson, C, 280)}
+          </div>
+        </div>
+      </div>
+      <OpenMatPlotWindow
+        isOpen={isPlotWindowOpen}
+        onClose={() => setIsPlotWindowOpen(false)}
+        figureJson={figureJson}
+        figureMeta={figureMeta}
+        C={C}
+      />
+    </div>
+  );
 }
 
 function buildFigureFromPlotState(plotState) {
@@ -969,10 +1231,13 @@ function makePlotState() {
   return { series: [], hold: false, title: "", xlabel: "", ylabel: "", legend: [], grid: true, xlim: null, ylim: null, axisMode: "auto" };
 }
 
-function createExecutionEngine() {
+function createExecutionEngine(options = {}) {
+  const extensions = options.extensions || [];
   const parser = math.parser();
   const variables = new Set();
+  const functionNames = new Set();
   const logs = [];
+  let plot3DRequest = null;
 
   // Subplot state: null = single figure, otherwise grid layout
   const subplotState = { active: false, rows: 1, cols: 1, slots: [], current: 0 };
@@ -1173,6 +1438,24 @@ function createExecutionEngine() {
     return { __multi: [toPlain(Q), toPlain(R)], Q: toPlain(Q), R: toPlain(R) };
   });
   parser.set("svd", (A) => svdDecomp(A));
+  parser.set("trapz", (x, y = null) => trapzArray(x, y));
+  parser.set("gradient", (value, spacing = 1) => gradientArray(value, spacing));
+  parser.set("roots", (coefficients) => companionRoots(coefficients));
+  parser.set("rank", (A, tolerance = null) => matrixRank(A, tolerance));
+  parser.set("cond", (A) => conditionNumber(A));
+  parser.set("orth", (A) => orthonormalBasis(A, "orth"));
+  parser.set("null", (A) => orthonormalBasis(A, "null"));
+  parser.set("surf", (...args) => {
+    plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
+    logs.push("3D surface ready. Opened in 3D Grapher.");
+    return args[args.length - 1] ?? null;
+  });
+  parser.set("mesh", (...args) => {
+    plot3DRequest = convertSurfaceTo3DConfig("mesh", args, plotState);
+    logs.push("3D mesh ready. Opened in 3D Grapher.");
+    return args[args.length - 1] ?? null;
+  });
+  parser.set("whos", () => buildWorkspaceSnapshot(parser, variables));
 
   // ── Subplot ──
   parser.set("subplot", (rows, cols, idx) => {
@@ -1249,12 +1532,35 @@ function createExecutionEngine() {
     })() : bm();
   });
 
+  extensions.forEach((extension) => {
+    Object.entries(extension?.functions || {}).forEach(([name, fn]) => {
+      if (typeof fn !== "function") return;
+      parser.set(name, (...args) =>
+        toPlain(fn(...args, {
+          math,
+          parser,
+          variables,
+          logs,
+          plotState,
+          setPlot3DRequest: (config) => {
+            plot3DRequest = config;
+          },
+        })),
+      );
+      functionNames.add(name);
+    });
+  });
+
   return {
     parser,
     logs,
     plotState,
     subplotState,
     variables,
+    functionNames,
+    getPlot3DRequest() {
+      return plot3DRequest;
+    },
     clearVariables(names) {
       if (names.length === 0) {
         Array.from(variables).forEach((name) => parser.remove(name));
@@ -1274,9 +1580,10 @@ const BREAK = Symbol('break');
 const CONTINUE = Symbol('continue');
 const RETURN = Symbol('return');
 
-function executeScript(source) {
-  const engine = createExecutionEngine();
-  const { parser, logs, plotState, subplotState, variables } = engine;
+function executeScript(source, options = {}) {
+  const extensions = options.extensions || [];
+  const engine = createExecutionEngine({ extensions });
+  const { parser, logs, plotState, subplotState, variables, functionNames } = engine;
 
   // User-defined functions registry: name -> { ins, outs, body }
   const userFunctions = {};
@@ -1302,13 +1609,41 @@ function executeScript(source) {
       return null;
     }
 
-    const line = preprocessLine(withoutSemicolon, variables);
+    const line = preprocessLine(withoutSemicolon, variables, functionNames);
     if (!line) return null;
+
+    const anonymousAssign = withoutSemicolon.match(/^([A-Za-z_]\w*)\s*=\s*@\(([^)]*)\)\s*(.+)$/);
+    if (anonymousAssign) {
+      const [, name, paramsRaw, bodyRaw] = anonymousAssign;
+      const params = paramsRaw.split(",").map((entry) => entry.trim()).filter(Boolean);
+      const body = preprocessLine(bodyRaw, variables, functionNames);
+      const anonymousFn = (...args) => {
+        const saved = new Map();
+        params.forEach((param, index) => {
+          try {
+            saved.set(param, parser.get(param));
+          } catch {
+            saved.set(param, undefined);
+          }
+          parser.set(param, args[index] ?? null);
+        });
+        const result = toPlain(parser.evaluate(body));
+        params.forEach((param) => {
+          if (saved.get(param) === undefined) parser.remove(param);
+          else parser.set(param, saved.get(param));
+        });
+        return result;
+      };
+      parser.set(name, anonymousFn);
+      variables.add(name);
+      functionNames.add(name);
+      return hasSemicolon ? null : anonymousFn;
+    }
 
     const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
     if (multiAssign) {
       const names = multiAssign[1].split(',').map((n) => n.trim()).filter(Boolean);
-      const result = toPlain(parser.evaluate(multiAssign[2]));
+      const result = toPlain(parser.evaluate(preprocessLine(multiAssign[2], variables, functionNames)));
       const values = result?.__multi || [];
       names.forEach((name, idx) => {
         parser.set(name, values[idx]);
@@ -1365,7 +1700,7 @@ function executeScript(source) {
 
     if (node.type === 'if') {
       for (const branch of node.branches) {
-        const condExpr = preprocessLine(branch.cond.replace(/;\s*$/, ''), variables);
+        const condExpr = preprocessLine(branch.cond.replace(/;\s*$/, ''), variables, functionNames);
         const condVal = toPlain(parser.evaluate(condExpr));
         if (isTruthy(condVal)) {
           return executeBlock(branch.body);
@@ -1376,7 +1711,7 @@ function executeScript(source) {
     }
 
     if (node.type === 'for') {
-      const iterExpr = preprocessLine(node.iterExpr.replace(/;\s*$/, ''), variables);
+      const iterExpr = preprocessLine(node.iterExpr.replace(/;\s*$/, ''), variables, functionNames);
       const iterVal = toPlain(parser.evaluate(iterExpr));
       const items = Array.isArray(iterVal) ? normalizeVector(iterVal) : [realValue(iterVal)];
       let last = null;
@@ -1395,7 +1730,7 @@ function executeScript(source) {
       let last = null;
       let guard = 0;
       while (guard++ < 100000) {
-        const condExpr = preprocessLine(node.condExpr.replace(/;\s*$/, ''), variables);
+        const condExpr = preprocessLine(node.condExpr.replace(/;\s*$/, ''), variables, functionNames);
         const condVal = toPlain(parser.evaluate(condExpr));
         if (!isTruthy(condVal)) break;
         const sig = executeBlock(node.body);
@@ -1423,6 +1758,7 @@ function executeScript(source) {
         Object.entries(saved).forEach(([k, v]) => v == null ? null : parser.set(k, v));
         return result;
       });
+      functionNames.add(name);
       return null;
     }
 
@@ -1468,11 +1804,22 @@ function executeScript(source) {
     outputBlocks.push(formatValue(lastVisibleResult));
   }
 
-  return {
+  const result = {
     output: outputBlocks.filter(Boolean).join('\n\n') || (figureJson ? 'Plot rendered.' : 'No output.'),
     figureJson,
     workspace: buildWorkspaceSnapshot(parser, variables),
+    plot3DRequest: engine.getPlot3DRequest(),
   };
+  extensions.forEach((extension) => {
+    if (typeof extension?.onRun === "function") {
+      try {
+        extension.onRun(result, { parser, variables, logs, plotState, subplotState });
+      } catch {
+        // Keep the core run resilient even if an extension hook fails.
+      }
+    }
+  });
+  return result;
 }
 
 export default function OpenMatStudio() {
@@ -1484,6 +1831,10 @@ export default function OpenMatStudio() {
   const [output, setOutput] = useState("");
   const [figureJson, setFigureJson] = useState(null);
   const [baseFigureJson, setBaseFigureJson] = useState(null);
+  const [isPlotWindowOpen, setIsPlotWindowOpen] = useState(false);
+  const [plotPanelMode, setPlotPanelMode] = useLocalStorage("openmat-plot-panel-mode", "pane");
+  const [surfaceConfig, setSurfaceConfig] = useState(null);
+  const [plotKind, setPlotKind] = useState("2d");
   const [normalizedPreview, setNormalizedPreview] = useState("");
   const [workspaceItems, setWorkspaceItems] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState(null);
@@ -1494,6 +1845,7 @@ export default function OpenMatStudio() {
   const outputRef = useRef(null);
   const importRef = useRef(null);
   const shellRef = useRef(null);
+  const stateRef = useRef({});
 
   const exampleMap = useMemo(
     () => Object.fromEntries(EXAMPLES.map((example) => [example.id, example])),
@@ -1516,12 +1868,14 @@ export default function OpenMatStudio() {
     "Matrices: [1 2; 3 4], A', A \\\\ b, inv, det, trace, eig, qr, svd",
     "Arrays: linspace, logspace, zeros, ones, eye, rand, randn, reshape, repmat",
     "Statistics: mean, median, std, var, min, max, sum, prod, sort, unique, find",
-    "Plots: plot, scatter, bar, hist, stem, area, hold on/off, clf",
+    "Numerics: trapz, gradient, roots, rank, cond, orth, null, interp1",
+    "Plots: plot, scatter, bar, hist, stem, area, hold on/off, clf, subplot",
+    "3D: surf(X,Y,Z), mesh(X,Y,Z) launch into the 3D grapher",
     "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
     "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
-    "Functions: function [out]=name(in) ... end  (recursive supported)",
-    "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum, interp1",
-    "Output: disp, sprintf, fprintf, num2str, who, clear, clc",
+    "Functions: function [out]=name(in)...end and f = @(x) expr",
+    "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
+    "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
   ];
 
   const runCode = useCallback(() => {
@@ -1533,10 +1887,18 @@ export default function OpenMatStudio() {
         .filter(Boolean)
         .join("\n");
       setNormalizedPreview(normalized);
-      const result = executeScript(code);
+      const result = executeScript(code, { extensions: listOpenMatExtensions() });
       setOutput(result.output);
       setFigureJson(result.figureJson);
       setBaseFigureJson(result.figureJson);
+      setSurfaceConfig(result.plot3DRequest || null);
+      if (result.plot3DRequest) {
+        setPlotKind("3d");
+      } else if (result.figureJson) {
+        setPlotKind("2d");
+      } else {
+        setPlotKind("2d");
+      }
       setWorkspaceItems(result.workspace || []);
       setSelectedVariable((current) =>
         result.workspace?.find((item) => item.name === current?.name) ||
@@ -1546,10 +1908,14 @@ export default function OpenMatStudio() {
       setWorkspaceTab(
         result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console",
       );
+      window.dispatchEvent(new CustomEvent("openmat:run", { detail: result }));
     } catch (error) {
       setOutput(`Error: ${error.message}`);
       setFigureJson(null);
       setBaseFigureJson(null);
+      setIsPlotWindowOpen(false);
+      setSurfaceConfig(null);
+      setPlotKind("2d");
       setWorkspaceItems([]);
       setSelectedVariable(null);
       setWorkspaceTab("console");
@@ -1559,13 +1925,16 @@ export default function OpenMatStudio() {
         outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [code, setWorkspaceTab]);
+  }, [code, openGrapher, setWorkspaceTab]);
 
   const resetWorkspace = useCallback(() => {
     setCode(DEFAULT_CODE);
     setOutput("");
     setFigureJson(null);
     setBaseFigureJson(null);
+    setSurfaceConfig(null);
+    setPlotKind("2d");
+    setIsPlotWindowOpen(false);
     setNormalizedPreview("");
     setWorkspaceItems([]);
     setSelectedVariable(null);
@@ -1579,6 +1948,9 @@ export default function OpenMatStudio() {
       setOutput("");
       setFigureJson(null);
       setBaseFigureJson(null);
+      setSurfaceConfig(null);
+      setPlotKind("2d");
+      setIsPlotWindowOpen(false);
       setNormalizedPreview("");
     },
     [exampleMap, setCode],
@@ -1616,6 +1988,9 @@ export default function OpenMatStudio() {
         setOutput("");
         setFigureJson(null);
         setBaseFigureJson(null);
+        setSurfaceConfig(null);
+        setPlotKind("2d");
+        setIsPlotWindowOpen(false);
         setNormalizedPreview("");
         setWorkspaceItems([]);
         setSelectedVariable(null);
@@ -1629,6 +2004,33 @@ export default function OpenMatStudio() {
   }, [setBrowserTab, setCode, setWorkspaceTab]);
 
   const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
+
+  useEffect(() => {
+    stateRef.current = {
+      code,
+      output,
+      workspaceItems,
+      figureJson,
+    };
+  }, [code, output, workspaceItems, figureJson]);
+
+  useEffect(() => {
+    const api = {
+      registerExtension: registerOpenMatExtension,
+      unregisterExtension: unregisterOpenMatExtension,
+      listExtensions: () => listOpenMatExtensions().map(({ name }) => name),
+      run: (source) => executeScript(String(source ?? stateRef.current.code ?? ""), { extensions: listOpenMatExtensions() }),
+      setCode: (nextCode) => setCode(String(nextCode ?? "")),
+      appendCode: (snippet) => setCode((prev) => `${prev}${prev.endsWith("\n") ? "" : "\n"}${String(snippet ?? "")}`),
+      getState: () => ({ ...stateRef.current }),
+      open3D: (config) => openGrapher({ mode: "3d", ...config }),
+    };
+    window.OpenMAT = api;
+    window.dispatchEvent(new CustomEvent("openmat:ready", { detail: { extensions: api.listExtensions() } }));
+    return () => {
+      if (window.OpenMAT === api) delete window.OpenMAT;
+    };
+  }, [openGrapher, setCode]);
 
   useEffect(() => {
     if (!isResizingRightPane) return undefined;
@@ -1658,6 +2060,11 @@ export default function OpenMatStudio() {
       document.body.style.userSelect = "";
     };
   }, [isResizingRightPane, setRightPaneWidth]);
+
+  const isPlotFocused = plotPanelMode === "focus";
+  const rightPaneCssWidth = isPlotFocused
+    ? "min(100%, max(56vw, 760px))"
+    : `min(100%, ${rightPaneWidth}px)`;
 
   return (
     <div
@@ -1701,11 +2108,11 @@ export default function OpenMatStudio() {
           </button>
           <button
             type="button"
-            onClick={() => openGrapher({ mode: "3d", title: "OpenMAT Surface Lab" })}
+            onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
             className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
           >
-            3D Grapher
+            Separate 3D
           </button>
           <button
             type="button"
@@ -1789,11 +2196,11 @@ export default function OpenMatStudio() {
           </button>
           <button
             type="button"
-            onClick={() => openGrapher({ mode: "3d", title: "OpenMAT Surface Lab" })}
+            onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
             className="rounded-lg border px-3 py-1.5 text-xs font-semibold md:hidden"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
           >
-            3D Grapher
+            Separate 3D
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-[11px]" style={{ color: C.muted }}>
@@ -1964,7 +2371,7 @@ export default function OpenMatStudio() {
           style={{
             borderColor: C.border,
             background: C.surface2,
-            width: `min(100%, ${rightPaneWidth}px)`,
+            width: rightPaneCssWidth,
           }}
         >
           <div
@@ -2003,9 +2410,34 @@ export default function OpenMatStudio() {
                   <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
                     Figure
                   </div>
-                  {figureJson ? (
+                  {figureJson || surfaceConfig ? (
                     <>
                       <div className="mb-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPlotPanelMode((current) => {
+                              const next = current === "focus" ? "pane" : "focus";
+                              if (next === "focus") setSidebarOpen(false);
+                              return next;
+                            });
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: isPlotFocused ? C.blue : C.border, background: C.surface2, color: isPlotFocused ? C.blue : C.text }}
+                        >
+                          <Maximize2 className="h-3.5 w-3.5" />
+                          {isPlotFocused ? "Exit Focus" : "Focus Plot"}
+                        </button>
+                        {surfaceConfig && (
+                          <button
+                            type="button"
+                            onClick={() => setPlotKind((current) => current === "3d" ? "2d" : "3d")}
+                            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {plotKind === "3d" ? "Show 2D" : "Show 3D"}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => setFigureJson((current) => scaleFigureBounds(current, 0.8))}
@@ -2046,38 +2478,36 @@ export default function OpenMatStudio() {
                           <Grid3X3 className="h-3.5 w-3.5" />
                           Grid
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsPlotWindowOpen(true)}
+                          disabled={!figureJson}
+                          className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text, opacity: figureJson ? 1 : 0.5 }}
+                        >
+                          <Maximize2 className="h-3.5 w-3.5" />
+                          Full Screen
+                        </button>
                       </div>
                       <div className="mb-2 flex items-center justify-between gap-3 text-[11px]" style={{ color: C.muted }}>
-                        <span>Axis mode: {figureMeta.axisMode}</span>
-                        <span>Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts.</span>
+                        <span>{plotKind === "3d" ? "Surface viewport" : `Axis mode: ${figureMeta.axisMode}`}</span>
+                        <span>{plotKind === "3d" ? "Use `surf` or `mesh` to populate the local 3D view." : "Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts."}</span>
                       </div>
-                      {(() => {
-                        try {
-                          const parsed = typeof figureJson === 'string' ? JSON.parse(figureJson) : figureJson;
-                          if (parsed?.type === 'opencalc_subplots') {
-                            const { cols, panels } = parsed;
-                            return (
-                              <div
-                                style={{
-                                  display: 'grid',
-                                  gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                                  gap: 8,
-                                }}
-                              >
-                                {panels.map((panel, idx) => (
-                                  <div key={idx} style={{ minWidth: 0 }}>
-                                    {panel
-                                      ? <FigureRenderer figureJson={panel} C={C} />
-                                      : <div style={{ height: 180, borderRadius: 8, background: C.surface2, border: `1px solid ${C.border}` }} />
-                                    }
-                                  </div>
-                                ))}
-                              </div>
-                            );
-                          }
-                        } catch { /* fall through */ }
-                        return <FigureRenderer figureJson={figureJson} C={C} />;
-                      })()}
+                      {plotKind === "3d" && surfaceConfig ? (
+                        <div className="h-[540px] overflow-hidden rounded-2xl border" style={{ borderColor: C.border }}>
+                          <GlobalGrapher3D
+                            embedded
+                            isOpen
+                            launchConfig={surfaceConfig}
+                            onClose={() => {
+                              setSurfaceConfig(null);
+                              setPlotKind("2d");
+                            }}
+                            onSwitchTo2D={() => setPlotKind("2d")}
+                            onSwitchToJSX={() => openGrapher({ mode: "pro" })}
+                          />
+                        </div>
+                      ) : renderOpenMatFigure(figureJson, C)}
                     </>
                   ) : (
                     <div
@@ -2090,11 +2520,11 @@ export default function OpenMatStudio() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => openGrapher({ mode: "3d", title: "OpenMAT Surface Lab" })}
+                  onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
                   className="w-full rounded-xl border px-3 py-2 text-sm font-semibold"
                   style={{ borderColor: C.border, background: C.surface, color: C.text }}
                 >
-                  Open 3D Grapher for surface-style work
+                  Open Separate 3D Window
                 </button>
               </div>
             )}

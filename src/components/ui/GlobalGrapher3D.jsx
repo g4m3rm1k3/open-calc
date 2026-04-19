@@ -43,6 +43,24 @@ const Function3D = ({ fn, settings }) => {
   const meshRef = useRef()
   
   const geometry = useMemo(() => {
+    if (fn.surfaceData?.Z) {
+      const { X, Y, Z } = fn.surfaceData
+      const rows = Z.length
+      const cols = rows ? Z[0].length : 0
+      const geo = new THREE.PlaneGeometry(1, 1, Math.max(cols - 1, 1), Math.max(rows - 1, 1))
+      geo.rotateX(-Math.PI / 2)
+      const pos = geo.attributes.position
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          const index = row * cols + col
+          pos.setX(index, X?.[row]?.[col] ?? col)
+          pos.setZ(index, Y?.[row]?.[col] ?? row)
+          pos.setY(index, Z?.[row]?.[col] ?? 0)
+        }
+      }
+      geo.computeVertexNormals()
+      return geo
+    }
     const size = settings.range || 10
     const segments = settings.resolution || 64
     const geo = new THREE.PlaneGeometry(size, size, segments, segments)
@@ -81,7 +99,7 @@ const Function3D = ({ fn, settings }) => {
     
     geo.computeVertexNormals()
     return geo
-  }, [fn.latex, settings.range, settings.resolution])
+  }, [fn.latex, fn.surfaceData, settings.range, settings.resolution])
 
   if (!fn.visible) return null
 
@@ -98,7 +116,7 @@ const Function3D = ({ fn, settings }) => {
   )
 }
 
-const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
+const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchConfig, embedded = false }) => {
   const [functions, setFunctions] = useLocalStorage('global-grapher-3d-funcs', [
     { id: 1, latex: 'sin(x) * cos(y)', color: '#6366f1', visible: true, wireframe: false, opacity: 0.8 }
   ])
@@ -119,6 +137,25 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen || !launchConfig) return
+    if (Array.isArray(launchConfig.functions) && launchConfig.functions.length) {
+      const nextFunctions = launchConfig.functions.map((fn, index) => ({
+        id: fn.id ?? Date.now() + index,
+        latex: fn.latex || fn.expr || fn.label || 'surface',
+        color: fn.color || '#6366f1',
+        visible: fn.visible !== false,
+        wireframe: !!fn.wireframe,
+        opacity: fn.opacity ?? 0.8,
+        surfaceData: fn.surfaceData ?? null,
+      }))
+      setFunctions((prev) => launchConfig.replace === false ? [...prev, ...nextFunctions] : nextFunctions)
+    }
+    if (launchConfig.settings) {
+      setSettings((prev) => ({ ...prev, ...launchConfig.settings }))
+    }
+  }, [isOpen, launchConfig])
+
   if (!isOpen) return null
 
   const addFunction = () => {
@@ -135,7 +172,7 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
     if (functions.length > 1) {
       setFunctions(functions.filter(f => f.id !== id))
     } else {
-      setFunctions([{ id: Date.now(), latex: '0', color: '#6366f1', visible: true, wireframe: false, opacity: 0.8 }])
+      setFunctions([{ id: Date.now(), latex: 'surface', color: '#6366f1', visible: true, wireframe: false, opacity: 0.8 }])
     }
   }
 
@@ -144,15 +181,15 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xl overflow-hidden sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl w-full sm:max-w-7xl flex flex-col md:flex-row h-full sm:h-[92vh] overflow-hidden">
+    <div className={embedded ? "h-full w-full overflow-hidden" : "fixed inset-0 z-[70] bg-slate-900/80 backdrop-blur-xl overflow-hidden sm:flex sm:items-center sm:justify-center sm:p-4"}>
+      <div className={embedded ? "flex h-full w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 md:flex-row" : "bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl w-full sm:max-w-7xl flex flex-col md:flex-row h-full sm:h-[92vh] overflow-hidden"}>
         
         {/* Sidebar */}
         <div className="w-full md:w-80 bg-slate-50/50 dark:bg-slate-950/30 border-r border-slate-200 dark:border-slate-800 flex flex-col">
           <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
             <h3 className="font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 tracking-tight">
               <Box className="w-5 h-5 text-indigo-500" />
-              3D Plotter
+              {launchConfig?.title || '3D Plotter'}
             </h3>
             <div className="flex items-center gap-1">
               <button 
@@ -175,10 +212,10 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
               >
                 <Plus className="w-5 h-5" />
               </button>
-              <button onClick={onClose} title="Close"
+              {!embedded && onClose && <button onClick={onClose} title="Close"
                 className="md:hidden p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-all ml-1">
                 <X className="w-4 h-4" />
-              </button>
+              </button>}
             </div>
           </div>
 
@@ -271,12 +308,14 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX }) => {
 
         {/* Viewport */}
         <div className="flex-1 relative bg-slate-50 dark:bg-slate-950">
-          <button 
-            onClick={onClose}
-            className="absolute top-6 right-6 z-20 p-2 bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl transition-all border border-slate-200 dark:border-slate-700 backdrop-blur-md shadow-xl"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {!embedded && (
+            <button 
+              onClick={onClose}
+              className="absolute top-6 right-6 z-20 p-2 bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl transition-all border border-slate-200 dark:border-slate-700 backdrop-blur-md shadow-xl"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          )}
 
           <Canvas camera={{ position: [8, 8, 8], fov: 45 }}>
             <color attach="background" args={[settings.isDark ? '#020617' : '#f8fafc']} />

@@ -5,6 +5,18 @@
 
 import { useEffect, useRef } from 'react'
 
+function getNiceTickStep(min, max, targetCount = 8) {
+  const range = Math.abs(max - min) || 1
+  const raw = range / Math.max(targetCount, 2)
+  const magnitude = 10 ** Math.floor(Math.log10(raw))
+  const normalized = raw / magnitude
+  let step = magnitude
+  if (normalized > 5) step = 10 * magnitude
+  else if (normalized > 2) step = 5 * magnitude
+  else if (normalized > 1) step = 2 * magnitude
+  return step
+}
+
 // ── Color token mapping ───────────────────────────────────────────────────────
 // Maps Python color names to actual CSS colors.
 // The 'C' object comes from the notebook's useColors() hook.
@@ -128,15 +140,17 @@ export default function FigureRenderer({ figureJson, C }) {
             // y-axis
             ctx.beginPath(); ctx.moveTo(toX(0), pt); ctx.lineTo(toX(0), pt + ih); ctx.stroke()
             if (el.ticks !== false) {
+              const xStep = getNiceTickStep(xmin, xmax, Math.max(4, Math.floor(iw / 90)))
+              const yStep = getNiceTickStep(ymin, ymax, Math.max(4, Math.floor(ih / 44)))
               ctx.fillStyle = C.hint; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
-              for (let x = Math.ceil(xmin); x <= Math.floor(xmax); x++) {
-                if (x === 0) continue
-                ctx.fillText(x, toX(x), toY(0) + 14)
+              for (let x = Math.ceil(xmin / xStep) * xStep; x <= xmax + xStep * 0.25; x += xStep) {
+                if (Math.abs(x) < 1e-9) continue
+                ctx.fillText(Number(x.toFixed(6)), toX(x), toY(0) + 14)
               }
               ctx.textAlign = 'right'
-              for (let y = Math.ceil(ymin); y <= Math.floor(ymax); y++) {
-                if (y === 0) continue
-                ctx.fillText(y, toX(0) - 4, toY(y) + 4)
+              for (let y = Math.ceil(ymin / yStep) * yStep; y <= ymax + yStep * 0.25; y += yStep) {
+                if (Math.abs(y) < 1e-9) continue
+                ctx.fillText(Number(y.toFixed(6)), toX(0) - 4, toY(y) + 4)
               }
             }
             break
