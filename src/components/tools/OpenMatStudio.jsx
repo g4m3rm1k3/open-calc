@@ -4,6 +4,7 @@ import { create, all, format as mathFormat } from "mathjs";
 import { useNavigate } from "react-router-dom";
 import {
   Play,
+  Pause,
   RefreshCw,
   Cpu,
   LineChart,
@@ -264,6 +265,21 @@ xlabel('time')
 ylabel('amplitude')
 `,
   },
+  {
+    id: "animated-wave",
+    label: "Animated Wave",
+    icon: Waves,
+    description: "Use an animate control to scrub or play a time-like parameter.",
+    code: `phase = animate('phase', 0, 2*pi, 0.08, 0, 1.2, 1);
+x = linspace(0, 8*pi, 500);
+y = sin(x - phase) .* exp(-0.03 * x);
+plot(x, y)
+grid on
+title('Animated Wave')
+xlabel('position')
+ylabel('amplitude')
+`,
+  },
 ];
 
 const HELP_TEXT = [
@@ -302,6 +318,7 @@ const HELP_TEXT = [
   "axis tight/equal/auto/[xmin xmax ymin ymax]",
   "surf(X,Y,Z)   mesh(X,Y,Z) -> opens the 3D Grapher",
   "slider('gain', min, max, step, default) -> interactive controls",
+  "animate('t', min, max, step, default, speed, loop) -> play-ready control",
   "",
   "── Output ──",
   "disp(x)   sprintf('%g', x)   fprintf('val = %f\\n', x)",
@@ -1271,6 +1288,40 @@ function createExecutionEngine(options = {}) {
 
   const plotState = makePlotState();
 
+  const registerControl = (type, name, min, max, step = 1, defaultValue = null, meta = {}) => {
+    const key = String(name);
+    const lower = Number(min);
+    const upper = Number(max);
+    const safeMin = Number.isFinite(lower) ? lower : 0;
+    const safeMax = Number.isFinite(upper) ? upper : safeMin + 1;
+    const safeStep = Math.abs(Number(step)) || 1;
+    const fallback = defaultValue == null ? safeMin : Number(defaultValue);
+    const rawValue = Object.prototype.hasOwnProperty.call(controlValues, key)
+      ? Number(controlValues[key])
+      : fallback;
+    const value = clampValue(
+      Number.isFinite(rawValue) ? rawValue : fallback,
+      Math.min(safeMin, safeMax),
+      Math.max(safeMin, safeMax),
+    );
+    parser.set(key, value);
+    variables.add(key);
+    if (!controlSet.has(key)) {
+      controls.push({
+        name: key,
+        type,
+        min: Math.min(safeMin, safeMax),
+        max: Math.max(safeMin, safeMax),
+        step: safeStep,
+        value,
+        defaultValue: fallback,
+        ...meta,
+      });
+      controlSet.add(key);
+    }
+    return value;
+  };
+
   const clearPlots = () => {
     Object.assign(plotState, makePlotState());
   };
@@ -1482,33 +1533,17 @@ function createExecutionEngine(options = {}) {
     logs.push("3D mesh ready. Opened in 3D Grapher.");
     return args[args.length - 1] ?? null;
   });
-  parser.set("slider", (name, min, max, step = 1, defaultValue = null) => {
-    const key = String(name);
-    const lower = Number(min);
-    const upper = Number(max);
-    const safeMin = Number.isFinite(lower) ? lower : 0;
-    const safeMax = Number.isFinite(upper) ? upper : safeMin + 1;
-    const safeStep = Math.abs(Number(step)) || 1;
-    const fallback = defaultValue == null ? safeMin : Number(defaultValue);
-    const rawValue = Object.prototype.hasOwnProperty.call(controlValues, key)
-      ? Number(controlValues[key])
-      : fallback;
-    const value = clampValue(Number.isFinite(rawValue) ? rawValue : fallback, Math.min(safeMin, safeMax), Math.max(safeMin, safeMax));
-    parser.set(key, value);
-    variables.add(key);
-    if (!controlSet.has(key)) {
-      controls.push({
-        name: key,
-        min: Math.min(safeMin, safeMax),
-        max: Math.max(safeMin, safeMax),
-        step: safeStep,
-        value,
-        defaultValue: fallback,
-      });
-      controlSet.add(key);
-    }
-    return value;
-  });
+  parser.set("slider", (name, min, max, step = 1, defaultValue = null) =>
+    registerControl("slider", name, min, max, step, defaultValue),
+  );
+  parser.set(
+    "animate",
+    (name, min, max, step = 1, defaultValue = null, speed = 1, loop = 1) =>
+      registerControl("animate", name, min, max, step, defaultValue, {
+        speed: Math.abs(Number(speed)) || 1,
+        loop: Boolean(Number(loop)),
+      }),
+  );
   parser.set("whos", () => buildWorkspaceSnapshot(parser, variables));
 
   // ── Subplot ──
@@ -1896,6 +1931,7 @@ export default function OpenMatStudio() {
   const [plotKind, setPlotKind] = useState("2d");
   const [controlSpecs, setControlSpecs] = useState([]);
   const [controlValues, setControlValues] = useLocalStorage("openmat-control-values", {});
+  const [controlPlayback, setControlPlayback] = useLocalStorage("openmat-control-playback", {});
   const [normalizedPreview, setNormalizedPreview] = useState("");
   const [workspaceItems, setWorkspaceItems] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState(null);
@@ -1907,6 +1943,11 @@ export default function OpenMatStudio() {
   const importRef = useRef(null);
   const shellRef = useRef(null);
   const stateRef = useRef({});
+  const controlValuesRef = useRef(controlValues);
+
+  useEffect(() => {
+    controlValuesRef.current = controlValues;
+  }, [controlValues]);
 
   const exampleMap = useMemo(
     () => Object.fromEntries(EXAMPLES.map((example) => [example.id, example])),
@@ -1935,6 +1976,7 @@ export default function OpenMatStudio() {
     "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
     "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
     "Interactivity: slider('name', min, max, step, default)",
+    "Animation: animate('t', min, max, step, default, speed, loop)",
     "Functions: function [out]=name(in)...end and f = @(x) expr",
     "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
     "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
@@ -1967,6 +2009,17 @@ export default function OpenMatStudio() {
         });
         return merged;
       });
+      setControlPlayback((current) => {
+        const next = {};
+        (result.controls || []).forEach((control) => {
+          if (control.type === "animate") {
+            next[control.name] = {
+              playing: current[control.name]?.playing ?? false,
+            };
+          }
+        });
+        return next;
+      });
       if (result.plot3DRequest) {
         setPlotKind("3d");
       } else if (result.figureJson) {
@@ -1992,6 +2045,7 @@ export default function OpenMatStudio() {
       setSurfaceConfig(null);
       setPlotKind("2d");
       setControlSpecs([]);
+      setControlPlayback({});
       setWorkspaceItems([]);
       setSelectedVariable(null);
       setWorkspaceTab("console");
@@ -2001,7 +2055,7 @@ export default function OpenMatStudio() {
         outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [code, controlValues, setControlValues, setWorkspaceTab]);
+  }, [code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
 
   const resetWorkspace = useCallback(() => {
     setCode(DEFAULT_CODE);
@@ -2012,11 +2066,12 @@ export default function OpenMatStudio() {
     setPlotKind("2d");
     setControlSpecs([]);
     setControlValues({});
+    setControlPlayback({});
     setIsPlotWindowOpen(false);
     setNormalizedPreview("");
     setWorkspaceItems([]);
     setSelectedVariable(null);
-  }, [setCode, setControlValues]);
+  }, [setCode, setControlPlayback, setControlValues]);
 
   const loadExample = useCallback(
     (exampleId) => {
@@ -2030,10 +2085,11 @@ export default function OpenMatStudio() {
       setPlotKind("2d");
       setControlSpecs([]);
       setControlValues({});
+      setControlPlayback({});
       setIsPlotWindowOpen(false);
       setNormalizedPreview("");
     },
-    [exampleMap, setCode, setControlValues],
+    [exampleMap, setCode, setControlPlayback, setControlValues],
   );
 
   const exportWorkspace = useCallback(() => {
@@ -2072,6 +2128,7 @@ export default function OpenMatStudio() {
         setPlotKind("2d");
         setControlSpecs([]);
         setControlValues({});
+        setControlPlayback({});
         setIsPlotWindowOpen(false);
         setNormalizedPreview("");
         setWorkspaceItems([]);
@@ -2083,7 +2140,7 @@ export default function OpenMatStudio() {
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [setBrowserTab, setCode, setControlValues, setWorkspaceTab]);
+  }, [setBrowserTab, setCode, setControlPlayback, setControlValues, setWorkspaceTab]);
 
   const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
 
@@ -2158,6 +2215,82 @@ export default function OpenMatStudio() {
     setControlValues(nextControls);
     runCode(nextControls);
   }, [controlSpecs, controlValues, runCode, setControlValues]);
+
+  const toggleAnimatedControl = useCallback((name) => {
+    setControlPlayback((current) => ({
+      ...current,
+      [name]: {
+        playing: !(current[name]?.playing ?? false),
+      },
+    }));
+  }, [setControlPlayback]);
+
+  const resetAnimatedControl = useCallback((name) => {
+    const spec = controlSpecs.find((control) => control.name === name);
+    if (!spec) return;
+    const resetValue = spec.defaultValue ?? spec.min;
+    const nextControls = { ...controlValuesRef.current, [name]: resetValue };
+    setControlPlayback((current) => ({
+      ...current,
+      [name]: {
+        playing: false,
+      },
+    }));
+    setControlValues(nextControls);
+    runCode(nextControls);
+  }, [controlSpecs, runCode, setControlPlayback, setControlValues]);
+
+  const stepAnimatedControls = useCallback(() => {
+    const animatedControls = controlSpecs.filter(
+      (control) => control.type === "animate" && controlPlayback[control.name]?.playing,
+    );
+    if (!animatedControls.length) return;
+
+    const nextControls = { ...controlValuesRef.current };
+    const stoppedNames = [];
+
+    animatedControls.forEach((control) => {
+      const currentValue = Object.prototype.hasOwnProperty.call(nextControls, control.name)
+        ? Number(nextControls[control.name])
+        : control.value;
+      let nextValue = currentValue + control.step * (control.speed || 1);
+      if (nextValue > control.max + 1e-9) {
+        if (control.loop) {
+          nextValue = control.min;
+        } else {
+          nextValue = control.max;
+          stoppedNames.push(control.name);
+        }
+      }
+      nextControls[control.name] = Number(nextValue.toFixed(6));
+    });
+
+    if (stoppedNames.length) {
+      setControlPlayback((current) => {
+        const next = { ...current };
+        stoppedNames.forEach((name) => {
+          next[name] = { playing: false };
+        });
+        return next;
+      });
+    }
+
+    setControlValues(nextControls);
+    runCode(nextControls);
+  }, [controlPlayback, controlSpecs, runCode, setControlPlayback, setControlValues]);
+
+  useEffect(() => {
+    const hasActiveAnimation = controlSpecs.some(
+      (control) => control.type === "animate" && controlPlayback[control.name]?.playing,
+    );
+    if (!hasActiveAnimation) return undefined;
+
+    const timer = window.setInterval(() => {
+      stepAnimatedControls();
+    }, 80);
+
+    return () => window.clearInterval(timer);
+  }, [controlPlayback, controlSpecs, stepAnimatedControls]);
 
   return (
     <div
@@ -2587,17 +2720,54 @@ export default function OpenMatStudio() {
                                   style={{ borderColor: C.border, background: C.surface }}
                                 >
                                   <div className="mb-2 flex items-center justify-between gap-3">
-                                    <span className="font-mono text-sm font-semibold">{control.name}</span>
-                                    <input
-                                      type="number"
-                                      value={currentValue}
-                                      min={control.min}
-                                      max={control.max}
-                                      step={control.step}
-                                      onChange={(event) => updateControlValue(control.name, event.target.value)}
-                                      className="w-24 rounded-md border px-2 py-1 text-xs"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
+                                    <div>
+                                      <span className="font-mono text-sm font-semibold">{control.name}</span>
+                                      <div className="text-[11px]" style={{ color: C.muted }}>
+                                        {control.type === "animate" ? "Animated parameter" : "Interactive parameter"}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {control.type === "animate" && (
+                                        <>
+                                          <button
+                                            type="button"
+                                            onClick={() => toggleAnimatedControl(control.name)}
+                                            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                                            style={{
+                                              borderColor: controlPlayback[control.name]?.playing ? C.blue : C.border,
+                                              background: C.surface2,
+                                              color: controlPlayback[control.name]?.playing ? C.blue : C.text,
+                                            }}
+                                          >
+                                            {controlPlayback[control.name]?.playing ? (
+                                              <Pause className="h-3 w-3" />
+                                            ) : (
+                                              <Play className="h-3 w-3" />
+                                            )}
+                                            {controlPlayback[control.name]?.playing ? "Pause" : "Play"}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => resetAnimatedControl(control.name)}
+                                            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                          >
+                                            <RefreshCw className="h-3 w-3" />
+                                            Reset
+                                          </button>
+                                        </>
+                                      )}
+                                      <input
+                                        type="number"
+                                        value={currentValue}
+                                        min={control.min}
+                                        max={control.max}
+                                        step={control.step}
+                                        onChange={(event) => updateControlValue(control.name, event.target.value)}
+                                        className="w-24 rounded-md border px-2 py-1 text-xs"
+                                        style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                      />
+                                    </div>
                                   </div>
                                   <input
                                     type="range"
@@ -2610,7 +2780,10 @@ export default function OpenMatStudio() {
                                   />
                                   <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
                                     <span>{control.min}</span>
-                                    <span>step {control.step}</span>
+                                    <span>
+                                      step {control.step}
+                                      {control.type === "animate" ? ` • speed ${control.speed || 1}x` : ""}
+                                    </span>
                                     <span>{control.max}</span>
                                   </div>
                                 </div>
