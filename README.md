@@ -28,6 +28,8 @@ A `mathBridge` field on every visualization explicitly states which part of the 
 
 Students can run Python and JavaScript code directly in the browser — no installation required, powered by Pyodide and a sandboxed JS runtime.
 
+OpenMAT is also included as a MATLAB-style matrix workspace inside the app. It uses a custom MATLAB-like language layer on top of a browser-side math engine and Open Calc's own plotting stack. See [docs/OpenMAT.md](docs/OpenMAT.md) for the current language model, supported features, and extension direction.
+
 ---
 
 ## Courses

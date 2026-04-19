@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import FigureRenderer from './FigureRenderer'
 import { parseProse } from '../../math/parseProse.jsx'
+import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
 
 // ── Colors hook (same as all viz components) ─────────────────────────────────
 function useColors() {
@@ -507,8 +508,9 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
       {/* Monaco Editor */}
       <Editor
         height={editorHeight}
+        beforeMount={setupOpenCalcMonaco}
         defaultLanguage="python"
-        theme={document.documentElement.classList.contains('dark') ? 'vs-dark' : 'vs'}
+        theme={document.documentElement.classList.contains('dark') ? 'open-calc-dark' : 'open-calc-light'}
         value={cell.code}
         onChange={(val) => onUpdate(cell.id, val || '')}
         options={{

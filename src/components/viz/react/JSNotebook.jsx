@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
+import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 
@@ -410,10 +411,11 @@ function NotebookCell({ cell, cellIndex, T, dark }) {
         <Editor
           key={`${activeTab}-${dark}`}
           height={editorHeight}
+          beforeMount={setupOpenCalcMonaco}
           language={MONACO_LANG[activeTab]}
           value={editorValue}
           onChange={handleEditorChange}
-          theme={dark ? "vs-dark" : "light"}
+          theme={dark ? "open-calc-dark" : "open-calc-light"}
           options={{
             fontSize: 13, lineHeight: 20,
             minimap: { enabled: false },

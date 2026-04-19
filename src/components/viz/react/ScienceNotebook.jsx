@@ -14,6 +14,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
 function useIsDark() {
@@ -361,9 +362,10 @@ function VisualCell({ cell, cellIndex, T, dark, forceCodeOpen }) {
           <Editor
             key={`src-${cellIndex}-${activeTab}-${dark}`}
             height={Math.min(420, Math.max(80, currentTab.code.split('\n').length * 19 + 24))}
+            beforeMount={setupOpenCalcMonaco}
             language={currentTab.lang}
             value={currentTab.code}
-            theme={dark ? 'vs-dark' : 'light'}
+            theme={dark ? 'open-calc-dark' : 'open-calc-light'}
             options={{
               readOnly: true, fontSize: 12, lineHeight: 19,
               minimap: { enabled: false }, scrollBeyondLastLine: false,
@@ -683,10 +685,11 @@ if(window.ResizeObserver){new ResizeObserver(r).observe(document.body)}else{wind
         <Editor
           key={`coding-${cellIndex}-${dark}`}
           height={editorH}
+          beforeMount={setupOpenCalcMonaco}
           language={cell.language || 'javascript'}
           value={showSolution ? (cell.solutionCode || code) : code}
           onChange={(val='') => { if (!showSolution) setCode(val) }}
-          theme={dark ? 'vs-dark' : 'light'}
+          theme={dark ? 'open-calc-dark' : 'open-calc-light'}
           options={{ fontSize:13, lineHeight:20, minimap:{enabled:false}, scrollBeyondLastLine:false, wordWrap:'on', tabSize:2, readOnly:showSolution, renderLineHighlight:'none', overviewRulerLanes:0, folding:false, lineDecorationsWidth:6, lineNumbersMinChars:3, padding:{top:10,bottom:10} }}
         />
       </div>
@@ -799,9 +802,10 @@ function WalkthroughCell({ cell, cellIndex, T, dark }) {
           <Editor
             key={`wt-${cellIndex}-${step}-${dark}`}
             height={Math.min(280, Math.max(60, currentStep.code.split('\n').length * 20 + 20))}
+            beforeMount={setupOpenCalcMonaco}
             language={cell.language || 'javascript'}
             value={currentStep.code}
-            theme={dark ? 'vs-dark' : 'light'}
+            theme={dark ? 'open-calc-dark' : 'open-calc-light'}
             options={{ readOnly: true, fontSize: 12, lineHeight: 19, minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', renderLineHighlight: 'none', overviewRulerLanes: 0, folding: false, lineDecorationsWidth: 6, lineNumbersMinChars: 3, padding: { top: 8, bottom: 8 }, domReadOnly: true }}
           />
         </div>

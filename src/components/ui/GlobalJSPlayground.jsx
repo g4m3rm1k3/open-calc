@@ -50,6 +50,7 @@ ${cell.html || ''}
 
 
 import Editor from '@monaco-editor/react'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const T = {
@@ -781,10 +782,11 @@ ${cell.js || ''}
         <Editor
           key={`${cell.id}-${activeTab}`}
           height={editorHeight}
+          beforeMount={setupOpenCalcMonaco}
           language={MONACO_LANG[activeTab]}
           value={editorValue}
           onChange={handleChange}
-          theme="vs-dark"
+          theme="open-calc-dark"
           options={{
             fontSize: 12, lineHeight: 20,
             minimap: { enabled: false },

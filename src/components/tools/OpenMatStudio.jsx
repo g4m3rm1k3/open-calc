@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Play,
   Pause,
+  Plus,
+  Pencil,
   RefreshCw,
   Cpu,
   LineChart,
@@ -25,6 +27,7 @@ import FigureRenderer from "../viz/react/FigureRenderer.jsx";
 import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
 const math = create(all);
 math.config({ matrix: "Array", number: "number" });
@@ -381,6 +384,11 @@ ylabel('height')
 const HELP_TEXT = [
   "Supported MATLAB-like syntax:",
   "",
+  "── Language Model ──",
+  "OpenMAT is a MATLAB-like dialect built on top of a local math engine.",
+  "It is not raw JavaScript, Python, or full MATLAB compatibility.",
+  "Docs source of truth: docs/OpenMAT.md",
+  "",
   "── Matrices ──",
   "A = [1 2; 3 4]   A'   A \\ b   inv(A)   det(A)   trace(A)",
   "[V,D] = eig(A)   [Q,R] = qr(A)   [U,S,V] = svd(A)",
@@ -426,6 +434,95 @@ const HELP_TEXT = [
 
 const SERIES_COLORS = ["teal", "blue", "amber", "purple", "red", "green"];
 const OPENMAT_EXTENSION_REGISTRY = new Map();
+
+function makeDocumentId() {
+  return `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createOpenMatDocument(name = "untitled.m", code = "") {
+  return {
+    id: makeDocumentId(),
+    name,
+    code,
+  };
+}
+
+function getNextUntitledName(documents) {
+  const untitledCount = documents.filter((doc) => /^untitled(?: \d+)?\.m$/i.test(doc.name)).length;
+  return untitledCount === 0 ? "untitled.m" : `untitled ${untitledCount + 1}.m`;
+}
+
+function normalizeImportedDocuments(value) {
+  if (!Array.isArray(value) || value.length === 0) return null;
+  const docs = value
+    .map((doc, index) => ({
+      id: typeof doc?.id === "string" ? doc.id : makeDocumentId(),
+      name: typeof doc?.name === "string" && doc.name.trim() ? doc.name.trim() : `script ${index + 1}.m`,
+      code: typeof doc?.code === "string" ? doc.code : "",
+    }));
+  return docs.length ? docs : null;
+}
+
+function getInitialOpenMatDocuments() {
+  if (typeof window === "undefined") {
+    return [createOpenMatDocument("untitled.m", DEFAULT_CODE)];
+  }
+  try {
+    const savedDocs = window.localStorage.getItem("openmat-documents");
+    const parsedDocs = normalizeImportedDocuments(savedDocs ? JSON.parse(savedDocs) : null);
+    if (parsedDocs) return parsedDocs;
+
+    const legacyCode = window.localStorage.getItem("openmat-code");
+    const parsedCode = legacyCode ? JSON.parse(legacyCode) : DEFAULT_CODE;
+    return [createOpenMatDocument("untitled.m", typeof parsedCode === "string" ? parsedCode : DEFAULT_CODE)];
+  } catch {
+    return [createOpenMatDocument("untitled.m", DEFAULT_CODE)];
+  }
+}
+
+function getInitialActiveDocumentId(documents) {
+  if (typeof window === "undefined") return documents[0]?.id || null;
+  try {
+    const savedId = window.localStorage.getItem("openmat-active-document-id");
+    const parsedId = savedId ? JSON.parse(savedId) : null;
+    if (typeof parsedId === "string" && documents.some((doc) => doc.id === parsedId)) {
+      return parsedId;
+    }
+  } catch {
+    // fall through to first document
+  }
+  return documents[0]?.id || null;
+}
+
+function buildRecoverySnapshot({
+  documents,
+  activeDocumentId,
+  browserTab,
+  workspaceTab,
+  controlValues,
+  reason,
+}) {
+  return {
+    documents,
+    activeDocumentId,
+    browserTab,
+    workspaceTab,
+    controlValues,
+    reason,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function compactDocumentLabel(name, crowded = false) {
+  const safeName = typeof name === "string" && name.trim() ? name.trim() : "untitled.m";
+  if (!crowded) return safeName;
+
+  const extIndex = safeName.lastIndexOf(".");
+  const base = extIndex > 0 ? safeName.slice(0, extIndex) : safeName;
+  const extension = extIndex > 0 ? safeName.slice(extIndex) : "";
+  const compactBase = base.length <= 6 ? base : `${base.slice(0, 3)}...`;
+  return `${compactBase}${extension}`;
+}
 
 function registerOpenMatExtension(name, extension) {
   if (!name || typeof name !== "string") {
@@ -2015,7 +2112,11 @@ export default function OpenMatStudio() {
   const navigate = useNavigate();
   const C = useColors();
   const { openGrapher } = useGrapher();
-  const [code, setCode] = useLocalStorage("openmat-code", DEFAULT_CODE);
+  const [documents, setDocuments] = useLocalStorage("openmat-documents", getInitialOpenMatDocuments());
+  const [activeDocumentId, setActiveDocumentId] = useLocalStorage(
+    "openmat-active-document-id",
+    getInitialActiveDocumentId(getInitialOpenMatDocuments()),
+  );
   const [rightPaneWidth, setRightPaneWidth] = useLocalStorage("openmat-right-pane-width", 390);
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState("");
@@ -2028,6 +2129,7 @@ export default function OpenMatStudio() {
   const [controlSpecs, setControlSpecs] = useState([]);
   const [controlValues, setControlValues] = useLocalStorage("openmat-control-values", {});
   const [controlPlayback, setControlPlayback] = useLocalStorage("openmat-control-playback", {});
+  const [recoverySnapshot, setRecoverySnapshot] = useLocalStorage("openmat-recovery-snapshot", null);
   const [normalizedPreview, setNormalizedPreview] = useState("");
   const [workspaceItems, setWorkspaceItems] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState(null);
@@ -2040,15 +2142,64 @@ export default function OpenMatStudio() {
   const shellRef = useRef(null);
   const stateRef = useRef({});
   const controlValuesRef = useRef(controlValues);
+  const monacoRef = useRef(null);
+
+  const activeDocument = useMemo(
+    () => documents.find((doc) => doc.id === activeDocumentId) || documents[0] || null,
+    [activeDocumentId, documents],
+  );
+  const code = activeDocument?.code ?? "";
 
   useEffect(() => {
     controlValuesRef.current = controlValues;
   }, [controlValues]);
 
+  useEffect(() => {
+    if (!monacoRef.current) return;
+    monacoRef.current.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
+  }, [C.isDark]);
+
+  useEffect(() => {
+    if (!documents.length) {
+      const fallback = createOpenMatDocument("untitled.m", DEFAULT_CODE);
+      setDocuments([fallback]);
+      setActiveDocumentId(fallback.id);
+      return;
+    }
+    if (!documents.some((doc) => doc.id === activeDocumentId)) {
+      setActiveDocumentId(documents[0].id);
+    }
+  }, [activeDocumentId, documents, setActiveDocumentId, setDocuments]);
+
   const exampleMap = useMemo(
     () => Object.fromEntries(EXAMPLES.map((example) => [example.id, example])),
     [],
   );
+
+  const captureRecoverySnapshot = useCallback((reason) => {
+    setRecoverySnapshot(
+      buildRecoverySnapshot({
+        documents,
+        activeDocumentId,
+        browserTab,
+        workspaceTab,
+        controlValues,
+        reason,
+      }),
+    );
+  }, [activeDocumentId, browserTab, controlValues, documents, setRecoverySnapshot, workspaceTab]);
+
+  const setCode = useCallback((value) => {
+    if (!activeDocument) return;
+    setDocuments((current) =>
+      current.map((doc) => {
+        if (doc.id !== activeDocument.id) return doc;
+        const nextCode = value instanceof Function ? value(doc.code) : value;
+        return { ...doc, code: String(nextCode ?? "") };
+      }),
+    );
+  }, [activeDocument, setDocuments]);
+
 
   const workspaceTabs = [
     { id: "plot", label: "Figure", icon: LineChart },
@@ -2062,7 +2213,9 @@ export default function OpenMatStudio() {
     { id: "functions", label: "Functions" },
     { id: "notes", label: "Notes" },
   ];
+  const crowdedTabs = documents.length >= 6;
   const referenceItems = [
+    "Language: MATLAB-like syntax over a local math engine, not raw JS/Python",
     "Matrices: [1 2; 3 4], A', A \\\\ b, inv, det, trace, eig, qr, svd",
     "Arrays: linspace, logspace, zeros, ones, eye, rand, randn, reshape, repmat",
     "Statistics: mean, median, std, var, min, max, sum, prod, sort, unique, find",
@@ -2077,6 +2230,49 @@ export default function OpenMatStudio() {
     "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
     "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
   ];
+
+  const clearRunState = useCallback(() => {
+    setOutput("");
+    setFigureJson(null);
+    setBaseFigureJson(null);
+    setSurfaceConfig(null);
+    setPlotKind("2d");
+    setControlSpecs([]);
+    setControlValues({});
+    setControlPlayback({});
+    setIsPlotWindowOpen(false);
+    setNormalizedPreview("");
+    setWorkspaceItems([]);
+    setSelectedVariable(null);
+  }, [setControlPlayback, setControlValues]);
+
+  const restoreRecoverySnapshot = useCallback(() => {
+    const importedDocuments = normalizeImportedDocuments(recoverySnapshot?.documents);
+    if (!importedDocuments) return;
+    setDocuments(importedDocuments);
+    const importedActiveId =
+      typeof recoverySnapshot?.activeDocumentId === "string"
+      && importedDocuments.some((doc) => doc.id === recoverySnapshot.activeDocumentId)
+        ? recoverySnapshot.activeDocumentId
+        : importedDocuments[0].id;
+    setActiveDocumentId(importedActiveId);
+    if (typeof recoverySnapshot?.browserTab === "string") setBrowserTab(recoverySnapshot.browserTab);
+    if (typeof recoverySnapshot?.workspaceTab === "string") setWorkspaceTab(recoverySnapshot.workspaceTab);
+    clearRunState();
+    setControlValues(
+      recoverySnapshot?.controlValues && typeof recoverySnapshot.controlValues === "object"
+        ? recoverySnapshot.controlValues
+        : {},
+    );
+  }, [
+    clearRunState,
+    recoverySnapshot,
+    setActiveDocumentId,
+    setBrowserTab,
+    setControlValues,
+    setDocuments,
+    setWorkspaceTab,
+  ]);
 
   const runCode = useCallback((nextControlValues = controlValues) => {
     setRunning(true);
@@ -2154,45 +2350,33 @@ export default function OpenMatStudio() {
   }, [code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
 
   const resetWorkspace = useCallback(() => {
-    setCode(DEFAULT_CODE);
-    setOutput("");
-    setFigureJson(null);
-    setBaseFigureJson(null);
-    setSurfaceConfig(null);
-    setPlotKind("2d");
-    setControlSpecs([]);
-    setControlValues({});
-    setControlPlayback({});
-    setIsPlotWindowOpen(false);
-    setNormalizedPreview("");
-    setWorkspaceItems([]);
-    setSelectedVariable(null);
-  }, [setCode, setControlPlayback, setControlValues]);
+    captureRecoverySnapshot("Reset workspace");
+    const resetDocument = createOpenMatDocument("untitled.m", DEFAULT_CODE);
+    setDocuments([resetDocument]);
+    setActiveDocumentId(resetDocument.id);
+    clearRunState();
+  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setDocuments]);
 
   const loadExample = useCallback(
     (exampleId) => {
       const example = exampleMap[exampleId];
       if (!example) return;
-      setCode(example.code);
-      setOutput("");
-      setFigureJson(null);
-      setBaseFigureJson(null);
-      setSurfaceConfig(null);
-      setPlotKind("2d");
-      setControlSpecs([]);
-      setControlValues({});
-      setControlPlayback({});
-      setIsPlotWindowOpen(false);
-      setNormalizedPreview("");
+      captureRecoverySnapshot(`Load example: ${example.label}`);
+      const document = createOpenMatDocument(`${example.label}.m`, example.code);
+      setDocuments((current) => [...current, document]);
+      setActiveDocumentId(document.id);
+      clearRunState();
     },
-    [exampleMap, setCode, setControlPlayback, setControlValues],
+    [captureRecoverySnapshot, clearRunState, exampleMap, setActiveDocumentId, setDocuments],
   );
 
   const exportWorkspace = useCallback(() => {
     const payload = {
-      code,
+      documents,
+      activeDocumentId,
       browserTab,
       workspaceTab,
+      controlValues,
       exportedAt: new Date().toISOString(),
       app: "OpenMAT",
     };
@@ -2202,10 +2386,10 @@ export default function OpenMatStudio() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "openmat-workspace.json";
+    link.download = "openmat-session.json";
     link.click();
     URL.revokeObjectURL(url);
-  }, [browserTab, code, workspaceTab]);
+  }, [activeDocumentId, browserTab, controlValues, documents, workspaceTab]);
 
   const importWorkspace = useCallback((event) => {
     const file = event.target.files?.[0];
@@ -2213,22 +2397,28 @@ export default function OpenMatStudio() {
     const reader = new FileReader();
     reader.onload = (loadEvent) => {
       try {
+        captureRecoverySnapshot(`Import session: ${file.name}`);
         const parsed = JSON.parse(String(loadEvent.target?.result || "{}"));
-        if (typeof parsed.code === "string") setCode(parsed.code);
+        const importedDocuments = normalizeImportedDocuments(parsed.documents)
+          || (typeof parsed.code === "string"
+            ? [createOpenMatDocument("untitled.m", parsed.code)]
+            : null);
+        if (!importedDocuments) {
+          throw new Error("No valid OpenMAT documents were found in this file.");
+        }
+        setDocuments(importedDocuments);
+        const importedActiveId =
+          typeof parsed.activeDocumentId === "string"
+          && importedDocuments.some((doc) => doc.id === parsed.activeDocumentId)
+            ? parsed.activeDocumentId
+            : importedDocuments[0].id;
+        setActiveDocumentId(importedActiveId);
         if (typeof parsed.browserTab === "string") setBrowserTab(parsed.browserTab);
         if (typeof parsed.workspaceTab === "string") setWorkspaceTab(parsed.workspaceTab);
-        setOutput("");
-        setFigureJson(null);
-        setBaseFigureJson(null);
-        setSurfaceConfig(null);
-        setPlotKind("2d");
-        setControlSpecs([]);
-        setControlValues({});
-        setControlPlayback({});
-        setIsPlotWindowOpen(false);
-        setNormalizedPreview("");
-        setWorkspaceItems([]);
-        setSelectedVariable(null);
+        clearRunState();
+        setControlValues(
+          parsed.controlValues && typeof parsed.controlValues === "object" ? parsed.controlValues : {},
+        );
       } catch (error) {
         setOutput(`Error: Could not import workspace. ${error.message}`);
         setWorkspaceTab("console");
@@ -2236,18 +2426,66 @@ export default function OpenMatStudio() {
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [setBrowserTab, setCode, setControlPlayback, setControlValues, setWorkspaceTab]);
+  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setWorkspaceTab]);
+
+  const createNewDocument = useCallback(() => {
+    const document = createOpenMatDocument(getNextUntitledName(documents), "");
+    setDocuments((current) => [...current, document]);
+    setActiveDocumentId(document.id);
+    clearRunState();
+  }, [clearRunState, documents, setActiveDocumentId, setDocuments]);
+
+  const renameActiveDocument = useCallback(() => {
+    if (!activeDocument) return;
+    const nextName = window.prompt("Rename script", activeDocument.name);
+    if (!nextName) return;
+    const trimmed = nextName.trim();
+    if (!trimmed) return;
+    setDocuments((current) =>
+      current.map((doc) => (doc.id === activeDocument.id ? { ...doc, name: trimmed } : doc)),
+    );
+  }, [activeDocument, setDocuments]);
+
+  const switchDocument = useCallback((documentId) => {
+    if (!documentId || documentId === activeDocumentId) return;
+    setActiveDocumentId(documentId);
+    clearRunState();
+  }, [activeDocumentId, clearRunState, setActiveDocumentId]);
+
+  const closeDocument = useCallback((documentId) => {
+    if (!documentId) return;
+    captureRecoverySnapshot("Close script tab");
+    if (documents.length <= 1) {
+      resetWorkspace();
+      return;
+    }
+    const currentIndex = documents.findIndex((doc) => doc.id === documentId);
+    const nextDocuments = documents.filter((doc) => doc.id !== documentId);
+    const nextActive =
+      activeDocumentId === documentId
+        ? nextDocuments[Math.max(0, currentIndex - 1)]?.id || nextDocuments[0]?.id
+        : activeDocumentId;
+    setDocuments(nextDocuments);
+    setActiveDocumentId(nextActive);
+    if (activeDocumentId === documentId) {
+      clearRunState();
+    }
+  }, [activeDocumentId, captureRecoverySnapshot, clearRunState, documents, resetWorkspace, setActiveDocumentId, setDocuments]);
 
   const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
 
   useEffect(() => {
     stateRef.current = {
+      documents,
+      activeDocumentId,
+      activeDocument,
       code,
       output,
       workspaceItems,
       figureJson,
+      recoverySnapshot,
     };
-  }, [code, output, workspaceItems, figureJson]);
+  }, [activeDocument, activeDocumentId, code, documents, figureJson, output, recoverySnapshot, workspaceItems]);
 
   useEffect(() => {
     const api = {
@@ -2257,6 +2495,22 @@ export default function OpenMatStudio() {
       run: (source) => executeScript(String(source ?? stateRef.current.code ?? ""), { extensions: listOpenMatExtensions() }),
       setCode: (nextCode) => setCode(String(nextCode ?? "")),
       appendCode: (snippet) => setCode((prev) => `${prev}${prev.endsWith("\n") ? "" : "\n"}${String(snippet ?? "")}`),
+      createDocument: (name = null, nextCode = "") => {
+        const document = createOpenMatDocument(name || getNextUntitledName(stateRef.current.documents || []), String(nextCode ?? ""));
+        setDocuments((current) => [...current, document]);
+        setActiveDocumentId(document.id);
+        return document.id;
+      },
+      renameDocument: (id, name) => {
+        if (!id || !name) return;
+        setDocuments((current) =>
+          current.map((doc) => (doc.id === id ? { ...doc, name: String(name).trim() || doc.name } : doc)),
+        );
+      },
+      setActiveDocument: (id) => {
+        if (typeof id === "string") setActiveDocumentId(id);
+      },
+      restoreLastSnapshot: () => restoreRecoverySnapshot(),
       getState: () => ({ ...stateRef.current }),
       open3D: (config) => openGrapher({ mode: "3d", ...config }),
     };
@@ -2265,7 +2519,7 @@ export default function OpenMatStudio() {
     return () => {
       if (window.OpenMAT === api) delete window.OpenMAT;
     };
-  }, [openGrapher, setCode]);
+  }, [openGrapher, restoreRecoverySnapshot, setActiveDocumentId, setCode, setDocuments]);
 
   useEffect(() => {
     if (!isResizingRightPane) return undefined;
@@ -2412,7 +2666,19 @@ export default function OpenMatStudio() {
               OpenMAT
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold">untitled.m</div>
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="truncate text-sm font-semibold">{activeDocument?.name || "untitled.m"}</div>
+                <button
+                  type="button"
+                  onClick={renameActiveDocument}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                  style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                  title="Rename current script"
+                >
+                  <Pencil className="h-3 w-3" />
+                  Rename
+                </button>
+              </div>
               <div className="text-[11px]" style={{ color: C.muted }}>
                 Matrix computing workspace • local engine • mobile-aware layout
               </div>
@@ -2446,6 +2712,18 @@ export default function OpenMatStudio() {
             <Upload className="h-3.5 w-3.5" />
             Import
           </button>
+          {normalizeImportedDocuments(recoverySnapshot?.documents) && (
+            <button
+              type="button"
+              onClick={restoreRecoverySnapshot}
+              className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+              style={{ borderColor: C.border, background: C.surface, color: C.text }}
+              title={recoverySnapshot?.reason ? `Restore: ${recoverySnapshot.reason}` : "Restore last snapshot"}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Restore
+            </button>
+          )}
           <button
             type="button"
             onClick={resetWorkspace}
@@ -2529,6 +2807,13 @@ export default function OpenMatStudio() {
             <div className="min-h-0 flex-1 overflow-auto p-3">
               {browserTab === "examples" && (
                 <div className="space-y-3">
+                  <div
+                    className="rounded-2xl border px-3 py-2 text-xs leading-5"
+                    style={{ borderColor: C.border, background: C.surface, color: C.muted }}
+                  >
+                    Examples open in a new script tab so your current work stays intact. `Restore`
+                    brings back the last session snapshot after resets, imports, or accidental closes.
+                  </div>
                   {EXAMPLES.map((example) => {
                     const Icon = example.icon;
                     return (
@@ -2590,17 +2875,99 @@ export default function OpenMatStudio() {
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="flex items-center justify-between gap-3 border-b px-3 py-2" style={{ borderColor: C.border }}>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex min-w-0 items-end gap-1 overflow-x-auto pb-1">
+                {documents.map((document) => {
+                  const active = document.id === activeDocument?.id;
+                  return (
+                    <div
+                      key={document.id}
+                      className="flex items-center"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => switchDocument(document.id)}
+                        onMouseDown={(event) => {
+                          if (event.button === 1) {
+                            event.preventDefault();
+                            closeDocument(document.id);
+                          }
+                        }}
+                        onDoubleClick={() => {
+                          if (document.id === activeDocument?.id) renameActiveDocument();
+                        }}
+                        className="inline-flex items-center gap-2 rounded-t-lg border border-b-0 px-3 py-1.5 pr-2 text-xs font-semibold"
+                        style={{
+                          background: active ? C.surface : C.surface2,
+                          borderColor: C.border,
+                          color: active ? C.text : C.muted,
+                          transition: "background-color 140ms ease, color 140ms ease, border-color 140ms ease",
+                        }}
+                        title={document.name}
+                        onMouseEnter={(event) => {
+                          if (document.id !== activeDocument?.id) {
+                            event.currentTarget.style.background = C.surface;
+                            event.currentTarget.style.color = C.text;
+                          }
+                        }}
+                        onMouseLeave={(event) => {
+                          event.currentTarget.style.background =
+                            document.id === activeDocument?.id ? C.surface : C.surface2;
+                          event.currentTarget.style.color =
+                            document.id === activeDocument?.id ? C.text : C.muted;
+                        }}
+                      >
+                        <span className={crowdedTabs ? "max-w-[74px] truncate" : "max-w-[116px] truncate"}>
+                          {compactDocumentLabel(document.name, crowdedTabs)}
+                        </span>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            closeDocument(document.id);
+                          }}
+                          onMouseDown={(event) => {
+                            event.stopPropagation();
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              closeDocument(document.id);
+                            }
+                          }}
+                          className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-[11px]"
+                          style={{
+                            color: C.muted,
+                            transition: "background-color 140ms ease, color 140ms ease",
+                          }}
+                          title={`Close ${document.name}`}
+                          aria-label={`Close ${document.name}`}
+                          onMouseEnter={(event) => {
+                            event.currentTarget.style.background = "rgba(220, 38, 38, 0.14)";
+                            event.currentTarget.style.color = "#f87171";
+                          }}
+                          onMouseLeave={(event) => {
+                            event.currentTarget.style.background = "transparent";
+                            event.currentTarget.style.color = C.muted;
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
               <button
                 type="button"
-                className="rounded-t-lg border border-b-0 px-3 py-1.5 text-xs font-semibold"
-                style={{
-                  background: C.surface,
-                  borderColor: C.border,
-                  color: C.text,
-                }}
+                onClick={createNewDocument}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-xs font-semibold"
+                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                title="New script tab"
               >
-                untitled.m
+                <Plus className="h-4 w-4" />
               </button>
             </div>
             <div className="text-[11px]" style={{ color: C.muted }}>
@@ -2611,9 +2978,10 @@ export default function OpenMatStudio() {
           <div className="min-h-0 min-w-0 flex-1 p-2 md:p-3">
             <Editor
               height="100%"
-              defaultLanguage="matlab"
-              language="matlab"
-              theme={C.isDark ? "vs-dark" : "vs"}
+              beforeMount={setupOpenCalcMonaco}
+              defaultLanguage="openmat"
+              language="openmat"
+              theme={C.isDark ? "openmat-dark" : "openmat-light"}
               value={code}
               onChange={(value) => setCode(value || "")}
               options={{
@@ -2625,7 +2993,9 @@ export default function OpenMatStudio() {
                 wordWrap: "on",
                 padding: { top: 16, bottom: 16 },
               }}
-              onMount={(editor) => {
+              onMount={(editor, monaco) => {
+                monacoRef.current = monaco;
+                monaco.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
                 editor.addCommand(1024 | 3, () => {
                   runCode();
                 });
@@ -3036,6 +3406,31 @@ export default function OpenMatStudio() {
                         {item}
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">What OpenMAT Is</div>
+                  <div style={{ color: C.muted }}>
+                    OpenMAT is a MATLAB-like scripting layer implemented inside the browser on top of
+                    a local math engine and Open Calc&apos;s figure system. It is not raw JavaScript,
+                    not Python, and not full MATLAB compatibility. The user language is intentionally
+                    hybrid so we can keep matrix-first syntax while staying browser-native.
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Docs To Keep Updated</div>
+                  <div style={{ color: C.muted }}>
+                    Keep these in sync as features land: `docs/OpenMAT.md`, the in-app Reference tab,
+                    built-in `help`, and the example scripts. If a feature only exists in code, OpenMAT
+                    becomes harder to learn and harder to extend.
                   </div>
                 </div>
 
