@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { create, all, format as mathFormat } from "mathjs";
 import { useNavigate } from "react-router-dom";
+import MarkdownProse from "../math/MarkdownProse.jsx";
 import {
   Play,
   Pause,
@@ -22,12 +23,14 @@ import {
   Grid3X3,
   Maximize2,
   X,
+  CircleHelp,
 } from "lucide-react";
 import FigureRenderer from "../viz/react/FigureRenderer.jsx";
 import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
+import openMatGuide from "../../../docs/OpenMAT.md?raw";
 
 const math = create(all);
 math.config({ matrix: "Array", number: "number" });
@@ -381,6 +384,57 @@ ylabel('height')
   },
 ];
 
+const SIMULATION_WORKSPACES = [
+  {
+    id: "pendulum-lab",
+    title: "Pendulum",
+    summary: "Small-angle pendulum with tunable length, gravity, and release angle.",
+    controls: ["L", "g", "theta0", "t"],
+    outcomes: [
+      "See how period changes with length and gravity.",
+      "Compare geometric motion to the plotted angle response.",
+      "Use the console to inspect intermediate values like theta or bob position.",
+    ],
+    prompts: [
+      "What happens to the period when you double L?",
+      "How sensitive is the motion to the release angle inside the small-angle regime?",
+      "What variable would you plot next to study energy?",
+    ],
+  },
+  {
+    id: "spring-mass-lab",
+    title: "Spring-Mass",
+    summary: "Oscillation lab for amplitude, stiffness, mass, damping, and time.",
+    controls: ["A", "k", "m", "c", "t"],
+    outcomes: [
+      "Study how damping changes the envelope and settling behavior.",
+      "Compare how stiffness and mass reshape the oscillation frequency.",
+      "Reuse the same session to test closed-form ideas in the console.",
+    ],
+    prompts: [
+      "Which parameter changes frequency most directly?",
+      "How much damping is needed before the motion looks heavily suppressed?",
+      "What extra plot would help compare displacement and envelope?",
+    ],
+  },
+  {
+    id: "projectile-lab",
+    title: "Projectile",
+    summary: "Kinematics workspace for launch speed, angle, gravity, and animated trajectory.",
+    controls: ["v0", "angle", "g", "t"],
+    outcomes: [
+      "Connect launch parameters to range, peak height, and flight shape.",
+      "Use the figure pane to read the arc while the controls rerun the lab.",
+      "Turn one configuration into a reusable script or worksheet example.",
+    ],
+    prompts: [
+      "Which angle maximizes range for a fixed speed?",
+      "How does changing gravity affect peak height versus total range?",
+      "What console command would help compute the peak directly?",
+    ],
+  },
+];
+
 const HELP_TEXT = [
   "Supported MATLAB-like syntax:",
   "",
@@ -395,6 +449,7 @@ const HELP_TEXT = [
   "Console runs quick commands against the current workspace without editing the file.",
   "Promote to Script appends the last console command into the active tab.",
   "Workspace shows variables from the latest script run or console command.",
+  "Simulation Mode adds a guided panel layer on top of the same session.",
   "",
   "── Matrices ──",
   "A = [1 2; 3 4]   A'   A \\ b   inv(A)   det(A)   trace(A)",
@@ -2154,9 +2209,12 @@ export default function OpenMatStudio() {
   const [selectedVariable, setSelectedVariable] = useState(null);
   const [workspaceTab, setWorkspaceTab] = useLocalStorage("openmat-workspace-tab", "plot");
   const [browserTab, setBrowserTab] = useLocalStorage("openmat-browser-tab", "examples");
+  const [workspaceMode, setWorkspaceMode] = useLocalStorage("openmat-workspace-mode", "script");
+  const [activeSimulationId, setActiveSimulationId] = useLocalStorage("openmat-active-simulation", "pendulum-lab");
   const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [commandInput, setCommandInput] = useState("");
   const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1);
   const [lastConsoleCommand, setLastConsoleCommand] = useState("");
@@ -2167,6 +2225,7 @@ export default function OpenMatStudio() {
   const stateRef = useRef({});
   const controlValuesRef = useRef(controlValues);
   const monacoRef = useRef(null);
+  const pendingAutoRunDocumentIdRef = useRef(null);
 
   const activeDocument = useMemo(
     () => documents.find((doc) => doc.id === activeDocumentId) || documents[0] || null,
@@ -2199,6 +2258,11 @@ export default function OpenMatStudio() {
     () => Object.fromEntries(EXAMPLES.map((example) => [example.id, example])),
     [],
   );
+  const simulationMap = useMemo(
+    () => Object.fromEntries(SIMULATION_WORKSPACES.map((workspace) => [workspace.id, workspace])),
+    [],
+  );
+  const activeSimulation = simulationMap[activeSimulationId] || SIMULATION_WORKSPACES[0];
 
   const captureRecoverySnapshot = useCallback((reason) => {
     setRecoverySnapshot(
@@ -2244,6 +2308,7 @@ export default function OpenMatStudio() {
     "Console is for one-line experiments against the current workspace, not for editing files.",
     "Promote to Script copies the last useful console command into the active script tab.",
     "Workspace shows the current live variables that simulation and plotting tools build on.",
+    "Simulation Mode wraps the same session with guided models, prompts, and lab workflow.",
   ];
   const referenceItems = [
     "Language: MATLAB-like syntax over a local math engine, not raw JS/Python",
@@ -2267,6 +2332,33 @@ export default function OpenMatStudio() {
     `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
     `${commandHistory.length} console command${commandHistory.length === 1 ? "" : "s"} saved`,
   ];
+  const quickStartGuide = `## Quick start
+
+### Switching modes
+
+- Click **Script Mode** in the top header when you want the regular coding workspace.
+- Click **Simulation Mode** in the same place when you want guided labs and prompts.
+- Both modes use the **same session**, so the editor, figure, console, and workspace stay connected.
+
+### Example users can try
+
+1. Click **Simulation Mode**.
+2. In the left panel, choose **Pendulum**.
+3. OpenMAT loads the guided lab into a script tab.
+4. Press **Run** if it has not already run.
+5. In the **Figure** pane, move the sliders like \`length\`, \`gravity\`, or \`theta0\`.
+6. Watch the plot update, then open **Workspace** or **Console** to inspect the same session.
+7. Click **Script Mode** again if you want to edit the code directly.
+
+### Mental model
+
+- **Editor**: saved scripts and labs
+- **Run**: refreshes figure, workspace, and console from the active tab
+- **Console**: quick one-line experiments against the current workspace
+- **Workspace**: variables from the latest run
+- **Promote to Script**: moves a useful console command back into the active script
+`;
+  const helpMarkdown = `${quickStartGuide}\n\n---\n\n${openMatGuide}`;
 
   const clearRunState = useCallback(() => {
     setOutput("");
@@ -2396,6 +2488,12 @@ export default function OpenMatStudio() {
     }
   }, [applyExecutionResult, code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
 
+  useEffect(() => {
+    if (pendingAutoRunDocumentIdRef.current !== activeDocumentId) return;
+    pendingAutoRunDocumentIdRef.current = null;
+    runCode();
+  }, [activeDocumentId, runCode]);
+
   const runConsoleCommand = useCallback(() => {
     const command = commandInput.trim();
     if (!command) return;
@@ -2460,6 +2558,34 @@ export default function OpenMatStudio() {
     },
     [captureRecoverySnapshot, clearRunState, exampleMap, setActiveDocumentId, setDocuments],
   );
+
+  const openSimulationWorkspace = useCallback((simulationId) => {
+    const simulation = simulationMap[simulationId];
+    const example = exampleMap[simulationId];
+    if (!simulation || !example) return;
+    setWorkspaceMode("sim");
+    setActiveSimulationId(simulationId);
+    const existing = documents.find((doc) => doc.name === `${example.label}.m`);
+    if (existing) {
+      setActiveDocumentId(existing.id);
+      pendingAutoRunDocumentIdRef.current = existing.id;
+      return;
+    }
+    const document = createOpenMatDocument(`${example.label}.m`, example.code);
+    setDocuments((current) => [...current, document]);
+    setActiveDocumentId(document.id);
+    pendingAutoRunDocumentIdRef.current = document.id;
+    clearRunState();
+  }, [
+    clearRunState,
+    documents,
+    exampleMap,
+    setActiveDocumentId,
+    setActiveSimulationId,
+    setDocuments,
+    setWorkspaceMode,
+    simulationMap,
+  ]);
 
   const exportWorkspace = useCallback(() => {
     const payload = {
@@ -2575,8 +2701,10 @@ export default function OpenMatStudio() {
       workspaceItems,
       figureJson,
       recoverySnapshot,
+      workspaceMode,
+      activeSimulation,
     };
-  }, [activeDocument, activeDocumentId, code, documents, figureJson, output, recoverySnapshot, workspaceItems]);
+  }, [activeDocument, activeDocumentId, activeSimulation, code, documents, figureJson, output, recoverySnapshot, workspaceItems, workspaceMode]);
 
   useEffect(() => {
     const api = {
@@ -2774,9 +2902,46 @@ export default function OpenMatStudio() {
                 Matrix computing workspace • local engine • mobile-aware layout
               </div>
             </div>
+            <div className="ml-2 inline-flex rounded-lg border p-1" style={{ borderColor: C.border, background: C.surface }}>
+              {[
+                { id: "script", label: "Script Mode" },
+                { id: "sim", label: "Simulation Mode" },
+              ].map((mode) => {
+                const active = workspaceMode === mode.id;
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => {
+                      setWorkspaceMode(mode.id);
+                      if (mode.id === "sim" && activeSimulation?.id) {
+                        setActiveSimulationId(activeSimulation.id);
+                      }
+                    }}
+                    className="rounded-md px-2.5 py-1 text-[11px] font-semibold"
+                    style={{
+                      background: active ? C.surface2 : "transparent",
+                      color: active ? C.text : C.muted,
+                    }}
+                  >
+                    {mode.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+            title="Open OpenMAT help"
+          >
+            <CircleHelp className="h-3.5 w-3.5" />
+            Help
+          </button>
           <button
             type="button"
             onClick={() => setSidebarOpen((value) => !value)}
@@ -2874,29 +3039,112 @@ export default function OpenMatStudio() {
             className="flex w-full shrink-0 flex-col border-b lg:w-[280px] lg:border-b-0 lg:border-r"
             style={{ borderColor: C.border, background: C.surface3 }}
           >
-            <div className="flex items-center gap-1 border-b px-3 py-2" style={{ borderColor: C.border }}>
-              {browserTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setBrowserTab(tab.id)}
-                  className="rounded-md px-2.5 py-1 text-xs font-semibold"
-                  style={{
-                    background: browserTab === tab.id ? C.surface : "transparent",
-                    color: browserTab === tab.id ? C.text : C.muted,
-                    border:
-                      browserTab === tab.id
-                        ? `1px solid ${C.border}`
-                        : "1px solid transparent",
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            {workspaceMode === "script" ? (
+              <div className="flex items-center gap-1 border-b px-3 py-2" style={{ borderColor: C.border }}>
+                {browserTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setBrowserTab(tab.id)}
+                    className="rounded-md px-2.5 py-1 text-xs font-semibold"
+                    style={{
+                      background: browserTab === tab.id ? C.surface : "transparent",
+                      color: browserTab === tab.id ? C.text : C.muted,
+                      border:
+                        browserTab === tab.id
+                          ? `1px solid ${C.border}`
+                          : "1px solid transparent",
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="border-b px-3 py-3" style={{ borderColor: C.border }}>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                  OpenMAT Sim
+                </div>
+                <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                  Guided simulation workflow built on the same OpenMAT script, console, and workspace session.
+                </div>
+              </div>
+            )}
 
             <div className="min-h-0 flex-1 overflow-auto p-3">
-              {browserTab === "examples" && (
+              {workspaceMode === "sim" && (
+                <div className="space-y-3">
+                  <div
+                    className="rounded-2xl border px-3 py-2 text-xs leading-5"
+                    style={{ borderColor: C.border, background: C.surface, color: C.muted }}
+                  >
+                    Choose a guided model to load its lab into the shared OpenMAT session. Then use the same controls,
+                    figure pane, workspace, and console to explore it.
+                  </div>
+                  {SIMULATION_WORKSPACES.map((simulation) => {
+                    const active = activeSimulation?.id === simulation.id;
+                    return (
+                      <button
+                        key={simulation.id}
+                        type="button"
+                        onClick={() => openSimulationWorkspace(simulation.id)}
+                        className="block w-full rounded-2xl border px-3 py-3 text-left"
+                        style={{
+                          borderColor: active ? C.blue : C.border,
+                          background: active ? C.surface : C.surface2,
+                        }}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-sm font-semibold">{simulation.title}</div>
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                            style={{ background: active ? "rgba(23, 105, 209, 0.14)" : C.surface, color: active ? C.blue : C.muted }}
+                          >
+                            {active ? "Active" : "Load"}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                          {simulation.summary}
+                        </div>
+                        <div className="mt-2 text-[11px]" style={{ color: C.hint }}>
+                          Controls: {simulation.controls.join(", ")}
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {activeSimulation && (
+                    <div
+                      className="rounded-2xl border p-4 text-sm leading-6"
+                      style={{ borderColor: C.border, background: C.surface }}
+                    >
+                      <div className="mb-2 font-semibold">{activeSimulation.title} guide</div>
+                      <div style={{ color: C.muted }}>{activeSimulation.summary}</div>
+                      <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        What to look for
+                      </div>
+                      <div className="mt-2 grid gap-2">
+                        {activeSimulation.outcomes.map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Prompts
+                      </div>
+                      <div className="mt-2 grid gap-2">
+                        {activeSimulation.prompts.map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {workspaceMode === "script" && browserTab === "examples" && (
                 <div className="space-y-3">
                   <div
                     className="rounded-2xl border px-3 py-2 text-xs leading-5"
@@ -2933,7 +3181,7 @@ export default function OpenMatStudio() {
                 </div>
               )}
 
-              {browserTab === "functions" && (
+              {workspaceMode === "script" && browserTab === "functions" && (
                 <div className="grid gap-2">
                   {referenceItems.map((item) => (
                     <div
@@ -2947,7 +3195,7 @@ export default function OpenMatStudio() {
                 </div>
               )}
 
-              {browserTab === "notes" && (
+              {workspaceMode === "script" && browserTab === "notes" && (
                 <div
                   className="rounded-2xl border p-4 text-sm leading-6"
                   style={{ borderColor: C.border, background: C.surface }}
@@ -3147,6 +3395,43 @@ export default function OpenMatStudio() {
           <div className="min-h-0 flex-1 overflow-auto p-3">
             {workspaceTab === "plot" && (
               <div className="space-y-3">
+                {workspaceMode === "sim" && activeSimulation && (
+                  <div
+                    className="rounded-2xl border p-3"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Simulation Workbench
+                        </div>
+                        <div className="mt-1 text-sm font-semibold">{activeSimulation.title}</div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                          {activeSimulation.summary}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openSimulationWorkspace(activeSimulation.id)}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                      >
+                        Load Guided Lab
+                      </button>
+                    </div>
+                    <div className="mt-3 grid gap-2 md:grid-cols-3">
+                      {activeSimulation.outcomes.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-xl border px-3 py-2 text-xs"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div
                   className="rounded-2xl border p-3"
                   style={{ borderColor: C.border, background: C.surface }}
@@ -3690,6 +3975,17 @@ export default function OpenMatStudio() {
                   className="rounded-2xl border p-4 text-sm leading-6"
                   style={{ borderColor: C.border, background: C.surface }}
                 >
+                  <div className="mb-2 font-semibold">Current modes</div>
+                  <div style={{ color: C.muted }}>
+                    Script Mode is the MATLAB-like workspace for editing, running, plotting, and using the console.
+                    Simulation Mode adds a guided layer for focused labs without leaving the same session.
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
                   <div className="mb-2 font-semibold">Foundation for OpenMAT Sim</div>
                   <div style={{ color: C.muted }}>
                     The next guided simulation workspace should sit on top of this same engine and
@@ -3742,6 +4038,48 @@ export default function OpenMatStudio() {
           </div>
         </div>
       </div>
+
+      {helpOpen && (
+        <div
+          className="fixed inset-0 z-[130] flex items-stretch justify-end bg-slate-950/55 backdrop-blur-[2px]"
+          onClick={() => setHelpOpen(false)}
+        >
+          <div
+            className="flex h-full w-full max-w-[900px] flex-col border-l shadow-2xl"
+            style={{ borderColor: C.border, background: C.surface3 }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div
+              className="flex items-center justify-between gap-3 border-b px-5 py-4"
+              style={{ borderColor: C.border }}
+            >
+              <div className="min-w-0">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                  OpenMAT Help
+                </div>
+                <div className="mt-1 text-sm" style={{ color: C.muted }}>
+                  Rendered from <code>docs/OpenMAT.md</code> so the in-app help stays aligned with the docs.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHelpOpen(false)}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                title="Close help"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-auto px-5 py-5">
+              <MarkdownProse
+                text={helpMarkdown}
+                className="[&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1.5 [&_code]:py-0.5 dark:[&_code]:bg-slate-800"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

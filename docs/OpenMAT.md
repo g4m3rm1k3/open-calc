@@ -105,6 +105,21 @@ OpenMAT is being shaped as a shared foundation for two interfaces:
 
 These should not become two separate products. They should stay two layers on top of the same computational session so users can move between free-form scripting and structured simulation work.
 
+## First guided simulation layer
+
+The first `OpenMAT Sim` pass uses the same OpenMAT session model and adds a guided panel layer for:
+
+- `Pendulum`
+- `Spring-Mass`
+- `Projectile`
+
+Each guided model should:
+
+1. load a lab script into the editor without becoming a separate tool
+2. reuse the same figure pane, controls, workspace, and console
+3. add prompts and observation cues for learners
+4. keep script mode available for deeper editing and experimentation
+
 ## Extension API direction
 
 OpenMAT is being opened to extension so custom scripts and eventually app-level integrations can register new functions.
