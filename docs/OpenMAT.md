@@ -52,6 +52,32 @@ This means the product model is:
 4. Promote good discoveries back into the script.
 5. Use the same session state as the basis for simulation workflows later.
 
+## Getting started with the lab
+
+If someone is brand new to OpenMAT, the first lesson should be about workflow, not language syntax.
+
+Recommended beginner flow:
+
+1. Enter `Simulation Mode`
+2. Pick a guided lab such as `Pendulum`
+3. Press `Run`
+4. Move the sliders and watch the viewport and plots respond
+5. Open `Workspace` to see what variables the lab produced
+6. Try a one-line console command
+7. Return to `Script Mode` only after the user understands the lab workflow
+
+For geometry authoring:
+
+1. Open the `Geometry` rail in `Simulation Mode`
+2. Select a simulation object first if you want to replace it
+3. Click `Open ScratchPad`
+4. ScratchPad opens in `Geo` mode with `Select` active
+5. Click one shape and use `Send to OpenMAT`
+6. The shape either replaces the selected object or imports centered into the viewport
+7. Use `Sync Linked Scratch Geometry` after later ScratchPad edits
+
+That is the best first chapter for a course because it teaches the interaction model before introducing OpenMAT's language layer.
+
 ## What OpenMAT is strong at today
 
 - matrix algebra
@@ -120,6 +146,33 @@ Each guided model should:
 3. add prompts and observation cues for learners
 4. keep script mode available for deeper editing and experimentation
 
+## Workbench model
+
+OpenMAT should grow through focused workbenches instead of one giant generic simulation UI.
+
+A workbench is:
+
+- one class of problem
+- one preferred set of primitives and panels
+- one set of outcomes and prompts
+- one attached lesson flow
+
+Current built-in workbenches include:
+
+- `Pendulum`
+- `Spring-Mass`
+- `Projectile`
+- `Merchant Circle`
+- `Beam / Cantilever`
+
+This is the beginning of the platform model:
+
+1. `OpenMAT Core`
+2. `Workbenches`
+3. `Lessons`
+
+The first good engineering workbench is `Beam / Cantilever` because it ties together geometry, load, section properties, deflection, stress, and strain.
+
 ## Extension API direction
 
 OpenMAT is being opened to extension so custom scripts and eventually app-level integrations can register new functions.
@@ -129,8 +182,12 @@ Current surface:
 - `window.OpenMAT.registerExtension(name, extension)`
 - `window.OpenMAT.unregisterExtension(name)`
 - `window.OpenMAT.listExtensions()`
+- `window.OpenMAT.listWorkbenches()`
+- `window.OpenMAT.getWorkbench(id)`
+- `window.OpenMAT.openWorkbench(id)`
 - `window.OpenMAT.run(source)`
 - `window.OpenMAT.getState()`
+- `window.OpenMAT.exportSession()`
 
 This should be treated as an evolving API until a more formal contract is published.
 

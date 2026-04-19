@@ -382,6 +382,103 @@ xlabel('downrange')
 ylabel('height')
 `,
   },
+  {
+    id: "merchant-lab",
+    label: "Merchant Circle",
+    icon: AlertCircle,
+    description: "Explore cutting-force decomposition with Merchant-style machining parameters.",
+    code: `rake = slider('rake', 0, 25, 1, 10);
+friction = slider('friction', 10, 45, 1, 28);
+shear = slider('shear', 10, 40, 1, 22);
+cut = slider('cut', 50, 350, 5, 180);
+feed = slider('feed', 20, 180, 5, 90);
+
+alpha = rake * pi / 180;
+beta = friction * pi / 180;
+phi = shear * pi / 180;
+
+Fc = cut;
+Ft = feed;
+R = sqrt(Fc^2 + Ft^2);
+Fs = R * cos(beta - alpha + phi);
+Fn = R * sin(beta - alpha + phi);
+mu = tan(beta);
+
+theta = linspace(0, 2*pi, 240);
+circleX = R * cos(theta);
+circleY = R * sin(theta);
+
+plot(circleX, circleY)
+hold on
+plot([0 Fc], [0 Ft])
+grid on
+axis equal
+title('Merchant Circle')
+xlabel('Cutting force axis')
+ylabel('Thrust force axis')
+`,
+  },
+  {
+    id: "beam-lab",
+    label: "Beam / Cantilever",
+    icon: LineChart,
+    description: "Study deflection, stress, and strain for a cantilever beam with an end load.",
+    code: `L = slider('L', 0.4, 3.0, 0.05, 1.6);
+F = slider('F', 20, 1500, 10, 320);
+b = slider('b', 0.02, 0.18, 0.005, 0.06);
+h = slider('h', 0.02, 0.24, 0.005, 0.12);
+E_GPa = slider('E_GPa', 20, 220, 5, 69);
+
+E = E_GPa * 1e9;
+I = b * h^3 / 12;
+delta = F * L^3 / (3 * E * I);
+sigma = F * L * (h / 2) / I;
+strain = sigma / E;
+
+x = linspace(0, L, 180);
+y = -(F .* x.^2 .* (3 * L - x)) / (6 * E * I);
+
+plot(x, y)
+grid on
+title('Cantilever Deflection')
+xlabel('beam length (m)')
+ylabel('deflection (m)')
+`,
+  },
+  {
+    id: "chatter-lab",
+    label: "Natural Frequency / Chatter",
+    icon: AlertCircle,
+    description: "Estimate endmill stiffness, natural frequency, tooth-pass excitation, and chatter risk.",
+    code: `L = slider('L', 0.02, 0.18, 0.002, 0.09);
+d_mm = slider('d_mm', 4, 25, 0.5, 12);
+E_GPa = slider('E_GPa', 20, 220, 5, 210);
+rho = slider('rho', 2500, 9000, 100, 7850);
+F = slider('F', 10, 1200, 10, 180);
+rpm = slider('rpm', 500, 30000, 100, 12000);
+teeth = slider('teeth', 1, 8, 1, 4);
+
+d = d_mm / 1000;
+E = E_GPa * 1e9;
+I = pi * d^4 / 64;
+A = pi * d^2 / 4;
+m_eff = 0.24 * rho * A * L;
+k_tip = 3 * E * I / L^3;
+delta = F / k_tip;
+f_n = (1 / (2*pi)) * sqrt(k_tip / max(m_eff, 1e-9));
+tooth_hz = rpm * teeth / 60;
+chatter_ratio = tooth_hz / f_n;
+
+x = [0 tooth_hz tooth_hz];
+y = [0 0 f_n];
+plot([0 3000], [f_n f_n])
+hold on
+stem([tooth_hz], [f_n])
+title('Natural Frequency / Chatter')
+xlabel('excitation frequency (Hz)')
+ylabel('natural frequency (Hz)')
+`,
+  },
 ];
 
 const SIMULATION_WORKSPACES = [
@@ -400,6 +497,14 @@ const SIMULATION_WORKSPACES = [
       "How sensitive is the motion to the release angle inside the small-angle regime?",
       "What variable would you plot next to study energy?",
     ],
+    lesson: {
+      title: "Pendulum starter",
+      steps: [
+        { title: "Run the lab", body: "Press Run and watch the bob, trail, and plot all respond from the same session." },
+        { title: "Change one parameter", body: "Adjust length or gravity and notice how the period changes before touching the code." },
+        { title: "Inspect the workspace", body: "Open Workspace and look for L, theta, x, and y so the geometry and math stay connected." },
+      ],
+    },
   },
   {
     id: "spring-mass-lab",
@@ -416,6 +521,14 @@ const SIMULATION_WORKSPACES = [
       "How much damping is needed before the motion looks heavily suppressed?",
       "What extra plot would help compare displacement and envelope?",
     ],
+    lesson: {
+      title: "Spring-mass starter",
+      steps: [
+        { title: "Run and observe", body: "Press Run, then compare the viewport motion to the plotted displacement." },
+        { title: "Tune damping", body: "Increase c and watch the response settle sooner while the envelope tightens." },
+        { title: "Replace a part", body: "Select the mass or spring, then import ScratchPad geometry to swap in your own shape." },
+      ],
+    },
   },
   {
     id: "projectile-lab",
@@ -432,6 +545,87 @@ const SIMULATION_WORKSPACES = [
       "How does changing gravity affect peak height versus total range?",
       "What console command would help compute the peak directly?",
     ],
+    lesson: {
+      title: "Projectile starter",
+      steps: [
+        { title: "Run the launch", body: "Use Run once, then move speed and angle controls to build intuition about the arc." },
+        { title: "Read the scene", body: "Compare the live marker in the viewport with the trajectory plot and workspace values." },
+        { title: "Ask a question", body: "Use the Console for a quick range or peak-height check without rewriting the script." },
+      ],
+    },
+  },
+  {
+    id: "merchant-lab",
+    title: "Merchant Circle",
+    summary: "Cutting-force workbench for rake, friction, shear angle, and force decomposition.",
+    controls: ["rake", "friction", "shear", "cut", "feed"],
+    outcomes: [
+      "Decompose cutting and thrust forces into resultant and shear-plane components.",
+      "Connect machining geometry to the force circle instead of only plotting a waveform.",
+      "Use this as a stepping stone toward chatter, harmonics, and long-tool discussions.",
+    ],
+    prompts: [
+      "How does friction angle change the resultant force direction?",
+      "What happens to the circle when you increase cutting force but keep feed force fixed?",
+      "Which variable would you add next to discuss tool deflection or chatter risk?",
+    ],
+    lesson: {
+      title: "Merchant circle starter",
+      steps: [
+        { title: "Run the force circle", body: "Use the sliders to change rake, friction, and shear while watching the force vectors update." },
+        { title: "Read the decomposition", body: "Compare Fc, Ft, and R in the workspace so the geometry matches the machining forces." },
+        { title: "Think like a machinist", body: "Ask how these forces would affect a long endmill, chatter risk, or workholding." },
+      ],
+    },
+  },
+  {
+    id: "beam-lab",
+    title: "Beam / Cantilever",
+    summary: "Cantilever workbench for beam length, section size, load, deflection, stress, and strain.",
+    controls: ["L", "F", "b", "h", "E_GPa"],
+    outcomes: [
+      "See how beam length and section height dominate deflection.",
+      "Connect geometry, material stiffness, stress, and strain in one guided workbench.",
+      "Use this as the first serious bridge from drawing geometry to structural analysis.",
+    ],
+    prompts: [
+      "What happens to tip deflection when you double beam length?",
+      "Which matters more for stiffness here: width or height?",
+      "How would you model a second force or a distributed load next?",
+    ],
+    lesson: {
+      title: "Beam / Cantilever getting started",
+      steps: [
+        { title: "Run the baseline beam", body: "Press Run and note the deflected shape, end load arrow, and support condition at the wall." },
+        { title: "Change geometry first", body: "Adjust height h and width b before changing the force so you can feel how cross-section affects stiffness." },
+        { title: "Read engineering outputs", body: "Open Workspace and look for I, delta, sigma, and strain to tie the scene to beam theory." },
+        { title: "Replace editable parts", body: "Select the beam or wall geometry, then send one ScratchPad shape into OpenMAT to replace it." },
+      ],
+    },
+  },
+  {
+    id: "chatter-lab",
+    title: "Natural Frequency / Chatter",
+    summary: "Machining-focused workbench for endmill stiffness, natural frequency, tooth-pass excitation, and chatter risk.",
+    controls: ["L", "d_mm", "E_GPa", "rho", "F", "rpm", "teeth"],
+    outcomes: [
+      "Estimate how stickout and diameter change stiffness and deflection.",
+      "Compare tooth-pass frequency to the tool's natural frequency.",
+      "Use this as a bridge from beam theory to machining vibration intuition.",
+    ],
+    prompts: [
+      "What happens to natural frequency when you increase stickout?",
+      "How much does tool diameter matter compared with spindle speed?",
+      "When does tooth-pass frequency get close enough to warn about resonance?",
+    ],
+    lesson: {
+      title: "Chatter workbench starter",
+      steps: [
+        { title: "Run the baseline tool", body: "Press Run and note the natural frequency, tooth-pass frequency, and static tip deflection." },
+        { title: "Change stickout first", body: "Increase L and watch stiffness drop while the chatter risk rises." },
+        { title: "Think like a machinist", body: "Adjust RPM and tooth count to see when excitation approaches the natural frequency band." },
+      ],
+    },
   },
 ];
 
@@ -1334,6 +1528,13 @@ function toFiniteNumber(value, fallback = 0) {
   return Number.isFinite(next) ? next : fallback;
 }
 
+function sanitizeName(value) {
+  return String(value || "item")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "item";
+}
+
 function buildPolylinePath(xs, ys, width, height, padding = 28) {
   if (!Array.isArray(xs) || !Array.isArray(ys) || xs.length === 0 || ys.length === 0) return "";
   const points = xs
@@ -1357,7 +1558,1611 @@ function buildPolylinePath(xs, ys, width, height, padding = 28) {
     .join(" ");
 }
 
-function OpenMatSimulationViewport({ activeSimulation, workspaceItems, figureJson, surfaceConfig, plotKind, setPlotKind, C, openGrapher }) {
+function offsetPath(path, dx, dy) {
+  if (!path) return "";
+  return path.replace(/([ML])\s*([\d.-]+)\s*([\d.-]+)/g, (match, cmd, x, y) => (
+    `${cmd} ${(Number(x) + dx).toFixed(2)} ${(Number(y) + dy).toFixed(2)}`
+  ));
+}
+
+const SIM_SCENE_WIDTH = 520;
+const SIM_SCENE_HEIGHT = 320;
+
+function createSimElement(type) {
+  const id = `sim-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  if (type === "line") {
+    return {
+      id,
+      type: "line",
+      role: "rod",
+      name: "Rod",
+      x1: 120,
+      y1: 92,
+      x2: 300,
+      y2: 156,
+      stroke: "#63b8ff",
+      density: 1,
+    };
+  }
+  if (type === "rect") {
+    return {
+      id,
+      type: "rect",
+      role: "mass",
+      name: "Mass",
+      x: 190,
+      y: 132,
+      width: 84,
+      height: 56,
+      fill: "#63b8ff",
+      density: 1,
+    };
+  }
+  if (type === "circle") {
+    return {
+      id,
+      type: "circle",
+      role: "mass",
+      name: "Body",
+      cx: 240,
+      cy: 152,
+      r: 28,
+      fill: "#31d0c4",
+      density: 1,
+    };
+  }
+  if (type === "force") {
+    return {
+      id,
+      type: "force",
+      role: "force",
+      name: "Force",
+      x1: 180,
+      y1: 140,
+      x2: 300,
+      y2: 96,
+      stroke: "#ff8b8b",
+      magnitude: 120,
+      label: "F",
+    };
+  }
+  if (type === "support") {
+    return {
+      id,
+      type: "support",
+      role: "support",
+      name: "Support",
+      x: 220,
+      y: 210,
+      size: 28,
+      fill: "#f0b44c",
+    };
+  }
+  if (type === "moment") {
+    return {
+      id,
+      type: "moment",
+      role: "moment",
+      name: "Moment",
+      x: 240,
+      y: 140,
+      radius: 34,
+      magnitude: 45,
+      label: "M",
+      stroke: "#b89cff",
+    };
+  }
+  if (type === "dimension") {
+    return {
+      id,
+      type: "dimension",
+      role: "dimension",
+      name: "Dimension",
+      x1: 120,
+      y1: 250,
+      x2: 320,
+      y2: 250,
+      offset: 18,
+      label: "L",
+      stroke: "#90a4c2",
+    };
+  }
+  return {
+    id,
+    type: "point",
+    role: "anchor",
+    name: "Joint",
+      x: 240,
+      y: 152,
+      fill: "#f0b44c",
+    };
+}
+
+function convertScratchShapeToSimElement(shape, existing = null) {
+  if (!shape?.type || !Array.isArray(shape.points)) return null;
+  const id = existing?.id || `sim-import-${shape.id ?? Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const source = {
+    kind: "scratch",
+    shapeId: shape.id,
+    linked: true,
+  };
+
+  if (shape.type === "segment") {
+    const [x1, y1, x2, y2] = shape.points.map(Number);
+    return {
+      ...existing,
+      id,
+      type: "line",
+      role: existing?.role || "rod",
+      name: existing?.name || "Imported Segment",
+      x1,
+      y1,
+      x2,
+      y2,
+      stroke: shape.color || existing?.stroke || "#63b8ff",
+      density: existing?.density ?? 1,
+      source,
+    };
+  }
+
+  if (shape.type === "rect") {
+    const [x1, y1, x2, y2] = shape.points.map(Number);
+    return {
+      ...existing,
+      id,
+      type: "rect",
+      role: existing?.role || "mass",
+      name: existing?.name || "Imported Rectangle",
+      x: Math.min(x1, x2),
+      y: Math.min(y1, y2),
+      width: Math.abs(x2 - x1),
+      height: Math.abs(y2 - y1),
+      fill: shape.color || existing?.fill || "#63b8ff",
+      density: existing?.density ?? 1,
+      source,
+    };
+  }
+
+  if (shape.type === "circle") {
+    const [cx, cy, rx, ry] = shape.points.map(Number);
+    return {
+      ...existing,
+      id,
+      type: "circle",
+      role: existing?.role || "mass",
+      name: existing?.name || "Imported Circle",
+      cx,
+      cy,
+      r: Math.hypot(rx - cx, ry - cy),
+      fill: shape.color || existing?.fill || "#31d0c4",
+      density: existing?.density ?? 1,
+      source,
+    };
+  }
+
+  if (shape.type === "triangle" || shape.type === "polygon") {
+    return {
+      ...existing,
+      id,
+      type: "polygon",
+      role: existing?.role || "body",
+      name: existing?.name || (shape.type === "triangle" ? "Imported Triangle" : "Imported Polygon"),
+      points: shape.points.map(Number),
+      fill: shape.color || existing?.fill || "#31d0c4",
+      stroke: shape.color || existing?.stroke || "#31d0c4",
+      density: existing?.density ?? 1,
+      source,
+    };
+  }
+
+  return null;
+}
+
+function convertSimElementToScratchShape(element) {
+  if (!element) return null;
+  const id = `oc-openmat-${element.id}-${Date.now()}`;
+  const color = element.stroke || element.fill || "#63b8ff";
+  const sw = element.role === "rod" ? 5 : 3;
+
+  if (element.type === "line") {
+    return {
+      id,
+      type: "segment",
+      points: [Number(element.x1), Number(element.y1), Number(element.x2), Number(element.y2)],
+      color,
+      sw,
+      sourceOpenMatElementId: element.id,
+    };
+  }
+  if (element.type === "rect") {
+    return {
+      id,
+      type: "rect",
+      points: [
+        Number(element.x),
+        Number(element.y),
+        Number(element.x) + Number(element.width),
+        Number(element.y) + Number(element.height),
+      ],
+      color,
+      sw,
+      sourceOpenMatElementId: element.id,
+    };
+  }
+  if (element.type === "circle") {
+    return {
+      id,
+      type: "circle",
+      points: [
+        Number(element.cx),
+        Number(element.cy),
+        Number(element.cx) + Number(element.r),
+        Number(element.cy),
+      ],
+      color,
+      sw,
+      sourceOpenMatElementId: element.id,
+    };
+  }
+  if (element.type === "polygon") {
+    const points = Array.isArray(element.points) ? element.points.map(Number) : [];
+    const type = points.length === 6 ? "triangle" : "polygon";
+    return {
+      id,
+      type,
+      points,
+      color,
+      sw,
+      sourceOpenMatElementId: element.id,
+    };
+  }
+  if (element.type === "point") {
+    return {
+      id,
+      type: "circle",
+      points: [Number(element.x), Number(element.y), Number(element.x) + 10, Number(element.y)],
+      color,
+      sw,
+      sourceOpenMatElementId: element.id,
+    };
+  }
+  return null;
+}
+
+function createGuidedSource(simulationId) {
+  return { kind: "guided", linked: true, simulationId };
+}
+
+function buildGuidedSceneElements(activeSimulation, workspaceItems, C) {
+  if (!activeSimulation?.id) return [];
+  const source = createGuidedSource(activeSimulation.id);
+
+  if (activeSimulation.id === "pendulum-lab") {
+    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 1.2), 1.2), 0.2);
+    const bobX = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const bobY = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "y", -L), -L);
+    const scale = 135 / Math.max(L, 1);
+    const pivotX = 170;
+    const pivotY = 52;
+    const viewX = pivotX + bobX * scale;
+    const viewY = pivotY + Math.abs(bobY) * scale;
+    return [
+      { id: "guided-pendulum-anchor", type: "point", role: "anchor", name: "Pivot", x: pivotX, y: pivotY, fill: C.text, source },
+      { id: "guided-pendulum-rod", type: "line", role: "rod", name: "Rod", x1: pivotX, y1: pivotY, x2: viewX, y2: viewY, stroke: C.blue, source },
+      { id: "guided-pendulum-bob", type: "circle", role: "mass", name: "Bob", cx: viewX, cy: viewY, r: 24, fill: C.blue, source },
+    ];
+  }
+
+  if (activeSimulation.id === "spring-mass-lab") {
+    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const massX = 290 + x * 72;
+    return [
+      { id: "guided-spring-wall", type: "rect", role: "anchor", name: "Wall", x: 45, y: 120, width: 18, height: 100, fill: C.border, source },
+      { id: "guided-spring-link", type: "line", role: "spring", name: "Spring", x1: 63, y1: 170, x2: massX, y2: 170, stroke: C.teal, source },
+      { id: "guided-spring-mass", type: "rect", role: "mass", name: "Mass", x: massX, y: 132, width: 86, height: 76, fill: C.blue, source },
+    ];
+  }
+
+  if (activeSimulation.id === "projectile-lab") {
+    const px = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "px", 0), 0);
+    const py = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "py", 0), 0);
+    const xs = getWorkspaceItemValue(workspaceItems, "x", []);
+    const ys = getWorkspaceItemValue(workspaceItems, "y", []);
+    const xMax = Math.max(...(Array.isArray(xs) ? xs.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const yMax = Math.max(...(Array.isArray(ys) ? ys.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const markerX = 34 + (px / xMax) * (SIM_SCENE_WIDTH - 68);
+    const markerY = SIM_SCENE_HEIGHT - 34 - (Math.max(py, 0) / yMax) * (SIM_SCENE_HEIGHT - 68);
+    return [
+      { id: "guided-projectile-ground", type: "line", role: "anchor", name: "Ground", x1: 28, y1: SIM_SCENE_HEIGHT - 34, x2: SIM_SCENE_WIDTH - 24, y2: SIM_SCENE_HEIGHT - 34, stroke: C.border, source },
+      { id: "guided-projectile-axis", type: "line", role: "anchor", name: "Axis", x1: 34, y1: SIM_SCENE_HEIGHT - 28, x2: 34, y2: 30, stroke: C.border, source },
+      { id: "guided-projectile-body", type: "circle", role: "mass", name: "Projectile", cx: markerX, cy: markerY, r: 10, fill: C.blue, source },
+    ];
+  }
+
+  if (activeSimulation.id === "merchant-lab") {
+    const Fc = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "Fc", 180), 180);
+    const Ft = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "Ft", 90), 90);
+    const R = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "R", Math.hypot(Fc, Ft)), Math.hypot(Fc, Ft));
+    const scale = 0.65;
+    const originX = 170;
+    const originY = 190;
+    return [
+      { id: "guided-merchant-tool", type: "polygon", role: "body", name: "Tool", points: [90, 90, 158, 90, 122, 152], fill: C.border, stroke: C.blue, source },
+      { id: "guided-merchant-chip", type: "polygon", role: "body", name: "Chip", points: [158, 88, 230, 66, 246, 96, 176, 116], fill: C.teal, stroke: C.teal, source },
+      { id: "guided-merchant-cut", type: "force", role: "force", name: "Cutting Force", x1: originX, y1: originY, x2: originX + Fc * scale, y2: originY, magnitude: Fc, label: "Fc", stroke: C.red, source },
+      { id: "guided-merchant-thrust", type: "force", role: "force", name: "Thrust Force", x1: originX, y1: originY, x2: originX, y2: originY - Ft * scale, magnitude: Ft, label: "Ft", stroke: C.amber, source },
+      { id: "guided-merchant-resultant", type: "force", role: "force", name: "Resultant", x1: originX, y1: originY, x2: originX + Fc * scale, y2: originY - Ft * scale, magnitude: R, label: "R", stroke: C.blue, source },
+      { id: "guided-merchant-support", type: "support", role: "support", name: "Reference", x: originX, y: originY + 16, size: 24, fill: C.hint, source },
+    ];
+  }
+
+  if (activeSimulation.id === "beam-lab") {
+    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 1.6), 1.6), 0.2);
+    const F = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "F", 320), 320), 0);
+    const delta = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "delta", 0.01), 0.01));
+    const sigma = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "sigma", 0), 0));
+    const beamStartX = 90;
+    const beamY = 156;
+    const beamEndX = 350;
+    const beamEndY = beamY + Math.min(80, Math.max(6, delta * 3200));
+    return [
+      { id: "guided-beam-wall", type: "rect", role: "anchor", name: "Wall", x: 44, y: 110, width: 26, height: 112, fill: C.border, source },
+      { id: "guided-beam-support", type: "support", role: "support", name: "Fixed Support", x: beamStartX, y: beamY, size: 20, fill: C.amber, source },
+      { id: "guided-beam-member", type: "line", role: "rod", name: "Beam", x1: beamStartX, y1: beamY, x2: beamEndX, y2: beamEndY, stroke: C.blue, stiffness: 1, source },
+      { id: "guided-beam-load", type: "force", role: "force", name: "End Load", x1: beamEndX, y1: beamEndY - 48, x2: beamEndX, y2: beamEndY + 20, magnitude: F, label: "F", stroke: C.red, source },
+      { id: "guided-beam-span", type: "dimension", role: "dimension", name: "Span", x1: beamStartX, y1: 252, x2: beamEndX, y2: 252, offset: 16, label: `Span ${L.toFixed(2)} m`, stroke: C.hint, source },
+    ];
+  }
+
+  if (activeSimulation.id === "chatter-lab") {
+    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 0.09), 0.09), 0.02);
+    const d_mm = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "d_mm", 12), 12), 1);
+    const delta = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "delta", 0.0002), 0.0002));
+    const beamStartX = 96;
+    const beamY = 154;
+    const beamEndX = 356;
+    const beamEndY = beamY + Math.min(44, Math.max(2, delta * 18000));
+    const toolRadius = Math.max(8, Math.min(22, d_mm * 0.9));
+    return [
+      { id: "guided-chatter-holder", type: "rect", role: "anchor", name: "Holder", x: 54, y: 102, width: 36, height: 104, fill: C.border, source },
+      { id: "guided-chatter-tool", type: "line", role: "rod", name: "Tool", x1: beamStartX, y1: beamY, x2: beamEndX, y2: beamEndY, stroke: C.blue, stiffness: 1, source },
+      { id: "guided-chatter-tip", type: "circle", role: "mass", name: "Tool Tip", cx: beamEndX, cy: beamEndY, r: toolRadius, fill: C.teal, density: 1, source },
+      { id: "guided-chatter-stickout", type: "dimension", role: "dimension", name: "Stickout", x1: beamStartX, y1: 252, x2: beamEndX, y2: 252, offset: 14, label: `L ${Number(L).toFixed(3)} m`, stroke: C.hint, source },
+    ];
+  }
+
+  return [];
+}
+
+function resolveLinkedSimulationElements(elements, activeSimulation, workspaceItems, C) {
+  if (!Array.isArray(elements) || !elements.length) return [];
+  const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
+  if (!guided.length) return elements;
+  const guidedById = new Map(guided.map((element) => [element.id, element]));
+  return elements.map((element) => {
+    if (element?.source?.kind !== "guided" || !element?.source?.linked) {
+      return element;
+    }
+    const nextGuided = guidedById.get(element.id);
+    if (!nextGuided) return element;
+    return {
+      ...nextGuided,
+      name: element.name || nextGuided.name,
+      role: element.role || nextGuided.role,
+      source: element.source,
+    };
+  });
+}
+
+function makeConstraintId(type = "constraint") {
+  return `sim-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function createMateConstraint(sourceElementId, sourceAttachmentId, targetElementId, targetAttachmentId) {
+  return {
+    id: makeConstraintId("mate"),
+    type: "mate",
+    sourceElementId,
+    sourceAttachmentId,
+    targetElementId,
+    targetAttachmentId,
+  };
+}
+
+function describeConstraint(constraint, elements) {
+  if (!constraint) return "Constraint";
+  const source = elements.find((element) => element.id === constraint.sourceElementId);
+  const target = elements.find((element) => element.id === constraint.targetElementId);
+  if (constraint.type === "mate") {
+    return `${source?.name || "Part"} -> ${target?.name || "Part"} mate`;
+  }
+  return constraint.type || "Constraint";
+}
+
+function getSimElementAttachmentPoints(element) {
+  if (!element) return [];
+  if (element.type === "force" || element.type === "dimension") {
+    const cx = (Number(element.x1) + Number(element.x2)) / 2;
+    const cy = (Number(element.y1) + Number(element.y2)) / 2;
+    return [
+      { id: `${element.id}-start`, label: "Start", x: Number(element.x1), y: Number(element.y1) },
+      { id: `${element.id}-center`, label: "Center", x: cx, y: cy },
+      { id: `${element.id}-end`, label: "End", x: Number(element.x2), y: Number(element.y2) },
+    ];
+  }
+  if (element.type === "support" || element.type === "moment") {
+    return [{ id: `${element.id}-center`, label: "Center", x: Number(element.x), y: Number(element.y) }];
+  }
+  if (element.type === "line") {
+    const cx = (Number(element.x1) + Number(element.x2)) / 2;
+    const cy = (Number(element.y1) + Number(element.y2)) / 2;
+    return [
+      { id: `${element.id}-start`, label: "Start", x: Number(element.x1), y: Number(element.y1) },
+      { id: `${element.id}-center`, label: "Center", x: cx, y: cy },
+      { id: `${element.id}-end`, label: "End", x: Number(element.x2), y: Number(element.y2) },
+    ];
+  }
+  if (element.type === "rect") {
+    const x = Number(element.x);
+    const y = Number(element.y);
+    const width = Number(element.width);
+    const height = Number(element.height);
+    return [
+      { id: `${element.id}-center`, label: "Center", x: x + width / 2, y: y + height / 2 },
+      { id: `${element.id}-tl`, label: "Top Left", x, y },
+      { id: `${element.id}-tr`, label: "Top Right", x: x + width, y },
+      { id: `${element.id}-bl`, label: "Bottom Left", x, y: y + height },
+      { id: `${element.id}-br`, label: "Bottom Right", x: x + width, y: y + height },
+    ];
+  }
+  if (element.type === "circle") {
+    const cx = Number(element.cx);
+    const cy = Number(element.cy);
+    const r = Number(element.r);
+    return [
+      { id: `${element.id}-center`, label: "Center", x: cx, y: cy },
+      { id: `${element.id}-top`, label: "Top", x: cx, y: cy - r },
+      { id: `${element.id}-right`, label: "Right", x: cx + r, y: cy },
+      { id: `${element.id}-bottom`, label: "Bottom", x: cx, y: cy + r },
+      { id: `${element.id}-left`, label: "Left", x: cx - r, y: cy },
+    ];
+  }
+  if (element.type === "polygon") {
+    const points = [];
+    for (let index = 0; index < element.points.length; index += 2) {
+      points.push({ x: Number(element.points[index]), y: Number(element.points[index + 1]) });
+    }
+    const centroid = points.reduce(
+      (acc, point) => ({ x: acc.x + point.x / points.length, y: acc.y + point.y / points.length }),
+      { x: 0, y: 0 },
+    );
+    return [
+      ...points.map((point, index) => ({
+        id: `${element.id}-v${index + 1}`,
+        label: `Vertex ${index + 1}`,
+        x: point.x,
+        y: point.y,
+      })),
+      { id: `${element.id}-center`, label: "Center", x: centroid.x, y: centroid.y },
+    ];
+  }
+  return [{ id: `${element.id}-point`, label: "Point", x: Number(element.x), y: Number(element.y) }];
+}
+
+function polygonMetrics(points) {
+  if (!Array.isArray(points) || points.length < 6) return { area: 0, centroidX: 0, centroidY: 0 };
+  let signedArea = 0;
+  let cx = 0;
+  let cy = 0;
+  const vertexCount = points.length / 2;
+  for (let index = 0; index < vertexCount; index += 1) {
+    const next = (index + 1) % vertexCount;
+    const x0 = Number(points[index * 2]);
+    const y0 = Number(points[index * 2 + 1]);
+    const x1 = Number(points[next * 2]);
+    const y1 = Number(points[next * 2 + 1]);
+    const cross = x0 * y1 - x1 * y0;
+    signedArea += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+  }
+  const area = Math.abs(signedArea) / 2;
+  if (Math.abs(signedArea) < 1e-8) {
+    const coords = Array.from({ length: vertexCount }, (_, index) => ({
+      x: Number(points[index * 2]),
+      y: Number(points[index * 2 + 1]),
+    }));
+    return {
+      area,
+      centroidX: coords.reduce((sum, point) => sum + point.x, 0) / Math.max(coords.length, 1),
+      centroidY: coords.reduce((sum, point) => sum + point.y, 0) / Math.max(coords.length, 1),
+    };
+  }
+  return {
+    area,
+    centroidX: cx / (3 * signedArea),
+    centroidY: cy / (3 * signedArea),
+  };
+}
+
+function deriveMechanicalModel(elements, constraints = []) {
+  const entities = [];
+  const workspace = [];
+  let bodyCount = 0;
+  let springCount = 0;
+  let supportCount = 0;
+  let constraintCount = Array.isArray(constraints) ? constraints.length : 0;
+  let totalMass = 0;
+  let totalForceMagnitude = 0;
+
+  elements.forEach((element) => {
+    if (!element) return;
+    if (element.type === "line" && element.role !== "force" && element.role !== "dimension") {
+      const length = Math.hypot(Number(element.x2) - Number(element.x1), Number(element.y2) - Number(element.y1));
+      const model = {
+        id: element.id,
+        kind: element.role === "spring" ? "spring" : "member",
+        name: element.name,
+        length,
+        stiffness: Number(element.stiffness ?? 1),
+        damping: Number(element.damping ?? 0),
+      };
+      entities.push(model);
+      workspace.push({ name: `${sanitizeName(element.name || element.id)}_length`, value: Number(length.toFixed(3)) });
+      if (element.role === "spring") {
+        springCount += 1;
+        workspace.push({ name: `${sanitizeName(element.name || element.id)}_k`, value: model.stiffness });
+      }
+      return;
+    }
+    if (element.type === "rect" || element.type === "circle" || element.type === "polygon") {
+      let area = 0;
+      let centroidX = 0;
+      let centroidY = 0;
+      if (element.type === "rect") {
+        area = Number(element.width) * Number(element.height);
+        centroidX = Number(element.x) + Number(element.width) / 2;
+        centroidY = Number(element.y) + Number(element.height) / 2;
+      } else if (element.type === "circle") {
+        area = Math.PI * Number(element.r) * Number(element.r);
+        centroidX = Number(element.cx);
+        centroidY = Number(element.cy);
+      } else {
+        const polygon = polygonMetrics(element.points);
+        area = polygon.area;
+        centroidX = polygon.centroidX;
+        centroidY = polygon.centroidY;
+      }
+      const density = Number(element.density ?? 1);
+      const mass = area * density;
+      totalMass += mass;
+      bodyCount += 1;
+      entities.push({
+        id: element.id,
+        kind: element.role === "mass" ? "mass" : "body",
+        name: element.name,
+        area,
+        density,
+        mass,
+        centroidX,
+        centroidY,
+      });
+      const safeName = sanitizeName(element.name || element.id);
+      workspace.push({ name: `${safeName}_area`, value: Number(area.toFixed(3)) });
+      workspace.push({ name: `${safeName}_mass`, value: Number(mass.toFixed(3)) });
+      return;
+    }
+    if (element.type === "point" || element.type === "support") {
+      supportCount += 1;
+      entities.push({
+        id: element.id,
+        kind: element.type === "support" ? "support" : "anchor",
+        name: element.name,
+        x: Number(element.x),
+        y: Number(element.y),
+      });
+      return;
+    }
+    if (element.type === "force") {
+      const magnitude = Number(element.magnitude) || Math.hypot(Number(element.x2) - Number(element.x1), Number(element.y2) - Number(element.y1));
+      totalForceMagnitude += magnitude;
+      entities.push({
+        id: element.id,
+        kind: "force",
+        name: element.name,
+        magnitude,
+        fx: Number(element.x2) - Number(element.x1),
+        fy: Number(element.y2) - Number(element.y1),
+      });
+      workspace.push({ name: `${sanitizeName(element.name || element.id)}_force`, value: Number(magnitude.toFixed(3)) });
+    }
+  });
+
+  return {
+    entities,
+    summary: {
+      bodyCount,
+      springCount,
+      supportCount,
+      constraintCount,
+      totalMass: Number(totalMass.toFixed(3)),
+      totalForceMagnitude: Number(totalForceMagnitude.toFixed(3)),
+    },
+    workspace,
+  };
+}
+
+function updateElementFromAttachmentDrag(element, attachmentId, x, y) {
+  if (!element || !attachmentId) return element;
+  const suffix = attachmentId.replace(`${element.id}-`, "");
+
+  if (element.type === "line") {
+    if (suffix === "start") return { ...element, x1: x, y1: y };
+    if (suffix === "end") return { ...element, x2: x, y2: y };
+    if (suffix === "center") {
+      const cx = (Number(element.x1) + Number(element.x2)) / 2;
+      const cy = (Number(element.y1) + Number(element.y2)) / 2;
+      const dx = x - cx;
+      const dy = y - cy;
+      return { ...element, x1: Number(element.x1) + dx, y1: Number(element.y1) + dy, x2: Number(element.x2) + dx, y2: Number(element.y2) + dy };
+    }
+  }
+
+  if (element.type === "force" || element.type === "dimension") {
+    if (suffix === "start") return { ...element, x1: x, y1: y };
+    if (suffix === "end") return { ...element, x2: x, y2: y };
+    if (suffix === "center") {
+      const cx = (Number(element.x1) + Number(element.x2)) / 2;
+      const cy = (Number(element.y1) + Number(element.y2)) / 2;
+      const dx = x - cx;
+      const dy = y - cy;
+      return { ...element, x1: Number(element.x1) + dx, y1: Number(element.y1) + dy, x2: Number(element.x2) + dx, y2: Number(element.y2) + dy };
+    }
+  }
+
+  if (element.type === "support" || element.type === "moment") {
+    if (suffix === "center") return { ...element, x, y };
+  }
+
+  if (element.type === "rect") {
+    const left = Number(element.x);
+    const top = Number(element.y);
+    const right = left + Number(element.width);
+    const bottom = top + Number(element.height);
+    if (suffix === "center") {
+      return { ...element, x: x - Number(element.width) / 2, y: y - Number(element.height) / 2 };
+    }
+    if (suffix === "tl") return { ...element, x, y, width: Math.max(8, right - x), height: Math.max(8, bottom - y) };
+    if (suffix === "tr") return { ...element, y, width: Math.max(8, x - left), height: Math.max(8, bottom - y) };
+    if (suffix === "bl") return { ...element, x, width: Math.max(8, right - x), height: Math.max(8, y - top) };
+    if (suffix === "br") return { ...element, width: Math.max(8, x - left), height: Math.max(8, y - top) };
+  }
+
+  if (element.type === "circle") {
+    const cx = Number(element.cx);
+    const cy = Number(element.cy);
+    if (suffix === "center") return { ...element, cx: x, cy: y };
+    const r = Math.max(6, Math.hypot(x - cx, y - cy));
+    return { ...element, r };
+  }
+
+  if (element.type === "polygon") {
+    const points = [...element.points];
+    if (suffix === "center") {
+      const attachments = getSimElementAttachmentPoints(element);
+      const center = attachments.find((point) => point.id.endsWith("-center"));
+      const dx = x - (center?.x ?? 0);
+      const dy = y - (center?.y ?? 0);
+      for (let index = 0; index < points.length; index += 2) {
+        points[index] += dx;
+        points[index + 1] += dy;
+      }
+      return { ...element, points };
+    }
+    const match = suffix.match(/^v(\d+)$/);
+    if (match) {
+      const vertexIndex = (Number(match[1]) - 1) * 2;
+      points[vertexIndex] = x;
+      points[vertexIndex + 1] = y;
+      return { ...element, points };
+    }
+  }
+
+  if (element.type === "point") {
+    return { ...element, x, y };
+  }
+
+  return element;
+}
+
+function buildSpringPolyline(x1, y1, x2, y2, turns = 7, amplitude = 12) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const length = Math.hypot(dx, dy) || 1;
+  const nx = -dy / length;
+  const ny = dx / length;
+  const points = [];
+
+  for (let index = 0; index <= turns + 1; index += 1) {
+    const t = index / (turns + 1);
+    const baseX = x1 + dx * t;
+    const baseY = y1 + dy * t;
+    let offset = 0;
+    if (index !== 0 && index !== turns + 1) {
+      offset = index % 2 === 0 ? amplitude : -amplitude;
+    }
+    points.push(`${(baseX + nx * offset).toFixed(2)},${(baseY + ny * offset).toFixed(2)}`);
+  }
+
+  return points.join(" ");
+}
+
+function getElementBounds(element) {
+  if (!element) return null;
+  if (element.type === "line" || element.type === "force" || element.type === "dimension") {
+    return {
+      minX: Math.min(Number(element.x1), Number(element.x2)),
+      maxX: Math.max(Number(element.x1), Number(element.x2)),
+      minY: Math.min(Number(element.y1), Number(element.y2)),
+      maxY: Math.max(Number(element.y1), Number(element.y2)),
+    };
+  }
+  if (element.type === "rect") {
+    return {
+      minX: Number(element.x),
+      maxX: Number(element.x) + Number(element.width),
+      minY: Number(element.y),
+      maxY: Number(element.y) + Number(element.height),
+    };
+  }
+  if (element.type === "circle") {
+    return {
+      minX: Number(element.cx) - Number(element.r),
+      maxX: Number(element.cx) + Number(element.r),
+      minY: Number(element.cy) - Number(element.r),
+      maxY: Number(element.cy) + Number(element.r),
+    };
+  }
+  if (element.type === "point" || element.type === "support" || element.type === "moment") {
+    const size = Number(element.size || element.radius || 8);
+    return {
+      minX: Number(element.x) - size,
+      maxX: Number(element.x) + size,
+      minY: Number(element.y) - size,
+      maxY: Number(element.y) + size,
+    };
+  }
+  if (element.type === "polygon") {
+    const xs = [];
+    const ys = [];
+    for (let index = 0; index < element.points.length; index += 2) {
+      xs.push(Number(element.points[index]));
+      ys.push(Number(element.points[index + 1]));
+    }
+    return {
+      minX: Math.min(...xs),
+      maxX: Math.max(...xs),
+      minY: Math.min(...ys),
+      maxY: Math.max(...ys),
+    };
+  }
+  return null;
+}
+
+function translateSimElement(element, dx, dy) {
+  if (!element) return element;
+  if (element.type === "line" || element.type === "force" || element.type === "dimension") {
+    return { ...element, x1: Number(element.x1) + dx, y1: Number(element.y1) + dy, x2: Number(element.x2) + dx, y2: Number(element.y2) + dy };
+  }
+  if (element.type === "rect") return { ...element, x: Number(element.x) + dx, y: Number(element.y) + dy };
+  if (element.type === "circle") return { ...element, cx: Number(element.cx) + dx, cy: Number(element.cy) + dy };
+  if (element.type === "polygon") {
+    return {
+      ...element,
+      points: element.points.map((value, index) => Number(value) + (index % 2 === 0 ? dx : dy)),
+    };
+  }
+  return { ...element, x: Number(element.x) + dx, y: Number(element.y) + dy };
+}
+
+function centerSimulationElements(elements, width = SIM_SCENE_WIDTH, height = SIM_SCENE_HEIGHT) {
+  if (!Array.isArray(elements) || !elements.length) return [];
+  const bounds = elements.map(getElementBounds).filter(Boolean);
+  if (!bounds.length) return elements;
+  const minX = Math.min(...bounds.map((bound) => bound.minX));
+  const maxX = Math.max(...bounds.map((bound) => bound.maxX));
+  const minY = Math.min(...bounds.map((bound) => bound.minY));
+  const maxY = Math.max(...bounds.map((bound) => bound.maxY));
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const dx = width / 2 - centerX;
+  const dy = height / 2 - centerY;
+  return elements.map((element) => translateSimElement(element, dx, dy));
+}
+
+function alignSimulationElementToTarget(element, target) {
+  const sourceBounds = getElementBounds(element);
+  const targetBounds = getElementBounds(target);
+  if (!sourceBounds || !targetBounds) return element;
+  const sourceCenterX = (sourceBounds.minX + sourceBounds.maxX) / 2;
+  const sourceCenterY = (sourceBounds.minY + sourceBounds.maxY) / 2;
+  const targetCenterX = (targetBounds.minX + targetBounds.maxX) / 2;
+  const targetCenterY = (targetBounds.minY + targetBounds.maxY) / 2;
+  return translateSimElement(element, targetCenterX - sourceCenterX, targetCenterY - sourceCenterY);
+}
+
+function getSimulationRoleMeta(role) {
+  if (role === "anchor") return { label: "Fixed", description: "Locked support or wall" };
+  if (role === "spring") return { label: "Spring", description: "Flexible connector" };
+  if (role === "mass") return { label: "Mass", description: "Body with area and mass" };
+  if (role === "support") return { label: "Support", description: "Support symbol / reaction point" };
+  if (role === "force") return { label: "Force", description: "Applied load" };
+  if (role === "dimension") return { label: "Dimension", description: "Measurement marker" };
+  if (role === "body") return { label: "Body", description: "General geometry body" };
+  return { label: "Member", description: "Structural member / rod" };
+}
+
+function getSimulationQuickStart(activeSimulation, hasAnimatedControls) {
+  const title = activeSimulation?.title || "this workbench";
+  return [
+    `Press Run to load ${title}. ${hasAnimatedControls ? "Animated workbenches use Play inside Parameters after the first run." : "Static workbenches use Run plus the sliders in Parameters; there is no Play button."}`,
+    "Click a part in the viewport to select it. The Properties rail is where you rename it, change its role, or replace it from ScratchPad.",
+    "Pick one attachment point on the selected part, then use Start Mate and click a point on another part to snap them together.",
+    "Double-click a part to open a ScratchPad copy for shape editing, then Send to OpenMAT to bring the edited shape back.",
+    "Use Reload Lab to restore the default editable scene, and Refresh Model when you want to recalculate without losing your scene edits.",
+  ];
+}
+
+function simulationElementsEqual(a, b) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  for (const key of aKeys) {
+    const av = a[key];
+    const bv = b[key];
+    if (Array.isArray(av) || Array.isArray(bv)) {
+      if (JSON.stringify(av) !== JSON.stringify(bv)) return false;
+      continue;
+    }
+    if (av && typeof av === "object" || bv && typeof bv === "object") {
+      if (JSON.stringify(av) !== JSON.stringify(bv)) return false;
+      continue;
+    }
+    if (av !== bv) return false;
+  }
+  return true;
+}
+
+function OpenMatTooltip({ content, children, delay = 700, fullWidth = false }) {
+  const [open, setOpen] = useState(false);
+  const timerRef = useRef(null);
+
+  const show = () => {
+    if (!content) return;
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      setOpen(true);
+    }, delay);
+  };
+
+  const hide = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setOpen(false);
+  };
+
+  useEffect(() => () => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+  }, []);
+
+  return (
+    <div
+      className={fullWidth ? "relative w-full" : "relative inline-flex"}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+    >
+      {children}
+      {open && content && (
+        <div
+          className="pointer-events-none absolute bottom-full left-1/2 z-[120] mb-2 w-64 -translate-x-1/2 rounded-xl border px-3 py-2 text-[11px] leading-5 shadow-2xl"
+          style={{
+            borderColor: "rgba(125, 211, 252, 0.28)",
+            background: "rgba(8, 15, 31, 0.96)",
+            color: "#d8f0ff",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          {content}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function renderAuthoredSimElement(element, C, isSelected, onSelect, onDoubleSelect) {
+  const common = {
+    onClick: (event) => {
+      event.stopPropagation();
+      onSelect?.(element.id);
+    },
+    onDoubleClick: (event) => {
+      event.stopPropagation();
+      onDoubleSelect?.(element.id);
+    },
+    style: { cursor: "pointer" },
+  };
+  const highlight = isSelected ? { stroke: C.amber, strokeWidth: 3 } : {};
+
+  if (element.type === "line") {
+    if (element.role === "spring") {
+      return (
+        <polyline
+          key={element.id}
+          points={buildSpringPolyline(Number(element.x1), Number(element.y1), Number(element.x2), Number(element.y2))}
+          fill="none"
+          stroke={isSelected ? C.amber : C.teal}
+          strokeWidth={5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          {...common}
+        />
+      );
+    }
+    return (
+      <line
+        key={element.id}
+        x1={element.x1}
+        y1={element.y1}
+        x2={element.x2}
+        y2={element.y2}
+        stroke={isSelected ? C.amber : element.stroke || C.blue}
+        strokeWidth={element.role === "rod" ? 6 : 4}
+        strokeLinecap="round"
+        {...common}
+      />
+    );
+  }
+
+  if (element.type === "rect") {
+    return (
+      <rect
+        key={element.id}
+        x={element.x}
+        y={element.y}
+        width={element.width}
+        height={element.height}
+        rx={element.role === "mass" ? 14 : 8}
+        fill={element.fill || C.blue}
+        opacity={0.88}
+        {...highlight}
+        {...common}
+      />
+    );
+  }
+
+  if (element.type === "circle") {
+    return (
+      <circle
+        key={element.id}
+        cx={element.cx}
+        cy={element.cy}
+        r={element.r}
+        fill={element.fill || C.teal}
+        opacity={0.9}
+        {...highlight}
+        {...common}
+      />
+    );
+  }
+
+  if (element.type === "polygon") {
+    const points = [];
+    for (let index = 0; index < element.points.length; index += 2) {
+      points.push(`${element.points[index]},${element.points[index + 1]}`);
+    }
+    return (
+      <polygon
+        key={element.id}
+        points={points.join(" ")}
+        fill={element.fill || C.teal}
+        fillOpacity={0.2}
+        stroke={isSelected ? C.amber : element.stroke || C.teal}
+        strokeWidth={isSelected ? 3 : 2}
+        {...common}
+      />
+    );
+  }
+
+  if (element.type === "force") {
+    const dx = Number(element.x2) - Number(element.x1);
+    const dy = Number(element.y2) - Number(element.y1);
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    const arrow = 14;
+    const px = -uy;
+    const py = ux;
+    const tipX = Number(element.x2);
+    const tipY = Number(element.y2);
+    const baseX = tipX - ux * arrow;
+    const baseY = tipY - uy * arrow;
+    const color = isSelected ? C.amber : element.stroke || C.red;
+    return (
+      <g key={element.id} {...common}>
+        <line x1={element.x1} y1={element.y1} x2={tipX} y2={tipY} stroke={color} strokeWidth={4} strokeLinecap="round" />
+        <polygon
+          points={`${tipX},${tipY} ${baseX + px * 6},${baseY + py * 6} ${baseX - px * 6},${baseY - py * 6}`}
+          fill={color}
+        />
+        <text x={baseX + px * 10} y={baseY + py * 10} fill={color} fontSize="12" fontWeight="700">
+          {element.label || "F"} {Number(element.magnitude || length).toFixed(0)}
+        </text>
+      </g>
+    );
+  }
+
+  if (element.type === "support") {
+    const size = Number(element.size || 26);
+    const x = Number(element.x);
+    const y = Number(element.y);
+    const color = isSelected ? C.amber : element.fill || C.amber;
+    return (
+      <g key={element.id} {...common}>
+        <polygon points={`${x},${y} ${x - size / 2},${y + size} ${x + size / 2},${y + size}`} fill={color} fillOpacity="0.3" stroke={color} strokeWidth={2} />
+        <line x1={x - size / 2 - 8} y1={y + size} x2={x + size / 2 + 8} y2={y + size} stroke={color} strokeWidth={3} />
+      </g>
+    );
+  }
+
+  if (element.type === "moment") {
+    const radius = Number(element.radius || 32);
+    const x = Number(element.x);
+    const y = Number(element.y);
+    const color = isSelected ? C.amber : element.stroke || C.purple;
+    const d = `M ${x - radius} ${y} A ${radius} ${radius} 0 1 1 ${x + radius * 0.6} ${y - radius * 0.78}`;
+    return (
+      <g key={element.id} {...common}>
+        <path d={d} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" />
+        <polygon points={`${x + radius * 0.6},${y - radius * 0.78} ${x + radius * 0.2},${y - radius * 0.72} ${x + radius * 0.42},${y - radius * 0.38}`} fill={color} />
+        <text x={x + radius + 4} y={y - radius + 4} fill={color} fontSize="12" fontWeight="700">
+          {element.label || "M"} {Number(element.magnitude || 0).toFixed(0)}
+        </text>
+      </g>
+    );
+  }
+
+  if (element.type === "dimension") {
+    const x1 = Number(element.x1);
+    const y1 = Number(element.y1);
+    const x2 = Number(element.x2);
+    const y2 = Number(element.y2);
+    const offset = Number(element.offset || 16);
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const length = Math.hypot(dx, dy) || 1;
+    const nx = -dy / length;
+    const ny = dx / length;
+    const sx1 = x1 + nx * offset;
+    const sy1 = y1 + ny * offset;
+    const sx2 = x2 + nx * offset;
+    const sy2 = y2 + ny * offset;
+    const color = isSelected ? C.amber : element.stroke || C.muted;
+    return (
+      <g key={element.id} {...common}>
+        <line x1={x1} y1={y1} x2={sx1} y2={sy1} stroke={color} strokeWidth={2} />
+        <line x1={x2} y1={y2} x2={sx2} y2={sy2} stroke={color} strokeWidth={2} />
+        <line x1={sx1} y1={sy1} x2={sx2} y2={sy2} stroke={color} strokeWidth={2} />
+        <text x={(sx1 + sx2) / 2 + nx * 8} y={(sy1 + sy2) / 2 + ny * 8} fill={color} fontSize="12" fontWeight="700">
+          {element.label ? element.label : `L ${length.toFixed(1)}`}
+        </text>
+      </g>
+    );
+  }
+
+  return (
+    <circle
+      key={element.id}
+      cx={element.x}
+      cy={element.y}
+      r={isSelected ? 9 : 7}
+      fill={element.fill || C.amber}
+      stroke={isSelected ? C.text : C.surface}
+      strokeWidth={2}
+      {...common}
+    />
+  );
+}
+
+function buildSimulationScene(activeSimulation, workspaceItems, C, authoredElements = []) {
+  if (!activeSimulation?.id) return null;
+  const hasAuthoredScene = authoredElements.length > 0;
+
+  if (activeSimulation.id === "pendulum-lab") {
+    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 1.2), 1.2), 0.2);
+    const bobX = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const bobY = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "y", -L), -L);
+    const scale = 135 / Math.max(L, 1);
+    const pivotX = 170;
+    const pivotY = 52;
+    const viewX = pivotX + bobX * scale;
+    const viewY = pivotY + Math.abs(bobY) * scale;
+
+    return {
+      title: "Pendulum scene",
+      note: "Figure output still available in the script workspace.",
+      width: 520,
+      height: 320,
+      defs: [
+        {
+          type: "linearGradient",
+          id: "pendulum-glow",
+          x1: "0%",
+          x2: "100%",
+          stops: [
+            { offset: "0%", color: C.blue, opacity: "0.25" },
+            { offset: "100%", color: C.teal, opacity: "0.5" },
+          ],
+        },
+      ],
+      shapes: [
+        { type: "rect", x: 0, y: 0, width: 520, height: 320, fill: C.surface3 },
+        { type: "line", x1: 60, y1: 260, x2: 460, y2: 260, stroke: C.border, strokeWidth: 2 },
+        ...(!hasAuthoredScene ? [
+          { type: "line", x1: pivotX, y1: pivotY, x2: viewX, y2: viewY, stroke: "url(#pendulum-glow)", strokeWidth: 5 },
+          { type: "circle", cx: pivotX, cy: pivotY, r: 8, fill: C.text },
+          { type: "circle", cx: viewX, cy: viewY, r: 24, fill: C.blue, opacity: 0.9 },
+          { type: "circle", cx: viewX, cy: viewY, r: 34, fill: C.blue, opacity: 0.12 },
+        ] : []),
+        {
+          type: "path",
+          d: `M ${pivotX - 90} ${pivotY + 170} Q ${pivotX} ${pivotY + 210} ${pivotX + 90} ${pivotY + 170}`,
+          fill: "none",
+          stroke: C.border,
+          strokeDasharray: "8 8",
+        },
+        { type: "text", x: 28, y: 34, fill: C.muted, fontSize: 14, text: "Pivot and bob geometry" },
+        {
+          type: "text",
+          x: 28,
+          y: 56,
+          fill: C.hint,
+          fontSize: 12,
+          text: hasAuthoredScene
+            ? "Editable pendulum scene active. Select a part, pick a point, then Mate or replace it."
+            : "This panel is meant to feel like a scene viewport, not just a graph.",
+        },
+      ],
+    };
+  }
+
+  if (activeSimulation.id === "spring-mass-lab") {
+    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const amplitude = Math.max(Math.abs(x), 0.2);
+    const massX = 290 + x * 72;
+    const springPoints = Array.from({ length: 9 }, (_, index) => {
+      const t = index / 8;
+      const px = 70 + t * (massX - 100);
+      const py = 170 + (index % 2 === 0 ? -22 : 22);
+      return `${px},${index === 0 || index === 8 ? 170 : py}`;
+    }).join(" ");
+
+    return {
+      title: "Spring-mass scene",
+      width: 520,
+      height: 320,
+      shapes: [
+        { type: "rect", x: 0, y: 0, width: 520, height: 320, fill: C.surface3 },
+        ...(!hasAuthoredScene ? [
+          { type: "rect", x: 45, y: 120, width: 18, height: 100, rx: 4, fill: C.border },
+          { type: "line", x1: 63, y1: 170, x2: 100, y2: 170, stroke: C.border, strokeWidth: 4 },
+          {
+            type: "polyline",
+            points: springPoints,
+            fill: "none",
+            stroke: C.teal,
+            strokeWidth: 5,
+            strokeLinejoin: "round",
+            strokeLinecap: "round",
+          },
+          { type: "rect", x: massX, y: 132, width: 86, height: 76, rx: 18, fill: C.blue, opacity: 0.92 },
+          { type: "rect", x: massX, y: 132, width: 86, height: 76, rx: 18, fill: "none", stroke: C.surface, strokeWidth: 2, opacity: 0.3 },
+        ] : []),
+        { type: "line", x1: 36, y1: 246, x2: 484, y2: 246, stroke: C.border, strokeWidth: 2 },
+        { type: "text", x: 28, y: 34, fill: C.muted, fontSize: 14, text: `Mass displacement: ${amplitude.toFixed(3)}` },
+        {
+          type: "text",
+          x: 28,
+          y: 56,
+          fill: C.hint,
+          fontSize: 12,
+          text: hasAuthoredScene
+            ? "Editable spring-mass scene active. Select the wall, spring, or mass to modify or replace it."
+            : "The center viewport is becoming a model scene instead of just a plot target.",
+        },
+      ],
+    };
+  }
+
+  if (activeSimulation.id === "projectile-lab") {
+    const xs = getWorkspaceItemValue(workspaceItems, "x", []);
+    const ys = getWorkspaceItemValue(workspaceItems, "y", []);
+    const px = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "px", 0), 0);
+    const py = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "py", 0), 0);
+    const width = 520;
+    const height = 320;
+    const path = buildPolylinePath(xs, ys, width, height, 34);
+    const xMax = Math.max(...(Array.isArray(xs) ? xs.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const yMax = Math.max(...(Array.isArray(ys) ? ys.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const markerX = 34 + (px / xMax) * (width - 68);
+    const markerY = height - 34 - (Math.max(py, 0) / yMax) * (height - 68);
+
+    return {
+      title: "Projectile scene",
+      width,
+      height,
+      shapes: [
+        { type: "rect", x: 0, y: 0, width, height, fill: C.surface3 },
+        ...(!hasAuthoredScene ? [
+          { type: "line", x1: 28, y1: height - 34, x2: width - 24, y2: height - 34, stroke: C.border, strokeWidth: 2 },
+          { type: "line", x1: 34, y1: height - 28, x2: 34, y2: 30, stroke: C.border, strokeWidth: 2 },
+        ] : []),
+        ...(path ? [{ type: "path", d: path, fill: "none", stroke: C.teal, strokeWidth: 5, strokeLinecap: "round" }] : []),
+        ...(!hasAuthoredScene ? [
+          { type: "circle", cx: markerX, cy: markerY, r: 10, fill: C.blue },
+          { type: "circle", cx: markerX, cy: markerY, r: 18, fill: C.blue, opacity: 0.16 },
+        ] : []),
+        { type: "text", x: 28, y: 34, fill: C.muted, fontSize: 14, text: "Trajectory viewport with live projectile marker" },
+        {
+          type: "text",
+          x: 28,
+          y: 56,
+          fill: C.hint,
+          fontSize: 12,
+          text: hasAuthoredScene
+            ? "Editable projectile scene active. Select the projectile or ground, then modify, mate, or replace it."
+            : "The graph still matters, but the center panel should read as a simulation scene first.",
+        },
+      ],
+    };
+  }
+
+  if (activeSimulation.id === "merchant-lab") {
+    const Fc = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "Fc", 180), 180);
+    const Ft = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "Ft", 90), 90);
+    const R = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "R", Math.hypot(Fc, Ft)), Math.hypot(Fc, Ft));
+    const scale = 0.65;
+    const originX = 170;
+    const originY = 190;
+    const radius = Math.max(R * scale, 12);
+
+    return {
+      title: "Merchant cutting-force scene",
+      width: 520,
+      height: 320,
+      shapes: [
+        { type: "rect", x: 0, y: 0, width: 520, height: 320, fill: C.surface3 },
+        { type: "circle", cx: originX, cy: originY, r: radius, fill: "none", stroke: C.border, strokeWidth: 2, opacity: 0.8 },
+        ...(!hasAuthoredScene ? [
+          { type: "polygon", points: "90,90 158,90 122,152", fill: C.border, stroke: C.blue, strokeWidth: 2, fillOpacity: 0.2 },
+          { type: "polygon", points: "158,88 230,66 246,96 176,116", fill: C.teal, stroke: C.teal, strokeWidth: 2, fillOpacity: 0.16 },
+        ] : []),
+        { type: "text", x: 28, y: 34, fill: C.muted, fontSize: 14, text: "Merchant circle and cutting-force decomposition" },
+        {
+          type: "text",
+          x: 28,
+          y: 56,
+          fill: C.hint,
+          fontSize: 12,
+          text: hasAuthoredScene
+            ? "Editable cutting-force scene active. Select tool, chip, or force vectors and modify them directly."
+            : "Useful for cutting mechanics, tool loads, and the bridge toward machining simulations.",
+        },
+      ],
+    };
+  }
+
+  if (activeSimulation.id === "beam-lab") {
+    const xs = getWorkspaceItemValue(workspaceItems, "x", []);
+    const ys = getWorkspaceItemValue(workspaceItems, "y", []);
+    const F = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "F", 320), 320), 0);
+    const delta = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "delta", 0.01), 0.01));
+    const sigma = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "sigma", 0), 0);
+    const strain = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "strain", 0), 0);
+    const width = 520;
+    const height = 320;
+    const path = buildPolylinePath(xs, ys, width - 120, 120, 0);
+    const beamPath = path ? offsetPath(path, 94, 112) : null;
+    const tipX = 430;
+    const tipY = 156 + Math.min(80, Math.max(6, delta * 3200));
+
+    return {
+      title: "Beam / cantilever scene",
+      width,
+      height,
+      shapes: [
+        { type: "rect", x: 0, y: 0, width, height, fill: C.surface3 },
+        ...(!authoredElements.length ? [
+          { type: "rect", x: 48, y: 108, width: 28, height: 116, rx: 4, fill: C.border },
+          { type: "support", x: 90, y: 156, size: 18, fill: C.amber },
+          { type: "line", x1: 74, y1: 156, x2: 430, y2: 156, stroke: C.border, strokeWidth: 2, strokeDasharray: "8 8" },
+          ...(beamPath ? [{ type: "path", d: beamPath, fill: "none", stroke: C.blue, strokeWidth: 6, strokeLinecap: "round" }] : []),
+          { type: "line", x1: tipX, y1: tipY - 46, x2: tipX, y2: tipY + 18, stroke: C.red, strokeWidth: 4 },
+          { type: "polygon", points: `${tipX - 8},${tipY + 4} ${tipX + 8},${tipY + 4} ${tipX},${tipY + 20}`, fill: C.red, stroke: C.red, strokeWidth: 2 },
+          { type: "line", x1: 90, y1: 250, x2: 430, y2: 250, stroke: C.hint, strokeWidth: 2 },
+        ] : []),
+        { type: "text", x: 28, y: 30, fill: C.muted, fontSize: 14, text: `Tip deflection: ${delta.toExponential(2)} m` },
+        { type: "text", x: 28, y: 52, fill: C.hint, fontSize: 12, text: `Stress ${sigma.toExponential(2)} Pa • Strain ${strain.toExponential(2)}` },
+        {
+          type: "text",
+          x: 28,
+          y: 74,
+          fill: C.hint,
+          fontSize: 12,
+          text: authoredElements.length
+            ? "Editable scene active. Select a part, then use Mate or ScratchPad replacement."
+            : "A first engineering workbench: support, member, load, section, and response.",
+        },
+        ...(!authoredElements.length ? [{ type: "text", x: tipX - 18, y: tipY - 54, fill: C.red, fontSize: 12, text: `F ${F.toFixed(0)} N` }] : []),
+      ],
+    };
+  }
+
+  if (activeSimulation.id === "chatter-lab") {
+    const f_n = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "f_n", 480), 480));
+    const toothHz = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "tooth_hz", 800), 800));
+    const delta = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "delta", 0.0002), 0.0002));
+    const ratio = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "chatter_ratio", 1.2), 1.2));
+    const tipX = 362;
+    const baseY = 160;
+    const tipY = baseY + Math.min(42, Math.max(2, delta * 18000));
+    return {
+      title: "Natural frequency / chatter scene",
+      width: 520,
+      height: 320,
+      shapes: [
+        { type: "rect", x: 0, y: 0, width: 520, height: 320, fill: C.surface3 },
+        ...(!hasAuthoredScene ? [
+          { type: "rect", x: 54, y: 102, width: 36, height: 104, rx: 8, fill: C.border },
+          { type: "line", x1: 96, y1: baseY, x2: tipX, y2: tipY, stroke: C.blue, strokeWidth: 6, strokeLinecap: "round" },
+          { type: "circle", cx: tipX, cy: tipY, r: 14, fill: C.teal, opacity: 0.92 },
+          { type: "line", x1: 408, y1: 78, x2: 408, y2: 222, stroke: C.border, strokeWidth: 1.5, strokeDasharray: "6 6" },
+          { type: "line", x1: 84, y1: 250, x2: 448, y2: 250, stroke: C.border, strokeWidth: 2 },
+        ] : []),
+        { type: "text", x: 28, y: 34, fill: C.muted, fontSize: 14, text: `Natural ${f_n.toFixed(0)} Hz • Tooth-pass ${toothHz.toFixed(0)} Hz` },
+        { type: "text", x: 28, y: 56, fill: ratio > 0.85 && ratio < 1.15 ? C.red : C.hint, fontSize: 12, text: ratio > 0.85 && ratio < 1.15 ? "Warning: excitation is near the natural frequency band." : `Chatter ratio: ${ratio.toFixed(2)}` },
+      ],
+    };
+  }
+
+  return null;
+}
+
+function SimulationSceneRenderer({
+  scene,
+  C,
+  showFigureNote = false,
+  authoredElements = [],
+  selectedElementId = "",
+  selectedAttachmentId = "",
+  mateSource = null,
+  onSelectElement,
+  onDoubleSelectElement,
+  onSelectAttachment,
+  onCompleteMate,
+  onClearSelection,
+  onDragAttachment,
+}) {
+  if (!scene) return null;
+  const svgRef = useRef(null);
+  const dragRef = useRef(null);
+  const [camera, setCamera] = useState({ x: 0, y: 0, scale: 1 });
+  const panRef = useRef(null);
+
+  const screenToWorld = useCallback((clientX, clientY) => {
+    if (!svgRef.current) return null;
+    const svg = svgRef.current;
+    const point = svg.createSVGPoint();
+    point.x = clientX;
+    point.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    const local = point.matrixTransform(ctm.inverse());
+    return {
+      x: (local.x - camera.x) / camera.scale,
+      y: (local.y - camera.y) / camera.scale,
+    };
+  }, [camera]);
+
+  useEffect(() => {
+    const handleMove = (event) => {
+      if (dragRef.current && typeof onDragAttachment === "function") {
+        const world = screenToWorld(event.clientX, event.clientY);
+        if (!world) return;
+        onDragAttachment(dragRef.current, world.x, world.y);
+        return;
+      }
+      if (panRef.current) {
+        const dx = event.clientX - panRef.current.x;
+        const dy = event.clientY - panRef.current.y;
+        panRef.current = { x: event.clientX, y: event.clientY };
+        setCamera((current) => ({ ...current, x: current.x + dx, y: current.y + dy }));
+      }
+    };
+
+    const handleUp = () => {
+      dragRef.current = null;
+      panRef.current = null;
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [onDragAttachment, screenToWorld]);
+
+  const renderShape = (shape, index) => {
+    const { type, text, ...rest } = shape;
+    if (type === "text") {
+      return (
+        <text key={`${type}-${index}`} {...rest}>
+          {text}
+        </text>
+      );
+    }
+    if (type === "line") return <line key={`${type}-${index}`} {...rest} />;
+    if (type === "circle") return <circle key={`${type}-${index}`} {...rest} />;
+    if (type === "rect") return <rect key={`${type}-${index}`} {...rest} />;
+    if (type === "path") return <path key={`${type}-${index}`} {...rest} />;
+    if (type === "polyline") return <polyline key={`${type}-${index}`} {...rest} />;
+    if (type === "polygon") return <polygon key={`${type}-${index}`} {...rest} />;
+    return null;
+  };
+
+  return (
+    <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+            Model viewport
+          </div>
+          <div className="mt-1 text-sm font-semibold">{scene.title}</div>
+        </div>
+        {showFigureNote && scene.note && (
+          <div className="text-[11px]" style={{ color: C.muted }}>
+            {scene.note}
+          </div>
+        )}
+      </div>
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${scene.width} ${scene.height}`}
+        className="min-h-0 flex-1 rounded-2xl"
+        style={{ background: C.surface3 }}
+        onClick={() => onClearSelection?.()}
+        onWheel={(event) => {
+          event.preventDefault();
+          const factor = event.deltaY < 0 ? 1.08 : 0.92;
+          setCamera((current) => ({
+            ...current,
+            scale: Math.min(4, Math.max(0.35, current.scale * factor)),
+          }));
+        }}
+        onMouseDown={(event) => {
+          if (event.target === svgRef.current) {
+            panRef.current = { x: event.clientX, y: event.clientY };
+          }
+        }}
+      >
+        {Array.isArray(scene.defs) && scene.defs.length > 0 && (
+          <defs>
+            {scene.defs.map((def, index) => {
+              if (def.type === "linearGradient") {
+                return (
+                  <linearGradient key={`def-${index}`} id={def.id} x1={def.x1} x2={def.x2} y1={def.y1} y2={def.y2}>
+                    {def.stops?.map((stop, stopIndex) => (
+                      <stop
+                        key={`stop-${stopIndex}`}
+                        offset={stop.offset}
+                        stopColor={stop.color}
+                        stopOpacity={stop.opacity}
+                      />
+                    ))}
+                  </linearGradient>
+                );
+              }
+              return null;
+            })}
+          </defs>
+        )}
+        <g transform={`translate(${camera.x} ${camera.y}) scale(${camera.scale})`}>
+          {scene.shapes.map(renderShape)}
+          {authoredElements.map((element) =>
+            renderAuthoredSimElement(element, C, element.id === selectedElementId, onSelectElement, onDoubleSelectElement),
+          )}
+          {authoredElements.flatMap((element) => {
+            const isSelectedElement = element.id === selectedElementId;
+            const isMateTargetElement = Boolean(mateSource) && element.id !== mateSource.elementId;
+            if (!isSelectedElement && !isMateTargetElement) return [];
+            return getSimElementAttachmentPoints(element).map((point) => {
+              const active = point.id === selectedAttachmentId;
+              const isMateSourcePoint = mateSource?.elementId === element.id && mateSource?.attachmentId === point.id;
+              const isMateTargetPoint = Boolean(mateSource) && element.id !== mateSource.elementId;
+              return (
+                <g
+                  key={point.id}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (isMateTargetPoint) {
+                      onCompleteMate?.(element.id, point.id);
+                      return;
+                    }
+                    onSelectAttachment?.(point.id);
+                  }}
+                  onMouseDown={(event) => {
+                    if (isMateTargetPoint) return;
+                    event.stopPropagation();
+                    dragRef.current = point.id;
+                    onSelectAttachment?.(point.id);
+                  }}
+                  style={{ cursor: isMateTargetPoint ? "copy" : "pointer" }}
+                >
+                  <circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={isMateSourcePoint ? 8 : active ? 7 : 5}
+                    fill={isMateSourcePoint ? C.teal : active ? C.amber : isMateTargetPoint ? C.surface2 : C.surface}
+                    stroke={isMateSourcePoint ? C.text : active ? C.text : isMateTargetPoint ? C.teal : C.blue}
+                    strokeWidth={2}
+                  />
+                </g>
+              );
+            });
+          })}
+        </g>
+      </svg>
+      <div className="mt-3 flex items-center justify-between gap-3 text-[11px]" style={{ color: C.muted }}>
+        <span>Drag empty space to pan. Mouse wheel to zoom.</span>
+        <button
+          type="button"
+          onClick={() => setCamera({ x: 0, y: 0, scale: 1 })}
+          className="rounded-lg border px-2.5 py-1 font-semibold"
+          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+        >
+          Reset View
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OpenMatSimulationViewport({
+  activeSimulation,
+  workspaceItems,
+  figureJson,
+  surfaceConfig,
+  plotKind,
+  setPlotKind,
+  C,
+  openGrapher,
+  authoredElements = [],
+  selectedElementId = "",
+  selectedAttachmentId = "",
+  mateSource = null,
+  onSelectElement,
+  onDoubleSelectElement,
+  onSelectAttachment,
+  onCompleteMate,
+  onClearSelection,
+  onDragAttachment,
+}) {
   if (plotKind === "3d" && surfaceConfig) {
     return (
       <div className="flex h-full min-h-[420px] flex-col">
@@ -1396,115 +3201,24 @@ function OpenMatSimulationViewport({ activeSimulation, workspaceItems, figureJso
     );
   }
 
-  if (activeSimulation?.id === "pendulum-lab") {
-    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 1.2), 1.2), 0.2);
-    const bobX = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
-    const bobY = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "y", -L), -L);
-    const scale = 135 / Math.max(L, 1);
-    const pivotX = 170;
-    const pivotY = 52;
-    const viewX = pivotX + bobX * scale;
-    const viewY = pivotY + Math.abs(bobY) * scale;
+  const scene = buildSimulationScene(activeSimulation, workspaceItems, C, authoredElements);
+  if (scene) {
     return (
-      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
-              Model viewport
-            </div>
-            <div className="mt-1 text-sm font-semibold">Pendulum scene</div>
-          </div>
-          {figureJson && (
-            <div className="text-[11px]" style={{ color: C.muted }}>
-              Figure output still available in the script workspace.
-            </div>
-          )}
-        </div>
-        <svg viewBox="0 0 520 320" className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
-          <defs>
-            <linearGradient id="pendulum-glow" x1="0%" x2="100%">
-              <stop offset="0%" stopColor={C.blue} stopOpacity="0.25" />
-              <stop offset="100%" stopColor={C.teal} stopOpacity="0.5" />
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="520" height="320" fill={C.surface3} />
-          <line x1="60" y1="260" x2="460" y2="260" stroke={C.border} strokeWidth="2" />
-          <line x1={pivotX} y1={pivotY} x2={viewX} y2={viewY} stroke="url(#pendulum-glow)" strokeWidth="5" />
-          <circle cx={pivotX} cy={pivotY} r="8" fill={C.text} />
-          <circle cx={viewX} cy={viewY} r="24" fill={C.blue} opacity="0.9" />
-          <circle cx={viewX} cy={viewY} r="34" fill={C.blue} opacity="0.12" />
-          <path d={`M ${pivotX - 90} ${pivotY + 170} Q ${pivotX} ${pivotY + 210} ${pivotX + 90} ${pivotY + 170}`} fill="none" stroke={C.border} strokeDasharray="8 8" />
-          <text x="28" y="34" fill={C.muted} fontSize="14">Pivot and bob geometry</text>
-          <text x="28" y="56" fill={C.hint} fontSize="12">This panel is meant to feel like a scene viewport, not just a graph.</text>
-        </svg>
-      </div>
-    );
-  }
-
-  if (activeSimulation?.id === "spring-mass-lab") {
-    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
-    const amplitude = Math.max(Math.abs(x), 0.2);
-    const massX = 290 + x * 72;
-    const springPoints = Array.from({ length: 9 }, (_, index) => {
-      const t = index / 8;
-      const px = 70 + t * (massX - 100);
-      const py = 170 + (index % 2 === 0 ? -22 : 22);
-      return `${px},${index === 0 || index === 8 ? 170 : py}`;
-    }).join(" ");
-    return (
-      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
-        <div className="mb-3">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
-            Model viewport
-          </div>
-          <div className="mt-1 text-sm font-semibold">Spring-mass scene</div>
-        </div>
-        <svg viewBox="0 0 520 320" className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
-          <rect x="0" y="0" width="520" height="320" fill={C.surface3} />
-          <rect x="45" y="120" width="18" height="100" rx="4" fill={C.border} />
-          <line x1="63" y1="170" x2="100" y2="170" stroke={C.border} strokeWidth="4" />
-          <polyline points={springPoints} fill="none" stroke={C.teal} strokeWidth="5" strokeLinejoin="round" strokeLinecap="round" />
-          <rect x={massX} y="132" width="86" height="76" rx="18" fill={C.blue} opacity="0.92" />
-          <rect x={massX} y="132" width="86" height="76" rx="18" fill="none" stroke={C.surface} strokeWidth="2" opacity="0.3" />
-          <line x1="36" y1="246" x2="484" y2="246" stroke={C.border} strokeWidth="2" />
-          <text x="28" y="34" fill={C.muted} fontSize="14">Mass displacement: {amplitude.toFixed(3)}</text>
-          <text x="28" y="56" fill={C.hint} fontSize="12">The center viewport is becoming a model scene instead of just a plot target.</text>
-        </svg>
-      </div>
-    );
-  }
-
-  if (activeSimulation?.id === "projectile-lab") {
-    const xs = getWorkspaceItemValue(workspaceItems, "x", []);
-    const ys = getWorkspaceItemValue(workspaceItems, "y", []);
-    const px = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "px", 0), 0);
-    const py = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "py", 0), 0);
-    const width = 520;
-    const height = 320;
-    const path = buildPolylinePath(xs, ys, width, height, 34);
-    const xMax = Math.max(...(Array.isArray(xs) ? xs.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
-    const yMax = Math.max(...(Array.isArray(ys) ? ys.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
-    const markerX = 34 + (px / xMax) * (width - 68);
-    const markerY = height - 34 - (Math.max(py, 0) / yMax) * (height - 68);
-    return (
-      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
-        <div className="mb-3">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
-            Model viewport
-          </div>
-          <div className="mt-1 text-sm font-semibold">Projectile scene</div>
-        </div>
-        <svg viewBox={`0 0 ${width} ${height}`} className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
-          <rect x="0" y="0" width={width} height={height} fill={C.surface3} />
-          <line x1="28" y1={height - 34} x2={width - 24} y2={height - 34} stroke={C.border} strokeWidth="2" />
-          <line x1="34" y1={height - 28} x2="34" y2="30" stroke={C.border} strokeWidth="2" />
-          {path && <path d={path} fill="none" stroke={C.teal} strokeWidth="5" strokeLinecap="round" />}
-          <circle cx={markerX} cy={markerY} r="10" fill={C.blue} />
-          <circle cx={markerX} cy={markerY} r="18" fill={C.blue} opacity="0.16" />
-          <text x="28" y="34" fill={C.muted} fontSize="14">Trajectory viewport with live projectile marker</text>
-          <text x="28" y="56" fill={C.hint} fontSize="12">The graph still matters, but the center panel should read as a simulation scene first.</text>
-        </svg>
-      </div>
+      <SimulationSceneRenderer
+        scene={scene}
+        C={C}
+        showFigureNote={Boolean(figureJson)}
+        authoredElements={authoredElements}
+        selectedElementId={selectedElementId}
+        selectedAttachmentId={selectedAttachmentId}
+        mateSource={mateSource}
+        onSelectElement={onSelectElement}
+        onDoubleSelectElement={onDoubleSelectElement}
+        onSelectAttachment={onSelectAttachment}
+        onCompleteMate={onCompleteMate}
+        onClearSelection={onClearSelection}
+        onDragAttachment={onDragAttachment}
+      />
     );
   }
 
@@ -1923,12 +3637,20 @@ function createExecutionEngine(options = {}) {
     plotState.ylabel = String(text);
     return text;
   });
-  parser.set("xlim", (range) => {
-    plotState.xlim = normalizeVector(range).slice(0, 2);
+  parser.set("xlim", (min, max) => {
+    if (max !== undefined) {
+      plotState.xlim = [Number(min), Number(max)];
+    } else {
+      plotState.xlim = normalizeVector(min).slice(0, 2);
+    }
     return plotState.xlim;
   });
-  parser.set("ylim", (range) => {
-    plotState.ylim = normalizeVector(range).slice(0, 2);
+  parser.set("ylim", (min, max) => {
+    if (max !== undefined) {
+      plotState.ylim = [Number(min), Number(max)];
+    } else {
+      plotState.ylim = normalizeVector(min).slice(0, 2);
+    }
     return plotState.ylim;
   });
   parser.set("axis", (mode) => {
@@ -2419,6 +4141,9 @@ export default function OpenMatStudio() {
   const [simLeftTab, setSimLeftTab] = useLocalStorage("openmat-sim-left-tab", "models");
   const [simRightTab, setSimRightTab] = useLocalStorage("openmat-sim-right-tab", "params");
   const [simEditorWidth, setSimEditorWidth] = useLocalStorage("openmat-sim-editor-width", 40);
+  const [simGeometryStore, setSimGeometryStore] = useLocalStorage("openmat-sim-geometry-store", {});
+  const [simConstraintStore, setSimConstraintStore] = useLocalStorage("openmat-sim-constraint-store", {});
+  const [workbenchLessonProgress, setWorkbenchLessonProgress] = useLocalStorage("openmat-workbench-lesson-progress", {});
   const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
@@ -2427,6 +4152,9 @@ export default function OpenMatStudio() {
   const [commandInput, setCommandInput] = useState("");
   const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1);
   const [lastConsoleCommand, setLastConsoleCommand] = useState("");
+  const [selectedSimElementId, setSelectedSimElementId] = useState("");
+  const [selectedAttachmentId, setSelectedAttachmentId] = useState("");
+  const [pendingMateSource, setPendingMateSource] = useState(null);
   const outputRef = useRef(null);
   const consoleInputRef = useRef(null);
   const importRef = useRef(null);
@@ -2472,6 +4200,42 @@ export default function OpenMatStudio() {
     [],
   );
   const activeSimulation = simulationMap[activeSimulationId] || SIMULATION_WORKSPACES[0];
+  const activeLesson = activeSimulation?.lesson || null;
+  const activeLessonStepIndex = Math.min(
+    Math.max(Number(workbenchLessonProgress?.[activeSimulationId] ?? 0), 0),
+    Math.max((activeLesson?.steps?.length || 1) - 1, 0),
+  );
+  const activeLessonStep = activeLesson?.steps?.[activeLessonStepIndex] || null;
+  const authoredSimElements = useMemo(
+    () => simGeometryStore[activeSimulationId] || [],
+    [activeSimulationId, simGeometryStore],
+  );
+  const activeConstraints = useMemo(
+    () => simConstraintStore[activeSimulationId] || [],
+    [activeSimulationId, simConstraintStore],
+  );
+  const liveSimElements = useMemo(
+    () => resolveLinkedSimulationElements(authoredSimElements, activeSimulation, workspaceItems, C),
+    [C, activeSimulation, authoredSimElements, workspaceItems],
+  );
+  const selectedSimElement = useMemo(
+    () => liveSimElements.find((element) => element.id === selectedSimElementId) || null,
+    [liveSimElements, selectedSimElementId],
+  );
+  const selectedAttachment = useMemo(
+    () => getSimElementAttachmentPoints(selectedSimElement).find((point) => point.id === selectedAttachmentId) || null,
+    [selectedAttachmentId, selectedSimElement],
+  );
+  const derivedMechanicalModel = useMemo(
+    () => deriveMechanicalModel(liveSimElements, activeConstraints),
+    [activeConstraints, liveSimElements],
+  );
+  const setActiveLessonStep = useCallback((nextIndex) => {
+    setWorkbenchLessonProgress((current) => ({
+      ...(current && typeof current === "object" ? current : {}),
+      [activeSimulationId]: Math.max(0, Number(nextIndex) || 0),
+    }));
+  }, [activeSimulationId, setWorkbenchLessonProgress]);
   const simulationTreeItems = useMemo(() => ([
     {
       id: "model",
@@ -2480,6 +4244,9 @@ export default function OpenMatStudio() {
       lines: [
         "Shared OpenMAT session",
         surfaceConfig ? "3D surface attached" : "Scene viewport active",
+        `${liveSimElements.length} authored element${liveSimElements.length === 1 ? "" : "s"}`,
+        `${activeConstraints.length} assembly constraint${activeConstraints.length === 1 ? "" : "s"}`,
+        `${derivedMechanicalModel.summary.bodyCount} bodies • ${derivedMechanicalModel.summary.springCount} springs`,
       ],
     },
     {
@@ -2505,7 +4272,9 @@ export default function OpenMatStudio() {
       detail: `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
       lines: workspaceItems.length
         ? workspaceItems.slice(0, 4).map((item) => `${item.name}: ${item.preview}`)
-        : ["No results yet"],
+        : derivedMechanicalModel.workspace.length
+          ? derivedMechanicalModel.workspace.slice(0, 4).map((item) => `${item.name}: ${item.value}`)
+          : ["No results yet"],
     },
     {
       id: "bridge",
@@ -2516,12 +4285,397 @@ export default function OpenMatStudio() {
         "Promote console experiments back into the script",
       ],
     },
-  ]), [activeSimulation?.title, controlSpecs, surfaceConfig, workspaceItems]);
-  const simulationMetricCards = useMemo(() => (
-    workspaceItems
+  ]), [activeConstraints.length, activeSimulation?.title, controlSpecs, derivedMechanicalModel, liveSimElements.length, surfaceConfig, workspaceItems]);
+
+  useEffect(() => {
+    if (!liveSimElements.some((element) => element.id === selectedSimElementId)) {
+      setSelectedSimElementId("");
+      setSelectedAttachmentId("");
+      setPendingMateSource(null);
+    }
+  }, [liveSimElements, selectedSimElementId]);
+
+  const updateSimulationElements = useCallback((updater) => {
+    setSimGeometryStore((current) => {
+      const currentItems = current[activeSimulationId] || [];
+      const nextItems = updater(currentItems);
+      if (nextItems === currentItems) {
+        return current;
+      }
+      return { ...current, [activeSimulationId]: nextItems };
+    });
+  }, [activeSimulationId, setSimGeometryStore]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || workspaceMode !== "sim") return undefined;
+    let lastRaw = window.localStorage.getItem("oc-pad-shapes") || "";
+    const sync = () => {
+      const nextRaw = window.localStorage.getItem("oc-pad-shapes") || "";
+      if (nextRaw === lastRaw) return;
+      lastRaw = nextRaw;
+      try {
+        const parsed = nextRaw ? JSON.parse(nextRaw) : [];
+        if (!Array.isArray(parsed)) return;
+        updateSimulationElements((items) =>
+          items.map((element) => {
+            const shapeId = element?.source?.kind === "scratch" && element?.source?.linked ? element.source.shapeId : null;
+            if (!shapeId) return element;
+            const shape = parsed.find((entry) => entry?.id === shapeId);
+            return shape ? convertScratchShapeToSimElement(shape, element) : element;
+          }),
+        );
+      } catch {
+        // Ignore malformed scratch storage and leave the current scene intact.
+      }
+    };
+    const interval = window.setInterval(sync, 1200);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("storage", sync);
+    };
+  }, [updateSimulationElements, workspaceMode]);
+
+  useEffect(() => {
+    if (workspaceMode !== "sim") return;
+    if (authoredSimElements.length > 0) return;
+    if (!workspaceItems.length) return;
+    const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
+    if (!guided.length) return;
+    updateSimulationElements(() => guided);
+  }, [C, activeSimulation, authoredSimElements.length, updateSimulationElements, workspaceItems, workspaceMode]);
+
+  useEffect(() => {
+    if (workspaceMode !== "sim") return;
+    if (!workspaceItems.length) return;
+    const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
+    if (!guided.length) return;
+    const guidedById = new Map(guided.map((element) => [element.id, element]));
+    updateSimulationElements((items) => {
+      let changed = false;
+      const nextItems = items.map((element) => {
+        if (element?.source?.kind !== "guided" || !element?.source?.linked) return element;
+        const nextGuided = guidedById.get(element.id);
+        if (!nextGuided) return element;
+        const merged = {
+          ...nextGuided,
+          name: element.name || nextGuided.name,
+          role: element.role || nextGuided.role,
+          source: element.source,
+        };
+        if (!simulationElementsEqual(element, merged)) {
+          changed = true;
+          return merged;
+        }
+        return element;
+      });
+      return changed ? nextItems : items;
+    });
+  }, [C, activeSimulation, updateSimulationElements, workspaceItems, workspaceMode]);
+
+  const addSimulationElement = useCallback((type) => {
+    const next = createSimElement(type);
+    updateSimulationElements((items) => [...items, next]);
+    setSelectedSimElementId(next.id);
+    setSelectedAttachmentId("");
+  }, [updateSimulationElements]);
+
+  const updateSelectedSimulationElement = useCallback((field, value) => {
+    if (!selectedSimElementId) return;
+    updateSimulationElements((items) =>
+      items.map((element) => {
+        if (element.id !== selectedSimElementId) return element;
+        const numericFields = new Set(["x", "y", "x1", "y1", "x2", "y2", "width", "height", "cx", "cy", "r", "size", "radius", "magnitude", "offset", "density", "stiffness", "damping"]);
+        return { ...element, [field]: numericFields.has(field) ? Number(value) : value };
+      }),
+    );
+  }, [selectedSimElementId, updateSimulationElements]);
+
+  const convertSelectedSimulationElement = useCallback((role) => {
+    if (!selectedSimElementId) return;
+    updateSimulationElements((items) =>
+      items.map((element) => element.id === selectedSimElementId ? { ...element, role, name: role === "mass" ? "Mass" : role === "spring" ? "Spring" : role === "anchor" ? "Anchor" : "Rod" } : element),
+    );
+  }, [selectedSimElementId, updateSimulationElements]);
+
+  const deleteSelectedSimulationElement = useCallback(() => {
+    if (!selectedSimElementId) return;
+    updateSimulationElements((items) => items.filter((element) => element.id !== selectedSimElementId));
+    setSimConstraintStore((current) => {
+      const nextConstraints = (current?.[activeSimulationId] || []).filter((constraint) =>
+        constraint.sourceElementId !== selectedSimElementId && constraint.targetElementId !== selectedSimElementId,
+      );
+      if (nextConstraints.length === (current?.[activeSimulationId] || []).length) return current;
+      return { ...(current && typeof current === "object" ? current : {}), [activeSimulationId]: nextConstraints };
+    });
+    setSelectedSimElementId("");
+    setSelectedAttachmentId("");
+  }, [activeSimulationId, selectedSimElementId, setSimConstraintStore, updateSimulationElements]);
+
+  const createJointFromAttachment = useCallback(() => {
+    if (!selectedAttachment) return;
+    const next = {
+      id: `sim-point-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      type: "point",
+      role: "anchor",
+      name: `${selectedAttachment.label} Joint`,
+      x: selectedAttachment.x,
+      y: selectedAttachment.y,
+      fill: C.amber,
+    };
+    updateSimulationElements((items) => [...items, next]);
+    setSelectedSimElementId(next.id);
+    setSelectedAttachmentId("");
+  }, [C.amber, selectedAttachment, updateSimulationElements]);
+
+  const beginMateFromSelectedAttachment = useCallback(() => {
+    if (!selectedSimElementId || !selectedAttachmentId) return;
+    setPendingMateSource({ elementId: selectedSimElementId, attachmentId: selectedAttachmentId });
+  }, [selectedAttachmentId, selectedSimElementId]);
+
+  const cancelPendingMate = useCallback(() => {
+    setPendingMateSource(null);
+  }, []);
+
+  const completeMateToAttachment = useCallback((targetElementId, targetAttachmentId) => {
+    if (!pendingMateSource || !targetElementId || !targetAttachmentId) return;
+    if (pendingMateSource.elementId === targetElementId) return;
+    updateSimulationElements((items) => {
+      const sourceElement = items.find((element) => element.id === pendingMateSource.elementId);
+      const targetElement = items.find((element) => element.id === targetElementId);
+      if (!sourceElement || !targetElement) return items;
+      const targetPoint = getSimElementAttachmentPoints(targetElement).find((point) => point.id === targetAttachmentId);
+      if (!targetPoint) return items;
+      return items.map((element) =>
+        element.id === pendingMateSource.elementId
+          ? updateElementFromAttachmentDrag(element, pendingMateSource.attachmentId, targetPoint.x, targetPoint.y)
+          : element,
+      );
+    });
+    setSelectedSimElementId(pendingMateSource.elementId);
+    setSelectedAttachmentId("");
+    setPendingMateSource(null);
+    setSimRightTab("properties");
+    const nextConstraint = createMateConstraint(
+      pendingMateSource.elementId,
+      pendingMateSource.attachmentId,
+      targetElementId,
+      targetAttachmentId,
+    );
+    setSimConstraintStore((current) => {
+      const next = [...(current?.[activeSimulationId] || []).filter((constraint) =>
+        !(
+          constraint.type === "mate"
+          && constraint.sourceElementId === nextConstraint.sourceElementId
+          && constraint.sourceAttachmentId === nextConstraint.sourceAttachmentId
+        )
+      ), nextConstraint];
+      return { ...(current && typeof current === "object" ? current : {}), [activeSimulationId]: next };
+    });
+  }, [activeSimulationId, pendingMateSource, setSimConstraintStore, updateSimulationElements]);
+
+  const deleteConstraint = useCallback((constraintId) => {
+    setSimConstraintStore((current) => {
+      const nextConstraints = (current?.[activeSimulationId] || []).filter((constraint) => constraint.id !== constraintId);
+      if (nextConstraints.length === (current?.[activeSimulationId] || []).length) return current;
+      return { ...(current && typeof current === "object" ? current : {}), [activeSimulationId]: nextConstraints };
+    });
+  }, [activeSimulationId, setSimConstraintStore]);
+
+  const openScratchGeometryTool = useCallback(() => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("oc-open-scratchpad", { detail: { mode: "geo", tool: "select" } }));
+    setOutput("ScratchPad opened in Geo Select mode. Pick one shape, then click Send to OpenMAT.");
+  }, []);
+
+  const importScratchGeometry = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("oc-pad-shapes");
+      const selectedShapeId = window.localStorage.getItem("oc-pad-selected-shape-id");
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(parsed) || !parsed.length) {
+        window.dispatchEvent(new CustomEvent("oc-open-scratchpad", { detail: { mode: "geo", tool: "select" } }));
+        setOutput("No scratchpad geometry found yet. ScratchPad was opened so you can draw or select a shape.");
+        return;
+      }
+      if (!selectedShapeId) {
+        window.dispatchEvent(new CustomEvent("oc-open-scratchpad", { detail: { mode: "geo", tool: "select" } }));
+        setOutput("No ScratchPad geometry is selected. ScratchPad was opened so you can select one shape in Geo mode, then import it here.");
+        return;
+      }
+      const selectedShape = parsed.find((shape) => String(shape?.id) === String(selectedShapeId));
+      if (!selectedShape) {
+        window.dispatchEvent(new CustomEvent("oc-open-scratchpad", { detail: { mode: "geo", tool: "select" } }));
+        setOutput("The selected ScratchPad shape was not found. ScratchPad was opened so you can re-select it and try again.");
+        return;
+      }
+      let importedElement = convertScratchShapeToSimElement(selectedShape);
+      if (!importedElement) {
+        setOutput("The selected ScratchPad shape could not be converted into simulation geometry.");
+        return;
+      }
+      const targetElement = selectedSimElementId
+        ? authoredSimElements.find((element) => element.id === selectedSimElementId) || null
+        : null;
+      if (targetElement) {
+        importedElement = alignSimulationElementToTarget(
+          convertScratchShapeToSimElement(selectedShape, targetElement),
+          targetElement,
+        );
+        updateSimulationElements((items) =>
+          items.map((element) => (element.id === targetElement.id ? importedElement : element)),
+        );
+      } else {
+        importedElement = centerSimulationElements([importedElement])[0];
+        updateSimulationElements((items) => [...items, importedElement]);
+      }
+      setSelectedSimElementId(importedElement.id);
+      setSelectedAttachmentId("");
+      setSimLeftTab("geometry");
+      setSimRightTab("properties");
+      setOutput(
+        targetElement
+          ? `Replaced "${targetElement.name}" with the selected ScratchPad geometry.`
+          : "Imported the selected ScratchPad shape into the center of the simulation scene.",
+      );
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    }
+  }, [authoredSimElements, selectedSimElementId, updateSimulationElements]);
+
+  const syncScratchGeometry = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("oc-pad-shapes");
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(parsed)) {
+        setOutput("Scratch geometry store is not available.");
+        return;
+      }
+      let synced = 0;
+      updateSimulationElements((items) =>
+        items.map((element) => {
+          const shapeId = element?.source?.kind === "scratch" && element?.source?.linked ? element.source.shapeId : null;
+          if (!shapeId) return element;
+          const shape = parsed.find((entry) => entry?.id === shapeId);
+          if (!shape) return element;
+          synced += 1;
+          return convertScratchShapeToSimElement(shape, element);
+        }),
+      );
+      setOutput(
+        synced
+          ? `Synced ${synced} linked scratch shape${synced === 1 ? "" : "s"} into the current simulation scene.`
+          : "No linked scratch geometry was found in the current scene.",
+      );
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    }
+  }, [updateSimulationElements]);
+
+  useEffect(() => {
+    const handleExport = () => {
+      importScratchGeometry();
+    };
+    window.addEventListener("oc-export-scratch-geometry", handleExport);
+    return () => window.removeEventListener("oc-export-scratch-geometry", handleExport);
+  }, [importScratchGeometry]);
+
+  const loadGuidedScenePrimitives = useCallback(() => {
+    const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
+    if (!guided.length) {
+      setOutput("No guided scene primitives are available for this simulation yet.");
+      return;
+    }
+    updateSimulationElements(() => guided);
+    setSelectedSimElementId(guided[0].id);
+    setSelectedAttachmentId("");
+    setSimLeftTab("geometry");
+    setSimRightTab("properties");
+    setOutput(`Loaded ${guided.length} guided scene primitive${guided.length === 1 ? "" : "s"} for ${activeSimulation.title}.`);
+  }, [C, activeSimulation, updateSimulationElements, workspaceItems]);
+
+  const revertSimulationScene = useCallback(() => {
+    const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
+    if (!guided.length) {
+      setOutput("No default guided scene is available to reload for this workbench.");
+      return;
+    }
+    updateSimulationElements(() => guided);
+    setSelectedSimElementId(guided[0]?.id || "");
+    setSelectedAttachmentId("");
+    setPendingMateSource(null);
+    setSimLeftTab("geometry");
+    setSimRightTab("properties");
+    setOutput(`Reloaded the default ${activeSimulation.title} scene and cleared custom edits to this workbench geometry.`);
+  }, [C, activeSimulation, updateSimulationElements, workspaceItems]);
+
+  const openSelectedElementInScratchPad = useCallback((elementId) => {
+    if (typeof window === "undefined") return;
+    const element = authoredSimElements.find((entry) => entry.id === elementId);
+    if (!element) return;
+    const scratchShape = convertSimElementToScratchShape(element);
+    if (!scratchShape) {
+      setOutput("This scene object cannot be edited in ScratchPad yet. Try lines, rectangles, circles, polygons, or points.");
+      return;
+    }
+    try {
+      const raw = window.localStorage.getItem("oc-pad-shapes");
+      const existing = raw ? JSON.parse(raw) : [];
+      const nextShapes = Array.isArray(existing) ? [...existing, scratchShape] : [scratchShape];
+      window.localStorage.setItem("oc-pad-shapes", JSON.stringify(nextShapes));
+      window.localStorage.setItem("oc-pad-selected-shape-id", String(scratchShape.id));
+      window.dispatchEvent(new CustomEvent("oc-open-scratchpad", { detail: { mode: "geo", tool: "select" } }));
+      setOutput(`Opened ${element.name} in ScratchPad. Edit it there, then Send to OpenMAT to replace or import it back.`);
+    } catch {
+      setOutput("Could not open this scene object in ScratchPad.");
+    }
+  }, [authoredSimElements]);
+
+  const dragSimulationAttachment = useCallback((attachmentId, x, y) => {
+    const ownerId = authoredSimElements.find((element) => attachmentId.startsWith(`${element.id}-`))?.id;
+    if (!ownerId) return;
+    updateSimulationElements((items) =>
+      items.map((element) => element.id === ownerId ? updateElementFromAttachmentDrag(element, attachmentId, x, y) : element),
+    );
+  }, [authoredSimElements, updateSimulationElements]);
+  const simulationMetricCards = useMemo(() => {
+    const workspaceCards = workspaceItems
       .filter((item) => typeof item.value === "number" || (Array.isArray(item.value) && item.value.length <= 4))
-      .slice(0, 4)
-  ), [workspaceItems]);
+      .slice(0, 4);
+    if (workspaceCards.length) return workspaceCards;
+    return [
+      {
+        name: "Bodies",
+        preview: String(derivedMechanicalModel.summary.bodyCount),
+        className: "model",
+        size: [1, 1],
+        bytes: 0,
+      },
+      {
+        name: "Springs",
+        preview: String(derivedMechanicalModel.summary.springCount),
+        className: "model",
+        size: [1, 1],
+        bytes: 0,
+      },
+      {
+        name: "Total Mass",
+        preview: String(derivedMechanicalModel.summary.totalMass),
+        className: "model",
+        size: [1, 1],
+        bytes: 0,
+      },
+      {
+        name: "Total Force",
+        preview: String(derivedMechanicalModel.summary.totalForceMagnitude),
+        className: "model",
+        size: [1, 1],
+        bytes: 0,
+      },
+    ];
+  }, [derivedMechanicalModel, workspaceItems]);
 
   const captureRecoverySnapshot = useCallback((reason) => {
     setRecoverySnapshot(
@@ -2581,9 +4735,13 @@ export default function OpenMatStudio() {
     "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
     "Interactivity: slider('name', min, max, step, default)",
     "Animation: animate('t', min, max, step, default, speed, loop)",
-    "Functions: function [out]=name(in)...end and f = @(x) expr",
-    "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
-    "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
+  "Simulation authoring: rods, springs, masses, supports, forces, moments, dimensions",
+  "Linked geometry: scratchpad geometry can sync back into simulation scenes by shape id",
+  "Workbenches: pendulum, spring-mass, projectile, Merchant circle, beam/cantilever",
+  "Functions: function [out]=name(in)...end and f = @(x) expr",
+  "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
+  "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
+  "Workbench API: listWorkbenches(), getWorkbench(id), openWorkbench(id), exportSession()",
   ];
   const hasWorkspaceContext = workspaceItems.length > 0;
   const sessionSummary = [
@@ -2608,6 +4766,16 @@ export default function OpenMatStudio() {
 5. In the **Figure** pane, move the sliders like \`length\`, \`gravity\`, or \`theta0\`.
 6. Watch the plot update, then open **Workspace** or **Console** to inspect the same session.
 7. Click **Script Mode** again if you want to edit the code directly.
+
+### Importing or replacing geometry
+
+1. In **Simulation Mode**, select a scene object first if you want to replace it.
+2. Open the **Geometry** rail and click **Open ScratchPad** or **Import Scratch Geometry**.
+3. ScratchPad opens directly in **Geo** mode with **Select** active when needed.
+4. In ScratchPad, click one shape and use **Send to OpenMAT**.
+5. If a simulation object was selected, the imported shape replaces it.
+6. If nothing was selected, the imported shape is centered into the simulation viewport.
+7. Use **Sync Linked Scratch Geometry** later if you keep editing that shape in ScratchPad.
 
 ### Mental model
 
@@ -2677,7 +4845,16 @@ export default function OpenMatStudio() {
       setFigureJson(result.figureJson);
       setBaseFigureJson(result.figureJson);
       setSurfaceConfig(result.plot3DRequest || null);
-      setControlSpecs(result.controls || []);
+      setControlSpecs((current) => {
+        const incoming = result.controls || [];
+        if (
+          current.length === incoming.length &&
+          current.every((c, i) => c.name === incoming[i].name && c.type === incoming[i].type)
+        ) {
+          return current;
+        }
+        return incoming;
+      });
       setControlValues((current) => {
         const merged = { ...current };
         (result.controls || []).forEach((control) => {
@@ -2688,13 +4865,17 @@ export default function OpenMatStudio() {
         return merged;
       });
       setControlPlayback((current) => {
+        const incoming = result.controls || [];
+        const animateControls = incoming.filter((c) => c.type === "animate");
+        const allMatch =
+          Object.keys(current).length === animateControls.length &&
+          animateControls.every((c) => c.name in current);
+        if (allMatch) return current;
         const next = {};
-        (result.controls || []).forEach((control) => {
-          if (control.type === "animate") {
-            next[control.name] = {
-              playing: current[control.name]?.playing ?? false,
-            };
-          }
+        animateControls.forEach((control) => {
+          next[control.name] = {
+            playing: current[control.name]?.playing ?? false,
+          };
         });
         return next;
       });
@@ -2711,9 +4892,10 @@ export default function OpenMatStudio() {
         result.workspace?.[0] ||
         null,
       );
-      setWorkspaceTab(
-        result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console",
-      );
+      setWorkspaceTab((current) => {
+        const desired = result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console";
+        return current === desired ? current : desired;
+      });
       setLastConsoleCommand(commandLabel);
       window.dispatchEvent(new CustomEvent("openmat:run", { detail: result }));
     }, [setControlPlayback, setControlValues, setWorkspaceTab]);
@@ -2752,6 +4934,11 @@ export default function OpenMatStudio() {
     pendingAutoRunDocumentIdRef.current = null;
     runCode();
   }, [activeDocumentId, runCode]);
+
+  const refreshSimulationModel = useCallback(() => {
+    runCode();
+    setOutput(`Refreshed ${activeSimulation.title} from the current script, sliders, and scene state.`);
+  }, [activeSimulation.title, runCode]);
 
   const runConsoleCommand = useCallback(() => {
     const command = commandInput.trim();
@@ -2824,6 +5011,10 @@ export default function OpenMatStudio() {
     if (!simulation || !example) return;
     setWorkspaceMode("sim");
     setActiveSimulationId(simulationId);
+    setWorkbenchLessonProgress((current) => ({
+      ...(current && typeof current === "object" ? current : {}),
+      [simulationId]: 0,
+    }));
     const existing = documents.find((doc) => doc.name === `${example.label}.m`);
     if (existing) {
       setActiveDocumentId(existing.id);
@@ -2839,6 +5030,7 @@ export default function OpenMatStudio() {
     clearRunState,
     documents,
     exampleMap,
+    setWorkbenchLessonProgress,
     setActiveDocumentId,
     setActiveSimulationId,
     setDocuments,
@@ -2852,6 +5044,13 @@ export default function OpenMatStudio() {
       activeDocumentId,
       browserTab,
       workspaceTab,
+      workspaceMode,
+      activeSimulationId,
+      simGeometryStore,
+      simConstraintStore,
+      simLeftTab,
+      simRightTab,
+      workbenchLessonProgress,
       controlValues,
       exportedAt: new Date().toISOString(),
       app: "OpenMAT",
@@ -2865,7 +5064,7 @@ export default function OpenMatStudio() {
     link.download = "openmat-session.json";
     link.click();
     URL.revokeObjectURL(url);
-  }, [activeDocumentId, browserTab, controlValues, documents, workspaceTab]);
+  }, [activeDocumentId, activeSimulationId, browserTab, controlValues, documents, simConstraintStore, simGeometryStore, simLeftTab, simRightTab, workbenchLessonProgress, workspaceMode, workspaceTab]);
 
   const importWorkspace = useCallback((event) => {
     const file = event.target.files?.[0];
@@ -2891,6 +5090,15 @@ export default function OpenMatStudio() {
         setActiveDocumentId(importedActiveId);
         if (typeof parsed.browserTab === "string") setBrowserTab(parsed.browserTab);
         if (typeof parsed.workspaceTab === "string") setWorkspaceTab(parsed.workspaceTab);
+        if (typeof parsed.workspaceMode === "string") setWorkspaceMode(parsed.workspaceMode);
+        if (typeof parsed.activeSimulationId === "string") setActiveSimulationId(parsed.activeSimulationId);
+        if (parsed.simGeometryStore && typeof parsed.simGeometryStore === "object") setSimGeometryStore(parsed.simGeometryStore);
+        if (parsed.simConstraintStore && typeof parsed.simConstraintStore === "object") setSimConstraintStore(parsed.simConstraintStore);
+        if (typeof parsed.simLeftTab === "string") setSimLeftTab(parsed.simLeftTab);
+        if (typeof parsed.simRightTab === "string") setSimRightTab(parsed.simRightTab);
+        if (parsed.workbenchLessonProgress && typeof parsed.workbenchLessonProgress === "object") {
+          setWorkbenchLessonProgress(parsed.workbenchLessonProgress);
+        }
         clearRunState();
         setControlValues(
           parsed.controlValues && typeof parsed.controlValues === "object" ? parsed.controlValues : {},
@@ -2902,7 +5110,7 @@ export default function OpenMatStudio() {
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setWorkspaceTab]);
+  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setActiveSimulationId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setSimConstraintStore, setSimGeometryStore, setSimLeftTab, setSimRightTab, setWorkbenchLessonProgress, setWorkspaceMode, setWorkspaceTab]);
 
   const createNewDocument = useCallback(() => {
     const document = createOpenMatDocument(getNextUntitledName(documents), "");
@@ -2988,8 +5196,20 @@ export default function OpenMatStudio() {
       setActiveDocument: (id) => {
         if (typeof id === "string") setActiveDocumentId(id);
       },
+      listWorkbenches: () => SIMULATION_WORKSPACES.map(({ id, title, summary, controls, lesson }) => ({
+        id,
+        title,
+        summary,
+        controls,
+        lessonTitle: lesson?.title || "",
+      })),
+      getWorkbench: (id) => simulationMap[id] || null,
+      openWorkbench: (id) => {
+        if (typeof id === "string" && simulationMap[id]) openSimulationWorkspace(id);
+      },
       restoreLastSnapshot: () => restoreRecoverySnapshot(),
       getState: () => ({ ...stateRef.current }),
+      exportSession: exportWorkspace,
       open3D: (config) => openGrapher({ mode: "3d", ...config }),
     };
     window.OpenMAT = api;
@@ -2997,7 +5217,7 @@ export default function OpenMatStudio() {
     return () => {
       if (window.OpenMAT === api) delete window.OpenMAT;
     };
-  }, [openGrapher, restoreRecoverySnapshot, setActiveDocumentId, setCode, setDocuments]);
+  }, [exportWorkspace, openGrapher, openSimulationWorkspace, restoreRecoverySnapshot, setActiveDocumentId, setCode, setDocuments, simulationMap]);
 
   useEffect(() => {
     if (!isResizingRightPane) return undefined;
@@ -3291,16 +5511,18 @@ export default function OpenMatStudio() {
               Separate 3D
             </button>
           )}
-          <button
-            type="button"
-            onClick={runCode}
-            disabled={running}
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)" }}
-          >
-            <Play className="h-3.5 w-3.5" />
-            {running ? "Running..." : "Run"}
-          </button>
+          <OpenMatTooltip content={workspaceMode === "sim" ? "Run the current workbench model. Static workbenches use Run plus sliders instead of a Play button." : "Run the current OpenMAT script and refresh the figure, workspace, and console."}>
+            <button
+              type="button"
+              onClick={runCode}
+              disabled={running}
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)" }}
+            >
+              <Play className="h-3.5 w-3.5" />
+              {running ? "Running..." : "Run"}
+            </button>
+          </OpenMatTooltip>
           <button
             type="button"
             onClick={() => navigate("/")}
@@ -3327,6 +5549,7 @@ export default function OpenMatStudio() {
             {[
               { id: "models", label: "Models", icon: Waves },
               { id: "project", label: "Project", icon: Rows3 },
+              { id: "geometry", label: "Geometry", icon: Pencil },
             ].map((tab) => {
               const Icon = tab.icon;
               const active = simLeftTab === tab.id;
@@ -3349,12 +5572,14 @@ export default function OpenMatStudio() {
             <div className="flex w-[280px] shrink-0 flex-col border-r" style={{ borderColor: C.border, background: C.surface3 }}>
               <div className="border-b px-4 py-3" style={{ borderColor: C.border }}>
                 <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
-                  {simLeftTab === "models" ? "Simulation Browser" : "Project Tree"}
+                  {simLeftTab === "models" ? "Simulation Browser" : simLeftTab === "project" ? "Project Tree" : "Geometry Authoring"}
                 </div>
                 <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                   {simLeftTab === "models"
                     ? "Choose guided labs and swap between simulation families."
-                    : "Toggle the support panels you need instead of showing everything at once."}
+                    : simLeftTab === "project"
+                      ? "Toggle the support panels you need instead of showing everything at once."
+                      : "Place simple scene geometry, then convert it into rods, springs, masses, and anchors."}
                 </div>
               </div>
               <div className="min-h-0 flex-1 overflow-auto p-3">
@@ -3383,7 +5608,7 @@ export default function OpenMatStudio() {
                       );
                     })}
                   </div>
-                ) : (
+                ) : simLeftTab === "project" ? (
                   <div className="space-y-3">
                     {simulationTreeItems.map((section) => (
                       <div key={section.id} className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
@@ -3400,6 +5625,129 @@ export default function OpenMatStudio() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: C.hint }}>
+                        Add primitive
+                      </div>
+                      <div className="grid gap-2">
+                        {[
+                          { type: "line", label: "Add Rod Line", tip: "Create a straight member you can later treat as a beam, rod, or spring-like connector." },
+                          { type: "rect", label: "Add Rect / Wall Block", tip: "Create a block or wall shape. This is useful for masses, housings, and fixed supports." },
+                          { type: "circle", label: "Add Body Circle", tip: "Create a circular body or bob. Good for simple masses, rollers, or pulley-like placeholders." },
+                          { type: "point", label: "Add Joint Point", tip: "Create a free point marker you can use as a joint, pivot, or reference point." },
+                          { type: "force", label: "Add Force Arrow", tip: "Create an applied load arrow with a direction and magnitude." },
+                          { type: "support", label: "Add Support", tip: "Create a support symbol to mark where the model is constrained or reacts." },
+                          { type: "moment", label: "Add Moment", tip: "Create a rotational load marker for torques or moments." },
+                          { type: "dimension", label: "Add Dimension", tip: "Create a measurement marker to show span, width, height, or spacing." },
+                        ].map((item) => (
+                          <OpenMatTooltip key={item.type} content={item.tip} fullWidth>
+                            <button
+                              type="button"
+                              onClick={() => addSimulationElement(item.type)}
+                              className="w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                              style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                            >
+                              {item.label}
+                            </button>
+                          </OpenMatTooltip>
+                        ))}
+                      </div>
+                      <OpenMatTooltip content="Open ScratchPad directly in geometry-select mode so you can choose or edit one shape and send it back into this workbench." fullWidth>
+                        <button
+                          type="button"
+                          onClick={openScratchGeometryTool}
+                          className="mt-3 w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Open ScratchPad
+                        </button>
+                      </OpenMatTooltip>
+                      <div className="mt-2 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Opens ScratchPad directly in Geo Select mode so you can choose one shape and send it back here.
+                      </div>
+                      <OpenMatTooltip content="Bring the currently selected ScratchPad shape into the simulation. If a scene part is selected first, that part will be replaced." fullWidth>
+                        <button
+                          type="button"
+                          onClick={importScratchGeometry}
+                          className="mt-3 w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Import Scratch Geometry
+                        </button>
+                      </OpenMatTooltip>
+                      <div className="mt-2 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Imports the currently selected ScratchPad shape. If a scene part is selected first, the imported shape replaces that part.
+                      </div>
+                      <div className="mt-2 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Tip: use the Properties rail to rename parts, mark them as Fixed, Member, Spring, or Mass, and start a Mate from any attachment point.
+                      </div>
+                      <OpenMatTooltip content="Refresh any scene parts that are still linked to their original ScratchPad geometry." fullWidth>
+                        <button
+                          type="button"
+                          onClick={syncScratchGeometry}
+                          className="mt-3 w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Sync Linked Scratch Geometry
+                        </button>
+                      </OpenMatTooltip>
+                      <div className="mt-2 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Keeps imported scratch shapes live-linked so later edits update here too.
+                      </div>
+                      <OpenMatTooltip content="Convert the built-in workbench scene into editable parts so you can select, replace, delete, or mate them." fullWidth>
+                        <button
+                          type="button"
+                          onClick={loadGuidedScenePrimitives}
+                          className="mt-3 w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Load Guided Scene Primitives
+                        </button>
+                      </OpenMatTooltip>
+                      <div className="mt-2 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Converts the current guided lab into editable primitives so you can delete, replace, or annotate parts directly.
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: C.hint }}>
+                        Scene objects
+                      </div>
+                      {liveSimElements.length ? (
+                        <div className="grid gap-2">
+                          {liveSimElements.map((element) => {
+                            const active = element.id === selectedSimElementId;
+                            const roleMeta = getSimulationRoleMeta(element.role);
+                            return (
+                              <OpenMatTooltip key={element.id} content={`Double-click to open this part in ScratchPad for geometry editing.`} fullWidth>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSimElementId(element.id);
+                                    setSelectedAttachmentId("");
+                                    setSimRightTab("properties");
+                                  }}
+                                  onDoubleClick={() => openSelectedElementInScratchPad(element.id)}
+                                  className="w-full rounded-xl border px-3 py-2 text-left"
+                                  style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface2 : C.surface, color: C.text }}
+                                >
+                                  <div className="text-sm font-semibold">{element.name}</div>
+                                  <div className="mt-1 text-[11px]" style={{ color: C.muted }}>
+                                    {roleMeta.label} • {element.type}
+                                  </div>
+                                </button>
+                              </OpenMatTooltip>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border px-3 py-4 text-sm" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                          No custom geometry yet. Add a primitive to start building your own scene.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -3523,17 +5871,19 @@ export default function OpenMatStudio() {
                     )}
                     <button
                       type="button"
-                      onClick={() => openSimulationWorkspace(activeSimulation.id)}
+                      onClick={revertSimulationScene}
                       className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
                       style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                      title="Restore the default editable scene for this workbench"
                     >
                       Reload Lab
                     </button>
                     <button
                       type="button"
-                      onClick={runCode}
+                      onClick={refreshSimulationModel}
                       className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
                       style={{ borderColor: C.blue, background: "rgba(23, 105, 209, 0.12)", color: C.blue }}
+                      title="Rerun the current script and slider state without wiping your scene edits"
                     >
                       Refresh Model
                     </button>
@@ -3550,6 +5900,28 @@ export default function OpenMatStudio() {
                   setPlotKind={setPlotKind}
                   C={C}
                   openGrapher={openGrapher}
+                  authoredElements={liveSimElements}
+                  selectedElementId={selectedSimElementId}
+                  selectedAttachmentId={selectedAttachmentId}
+                  mateSource={pendingMateSource}
+                  onSelectElement={(id) => {
+                    setSelectedSimElementId(id);
+                    setSelectedAttachmentId("");
+                    setPendingMateSource(null);
+                    setSimRightTab("properties");
+                  }}
+                  onDoubleSelectElement={openSelectedElementInScratchPad}
+                  onSelectAttachment={(id) => {
+                    setSelectedAttachmentId(id);
+                    setSimRightTab("properties");
+                  }}
+                  onCompleteMate={completeMateToAttachment}
+                  onDragAttachment={dragSimulationAttachment}
+                  onClearSelection={() => {
+                    setSelectedSimElementId("");
+                    setSelectedAttachmentId("");
+                    setPendingMateSource(null);
+                  }}
                 />
               </div>
             </div>
@@ -3559,7 +5931,7 @@ export default function OpenMatStudio() {
             <div className="flex w-[340px] shrink-0 flex-col border-l" style={{ borderColor: C.border, background: C.surface2 }}>
               <div className="border-b px-4 py-3" style={{ borderColor: C.border }}>
                 <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
-                  {simRightTab === "params" ? "Parameters" : simRightTab === "results" ? "Results" : simRightTab === "console" ? "Console" : simRightTab === "workspace" ? "Workspace" : "Reference"}
+                  {simRightTab === "params" ? "Parameters" : simRightTab === "results" ? "Results" : simRightTab === "assembly" ? "Assembly" : simRightTab === "console" ? "Console" : simRightTab === "workspace" ? "Workspace" : simRightTab === "properties" ? "Properties" : "Reference"}
                 </div>
                 <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                   Toggle only the panel you need while keeping the editor and viewport side by side.
@@ -3569,11 +5941,28 @@ export default function OpenMatStudio() {
                 {simRightTab === "params" && (
                   <div className="space-y-3">
                     <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Use this workbench
+                      </div>
+                      <div className="grid gap-2">
+                        {getSimulationQuickStart(activeSimulation, controlSpecs.some((control) => control.type === "animate")).slice(0, 2).map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                       <div className="text-sm font-semibold">{activeSimulation.title}</div>
                       <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                         {activeSimulation.summary}
                       </div>
                     </div>
+                    {!controlSpecs.some((control) => control.type === "animate") && (
+                      <div className="rounded-2xl border p-4 text-xs leading-5" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                        This workbench is a static analysis setup, so there is no Play button here. Use <span style={{ color: C.text, fontWeight: 700 }}>Run</span> once, then adjust the sliders to refresh the model.
+                      </div>
+                    )}
                     {controlSpecs.length ? controlSpecs.map((control) => {
                       const currentValue = Object.prototype.hasOwnProperty.call(controlValues, control.name)
                         ? Number(controlValues[control.name])
@@ -3657,6 +6046,65 @@ export default function OpenMatStudio() {
                   </div>
                 )}
 
+                {simRightTab === "assembly" && (
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Constraint Summary
+                      </div>
+                      <div className="grid gap-2">
+                        {[
+                          `${activeConstraints.length} saved constraint${activeConstraints.length === 1 ? "" : "s"}`,
+                          `${derivedMechanicalModel.summary.supportCount} supports / anchors`,
+                          `${derivedMechanicalModel.summary.springCount} springs`,
+                        ].map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Constraints
+                      </div>
+                      <div className="mb-3 text-[11px] leading-5" style={{ color: C.muted }}>
+                        Mates created from attachment points are stored here as assembly relationships for this workbench.
+                      </div>
+                      {activeConstraints.length ? (
+                        <div className="grid gap-2">
+                          {activeConstraints.map((constraint) => (
+                            <div key={constraint.id} className="rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <div className="text-sm font-semibold" style={{ color: C.text }}>
+                                    {describeConstraint(constraint, liveSimElements)}
+                                  </div>
+                                  <div className="mt-1 text-[11px] leading-5" style={{ color: C.muted }}>
+                                    {`${constraint.sourceAttachmentId} -> ${constraint.targetAttachmentId}`}
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteConstraint(constraint.id)}
+                                  className="rounded-lg border px-2.5 py-1 text-xs font-semibold"
+                                  style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="rounded-xl border px-3 py-3 text-sm leading-6" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                          Select a part, choose an attachment point, then use <span style={{ color: C.text, fontWeight: 700 }}>Start Mate</span> to create a saved assembly constraint.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {simRightTab === "console" && (
                   <div className="flex h-full min-h-[420px] flex-col gap-3">
                     <div className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
@@ -3729,8 +6177,360 @@ export default function OpenMatStudio() {
                   </div>
                 )}
 
+                {simRightTab === "properties" && (
+                  <div className="grid gap-3">
+                    {selectedSimElement ? (
+                      <>
+                        <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="text-sm font-semibold">{selectedSimElement.name}</div>
+                              <div className="mt-1 text-[11px]" style={{ color: C.muted }}>
+                                {getSimulationRoleMeta(selectedSimElement.role).label} • {selectedSimElement.type}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={deleteSelectedSimulationElement}
+                              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                              style={{ borderColor: C.border, background: C.surface2, color: C.red }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+
+                          <div className="mb-3 grid gap-2">
+                            {["rod", "spring", "mass", "anchor"].map((role) => {
+                              const meta = getSimulationRoleMeta(role);
+                              return (
+                              <OpenMatTooltip key={role} content={`${meta.label}: ${meta.description}`} fullWidth>
+                                <button
+                                  type="button"
+                                  onClick={() => convertSelectedSimulationElement(role)}
+                                  className="w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold capitalize"
+                                  style={{
+                                    borderColor: selectedSimElement.role === role ? C.blue : C.border,
+                                    background: selectedSimElement.role === role ? C.surface2 : C.surface,
+                                    color: selectedSimElement.role === role ? C.blue : C.text,
+                                  }}
+                                >
+                                  <div>{meta.label}</div>
+                                  <div className="mt-1 text-[11px] font-normal normal-case" style={{ color: selectedSimElement.role === role ? C.blue : C.muted }}>
+                                    {meta.description}
+                                  </div>
+                                </button>
+                              </OpenMatTooltip>
+                            )})}
+                          </div>
+
+                          {selectedSimElement.source?.kind === "scratch" && (
+                            <div className="mb-3 rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              Linked to ScratchPad geometry #{selectedSimElement.source.shapeId}. Shape edits there can sync back into this scene.
+                            </div>
+                          )}
+
+                          <OpenMatTooltip content="Open ScratchPad, edit or select one shape, then send it back to replace the currently selected scene part." fullWidth>
+                            <button
+                              type="button"
+                              onClick={openScratchGeometryTool}
+                              className="mb-3 w-full rounded-xl border px-3 py-2 text-left text-sm font-semibold"
+                              style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                            >
+                              Replace This Part From ScratchPad
+                            </button>
+                          </OpenMatTooltip>
+                          <div className="mb-3 text-[11px] leading-5" style={{ color: C.muted }}>
+                            Select a scene part first, open ScratchPad, choose one shape, then send it back to replace this part.
+                          </div>
+
+                          <div className="grid gap-2">
+                            <div className="grid gap-1">
+                              <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>Name</label>
+                              <input
+                                value={selectedSimElement.name || ""}
+                                onChange={(event) => updateSelectedSimulationElement("name", event.target.value)}
+                                className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                              />
+                            </div>
+
+                            {selectedSimElement.type === "line" && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["x1", "y1", "x2", "y2"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {selectedSimElement.type === "rect" && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["x", "y", "width", "height"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {selectedSimElement.type === "circle" && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["cx", "cy", "r"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {selectedSimElement.type === "point" && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["x", "y"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {selectedSimElement.type === "polygon" && (
+                              <div className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                                Polygon vertices are edited directly in the viewport by dragging attachment points.
+                              </div>
+                            )}
+
+                            {(selectedSimElement.type === "force" || selectedSimElement.type === "dimension") && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["x1", "y1", "x2", "y2"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                                {(selectedSimElement.type === "force" ? ["magnitude", "label"] : ["offset", "label"]).map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type={field === "label" ? "text" : "number"}
+                                      value={selectedSimElement[field] ?? ""}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {(selectedSimElement.type === "support" || selectedSimElement.type === "moment") && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {(selectedSimElement.type === "support" ? ["x", "y", "size"] : ["x", "y", "radius", "magnitude"]).map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field]}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {["line", "rect", "circle", "polygon"].includes(selectedSimElement.type) && (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                {["density", "stiffness", "damping"].map((field) => (
+                                  <div key={field} className="grid gap-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
+                                    <input
+                                      type="number"
+                                      value={selectedSimElement[field] ?? (field === "density" ? 1 : 0)}
+                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
+                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                          <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                            Attachment points
+                          </div>
+                          <div className="mb-3 text-[11px] leading-5" style={{ color: C.muted }}>
+                            Pick a point on this part, then either create a free joint marker or start a Mate to snap that point onto another part.
+                          </div>
+                          <div className="grid gap-2">
+                            {getSimElementAttachmentPoints(selectedSimElement).map((point) => {
+                              const active = selectedAttachmentId === point.id;
+                              return (
+                                <button
+                                  key={point.id}
+                                  type="button"
+                                  onClick={() => setSelectedAttachmentId(point.id)}
+                                  className="rounded-xl border px-3 py-2 text-left"
+                                  style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface2 : C.surface, color: C.text }}
+                                >
+                                  <div className="text-sm font-semibold">{point.label}</div>
+                                  <div className="mt-1 text-[11px]" style={{ color: C.muted }}>
+                                    ({point.x.toFixed(1)}, {point.y.toFixed(1)})
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {pendingMateSource ? (
+                            <div className="mt-3 rounded-xl border px-3 py-3 text-sm" style={{ borderColor: C.teal, background: C.surface2, color: C.text }}>
+                              <div className="font-semibold">Mate mode active</div>
+                              <div className="mt-1 text-[11px] leading-5" style={{ color: C.muted }}>
+                                Click an attachment point on another part in the viewport to snap this point into place.
+                              </div>
+                              <button
+                                type="button"
+                                onClick={cancelPendingMate}
+                                className="mt-3 w-full rounded-xl border px-3 py-2 text-sm font-semibold"
+                                style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                              >
+                                Cancel Mate
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="mt-3 grid gap-2">
+                              <OpenMatTooltip content="Start an assembly-style mate. After clicking this, pick an attachment point on another part to snap the selected point there." fullWidth>
+                                <button
+                                  type="button"
+                                  onClick={beginMateFromSelectedAttachment}
+                                  disabled={!selectedAttachment}
+                                  className="w-full rounded-xl border px-3 py-2 text-sm font-semibold"
+                                  style={{ borderColor: C.border, background: C.surface2, color: selectedAttachment ? C.text : C.hint, opacity: selectedAttachment ? 1 : 0.55 }}
+                                >
+                                  Start Mate From Selected Point
+                                </button>
+                              </OpenMatTooltip>
+                              <OpenMatTooltip content="Drop a free joint marker at the selected point so you can use it as a visible pivot or reference point." fullWidth>
+                                <button
+                                  type="button"
+                                  onClick={createJointFromAttachment}
+                                  disabled={!selectedAttachment}
+                                  className="w-full rounded-xl border px-3 py-2 text-sm font-semibold"
+                                  style={{ borderColor: C.border, background: C.surface2, color: selectedAttachment ? C.text : C.hint, opacity: selectedAttachment ? 1 : 0.55 }}
+                                >
+                                  Create Joint Marker From Selected Point
+                                </button>
+                              </OpenMatTooltip>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                        <div className="font-semibold" style={{ color: C.text }}>No part selected yet</div>
+                        <div className="mt-2">
+                          Select a scene part in the viewport or object list to rename it, change what it means physically, replace it from ScratchPad, or mate one of its points to another part.
+                        </div>
+                        <div className="mt-3 grid gap-2">
+                          {getSimulationQuickStart(activeSimulation, controlSpecs.some((control) => control.type === "animate")).slice(1, 4).map((item) => (
+                            <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {simRightTab === "reference" && (
                   <div className="grid gap-3">
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Use this workbench
+                      </div>
+                      <div className="grid gap-2">
+                        {getSimulationQuickStart(activeSimulation, controlSpecs.some((control) => control.type === "animate")).map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {activeLesson && activeLessonStep && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Lesson
+                        </div>
+                        <div className="text-sm font-semibold">{activeLesson.title}</div>
+                        <div className="mt-1 text-xs" style={{ color: C.muted }}>
+                          Step {activeLessonStepIndex + 1} of {activeLesson.steps.length}
+                        </div>
+                        <div className="mt-3 rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                          <div className="text-sm font-semibold">{activeLessonStep.title}</div>
+                          <div className="mt-1 text-xs leading-6" style={{ color: C.muted }}>
+                            {activeLessonStep.body}
+                          </div>
+                        </div>
+                        <div className="mt-3 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setActiveLessonStep(activeLessonStepIndex - 1)}
+                            disabled={activeLessonStepIndex <= 0}
+                            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                            style={{ borderColor: C.border, background: C.surface2, color: activeLessonStepIndex <= 0 ? C.hint : C.text, opacity: activeLessonStepIndex <= 0 ? 0.55 : 1 }}
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveLessonStep(activeLessonStepIndex + 1)}
+                            disabled={activeLessonStepIndex >= activeLesson.steps.length - 1}
+                            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                            style={{ borderColor: activeLessonStepIndex >= activeLesson.steps.length - 1 ? C.border : C.blue, background: C.surface2, color: activeLessonStepIndex >= activeLesson.steps.length - 1 ? C.hint : C.blue, opacity: activeLessonStepIndex >= activeLesson.steps.length - 1 ? 0.55 : 1 }}
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                       <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
                         Interaction model
@@ -3764,6 +6564,8 @@ export default function OpenMatStudio() {
           <div className="flex w-14 shrink-0 flex-col border-l" style={{ borderColor: C.border, background: C.surface3 }}>
             {[
               { id: "params", label: "Params", icon: Cpu },
+              { id: "properties", label: "Properties", icon: Pencil },
+              { id: "assembly", label: "Assembly", icon: Rows3 },
               { id: "results", label: "Results", icon: LineChart },
               { id: "console", label: "Console", icon: Rows3 },
               { id: "workspace", label: "Workspace", icon: Sigma },
@@ -3893,6 +6695,37 @@ export default function OpenMatStudio() {
                           </div>
                         ))}
                       </div>
+                      {activeLesson && activeLessonStep && (
+                        <>
+                          <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                            Lesson step
+                          </div>
+                          <div className="mt-2 rounded-xl border px-3 py-3 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            <div className="font-semibold" style={{ color: C.text }}>{activeLessonStep.title}</div>
+                            <div className="mt-1">{activeLessonStep.body}</div>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setActiveLessonStep(activeLessonStepIndex - 1)}
+                              disabled={activeLessonStepIndex <= 0}
+                              className="rounded-lg border px-3 py-1 text-[11px] font-semibold"
+                              style={{ borderColor: C.border, background: C.surface, color: activeLessonStepIndex <= 0 ? C.hint : C.text, opacity: activeLessonStepIndex <= 0 ? 0.55 : 1 }}
+                            >
+                              Back
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveLessonStep(activeLessonStepIndex + 1)}
+                              disabled={activeLessonStepIndex >= activeLesson.steps.length - 1}
+                              className="rounded-lg border px-3 py-1 text-[11px] font-semibold"
+                              style={{ borderColor: activeLessonStepIndex >= activeLesson.steps.length - 1 ? C.border : C.blue, background: C.surface, color: activeLessonStepIndex >= activeLesson.steps.length - 1 ? C.hint : C.blue, opacity: activeLessonStepIndex >= activeLesson.steps.length - 1 ? 0.55 : 1 }}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

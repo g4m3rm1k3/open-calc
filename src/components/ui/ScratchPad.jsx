@@ -15,6 +15,7 @@ const PALETTE = [
 ]
 const LINES_KEY  = 'oc-pad-lines'
 const SHAPES_KEY = 'oc-pad-shapes'
+const SELECTED_SHAPE_KEY = 'oc-pad-selected-shape-id'
 const SIZE_KEY   = 'oc-pad-size'
 const GRID_KEY   = 'oc-pad-grid'
 const MIN_W = 300, MIN_H = 220, DEFAULT_W = 680, DEFAULT_H = 520
@@ -633,8 +634,22 @@ export default function ScratchPad({isOpen,onClose}) {
 
   useEffect(()=>{save(LINES_KEY,lines)},[lines])
   useEffect(()=>{save(SHAPES_KEY,shapes)},[shapes])
+  useEffect(()=>{try{
+    if(selectedId==null) localStorage.removeItem(SELECTED_SHAPE_KEY)
+    else localStorage.setItem(SELECTED_SHAPE_KEY,String(selectedId))
+  }catch{}},[selectedId])
   useEffect(()=>{if(!isMobile)save(SIZE_KEY,{w:panelW,h:panelH})},[panelW,panelH,isMobile])
   useEffect(()=>{save(GRID_KEY,{show:showGrid,step:gridStep,snap:snapToGrid,osnap:osnapOn,allDims:showAllDims})},[showGrid,gridStep,snapToGrid,osnapOn,showAllDims])
+
+  useEffect(()=>{
+    const handleOpenForGeo=(event)=>{
+      const detail=event?.detail||{}
+      if(detail.mode==='geo') setMode('geo')
+      if(detail.tool) setGeoTool(detail.tool)
+    }
+    window.addEventListener('oc-open-scratchpad',handleOpenForGeo)
+    return()=>window.removeEventListener('oc-open-scratchpad',handleOpenForGeo)
+  },[])
 
   // Sync form ↔ selected shape
   useEffect(()=>{
@@ -810,6 +825,15 @@ export default function ScratchPad({isOpen,onClose}) {
     else             setLines(prev=>prev.slice(0,-1))
   }
   const clear=()=>{ setLines([]); setShapes([]); setInProg(null); setSelectedId(null) }
+  const handleClose=useCallback(()=>{
+    setInProg(null)
+    setSelectedId(null)
+    onClose?.()
+  },[onClose])
+  const exportSelectionToOpenMat=useCallback(()=>{
+    if(!selectedId) return
+    window.dispatchEvent(new CustomEvent('oc-export-scratch-geometry'))
+  },[selectedId])
 
   const pickColor=c=>{ setColor(c); if(mode==='draw') setTool('brush') }
   const brushActive=mode==='draw'&&tool==='brush'
@@ -872,7 +896,7 @@ export default function ScratchPad({isOpen,onClose}) {
       {isMobile && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 119, background: 'rgba(0,0,0,0.4)' }}
-          onClick={onClose}
+          onClick={handleClose}
         />
       )}
     <div style={isMobile?mobileStyle:desktopStyle}>
@@ -902,8 +926,9 @@ export default function ScratchPad({isOpen,onClose}) {
           <Div c={bdr}/>
           <IBtn onClick={undo}  color={ic}      disabled={!canUndo}><Undo2 size={15}/></IBtn>
           <IBtn onClick={clear} color="#ef4444" disabled={!canClear}><Trash2 size={15}/></IBtn>
+          {mode==='geo'&&selectedId&&<><Div c={bdr}/><TBtn active={false} onClick={exportSelectionToOpenMat} dark={darkCanvas}>Send</TBtn></>}
           <Div c={bdr}/>
-          <IBtn onClick={onClose} color={ic}><X size={16}/></IBtn>
+          <IBtn onClick={handleClose} color={ic}><X size={16}/></IBtn>
         </div>
         {/* Row 2: tools */}
         <div style={{...rowStyle,borderBottom:`1px solid ${bdr}`}}>
@@ -950,8 +975,9 @@ export default function ScratchPad({isOpen,onClose}) {
         <Div c={bdr}/>
         <IBtn onClick={undo}  color={ic}      disabled={!canUndo}><Undo2 size={15}/></IBtn>
         <IBtn onClick={clear} color="#ef4444" disabled={!canClear}><Trash2 size={15}/></IBtn>
+        {mode==='geo'&&selectedId&&<><Div c={bdr}/><TBtn active={false} onClick={exportSelectionToOpenMat} dark={darkCanvas}>Send to OpenMAT</TBtn></>}
         <Div c={bdr}/>
-        <IBtn onClick={onClose} color={ic}><X size={15}/></IBtn>
+        <IBtn onClick={handleClose} color={ic}><X size={15}/></IBtn>
       </div>}
 
       {/* ══ SHAPE INPUT PANEL (geo mode only) ══ */}
@@ -1034,6 +1060,7 @@ export default function ScratchPad({isOpen,onClose}) {
           </span>
           <span style={{fontSize:11,color:ic,opacity:0.7}}>selected — drag to move · edit fields above · Delete to remove</span>
           <div style={{flex:1}}/>
+          <button onClick={exportSelectionToOpenMat} style={{padding:'4px 10px',borderRadius:8,border:'none',background:'#2563eb',color:'#fff',fontSize:11,fontWeight:600,cursor:'pointer'}}>Send to OpenMAT</button>
           <IBtn onClick={()=>{setShapes(prev=>prev.filter(s=>s.id!==selectedId));setSelectedId(null)}} color="#ef4444"><Trash2 size={13}/></IBtn>
         </div>
       )}

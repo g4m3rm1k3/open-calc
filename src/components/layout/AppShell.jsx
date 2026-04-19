@@ -796,6 +796,12 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("keydown", handler);
   }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen, pythonOpen]);
 
+  useEffect(() => {
+    const openScratch = () => setScratchOpen(true);
+    window.addEventListener("oc-open-scratchpad", openScratch);
+    return () => window.removeEventListener("oc-open-scratchpad", openScratch);
+  }, []);
+
   if (isOpenMatRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
@@ -851,6 +857,10 @@ export default function AppShell({ children }) {
               setGraphJSXOpen(false);
               setGraph3DOpen(true);
             }}
+          />
+          <ScratchPad
+            isOpen={scratchOpen}
+            onClose={() => setScratchOpen(false)}
           />
         </div>
       </GrapherContext.Provider>
