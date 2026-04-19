@@ -280,6 +280,102 @@ xlabel('position')
 ylabel('amplitude')
 `,
   },
+  {
+    id: "pendulum-lab",
+    label: "Pendulum Lab",
+    icon: Sigma,
+    description: "Animate a small-angle pendulum with tunable length, gravity, and release angle.",
+    code: `t = animate('t', 0, 18, 0.06, 0, 1.0, 1);
+L = slider('L', 0.6, 2.0, 0.1, 1.2);
+g = slider('g', 1, 20, 0.5, 9.8);
+theta0 = slider('theta0', 0.1, 1.1, 0.05, 0.75);
+
+omega = sqrt(g / L);
+theta = theta0 * cos(omega * t);
+x = L * sin(theta);
+y = -L * cos(theta);
+
+trailT = linspace(max(0, t - 5), t, 120);
+trailTheta = theta0 * cos(omega * trailT);
+trailX = L * sin(trailTheta);
+trailY = -L * cos(trailTheta);
+
+plot([0 x], [0 y])
+hold on
+plot(trailX, trailY)
+scatter(x, y)
+grid on
+axis equal
+xlim(-L - 0.4, L + 0.4)
+ylim(-L - 0.4, 0.4)
+title('Pendulum Lab')
+xlabel('horizontal position')
+ylabel('vertical position')
+`,
+  },
+  {
+    id: "spring-mass-lab",
+    label: "Spring-Mass",
+    icon: Cpu,
+    description: "Explore damping and stiffness with a one-dimensional spring-mass animation.",
+    code: `t = animate('t', 0, 24, 0.05, 0, 1.0, 1);
+A = slider('A', 0.3, 2.0, 0.05, 1.1);
+k = slider('k', 0.5, 8.0, 0.1, 3.2);
+m = slider('m', 0.5, 5.0, 0.1, 1.4);
+c = slider('c', 0.0, 2.5, 0.05, 0.35);
+
+alpha = c / (2 * m);
+omega = sqrt(max(k / m - alpha^2, 0.001));
+x = A * exp(-alpha * t) * cos(omega * t);
+
+tt = linspace(max(0, t - 10), t, 220);
+xx = A * exp(-alpha * tt) .* cos(omega * tt);
+
+plot(tt, xx)
+hold on
+scatter(t, x)
+grid on
+xlim(max(0, t - 10), max(10, t))
+ylim(-A * 1.3, A * 1.3)
+title('Spring-Mass Response')
+xlabel('time')
+ylabel('displacement')
+`,
+  },
+  {
+    id: "projectile-lab",
+    label: "Projectile Lab",
+    icon: LineChart,
+    description: "Animate a projectile arc and tune launch speed, angle, and gravity.",
+    code: `t = animate('t', 0, 14, 0.05, 0, 1.0, 1);
+v0 = slider('v0', 6, 40, 1, 22);
+angle = slider('angle', 0.2, 1.3, 0.02, 0.85);
+g = slider('g', 1, 20, 0.5, 9.8);
+
+vx = v0 * cos(angle);
+vy = v0 * sin(angle);
+flight = max(2 * vy / g, 0.1);
+tc = min(t, flight);
+tt = linspace(0, tc, 180);
+x = vx * tt;
+y = vy * tt - 0.5 * g * tt.^2;
+
+px = vx * tc;
+py = vy * tc - 0.5 * g * tc.^2;
+range = vx * flight;
+peak = (vy^2) / (2 * g);
+
+plot(x, y)
+hold on
+scatter(px, py)
+grid on
+xlim(0, range * 1.1 + 1)
+ylim(0, peak * 1.35 + 1)
+title('Projectile Lab')
+xlabel('downrange')
+ylabel('height')
+`,
+  },
 ];
 
 const HELP_TEXT = [
