@@ -136,24 +136,102 @@ plot(x, y)
 y(1:5)
 `,
   },
+  {
+    id: "control-flow",
+    label: "Control Flow",
+    icon: Grid3X3,
+    description: "if/else, for loops, while loops, and break.",
+    code: `% Fibonacci with a for loop
+n = 12;
+fib = zeros(1, n);
+fib(1) = 1;
+fib(2) = 1;
+for i = 3:n
+  fib(i) = fib(i-1) + fib(i-2);
+end
+disp(fib)
+bar(fib)
+title('Fibonacci Numbers')
+
+% while with break
+x = 1;
+while x < 500
+  x = x * 2;
+  if x > 200
+    break
+  end
+end
+disp(x)
+`,
+  },
+  {
+    id: "functions",
+    label: "Functions",
+    icon: Sigma,
+    description: "Define and call your own functions.",
+    code: `function result = factorial(n)
+  if n <= 1
+    result = 1;
+  else
+    result = n * factorial(n - 1);
+  end
+end
+
+function [mn, mx, rng] = stats(v)
+  mn = mean(v);
+  mx = max(v);
+  rng = mx - min(v);
+end
+
+disp(factorial(7))
+
+data = [3 8 1 6 2 9 4 7 5];
+[m, x, r] = stats(data)
+disp(mean(data))
+disp(std(data))
+hist(data, 5)
+title('Data Distribution')
+`,
+  },
 ];
 
 const HELP_TEXT = [
   "Supported MATLAB-like syntax:",
-  "A = [1 2; 3 4]",
-  "x = 0:0.1:2*pi",
-  "A \\ b",
-  "A' transpose",
-  "x(1:5) indexing",
-  ".*  ./  .^ elementwise ops",
-  "[V, D] = eig(A)",
-  "[Q, R] = qr(A)",
-  "plot, scatter, bar, stem, area, hold on/off, clf",
-  "title, xlabel, ylabel, legend, grid on/off, xlim, ylim, axis tight/equal/auto",
-  "zeros, ones, eye, rand, linspace, logspace, meshgrid",
-  "polyfit, polyval, diff, cumsum, cumprod, dot, cross",
-  "det, inv, pinv, fft, ifft, norm, trace, diag",
-  "who, clear, clc, disp, help",
+  "",
+  "── Matrices ──",
+  "A = [1 2; 3 4]   A'   A \\ b   inv(A)   det(A)   trace(A)",
+  "[V,D] = eig(A)   [Q,R] = qr(A)   [U,S,V] = svd(A)",
+  "",
+  "── Arrays ──",
+  "x = 0:0.1:2*pi   linspace(a,b,n)   logspace(a,b,n)",
+  "zeros(m,n)   ones(m,n)   eye(n)   rand(m,n)   randn(m,n)",
+  "reshape(A,m,n)   repmat(A,m,n)   size   length   numel",
+  "",
+  "── Statistics ──",
+  "mean  median  std  var  min  max  sum  prod",
+  "sort  unique  find  any  all  hist(x,bins)",
+  "interp1(x,y,xi)",
+  "",
+  "── Control Flow ──",
+  "if cond ... elseif cond ... else ... end",
+  "for i = 1:n ... end",
+  "while cond ... end",
+  "break   continue",
+  "",
+  "── Functions ──",
+  "function [out1,out2] = myFunc(a, b)",
+  "  out1 = a + b;",
+  "  out2 = a * b;",
+  "end",
+  "",
+  "── Plotting ──",
+  "plot, scatter, bar, stem, area, hist, hold on/off, clf",
+  "title, xlabel, ylabel, legend, grid on/off, xlim, ylim",
+  "axis tight/equal/auto/[xmin xmax ymin ymax]",
+  "",
+  "── Output ──",
+  "disp(x)   sprintf('%g', x)   fprintf('val = %f\\n', x)",
+  "num2str(x)   who   clear   clc",
 ].join("\n");
 
 const SERIES_COLORS = ["teal", "blue", "amber", "purple", "red", "green"];
@@ -302,6 +380,211 @@ function polyval(coefficients, xValues) {
   return normalizeVector(xValues).map((value) =>
     coeffs.reduce((acc, coefficient) => acc * value + coefficient, 0),
   );
+}
+
+// ─── Statistics helpers ───────────────────────────────────────────────────────
+function statMean(value) {
+  const v = normalizeVector(value);
+  return v.reduce((a, b) => a + b, 0) / v.length;
+}
+function statMedian(value) {
+  const v = [...normalizeVector(value)].sort((a, b) => a - b);
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 === 0 ? (v[m - 1] + v[m]) / 2 : v[m];
+}
+function statStd(value, flag = 0) {
+  const v = normalizeVector(value);
+  const mu = statMean(v);
+  const denom = flag === 1 ? v.length : v.length - 1;
+  return Math.sqrt(v.reduce((s, x) => s + (x - mu) ** 2, 0) / denom);
+}
+function statVar(value, flag = 0) { return statStd(value, flag) ** 2; }
+function statMin(value) {
+  const v = normalizeVector(value);
+  return Array.isArray(toPlain(value)) ? Math.min(...v) : v[0];
+}
+function statMax(value) {
+  const v = normalizeVector(value);
+  return Array.isArray(toPlain(value)) ? Math.max(...v) : v[0];
+}
+function statSum(value) { return normalizeVector(value).reduce((a, b) => a + b, 0); }
+function statProd(value) { return normalizeVector(value).reduce((a, b) => a * b, 1); }
+function statSort(value, dir = 'ascend') {
+  const v = [...normalizeVector(value)];
+  v.sort((a, b) => a - b);
+  return dir === 'descend' ? v.reverse() : v;
+}
+function statUnique(value) { return [...new Set(normalizeVector(value))].sort((a, b) => a - b); }
+function statMod(a, b) { return ((Number(a) % Number(b)) + Number(b)) % Number(b); }
+function statRem(a, b) { return Number(a) % Number(b); }
+function statFix(value) {
+  const fn = (x) => x >= 0 ? Math.floor(x) : Math.ceil(x);
+  return isCollection(value) ? mapDeep(value, fn) : fn(Number(value));
+}
+
+function statAny(value) { return normalizeVector(value).some(Boolean) ? 1 : 0; }
+function statAll(value) { return normalizeVector(value).every(Boolean) ? 1 : 0; }
+function statFind(value) {
+  const v = normalizeVector(value);
+  return v.map((x, i) => (x ? i + 1 : null)).filter((x) => x !== null);
+}
+function reshapeArray(value, rows, cols) {
+  const flat = normalizeVector(value);
+  const r = Number(rows), c = Number(cols);
+  const out = [];
+  for (let i = 0; i < r; i++) {
+    out.push(flat.slice(i * c, i * c + c));
+  }
+  return out;
+}
+function repmatArray(value, m, n) {
+  const plain = toPlain(value);
+  const isVec = !isMatrix(plain);
+  const mat = isVec ? [normalizeVector(plain)] : plain;
+  const rowRep = Array.from({ length: m }, () => mat).flat();
+  return rowRep.map((row) => Array.from({ length: n }, () => row).flat());
+}
+function histArray(value, bins = 10) {
+  const v = normalizeVector(value);
+  const mn = Math.min(...v), mx = Math.max(...v);
+  const w = (mx - mn) / Number(bins);
+  const counts = Array(Number(bins)).fill(0);
+  v.forEach((x) => {
+    const i = Math.min(Math.floor((x - mn) / w), Number(bins) - 1);
+    counts[i]++;
+  });
+  const centers = Array.from({ length: Number(bins) }, (_, i) => mn + w * (i + 0.5));
+  return { __histData: { centers, counts } };
+}
+function interp1Array(x, y, xi) {
+  const xv = normalizeVector(x), yv = normalizeVector(y), xiv = normalizeVector(xi);
+  return xiv.map((xq) => {
+    if (xq <= xv[0]) return yv[0];
+    if (xq >= xv[xv.length - 1]) return yv[yv.length - 1];
+    let lo = 0;
+    for (let i = 0; i < xv.length - 1; i++) { if (xv[i] <= xq && xq <= xv[i + 1]) { lo = i; break; } }
+    const t = (xq - xv[lo]) / (xv[lo + 1] - xv[lo]);
+    return yv[lo] + t * (yv[lo + 1] - yv[lo]);
+  });
+}
+function svdDecomp(A) {
+  const result = math.svd(A);
+  const U = toPlain(result.U), S = toPlain(result.S), V = toPlain(result.V);
+  const diagS = Array.isArray(S[0]) ? S : makeDiagonal(S);
+  return { __multi: [U, diagS, V], U, S: diagS, V };
+}
+function sprintfFormat(fmt, ...args) {
+  let i = 0;
+  return String(fmt).replace(/%[\d.]*[diouxXeEfgGs]/g, (m) => {
+    const val = args[i++];
+    if (val == null) return m;
+    if (m.endsWith('d') || m.endsWith('i')) return Math.round(Number(val)).toString();
+    if (m.endsWith('f') || m.endsWith('e') || m.endsWith('g')) {
+      const prec = (m.match(/\.(\d+)/) || [, '6'])[1];
+      return Number(val).toFixed(Number(prec));
+    }
+    return String(val);
+  });
+}
+
+// ─── Block-aware script parser ────────────────────────────────────────────────
+// Parses MATLAB source into a tree of Statement nodes before execution.
+// Handles: if/elseif/else/end, for/end, while/end, function/end
+
+function parseBlocks(lines) {
+  const stack = [{ type: 'root', body: [] }];
+  const top = () => stack[stack.length - 1];
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const stripped = raw.replace(/%.*$/, '').trim();
+    if (!stripped) continue;
+
+    const lower = stripped.toLowerCase();
+
+    // function definition
+    const fnMatch = stripped.match(/^function\s+(?:\[([^\]]*)\]\s*=\s*|([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\(([^)]*)\)/i);
+    if (fnMatch) {
+      const outMulti = fnMatch[1] ? fnMatch[1].split(',').map(s => s.trim()).filter(Boolean) : null;
+      const outSingle = fnMatch[2] ? [fnMatch[2].trim()] : null;
+      const outs = outMulti || outSingle || [];
+      const name = fnMatch[3];
+      const ins = fnMatch[4].split(',').map(s => s.trim()).filter(Boolean);
+      const node = { type: 'function', name, ins, outs, body: [] };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // for loop
+    const forMatch = stripped.match(/^for\s+([A-Za-z_]\w*)\s*=\s*(.+)$/i);
+    if (forMatch) {
+      const node = { type: 'for', varName: forMatch[1], iterExpr: forMatch[2], body: [] };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // while loop
+    const whileMatch = stripped.match(/^while\s+(.+)$/i);
+    if (whileMatch) {
+      const node = { type: 'while', condExpr: whileMatch[1], body: [] };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // if
+    const ifMatch = stripped.match(/^if\s+(.+)$/i);
+    if (ifMatch) {
+      const node = { type: 'if', branches: [{ cond: ifMatch[1], body: [] }], elseBody: null };
+      top().body.push(node);
+      stack.push(node);
+      continue;
+    }
+
+    // elseif — attach to current if node
+    const elseifMatch = stripped.match(/^elseif\s+(.+)$/i);
+    if (elseifMatch) {
+      const ifNode = top();
+      if (ifNode.type === 'if') ifNode.branches.push({ cond: elseifMatch[1], body: [] });
+      continue;
+    }
+
+    // else
+    if (lower === 'else') {
+      const ifNode = top();
+      if (ifNode.type === 'if') ifNode.elseBody = [];
+      continue;
+    }
+
+    // end
+    if (lower === 'end') {
+      if (stack.length > 1) stack.pop();
+      continue;
+    }
+
+    // Resolve the correct body array for the current top node
+    // (if nodes have branches/elseBody instead of a direct body)
+    const getTargetBody = (node) => {
+      if (node.type === 'if') {
+        return node.elseBody !== null
+          ? node.elseBody
+          : node.branches[node.branches.length - 1].body;
+      }
+      return node.body;
+    };
+
+    // break / continue / return
+    if (lower === 'break') { getTargetBody(top()).push({ type: 'break' }); continue; }
+    if (lower === 'continue') { getTargetBody(top()).push({ type: 'continue' }); continue; }
+    if (lower === 'return') { getTargetBody(top()).push({ type: 'return' }); continue; }
+
+    // plain statement
+    getTargetBody(top()).push({ type: 'line', raw: stripped });
+  }
+
+  return stack[0].body;
 }
 
 function isCollection(value) {
@@ -872,6 +1155,60 @@ function createExecutionEngine() {
     const { Q, R } = math.qr(A);
     return { __multi: [toPlain(Q), toPlain(R)], Q: toPlain(Q), R: toPlain(R) };
   });
+  parser.set("svd", (A) => svdDecomp(A));
+
+  // ── Statistics ──
+  parser.set("mean", (v) => statMean(v));
+  parser.set("median", (v) => statMedian(v));
+  parser.set("std", (v, flag = 0) => statStd(v, Number(flag)));
+  parser.set("var", (v, flag = 0) => statVar(v, Number(flag)));
+  parser.set("min", (v) => statMin(v));
+  parser.set("max", (v) => statMax(v));
+  parser.set("sum", (v) => statSum(v));
+  parser.set("prod", (v) => statProd(v));
+  parser.set("sort", (v, dir = 'ascend') => statSort(v, String(dir)));
+  parser.set("unique", (v) => statUnique(v));
+  parser.set("any", (v) => statAny(v));
+  parser.set("all", (v) => statAll(v));
+  parser.set("find", (v) => statFind(v));
+  parser.set("mod", (a, b) => statMod(a, b));
+  parser.set("rem", (a, b) => statRem(a, b));
+  parser.set("fix", (v) => statFix(v));
+  parser.set("reshape", (v, r, c) => reshapeArray(v, r, c));
+  parser.set("repmat", (v, m, n) => repmatArray(v, m, n));
+  parser.set("hist", (v, bins = 10) => {
+    const h = histArray(v, bins);
+    registerPlot('bar', h.__histData.counts, h.__histData.centers.map(x => x.toFixed(2)));
+    return h.__histData.counts;
+  });
+  parser.set("interp1", (x, y, xi) => interp1Array(x, y, xi));
+  parser.set("sprintf", (fmt, ...args) => sprintfFormat(fmt, ...args));
+  parser.set("fprintf", (fmt, ...args) => { logs.push(sprintfFormat(fmt, ...args)); return null; });
+  parser.set("num2str", (v, fmt) => fmt ? sprintfFormat(`%${fmt}f`, v) : String(Number(v)));
+  parser.set("str2num", (s) => Number(s));
+  parser.set("isempty", (v) => (normalizeVector(v).length === 0 ? 1 : 0));
+  parser.set("zeros", (m, n = null) => {
+    const r = Number(m), c = n == null ? r : Number(n);
+    if (r === 1) return Array(c).fill(0); // row vector → flat
+    return Array.from({ length: r }, () => Array(c).fill(0));
+  });
+  parser.set("ones", (m, n = null) => {
+    const r = Number(m), c = n == null ? r : Number(n);
+    if (r === 1) return Array(c).fill(1); // row vector → flat
+    return Array.from({ length: r }, () => Array(c).fill(1));
+  });
+  // randnormal via Box-Muller
+  parser.set("randn", (...shape) => {
+    const bm = () => {
+      const u = 1 - Math.random(), v = Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    };
+    if (shape.length === 0) return bm();
+    return makeRandomArray(shape.map(Number)).map ? (() => {
+      function fill(arr) { return Array.isArray(arr) ? arr.map(fill) : bm(); }
+      return fill(makeRandomArray(shape.map(Number)));
+    })() : bm();
+  });
 
   return {
     parser,
@@ -892,49 +1229,68 @@ function createExecutionEngine() {
   };
 }
 
+// Signals for non-local flow inside block interpreter
+const BREAK = Symbol('break');
+const CONTINUE = Symbol('continue');
+const RETURN = Symbol('return');
+
 function executeScript(source) {
   const engine = createExecutionEngine();
   const { parser, logs, plotState, variables } = engine;
-  let lastVisibleResult = null;
 
-  const lines = source.split(/\r?\n/);
+  // User-defined functions registry: name -> { ins, outs, body }
+  const userFunctions = {};
 
-  for (const rawLine of lines) {
-    const trimmedRaw = rawLine.replace(/%.*$/, "").trim();
-    if (!trimmedRaw) continue;
+  function isTruthy(val) {
+    if (val == null) return false;
+    if (typeof val === 'number') return val !== 0;
+    if (typeof val === 'boolean') return val;
+    if (Array.isArray(val)) return val.flat(Infinity).some((x) => x !== 0 && x != null);
+    return Boolean(val);
+  }
+
+  function executeLine(rawLine) {
+    const trimmedRaw = rawLine.replace(/%.*$/, '').trim();
+    if (!trimmedRaw) return null;
 
     const hasSemicolon = /;\s*$/.test(trimmedRaw);
-    const withoutSemicolon = trimmedRaw.replace(/;\s*$/, "");
+    const withoutSemicolon = trimmedRaw.replace(/;\s*$/, '');
 
     if (/^clear(\s+.+)?$/i.test(withoutSemicolon)) {
-      const args = withoutSemicolon
-        .replace(/^clear/i, "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+      const args = withoutSemicolon.replace(/^clear/i, '').trim().split(/\s+/).filter(Boolean);
       engine.clearVariables(args);
-      continue;
+      return null;
     }
 
     const line = preprocessLine(withoutSemicolon, variables);
-    if (!line) continue;
+    if (!line) return null;
 
     const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
     if (multiAssign) {
-      const names = multiAssign[1]
-        .split(",")
-        .map((name) => name.trim())
-        .filter(Boolean);
+      const names = multiAssign[1].split(',').map((n) => n.trim()).filter(Boolean);
       const result = toPlain(parser.evaluate(multiAssign[2]));
       const values = result?.__multi || [];
-      names.forEach((name, index) => {
-        parser.set(name, values[index]);
+      names.forEach((name, idx) => {
+        parser.set(name, values[idx]);
         variables.add(name);
       });
-      if (!hasSemicolon) {
-        lastVisibleResult = values.length === 1 ? values[0] : values;
+      return hasSemicolon ? null : (values.length === 1 ? values[0] : values);
+    }
+
+    // Indexed assignment: name[i] = expr  (result of replaceIndexing on name(i) = expr)
+    const indexedAssign = line.match(/^([A-Za-z_]\w*)\[([^\]]+)\]\s*=\s*(.+)$/);
+    if (indexedAssign) {
+      const [, name, idxExpr, valExpr] = indexedAssign;
+      const arr = parser.get(name);
+      const idx = Number(toPlain(parser.evaluate(idxExpr)));
+      const val = toPlain(parser.evaluate(valExpr));
+      const updated = Array.isArray(arr) ? [...arr] : arr;
+      if (Array.isArray(updated)) {
+        updated[idx - 1] = val; // 1-based
       }
-      continue;
+      parser.set(name, updated);
+      variables.add(name);
+      return hasSemicolon ? null : updated;
     }
 
     const assign = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
@@ -942,30 +1298,120 @@ function executeScript(source) {
       const [, name, expr] = assign;
       const result = toPlain(parser.evaluate(expr));
       parser.set(name, result);
-      parser.set("ans", result);
+      parser.set('ans', result);
       variables.add(name);
-      if (!hasSemicolon) {
-        lastVisibleResult = result;
-      }
-      continue;
+      return hasSemicolon ? null : result;
     }
 
     const result = toPlain(parser.evaluate(line));
-    parser.set("ans", result);
-    if (!hasSemicolon && result != null && result !== "") {
+    parser.set('ans', result);
+    return (hasSemicolon || result == null || result === '') ? null : result;
+  }
+
+  function executeBlock(nodes) {
+    let last = null;
+    for (const node of nodes) {
+      const sig = executeNode(node);
+      if (sig === BREAK || sig === CONTINUE || sig === RETURN) return sig;
+      if (sig != null && sig !== BREAK && sig !== CONTINUE && sig !== RETURN) last = sig;
+    }
+    return last;
+  }
+
+  function executeNode(node) {
+    if (node.type === 'line') {
+      return executeLine(node.raw);
+    }
+
+    if (node.type === 'if') {
+      for (const branch of node.branches) {
+        const condExpr = preprocessLine(branch.cond.replace(/;\s*$/, ''), variables);
+        const condVal = toPlain(parser.evaluate(condExpr));
+        if (isTruthy(condVal)) {
+          return executeBlock(branch.body);
+        }
+      }
+      if (node.elseBody) return executeBlock(node.elseBody);
+      return null;
+    }
+
+    if (node.type === 'for') {
+      const iterExpr = preprocessLine(node.iterExpr.replace(/;\s*$/, ''), variables);
+      const iterVal = toPlain(parser.evaluate(iterExpr));
+      const items = Array.isArray(iterVal) ? normalizeVector(iterVal) : [realValue(iterVal)];
+      let last = null;
+      for (const item of items) {
+        parser.set(node.varName, item);
+        variables.add(node.varName);
+        const sig = executeBlock(node.body);
+        if (sig === BREAK) break;
+        if (sig === RETURN) return sig;
+        if (sig !== CONTINUE && sig != null) last = sig;
+      }
+      return last;
+    }
+
+    if (node.type === 'while') {
+      let last = null;
+      let guard = 0;
+      while (guard++ < 100000) {
+        const condExpr = preprocessLine(node.condExpr.replace(/;\s*$/, ''), variables);
+        const condVal = toPlain(parser.evaluate(condExpr));
+        if (!isTruthy(condVal)) break;
+        const sig = executeBlock(node.body);
+        if (sig === BREAK) break;
+        if (sig === RETURN) return sig;
+        if (sig !== CONTINUE && sig != null) last = sig;
+      }
+      return last;
+    }
+
+    if (node.type === 'function') {
+      // Register user function — called later when invoked
+      const { name, ins, outs, body } = node;
+      userFunctions[name] = { ins, outs, body };
+      parser.set(name, (...args) => {
+        // Create a scoped parser by saving/restoring variables
+        const saved = {};
+        ins.forEach((param, i) => { saved[param] = parser.get(param); parser.set(param, args[i] ?? null); });
+        outs.forEach((o) => { saved[o] = parser.get(o); });
+        executeBlock(body);
+        const result = outs.length === 1
+          ? parser.get(outs[0])
+          : outs.length > 1 ? { __multi: outs.map((o) => parser.get(o)) } : null;
+        // Restore outer scope
+        Object.entries(saved).forEach(([k, v]) => v == null ? null : parser.set(k, v));
+        return result;
+      });
+      return null;
+    }
+
+    if (node.type === 'break') return BREAK;
+    if (node.type === 'continue') return CONTINUE;
+    if (node.type === 'return') return RETURN;
+    return null;
+  }
+
+  const lines = source.split(/\r?\n/);
+  const tree = parseBlocks(lines);
+  let lastVisibleResult = null;
+
+  for (const node of tree) {
+    const result = executeNode(node);
+    if (result != null && result !== BREAK && result !== CONTINUE && result !== RETURN) {
       lastVisibleResult = result;
     }
   }
 
   const figureJson = buildFigureFromPlotState(plotState);
   const outputBlocks = [];
-  if (logs.length) outputBlocks.push(logs.filter(Boolean).join("\n"));
-  if (lastVisibleResult != null && lastVisibleResult !== "") {
+  if (logs.length) outputBlocks.push(logs.filter(Boolean).join('\n'));
+  if (lastVisibleResult != null && lastVisibleResult !== '') {
     outputBlocks.push(formatValue(lastVisibleResult));
   }
 
   return {
-    output: outputBlocks.filter(Boolean).join("\n\n") || (figureJson ? "Plot rendered." : "No output."),
+    output: outputBlocks.filter(Boolean).join('\n\n') || (figureJson ? 'Plot rendered.' : 'No output.'),
     figureJson,
     workspace: buildWorkspaceSnapshot(parser, variables),
   };
@@ -1009,12 +1455,15 @@ export default function OpenMatStudio() {
     { id: "notes", label: "Notes" },
   ];
   const referenceItems = [
-    "Matrices: [1 2; 3 4], A', A \\\\ b, inv(A), det(A)",
-    "Ranges: x = 0:0.1:2*pi, linspace, logspace, meshgrid",
-    "Plots: plot, scatter, bar, stem, area, hold on/off, clf",
+    "Matrices: [1 2; 3 4], A', A \\\\ b, inv, det, trace, eig, qr, svd",
+    "Arrays: linspace, logspace, zeros, ones, eye, rand, randn, reshape, repmat",
+    "Statistics: mean, median, std, var, min, max, sum, prod, sort, unique, find",
+    "Plots: plot, scatter, bar, hist, stem, area, hold on/off, clf",
     "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
-    "Signals: sin, cos, tan, exp, log, fft, ifft, abs, real, imag",
-    "Polynomials: polyfit, polyval, diff, cumsum, cumprod",
+    "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
+    "Functions: function [out]=name(in) ... end  (recursive supported)",
+    "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum, interp1",
+    "Output: disp, sprintf, fprintf, num2str, who, clear, clc",
   ];
 
   const runCode = useCallback(() => {
