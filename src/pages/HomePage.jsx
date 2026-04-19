@@ -28,10 +28,10 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <section className="text-center py-12 mb-12">
-        <div className="inline-block text-6xl mb-4">∂</div>
+        <div className="inline-block text-6xl mb-4">⚡</div>
         <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3">OpenCalc</h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6">
-          An open-source interactive calculus textbook. Learn with <strong>intuition first</strong>, backed by interactive visualizations, complete worked examples, and rigorous proofs — all in one place.
+          An open-source interactive learning platform for math, science, and programming. Build real understanding with <strong>intuition first</strong> — interactive visualizations, worked examples, in-browser code, and rigorous proofs across every subject.
         </p>
 
         {totalLessons > 0 && (
@@ -53,8 +53,8 @@ export default function HomePage() {
       <section className="mb-12 grid sm:grid-cols-3 gap-4">
         {[
           { icon: '🧠', title: 'Intuition First', desc: 'Every topic starts with a real-world question and a visual. Build the "why" before the "how."' },
-          { icon: '📐', title: 'Complete Math', desc: 'Every algebra step is shown. No "obviously" or "it can be shown" — just clear, traceable reasoning.' },
-          { icon: '∴ Rigor', icon2: '∴', title: 'Formal Proofs', desc: 'The rigorous layer for when you want to understand why things are actually true.' },
+          { icon: '⌨️', title: 'Learn by Doing', desc: 'Write and run Python or JavaScript directly in the browser. No installs, no accounts — just code.' },
+          { icon: '∴', title: 'Rigorous Depth', desc: 'Step-by-step proofs and derivations for when you want to understand why things are actually true.' },
         ].map((item, i) => (
           <div key={i} className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
             <div className="text-2xl mb-2">{item.icon2 ?? item.icon}</div>
@@ -115,7 +115,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-sm text-slate-500 dark:text-slate-400">
-        <p>OpenCalc is free and open source. <Link to="/about" className="text-brand-600 dark:text-brand-400 hover:underline">Learn more</Link>.</p>
+        <p>OpenCalc is free, open source, and runs entirely in your browser. <Link to="/about" className="text-brand-600 dark:text-brand-400 hover:underline">Learn more</Link>.</p>
       </footer>
     </div>
   )

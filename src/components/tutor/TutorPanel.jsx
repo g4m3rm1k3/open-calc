@@ -86,6 +86,22 @@ async function* callAnthropic(key, model, sysPrompt, msgs) {
   }
 }
 
+async function* callHuggingFace(key, model, sysPrompt, msgs) {
+  const { HfInference } = await import('@huggingface/inference')
+  const hf = new HfInference(key)
+  const allMsgs = sysPrompt ? [{ role: 'system', content: sysPrompt }, ...msgs] : msgs
+  const stream = hf.chatCompletionStream({
+    model,
+    messages: allMsgs,
+    max_tokens: 1024,
+    temperature: 0.7,
+  })
+  for await (const chunk of stream) {
+    const t = chunk.choices?.[0]?.delta?.content
+    if (t) yield t
+  }
+}
+
 async function* callGoogle(key, model, sysPrompt, msgs) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`
   const res = await fetch(url, {
@@ -106,12 +122,13 @@ async function* callGoogle(key, model, sysPrompt, msgs) {
   if (text) yield text
 }
 
-async function* callProvider(settings, sysPrompt, msgs) {
+async function* callProvider(settings, msgs, sysPrompt = '') {
   const p = getProvider(settings.provider)
+  const allMsgs = sysPrompt ? [{ role: 'system', content: sysPrompt }, ...msgs] : msgs
   if (settings.provider === 'webllm') {
     if (!_engine) throw new Error('Model not loaded yet.')
     const stream = await _engine.chat.completions.create({
-      messages: [{ role: 'system', content: sysPrompt }, ...msgs],
+      messages: allMsgs,
       stream: true, temperature: 0.7, max_tokens: 512,
     })
     for await (const chunk of stream) {
@@ -125,42 +142,44 @@ async function* callProvider(settings, sysPrompt, msgs) {
   if (p.protocol === 'openai') yield* callOpenAICompat(p.endpoint, key, settings.model, sysPrompt, msgs)
   else if (p.protocol === 'anthropic') yield* callAnthropic(key, settings.model, sysPrompt, msgs)
   else if (p.protocol === 'google') yield* callGoogle(key, settings.model, sysPrompt, msgs)
+  else if (p.protocol === 'huggingface') yield* callHuggingFace(key, settings.model, sysPrompt, msgs)
 }
 
-// ─── System prompt ────────────────────────────────────────────────────────────
-function buildSystemPrompt(lesson) {
-  const mathFormat = [
-    'Format math using $...$ for inline and $$...$$ for display blocks.',
-    'Use **bold** for key terms, `code` for function names, numbered lists for steps.',
-    'Keep replies short (2–4 sentences) unless a full worked example is asked for.',
-    'Offer hints before giving full solutions.',
-  ].join(' ')
 
-  if (!lesson) {
-    return `You are a friendly math tutor. Respond conversationally to greetings and small talk. When math questions come up, be helpful and precise. ${mathFormat}`
+// ─── Dynamic system prompt ────────────────────────────────────────────────────
+function buildSystemPrompt(lesson) {
+  if (!lesson) return 'You are a helpful tutor. Answer questions directly and concisely.'
+
+  const lines = [
+    `You are a helpful tutor for an interactive STEM learning platform.`,
+    `The student is currently on the "${lesson.title}" lesson.`,
+  ]
+
+  // Hook — the motivating question
+  if (lesson.hook?.question) {
+    lines.push(`The lesson opens with: "${lesson.hook.question.replace(/[*_`]/g, '').slice(0, 200)}"`)
   }
 
+  // Key concepts from intuition prose
   const prose = lesson.intuition?.prose ?? []
-  const contextLines = prose.slice(0, 2).map((p) =>
-    `• ${p.replace(/^\*\*[^*]+\*\*:?\s*/, '').slice(0, 300)}`
-  )
-  const ex = lesson.workedExamples?.[0]
-  const exLine = ex
-    ? `Example problem on this page: "${ex.problem.replace(/\\\(|\\\)|\\\[|\\\]/g, '').slice(0, 200)}"`
-    : ''
+  if (prose.length > 0) {
+    lines.push(`Key concepts covered:`)
+    prose.slice(0, 4).forEach((p) => {
+      const clean = p.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/[`]/g, '').trim()
+      if (clean.length > 20) lines.push(`- ${clean.slice(0, 200)}`)
+    })
+  }
 
-  return [
-    `You are a friendly and knowledgeable math tutor.`,
-    `The student is currently on the "${lesson.title}" lesson${lesson.subtitle ? ` (${lesson.subtitle})` : ''}.`,
-    `Use this as background context — only bring it up when the student asks about it or it is directly relevant.`,
-    `Don't introduce yourself or summarise the topic unprompted. Just respond naturally to whatever the student says.`,
-    ``,
-    `Background context (use only when relevant):`,
-    ...contextLines,
-    exLine,
-    ``,
-    mathFormat,
-  ].filter(Boolean).join('\n')
+  // First worked example problem statement
+  const ex = lesson.workedExamples?.[0]
+  if (ex?.problem) {
+    lines.push(`Example problem on this page: "${ex.problem.replace(/[*_`]/g, '').slice(0, 200)}"`)
+  }
+
+  lines.push(``)
+  lines.push(`The student can ask you anything about this page or related concepts. If they ask "what's on this page" or "what is this lesson about", give a friendly 2–3 sentence summary. Keep all other answers concise. Use $...$ for inline math and $$...$$ for display math.`)
+
+  return lines.join('\n')
 }
 
 // ─── Markdown + LaTeX message renderer ───────────────────────────────────────
@@ -328,58 +347,67 @@ function persistSettings(s) {
 const DEFAULT_SIZE = { w: 380, h: 560 }
 const MIN_SIZE = { w: 280, h: 360 }
 
-function useDragResize(initialPos) {
-  const [pos, setPos] = useState(initialPos) // { x, y } from bottom-right
+function useDragResize() {
+  const [pos, setPos] = useState(() => ({
+    x: Math.max(16, window.innerWidth - DEFAULT_SIZE.w - 24),
+    y: 16,
+  }))
   const [size, setSize] = useState(DEFAULT_SIZE)
-  const dragRef = useRef(null)   // { startX, startY, startPosX, startPosY }
-  const resizeRef = useRef(null) // { startX, startY, startW, startH }
+
+  // Keep mutable refs so event handlers never close over stale state
+  const posRef = useRef(pos)
+  const sizeRef = useRef(size)
+  useEffect(() => { posRef.current = pos }, [pos])
+  useEffect(() => { sizeRef.current = size }, [size])
 
   const onDragStart = useCallback((e) => {
     if (e.button !== 0) return
     e.preventDefault()
-    dragRef.current = { startX: e.clientX, startY: e.clientY, startPosX: pos.x, startPosY: pos.y }
+    const startX = e.clientX
+    const startY = e.clientY
+    const startPosX = posRef.current.x
+    const startPosY = posRef.current.y
 
     const onMove = (me) => {
-      if (!dragRef.current) return
-      const dx = me.clientX - dragRef.current.startX
-      const dy = me.clientY - dragRef.current.startY
+      const dx = me.clientX - startX
+      const dy = me.clientY - startY
       setPos({
-        x: Math.max(0, dragRef.current.startPosX - dx),
-        y: Math.max(0, dragRef.current.startPosY - dy),
+        x: Math.max(0, Math.min(window.innerWidth - MIN_SIZE.w, startPosX + dx)),
+        y: Math.max(0, startPosY - dy),
       })
     }
     const onUp = () => {
-      dragRef.current = null
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
-  }, [pos])
+  }, [])
 
   const onResizeStart = useCallback((e) => {
     if (e.button !== 0) return
     e.preventDefault()
     e.stopPropagation()
-    resizeRef.current = { startX: e.clientX, startY: e.clientY, startW: size.w, startH: size.h }
+    const startX = e.clientX
+    const startY = e.clientY
+    const startW = sizeRef.current.w
+    const startH = sizeRef.current.h
 
     const onMove = (me) => {
-      if (!resizeRef.current) return
-      const dx = me.clientX - resizeRef.current.startX
-      const dy = me.clientY - resizeRef.current.startY
+      const dx = me.clientX - startX
+      const dy = me.clientY - startY
       setSize({
-        w: Math.max(MIN_SIZE.w, resizeRef.current.startW + dx),
-        h: Math.max(MIN_SIZE.h, resizeRef.current.startH + dy),
+        w: Math.max(MIN_SIZE.w, startW + dx),
+        h: Math.max(MIN_SIZE.h, startH - dy), // top-right handle: drag up = taller
       })
     }
     const onUp = () => {
-      resizeRef.current = null
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
-  }, [size])
+  }, [])
 
   return { pos, size, onDragStart, onResizeStart }
 }
@@ -519,13 +547,25 @@ export default function TutorPanel({ lesson }) {
   const hasKey = !provider.requiresKey || !!(settings.keys?.[settings.provider])
   const canSend = !!input.trim() && status === 'ready'
 
-  // Drag & resize — initial position is bottom-right (offset from corner)
-  const { pos, size, onDragStart, onResizeStart } = useDragResize({ x: 16, y: 16 })
+  const { pos, size, onDragStart, onResizeStart } = useDragResize()
 
   useEffect(() => { persistSettings(settings) }, [settings])
 
+  // Reset chat history when navigating to a different lesson
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    setMessages([])
+    setStreamContent('')
+    setErrorMsg('')
+  }, [lesson?.id])
+
+  // Scroll to bottom — debounced so fast streaming doesn't thrash the layout
+  const scrollTimer = useRef(null)
+  useEffect(() => {
+    clearTimeout(scrollTimer.current)
+    scrollTimer.current = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 80)
+    return () => clearTimeout(scrollTimer.current)
   }, [messages, streamContent])
 
   useEffect(() => {
@@ -592,10 +632,17 @@ export default function TutorPanel({ lesson }) {
     accRef.current = ''
     setStreamContent('')
     try {
-      const gen = callProvider(settings, buildSystemPrompt(lesson), history)
+      const gen = callProvider(settings, history, buildSystemPrompt(lesson))
+      let rafPending = false
       for await (const token of gen) {
         accRef.current += token
-        setStreamContent(accRef.current)
+        if (!rafPending) {
+          rafPending = true
+          requestAnimationFrame(() => {
+            setStreamContent(accRef.current)
+            rafPending = false
+          })
+        }
       }
       setMessages((prev) => [...prev, { role: 'assistant', content: accRef.current }])
       setStreamContent('')
@@ -611,13 +658,15 @@ export default function TutorPanel({ lesson }) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
   }
 
-  // Clamp panel within viewport
+  const clampedLeft = Math.max(0, Math.min(pos.x, window.innerWidth - MIN_SIZE.w - 8))
+  const clampedBottom = Math.max(0, pos.y)
+  const availableHeight = Math.max(MIN_SIZE.h, window.innerHeight - clampedBottom - 72)
   const panelStyle = {
     position: 'fixed',
-    right: pos.x,
-    bottom: pos.y,
-    width: Math.min(size.w, window.innerWidth - 16),
-    height: Math.min(size.h, window.innerHeight - pos.y - 64),
+    left: clampedLeft,
+    bottom: clampedBottom,
+    width: Math.min(size.w, window.innerWidth - clampedLeft - 8),
+    height: Math.min(size.h, availableHeight),
     zIndex: 9998,
   }
 
@@ -787,40 +836,58 @@ export default function TutorPanel({ lesson }) {
                       : <IconSend />}
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-1.5 text-center">
-                  {settings.provider === 'webllm'
-                    ? '🔒 Running locally · no data sent anywhere'
-                    : `Powered by ${provider.label} · key stored locally only`}
+                {/* Model switcher */}
+                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-600 shrink-0">Model:</span>
+                  <select
+                    value={`${settings.provider}:${settings.model}`}
+                    onChange={(e) => {
+                      const [pid, ...rest] = e.target.value.split(':')
+                      updateSettings({ provider: pid, model: rest.join(':') })
+                    }}
+                    className="flex-1 min-w-0 text-[10px] px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-400 cursor-pointer"
+                  >
+                    {PROVIDERS.map((p) => (
+                      <optgroup key={p.id} label={`${p.label} (${p.badge})`}>
+                        {p.models.map((m) => (
+                          <option key={m.id} value={`${p.id}:${m.id}`}>
+                            {m.label}{m.note ? ` — ${m.note}` : ''}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-1 text-center">
+                  AI can make mistakes — verify important answers.
                 </p>
               </div>
             </>
           )}
 
-          {/* ── Resize handle ── */}
+          {/* ── Resize handle (top-right: drag right=wider, drag up=taller) ── */}
           <div
             onMouseDown={onResizeStart}
-            className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-1"
+            className="absolute top-0 right-0 w-5 h-5 cursor-ne-resize flex items-start justify-end p-1"
             title="Resize"
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" className="text-slate-300 dark:text-slate-600">
-              <path d="M10 0L0 10h2L10 2V0zM10 4L4 10h2l4-4V4zM10 8L8 10h2V8z" />
+              <path d="M0 0h10v2H2v8H0z" />
             </svg>
           </div>
         </div>
       )}
 
-      {/* Toggle button */}
-      <div className="fixed z-[9997]" style={{ right: pos.x, bottom: pos.y > 20 ? pos.y - 56 : 16 }}>
+      {/* Toggle button — always fixed bottom-right, never moves */}
+      {!open && (
         <button
-          onClick={() => setOpen((o) => !o)}
-          className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
-            open ? 'bg-slate-600 dark:bg-slate-700 text-white' : 'bg-brand-600 text-white hover:bg-brand-700 hover:scale-105'
-          }`}
-          title={open ? 'Close tutor' : 'AI Tutor'}
+          onClick={() => setOpen(true)}
+          className="fixed z-[9997] bottom-4 right-4 w-12 h-12 rounded-full shadow-lg flex items-center justify-center bg-brand-600 text-white hover:bg-brand-700 hover:scale-105 transition-all duration-200"
+          title="AI Tutor"
         >
-          {open ? <IconClose /> : <IconChat />}
+          <IconChat />
         </button>
-      </div>
+      )}
     </>
   )
 }

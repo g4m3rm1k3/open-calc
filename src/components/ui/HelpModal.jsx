@@ -992,10 +992,10 @@ function SectionOverview() {
   return (
     <div>
       <SectionHeading sub="No coding experience required to get started.">
-        How open-calc works
+        How OpenCalc works
       </SectionHeading>
       <Para>
-        open-calc is an interactive math learning app. Every topic is a{" "}
+        OpenCalc is an open-source interactive STEM learning platform. Every topic is a{" "}
         <strong>lesson</strong>. Lessons are grouped into{" "}
         <strong>chapters</strong>. You write lessons as simple text files — the
         app reads them and renders them automatically.
@@ -3300,7 +3300,7 @@ export default function HelpModal({ isOpen, onClose }) {
                 Contributor Docs
               </h1>
               <p className="text-[11px] text-white/70">
-                open-calc · For all skill levels
+                OpenCalc · For all skill levels
               </p>
             </div>
           </div>

@@ -11,9 +11,9 @@ export const PROVIDERS = [
     requiresKey: false,
     models: [
       {
-        id: 'Qwen2.5-Math-1.5B-Instruct-q4f16_1-MLC',
-        label: 'Qwen2.5-Math 1.5B',
-        note: '~900 MB · Math-specialized',
+        id: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+        label: 'Llama 3.2 3B',
+        note: '~1.5 GB · General purpose',
       },
       {
         id: 'Phi-3.5-mini-instruct-q4f16_1-MLC',
@@ -21,10 +21,26 @@ export const PROVIDERS = [
         note: '~2 GB · General purpose',
       },
       {
-        id: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
-        label: 'Llama 3.2 3B',
-        note: '~1.5 GB · General purpose',
+        id: 'Qwen2.5-Math-1.5B-Instruct-q4f16_1-MLC',
+        label: 'Qwen2.5-Math 1.5B',
+        note: '~900 MB · Math-specialized',
       },
+    ],
+  },
+  {
+    id: 'huggingface',
+    label: 'Hugging Face',
+    badge: 'Free tier',
+    description: 'Thousands of open models. Free tier available at huggingface.co.',
+    requiresKey: true,
+    keyPlaceholder: 'hf_...',
+    keyHref: 'https://huggingface.co/settings/tokens',
+    protocol: 'huggingface',
+    models: [
+      { id: 'meta-llama/Llama-3.2-3B-Instruct', label: 'Llama 3.2 3B', note: 'Free tier' },
+      { id: 'mistralai/Mistral-7B-Instruct-v0.3', label: 'Mistral 7B', note: 'Free tier' },
+      { id: 'Qwen/Qwen2.5-Math-7B-Instruct', label: 'Qwen2.5-Math 7B', note: 'Math-focused' },
+      { id: 'microsoft/Phi-3.5-mini-instruct', label: 'Phi-3.5 Mini', note: 'Efficient' },
     ],
   },
   {
@@ -98,6 +114,6 @@ export const STORAGE_KEY = 'opencalc_tutor'
 
 export const DEFAULT_SETTINGS = {
   provider: 'webllm',
-  model: 'Qwen2.5-Math-1.5B-Instruct-q4f16_1-MLC',
+  model: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
   keys: {}, // { [providerId]: apiKey }
 }
