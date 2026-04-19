@@ -34,6 +34,24 @@ When a user runs a script:
 4. Plot commands are converted into Open Calc figure data or 3D launch data.
 5. Interactive controls such as `slider(...)` and `animate(...)` are surfaced in the UI and fed back into reruns.
 
+## Interaction model
+
+OpenMAT should be understood as one shared session with several views into it:
+
+- `Editor` tabs hold saved scripts, examples, and labs.
+- `Run` executes the active script tab and refreshes the Figure, Workspace, and Console.
+- `Console` is for short one-line experiments against the current workspace state.
+- `Promote to Script` moves a useful console command back into the active script tab.
+- `Workspace` shows the live variables produced by the latest script run or console command.
+
+This means the product model is:
+
+1. Write or load a script in the editor.
+2. Run it to create figures and variables.
+3. Probe or extend the result in the console.
+4. Promote good discoveries back into the script.
+5. Use the same session state as the basis for simulation workflows later.
+
 ## What OpenMAT is strong at today
 
 - matrix algebra
@@ -76,6 +94,17 @@ These are not MATLAB features, but part of OpenMAT's identity:
 - integrated Open Calc figure rendering
 - integrated Open Calc 3D workspace bridge
 
+## UI direction
+
+OpenMAT is being shaped as a shared foundation for two interfaces:
+
+- `Script Mode`
+  MATLAB-like editing, console work, workspace browsing, and plotting
+- `Simulation Mode`
+  A guided, more ANSYS-like workflow with project trees, setup panels, solver controls, and result dashboards
+
+These should not become two separate products. They should stay two layers on top of the same computational session so users can move between free-form scripting and structured simulation work.
+
 ## Extension API direction
 
 OpenMAT is being opened to extension so custom scripts and eventually app-level integrations can register new functions.
@@ -108,3 +137,4 @@ If a feature lands and only one of those gets updated, documentation is consider
 - simulation cookbook
 - plotting cookbook
 - indexing and array semantics guide
+- script mode vs simulation mode workflow guide

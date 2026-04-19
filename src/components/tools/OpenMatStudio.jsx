@@ -389,6 +389,13 @@ const HELP_TEXT = [
   "It is not raw JavaScript, Python, or full MATLAB compatibility.",
   "Docs source of truth: docs/OpenMAT.md",
   "",
+  "── Interaction Model ──",
+  "Editor tabs hold saved scripts and labs.",
+  "Run executes the current script tab and refreshes Figure, Workspace, and Console.",
+  "Console runs quick commands against the current workspace without editing the file.",
+  "Promote to Script appends the last console command into the active tab.",
+  "Workspace shows variables from the latest script run or console command.",
+  "",
   "── Matrices ──",
   "A = [1 2; 3 4]   A'   A \\ b   inv(A)   det(A)   trace(A)",
   "[V,D] = eig(A)   [Q,R] = qr(A)   [U,S,V] = svd(A)",
@@ -1480,6 +1487,14 @@ function createExecutionEngine(options = {}) {
   const subplotState = { active: false, rows: 1, cols: 1, slots: [], current: 0 };
 
   const plotState = makePlotState();
+  const initialWorkspace = Array.isArray(options.initialWorkspace) ? options.initialWorkspace : [];
+
+  initialWorkspace.forEach((item) => {
+    const name = typeof item?.name === "string" ? item.name.trim() : "";
+    if (!name) return;
+    parser.set(name, toPlain(item.value));
+    variables.add(name);
+  });
 
   const registerControl = (type, name, min, max, step = 1, defaultValue = null, meta = {}) => {
     const key = String(name);
@@ -1867,7 +1882,11 @@ const RETURN = Symbol('return');
 
 function executeScript(source, options = {}) {
   const extensions = options.extensions || [];
-  const engine = createExecutionEngine({ extensions, controlValues: options.controlValues || {} });
+  const engine = createExecutionEngine({
+    extensions,
+    controlValues: options.controlValues || {},
+    initialWorkspace: options.initialWorkspace || [],
+  });
   const { parser, logs, plotState, subplotState, variables, functionNames } = engine;
 
   // User-defined functions registry: name -> { ins, outs, body }
@@ -2135,9 +2154,14 @@ export default function OpenMatStudio() {
   const [selectedVariable, setSelectedVariable] = useState(null);
   const [workspaceTab, setWorkspaceTab] = useLocalStorage("openmat-workspace-tab", "plot");
   const [browserTab, setBrowserTab] = useLocalStorage("openmat-browser-tab", "examples");
+  const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
+  const [commandInput, setCommandInput] = useState("");
+  const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1);
+  const [lastConsoleCommand, setLastConsoleCommand] = useState("");
   const outputRef = useRef(null);
+  const consoleInputRef = useRef(null);
   const importRef = useRef(null);
   const shellRef = useRef(null);
   const stateRef = useRef({});
@@ -2214,6 +2238,13 @@ export default function OpenMatStudio() {
     { id: "notes", label: "Notes" },
   ];
   const crowdedTabs = documents.length >= 6;
+  const interactionModelItems = [
+    "Editor tabs store saved scripts, examples, and labs.",
+    "Run executes the active script and refreshes Figure, Workspace, and Console together.",
+    "Console is for one-line experiments against the current workspace, not for editing files.",
+    "Promote to Script copies the last useful console command into the active script tab.",
+    "Workspace shows the current live variables that simulation and plotting tools build on.",
+  ];
   const referenceItems = [
     "Language: MATLAB-like syntax over a local math engine, not raw JS/Python",
     "Matrices: [1 2; 3 4], A', A \\\\ b, inv, det, trace, eig, qr, svd",
@@ -2230,6 +2261,12 @@ export default function OpenMatStudio() {
     "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
     "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
   ];
+  const hasWorkspaceContext = workspaceItems.length > 0;
+  const sessionSummary = [
+    `${documents.length} script tab${documents.length === 1 ? "" : "s"}`,
+    `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
+    `${commandHistory.length} console command${commandHistory.length === 1 ? "" : "s"} saved`,
+  ];
 
   const clearRunState = useCallback(() => {
     setOutput("");
@@ -2240,6 +2277,7 @@ export default function OpenMatStudio() {
     setControlSpecs([]);
     setControlValues({});
     setControlPlayback({});
+    setLastConsoleCommand("");
     setIsPlotWindowOpen(false);
     setNormalizedPreview("");
     setWorkspaceItems([]);
@@ -2274,20 +2312,17 @@ export default function OpenMatStudio() {
     setWorkspaceTab,
   ]);
 
-  const runCode = useCallback((nextControlValues = controlValues) => {
-    setRunning(true);
-    try {
-      const normalized = code
+  const applyExecutionResult = useCallback((result, source, nextControlValues, commandLabel = "") => {
+      const normalized = source
         .split(/\r?\n/)
         .map((line) => preprocessLine(line.replace(/;\s*$/, ""), new Set()))
         .filter(Boolean)
         .join("\n");
       setNormalizedPreview(normalized);
-      const result = executeScript(code, {
-        extensions: listOpenMatExtensions(),
-        controlValues: nextControlValues,
-      });
-      setOutput(result.output);
+      const consoleOutput = commandLabel
+        ? `>> ${commandLabel}\n${result.output || "No output."}`
+        : result.output;
+      setOutput(consoleOutput);
       setFigureJson(result.figureJson);
       setBaseFigureJson(result.figureJson);
       setSurfaceConfig(result.plot3DRequest || null);
@@ -2328,7 +2363,18 @@ export default function OpenMatStudio() {
       setWorkspaceTab(
         result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console",
       );
+      setLastConsoleCommand(commandLabel);
       window.dispatchEvent(new CustomEvent("openmat:run", { detail: result }));
+    }, [setControlPlayback, setControlValues, setWorkspaceTab]);
+
+  const runCode = useCallback((nextControlValues = controlValues) => {
+    setRunning(true);
+    try {
+      const result = executeScript(code, {
+        extensions: listOpenMatExtensions(),
+        controlValues: nextControlValues,
+      });
+      applyExecutionResult(result, code, nextControlValues, "");
     } catch (error) {
       setOutput(`Error: ${error.message}`);
       setFigureJson(null);
@@ -2338,6 +2384,7 @@ export default function OpenMatStudio() {
       setPlotKind("2d");
       setControlSpecs([]);
       setControlPlayback({});
+      setLastConsoleCommand("");
       setWorkspaceItems([]);
       setSelectedVariable(null);
       setWorkspaceTab("console");
@@ -2347,7 +2394,51 @@ export default function OpenMatStudio() {
         outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
+  }, [applyExecutionResult, code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
+
+  const runConsoleCommand = useCallback(() => {
+    const command = commandInput.trim();
+    if (!command) return;
+    setRunning(true);
+    try {
+      const source = command;
+      const result = executeScript(source, {
+        extensions: listOpenMatExtensions(),
+        controlValues,
+        initialWorkspace: workspaceItems,
+      });
+      applyExecutionResult(result, source, controlValues, command);
+      setCommandHistory((current) => {
+        const trimmed = current.filter((entry) => entry !== command);
+        return [...trimmed.slice(-99), command];
+      });
+      setCommandHistoryIndex(-1);
+      setCommandInput("");
+      setWorkspaceTab(result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console");
+    } catch (error) {
+      setOutput(`>> ${command}\nError: ${error.message}`);
+      setLastConsoleCommand(command);
+      setWorkspaceTab("console");
+    } finally {
+      setRunning(false);
+      requestAnimationFrame(() => {
+        outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        consoleInputRef.current?.focus();
+      });
+    }
+  }, [
+    applyExecutionResult,
+    commandInput,
+    controlValues,
+    setCommandHistory,
+    setWorkspaceTab,
+    workspaceItems,
+  ]);
+
+  const insertLastCommandIntoScript = useCallback(() => {
+    if (!lastConsoleCommand) return;
+    setCode((prev) => `${prev}${prev.endsWith("\n") || !prev ? "" : "\n"}${lastConsoleCommand}\n`);
+  }, [lastConsoleCommand, setCode]);
 
   const resetWorkspace = useCallback(() => {
     captureRecoverySnapshot("Reset workspace");
@@ -3281,26 +3372,181 @@ export default function OpenMatStudio() {
               </div>
             )}
 
-            {workspaceTab === "console" && (
-              <div
-                ref={outputRef}
-                className="min-h-[220px] rounded-2xl border p-4"
-                style={{ borderColor: C.border, background: C.surface }}
-              >
+              {workspaceTab === "console" && (
                 <div
-                  className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]"
-                  style={{ color: C.hint }}
+                  ref={outputRef}
+                  className="grid min-h-[220px] gap-3 rounded-2xl border p-4"
+                  style={{ borderColor: C.border, background: C.surface }}
                 >
-                  Console
+                  <div className="flex items-center justify-between gap-3">
+                    <div
+                      className="text-xs font-semibold uppercase tracking-[0.18em]"
+                      style={{ color: C.hint }}
+                    >
+                      Command Window
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={insertLastCommandIntoScript}
+                        disabled={!lastConsoleCommand}
+                        className="rounded-md border px-2.5 py-1 text-[11px] font-semibold"
+                        style={{
+                          borderColor: C.border,
+                          background: C.surface2,
+                          color: lastConsoleCommand ? C.text : C.hint,
+                          opacity: lastConsoleCommand ? 1 : 0.55,
+                        }}
+                        title="Append the last console command to the active script"
+                      >
+                        Promote to Script
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCommandInput("");
+                          setCommandHistoryIndex(-1);
+                          consoleInputRef.current?.focus();
+                        }}
+                        className="rounded-md border px-2.5 py-1 text-[11px] font-semibold"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                      >
+                        Clear Input
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="rounded-xl border px-3 py-3"
+                    style={{ borderColor: C.border, background: C.surface3 }}
+                  >
+                    <label
+                      htmlFor="openmat-command-input"
+                      className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em]"
+                      style={{ color: C.hint }}
+                    >
+                      Command
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="shrink-0 text-sm font-semibold"
+                        style={{ color: C.blue }}
+                      >
+                        &gt;&gt;
+                      </span>
+                      <input
+                        id="openmat-command-input"
+                        ref={consoleInputRef}
+                        type="text"
+                        value={commandInput}
+                        onChange={(event) => {
+                          setCommandInput(event.target.value);
+                          setCommandHistoryIndex(-1);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            runConsoleCommand();
+                            return;
+                          }
+                          if (event.key === "ArrowUp") {
+                            if (!commandHistory.length) return;
+                            event.preventDefault();
+                            const nextIndex =
+                              commandHistoryIndex < 0
+                                ? commandHistory.length - 1
+                                : Math.max(0, commandHistoryIndex - 1);
+                            setCommandHistoryIndex(nextIndex);
+                            setCommandInput(commandHistory[nextIndex] || "");
+                            return;
+                          }
+                          if (event.key === "ArrowDown") {
+                            if (!commandHistory.length) return;
+                            event.preventDefault();
+                            if (commandHistoryIndex < 0) return;
+                            const nextIndex = commandHistoryIndex + 1;
+                            if (nextIndex >= commandHistory.length) {
+                              setCommandHistoryIndex(-1);
+                              setCommandInput("");
+                              return;
+                            }
+                            setCommandHistoryIndex(nextIndex);
+                            setCommandInput(commandHistory[nextIndex] || "");
+                          }
+                        }}
+                        placeholder="Try: x = 0:0.1:10"
+                        className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+                        style={{ color: C.text }}
+                      />
+                      <button
+                        type="button"
+                        onClick={runConsoleCommand}
+                        disabled={running || !commandInput.trim()}
+                        className="rounded-md px-3 py-1.5 text-xs font-semibold"
+                        style={{
+                          background: running || !commandInput.trim() ? C.surface2 : C.blue,
+                          color: running || !commandInput.trim() ? C.hint : "#06121f",
+                          opacity: running || !commandInput.trim() ? 0.7 : 1,
+                        }}
+                      >
+                        Run
+                      </button>
+                    </div>
+                    <div className="mt-2 text-[11px]" style={{ color: C.muted }}>
+                      Up/Down recalls command history. Commands run against the current workspace without changing the file.
+                    </div>
+                  </div>
+                  <div
+                    className="rounded-xl border p-3"
+                    style={{ borderColor: C.border, background: C.surface2 }}
+                  >
+                    <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                      Session State
+                    </div>
+                    <div className="grid gap-1 text-xs" style={{ color: C.muted }}>
+                      {sessionSummary.map((item) => (
+                        <div key={item}>{item}</div>
+                      ))}
+                      <div>
+                        Workspace context: {hasWorkspaceContext ? "ready for console commands" : "run a script first"}
+                      </div>
+                    </div>
+                  </div>
+                  {commandHistory.length > 0 && (
+                    <div
+                      className="rounded-xl border p-3"
+                      style={{ borderColor: C.border, background: C.surface2 }}
+                    >
+                      <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Recent Commands
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {commandHistory.slice(-8).reverse().map((entry, index) => (
+                          <button
+                            key={`${entry}-${index}`}
+                            type="button"
+                            onClick={() => {
+                              setCommandInput(entry);
+                              setCommandHistoryIndex(-1);
+                              consoleInputRef.current?.focus();
+                            }}
+                            className="rounded-md border px-2.5 py-1 text-left text-[11px] font-mono"
+                            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                            title={entry}
+                          >
+                            {entry.length > 36 ? `${entry.slice(0, 33)}...` : entry}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <pre
+                    className="whitespace-pre-wrap break-words text-sm leading-6"
+                    style={{ color: output.startsWith("Error:") ? C.red : C.text }}
+                  >
+                    {output || "Run a script to see matrix output, variables, or plots here."}
+                  </pre>
                 </div>
-                <pre
-                  className="whitespace-pre-wrap break-words text-sm leading-6"
-                  style={{ color: output.startsWith("Error:") ? C.red : C.text }}
-                >
-                  {output || "Run a script to see matrix output, variables, or plots here."}
-                </pre>
-              </div>
-            )}
+              )}
 
             {workspaceTab === "workspace" && (
               <div className="grid gap-3">
@@ -3380,6 +3626,24 @@ export default function OpenMatStudio() {
                   className="rounded-2xl border p-4 text-sm leading-6"
                   style={{ borderColor: C.border, background: C.surface }}
                 >
+                  <div className="mb-3 font-semibold">Interaction Model</div>
+                  <div className="grid gap-2">
+                    {interactionModelItems.map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
                   <div className="mb-3 font-semibold">Supported features</div>
                   <div className="grid gap-2">
                     {[
@@ -3419,6 +3683,19 @@ export default function OpenMatStudio() {
                     a local math engine and Open Calc&apos;s figure system. It is not raw JavaScript,
                     not Python, and not full MATLAB compatibility. The user language is intentionally
                     hybrid so we can keep matrix-first syntax while staying browser-native.
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Foundation for OpenMAT Sim</div>
+                  <div style={{ color: C.muted }}>
+                    The next guided simulation workspace should sit on top of this same engine and
+                    session model. Script Mode stays MATLAB-like, while Simulation Mode can become
+                    more ANSYS-like with project trees, setup panels, solver controls, and results
+                    views that still feed the same workspace, figures, and console.
                   </div>
                 </div>
 
