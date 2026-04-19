@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { create, all, format as mathFormat } from "mathjs";
+import { useNavigate } from "react-router-dom";
 import {
   Play,
   RefreshCw,
@@ -245,6 +246,24 @@ Z = sin(sqrt(X.^2 + Y.^2));
 surf(X, Y, Z)
 `,
   },
+  {
+    id: "interactive-signal",
+    label: "Interactive Signal",
+    icon: Waves,
+    description: "Drive a plot with sliders and rerun it live from the controls pane.",
+    code: `amp = slider('amp', 0.2, 2.5, 0.1, 1.2);
+freq = slider('freq', 0.5, 6, 0.1, 2.0);
+damp = slider('damp', 0, 0.3, 0.01, 0.08);
+
+t = linspace(0, 10, 600);
+y = amp * sin(freq * t) .* exp(-damp * t);
+plot(t, y)
+grid on
+title('Interactive Signal')
+xlabel('time')
+ylabel('amplitude')
+`,
+  },
 ];
 
 const HELP_TEXT = [
@@ -282,6 +301,7 @@ const HELP_TEXT = [
   "title, xlabel, ylabel, legend, grid on/off, xlim, ylim",
   "axis tight/equal/auto/[xmin xmax ymin ymax]",
   "surf(X,Y,Z)   mesh(X,Y,Z) -> opens the 3D Grapher",
+  "slider('gain', min, max, step, default) -> interactive controls",
   "",
   "── Output ──",
   "disp(x)   sprintf('%g', x)   fprintf('val = %f\\n', x)",
@@ -400,6 +420,10 @@ function meshgrid(xValues, yValues = xValues) {
       y.map((value) => Array.from({ length: x.length }, () => value)),
     ],
   };
+}
+
+function clampValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function diffArray(value) {
@@ -1233,11 +1257,14 @@ function makePlotState() {
 
 function createExecutionEngine(options = {}) {
   const extensions = options.extensions || [];
+  const controlValues = options.controlValues || {};
   const parser = math.parser();
   const variables = new Set();
   const functionNames = new Set();
   const logs = [];
   let plot3DRequest = null;
+  const controls = [];
+  const controlSet = new Set();
 
   // Subplot state: null = single figure, otherwise grid layout
   const subplotState = { active: false, rows: 1, cols: 1, slots: [], current: 0 };
@@ -1455,6 +1482,33 @@ function createExecutionEngine(options = {}) {
     logs.push("3D mesh ready. Opened in 3D Grapher.");
     return args[args.length - 1] ?? null;
   });
+  parser.set("slider", (name, min, max, step = 1, defaultValue = null) => {
+    const key = String(name);
+    const lower = Number(min);
+    const upper = Number(max);
+    const safeMin = Number.isFinite(lower) ? lower : 0;
+    const safeMax = Number.isFinite(upper) ? upper : safeMin + 1;
+    const safeStep = Math.abs(Number(step)) || 1;
+    const fallback = defaultValue == null ? safeMin : Number(defaultValue);
+    const rawValue = Object.prototype.hasOwnProperty.call(controlValues, key)
+      ? Number(controlValues[key])
+      : fallback;
+    const value = clampValue(Number.isFinite(rawValue) ? rawValue : fallback, Math.min(safeMin, safeMax), Math.max(safeMin, safeMax));
+    parser.set(key, value);
+    variables.add(key);
+    if (!controlSet.has(key)) {
+      controls.push({
+        name: key,
+        min: Math.min(safeMin, safeMax),
+        max: Math.max(safeMin, safeMax),
+        step: safeStep,
+        value,
+        defaultValue: fallback,
+      });
+      controlSet.add(key);
+    }
+    return value;
+  });
   parser.set("whos", () => buildWorkspaceSnapshot(parser, variables));
 
   // ── Subplot ──
@@ -1561,6 +1615,9 @@ function createExecutionEngine(options = {}) {
     getPlot3DRequest() {
       return plot3DRequest;
     },
+    getControls() {
+      return controls;
+    },
     clearVariables(names) {
       if (names.length === 0) {
         Array.from(variables).forEach((name) => parser.remove(name));
@@ -1582,7 +1639,7 @@ const RETURN = Symbol('return');
 
 function executeScript(source, options = {}) {
   const extensions = options.extensions || [];
-  const engine = createExecutionEngine({ extensions });
+  const engine = createExecutionEngine({ extensions, controlValues: options.controlValues || {} });
   const { parser, logs, plotState, subplotState, variables, functionNames } = engine;
 
   // User-defined functions registry: name -> { ins, outs, body }
@@ -1809,6 +1866,7 @@ function executeScript(source, options = {}) {
     figureJson,
     workspace: buildWorkspaceSnapshot(parser, variables),
     plot3DRequest: engine.getPlot3DRequest(),
+    controls: engine.getControls(),
   };
   extensions.forEach((extension) => {
     if (typeof extension?.onRun === "function") {
@@ -1823,6 +1881,7 @@ function executeScript(source, options = {}) {
 }
 
 export default function OpenMatStudio() {
+  const navigate = useNavigate();
   const C = useColors();
   const { openGrapher } = useGrapher();
   const [code, setCode] = useLocalStorage("openmat-code", DEFAULT_CODE);
@@ -1835,6 +1894,8 @@ export default function OpenMatStudio() {
   const [plotPanelMode, setPlotPanelMode] = useLocalStorage("openmat-plot-panel-mode", "pane");
   const [surfaceConfig, setSurfaceConfig] = useState(null);
   const [plotKind, setPlotKind] = useState("2d");
+  const [controlSpecs, setControlSpecs] = useState([]);
+  const [controlValues, setControlValues] = useLocalStorage("openmat-control-values", {});
   const [normalizedPreview, setNormalizedPreview] = useState("");
   const [workspaceItems, setWorkspaceItems] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState(null);
@@ -1873,12 +1934,13 @@ export default function OpenMatStudio() {
     "3D: surf(X,Y,Z), mesh(X,Y,Z) launch into the 3D grapher",
     "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
     "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
+    "Interactivity: slider('name', min, max, step, default)",
     "Functions: function [out]=name(in)...end and f = @(x) expr",
     "Math: sin, cos, exp, log, fft, ifft, polyfit, polyval, diff, cumsum",
     "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
   ];
 
-  const runCode = useCallback(() => {
+  const runCode = useCallback((nextControlValues = controlValues) => {
     setRunning(true);
     try {
       const normalized = code
@@ -1887,11 +1949,24 @@ export default function OpenMatStudio() {
         .filter(Boolean)
         .join("\n");
       setNormalizedPreview(normalized);
-      const result = executeScript(code, { extensions: listOpenMatExtensions() });
+      const result = executeScript(code, {
+        extensions: listOpenMatExtensions(),
+        controlValues: nextControlValues,
+      });
       setOutput(result.output);
       setFigureJson(result.figureJson);
       setBaseFigureJson(result.figureJson);
       setSurfaceConfig(result.plot3DRequest || null);
+      setControlSpecs(result.controls || []);
+      setControlValues((current) => {
+        const merged = { ...current };
+        (result.controls || []).forEach((control) => {
+          merged[control.name] = Object.prototype.hasOwnProperty.call(nextControlValues, control.name)
+            ? nextControlValues[control.name]
+            : control.value;
+        });
+        return merged;
+      });
       if (result.plot3DRequest) {
         setPlotKind("3d");
       } else if (result.figureJson) {
@@ -1916,6 +1991,7 @@ export default function OpenMatStudio() {
       setIsPlotWindowOpen(false);
       setSurfaceConfig(null);
       setPlotKind("2d");
+      setControlSpecs([]);
       setWorkspaceItems([]);
       setSelectedVariable(null);
       setWorkspaceTab("console");
@@ -1925,7 +2001,7 @@ export default function OpenMatStudio() {
         outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [code, openGrapher, setWorkspaceTab]);
+  }, [code, controlValues, setControlValues, setWorkspaceTab]);
 
   const resetWorkspace = useCallback(() => {
     setCode(DEFAULT_CODE);
@@ -1934,11 +2010,13 @@ export default function OpenMatStudio() {
     setBaseFigureJson(null);
     setSurfaceConfig(null);
     setPlotKind("2d");
+    setControlSpecs([]);
+    setControlValues({});
     setIsPlotWindowOpen(false);
     setNormalizedPreview("");
     setWorkspaceItems([]);
     setSelectedVariable(null);
-  }, [setCode]);
+  }, [setCode, setControlValues]);
 
   const loadExample = useCallback(
     (exampleId) => {
@@ -1950,10 +2028,12 @@ export default function OpenMatStudio() {
       setBaseFigureJson(null);
       setSurfaceConfig(null);
       setPlotKind("2d");
+      setControlSpecs([]);
+      setControlValues({});
       setIsPlotWindowOpen(false);
       setNormalizedPreview("");
     },
-    [exampleMap, setCode],
+    [exampleMap, setCode, setControlValues],
   );
 
   const exportWorkspace = useCallback(() => {
@@ -1990,6 +2070,8 @@ export default function OpenMatStudio() {
         setBaseFigureJson(null);
         setSurfaceConfig(null);
         setPlotKind("2d");
+        setControlSpecs([]);
+        setControlValues({});
         setIsPlotWindowOpen(false);
         setNormalizedPreview("");
         setWorkspaceItems([]);
@@ -2001,7 +2083,7 @@ export default function OpenMatStudio() {
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [setBrowserTab, setCode, setWorkspaceTab]);
+  }, [setBrowserTab, setCode, setControlValues, setWorkspaceTab]);
 
   const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
 
@@ -2065,6 +2147,17 @@ export default function OpenMatStudio() {
   const rightPaneCssWidth = isPlotFocused
     ? "min(100%, max(56vw, 760px))"
     : `min(100%, ${rightPaneWidth}px)`;
+  const updateControlValue = useCallback((name, nextValue) => {
+    const spec = controlSpecs.find((control) => control.name === name);
+    if (!spec) return;
+    const clamped = clampValue(Number(nextValue), spec.min, spec.max);
+    const snapped = spec.step > 0
+      ? Number((Math.round((clamped - spec.min) / spec.step) * spec.step + spec.min).toFixed(6))
+      : clamped;
+    const nextControls = { ...controlValues, [name]: snapped };
+    setControlValues(nextControls);
+    runCode(nextControls);
+  }, [controlSpecs, controlValues, runCode, setControlValues]);
 
   return (
     <div
@@ -2097,7 +2190,7 @@ export default function OpenMatStudio() {
             </div>
           </div>
         </div>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => setSidebarOpen((value) => !value)}
@@ -2108,12 +2201,45 @@ export default function OpenMatStudio() {
           </button>
           <button
             type="button"
-            onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
-            className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            onClick={exportWorkspace}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
           >
-            Separate 3D
+            <Download className="h-3.5 w-3.5" />
+            Export
           </button>
+          <button
+            type="button"
+            onClick={() => importRef.current?.click()}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Import
+          </button>
+          <button
+            type="button"
+            onClick={resetWorkspace}
+            className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{
+              background: C.surface,
+              borderColor: C.border,
+              color: C.text,
+            }}
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Reset
+          </button>
+          {surfaceConfig && (
+            <button
+              type="button"
+              onClick={() => openGrapher(surfaceConfig)}
+              className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+              style={{ borderColor: C.border, background: C.surface, color: C.text }}
+            >
+              Separate 3D
+            </button>
+          )}
           <button
             type="button"
             onClick={runCode}
@@ -2124,97 +2250,25 @@ export default function OpenMatStudio() {
             <Play className="h-3.5 w-3.5" />
             {running ? "Running..." : "Run"}
           </button>
-        </div>
-      </div>
-
-      <div
-        className="flex flex-wrap items-center gap-2 border-b px-3 py-1.5 text-xs"
-        style={{ borderColor: C.border, background: C.surface }}
-      >
-        <button
-          type="button"
-          onClick={() => setSidebarOpen((value) => !value)}
-          className="rounded-md px-2.5 py-1 font-medium"
-          style={{ color: C.muted }}
-        >
-          {sidebarOpen ? "Hide Browser" : "Show Browser"}
-        </button>
-        <button
-          type="button"
-          onClick={exportWorkspace}
-          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium"
-          style={{ color: C.muted }}
-        >
-          <Download className="h-3.5 w-3.5" />
-          Export
-        </button>
-        <button
-          type="button"
-          onClick={() => importRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium"
-          style={{ color: C.muted }}
-        >
-          <Upload className="h-3.5 w-3.5" />
-          Import
-        </button>
-        <input
-          ref={importRef}
-          type="file"
-          accept=".json"
-          className="hidden"
-          onChange={importWorkspace}
-        />
-      </div>
-
-      <div
-        className="flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2"
-        style={{ borderColor: C.border, background: C.surface2 }}
-      >
-        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            onClick={resetWorkspace}
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold"
-            style={{
-              background: C.surface,
-              border: `1px solid ${C.border}`,
-              color: C.text,
-            }}
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Reset
-          </button>
-          <button
-            type="button"
-            onClick={runCode}
-            disabled={running}
-            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 md:hidden"
-            style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)" }}
-          >
-            <Play className="h-3.5 w-3.5" />
-            {running ? "Running..." : "Run"}
-          </button>
-          <button
-            type="button"
-            onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
-            className="rounded-lg border px-3 py-1.5 text-xs font-semibold md:hidden"
+            onClick={() => navigate("/")}
+            className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
+            title="Close OpenMAT"
           >
-            Separate 3D
+            <X className="h-3.5 w-3.5" />
+            Close
           </button>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-[11px]" style={{ color: C.muted }}>
-          <span className="rounded-full px-2 py-1" style={{ background: C.surface3 }}>
-            Matrix algebra
-          </span>
-          <span className="rounded-full px-2 py-1" style={{ background: C.surface3 }}>
-            Plot stack
-          </span>
-          <span className="rounded-full px-2 py-1" style={{ background: C.surface3 }}>
-            Ready for tablet refinement
-          </span>
-        </div>
       </div>
+      <input
+        ref={importRef}
+        type="file"
+        accept=".json"
+        className="hidden"
+        onChange={importWorkspace}
+      />
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen && (
@@ -2508,6 +2562,63 @@ export default function OpenMatStudio() {
                           />
                         </div>
                       ) : renderOpenMatFigure(figureJson, C)}
+                      {controlSpecs.length > 0 && (
+                        <div
+                          className="mt-4 rounded-2xl border p-3"
+                          style={{ borderColor: C.border, background: C.surface2 }}
+                        >
+                          <div className="mb-3 flex items-center justify-between gap-3">
+                            <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                              Controls
+                            </div>
+                            <div className="text-[11px]" style={{ color: C.muted }}>
+                              Slider changes rerun the script.
+                            </div>
+                          </div>
+                          <div className="grid gap-3 md:grid-cols-2">
+                            {controlSpecs.map((control) => {
+                              const currentValue = Object.prototype.hasOwnProperty.call(controlValues, control.name)
+                                ? Number(controlValues[control.name])
+                                : control.value;
+                              return (
+                                <div
+                                  key={control.name}
+                                  className="rounded-xl border px-3 py-3"
+                                  style={{ borderColor: C.border, background: C.surface }}
+                                >
+                                  <div className="mb-2 flex items-center justify-between gap-3">
+                                    <span className="font-mono text-sm font-semibold">{control.name}</span>
+                                    <input
+                                      type="number"
+                                      value={currentValue}
+                                      min={control.min}
+                                      max={control.max}
+                                      step={control.step}
+                                      onChange={(event) => updateControlValue(control.name, event.target.value)}
+                                      className="w-24 rounded-md border px-2 py-1 text-xs"
+                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                    />
+                                  </div>
+                                  <input
+                                    type="range"
+                                    min={control.min}
+                                    max={control.max}
+                                    step={control.step}
+                                    value={currentValue}
+                                    onChange={(event) => updateControlValue(control.name, event.target.value)}
+                                    className="w-full accent-cyan-500"
+                                  />
+                                  <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
+                                    <span>{control.min}</span>
+                                    <span>step {control.step}</span>
+                                    <span>{control.max}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div
@@ -2518,14 +2629,16 @@ export default function OpenMatStudio() {
                     </div>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => openGrapher(surfaceConfig || { mode: "3d", title: "OpenMAT Surface Lab" })}
-                  className="w-full rounded-xl border px-3 py-2 text-sm font-semibold"
-                  style={{ borderColor: C.border, background: C.surface, color: C.text }}
-                >
-                  Open Separate 3D Window
-                </button>
+                {surfaceConfig && (
+                  <button
+                    type="button"
+                    onClick={() => openGrapher(surfaceConfig)}
+                    className="w-full rounded-xl border px-3 py-2 text-sm font-semibold"
+                    style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                  >
+                    Open Separate 3D Window
+                  </button>
+                )}
               </div>
             )}
 
