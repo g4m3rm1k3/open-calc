@@ -137,6 +137,34 @@ y(1:5)
 `,
   },
   {
+    id: "subplots",
+    label: "Subplots",
+    icon: LineChart,
+    description: "Multiple plots in a grid with subplot(rows, cols, idx).",
+    code: `t = linspace(0, 2*pi, 200);
+
+subplot(2, 2, 1)
+plot(t, sin(t))
+title('sin(t)')
+xlabel('t')
+
+subplot(2, 2, 2)
+plot(t, cos(t))
+title('cos(t)')
+xlabel('t')
+
+subplot(2, 2, 3)
+plot(t, sin(t) .* exp(-0.3*t))
+title('Damped sine')
+xlabel('t')
+
+subplot(2, 2, 4)
+x = randn(1, 200);
+hist(x, 15)
+title('Normal dist')
+`,
+  },
+  {
     id: "control-flow",
     label: "Control Flow",
     icon: Grid3X3,
@@ -937,33 +965,22 @@ function buildFigureFromPlotState(plotState) {
   });
 }
 
+function makePlotState() {
+  return { series: [], hold: false, title: "", xlabel: "", ylabel: "", legend: [], grid: true, xlim: null, ylim: null, axisMode: "auto" };
+}
+
 function createExecutionEngine() {
   const parser = math.parser();
   const variables = new Set();
   const logs = [];
-  const plotState = {
-    series: [],
-    hold: false,
-    title: "",
-    xlabel: "",
-    ylabel: "",
-    legend: [],
-    grid: true,
-    xlim: null,
-    ylim: null,
-    axisMode: "auto",
-  };
+
+  // Subplot state: null = single figure, otherwise grid layout
+  const subplotState = { active: false, rows: 1, cols: 1, slots: [], current: 0 };
+
+  const plotState = makePlotState();
 
   const clearPlots = () => {
-    plotState.series = [];
-    plotState.hold = false;
-    plotState.title = "";
-    plotState.xlabel = "";
-    plotState.ylabel = "";
-    plotState.legend = [];
-    plotState.xlim = null;
-    plotState.ylim = null;
-    plotState.axisMode = "auto";
+    Object.assign(plotState, makePlotState());
   };
 
   const registerPlot = (kind, first, second) => {
@@ -1157,6 +1174,28 @@ function createExecutionEngine() {
   });
   parser.set("svd", (A) => svdDecomp(A));
 
+  // ── Subplot ──
+  parser.set("subplot", (rows, cols, idx) => {
+    const r = Number(rows), c = Number(cols), i = Number(idx);
+    if (!subplotState.active || subplotState.rows !== r || subplotState.cols !== c) {
+      // Save any current plotState before switching
+      if (subplotState.active && subplotState.current > 0) {
+        subplotState.slots[subplotState.current - 1] = { ...makePlotState(), ...plotState, series: [...plotState.series] };
+      }
+      subplotState.active = true;
+      subplotState.rows = r;
+      subplotState.cols = c;
+      subplotState.slots = Array.from({ length: r * c }, () => null);
+    } else if (subplotState.current > 0) {
+      // Save the current panel before moving to next
+      subplotState.slots[subplotState.current - 1] = { ...makePlotState(), ...plotState, series: [...plotState.series] };
+    }
+    subplotState.current = i;
+    // Reset plotState for the new panel
+    Object.assign(plotState, makePlotState());
+    return null;
+  });
+
   // ── Statistics ──
   parser.set("mean", (v) => statMean(v));
   parser.set("median", (v) => statMedian(v));
@@ -1214,6 +1253,7 @@ function createExecutionEngine() {
     parser,
     logs,
     plotState,
+    subplotState,
     variables,
     clearVariables(names) {
       if (names.length === 0) {
@@ -1236,7 +1276,7 @@ const RETURN = Symbol('return');
 
 function executeScript(source) {
   const engine = createExecutionEngine();
-  const { parser, logs, plotState, variables } = engine;
+  const { parser, logs, plotState, subplotState, variables } = engine;
 
   // User-defined functions registry: name -> { ins, outs, body }
   const userFunctions = {};
@@ -1403,7 +1443,25 @@ function executeScript(source) {
     }
   }
 
-  const figureJson = buildFigureFromPlotState(plotState);
+  // Flush last subplot panel if active
+  let figureJson;
+  if (subplotState.active) {
+    if (subplotState.current > 0) {
+      subplotState.slots[subplotState.current - 1] = { ...makePlotState(), ...plotState, series: [...plotState.series] };
+    }
+    const panels = subplotState.slots.map((slot) =>
+      slot && slot.series.length > 0 ? buildFigureFromPlotState(slot) : null
+    );
+    figureJson = JSON.stringify({
+      type: 'opencalc_subplots',
+      rows: subplotState.rows,
+      cols: subplotState.cols,
+      panels,
+    });
+  } else {
+    figureJson = buildFigureFromPlotState(plotState);
+  }
+
   const outputBlocks = [];
   if (logs.length) outputBlocks.push(logs.filter(Boolean).join('\n'));
   if (lastVisibleResult != null && lastVisibleResult !== '') {
@@ -1993,7 +2051,33 @@ export default function OpenMatStudio() {
                         <span>Axis mode: {figureMeta.axisMode}</span>
                         <span>Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts.</span>
                       </div>
-                      <FigureRenderer figureJson={figureJson} C={C} />
+                      {(() => {
+                        try {
+                          const parsed = typeof figureJson === 'string' ? JSON.parse(figureJson) : figureJson;
+                          if (parsed?.type === 'opencalc_subplots') {
+                            const { cols, panels } = parsed;
+                            return (
+                              <div
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                                  gap: 8,
+                                }}
+                              >
+                                {panels.map((panel, idx) => (
+                                  <div key={idx} style={{ minWidth: 0 }}>
+                                    {panel
+                                      ? <FigureRenderer figureJson={panel} C={C} />
+                                      : <div style={{ height: 180, borderRadius: 8, background: C.surface2, border: `1px solid ${C.border}` }} />
+                                    }
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          }
+                        } catch { /* fall through */ }
+                        return <FigureRenderer figureJson={figureJson} C={C} />;
+                      })()}
                     </>
                   ) : (
                     <div
