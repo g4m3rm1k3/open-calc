@@ -1324,6 +1324,210 @@ function renderOpenMatFigure(figureJson, C, emptyHeight = 180) {
   return <FigureRenderer figureJson={figureJson} C={C} />;
 }
 
+function getWorkspaceItemValue(workspaceItems, name, fallback = null) {
+  return workspaceItems.find((item) => item.name === name)?.value ?? fallback;
+}
+
+function toFiniteNumber(value, fallback = 0) {
+  if (Array.isArray(value)) return toFiniteNumber(value[0], fallback);
+  const next = Number(value);
+  return Number.isFinite(next) ? next : fallback;
+}
+
+function buildPolylinePath(xs, ys, width, height, padding = 28) {
+  if (!Array.isArray(xs) || !Array.isArray(ys) || xs.length === 0 || ys.length === 0) return "";
+  const points = xs
+    .map((x, index) => [Number(x), Number(ys[index])])
+    .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+  if (!points.length) return "";
+
+  const xMin = Math.min(...points.map(([x]) => x));
+  const xMax = Math.max(...points.map(([x]) => x));
+  const yMin = Math.min(...points.map(([, y]) => y));
+  const yMax = Math.max(...points.map(([, y]) => y));
+  const xSpan = Math.max(xMax - xMin, 1e-6);
+  const ySpan = Math.max(yMax - yMin, 1e-6);
+
+  return points
+    .map(([x, y], index) => {
+      const px = padding + ((x - xMin) / xSpan) * (width - padding * 2);
+      const py = height - padding - ((y - yMin) / ySpan) * (height - padding * 2);
+      return `${index === 0 ? "M" : "L"} ${px.toFixed(2)} ${py.toFixed(2)}`;
+    })
+    .join(" ");
+}
+
+function OpenMatSimulationViewport({ activeSimulation, workspaceItems, figureJson, surfaceConfig, plotKind, setPlotKind, C, openGrapher }) {
+  if (plotKind === "3d" && surfaceConfig) {
+    return (
+      <div className="flex h-full min-h-[420px] flex-col">
+        <div className="mb-3 flex items-center justify-between gap-3 text-xs" style={{ color: C.muted }}>
+          <div>Embedded 3D simulation viewport</div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPlotKind("2d")}
+              className="rounded-lg border px-2.5 py-1.5 font-semibold"
+              style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+            >
+              Show 2D
+            </button>
+            <button
+              type="button"
+              onClick={() => openGrapher(surfaceConfig)}
+              className="rounded-lg border px-2.5 py-1.5 font-semibold"
+              style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+            >
+              Open Separate 3D
+            </button>
+          </div>
+        </div>
+        <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border" style={{ borderColor: C.border }}>
+          <GlobalGrapher3D
+            embedded
+            isOpen
+            launchConfig={surfaceConfig}
+            onClose={() => setPlotKind("2d")}
+            onSwitchTo2D={() => setPlotKind("2d")}
+            onSwitchToJSX={() => openGrapher({ mode: "pro" })}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (activeSimulation?.id === "pendulum-lab") {
+    const L = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "L", 1.2), 1.2), 0.2);
+    const bobX = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const bobY = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "y", -L), -L);
+    const scale = 135 / Math.max(L, 1);
+    const pivotX = 170;
+    const pivotY = 52;
+    const viewX = pivotX + bobX * scale;
+    const viewY = pivotY + Math.abs(bobY) * scale;
+    return (
+      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+              Model viewport
+            </div>
+            <div className="mt-1 text-sm font-semibold">Pendulum scene</div>
+          </div>
+          {figureJson && (
+            <div className="text-[11px]" style={{ color: C.muted }}>
+              Figure output still available in the script workspace.
+            </div>
+          )}
+        </div>
+        <svg viewBox="0 0 520 320" className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
+          <defs>
+            <linearGradient id="pendulum-glow" x1="0%" x2="100%">
+              <stop offset="0%" stopColor={C.blue} stopOpacity="0.25" />
+              <stop offset="100%" stopColor={C.teal} stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="520" height="320" fill={C.surface3} />
+          <line x1="60" y1="260" x2="460" y2="260" stroke={C.border} strokeWidth="2" />
+          <line x1={pivotX} y1={pivotY} x2={viewX} y2={viewY} stroke="url(#pendulum-glow)" strokeWidth="5" />
+          <circle cx={pivotX} cy={pivotY} r="8" fill={C.text} />
+          <circle cx={viewX} cy={viewY} r="24" fill={C.blue} opacity="0.9" />
+          <circle cx={viewX} cy={viewY} r="34" fill={C.blue} opacity="0.12" />
+          <path d={`M ${pivotX - 90} ${pivotY + 170} Q ${pivotX} ${pivotY + 210} ${pivotX + 90} ${pivotY + 170}`} fill="none" stroke={C.border} strokeDasharray="8 8" />
+          <text x="28" y="34" fill={C.muted} fontSize="14">Pivot and bob geometry</text>
+          <text x="28" y="56" fill={C.hint} fontSize="12">This panel is meant to feel like a scene viewport, not just a graph.</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (activeSimulation?.id === "spring-mass-lab") {
+    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const amplitude = Math.max(Math.abs(x), 0.2);
+    const massX = 290 + x * 72;
+    const springPoints = Array.from({ length: 9 }, (_, index) => {
+      const t = index / 8;
+      const px = 70 + t * (massX - 100);
+      const py = 170 + (index % 2 === 0 ? -22 : 22);
+      return `${px},${index === 0 || index === 8 ? 170 : py}`;
+    }).join(" ");
+    return (
+      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+        <div className="mb-3">
+          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+            Model viewport
+          </div>
+          <div className="mt-1 text-sm font-semibold">Spring-mass scene</div>
+        </div>
+        <svg viewBox="0 0 520 320" className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
+          <rect x="0" y="0" width="520" height="320" fill={C.surface3} />
+          <rect x="45" y="120" width="18" height="100" rx="4" fill={C.border} />
+          <line x1="63" y1="170" x2="100" y2="170" stroke={C.border} strokeWidth="4" />
+          <polyline points={springPoints} fill="none" stroke={C.teal} strokeWidth="5" strokeLinejoin="round" strokeLinecap="round" />
+          <rect x={massX} y="132" width="86" height="76" rx="18" fill={C.blue} opacity="0.92" />
+          <rect x={massX} y="132" width="86" height="76" rx="18" fill="none" stroke={C.surface} strokeWidth="2" opacity="0.3" />
+          <line x1="36" y1="246" x2="484" y2="246" stroke={C.border} strokeWidth="2" />
+          <text x="28" y="34" fill={C.muted} fontSize="14">Mass displacement: {amplitude.toFixed(3)}</text>
+          <text x="28" y="56" fill={C.hint} fontSize="12">The center viewport is becoming a model scene instead of just a plot target.</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (activeSimulation?.id === "projectile-lab") {
+    const xs = getWorkspaceItemValue(workspaceItems, "x", []);
+    const ys = getWorkspaceItemValue(workspaceItems, "y", []);
+    const px = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "px", 0), 0);
+    const py = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "py", 0), 0);
+    const width = 520;
+    const height = 320;
+    const path = buildPolylinePath(xs, ys, width, height, 34);
+    const xMax = Math.max(...(Array.isArray(xs) ? xs.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const yMax = Math.max(...(Array.isArray(ys) ? ys.map((value) => Number(value)).filter(Number.isFinite) : [1]), 1);
+    const markerX = 34 + (px / xMax) * (width - 68);
+    const markerY = height - 34 - (Math.max(py, 0) / yMax) * (height - 68);
+    return (
+      <div className="flex h-full min-h-[420px] flex-col rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+        <div className="mb-3">
+          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+            Model viewport
+          </div>
+          <div className="mt-1 text-sm font-semibold">Projectile scene</div>
+        </div>
+        <svg viewBox={`0 0 ${width} ${height}`} className="min-h-0 flex-1 rounded-2xl" style={{ background: C.surface3 }}>
+          <rect x="0" y="0" width={width} height={height} fill={C.surface3} />
+          <line x1="28" y1={height - 34} x2={width - 24} y2={height - 34} stroke={C.border} strokeWidth="2" />
+          <line x1="34" y1={height - 28} x2="34" y2="30" stroke={C.border} strokeWidth="2" />
+          {path && <path d={path} fill="none" stroke={C.teal} strokeWidth="5" strokeLinecap="round" />}
+          <circle cx={markerX} cy={markerY} r="10" fill={C.blue} />
+          <circle cx={markerX} cy={markerY} r="18" fill={C.blue} opacity="0.16" />
+          <text x="28" y="34" fill={C.muted} fontSize="14">Trajectory viewport with live projectile marker</text>
+          <text x="28" y="56" fill={C.hint} fontSize="12">The graph still matters, but the center panel should read as a simulation scene first.</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (figureJson) {
+    return (
+      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+        {renderOpenMatFigure(figureJson, C, 280)}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full min-h-[420px] items-center justify-center rounded-2xl border p-8 text-center" style={{ borderColor: C.border, background: C.surface }}>
+      <div>
+        <div className="text-sm font-semibold">Simulation viewport ready</div>
+        <div className="mt-2 text-xs leading-6" style={{ color: C.muted }}>
+          Load a guided lab and run it to populate the model scene, controls, and result panels.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
   if (!isOpen || !figureJson) return null;
 
@@ -2211,9 +2415,14 @@ export default function OpenMatStudio() {
   const [browserTab, setBrowserTab] = useLocalStorage("openmat-browser-tab", "examples");
   const [workspaceMode, setWorkspaceMode] = useLocalStorage("openmat-workspace-mode", "script");
   const [activeSimulationId, setActiveSimulationId] = useLocalStorage("openmat-active-simulation", "pendulum-lab");
+  const [simBridgeTab, setSimBridgeTab] = useLocalStorage("openmat-sim-bridge-tab", "script");
+  const [simLeftTab, setSimLeftTab] = useLocalStorage("openmat-sim-left-tab", "models");
+  const [simRightTab, setSimRightTab] = useLocalStorage("openmat-sim-right-tab", "params");
+  const [simEditorWidth, setSimEditorWidth] = useLocalStorage("openmat-sim-editor-width", 40);
   const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
+  const [isResizingSimCenter, setIsResizingSimCenter] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [commandInput, setCommandInput] = useState("");
   const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1);
@@ -2263,6 +2472,56 @@ export default function OpenMatStudio() {
     [],
   );
   const activeSimulation = simulationMap[activeSimulationId] || SIMULATION_WORKSPACES[0];
+  const simulationTreeItems = useMemo(() => ([
+    {
+      id: "model",
+      title: "Model",
+      detail: activeSimulation?.title || "Simulation model",
+      lines: [
+        "Shared OpenMAT session",
+        surfaceConfig ? "3D surface attached" : "Scene viewport active",
+      ],
+    },
+    {
+      id: "inputs",
+      title: "Inputs",
+      detail: `${controlSpecs.length} interactive parameter${controlSpecs.length === 1 ? "" : "s"}`,
+      lines: controlSpecs.length
+        ? controlSpecs.slice(0, 4).map((control) => `${control.name}: ${control.type}`)
+        : ["Run the lab to populate control inputs"],
+    },
+    {
+      id: "solver",
+      title: "Solver",
+      detail: "Local browser engine",
+      lines: [
+        "MATLAB-like preprocessing",
+        "Numerics + plotting on the same run cycle",
+      ],
+    },
+    {
+      id: "results",
+      title: "Results",
+      detail: `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
+      lines: workspaceItems.length
+        ? workspaceItems.slice(0, 4).map((item) => `${item.name}: ${item.preview}`)
+        : ["No results yet"],
+    },
+    {
+      id: "bridge",
+      title: "Bridge",
+      detail: "Script + console workflow",
+      lines: [
+        "Use the lower bridge to edit code",
+        "Promote console experiments back into the script",
+      ],
+    },
+  ]), [activeSimulation?.title, controlSpecs, surfaceConfig, workspaceItems]);
+  const simulationMetricCards = useMemo(() => (
+    workspaceItems
+      .filter((item) => typeof item.value === "number" || (Array.isArray(item.value) && item.value.length <= 4))
+      .slice(0, 4)
+  ), [workspaceItems]);
 
   const captureRecoverySnapshot = useCallback((reason) => {
     setRecoverySnapshot(
@@ -2769,6 +3028,35 @@ export default function OpenMatStudio() {
     };
   }, [isResizingRightPane, setRightPaneWidth]);
 
+  useEffect(() => {
+    if (!isResizingSimCenter) return undefined;
+
+    const handleMove = (event) => {
+      const shellRect = shellRef.current?.getBoundingClientRect();
+      if (!shellRect) return;
+      const nextPercent = ((event.clientX - shellRect.left) / shellRect.width) * 100;
+      const clamped = Math.max(28, Math.min(62, nextPercent));
+      setSimEditorWidth(Math.round(clamped));
+    };
+
+    const handleUp = () => {
+      setIsResizingSimCenter(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, [isResizingSimCenter, setSimEditorWidth]);
+
   const isPlotFocused = plotPanelMode === "focus";
   const rightPaneCssWidth = isPlotFocused
     ? "min(100%, max(56vw, 760px))"
@@ -3033,6 +3321,472 @@ export default function OpenMatStudio() {
         onChange={importWorkspace}
       />
 
+      {workspaceMode === "sim" ? (
+        <div className="flex min-h-0 flex-1">
+          <div className="flex w-14 shrink-0 flex-col border-r" style={{ borderColor: C.border, background: C.surface3 }}>
+            {[
+              { id: "models", label: "Models", icon: Waves },
+              { id: "project", label: "Project", icon: Rows3 },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const active = simLeftTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSimLeftTab((current) => current === tab.id ? "" : tab.id)}
+                  className="m-2 inline-flex h-10 items-center justify-center rounded-xl border"
+                  style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface2 : C.surface, color: active ? C.blue : C.muted }}
+                  title={tab.label}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              );
+            })}
+          </div>
+
+          {simLeftTab && (
+            <div className="flex w-[280px] shrink-0 flex-col border-r" style={{ borderColor: C.border, background: C.surface3 }}>
+              <div className="border-b px-4 py-3" style={{ borderColor: C.border }}>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                  {simLeftTab === "models" ? "Simulation Browser" : "Project Tree"}
+                </div>
+                <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                  {simLeftTab === "models"
+                    ? "Choose guided labs and swap between simulation families."
+                    : "Toggle the support panels you need instead of showing everything at once."}
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto p-3">
+                {simLeftTab === "models" ? (
+                  <div className="space-y-3">
+                    {SIMULATION_WORKSPACES.map((simulation) => {
+                      const active = activeSimulation?.id === simulation.id;
+                      return (
+                        <button
+                          key={simulation.id}
+                          type="button"
+                          onClick={() => openSimulationWorkspace(simulation.id)}
+                          className="block w-full rounded-2xl border px-3 py-3 text-left"
+                          style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface : C.surface2 }}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm font-semibold">{simulation.title}</div>
+                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: active ? "rgba(23, 105, 209, 0.14)" : C.surface, color: active ? C.blue : C.muted }}>
+                              {active ? "Loaded" : "Open"}
+                            </span>
+                          </div>
+                          <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                            {simulation.summary}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {simulationTreeItems.map((section) => (
+                      <div key={section.id} className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: C.hint }}>
+                          {section.title}
+                        </div>
+                        <div className="mt-1 text-sm font-semibold">{section.detail}</div>
+                        <div className="mt-2 grid gap-2">
+                          {section.lines.map((line) => (
+                            <div key={line} className="rounded-xl border px-3 py-2 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 flex-col" style={{ width: `${simEditorWidth}%` }}>
+              <div className="border-b px-4 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                      Script Editor
+                    </div>
+                    <div className="mt-1 text-sm font-semibold">{activeDocument?.name || "untitled.m"}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={createNewDocument}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border"
+                      style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                      title="New script tab"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={renameActiveDocument}
+                      className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                      style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Rename
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 flex min-w-0 items-end gap-1 overflow-x-auto pb-1">
+                  {documents.map((document) => {
+                    const active = document.id === activeDocument?.id;
+                    return (
+                      <button
+                        key={document.id}
+                        type="button"
+                        onClick={() => switchDocument(document.id)}
+                        className="inline-flex items-center gap-2 rounded-t-lg border border-b-0 px-3 py-1.5 pr-2 text-xs font-semibold"
+                        style={{ background: active ? C.surface : C.surface2, borderColor: C.border, color: active ? C.text : C.muted }}
+                        title={document.name}
+                      >
+                        <span className={crowdedTabs ? "max-w-[74px] truncate" : "max-w-[116px] truncate"}>
+                          {compactDocumentLabel(document.name, crowdedTabs)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 p-2 md:p-3">
+                <Editor
+                  height="100%"
+                  beforeMount={setupOpenCalcMonaco}
+                  defaultLanguage="openmat"
+                  language="openmat"
+                  theme={C.isDark ? "openmat-dark" : "openmat-light"}
+                  value={code}
+                  onChange={(value) => setCode(value || "")}
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 13,
+                    lineHeight: 21,
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    wordWrap: "on",
+                    padding: { top: 14, bottom: 14 },
+                  }}
+                  onMount={(editor, monaco) => {
+                    monacoRef.current = monaco;
+                    monaco.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
+                    editor.addCommand(1024 | 3, () => {
+                      runCode();
+                    });
+                  }}
+                />
+              </div>
+            </div>
+
+            <div
+              className="hidden w-2 shrink-0 cursor-ew-resize border-l border-r lg:flex lg:items-center lg:justify-center"
+              style={{ borderColor: C.border, background: C.surface3 }}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                setIsResizingSimCenter(true);
+              }}
+              title="Drag to resize editor and viewport"
+            >
+              <div className="h-12 w-1 rounded-full" style={{ background: C.border }} />
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="border-b px-4 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                      Viewport
+                    </div>
+                    <div className="mt-1 text-sm font-semibold">{activeSimulation?.title || "Simulation"}</div>
+                    <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                      {activeSimulation?.summary || "A guided simulation scene built on the same plotting and workspace engine."}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {surfaceConfig && (
+                      <button
+                        type="button"
+                        onClick={() => setPlotKind((current) => current === "3d" ? "2d" : "3d")}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                        style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                      >
+                        {plotKind === "3d" ? "Show 2D" : "Show 3D"}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => openSimulationWorkspace(activeSimulation.id)}
+                      className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                      style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                    >
+                      Reload Lab
+                    </button>
+                    <button
+                      type="button"
+                      onClick={runCode}
+                      className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                      style={{ borderColor: C.blue, background: "rgba(23, 105, 209, 0.12)", color: C.blue }}
+                    >
+                      Refresh Model
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 p-3">
+                <OpenMatSimulationViewport
+                  activeSimulation={activeSimulation}
+                  workspaceItems={workspaceItems}
+                  figureJson={figureJson}
+                  surfaceConfig={surfaceConfig}
+                  plotKind={plotKind}
+                  setPlotKind={setPlotKind}
+                  C={C}
+                  openGrapher={openGrapher}
+                />
+              </div>
+            </div>
+          </div>
+
+          {simRightTab && (
+            <div className="flex w-[340px] shrink-0 flex-col border-l" style={{ borderColor: C.border, background: C.surface2 }}>
+              <div className="border-b px-4 py-3" style={{ borderColor: C.border }}>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                  {simRightTab === "params" ? "Parameters" : simRightTab === "results" ? "Results" : simRightTab === "console" ? "Console" : simRightTab === "workspace" ? "Workspace" : "Reference"}
+                </div>
+                <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                  Toggle only the panel you need while keeping the editor and viewport side by side.
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-auto p-3">
+                {simRightTab === "params" && (
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="text-sm font-semibold">{activeSimulation.title}</div>
+                      <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                        {activeSimulation.summary}
+                      </div>
+                    </div>
+                    {controlSpecs.length ? controlSpecs.map((control) => {
+                      const currentValue = Object.prototype.hasOwnProperty.call(controlValues, control.name)
+                        ? Number(controlValues[control.name])
+                        : control.value;
+                      return (
+                        <div key={control.name} className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="font-mono text-sm font-semibold">{control.name}</div>
+                              <div className="text-[11px]" style={{ color: C.muted }}>
+                                {control.type === "animate" ? "Animated driver" : "Interactive input"}
+                              </div>
+                            </div>
+                            <div className="text-xs font-semibold" style={{ color: C.blue }}>
+                              {Number(currentValue).toFixed(3).replace(/\.?0+$/, "")}
+                            </div>
+                          </div>
+                          <input
+                            type="range"
+                            min={control.min}
+                            max={control.max}
+                            step={control.step || 0.01}
+                            value={currentValue}
+                            onChange={(event) => updateControlValue(control.name, event.target.value)}
+                            className="w-full accent-sky-500"
+                          />
+                          <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
+                            <span>{control.min}</span>
+                            <span>step {control.step}</span>
+                            <span>{control.max}</span>
+                          </div>
+                          {control.type === "animate" && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => toggleAnimatedControl(control.name)}
+                                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                                style={{ borderColor: controlPlayback[control.name]?.playing ? C.blue : C.border, background: C.surface2, color: controlPlayback[control.name]?.playing ? C.blue : C.text }}
+                              >
+                                {controlPlayback[control.name]?.playing ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                                {controlPlayback[control.name]?.playing ? "Pause" : "Play"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => resetAnimatedControl(control.name)}
+                                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
+                                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                              >
+                                <RefreshCw className="h-3 w-3" />
+                                Reset
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }) : (
+                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                        Run the current model to populate interactive parameters.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {simRightTab === "results" && (
+                  <div className="grid gap-2">
+                    {simulationMetricCards.length ? simulationMetricCards.map((item) => (
+                      <div key={item.name} className="rounded-2xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.hint }}>
+                          {item.name}
+                        </div>
+                        <div className="mt-1 text-sm font-semibold">{item.preview}</div>
+                        <div className="mt-1 text-[11px]" style={{ color: C.muted }}>
+                          {item.className} • {item.size[0]}×{item.size[1]}
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                        Run the model to populate result cards.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {simRightTab === "console" && (
+                  <div className="flex h-full min-h-[420px] flex-col gap-3">
+                    <div className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Command bridge
+                        </div>
+                        <button
+                          type="button"
+                          onClick={insertLastCommandIntoScript}
+                          disabled={!lastConsoleCommand}
+                          className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: lastConsoleCommand ? C.text : C.hint, opacity: lastConsoleCommand ? 1 : 0.55 }}
+                        >
+                          Promote to Script
+                        </button>
+                      </div>
+                      <pre className="max-h-[220px] overflow-auto whitespace-pre-wrap text-xs leading-6" style={{ color: C.text }}>
+                        {output || "Run the lab or issue a console command to inspect the current workspace."}
+                      </pre>
+                    </div>
+                    <div className="mt-auto flex items-center gap-2">
+                      <input
+                        ref={consoleInputRef}
+                        value={commandInput}
+                        onChange={(event) => {
+                          setCommandInput(event.target.value);
+                          setCommandHistoryIndex(-1);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            runConsoleCommand();
+                          }
+                        }}
+                        placeholder="Type a one-line command, for example: theta"
+                        className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
+                        style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                      />
+                      <button
+                        type="button"
+                        onClick={runConsoleCommand}
+                        className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white"
+                        style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)" }}
+                      >
+                        <Play className="h-4 w-4" />
+                        Run
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {simRightTab === "workspace" && (
+                  <div className="grid gap-2">
+                    {workspaceItems.length ? workspaceItems.map((item) => (
+                      <div key={item.name} className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                          {item.name}
+                        </div>
+                        <div className="mt-1 text-sm font-semibold">{item.preview}</div>
+                        <div className="mt-2 text-[11px]" style={{ color: C.muted }}>
+                          {item.className} • {item.size[0]}×{item.size[1]} • {item.bytes} bytes
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                        Run the current model to populate the workspace.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {simRightTab === "reference" && (
+                  <div className="grid gap-3">
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Interaction model
+                      </div>
+                      <div className="grid gap-2">
+                        {interactionModelItems.map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Learning prompts
+                      </div>
+                      <div className="grid gap-2">
+                        {activeSimulation.prompts.map((item) => (
+                          <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="flex w-14 shrink-0 flex-col border-l" style={{ borderColor: C.border, background: C.surface3 }}>
+            {[
+              { id: "params", label: "Params", icon: Cpu },
+              { id: "results", label: "Results", icon: LineChart },
+              { id: "console", label: "Console", icon: Rows3 },
+              { id: "workspace", label: "Workspace", icon: Sigma },
+              { id: "reference", label: "Reference", icon: AlertCircle },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const active = simRightTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSimRightTab((current) => current === tab.id ? "" : tab.id)}
+                  className="m-2 inline-flex h-10 items-center justify-center rounded-xl border"
+                  style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface2 : C.surface, color: active ? C.blue : C.muted }}
+                  title={tab.label}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen && (
           <div
@@ -4038,6 +4792,7 @@ export default function OpenMatStudio() {
           </div>
         </div>
       </div>
+      )}
 
       {helpOpen && (
         <div
