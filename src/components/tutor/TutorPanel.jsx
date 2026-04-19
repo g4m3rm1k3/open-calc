@@ -676,7 +676,7 @@ export default function TutorPanel({ lesson }) {
       {open && (
         <div
           style={panelStyle}
-          className="flex flex-col rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden select-none"
+          className="flex flex-col rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden select-none min-h-0"
         >
           {/* ── Drag handle / header ── */}
           <div
@@ -721,7 +721,7 @@ export default function TutorPanel({ lesson }) {
           {view === 'settings' ? (
             <SettingsView settings={settings} onChange={updateSettings} />
           ) : (
-            <>
+            <div className="flex flex-col flex-1 min-h-0">
               {/* Status banners */}
               {status === 'loading-model' && (
                 <div className="px-3 py-2 bg-sky-50 dark:bg-sky-900/20 border-b border-sky-100 dark:border-sky-800 shrink-0">
@@ -759,7 +759,7 @@ export default function TutorPanel({ lesson }) {
               )}
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+              <div className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-3">
                 {messages.length === 0 && !streamContent && (
                   <div className="flex flex-col items-center justify-center h-full text-center gap-2 py-6">
                     <span className="text-3xl select-none">📐</span>
@@ -862,7 +862,7 @@ export default function TutorPanel({ lesson }) {
                   AI can make mistakes — verify important answers.
                 </p>
               </div>
-            </>
+            </div>
           )}
 
           {/* ── Resize handle (top-right: drag right=wider, drag up=taller) ── */}
