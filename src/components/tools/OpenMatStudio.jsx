@@ -629,6 +629,42 @@ const SIMULATION_WORKSPACES = [
   },
 ];
 
+const OPENMAT_INTERACTIVE_TOURS = {
+  "spring-mass-basics": {
+    id: "spring-mass-basics",
+    simulationId: "spring-mass-lab",
+    title: "Spring-Mass Getting Started",
+    subtitle: "Learn the bench first, then modify the original model.",
+    steps: [
+      {
+        id: "run-workbench",
+        title: "Run the workbench",
+        body: "Press Run once so OpenMAT loads the Spring-Mass script, viewport state, sliders, and workspace together.",
+      },
+      {
+        id: "play-animation",
+        title: "Play the motion",
+        body: "Use Play in Parameters to start the animated time driver and connect the numbers to the moving scene.",
+      },
+      {
+        id: "select-part",
+        title: "Select a part",
+        body: "Click the spring, mass, or wall in the viewport so the Properties rail becomes the assembly editor for that part.",
+      },
+      {
+        id: "edit-part",
+        title: "Modify the original model",
+        body: "With a part selected, use the highlighted Selected Part Controls sliders on the right to change that original part and make your own variant.",
+      },
+      {
+        id: "reload-lab",
+        title: "Recover the default scene",
+        body: "Press Reload Lab to restore the original guided assembly after your edits.",
+      },
+    ],
+  },
+};
+
 const HELP_TEXT = [
   "Supported MATLAB-like syntax:",
   "",
@@ -2636,6 +2672,111 @@ function getSimulationRoleMeta(role) {
   return { label: "Member", description: "Structural member / rod" };
 }
 
+const SIMULATION_TYPE_PROPERTY_SCHEMAS = {
+  line: [
+    { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
+  ],
+  rect: [
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "width", label: "width", type: "number", min: 4, max: 800, step: 1, slider: true },
+    { field: "height", label: "height", type: "number", min: 4, max: 800, step: 1, slider: true },
+  ],
+  circle: [
+    { field: "cx", label: "cx", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "cy", label: "cy", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "r", label: "radius", type: "number", min: 2, max: 240, step: 1, slider: true },
+  ],
+  point: [
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
+  ],
+  force: [
+    { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+    { field: "label", label: "label", type: "text" },
+  ],
+  dimension: [
+    { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "offset", label: "offset", type: "number", min: -200, max: 200, step: 1, slider: true },
+    { field: "label", label: "label", type: "text" },
+  ],
+  support: [
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "size", label: "size", type: "number", min: 8, max: 240, step: 1, slider: true },
+  ],
+  moment: [
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "radius", label: "radius", type: "number", min: 8, max: 240, step: 1, slider: true },
+    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+  ],
+};
+
+const SIMULATION_ROLE_PROPERTY_SCHEMAS = {
+  anchor: [
+    { field: "stiffness", label: "support stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
+    { field: "damping", label: "support damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
+  ],
+  rod: [
+    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true },
+    { field: "stiffness", label: "axial stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
+    { field: "youngsModulus", label: "Young's modulus", type: "number", min: 0, max: 400000000000, step: 1000000000 },
+    { field: "area", label: "area", type: "number", min: 0, max: 10000, step: 1 },
+  ],
+  spring: [
+    { field: "stiffness", label: "spring constant", type: "number", min: 0, max: 50000, step: 10, slider: true },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 5000, step: 1, slider: true },
+    { field: "restLength", label: "rest length", type: "number", min: 0, max: 800, step: 1, slider: true },
+  ],
+  mass: [
+    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true },
+    { field: "massValue", label: "mass", type: "number", min: 0, max: 10000, step: 0.1, slider: true },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
+    { field: "centerOfMassOffset", label: "center of mass offset", type: "number", min: -200, max: 200, step: 1 },
+  ],
+  support: [
+    { field: "size", label: "support size", type: "number", min: 8, max: 240, step: 1, slider: true },
+    { field: "stiffness", label: "reaction stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
+  ],
+  force: [
+    { field: "magnitude", label: "load magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+  ],
+};
+
+function getSimulationPropertySchema(element) {
+  if (!element) return [];
+  const baseFields = [
+    { field: "name", label: "name", type: "text" },
+  ];
+  const typeFields = SIMULATION_TYPE_PROPERTY_SCHEMAS[element.type] || [];
+  const roleFields = SIMULATION_ROLE_PROPERTY_SCHEMAS[element.role] || [];
+  const schema = [...baseFields, ...typeFields, ...roleFields];
+  const seen = new Set();
+  return schema.filter((item) => {
+    if (seen.has(item.field)) return false;
+    seen.add(item.field);
+    return true;
+  });
+}
+
+function getSimulationPropertyValue(element, field) {
+  if (!element) return "";
+  const value = element[field];
+  return value ?? "";
+}
+
 function getSimulationQuickStart(activeSimulation, hasAnimatedControls) {
   const title = activeSimulation?.title || "this workbench";
   return [
@@ -4378,6 +4519,12 @@ export default function OpenMatStudio() {
   const [simGeometryStore, setSimGeometryStore] = useLocalStorage("openmat-sim-geometry-store", {});
   const [simConstraintStore, setSimConstraintStore] = useLocalStorage("openmat-sim-constraint-store", {});
   const [workbenchLessonProgress, setWorkbenchLessonProgress] = useLocalStorage("openmat-workbench-lesson-progress", {});
+  const [interactiveTour, setInteractiveTour] = useLocalStorage("openmat-interactive-tour", {
+    active: false,
+    id: "",
+    stepIndex: 0,
+    lastAction: "",
+  });
   const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
@@ -4434,6 +4581,58 @@ export default function OpenMatStudio() {
     [],
   );
   const activeSimulation = simulationMap[activeSimulationId] || SIMULATION_WORKSPACES[0];
+  const activeSimulationTour = useMemo(
+    () => Object.values(OPENMAT_INTERACTIVE_TOURS).find((tour) => tour.simulationId === activeSimulationId) || null,
+    [activeSimulationId],
+  );
+  const activeInteractiveTour = interactiveTour?.id ? OPENMAT_INTERACTIVE_TOURS[interactiveTour.id] || null : null;
+  const activeInteractiveTourStep = activeInteractiveTour?.steps?.[interactiveTour.stepIndex] || null;
+  const interactiveTourProgressLabel = activeInteractiveTour
+    ? `${Math.min((interactiveTour.stepIndex || 0) + 1, activeInteractiveTour.steps.length)} / ${activeInteractiveTour.steps.length}`
+    : "";
+  const activeInteractiveTourTarget = useMemo(() => {
+    if (!interactiveTour?.active || !activeInteractiveTourStep) return "";
+    switch (activeInteractiveTourStep.id) {
+      case "run-workbench":
+        return "tour-run";
+      case "play-animation":
+        return "tour-play";
+      case "select-part":
+        return "tour-viewport";
+      case "edit-part":
+        return "tour-params";
+      case "reload-lab":
+        return "tour-reload";
+      default:
+        return "";
+    }
+  }, [activeInteractiveTourStep, interactiveTour?.active]);
+  const getInteractiveTourHighlight = useCallback((targetId) => {
+    if (activeInteractiveTourTarget !== targetId) {
+      return { className: "", style: {} };
+    }
+    return {
+      className: "animate-pulse",
+      style: {
+        borderColor: C.blue,
+        boxShadow: `0 0 0 2px rgba(99, 184, 255, 0.45), 0 0 28px rgba(99, 184, 255, 0.2)`,
+      },
+    };
+  }, [C.blue, activeInteractiveTourTarget]);
+  const interactiveTourOverlayPosition = useMemo(() => {
+    switch (activeInteractiveTourTarget) {
+      case "tour-run":
+      case "tour-reload":
+        return { left: 16, bottom: 16 };
+      case "tour-play":
+      case "tour-params":
+        return { left: 16, top: 16 };
+      case "tour-viewport":
+        return { left: 16, top: 16 };
+      default:
+        return { right: 16, top: 16 };
+    }
+  }, [activeInteractiveTourTarget]);
   const activeLesson = activeSimulation?.lesson || null;
   const activeLessonStepIndex = Math.min(
     Math.max(Number(workbenchLessonProgress?.[activeSimulationId] ?? 0), 0),
@@ -4495,6 +4694,20 @@ export default function OpenMatStudio() {
     () => displayedSimElements.find((element) => element.id === selectedSimElementId) || null,
     [displayedSimElements, selectedSimElementId],
   );
+  const selectedSimElementPropertySchema = useMemo(
+    () => getSimulationPropertySchema(selectedSimElement),
+    [selectedSimElement],
+  );
+  const selectedSimElementSliderControls = useMemo(
+    () => selectedSimElementPropertySchema
+      .filter((item) => item.slider && item.type === "number")
+      .map((item) => ({
+        ...item,
+        name: `${selectedSimElement?.name || getSimulationRoleMeta(selectedSimElement?.role).label} · ${item.label}`,
+        value: Number(getSimulationPropertyValue(selectedSimElement, item.field) || 0),
+      })),
+    [selectedSimElement, selectedSimElementPropertySchema],
+  );
   const selectedAttachment = useMemo(
     () => getSimElementAttachmentPoints(selectedSimElement).find((point) => point.id === selectedAttachmentId) || null,
     [selectedAttachmentId, selectedSimElement],
@@ -4507,6 +4720,69 @@ export default function OpenMatStudio() {
     () => activeSimulationId === "spring-mass-lab" ? augmentSpringMassFigure(figureJson, customSpringMassModel, C) : figureJson,
     [C, activeSimulationId, customSpringMassModel, figureJson],
   );
+  const runButtonHighlight = getInteractiveTourHighlight("tour-run");
+  const reloadLabHighlight = getInteractiveTourHighlight("tour-reload");
+  const viewportHighlight = getInteractiveTourHighlight("tour-viewport");
+  const selectedControlsHighlight = getInteractiveTourHighlight("tour-params");
+  const markInteractiveTourAction = useCallback((action) => {
+    if (!action) return;
+    setInteractiveTour((current) => {
+      if (!current?.active) return current;
+      return { ...current, lastAction: action };
+    });
+  }, [setInteractiveTour]);
+
+  const closeInteractiveTour = useCallback(() => {
+    setInteractiveTour({
+      active: false,
+      id: "",
+      stepIndex: 0,
+      lastAction: "",
+    });
+  }, [setInteractiveTour]);
+
+  useEffect(() => {
+    if (!interactiveTour?.active || !activeInteractiveTour || activeInteractiveTour.simulationId !== activeSimulationId) return;
+    if (interactiveTour.stepIndex >= activeInteractiveTour.steps.length) return;
+    const stepId = activeInteractiveTourStep?.id;
+    let completed = false;
+    if (stepId === "run-workbench") {
+      completed = controlSpecs.length > 0 && workspaceItems.length > 0;
+    } else if (stepId === "play-animation") {
+      completed = controlSpecs.some((control) => control.type === "animate" && controlPlayback[control.name]?.playing);
+    } else if (stepId === "select-part") {
+      completed = Boolean(selectedSimElementId);
+    } else if (stepId === "edit-part") {
+      completed = interactiveTour.lastAction === "edit-part";
+    } else if (stepId === "reload-lab") {
+      completed = interactiveTour.lastAction === "reload-lab";
+    }
+    if (!completed) return;
+    setInteractiveTour((current) => {
+      if (!current?.active || current.id !== interactiveTour.id) return current;
+      return {
+        ...current,
+        stepIndex: Math.min((current.stepIndex || 0) + 1, activeInteractiveTour.steps.length),
+        lastAction: "",
+      };
+    });
+  }, [
+    activeInteractiveTour,
+    activeInteractiveTourStep,
+    activeSimulationId,
+    controlPlayback,
+    controlSpecs,
+    interactiveTour,
+    selectedSimElementId,
+    setInteractiveTour,
+    workspaceItems.length,
+  ]);
+  useEffect(() => {
+    if (!interactiveTour?.active) return;
+    if (activeInteractiveTourStep?.id !== "edit-part") return;
+    if (simRightTab === "params") return;
+    setSimRightTab("params");
+  }, [activeInteractiveTourStep?.id, interactiveTour?.active, setSimRightTab, simRightTab]);
   const setActiveLessonStep = useCallback((nextIndex) => {
     setWorkbenchLessonProgress((current) => ({
       ...(current && typeof current === "object" ? current : {}),
@@ -4669,19 +4945,41 @@ export default function OpenMatStudio() {
 
   const updateSelectedSimulationElement = useCallback((field, value) => {
     if (!selectedSimElementId) return;
+    const schemaField = selectedSimElementPropertySchema.find((item) => item.field === field);
     updateSimulationElements((items) =>
       items.map((element) => {
         if (element.id !== selectedSimElementId) return element;
-        const numericFields = new Set(["x", "y", "x1", "y1", "x2", "y2", "width", "height", "cx", "cy", "r", "size", "radius", "magnitude", "offset", "density", "stiffness", "damping"]);
-        return { ...element, [field]: numericFields.has(field) ? Number(value) : value };
+        return { ...element, [field]: schemaField?.type === "number" ? Number(value) : value };
       }),
     );
-  }, [selectedSimElementId, updateSimulationElements]);
+    markInteractiveTourAction("edit-part");
+  }, [markInteractiveTourAction, selectedSimElementId, selectedSimElementPropertySchema, updateSimulationElements]);
+
+  const updateSelectedSimulationSliderValue = useCallback((field, nextValue, config) => {
+    const min = Number(config?.min ?? nextValue);
+    const max = Number(config?.max ?? nextValue);
+    const step = Number(config?.step ?? 0);
+    const clamped = clampValue(Number(nextValue), min, max);
+    const snapped = step > 0
+      ? Number((Math.round((clamped - min) / step) * step + min).toFixed(6))
+      : clamped;
+    updateSelectedSimulationElement(field, snapped);
+  }, [updateSelectedSimulationElement]);
 
   const convertSelectedSimulationElement = useCallback((role) => {
     if (!selectedSimElementId) return;
     updateSimulationElements((items) =>
-      items.map((element) => element.id === selectedSimElementId ? { ...element, role, name: role === "mass" ? "Mass" : role === "spring" ? "Spring" : role === "anchor" ? "Anchor" : "Rod" } : element),
+      items.map((element) => element.id === selectedSimElementId ? {
+        ...element,
+        role,
+        name:
+          role === "mass" ? "Mass" :
+          role === "spring" ? "Spring" :
+          role === "anchor" ? "Anchor" :
+          role === "support" ? "Support" :
+          role === "force" ? "Force" :
+          "Rod",
+      } : element),
     );
   }, [selectedSimElementId, updateSimulationElements]);
 
@@ -4896,7 +5194,8 @@ export default function OpenMatStudio() {
     setSimLeftTab("geometry");
     setSimRightTab("properties");
     setOutput(`Reloaded the default ${activeSimulation.title} scene and cleared custom edits to this workbench geometry.`);
-  }, [C, activeSimulation, updateSimulationElements, workspaceItems]);
+    markInteractiveTourAction("reload-lab");
+  }, [C, activeSimulation, markInteractiveTourAction, updateSimulationElements, workspaceItems]);
 
   const openSelectedElementInScratchPad = useCallback((elementId) => {
     if (typeof window === "undefined") return;
@@ -5195,6 +5494,7 @@ export default function OpenMatStudio() {
         controlValues: nextControlValues,
       });
       applyExecutionResult(result, code, nextControlValues, "");
+      markInteractiveTourAction("run-workbench");
     } catch (error) {
       setOutput(`Error: ${error.message}`);
       setFigureJson(null);
@@ -5214,7 +5514,7 @@ export default function OpenMatStudio() {
         outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
-  }, [applyExecutionResult, code, controlValues, setControlPlayback, setControlValues, setWorkspaceTab]);
+  }, [applyExecutionResult, code, controlValues, markInteractiveTourAction, setControlPlayback, setControlValues, setWorkspaceTab]);
 
   useEffect(() => {
     if (pendingAutoRunDocumentIdRef.current !== activeDocumentId) return;
@@ -5324,6 +5624,19 @@ export default function OpenMatStudio() {
     setWorkspaceMode,
     simulationMap,
   ]);
+
+  const startInteractiveTour = useCallback((tourId = "spring-mass-basics") => {
+    const tour = OPENMAT_INTERACTIVE_TOURS[tourId];
+    if (!tour) return;
+    openSimulationWorkspace(tour.simulationId);
+    setSimRightTab("params");
+    setInteractiveTour({
+      active: true,
+      id: tourId,
+      stepIndex: 0,
+      lastAction: "",
+    });
+  }, [openSimulationWorkspace, setInteractiveTour, setSimRightTab]);
 
   const exportWorkspace = useCallback(() => {
     const payload = {
@@ -5729,6 +6042,16 @@ export default function OpenMatStudio() {
         <div className="flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"
+            onClick={() => startInteractiveTour()}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+            title="Launch the interactive OpenMAT getting-started tour"
+          >
+            <Play className="h-3.5 w-3.5" />
+            Start Tour
+          </button>
+          <button
+            type="button"
             onClick={() => setHelpOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
@@ -5803,8 +6126,8 @@ export default function OpenMatStudio() {
               type="button"
               onClick={runCode}
               disabled={running}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)" }}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 ${runButtonHighlight.className}`}
+              style={{ background: "linear-gradient(135deg, #0f8d85, #1769d1)", borderColor: "transparent", ...runButtonHighlight.style }}
             >
               <Play className="h-3.5 w-3.5" />
               {running ? "Running..." : "Run"}
@@ -6146,6 +6469,17 @@ export default function OpenMatStudio() {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
+                    {activeSimulationTour && (
+                      <button
+                        type="button"
+                        onClick={() => startInteractiveTour(activeSimulationTour.id)}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                        style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                        title="Start an interactive tour for this workbench"
+                      >
+                        {interactiveTour?.active && activeInteractiveTour?.id === activeSimulationTour.id ? "Restart Tour" : "Start Tour"}
+                      </button>
+                    )}
                     {surfaceConfig && (
                       <button
                         type="button"
@@ -6159,8 +6493,8 @@ export default function OpenMatStudio() {
                     <button
                       type="button"
                       onClick={revertSimulationScene}
-                      className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
-                      style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${reloadLabHighlight.className}`}
+                      style={{ borderColor: C.border, background: C.surface, color: C.text, ...reloadLabHighlight.style }}
                       title="Restore the default editable scene for this workbench"
                     >
                       Reload Lab
@@ -6177,39 +6511,100 @@ export default function OpenMatStudio() {
                   </div>
                 </div>
               </div>
-              <div className="min-h-0 flex-1 p-3">
-                <OpenMatSimulationViewport
-                  activeSimulation={activeSimulation}
-                  workspaceItems={displayWorkspaceItems}
-                  figureJson={displayFigureJson}
-                  surfaceConfig={surfaceConfig}
-                  plotKind={plotKind}
-                  setPlotKind={setPlotKind}
-                  C={C}
-                  openGrapher={openGrapher}
-                  authoredElements={displayedSimElements}
-                  selectedElementId={selectedSimElementId}
-                  selectedAttachmentId={selectedAttachmentId}
-                  mateSource={pendingMateSource}
-                  onSelectElement={(id) => {
-                    setSelectedSimElementId(id);
-                    setSelectedAttachmentId("");
-                    setPendingMateSource(null);
-                    setSimRightTab("properties");
-                  }}
-                  onDoubleSelectElement={openSelectedElementInScratchPad}
-                  onSelectAttachment={(id) => {
-                    setSelectedAttachmentId(id);
-                    setSimRightTab("properties");
-                  }}
-                  onCompleteMate={completeMateToAttachment}
-                  onDragAttachment={dragSimulationAttachment}
-                  onClearSelection={() => {
-                    setSelectedSimElementId("");
-                    setSelectedAttachmentId("");
-                    setPendingMateSource(null);
-                  }}
-                />
+              <div className="relative min-h-0 flex-1 p-3">
+                {interactiveTour?.active && activeInteractiveTour && activeInteractiveTour.simulationId === activeSimulationId && (
+                  <div
+                    className="pointer-events-auto absolute z-20 w-[340px] rounded-2xl border p-4 shadow-2xl"
+                    style={{
+                      ...interactiveTourOverlayPosition,
+                      borderColor: C.border,
+                      background: "linear-gradient(180deg, rgba(23,105,209,0.18), rgba(8,15,31,0.92))",
+                      backdropFilter: "blur(12px)",
+                    }}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Interactive Tour
+                        </div>
+                        <div className="mt-1 text-sm font-semibold">
+                          {activeInteractiveTour.title}
+                        </div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                          {activeInteractiveTour.subtitle}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold" style={{ background: C.surface, color: C.blue }}>
+                          {interactiveTour.stepIndex >= activeInteractiveTour.steps.length ? "Complete" : `Step ${interactiveTourProgressLabel}`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={closeInteractiveTour}
+                          className="rounded-lg border px-3 py-1.5 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                    {interactiveTour.stepIndex < activeInteractiveTour.steps.length ? (
+                      <div className="mt-3 rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="text-sm font-semibold">{activeInteractiveTourStep?.title}</div>
+                        <div className="mt-1 text-xs leading-6" style={{ color: C.muted }}>
+                          {activeInteractiveTourStep?.body}
+                        </div>
+                        <div className="mt-3 text-[11px]" style={{ color: C.hint }}>
+                          Look for the blinking highlighted control in the real UI. The tour advances automatically when you complete that step.
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-3 rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="text-sm font-semibold">Tour complete</div>
+                        <div className="mt-1 text-xs leading-6" style={{ color: C.muted }}>
+                          You have run the bench, played the motion, selected a part, changed the original model, and restored the default scene. Restart it any time from Start Tour.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div
+                  className={`rounded-[28px] ${viewportHighlight.className}`}
+                  style={viewportHighlight.style}
+                >
+                  <OpenMatSimulationViewport
+                    activeSimulation={activeSimulation}
+                    workspaceItems={displayWorkspaceItems}
+                    figureJson={displayFigureJson}
+                    surfaceConfig={surfaceConfig}
+                    plotKind={plotKind}
+                    setPlotKind={setPlotKind}
+                    C={C}
+                    openGrapher={openGrapher}
+                    authoredElements={displayedSimElements}
+                    selectedElementId={selectedSimElementId}
+                    selectedAttachmentId={selectedAttachmentId}
+                    mateSource={pendingMateSource}
+                    onSelectElement={(id) => {
+                      setSelectedSimElementId(id);
+                      setSelectedAttachmentId("");
+                      setPendingMateSource(null);
+                      setSimRightTab("properties");
+                    }}
+                    onDoubleSelectElement={openSelectedElementInScratchPad}
+                    onSelectAttachment={(id) => {
+                      setSelectedAttachmentId(id);
+                      setSimRightTab("properties");
+                    }}
+                    onCompleteMate={completeMateToAttachment}
+                    onDragAttachment={dragSimulationAttachment}
+                    onClearSelection={() => {
+                      setSelectedSimElementId("");
+                      setSelectedAttachmentId("");
+                      setPendingMateSource(null);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -6250,7 +6645,20 @@ export default function OpenMatStudio() {
                         This workbench is a static analysis setup, so there is no Play button here. Use <span style={{ color: C.text, fontWeight: 700 }}>Run</span> once, then adjust the sliders to refresh the model.
                       </div>
                     )}
-                    {controlSpecs.length ? controlSpecs.map((control) => {
+                    {selectedSimElementSliderControls.length > 0 && (
+                      <div
+                        className={`rounded-2xl border p-4 ${selectedControlsHighlight.className}`}
+                        style={{ borderColor: C.border, background: C.surface, ...selectedControlsHighlight.style }}
+                      >
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Selected Part Controls
+                        </div>
+                        <div className="text-[11px] leading-5" style={{ color: C.muted }}>
+                          Slider-ready properties from the selected simulation object appear here automatically.
+                        </div>
+                      </div>
+                    )}
+                    {controlSpecs.map((control) => {
                       const currentValue = Object.prototype.hasOwnProperty.call(controlValues, control.name)
                         ? Number(controlValues[control.name])
                         : control.value;
@@ -6286,8 +6694,18 @@ export default function OpenMatStudio() {
                               <button
                                 type="button"
                                 onClick={() => toggleAnimatedControl(control.name)}
-                                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold"
-                                style={{ borderColor: controlPlayback[control.name]?.playing ? C.blue : C.border, background: C.surface2, color: controlPlayback[control.name]?.playing ? C.blue : C.text }}
+                                className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-semibold ${activeInteractiveTourTarget === "tour-play" ? "animate-pulse" : ""}`}
+                                style={{
+                                  borderColor: controlPlayback[control.name]?.playing ? C.blue : C.border,
+                                  background: C.surface2,
+                                  color: controlPlayback[control.name]?.playing ? C.blue : C.text,
+                                  ...(activeInteractiveTourTarget === "tour-play"
+                                    ? {
+                                        borderColor: C.blue,
+                                        boxShadow: `0 0 0 2px rgba(99, 184, 255, 0.45), 0 0 28px rgba(99, 184, 255, 0.2)`,
+                                      }
+                                    : {}),
+                                }}
                               >
                                 {controlPlayback[control.name]?.playing ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                                 {controlPlayback[control.name]?.playing ? "Pause" : "Play"}
@@ -6305,7 +6723,40 @@ export default function OpenMatStudio() {
                           )}
                         </div>
                       );
-                    }) : (
+                    })}
+                    {selectedSimElementSliderControls.map((control) => {
+                      const currentValue = Number(getSimulationPropertyValue(selectedSimElement, control.field) || 0);
+                      return (
+                        <div key={`${selectedSimElement?.id}-${control.field}`} className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="font-mono text-sm font-semibold">{control.label}</div>
+                              <div className="text-[11px]" style={{ color: C.muted }}>
+                                {getSimulationRoleMeta(selectedSimElement?.role).label} property
+                              </div>
+                            </div>
+                            <div className="text-xs font-semibold" style={{ color: C.blue }}>
+                              {Number(currentValue).toFixed(3).replace(/\.?0+$/, "")}
+                            </div>
+                          </div>
+                          <input
+                            type="range"
+                            min={control.min}
+                            max={control.max}
+                            step={control.step || 0.01}
+                            value={currentValue}
+                            onChange={(event) => updateSelectedSimulationSliderValue(control.field, event.target.value, control)}
+                            className="w-full accent-sky-500"
+                          />
+                          <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
+                            <span>{control.min}</span>
+                            <span>step {control.step}</span>
+                            <span>{control.max}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {!controlSpecs.length && !selectedSimElementSliderControls.length && (
                       <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
                         Run the current model to populate interactive parameters.
                       </div>
@@ -6487,7 +6938,7 @@ export default function OpenMatStudio() {
                           </div>
 
                           <div className="mb-3 grid gap-2">
-                            {["rod", "spring", "mass", "anchor"].map((role) => {
+                            {["rod", "spring", "mass", "anchor", "support", "force"].map((role) => {
                               const meta = getSimulationRoleMeta(role);
                               return (
                               <OpenMatTooltip key={role} content={`${meta.label}: ${meta.description}`} fullWidth>
@@ -6531,150 +6982,32 @@ export default function OpenMatStudio() {
                           </div>
 
                           <div className="grid gap-2">
-                            <div className="grid gap-1">
-                              <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>Name</label>
-                              <input
-                                value={selectedSimElement.name || ""}
-                                onChange={(event) => updateSelectedSimulationElement("name", event.target.value)}
-                                className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                              />
+                            <div className="grid gap-2 md:grid-cols-2">
+                              {selectedSimElementPropertySchema.map((field) => (
+                                <div
+                                  key={field.field}
+                                  className={field.type === "text" ? "grid gap-1 md:col-span-2" : "grid gap-1"}
+                                >
+                                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                                    {field.label}
+                                  </label>
+                                  <input
+                                    type={field.type === "text" ? "text" : "number"}
+                                    min={field.type === "number" ? field.min : undefined}
+                                    max={field.type === "number" ? field.max : undefined}
+                                    step={field.type === "number" ? field.step : undefined}
+                                    value={getSimulationPropertyValue(selectedSimElement, field.field)}
+                                    onChange={(event) => updateSelectedSimulationElement(field.field, event.target.value)}
+                                    className="rounded-xl border px-3 py-2 text-sm outline-none"
+                                    style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                                  />
+                                </div>
+                              ))}
                             </div>
-
-                            {selectedSimElement.type === "line" && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["x1", "y1", "x2", "y2"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {selectedSimElement.type === "rect" && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["x", "y", "width", "height"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {selectedSimElement.type === "circle" && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["cx", "cy", "r"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {selectedSimElement.type === "point" && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["x", "y"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
 
                             {selectedSimElement.type === "polygon" && (
                               <div className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
                                 Polygon vertices are edited directly in the viewport by dragging attachment points.
-                              </div>
-                            )}
-
-                            {(selectedSimElement.type === "force" || selectedSimElement.type === "dimension") && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["x1", "y1", "x2", "y2"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                                {(selectedSimElement.type === "force" ? ["magnitude", "label"] : ["offset", "label"]).map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type={field === "label" ? "text" : "number"}
-                                      value={selectedSimElement[field] ?? ""}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {(selectedSimElement.type === "support" || selectedSimElement.type === "moment") && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {(selectedSimElement.type === "support" ? ["x", "y", "size"] : ["x", "y", "radius", "magnitude"]).map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field]}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {["line", "rect", "circle", "polygon"].includes(selectedSimElement.type) && (
-                              <div className="grid gap-2 md:grid-cols-2">
-                                {["density", "stiffness", "damping"].map((field) => (
-                                  <div key={field} className="grid gap-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>{field}</label>
-                                    <input
-                                      type="number"
-                                      value={selectedSimElement[field] ?? (field === "density" ? 1 : 0)}
-                                      onChange={(event) => updateSelectedSimulationElement(field, event.target.value)}
-                                      className="rounded-xl border px-3 py-2 text-sm outline-none"
-                                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
-                                    />
-                                  </div>
-                                ))}
                               </div>
                             )}
                           </div>
@@ -6860,13 +7193,23 @@ export default function OpenMatStudio() {
             ].map((tab) => {
               const Icon = tab.icon;
               const active = simRightTab === tab.id;
+              const isTourTarget = tab.id === "params" && activeInteractiveTourTarget === "tour-params";
               return (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setSimRightTab((current) => current === tab.id ? "" : tab.id)}
-                  className="m-2 inline-flex h-10 items-center justify-center rounded-xl border"
-                  style={{ borderColor: active ? C.blue : C.border, background: active ? C.surface2 : C.surface, color: active ? C.blue : C.muted }}
+                  className={`m-2 inline-flex h-10 items-center justify-center rounded-xl border ${isTourTarget ? "animate-pulse" : ""}`}
+                  style={{
+                    borderColor: isTourTarget ? C.blue : active ? C.blue : C.border,
+                    background: active ? C.surface2 : C.surface,
+                    color: active || isTourTarget ? C.blue : C.muted,
+                    ...(isTourTarget
+                      ? {
+                          boxShadow: `0 0 0 2px rgba(99, 184, 255, 0.45), 0 0 28px rgba(99, 184, 255, 0.2)`,
+                        }
+                      : {}),
+                  }}
                   title={tab.label}
                 >
                   <Icon className="h-4 w-4" />
