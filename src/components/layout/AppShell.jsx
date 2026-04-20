@@ -315,6 +315,14 @@ function TopBar({
           OpenMAT
         </NavLink>
         <NavLink
+          to="/arkanoid-learn"
+          className={({ isActive }) =>
+            `text-sm font-bold transition-colors ${isActive ? "text-rose-600 dark:text-rose-400" : "text-slate-800 dark:text-slate-100 hover:text-rose-600"}`
+          }
+        >
+          Arkanoid Learn
+        </NavLink>
+        <NavLink
           to="/logic-sim"
           className={({ isActive }) =>
             `text-sm font-bold transition-colors ${isActive ? "text-violet-600 dark:text-violet-400" : "text-slate-800 dark:text-slate-100 hover:text-violet-600"}`
@@ -617,6 +625,7 @@ export default function AppShell({ children }) {
   const isUniversalCalcRoute = location.pathname.startsWith("/universal-calc");
   const isChemistryRoute = location.pathname.startsWith("/chemistry");
   const isOpenMatRoute = location.pathname.startsWith("/openmat");
+  const isArkanoidLearnRoute = location.pathname.startsWith("/arkanoid-learn");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -802,10 +811,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className="h-screen overflow-hidden bg-white dark:bg-slate-950">
+        <div className={`h-screen overflow-hidden ${isArkanoidLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>

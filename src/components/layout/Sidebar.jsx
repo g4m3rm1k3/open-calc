@@ -156,6 +156,13 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
               >
                 Universal Calc
               </Link>
+              <Link
+                to="/arkanoid-learn"
+                onClick={onNavigate}
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors"
+              >
+                Arkanoid Learn
+              </Link>
               <button
                 onClick={() => { onNavigate(); onSearchOpen?.(); }}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
