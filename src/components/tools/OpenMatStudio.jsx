@@ -1417,6 +1417,18 @@ function buildWorkspaceSnapshot(parser, variables) {
     });
 }
 
+function makeWorkspaceItem(name, value) {
+  const plain = toPlain(value);
+  return {
+    name,
+    className: inferClass(plain),
+    size: inferSize(plain),
+    bytes: estimateBytes(plain),
+    preview: summarizeValue(plain),
+    value: plain,
+  };
+}
+
 function parseFigureJson(figureJson) {
   if (!figureJson) return null;
   try {
@@ -1516,6 +1528,41 @@ function renderOpenMatFigure(figureJson, C, emptyHeight = 180) {
     );
   }
   return <FigureRenderer figureJson={figureJson} C={C} />;
+}
+
+function augmentSpringMassFigure(figureJson, model, C) {
+  if (!model?.active) return figureJson;
+  const parsed = parseFigureJson(figureJson);
+  if (!parsed || parsed.type !== "opencalc_figure") return figureJson;
+  const next = {
+    ...parsed,
+    elements: [
+      ...(parsed.elements || []),
+      {
+        type: "curve",
+        xs: model.tt,
+        ys: model.xx,
+        color: C.purple,
+        width: 2,
+      },
+      {
+        type: "scatter",
+        xs: [model.t],
+        ys: [model.displacement],
+        color: C.red,
+        radius: 4,
+        labels: null,
+      },
+      {
+        type: "text",
+        pos: [parsed.xmin + (parsed.xmax - parsed.xmin) * 0.03, parsed.ymax - (parsed.ymax - parsed.ymin) * 0.08],
+        content: "Assembly response",
+        color: C.purple,
+        size: 11,
+      },
+    ],
+  };
+  return stringifyFigure(next);
 }
 
 function getWorkspaceItemValue(workspaceItems, name, fallback = null) {
@@ -1854,7 +1901,7 @@ function buildGuidedSceneElements(activeSimulation, workspaceItems, C) {
   }
 
   if (activeSimulation.id === "spring-mass-lab") {
-    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "x", 0), 0);
+    const x = toFiniteNumber(getWorkspaceItemValue(workspaceItems, "asm_x", getWorkspaceItemValue(workspaceItems, "x", 0)), 0);
     const massX = 290 + x * 72;
     return [
       { id: "guided-spring-wall", type: "rect", role: "anchor", name: "Wall", x: 45, y: 120, width: 18, height: 100, fill: C.border, source },
@@ -2049,6 +2096,10 @@ function getSimElementAttachmentPoints(element) {
   return [{ id: `${element.id}-point`, label: "Point", x: Number(element.x), y: Number(element.y) }];
 }
 
+function getAttachmentPointById(element, attachmentId) {
+  return getSimElementAttachmentPoints(element).find((point) => point.id === attachmentId) || null;
+}
+
 function polygonMetrics(points) {
   if (!Array.isArray(points) || points.length < 6) return { area: 0, centroidX: 0, centroidY: 0 };
   let signedArea = 0;
@@ -2190,6 +2241,189 @@ function deriveMechanicalModel(elements, constraints = []) {
     },
     workspace,
   };
+}
+
+function deriveConstraintSemantics(elements, constraints = []) {
+  const byId = new Map((elements || []).map((element) => [element.id, element]));
+  const semantics = {
+    fixed: [],
+    springConnections: [],
+    massBodies: [],
+    drivenInputs: [],
+  };
+
+  elements.forEach((element) => {
+    if (!element) return;
+    if (element.role === "mass" && ["rect", "circle", "polygon"].includes(element.type)) {
+      semantics.massBodies.push({ id: element.id, name: element.name || element.id, element });
+    }
+    if (element.role === "anchor" || element.role === "support" || element.type === "support" || element.type === "point") {
+      semantics.fixed.push({ id: element.id, name: element.name || element.id, element });
+    }
+  });
+
+  constraints.forEach((constraint) => {
+    if (!constraint || constraint.type !== "mate") return;
+    const source = byId.get(constraint.sourceElementId);
+    const target = byId.get(constraint.targetElementId);
+    if (!source || !target) return;
+    const sourcePoint = getAttachmentPointById(source, constraint.sourceAttachmentId);
+    const targetPoint = getAttachmentPointById(target, constraint.targetAttachmentId);
+    if (!sourcePoint || !targetPoint) return;
+
+    const sourceFixed = source.role === "anchor" || source.role === "support" || source.type === "support" || source.type === "point";
+    const targetFixed = target.role === "anchor" || target.role === "support" || target.type === "support" || target.type === "point";
+    const sourceMass = source.role === "mass";
+    const targetMass = target.role === "mass";
+    const sourceSpring = source.role === "spring" && source.type === "line";
+    const targetSpring = target.role === "spring" && target.type === "line";
+
+    if (sourceSpring) {
+      semantics.springConnections.push({
+        springElementId: source.id,
+        springAttachmentId: constraint.sourceAttachmentId,
+        counterpartElementId: target.id,
+        counterpartAttachmentId: constraint.targetAttachmentId,
+        kind: targetFixed ? "fixed" : targetMass ? "mass" : "other",
+        springPoint: sourcePoint,
+        counterpartPoint: targetPoint,
+      });
+    }
+    if (targetSpring) {
+      semantics.springConnections.push({
+        springElementId: target.id,
+        springAttachmentId: constraint.targetAttachmentId,
+        counterpartElementId: source.id,
+        counterpartAttachmentId: constraint.sourceAttachmentId,
+        kind: sourceFixed ? "fixed" : sourceMass ? "mass" : "other",
+        springPoint: targetPoint,
+        counterpartPoint: sourcePoint,
+      });
+    }
+  });
+
+  return semantics;
+}
+
+function deriveConstraintDrivenSpringMassModel(elements, constraints = [], workspaceItems = []) {
+  const semantics = deriveConstraintSemantics(elements, constraints);
+  const springs = elements.filter((element) => element?.role === "spring" && element?.type === "line");
+  const masses = elements.filter((element) => element?.role === "mass" && ["rect", "circle", "polygon"].includes(element?.type));
+  const fixedElements = elements.filter((element) => element && (element.role === "anchor" || element.role === "support" || element.type === "support" || element.type === "point"));
+
+  const t = Math.max(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "t", 0), 0), 0);
+  const amplitude = Math.abs(toFiniteNumber(getWorkspaceItemValue(workspaceItems, "A", 0.35), 0.35));
+  const fallbackSpring = springs[0] || null;
+  const fallbackMass = masses[0] || null;
+  const fallbackFixed = fixedElements[0] || null;
+
+  let activeSpring = null;
+  let activeMass = null;
+  let fixedEndpoint = null;
+  let springMassAttachment = null;
+
+  springs.some((spring) => {
+    const links = semantics.springConnections.filter((connection) => connection.springElementId === spring.id);
+    const fixedLink = links.find((connection) => connection.kind === "fixed");
+    const massLink = links.find((connection) => connection.kind === "mass");
+    if (!fixedLink || !massLink) return false;
+    activeSpring = spring;
+    activeMass = elements.find((element) => element.id === massLink.counterpartElementId) || null;
+    fixedEndpoint = fixedLink.counterpartPoint;
+    springMassAttachment = {
+      springAttachmentId: massLink.springAttachmentId,
+      massAttachmentId: massLink.counterpartAttachmentId,
+      massPoint: massLink.counterpartPoint,
+    };
+    return true;
+  });
+
+  if (!activeSpring || !activeMass || !fixedEndpoint || !springMassAttachment?.massPoint) {
+    if (!fallbackSpring || !fallbackMass || !fallbackFixed) {
+      return { active: false, semantics };
+    }
+    activeSpring = fallbackSpring;
+    activeMass = fallbackMass;
+    fixedEndpoint = getSimElementAttachmentPoints(fallbackFixed)[0] || null;
+    springMassAttachment = {
+      springAttachmentId: `${fallbackSpring.id}-end`,
+      massAttachmentId: `${fallbackMass.id}-center`,
+      massPoint: getAttachmentPointById(fallbackMass, `${fallbackMass.id}-center`) || getSimElementAttachmentPoints(fallbackMass)[0] || null,
+    };
+  }
+
+  if (!fixedEndpoint || !springMassAttachment?.massPoint) {
+    return { active: false, semantics };
+  }
+
+  const springLength = Math.hypot(Number(activeSpring.x2) - Number(activeSpring.x1), Number(activeSpring.y2) - Number(activeSpring.y1));
+  const derivedMass = (() => {
+    if (activeMass.type === "rect") return (Number(activeMass.width) * Number(activeMass.height) * Number(activeMass.density ?? 1)) / 9000;
+    if (activeMass.type === "circle") return (Math.PI * Number(activeMass.r) * Number(activeMass.r) * Number(activeMass.density ?? 1)) / 9000;
+    if (activeMass.type === "polygon") return (polygonMetrics(activeMass.points).area * Number(activeMass.density ?? 1)) / 9000;
+    return 1;
+  })();
+
+  const k = Math.max(toFiniteNumber(activeSpring.stiffness, getWorkspaceItemValue(workspaceItems, "k", 3.2)), 0.05);
+  const m = Math.max(toFiniteNumber(activeMass.massValue, getWorkspaceItemValue(workspaceItems, "m", derivedMass)), 0.05);
+  const c = Math.max(toFiniteNumber(activeSpring.damping, getWorkspaceItemValue(workspaceItems, "c", 0.35)), 0);
+  const alpha = c / (2 * m);
+  const omegaN = Math.sqrt(Math.max(k / m, 1e-6));
+  const omegaD = Math.sqrt(Math.max(omegaN * omegaN - alpha * alpha, 1e-6));
+  const dampingRatio = Math.min(alpha / Math.max(omegaN, 1e-6), 5);
+  const displacement = amplitude * Math.exp(-alpha * t) * Math.cos(omegaD * t);
+  const startT = Math.max(0, t - 10);
+  const tt = Array.from({ length: 220 }, (_, index) => startT + ((t - startT) * index) / 219);
+  const xx = tt.map((time) => amplitude * Math.exp(-alpha * time) * Math.cos(omegaD * time));
+  const unitDx = Number(springMassAttachment.massPoint.x) - Number(fixedEndpoint.x);
+  const unitDy = Number(springMassAttachment.massPoint.y) - Number(fixedEndpoint.y);
+  const axisLength = Math.hypot(unitDx, unitDy) || 1;
+  const axis = { x: unitDx / axisLength, y: unitDy / axisLength };
+  const viewportScale = 92 / Math.max(amplitude, 0.35);
+  const offset = {
+    dx: axis.x * displacement * viewportScale,
+    dy: axis.y * displacement * viewportScale,
+  };
+
+  return {
+    active: true,
+    semantics,
+    springElementId: activeSpring.id,
+    massElementId: activeMass.id,
+    displacement,
+    omegaN,
+    omegaD,
+    dampingRatio,
+    springLength,
+    k,
+    m,
+    c,
+    t,
+    tt,
+    xx,
+    offset,
+    massAttachmentId: springMassAttachment.massAttachmentId,
+    springAttachmentId: springMassAttachment.springAttachmentId,
+  };
+}
+
+function applyConstraintDrivenSpringMassPose(elements, model) {
+  if (!model?.active || !Array.isArray(elements) || !elements.length) return elements;
+  return elements.map((element) => {
+    if (element.id === model.massElementId) {
+      return translateSimElement(element, model.offset.dx, model.offset.dy);
+    }
+    if (element.id === model.springElementId && element.type === "line") {
+      const movedMass = elements.find((entry) => entry.id === model.massElementId);
+      const massPoint = movedMass ? getAttachmentPointById(movedMass, model.massAttachmentId) : null;
+      const movedPoint = massPoint ? { x: massPoint.x + model.offset.dx, y: massPoint.y + model.offset.dy } : null;
+      if (!movedPoint) return element;
+      const suffix = model.springAttachmentId.replace(`${element.id}-`, "");
+      if (suffix === "start") return { ...element, x1: movedPoint.x, y1: movedPoint.y };
+      if (suffix === "end") return { ...element, x2: movedPoint.x, y2: movedPoint.y };
+    }
+    return element;
+  });
 }
 
 function updateElementFromAttachmentDrag(element, attachmentId, x, y) {
@@ -3291,7 +3525,7 @@ function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
       <OpenMatPlotWindow
         isOpen={isPlotWindowOpen}
         onClose={() => setIsPlotWindowOpen(false)}
-        figureJson={figureJson}
+        figureJson={displayFigureJson}
         figureMeta={figureMeta}
         C={C}
       />
@@ -4210,6 +4444,10 @@ export default function OpenMatStudio() {
     () => simGeometryStore[activeSimulationId] || [],
     [activeSimulationId, simGeometryStore],
   );
+  const hasInitializedSimGeometry = useMemo(
+    () => Object.prototype.hasOwnProperty.call(simGeometryStore || {}, activeSimulationId),
+    [activeSimulationId, simGeometryStore],
+  );
   const activeConstraints = useMemo(
     () => simConstraintStore[activeSimulationId] || [],
     [activeSimulationId, simConstraintStore],
@@ -4218,9 +4456,44 @@ export default function OpenMatStudio() {
     () => resolveLinkedSimulationElements(authoredSimElements, activeSimulation, workspaceItems, C),
     [C, activeSimulation, authoredSimElements, workspaceItems],
   );
+  const hasCustomSpringMassAssembly = useMemo(
+    () => activeSimulationId === "spring-mass-lab" && (
+      activeConstraints.length > 0 ||
+      liveSimElements.some((element) => element?.source?.kind !== "guided")
+    ),
+    [activeConstraints.length, activeSimulationId, liveSimElements],
+  );
+  const customSpringMassModel = useMemo(
+    () => hasCustomSpringMassAssembly
+      ? deriveConstraintDrivenSpringMassModel(liveSimElements, activeConstraints, workspaceItems)
+      : { active: false, semantics: { fixed: [], springConnections: [], massBodies: [], drivenInputs: [] } },
+    [activeConstraints, hasCustomSpringMassAssembly, liveSimElements, workspaceItems],
+  );
+  const displayedSimElements = useMemo(
+    () => activeSimulationId === "spring-mass-lab"
+      ? applyConstraintDrivenSpringMassPose(liveSimElements, customSpringMassModel)
+      : liveSimElements,
+    [activeSimulationId, customSpringMassModel, liveSimElements],
+  );
+  const generatedWorkspaceItems = useMemo(() => {
+    if (!customSpringMassModel?.active) return [];
+    return [
+      makeWorkspaceItem("asm_k", Number(customSpringMassModel.k.toFixed(4))),
+      makeWorkspaceItem("asm_m", Number(customSpringMassModel.m.toFixed(4))),
+      makeWorkspaceItem("asm_c", Number(customSpringMassModel.c.toFixed(4))),
+      makeWorkspaceItem("asm_omega_n", Number(customSpringMassModel.omegaN.toFixed(4))),
+      makeWorkspaceItem("asm_zeta", Number(customSpringMassModel.dampingRatio.toFixed(4))),
+      makeWorkspaceItem("asm_x", Number(customSpringMassModel.displacement.toFixed(6))),
+    ];
+  }, [customSpringMassModel]);
+  const displayWorkspaceItems = useMemo(() => {
+    if (!generatedWorkspaceItems.length) return workspaceItems;
+    const reserved = new Set(generatedWorkspaceItems.map((item) => item.name));
+    return [...workspaceItems.filter((item) => !reserved.has(item.name)), ...generatedWorkspaceItems];
+  }, [generatedWorkspaceItems, workspaceItems]);
   const selectedSimElement = useMemo(
-    () => liveSimElements.find((element) => element.id === selectedSimElementId) || null,
-    [liveSimElements, selectedSimElementId],
+    () => displayedSimElements.find((element) => element.id === selectedSimElementId) || null,
+    [displayedSimElements, selectedSimElementId],
   );
   const selectedAttachment = useMemo(
     () => getSimElementAttachmentPoints(selectedSimElement).find((point) => point.id === selectedAttachmentId) || null,
@@ -4229,6 +4502,10 @@ export default function OpenMatStudio() {
   const derivedMechanicalModel = useMemo(
     () => deriveMechanicalModel(liveSimElements, activeConstraints),
     [activeConstraints, liveSimElements],
+  );
+  const displayFigureJson = useMemo(
+    () => activeSimulationId === "spring-mass-lab" ? augmentSpringMassFigure(figureJson, customSpringMassModel, C) : figureJson,
+    [C, activeSimulationId, customSpringMassModel, figureJson],
   );
   const setActiveLessonStep = useCallback((nextIndex) => {
     setWorkbenchLessonProgress((current) => ({
@@ -4269,9 +4546,9 @@ export default function OpenMatStudio() {
     {
       id: "results",
       title: "Results",
-      detail: `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
-      lines: workspaceItems.length
-        ? workspaceItems.slice(0, 4).map((item) => `${item.name}: ${item.preview}`)
+      detail: `${displayWorkspaceItems.length} workspace variable${displayWorkspaceItems.length === 1 ? "" : "s"}`,
+      lines: displayWorkspaceItems.length
+        ? displayWorkspaceItems.slice(0, 4).map((item) => `${item.name}: ${item.preview}`)
         : derivedMechanicalModel.workspace.length
           ? derivedMechanicalModel.workspace.slice(0, 4).map((item) => `${item.name}: ${item.value}`)
           : ["No results yet"],
@@ -4285,15 +4562,25 @@ export default function OpenMatStudio() {
         "Promote console experiments back into the script",
       ],
     },
-  ]), [activeConstraints.length, activeSimulation?.title, controlSpecs, derivedMechanicalModel, liveSimElements.length, surfaceConfig, workspaceItems]);
+  ]), [activeConstraints.length, activeSimulation?.title, controlSpecs, derivedMechanicalModel, displayWorkspaceItems, liveSimElements.length, surfaceConfig]);
 
   useEffect(() => {
-    if (!liveSimElements.some((element) => element.id === selectedSimElementId)) {
+    if (!displayedSimElements.some((element) => element.id === selectedSimElementId)) {
       setSelectedSimElementId("");
       setSelectedAttachmentId("");
       setPendingMateSource(null);
     }
-  }, [liveSimElements, selectedSimElementId]);
+  }, [displayedSimElements, selectedSimElementId]);
+
+  useEffect(() => {
+    if (!displayWorkspaceItems.length) {
+      setSelectedVariable(null);
+      return;
+    }
+    setSelectedVariable((current) =>
+      displayWorkspaceItems.find((item) => item.name === current?.name) || current || displayWorkspaceItems[0] || null,
+    );
+  }, [displayWorkspaceItems]);
 
   const updateSimulationElements = useCallback((updater) => {
     setSimGeometryStore((current) => {
@@ -4338,12 +4625,12 @@ export default function OpenMatStudio() {
 
   useEffect(() => {
     if (workspaceMode !== "sim") return;
-    if (authoredSimElements.length > 0) return;
+    if (hasInitializedSimGeometry) return;
     if (!workspaceItems.length) return;
     const guided = buildGuidedSceneElements(activeSimulation, workspaceItems, C);
     if (!guided.length) return;
     updateSimulationElements(() => guided);
-  }, [C, activeSimulation, authoredSimElements.length, updateSimulationElements, workspaceItems, workspaceMode]);
+  }, [C, activeSimulation, hasInitializedSimGeometry, updateSimulationElements, workspaceItems, workspaceMode]);
 
   useEffect(() => {
     if (workspaceMode !== "sim") return;
@@ -4641,7 +4928,7 @@ export default function OpenMatStudio() {
     );
   }, [authoredSimElements, updateSimulationElements]);
   const simulationMetricCards = useMemo(() => {
-    const workspaceCards = workspaceItems
+    const workspaceCards = displayWorkspaceItems
       .filter((item) => typeof item.value === "number" || (Array.isArray(item.value) && item.value.length <= 4))
       .slice(0, 4);
     if (workspaceCards.length) return workspaceCards;
@@ -4675,7 +4962,7 @@ export default function OpenMatStudio() {
         bytes: 0,
       },
     ];
-  }, [derivedMechanicalModel, workspaceItems]);
+  }, [derivedMechanicalModel, displayWorkspaceItems]);
 
   const captureRecoverySnapshot = useCallback((reason) => {
     setRecoverySnapshot(
@@ -4743,10 +5030,10 @@ export default function OpenMatStudio() {
   "Output/API: disp, sprintf, fprintf, num2str, who, whos, clear, clc, window.OpenMAT",
   "Workbench API: listWorkbenches(), getWorkbench(id), openWorkbench(id), exportSession()",
   ];
-  const hasWorkspaceContext = workspaceItems.length > 0;
+  const hasWorkspaceContext = displayWorkspaceItems.length > 0;
   const sessionSummary = [
     `${documents.length} script tab${documents.length === 1 ? "" : "s"}`,
-    `${workspaceItems.length} workspace variable${workspaceItems.length === 1 ? "" : "s"}`,
+    `${displayWorkspaceItems.length} workspace variable${displayWorkspaceItems.length === 1 ? "" : "s"}`,
     `${commandHistory.length} console command${commandHistory.length === 1 ? "" : "s"} saved`,
   ];
   const quickStartGuide = `## Quick start
@@ -5156,7 +5443,7 @@ export default function OpenMatStudio() {
     }
   }, [activeDocumentId, captureRecoverySnapshot, clearRunState, documents, resetWorkspace, setActiveDocumentId, setDocuments]);
 
-  const figureMeta = useMemo(() => extractFigureMeta(figureJson), [figureJson]);
+  const figureMeta = useMemo(() => extractFigureMeta(displayFigureJson), [displayFigureJson]);
 
   useEffect(() => {
     stateRef.current = {
@@ -5165,13 +5452,13 @@ export default function OpenMatStudio() {
       activeDocument,
       code,
       output,
-      workspaceItems,
-      figureJson,
+      workspaceItems: displayWorkspaceItems,
+      figureJson: displayFigureJson,
       recoverySnapshot,
       workspaceMode,
       activeSimulation,
     };
-  }, [activeDocument, activeDocumentId, activeSimulation, code, documents, figureJson, output, recoverySnapshot, workspaceItems, workspaceMode]);
+  }, [activeDocument, activeDocumentId, activeSimulation, code, displayFigureJson, displayWorkspaceItems, documents, output, recoverySnapshot, workspaceMode]);
 
   useEffect(() => {
     const api = {
@@ -5893,14 +6180,14 @@ export default function OpenMatStudio() {
               <div className="min-h-0 flex-1 p-3">
                 <OpenMatSimulationViewport
                   activeSimulation={activeSimulation}
-                  workspaceItems={workspaceItems}
-                  figureJson={figureJson}
+                  workspaceItems={displayWorkspaceItems}
+                  figureJson={displayFigureJson}
                   surfaceConfig={surfaceConfig}
                   plotKind={plotKind}
                   setPlotKind={setPlotKind}
                   C={C}
                   openGrapher={openGrapher}
-                  authoredElements={liveSimElements}
+                  authoredElements={displayedSimElements}
                   selectedElementId={selectedSimElementId}
                   selectedAttachmentId={selectedAttachmentId}
                   mateSource={pendingMateSource}
@@ -6159,7 +6446,7 @@ export default function OpenMatStudio() {
 
                 {simRightTab === "workspace" && (
                   <div className="grid gap-2">
-                    {workspaceItems.length ? workspaceItems.map((item) => (
+                    {displayWorkspaceItems.length ? displayWorkspaceItems.map((item) => (
                       <div key={item.name} className="rounded-2xl border p-3" style={{ borderColor: C.border, background: C.surface }}>
                         <div className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
                           {item.name}
@@ -7026,7 +7313,7 @@ export default function OpenMatStudio() {
                   <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
                     Figure
                   </div>
-                  {figureJson || surfaceConfig ? (
+                  {displayFigureJson || surfaceConfig ? (
                     <>
                       <div className="mb-3 flex flex-wrap gap-2">
                         <button
@@ -7097,9 +7384,9 @@ export default function OpenMatStudio() {
                         <button
                           type="button"
                           onClick={() => setIsPlotWindowOpen(true)}
-                          disabled={!figureJson}
+                          disabled={!displayFigureJson}
                           className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
-                          style={{ borderColor: C.border, background: C.surface2, color: C.text, opacity: figureJson ? 1 : 0.5 }}
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text, opacity: displayFigureJson ? 1 : 0.5 }}
                         >
                           <Maximize2 className="h-3.5 w-3.5" />
                           Full Screen
@@ -7123,7 +7410,7 @@ export default function OpenMatStudio() {
                             onSwitchToJSX={() => openGrapher({ mode: "pro" })}
                           />
                         </div>
-                      ) : renderOpenMatFigure(figureJson, C)}
+                      ) : renderOpenMatFigure(displayFigureJson, C)}
                       {controlSpecs.length > 0 && (
                         <div
                           className="mt-4 rounded-2xl border p-3"
@@ -7429,9 +7716,9 @@ export default function OpenMatStudio() {
                   <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
                     Workspace
                   </div>
-                  {workspaceItems.length ? (
+                  {displayWorkspaceItems.length ? (
                     <div className="space-y-2">
-                      {workspaceItems.map((item) => {
+                      {displayWorkspaceItems.map((item) => {
                         const active = selectedVariable?.name === item.name;
                         return (
                           <button
