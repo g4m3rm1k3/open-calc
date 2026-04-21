@@ -32,6 +32,7 @@ const BALL_SPEED = 430;
 const PREVIEW_STEPS = 720;
 const PREVIEW_DT = 1 / 180;
 const CUSTOM_LEVEL_STORAGE_KEY = "arkanoid-learn-custom-grid";
+const PADDLE_MAX_SPEED = 760;
 
 const BRICK_TYPES = {
   0: { id: 0, label: "Erase", hp: 0, color: "transparent", glow: "transparent" },
@@ -445,6 +446,7 @@ export default function ArkanoidLearn() {
   const lastTimeRef = useRef(0);
   const gameRef = useRef(null);
   const inputRef = useRef({ left: false, right: false });
+  const pointerTargetXRef = useRef(WORLD_W / 2);
 
   const activeLevel = useMemo(
     () => LEVELS.find((level) => level.id === activeLevelId) || LEVELS[0],
@@ -453,6 +455,7 @@ export default function ArkanoidLearn() {
 
   const loadLevel = useCallback((grid, levelId) => {
     gameRef.current = makeLevelState(levelId, grid);
+    pointerTargetXRef.current = WORLD_W / 2;
     setFrame((value) => value + 1);
   }, []);
 
@@ -470,7 +473,11 @@ export default function ArkanoidLearn() {
     if (!bounds || !gameRef.current) return;
     const ratio = WORLD_W / bounds.width;
     const worldX = (clientX - bounds.left) * ratio;
-    gameRef.current.paddleTargetX = clamp(worldX, WALL + PADDLE_W / 2, WORLD_W - WALL - PADDLE_W / 2);
+    pointerTargetXRef.current = clamp(
+      worldX,
+      WALL + PADDLE_W / 2,
+      WORLD_W - WALL - PADDLE_W / 2,
+    );
   }, []);
 
   const launchBall = useCallback(() => {
@@ -529,13 +536,24 @@ export default function ArkanoidLearn() {
       const dt = paused ? 0 : rawDt * (slowMotion ? 0.38 : 1);
 
       if (!paused) {
-        const moveDirection = (inputRef.current.right ? 1 : 0) - (inputRef.current.left ? 1 : 0);
-        if (moveDirection !== 0) {
+        const pointerDelta = pointerTargetXRef.current - game.paddleTargetX;
+        if (Math.abs(pointerDelta) > 0.1) {
+          const pointerStep = Math.sign(pointerDelta) * Math.min(Math.abs(pointerDelta), PADDLE_MAX_SPEED * dt);
           game.paddleTargetX = clamp(
-            game.paddleTargetX + moveDirection * 760 * dt,
+            game.paddleTargetX + pointerStep,
             WALL + PADDLE_W / 2,
             WORLD_W - WALL - PADDLE_W / 2,
           );
+        }
+
+        const moveDirection = (inputRef.current.right ? 1 : 0) - (inputRef.current.left ? 1 : 0);
+        if (moveDirection !== 0) {
+          game.paddleTargetX = clamp(
+            game.paddleTargetX + moveDirection * PADDLE_MAX_SPEED * dt,
+            WALL + PADDLE_W / 2,
+            WORLD_W - WALL - PADDLE_W / 2,
+          );
+          pointerTargetXRef.current = game.paddleTargetX;
         }
       }
 
