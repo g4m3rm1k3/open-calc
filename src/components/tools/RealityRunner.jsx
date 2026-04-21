@@ -129,9 +129,11 @@ function buildLightningPath(x, y1, y2, seed) {
 }
 
 function spawnLightningStrike(game, targetX) {
-  const rodHit = game.obstacles.find(
-    (o) => o.kind === "lightningRod" && Math.abs(o.x + o.w / 2 - targetX) < 90
-  );
+  // Find nearest rod within 500px — tall conductors attract lightning
+  const rods = game.obstacles.filter((o) => o.kind === "lightningRod" && Math.abs(o.x + o.w / 2 - targetX) < 500);
+  const rodHit = rods.length > 0
+    ? rods.reduce((best, o) => Math.abs(o.x + o.w / 2 - targetX) < Math.abs(best.x + best.w / 2 - targetX) ? o : best)
+    : null;
   const boltX = rodHit ? rodHit.x + rodHit.w / 2 : targetX;
   const boltY2 = rodHit ? rodHit.y : GROUND_Y;
   const seed = Math.floor(Math.random() * 999983);
@@ -257,8 +259,11 @@ function createRunState() {
     lightningBolts: [],
     lightningTimer: 4 + Math.random() * 3,
     lightningRodCharges: {},
-    nextSpawnX: SEGMENT_LENGTH * 0.35,
+    flipL: false,
+    flipR: false,
+    nextSpawnX: 320,
     nextSceneSpawnMetric: 420,
+    platformCursor: { x: 280, y: GROUND_Y },
     furthestX: player.x,
     lastDt: PREVIEW_DT,
   };
@@ -275,6 +280,7 @@ function createRunStateFromCheckpoint(checkpoint, unlocks = {}) {
   game.currentRegionIndex = Math.max(0, Math.floor(spawnX / SEGMENT_LENGTH));
   game.furthestX = spawnX;
   game.nextSpawnX = Math.max(SEGMENT_LENGTH * 0.35, spawnX + 240);
+  game.platformCursor = { x: spawnX, y: GROUND_Y };
   game.checkpoint = checkpoint || game.checkpoint;
   game.unlocks = {
     ...game.unlocks,
@@ -302,8 +308,13 @@ function createRunStateForScene(sceneId) {
     crush: scene.id === "pinball",
   };
   // Center player inside the shaft for vertical scenes
-  if (scene.id === "fall" || scene.id === "climb") {
+  if (scene.id === "fall" || scene.id === "climb" || scene.id === "pinball") {
     game.player.x = game.sceneAnchorX;
+  }
+  if (scene.id === "pinball") {
+    game.player.y = 180;
+    game.player.vy = 300;
+    game.player.grounded = false;
   }
   clearSceneScoped(game);
   seedRegionEntry(game, scene, 0);
@@ -375,15 +386,18 @@ function seedRegionEntry(game, scene, regionIndex) {
       (enemy) => !(enemy.entrySeed && enemy.regionIndex === regionIndex),
     );
 
+    const lw = entryX - SHAFT_HALF_W + 26;  // left-wall pad x
+    const rw = entryX + SHAFT_HALF_W - 156; // right-wall pad x
+    // Wide center pad at the very bottom — player at x=entryX will hit this on the way up
     game.obstacles.push(
       {
-        id: `entry-climb-water-${regionIndex}`,
-        kind: "water",
-        x: entryX - SHAFT_HALF_W + 20,
-        y: WORLD_H - CLIMB_WATER_DEPTH,
-        w: SHAFT_HALF_W * 2 - 40,
-        h: CLIMB_WATER_DEPTH - 28,
-        theme: "water",
+        id: `entry-climb-pad-c-${regionIndex}`,
+        kind: "bouncePad",
+        x: entryX - 80,
+        y: WORLD_H - 240,
+        w: 160,
+        h: 18,
+        theme: "wall-pad",
         entrySeed: true,
         regionIndex,
         sceneScoped: true,
@@ -391,8 +405,8 @@ function seedRegionEntry(game, scene, regionIndex) {
       {
         id: `entry-climb-pad-l-${regionIndex}`,
         kind: "bouncePad",
-        x: entryX - SHAFT_HALF_W + 26,
-        y: WORLD_H - 260,
+        x: lw,
+        y: WORLD_H - 430,
         w: 130,
         h: 18,
         theme: "wall-pad",
@@ -403,8 +417,8 @@ function seedRegionEntry(game, scene, regionIndex) {
       {
         id: `entry-climb-pad-r-${regionIndex}`,
         kind: "bouncePad",
-        x: entryX + SHAFT_HALF_W - 156,
-        y: WORLD_H - 430,
+        x: rw,
+        y: WORLD_H - 600,
         w: 130,
         h: 18,
         theme: "wall-pad",
@@ -415,11 +429,38 @@ function seedRegionEntry(game, scene, regionIndex) {
       {
         id: `entry-climb-pad-l2-${regionIndex}`,
         kind: "bouncePad",
-        x: entryX - SHAFT_HALF_W + 26,
-        y: WORLD_H - 600,
+        x: lw,
+        y: WORLD_H - 760,
         w: 130,
         h: 18,
         theme: "wall-pad",
+        entrySeed: true,
+        regionIndex,
+        sceneScoped: true,
+      },
+      // Bounce pad just below the exit portal — player must chain bounces up to reach it
+      {
+        id: `entry-climb-top-pad-${regionIndex}`,
+        kind: "bouncePad",
+        x: entryX - 70,
+        y: 280,
+        w: 140,
+        h: 18,
+        theme: "wall-pad",
+        entrySeed: true,
+        regionIndex,
+        sceneScoped: true,
+      },
+      // Exit portal — float above the top bounce pad, reachable from a solid chain
+      {
+        id: `entry-climb-exit-${regionIndex}`,
+        kind: "portal",
+        target: "side",
+        x: entryX - 60,
+        y: 200,
+        w: 120,
+        h: 24,
+        theme: "portal",
         entrySeed: true,
         regionIndex,
         sceneScoped: true,
@@ -439,70 +480,48 @@ function seedRegionEntry(game, scene, regionIndex) {
   }
 
   if (scene.id === "pinball") {
+    const cx = entryX;
+    // Room walls (solid barriers forming a funnel)
     game.obstacles.push(
-      {
-        id: `entry-pinball-pad-l-${regionIndex}`,
-        kind: "solid",
-        x: entryX - 220,
-        y: WORLD_H - 210,
-        w: 180,
-        h: 22,
-        theme: "flipper",
-        sceneScoped: true,
-      },
-      {
-        id: `entry-pinball-pad-r-${regionIndex}`,
-        kind: "solid",
-        x: entryX + 40,
-        y: WORLD_H - 210,
-        w: 180,
-        h: 22,
-        theme: "flipper",
-        sceneScoped: true,
-      },
-      {
-        id: `entry-pinball-bumper-a-${regionIndex}`,
-        kind: "bouncePad",
-        x: entryX - 80,
-        y: WORLD_H - 470,
-        w: 140,
-        h: 20,
-        theme: "bumper",
-        sceneScoped: true,
-      },
-      {
-        id: `entry-pinball-bumper-b-${regionIndex}`,
-        kind: "bouncePad",
-        x: entryX + 140,
-        y: WORLD_H - 610,
-        w: 120,
-        h: 18,
-        theme: "bumper",
-        sceneScoped: true,
-      },
+      // Left wall angled
+      { id: `pb-lwall-${regionIndex}`, kind: "solid", x: cx - 320, y: 120, w: 22, h: WORLD_H - 300, theme: "block", sceneScoped: true },
+      // Right wall angled
+      { id: `pb-rwall-${regionIndex}`, kind: "solid", x: cx + 298, y: 120, w: 22, h: WORLD_H - 300, theme: "block", sceneScoped: true },
+      // Flippers — static for now, Z/X key handling will tilt them via physics
+      { id: `pb-flip-l-${regionIndex}`, kind: "flipper", side: "left",  x: cx - 200, y: WORLD_H - 160, w: 160, h: 18, theme: "flipper", sceneScoped: true },
+      { id: `pb-flip-r-${regionIndex}`, kind: "flipper", side: "right", x: cx + 40,  y: WORLD_H - 160, w: 160, h: 18, theme: "flipper", sceneScoped: true },
+      // Circular bumpers (high elasticity bounce pads)
+      { id: `pb-bump-a-${regionIndex}`, kind: "bumper", x: cx - 60,  y: 260, r: 36, theme: "bumper", sceneScoped: true },
+      { id: `pb-bump-b-${regionIndex}`, kind: "bumper", x: cx + 110, y: 400, r: 28, theme: "bumper", sceneScoped: true },
+      { id: `pb-bump-c-${regionIndex}`, kind: "bumper", x: cx - 130, y: 480, r: 30, theme: "bumper", sceneScoped: true },
+      { id: `pb-bump-d-${regionIndex}`, kind: "bumper", x: cx + 30,  y: 600, r: 32, theme: "bumper", sceneScoped: true },
+      // Exit portal near the top centre
+      { id: `pb-exit-${regionIndex}`, kind: "portal", target: "side", x: cx - 50, y: 80, w: 100, h: 22, theme: "portal", sceneScoped: true },
     );
-    game.collectibles.push({
-      id: `entry-pinball-energy-${regionIndex}`,
-      type: "energy",
-      x: entryX,
-      y: WORLD_H - 720,
-      r: 18,
-      sceneScoped: true,
-    });
+    game.collectibles.push(
+      { id: `pb-energy-a-${regionIndex}`, type: "energy", x: cx - 40, y: 350, r: 16, sceneScoped: true },
+      { id: `pb-energy-b-${regionIndex}`, type: "energy", x: cx + 80, y: 530, r: 16, sceneScoped: true },
+      { id: `pb-life-${regionIndex}`,     type: "life",   x: cx,      y: 700, r: 16, sceneScoped: true },
+    );
   }
 }
 
 function beginRegionTransition(game, sceneId, anchorX) {
   const scene = sceneById(sceneId);
   game.activeSceneId = scene.id;
-  game.sceneAnchorX = anchorX;
+  // Vertical scenes always center the shaft in the viewport
+  const shaftAnchor = (scene.id === "fall" || scene.id === "climb" || scene.id === "pinball")
+    ? WORLD_W * 0.5
+    : anchorX;
+  game.sceneAnchorX = shaftAnchor;
+  game.portalReturnX = anchorX; // save original world-x to return to
   game.transition = {
     title: `${scene.title} region`,
     subtitle: scene.subtitle,
     ttl: 0.95,
   };
   game.regionGrace = 2.2;
-  game.player.x = anchorX;
+  game.player.x = shaftAnchor;
 
   if (scene.id === "fall") {
     game.player.y = 160;
@@ -516,6 +535,12 @@ function beginRegionTransition(game, sceneId, anchorX) {
     game.player.vy = -320;
     game.player.grounded = false;
     game.reason = "Climb region entered. Bounce upward and stay ahead of the hazard.";
+  } else if (scene.id === "pinball") {
+    game.player.y = 180;
+    game.player.vx = 0;
+    game.player.vy = 300;
+    game.player.grounded = false;
+    game.reason = "Pinball room! Z/X = flippers. mgh converts to kinetic speed as you drop.";
   } else {
     game.player.y = GROUND_Y - game.player.r;
     game.player.vx = Math.max(140, game.player.vx);
@@ -543,6 +568,8 @@ function returnToSideScene(game, reason) {
   game.player.vy = 0;
   game.player.grounded = true;
   game.reason = reason;
+  // Reset platform cursor so the chain continues from where the player re-enters
+  game.platformCursor = { x: game.player.x, y: GROUND_Y };
 }
 
 function makeTutorial(id, title, body) {
@@ -625,132 +652,117 @@ function projectHorizontalInput(mode, input, controlGain, vx, grounded) {
   return input * (controlGain * 760) + passiveDrag;
 }
 
+// Tier heights — player can jump ~148px up with default settings
+const CHAIN_TIERS = [GROUND_Y, GROUND_Y - 120, GROUND_Y - 240, GROUND_Y - 360];
+const MAX_JUMP_H = 148; // max upward reach from a standing jump
+const MAX_GAP_X = 260;  // max safe horizontal gap while airborne
+const MIN_GAP_X = 55;   // minimum gap so platforms don't merge visually
+
+function pickNextTier(prevY) {
+  // Which tiers can the player physically reach from prevY?
+  const reachable = CHAIN_TIERS.filter(ty => ty >= prevY || (prevY - ty) <= MAX_JUMP_H);
+  // Weight: prefer one tier up from current, allow staying or falling, rarely return to ground
+  const weights = reachable.map(ty => {
+    if (ty === GROUND_Y) return prevY === GROUND_Y ? 0.15 : 0.08;
+    if (ty === prevY) return 0.35;
+    if (ty < prevY) return 0.40; // going up is rewarding
+    return 0.17; // falling down
+  });
+  const total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < reachable.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return reachable[i];
+  }
+  return reachable[reachable.length - 1];
+}
+
 function spawnSideChunk(game, baseX) {
-  baseX += 120 + Math.random() * 260;
-  const difficulty = game.difficulty;
-  const roofChance = clamp(0.25 + difficulty * 0.05, 0.25, 0.62);
-  const enemyChance = clamp(0.42 + difficulty * 0.05, 0.35, 0.8);
+  // Ensure cursor exists — fallback to ground at baseX
+  if (!game.platformCursor) game.platformCursor = { x: baseX, y: GROUND_Y };
+  const prev = game.platformCursor;
 
-  const groundObstacle = Math.random();
-  if (groundObstacle < 0.24) {
-    const h = 42 + Math.random() * 120;
+  // ── Next platform position ────────────────────────────────────────────────
+  const nextY = pickNextTier(prev.y);
+  // Tighter gap when going up (less horizontal momentum during ascent)
+  const maxGap = nextY < prev.y ? MAX_GAP_X - 40 : MAX_GAP_X;
+  const nextX = prev.x + MIN_GAP_X + Math.random() * (maxGap - MIN_GAP_X);
+  const pw = 85 + Math.random() * 75;
+  const isBouncePad = nextY < GROUND_Y && Math.random() < 0.26;
+
+  if (nextY < GROUND_Y) {
     game.obstacles.push({
-      id: `obs-${Math.random()}`,
-      kind: "solid",
-      x: baseX,
-      y: GROUND_Y - h,
-      w: 64 + Math.random() * 60,
-      h,
-      theme: "block",
+      id: `plat-${Math.random()}`, kind: isBouncePad ? "bouncePad" : "solid",
+      x: nextX, y: nextY, w: pw, h: 16, theme: isBouncePad ? "pad" : "block",
     });
-  } else if (groundObstacle < 0.48) {
-    const w = 180 + Math.random() * 180;
-    const h = 70 + Math.random() * 120;
-    game.obstacles.push({
-      id: `hill-${Math.random()}`,
-      kind: "hill",
-      x: baseX,
-      y: GROUND_Y - h,
-      w,
-      h,
-      dir: Math.random() < 0.5 ? "up" : "down",
-      theme: "hill",
-    });
-  } else if (groundObstacle < 0.74) {
-    const width = 60 + Math.random() * 70;
-    game.obstacles.push({
-      id: `obs-${Math.random()}`,
-      kind: "spike",
-      x: baseX,
-      y: GROUND_Y - 28,
-      w: width,
-      h: 28,
-      theme: "spike",
-    });
-  } else {
-    game.obstacles.push({
-      id: `obs-${Math.random()}`,
-      kind: "bouncePad",
-      x: baseX,
-      y: GROUND_Y - 18,
-      w: 110,
-      h: 18,
-      theme: "pad",
-    });
+
+    // Collectible above platform
+    if (Math.random() < 0.50) {
+      game.collectibles.push({ id: `c-${Math.random()}`, type: Math.random() < 0.65 ? "energy" : "life", x: nextX + pw * 0.45, y: nextY - 30, r: 15 });
+    }
+
+    // Enemy patrolling the platform
+    if (Math.random() < clamp(0.50 + game.difficulty * 0.04, 0.50, 0.84)) {
+      const archs = [
+        { shape: "circle", behavior: "hover" },
+        { shape: "diamond", behavior: "patrol" },
+        { shape: "square", behavior: "vertical" },
+      ];
+      const a = archs[Math.floor(Math.random() * archs.length)];
+      game.enemies.push({ id: `en-${Math.random()}`, shape: a.shape, behavior: a.behavior, x: nextX + pw * 0.5 + (Math.random() - 0.5) * 50, y: nextY - 36, vx: -(40 + Math.random() * 80), vy: 0, r: 18 + Math.random() * 8, phase: Math.random() * Math.PI * 2, amplitude: 20 + Math.random() * 30, amplitudeY: 14 + Math.random() * 24 });
+    }
+
+    // Portal ON the platform — always reachable because player is already here
+    if (Math.random() < 0.09 && baseX > (game.checkpoint?.x ?? 0) + 500) {
+      const target = Math.random() < 0.5 ? "fall" : "climb";
+      game.obstacles.push({ id: `portal-${Math.random()}`, kind: "portal", target, x: nextX + pw * 0.1, y: nextY - 28, w: 100, h: 22, theme: "portal" });
+    }
   }
 
-  if (Math.random() < roofChance) {
-    const h = 44 + Math.random() * 100;
-    game.obstacles.push({
-      id: `roof-${Math.random()}`,
-      kind: "roof",
-      x: baseX + 120,
-      y: 90,
-      w: 90 + Math.random() * 80,
-      h,
-      theme: "roof",
-    });
+  // ── Ground hazard in the corridor between prev and next platform ──────────
+  const hzX = prev.x + 10;
+  const hzW = nextX - prev.x - 20;
+  if (hzW > 70) {
+    const roll = Math.random();
+    if (roll < 0.22) {
+      game.obstacles.push({ id: `spike-${Math.random()}`, kind: "spike", x: hzX, y: GROUND_Y - 28, w: clamp(hzW * 0.6, 40, 100), h: 28, theme: "spike" });
+    } else if (roll < 0.42) {
+      const hw = clamp(hzW * 0.75, 80, 220), hh = 50 + Math.random() * 70;
+      game.obstacles.push({ id: `hill-${Math.random()}`, kind: "hill", x: hzX, y: GROUND_Y - hh, w: hw, h: hh, dir: Math.random() < 0.5 ? "up" : "down", theme: "hill" });
+    } else if (roll < 0.57) {
+      game.obstacles.push({ id: `gpad-${Math.random()}`, kind: "bouncePad", x: hzX + Math.random() * Math.max(0, hzW - 90), y: GROUND_Y - 18, w: 90, h: 18, theme: "pad" });
+    } else if (roll < 0.73) {
+      // Water — hop platforms spaced evenly above it
+      const ww = clamp(hzW * 0.85, 140, 320);
+      game.obstacles.push({ id: `water-${Math.random()}`, kind: "water", x: hzX, y: GROUND_Y - 36, w: ww, h: 52, theme: "water" });
+      const nHops = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < nHops; i++) {
+        const hpw = 65 + Math.random() * 35;
+        const hpx = hzX + (ww / nHops) * i + 8;
+        game.obstacles.push({ id: `wplat-${Math.random()}`, kind: "solid", x: hpx, y: GROUND_Y - 128, w: hpw, h: 16, theme: "block" });
+      }
+      game.collectibles.push({ id: `wpick-${Math.random()}`, type: "energy", x: hzX + ww / 2, y: GROUND_Y - 158, r: 15 });
+    } else {
+      // Pitfall — hop platforms bridge the gap, or fall to free-fall shaft
+      const pitW = clamp(hzW * 0.75, 140, 300);
+      game.obstacles.push({ id: `pitfall-${Math.random()}`, kind: "pitfall", x: hzX, y: GROUND_Y, w: pitW, h: 140 });
+      const np = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < np; i++) {
+        const px = hzX + (pitW / np) * i + 10;
+        const py = GROUND_Y - 108 - Math.random() * 28;
+        game.obstacles.push({ id: `pitplat-${Math.random()}`, kind: "solid", x: px, y: py, w: 70 + Math.random() * 40, h: 16, theme: "block" });
+        if (i === 1) game.collectibles.push({ id: `pitpick-${Math.random()}`, type: Math.random() < 0.6 ? "energy" : "life", x: px + 35, y: py - 28, r: 15 });
+      }
+    }
   }
 
-  if (Math.random() < enemyChance) {
-    const archetypes = [
-      { shape: "circle", behavior: "hover" },
-      { shape: "diamond", behavior: "patrol" },
-      { shape: "square", behavior: "vertical" },
-    ];
-    const archetype = archetypes[Math.floor(Math.random() * archetypes.length)];
-    game.enemies.push({
-      id: `enemy-${Math.random()}`,
-      shape: archetype.shape,
-      x: baseX + 100 + Math.random() * 120,
-      y: GROUND_Y - 70 - Math.random() * 140,
-      vx: -(40 + Math.random() * 90),
-      vy: 0,
-      r: 18 + Math.random() * 9,
-      phase: Math.random() * Math.PI * 2,
-      amplitude: 24 + Math.random() * 40,
-      amplitudeY: 18 + Math.random() * 30,
-      behavior: archetype.behavior,
-    });
+  // ── Lightning rod ─────────────────────────────────────────────────────────
+  if (Math.random() < 0.16 && hzW > 40) {
+    game.obstacles.push({ id: `rod-${Math.random()}`, kind: "lightningRod", x: hzX + Math.random() * Math.max(1, hzW - 20), y: GROUND_Y - 100, w: 14, h: 100, theme: "rod" });
   }
 
-  // Collectibles at reachable height (max ~140px above ground with default jump)
-  if (Math.random() < 0.22) {
-    game.collectibles.push({
-      id: `pickup-${Math.random()}`,
-      type: Math.random() < 0.65 ? "energy" : "life",
-      x: baseX + 140 + Math.random() * 180,
-      y: GROUND_Y - 70 - Math.random() * 100,
-      r: 15,
-    });
-  }
-
-  // Lightning rod: tall conductor on the ground that attracts real lightning strikes
-  if (Math.random() < 0.15) {
-    game.obstacles.push({
-      id: `rod-${Math.random()}`,
-      kind: "lightningRod",
-      x: baseX + 60 + Math.random() * 200,
-      y: GROUND_Y - 90,
-      w: 14,
-      h: 90,
-      theme: "rod",
-    });
-  }
-
-  if (Math.random() < 0.12 && baseX > game.checkpoint.x + 600) {
-    const floorPortal = Math.random() < 0.5;
-    game.obstacles.push({
-      id: `portal-${Math.random()}`,
-      kind: "portal",
-      target: floorPortal ? "fall" : "climb",
-      x: baseX + 120,
-      y: floorPortal ? GROUND_Y - 24 : 104,
-      w: 120,
-      h: 24,
-      theme: "portal",
-    });
-  }
+  // ── Advance cursor to right edge of the new platform ─────────────────────
+  game.platformCursor = { x: nextX + pw, y: nextY };
 }
 
 function spawnFallChunk(game, baseX) {
@@ -818,35 +830,41 @@ function spawnFallChunk(game, baseX) {
 }
 
 function spawnClimbChunk(game, baseX) {
-  const baseY = 160 + Math.random() * 520;
+  const anchorX = game.sceneAnchorX;
+  const lw = anchorX - SHAFT_HALF_W + 26;
+  const rw = anchorX + SHAFT_HALF_W - 156;
   const difficulty = game.difficulty;
-  const platformX = baseX + 120 + Math.random() * 700;
+  // Alternate left/right pads so player zigzags upward through the shaft
+  const useLeft = Math.random() < 0.5;
+  const padX = useLeft ? lw : rw;
+  const baseY = 120 + Math.random() * 560;
 
   game.obstacles.push({
-    id: `ledge-${Math.random()}`,
-    kind: "solid",
-    x: platformX,
+    id: `pad-${Math.random()}`,
+    kind: "bouncePad",
+    x: padX,
     y: baseY,
-    w: 160 + Math.random() * 120,
-    h: 22,
-    theme: "ledge",
+    w: 130 + Math.random() * 30,
+    h: 18,
+    theme: "wall-pad",
     sceneScoped: true,
   });
 
-  if (Math.random() < 0.52 + difficulty * 0.04) {
+  // Occasional solid ledge mid-shaft to rest on
+  if (Math.random() < 0.3) {
     game.obstacles.push({
-      id: `pad-${Math.random()}`,
-      kind: "bouncePad",
-      x: clamp(platformX + (Math.random() * 160 - 40), 80, WORLD_W - 200),
-      y: baseY - 90,
-      w: 120,
-      h: 16,
-      theme: "pad",
+      id: `ledge-${Math.random()}`,
+      kind: "solid",
+      x: anchorX - 55,
+      y: baseY - 180,
+      w: 110,
+      h: 18,
+      theme: "ledge",
       sceneScoped: true,
     });
   }
 
-  if (Math.random() < 0.48 + difficulty * 0.05) {
+  if (Math.random() < 0.45 + difficulty * 0.05) {
     const archetypes = [
       { shape: "diamond", behavior: "hover" },
       { shape: "pentagon", behavior: "swoop" },
@@ -856,14 +874,14 @@ function spawnClimbChunk(game, baseX) {
     game.enemies.push({
       id: `enemy-${Math.random()}`,
       shape: archetype.shape,
-      x: baseX + 160 + Math.random() * 760,
-      y: baseY - 50,
-      vx: (Math.random() < 0.5 ? -1 : 1) * (70 + Math.random() * 100),
+      x: anchorX + (Math.random() < 0.5 ? -1 : 1) * (40 + Math.random() * 140),
+      y: baseY - 60,
+      vx: (Math.random() < 0.5 ? -1 : 1) * (60 + Math.random() * 80),
       vy: 0,
       r: 18 + Math.random() * 10,
       phase: Math.random() * Math.PI * 2,
       amplitude: 18 + Math.random() * 32,
-      amplitudeY: 22 + Math.random() * 44,
+      amplitudeY: 20 + Math.random() * 40,
       behavior: archetype.behavior,
       sceneScoped: true,
     });
@@ -872,11 +890,10 @@ function spawnClimbChunk(game, baseX) {
   game.collectibles.push({
     id: `climb-energy-${Math.random()}`,
     type: "energy",
-    x: baseX + 120 + Math.random() * 560,
-    y: 120 + Math.random() * 140,
+    x: anchorX + (Math.random() < 0.5 ? -1 : 1) * (20 + Math.random() * 80),
+    y: baseY - 120,
     r: 16,
     sceneScoped: true,
-    lightningRod: true,
   });
 }
 
@@ -1097,9 +1114,16 @@ function moveWorldForScene(game, dt) {
 
 function resolveObstacleCollision(game, obstacle, params, superGravity) {
   const player = game.player;
+  // These are purely visual/logical — no physical collision
+  if (obstacle.kind === "pitfall" || obstacle.kind === "lightningRod") return false;
   if (obstacle.kind === "portal") {
     if (!rectCircleIntersect({ x: player.x, y: player.y, r: player.r }, obstacle)) return false;
-    if (game.activeSceneId === "side") {
+    if (obstacle.target === "side") {
+      // Return portal from fall/climb back to side scroll
+      returnToSideScene(game, "Portal reached — you escaped the shaft!");
+      game.score += 280;
+      game.energy = Math.min(100, game.energy + 20);
+    } else if (game.activeSceneId === "side") {
       game.portalReturnX = obstacle.x;
       beginRegionTransition(game, obstacle.target, obstacle.x + obstacle.w * 0.5);
     }
@@ -1146,6 +1170,37 @@ function resolveObstacleCollision(game, obstacle, params, superGravity) {
     return true;
   }
 
+  // Circular bumper — radial bounce with high restitution
+  if (obstacle.kind === "bumper") {
+    const dx = player.x - obstacle.x;
+    const dy = player.y - obstacle.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > player.r + obstacle.r) return false;
+    const nx = dx / (dist || 1);
+    const ny = dy / (dist || 1);
+    const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+    const bounceSpeed = Math.max(520, speed * 1.35);
+    player.vx = nx * bounceSpeed;
+    player.vy = ny * bounceSpeed;
+    player.x = obstacle.x + nx * (player.r + obstacle.r + 2);
+    player.y = obstacle.y + ny * (player.r + obstacle.r + 2);
+    game.score += 30;
+    game.reason = `Bumper! Impulse J = Δp — elastic collision with a fixed mass.`;
+    return true;
+  }
+
+  if (obstacle.kind === "flipper") {
+    if (!rectCircleIntersect({ x: player.x, y: player.y, r: player.r }, obstacle)) return false;
+    const flipActive = obstacle.side === "left" ? game.flipL : game.flipR;
+    const upKick = flipActive ? -820 : -280;
+    player.vy = upKick;
+    player.vx += obstacle.side === "left" ? 280 : -280;
+    player.y = obstacle.y - player.r;
+    game.score += 15;
+    game.reason = `Flipper! τ = Iα — angular acceleration becomes linear launch.`;
+    return true;
+  }
+
   if (!rectCircleIntersect({ x: player.x, y: player.y, r: player.r }, obstacle)) return false;
 
   const fromTop = player.y < obstacle.y + obstacle.h / 2 && player.vy >= 0;
@@ -1161,11 +1216,14 @@ function resolveObstacleCollision(game, obstacle, params, superGravity) {
 
   if (obstacle.kind === "bouncePad") {
     if (fromTop || fromBottom) {
-      const bounceStrength = Math.max(250, Math.abs(player.vy) * Math.max(0.35, params.elasticity) + params.jumpSpeed * 0.55);
-      player.vy = fromTop ? -bounceStrength : bounceStrength * 0.5;
+      const bounceStrength = Math.max(280, Math.abs(player.vy) * Math.max(0.35, params.elasticity) + params.jumpSpeed * 0.55);
+      // In climb the player hits pads from below going UP — they should be boosted further upward.
+      // In all other scenes hitting from below means the pad deflects you back down.
+      const climbBoost = game.activeSceneId === "climb" && fromBottom;
+      player.vy = (fromTop || climbBoost) ? -bounceStrength : bounceStrength * 0.5;
       player.y = fromTop ? obstacle.y - player.r : obstacle.y + obstacle.h + player.r;
       player.grounded = false;
-      game.reason = `Bounce pad returned energy with e = ${formatNumber(params.elasticity, 2)}`;
+      game.reason = `Bounce pad! e = ${formatNumber(params.elasticity, 2)} — v_after/v_before`;
       return true;
     }
   }
@@ -1264,7 +1322,18 @@ function updateRun(game, params, input, dt) {
 
   if (scene.id === "side") {
     if (player.y >= GROUND_Y - player.r) {
-      if (Math.abs(player.vy) > 120 && params.elasticity > 0.08) {
+      // Check if player is over a pitfall — if so let them fall into free-fall
+      const overPit = game.obstacles.some(
+        (o) => o.kind === "pitfall" && player.x > o.x && player.x < o.x + o.w,
+      );
+      if (overPit) {
+        if (player.y > GROUND_Y + 160) {
+          beginRegionTransition(game, "fall", player.x);
+          game.reason = "Fell into the gap — free fall begins! KE = ½mv² — all that falling speed becomes momentum.";
+          return;
+        }
+        // just keep falling
+      } else if (Math.abs(player.vy) > 120 && params.elasticity > 0.08) {
         player.y = GROUND_Y - player.r;
         player.vy = -Math.abs(player.vy) * params.elasticity;
         game.reason = "Floor bounce. More elasticity keeps you lively.";
@@ -1280,13 +1349,38 @@ function updateRun(game, params, input, dt) {
       player.vy = Math.abs(player.vy) * 0.22;
       game.reason = "You scraped the roof. Gravity and jump speed are fighting each other.";
     }
+  } else if (scene.id === "pinball") {
+    // Bounce off side walls of the pinball room
+    if (player.x <= shaftLeft + player.r + 1) {
+      player.vx = Math.abs(player.vx) * Math.max(0.6, params.elasticity);
+    }
+    if (player.x >= shaftRight - player.r - 1) {
+      player.vx = -Math.abs(player.vx) * Math.max(0.6, params.elasticity);
+    }
+    // Ceiling bounce
+    if (player.y <= 80 + player.r) {
+      player.y = 80 + player.r;
+      player.vy = Math.abs(player.vy) * 0.7;
+    }
+    // Fall through bottom → return to side scroll (drain!)
+    if (player.y > WORLD_H - 30) {
+      returnToSideScene(game, "Ball drained — back to the run. In pinball, potential energy (mgh) becomes kinetic speed when the ball drops.");
+      game.energy = Math.max(0, game.energy - 20);
+      return;
+    }
+    // Space = both flippers simultaneously
+    if (input.jumpQueued) {
+      game.flipL = true;
+      game.flipR = true;
+      setTimeout(() => { game.flipL = false; game.flipR = false; }, 120);
+    }
   } else if (scene.id === "fall") {
     if (player.x <= shaftLeft + player.r + 1 || player.x >= shaftRight - player.r - 1) {
       player.vx *= -Math.max(0.2, params.elasticity);
       game.reason = "Shaft wall rebound.";
     }
-    if (game.runMode === "main" && player.y > WORLD_H - 70) {
-      returnToSideScene(game, "Free-fall portal complete. Bonus route cleared.");
+    if (player.y > WORLD_H - 70) {
+      returnToSideScene(game, "Free-fall complete — you threaded the shaft. KE = ½mv²: all that speed converts back to horizontal momentum.");
       game.score += 220;
       game.energy = Math.min(100, game.energy + 18);
       return;
@@ -1296,8 +1390,18 @@ function updateRun(game, params, input, dt) {
       player.vx *= -Math.max(0.2, params.elasticity);
       game.reason = "Wall rebound. Keep the climb controlled.";
     }
-    if (game.runMode === "main" && player.y < 70) {
-      returnToSideScene(game, "Climb portal complete. You made it back to the side run.");
+    // Danger floor at the bottom of the shaft — big bounce back up, costs energy
+    if (player.y >= WORLD_H - 80) {
+      player.y = WORLD_H - 80 - player.r;
+      player.vy = -Math.max(300, Math.abs(player.vy) * Math.max(0.5, params.elasticity));
+      player.grounded = false;
+      if (game.invulnerable <= 0) {
+        game.energy = Math.max(0, game.energy - 12);
+        game.reason = "Hit the danger floor! Bounce pads build potential energy — use them to climb.";
+      }
+    }
+    if (player.y < 70) {
+      returnToSideScene(game, "Climb complete — gravitational PE = mgh. You converted bounce-pad energy into height and escaped.");
       game.score += 260;
       game.energy = Math.min(100, game.energy + 24);
       return;
@@ -1389,7 +1493,7 @@ function updateRun(game, params, input, dt) {
     const spawnLead = WORLD_W * 1.4;
     while (game.nextSpawnX < game.player.x + spawnLead) {
       spawnSceneContent(game, game.nextSpawnX);
-      game.nextSpawnX += 420 + Math.random() * 180;
+      game.nextSpawnX += 260 + Math.random() * 100;
     }
   } else if (game.runMode === "scene_test" && scene.id === "fall") {
     while (game.nextSceneSpawnMetric < game.player.y + WORLD_H * 1.25) {
@@ -1420,13 +1524,24 @@ function updateRun(game, params, input, dt) {
   maybeUnlockProgress(game);
   maybeUpdateCheckpoint(game);
 
-  // Real-time lightning strikes
+  // Real-time lightning strikes — 40% target the nearest visible rod (tall conductors attract)
   game.lightningTimer -= dt;
   if (game.lightningTimer <= 0) {
-    const strikeSide = Math.random() < 0.55;
-    const tx = strikeSide
-      ? player.x + 80 + Math.random() * 400
-      : player.x - 80 - Math.random() * 300;
+    let tx;
+    if (Math.random() < 0.4) {
+      const visibleRods = game.obstacles.filter(
+        (o) => o.kind === "lightningRod" && o.x > player.x - 200 && o.x < player.x + WORLD_W,
+      );
+      if (visibleRods.length > 0) {
+        const rod = visibleRods[Math.floor(Math.random() * visibleRods.length)];
+        tx = rod.x + rod.w / 2;
+      }
+    }
+    if (!tx) {
+      tx = Math.random() < 0.55
+        ? player.x + 80 + Math.random() * 400
+        : player.x - 80 - Math.random() * 300;
+    }
     spawnLightningStrike(game, tx);
     game.lightningTimer = 3 + Math.random() * 5;
   }
@@ -1605,6 +1720,16 @@ export default function RealityRunner() {
 
   useEffect(() => {
     const onKeyDown = (event) => {
+      // Space / Enter always dismiss the Euler tutorial modal first
+      if (event.code === "Space" || event.key === "Enter") {
+        const game = gameRef.current;
+        if (game && game.tutorial) {
+          event.preventDefault();
+          game.tutorial = null;
+          setFrame((v) => v + 1);
+          return;
+        }
+      }
       if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
         event.preventDefault();
         inputRef.current.left = true;
@@ -1624,6 +1749,8 @@ export default function RealityRunner() {
         event.preventDefault();
         inputRef.current.shootQueued = true;
       }
+      if (event.key === "z" || event.key === "Z") { if (gameRef.current) gameRef.current.flipL = true; }
+      if (event.key === "x" || event.key === "X") { if (gameRef.current) gameRef.current.flipR = true; }
       if (event.key === "r" || event.key === "R") {
         event.preventDefault();
         resetRun();
@@ -1637,6 +1764,8 @@ export default function RealityRunner() {
       if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
         inputRef.current.right = false;
       }
+      if (event.key === "z" || event.key === "Z") { if (gameRef.current) gameRef.current.flipL = false; }
+      if (event.key === "x" || event.key === "X") { if (gameRef.current) gameRef.current.flipR = false; }
       if (event.key === "Shift") {
         inputRef.current.superGravity = false;
       }
@@ -1873,27 +2002,6 @@ export default function RealityRunner() {
             </div>
 
             <div className="mb-6 rounded-3xl border border-slate-800 bg-slate-950/60 p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Start In</div>
-              <div className="mt-3 grid gap-2">
-                {[
-                  ["side", "Main Run"],
-                  ["fall", "Free Fall Test"],
-                  ["climb", "Climb Test"],
-                  ["pinball", "Pinball Door"],
-                ].map(([id, label]) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => startSceneRun(id)}
-                    className="rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-left text-sm font-semibold text-slate-200 transition hover:border-cyan-400/40 hover:text-white"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-6 rounded-3xl border border-slate-800 bg-slate-950/60 p-4">
               <div className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Reality Controls</div>
               <div className="mt-3 space-y-4">
                 <label className="block">
@@ -2071,12 +2179,35 @@ export default function RealityRunner() {
                         </g>
                       );
                     })}
-                    {scene.id === "side" && (
-                      <>
-                        <rect x={cameraX - 80} y={GROUND_Y} width={WORLD_W + 160} height={WORLD_H - GROUND_Y + 60} fill="rgba(51,65,85,0.82)" />
-                        <rect x={cameraX - 80} y={74} width={WORLD_W + 160} height="18" fill="rgba(24,34,52,0.85)" />
-                      </>
-                    )}
+                    {scene.id === "side" && (() => {
+                      // Render ground with dark pit gaps where pitfall obstacles are
+                      const pits = game.obstacles.filter((o) => o.kind === "pitfall");
+                      const groundLeft = cameraX - 80;
+                      const groundRight = cameraX + WORLD_W + 80;
+                      // Build segments between pits
+                      const segments = [];
+                      let cursor = groundLeft;
+                      const sortedPits = [...pits].sort((a, b) => a.x - b.x);
+                      for (const pit of sortedPits) {
+                        if (pit.x > cursor && pit.x < groundRight) {
+                          segments.push({ x: cursor, w: pit.x - cursor });
+                        }
+                        cursor = Math.max(cursor, pit.x + pit.w);
+                      }
+                      if (cursor < groundRight) segments.push({ x: cursor, w: groundRight - cursor });
+                      return (
+                        <>
+                          {segments.map((seg, si) => (
+                            <rect key={si} x={seg.x} y={GROUND_Y} width={seg.w} height={WORLD_H - GROUND_Y + 60} fill="rgba(51,65,85,0.82)" />
+                          ))}
+                          {/* Pit openings — void below */}
+                          {sortedPits.map((pit) => (
+                            <rect key={pit.id} x={pit.x} y={GROUND_Y} width={pit.w} height={WORLD_H - GROUND_Y + 60} fill="rgba(2,4,12,0.97)" />
+                          ))}
+                          <rect x={groundLeft} y={74} width={WORLD_W + 160} height="18" fill="rgba(24,34,52,0.85)" />
+                        </>
+                      );
+                    })()}
                     {scene.id === "fall" && (
                       <>
                         <rect x={sceneCenterX - SHAFT_HALF_W - 24} y={cameraY - 120} width={SHAFT_HALF_W * 2 + 48} height={WORLD_H + 240} rx="36" fill="rgba(2,6,23,0.44)" stroke="rgba(96,165,250,0.22)" strokeWidth="2" />
@@ -2120,26 +2251,26 @@ export default function RealityRunner() {
                             </text>
                           </>
                         )}
-                        <rect x={sceneCenterX - SHAFT_HALF_W + 24} y={cameraY + WORLD_H - CLIMB_WATER_DEPTH} width={SHAFT_HALF_W * 2 - 48} height={CLIMB_WATER_DEPTH - 32} rx="28" fill="rgba(56,189,248,0.16)" stroke="rgba(103,232,249,0.28)" strokeWidth="2" />
-                        {/* Animated water waves — sin wave surface, use this momentum to escape */}
-                        {(() => {
-                          const t = Date.now() / 420;
-                          const wy = cameraY + WORLD_H - CLIMB_WATER_DEPTH + 18;
-                          const wx0 = sceneCenterX - SHAFT_HALF_W + 32;
-                          const wx1 = sceneCenterX + SHAFT_HALF_W - 32;
-                          const ww = wx1 - wx0;
-                          const pts = Array.from({ length: 16 }, (_, i) => {
-                            const rx = wx0 + (ww * i) / 15;
-                            const ry = wy + Math.sin(t + (i / 15) * Math.PI * 3) * 14;
-                            return `${rx.toFixed(1)},${ry.toFixed(1)}`;
-                          }).join(" ");
-                          return (
-                            <polyline points={pts} fill="none" stroke="rgba(125,211,252,0.95)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                          );
-                        })()}
+                        {/* Soft floor glow at the bottom of the shaft */}
+                        <rect x={sceneCenterX - SHAFT_HALF_W + 24} y={cameraY + WORLD_H - 80} width={SHAFT_HALF_W * 2 - 48} height={60} rx="12" fill="rgba(239,68,68,0.18)" stroke="rgba(252,165,165,0.35)" strokeWidth="2" />
+                        <text x={sceneCenterX} y={cameraY + WORLD_H - 30} textAnchor="middle" fill="#fca5a5" fontSize="12" fontWeight="700">danger zone</text>
                         <ellipse cx={sceneCenterX} cy={cameraY + 120} rx="86" ry="28" fill="rgba(167,139,250,0.16)" stroke="#c4b5fd" strokeWidth="3" />
                         <ellipse cx={sceneCenterX} cy={cameraY + 120} rx="60" ry="18" fill="rgba(2,6,23,0.9)" />
                       </>
+                    )}
+                    {scene.id === "pinball" && (
+                      // 2.5D perspective overlay — skew gives the slanted table feel
+                      <g transform={`skewY(-8) translate(0, 40)`}>
+                        {/* Table outline */}
+                        <rect x={sceneCenterX - SHAFT_HALF_W - 20} y={80} width={SHAFT_HALF_W * 2 + 40} height={WORLD_H - 100} rx="18" fill="none" stroke="rgba(251,191,36,0.35)" strokeWidth="3" strokeDasharray="8 6" />
+                        {/* Cannon at top right — decorative, teaches projectile launch */}
+                        <rect x={sceneCenterX + SHAFT_HALF_W - 60} y={88} width={50} height={28} rx="8" fill="rgba(100,116,139,0.9)" stroke="#94a3b8" strokeWidth="2" />
+                        <text x={sceneCenterX + SHAFT_HALF_W - 35} y={107} textAnchor="middle" fill="#e2e8f0" fontSize="11" fontWeight="700">CANNON</text>
+                        {/* Score target hint */}
+                        <text x={sceneCenterX} y={WORLD_H - 20} textAnchor="middle" fill="rgba(251,191,36,0.7)" fontSize="13" fontWeight="700">
+                          Z = left flipper · X = right flipper · Space = both · Fall = drain
+                        </text>
+                      </g>
                     )}
 
                     {showPreview && previewPoints.length > 1 && (
@@ -2191,15 +2322,36 @@ export default function RealityRunner() {
                       );
                     }
                     if (obstacle.kind === "portal") {
-                      const portalColor = obstacle.target === "fall" ? "#67e8f9" : "#c4b5fd";
-                      const innerColor = obstacle.target === "fall" ? "rgba(34,211,238,0.14)" : "rgba(167,139,250,0.18)";
+                      const portalColor = obstacle.target === "fall" ? "#67e8f9" : obstacle.target === "climb" ? "#c4b5fd" : "#4ade80";
+                      const innerColor = obstacle.target === "fall" ? "rgba(34,211,238,0.14)" : obstacle.target === "climb" ? "rgba(167,139,250,0.18)" : "rgba(74,222,128,0.14)";
+                      const label = obstacle.target === "fall" ? "FREE FALL" : obstacle.target === "climb" ? "CLIMB" : "EXIT ↑";
                       return (
                         <g key={obstacle.id} filter="url(#rr-glow)">
                           <rect x={obstacle.x} y={obstacle.y} width={obstacle.w} height={obstacle.h} rx="12" fill={innerColor} stroke={portalColor} strokeWidth="3" />
                           <ellipse cx={obstacle.x + obstacle.w / 2} cy={obstacle.y + obstacle.h / 2} rx={obstacle.w * 0.32} ry={obstacle.h * 0.28} fill="rgba(2,6,23,0.92)" stroke={portalColor} strokeWidth="2" />
-                          <text x={obstacle.x + obstacle.w / 2} y={obstacle.y - 10} textAnchor="middle" fill={portalColor} fontSize="12" fontWeight="700">
-                            {obstacle.target === "fall" ? "FREE FALL" : "CLIMB"}
+                          <text x={obstacle.x + obstacle.w / 2} y={obstacle.y - 8} textAnchor="middle" fill={portalColor} fontSize="12" fontWeight="700">
+                            {label}
                           </text>
+                        </g>
+                      );
+                    }
+                    if (obstacle.kind === "bumper") {
+                      return (
+                        <g key={obstacle.id} filter="url(#rr-glow)">
+                          <circle cx={obstacle.x} cy={obstacle.y} r={obstacle.r + 6} fill="rgba(251,191,36,0.12)" />
+                          <circle cx={obstacle.x} cy={obstacle.y} r={obstacle.r} fill="rgba(251,191,36,0.82)" stroke="#fde68a" strokeWidth="3" />
+                          <text x={obstacle.x} y={obstacle.y + 5} textAnchor="middle" fill="#08101b" fontSize="14" fontWeight="900">●</text>
+                        </g>
+                      );
+                    }
+                    if (obstacle.kind === "flipper") {
+                      const active = obstacle.side === "left" ? game.flipL : game.flipR;
+                      const tilt = obstacle.side === "left" ? (active ? -28 : 12) : (active ? 28 : -12);
+                      const cx2 = obstacle.x + obstacle.w / 2;
+                      const cy2 = obstacle.y + obstacle.h / 2;
+                      return (
+                        <g key={obstacle.id} transform={`rotate(${tilt}, ${cx2}, ${cy2})`}>
+                          <rect x={obstacle.x} y={obstacle.y} width={obstacle.w} height={obstacle.h} rx="9" fill={active ? "rgba(251,191,36,0.9)" : "rgba(148,163,184,0.72)"} stroke={active ? "#fde68a" : "#94a3b8"} strokeWidth="2" />
                         </g>
                       );
                     }
@@ -2207,7 +2359,15 @@ export default function RealityRunner() {
                       return (
                         <g key={obstacle.id}>
                           <rect x={obstacle.x} y={obstacle.y} width={obstacle.w} height={obstacle.h} rx="24" fill="rgba(56,189,248,0.14)" stroke="rgba(103,232,249,0.3)" strokeWidth="2" />
-                          <path d={`M${obstacle.x + 10},${obstacle.y + 18} C${obstacle.x + obstacle.w * 0.22},${obstacle.y - 4} ${obstacle.x + obstacle.w * 0.5},${obstacle.y + 34} ${obstacle.x + obstacle.w - 10},${obstacle.y + 14}`} fill="none" stroke="rgba(125,211,252,0.95)" strokeWidth="4" strokeLinecap="round" />
+                          {(() => {
+                            const t = Date.now() / 420;
+                            const pts = Array.from({ length: 10 }, (_, i) => {
+                              const rx = obstacle.x + 8 + ((obstacle.w - 16) * i) / 9;
+                              const ry = obstacle.y + 12 + Math.sin(t + (i / 9) * Math.PI * 2.5) * 8;
+                              return `${rx.toFixed(1)},${ry.toFixed(1)}`;
+                            }).join(" ");
+                            return <polyline points={pts} fill="none" stroke="rgba(125,211,252,0.95)" strokeWidth="3" strokeLinecap="round" />;
+                          })()}
                         </g>
                       );
                     }
@@ -2452,7 +2612,9 @@ export default function RealityRunner() {
                     <div>Left / Right steer motion</div>
                     <div>Space jumps or launches a rebound</div>
                     <div>Shift activates super gravity {game.unlocks.crush ? "" : "(locked)"}</div>
-                    <div>F or Fire Bolt shoots {game.unlocks.blaster ? "" : "(locked until Euler teaches it)"}</div>
+                    <div>F — fire bolt {game.unlocks.blaster ? "" : "(locked)"}</div>
+                    <div>Z / X — left / right pinball flipper</div>
+                    <div>Space / Enter — dismiss Euler modal</div>
                     <div>Floor portals enter free fall. Ceiling portals enter climb.</div>
                     {game.regionGrace > 0 && (
                       <div className="font-semibold text-cyan-200">Region grace: {formatNumber(game.regionGrace, 1)}s</div>
