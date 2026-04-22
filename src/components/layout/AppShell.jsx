@@ -322,14 +322,7 @@ function TopBar({
         >
           Arkanoid Learn
         </NavLink>
-        <NavLink
-          to="/reality-runner"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-100 hover:text-emerald-600"}`
-          }
-        >
-          Reality Runner
-        </NavLink>
+        {/* Reality Runner hidden until physics fixed */}
         <NavLink
           to="/logic-sim"
           className={({ isActive }) =>

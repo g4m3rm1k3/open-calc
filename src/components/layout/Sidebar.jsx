@@ -163,13 +163,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
               >
                 Arkanoid Learn
               </Link>
-              <Link
-                to="/reality-runner"
-                onClick={onNavigate}
-                className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-              >
-                Reality Runner
-              </Link>
+              {/* Reality Runner hidden until physics fixed */}
               <button
                 onClick={() => { onNavigate(); onSearchOpen?.(); }}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"

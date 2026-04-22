@@ -32,6 +32,7 @@
     "mathjs": "^15.1.1",
     "matter-js": "^0.20.0",
     "monaco-editor": "^0.55.1",
+    "phaser": "^4.0.0",
     "pyodide": "^0.29.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
