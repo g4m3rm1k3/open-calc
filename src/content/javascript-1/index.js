@@ -4,6 +4,8 @@ import lesson0_2 from './lesson0-2.js'
 import lesson0_3 from './lesson0-3.js'
 import lesson1_1 from './lesson1-1.js'
 import lesson1_2 from './lesson1-2.js'
+import lesson2_1 from './lesson2-1.js'
+import lesson2_2 from './lesson2-2.js'
 
 const J1 = {
   title: 'JavaScript Core Foundations',
@@ -31,4 +33,16 @@ const J2 = {
   ],
 };
 
-export default [J1, J2];
+const J3 = {
+  title: 'Functions and Closures',
+  number: 'js2.1',
+  slug: 'functions-and-closures',
+  description: 'Declarations, expressions, arrow functions, hoisting, scope, and closure-based state.',
+  course: 'javascript-core',
+  lessons: [
+    lesson2_1,
+    lesson2_2
+  ],
+};
+
+export default [J1, J2, J3];
