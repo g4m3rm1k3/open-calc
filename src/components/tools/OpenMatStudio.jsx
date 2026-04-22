@@ -665,6 +665,235 @@ const OPENMAT_INTERACTIVE_TOURS = {
   },
 };
 
+const WORKBENCH_ENRICHMENTS = {
+  "pendulum-lab": {
+    startHere: [
+      "Run the default pendulum once before changing anything.",
+      "Change only length or gravity first so period changes are easy to read.",
+      "Use the workspace to connect theta, x, and y back to the motion.",
+    ],
+    units: {
+      system: "SI-like teaching units",
+      controls: { L: "m", g: "m/s^2", theta0: "rad", t: "s" },
+      results: { theta: "rad", x: "m", y: "m" },
+    },
+    materials: [
+      { id: "earth-lab", label: "Earth baseline", description: "Classroom pendulum under Earth gravity.", controlOverrides: { L: 1.2, g: 9.8, theta0: 0.75 } },
+      { id: "moon-lab", label: "Moon gravity", description: "Same pendulum with slower motion under lunar gravity.", controlOverrides: { L: 1.2, g: 1.62, theta0: 0.75 } },
+    ],
+    solver: {
+      title: "Closed-form small-angle model",
+      detail: "Browser-side symbolic/numeric run using a small-angle pendulum approximation.",
+      assumptions: [
+        "Massless rod and point mass bob.",
+        "Small-angle behavior is the intended regime.",
+        "No air drag, bearing friction, or large-angle nonlinear correction.",
+      ],
+      outputs: ["theta(t)", "bob x/y position", "linked viewport + plot response"],
+    },
+    benchmarks: [
+      {
+        id: "small-angle-earth",
+        title: "Small-angle Earth check",
+        description: "Verify the default Earth pendulum stays in a realistic teaching range.",
+        controlOverrides: { L: 1.0, g: 9.8, theta0: 0.2, t: 0 },
+        workspaceExpectations: [
+          { name: "g", expected: 9.8, tolerance: 0.01, label: "gravity" },
+          { name: "L", expected: 1.0, tolerance: 0.001, label: "length" },
+        ],
+      },
+    ],
+  },
+  "spring-mass-lab": {
+    startHere: [
+      "Run once, then press Play so you can compare the motion and the plot.",
+      "Change damping before stiffness so the envelope change is obvious.",
+      "Select the mass or spring only after you understand the stock lab.",
+    ],
+    units: {
+      system: "Normalized teaching units",
+      controls: { A: "m", k: "N/m", m: "kg", c: "N*s/m", t: "s" },
+      results: { alpha: "1/s", omega: "rad/s", x: "m", asm_k: "N/m", asm_m: "kg", asm_c: "N*s/m", asm_omega_n: "rad/s", asm_zeta: "-", asm_x: "m" },
+    },
+    materials: [
+      { id: "light-damped", label: "Light damping", description: "Oscillatory lab with a long visible envelope.", controlOverrides: { A: 1.1, k: 3.2, m: 1.4, c: 0.35 } },
+      { id: "heavy-damped", label: "Heavy damping", description: "Faster settling with suppressed oscillation.", controlOverrides: { A: 1.1, k: 3.2, m: 1.4, c: 1.4 } },
+    ],
+    solver: {
+      title: "Single-DOF damped oscillator",
+      detail: "Closed-form underdamped response built from the current slider values or assembled scene values.",
+      assumptions: [
+        "Single dominant mass and linear spring/damper behavior.",
+        "No geometric nonlinearity or multi-body contact.",
+        "Assembly-derived spring-mass uses equivalent lumped parameters.",
+      ],
+      outputs: ["alpha", "omega", "x(t)", "assembly-derived omega_n and zeta when custom geometry is active"],
+    },
+    benchmarks: [
+      {
+        id: "baseline-oscillator",
+        title: "Baseline oscillator check",
+        description: "Compare the default oscillator against its expected natural frequency.",
+        controlOverrides: { A: 1.1, k: 3.2, m: 1.4, c: 0.35, t: 0 },
+        workspaceExpectations: [
+          { name: "omega", expected: Math.sqrt(Math.max(3.2 / 1.4 - (0.35 / (2 * 1.4)) ** 2, 0.001)), tolerance: 0.01, label: "damped natural frequency" },
+        ],
+      },
+    ],
+  },
+  "projectile-lab": {
+    startHere: [
+      "Run the default launch and read the arc before changing controls.",
+      "Change angle before speed if you want intuition, speed before angle if you want reach.",
+      "Use the workspace to compare range and peak with what the arc looks like.",
+    ],
+    units: {
+      system: "SI-like kinematics units",
+      controls: { v0: "m/s", angle: "rad", g: "m/s^2", t: "s" },
+      results: { vx: "m/s", vy: "m/s", px: "m", py: "m", range: "m", peak: "m", flight: "s" },
+    },
+    materials: [
+      { id: "classroom-throw", label: "Classroom throw", description: "Moderate launch under Earth gravity.", controlOverrides: { v0: 22, angle: 0.85, g: 9.8 } },
+      { id: "lunar-throw", label: "Low gravity throw", description: "Longer range under Moon gravity.", controlOverrides: { v0: 22, angle: 0.85, g: 1.62 } },
+    ],
+    solver: {
+      title: "Ballistic closed-form solver",
+      detail: "Analytical projectile kinematics with no drag, spin, or lift.",
+      assumptions: [
+        "Point mass projectile.",
+        "Uniform downward gravity only.",
+        "No air resistance, Magnus force, or terrain interaction.",
+      ],
+      outputs: ["range", "peak", "flight time", "current point on arc"],
+    },
+    benchmarks: [
+      {
+        id: "fortyfive-degree",
+        title: "45 degree range check",
+        description: "Classical drag-free benchmark under Earth gravity.",
+        controlOverrides: { v0: 20, angle: Math.PI / 4, g: 9.8, t: 0 },
+        workspaceExpectations: [
+          { name: "range", expected: (20 ** 2 * Math.sin(Math.PI / 2)) / 9.8, tolerance: 0.01, label: "range" },
+          { name: "peak", expected: ((20 * Math.sin(Math.PI / 4)) ** 2) / (2 * 9.8), tolerance: 0.01, label: "peak height" },
+        ],
+      },
+    ],
+  },
+  "merchant-lab": {
+    startHere: [
+      "Run the default circle and learn which force is Fc, Ft, and R.",
+      "Change friction angle before feed force so the geometry shift is easy to see.",
+      "Use the workspace to connect mu and R to the drawn circle.",
+    ],
+    units: {
+      system: "Machining force study units",
+      controls: { rake: "deg", friction: "deg", shear: "deg", cut: "N", feed: "N" },
+      results: { Fc: "N", Ft: "N", R: "N", Fs: "N", Fn: "N", mu: "-" },
+    },
+    materials: [
+      { id: "aluminum-cut", label: "Aluminum-like cut", description: "Lower force, lower friction reference case.", controlOverrides: { rake: 12, friction: 20, shear: 24, cut: 120, feed: 60 } },
+      { id: "steel-cut", label: "Steel-like cut", description: "Higher force and friction reference case.", controlOverrides: { rake: 8, friction: 32, shear: 20, cut: 220, feed: 110 } },
+    ],
+    solver: {
+      title: "Merchant circle force decomposition",
+      detail: "Direct closed-form force geometry from user-entered rake, friction, and shear angles.",
+      assumptions: [
+        "Orthogonal cutting abstraction.",
+        "Steady-state force decomposition, not transient chip segmentation.",
+        "No tool wear or thermal softening model.",
+      ],
+      outputs: ["Fc", "Ft", "R", "Fs", "Fn", "mu"],
+    },
+    benchmarks: [
+      {
+        id: "merchant-default",
+        title: "Default force-circle check",
+        description: "Validate resultant force magnitude against the input force components.",
+        controlOverrides: { rake: 10, friction: 28, shear: 22, cut: 180, feed: 90 },
+        workspaceExpectations: [
+          { name: "R", expected: Math.sqrt(180 ** 2 + 90 ** 2), tolerance: 0.01, label: "resultant force" },
+          { name: "mu", expected: Math.tan(28 * Math.PI / 180), tolerance: 0.001, label: "friction coefficient" },
+        ],
+      },
+    ],
+  },
+  "beam-lab": {
+    startHere: [
+      "Run the stock cantilever before changing geometry.",
+      "Change beam height before force so stiffness sensitivity is obvious.",
+      "Use the workspace for I, delta, sigma, and strain before editing parts.",
+    ],
+    units: {
+      system: "SI structural units",
+      controls: { L: "m", F: "N", b: "m", h: "m", E_GPa: "GPa" },
+      results: { E: "Pa", I: "m^4", delta: "m", sigma: "Pa", strain: "-", x: "m", y: "m" },
+    },
+    materials: [
+      { id: "al6061", label: "Al 6061-T6", description: "Light, lower stiffness benchmark material.", controlOverrides: { E_GPa: 69 } },
+      { id: "steel", label: "Structural steel", description: "Higher stiffness reference material.", controlOverrides: { E_GPa: 200 } },
+    ],
+    solver: {
+      title: "Euler-Bernoulli cantilever beam",
+      detail: "Closed-form end-loaded cantilever response using section stiffness and elastic modulus.",
+      assumptions: [
+        "Small deflection elastic behavior.",
+        "Prismatic rectangular cross-section.",
+        "Single end load with no shear deformation correction.",
+      ],
+      outputs: ["section inertia I", "tip deflection delta", "max stress sigma", "strain"],
+    },
+    benchmarks: [
+      {
+        id: "beam-default",
+        title: "Cantilever closed-form check",
+        description: "Compare the stock beam against the closed-form cantilever equations.",
+        controlOverrides: { L: 1.6, F: 320, b: 0.06, h: 0.12, E_GPa: 69 },
+        workspaceExpectations: [
+          { name: "delta", expected: (320 * 1.6 ** 3) / (3 * (69e9) * ((0.06 * 0.12 ** 3) / 12)), tolerance: 1e-9, label: "tip deflection" },
+          { name: "sigma", expected: (320 * 1.6 * (0.12 / 2)) / ((0.06 * 0.12 ** 3) / 12), tolerance: 1, label: "max bending stress" },
+        ],
+      },
+    ],
+  },
+  "chatter-lab": {
+    startHere: [
+      "Run the default tool first and read natural frequency before touching RPM.",
+      "Change stickout before spindle speed so the stiffness tradeoff is obvious.",
+      "Use the workspace for k_tip, f_n, tooth_hz, and chatter_ratio.",
+    ],
+    units: {
+      system: "SI machining vibration units",
+      controls: { L: "m", d_mm: "mm", E_GPa: "GPa", rho: "kg/m^3", F: "N", rpm: "rev/min", teeth: "count" },
+      results: { d: "m", I: "m^4", A: "m^2", m_eff: "kg", k_tip: "N/m", delta: "m", f_n: "Hz", tooth_hz: "Hz", chatter_ratio: "-" },
+    },
+    materials: [
+      { id: "steel-tool", label: "Steel tool", description: "Dense high-stiffness reference tool.", controlOverrides: { E_GPa: 210, rho: 7850 } },
+      { id: "carbide-tool", label: "Carbide-like tool", description: "Stiffer tool with higher natural frequency.", controlOverrides: { E_GPa: 600, rho: 15000 } },
+    ],
+    solver: {
+      title: "Lumped beam + tooth-pass estimate",
+      detail: "Static cantilever stiffness plus lumped effective mass and tooth-pass excitation comparison.",
+      assumptions: [
+        "Uniform cylindrical shank approximation.",
+        "Single dominant bending mode.",
+        "Chatter risk shown as a screening ratio, not a full stability lobe solution.",
+      ],
+      outputs: ["k_tip", "delta", "f_n", "tooth_hz", "chatter_ratio"],
+    },
+    benchmarks: [
+      {
+        id: "tool-default",
+        title: "Tool dynamics check",
+        description: "Validate the default tool's tooth-pass frequency and static deflection calculations.",
+        controlOverrides: { L: 0.09, d_mm: 12, E_GPa: 210, rho: 7850, F: 180, rpm: 12000, teeth: 4 },
+        workspaceExpectations: [
+          { name: "tooth_hz", expected: 12000 * 4 / 60, tolerance: 0.001, label: "tooth-pass frequency" },
+        ],
+      },
+    ],
+  },
+};
+
 const HELP_TEXT = [
   "Supported MATLAB-like syntax:",
   "",
@@ -2674,32 +2903,32 @@ function getSimulationRoleMeta(role) {
 
 const SIMULATION_TYPE_PROPERTY_SCHEMAS = {
   line: [
-    { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
   ],
   rect: [
-    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "width", label: "width", type: "number", min: 4, max: 800, step: 1, slider: true },
-    { field: "height", label: "height", type: "number", min: 4, max: 800, step: 1, slider: true },
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "width", label: "width", type: "number", min: 4, max: 800, step: 1, slider: true, unit: "scene px" },
+    { field: "height", label: "height", type: "number", min: 4, max: 800, step: 1, slider: true, unit: "scene px" },
   ],
   circle: [
-    { field: "cx", label: "cx", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "cy", label: "cy", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "r", label: "radius", type: "number", min: 2, max: 240, step: 1, slider: true },
+    { field: "cx", label: "cx", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "cy", label: "cy", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "r", label: "radius", type: "number", min: 2, max: 240, step: 1, slider: true, unit: "scene px" },
   ],
   point: [
-    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
+    { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
+    { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1, unit: "scene px" },
   ],
   force: [
     { field: "x1", label: "x1", type: "number", min: -600, max: 1200, step: 1 },
     { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
     { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
     { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true, unit: "N" },
     { field: "label", label: "label", type: "text" },
   ],
   dimension: [
@@ -2707,51 +2936,51 @@ const SIMULATION_TYPE_PROPERTY_SCHEMAS = {
     { field: "y1", label: "y1", type: "number", min: -600, max: 1200, step: 1 },
     { field: "x2", label: "x2", type: "number", min: -600, max: 1200, step: 1 },
     { field: "y2", label: "y2", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "offset", label: "offset", type: "number", min: -200, max: 200, step: 1, slider: true },
+    { field: "offset", label: "offset", type: "number", min: -200, max: 200, step: 1, slider: true, unit: "scene px" },
     { field: "label", label: "label", type: "text" },
   ],
   support: [
     { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
     { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "size", label: "size", type: "number", min: 8, max: 240, step: 1, slider: true },
+    { field: "size", label: "size", type: "number", min: 8, max: 240, step: 1, slider: true, unit: "scene px" },
   ],
   moment: [
     { field: "x", label: "x", type: "number", min: -600, max: 1200, step: 1 },
     { field: "y", label: "y", type: "number", min: -600, max: 1200, step: 1 },
-    { field: "radius", label: "radius", type: "number", min: 8, max: 240, step: 1, slider: true },
-    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+    { field: "radius", label: "radius", type: "number", min: 8, max: 240, step: 1, slider: true, unit: "scene px" },
+    { field: "magnitude", label: "magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true, unit: "N*m" },
   ],
 };
 
 const SIMULATION_ROLE_PROPERTY_SCHEMAS = {
   anchor: [
-    { field: "stiffness", label: "support stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
-    { field: "damping", label: "support damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
+    { field: "stiffness", label: "support stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true, unit: "N/m" },
+    { field: "damping", label: "support damping", type: "number", min: 0, max: 2000, step: 1, slider: true, unit: "N*s/m" },
   ],
   rod: [
-    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true },
-    { field: "stiffness", label: "axial stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
-    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
-    { field: "youngsModulus", label: "Young's modulus", type: "number", min: 0, max: 400000000000, step: 1000000000 },
-    { field: "area", label: "area", type: "number", min: 0, max: 10000, step: 1 },
+    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true, unit: "kg/m^3" },
+    { field: "stiffness", label: "axial stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true, unit: "N/m" },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true, unit: "N*s/m" },
+    { field: "youngsModulus", label: "Young's modulus", type: "number", min: 0, max: 400000000000, step: 1000000000, unit: "Pa" },
+    { field: "area", label: "area", type: "number", min: 0, max: 10000, step: 1, unit: "m^2" },
   ],
   spring: [
-    { field: "stiffness", label: "spring constant", type: "number", min: 0, max: 50000, step: 10, slider: true },
-    { field: "damping", label: "damping", type: "number", min: 0, max: 5000, step: 1, slider: true },
-    { field: "restLength", label: "rest length", type: "number", min: 0, max: 800, step: 1, slider: true },
+    { field: "stiffness", label: "spring constant", type: "number", min: 0, max: 50000, step: 10, slider: true, unit: "N/m" },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 5000, step: 1, slider: true, unit: "N*s/m" },
+    { field: "restLength", label: "rest length", type: "number", min: 0, max: 800, step: 1, slider: true, unit: "scene px" },
   ],
   mass: [
-    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true },
-    { field: "massValue", label: "mass", type: "number", min: 0, max: 10000, step: 0.1, slider: true },
-    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true },
-    { field: "centerOfMassOffset", label: "center of mass offset", type: "number", min: -200, max: 200, step: 1 },
+    { field: "density", label: "density", type: "number", min: 0, max: 20000, step: 10, slider: true, unit: "kg/m^3" },
+    { field: "massValue", label: "mass", type: "number", min: 0, max: 10000, step: 0.1, slider: true, unit: "kg" },
+    { field: "damping", label: "damping", type: "number", min: 0, max: 2000, step: 1, slider: true, unit: "N*s/m" },
+    { field: "centerOfMassOffset", label: "center of mass offset", type: "number", min: -200, max: 200, step: 1, unit: "scene px" },
   ],
   support: [
-    { field: "size", label: "support size", type: "number", min: 8, max: 240, step: 1, slider: true },
-    { field: "stiffness", label: "reaction stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true },
+    { field: "size", label: "support size", type: "number", min: 8, max: 240, step: 1, slider: true, unit: "scene px" },
+    { field: "stiffness", label: "reaction stiffness", type: "number", min: 0, max: 50000, step: 10, slider: true, unit: "N/m" },
   ],
   force: [
-    { field: "magnitude", label: "load magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true },
+    { field: "magnitude", label: "load magnitude", type: "number", min: -5000, max: 5000, step: 1, slider: true, unit: "N" },
   ],
 };
 
@@ -2786,6 +3015,39 @@ function getSimulationQuickStart(activeSimulation, hasAnimatedControls) {
     "Double-click a part to open a ScratchPad copy for shape editing, then Send to OpenMAT to bring the edited shape back.",
     "Use Reload Lab to restore the default editable scene, and Refresh Model when you want to recalculate without losing your scene edits.",
   ];
+}
+
+function getWorkbenchEnrichment(simulationId) {
+  return WORKBENCH_ENRICHMENTS[simulationId] || null;
+}
+
+function formatUnit(unit) {
+  return unit ? ` (${unit})` : "";
+}
+
+function getControlUnit(enrichment, controlName) {
+  return enrichment?.units?.controls?.[controlName] || "";
+}
+
+function getWorkspaceUnit(enrichment, name) {
+  return enrichment?.units?.results?.[name] || "";
+}
+
+function getPropertyFieldUnit(field) {
+  return field?.unit || "";
+}
+
+function extractNumericValue(value) {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (Array.isArray(value) && value.length === 1) {
+    return extractNumericValue(value[0]);
+  }
+  return null;
+}
+
+function findWorkspaceValue(items, name) {
+  const item = (items || []).find((entry) => entry?.name === name);
+  return item ? extractNumericValue(item.value) : null;
 }
 
 function simulationElementsEqual(a, b) {
@@ -4526,6 +4788,10 @@ export default function OpenMatStudio() {
     lastAction: "",
   });
   const [commandHistory, setCommandHistory] = useLocalStorage("openmat-command-history", []);
+  const [workbenchPresetStore, setWorkbenchPresetStore] = useLocalStorage("openmat-workbench-presets", {});
+  const [parameterStudyStore, setParameterStudyStore] = useLocalStorage("openmat-parameter-study-store", {});
+  const [benchmarkResults, setBenchmarkResults] = useState([]);
+  const [parameterStudyResults, setParameterStudyResults] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
   const [isResizingSimCenter, setIsResizingSimCenter] = useState(false);
@@ -4634,6 +4900,10 @@ export default function OpenMatStudio() {
     }
   }, [activeInteractiveTourTarget]);
   const activeLesson = activeSimulation?.lesson || null;
+  const activeWorkbenchEnrichment = useMemo(
+    () => getWorkbenchEnrichment(activeSimulationId),
+    [activeSimulationId],
+  );
   const activeLessonStepIndex = Math.min(
     Math.max(Number(workbenchLessonProgress?.[activeSimulationId] ?? 0), 0),
     Math.max((activeLesson?.steps?.length || 1) - 1, 0),
@@ -4698,6 +4968,14 @@ export default function OpenMatStudio() {
     () => getSimulationPropertySchema(selectedSimElement),
     [selectedSimElement],
   );
+  const activeCustomPresets = useMemo(
+    () => Array.isArray(workbenchPresetStore?.[activeSimulationId]) ? workbenchPresetStore[activeSimulationId] : [],
+    [activeSimulationId, workbenchPresetStore],
+  );
+  const activeWorkbenchPresets = useMemo(
+    () => [...(activeWorkbenchEnrichment?.materials || []), ...activeCustomPresets],
+    [activeCustomPresets, activeWorkbenchEnrichment],
+  );
   const selectedSimElementSliderControls = useMemo(
     () => selectedSimElementPropertySchema
       .filter((item) => item.slider && item.type === "number")
@@ -4715,6 +4993,10 @@ export default function OpenMatStudio() {
   const derivedMechanicalModel = useMemo(
     () => deriveMechanicalModel(liveSimElements, activeConstraints),
     [activeConstraints, liveSimElements],
+  );
+  const activeParameterStudy = useMemo(
+    () => parameterStudyStore?.[activeSimulationId] || {},
+    [activeSimulationId, parameterStudyStore],
   );
   const displayFigureJson = useMemo(
     () => activeSimulationId === "spring-mass-lab" ? augmentSpringMassFigure(figureJson, customSpringMassModel, C) : figureJson,
@@ -5262,6 +5544,14 @@ export default function OpenMatStudio() {
       },
     ];
   }, [derivedMechanicalModel, displayWorkspaceItems]);
+  const parameterStudyControls = useMemo(
+    () => controlSpecs.filter((control) => typeof control.min === "number" && typeof control.max === "number" && control.type !== "animate"),
+    [controlSpecs],
+  );
+  const numericWorkspaceOutputs = useMemo(
+    () => displayWorkspaceItems.filter((item) => typeof extractNumericValue(item.value) === "number"),
+    [displayWorkspaceItems],
+  );
 
   const captureRecoverySnapshot = useCallback((reason) => {
     setRecoverySnapshot(
@@ -5522,10 +5812,150 @@ export default function OpenMatStudio() {
     runCode();
   }, [activeDocumentId, runCode]);
 
+  useEffect(() => {
+    setBenchmarkResults([]);
+    setParameterStudyResults([]);
+  }, [activeSimulationId]);
+
   const refreshSimulationModel = useCallback(() => {
     runCode();
     setOutput(`Refreshed ${activeSimulation.title} from the current script, sliders, and scene state.`);
   }, [activeSimulation.title, runCode]);
+
+  const applyWorkbenchPreset = useCallback((preset) => {
+    if (!preset?.controlOverrides) return;
+    const nextValues = { ...controlValuesRef.current, ...preset.controlOverrides };
+    setControlValues(nextValues);
+    setSimRightTab("params");
+    runCode(nextValues);
+    setOutput(`Applied ${preset.label} to ${activeSimulation.title}.`);
+  }, [activeSimulation.title, runCode, setControlValues, setSimRightTab]);
+
+  const saveCurrentWorkbenchPreset = useCallback(() => {
+    const snapshot = {};
+    controlSpecs.forEach((control) => {
+      snapshot[control.name] = Object.prototype.hasOwnProperty.call(controlValuesRef.current, control.name)
+        ? Number(controlValuesRef.current[control.name])
+        : control.value;
+    });
+    const nextPreset = {
+      id: `custom-${Date.now()}`,
+      label: `Custom ${activeCustomPresets.length + 1}`,
+      description: `Saved from the current ${activeSimulation.title} control state.`,
+      controlOverrides: snapshot,
+    };
+    setWorkbenchPresetStore((current) => ({
+      ...(current && typeof current === "object" ? current : {}),
+      [activeSimulationId]: [...activeCustomPresets, nextPreset],
+    }));
+    setOutput(`Saved a custom preset for ${activeSimulation.title}.`);
+  }, [activeCustomPresets, activeSimulation.title, activeSimulationId, controlSpecs, setWorkbenchPresetStore]);
+
+  const removeWorkbenchPreset = useCallback((presetId) => {
+    setWorkbenchPresetStore((current) => ({
+      ...(current && typeof current === "object" ? current : {}),
+      [activeSimulationId]: activeCustomPresets.filter((preset) => preset.id !== presetId),
+    }));
+    setOutput("Removed the custom preset.");
+  }, [activeCustomPresets, activeSimulationId, setWorkbenchPresetStore]);
+
+  const runBenchmarkSuite = useCallback(() => {
+    const benchmarks = activeWorkbenchEnrichment?.benchmarks || [];
+    if (!benchmarks.length) {
+      setBenchmarkResults([]);
+      setOutput(`No benchmark checks are defined yet for ${activeSimulation.title}.`);
+      return;
+    }
+    const results = benchmarks.map((benchmark) => {
+      try {
+        const result = executeScript(code, {
+          extensions: listOpenMatExtensions(),
+          controlValues: { ...controlValuesRef.current, ...(benchmark.controlOverrides || {}) },
+        });
+        const checks = (benchmark.workspaceExpectations || []).map((expectation) => {
+          const actual = findWorkspaceValue(result.workspace, expectation.name);
+          const error = actual == null ? null : Math.abs(actual - expectation.expected);
+          const pass = actual != null && error <= expectation.tolerance;
+          return {
+            ...expectation,
+            actual,
+            error,
+            pass,
+          };
+        });
+        return {
+          ...benchmark,
+          pass: checks.every((item) => item.pass),
+          checks,
+        };
+      } catch (error) {
+        return {
+          ...benchmark,
+          pass: false,
+          checks: [],
+          error: error.message,
+        };
+      }
+    });
+    setBenchmarkResults(results);
+    setSimRightTab("results");
+    setOutput(`Ran ${results.length} benchmark check${results.length === 1 ? "" : "s"} for ${activeSimulation.title}.`);
+  }, [activeSimulation.title, activeWorkbenchEnrichment, code, setSimRightTab]);
+
+  const updateParameterStudyConfig = useCallback((field, value) => {
+    setParameterStudyStore((current) => ({
+      ...(current && typeof current === "object" ? current : {}),
+      [activeSimulationId]: {
+        ...(current?.[activeSimulationId] && typeof current[activeSimulationId] === "object" ? current[activeSimulationId] : {}),
+        [field]: value,
+      },
+    }));
+  }, [activeSimulationId, setParameterStudyStore]);
+
+  const runParameterStudy = useCallback(() => {
+    const studyControlName = activeParameterStudy?.controlName || controlSpecs.find((control) => control.type !== "animate")?.name;
+    const studyOutputName = activeParameterStudy?.outputName || displayWorkspaceItems.find((item) => typeof item.value === "number")?.name;
+    const sampleCount = Math.max(3, Math.min(9, Number(activeParameterStudy?.sampleCount) || 5));
+    const control = controlSpecs.find((entry) => entry.name === studyControlName);
+    if (!control || !studyOutputName) {
+      setOutput("Choose one numeric control and one numeric output before running a parameter study.");
+      return;
+    }
+    const results = [];
+    for (let index = 0; index < sampleCount; index += 1) {
+      const value = sampleCount === 1
+        ? control.min
+        : control.min + ((control.max - control.min) * index) / (sampleCount - 1);
+      try {
+        const runResult = executeScript(code, {
+          extensions: listOpenMatExtensions(),
+          controlValues: {
+            ...controlValuesRef.current,
+            [studyControlName]: Number(value.toFixed(6)),
+          },
+        });
+        const outputValue = findWorkspaceValue(runResult.workspace, studyOutputName);
+        results.push({
+          controlName: studyControlName,
+          controlValue: Number(value.toFixed(6)),
+          outputName: studyOutputName,
+          outputValue,
+          unit: getWorkspaceUnit(activeWorkbenchEnrichment, studyOutputName),
+        });
+      } catch {
+        results.push({
+          controlName: studyControlName,
+          controlValue: Number(value.toFixed(6)),
+          outputName: studyOutputName,
+          outputValue: null,
+          unit: getWorkspaceUnit(activeWorkbenchEnrichment, studyOutputName),
+        });
+      }
+    }
+    setParameterStudyResults(results);
+    setSimRightTab("results");
+    setOutput(`Ran a ${sampleCount}-point parameter study on ${studyControlName} -> ${studyOutputName}.`);
+  }, [activeParameterStudy, activeWorkbenchEnrichment, code, controlSpecs, displayWorkspaceItems, setSimRightTab]);
 
   const runConsoleCommand = useCallback(() => {
     const command = commandInput.trim();
@@ -5652,6 +6082,8 @@ export default function OpenMatStudio() {
       simRightTab,
       workbenchLessonProgress,
       controlValues,
+      workbenchPresetStore,
+      parameterStudyStore,
       exportedAt: new Date().toISOString(),
       app: "OpenMAT",
     };
@@ -5664,7 +6096,7 @@ export default function OpenMatStudio() {
     link.download = "openmat-session.json";
     link.click();
     URL.revokeObjectURL(url);
-  }, [activeDocumentId, activeSimulationId, browserTab, controlValues, documents, simConstraintStore, simGeometryStore, simLeftTab, simRightTab, workbenchLessonProgress, workspaceMode, workspaceTab]);
+  }, [activeDocumentId, activeSimulationId, browserTab, controlValues, documents, parameterStudyStore, simConstraintStore, simGeometryStore, simLeftTab, simRightTab, workbenchLessonProgress, workbenchPresetStore, workspaceMode, workspaceTab]);
 
   const importWorkspace = useCallback((event) => {
     const file = event.target.files?.[0];
@@ -5699,6 +6131,12 @@ export default function OpenMatStudio() {
         if (parsed.workbenchLessonProgress && typeof parsed.workbenchLessonProgress === "object") {
           setWorkbenchLessonProgress(parsed.workbenchLessonProgress);
         }
+        if (parsed.workbenchPresetStore && typeof parsed.workbenchPresetStore === "object") {
+          setWorkbenchPresetStore(parsed.workbenchPresetStore);
+        }
+        if (parsed.parameterStudyStore && typeof parsed.parameterStudyStore === "object") {
+          setParameterStudyStore(parsed.parameterStudyStore);
+        }
         clearRunState();
         setControlValues(
           parsed.controlValues && typeof parsed.controlValues === "object" ? parsed.controlValues : {},
@@ -5710,7 +6148,7 @@ export default function OpenMatStudio() {
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setActiveSimulationId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setSimConstraintStore, setSimGeometryStore, setSimLeftTab, setSimRightTab, setWorkbenchLessonProgress, setWorkspaceMode, setWorkspaceTab]);
+  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setActiveSimulationId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setParameterStudyStore, setSimConstraintStore, setSimGeometryStore, setSimLeftTab, setSimRightTab, setWorkbenchLessonProgress, setWorkbenchPresetStore, setWorkspaceMode, setWorkspaceTab]);
 
   const createNewDocument = useCallback(() => {
     const document = createOpenMatDocument(getNextUntitledName(documents), "");
@@ -6197,6 +6635,9 @@ export default function OpenMatStudio() {
                   <div className="space-y-3">
                     {SIMULATION_WORKSPACES.map((simulation) => {
                       const active = activeSimulation?.id === simulation.id;
+                      const enrichment = getWorkbenchEnrichment(simulation.id);
+                      const presetCount = (enrichment?.materials?.length || 0) + ((workbenchPresetStore?.[simulation.id] || []).length);
+                      const benchmarkCount = enrichment?.benchmarks?.length || 0;
                       return (
                         <button
                           key={simulation.id}
@@ -6214,6 +6655,30 @@ export default function OpenMatStudio() {
                           <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                             {simulation.summary}
                           </div>
+                          {(enrichment?.units || enrichment?.startHere?.length || benchmarkCount || presetCount) && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {enrichment?.units?.system && (
+                                <span className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: C.surface, color: C.blue }}>
+                                  {enrichment.units.system}
+                                </span>
+                              )}
+                              {benchmarkCount > 0 && (
+                                <span className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: C.surface, color: C.text }}>
+                                  {benchmarkCount} benchmark{benchmarkCount === 1 ? "" : "s"}
+                                </span>
+                              )}
+                              {presetCount > 0 && (
+                                <span className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: C.surface, color: C.text }}>
+                                  {presetCount} preset{presetCount === 1 ? "" : "s"}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {enrichment?.startHere?.[0] && (
+                            <div className="mt-3 rounded-xl border px-3 py-2 text-[11px] leading-5" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                              {enrichment.startHere[0]}
+                            </div>
+                          )}
                         </button>
                       );
                     })}
@@ -6355,6 +6820,152 @@ export default function OpenMatStudio() {
                       ) : (
                         <div className="rounded-xl border px-3 py-4 text-sm" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
                           No custom geometry yet. Add a primitive to start building your own scene.
+                        </div>
+                      )}
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Benchmark validation
+                        </div>
+                        <button
+                          type="button"
+                          onClick={runBenchmarkSuite}
+                          className="rounded-lg border px-3 py-1.5 text-[11px] font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Run Benchmarks
+                        </button>
+                      </div>
+                      {activeWorkbenchEnrichment?.benchmarks?.length ? (
+                        <div className="space-y-2">
+                          {activeWorkbenchEnrichment.benchmarks.map((benchmark) => {
+                            const result = benchmarkResults.find((item) => item.id === benchmark.id);
+                            const pass = result?.pass;
+                            return (
+                              <div key={benchmark.id} className="rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <div className="text-sm font-semibold">{benchmark.label}</div>
+                                    <div className="mt-1 text-[11px] leading-5" style={{ color: C.muted }}>
+                                      {benchmark.description}
+                                    </div>
+                                  </div>
+                                  <span
+                                    className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                    style={{
+                                      background: pass == null ? C.surface : pass ? "rgba(44, 182, 125, 0.16)" : "rgba(220, 38, 38, 0.16)",
+                                      color: pass == null ? C.muted : pass ? C.green : C.red,
+                                    }}
+                                  >
+                                    {pass == null ? "Ready" : pass ? "Pass" : "Check"}
+                                  </span>
+                                </div>
+                                {result?.checks?.length > 0 && (
+                                  <div className="mt-3 grid gap-2">
+                                    {result.checks.map((check) => (
+                                      <div key={`${benchmark.id}-${check.name}`} className="rounded-lg border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface }}>
+                                        <div className="font-semibold" style={{ color: check.pass ? C.green : C.text }}>
+                                          {check.name}
+                                        </div>
+                                        <div className="mt-1 leading-5" style={{ color: C.muted }}>
+                                          expected {check.expected}{formatUnit(check.unit)} +/- {check.tolerance}{formatUnit(check.unit)}; actual {check.actual == null ? "n/a" : check.actual}{formatUnit(check.unit)}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {result?.error && (
+                                  <div className="mt-3 rounded-lg border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface, color: C.red }}>
+                                    {result.error}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-sm" style={{ color: C.muted }}>
+                          No benchmark checks are defined for this workbench yet.
+                        </div>
+                      )}
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Parameter study
+                        </div>
+                        <button
+                          type="button"
+                          onClick={runParameterStudy}
+                          className="rounded-lg border px-3 py-1.5 text-[11px] font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Run Study
+                        </button>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <label className="grid gap-1">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Sweep control
+                          </span>
+                          <select
+                            value={activeParameterStudy?.controlName || parameterStudyControls[0]?.name || ""}
+                            onChange={(event) => updateParameterStudyConfig("controlName", event.target.value)}
+                            className="rounded-xl border px-3 py-2 text-sm"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {parameterStudyControls.map((control) => (
+                              <option key={control.name} value={control.name}>
+                                {control.name}{formatUnit(getControlUnit(activeWorkbenchEnrichment, control.name))}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="grid gap-1">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Track output
+                          </span>
+                          <select
+                            value={activeParameterStudy?.outputName || numericWorkspaceOutputs[0]?.name || ""}
+                            onChange={(event) => updateParameterStudyConfig("outputName", event.target.value)}
+                            className="rounded-xl border px-3 py-2 text-sm"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {numericWorkspaceOutputs.map((item) => (
+                              <option key={item.name} value={item.name}>
+                                {item.name}{formatUnit(getWorkspaceUnit(activeWorkbenchEnrichment, item.name))}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="grid gap-1 md:col-span-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Samples
+                          </span>
+                          <input
+                            type="range"
+                            min={3}
+                            max={9}
+                            step={1}
+                            value={Math.max(3, Math.min(9, Number(activeParameterStudy?.sampleCount) || 5))}
+                            onChange={(event) => updateParameterStudyConfig("sampleCount", Number(event.target.value))}
+                            className="w-full accent-sky-500"
+                          />
+                        </label>
+                      </div>
+                      {parameterStudyResults.length > 0 && (
+                        <div className="mt-3 grid gap-2">
+                          {parameterStudyResults.map((row, index) => (
+                            <div key={`${row.controlName}-${index}`} className="rounded-xl border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface2 }}>
+                              <div className="font-semibold">
+                                {row.controlName} = {row.controlValue}{formatUnit(getControlUnit(activeWorkbenchEnrichment, row.controlName))}
+                              </div>
+                              <div className="mt-1" style={{ color: C.muted }}>
+                                {row.outputName}: {row.outputValue == null ? "n/a" : row.outputValue}{formatUnit(row.unit)}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -6640,6 +7251,82 @@ export default function OpenMatStudio() {
                         {activeSimulation.summary}
                       </div>
                     </div>
+                    {activeWorkbenchEnrichment?.startHere?.length > 0 && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Start Here
+                        </div>
+                        <div className="grid gap-2">
+                          {activeWorkbenchEnrichment.startHere.map((item) => (
+                            <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {activeWorkbenchEnrichment?.units && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Units
+                        </div>
+                        <div className="text-xs leading-5" style={{ color: C.muted }}>
+                          {activeWorkbenchEnrichment.units.system}
+                        </div>
+                      </div>
+                    )}
+                    {activeWorkbenchPresets.length > 0 && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 flex items-center justify-between gap-3">
+                          <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                            Materials & Presets
+                          </div>
+                          <button
+                            type="button"
+                            onClick={saveCurrentWorkbenchPreset}
+                            className="rounded-lg border px-2.5 py-1 text-[11px] font-semibold"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            Save Current
+                          </button>
+                        </div>
+                        <div className="grid gap-2">
+                          {activeWorkbenchPresets.map((preset) => {
+                            const isCustom = String(preset.id || "").startsWith("custom-");
+                            return (
+                              <div key={preset.id || preset.label} className="rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <div className="text-sm font-semibold">{preset.label}</div>
+                                    <div className="mt-1 text-[11px] leading-5" style={{ color: C.muted }}>
+                                      {preset.description}
+                                    </div>
+                                  </div>
+                                  {isCustom && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeWorkbenchPreset(preset.id)}
+                                      className="rounded-lg border px-2 py-1 text-[11px] font-semibold"
+                                      style={{ borderColor: C.border, background: C.surface, color: C.red }}
+                                    >
+                                      Delete
+                                    </button>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => applyWorkbenchPreset(preset)}
+                                  className="mt-3 w-full rounded-lg border px-3 py-2 text-xs font-semibold"
+                                  style={{ borderColor: C.border, background: C.surface, color: C.text }}
+                                >
+                                  Apply Preset
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                     {!controlSpecs.some((control) => control.type === "animate") && (
                       <div className="rounded-2xl border p-4 text-xs leading-5" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
                         This workbench is a static analysis setup, so there is no Play button here. Use <span style={{ color: C.text, fontWeight: 700 }}>Run</span> once, then adjust the sliders to refresh the model.
@@ -6662,6 +7349,7 @@ export default function OpenMatStudio() {
                       const currentValue = Object.prototype.hasOwnProperty.call(controlValues, control.name)
                         ? Number(controlValues[control.name])
                         : control.value;
+                      const controlUnit = getControlUnit(activeWorkbenchEnrichment, control.name);
                       return (
                         <div key={control.name} className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                           <div className="mb-2 flex items-center justify-between gap-3">
@@ -6669,10 +7357,12 @@ export default function OpenMatStudio() {
                               <div className="font-mono text-sm font-semibold">{control.name}</div>
                               <div className="text-[11px]" style={{ color: C.muted }}>
                                 {control.type === "animate" ? "Animated driver" : "Interactive input"}
+                                {formatUnit(controlUnit)}
                               </div>
                             </div>
                             <div className="text-xs font-semibold" style={{ color: C.blue }}>
                               {Number(currentValue).toFixed(3).replace(/\.?0+$/, "")}
+                              {formatUnit(controlUnit)}
                             </div>
                           </div>
                           <input
@@ -6685,9 +7375,9 @@ export default function OpenMatStudio() {
                             className="w-full accent-sky-500"
                           />
                           <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
-                            <span>{control.min}</span>
-                            <span>step {control.step}</span>
-                            <span>{control.max}</span>
+                            <span>{control.min}{formatUnit(controlUnit)}</span>
+                            <span>step {control.step}{formatUnit(controlUnit)}</span>
+                            <span>{control.max}{formatUnit(controlUnit)}</span>
                           </div>
                           {control.type === "animate" && (
                             <div className="mt-2 flex items-center gap-2">
@@ -6726,17 +7416,19 @@ export default function OpenMatStudio() {
                     })}
                     {selectedSimElementSliderControls.map((control) => {
                       const currentValue = Number(getSimulationPropertyValue(selectedSimElement, control.field) || 0);
+                      const controlUnit = getPropertyFieldUnit(control);
                       return (
                         <div key={`${selectedSimElement?.id}-${control.field}`} className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                           <div className="mb-2 flex items-center justify-between gap-3">
                             <div>
                               <div className="font-mono text-sm font-semibold">{control.label}</div>
                               <div className="text-[11px]" style={{ color: C.muted }}>
-                                {getSimulationRoleMeta(selectedSimElement?.role).label} property
+                                {getSimulationRoleMeta(selectedSimElement?.role).label} property{formatUnit(controlUnit)}
                               </div>
                             </div>
                             <div className="text-xs font-semibold" style={{ color: C.blue }}>
                               {Number(currentValue).toFixed(3).replace(/\.?0+$/, "")}
+                              {formatUnit(controlUnit)}
                             </div>
                           </div>
                           <input
@@ -6749,9 +7441,9 @@ export default function OpenMatStudio() {
                             className="w-full accent-sky-500"
                           />
                           <div className="mt-2 flex items-center justify-between text-[11px]" style={{ color: C.muted }}>
-                            <span>{control.min}</span>
-                            <span>step {control.step}</span>
-                            <span>{control.max}</span>
+                            <span>{control.min}{formatUnit(controlUnit)}</span>
+                            <span>step {control.step}{formatUnit(controlUnit)}</span>
+                            <span>{control.max}{formatUnit(controlUnit)}</span>
                           </div>
                         </div>
                       );
@@ -6765,7 +7457,45 @@ export default function OpenMatStudio() {
                 )}
 
                 {simRightTab === "results" && (
-                  <div className="grid gap-2">
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        Solver transparency
+                      </div>
+                      {activeWorkbenchEnrichment?.solver ? (
+                        <div className="space-y-3">
+                          <div>
+                            <div className="text-sm font-semibold">{activeWorkbenchEnrichment.solver.label}</div>
+                            <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                              {activeWorkbenchEnrichment.solver.summary}
+                            </div>
+                          </div>
+                          {activeWorkbenchEnrichment.solver.assumptions?.length > 0 && (
+                            <div className="grid gap-2">
+                              {activeWorkbenchEnrichment.solver.assumptions.map((item) => (
+                                <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                                  {item}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {activeWorkbenchEnrichment.solver.outputs?.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {activeWorkbenchEnrichment.solver.outputs.map((item) => (
+                                <span key={item} className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ background: C.surface2, color: C.text }}>
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-sm" style={{ color: C.muted }}>
+                          Run the active workbench to inspect solver assumptions and outputs.
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid gap-2">
                     {simulationMetricCards.length ? simulationMetricCards.map((item) => (
                       <div key={item.name} className="rounded-2xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface }}>
                         <div className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.hint }}>
@@ -6781,6 +7511,153 @@ export default function OpenMatStudio() {
                         Run the model to populate result cards.
                       </div>
                     )}
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Benchmark validation
+                        </div>
+                        <button
+                          type="button"
+                          onClick={runBenchmarkSuite}
+                          className="rounded-lg border px-3 py-1.5 text-[11px] font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Run Benchmarks
+                        </button>
+                      </div>
+                      {activeWorkbenchEnrichment?.benchmarks?.length ? (
+                        <div className="space-y-2">
+                          {activeWorkbenchEnrichment.benchmarks.map((benchmark) => {
+                            const result = benchmarkResults.find((item) => item.id === benchmark.id);
+                            const pass = result?.pass;
+                            return (
+                              <div key={benchmark.id} className="rounded-xl border px-3 py-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <div className="text-sm font-semibold">{benchmark.label}</div>
+                                    <div className="mt-1 text-[11px] leading-5" style={{ color: C.muted }}>
+                                      {benchmark.description}
+                                    </div>
+                                  </div>
+                                  <span
+                                    className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                    style={{
+                                      background: pass == null ? C.surface : pass ? "rgba(44, 182, 125, 0.16)" : "rgba(220, 38, 38, 0.16)",
+                                      color: pass == null ? C.muted : pass ? C.green : C.red,
+                                    }}
+                                  >
+                                    {pass == null ? "Ready" : pass ? "Pass" : "Check"}
+                                  </span>
+                                </div>
+                                {result?.checks?.length > 0 && (
+                                  <div className="mt-3 grid gap-2">
+                                    {result.checks.map((check) => (
+                                      <div key={`${benchmark.id}-${check.name}`} className="rounded-lg border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface }}>
+                                        <div className="font-semibold" style={{ color: check.pass ? C.green : C.text }}>
+                                          {check.name}
+                                        </div>
+                                        <div className="mt-1 leading-5" style={{ color: C.muted }}>
+                                          expected {check.expected}{formatUnit(check.unit)} +/- {check.tolerance}{formatUnit(check.unit)}; actual {check.actual == null ? "n/a" : check.actual}{formatUnit(check.unit)}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {result?.error && (
+                                  <div className="mt-3 rounded-lg border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface, color: C.red }}>
+                                    {result.error}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-sm" style={{ color: C.muted }}>
+                          No benchmark checks are defined for this workbench yet.
+                        </div>
+                      )}
+                    </div>
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Parameter study
+                        </div>
+                        <button
+                          type="button"
+                          onClick={runParameterStudy}
+                          className="rounded-lg border px-3 py-1.5 text-[11px] font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Run Study
+                        </button>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <label className="grid gap-1">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Sweep control
+                          </span>
+                          <select
+                            value={activeParameterStudy?.controlName || parameterStudyControls[0]?.name || ""}
+                            onChange={(event) => updateParameterStudyConfig("controlName", event.target.value)}
+                            className="rounded-xl border px-3 py-2 text-sm"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {parameterStudyControls.map((control) => (
+                              <option key={control.name} value={control.name}>
+                                {control.name}{formatUnit(getControlUnit(activeWorkbenchEnrichment, control.name))}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="grid gap-1">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Track output
+                          </span>
+                          <select
+                            value={activeParameterStudy?.outputName || numericWorkspaceOutputs[0]?.name || ""}
+                            onChange={(event) => updateParameterStudyConfig("outputName", event.target.value)}
+                            className="rounded-xl border px-3 py-2 text-sm"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {numericWorkspaceOutputs.map((item) => (
+                              <option key={item.name} value={item.name}>
+                                {item.name}{formatUnit(getWorkspaceUnit(activeWorkbenchEnrichment, item.name))}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="grid gap-1 md:col-span-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
+                            Samples
+                          </span>
+                          <input
+                            type="range"
+                            min={3}
+                            max={9}
+                            step={1}
+                            value={Math.max(3, Math.min(9, Number(activeParameterStudy?.sampleCount) || 5))}
+                            onChange={(event) => updateParameterStudyConfig("sampleCount", Number(event.target.value))}
+                            className="w-full accent-sky-500"
+                          />
+                        </label>
+                      </div>
+                      {parameterStudyResults.length > 0 && (
+                        <div className="mt-3 grid gap-2">
+                          {parameterStudyResults.map((row, index) => (
+                            <div key={`${row.controlName}-${index}`} className="rounded-xl border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface2 }}>
+                              <div className="font-semibold">
+                                {row.controlName} = {row.controlValue}{formatUnit(getControlUnit(activeWorkbenchEnrichment, row.controlName))}
+                              </div>
+                              <div className="mt-1" style={{ color: C.muted }}>
+                                {row.outputName}: {row.outputValue == null ? "n/a" : row.outputValue}{formatUnit(row.unit)}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -6989,7 +7866,7 @@ export default function OpenMatStudio() {
                                   className={field.type === "text" ? "grid gap-1 md:col-span-2" : "grid gap-1"}
                                 >
                                   <label className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.hint }}>
-                                    {field.label}
+                                    {field.label}{formatUnit(getPropertyFieldUnit(field))}
                                   </label>
                                   <input
                                     type={field.type === "text" ? "text" : "number"}
@@ -7114,6 +7991,76 @@ export default function OpenMatStudio() {
                         ))}
                       </div>
                     </div>
+                    {activeWorkbenchEnrichment?.units && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Units and properties
+                        </div>
+                        <div className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                          {activeWorkbenchEnrichment.units.system}
+                        </div>
+                        {Object.entries(activeWorkbenchEnrichment.units.controls || {}).length > 0 && (
+                          <div className="mt-3 grid gap-2">
+                            {Object.entries(activeWorkbenchEnrichment.units.controls).map(([name, unit]) => (
+                              <div key={name} className="rounded-xl border px-3 py-2 text-[11px]" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                                <span style={{ color: C.text, fontWeight: 600 }}>{name}</span>
+                                {formatUnit(unit)}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {activeWorkbenchEnrichment?.materials?.length > 0 && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Material presets
+                        </div>
+                        <div className="grid gap-2">
+                          {activeWorkbenchEnrichment.materials.map((preset) => (
+                            <div key={preset.label} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              <div className="font-semibold" style={{ color: C.text }}>{preset.label}</div>
+                              <div className="mt-1">{preset.description}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {activeWorkbenchEnrichment?.solver && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Solver assumptions
+                        </div>
+                        <div className="text-sm font-semibold">{activeWorkbenchEnrichment.solver.label}</div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                          {activeWorkbenchEnrichment.solver.summary}
+                        </div>
+                        {activeWorkbenchEnrichment.solver.assumptions?.length > 0 && (
+                          <div className="mt-3 grid gap-2">
+                            {activeWorkbenchEnrichment.solver.assumptions.map((item) => (
+                              <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                                {item}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {activeWorkbenchEnrichment?.benchmarks?.length > 0 && (
+                      <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                          Validation benches
+                        </div>
+                        <div className="grid gap-2">
+                          {activeWorkbenchEnrichment.benchmarks.map((benchmark) => (
+                            <div key={benchmark.id} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                              <div className="font-semibold" style={{ color: C.text }}>{benchmark.label}</div>
+                              <div className="mt-1">{benchmark.description}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {activeLesson && activeLessonStep && (
                       <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                         <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
