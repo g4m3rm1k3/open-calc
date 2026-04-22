@@ -1,5 +1,4 @@
 // Chapter js2.1 — Lesson 2-1: Functions — The Reusable Unit
-// Style: narrative tutorial, Python bridging, incremental builds
 
 const LESSON_JS_CORE_2_1 = {
   title: 'Functions — The Reusable Unit',
@@ -17,22 +16,20 @@ You have already seen code that runs top-to-bottom, once. That is fine for a scr
 
 But programs are not single tasks. They are collections of *operations that need to happen at different times, with different inputs, multiple times.* Functions are how you name an operation and reuse it.
 
-**In Python you write:**
-\`\`\`python
-def greet(name):
-    return f"Hello, {name}!"
-\`\`\`
+Every language has them — C calls them functions, Java calls them methods, Rust calls them fns. In JavaScript:
 
-**In JavaScript:**
 \`\`\`js
 function greet(name) {
   return "Hello, " + name + "!";
 }
+
+greet("Alice");  // "Hello, Alice!"
+greet("Bob");    // "Hello, Bob!"
 \`\`\`
 
-The structure is almost identical. The differences are cosmetic: no colon, braces instead of indentation. The idea is the same — give a block of code a name, and call it whenever you need it.
+Define once, call many times with different inputs. That is all a function is.
 
-What trips everyone up: **JavaScript has three different syntaxes for creating a function.** They are not interchangeable. By the end of this lesson you will know when each one is appropriate and why.`,
+What makes JavaScript unusual: **it has three different syntaxes for creating a function**, and they are not interchangeable. By the end of this lesson you will know when each one is appropriate and why.`,
     },
 
     // ─── Part 1 Cell: basic function declaration ──────────────────────────────
@@ -71,16 +68,16 @@ document.getElementById('result').textContent = message;`,
       type: 'markdown',
       instruction: `## Part 2 — Functions Are First-Class Values
 
-Here is the concept that separates JavaScript from languages like C or Java: **a function is just a value**, like a number or a string.
+Here is the concept that separates JavaScript from older languages like C: **a function is just a value**, like a number or a string.
+
+In C, a function is a fixed address in memory — you can hold a *pointer* to it, but it is a second-class citizen. In JavaScript, a function is a proper value you can store, pass around, and return from other functions with no special syntax.
 
 That means you can:
 - Store a function in a variable
 - Pass a function to another function as an argument
 - Return a function from a function
 
-**In Python, the same is true** — functions are first-class objects. If you have written \`list.sort(key=my_func)\`, you have already passed a function as a value.
-
-The syntax that makes this obvious in JavaScript is the **function expression**:
+The syntax that makes this obvious is the **function expression**:
 
 \`\`\`js
 // Function declaration — the name is part of the syntax
@@ -134,23 +131,18 @@ document.getElementById('r3').textContent = 'applyTwice(double, 3): ' + result;`
       type: 'markdown',
       instruction: `## Part 3 — Arrow Functions: The Short Form
 
-ES6 introduced **arrow functions** — a shorter syntax for function expressions. You will see them everywhere in modern JavaScript.
+ES6 (2015) introduced **arrow functions** — a shorter syntax for function expressions. You will see them everywhere in modern JavaScript.
 
 \`\`\`js
-// Equivalent forms of the same function:
+// Three equivalent forms of the same function:
 const add = function(a, b) { return a + b; }  // function expression
-const add = (a, b) => { return a + b; }        // arrow function, explicit return
-const add = (a, b) => a + b;                   // arrow function, implicit return
+const add = (a, b) => { return a + b; }        // arrow, explicit return
+const add = (a, b) => a + b;                   // arrow, implicit return
 \`\`\`
 
-**Implicit return**: when the body is a single expression (no braces), the value is automatically returned. No \`return\` keyword needed.
+**Implicit return**: when the body is a single expression with no braces, that expression's value is returned automatically. No \`return\` keyword needed.
 
-**Python equivalent**: the arrow function closely mirrors a Python lambda:
-\`\`\`python
-add = lambda a, b: a + b
-\`\`\`
-
-But arrow functions are more powerful — they can span multiple lines, they just lose implicit return when you add braces.
+If you know C#, this is similar to a lambda expression: \`(a, b) => a + b\`. If you know Rust, it mirrors closures: \`|a, b| a + b\`. The arrow syntax is now common across many modern languages for the same reason — it is less noise for short operations.
 
 ### The one real difference: \`this\`
 
@@ -164,7 +156,7 @@ Arrow functions do **not** have their own \`this\`. They inherit it from the sur
 
 Three forms of the same operation — pick the one that reads best for your use case.
 
-Arrow functions shine in array methods like \`.map()\`, \`.filter()\`, \`.reduce()\`. Run the cell and see how terse the transformation becomes.`,
+Arrow functions shine in array methods like \`.map()\`, \`.filter()\`, \`.reduce()\`. Run the cell and see how concise the transformation becomes.`,
       html: `<div class="panel">
   <div class="label">Explicit return</div>
   <div class="row" id="r1">?</div>
@@ -210,21 +202,21 @@ This means **function declarations can be called before they appear in the file*
 
 \`\`\`js
 // This works — declaration is hoisted to the top of its scope
-sayHello();              // "Hello!" — runs fine
+sayHello();
 function sayHello() { console.log("Hello!"); }
 \`\`\`
 
 **Function expressions and arrow functions are NOT hoisted.** Only the variable name is hoisted (as \`undefined\`), not the function value:
 
 \`\`\`js
-// This crashes — the variable exists but holds undefined, not a function
+// This crashes
 sayHello();              // TypeError: sayHello is not a function
 const sayHello = () => console.log("Hello!");
 \`\`\`
 
-**Python analogy**: Python does not hoist anything. Calling before defining always crashes. JavaScript is more permissive with declarations — which can hide bugs if you're not careful.
+In C or Java, calling a function before its definition is a compile error — you find out immediately. In JavaScript with \`var\`, you get a silent \`undefined\` and a runtime crash. This is one of several reasons modern JavaScript uses \`let\` and \`const\` — they throw a clear error instead of silently producing garbage.
 
-**Practical rule**: define before you call. Rely on hoisting only when it genuinely improves readability (e.g., put your \`main()\` call at the top of a script file, with implementations below).`,
+**Practical rule**: define before you call. Rely on hoisting only when it genuinely improves readability (e.g., putting your \`main()\` call at the top of a file, with implementations below).`,
     },
 
     // ─── Part 4 Cell: hoisting demo ──────────────────────────────────────────
@@ -232,9 +224,9 @@ const sayHello = () => console.log("Hello!");
       type: 'js',
       instruction: `### Hoisting: Declaration vs Expression
 
-This cell shows the difference live. The declaration call succeeds even though it appears *before* the definition in the source code. The expression call would fail if placed before the definition.
+The declaration call succeeds even though it appears *before* the definition in the source. The expression call would fail if placed before the \`const\` line.
 
-Run it, then try moving \`callExpression()\` above the \`const\` line and see the error.`,
+Run it, then try moving \`callExpression()\` above its \`const\` line and observe the error.`,
       html: `<div class="panel">
   <div class="row" id="r1">Declaration (called before defined): ?</div>
   <div class="row" id="r2">Expression (called after defined): ?</div>
@@ -265,8 +257,6 @@ console.log(d2);`,
       type: 'markdown',
       instruction: `## Part 5 — Parameters, Defaults, and Return Values
 
-JavaScript parameters are flexible in ways Python is not:
-
 **Default parameters** (ES6):
 \`\`\`js
 function greet(name = "stranger") {
@@ -276,9 +266,9 @@ greet();          // "Hello, stranger!"
 greet("Alice");   // "Hello, Alice!"
 \`\`\`
 
-**Extra arguments are silently ignored:**
+**Extra arguments are silently ignored** — unlike C, which would be undefined behavior, JavaScript just discards them:
 \`\`\`js
-greet("Alice", "Bob", "Charlie"); // "Hello, Alice!" — extra args ignored
+greet("Alice", "Bob", "Charlie"); // "Hello, Alice!" — extras dropped
 \`\`\`
 
 **Missing arguments become \`undefined\`:**
@@ -287,7 +277,7 @@ function add(a, b) { return a + b; }
 add(5);   // NaN — because 5 + undefined = NaN
 \`\`\`
 
-**Rest parameters** collect remaining args into an array:
+**Rest parameters** — collect any remaining arguments into an array. This is variadic functions, the same idea as \`printf\` in C or variadic templates in C++, but without the complexity:
 \`\`\`js
 function sum(...numbers) {
   return numbers.reduce((total, n) => total + n, 0);
@@ -295,9 +285,7 @@ function sum(...numbers) {
 sum(1, 2, 3, 4, 5); // 15
 \`\`\`
 
-**Python equivalent**: \`*args\`. The behavior is identical — extra positional arguments are collected into a sequence.
-
-**Every function returns a value.** If you do not write \`return\`, the function returns \`undefined\`. This is different from Python, which also returns \`None\` implicitly, but \`undefined\` and \`None\` behave differently in conditionals.`,
+**Every function returns a value.** If you do not write \`return\`, the function returns \`undefined\`. There is no \`void\` keyword — the implicit return type is simply \`undefined\`.`,
     },
 
     // ─── Part 5 Cell: parameters ─────────────────────────────────────────────
@@ -305,7 +293,7 @@ sum(1, 2, 3, 4, 5); // 15
       type: 'js',
       instruction: `### Default and Rest Parameters
 
-Run this. Then try calling \`sum()\` with no arguments (should return 0), and \`greet()\` with a name (should use your name instead of the default).`,
+Run this. Then try calling \`sum()\` with no arguments (should return 0) and \`greet()\` with a name.`,
       html: `<div class="panel">
   <div class="row" id="r1">greet(): ?</div>
   <div class="row" id="r2">greet("Alice"): ?</div>
@@ -342,7 +330,7 @@ console.log('noReturn():', noReturn()); // undefined`,
       type: 'markdown',
       instruction: `## Part 6 — Scope: Where Names Are Visible
 
-A function creates a **scope** — a private namespace. Variables declared inside the function are invisible outside it.
+A function creates a **scope** — a private namespace. Variables declared inside are invisible outside.
 
 \`\`\`js
 function compute() {
@@ -353,26 +341,26 @@ function compute() {
 console.log(result);   // ReferenceError — result does not exist here
 \`\`\`
 
-**Scope chains**: when JavaScript looks up a name, it searches outward from the current scope, up through enclosing scopes, until it finds the name or runs out of scopes (which gives a \`ReferenceError\`).
+**Scope chains**: when JavaScript looks up a name, it searches outward from the current scope, up through enclosing scopes, until it finds the name or runs out (giving a \`ReferenceError\`).
 
 \`\`\`js
-const prefix = "Hello";          // outer scope
+const prefix = "Hello";
 
 function greet(name) {
-  return prefix + ", " + name;   // can see prefix from outer scope
+  return prefix + ", " + name;   // can read prefix from the outer scope
 }
 \`\`\`
 
-**Python analogy**: identical behavior. Python calls this the LEGB rule (Local → Enclosing → Global → Built-in). JavaScript's scope chain is the same idea.
+Every language with lexical scope works this way — C's local variables, Rust's block scopes, Go's function-level scope. The rule is the same: inner can see outer, outer cannot see inner.
 
-**Block scope (\`let\` and \`const\`)**: unlike Python, JavaScript distinguishes between *function scope* (for \`var\`) and *block scope* (for \`let\`/\`const\`). A \`let\` inside an \`if\` block is invisible outside that block — even within the same function.
+**Block scope (\`let\` and \`const\`)**: JavaScript distinguishes between *function scope* (for the legacy \`var\`) and *block scope* (for \`let\`/\`const\`). A \`let\` inside an \`if\` block is gone when the block closes — exactly like a local variable in a C \`if\` block.
 
 \`\`\`js
 function example() {
   if (true) {
-    let x = 10;    // block-scoped to the if-block
+    let x = 10;    // block-scoped — dies when } closes
   }
-  console.log(x);  // ReferenceError — x is gone
+  console.log(x);  // ReferenceError
 }
 \`\`\``,
     },
@@ -382,7 +370,7 @@ function example() {
       type: 'js',
       instruction: `### Scope in Action
 
-Watch how the function can see \`prefix\` from the outer scope, but \`inner\` is invisible from outside the function. The scope chain search is automatic — JavaScript walks up until it finds the name.`,
+The function reads \`prefix\` from the outer scope automatically. But \`inner\` is gone the moment the function returns — the catch block proves it does not exist outside.`,
       html: `<div class="panel">
   <div class="row ok" id="r1">outer-to-inner lookup: ?</div>
   <div class="row ok" id="r2">return value visible outside: ?</div>
@@ -391,16 +379,15 @@ Watch how the function can see \`prefix\` from the outer scope, but \`inner\` is
       css: `.panel{height:100%;background:#09111c;padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:10px;font-family:monospace;}
 .row{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px;color:#e2e8f0;font-size:13px;}
 .err{border-color:#f87171;color:#fca5a5;}`,
-      startCode: `const prefix = "→";   // outer scope — visible everywhere below
+      startCode: `const prefix = "→";   // outer scope
 
 function annotate(msg) {
-  const inner = prefix + " " + msg;  // inner is private to this function
+  const inner = prefix + " " + msg;  // private to this function
   return inner;
 }
 
 const output = annotate("function scope");
 
-// Inner variable is gone once the function returns
 let leaked;
 try {
   leaked = inner;       // inner does not exist here
@@ -429,7 +416,7 @@ console.log('outer lookup works:', output);`,
 
 **Predict hoisting:** declarations are available before their source position; expressions are not.
 
-**Read scope chains:** when a name is not in the current scope, JavaScript searches outward — just like Python's LEGB rule.
+**Read scope chains:** inner scopes see outer names. Outer scopes cannot see inside.
 
 ---
 
@@ -464,12 +451,12 @@ export default {
       {
         type: 'warning',
         title: 'What Trips Everyone Up',
-        body: 'Only function *declarations* are hoisted. Calling a `const fn = () => {}` before that line crashes with "fn is not a function". The variable exists (TDZ) but holds nothing callable yet.',
+        body: 'Only function *declarations* are hoisted. Calling a `const fn = () => {}` before that line crashes with "fn is not a function". The variable exists but holds nothing callable yet.',
       },
       {
         type: 'tip',
-        title: 'Python Bridge',
-        body: '`const fn = (a, b) => a + b` is JavaScript\'s lambda. Rest parameters `...args` mirror Python\'s `*args`. Default parameters work identically.',
+        title: 'Arrow Functions Across Languages',
+        body: 'The `=>` syntax appears in C# lambdas, Rust closures (`|a, b| a + b`), and Java lambda expressions. JavaScript arrow functions are the same idea — a short anonymous function without ceremony.',
       },
     ],
     visualizations: [

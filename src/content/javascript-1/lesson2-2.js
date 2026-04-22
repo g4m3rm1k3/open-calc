@@ -1,5 +1,4 @@
 // Chapter js2.1 — Lesson 2-2: Closures and Lexical Scope
-// Style: narrative tutorial, Python bridging, incremental builds
 
 const LESSON_JS_CORE_2_2 = {
   title: 'Closures — Functions That Remember',
@@ -19,13 +18,11 @@ Now add one rule: **a function remembers the scope it was created in**, even aft
 
 That remembered scope is called a **closure**.
 
-Here is the minimal example:
-
 \`\`\`js
 function makeCounter() {
   let count = 0;           // private to makeCounter
 
-  return function() {      // this inner function is returned to the caller
+  return function() {      // this inner function is returned
     count++;               // still has access to count — it was "closed over"
     return count;
   };
@@ -37,20 +34,9 @@ counter();  // 2
 counter();  // 3
 \`\`\`
 
-\`makeCounter\` has returned. Its local variables should be gone. But \`count\` is still alive — because the inner function holds a reference to it.
+\`makeCounter\` has returned. In most languages, local variables vanish when a function returns — the stack frame is gone. But here \`count\` is still alive, because the inner function holds a reference to it. The JavaScript engine keeps the memory alive as long as something refers to it.
 
-**Python analogy:**
-\`\`\`python
-def make_counter():
-    count = 0
-    def inner():
-        nonlocal count
-        count += 1
-        return count
-    return inner
-\`\`\`
-
-Python requires the \`nonlocal\` keyword to *write* to an outer variable. JavaScript does not — inner functions can read and write outer variables freely.`,
+This is different from C, where a local variable truly dies with its stack frame — returning a pointer to it is undefined behavior. JavaScript's garbage collector handles lifetime automatically, so closures just work.`,
     },
 
     // ─── Part 1 Cell: counter closure ────────────────────────────────────────
@@ -58,7 +44,7 @@ Python requires the \`nonlocal\` keyword to *write* to an outer variable. JavaSc
       type: 'js',
       instruction: `### The Counter: A Closure in Action
 
-Each call to \`makeCounter()\` creates an independent counter — its own private \`count\`. Notice how \`counterA\` and \`counterB\` do not interfere with each other even though they were produced by the same function.
+Each call to \`makeCounter()\` creates an **independent** counter with its own private \`count\`. Notice how \`counterA\` and \`counterB\` do not interfere with each other, even though they came from the same function.
 
 This is the key: closures create **private, persistent state** without global variables.`,
       html: `<div class="panel">
@@ -99,7 +85,7 @@ document.getElementById('btnB').onclick = () => {
   document.getElementById('cb').textContent = counterB();
 };
 
-console.log('Two independent counters created. Click the buttons.');`,
+console.log('Two independent counters. Click the buttons.');`,
       outputHeight: 220,
     },
 
@@ -108,7 +94,7 @@ console.log('Two independent counters created. Click the buttons.');`,
       type: 'markdown',
       instruction: `## Part 2 — Factory Functions
 
-A **factory function** is a regular function that returns an object. Closures are what make the object's methods stateful.
+A **factory function** is a regular function that returns an object. Closures are what make the returned object's methods stateful — they remember the variables they were created alongside.
 
 \`\`\`js
 function createUser(name) {
@@ -122,15 +108,15 @@ function createUser(name) {
 }
 
 const alice = createUser("Alice");
-alice.login();   // 1
-alice.login();   // 2
-alice.status();  // "Alice has logged in 2 times"
-alice.loginCount; // undefined — private, not reachable from outside
+alice.login();        // 1
+alice.login();        // 2
+alice.status();       // "Alice has logged in 2 times"
+alice.loginCount;     // undefined — it is genuinely private
 \`\`\`
 
-**Why this matters in real code**: every time you write a React hook, a module with internal state, or a cache function, you are using a closure. The pattern is ubiquitous.
+This pattern achieves something C++ needs \`private:\` access modifiers to enforce. JavaScript enforces it through scope — if the variable was never put on the object, it simply cannot be reached from outside.
 
-**Python analogy**: factory functions mirror Python classes with \`__init__\` and private attributes. The key difference is there is no \`self\` — \`name\` and \`loginCount\` are simply captured variables, not object properties.`,
+Every time you write a React hook, a module with internal state, or a caching function, you are using this pattern.`,
     },
 
     // ─── Part 2 Cell: factory function ───────────────────────────────────────
@@ -138,9 +124,9 @@ alice.loginCount; // undefined — private, not reachable from outside
       type: 'js',
       instruction: `### Factory Function: Private State via Closure
 
-\`loginCount\` is genuinely private — it cannot be read or modified from outside the factory. The only way to interact with it is through the methods the factory exposes.
+\`loginCount\` is never put on the returned object — it only exists in the closure. The "Peek" button proves it cannot be accessed from outside.
 
-Press Login a few times and watch the state persist between calls without any global variable.`,
+Press Login a few times and watch the state persist between calls.`,
       html: `<div class="panel">
   <div id="name-display" class="name-row">User: —</div>
   <div id="count-display" class="stat-row">Logins: 0</div>
@@ -157,7 +143,7 @@ Press Login a few times and watch the state persist between calls without any gl
 .btn-row{display:flex;gap:8px;}
 button{flex:1;background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:9px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:12px;}`,
       startCode: `function createUser(name) {
-  let loginCount = 0;   // genuinely private — not on the object
+  let loginCount = 0;   // genuinely private
 
   return {
     getName:  () => name,
@@ -178,7 +164,6 @@ document.getElementById('loginBtn').onclick = () => {
 };
 
 document.getElementById('peekBtn').onclick = () => {
-  // loginCount is not a property of the returned object
   const val = alice.loginCount;
   document.getElementById('status-display').textContent =
     "alice.loginCount = " + val + "  (undefined — it is private)";
@@ -191,7 +176,7 @@ document.getElementById('peekBtn').onclick = () => {
       type: 'markdown',
       instruction: `## Part 3 — The Loop Bug That Catches Everyone
 
-This is one of the most famous JavaScript interview questions. It looks simple and has a non-obvious answer.
+This is one of the most famous JavaScript gotchas. Every developer who learned JS before 2015 has been burned by it.
 
 \`\`\`js
 for (var i = 0; i < 3; i++) {
@@ -201,7 +186,9 @@ for (var i = 0; i < 3; i++) {
 // Actual:   3, 3, 3
 \`\`\`
 
-Why? Because \`var\` is **function-scoped**, not block-scoped. All three closures share the *same* \`i\`. By the time the timeouts fire, the loop has finished and \`i\` is 3.
+Why? Because \`var\` is **function-scoped**, not block-scoped. All three closures share the *same* \`i\`. By the time the timeouts fire, the loop has already finished and \`i\` is 3.
+
+If you come from C or Java, this surprises you: in those languages, a loop variable declared in the \`for\` header is block-scoped to the loop body. Every iteration gets its own \`i\`. In JavaScript with \`var\`, that is not true.
 
 **The fix — use \`let\`:**
 
@@ -212,11 +199,9 @@ for (let i = 0; i < 3; i++) {
 // Actual: 0, 1, 2
 \`\`\`
 
-\`let\` is **block-scoped**. Each loop iteration creates a brand-new \`i\` binding. Each closure captures its own copy.
+\`let\` is block-scoped. Each loop iteration creates a brand-new \`i\` binding. Each closure captures its own independent copy. This is the behavior you expected.
 
-**Python does not have this bug** because Python for-loops do not close over the loop variable the same way — Python closures capture by *reference to the name*, and the behavior differs enough that this particular trap does not arise in the same form.
-
-This bug is the reason the JavaScript community moved from \`var\` to \`let\` and \`const\`. You should use \`let\`/\`const\` exclusively.`,
+This bug is one of the main reasons the JavaScript community moved from \`var\` to \`let\` and \`const\`. **Use \`let\` and \`const\` exclusively.**`,
     },
 
     // ─── Part 3 Cell: loop bug ────────────────────────────────────────────────
@@ -224,9 +209,9 @@ This bug is the reason the JavaScript community moved from \`var\` to \`let\` an
       type: 'js',
       instruction: `### var vs let in Closures
 
-Run the cell and see both behaviors side by side. The \`var\` row will always log 3. The \`let\` row captures each iteration's value correctly.`,
+Run the cell and see both behaviors side by side. The \`var\` row shows the old IIFE workaround that developers used before \`let\` existed. The \`let\` row just works.`,
       html: `<div class="panel">
-  <div class="label">var loop (shared i)</div>
+  <div class="label">var loop (shared i — needs workaround)</div>
   <div id="var-row" class="row bad">waiting 300ms…</div>
   <div class="label">let loop (own i per iteration)</div>
   <div id="let-row" class="row good">waiting 300ms…</div>
@@ -239,22 +224,22 @@ Run the cell and see both behaviors side by side. The \`var\` row will always lo
       startCode: `const varResults = [];
 const letResults = [];
 
-// var — function-scoped, one shared binding
+// var — one shared binding across all iterations
+// Old fix: immediately-invoked function expression (IIFE) to capture a copy
 for (var i = 0; i < 3; i++) {
-  setTimeout((function(captured_i) {
-    // Without this IIFE wrapper, all callbacks see i = 3
-    return function() { varResults.push(captured_i); };
-  })(i), 150);   // immediately-invoked to capture current i the old way
+  setTimeout((function(captured) {
+    return function() { varResults.push(captured); };
+  })(i), 150);
 }
 
-// let — block-scoped, fresh binding each iteration
+// let — fresh binding per iteration, closures capture different values
 for (let j = 0; j < 3; j++) {
   setTimeout(function() { letResults.push(j); }, 150);
 }
 
 setTimeout(() => {
   document.getElementById('var-row').textContent =
-    "var (IIFE workaround needed): [" + varResults + "]";
+    "var (IIFE workaround): [" + varResults + "]";
   document.getElementById('let-row').textContent =
     "let (just works): [" + letResults + "]";
   console.log('var results:', varResults);
@@ -268,7 +253,7 @@ setTimeout(() => {
       type: 'markdown',
       instruction: `## Part 4 — Practical Pattern: Memoization
 
-A closure can wrap any function and add **caching** — store results you have computed before, return them instantly the second time.
+A closure can wrap any function and add **caching** — store results you have already computed, return them instantly on repeat calls.
 
 \`\`\`js
 function memoize(fn) {
@@ -277,8 +262,7 @@ function memoize(fn) {
   return function(...args) {
     const key = JSON.stringify(args);
     if (key in cache) {
-      console.log("cache hit!");
-      return cache[key];
+      return cache[key];    // instant — no recomputation
     }
     const result = fn(...args);
     cache[key] = result;
@@ -291,11 +275,11 @@ const expensiveCalc = memoize(function(n) {
   return n * n;
 });
 
-expensiveCalc(10);  // computed
+expensiveCalc(10);  // computed, stored
 expensiveCalc(10);  // cache hit — instant
 \`\`\`
 
-**Python equivalent**: \`functools.lru_cache\` does the same thing at the decorator level. The JavaScript version is explicit — you can inspect and clear the cache directly because \`cache\` is just an object inside the closure.
+This is the same idea as memoization tables in dynamic programming — once you compute a value, store it. The closure is what makes the \`cache\` persist between calls without becoming a global variable.
 
 This pattern appears in React (\`useMemo\`), routing libraries, API clients, and anywhere expensive computation should not repeat for the same input.`,
     },
@@ -305,15 +289,15 @@ This pattern appears in React (\`useMemo\`), routing libraries, API clients, and
       type: 'js',
       instruction: `### Memoize: Caching with a Closure
 
-The \`memoize\` wrapper uses a closure (\`cache\`) to remember results. Call \`slowSquare(8)\` twice — the second call is instant and shows "CACHE HIT".
+Call \`slowSquare(8)\` twice — the second call is instant and shows "CACHE HIT". Call it with a new number to see a fresh computation.
 
-Try calling it with a new number to see a fresh computation.`,
+The \`cache\` object lives inside the closure — it persists across calls without polluting any outer scope.`,
       html: `<div class="panel">
   <div class="label">Call log</div>
   <div id="log" class="log-box"></div>
   <div class="btn-row">
     <button id="b8a">slowSquare(8) — first</button>
-    <button id="b8b">slowSquare(8) — second</button>
+    <button id="b8b">slowSquare(8) — again</button>
     <button id="b12">slowSquare(12) — new</button>
   </div>
 </div>`,
@@ -328,10 +312,10 @@ button{flex:1;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:
   return function(...args) {
     const key = JSON.stringify(args);
     if (key in cache) {
-      log("CACHE HIT for args " + key + " → " + cache[key]);
+      log("CACHE HIT for " + key + " → " + cache[key]);
       return cache[key];
     }
-    log("computing for args " + key + "…");
+    log("computing for " + key + "…");
     const result = fn(...args);
     cache[key] = result;
     log("stored result " + result);
@@ -339,7 +323,6 @@ button{flex:1;background:#1e2a3f;border:1px solid #334155;color:#94a3b8;padding:
   };
 }
 
-// Simulate a slow computation (normally this might call an API or do heavy math)
 const slowSquare = memoize(function(n) {
   return n * n;
 });
@@ -356,7 +339,7 @@ document.getElementById('b8a').onclick  = () => slowSquare(8);
 document.getElementById('b8b').onclick  = () => slowSquare(8);
 document.getElementById('b12').onclick  = () => slowSquare(12);
 
-log("memoized slowSquare ready. Click the buttons.");`,
+log("memoized slowSquare ready — click the buttons.");`,
       outputHeight: 280,
     },
 
@@ -365,17 +348,17 @@ log("memoized slowSquare ready. Click the buttons.");`,
       type: 'markdown',
       instruction: `## You Can Now Do the Following
 
-**Explain what a closure is:** a function that retains access to variables from the scope in which it was defined, even after that scope is no longer active.
+**Explain what a closure is:** a function bundled with the variables from the scope it was defined in. Those variables stay alive as long as the function exists.
 
-**Build factory functions** that return objects with private state — no classes required.
+**Build factory functions** that return objects with genuinely private state — not enforced by an access modifier, but by scope.
 
-**Diagnose the loop bug:** if timeouts or callbacks produce the same value repeatedly, the closure is sharing a \`var\` binding. Fix it with \`let\`.
+**Diagnose the loop bug:** if a \`setTimeout\` or event callback always logs the same final value, the closure is sharing a \`var\` binding. Fix it with \`let\`.
 
 **Write memoization:** wrap any pure function with a closure-based cache to skip redundant computation.
 
 ---
 
-**Next lesson: Arrays and Objects** — the two data structures that underpin every non-trivial JavaScript program. We will cover destructuring, spread, and the reference model that determines when two objects are "equal".`,
+**Next lesson: Arrays** — the ordered collection at the center of almost every JavaScript program. We will cover \`.map()\`, \`.filter()\`, \`.reduce()\`, destructuring, and spread — the tools you will use every day.`,
     },
 
   ],
@@ -392,26 +375,26 @@ export default {
 
   hook: {
     question: 'How can a function remember something after it returns?',
-    realWorldContext: 'Closures power React hooks, module state, caching layers, and event handlers. Every time you write a function inside a function, you are creating a closure — understanding it makes bugs disappear.',
+    realWorldContext: 'Closures power React hooks, module state, caches, and event handlers. Every time you write a function inside a function, you are creating a closure — understanding it makes bugs disappear.',
     previewVisualizationId: 'JSNotebook',
   },
 
   intuition: {
     prose: [
       'A closure is a function bundled with the variables from the scope it was defined in.',
-      'Each call to a factory function creates a new, independent closure — its own private state.',
+      'Each factory-function call creates a new, independent closure with its own private state.',
       '`let` in a for-loop gives each iteration its own binding; `var` shares one binding across all callbacks.',
     ],
     callouts: [
       {
         type: 'warning',
         title: 'The Loop Bug',
-        body: 'Using `var` in a for-loop and closing over the loop variable inside a callback always produces the final value for every callback. Use `let` — it creates a fresh binding each iteration.',
+        body: 'Using `var` in a for-loop and referencing it inside a callback always produces the final value. Use `let` — it creates a fresh binding each iteration.',
       },
       {
         type: 'tip',
-        title: 'Python Bridge',
-        body: 'Python closures need `nonlocal` to write to an outer variable. JavaScript closures can read and write outer variables freely — no keyword needed.',
+        title: 'Why Variables Don\'t Die',
+        body: 'In C, local variables die with the stack frame. In JavaScript, the garbage collector keeps memory alive as long as something holds a reference to it — closures are that reference.',
       },
     ],
     visualizations: [
@@ -430,7 +413,7 @@ export default {
 
   mentalModel: [
     'A closure = function + the scope chain it was born in.',
-    'Each factory-function call creates an independent closure with its own private variables.',
+    'Each factory call creates an independent closure with its own private variables.',
     '`let` in a for-loop: fresh binding per iteration — callbacks capture different values.',
     '`var` in a for-loop: one shared binding — all callbacks see the final value.',
     'Memoization = closure holding a cache object. Same input → instant return.',
