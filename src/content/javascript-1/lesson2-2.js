@@ -358,7 +358,114 @@ log("memoized slowSquare ready — click the buttons.");`,
 
 ---
 
-**Next lesson: Arrays** — the ordered collection at the center of almost every JavaScript program. We will cover \`.map()\`, \`.filter()\`, \`.reduce()\`, destructuring, and spread — the tools you will use every day.`,
+### Before the Challenges
+
+Each challenge below tests one closure concept from this lesson. Write real code — do not just pass the check; make sure you understand why it works.`,
+    },
+
+    // ─── Challenge 1: makeMultiplier ─────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 1: makeMultiplier
+
+Write a factory function \`makeMultiplier(factor)\` that returns a new function. The returned function takes a number and multiplies it by \`factor\`.
+
+\`\`\`
+const triple = makeMultiplier(3);
+triple(4)   → 12
+triple(10)  → 30
+
+const half = makeMultiplier(0.5);
+half(20)    → 10
+\`\`\``,
+      startCode: `function makeMultiplier(factor) {
+  // return a function that multiplies its argument by factor
+}
+
+const triple = makeMultiplier(3);
+const half   = makeMultiplier(0.5);
+
+console.log(triple(4));   // 12
+console.log(triple(10));  // 30
+console.log(half(20));    // 10`,
+      solutionCode: `function makeMultiplier(factor) {
+  return function(n) { return n * factor; };
+}
+const triple = makeMultiplier(3);
+const half   = makeMultiplier(0.5);
+console.log(triple(4));
+console.log(triple(10));
+console.log(half(20));`,
+      check: (code, logs) =>
+        logs[0] === '12' && logs[1] === '30' && logs[2] === '10',
+      successMessage: 'Correct! Each makeMultiplier call creates a closure that remembers its own factor.',
+      failMessage: 'The returned function should close over `factor` from the outer call.',
+    },
+
+    // ─── Challenge 2: fix the loop bug ──────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 2: Fix the Loop Bug
+
+The code below uses \`var\` in a loop and logs the same value three times instead of 0, 1, 2. Fix it with a one-word change so the output is \`0 1 2\`.`,
+      startCode: `for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 50);
+}
+// currently logs: 3  3  3
+// should log:     0  1  2`,
+      solutionCode: `for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 50);
+}`,
+      check: (code) => /for\s*\(\s*let/.test(code),
+      successMessage: 'Correct! `let` creates a fresh binding per iteration — each closure captures a different i.',
+      failMessage: 'Change `var` to `let` in the for-loop header.',
+    },
+
+    // ─── Challenge 3: write a once() wrapper ────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 3: Write \`once\`
+
+Write a function \`once(fn)\` that returns a new function. The returned function calls \`fn\` the **first time** it is invoked, then returns that same result on every subsequent call without calling \`fn\` again.
+
+\`\`\`
+let count = 0;
+const incrementOnce = once(() => { count++; return count; });
+
+incrementOnce()  → 1    (fn runs, count becomes 1)
+incrementOnce()  → 1    (fn does NOT run again)
+incrementOnce()  → 1    (still 1)
+\`\`\``,
+      startCode: `function once(fn) {
+  // use a closure to remember whether fn has been called
+  // and what it returned
+}
+
+let count = 0;
+const incrementOnce = once(() => { count++; return count; });
+
+console.log(incrementOnce());   // 1
+console.log(incrementOnce());   // 1
+console.log(incrementOnce());   // 1
+console.log('count:', count);   // count: 1 (fn only ran once)`,
+      solutionCode: `function once(fn) {
+  let called = false;
+  let result;
+  return function() {
+    if (!called) { called = true; result = fn(); }
+    return result;
+  };
+}
+let count = 0;
+const incrementOnce = once(() => { count++; return count; });
+console.log(incrementOnce());
+console.log(incrementOnce());
+console.log(incrementOnce());
+console.log('count:', count);`,
+      check: (code, logs) =>
+        logs[0] === '1' && logs[1] === '1' && logs[2] === '1' && logs[3] === 'count: 1',
+      successMessage: 'Correct! once() is a real utility used in initialization, analytics, and event wiring.',
+      failMessage: 'Track whether fn has been called with a boolean in the closure. Cache the result and return it every time after.',
     },
 
   ],

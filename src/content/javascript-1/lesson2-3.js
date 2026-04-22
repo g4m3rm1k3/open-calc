@@ -428,7 +428,112 @@ document.getElementById('r4').textContent =
 
 ---
 
-**Next lesson: Objects** — key-value stores, destructuring, spread, and the reference model that determines when two objects are "the same".`,
+### Before the Challenges
+
+Apply the big three: \`filter\`, \`map\`, and \`reduce\`. Each challenge uses real-looking data.`,
+    },
+
+    // ─── Challenge 1: filter ─────────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 1: Filter Active Users
+
+Given the array below, use \`.filter()\` to create a new array \`activeUsers\` that contains only users where \`active\` is \`true\`. Then log the count.
+
+Expected: \`active count: 3\``,
+      startCode: `const users = [
+  { name: "Alice", active: true  },
+  { name: "Bob",   active: false },
+  { name: "Carol", active: true  },
+  { name: "Dave",  active: false },
+  { name: "Eve",   active: true  },
+];
+
+const activeUsers = null; // replace with .filter()
+
+console.log("active count:", activeUsers.length);`,
+      solutionCode: `const users = [
+  { name: "Alice", active: true  },
+  { name: "Bob",   active: false },
+  { name: "Carol", active: true  },
+  { name: "Dave",  active: false },
+  { name: "Eve",   active: true  },
+];
+const activeUsers = users.filter(u => u.active);
+console.log("active count:", activeUsers.length);`,
+      check: (code, logs) =>
+        /\.filter\s*\(/.test(code) && logs[0] === 'active count: 3',
+      successMessage: 'Correct! .filter() with a predicate is the cleanest way to select a subset.',
+      failMessage: 'Use .filter(u => u.active) — the callback should return true for users you want to keep.',
+    },
+
+    // ─── Challenge 2: map ────────────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 2: Map to Display Strings
+
+Given the products array, use \`.map()\` to produce an array of strings in this format: \`"Keyboard — $89"\`. Log each one.
+
+Expected output (3 lines):
+\`\`\`
+Keyboard — $89
+Mouse — $45
+Webcam — $120
+\`\`\``,
+      startCode: `const products = [
+  { name: "Keyboard", price: 89  },
+  { name: "Mouse",    price: 45  },
+  { name: "Webcam",   price: 120 },
+];
+
+const labels = null; // replace with .map()
+
+labels.forEach(label => console.log(label));`,
+      solutionCode: `const products = [
+  { name: "Keyboard", price: 89  },
+  { name: "Mouse",    price: 45  },
+  { name: "Webcam",   price: 120 },
+];
+const labels = products.map(p => p.name + " — $" + p.price);
+labels.forEach(label => console.log(label));`,
+      check: (code, logs) =>
+        /\.map\s*\(/.test(code) &&
+        logs[0] === 'Keyboard — $89' &&
+        logs[1] === 'Mouse — $45' &&
+        logs[2] === 'Webcam — $120',
+      successMessage: 'Correct! .map() transforms every element into a new form — same length, different shape.',
+      failMessage: 'Use .map(p => p.name + " — $" + p.price) to build the label string for each product.',
+    },
+
+    // ─── Challenge 3: reduce ─────────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 3: Total Revenue with reduce
+
+Use \`.reduce()\` to calculate the total revenue from the orders array. Each order has a \`quantity\` and \`unitPrice\`. Log the result as: \`"total: 485"\`
+
+Expected: \`total: 485\``,
+      startCode: `const orders = [
+  { item: "Widget",  quantity: 3, unitPrice: 25  },
+  { item: "Gadget",  quantity: 2, unitPrice: 80  },
+  { item: "Doohickey", quantity: 5, unitPrice: 27 },
+];
+
+// Each order contributes quantity * unitPrice to the total
+const total = null; // replace with .reduce()
+
+console.log("total:", total);`,
+      solutionCode: `const orders = [
+  { item: "Widget",  quantity: 3, unitPrice: 25  },
+  { item: "Gadget",  quantity: 2, unitPrice: 80  },
+  { item: "Doohickey", quantity: 5, unitPrice: 27 },
+];
+const total = orders.reduce((sum, o) => sum + o.quantity * o.unitPrice, 0);
+console.log("total:", total);`,
+      check: (code, logs) =>
+        /\.reduce\s*\(/.test(code) && logs[0] === 'total: 485',
+      successMessage: 'Correct! reduce folds the whole array into one value — totals, max, groupings, all use this pattern.',
+      failMessage: 'Use .reduce((sum, o) => sum + o.quantity * o.unitPrice, 0). The second argument is the starting value.',
     },
 
   ],

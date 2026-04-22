@@ -7,6 +7,7 @@ import lesson1_2 from './lesson1-2.js'
 import lesson2_1 from './lesson2-1.js'
 import lesson2_2 from './lesson2-2.js'
 import lesson2_3 from './lesson2-3.js'
+import lesson2_35 from './lesson2-35.js'
 import lesson2_4 from './lesson2-4.js'
 
 const J1 = {
@@ -36,16 +37,17 @@ const J2 = {
 };
 
 const J3 = {
-  title: 'Functions and Closures',
+  title: 'Functions, Data, and the DOM',
   number: 'js2.1',
-  slug: 'functions-and-closures',
-  description: 'Declarations, expressions, arrow functions, hoisting, scope, and closure-based state.',
+  slug: 'functions-data-dom',
+  description: 'Functions, closures, arrays, objects, and getting real data from the browser.',
   course: 'javascript-core',
   lessons: [
-    lesson2_1,
-    lesson2_2,
-    lesson2_3,
-    lesson2_4,
+    lesson2_1,   // Functions — The Reusable Unit
+    lesson2_2,   // Closures — Functions That Remember
+    lesson2_3,   // Arrays — Ordered Collections
+    lesson2_35,  // The DOM and Forms
+    lesson2_4,   // Objects — Key-Value Maps
   ],
 };
 

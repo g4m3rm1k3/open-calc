@@ -420,7 +420,91 @@ console.log('outer lookup works:', output);`,
 
 ---
 
-**Next lesson: Closures** — what happens when a function *captures* variables from its outer scope, and why that gives JavaScript one of its most powerful patterns for managing state without global variables.`,
+### Before the Challenges
+
+Apply what you just learned. Read each prompt carefully before writing any code.`,
+    },
+
+    // ─── Challenge 1: write clamp ────────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 1: Write \`clamp\`
+
+Write a function \`clamp(value, min, max)\` that returns \`value\` if it is between \`min\` and \`max\`, returns \`min\` if \`value\` is below \`min\`, and returns \`max\` if \`value\` is above \`max\`.
+
+\`\`\`
+clamp(5, 0, 10)  → 5
+clamp(-3, 0, 10) → 0
+clamp(15, 0, 10) → 10
+\`\`\``,
+      startCode: `function clamp(value, min, max) {
+  // your code here
+}
+
+console.log(clamp(5,  0, 10));   // 5
+console.log(clamp(-3, 0, 10));   // 0
+console.log(clamp(15, 0, 10));   // 10`,
+      solutionCode: `function clamp(value, min, max) {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+console.log(clamp(5,  0, 10));
+console.log(clamp(-3, 0, 10));
+console.log(clamp(15, 0, 10));`,
+      check: (code, logs) =>
+        logs[0] === '5' && logs[1] === '0' && logs[2] === '10',
+      successMessage: 'Correct! clamp is used everywhere — canvas bounds, slider ranges, game physics.',
+      failMessage: 'Check all three cases: within range, below min, above max.',
+    },
+
+    // ─── Challenge 2: arrow + implicit return ────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 2: Convert to Arrow with Implicit Return
+
+Rewrite the function below as an arrow function that uses **implicit return** (no braces, no \`return\` keyword).
+
+The result must be assigned to \`const double\`.`,
+      startCode: `// Rewrite this as an arrow function with implicit return:
+// function double(n) { return n * 2; }
+
+const double = null; // replace null with the arrow function
+
+console.log(double(4));   // 8
+console.log(double(10));  // 20`,
+      solutionCode: `const double = n => n * 2;
+console.log(double(4));
+console.log(double(10));`,
+      check: (code, logs) =>
+        /const\s+double\s*=/.test(code) &&
+        /=>\s*n\s*\*\s*2|=>\s*2\s*\*\s*n/.test(code) &&
+        !/{/.test(code.split('=')[1]?.split('\n')[0] ?? '') &&
+        logs[0] === '8' && logs[1] === '20',
+      successMessage: 'Correct! Implicit return: single expression after `=>`, no braces needed.',
+      failMessage: 'Remove the `{` and `return` keyword. A single expression after `=>` returns automatically.',
+    },
+
+    // ─── Challenge 3: fix hoisting bug ──────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 3: Fix the Hoisting Bug
+
+The code below crashes because it tries to call \`formatPrice\` before the \`const\` definition. Fix it — without changing the function itself — so both \`console.log\` calls succeed.
+
+Hint: there are two valid fixes. Pick one.`,
+      startCode: `console.log(formatPrice(9.9));    // crashes
+console.log(formatPrice(14.99));  // crashes
+
+const formatPrice = (n) => "$" + n.toFixed(2);`,
+      solutionCode: `// Option A: move the const above the calls
+const formatPrice = (n) => "$" + n.toFixed(2);
+console.log(formatPrice(9.9));
+console.log(formatPrice(14.99));`,
+      check: (code, logs) =>
+        logs[0] === '$9.90' && logs[1] === '$14.99',
+      successMessage: 'Fixed! Arrow functions are not hoisted — they must be defined before first use.',
+      failMessage: 'The const must appear before any call to formatPrice. Move it above the console.log lines.',
     },
 
   ],

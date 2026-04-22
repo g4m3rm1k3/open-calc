@@ -446,7 +446,134 @@ document.getElementById('freeze').textContent  =
 
 ---
 
-**Next lesson: The DOM** — document.querySelector, events, and how JavaScript reaches into the HTML to make pages interactive. This is where everything you have learned so far starts producing visible results on screen.`,
+### Before the Challenges
+
+The final challenge pulls everything together — you will build a user object from a form, the same pattern you will use in every real app.`,
+    },
+
+    // ─── Challenge 1: destructuring ──────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 1: Destructure a Config Object
+
+Given the config object below, use **one destructuring statement** to extract:
+- \`theme\` into a variable called \`theme\`
+- \`lang\` into a variable called \`language\` (rename it)
+- \`timeout\` with a default of \`30\` (it is missing from the object)
+
+Then log all three. Expected:
+\`\`\`
+dark
+fr
+30
+\`\`\``,
+      startCode: `const config = { theme: "dark", lang: "fr" };
+
+// Write one destructuring statement here
+// const { ... } = config;
+
+console.log(theme);
+console.log(language);
+console.log(timeout);`,
+      solutionCode: `const config = { theme: "dark", lang: "fr" };
+const { theme, lang: language, timeout = 30 } = config;
+console.log(theme);
+console.log(language);
+console.log(timeout);`,
+      check: (code, logs) =>
+        /const\s*\{[^}]+\}\s*=\s*config/.test(code) &&
+        /lang\s*:\s*language/.test(code) &&
+        logs[0] === 'dark' && logs[1] === 'fr' && logs[2] === '30',
+      successMessage: 'Correct! Renaming and defaults in one destructuring statement — this is very common in real code.',
+      failMessage: 'Syntax: `const { theme, lang: language, timeout = 30 } = config;` — rename with `:`, default with `=`.',
+    },
+
+    // ─── Challenge 2: merge objects ──────────────────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 2: Merge with Override
+
+You have a \`defaults\` object and a \`userPrefs\` object. Use spread to create a \`settings\` object where \`userPrefs\` values override the defaults. Then log \`settings.theme\` and \`settings.lang\`.
+
+Expected:
+\`\`\`
+light
+fr
+\`\`\``,
+      startCode: `const defaults = { theme: "dark", lang: "en", fontSize: 14 };
+const userPrefs = { theme: "light", lang: "fr" };
+
+const settings = null; // replace with spread merge
+
+console.log(settings.theme);
+console.log(settings.lang);`,
+      solutionCode: `const defaults = { theme: "dark", lang: "en", fontSize: 14 };
+const userPrefs = { theme: "light", lang: "fr" };
+const settings = { ...defaults, ...userPrefs };
+console.log(settings.theme);
+console.log(settings.lang);`,
+      check: (code, logs) =>
+        /\.\.\.\s*defaults/.test(code) && /\.\.\.\s*userPrefs/.test(code) &&
+        logs[0] === 'light' && logs[1] === 'fr',
+      successMessage: 'Correct! Spread merge: the last source wins for any key that appears in multiple objects.',
+      failMessage: 'Use `{ ...defaults, ...userPrefs }` — userPrefs must come second so its keys overwrite defaults.',
+    },
+
+    // ─── Challenge 3: form → object (uses DOM) ──────────────────────────────
+    {
+      type: 'challenge',
+      instruction: `### Challenge 3: Build a User Object from the Form
+
+The preview has a form with fields: \`#username\`, \`#age\` (number), and \`#role\` (select).
+
+On submit:
+1. \`preventDefault()\`
+2. Read all three values — make \`age\` a \`Number\`
+3. Build a user object \`{ username, age, role, createdAt: new Date().toISOString() }\`
+4. Log it
+5. Display it in \`#output\` using \`JSON.stringify(user, null, 2)\``,
+      html: `<div class="c-app">
+  <form id="userForm" class="c-form">
+    <input id="username" type="text"   placeholder="Username" />
+    <input id="age"      type="number" placeholder="Age" />
+    <select id="role">
+      <option value="viewer">Viewer</option>
+      <option value="editor">Editor</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button type="submit">Create User</button>
+  </form>
+  <pre id="output" class="c-output">—</pre>
+</div>`,
+      css: `.c-app{height:100%;background:#09111c;padding:16px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:monospace;}
+.c-form{display:flex;flex-direction:column;gap:8px;}
+input,select{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px;color:#e2e8f0;font-size:12px;font-family:monospace;outline:none;}
+button{background:#1e3a5f;border:1px solid #38bdf8;color:#93c5fd;padding:10px;border-radius:8px;cursor:pointer;font-size:12px;}
+.c-output{background:#050e1a;border:1px solid #1e293b;border-radius:8px;padding:12px;color:#4ade80;font-size:12px;margin:0;white-space:pre-wrap;overflow:auto;}`,
+      startCode: `document.getElementById('userForm').addEventListener('submit', (event) => {
+  // 1. prevent page reload
+  // 2. read username, age (as Number), role
+  // 3. build a user object with those + createdAt: new Date().toISOString()
+  // 4. console.log(user)
+  // 5. display JSON.stringify(user, null, 2) in #output
+});`,
+      solutionCode: `document.getElementById('userForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const age      = Number(document.getElementById('age').value);
+  const role     = document.getElementById('role').value;
+  const user = { username, age, role, createdAt: new Date().toISOString() };
+  console.log(user);
+  document.getElementById('output').textContent = JSON.stringify(user, null, 2);
+});`,
+      check: (code) =>
+        /preventDefault/.test(code) &&
+        /Number\s*\(/.test(code) &&
+        /createdAt/.test(code) &&
+        /JSON\.stringify/.test(code),
+      successMessage: 'Correct! This is the exact pattern every form in a real app uses — read inputs, build an object, send or display it.',
+      failMessage: 'Make sure to: preventDefault, convert age with Number(), include createdAt, and JSON.stringify the result into #output.',
+      outputHeight: 270,
     },
 
   ],
@@ -456,7 +583,7 @@ export default {
   id: 'js-core-2-4-objects',
   slug: 'objects-key-value-maps',
   chapter: 'js2.1',
-  order: 3,
+  order: 4,
   title: 'Objects — Key-Value Maps',
   subtitle: 'Properties, methods, this, references, destructuring, and merging.',
   tags: ['javascript', 'objects', 'destructuring', 'spread', 'this', 'references'],
