@@ -482,32 +482,32 @@ title('Clipped Wavefront')
     matlabLike: true,
     code: `% --- 3D Gradient Descent Lab ---
 clear;
-learning_rate = slider('learning_rate', 0.02, 0.4, 0.02, 0.1);
+lr = slider('learning_rate', 0.02, 0.4, 0.02, 0.1);
 h = 0.001;
 [X, Y] = meshgrid(-2:0.1:2);
-Z = X .^ 2 + Y .^ 2;
+Z = X.^2 + Y.^2;
 
-curr_x = 1.8;
-curr_y = 1.8;
-path_x = [curr_x];
-path_y = [curr_y];
-path_z = [curr_x^2 + curr_y^2];
+currX = 1.8;
+currY = 1.8;
+pathX = [currX];
+pathY = [currY];
+pathZ = [currX^2 + currY^2];
 
 for i = 1:20
-  dz_dx = (((curr_x + h)^2 + curr_y^2) - (curr_x^2 + curr_y^2)) / h;
-  dz_dy = ((curr_x^2 + (curr_y + h)^2) - (curr_x^2 + curr_y^2)) / h;
+  dzdx = (((currX + h)^2 + currY^2) - (currX^2 + currY^2)) / h;
+  dzdy = ((currX^2 + (currY + h)^2) - (currX^2 + currY^2)) / h;
 
-  curr_x = curr_x - learning_rate * dz_dx;
-  curr_y = curr_y - learning_rate * dz_dy;
+  currX = currX - lr * dzdx;
+  currY = currY - lr * dzdy;
 
-  path_x = [path_x; curr_x];
-  path_y = [path_y; curr_y];
-  path_z = [path_z; curr_x^2 + curr_y^2];
+  pathX = [pathX; currX];
+  pathY = [pathY; currY];
+  pathZ = [pathZ; currX^2 + currY^2];
 end
 
 surf(X, Y, Z)
 hold on
-plot3(path_x, path_y, path_z)
+plot3(pathX, pathY, pathZ)
 title('Gradient Descent: Finding the Minimum')
 `,
   },
@@ -10345,7 +10345,7 @@ export default function OpenMatStudio() {
           </div>
         </div>
       )}
-      <TutorPanel context={openMatTutorContext} />
+      <TutorPanel context={openMatTutorContext} onApplyCode={(nextCode) => setCode(String(nextCode ?? ""))} />
     </div>
   );
 }

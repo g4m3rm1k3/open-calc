@@ -154,6 +154,8 @@ function buildSystemPrompt(lesson, context = null) {
       `Your job is to help users translate MATLAB ideas into OpenMAT syntax and workflow honestly.`,
       `Prefer practical debugging, short rewrites, and blunt notes about current limitations over vague encouragement.`,
       `When a feature is not supported yet, say so clearly and suggest the closest working OpenMAT alternative.`,
+      `Do not invent parser limitations that are not true.`,
+      `OpenMAT currently supports ^ and .^ for power, title/xlabel/ylabel with string arguments, and whitespace-normalized element-wise operators in many common cases.`,
       ``,
       `Current workspace: ${context.title ?? 'OpenMAT Workspace'}`,
     ]
@@ -228,6 +230,28 @@ function buildSystemPrompt(lesson, context = null) {
   lines.push(`The student can ask you anything about this page or related concepts. If they ask "what's on this page" or "what is this lesson about", give a friendly 2–3 sentence summary. Keep all other answers concise. Use $...$ for inline math and $$...$$ for display math.`)
 
   return lines.join('\n')
+}
+
+function splitMessageBlocks(content) {
+  const blocks = []
+  const regex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g
+  let lastIndex = 0
+  let match
+  while ((match = regex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      blocks.push({ type: 'text', content: content.slice(lastIndex, match.index) })
+    }
+    blocks.push({
+      type: 'codeblock',
+      language: match[1] || '',
+      content: match[2].replace(/\s+$/, ''),
+    })
+    lastIndex = regex.lastIndex
+  }
+  if (lastIndex < content.length) {
+    blocks.push({ type: 'text', content: content.slice(lastIndex) })
+  }
+  return blocks.filter((block) => block.content?.trim?.())
 }
 
 // ─── Markdown + LaTeX message renderer ───────────────────────────────────────
@@ -317,62 +341,96 @@ function parseMessage(text) {
 }
 
 // Split into lines/paragraphs and render segments within each
-function TutorMessage({ content, isUser }) {
+function TutorMessage({ content, isUser, onApplyCode }) {
   const rendered = useMemo(() => {
     if (isUser) return null
-    // Split on blank lines into paragraphs; split on \n within for line breaks
-    const paragraphs = content.split(/\n{2,}/)
-    return paragraphs.map((para, pi) => {
-      // Numbered list item
-      const isNumbered = /^\d+\.\s/.test(para.trim())
-      // Bullet list item
-      const isBullet = /^[-*]\s/.test(para.trim())
-
-      const lines = para.split('\n')
-      return (
-        <p key={pi} className={`${pi > 0 ? 'mt-2' : ''} ${isNumbered || isBullet ? 'pl-3' : ''}`}>
-          {lines.map((line, li) => {
-            const segs = parseMessage(line)
-            return (
-              <span key={li}>
-                {li > 0 && <br />}
-                {segs.map((seg, si) => {
-                  if (seg.type === 'display-math') {
-                    return (
-                      <span
-                        key={si}
-                        className="block my-2 overflow-x-auto text-center"
-                        dangerouslySetInnerHTML={{ __html: renderKatex(seg.content, true) }}
-                      />
-                    )
-                  }
-                  if (seg.type === 'inline-math') {
-                    return (
-                      <span
-                        key={si}
-                        dangerouslySetInnerHTML={{ __html: renderKatex(seg.content, false) }}
-                      />
-                    )
-                  }
-                  if (seg.type === 'code') {
-                    return (
-                      <code key={si} className="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-[12px] font-mono text-slate-700 dark:text-slate-300 mx-0.5">
-                        {seg.content}
-                      </code>
-                    )
-                  }
-                  if (seg.type === 'bold') {
-                    return <strong key={si} className="font-semibold">{seg.content}</strong>
-                  }
-                  return <span key={si}>{seg.content}</span>
-                })}
+    const blocks = splitMessageBlocks(content)
+    return blocks.map((block, blockIndex) => {
+      if (block.type === 'codeblock') {
+        const language = (block.language || '').toLowerCase()
+        const isScriptLike = ['matlab', 'openmat', 'm', 'text', ''].includes(language)
+        return (
+          <div key={blockIndex} className={`${blockIndex > 0 ? 'mt-3' : ''} rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/70 overflow-hidden`}>
+            <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-700">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {language || 'code'}
               </span>
-            )
-          })}
-        </p>
-      )
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(block.content)}
+                  className="text-[11px] font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
+                >
+                  Copy
+                </button>
+                {onApplyCode && isScriptLike && (
+                  <button
+                    type="button"
+                    onClick={() => onApplyCode(block.content)}
+                    className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                  >
+                    Apply
+                  </button>
+                )}
+              </div>
+            </div>
+            <pre className="overflow-x-auto px-3 py-3 text-[12px] leading-6 text-slate-800 dark:text-slate-200">
+              <code>{block.content}</code>
+            </pre>
+          </div>
+        )
+      }
+
+      const paragraphs = block.content.split(/\n{2,}/)
+      return paragraphs.map((para, pi) => {
+        const isNumbered = /^\d+\.\s/.test(para.trim())
+        const isBullet = /^[-*]\s/.test(para.trim())
+        const lines = para.split('\n')
+        return (
+          <p key={`${blockIndex}-${pi}`} className={`${blockIndex > 0 || pi > 0 ? 'mt-2' : ''} ${isNumbered || isBullet ? 'pl-3' : ''}`}>
+            {lines.map((line, li) => {
+              const segs = parseMessage(line)
+              return (
+                <span key={li}>
+                  {li > 0 && <br />}
+                  {segs.map((seg, si) => {
+                    if (seg.type === 'display-math') {
+                      return (
+                        <span
+                          key={si}
+                          className="block my-2 overflow-x-auto text-center"
+                          dangerouslySetInnerHTML={{ __html: renderKatex(seg.content, true) }}
+                        />
+                      )
+                    }
+                    if (seg.type === 'inline-math') {
+                      return (
+                        <span
+                          key={si}
+                          dangerouslySetInnerHTML={{ __html: renderKatex(seg.content, false) }}
+                        />
+                      )
+                    }
+                    if (seg.type === 'code') {
+                      return (
+                        <code key={si} className="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-[12px] font-mono text-slate-700 dark:text-slate-300 mx-0.5">
+                          {seg.content}
+                        </code>
+                      )
+                    }
+                    if (seg.type === 'bold') {
+                      return <strong key={si} className="font-semibold">{seg.content}</strong>
+                    }
+                    return <span key={si}>{seg.content}</span>
+                  })}
+                </span>
+              )
+            })}
+          </p>
+        )
+      })
     })
-  }, [content, isUser])
+  }, [content, isUser, onApplyCode])
 
   if (isUser) {
     return <span>{content}</span>
@@ -576,7 +634,7 @@ const IconChat = () => (
 )
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
-export default function TutorPanel({ lesson, context = null }) {
+export default function TutorPanel({ lesson, context = null, onApplyCode = null }) {
   const [open, setOpen] = useState(false)
   const [view, setView] = useState('chat')
   const [settings, setSettings] = useState(loadSettings)
@@ -828,7 +886,7 @@ export default function TutorPanel({ lesson, context = null }) {
                         ? 'bg-brand-600 text-white rounded-2xl rounded-br-sm'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-2xl rounded-bl-sm'
                     }`}>
-                      <TutorMessage content={msg.content} isUser={msg.role === 'user'} />
+                      <TutorMessage content={msg.content} isUser={msg.role === 'user'} onApplyCode={msg.role === 'user' ? null : onApplyCode} />
                     </div>
                   </div>
                 ))}
@@ -837,7 +895,7 @@ export default function TutorPanel({ lesson, context = null }) {
                 {streamContent && (
                   <div className="flex justify-start">
                     <div className="max-w-[88%] px-3 py-2 rounded-2xl rounded-bl-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm leading-relaxed break-words">
-                      <TutorMessage content={streamContent} isUser={false} />
+                      <TutorMessage content={streamContent} isUser={false} onApplyCode={onApplyCode} />
                       <span className="inline-block w-0.5 h-3.5 ml-0.5 bg-slate-400 dark:bg-slate-500 animate-pulse rounded-full align-middle" />
                     </div>
                   </div>
