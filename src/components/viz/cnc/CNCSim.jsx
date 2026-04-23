@@ -1,4 +1,61 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  CNCEngine,
+  MACHINE_DEFINITIONS,
+  TOOL_TEMPLATES,
+} from "./CNCEngine.js";
+
+function channelStateToMs(ch) {
+  return {
+    pos:    ch.pos,
+    mpos:   ch.machinePos,
+    feed:   ch.feed,
+    rpm:    ch.rpm,
+    dir:    ch.dir,
+    coolant: ch.coolant?.flood || false,
+    activeT: ch.activeT,
+    activeH: ch.activeH,
+    motion:  ch.motionMode,
+    posMode: ch.posMode,
+    plane:   ch.plane,
+    units:   ch.units,
+    wcs:     ch.activeWCS,
+    offsets: ch.offsets,
+    vars:    (ch.vars && typeof ch.vars.entries === 'function') ? Object.fromEntries(ch.vars.entries()) : (ch.vars || {}),
+    done:    ch.done,
+    error:   ch.error,
+    home:    ch.home,
+    ptr:     ch.pointer,
+    liveDir: ch.liveDir,
+    liveRPM: ch.liveRPM,
+    cssMode: ch.cssMode,
+    cssSpeed:ch.cssSpeed,
+    waiting: ch.waiting,
+  };
+}
+
+function engineDefToMachCfg(def) {
+  const isLathe = def.class === "lathe" || def.class === "millturn" || def.class === "swiss";
+  const isMill  = def.class === "mill"  || def.class === "millturn";
+  return {
+    class:       def.class,
+    label:       def.label,
+    isLathe,
+    isMill,
+    axes:        [...(def.axes?.linear || []), ...(def.axes?.rotary || [])],
+    rotary:      def.axes?.rotary || [],
+    liveTools:   def.mCodes?.liveToolCW != null,
+    subSpindle:  !!def.axes?.subSpindleAxes,
+    turret2:     (def.channels?.length || 1) > 1,
+    channels:    def.channels || [{ id:0, label:"Main" }],
+    waitCodes:   def.waitCodes || {},
+    dialect:     def.dialect,
+    bedType:     "slant",
+    turret:      "disc",
+    maxSpindleRPM: def.maxSpindleRPM || 3000,
+    spindleKW:   def.spindleKW || 15,
+  };
+}
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const PALETTE_DARK = {
@@ -111,104 +168,42 @@ const initMS = () => ({
   home:{X:0,Y:0,Z:0,B:0,C:0},
 });
 
-const initTools = () => ({
-  1:{cls:"mill",  type:"End Mill",   desc:"10mm 4-fl Carbide",dia:10,cr:0,tlo:75,lc:22,lt:75,shank:10,fl:4,mat:"Carbide",hdia:32,hlen:50},
-  2:{cls:"mill",  type:"Drill",      desc:"6mm HSS Drill",    dia:6, cr:0,tlo:80,lc:40,lt:80,shank:6, fl:2,mat:"HSS",   hdia:32,hlen:50},
-  3:{cls:"lathe", type:"OD Turning", desc:"CNMG80 Insert",    dia:0, cr:0.8,tlo:30,lc:0,lt:30,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:80,relief:5},
-  4:{cls:"lathe", type:"Facing",     desc:"WNMG Facing",      dia:0, cr:0.4,tlo:25,lc:0,lt:25,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:35,relief:7},
-  5:{cls:"lathe", type:"Grooving",   desc:"3mm Groove/Part",  dia:3, cr:0.2,tlo:20,lc:0,lt:20,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:0, relief:7},
-  6:{cls:"live",  type:"Live End Mill",desc:"8mm Live EM",    dia:8, cr:0,tlo:60,lc:18,lt:60,shank:8, fl:4,mat:"Carbide",hdia:25,hlen:40},
-});
-
-// ─── G-CODE PARSER ──────────────────────────────────────────────────────────
-const gL = w => w?.G==null?[]:Array.isArray(w.G)?w.G:[w.G];
-const mL = w => w?.M==null?[]:Array.isArray(w.M)?w.M:[w.M];
-
-function parseGCode(src) {
-  return src.split("\n").reduce((acc, raw, li) => {
-    const t = raw.trim();
-    if (!t || t === "%") return acc;
-    const cm = t.match(/\(([^)]*)\)|;(.*)/);
-    const cmt = cm ? (cm[1]||cm[2]||"").trim() : "";
-    const clean = t.replace(/\([^)]*\)/g,"").replace(/;.*/,"").trim();
-    const seqM = clean.match(/^N(\d+)/i);
-    const seqN = seqM ? parseInt(seqM[1]) : null;
-    if (!clean && cmt) { acc.push({raw:t,clean:"",cmt,type:"cmt",li,seqN}); return acc; }
-    if (!clean) return acc;
-    const w={};
-    let m;
-    const re=/([A-Za-z])\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)/g;
-    while ((m=re.exec(clean))!==null) {
-      const k=m[1].toUpperCase(),v=parseFloat(m[2]);
-      w[k]==null?(w[k]=v):Array.isArray(w[k])?w[k].push(v):(w[k]=[w[k],v]);
-    }
-    acc.push({raw:t,clean,cmt,w,type:"block",li,seqN});
-    return acc;
-  }, []);
-}
-
-// ─── PATH BUILDER ─────────────────────────────────────────────────────────
-function buildPath(blks) {
-  const pts=[];
-  let cx=0,cy=0,cz=0,mode="G00",pm="G90",feed=200;
-  let rapid=0,cut=0,arc=0,tc=0,dist=0,time=0;
-  const ap=(x,y,z,m,bi,f)=>{
-    const d=Math.sqrt((x-cx)**2+(y-cy)**2+(z-cz)**2);
-    dist+=d;
-    const spd=m==="G00"?8000:(f||feed);
-    if(spd>0) time+=d/spd*60;
-    if(m==="G00")rapid++;else if(m==="G02"||m==="G03")arc++;else cut++;
-    pts.push({x,y,z,m,bi,feed:f||feed});
-    cx=x;cy=y;cz=z;
-  };
-  const ax=v=>pm==="G90"?v:cx+v;
-  const ay=v=>pm==="G90"?v:cy+v;
-  const az=v=>pm==="G90"?v:cz+v;
-  for(let bi=0;bi<blks.length;bi++){
-    const b=blks[bi];if(b.type==="cmt")continue;
-    const w=b.w||{};
-    const gs=gL(w);
-    for(const g of gs){
-      if(g===0)mode="G00";else if(g===1)mode="G01";
-      else if(g===2)mode="G02";else if(g===3)mode="G03";
-      else if(g===90)pm="G90";else if(g===91)pm="G91";
-    }
-    if(w.F!=null)feed=w.F;
-    if(w.T!=null)tc++;
-    const hx=w.X!=null,hy=w.Y!=null,hz=w.Z!=null;
-    if(hx||hy||hz){
-      const nx=hx?ax(w.X):cx,ny=hy?ay(w.Y):cy,nz=hz?az(w.Z):cz;
-      if(mode==="G02"||mode==="G03"){
-        const I=w.I||0,J=w.J||0,K=w.K||0;
-        let ocx=cx+I,ocy=cy+J;
-        if(w.R!=null){
-          const dx=nx-cx,dy=ny-cy,len=Math.sqrt(dx*dx+dy*dy);
-          if(len>0.001){
-            const h=Math.sqrt(Math.max(0,w.R*w.R-(len/2)**2));
-            const mx=(cx+nx)/2,my=(cy+ny)/2;
-            const nx2=-dy/len,ny2=dx/len;
-            const sign=mode==="G02"?1:-1;
-            ocx=mx+sign*h*nx2;ocy=my+sign*h*ny2;
-          }
-        }
-        const r=Math.sqrt((cx-ocx)**2+(cy-ocy)**2)||1;
-        let a0=Math.atan2(cy-ocy,cx-ocx),a1=Math.atan2(ny-ocy,nx-ocx);
-        let da=a1-a0;
-        if(mode==="G02"){if(da>0)da-=2*Math.PI;}else{if(da<0)da+=2*Math.PI;}
-        const steps=Math.max(8,Math.round(Math.abs(da)*r/2));
-        for(let s=1;s<=steps;s++){const a=a0+da*s/steps;ap(ocx+r*Math.cos(a),ocy+r*Math.sin(a),nz,mode,bi,feed);}
-      }else ap(nx,ny,nz,mode,bi,feed);
-    }
-    const cg=gs.find(g=>g>=81&&g<=89);
-    if(cg){
-      const rz=w.R!=null?w.R:cz+3,dz=w.Z!=null?(pm==="G90"?w.Z:cz+w.Z):cz-10;
-      const nx=w.X!=null?(pm==="G90"?w.X:cx+w.X):cx;
-      const ny=w.Y!=null?(pm==="G90"?w.Y:cy+w.Y):cy;
-      ap(nx,ny,rz,"G00",bi,0);ap(nx,ny,dz,"G01",bi,feed);ap(nx,ny,rz,"G00",bi,0);
-    }
+// Build default tool table from TOOL_TEMPLATES
+const initTools = () => {
+  const t = {};
+  let n = 1;
+  // Mill tools: pick representative set
+  const millKeys = ["end_mill_4fl", "drill_8"];
+  for (const k of millKeys) {
+    const tmpl = TOOL_TEMPLATES.mill[k];
+    if (tmpl) t[n++] = { ...tmpl, tlo: tmpl.lt || 75, hdia: 32, hlen: 50 };
   }
-  return{pts,stats:{blocks:blks.length,rapid,cut,arc,tc,time:Math.round(time),dist:Math.round(dist)}};
-}
+  // Lathe tools
+  const latheKeys = ["od_cnmg_80", "facing_wnmg", "grooving_3mm"];
+  for (const k of latheKeys) {
+    const tmpl = TOOL_TEMPLATES.lathe[k];
+    if (tmpl) t[n++] = { ...tmpl, hdia: 16, hlen: 80 };
+  }
+  // Live tool
+  const liveKeys = ["live_end_mill_8"];
+  for (const k of liveKeys) {
+    const tmpl = TOOL_TEMPLATES.live?.[k];
+    if (tmpl) t[n++] = { ...tmpl, tlo: tmpl.lt || 60, hdia: 25, hlen: 40 };
+  }
+  // Fallback: if templates didn't resolve, use safe defaults
+  if (Object.keys(t).length === 0) {
+    return {
+      1:{cls:"mill",  type:"End Mill",   desc:"10mm 4-fl Carbide",dia:10,cr:0,tlo:75,lc:22,lt:75,shank:10,fl:4,mat:"Carbide",hdia:32,hlen:50},
+      2:{cls:"mill",  type:"Drill",      desc:"6mm HSS Drill",    dia:6, cr:0,tlo:80,lc:40,lt:80,shank:6, fl:2,mat:"HSS",   hdia:32,hlen:50},
+      3:{cls:"lathe", type:"OD Turning", desc:"CNMG80 Insert",    dia:0, cr:0.8,tlo:30,lc:0,lt:30,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:80,relief:5},
+      4:{cls:"lathe", type:"Facing",     desc:"WNMG Facing",      dia:0, cr:0.4,tlo:25,lc:0,lt:25,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:35,relief:7},
+      5:{cls:"lathe", type:"Grooving",   desc:"3mm Groove/Part",  dia:3, cr:0.2,tlo:20,lc:0,lt:20,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:0, relief:7},
+      6:{cls:"live",  type:"Live End Mill",desc:"8mm Live EM",    dia:8, cr:0,tlo:60,lc:18,lt:60,shank:8, fl:4,mat:"Carbide",hdia:25,hlen:40},
+    };
+  }
+  return t;
+};
+
 
 // ─── GEOM → G-CODE ─────────────────────────────────────────────────────────
 function geomToGCode(geoms,machCfg,toolDia=10,depth=2,feed=200,rpm=1500){
@@ -446,7 +441,158 @@ G01 X0. Y0.
 G00 Z50.
 M05 M09 M30`},
   ],
+
+  // ── Siemens 840D programs ──────────────────────────────────────────────────
+  siemens_mill:[
+    {id:"P1",name:"Square Pocket",desc:"Siemens 840D — G01 linear",code:`;SQUARE POCKET - Siemens 840D
+G71 G90 G17 G40 G49
+T1 D1 M6
+S1500 M3
+M8
+G0 X0 Y0 Z5.
+G1 Z-2. F100
+G1 X50. F200
+G1 Y50.
+G1 X0.
+G1 Y0.
+G0 Z50.
+M9 M5 M30`},
+    {id:"P2",name:"Bolt Circle — R-vars",desc:"Siemens R-vars WHILE loop, 8 holes Ø80",code:`;BOLT CIRCLE - Siemens 840D
+G71 G90 G17 G40
+T2 D1 M6
+S2000 M3 M8
+R100=0
+R101=8
+R102=40.
+WHILE R100<R101
+  R103=R100*360./R101
+  R104=R102*COS(R103)
+  R105=R102*SIN(R103)
+  G0 X=R104 Y=R105
+  G81 Z=-10. DP=-10. RTP=3. F80
+  R100=R100+1
+ENDWHILE
+G80
+G0 Z50.
+M5 M30`},
+  ],
+  siemens_lathe:[
+    {id:"P10",name:"OD Turning",desc:"Siemens 840D — G96 CSS, roughing",code:`;OD TURNING - Siemens 840D
+G71 G90 G18 G40
+T1 D1
+G96 S200 M3
+M8
+G0 X85. Z2.
+G1 X80. Z0. F0.3
+G1 Z-100. F0.2
+G1 X85.
+G0 X100. Z50.
+M9 M5 M30`},
+  ],
+
+  // ── Okuma OSP programs (VC variables) ─────────────────────────────────────
+  okuma_mill:[
+    {id:"O0001",name:"Square Pocket",desc:"Okuma OSP — standard G-code",code:`O0001 (SQUARE POCKET - OKUMA)
+G21 G90 G17 G40 G49 G80
+T1 M6
+G43 H1
+S1500 M3
+M8
+G0 X0 Y0 Z5.
+G1 Z-2. F100
+G1 X50. F200
+G1 Y50.
+G1 X0.
+G1 Y0.
+G0 Z50.
+M9 M5 M30`},
+    {id:"O0002",name:"Bolt Circle — VC vars",desc:"Okuma VC variable loop, 8 holes Ø80",code:`O0002 (BOLT CIRCLE - OKUMA OSP)
+G21 G90 G17 G40 G49 G80
+T2 M6 G43 H2
+S2000 M3 M8
+VC100=0
+VC101=8
+VC102=40.
+WHILE [VC100 LT VC101] DO1
+  VC103=VC100*360./VC101
+  VC104=VC102*COS[VC103]
+  VC105=VC102*SIN[VC103]
+  G0 X[VC104] Y[VC105]
+  G81 Z-10. R3. F80
+  VC100=VC100+1
+END1
+G80
+G0 Z50.
+M5 M30`},
+  ],
+  okuma_lathe:[
+    {id:"O1001",name:"OD Turning",desc:"Okuma OSP — G96 CSS turning",code:`O1001 (OD TURNING - OKUMA)
+G21 G90 G18 G40
+T0303
+G96 S200 M3
+G50 S3000
+M8
+G0 X85. Z2.
+G1 X80. Z0. F0.3
+G1 Z-100. F0.2
+G1 X85.
+G0 X100. Z50.
+M9 M5 M30`},
+  ],
+
+  // ── HAAS programs (Fanuc-compatible, slight differences) ──────────────────
+  haas_mill:[
+    {id:"O0001",name:"Square Pocket",desc:"HAAS Fanuc-compat macro B",code:`O0001 (SQUARE POCKET - HAAS)
+G21 G90 G17 G40 G49 G80
+T1 M6
+G43 H1
+S1500 M3
+M8
+G0 X0. Y0. Z5.
+G1 Z-2. F100.
+G1 X50. F200.
+G1 Y50.
+G1 X0.
+G1 Y0.
+G0 Z50.
+M9 M5 M30`},
+    {id:"O0002",name:"Bolt Circle — Macro B",desc:"HAAS #vars WHILE/DO/END, 8 holes",code:`O0002 (BOLT CIRCLE - HAAS)
+G21 G90 G17 G40 G49 G80
+T2 M6 G43 H2
+S2000 M3 M8
+#100 = 0.
+#101 = 8.
+#102 = 40.
+WHILE [#100 LT #101] DO1
+#103 = #100 * 360. / #101
+#104 = #102 * COS[#103]
+#105 = #102 * SIN[#103]
+G0 X#104 Y#105
+G81 Z-10. R3. F80.
+#100 = #100 + 1.
+END1
+G80
+G0 Z50.
+M9 M5 M30`},
+  ],
 };
+
+// ── Helper: pick the right program set for the active machine definition ─────
+function getProgLib(machDef) {
+  if (!machDef) return PROG_LIB.mill;
+  const dialect = machDef.dialect || "fanuc";
+  const cls = machDef.class || "mill";
+  const isLathe = cls === "lathe" || cls === "millturn" || cls === "swiss";
+
+  // Check dialect-specific library first
+  const dialectKey = `${dialect}_${isLathe ? "lathe" : "mill"}`;
+  if (PROG_LIB[dialectKey]) return PROG_LIB[dialectKey];
+
+  // Fanuc/generic fallback by machine class
+  if (cls === "millturn") return PROG_LIB.millturn;
+  if (isLathe) return PROG_LIB.lathe;
+  return PROG_LIB.mill;
+}
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
 const getCSS = () => `
@@ -589,16 +735,16 @@ export default function CNCSimPro() {
 
   const CSS = useMemo(() => getCSS(), [dark]);
 
-  const [preset, setPreset] = useState("lathe2");
-  const [mach, setMach] = useState(MACHINE_PRESETS.lathe2);
-  const [customMach, setCustomMach] = useState({...MACHINE_PRESETS.lathe2});
+  const [machDefId, setMachDefId] = useState("fanuc_mill");
+  const [mach, setMach] = useState(engineDefToMachCfg(MACHINE_DEFINITIONS["fanuc_mill"]));
+  const [customMach, setCustomMach] = useState(engineDefToMachCfg(MACHINE_DEFINITIONS["fanuc_mill"]));
   const [showMachBuilder, setShowMachBuilder] = useState(false);
 
   const [ms, setMs] = useState(initMS);
   const [tools, setTools] = useState(initTools);
-  const [stock, setStock] = useState({shape:"cyl",diameter:80,length:150,x:0,y:0,z:0});
+  const [stock, setStock] = useState({shape:"rect",width:100,height:80,depth:40,x:0,y:0,z:0});
   const [fixtures, setFixtures] = useState([]);
-  const [code, setCode] = useState(PROG_LIB.lathe[0].code);
+  const [code, setCode] = useState(() => getProgLib(MACHINE_DEFINITIONS["fanuc_mill"])[0].code);
   const [blocks, setBlocks] = useState([]);
   const [pathPts, setPathPts] = useState([]);
   const [pStats, setPStats] = useState({blocks:0,rapid:0,cut:0,arc:0,tc:0,time:0,dist:0});
@@ -642,6 +788,7 @@ export default function CNCSimPro() {
   const pathRef  = useRef([]);
   const msRef    = useRef(ms);
   const playRef  = useRef(null);
+  const engineRef = useRef(null);
   const doneRef  = useRef(false);
   const playingRef = useRef(false);
   const dragRef  = useRef({on:false,btn:0,lx:0,ly:0});
@@ -655,7 +802,9 @@ export default function CNCSimPro() {
 
   // ─── When preset changes, apply machine config + reset stock ───
   useEffect(()=>{
-    const m = MACHINE_PRESETS[preset] || mach;
+    const def = MACHINE_DEFINITIONS[machDefId];
+    if(!def) return;
+    const m = engineDefToMachCfg(def);
     setMach(m);
     setCustomMach({...m});
     if (m.isLathe) {
@@ -665,83 +814,77 @@ export default function CNCSimPro() {
     }
     // reset ms axes
     setMs(initMS());
-    // Set appropriate code library
-  },[preset]);
+    // Load the first program from the dialect-appropriate library
+    const lib = getProgLib(def);
+    if (lib?.length) {
+      setCode(lib[0].code);
+      // reload() will be called by the code useEffect below
+    }
+  },[machDefId]);
 
   // ─── Reload code ───────────────────────────────────────────────
   const reload = useCallback((src)=>{
     const s = src ?? code;
-    const blks = parseGCode(s);
-    const {pts,stats} = buildPath(blks);
-    blksRef.current = blks; setBlocks(blks);
-    pathRef.current = pts;  setPathPts(pts);
+    const defId = machDefId;
+    const def = MACHINE_DEFINITIONS[defId] || MACHINE_DEFINITIONS["fanuc_mill"];
+
+    setAlarms([]);
+    const engine = new CNCEngine(def);
+    try {
+      engine.loadPrograms(s);
+    } catch (err) {
+      console.error("Engine processing error:", err);
+      setAlarms([`Parse/Trace Error: ${err.message}`]);
+    }
+    engineRef.current = engine;
+
+    const pts   = engine.getPathPoints();
+    const stats = engine.getStats();
+    const state = engine.getState(); // array, one per channel
+
+    pathRef.current = pts;
+    setPathPts(pts);
     setPStats(stats);
-    ptrRef.current=0; setPointer(0);
-    setCurPt(0);
-    const nm=initMS(); msRef.current=nm; setMs(nm);
-    doneRef.current=false;
-    playingRef.current=false; setIsPlaying(false);
+    setBlocks(engine.channels[0].blocks);
+    setCurPt(0); setPointer(0); ptrRef.current = 0;
+    setMs(channelStateToMs(state[0]));
+    setOpMsgs([]);
+    doneRef.current = false;
+    playingRef.current = false; setIsPlaying(false);
     clearTimeout(playRef.current); cancelAnimationFrame(playRef.current);
-    remRef.current=[]; setMatRemoval([]);
-  },[code]);
+    remRef.current = []; setMatRemoval([]);
+  }, [code, machDefId]);
+
+  // Trigger initial parse on mount
+  useEffect(()=>{
+    reload(code);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ─── Step ──────────────────────────────────────────────────────
-  const step = useCallback(()=>{
-    const blks=blksRef.current, ptr=ptrRef.current;
-    if(doneRef.current||ptr>=blks.length){doneRef.current=true;setIsPlaying(false);return;}
-    const b=blks[ptr]; ptrRef.current=ptr+1;
-    const nm={...msRef.current,ptr:ptr+1};
-    if(b.type!=="cmt"){
-      const w=b.w||{},gs=gL(w),ms2=mL(w);
-      for(const g of gs){
-        if(g===0)nm.motion="G00";else if(g===1)nm.motion="G01";
-        else if(g===2)nm.motion="G02";else if(g===3)nm.motion="G03";
-        else if(g===17)nm.plane="G17";else if(g===18)nm.plane="G18";
-        else if(g===20)nm.units="inch";else if(g===21)nm.units="mm";
-        else if(g===43){nm.tlOff="G43";if(w.H!=null)nm.activeH=w.H;}
-        else if([54,55,56,57].includes(g))nm.wcs=`G${g}`;
-        else if(g===90)nm.posMode="G90";else if(g===91)nm.posMode="G91";
-        else if(g===96||g===97){}
-        else if(g===28)nm.pos={...nm.home};
-        else if(g>=80&&g<=89)nm.cycle=`G${Math.round(g)}`;
-      }
-      for(const m of ms2){
-        if(m===3||m===13){nm.dir="CW";if(w.S!=null)nm.rpm=w.S;}
-        else if(m===4||m===14){nm.dir="CCW";if(w.S!=null)nm.rpm=w.S;}
-        else if(m===5){nm.dir="";nm.rpm=0;}
-        else if(m===8||m===9)nm.coolant=m===8;
-        else if(m===6){if(w.T!=null){nm.activeT=w.T;nm.activeH=w.T;}}
-        else if(m===30||m===2)doneRef.current=true;
-        else if(m===19){}// spindle orient - no-op
-      }
-      if(w.T!=null&&!ms2.includes(6))nm.activeT=w.T;
-      if(w.S!=null&&nm.dir)nm.rpm=w.S;
-      if(w.F!=null)nm.feed=w.F;
-      if(w.H!=null)nm.activeH=w.H;
-      const av=v=>nm.posMode==="G90"?v:(nm.pos[Object.keys(nm.pos)[0]]||0)+v;
-      const np={...nm.pos};
-      if(w.X!=null)np.X=nm.posMode==="G90"?w.X:np.X+w.X;
-      if(w.Y!=null)np.Y=nm.posMode==="G90"?w.Y:np.Y+w.Y;
-      if(w.Z!=null)np.Z=nm.posMode==="G90"?w.Z:np.Z+w.Z;
-      if(w.B!=null)np.B=w.B; if(w.C!=null)np.C=w.C;
-      nm.pos=np;
-      const off=nm.offsets[nm.wcs]||{X:0,Y:0,Z:0};
-      nm.mpos={X:np.X+(off.X||0),Y:np.Y+(off.Y||0),Z:np.Z+(off.Z||0)};
-      // Material removal (lathe only) — update profile
-      if(mach.isLathe&&(nm.motion==="G01"||nm.motion==="G02"||nm.motion==="G03")){
-        const xr=Math.abs(np.X)/2; // radius in lathe (X is diameter)
-        const z=np.Z;
-        remRef.current=[...remRef.current,{z,xr}];
-        setMatRemoval([...remRef.current]);
-      }
-    } else {
-      if(b.cmt)setOpMsgs(p=>[...p.slice(-29),b.cmt]);
+  const step = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine || engine.isDone()) { doneRef.current = true; setIsPlaying(false); return; }
+
+    const result = engine.stepAll();
+    const ch0 = result[0];
+
+    ptrRef.current = ch0.pointer;
+    setPointer(ch0.pointer);
+    setCurPt(ch0.pointer);
+
+    setMs(channelStateToMs(ch0));
+
+    if (mach.isLathe && (ch0.motionMode === "G01" || ch0.motionMode === "G02" || ch0.motionMode === "G03")) {
+      const xr = Math.abs(ch0.pos.X) / 2;
+      const z = ch0.pos.Z;
+      remRef.current = [...remRef.current, { z, xr }];
+      setMatRemoval([...remRef.current]);
     }
-    msRef.current=nm;
-    setMs({...nm});
-    const np2=Math.min(ptrRef.current,pathRef.current.length);
-    setCurPt(np2); setPointer(ptrRef.current);
-  },[mach.isLathe]);
+
+    doneRef.current = engine.isDone();
+    if (doneRef.current) setIsPlaying(false);
+  }, [mach.isLathe]);
 
   // ─── Auto-run ──────────────────────────────────────────────────
   const autoRun = useCallback(()=>{
@@ -1076,21 +1219,62 @@ export default function CNCSimPro() {
 
       // Toolpath
       if(pathRef.current.length>1){
-        let prev=pathRef.current[0];
-        for(let i=1;i<pathRef.current.length;i++){
-          const p=pathRef.current[i];
+        const pts=pathRef.current;
+        let prev=pts[0];
+
+        // ── Pass 1: draw all path lines ────────────────────────────────────
+        for(let i=1;i<pts.length;i++){
+          const p=pts[i];
           const pa=proj(prev.x,prev.y,prev.z),pb=proj(p.x,p.y,p.z);
-          ctx.strokeStyle=p.m==="G00"?C.rapid+"45":p.m==="G02"||p.m==="G03"?C.arc+"70":C.feed+"55";
-          ctx.lineWidth=p.m==="G00"?.8:1.3;
-          ctx.setLineDash(p.m==="G00"?[4,3]:[]);
+
+          // Classify: retract = G00 where Z increases and XY doesn't change
+          const isRetract = p.m==="G00" &&
+                            p.z > prev.z &&
+                            Math.abs(p.x-prev.x)<0.001 &&
+                            Math.abs(p.y-prev.y)<0.001;
+          // XY rapid (positioning move), no Z component
+          const isXYRapid = p.m==="G00" && !isRetract;
+
+          if(isRetract){
+            ctx.strokeStyle=C.amber+"99"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+          } else if(isXYRapid){
+            ctx.strokeStyle=C.rapid+"50"; ctx.lineWidth=0.8; ctx.setLineDash([4,3]);
+          } else if(p.m==="G02"||p.m==="G03"){
+            ctx.strokeStyle=C.arc+"90"; ctx.lineWidth=1.5; ctx.setLineDash([]);
+          } else {
+            // G01 feed
+            ctx.strokeStyle=C.feed+"85"; ctx.lineWidth=1.5; ctx.setLineDash([]);
+          }
           ctx.beginPath();ctx.moveTo(pa.sx,pa.sy);ctx.lineTo(pb.sx,pb.sy);ctx.stroke();
           prev=p;
         }
         ctx.setLineDash([]);
+
+        // ── Pass 2: endpoint dots at drill / plunge positions ──────────────
+        prev=pts[0];
+        for(let i=1;i<pts.length;i++){
+          const p=pts[i];
+          // Drill endpoint: G01 moving downward in Z (plunge)
+          if(p.m==="G01" && p.z < prev.z - 0.01){
+            const{sx,sy}=proj(p.x,p.y,p.z);
+            ctx.fillStyle=C.feed;
+            ctx.beginPath();ctx.arc(sx,sy,3,0,Math.PI*2);ctx.fill();
+          }
+          // Retract start: G00 moving up from a plunge point
+          if(p.m==="G00" && p.z > prev.z + 0.01 && Math.abs(p.x-prev.x)<0.001 && Math.abs(p.y-prev.y)<0.001){
+            const{sx,sy}=proj(prev.x,prev.y,prev.z);
+            ctx.strokeStyle=C.amber; ctx.lineWidth=1.5;
+            ctx.beginPath();ctx.arc(sx,sy,4,0,Math.PI*2);ctx.stroke();
+          }
+          prev=p;
+        }
+
+        // ── Pass 3: step-through highlight ────────────────────────────────
         if(curPt>0){
           ctx.strokeStyle=C.blue2;ctx.lineWidth=2.5;ctx.shadowColor=C.blue2;ctx.shadowBlur=3;
           ctx.beginPath();
-          pathRef.current.slice(0,Math.min(curPt,pathRef.current.length)).forEach((p,i)=>{
+          const drawnPath = pathRef.current.filter(p => p.bi < curPt);
+          drawnPath.forEach((p,i)=>{
             const{sx,sy}=proj(p.x,p.y,p.z);
             i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
           });
@@ -1462,7 +1646,7 @@ export default function CNCSimPro() {
 
   // ─── Setup export/import ──────────────────────────────────────
   const exportSetup=()=>{
-    const d={version:4,ts:new Date().toISOString(),preset,mach,code,tools,stock,fixtures,geoms,offsets:ms.offsets,wcs:ms.wcs,home:ms.home,savedProgs,geomDepth,geomFeed};
+    const d={version:4,ts:new Date().toISOString(),machDefId,mach,code,tools,stock,fixtures,geoms,offsets:ms.offsets,wcs:ms.wcs,home:ms.home,savedProgs,geomDepth,geomFeed};
     const b=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
     const a=document.createElement("a");a.href=URL.createObjectURL(b);
     a.download=`cnc_${new Date().toISOString().slice(0,10)}.cncsetup`;a.click();
@@ -1472,7 +1656,7 @@ export default function CNCSimPro() {
     const r=new FileReader();
     r.onload=e=>{try{
       const d=JSON.parse(e.target.result);
-      if(d.preset)setPreset(d.preset);
+      if(d.machDefId)setMachDefId(d.machDefId);
       if(d.code)setCode(d.code);
       if(d.tools)setTools(d.tools);
       if(d.stock)setStock(d.stock);
@@ -1625,6 +1809,33 @@ export default function CNCSimPro() {
             </>}
 
             {leftTab==="mach"&&<>
+              <div className="sec">Machine Definition</div>
+              <select
+                value={machDefId}
+                onChange={e => {
+                  setMachDefId(e.target.value);
+                  const def = MACHINE_DEFINITIONS[e.target.value];
+                  setMach(engineDefToMachCfg(def));
+                }}
+                style={{width:"100%", marginBottom:8}}
+              >
+                {Object.entries(MACHINE_DEFINITIONS).map(([k,v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+
+              {MACHINE_DEFINITIONS[machDefId]?.channels?.length > 1 && (
+                <div style={{marginBottom:8}}>
+                  <div className="sec">Channels</div>
+                  {MACHINE_DEFINITIONS[machDefId].channels.map((ch, i) => (
+                    <div key={i} className="mini">
+                      <span className="mini-l">{ch.tag || `CH${i+1}`}</span>
+                      <span className="mini-v">{ch.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/*
               <div className="sec">Machine Preset</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4,marginBottom:8}}>
                 {Object.entries(MACHINE_PRESETS).map(([k,m])=>(
@@ -1635,6 +1846,7 @@ export default function CNCSimPro() {
                   </div>
                 ))}
               </div>
+              */}
               <div className="div"/>
               <div className="sec">Machine Config Builder</div>
               <div className="mcfg-row"><span className="mcfg-lbl">Class</span>
@@ -1840,7 +2052,7 @@ export default function CNCSimPro() {
             </div>
             <div className="trace-lines">
               {blocks.map((b,bi)=>{
-                const gs=gL(b.w||{});const m=gs.find(g=>g===0||g===1||g===2||g===3);
+                const gWord=b.words?.G; const gs=gWord!=null?(Array.isArray(gWord)?gWord:[gWord]):[]; const m=gs.find(g=>g===0||g===1||g===2||g===3);
                 return(
                   <div key={bi} id={`tl${bi}`} className={`tline${b.type==="cmt"?" cmt":""}${bi===pointer-1?" cur":""}${m===0?" rpl":m===1?" fpl":(m===2||m===3)?" apl":""}`}>
                     {b.seqN!=null?<span className="tline-nn">N{b.seqN}</span>:<span className="tline-n">{bi}</span>}
