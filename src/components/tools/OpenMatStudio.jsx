@@ -953,6 +953,34 @@ const HELP_TEXT = [
   "window.OpenMAT.registerExtension(name, { functions, onRun })",
 ].join("\n");
 
+const MATLAB_COMPATIBILITY = {
+  worksWell: [
+    "Matrix and vector literals, transpose, and linear solves such as A \\ b",
+    "Colon ranges and array generation such as linspace, logspace, zeros, ones, eye, rand, and randn",
+    "Basic control flow: if / elseif / else, for, while, break, and continue",
+    "User-defined functions, multi-output assignment, and anonymous functions with @(...)",
+    "Common classroom numerics and plotting such as eig, qr, svd, roots, trapz, gradient, plot, bar, stem, area, hist, and subplot",
+  ],
+  different: [
+    "OpenMAT runs on a browser-side math engine, so numeric edge cases can differ from MATLAB",
+    "Figures render into Open Calc plots and 3D handoff views instead of MATLAB graphics handles",
+    "Simulation workbenches and controls like slider(...) and animate(...) are OpenMAT features, not MATLAB features",
+    "Workspace, console, and script tabs share one local session model instead of MATLAB's desktop workflow",
+  ],
+  notYet: [
+    "No toolbox-level compatibility promise for Control System, Signal Processing, Optimization, PDE, Symbolic Math, or Simulink workflows",
+    "No full .m project compatibility for multi-file production codebases, package folders, classdef, or app workflows",
+    "No desktop file I/O environment or MATLAB GUI/handle ecosystem parity",
+    "No guarantee that workplace scripts using specialized toolboxes or advanced language corners will run unchanged",
+  ],
+  rewriteTips: [
+    "Start by testing a small numeric core, not the entire workplace script",
+    "Replace toolbox calls with simpler matrix or plotting equivalents when possible",
+    "Use the Reference tab and docs/OpenMAT.md to see what is MATLAB-like versus OpenMAT-only",
+    "Treat OpenMAT as a lab and engineering intuition runtime first, not a drop-in MATLAB replacement yet",
+  ],
+};
+
 const SERIES_COLORS = ["teal", "blue", "amber", "purple", "red", "green"];
 const OPENMAT_EXTENSION_REGISTRY = new Map();
 
@@ -1663,6 +1691,60 @@ function estimateBytes(value) {
 function summarizeValue(value) {
   const text = formatValue(value).replace(/\s+/g, " ").trim();
   return text.length > 90 ? `${text.slice(0, 87)}...` : text || "(empty)";
+}
+
+function downloadTextFile(filename, content, type = "text/plain;charset=utf-8") {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function normalizeTabularRows(value) {
+  const plain = toPlain(value);
+  if (plain == null) return [];
+  if (!Array.isArray(plain)) return [[plain]];
+  if (!plain.length) return [];
+  if (Array.isArray(plain[0])) return plain.map((row) => (Array.isArray(row) ? row : [row]));
+  return plain.map((entry) => [entry]);
+}
+
+function csvCell(value) {
+  if (value == null) return "";
+  if (typeof value === "number") return Number.isFinite(value) ? String(value) : "";
+  const text = typeof value === "string" ? value : JSON.stringify(value);
+  if (/[",\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+function valueToCsv(value) {
+  const rows = normalizeTabularRows(value);
+  if (!rows.length) return "";
+  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+}
+
+function tableToMatlabLiteral(rows) {
+  if (!rows.length) return "[]";
+  return `[${rows.map((row) => row.join(" ")).join("; ")}]`;
+}
+
+function parseDelimitedRows(text) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (!lines.length) return [];
+  return lines.map((line) =>
+    line
+      .split(/[\t,;]+/)
+      .map((entry) => Number(entry.trim()))
+      .filter((value) => Number.isFinite(value)),
+  ).filter((row) => row.length > 0);
 }
 
 function buildWorkspaceSnapshot(parser, variables) {
@@ -4757,6 +4839,7 @@ export default function OpenMatStudio() {
   const [rightPaneWidth, setRightPaneWidth] = useLocalStorage("openmat-right-pane-width", 390);
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState("");
+  const [lastRunReport, setLastRunReport] = useState(null);
   const [figureJson, setFigureJson] = useState(null);
   const [baseFigureJson, setBaseFigureJson] = useState(null);
   const [isPlotWindowOpen, setIsPlotWindowOpen] = useState(false);
@@ -4805,6 +4888,7 @@ export default function OpenMatStudio() {
   const outputRef = useRef(null);
   const consoleInputRef = useRef(null);
   const importRef = useRef(null);
+  const dataImportRef = useRef(null);
   const shellRef = useRef(null);
   const stateRef = useRef({});
   const controlValuesRef = useRef(controlValues);
@@ -5587,9 +5671,34 @@ export default function OpenMatStudio() {
   ];
   const browserTabs = [
     { id: "examples", label: "Examples" },
+    { id: "benchmarks", label: "Benchmarks" },
     { id: "functions", label: "Functions" },
     { id: "notes", label: "Notes" },
   ];
+  const workspaceOverview = useMemo(() => {
+    const bytes = displayWorkspaceItems.reduce((sum, item) => sum + Number(item.bytes || 0), 0);
+    const matrixCount = displayWorkspaceItems.filter((item) => Array.isArray(item.value)).length;
+    const scalarCount = displayWorkspaceItems.filter((item) => !Array.isArray(item.value)).length;
+    return {
+      variableCount: displayWorkspaceItems.length,
+      matrixCount,
+      scalarCount,
+      bytes,
+    };
+  }, [displayWorkspaceItems]);
+  const benchmarkShowcases = useMemo(
+    () =>
+      SIMULATION_WORKSPACES
+        .filter((workspace) => getWorkbenchEnrichment(workspace.id)?.benchmarks?.length)
+        .map((workspace) => ({
+          id: workspace.id,
+          title: workspace.title,
+          summary: workspace.summary,
+          benchmarkCount: getWorkbenchEnrichment(workspace.id)?.benchmarks?.length || 0,
+          solverLabel: getWorkbenchEnrichment(workspace.id)?.solver?.label || "Guided workbench",
+        })),
+    [],
+  );
   const crowdedTabs = documents.length >= 6;
   const interactionModelItems = [
     "Editor tabs store saved scripts, examples, and labs.",
@@ -5665,6 +5774,7 @@ export default function OpenMatStudio() {
 
   const clearRunState = useCallback(() => {
     setOutput("");
+    setLastRunReport(null);
     setFigureJson(null);
     setBaseFigureJson(null);
     setSurfaceConfig(null);
@@ -5768,6 +5878,15 @@ export default function OpenMatStudio() {
         result.workspace?.[0] ||
         null,
       );
+      setLastRunReport({
+        status: "ok",
+        source: commandLabel ? "console" : "script",
+        executedAt: new Date().toISOString(),
+        variableCount: result.workspace?.length || 0,
+        controlCount: result.controls?.length || 0,
+        figureKind: result.plot3DRequest ? "3d" : result.figureJson ? "2d" : "none",
+        outputPreview: String(result.output || "No output.").slice(0, 240),
+      });
       setWorkspaceTab((current) => {
         const desired = result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console";
         return current === desired ? current : desired;
@@ -5787,6 +5906,15 @@ export default function OpenMatStudio() {
       markInteractiveTourAction("run-workbench");
     } catch (error) {
       setOutput(`Error: ${error.message}`);
+      setLastRunReport({
+        status: "error",
+        source: "script",
+        executedAt: new Date().toISOString(),
+        variableCount: 0,
+        controlCount: 0,
+        figureKind: "none",
+        outputPreview: String(error.message || "Unknown error"),
+      });
       setFigureJson(null);
       setBaseFigureJson(null);
       setIsPlotWindowOpen(false);
@@ -5979,6 +6107,15 @@ export default function OpenMatStudio() {
     } catch (error) {
       setOutput(`>> ${command}\nError: ${error.message}`);
       setLastConsoleCommand(command);
+      setLastRunReport({
+        status: "error",
+        source: "console",
+        executedAt: new Date().toISOString(),
+        variableCount: workspaceItems.length,
+        controlCount: controlSpecs.length,
+        figureKind: surfaceConfig ? "3d" : displayFigureJson ? "2d" : "none",
+        outputPreview: String(error.message || "Unknown error"),
+      });
       setWorkspaceTab("console");
     } finally {
       setRunning(false);
@@ -5990,7 +6127,10 @@ export default function OpenMatStudio() {
   }, [
     applyExecutionResult,
     commandInput,
+    controlSpecs.length,
     controlValues,
+    displayFigureJson,
+    surfaceConfig,
     setCommandHistory,
     setWorkspaceTab,
     workspaceItems,
@@ -6149,6 +6289,81 @@ export default function OpenMatStudio() {
     reader.readAsText(file);
     event.target.value = "";
   }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setActiveSimulationId, setBrowserTab, setControlPlayback, setControlValues, setDocuments, setParameterStudyStore, setSimConstraintStore, setSimGeometryStore, setSimLeftTab, setSimRightTab, setWorkbenchLessonProgress, setWorkbenchPresetStore, setWorkspaceMode, setWorkspaceTab]);
+
+  const exportActiveDocument = useCallback(() => {
+    if (!activeDocument) return;
+    const filename = String(activeDocument.name || "untitled.m").endsWith(".m")
+      ? String(activeDocument.name || "untitled.m")
+      : `${String(activeDocument.name || "untitled")}.m`;
+    downloadTextFile(filename, activeDocument.code || "", "text/x-matlab;charset=utf-8");
+    setOutput(`Exported ${filename} from the active OpenMAT script tab.`);
+  }, [activeDocument]);
+
+  const exportSelectedVariableCsv = useCallback(() => {
+    if (!selectedVariable) {
+      setOutput("Select a workspace variable first, then export it as CSV.");
+      setWorkspaceTab("workspace");
+      return;
+    }
+    const csv = valueToCsv(selectedVariable.value);
+    if (!csv) {
+      setOutput(`Workspace variable ${selectedVariable.name} is empty or not tabular enough to export as CSV.`);
+      setWorkspaceTab("workspace");
+      return;
+    }
+    downloadTextFile(`${selectedVariable.name}.csv`, csv, "text/csv;charset=utf-8");
+    setOutput(`Exported workspace variable ${selectedVariable.name} to CSV.`);
+    setWorkspaceTab("workspace");
+  }, [selectedVariable, setWorkspaceTab]);
+
+  const importScriptOrData = useCallback((event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const ext = String(file.name || "").toLowerCase().split(".").pop();
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+      try {
+        captureRecoverySnapshot(`Import data/script: ${file.name}`);
+        const raw = String(loadEvent.target?.result || "");
+        if (ext === "m") {
+          const document = createOpenMatDocument(file.name, raw);
+          setDocuments((current) => [...current, document]);
+          setActiveDocumentId(document.id);
+          clearRunState();
+          setOutput(`Imported MATLAB-style script ${file.name} into a new tab.`);
+          return;
+        }
+        if (["csv", "tsv", "txt"].includes(ext)) {
+          const rows = parseDelimitedRows(raw);
+          if (!rows.length) {
+            throw new Error("No numeric table rows were found in this file.");
+          }
+          const varName = String(file.name || "data")
+            .replace(/\.[^.]+$/, "")
+            .replace(/[^A-Za-z0-9_]+/g, "_")
+            .replace(/^([^A-Za-z_])/, "_$1");
+          const literal = tableToMatlabLiteral(rows);
+          const previewPlot =
+            rows[0]?.length >= 2
+              ? `\n% Quick look\nplot(${varName}(:,1), ${varName}(:,2))\nxlabel('${varName} col 1')\nylabel('${varName} col 2')`
+              : "";
+          const codeText = `% Imported from ${file.name}\n${varName} = ${literal};\nrows = size(${varName}, 1)\ncols = size(${varName}, 2)${previewPlot}\n`;
+          const document = createOpenMatDocument(`${varName}.m`, codeText);
+          setDocuments((current) => [...current, document]);
+          setActiveDocumentId(document.id);
+          clearRunState();
+          setOutput(`Imported ${file.name} as numeric data and created script ${varName}.m.`);
+          return;
+        }
+        throw new Error("Supported imports here are .m, .csv, .tsv, and .txt.");
+      } catch (error) {
+        setOutput(`Error: Could not import ${file.name}. ${error.message}`);
+        setWorkspaceTab("console");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  }, [captureRecoverySnapshot, clearRunState, setActiveDocumentId, setDocuments, setWorkspaceTab]);
 
   const createNewDocument = useCallback(() => {
     const document = createOpenMatDocument(getNextUntitledName(documents), "");
@@ -6513,7 +6728,7 @@ export default function OpenMatStudio() {
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
           >
             <Download className="h-3.5 w-3.5" />
-            Export
+            Export Session
           </button>
           <button
             type="button"
@@ -6522,7 +6737,25 @@ export default function OpenMatStudio() {
             style={{ borderColor: C.border, background: C.surface, color: C.text }}
           >
             <Upload className="h-3.5 w-3.5" />
-            Import
+            Import Session
+          </button>
+          <button
+            type="button"
+            onClick={exportActiveDocument}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export .m
+          </button>
+          <button
+            type="button"
+            onClick={() => dataImportRef.current?.click()}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Import .m / CSV
           </button>
           {normalizeImportedDocuments(recoverySnapshot?.documents) && (
             <button
@@ -6589,6 +6822,13 @@ export default function OpenMatStudio() {
         accept=".json"
         className="hidden"
         onChange={importWorkspace}
+      />
+      <input
+        ref={dataImportRef}
+        type="file"
+        accept=".m,.csv,.tsv,.txt"
+        className="hidden"
+        onChange={importScriptOrData}
       />
 
       {workspaceMode === "sim" ? (
@@ -8061,6 +8301,35 @@ export default function OpenMatStudio() {
                         </div>
                       </div>
                     )}
+                    <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                        MATLAB compatibility
+                      </div>
+                      <div className="text-xs leading-5" style={{ color: C.muted }}>
+                        OpenMAT is intentionally MATLAB-like, but it is not a drop-in MATLAB runtime. Use this panel to see where current compatibility is strong and where scripts will likely need rewriting.
+                      </div>
+                      <div className="mt-3 grid gap-3">
+                        {[
+                          { title: "Works well", items: MATLAB_COMPATIBILITY.worksWell, color: C.green },
+                          { title: "Works, but differently", items: MATLAB_COMPATIBILITY.different, color: C.blue },
+                          { title: "Not supported yet", items: MATLAB_COMPATIBILITY.notYet, color: C.red },
+                          { title: "Rewrite tips", items: MATLAB_COMPATIBILITY.rewriteTips, color: C.amber },
+                        ].map((section) => (
+                          <div key={section.title} className="rounded-xl border p-3" style={{ borderColor: C.border, background: C.surface2 }}>
+                            <div className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: section.color }}>
+                              {section.title}
+                            </div>
+                            <div className="mt-2 grid gap-2">
+                              {section.items.map((item) => (
+                                <div key={item} className="rounded-lg border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface, color: C.muted }}>
+                                  {item}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     {activeLesson && activeLessonStep && (
                       <div className="rounded-2xl border p-4" style={{ borderColor: C.border, background: C.surface }}>
                         <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
@@ -8356,6 +8625,55 @@ export default function OpenMatStudio() {
                       {item}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {workspaceMode === "script" && browserTab === "benchmarks" && (
+                <div className="space-y-3">
+                  <div
+                    className="rounded-2xl border p-4 text-sm leading-6"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
+                    <div className="mb-2 font-semibold">Benchmark-backed workbenches</div>
+                    <div style={{ color: C.muted }}>
+                      These benches have solver notes, benchmark checks, and guided presets. They are the fastest way to show that OpenMAT is not just a toy script editor.
+                    </div>
+                  </div>
+                  <div className="grid gap-3">
+                    {benchmarkShowcases.map((bench) => (
+                      <div
+                        key={bench.id}
+                        className="rounded-2xl border p-4"
+                        style={{ borderColor: C.border, background: C.surface }}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-semibold">{bench.title}</div>
+                            <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                              {bench.summary}
+                            </div>
+                          </div>
+                          <span
+                            className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                            style={{ background: C.surface2, color: C.text }}
+                          >
+                            {bench.benchmarkCount} checks
+                          </span>
+                        </div>
+                        <div className="mt-3 text-[11px]" style={{ color: C.muted }}>
+                          {bench.solverLabel}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => openSimulationWorkspace(bench.id)}
+                          className="mt-3 w-full rounded-lg border px-3 py-2 text-xs font-semibold"
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                        >
+                          Open Workbench
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -8960,6 +9278,30 @@ export default function OpenMatStudio() {
                       </div>
                     </div>
                   </div>
+                  <div
+                    className="rounded-xl border p-3"
+                    style={{ borderColor: C.border, background: C.surface2 }}
+                  >
+                    <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                      Last Run
+                    </div>
+                    {lastRunReport ? (
+                      <div className="grid gap-1 text-xs" style={{ color: C.muted }}>
+                        <div>Status: <span style={{ color: lastRunReport.status === "ok" ? C.green : C.red, fontWeight: 700 }}>{lastRunReport.status === "ok" ? "ok" : "error"}</span></div>
+                        <div>Source: {lastRunReport.source}</div>
+                        <div>Figure: {lastRunReport.figureKind}</div>
+                        <div>Workspace vars: {lastRunReport.variableCount}</div>
+                        <div>Interactive controls: {lastRunReport.controlCount}</div>
+                        <div className="rounded-lg border px-3 py-2 leading-5" style={{ borderColor: C.border, background: C.surface, color: C.text }}>
+                          {lastRunReport.outputPreview}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-xs" style={{ color: C.muted }}>
+                        Run a script or console command to capture diagnostics here.
+                      </div>
+                    )}
+                  </div>
                   {commandHistory.length > 0 && (
                     <div
                       className="rounded-xl border p-3"
@@ -8999,6 +9341,40 @@ export default function OpenMatStudio() {
 
             {workspaceTab === "workspace" && (
               <div className="grid gap-3">
+                <div
+                  className="rounded-2xl border p-3"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                      Workspace Overview
+                    </div>
+                    <button
+                      type="button"
+                      onClick={exportSelectedVariableCsv}
+                      className="rounded-md border px-2.5 py-1 text-[11px] font-semibold"
+                      style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                    >
+                      Export Selected CSV
+                    </button>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {[
+                      `${workspaceOverview.variableCount} live variable${workspaceOverview.variableCount === 1 ? "" : "s"}`,
+                      `${workspaceOverview.matrixCount} matrix/array item${workspaceOverview.matrixCount === 1 ? "" : "s"}`,
+                      `${workspaceOverview.scalarCount} scalar/string item${workspaceOverview.scalarCount === 1 ? "" : "s"}`,
+                      `${workspaceOverview.bytes} total bytes estimated`,
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2 text-xs"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <div
                   className="rounded-2xl border p-3"
                   style={{ borderColor: C.border, background: C.surface }}
@@ -9119,6 +9495,40 @@ export default function OpenMatStudio() {
                         {item}
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Native plotting and data workflow</div>
+                  <div className="grid gap-2">
+                    {[
+                      "2D figures render inside OpenMAT and keep axis/grid state local to the session.",
+                      "surf(...) and mesh(...) populate the integrated 3D viewport and can open in the separate 3D grapher.",
+                      "Session export/import preserves scripts, tabs, controls, and workbench state as OpenMAT JSON.",
+                      "MATLAB-style .m files can be imported into new tabs, and active tabs can be exported back out as .m.",
+                      "CSV/TSV data can be imported into a generated OpenMAT script, and selected workspace tables can be exported to CSV.",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2 text-xs"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Benchmark credibility</div>
+                  <div style={{ color: C.muted }}>
+                    OpenMAT is strongest when it pairs a MATLAB-like script with a benchmark-backed workbench. Use the browser&apos;s <span style={{ color: C.text, fontWeight: 700 }}>Benchmarks</span> tab to open projectile, beam, machining, and vibration benches that expose solver assumptions and validation checks directly in the UI.
                   </div>
                 </div>
 

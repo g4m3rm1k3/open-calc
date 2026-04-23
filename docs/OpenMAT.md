@@ -110,6 +110,87 @@ OpenMAT currently supports a growing subset of MATLAB-like behavior:
 - animation: `animate(...)`
 - 3D handoff: `surf(...)`, `mesh(...)`
 
+## MATLAB compatibility quick read
+
+OpenMAT has a real chance to feel familiar to MATLAB users, but the honest framing today is:
+
+- strong for guided numeric work, teaching, and compact engineering scripts
+- partial for general-purpose MATLAB coding
+- not yet suitable as a drop-in runtime for workplace MATLAB projects
+
+If someone pastes in production MATLAB from work, the right question is not "is OpenMAT broken?" but:
+
+1. is this script mostly matrix math and plotting
+2. or is it leaning on MATLAB desktop workflow, graphics handles, file I/O, classes, and toolboxes
+
+The first category has a good chance.
+The second category usually needs rewriting.
+
+## Try this
+
+These patterns are the best fit for OpenMAT right now:
+
+- matrix and vector scripts
+- classroom linear algebra and calculus labs
+- compact engineering calculations
+- parameter sweeps built around core numerics
+- plots and quick visual analysis
+- single-file or small multi-function experiments
+
+Good examples:
+
+- `A = [1 2; 3 4]; x = A \ b`
+- `t = 0:0.01:10; y = sin(t); plot(t, y)`
+- `function y = f(x); y = x.^2; end`
+- `slider('k', 10, 200, 5, 50)`
+
+## Works, but differently
+
+These concepts exist, but not in full MATLAB form:
+
+- plotting works through Open Calc rendering rather than MATLAB graphics handles
+- `surf(...)` and `mesh(...)` hand off to the integrated 3D grapher instead of MATLAB figure windows
+- the console, editor, workspace, and simulation benches all share one local browser session
+- OpenMAT-specific interactivity such as `slider(...)` and `animate(...)` is part of the language surface
+
+So a user can often keep the math while changing the workflow.
+
+## Won't work yet
+
+These are the most important boundaries to state clearly:
+
+- no toolbox compatibility promise for Control System, Signal Processing, Optimization, PDE, Symbolic Math, or Simulink
+- no desktop MATLAB environment parity
+- no drop-in support for multi-file production codebases, package folders, `classdef`, or app-style workflows
+- no MATLAB GUI/handle graphics ecosystem parity
+- no guarantee that workplace scripts with specialized toolbox dependencies will run unchanged
+
+That means OpenMAT should currently be pitched as:
+
+- a browser-first MATLAB-like lab
+- an engineering intuition studio
+- a compact numeric runtime
+
+not as:
+
+- "MATLAB in the browser"
+
+## Rewrite guidance
+
+If a MATLAB script fails in OpenMAT, the recommended approach is:
+
+1. isolate the numeric core
+2. remove toolbox calls first
+3. replace file-system or GUI assumptions
+4. test one function or section at a time
+5. rebuild plotting and interactivity using OpenMAT's native workflow
+
+The shortest successful migration path is usually:
+
+- keep the math
+- simplify the environment assumptions
+- use OpenMAT's plotting, sliders, and workbench UI instead of trying to mirror MATLAB exactly
+
 ## OpenMAT-specific features
 
 These are not MATLAB features, but part of OpenMAT's identity:
@@ -172,6 +253,80 @@ This is the beginning of the platform model:
 3. `Lessons`
 
 The first good engineering workbench is `Beam / Cantilever` because it ties together geometry, load, section properties, deflection, stress, and strain.
+
+## Native plotting and 3D
+
+OpenMAT should compete in its own lane by being more visual and more immediate than a traditional numerical desktop tool.
+
+Current plotting direction:
+
+- native 2D figures inside the OpenMAT figure pane
+- subplot support inside the same session
+- local axis, grid, and view-state control
+- `surf(...)` and `mesh(...)` routed into the integrated 3D viewport
+- one-click handoff from local 3D into the separate app grapher when a user wants a larger surface workspace
+
+The important product rule is:
+
+- 3D should feel like OpenMAT itself, not like leaving OpenMAT to find another tool
+
+That means the local 3D viewport matters a lot for credibility even if the app also has a bigger dedicated grapher.
+
+## Script and data workflow
+
+To feel MATLAB-like in real use, OpenMAT needs more than syntax. It needs file and data flow.
+
+Current direction:
+
+- import `.m` files into new OpenMAT script tabs
+- export the active script tab back out as `.m`
+- import `.csv`, `.tsv`, or plain-text numeric tables into generated OpenMAT starter scripts
+- export selected workspace tables or matrices to `.csv`
+- preserve full OpenMAT sessions as JSON for restore/share/debug workflows
+
+The honest framing is:
+
+- OpenMAT session export is native OpenMAT state
+- `.m` export is for script portability
+- CSV export/import is for data portability
+
+## Benchmark-backed workbenches
+
+The strongest proof that OpenMAT is worth trusting is not a claim of total MATLAB compatibility. It is benchmark-backed workbenches that make assumptions, outputs, and validation visible.
+
+The flagship benchmark path should emphasize:
+
+- `Projectile`
+  Classical drag-free kinematics benchmark
+- `Beam / Cantilever`
+  Closed-form end-loaded beam comparison
+- `Merchant Circle`
+  Force decomposition and resultant checks
+- `Spring-Mass`
+  Frequency and damping intuition with expected response bands
+- `Chatter / Tool Dynamics`
+  Directional engineering estimates with explicit assumptions
+
+These benches should always expose:
+
+- solver summary
+- assumptions
+- key outputs
+- benchmark checks
+- recommended presets
+
+## Professional-feeling workflow
+
+OpenMAT does not need to become all of MATLAB to become compelling. It does need to feel serious.
+
+That means:
+
+- editor, figure, workspace, console, and normalized-code views should all feel connected
+- the last run should be inspectable
+- errors should be readable and recoverable
+- imported scripts/data should land in obvious places
+- benchmark scripts should be easy to open from the browser
+- compatibility limits should be documented before the user hits them
 
 ## Extension API direction
 
