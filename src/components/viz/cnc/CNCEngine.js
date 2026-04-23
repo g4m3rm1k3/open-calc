@@ -728,6 +728,13 @@ class ChannelState {
     c.waiting = this.waiting;
     c.done = this.done;
     c.error = this.error;
+    c.message = this.message;
+    c.pointer = this.pointer;
+    c.blocks = this.blocks;
+    c.callStack = this.callStack.map(frame => ({
+      ...frame,
+      blocks: frame.blocks,
+    }));
     return c;
   }
 }
@@ -998,6 +1005,8 @@ export class CNCEngine {
     this.syncPoints = new Map();  // syncId -> Set of channelIds waiting
     this.pathPoints = [];         // [{x,y,z,m,feed,channelId,bi}]
     this.stats    = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
+    this.backplotPathPoints = [];
+    this.backplotStats = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
     this.evalors  = this.channels.map(ch => new ExpressionEvaluator(ch));
     this._maxSteps = 100000;      // infinite-loop guard
   }
@@ -1065,8 +1074,10 @@ export class CNCEngine {
 
   // ── Build full path (pre-run for backplot) ───────────────────────────────
   _buildFullPath() {
-    this.pathPoints = [];
-    this.stats = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
+    const recorder = {
+      pathPoints: [],
+      stats: { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 },
+    };
     const tempChannels = this.channels.map(ch => ch.clone());
     const tempEvalors  = tempChannels.map(ch => new ExpressionEvaluator(ch));
     let totalSteps = 0;
@@ -1079,7 +1090,7 @@ export class CNCEngine {
         const ch = tempChannels[ci];
         if (ch.done || ch.waiting) continue;
         allDone = false;
-        this._executeBlock(ch, tempEvalors[ci], true);
+        this._executeBlock(ch, tempEvalors[ci], true, recorder);
         totalSteps++;
         // Resolve sync
         if (ch.waiting) this._trySyncResolve(tempChannels);
@@ -1090,7 +1101,9 @@ export class CNCEngine {
       if (done === tempChannels.length) allDone = true;
       if (waiting === tempChannels.filter(ch => !ch.done).length && waiting > 0) break; // deadlock
     }
-    this.stats.blocks = this.pathPoints.length;
+    recorder.stats.blocks = recorder.pathPoints.length;
+    this.backplotPathPoints = recorder.pathPoints;
+    this.backplotStats = recorder.stats;
   }
 
   // ── Single step (for interactive playback) ───────────────────────────────
@@ -1098,7 +1111,7 @@ export class CNCEngine {
     const ch = this.channels[channelId];
     const ev = this.evalors[channelId];
     if (ch.done || ch.waiting) return { done: ch.done, waiting: ch.waiting };
-    this._executeBlock(ch, ev, false);
+    this._executeBlock(ch, ev, false, null);
     this._trySyncResolve(this.channels);
     return {
       done: ch.done, error: ch.error,
@@ -1111,7 +1124,7 @@ export class CNCEngine {
     for (let ci = 0; ci < this.channels.length; ci++) {
       const ch = this.channels[ci];
       if (!ch.done && !ch.waiting) {
-        this._executeBlock(ch, this.evalors[ci], false);
+        this._executeBlock(ch, this.evalors[ci], false, null);
       }
     }
     this._trySyncResolve(this.channels);
@@ -1122,13 +1135,16 @@ export class CNCEngine {
     this.channels = this.machDef.channels.map(cd => new ChannelState(cd, this.machDef));
     this.evalors  = this.channels.map(ch => new ExpressionEvaluator(ch));
     this.syncPoints.clear();
+    this.pathPoints = [];
+    this.stats = { rapid:0, cut:0, arc:0, tc:0, dist:0, time:0, blocks:0 };
     // Reload blocks
     const mainBlocks = this._getMainBlocks();
     this._splitChannelBlocks(mainBlocks);
+    this._buildFullPath();
   }
 
   // ── Execute one block on a channel ───────────────────────────────────────
-  _executeBlock(ch, ev, pathOnly) {
+  _executeBlock(ch, ev, pathOnly, recorder = null) {
     const blks = ch.callStack.length
       ? ch.callStack[ch.callStack.length - 1].blocks
       : ch.blocks;
@@ -1210,7 +1226,7 @@ export class CNCEngine {
 
     // ── M-codes ───────────────────────────────────────────────────────────
     for (const m of ms2) {
-      const stop = this._applyMCode(ch, ev, m, w, pathOnly);
+      const stop = this._applyMCode(ch, ev, m, w, pathOnly, recorder);
       if (stop) return; // M98 sub call handled, return early
     }
 
@@ -1234,7 +1250,7 @@ export class CNCEngine {
     if (w.H != null && !gs.includes(43) && !gs.includes(44)) ch.activeH = w.H;
 
     // ── Motion ────────────────────────────────────────────────────────────
-    this._applyMotion(ch, ev, w, b, pathOnly);
+    this._applyMotion(ch, ev, w, b, pathOnly, recorder);
   }
 
   _applyGCode(ch, ev, g, w, b) {
@@ -1293,7 +1309,7 @@ export class CNCEngine {
     }
   }
 
-  _applyMCode(ch, ev, m, w, pathOnly) {
+  _applyMCode(ch, ev, m, w, pathOnly, recorder = null) {
     const def = ch.machDef.mCodes || {};
     const match = (arr) => arr?.includes(`M${m}`);
 
@@ -1323,7 +1339,7 @@ export class CNCEngine {
       }
       if (w.P != null && pathOnly) {
         // In path-build mode, inline the sub
-        this._inlineSubPath(ch, ev, w.P, w.L || 1);
+        this._inlineSubPath(ch, ev, w.P, w.L || 1, recorder);
         return true;
       }
     }
@@ -1334,9 +1350,10 @@ export class CNCEngine {
     return false;
   }
 
-  _applyMotion(ch, ev, w, b, pathOnly) {
+  _applyMotion(ch, ev, w, b, pathOnly, recorder = null) {
     const mode = ch.motionMode;
     const abs = ch.posMode === "G90";
+    const shouldRecordPath = Boolean(recorder);
     const av = (cur, v) => {
       const resolved = ev.resolve(v) ?? v;
       return abs ? resolved : cur + resolved;
@@ -1353,12 +1370,12 @@ export class CNCEngine {
     if (w.B != null) ch.pos.B = av(ch.pos.B, w.B);
     if (w.C != null) ch.pos.C = av(ch.pos.C, w.C);
 
-    if (mode === "G00" || mode === "G01") {
-      this._addPathPoint(ch, nx, ny, nz, mode, b);
-    } else if (mode === "G02" || mode === "G03") {
-      this._addArcPath(ch, ev, w, nx, ny, nz, mode, b);
-    } else if (hasCyc) {
-      this._addCyclePoints(ch, ev, w, nx, ny, nz, mode, b);
+    if (shouldRecordPath && (mode === "G00" || mode === "G01")) {
+      this._addPathPoint(ch, nx, ny, nz, mode, b, recorder);
+    } else if (shouldRecordPath && (mode === "G02" || mode === "G03")) {
+      this._addArcPath(ch, ev, w, nx, ny, nz, mode, b, recorder);
+    } else if (shouldRecordPath && hasCyc) {
+      this._addCyclePoints(ch, ev, w, nx, ny, nz, mode, b, recorder);
     }
 
     ch.pos.X = nx; ch.pos.Y = ny; ch.pos.Z = nz;
@@ -1371,17 +1388,17 @@ export class CNCEngine {
     ch.vars.set(5043, ch.pos.Z);
   }
 
-  _addPathPoint(ch, x, y, z, mode, b) {
+  _addPathPoint(ch, x, y, z, mode, b, recorder) {
     const d = Math.sqrt((x-ch.pos.X)**2+(y-ch.pos.Y)**2+(z-ch.pos.Z)**2);
     const spd = mode === "G00" ? 8000 : (ch.feed || 200);
-    this.stats.dist += d;
-    if (spd > 0) this.stats.time += d / spd * 60;
-    if (mode === "G00") this.stats.rapid++;
-    else this.stats.cut++;
-    this.pathPoints.push({ x, y, z, m: mode, channelId: ch.id, feed: ch.feed, tool: ch.activeT, bi: b?._ptr });
+    recorder.stats.dist += d;
+    if (spd > 0) recorder.stats.time += d / spd * 60;
+    if (mode === "G00") recorder.stats.rapid++;
+    else recorder.stats.cut++;
+    recorder.pathPoints.push({ x, y, z, m: mode, channelId: ch.id, feed: ch.feed, tool: ch.activeT, bi: b?._ptr });
   }
 
-  _addArcPath(ch, ev, w, nx, ny, nz, mode, b) {
+  _addArcPath(ch, ev, w, nx, ny, nz, mode, b, recorder) {
     const I = ev.resolve(w.I) ?? 0;
     const J = ev.resolve(w.J) ?? 0;
     const K = ev.resolve(w.K) ?? 0;
@@ -1404,37 +1421,40 @@ export class CNCEngine {
       const a = a0+da*s/steps;
       const px=ocx+r*Math.cos(a), py=ocy+r*Math.sin(a);
       const d=Math.sqrt((px-ch.pos.X)**2+(py-ch.pos.Y)**2+(nz-ch.pos.Z)**2);
-      this.stats.dist+=d; this.stats.arc++;
-      if(ch.feed>0) this.stats.time+=d/ch.feed*60;
-      this.pathPoints.push({x:px,y:py,z:nz,m:mode,channelId:ch.id,feed:ch.feed,tool:ch.activeT, bi: b?._ptr});
+      recorder.stats.dist += d;
+      recorder.stats.arc++;
+      if (ch.feed > 0) recorder.stats.time += d / ch.feed * 60;
+      recorder.pathPoints.push({x:px,y:py,z:nz,m:mode,channelId:ch.id,feed:ch.feed,tool:ch.activeT, bi: b?._ptr});
     }
   }
 
-  _addCyclePoints(ch, ev, w, nx, ny, nz, mode, b) {
+  _addCyclePoints(ch, ev, w, nx, ny, nz, mode, b, recorder) {
     const rz = w.R != null ? (ch.posMode==="G90"?w.R:ch.pos.Z+w.R) : ch.pos.Z+3;
     const dz = nz;
     const bi = b?._ptr;
-    this.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
-    this.pathPoints.push({x:nx,y:ny,z:dz,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-    this.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
-    this.stats.cut += 2; this.stats.rapid += 2;
+    recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+    recorder.pathPoints.push({x:nx,y:ny,z:dz,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
+    recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+    recorder.stats.cut += 2;
+    recorder.stats.rapid += 2;
     if (mode === "G83" && w.Q != null) {
       // Peck — add multiple pecks
       const q = Math.abs(w.Q), totalDepth = Math.abs(dz - rz);
       let currentZ = rz;
       while (currentZ > dz) {
         const peckZ = Math.max(dz, currentZ - q);
-        this.pathPoints.push({x:nx,y:ny,z:peckZ,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-        this.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+        recorder.pathPoints.push({x:nx,y:ny,z:peckZ,m:"G01",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
+        recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
         currentZ = peckZ;
-        this.stats.cut++; this.stats.rapid++;
+        recorder.stats.cut++;
+        recorder.stats.rapid++;
       }
     }
     if (mode === "G76") {
       // Threading: add a few spring passes
       for (let p=0;p<3;p++) {
-        this.pathPoints.push({x:nx,y:ny,z:dz,m:"G32",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
-        this.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
+        recorder.pathPoints.push({x:nx,y:ny,z:dz,m:"G32",channelId:ch.id,feed:ch.feed,tool:ch.activeT,bi});
+        recorder.pathPoints.push({x:nx,y:ny,z:rz,m:"G00",channelId:ch.id,feed:0,tool:ch.activeT,bi});
       }
     }
   }
@@ -1484,7 +1504,7 @@ export class CNCEngine {
     }
   }
 
-  _inlineSubPath(ch, ev, progNum, repeat) {
+  _inlineSubPath(ch, ev, progNum, repeat, recorder) {
     const key = `O${progNum}`;
     let subBlocks = this.programs.get(key);
 
@@ -1510,11 +1530,13 @@ export class CNCEngine {
     if (!subBlocks) return;
     const tempCh = ch.clone();
     const tempEv = new ExpressionEvaluator(tempCh);
+    tempCh.blocks = subBlocks;
     for (let r = 0; r < Math.min(repeat, 50); r++) {
       tempCh.pointer = 0;
+      tempCh.done = false;
       for (const b of subBlocks) {
         if (!b || b.type === "cmt") continue;
-        this._executeBlock(tempCh, tempEv, true);
+        this._executeBlock(tempCh, tempEv, true, recorder);
         if (tempCh.done) break;
       }
     }
@@ -1700,8 +1722,8 @@ export class CNCEngine {
   }
 
   getState()     { return this.channels.map(ch => this._getChannelSnapshot(ch)); }
-  getPathPoints(){ return this.pathPoints; }
-  getStats()     { return { ...this.stats, blocks: this.pathPoints.length }; }
+  getPathPoints(){ return this.backplotPathPoints; }
+  getStats()     { return { ...this.backplotStats, blocks: this.backplotPathPoints.length }; }
   isDone()       { return this.channels.every(ch => ch.done); }
   hasWaiting()   { return this.channels.some(ch => ch.waiting && !ch.done); }
 
