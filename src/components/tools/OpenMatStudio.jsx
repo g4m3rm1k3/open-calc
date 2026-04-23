@@ -3,6 +3,7 @@ import Editor from "@monaco-editor/react";
 import { create, all, format as mathFormat } from "mathjs";
 import { useNavigate } from "react-router-dom";
 import MarkdownProse from "../math/MarkdownProse.jsx";
+import TutorPanel from "../tutor/TutorPanel.jsx";
 import {
   Play,
   Pause,
@@ -6832,6 +6833,27 @@ export default function OpenMatStudio() {
   }, [activeDocumentId, captureRecoverySnapshot, clearRunState, documents, resetWorkspace, setActiveDocumentId, setDocuments]);
 
   const figureMeta = useMemo(() => extractFigureMeta(displayFigureJson), [displayFigureJson]);
+  const openMatTutorContext = useMemo(() => {
+    const activeName = activeDocument?.name || "untitled.m";
+    const docsExcerpt = [
+      "OpenMAT is MATLAB-like for matrix and numeric labs, but it is not a full MATLAB runtime.",
+      "Best fit: compact numeric scripts, plotting, interactive sliders, and browser-native 3D demos.",
+      "Known gaps: toolbox parity, some desktop/file workflows, full figure styling, full colorbar/colormap/shading parity.",
+      "When debugging, distinguish parser syntax issues from unsupported MATLAB features.",
+    ].join(" ");
+    return {
+      id: `openmat-${activeDocument?.id || "workspace"}-${workspaceTab}-${lastRunReport?.source || "idle"}`,
+      title: `OpenMAT Assistant · ${activeName}`,
+      summary: "Help the user translate MATLAB ideas into working OpenMAT scripts using the current editor tab, output, and docs context.",
+      docsExcerpt,
+      activeCode: (code || "").slice(0, 6000),
+      output: (output || "").slice(0, 4000),
+      lastRunStatus: lastRunReport?.status || "idle",
+      lastRunSource: lastRunReport?.source || "none",
+      lastRunFigureKind: lastRunReport?.figureKind || (plotKind === "3d" ? "3d" : "none"),
+      lastRunPreview: lastRunReport?.outputPreview || "No recent run preview captured yet.",
+    };
+  }, [activeDocument?.id, activeDocument?.name, workspaceTab, lastRunReport, code, output, plotKind]);
 
   useEffect(() => {
     stateRef.current = {
@@ -10323,6 +10345,7 @@ export default function OpenMatStudio() {
           </div>
         </div>
       )}
+      <TutorPanel context={openMatTutorContext} />
     </div>
   );
 }

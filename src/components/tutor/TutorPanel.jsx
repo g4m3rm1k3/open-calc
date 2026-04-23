@@ -147,7 +147,55 @@ async function* callProvider(settings, msgs, sysPrompt = '') {
 
 
 // ─── Dynamic system prompt ────────────────────────────────────────────────────
-function buildSystemPrompt(lesson) {
+function buildSystemPrompt(lesson, context = null) {
+  if (context) {
+    const lines = [
+      `You are a helpful OpenMAT assistant inside Open Calc.`,
+      `Your job is to help users translate MATLAB ideas into OpenMAT syntax and workflow honestly.`,
+      `Prefer practical debugging, short rewrites, and blunt notes about current limitations over vague encouragement.`,
+      `When a feature is not supported yet, say so clearly and suggest the closest working OpenMAT alternative.`,
+      ``,
+      `Current workspace: ${context.title ?? 'OpenMAT Workspace'}`,
+    ]
+
+    if (context.summary) lines.push(`Summary: ${context.summary}`)
+    if (context.lastRunStatus) lines.push(`Last run status: ${context.lastRunStatus}`)
+    if (context.lastRunSource) lines.push(`Last run source: ${context.lastRunSource}`)
+    if (context.lastRunFigureKind) lines.push(`Last figure kind: ${context.lastRunFigureKind}`)
+    if (context.lastRunPreview) lines.push(`Last run preview: ${context.lastRunPreview}`)
+
+    if (context.docsExcerpt) {
+      lines.push(``)
+      lines.push(`Relevant OpenMAT docs excerpt:`)
+      lines.push(context.docsExcerpt)
+    }
+
+    if (context.activeCode) {
+      lines.push(``)
+      lines.push(`Active script on screen:`)
+      lines.push('```matlab')
+      lines.push(context.activeCode)
+      lines.push('```')
+    }
+
+    if (context.output) {
+      lines.push(``)
+      lines.push(`Current console/output text:`)
+      lines.push('```text')
+      lines.push(context.output)
+      lines.push('```')
+    }
+
+    lines.push(``)
+    lines.push(`When helping with syntax:`)
+    lines.push(`- point out whether the issue is parser syntax, unsupported MATLAB behavior, or plotting workflow`)
+    lines.push(`- if possible, give a corrected OpenMAT script block`)
+    lines.push(`- keep answers concise but useful`)
+    lines.push(`- use $...$ for inline math and $$...$$ for display math when helpful`)
+
+    return lines.join('\n')
+  }
+
   if (!lesson) return 'You are a helpful tutor. Answer questions directly and concisely.'
 
   const lines = [
@@ -528,7 +576,7 @@ const IconChat = () => (
 )
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
-export default function TutorPanel({ lesson }) {
+export default function TutorPanel({ lesson, context = null }) {
   const [open, setOpen] = useState(false)
   const [view, setView] = useState('chat')
   const [settings, setSettings] = useState(loadSettings)
@@ -556,7 +604,7 @@ export default function TutorPanel({ lesson }) {
     setMessages([])
     setStreamContent('')
     setErrorMsg('')
-  }, [lesson?.id])
+  }, [lesson?.id, context?.id])
 
   // Scroll to bottom — debounced so fast streaming doesn't thrash the layout
   const scrollTimer = useRef(null)
@@ -632,7 +680,7 @@ export default function TutorPanel({ lesson }) {
     accRef.current = ''
     setStreamContent('')
     try {
-      const gen = callProvider(settings, history, buildSystemPrompt(lesson))
+      const gen = callProvider(settings, history, buildSystemPrompt(lesson, context))
       let rafPending = false
       for await (const token of gen) {
         accRef.current += token
@@ -765,7 +813,7 @@ export default function TutorPanel({ lesson }) {
                     <span className="text-3xl select-none">📐</span>
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                       Ask anything about{' '}
-                      <span className="text-brand-600 dark:text-brand-400">{lesson?.title ?? 'this lesson'}</span>
+                      <span className="text-brand-600 dark:text-brand-400">{context?.title ?? lesson?.title ?? 'this lesson'}</span>
                     </p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 max-w-[220px]">
                       "Walk me through step by step" · "Give me a harder example" · "Why does this work?"
