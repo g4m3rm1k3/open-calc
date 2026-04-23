@@ -20,7 +20,10 @@ import lesson4_4 from './lesson4-4.js'
 import lesson5_1 from './lesson5-1.js'
 import lesson5_2 from './lesson5-2.js'
 import lesson5_3 from './lesson5-3.js'
+import lesson5_4 from './lesson5-4.js'
 import lesson6_1 from './lesson6-1.js'
+import lesson6_2 from './lesson6-2.js'
+import lesson7_1 from './lesson7-1.js'
 
 const J1 = {
   title: 'JavaScript Core Foundations',
@@ -95,12 +98,13 @@ const J6 = {
   title: 'Libraries from CDNs',
   number: 'js5.1',
   slug: 'libraries-from-cdns',
-  description: 'Load professional libraries in one script tag — Chart.js, Lodash, Axios, and Anime.js.',
+  description: 'Load professional libraries in one script tag — Chart.js, Lodash, Axios, Anime.js, and Day.js.',
   course: 'javascript-core',
   lessons: [
     lesson5_1,   // Chart.js — Data Visualization from a CDN
     lesson5_2,   // Lodash and Axios — Utility and HTTP Libraries
     lesson5_3,   // Anime.js — Animations from a CDN
+    lesson5_4,   // Day.js — Dates and Times from a CDN
   ],
 };
 
@@ -108,11 +112,23 @@ const J7 = {
   title: 'The Browser Platform',
   number: 'js6.1',
   slug: 'browser-platform',
-  description: 'localStorage, sessionStorage, cookies, and browser APIs for building stateful web apps.',
+  description: 'localStorage, sessionStorage, Web Workers, and browser APIs for building stateful, performant web apps.',
   course: 'javascript-core',
   lessons: [
     lesson6_1,   // Browser Storage — localStorage, sessionStorage, and Cookies
+    lesson6_2,   // Web Workers — True Parallelism in the Browser
   ],
 };
 
-export default [J1, J2, J3, J4, J5, J6, J7];
+const J8 = {
+  title: 'JavaScript Patterns',
+  number: 'js7.1',
+  slug: 'javascript-patterns',
+  description: 'Observer, pub/sub, singleton, factory, and state machine — the architecture behind every major library.',
+  course: 'javascript-core',
+  lessons: [
+    lesson7_1,   // Design Patterns in Practice
+  ],
+};
+
+export default [J1, J2, J3, J4, J5, J6, J7, J8];
