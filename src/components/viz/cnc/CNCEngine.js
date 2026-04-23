@@ -1011,15 +1011,29 @@ export class CNCEngine {
     this._maxSteps = 100000;      // infinite-loop guard
   }
 
+  _selectParsedEntryBlocks(parsed, sourceName = "MAIN") {
+    const mainBlocks = parsed.get("MAIN");
+    const namedBlocks = parsed.get(sourceName.toUpperCase());
+    return (Array.isArray(mainBlocks) && mainBlocks.length ? mainBlocks : null)
+      || (Array.isArray(namedBlocks) && namedBlocks.length ? namedBlocks : null)
+      || [...parsed.values()].find(blocks => Array.isArray(blocks) && blocks.length > 0)
+      || [];
+  }
+
   // ── Load one or multiple program texts ──────────────────────────────────
   loadPrograms(sources) {
     // sources: { main: "...", O9001: "...", ... }  OR  single string
     const srcMap = typeof sources === "string"
       ? { MAIN: sources }
       : sources;
+    const explicitChannelBlocks = new Map();
 
     for (const [name, src] of Object.entries(srcMap)) {
       const parsed = this.parser.parse(src);
+      const chMatch = String(name).toUpperCase().match(/^CH(?:ANNEL)?[_-]?(\d+)$/);
+      if (chMatch) {
+        explicitChannelBlocks.set(parseInt(chMatch[1], 10) - 1, this._selectParsedEntryBlocks(parsed, name));
+      }
       for (const [progId, blocks] of parsed.entries()) {
         this.programs.set(progId === "MAIN" ? name.toUpperCase() : progId, blocks);
       }
@@ -1034,6 +1048,12 @@ export class CNCEngine {
     } else {
       // Multi-channel: split by $1/$2/$3 tags
       this._splitChannelBlocks(mainBlocks);
+      explicitChannelBlocks.forEach((blocks, idx) => {
+        if (this.channels[idx]) {
+          this.channels[idx].blocks = blocks || [];
+          this.channels[idx].pointer = 0;
+        }
+      });
     }
 
     // Pre-run full path for backplot
@@ -1713,7 +1733,7 @@ export class CNCEngine {
       activeT: ch.activeT, activeH: ch.activeH,
       motionMode: ch.motionMode, posMode: ch.posMode, plane: ch.plane,
       units: ch.units, cssMode: ch.cssMode, cssSpeed: ch.cssSpeed,
-      activeWCS: ch.activeWCS, offsets: ch.offsets,
+      activeWCS: ch.activeWCS, offsets: ch.offsets, home: {...ch.home},
       waiting: ch.waiting, done: ch.done, error: ch.error, message: ch.message,
       vars: Object.fromEntries(ch.vars), rVars: Object.fromEntries(ch.rVars),
       callStackDepth: ch.callStack.length,
