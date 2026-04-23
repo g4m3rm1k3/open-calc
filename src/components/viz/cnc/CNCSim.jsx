@@ -6,26 +6,29 @@ import {
 } from "./CNCEngine.js";
 
 function channelStateToMs(ch) {
+  const base = initMS();
+  if (!ch) return base;
   return {
-    pos:    ch.pos,
-    mpos:   ch.machinePos,
-    feed:   ch.feed,
-    rpm:    ch.rpm,
-    dir:    ch.dir,
+    ...base,
+    pos:    ch.pos || base.pos,
+    mpos:   ch.machinePos || base.mpos,
+    feed:   ch.feed ?? base.feed,
+    rpm:    ch.rpm ?? base.rpm,
+    dir:    ch.dir ?? base.dir,
     coolant: ch.coolant?.flood || false,
-    activeT: ch.activeT,
-    activeH: ch.activeH,
-    motion:  ch.motionMode,
-    posMode: ch.posMode,
-    plane:   ch.plane,
-    units:   ch.units,
-    wcs:     ch.activeWCS,
-    offsets: ch.offsets,
+    activeT: ch.activeT ?? base.activeT,
+    activeH: ch.activeH ?? base.activeH,
+    motion:  ch.motionMode ?? base.motion,
+    posMode: ch.posMode ?? base.posMode,
+    plane:   ch.plane ?? base.plane,
+    units:   ch.units ?? base.units,
+    wcs:     ch.activeWCS ?? base.wcs,
+    offsets: ch.offsets || base.offsets,
     vars:    (ch.vars && typeof ch.vars.entries === 'function') ? Object.fromEntries(ch.vars.entries()) : (ch.vars || {}),
-    done:    ch.done,
-    error:   ch.error,
-    home:    ch.home,
-    ptr:     ch.pointer,
+    done:    ch.done ?? base.done,
+    error:   ch.error ?? base.error,
+    home:    ch.home || base.home,
+    ptr:     ch.pointer ?? base.ptr,
     liveDir: ch.liveDir,
     liveRPM: ch.liveRPM,
     cssMode: ch.cssMode,
@@ -56,6 +59,31 @@ function engineDefToMachCfg(def) {
     spindleKW:   def.spindleKW || 15,
   };
 }
+
+function formatControlLabel(def) {
+  const vendor = def?.vendor || "Custom";
+  const dialect = (def?.dialect || "fanuc").toUpperCase();
+  return `${vendor} ${dialect}`;
+}
+
+function getControlBehavior(def) {
+  const toolSyntax = def?.toolChange?.syntax || "T";
+  const feedMode = def?.modals?.feed?.default || "G94";
+  const absMode = def?.modals?.absInc?.default || "G90";
+  const plane = def?.modals?.plane?.default || (def?.class === "lathe" ? "G18" : "G17");
+  const units = def?.modals?.units?.default || "G21";
+  const waitCodes = Object.keys(def?.waitCodes || {});
+  return {
+    toolSyntax,
+    feedMode,
+    absMode,
+    plane,
+    units,
+    waitCodes,
+  };
+}
+
+const CHANNEL_COLORS = ["#63b8ff", "#46d89f", "#f0b44c", "#b89cff"];
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const PALETTE_DARK = {
@@ -442,6 +470,55 @@ G00 Z50.
 M05 M09 M30`},
   ],
 
+  fanuc_lathe_multich:[
+    {id:"O3001",name:"Twin Turret Sync",desc:"Two tagged channels with sync waits",code:`O3001 (2-CHANNEL SYNC DEMO)
+$1 T0101
+$1 G21 G90 G18
+$1 G97 S1800 M03
+$1 G00 X40. Z2.
+$1 G01 Z-25. F0.2
+$1 M200 P1
+$1 G01 X28. F0.15
+$1 G00 X60. Z60.
+$1 M30
+$2 T0202
+$2 G21 G90 G18
+$2 G97 S1500 M03
+$2 G00 X60. Z2.
+$2 G01 X42. Z-10. F0.18
+$2 M200 P1
+$2 G01 Z-35. F0.12
+$2 G00 X80. Z60.
+$2 M30`},
+  ],
+  fanuc_lathe_3turret:[
+    {id:"O3101",name:"3 Turret Global Sync",desc:"Three channels meeting at a common sync point",code:`O3101 (3-TURRET SYNC DEMO)
+$1 T0101
+$1 G21 G90 G18
+$1 G97 S1600 M03
+$1 G00 X45. Z2.
+$1 G01 Z-18. F0.2
+$1 M300 P7
+$1 G00 X70. Z70.
+$1 M30
+$2 T0202
+$2 G21 G90 G18
+$2 G97 S1400 M03
+$2 G00 X55. Z0.
+$2 G01 X35. Z-12. F0.18
+$2 M300 P7
+$2 G00 X80. Z70.
+$2 M30
+$3 T0303
+$3 G21 G90 G18
+$3 G97 S1200 M03
+$3 G00 X30. Z10.
+$3 G01 Z-30. F0.16
+$3 M300 P7
+$3 G00 X65. Z80.
+$3 M30`},
+  ],
+
   // ── Siemens 840D programs ──────────────────────────────────────────────────
   siemens_mill:[
     {id:"P1",name:"Square Pocket",desc:"Siemens 840D — G01 linear",code:`;SQUARE POCKET - Siemens 840D
@@ -488,6 +565,28 @@ G1 Z-100. F0.2
 G1 X85.
 G0 X100. Z50.
 M9 M5 M30`},
+  ],
+  siemens_840d_sync:[
+    {id:"P20",name:"2 Channel Sync",desc:"Two Siemens channels with buffer wait",code:`CHAN1:
+G71 G90 G17
+T1 D1 M6
+S2400 M3
+G0 X0 Y0 Z10.
+G1 Z-6. F120
+WBUF
+G1 X40. F260
+G0 Z30.
+M30
+CHAN2:
+G71 G90 G17
+T2 D1 M6
+S1800 M3
+G0 X10 Y40 Z10.
+G1 Z-4. F110
+WBUF
+G1 Y0. F220
+G0 Z25.
+M30`},
   ],
 
   // ── Okuma OSP programs (VC variables) ─────────────────────────────────────
@@ -539,6 +638,28 @@ G1 X85.
 G0 X100. Z50.
 M9 M5 M30`},
   ],
+  okuma_multitask:[
+    {id:"O1201",name:"Dual Channel Wait",desc:"Two Okuma channels with wait M-codes",code:`$1 O1201
+$1 G21 G90 G18
+$1 T0101
+$1 G97 S1600 M03
+$1 G00 X48. Z2.
+$1 G01 Z-20. F0.2
+$1 M200 P4
+$1 G01 X32. F0.15
+$1 G00 X80. Z80.
+$1 M30
+$2 O1201
+$2 G21 G90 G18
+$2 T0202
+$2 G97 S1500 M03
+$2 G00 X70. Z0.
+$2 G01 X44. Z-12. F0.18
+$2 M200 P4
+$2 G01 Z-38. F0.12
+$2 G00 X90. Z80.
+$2 M30`},
+  ],
 
   // ── HAAS programs (Fanuc-compatible, slight differences) ──────────────────
   haas_mill:[
@@ -580,6 +701,7 @@ M9 M5 M30`},
 // ── Helper: pick the right program set for the active machine definition ─────
 function getProgLib(machDef) {
   if (!machDef) return PROG_LIB.mill;
+  if (machDef.id && PROG_LIB[machDef.id]) return PROG_LIB[machDef.id];
   const dialect = machDef.dialect || "fanuc";
   const cls = machDef.class || "mill";
   const isLathe = cls === "lathe" || cls === "millturn" || cls === "swiss";
@@ -614,9 +736,11 @@ const getCSS = () => `
 .run-dot.done{background:${C.amber}}
 .run-dot.err{background:${C.red}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.main{display:grid;grid-template-columns:260px 1fr 276px;overflow:hidden;height:100%}
+.main{display:grid;grid-template-columns:260px minmax(320px,1fr) 6px 420px;overflow:hidden;height:100%}
 .panel{background:${C.p1};border-right:1px solid ${C.bd};display:flex;flex-direction:column;overflow:hidden}
 .panel-r{border-right:none;border-left:1px solid ${C.bd}}
+.splitter{background:${C.bg};border-left:1px solid ${C.bd};border-right:1px solid ${C.bd};cursor:col-resize}
+.splitter:hover{background:${C.p3}}
 .tabrow{display:flex;background:${C.bg};border-bottom:1px solid ${C.bd};flex-shrink:0}
 .tab{flex:1;padding:6px 2px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;color:${C.txt3};cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase}
 .tab.on{color:${C.blue};border-bottom-color:${C.blue};background:${C.blueBg}}
@@ -684,7 +808,7 @@ select option{background:${C.p2}}
 .vp-btn.on{border-color:${C.green};color:${C.green};background:${C.greenBg}}
 .ctrlbar{background:${C.p1};border-bottom:1px solid ${C.bd};padding:5px 10px;display:flex;align-items:center;gap:5px;flex-shrink:0;overflow-x:auto}
 .ctrl-div{width:1px;height:22px;background:${C.bd};margin:0 2px;flex-shrink:0}
-.trace-area{height:120px;border-top:1px solid ${C.bd};display:flex;flex-direction:column;flex-shrink:0}
+.trace-area{display:flex;flex-direction:column;flex:1;min-height:220px}
 .trace-hdr{font-size:9px;font-weight:700;letter-spacing:1px;color:${C.txt3};padding:4px 10px;border-bottom:1px solid ${C.bd};flex-shrink:0;display:flex;gap:8px;align-items:center;text-transform:uppercase}
 .trace-lines{flex:1;overflow-y:auto;padding:2px 8px}
 .trace-lines::-webkit-scrollbar{width:3px}
@@ -746,6 +870,9 @@ export default function CNCSimPro() {
   const [fixtures, setFixtures] = useState([]);
   const [code, setCode] = useState(() => getProgLib(MACHINE_DEFINITIONS["fanuc_mill"])[0].code);
   const [blocks, setBlocks] = useState([]);
+  const [channelBlocks, setChannelBlocks] = useState([[]]);
+  const [channelStates, setChannelStates] = useState([]);
+  const [activeChannel, setActiveChannel] = useState(0);
   const [pathPts, setPathPts] = useState([]);
   const [pStats, setPStats] = useState({blocks:0,rapid:0,cut:0,arc:0,tc:0,time:0,dist:0});
   const [curPt, setCurPt] = useState(0);
@@ -779,6 +906,10 @@ export default function CNCSimPro() {
   const [savedProgs, setSavedProgs] = useState(()=>{try{return JSON.parse(localStorage.getItem("csv4")||"[]")}catch{return []}});
   const [editTool, setEditTool] = useState({n:7,cls:"lathe",type:"OD Turning",desc:"",dia:0,cr:0.8,tlo:30,lc:0,lt:30,shank:16,fl:1,mat:"Carbide",hdia:16,hlen:80,iAngle:80,relief:5});
   const [arcPts, setArcPts] = useState([]); // for 3-point arc
+  const [rightPanelWidth, setRightPanelWidth] = useState(460);
+
+  const machDef = MACHINE_DEFINITIONS[machDefId] || MACHINE_DEFINITIONS["fanuc_mill"];
+  const controlBehavior = useMemo(() => getControlBehavior(machDef), [machDef]);
 
   const vpRef    = useRef(null);
   const cvsRef   = useRef(null);
@@ -787,6 +918,7 @@ export default function CNCSimPro() {
   const blksRef  = useRef([]);
   const pathRef  = useRef([]);
   const msRef    = useRef(ms);
+  const activeChannelRef = useRef(activeChannel);
   const playRef  = useRef(null);
   const engineRef = useRef(null);
   const doneRef  = useRef(false);
@@ -796,31 +928,10 @@ export default function CNCSimPro() {
 
   // keep refs in sync
   useEffect(()=>{msRef.current=ms},[ms]);
+  useEffect(()=>{activeChannelRef.current=activeChannel},[activeChannel]);
   useEffect(()=>{blksRef.current=blocks},[blocks]);
   useEffect(()=>{pathRef.current=pathPts},[pathPts]);
   useEffect(()=>{playingRef.current=isPlaying},[isPlaying]);
-
-  // ─── When preset changes, apply machine config + reset stock ───
-  useEffect(()=>{
-    const def = MACHINE_DEFINITIONS[machDefId];
-    if(!def) return;
-    const m = engineDefToMachCfg(def);
-    setMach(m);
-    setCustomMach({...m});
-    if (m.isLathe) {
-      setStock({shape:"cyl",diameter:80,length:150,x:0,y:0,z:0});
-    } else {
-      setStock({shape:"rect",width:100,height:80,depth:40,x:0,y:0,z:0});
-    }
-    // reset ms axes
-    setMs(initMS());
-    // Load the first program from the dialect-appropriate library
-    const lib = getProgLib(def);
-    if (lib?.length) {
-      setCode(lib[0].code);
-      // reload() will be called by the code useEffect below
-    }
-  },[machDefId]);
 
   // ─── Reload code ───────────────────────────────────────────────
   const reload = useCallback((src)=>{
@@ -841,13 +952,17 @@ export default function CNCSimPro() {
     const pts   = engine.getPathPoints();
     const stats = engine.getStats();
     const state = engine.getState(); // array, one per channel
+    const nextActive = Math.min(activeChannelRef.current, Math.max(0, state.length - 1));
 
     pathRef.current = pts;
     setPathPts(pts);
     setPStats(stats);
-    setBlocks(engine.channels[0].blocks);
+    setChannelStates(state);
+    setChannelBlocks(engine.channels.map(ch => ch.blocks || []));
+    setBlocks(engine.channels[nextActive]?.blocks || []);
     setCurPt(0); setPointer(0); ptrRef.current = 0;
-    setMs(channelStateToMs(state[0]));
+    setActiveChannel(nextActive);
+    setMs(channelStateToMs(state[nextActive] || state[0] || initMS()));
     setOpMsgs([]);
     doneRef.current = false;
     playingRef.current = false; setIsPlaying(false);
@@ -861,30 +976,53 @@ export default function CNCSimPro() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ─── When preset changes, apply machine config + reset stock ───
+  useEffect(()=>{
+    const def = MACHINE_DEFINITIONS[machDefId];
+    if(!def) return;
+    const m = engineDefToMachCfg(def);
+    setMach(m);
+    setCustomMach({...m});
+    setActiveChannel(0);
+    if (m.isLathe) {
+      setStock({shape:"cyl",diameter:80,length:150,x:0,y:0,z:0});
+    } else {
+      setStock({shape:"rect",width:100,height:80,depth:40,x:0,y:0,z:0});
+    }
+    setMs(initMS());
+    const lib = getProgLib(def);
+    if (lib?.length) {
+      setCode(lib[0].code);
+      setTimeout(() => reload(lib[0].code), 0);
+    }
+  },[machDefId, reload]);
+
   // ─── Step ──────────────────────────────────────────────────────
   const step = useCallback(() => {
     const engine = engineRef.current;
     if (!engine || engine.isDone()) { doneRef.current = true; setIsPlaying(false); return; }
 
     const result = engine.stepAll();
-    const ch0 = result[0];
+    const focused = result[Math.min(activeChannel, Math.max(0, result.length - 1))] || result[0];
+    setChannelStates(result);
+    setChannelBlocks(engine.channels.map(ch => ch.blocks || []));
 
-    ptrRef.current = ch0.pointer;
-    setPointer(ch0.pointer);
-    setCurPt(ch0.pointer);
+    ptrRef.current = focused.pointer;
+    setPointer(focused.pointer);
+    setCurPt(focused.pointer);
 
-    setMs(channelStateToMs(ch0));
+    setMs(channelStateToMs(focused));
 
-    if (mach.isLathe && (ch0.motionMode === "G01" || ch0.motionMode === "G02" || ch0.motionMode === "G03")) {
-      const xr = Math.abs(ch0.pos.X) / 2;
-      const z = ch0.pos.Z;
+    if (mach.isLathe && (focused.motionMode === "G01" || focused.motionMode === "G02" || focused.motionMode === "G03")) {
+      const xr = Math.abs(focused.pos.X) / 2;
+      const z = focused.pos.Z;
       remRef.current = [...remRef.current, { z, xr }];
       setMatRemoval([...remRef.current]);
     }
 
     doneRef.current = engine.isDone();
     if (doneRef.current) setIsPlaying(false);
-  }, [mach.isLathe]);
+  }, [mach.isLathe, activeChannel]);
 
   // ─── Auto-run ──────────────────────────────────────────────────
   const autoRun = useCallback(()=>{
@@ -918,6 +1056,33 @@ export default function CNCSimPro() {
     playingRef.current=false;setIsPlaying(false);
     reload();
   },[reload]);
+
+  useEffect(() => {
+    const next = channelStates[activeChannel];
+    setBlocks(channelBlocks[activeChannel] || []);
+    if (!next) return;
+    ptrRef.current = next.pointer;
+    setPointer(next.pointer);
+    setCurPt(next.pointer);
+    setMs(channelStateToMs(next));
+  }, [activeChannel, channelStates, channelBlocks]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!dragRef.current.resizeRight) return;
+      const next = Math.max(320, Math.min(900, window.innerWidth - e.clientX));
+      setRightPanelWidth(next);
+    };
+    const onUp = () => {
+      if (dragRef.current.resizeRight) dragRef.current.resizeRight = false;
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   // ─── VIEWPORT RENDERING ───────────────────────────────────────
   const draw = useCallback(()=>{
@@ -1059,30 +1224,33 @@ export default function CNCSimPro() {
         let prev=pathRef.current[0];
         for(let i=1;i<pathRef.current.length;i++){
           const p=pathRef.current[i];
+          if (p.channelId !== prev.channelId) { prev = p; continue; }
           const xrA=Math.abs(prev.y)/2, xrB=Math.abs(p.y||0)/2; // lathe X is diameter → radius
           const pa=toS(prev.z,xrA), pb=toS(p.z||0,xrB);
-          ctx.strokeStyle=p.m==="G00"?C.rapid+"55":p.m==="G02"||p.m==="G03"?C.arc+"80":C.feed+"65";
+          const channelColor = CHANNEL_COLORS[p.channelId % CHANNEL_COLORS.length] || C.blue;
+          ctx.strokeStyle=p.m==="G00"?C.rapid+"55":p.m==="G02"||p.m==="G03"?C.arc+"80":`${channelColor}99`;
           ctx.lineWidth=p.m==="G00"?0.8:1.5;
           ctx.setLineDash(p.m==="G00"?[4,3]:[]);
           ctx.beginPath();ctx.moveTo(pa.sx,pa.sy);ctx.lineTo(pb.sx,pb.sy);ctx.stroke();
           // Mirror
           const pam=toS(prev.z,-xrA),pbm=toS(p.z||0,-xrB);
-          ctx.strokeStyle=p.m==="G00"?C.rapid+"25":C.feed+"30";
+          ctx.strokeStyle=p.m==="G00"?C.rapid+"25":`${channelColor}55`;
           ctx.beginPath();ctx.moveTo(pam.sx,pam.sy);ctx.lineTo(pbm.sx,pbm.sy);ctx.stroke();
           prev=p;
         }
         ctx.setLineDash([]);
         // Executed
         if(curPt>0){
-          ctx.strokeStyle=C.blue2; ctx.lineWidth=2.5;
-          ctx.shadowColor=C.blue2; ctx.shadowBlur=3;
+          const hi = CHANNEL_COLORS[activeChannel % CHANNEL_COLORS.length] || C.blue2;
+          ctx.strokeStyle=hi; ctx.lineWidth=2.5;
+          ctx.shadowColor=hi; ctx.shadowBlur=3;
           ctx.beginPath();
-          for(let i=0;i<Math.min(curPt,pathRef.current.length);i++){
-            const p=pathRef.current[i];
+          const drawnPath = pathRef.current.filter(p => p.channelId === activeChannel && p.bi < curPt);
+          drawnPath.forEach((p,i)=>{
             const xr=Math.abs(p.y||0)/2;
             const{sx,sy}=toS(p.z||0,xr);
             i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
-          }
+          });
           ctx.stroke(); ctx.shadowBlur=0;
         }
       }
@@ -1225,7 +1393,9 @@ export default function CNCSimPro() {
         // ── Pass 1: draw all path lines ────────────────────────────────────
         for(let i=1;i<pts.length;i++){
           const p=pts[i];
+          if (p.channelId !== prev.channelId) { prev = p; continue; }
           const pa=proj(prev.x,prev.y,prev.z),pb=proj(p.x,p.y,p.z);
+          const channelColor = CHANNEL_COLORS[p.channelId % CHANNEL_COLORS.length] || C.feed;
 
           // Classify: retract = G00 where Z increases and XY doesn't change
           const isRetract = p.m==="G00" &&
@@ -1243,7 +1413,7 @@ export default function CNCSimPro() {
             ctx.strokeStyle=C.arc+"90"; ctx.lineWidth=1.5; ctx.setLineDash([]);
           } else {
             // G01 feed
-            ctx.strokeStyle=C.feed+"85"; ctx.lineWidth=1.5; ctx.setLineDash([]);
+            ctx.strokeStyle=`${channelColor}cc`; ctx.lineWidth=1.5; ctx.setLineDash([]);
           }
           ctx.beginPath();ctx.moveTo(pa.sx,pa.sy);ctx.lineTo(pb.sx,pb.sy);ctx.stroke();
           prev=p;
@@ -1271,9 +1441,10 @@ export default function CNCSimPro() {
 
         // ── Pass 3: step-through highlight ────────────────────────────────
         if(curPt>0){
-          ctx.strokeStyle=C.blue2;ctx.lineWidth=2.5;ctx.shadowColor=C.blue2;ctx.shadowBlur=3;
+          const hi = CHANNEL_COLORS[activeChannel % CHANNEL_COLORS.length] || C.blue2;
+          ctx.strokeStyle=hi;ctx.lineWidth=2.5;ctx.shadowColor=hi;ctx.shadowBlur=3;
           ctx.beginPath();
-          const drawnPath = pathRef.current.filter(p => p.bi < curPt);
+          const drawnPath = pathRef.current.filter(p => p.channelId === activeChannel && p.bi < curPt);
           drawnPath.forEach((p,i)=>{
             const{sx,sy}=proj(p.x,p.y,p.z);
             i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
@@ -1680,11 +1851,7 @@ export default function CNCSimPro() {
   },[tools,mach]);
 
   // ─── Prog library by machine ──────────────────────────────────
-  const progLib = useMemo(()=>{
-    if(mach.class==="millturn")return PROG_LIB.millturn;
-    if(mach.isLathe)return PROG_LIB.lathe;
-    return PROG_LIB.mill;
-  },[mach]);
+  const progLib = useMemo(() => getProgLib(machDef), [machDef]);
 
   // ─── Generate G-code from geometry ────────────────────────────
   const genFromGeom=()=>{
@@ -1707,6 +1874,7 @@ export default function CNCSimPro() {
   // ─── RENDER ─────────────────────────────────────────────────────
   const axisColor=ax=>ax==="X"?C.red:ax==="Y"?C.green:ax==="Z"?C.blue:ax==="B"?C.purple:C.amber;
   const activeT=tools[ms.activeT];
+  const currentChannel = channelStates[activeChannel];
 
   return(<>
     <style>{CSS}</style>
@@ -1723,6 +1891,11 @@ export default function CNCSimPro() {
           <span style={{fontSize:10,fontWeight:700,letterSpacing:1,color:C.txt3,minWidth:80}}>{isPlaying?"EXECUTING":doneRef.current?"COMPLETED":"READY"}</span>
         </div>
         <div className="tseg"><span className="tlbl">Machine</span><span className="bdg bdg-mt">{mach.label||"Custom"}</span></div>
+        <div className="tseg" style={{gap:4}}>
+          <span className="tlbl">Control</span>
+          <span className="bdg bdg-bl">{formatControlLabel(machDef)}</span>
+          <span className="bdg bdg-mt">{controlBehavior.toolSyntax}</span>
+        </div>
         <div className="tseg">
           <span className="tlbl">T</span>
           <span className="bdg bdg-am">T{String(ms.activeT).padStart(2,"0")} {activeT?.type?.split(" ")[0]||""}</span>
@@ -1743,8 +1916,31 @@ export default function CNCSimPro() {
           {ms.coolant&&<span className="bdg bdg-bl">COOL</span>}
           {mach.liveTools&&ms.dir&&<span className="bdg bdg-gr">LT {ms.dir}</span>}
         </div>
+        {channelStates.length > 1 && (
+          <div className="tseg" style={{gap:4}}>
+            <span className="tlbl">Channels</span>
+            {channelStates.map((ch, idx) => (
+              <button
+                key={ch.id ?? idx}
+                onClick={() => setActiveChannel(idx)}
+                style={{
+                  background: idx===activeChannel ? `${CHANNEL_COLORS[idx % CHANNEL_COLORS.length]}22` : "transparent",
+                  color: idx===activeChannel ? CHANNEL_COLORS[idx % CHANNEL_COLORS.length] : C.txt3,
+                  border: `1px solid ${idx===activeChannel ? CHANNEL_COLORS[idx % CHANNEL_COLORS.length] : C.bd}`,
+                  borderRadius: 4,
+                  padding: "2px 7px",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                {ch.label || `CH${idx+1}`}
+              </button>
+            ))}
+          </div>
+        )}
         <div style={{flex:1}}/>
-        <div className="tseg"><span style={{fontSize:9,color:C.txt3,fontFamily:"monospace"}}>BLK {pointer}</span></div>
+        <div className="tseg"><span style={{fontSize:9,color:C.txt3,fontFamily:"monospace"}}>{currentChannel?.label || "CH1"} BLK {pointer}</span></div>
         <button
           onClick={()=>window.history.back()}
           title="Exit CNC Sim"
@@ -1755,7 +1951,7 @@ export default function CNCSimPro() {
       </div>
 
       {/* MAIN */}
-      <div className="main">
+      <div className="main" style={{gridTemplateColumns:`260px minmax(320px,1fr) 6px ${rightPanelWidth}px`}}>
 
         {/* LEFT */}
         <div className="panel">
@@ -1767,6 +1963,40 @@ export default function CNCSimPro() {
           <div className="pscroll">
 
             {leftTab==="dro"&&<>
+              {channelStates.length > 1 && <>
+                <div className="sec">Channel Monitor</div>
+                {channelStates.map((ch, idx) => {
+                  const chBlocks = channelBlocks[idx] || [];
+                  const prog = chBlocks.length ? Math.round((ch.pointer / chBlocks.length) * 100) : 0;
+                  const chColor = CHANNEL_COLORS[idx % CHANNEL_COLORS.length] || C.blue;
+                  return (
+                    <div
+                      key={ch.id ?? idx}
+                      onClick={() => setActiveChannel(idx)}
+                      style={{
+                        background: idx===activeChannel ? `${chColor}14` : C.bg,
+                        border: `1px solid ${idx===activeChannel ? chColor : C.bd}`,
+                        borderRadius: 4,
+                        padding: "7px 8px",
+                        marginBottom: 4,
+                        cursor: "pointer"
+                      }}
+                    >
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                        <span style={{fontSize:10,fontWeight:700,color:idx===activeChannel ? chColor : C.txt}}>{ch.label || `CH${idx+1}`}</span>
+                        <span style={{fontSize:9,color:ch.waiting ? C.amber2 : ch.done ? C.green2 : C.txt3}}>
+                          {ch.waiting ? "WAIT" : ch.done ? "DONE" : "RUN"}
+                        </span>
+                      </div>
+                      <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:C.txt3,fontFamily:"monospace"}}>
+                        <span>T{String(ch.activeT||0).padStart(2,"0")} {ch.motionMode}</span>
+                        <span>BLK {ch.pointer}/{chBlocks.length}</span>
+                      </div>
+                      <div className="progbar" style={{marginTop:5}}><div className="progfill" style={{width:`${prog}%`,background:chColor}}/></div>
+                    </div>
+                  );
+                })}
+              </>}
               <div className="sec">Work Position</div>
               {mach.axes.map(ax=>(
                 <div className="dro" key={ax}>
@@ -1833,6 +2063,20 @@ export default function CNCSimPro() {
                       <span className="mini-v">{ch.label}</span>
                     </div>
                   ))}
+                </div>
+              )}
+              <div className="sec">Control Behavior</div>
+              <div className="mini"><span className="mini-l">Vendor</span><span className="mini-v">{machDef.vendor || "Custom"}</span></div>
+              <div className="mini"><span className="mini-l">Dialect</span><span className="mini-v">{(machDef.dialect || "fanuc").toUpperCase()}</span></div>
+              <div className="mini"><span className="mini-l">Tool Call</span><span className="mini-v">{controlBehavior.toolSyntax}</span></div>
+              <div className="mini"><span className="mini-l">Feed Mode</span><span className="mini-v">{controlBehavior.feedMode}</span></div>
+              <div className="mini"><span className="mini-l">Default Plane</span><span className="mini-v">{controlBehavior.plane}</span></div>
+              <div className="mini"><span className="mini-l">Abs / Inc</span><span className="mini-v">{controlBehavior.absMode}</span></div>
+              <div className="mini"><span className="mini-l">Units</span><span className="mini-v">{controlBehavior.units}</span></div>
+              {controlBehavior.waitCodes.length > 0 && (
+                <div style={{background:C.bg,border:`1px solid ${C.bd}`,borderRadius:4,padding:"6px 8px",marginBottom:8,fontSize:9,color:C.txt3,lineHeight:1.7}}>
+                  <b style={{color:C.txt2}}>Channel sync codes</b><br/>
+                  <span style={{fontFamily:"monospace"}}>{controlBehavior.waitCodes.join(", ")}</span>
                 </div>
               )}
               {/*
@@ -2003,7 +2247,7 @@ export default function CNCSimPro() {
         </div>
 
         {/* CENTER */}
-        <div style={{display:"flex",flexDirection:"column",overflow:"hidden"}}>
+        <div style={{display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0}}>
           <div className="ctrlbar">
             <button className={`btn lg${isPlaying?" btn-am":" btn-gr"}`} style={{minWidth:120}} onClick={toggleCycle}>{isPlaying?"⏹ Feed Hold":"▶ Cycle Start"}</button>
             <button className="btn" onClick={step}>Step ▸</button>
@@ -2031,6 +2275,7 @@ export default function CNCSimPro() {
               onMouseUp={onMouseUp} onContextMenu={onContextMenu}
               style={{cursor:drawTool!=="select"?"crosshair":mach.isLathe?"default":"default"}}/>
             <div className="vp-hud">
+              {channelStates.length > 1 && <>Channel: <span style={{color:CHANNEL_COLORS[activeChannel % CHANNEL_COLORS.length] || C.blue2}}>{currentChannel?.label || `CH${activeChannel+1}`}</span><br/></>}
               {mach.isLathe?<>Z: <span>{(ms.pos.Z||0).toFixed(3)}</span> &nbsp; X(dia): <span>{(ms.pos.X||0).toFixed(3)}</span></>
                 :<>X: <span>{(ms.pos.X||0).toFixed(3)}</span> &nbsp; Y: <span>{(ms.pos.Y||0).toFixed(3)}</span> &nbsp; Z: <span>{(ms.pos.Z||0).toFixed(3)}</span></>}
               <br/>Feed: <span>{ms.feed}</span> &nbsp; RPM: <span>{ms.rpm}</span>
@@ -2045,32 +2290,81 @@ export default function CNCSimPro() {
             </div>
           </div>
 
-          <div className="trace-area">
-            <div className="trace-hdr">
-              Program Trace <span style={{fontFamily:"monospace"}}>BLK {pointer}/{blocks.length}</span>
-              <span style={{fontSize:9,color:C.txt3,marginLeft:"auto"}}>{pStats.dist}mm | {pStats.time}s</span>
-            </div>
-            <div className="trace-lines">
-              {blocks.map((b,bi)=>{
-                const gWord=b.words?.G; const gs=gWord!=null?(Array.isArray(gWord)?gWord:[gWord]):[]; const m=gs.find(g=>g===0||g===1||g===2||g===3);
-                return(
-                  <div key={bi} id={`tl${bi}`} className={`tline${b.type==="cmt"?" cmt":""}${bi===pointer-1?" cur":""}${m===0?" rpl":m===1?" fpl":(m===2||m===3)?" apl":""}`}>
-                    {b.seqN!=null?<span className="tline-nn">N{b.seqN}</span>:<span className="tline-n">{bi}</span>}
-                    <span>{b.raw}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
+        <div className="splitter" onMouseDown={() => { dragRef.current.resizeRight = true; }} />
+
         {/* RIGHT */}
-        <div className="panel panel-r">
+        <div className="panel panel-r" style={{minWidth:0}}>
           <div className="tabrow">
-            {["tools","draw","code","progs","setup"].map(t=>(
+            {["trace","code","progs","tools","draw","setup"].map(t=>(
               <div key={t} className={`tab${rightTab===t?" on":""}`} onClick={()=>setRightTab(t)}>{t.toUpperCase()}</div>
             ))}
           </div>
+
+          {rightTab==="trace"&&(
+            <div className="trace-area">
+              <div className="trace-hdr">
+                Program Trace <span style={{fontFamily:"monospace"}}>{currentChannel?.label || "CH1"} BLK {pointer}/{blocks.length}</span>
+                <span style={{fontSize:9,color:C.txt3,marginLeft:"auto"}}>{pStats.dist}mm | {pStats.time}s</span>
+              </div>
+              <div className="trace-lines" style={channelStates.length > 1 ? {display:"grid",gridTemplateColumns:`repeat(${channelStates.length}, minmax(220px, 1fr))`,gap:8,alignItems:"start"} : undefined}>
+                {(channelStates.length > 1 ? channelStates : [{...currentChannel, id: activeChannel, label: currentChannel?.label || "CH1", pointer}]).map((ch, ci) => {
+                  const chBlocks = channelBlocks[ci] || blocks;
+                  const chPointer = ch?.pointer ?? pointer;
+                  const chColor = CHANNEL_COLORS[ci % CHANNEL_COLORS.length] || C.blue;
+                  return (
+                    <div key={ch?.id ?? ci} style={channelStates.length > 1 ? {minWidth:0, border:`1px solid ${ci===activeChannel ? chColor : C.bd}`, borderRadius:4, overflow:"hidden", background:C.bg} : undefined}>
+                      {channelStates.length > 1 && (
+                        <div
+                          onClick={() => setActiveChannel(ci)}
+                          style={{
+                            padding:"5px 8px",
+                            fontSize:9,
+                            fontWeight:700,
+                            letterSpacing:0.8,
+                            cursor:"pointer",
+                            color:ci===activeChannel ? chColor : C.txt2,
+                            borderBottom:`1px solid ${ci===activeChannel ? chColor : C.bd}`,
+                            background:ci===activeChannel ? `${chColor}12` : C.p1
+                          }}
+                        >
+                          {ch?.label || `CH${ci+1}`} {ch?.waiting ? "• WAIT" : ch?.done ? "• DONE" : ""}
+                        </div>
+                      )}
+                      <div>
+                        {chBlocks.map((b,bi)=>{
+                          const gWord=b.words?.G; const gs=gWord!=null?(Array.isArray(gWord)?gWord:[gWord]):[]; const m=gs.find(g=>g===0||g===1||g===2||g===3);
+                          return(
+                            <div key={bi} id={`tl${ci}-${bi}`} className={`tline${b.type==="cmt"?" cmt":""}${bi===chPointer-1?" cur":""}${m===0?" rpl":m===1?" fpl":(m===2||m===3)?" apl":""}`}>
+                              {b.seqN!=null?<span className="tline-nn">N{b.seqN}</span>:<span className="tline-n">{bi}</span>}
+                              <span>{b.raw}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{padding:"8px 10px",borderTop:`1px solid ${C.bd}`,display:"grid",gridTemplateColumns:channelStates.length>1?"repeat(2, minmax(0,1fr))":"1fr",gap:6}}>
+                {(channelStates.length > 0 ? channelStates : [currentChannel].filter(Boolean)).map((ch, idx) => {
+                  const chColor = CHANNEL_COLORS[idx % CHANNEL_COLORS.length] || C.blue;
+                  return (
+                    <div key={ch?.id ?? idx} style={{background:C.bg,border:`1px solid ${idx===activeChannel ? chColor : C.bd}`,borderRadius:4,padding:"7px 8px"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                        <span style={{fontSize:10,fontWeight:700,color:idx===activeChannel ? chColor : C.txt}}>{ch?.label || `CH${idx+1}`}</span>
+                        <span style={{fontSize:9,color:C.txt3,fontFamily:"monospace"}}>{ch?.motionMode || "G00"}</span>
+                      </div>
+                      <div style={{display:"flex",gap:8,flexWrap:"wrap",fontSize:9,color:C.txt2,fontFamily:"monospace"}}>
+                        {mach.axes.map(ax => <span key={ax}>{ax}:{((ch?.pos?.[ax]) ?? 0).toFixed(3)}</span>)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* TOOLS */}
           {rightTab==="tools"&&<div className="pscroll">
