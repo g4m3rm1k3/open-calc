@@ -2,29 +2,43 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
 const PALETTE_DARK = {
-  bg:"#0f172a", p1:"#1e293b", p2:"#334155", p3:"#475569", p4:"#64748b",
-  bd:"#334155", bd2:"#475569",
-  blue:"#60a5fa", blue2:"#93c5fd", blueBg:"#1e3a8a",
-  green:"#34d399", green2:"#6ee7b7", greenBg:"#064e3b",
-  amber:"#fbbf24", amber2:"#fcd34d", amberBg:"#78350f",
-  red:"#f87171", red2:"#fca5a5", redBg:"#7f1d1d",
-  purple:"#c084fc", teal:"#2dd4bf",
-  txt:"#f8fafc", txt2:"#cbd5e1", txt3:"#94a3b8",
-  rapid:"#f87171", feed:"#34d399", arc:"#c084fc",
+  bg:"#07111e", p1:"#0f172a", p2:"#132033", p3:"#1e293b", p4:"#334155",
+  bd:"#2b3a55", bd2:"#475569",
+  blue:"#63b8ff", blue2:"#94b8ff", blueBg:"rgba(33, 102, 255, 0.10)",
+  green:"#46d89f", green2:"#6ee7b7", greenBg:"rgba(70, 216, 159, 0.1)",
+  amber:"#f0b44c", amber2:"#fcd34d", amberBg:"rgba(240, 180, 76, 0.1)",
+  red:"#ff8b8b", red2:"#fca5a5", redBg:"rgba(255, 139, 139, 0.1)",
+  purple:"#b89cff", teal:"#31d0c4",
+  txt:"#e6eefb", txt2:"#90a4c2", txt3:"#61738e",
+  rapid:"#ff8b8b", feed:"#46d89f", arc:"#b89cff",
   steel:"#334155", steelLight:"#475569",
+  grad: "linear-gradient(135deg, #091324 0%, #0a314e 52%, #0f5f64 100%)",
+  gradBorder: "rgba(148, 184, 255, 0.18)",
+  vpBg: "#0B1424", codeBg: "#0f172a", brandTxt: "#ffffff",
+  grid: "#131c28", axBd: "#1e3040", axGrid: "#2a4060",
+  cutOverlay: "rgba(255,110,46,0.15)", cutBorder: "rgba(255,110,46,0.5)",
+  stockTop: "#1e3a5a", stockS1: "#152840", stockS2: "#1a4060", stockFront: "#0f2035", stockBd: "#2a5278",
+  fixTop: "#2a3a10", fixSide: "#3a5015", fixBd: "#4a6820",
 };
 
 const PALETTE_LIGHT = {
-  bg:"#f8fafc", p1:"#ffffff", p2:"#f1f5f9", p3:"#e2e8f0", p4:"#cbd5e1",
-  bd:"#e2e8f0", bd2:"#cbd5e1",
-  blue:"#3b82f6", blue2:"#2563eb", blueBg:"#e0f2fe",
-  green:"#10b981", green2:"#059669", greenBg:"#ecfdf5",
-  amber:"#f59e0b", amber2:"#d97706", amberBg:"#fffbeb",
-  red:"#ef4444", red2:"#dc2626", redBg:"#fef2f2",
-  purple:"#a855f7", teal:"#14b8a6",
-  txt:"#0f172a", txt2:"#475569", txt3:"#64748b",
-  rapid:"#ef4444", feed:"#10b981", arc:"#a855f7",
+  bg:"#f4f7fb", p1:"#ffffff", p2:"#edf4ff", p3:"#e2e8f0", p4:"#cbd5e1",
+  bd:"#d5dfef", bd2:"#94a3b8",
+  blue:"#1769d1", blue2:"#10243e", blueBg:"rgba(23, 105, 209, 0.10)",
+  green:"#198754", green2:"#059669", greenBg:"rgba(25, 135, 84, 0.1)",
+  amber:"#b36d05", amber2:"#d97706", amberBg:"rgba(179, 109, 5, 0.1)",
+  red:"#c03535", red2:"#dc2626", redBg:"rgba(192, 53, 53, 0.1)",
+  purple:"#6f42c1", teal:"#0f8d85",
+  txt:"#15253a", txt2:"#607188", txt3:"#8a99ae",
+  rapid:"#c03535", feed:"#198754", arc:"#6f42c1",
   steel:"#cbd5e1", steelLight:"#94a3b8",
+  grad: "linear-gradient(135deg, #eef6ff 0%, #daeefe 48%, #ddfbf3 100%)",
+  gradBorder: "rgba(23, 105, 209, 0.16)",
+  vpBg: "#ffffff", codeBg: "#f8fbff", brandTxt: "#10243e",
+  grid: "#d5dfef", axBd: "#cbd5e1", axGrid: "#94a3b8",
+  cutOverlay: "rgba(239,68,68,0.15)", cutBorder: "rgba(239,68,68,0.5)",
+  stockTop: "#bfdbfe", stockS1: "#93c5fd", stockS2: "#60a5fa", stockFront: "#3b82f6", stockBd: "#2563eb",
+  fixTop: "#fcd34d", fixSide: "#fbbf24", fixBd: "#d97706",
 };
 
 const C = { ...(typeof document !== 'undefined' && document.documentElement.classList.contains("dark") ? PALETTE_DARK : PALETTE_LIGHT) };
@@ -437,12 +451,12 @@ M05 M09 M30`},
 // ─── CSS ─────────────────────────────────────────────────────────────────────
 const getCSS = () => `
 .sim *{box-sizing:border-box;margin:0;padding:0}
-.sim{font-family:system-ui,-apple-system,sans-serif;font-size:12px;background:${C.bg};color:${C.txt};display:grid;grid-template-rows:42px 1fr;height:100vh;width:100vw;overflow:hidden}
-.topbar{background:${C.p1};border-bottom:1px solid ${C.bd};display:flex;align-items:center;padding:0;z-index:20;overflow:hidden}
-.brand{color:${C.blue2};font-weight:700;font-size:13px;padding:0 14px;border-right:1px solid ${C.bd};height:100%;display:flex;align-items:center;gap:8px;white-space:nowrap;letter-spacing:.5px}
-.tseg{display:flex;align-items:center;gap:5px;padding:0 10px;border-right:1px solid ${C.bd};height:100%;white-space:nowrap}
-.tlbl{font-size:9px;color:${C.txt3};letter-spacing:1px;text-transform:uppercase}
-.tval{font-family:'Courier New',monospace;font-size:11px;font-weight:600}
+.sim{font-family:'Inter',sans-serif;font-size:12px;background:${C.bg};color:${C.txt};display:grid;grid-template-rows:42px 1fr;height:100vh;width:100vw;overflow:hidden}
+.topbar{background:${C.grad};border-bottom:1px solid ${C.gradBorder};color:${C.brandTxt};display:flex;align-items:center;padding:0;z-index:20;overflow:hidden}
+.brand{color:inherit;font-weight:700;font-size:13px;padding:0 14px;border-right:1px solid ${C.gradBorder};height:100%;display:flex;align-items:center;gap:8px;white-space:nowrap;letter-spacing:.5px}
+.tseg{display:flex;align-items:center;gap:5px;padding:0 10px;border-right:1px solid ${C.gradBorder};height:100%;white-space:nowrap}
+.tlbl{font-size:9px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase}
+.tval{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
 .bdg{border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid}
 .bdg-bl{background:${C.blueBg};color:${C.blue2};border-color:${C.blue}30}
 .bdg-gr{background:${C.greenBg};color:${C.green2};border-color:${C.green}30}
@@ -468,11 +482,11 @@ const getCSS = () => `
 .div{height:1px;background:${C.bd};margin:9px 0}
 .dro{display:flex;align-items:center;background:${C.bg};border:1px solid ${C.bd};border-radius:4px;padding:5px 8px;margin-bottom:3px;gap:8px}
 .dro-ax{font-family:monospace;font-size:12px;font-weight:700;width:14px;flex-shrink:0}
-.dro-num{font-family:'Courier New',monospace;font-size:20px;font-weight:700;flex:1;text-align:right;letter-spacing:-.5px}
+.dro-num{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;flex:1;text-align:right;letter-spacing:-.5px}
 .dro-unit{font-size:9px;color:${C.txt3};min-width:20px}
 .mini{display:flex;justify-content:space-between;align-items:center;padding:3px 7px;background:${C.bg};border:1px solid ${C.bd};border-radius:3px;margin-bottom:2px}
 .mini-l{font-size:9px;color:${C.txt3};font-family:monospace}
-.mini-v{font-family:'Courier New',monospace;font-size:10px;color:${C.txt2}}
+.mini-v{font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.txt2}}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 .sbox{background:${C.bg};border:1px solid ${C.bd};border-radius:4px;padding:5px 7px}
 .sbox-l{font-size:8px;color:${C.txt3};font-weight:700;letter-spacing:1px;text-transform:uppercase}
@@ -510,18 +524,18 @@ select option{background:${C.p2}}
 .mvar-k{font-size:9px;color:${C.teal};font-family:monospace}
 .mvar-v{font-size:9px;color:${C.purple};font-family:monospace}
 .alarm-i{background:${C.redBg};border:1px solid ${C.red}25;border-radius:3px;padding:4px 7px;color:${C.red2};font-size:9px;margin-bottom:3px}
-#vpWrap{position:relative;background:#080d12;overflow:hidden;flex:1}
+#vpWrap{position:relative;background:${C.vpBg};overflow:hidden;flex:1}
 #vpCvs{display:block}
-.vp-hud{position:absolute;top:10px;left:10px;background:rgba(22,27,34,.92);border:1px solid ${C.bd};border-radius:4px;padding:7px 11px;font-size:10px;line-height:1.9;pointer-events:none;z-index:5}
-.vp-hud span{font-family:monospace;font-weight:600}
-.coord-input-bar{position:absolute;bottom:0;left:0;right:0;background:rgba(22,27,34,.97);border-top:1px solid ${C.blue};padding:6px 10px;display:flex;gap:6px;align-items:center;z-index:10}
+.vp-hud{position:absolute;top:10px;left:10px;background:${C.p1}E6;border:1px solid ${C.bd};border-radius:4px;padding:7px 11px;font-size:10px;line-height:1.9;pointer-events:none;z-index:5;color:${C.txt}}
+.vp-hud span{font-family:'JetBrains Mono',monospace;font-weight:600}
+.coord-input-bar{position:absolute;bottom:0;left:0;right:0;background:${C.p1}FA;border-top:1px solid ${C.blue};padding:6px 10px;display:flex;gap:6px;align-items:center;z-index:10}
 .snap-indicator{position:absolute;pointer-events:none;z-index:8}
 .vp-legend{position:absolute;bottom:10px;left:10px;display:flex;gap:5px;pointer-events:none;z-index:5}
 .leg{font-size:9px;padding:2px 7px;border-radius:2px;border:1px solid}
 .vp-toolbar{position:absolute;top:10px;right:10px;display:flex;gap:4px;z-index:5}
-.vp-btn{background:rgba(22,27,34,.9);border:1px solid ${C.bd};color:${C.txt3};border-radius:3px;padding:4px 9px;font-size:9px;font-weight:600;cursor:pointer;font-family:inherit}
+.vp-btn{background:${C.p1}E6;border:1px solid ${C.bd};color:${C.txt3};border-radius:3px;padding:4px 9px;font-size:9px;font-weight:600;cursor:pointer;font-family:inherit}
 .vp-btn:hover{border-color:${C.blue};color:${C.blue}}
-.vp-btn.on{border-color:${C.green};color:${C.green};background:rgba(63,185,80,.1)}
+.vp-btn.on{border-color:${C.green};color:${C.green};background:${C.greenBg}}
 .ctrlbar{background:${C.p1};border-bottom:1px solid ${C.bd};padding:5px 10px;display:flex;align-items:center;gap:5px;flex-shrink:0;overflow-x:auto}
 .ctrl-div{width:1px;height:22px;background:${C.bd};margin:0 2px;flex-shrink:0}
 .trace-area{height:120px;border-top:1px solid ${C.bd};display:flex;flex-direction:column;flex-shrink:0}
@@ -538,7 +552,7 @@ select option{background:${C.p2}}
 .tline.apl{border-left:2px solid ${C.arc}}
 .tline-n{color:${C.bd2};min-width:30px;text-align:right;user-select:none;flex-shrink:0}
 .tline-nn{color:${C.blue2};min-width:30px;text-align:right;flex-shrink:0;font-weight:700}
-#ceditor{flex:1;resize:none;background:#080d12;color:#3fb950;font-family:'Courier New',monospace;font-size:11px;border:none;outline:none;line-height:1.7;padding:8px;width:100%}
+#ceditor{flex:1;resize:none;background:${C.codeBg};color:${C.green};font-family:'JetBrains Mono',monospace;font-size:11px;border:none;outline:none;line-height:1.7;padding:8px;width:100%}
 .progbar{height:2px;background:${C.bd};border-radius:1px;overflow:hidden}
 .progfill{height:100%;background:${C.blue};border-radius:1px;transition:.3s}
 .draw-tb{display:flex;gap:3px;padding:5px 8px;border-bottom:1px solid ${C.bd};background:${C.bg};flex-shrink:0;flex-wrap:wrap;align-items:center}
@@ -767,7 +781,7 @@ export default function CNCSimPro() {
     const cvs=cvsRef.current; if(!cvs)return;
     const ctx=cvs.getContext("2d");
     const W=cvs.width,H=cvs.height;
-    ctx.fillStyle="#070c12"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=C.vpBg; ctx.fillRect(0,0,W,H);
 
     const cam=camRef.current;
     const isLathe=mach.isLathe;
@@ -844,8 +858,8 @@ export default function CNCSimPro() {
         if(profile.size>0){
           const zs=[...profile.keys()].sort((a,b)=>a-b);
           // Shade removed material
-          ctx.fillStyle="rgba(255,110,46,0.15)";
-          ctx.strokeStyle="rgba(255,110,46,0.5)";
+          ctx.fillStyle=C.cutOverlay;
+          ctx.strokeStyle=C.cutBorder;
           ctx.lineWidth=1;
           // Draw removed area (between machined radius and original surface)
           const R=(stock.diameter||80)/2;
@@ -904,13 +918,13 @@ export default function CNCSimPro() {
           const p=pathRef.current[i];
           const xrA=Math.abs(prev.y)/2, xrB=Math.abs(p.y||0)/2; // lathe X is diameter → radius
           const pa=toS(prev.z,xrA), pb=toS(p.z||0,xrB);
-          ctx.strokeStyle=p.m==="G00"?"#ff6e2e55":p.m==="G02"||p.m==="G03"?"#bc8cff80":"#3fb95065";
+          ctx.strokeStyle=p.m==="G00"?C.rapid+"55":p.m==="G02"||p.m==="G03"?C.arc+"80":C.feed+"65";
           ctx.lineWidth=p.m==="G00"?0.8:1.5;
           ctx.setLineDash(p.m==="G00"?[4,3]:[]);
           ctx.beginPath();ctx.moveTo(pa.sx,pa.sy);ctx.lineTo(pb.sx,pb.sy);ctx.stroke();
           // Mirror
           const pam=toS(prev.z,-xrA),pbm=toS(p.z||0,-xrB);
-          ctx.strokeStyle=p.m==="G00"?"#ff6e2e25":"#3fb95030";
+          ctx.strokeStyle=p.m==="G00"?C.rapid+"25":C.feed+"30";
           ctx.beginPath();ctx.moveTo(pam.sx,pam.sy);ctx.lineTo(pbm.sx,pbm.sy);ctx.stroke();
           prev=p;
         }
@@ -1019,7 +1033,7 @@ export default function CNCSimPro() {
 
       // Grid
       if(layers.grid){
-        ctx.strokeStyle="#131c28"; ctx.lineWidth=0.5;
+        ctx.strokeStyle=C.grid; ctx.lineWidth=0.5;
         for(let i=-300;i<=300;i+=25){
           const a=proj(i,-300,0),b=proj(i,300,0);
           ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke();
@@ -1033,17 +1047,17 @@ export default function CNCSimPro() {
         const sw=stock.width||100,sh=stock.height||80,sd=stock.depth||40;
         const ox=stock.x||0,oy=stock.y||0,oz=stock.z||0;
         const co=[[ox,oy,oz],[ox+sw,oy,oz],[ox+sw,oy+sh,oz],[ox,oy+sh,oz],[ox,oy,oz+sd],[ox+sw,oy,oz+sd],[ox+sw,oy+sh,oz+sd],[ox,oy+sh,oz+sd]];
-        const faces=[[0,1,5,4,"#1e3a5a"],[1,2,6,5,"#152840"],[3,2,6,7,"#152840"],[4,5,6,7,"#1a4060"],[0,1,2,3,"#0f2035"]];
+        const faces=[[0,1,5,4,C.stockTop],[1,2,6,5,C.stockS1],[3,2,6,7,C.stockS1],[4,5,6,7,C.stockS2],[0,1,2,3,C.stockFront]];
         faces.forEach(([a,b,c,d,f])=>{
           const ps=[a,b,c,d].map(i=>proj(...co[i]));
-          ctx.fillStyle=f;ctx.strokeStyle="#2a5278";ctx.lineWidth=0.7;
+          ctx.fillStyle=f;ctx.strokeStyle=C.stockBd;ctx.lineWidth=0.7;
           ctx.beginPath();ctx.moveTo(ps[0].sx,ps[0].sy);ps.slice(1).forEach(p=>ctx.lineTo(p.sx,p.sy));ctx.closePath();ctx.fill();ctx.stroke();
         });
         fixtures.forEach(fx=>{
           const fc=[[fx.x,fx.y,fx.z],[fx.x+fx.w,fx.y,fx.z],[fx.x+fx.w,fx.y+fx.h,fx.z],[fx.x,fx.y+fx.h,fx.z],[fx.x,fx.y,fx.z+fx.d],[fx.x+fx.w,fx.y,fx.z+fx.d],[fx.x+fx.w,fx.y+fx.h,fx.z+fx.d],[fx.x,fx.y+fx.h,fx.z+fx.d]];
-          [[0,1,5,4,"#2a3a10"],[4,5,6,7,"#3a5015"]].forEach(([a,b,c,d,f])=>{
+          [[0,1,5,4,C.fixTop],[4,5,6,7,C.fixSide]].forEach(([a,b,c,d,f])=>{
             const ps=[a,b,c,d].map(i=>proj(...fc[i]));
-            ctx.fillStyle=f;ctx.strokeStyle="#4a6820";ctx.lineWidth=0.7;
+            ctx.fillStyle=f;ctx.strokeStyle=C.fixBd;ctx.lineWidth=0.7;
             ctx.beginPath();ctx.moveTo(ps[0].sx,ps[0].sy);ps.slice(1).forEach(p=>ctx.lineTo(p.sx,p.sy));ctx.closePath();ctx.fill();ctx.stroke();
           });
         });
@@ -1066,7 +1080,7 @@ export default function CNCSimPro() {
         for(let i=1;i<pathRef.current.length;i++){
           const p=pathRef.current[i];
           const pa=proj(prev.x,prev.y,prev.z),pb=proj(p.x,p.y,p.z);
-          ctx.strokeStyle=p.m==="G00"?"#ff6e2e45":p.m==="G02"||p.m==="G03"?"#bc8cff70":"#3fb95055";
+          ctx.strokeStyle=p.m==="G00"?C.rapid+"45":p.m==="G02"||p.m==="G03"?C.arc+"70":C.feed+"55";
           ctx.lineWidth=p.m==="G00"?.8:1.3;
           ctx.setLineDash(p.m==="G00"?[4,3]:[]);
           ctx.beginPath();ctx.moveTo(pa.sx,pa.sy);ctx.lineTo(pb.sx,pb.sy);ctx.stroke();
