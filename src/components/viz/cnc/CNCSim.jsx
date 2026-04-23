@@ -1,18 +1,33 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 // ─── PALETTE ──────────────────────────────────────────────────────────────────
-const C = {
-  bg:"#0f1117",p1:"#161b22",p2:"#1c2330",p3:"#222d3d",p4:"#2a3649",
-  bd:"#30363d",bd2:"#404a5a",
-  blue:"#58a6ff",blue2:"#79c0ff",blueBg:"#0d1f33",
-  green:"#3fb950",green2:"#7ee787",greenBg:"#0d2014",
-  amber:"#d29922",amber2:"#e3b341",amberBg:"#1f1700",
-  red:"#f85149",red2:"#ffa198",redBg:"#1f0d0d",
-  purple:"#bc8cff",teal:"#39d353",
-  txt:"#e6edf3",txt2:"#8b949e",txt3:"#484f58",
-  rapid:"#ff6e2e",feed:"#3fb950",arc:"#bc8cff",
-  steel:"#3a4a5c",steelLight:"#4a6070",
+const PALETTE_DARK = {
+  bg:"#0f172a", p1:"#1e293b", p2:"#334155", p3:"#475569", p4:"#64748b",
+  bd:"#334155", bd2:"#475569",
+  blue:"#60a5fa", blue2:"#93c5fd", blueBg:"#1e3a8a",
+  green:"#34d399", green2:"#6ee7b7", greenBg:"#064e3b",
+  amber:"#fbbf24", amber2:"#fcd34d", amberBg:"#78350f",
+  red:"#f87171", red2:"#fca5a5", redBg:"#7f1d1d",
+  purple:"#c084fc", teal:"#2dd4bf",
+  txt:"#f8fafc", txt2:"#cbd5e1", txt3:"#94a3b8",
+  rapid:"#f87171", feed:"#34d399", arc:"#c084fc",
+  steel:"#334155", steelLight:"#475569",
 };
+
+const PALETTE_LIGHT = {
+  bg:"#f8fafc", p1:"#ffffff", p2:"#f1f5f9", p3:"#e2e8f0", p4:"#cbd5e1",
+  bd:"#e2e8f0", bd2:"#cbd5e1",
+  blue:"#3b82f6", blue2:"#2563eb", blueBg:"#e0f2fe",
+  green:"#10b981", green2:"#059669", greenBg:"#ecfdf5",
+  amber:"#f59e0b", amber2:"#d97706", amberBg:"#fffbeb",
+  red:"#ef4444", red2:"#dc2626", redBg:"#fef2f2",
+  purple:"#a855f7", teal:"#14b8a6",
+  txt:"#0f172a", txt2:"#475569", txt3:"#64748b",
+  rapid:"#ef4444", feed:"#10b981", arc:"#a855f7",
+  steel:"#cbd5e1", steelLight:"#94a3b8",
+};
+
+const C = { ...(typeof document !== 'undefined' && document.documentElement.classList.contains("dark") ? PALETTE_DARK : PALETTE_LIGHT) };
 
 // ─── MACHINE CONFIG BUILDER PRESETS ──────────────────────────────────────────
 const BED_TYPES = {
@@ -420,7 +435,7 @@ M05 M09 M30`},
 };
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
-const CSS = `
+const getCSS = () => `
 .sim *{box-sizing:border-box;margin:0;padding:0}
 .sim{font-family:system-ui,-apple-system,sans-serif;font-size:12px;background:${C.bg};color:${C.txt};display:grid;grid-template-rows:42px 1fr;height:100vh;width:100vw;overflow:hidden}
 .topbar{background:${C.p1};border-bottom:1px solid ${C.bd};display:flex;align-items:center;padding:0;z-index:20;overflow:hidden}
@@ -545,6 +560,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 export default function CNCSimPro() {
+  const isDarkFn = useCallback(() => typeof document !== "undefined" && document.documentElement.classList.contains("dark"), []);
+  const [dark, setDark] = useState(isDarkFn);
+
+  useEffect(() => {
+    const ob = new MutationObserver(() => setDark(isDarkFn()));
+    ob.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => ob.disconnect();
+  }, [isDarkFn]);
+
+  useEffect(() => {
+    Object.assign(C, dark ? PALETTE_DARK : PALETTE_LIGHT);
+  }, [dark]);
+
+  const CSS = useMemo(() => getCSS(), [dark]);
+
   const [preset, setPreset] = useState("lathe2");
   const [mach, setMach] = useState(MACHINE_PRESETS.lathe2);
   const [customMach, setCustomMach] = useState({...MACHINE_PRESETS.lathe2});
