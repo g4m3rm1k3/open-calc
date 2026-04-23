@@ -371,6 +371,40 @@ title('Animated 3D Helix')
 `,
   },
   {
+    id: "torus-stress-test",
+    label: "Torus Stress Test",
+    icon: Cpu,
+    description: "Loop growth, matrix inversion, console output, and a torus surface in one 3D stress pass.",
+    matlabLike: true,
+    code: `% --- OpenMAT Stress Test ---
+clear;
+t = linspace(0, 2*pi, 100);
+X = [];
+Y = [];
+Z = [];
+
+fprintf('Testing loops...\\n');
+for i = 1:500
+  new_z = sin(t + i/2);
+  Z = [Z; new_z];
+end
+
+A = rand(5, 5);
+B = inv(A);
+check = A * B;
+disp('Identity Check (should be close to 1s on diagonal):');
+disp(check);
+
+[u, v] = meshgrid(linspace(0, 2*pi, 30));
+surf_x = (2 + cos(v)) .* cos(u);
+surf_y = (2 + cos(v)) .* sin(u);
+surf_z = sin(v);
+
+surf(surf_x, surf_y, surf_z);
+title('Torus Test');
+`,
+  },
+  {
     id: "interactive-signal",
     label: "Interactive Signal",
     icon: Waves,
@@ -1084,6 +1118,38 @@ const OPENMAT_SHOWCASE_EXAMPLE_IDS = [
   "interactive-surface-3d",
   "animated-helix-3d",
   "pendulum-lab",
+];
+
+const OPENMAT_TUTORIAL_CARDS = [
+  {
+    id: "run-script",
+    title: "Run a Script",
+    body: "Write code in the center editor, press Run, then read Figure, Workspace, and Console as one cycle.",
+    action: "help",
+    cta: "Open Help",
+  },
+  {
+    id: "read-results",
+    title: "Read Results",
+    body: "Use Figure for plots, Workspace for values and arrays, and Console for quick checks without editing the file.",
+    action: "reference",
+    cta: "Open Reference",
+  },
+  {
+    id: "matlab-limits",
+    title: "Know the Limits",
+    body: "OpenMAT is MATLAB-like for numeric labs, plotting, and interactive demos, but not full toolbox or desktop parity yet.",
+    action: "compatibility",
+    cta: "See Limits",
+  },
+  {
+    id: "native-3d",
+    title: "Try Native 3D",
+    body: "Use plot3, scatter3, surf, mesh, and animate(...) in the local OpenMAT viewport instead of bouncing to another tool.",
+    action: "example",
+    exampleId: "torus-stress-test",
+    cta: "Load 3D Stress Test",
+  },
 ];
 
 const MATLAB_COMPATIBILITY = {
@@ -5911,6 +5977,14 @@ export default function OpenMatStudio() {
     () => OPENMAT_SHOWCASE_EXAMPLE_IDS.map((id) => exampleMap[id]).filter(Boolean),
     [exampleMap],
   );
+  const featuredExampleIds = useMemo(
+    () => new Set(OPENMAT_SHOWCASE_EXAMPLE_IDS),
+    [],
+  );
+  const browserExampleList = useMemo(
+    () => EXAMPLES.filter((example) => !featuredExampleIds.has(example.id)),
+    [featuredExampleIds],
+  );
   const crowdedTabs = documents.length >= 6;
   const interactionModelItems = [
     "Editor tabs store saved scripts, examples, and labs.",
@@ -6374,6 +6448,19 @@ export default function OpenMatStudio() {
     },
     [captureRecoverySnapshot, clearRunState, exampleMap, setActiveDocumentId, setDocuments],
   );
+
+  const handleTutorialAction = useCallback((card) => {
+    if (!card?.action) return;
+    if (card.action === "example" && card.exampleId) {
+      loadExample(card.exampleId);
+      return;
+    }
+    if (card.action === "help") {
+      setHelpOpen(true);
+      return;
+    }
+    setWorkspaceTab("reference");
+  }, [loadExample, setWorkspaceTab]);
 
   const openSimulationWorkspace = useCallback((simulationId) => {
     const simulation = simulationMap[simulationId];
@@ -8828,7 +8915,7 @@ export default function OpenMatStudio() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-semibold">MATLAB User Quick Start</div>
+                        <div className="text-sm font-semibold">OpenMAT Quick Start</div>
                         <div className="mt-1 text-xs leading-5" style={{ color: C.heroMuted }}>
                           Start with one 2D plot, one matrix workflow, one 3D curve, and one surface. That gives judges and technical users a fast path to “this is real enough to trust.”
                         </div>
@@ -8837,32 +8924,58 @@ export default function OpenMatStudio() {
                         className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
                         style={{ background: C.heroBadgeBg, border: `1px solid ${C.heroBadgeBorder}`, color: C.heroBadgeText }}
                       >
-                        Start Here
+                        Learn First
                       </span>
                     </div>
                     <div className="mt-3 grid gap-2">
-                      {matlabQuickStartExamples.map((example) => {
-                        const Icon = example.icon;
+                      {OPENMAT_TUTORIAL_CARDS.map((card) => {
+                        const example = card.exampleId ? exampleMap[card.exampleId] : null;
+                        const Icon = example?.icon || CircleHelp;
                         return (
                           <button
-                            key={example.id}
+                            key={card.id}
                             type="button"
-                            onClick={() => loadExample(example.id)}
+                            onClick={() => handleTutorialAction(card)}
                             className="flex items-start gap-3 rounded-xl border px-3 py-3 text-left"
                             style={{ borderColor: C.heroBadgeBorder, background: C.heroPillBg, color: C.heroPillText }}
                           >
                             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: "rgba(255,255,255,0.12)" }}>
                               <Icon className="h-4 w-4" />
                             </div>
-                            <div>
-                              <div className="text-sm font-semibold">{example.label}</div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="text-sm font-semibold">{card.title}</div>
+                                <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.heroBadgeText }}>
+                                  {card.cta}
+                                </span>
+                              </div>
                               <div className="mt-1 text-xs leading-5" style={{ color: C.heroMuted }}>
-                                {example.description}
+                                {card.body}
                               </div>
                             </div>
                           </button>
                         );
                       })}
+                    </div>
+                  </div>
+                  <div
+                    className="rounded-2xl border p-4"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
+                    <div className="text-sm font-semibold">Current OpenMAT Limits</div>
+                    <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                      Strong for numeric scripting, classroom linear algebra, plotting, interactive sliders, and native 3D demos. Not yet a full MATLAB desktop or toolbox replacement.
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {[
+                        "Good today: matrices, loops, local functions, anonymous functions, plot/hold, subplot, surf/mesh/plot3/scatter3, sliders, animate.",
+                        "Missing or partial: toolbox workflows, broad file I/O patterns, classdef/packages, full figure styling, full MATLAB graphics-handle behavior.",
+                        "Gradient descent is scriptable here. Color-mapped optimization surfaces and richer per-series styling still need more plotting controls.",
+                      ].map((item) => (
+                        <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                          {item}
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div
@@ -8912,7 +9025,7 @@ export default function OpenMatStudio() {
                       })}
                     </div>
                   </div>
-                  {EXAMPLES.map((example) => {
+                  {browserExampleList.map((example) => {
                     const Icon = example.icon;
                     return (
                       <button
