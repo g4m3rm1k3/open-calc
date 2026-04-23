@@ -289,6 +289,24 @@ surf(X, Y, Z)
 `,
   },
   {
+    id: "gcode-helix",
+    label: "G-Code Helix",
+    icon: LineChart,
+    description: "A machinist-flavored 3D helix that reads like a thread or spiral toolpath.",
+    featured: true,
+    matlabLike: true,
+    code: `% --- CNC Spring / Helix Test ---
+t = linspace(0, 10*pi, 500);
+x = cos(t);
+y = sin(t);
+z = t / 10;
+
+plot3(x, y, z)
+grid on
+title('G-Code Style Helix')
+`,
+  },
+  {
     id: "helix-plot3",
     label: "Helix plot3",
     icon: LineChart,
@@ -371,6 +389,38 @@ title('Animated 3D Helix')
 `,
   },
   {
+    id: "lorenz-attractor",
+    label: "Lorenz Butterfly",
+    icon: Waves,
+    description: "A classic chaos-system flex that proves loops, accumulation, and 3D curves all work together.",
+    featured: true,
+    matlabLike: true,
+    code: `% --- Lorenz Attractor ---
+dt = 0.01;
+x = 0.1;
+y = 0;
+z = 0;
+X = [];
+Y = [];
+Z = [];
+
+for i = 1:1000
+  dx = 10 * (y - x);
+  dy = x * (28 - z) - y;
+  dz = x * y - (8/3) * z;
+  x = x + dx * dt;
+  y = y + dy * dt;
+  z = z + dz * dt;
+  X = [X; x];
+  Y = [Y; y];
+  Z = [Z; z];
+end
+
+plot3(X, Y, Z)
+title('Lorenz Butterfly')
+`,
+  },
+  {
     id: "torus-stress-test",
     label: "Torus Stress Test",
     icon: Cpu,
@@ -402,6 +452,62 @@ surf_z = sin(v);
 
 surf(surf_x, surf_y, surf_z);
 title('Torus Test');
+`,
+  },
+  {
+    id: "clipped-wavefront",
+    label: "Clipped Wavefront",
+    icon: Cpu,
+    description: "Logical masking plus a sculpted surface for a fast, eye-catching matrix-art stress test.",
+    matlabLike: true,
+    code: `% --- Logical Pattern Test ---
+[X, Y] = meshgrid(-5:0.2:5);
+R = sqrt(X.^2 + Y.^2);
+Z = sin(R);
+
+Z(Z > 0.5) = 0.5;
+Z(Z < -0.5) = -0.5;
+
+surf(X, Y, Z)
+title('Clipped Wavefront')
+`,
+  },
+  {
+    id: "gradient-descent-lab",
+    label: "Gradient Descent Lab",
+    icon: Cpu,
+    description: "A live optimization lab: surface bowl plus descent path driven by a learning-rate slider.",
+    featured: true,
+    matlabLike: true,
+    code: `% --- 3D Gradient Descent Lab ---
+clear;
+learning_rate = slider('learning_rate', 0.02, 0.4, 0.02, 0.1);
+h = 0.001;
+[X, Y] = meshgrid(-2:0.1:2);
+Z = X .^ 2 + Y .^ 2;
+
+curr_x = 1.8;
+curr_y = 1.8;
+path_x = [curr_x];
+path_y = [curr_y];
+path_z = [curr_x^2 + curr_y^2];
+
+for i = 1:20
+  dz_dx = (((curr_x + h)^2 + curr_y^2) - (curr_x^2 + curr_y^2)) / h;
+  dz_dy = ((curr_x^2 + (curr_y + h)^2) - (curr_x^2 + curr_y^2)) / h;
+
+  curr_x = curr_x - learning_rate * dz_dx;
+  curr_y = curr_y - learning_rate * dz_dy;
+
+  path_x = [path_x; curr_x];
+  path_y = [path_y; curr_y];
+  path_z = [path_z; curr_x^2 + curr_y^2];
+end
+
+surf(X, Y, Z)
+hold on
+plot3(path_x, path_y, path_z)
+title('Gradient Descent: Finding the Minimum')
 `,
   },
   {
@@ -1113,39 +1219,47 @@ const MATLAB_QUICK_START_EXAMPLE_IDS = [
 ];
 
 const OPENMAT_SHOWCASE_EXAMPLE_IDS = [
-  "interactive-signal",
-  "animated-wave",
-  "interactive-surface-3d",
-  "animated-helix-3d",
-  "pendulum-lab",
+  "gcode-helix",
+  "lorenz-attractor",
+  "gradient-descent-lab",
+  "clipped-wavefront",
+  "torus-stress-test",
 ];
 
 const OPENMAT_TUTORIAL_CARDS = [
   {
     id: "run-script",
     title: "Run a Script",
-    body: "Write code in the center editor, press Run, then read Figure, Workspace, and Console as one cycle.",
+    body: "Write code in the editor, press Run, then read Figure, Workspace, and Console as one loop instead of separate tools.",
     action: "help",
     cta: "Open Help",
   },
   {
-    id: "read-results",
-    title: "Read Results",
-    body: "Use Figure for plots, Workspace for values and arrays, and Console for quick checks without editing the file.",
+    id: "read-reference",
+    title: "Learn the Workflow",
+    body: "Use the Reference tab to see the 60-second workflow, supported syntax, and where OpenMAT differs from MATLAB.",
     action: "reference",
-    cta: "Open Reference",
+    cta: "See Workflow",
   },
   {
     id: "matlab-limits",
-    title: "Know the Limits",
-    body: "OpenMAT is MATLAB-like for numeric labs, plotting, and interactive demos, but not full toolbox or desktop parity yet.",
+    title: "Know the Boundaries",
+    body: "OpenMAT is strong for numeric labs, plotting, and interactive demos, but it is not full MATLAB desktop or toolbox parity yet.",
     action: "compatibility",
     cta: "See Limits",
   },
   {
+    id: "optimization-lab",
+    title: "Try Optimization Lab",
+    body: "Load a bowl surface with a descent path driven by a learning-rate slider to see math, logic, 3D, and interactivity together.",
+    action: "example",
+    exampleId: "gradient-descent-lab",
+    cta: "Load Demo",
+  },
+  {
     id: "native-3d",
     title: "Try Native 3D",
-    body: "Use plot3, scatter3, surf, mesh, and animate(...) in the local OpenMAT viewport instead of bouncing to another tool.",
+    body: "Use plot3, scatter3, surf, mesh, and animate(...) in the local OpenMAT viewport for quick engineering-style figures.",
     action: "example",
     exampleId: "torus-stress-test",
     cta: "Load 3D Stress Test",
@@ -1832,6 +1946,13 @@ function normalizeMatrixSyntax(line) {
   });
 }
 
+function normalizeElementwiseOperators(line) {
+  return line
+    .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\^\s*/g, "$1.^")
+    .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\*\s*/g, "$1.*")
+    .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\/\s*/g, "$1./");
+}
+
 function replaceIndexing(line, variables, functionNames = new Set()) {
   if (variables.size === 0) return line;
   return line.replace(/\b([A-Za-z_]\w*)\s*\(([^()]+)\)/g, (match, name, inner) => {
@@ -1865,6 +1986,7 @@ function preprocessLine(line, variables, functionNames = new Set()) {
   output = output.replace(/^axis\s+tight$/i, "axis('tight')");
   output = output.replace(/^axis\s+equal$/i, "axis('equal')");
   output = output.replace(/^axis\s+auto$/i, "axis('auto')");
+  output = normalizeElementwiseOperators(output);
   output = normalizeMatrixSyntax(output);
   output = replaceIndexing(output, variables, functionNames);
   output = replaceBackslash(output);
@@ -8962,6 +9084,24 @@ export default function OpenMatStudio() {
                     className="rounded-2xl border p-4"
                     style={{ borderColor: C.border, background: C.surface }}
                   >
+                    <div className="text-sm font-semibold">Use OpenMAT in 60 Seconds</div>
+                    <div className="mt-3 grid gap-2">
+                      {[
+                        "1. Load an example or write a short script in the editor.",
+                        "2. Press Run and read Figure first, then Workspace, then Console.",
+                        "3. Use slider(...) and animate(...) to rerun the same script with new inputs.",
+                        "4. If a script feels broken, check Reference for supported syntax and current limits before assuming MATLAB parity.",
+                      ].map((item) => (
+                        <div key={item} className="rounded-xl border px-3 py-2 text-xs leading-5" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div
+                    className="rounded-2xl border p-4"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
                     <div className="text-sm font-semibold">Current OpenMAT Limits</div>
                     <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                       Strong for numeric scripting, classroom linear algebra, plotting, interactive sliders, and native 3D demos. Not yet a full MATLAB desktop or toolbox replacement.
@@ -9922,6 +10062,30 @@ export default function OpenMatStudio() {
                   className="rounded-2xl border p-4 text-sm leading-6"
                   style={{ borderColor: C.border, background: C.surface }}
                 >
+                  <div className="mb-3 font-semibold">Start Here</div>
+                  <div className="grid gap-2">
+                    {[
+                      "1. Editor: load an example or write a short script.",
+                      "2. Run: execute the active tab and let Figure, Workspace, and Console update together.",
+                      "3. Figure: trust plots first when checking if a script worked.",
+                      "4. Workspace: inspect arrays and scalars after the run, not during every loop iteration.",
+                      "5. Console: test one-liners against the latest workspace state, then promote useful commands back into the script.",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
                   <div className="mb-3 font-semibold">Interaction Model</div>
                   <div className="grid gap-2">
                     {interactionModelItems.map((item) => (
@@ -9962,6 +10126,28 @@ export default function OpenMatStudio() {
                         key={item}
                         className="rounded-xl border px-3 py-2 font-mono text-xs"
                         style={{ borderColor: C.border, background: C.surface2 }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Optimization and color limits</div>
+                  <div className="grid gap-2">
+                    {[
+                      "Gradient descent and other iterative optimization demos are scriptable today with loops, sliders, surf(...), and plot3(...).",
+                      "The current plotting layer is still lighter than MATLAB for colormap, colorbar, shading interp, and rich per-series styling.",
+                      "If you want a challenge-ready optimization demo right now, use geometry, motion, and an overlaid path before relying on advanced color semantics.",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2 text-xs"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
                       >
                         {item}
                       </div>

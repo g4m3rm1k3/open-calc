@@ -92,8 +92,8 @@ Recommended first examples:
 
 - `MATLAB First Plot`
 - `Matrix Quick Start`
-- `Helix plot3`
-- `Surface + Mesh Demo`
+- `Gradient Descent Lab`
+- `G-Code Helix`
 
 That sequence matters because it establishes trust before it introduces OpenMAT-only interactivity.
 
@@ -102,16 +102,17 @@ That sequence matters because it establishes trust before it introduces OpenMAT-
 For judges or first-time users, the strongest short demo order is:
 
 1. `MATLAB First Plot`
-2. `Interactive Signal`
-3. `Animated 3D Helix`
-4. `Interactive 3D Surface`
-5. `Pendulum Lab`
+2. `G-Code Helix`
+3. `Lorenz Butterfly`
+4. `Gradient Descent Lab`
+5. `Torus Stress Test`
 
 Why this order works:
 
-- the first two prove basic plotting and controls
-- the next two create visual wow quickly
-- the last one shows engineering intuition, not just graphing
+- the first one proves ordinary MATLAB-like plotting
+- the next two create fast visual trust and engineering flavor
+- the optimization lab shows math, logic, 3D, and sliders together
+- the torus stress test shows the engine can survive a bigger 3D script
 
 ## What OpenMAT is strong at today
 
@@ -189,6 +190,30 @@ These concepts exist, but not in full MATLAB form:
 - OpenMAT-specific interactivity such as `slider(...)` and `animate(...)` is part of the language surface
 
 So a user can often keep the math while changing the workflow.
+
+## Optimization and color reality check
+
+OpenMAT can already support a compelling optimization demo:
+
+- loops and finite-difference updates
+- sliders that rerun the same script with new parameters
+- `surf(...)` for a cost landscape
+- `plot3(...)` for the descent path on top
+
+That is enough to build a strong gradient-descent lab today.
+
+What is still lighter than MATLAB:
+
+- no full `colormap(...)` workflow yet
+- no true `colorbar`
+- no full `shading interp` style parity
+- more limited figure styling and per-series color controls
+
+So the best current strategy is:
+
+1. lead with geometry, motion, and overlaid paths
+2. use color as a bonus, not the core proof
+3. pitch the demo as a live engineering lab, not full MATLAB figure parity
 
 ## Won't work yet
 
