@@ -800,7 +800,7 @@ export default function CNCSimPro() {
 
       // Grid
       if(layers.grid){
-        ctx.strokeStyle="#131c28"; ctx.lineWidth=0.5;
+        ctx.strokeStyle=C.grid; ctx.lineWidth=0.5;
         const zMin=Math.floor((-originX)/sc/25)*25;
         const zMax=Math.ceil((W-originX)/sc/25)*25;
         const xMin=Math.floor((-originY)/sc/25)*25;
@@ -808,10 +808,10 @@ export default function CNCSimPro() {
         for(let z=zMin;z<=zMax;z+=25){const s=toS(z,0);ctx.beginPath();ctx.moveTo(s.sx,-originY);ctx.lineTo(s.sx,H+originY);ctx.stroke();}
         for(let x=xMin;x<=xMax;x+=25){const sy=originY-x*sc;ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();}
         // Bold Z=0 line
-        ctx.strokeStyle="#1e3040"; ctx.lineWidth=1;
+        ctx.strokeStyle=C.axBd; ctx.lineWidth=1;
         const z0=toS(0,0); ctx.beginPath();ctx.moveTo(z0.sx,-H);ctx.lineTo(z0.sx,2*H);ctx.stroke();
         // Centreline
-        ctx.strokeStyle="#2a4060"; ctx.lineWidth=1.5; ctx.setLineDash([12,6]);
+        ctx.strokeStyle=C.axGrid; ctx.lineWidth=1.5; ctx.setLineDash([12,6]);
         ctx.beginPath();ctx.moveTo(0,originY);ctx.lineTo(W,originY);ctx.stroke();
         ctx.setLineDash([]);
       }
@@ -824,7 +824,7 @@ export default function CNCSimPro() {
         const tl=toS(sz,sx2+R), tr=toS(sz+L,sx2+R);
         const bl=toS(sz,sx2), br=toS(sz+L,sx2);
         // Top half (solid stock)
-        ctx.fillStyle="#1a3550"; ctx.strokeStyle="#2a5080"; ctx.lineWidth=1;
+        ctx.fillStyle=C.stockS1; ctx.strokeStyle=C.stockBd; ctx.lineWidth=1;
         ctx.beginPath();
         ctx.moveTo(bl.sx,bl.sy); ctx.lineTo(br.sx,br.sy);
         ctx.lineTo(tr.sx,tr.sy); ctx.lineTo(tl.sx,tl.sy);
@@ -832,13 +832,13 @@ export default function CNCSimPro() {
         // Mirror (bottom half)
         const tlm=toS(sz,-(sx2+R)), trm=toS(sz+L,-(sx2+R));
         const blm=toS(sz,-sx2), brm=toS(sz+L,-sx2);
-        ctx.fillStyle="#152840";
+        ctx.fillStyle=C.stockS2;
         ctx.beginPath();
         ctx.moveTo(blm.sx,blm.sy); ctx.lineTo(brm.sx,brm.sy);
         ctx.lineTo(trm.sx,trm.sy); ctx.lineTo(tlm.sx,tlm.sy);
         ctx.closePath(); ctx.fill(); ctx.stroke();
         // End faces
-        ctx.strokeStyle="#3a7090"; ctx.lineWidth=2;
+        ctx.strokeStyle=C.stockTop; ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(tl.sx,tl.sy);ctx.lineTo(bl.sx,bl.sy);ctx.stroke();
         ctx.beginPath();ctx.moveTo(tr.sx,tr.sy);ctx.lineTo(br.sx,br.sy);ctx.stroke();
         ctx.beginPath();ctx.moveTo(tlm.sx,tlm.sy);ctx.lineTo(blm.sx,blm.sy);ctx.stroke();
@@ -1405,10 +1405,10 @@ export default function CNCSimPro() {
       const R=(stock.diameter||80)/2,L=stock.length||150;
       const sc=Math.min((cvs.width-20)/L,(cvs.height-20)/(R));
       const ox=10,cy=cvs.height/2;
-      ctx.fillStyle="#1a3550";ctx.strokeStyle="#2a5080";ctx.lineWidth=1;
+      ctx.fillStyle=C.stockS1;ctx.strokeStyle=C.stockBd;ctx.lineWidth=1;
       ctx.beginPath();ctx.rect(ox,cy-R*sc,L*sc,R*sc*2);ctx.fill();ctx.stroke();
-      ctx.beginPath();ctx.ellipse(ox,cy,3,R*sc,0,0,Math.PI*2);ctx.fillStyle="#0e2035";ctx.fill();ctx.stroke();
-      ctx.beginPath();ctx.ellipse(ox+L*sc,cy,3,R*sc,0,0,Math.PI*2);ctx.fillStyle="#1e3a5a";ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(ox,cy,3,R*sc,0,0,Math.PI*2);ctx.fillStyle=C.stockFront;ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(ox+L*sc,cy,3,R*sc,0,0,Math.PI*2);ctx.fillStyle=C.stockTop;ctx.fill();ctx.stroke();
       // Centreline
       ctx.strokeStyle=C.blue+"40";ctx.lineWidth=1;ctx.setLineDash([6,4]);
       ctx.beginPath();ctx.moveTo(ox,cy);ctx.lineTo(ox+L*sc,cy);ctx.stroke();ctx.setLineDash([]);
@@ -1420,8 +1420,8 @@ export default function CNCSimPro() {
       const p=(x,y,z)=>({x:ox+x*sc+z*sc*sk,y:oy-y*sc-z*sc*sk});
       const A=p(0,0,0),B=p(W,0,0),Cp=p(W,H2,0),Dp=p(0,H2,0);
       const E=p(0,0,D),F=p(W,0,D),G=p(W,H2,D),Hp=p(0,H2,D);
-      const fc=(pts,fill)=>{ctx.fillStyle=fill;ctx.strokeStyle="#2a5278";ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.closePath();ctx.fill();ctx.stroke();};
-      fc([A,B,Cp,Dp],"#1e3a5a");fc([B,F,G,Cp],"#152840");fc([E,F,G,Hp],"#1a4060");
+      const fc=(pts,fill)=>{ctx.fillStyle=fill;ctx.strokeStyle=C.stockBd;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.closePath();ctx.fill();ctx.stroke();};
+      fc([A,B,Cp,Dp],C.stockTop);fc([B,F,G,Cp],C.stockS1);fc([E,F,G,Hp],C.stockS2);
       ctx.fillStyle=C.blue;ctx.font="bold 8px system-ui";ctx.fillText(`${W}×${H2}×${D}mm`,4,10);
     }
   },[stock]);
@@ -2010,7 +2010,7 @@ export default function CNCSimPro() {
               </div>
               <textarea id="ced" value={code} spellCheck={false}
                 onChange={e=>{setCode(e.target.value);clearTimeout(window._ct);window._ct=setTimeout(()=>reload(e.target.value),900);}}
-                style={{flex:1,resize:"none",background:"#080d12",color:"#3fb950",fontFamily:"'Courier New',monospace",fontSize:11,border:"none",outline:"none",lineHeight:1.7,padding:8,width:"100%"}}/>
+                style={{flex:1,resize:"none",background:C.codeBg,color:C.green,fontFamily:"'JetBrains Mono',monospace",fontSize:11,border:"none",outline:"none",lineHeight:1.7,padding:8,width:"100%"}}/>
             </div>
           )}
 
