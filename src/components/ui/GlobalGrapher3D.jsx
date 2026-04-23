@@ -38,11 +38,25 @@ const Scene = ({ functions, settings }) => {
   )
 }
 
-// --- Dynamic Function Surface ---
+const buildPointsGeometry = (xs = [], ys = [], zs = []) => {
+  const count = Math.min(xs.length, ys.length, zs.length)
+  const positions = new Float32Array(count * 3)
+  for (let i = 0; i < count; i += 1) {
+    positions[i * 3] = xs[i] ?? 0
+    positions[i * 3 + 1] = zs[i] ?? 0
+    positions[i * 3 + 2] = ys[i] ?? 0
+  }
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  return geometry
+}
+
+// --- Dynamic Function Surface / 3D primitives ---
 const Function3D = ({ fn, settings }) => {
-  const meshRef = useRef()
-  
   const geometry = useMemo(() => {
+    if (fn.plotType === 'line3' || fn.plotType === 'scatter3') {
+      return buildPointsGeometry(fn.xs || [], fn.ys || [], fn.zs || [])
+    }
     if (fn.surfaceData?.Z) {
       const { X, Y, Z } = fn.surfaceData
       const rows = Z.length
@@ -103,6 +117,28 @@ const Function3D = ({ fn, settings }) => {
 
   if (!fn.visible) return null
 
+  if (fn.plotType === 'line3') {
+    return (
+      <line geometry={geometry}>
+        <lineBasicMaterial color={fn.color} transparent opacity={fn.opacity ?? 1} />
+      </line>
+    )
+  }
+
+  if (fn.plotType === 'scatter3') {
+    return (
+      <points geometry={geometry}>
+        <pointsMaterial
+          color={fn.color}
+          size={fn.pointSize ?? 0.12}
+          transparent
+          opacity={fn.opacity ?? 0.95}
+          sizeAttenuation
+        />
+      </points>
+    )
+  }
+
   return (
     <mesh geometry={geometry}>
       <meshStandardMaterial 
@@ -120,6 +156,7 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
   const [functions, setFunctions] = useLocalStorage('global-grapher-3d-funcs', [
     { id: 1, latex: 'sin(x) * cos(y)', color: '#6366f1', visible: true, wireframe: false, opacity: 0.8 }
   ])
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   
   const [settings, setSettings] = useLocalStorage('global-grapher-3d-settings', {
     isDark: document.documentElement.classList.contains('dark'),
@@ -128,6 +165,7 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
     resolution: 64,
     autoRotate: false
   })
+  const lastLaunchSignatureRef = useRef('')
 
   // Sync dark mode
   useEffect(() => {
@@ -139,6 +177,14 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
 
   useEffect(() => {
     if (!isOpen || !launchConfig) return
+    const launchSignature = JSON.stringify({
+      functions: launchConfig.functions || [],
+      settings: launchConfig.settings || {},
+      replace: launchConfig.replace !== false,
+      title: launchConfig.title || '',
+    })
+    if (lastLaunchSignatureRef.current === launchSignature) return
+    lastLaunchSignatureRef.current = launchSignature
     if (Array.isArray(launchConfig.functions) && launchConfig.functions.length) {
       const nextFunctions = launchConfig.functions.map((fn, index) => ({
         id: fn.id ?? Date.now() + index,
@@ -148,13 +194,28 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
         wireframe: !!fn.wireframe,
         opacity: fn.opacity ?? 0.8,
         surfaceData: fn.surfaceData ?? null,
+        plotType: fn.plotType ?? null,
+        xs: fn.xs ?? [],
+        ys: fn.ys ?? [],
+        zs: fn.zs ?? [],
+        pointSize: fn.pointSize ?? 0.12,
       }))
-      setFunctions((prev) => launchConfig.replace === false ? [...prev, ...nextFunctions] : nextFunctions)
+      const nextValue = launchConfig.replace === false ? [...functions, ...nextFunctions] : nextFunctions
+      const currentSignature = JSON.stringify(functions)
+      const nextSignature = JSON.stringify(nextValue)
+      if (currentSignature !== nextSignature) {
+        setFunctions(nextValue)
+      }
     }
     if (launchConfig.settings) {
-      setSettings((prev) => ({ ...prev, ...launchConfig.settings }))
+      const nextSettings = { ...settings, ...launchConfig.settings }
+      const currentSettingsSignature = JSON.stringify(settings)
+      const nextSettingsSignature = JSON.stringify(nextSettings)
+      if (currentSettingsSignature !== nextSettingsSignature) {
+        setSettings(nextSettings)
+      }
     }
-  }, [isOpen, launchConfig])
+  }, [functions, isOpen, launchConfig, setFunctions, setSettings, settings])
 
   if (!isOpen) return null
 
@@ -185,13 +246,15 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
       <div className={embedded ? "flex h-full w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 md:flex-row" : "bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl shadow-2xl w-full sm:max-w-7xl flex flex-col md:flex-row h-full sm:h-[92vh] overflow-hidden"}>
         
         {/* Sidebar */}
-        <div className="w-full md:w-80 bg-slate-50/50 dark:bg-slate-950/30 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+        {sidebarOpen && (
+        <div className="w-full md:w-[19rem] lg:w-[20.5rem] bg-slate-50/50 dark:bg-slate-950/30 border-r border-slate-200 dark:border-slate-800 flex flex-col">
           <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white/50 dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
             <h3 className="font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 tracking-tight">
               <Box className="w-5 h-5 text-indigo-500" />
               {launchConfig?.title || '3D Plotter'}
             </h3>
             <div className="flex items-center gap-1">
+              {typeof onSwitchTo2D === 'function' && (
               <button 
                 onClick={onSwitchTo2D}
                 title="Switch to 2D Plotter (G)"
@@ -199,6 +262,8 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
               >
                 <Activity className="w-5 h-5 transition-transform hover:scale-110" />
               </button>
+              )}
+              {typeof onSwitchToJSX === 'function' && (
               <button 
                 onClick={onSwitchToJSX}
                 title="Switch to JSXGraph Pro (X)"
@@ -206,6 +271,7 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
               >
                 <Settings2 className="w-5 h-5 transition-transform hover:scale-110" />
               </button>
+              )}
               <button 
                 onClick={addFunction}
                 className="p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
@@ -299,15 +365,23 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
               <Info className="w-4 h-4 text-indigo-500 mt-1" />
               <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                 <p className="font-bold text-indigo-600 dark:text-indigo-400">3D Syntax</p>
-                <p>Functions take <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">x</code> and <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">y</code> as inputs.</p>
-                <p>Try: <code className="italic">Math.sqrt(x*x + y*y)</code></p>
+                <p>OpenMAT can render surfaces, 3D curves, and 3D point clouds in this viewport.</p>
+                <p>Try: <code className="italic">surf(X,Y,Z)</code>, <code className="italic">plot3(x,y,z)</code>, <code className="italic">scatter3(x,y,z)</code>, or animate a 3D curve with <code className="italic">animate(...)</code>.</p>
               </div>
             </div>
           </div>
         </div>
+        )}
 
         {/* Viewport */}
         <div className="flex-1 relative bg-slate-50 dark:bg-slate-950">
+          <button
+            onClick={() => setSidebarOpen((current) => !current)}
+            className="absolute left-4 top-4 z-20 inline-flex items-center gap-2 rounded-2xl border bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 shadow-xl backdrop-blur-md transition-all hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:bg-slate-900"
+          >
+            <Layers className="h-4 w-4" />
+            {sidebarOpen ? 'Hide Controls' : 'Show Controls'}
+          </button>
           {!embedded && (
             <button 
               onClick={onClose}

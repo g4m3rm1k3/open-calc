@@ -78,6 +78,41 @@ For geometry authoring:
 
 That is the best first chapter for a course because it teaches the interaction model before introducing OpenMAT's language layer.
 
+## MATLAB user quick start
+
+If someone already knows MATLAB, the fastest OpenMAT success path is:
+
+1. run one simple 2D plot
+2. run one matrix example
+3. run one `plot3(...)` example
+4. run one `surf(...)` example
+5. only then try `slider(...)` and `animate(...)`
+
+Recommended first examples:
+
+- `MATLAB First Plot`
+- `Matrix Quick Start`
+- `Helix plot3`
+- `Surface + Mesh Demo`
+
+That sequence matters because it establishes trust before it introduces OpenMAT-only interactivity.
+
+## Challenge demo path
+
+For judges or first-time users, the strongest short demo order is:
+
+1. `MATLAB First Plot`
+2. `Interactive Signal`
+3. `Animated 3D Helix`
+4. `Interactive 3D Surface`
+5. `Pendulum Lab`
+
+Why this order works:
+
+- the first two prove basic plotting and controls
+- the next two create visual wow quickly
+- the last one shows engineering intuition, not just graphing
+
 ## What OpenMAT is strong at today
 
 - matrix algebra
@@ -263,7 +298,8 @@ Current plotting direction:
 - native 2D figures inside the OpenMAT figure pane
 - subplot support inside the same session
 - local axis, grid, and view-state control
-- `surf(...)` and `mesh(...)` routed into the integrated 3D viewport
+- `surf(...)`, `mesh(...)`, and `surfc(...)` rendered in the integrated 3D viewport
+- `plot3(...)` and `scatter3(...)` rendered as native 3D curve / point-cloud views
 - one-click handoff from local 3D into the separate app grapher when a user wants a larger surface workspace
 
 The important product rule is:

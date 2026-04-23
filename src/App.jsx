@@ -18,6 +18,7 @@ const ReferencePage = lazy(() => import("./pages/ReferencePage.jsx"));
 const UniversalCalcPage = lazy(() => import("./pages/UniversalCalcPage.jsx"));
 const OpenMatPage = lazy(() => import("./pages/OpenMatPage.jsx"));
 const ArkanoidLearnPage = lazy(() => import("./pages/ArkanoidLearnPage.jsx"));
+const CNCSimPage = lazy(() => import("./pages/CNCSimPage.jsx"));
 const RealityRunnerPage = lazy(() => import("./pages/RealityRunnerPage.jsx"));
 const CoursePage = lazy(() => import("./pages/CoursePage.jsx"));
 const LogicSimPage = lazy(() => import("./pages/LogicSimPage.jsx"));
@@ -68,6 +69,7 @@ export default function App() {
                     />
                     <Route path="openmat" element={<OpenMatPage />} />
                     <Route path="arkanoid-learn" element={<ArkanoidLearnPage />} />
+                    <Route path="cnc-sim" element={<CNCSimPage />} />
                     <Route path="reality-runner" element={<RealityRunnerPage />} />
                     <Route path="logic-sim" element={<LogicSimPage />} />
                     <Route path="chemistry" element={<ChemistryPage />} />

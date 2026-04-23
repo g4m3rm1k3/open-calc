@@ -324,6 +324,14 @@ function TopBar({
         </NavLink>
         {/* Reality Runner hidden until physics fixed */}
         <NavLink
+          to="/cnc-sim"
+          className={({ isActive }) =>
+            `text-sm font-bold transition-colors ${isActive ? "text-amber-600 dark:text-amber-400" : "text-slate-800 dark:text-slate-100 hover:text-amber-600"}`
+          }
+        >
+          CNC Sim
+        </NavLink>
+        <NavLink
           to="/logic-sim"
           className={({ isActive }) =>
             `text-sm font-bold transition-colors ${isActive ? "text-violet-600 dark:text-violet-400" : "text-slate-800 dark:text-slate-100 hover:text-violet-600"}`
@@ -627,6 +635,7 @@ export default function AppShell({ children }) {
   const isChemistryRoute = location.pathname.startsWith("/chemistry");
   const isOpenMatRoute = location.pathname.startsWith("/openmat");
   const isArkanoidLearnRoute = location.pathname.startsWith("/arkanoid-learn");
+  const isCNCSimRoute = location.pathname.startsWith("/cnc-sim");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -813,7 +822,7 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>

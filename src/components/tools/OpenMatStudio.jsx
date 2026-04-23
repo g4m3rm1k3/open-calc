@@ -26,7 +26,7 @@ import {
   CircleHelp,
 } from "lucide-react";
 import FigureRenderer from "../viz/react/FigureRenderer.jsx";
-import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
+import OpenMatGrapher3D from "../ui/OpenMatGrapher3D.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
@@ -97,6 +97,41 @@ ylabel('y')
 `;
 
 const EXAMPLES = [
+  {
+    id: "matlab-first-plot",
+    label: "MATLAB First Plot",
+    icon: LineChart,
+    description: "The fastest way for a MATLAB user to confirm plotting, labels, and grid behavior.",
+    featured: true,
+    matlabLike: true,
+    code: `x = linspace(0, 2*pi, 300);
+y = sin(x);
+
+plot(x, y)
+grid on
+title('My first OpenMAT plot')
+xlabel('x')
+ylabel('sin(x)')
+`,
+  },
+  {
+    id: "matlab-matrix-quickstart",
+    label: "Matrix Quick Start",
+    icon: Rows3,
+    description: "A short Ax=b workflow with matrix inspection and a simple result plot.",
+    featured: true,
+    matlabLike: true,
+    code: `A = [4 -1 0; -1 4 -1; 0 -1 3];
+b = [15; 10; 10];
+x = A \\ b
+
+plot(1:3, x)
+grid on
+title('Solution Vector')
+xlabel('index')
+ylabel('x(i)')
+`,
+  },
   {
     id: "linear-system",
     label: "Linear System",
@@ -236,7 +271,7 @@ title('Data Distribution')
     id: "anonymous-3d",
     label: "Anonymous + 3D",
     icon: Waves,
-    description: "Use anonymous functions, roots, integration, and launch a surface into the 3D grapher.",
+    description: "Use anonymous functions, roots, integration, and render a 3D surface in OpenMAT.",
     code: `f = @(x) x.^3 - 4*x + 1;
 x = linspace(-3, 3, 200);
 y = f(x);
@@ -251,6 +286,88 @@ trapz(x, y)
 [X, Y] = meshgrid(-4:0.4:4, -4:0.4:4);
 Z = sin(sqrt(X.^2 + Y.^2));
 surf(X, Y, Z)
+`,
+  },
+  {
+    id: "helix-plot3",
+    label: "Helix plot3",
+    icon: LineChart,
+    description: "A true 3D curve example with plot3(x, y, z).",
+    featured: true,
+    matlabLike: true,
+    code: `t = linspace(0, 8*pi, 320);
+x = cos(t);
+y = sin(t);
+z = linspace(0, 6, 320);
+
+plot3(x, y, z)
+title('3D Helix')
+`,
+  },
+  {
+    id: "scatter3-cloud",
+    label: "scatter3 Cloud",
+    icon: Sigma,
+    description: "Show a 3D point cloud with scatter3(x, y, z).",
+    code: `t = linspace(0, 6*pi, 240);
+r = linspace(0.4, 2.2, 240);
+x = r .* cos(t);
+y = r .* sin(t);
+z = linspace(-2, 2, 240) + 0.3*sin(3*t);
+
+scatter3(x, y, z)
+title('3D Spiral Point Cloud')
+`,
+  },
+  {
+    id: "interactive-surface-3d",
+    label: "Interactive 3D Surface",
+    icon: Cpu,
+    description: "Drive a 3D surface with OpenMAT sliders inside the local viewport.",
+    featured: true,
+    code: `amp = slider('amp', 0.4, 2.5, 0.1, 1.2);
+freq = slider('freq', 0.5, 3.5, 0.1, 1.4);
+
+[X, Y] = meshgrid(-5:0.25:5, -5:0.25:5);
+R = sqrt(X.^2 + Y.^2) + 0.001;
+Z = amp * sin(freq * R) ./ R;
+
+surf(X, Y, Z)
+title('Interactive Ripple Surface')
+`,
+  },
+  {
+    id: "matlab-surface-demo",
+    label: "Surface + Mesh Demo",
+    icon: Cpu,
+    description: "A MATLAB-style surface benchmark with a shape that reads well in 3D.",
+    featured: true,
+    matlabLike: true,
+    code: `[X, Y] = meshgrid(-3:0.18:3, -3:0.18:3);
+Z = 3*(1 - X).^2 .* exp(-(X.^2) - (Y + 1).^2) ...
+    - 10*(X/5 - X.^3 - Y.^5) .* exp(-X.^2 - Y.^2) ...
+    - (1/3) * exp(-(X + 1).^2 - Y.^2);
+
+surf(X, Y, Z)
+title('Surface Demo')
+`,
+  },
+  {
+    id: "animated-helix-3d",
+    label: "Animated 3D Helix",
+    icon: Waves,
+    description: "Animate a 3D curve directly in the local OpenMAT viewport with animate(...).",
+    featured: true,
+    code: `phase = animate('phase', 0, 6*pi, 0.07, 0, 1.1, 1);
+pitch = slider('pitch', 0.08, 0.5, 0.02, 0.22);
+
+t = linspace(phase, phase + 6*pi, 260);
+x = cos(t);
+y = sin(t);
+z = pitch * t + 0.25 * sin(2*t);
+
+plot3(x, y, z)
+title('Animated 3D Helix')
 `,
   },
   {
@@ -941,7 +1058,8 @@ const HELP_TEXT = [
   "plot, scatter, bar, stem, area, hist, hold on/off, clf",
   "title, xlabel, ylabel, legend, grid on/off, xlim, ylim",
   "axis tight/equal/auto/[xmin xmax ymin ymax]",
-  "surf(X,Y,Z)   mesh(X,Y,Z) -> opens the 3D Grapher",
+  "surf(X,Y,Z)   mesh(X,Y,Z)   surfc(X,Y,Z)",
+  "plot3(X,Y,Z)   scatter3(X,Y,Z) -> native OpenMAT 3D viewport",
   "slider('gain', min, max, step, default) -> interactive controls",
   "animate('t', min, max, step, default, speed, loop) -> play-ready control",
   "",
@@ -952,6 +1070,21 @@ const HELP_TEXT = [
   "── Extensions ──",
   "window.OpenMAT.registerExtension(name, { functions, onRun })",
 ].join("\n");
+
+const MATLAB_QUICK_START_EXAMPLE_IDS = [
+  "matlab-first-plot",
+  "matlab-matrix-quickstart",
+  "helix-plot3",
+  "matlab-surface-demo",
+];
+
+const OPENMAT_SHOWCASE_EXAMPLE_IDS = [
+  "interactive-signal",
+  "animated-wave",
+  "interactive-surface-3d",
+  "animated-helix-3d",
+  "pendulum-lab",
+];
 
 const MATLAB_COMPATIBILITY = {
   worksWell: [
@@ -1446,6 +1579,36 @@ function convertSurfaceTo3DConfig(kind, args, plotState) {
     settings: {
       range: Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 10),
       resolution: Math.min(128, Math.max(surfaceData.Z.length, surfaceData.Z[0]?.length || 32)),
+    },
+  };
+}
+
+function convertPointSeries3DConfig(kind, args, plotState) {
+  const xs = normalizeVector(args[0]).map(Number);
+  const ys = normalizeVector(args[1]).map(Number);
+  const zs = normalizeVector(args[2]).map(Number);
+  const count = Math.min(xs.length, ys.length, zs.length);
+  return {
+    mode: "3d",
+    title: plotState.title || `OpenMAT ${kind === "scatter3" ? "3D Scatter" : "3D Curve"}`,
+    replace: true,
+    functions: [
+      {
+        id: Date.now(),
+        latex: kind === "scatter3" ? "scatter3 data" : "plot3 data",
+        color: kind === "scatter3" ? "#f97316" : "#22c55e",
+        visible: true,
+        opacity: kind === "scatter3" ? 0.95 : 1,
+        plotType: kind === "scatter3" ? "scatter3" : "line3",
+        xs: xs.slice(0, count),
+        ys: ys.slice(0, count),
+        zs: zs.slice(0, count),
+        pointSize: kind === "scatter3" ? 0.14 : 0.1,
+      },
+    ],
+    settings: {
+      range: 10,
+      resolution: 64,
     },
   };
 }
@@ -3907,7 +4070,7 @@ function OpenMatSimulationViewport({
           </div>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border" style={{ borderColor: C.border }}>
-          <GlobalGrapher3D
+          <OpenMatGrapher3D
             embedded
             isOpen
             launchConfig={surfaceConfig}
@@ -3961,8 +4124,18 @@ function OpenMatSimulationViewport({
   );
 }
 
-function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
-  if (!isOpen || !figureJson) return null;
+function OpenMatPlotWindow({
+  isOpen,
+  onClose,
+  figureJson,
+  figureMeta,
+  surfaceConfig,
+  plotKind,
+  onOpenSeparate3D,
+  C,
+}) {
+  const showing3D = plotKind === "3d" && surfaceConfig;
+  if (!isOpen || (!figureJson && !showing3D)) return null;
 
   return (
     <div className="fixed inset-0 z-[90] bg-slate-950/55 backdrop-blur-md">
@@ -3976,16 +4149,29 @@ function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
         >
           <div>
             <div className="text-sm font-semibold" style={{ color: C.text }}>
-              OpenMAT Plot Window
+              {showing3D ? "OpenMAT 3D Window" : "OpenMAT Plot Window"}
             </div>
             <div className="text-xs" style={{ color: C.muted }}>
-              Larger figure view for dense plots and subplot layouts.
+              {showing3D
+                ? "Full-size 3D scene with persistent controls and room to inspect animated motion."
+                : "Larger figure view for dense plots and subplot layouts."}
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden text-xs md:block" style={{ color: C.muted }}>
-              Axis mode: {figureMeta.axisMode}
-            </div>
+            {showing3D ? (
+              <button
+                type="button"
+                onClick={onOpenSeparate3D}
+                className="hidden rounded-xl border px-3 py-2 text-sm font-semibold md:inline-flex"
+                style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+              >
+                Open Separate 3D
+              </button>
+            ) : (
+              <div className="hidden text-xs md:block" style={{ color: C.muted }}>
+                Axis mode: {figureMeta.axisMode}
+              </div>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -4000,20 +4186,21 @@ function OpenMatPlotWindow({ isOpen, onClose, figureJson, figureMeta, C }) {
 
         <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
           <div
-            className="min-h-full rounded-3xl border p-4 md:p-6"
+            className={`rounded-3xl border ${showing3D ? "h-full min-h-[78vh] overflow-hidden p-0" : "min-h-full p-4 md:p-6"}`}
             style={{ borderColor: C.border, background: C.surface }}
           >
-            {renderOpenMatFigure(figureJson, C, 280)}
+            {showing3D ? (
+              <OpenMatGrapher3D
+                embedded
+                isOpen
+                launchConfig={null}
+              />
+            ) : (
+              renderOpenMatFigure(figureJson, C, 280)
+            )}
           </div>
         </div>
       </div>
-      <OpenMatPlotWindow
-        isOpen={isPlotWindowOpen}
-        onClose={() => setIsPlotWindowOpen(false)}
-        figureJson={displayFigureJson}
-        figureMeta={figureMeta}
-        C={C}
-      />
     </div>
   );
 }
@@ -4433,12 +4620,27 @@ function createExecutionEngine(options = {}) {
   parser.set("null", (A) => orthonormalBasis(A, "null"));
   parser.set("surf", (...args) => {
     plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
-    logs.push("3D surface ready. Opened in 3D Grapher.");
+    logs.push("3D surface ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("mesh", (...args) => {
     plot3DRequest = convertSurfaceTo3DConfig("mesh", args, plotState);
-    logs.push("3D mesh ready. Opened in 3D Grapher.");
+    logs.push("3D mesh ready in the OpenMAT viewport.");
+    return args[args.length - 1] ?? null;
+  });
+  parser.set("surfc", (...args) => {
+    plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
+    logs.push("3D shaded surface ready in the OpenMAT viewport.");
+    return args[args.length - 1] ?? null;
+  });
+  parser.set("plot3", (...args) => {
+    plot3DRequest = convertPointSeries3DConfig("plot3", args, plotState);
+    logs.push("3D curve ready in the OpenMAT viewport.");
+    return args[args.length - 1] ?? null;
+  });
+  parser.set("scatter3", (...args) => {
+    plot3DRequest = convertPointSeries3DConfig("scatter3", args, plotState);
+    logs.push("3D scatter ready in the OpenMAT viewport.");
     return args[args.length - 1] ?? null;
   });
   parser.set("slider", (name, min, max, step = 1, defaultValue = null) =>
@@ -4837,6 +5039,7 @@ export default function OpenMatStudio() {
     getInitialActiveDocumentId(getInitialOpenMatDocuments()),
   );
   const [rightPaneWidth, setRightPaneWidth] = useLocalStorage("openmat-right-pane-width", 390);
+  const [browserPaneWidth, setBrowserPaneWidth] = useLocalStorage("openmat-browser-pane-width", 340);
   const [running, setRunning] = useState(false);
   const [output, setOutput] = useState("");
   const [lastRunReport, setLastRunReport] = useState(null);
@@ -4877,6 +5080,7 @@ export default function OpenMatStudio() {
   const [parameterStudyResults, setParameterStudyResults] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isResizingRightPane, setIsResizingRightPane] = useState(false);
+  const [isResizingBrowserPane, setIsResizingBrowserPane] = useState(false);
   const [isResizingSimCenter, setIsResizingSimCenter] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [commandInput, setCommandInput] = useState("");
@@ -5699,6 +5903,14 @@ export default function OpenMatStudio() {
         })),
     [],
   );
+  const matlabQuickStartExamples = useMemo(
+    () => MATLAB_QUICK_START_EXAMPLE_IDS.map((id) => exampleMap[id]).filter(Boolean),
+    [exampleMap],
+  );
+  const featuredExampleShowcase = useMemo(
+    () => OPENMAT_SHOWCASE_EXAMPLE_IDS.map((id) => exampleMap[id]).filter(Boolean),
+    [exampleMap],
+  );
   const crowdedTabs = documents.length >= 6;
   const interactionModelItems = [
     "Editor tabs store saved scripts, examples, and labs.",
@@ -5715,7 +5927,7 @@ export default function OpenMatStudio() {
     "Statistics: mean, median, std, var, min, max, sum, prod, sort, unique, find",
     "Numerics: trapz, gradient, roots, rank, cond, orth, null, interp1",
     "Plots: plot, scatter, bar, hist, stem, area, hold on/off, clf, subplot",
-    "3D: surf(X,Y,Z), mesh(X,Y,Z) launch into the 3D grapher",
+    "3D: surf(X,Y,Z), mesh(X,Y,Z), surfc(X,Y,Z), plot3(X,Y,Z), scatter3(X,Y,Z)",
     "Axes: title, xlabel, ylabel, legend, grid, xlim, ylim, axis tight/equal/auto",
     "Control: if/elseif/else/end, for i=1:n...end, while cond...end, break, continue",
     "Interactivity: slider('name', min, max, step, default)",
@@ -5888,7 +6100,8 @@ export default function OpenMatStudio() {
         outputPreview: String(result.output || "No output.").slice(0, 240),
       });
       setWorkspaceTab((current) => {
-        const desired = result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console";
+        const hasFigureOutput = Boolean(result.figureJson || result.plot3DRequest);
+        const desired = hasFigureOutput ? "plot" : result.workspace?.length ? "workspace" : "console";
         return current === desired ? current : desired;
       });
       setLastConsoleCommand(commandLabel);
@@ -6103,7 +6316,7 @@ export default function OpenMatStudio() {
       });
       setCommandHistoryIndex(-1);
       setCommandInput("");
-      setWorkspaceTab(result.figureJson ? "plot" : result.workspace?.length ? "workspace" : "console");
+      setWorkspaceTab(result.figureJson || result.plot3DRequest ? "plot" : result.workspace?.length ? "workspace" : "console");
     } catch (error) {
       setOutput(`>> ${command}\nError: ${error.message}`);
       setLastConsoleCommand(command);
@@ -6473,6 +6686,35 @@ export default function OpenMatStudio() {
   }, [exportWorkspace, openGrapher, openSimulationWorkspace, restoreRecoverySnapshot, setActiveDocumentId, setCode, setDocuments, simulationMap]);
 
   useEffect(() => {
+    if (!isResizingBrowserPane) return undefined;
+
+    const handleMove = (event) => {
+      const shellRect = shellRef.current?.getBoundingClientRect();
+      if (!shellRect) return;
+      const nextWidth = event.clientX - shellRect.left;
+      const clamped = Math.max(280, Math.min(520, nextWidth));
+      setBrowserPaneWidth(Math.round(clamped));
+    };
+
+    const handleUp = () => {
+      setIsResizingBrowserPane(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, [isResizingBrowserPane, setBrowserPaneWidth]);
+
+  useEffect(() => {
     if (!isResizingRightPane) return undefined;
 
     const handleMove = (event) => {
@@ -6534,6 +6776,7 @@ export default function OpenMatStudio() {
   const rightPaneCssWidth = isPlotFocused
     ? "min(100%, max(56vw, 760px))"
     : `min(100%, ${rightPaneWidth}px)`;
+  const browserPaneCssWidth = `clamp(280px, ${browserPaneWidth}px, 520px)`;
   const updateControlValue = useCallback((name, nextValue) => {
     const spec = controlSpecs.find((control) => control.name === name);
     if (!spec) return;
@@ -8438,8 +8681,8 @@ export default function OpenMatStudio() {
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {sidebarOpen && (
           <div
-            className="flex w-full shrink-0 flex-col border-b lg:w-[280px] lg:border-b-0 lg:border-r"
-            style={{ borderColor: C.border, background: C.surface3 }}
+            className="flex w-full shrink-0 flex-col border-b lg:border-b-0 lg:border-r"
+            style={{ borderColor: C.border, background: C.surface3, width: browserPaneCssWidth }}
           >
             {workspaceMode === "script" ? (
               <div className="flex items-center gap-1 border-b px-3 py-2" style={{ borderColor: C.border }}>
@@ -8580,11 +8823,94 @@ export default function OpenMatStudio() {
               {workspaceMode === "script" && browserTab === "examples" && (
                 <div className="space-y-3">
                   <div
+                    className="rounded-2xl border p-4"
+                    style={{ borderColor: C.heroBorder, background: C.heroBg, color: C.heroText }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold">MATLAB User Quick Start</div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.heroMuted }}>
+                          Start with one 2D plot, one matrix workflow, one 3D curve, and one surface. That gives judges and technical users a fast path to “this is real enough to trust.”
+                        </div>
+                      </div>
+                      <span
+                        className="rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                        style={{ background: C.heroBadgeBg, border: `1px solid ${C.heroBadgeBorder}`, color: C.heroBadgeText }}
+                      >
+                        Start Here
+                      </span>
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {matlabQuickStartExamples.map((example) => {
+                        const Icon = example.icon;
+                        return (
+                          <button
+                            key={example.id}
+                            type="button"
+                            onClick={() => loadExample(example.id)}
+                            className="flex items-start gap-3 rounded-xl border px-3 py-3 text-left"
+                            style={{ borderColor: C.heroBadgeBorder, background: C.heroPillBg, color: C.heroPillText }}
+                          >
+                            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: "rgba(255,255,255,0.12)" }}>
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="text-sm font-semibold">{example.label}</div>
+                              <div className="mt-1 text-xs leading-5" style={{ color: C.heroMuted }}>
+                                {example.description}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div
                     className="rounded-2xl border px-3 py-2 text-xs leading-5"
                     style={{ borderColor: C.border, background: C.surface, color: C.muted }}
                   >
                     Examples open in a new script tab so your current work stays intact. `Restore`
                     brings back the last session snapshot after resets, imports, or accidental closes.
+                  </div>
+                  <div
+                    className="rounded-2xl border p-4"
+                    style={{ borderColor: C.border, background: C.surface }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold">Featured OpenMAT Demos</div>
+                        <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                          These are the strongest “show, don’t tell” examples for challenge judges: interactivity, animation, and engineering-style behavior in one click.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {featuredExampleShowcase.map((example) => {
+                        const Icon = example.icon;
+                        return (
+                          <button
+                            key={example.id}
+                            type="button"
+                            onClick={() => loadExample(example.id)}
+                            className="flex items-start gap-3 rounded-xl border px-3 py-3 text-left"
+                            style={{ borderColor: C.border, background: C.surface2 }}
+                          >
+                            <div
+                              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                              style={{ background: "rgba(23, 105, 209, 0.12)" }}
+                            >
+                              <Icon className="h-4 w-4" style={{ color: C.blue }} />
+                            </div>
+                            <div>
+                              <div className="text-sm font-semibold">{example.label}</div>
+                              <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
+                                {example.description}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                   {EXAMPLES.map((example) => {
                     const Icon = example.icon;
@@ -8603,7 +8929,25 @@ export default function OpenMatStudio() {
                           <Icon className="h-4 w-4" style={{ color: C.blue }} />
                         </div>
                         <div>
-                          <div className="text-sm font-semibold">{example.label}</div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className="text-sm font-semibold">{example.label}</div>
+                            {example.matlabLike && (
+                              <span
+                                className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                style={{ background: C.surface2, color: C.blue }}
+                              >
+                                MATLAB-like
+                              </span>
+                            )}
+                            {example.featured && (
+                              <span
+                                className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                style={{ background: C.surface2, color: C.amber }}
+                              >
+                                Featured
+                              </span>
+                            )}
+                          </div>
                           <div className="mt-1 text-xs leading-5" style={{ color: C.muted }}>
                             {example.description}
                           </div>
@@ -8691,6 +9035,20 @@ export default function OpenMatStudio() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {sidebarOpen && (
+          <div
+            className="hidden w-2 shrink-0 cursor-ew-resize border-r lg:flex lg:items-center lg:justify-center"
+            style={{ borderColor: C.border, background: C.surface3 }}
+            onMouseDown={(event) => {
+              event.preventDefault();
+              setIsResizingBrowserPane(true);
+            }}
+            title="Drag to resize example browser"
+          >
+            <div className="h-12 w-1 rounded-full" style={{ background: C.border }} />
           </div>
         )}
 
@@ -8992,21 +9350,21 @@ export default function OpenMatStudio() {
                         <button
                           type="button"
                           onClick={() => setIsPlotWindowOpen(true)}
-                          disabled={!displayFigureJson}
+                          disabled={!(displayFigureJson || surfaceConfig)}
                           className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
-                          style={{ borderColor: C.border, background: C.surface2, color: C.text, opacity: displayFigureJson ? 1 : 0.5 }}
+                          style={{ borderColor: C.border, background: C.surface2, color: C.text, opacity: displayFigureJson || surfaceConfig ? 1 : 0.5 }}
                         >
                           <Maximize2 className="h-3.5 w-3.5" />
                           Full Screen
                         </button>
                       </div>
                       <div className="mb-2 flex items-center justify-between gap-3 text-[11px]" style={{ color: C.muted }}>
-                        <span>{plotKind === "3d" ? "Surface viewport" : `Axis mode: ${figureMeta.axisMode}`}</span>
-                        <span>{plotKind === "3d" ? "Use `surf` or `mesh` to populate the local 3D view." : "Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts."}</span>
+                        <span>{plotKind === "3d" ? "OpenMAT 3D viewport" : `Axis mode: ${figureMeta.axisMode}`}</span>
+                        <span>{plotKind === "3d" ? "Use `surf`, `mesh`, `surfc`, `plot3`, `scatter3`, and `animate(...)` to drive the local 3D view." : "Use `axis equal`, `axis tight`, `xlim`, and `ylim` in scripts."}</span>
                       </div>
                       {plotKind === "3d" && surfaceConfig ? (
-                        <div className="h-[540px] overflow-hidden rounded-2xl border" style={{ borderColor: C.border }}>
-                          <GlobalGrapher3D
+                        <div className="h-[72vh] min-h-[680px] overflow-hidden rounded-2xl border" style={{ borderColor: C.border }}>
+                          <OpenMatGrapher3D
                             embedded
                             isOpen
                             launchConfig={surfaceConfig}
@@ -9613,6 +9971,17 @@ export default function OpenMatStudio() {
         </div>
       </div>
       )}
+
+      <OpenMatPlotWindow
+        isOpen={isPlotWindowOpen}
+        onClose={() => setIsPlotWindowOpen(false)}
+        figureJson={displayFigureJson}
+        figureMeta={figureMeta}
+        surfaceConfig={surfaceConfig}
+        plotKind={plotKind}
+        onOpenSeparate3D={() => surfaceConfig && openGrapher(surfaceConfig)}
+        C={C}
+      />
 
       {helpOpen && (
         <div
