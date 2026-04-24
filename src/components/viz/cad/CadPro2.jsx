@@ -1,1242 +1,1768 @@
-// CadPro2.jsx — Professional Parametric CAD  (standalone, not in app router yet)
-// R3F + Three.js rendering | BSP-tree CSG | Sketch→Extrude/Cut/Revolve | Assembly+Mates
-
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { OrbitControls, GizmoHelper, GizmoViewport, Grid } from "@react-three/drei";
-import * as THREE from "three";
 
-// ─── PALETTE ─────────────────────────────────────────────────────────────────
-const D = {
+// ─── PALETTE (matches CNC Sim) ─────────────────────────────────────────────
+const PALETTE_DARK = {
   bg:"#07111e", p1:"#0f172a", p2:"#132033", p3:"#1e293b", p4:"#334155",
   bd:"#2b3a55", bd2:"#475569",
   blue:"#63b8ff", blue2:"#94b8ff", blueBg:"rgba(33,102,255,0.10)",
   green:"#46d89f", green2:"#6ee7b7", greenBg:"rgba(70,216,159,0.1)",
-  amber:"#f0b44c", amberBg:"rgba(240,180,76,0.1)",
-  red:"#ff8b8b", redBg:"rgba(255,139,139,0.1)",
+  amber:"#f0b44c", amber2:"#fcd34d", amberBg:"rgba(240,180,76,0.1)",
+  red:"#ff8b8b", red2:"#fca5a5", redBg:"rgba(255,139,139,0.1)",
   purple:"#b89cff", teal:"#31d0c4",
   txt:"#e6eefb", txt2:"#90a4c2", txt3:"#61738e",
+  grad:"linear-gradient(135deg,#091324 0%,#0a314e 52%,#0f5f64 100%)",
+  gradBorder:"rgba(148,184,255,0.18)",
+  vpBg:"#0B1424", codeBg:"#0f172a", brandTxt:"#ffffff",
+  grid:"#131c28", axBd:"#1e3040",
+  face:"rgba(99,184,255,0.12)", faceHov:"rgba(99,184,255,0.25)", faceEdge:"#2a5080",
+  sketchLine:"#63b8ff", sketchArc:"#b89cff", sketchDim:"#f0b44c",
+  selEdge:"#46d89f", selFace:"rgba(70,216,159,0.18)",
+  construction:"rgba(99,184,255,0.4)",
 };
+const PALETTE_LIGHT = {
+  bg:"#f4f7fb", p1:"#ffffff", p2:"#edf4ff", p3:"#e2e8f0", p4:"#cbd5e1",
+  bd:"#d5dfef", bd2:"#94a3b8",
+  blue:"#1769d1", blue2:"#10243e", blueBg:"rgba(23,105,209,0.10)",
+  green:"#198754", green2:"#059669", greenBg:"rgba(25,135,84,0.1)",
+  amber:"#b36d05", amber2:"#d97706", amberBg:"rgba(179,109,5,0.1)",
+  red:"#c03535", red2:"#dc2626", redBg:"rgba(192,53,53,0.1)",
+  purple:"#6f42c1", teal:"#0f8d85",
+  txt:"#15253a", txt2:"#607188", txt3:"#8a99ae",
+  grad:"linear-gradient(135deg,#eef6ff 0%,#daeefe 48%,#ddfbf3 100%)",
+  gradBorder:"rgba(23,105,209,0.16)",
+  vpBg:"#f0f4fa", codeBg:"#f8fbff", brandTxt:"#10243e",
+  grid:"#d5dfef", axBd:"#cbd5e1",
+  face:"rgba(23,105,209,0.08)", faceHov:"rgba(23,105,209,0.18)", faceEdge:"#93b8e0",
+  sketchLine:"#1769d1", sketchArc:"#6f42c1", sketchDim:"#b36d05",
+  selEdge:"#198754", selFace:"rgba(25,135,84,0.15)",
+  construction:"rgba(23,105,209,0.35)",
+};
+let C = { ...PALETTE_DARK };
 
-// ─── CSG ENGINE (BSP tree — port of csg.js algorithm) ────────────────────────
-const CSG_EPS = 1e-5;
-const [COPLANAR, FRONT, BACK, SPANNING] = [0, 1, 2, 3];
+// ─── 3D MATH ──────────────────────────────────────────────────────────────────
+const v3 = (x,y,z) => ({x,y,z});
+const vadd = (a,b) => v3(a.x+b.x, a.y+b.y, a.z+b.z);
+const vsub = (a,b) => v3(a.x-b.x, a.y-b.y, a.z-b.z);
+const vscale = (v,s) => v3(v.x*s, v.y*s, v.z*s);
+const vdot = (a,b) => a.x*b.x + a.y*b.y + a.z*b.z;
+const vcross = (a,b) => v3(a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x);
+const vlen = v => Math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+const vnorm = v => { const l=vlen(v); return l<1e-10?v3(0,0,0):vscale(v,1/l); };
+const vlerp = (a,b,t) => vadd(vscale(a,1-t),vscale(b,t));
 
-class CsgPlane {
-  constructor(n, w) { this.n = n.clone(); this.w = w; }
-  static fromPts(a, b, c) {
-    const n = new THREE.Vector3().crossVectors(
-      new THREE.Vector3().subVectors(b, a),
-      new THREE.Vector3().subVectors(c, a)
-    ).normalize();
-    return new CsgPlane(n, n.dot(a));
+// Mat4 column-major
+const mat4id = () => [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+function mat4mul(a,b) {
+  const r=new Array(16);
+  for(let i=0;i<4;i++) for(let j=0;j<4;j++) {
+    r[i+j*4]=a[i]*b[j*4]+a[i+4]*b[j*4+1]+a[i+8]*b[j*4+2]+a[i+12]*b[j*4+3];
   }
-  clone() { return new CsgPlane(this.n.clone(), this.w); }
-  flip() { return new CsgPlane(this.n.clone().negate(), -this.w); }
-  classify(v) {
-    const d = this.n.dot(v) - this.w;
-    return d < -CSG_EPS ? BACK : d > CSG_EPS ? FRONT : COPLANAR;
+  return r;
+}
+function mat4rotX(a) { const c=Math.cos(a),s=Math.sin(a); return [1,0,0,0, 0,c,s,0, 0,-s,c,0, 0,0,0,1]; }
+function mat4rotY(a) { const c=Math.cos(a),s=Math.sin(a); return [c,0,-s,0, 0,1,0,0, s,0,c,0, 0,0,0,1]; }
+function mat4rotZ(a) { const c=Math.cos(a),s=Math.sin(a); return [c,s,0,0, -s,c,0,0, 0,0,1,0, 0,0,0,1]; }
+function mat4trans(x,y,z) { return [1,0,0,0, 0,1,0,0, 0,0,1,0, x,y,z,1]; }
+function mat4scale(x,y,z) { return [x,0,0,0, 0,y,0,0, 0,0,z,0, 0,0,0,1]; }
+function transformPoint(m, p) {
+  const x=m[0]*p.x+m[4]*p.y+m[8]*p.z+m[12];
+  const y=m[1]*p.x+m[5]*p.y+m[9]*p.z+m[13];
+  const z=m[2]*p.x+m[6]*p.y+m[10]*p.z+m[14];
+  const w=m[3]*p.x+m[7]*p.y+m[11]*p.z+m[15];
+  return v3(x/w,y/w,z/w);
+}
+function transformNormal(m, n) {
+  // Use upper 3x3
+  const x=m[0]*n.x+m[4]*n.y+m[8]*n.z;
+  const y=m[1]*n.x+m[5]*n.y+m[9]*n.z;
+  const z=m[2]*n.x+m[6]*n.y+m[10]*n.z;
+  return vnorm(v3(x,y,z));
+}
+
+// Perspective projection
+function perspProj(p, fov, aspect, near, far) {
+  const f = 1/Math.tan(fov/2);
+  const nf = 1/(near-far);
+  return v3(
+    p.x*f/aspect,
+    p.y*f,
+    (p.z*(near+far)*nf) - (2*near*far*nf)
+  );
+}
+
+// ─── SOLID GEOMETRY ─────────────────────────────────────────────────────────
+// Each solid is a list of { verts, tris, normals, material }
+// We store parametric features and rebuild geometry when params change
+
+function makeBox(w,h,d) {
+  const hw=w/2, hh=h/2, hd=d/2;
+  const verts = [
+    v3(-hw,-hh,-hd), v3( hw,-hh,-hd), v3( hw, hh,-hd), v3(-hw, hh,-hd),
+    v3(-hw,-hh, hd), v3( hw,-hh, hd), v3( hw, hh, hd), v3(-hw, hh, hd),
+  ];
+  const faces = [
+    { verts:[0,1,2,3], normal:v3(0,0,-1), id:"back"  },
+    { verts:[5,4,7,6], normal:v3(0,0, 1), id:"front" },
+    { verts:[4,0,3,7], normal:v3(-1,0,0), id:"left"  },
+    { verts:[1,5,6,2], normal:v3( 1,0,0), id:"right" },
+    { verts:[4,5,1,0], normal:v3(0,-1,0), id:"bottom"},
+    { verts:[3,2,6,7], normal:v3(0, 1,0), id:"top"   },
+  ];
+  const edges = [];
+  // 12 edges of a box
+  const edgePairs = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  edgePairs.forEach(([a,b],i)=>edges.push({a,b,id:`e${i}`}));
+  return {verts,faces,edges,type:"box",params:{w,h,d}};
+}
+
+function makeCylinder(r,h,segs=32) {
+  const verts = [];
+  const step = 2*Math.PI/segs;
+  // Bottom circle verts
+  for(let i=0;i<segs;i++) verts.push(v3(r*Math.cos(i*step),0,r*Math.sin(i*step)));
+  // Top circle verts
+  for(let i=0;i<segs;i++) verts.push(v3(r*Math.cos(i*step),h,r*Math.sin(i*step)));
+  verts.push(v3(0,0,0));   // bottom center = segs*2
+  verts.push(v3(0,h,0));  // top center = segs*2+1
+
+  const faces = [];
+  // Side faces (quads)
+  for(let i=0;i<segs;i++) {
+    const n=(i+1)%segs;
+    faces.push({verts:[i,n,n+segs,i+segs], normal:vnorm(v3(Math.cos((i+0.5)*step),0,Math.sin((i+0.5)*step))), id:`side${i}`});
   }
-  split(poly, cf, cb, f, b) {
-    let pt = 0;
-    const ts = poly.verts.map(v => { const t = this.classify(v.pos); pt |= t; return t; });
-    if (pt === COPLANAR) { (this.n.dot(poly.plane.n) > 0 ? cf : cb).push(poly); return; }
-    if (pt === FRONT)  { f.push(poly); return; }
-    if (pt === BACK)   { b.push(poly); return; }
-    const fa = [], ba = [];
-    for (let i = 0; i < poly.verts.length; i++) {
-      const j = (i + 1) % poly.verts.length;
-      const ti = ts[i], tj = ts[j], vi = poly.verts[i], vj = poly.verts[j];
-      if (ti !== BACK)  fa.push(vi);
-      if (ti !== FRONT) ba.push(vi);
-      if ((ti | tj) === SPANNING) {
-        const t = (this.w - this.n.dot(vi.pos)) / this.n.dot(new THREE.Vector3().subVectors(vj.pos, vi.pos));
-        const sv = { pos: vi.pos.clone().lerp(vj.pos, t), nrm: vi.nrm.clone().lerp(vj.nrm, t).normalize() };
-        fa.push(sv); ba.push(sv);
-      }
+  // Bottom cap
+  const botVerts = Array.from({length:segs},(_,i)=>i);
+  faces.push({verts:botVerts.reverse(), normal:v3(0,-1,0), id:"bottom"});
+  // Top cap
+  const topVerts = Array.from({length:segs},(_,i)=>i+segs);
+  faces.push({verts:topVerts, normal:v3(0,1,0), id:"top"});
+
+  const edges = [];
+  for(let i=0;i<segs;i++){
+    edges.push({a:i,b:(i+1)%segs,id:`bot${i}`});
+    edges.push({a:i+segs,b:((i+1)%segs)+segs,id:`top${i}`});
+    if(i%4===0) edges.push({a:i,b:i+segs,id:`vert${i}`});
+  }
+  return {verts,faces,edges,type:"cylinder",params:{r,h,segs}};
+}
+
+// Extrude a 2D sketch profile along Z
+function extrudeProfile(profile, depth) {
+  const pts = profile; // array of {x,y}
+  const n = pts.length;
+  const verts = [];
+  // Bottom face (z=0)
+  pts.forEach(p => verts.push(v3(p.x, p.y, 0)));
+  // Top face (z=depth)
+  pts.forEach(p => verts.push(v3(p.x, p.y, depth)));
+
+  const faces = [];
+  // Side faces
+  for(let i=0;i<n;i++) {
+    const j=(i+1)%n;
+    const mid = {x:(pts[i].x+pts[j].x)/2, y:(pts[i].y+pts[j].y)/2};
+    const dx=pts[j].x-pts[i].x, dy=pts[j].y-pts[i].y;
+    const normal = vnorm(v3(dy, -dx, 0));
+    faces.push({verts:[i,j,j+n,i+n], normal, id:`side${i}`});
+  }
+  // Bottom cap
+  faces.push({verts:Array.from({length:n},(_,i)=>i).reverse(), normal:v3(0,0,-1), id:"bottom"});
+  // Top cap
+  faces.push({verts:Array.from({length:n},(_,i)=>i+n), normal:v3(0,0,1), id:"top"});
+
+  const edges = [];
+  for(let i=0;i<n;i++){
+    edges.push({a:i,b:(i+1)%n,id:`bot${i}`});
+    edges.push({a:i+n,b:((i+1)%n)+n,id:`top${i}`});
+    edges.push({a:i,b:i+n,id:`vert${i}`});
+  }
+  return {verts,faces,edges,type:"extrude",params:{profile:pts,depth}};
+}
+
+// Revolve a 2D sketch profile around Y axis
+function revolveProfile(profile, angle=Math.PI*2, segs=32) {
+  const pts = profile; // array of {x,y} — x is radius, y is height
+  const nPts = pts.length;
+  const step = angle/segs;
+  const verts = [];
+  for(let s=0;s<=segs;s++) {
+    const a = s*step;
+    pts.forEach(p => verts.push(v3(p.x*Math.cos(a), p.y, p.x*Math.sin(a))));
+  }
+  const faces = [];
+  for(let s=0;s<segs;s++) {
+    for(let i=0;i<nPts-1;i++) {
+      const a=s*nPts+i, b=s*nPts+i+1, c=(s+1)*nPts+i+1, d=(s+1)*nPts+i;
+      const n1=vsub(verts[b],verts[a]), n2=vsub(verts[d],verts[a]);
+      const normal=vnorm(vcross(n1,n2));
+      faces.push({verts:[a,b,c,d], normal, id:`s${s}p${i}`});
     }
-    if (fa.length >= 3) f.push(new CsgPoly(fa));
-    if (ba.length >= 3) b.push(new CsgPoly(ba));
   }
+  const edges = [];
+  for(let i=0;i<nPts-1;i++) edges.push({a:i,b:i+1,id:`profile${i}`});
+  return {verts,faces,edges,type:"revolve",params:{profile:pts,angle,segs}};
 }
 
-class CsgPoly {
-  constructor(verts) {
-    this.verts = verts;
-    if (verts.length >= 3) this.plane = CsgPlane.fromPts(verts[0].pos, verts[1].pos, verts[2].pos);
-  }
-  clone() { return new CsgPoly(this.verts.map(v => ({ pos: v.pos.clone(), nrm: v.nrm.clone() }))); }
-  flip() { return new CsgPoly([...this.verts].reverse().map(v => ({ pos: v.pos.clone(), nrm: v.nrm.clone().negate() }))); }
-}
+// ─── SKETCH ENTITY IDS ───────────────────────────────────────────────────────
+let _eid = 1;
+const newId = () => _eid++;
 
-class CsgNode {
-  constructor(polys) { this.plane = null; this.front = null; this.back = null; this.polys = []; if (polys?.length) this.build(polys); }
-  clone() { const n = new CsgNode(); if (this.plane) n.plane = this.plane.clone(); if (this.front) n.front = this.front.clone(); if (this.back) n.back = this.back.clone(); n.polys = this.polys.map(p => p.clone()); return n; }
-  invert() { this.polys = this.polys.map(p => p.flip()); if (this.plane) this.plane = this.plane.flip(); if (this.front) this.front.invert(); if (this.back) this.back.invert(); [this.front, this.back] = [this.back, this.front]; }
-  clip(polys) { if (!this.plane) return polys.slice(); let f = [], b = []; polys.forEach(p => this.plane.split(p, f, b, f, b)); if (this.front) f = this.front.clip(f); if (this.back) b = this.back.clip(b); else b = []; return [...f, ...b]; }
-  clipTo(bsp) { this.polys = bsp.clip(this.polys); if (this.front) this.front.clipTo(bsp); if (this.back) this.back.clipTo(bsp); }
-  all() { let p = this.polys.slice(); if (this.front) p = [...p, ...this.front.all()]; if (this.back) p = [...p, ...this.back.all()]; return p; }
-  build(polys) {
-    if (!polys.length) return;
-    if (!this.plane) this.plane = polys[0].plane?.clone();
-    if (!this.plane) { this.polys.push(...polys); return; }
-    const f = [], b = [];
-    polys.forEach(p => this.plane.split(p, this.polys, this.polys, f, b));
-    if (f.length) { if (!this.front) this.front = new CsgNode(); this.front.build(f); }
-    if (b.length) { if (!this.back)  this.back  = new CsgNode(); this.back.build(b);  }
-  }
-}
-
-function csgSubtract(pa, pb) {
-  const a = new CsgNode(pa.map(p => p.clone())), b = new CsgNode(pb.map(p => p.clone()));
-  a.invert(); a.clipTo(b); b.clipTo(a); b.invert(); b.clipTo(a); b.invert(); a.build(b.all()); a.invert();
-  return a.all();
-}
-function csgUnion(pa, pb) {
-  const a = new CsgNode(pa.map(p => p.clone())), b = new CsgNode(pb.map(p => p.clone()));
-  a.clipTo(b); b.clipTo(a); b.invert(); b.clipTo(a); b.invert(); a.build(b.all());
-  return a.all();
-}
-
-// ─── GEOM ↔ CSG CONVERSION ───────────────────────────────────────────────────
-function geomToPolys(geom) {
-  geom.computeVertexNormals();
-  const pos = geom.attributes.position.array;
-  const nrm = geom.attributes.normal.array;
-  const polys = [];
-  for (let i = 0; i < pos.length / 9; i++) {
-    const verts = [];
-    for (let j = 0; j < 3; j++) {
-      const k = (i * 3 + j) * 3;
-      verts.push({ pos: new THREE.Vector3(pos[k], pos[k+1], pos[k+2]), nrm: new THREE.Vector3(nrm[k], nrm[k+1], nrm[k+2]) });
+// ─── CONSTRAINT SOLVER (simplified) ─────────────────────────────────────────
+// Apply constraints to sketch points, return solved positions
+function solveConstraints(entities, constraints) {
+  // We do a simple iterative solver
+  const pts = {};
+  entities.forEach(e => {
+    if(e.type==="point") pts[e.id]={x:e.x,y:e.y,fixed:e.fixed};
+    if(e.type==="line") {
+      pts[`${e.id}_a`]={x:e.x1,y:e.y1,fixed:false};
+      pts[`${e.id}_b`]={x:e.x2,y:e.y2,fixed:false};
     }
-    const p = new CsgPoly(verts);
-    if (p.plane) polys.push(p);
-  }
-  return polys;
-}
-
-function polysToGeom(polys) {
-  const pos = [], nrm = [];
-  polys.forEach(poly => {
-    for (let i = 1; i < poly.verts.length - 1; i++) {
-      [poly.verts[0], poly.verts[i], poly.verts[i+1]].forEach(v => {
-        pos.push(v.pos.x, v.pos.y, v.pos.z);
-        nrm.push(v.nrm.x, v.nrm.y, v.nrm.z);
-      });
+    if(e.type==="circle") pts[`${e.id}_c`]={x:e.cx,y:e.cy,fixed:false};
+    if(e.type==="arc") {
+      pts[`${e.id}_c`]={x:e.cx,y:e.cy,fixed:false};
     }
   });
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute("normal",   new THREE.Float32BufferAttribute(nrm, 3));
-  return g;
-}
 
-// ─── GEOMETRY BUILDERS ───────────────────────────────────────────────────────
-function sketchProfile(entities) {
-  const circle = entities.find(e => e.type === "circle");
-  if (circle) {
-    const pts = [];
-    for (let i = 0; i < 48; i++) {
-      const a = (i / 48) * Math.PI * 2;
-      pts.push(new THREE.Vector2(circle.cx + circle.r * Math.cos(a), circle.cy + circle.r * Math.sin(a)));
-    }
-    return pts;
+  // Apply constraints iteratively
+  for(let iter=0;iter<20;iter++) {
+    constraints.forEach(c => {
+      if(c.type==="fixed") {
+        const p=pts[c.ptId];
+        if(p){p.x=c.x;p.y=c.y;}
+      }
+      if(c.type==="horizontal") {
+        const a=pts[c.ptA],b=pts[c.ptB];
+        if(a&&b){const my=(a.y+b.y)/2;if(!a.fixed)a.y=my;if(!b.fixed)b.y=my;}
+      }
+      if(c.type==="vertical") {
+        const a=pts[c.ptA],b=pts[c.ptB];
+        if(a&&b){const mx=(a.x+b.x)/2;if(!a.fixed)a.x=mx;if(!b.fixed)b.x=mx;}
+      }
+      if(c.type==="coincident") {
+        const a=pts[c.ptA],b=pts[c.ptB];
+        if(a&&b){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;if(!a.fixed){a.x=mx;a.y=my;}if(!b.fixed){b.x=mx;b.y=my;}}
+      }
+      if(c.type==="horizontal_dim") {
+        const a=pts[c.ptA],b=pts[c.ptB];
+        if(a&&b&&!b.fixed){b.x=a.x+c.val;}
+      }
+      if(c.type==="vertical_dim") {
+        const a=pts[c.ptA],b=pts[c.ptB];
+        if(a&&b&&!b.fixed){b.y=a.y+c.val;}
+      }
+      if(c.type==="radius") {
+        const cpt=pts[`${c.entId}_c`];
+        // radius constraint: store for display only
+      }
+    });
   }
-  const lines = entities.filter(e => e.type === "line");
-  if (lines.length < 3) return null;
-  const EPS = 0.5;
-  const eq = (a, b) => Math.abs(a.x-b.x) < EPS && Math.abs(a.y-b.y) < EPS;
-  const used = new Set();
-  const loop = [{ x: lines[0].x1, y: lines[0].y1 }];
-  used.add(0);
-  let cur = { x: lines[0].x2, y: lines[0].y2 };
-  for (let iter = 0; iter < lines.length * 2; iter++) {
-    let found = false;
-    for (let i = 0; i < lines.length; i++) {
-      if (used.has(i)) continue;
-      const l = lines[i];
-      if (eq(cur, {x:l.x1,y:l.y1})) { loop.push({x:l.x1,y:l.y1}); cur={x:l.x2,y:l.y2}; used.add(i); found=true; break; }
-      if (eq(cur, {x:l.x2,y:l.y2})) { loop.push({x:l.x2,y:l.y2}); cur={x:l.x1,y:l.y1}; used.add(i); found=true; break; }
-    }
-    if (!found || eq(cur, loop[0])) break;
-  }
-  return loop.length >= 3 ? loop.map(p => new THREE.Vector2(p.x, p.y)) : null;
-}
-
-const PLANE_MAT = {
-  XY: new THREE.Matrix4(),
-  XZ: new THREE.Matrix4().makeRotationX(-Math.PI / 2),
-  YZ: new THREE.Matrix4().makeRotationY( Math.PI / 2),
-};
-
-function extrudePolys(profile2D, depth, planeMat) {
-  if (!profile2D?.length) return null;
-  const shape = new THREE.Shape(profile2D);
-  const geom  = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
-  if (planeMat) geom.applyMatrix4(planeMat);
-  geom.computeVertexNormals();
-  return geomToPolys(geom);
-}
-
-function revolvePolys(profile2D, angleDeg, segs) {
-  if (!profile2D?.length) return null;
-  const pts  = profile2D.map(p => new THREE.Vector2(Math.abs(p.x), p.y));
-  const geom = new THREE.LatheGeometry(pts, segs ?? 48, 0, (angleDeg ?? 360) * Math.PI / 180);
-  geom.computeVertexNormals();
-  return geomToPolys(geom);
-}
-
-function cylinderPolys(r, h, cx, cz) {
-  const geom = new THREE.CylinderGeometry(r, r, h + 2, 32, 1);
-  geom.applyMatrix4(new THREE.Matrix4().makeTranslation(cx ?? 0, h / 2, cz ?? 0));
-  geom.computeVertexNormals();
-  return geomToPolys(geom);
-}
-
-// ─── FEATURE EVALUATOR ───────────────────────────────────────────────────────
-function evaluateFeatures(features) {
-  let polys = null;
-  for (const f of features) {
-    if (f.suppressed) continue;
-
-    if (f.type === "extrude_boss" || f.type === "extrude") {
-      const sk = features.find(s => s.id === f.sketchId && s.type === "sketch");
-      if (!sk) continue;
-      const prof = sketchProfile(sk.entities);
-      if (!prof) continue;
-      const mat = f.planeOverride ? PLANE_MAT[f.planeOverride] : (PLANE_MAT[sk.planeId] ?? PLANE_MAT.XY);
-      const np = extrudePolys(prof, f.depth ?? 20, mat);
-      if (!np) continue;
-      polys = polys ? csgUnion(polys, np) : np;
-    }
-
-    else if (f.type === "extrude_cut") {
-      if (!polys) continue;
-      const sk = features.find(s => s.id === f.sketchId && s.type === "sketch");
-      if (!sk) continue;
-      const prof = sketchProfile(sk.entities);
-      if (!prof) continue;
-      const baseMat = PLANE_MAT[sk.planeId] ?? PLANE_MAT.XY;
-      // offset -0.1 to ensure clean cut through solid
-      const mat = baseMat.clone().premultiply(new THREE.Matrix4().makeTranslation(0, 0, -0.1));
-      const depth = (f.depth ?? 100) + 0.2;
-      const np = extrudePolys(prof, depth, mat);
-      if (!np) continue;
-      polys = csgSubtract(polys, np);
-    }
-
-    else if (f.type === "revolve") {
-      const sk = features.find(s => s.id === f.sketchId && s.type === "sketch");
-      if (!sk) continue;
-      const prof = sketchProfile(sk.entities);
-      if (!prof) continue;
-      const np = revolvePolys(prof, f.angle ?? 360, f.segs ?? 48);
-      if (!np) continue;
-      polys = polys ? csgUnion(polys, np) : np;
-    }
-
-    else if (f.type === "hole") {
-      if (!polys) continue;
-      const np = cylinderPolys(f.dia / 2, f.depth ?? 100, f.cx ?? 0, f.cz ?? 0);
-      polys = csgSubtract(polys, np);
-    }
-  }
-  return polys ? polysToGeom(polys) : null;
+  return pts;
 }
 
 // ─── INITIAL STATE ────────────────────────────────────────────────────────────
-let _uid = 100;
-const uid = () => ++_uid;
-
-const makePart = (name, features, color) => ({ id: uid(), name, features, color: color ?? "#63b8ff" });
-
-const DEMO_PART = makePart("Base Block", [
-  { id:1, type:"sketch", name:"Sketch1", planeId:"XZ", entities:[
-    {id:10,type:"line",x1:-30,y1:-20,x2:30,y2:-20},
-    {id:11,type:"line",x1:30,y1:-20,x2:30,y2:20},
-    {id:12,type:"line",x1:30,y1:20,x2:-30,y2:20},
-    {id:13,type:"line",x1:-30,y1:20,x2:-30,y2:-20},
-  ], constraints:[] },
-  { id:2, type:"extrude", name:"Extrude1", sketchId:1, depth:25 },
-  { id:3, type:"sketch", name:"Sketch2", planeId:"XZ", entities:[
-    {id:20,type:"circle",cx:0,cy:0,r:8},
-  ], constraints:[] },
-  { id:4, type:"extrude_cut", name:"Cut1", sketchId:3, depth:30,
-    planeOverride: null },
-], "#63b8ff");
-
-const DEMO_PART2 = makePart("Cylinder", [
-  { id:5, type:"sketch", name:"Sketch1", planeId:"XZ", entities:[
-    {id:30,type:"circle",cx:0,cy:0,r:12},
-  ], constraints:[] },
-  { id:6, type:"extrude", name:"Extrude1", sketchId:5, depth:40 },
-  { id:7, type:"sketch", name:"Sketch2", planeId:"XZ", entities:[
-    {id:40,type:"circle",cx:0,cy:0,r:5},
-  ], constraints:[] },
-  { id:8, type:"extrude_cut", name:"Cut1", sketchId:7, depth:50 },
-], "#46d89f");
-
-const initState = () => ({
-  docType: "part",          // "part" | "assembly"
-  activePart: DEMO_PART,    // single-part editing
-
-  // Assembly
-  parts: [DEMO_PART, DEMO_PART2],
-  instances: [
-    { id:uid(), partId: DEMO_PART.id,  name:"Block<1>",    pos:[0,0,0],    rot:[0,0,0] },
-    { id:uid(), partId: DEMO_PART2.id, name:"Cylinder<1>", pos:[50,0,0],   rot:[0,0,0] },
+const initCADState = () => ({
+  // Feature tree
+  features: [
+    { id:1, type:"sketch", name:"Sketch1", planeId:"XY", entities:[
+      {id:10,type:"line",x1:-30,y1:-20,x2:30,y2:-20},
+      {id:11,type:"line",x1:30,y1:-20,x2:30,y2:20},
+      {id:12,type:"line",x1:30,y1:20,x2:-30,y2:20},
+      {id:13,type:"line",x1:-30,y1:20,x2:-30,y2:-20},
+    ], constraints:[
+      {id:20,type:"horizontal_dim",ptA:"10_a",ptB:"10_b",val:60,x:0,y:-35,label:"60"},
+      {id:21,type:"vertical_dim",ptA:"11_a",ptB:"11_b",val:40,x:40,y:0,label:"40"},
+    ], solved:true },
+    { id:2, type:"extrude", name:"Extrude1", sketchId:1, depth:25, dir:1, solid:null },
+    { id:3, type:"sketch", name:"Sketch2", planeId:"top", entities:[
+      {id:30,type:"circle",cx:0,cy:0,r:8},
+    ], constraints:[], solved:true },
+    { id:4, type:"extrude", name:"Extrude2", sketchId:3, depth:30, dir:1, solid:null },
+    { id:5, type:"fillet", name:"Fillet1", edgeIds:["e0","e1","e2","e3"], radius:3 },
   ],
-  mates: [],
-  activeInstanceId: null,
-
-  // 3D / Sketch mode
-  mode: "3d",
-  activeFeatureId: null,
+  activeFeatureId: 2,
+  selection: { type:null, ids:[] },
+  mode: "3d", // "3d" | "sketch"
   activeSketchId: null,
-  sketchTool: "select",
+  sketchTool: "select", // select|line|arc|circle|rect|dimension|constraint
   sketchDrawing: false,
   sketchPts: [],
-  selection: { type: null, ids: [] },
-  hoveredFaceNormal: null,
+  snapMode: { grid:true, points:true, midpoint:true },
+  hoveredEntity: null,
+  hoveredEdge: null,
+  hoveredFace: null,
+  editingDimId: null,
+  editingDimVal: "",
+  undoStack: [],
+  redoStack: [],
 });
 
-// ─── FEATURE META ─────────────────────────────────────────────────────────────
-const FMETA = {
-  sketch:      { icon:"✏", col:"#63b8ff", bg:"rgba(99,184,255,0.12)" },
-  extrude:     { icon:"⬆", col:"#46d89f", bg:"rgba(70,216,159,0.12)" },
-  extrude_boss:{ icon:"⬆", col:"#46d89f", bg:"rgba(70,216,159,0.12)" },
-  extrude_cut: { icon:"⬇", col:"#ff8b8b", bg:"rgba(255,139,139,0.12)" },
-  revolve:     { icon:"↻", col:"#b89cff", bg:"rgba(184,156,255,0.12)" },
-  fillet:      { icon:"⌒", col:"#f0b44c", bg:"rgba(240,180,76,0.12)" },
-  chamfer:     { icon:"∠", col:"#f0b44c", bg:"rgba(240,180,76,0.12)" },
-  hole:        { icon:"○", col:"#ff8b8b", bg:"rgba(255,139,139,0.12)" },
-  shell:       { icon:"⬜", col:"#31d0c4", bg:"rgba(49,208,196,0.12)" },
-  pattern:     { icon:"⊞", col:"#f0b44c", bg:"rgba(240,180,76,0.12)" },
-  mirror:      { icon:"⇌", col:"#b89cff", bg:"rgba(184,156,255,0.12)" },
+// ─── GEOMETRY CACHE ───────────────────────────────────────────────────────────
+function buildSolid(feature, features) {
+  if(feature.type==="extrude") {
+    const sketch = features.find(f=>f.id===feature.sketchId);
+    if(!sketch) return null;
+    // Extract closed profile from sketch lines/circles
+    const ents = sketch.entities;
+    // Try to find a closed polygon from lines
+    const lines = ents.filter(e=>e.type==="line");
+    if(lines.length>=3) {
+      // Build polygon from connected lines
+      const profile = [
+        {x:lines[0].x1,y:lines[0].y1},
+        {x:lines[0].x2,y:lines[0].y2},
+        {x:lines[1].x2,y:lines[1].y2},
+        {x:lines[2].x2,y:lines[2].y2},
+      ];
+      if(lines.length===4) profile.push({x:lines[3].x2,y:lines[3].y2});
+      // For XY plane, extrude along Z
+      const solid = extrudeProfile(profile.slice(0,-1), feature.depth);
+      // Apply plane transform
+      if(sketch.planeId==="top") {
+        // Top face: Y=depth of previous extrude
+        const prevExtrude = features.slice(0,features.indexOf(feature)).reverse().find(f=>f.type==="extrude");
+        const yOff = prevExtrude?prevExtrude.depth:0;
+        solid.verts = solid.verts.map(v=>v3(v.x, v.z+yOff, v.y));
+        solid.faces.forEach(f=>{
+          f.normal = v3(f.normal.x, f.normal.z, f.normal.y);
+        });
+      }
+      return solid;
+    }
+    // Circle → cylinder
+    const circles = ents.filter(e=>e.type==="circle");
+    if(circles.length>=1) {
+      const c=circles[0];
+      const prevExtrude = features.slice(0,features.indexOf(feature)).reverse().find(f=>f.type==="extrude");
+      const yOff = prevExtrude?prevExtrude.depth:0;
+      const solid = makeCylinder(c.r, feature.depth, 32);
+      solid.verts = solid.verts.map(v=>v3(v.x+c.cx, v.y+yOff, v.z+c.cy));
+      return solid;
+    }
+  }
+  return null;
+}
+
+// ─── CSS ──────────────────────────────────────────────────────────────────────
+const getCSS = () => `
+.cad *{box-sizing:border-box;margin:0;padding:0}
+.cad{font-family:'Inter',sans-serif;font-size:12px;background:${C.bg};color:${C.txt};display:grid;grid-template-rows:42px 1fr;height:100vh;width:100vw;overflow:hidden}
+.topbar{background:${C.grad};border-bottom:1px solid ${C.gradBorder};color:${C.brandTxt};display:flex;align-items:center;padding:0;z-index:20;overflow:hidden}
+.brand{color:inherit;font-weight:700;font-size:13px;padding:0 14px;border-right:1px solid ${C.gradBorder};height:100%;display:flex;align-items:center;gap:8px;white-space:nowrap;letter-spacing:.5px}
+.tseg{display:flex;align-items:center;gap:5px;padding:0 10px;border-right:1px solid ${C.gradBorder};height:100%;white-space:nowrap}
+.tlbl{font-size:9px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase}
+.tval{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+.bdg{border-radius:3px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid}
+.bdg-bl{background:${C.blueBg};color:${C.blue2};border-color:${C.blue}30}
+.bdg-gr{background:${C.greenBg};color:${C.green2};border-color:${C.green}30}
+.bdg-am{background:${C.amberBg};color:${C.amber2};border-color:${C.amber}30}
+.bdg-rd{background:${C.redBg};color:${C.red2};border-color:${C.red}30}
+.bdg-mt{background:${C.p2};color:${C.txt3};border-color:${C.bd}}
+.main{display:grid;grid-template-columns:236px minmax(0,1fr) 260px;overflow:hidden;height:100%;min-height:0}
+.panel{background:${C.p1};border-right:1px solid ${C.bd};display:flex;flex-direction:column;overflow:hidden}
+.panel-r{border-right:none;border-left:1px solid ${C.bd}}
+.tabrow{display:flex;background:${C.bg};border-bottom:1px solid ${C.bd};flex-shrink:0}
+.tab{flex:1;padding:6px 2px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;color:${C.txt3};cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase}
+.tab.on{color:${C.blue};border-bottom-color:${C.blue};background:${C.blueBg}}
+.pscroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px}
+.pscroll::-webkit-scrollbar{width:4px}
+.pscroll::-webkit-scrollbar-thumb{background:${C.bd2};border-radius:2px}
+.sec{font-size:9px;font-weight:700;letter-spacing:2px;color:${C.txt3};text-transform:uppercase;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid ${C.bd}}
+.sec:first-child{margin-top:0}
+.div{height:1px;background:${C.bd};margin:9px 0}
+input,select,textarea{background:${C.p2};border:1px solid ${C.bd};color:${C.txt};border-radius:3px;padding:4px 7px;font-family:inherit;font-size:11px;width:100%;outline:none;transition:.15s}
+input:focus,select:focus{border-color:${C.blue};background:${C.p3}}
+select option{background:${C.p2}}
+.lbl{font-size:9px;font-weight:600;color:${C.txt3};text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.field{margin-bottom:5px}
+.frow{display:flex;gap:5px}
+.frow>.field{flex:1;min-width:0}
+.btn{background:${C.p3};border:1px solid ${C.bd2};color:${C.txt};border-radius:3px;padding:5px 10px;font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:${C.blue};color:${C.blue2}}
+.btn-bl{background:${C.blueBg};color:${C.blue2};border-color:${C.blue}30}
+.btn-gr{background:${C.greenBg};color:${C.green2};border-color:${C.green}30}
+.btn-am{background:${C.amberBg};color:${C.amber2};border-color:${C.amber}30}
+.btn-rd{background:${C.redBg};color:${C.red2};border-color:${C.red}30}
+.btn.full{width:100%;text-align:center}
+.btn.lg{padding:7px 14px;font-size:12px;font-weight:600}
+.btnrow{display:flex;gap:4px}
+.ftree-item{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:3px;cursor:pointer;font-size:10px;border:1px solid transparent}
+.ftree-item:hover{background:${C.p3};border-color:${C.bd}}
+.ftree-item.active{background:${C.blueBg};border-color:${C.blue}30;color:${C.blue2}}
+.ftree-item.suppressed{opacity:.4}
+.ftree-icon{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.ftree-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ftree-status{font-size:8px;color:${C.txt3};flex-shrink:0}
+.proprow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid ${C.bd}}
+.proprow:last-child{border-bottom:none}
+.prop-l{font-size:9px;color:${C.txt3}}
+.prop-v{font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.txt2}}
+#vpWrap{position:relative;background:${C.vpBg};overflow:hidden;flex:1;min-height:0}
+#vpCvs{display:block;position:absolute;inset:0;width:100%;height:100%}
+.vp-hud{position:absolute;top:10px;left:10px;background:${C.p1}E6;border:1px solid ${C.bd};border-radius:4px;padding:7px 11px;font-size:10px;line-height:1.9;pointer-events:none;z-index:5;color:${C.txt}}
+.vp-hud span{font-family:'JetBrains Mono',monospace;font-weight:600}
+.vp-toolbar{position:absolute;top:10px;right:10px;display:flex;gap:4px;z-index:5;flex-direction:column}
+.vp-btn{background:${C.p1}E6;border:1px solid ${C.bd};color:${C.txt3};border-radius:3px;padding:4px 9px;font-size:9px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.vp-btn:hover{border-color:${C.blue};color:${C.blue}}
+.vp-btn.on{border-color:${C.green};color:${C.green};background:${C.greenBg}}
+.sketch-toolbar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10;background:${C.p1}F0;border:1px solid ${C.bd};border-radius:6px;padding:5px 8px}
+.sktool{background:${C.p3};border:1px solid ${C.bd};color:${C.txt3};border-radius:3px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit}
+.sktool:hover{border-color:${C.blue};color:${C.blue2}}
+.sktool.on{background:${C.blueBg};border-color:${C.blue};color:${C.blue2}}
+.dim-popup{position:absolute;background:${C.p1};border:1px solid ${C.blue};border-radius:4px;padding:6px 8px;z-index:20;display:flex;gap:6px;align-items:center}
+.dim-popup input{width:80px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.snap-dot{position:absolute;pointer-events:none;z-index:8;transform:translate(-50%,-50%)}
+.mini{display:flex;justify-content:space-between;align-items:center;padding:3px 7px;background:${C.bg};border:1px solid ${C.bd};border-radius:3px;margin-bottom:2px}
+.mini-l{font-size:9px;color:${C.txt3};font-family:monospace}
+.mini-v{font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.txt2}}
+.ctrlbar{background:${C.p1};border-bottom:1px solid ${C.bd};padding:5px 10px;display:flex;align-items:center;gap:5px;flex-shrink:0;overflow-x:auto}
+.ctrl-div{width:1px;height:22px;background:${C.bd};margin:0 2px;flex-shrink:0}
+.plane-indicator{position:absolute;bottom:10px;left:10px;display:flex;gap:8px;pointer-events:none;z-index:5}
+.axis-label{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:3px;border:1px solid}
+`;
+
+// ─── FEATURE ICONS ────────────────────────────────────────────────────────────
+const FEATURE_COLORS = {
+  sketch:   { bg:"rgba(99,184,255,0.15)", col:"#63b8ff", icon:"✏" },
+  extrude:  { bg:"rgba(70,216,159,0.12)", col:"#46d89f", icon:"⬆" },
+  revolve:  { bg:"rgba(184,156,255,0.12)", col:"#b89cff", icon:"↻" },
+  fillet:   { bg:"rgba(240,180,76,0.12)", col:"#f0b44c", icon:"⌒" },
+  chamfer:  { bg:"rgba(255,139,139,0.12)", col:"#ff8b8b", icon:"∠" },
+  shell:    { bg:"rgba(49,208,196,0.12)", col:"#31d0c4", icon:"⬜" },
+  pattern:  { bg:"rgba(240,180,76,0.12)", col:"#f0b44c", icon:"⊞" },
+  mirror:   { bg:"rgba(184,156,255,0.12)", col:"#b89cff", icon:"⇌" },
+  hole:     { bg:"rgba(255,139,139,0.12)", col:"#ff8b8b", icon:"○" },
 };
 
-// ─── R3F: SOLID MESH ─────────────────────────────────────────────────────────
-function SolidMesh({ features, color, selected, onClick }) {
-  const geom = useMemo(() => evaluateFeatures(features), [features]);
-  const meshRef = useRef();
-
-  if (!geom) return null;
-  return (
-    <mesh ref={meshRef} geometry={geom} onClick={onClick} castShadow receiveShadow>
-      <meshStandardMaterial
-        color={selected ? "#94b8ff" : color ?? "#63b8ff"}
-        metalness={0.25}
-        roughness={0.45}
-        envMapIntensity={0.8}
-      />
-    </mesh>
-  );
-}
-
-// Edges wireframe overlay
-function SolidEdges({ features, visible }) {
-  const geom = useMemo(() => {
-    const g = evaluateFeatures(features);
-    if (!g) return null;
-    return new THREE.EdgesGeometry(g, 15);
-  }, [features]);
-  if (!geom || !visible) return null;
-  return (
-    <lineSegments geometry={geom}>
-      <lineBasicMaterial color="#94b8ff" linewidth={1} />
-    </lineSegments>
-  );
-}
-
-// ─── R3F: SKETCH PLANE INDICATOR ─────────────────────────────────────────────
-function SketchPlaneIndicator({ planeId }) {
-  const mat = PLANE_MAT[planeId] ?? PLANE_MAT.XY;
-  const euler = new THREE.Euler().setFromRotationMatrix(mat);
-  return (
-    <mesh rotation={euler} position={[0, 0.01, 0]}>
-      <planeGeometry args={[200, 200]} />
-      <meshBasicMaterial color="#63b8ff" transparent opacity={0.04} side={THREE.DoubleSide} />
-    </mesh>
-  );
-}
-
-// ─── R3F: SCENE ──────────────────────────────────────────────────────────────
-function Scene({ state, dispatch }) {
-  const orbitRef = useRef();
-  const { camera } = useThree();
-
-  const setStdView = useCallback((view) => {
-    const d = 200;
-    const views = {
-      iso:    [d*0.7, d*0.7, d*0.7],
-      front:  [0, 0, d],
-      back:   [0, 0, -d],
-      top:    [0, d, 0],
-      bottom: [0, -d, 0],
-      right:  [d, 0, 0],
-      left:   [-d, 0, 0],
-    };
-    const p = views[view] ?? views.iso;
-    camera.position.set(...p);
-    camera.lookAt(0, 0, 0);
-    if (orbitRef.current) orbitRef.current.target.set(0, 0, 0);
-  }, [camera]);
-
-  // Expose setStdView via dispatch
-  useEffect(() => { dispatch({ type: "SET_VIEW_FN", fn: setStdView }); }, [setStdView]);
-
-  const sketchMode = state.mode === "sketch";
-  const activeSk = state.activePart?.features.find(f => f.id === state.activeSketchId && f.type === "sketch");
-
-  return (
-    <>
-      <color attach="background" args={["#0B1424"]} />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[100, 150, 100]} intensity={1.2} castShadow shadow-mapSize={[2048, 2048]} />
-      <directionalLight position={[-80, 50, -60]} intensity={0.4} color="#aaccff" />
-      <hemisphereLight args={["#1a3a5c", "#0a1020", 0.6]} />
-
-      <Grid
-        args={[400, 400]}
-        cellSize={10}
-        cellThickness={0.5}
-        cellColor="#1e3040"
-        sectionSize={50}
-        sectionThickness={1}
-        sectionColor="#2a4060"
-        fadeDistance={600}
-        position={[0, -0.1, 0]}
-      />
-
-      {/* Origin axes */}
-      <arrowHelper args={[new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 40, 0xff4444, 5, 3]} />
-      <arrowHelper args={[new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 40, 0x44ff44, 5, 3]} />
-      <arrowHelper args={[new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 40, 0x4444ff, 5, 3]} />
-
-      {state.docType === "part" && state.activePart && (
-        <>
-          <SolidMesh
-            features={state.activePart.features}
-            color={state.activePart.color}
-            selected={false}
-            onClick={(e) => { e.stopPropagation(); dispatch({ type:"SELECT_FACE", normal: e.face?.normal }); }}
-          />
-          <SolidEdges features={state.activePart.features} visible={!sketchMode} />
-          {sketchMode && activeSk && <SketchPlaneIndicator planeId={activeSk.planeId} />}
-        </>
-      )}
-
-      {state.docType === "assembly" && state.instances.map(inst => {
-        const part = state.parts.find(p => p.id === inst.partId);
-        if (!part) return null;
-        return (
-          <group key={inst.id} position={inst.pos} rotation={inst.rot}>
-            <SolidMesh
-              features={part.features}
-              color={part.color}
-              selected={state.activeInstanceId === inst.id}
-              onClick={(e) => { e.stopPropagation(); dispatch({ type:"SELECT_INSTANCE", id: inst.id }); }}
-            />
-            <SolidEdges features={part.features} visible={true} />
-          </group>
-        );
-      })}
-
-      <OrbitControls
-        ref={orbitRef}
-        enableDamping
-        dampingFactor={0.08}
-        mouseButtons={{ LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }}
-      />
-      <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-        <GizmoViewport axisColors={["#ff4444","#44ff44","#4444ff"]} labelColor="white" />
-      </GizmoHelper>
-    </>
-  );
-}
-
-// ─── SKETCH CANVAS OVERLAY ───────────────────────────────────────────────────
-function SketchOverlay({ state, dispatch }) {
-  const cvsRef  = useRef(null);
-  const contRef = useRef(null);
-  const scaleRef = useRef(3);   // px per mm
-  const panRef  = useRef({ x: 0, y: 0 });
-  const dragRef = useRef({ on: false, lx: 0, ly: 0, btn: 0 });
-  const ptRef   = useRef(null); // live mouse point
-
-  const sk = state.activePart?.features.find(f => f.id === state.activeSketchId && f.type === "sketch");
-
-  const w2s = useCallback((wx, wy) => {
-    const cvs = cvsRef.current; if (!cvs) return {sx:0,sy:0};
-    return { sx: cvs.width/2 + panRef.current.x + wx * scaleRef.current,
-             sy: cvs.height/2 - panRef.current.y - wy * scaleRef.current };
-  }, []);
-
-  const s2w = useCallback((sx, sy) => {
-    const cvs = cvsRef.current; if (!cvs) return {wx:0,wy:0};
-    const wx = (sx - cvs.width/2  - panRef.current.x) / scaleRef.current;
-    const wy = -(sy - cvs.height/2 + panRef.current.y) / scaleRef.current;
-    const gsnap = 5;
-    return { wx: Math.round(wx/gsnap)*gsnap, wy: Math.round(wy/gsnap)*gsnap };
-  }, []);
-
-  const draw = useCallback(() => {
-    const cvs = cvsRef.current; if (!cvs || !sk) return;
-    const ctx = cvs.getContext("2d");
-    const W = cvs.width, H = cvs.height;
-    ctx.fillStyle = "#0B1828"; ctx.fillRect(0,0,W,H);
-
-    // Grid
-    const step = 10 * scaleRef.current;
-    const ox = W/2 + panRef.current.x, oy = H/2 - panRef.current.y;
-    ctx.strokeStyle = "#131c28"; ctx.lineWidth = 0.5;
-    for (let x = (ox % step) - step; x < W + step; x += step) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = (oy % step) - step; y < H + step; y += step) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-    // Major grid (50mm)
-    const mstep = 50 * scaleRef.current;
-    ctx.strokeStyle = "#1e3040"; ctx.lineWidth = 1;
-    for (let x = (ox % mstep) - mstep; x < W + mstep; x += mstep) {
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
-    }
-    for (let y = (oy % mstep) - mstep; y < H + mstep; y += mstep) {
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
-    }
-    // Origin cross
-    ctx.strokeStyle = "#2a5080"; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(ox-20,oy); ctx.lineTo(ox+20,oy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(ox,oy-20); ctx.lineTo(ox,oy+20); ctx.stroke();
-    ctx.fillStyle = D.blue; ctx.font = "bold 10px system-ui";
-    ctx.fillText("X", ox+22, oy+4); ctx.fillText("Y", ox+4, oy-22);
-
-    // Entities
-    sk.entities.forEach(e => {
-      ctx.strokeStyle = D.blue; ctx.lineWidth = 1.5; ctx.setLineDash([]);
-      if (e.type === "line") {
-        const a = w2s(e.x1, e.y1), b = w2s(e.x2, e.y2);
-        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
-        // Endpoint dots
-        [a,b].forEach(p => { ctx.fillStyle = D.blue; ctx.beginPath(); ctx.arc(p.sx,p.sy,3,0,Math.PI*2); ctx.fill(); });
-      }
-      if (e.type === "circle") {
-        const c = w2s(e.cx, e.cy);
-        const er = w2s(e.cx + e.r, e.cy);
-        const sr = Math.sqrt((er.sx-c.sx)**2+(er.sy-c.sy)**2);
-        ctx.strokeStyle = D.purple; ctx.beginPath(); ctx.arc(c.sx,c.sy,sr,0,Math.PI*2); ctx.stroke();
-        ctx.fillStyle = D.purple; ctx.beginPath(); ctx.arc(c.sx,c.sy,3,0,Math.PI*2); ctx.fill();
-      }
-      if (e.type === "arc") {
-        const c = w2s(e.cx, e.cy);
-        const er = w2s(e.cx + e.r, e.cy);
-        const sr = Math.sqrt((er.sx-c.sx)**2+(er.sy-c.sy)**2);
-        ctx.strokeStyle = D.purple; ctx.beginPath();
-        ctx.arc(c.sx, c.sy, sr, -e.startAngle, -e.endAngle, true); ctx.stroke();
-      }
-    });
-
-    // Live preview while drawing
-    const tool = state.sketchTool;
-    const pt   = ptRef.current;
-    if (state.sketchDrawing && state.sketchPts.length && pt) {
-      const p0 = state.sketchPts[0];
-      const s0 = w2s(p0.x, p0.y);
-      ctx.strokeStyle = D.amber; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
-      if (tool === "line") {
-        const sp = w2s(pt.wx, pt.wy);
-        ctx.beginPath(); ctx.moveTo(s0.sx, s0.sy); ctx.lineTo(sp.sx, sp.sy); ctx.stroke();
-      }
-      if (tool === "circle") {
-        const r = Math.sqrt((pt.wx-p0.x)**2+(pt.wy-p0.y)**2);
-        const sr = r * scaleRef.current;
-        ctx.beginPath(); ctx.arc(s0.sx, s0.sy, sr, 0, Math.PI*2); ctx.stroke();
-      }
-      if (tool === "rect") {
-        const sp = w2s(pt.wx, pt.wy);
-        ctx.beginPath(); ctx.rect(s0.sx, s0.sy, sp.sx-s0.sx, sp.sy-s0.sy); ctx.stroke();
-      }
-      ctx.setLineDash([]);
-    }
-
-    // Snap dot
-    if (pt) {
-      const sp = w2s(pt.wx, pt.wy);
-      ctx.strokeStyle = D.amber; ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(sp.sx-6,sp.sy); ctx.lineTo(sp.sx+6,sp.sy);
-      ctx.moveTo(sp.sx,sp.sy-6); ctx.lineTo(sp.sx,sp.sy+6);
-      ctx.stroke();
-    }
-  }, [sk, state.sketchDrawing, state.sketchPts, state.sketchTool, w2s]);
-
-  useEffect(() => {
-    const cvs = cvsRef.current; if (!cvs) return;
-    const cont = contRef.current;
-    const ro = new ResizeObserver(() => {
-      cvs.width  = cont.offsetWidth;
-      cvs.height = cont.offsetHeight;
-      draw();
-    });
-    ro.observe(cont);
-    return () => ro.disconnect();
-  }, [draw]);
-
-  useEffect(() => { draw(); }, [draw, sk, state]);
-
-  const onMouseMove = useCallback(e => {
-    const rect = cvsRef.current.getBoundingClientRect();
-    const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
-    const wpt = s2w(sx, sy);
-    ptRef.current = wpt;
-    if (dragRef.current.on && dragRef.current.btn !== 0) {
-      panRef.current.x += e.clientX - dragRef.current.lx;
-      panRef.current.y -= e.clientY - dragRef.current.ly;
-      dragRef.current.lx = e.clientX; dragRef.current.ly = e.clientY;
-    }
-    draw();
-  }, [s2w, draw]);
-
-  const onMouseDown = useCallback(e => {
-    dragRef.current = { on: true, btn: e.button, lx: e.clientX, ly: e.clientY };
-    if (e.button !== 0) return;
-    const rect = cvsRef.current.getBoundingClientRect();
-    const pt = s2w(e.clientX - rect.left, e.clientY - rect.top);
-    const tool = state.sketchTool;
-
-    if (tool === "select") return;
-
-    if (!state.sketchDrawing) {
-      dispatch({ type:"SK_START", pt });
-    } else {
-      const p0 = state.sketchPts[0];
-      if (tool === "line") {
-        dispatch({ type:"SK_ADD_LINE", x1:p0.x, y1:p0.y, x2:pt.wx, y2:pt.wy });
-        dispatch({ type:"SK_START", pt: {wx:pt.wx, wy:pt.wy} });
-      } else if (tool === "circle") {
-        const r = Math.sqrt((pt.wx-p0.x)**2+(pt.wy-p0.y)**2);
-        dispatch({ type:"SK_ADD_CIRCLE", cx:p0.x, cy:p0.y, r: Math.max(1,r) });
-        dispatch({ type:"SK_STOP" });
-      } else if (tool === "rect") {
-        const x1=p0.x, y1=p0.y, x2=pt.wx, y2=pt.wy;
-        dispatch({ type:"SK_ADD_RECT", x1,y1,x2,y2 });
-        dispatch({ type:"SK_STOP" });
-      }
-    }
-  }, [state.sketchTool, state.sketchDrawing, state.sketchPts, s2w, dispatch]);
-
-  const onMouseUp   = useCallback(() => { dragRef.current.on = false; }, []);
-  const onWheel     = useCallback(e => { scaleRef.current = Math.max(0.5, Math.min(30, scaleRef.current * (e.deltaY < 0 ? 1.1 : 0.9))); draw(); }, [draw]);
-  const onDblClick  = useCallback(() => { if (state.sketchTool === "line") dispatch({ type:"SK_STOP" }); }, [state.sketchTool, dispatch]);
-  const onKeyDown   = useCallback(e => { if (e.key === "Escape") dispatch({ type:"SK_STOP" }); }, [dispatch]);
-
-  if (state.mode !== "sketch") return null;
-
-  return (
-    <div ref={contRef} style={{ position:"absolute", inset:0, zIndex:10 }}
-      tabIndex={0} onKeyDown={onKeyDown}>
-      <canvas ref={cvsRef}
-        onMouseMove={onMouseMove} onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp} onWheel={onWheel} onDoubleClick={onDblClick}
-        style={{ display:"block", width:"100%", height:"100%", cursor: state.sketchTool === "select" ? "default" : "crosshair" }} />
-    </div>
-  );
-}
-
-// ─── REDUCER ─────────────────────────────────────────────────────────────────
-let _viewFn = null;
-
-function reducer(state, action) {
-  switch (action.type) {
-    case "SET_VIEW_FN": { _viewFn = action.fn; return state; }
-
-    case "SET_DOC_TYPE": return { ...state, docType: action.docType };
-
-    case "SET_ACTIVE_FEATURE": return { ...state, activeFeatureId: action.id };
-
-    case "SELECT_FACE": return { ...state, selection: { type:"face", ids:[], normal: action.normal } };
-
-    case "SELECT_INSTANCE": return { ...state, activeInstanceId: action.id };
-
-    case "ENTER_SKETCH": {
-      const sk = state.activePart?.features.find(f => f.id === action.id && f.type === "sketch");
-      if (!sk) return state;
-      return { ...state, mode:"sketch", activeSketchId: action.id, sketchTool:"select", sketchDrawing:false, sketchPts:[] };
-    }
-
-    case "EXIT_SKETCH":
-      return { ...state, mode:"3d", activeSketchId:null, sketchDrawing:false, sketchPts:[] };
-
-    case "SET_SKETCH_TOOL":
-      return { ...state, sketchTool: action.tool, sketchDrawing:false, sketchPts:[] };
-
-    case "SK_START":
-      return { ...state, sketchDrawing:true, sketchPts:[{ x: action.pt.wx, y: action.pt.wy }] };
-
-    case "SK_STOP":
-      return { ...state, sketchDrawing:false, sketchPts:[] };
-
-    case "SK_ADD_LINE": {
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === state.activeSketchId
-          ? { ...f, entities:[...f.entities, { id:uid(), type:"line", x1:action.x1, y1:action.y1, x2:action.x2, y2:action.y2 }] }
-          : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "SK_ADD_CIRCLE": {
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === state.activeSketchId
-          ? { ...f, entities:[...f.entities, { id:uid(), type:"circle", cx:action.cx, cy:action.cy, r:action.r }] }
-          : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "SK_ADD_RECT": {
-      const { x1,y1,x2,y2 } = action;
-      const lines = [
-        { id:uid(), type:"line", x1, y1, x2, y2:y1 },
-        { id:uid(), type:"line", x1:x2, y1, x2, y2 },
-        { id:uid(), type:"line", x1:x2, y1:y2, x2, y2 },
-        { id:uid(), type:"line", x1, y1:y2, x2:x1, y2 },
-      ];
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === state.activeSketchId
-          ? { ...f, entities:[...f.entities, ...lines] }
-          : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "ADD_FEATURE": {
-      const part = state.activePart;
-      const f = action.feature;
-      return { ...state, activePart:{ ...part, features:[...part.features, f] }, activeFeatureId: f.id };
-    }
-
-    case "DELETE_FEATURE": {
-      const part = state.activePart;
-      return { ...state, activePart:{ ...part, features: part.features.filter(f => f.id !== action.id) } };
-    }
-
-    case "UPDATE_FEATURE_PARAM": {
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === action.id ? { ...f, [action.key]: action.val } : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "TOGGLE_SUPPRESSED": {
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === action.id ? { ...f, suppressed: !f.suppressed } : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "CLEAR_SKETCH_ENTITIES": {
-      const part = state.activePart;
-      const features = part.features.map(f =>
-        f.id === action.id ? { ...f, entities:[] } : f
-      );
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    case "ADD_SKETCH": {
-      const part = state.activePart;
-      const newSk = { id:uid(), type:"sketch", name:`Sketch${part.features.filter(f=>f.type==="sketch").length+1}`,
-        planeId: action.planeId ?? "XZ", entities:[], constraints:[] };
-      return { ...state, activePart:{ ...part, features:[...part.features, newSk] },
-        mode:"sketch", activeSketchId: newSk.id, activeFeatureId: newSk.id, sketchTool:"line", sketchDrawing:false, sketchPts:[] };
-    }
-
-    case "ADD_EXTRUDE": {
-      const sketchId = state.activeSketchId ?? state.activePart?.features.slice().reverse().find(f=>f.type==="sketch")?.id;
-      if (!sketchId) return state;
-      const f = { id:uid(), type: action.cut ? "extrude_cut" : "extrude", name: action.cut ? `Cut${uid()}` : `Extrude${uid()}`, sketchId, depth: action.depth ?? 20 };
-      const part = state.activePart;
-      return { ...state, activePart:{ ...part, features:[...part.features, f] }, activeFeatureId: f.id };
-    }
-
-    case "ADD_REVOLVE": {
-      const sketchId = state.activeSketchId ?? state.activePart?.features.slice().reverse().find(f=>f.type==="sketch")?.id;
-      if (!sketchId) return state;
-      const f = { id:uid(), type:"revolve", name:`Revolve${uid()}`, sketchId, angle: action.angle ?? 360 };
-      const part = state.activePart;
-      return { ...state, activePart:{ ...part, features:[...part.features, f] }, activeFeatureId: f.id };
-    }
-
-    case "ADD_HOLE": {
-      const f = { id:uid(), type:"hole", name:`Hole${uid()}`, dia: action.dia ?? 10, depth: action.depth ?? 50, cx: action.cx ?? 0, cz: action.cz ?? 0 };
-      const part = state.activePart;
-      return { ...state, activePart:{ ...part, features:[...part.features, f] }, activeFeatureId: f.id };
-    }
-
-    case "ADD_MATE": {
-      return { ...state, mates:[...state.mates, { id:uid(), ...action.mate }] };
-    }
-
-    case "MOVE_INSTANCE": {
-      const instances = state.instances.map(i =>
-        i.id === action.id ? { ...i, pos: action.pos } : i
-      );
-      return { ...state, instances };
-    }
-
-    case "SWITCH_PART": {
-      const part = state.parts.find(p => p.id === action.id);
-      if (!part) return state;
-      return { ...state, activePart: part };
-    }
-
-    case "RENAME_FEATURE": {
-      const part = state.activePart;
-      const features = part.features.map(f => f.id === action.id ? { ...f, name: action.name } : f);
-      return { ...state, activePart:{ ...part, features } };
-    }
-
-    default: return state;
-  }
-}
-
-// ─── PANELS ──────────────────────────────────────────────────────────────────
-function Btn({ children, onClick, color, small, style }) {
-  const [hov, setHov] = useState(false);
-  const c = color ?? D.blue;
-  return (
-    <button onClick={onClick}
-      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{ background: hov ? `${c}22` : "transparent", border:`1px solid ${hov?c:D.bd}`,
-        color: hov ? c : D.txt2, borderRadius:3, padding: small ? "2px 7px" : "4px 10px",
-        fontSize: small ? 9 : 10, fontWeight:600, cursor:"pointer", fontFamily:"inherit",
-        transition:"all 0.15s", ...style }}>
-      {children}
-    </button>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-      <div style={{ fontSize:9, color:D.txt3, width:70, flexShrink:0 }}>{label}</div>
-      <div style={{ flex:1 }}>{children}</div>
-    </div>
-  );
-}
-
-function Inp({ value, onChange, type, step, min, style }) {
-  return (
-    <input type={type ?? "text"} value={value} step={step} min={min}
-      onChange={e => onChange(type==="number" ? parseFloat(e.target.value)||0 : e.target.value)}
-      style={{ width:"100%", background:D.bg, border:`1px solid ${D.bd}`, color:D.txt,
-        borderRadius:3, padding:"3px 6px", fontSize:10, fontFamily:"'JetBrains Mono',monospace", ...style }} />
-  );
-}
-
-function Sel({ value, onChange, opts }) {
-  return (
-    <select value={value} onChange={e=>onChange(e.target.value)}
-      style={{ width:"100%", background:D.bg, border:`1px solid ${D.bd}`, color:D.txt,
-        borderRadius:3, padding:"3px 6px", fontSize:10, fontFamily:"inherit" }}>
-      {opts.map(o => <option key={o.v ?? o} value={o.v ?? o}>{o.l ?? o}</option>)}
-    </select>
-  );
-}
-
-function PropRow({ label, value, color }) {
-  return (
-    <div style={{ display:"flex", justifyContent:"space-between", padding:"3px 8px",
-      borderBottom:`1px solid ${D.bd}22`, fontSize:10 }}>
-      <span style={{ color:D.txt3 }}>{label}</span>
-      <span style={{ color: color ?? D.txt2, fontFamily:"'JetBrains Mono',monospace" }}>{value}</span>
-    </div>
-  );
-}
-
-function FeatureTreePanel({ state, dispatch }) {
-  const [renaming, setRenaming] = useState(null);
-  const [renameVal, setRenameVal] = useState("");
-  const features = state.activePart?.features ?? [];
-
-  return (
-    <div style={{ display:"flex", flexDirection:"column", height:"100%", overflow:"hidden" }}>
-      {/* Part selector */}
-      {state.docType === "part" && state.parts.length > 1 && (
-        <div style={{ padding:"4px 8px", borderBottom:`1px solid ${D.bd}`, fontSize:9, color:D.txt3 }}>
-          {state.parts.map(p => (
-            <button key={p.id} onClick={() => dispatch({ type:"SWITCH_PART", id:p.id })}
-              style={{ marginRight:4, padding:"2px 7px", background: state.activePart?.id===p.id ? D.blueBg : "transparent",
-                border:`1px solid ${state.activePart?.id===p.id ? D.blue : D.bd}`,
-                color: state.activePart?.id===p.id ? D.blue2 : D.txt3,
-                borderRadius:3, fontSize:9, cursor:"pointer" }}>
-              {p.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div style={{ flex:1, overflowY:"auto", padding:"4px 0" }}>
-        {features.map(f => {
-          const meta = FMETA[f.type] ?? FMETA.sketch;
-          const isActive = f.id === state.activeFeatureId;
-          const isSk = f.id === state.activeSketchId;
-          return (
-            <div key={f.id}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 8px",
-                background: isActive ? D.blueBg : "transparent",
-                borderLeft:`2px solid ${isActive ? D.blue : "transparent"}`,
-                opacity: f.suppressed ? 0.4 : 1, cursor:"pointer" }}
-              onClick={() => dispatch({ type:"SET_ACTIVE_FEATURE", id:f.id })}>
-              <div style={{ width:18, height:18, borderRadius:3, background:meta.bg,
-                color:meta.col, display:"flex", alignItems:"center", justifyContent:"center",
-                fontSize:10, flexShrink:0 }}>
-                {meta.icon}
-              </div>
-              {renaming === f.id ? (
-                <input autoFocus value={renameVal}
-                  onChange={e => setRenameVal(e.target.value)}
-                  onBlur={() => { dispatch({ type:"RENAME_FEATURE", id:f.id, name:renameVal }); setRenaming(null); }}
-                  onKeyDown={e => { if(e.key==="Enter"||e.key==="Escape"){dispatch({type:"RENAME_FEATURE",id:f.id,name:renameVal});setRenaming(null);}}}
-                  style={{ flex:1, background:"transparent", border:`1px solid ${D.blue}`,
-                    color:D.txt, fontSize:10, borderRadius:2, padding:"1px 4px" }} />
-              ) : (
-                <span style={{ flex:1, fontSize:10, color: isActive ? D.blue2 : D.txt,
-                  textDecoration: f.suppressed ? "line-through" : "none" }}
-                  onDoubleClick={() => { if(f.type==="sketch") dispatch({type:"ENTER_SKETCH",id:f.id}); else { setRenaming(f.id); setRenameVal(f.name); } }}>
-                  {f.name}
-                </span>
-              )}
-              <div style={{ display:"flex", gap:2 }}>
-                {f.type === "sketch" && (
-                  <button onClick={e=>{e.stopPropagation();dispatch({type:"ENTER_SKETCH",id:f.id});}}
-                    style={{background:"none",border:"none",color:isSk?D.green2:D.txt3,cursor:"pointer",fontSize:9,padding:0}}>
-                    {isSk?"•edit":"edit"}
-                  </button>
-                )}
-                <button onClick={e=>{e.stopPropagation();dispatch({type:"TOGGLE_SUPPRESSED",id:f.id});}}
-                  style={{background:"none",border:"none",color:D.txt3,cursor:"pointer",fontSize:9,padding:0}}>
-                  {f.suppressed?"show":"hide"}
-                </button>
-                <button onClick={e=>{e.stopPropagation();dispatch({type:"DELETE_FEATURE",id:f.id});}}
-                  style={{background:"none",border:"none",color:D.red+"80",cursor:"pointer",fontSize:11,padding:0}}>
-                  ✕
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Add buttons */}
-      <div style={{ padding:"6px 8px", borderTop:`1px solid ${D.bd}`, display:"flex", flexWrap:"wrap", gap:4 }}>
-        <Btn small onClick={() => dispatch({ type:"ADD_SKETCH" })}>+ Sketch</Btn>
-        <Btn small onClick={() => dispatch({ type:"ADD_EXTRUDE" })}>⬆ Boss</Btn>
-        <Btn small onClick={() => dispatch({ type:"ADD_EXTRUDE", cut:true })}>⬇ Cut</Btn>
-        <Btn small onClick={() => dispatch({ type:"ADD_REVOLVE" })}>↻ Revolve</Btn>
-        <Btn small onClick={() => dispatch({ type:"ADD_HOLE", dia:10, depth:30 })}>○ Hole</Btn>
-      </div>
-    </div>
-  );
-}
-
-function PropertiesPanel({ state, dispatch }) {
-  const f = state.activePart?.features.find(f => f.id === state.activeFeatureId);
-  const meta = f ? (FMETA[f.type] ?? FMETA.sketch) : null;
-
-  if (!f) return (
-    <div style={{ padding:12, fontSize:10, color:D.txt3 }}>
-      Select a feature to view properties.
-    </div>
-  );
-
-  return (
-    <div style={{ padding:8 }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8,
-        background:D.bg, border:`1px solid ${D.bd}`, borderRadius:4, padding:"8px 10px" }}>
-        <div style={{ width:28, height:28, borderRadius:4, background:meta.bg,
-          color:meta.col, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>
-          {meta.icon}
-        </div>
-        <div>
-          <div style={{ fontWeight:600, fontSize:11 }}>{f.name}</div>
-          <div style={{ fontSize:9, color:D.txt3, textTransform:"uppercase", letterSpacing:1 }}>{f.type}</div>
-        </div>
-      </div>
-
-      {(f.type === "extrude" || f.type === "extrude_boss" || f.type === "extrude_cut") && (<>
-        <Field label="Depth (mm)">
-          <Inp type="number" value={f.depth ?? 20} step={1} min={0.1}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"depth", val:v })} />
-        </Field>
-        <Field label="Sketch">
-          <Sel value={f.sketchId ?? ""} onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"sketchId", val:parseInt(v) })}
-            opts={state.activePart?.features.filter(s=>s.type==="sketch").map(s=>({v:s.id,l:s.name})) ?? []} />
-        </Field>
-        <PropRow label="Operation" value={f.type === "extrude_cut" ? "Subtract" : "Add"} color={f.type==="extrude_cut"?D.red:D.green2} />
-      </>)}
-
-      {f.type === "revolve" && (<>
-        <Field label="Angle (°)">
-          <Inp type="number" value={f.angle ?? 360} step={1} min={1} max={360}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"angle", val:Math.max(1,Math.min(360,v)) })} />
-        </Field>
-        <Field label="Sketch">
-          <Sel value={f.sketchId ?? ""} onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"sketchId", val:parseInt(v) })}
-            opts={state.activePart?.features.filter(s=>s.type==="sketch").map(s=>({v:s.id,l:s.name})) ?? []} />
-        </Field>
-      </>)}
-
-      {f.type === "hole" && (<>
-        <Field label="Diameter">
-          <Inp type="number" value={f.dia ?? 10} step={0.5} min={0.1}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"dia", val:v })} />
-        </Field>
-        <Field label="Depth">
-          <Inp type="number" value={f.depth ?? 30} step={1} min={0.1}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"depth", val:v })} />
-        </Field>
-        <Field label="Center X">
-          <Inp type="number" value={f.cx ?? 0} step={1}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"cx", val:v })} />
-        </Field>
-        <Field label="Center Z">
-          <Inp type="number" value={f.cz ?? 0} step={1}
-            onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"cz", val:v })} />
-        </Field>
-      </>)}
-
-      {f.type === "sketch" && (<>
-        <Field label="Plane">
-          <Sel value={f.planeId ?? "XZ"} onChange={v => dispatch({ type:"UPDATE_FEATURE_PARAM", id:f.id, key:"planeId", val:v })}
-            opts={[{v:"XZ",l:"XZ (Top)"},{v:"XY",l:"XY (Front)"},{v:"YZ",l:"YZ (Right)"}]} />
-        </Field>
-        <PropRow label="Entities" value={f.entities.length} />
-        <div style={{ marginTop:6, display:"flex", gap:4 }}>
-          <Btn small onClick={() => dispatch({ type:"ENTER_SKETCH", id:f.id })}>✏ Edit Sketch</Btn>
-          <Btn small onClick={() => dispatch({ type:"CLEAR_SKETCH_ENTITIES", id:f.id })}>Clear</Btn>
-        </div>
-      </>)}
-    </div>
-  );
-}
-
-function AssemblyPanel({ state, dispatch }) {
-  return (
-    <div style={{ padding:8 }}>
-      <div style={{ fontSize:9, color:D.txt3, marginBottom:6, textTransform:"uppercase", letterSpacing:1 }}>Instances</div>
-      {state.instances.map(inst => {
-        const part = state.parts.find(p => p.id === inst.partId);
-        const isActive = inst.id === state.activeInstanceId;
-        return (
-          <div key={inst.id}
-            style={{ padding:"5px 8px", marginBottom:2, borderRadius:3,
-              background: isActive ? D.blueBg : D.bg,
-              border:`1px solid ${isActive ? D.blue : D.bd}`,
-              cursor:"pointer" }}
-            onClick={() => dispatch({ type:"SELECT_INSTANCE", id:inst.id })}>
-            <div style={{ fontSize:10, color: isActive ? D.blue2 : D.txt }}>{inst.name}</div>
-            <div style={{ fontSize:9, color:D.txt3 }}>{part?.name} — [{inst.pos.map(v=>v.toFixed(0)).join(", ")}]</div>
-          </div>
-        );
-      })}
-
-      {state.activeInstanceId && (() => {
-        const inst = state.instances.find(i => i.id === state.activeInstanceId);
-        if (!inst) return null;
-        return (
-          <div style={{ marginTop:8, padding:8, background:D.bg, border:`1px solid ${D.bd}`, borderRadius:4 }}>
-            <div style={{ fontSize:9, color:D.txt3, marginBottom:6 }}>POSITION</div>
-            {["X","Y","Z"].map((axis, i) => (
-              <Field key={axis} label={axis}>
-                <Inp type="number" value={inst.pos[i]} step={5}
-                  onChange={v => {
-                    const pos = [...inst.pos]; pos[i] = v;
-                    dispatch({ type:"MOVE_INSTANCE", id:inst.id, pos });
-                  }} />
-              </Field>
-            ))}
-          </div>
-        );
-      })()}
-
-      <div style={{ marginTop:8, fontSize:9, color:D.txt3, textTransform:"uppercase", letterSpacing:1 }}>Mates</div>
-      {state.mates.length === 0 && (
-        <div style={{ fontSize:9, color:D.txt3, padding:"6px 0" }}>No mates yet. Select two faces, then add a mate.</div>
-      )}
-      {state.mates.map(m => (
-        <div key={m.id} style={{ padding:"4px 8px", marginBottom:2, background:D.bg, border:`1px solid ${D.bd}`, borderRadius:3 }}>
-          <span style={{ fontSize:9, color:D.green2 }}>{m.type}</span>
-          <span style={{ fontSize:9, color:D.txt3, marginLeft:6 }}>{m.instanceA} ↔ {m.instanceB}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function CadPro2() {
-  const [state, dispatch] = useMemo(() => {
-    let s = initState();
-    const d = (action) => { s = reducer(s, action); };
-    return [s, d];
-  }, []);
+export default function CADPro() {
+  const isDarkFn = useCallback(() => typeof document !== "undefined" && document.documentElement.classList.contains("dark"), []);
+  const [dark, setDark] = useState(isDarkFn);
+  useEffect(()=>{ const ob=new MutationObserver(()=>setDark(isDarkFn())); ob.observe(document.documentElement,{attributes:true,attributeFilter:["class"]}); return()=>ob.disconnect(); },[isDarkFn]);
+  useEffect(()=>{ Object.assign(C, dark?PALETTE_DARK:PALETTE_LIGHT); },[dark]);
+  const CSS = useMemo(()=>getCSS(),[dark]);
 
-  const [, forceUpdate] = useState(0);
-  const stateRef = useRef(state);
-
-  const disp = useCallback(action => {
-    stateRef.current = reducer(stateRef.current, action);
-    forceUpdate(n => n + 1);
-  }, []);
-
-  const liveState = stateRef.current;
+  const [state, setState] = useState(initCADState);
   const [leftTab, setLeftTab] = useState("tree");
   const [rightTab, setRightTab] = useState("props");
-  const sketchMode = liveState.mode === "sketch";
-  const activeSk = liveState.activePart?.features.find(f => f.id === liveState.activeSketchId && f.type === "sketch");
+  const [camState, setCamState] = useState({ azimuth:-0.6, elevation:0.5, dist:200, px:0, py:0, zoom:1 });
+  const [mousePos, setMousePos] = useState({x:0,y:0,wx:0,wy:0});
+  const [snapPt, setSnapPt] = useState(null);
+  const [dimPopup, setDimPopup] = useState(null);
+  const [dimVal, setDimVal] = useState("");
+  const [newFeatureType, setNewFeatureType] = useState("extrude");
+  const [extrudeDepth, setExtrudeDepth] = useState(25);
+  const [filletRadius, setFilletRadius] = useState(3);
+  const [chamferDist, setChamferDist] = useState(2);
+  const [holeType, setHoleType] = useState("simple");
+  const [holeDia, setHoleDia] = useState(8);
+  const [holeDep, setHoleDep] = useState(20);
+  const [editingFeature, setEditingFeature] = useState(null);
 
-  return (
-    <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:D.bg,
-      color:D.txt, fontFamily:"system-ui, sans-serif", overflow:"hidden" }}>
+  const vpRef = useRef(null);
+  const cvsRef = useRef(null);
+  const camRef = useRef({ azimuth:-0.6, elevation:0.5, dist:200, px:0, py:0, zoom:1 });
+  const dragRef = useRef({ on:false, btn:0, lx:0, ly:0 });
+  const stateRef = useRef(state);
+  useEffect(()=>{ stateRef.current=state; },[state]);
 
-      {/* TOP BAR */}
-      <div style={{ height:36, background:D.p1, borderBottom:`1px solid ${D.bd}`,
-        display:"flex", alignItems:"center", gap:8, padding:"0 10px", flexShrink:0 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6, fontWeight:700, fontSize:13, color:"#fff" }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <rect x="2" y="2" width="12" height="12" rx="2" stroke="#63b8ff" strokeWidth="1.5"/>
-            <rect x="5" y="5" width="6" height="6" rx="1" fill="#63b8ff"/>
-          </svg>
-          CAD·PRO <span style={{ fontSize:8, color:"rgba(255,255,255,0.4)", letterSpacing:2 }}>2.0</span>
+  // Build solid cache
+  const solids = useMemo(()=>{
+    const result = [];
+    state.features.forEach(f=>{
+      if(f.type==="extrude"||f.type==="revolve") {
+        const solid = buildSolid(f, state.features);
+        if(solid) result.push({featureId:f.id, solid, feature:f});
+      }
+    });
+    return result;
+  },[state.features]);
+
+  // ─── RENDER ──────────────────────────────────────────────────────────────────
+  const draw = useCallback(()=>{
+    const cvs=cvsRef.current; if(!cvs)return;
+    const ctx=cvs.getContext("2d");
+    const W=cvs.width, H=cvs.height;
+    ctx.fillStyle=C.vpBg; ctx.fillRect(0,0,W,H);
+
+    const cam=camRef.current;
+    const mode=stateRef.current.mode;
+
+    // Build view matrix from camera
+    const mRot = mat4mul(mat4rotX(-cam.elevation), mat4rotY(-cam.azimuth));
+    const viewDist = cam.dist;
+
+    // Project 3D → 2D
+    const proj3d = (p) => {
+      const r = transformPoint(mRot, p);
+      // Simple perspective
+      const fov = 50 * Math.PI/180;
+      const f = 1/Math.tan(fov/2);
+      const z = r.z + viewDist;
+      if(z<1) return null;
+      const scale = f * viewDist / z;
+      return {
+        sx: W/2 + (r.x + cam.px)*scale*cam.zoom*(W/600),
+        sy: H/2 - (r.y + cam.py)*scale*cam.zoom*(W/600),
+        z: r.z,
+        depth: z
+      };
+    };
+
+    // ─── GRID ─────────────────────────────────────────────────────────────────
+    const drawGrid = () => {
+      const size=200, step=10;
+      ctx.strokeStyle=C.grid; ctx.lineWidth=0.5;
+      for(let x=-size;x<=size;x+=step) {
+        const a=proj3d(v3(x,0,-size)), b=proj3d(v3(x,0,size));
+        if(!a||!b)continue;
+        ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke();
+      }
+      for(let z=-size;z<=size;z+=step) {
+        const a=proj3d(v3(-size,0,z)), b=proj3d(v3(size,0,z));
+        if(!a||!b)continue;
+        ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke();
+      }
+      // Axis lines
+      [
+        [v3(-size,0,0),v3(size,0,0), C.red,    "X"],
+        [v3(0,-size,0),v3(0,size,0), C.green,  "Y"],
+        [v3(0,0,-size),v3(0,0,size), C.blue,   "Z"],
+      ].forEach(([a,b,col,lbl])=>{
+        const pa=proj3d(a), pb=proj3d(b); if(!pa||!pb)return;
+        ctx.strokeStyle=col+"80"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(pa.sx,pa.sy); ctx.lineTo(pb.sx,pb.sy); ctx.stroke();
+        // Label at positive end
+        const pend=proj3d(v3(b.x?size*0.7:0, b.y?size*0.7:0, b.z?size*0.7:0));
+        if(pend){ctx.fillStyle=col; ctx.font="bold 11px system-ui"; ctx.fillText(lbl,pend.sx+4,pend.sy-3);}
+      });
+    };
+
+    if(mode==="3d") {
+      drawGrid();
+
+      // ─── DRAW SOLIDS ────────────────────────────────────────────────────────
+      // Sort faces by depth for painter's algorithm
+      const allFaces = [];
+      solids.forEach(({solid,featureId,feature})=>{
+        if(!solid) return;
+        solid.faces.forEach(face => {
+          const faceVerts = face.verts.map(vi=>solid.verts[vi]);
+          const worldCenter = faceVerts.reduce((acc,v)=>vadd(acc,v),v3(0,0,0));
+          const avgWorldCenter = vscale(worldCenter, 1/faceVerts.length);
+          const camVerts = faceVerts.map(v => transformPoint(mRot, v));
+          const center = camVerts.reduce((acc,v)=>vadd(acc,v),v3(0,0,0));
+          const pc = proj3d(avgWorldCenter);
+          if(!pc) return;
+          // Backface culling must be done in camera space because the scene is rotated into view.
+          const camNormal = transformNormal(mRot, face.normal);
+          if(camNormal.z >= 0.02) return;
+          allFaces.push({face, faceVerts, featureId, solid, depth:pc.depth, normal:camNormal});
+        });
+      });
+      allFaces.sort((a,b)=>b.depth-a.depth);
+
+      const sel = stateRef.current.selection;
+      const hovFace = stateRef.current.hoveredFace;
+      const hovEdge = stateRef.current.hoveredEdge;
+
+      allFaces.forEach(({face, faceVerts, featureId, depth, normal})=>{
+        const pts2d = faceVerts.map(v=>proj3d(v)).filter(Boolean);
+        if(pts2d.length<3) return;
+
+        // Lighting
+        const lightDir = vnorm(v3(-0.5,0.8,-0.6));
+        const diff = Math.max(0, vdot(normal, lightDir));
+        const ambient = 0.35;
+        const brightness = ambient + diff*(1-ambient);
+
+        const isSelected = sel.type==="face"&&sel.ids.includes(face.id);
+        const isHovered  = hovFace === `${featureId}_${face.id}`;
+
+        // Fill
+        let fillAlpha = brightness;
+        if(isSelected) fillAlpha = Math.min(1, fillAlpha+0.3);
+        if(isHovered)  fillAlpha = Math.min(1, fillAlpha+0.15);
+
+        ctx.beginPath();
+        ctx.moveTo(pts2d[0].sx,pts2d[0].sy);
+        pts2d.slice(1).forEach(p=>ctx.lineTo(p.sx,p.sy));
+        ctx.closePath();
+
+        if(isSelected) ctx.fillStyle=`rgba(70,216,159,${0.2+fillAlpha*0.3})`;
+        else if(isHovered) ctx.fillStyle=`rgba(99,184,255,${0.15+fillAlpha*0.2})`;
+        else ctx.fillStyle=`rgba(${dark?`${Math.round(30+fillAlpha*50)},${Math.round(60+fillAlpha*80)},${Math.round(90+fillAlpha*110)}`:`${Math.round(180+fillAlpha*60)},${Math.round(200+fillAlpha*40)},${Math.round(220+fillAlpha*30)}`},${0.85+fillAlpha*0.1})`;
+        ctx.fill();
+
+        // Edge stroke
+        ctx.strokeStyle = isSelected ? C.selEdge : `rgba(${dark?"99,184,255":"23,105,209"},0.4)`;
+        ctx.lineWidth = isSelected ? 1.5 : 0.7;
+        ctx.stroke();
+      });
+
+      // Draw edges for selected solid
+      solids.forEach(({solid,featureId})=>{
+        if(!solid) return;
+        const isActiveSolid = stateRef.current.activeFeatureId===featureId;
+        solid.edges.forEach(edge=>{
+          const pa=proj3d(solid.verts[edge.a]);
+          const pb=proj3d(solid.verts[edge.b]);
+          if(!pa||!pb) return;
+          const isHovEdge = hovEdge===`${featureId}_${edge.id}`;
+          const isSelEdge = sel.type==="edge"&&sel.ids.includes(`${featureId}_${edge.id}`);
+          if(isHovEdge||isSelEdge) {
+            ctx.strokeStyle = isSelEdge ? C.selEdge : C.blue;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(pa.sx,pa.sy); ctx.lineTo(pb.sx,pb.sy); ctx.stroke();
+          }
+        });
+      });
+
+      // ─── SKETCH OVERLAY (3D) ────────────────────────────────────────────────
+      state.features.filter(f=>f.type==="sketch").forEach(sk=>{
+        const isActive = sk.id===state.activeSketchId;
+        sk.entities.forEach(e=>{
+          const alpha = isActive?1:0.4;
+          if(e.type==="line") {
+            const pa=proj3d(sk.planeId==="top"?v3(e.x1,30,e.y1):v3(e.x1,0,e.y1)); // simplify
+            const pb=proj3d(sk.planeId==="top"?v3(e.x2,30,e.y2):v3(e.x2,0,e.y2));
+            if(!pa||!pb) return;
+            ctx.strokeStyle=C.sketchLine+`${Math.round(alpha*255).toString(16).padStart(2,"0")}`;
+            ctx.lineWidth=isActive?1.5:1;
+            ctx.setLineDash(isActive?[]:[4,3]);
+            ctx.beginPath(); ctx.moveTo(pa.sx,pa.sy); ctx.lineTo(pb.sx,pb.sy); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+          if(e.type==="circle") {
+            const pc=proj3d(sk.planeId==="top"?v3(e.cx,30,e.cy):v3(e.cx,0,e.cy));
+            const pr=proj3d(sk.planeId==="top"?v3(e.cx+e.r,30,e.cy):v3(e.cx+e.r,0,e.cy));
+            if(!pc||!pr) return;
+            const screenR=Math.sqrt((pr.sx-pc.sx)**2+(pr.sy-pc.sy)**2);
+            ctx.strokeStyle=C.sketchArc; ctx.lineWidth=isActive?1.5:1;
+            ctx.beginPath(); ctx.arc(pc.sx,pc.sy,screenR,0,Math.PI*2); ctx.stroke();
+          }
+        });
+
+        // Dimensions
+        if(isActive) {
+          sk.constraints.forEach(c=>{
+            if(!c.label) return;
+            const isEditing = stateRef.current.editingDimId===c.id;
+            if(c.type==="horizontal_dim") {
+              const midPt = proj3d(v3(c.x||0, sk.planeId==="top"?30:0, (c.y||0)-15));
+              if(!midPt) return;
+              ctx.fillStyle=isEditing?C.amber:C.sketchDim;
+              ctx.font=`bold 10px JetBrains Mono, monospace`;
+              ctx.fillText(c.label+"mm", midPt.sx, midPt.sy);
+            }
+            if(c.type==="vertical_dim") {
+              const midPt = proj3d(v3((c.x||0)+20, sk.planeId==="top"?30:0, c.y||0));
+              if(!midPt) return;
+              ctx.fillStyle=isEditing?C.amber:C.sketchDim;
+              ctx.font=`bold 10px JetBrains Mono, monospace`;
+              ctx.fillText(c.label+"mm", midPt.sx, midPt.sy);
+            }
+          });
+        }
+      });
+
+    } else if(mode==="sketch") {
+      // ─── SKETCH 2D MODE ──────────────────────────────────────────────────────
+      const sk = state.features.find(f=>f.id===state.activeSketchId);
+      const scale = camRef.current.dist/2 * camRef.current.zoom;
+      const ox=W/2+cam.px*scale, oy=H/2-cam.py*scale;
+      const s2s=(x,y)=>({sx:ox+x*scale/80, sy:oy-y*scale/80});
+      const toWorld=(sx,sy)=>({x:(sx-ox)*80/scale, y:-(sy-oy)*80/scale});
+
+      // Grid
+      const gstep=10;
+      ctx.strokeStyle=C.grid; ctx.lineWidth=0.5;
+      for(let x=-200;x<=200;x+=gstep){const{sx,sy}=s2s(x,0);ctx.beginPath();ctx.moveTo(sx,-H);ctx.lineTo(sx,2*H);ctx.stroke();}
+      for(let y=-200;y<=200;y+=gstep){const{sx,sy}=s2s(0,y);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();}
+      // Major grid
+      ctx.strokeStyle=C.axBd; ctx.lineWidth=1;
+      for(let x=-200;x<=200;x+=50){const{sx}=s2s(x,0);ctx.beginPath();ctx.moveTo(sx,-H);ctx.lineTo(sx,2*H);ctx.stroke();}
+      for(let y=-200;y<=200;y+=50){const{sy}=s2s(0,y);ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();}
+      // Origin
+      const O=s2s(0,0);
+      ctx.strokeStyle=C.blue+"60"; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(O.sx-15,O.sy); ctx.lineTo(O.sx+15,O.sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(O.sx,O.sy-15); ctx.lineTo(O.sx,O.sy+15); ctx.stroke();
+      ctx.fillStyle=C.blue; ctx.font="bold 9px system-ui";
+      ctx.fillText("X",O.sx+18,O.sy+4); ctx.fillText("Y",O.sx+4,O.sy-18);
+
+      if(sk) {
+        const hov=stateRef.current.hoveredEntity;
+        const selIds=stateRef.current.selection.ids;
+
+        sk.entities.forEach(e=>{
+          const isHov=hov===e.id;
+          const isSel=selIds.includes(e.id);
+          const lw=isHov||isSel?2.5:1.5;
+
+          if(e.type==="line") {
+            const a=s2s(e.x1,e.y1), b=s2s(e.x2,e.y2);
+            ctx.strokeStyle=isSel?C.selEdge:isHov?C.blue:C.sketchLine;
+            ctx.lineWidth=lw;
+            ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke();
+            // Endpoints
+            [a,b].forEach(p=>{
+              ctx.fillStyle=isSel?C.selEdge:C.sketchLine;
+              ctx.beginPath(); ctx.arc(p.sx,p.sy,3,0,Math.PI*2); ctx.fill();
+            });
+          }
+          if(e.type==="arc") {
+            const c=s2s(e.cx,e.cy);
+            const rs=s2s(e.cx+e.r,e.cy);
+            const screenR=Math.abs(rs.sx-c.sx);
+            ctx.strokeStyle=isSel?C.selEdge:isHov?C.blue:C.sketchArc;
+            ctx.lineWidth=lw;
+            ctx.beginPath(); ctx.arc(c.sx,c.sy,screenR,e.a0,e.a1,e.ccw); ctx.stroke();
+          }
+          if(e.type==="circle") {
+            const c=s2s(e.cx,e.cy);
+            const rs=s2s(e.cx+e.r,e.cy);
+            const screenR=Math.abs(rs.sx-c.sx);
+            ctx.strokeStyle=isSel?C.selEdge:isHov?C.blue:C.sketchArc;
+            ctx.lineWidth=lw;
+            ctx.beginPath(); ctx.arc(c.sx,c.sy,screenR,0,Math.PI*2); ctx.stroke();
+            ctx.fillStyle=C.sketchArc+"20"; ctx.fill();
+            ctx.fillStyle=C.sketchArc;
+            ctx.beginPath(); ctx.arc(c.sx,c.sy,3,0,Math.PI*2); ctx.fill();
+          }
+          if(e.type==="point") {
+            const p=s2s(e.x,e.y);
+            ctx.fillStyle=isSel?C.selEdge:C.sketchLine;
+            ctx.beginPath(); ctx.arc(p.sx,p.sy,4,0,Math.PI*2); ctx.fill();
+          }
+        });
+
+        // Dimensions
+        sk.constraints.forEach(c=>{
+          if(!c.label) return;
+          const isEditing=stateRef.current.editingDimId===c.id;
+
+          if(c.type==="horizontal_dim") {
+            // Find the line entity
+            const ent=sk.entities.find(e=>e.id.toString()===c.ptA?.split("_")[0]);
+            if(!ent||ent.type!=="line") return;
+            const a=s2s(ent.x1,ent.y1), b=s2s(ent.x2,ent.y2);
+            const yOff=-20;
+            ctx.strokeStyle=isEditing?C.amber:C.sketchDim; ctx.lineWidth=1;
+            ctx.setLineDash([3,2]);
+            ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(a.sx,a.sy+yOff); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(b.sx,b.sy); ctx.lineTo(b.sx,b.sy+yOff); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(a.sx,a.sy+yOff); ctx.lineTo(b.sx,b.sy+yOff);
+            ctx.strokeStyle=isEditing?C.amber:C.sketchDim; ctx.lineWidth=1.5;
+            ctx.stroke();
+            const mx=(a.sx+b.sx)/2, my=(a.sy+b.sy)/2+yOff-4;
+            ctx.fillStyle=isEditing?C.amber:C.sketchDim;
+            ctx.font=`bold 10px JetBrains Mono, monospace`;
+            ctx.textAlign="center"; ctx.fillText(c.label+"mm",mx,my); ctx.textAlign="left";
+            // Click hotspot (invisible rect for interaction)
+            if(isEditing) {
+              ctx.strokeStyle=C.amber; ctx.lineWidth=1.5;
+              ctx.strokeRect(mx-22,my-11,44,14);
+            }
+          }
+          if(c.type==="vertical_dim") {
+            const ent=sk.entities.find(e=>e.id.toString()===c.ptA?.split("_")[0]);
+            if(!ent||ent.type!=="line") return;
+            const a=s2s(ent.x1,ent.y1), b=s2s(ent.x2,ent.y2);
+            const xOff=20;
+            ctx.strokeStyle=isEditing?C.amber:C.sketchDim; ctx.lineWidth=1;
+            ctx.setLineDash([3,2]);
+            ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(a.sx+xOff,a.sy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(b.sx,b.sy); ctx.lineTo(b.sx+xOff,b.sy); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(a.sx+xOff,a.sy); ctx.lineTo(b.sx+xOff,b.sy);
+            ctx.strokeStyle=isEditing?C.amber:C.sketchDim; ctx.lineWidth=1.5;
+            ctx.stroke();
+            const mx=a.sx+xOff+16, my=(a.sy+b.sy)/2;
+            ctx.fillStyle=isEditing?C.amber:C.sketchDim;
+            ctx.font=`bold 10px JetBrains Mono, monospace`;
+            ctx.fillText(c.label+"mm",mx,my);
+          }
+          if(c.type==="radius") {
+            const ent=sk.entities.find(e=>e.id===c.entId);
+            if(!ent||(ent.type!=="circle"&&ent.type!=="arc")) return;
+            const c2=s2s(ent.cx,ent.cy);
+            const re=s2s(ent.cx+ent.r,ent.cy);
+            ctx.strokeStyle=C.sketchDim; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(c2.sx,c2.sy); ctx.lineTo(re.sx,re.sy); ctx.stroke();
+            ctx.fillStyle=C.sketchDim; ctx.font="bold 10px JetBrains Mono, monospace";
+            ctx.fillText("R"+c.label,re.sx+4,re.sy);
+          }
+        });
+
+        // In-progress draw
+        if(state.sketchDrawing&&state.sketchPts.length>0) {
+          const cur=mousePos; // screen coords
+          ctx.strokeStyle=C.blue; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+          if(state.sketchTool==="line"||state.sketchTool==="rect") {
+            const sp=s2s(state.sketchPts[0].x, state.sketchPts[0].y);
+            ctx.beginPath(); ctx.moveTo(sp.sx,sp.sy); ctx.lineTo(cur.x,cur.y); ctx.stroke();
+          }
+          if(state.sketchTool==="circle") {
+            const sp=s2s(state.sketchPts[0].x, state.sketchPts[0].y);
+            const r=Math.sqrt((cur.x-sp.sx)**2+(cur.y-sp.sy)**2);
+            ctx.beginPath(); ctx.arc(sp.sx,sp.sy,r,0,Math.PI*2); ctx.stroke();
+          }
+          ctx.setLineDash([]);
+        }
+
+        // Snap indicator
+        if(snapPt) {
+          const sp=s2s(snapPt.x,snapPt.y);
+          ctx.strokeStyle=C.blue; ctx.lineWidth=1.5;
+          ctx.strokeRect(sp.sx-5,sp.sy-5,10,10);
+          ctx.fillStyle=C.blue+"40"; ctx.fillRect(sp.sx-4,sp.sy-4,8,8);
+        }
+      }
+    }
+
+    // Cursor pos indicator
+    if(state.mode==="sketch") {
+      ctx.fillStyle=C.txt3; ctx.font="9px JetBrains Mono, monospace";
+      ctx.fillText(`X:${mousePos.wx?.toFixed(2)||"0.00"} Y:${mousePos.wy?.toFixed(2)||"0.00"}`, 10, H-10);
+    }
+
+  },[dark,state,solids,mousePos,snapPt]);
+
+  // ─── RESIZE ──────────────────────────────────────────────────────────────────
+  useEffect(()=>{
+    const cvs=cvsRef.current,vp=vpRef.current; if(!cvs||!vp)return;
+    const resize = () => {
+      const rect = vp.getBoundingClientRect();
+      const nextW = Math.max(1, Math.floor(rect.width || vp.clientWidth || 1));
+      const nextH = Math.max(1, Math.floor(rect.height || vp.clientHeight || 1));
+      if (cvs.width !== nextW) cvs.width = nextW;
+      if (cvs.height !== nextH) cvs.height = nextH;
+      draw();
+    };
+    const raf = requestAnimationFrame(resize);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(resize) : null;
+    ro?.observe(vp);
+    resize();
+    window.addEventListener("resize", resize);
+    return()=>{
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      window.removeEventListener("resize", resize);
+    };
+  },[draw]);
+
+  useEffect(()=>{draw();},[draw,state,camState,mousePos,snapPt]);
+
+  // ─── WHEEL ───────────────────────────────────────────────────────────────────
+  useEffect(()=>{
+    const cvs=cvsRef.current; if(!cvs)return;
+    const h=e=>{
+      e.preventDefault();
+      const delta=e.deltaY>0?0.88:1.14;
+      camRef.current = {...camRef.current, zoom:Math.max(0.05,Math.min(20,camRef.current.zoom*delta))};
+      setCamState({...camRef.current});
+      draw();
+    };
+    cvs.addEventListener("wheel",h,{passive:false});
+    return()=>cvs.removeEventListener("wheel",h);
+  },[draw]);
+
+  // ─── SKETCH WORLD COORDS ─────────────────────────────────────────────────────
+  const screenToSketch = useCallback((sx,sy)=>{
+    const cvs=cvsRef.current; if(!cvs)return{x:0,y:0};
+    const W=cvs.width,H=cvs.height;
+    const cam=camRef.current;
+    const scale=cam.dist/2*cam.zoom;
+    const ox=W/2+cam.px*scale, oy=H/2-cam.py*scale;
+    return{x:(sx-ox)*80/scale, y:-(sy-oy)*80/scale};
+  },[]);
+
+  // ─── SNAP ────────────────────────────────────────────────────────────────────
+  const computeSnap = useCallback((wx,wy)=>{
+    const s=stateRef.current;
+    const sk=s.features.find(f=>f.id===s.activeSketchId);
+    let best=null, bestDist=10; // 10 world units snap threshold
+    // Grid snap (10mm)
+    const gx=Math.round(wx/10)*10, gy=Math.round(wy/10)*10;
+    const gd=Math.sqrt((wx-gx)**2+(wy-gy)**2);
+    if(gd<bestDist){bestDist=gd;best={x:gx,y:gy,type:"grid"};}
+
+    if(sk&&s.snapMode.points) {
+      // Endpoint snap
+      sk.entities.forEach(e=>{
+        const check=(px,py)=>{const d=Math.sqrt((wx-px)**2+(wy-py)**2);if(d<bestDist){bestDist=d;best={x:px,y:py,type:"endpoint"};}};
+        if(e.type==="line"){check(e.x1,e.y1);check(e.x2,e.y2);}
+        if(e.type==="circle"||e.type==="arc")check(e.cx,e.cy);
+      });
+    }
+    if(sk&&s.snapMode.midpoint) {
+      sk.entities.forEach(e=>{
+        if(e.type==="line"){const mx=(e.x1+e.x2)/2,my=(e.y1+e.y2)/2;const d=Math.sqrt((wx-mx)**2+(wy-my)**2);if(d<bestDist){bestDist=d;best={x:mx,y:my,type:"midpoint"};}}
+      });
+    }
+    return best||{x:wx,y:wy,type:"free"};
+  },[]);
+
+  // ─── MOUSE ───────────────────────────────────────────────────────────────────
+  const onMouseMove = useCallback((e)=>{
+    const d=dragRef.current;
+    const rect=cvsRef.current?.getBoundingClientRect();
+    const mx=rect?e.clientX-rect.left:0, my=rect?e.clientY-rect.top:0;
+
+    if(d.on) {
+      const dx=e.clientX-d.lx, dy=e.clientY-d.ly;
+      if(stateRef.current.mode==="3d") {
+        if(d.btn===1){
+          camRef.current.azimuth  -= dx*0.008;
+          camRef.current.elevation = Math.max(-1.5,Math.min(1.5,camRef.current.elevation+dy*0.008));
+        } else if(d.btn===2||d.btn===4) {
+          const sc=camRef.current.dist/2*camRef.current.zoom;
+          camRef.current.px += dx/(sc/80);
+          camRef.current.py -= dy/(sc/80);
+        }
+      } else {
+        // Pan in sketch mode
+        if(d.btn===2||d.btn===4) {
+          const sc=camRef.current.dist/2*camRef.current.zoom;
+          camRef.current.px += dx/(sc/80);
+          camRef.current.py -= dy/(sc/80);
+        }
+      }
+      dragRef.current.lx=e.clientX; dragRef.current.ly=e.clientY;
+      setCamState({...camRef.current});
+      draw();
+    }
+
+    if(stateRef.current.mode==="sketch") {
+      const wp=screenToSketch(mx,my);
+      const sn=computeSnap(wp.x,wp.y);
+      setSnapPt(sn);
+      setMousePos({x:mx,y:my,wx:sn.x,wy:sn.y});
+
+      // Hover detection
+      const s=stateRef.current;
+      const sk=s.features.find(f=>f.id===s.activeSketchId);
+      if(sk) {
+        let hovId=null;
+        sk.entities.forEach(e=>{
+          if(e.type==="line") {
+            // Distance from point to line segment
+            const dx=e.x2-e.x1,dy=e.y2-e.y1;
+            const t=Math.max(0,Math.min(1,((sn.x-e.x1)*dx+(sn.y-e.y1)*dy)/(dx*dx+dy*dy)));
+            const d=Math.sqrt((sn.x-(e.x1+t*dx))**2+(sn.y-(e.y1+t*dy))**2);
+            if(d<3) hovId=e.id;
+          }
+          if(e.type==="circle"||e.type==="arc") {
+            const d=Math.abs(Math.sqrt((sn.x-e.cx)**2+(sn.y-e.cy)**2)-e.r);
+            if(d<3) hovId=e.id;
+          }
+        });
+        setState(p=>({...p,hoveredEntity:hovId}));
+      }
+    } else {
+      setMousePos({x:mx,y:my,wx:0,wy:0});
+      // TODO: 3D hover detection for faces/edges
+    }
+  },[screenToSketch,computeSnap,draw]);
+
+  const onMouseDown = useCallback((e)=>{
+    dragRef.current={on:true,btn:e.buttons,lx:e.clientX,ly:e.clientY};
+
+    if(stateRef.current.mode==="sketch"&&e.button===0) {
+      const pt=snapPt||{x:0,y:0};
+      const s=stateRef.current;
+      const tool=s.sketchTool;
+
+      if(tool==="line") {
+        if(!s.sketchDrawing) {
+          setState(p=>({...p,sketchDrawing:true,sketchPts:[{x:pt.x,y:pt.y}]}));
+        } else {
+          // Finish line
+          const p0=s.sketchPts[0];
+          const newLine={id:newId(),type:"line",x1:p0.x,y1:p0.y,x2:pt.x,y2:pt.y};
+          setState(p=>{
+            const sk=p.features.find(f=>f.id===p.activeSketchId);
+            if(!sk) return p;
+            const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:[...f.entities,newLine]}:f);
+            return{...p,features:updFeatures,sketchDrawing:false,sketchPts:[{x:pt.x,y:pt.y}],sketchDrawing:true};
+          });
+        }
+      } else if(tool==="circle") {
+        if(!s.sketchDrawing) {
+          setState(p=>({...p,sketchDrawing:true,sketchPts:[{x:pt.x,y:pt.y}]}));
+        } else {
+          const p0=s.sketchPts[0];
+          const r=Math.sqrt((pt.x-p0.x)**2+(pt.y-p0.y)**2);
+          const newCircle={id:newId(),type:"circle",cx:p0.x,cy:p0.y,r:Math.max(1,r)};
+          setState(p=>{
+            const sk=p.features.find(f=>f.id===p.activeSketchId);
+            if(!sk) return p;
+            const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:[...f.entities,newCircle]}:f);
+            return{...p,features:updFeatures,sketchDrawing:false,sketchPts:[],sketchTool:"select"};
+          });
+        }
+      } else if(tool==="rect") {
+        if(!s.sketchDrawing) {
+          setState(p=>({...p,sketchDrawing:true,sketchPts:[{x:pt.x,y:pt.y}]}));
+        } else {
+          const p0=s.sketchPts[0];
+          const x1=p0.x,y1=p0.y,x2=pt.x,y2=pt.y;
+          const lines=[
+            {id:newId(),type:"line",x1,y1,x2,y2:y1},
+            {id:newId(),type:"line",x1:x2,y1,x2,y2},
+            {id:newId(),type:"line",x1:x2,y1:y2,x2:x1,y2},
+            {id:newId(),type:"line",x1,y1:y2,x2,y2:y1},
+          ];
+          setState(p=>{
+            const sk=p.features.find(f=>f.id===p.activeSketchId);
+            if(!sk) return p;
+            const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:[...f.entities,...lines]}:f);
+            return{...p,features:updFeatures,sketchDrawing:false,sketchPts:[],sketchTool:"select"};
+          });
+        }
+      } else if(tool==="select") {
+        // Select/deselect entity
+        const sk=s.features.find(f=>f.id===s.activeSketchId);
+        if(sk) {
+          let clickedId=null;
+          sk.entities.forEach(e=>{
+            if(e.type==="line"){const dx=e.x2-e.x1,dy=e.y2-e.y1;const t=Math.max(0,Math.min(1,((pt.x-e.x1)*dx+(pt.y-e.y1)*dy)/(dx*dx+dy*dy)));const d=Math.sqrt((pt.x-(e.x1+t*dx))**2+(pt.y-(e.y1+t*dy))**2);if(d<3)clickedId=e.id;}
+            if(e.type==="circle"||e.type==="arc"){const d=Math.abs(Math.sqrt((pt.x-e.cx)**2+(pt.y-e.cy)**2)-e.r);if(d<3)clickedId=e.id;}
+          });
+          setState(p=>({...p,selection:clickedId?{type:"sketch",ids:[clickedId]}:{type:null,ids:[]}}));
+        }
+      } else if(tool==="dimension") {
+        // Click on entity to add dimension
+        const sk=s.features.find(f=>f.id===s.activeSketchId);
+        if(sk) {
+          let clickedEnt=null;
+          sk.entities.forEach(e=>{
+            if(e.type==="line"){const dx=e.x2-e.x1,dy=e.y2-e.y1;const t=Math.max(0,Math.min(1,((pt.x-e.x1)*dx+(pt.y-e.y1)*dy)/(dx*dx+dy*dy)));const d=Math.sqrt((pt.x-(e.x1+t*dx))**2+(pt.y-(e.y1+t*dy))**2);if(d<3)clickedEnt=e;}
+            if(e.type==="circle"||e.type==="arc"){const d=Math.abs(Math.sqrt((pt.x-e.cx)**2+(pt.y-e.cy)**2)-e.r);if(d<3)clickedEnt=e;}
+          });
+          if(clickedEnt) {
+            const rect=cvsRef.current?.getBoundingClientRect();
+            const sx=rect?e.clientX-rect.left:200, sy=rect?e.clientY-rect.top:200;
+            let dimType="", ptA="",ptB="",initVal="";
+            if(clickedEnt.type==="line") {
+              const dxl=Math.abs(clickedEnt.x2-clickedEnt.x1),dyl=Math.abs(clickedEnt.y2-clickedEnt.y1);
+              if(dxl>dyl){dimType="horizontal_dim";ptA=`${clickedEnt.id}_a`;ptB=`${clickedEnt.id}_b`;initVal=dxl.toFixed(1);}
+              else{dimType="vertical_dim";ptA=`${clickedEnt.id}_a`;ptB=`${clickedEnt.id}_b`;initVal=dyl.toFixed(1);}
+            }
+            if(clickedEnt.type==="circle"){dimType="radius";initVal=clickedEnt.r.toFixed(1);}
+            if(dimType) {
+              setDimPopup({sx,sy,dimType,entId:clickedEnt.id,ptA,ptB,initVal});
+              setDimVal(initVal);
+            }
+          }
+        }
+      }
+    }
+  },[snapPt]);
+
+  const onMouseUp = useCallback(()=>{ dragRef.current.on=false; },[]);
+  const onContextMenu = useCallback((e)=>{
+    e.preventDefault();
+    setState(p=>({...p,sketchDrawing:false,sketchPts:[]}));
+  },[]);
+
+  // Confirm dimension
+  const confirmDim = useCallback(()=>{
+    if(!dimPopup) return;
+    const val=parseFloat(dimVal);
+    if(isNaN(val)||val<=0) return;
+    const cid=newId();
+    setState(p=>{
+      const sk=p.features.find(f=>f.id===p.activeSketchId);
+      if(!sk) return p;
+      let newConstraint;
+      if(dimPopup.dimType==="horizontal_dim"||dimPopup.dimType==="vertical_dim") {
+        newConstraint={id:cid,type:dimPopup.dimType,ptA:dimPopup.ptA,ptB:dimPopup.ptB,val,label:val.toFixed(1),x:0,y:0};
+        // Update entity
+        const ent=sk.entities.find(e=>e.id===dimPopup.entId);
+        let updEnt=ent?{...ent}:null;
+        if(ent&&dimPopup.dimType==="horizontal_dim"){
+          const sign=ent.x2>=ent.x1?1:-1;
+          updEnt={...ent,x2:ent.x1+sign*val};
+        }
+        if(ent&&dimPopup.dimType==="vertical_dim"){
+          const sign=ent.y2>=ent.y1?1:-1;
+          updEnt={...ent,y2:ent.y1+sign*val};
+        }
+        const updFeatures=p.features.map(f=>f.id===sk.id?{
+          ...f,
+          entities:updEnt?f.entities.map(e=>e.id===updEnt.id?updEnt:e):f.entities,
+          constraints:[...f.constraints,newConstraint]
+        }:f);
+        return{...p,features:updFeatures,editingDimId:null};
+      }
+      if(dimPopup.dimType==="radius") {
+        const ent=sk.entities.find(e=>e.id===dimPopup.entId);
+        if(ent) {
+          const updEnt={...ent,r:val};
+          newConstraint={id:cid,type:"radius",entId:dimPopup.entId,label:val.toFixed(1)};
+          const updFeatures=p.features.map(f=>f.id===sk.id?{
+            ...f,
+            entities:f.entities.map(e=>e.id===updEnt.id?updEnt:e),
+            constraints:[...f.constraints,newConstraint]
+          }:f);
+          return{...p,features:updFeatures};
+        }
+      }
+      return p;
+    });
+    setDimPopup(null);
+  },[dimPopup,dimVal]);
+
+  // ─── ENTER SKETCH ────────────────────────────────────────────────────────────
+  const enterSketch = useCallback((sketchId)=>{
+    setState(p=>({...p,mode:"sketch",activeSketchId:sketchId,sketchTool:"select",sketchDrawing:false,sketchPts:[]}));
+  },[]);
+  const exitSketch = useCallback(()=>{
+    setState(p=>({...p,mode:"3d",activeSketchId:null,sketchTool:"select",sketchDrawing:false,sketchPts:[]}));
+  },[]);
+
+  // ─── ADD FEATURE ─────────────────────────────────────────────────────────────
+  const addFeature = useCallback((type)=>{
+    const id=newId();
+    setState(p=>{
+      let newFeat;
+      if(type==="sketch") {
+        newFeat={id,type:"sketch",name:`Sketch${p.features.filter(f=>f.type==="sketch").length+1}`,planeId:"XY",entities:[],constraints:[],solved:false};
+      } else if(type==="extrude") {
+        const sketches=p.features.filter(f=>f.type==="sketch");
+        if(!sketches.length) return p;
+        const lastSketch=sketches[sketches.length-1];
+        newFeat={id,type:"extrude",name:`Extrude${p.features.filter(f=>f.type==="extrude").length+1}`,sketchId:lastSketch.id,depth:extrudeDepth,dir:1};
+      } else if(type==="revolve") {
+        const sketches=p.features.filter(f=>f.type==="sketch");
+        if(!sketches.length) return p;
+        const lastSketch=sketches[sketches.length-1];
+        newFeat={id,type:"revolve",name:`Revolve${p.features.filter(f=>f.type==="revolve").length+1}`,sketchId:lastSketch.id,angle:Math.PI*2,segs:32};
+      } else if(type==="fillet") {
+        const selEdges=p.selection.type==="edge"?p.selection.ids:[];
+        newFeat={id,type:"fillet",name:`Fillet${p.features.filter(f=>f.type==="fillet").length+1}`,edgeIds:selEdges,radius:filletRadius};
+      } else if(type==="chamfer") {
+        const selEdges=p.selection.type==="edge"?p.selection.ids:[];
+        newFeat={id,type:"chamfer",name:`Chamfer${p.features.filter(f=>f.type==="chamfer").length+1}`,edgeIds:selEdges,dist:chamferDist};
+      } else if(type==="hole") {
+        newFeat={id,type:"hole",name:`Hole${p.features.filter(f=>f.type==="hole").length+1}`,holeType,dia:holeDia,depth:holeDep,sketchId:null};
+      } else return p;
+      return{...p,features:[...p.features,newFeat],activeFeatureId:id};
+    });
+    if(type==="sketch") {
+      setTimeout(()=>setState(p=>({...p,mode:"sketch",activeSketchId:id,sketchTool:"line"})),0);
+    }
+  },[extrudeDepth,filletRadius,chamferDist,holeType,holeDia,holeDep]);
+
+  // ─── DELETE FEATURE ───────────────────────────────────────────────────────────
+  const deleteFeature = useCallback((id)=>{
+    setState(p=>({...p,features:p.features.filter(f=>f.id!==id),activeFeatureId:null}));
+  },[]);
+
+  const updateFeatureParam = useCallback((fid,key,val)=>{
+    setState(p=>({...p,features:p.features.map(f=>f.id===fid?{...f,[key]:val}:f)}));
+  },[]);
+
+  const deleteSelectedEntity = useCallback(()=>{
+    const s=stateRef.current;
+    if(s.mode!=="sketch"||!s.activeSketchId) return;
+    setState(p=>{
+      const sk=p.features.find(f=>f.id===p.activeSketchId);
+      if(!sk) return p;
+      const selIds=p.selection.ids;
+      const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:f.entities.filter(e=>!selIds.includes(e.id))}:f);
+      return{...p,features:updFeatures,selection:{type:null,ids:[]}};
+    });
+  },[]);
+
+  // ─── KEYBOARD ────────────────────────────────────────────────────────────────
+  useEffect(()=>{
+    const h=e=>{
+      if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+      if(e.code==="Escape"){
+        setState(p=>({...p,sketchDrawing:false,sketchPts:[],sketchTool:"select"}));
+        setDimPopup(null);
+      }
+      if(e.code==="Delete"||e.code==="Backspace") deleteSelectedEntity();
+      if(e.code==="KeyF"&&!e.shiftKey) setState(p=>({...p,sketchTool:"select"}));
+      if(e.code==="KeyL") setState(p=>p.mode==="sketch"?{...p,sketchTool:"line"}:p);
+      if(e.code==="KeyC") setState(p=>p.mode==="sketch"?{...p,sketchTool:"circle"}:p);
+      if(e.code==="KeyR") setState(p=>p.mode==="sketch"?{...p,sketchTool:"rect"}:p);
+      if(e.code==="KeyD") setState(p=>p.mode==="sketch"?{...p,sketchTool:"dimension"}:p);
+    };
+    window.addEventListener("keydown",h);
+    return()=>window.removeEventListener("keydown",h);
+  },[deleteSelectedEntity]);
+
+  // ─── VIEW PRESET ─────────────────────────────────────────────────────────────
+  const setView = useCallback((v)=>{
+    const presets={
+      iso:{azimuth:-0.65,elevation:0.5},
+      front:{azimuth:0,elevation:0},
+      top:{azimuth:0,elevation:Math.PI/2-0.01},
+      right:{azimuth:Math.PI/2,elevation:0},
+      back:{azimuth:Math.PI,elevation:0},
+      left:{azimuth:-Math.PI/2,elevation:0},
+    };
+    const p=presets[v]||presets.iso;
+    camRef.current={...camRef.current,...p,px:0,py:0};
+    setCamState({...camRef.current}); draw();
+  },[draw]);
+
+  // ─── SELECTED FEATURE PROPS ───────────────────────────────────────────────────
+  const activeFeature = state.features.find(f=>f.id===state.activeFeatureId);
+
+  // ─── EXPORT G-CODE ──────────────────────────────────────────────────────────
+  const exportGCode = ()=>{
+    const lines=["(CAD-PRO EXPORT)","G21 G90 G17 G40 G49","T1 M06","G43 H1","S1500 M03","M08",""];
+    let bn=10; const N=()=>`N${bn+=10}`;
+    solids.forEach(({solid,feature})=>{
+      if(!solid) return;
+      lines.push(`(${feature.name})`);
+      lines.push(`${N()} G00 Z5.`);
+      // For extrudes, generate a simple boundary follow
+      if(solid.type==="extrude"&&solid.params?.profile) {
+        const prof=solid.params.profile;
+        lines.push(`${N()} G00 X${prof[0].x.toFixed(3)} Y${prof[0].y.toFixed(3)}`);
+        lines.push(`${N()} G01 Z-${solid.params.depth?.toFixed(3)||"25.000"} F80`);
+        prof.forEach(p=>lines.push(`${N()} G01 X${p.x.toFixed(3)} Y${p.y.toFixed(3)} F200`));
+        lines.push(`${N()} G01 X${prof[0].x.toFixed(3)} Y${prof[0].y.toFixed(3)}`);
+      }
+      lines.push(`${N()} G00 Z50.`);
+    });
+    lines.push("","M09","M05","M30");
+    const blob=new Blob([lines.join("\n")],{type:"text/plain"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="cad_export.nc"; a.click();
+  };
+
+  // ─── RENDER ──────────────────────────────────────────────────────────────────
+  const sketchInProgress = state.mode==="sketch";
+  const sk = state.features.find(f=>f.id===state.activeSketchId);
+
+  return(<>
+    <style>{CSS}</style>
+    <div className="cad">
+
+      {/* TOPBAR */}
+      <div className="topbar">
+        <div className="brand">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke={C.blue2} strokeWidth="1.5"/><rect x="5" y="5" width="6" height="6" rx="1" fill={C.blue2}/></svg>
+          CAD·PRO <span style={{fontSize:8,color:"rgba(255,255,255,0.5)",letterSpacing:2}}>v1</span>
         </div>
-
-        <div style={{ width:1, height:20, background:D.bd, margin:"0 2px" }} />
-
-        {/* Doc type toggle */}
-        {["part","assembly"].map(t => (
-          <button key={t} onClick={() => disp({ type:"SET_DOC_TYPE", docType:t })}
-            style={{ padding:"3px 10px", background: liveState.docType===t ? D.blueBg : "transparent",
-              border:`1px solid ${liveState.docType===t ? D.blue : D.bd}`,
-              color: liveState.docType===t ? D.blue2 : D.txt3,
-              borderRadius:3, fontSize:9, fontWeight:700, cursor:"pointer", textTransform:"uppercase" }}>
-            {t}
-          </button>
-        ))}
-
-        <div style={{ width:1, height:20, background:D.bd, margin:"0 2px" }} />
-
-        {/* Sketch mode indicator / toolbar */}
-        {sketchMode ? (<>
-          <div style={{ background:D.greenBg, border:`1px solid ${D.green}30`, color:D.green2,
-            padding:"2px 9px", borderRadius:3, fontSize:9, fontWeight:700 }}>
-            SKETCH — {activeSk?.name}
-          </div>
-          {[
-            { t:"select", l:"▷ Select" }, { t:"line", l:"⟋ Line" },
-            { t:"circle", l:"○ Circle" }, { t:"rect", l:"□ Rect" },
-          ].map(({ t, l }) => (
-            <button key={t} onClick={() => disp({ type:"SET_SKETCH_TOOL", tool:t })}
-              style={{ padding:"2px 8px", background: liveState.sketchTool===t ? D.blueBg : "transparent",
-                border:`1px solid ${liveState.sketchTool===t ? D.blue : D.bd}`,
-                color: liveState.sketchTool===t ? D.blue2 : D.txt3,
-                borderRadius:3, fontSize:9, fontWeight:700, cursor:"pointer" }}>
-              {l}
-            </button>
-          ))}
-          <Btn onClick={() => disp({ type:"EXIT_SKETCH" })}>✓ Exit Sketch</Btn>
-        </>) : (<>
-          {/* Standard views */}
-          {["iso","front","top","right"].map(v => (
-            <button key={v} onClick={() => _viewFn?.(v)}
-              style={{ padding:"2px 7px", background:"transparent", border:`1px solid ${D.bd}`,
-                color:D.txt3, borderRadius:3, fontSize:9, cursor:"pointer", textTransform:"uppercase" }}>
-              {v}
-            </button>
-          ))}
-        </>)}
-
-        <div style={{ flex:1 }} />
-        <div style={{ fontSize:9, color:D.txt3 }}>
-          {liveState.activePart?.features.length ?? 0} features
+        {sketchInProgress&&<div className="tseg">
+          <span style={{background:C.greenBg,border:`1px solid ${C.green}30`,color:C.green2,padding:"2px 9px",borderRadius:3,fontSize:9,fontWeight:700}}>SKETCH MODE — {sk?.name||""}</span>
+          <button className="btn btn-am" style={{padding:"3px 10px",fontSize:9}} onClick={exitSketch}>✓ Exit Sketch</button>
+        </div>}
+        {!sketchInProgress&&<>
+          <div className="tseg"><span className="tlbl">Mode</span><span className="bdg bdg-bl">3D Model</span></div>
+          <div className="tseg"><span className="tlbl">Features</span><span className="tval" style={{color:C.blue2}}>{state.features.length}</span></div>
+          {state.selection.ids.length>0&&<div className="tseg"><span className="tlbl">Selected</span><span className="bdg bdg-gr">{state.selection.type} × {state.selection.ids.length}</span></div>}
+        </>}
+        <div style={{flex:1}}/>
+        <div className="tseg">
+          <button className="btn btn-am" style={{fontSize:9,padding:"3px 10px"}} onClick={exportGCode}>↓ Export G-Code</button>
         </div>
+        <button onClick={()=>window.history.back()} style={{margin:"0 10px",padding:"4px 12px",background:"transparent",border:`1px solid ${C.bd}`,borderRadius:5,color:C.txt3,fontSize:11,fontWeight:700,cursor:"pointer"}}
+          onMouseEnter={e=>e.currentTarget.style.color=C.red}
+          onMouseLeave={e=>e.currentTarget.style.color=C.txt3}>✕</button>
       </div>
 
       {/* MAIN */}
-      <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
+      <div className="main">
 
-        {/* LEFT PANEL */}
-        <div style={{ width:220, background:D.p1, borderRight:`1px solid ${D.bd}`,
-          display:"flex", flexDirection:"column", flexShrink:0, overflow:"hidden" }}>
-          <div style={{ display:"flex", borderBottom:`1px solid ${D.bd}` }}>
-            {(liveState.docType === "part" ? ["tree"] : ["tree","assembly"]).map(t => (
-              <div key={t} onClick={() => setLeftTab(t)}
-                style={{ flex:1, padding:"6px 0", textAlign:"center", fontSize:9, fontWeight:700,
-                  color: leftTab===t ? D.blue2 : D.txt3, cursor:"pointer",
-                  borderBottom:`2px solid ${leftTab===t ? D.blue : "transparent"}`,
-                  textTransform:"uppercase", letterSpacing:1 }}>
-                {t}
-              </div>
-            ))}
+        {/* LEFT: FEATURE TREE */}
+        <div className="panel">
+          <div className="tabrow">
+            {["tree","sketch"].map(t=><div key={t} className={`tab${leftTab===t?" on":""}`} onClick={()=>setLeftTab(t)}>{t.toUpperCase()}</div>)}
           </div>
-          <div style={{ flex:1, overflow:"hidden" }}>
-            {leftTab === "tree" && <FeatureTreePanel state={liveState} dispatch={disp} />}
-            {leftTab === "assembly" && <AssemblyPanel state={liveState} dispatch={disp} />}
+          <div className="pscroll">
+
+            {leftTab==="tree"&&<>
+              <div className="sec">Feature Tree</div>
+              {state.features.map((f,fi)=>{
+                const meta=FEATURE_COLORS[f.type]||FEATURE_COLORS.sketch;
+                const isActive=f.id===state.activeFeatureId;
+                return(
+                  <div key={f.id} style={{marginBottom:2}}>
+                    <div className={`ftree-item${isActive?" active":""}`}
+                      onClick={()=>setState(p=>({...p,activeFeatureId:f.id}))}
+                      onDoubleClick={()=>f.type==="sketch"?enterSketch(f.id):setEditingFeature(f.id)}>
+                      <div className="ftree-icon" style={{background:meta.bg,color:meta.col}}>{meta.icon}</div>
+                      <span className="ftree-name" style={{color:isActive?C.blue2:C.txt}}>{f.name}</span>
+                      {f.type==="sketch"&&<button style={{background:"none",border:"none",color:C.txt3,cursor:"pointer",fontSize:9,padding:0}} onClick={e=>{e.stopPropagation();enterSketch(f.id);}}>Edit</button>}
+                      <button style={{background:"none",border:"none",color:C.txt3,cursor:"pointer",fontSize:10,padding:0,marginLeft:4}} onClick={e=>{e.stopPropagation();deleteFeature(f.id);}}>✕</button>
+                    </div>
+                    {isActive&&editingFeature===f.id&&(
+                      <div style={{background:C.bg,border:`1px solid ${C.bd}`,borderRadius:4,padding:"8px 10px",margin:"4px 0 4px 22px",fontSize:10}}>
+                        {f.type==="extrude"&&<>
+                          <div className="field"><div className="lbl">Depth</div>
+                            <input type="number" value={f.depth} step={0.1} onChange={e=>updateFeatureParam(f.id,"depth",parseFloat(e.target.value)||1)}/>
+                          </div>
+                          <div className="field"><div className="lbl">Direction</div>
+                            <select value={f.dir} onChange={e=>updateFeatureParam(f.id,"dir",parseInt(e.target.value))}>
+                              <option value={1}>Forward</option><option value={-1}>Reverse</option>
+                            </select>
+                          </div>
+                        </>}
+                        {f.type==="fillet"&&<div className="field"><div className="lbl">Radius</div><input type="number" value={f.radius} step={0.1} onChange={e=>updateFeatureParam(f.id,"radius",parseFloat(e.target.value)||0.5)}/></div>}
+                        {f.type==="chamfer"&&<div className="field"><div className="lbl">Distance</div><input type="number" value={f.dist} step={0.1} onChange={e=>updateFeatureParam(f.id,"dist",parseFloat(e.target.value)||0.5)}/></div>}
+                        {f.type==="hole"&&<>
+                          <div className="field"><div className="lbl">Diameter</div><input type="number" value={f.dia} step={0.1} onChange={e=>updateFeatureParam(f.id,"dia",parseFloat(e.target.value)||1)}/></div>
+                          <div className="field"><div className="lbl">Depth</div><input type="number" value={f.depth} step={0.1} onChange={e=>updateFeatureParam(f.id,"depth",parseFloat(e.target.value)||1)}/></div>
+                        </>}
+                        <button className="btn btn-rd" style={{fontSize:9,padding:"2px 8px"}} onClick={()=>setEditingFeature(null)}>Close</button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              <div className="div"/>
+              <div className="sec">Add Feature</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>
+                {[
+                  {type:"sketch",icon:"✏",label:"New Sketch"},
+                  {type:"extrude",icon:"⬆",label:"Extrude"},
+                  {type:"revolve",icon:"↻",label:"Revolve"},
+                  {type:"fillet",icon:"⌒",label:"Fillet"},
+                  {type:"chamfer",icon:"∠",label:"Chamfer"},
+                  {type:"hole",icon:"○",label:"Hole"},
+                  {type:"shell",icon:"⬜",label:"Shell"},
+                  {type:"pattern",icon:"⊞",label:"Pattern"},
+                ].map(({type,icon,label})=>{
+                  const meta=FEATURE_COLORS[type]||FEATURE_COLORS.sketch;
+                  return(
+                    <button key={type} className="btn" style={{padding:"5px 4px",textAlign:"center",display:"flex",alignItems:"center",gap:5,fontSize:9}}
+                      onClick={()=>addFeature(type)}>
+                      <span style={{color:meta.col}}>{icon}</span>{label}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="div"/>
+              <div className="sec">Extrude Options</div>
+              <div className="field"><div className="lbl">Depth</div>
+                <input type="number" value={extrudeDepth} step={0.1} onChange={e=>setExtrudeDepth(parseFloat(e.target.value)||1)}/>
+              </div>
+              <div className="sec">Fillet / Chamfer</div>
+              <div className="frow">
+                <div className="field"><div className="lbl">Fillet R</div><input type="number" value={filletRadius} step={0.1} onChange={e=>setFilletRadius(parseFloat(e.target.value)||0.5)}/></div>
+                <div className="field"><div className="lbl">Chamfer D</div><input type="number" value={chamferDist} step={0.1} onChange={e=>setChamferDist(parseFloat(e.target.value)||0.5)}/></div>
+              </div>
+              <div className="sec">Hole</div>
+              <div className="frow">
+                <div className="field"><div className="lbl">Ø dia</div><input type="number" value={holeDia} step={0.1} onChange={e=>setHoleDia(parseFloat(e.target.value)||1)}/></div>
+                <div className="field"><div className="lbl">Depth</div><input type="number" value={holeDep} step={0.1} onChange={e=>setHoleDep(parseFloat(e.target.value)||1)}/></div>
+              </div>
+              <select value={holeType} onChange={e=>setHoleType(e.target.value)} style={{marginBottom:6}}>
+                <option value="simple">Simple through</option><option value="blind">Blind</option>
+                <option value="countersink">Countersink</option><option value="counterbore">Counterbore</option>
+              </select>
+            </>}
+
+            {leftTab==="sketch"&&sketchInProgress&&sk&&<>
+              <div className="sec">Sketch Tools</div>
+              {[
+                {tool:"select",label:"Select (F)",key:"F"},
+                {tool:"line",label:"Line (L)",key:"L"},
+                {tool:"arc",label:"Arc (A)",key:"A"},
+                {tool:"circle",label:"Circle (C)",key:"C"},
+                {tool:"rect",label:"Rectangle (R)",key:"R"},
+                {tool:"dimension",label:"Dimension (D)",key:"D"},
+              ].map(({tool,label})=>(
+                <div key={tool} className={`ftree-item${state.sketchTool===tool?" active":""}`}
+                  style={{cursor:"pointer",marginBottom:2}}
+                  onClick={()=>setState(p=>({...p,sketchTool:tool,sketchDrawing:false,sketchPts:[]}))}>
+                  <span style={{fontWeight:600,fontSize:10}}>{label}</span>
+                </div>
+              ))}
+              <div className="div"/>
+              <div className="sec">Constraints</div>
+              {[
+                {type:"horizontal",label:"Horizontal"},
+                {type:"vertical",label:"Vertical"},
+                {type:"coincident",label:"Coincident"},
+                {type:"tangent",label:"Tangent"},
+                {type:"equal",label:"Equal"},
+                {type:"parallel",label:"Parallel"},
+                {type:"perpendicular",label:"Perpendicular"},
+                {type:"midpoint",label:"Midpoint"},
+                {type:"symmetric",label:"Symmetric"},
+                {type:"fix",label:"Fix Point"},
+              ].map(c=>(
+                <button key={c.type} className="btn" style={{marginBottom:3,fontSize:9,padding:"3px 8px",width:"100%",textAlign:"left"}}>
+                  {c.label}
+                </button>
+              ))}
+              <div className="div"/>
+              <div className="sec">Snap ({state.snapMode.grid?"●":"○"} Grid {state.snapMode.points?"●":"○"} Pts)</div>
+              <div className="btnrow">
+                <button className={`btn${state.snapMode.grid?" btn-bl":""}`} style={{flex:1,fontSize:9}} onClick={()=>setState(p=>({...p,snapMode:{...p.snapMode,grid:!p.snapMode.grid}}))}>Grid</button>
+                <button className={`btn${state.snapMode.points?" btn-bl":""}`} style={{flex:1,fontSize:9}} onClick={()=>setState(p=>({...p,snapMode:{...p.snapMode,points:!p.snapMode.points}}))}>Points</button>
+                <button className={`btn${state.snapMode.midpoint?" btn-bl":""}`} style={{flex:1,fontSize:9}} onClick={()=>setState(p=>({...p,snapMode:{...p.snapMode,midpoint:!p.snapMode.midpoint}}))}>Mid</button>
+              </div>
+              <div className="div"/>
+              <div className="sec">Entities ({sk.entities.length})</div>
+              {sk.entities.map(e=>{
+                const isSel=state.selection.ids.includes(e.id);
+                return(
+                  <div key={e.id} className={`ftree-item${isSel?" active":""}`} style={{marginBottom:2}}
+                    onClick={()=>setState(p=>({...p,selection:{type:"sketch",ids:[e.id]}}))}>
+                    <span style={{color:C.txt3,fontFamily:"monospace",fontSize:9,minWidth:20}}>{e.id}</span>
+                    <span style={{flex:1,fontSize:9}}>{e.type} {e.type==="circle"?`R${e.r?.toFixed(1)}`:e.type==="line"?`(${e.x1?.toFixed(0)},${e.y1?.toFixed(0)})→(${e.x2?.toFixed(0)},${e.y2?.toFixed(0)})`:`(${e.cx?.toFixed(0)},${e.cy?.toFixed(0)})`}</span>
+                    <button style={{background:"none",border:"none",color:C.txt3,cursor:"pointer",fontSize:10}} onClick={e2=>{e2.stopPropagation();setState(p=>{const sk=p.features.find(f=>f.id===p.activeSketchId);const updFeatures=p.features.map(f=>f.id===sk.id?{...f,entities:f.entities.filter(ent=>ent.id!==e.id)}:f);return{...p,features:updFeatures};});}}>✕</button>
+                  </div>
+                );
+              })}
+              <div className="div"/>
+              <div className="sec">Dimensions ({sk.constraints.filter(c=>c.label).length})</div>
+              {sk.constraints.filter(c=>c.label).map(c=>(
+                <div key={c.id} className="mini" style={{cursor:"pointer"}} onClick={()=>{setState(p=>({...p,editingDimId:c.id}));setDimVal(c.label);}}>
+                  <span className="mini-l">{c.type.replace("_dim","").toUpperCase()}</span>
+                  <span className="mini-v" style={{color:state.editingDimId===c.id?C.amber:C.txt2}}>{c.label}mm</span>
+                </div>
+              ))}
+              <div className="div"/>
+              <button className="btn btn-gr full lg" onClick={exitSketch} style={{marginTop:4}}>✓ Finish Sketch</button>
+            </>}
+
+            {leftTab==="sketch"&&!sketchInProgress&&<>
+              <div style={{color:C.txt3,fontSize:10,padding:"12px 0",lineHeight:1.8}}>
+                No active sketch.<br/>
+                Double-click a Sketch in the feature tree, or create a new one.
+              </div>
+              <button className="btn btn-bl full lg" onClick={()=>addFeature("sketch")}>+ New Sketch</button>
+            </>}
           </div>
         </div>
 
-        {/* VIEWPORT */}
-        <div style={{ flex:1, position:"relative", overflow:"hidden" }}>
-          <Canvas
-            camera={{ position:[120, 90, 120], fov:45, near:0.1, far:5000 }}
-            shadows
-            style={{ display:"block", width:"100%", height:"100%" }}>
-            <Scene state={liveState} dispatch={disp} />
-          </Canvas>
+        {/* CENTER: VIEWPORT */}
+        <div style={{display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0,minHeight:0}}>
+          {/* Mini toolbar */}
+          <div className="ctrlbar">
+            {sketchInProgress?<>
+              {["select","line","arc","circle","rect","dimension"].map(tool=>(
+                <button key={tool} className={`btn${state.sketchTool===tool?" btn-bl":""}`} style={{fontSize:10,padding:"3px 8px"}}
+                  onClick={()=>setState(p=>({...p,sketchTool:tool,sketchDrawing:false,sketchPts:[]}))}>
+                  {tool}
+                </button>
+              ))}
+              <div className="ctrl-div"/>
+              <span style={{fontSize:9,color:C.txt3}}>Snap:</span>
+              <button className={`btn${state.snapMode.grid?" btn-bl":""}`} style={{fontSize:9,padding:"3px 6px"}} onClick={()=>setState(p=>({...p,snapMode:{...p.snapMode,grid:!p.snapMode.grid}}))}>Grid</button>
+              <button className={`btn${state.snapMode.points?" btn-bl":""}`} style={{fontSize:9,padding:"3px 6px"}} onClick={()=>setState(p=>({...p,snapMode:{...p.snapMode,points:!p.snapMode.points}}))}>Pts</button>
+              <div style={{flex:1}}/>
+              <button className="btn btn-gr" style={{fontSize:10}} onClick={exitSketch}>✓ Finish Sketch</button>
+            </>:<>
+              <span style={{fontSize:9,color:C.txt3}}>View:</span>
+              {["iso","front","top","right","left","back"].map(v=>(
+                <button key={v} className="btn" style={{fontSize:9,padding:"3px 6px"}} onClick={()=>setView(v)}>{v}</button>
+              ))}
+              <div className="ctrl-div"/>
+              <span style={{fontSize:9,color:C.txt3}}>Select:</span>
+              {["face","edge","solid"].map(t=>(
+                <button key={t} className={`btn${state.selection.type===t?" btn-bl":""}`} style={{fontSize:9,padding:"3px 6px"}}
+                  onClick={()=>setState(p=>({...p,selection:{type:t,ids:[]}}))}>
+                  {t}
+                </button>
+              ))}
+            </>}
+          </div>
 
-          <SketchOverlay state={liveState} dispatch={disp} />
+          <div id="vpWrap" ref={vpRef} style={{flex:1,position:"relative",minHeight:0}}>
+            <canvas id="vpCvs" ref={cvsRef}
+              onMouseDown={onMouseDown} onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp} onContextMenu={onContextMenu}
+              style={{cursor:sketchInProgress&&state.sketchTool!=="select"?"crosshair":"default"}}/>
 
-          {/* HUD */}
-          <div style={{ position:"absolute", top:8, left:8, background:`${D.p1}E0`,
-            border:`1px solid ${D.bd}`, borderRadius:4, padding:"5px 10px",
-            fontSize:9, lineHeight:1.8, color:D.txt, pointerEvents:"none" }}>
-            <div style={{ fontFamily:"monospace" }}>
-              <b style={{ color:D.blue2 }}>CAD·PRO 2.0</b><br/>
-              Mode: <span style={{ color:D.amber }}>{liveState.mode.toUpperCase()}</span><br/>
-              {sketchMode && <>Tool: <span style={{ color:D.green2 }}>{liveState.sketchTool}</span><br/></>}
-              {sketchMode && <><span style={{ color:D.txt3 }}>Dbl-click=finish line | ESC=stop</span><br/></>}
-              {!sketchMode && <><span style={{ color:D.txt3 }}>LMB=rotate | RMB=pan | scroll=zoom</span><br/></>}
+            <div className="vp-hud">
+              {sketchInProgress
+                ?<>X: <span>{(mousePos.wx||0).toFixed(2)}</span> Y: <span>{(mousePos.wy||0).toFixed(2)}</span>{snapPt&&<><br/>Snap: <span>{snapPt.type}</span></>}</>
+                :<>Az: <span>{(camState.azimuth*180/Math.PI).toFixed(0)}°</span> El: <span>{(camState.elevation*180/Math.PI).toFixed(0)}°</span><br/>Zoom: <span>{(camState.zoom||1).toFixed(2)}×</span></>
+              }
+              <br/>{sketchInProgress?"Left: draw · Right: cancel · Esc: stop":"Left-drag: orbit · Right-drag: pan · Scroll: zoom"}
             </div>
+
+            <div className="vp-toolbar">
+              {!sketchInProgress&&["iso","top","front","right"].map(v=>(
+                <button key={v} className="vp-btn" onClick={()=>setView(v)}>{v.toUpperCase()}</button>
+              ))}
+              {sketchInProgress&&<button className="vp-btn on" onClick={exitSketch}>✓ Exit Sketch</button>}
+            </div>
+
+            {/* Axis labels */}
+            <div className="plane-indicator">
+              {sketchInProgress
+                ?<><span className="axis-label" style={{color:C.red,borderColor:C.red+"40"}}>X</span>
+                  <span className="axis-label" style={{color:C.green,borderColor:C.green+"40"}}>Y</span></>
+                :<><span className="axis-label" style={{color:C.red,borderColor:C.red+"40"}}>X</span>
+                  <span className="axis-label" style={{color:C.green,borderColor:C.green+"40"}}>Y</span>
+                  <span className="axis-label" style={{color:C.blue,borderColor:C.blue+"40"}}>Z</span></>
+              }
+            </div>
+
+            {/* Sketch bottom toolbar */}
+            {sketchInProgress&&<div className="sketch-toolbar">
+              {[
+                {tool:"select",label:"▶ Select",key:"F"},
+                {tool:"line",label:"/ Line",key:"L"},
+                {tool:"arc",label:"( Arc",key:"A"},
+                {tool:"circle",label:"○ Circle",key:"C"},
+                {tool:"rect",label:"□ Rect",key:"R"},
+                {tool:"dimension",label:"↔ Dim",key:"D"},
+              ].map(({tool,label,key})=>(
+                <button key={tool} className={`sktool${state.sketchTool===tool?" on":""}`}
+                  onClick={()=>setState(p=>({...p,sketchTool:tool,sketchDrawing:false,sketchPts:[]}))}>
+                  {label} <span style={{fontSize:8,color:C.txt3}}>({key})</span>
+                </button>
+              ))}
+              <div style={{width:1,background:C.bd,margin:"0 4px"}}/>
+              <button className="sktool" style={{color:C.green2,borderColor:C.green+"30",background:C.greenBg}} onClick={exitSketch}>✓ Done</button>
+            </div>}
+
+            {/* Dimension popup */}
+            {dimPopup&&<div className="dim-popup" style={{left:dimPopup.sx,top:dimPopup.sy-40}}>
+              <span style={{fontSize:9,color:C.txt3,fontFamily:"monospace"}}>{dimPopup.dimType.replace("_dim","").toUpperCase()}:</span>
+              <input type="number" value={dimVal} step={0.1} autoFocus
+                onChange={e=>setDimVal(e.target.value)}
+                onKeyDown={e=>{if(e.key==="Enter")confirmDim();if(e.key==="Escape"){setDimPopup(null);}}}
+                style={{width:70,fontFamily:"'JetBrains Mono',monospace"}}/>
+              <span style={{fontSize:9,color:C.txt3}}>mm</span>
+              <button className="btn btn-gr" style={{fontSize:9,padding:"2px 6px"}} onClick={confirmDim}>✓</button>
+              <button className="btn" style={{fontSize:9,padding:"2px 6px"}} onClick={()=>setDimPopup(null)}>✕</button>
+            </div>}
           </div>
         </div>
 
-        {/* RIGHT PANEL */}
-        <div style={{ width:230, background:D.p1, borderLeft:`1px solid ${D.bd}`,
-          display:"flex", flexDirection:"column", flexShrink:0, overflow:"hidden" }}>
-          <div style={{ display:"flex", borderBottom:`1px solid ${D.bd}` }}>
-            {["props","mates"].map(t => (
-              <div key={t} onClick={() => setRightTab(t)}
-                style={{ flex:1, padding:"6px 0", textAlign:"center", fontSize:9, fontWeight:700,
-                  color: rightTab===t ? D.blue2 : D.txt3, cursor:"pointer",
-                  borderBottom:`2px solid ${rightTab===t ? D.blue : "transparent"}`,
-                  textTransform:"uppercase", letterSpacing:1 }}>
-                {t}
-              </div>
+        {/* RIGHT: PROPERTIES */}
+        <div className="panel panel-r">
+          <div className="tabrow">
+            {["props","measure","materials","export"].map(t=>(
+              <div key={t} className={`tab${rightTab===t?" on":""}`} onClick={()=>setRightTab(t)}>{t.toUpperCase()}</div>
             ))}
           </div>
-          <div style={{ flex:1, overflowY:"auto" }}>
-            {rightTab === "props" && <PropertiesPanel state={liveState} dispatch={disp} />}
-            {rightTab === "mates" && <AssemblyPanel state={liveState} dispatch={disp} />}
+          <div className="pscroll">
+
+            {rightTab==="props"&&<>
+              <div className="sec">Active Feature</div>
+              {activeFeature?(<>
+                <div style={{display:"flex",alignItems:"center",gap:8,background:C.bg,border:`1px solid ${C.bd}`,borderRadius:4,padding:"8px 10px",marginBottom:8}}>
+                  <div style={{width:28,height:28,borderRadius:4,background:(FEATURE_COLORS[activeFeature.type]||FEATURE_COLORS.sketch).bg,color:(FEATURE_COLORS[activeFeature.type]||FEATURE_COLORS.sketch).col,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>
+                    {(FEATURE_COLORS[activeFeature.type]||FEATURE_COLORS.sketch).icon}
+                  </div>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:11}}>{activeFeature.name}</div>
+                    <div style={{fontSize:9,color:C.txt3,textTransform:"uppercase",letterSpacing:1}}>{activeFeature.type}</div>
+                  </div>
+                </div>
+                {activeFeature.type==="extrude"&&<>
+                  <div className="proprow"><span className="prop-l">Depth</span><span className="prop-v">{activeFeature.depth} mm</span></div>
+                  <div className="proprow"><span className="prop-l">Direction</span><span className="prop-v">{activeFeature.dir===1?"Forward":"Reverse"}</span></div>
+                  <div className="proprow"><span className="prop-l">Sketch</span><span className="prop-v">{state.features.find(f=>f.id===activeFeature.sketchId)?.name||"—"}</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Depth</div>
+                    <input type="number" value={activeFeature.depth} step={0.1}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"depth",parseFloat(e.target.value)||1)}/>
+                  </div>
+                  <div className="field"><div className="lbl">Direction</div>
+                    <select value={activeFeature.dir} onChange={e=>updateFeatureParam(activeFeature.id,"dir",parseInt(e.target.value))}>
+                      <option value={1}>Forward (+Z)</option><option value={-1}>Reverse (-Z)</option>
+                    </select>
+                  </div>
+                  <div className="field"><div className="lbl">Sketch</div>
+                    <select value={activeFeature.sketchId} onChange={e=>updateFeatureParam(activeFeature.id,"sketchId",parseInt(e.target.value))}>
+                      {state.features.filter(f=>f.type==="sketch").map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                </>}
+                {activeFeature.type==="sketch"&&<>
+                  <div className="proprow"><span className="prop-l">Plane</span><span className="prop-v">{activeFeature.planeId}</span></div>
+                  <div className="proprow"><span className="prop-l">Entities</span><span className="prop-v">{activeFeature.entities.length}</span></div>
+                  <div className="proprow"><span className="prop-l">Constraints</span><span className="prop-v">{activeFeature.constraints.length}</span></div>
+                  <div className="proprow"><span className="prop-l">Status</span><span className="prop-v" style={{color:C.green2}}>Defined</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Plane</div>
+                    <select value={activeFeature.planeId} onChange={e=>updateFeatureParam(activeFeature.id,"planeId",e.target.value)}>
+                      <option value="XY">XY (Top)</option><option value="XZ">XZ (Front)</option><option value="YZ">YZ (Right)</option>
+                      <option value="top">Top face</option><option value="front">Front face</option>
+                    </select>
+                  </div>
+                  <button className="btn btn-bl full lg" onClick={()=>enterSketch(activeFeature.id)}>✏ Edit Sketch</button>
+                </>}
+                {activeFeature.type==="fillet"&&<>
+                  <div className="proprow"><span className="prop-l">Radius</span><span className="prop-v">{activeFeature.radius} mm</span></div>
+                  <div className="proprow"><span className="prop-l">Edges</span><span className="prop-v">{activeFeature.edgeIds?.length||0}</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Radius</div>
+                    <input type="number" value={activeFeature.radius} step={0.1}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"radius",parseFloat(e.target.value)||0.5)}/>
+                  </div>
+                </>}
+                {activeFeature.type==="chamfer"&&<>
+                  <div className="proprow"><span className="prop-l">Distance</span><span className="prop-v">{activeFeature.dist} mm</span></div>
+                  <div className="proprow"><span className="prop-l">Edges</span><span className="prop-v">{activeFeature.edgeIds?.length||0}</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Distance</div>
+                    <input type="number" value={activeFeature.dist} step={0.1}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"dist",parseFloat(e.target.value)||0.5)}/>
+                  </div>
+                </>}
+                {activeFeature.type==="hole"&&<>
+                  <div className="proprow"><span className="prop-l">Type</span><span className="prop-v">{activeFeature.holeType}</span></div>
+                  <div className="proprow"><span className="prop-l">Diameter</span><span className="prop-v">{activeFeature.dia} mm</span></div>
+                  <div className="proprow"><span className="prop-l">Depth</span><span className="prop-v">{activeFeature.depth} mm</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Type</div>
+                    <select value={activeFeature.holeType} onChange={e=>updateFeatureParam(activeFeature.id,"holeType",e.target.value)}>
+                      <option value="simple">Simple through</option><option value="blind">Blind</option>
+                      <option value="countersink">Countersink</option><option value="counterbore">Counterbore</option>
+                    </select>
+                  </div>
+                  <div className="field"><div className="lbl">Diameter</div>
+                    <input type="number" value={activeFeature.dia} step={0.1}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"dia",parseFloat(e.target.value)||1)}/>
+                  </div>
+                  <div className="field"><div className="lbl">Depth</div>
+                    <input type="number" value={activeFeature.depth} step={0.1}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"depth",parseFloat(e.target.value)||1)}/>
+                  </div>
+                </>}
+                {activeFeature.type==="revolve"&&<>
+                  <div className="proprow"><span className="prop-l">Angle</span><span className="prop-v">{(activeFeature.angle*180/Math.PI).toFixed(0)}°</span></div>
+                  <div className="proprow"><span className="prop-l">Sketch</span><span className="prop-v">{state.features.find(f=>f.id===activeFeature.sketchId)?.name||"—"}</span></div>
+                  <div className="div"/>
+                  <div className="field"><div className="lbl">Angle (°)</div>
+                    <input type="number" value={(activeFeature.angle*180/Math.PI).toFixed(0)} step={1} min={1} max={360}
+                      onChange={e=>updateFeatureParam(activeFeature.id,"angle",parseFloat(e.target.value||360)*Math.PI/180)}/>
+                  </div>
+                </>}
+              </>):<div style={{color:C.txt3,fontSize:10,lineHeight:1.8}}>
+                Click a feature in the tree to see its properties.<br/><br/>
+                <b style={{color:C.txt2}}>Tip:</b> Double-click to edit inline.
+              </div>}
+
+              <div className="div"/>
+              <div className="sec">Selection</div>
+              {state.selection.ids.length?(<>
+                <div className="proprow"><span className="prop-l">Type</span><span className="prop-v">{state.selection.type}</span></div>
+                <div className="proprow"><span className="prop-l">Count</span><span className="prop-v">{state.selection.ids.length}</span></div>
+                <button className="btn btn-rd full" style={{marginTop:4,fontSize:9}} onClick={()=>setState(p=>({...p,selection:{type:null,ids:[]}}))}>Clear Selection</button>
+              </>):<div style={{color:C.txt3,fontSize:9}}>No selection</div>}
+            </>}
+
+            {rightTab==="measure"&&<>
+              <div className="sec">Measurements</div>
+              {solids.map(({solid,featureId,feature})=>{
+                if(!solid) return null;
+                // Bounding box
+                const xs=solid.verts.map(v=>v.x), ys=solid.verts.map(v=>v.y), zs=solid.verts.map(v=>v.z);
+                const bbx=[Math.min(...xs),Math.max(...xs)];
+                const bby=[Math.min(...ys),Math.max(...ys)];
+                const bbz=[Math.min(...zs),Math.max(...zs)];
+                const dims={x:bbx[1]-bbx[0],y:bby[1]-bby[0],z:bbz[1]-bbz[0]};
+                const vol=dims.x*dims.y*dims.z;
+                return(
+                  <div key={featureId} style={{background:C.bg,border:`1px solid ${C.bd}`,borderRadius:4,padding:"8px",marginBottom:8}}>
+                    <div style={{fontWeight:600,fontSize:10,marginBottom:6,color:C.txt}}>{feature.name}</div>
+                    <div className="proprow"><span className="prop-l">Width (X)</span><span className="prop-v">{dims.x.toFixed(2)} mm</span></div>
+                    <div className="proprow"><span className="prop-l">Height (Y)</span><span className="prop-v">{dims.y.toFixed(2)} mm</span></div>
+                    <div className="proprow"><span className="prop-l">Depth (Z)</span><span className="prop-v">{dims.z.toFixed(2)} mm</span></div>
+                    <div className="proprow"><span className="prop-l">Volume (est)</span><span className="prop-v">{(vol/1000).toFixed(2)} cm³</span></div>
+                    <div className="proprow"><span className="prop-l">Faces</span><span className="prop-v">{solid.faces.length}</span></div>
+                    <div className="proprow"><span className="prop-l">Verts</span><span className="prop-v">{solid.verts.length}</span></div>
+                  </div>
+                );
+              })}
+              {!solids.length&&<div style={{color:C.txt3,fontSize:9}}>No solids in model</div>}
+            </>}
+
+            {rightTab==="materials"&&<>
+              <div className="sec">Material</div>
+              <div className="field"><div className="lbl">Material</div>
+                <select defaultValue="alum6061">
+                  <option value="alum6061">Aluminium 6061</option>
+                  <option value="alum7075">Aluminium 7075</option>
+                  <option value="steel1018">Steel 1018</option>
+                  <option value="steel4140">Steel 4140</option>
+                  <option value="ss304">Stainless 304</option>
+                  <option value="ss316">Stainless 316</option>
+                  <option value="brass360">Brass 360</option>
+                  <option value="copper">Copper</option>
+                  <option value="titanium">Titanium Ti-6Al-4V</option>
+                  <option value="abs">ABS Plastic</option>
+                  <option value="nylon">Nylon PA66</option>
+                  <option value="delrin">Delrin (POM)</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div className="div"/>
+              <div className="sec">Physical Properties</div>
+              {[
+                ["Density","2.70 g/cm³"],["Yield Strength","276 MPa"],["UTS","310 MPa"],
+                ["Elastic Modulus","68.9 GPa"],["Poisson Ratio","0.33"],["Hardness","95 HB"],
+              ].map(([l,v])=><div key={l} className="proprow"><span className="prop-l">{l}</span><span className="prop-v">{v}</span></div>)}
+              <div className="div"/>
+              <div className="sec">Machining Properties</div>
+              {[
+                ["Machinability","Good"],["Cutting Speed","200–400 m/min"],["Feed Rate","0.1–0.3 mm/rev"],
+                ["Coolant","Recommended"],
+              ].map(([l,v])=><div key={l} className="proprow"><span className="prop-l">{l}</span><span className="prop-v">{v}</span></div>)}
+              <div className="div"/>
+              <div className="sec">Mass Estimate</div>
+              {solids.map(({solid,featureId,feature})=>{
+                if(!solid) return null;
+                const xs=solid.verts.map(v=>v.x),ys=solid.verts.map(v=>v.y),zs=solid.verts.map(v=>v.z);
+                const vol=(Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys))*(Math.max(...zs)-Math.min(...zs))/1000;
+                const mass=(vol*2.70).toFixed(1);
+                return <div key={featureId} className="proprow"><span className="prop-l">{feature.name}</span><span className="prop-v">{mass} g</span></div>;
+              })}
+            </>}
+
+            {rightTab==="export"&&<>
+              <div className="sec">Export Options</div>
+              <div style={{fontSize:10,color:C.txt3,lineHeight:1.7,marginBottom:8}}>Export the CAD model for CNC machining, simulation, or other tools.</div>
+              <button className="btn btn-gr full lg" onClick={exportGCode} style={{marginBottom:6}}>↓ Export G-Code (.nc)</button>
+              <button className="btn full" style={{marginBottom:6,fontSize:10}} onClick={()=>{
+                const d={features:state.features,version:1};
+                const b=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+                const a=document.createElement("a");a.href=URL.createObjectURL(b);
+                a.download="model.cadpro";a.click();
+              }}>↓ Save Model (.cadpro)</button>
+              <button className="btn full" style={{marginBottom:6,fontSize:10}} onClick={()=>{
+                const fileIn=document.createElement("input");fileIn.type="file";fileIn.accept=".cadpro,.json";
+                fileIn.onchange=e=>{
+                  const f=e.target.files[0];if(!f)return;
+                  const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.features)setState(p=>({...p,features:d.features}));}catch{}};r.readAsText(f);
+                };fileIn.click();
+              }}>↑ Load Model (.cadpro)</button>
+              <div className="div"/>
+              <div className="sec">G-Code Settings</div>
+              <div className="field"><div className="lbl">Units</div><select><option>mm (G21)</option><option>inch (G20)</option></select></div>
+              <div className="field"><div className="lbl">Post Processor</div>
+                <select><option>Generic Fanuc</option><option>Siemens 840D</option><option>Heidenhain</option><option>Mazatrol</option><option>Haas</option></select>
+              </div>
+              <div className="field"><div className="lbl">Tolerance</div>
+                <select><option>0.01 mm (fine)</option><option>0.05 mm (standard)</option><option>0.1 mm (rough)</option></select>
+              </div>
+              <div className="div"/>
+              <div className="sec">CNC Sim Integration</div>
+              <div style={{fontSize:9,color:C.txt3,lineHeight:1.8}}>Export G-Code and load directly into the CNC Simulator to verify the toolpath before machining.</div>
+              <div className="div"/>
+              <div className="sec">Model Info</div>
+              {[
+                ["Features",state.features.length],
+                ["Solids",solids.length],
+                ["Sketches",state.features.filter(f=>f.type==="sketch").length],
+              ].map(([l,v])=><div key={l} className="proprow"><span className="prop-l">{l}</span><span className="prop-v">{v}</span></div>)}
+            </>}
           </div>
         </div>
+
       </div>
     </div>
-  );
+  </>);
 }

@@ -4,6 +4,7 @@ import {
   NavLink,
   Outlet,
   useLocation,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../content/index.js";
@@ -237,8 +238,22 @@ function TopBar({
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains("dark"),
   );
+  const navigate = useNavigate();
   const videoActive = videoOpen && !videoMinimized;
   const handleVideoToggle = () => (videoOpen ? toggleMinimize() : openPlayer());
+
+  const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
+  const gamesMenuRef = useRef(null);
+  useEffect(() => {
+    if (!gamesMenuOpen) return;
+    const handler = (e) => {
+      if (gamesMenuRef.current && !gamesMenuRef.current.contains(e.target))
+        setGamesMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [gamesMenuOpen]);
+  const anyGameOpen = poolOpen || basketOpen || golfOpen || footballOpen;
 
   const toggleDark = () => {
     const isDark = document.documentElement.classList.toggle("dark");
@@ -455,78 +470,48 @@ function TopBar({
             <PlayCircle className="w-4 h-4" />
           </button>
           <button
-            onClick={onPoolToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${poolOpen ? "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30" : "text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30"}`}
-            title="Physics Pool Lab"
-          >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              🎱
-            </span>
-          </button>
-          <button
             onClick={onChemToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${chemOpen ? "text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30" : "text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30"}`}
             title="Periodic Table & Chemistry"
           >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              ⚛
-            </span>
+            <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>⚛</span>
           </button>
           <button
             onClick={onPhysicsToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${physicsOpen ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30" : "text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30"}`}
             title="Physics Laboratory"
           >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              φ
-            </span>
+            <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>φ</span>
           </button>
-          <button
-            onClick={onBasketToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${basketOpen ? "text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30" : "text-orange-500 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/30"}`}
-            title="Basketball Physics Lab"
-          >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              🏀
-            </span>
-          </button>
-          <button
-            onClick={onGolfToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${golfOpen ? "text-lime-700 dark:text-lime-300 bg-lime-50 dark:bg-lime-900/30" : "text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-900/30"}`}
-            title="Physics Mini Golf Lab"
-          >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              ⛳
-            </span>
-          </button>
-          <button
-            onClick={onFootballToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${footballOpen ? "text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30" : "text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30"}`}
-            title="Football Calculus"
-          >
-            <span
-              className="text-base leading-none"
-              style={{ lineHeight: "16px", display: "block" }}
-            >
-              🏈
-            </span>
-          </button>
+
         </div>
+      </div>
+
+      {/* Games dropdown — outside overflow-hidden container so the menu isn't clipped */}
+      <div ref={gamesMenuRef} style={{ position: "relative" }}>
+        <button
+          onClick={() => setGamesMenuOpen(v => !v)}
+          className={`p-2 rounded-lg transition-colors ${anyGameOpen || gamesMenuOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
+          title="Games"
+        >
+          <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>🎮</span>
+        </button>
+        {gamesMenuOpen && (
+          <div className="absolute right-0 top-[calc(100%+4px)] z-[200] min-w-[190px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-lg">
+            {[
+              { emoji: "🧱", label: "Arkanoid Learn",    onClick: () => { setGamesMenuOpen(false); navigate("/arkanoid-learn"); }, active: false },
+              { emoji: "🎱", label: "Physics Pool Lab",  onClick: () => { onPoolToggle();     setGamesMenuOpen(false); }, active: poolOpen },
+              { emoji: "🏀", label: "Basketball Lab",    onClick: () => { onBasketToggle();   setGamesMenuOpen(false); }, active: basketOpen },
+              { emoji: "⛳", label: "Mini Golf Lab",      onClick: () => { onGolfToggle();     setGamesMenuOpen(false); }, active: golfOpen },
+              { emoji: "🏈", label: "Football Calculus", onClick: () => { onFootballToggle(); setGamesMenuOpen(false); }, active: footballOpen },
+            ].map(({ emoji, label, onClick, active }) => (
+              <button key={label} onClick={onClick}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${active ? "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 font-semibold" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
+                <span>{emoji}</span>{label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Help */}
@@ -636,6 +621,7 @@ export default function AppShell({ children }) {
   const isOpenMatRoute = location.pathname.startsWith("/openmat");
   const isArkanoidLearnRoute = location.pathname.startsWith("/arkanoid-learn");
   const isCNCSimRoute = location.pathname.startsWith("/cnc-sim");
+  const isCadProRoute = location.pathname.startsWith("/cad-pro");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -822,10 +808,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>

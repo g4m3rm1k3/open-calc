@@ -206,7 +206,7 @@ const OpenMatScene = ({ functions, settings }) => {
       <ambientLight intensity={0.7} />
       <directionalLight position={[10, 14, 8]} intensity={1.2} />
       <directionalLight position={[-8, 6, -4]} intensity={0.35} />
-      <OrbitControls makeDefault dampingFactor={0.1} target={[0, 0, 0]} />
+      <OrbitControls makeDefault dampingFactor={0.1} target={[0, 0, 0]} autoRotate={settings?.autoRotate} autoRotateSpeed={0.5} />
       {settings.showGrid && <BoxFrame range={range} isDark={settings.isDark} />}
       {functions.map((fn) => (
         <OpenMatFunction3D key={fn.id} fn={fn} settings={settings} />
@@ -462,7 +462,7 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
           <Canvas camera={{ position: [12, 10, 12], fov: 42 }}>
             <color attach="background" args={[settings.isDark ? "#020617" : "#f8fafc"]} />
             <OpenMatScene functions={functions} settings={settings} />
-            {settings.autoRotate && <OrbitControls autoRotate autoRotateSpeed={0.5} />}
+            {/* autoRotate handled by the OrbitControls inside OpenMatScene */}
           </Canvas>
 
           <div className="pointer-events-none absolute bottom-6 left-6 right-6 flex items-center justify-between">

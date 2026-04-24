@@ -11,7 +11,7 @@ const Scene = ({ functions, settings }) => {
     <>
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      <OrbitControls makeDefault dampingFactor={0.1} />
+      <OrbitControls makeDefault dampingFactor={0.1} autoRotate={settings?.autoRotate} autoRotateSpeed={0.5} />
       
       {/* Dynamic Grid */}
       <Grid 
@@ -394,7 +394,7 @@ const GlobalGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchC
           <Canvas camera={{ position: [8, 8, 8], fov: 45 }}>
             <color attach="background" args={[settings.isDark ? '#020617' : '#f8fafc']} />
             <Scene functions={functions} settings={settings} />
-            {settings.autoRotate && <OrbitControls autoRotate autoRotateSpeed={0.5} />}
+            {/* autoRotate handled by the OrbitControls inside Scene */}
           </Canvas>
 
           <div className="absolute bottom-6 left-6 right-6 flex justify-between items-center pointer-events-none">
