@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 const DEFAULT_START = { lat: 38.9, lng: -77.0 };
-const WORLD_ZOOM = 11;
+const WORLD_ZOOM = 13;
 const STEP_SIZE = 0.012;
 const ENCOUNTER_STEP_THRESHOLD = 24;
 const ENCOUNTER_COOLDOWN_MS = 18000;
@@ -142,6 +142,13 @@ const ROAD_GRAPH = [
   ["academy", "alchemy-lab"],
   ["academy", "math-citadel"],
   ["academy", "engineers-haven"],
+];
+
+const WAYPOINTS = [
+  { id: "wp-north", lat: 39.1, lng: -77.0, topic: "physics", label: "Northern Crossroads", color: "#3b82f6" },
+  { id: "wp-east", lat: 38.9, lng: -76.75, topic: "chemistry", label: "Eastern Trade Post", color: "#10b981" },
+  { id: "wp-south", lat: 38.7, lng: -77.0, topic: "math", label: "Southern Pass", color: "#8b5cf6" },
+  { id: "wp-west", lat: 38.9, lng: -77.25, topic: "engineering", label: "Western Junction", color: "#f59e0b" },
 ];
 
 const REGION_GUIDE = [
@@ -1270,7 +1277,7 @@ export default function StemQuest() {
   const [victories, setVictories] = useState(progress.victories ?? 0);
   const [gameActive, setGameActive] = useState(true);
   const [geoStatus, setGeoStatus] = useState("Locating home...");
-  const [mapStyle, setMapStyle] = useState("terrain");
+  const [mapStyle, setMapStyle] = useState("dark");
 
   const quests = useMemo(() => getQuestList(progress), [progress]);
   const activeQuest =
@@ -1416,6 +1423,14 @@ export default function StemQuest() {
     setProgress((current) => ({ ...current, dismissedQuestIntro: true }));
   }, [setProgress]);
 
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "stem-terrain-filter";
+    style.textContent = ".terrain-tiles img { filter: brightness(0.55) saturate(0.65) hue-rotate(5deg); }";
+    document.head.appendChild(style);
+    return () => document.getElementById("stem-terrain-filter")?.remove();
+  }, []);
+
   const tileUrl =
     mapStyle === "terrain"
       ? "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
@@ -1443,7 +1458,7 @@ export default function StemQuest() {
           keyboard={false}
           touchZoom={false}
         >
-          <TileLayer url={tileUrl} attribution={tileAttribution} />
+          <TileLayer url={tileUrl} attribution={tileAttribution} className={mapStyle === "terrain" ? "terrain-tiles" : undefined} />
           <MapSync pos={playerPos} zoom={WORLD_ZOOM} />
           <KeyboardController
             setPos={setPlayerPos}
@@ -1472,6 +1487,19 @@ export default function StemQuest() {
               />
             );
           })}
+
+          {WAYPOINTS.map((wp) => (
+            <CircleMarker
+              key={wp.id}
+              center={[wp.lat, wp.lng]}
+              radius={5}
+              pathOptions={{ color: wp.color, fillColor: wp.color, fillOpacity: 0.75, weight: 2 }}
+            >
+              <Tooltip direction="top" offset={[0, -6]}>
+                {wp.label}
+              </Tooltip>
+            </CircleMarker>
+          ))}
 
           {TOWNS.map((town) => (
             <CircleMarker

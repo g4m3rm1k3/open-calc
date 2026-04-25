@@ -71,6 +71,52 @@
           "hint": "It is named after Andre-Marie Ampere.",
           "explain": "The ampere is the SI unit for electrical current."
         }
+      },
+      {
+        "id": "intro-sci-notation",
+        "title": "Scientific notation handles extreme numbers",
+        "story": "The Academy librarian needs to record both the mass of a proton and the distance to a distant star on the same page. Writing out all those zeros would fill the whole page — so the notation compresses them.",
+        "summary": "Scientific notation writes any number as a value between 1 and 10 multiplied by a power of 10.",
+        "formula": "a x 10^n, where 1 <= a < 10",
+        "definitions": [
+          { "symbol": "a", "meaning": "the coefficient, a number between 1 and 10" },
+          { "symbol": "n", "meaning": "the exponent, shows how many places the decimal moves" }
+        ],
+        "intuition": "Positive exponents mean the number is large. Negative exponents mean the number is tiny. The exponent just counts how far the decimal point moved.",
+        "workedExample": "0.0045 becomes 4.5 x 10^-3. The decimal moved 3 places to the right, so the exponent is negative 3. Similarly, 6500 becomes 6.5 x 10^3.",
+        "mistake": "Do not confuse positive and negative exponents. 10^-3 means one thousandth, not negative one thousand.",
+        "takeaway": "Scientific notation makes it easy to compare and compute with numbers across many orders of magnitude.",
+        "visual": { "type": "constant-bar", "label": "0.0045 =", "value": "4.5 x 10^-3" },
+        "question": {
+          "q": "Which correctly expresses 4500 in scientific notation?",
+          "opts": ["45 x 10^2", "4.5 x 10^3", "0.45 x 10^4", "4500 x 10^0"],
+          "a": 1,
+          "hint": "Move the decimal until one digit is left of it, count the moves.",
+          "explain": "4500 = 4.5 x 10^3. The decimal moved 3 places left, giving exponent 3."
+        }
+      },
+      {
+        "id": "intro-vectors",
+        "title": "Vectors have direction, scalars do not",
+        "story": "Two runners at the Academy both travel at 5 m/s. One goes north, the other goes east. They have the same speed but different velocities, because velocity carries direction.",
+        "summary": "A scalar is a single number with units. A vector is a quantity with both magnitude and direction.",
+        "formula": "velocity = speed + direction",
+        "definitions": [
+          { "symbol": "scalar", "meaning": "magnitude only, like speed or temperature" },
+          { "symbol": "vector", "meaning": "magnitude and direction, like velocity or force" }
+        ],
+        "intuition": "Speed says how fast. Velocity says how fast and which way. The direction part matters when forces cancel, paths cross, or components need to be combined.",
+        "workedExample": "A car going 60 mph north and a car going 60 mph east both have the same speed, but their velocity vectors point differently. They would collide at an intersection if timed poorly.",
+        "mistake": "Do not treat velocity as just a bigger word for speed. The direction distinction matters in every force and momentum calculation.",
+        "takeaway": "Vectors require both a number and a direction. Forgetting the direction makes the answer incomplete.",
+        "visual": { "type": "force-box", "left": "speed: 5 m/s", "center": "direction: N", "right": "velocity" },
+        "question": {
+          "q": "Which of these is a vector quantity?",
+          "opts": ["Temperature", "Mass", "Speed", "Velocity"],
+          "a": 3,
+          "hint": "Which one needs both a number and a direction to be fully described?",
+          "explain": "Velocity is a vector. It requires both magnitude (speed) and direction. Temperature, mass, and speed are scalars."
+        }
       }
     ]
   },
@@ -149,6 +195,55 @@
           "hint": "Square the speed first.",
           "explain": "KE = 1/2 x 2 x 4^2 = 16 J."
         }
+      },
+      {
+        "id": "physics-gravity",
+        "title": "Gravity pulls objects down at a steady rate",
+        "story": "A trainee in Physics Keep drops a stone off the tower wall. No matter how heavy the stone is, it gains the same speed each second on the way down. The ground does not care about mass.",
+        "summary": "Near Earth's surface, gravity accelerates every object downward at about 9.8 m/s^2, regardless of mass.",
+        "formula": "g = 9.8 m/s^2 (downward)",
+        "definitions": [
+          { "symbol": "g", "meaning": "gravitational acceleration at Earth's surface" },
+          { "symbol": "9.8 m/s^2", "meaning": "about 10 m/s faster downward each second" }
+        ],
+        "intuition": "Galileo showed that a feather and a bowling ball dropped in a vacuum hit the ground at the same time. Mass does not change how fast gravity pulls — it only affects the total force, not the acceleration.",
+        "workedExample": "After 1 second of freefall from rest, an object reaches 9.8 m/s. After 2 seconds, 19.6 m/s. The speed added each second is the same constant 9.8.",
+        "mistake": "Do not confuse weight (F = mg) with mass. A heavier object has more weight but falls at the same acceleration.",
+        "takeaway": "In freefall, all objects accelerate equally regardless of mass. Gravity is an equal-opportunity puller.",
+        "visual": { "type": "line-rise", "xLabel": "seconds", "yLabel": "speed (m/s)", "tag": "+9.8 m/s each second" },
+        "question": {
+          "q": "An object is dropped from rest. What is its speed after 2 seconds? (g = 9.8 m/s^2)",
+          "opts": ["4.9 m/s", "9.8 m/s", "19.6 m/s", "39.2 m/s"],
+          "a": 2,
+          "hint": "Use v = g x t with u = 0.",
+          "explain": "v = 0 + 9.8 x 2 = 19.6 m/s."
+        }
+      },
+      {
+        "id": "physics-work",
+        "title": "Work transfers energy through force",
+        "story": "A knight pushes a supply cart across the courtyard of Physics Keep. The longer the distance and the harder the push, the more energy she transfers to that cart.",
+        "summary": "Work is done when a force moves an object through a distance. Power is the rate of doing that work.",
+        "formula": "W = F d  |  P = W / t",
+        "definitions": [
+          { "symbol": "W", "meaning": "work done, measured in joules" },
+          { "symbol": "F", "meaning": "force applied, in newtons" },
+          { "symbol": "d", "meaning": "distance moved in direction of force" },
+          { "symbol": "P", "meaning": "power, rate of doing work (watts)" },
+          { "symbol": "t", "meaning": "time taken" }
+        ],
+        "intuition": "Pushing hard over a long distance does a lot of work. Doing that same work quickly requires a lot of power. A slow lift and a fast lift can do the same work; the fast one just needs more power.",
+        "workedExample": "If F = 50 N and d = 4 m, then W = 50 x 4 = 200 J. If that work is done in 2 seconds, P = 200 / 2 = 100 W.",
+        "mistake": "Work requires motion in the direction of the force. Holding a heavy box still does zero work, no matter how tired your arms get.",
+        "takeaway": "Work and power are related but different. Work is total energy transferred. Power is how fast that transfer happens.",
+        "visual": { "type": "force-box", "left": "50 N", "center": "4 m", "right": "200 J" },
+        "question": {
+          "q": "A 50 N force moves an object 4 m. How much work is done?",
+          "opts": ["12.5 J", "54 J", "200 J", "400 J"],
+          "a": 2,
+          "hint": "W = F x d",
+          "explain": "W = 50 N x 4 m = 200 J."
+        }
       }
     ]
   },
@@ -222,6 +317,54 @@
           "a": 0,
           "hint": "This is Avogadro's number.",
           "explain": "One mole contains 6.022 x 10^23 particles."
+        }
+      },
+      {
+        "id": "chem-ph",
+        "title": "The pH scale measures acidity",
+        "story": "Dr. Curie sets out three vials along the lab bench: lemon juice, pure water, and baking soda solution. Each one has a different number on the pH meter, and that number predicts how it reacts with other materials.",
+        "summary": "The pH scale runs from 0 to 14. Below 7 is acidic, 7 is neutral, and above 7 is basic.",
+        "formula": "pH = -log[H+]",
+        "definitions": [
+          { "symbol": "pH", "meaning": "measure of hydrogen ion concentration" },
+          { "symbol": "[H+]", "meaning": "concentration of hydrogen ions in solution" },
+          { "symbol": "log", "meaning": "base-10 logarithm" }
+        ],
+        "intuition": "A lower pH means more hydrogen ions and a more acidic solution. Each step on the scale is a factor of 10, so pH 3 has 10 times more hydrogen ions than pH 4.",
+        "workedExample": "Lemon juice has a pH near 2. Water has pH 7. Bleach has pH near 12. Moving from pH 7 to pH 5 means the concentration of hydrogen ions increased by 100 times.",
+        "mistake": "Do not think pH 0 is the strongest possible acid in all situations. Concentrated sulfuric acid can go below pH 0.",
+        "takeaway": "pH is a compact way to describe acidity. Each unit change represents a tenfold difference in ion concentration.",
+        "visual": { "type": "ratio-bars", "left": "acid: pH < 7", "right": "base: pH > 7", "tag": "neutral: 7" },
+        "question": {
+          "q": "Which pH value represents a basic (alkaline) solution?",
+          "opts": ["2", "5", "7", "10"],
+          "a": 3,
+          "hint": "Basic solutions have pH above 7.",
+          "explain": "pH 10 is above 7, so it is basic. pH 7 is neutral. Below 7 is acidic."
+        }
+      },
+      {
+        "id": "chem-states",
+        "title": "Matter exists in different states",
+        "story": "A flask of water in the Alchemy Lab can be ice, liquid, or steam depending on the temperature. The same molecule, H2O, behaves completely differently in each state because of how much energy the particles carry.",
+        "summary": "The state of matter depends on how much kinetic energy the particles have compared to the forces holding them together.",
+        "formula": "solid < liquid < gas (by particle energy)",
+        "definitions": [
+          { "symbol": "solid", "meaning": "particles vibrate in fixed positions" },
+          { "symbol": "liquid", "meaning": "particles flow but stay in contact" },
+          { "symbol": "gas", "meaning": "particles move freely and spread out" }
+        ],
+        "intuition": "Adding energy (heat) gives particles enough motion to break free from their neighbors. Removing energy makes them slow down and pack together. The state is just a description of how loosely or tightly packed the particles are.",
+        "workedExample": "Ice melts at 0 C because water molecules gain enough energy to start sliding past each other. At 100 C, they gain enough energy to escape the liquid surface and become steam.",
+        "mistake": "Do not confuse temperature with heat energy. A large cold object can hold more total energy than a small hot one.",
+        "takeaway": "States of matter are not fixed properties of a substance. They change with energy and pressure.",
+        "visual": { "type": "energy-bars", "labels": ["solid", "liquid", "gas"] },
+        "question": {
+          "q": "In which state do particles have the most freedom of movement?",
+          "opts": ["Solid", "Liquid", "Gas", "Plasma"],
+          "a": 2,
+          "hint": "Think about which state has no fixed shape or volume.",
+          "explain": "Gas particles move freely and fill any container. Solids keep their shape; liquids take the container shape but keep their volume."
         }
       }
     ]
@@ -299,6 +442,53 @@
           "hint": "Square the radius before multiplying by pi.",
           "explain": "A = pi x 2^2 = 4pi."
         }
+      },
+      {
+        "id": "math-pythagorean",
+        "title": "The Pythagorean theorem links sides of right triangles",
+        "story": "A scout at the Citadel wants to know the straight-line distance across a rectangular field without walking the diagonal. She walks 3 km east and 4 km north instead, then calculates.",
+        "summary": "In a right triangle, the square of the hypotenuse equals the sum of the squares of the two shorter sides.",
+        "formula": "a^2 + b^2 = c^2",
+        "definitions": [
+          { "symbol": "a, b", "meaning": "the two shorter sides (legs) of the right triangle" },
+          { "symbol": "c", "meaning": "the hypotenuse, the side opposite the right angle" }
+        ],
+        "intuition": "The hypotenuse is always longer than either leg, but shorter than their sum. The relationship is exact for right angles and approximate for others.",
+        "workedExample": "If a = 3 and b = 4, then c^2 = 9 + 16 = 25, so c = 5. The 3-4-5 triangle is the most famous example and appears often in engineering and architecture.",
+        "mistake": "Do not add the sides directly. a + b does not equal c. You must square, add, then take the square root.",
+        "takeaway": "Pythagorean triples like 3-4-5 and 5-12-13 are worth memorizing. They come up in distance, force, and vector problems.",
+        "visual": { "type": "force-box", "left": "3^2 = 9", "center": "4^2 = 16", "right": "c = 5" },
+        "question": {
+          "q": "A right triangle has legs of length 3 and 4. What is the hypotenuse?",
+          "opts": ["5", "7", "12", "25"],
+          "a": 0,
+          "hint": "Apply a^2 + b^2 = c^2 and solve for c.",
+          "explain": "3^2 + 4^2 = 9 + 16 = 25, so c = sqrt(25) = 5."
+        }
+      },
+      {
+        "id": "math-quadratic",
+        "title": "Quadratic equations describe curved relationships",
+        "story": "A cannonball launched from the Citadel wall follows a parabolic path. The height at each second is not a straight line — it curves down because gravity accelerates the ball.",
+        "summary": "A quadratic equation has an x^2 term and can model parabolic motion, area problems, and optimization.",
+        "formula": "x = (-b ± sqrt(b^2 - 4ac)) / 2a",
+        "definitions": [
+          { "symbol": "a, b, c", "meaning": "coefficients in ax^2 + bx + c = 0" },
+          { "symbol": "±", "meaning": "two solutions: one with + and one with -" },
+          { "symbol": "discriminant", "meaning": "b^2 - 4ac, tells you how many real solutions exist" }
+        ],
+        "intuition": "Quadratics often have two solutions because a parabola can cross the x-axis at two points. The discriminant tells you if there are 2 real solutions (positive), 1 (zero), or none (negative).",
+        "workedExample": "For x^2 - 5x + 6 = 0, a=1, b=-5, c=6. Discriminant = 25 - 24 = 1. Solutions: (5 ± 1) / 2 = 3 or 2. Both values check out: (3-2)(3-3)=0 and (2-2)=0.",
+        "mistake": "Do not forget the ± sign. There can be two valid answers, and both matter in physical or geometric contexts.",
+        "takeaway": "The quadratic formula always works for any quadratic, even when factoring is not obvious.",
+        "visual": { "type": "line-slope", "xLabel": "x", "yLabel": "y = ax^2", "tag": "parabola curves both ways" },
+        "question": {
+          "q": "How many real solutions does x^2 + 4x + 5 = 0 have? (discriminant = 16 - 20 = -4)",
+          "opts": ["0", "1", "2", "3"],
+          "a": 0,
+          "hint": "A negative discriminant means no real square root.",
+          "explain": "Discriminant = b^2 - 4ac = 16 - 20 = -4. Negative means no real solutions."
+        }
       }
     ]
   },
@@ -375,6 +565,53 @@
           "a": 1,
           "hint": "Divide useful output by total input, then convert to percent.",
           "explain": "80 / 100 = 0.8, so the efficiency is 80%."
+        }
+      },
+      {
+        "id": "eng-stress",
+        "title": "Stress tells you how hard a material is working",
+        "story": "A pillar in Engineers Haven supports a heavy roof. Two pillars of the same material but different cross-sections carry the same load differently — the thinner one works much harder and may fail first.",
+        "summary": "Stress is the internal force per unit area inside a material. High stress means the material is being stretched or compressed intensely.",
+        "formula": "sigma = F / A",
+        "definitions": [
+          { "symbol": "sigma", "meaning": "stress, measured in pascals (Pa)" },
+          { "symbol": "F", "meaning": "applied force in newtons" },
+          { "symbol": "A", "meaning": "cross-sectional area in square meters" }
+        ],
+        "intuition": "The same force spread over a larger area creates less stress. That is why snowshoes distribute your weight over snow — the stress per unit area drops below what the snow can hold.",
+        "workedExample": "If F = 1000 N is applied to a rod with A = 0.01 m^2, then stress = 1000 / 0.01 = 100000 Pa = 100 kPa. Doubling the area halves the stress.",
+        "mistake": "Do not confuse force and stress. A thin wire under 10 N can break where a thick cable under 1000 N is fine, depending on area.",
+        "takeaway": "Material failure depends on stress, not total force. Area matters as much as load.",
+        "visual": { "type": "force-box", "left": "1000 N", "center": "0.01 m^2", "right": "100 kPa" },
+        "question": {
+          "q": "A force of 500 N acts on a cross-section of 0.05 m^2. What is the stress?",
+          "opts": ["25 Pa", "10000 Pa", "25000 Pa", "0.0001 Pa"],
+          "a": 1,
+          "hint": "sigma = F / A",
+          "explain": "sigma = 500 / 0.05 = 10000 Pa."
+        }
+      },
+      {
+        "id": "eng-resistors",
+        "title": "Resistors in series and parallel behave differently",
+        "story": "An apprentice in Engineers Haven wires two light bulbs. One circuit makes both bulbs dim when one is unscrewed. The other circuit leaves one bright. The wiring pattern is the difference.",
+        "summary": "Series resistors add directly. Parallel resistors reduce total resistance because current has more paths.",
+        "formula": "Series: R_total = R1 + R2  |  Parallel: 1/R_total = 1/R1 + 1/R2",
+        "definitions": [
+          { "symbol": "series", "meaning": "components connected end-to-end, same current through each" },
+          { "symbol": "parallel", "meaning": "components connected side-by-side, same voltage across each" }
+        ],
+        "intuition": "In series, resistance stacks up. In parallel, current finds multiple routes, so total resistance goes down. Adding a parallel path always lowers overall resistance.",
+        "workedExample": "Two 10-ohm resistors in series give 20 ohms. The same two in parallel: 1/R = 1/10 + 1/10 = 0.2, so R = 5 ohms. Half the resistance, double the current at the same voltage.",
+        "mistake": "Do not add resistors in parallel the same way as series. Parallel resistors always give a result smaller than the smallest individual resistor.",
+        "takeaway": "Circuit topology — how parts are connected — changes behavior as much as the component values do.",
+        "visual": { "type": "ohm-loop", "left": "Series: +", "center": "Parallel: less", "right": "R total" },
+        "question": {
+          "q": "Two 6-ohm resistors are connected in series. What is the total resistance?",
+          "opts": ["3 ohms", "6 ohms", "12 ohms", "36 ohms"],
+          "a": 2,
+          "hint": "In series, resistances simply add.",
+          "explain": "Series total = 6 + 6 = 12 ohms."
         }
       }
     ]
