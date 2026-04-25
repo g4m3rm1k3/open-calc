@@ -518,6 +518,187 @@ function DialogueBox({ town, onClose, onBattle }) {
   );
 }
 
+function buildLessonSteps(round) {
+  if (Array.isArray(round.lessonSteps) && round.lessonSteps.length > 0) {
+    return round.lessonSteps;
+  }
+
+  const steps = [];
+
+  steps.push({
+    id: "idea",
+    badge: "Core Idea",
+    title: "What this idea means",
+    body: round.intuition ?? round.summary,
+    formula: round.formula,
+    definitions: round.definitions ?? [],
+    visual: round.visual ?? null,
+  });
+
+  if (Array.isArray(round.definitions) && round.definitions.length > 0) {
+    steps.push({
+      id: "definitions",
+      badge: "Definitions",
+      title: "What each symbol means",
+      body: "Read the formula by naming each quantity before you try to calculate with it.",
+      formula: round.formula,
+      definitions: round.definitions,
+      visual: { type: "definitions" },
+    });
+  }
+
+  if (round.workedExample) {
+    steps.push({
+      id: "example",
+      badge: "Worked Example",
+      title: "See it in action",
+      body: round.workedExample,
+      formula: round.formula,
+      definitions: round.definitions ?? [],
+      visual: round.visual ?? null,
+    });
+  }
+
+  steps.push({
+    id: "takeaway",
+    badge: "Takeaway",
+    title: "What to remember",
+    body: round.takeaway ?? round.summary,
+    mistake: round.mistake ?? null,
+    formula: round.formula,
+    definitions: round.definitions ?? [],
+    visual: null,
+  });
+
+  return steps;
+}
+
+function LessonVisual({ visual, formula, definitions, color }) {
+  const accent = color ?? "#6366f1";
+
+  if (!visual && !formula) return null;
+
+  if (visual?.type === "atom-core") {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950">
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-4 border-cyan-400/40 bg-cyan-950/30 text-center">
+          <div className="rounded-full bg-cyan-400/20 px-3 py-2 text-sm font-bold text-cyan-200">{visual.center}</div>
+          <div className="absolute -bottom-7 text-xs uppercase tracking-[0.16em] text-slate-400">{visual.ring}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (visual?.type === "molecule") {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950">
+        <svg viewBox="0 0 240 140" className="h-full w-full">
+          <line x1="120" y1="70" x2="72" y2="40" stroke="#475569" strokeWidth="4" />
+          <line x1="120" y1="70" x2="168" y2="40" stroke="#475569" strokeWidth="4" />
+          <circle cx="120" cy="70" r="24" fill="#0f766e" />
+          <circle cx="72" cy="40" r="18" fill="#334155" />
+          <circle cx="168" cy="40" r="18" fill="#334155" />
+          <text x="120" y="76" textAnchor="middle" fill="#ecfeff" fontSize="22" fontWeight="700">{visual.center}</text>
+          <text x="72" y="46" textAnchor="middle" fill="#f8fafc" fontSize="18" fontWeight="700">{visual.outer?.[0] ?? "H"}</text>
+          <text x="168" y="46" textAnchor="middle" fill="#f8fafc" fontSize="18" fontWeight="700">{visual.outer?.[1] ?? "H"}</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (visual?.type === "circle-area") {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950">
+        <svg viewBox="0 0 240 140" className="h-full w-full">
+          <circle cx="120" cy="70" r="42" fill="rgba(99,102,241,0.12)" stroke="#818cf8" strokeWidth="4" />
+          <line x1="120" y1="70" x2="162" y2="70" stroke="#fbbf24" strokeWidth="4" />
+          <text x="138" y="62" fill="#fbbf24" fontSize="14" fontWeight="700">r</text>
+          <text x="120" y="76" textAnchor="middle" fill="#e2e8f0" fontSize="16" fontWeight="700">A</text>
+          <text x="120" y="124" textAnchor="middle" fill="#94a3b8" fontSize="12">{visual.tag ?? "radius controls area"}</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (visual?.type === "line-rise" || visual?.type === "line-slope") {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950">
+        <svg viewBox="0 0 240 140" className="h-full w-full">
+          <line x1="38" y1="106" x2="202" y2="106" stroke="#475569" strokeWidth="3" />
+          <line x1="38" y1="106" x2="38" y2="20" stroke="#475569" strokeWidth="3" />
+          <line x1="54" y1="92" x2="170" y2="42" stroke={accent} strokeWidth="5" strokeLinecap="round" />
+          <text x="202" y="122" fill="#94a3b8" fontSize="12">{visual.xLabel ?? "x"}</text>
+          <text x="18" y="22" fill="#94a3b8" fontSize="12">{visual.yLabel ?? "y"}</text>
+          <text x="120" y="28" textAnchor="middle" fill="#e2e8f0" fontSize="12">{visual.tag ?? "rate of change"}</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (visual?.type === "force-box" || visual?.type === "beam-load" || visual?.type === "ratio-bars" || visual?.type === "ohm-loop" || visual?.type === "energy-bars" || visual?.type === "count-cluster" || visual?.type === "constant-bar" || visual?.type === "unit-card" || visual?.type === "bond-share") {
+    const pills =
+      visual.type === "force-box"
+        ? [visual.left, visual.center, visual.right]
+        : visual.type === "beam-load"
+          ? [visual.top, visual.bottom, visual.result]
+          : visual.type === "ratio-bars"
+            ? [visual.left, visual.right, visual.tag]
+            : visual.type === "ohm-loop"
+              ? [visual.left, visual.center, visual.right]
+              : visual.type === "energy-bars"
+                ? visual.labels
+                : visual.type === "count-cluster"
+                  ? [visual.label, visual.value]
+                  : visual.type === "constant-bar"
+                    ? [visual.label, visual.value]
+                    : visual.type === "unit-card"
+                      ? visual.items
+                      : [visual.left, visual.center, visual.right];
+
+    return (
+      <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+        <div className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Visual Model</div>
+        <div className="flex flex-wrap items-center gap-2">
+          {pills.filter(Boolean).map((pill) => (
+            <div
+              key={pill}
+              className="rounded-full border px-3 py-2 text-sm font-semibold"
+              style={{ borderColor: `${accent}55`, background: `${accent}18`, color: "#e2e8f0" }}
+            >
+              {pill}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (visual?.type === "definitions" && definitions?.length) {
+    return (
+      <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+        <div className="mb-3 font-mono text-lg font-bold text-emerald-300">{formula}</div>
+        <div className="grid gap-2">
+          {definitions.map((item) => (
+            <div key={item.symbol} className="flex items-center gap-3 rounded-xl bg-slate-900 px-3 py-2">
+              <div className="min-w-[56px] rounded-lg bg-slate-800 px-2 py-1 text-center font-mono text-sm font-bold text-cyan-300">
+                {item.symbol}
+              </div>
+              <div className="text-sm text-slate-300">{item.meaning}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+      <div className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Key Formula</div>
+      <div className="font-mono text-lg font-bold text-emerald-300">{formula}</div>
+    </div>
+  );
+}
+
 function BattleScreen({ town, onComplete }) {
   const topicPack = lessonBattles[town.topic] ?? lessonBattles.intro;
   const [rounds] = useState(() => {
@@ -533,10 +714,12 @@ function BattleScreen({ town, onComplete }) {
   const [showHint, setShowHint] = useState(false);
   const [result, setResult] = useState(null);
   const [timer, setTimer] = useState(40);
+  const [lessonStepIndex, setLessonStepIndex] = useState(0);
   const timerRef = useRef(null);
 
   const round = rounds[roundIndex];
   const question = round.question;
+  const lessonSteps = buildLessonSteps(round);
 
   const resetTimer = useCallback(() => {
     clearInterval(timerRef.current);
@@ -556,6 +739,7 @@ function BattleScreen({ town, onComplete }) {
     setSelected(null);
     setLocked(false);
     setShowHint(false);
+    setLessonStepIndex(0);
     if (phase === "quiz") {
       resetTimer();
     } else {
@@ -645,13 +829,14 @@ function BattleScreen({ town, onComplete }) {
   }
 
   if (phase === "story" || phase === "lesson") {
-    const nextPhase = phase === "story" ? "lesson" : "quiz";
-    const badge = phase === "story" ? "Scene" : "Lesson";
-    const title = phase === "story" ? round.title : `Lesson: ${round.title}`;
+    const activeStep = lessonSteps[Math.min(lessonStepIndex, lessonSteps.length - 1)];
+    const lastLessonStep = lessonStepIndex >= lessonSteps.length - 1;
+    const badge = phase === "story" ? "Scene" : activeStep.badge ?? "Lesson";
+    const title = phase === "story" ? round.title : activeStep.title ?? `Lesson: ${round.title}`;
     const body =
       phase === "story"
-        ? `Before the challenge begins, ${town.npc} frames the problem: ${round.summary}`
-        : round.summary;
+        ? round.story ?? `Before the challenge begins, ${town.npc} frames the problem: ${round.summary}`
+        : activeStep.body;
 
     return (
       <div className="absolute inset-0 z-[2000] flex items-center justify-center bg-black px-6">
@@ -678,28 +863,78 @@ function BattleScreen({ town, onComplete }) {
             <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-4">
               <p className="text-base leading-relaxed text-slate-100">{body}</p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-4">
-              <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Key Formula</div>
-              <div className="font-mono text-lg text-emerald-300">{round.formula}</div>
-            </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-300">
-              {phase === "story"
-                ? "This is the narrative setup. Advance once for the focused lesson card, then once more to start the quiz."
-                : "Read the lesson once more, then answer a single question about it under pressure."}
-            </div>
+            {phase === "lesson" && (
+              <>
+                <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                  <div className="space-y-4">
+                    {activeStep.formula && (
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-4">
+                        <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Key Formula</div>
+                        <div className="font-mono text-lg text-emerald-300">{activeStep.formula}</div>
+                      </div>
+                    )}
+                    {activeStep.definitions?.length > 0 && (
+                      <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-4">
+                        <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Symbol Definitions</div>
+                        <div className="space-y-2">
+                          {activeStep.definitions.map((item) => (
+                            <div key={item.symbol} className="flex items-start gap-3 rounded-xl bg-slate-950 px-3 py-2">
+                              <div className="min-w-[56px] rounded-lg bg-slate-800 px-2 py-1 text-center font-mono text-sm font-bold text-cyan-300">
+                                {item.symbol}
+                              </div>
+                              <div className="text-sm text-slate-300">{item.meaning}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {activeStep.mistake && (
+                      <div className="rounded-2xl border border-amber-500/30 bg-slate-900 px-4 py-3 text-sm text-amber-200">
+                        <span className="font-semibold">Common mistake:</span> {activeStep.mistake}
+                      </div>
+                    )}
+                  </div>
+                  <LessonVisual
+                    visual={activeStep.visual}
+                    formula={activeStep.formula}
+                    definitions={activeStep.definitions}
+                    color={town.color}
+                  />
+                </div>
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-300">
+                  Step {lessonStepIndex + 1} of {lessonSteps.length}. Learn the idea, name the symbols, work the example, then take the quiz.
+                </div>
+              </>
+            )}
+            {phase === "story" && (
+              <div className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-slate-300">
+                This is the narrative setup. Advance into the lesson cards, then start the quiz once the concept is clear.
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between border-t px-6 py-4" style={{ borderColor: `${town.color}33` }}>
             <div className="text-xs text-slate-500">
-              {phase === "story" ? "Story setup first." : "Lesson second."}
+              {phase === "story" ? "Story setup first." : `Lesson step ${lessonStepIndex + 1} of ${lessonSteps.length}.`}
             </div>
             <button
-              onClick={() => setPhase(nextPhase)}
+              onClick={() => {
+                if (phase === "story") {
+                  setPhase("lesson");
+                  setLessonStepIndex(0);
+                  return;
+                }
+                if (!lastLessonStep) {
+                  setLessonStepIndex((current) => current + 1);
+                  return;
+                }
+                setPhase("quiz");
+              }}
               className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white"
               style={{ background: town.color }}
             >
               <ChevronRight className="h-4 w-4" />
-              {phase === "story" ? "Continue to Lesson" : "Start Quiz"}
+              {phase === "story" ? "Continue to Lesson" : lastLessonStep ? "Start Quiz" : "Next Lesson Step"}
             </button>
           </div>
         </div>

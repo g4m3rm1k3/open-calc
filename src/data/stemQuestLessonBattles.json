@@ -5,8 +5,18 @@
       {
         "id": "intro-light",
         "title": "Science measures the world",
+        "story": "Professor Newton points to a signal tower on the Academy wall. If every traveler reported light with a different number system, nobody could compare experiments or trust measurements across towns.",
         "summary": "Scientists use standard constants and units so experiments can be compared anywhere in the world.",
         "formula": "c = 3 x 10^8 m/s",
+        "definitions": [
+          { "symbol": "c", "meaning": "speed of light in vacuum" },
+          { "symbol": "m/s", "meaning": "meters traveled each second" }
+        ],
+        "intuition": "A constant is a value we treat as fixed in a given situation. The speed of light in vacuum is one of the most important constants because it sets the scale for how fast information and light can move.",
+        "workedExample": "If light travels at 3 x 10^8 meters each second, then in 2 seconds it covers about 6 x 10^8 meters. The number is huge, which is why light seems instant in everyday life.",
+        "mistake": "Do not confuse 10^8 with 10^6. That would make light one hundred times slower than it really is.",
+        "takeaway": "Shared constants let scientists in different places compare results and build on each other's work.",
+        "visual": { "type": "constant-bar", "label": "Light speed", "value": "3 x 10^8 m/s" },
         "question": {
           "q": "What is the speed of light in a vacuum?",
           "opts": ["3 x 10^8 m/s", "3 x 10^6 m/s", "3 x 10^10 m/s", "3 x 10^4 m/s"],
@@ -18,8 +28,19 @@
       {
         "id": "intro-water",
         "title": "Chemistry uses symbols as shorthand",
+        "story": "In the Academy kitchen, two flasks look identical until the labels are read. One is water, and one is hydrogen peroxide. A tiny symbol difference changes the substance completely.",
         "summary": "Chemical formulas tell you which atoms are present and how many of each are bonded together.",
         "formula": "H2O",
+        "definitions": [
+          { "symbol": "H", "meaning": "hydrogen atom" },
+          { "symbol": "O", "meaning": "oxygen atom" },
+          { "symbol": "2", "meaning": "two hydrogen atoms" }
+        ],
+        "intuition": "A chemical formula is like a compact recipe. It tells you what atoms are present and how many of each belong in one molecule.",
+        "workedExample": "H2O means one water molecule contains two hydrogen atoms and one oxygen atom. If the formula were H2O2 instead, that would be hydrogen peroxide, which behaves very differently.",
+        "mistake": "Do not read H2O as H + 2O. The subscript belongs only to hydrogen in this formula.",
+        "takeaway": "Small changes in a formula can represent an entirely different substance.",
+        "visual": { "type": "molecule", "center": "O", "outer": ["H", "H"] },
         "question": {
           "q": "What is the chemical formula for water?",
           "opts": ["HO", "H2O", "H2O2", "OH"],
@@ -31,8 +52,18 @@
       {
         "id": "intro-current",
         "title": "Units help engineers communicate",
+        "story": "An Academy apprentice reports a machine using '12 power' instead of giving the unit. The engineer cannot tell whether that means current, voltage, or power until the unit is named correctly.",
         "summary": "Each physical quantity has a standard unit so people do not confuse current, force, energy, or power.",
         "formula": "Current -> ampere (A)",
+        "definitions": [
+          { "symbol": "Current", "meaning": "flow of electric charge" },
+          { "symbol": "A", "meaning": "ampere, the unit of current" }
+        ],
+        "intuition": "Numbers alone are not enough. Units tell you what kind of quantity you are measuring and keep people from mixing unlike things.",
+        "workedExample": "A wire carrying 2 A and a battery supplying 12 V are not interchangeable facts. One tells you charge flow; the other tells you electrical push.",
+        "mistake": "Do not mix ampere, volt, watt, and ohm. They describe different electrical ideas.",
+        "takeaway": "A correct number with the wrong unit can still lead to a wrong design decision.",
+        "visual": { "type": "unit-card", "items": ["A = current", "V = voltage", "W = power"] },
         "question": {
           "q": "Which unit measures electrical current?",
           "opts": ["Volt", "Watt", "Ampere", "Ohm"],
@@ -49,8 +80,20 @@
       {
         "id": "physics-velocity",
         "title": "Acceleration changes velocity",
+        "story": "A training cart in Physics Keep starts from rest on a straight track. Each second, its speed increases by the same amount, so the knights can predict its future motion.",
         "summary": "If an object starts from rest and accelerates steadily, its velocity grows linearly with time.",
         "formula": "v = u + at",
+        "definitions": [
+          { "symbol": "v", "meaning": "final velocity" },
+          { "symbol": "u", "meaning": "starting velocity" },
+          { "symbol": "a", "meaning": "acceleration" },
+          { "symbol": "t", "meaning": "time" }
+        ],
+        "intuition": "Acceleration tells you how quickly velocity changes. If acceleration stays constant, each extra second adds the same speed change.",
+        "workedExample": "If u = 0 m/s, a = 5 m/s^2, and t = 3 s, then v = 0 + 5 x 3 = 15 m/s. Starting from rest makes the calculation simpler because the first term is zero.",
+        "mistake": "Do not confuse velocity with acceleration. Velocity is how fast you are going; acceleration is how fast velocity changes.",
+        "takeaway": "Constant acceleration creates a straight-line growth pattern in velocity over time.",
+        "visual": { "type": "line-rise", "xLabel": "time", "yLabel": "velocity", "tag": "+a each second" },
         "question": {
           "q": "An object starts from rest and accelerates at 5 m/s^2. What is its velocity after 3 seconds?",
           "opts": ["5 m/s", "10 m/s", "15 m/s", "20 m/s"],
@@ -62,8 +105,19 @@
       {
         "id": "physics-force",
         "title": "Force and acceleration are linked",
+        "story": "A gate in Physics Keep is blocked by a heavy crate. Two students push with the same force, but the lighter practice crate speeds up much more than the heavy one.",
         "summary": "Newton's second law says acceleration increases with force and decreases with mass.",
         "formula": "F = ma",
+        "definitions": [
+          { "symbol": "F", "meaning": "net force on the object" },
+          { "symbol": "m", "meaning": "mass of the object" },
+          { "symbol": "a", "meaning": "acceleration produced" }
+        ],
+        "intuition": "Force is the push or pull. Mass is the object's resistance to changing its motion. More push increases acceleration, but more mass makes the same push less effective.",
+        "workedExample": "If F = 30 N and m = 10 kg, then a = F / m = 30 / 10 = 3 m/s^2. Dividing by mass tells you how much acceleration each kilogram gets from the push.",
+        "mistake": "Do not leave the formula as F = ma when solving for acceleration. Rearrange it first to a = F / m.",
+        "takeaway": "A light object and a heavy object do not respond the same way to the same force.",
+        "visual": { "type": "force-box", "left": "30 N", "center": "10 kg", "right": "3 m/s^2" },
         "question": {
           "q": "A 10 kg object has a net force of 30 N. What is its acceleration?",
           "opts": ["0.33 m/s^2", "3 m/s^2", "20 m/s^2", "300 m/s^2"],
@@ -75,8 +129,19 @@
       {
         "id": "physics-energy",
         "title": "Motion stores energy",
+        "story": "A steel ball rolling down the Keep's ramp is easy to stop at low speed, but much harder to stop once it is moving fast. That extra difficulty is stored energy.",
         "summary": "Moving objects carry kinetic energy, and that energy increases with the square of speed.",
         "formula": "KE = 1/2 mv^2",
+        "definitions": [
+          { "symbol": "KE", "meaning": "kinetic energy" },
+          { "symbol": "m", "meaning": "mass" },
+          { "symbol": "v", "meaning": "speed" }
+        ],
+        "intuition": "Kinetic energy depends on both mass and speed, but speed matters even more because it is squared. Doubling speed multiplies the speed term by four.",
+        "workedExample": "If m = 2 kg and v = 4 m/s, then KE = 1/2 x 2 x 4^2 = 16 J. The square happens before the multiplication by mass.",
+        "mistake": "Do not forget to square the speed. Using 4 instead of 4^2 would cut the energy way down.",
+        "takeaway": "Fast-moving objects become much more energetic very quickly.",
+        "visual": { "type": "energy-bars", "labels": ["mass", "speed^2", "energy"] },
         "question": {
           "q": "What is the kinetic energy of a 2 kg object moving at 4 m/s?",
           "opts": ["8 J", "16 J", "32 J", "4 J"],
@@ -93,8 +158,18 @@
       {
         "id": "chem-atomic-number",
         "title": "Elements are defined by protons",
+        "story": "Dr. Curie holds up carbon and oxygen samples. They look different because their atoms have different numbers of protons in the nucleus, which changes the identity of the element itself.",
         "summary": "An element's atomic number tells you how many protons are in its nucleus.",
         "formula": "atomic number = protons",
+        "definitions": [
+          { "symbol": "atomic number", "meaning": "number that identifies the element" },
+          { "symbol": "protons", "meaning": "positively charged particles in the nucleus" }
+        ],
+        "intuition": "If you change the proton count, you change the element. Six protons means carbon. Eight protons means oxygen. The proton count is the element's identity tag.",
+        "workedExample": "Carbon has 6 protons, so its atomic number is 6. If an atom had 7 protons instead, it would not be carbon anymore; it would be nitrogen.",
+        "mistake": "Do not confuse atomic number with mass number. Atomic number counts protons only.",
+        "takeaway": "Protons decide what the element is, not how heavy the atom happens to be.",
+        "visual": { "type": "atom-core", "center": "6 p+", "ring": "carbon" },
         "question": {
           "q": "What is the atomic number of carbon?",
           "opts": ["4", "6", "8", "12"],
@@ -106,8 +181,18 @@
       {
         "id": "chem-bonds",
         "title": "Atoms bond in different ways",
+        "story": "In the Alchemy Lab, one sample dissolves into charged ions while another stays together as shared electron pairs. The kind of bond explains the difference.",
         "summary": "Covalent bonds share electrons, while ionic bonds transfer them.",
         "formula": "covalent bond = shared electrons",
+        "definitions": [
+          { "symbol": "covalent", "meaning": "atoms share electrons" },
+          { "symbol": "ionic", "meaning": "electrons transfer, making ions" }
+        ],
+        "intuition": "Bonds are about what atoms do with electrons. Sharing creates covalent bonds. Taking and giving creates ionic bonds.",
+        "workedExample": "In a water molecule, atoms share electrons, so the bonding is covalent. In table salt, sodium gives up an electron and chlorine takes it, so the bonding is ionic.",
+        "mistake": "Do not assume every solid uses the same kind of bond. Different materials are held together in different ways.",
+        "takeaway": "Looking at electron behavior helps you predict the kind of bond.",
+        "visual": { "type": "bond-share", "left": "Atom A", "right": "Atom B", "center": "e-" },
         "question": {
           "q": "Which type of bond involves sharing electrons?",
           "opts": ["Ionic", "Covalent", "Metallic", "Hydrogen"],
@@ -119,8 +204,18 @@
       {
         "id": "chem-mole",
         "title": "Chemists count in moles",
+        "story": "The lab ledger cannot list every atom in a sample one by one, so chemists use a giant counting unit called the mole to talk about manageable amounts of matter.",
         "summary": "A mole is a counting unit for atoms and molecules, just like a dozen is a counting unit for eggs.",
         "formula": "1 mole = 6.022 x 10^23 particles",
+        "definitions": [
+          { "symbol": "mole", "meaning": "counting unit for particles" },
+          { "symbol": "6.022 x 10^23", "meaning": "Avogadro's number" }
+        ],
+        "intuition": "A mole does not describe mass by itself. It describes how many particles you have. It is chemistry's version of a giant bundle count.",
+        "workedExample": "If you have 1 mole of water molecules, you have 6.022 x 10^23 molecules. That is far too many to count one at a time, so the mole makes the number usable.",
+        "mistake": "Do not confuse a mole with a gram. One is a particle count; the other is a mass unit.",
+        "takeaway": "The mole lets chemists talk about enormous numbers of particles in a practical way.",
+        "visual": { "type": "count-cluster", "label": "1 mole", "value": "6.022 x 10^23" },
         "question": {
           "q": "How many particles are in one mole?",
           "opts": ["6.022 x 10^23", "6.022 x 10^20", "3.14 x 10^8", "9.81 x 10^2"],
@@ -137,8 +232,19 @@
       {
         "id": "math-derivative",
         "title": "Derivatives measure change",
+        "story": "At the Math Citadel, a scout tracks how fast the mountain road rises. The important question is not just the height, but how quickly the height changes from one step to the next.",
         "summary": "The derivative tells you how quickly one quantity changes as another changes.",
         "formula": "d/dx (x^3) = 3x^2",
+        "definitions": [
+          { "symbol": "d/dx", "meaning": "take the derivative with respect to x" },
+          { "symbol": "x^3", "meaning": "the original function" },
+          { "symbol": "3x^2", "meaning": "the rate-of-change function" }
+        ],
+        "intuition": "A derivative answers the question 'how fast is this changing right now?' The power rule is one of the fastest ways to compute that change for simple powers of x.",
+        "workedExample": "For x^3, the power rule says bring the exponent down and subtract one from the exponent. That turns x^3 into 3x^2.",
+        "mistake": "Do not keep the power at 3 after differentiating. The exponent drops by one.",
+        "takeaway": "Derivatives turn a function into a new function that describes its rate of change.",
+        "visual": { "type": "line-slope", "xLabel": "x", "yLabel": "change", "tag": "steeper means bigger derivative" },
         "question": {
           "q": "What is the derivative of x^3?",
           "opts": ["x^2", "3x^2", "3x", "x^4 / 4"],
@@ -150,8 +256,18 @@
       {
         "id": "math-slope",
         "title": "Linear equations encode rate",
+        "story": "A messenger in the Citadel earns the same extra pay for every mile traveled. That steady rate shows up as the slope in a linear equation.",
         "summary": "In y = mx + b, the slope m tells you how much y changes when x increases by one.",
         "formula": "y = mx + b",
+        "definitions": [
+          { "symbol": "m", "meaning": "slope or rate of change" },
+          { "symbol": "b", "meaning": "starting value when x = 0" }
+        ],
+        "intuition": "Linear equations combine a starting value with a constant rate. If x goes up by 1 each time, y goes up by m each time.",
+        "workedExample": "In y = 3x + 5, the slope is 3. That means each time x increases by 1, y increases by 3. The +5 is just the starting offset.",
+        "mistake": "Do not confuse the slope m with the intercept b. The intercept tells you where the line starts, not how steep it is.",
+        "takeaway": "The coefficient of x in slope-intercept form is the rate.",
+        "visual": { "type": "line-rise", "xLabel": "x", "yLabel": "y", "tag": "rise 3 for each run 1" },
         "question": {
           "q": "What is the slope of y = 3x + 5?",
           "opts": ["5", "3", "8", "-3"],
@@ -163,8 +279,19 @@
       {
         "id": "math-area",
         "title": "Geometry turns shape into measurement",
+        "story": "A circular courtyard in the Citadel must be tiled. To estimate materials, the builders need area, not just the boundary length.",
         "summary": "Area formulas let you compare how much space different shapes cover.",
         "formula": "A = pi r^2",
+        "definitions": [
+          { "symbol": "A", "meaning": "area" },
+          { "symbol": "r", "meaning": "radius" },
+          { "symbol": "pi", "meaning": "circle constant about 3.14" }
+        ],
+        "intuition": "Circle area depends on the radius squared, so making the radius just a little larger grows the covered space quickly.",
+        "workedExample": "If r = 2, then A = pi x 2^2 = 4pi. Square the radius first, then multiply by pi.",
+        "mistake": "Do not use 2r inside the square unless the formula asks for diameter. This formula uses radius.",
+        "takeaway": "The radius controls the area strongly because it is squared.",
+        "visual": { "type": "circle-area", "center": "A", "tag": "r = 2" },
         "question": {
           "q": "What is the area of a circle with radius 2?",
           "opts": ["2pi", "4pi", "8pi", "16pi"],
@@ -181,8 +308,19 @@
       {
         "id": "eng-ohm",
         "title": "Circuits connect voltage, current, and resistance",
+        "story": "Circuit Golem points to a dim lamp in Engineers Haven. The battery is fine, but the path through the circuit resists charge flow. To predict what happens, engineers use Ohm's law.",
         "summary": "Ohm's law is one of the first tools engineers use to predict electrical behavior.",
-        "formula": "V = IR",
+        "formula": "V = I R",
+        "definitions": [
+          { "symbol": "V", "meaning": "voltage, the electrical push" },
+          { "symbol": "I", "meaning": "current, the flow of charge" },
+          { "symbol": "R", "meaning": "resistance, how strongly the circuit opposes flow" }
+        ],
+        "intuition": "Voltage pushes charge through a circuit. Resistance fights that motion. Current is the actual flow you get after those two effects interact.",
+        "workedExample": "If I = 2 A and R = 5 ohms, then V = I x R = 2 x 5 = 10 V. That means a 10-volt push is needed to drive 2 amps through 5 ohms of resistance.",
+        "mistake": "Do not memorize only one arrangement. If you need current instead, rearrange to I = V / R.",
+        "takeaway": "Voltage, current, and resistance are linked. If one changes, at least one of the others must respond.",
+        "visual": { "type": "ohm-loop", "left": "V", "center": "I", "right": "R" },
         "question": {
           "q": "If current is 2 A and resistance is 5 ohms, what is the voltage?",
           "opts": ["2.5 V", "7 V", "10 V", "0.4 V"],
@@ -194,8 +332,19 @@
       {
         "id": "eng-load",
         "title": "Distributed loads add up",
+        "story": "A bridge deck in Engineers Haven carries a steady line of weight across its length. Before checking stresses, the engineers first convert that spread-out load into a total load.",
         "summary": "Engineers often convert load per unit length into total load before analyzing structures.",
         "formula": "total load = load per length x length",
+        "definitions": [
+          { "symbol": "load per length", "meaning": "force spread across each meter" },
+          { "symbol": "length", "meaning": "distance the load acts over" },
+          { "symbol": "total load", "meaning": "combined force from the whole span" }
+        ],
+        "intuition": "A distributed load is like repeating the same force amount over and over along a beam. To get the total force, multiply the repeated amount by how far it extends.",
+        "workedExample": "If the load is 10 N/m across 4 m, then total load = 10 x 4 = 40 N. The 'per meter' and the meters cancel, leaving newtons.",
+        "mistake": "Do not add the load per meter directly to the length. They are different quantities and must be multiplied.",
+        "takeaway": "Total load comes from both intensity and span length.",
+        "visual": { "type": "beam-load", "top": "10 N/m", "bottom": "4 m", "result": "40 N" },
         "question": {
           "q": "What is the total load of 10 N/m over 4 m?",
           "opts": ["10 N", "20 N", "40 N", "2.5 N"],
@@ -207,8 +356,19 @@
       {
         "id": "eng-efficiency",
         "title": "Efficiency compares useful output to input",
+        "story": "An engine in Engineers Haven turns fuel into motion, heat, and noise. Only part of the input becomes useful work, so engineers measure how much value the system keeps.",
         "summary": "No real machine is perfectly efficient, so engineers compare useful energy out to total energy in.",
         "formula": "efficiency = output / input x 100%",
+        "definitions": [
+          { "symbol": "output", "meaning": "useful energy or work delivered" },
+          { "symbol": "input", "meaning": "total energy supplied" },
+          { "symbol": "%", "meaning": "fraction converted to percent" }
+        ],
+        "intuition": "Efficiency is a comparison, not a raw amount. It tells you what fraction of what you put in becomes useful output.",
+        "workedExample": "If a machine gives 80 J of useful output from 100 J of input, then efficiency = 80 / 100 x 100% = 80%.",
+        "mistake": "Do not let efficiency exceed 100% in a normal machine. That would imply you got more useful energy out than total energy in.",
+        "takeaway": "Good engineering reduces wasted energy, but real systems always lose something.",
+        "visual": { "type": "ratio-bars", "left": "80 J out", "right": "100 J in", "tag": "80%" },
         "question": {
           "q": "A machine gives 80 J of useful output from 100 J of input. What is its efficiency?",
           "opts": ["20%", "80%", "100%", "180%"],
