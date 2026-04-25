@@ -1,0 +1,222 @@
+{
+  "intro": {
+    "title": "General STEM Foundations",
+    "lessons": [
+      {
+        "id": "intro-light",
+        "title": "Science measures the world",
+        "summary": "Scientists use standard constants and units so experiments can be compared anywhere in the world.",
+        "formula": "c = 3 x 10^8 m/s",
+        "question": {
+          "q": "What is the speed of light in a vacuum?",
+          "opts": ["3 x 10^8 m/s", "3 x 10^6 m/s", "3 x 10^10 m/s", "3 x 10^4 m/s"],
+          "a": 0,
+          "hint": "It is about 300 million meters per second.",
+          "explain": "The speed of light in a vacuum is about 3 x 10^8 meters per second."
+        }
+      },
+      {
+        "id": "intro-water",
+        "title": "Chemistry uses symbols as shorthand",
+        "summary": "Chemical formulas tell you which atoms are present and how many of each are bonded together.",
+        "formula": "H2O",
+        "question": {
+          "q": "What is the chemical formula for water?",
+          "opts": ["HO", "H2O", "H2O2", "OH"],
+          "a": 1,
+          "hint": "Two hydrogen atoms and one oxygen atom.",
+          "explain": "Water is H2O: two hydrogen atoms bonded to one oxygen atom."
+        }
+      },
+      {
+        "id": "intro-current",
+        "title": "Units help engineers communicate",
+        "summary": "Each physical quantity has a standard unit so people do not confuse current, force, energy, or power.",
+        "formula": "Current -> ampere (A)",
+        "question": {
+          "q": "Which unit measures electrical current?",
+          "opts": ["Volt", "Watt", "Ampere", "Ohm"],
+          "a": 2,
+          "hint": "It is named after Andre-Marie Ampere.",
+          "explain": "The ampere is the SI unit for electrical current."
+        }
+      }
+    ]
+  },
+  "physics": {
+    "title": "Physics of Motion",
+    "lessons": [
+      {
+        "id": "physics-velocity",
+        "title": "Acceleration changes velocity",
+        "summary": "If an object starts from rest and accelerates steadily, its velocity grows linearly with time.",
+        "formula": "v = u + at",
+        "question": {
+          "q": "An object starts from rest and accelerates at 5 m/s^2. What is its velocity after 3 seconds?",
+          "opts": ["5 m/s", "10 m/s", "15 m/s", "20 m/s"],
+          "a": 2,
+          "hint": "Start with u = 0 and use v = u + at.",
+          "explain": "v = 0 + 5 x 3 = 15 m/s."
+        }
+      },
+      {
+        "id": "physics-force",
+        "title": "Force and acceleration are linked",
+        "summary": "Newton's second law says acceleration increases with force and decreases with mass.",
+        "formula": "F = ma",
+        "question": {
+          "q": "A 10 kg object has a net force of 30 N. What is its acceleration?",
+          "opts": ["0.33 m/s^2", "3 m/s^2", "20 m/s^2", "300 m/s^2"],
+          "a": 1,
+          "hint": "Rearrange the formula to a = F / m.",
+          "explain": "a = 30 / 10 = 3 m/s^2."
+        }
+      },
+      {
+        "id": "physics-energy",
+        "title": "Motion stores energy",
+        "summary": "Moving objects carry kinetic energy, and that energy increases with the square of speed.",
+        "formula": "KE = 1/2 mv^2",
+        "question": {
+          "q": "What is the kinetic energy of a 2 kg object moving at 4 m/s?",
+          "opts": ["8 J", "16 J", "32 J", "4 J"],
+          "a": 1,
+          "hint": "Square the speed first.",
+          "explain": "KE = 1/2 x 2 x 4^2 = 16 J."
+        }
+      }
+    ]
+  },
+  "chemistry": {
+    "title": "Chemistry of Matter",
+    "lessons": [
+      {
+        "id": "chem-atomic-number",
+        "title": "Elements are defined by protons",
+        "summary": "An element's atomic number tells you how many protons are in its nucleus.",
+        "formula": "atomic number = protons",
+        "question": {
+          "q": "What is the atomic number of carbon?",
+          "opts": ["4", "6", "8", "12"],
+          "a": 1,
+          "hint": "Carbon has six protons.",
+          "explain": "Carbon's atomic number is 6 because it has 6 protons."
+        }
+      },
+      {
+        "id": "chem-bonds",
+        "title": "Atoms bond in different ways",
+        "summary": "Covalent bonds share electrons, while ionic bonds transfer them.",
+        "formula": "covalent bond = shared electrons",
+        "question": {
+          "q": "Which type of bond involves sharing electrons?",
+          "opts": ["Ionic", "Covalent", "Metallic", "Hydrogen"],
+          "a": 1,
+          "hint": "Think of atoms holding electrons together.",
+          "explain": "Covalent bonds form when atoms share electron pairs."
+        }
+      },
+      {
+        "id": "chem-mole",
+        "title": "Chemists count in moles",
+        "summary": "A mole is a counting unit for atoms and molecules, just like a dozen is a counting unit for eggs.",
+        "formula": "1 mole = 6.022 x 10^23 particles",
+        "question": {
+          "q": "How many particles are in one mole?",
+          "opts": ["6.022 x 10^23", "6.022 x 10^20", "3.14 x 10^8", "9.81 x 10^2"],
+          "a": 0,
+          "hint": "This is Avogadro's number.",
+          "explain": "One mole contains 6.022 x 10^23 particles."
+        }
+      }
+    ]
+  },
+  "math": {
+    "title": "Math of Patterns and Change",
+    "lessons": [
+      {
+        "id": "math-derivative",
+        "title": "Derivatives measure change",
+        "summary": "The derivative tells you how quickly one quantity changes as another changes.",
+        "formula": "d/dx (x^3) = 3x^2",
+        "question": {
+          "q": "What is the derivative of x^3?",
+          "opts": ["x^2", "3x^2", "3x", "x^4 / 4"],
+          "a": 1,
+          "hint": "Bring the exponent down and subtract one from the power.",
+          "explain": "Using the power rule, d/dx (x^3) = 3x^2."
+        }
+      },
+      {
+        "id": "math-slope",
+        "title": "Linear equations encode rate",
+        "summary": "In y = mx + b, the slope m tells you how much y changes when x increases by one.",
+        "formula": "y = mx + b",
+        "question": {
+          "q": "What is the slope of y = 3x + 5?",
+          "opts": ["5", "3", "8", "-3"],
+          "a": 1,
+          "hint": "The slope is the coefficient of x.",
+          "explain": "In y = 3x + 5, the slope m is 3."
+        }
+      },
+      {
+        "id": "math-area",
+        "title": "Geometry turns shape into measurement",
+        "summary": "Area formulas let you compare how much space different shapes cover.",
+        "formula": "A = pi r^2",
+        "question": {
+          "q": "What is the area of a circle with radius 2?",
+          "opts": ["2pi", "4pi", "8pi", "16pi"],
+          "a": 1,
+          "hint": "Square the radius before multiplying by pi.",
+          "explain": "A = pi x 2^2 = 4pi."
+        }
+      }
+    ]
+  },
+  "engineering": {
+    "title": "Engineering in Practice",
+    "lessons": [
+      {
+        "id": "eng-ohm",
+        "title": "Circuits connect voltage, current, and resistance",
+        "summary": "Ohm's law is one of the first tools engineers use to predict electrical behavior.",
+        "formula": "V = IR",
+        "question": {
+          "q": "If current is 2 A and resistance is 5 ohms, what is the voltage?",
+          "opts": ["2.5 V", "7 V", "10 V", "0.4 V"],
+          "a": 2,
+          "hint": "Multiply current by resistance.",
+          "explain": "V = I x R = 2 x 5 = 10 V."
+        }
+      },
+      {
+        "id": "eng-load",
+        "title": "Distributed loads add up",
+        "summary": "Engineers often convert load per unit length into total load before analyzing structures.",
+        "formula": "total load = load per length x length",
+        "question": {
+          "q": "What is the total load of 10 N/m over 4 m?",
+          "opts": ["10 N", "20 N", "40 N", "2.5 N"],
+          "a": 2,
+          "hint": "Multiply the distributed load by the full length.",
+          "explain": "10 N/m x 4 m = 40 N."
+        }
+      },
+      {
+        "id": "eng-efficiency",
+        "title": "Efficiency compares useful output to input",
+        "summary": "No real machine is perfectly efficient, so engineers compare useful energy out to total energy in.",
+        "formula": "efficiency = output / input x 100%",
+        "question": {
+          "q": "A machine gives 80 J of useful output from 100 J of input. What is its efficiency?",
+          "opts": ["20%", "80%", "100%", "180%"],
+          "a": 1,
+          "hint": "Divide useful output by total input, then convert to percent.",
+          "explain": "80 / 100 = 0.8, so the efficiency is 80%."
+        }
+      }
+    ]
+  }
+}

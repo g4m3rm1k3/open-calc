@@ -157,6 +157,13 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                 Universal Calc
               </Link>
               <Link
+                to="/stem-quest"
+                onClick={onNavigate}
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+              >
+                🗺️ STEM Quest
+              </Link>
+              <Link
                 to="/arkanoid-learn"
                 onClick={onNavigate}
                 className="px-3 py-2 rounded-lg text-sm font-semibold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors"

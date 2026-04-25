@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FONT_BODY = "system-ui, sans-serif";
 const FONT_MONO = "'Courier New', monospace";
@@ -670,6 +671,7 @@ function useViewportSize(ref) {
 }
 
 export default function OpenCraftStudio() {
+  const navigate = useNavigate();
   const worldRef = useRef(buildWorld());
   const canvasRef = useRef(null);
   const viewportRef = useRef(null);
@@ -932,6 +934,13 @@ export default function OpenCraftStudio() {
     registerProgress((current) => ({ ...current, customBlocks: current.customBlocks + 1 }));
     notify(`Registered ${builder.name} as block #${id}.`);
   }, [builder, notify, registerProgress]);
+
+  const exitOpenCraft = useCallback(() => {
+    if (document.pointerLockElement) {
+      document.exitPointerLock?.();
+    }
+    navigate("/");
+  }, [navigate]);
 
   useEffect(() => {
     const down = (event) => {
@@ -1380,6 +1389,9 @@ export default function OpenCraftStudio() {
           </div>
           <button onClick={resetWorld} style={{ ...styles.button, padding: "11px 14px", fontWeight: 700 }}>
             Reset World
+          </button>
+          <button onClick={exitOpenCraft} style={{ ...styles.button, padding: "11px 14px", fontWeight: 700 }}>
+            Close
           </button>
         </div>
       </div>

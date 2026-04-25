@@ -1,0 +1,56 @@
+[
+  {
+    "id": "starter-path",
+    "title": "The First Road",
+    "detail": "Visit The Academy and clear your first lesson battle.",
+    "story": "Professor Newton tells you the world will feel overwhelming until you choose a first road and follow it. The Academy is where that road begins.",
+    "targetTownId": "academy",
+    "requires": [],
+    "completeWhen": ["victories>=1"]
+  },
+  {
+    "id": "physics-road",
+    "title": "Road to Physics Keep",
+    "detail": "Follow the northern road and clear Physics Keep.",
+    "story": "The Academy's first recommendation is simple: go north and learn the rules of motion before chasing harder disciplines.",
+    "targetTownId": "physics-keep",
+    "requires": ["victories>=1"],
+    "completeWhen": ["topic:physics"]
+  },
+  {
+    "id": "chemist-call",
+    "title": "A Letter from the Coast",
+    "detail": "Travel east and clear Alchemy Lab.",
+    "story": "Once you understand motion, the Academy sends you east. Matter and materials are the next step in seeing how the world is built.",
+    "targetTownId": "alchemy-lab",
+    "requires": ["topic:physics"],
+    "completeWhen": ["topic:chemistry"]
+  },
+  {
+    "id": "citadel-proof",
+    "title": "Proof at the Citadel",
+    "detail": "Travel south and clear Math Citadel.",
+    "story": "Your mentors now insist that intuition is not enough. To keep going, you need the precise language that lets STEM become exact.",
+    "targetTownId": "math-citadel",
+    "requires": ["topic:physics"],
+    "completeWhen": ["topic:math"]
+  },
+  {
+    "id": "haven-design",
+    "title": "Design for the Real World",
+    "detail": "Travel west and clear Engineers Haven.",
+    "story": "When you have enough theory, the world asks for designs. Engineers Haven is where ideas become tools, structures, and systems.",
+    "targetTownId": "engineers-haven",
+    "requires": ["topic:physics", "topic:math"],
+    "completeWhen": ["topic:engineering"]
+  },
+  {
+    "id": "grand-tour",
+    "title": "The Grand Tour",
+    "detail": "Visit every specialist town at least once.",
+    "story": "A real scholar does not master only one corner of the map. The Academy wants proof that you have seen the whole world.",
+    "targetTownId": "academy",
+    "requires": ["victories>=1"],
+    "completeWhen": ["visited:physics-keep", "visited:alchemy-lab", "visited:math-citadel", "visited:engineers-haven"]
+  }
+]

@@ -496,6 +496,7 @@ function TopBar({
         {gamesMenuOpen && (
           <div className="absolute right-0 top-[calc(100%+4px)] z-[200] min-w-[190px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-lg">
             {[
+              { emoji: "🗺️", label: "STEM Quest",         onClick: () => { setGamesMenuOpen(false); navigate("/stem-quest"); }, active: false },
               { emoji: "🧱", label: "Arkanoid Learn",    onClick: () => { setGamesMenuOpen(false); navigate("/arkanoid-learn"); }, active: false },
               { emoji: "🧪", label: "OpenCraft",         onClick: () => { setGamesMenuOpen(false); navigate("/open-craft"); }, active: location.pathname.startsWith("/open-craft") },
               { emoji: "🎱", label: "Physics Pool Lab",  onClick: () => { onPoolToggle();     setGamesMenuOpen(false); }, active: poolOpen },
@@ -622,6 +623,7 @@ export default function AppShell({ children }) {
   const isCadProRoute = location.pathname.startsWith("/cad-pro");
   const isOpenCraftRoute = location.pathname.startsWith("/open-craft");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
+  const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -696,10 +698,10 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>
