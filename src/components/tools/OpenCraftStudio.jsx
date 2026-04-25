@@ -44,6 +44,13 @@ const BLOCKS = {
   22: { name: "Rubber", rgb: [46, 46, 52], emit: 0, density: 1100, hard: 2, cat: "solid", note: "High-friction elastic surface. Rubber grips better and returns more energy on impact.", traction: 1.25, drag: 16, jump: 9.2, bounce: 0.38 },
   23: { name: "Slime", rgb: [88, 210, 110], emit: 0.06, density: 1050, hard: 0, cat: "liquid", note: "Viscoelastic goo. Slime damps motion sideways but can bounce energy back vertically.", traction: 0.5, drag: 8.5, jump: 7.6, bounce: 0.62 },
   24: { name: "Teflon", rgb: [210, 222, 230], emit: 0, density: 2200, hard: 2, cat: "solid", note: "Extremely low-friction polymer. PTFE shows why slippery materials resist sticking and sliding losses.", traction: 0.09, drag: 0.9, jump: 7.0, bounce: 0.01 },
+  25: { name: "Copper Wire", rgb: [201, 124, 68], emit: 0, density: 8940, hard: 2, cat: "metal", note: "Conductor block for simple circuits. Carry power from switches, solar, batteries, or reactors.", conductsPower: true, inventoryKey: "wire", limitedCount: 24 },
+  26: { name: "Lamp", rgb: [246, 228, 164], emit: 0.02, density: 1500, hard: 1, cat: "solid", note: "Needs power to shine brightly. Great for showing circuits and energy transfer.", powerConsumer: "lamp", inventoryKey: "lamp", limitedCount: 8 },
+  27: { name: "Switch", rgb: [116, 145, 168], emit: 0, density: 1800, hard: 2, cat: "solid", note: "Interactive control block. Toggle it on and off to open or break a circuit.", toggleTo: 28, inventoryKey: "switch", limitedCount: 4 },
+  28: { name: "Switch (On)", rgb: [102, 223, 170], emit: 0.14, density: 1800, hard: 2, cat: "solid", note: "Closed circuit switch. This block acts as a local power source.", toggleTo: 27, powerSource: "switch", inventoryKey: "switch", hiddenInPalette: true, limitedCount: 4 },
+  29: { name: "Battery", rgb: [112, 206, 255], emit: 0.16, density: 2200, hard: 2, cat: "solid", note: "Stored electrical energy. Think of it as limited portable power for circuits.", powerSource: "battery", inventoryKey: "battery", limitedCount: 4 },
+  30: { name: "Reactor", rgb: [120, 255, 126], emit: 0.95, density: 4000, hard: 5, cat: "nuclear", note: "Compact nuclear source block. Massive energy density makes it ideal for teaching power generation.", powerSource: "always", inventoryKey: "reactor", limitedCount: 2 },
+  31: { name: "Solar Panel", rgb: [69, 142, 255], emit: 0.08, density: 2100, hard: 2, cat: "solid", note: "Provides electricity only when the sun is up. Great for renewable-energy builds.", powerSource: "day", inventoryKey: "solar", limitedCount: 6 },
 };
 
 const blockApi = {
@@ -80,8 +87,8 @@ const STEM_LESSONS = {
   },
   metal: {
     title: "Conductivity and Free Electrons",
-    body: "Metals conduct because some electrons move freely through the lattice. Copper is common in wiring because it balances conductivity, cost, and manufacturability.",
-    formulas: ["Current depends on charge flow", "Conductivity tracks electron mobility", "Heat and electricity often travel well in the same materials"],
+    body: "Metals conduct because some electrons move freely through the lattice. Copper wire, batteries, and switches make that idea visible by turning a circuit into light.",
+    formulas: ["Current depends on charge flow", "Conductivity tracks electron mobility", "Power = voltage x current"],
   },
   liquid: {
     title: "Flow, Pressure, and Heat Transfer",
@@ -149,7 +156,22 @@ const MISSIONS = [
     detail: "Try the gravity gun, anti-gravity lift, or antimatter tool.",
     isDone: (progress) => progress.toolUses > 0,
   },
+  {
+    id: "power-up",
+    title: "Light a Circuit",
+    detail: "Power at least one lamp with a switch, solar panel, battery, or reactor.",
+    isDone: (progress) => progress.poweredLamps > 0,
+  },
 ];
+
+const INITIAL_INVENTORY = {
+  wire: 24,
+  lamp: 8,
+  switch: 4,
+  battery: 4,
+  reactor: 2,
+  solar: 6,
+};
 
 function buildWorld() {
   const world = new Uint8Array(WORLD_X * WORLD_Y * WORLD_Z);
@@ -262,6 +284,17 @@ function buildWorld() {
   for (let x = 70; x < 82; x += 1) for (let z = 22; z < 30; z += 1) set(x, 5, z, 23);
   for (let x = 54; x < 70; x += 1) for (let z = 34; z < 42; z += 1) set(x, 5, z, 24);
 
+  set(31, 6, 12, 27);
+  set(32, 6, 12, 25);
+  set(33, 6, 12, 25);
+  set(34, 6, 12, 26);
+  set(37, 6, 12, 31);
+  set(37, 6, 13, 25);
+  set(37, 6, 14, 26);
+  set(41, 6, 12, 29);
+  set(41, 6, 13, 25);
+  set(41, 6, 14, 26);
+
   return world;
 }
 
@@ -303,19 +336,107 @@ function drawPolygon(ctx, points, fill, stroke, lineWidth) {
   return true;
 }
 
-function shadeColor(r, g, b, factor, emit, t, distance) {
+function shadeColor(r, g, b, factor, emit, t, distance, ambient = 1) {
   const pulse = emit > 0 ? 0.88 + 0.12 * Math.sin(t * 3) : 1;
   const fog = Math.max(0, 1 - (distance / 18) ** 2);
-  const mix = factor * pulse * (0.15 + 0.85 * fog);
+  const mix = factor * pulse * ambient * (0.15 + 0.85 * fog);
   return `rgb(${Math.min(255, (r * mix) | 0)},${Math.min(255, (g * mix) | 0)},${Math.min(255, (b * mix) | 0)})`;
+}
+
+function getDaylight(t) {
+  const cycle = (t % 180) / 180;
+  const angle = cycle * Math.PI * 2;
+  return Math.max(0.12, 0.18 + Math.max(0, Math.sin(angle - Math.PI / 2)) * 0.92);
+}
+
+function isDirectPowerSource(block, daylight) {
+  if (!block) return false;
+  if (block.powerSource === "always" || block.powerSource === "switch" || block.powerSource === "battery") return true;
+  if (block.powerSource === "day") return daylight > 0.55;
+  return false;
+}
+
+function canCarryPower(block) {
+  return Boolean(block?.conductsPower || block?.powerConsumer || block?.powerSource);
+}
+
+function powerKey(x, y, z) {
+  return `${x},${y},${z}`;
+}
+
+function isBlockPowered(world, x, y, z, daylight, cache, visiting = new Set(), depth = 0) {
+  if (!inBounds(x, y, z)) return false;
+  const key = powerKey(x, y, z);
+  if (cache.has(key)) return cache.get(key);
+  if (visiting.has(key) || depth > 48) return false;
+  const block = BLOCKS[world[worldIndex(x, y, z)]];
+  if (!block || !canCarryPower(block)) {
+    cache.set(key, false);
+    return false;
+  }
+  if (isDirectPowerSource(block, daylight)) {
+    cache.set(key, true);
+    return true;
+  }
+
+  visiting.add(key);
+  let powered = false;
+  for (const [dx, dy, dz] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+    const nx = x + dx;
+    const ny = y + dy;
+    const nz = z + dz;
+    if (!inBounds(nx, ny, nz)) continue;
+    const neighbor = BLOCKS[world[worldIndex(nx, ny, nz)]];
+    if (!neighbor || !canCarryPower(neighbor)) continue;
+    if (isBlockPowered(world, nx, ny, nz, daylight, cache, visiting, depth + 1)) {
+      powered = true;
+      break;
+    }
+  }
+  visiting.delete(key);
+  cache.set(key, powered);
+  return powered;
+}
+
+function resolveRenderedBlock(world, x, y, z, daylight, cache) {
+  const blockId = world[worldIndex(x, y, z)];
+  const block = BLOCKS[blockId];
+  if (!block) return null;
+  const powered = isBlockPowered(world, x, y, z, daylight, cache);
+
+  if (blockId === 25) {
+    return {
+      ...block,
+      emit: powered ? 0.18 : 0,
+      rgb: powered ? [255, 174, 88] : block.rgb,
+      note: powered ? "Copper wire is energized and carrying current." : block.note,
+    };
+  }
+  if (blockId === 26) {
+    return {
+      ...block,
+      name: powered ? "Lamp (On)" : "Lamp",
+      emit: powered ? Math.max(block.emit, 0.95) : 0.02,
+      rgb: powered ? [255, 238, 160] : block.rgb,
+      note: powered ? "The lamp is lit because the circuit is complete." : block.note,
+    };
+  }
+  if (blockId === 31) {
+    return {
+      ...block,
+      emit: daylight > 0.55 ? 0.24 : 0.02,
+      note: daylight > 0.55 ? "Solar panel is generating electricity in daylight." : "Solar panel is idle because there is not enough sunlight.",
+    };
+  }
+  return block;
 }
 
 function hasNeighbor(world, x, y, z) {
   return inBounds(x, y, z) && Boolean(world[worldIndex(x, y, z)]);
 }
 
-function drawVoxel(ctx, world, camera, width, height, x, y, z, blockId, isTarget, t) {
-  const block = BLOCKS[blockId];
+function drawVoxel(ctx, world, camera, width, height, x, y, z, blockId, isTarget, t, daylight, powerCache) {
+  const block = resolveRenderedBlock(world, x, y, z, daylight, powerCache);
   if (!blockId || !block) return null;
   if (Math.floor(camera.cx) === x && Math.floor(camera.cy) === y && Math.floor(camera.cz) === z) {
     return null;
@@ -350,7 +471,7 @@ function drawVoxel(ctx, world, camera, width, height, x, y, z, blockId, isTarget
     if (!face.show) continue;
     const points = face.corners.map((index) => corners[index]);
     if (points.some((point) => !point)) continue;
-    drawPolygon(ctx, points, shadeColor(r, g, b, face.shade, block.emit, t, center.z), edge, edgeWidth);
+    drawPolygon(ctx, points, shadeColor(r, g, b, face.shade, block.emit, t, center.z, 0.45 + daylight * 0.75), edge, edgeWidth);
     drew = true;
   }
 
@@ -563,6 +684,7 @@ export default function OpenCraftStudio() {
   const mouseRef = useRef({ down: false, startX: 0, startY: 0, x: 0, y: 0, moved: false });
   const cameraRef = useRef({ ...SPAWN_POINT });
   const targetRef = useRef(null);
+  const poweredLampSeenRef = useRef(false);
 
   const viewport = useViewportSize(viewportRef);
 
@@ -591,8 +713,10 @@ export default function OpenCraftStudio() {
     customBlocks: 0,
     placedEmissive: 0,
     toolUses: 0,
+    poweredLamps: 0,
     probedBlocks: [],
   });
+  const [inventory, setInventory] = useState(INITIAL_INVENTORY);
   const [forcedTick, setForcedTick] = useState(0);
 
   const notify = useCallback((message, duration = 2400) => {
@@ -604,7 +728,7 @@ export default function OpenCraftStudio() {
   const missions = useMemo(() => MISSIONS.map((mission) => ({ ...mission, done: mission.isDone(progress) })), [progress]);
   const completedMissionCount = missions.filter((mission) => mission.done).length;
 
-  const allBlocks = useMemo(() => Object.entries(BLOCKS).filter(([, value]) => value.name !== "Air"), [forcedTick]);
+  const allBlocks = useMemo(() => Object.entries(BLOCKS).filter(([, value]) => value.name !== "Air" && !value.hiddenInPalette), [forcedTick]);
   const categories = useMemo(() => [...new Set(allBlocks.map(([, block]) => block.cat))], [allBlocks]);
   const hotbarBlocks = useMemo(() => {
     const pageSize = 10;
@@ -655,6 +779,7 @@ export default function OpenCraftStudio() {
     worldRef.current = buildWorld();
     cameraRef.current = { ...SPAWN_POINT };
     targetRef.current = null;
+    poweredLampSeenRef.current = false;
     setStemInfo(null);
     setComparison(null);
     setShowQuickStart(true);
@@ -663,8 +788,10 @@ export default function OpenCraftStudio() {
       customBlocks: current.customBlocks,
       placedEmissive: 0,
       toolUses: 0,
+      poweredLamps: 0,
       probedBlocks: [],
     }));
+    setInventory(INITIAL_INVENTORY);
     notify("OpenCraft world reset.");
   }, [notify]);
 
@@ -673,6 +800,12 @@ export default function OpenCraftStudio() {
     const activeSelectedBlock = selectedBlockRef.current;
     if (toolId === "place") {
       const { pbx, pby, pbz } = target;
+      const selected = BLOCKS[activeSelectedBlock];
+      const inventoryKey = selected?.inventoryKey;
+      if (inventoryKey && (inventory[inventoryKey] ?? 0) <= 0) {
+        notify(`Out of ${selected?.name || "tech blocks"}. Mine one back or reset the world.`);
+        return;
+      }
       if (
         inBounds(pbx, pby, pbz) &&
         !world[worldIndex(pbx, pby, pbz)] &&
@@ -680,6 +813,9 @@ export default function OpenCraftStudio() {
       ) {
         world[worldIndex(pbx, pby, pbz)] = activeSelectedBlock;
         const placed = BLOCKS[activeSelectedBlock];
+        if (inventoryKey) {
+          setInventory((current) => ({ ...current, [inventoryKey]: Math.max(0, (current[inventoryKey] ?? 0) - 1) }));
+        }
         if (placed?.emit > 0) {
           registerProgress((current) => ({ ...current, placedEmissive: current.placedEmissive + 1 }));
         }
@@ -688,8 +824,12 @@ export default function OpenCraftStudio() {
       return;
     }
     if (toolId === "erase") {
+      const removedBlock = BLOCKS[target.blockId];
       world[worldIndex(target.bx, target.by, target.bz)] = 0;
-      notify(`Removed ${BLOCKS[target.blockId]?.name || "block"}.`);
+      if (removedBlock?.inventoryKey) {
+        setInventory((current) => ({ ...current, [removedBlock.inventoryKey]: (current[removedBlock.inventoryKey] ?? 0) + 1 }));
+      }
+      notify(`Removed ${removedBlock?.name || "block"}.`);
       return;
     }
     if (toolId === "probe") {
@@ -765,8 +905,16 @@ export default function OpenCraftStudio() {
         registerProgress((current) => ({ ...current, toolUses: current.toolUses + 1 }));
         notify("Gravity gun dropped the block.");
       }
+      return;
     }
-  }, [notify, registerProgress]);
+    if (toolId === "toggle") {
+      const block = BLOCKS[target.blockId];
+      if (block?.toggleTo) {
+        world[worldIndex(target.bx, target.by, target.bz)] = block.toggleTo;
+        notify(`${BLOCKS[block.toggleTo]?.name || "Block"} toggled.`);
+      }
+    }
+  }, [notify, registerProgress, inventory]);
 
   const registerCustomBlock = useCallback(() => {
     const hex = builder.color;
@@ -921,6 +1069,8 @@ export default function OpenCraftStudio() {
       const camera = cameraRef.current;
       const world = worldRef.current;
       const keys = keysRef.current;
+      const daylight = getDaylight(t);
+      const powerCache = new Map();
 
       const speed = keys.shift ? 10 : 5;
       const surfaceProps = getSurfaceProperties(world, camera);
@@ -1011,15 +1161,36 @@ export default function OpenCraftStudio() {
       const height = viewport.height;
 
       const sky = ctx.createLinearGradient(0, 0, 0, height);
-      sky.addColorStop(0, "#061224");
-      sky.addColorStop(0.35, "#0a1b2e");
-      sky.addColorStop(0.68, "#091212");
-      sky.addColorStop(1, "#060806");
+      sky.addColorStop(0, daylight > 0.45 ? "#65b8ff" : "#081224");
+      sky.addColorStop(0.35, daylight > 0.45 ? "#7dd1ff" : "#10203a");
+      sky.addColorStop(0.68, daylight > 0.45 ? "#f6b070" : "#0b121d");
+      sky.addColorStop(1, daylight > 0.45 ? "#192228" : "#05080b");
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, width, height);
 
+      const celestialAngle = ((t % 180) / 180) * Math.PI * 2 - Math.PI / 2;
+      const sunX = width * 0.5 + Math.cos(celestialAngle) * width * 0.34;
+      const sunY = height * 0.72 - Math.sin(celestialAngle) * height * 0.5;
+      const moonX = width * 0.5 + Math.cos(celestialAngle + Math.PI) * width * 0.34;
+      const moonY = height * 0.72 - Math.sin(celestialAngle + Math.PI) * height * 0.5;
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 68);
+      sunGlow.addColorStop(0, `rgba(255,236,158,${0.22 + daylight * 0.25})`);
+      sunGlow.addColorStop(1, "rgba(255,236,158,0)");
+      ctx.fillStyle = sunGlow;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 68, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(255,244,183,${0.25 + daylight * 0.75})`;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(220,232,255,${0.28 + (1 - daylight) * 0.72})`;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, 14, 0, Math.PI * 2);
+      ctx.fill();
+
       for (let i = 0; i < 80; i += 1) {
-        const brightness = 0.3 + 0.4 * (Math.sin(i * 137.5 + t * 0.5) * 0.5 + 0.5);
+        const brightness = (0.08 + 0.5 * (Math.sin(i * 137.5 + t * 0.5) * 0.5 + 0.5)) * (1 - daylight);
         ctx.fillStyle = `rgba(255,255,255,${brightness})`;
         ctx.fillRect((Math.sin(i * 137.5) * 0.5 + 0.5) * width, (Math.cos(i * 97.3) * 0.5 + 0.5) * height * 0.5, 1, 1);
       }
@@ -1028,7 +1199,7 @@ export default function OpenCraftStudio() {
         .map(([x, y, z]) => projectPoint(camera, width, height, x, y, z))
         .filter(Boolean);
       if (groundPlane.length === 4) {
-        ctx.fillStyle = "#091109";
+        ctx.fillStyle = daylight > 0.45 ? "#36503a" : "#091109";
         ctx.beginPath();
         ctx.moveTo(groundPlane[0].sx, groundPlane[0].sy);
         groundPlane.slice(1).forEach((point) => ctx.lineTo(point.sx, point.sy));
@@ -1036,11 +1207,20 @@ export default function OpenCraftStudio() {
         ctx.fill();
       }
 
+      let litLampSeenThisFrame = false;
       const voxels = getVisibleVoxels(world, camera);
       const target = targetRef.current;
       for (const voxel of voxels) {
         const isTarget = target && target.bx === voxel.x && target.by === voxel.y && target.bz === voxel.z;
-        drawVoxel(ctx, world, camera, width, height, voxel.x, voxel.y, voxel.z, voxel.blockId, isTarget, t);
+        const rendered = resolveRenderedBlock(world, voxel.x, voxel.y, voxel.z, daylight, powerCache);
+        if (rendered?.powerConsumer === "lamp" && rendered.emit > 0.5) {
+          litLampSeenThisFrame = true;
+        }
+        drawVoxel(ctx, world, camera, width, height, voxel.x, voxel.y, voxel.z, voxel.blockId, isTarget, t, daylight, powerCache);
+      }
+      if (litLampSeenThisFrame && !poweredLampSeenRef.current) {
+        poweredLampSeenRef.current = true;
+        registerProgress((current) => ({ ...current, poweredLamps: current.poweredLamps + 1 }));
       }
 
       const centerX = width / 2;
@@ -1069,7 +1249,7 @@ export default function OpenCraftStudio() {
       ctx.fillRect(centerX - 1, centerY - 1, 2, 2);
 
       if (target) {
-        const block = BLOCKS[target.blockId];
+        const block = resolveRenderedBlock(world, target.bx, target.by, target.bz, daylight, powerCache);
         if (block) {
           const [r, g, b] = block.rgb;
           ctx.fillStyle = "rgba(0,0,0,0.72)";
@@ -1107,7 +1287,7 @@ export default function OpenCraftStudio() {
     return () => {
       window.cancelAnimationFrame(animationRef.current);
     };
-  }, [viewport, notify, applyTool]);
+  }, [viewport, notify, applyTool, registerProgress]);
 
   const styles = {
     frame: {
@@ -1166,6 +1346,7 @@ export default function OpenCraftStudio() {
     { id: "place", label: "Place", icon: "P", hint: "Add a selected block to the world." },
     { id: "erase", label: "Erase", icon: "X", hint: "Remove the targeted block." },
     { id: "probe", label: "Probe", icon: "?", hint: "Inspect a block and open the matching STEM lesson." },
+    { id: "toggle", label: "Toggle", icon: "S", hint: "Flip switches on and off to open or close a circuit." },
     { id: "antimatter", label: "Antimatter", icon: "E", hint: "Teach energy density with a dramatic blast." },
     { id: "antigravity", label: "Lift", icon: "U", hint: "Move a block upward to explore force ideas." },
     { id: "gravity", label: "Drop", icon: "D", hint: "Let gravity settle a block to the surface." },
@@ -1173,6 +1354,7 @@ export default function OpenCraftStudio() {
 
   const selectedBlockInfo = BLOCKS[selectedBlock];
   const target = targetRef.current;
+  const selectedInventoryCount = selectedBlockInfo?.inventoryKey ? inventory[selectedBlockInfo.inventoryKey] ?? 0 : null;
 
   return (
     <div style={styles.frame}>
@@ -1291,6 +1473,7 @@ export default function OpenCraftStudio() {
               </button>
               {hotbarBlocks.map(([id, block]) => {
                 const active = Number(id) === selectedBlock;
+                const count = block.inventoryKey ? inventory[block.inventoryKey] ?? 0 : null;
                 return (
                   <button
                     key={id}
@@ -1306,9 +1489,15 @@ export default function OpenCraftStudio() {
                       placeItems: "center",
                       cursor: "pointer",
                       boxShadow: block.emit > 0 ? `0 0 ${block.emit * 14}px rgba(${block.rgb.join(",")},0.9)` : "none",
+                      position: "relative",
                     }}
                   >
                     <div style={{ width: 26, height: 26, borderRadius: 8, background: `rgb(${block.rgb.join(",")})` }} />
+                    {count !== null ? (
+                      <div style={{ position: "absolute", right: 4, bottom: 2, fontSize: 10, fontWeight: 800, color: "#fdf7d2", textShadow: "0 1px 4px rgba(0,0,0,0.9)" }}>
+                        {count}
+                      </div>
+                    ) : null}
                   </button>
                 );
               })}
@@ -1478,6 +1667,7 @@ export default function OpenCraftStudio() {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 8 }}>
                       {allBlocks.filter(([, block]) => block.cat === category).map(([id, block]) => {
                         const active = Number(id) === selectedBlock;
+                        const count = block.inventoryKey ? inventory[block.inventoryKey] ?? 0 : null;
                         return (
                           <button
                             key={id}
@@ -1494,6 +1684,7 @@ export default function OpenCraftStudio() {
                           >
                             <div style={{ width: 24, height: 24, borderRadius: 8, background: `rgb(${block.rgb.join(",")})`, boxShadow: block.emit > 0 ? `0 0 ${block.emit * 10}px rgba(${block.rgb.join(",")},0.8)` : "none" }} />
                             <div style={{ fontSize: 11, fontWeight: 700 }}>{block.name}</div>
+                            {count !== null ? <div style={{ fontSize: 11, color: "#f7e7a7" }}>x{count}</div> : null}
                           </button>
                         );
                       })}
@@ -1508,6 +1699,9 @@ export default function OpenCraftStudio() {
                       <div>
                         <div style={{ fontWeight: 800, color: `rgb(${selectedBlockInfo.rgb.join(",")})` }}>{selectedBlockInfo.name}</div>
                         <div style={{ fontSize: 12, color: "rgba(230,255,244,0.64)" }}>rho={selectedBlockInfo.density} kg/m^3, hard={selectedBlockInfo.hard}, cat={selectedBlockInfo.cat}</div>
+                        {selectedInventoryCount !== null ? (
+                          <div style={{ fontSize: 12, color: "#f8e7a5" }}>inventory={selectedInventoryCount}</div>
+                        ) : null}
                         {(selectedBlockInfo.traction || selectedBlockInfo.drag || selectedBlockInfo.bounce) ? (
                           <div style={{ fontSize: 12, color: "rgba(154,231,255,0.8)" }}>
                             traction={selectedBlockInfo.traction ?? 0.85} drag={selectedBlockInfo.drag ?? 10} bounce={selectedBlockInfo.bounce ?? 0.06}
