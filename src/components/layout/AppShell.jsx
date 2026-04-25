@@ -377,9 +377,6 @@ function TopBar({
           />
         </svg>
         <span className="hidden sm:inline">Search</span>
-        <kbd className="hidden sm:inline font-mono text-xs bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600">
-          ⌘K
-        </kbd>
       </button>
 
       {/* Spacer for mobile */}
@@ -398,21 +395,21 @@ function TopBar({
           <button
             onClick={onGraphToggle}
             className="p-2 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
-            title="2D Grapher (G)"
+            title="2D Grapher"
           >
             <Activity className="w-4 h-4" />
           </button>
           <button
             onClick={onGraph3DToggle}
             className="p-2 text-amber-500  dark:text-amber-400  hover:bg-amber-50  dark:hover:bg-amber-900/30  transition-colors border-l border-slate-200 dark:border-slate-700"
-            title="3D Plotter (3)"
+            title="3D Plotter"
           >
             <Box className="w-4 h-4" />
           </button>
           <button
             onClick={onGraphJSXToggle}
             className="p-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors border-l border-slate-200 dark:border-slate-700"
-            title="JSXGraph Pro (X)"
+            title="JSXGraph Pro"
           >
             <Settings2 className="w-4 h-4" />
           </button>
@@ -423,49 +420,49 @@ function TopBar({
           <button
             onClick={onScratchToggle}
             className={`p-2 transition-colors ${scratchOpen ? "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-900/30" : "text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30"}`}
-            title="Scratchpad (S)"
+            title="Scratchpad"
           >
             <PenLine className="w-4 h-4" />
           </button>
           <button
             onClick={onCalcToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${calcOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="TI Calculator (C)"
+            title="TI Calculator"
           >
             <Calculator className="w-4 h-4" />
           </button>
           <button
             onClick={onSigmaToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${sigmaOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="Sigma Evaluator (Z)"
+            title="Sigma Evaluator"
           >
             <span className="text-sm font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>Σ</span>
           </button>
           <button
             onClick={onPolyToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${polyOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="Polynomial Solver (Q)"
+            title="Polynomial Solver"
           >
             <span className="text-[10px] font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>P(x)</span>
           </button>
           <button
             onClick={onPythonToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${pythonOpen ? "text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30" : "text-teal-500 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30"}`}
-            title="Python Sandbox (P)"
+            title="Python Sandbox"
           >
             <Terminal className="w-4 h-4" />
           </button>
           <button
             onClick={onJsToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${jsOpen ? "text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30" : "text-yellow-500 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30"}`}
-            title="JS Playground (J)"
+            title="JS Playground"
           >
             <Code2 className="w-4 h-4" />
           </button>
           <button
             onClick={handleVideoToggle}
             className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${videoActive ? "text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30" : "text-sky-500 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30"}`}
-            title="Video Player (V)"
+            title="Video Player"
           >
             <PlayCircle className="w-4 h-4" />
           </button>
@@ -500,6 +497,7 @@ function TopBar({
           <div className="absolute right-0 top-[calc(100%+4px)] z-[200] min-w-[190px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-lg">
             {[
               { emoji: "🧱", label: "Arkanoid Learn",    onClick: () => { setGamesMenuOpen(false); navigate("/arkanoid-learn"); }, active: false },
+              { emoji: "🧪", label: "OpenCraft",         onClick: () => { setGamesMenuOpen(false); navigate("/open-craft"); }, active: location.pathname.startsWith("/open-craft") },
               { emoji: "🎱", label: "Physics Pool Lab",  onClick: () => { onPoolToggle();     setGamesMenuOpen(false); }, active: poolOpen },
               { emoji: "🏀", label: "Basketball Lab",    onClick: () => { onBasketToggle();   setGamesMenuOpen(false); }, active: basketOpen },
               { emoji: "⛳", label: "Mini Golf Lab",      onClick: () => { onGolfToggle();     setGamesMenuOpen(false); }, active: golfOpen },
@@ -622,6 +620,7 @@ export default function AppShell({ children }) {
   const isArkanoidLearnRoute = location.pathname.startsWith("/arkanoid-learn");
   const isCNCSimRoute = location.pathname.startsWith("/cnc-sim");
   const isCadProRoute = location.pathname.startsWith("/cad-pro");
+  const isOpenCraftRoute = location.pathname.startsWith("/open-craft");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
@@ -691,127 +690,16 @@ export default function AppShell({ children }) {
     else setGraphJSXOpen(true); // 'pro' default
   }, []);
 
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handler = (e) => {
-      // CMD/CTRL + K for search
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        openSearch();
-      }
-
-      // If the Python notebook is open, we do not want global single-key shortcuts to fire!
-      if (pythonOpen) {
-        if (e.key === "Escape") setPythonOpen(false);
-        return;
-      }
-
-      const activeElement = document.activeElement;
-      const target = e.target;
-
-      // Nuclear Typing Check: Covers Monaco (Python), CodeMirror, Standard Inputs, and Custom Editable Divs
-      const isTyping =
-        ["INPUT", "TEXTAREA", "SELECT"].includes(activeElement?.tagName) ||
-        activeElement?.isContentEditable ||
-        target?.closest(".monaco-editor") ||
-        target?.closest(".cm-editor") ||
-        target?.closest('[contenteditable="true"]');
-
-      if (isTyping && e.key !== "Escape") return;
-
-      // 'g' key for graph
-      if (e.key.toLowerCase() === "g") {
-        setGraphOpen((prev) => !prev);
-        if (!graphOpen) {
-          setGraph3DOpen(false);
-          setGraphJSXOpen(false);
-        }
-      }
-      // '3' key for 3D plotter
-      if (e.key === "3") {
-        setGraph3DOpen((prev) => !prev);
-        if (!graph3DOpen) {
-          setGraphOpen(false);
-          setGraphJSXOpen(false);
-        }
-      }
-      // 'x' key for JSXGraph Pro
-      if (e.key.toLowerCase() === "x") {
-        setGraphJSXOpen((prev) => !prev);
-        if (!graphJSXOpen) {
-          setGraphOpen(false);
-          setGraph3DOpen(false);
-        }
-      }
-      // 's' key for scratchpad
-      if (e.key.toLowerCase() === "s") {
-        setScratchOpen((prev) => !prev);
-      }
-      // 'c' key for TI calculator
-      if (e.key.toLowerCase() === "c") {
-        setCalcOpen((prev) => !prev);
-      }
-      // 'z' key for Sigma Evaluator
-      if (e.key.toLowerCase() === "z") {
-        setSigmaOpen((prev) => !prev);
-      }
-      // 'q' key for Polynomial Solver
-      if (e.key.toLowerCase() === "q") {
-        setPolyOpen((prev) => !prev);
-      }
-      // 'p' key for Python sandbox
-      if (e.key.toLowerCase() === "p") {
-        setPythonOpen((prev) => !prev);
-      }
-      // 'j' key for JS playground
-      if (e.key.toLowerCase() === "j") {
-        setJsOpen((prev) => !prev);
-      }
-      // 'v' key for video player
-      if (e.key.toLowerCase() === "v") {
-        // handled via context; dispatch a custom event the FloatingVideoPlayer can listen to
-        window.dispatchEvent(new CustomEvent("oc-toggle-video"));
-      }
-      // '?' key for help docs
-      if (e.key === "?") {
-        setHelpOpen((prev) => !prev);
-      }
-      // 'Escape' to close modals
-      if (e.key === "Escape") {
-        setGraphOpen(false);
-        setGraph3DOpen(false);
-        setGraphJSXOpen(false);
-        setScratchOpen(false);
-        setCalcOpen(false);
-        setSigmaOpen(false);
-        setPolyOpen(false);
-        setPythonOpen(false);
-        setJsOpen(false);
-        setHelpOpen(false);
-        setPoolOpen(false);
-        setGolfOpen(false);
-      }
-      // 'Shift+D' — toggle Dev Mode (shows VIZ component names on every viz frame)
-      if (e.shiftKey && e.key === "D") {
-        const html = document.documentElement;
-        const isDevMode = html.classList.toggle("dev-mode");
-        localStorage.setItem("oc-dev-mode", isDevMode ? "1" : "");
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [openSearch, graphOpen, graph3DOpen, graphJSXOpen, pythonOpen]);
-
   useEffect(() => {
     const openScratch = () => setScratchOpen(true);
     window.addEventListener("oc-open-scratchpad", openScratch);
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
+        <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>
           <div className="h-full w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>

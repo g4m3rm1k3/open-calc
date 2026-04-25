@@ -163,6 +163,13 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
               >
                 Arkanoid Learn
               </Link>
+              <Link
+                to="/open-craft"
+                onClick={onNavigate}
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-colors"
+              >
+                OpenCraft
+              </Link>
               {/* Reality Runner hidden until physics fixed */}
               <Link
                 to="/cnc-sim"
