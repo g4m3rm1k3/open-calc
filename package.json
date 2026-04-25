@@ -16,7 +16,7 @@
     "desktop:dev": "node scripts/run-desktop-dev.mjs",
     "desktop:sync-package": "node scripts/sync-desktop-package.mjs",
     "desktop:prepare-build": "node scripts/prepare-desktop-build.mjs",
-    "desktop:build": "npm run build && npm run desktop:sync-package && npm run desktop:prepare-build && node --max-old-space-size=4096 ./node_modules/electron-builder/cli.js --projectDir desktop/staging --win portable"
+    "desktop:build": "cross-env ELECTRON_BUILD=1 node src/scripts/build-search-index.js && cross-env ELECTRON_BUILD=1 vite build && npm run desktop:sync-package && npm run desktop:prepare-build && node --max-old-space-size=4096 ./node_modules/electron-builder/cli.js --projectDir desktop/staging --win portable"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
@@ -62,6 +62,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^10.1.0",
     "electron": "^35.5.1",
     "electron-builder": "^26.0.12",
     "postcss": "^8.4.45",

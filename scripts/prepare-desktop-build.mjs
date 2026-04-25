@@ -15,7 +15,6 @@ await copyIntoStage('desktop/app/main.mjs', 'app/main.mjs')
 await copyIntoStage('desktop/app/preload.mjs', 'app/preload.mjs')
 await copyIntoStage('desktop/app/package.json', 'app/package.json')
 await copyIntoStage('dist', 'dist')
-await copyIntoStage('backend', 'backend')
 
 const rootPackage = JSON.parse(await fs.readFile(rootPackagePath, 'utf8'))
 const desktopPackage = JSON.parse(await fs.readFile(desktopPackagePath, 'utf8'))
@@ -42,10 +41,6 @@ const builderPackage = {
       {
         from: 'dist',
         to: 'dist',
-      },
-      {
-        from: 'backend',
-        to: 'backend',
       },
     ],
     win: {

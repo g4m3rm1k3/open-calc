@@ -1,4 +1,4 @@
-﻿# open-calc
+# OpenCalc
 
 An open-source interactive STEM platform — intuition first, rigour always.
 
@@ -13,12 +13,42 @@ Every proof has a synchronized visualization. Every worked example is interactiv
 
 ---
 
+## Download
+
+| Platform | File | Notes |
+| --- | --- | --- |
+| **Windows** (10/11, 64-bit) | `open-calc-X.X.X.exe` | See SmartScreen note below |
+| **macOS** | `open-calc-X.X.X.dmg` | Coming soon |
+
+👉 **[Download the latest release →](../../releases/latest)**
+
+### Windows SmartScreen warning
+
+When you first run the `.exe`, Windows may show a blue "Windows protected your PC" dialog. This happens because the app is not yet code-signed. It is safe to run:
+
+1. Click **"More info"**
+2. Click **"Run anyway"**
+
+### System requirements
+
+| | Minimum | Recommended |
+| --- | --- | --- |
+| **OS** | Windows 10 64-bit | Windows 11 |
+| **RAM** | 4 GB | 8 GB+ |
+| **Storage** | 400 MB free | 1 GB+ free |
+| **GPU** | Any with WebGL | Dedicated GPU |
+| **Internet** | Not required | Required for P2P study chat |
+
+> **Note on heavy features:** The AI Tutor and Python sandbox are memory-intensive. If the app becomes unresponsive while using them, close other programs to free up RAM. The app will offer to restart itself if it runs into trouble.
+
+---
+
 ## What it is
 
-open-calc teaches university-level STEM with the belief that **intuition and rigour are not opposites** — they reinforce each other. Every concept follows the same cycle:
+OpenCalc teaches university-level STEM with the belief that **intuition and rigour are not opposites** — they reinforce each other. Every concept follows the same cycle:
 
 | Stage | What happens |
-|---|---|
+| --- | --- |
 | **Hook** | A real-world question that makes the concept feel necessary |
 | **Intuition** | Geometric or physical reasoning with interactive visualizations |
 | **Math** | Precise definitions, theorems, and worked examples |
@@ -28,14 +58,24 @@ A `mathBridge` field on every visualization explicitly states which part of the 
 
 Students can run Python and JavaScript code directly in the browser — no installation required, powered by Pyodide and a sandboxed JS runtime.
 
-OpenMAT is also included as a MATLAB-style matrix workspace inside the app. It uses a custom MATLAB-like language layer on top of a browser-side math engine and Open Calc's own plotting stack. See [docs/OpenMAT.md](docs/OpenMAT.md) for the current language model, supported features, and extension direction.
+---
+
+## Study Chat (P2P — no server)
+
+OpenCalc has a built-in global and per-lesson study chat. It connects students worldwide who are studying the same material — **with no server, no account, and no cost**.
+
+- **Global room** — always open, connects all OpenCalc users worldwide
+- **Lesson rooms** — automatically join a room for whichever lesson you are on; anyone else studying that lesson worldwide is in the same room
+- **No server** — powered by WebRTC over the BitTorrent/Nostr DHT network. Peer data flows directly between browsers, never through a central server
+- **Block users** — hover any message and click the block icon to permanently hide messages from that user (stored locally)
+- **Anonymous by default** — you get a random math-themed name (e.g. "CuriousEuler") that you can change at any time
 
 ---
 
 ## Courses
 
 | Course | Description | Status |
-|---|---|---|
+| --- | --- | --- |
 | **Pre-Calculus** | Functions, graphs, transformations, trigonometry | ✅ Active |
 | **Geometry** | Proofs, constructions, similarity, circles, coordinates | ✅ Active |
 | **Calculus** | Limits, derivatives, applications, integration, series (chapters 0–6) | ✅ Active |
@@ -53,7 +93,7 @@ OpenMAT is also included as a MATLAB-style matrix workspace inside the app. It u
 ## Tech stack
 
 | Tool | Role |
-|---|---|
+| --- | --- |
 | React 18 + Vite 5 | UI and build |
 | D3.js 7 | 2D interactive visualizations |
 | Three.js | 3D visualizations |
@@ -62,10 +102,11 @@ OpenMAT is also included as a MATLAB-style matrix workspace inside the app. It u
 | Tailwind CSS | Styling with full dark mode |
 | React Router | Client-side routing |
 | Fuse.js | Full-text search across all lessons |
+| Trystero + WebRTC | Serverless P2P study chat |
 
 ---
 
-## Getting started
+## Getting started (development)
 
 **Requirements:** Node.js 18+, npm 9+
 
@@ -73,58 +114,35 @@ OpenMAT is also included as a MATLAB-style matrix workspace inside the app. It u
 git clone https://github.com/your-username/open-calc.git
 cd open-calc
 npm install
-npm run dev        # starts dev server
+npm run dev        # starts dev server at http://localhost:5173
 ```
 
-Open `http://localhost:5173`.
-
 ```bash
-npm run build      # production build + generates search index
+npm run build      # production build
 npm run preview    # preview the production build locally
-npm run backend    # optional local backend for overrides + hosting
 ```
 
-### Optional backend companion
-
-`open-calc` is still a frontend-first app, but there is now an optional local backend companion in [`backend/server.mjs`](backend/server.mjs).
-
-It is designed for three things:
-
-- keep user edits outside the shipped app so normal updates do not overwrite them
-- let a user's machine act as a local/LAN host for the built app
-- provide a clean path toward a packaged desktop executable later
-
-The optional docs hub also uses this backend now:
-
-- users can create their own markdown docs
-- bundled docs in `src/docs/` can be locally overridden without editing shipped files
-- docs can be exported and imported as share packs between machines
-- running the backend on LAN makes one user's PC a simple host for peers on the same network
-
-By default the backend binds to `127.0.0.1:4318` for safety. Run `npm run backend:lan` if you explicitly want to expose it on your local network.
-
-Lesson overrides live in the user's app-data folder, not in `src/content/`. The frontend will detect the backend automatically for lesson pages and merge a local override on top of the built-in lesson if one exists.
-
-See [docs/optional-backend.md](docs/optional-backend.md) for the API, storage layout, and update model.
-See [desktop/PORTABLE_RELEASES.md](desktop/PORTABLE_RELEASES.md) for the recommended portable executable + GitHub Releases update model.
-
-### Web + desktop together
-
-`open-calc` is intended to keep both distribution modes:
-
-- GitHub Pages or any static hosting for the browser-first version
-- a downloadable portable desktop executable for users who want a local app
-
-The desktop wrapper does not replace the web app. It packages the same built frontend and starts the optional local backend automatically.
-
-Desktop commands:
+### Building the desktop app
 
 ```bash
-npm run desktop:dev
+# Windows (.exe portable)
 npm run desktop:build
+
+# The output will be in desktop/staging/release/
 ```
 
-`npm run desktop:build` now produces a portable Windows executable in `desktop/staging/release/` without changing the GitHub Pages/static-hosted version.
+Build the Mac version (`.dmg`) by running `npm run desktop:build` on a Mac — electron-builder must run on the target OS.
+
+Both files are uploaded as assets to the same GitHub Release.
+
+### Optional local backend
+
+The optional backend in `backend/server.mjs` enables lesson overrides and LAN hosting. It is **not required** for the desktop app or the web app.
+
+```bash
+npm run backend        # binds to 127.0.0.1:4318
+npm run backend:lan    # exposes on local network
+```
 
 ---
 
@@ -155,6 +173,7 @@ src/
     linear-algebra/
     web-1/
   components/
+    chat/           # P2P study chat (global + lesson rooms)
     viz/
       d3/           # 2D D3 visualizations
       three/        # 3D Three.js visualizations
@@ -163,9 +182,11 @@ src/
     lesson/         # lesson layout components
     math/           # KaTeX wrappers
   pages/            # route-level components
-  context/          # app-level state (progress, theme)
+  context/          # app-level state (progress, theme, chat)
 public/
   search-index.json # generated by npm run build
+desktop/
+  app/              # Electron main process (no backend dependency)
 ```
 
 ---

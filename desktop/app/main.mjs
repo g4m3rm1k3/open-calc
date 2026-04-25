@@ -1,5 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
-import { spawn } from 'node:child_process'
+import { app, BrowserWindow, dialog, ipcMain, shell, protocol, net } from 'electron'
 import { promises as fs } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -7,82 +6,83 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isDev = !app.isPackaged
-const backendPort = Number(process.env.OPEN_CALC_BACKEND_PORT ?? 4318)
-const backendBaseUrl = `http://127.0.0.1:${backendPort}`
 const updateManifestUrl = process.env.OPEN_CALC_UPDATE_MANIFEST_URL ?? ''
 
-let mainWindow = null
-let backendProcess = null
+// Register custom scheme before app is ready — required by Electron
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'opencalc', privileges: { secure: true, standard: true, supportFetchAPI: true, corsEnabled: true } },
+])
 
-app.whenReady().then(async () => {
-  await startBackend()
-  await waitForBackend()
+// Give the V8 heap room to breathe without letting it consume all RAM.
+// WebLLM and Pyodide are both memory-heavy; 4 GB is a safe ceiling on
+// most modern machines while still leaving headroom for the OS.
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096')
+
+// Some integrated GPUs fail on certain D3D/Vulkan paths. Letting Electron
+// pick the best available renderer avoids hard GPU crashes on low-end PCs.
+app.commandLine.appendSwitch('ignore-gpu-blocklist')
+app.commandLine.appendSwitch('enable-gpu-rasterization')
+
+let mainWindow = null
+
+app.whenReady().then(() => {
+  // Serve the built dist/ through a custom scheme so file:// security
+  // restrictions never apply, regardless of where the portable exe extracts.
+  protocol.handle('opencalc', (request) => {
+    const url = new URL(request.url)
+    // Strip leading slash so path.join works correctly on Windows
+    const relative = url.pathname.replace(/^\//, '')
+    const filePath = path.join(resolveDistDir(), relative || 'index.html')
+    return net.fetch(`file:///${filePath.replace(/\\/g, '/')}`)
+  })
+
   createWindow()
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-})
-
-app.on('before-quit', () => {
-  stopBackend()
+  if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
 ipcMain.handle('desktop:get-runtime-info', async () => ({
   isDesktop: true,
   isPackaged: app.isPackaged,
   version: app.getVersion(),
-  backendBaseUrl,
   updateManifestUrl,
 }))
 
 ipcMain.handle('desktop:check-for-updates', async () => {
-  if (!updateManifestUrl) {
-    return { ok: false, reason: 'No update manifest URL configured' }
-  }
-
-  const response = await fetch(updateManifestUrl)
-  if (!response.ok) {
-    return { ok: false, reason: `Update manifest request failed with ${response.status}` }
-  }
-
-  const manifest = await response.json()
-  const currentVersion = app.getVersion()
-  return {
-    ok: true,
-    currentVersion,
-    manifest,
-    updateAvailable: isVersionNewer(manifest.version, currentVersion),
+  if (!updateManifestUrl) return { ok: false, reason: 'No update manifest URL configured' }
+  try {
+    const response = await fetch(updateManifestUrl)
+    if (!response.ok) return { ok: false, reason: `Manifest request failed: ${response.status}` }
+    const manifest = await response.json()
+    const currentVersion = app.getVersion()
+    return { ok: true, currentVersion, manifest, updateAvailable: isVersionNewer(manifest.version, currentVersion) }
+  } catch (e) {
+    return { ok: false, reason: String(e) }
   }
 })
 
 ipcMain.handle('desktop:download-portable-update', async (_event, assetUrl) => {
-  if (!assetUrl) {
-    return { ok: false, reason: 'Missing asset URL' }
+  if (!assetUrl) return { ok: false, reason: 'Missing asset URL' }
+  try {
+    const response = await fetch(assetUrl)
+    if (!response.ok) return { ok: false, reason: `Download failed: ${response.status}` }
+    const buffer = Buffer.from(await response.arrayBuffer())
+    const downloadsDir = path.join(os.homedir(), 'Downloads')
+    await fs.mkdir(downloadsDir, { recursive: true })
+    const filename = path.basename(new URL(assetUrl).pathname)
+    const outputPath = path.join(downloadsDir, filename)
+    await fs.writeFile(outputPath, buffer)
+    await shell.showItemInFolder(outputPath)
+    return { ok: true, outputPath }
+  } catch (e) {
+    return { ok: false, reason: String(e) }
   }
-
-  const response = await fetch(assetUrl)
-  if (!response.ok) {
-    return { ok: false, reason: `Download failed with ${response.status}` }
-  }
-
-  const buffer = Buffer.from(await response.arrayBuffer())
-  const downloadsDir = path.join(os.homedir(), 'Downloads')
-  await fs.mkdir(downloadsDir, { recursive: true })
-  const filename = path.basename(new URL(assetUrl).pathname)
-  const outputPath = path.join(downloadsDir, filename)
-  await fs.writeFile(outputPath, buffer)
-  await shell.showItemInFolder(outputPath)
-
-  return { ok: true, outputPath }
 })
 
 ipcMain.handle('desktop:open-external', async (_event, url) => {
@@ -105,96 +105,65 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
+      // Allow WebAssembly (needed by Pyodide) and WebGL (Three.js / D3)
+      webSecurity: true,
     },
   })
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow?.show()
-  })
+  mainWindow.once('ready-to-show', () => mainWindow?.show())
 
-  mainWindow.loadURL(backendBaseUrl)
-}
-
-async function startBackend() {
-  const nodeExecutable = process.execPath
-  const backendEntry = resolveBackendEntry()
-  const distDir = resolveDesktopDistDir()
-  const env = {
-    ...process.env,
-    OPEN_CALC_BACKEND_HOST: '127.0.0.1',
-    OPEN_CALC_BACKEND_PORT: String(backendPort),
-    OPEN_CALC_DIST_DIR: distDir,
-    OPEN_CALC_RUNTIME_ROOT: resolveRuntimeRoot(),
-  }
-
-  backendProcess = spawn(nodeExecutable, [backendEntry], {
-    cwd: resolveRuntimeRoot(),
-    env,
-    stdio: 'ignore',
-    windowsHide: true,
-  })
-
-  backendProcess.on('exit', () => {
-    backendProcess = null
-  })
-}
-
-function stopBackend() {
-  if (backendProcess && !backendProcess.killed) {
-    backendProcess.kill()
-  }
-}
-
-async function waitForBackend(timeoutMs = 15000) {
-  const startedAt = Date.now()
-  while (Date.now() - startedAt < timeoutMs) {
-    try {
-      const response = await fetch(`${backendBaseUrl}/api/health`)
-      if (response.ok) return
-    } catch {
-      // retry
+  // If the renderer process crashes (OOM, GPU fault, etc.) show a recovery
+  // dialog rather than silently leaving the user with a blank window.
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    if (details.reason === 'clean-exit') return
+    const choice = dialog.showMessageBoxSync(mainWindow, {
+      type: 'error',
+      title: 'OpenCalc stopped responding',
+      message: 'The app ran into a problem and needs to restart.',
+      detail: `Reason: ${details.reason}\n\nTip: if this keeps happening, try closing other apps to free up memory — the AI Tutor and Python sandbox are memory-intensive features.`,
+      buttons: ['Restart', 'Quit'],
+      defaultId: 0,
+    })
+    if (choice === 0) {
+      app.relaunch()
     }
-    await new Promise((resolve) => setTimeout(resolve, 300))
-  }
+    app.quit()
+  })
 
-  dialog.showErrorBox(
-    'open-calc backend failed to start',
-    'The desktop app could not start its local backend companion.'
-  )
+  // Catch a frozen (but not yet crashed) renderer and offer to restart.
+  mainWindow.on('unresponsive', () => {
+    const choice = dialog.showMessageBoxSync(mainWindow, {
+      type: 'warning',
+      title: 'OpenCalc is not responding',
+      message: 'The app is not responding. This can happen when loading large AI models or running heavy Python computations.',
+      buttons: ['Wait', 'Restart'],
+      defaultId: 0,
+    })
+    if (choice === 1) {
+      app.relaunch()
+      app.quit()
+    }
+  })
+
+  if (isDev) {
+    const devPort = process.env.VITE_PORT ?? 5173
+    mainWindow.loadURL(`http://localhost:${devPort}`)
+  } else {
+    mainWindow.loadURL('opencalc://app/index.html')
+  }
 }
 
-function resolveBackendEntry() {
-  if (isDev) {
-    return path.resolve(__dirname, '..', '..', 'backend', 'server.mjs')
-  }
-  return path.join(process.resourcesPath, 'backend', 'server.mjs')
-}
-
-function resolveDesktopDistDir() {
-  if (isDev) {
-    return path.resolve(__dirname, '..', '..', 'dist')
-  }
+function resolveDistDir() {
+  if (isDev) return path.resolve(__dirname, '..', '..', 'dist')
   return path.join(process.resourcesPath, 'dist')
 }
 
-function resolveRuntimeRoot() {
-  if (isDev) {
-    return path.resolve(__dirname, '..', '..')
-  }
-  return process.resourcesPath
-}
-
 function isVersionNewer(candidate, current) {
-  const candidateParts = String(candidate || '').split('.').map(Number)
-  const currentParts = String(current || '').split('.').map(Number)
-  const maxLength = Math.max(candidateParts.length, currentParts.length)
-
-  for (let index = 0; index < maxLength; index += 1) {
-    const candidateValue = candidateParts[index] || 0
-    const currentValue = currentParts[index] || 0
-    if (candidateValue > currentValue) return true
-    if (candidateValue < currentValue) return false
+  const a = String(candidate || '').split('.').map(Number)
+  const b = String(current || '').split('.').map(Number)
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if ((a[i] || 0) > (b[i] || 0)) return true
+    if ((a[i] || 0) < (b[i] || 0)) return false
   }
-
   return false
 }
