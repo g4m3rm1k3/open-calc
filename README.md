@@ -94,6 +94,13 @@ It is designed for three things:
 - let a user's machine act as a local/LAN host for the built app
 - provide a clean path toward a packaged desktop executable later
 
+The optional docs hub also uses this backend now:
+
+- users can create their own markdown docs
+- bundled docs in `src/docs/` can be locally overridden without editing shipped files
+- docs can be exported and imported as share packs between machines
+- running the backend on LAN makes one user's PC a simple host for peers on the same network
+
 By default the backend binds to `127.0.0.1:4318` for safety. Run `npm run backend:lan` if you explicitly want to expose it on your local network.
 
 Lesson overrides live in the user's app-data folder, not in `src/content/`. The frontend will detect the backend automatically for lesson pages and merge a local override on top of the built-in lesson if one exists.

@@ -10,12 +10,17 @@ const repoRoot = path.resolve(process.cwd())
 const distDir = path.join(repoRoot, 'dist')
 const dataDir = resolveDataDir()
 const overridesDir = path.join(dataDir, 'overrides', 'lessons')
+const docsDir = path.join(dataDir, 'docs')
+const userDocsDir = path.join(docsDir, 'user')
+const docOverridesDir = path.join(docsDir, 'overrides')
 const configPath = path.join(dataDir, 'config.json')
 const updateCachePath = path.join(dataDir, 'cache', 'update-manifest.json')
 
 await ensureDirectory(path.dirname(configPath))
 await ensureDirectory(path.dirname(updateCachePath))
 await ensureDirectory(overridesDir)
+await ensureDirectory(userDocsDir)
+await ensureDirectory(docOverridesDir)
 
 const config = await loadConfig()
 
@@ -60,6 +65,26 @@ const server = createServer(async (request, response) => {
 
     if (url.pathname === '/api/lesson-override') {
       return handleLessonOverride(request, response, url)
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/docs') {
+      return handleDocsIndex(response)
+    }
+
+    if (url.pathname === '/api/docs/user') {
+      return handleUserDocs(request, response, url)
+    }
+
+    if (url.pathname === '/api/docs/override') {
+      return handleDocOverrides(request, response, url)
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/docs/share/import') {
+      return handleDocShareImport(request, response)
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/docs/share/export') {
+      return handleDocShareExport(response, url)
     }
 
     if (request.method === 'POST' && url.pathname === '/api/update/check') {
@@ -156,6 +181,158 @@ async function handleUpdateCheck(response) {
   return json(response, 200, payload)
 }
 
+async function handleDocsIndex(response) {
+  return json(response, 200, {
+    backendAvailable: true,
+    userDocs: await listUserDocs(),
+    overrideDocs: await listDocOverrides(),
+  })
+}
+
+async function handleUserDocs(request, response, url) {
+  const id = url.searchParams.get('id')
+
+  if (request.method === 'GET') {
+    if (!id) {
+      return json(response, 200, { docs: await listUserDocs() })
+    }
+    const doc = await readJsonIfExists(resolveUserDocPath(id))
+    if (!doc) {
+      return json(response, 404, { error: 'Document not found' })
+    }
+    return json(response, 200, { doc })
+  }
+
+  if (request.method === 'POST') {
+    const payload = await readJsonBody(request)
+    const idValue = slugify(payload?.name || 'document') || randomId()
+    const doc = normalizeUserDoc({
+      id: `${idValue}-${randomId(6)}`,
+      name: payload?.name || 'Untitled',
+      content: payload?.content || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+    await writeJson(resolveUserDocPath(doc.id), doc)
+    return json(response, 201, { doc })
+  }
+
+  if (!id) {
+    return json(response, 400, { error: 'Missing id query parameter' })
+  }
+
+  if (request.method === 'PUT') {
+    const payload = await readJsonBody(request)
+    const existing = await readJsonIfExists(resolveUserDocPath(id))
+    const now = new Date().toISOString()
+    const doc = normalizeUserDoc({
+      ...(existing || { id, createdAt: now }),
+      ...payload,
+      id,
+      updatedAt: now,
+    })
+    await writeJson(resolveUserDocPath(id), doc)
+    return json(response, 200, { doc })
+  }
+
+  if (request.method === 'DELETE') {
+    await fs.rm(resolveUserDocPath(id), { force: true })
+    return json(response, 200, { ok: true, id })
+  }
+
+  return json(response, 405, { error: 'Method not allowed' })
+}
+
+async function handleDocOverrides(request, response, url) {
+  const docPath = url.searchParams.get('path')
+  if (!docPath) {
+    return json(response, 400, { error: 'Missing path query parameter' })
+  }
+
+  const overridePath = resolveDocOverridePath(docPath)
+
+  if (request.method === 'GET') {
+    const doc = await readJsonIfExists(overridePath)
+    return json(response, 200, {
+      path: docPath,
+      doc,
+    })
+  }
+
+  if (request.method === 'PUT') {
+    const payload = await readJsonBody(request)
+    const existing = await readJsonIfExists(overridePath)
+    const now = new Date().toISOString()
+    const doc = normalizeOverrideDoc({
+      ...(existing || { path: docPath, createdAt: now }),
+      ...payload,
+      path: docPath,
+      updatedAt: now,
+    })
+    await writeJson(overridePath, doc)
+    return json(response, 200, { doc })
+  }
+
+  if (request.method === 'DELETE') {
+    await fs.rm(overridePath, { force: true })
+    return json(response, 200, { ok: true, path: docPath })
+  }
+
+  return json(response, 405, { error: 'Method not allowed' })
+}
+
+async function handleDocShareExport(response, url) {
+  const type = url.searchParams.get('type')
+  if (type === 'user') {
+    const id = url.searchParams.get('id')
+    if (!id) return json(response, 400, { error: 'Missing id query parameter' })
+    const doc = await readJsonIfExists(resolveUserDocPath(id))
+    if (!doc) return json(response, 404, { error: 'Document not found' })
+    return json(response, 200, buildSharePack('user', doc))
+  }
+  if (type === 'override') {
+    const docPath = url.searchParams.get('path')
+    if (!docPath) return json(response, 400, { error: 'Missing path query parameter' })
+    const doc = await readJsonIfExists(resolveDocOverridePath(docPath))
+    if (!doc) return json(response, 404, { error: 'Override not found' })
+    return json(response, 200, buildSharePack('override', doc))
+  }
+  return json(response, 400, { error: 'Unknown share export type' })
+}
+
+async function handleDocShareImport(request, response) {
+  const payload = await readJsonBody(request)
+  if (!payload || payload.kind !== 'open-calc-doc-share' || !payload.doc || !payload.docType) {
+    return json(response, 400, { error: 'Invalid share pack' })
+  }
+
+  const now = new Date().toISOString()
+  if (payload.docType === 'user') {
+    const imported = normalizeUserDoc({
+      ...payload.doc,
+      id: `${slugify(payload.doc.name || 'shared-doc') || 'shared-doc'}-${randomId(6)}`,
+      importedFromShare: true,
+      createdAt: now,
+      updatedAt: now,
+    })
+    await writeJson(resolveUserDocPath(imported.id), imported)
+    return json(response, 201, { imported })
+  }
+
+  if (payload.docType === 'override') {
+    const imported = normalizeOverrideDoc({
+      ...payload.doc,
+      createdAt: payload.doc.createdAt || now,
+      updatedAt: now,
+      importedFromShare: true,
+    })
+    await writeJson(resolveDocOverridePath(imported.path), imported)
+    return json(response, 201, { imported })
+  }
+
+  return json(response, 400, { error: 'Unsupported share docType' })
+}
+
 async function tryServeStatic(pathname, response) {
   const frontendEnabled = config.serveFrontend !== false
   if (!frontendEnabled || !(await exists(distDir))) {
@@ -206,6 +383,28 @@ async function listOverrideKeys() {
   return results.sort()
 }
 
+async function listUserDocs() {
+  const docs = []
+  const entries = await fs.readdir(userDocsDir, { withFileTypes: true })
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.json')) continue
+    const doc = await readJsonIfExists(path.join(userDocsDir, entry.name))
+    if (doc) docs.push(normalizeUserDoc(doc))
+  }
+  return docs.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
+}
+
+async function listDocOverrides() {
+  const docs = []
+  const entries = await fs.readdir(docOverridesDir, { withFileTypes: true })
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.json')) continue
+    const doc = await readJsonIfExists(path.join(docOverridesDir, entry.name))
+    if (doc) docs.push(normalizeOverrideDoc(doc))
+  }
+  return docs.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
+}
+
 async function walkOverrides(currentDir, results) {
   const entries = await fs.readdir(currentDir, { withFileTypes: true })
   for (const entry of entries) {
@@ -227,6 +426,24 @@ function resolveOverridePath(lessonKey) {
   const resolved = safeJoin(overridesDir, `${normalizedKey}.json`)
   if (!resolved) {
     throw new Error(`Invalid override key: ${lessonKey}`)
+  }
+  return resolved
+}
+
+function resolveUserDocPath(id) {
+  const safeId = slugify(id)
+  const resolved = safeJoin(userDocsDir, `${safeId}.json`)
+  if (!resolved) {
+    throw new Error(`Invalid user doc id: ${id}`)
+  }
+  return resolved
+}
+
+function resolveDocOverridePath(docPath) {
+  const safeName = Buffer.from(docPath).toString('base64url')
+  const resolved = safeJoin(docOverridesDir, `${safeName}.json`)
+  if (!resolved) {
+    throw new Error(`Invalid doc override path: ${docPath}`)
   }
   return resolved
 }
@@ -293,6 +510,57 @@ async function exists(filePath) {
 
 async function ensureDirectory(dirPath) {
   await fs.mkdir(dirPath, { recursive: true })
+}
+
+async function writeJson(filePath, payload) {
+  await ensureDirectory(path.dirname(filePath))
+  await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8')
+}
+
+function normalizeUserDoc(doc) {
+  return {
+    id: String(doc.id),
+    source: 'user',
+    name: doc.name || 'Untitled',
+    content: doc.content || '',
+    createdAt: doc.createdAt || new Date().toISOString(),
+    updatedAt: doc.updatedAt || new Date().toISOString(),
+    importedFromShare: Boolean(doc.importedFromShare),
+  }
+}
+
+function normalizeOverrideDoc(doc) {
+  return {
+    source: 'override',
+    path: String(doc.path),
+    name: doc.name || path.basename(String(doc.path)).replace(/\.md$/i, ''),
+    content: doc.content || '',
+    createdAt: doc.createdAt || new Date().toISOString(),
+    updatedAt: doc.updatedAt || new Date().toISOString(),
+    importedFromShare: Boolean(doc.importedFromShare),
+  }
+}
+
+function buildSharePack(docType, doc) {
+  return {
+    kind: 'open-calc-doc-share',
+    version: 1,
+    docType,
+    exportedAt: new Date().toISOString(),
+    doc,
+  }
+}
+
+function slugify(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function randomId(length = 10) {
+  return Math.random().toString(36).slice(2, 2 + length)
 }
 
 function applyCors(response) {

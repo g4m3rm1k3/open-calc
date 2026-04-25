@@ -28,6 +28,8 @@ Important paths:
 ```text
 config.json
 overrides/lessons/<chapterId>/<lessonSlug>.json
+docs/user/<docId>.json
+docs/overrides/<encoded-doc-path>.json
 cache/update-manifest.json
 ```
 
@@ -56,6 +58,38 @@ You can override the root with `OPEN_CALC_DATA_DIR`.
 `POST /api/update/check`
 - fetches and caches the configured update manifest if `config.json` contains `updateManifestUrl`
 
+### Docs API
+
+`GET /api/docs`
+- returns user-created docs and local overrides for bundled markdown docs
+
+`POST /api/docs/user`
+- creates a new user markdown doc
+
+`GET /api/docs/user?id=<docId>`
+- returns one user doc
+
+`PUT /api/docs/user?id=<docId>`
+- updates a user doc
+
+`DELETE /api/docs/user?id=<docId>`
+- deletes a user doc
+
+`GET /api/docs/override?path=/src/docs/...`
+- returns the local override for a bundled markdown doc, if present
+
+`PUT /api/docs/override?path=/src/docs/...`
+- stores a local override for that bundled markdown doc
+
+`DELETE /api/docs/override?path=/src/docs/...`
+- removes the override and restores the built-in version
+
+`GET /api/docs/share/export?...`
+- exports a share pack for a user doc or bundled-doc override
+
+`POST /api/docs/share/import`
+- imports a share pack into the local machine
+
 ## Frontend behavior
 
 Lesson pages now try the optional backend automatically. If the backend is reachable and an override exists, the app deep-merges the local override on top of the built-in lesson object.
@@ -67,6 +101,18 @@ That means:
 - users do not need to fork the whole lesson file to customize a title, hook, prose block, quiz, or metadata
 
 Arrays are replaced wholesale. Plain objects are merged recursively.
+
+## Docs behavior
+
+The docs hub now supports three document types:
+
+- bundled docs from `src/docs/`
+- local overrides of bundled docs
+- user-created markdown docs
+
+Bundled docs stay in the app bundle. Local edits are stored separately in app-data, so app updates still work cleanly.
+
+For sharing today, docs can be exported as portable JSON share packs and imported on another machine. If the backend is running in LAN mode, that host machine can also act as a simple peer-accessible node for docs and overrides on the same network.
 
 ## Hosting model
 
@@ -89,6 +135,8 @@ Right now it supports:
 - a user's PC acting as a host node
 - LAN or port-forwarded access to that host
 - local override persistence outside the shipped app
+- user-created docs and bundled-doc overrides
+- portable doc share packs for manual peer exchange
 - a clean update channel for the main app
 
 Future work for true peer-to-peer collaboration would likely add:
