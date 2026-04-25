@@ -4,11 +4,11 @@ const FONT_BODY = "system-ui, sans-serif";
 const FONT_MONO = "'Courier New', monospace";
 const FONT_HEAD = "'Arial Black', Impact, sans-serif";
 
-const WORLD_X = 48;
+const WORLD_X = 256;
 const WORLD_Y = 16;
-const WORLD_Z = 48;
+const WORLD_Z = 256;
 const EYE_HEIGHT = 1.62;
-const SPAWN_POINT = { cx: 24, cy: 6 + EYE_HEIGHT, cz: 8, yaw: 0.4, pitch: 0.15, vy: 0 };
+const SPAWN_POINT = { cx: 24, cy: 6 + EYE_HEIGHT, cz: 8, yaw: 0.4, pitch: 0.15, vy: 0, vx: 0, vz: 0 };
 
 function worldIndex(x, y, z) {
   return (y * WORLD_X * WORLD_Z + z * WORLD_X + x) | 0;
@@ -33,14 +33,17 @@ const BLOCKS = {
   11: { name: "Diamond", rgb: [180, 242, 255], emit: 0.4, density: 3515, hard: 10, cat: "mineral", note: "Diamond is carbon in a tetrahedral lattice, maximizing hardness." },
   12: { name: "Uranium", rgb: [55, 225, 18], emit: 1.0, density: 19100, hard: 6, cat: "nuclear", note: "Fission converts tiny mass differences into huge energy releases." },
   13: { name: "Lava", rgb: [248, 88, 8], emit: 1.0, density: 3100, hard: 0, cat: "liquid", note: "Molten rock radiates heat and changes viscosity as it cools." },
-  14: { name: "Ice", rgb: [198, 232, 255], emit: 0, density: 917, hard: 1, cat: "solid", note: "Solid water expands because hydrogen bonds hold an open structure." },
+  14: { name: "Ice", rgb: [198, 232, 255], emit: 0, density: 917, hard: 1, cat: "solid", note: "Low-friction surface. Ice teaches why tiny coefficients of friction make stopping hard.", traction: 0.16, drag: 1.4, jump: 7.2, bounce: 0.02 },
   15: { name: "Glass", rgb: [162, 222, 238], emit: 0.1, density: 2500, hard: 5, cat: "mineral", note: "Amorphous solids behave differently from crystals because they lack long-range order." },
   16: { name: "Copper", rgb: [184, 112, 52], emit: 0, density: 8960, hard: 3, cat: "metal", note: "Copper is a benchmark conductor for circuits, motors, and heat transfer." },
   17: { name: "Coal", rgb: [44, 38, 38], emit: 0, density: 1400, hard: 3, cat: "organic", note: "Carbon-rich fuel stores chemical energy from ancient biomass." },
   18: { name: "Plasma", rgb: [242, 105, 255], emit: 1.0, density: 0.001, hard: 0, cat: "plasma", note: "Ionized gas responds strongly to electric and magnetic fields." },
   19: { name: "Antimatter", rgb: [200, 0, 255], emit: 1.0, density: 0.001, hard: 0, cat: "exotic", note: "Matter-antimatter annihilation is a dramatic way to teach E = mc^2." },
   20: { name: "Obsidian", rgb: [22, 16, 40], emit: 0, density: 2600, hard: 7, cat: "mineral", note: "Rapid cooling creates volcanic glass instead of orderly crystals." },
-  21: { name: "Water", rgb: [45, 105, 210], emit: 0, density: 1000, hard: 0, cat: "liquid", note: "High specific heat makes water critical for climate and thermal management." },
+  21: { name: "Water", rgb: [45, 105, 210], emit: 0, density: 1000, hard: 0, cat: "liquid", note: "High specific heat makes water critical for climate and thermal management.", traction: 0.42, drag: 5.2, jump: 6.2, bounce: 0.04 },
+  22: { name: "Rubber", rgb: [46, 46, 52], emit: 0, density: 1100, hard: 2, cat: "solid", note: "High-friction elastic surface. Rubber grips better and returns more energy on impact.", traction: 1.25, drag: 16, jump: 9.2, bounce: 0.38 },
+  23: { name: "Slime", rgb: [88, 210, 110], emit: 0.06, density: 1050, hard: 0, cat: "liquid", note: "Viscoelastic goo. Slime damps motion sideways but can bounce energy back vertically.", traction: 0.5, drag: 8.5, jump: 7.6, bounce: 0.62 },
+  24: { name: "Teflon", rgb: [210, 222, 230], emit: 0, density: 2200, hard: 2, cat: "solid", note: "Extremely low-friction polymer. PTFE shows why slippery materials resist sticking and sliding losses.", traction: 0.09, drag: 0.9, jump: 7.0, bounce: 0.01 },
 };
 
 const blockApi = {
@@ -82,7 +85,7 @@ const STEM_LESSONS = {
   },
   liquid: {
     title: "Flow, Pressure, and Heat Transfer",
-    body: "Liquids change shape under small shear forces, which makes them useful for cooling, transport, and fluid power. Water and lava both flow, but their viscosity and thermal behavior are very different.",
+    body: "Liquids change shape under small shear forces, which makes them useful for cooling, transport, and fluid power. Water, lava, and slime all flow differently because viscosity and elasticity change how momentum dissipates.",
     formulas: ["Pressure rises with depth", "Flow depends on velocity and cross-section", "Thermal storage depends on specific heat"],
   },
   plasma: {
@@ -107,8 +110,8 @@ const STEM_LESSONS = {
   },
   solid: {
     title: "Solids, Phases, and Density Anomalies",
-    body: "Solids usually pack more tightly than liquids, but ice breaks that rule. That one exception is a great way to teach how microscopic structure can overturn intuition.",
-    formulas: ["Density = mass / volume", "Phase changes trade energy with the environment", "Microscopic geometry shapes bulk properties"],
+    body: "Solids usually pack more tightly than liquids, but ice breaks that rule. Rubber and Teflon add another lesson: microscopic surface structure changes friction, bounce, and grip in ways you can feel while moving.",
+    formulas: ["Density = mass / volume", "Friction force = mu N", "Microscopic geometry shapes bulk properties"],
   },
 };
 
@@ -154,6 +157,9 @@ function buildWorld() {
     if (inBounds(x, y, z)) world[worldIndex(x, y, z)] = block;
   };
 
+  const featureLimitX = 48;
+  const featureLimitZ = 48;
+
   for (let x = 0; x < WORLD_X; x += 1) {
     for (let z = 0; z < WORLD_Z; z += 1) {
       set(x, 0, z, 1);
@@ -165,11 +171,11 @@ function buildWorld() {
     }
   }
 
-  for (let x = 30; x < 42; x += 1) for (let z = 30; z < 42; z += 1) {
+  for (let x = 30; x < Math.min(42, featureLimitX); x += 1) for (let z = 30; z < Math.min(42, featureLimitZ); z += 1) {
     set(x, 5, z, 5);
     set(x, 4, z, 6);
   }
-  for (let x = 4; x < 16; x += 1) for (let z = 32; z < 44; z += 1) set(x, 5, z, 14);
+  for (let x = 4; x < Math.min(16, featureLimitX); x += 1) for (let z = 32; z < Math.min(44, featureLimitZ); z += 1) set(x, 5, z, 14);
 
   const ore = (x, z, block) => {
     set(x, 2, z, block);
@@ -251,6 +257,11 @@ function buildWorld() {
     set(44, y, 8, 15);
     set(44, y, 9, 15);
   }
+
+  for (let x = 52; x < 68; x += 1) for (let z = 10; z < 18; z += 1) set(x, 5, z, 22);
+  for (let x = 70; x < 82; x += 1) for (let z = 22; z < 30; z += 1) set(x, 5, z, 23);
+  for (let x = 54; x < 70; x += 1) for (let z = 34; z < 42; z += 1) set(x, 5, z, 24);
+
   return world;
 }
 
@@ -269,7 +280,7 @@ function projectPoint(camera, width, height, x, y, z) {
   const ry = dy * cosP - rz * sinP;
   const depth = dy * sinP + rz * cosP;
 
-  if (depth < 0.3) return null;
+  if (depth < 0.05) return null;
   const focal = Math.max(280, width * 0.58);
   return {
     sx: width / 2 + (rx / depth) * focal,
@@ -306,6 +317,9 @@ function hasNeighbor(world, x, y, z) {
 function drawVoxel(ctx, world, camera, width, height, x, y, z, blockId, isTarget, t) {
   const block = BLOCKS[blockId];
   if (!blockId || !block) return null;
+  if (Math.floor(camera.cx) === x && Math.floor(camera.cy) === y && Math.floor(camera.cz) === z) {
+    return null;
+  }
   const [r, g, b] = block.rgb;
 
   const relativeX = camera.cx - (x + 0.5);
@@ -464,14 +478,48 @@ function isPlayerOccupyingBlock(camera, x, y, z) {
   return Math.floor(camera.cx) === x && Math.floor(camera.cz) === z && y >= bodyMinY && y <= bodyMaxY;
 }
 
+function getSurfaceBlock(world, x, y, z) {
+  if (!inBounds(x, y, z)) return null;
+  return BLOCKS[world[worldIndex(x, y, z)]] || null;
+}
+
+function getSurfaceProperties(world, camera) {
+  const underX = Math.floor(camera.cx);
+  const underZ = Math.floor(camera.cz);
+  const underY = Math.max(0, Math.floor(camera.cy - EYE_HEIGHT - 0.08));
+  const surface = getSurfaceBlock(world, underX, underY, underZ);
+  return {
+    surface,
+    traction: surface?.traction ?? 0.85,
+    drag: surface?.drag ?? 10,
+    jump: surface?.jump ?? 8,
+    bounce: surface?.bounce ?? 0.06,
+  };
+}
+
 function isColumnBlocked(world, x, cy, z) {
-  if (!inBounds(x, 0, z)) return true;
+  if (!inBounds(x, 0, z)) return false;
   const bodyMinY = Math.max(0, Math.floor(cy - EYE_HEIGHT + 0.05));
   const bodyMaxY = Math.min(WORLD_Y - 1, Math.floor(cy - 0.1));
   for (let y = bodyMinY; y <= bodyMaxY; y += 1) {
     if (world[worldIndex(x, y, z)]) return true;
   }
   return false;
+}
+
+function isBodyBlocked(world, cx, cy, cz, radius = 0.28) {
+  const offsets = [
+    [0, 0],
+    [radius, 0],
+    [-radius, 0],
+    [0, radius],
+    [0, -radius],
+    [radius * 0.72, radius * 0.72],
+    [-radius * 0.72, radius * 0.72],
+    [radius * 0.72, -radius * 0.72],
+    [-radius * 0.72, -radius * 0.72],
+  ];
+  return offsets.some(([dx, dz]) => isColumnBlocked(world, Math.floor(cx + dx), cy, Math.floor(cz + dz)));
 }
 
 function useViewportSize(ref) {
@@ -504,8 +552,10 @@ export default function OpenCraftStudio() {
   const worldRef = useRef(buildWorld());
   const canvasRef = useRef(null);
   const viewportRef = useRef(null);
+  const pointerLockedRef = useRef(false);
   const keysRef = useRef({});
-  const toolRef = useRef("place");
+  const leftToolRef = useRef("place");
+  const rightToolRef = useRef("erase");
   const selectedBlockRef = useRef(4);
   const animationRef = useRef(null);
   const lastTimeRef = useRef(0);
@@ -517,7 +567,8 @@ export default function OpenCraftStudio() {
   const viewport = useViewportSize(viewportRef);
 
   const [selectedBlock, setSelectedBlock] = useState(4);
-  const [tool, setTool] = useState("place");
+  const [leftTool, setLeftTool] = useState("place");
+  const [rightTool, setRightTool] = useState("erase");
   const [showTools, setShowTools] = useState(false);
   const [activePanel, setActivePanel] = useState("missions");
   const [stemInfo, setStemInfo] = useState(null);
@@ -525,6 +576,7 @@ export default function OpenCraftStudio() {
   const [showQuickStart, setShowQuickStart] = useState(true);
   const [hotbarPage, setHotbarPage] = useState(0);
   const [comparison, setComparison] = useState(null);
+  const [pointerLocked, setPointerLocked] = useState(false);
   const [builder, setBuilder] = useState({
     name: "Conductive Foam",
     color: "#ff8b3d",
@@ -560,9 +612,30 @@ export default function OpenCraftStudio() {
   }, [allBlocks, hotbarPage]);
   const hotbarPageCount = Math.max(1, Math.ceil(allBlocks.length / 10));
 
+  const cycleSelectedBlock = useCallback((delta) => {
+    if (!allBlocks.length) return;
+    const currentIndex = Math.max(0, allBlocks.findIndex(([id]) => Number(id) === selectedBlockRef.current));
+    const nextIndex = (currentIndex + delta + allBlocks.length) % allBlocks.length;
+    const nextId = Number(allBlocks[nextIndex][0]);
+    setSelectedBlock(nextId);
+  }, [allBlocks]);
+
   useEffect(() => {
-    toolRef.current = tool;
-  }, [tool]);
+    const selectedIndex = allBlocks.findIndex(([id]) => Number(id) === selectedBlock);
+    if (selectedIndex < 0) return;
+    const targetPage = Math.floor(selectedIndex / 10);
+    if (targetPage !== hotbarPage) {
+      setHotbarPage(targetPage);
+    }
+  }, [allBlocks, selectedBlock, hotbarPage]);
+
+  useEffect(() => {
+    leftToolRef.current = leftTool;
+  }, [leftTool]);
+
+  useEffect(() => {
+    rightToolRef.current = rightTool;
+  }, [rightTool]);
 
   useEffect(() => {
     selectedBlockRef.current = selectedBlock;
@@ -595,11 +668,10 @@ export default function OpenCraftStudio() {
     notify("OpenCraft world reset.");
   }, [notify]);
 
-  const applyTool = useCallback((target, world) => {
+  const applyTool = useCallback((toolId, target, world) => {
     if (!target || !world) return;
-    const activeTool = toolRef.current;
     const activeSelectedBlock = selectedBlockRef.current;
-    if (activeTool === "place") {
+    if (toolId === "place") {
       const { pbx, pby, pbz } = target;
       if (
         inBounds(pbx, pby, pbz) &&
@@ -615,12 +687,12 @@ export default function OpenCraftStudio() {
       }
       return;
     }
-    if (activeTool === "erase") {
+    if (toolId === "erase") {
       world[worldIndex(target.bx, target.by, target.bz)] = 0;
       notify(`Removed ${BLOCKS[target.blockId]?.name || "block"}.`);
       return;
     }
-    if (activeTool === "probe") {
+    if (toolId === "probe") {
       const block = BLOCKS[target.blockId];
       if (!block) return;
       setShowQuickStart(false);
@@ -650,7 +722,7 @@ export default function OpenCraftStudio() {
       notify(`Probed ${block.name}. STEM lesson unlocked.`);
       return;
     }
-    if (activeTool === "antimatter") {
+    if (toolId === "antimatter") {
       let removed = 0;
       for (let dx = -1; dx <= 1; dx += 1) {
         for (let dy = -1; dy <= 1; dy += 1) {
@@ -671,7 +743,7 @@ export default function OpenCraftStudio() {
       notify(`Antimatter pulse removed ${removed} nearby blocks.`);
       return;
     }
-    if (activeTool === "antigravity") {
+    if (toolId === "antigravity") {
       const blockId = world[worldIndex(target.bx, target.by, target.bz)];
       const ny = Math.min(WORLD_Y - 1, target.by + 3);
       if (blockId && !world[worldIndex(target.bx, ny, target.bz)]) {
@@ -682,7 +754,7 @@ export default function OpenCraftStudio() {
       }
       return;
     }
-    if (activeTool === "gravity") {
+    if (toolId === "gravity") {
       const blockId = world[worldIndex(target.bx, target.by, target.bz)];
       if (!blockId) return;
       let lowest = target.by - 1;
@@ -734,8 +806,21 @@ export default function OpenCraftStudio() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
+    const onPointerLockChange = () => {
+      const locked = document.pointerLockElement === canvas;
+      pointerLockedRef.current = locked;
+      setPointerLocked(locked);
+      if (!locked) {
+        mouseRef.current.down = false;
+      }
+    };
     const onDown = (event) => {
       if (event.target !== canvas) return;
+      if (!pointerLockedRef.current) {
+        canvas.requestPointerLock?.();
+        event.preventDefault();
+        return;
+      }
       mouseRef.current = {
         down: true,
         startX: event.clientX,
@@ -747,6 +832,15 @@ export default function OpenCraftStudio() {
       event.preventDefault();
     };
     const onMove = (event) => {
+      if (pointerLockedRef.current) {
+        const dx = event.movementX || 0;
+        const dy = event.movementY || 0;
+        if (!dx && !dy) return;
+        cameraRef.current.yaw += dx * 0.0035;
+        cameraRef.current.pitch = Math.max(-1.1, Math.min(1.1, cameraRef.current.pitch + dy * 0.0028));
+        mouseRef.current.moved = true;
+        return;
+      }
       if (!mouseRef.current.down) return;
       const dx = event.clientX - mouseRef.current.x;
       const dy = event.clientY - mouseRef.current.y;
@@ -761,10 +855,12 @@ export default function OpenCraftStudio() {
     const onUp = () => {
       mouseRef.current.down = false;
     };
+    document.addEventListener("pointerlockchange", onPointerLockChange);
     document.addEventListener("mousedown", onDown);
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
     return () => {
+      document.removeEventListener("pointerlockchange", onPointerLockChange);
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
@@ -774,20 +870,42 @@ export default function OpenCraftStudio() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-    const onClick = () => {
-      if (mouseRef.current.moved) return;
-      applyTool(targetRef.current, worldRef.current);
+    const onMouseDown = (event) => {
+      if (event.target !== canvas) return;
+      if (!pointerLockedRef.current) {
+        canvas.requestPointerLock?.();
+        event.preventDefault();
+        return;
+      }
+      const toolId = event.button === 2 ? rightToolRef.current : leftToolRef.current;
+      applyTool(toolId, targetRef.current, worldRef.current);
+      mouseRef.current.moved = false;
+      event.preventDefault();
     };
     const onRightClick = (event) => {
       event.preventDefault();
     };
-    canvas.addEventListener("click", onClick);
+    canvas.addEventListener("mousedown", onMouseDown);
     canvas.addEventListener("contextmenu", onRightClick);
     return () => {
-      canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("mousedown", onMouseDown);
       canvas.removeEventListener("contextmenu", onRightClick);
     };
   }, [applyTool]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+    const onWheel = (event) => {
+      if (document.pointerLockElement !== canvas) return;
+      event.preventDefault();
+      cycleSelectedBlock(event.deltaY > 0 ? 1 : -1);
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener("wheel", onWheel);
+    };
+  }, [cycleSelectedBlock]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -805,6 +923,7 @@ export default function OpenCraftStudio() {
       const keys = keysRef.current;
 
       const speed = keys.shift ? 10 : 5;
+      const surfaceProps = getSurfaceProperties(world, camera);
       const sinY = Math.sin(camera.yaw);
       const cosY = Math.cos(camera.yaw);
       let moveX = 0;
@@ -827,14 +946,27 @@ export default function OpenCraftStudio() {
       }
       if (moveX || moveZ) {
         const length = Math.hypot(moveX, moveZ);
-        const nextX = Math.max(0.6, Math.min(WORLD_X - 0.6, camera.cx + (moveX / length) * speed * dt));
-        const nextZ = Math.max(0.6, Math.min(WORLD_Z - 0.6, camera.cz + (moveZ / length) * speed * dt));
-        if (!isColumnBlocked(world, Math.floor(nextX), camera.cy, Math.floor(camera.cz))) {
-          camera.cx = nextX;
-        }
-        if (!isColumnBlocked(world, Math.floor(camera.cx), camera.cy, Math.floor(nextZ))) {
-          camera.cz = nextZ;
-        }
+        const accel = speed * (5 + surfaceProps.traction * 8);
+        camera.vx += (moveX / length) * accel * dt;
+        camera.vz += (moveZ / length) * accel * dt;
+      }
+
+      const horizontalDrag = Math.max(0.25, surfaceProps.drag);
+      const dragFactor = Math.exp(-horizontalDrag * dt);
+      camera.vx *= dragFactor;
+      camera.vz *= dragFactor;
+
+      const nextX = Math.max(0.6, Math.min(WORLD_X - 0.6, camera.cx + camera.vx * dt));
+      const nextZ = Math.max(0.6, Math.min(WORLD_Z - 0.6, camera.cz + camera.vz * dt));
+      if (!isBodyBlocked(world, nextX, camera.cy, camera.cz)) {
+        camera.cx = nextX;
+      } else {
+        camera.vx = 0;
+      }
+      if (!isBodyBlocked(world, camera.cx, camera.cy, nextZ)) {
+        camera.cz = nextZ;
+      } else {
+        camera.vz = 0;
       }
 
       const gravity = 22;
@@ -861,9 +993,12 @@ export default function OpenCraftStudio() {
       const groundLevel = topSolid + 1 + EYE_HEIGHT;
       const onGround = camera.cy <= groundLevel + 0.05 && camera.cy >= groundLevel - 0.5;
       if (onGround) {
+        const impactSpeed = Math.abs(camera.vy || 0);
         camera.cy = groundLevel;
-        if (camera.vy < 0) camera.vy = 0;
-        if (keys[" "]) camera.vy = 8;
+        if (camera.vy < 0) {
+          camera.vy = impactSpeed > 6 ? impactSpeed * surfaceProps.bounce : 0;
+        }
+        if (keys[" "]) camera.vy = surfaceProps.jump;
       }
       const headY = Math.floor(camera.cy + 0.1);
       if (headY < WORLD_Y && world[worldIndex(footX, headY, footZ)] && camera.vy > 0) camera.vy = 0;
@@ -963,7 +1098,7 @@ export default function OpenCraftStudio() {
       ctx.fillText(`${camera.cx.toFixed(1)}, ${camera.cy.toFixed(1)}, ${camera.cz.toFixed(1)}`, 18, 26);
       ctx.fillStyle = "rgba(255,255,255,0.42)";
       ctx.font = `9px ${FONT_MONO}`;
-      ctx.fillText("WASD move  drag look  Space jump", 18, 39);
+      ctx.fillText(pointerLockedRef.current ? "WASD move  mouse look  Esc unlock" : "Click world to lock mouse", 18, 39);
 
       animationRef.current = window.requestAnimationFrame(renderFrame);
     };
@@ -1075,10 +1210,10 @@ export default function OpenCraftStudio() {
               {toolButtons.map((button) => (
                 <button
                   key={button.id}
-                  onClick={() => setTool(button.id)}
+                  onClick={() => setLeftTool(button.id)}
                   style={{
                     ...styles.button,
-                    ...(tool === button.id ? styles.activeButton : null),
+                    ...(leftTool === button.id ? styles.activeButton : null),
                     padding: "9px 12px",
                     minWidth: 96,
                     textAlign: "left",
@@ -1095,7 +1230,7 @@ export default function OpenCraftStudio() {
           <div ref={viewportRef} style={{ position: "relative", minHeight: 0 }}>
             <canvas
               ref={canvasRef}
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", cursor: "crosshair", imageRendering: "pixelated" }}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", cursor: pointerLocked ? "none" : "crosshair", imageRendering: "pixelated" }}
             />
 
             {notification ? (
@@ -1110,12 +1245,16 @@ export default function OpenCraftStudio() {
                   <div style={{ color: "#9be8ff", fontFamily: FONT_HEAD, fontSize: 12, letterSpacing: "0.08em" }}>STEM QUICK START</div>
                   <button onClick={() => setShowQuickStart(false)} style={{ ...styles.button, padding: "4px 8px", fontSize: 11 }}>Hide</button>
                 </div>
-                <div style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(227,255,246,0.82)" }}>
-                  1. Probe a glowing block to unlock a lesson.
+              <div style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(227,255,246,0.82)" }}>
+                  1. Click the world to lock the mouse like a real first-person game.
                   <br />
-                  2. Place different materials and compare density and hardness.
+                  2. Left and right click can use different tools.
                   <br />
-                  3. Build a custom block and write the science note you want to teach.
+                  3. Use the mouse wheel while locked to scroll the hotbar.
+                  <br />
+                  4. Probe a glowing block to unlock a lesson.
+                  <br />
+                  5. Test ice, rubber, slime, and teflon to feel friction and bounce differences.
                 </div>
               </div>
             ) : null}
@@ -1181,6 +1320,10 @@ export default function OpenCraftStudio() {
               </button>
             </div>
 
+            <div style={{ position: "absolute", left: "50%", bottom: 78, transform: "translateX(-50%)", color: "rgba(230,255,244,0.62)", fontSize: 11, padding: "4px 12px", borderRadius: 999, background: "rgba(0,0,0,0.44)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              Hotbar {hotbarPage + 1}/{hotbarPageCount} • wheel while locked to cycle blocks
+            </div>
+
             <div style={{ position: "absolute", left: 18, bottom: 18, display: "flex", gap: 8 }}>
               {[
                 { axis: "X", color: "#f87171" },
@@ -1226,11 +1369,41 @@ export default function OpenCraftStudio() {
 
           <div style={{ padding: 16, borderBottom: "1px solid rgba(90,138,155,0.18)" }}>
             <div style={{ ...styles.metricCard, display: "grid", gap: 6 }}>
-              <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(217,255,243,0.56)" }}>Active Tool</div>
+              <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(217,255,243,0.56)" }}>Mouse Actions</div>
+              <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "88px 1fr", gap: 10, alignItems: "center" }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#8ae7ff", textTransform: "uppercase", letterSpacing: "0.08em" }}>Left click</div>
+                  <select
+                    value={leftTool}
+                    onChange={(event) => setLeftTool(event.target.value)}
+                    style={{ borderRadius: 10, border: "1px solid rgba(90,138,155,0.25)", background: "rgba(6,11,20,0.9)", color: "#e4fff2", padding: "10px 12px", fontFamily: FONT_BODY, outline: "none" }}
+                  >
+                    {toolButtons.map((button) => (
+                      <option key={`left-${button.id}`} value={button.id}>{button.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "88px 1fr", gap: 10, alignItems: "center" }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#f9c97f", textTransform: "uppercase", letterSpacing: "0.08em" }}>Right click</div>
+                  <select
+                    value={rightTool}
+                    onChange={(event) => setRightTool(event.target.value)}
+                    style={{ borderRadius: 10, border: "1px solid rgba(90,138,155,0.25)", background: "rgba(6,11,20,0.9)", color: "#e4fff2", padding: "10px 12px", fontFamily: FONT_BODY, outline: "none" }}
+                  >
+                    {toolButtons.map((button) => (
+                      <option key={`right-${button.id}`} value={button.id}>{button.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ color: "rgba(230,255,244,0.64)", fontSize: 12, lineHeight: 1.55 }}>
+                  Left: {toolButtons.find((item) => item.id === leftTool)?.hint}
+                  <br />
+                  Right: {toolButtons.find((item) => item.id === rightTool)?.hint}
+                </div>
+              </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                <div>
-                  <div style={{ fontFamily: FONT_HEAD, color: "#9ef7b9", fontSize: 16 }}>{toolButtons.find((item) => item.id === tool)?.label}</div>
-                  <div style={{ color: "rgba(230,255,244,0.64)", fontSize: 12 }}>{toolButtons.find((item) => item.id === tool)?.hint}</div>
+                <div style={{ color: "rgba(230,255,244,0.64)", fontSize: 12 }}>
+                  Locked mouse mode uses these bindings directly in the world.
                 </div>
                 <button onClick={() => setShowTools((open) => !open)} style={{ ...styles.button, padding: "10px 12px", fontWeight: 700 }}>
                   Tool Menu
@@ -1244,12 +1417,12 @@ export default function OpenCraftStudio() {
                   <button
                     key={button.id}
                     onClick={() => {
-                      setTool(button.id);
+                      setLeftTool(button.id);
                       setShowTools(false);
                     }}
                     style={{
                       ...styles.button,
-                      ...(tool === button.id ? styles.activeButton : null),
+                      ...(leftTool === button.id ? styles.activeButton : null),
                       padding: "11px 12px",
                       display: "grid",
                       gridTemplateColumns: "40px 1fr",
@@ -1335,6 +1508,11 @@ export default function OpenCraftStudio() {
                       <div>
                         <div style={{ fontWeight: 800, color: `rgb(${selectedBlockInfo.rgb.join(",")})` }}>{selectedBlockInfo.name}</div>
                         <div style={{ fontSize: 12, color: "rgba(230,255,244,0.64)" }}>rho={selectedBlockInfo.density} kg/m^3, hard={selectedBlockInfo.hard}, cat={selectedBlockInfo.cat}</div>
+                        {(selectedBlockInfo.traction || selectedBlockInfo.drag || selectedBlockInfo.bounce) ? (
+                          <div style={{ fontSize: 12, color: "rgba(154,231,255,0.8)" }}>
+                            traction={selectedBlockInfo.traction ?? 0.85} drag={selectedBlockInfo.drag ?? 10} bounce={selectedBlockInfo.bounce ?? 0.06}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                     <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.6, color: "rgba(230,255,244,0.76)" }}>{selectedBlockInfo.note}</div>
@@ -1478,7 +1656,7 @@ export default function OpenCraftStudio() {
                       ))}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: "rgba(230,255,244,0.56)" }}>No probes yet. Start with Uranium, Copper, Water, or Ice.</div>
+                    <div style={{ fontSize: 12, color: "rgba(230,255,244,0.56)" }}>No probes yet. Start with Uranium, Copper, Ice, Rubber, or Slime.</div>
                   )}
                 </div>
 
