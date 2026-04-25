@@ -108,5 +108,14 @@
     "h": 774,
     "updatedAt": 1776009903675,
     "deleted": false
+  },  "ch4-006:intuition": {
+    "text": "Here is the complete, start-to-finish logic of U-Substitution, all at once, with nothing held back.\n\n### The Complete U-Substitution Master Guide\n\nWhen you look at a problem, your goal is to find the \"Inside\" function, find its exact derivative, and compare it to the \"Outside\" leftover pieces. \n\n**Phase 1: The Setup**\n1. **Pick $u$:** Identify the \"Inside\" function (usually trapped in parentheses).\n2. **Find $du$:** Take the strict, standalone derivative of that $u$. This is your target.\n\n**Phase 2: The Comparison (Your Two Scenarios)**\nNow, you look at the \"Outside\" pieces of the original problem and compare them to your target $du$. \n\n* **Scenario A: The Perfect Match**\n    * *What happens:* The outside pieces perfectly match the derivative you just calculated.\n    * *Your Action:* You take that entire outside piece, box it up with the $dx$, and swap it out for a single $du$. Nothing is left over.\n* **Scenario B: The Scaling Factor (The Mismatch)**\n    * *What happens:* The outside pieces have the correct letters ($x$), but the wrong constants (numbers). For example, your target $du$ requires a $6x$, but the outside only has an $x$. \n    * *Your Action:* You mathematically \"scale\" your $du$ to match what is actually on the page. If you need to get rid of a $6$, you divide by $6$. That $\\frac{1}{6}$ is your scaling factor, and it gets permanently pulled to the very front of the integral, completely outside the $\\int$ symbol.\n\n**Phase 3: The Execution**\n1. **Substitute:** Rewrite the integral so it only has $u$'s and $du$. (And your scaling factor out front, if you had one).\n2. **Integrate:** Use the standard reverse power rule on the $u$.\n3. **Swap Back:** Erase the $u$ in your final answer and put the original \"Inside\" $x$ equation back in its place. Add $+ C$.\n\n---\n\nThat is the entire system. Every single problem will fall into Scenario A or Scenario B. \n\nLet's run this complete manual on **Participation Activity #1** from your screen:\n$$\\int 3x^2(x^3 - 9)^4 \\, dx$$\n\nIf you look at that problem and run Phase 1, what is your $u$, and does its derivative give you a Perfect Match (Scenario A) or a Scaling Factor (Scenario B)?",
+    "color": "yellow",
+    "ruled": true,
+    "fontIdx": 1,
+    "w": 1133,
+    "h": 707,
+    "updatedAt": 1777153452013,
+    "deleted": false
   }
 }
