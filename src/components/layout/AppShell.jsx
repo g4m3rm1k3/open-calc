@@ -354,6 +354,14 @@ function TopBar({
         >
           Logic Sim
         </NavLink>
+        <NavLink
+          to="/docs"
+          className={({ isActive }) =>
+            `text-sm font-bold transition-colors ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-100 hover:text-indigo-600"}`
+          }
+        >
+          Docs
+        </NavLink>
         <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none"></div>
       </nav>
 
@@ -624,6 +632,7 @@ export default function AppShell({ children }) {
   const isOpenCraftRoute = location.pathname.startsWith("/open-craft");
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
+  const isDocsRoute = location.pathname.startsWith("/docs");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -698,7 +707,7 @@ export default function AppShell({ children }) {
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
 
-  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute) {
+  if (isOpenMatRoute || isArkanoidLearnRoute || isRealityRunnerRoute || isCNCSimRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute || isDocsRoute) {
     return (
       <GrapherContext.Provider value={{ openGrapher }}>
         <div className={`h-screen overflow-hidden ${(isArkanoidLearnRoute || isRealityRunnerRoute || isCadProRoute || isOpenCraftRoute || isStemQuestRoute) ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}>

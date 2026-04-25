@@ -81,7 +81,24 @@ Open `http://localhost:5173`.
 ```bash
 npm run build      # production build + generates search index
 npm run preview    # preview the production build locally
+npm run backend    # optional local backend for overrides + hosting
 ```
+
+### Optional backend companion
+
+`open-calc` is still a frontend-first app, but there is now an optional local backend companion in [`backend/server.mjs`](backend/server.mjs).
+
+It is designed for three things:
+
+- keep user edits outside the shipped app so normal updates do not overwrite them
+- let a user's machine act as a local/LAN host for the built app
+- provide a clean path toward a packaged desktop executable later
+
+By default the backend binds to `127.0.0.1:4318` for safety. Run `npm run backend:lan` if you explicitly want to expose it on your local network.
+
+Lesson overrides live in the user's app-data folder, not in `src/content/`. The frontend will detect the backend automatically for lesson pages and merge a local override on top of the built-in lesson if one exists.
+
+See [docs/optional-backend.md](docs/optional-backend.md) for the API, storage layout, and update model.
 
 ---
 

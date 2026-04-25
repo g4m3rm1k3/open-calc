@@ -8,7 +8,9 @@
     "dev": "node src/scripts/build-search-index.js && vite",
     "build": "node src/scripts/build-search-index.js && vite build",
     "preview": "vite preview",
-    "index": "node src/scripts/build-search-index.js"
+    "index": "node src/scripts/build-search-index.js",
+    "backend": "node backend/server.mjs",
+    "backend:lan": "node backend/server.mjs --host-lan"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",

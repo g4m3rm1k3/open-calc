@@ -12,15 +12,17 @@ import OpenInGrapher from '../components/lesson/OpenInGrapher.jsx'
 import LessonQuizBlock from '../components/lesson/LessonQuizBlock.jsx'
 import { useVideoPlayer } from '../context/VideoPlayerContext.jsx'
 import TutorPanel from '../components/tutor/TutorPanel.jsx'
+import { useOptionalLesson } from '../hooks/useOptionalLesson.js'
 
 export default function LessonPage() {
   const { chapterId, lessonSlug, '*': rest } = useParams()
   const slug = lessonSlug + (rest ? `/${rest}` : '')
   const key = `${chapterId}/${slug}`
   const rawLesson = LESSON_MAP[key]
+  const { lessonSource, lessonOverride, isLoadingOverride } = useOptionalLesson(key, rawLesson)
   const lesson = useMemo(
-    () => rawLesson ? enhanceLessonForUnifiedLearning(rawLesson) : null,
-    [rawLesson]
+    () => lessonOverride ? enhanceLessonForUnifiedLearning(lessonOverride) : null,
+    [lessonOverride]
   )
   const { markCheckpoint, setActiveTab, getActiveTab, getLessonStatus, setReadingProgress, getReadingProgress } = useProgress()
   const { setLessonId } = useVideoPlayer()
@@ -123,9 +125,21 @@ export default function LessonPage() {
           {(() => {
             const chObj = CURRICULUM.find(c => String(c.number) === chapterId)
             return (
-              <span className="text-xs font-mono text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 rounded">
-                {chObj?.title ?? chapterId}{lesson.order !== undefined ? ` · Lesson ${lesson.order + 1}` : ''}
-              </span>
+              <>
+                <span className="text-xs font-mono text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 rounded">
+                  {chObj?.title ?? chapterId}{lesson.order !== undefined ? ` · Lesson ${lesson.order + 1}` : ''}
+                </span>
+                {lessonSource === 'override' && (
+                  <span className="text-xs font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-900/60">
+                    Local override
+                  </span>
+                )}
+                {isLoadingOverride && (
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                    Checking local backend…
+                  </span>
+                )}
+              </>
             )
           })()}
         </div>
