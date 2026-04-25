@@ -59,12 +59,6 @@ export default {
     ],
     visualizations: [
       {
-        id: "RosettaStoneViz",
-        title: "Side-by-Side Proof Explorer",
-        mathBridge: "Interactive: type any expression with a number on the left and a variable on the right. The visualizer evaluates both and shows they are identical operations, step by step.",
-        caption: "Every identity proved numerically and algebraically simultaneously.",
-      },
-      {
         id: "DistributivePropertyViz",
         title: "The Distributive Property — Area Model",
         mathBridge: "A rectangle with width (a+b) and height (c+d) has area (a+b)(c+d) = ac + ad + bc + bd. The four sub-rectangles are the four terms. FOIL is just naming the four sub-rectangles.",
