@@ -299,15 +299,6 @@ function TopBar({
       </div>
 
       <nav className="hidden lg:flex flex-1 items-center gap-5 ml-6 h-full">
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-800 dark:text-slate-100 hover:text-brand-600"}`
-          }
-        >
-          Home
-        </NavLink>
         <CoursesDropdown />
         <NavLink
           to="/reference"
@@ -332,14 +323,6 @@ function TopBar({
           }
         >
           OpenMAT
-        </NavLink>
-        <NavLink
-          to="/arkanoid-learn"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-rose-600 dark:text-rose-400" : "text-slate-800 dark:text-slate-100 hover:text-rose-600"}`
-          }
-        >
-          Arkanoid Learn
         </NavLink>
         {/* Reality Runner hidden until physics fixed */}
         <NavLink
@@ -509,7 +492,6 @@ function TopBar({
           <div className="absolute right-0 top-[calc(100%+4px)] z-[200] min-w-[190px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-lg">
             {[
               { emoji: "🗺️", label: "STEM Quest",         onClick: () => { setGamesMenuOpen(false); navigate("/stem-quest"); }, active: false },
-              { emoji: "🧱", label: "Arkanoid Learn",    onClick: () => { setGamesMenuOpen(false); navigate("/arkanoid-learn"); }, active: false },
               { emoji: "🧪", label: "OpenCraft",         onClick: () => { setGamesMenuOpen(false); navigate("/open-craft"); }, active: location.pathname.startsWith("/open-craft") },
               { emoji: "🎱", label: "Physics Pool Lab",  onClick: () => { onPoolToggle();     setGamesMenuOpen(false); }, active: poolOpen },
               { emoji: "🏀", label: "Basketball Lab",    onClick: () => { onBasketToggle();   setGamesMenuOpen(false); }, active: basketOpen },
