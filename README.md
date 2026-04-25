@@ -106,6 +106,25 @@ By default the backend binds to `127.0.0.1:4318` for safety. Run `npm run backen
 Lesson overrides live in the user's app-data folder, not in `src/content/`. The frontend will detect the backend automatically for lesson pages and merge a local override on top of the built-in lesson if one exists.
 
 See [docs/optional-backend.md](docs/optional-backend.md) for the API, storage layout, and update model.
+See [desktop/PORTABLE_RELEASES.md](desktop/PORTABLE_RELEASES.md) for the recommended portable executable + GitHub Releases update model.
+
+### Web + desktop together
+
+`open-calc` is intended to keep both distribution modes:
+
+- GitHub Pages or any static hosting for the browser-first version
+- a downloadable portable desktop executable for users who want a local app
+
+The desktop wrapper does not replace the web app. It packages the same built frontend and starts the optional local backend automatically.
+
+Desktop commands:
+
+```bash
+npm run desktop:dev
+npm run desktop:build
+```
+
+`npm run desktop:build` now produces a portable Windows executable in `desktop/staging/release/` without changing the GitHub Pages/static-hosted version.
 
 ---
 

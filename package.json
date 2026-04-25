@@ -4,13 +4,19 @@
   "description": "An open-source interactive calculus textbook — intuition first, rigor always",
   "license": "GPL-3.0-or-later",
   "type": "module",
+  "main": "desktop/app/main.mjs",
   "scripts": {
     "dev": "node src/scripts/build-search-index.js && vite",
     "build": "node src/scripts/build-search-index.js && vite build",
     "preview": "vite preview",
     "index": "node src/scripts/build-search-index.js",
     "backend": "node backend/server.mjs",
-    "backend:lan": "node backend/server.mjs --host-lan"
+    "backend:lan": "node backend/server.mjs --host-lan",
+    "release:manifest": "node scripts/build-github-release-manifest.mjs",
+    "desktop:dev": "node scripts/run-desktop-dev.mjs",
+    "desktop:sync-package": "node scripts/sync-desktop-package.mjs",
+    "desktop:prepare-build": "node scripts/prepare-desktop-build.mjs",
+    "desktop:build": "npm run build && npm run desktop:sync-package && npm run desktop:prepare-build && node --max-old-space-size=4096 ./node_modules/electron-builder/cli.js --projectDir desktop/staging --win portable"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
@@ -20,6 +26,8 @@
     "@monaco-editor/react": "^4.7.0",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
+    "@trystero-p2p/nostr": "^0.23.1",
+    "@trystero-p2p/torrent": "^0.23.1",
     "d3": "^7.9.0",
     "d3-selection": "^3.0.0",
     "fflate": "^0.8.2",
@@ -46,15 +54,22 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "three": "^0.168.0"
+    "three": "^0.168.0",
+    "trystero": "^0.23.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "electron": "^35.5.1",
+    "electron-builder": "^26.0.12",
     "postcss": "^8.4.45",
     "tailwindcss": "^3.4.11",
     "vite": "^5.4.2"
+  },
+  "build": {
+    "appId": "org.opencalc.desktop",
+    "productName": "open-calc"
   }
 }

@@ -4,3 +4,13 @@ dist/
 *.log
 incomplete ideas/
 .claude/settings.local.json
+
+# Electron build output
+desktop/staging/
+desktop/out/
+release/
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm

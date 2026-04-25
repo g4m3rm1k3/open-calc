@@ -58,6 +58,8 @@ You can override the root with `OPEN_CALC_DATA_DIR`.
 `POST /api/update/check`
 - fetches and caches the configured update manifest if `config.json` contains `updateManifestUrl`
 
+The intended production use is a GitHub-hosted release manifest for portable desktop builds, not repository source diffs. See [../desktop/PORTABLE_RELEASES.md](../desktop/PORTABLE_RELEASES.md).
+
 ### Docs API
 
 `GET /api/docs`

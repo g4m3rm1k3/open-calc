@@ -1,0 +1,13 @@
+{
+  "channel": "stable",
+  "version": "0.1.0",
+  "publishedAt": "2026-04-25T00:00:00.000Z",
+  "notesUrl": "https://github.com/your-org/open-calc/releases/tag/v0.1.0",
+  "assets": {
+    "windowsPortableZip": {
+      "url": "https://github.com/your-org/open-calc/releases/download/v0.1.0/open-calc-win64-portable.zip",
+      "sha256": "REPLACE_WITH_SHA256",
+      "size": 0
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "open-calc",
+  "productName": "open-calc",
+  "description": "Portable desktop shell for open-calc",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "main.mjs",
+  "author": "open-calc contributors",
+  "dependencies": {},
+  "version": "0.1.0"
+}

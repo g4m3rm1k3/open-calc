@@ -41,7 +41,9 @@ import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
 import GlobalJSPlayground from "../ui/GlobalJSPlayground.jsx";
-import { Terminal, Code2, PlayCircle, HelpCircle } from "lucide-react";
+import { Terminal, Code2, PlayCircle, HelpCircle, MessageSquare } from "lucide-react";
+import { ChatProvider } from "../../context/ChatContext.jsx";
+import ChatPanel from "../chat/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoPlayer } from "../../context/VideoPlayerContext.jsx";
 import PhysicsPoolLab from "../tools/PhysicsPoolLab.jsx";
@@ -227,6 +229,8 @@ function TopBar({
   golfOpen,
   onFootballToggle,
   footballOpen,
+  onChatToggle,
+  chatOpen,
 }) {
   const { openSearch } = useSearchContext();
   const {
@@ -521,6 +525,20 @@ function TopBar({
         )}
       </div>
 
+      {/* Chat */}
+      <button
+        onClick={onChatToggle}
+        className={`p-2 rounded-lg transition-colors ${
+          chatOpen
+            ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50"
+            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+        }`}
+        aria-label="Study chat"
+        title="Study Chat (global & lesson rooms)"
+      >
+        <MessageSquare className="w-5 h-5" />
+      </button>
+
       {/* Help */}
       <button
         onClick={onHelpToggle}
@@ -669,6 +687,7 @@ export default function AppShell({ children }) {
   const [golfOpen, setGolfOpen] = useState(false);
   const [footballOpen, setFootballOpen] = useState(false);
   const [polyOpen, setPolyOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
     setGraph3DOpen(false);
@@ -773,6 +792,7 @@ export default function AppShell({ children }) {
   }
 
   return (
+    <ChatProvider>
     <GrapherContext.Provider value={{ openGrapher }}>
       <div className="min-h-screen bg-white dark:bg-slate-950">
         <TopBar
@@ -807,6 +827,8 @@ export default function AppShell({ children }) {
           golfOpen={golfOpen}
           onFootballToggle={() => setFootballOpen((prev) => !prev)}
           footballOpen={footballOpen}
+          onChatToggle={() => setChatOpen((prev) => !prev)}
+          chatOpen={chatOpen}
         />
 
         {/* Mobile sidebar/tools backdrop */}
@@ -1117,6 +1139,8 @@ export default function AppShell({ children }) {
         {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
         {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
         {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
+        <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+
         {footballOpen && (
           <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">
             <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800 shrink-0">
@@ -1149,5 +1173,6 @@ export default function AppShell({ children }) {
         )}
       </div>
     </GrapherContext.Provider>
+    </ChatProvider>
   );
 }
