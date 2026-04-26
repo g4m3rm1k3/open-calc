@@ -143,11 +143,12 @@ const PROSE_COMPONENTS = {
   em: ({ children }) => (
     <em className="italic text-slate-600 dark:text-slate-300">{children}</em>
   ),
-  // Inline code
-  code: ({ inline, children }) =>
-    inline
-      ? <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">{children}</code>
-      : <code className="block">{children}</code>,
+  // Inline code — react-markdown v9+ removed the `inline` prop.
+  // Block code has className="language-*"; inline code has no className.
+  code: ({ className, children }) =>
+    className?.startsWith('language-')
+      ? <code className="block">{children}</code>
+      : <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">{children}</code>,
   // Unordered list
   ul: ({ children }) => (
     <ul className="list-disc pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">{children}</ul>
