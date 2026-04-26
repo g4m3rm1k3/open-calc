@@ -35,61 +35,96 @@ function Meteor({ active, onDone }) {
   )
 }
 
-function CometTail({ count = 20 }) {
-  const points = useMemo(() => Array.from({ length: count }).map(() => ({
-    x: 0, y: 0, z: 0,
-    vx: -(Math.random() * 0.2 + 0.1),
-    vy: (Math.random() - 0.5) * 0.05,
-    life: Math.random()
-  })), [])
-
+function CometTail({ count = 2500 }) {
   const ref = useRef()
-  useFrame(() => {
-    points.forEach((p, i) => {
-      p.x += p.vx
-      p.y += p.vy
-      p.life -= 0.01
-      if (p.life <= 0) {
-        p.x = 0; p.y = 0; p.life = 1
+  const [geometry] = useState(() => {
+    const geo = new THREE.BufferGeometry()
+    const positions = new Float32Array(count * 3)
+    const colors = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = 0
+      positions[i * 3 + 1] = 0
+      positions[i * 3 + 2] = 0
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    return geo
+  })
+
+  useFrame((state) => {
+    const positions = geometry.attributes.position.array
+    const colors = geometry.attributes.color.array
+    for (let i = 0; i < count; i++) {
+      const idx = i * 3
+      // Move BEHIND the motion (Motion is +X, -Y, so tail is -X, +Y)
+      positions[idx] -= 0.18
+      positions[idx + 1] += 0.08
+      
+      // Conic expansion
+      const lateralShift = Math.sqrt(positions[idx]*positions[idx] + positions[idx+1]*positions[idx+1]) * 0.05
+      positions[idx] += (Math.random() - 0.5) * lateralShift
+      positions[idx + 1] += (Math.random() - 0.5) * lateralShift
+      positions[idx + 2] += (Math.random() - 0.5) * lateralShift
+
+      // Reset and recycle
+      const distSq = positions[idx]*positions[idx] + positions[idx+1]*positions[idx+1]
+      if (distSq > 3600 || Math.random() < 0.005) { // Reset at dist 60 or randomly
+        positions[idx] = (Math.random() - 0.5) * 0.2
+        positions[idx + 1] = (Math.random() - 0.5) * 0.2
+        positions[idx + 2] = (Math.random() - 0.5) * 0.2
       }
-      const s = 0.1 * p.life
-      const matrix = new THREE.Matrix4()
-        .makeTranslation(p.x, p.y, 0)
-        .scale(new THREE.Vector3(s, s, s))
-      ref.current.setMatrixAt(i, matrix)
-    })
-    ref.current.instanceMatrix.needsUpdate = true
+
+      // Color logic: Red hot -> Blue cool down
+      const dist = Math.sqrt(distSq)
+      const fade = Math.max(0, 1 - dist / 60)
+      if (dist < 2) {
+        colors[idx] = 1; colors[idx + 1] = 1; colors[idx + 2] = 1 // Bright nucleus
+      } else if (dist < 20) {
+        colors[idx] = 0.98 * fade; colors[idx + 1] = 0.45 * fade; colors[idx + 2] = 0.08 * fade // Red/Orange
+      } else {
+        colors[idx] = 0.1 * fade; colors[idx + 1] = 0.4 * fade; colors[idx + 2] = 1.0 * fade // Blue Ion
+      }
+    }
+    geometry.attributes.position.needsUpdate = true
+    geometry.attributes.color.needsUpdate = true
   })
 
   return (
-    <instancedMesh ref={ref} args={[null, null, count]}>
-      <sphereGeometry args={[1, 8, 8]} />
-      <meshBasicMaterial color="#fef08a" transparent opacity={0.6} />
-    </instancedMesh>
+    <points geometry={geometry}>
+      <pointsMaterial size={0.14} vertexColors transparent opacity={0.5} blending={THREE.AdditiveBlending} />
+    </points>
   )
 }
 
-function Comet() {
+function Comet({ config }) {
   const ref = useRef()
+  
   useFrame((state) => {
     if (ref.current) {
-      const now = new Date()
-      const secondsInDay = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()
-      const progress = secondsInDay / 86400
-      ref.current.position.x = -40 + (progress * 80)
-      ref.current.position.y = 8
-      ref.current.position.z = -25
+      const duration = 600 
+      const progress = (state.clock.elapsedTime % duration) / duration
+      
+      ref.current.position.x = -70 + (progress * 140)
+      ref.current.position.y = 12 - (progress * 8)
+      ref.current.position.z = -40
+      ref.current.rotation.set(0, 0, 0) // Reset rotation, handled by partile vector
     }
   })
 
   return (
     <group ref={ref}>
+      {/* Incandescent Heart */}
       <mesh>
-        <sphereGeometry args={[0.3, 16, 16]} />
-        <meshBasicMaterial color="#fff" />
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      {/* Soft Thermal Atmosphere */}
+      <mesh scale={4}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshBasicMaterial color="#f97316" transparent opacity={0.1} blending={THREE.AdditiveBlending} />
       </mesh>
       <CometTail />
-      <pointLight color="#fef9c3" intensity={5} distance={15} />
+      <pointLight color="#f97316" intensity={15} distance={60} />
     </group>
   )
 }
@@ -140,12 +175,12 @@ function EnvironmentWrapper({ children }) {
   return <group ref={groupRef}>{children}</group>
 }
 
-function NightSystem() {
+function NightSystem({ config }) {
   return (
     <EnvironmentWrapper>
       <Stars radius={100} depth={50} count={6000} factor={4} saturation={0} fade speed={1.5} />
       <MeteorSystem />
-      <Comet />
+      <Comet config={config} />
       <ambientLight intensity={0.2} />
     </EnvironmentWrapper>
   )
@@ -188,7 +223,7 @@ function MovingCloud({ index }) {
   )
 }
 
-function DaySystem() {
+function DaySystem({ config }) {
   const clouds = useMemo(() => Array.from({ length: 8 }).map((_, i) => i), [])
   return (
     <EnvironmentWrapper>
@@ -196,7 +231,7 @@ function DaySystem() {
       {clouds.map((i) => (
         <MovingCloud key={i} index={i} />
       ))}
-      <Comet />
+      <Comet config={config} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[0, 10, 5]} intensity={2} color="#ffffff" />
     </EnvironmentWrapper>
@@ -228,7 +263,7 @@ export default function DynamicBackground({ mode, config }) {
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100 dark:bg-[#020617]">
       <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
-        {isDark ? <NightSystem /> : <DaySystem />}
+        {isDark ? <NightSystem config={config} /> : <DaySystem config={config} />}
       </Canvas>
     </div>
   )
