@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  X,
-  Plus,
-  Trash2,
-  Code2,
-  Download,
-} from "lucide-react";
+import { X, Plus, Trash2, Code2, Download } from "lucide-react";
 import FullPageIDE from "./FullPageIDE";
 import { zipSync, strToU8 } from "fflate";
 
@@ -821,7 +815,12 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
         }}
       >
         <span
-          style={{ fontSize: 11, color: T.muted, fontWeight: 500, letterSpacing: ".03em" }}
+          style={{
+            fontSize: 11,
+            color: T.muted,
+            fontWeight: 500,
+            letterSpacing: ".03em",
+          }}
         >
           {cell.label || "Untitled cell"}
         </span>
