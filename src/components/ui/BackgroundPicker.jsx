@@ -3,8 +3,8 @@ import { X, Image as ImageIcon, Sparkles, Palette, Check } from 'lucide-react'
 
 const PRESET_GRADIENTS = [
   { id: 'mesh', label: 'Cosmic Mesh', css: 'radial-gradient(at 0% 0%, rgb(59, 130, 246) 0, transparent 50%), radial-gradient(at 100% 0%, rgb(168, 85, 247) 0, transparent 50%), radial-gradient(at 50% 100%, rgb(236, 72, 153) 0, transparent 50%)' },
-  { id: 'ocean', label: 'Ocean Depth', css: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' },
-  { id: 'sunset', label: 'Evening Sky', css: 'linear-gradient(180deg, #fef3c7 0%, #fbbf24 100%)' },
+  { id: 'ocean', label: 'Ocean Depth', css: 'linear-gradient(180deg, #38bdf8 0%, #2dd4bf 50%, #134e4a 100%)' },
+  { id: 'sunset', label: 'Evening Sky', css: 'linear-gradient(180deg, #020617 0%, #38bdf8 65%, #ff4500 100%)' },
 ]
 
 export default function BackgroundPicker({ config, onUpdate, onClose }) {
