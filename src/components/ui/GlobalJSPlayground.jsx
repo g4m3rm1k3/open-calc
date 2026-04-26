@@ -814,8 +814,8 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
       >
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 6,
             padding: "7px 12px",
             background: T.dark
@@ -824,8 +824,27 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
             borderBottom: `1px solid ${T.border}`,
           }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent, display: 'inline-block', boxShadow: `0 0 6px ${T.accent}` }} />
-          <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: ".1em", textTransform: "uppercase" }}>Live Preview</span>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: T.accent,
+              display: "inline-block",
+              boxShadow: `0 0 6px ${T.accent}`,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: T.accent,
+              letterSpacing: ".1em",
+              textTransform: "uppercase",
+            }}
+          >
+            Live Preview
+          </span>
         </div>
         <iframe
           ref={iframeRef}
@@ -872,7 +891,7 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
                 fontWeight: activeTab === tab ? 700 : 500,
                 cursor: "pointer",
                 letterSpacing: ".04em",
-                transition: 'color 0.15s',
+                transition: "color 0.15s",
               }}
             >
               {TAB_LABEL[tab]}
@@ -1097,44 +1116,70 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
           <header
             style={{
               background: T.dark
-                ? 'linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f2233 100%)'
-                : 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 50%, #fefce8 100%)',
+                ? "linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f2233 100%)"
+                : "linear-gradient(135deg, #eff6ff 0%, #f0fdf4 50%, #fefce8 100%)",
               borderBottom: `1px solid ${T.border}`,
-              padding: '14px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              padding: "14px 20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
               flexShrink: 0,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 34, height: 34,
-                background: 'linear-gradient(135deg, #f59e0b, #f97316)',
-                borderRadius: 10,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff',
-                boxShadow: '0 4px 14px rgba(245,158,11,0.4)',
-                flexShrink: 0,
-              }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  background: "linear-gradient(135deg, #f59e0b, #f97316)",
+                  borderRadius: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  boxShadow: "0 4px 14px rgba(245,158,11,0.4)",
+                  flexShrink: 0,
+                }}
+              >
                 <Code2 size={15} />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.2 }}>JS Playground</div>
-                <div style={{ fontSize: 10, color: T.muted, letterSpacing: '.06em', textTransform: 'uppercase' }}>sandboxed · live preview</div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: T.text,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  JS Playground
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: T.muted,
+                    letterSpacing: ".06em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  sandboxed · live preview
+                </div>
               </div>
             </div>
             <button
               onClick={onClose}
               style={{
-                background: T.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                background: T.dark
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.05)",
                 border: `1px solid ${T.border}`,
                 borderRadius: 10,
                 color: T.muted,
-                cursor: 'pointer',
-                padding: '6px 8px',
-                display: 'flex', alignItems: 'center',
-                transition: 'all 0.15s',
+                cursor: "pointer",
+                padding: "6px 8px",
+                display: "flex",
+                alignItems: "center",
+                transition: "all 0.15s",
               }}
             >
               <X size={18} />
@@ -1159,13 +1204,15 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
                 padding: "11px",
                 borderRadius: 10,
                 border: `1.5px dashed ${T.accent}55`,
-                background: T.dark ? 'rgba(56,189,248,0.04)' : 'rgba(2,132,199,0.03)',
+                background: T.dark
+                  ? "rgba(56,189,248,0.04)"
+                  : "rgba(2,132,199,0.03)",
                 color: T.accent,
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",
                 display: "flex",
-                transition: 'all 0.15s',
+                transition: "all 0.15s",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
