@@ -41,7 +41,7 @@ import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
 import GlobalJSPlayground from "../ui/GlobalJSPlayground.jsx";
-import { Terminal, Code2, PlayCircle, HelpCircle, MessageSquare } from "lucide-react";
+import { Terminal, Code2, PlayCircle, HelpCircle, MessageSquare, Sparkles } from "lucide-react";
 import { ChatProvider, useChat } from "../../context/ChatContext.jsx";
 import ChatPanel from "../chat/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,6 +52,8 @@ import MiniGolfGame from "../tools/MiniGolfGame.jsx";
 import FootballCalculus from "../viz/react/FootballCalculus.jsx";
 import ChemistryPage from "../../pages/ChemistryPage.jsx";
 import PhysicsPage from "../../pages/PhysicsPage.jsx";
+import DynamicBackground from "../ui/DynamicBackground.jsx";
+import BackgroundPicker from "../ui/BackgroundPicker.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -254,6 +256,9 @@ function TopBar({
   footballOpen,
   onChatToggle,
   chatOpen,
+  onBgPickerToggle,
+  dark,
+  toggleDark,
 }) {
   const { openSearch } = useSearchContext();
   const {
@@ -262,9 +267,6 @@ function TopBar({
     openPlayer,
     toggleMinimize,
   } = useVideoPlayer();
-  const [dark, setDark] = useState(() =>
-    document.documentElement.classList.contains("dark"),
-  );
   const navigate = useNavigate();
   const videoActive = videoOpen && !videoMinimized;
   const handleVideoToggle = () => (videoOpen ? toggleMinimize() : openPlayer());
@@ -281,12 +283,6 @@ function TopBar({
     return () => document.removeEventListener("mousedown", handler);
   }, [gamesMenuOpen]);
   const anyGameOpen = poolOpen || basketOpen || golfOpen || footballOpen;
-
-  const toggleDark = () => {
-    const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("oc-theme", isDark ? "dark" : "light");
-    setDark(isDark);
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[60] h-[60px] bg-[var(--color-surface)] backdrop-blur-xl border-b border-[var(--color-border)] flex items-center px-4 gap-3">
@@ -545,9 +541,18 @@ function TopBar({
       {/* Chat */}
       <ChatToggleButton onClick={onChatToggle} isOpen={chatOpen} />
 
-      {/* Help */}
-      <button
-        onClick={onHelpToggle}
+      {/* Help & Atmosphere */}
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onBgPickerToggle}
+          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          title="Course Atmosphere"
+        >
+          <Sparkles className="w-5 h-5" />
+        </button>
+
+        <button
+          onClick={onHelpToggle}
         className={`p-2 rounded-lg transition-colors ${
           helpOpen
             ? "text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50"
@@ -558,8 +563,9 @@ function TopBar({
       >
         <HelpCircle className="w-5 h-5" />
       </button>
+    </div>
 
-      {/* Dark mode toggle */}
+    {/* Dark mode toggle */}
       <button
         onClick={toggleDark}
         className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -714,6 +720,27 @@ export default function AppShell({ children }) {
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null);
   const { openSearch } = useSearchContext();
 
+  const [bgConfig, setBgConfig] = useState(() => {
+    const saved = localStorage.getItem('oc-bg-config')
+    return saved ? JSON.parse(saved) : { type: 'dynamic' }
+  })
+  const [bgPickerOpen, setBgPickerOpen] = useState(false)
+
+  const updateBgConfig = (newConfig) => {
+    setBgConfig(newConfig)
+    localStorage.setItem('oc-bg-config', JSON.stringify(newConfig))
+  }
+
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
+
+  const toggleDark = () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("oc-theme", isDark ? "dark" : "light");
+    setDark(isDark);
+  };
+
   // openGrapher — called by any lesson/component via GrapherContext
   const openGrapher = useCallback((config) => {
     const mode = config?.mode ?? "pro";
@@ -801,14 +828,7 @@ export default function AppShell({ children }) {
     <ChatProvider>
     <GrapherContext.Provider value={{ openGrapher }}>
       <div className="min-h-screen transition-colors duration-500 relative overflow-hidden">
-        <div className="fixed inset-0 z-[-1] bg-[var(--color-page-bg)]" />
-        <div className="fixed inset-0 z-[-1] opacity-30 dark:opacity-20 pointer-events-none" 
-             style={{ 
-               backgroundImage: `radial-gradient(at 0% 0%, rgb(59, 130, 246) 0, transparent 50%), 
-                                radial-gradient(at 100% 0%, rgb(168, 85, 247) 0, transparent 50%), 
-                                radial-gradient(at 50% 100%, rgb(236, 72, 153) 0, transparent 50%)` 
-             }} 
-        />
+        <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />
         <TopBar
           onMenuToggle={() => setSidebarOpen((o) => !o)}
           sidebarOpen={sidebarOpen}
@@ -843,6 +863,9 @@ export default function AppShell({ children }) {
           footballOpen={footballOpen}
           onChatToggle={() => setChatOpen((prev) => !prev)}
           chatOpen={chatOpen}
+          onBgPickerToggle={() => setBgPickerOpen(o => !o)}
+          dark={dark}
+          toggleDark={toggleDark}
         />
 
         {/* Mobile sidebar/tools backdrop */}
@@ -1154,6 +1177,13 @@ export default function AppShell({ children }) {
         {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
         {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
         <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+        {bgPickerOpen && (
+          <BackgroundPicker 
+            config={bgConfig} 
+            onUpdate={updateBgConfig} 
+            onClose={() => setBgPickerOpen(false)} 
+          />
+        )}
 
         {footballOpen && (
           <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">
