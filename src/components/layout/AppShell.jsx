@@ -322,6 +322,18 @@ function TopBar({
       </div>
 
       <nav className="hidden lg:flex flex-1 items-center gap-5 ml-6 h-full">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `text-sm font-bold transition-colors ${
+              isActive
+                ? "text-sky-600 dark:text-sky-400"
+                : "text-slate-800 dark:text-slate-100 hover:text-sky-600"
+            }`
+          }
+        >
+          Home
+        </NavLink>
         <CoursesDropdown />
         <NavLink
           to="/reference"

@@ -51,6 +51,18 @@
 }
 
 @layer components {
+  .oc-shell-card {
+    @apply rounded-[28px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur;
+  }
+
+  .oc-soft-panel {
+    @apply rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm;
+  }
+
+  .oc-section-kicker {
+    @apply text-[11px] font-black uppercase tracking-[0.22em] text-brand-600 dark:text-brand-400;
+  }
+
   /* Math display */
   .math-display {
     @apply overflow-x-auto py-4 px-2;
@@ -137,7 +149,7 @@
 
   /* Prose section */
   .prose-content p {
-    @apply mb-4 leading-relaxed;
+    @apply mb-5 leading-8 text-[16px] sm:text-[17px];
   }
   .prose-content p:last-child {
     @apply mb-0;

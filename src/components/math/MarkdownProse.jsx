@@ -118,48 +118,48 @@ function preprocess(text) {
 const PROSE_COMPONENTS = {
   // Headings
   h1: ({ children }) => (
-    <h1 className="text-xl font-bold text-slate-900 dark:text-sky-100 mt-6 mb-3">{children}</h1>
+    <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-50 mt-8 mb-4">{children}</h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-lg font-bold text-slate-800 dark:text-sky-200 mt-5 mb-2">{children}</h2>
+    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 mb-3">{children}</h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-[15px] font-bold text-slate-800 dark:text-slate-300 mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-6 mb-2">{children}</h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[13px] font-black uppercase tracking-[0.1em] text-brand-600 dark:text-brand-400 mt-4 mb-1.5">{children}</h4>
+    <h4 className="text-[12px] font-black uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400 mt-5 mb-2">{children}</h4>
   ),
   // Paragraphs
   p: ({ children }) => (
-    <p className="mb-4 last:mb-0 text-[15px] leading-[1.85] text-slate-700 dark:text-slate-400">
+    <p className="mb-5 last:mb-0 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
       {children}
     </p>
   ),
   // Bold — clearly brighter than body in both modes
   strong: ({ children }) => (
-    <strong className="font-semibold text-slate-900 dark:text-slate-100">{children}</strong>
+    <strong className="font-semibold text-slate-950 dark:text-white">{children}</strong>
   ),
   // Italic
   em: ({ children }) => (
-    <em className="italic text-slate-600 dark:text-slate-400">{children}</em>
+    <em className="italic text-slate-600 dark:text-slate-300">{children}</em>
   ),
   // Inline code
   code: ({ inline, children }) =>
     inline
-      ? <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-[0.85em] text-brand-600 dark:text-brand-400">{children}</code>
+      ? <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">{children}</code>
       : <code className="block">{children}</code>,
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-5 space-y-2 mb-4 text-[15px] leading-7 text-slate-700 dark:text-slate-400">{children}</ul>
+    <ul className="list-disc pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">{children}</ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-5 space-y-2 mb-4 text-[15px] leading-7 text-slate-700 dark:text-slate-400">{children}</ol>
+    <ol className="list-decimal pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">{children}</ol>
   ),
   li: ({ children }) => <li className="leading-7">{children}</li>,
   // Block quote
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-4 my-2 italic text-slate-600 dark:text-slate-400">
+    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-5 py-1 my-5 italic text-slate-600 dark:text-slate-300">
       {children}
     </blockquote>
   ),
@@ -169,7 +169,7 @@ const PROSE_COMPONENTS = {
   ),
   // Tables
   table: ({ children }) => (
-    <div className="overflow-x-auto my-4">
+    <div className="overflow-x-auto my-6 rounded-2xl border border-slate-200 dark:border-slate-800">
       <table className="w-full text-sm border-collapse">{children}</table>
     </div>
   ),
