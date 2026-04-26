@@ -218,9 +218,9 @@ export default function LessonPage() {
         </div>
       )}
 
-      <section className="mb-10 w-full">
+      <div className="space-y-12">
         <MicroCycleLesson lesson={lesson} />
-      </section>
+      </div>
 
       {lesson.quiz?.length > 0 && <LessonQuizBlock lessonId={lesson.id} questions={lesson.quiz} />}
 

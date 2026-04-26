@@ -392,38 +392,50 @@ function IntuitionBlock({ data, lesson }) {
   if (!hasPrimary && !hasAlternate) return null
 
   return (
-    <div className="mb-10">
-      <SectionDivider icon="🧠" label="Intuition" color="slate" noteId={lesson?.id ? `${lesson.id}:intuition` : undefined} />
-      <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
-
-      <SectionContent data={data} />
-      {data.perspectives?.length > 0 && <PerspectiveSync perspectives={data.perspectives} bridge={data.bridge} />}
-      {data.localLinearity && <LocalLinearity config={data.localLinearity} />}
-      {primaryVizzes.length > 0 && (
-        <div className="mt-6 space-y-4">
-          {primaryVizzes.map((viz, i) => (
-            <VizCard key={`${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
-          ))}
+    <div className="oc-shell-card mb-12 overflow-hidden">
+      <div className="oc-header-gradient px-8 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-xl shadow-sm">
+          🧠
         </div>
-      )}
-      {data.failureModes?.length > 0 && <FailureModes modes={data.failureModes} />}
-      {hasAlternate && (
-        <>
-          <div className="my-8 flex items-center gap-3 text-slate-400 dark:text-slate-600">
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-            <span className="text-xs font-semibold uppercase tracking-widest">Another way to see it</span>
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+        <div className="flex flex-col">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Conceptual</span>
+          <span className="font-bold text-slate-800 dark:text-slate-100 text-sm uppercase tracking-wider">Intuition</span>
+        </div>
+        <div className="flex-1" />
+        {lesson?.id && <StickyNote noteId={`${lesson.id}:intuition`} />}
+      </div>
+      
+      <div className="p-8">
+        <SemanticsBlock semantics={data.semantics ?? lesson?.semantics} />
+        <SectionContent data={data} />
+        {data.perspectives?.length > 0 && <PerspectiveSync perspectives={data.perspectives} bridge={data.bridge} />}
+        {data.localLinearity && <LocalLinearity config={data.localLinearity} />}
+        {primaryVizzes.length > 0 && (
+          <div className="mt-6 space-y-4">
+            {primaryVizzes.map((viz, i) => (
+              <VizCard key={`${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
+            ))}
           </div>
-          <SectionContent data={data.alternate} />
-          {alternateVizzes.length > 0 && (
-            <div className="mt-6 space-y-4">
-              {alternateVizzes.map((viz, i) => (
-                <VizCard key={`alt-${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:alt-${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
-              ))}
+        )}
+        {data.failureModes?.length > 0 && <FailureModes modes={data.failureModes} />}
+        {hasAlternate && (
+          <>
+            <div className="my-10 flex items-center gap-4">
+              <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Another Perspective</span>
+              <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
             </div>
-          )}
-        </>
-      )}
+            <SectionContent data={data.alternate} />
+            {alternateVizzes.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {alternateVizzes.map((viz, i) => (
+                  <VizCard key={`alt-${viz.id}-${i}`} viz={viz} noteId={lesson?.id ? `${lesson.id}:viz:alt-${viz.id}` : undefined} borderColor="border-slate-200 dark:border-slate-700" />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -439,7 +451,7 @@ function MathBlock({ data, lessonId }) {
   if (!hasProse && !hasCallouts && !vizzes.length) return null
 
   return (
-    <div id={lessonId ? `${lessonId}-math` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-brand-200 dark:border-brand-900/60 shadow-sm">
+    <div id={lessonId ? `${lessonId}-math` : undefined} className="oc-shell-card mb-12 overflow-hidden group">
       <div
         role="button"
         tabIndex={0}
@@ -461,7 +473,7 @@ function MathBlock({ data, lessonId }) {
         </span>
       </div>
       {open && (
-        <div className="px-6 py-5 bg-brand-50/30 dark:bg-brand-950/10 space-y-4">
+        <div className="p-8 space-y-6 bg-white dark:bg-slate-900">
           {data.processDefinition?.length > 0 && (
             <div className="mb-6 p-4 rounded-xl bg-brand-600 text-white shadow-xl shadow-brand-500/20">
               <p className="text-[10px] font-bold uppercase tracking-widest text-brand-200 mb-3">Operational Thinking: Finding the Derivative</p>
@@ -508,7 +520,7 @@ function RigorBlock({ data, lessonId }) {
   if (!hasProse && !hasCallouts && !vizzes.length && !hasProofSteps) return null
 
   return (
-    <div id={lessonId ? `${lessonId}-rigor` : undefined} className="mb-8 rounded-2xl overflow-hidden border border-purple-200 dark:border-purple-900/60 shadow-sm">
+    <div id={lessonId ? `${lessonId}-rigor` : undefined} className="oc-shell-card mb-12 overflow-hidden group">
       <div
         role="button"
         tabIndex={0}
@@ -535,7 +547,7 @@ function RigorBlock({ data, lessonId }) {
         </span>
       </div>
       {open && (
-        <div className="px-6 py-5 bg-purple-50/20 dark:bg-purple-950/10 space-y-4">
+        <div className="p-8 space-y-6 bg-white dark:bg-slate-900">
           {hasProse || hasCallouts || isBlocksFormat ? <SectionContent data={data} /> : null}
           {hasProofSteps ? (
             <DynamicProof

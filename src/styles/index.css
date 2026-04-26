@@ -19,7 +19,7 @@
     --topbar-height: 60px;
     /* Semantic color tokens */
     --color-surface:    #ffffff;
-    --color-page-bg:    #f8fafc;   /* slate-50 */
+    --color-page-bg:    #f1f5f9;   /* slate-100/light */
     --color-border:     #e2e8f0;   /* slate-200 */
     --color-text-muted: #64748b;   /* slate-500 */
     
@@ -29,7 +29,7 @@
 
   .dark {
     --color-surface:    #0f172a;   /* slate-900 */
-    --color-page-bg:    #020617;   /* slate-950/deep */
+    --color-page-bg:    #020617;   /* deep navy */
     --color-border:     #334155;   /* slate-700 */
     --color-text-muted: #94a3b8;   /* slate-400 */
     
@@ -72,8 +72,13 @@
   }
 
   .oc-header-gradient {
-    @apply bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.42),transparent)]
-           dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_26%),linear-gradient(180deg,rgba(15,23,42,0.42),transparent)];
+    @apply bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.42),transparent)]
+           dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),linear-gradient(180deg,rgba(15,23,42,0.42),transparent)];
+  }
+
+  .oc-card-container {
+    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 sm:p-10 transition-all duration-300;
+    box-shadow: var(--shadow-premium);
   }
 
   .oc-section-kicker {

@@ -76,7 +76,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
     : 'border-slate-200 dark:border-slate-700'
 
   return (
-    <div className={`rounded-xl border ${borderColor} bg-white dark:bg-slate-900 p-4 transition-colors`}>
+    <div className={`rounded-3xl border-2 ${borderColor} bg-white dark:bg-slate-900 p-6 transition-all duration-300 shadow-sm hover:shadow-premium`}>
       <div className="flex items-start gap-3">
         <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
           submitted
@@ -144,16 +144,16 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                 <button
                   onClick={handleSubmit}
                   disabled={(q.type === 'choice' && !selected) || (q.type === 'input' && !inputVal.trim())}
-                  className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-xs font-semibold transition-colors disabled:cursor-not-allowed"
+                  className="px-6 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95 disabled:cursor-not-allowed"
                 >
-                  Check
+                  Check Answer
                 </button>
                 {allHints.length > 0 && hintLevel < allHints.length - 1 && (
                   <button
                     onClick={showHint}
-                    className="text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 underline underline-offset-2"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                   >
-                    Hint {hintLevel + 2 <= allHints.length ? `(${hintLevel + 2}/${allHints.length})` : ''}
+                    💡 Hint {hintLevel + 2 <= allHints.length ? `(${hintLevel + 2}/${allHints.length})` : ''}
                   </button>
                 )}
               </>
@@ -234,34 +234,46 @@ export default function LessonQuizBlock({ lessonId, questions }) {
         : { text: 'Needs Review', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' }
 
   return (
-    <section className="mt-16 pt-10 border-t-2 border-slate-200 dark:border-slate-700">
+    <section className="mt-20 oc-shell-card overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="oc-header-gradient px-8 py-10 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Lesson Quiz</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            {total} questions · answer any order · skip and come back
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 shadow-sm flex items-center justify-center text-xl">
+              🎯
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Lesson Quiz</h2>
+          </div>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            {total} questions · Mastery required: 80%
           </p>
         </div>
 
         {/* Live score counter */}
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1.5">
           {displayCorrect !== null && (
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
               <span className="text-yellow-400 text-sm">★</span>
-              <span className="text-2xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
+              <span className="text-2xl font-black tabular-nums text-slate-900 dark:text-slate-100">
                 {displayCorrect}
               </span>
-              <span className="text-sm text-slate-400 dark:text-slate-500">/ {total} pts</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pt-1">
+                / {total} Points
+              </span>
             </div>
           )}
-          <span className="text-xs text-slate-400 dark:text-slate-500">
-            {displayAttempted}/{total} answered
-          </span>
+          <div className="flex items-center gap-2 pr-2">
+            <div className="w-24 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div className="h-full bg-brand-500 transition-all duration-500" style={{ width: `${(displayAttempted / total) * 100}%` }} />
+            </div>
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              {displayAttempted}/{total} Answered
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="p-8 space-y-6 bg-slate-50/30 dark:bg-slate-950/20">
         {questions.map((q, i) => (
           <QuizQuestion
             key={q.id ?? i}
