@@ -8,9 +8,8 @@ import {
   useParams,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../content/index.js";
-import PinsPanel from "../ui/PinsPanel.jsx";
-import NotesPanel from "../ui/NotesPanel.jsx";
 import Sidebar from "./Sidebar.jsx";
+import UtilityPanel from "../ui/UtilityPanel.jsx";
 import SearchModal from "../search/SearchModal.jsx";
 import GlobalGrapher from "../ui/GlobalGrapher.jsx";
 import GlobalGrapher3D from "../ui/GlobalGrapher3D.jsx";
@@ -945,8 +944,7 @@ export default function AppShell({ children }) {
         {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
         {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
         {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
-        <PinsPanel />
-        <NotesPanel />
+        <UtilityPanel />
         <WelcomeModal />
         <SearchModal />
         <GlobalGrapher
