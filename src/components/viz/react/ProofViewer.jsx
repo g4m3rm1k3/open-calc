@@ -15,14 +15,17 @@ function useMath() {
     typeof window !== "undefined" && !!window.katex,
   );
   useEffect(() => {
-    if (window.katex) { setReady(true); return; }
+    if (window.katex) {
+      setReady(true);
+      return;
+    }
     const link = document.createElement("link");
-    link.rel  = "stylesheet";
+    link.rel = "stylesheet";
     link.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
     document.head.appendChild(link);
-    const s    = document.createElement("script");
-    s.src      = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
-    s.onload   = () => setReady(true);
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
+    s.onload = () => setReady(true);
     document.head.appendChild(s);
   }, []);
   return ready;
@@ -33,7 +36,10 @@ function M({ t, display = false, ready }) {
   useEffect(() => {
     if (!ready || !ref.current || !window.katex || !t) return;
     try {
-      window.katex.render(t, ref.current, { throwOnError: false, displayMode: display });
+      window.katex.render(t, ref.current, {
+        throwOnError: false,
+        displayMode: display,
+      });
     } catch (_) {
       if (ref.current) ref.current.textContent = t;
     }
@@ -58,7 +64,8 @@ function WhyPanel({ why, depth = 0, ready }) {
   if (!why) return null;
 
   const color = DEPTH_ACCENTS[Math.min(depth, DEPTH_ACCENTS.length - 1)];
-  const label = why.tag || DEPTH_LABELS[Math.min(depth, DEPTH_LABELS.length - 1)];
+  const label =
+    why.tag || DEPTH_LABELS[Math.min(depth, DEPTH_LABELS.length - 1)];
 
   return (
     <div style={{ marginLeft: depth * 14, marginTop: 12 }}>
@@ -67,9 +74,9 @@ function WhyPanel({ why, depth = 0, ready }) {
         onClick={() => setOpen((o) => !o)}
         style={{
           background: open ? `${color}22` : `${color}14`,
-          border:     `1px solid ${color}`,
-          color:      color,
-          boxShadow:  open ? `0 0 16px ${color}2e` : "none",
+          border: `1px solid ${color}`,
+          color: color,
+          boxShadow: open ? `0 0 16px ${color}2e` : "none",
         }}
       >
         <span className="proof-why-dot" style={{ background: color }}>
@@ -100,14 +107,26 @@ function WhyPanel({ why, depth = 0, ready }) {
               {why.steps.map((st, i) => (
                 <div
                   key={i}
-                  style={{ display: "flex", gap: 14, marginBottom: 14, alignItems: "flex-start" }}
+                  style={{
+                    display: "flex",
+                    gap: 14,
+                    marginBottom: 14,
+                    alignItems: "flex-start",
+                  }}
                 >
                   <div
                     style={{
-                      minWidth: 24, height: 24, borderRadius: 8,
-                      background: color, color: "#fff",
-                      fontSize: 12, fontWeight: 900, flexShrink: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
+                      minWidth: 24,
+                      height: 24,
+                      borderRadius: 8,
+                      background: color,
+                      color: "#fff",
+                      fontSize: 12,
+                      fontWeight: 900,
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       boxShadow: `0 3px 10px ${color}44`,
                     }}
                   >
@@ -116,7 +135,10 @@ function WhyPanel({ why, depth = 0, ready }) {
                   <div>
                     <p className="proof-why-step-text">{st.text}</p>
                     {st.math && (
-                      <div className="proof-well proof-well--compact" style={{ marginTop: 6 }}>
+                      <div
+                        className="proof-well proof-well--compact"
+                        style={{ marginTop: 6 }}
+                      >
                         <M t={st.math} display ready={ready} />
                       </div>
                     )}
@@ -126,7 +148,9 @@ function WhyPanel({ why, depth = 0, ready }) {
             </div>
           )}
 
-          {why.why && <WhyPanel why={why.why} depth={depth + 1} ready={ready} />}
+          {why.why && (
+            <WhyPanel why={why.why} depth={depth + 1} ready={ready} />
+          )}
         </div>
       )}
     </div>
@@ -140,7 +164,9 @@ function ProofStep({ step, idx, total, ready }) {
       <div className="proof-ribbon">
         <div className="proof-ribbon-number">{idx + 1}</div>
         <span className="proof-ribbon-tag">{step.tag}</span>
-        <span className="proof-ribbon-counter">STEP {idx + 1} / {total}</span>
+        <span className="proof-ribbon-counter">
+          STEP {idx + 1} / {total}
+        </span>
       </div>
 
       <div style={{ padding: "0 4px" }}>
@@ -150,9 +176,7 @@ function ProofStep({ step, idx, total, ready }) {
           <M t={step.math} display ready={ready} />
         </div>
 
-        {step.note && (
-          <p className="proof-note">{step.note}</p>
-        )}
+        {step.note && <p className="proof-note">{step.note}</p>}
 
         <div style={{ paddingBottom: 12 }}>
           <WhyPanel why={step.why} depth={0} ready={ready} />
@@ -168,17 +192,26 @@ export default function ProofViewer({ proof }) {
   const ready = useMath();
   const steps = proof?.steps ?? [];
 
-  useEffect(() => { setStep(0); }, [proof]);
+  useEffect(() => {
+    setStep(0);
+  }, [proof]);
 
-  if (!proof) return (
-    <div style={{ padding: "3rem", textAlign: "center", color: "var(--proof-meta-color)", fontFamily: "var(--font-sans)" }}>
-      No proof available yet for this formula.
-    </div>
-  );
+  if (!proof)
+    return (
+      <div
+        style={{
+          padding: "3rem",
+          textAlign: "center",
+          color: "var(--proof-meta-color)",
+          fontFamily: "var(--font-sans)",
+        }}
+      >
+        No proof available yet for this formula.
+      </div>
+    );
 
   return (
     <div style={{ fontFamily: "var(--font-sans)", padding: "0 8px 32px" }}>
-
       {/* Header */}
       <div className="proof-header">
         {proof.category && (
@@ -191,9 +224,7 @@ export default function ProofViewer({ proof }) {
         <div className="proof-well proof-well--hero">
           <M t={proof.problem} display ready={ready} />
         </div>
-        {proof.preamble && (
-          <p className="proof-preamble">{proof.preamble}</p>
-        )}
+        {proof.preamble && <p className="proof-preamble">{proof.preamble}</p>}
       </div>
 
       {/* Progress pips */}
@@ -203,7 +234,11 @@ export default function ProofViewer({ proof }) {
             key={i}
             className={
               "proof-pip" +
-              (i < step ? " proof-pip--done" : i === step ? " proof-pip--current" : "")
+              (i < step
+                ? " proof-pip--done"
+                : i === step
+                  ? " proof-pip--current"
+                  : "")
             }
             onClick={() => setStep(i)}
             title={`Step ${i + 1}: ${steps[i].tag}`}
@@ -229,7 +264,9 @@ export default function ProofViewer({ proof }) {
         >
           ← Previous
         </button>
-        <span className="proof-nav-counter">{step + 1} / {steps.length}</span>
+        <span className="proof-nav-counter">
+          {step + 1} / {steps.length}
+        </span>
         <button
           className="proof-nav-btn proof-nav-btn--next"
           onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
@@ -238,7 +275,6 @@ export default function ProofViewer({ proof }) {
           Next →
         </button>
       </div>
-
     </div>
   );
 }
