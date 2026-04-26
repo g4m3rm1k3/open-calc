@@ -82,29 +82,40 @@ function ChatMessage({ msg, onBlockRequest }) {
 
   if (msg.isLovelace) {
     return (
-      <div className="flex flex-col items-start gap-1">
-        <div className="flex items-center gap-1.5">
-          <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-            <Sparkles className="w-3 h-3 text-violet-500 dark:text-violet-400" />
+      <motion.div 
+        initial={{ opacity: 0, x: -10 }} 
+        animate={{ opacity: 1, x: 0 }}
+        className="flex flex-col items-start gap-1 mb-2"
+      >
+        <div className="flex items-center gap-1.5 ml-1">
+          <div className="w-5 h-5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] flex items-center justify-center">
+            <Sparkles className="w-3 h-3 text-white" />
           </div>
-          <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">Lovelace</span>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatTime(msg.timestamp)}</span>
+          <span className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 tracking-wider">LOVELACE</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{formatTime(msg.timestamp)}</span>
         </div>
-        <div className="max-w-[90%] bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/50 text-slate-800 dark:text-slate-200 rounded-2xl rounded-tl-sm px-3 py-2 text-sm leading-relaxed">
+        <div className="max-w-[95%] bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-400/20 text-indigo-950 dark:text-indigo-50 rounded-2xl rounded-tl-[4px] px-4 py-2.5 text-[13.5px] leading-relaxed shadow-sm">
           {msg.text}
         </div>
-      </div>
+      </motion.div>
     )
   }
 
   if (msg.isOwn) {
     return (
-      <div className="flex flex-col items-end gap-0.5">
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 mr-1">{formatTime(msg.timestamp)}</span>
-        <div className="max-w-[80%] bg-brand-600 text-white rounded-2xl rounded-tr-sm px-3 py-2 text-sm leading-relaxed">
+      <motion.div 
+        initial={{ opacity: 0, x: 10 }} 
+        animate={{ opacity: 1, x: 0 }}
+        className="flex flex-col items-end gap-1 mb-2"
+      >
+        <div className="flex items-center gap-1.5 mr-1">
+           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">{formatTime(msg.timestamp)}</span>
+           <span className="text-[11px] font-black text-brand-600 dark:text-brand-400 tracking-wider uppercase">Me</span>
+        </div>
+        <div className="max-w-[85%] bg-brand-600 dark:bg-brand-500 shadow-[0_4px_15px_rgba(79,70,229,0.3)] text-white rounded-2xl rounded-tr-[4px] px-4 py-2.5 text-[13.5px] leading-relaxed">
           {msg.text}
         </div>
-      </div>
+      </motion.div>
     )
   }
 
@@ -178,11 +189,11 @@ function ChatInput({ onSend, disabled }) {
   }
 
   return (
-    <div className="flex flex-col gap-1 p-3 border-t border-slate-200 dark:border-slate-800 shrink-0">
+    <div className="flex flex-col gap-2 p-4 pt-1 bg-white/20 dark:bg-black/20 border-t border-white/10 shrink-0">
       {hasLovelace && (
-        <div className="flex items-center gap-1 text-[10px] text-violet-500 dark:text-violet-400 px-1">
-          <Sparkles className="w-3 h-3" />
-          <span>Lovelace will answer — first use downloads ~880 MB</span>
+        <div className="flex items-center gap-2 text-[10px] text-indigo-600 dark:text-indigo-400 px-2 py-1 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-200/30 dark:border-indigo-400/10">
+          <Sparkles className="w-3 h-3 animate-pulse" />
+          <span className="font-bold uppercase tracking-wider">AI TUTOR MODE</span>
         </div>
       )}
       <div className="flex items-center gap-2">
@@ -191,17 +202,17 @@ function ChatInput({ onSend, disabled }) {
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() } }}
-          placeholder={disabled ? 'Connecting…' : 'Message… or @Lovelace [question]'}
+          placeholder={disabled ? 'Synchronizing…' : 'Message @Lovelace…'}
           disabled={disabled}
           maxLength={500}
-          className="flex-1 text-sm bg-slate-100 dark:bg-slate-800 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-brand-500/50 disabled:opacity-50"
+          className="flex-1 text-[13.5px] font-semibold bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all shadow-inner"
         />
         <button
           onClick={submit}
           disabled={!text.trim() || disabled}
-          className={`p-2 rounded-xl text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${hasLovelace ? 'bg-violet-600 hover:bg-violet-700' : 'bg-brand-600 hover:bg-brand-700'}`}
+          className={`p-3 rounded-2xl text-white shadow-lg transition-all duration-300 ${hasLovelace ? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20' : 'bg-brand-600 hover:bg-brand-500 shadow-brand-500/20'} hover:scale-105 active:scale-95`}
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -275,18 +286,20 @@ export default function ChatPanel({ isOpen, onClose }) {
             initial={{ x: '100%', opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed right-0 top-[60px] bottom-0 w-[320px] z-[150] flex flex-col bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-2xl"
+            transition={{ type: 'spring', damping: 28, stiffness: 400 }}
+            className="fixed right-0 top-[60px] bottom-0 w-[360px] z-[150] flex flex-col bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-l border-white/20 dark:border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_100px_rgba(0,0,0,0.5)]"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-base">💬</span>
-                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">Study Chat</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${connected ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-                  {connected ? 'live' : 'connecting…'}
-                </span>
-              </div>
+            {/* Header - Holographic Prism */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
+               <div className="flex items-center gap-3">
+                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse" />
+                 <span className="font-black text-slate-900 dark:text-white text-xs uppercase tracking-[0.2em]">Study HUD</span>
+                 {connected ? (
+                    <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 tracking-[0.1em] uppercase">LINKED</span>
+                 ) : (
+                    <Loader2 className="w-3 h-3 animate-spin text-slate-400" />
+                 )}
+               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setShowSettings(v => !v)}
