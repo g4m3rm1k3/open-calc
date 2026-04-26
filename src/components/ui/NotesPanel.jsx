@@ -147,7 +147,7 @@ export default function NotesPanel() {
   }
 
   return (
-    <div className="hidden lg:block fixed right-0 top-[60px] bottom-0 z-[39] pointer-events-none">
+    <div className="hidden lg:block fixed right-0 top-[90px] bottom-0 z-[39] pointer-events-none">
       {/* Slide-in panel */}
       <div
         className={`absolute right-0 top-0 bottom-0 w-[280px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-200 pointer-events-auto shadow-xl ${open ? 'translate-x-0' : 'translate-x-full'}`}

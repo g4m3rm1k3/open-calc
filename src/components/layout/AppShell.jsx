@@ -19,20 +19,39 @@ import ScratchPad from "../ui/ScratchPad.jsx";
 import { useSearchContext } from "../../context/SearchContext.jsx";
 import { useProgress } from "../../hooks/useProgress.js";
 import GrapherContext from "../../context/GrapherContext.jsx";
-import {
-  Activity,
-  Box,
-  Settings2,
-  PenLine,
-  Smartphone,
-  Layers,
-  Search,
-  BookOpen,
-  Home,
-  Compass,
-  Menu,
-  X,
+import { 
+  Activity, 
+  Box, 
+  Settings2, 
+  PenLine, 
+  Smartphone, 
+  Layers, 
+  Search, 
+  BookOpen, 
+  Home, 
+  Compass, 
+  Menu, 
+  X, 
   Calculator,
+  Terminal, 
+  Code2, 
+  PlayCircle, 
+  HelpCircle, 
+  MessageSquare, 
+  Sparkles,
+  Cpu,
+  Wrench,
+  Binary,
+  FileText,
+  Variable,
+  Hash,
+  Gamepad2,
+  Library,
+  LayoutGrid,
+  Zap,
+  GraduationCap,
+  Atom,
+  FlaskConical
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -41,7 +60,6 @@ import HelpModal from "../ui/HelpModal.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
 import GlobalJSPlayground from "../ui/GlobalJSPlayground.jsx";
-import { Terminal, Code2, PlayCircle, HelpCircle, MessageSquare, Sparkles } from "lucide-react";
 import { ChatProvider, useChat } from "../../context/ChatContext.jsx";
 import ChatPanel from "../chat/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
@@ -222,6 +240,19 @@ function CoursesDropdown() {
   );
 }
 
+function RibbonGroup({ title, children }) {
+  return (
+    <div className="flex flex-col items-center gap-1.5 flex-none animate-in fade-in slide-in-from-top-1 duration-500">
+      <div className="flex items-center gap-1 p-1 bg-slate-100/30 dark:bg-white/5 rounded-xl border border-[var(--color-border)] h-[42px]">
+        {children}
+      </div>
+      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 whitespace-nowrap">
+        {title}
+      </span>
+    </div>
+  )
+}
+
 function TopBar({
   onMenuToggle,
   sidebarOpen,
@@ -270,9 +301,9 @@ function TopBar({
   const navigate = useNavigate();
   const videoActive = videoOpen && !videoMinimized;
   const handleVideoToggle = () => (videoOpen ? toggleMinimize() : openPlayer());
-
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
   const gamesMenuRef = useRef(null);
+
   useEffect(() => {
     if (!gamesMenuOpen) return;
     const handler = (e) => {
@@ -282,325 +313,128 @@ function TopBar({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [gamesMenuOpen]);
-  const anyGameOpen = poolOpen || basketOpen || golfOpen || footballOpen;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[60] h-[60px] bg-[var(--color-surface)] backdrop-blur-xl border-b border-[var(--color-border)] flex items-center px-4 gap-3">
-      {/* Mobile Menu & Brand */}
-      <div className="lg:hidden flex items-center gap-1">
-        <button
-          onClick={onMenuToggle}
-          className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          aria-label={sidebarOpen ? "Close menu" : "Toggle menu"}
-        >
-          {sidebarOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+    <header className="fixed top-0 left-0 right-0 z-[100] h-[90px] bg-[var(--color-surface)] backdrop-blur-3xl border-b border-[var(--color-border)] flex items-center px-6 shadow-sm">
+      {/* 1. BRANDING & SEARCH */}
+      <div className="flex flex-col items-center justify-center gap-1.5 border-r border-[var(--color-border)] pr-8 h-full min-w-[80px]">
+        <Link to="/" className="text-brand-600 dark:text-brand-400 font-black text-3xl tracking-tighter hover:scale-110 transition-transform">
+          ∂
+        </Link>
+        <button onClick={openSearch} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-brand-500 transition-colors">
+          <Search className="w-3 h-3" /> Search
         </button>
-        <AnimatePresence>
-          {!sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-            >
-              <Link
-                to="/"
-                className="p-2 -ml-1 rounded-lg text-brand-600 dark:text-brand-400 font-bold text-xl"
-              >
-                ∂
-              </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
-      <nav className="hidden lg:flex flex-1 items-center gap-5 ml-6 h-full">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${
-              isActive
-                ? "text-sky-600 dark:text-sky-400"
-                : "text-slate-800 dark:text-slate-100 hover:text-sky-600"
-            }`
-          }
-        >
-          Home
-        </NavLink>
-        <CoursesDropdown />
-        <NavLink
-          to="/reference"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-amber-600 dark:text-amber-400" : "text-slate-800 dark:text-slate-100 hover:text-amber-600"}`
-          }
-        >
-          Reference
-        </NavLink>
-        <NavLink
-          to="/universal-calc"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-100 hover:text-emerald-600"}`
-          }
-        >
-          Universal Calc
-        </NavLink>
-        <NavLink
-          to="/openmat"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-cyan-600 dark:text-cyan-400" : "text-slate-800 dark:text-slate-100 hover:text-cyan-600"}`
-          }
-        >
-          OpenMAT
-        </NavLink>
-        {/* Reality Runner hidden until physics fixed */}
-        <NavLink
-          to="/cnc-sim"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-amber-600 dark:text-amber-400" : "text-slate-800 dark:text-slate-100 hover:text-amber-600"}`
-          }
-        >
-          CNC Sim
-        </NavLink>
-        <NavLink
-          to="/logic-sim"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-violet-600 dark:text-violet-400" : "text-slate-800 dark:text-slate-100 hover:text-violet-600"}`
-          }
-        >
-          Logic Sim
-        </NavLink>
-        <NavLink
-          to="/docs"
-          className={({ isActive }) =>
-            `text-sm font-bold transition-colors ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-100 hover:text-indigo-600"}`
-          }
-        >
-          Docs
-        </NavLink>
-        <div className="flex items-center gap-1.5 opacity-50 cursor-not-allowed select-none"></div>
-      </nav>
+      {/* 2. THE EXPANDED GRID RIBBON */}
+      <div className="flex-1 grid grid-flow-col auto-cols-auto gap-1 px-6 h-full items-center justify-start overflow-hidden">
+        
+        {/* NAV BAY */}
+        <RibbonGroup title="Navigation">
+          <CoursesDropdown />
+          <NavLink to="/reference" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Reference Library">
+            <Library className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/docs" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Technical Docs">
+            <FileText className="w-5 h-5" />
+          </NavLink>
+        </RibbonGroup>
 
-      <div className="flex-1 lg:hidden" />
+        {/* ECOSYSTEM BAY */}
+        <RibbonGroup title="Ecosystem">
+          <NavLink to="/universal-calc" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Universal Calculus">
+            <Cpu className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/openmat" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="OpenMAT Platform">
+            <Atom className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/cnc-sim" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-orange-100 dark:bg-orange-900/40 text-orange-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="CNC Simulator">
+            <Wrench className="w-5 h-5" />
+          </NavLink>
+          <NavLink to="/logic-sim" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Logic Suite">
+            <Binary className="w-5 h-5" />
+          </NavLink>
+        </RibbonGroup>
 
-      <button
-        onClick={openSearch}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors hidden sm:flex"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-        <span className="hidden sm:inline">Search</span>
-      </button>
+        {/* MATH BAY */}
+        <RibbonGroup title="Analysis">
+          <button onClick={onGraphToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="2D Grapher">
+            <Activity className="w-5 h-5" />
+          </button>
+          <button onClick={onGraph3DToggle} className="p-2 rounded-lg text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all" title="3D Plotter">
+            <Box className="w-5 h-5" />
+          </button>
+          <button onClick={onGraphJSXToggle} className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all" title="JSXGraph Pro">
+            <Settings2 className="w-5 h-5" />
+          </button>
+          <div className="w-px h-6 bg-[var(--color-border)] mx-1" />
+          <button onClick={onCalcToggle} className="p-2 rounded-lg text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all" title="Calculator">
+            <Calculator className="w-5 h-5" />
+          </button>
+          <button onClick={onSigmaToggle} className="p-2 rounded-lg text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all font-bold text-sm" title="Sigma Σ">
+            Σ
+          </button>
+          <button onClick={onPolyToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all font-black text-[10px]" title="Polynomial Solver">
+            P(x)
+          </button>
+        </RibbonGroup>
 
-      {/* Spacer for mobile */}
-      <div className="flex-1 min-w-[8px] lg:hidden" />
-      <div className="lg:hidden flex-none">
-        <MobileLocationBadge />
-      </div>
-      <div className="flex-1 lg:hidden" />
+        {/* ENGINES BAY */}
+        <RibbonGroup title="Development">
+          <button onClick={onScratchToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all" title="Scratchpad">
+            <PenLine className="w-5 h-5" />
+          </button>
+          <button onClick={onPythonToggle} className="p-2 rounded-lg text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all" title="Python Notebook">
+            <Terminal className="w-5 h-5" />
+          </button>
+          <button onClick={onJsToggle} className="p-2 rounded-lg text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all" title="JS Playground">
+            <Code2 className="w-5 h-5" />
+          </button>
+        </RibbonGroup>
 
-      <ScoreWidget />
-
-      {/* Utility tool buttons — icon only, grouped by type */}
-      <div className="hidden lg:flex items-center gap-1">
-        {/* Graphers */}
-        <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <button
-            onClick={onGraphToggle}
-            className="p-2 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
-            title="2D Grapher"
-          >
-            <Activity className="w-4 h-4" />
+        {/* SIMS BAY */}
+        <RibbonGroup title="Laboratories">
+          <button onClick={onChemToggle} className="p-2 rounded-lg text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-all" title="Chemistry Lab">
+            <FlaskConical className="w-5 h-5" />
           </button>
-          <button
-            onClick={onGraph3DToggle}
-            className="p-2 text-amber-500  dark:text-amber-400  hover:bg-amber-50  dark:hover:bg-amber-900/30  transition-colors border-l border-slate-200 dark:border-slate-700"
-            title="3D Plotter"
-          >
-            <Box className="w-4 h-4" />
+          <button onClick={onPhysicsToggle} className="p-2 rounded-lg text-fuchsia-500 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-900/30 transition-all" title="Physics Engine">
+            <Zap className="w-5 h-5" />
           </button>
-          <button
-            onClick={onGraphJSXToggle}
-            className="p-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors border-l border-slate-200 dark:border-slate-700"
-            title="JSXGraph Pro"
-          >
-            <Settings2 className="w-4 h-4" />
+          <div className="w-px h-6 bg-[var(--color-border)] mx-1" />
+          <button onClick={onBasketToggle} className="p-2 rounded-lg text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-all" title="Basketball Lab">
+            <span className="text-lg">🏀</span>
           </button>
-        </div>
-
-        {/* Other tools */}
-        <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden ml-1">
-          <button
-            onClick={onScratchToggle}
-            className={`p-2 transition-colors ${scratchOpen ? "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-900/30" : "text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30"}`}
-            title="Scratchpad"
-          >
-            <PenLine className="w-4 h-4" />
+          <button onClick={onPoolToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="Physics Pool">
+            <span className="text-lg">🎱</span>
           </button>
-          <button
-            onClick={onCalcToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${calcOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="TI Calculator"
-          >
-            <Calculator className="w-4 h-4" />
+          <button onClick={onGolfToggle} className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all" title="Mini Golf">
+            <span className="text-lg">⛳</span>
           </button>
-          <button
-            onClick={onSigmaToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${sigmaOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="Sigma Evaluator"
-          >
-            <span className="text-sm font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>Σ</span>
+          <button onClick={onFootballToggle} className="p-2 rounded-lg text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all" title="Football Calc">
+            <span className="text-lg">🏈</span>
           </button>
-          <button
-            onClick={onPolyToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${polyOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-            title="Polynomial Solver"
-          >
-            <span className="text-[10px] font-bold leading-none" style={{ lineHeight: '16px', display: 'block' }}>P(x)</span>
+          <button onClick={() => navigate("/stem-quest")} className="p-2 rounded-lg text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-all" title="STEM Quest">
+            <GraduationCap className="w-5 h-5" />
           </button>
-          <button
-            onClick={onPythonToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${pythonOpen ? "text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30" : "text-teal-500 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30"}`}
-            title="Python Sandbox"
-          >
-            <Terminal className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onJsToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${jsOpen ? "text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30" : "text-yellow-500 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30"}`}
-            title="JS Playground"
-          >
-            <Code2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleVideoToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${videoActive ? "text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30" : "text-sky-500 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30"}`}
-            title="Video Player"
-          >
-            <PlayCircle className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onChemToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${chemOpen ? "text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30" : "text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30"}`}
-            title="Periodic Table & Chemistry"
-          >
-            <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>⚛</span>
-          </button>
-          <button
-            onClick={onPhysicsToggle}
-            className={`p-2 transition-colors border-l border-slate-200 dark:border-slate-700 ${physicsOpen ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30" : "text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30"}`}
-            title="Physics Laboratory"
-          >
-            <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>φ</span>
-          </button>
-
-        </div>
+        </RibbonGroup>
       </div>
 
-      {/* Games dropdown — outside overflow-hidden container so the menu isn't clipped */}
-      <div ref={gamesMenuRef} style={{ position: "relative" }}>
-        <button
-          onClick={() => setGamesMenuOpen(v => !v)}
-          className={`p-2 rounded-lg transition-colors ${anyGameOpen || gamesMenuOpen ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30" : "text-violet-500 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/30"}`}
-          title="Games"
-        >
-          <span className="text-base leading-none" style={{ lineHeight: "16px", display: "block" }}>🎮</span>
+      {/* 3. ASSISTANTS & UTILS */}
+      <div className="flex items-center gap-3 border-l border-[var(--color-border)] pl-8 h-full">
+        <ScoreWidget />
+        <button onClick={handleVideoToggle} className={`p-2.5 rounded-xl transition-all ${videoActive ? "bg-sky-500 text-white shadow-lg shadow-sky-500/30" : "text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20"}`} title="Video Academy">
+          <PlayCircle className="w-5 h-5" />
         </button>
-        {gamesMenuOpen && (
-          <div className="absolute right-0 top-[calc(100%+4px)] z-[200] min-w-[190px] overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-lg">
-            {[
-              { emoji: "🗺️", label: "STEM Quest",         onClick: () => { setGamesMenuOpen(false); navigate("/stem-quest"); }, active: false },
-              { emoji: "🧪", label: "OpenCraft",         onClick: () => { setGamesMenuOpen(false); navigate("/open-craft"); }, active: location.pathname.startsWith("/open-craft") },
-              { emoji: "🎱", label: "Physics Pool Lab",  onClick: () => { onPoolToggle();     setGamesMenuOpen(false); }, active: poolOpen },
-              { emoji: "🏀", label: "Basketball Lab",    onClick: () => { onBasketToggle();   setGamesMenuOpen(false); }, active: basketOpen },
-              { emoji: "⛳", label: "Mini Golf Lab",      onClick: () => { onGolfToggle();     setGamesMenuOpen(false); }, active: golfOpen },
-              { emoji: "🏈", label: "Football Calculus", onClick: () => { onFootballToggle(); setGamesMenuOpen(false); }, active: footballOpen },
-            ].map(({ emoji, label, onClick, active }) => (
-              <button key={label} onClick={onClick}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors ${active ? "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 font-semibold" : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"}`}>
-                <span>{emoji}</span>{label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Chat */}
-      <ChatToggleButton onClick={onChatToggle} isOpen={chatOpen} />
-
-      {/* Help & Atmosphere */}
-      <div className="flex items-center gap-1">
-        <button
-          onClick={onBgPickerToggle}
-          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Course Atmosphere"
-        >
+        <ChatToggleButton onClick={onChatToggle} isOpen={chatOpen} />
+        <div className="w-px h-8 bg-[var(--color-border)] mx-1" />
+        <button onClick={onBgPickerToggle} className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Sky Atmosphere">
           <Sparkles className="w-5 h-5" />
         </button>
-
-        <button
-          onClick={onHelpToggle}
-        className={`p-2 rounded-lg transition-colors ${
-          helpOpen
-            ? "text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50"
-            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-        }`}
-        aria-label="Open contributor docs"
-        title="Contributor Docs (?)"
-      >
-        <HelpCircle className="w-5 h-5" />
-      </button>
-    </div>
-
-    {/* Dark mode toggle */}
-      <button
-        onClick={toggleDark}
-        className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-        aria-label="Toggle dark mode"
-      >
-        {dark ? (
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-            />
-          </svg>
-        ) : (
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-            />
-          </svg>
-        )}
-      </button>
+        <button onClick={toggleDark} className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          {dark ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg> 
+                : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>}
+        </button>
+      </div>
     </header>
   );
 }
@@ -893,7 +727,7 @@ export default function AppShell({ children }) {
         <aside
           onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
           onMouseLeave={() => setSidebarHovered(false)}
-          className={`fixed top-[60px] left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-transform duration-300 ease-in-out w-[280px]
+          className={`fixed top-[90px] left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-transform duration-300 ease-in-out w-[280px]
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
@@ -915,7 +749,7 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-300 ease-in-out pt-[60px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"}`}
+          className={`transition-[padding] duration-300 ease-in-out pt-[90px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"}`}
         >
           <div
             className={
