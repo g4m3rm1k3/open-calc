@@ -348,42 +348,57 @@ export default function FloatingVideoPlayer() {
            exit={{ opacity: 0, scale: 0.9, y: isMobile ? 100 : 0 }}
            ref={playerRef}
            style={isMobile ? { width: '100%', height: '100%', top: 0, left: 0 } : { width, height }}
-           className={`fixed top-0 left-0 z-[9998] bg-white dark:bg-slate-900 shadow-3xl overflow-hidden flex flex-col group/player ${
-             isMobile ? 'rounded-none' : 'rounded-2xl border border-slate-200 dark:border-slate-800'
+           className={`fixed top-0 left-0 z-[9998] shadow-[0_0_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_150px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group/player ${
+             isMobile ? 'bg-slate-950 rounded-none' : 'bg-white/80 dark:bg-slate-950/60 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 dark:border-white/5 ring-1 ring-black/5'
            }`}
         >
-          {/* Header - draggable area on desktop; always visible on mobile */}
+          {/* Header - Holographic Prism Control */}
           <div 
             onPointerDown={(e) => dragControls.start(e)}
-            className={`flex-shrink-0 flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 select-none transition-all duration-500 transform ${
+            className={`flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-white/10 select-none transition-all duration-500 transform ${
               !isMobile && currentVideo
                 ? 'opacity-0 translate-y-[-10px] group-hover/player:opacity-100 group-hover/player:translate-y-0 cursor-grab active:cursor-grabbing'
                 : 'opacity-100 translate-y-0 cursor-grab active:cursor-grabbing'
-            }`}
+            } ${isMobile ? 'bg-slate-900' : 'bg-gradient-to-r from-transparent via-white/5 to-transparent'}`}
           >
-            <div className="flex items-center gap-3 truncate">
-              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><Video size={16} /></div>
-              <div className="truncate">
-                <h3 className="text-xs font-bold text-white truncate leading-none mb-1">{currentVideo?.title || 'Tutorial Hub'}</h3>
+            <div className="flex items-center gap-4 truncate">
+              <div className="relative flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-2xl bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center text-white">
+                  <Video size={18} />
+                </div>
+                {!isMinimized && (
+                  <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full animate-pulse -z-10" />
+                )}
+              </div>
+              <div className="truncate flex flex-col">
+                <h3 className="text-[12px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1.5 truncate">
+                  {currentVideo?.title || 'Tutorial Hub'}
+                </h3>
                 {lessonId && (
-                  <p className="text-[9px] font-bold text-brand-400 uppercase tracking-widest leading-none opacity-80">
-                    {ALL_LESSONS.find(l => l.id === lessonId)?.title || 'Curriculum'}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-80 shrink-0">
+                      Scientific Insight
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <p className="text-[10px] text-slate-400 font-medium truncate uppercase tracking-tight">
+                      {ALL_LESSONS.find(l => l.id === lessonId)?.title || 'Curriculum'}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
             
             <div className="flex-shrink-0 flex items-center gap-1">
-              <button onClick={toggleMinimize} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Minimize">
+              <button onClick={toggleMinimize} className="p-2 hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-400 transition-all" title="Minimize">
                 <Minus size={18} />
               </button>
-                <button
-                  onClick={isMobile ? closePlayer : toggleMinimize}
-                  className={`rounded-lg text-slate-400 transition-colors ${isMobile ? 'p-2 bg-red-600 hover:bg-red-700 text-white' : 'p-1.5 hover:bg-red-900/40 hover:text-red-500'}`}
-                  title="Close"
-                >
-                  <X size={isMobile ? 20 : 18} />
-                </button>
+              <button
+                onClick={isMobile ? closePlayer : toggleMinimize}
+                className={`rounded-xl transition-all ${isMobile ? 'p-2 bg-red-600 hover:bg-red-700 text-white' : 'p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-500'}`}
+                title="Close"
+              >
+                <X size={18} />
+              </button>
             </div>
           </div>
 
@@ -420,15 +435,15 @@ export default function FloatingVideoPlayer() {
                 )}
 
                {/* Mobile sidebar toggle Overlay button */}
-               {!isMobile && (
-                 <button 
+                {!isMobile && (
+                  <button 
                   onClick={() => setSidebarOpen(!sidebarOpen)} 
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-4 h-20 bg-slate-800/80 text-white rounded-l-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-brand-500 transition-all shadow-xl"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-6 h-24 bg-white/10 dark:bg-slate-900/40 backdrop-blur-3xl text-white rounded-l-[1.5rem] border-y border-l border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-indigo-600 transition-all shadow-2xl"
                   title={sidebarOpen ? "Hide Library" : "Show Library"}
-                 >
-                    <ChevronRight size={14} className={sidebarOpen ? '' : 'rotate-180'} />
-                 </button>
-               )}
+                  >
+                    <ChevronRight size={16} className={sidebarOpen ? '' : 'rotate-180'} />
+                  </button>
+                )}
             </div>
 
             {/* Sidebar / List Area */}
@@ -439,24 +454,24 @@ export default function FloatingVideoPlayer() {
                   : `border-r h-full overflow-hidden ${sidebarOpen ? 'w-72' : 'w-0'}`
               }`}
             >
-              <div className="flex-shrink-0 px-3 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-wrap items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                 <button onClick={() => setNavStack(['courses'])} className="hover:text-brand-500 flex items-center transition-colors">LIBRARY</button>
+              <div className="flex-shrink-0 px-4 py-3 border-b border-white/5 bg-white/5 backdrop-blur-md flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                 <button onClick={() => setNavStack(['courses'])} className="hover:text-indigo-400 flex items-center transition-colors">LIBRARY</button>
                  {selectedCourse && (
                    <>
-                      <ChevronRight size={10} className="text-slate-600" />
-                      <button onClick={() => setNavStack(['courses', 'chapters'])} className="hover:text-brand-500 transition-colors uppercase">{selectedCourse}</button>
+                      <ChevronRight size={12} className="text-slate-600" />
+                      <button onClick={() => setNavStack(['courses', 'chapters'])} className="hover:text-indigo-400 transition-colors uppercase">{selectedCourse}</button>
                    </>
                  )}
                  {selectedChapter && (navStack.includes('lessons') || navStack.includes('playlist')) && (
                    <>
-                      <ChevronRight size={10} className="text-slate-600" />
-                      <button onClick={() => setNavStack(['courses', 'chapters', 'lessons'])} className="hover:text-brand-500 transition-colors">CH {selectedChapter.number}</button>
+                      <ChevronRight size={12} className="text-slate-600" />
+                      <button onClick={() => setNavStack(['courses', 'chapters', 'lessons'])} className="hover:text-indigo-400 transition-colors">CH {selectedChapter.number}</button>
                    </>
                  )}
                  {navStack.includes('playlist') && (
                    <>
-                      <ChevronRight size={10} className="text-slate-600" />
-                      <span className="text-brand-500">PLAYLIST</span>
+                      <ChevronRight size={12} className="text-slate-600" />
+                      <span className="text-indigo-500">PLAYLIST</span>
                    </>
                  )}
               </div>
@@ -669,70 +684,74 @@ export default function FloatingVideoPlayer() {
 
 function VideoRow({ video, active, onClick, isPinned, onPin, progress }) {
   return (
-    <div className="group/row relative">
+    <div className="group/row relative px-2 mb-1">
       <button 
         onClick={onClick} 
-        className={`w-full flex items-start gap-3 p-2 rounded-xl transition-all ${
+        className={`w-full flex items-start gap-3 p-2.5 rounded-[1.25rem] transition-all duration-300 ${
           active 
-            ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300 ring-1 ring-brand-200 shadow-sm' 
-            : 'hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+            ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(79,70,229,0.1)]' 
+            : 'hover:bg-white/40 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400'
         }`}
       >
-        <div className={`mt-0.5 flex-shrink-0 w-12 h-9 rounded-lg overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 relative ${active ? 'ring-2 ring-brand-400' : ''}`}>
+        <div className={`mt-0.5 flex-shrink-0 w-14 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-white/10 dark:border-white/5 relative ${active ? 'ring-2 ring-indigo-500' : ''}`}>
           {(() => {
             const videoId = video.url.match(/(?:embed\/|v=)([^&?/\s]+)/)?.[1];
             if (videoId) {
               return (
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full group-hover/row:scale-110 transition-transform duration-500">
                   <img 
                     src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
                     alt="" 
                     className="w-full h-full object-cover"
                   />
                   {active && (
-                    <div className="absolute inset-0 bg-brand-500/20 flex items-center justify-center">
-                      <Play size={10} fill="currentColor" className="text-white" />
+                    <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
+                      <Play size={12} fill="currentColor" className="text-white" />
                     </div>
                   )}
                   {/* Progress Indicator */}
                   {progress > 0 && (
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-black/30 backdrop-blur-sm">
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-black/40 backdrop-blur-sm">
                       <div 
-                        className={`h-full transition-all duration-300 ${progress >= 95 ? 'bg-emerald-500' : 'bg-orange-500'}`}
+                        className={`h-full transition-all duration-300 ${progress >= 95 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]'}`}
                         style={{ width: `${progress}%` }}
                       />
-                    </div>
-                  )}
-                  {/* Completion Checkmark */}
-                  {progress >= 95 && (
-                    <div className="absolute top-1 right-1 bg-emerald-500 text-white p-0.5 rounded-full shadow-lg">
-                      <ChevronRight size={8} strokeWidth={4} />
                     </div>
                   )}
                 </div>
               );
             }
-            return active ? <Play size={12} fill="currentColor" /> : <Video size={12} />;
+            return active ? <Play size={14} fill="currentColor" /> : <Video size={14} />;
           })()}
+          {/* Completion Checkmark Overlay */}
+          {progress >= 95 && (
+            <div className="absolute top-1 right-1 bg-emerald-500 text-white p-0.5 rounded-full shadow-lg z-10">
+              <ChevronRight size={8} strokeWidth={4} />
+            </div>
+          )}
         </div>
         
         <div className="flex-1 text-left min-w-0 pr-6">
-          <p className="text-[11px] font-semibold leading-tight mb-0.5 truncate">{video.title}</p>
-          <p className="text-[8px] text-slate-400 uppercase">{video.source}</p>
+          <p className="text-[12px] font-bold leading-tight mb-1 truncate tracking-tight text-slate-800 dark:text-slate-200">{video.title}</p>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-60">Insight</span>
+            <span className="w-0.5 h-0.5 rounded-full bg-slate-400 dark:bg-slate-600" />
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate">{video.source}</p>
+          </div>
         </div>
       </button>
 
       {/* Pin Toggle */}
       <button 
         onClick={(e) => { e.stopPropagation(); onPin?.(); }}
-        className={`absolute right-2 top-3 p-1.5 rounded-lg transition-all ${
+        className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all duration-300 ${
           isPinned 
-            ? 'text-brand-500 opacity-100' 
-            : 'text-slate-300 opacity-0 group-hover/row:opacity-100 hover:text-brand-400'
+            ? 'text-indigo-500 opacity-100 bg-indigo-500/10' 
+            : 'text-slate-300 opacity-0 group-hover/row:opacity-100 hover:text-indigo-400 hover:bg-white/20'
         }`}
         title={isPinned ? 'Remove Pin' : 'Pin Tutorial'}
       >
-        <Plus size={14} className={isPinned ? 'rotate-45' : ''} />
+        <Plus size={14} className={isPinned ? 'rotate-45 transition-transform' : 'transition-transform'} />
       </button>
     </div>
   );
