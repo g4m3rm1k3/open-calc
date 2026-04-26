@@ -363,11 +363,19 @@ const CellComponent = React.memo(
     return (
       <div
         style={{
-          background: C.surface,
-          border: `0.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : C.border}`,
+          background: `${C.surface}dd`,
+          border: `1.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : C.blueBd + "55"}`,
           borderRadius: 12,
           overflow: "hidden",
-          transition: "border-color .2s",
+          transition: "border-color .2s, box-shadow .2s",
+          boxShadow:
+            cell.status === "error"
+              ? `0 6px 28px ${C.redBd}33, 0 2px 8px ${C.redBd}18`
+              : cell.status === "running"
+                ? `0 6px 28px ${C.tealBd}33, 0 2px 8px ${C.tealBd}18`
+                : isChallenge
+                  ? `0 6px 28px ${C.purpleBd}28, 0 2px 8px ${C.purpleBd}14, 0 1px 3px #0004`
+                  : `0 6px 24px ${C.blueBd}18, 0 2px 6px #0003`,
         }}
       >
         {/* ── Challenge header ────────────────────────────────────────────── */}
@@ -375,8 +383,8 @@ const CellComponent = React.memo(
           <div
             style={{
               padding: "12px 16px",
-              background: C.purpleBg,
-              borderBottom: `0.5px solid ${C.purpleBd}`,
+              background: `linear-gradient(135deg, ${C.purpleBg} 0%, ${C.blueBg} 100%)`,
+              borderBottom: `1px solid ${C.purpleBd}`,
             }}
           >
             <div
@@ -470,17 +478,20 @@ const CellComponent = React.memo(
         {(cell.prose ||
           cell.instructions ||
           (!isChallenge && cell.cellTitle)) && (
-          <div style={{ borderBottom: `0.5px solid ${C.border}` }}>
+          <div style={{ borderBottom: `1px solid ${C.border}` }}>
             {/* Title bar (only for non-challenges, challenges have their own header) */}
             {!isChallenge && cell.cellTitle && (
               <div
                 style={{
-                  padding: "8px 16px 0",
+                  padding: "7px 16px",
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: "0.07em",
                   textTransform: "uppercase",
-                  color: C.muted,
+                  color: C.blue,
+                  background: `linear-gradient(90deg, ${C.blueBg} 0%, ${C.surface2} 60%, ${C.surface} 100%)`,
+                  borderBottom: `1px solid ${C.blueBd}44`,
+                  borderLeft: `3px solid ${C.blue}`,
                 }}
               >
                 {cell.cellTitle}
@@ -504,13 +515,15 @@ const CellComponent = React.memo(
                         <p
                           key={i}
                           style={{
-                            margin: i === 0 ? "0 0 4px" : "12px 0 4px",
+                            margin: i === 0 ? "0 0 4px" : "14px 0 4px",
                             fontSize: 11,
                             fontWeight: 700,
                             letterSpacing: "0.06em",
                             textTransform: "uppercase",
-                            color: C.muted,
+                            color: C.blue,
                             lineHeight: 1.4,
+                            paddingLeft: 8,
+                            borderLeft: `2px solid ${C.blue}`,
                           }}
                         >
                           {p.slice(3)}
@@ -553,7 +566,8 @@ const CellComponent = React.memo(
                                 letterSpacing: "0.07em",
                                 textTransform: "uppercase",
                                 color: C.muted,
-                                background: C.surface2,
+                                background: `linear-gradient(90deg, ${C.surface2} 0%, ${C.surface} 100%)`,
+                                borderBottom: `1px solid ${C.border}`,
                               }}
                             >
                               {lang}

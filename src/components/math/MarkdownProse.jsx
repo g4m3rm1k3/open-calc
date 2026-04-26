@@ -12,10 +12,10 @@
  *   {{algebra:id|text}}  →  **text**  (bold label; preserves readability)
  */
 
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 // ─── Preprocessor ────────────────────────────────────────────────────────────
 
@@ -25,31 +25,46 @@ import rehypeKatex from 'rehype-katex'
  * NOT a math-continuation character (_ ^ { \).  Returns the end index.
  */
 function scanBareMath(src, start) {
-  let i = start
-  let depth = 0
-  let hadBraces = false
+  let i = start;
+  let depth = 0;
+  let hadBraces = false;
 
   while (i < src.length) {
-    const c = src[i]
-    if (c === '{') { depth++; hadBraces = true; i++; continue }
-    if (c === '}') {
-      if (depth > 0) depth--
-      i++
+    const c = src[i];
+    if (c === "{") {
+      depth++;
+      hadBraces = true;
+      i++;
+      continue;
+    }
+    if (c === "}") {
+      if (depth > 0) depth--;
+      i++;
       if (depth === 0 && hadBraces) {
-        const peek = i < src.length ? src[i] : ''
-        if (peek === '_' || peek === '^' || peek === '{' || peek === '\\') continue
-        break  // all braces closed, not continuing — stop here
+        const peek = i < src.length ? src[i] : "";
+        if (peek === "_" || peek === "^" || peek === "{" || peek === "\\")
+          continue;
+        break; // all braces closed, not continuing — stop here
       }
-      continue
+      continue;
     }
     if (depth === 0) {
-      if (c === '\n') break
+      if (c === "\n") break;
       // Bare command with no braces: stop at space or prose punctuation
-      if (!hadBraces && (c === ' ' || c === ',' || c === '.' || c === ';' || c === '!' || c === '?')) break
+      if (
+        !hadBraces &&
+        (c === " " ||
+          c === "," ||
+          c === "." ||
+          c === ";" ||
+          c === "!" ||
+          c === "?")
+      )
+        break;
     }
-    i++
+    i++;
   }
-  return i
+  return i;
 }
 
 /**
@@ -58,59 +73,77 @@ function scanBareMath(src, start) {
  * where the author forgot to add dollar signs.
  */
 function wrapBareLatex(src) {
-  let out = ''
-  let i = 0
+  let out = "";
+  let i = 0;
   while (i < src.length) {
     // Skip past already-delimited math so we don't double-wrap
-    if (src.startsWith('$$', i)) {
-      const close = src.indexOf('$$', i + 2)
-      if (close !== -1) { out += src.slice(i, close + 2); i = close + 2; continue }
-    }
-    if (src[i] === '$' && src[i - 1] !== '\\') {
-      const close = src.indexOf('$', i + 1)
-      if (close !== -1 && close - i < 300) { out += src.slice(i, close + 1); i = close + 1; continue }
-    }
-    if (src.startsWith('\\(', i)) {
-      const close = src.indexOf('\\)', i + 2)
-      if (close !== -1) { out += src.slice(i, close + 2); i = close + 2; continue }
-    }
-    if (src.startsWith('\\[', i)) {
-      const close = src.indexOf('\\]', i + 2)
-      if (close !== -1) { out += src.slice(i, close + 2); i = close + 2; continue }
-    }
-    // Bare \command — wrap in $...$
-    if (src[i] === '\\' && i + 1 < src.length && /[a-zA-Z]/.test(src[i + 1])) {
-      const end = scanBareMath(src, i)
-      if (end > i + 1) {
-        out += '$' + src.slice(i, end) + '$'
-        i = end
-        continue
+    if (src.startsWith("$$", i)) {
+      const close = src.indexOf("$$", i + 2);
+      if (close !== -1) {
+        out += src.slice(i, close + 2);
+        i = close + 2;
+        continue;
       }
     }
-    out += src[i]
-    i++
+    if (src[i] === "$" && src[i - 1] !== "\\") {
+      const close = src.indexOf("$", i + 1);
+      if (close !== -1 && close - i < 300) {
+        out += src.slice(i, close + 1);
+        i = close + 1;
+        continue;
+      }
+    }
+    if (src.startsWith("\\(", i)) {
+      const close = src.indexOf("\\)", i + 2);
+      if (close !== -1) {
+        out += src.slice(i, close + 2);
+        i = close + 2;
+        continue;
+      }
+    }
+    if (src.startsWith("\\[", i)) {
+      const close = src.indexOf("\\]", i + 2);
+      if (close !== -1) {
+        out += src.slice(i, close + 2);
+        i = close + 2;
+        continue;
+      }
+    }
+    // Bare \command — wrap in $...$
+    if (src[i] === "\\" && i + 1 < src.length && /[a-zA-Z]/.test(src[i + 1])) {
+      const end = scanBareMath(src, i);
+      if (end > i + 1) {
+        out += "$" + src.slice(i, end) + "$";
+        i = end;
+        continue;
+      }
+    }
+    out += src[i];
+    i++;
   }
-  return out
+  return out;
 }
 
 function preprocess(text) {
-  if (!text) return ''
-  return wrapBareLatex(text)
-    // \[…\] → $$\n…\n$$ (block / display math)
-    .replace(/\\\[/g, '$$\n')
-    .replace(/\\\]/g, '\n$$')
-    // \(…\) → $…$ (inline math)
-    .replace(/\\\(/g, '$')
-    .replace(/\\\)/g, '$')
-    // {{algebra:topicId|linkText}} → **linkText**  (preserves visible text)
-    .replace(/\{\{algebra:[^|]+\|([^}]+)\}\}/g, '**$1**')
-    // "Step N:" mid-sentence → new paragraph with bold label.
-    .replace(/\.\s+(Step\s+\d+:)/g, '.\n\n**$1**')
-    // "(1) ... (2) ..." inline numbered steps → new paragraphs.
-    // Matches a period/em-dash followed by a space then "(N)" at start of a new step.
-    .replace(/[.—]\s+(\(\d+\))\s+/g, '.\n\n$1 ')
-    // Sentence break after inline math: "$math$. Next sentence" → hard line break.
-    .replace(/(\$[^$\n]+\$)\.\s+(?=\S)/g, '$1.  \n')
+  if (!text) return "";
+  return (
+    wrapBareLatex(text)
+      // \[…\] → $$\n…\n$$ (block / display math)
+      .replace(/\\\[/g, "$$\n")
+      .replace(/\\\]/g, "\n$$")
+      // \(…\) → $…$ (inline math)
+      .replace(/\\\(/g, "$")
+      .replace(/\\\)/g, "$")
+      // {{algebra:topicId|linkText}} → **linkText**  (preserves visible text)
+      .replace(/\{\{algebra:[^|]+\|([^}]+)\}\}/g, "**$1**")
+      // "Step N:" mid-sentence → new paragraph with bold label.
+      .replace(/\.\s+(Step\s+\d+:)/g, ".\n\n**$1**")
+      // "(1) ... (2) ..." inline numbered steps → new paragraphs.
+      // Matches a period/em-dash followed by a space then "(N)" at start of a new step.
+      .replace(/[.—]\s+(\(\d+\))\s+/g, ".\n\n$1 ")
+      // Sentence break after inline math: "$math$. Next sentence" → hard line break.
+      .replace(/(\$[^$\n]+\$)\.\s+(?=\S)/g, "$1.  \n")
+  );
 }
 
 // ─── Tailwind class maps for ReactMarkdown elements ───────────────────────────
@@ -118,16 +151,24 @@ function preprocess(text) {
 const PROSE_COMPONENTS = {
   // Headings
   h1: ({ children }) => (
-    <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-50 mt-8 mb-4">{children}</h1>
+    <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-50 mt-8 mb-4">
+      {children}
+    </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 mb-3">{children}</h2>
+    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 mt-8 mb-3">
+      {children}
+    </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-6 mb-2">{children}</h3>
+    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-6 mb-2">
+      {children}
+    </h3>
   ),
   h4: ({ children }) => (
-    <h4 className="text-[12px] font-black uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400 mt-5 mb-2">{children}</h4>
+    <h4 className="text-[12px] font-black uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400 mt-5 mb-2">
+      {children}
+    </h4>
   ),
   // Paragraphs
   p: ({ children }) => (
@@ -137,7 +178,9 @@ const PROSE_COMPONENTS = {
   ),
   // Bold — clearly brighter than body in both modes
   strong: ({ children }) => (
-    <strong className="font-semibold text-slate-950 dark:text-white">{children}</strong>
+    <strong className="font-semibold text-slate-950 dark:text-white">
+      {children}
+    </strong>
   ),
   // Italic
   em: ({ children }) => (
@@ -146,16 +189,24 @@ const PROSE_COMPONENTS = {
   // Inline code — react-markdown v9+ removed the `inline` prop.
   // Block code has className="language-*"; inline code has no className.
   code: ({ className, children }) =>
-    className?.startsWith('language-')
-      ? <code className="block">{children}</code>
-      : <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">{children}</code>,
+    className?.startsWith("language-") ? (
+      <code className="block">{children}</code>
+    ) : (
+      <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 font-mono text-[0.86em] text-brand-700 dark:text-brand-300">
+        {children}
+      </code>
+    ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">{children}</ul>
+    <ul className="list-disc pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
+      {children}
+    </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">{children}</ol>
+    <ol className="list-decimal pl-6 space-y-2 mb-5 text-[16px] sm:text-[17px] leading-8 text-slate-700 dark:text-slate-300">
+      {children}
+    </ol>
   ),
   li: ({ children }) => <li className="leading-7">{children}</li>,
   // Block quote
@@ -165,9 +216,7 @@ const PROSE_COMPONENTS = {
     </blockquote>
   ),
   // Horizontal rule
-  hr: () => (
-    <hr className="my-4 border-slate-200 dark:border-slate-700" />
-  ),
+  hr: () => <hr className="my-4 border-slate-200 dark:border-slate-700" />,
   // Tables
   table: ({ children }) => (
     <div className="overflow-x-auto my-6 rounded-2xl border border-slate-200 dark:border-slate-800">
@@ -179,7 +228,9 @@ const PROSE_COMPONENTS = {
   ),
   tbody: ({ children }) => <tbody>{children}</tbody>,
   tr: ({ children }) => (
-    <tr className="border-b border-slate-200 dark:border-slate-700">{children}</tr>
+    <tr className="border-b border-slate-200 dark:border-slate-700">
+      {children}
+    </tr>
   ),
   th: ({ children }) => (
     <th className="px-3 py-2 text-left font-semibold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
@@ -193,11 +244,16 @@ const PROSE_COMPONENTS = {
   ),
   // Links
   a: ({ href, children }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand-600 dark:text-brand-400 underline hover:text-brand-700 dark:hover:text-brand-300">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-brand-600 dark:text-brand-400 underline hover:text-brand-700 dark:hover:text-brand-300"
+    >
       {children}
     </a>
   ),
-}
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -205,8 +261,8 @@ const PROSE_COMPONENTS = {
  * Render a single prose string (one item from lesson.intuition.prose etc.)
  * as a block with full markdown + math support.
  */
-export default function MarkdownProse({ text, className = '' }) {
-  if (!text) return null
+export default function MarkdownProse({ text, className = "" }) {
+  if (!text) return null;
   return (
     <div className={className}>
       <ReactMarkdown
@@ -217,5 +273,5 @@ export default function MarkdownProse({ text, className = '' }) {
         {preprocess(text)}
       </ReactMarkdown>
     </div>
-  )
+  );
 }
