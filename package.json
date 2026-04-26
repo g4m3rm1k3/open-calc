@@ -28,6 +28,7 @@
     "@react-three/fiber": "^8.17.10",
     "@trystero-p2p/nostr": "^0.23.1",
     "@trystero-p2p/torrent": "^0.23.1",
+    "@webcontainer/api": "^1.6.4",
     "d3": "^7.9.0",
     "d3-selection": "^3.0.0",
     "fflate": "^0.8.2",

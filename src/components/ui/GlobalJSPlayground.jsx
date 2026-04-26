@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -10,7 +11,9 @@ import {
   Download,
   FileDown,
   Upload,
+  Maximize2,
 } from "lucide-react";
+import FullPageIDE from "./FullPageIDE";
 import { zipSync, strToU8 } from "fflate";
 
 // ── File helpers ──────────────────────────────────────────────────────────────
@@ -737,6 +740,7 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
   const [activeTab, setActiveTab] = useState(cell.html ? "html" : "js");
   const [logs, setLogs] = useState([]);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [ideOpen, setIdeOpen] = useState(false);
 
   const handleUpload = (e) => {
     const file = e.target.files?.[0];
@@ -1014,6 +1018,24 @@ ${cell.js || ""}
             <FileDown size={13} />
           </button>
 
+          {/* Expand to full-page IDE */}
+          <button
+            onClick={() => setIdeOpen(true)}
+            title="Open in full-page IDE"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: T.accent,
+              cursor: "pointer",
+              padding: "3px 6px",
+              display: "flex",
+              alignItems: "center",
+              opacity: 0.8,
+            }}
+          >
+            <Maximize2 size={13} />
+          </button>
+
           {canDelete && (
             <button
               onClick={onDelete}
@@ -1062,6 +1084,23 @@ ${cell.js || ""}
       </div>
 
       <ConsolePanel logs={logs} />
+
+      {/* Full-page IDE overlay — rendered via portal so it escapes the panel's transform/overflow */}
+      {ideOpen &&
+        createPortal(
+          <AnimatePresence>
+            <FullPageIDE
+              cell={cell}
+              onChange={onChange}
+              onClose={() => {
+                setIdeOpen(false);
+                // Force the cell preview to refresh immediately with the latest code
+                updatePreview(cell.html, cell.css, cell.js);
+              }}
+            />
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
