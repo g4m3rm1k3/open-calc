@@ -63,8 +63,8 @@ function AssessmentQuestion({ q, index }) {
     : 'border-slate-200 dark:border-slate-700'
 
   return (
-    <div className={`rounded-xl border ${borderColor} bg-white dark:bg-slate-900 p-4 transition-colors`}>
-      <div className="flex items-start gap-3">
+    <div className={`rounded-2xl border-2 ${borderColor} bg-white/80 dark:bg-slate-900/80 shadow-xl hover:shadow-2xl transition-all duration-300 w-full`}>
+      <div className="flex items-start gap-3 px-6 py-6">
         <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
           submitted
             ? correct
@@ -161,8 +161,10 @@ function AssessmentQuestion({ q, index }) {
           </div>
 
           {hintShown && hintText && (
-            <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-200">
-              {parseProse(hintText)}
+            <div className="my-5 w-full px-6 py-4 rounded-2xl bg-gradient-to-br from-teal-50/80 via-white/80 to-emerald-50/80 dark:from-teal-900/40 dark:via-slate-900/60 dark:to-emerald-900/30 border-2 border-teal-300/60 dark:border-teal-900/60 shadow-2xl backdrop-blur-xl text-base text-teal-900 dark:text-teal-100 flex items-start gap-3">
+              <span className="text-2xl mr-2 select-none text-emerald-500 dark:text-emerald-300">💡</span>
+              <span className="font-semibold">Hint:</span>
+              <span className="ml-2">{parseProse(hintText)}</span>
             </div>
           )}
         </div>
@@ -188,21 +190,26 @@ export default function AssessmentBlock({ assessment }) {
   if (questions.length === 0) return null
 
   return (
-    <section className="mt-12 pt-8 border-t border-teal-200 dark:border-teal-900/50">
-      <div className="flex items-center gap-3 mb-5">
-        <span className="text-xl">🧪</span>
-        <div>
-          <h2 className="text-base font-bold text-teal-800 dark:text-teal-200">Understanding Check</h2>
-          <p className="text-xs text-teal-600 dark:text-teal-400 mt-0.5">
-            {questions.length} question{questions.length !== 1 ? 's' : ''} · ungraded · check your understanding
-          </p>
+    <section className="mt-12 pt-8">
+      <div className="max-w-4xl mx-auto rounded-3xl border border-teal-200/40 dark:border-teal-900/40 bg-white/30 dark:bg-slate-900/30 shadow-2xl backdrop-blur-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-4 px-8 py-6 bg-gradient-to-r from-teal-400/30 via-white/10 to-emerald-300/10 dark:from-teal-900/30 dark:via-slate-900/10 dark:to-emerald-900/10 border-b border-teal-200/20 dark:border-teal-900/20 backdrop-blur-xl">
+          <div className="w-12 h-12 rounded-2xl bg-white/70 dark:bg-slate-900/70 flex items-center justify-center text-2xl shadow-lg border-2 border-teal-200/40 dark:border-teal-900/40 backdrop-blur-md">
+            🧪
+          </div>
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-teal-700 dark:text-teal-200 opacity-90">Understanding Check</div>
+            <div className="text-xs text-teal-600 dark:text-teal-400 mt-0.5">
+              {questions.length} question{questions.length !== 1 ? 's' : ''} · ungraded · check your understanding
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="space-y-4">
-        {questions.map((q, i) => (
-          <AssessmentQuestion key={q.id ?? i} q={q} index={i} />
-        ))}
+        {/* Questions */}
+        <div className="space-y-6 px-6 pb-8 pt-8">
+          {questions.map((q, i) => (
+            <AssessmentQuestion key={q.id ?? i} q={q} index={i} />
+          ))}
+        </div>
       </div>
     </section>
   )

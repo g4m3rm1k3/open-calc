@@ -613,7 +613,7 @@ function SpiralBlock({ spiral }) {
   const { recoveryPoints = [], futureLinks = [] } = spiral
   if (!recoveryPoints.length && !futureLinks.length) return null
   return (
-    <div className="mb-10 rounded-3xl border border-amber-200 dark:border-amber-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
+    <div className="mt-12 mb-10 rounded-3xl border border-amber-200 dark:border-amber-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
       <div className="px-6 py-4 oc-header-gradient border-b border-amber-100 dark:border-amber-900/40 flex items-center gap-3">
         <span className="text-lg">🔗</span>
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 dark:text-amber-300">Spiral Learning: Context & Progression</h3>

@@ -376,6 +376,9 @@ function TopBar({
           <NavLink to="/openmat" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="OpenMAT Platform">
             <Atom className="w-5 h-5" />
           </NavLink>
+          <NavLink to="/open-craft" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-lime-100 dark:bg-lime-900/40 text-lime-600" : "text-slate-500 hover:bg-lime-50 dark:hover:bg-lime-900/30"}`} title="OpenCraft Sandbox">
+            <Gamepad2 className="w-5 h-5" />
+          </NavLink>
           <NavLink to="/cnc-sim" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-orange-100 dark:bg-orange-900/40 text-orange-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="CNC Simulator">
             <Wrench className="w-5 h-5" />
           </NavLink>
