@@ -755,7 +755,7 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-300 ease-in-out pt-[90px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"}`}
+          className={`transition-[padding] duration-300 ease-in-out pt-[90px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"}`}
         >
           <div
             className={
