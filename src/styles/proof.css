@@ -1,0 +1,579 @@
+/*
+ * proof.css  —  Design tokens + component classes for ProofModal / ProofViewer
+ *
+ * ARCHITECTURE
+ * ─────────────────────────────────────────────────────────────────────────────
+ * All visual values live here as CSS custom properties.
+ * Components only assign class names — zero inline styles for visuals.
+ * To retheme the entire proof UI, edit the :root / .dark blocks at the top.
+ *
+ * TOKEN GROUPS
+ *   --proof-panel-*        modal container (glass card)
+ *   --proof-header-*       header block (title, formula, preamble)
+ *   --proof-well-*         equation display boxes (shared by header + steps)
+ *   --proof-step-card-*    step card wrapper
+ *   --proof-ribbon-*       numbered step header bar
+ *   --proof-nav-*          previous / next buttons
+ *   --proof-progress-*     step pip bar
+ *   --proof-why-*          expandable "Why?" panels
+ *   --proof-text-*         semantic text colors
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHT MODE TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Panel */
+  --proof-panel-bg: rgba(252, 253, 255, 0.92);
+  --proof-panel-border: rgba(99, 102, 241, 0.14);
+  --proof-panel-shadow:
+    0 40px 80px -20px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  /* Header */
+  --proof-header-bg: linear-gradient(
+    160deg,
+    rgba(238, 242, 255, 0.95) 0%,
+    rgba(245, 243, 255, 0.95) 100%
+  );
+  --proof-header-border: rgba(99, 102, 241, 0.18);
+
+  /* Title gradient — the "label" of the proof */
+  --proof-title-gradient: linear-gradient(
+    130deg,
+    #3730a3 0%,
+    #6d28d9 55%,
+    #be185d 100%
+  );
+
+  /* Category kicker + subtitle */
+  --proof-category-color: #4f46e5;
+  --proof-subtitle-color: #6366f1;
+
+  /* Equation wells — shared across header + steps */
+  --proof-well-bg: rgba(238, 242, 255, 0.7);
+  --proof-well-border: rgba(99, 102, 241, 0.28);
+  --proof-well-shadow:
+    0 2px 16px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --proof-well-text: #1e1b4b;
+
+  /* Step card */
+  --proof-step-card-bg: rgba(255, 255, 255, 0.78);
+  --proof-step-card-border: rgba(99, 102, 241, 0.12);
+  --proof-step-card-shadow:
+    0 4px 24px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  /* Step ribbon (numbered gradient bar) */
+  --proof-ribbon-bg: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+  --proof-ribbon-shadow: 0 6px 20px rgba(67, 56, 202, 0.32);
+
+  /* Instruction text */
+  --proof-instruction-color: #1e1b4b;
+
+  /* Step note (italic sidebar text) */
+  --proof-note-border: #7c3aed;
+  --proof-note-color: #5b21b6;
+
+  /* Navigation — prev (ghost) */
+  --proof-nav-prev-bg: rgba(255, 255, 255, 0.8);
+  --proof-nav-prev-border: rgba(99, 102, 241, 0.22);
+  --proof-nav-prev-color: #4338ca;
+  --proof-nav-prev-hover-bg: rgba(255, 255, 255, 0.98);
+
+  /* Navigation — next (filled gradient) */
+  --proof-nav-next-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --proof-nav-next-shadow: 0 8px 20px rgba(79, 70, 229, 0.38);
+
+  /* Navigation — disabled state */
+  --proof-nav-disabled-bg: rgba(241, 245, 249, 0.7);
+  --proof-nav-disabled-color: rgba(148, 163, 184, 0.75);
+
+  /* Progress bar pips */
+  --proof-progress-future: rgba(99, 102, 241, 0.13);
+  --proof-progress-done: rgba(99, 102, 241, 0.38);
+  --proof-progress-current: #6366f1;
+
+  /* Nav / preamble counter text */
+  --proof-meta-color: #818cf8;
+
+  /* Why panel */
+  --proof-why-panel-bg: rgba(248, 249, 255, 0.82);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dark {
+  /* Panel */
+  --proof-panel-bg: rgba(5, 7, 20, 0.9);
+  --proof-panel-border: rgba(255, 255, 255, 0.07);
+  --proof-panel-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+
+  /* Header */
+  --proof-header-bg: linear-gradient(
+    160deg,
+    rgba(10, 14, 40, 0.88) 0%,
+    rgba(18, 10, 44, 0.88) 100%
+  );
+  --proof-header-border: rgba(139, 92, 246, 0.22);
+
+  /* Title — lighter/brighter in dark so gradient pops */
+  --proof-title-gradient: linear-gradient(
+    130deg,
+    #93c5fd 0%,
+    #a78bfa 50%,
+    #f0abfc 100%
+  );
+
+  --proof-category-color: #22d3ee;
+  --proof-subtitle-color: #94a3b8;
+
+  /* Equation wells */
+  --proof-well-bg: rgba(0, 0, 0, 0.5);
+  --proof-well-border: rgba(34, 211, 238, 0.38);
+  --proof-well-shadow:
+    0 0 28px rgba(34, 211, 238, 0.12), inset 0 0 16px rgba(34, 211, 238, 0.04);
+  --proof-well-text: #e0e7ff;
+
+  /* Step card */
+  --proof-step-card-bg: rgba(8, 10, 28, 0.82);
+  --proof-step-card-border: rgba(255, 255, 255, 0.055);
+  --proof-step-card-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Step ribbon */
+  --proof-ribbon-bg: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+  --proof-ribbon-shadow:
+    0 6px 20px rgba(99, 102, 241, 0.28), 0 0 40px rgba(99, 102, 241, 0.1);
+
+  --proof-instruction-color: #dde4ff;
+
+  --proof-note-border: #8b5cf6;
+  --proof-note-color: #c4b5fd;
+
+  /* Navigation — prev */
+  --proof-nav-prev-bg: rgba(255, 255, 255, 0.055);
+  --proof-nav-prev-border: rgba(255, 255, 255, 0.1);
+  --proof-nav-prev-color: #a5b4fc;
+  --proof-nav-prev-hover-bg: rgba(255, 255, 255, 0.11);
+
+  /* Navigation — next */
+  --proof-nav-next-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --proof-nav-next-shadow:
+    0 8px 24px rgba(99, 102, 241, 0.42), 0 0 40px rgba(99, 102, 241, 0.15);
+
+  /* Navigation — disabled */
+  --proof-nav-disabled-bg: rgba(255, 255, 255, 0.03);
+  --proof-nav-disabled-color: rgba(255, 255, 255, 0.14);
+
+  /* Progress pips */
+  --proof-progress-future: rgba(255, 255, 255, 0.08);
+  --proof-progress-done: rgba(99, 102, 241, 0.5);
+  --proof-progress-current: #818cf8;
+
+  --proof-meta-color: #6366f1;
+
+  /* Why panel */
+  --proof-why-panel-bg: rgba(6, 8, 22, 0.78);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes proof-step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes proof-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes proof-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENT CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Modal panel ────────────────────────────────────────────────────────── */
+  .proof-panel {
+    background: var(--proof-panel-bg);
+    border: 1px solid var(--proof-panel-border);
+    box-shadow: var(--proof-panel-shadow);
+    backdrop-filter: blur(36px) saturate(180%);
+    -webkit-backdrop-filter: blur(36px) saturate(180%);
+    border-radius: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 90vw;
+    height: 90vh;
+    max-width: 900px;
+    overflow: hidden;
+    animation: proof-fade-in 0.2s ease;
+  }
+
+  /* ── Header section ─────────────────────────────────────────────────────── */
+  .proof-header {
+    background: var(--proof-header-bg);
+    border: 1px solid var(--proof-header-border);
+    border-radius: 18px;
+    padding: 28px 32px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Top accent stripe */
+  .proof-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--proof-title-gradient);
+  }
+
+  .proof-category {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--proof-category-color);
+    margin-bottom: 10px;
+  }
+
+  .proof-title {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+    background: var(--proof-title-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .proof-subtitle {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--proof-subtitle-color);
+    margin-bottom: 22px;
+    max-width: 82%;
+    line-height: 1.65;
+  }
+
+  /* ── Equation wells (used in header + steps + why panels) ──────────────── */
+  .proof-well {
+    background: var(--proof-well-bg);
+    border: 1.5px solid var(--proof-well-border);
+    box-shadow: var(--proof-well-shadow);
+    color: var(--proof-well-text);
+    border-radius: 14px;
+    padding: 22px 24px;
+    text-align: center;
+    overflow-x: auto;
+    font-size: 20px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Larger variant used in the header */
+  .proof-well--hero {
+    padding: 28px 32px;
+    font-size: 22px;
+  }
+
+  /* Compact variant inside why panels */
+  .proof-well--compact {
+    padding: 12px 16px;
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+
+  .proof-preamble {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--proof-subtitle-color);
+    line-height: 1.7;
+    max-width: 88%;
+    margin: 0;
+  }
+
+  /* ── Progress pips ──────────────────────────────────────────────────────── */
+  .proof-progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .proof-pip {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+    background: var(--proof-progress-future);
+    transition:
+      background 0.2s,
+      transform 0.15s,
+      border-radius 0.15s;
+  }
+  .proof-pip:hover {
+    filter: brightness(1.3);
+  }
+
+  .proof-pip--done {
+    background: var(--proof-progress-done);
+  }
+  .proof-pip--current {
+    background: var(--proof-progress-current);
+    transform: scaleY(1.8);
+    border-radius: 4px;
+  }
+
+  /* ── Step card ──────────────────────────────────────────────────────────── */
+  .proof-step-card {
+    background: var(--proof-step-card-bg);
+    border: 1px solid var(--proof-step-card-border);
+    box-shadow: var(--proof-step-card-shadow);
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 20px;
+    animation: proof-step-enter 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin-bottom: 14px;
+  }
+
+  /* ── Step ribbon (numbered gradient header bar) ─────────────────────────── */
+  .proof-ribbon {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: var(--proof-ribbon-bg);
+    box-shadow: var(--proof-ribbon-shadow);
+    color: #ffffff;
+    margin-bottom: 22px;
+  }
+
+  .proof-ribbon-number {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .proof-ribbon-tag {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .proof-ribbon-counter {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  /* ── Instruction text ───────────────────────────────────────────────────── */
+  .proof-instruction {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+    color: var(--proof-instruction-color);
+    margin-bottom: 20px;
+    padding: 0 4px;
+  }
+
+  /* ── Note (italic sidebar) ──────────────────────────────────────────────── */
+  .proof-note {
+    font-size: 13.5px;
+    line-height: 1.8;
+    font-style: italic;
+    font-weight: 500;
+    padding-left: 18px;
+    border-left: 3px solid var(--proof-note-border);
+    color: var(--proof-note-color);
+    margin-bottom: 18px;
+  }
+
+  /* ── Why button ─────────────────────────────────────────────────────────── */
+  .proof-why-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 12px;
+    padding: 7px 18px;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.18s;
+    text-transform: uppercase;
+  }
+
+  .proof-why-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Why panel ──────────────────────────────────────────────────────────── */
+  .proof-why-panel {
+    background: var(--proof-why-panel-bg);
+    border-radius: 0 16px 16px 0;
+    padding: 20px;
+    margin-top: 10px;
+    animation: proof-slide-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .proof-why-tag-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    color: #ffffff;
+  }
+
+  .proof-why-text {
+    font-size: 14px;
+    line-height: 1.8;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 14px;
+  }
+
+  .dark .proof-why-text {
+    color: #cbd5e1;
+  }
+
+  .proof-why-step-text {
+    font-size: 13px;
+    line-height: 1.7;
+    font-weight: 500;
+    color: #334155;
+  }
+
+  .dark .proof-why-step-text {
+    color: #cbd5e1;
+  }
+
+  /* ── Navigation ─────────────────────────────────────────────────────────── */
+  .proof-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .proof-nav-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    transition: all 0.18s;
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+
+  .proof-nav-btn--prev {
+    background: var(--proof-nav-prev-bg);
+    border: 1px solid var(--proof-nav-prev-border) !important;
+    color: var(--proof-nav-prev-color);
+  }
+  .proof-nav-btn--prev:not(:disabled):hover {
+    background: var(--proof-nav-prev-hover-bg);
+    transform: translateX(-2px);
+  }
+
+  .proof-nav-btn--next {
+    background: var(--proof-nav-next-bg);
+    box-shadow: var(--proof-nav-next-shadow);
+    color: #ffffff;
+  }
+  .proof-nav-btn--next:not(:disabled):hover {
+    filter: brightness(1.1);
+    transform: translateX(2px);
+  }
+
+  .proof-nav-btn:disabled {
+    background: var(--proof-nav-disabled-bg) !important;
+    border-color: transparent !important;
+    color: var(--proof-nav-disabled-color) !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .proof-nav-counter {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--proof-meta-color);
+    min-width: 68px;
+    text-align: center;
+  }

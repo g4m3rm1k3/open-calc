@@ -41,20 +41,7 @@ export default function ProofModal({ entry, proof, onClose }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        className="backdrop-blur-2xl shadow-2xl overflow-hidden"
-        style={{
-          background: "rgba(255,255,255,0.12)",
-          border: "1px solid rgba(255,255,255,0.25)",
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          width: "90vw",
-          height: "90vh",
-          maxWidth: "900px",
-          borderRadius: "24px",
-        }}
-      >
+      <div className="proof-panel">
         {/* Floating close button */}
         <button
           onClick={onClose}
