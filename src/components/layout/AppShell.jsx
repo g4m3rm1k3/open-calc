@@ -42,7 +42,7 @@ import MobileBottomNav from "./MobileBottomNav.jsx";
 import GlobalPythonNotebook from "../ui/GlobalPythonNotebook.jsx";
 import GlobalJSPlayground from "../ui/GlobalJSPlayground.jsx";
 import { Terminal, Code2, PlayCircle, HelpCircle, MessageSquare } from "lucide-react";
-import { ChatProvider } from "../../context/ChatContext.jsx";
+import { ChatProvider, useChat } from "../../context/ChatContext.jsx";
 import ChatPanel from "../chat/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useVideoPlayer } from "../../context/VideoPlayerContext.jsx";
@@ -176,6 +176,29 @@ function ScoreWidget() {
       )}
     </div>
   );
+}
+
+function ChatToggleButton({ onClick, isOpen }) {
+  const { unreadCount } = useChat()
+  return (
+    <button
+      onClick={onClick}
+      className={`relative p-2 rounded-lg transition-colors ${
+        isOpen
+          ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50"
+          : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+      }`}
+      aria-label="Study chat"
+      title="Study Chat"
+    >
+      <MessageSquare className="w-5 h-5" />
+      {unreadCount > 0 && !isOpen && (
+        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </span>
+      )}
+    </button>
+  )
 }
 
 function CoursesDropdown() {
@@ -508,18 +531,7 @@ function TopBar({
       </div>
 
       {/* Chat */}
-      <button
-        onClick={onChatToggle}
-        className={`p-2 rounded-lg transition-colors ${
-          chatOpen
-            ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50"
-            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-        }`}
-        aria-label="Study chat"
-        title="Study Chat (global & lesson rooms)"
-      >
-        <MessageSquare className="w-5 h-5" />
-      </button>
+      <ChatToggleButton onClick={onChatToggle} isOpen={chatOpen} />
 
       {/* Help */}
       <button

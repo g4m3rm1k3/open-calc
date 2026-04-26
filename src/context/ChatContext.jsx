@@ -1,12 +1,14 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { joinRoom } from '@trystero-p2p/nostr'
 import { useLocation } from 'react-router-dom'
 import { LESSON_MAP } from '../content/index.js'
+import { getOrCreateKeypair, createPool, publishMessage, subscribeHistory } from '../lib/nostrChat.js'
 
 const ChatContext = createContext(null)
 
 const APP_CONFIG = { appId: 'open-calc-v1' }
-const MAX_MESSAGES = 150
+const MAX_MESSAGES = 200
+const HISTORY_HOURS = 24
 
 const ADJ = ['Curious', 'Infinite', 'Prime', 'Acute', 'Tangent', 'Integral', 'Limit', 'Vector', 'Complex', 'Rational']
 const NAMES = ['Euler', 'Newton', 'Gauss', 'Cantor', 'Riemann', 'Leibniz', 'Fermat', 'Hilbert', 'Cauchy', 'Fourier']
@@ -16,7 +18,6 @@ function makeUsername() {
 }
 
 const BAD_PATTERNS = [/f+u+c+k+/gi, /s+h+i+t+/gi, /a+s+s+h+o+l+e/gi, /b+i+t+c+h/gi]
-
 function filterText(text) {
   let t = text
   BAD_PATTERNS.forEach(p => { t = t.replace(p, '***') })
@@ -29,27 +30,46 @@ function lessonIdFromPath(pathname) {
   return LESSON_MAP[`${m[1]}/${m[2]}`]?.id ?? null
 }
 
+function mergeMessages(existing, incoming) {
+  const seen = new Set(existing.map(m => m.id))
+  const merged = [...existing]
+  for (const msg of incoming) {
+    if (!seen.has(msg.id)) { merged.push(msg); seen.add(msg.id) }
+  }
+  return merged.sort((a, b) => a.timestamp - b.timestamp).slice(-MAX_MESSAGES)
+}
+
 export function ChatProvider({ children }) {
   const location = useLocation()
+
   const [username, setUsernameState] = useState(
     () => localStorage.getItem('oc-chat-username') || makeUsername()
   )
-  const [blockedPeers, setBlockedPeers] = useState(() => {
-    try { return new Set(JSON.parse(localStorage.getItem('oc-blocked-peers') || '[]')) }
-    catch { return new Set() }
+  const [blockedUsers, setBlockedUsers] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oc-blocked-peers') || '[]') }
+    catch { return [] }
   })
+  const blockedPeers = useMemo(() => new Set(blockedUsers.map(u => u.peerId)), [blockedUsers])
+
   const [globalMessages, setGlobalMessages] = useState([])
   const [lessonMessages, setLessonMessages] = useState([])
   const [globalPeers, setGlobalPeers] = useState(0)
   const [lessonPeers, setLessonPeers] = useState(0)
   const [currentLessonId, setCurrentLessonId] = useState(null)
   const [connected, setConnected] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [globalHistoryLoaded, setGlobalHistoryLoaded] = useState(false)
+  const [lessonHistoryLoaded, setLessonHistoryLoaded] = useState(false)
 
   const sendGlobalRef = useRef(null)
   const sendLessonRef = useRef(null)
   const lessonRoomRef = useRef(null)
   const usernameRef = useRef(username)
   usernameRef.current = username
+  const nostrPool = useRef(null)
+  const keypair = useRef(null)
+
+  const markAllRead = useCallback(() => setUnreadCount(0), [])
 
   const setUsername = useCallback((name) => {
     const clean = name.trim().slice(0, 20)
@@ -58,25 +78,45 @@ export function ChatProvider({ children }) {
     setUsernameState(clean)
   }, [])
 
-  const blockPeer = useCallback((peerId) => {
-    setBlockedPeers(prev => {
-      const next = new Set(prev)
-      next.add(peerId)
-      localStorage.setItem('oc-blocked-peers', JSON.stringify([...next]))
+  const blockPeer = useCallback((peerId, username) => {
+    setBlockedUsers(prev => {
+      if (prev.some(u => u.peerId === peerId)) return prev
+      const next = [...prev, { peerId, username: username || peerId.slice(0, 8) }]
+      localStorage.setItem('oc-blocked-peers', JSON.stringify(next))
       return next
     })
   }, [])
 
   const unblockPeer = useCallback((peerId) => {
-    setBlockedPeers(prev => {
-      const next = new Set(prev)
-      next.delete(peerId)
-      localStorage.setItem('oc-blocked-peers', JSON.stringify([...next]))
+    setBlockedUsers(prev => {
+      const next = prev.filter(u => u.peerId !== peerId)
+      localStorage.setItem('oc-blocked-peers', JSON.stringify(next))
       return next
     })
   }, [])
 
-  // Global room — joined once for the lifetime of the app
+  // Init Nostr keypair + pool once
+  useEffect(() => {
+    keypair.current = getOrCreateKeypair()
+    nostrPool.current = createPool()
+    return () => {
+      try { nostrPool.current?.close?.([], {}) } catch {}
+    }
+  }, [])
+
+  function makeIncomingMsg(data, peerId) {
+    return {
+      id: `${peerId}-${data.ts}`,
+      peerId,
+      username: String(data.username).slice(0, 20),
+      text: filterText(String(data.text).slice(0, 500)),
+      timestamp: data.ts,
+      isOwn: false,
+      isLovelace: !!data.isLovelace,
+    }
+  }
+
+  // Global room — joined once, history loaded from Nostr on mount
   useEffect(() => {
     let room
     try {
@@ -86,15 +126,9 @@ export function ChatProvider({ children }) {
 
       receive((data, peerId) => {
         if (!data?.text || !data?.username) return
-        const msg = {
-          id: `${peerId}-${data.ts}`,
-          peerId,
-          username: String(data.username).slice(0, 20),
-          text: filterText(String(data.text).slice(0, 500)),
-          timestamp: data.ts,
-          isOwn: false,
-        }
-        setGlobalMessages(prev => [...prev.slice(-(MAX_MESSAGES - 1)), msg])
+        const msg = makeIncomingMsg(data, peerId)
+        setGlobalMessages(prev => mergeMessages(prev, [msg]))
+        setUnreadCount(n => n + 1)
       })
 
       room.onPeerJoin(() => setGlobalPeers(n => n + 1))
@@ -103,15 +137,26 @@ export function ChatProvider({ children }) {
     } catch (e) {
       console.warn('[Chat] Global room failed:', e)
     }
+
+    // Load 24h of history from Nostr relays
+    if (nostrPool.current) {
+      subscribeHistory(nostrPool.current, 'global', HISTORY_HOURS, (msg) => {
+        setGlobalMessages(prev => mergeMessages(prev, [msg]))
+      }, () => setGlobalHistoryLoaded(true))
+    } else {
+      setGlobalHistoryLoaded(true)
+    }
+
     return () => { try { room?.leave() } catch {} }
   }, [])
 
-  // Lesson room — rejoined whenever the lesson changes
+  // Lesson room — rejoined + history reloaded when lesson changes
   useEffect(() => {
     const lessonId = lessonIdFromPath(location.pathname)
     setCurrentLessonId(lessonId)
     setLessonMessages([])
     setLessonPeers(0)
+    setLessonHistoryLoaded(false)
 
     if (lessonRoomRef.current) {
       try { lessonRoomRef.current.leave() } catch {}
@@ -119,7 +164,7 @@ export function ChatProvider({ children }) {
       sendLessonRef.current = null
     }
 
-    if (!lessonId) return
+    if (!lessonId) { setLessonHistoryLoaded(true); return }
 
     let room
     try {
@@ -130,21 +175,24 @@ export function ChatProvider({ children }) {
 
       receive((data, peerId) => {
         if (!data?.text || !data?.username) return
-        const msg = {
-          id: `${peerId}-${data.ts}`,
-          peerId,
-          username: String(data.username).slice(0, 20),
-          text: filterText(String(data.text).slice(0, 500)),
-          timestamp: data.ts,
-          isOwn: false,
-        }
-        setLessonMessages(prev => [...prev.slice(-(MAX_MESSAGES - 1)), msg])
+        const msg = makeIncomingMsg(data, peerId)
+        setLessonMessages(prev => mergeMessages(prev, [msg]))
+        setUnreadCount(n => n + 1)
       })
 
       room.onPeerJoin(() => setLessonPeers(n => n + 1))
       room.onPeerLeave(() => setLessonPeers(n => Math.max(0, n - 1)))
     } catch (e) {
       console.warn('[Chat] Lesson room failed:', e)
+    }
+
+    // Load lesson history from Nostr
+    if (nostrPool.current) {
+      subscribeHistory(nostrPool.current, `lesson-${lessonId}`, HISTORY_HOURS, (msg) => {
+        setLessonMessages(prev => mergeMessages(prev, [msg]))
+      }, () => setLessonHistoryLoaded(true))
+    } else {
+      setLessonHistoryLoaded(true)
     }
 
     return () => {
@@ -154,30 +202,48 @@ export function ChatProvider({ children }) {
     }
   }, [location.pathname])
 
-  const sendMessage = useCallback((text, roomType) => {
+  const sendMessage = useCallback((text, roomType, isLovelace = false) => {
     const filtered = filterText(text.trim().slice(0, 500))
     if (!filtered) return
     const ts = Date.now()
-    const uname = usernameRef.current
-    const msg = { id: `local-${ts}`, peerId: 'local', username: uname, text: filtered, timestamp: ts, isOwn: true }
+    const uname = isLovelace ? 'Lovelace' : usernameRef.current
+    const peerId = isLovelace ? 'lovelace-ai' : 'local'
+    const payload = { text: filtered, username: uname, ts, isLovelace }
+    const msg = { id: `${peerId}-${ts}`, peerId, username: uname, text: filtered, timestamp: ts, isOwn: !isLovelace, isLovelace }
+
+    const roomId = roomType === 'global' ? 'global' : `lesson-${lessonIdFromPath(location.pathname) ?? 'unknown'}`
 
     if (roomType === 'global') {
-      try { sendGlobalRef.current?.({ text: filtered, username: uname, ts }) } catch {}
-      setGlobalMessages(prev => [...prev.slice(-(MAX_MESSAGES - 1)), msg])
+      try { sendGlobalRef.current?.(payload) } catch {}
+      setGlobalMessages(prev => mergeMessages(prev, [msg]))
     } else {
-      try { sendLessonRef.current?.({ text: filtered, username: uname, ts }) } catch {}
-      setLessonMessages(prev => [...prev.slice(-(MAX_MESSAGES - 1)), msg])
+      try { sendLessonRef.current?.(payload) } catch {}
+      setLessonMessages(prev => mergeMessages(prev, [msg]))
     }
-  }, [])
+
+    // Persist to Nostr in background
+    if (keypair.current && nostrPool.current) {
+      publishMessage(nostrPool.current, keypair.current.sk, roomId, {
+        ...payload,
+        peerId: keypair.current.pk.slice(0, 16),
+      }).catch(() => {})
+    }
+  }, [location.pathname])
+
+  const sendLovelaceResponse = useCallback((text, roomType) => {
+    sendMessage(text, roomType, true)
+  }, [sendMessage])
 
   return (
     <ChatContext.Provider value={{
       username, setUsername,
-      blockedPeers, blockPeer, unblockPeer,
+      blockedPeers, blockedUsers, blockPeer, unblockPeer,
       globalMessages, lessonMessages,
       globalPeers, lessonPeers,
       currentLessonId, connected,
-      sendMessage,
+      sendMessage, sendLovelaceResponse,
+      unreadCount, markAllRead,
+      globalHistoryLoaded, lessonHistoryLoaded,
     }}>
       {children}
     </ChatContext.Provider>
