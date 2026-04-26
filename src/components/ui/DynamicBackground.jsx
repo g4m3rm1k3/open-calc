@@ -101,30 +101,33 @@ function Comet({ config }) {
   
   useFrame((state) => {
     if (ref.current) {
-      const duration = 600 
-      const progress = (state.clock.elapsedTime % duration) / duration
+      // Synchronize with Epoch (Universal Wall Clock)
+      // Duration: 2 Hours (7200 seconds)
+      const duration = 7200 
+      const now = Date.now() / 1000
+      const progress = (now % duration) / duration
       
       ref.current.position.x = -70 + (progress * 140)
       ref.current.position.y = 12 - (progress * 8)
       ref.current.position.z = -40
-      ref.current.rotation.set(0, 0, 0) // Reset rotation, handled by partile vector
+      ref.current.rotation.set(0, 0, 0)
     }
   })
 
   return (
     <group ref={ref}>
-      {/* Incandescent Heart */}
+      {/* Tiny Incandescent Heart */}
       <mesh>
-        <sphereGeometry args={[0.2, 16, 16]} />
+        <sphereGeometry args={[0.15, 8, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      {/* Soft Thermal Atmosphere */}
-      <mesh scale={4}>
-        <sphereGeometry args={[0.2, 16, 16]} />
-        <meshBasicMaterial color="#f97316" transparent opacity={0.1} blending={THREE.AdditiveBlending} />
+      {/* Diffuse Fire Atmosphere */}
+      <mesh scale={5}>
+        <sphereGeometry args={[0.15, 8, 8]} />
+        <meshBasicMaterial color="#f97316" transparent opacity={0.08} blending={THREE.AdditiveBlending} />
       </mesh>
       <CometTail />
-      <pointLight color="#f97316" intensity={15} distance={60} />
+      <pointLight color="#f97316" intensity={20} distance={70} />
     </group>
   )
 }
