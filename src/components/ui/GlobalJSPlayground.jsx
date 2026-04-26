@@ -6,17 +6,10 @@ import {
   Plus,
   Trash2,
   Code2,
-  LayoutTemplate,
-  ChevronDown,
   Download,
-  FileDown,
-  Upload,
-  Maximize2,
 } from "lucide-react";
 import FullPageIDE from "./FullPageIDE";
 import { zipSync, strToU8 } from "fflate";
-
-// ── File helpers ──────────────────────────────────────────────────────────────
 
 function slugify(str) {
   return (
@@ -70,9 +63,6 @@ ${cell.html || ""}
   const zipped = zipSync(files);
   triggerDownload(zipped, `${name}.zip`, "application/zip");
 }
-
-import Editor from "@monaco-editor/react";
-import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
 // ── Reactive colour tokens ────────────────────────────────────────────────────
 function useColors() {
@@ -736,40 +726,11 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
   const iframeRef = useRef(null);
   const iframeUidRef = useRef(null);
   const debounceRef = useRef(null);
-  const uploadRef = useRef(null);
-  const [activeTab, setActiveTab] = useState(cell.html ? "html" : "js");
-  const [logs, setLogs] = useState([]);
-  const [showTemplates, setShowTemplates] = useState(false);
   const [ideOpen, setIdeOpen] = useState(false);
-
-  const handleUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = "";
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      onChange({ ...cell, [activeTab]: ev.target.result });
-    };
-    reader.readAsText(file);
-  };
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (!e.data || e.data.type !== "jspg_console") return;
-      if (e.data.uid !== iframeUidRef.current) return;
-      setLogs((prev) => [
-        ...prev.slice(-49),
-        { level: e.data.level, msg: e.data.msg },
-      ]);
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
 
   const updatePreview = useCallback((html, css, js) => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setLogs([]);
       const doc = buildDoc(html, css, js);
       const match = doc.match(/window\.__id = '([^']+)'/);
       if (match) iframeUidRef.current = match[1];
@@ -780,22 +741,6 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
   useEffect(() => {
     updatePreview(cell.html, cell.css, cell.js);
   }, [cell.html, cell.css, cell.js, updatePreview]);
-
-  const handleChange = (val = "") => onChange({ ...cell, [activeTab]: val });
-
-  const insertTemplate = (template) => {
-    onChange({
-      ...cell,
-      html: template.cell.html,
-      css: template.cell.css,
-      js: template.cell.js,
-    });
-    setActiveTab("html");
-  };
-
-  const editorValue = cell[activeTab] || "";
-  const lineCount = editorValue.split("\n").length;
-  const editorHeight = Math.min(300, Math.max(100, lineCount * 20 + 28));
 
   return (
     <div
@@ -863,125 +808,47 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
         />
       </div>
 
-      {/* Tab bar + actions */}
+      {/* Action bar */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           background: T.dark
-            ? `linear-gradient(90deg, #0c1520 0%, #111827 100%)`
-            : `linear-gradient(90deg, #f1f5f9 0%, #f8fafc 100%)`,
-          borderBottom: `1px solid ${T.border}`,
-          padding: "0 8px",
-          position: "relative",
+            ? "linear-gradient(90deg, #0c1520 0%, #111827 100%)"
+            : "linear-gradient(90deg, #f1f5f9 0%, #f8fafc 100%)",
+          padding: "6px 10px",
         }}
       >
-        <div style={{ display: "flex" }}>
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: "8px 14px",
-                background: "transparent",
-                border: "none",
-                borderBottom:
-                  activeTab === tab
-                    ? `2px solid ${T.accent}`
-                    : "2px solid transparent",
-                color: activeTab === tab ? T.accent : T.muted,
-                fontSize: 11,
-                fontWeight: activeTab === tab ? 700 : 500,
-                cursor: "pointer",
-                letterSpacing: ".04em",
-                transition: "color 0.15s",
-              }}
-            >
-              {TAB_LABEL[tab]}
-            </button>
-          ))}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            padding: "5px 0",
-            position: "relative",
-          }}
+        <span
+          style={{ fontSize: 11, color: T.muted, fontWeight: 500, letterSpacing: ".03em" }}
         >
-          {/* Templates */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowTemplates((s) => !s)}
-              style={{
-                background: "transparent",
-                border: `0.5px solid ${T.border}`,
-                borderRadius: 6,
-                color: T.muted,
-                cursor: "pointer",
-                padding: "3px 8px",
-                fontSize: 11,
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <LayoutTemplate size={11} /> Templates <ChevronDown size={10} />
-            </button>
-            <AnimatePresence>
-              {showTemplates && (
-                <TemplatePicker
-                  onInsert={insertTemplate}
-                  onClose={() => setShowTemplates(false)}
-                />
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Upload a file into this cell */}
-          <input
-            ref={uploadRef}
-            type="file"
-            accept=".html,.htm,.css,.js"
-            style={{ display: "none" }}
-            onChange={handleUpload}
-          />
+          {cell.label || "Untitled cell"}
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {/* Open in IDE */}
           <button
-            onClick={() => uploadRef.current?.click()}
-            title="Upload .html / .css / .js into this cell"
+            onClick={() => setIdeOpen(true)}
+            title="Edit in full-page IDE"
             style={{
-              background: "transparent",
-              border: "none",
-              color: T.muted,
-              cursor: "pointer",
-              padding: "3px 6px",
               display: "flex",
               alignItems: "center",
-            }}
-          >
-            <Upload size={13} />
-          </button>
-
-          {/* Download — individual files (zip) */}
-          <button
-            onClick={() => downloadCell(cell, 0)}
-            title="Download as index.html + style.css + script.js (zip)"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: T.muted,
+              gap: 5,
+              background: T.dark ? `${T.accent}22` : `${T.accent}12`,
+              border: `1px solid ${T.accent}55`,
+              borderRadius: 6,
+              color: T.accent,
               cursor: "pointer",
-              padding: "3px 6px",
-              display: "flex",
-              alignItems: "center",
+              padding: "4px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: ".04em",
             }}
           >
-            <Download size={13} />
+            <Code2 size={12} /> Edit
           </button>
 
-          {/* Download — combined single HTML file */}
+          {/* Download combined HTML */}
           <button
             onClick={() => {
               const name = cell.label ? slugify(cell.label) : "cell";
@@ -991,49 +858,27 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${name}</title>
-<style>
-${cell.css || ""}
-</style>
+<style>${cell.css || ""}</style>
 </head>
 <body>
 ${cell.html || ""}
-<script>
-${cell.js || ""}
-<\/script>
+<script>${cell.js || ""}<\/script>
 </body>
 </html>`;
               triggerDownload(combined, `${name}.html`, "text/html");
             }}
-            title="Download as single combined .html file"
+            title="Download as .html"
             style={{
               background: "transparent",
               border: "none",
               color: T.muted,
               cursor: "pointer",
-              padding: "3px 6px",
+              padding: "4px 6px",
               display: "flex",
               alignItems: "center",
             }}
           >
-            <FileDown size={13} />
-          </button>
-
-          {/* Expand to full-page IDE */}
-          <button
-            onClick={() => setIdeOpen(true)}
-            title="Open in full-page IDE"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: T.accent,
-              cursor: "pointer",
-              padding: "3px 6px",
-              display: "flex",
-              alignItems: "center",
-              opacity: 0.8,
-            }}
-          >
-            <Maximize2 size={13} />
+            <Download size={13} />
           </button>
 
           {canDelete && (
@@ -1045,7 +890,7 @@ ${cell.js || ""}
                 border: "none",
                 color: T.muted,
                 cursor: "pointer",
-                padding: "3px 6px",
+                padding: "4px 6px",
                 display: "flex",
                 alignItems: "center",
               }}
@@ -1056,36 +901,7 @@ ${cell.js || ""}
         </div>
       </div>
 
-      {/* Monaco editor */}
-      <div style={{ background: T.editorBg }}>
-        <Editor
-          key={`${cell.id}-${activeTab}`}
-          height={editorHeight}
-          beforeMount={setupOpenCalcMonaco}
-          language={MONACO_LANG[activeTab]}
-          value={editorValue}
-          onChange={handleChange}
-          theme={T.dark ? "open-calc-dark" : "open-calc-light"}
-          options={{
-            fontSize: 12,
-            lineHeight: 20,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            tabSize: 2,
-            renderLineHighlight: "none",
-            overviewRulerLanes: 0,
-            folding: false,
-            lineDecorationsWidth: 4,
-            lineNumbersMinChars: 3,
-            padding: { top: 8, bottom: 8 },
-          }}
-        />
-      </div>
-
-      <ConsolePanel logs={logs} />
-
-      {/* Full-page IDE overlay — rendered via portal so it escapes the panel's transform/overflow */}
+      {/* Full-page IDE overlay — portal so it escapes panel's transform/overflow */}
       {ideOpen &&
         createPortal(
           <AnimatePresence>
@@ -1094,7 +910,6 @@ ${cell.js || ""}
               onChange={onChange}
               onClose={() => {
                 setIdeOpen(false);
-                // Force the cell preview to refresh immediately with the latest code
                 updatePreview(cell.html, cell.css, cell.js);
               }}
             />

@@ -1096,23 +1096,21 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
   // ── Sync file changes back to parent ─────────────────────────────────────
   const updateFile = useCallback(
     (name, content) => {
-      setFiles((prev) => {
-        const next = { ...prev, [name]: content };
-        onChange({
-          ...cell,
-          html: next["index.html"] ?? cell.html,
-          css: next["style.css"] ?? cell.css,
-          js: next["script.js"] ?? cell.js,
-          files: Object.fromEntries(
-            Object.entries(next).filter(
-              ([k]) => !["index.html", "style.css", "script.js"].includes(k),
-            ),
+      const next = { ...files, [name]: content };
+      setFiles(next);
+      onChange({
+        ...cell,
+        html: next["index.html"] ?? cell.html,
+        css: next["style.css"] ?? cell.css,
+        js: next["script.js"] ?? cell.js,
+        files: Object.fromEntries(
+          Object.entries(next).filter(
+            ([k]) => !["index.html", "style.css", "script.js"].includes(k),
           ),
-        });
-        return next;
+        ),
       });
     },
-    [cell, onChange],
+    [files, cell, onChange],
   );
 
   // ── Run C++ ───────────────────────────────────────────────────────────────
@@ -1169,20 +1167,18 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
     e.target.value = "";
     try {
       const imported = await readUpload(file);
-      setFiles((prev) => {
-        const next = { ...prev, ...imported };
-        onChange({
-          ...cell,
-          html: next["index.html"] ?? cell.html,
-          css: next["style.css"] ?? cell.css,
-          js: next["script.js"] ?? cell.js,
-          files: Object.fromEntries(
-            Object.entries(next).filter(
-              ([k]) => !["index.html", "style.css", "script.js"].includes(k),
-            ),
+      const next = { ...files, ...imported };
+      setFiles(next);
+      onChange({
+        ...cell,
+        html: next["index.html"] ?? cell.html,
+        css: next["style.css"] ?? cell.css,
+        js: next["script.js"] ?? cell.js,
+        files: Object.fromEntries(
+          Object.entries(next).filter(
+            ([k]) => !["index.html", "style.css", "script.js"].includes(k),
           ),
-        });
-        return next;
+        ),
       });
       const first = Object.keys(imported)[0];
       if (first) setActiveFile(first);
@@ -1788,7 +1784,7 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
               >
                 <iframe
                   sandbox="allow-scripts"
-                  srcdoc={srcdocContent}
+                  srcDoc={srcdocContent}
                   style={{
                     width: "100%",
                     height: "100%",
