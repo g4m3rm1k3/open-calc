@@ -231,7 +231,7 @@ export default function LessonPage() {
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {lesson.crossRefs.map((ref) => (
-              <CrossRef key={ref.lessonSlug} {...ref} />
+              <CrossRef key={ref.lessonSlug ?? ref.slug} {...ref} />
             ))}
           </div>
         </section>
