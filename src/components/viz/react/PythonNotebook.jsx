@@ -24,6 +24,7 @@ function useColors() {
     return () => obs.disconnect();
   }, []);
   return {
+    dark,
     bg: dark ? "#0f172a" : "#f8fafc",
     surface: dark ? "#1e293b" : "#ffffff",
     surface2: dark ? "#0f172a" : "#f1f5f9",
@@ -799,11 +800,7 @@ const CellComponent = React.memo(
           height={editorHeight}
           beforeMount={setupOpenCalcMonaco}
           defaultLanguage="python"
-          theme={
-            document.documentElement.classList.contains("dark")
-              ? "open-calc-dark"
-              : "open-calc-light"
-          }
+          theme={C.dark ? "open-calc-dark" : "open-calc-light"}
           value={cell.code}
           onChange={(val) => onUpdate(cell.id, val || "")}
           options={{

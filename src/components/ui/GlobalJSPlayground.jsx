@@ -1,21 +1,42 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Trash2, Code2, LayoutTemplate, ChevronDown, Download, FileDown, Upload } from 'lucide-react'
-import { zipSync, strToU8 } from 'fflate'
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  Plus,
+  Trash2,
+  Code2,
+  LayoutTemplate,
+  ChevronDown,
+  Download,
+  FileDown,
+  Upload,
+} from "lucide-react";
+import { zipSync, strToU8 } from "fflate";
 
 // ── File helpers ──────────────────────────────────────────────────────────────
 
 function slugify(str) {
-  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'cell'
+  return (
+    str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "cell"
+  );
 }
 
 function triggerDownload(content, filename, mime) {
-  const blob = new Blob([content instanceof Uint8Array ? [content] : [content]], { type: mime })
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href = url; a.download = filename
-  document.body.appendChild(a); a.click()
-  document.body.removeChild(a); URL.revokeObjectURL(url)
+  const blob = new Blob(
+    [content instanceof Uint8Array ? [content] : [content]],
+    { type: mime },
+  );
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // Download a single cell as three separate files:
@@ -24,7 +45,7 @@ function triggerDownload(content, filename, mime) {
 //   script.js
 // Browsers can only trigger one download at a time, so we use a tiny zip.
 function downloadCell(cell, index) {
-  const name = cell.label ? slugify(cell.label) : `cell-${index + 1}`
+  const name = cell.label ? slugify(cell.label) : `cell-${index + 1}`;
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -34,47 +55,68 @@ function downloadCell(cell, index) {
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-${cell.html || ''}
+${cell.html || ""}
 <script src="script.js"><\/script>
 </body>
-</html>`
+</html>`;
   const files = {
     [`${name}/index.html`]: strToU8(html),
-    [`${name}/style.css`]:  strToU8(cell.css || ''),
-    [`${name}/script.js`]:  strToU8(cell.js  || ''),
-  }
-  const zipped = zipSync(files)
-  triggerDownload(zipped, `${name}.zip`, 'application/zip')
+    [`${name}/style.css`]: strToU8(cell.css || ""),
+    [`${name}/script.js`]: strToU8(cell.js || ""),
+  };
+  const zipped = zipSync(files);
+  triggerDownload(zipped, `${name}.zip`, "application/zip");
 }
 
+import Editor from "@monaco-editor/react";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
-
-import Editor from '@monaco-editor/react'
-import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
-
-// ── Colour tokens ─────────────────────────────────────────────────────────────
-const T = {
-  border:   '#334155',
-  muted:    '#64748b',
-  accent:   '#38bdf8',
-  green:    '#34d399',
-  red:      '#f87171',
-  yellow:   '#fbbf24',
-  editorBg: '#0c1222',
+// ── Reactive colour tokens ────────────────────────────────────────────────────
+function useColors() {
+  const isDark = () =>
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark");
+  const [dark, setDark] = useState(isDark);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setDark(isDark()));
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => obs.disconnect();
+  }, []);
+  return {
+    dark,
+    border: dark ? "#334155" : "#e2e8f0",
+    muted: dark ? "#64748b" : "#94a3b8",
+    accent: dark ? "#38bdf8" : "#0284c7",
+    green: dark ? "#34d399" : "#16a34a",
+    red: dark ? "#f87171" : "#dc2626",
+    yellow: dark ? "#fbbf24" : "#d97706",
+    editorBg: dark ? "#0c1222" : "#f8fafc",
+    previewBg: dark ? "#0a1016" : "#f1f5f9",
+    tabBarBg: dark ? "#0c1520" : "#f8fafc",
+    consoleBg: dark ? "#080e18" : "#f8fafc",
+    surface: dark ? "#0f172a" : "#ffffff",
+    card: dark ? "#1e293b" : "#f8fafc",
+    text: dark ? "#e2e8f0" : "#1e293b",
+  };
 }
 
-const TABS = ['html', 'css', 'js']
-const TAB_LABEL = { html: 'HTML', css: 'CSS', js: 'JavaScript' }
-const MONACO_LANG = { html: 'html', css: 'css', js: 'javascript' }
+const TABS = ["html", "css", "js"];
+const TAB_LABEL = { html: "HTML", css: "CSS", js: "JavaScript" };
+const MONACO_LANG = { html: "html", css: "css", js: "javascript" };
 
-let _nextId = 10
-function nextId() { return _nextId++ }
+let _nextId = 10;
+function nextId() {
+  return _nextId++;
+}
 
 // ── Pre-built starter cells ───────────────────────────────────────────────────
 
 const DEMO_TORUS = {
   id: nextId(),
-  label: 'Three.js Torus Knot',
+  label: "Three.js Torus Knot",
   html: `<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <canvas id="c"></canvas>`,
   css: `* { margin: 0; padding: 0; }
@@ -134,11 +176,11 @@ let t = 0;
   stars.rotation.y = t * 0.02;
   renderer.render(scene, camera);
 })();`,
-}
+};
 
 const DEMO_PARTICLES = {
   id: nextId(),
-  label: 'Canvas Constellation',
+  label: "Canvas Constellation",
   html: `<canvas id="c"></canvas>`,
   css: `* { margin: 0; padding: 0; }
 body { background: #0f172a; overflow: hidden; }
@@ -198,11 +240,11 @@ function draw() {
   requestAnimationFrame(draw);
 }
 draw();`,
-}
+};
 
 const DEMO_DOM = {
   id: nextId(),
-  label: 'Interactive DOM Card',
+  label: "Interactive DOM Card",
   html: `<div class="card" id="card">
   <div class="badge" id="badge">Click me</div>
   <h2 id="title">open-calc</h2>
@@ -307,24 +349,28 @@ btn.addEventListener('click', () => {
   tag.style.color = tag.style.borderColor;
   tags.appendChild(tag);
 });`,
-}
+};
 
 // ── Template library ──────────────────────────────────────────────────────────
 
 const TEMPLATES = [
   {
-    id: 'blank',
-    label: 'Blank',
-    description: 'Empty cell',
-    icon: '📄',
-    cell: { html: '', css: `* { box-sizing: border-box; margin: 0; }
-body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }`, js: '' },
+    id: "blank",
+    label: "Blank",
+    description: "Empty cell",
+    icon: "📄",
+    cell: {
+      html: "",
+      css: `* { box-sizing: border-box; margin: 0; }
+body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }`,
+      js: "",
+    },
   },
   {
-    id: 'threejs',
-    label: 'Three.js Scene',
-    description: 'CDN import + renderer setup',
-    icon: '🧊',
+    id: "threejs",
+    label: "Three.js Scene",
+    description: "CDN import + renderer setup",
+    icon: "🧊",
     cell: {
       html: `<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>\n<canvas id="c"></canvas>`,
       css: `* { margin: 0; } body { background: #000; overflow: hidden; } canvas { display: block; width: 100%; }`,
@@ -353,10 +399,10 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     },
   },
   {
-    id: 'canvas',
-    label: 'Canvas 2D',
-    description: 'Blank canvas with draw loop',
-    icon: '🎨',
+    id: "canvas",
+    label: "Canvas 2D",
+    description: "Blank canvas with draw loop",
+    icon: "🎨",
     cell: {
       html: `<canvas id="c"></canvas>`,
       css: `* { margin: 0; } body { background: #0f172a; } canvas { display: block; }`,
@@ -382,10 +428,10 @@ draw();`,
     },
   },
   {
-    id: 'dom',
-    label: 'DOM Manipulation',
-    description: 'querySelector + events',
-    icon: '🌳',
+    id: "dom",
+    label: "DOM Manipulation",
+    description: "querySelector + events",
+    icon: "🌳",
     cell: {
       html: `<div id="app">
   <h2 id="title">Hello, DOM</h2>
@@ -407,10 +453,10 @@ btn.addEventListener('click', () => {
     },
   },
   {
-    id: 'css-anim',
-    label: 'CSS Animation',
-    description: 'Keyframes + transitions',
-    icon: '✨',
+    id: "css-anim",
+    label: "CSS Animation",
+    description: "Keyframes + transitions",
+    icon: "✨",
     cell: {
       html: `<div class="scene">
   <div class="orb orb-1"></div>
@@ -439,10 +485,10 @@ body { background: #0f172a; display: flex; align-items: center; justify-content:
     },
   },
   {
-    id: 'fetch',
-    label: 'Fetch API',
-    description: 'Load data from a public API',
-    icon: '🌐',
+    id: "fetch",
+    label: "Fetch API",
+    description: "Load data from a public API",
+    icon: "🌐",
     cell: {
       html: `<div id="out">Loading...</div>`,
       css: `body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }
@@ -461,10 +507,10 @@ fetch('https://jsonplaceholder.typicode.com/todos/1')
     },
   },
   {
-    id: 'flexbox',
-    label: 'Flexbox Layout',
-    description: 'Flex container exploration',
-    icon: '📐',
+    id: "flexbox",
+    label: "Flexbox Layout",
+    description: "Flex container exploration",
+    icon: "📐",
     cell: {
       html: `<div class="toolbar">
   <label>justify-content:
@@ -514,11 +560,11 @@ document.getElementById('ai').addEventListener('change', e => {
 });`,
     },
   },
-]
+];
 
 // ── Build sandboxed iframe document ──────────────────────────────────────────
 function buildDoc(html, css, js) {
-  const uid = Math.random().toString(36).slice(2)
+  const uid = Math.random().toString(36).slice(2);
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -555,162 +601,318 @@ ${js}
 } catch(e) { console.error('Runtime error: ' + e.message); }
 <\/script>
 </body>
-</html>`
+</html>`;
 }
 
 // ── Console panel ─────────────────────────────────────────────────────────────
 function ConsolePanel({ logs }) {
-  if (logs.length === 0) return null
-  const color = { log: '#e2e8f0', error: T.red, warn: T.yellow }
-  const icon  = { log: '›', error: '✗', warn: '⚠' }
+  const T = useColors();
+  if (logs.length === 0) return null;
+  const color = { log: T.text, error: T.red, warn: T.yellow };
+  const icon = { log: "›", error: "✗", warn: "⚠" };
   return (
-    <div style={{ background: '#080e18', borderTop: `1px solid ${T.border}`, padding: '8px 14px', maxHeight: 110, overflowY: 'auto' }}>
-      <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>Console</div>
+    <div
+      style={{
+        background: T.consoleBg,
+        borderTop: `1px solid ${T.border}`,
+        padding: "8px 14px",
+        maxHeight: 110,
+        overflowY: "auto",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          color: T.muted,
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+          marginBottom: 4,
+        }}
+      >
+        Console
+      </div>
       {logs.map((l, i) => (
-        <div key={i} style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, color: color[l.level] || '#e2e8f0', display: 'flex', gap: 8 }}>
+        <div
+          key={i}
+          style={{
+            fontFamily: "monospace",
+            fontSize: 12,
+            lineHeight: 1.6,
+            color: color[l.level] || "#e2e8f0",
+            display: "flex",
+            gap: 8,
+          }}
+        >
           <span style={{ color: T.muted, flexShrink: 0 }}>{icon[l.level]}</span>
-          <span style={{ wordBreak: 'break-all' }}>{l.msg}</span>
+          <span style={{ wordBreak: "break-all" }}>{l.msg}</span>
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 // ── Template picker ───────────────────────────────────────────────────────────
 function TemplatePicker({ onInsert, onClose }) {
+  const T = useColors();
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       style={{
-        position: 'absolute', bottom: '100%', right: 0, marginBottom: 8,
-        background: '#0f172a', border: `1px solid ${T.border}`,
-        borderRadius: 12, padding: 12, width: 320, zIndex: 50,
-        boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+        position: "absolute",
+        bottom: "100%",
+        right: 0,
+        marginBottom: 8,
+        background: T.surface,
+        border: `1px solid ${T.border}`,
+        borderRadius: 12,
+        padding: 12,
+        width: 320,
+        zIndex: 50,
+        boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
       }}
     >
-      <div style={{ fontSize: 10, fontWeight: 700, color: T.muted, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 10 }}>Insert Template</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {TEMPLATES.map(t => (
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: T.muted,
+          letterSpacing: ".1em",
+          textTransform: "uppercase",
+          marginBottom: 10,
+        }}
+      >
+        Insert Template
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {TEMPLATES.map((t) => (
           <button
             key={t.id}
-            onClick={() => { onInsert(t); onClose(); }}
-            style={{
-              background: '#1e293b', border: `1px solid ${T.border}`,
-              borderRadius: 8, padding: '10px 12px', cursor: 'pointer',
-              textAlign: 'left', transition: 'border-color 0.15s',
+            onClick={() => {
+              onInsert(t);
+              onClose();
             }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = T.accent}
-            onMouseLeave={e => e.currentTarget.style.borderColor = T.border}
+            style={{
+              background: T.card,
+              border: `1px solid ${T.border}`,
+              borderRadius: 8,
+              padding: "10px 12px",
+              cursor: "pointer",
+              textAlign: "left",
+              transition: "border-color 0.15s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = T.accent)}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = T.border)}
           >
             <div style={{ fontSize: 18, marginBottom: 4 }}>{t.icon}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>{t.label}</div>
-            <div style={{ fontSize: 11, color: T.muted, lineHeight: 1.4 }}>{t.description}</div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: T.text,
+                marginBottom: 2,
+              }}
+            >
+              {t.label}
+            </div>
+            <div style={{ fontSize: 11, color: T.muted, lineHeight: 1.4 }}>
+              {t.description}
+            </div>
           </button>
         ))}
       </div>
     </motion.div>
-  )
+  );
 }
 
 // ── Single cell ───────────────────────────────────────────────────────────────
 function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
-  const iframeRef = useRef(null)
-  const iframeUidRef = useRef(null)
-  const debounceRef = useRef(null)
-  const uploadRef = useRef(null)
-  const [activeTab, setActiveTab] = useState(cell.html ? 'html' : 'js')
-  const [logs, setLogs] = useState([])
-  const [showTemplates, setShowTemplates] = useState(false)
+  const T = useColors();
+  const iframeRef = useRef(null);
+  const iframeUidRef = useRef(null);
+  const debounceRef = useRef(null);
+  const uploadRef = useRef(null);
+  const [activeTab, setActiveTab] = useState(cell.html ? "html" : "js");
+  const [logs, setLogs] = useState([]);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const handleUpload = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    e.target.value = ''
-    const reader = new FileReader()
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    const reader = new FileReader();
     reader.onload = (ev) => {
-      onChange({ ...cell, [activeTab]: ev.target.result })
-    }
-    reader.readAsText(file)
-  }
+      onChange({ ...cell, [activeTab]: ev.target.result });
+    };
+    reader.readAsText(file);
+  };
 
   useEffect(() => {
     const handler = (e) => {
-      if (!e.data || e.data.type !== 'jspg_console') return
-      if (e.data.uid !== iframeUidRef.current) return
-      setLogs(prev => [...prev.slice(-49), { level: e.data.level, msg: e.data.msg }])
-    }
-    window.addEventListener('message', handler)
-    return () => window.removeEventListener('message', handler)
-  }, [])
+      if (!e.data || e.data.type !== "jspg_console") return;
+      if (e.data.uid !== iframeUidRef.current) return;
+      setLogs((prev) => [
+        ...prev.slice(-49),
+        { level: e.data.level, msg: e.data.msg },
+      ]);
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
 
   const updatePreview = useCallback((html, css, js) => {
-    clearTimeout(debounceRef.current)
+    clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setLogs([])
-      const doc = buildDoc(html, css, js)
-      const match = doc.match(/window\.__id = '([^']+)'/)
-      if (match) iframeUidRef.current = match[1]
-      if (iframeRef.current) iframeRef.current.srcdoc = doc
-    }, 700)
-  }, [])
+      setLogs([]);
+      const doc = buildDoc(html, css, js);
+      const match = doc.match(/window\.__id = '([^']+)'/);
+      if (match) iframeUidRef.current = match[1];
+      if (iframeRef.current) iframeRef.current.srcdoc = doc;
+    }, 700);
+  }, []);
 
   useEffect(() => {
-    updatePreview(cell.html, cell.css, cell.js)
-  }, [cell.html, cell.css, cell.js, updatePreview])
+    updatePreview(cell.html, cell.css, cell.js);
+  }, [cell.html, cell.css, cell.js, updatePreview]);
 
-  const handleChange = (val = '') => onChange({ ...cell, [activeTab]: val })
+  const handleChange = (val = "") => onChange({ ...cell, [activeTab]: val });
 
   const insertTemplate = (template) => {
-    onChange({ ...cell, html: template.cell.html, css: template.cell.css, js: template.cell.js })
-    setActiveTab('html')
-  }
+    onChange({
+      ...cell,
+      html: template.cell.html,
+      css: template.cell.css,
+      js: template.cell.js,
+    });
+    setActiveTab("html");
+  };
 
-  const editorValue = cell[activeTab] || ''
-  const lineCount = editorValue.split('\n').length
-  const editorHeight = Math.min(300, Math.max(100, lineCount * 20 + 28))
+  const editorValue = cell[activeTab] || "";
+  const lineCount = editorValue.split("\n").length;
+  const editorHeight = Math.min(300, Math.max(100, lineCount * 20 + 28));
 
   return (
-    <div style={{ border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden', marginBottom: 14 }}>
+    <div
+      style={{
+        border: `1.5px solid ${T.accent}44`,
+        borderRadius: 12,
+        overflow: "hidden",
+        marginBottom: 16,
+        boxShadow: T.dark
+          ? `0 6px 28px rgba(56,189,248,0.1), 0 2px 8px rgba(0,0,0,0.4)`
+          : `0 4px 20px rgba(2,132,199,0.08), 0 1px 4px rgba(0,0,0,0.08)`,
+      }}
+    >
       {/* Live preview */}
-      <div style={{ background: '#0a1016', borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ fontSize: 10, fontWeight: 600, color: T.muted, letterSpacing: '.08em', textTransform: 'uppercase', padding: '6px 12px 0' }}>Preview</div>
+      <div
+        style={{
+          background: T.previewBg,
+          borderBottom: `1px solid ${T.border}`,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: "7px 12px",
+            background: T.dark
+              ? `linear-gradient(90deg, rgba(56,189,248,0.12) 0%, ${T.previewBg} 100%)`
+              : `linear-gradient(90deg, rgba(2,132,199,0.07) 0%, ${T.previewBg} 100%)`,
+            borderBottom: `1px solid ${T.border}`,
+          }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: T.accent, display: 'inline-block', boxShadow: `0 0 6px ${T.accent}` }} />
+          <span style={{ fontSize: 10, fontWeight: 700, color: T.accent, letterSpacing: ".1em", textTransform: "uppercase" }}>Live Preview</span>
+        </div>
         <iframe
           ref={iframeRef}
           sandbox="allow-scripts"
-          style={{ width: '100%', height: cell.previewHeight || 200, border: 'none', display: 'block' }}
+          style={{
+            width: "100%",
+            height: cell.previewHeight || 200,
+            border: "none",
+            display: "block",
+          }}
           title={`cell-${cell.id}`}
         />
       </div>
 
       {/* Tab bar + actions */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0c1520', borderBottom: `1px solid ${T.border}`, padding: '0 8px', position: 'relative' }}>
-        <div style={{ display: 'flex' }}>
-          {TABS.map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              padding: '7px 14px', background: 'transparent', border: 'none',
-              borderBottom: activeTab === tab ? `2px solid ${T.accent}` : '2px solid transparent',
-              color: activeTab === tab ? T.accent : T.muted,
-              fontSize: 11, fontWeight: 600, cursor: 'pointer', letterSpacing: '.04em',
-            }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: T.dark
+            ? `linear-gradient(90deg, #0c1520 0%, #111827 100%)`
+            : `linear-gradient(90deg, #f1f5f9 0%, #f8fafc 100%)`,
+          borderBottom: `1px solid ${T.border}`,
+          padding: "0 8px",
+          position: "relative",
+        }}
+      >
+        <div style={{ display: "flex" }}>
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: "8px 14px",
+                background: "transparent",
+                border: "none",
+                borderBottom:
+                  activeTab === tab
+                    ? `2px solid ${T.accent}`
+                    : "2px solid transparent",
+                color: activeTab === tab ? T.accent : T.muted,
+                fontSize: 11,
+                fontWeight: activeTab === tab ? 700 : 500,
+                cursor: "pointer",
+                letterSpacing: ".04em",
+                transition: 'color 0.15s',
+              }}
+            >
               {TAB_LABEL[tab]}
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 0', position: 'relative' }}>
-
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "5px 0",
+            position: "relative",
+          }}
+        >
           {/* Templates */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: "relative" }}>
             <button
-              onClick={() => setShowTemplates(s => !s)}
-              style={{ background: 'transparent', border: `0.5px solid ${T.border}`, borderRadius: 6, color: T.muted, cursor: 'pointer', padding: '3px 8px', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}
+              onClick={() => setShowTemplates((s) => !s)}
+              style={{
+                background: "transparent",
+                border: `0.5px solid ${T.border}`,
+                borderRadius: 6,
+                color: T.muted,
+                cursor: "pointer",
+                padding: "3px 8px",
+                fontSize: 11,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
             >
               <LayoutTemplate size={11} /> Templates <ChevronDown size={10} />
             </button>
             <AnimatePresence>
               {showTemplates && (
-                <TemplatePicker onInsert={insertTemplate} onClose={() => setShowTemplates(false)} />
+                <TemplatePicker
+                  onInsert={insertTemplate}
+                  onClose={() => setShowTemplates(false)}
+                />
               )}
             </AnimatePresence>
           </div>
@@ -720,13 +922,21 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
             ref={uploadRef}
             type="file"
             accept=".html,.htm,.css,.js"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             onChange={handleUpload}
           />
           <button
             onClick={() => uploadRef.current?.click()}
             title="Upload .html / .css / .js into this cell"
-            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: T.muted,
+              cursor: "pointer",
+              padding: "3px 6px",
+              display: "flex",
+              alignItems: "center",
+            }}
           >
             <Upload size={13} />
           </button>
@@ -735,7 +945,15 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
           <button
             onClick={() => downloadCell(cell, 0)}
             title="Download as index.html + style.css + script.js (zip)"
-            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: T.muted,
+              cursor: "pointer",
+              padding: "3px 6px",
+              display: "flex",
+              alignItems: "center",
+            }}
           >
             <Download size={13} />
           </button>
@@ -743,7 +961,7 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
           {/* Download — combined single HTML file */}
           <button
             onClick={() => {
-              const name = cell.label ? slugify(cell.label) : 'cell'
+              const name = cell.label ? slugify(cell.label) : "cell";
               const combined = `<!DOCTYPE html>
 <html>
 <head>
@@ -751,26 +969,46 @@ function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${name}</title>
 <style>
-${cell.css || ''}
+${cell.css || ""}
 </style>
 </head>
 <body>
-${cell.html || ''}
+${cell.html || ""}
 <script>
-${cell.js || ''}
+${cell.js || ""}
 <\/script>
 </body>
-</html>`
-              triggerDownload(combined, `${name}.html`, 'text/html')
+</html>`;
+              triggerDownload(combined, `${name}.html`, "text/html");
             }}
             title="Download as single combined .html file"
-            style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: T.muted,
+              cursor: "pointer",
+              padding: "3px 6px",
+              display: "flex",
+              alignItems: "center",
+            }}
           >
             <FileDown size={13} />
           </button>
 
           {canDelete && (
-            <button onClick={onDelete} title="Delete cell" style={{ background: 'transparent', border: 'none', color: T.muted, cursor: 'pointer', padding: '3px 6px', display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={onDelete}
+              title="Delete cell"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: T.muted,
+                cursor: "pointer",
+                padding: "3px 6px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <Trash2 size={13} />
             </button>
           )}
@@ -786,15 +1024,19 @@ ${cell.js || ''}
           language={MONACO_LANG[activeTab]}
           value={editorValue}
           onChange={handleChange}
-          theme="open-calc-dark"
+          theme={T.dark ? "open-calc-dark" : "open-calc-light"}
           options={{
-            fontSize: 12, lineHeight: 20,
+            fontSize: 12,
+            lineHeight: 20,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
-            wordWrap: 'on', tabSize: 2,
-            renderLineHighlight: 'none',
-            overviewRulerLanes: 0, folding: false,
-            lineDecorationsWidth: 4, lineNumbersMinChars: 3,
+            wordWrap: "on",
+            tabSize: 2,
+            renderLineHighlight: "none",
+            overviewRulerLanes: 0,
+            folding: false,
+            lineDecorationsWidth: 4,
+            lineNumbersMinChars: 3,
             padding: { top: 8, bottom: 8 },
           }}
         />
@@ -802,31 +1044,37 @@ ${cell.js || ''}
 
       <ConsolePanel logs={logs} />
     </div>
-  )
+  );
 }
 
 // ── Main GlobalJSPlayground ───────────────────────────────────────────────────
 function makeBlank() {
   return {
-    id: nextId(), html: '', css: `* { box-sizing: border-box; margin: 0; }
-body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }`, js: '',
-  }
+    id: nextId(),
+    html: "",
+    css: `* { box-sizing: border-box; margin: 0; }
+body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }`,
+    js: "",
+  };
 }
 
 const INITIAL_CELLS = [
-  { ...DEMO_TORUS,     previewHeight: 280 },
+  { ...DEMO_TORUS, previewHeight: 280 },
   { ...DEMO_PARTICLES, previewHeight: 220 },
-  { ...DEMO_DOM,       previewHeight: 240 },
-]
+  { ...DEMO_DOM, previewHeight: 240 },
+];
 
 export default function GlobalJSPlayground({ isOpen, onClose }) {
-  const [cells, setCells] = useState(INITIAL_CELLS)
+  const T = useColors();
+  const [cells, setCells] = useState(INITIAL_CELLS);
 
-  const updateCell = (id, updated) => setCells(prev => prev.map(c => c.id === id ? updated : c))
-  const deleteCell = (id) => setCells(prev => prev.filter(c => c.id !== id))
-  const addCell = () => setCells(prev => [...prev, makeBlank()])
+  const updateCell = (id, updated) =>
+    setCells((prev) => prev.map((c) => (c.id === id ? updated : c)));
+  const deleteCell = (id) =>
+    setCells((prev) => prev.filter((c) => c.id !== id));
+  const addCell = () => setCells((prev) => [...prev, makeBlank()]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
@@ -842,37 +1090,86 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
           initial={{ x: 600, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 600, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
           className="relative w-full max-w-3xl h-full bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 dark:border-slate-800 flex flex-col pointer-events-auto overflow-hidden"
         >
           {/* Header */}
-          <header className="flex items-center justify-between p-4 px-6 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-yellow-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-yellow-500/20">
-                <Code2 size={14} />
+          <header
+            style={{
+              background: T.dark
+                ? 'linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f2233 100%)'
+                : 'linear-gradient(135deg, #eff6ff 0%, #f0fdf4 50%, #fefce8 100%)',
+              borderBottom: `1px solid ${T.border}`,
+              padding: '14px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 34, height: 34,
+                background: 'linear-gradient(135deg, #f59e0b, #f97316)',
+                borderRadius: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff',
+                boxShadow: '0 4px 14px rgba(245,158,11,0.4)',
+                flexShrink: 0,
+              }}>
+                <Code2 size={15} />
               </div>
-              <h2 className="text-md font-bold text-slate-800 dark:text-white">JS Playground</h2>
-              <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">sandboxed · live preview</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.2 }}>JS Playground</div>
+                <div style={{ fontSize: 10, color: T.muted, letterSpacing: '.06em', textTransform: 'uppercase' }}>sandboxed · live preview</div>
+              </div>
             </div>
-            <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-              <X size={20} />
+            <button
+              onClick={onClose}
+              style={{
+                background: T.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                border: `1px solid ${T.border}`,
+                borderRadius: 10,
+                color: T.muted,
+                cursor: 'pointer',
+                padding: '6px 8px',
+                display: 'flex', alignItems: 'center',
+                transition: 'all 0.15s',
+              }}
+            >
+              <X size={18} />
             </button>
           </header>
 
           {/* Cells */}
           <div className="flex-1 overflow-y-auto p-4 bg-slate-50/30 dark:bg-slate-950/30 custom-scrollbar">
-            {cells.map(cell => (
+            {cells.map((cell) => (
               <PlaygroundCell
                 key={cell.id}
                 cell={cell}
-                onChange={updated => updateCell(cell.id, updated)}
+                onChange={(updated) => updateCell(cell.id, updated)}
                 onDelete={() => deleteCell(cell.id)}
                 canDelete={cells.length > 1}
               />
             ))}
             <button
               onClick={addCell}
-              style={{ width: '100%', padding: '10px', borderRadius: 8, border: `1.5px dashed ${T.border}`, background: 'transparent', color: T.muted, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{
+                width: "100%",
+                padding: "11px",
+                borderRadius: 10,
+                border: `1.5px dashed ${T.accent}55`,
+                background: T.dark ? 'rgba(56,189,248,0.04)' : 'rgba(2,132,199,0.03)',
+                color: T.accent,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                transition: 'all 0.15s',
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
             >
               <Plus size={14} /> Add cell
             </button>
@@ -886,5 +1183,5 @@ export default function GlobalJSPlayground({ isOpen, onClose }) {
         </motion.div>
       </div>
     </AnimatePresence>
-  )
+  );
 }
