@@ -196,11 +196,26 @@
     @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors;
   }
   .oc-sidebar-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-[13.5px] font-semibold;
   }
 
   .oc-sidebar-item-active {
-    @apply oc-header-gradient shadow-sm font-bold;
+    @apply bg-white dark:bg-slate-800/80 shadow-[0_8px_20px_-6px_rgba(79,70,229,0.2)] dark:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.6)]
+           border border-indigo-100/50 dark:border-white/10 font-black;
+    position: relative;
+  }
+  .oc-sidebar-item-active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 25%; bottom: 25%; width: 3px;
+    @apply bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)];
+  }
+  .sidebar-chapter-active {
+    @apply text-indigo-700 dark:text-indigo-400 font-black relative bg-indigo-50/50 dark:bg-indigo-900/10;
+  }
+  .sidebar-chapter-active::after {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1 bg-indigo-500/80;
   }
   .tab-btn-active {
     @apply border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900;
@@ -243,6 +258,19 @@
   text-underline-offset: 2px;
 }
 
+/* Custom Scrollbar for Sidebar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 dark:bg-slate-800 rounded-full;
+}
+.sidebar-scroll:hover::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700;
+}
 .tooltip:hover::after,
 .tooltip:focus::after {
   content: attr(data-tooltip);
