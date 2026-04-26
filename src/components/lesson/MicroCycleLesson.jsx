@@ -184,18 +184,24 @@ function getSectionVizzes(section) {
 // ─── Section divider ───────────────────────────────────────────────────────
 
 function SectionDivider({ icon, label, color = 'slate', noteId }) {
-  const colors = {
-    slate: 'text-slate-500 dark:text-slate-400 after:bg-slate-200 dark:after:bg-slate-700',
-    brand: 'text-brand-600 dark:text-brand-400 after:bg-brand-200 dark:after:bg-brand-800',
-    purple: 'text-purple-600 dark:text-purple-400 after:bg-purple-200 dark:after:bg-purple-800',
-    emerald: 'text-emerald-600 dark:text-emerald-400 after:bg-emerald-200 dark:after:bg-emerald-800',
+  const themes = {
+    slate: 'from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300',
+    brand: 'from-brand-50 to-white dark:from-brand-950/40 dark:to-slate-950 border-brand-100 dark:border-brand-900/60 text-brand-700 dark:text-brand-300',
+    emerald: 'from-emerald-50 to-white dark:from-emerald-950/40 dark:to-slate-950 border-emerald-100 dark:border-emerald-900/60 text-emerald-700 dark:text-emerald-300',
+    purple: 'from-purple-50 to-white dark:from-purple-950/40 dark:to-slate-950 border-purple-100 dark:border-purple-900/60 text-purple-700 dark:text-purple-300',
   }
+  
   return (
-    <div id={noteId ? noteId.replace(/:/g, '-') : undefined} className={`flex items-center gap-3 mb-6 ${colors[color]}`}>
-      <span className="text-xl flex-shrink-0">{icon}</span>
-      <span className="font-bold text-sm uppercase tracking-widest flex-shrink-0">{label}</span>
+    <div 
+      id={noteId ? noteId.replace(/:/g, '-') : undefined} 
+      className={`group relative flex items-center gap-4 mb-8 p-1.5 pr-6 rounded-full border shadow-sm bg-gradient-to-r transition-all duration-300 hover:shadow-md ${themes[color]}`}
+    >
+      <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-inherit flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
+        {icon}
+      </div>
+      <span className="font-black text-[11px] uppercase tracking-[0.2em]">{label}</span>
+      <div className="flex-1" />
       {noteId && <StickyNote noteId={noteId} />}
-      <div className="flex-1 h-px after:block after:h-px bg-current opacity-30" />
     </div>
   )
 }
@@ -232,9 +238,9 @@ function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slat
 function SemanticsBlock({ semantics }) {
   if (!semantics) return null
   return (
-    <div className="mb-10 rounded-2xl border border-sky-100 dark:border-sky-900/40 bg-sky-50/30 dark:bg-sky-950/20 overflow-hidden">
-      <div className="px-5 py-3 border-b border-sky-100 dark:border-sky-900/40 bg-sky-100/50 dark:bg-sky-900/40">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">Semantic Layer: Symbols & Meaning</h3>
+    <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
+      <div className="px-6 py-4 oc-header-gradient border-b border-sky-100 dark:border-sky-900/40">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-800 dark:text-sky-300">Semantic Layer: Symbols & Meaning</h3>
       </div>
       <div className="p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -271,8 +277,10 @@ function SemanticsBlock({ semantics }) {
 function PerspectiveSync({ perspectives, bridge }) {
   if (!perspectives?.length) return null
   return (
-    <div className="mb-8 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-900 dark:to-indigo-950/20 shadow-sm">
-      <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-4">Perspective Synchronization Block</h3>
+    <div className="mb-10 rounded-3xl border border-indigo-100 dark:border-indigo-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
+      <div className="px-6 py-4 oc-header-gradient border-b border-indigo-100 dark:border-indigo-900/40">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-800 dark:text-indigo-300">Perspective Synchronization</h3>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         {perspectives.map((p, i) => (
           <div key={i} className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-indigo-50 dark:border-indigo-800 shadow-sm">
@@ -297,10 +305,10 @@ function PerspectiveSync({ perspectives, bridge }) {
 function FailureModes({ modes }) {
   if (!modes?.length) return null
   return (
-    <div className="mb-8 rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-rose-50/20 dark:bg-rose-950/10 overflow-hidden">
-      <div className="px-5 py-3 border-b border-rose-100 dark:border-rose-900/40 bg-rose-100/30 dark:bg-rose-900/30">
-         <h3 className="text-xs font-bold uppercase tracking-widest text-rose-700 dark:text-rose-400 flex items-center gap-2">
-           <span>🚨</span> Failure Modes: Where the Definition Breaks
+    <div className="mb-10 rounded-3xl border border-rose-100 dark:border-rose-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
+      <div className="px-6 py-4 oc-header-gradient border-b border-rose-100 dark:border-rose-900/40">
+         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-800 dark:text-rose-400 flex items-center gap-2">
+           <span>🚨</span> Failure Modes: Where Logic Breaks
          </h3>
       </div>
       <div className="p-4 overflow-x-auto">
@@ -437,13 +445,20 @@ function MathBlock({ data, lessonId }) {
         tabIndex={0}
         onClick={() => setOpen(o => !o)}
         onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-6 py-4 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 dark:hover:bg-brand-950/60 transition-colors text-left cursor-pointer"
+        className="oc-header-gradient w-full flex items-center gap-3 px-6 py-5 hover:opacity-90 transition-all text-left cursor-pointer border-b border-brand-100 dark:border-brand-900/60"
       >
-        <span className="text-xl">📐</span>
-        <span className="font-bold text-brand-800 dark:text-brand-200 text-sm uppercase tracking-wider">Mathematics</span>
-        <div className="flex-1 h-px bg-brand-200 dark:bg-brand-800/50" />
+        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-xl shadow-sm">
+          📐
+        </div>
+        <div className="flex flex-col">
+          <span className="font-black text-brand-900 dark:text-brand-100 text-[10px] uppercase tracking-[0.2em]">Operational</span>
+          <span className="font-bold text-brand-800 dark:text-brand-200 text-sm uppercase tracking-wider">Mathematics</span>
+        </div>
+        <div className="flex-1" />
         {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:math`} /></span>}
-        <span className="text-brand-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Show ▼'}</span>
+        <span className="bg-brand-100 dark:bg-brand-900/60 px-3 py-1 rounded-full text-brand-600 dark:text-brand-300 text-[10px] font-bold uppercase tracking-wider transition-transform group-hover:scale-105">
+          {open ? 'Collapse ▲' : 'Expand ▼'}
+        </span>
       </div>
       {open && (
         <div className="px-6 py-5 bg-brand-50/30 dark:bg-brand-950/10 space-y-4">
@@ -499,18 +514,25 @@ function RigorBlock({ data, lessonId }) {
         tabIndex={0}
         onClick={() => setOpen(o => !o)}
         onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-6 py-4 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-950/60 transition-colors text-left cursor-pointer"
+        className="oc-header-gradient w-full flex items-center gap-3 px-6 py-5 hover:opacity-90 transition-all text-left cursor-pointer border-b border-purple-100 dark:border-purple-900/60"
       >
-        <span className="text-lg font-bold text-purple-600 dark:text-purple-400">∴</span>
-        <span className="font-bold text-purple-800 dark:text-purple-200 text-sm uppercase tracking-wider">Formal Proof</span>
-        <div className="flex-1 h-px bg-purple-200 dark:bg-purple-800/50" />
+        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-xl shadow-sm">
+          ∴
+        </div>
+        <div className="flex flex-col">
+          <span className="font-black text-purple-900 dark:text-purple-100 text-[10px] uppercase tracking-[0.2em]">Formal</span>
+          <span className="font-bold text-purple-800 dark:text-purple-200 text-sm uppercase tracking-wider">Rigor & Proof</span>
+        </div>
+        <div className="flex-1" />
         {!open && (
-          <span className="text-xs text-purple-400 dark:text-purple-500 italic mr-2 hidden sm:inline">
-            Ready to see why this is true?
+          <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 dark:text-purple-500 mr-4 hidden sm:inline">
+            Show the logic
           </span>
         )}
         {lessonId && <span onClick={e => e.stopPropagation()}><StickyNote noteId={`${lessonId}:rigor`} /></span>}
-        <span className="text-purple-400 text-xs font-semibold">{open ? 'Hide ▲' : 'Prove it ▼'}</span>
+        <span className="bg-purple-100 dark:bg-purple-900/60 px-3 py-1 rounded-full text-purple-600 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider transition-transform group-hover:scale-105">
+          {open ? 'Collapse' : 'Prove It'}
+        </span>
       </div>
       {open && (
         <div className="px-6 py-5 bg-purple-50/20 dark:bg-purple-950/10 space-y-4">
@@ -579,10 +601,10 @@ function SpiralBlock({ spiral }) {
   const { recoveryPoints = [], futureLinks = [] } = spiral
   if (!recoveryPoints.length && !futureLinks.length) return null
   return (
-    <div className="mb-10 rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/20 dark:bg-amber-950/10 overflow-hidden">
-      <div className="px-5 py-3 border-b border-amber-100 dark:border-amber-900/40 bg-amber-100/40 dark:bg-amber-900/30 flex items-center gap-2">
-        <span>🔗</span>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-300">Spiral Learning — Where You've Been &amp; Where You're Going</h3>
+    <div className="mb-10 rounded-3xl border border-amber-200 dark:border-amber-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
+      <div className="px-6 py-4 oc-header-gradient border-b border-amber-100 dark:border-amber-900/40 flex items-center gap-3">
+        <span className="text-lg">🔗</span>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 dark:text-amber-300">Spiral Learning: Context & Progression</h3>
       </div>
       <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
         {recoveryPoints.length > 0 && (

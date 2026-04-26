@@ -133,14 +133,14 @@ export default function LessonPage() {
         );
       })()}
 
-      <header className="oc-shell-card mb-8 overflow-hidden">
-        <div className="bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.42),transparent)] px-6 py-7 dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_26%),linear-gradient(180deg,rgba(15,23,42,0.42),transparent)] sm:px-8 sm:py-8">
+      <header className="oc-shell-card mb-12 overflow-hidden shadow-2xl">
+        <div className="oc-header-gradient px-8 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
               const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId);
               return (
                 <>
-                  <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-950/50 dark:text-brand-300">
+                  <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-500/30">
                     {chapter?.title ?? chapterId}
                     {lesson.order !== undefined ? ` · Lesson ${lesson.order + 1}` : ""}
                   </span>
@@ -159,11 +159,11 @@ export default function LessonPage() {
             })()}
           </div>
 
-          <h1 className="text-4xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-5xl">
+          <h1 className="text-5xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-6xl lg:text-7xl !leading-[1.1]">
             {lesson.title}
           </h1>
           {lesson.subtitle && (
-            <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+            <p className="mt-6 max-w-3xl text-xl leading-relaxed text-slate-600 dark:text-slate-300 font-medium opacity-90">
               {lesson.subtitle}
             </p>
           )}

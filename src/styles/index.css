@@ -19,14 +19,21 @@
     --topbar-height: 60px;
     /* Semantic color tokens */
     --color-surface:    #ffffff;
+    --color-page-bg:    #f8fafc;   /* slate-50 */
     --color-border:     #e2e8f0;   /* slate-200 */
     --color-text-muted: #64748b;   /* slate-500 */
+    
+    /* Premium Shadows */
+    --shadow-premium: 0 20px 50px -12px rgba(15, 23, 42, 0.08), 0 4px 20px -2px rgba(15, 23, 42, 0.04);
   }
 
   .dark {
     --color-surface:    #0f172a;   /* slate-900 */
+    --color-page-bg:    #020617;   /* slate-950/deep */
     --color-border:     #334155;   /* slate-700 */
     --color-text-muted: #94a3b8;   /* slate-400 */
+    
+    --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
   }
 
   html {
@@ -34,7 +41,7 @@
   }
 
   body {
-    @apply font-sans text-slate-800 dark:text-slate-200 antialiased;
+    @apply font-sans text-slate-800 dark:text-slate-200 antialiased bg-[var(--color-page-bg)];
   }
 
   /* Scrollbar styling */
@@ -52,11 +59,21 @@
 
 @layer components {
   .oc-shell-card {
-    @apply rounded-[28px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur;
+    @apply rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 backdrop-blur-sm transition-all duration-300;
+    box-shadow: var(--shadow-premium);
   }
 
   .oc-soft-panel {
-    @apply rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm;
+    @apply rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300;
+  }
+
+  .oc-soft-panel:hover {
+    box-shadow: var(--shadow-premium);
+  }
+
+  .oc-header-gradient {
+    @apply bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.42),transparent)]
+           dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_26%),linear-gradient(180deg,rgba(15,23,42,0.42),transparent)];
   }
 
   .oc-section-kicker {

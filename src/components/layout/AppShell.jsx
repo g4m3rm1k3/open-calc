@@ -800,7 +800,7 @@ export default function AppShell({ children }) {
   return (
     <ChatProvider>
     <GrapherContext.Provider value={{ openGrapher }}>
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-[var(--color-page-bg)] transition-colors duration-500">
         <TopBar
           onMenuToggle={() => setSidebarOpen((o) => !o)}
           sidebarOpen={sidebarOpen}
@@ -894,7 +894,7 @@ export default function AppShell({ children }) {
                   ? "w-full h-[calc(100vh-60px)] flex flex-col overflow-hidden"
                 : isUniversalCalcRoute
                   ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
-                  : `${sidebarPinned ? "max-w-4xl" : "max-w-6xl"} mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300`
+                  : `${sidebarPinned ? "max-w-4xl" : "max-w-6xl"} mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
             }
           >
             {children ?? <Outlet />}
