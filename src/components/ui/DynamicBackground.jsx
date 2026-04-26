@@ -1,6 +1,53 @@
+// Simple animated water surface using vertex displacement
+function SimpleWater({ width = 50, height = 50, segments = 15, position = [0, -17, 0] }) {
+  const meshRef = useRef();
+  const [vertData, setVertData] = useState([]);
+  // Create geometry and store per-vertex data
+  const geometry = useMemo(() => {
+    const g = new THREE.PlaneGeometry(width, height, segments, segments);
+    g.rotateX(-Math.PI * 0.5);
+    const data = [];
+    const v3 = new THREE.Vector3();
+    for (let i = 0; i < g.attributes.position.count; i++) {
+      v3.fromBufferAttribute(g.attributes.position, i);
+      data.push({
+        initH: v3.y,
+        amplitude: THREE.MathUtils.randFloatSpread(2),
+        phase: THREE.MathUtils.randFloat(0, Math.PI)
+      });
+    }
+    setVertData(data);
+    return g;
+  }, [width, height, segments]);
+
+  useFrame(() => {
+    if (!meshRef.current || vertData.length === 0) return;
+    const g = meshRef.current.geometry;
+    const time = performance.now() * 0.001;
+    vertData.forEach((vd, idx) => {
+      const y = vd.initH + Math.sin(time + vd.phase) * vd.amplitude;
+      g.attributes.position.setY(idx, y);
+    });
+    g.attributes.position.needsUpdate = true;
+    g.computeVertexNormals();
+  });
+
+  return (
+    <mesh ref={meshRef} geometry={geometry} position={position} receiveShadow castShadow>
+      <meshStandardMaterial
+        color="#3ec7e0"
+        roughness={0.35}
+        metalness={0.2}
+        transparent
+        opacity={0.95}
+      />
+    </mesh>
+  );
+}
 import React, { useRef, useMemo, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Stars, Cloud, Float, Sky } from "@react-three/drei";
+import { Water } from "../../three/Water";
 import * as THREE from "three";
 
 function Meteor({ active, onDone }) {
@@ -202,14 +249,12 @@ function MeteorSystem() {
 
 function EnvironmentWrapper({ children }) {
   const groupRef = useRef();
-
   useFrame(() => {
     if (groupRef.current) {
-      // Whisper parallax: scroll at 0.5% rate
-      groupRef.current.position.y = window.scrollY * 0.005;
+      // Minimal parallax: scroll at 0.05% rate (barely noticeable)
+      groupRef.current.position.y = window.scrollY * 0.0005;
     }
   });
-
   return <group ref={groupRef}>{children}</group>;
 }
 
@@ -282,6 +327,8 @@ function DaySystem({ config }) {
       {clouds.map((i) => (
         <MovingCloud key={i} index={i} />
       ))}
+      {/* Simple animated water mesh at the bottom */}
+      <SimpleWater width={120} height={30} segments={32} position={[0, -17, 0]} />
       <Comet config={config} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[0, 10, 5]} intensity={2} color="#ffffff" />

@@ -251,17 +251,16 @@ function CoursesDropdown({ isExpanded = true }) {
   );
 }
 
-function RibbonGroup({ title, children, isExpanded = true }) {
+function RibbonGroup({ title, children }) {
+  // Horizontal group of icons, perfectly vertically centered in navbar
   return (
-    <div className="flex flex-col items-start gap-1 h-full px-5 border-r border-white/5 last:border-none group/ribbon mb-1">
-      <div className={`flex-1 flex items-center gap-1.5 transition-all duration-500 ${isExpanded ? 'scale-100' : 'scale-110 mt-1'}`}>
+    <div className="group/ribbon flex flex-col items-center justify-center h-full px-2 sm:px-3 border-r border-white/5 last:border-none mb-1 transition-all duration-500">
+      <div className="flex flex-row items-center justify-center h-full gap-1.5">
         {children}
       </div>
-      {isExpanded && (
-        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover/ribbon:text-indigo-500 transition-colors pb-2 animate-in fade-in slide-in-from-top-1 duration-500">
-          {title}
-        </span>
-      )}
+      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 transition-opacity pt-1 animate-in fade-in slide-in-from-top-1 duration-500">
+        {title}
+      </span>
     </div>
   );
 }
@@ -329,66 +328,83 @@ function TopBar({
     return () => document.removeEventListener("mousedown", handler);
   }, [gamesMenuOpen]);
 
+  // Compact nav: icon-only by default, expands on hover/focus
   return (
-    <header className={`fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-700 ease-in-out overflow-hidden ${isExpanded ? 'h-[85px]' : 'h-[50px] shadow-sm'}`}>
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-2 sm:px-6 shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500 ease-in-out h-14 hover:h-24 focus-within:h-24 group/nav overflow-x-auto overflow-y-hidden">
       {/* 1. BRANDING & SEARCH - Crystalline Module */}
-      <div className={`flex items-center gap-4 border-r border-white/10 pr-10 transition-all duration-500 ${isExpanded ? 'h-10' : 'h-8'}`}>
+      <div className="flex items-center gap-2 border-r border-white/10 pr-4 h-10">
         <Link to="/" className="relative group">
-          <span className={`text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] ${isExpanded ? 'text-4xl' : 'text-3xl'}`}>
+          <span className="text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] text-3xl group-hover:text-4xl">
             ∂
           </span>
           <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
-        
         <button 
           onClick={openSearch} 
-          className={`flex items-center gap-2 font-black uppercase tracking-[0.2em] transition-all duration-500 ${
-            isExpanded 
-              ? 'text-[9px] text-slate-400 hover:text-indigo-500 mt-1' 
-              : 'p-2 bg-indigo-500/10 text-indigo-500 rounded-xl hover:bg-indigo-500 hover:text-white shadow-sm'
-          }`}
+          className="flex items-center gap-2 p-2 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white shadow-sm transition-all duration-300"
           title="Search Archive"
         >
-          <Search className={isExpanded ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
-          {isExpanded && <span>ARCHIVE</span>}
+          <Search className="w-4 h-4" />
+          <span className="hidden group-hover/nav:inline text-xs font-bold tracking-tight ml-1 transition-all duration-300">ARCHIVE</span>
         </button>
       </div>
 
       {/* 2. THE EXPANDED GRID RIBBON */}
-      <div className="flex-1 grid grid-flow-col auto-cols-auto gap-1 px-6 h-full items-center justify-start overflow-hidden">
+      <nav className="flex-1 flex flex-row gap-2 px-2 h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap group/nav transition-all duration-500">
         
         {/* NAV BAY */}
-        <RibbonGroup title="Navigation" isExpanded={isExpanded}>
-          <CoursesDropdown isExpanded={isExpanded} />
-          <NavLink to="/reference" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Reference Library">
-            <Library className="w-5 h-5" />
-          </NavLink>
-          <NavLink to="/docs" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Technical Docs">
-            <FileText className="w-5 h-5" />
-          </NavLink>
+        <RibbonGroup title="Navigation">
+          <CoursesDropdown />
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/reference" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Reference Library">
+              <Library className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Reference</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/docs" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Technical Docs">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Docs</span>
+            </NavLink>
+          </div>
         </RibbonGroup>
 
         {/* ECOSYSTEM BAY */}
-        <RibbonGroup title="Ecosystem" isExpanded={isExpanded}>
-          <NavLink to="/universal-calc" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Universal Calculus">
-            <Cpu className="w-5 h-5" />
-          </NavLink>
-          <NavLink to="/openmat" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="OpenMAT Platform">
-            <Atom className="w-5 h-5" />
-          </NavLink>
-          <NavLink to="/open-craft" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-lime-100 dark:bg-lime-900/40 text-lime-600" : "text-slate-500 hover:bg-lime-50 dark:hover:bg-lime-900/30"}`} title="OpenCraft Sandbox">
-            <Gamepad2 className="w-5 h-5" />
-          </NavLink>
-          <NavLink to="/cnc-sim" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-orange-100 dark:bg-orange-900/40 text-orange-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="CNC Simulator">
-            <Wrench className="w-5 h-5" />
-          </NavLink>
-          <NavLink to="/logic-sim" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-violet-100 dark:bg-violet-900/40 text-violet-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Logic Suite">
-            <Binary className="w-5 h-5" />
-          </NavLink>
+        <RibbonGroup title="Ecosystem">
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/universal-calc" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Universal Calculus">
+              <Cpu className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Universal</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/openmat" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="OpenMAT Platform">
+              <Atom className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">OpenMAT</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/open-craft" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-lime-50 dark:hover:bg-lime-900/30"}`} style={{height: '100%'}} aria-label="OpenCraft Sandbox">
+              <Gamepad2 className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">OpenCraft</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/cnc-sim" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="CNC Simulator">
+              <Wrench className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">CNC Sim</span>
+            </NavLink>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <NavLink to="/logic-sim" className={({ isActive }) => `flex flex-col items-center justify-center h-full p-2 rounded-lg transition-all ${isActive ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700 shadow" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} style={{height: '100%'}} aria-label="Logic Suite">
+              <Binary className="w-5 h-5" />
+              <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Logic</span>
+            </NavLink>
+          </div>
         </RibbonGroup>
 
         {/* MATH BAY */}
-        <RibbonGroup title="Analysis" isExpanded={isExpanded}>
+        <RibbonGroup title="Analysis">
           <button onClick={onGraphToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="2D Grapher">
             <Activity className="w-5 h-5" />
           </button>
@@ -411,7 +427,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* ENGINES BAY */}
-        <RibbonGroup title="Development" isExpanded={isExpanded}>
+        <RibbonGroup title="Development">
           <button onClick={onScratchToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all" title="Scratchpad">
             <PenLine className="w-5 h-5" />
           </button>
@@ -424,7 +440,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* SIMS BAY */}
-        <RibbonGroup title="Laboratories" isExpanded={isExpanded}>
+        <RibbonGroup title="Laboratories">
           <button onClick={onChemToggle} className="p-2 rounded-lg text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-all" title="Chemistry Lab">
             <FlaskConical className="w-5 h-5" />
           </button>
@@ -448,10 +464,10 @@ function TopBar({
             <GraduationCap className="w-5 h-5" />
           </button>
         </RibbonGroup>
-      </div>
+      </nav>
 
       {/* 3. ASSISTANTS & UTILS */}
-      <div className="flex items-center gap-3 border-l border-[var(--color-border)] pl-8 h-full">
+      <div className="flex items-center gap-2 border-l border-[var(--color-border)] pl-4 h-full">
         <ScoreWidget />
         <button onClick={handleVideoToggle} className={`p-2.5 rounded-xl transition-all ${videoActive ? "bg-sky-500 text-white shadow-lg shadow-sky-500/30" : "text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20"}`} title="Video Academy">
           <PlayCircle className="w-5 h-5" />
@@ -468,13 +484,7 @@ function TopBar({
 
         <div className="w-px h-8 bg-white/10 mx-2" />
         
-        <button 
-          onClick={onToggleExpanded}
-          className={`p-2 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-110 active:scale-95 transition-all duration-500 ${isExpanded ? 'rotate-0' : 'rotate-180'}`}
-          title={isExpanded ? "Collapse Ribbon" : "Expand Ribbon"}
-        >
-          <ChevronUp size={16} />
-        </button>
+
       </div>
     </header>
   );
@@ -773,7 +783,7 @@ export default function AppShell({ children }) {
           onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
           onMouseLeave={() => setSidebarHovered(false)}
           className={`fixed left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-all duration-500 ease-in-out w-[280px]
-          ${ribbonExpanded ? "top-[85px]" : "top-[50px]"}
+          ${ribbonExpanded ? "top-14" : "top-[50px]"}
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
@@ -795,7 +805,7 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} ${ribbonExpanded ? "pt-[85px]" : "pt-[50px]"}`}
+          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} ${ribbonExpanded ? "pt-14" : "pt-[50px]"}`}
         >
           <div
             className={
