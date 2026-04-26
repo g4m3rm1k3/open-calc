@@ -5,34 +5,34 @@ import { useState, useRef, useEffect, useCallback } from "react";
 // ─────────────────────────────────────────────────────────────────
 const STYLES = `
 :root {
-  --bg:         #0b0e12;
-  --surface:    #111520;
-  --surface2:   #161c2a;
-  --surface3:   #1c2435;
-  --border:     #252e42;
-  --border2:    #1e2738;
-  --phosphor:   #00e5a0;
-  --phosphor2:  #00b87a;
-  --phosphor-d: rgba(0,229,160,0.08);
-  --amber:      #f5a623;
-  --amber-d:    rgba(245,166,35,0.1);
-  --red:        #e05050;
-  --blue:       #4da6ff;
-  --blue-d:     rgba(77,166,255,0.1);
-  --violet:     #a78bfa;
-  --text:       #d4dde8;
-  --text2:      #8a9ab5;
-  --text3:      #4a5a72;
-  --text-bright:#eef2f8;
+  --bg:         #eef2f7;
+  --surface:    #f8fafc;
+  --surface2:   #ffffff;
+  --surface3:   #e8edf5;
+  --border:     #cfd7e6;
+  --border2:    #dde4ef;
+  --phosphor:   #0076d6;
+  --phosphor2:  #005fb8;
+  --phosphor-d: rgba(0,118,214,0.08);
+  --amber:      #c46a00;
+  --amber-d:    rgba(196,106,0,0.1);
+  --red:        #c24141;
+  --blue:       #2563eb;
+  --blue-d:     rgba(37,99,235,0.1);
+  --violet:     #6d5bd0;
+  --text:       #1f2937;
+  --text2:      #475569;
+  --text3:      #64748b;
+  --text-bright:#0f172a;
   --mono:       'JetBrains Mono','Fira Code',monospace;
-  --sans:       'Inter',system-ui,sans-serif;
+  --sans:       'Segoe UI','Inter',system-ui,sans-serif;
   --serif:      'Georgia',Cambria,serif;
-  --header-h:   48px;
-  --sidebar-w:  240px;
-  --controls-h: 76px;
+  --header-h:   58px;
+  --sidebar-w:  320px;
+  --controls-h: 84px;
 }
 #physlab-root *, #physlab-root *::before, #physlab-root *::after { box-sizing: border-box; margin:0; padding:0; }
-#physlab-root { font-family: var(--mono); font-size:13px; line-height:1.5; }
+#physlab-root { font-family: var(--sans); font-size:14px; line-height:1.6; }
 #physlab-root ::-webkit-scrollbar { width:4px; height:4px; }
 #physlab-root ::-webkit-scrollbar-track { background:var(--surface); }
 #physlab-root ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
@@ -40,27 +40,29 @@ const STYLES = `
 /* Header */
 #physlab-root .pl-header {
   display:flex; align-items:center; gap:0;
-  background:var(--surface); border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#fdfefe 0%, #edf2f8 100%); border-bottom:1px solid var(--border);
   padding:0; z-index:10; height:var(--header-h); flex-shrink:0;
+  box-shadow:0 1px 0 rgba(255,255,255,0.8) inset;
 }
 #physlab-root .pl-logo {
   display:flex; align-items:center; gap:10px;
   padding:0 20px; height:100%; border-right:1px solid var(--border); flex-shrink:0;
 }
 #physlab-root .pl-logo-mark {
-  width:28px; height:28px; border:2px solid var(--phosphor); border-radius:4px;
+  width:28px; height:28px; border:2px solid var(--phosphor); border-radius:6px;
   display:flex; align-items:center; justify-content:center;
   font-size:12px; font-weight:600; color:var(--phosphor);
+  background:rgba(255,255,255,0.9);
 }
 #physlab-root .pl-logo-text {
-  font-size:13px; font-weight:600; letter-spacing:.12em;
+  font-size:15px; font-weight:700; letter-spacing:.12em;
   text-transform:uppercase; color:var(--text-bright);
 }
 #physlab-root .pl-lab-tabs { display:flex; height:100%; flex:1; overflow-x:auto; }
 #physlab-root .pl-lab-tabs::-webkit-scrollbar { height:0; }
 #physlab-root .pl-lab-tab {
-  display:flex; align-items:center; gap:6px; padding:0 14px; height:100%;
-  cursor:pointer; font-size:10px; font-weight:500; letter-spacing:.08em;
+  display:flex; align-items:center; gap:6px; padding:0 16px; height:100%;
+  cursor:pointer; font-size:11px; font-weight:600; letter-spacing:.08em;
   text-transform:uppercase; color:var(--text3);
   border-right:1px solid var(--border2); border-bottom:2px solid transparent;
   white-space:nowrap; transition:color .15s,border-color .15s,background .15s;
@@ -69,21 +71,21 @@ const STYLES = `
 #physlab-root .pl-lab-tab:hover { color:var(--text); background:var(--surface2); }
 #physlab-root .pl-lab-tab.active {
   color:var(--phosphor); border-bottom:2px solid var(--phosphor);
-  background:var(--phosphor-d);
+  background:linear-gradient(180deg,rgba(0,118,214,0.06) 0%, rgba(0,118,214,0.11) 100%);
 }
 #physlab-root .pl-tab-dot { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.4; }
 #physlab-root .pl-lab-tab.active .pl-tab-dot { opacity:1; }
 #physlab-root .pl-tab-cat {
-  font-size:9px; opacity:.5; margin-left:2px; font-weight:400;
+  font-size:10px; opacity:.6; margin-left:2px; font-weight:500;
 }
 #physlab-root .pl-header-actions {
   display:flex; align-items:center; gap:8px; padding:0 16px;
   height:100%; border-left:1px solid var(--border); flex-shrink:0;
 }
 #physlab-root .pl-hbtn {
-  font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase;
-  padding:6px 14px; border-radius:3px; border:1px solid var(--border);
-  background:transparent; color:var(--text2); cursor:pointer; transition:all .14s;
+  font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  padding:8px 16px; border-radius:8px; border:1px solid var(--border);
+  background:var(--surface2); color:var(--text2); cursor:pointer; transition:all .14s;
   white-space:nowrap;
 }
 #physlab-root .pl-hbtn:hover { border-color:var(--text2); color:var(--text); }
@@ -101,19 +103,19 @@ const STYLES = `
 #physlab-root .pl-sidebar {
   width:var(--sidebar-w); flex-shrink:0;
   display:flex; flex-direction:column;
-  background:var(--surface); border-right:1px solid var(--border); overflow:hidden;
+  background:linear-gradient(180deg,#f8fafc 0%, #eef3f9 100%); border-right:1px solid var(--border); overflow:hidden;
 }
 #physlab-root .pl-sb-section { padding:12px 14px 10px; border-bottom:1px solid var(--border2); }
 #physlab-root .pl-sb-label {
-  font-size:9px; font-weight:600; letter-spacing:.14em;
+  font-size:10px; font-weight:700; letter-spacing:.14em;
   text-transform:uppercase; color:var(--text3); margin-bottom:5px;
 }
-#physlab-root .pl-lab-name { font-size:12px; font-weight:600; color:var(--text-bright); margin-bottom:3px; }
-#physlab-root .pl-lab-obj { font-size:11px; color:var(--text2); line-height:1.45; }
+#physlab-root .pl-lab-name { font-size:18px; font-weight:700; color:var(--text-bright); margin-bottom:6px; line-height:1.35; }
+#physlab-root .pl-lab-obj { font-size:13px; color:var(--text2); line-height:1.6; }
 #physlab-root .pl-proc-scroll { flex:1; overflow-y:auto; padding:6px 0; }
 #physlab-root .pl-step {
-  display:flex; gap:9px; align-items:flex-start; padding:7px 12px;
-  cursor:pointer; transition:background .12s; border-left:2px solid transparent;
+  display:flex; gap:11px; align-items:flex-start; padding:10px 14px;
+  cursor:pointer; transition:background .12s; border-left:3px solid transparent;
 }
 #physlab-root .pl-step:hover { background:var(--surface2); }
 #physlab-root .pl-step.active { background:rgba(0,229,160,0.06); border-left-color:var(--phosphor); }
@@ -121,18 +123,18 @@ const STYLES = `
   background:var(--phosphor2); color:var(--bg); border-color:var(--phosphor2);
 }
 #physlab-root .pl-step-n {
-  width:19px; height:19px; flex-shrink:0; border-radius:50%;
+  width:24px; height:24px; flex-shrink:0; border-radius:50%;
   border:1px solid var(--border); display:flex; align-items:center;
   justify-content:center; font-size:10px; color:var(--text3); margin-top:1px;
 }
-#physlab-root .pl-step-title { font-size:11px; font-weight:500; color:var(--text); margin-bottom:1px; }
-#physlab-root .pl-step-desc { font-size:10px; color:var(--text3); line-height:1.4; }
+#physlab-root .pl-step-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+#physlab-root .pl-step-desc { font-size:12px; color:var(--text3); line-height:1.5; }
 
 /* Guided question callout */
 #physlab-root .pl-question {
-  margin:6px 12px; padding:8px 10px;
+  margin:8px 14px; padding:10px 12px;
   background:rgba(167,139,250,0.07); border:1px solid rgba(167,139,250,0.2);
-  border-radius:4px; font-size:10px; color:var(--violet); line-height:1.5;
+  border-radius:10px; font-size:12px; color:var(--violet); line-height:1.6;
 }
 #physlab-root .pl-question::before { content:"? "; font-weight:700; }
 
@@ -144,7 +146,7 @@ const STYLES = `
 #physlab-root .pl-status-val { color:var(--phosphor); font-weight:500; }
 
 /* Main */
-#physlab-root .pl-main { display:flex; flex-direction:column; flex:1; overflow:hidden; background:var(--bg); }
+#physlab-root .pl-main { display:flex; flex-direction:column; flex:1; overflow:hidden; background:linear-gradient(180deg,#f3f6fb 0%, #edf2f7 100%); }
 
 /* Panel tabs */
 #physlab-root .pl-panel-tabs {
@@ -152,8 +154,8 @@ const STYLES = `
   border-bottom:1px solid var(--border); padding:0 16px; flex-shrink:0;
 }
 #physlab-root .pl-ptab {
-  font-size:11px; font-weight:500; letter-spacing:.08em; text-transform:uppercase;
-  padding:10px 14px; cursor:pointer; color:var(--text3);
+  font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  padding:14px 16px; cursor:pointer; color:var(--text3);
   border-bottom:2px solid transparent; transition:all .14s;
   user-select:none; border:none; background:transparent; border-bottom:2px solid transparent;
 }
@@ -166,24 +168,46 @@ const STYLES = `
 #physlab-root .pl-panel.active { display:block; }
 
 /* Theory */
-#physlab-root .pl-theory-wrap { padding:24px 28px 36px; }
-#physlab-root .pl-theory-block { max-width:740px; margin:0 auto; }
+#physlab-root .pl-theory-wrap { padding:32px 36px 44px; }
+#physlab-root .pl-theory-block { max-width:960px; margin:0 auto; }
+#physlab-root .pl-overview-grid {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;
+  max-width:980px; margin:0 auto 20px;
+}
+#physlab-root .pl-overview-card {
+  background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+  padding:14px 16px; box-shadow:0 8px 24px rgba(15,23,42,0.05);
+}
+#physlab-root .pl-overview-card.wide { grid-column:1 / -1; }
+#physlab-root .pl-overview-head {
+  font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--phosphor); margin-bottom:8px; font-family:var(--mono);
+}
+#physlab-root .pl-overview-copy {
+  font-size:13px; color:var(--text2); line-height:1.7;
+}
+#physlab-root .pl-chip-row { display:flex; flex-wrap:wrap; gap:8px; }
+#physlab-root .pl-chip {
+  padding:6px 10px; border-radius:999px; background:#eef4ff; border:1px solid #c7dafb;
+  font-size:12px; color:#1e3a8a;
+}
+#physlab-root .pl-chip b { color:var(--phosphor); }
 #physlab-root .pl-theory-h1 {
-  font-family:var(--serif); font-size:21px; font-weight:600;
-  color:var(--text-bright); margin-bottom:5px; letter-spacing:-.01em;
+  font-family:var(--serif); font-size:34px; font-weight:700;
+  color:var(--text-bright); margin-bottom:8px; letter-spacing:-.02em;
 }
 #physlab-root .pl-theory-sub {
-  font-size:10px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase;
-  margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);
+  font-size:11px; color:var(--text3); letter-spacing:.12em; text-transform:uppercase;
+  margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border);
 }
 #physlab-root .pl-theory-section { margin-bottom:28px; }
 #physlab-root .pl-theory-h2 {
-  font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--amber); margin-bottom:10px;
+  font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:12px;
 }
 #physlab-root .pl-theory-p {
-  font-family:var(--sans); font-size:14px; color:var(--text2);
-  line-height:1.8; margin-bottom:10px;
+  font-family:var(--sans); font-size:16px; color:var(--text2);
+  line-height:1.85; margin-bottom:12px;
 }
 #physlab-root .pl-theory-p em { color:var(--text); font-style:italic; }
 #physlab-root .pl-theory-p strong { color:var(--text-bright); font-weight:500; }
@@ -191,14 +215,14 @@ const STYLES = `
 #physlab-root .pl-eq {
   background:var(--surface2); border:1px solid var(--border);
   border-left:3px solid var(--amber); border-radius:0 4px 4px 0;
-  padding:12px 16px; margin:14px 0;
+  padding:12px 16px; margin:14px 0; box-shadow:0 8px 24px rgba(15,23,42,0.05);
 }
 #physlab-root .pl-eq-tag {
   font-size:9px; letter-spacing:.14em; text-transform:uppercase;
   color:var(--text3); margin-bottom:7px;
 }
 #physlab-root .pl-eq-formula {
-  font-size:17px; font-weight:500; color:var(--text-bright);
+  font-size:28px; font-weight:700; color:var(--text-bright);
   letter-spacing:.04em; margin-bottom:8px;
 }
 #physlab-root .pl-eq-vars { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
@@ -211,7 +235,7 @@ const STYLES = `
 #physlab-root .pl-live {
   background:var(--surface3); border:1px solid var(--border);
   border-radius:4px; padding:12px 14px; margin:12px 0;
-  display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+  display:flex; flex-wrap:wrap; gap:14px; align-items:center; box-shadow:0 8px 24px rgba(15,23,42,0.04);
 }
 #physlab-root .pl-live-label {
   font-size:9px; letter-spacing:.1em; text-transform:uppercase;
@@ -292,7 +316,7 @@ const STYLES = `
 #physlab-root .pl-rec-btn:hover { background:var(--blue); color:var(--bg); }
 
 /* Data */
-#physlab-root .pl-data-wrap { padding:22px 26px; }
+#physlab-root .pl-data-wrap { padding:28px 32px; }
 #physlab-root .pl-data-header {
   display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px;
 }
@@ -329,19 +353,19 @@ const STYLES = `
 }
 
 /* Analysis */
-#physlab-root .pl-analysis-wrap { padding:22px 26px; }
+#physlab-root .pl-analysis-wrap { padding:28px 32px; }
 #physlab-root .pl-analysis-layout {
   display:grid; grid-template-columns:1fr 300px; gap:18px; max-width:1060px;
 }
 #physlab-root .pl-plot-outer {
   background:var(--surface2); border:1px solid var(--border);
-  border-radius:4px; overflow:hidden; aspect-ratio:4/3; position:relative;
+  border-radius:10px; overflow:hidden; aspect-ratio:4/3; position:relative;
 }
 #physlab-root .pl-plot-outer canvas { width:100%; height:100%; display:block; }
 #physlab-root .pl-analysis-right { display:flex; flex-direction:column; gap:12px; }
 #physlab-root .pl-result-card {
   background:var(--surface2); border:1px solid var(--border);
-  border-radius:4px; padding:13px 15px;
+  border-radius:10px; padding:13px 15px; box-shadow:0 8px 24px rgba(15,23,42,0.05);
 }
 #physlab-root .pl-result-title {
   font-size:9px; letter-spacing:.14em; text-transform:uppercase;
@@ -1615,6 +1639,103 @@ const LABS = [
   },
 ];
 
+const LAB_META = {
+  freefall: {
+    learn: "Gravity gives the same downward acceleration to every freely falling object when air resistance is negligible.",
+    variables: [
+      "d = distance fallen",
+      "t = fall time",
+      "g = gravitational acceleration"
+    ],
+    graphWhy: "Plot d against t² because free fall is quadratic in time. That linearizes the experiment and makes the slope equal to g/2.",
+    commonMistake: "Students often plot d vs t and wonder why the graph curves. The curve is expected. Squaring time is the trick that turns the relationship into a line."
+  },
+  incline: {
+    learn: "Only the component of gravity parallel to the ramp changes the cart's speed, so acceleration scales with sin(theta).",
+    variables: [
+      "a = cart acceleration",
+      "g = gravitational acceleration",
+      "theta = ramp angle"
+    ],
+    graphWhy: "Plot a against sin(theta), not theta itself, because Newton's law gives a = g sin(theta) exactly.",
+    commonMistake: "Using degrees directly on the x-axis hides the relationship. The physics is linear in sin(theta), not in the angle number."
+  },
+  hooke: {
+    learn: "A spring stretches in proportion to force only while it stays in its elastic region.",
+    variables: [
+      "F = applied force",
+      "x = extension",
+      "k = spring constant"
+    ],
+    graphWhy: "Plot F against x so the slope gives k directly.",
+    commonMistake: "Mixing up total length and extension breaks the analysis. Hooke's law uses extension from the natural length."
+  },
+  pendulum: {
+    learn: "A pendulum's period depends mostly on length, not bob mass, when the swing angle stays small.",
+    variables: [
+      "T = period",
+      "L = pendulum length",
+      "g = gravitational acceleration"
+    ],
+    graphWhy: "Plot T² against L because squaring removes the square root and makes the slope equal to 4pi²/g.",
+    commonMistake: "Large starting angles make the simple formula less accurate. Small-angle motion is part of the model."
+  },
+  snell: {
+    learn: "Light bends because its speed changes when it enters a new medium, and Snell's law tracks that change with sines.",
+    variables: [
+      "theta1 = incident angle",
+      "theta2 = refracted angle",
+      "n2 = refractive index of the second medium"
+    ],
+    graphWhy: "Plot sin(theta2) against sin(theta1) because Snell's law is linear in the sines of the angles.",
+    commonMistake: "Plotting raw angles makes the trend look curved. The law does not say angle is proportional to angle."
+  },
+  ohm: {
+    learn: "Voltage is the push, current is the response, and resistance controls how hard it is for charge to flow.",
+    variables: [
+      "V = voltage",
+      "I = current",
+      "R = resistance"
+    ],
+    graphWhy: "Plot I against V so the slope is conductance G = 1/R. Then invert the slope to recover resistance.",
+    commonMistake: "Reading the slope itself as resistance is backward. A steeper I-V line means a lower resistance."
+  },
+  cooling: {
+    learn: "Cooling slows down as an object approaches ambient temperature because the temperature difference driving heat loss shrinks.",
+    variables: [
+      "T = object temperature",
+      "Ta = ambient temperature",
+      "k = cooling constant"
+    ],
+    graphWhy: "Plot ln(T - Ta) against time because the logarithm turns the exponential decay into a line with slope -k.",
+    commonMistake: "Using raw temperature instead of temperature excess hides the exponential structure and ruins the linear fit."
+  }
+};
+
+function cleanPhysicsText(value) {
+  if (typeof value !== "string") return value;
+  return value
+    .replaceAll("â€”", "—")
+    .replaceAll("â€“", "–")
+    .replaceAll("â†’", "→")
+    .replaceAll("â‰ˆ", "≈")
+    .replaceAll("âˆš", "√")
+    .replaceAll("âˆ’", "−")
+    .replaceAll("Â½", "½")
+    .replaceAll("Â·", "·")
+    .replaceAll("Â²", "²")
+    .replaceAll("Â³", "³")
+    .replaceAll("Î¸", "θ")
+    .replaceAll("Ï†", "φ")
+    .replaceAll("â‚€", "₀")
+    .replaceAll("â‚", "₁")
+    .replaceAll("â‚‚", "₂")
+    .replaceAll("â‚ƒ", "₃")
+    .replaceAll("â‰¤", "≤")
+    .replaceAll("â‰¥", "≥")
+    .replaceAll("Ã—", "×");
+}
+
 // ─────────────────────────────────────────────────────────────────
 //  LIVE THEORY CALCULATOR FUNCTIONS
 // ─────────────────────────────────────────────────────────────────
@@ -1856,11 +1977,13 @@ export default function PhysicsLab({ onClose }) {
 
   // ── Inject CSS once ──────────────────────────────────────────
   useEffect(() => {
-    const el = document.createElement("style");
-    el.id = "physlab-styles";
-    if (!document.getElementById("physlab-styles")) {
-      el.textContent = STYLES; document.head.appendChild(el);
+    let el = document.getElementById("physlab-styles");
+    if (!el) {
+      el = document.createElement("style");
+      el.id = "physlab-styles";
+      document.head.appendChild(el);
     }
+    el.textContent = STYLES;
     registerLiveCalcs();
     return () => { document.getElementById("physlab-styles")?.remove(); delete window.PLLIVE; };
   }, []);
@@ -1987,32 +2110,32 @@ export default function PhysicsLab({ onClose }) {
     const sx=x=>pad.l+(x-(xMin-xP))/(xR+xP*2)*aw;
     const sy=y=>pad.t+(yMax+yP-y)/(yR+yP*2)*ah;
 
-    ctx.fillStyle="#111520"; ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle="rgba(0,229,160,0.06)"; ctx.lineWidth=0.8;
+    ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="rgba(148,163,184,0.28)"; ctx.lineWidth=0.8;
     for (let i=0;i<=5;i++) {
       const x=xMin-xP+i*(xR+xP*2)/5;
       ctx.beginPath(); ctx.moveTo(sx(x),pad.t); ctx.lineTo(sx(x),pad.t+ah); ctx.stroke();
-      ctx.font="10px JetBrains Mono,monospace"; ctx.fillStyle="#4a5a72"; ctx.textAlign="center";
+      ctx.font="10px JetBrains Mono,monospace"; ctx.fillStyle="#64748b"; ctx.textAlign="center";
       ctx.fillText(x.toFixed(x<1?3:x<10?2:1), sx(x), pad.t+ah+18);
       const y=yMin-yP+i*(yR+yP*2)/5;
       ctx.beginPath(); ctx.moveTo(pad.l,sy(y)); ctx.lineTo(pad.l+aw,sy(y)); ctx.stroke();
       ctx.textAlign="right";
       ctx.fillText(y.toFixed(y<1?3:y<10?2:1), pad.l-4, sy(y)+4);
     }
-    ctx.strokeStyle="#252e42"; ctx.lineWidth=1.5;
+    ctx.strokeStyle="#94a3b8"; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ah); ctx.lineTo(pad.l+aw,pad.t+ah); ctx.stroke();
 
     const x1=xMin-xP, x2=xMax+xP;
     ctx.beginPath(); ctx.moveTo(sx(x1),sy(slope*x1+intercept)); ctx.lineTo(sx(x2),sy(slope*x2+intercept));
-    ctx.strokeStyle="rgba(245,166,35,0.6)"; ctx.lineWidth=1.5; ctx.setLineDash([7,4]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle="rgba(196,106,0,0.85)"; ctx.lineWidth=1.5; ctx.setLineDash([7,4]); ctx.stroke(); ctx.setLineDash([]);
 
     xs.forEach((x,i) => {
       ctx.beginPath(); ctx.arc(sx(x),sy(ys[i]),5,0,Math.PI*2);
-      ctx.fillStyle="#00e5a0"; ctx.fill();
-      ctx.strokeStyle="rgba(0,229,160,0.3)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle="#0076d6"; ctx.fill();
+      ctx.strokeStyle="rgba(0,118,214,0.24)"; ctx.lineWidth=1; ctx.stroke();
     });
 
-    ctx.fillStyle="#8a9ab5"; ctx.font="11px JetBrains Mono,monospace"; ctx.textAlign="center";
+    ctx.fillStyle="#475569"; ctx.font="11px JetBrains Mono,monospace"; ctx.textAlign="center";
     ctx.fillText(setup.xLabel, W/2, H-5);
     ctx.save(); ctx.translate(13,(H+pad.t)/2); ctx.rotate(-Math.PI/2);
     ctx.fillText(setup.yLabel,0,0); ctx.restore();
@@ -2023,6 +2146,9 @@ export default function PhysicsLab({ onClose }) {
   //  RENDER
   // ─────────────────────────────────────────────────────────────
   const sch = lab.dataSchema;
+  const meta = LAB_META[lab.id];
+  const theoryHtml = cleanPhysicsText(lab.theory());
+  const guideHtml = cleanPhysicsText(GUIDES[lab.id] ?? "<div class='pl-guide'><div class='pl-guide-title'>No guide yet for this lab.</div></div>");
 
   return (
     <div id="physlab-root" style={{
@@ -2048,10 +2174,10 @@ export default function PhysicsLab({ onClose }) {
         <div className="pl-header-actions">
           <span style={{fontSize:"10px",color:"var(--text3)",marginRight:"2px"}}>{running?"Running":"Idle"}</span>
           <button className={`pl-hbtn ${running?"stop":"run"}`} onClick={toggleRun}>
-            {running ? "⏹ Stop" : "▶ Run"}
+            {running ? "Stop" : "Run"}
           </button>
-          <button className="pl-hbtn" onClick={resetLab}>↺ Reset</button>
-          {onClose && <button className="pl-hbtn" onClick={onClose}>✕</button>}
+          <button className="pl-hbtn" onClick={resetLab}>Reset</button>
+          {onClose && <button className="pl-hbtn" onClick={onClose}>Close</button>}
         </div>
       </div>
 
@@ -2062,8 +2188,8 @@ export default function PhysicsLab({ onClose }) {
         <aside className="pl-sidebar">
           <div className="pl-sb-section">
             <div className="pl-sb-label">Current Lab</div>
-            <div className="pl-lab-name">{lab.name} — {lab.subtitle}</div>
-            <div className="pl-lab-obj">{lab.objective}</div>
+            <div className="pl-lab-name">{cleanPhysicsText(`${lab.name} — ${lab.subtitle}`)}</div>
+            <div className="pl-lab-obj">{cleanPhysicsText(lab.objective)}</div>
           </div>
           <div className="pl-sb-section" style={{paddingTop:"10px",paddingBottom:"6px"}}>
             <div className="pl-sb-label">Procedure</div>
@@ -2077,12 +2203,12 @@ export default function PhysicsLab({ onClose }) {
                 >
                   <div className="pl-step-n">{i+1}</div>
                   <div>
-                    <div className="pl-step-title">{s.title}</div>
-                    <div className="pl-step-desc">{s.desc}</div>
+                    <div className="pl-step-title">{cleanPhysicsText(s.title)}</div>
+                    <div className="pl-step-desc">{cleanPhysicsText(s.desc)}</div>
                   </div>
                 </div>
                 {i===stepIdx && s.question && (
-                  <div className="pl-question">{s.question}</div>
+                  <div className="pl-question">{cleanPhysicsText(s.question)}</div>
                 )}
               </div>
             ))}
@@ -2105,7 +2231,32 @@ export default function PhysicsLab({ onClose }) {
             {/* THEORY */}
             <div className={`pl-panel ${panel==="theory"?"active":""}`}>
               <div className="pl-theory-wrap">
-                <div dangerouslySetInnerHTML={{__html: lab.theory()}} />
+                {meta && (
+                  <div className="pl-overview-grid">
+                    <div className="pl-overview-card wide">
+                      <div className="pl-overview-head">Concept</div>
+                      <div className="pl-overview-copy">{cleanPhysicsText(meta.learn)}</div>
+                    </div>
+                    <div className="pl-overview-card">
+                      <div className="pl-overview-head">Variables</div>
+                      <div className="pl-chip-row">
+                        {meta.variables.map((item) => {
+                          const [symbol, meaning] = item.split(" = ");
+                          return <div key={item} className="pl-chip"><b>{cleanPhysicsText(symbol)}</b> = {cleanPhysicsText(meaning)}</div>;
+                        })}
+                      </div>
+                    </div>
+                    <div className="pl-overview-card">
+                      <div className="pl-overview-head">Why This Plot Works</div>
+                      <div className="pl-overview-copy">{cleanPhysicsText(meta.graphWhy)}</div>
+                    </div>
+                    <div className="pl-overview-card wide">
+                      <div className="pl-overview-head">Common Mistake</div>
+                      <div className="pl-overview-copy">{cleanPhysicsText(meta.commonMistake)}</div>
+                    </div>
+                  </div>
+                )}
+                <div dangerouslySetInnerHTML={{__html: theoryHtml}} />
               </div>
             </div>
 
@@ -2129,7 +2280,7 @@ export default function PhysicsLab({ onClose }) {
                   ))}
                   <div style={{flex:1}} />
                   <div className="pl-ctrl-group">
-                    <button className="pl-rec-btn" onClick={recordPoint}>⊕ Record Point</button>
+                    <button className="pl-rec-btn" onClick={recordPoint}>Record Point</button>
                   </div>
                 </div>
               </div>
@@ -2202,7 +2353,7 @@ export default function PhysicsLab({ onClose }) {
                           <div className="pl-result-row"><span className="pl-rk">Theory</span><span className="pl-rv theory">{regResult.res.theory} {regResult.res.unit}</span></div>
                           <div className="pl-result-row"><span className="pl-rk">% Error</span><span className={`pl-rv ${parseFloat(regResult.res.pctError)<2?"good":parseFloat(regResult.res.pctError)<5?"":"warn"}`}>{regResult.res.pctError}%</span></div>
                         </div>
-                        <div className="pl-analysis-insight" dangerouslySetInnerHTML={{__html:lab.analysisInsight(regResult.slope,regResult.intercept,regResult.r2,state)}} />
+                        <div className="pl-analysis-insight" dangerouslySetInnerHTML={{__html:cleanPhysicsText(lab.analysisInsight(regResult.slope,regResult.intercept,regResult.r2,state))}} />
                       </>
                     ) : (
                       <div className="pl-result-card">
@@ -2220,7 +2371,7 @@ export default function PhysicsLab({ onClose }) {
             {/* GUIDE */}
             <div className={`pl-panel ${panel==="guide"?"active":""}`}>
               <div className="pl-theory-wrap">
-                <div dangerouslySetInnerHTML={{__html: GUIDES[lab.id] ?? "<div class='pl-guide'><div class='pl-guide-title'>No guide yet for this lab.</div></div>"}} />
+                <div dangerouslySetInnerHTML={{__html: guideHtml}} />
               </div>
             </div>
 
