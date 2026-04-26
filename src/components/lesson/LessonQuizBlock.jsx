@@ -115,7 +115,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                     key={i}
                     disabled={submitted}
                     onClick={() => !submitted && setSelected(opt)}
-                    className={`w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-lg border text-sm transition-colors ${optStyle}`}
+                    className={`w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-lg border text-sm transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-400 ${optStyle}`}
                   >
                     <span className="flex-shrink-0 w-5 h-5 rounded-full border border-current flex items-center justify-center text-xs font-bold mt-0.5">
                       {letter}

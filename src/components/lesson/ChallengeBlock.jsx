@@ -96,52 +96,63 @@ export default function ChallengeBlock({ challenge, number }) {
     return step
   })
 
+  // Icon based on difficulty
+  const DIFFICULTY_ICONS = {
+    easy: '🌱',
+    medium: '🚀',
+    hard: '🔥',
+  }
+  const difficulty = challenge.difficulty || 'medium'
+  const icon = DIFFICULTY_ICONS[difficulty] || '⭐'
+
   return (
-    <div className="oc-shell-card mb-8 overflow-hidden">
-      {/* Header with difficulty tag */}
-      <div className="px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-slate-100 flex items-center justify-center text-white dark:text-slate-900 text-xs font-black shadow-md">
-            {number ?? '?'}
+    <div className="relative mb-12 rounded-3xl shadow-2xl border border-slate-200/40 dark:border-slate-800/40 bg-white/30 dark:bg-slate-900/30 backdrop-blur-3xl overflow-hidden transition-all">
+      {/* Softer glassy header with subtle gradient */}
+      <div className="px-8 py-6 flex items-center justify-between bg-gradient-to-r from-brand-400/20 via-white/10 to-emerald-300/10 dark:from-brand-900/20 dark:via-slate-900/10 dark:to-emerald-900/10 border-b border-brand-200/20 dark:border-brand-800/20 shadow-md backdrop-blur-2xl">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-white/70 dark:bg-slate-900/70 flex items-center justify-center text-2xl shadow-lg border-2 border-brand-200/40 dark:border-brand-800/40 backdrop-blur-md">
+            {icon}
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Challenge Milestone</p>
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-brand-700 dark:text-brand-200 opacity-90">Challenge Milestone</div>
+            <div className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">#{number ?? '?'}</div>
+          </div>
         </div>
-        <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${DIFFICULTY_COLORS[challenge.difficulty] ?? DIFFICULTY_COLORS.medium}`}>
-          {challenge.difficulty}
+        <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-md border-2 ${DIFFICULTY_COLORS[difficulty] ?? DIFFICULTY_COLORS.medium}`}
+          style={{ letterSpacing: '0.18em', background: 'rgba(255,255,255,0.30)', backdropFilter: 'blur(8px)' }}>
+          {difficulty}
         </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-10 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+        {/* Problem */}
+        <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-5 mb-6 border border-slate-100/40 dark:border-slate-800/40 shadow-sm backdrop-blur-md">
+          <MarkdownProse text={challenge.problem} className="text-base leading-relaxed text-slate-700 dark:text-slate-300" />
+        </div>
 
-      {/* Problem */}
-      <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 mb-4">
-        <ProblemText text={challenge.problem} />
-      </div>
+        {/* Hint */}
+        {challenge.hint && (
+          <Spoiler label="💡 Show hint">
+            <MarkdownProse text={challenge.hint} className="text-base text-slate-600 dark:text-slate-300 italic leading-relaxed" />
+          </Spoiler>
+        )}
 
-      {/* Hint */}
-      {challenge.hint && (
-        <Spoiler label="Show hint">
-          <p className="text-sm text-slate-600 dark:text-slate-400 italic leading-relaxed">{parseProse(challenge.hint)}</p>
+        {/* Full walkthrough (unstyled, no extra backgrounds) */}
+        <Spoiler label="🧩 Show full walkthrough">
+          <div className="mb-4 flex flex-col gap-2">
+            {normalizedWalkthrough.map((step, i) => (
+              <MathStep key={i} step={step} stepNumber={step.expression ? i + 1 : undefined} />
+            ))}
+          </div>
+          <div className="bg-white/80 dark:bg-slate-900/80 border border-brand-200/40 dark:border-brand-800/40 rounded-xl p-4 mt-2 shadow backdrop-blur-md">
+            <span className="mr-2">✅</span>
+            <span className="text-base font-bold text-brand-700 dark:text-brand-200 leading-relaxed">
+              Answer:
+            </span>
+            <MarkdownProse text={String(challenge.answer ?? '')} className="inline ml-2" />
+          </div>
         </Spoiler>
-      )}
-
-      {/* Full walkthrough */}
-      <Spoiler label="Show full walkthrough">
-        <div className="divide-y divide-slate-100 dark:divide-slate-800 mb-3">
-          {normalizedWalkthrough.map((step, i) => (
-            <div key={i}>
-              <MathStep step={step} stepNumber={step.expression ? i + 1 : undefined} />
-              {step.prereq && <PrereqBox prereq={step.prereq} />}
-            </div>
-          ))}
-        </div>
-        <div className="bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 rounded-lg p-3">
-          <p className="text-sm font-semibold text-brand-700 dark:text-brand-300 leading-relaxed">
-            Answer: {parseProse(String(challenge.answer ?? ''))}
-          </p>
-        </div>
-      </Spoiler>
+      </div>
     </div>
-  </div>
   )
 }
