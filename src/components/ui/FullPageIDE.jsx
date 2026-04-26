@@ -464,7 +464,16 @@ function buildFileTree(paths) {
 }
 
 // ── FileTreeNode – recursive ──────────────────────────────────────────────────
-function FileTreeNode({ name, node, prefix, activeFile, onOpen, onDelete, depth, T }) {
+function FileTreeNode({
+  name,
+  node,
+  prefix,
+  activeFile,
+  onOpen,
+  onDelete,
+  depth,
+  T,
+}) {
   const isFolder = node !== null && typeof node === "object";
   const fullPath = prefix ? `${prefix}/${name}` : name;
   const [expanded, setExpanded] = useState(true);
@@ -498,10 +507,14 @@ function FileTreeNode({ name, node, prefix, activeFile, onOpen, onDelete, depth,
             userSelect: "none",
           }}
         >
-          <span style={{ color: T.muted, display: "flex", alignItems: "center" }}>
+          <span
+            style={{ color: T.muted, display: "flex", alignItems: "center" }}
+          >
             {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
           </span>
-          <span style={{ color: T.orange, display: "flex", alignItems: "center" }}>
+          <span
+            style={{ color: T.orange, display: "flex", alignItems: "center" }}
+          >
             {expanded ? <FolderOpen size={12} /> : <Folder size={12} />}
           </span>
           <span>{name}</span>
@@ -536,15 +549,28 @@ function FileTreeNode({ name, node, prefix, activeFile, onOpen, onDelete, depth,
         gap: 6,
         padding: `3px 8px 3px ${indent + 22}px`,
         cursor: "pointer",
-        background: isActive ? T.accentBg : hovered ? T.surface2 : "transparent",
-        borderRight: isActive ? `2px solid ${T.accent}` : "2px solid transparent",
+        background: isActive
+          ? T.accentBg
+          : hovered
+            ? T.surface2
+            : "transparent",
+        borderRight: isActive
+          ? `2px solid ${T.accent}`
+          : "2px solid transparent",
         fontSize: 12,
         color: isActive ? T.accent : T.text,
         userSelect: "none",
       }}
     >
       <FileIcon name={name} T={T} />
-      <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <span
+        style={{
+          flex: 1,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
         {name}
       </span>
       {hovered && (
@@ -857,7 +883,9 @@ function CppPane({ output, running, stdin, onStdinChange, onRun, T }) {
                   margin: "0 0 8px 0",
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
-                  background: T.dark ? "rgba(248,81,73,0.07)" : "rgba(207,34,46,0.05)",
+                  background: T.dark
+                    ? "rgba(248,81,73,0.07)"
+                    : "rgba(207,34,46,0.05)",
                   borderRadius: 6,
                   padding: "8px 10px",
                 }}
@@ -891,9 +919,11 @@ function CppPane({ output, running, stdin, onStdinChange, onRun, T }) {
                 {output.program_error}
               </pre>
             )}
-            {!output.compiler_error && !output.program_output && !output.program_error && (
-              <span style={{ color: T.muted }}>(no output)</span>
-            )}
+            {!output.compiler_error &&
+              !output.program_output &&
+              !output.program_error && (
+                <span style={{ color: T.muted }}>(no output)</span>
+              )}
             {output.status !== undefined && !output.compiler_error && (
               <div
                 style={{
@@ -909,9 +939,8 @@ function CppPane({ output, running, stdin, onStdinChange, onRun, T }) {
           </>
         ) : (
           <span style={{ color: T.muted, fontSize: 12 }}>
-            Press{" "}
-            <span style={{ color: T.green, fontWeight: 700 }}>Run</span> to
-            compile and execute your C++ code.
+            Press <span style={{ color: T.green, fontWeight: 700 }}>Run</span>{" "}
+            to compile and execute your C++ code.
           </span>
         )}
       </div>
@@ -1252,9 +1281,7 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
                     : "transparent",
                 border: "none",
                 borderBottom:
-                  mode === id
-                    ? `2px solid ${color}`
-                    : "2px solid transparent",
+                  mode === id ? `2px solid ${color}` : "2px solid transparent",
                 borderRadius: 0,
                 color: mode === id ? color : T.muted,
                 cursor: "pointer",
@@ -1651,9 +1678,7 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
                 transition: "background 0.15s",
                 zIndex: 10,
               }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.background = T.accent)
-              }
+              onMouseOver={(e) => (e.currentTarget.style.background = T.accent)}
               onMouseOut={(e) =>
                 (e.currentTarget.style.background = T.dark
                   ? "#21262d"
@@ -1758,7 +1783,9 @@ export default function FullPageIDE({ cell, onChange, onClose }) {
               </div>
 
               {/* Iframe */}
-              <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
+              <div
+                style={{ flex: 1, overflow: "hidden", position: "relative" }}
+              >
                 <iframe
                   sandbox="allow-scripts"
                   srcdoc={srcdocContent}
