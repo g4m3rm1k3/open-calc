@@ -43,9 +43,12 @@ function normalizeQuestion(q) {
   // Support both legacy format (type/text/answer-as-string) and new format (question/answer-as-index/explanation)
   const type = q.type ?? 'choice'
   const text = q.text ?? q.question ?? ''
-  const answer = typeof q.answer === 'number' && Array.isArray(q.options)
-    ? q.options[q.answer]
-    : q.answer
+  // Support both 'answer' and 'correct' as the answer index
+  const answerIndex = typeof q.answer === 'number' ? q.answer
+    : (typeof q.correct === 'number' ? q.correct : undefined)
+  const answer = typeof answerIndex === 'number' && Array.isArray(q.options)
+    ? q.options[answerIndex]
+    : (q.answer ?? q.correct)
   const hints = q.hints ?? (q.explanation ? [q.explanation] : [])
   return { ...q, type, text, answer, hints }
 }
