@@ -18,20 +18,20 @@
     --sidebar-width: 280px;
     --topbar-height: 60px;
     /* Semantic color tokens */
-    --color-surface:    #ffffff;
-    --color-page-bg:    #f1f5f9;   /* slate-100/light */
-    --color-border:     #e2e8f0;   /* slate-200 */
-    --color-text-muted: #64748b;   /* slate-500 */
+    --color-surface:    rgba(255, 255, 255, 0.72);
+    --color-page-bg:    #f1f5f9;
+    --color-border:     rgba(15, 23, 42, 0.08);
+    --color-text-muted: #64748b;
     
     /* Premium Shadows */
     --shadow-premium: 0 20px 50px -12px rgba(15, 23, 42, 0.08), 0 4px 20px -2px rgba(15, 23, 42, 0.04);
   }
 
   .dark {
-    --color-surface:    #0f172a;   /* slate-900 */
-    --color-page-bg:    #020617;   /* deep navy */
-    --color-border:     #334155;   /* slate-700 */
-    --color-text-muted: #94a3b8;   /* slate-400 */
+    --color-surface:    rgba(15, 23, 42, 0.72);
+    --color-page-bg:    #020617;
+    --color-border:     rgba(255, 255, 255, 0.08);
+    --color-text-muted: #94a3b8;
     
     --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
   }
@@ -59,16 +59,25 @@
 
 @layer components {
   .oc-shell-card {
-    @apply rounded-[32px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 backdrop-blur-sm transition-all duration-300;
+    @apply rounded-[32px] border border-[var(--color-border)] bg-[var(--color-surface)] backdrop-blur-xl transition-all duration-300;
     box-shadow: var(--shadow-premium);
   }
 
   .oc-soft-panel {
-    @apply rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300;
+    @apply rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] backdrop-blur-md shadow-sm transition-all duration-300;
   }
 
   .oc-soft-panel:hover {
     box-shadow: var(--shadow-premium);
+  }
+
+  .oc-premium-card-inner {
+    @apply rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300;
+  }
+
+  /* Interaction Utilities */
+  .oc-btn-premium {
+    @apply transition-all duration-200 active:scale-[0.94] active:brightness-90 hover:brightness-105 hover:shadow-xl hover:-translate-y-0.5;
   }
 
   .oc-header-gradient {
@@ -159,6 +168,13 @@
   /* Tab button */
   .tab-btn {
     @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors;
+  }
+  .oc-sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium;
+  }
+  
+  .oc-sidebar-item-active {
+    @apply oc-header-gradient shadow-sm font-bold;
   }
   .tab-btn-active {
     @apply border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900;

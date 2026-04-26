@@ -289,7 +289,7 @@ function TopBar({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[60] h-[60px] bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+    <header className="fixed top-0 left-0 right-0 z-[60] h-[60px] bg-[var(--color-surface)] backdrop-blur-xl border-b border-[var(--color-border)] flex items-center px-4 gap-3">
       {/* Mobile Menu & Brand */}
       <div className="lg:hidden flex items-center gap-1">
         <button
@@ -800,7 +800,15 @@ export default function AppShell({ children }) {
   return (
     <ChatProvider>
     <GrapherContext.Provider value={{ openGrapher }}>
-      <div className="min-h-screen bg-[var(--color-page-bg)] transition-colors duration-500">
+      <div className="min-h-screen transition-colors duration-500 relative overflow-hidden">
+        <div className="fixed inset-0 z-[-1] bg-[var(--color-page-bg)]" />
+        <div className="fixed inset-0 z-[-1] opacity-30 dark:opacity-20 pointer-events-none" 
+             style={{ 
+               backgroundImage: `radial-gradient(at 0% 0%, rgb(59, 130, 246) 0, transparent 50%), 
+                                radial-gradient(at 100% 0%, rgb(168, 85, 247) 0, transparent 50%), 
+                                radial-gradient(at 50% 100%, rgb(236, 72, 153) 0, transparent 50%)` 
+             }} 
+        />
         <TopBar
           onMenuToggle={() => setSidebarOpen((o) => !o)}
           sidebarOpen={sidebarOpen}
@@ -862,7 +870,7 @@ export default function AppShell({ children }) {
         <aside
           onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
           onMouseLeave={() => setSidebarHovered(false)}
-          className={`fixed top-[60px] left-0 bottom-0 z-50 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 ease-in-out w-[280px]
+          className={`fixed top-[60px] left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-transform duration-300 ease-in-out w-[280px]
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}

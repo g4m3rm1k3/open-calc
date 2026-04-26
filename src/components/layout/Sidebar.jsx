@@ -275,20 +275,40 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                   status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
                 }
 
+                let progressPct = 0
+                if (quizScore && quizScore.total > 0) {
+                  progressPct = (quizScore.attempted / quizScore.total) * 100
+                } else {
+                  const checkpoints = lesson.checkpoints?.length ?? 1
+                  const completed = getLessonStatus(lesson.id, checkpoints)
+                  // Simplified progress heuristic
+                  if (completed === 'pass') progressPct = 100
+                  else if (completed === 'partial') progressPct = 50
+                  else if (completed === 'active') progressPct = 25
+                }
+
                 return (
                   <Link
                     key={`lesson-${chapter.number}-${lesson.slug}-${lesson.id || lesson.title}`}
                     ref={el => { if (isActive) activeLinkRef.current = el }}
                     to={`/chapter/${chapter.number}/${lesson.slug}`}
                     onClick={onNavigate}
-                    className={`flex items-center gap-2.5 px-5 pl-8 py-2 text-sm transition-colors ${
+                    className={`oc-sidebar-item pl-8 group ${
                       isActive
-                        ? 'sidebar-link-active'
+                        ? 'oc-sidebar-item-active text-brand-700 dark:text-brand-100'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                     }`}
+                    style={isActive ? {
+                      backgroundImage: `linear-gradient(to right, rgba(59, 130, 246, 0.1) ${progressPct}%, transparent ${progressPct}%)`
+                    } : {}}
                   >
                     <ProgressDot status={status} />
                     <span className="leading-snug">{lesson.title}</span>
+                    {isActive && progressPct > 0 && (
+                      <span className="ml-auto text-[9px] font-black text-brand-500/60 tabular-nums">
+                        {Math.round(progressPct)}%
+                      </span>
+                    )}
                   </Link>
                 )
               })}

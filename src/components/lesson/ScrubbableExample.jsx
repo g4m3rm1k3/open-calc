@@ -345,7 +345,7 @@ export default function ScrubbableExample({ example, number, lessonId }) {
             {!isDone && (
               <button
                 onClick={() => setCurrentStep(s => s + 1)}
-                className="px-8 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-500/20 active:scale-95"
+                className="oc-btn-premium px-10 py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-500/30 ring-4 ring-brand-500/10 hover:ring-brand-500/20 active:ring-0"
               >
                 Reveal Step →
               </button>

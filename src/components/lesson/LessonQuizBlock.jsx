@@ -144,7 +144,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                 <button
                   onClick={handleSubmit}
                   disabled={(q.type === 'choice' && !selected) || (q.type === 'input' && !inputVal.trim())}
-                  className="px-6 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95 disabled:cursor-not-allowed"
+                  className="oc-btn-premium px-6 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white text-xs font-black uppercase tracking-widest shadow-md disabled:cursor-not-allowed"
                 >
                   Check Answer
                 </button>

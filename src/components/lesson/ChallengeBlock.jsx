@@ -97,17 +97,21 @@ export default function ChallengeBlock({ challenge, number }) {
   })
 
   return (
-    <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-5 mb-5">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-700 dark:bg-slate-500 text-white text-xs font-bold flex-shrink-0">
-          {number ?? '?'}
-        </span>
-        <span className="font-semibold text-slate-700 dark:text-slate-300">Challenge Problem</span>
-        <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-semibold ${DIFFICULTY_COLORS[challenge.difficulty] ?? DIFFICULTY_COLORS.medium}`}>
+    <div className="oc-shell-card mb-8 overflow-hidden">
+      {/* Header with difficulty tag */}
+      <div className="px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-slate-100 flex items-center justify-center text-white dark:text-slate-900 text-xs font-black shadow-md">
+            {number ?? '?'}
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Challenge Milestone</p>
+        </div>
+        <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${DIFFICULTY_COLORS[challenge.difficulty] ?? DIFFICULTY_COLORS.medium}`}>
           {challenge.difficulty}
-        </span>
+        </div>
       </div>
+
+      <div className="p-8">
 
       {/* Problem */}
       <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3 mb-4">
@@ -138,5 +142,6 @@ export default function ChallengeBlock({ challenge, number }) {
         </div>
       </Spoiler>
     </div>
+  </div>
   )
 }
