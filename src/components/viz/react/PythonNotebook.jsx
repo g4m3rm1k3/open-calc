@@ -369,6 +369,25 @@ const CellComponent = React.memo(({ cell, C, onRun, onClear, onRemove, onUpdate,
                     </p>
                   )
                 }
+                // ``` fenced code block
+                if (typeof p === 'string' && p.trimStart().startsWith('```')) {
+                  const lines = p.split('\n')
+                  // strip opening fence (```lang) and closing fence (```)
+                  const inner = lines.slice(1, lines[lines.length - 1].trimStart().startsWith('```') ? -1 : undefined).join('\n')
+                  const lang = lines[0].replace(/^```/, '').trim() || 'bash'
+                  return (
+                    <div key={i} style={{ margin: i === 0 ? '0 0 4px' : '8px 0 0', borderRadius: 7, overflow: 'hidden', border: `1px solid ${C.border}` }}>
+                      {lang && (
+                        <div style={{ padding: '3px 10px', fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: C.muted, background: C.surface2 }}>
+                          {lang}
+                        </div>
+                      )}
+                      <pre style={{ margin: 0, padding: '10px 12px', fontSize: 12, lineHeight: 1.6, overflowX: 'auto', background: C.bg, color: C.text, fontFamily: 'monospace' }}>
+                        <code>{inner}</code>
+                      </pre>
+                    </div>
+                  )
+                }
                 // - Bullet list: string with lines starting with "- "
                 if (typeof p === 'string' && p.trimStart().startsWith('- ')) {
                   const items = p.split('\n').filter(l => l.trim().startsWith('- '))
