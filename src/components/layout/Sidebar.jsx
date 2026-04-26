@@ -105,7 +105,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   return (
     <nav
       ref={navRef}
-      className="h-full overflow-y-auto py-6 sidebar-scroll backdrop-blur-2xl bg-white/40 dark:bg-slate-950/40 border-r border-white/20 dark:border-white/5 transition-all duration-500 shadow-[20px_0_40px_rgba(0,0,0,0.02)]"
+      className={`h-full overflow-y-auto py-10 sidebar-scroll backdrop-blur-3xl bg-white/40 dark:bg-slate-950/60 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(0,0,0,0.4)] ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -203,27 +203,40 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
           </div>
         </div>
 
-        <div className="flex items-center gap-3 px-5 pb-6 mb-4 border-b border-white/20 dark:border-white/5">
+        <div className="flex flex-col gap-4 px-6 pb-8 mb-6 border-b border-white/10">
           <Link
             to={courseHomePath}
             onClick={onNavigate}
-            className="flex-1 flex items-center gap-3 group"
+            className="flex items-center gap-4 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 dark:from-indigo-400/10 dark:to-purple-400/10 flex items-center justify-center border border-indigo-100/50 dark:border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.1)] group-hover:scale-105 transition-transform duration-300">
-               <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">∂</span>
+            <div className="relative shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center text-white text-2xl font-black group-hover:scale-110 transition-transform duration-500">
+                ∂
+              </div>
+              <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 animate-pulse" />
             </div>
-            <div className="min-w-0">
-              <div className="font-black text-slate-900 dark:text-white leading-tight tracking-tight text-lg">{courseName}</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.15em]">{showAllCourses ? 'Omnibus' : courseDesc}</div>
+            <div className="min-w-0 flex flex-col">
+              <div className="font-black text-slate-900 dark:text-white leading-none tracking-[0.15em] text-xl uppercase mb-1.5">{courseName}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest opacity-80 shrink-0">System Node</span>
+                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight truncate">{showAllCourses ? 'Omnibus' : courseDesc}</div>
+              </div>
             </div>
           </Link>
-          <button 
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePin(); }}
-            className="p-1.5 rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden lg:block"
-            title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
-          >
-            {isPinned ? <Pin className="w-4 h-4" /> : <PinOff className="w-4 h-4" />}
-          </button>
+          
+          <div className="flex items-center justify-between mt-2">
+            <button onClick={onSearchOpen} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-500 transition-all">
+              <Search className="w-3.5 h-3.5" /> Discovery Mode
+            </button>
+            <button 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePin(); }}
+              className="p-1.5 rounded-xl transition-all hover:bg-white/10 text-slate-400 hover:text-indigo-400 hidden lg:block"
+              title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
+            >
+              {isPinned ? <Pin className="w-4 h-4" /> : <PinOff className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {/* All-courses panel — shown when not inside a specific course */}
@@ -256,11 +269,14 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
               <Link
                 to={`/chapter/${chapter.number}`}
                 onClick={onNavigate}
-                className={`flex items-center justify-between px-6 py-2.5 text-[10.5px] font-black uppercase tracking-[0.2em] transition-all duration-300 hover:pl-7 ${isActiveChapter ? 'sidebar-chapter-active' : (CHAPTER_COLORS[chapter.number] ?? COURSE_TEXT_COLORS[activeCourseObj?.color] ?? CHAPTER_COLORS[0])}`}
+                className={`flex items-center justify-between px-8 py-3.5 text-[11px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:pl-9 ${isActiveChapter ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`}
               >
-                <span>Ch. {chapter.number} — {chapter.title}</span>
+                <div className="flex flex-col">
+                   <span className="text-[9px] opacity-60 mb-0.5">Chapter 0{chapter.number}</span>
+                   <span>{chapter.title}</span>
+                </div>
                 {chapter.comingSoon && (
-                  <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded text-[9px] font-black normal-case">SOON</span>
+                  <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-500 rounded-lg text-[8px] font-black tracking-widest uppercase">SOON</span>
                 )}
               </Link>
 
@@ -294,10 +310,10 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
                     ref={el => { if (isActive) activeLinkRef.current = el }}
                     to={`/chapter/${chapter.number}/${lesson.slug}`}
                     onClick={onNavigate}
-                    className={`oc-sidebar-item mx-3 pl-8 group overflow-hidden ${
+                    className={`relative mx-4 my-0.5 pl-10 pr-4 py-3 rounded-[1.25rem] flex items-center gap-3 transition-all duration-300 group overflow-hidden ${
                       isActive
-                        ? 'oc-sidebar-item-active text-indigo-700 dark:text-brand-50'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-white/5'
+                        ? 'bg-indigo-600/10 dark:bg-indigo-500/10 text-indigo-700 dark:text-white shadow-[0_0_20px_rgba(79,70,229,0.1)] ring-1 ring-indigo-500/30'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/40 dark:hover:bg-white/5'
                     }`}
                   >
                     {/* Progress Sweep Background for Active State */}

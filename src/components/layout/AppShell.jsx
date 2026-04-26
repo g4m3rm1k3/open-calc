@@ -46,11 +46,12 @@ import {
   Hash,
   Gamepad2,
   Library,
-  LayoutGrid,
-  Zap,
   GraduationCap,
   Atom,
-  FlaskConical
+  FlaskConical,
+  ChevronUp,
+  LayoutGrid,
+  Zap
 } from "lucide-react";
 import TICalc from "../calculator/TICalc.jsx";
 import SigmaCalc from "../calculator/SigmaCalc.jsx";
@@ -246,17 +247,19 @@ function CoursesDropdown() {
   );
 }
 
-function RibbonGroup({ title, children }) {
+function RibbonGroup({ title, children, isExpanded = true }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 flex-none animate-in fade-in slide-in-from-top-1 duration-500">
-      <div className="flex items-center gap-1 p-1 bg-slate-100/30 dark:bg-white/5 rounded-xl border border-[var(--color-border)] h-[42px]">
+    <div className="flex flex-col items-start gap-1 h-full px-5 border-r border-white/5 last:border-none group/ribbon mb-1">
+      <div className={`flex-1 flex items-center gap-1.5 transition-all duration-500 ${isExpanded ? 'scale-100' : 'scale-110 mt-1'}`}>
         {children}
       </div>
-      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 whitespace-nowrap">
-        {title}
-      </span>
+      {isExpanded && (
+        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover/ribbon:text-indigo-500 transition-colors pb-2 animate-in fade-in slide-in-from-top-1 duration-500">
+          {title}
+        </span>
+      )}
     </div>
-  )
+  );
 }
 
 function TopBar({
@@ -296,6 +299,8 @@ function TopBar({
   onBgPickerToggle,
   dark,
   toggleDark,
+  isExpanded,
+  onToggleExpanded
 }) {
   const { openSearch } = useSearchContext();
   const {
@@ -321,22 +326,27 @@ function TopBar({
   }, [gamesMenuOpen]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] h-[90px] bg-[var(--color-surface)] backdrop-blur-3xl border-b border-[var(--color-border)] flex items-center px-6 shadow-sm">
-      {/* 1. BRANDING & SEARCH */}
-      <div className="flex flex-col items-center justify-center gap-1.5 border-r border-[var(--color-border)] pr-8 h-full min-w-[80px]">
-        <Link to="/" className="text-brand-600 dark:text-brand-400 font-black text-3xl tracking-tighter hover:scale-110 transition-transform">
-          ∂
+    <header className={`fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-700 ease-in-out overflow-hidden ${isExpanded ? 'h-[85px]' : 'h-[50px] shadow-sm'}`}>
+      {/* 1. BRANDING & SEARCH - Crystalline Module */}
+      <div className={`flex flex-col items-center justify-center gap-1.5 border-r border-white/10 pr-10 min-w-[80px] transition-all duration-500 ${isExpanded ? 'h-10' : 'h-8'}`}>
+        <Link to="/" className="relative group">
+          <span className={`text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] ${isExpanded ? 'text-4xl' : 'text-2xl pt-2'}`}>
+            ∂
+          </span>
+          <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
-        <button onClick={openSearch} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-brand-500 transition-colors">
-          <Search className="w-3 h-3" /> Search
-        </button>
+        {isExpanded && (
+          <button onClick={openSearch} className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-500 transition-all animate-in fade-in duration-700">
+            <Search className="w-3.5 h-3.5" /> ARCHIVE
+          </button>
+        )}
       </div>
 
       {/* 2. THE EXPANDED GRID RIBBON */}
       <div className="flex-1 grid grid-flow-col auto-cols-auto gap-1 px-6 h-full items-center justify-start overflow-hidden">
         
         {/* NAV BAY */}
-        <RibbonGroup title="Navigation">
+        <RibbonGroup title="Navigation" isExpanded={isExpanded}>
           <CoursesDropdown />
           <NavLink to="/reference" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Reference Library">
             <Library className="w-5 h-5" />
@@ -347,7 +357,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* ECOSYSTEM BAY */}
-        <RibbonGroup title="Ecosystem">
+        <RibbonGroup title="Ecosystem" isExpanded={isExpanded}>
           <NavLink to="/universal-calc" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Universal Calculus">
             <Cpu className="w-5 h-5" />
           </NavLink>
@@ -363,7 +373,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* MATH BAY */}
-        <RibbonGroup title="Analysis">
+        <RibbonGroup title="Analysis" isExpanded={isExpanded}>
           <button onClick={onGraphToggle} className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all" title="2D Grapher">
             <Activity className="w-5 h-5" />
           </button>
@@ -386,7 +396,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* ENGINES BAY */}
-        <RibbonGroup title="Development">
+        <RibbonGroup title="Development" isExpanded={isExpanded}>
           <button onClick={onScratchToggle} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all" title="Scratchpad">
             <PenLine className="w-5 h-5" />
           </button>
@@ -399,7 +409,7 @@ function TopBar({
         </RibbonGroup>
 
         {/* SIMS BAY */}
-        <RibbonGroup title="Laboratories">
+        <RibbonGroup title="Laboratories" isExpanded={isExpanded}>
           <button onClick={onChemToggle} className="p-2 rounded-lg text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-all" title="Chemistry Lab">
             <FlaskConical className="w-5 h-5" />
           </button>
@@ -439,6 +449,16 @@ function TopBar({
         <button onClick={toggleDark} className="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           {dark ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg> 
                 : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>}
+        </button>
+
+        <div className="w-px h-8 bg-white/10 mx-2" />
+        
+        <button 
+          onClick={onToggleExpanded}
+          className={`p-2 rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-110 active:scale-95 transition-all duration-500 ${isExpanded ? 'rotate-0' : 'rotate-180'}`}
+          title={isExpanded ? "Collapse Ribbon" : "Expand Ribbon"}
+        >
+          <ChevronUp size={16} />
         </button>
       </div>
     </header>
@@ -503,6 +523,8 @@ export default function AppShell({ children }) {
   const isRealityRunnerRoute = location.pathname.startsWith("/reality-runner");
   const isStemQuestRoute = location.pathname.startsWith("/stem-quest");
   const isDocsRoute = location.pathname.startsWith("/docs");
+  
+  const [ribbonExpanded, setRibbonExpanded] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarPinned, setSidebarPinned] = useState(() => {
     const saved = localStorage.getItem("oc-sidebar-pinned");
@@ -670,6 +692,8 @@ export default function AppShell({ children }) {
       <div className="min-h-screen transition-colors duration-500 relative overflow-hidden">
         <DynamicBackground mode={dark ? "dark" : "light"} config={bgConfig} />
         <TopBar
+          isExpanded={ribbonExpanded}
+          onToggleExpanded={() => setRibbonExpanded(!ribbonExpanded)}
           onMenuToggle={() => setSidebarOpen((o) => !o)}
           sidebarOpen={sidebarOpen}
           onGraphToggle={() => setGraphOpen((prev) => !prev)}
@@ -733,7 +757,8 @@ export default function AppShell({ children }) {
         <aside
           onMouseEnter={() => !sidebarPinned && setSidebarHovered(true)}
           onMouseLeave={() => setSidebarHovered(false)}
-          className={`fixed top-[90px] left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-transform duration-300 ease-in-out w-[280px]
+          className={`fixed left-0 bottom-0 z-50 bg-[var(--color-surface)] backdrop-blur-xl border-r border-[var(--color-border)] transition-all duration-500 ease-in-out w-[280px]
+          ${ribbonExpanded ? "top-[85px]" : "top-[50px]"}
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           ${isSidebarExpanded ? "lg:translate-x-0" : "lg:-translate-x-[276px]"}
           ${!sidebarPinned && isSidebarExpanded ? "shadow-2xl ring-1 ring-black/5 dark:ring-white/5" : ""}
@@ -755,7 +780,7 @@ export default function AppShell({ children }) {
 
         {/* Main content */}
         <main
-          className={`transition-[padding] duration-300 ease-in-out pt-[90px] pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"}`}
+          className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-0 ${(isChemistryRoute || isOpenMatRoute) ? "h-screen overflow-hidden" : "min-h-screen"} ${sidebarPinned ? "lg:pl-[280px]" : "lg:pl-3"} ${chatOpen ? "lg:pr-[400px]" : "lg:pr-0"} ${ribbonExpanded ? "pt-[85px]" : "pt-[50px]"}`}
         >
           <div
             className={
