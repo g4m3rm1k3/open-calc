@@ -228,21 +228,25 @@ function ChatToggleButton({ onClick, isOpen }) {
   )
 }
 
-function CoursesDropdown() {
-  const location = useLocation();
-  const isActive = location.pathname.startsWith("/chapter") || location.pathname === '/courses';
+function CoursesDropdown({ isExpanded = true }) {
   return (
-    <NavLink
+    <NavLink 
       to="/courses"
-      className={({ isActive }) =>
-        `text-sm font-bold transition-colors ${
-          isActive
-            ? 'text-brand-600 dark:text-brand-400'
-            : 'text-slate-800 dark:text-slate-100 hover:text-brand-600'
+      className={({ isActive }) => 
+        `p-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' 
+            : 'text-slate-500 hover:bg-white/50 dark:hover:bg-white/5'
         }`
       }
+      title="Course Catalog"
     >
-      Courses
+      <BookOpen className="w-5 h-5" />
+      {isExpanded && (
+        <span className="text-sm font-bold tracking-tight animate-in fade-in slide-in-from-left-2 duration-500">
+          Courses
+        </span>
+      )}
     </NavLink>
   );
 }
@@ -328,18 +332,26 @@ function TopBar({
   return (
     <header className={`fixed top-0 left-0 right-0 z-[100] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border-b border-white/10 flex items-center px-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-700 ease-in-out overflow-hidden ${isExpanded ? 'h-[85px]' : 'h-[50px] shadow-sm'}`}>
       {/* 1. BRANDING & SEARCH - Crystalline Module */}
-      <div className={`flex flex-col items-center justify-center gap-1.5 border-r border-white/10 pr-10 min-w-[80px] transition-all duration-500 ${isExpanded ? 'h-10' : 'h-8'}`}>
+      <div className={`flex items-center gap-4 border-r border-white/10 pr-10 transition-all duration-500 ${isExpanded ? 'h-10' : 'h-8'}`}>
         <Link to="/" className="relative group">
-          <span className={`text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] ${isExpanded ? 'text-4xl' : 'text-2xl pt-2'}`}>
+          <span className={`text-indigo-600 dark:text-white font-black tracking-tighter transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(79,70,229,0.5)] ${isExpanded ? 'text-4xl' : 'text-3xl'}`}>
             ∂
           </span>
           <div className="absolute inset-0 bg-indigo-500/20 blur-md rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
-        {isExpanded && (
-          <button onClick={openSearch} className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-500 transition-all animate-in fade-in duration-700">
-            <Search className="w-3.5 h-3.5" /> ARCHIVE
-          </button>
-        )}
+        
+        <button 
+          onClick={openSearch} 
+          className={`flex items-center gap-2 font-black uppercase tracking-[0.2em] transition-all duration-500 ${
+            isExpanded 
+              ? 'text-[9px] text-slate-400 hover:text-indigo-500 mt-1' 
+              : 'p-2 bg-indigo-500/10 text-indigo-500 rounded-xl hover:bg-indigo-500 hover:text-white shadow-sm'
+          }`}
+          title="Search Archive"
+        >
+          <Search className={isExpanded ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
+          {isExpanded && <span>ARCHIVE</span>}
+        </button>
       </div>
 
       {/* 2. THE EXPANDED GRID RIBBON */}
@@ -347,7 +359,7 @@ function TopBar({
         
         {/* NAV BAY */}
         <RibbonGroup title="Navigation" isExpanded={isExpanded}>
-          <CoursesDropdown />
+          <CoursesDropdown isExpanded={isExpanded} />
           <NavLink to="/reference" className={({ isActive }) => `p-2 rounded-lg transition-all ${isActive ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`} title="Reference Library">
             <Library className="w-5 h-5" />
           </NavLink>
