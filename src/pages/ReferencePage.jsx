@@ -27,46 +27,60 @@ function FormulaCard({ entry, onOpenProof }) {
     }
   }, [entry.latex])
 
+  // Subtle categorical sheen
+  const sheenClass = {
+    blue:    'from-blue-600/5 to-transparent',
+    green:   'from-green-600/5 to-transparent',
+    purple:  'from-purple-600/5 to-transparent',
+    cyan:    'from-cyan-600/5 to-transparent',
+    orange:  'from-orange-600/5 to-transparent',
+    emerald: 'from-emerald-600/5 to-transparent',
+    rose:    'from-rose-600/5 to-transparent',
+  }[entry.color] || 'from-slate-600/5 to-transparent'
+
   return (
     <button
       onClick={hasProof ? () => onOpenProof(entry) : undefined}
-      className={`relative w-full text-left bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden transition-all duration-200 group shadow-sm ${
+      className={`relative w-full text-left bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden transition-all duration-300 group shadow-sm ${
         hasProof
-          ? 'hover:shadow-xl hover:border-amber-300 dark:hover:border-amber-700 hover:-translate-y-1 cursor-pointer'
-          : 'hover:shadow-md cursor-default'
+          ? 'hover:shadow-2xl hover:shadow-brand-500/10 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1.5 cursor-pointer'
+          : 'hover:shadow-xl cursor-default hover:-translate-y-0.5'
       }`}
     >
-      <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
-        <div className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      {/* Sheen Accent */}
+      <div className={`absolute inset-0 bg-gradient-to-tr ${sheenClass} opacity-100 pointer-events-none`} />
+
+      <div className="relative z-10 px-5 pt-5 pb-2 flex items-start justify-between gap-2">
+        <div className="font-bold text-[15px] text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
           {entry.name}
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           {hasProof && (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700">
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/20">
               Proof
             </span>
           )}
-          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${c.badge}`}>
+          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm ${c.badge}`}>
             {entry.categoryLabel}
           </span>
         </div>
       </div>
       <div
-        className="px-4 py-4 overflow-x-auto text-center text-slate-900 dark:text-slate-100 bg-slate-50/50 dark:bg-white/5 my-1 mx-4 rounded-lg border border-slate-100 dark:border-transparent"
+        className="relative z-10 px-5 py-5 overflow-x-auto text-center text-slate-900 dark:text-slate-100 bg-white/40 dark:bg-white/5 my-1 mx-3 rounded-xl border border-white/20 dark:border-white/5 shadow-inner"
         dangerouslySetInnerHTML={{ __html: html }}
       />
-      <div className="px-4 pb-3 min-h-[40px] flex flex-col justify-end">
+      <div className="relative z-10 px-5 pb-4 min-h-[46px] flex flex-col justify-end">
         {entry.note && (
-          <div className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium italic line-clamp-2 leading-relaxed">
             {entry.note}
           </div>
         )}
         {hasProof && (
-          <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+          <div className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400 font-black opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0 mt-1">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
             </svg>
-            View step-by-step proof
+            EXPLORE PROOF
           </div>
         )}
       </div>

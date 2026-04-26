@@ -248,6 +248,7 @@ export default function DynamicBackground({ mode, config }) {
   if (config?.type === 'image' && config.url) {
     return (
       <div 
+        data-bg
         className="fixed inset-0 z-[-1] bg-cover bg-center transition-opacity duration-1000"
         style={{ backgroundImage: `url(${config.url})` }}
       />
@@ -257,6 +258,7 @@ export default function DynamicBackground({ mode, config }) {
   if (config?.type === 'gradient' && config.css) {
     return (
       <div 
+        data-bg
         className="fixed inset-0 z-[-1] transition-opacity duration-1000"
         style={{ background: config.css }}
       />
@@ -264,7 +266,7 @@ export default function DynamicBackground({ mode, config }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100 dark:bg-[#020617]">
+    <div data-bg className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100 dark:bg-[#020617]">
       <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
         {isDark ? <NightSystem config={config} /> : <DaySystem config={config} />}
       </Canvas>

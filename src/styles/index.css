@@ -25,6 +25,12 @@
     
     /* Premium Shadows */
     --shadow-premium: 0 20px 50px -12px rgba(15, 23, 42, 0.08), 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+
+    /* Mathematical Analysis Wells */
+    --math-well-bg:     #f8fafc;
+    --math-well-border: #e2e8f0;
+    --math-well-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 10px 20px -10px rgba(0,0,0,0.05);
+    --math-text-shadow: none;
   }
 
   .dark {
@@ -34,6 +40,12 @@
     --color-text-muted: #94a3b8;
     
     --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+
+    /* Mathematical Analysis Wells (Dark) */
+    --math-well-bg:     rgba(0, 0, 0, 0.4);
+    --math-well-border: rgba(34, 211, 238, 0.6);
+    --math-well-shadow: 0 0 50px -10px rgba(34, 211, 238, 0.3), inset 0 0 30px rgba(34, 211, 238, 0.1);
+    --math-text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   }
 
   html {
@@ -42,6 +54,14 @@
 
   body {
     @apply font-sans text-slate-800 dark:text-slate-200 antialiased bg-[var(--color-page-bg)];
+  }
+
+  /* Hide page content while a proof modal is open, but keep the background visible */
+  body.proof-modal-open #root {
+    visibility: hidden;
+  }
+  body.proof-modal-open [data-bg] {
+    visibility: visible;
   }
 
   /* Scrollbar styling */
