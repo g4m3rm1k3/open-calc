@@ -202,19 +202,26 @@ function ChatToggleButton({ onClick, isOpen }) {
   return (
     <button
       onClick={onClick}
-      className={`relative p-2 rounded-lg transition-colors ${
+      className={`relative w-11 h-11 rounded-2xl transition-all duration-500 overflow-hidden group ${
         isOpen
-          ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50"
-          : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+          ? "bg-indigo-600 shadow-[0_0_30px_rgba(79,70,229,0.4)]"
+          : "bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/60 hover:dark:bg-slate-800/60"
       }`}
       aria-label="Study chat"
       title="Study Chat"
     >
-      <MessageSquare className="w-5 h-5" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        {isOpen ? (
+          <X className="w-5 h-5 text-white" />
+        ) : (
+          <div className="relative">
+             <MessageSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+             <div className="absolute inset-0 bg-indigo-500/10 blur-lg rounded-full animate-pulse" />
+          </div>
+        )}
+      </div>
       {unreadCount > 0 && !isOpen && (
-        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
-          {unreadCount > 99 ? '99+' : unreadCount}
-        </span>
+        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
       )}
     </button>
   )

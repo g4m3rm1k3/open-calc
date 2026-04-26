@@ -1,5 +1,6 @@
 // src/components/tutor/TutorPanel.jsx
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { motion } from 'framer-motion'
 import katex from 'katex'
 import { PROVIDERS, getProvider, STORAGE_KEY, DEFAULT_SETTINGS } from './tutorProviders.js'
 
@@ -610,28 +611,15 @@ function SettingsView({ settings, onChange }) {
   )
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-const IconSettings = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-  </svg>
-)
-const IconClose = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-    <path d="M18 6L6 18M6 6l12 12" />
-  </svg>
-)
-const IconSend = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-  </svg>
-)
-const IconChat = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-2 10H6V10h12v2zm0-3H6V7h12v2z" />
-  </svg>
-)
+// Icons
+import {
+  Settings,
+  X,
+  Send,
+  GraduationCap,
+  Sparkles,
+  Maximize2
+} from "lucide-react"
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
 export default function TutorPanel({ lesson, context = null, onApplyCode = null }) {
@@ -780,25 +768,23 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
     <>
       {/* Panel */}
       {open && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
           style={panelStyle}
-          className="flex flex-col rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden select-none min-h-0"
+          className="flex flex-col rounded-[2.5rem] shadow-[0_0_80px_rgba(0,0,0,0.15)] dark:shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border border-white/20 dark:border-white/5 overflow-hidden select-none min-h-0 ring-1 ring-black/5"
         >
-          {/* ── Drag handle / header ── */}
+          {/* Header - Scientific Handle */}
           <div
             onMouseDown={onDragStart}
-            className="flex items-center gap-2 px-3 py-2.5 border-b border-slate-100 dark:border-slate-800 shrink-0 cursor-grab active:cursor-grabbing"
+            className="flex items-center gap-3 px-6 py-5 border-b border-white/10 shrink-0 cursor-grab active:cursor-grabbing bg-gradient-to-r from-transparent via-white/5 to-transparent"
           >
-            {/* Grip dots */}
-            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor" className="text-slate-300 dark:text-slate-600 shrink-0">
-              {[0, 6].map(cx => [2, 8, 14].map(cy => (
-                <circle key={`${cx}-${cy}`} cx={cx + 3} cy={cy + 3} r="1.5" />
-              )))}
-            </svg>
-            <span className="text-base select-none">✨</span>
-            <div className="flex-1 min-w-0">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">AI Tutor</span>
-              <span className="ml-2 text-[11px] text-slate-400 dark:text-slate-500">{provider.label}</span>
+            <div className="w-9 h-9 rounded-2xl bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center shrink-0">
+               <GraduationCap className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1">STEM Coach</span>
+                <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-80 truncate">{provider.label} Advisor v1.0</span>
             </div>
             <button
               onMouseDown={(e) => e.stopPropagation()}
@@ -812,14 +798,14 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M19 12H5M5 12l7 7M5 12l7-7" />
                 </svg>
-              ) : <IconSettings />}
+              ) : <Settings className="w-4 h-4" />}
             </button>
             <button
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={() => setOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors"
+               onMouseDown={(e) => e.stopPropagation()}
+               onClick={() => setOpen(false)}
+               className="p-2 rounded-xl hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
             >
-              <IconClose />
+               <X className="w-4 h-4" />
             </button>
           </div>
 
@@ -939,7 +925,7 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
                     className="px-3 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 self-end">
                     {status === 'thinking'
                       ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                      : <IconSend />}
+                      : <Send className="w-4 h-4" />}
                   </button>
                 </div>
                 {/* Model switcher */}
@@ -981,18 +967,23 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
               <path d="M0 0h10v2H2v8H0z" />
             </svg>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Toggle button — always fixed bottom-right, never moves */}
+      {/* Toggle button — Luminous Advisor Orb */}
       {!open && (
-        <button
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setOpen(true)}
-          className="fixed z-[9997] bottom-4 right-4 w-12 h-12 rounded-full shadow-lg flex items-center justify-center bg-brand-600 text-white hover:bg-brand-700 hover:scale-105 transition-all duration-200"
-          title="AI Tutor"
+          className="fixed z-[9997] bottom-6 right-6 w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all"
+          title="STEM Coach"
         >
-          <IconChat />
-        </button>
+          <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full animate-pulse" />
+          <GraduationCap className="w-6 h-6 relative z-10" />
+        </motion.button>
       )}
     </>
   )
