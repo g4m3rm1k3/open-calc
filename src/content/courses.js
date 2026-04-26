@@ -139,5 +139,12 @@ export const COURSES = [
     desc: 'GPU Pipeline, WebGL & Three.js Mastery',
     color: 'violet'
   },
+  {
+    key: 'ai-engineering',
+    label: 'AI Engineering',
+    path: '/course/ai-engineering',
+    desc: 'LLMs, Agents & Production AI Systems',
+    color: 'rose'
+  },
 ];
 
