@@ -146,5 +146,12 @@ export const COURSES = [
     desc: 'LLMs, Agents & Production AI Systems',
     color: 'rose'
   },
+    {
+    key: 'three-js-2',
+    label: 'ThreeJS P2',
+    path: '/course/three-js-2',
+    desc: 'Learn ThreeJS from first principles',
+    color: 'rose'
+  },
 ];
 
