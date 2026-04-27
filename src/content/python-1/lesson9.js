@@ -420,5 +420,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does the def keyword do in Python?',
+      options: [
+        'Defines a new function',
+        'Deletes a variable',
+        'Returns a value'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is a parameter in a function definition?',
+      options: [
+        'A value returned by the function',
+        'A placeholder for input data',
+        'A variable outside the function'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What happens to variables created inside a function after it finishes?',
+      options: [
+        'They persist globally',
+        'They are deleted (local scope)',
+        'They are converted to parameters'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does the return keyword do?',
+      options: [
+        'Ends the function and sends a value back',
+        'Calls another function',
+        'Prints a value'],
+      correct: 0,
+    },
+  ],
 }

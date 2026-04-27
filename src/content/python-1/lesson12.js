@@ -461,5 +461,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does a for loop do in Python?',
+      options: [
+        'Repeats a block for each value in a sequence',
+        'Repeats a block forever',
+        'Repeats a block only once'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does range(5) produce?',
+      options: [
+        '0, 1, 2, 3, 4',
+        '1, 2, 3, 4, 5',
+        '5, 4, 3, 2, 1'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the accumulator pattern?',
+      options: [
+        'A way to sum or build up a result in a loop',
+        'A way to break out of a loop',
+        'A way to skip iterations'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does the loop variable hold after a for loop ends?',
+      options: [
+        'The first value in the sequence',
+        'The last value assigned',
+        'It is deleted'],
+      correct: 1,
+    },
+  ],
 }

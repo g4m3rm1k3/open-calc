@@ -603,5 +603,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is a function in Python?',
+      options: [
+        'A named block of code that can be called',
+        'A variable',
+        'A loop'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What keyword is used to define a function?',
+      options: [
+        'def',
+        'func',
+        'define'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does return do in a function?',
+      options: [
+        'Exits the function and gives back a value',
+        'Repeats the function',
+        'Defines a variable'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is a parameter?',
+      options: [
+        'A variable listed in the function definition',
+        'A value returned by the function',
+        'A loop variable'],
+      correct: 0,
+    },
+  ],
 }

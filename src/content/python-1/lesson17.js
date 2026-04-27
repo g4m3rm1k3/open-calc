@@ -27,6 +27,37 @@ export default {
   subtitle: 'Why some objects can change in place — and others cannot',
   tags: ['mutable', 'immutable', 'id', 'is', 'copy', 'deepcopy', 'tuple', 'reference', 'alias', 'hashable'],
 
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Which of these is a mutable type in Python?',
+      options: ['int', 'str', 'list'],
+      correct: 2,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does id(x) return?',
+      options: ['The value of x', 'The unique identity (memory address) of x', 'The type of x'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What happens if two variables point to the same mutable object and one is changed?',
+      options: ['Only one variable changes', 'Both variables see the change', 'An error occurs'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why are mutable default arguments a classic Python trap?',
+      options: ['They are re-created every call', 'They are shared across calls', 'They are not allowed'],
+      correct: 1,
+    },
+  ],
+
   hook: {
     question: 'When you assign a variable, do you get the value — or a reference to it?',
     realWorldContext:

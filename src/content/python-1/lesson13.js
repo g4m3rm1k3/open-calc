@@ -478,5 +478,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is an iterable in Python?',
+      options: [
+        'A value you can loop over one item at a time',
+        'A function',
+        'A number'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does for ch in "hello" do?',
+      options: [
+        'Loops over each character in the string',
+        'Loops over each word',
+        'Loops over each number'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does the in operator do in a for loop?',
+      options: [
+        'Tests membership and drives iteration',
+        'Adds two numbers',
+        'Defines a function'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does len() return for a string?',
+      options: [
+        'The number of characters',
+        'The number of words',
+        'The number of lines'],
+      correct: 0,
+    },
+  ],
 }

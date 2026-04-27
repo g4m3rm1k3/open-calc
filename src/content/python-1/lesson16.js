@@ -520,5 +520,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is an argument in Python?',
+      options: [
+        'A value passed to a function when calling it',
+        'A variable inside a function',
+        'A loop'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does a function return if there is no return statement?',
+      options: [
+        'None',
+        '0',
+        'Error'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the difference between a parameter and an argument?',
+      options: [
+        'Parameter is in the definition, argument is in the call',
+        'They are the same',
+        'Argument is always a string'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does the return value of a function do?',
+      options: [
+        'It is given back to the caller',
+        'It is ignored',
+        'It is always printed'],
+      correct: 0,
+    },
+  ],
 }

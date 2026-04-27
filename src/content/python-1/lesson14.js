@@ -486,5 +486,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the main difference between a for loop and a while loop?',
+      options: [
+        'for is for known sequences, while is for unknown counts',
+        'while is faster',
+        'for loops never end'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What must change inside a while loop to avoid an infinite loop?',
+      options: [
+        'The loop variable or condition',
+        'The function name',
+        'The indentation'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does while True: with a break statement do?',
+      options: [
+        'Creates a loop that can exit from the middle',
+        'Creates a loop that never ends',
+        'Creates a for loop'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does while/else mean in Python?',
+      options: [
+        'else runs only if the loop exited normally (no break)',
+        'else always runs',
+        'else runs before the loop'],
+      correct: 0,
+    },
+  ],
 }

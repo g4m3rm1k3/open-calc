@@ -31,6 +31,37 @@ export default {
   subtitle: 'Breaking a complex problem into functions that each do one thing well',
   tags: ['decomposition', 'functions', 'single-responsibility', 'orchestrator', 'tokenization', 'refactoring'],
 
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is decomposition in programming?',
+      options: ['Splitting a problem into functions that each do one thing', 'Making code longer', 'Removing all functions'],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the main benefit of decomposing code?',
+      options: ['It is easier to debug and maintain', 'It runs faster', 'It uses less memory'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is an orchestrator function?',
+      options: ['A function that calls other functions to coordinate work', 'A function with no parameters', 'A function that never returns'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the Single Responsibility Principle?',
+      options: ['Each function should do one thing', 'Each function should be as short as possible', 'Each function should have only one parameter'],
+      correct: 0,
+    },
+  ],
+
   hook: {
     question: 'What happens when your function does too much?',
     realWorldContext:

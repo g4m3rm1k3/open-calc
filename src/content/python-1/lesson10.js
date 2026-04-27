@@ -368,5 +368,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What type does the value True have in Python?',
+      options: [
+        'int',
+        'bool',
+        'str'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does the == operator do?',
+      options: [
+        'Assigns a value',
+        'Checks equality',
+        'Checks type'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Which of these is a logical operator in Python?',
+      options: [
+        'and',
+        'plus',
+        'concat'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the result of 3 < 2 or 5 > 1?',
+      options: [
+        'True',
+        'False',
+        'Error'],
+      correct: 0,
+    },
+  ],
 }

@@ -561,34 +561,37 @@ res
     ],
   },
 
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        text: 'What does 2 + 3 * 4 evaluate to in Python?',
-        options: ['20 — addition is performed first', '14 — multiplication has higher precedence', 'An error — cannot mix operators'],
-        correct: 1,
-      },
-      {
-        id: 'q2',
-        text: 'What is the result of 10 / 2 in Python?',
-        options: ['5 — integer, exact division', '5.0 — / always returns a float', 'An error — 10 and 2 are integers'],
-        correct: 1,
-      },
-      {
-        id: 'q3',
-        text: 'What does 17 % 5 produce?',
-        options: ['3 — the remainder when 17 is divided by 5', '3.4 — the float result of 17 / 5', '2 — the floor of 17 / 5'],
-        correct: 0,
-      },
-      {
-        id: 'q4',
-        text: 'Which expression produces 8 from the numbers 2, 2, and 1?',
-        options: ['2 ** 2 + 1  (equals 5)', '2 ** (2 + 1)  (equals 8)', '(2 ** 2) + 1  (equals 5)'],
-        correct: 1,
-      },
-    ],
-  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does 2 + 3 * 4 evaluate to in Python?',
+      options: ['20 — addition is performed first', '14 — multiplication has higher precedence', 'An error — cannot mix operators'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the result of 10 / 2 in Python?',
+      options: ['5 — integer, exact division', '5.0 — / always returns a float', 'An error — 10 and 2 are integers'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does 17 % 5 produce?',
+      options: ['3 — the remainder when 17 is divided by 5', '3.4 — the float result of 17 / 5', '2 — the floor of 17 / 5'],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Which expression produces 8 from the numbers 2, 2, and 1?',
+      options: ['2 ** 2 + 1  (equals 5)', '2 ** (2 + 1)  (equals 8)', '(2 ** 2) + 1  (equals 5)'],
+      correct: 1,
+    },
+  ],
 
   mentalModel: [
     'An expression is code that evaluates to a value.',
@@ -600,5 +603,5 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  
 }

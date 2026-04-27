@@ -375,5 +375,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is function composition?',
+      options: [
+        'Calling two functions in a row',
+        'Using the output of one function as the input to another',
+        'Defining a function inside another function'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In the expression abs(round(-3.8)), which function is evaluated first?',
+      options: [
+        'abs()',
+        'round()',
+        'They are evaluated at the same time'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does print(print("hi")) output?',
+      options: [
+        'hi',
+        'hi then None',
+        'None then hi'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the result of pow(len("logic"), 2)?',
+      options: [
+        '25',
+        '16',
+        '9'],
+      correct: 1,
+    },
+  ],
 }

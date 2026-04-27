@@ -386,5 +386,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does the function len() return?',
+      options: [
+        'The type of a value',
+        'The length of a sequence',
+        'The sum of a list'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Which function would you use to round a number to two decimal places?',
+      options: [
+        'abs()',
+        'pow()',
+        'round()'],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does print() return?',
+      options: [
+        'The value printed',
+        'None',
+        'The length of the string'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Which function finds the largest value in a list?',
+      options: [
+        'min()',
+        'max()',
+        'abs()'],
+      correct: 1,
+    },
+  ],
 }

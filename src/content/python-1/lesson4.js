@@ -643,42 +643,41 @@ res
     ],
   },
 
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        type: 'choice',
-        text: 'What does x = 5 do in Python?',
-        options: [
-          'Asserts that x and 5 are mathematically equal',
-          'Evaluates 5 and binds the name x to that value in the kernel',
-          'Displays 5 as output',
-        ],
-        answer: 'Evaluates 5 and binds the name x to that value in the kernel',
-      },
-      {
-        id: 'q2',
-        type: 'choice',
-        text: 'x = 3. After x = x * 2, what is x?',
-        options: ['3 — the original value is preserved', '6 — right side evaluates first, then x is rebound', 'An error — you cannot assign x to itself'],
-        answer: '6 — right side evaluates first, then x is rebound',
-      },
-      {
-        id: 'q3',
-        type: 'choice',
-        text: 'What does x += 10 mean?',
-        options: ['x = 10', 'x = x + 10', 'Add 10 to x and display the result'],
-        answer: 'x = x + 10',
-      },
-      {
-        id: 'q4',
-        type: 'choice',
-        text: 'You use a variable name that was never assigned. Python raises:',
-        options: ['A ValueError — the value is unknown', 'A NameError — the name is not in the kernel', 'A TypeError — the type cannot be determined'],
-        answer: 'A NameError — the name is not in the kernel',
-      },
-    ],
-  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does x = 5 do in Python?',
+      options: [
+        'Asserts that x and 5 are mathematically equal',
+        'Evaluates 5 and binds the name x to that value in the kernel',
+        'Displays 5 as output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'x = 3. After x = x * 2, what is x?',
+      options: ['3 — the original value is preserved', '6 — right side evaluates first, then x is rebound', 'An error — you cannot assign x to itself'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does x += 10 mean?',
+      options: ['x = 10', 'x = x + 10', 'Add 10 to x and display the result'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You use a variable name that was never assigned. Python raises:',
+      options: ['A ValueError — the value is unknown', 'A NameError — the name is not in the kernel', 'A TypeError — the type cannot be determined'],
+      correct: 1,
+    },
+  ],
 
   mentalModel: [
     '= is binding, not equality: evaluate the right side, then bind the name to the result.',
@@ -690,5 +689,5 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  
 }

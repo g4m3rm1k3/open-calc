@@ -428,34 +428,37 @@ res
     ],
   },
 
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        text: 'You write code in a cell but do not press Run. Does the kernel update?',
-        options: ['Yes — writing code updates the kernel immediately', 'No — the kernel only sees code after you run the cell', 'Only if you press Save first'],
-        correct: 1,
-      },
-      {
-        id: 'q2',
-        text: 'Cell 7 is below Cell 6 in the document. You run Cell 7 first. Cell 7\'s [n] counter shows:',
-        options: ['[7] — it is the seventh cell', '[1] — it was the first cell run in this session', 'An error — you cannot run out of order'],
-        correct: 1,
-      },
-      {
-        id: 'q3',
-        text: 'What does "Run All" do?',
-        options: ['Saves the notebook', 'Runs all cells in document order, guaranteeing a reproducible state', 'Checks for syntax errors without running'],
-        correct: 1,
-      },
-      {
-        id: 'q4',
-        text: 'Cell 5 defines "radius". Cell 4 uses "radius". You run Cell 4 before Cell 5. What happens?',
-        options: ['Cell 4 uses 0 as a default', 'Cell 4 raises a NameError — radius is not in the kernel yet', 'Cell 4 automatically runs Cell 5 first'],
-        correct: 1,
-      },
-    ],
-  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You write code in a cell but do not press Run. Does the kernel update?',
+      options: ['Yes — writing code updates the kernel immediately', 'No — the kernel only sees code after you run the cell', 'Only if you press Save first'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Cell 7 is below Cell 6 in the document. You run Cell 7 first. Cell 7\'s [n] counter shows:',
+      options: ['[7] — it is the seventh cell', '[1] — it was the first cell run in this session', 'An error — you cannot run out of order'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does "Run All" do?',
+      options: ['Saves the notebook', 'Runs all cells in document order, guaranteeing a reproducible state', 'Checks for syntax errors without running'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Cell 5 defines "radius". Cell 4 uses "radius". You run Cell 4 before Cell 5. What happens?',
+      options: ['Cell 4 uses 0 as a default', 'Cell 4 raises a NameError — radius is not in the kernel yet', 'Cell 4 automatically runs Cell 5 first'],
+      correct: 1,
+    },
+  ],
 
   mentalModel: [
     'A cell runs when you tell it to — not when you write it.',
@@ -469,5 +472,5 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  
 }

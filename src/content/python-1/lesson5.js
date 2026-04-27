@@ -575,5 +575,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does Python do when it runs a program?',
+      options: [
+        'Executes all lines at once',
+        'Executes one line at a time, top to bottom',
+        'Executes only the lines with variables'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'If you set y = x, and then change x, what happens to y?',
+      options: [
+        'y changes with x',
+        'y keeps the value x had at assignment',
+        'y is deleted'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the difference between evaluation and execution?',
+      options: [
+        'Evaluation updates state, execution computes values',
+        'Evaluation computes values, execution updates state',
+        'They are the same'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What happens if you use a variable before assigning it?',
+      options: [
+        'Python uses 0 as a default',
+        'Python raises a NameError',
+        'Python skips the line'],
+      correct: 1,
+    },
+  ],
 }

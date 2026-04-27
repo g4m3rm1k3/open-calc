@@ -586,38 +586,37 @@ res
     ],
   },
 
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        type: 'choice',
-        text: 'What does type(3 + 1.0) return?',
-        options: ["<class 'int'> — the first operand is an int", "<class 'float'> — int + float promotes to float", 'A TypeError — you cannot mix int and float'],
-        answer: "<class 'float'> — int + float promotes to float",
-      },
-      {
-        id: 'q2',
-        type: 'choice',
-        text: 'What does int(3.9) return?',
-        options: ['4 — rounds to nearest integer', '3 — truncates toward zero', 'An error — float cannot be converted to int'],
-        answer: '3 — truncates toward zero',
-      },
-      {
-        id: 'q3',
-        type: 'choice',
-        text: 'Which value is falsy?',
-        options: ['1', '"False"  (a non-empty string)', '0'],
-        answer: '0',
-      },
-      {
-        id: 'q4',
-        type: 'choice',
-        text: 'What is the type of True + 1?',
-        options: ["bool — True is a boolean", "int — bool is a subtype of int, arithmetic promotes to int", "float — mixing types always produces float"],
-        answer: "int — bool is a subtype of int, arithmetic promotes to int",
-      },
-    ],
-  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does type(3 + 1.0) return?',
+      options: ["<class 'int'> — the first operand is an int", "<class 'float'> — int + float promotes to float", 'A TypeError — you cannot mix int and float'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does int(3.9) return?',
+      options: ['4 — rounds to nearest integer', '3 — truncates toward zero', 'An error — float cannot be converted to int'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Which value is falsy?',
+      options: ['1', '"False"  (a non-empty string)', '0'],
+      correct: 2,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the type of True + 1?',
+      options: ["bool — True is a boolean", "int — bool is a subtype of int, arithmetic promotes to int", "float — mixing types always produces float"],
+      correct: 1,
+    },
+  ],
 
   mentalModel: [
     'Every value has a type: int, float, str, or bool.',
@@ -629,5 +628,5 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  
 }

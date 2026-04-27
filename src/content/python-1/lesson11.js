@@ -466,5 +466,46 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does an if statement do?',
+      options: [
+        'Repeats code multiple times',
+        'Executes a block only if a condition is True',
+        'Defines a function'],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the purpose of the else clause?',
+      options: [
+        'It provides a fallback block if the if condition is False',
+        'It repeats the if block',
+        'It ends the program'],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is required after every if, elif, or else line in Python?',
+      options: [
+        'A semicolon',
+        'A colon and an indented block',
+        'Parentheses'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does elif mean?',
+      options: [
+        'Else if',
+        'Else loop',
+        'Else function'],
+      correct: 0,
+    },
+  ],
 }

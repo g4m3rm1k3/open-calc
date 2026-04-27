@@ -429,38 +429,40 @@ res
     ],
   },
 
-  assessment: {
-    questions: [
-      {
-        id: 'q1',
-        text: 'What is the difference between 10 and 10.0 in Python?',
-        options: [
-          'Nothing — they are identical values',
-          '10 is an integer, 10.0 is a float — different types',
-          '10.0 is larger than 10',
-        ],
-        correct: 1,
-      },
-      {
-        id: 'q2',
-        text: 'What does 10 / 3 produce?',
-        options: ['3 (integer, remainder discarded)', '3.3333... (float)', 'An error — division requires equal types'],
-        correct: 1,
-      },
-      {
-        id: 'q3',
-        text: 'What kind of value is "False"?',
-        options: ['A boolean — the value False', 'A string — text that spells "False"', 'An error — False must not be in quotes'],
-        correct: 1,
-      },
-      {
-        id: 'q4',
-        text: 'A cell has three expressions on three lines. No print() is used. How many results appear in the output?',
-        options: ['Three — one per expression', 'One — only the last expression is shown', 'Zero — you need print() for any output'],
-        correct: 1,
-      },
-    ],
-  },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the difference between 10 and 10.0 in Python?',
+      options: [
+        'Nothing — they are identical values',
+        '10 is an integer, 10.0 is a float — different types',
+        '10.0 is larger than 10',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does 10 / 3 produce?',
+      options: ['3 (integer, remainder discarded)', '3.3333... (float)', 'An error — division requires equal types'],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What kind of value is "False"?',
+      options: ['A boolean — the value False', 'A string — text that spells "False"', 'An error — False must not be in quotes'],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A cell has three expressions on three lines. No print() is used. How many results appear in the output?',
+      options: ['Three — one per expression', 'One — only the last expression is shown', 'Zero — you need print() for any output'],
+      correct: 1,
+    },
+  ],
 
   mentalModel: [
     'A value is data. A literal is a value written directly in code.',
@@ -474,5 +476,4 @@ res
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
 }
