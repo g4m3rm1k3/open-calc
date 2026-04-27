@@ -153,5 +153,12 @@ export const COURSES = [
     desc: 'Learn ThreeJS from first principles',
     color: 'rose'
   },
+  {
+    key: 'canvas-1',
+    label: 'HTML Canvas',
+    path: '/course/canvas-1',
+    desc: '2D Graphics, Animation & CAD Foundations',
+    color: 'orange'
+  },
 ];
 
