@@ -222,7 +222,7 @@ export default function LessonPage() {
         <MicroCycleLesson lesson={lesson} />
       </div>
 
-      {lesson.quiz?.length > 0 && <LessonQuizBlock lessonId={lesson.id} questions={lesson.quiz} />}
+      {lesson.quiz?.length > 0 && <LessonQuizBlock key={lesson.id} lessonId={lesson.id} questions={lesson.quiz} />}
 
       {lesson.crossRefs?.length > 0 && (
         <section className="mb-10">

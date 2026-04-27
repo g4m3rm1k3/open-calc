@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { evaluate as mathEval, simplify as mathSimplify } from 'mathjs'
 import { useProgress } from '../../hooks/useProgress.js'
 import { parseProse } from '../math/parseProse.jsx'
@@ -199,8 +199,9 @@ export default function LessonQuizBlock({ lessonId, questions }) {
   const saved = getQuizScore(lessonId)
   const total = questions.length
 
-  // Local session state — fresh each page load
-  const [answers, setAnswers] = useState({})  // index → true/false
+  // Local session state — reset whenever the lesson changes
+  const [answers, setAnswers] = useState({})
+  useEffect(() => { setAnswers({}) }, [lessonId])
 
   const liveCorrect = Object.values(answers).filter(Boolean).length
   const liveAttempted = Object.keys(answers).length
@@ -279,7 +280,7 @@ export default function LessonQuizBlock({ lessonId, questions }) {
       <div className="p-8 space-y-6 bg-slate-50/30 dark:bg-slate-950/20">
         {questions.map((q, i) => (
           <QuizQuestion
-            key={q.id ?? i}
+            key={`${lessonId}-${q.id ?? i}`}
             q={q}
             index={i}
             onAnswer={handleAnswer}
