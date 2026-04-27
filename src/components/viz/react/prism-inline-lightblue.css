@@ -1,0 +1,7 @@
+/* Make normal inline code text light blue in dark mode, but keep syntax highlighting for keywords */
+@media (prefers-color-scheme: dark) {
+  :not(pre) > code[class*="language-"] .token.plain {
+    /*color: #38bdf8 !important; /* Tailwind sky-400 */
+    font-family: 'Courier New', Courier, monospace;
+  }
+}

@@ -1,0 +1,6 @@
+/* Make PrismJS inline code text light blue in dark mode */
+@media (prefers-color-scheme: dark) {
+  :not(pre) > code[class*="language-"] {
+    color: #38bdf8 !important; /* Tailwind sky-400 */
+  }
+}

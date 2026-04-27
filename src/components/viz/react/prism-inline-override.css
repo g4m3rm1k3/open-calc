@@ -1,0 +1,8 @@
+/* Remove PrismJS default inline code background, border-radius, and text-shadow for inline code */
+:not(pre) > code[class*="language-"] {
+  background: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}

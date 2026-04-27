@@ -1,0 +1,8 @@
+/* Remove background from PrismJS tokens for inline code */
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  background: none !important;
+}
