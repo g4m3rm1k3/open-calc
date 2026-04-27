@@ -351,7 +351,6 @@ function TopBar({
 
       {/* 2. THE EXPANDED GRID RIBBON */}
       <nav className="flex-1 flex flex-row gap-2 px-2 h-full items-center justify-start overflow-x-auto overflow-y-hidden whitespace-nowrap group/nav transition-all duration-500">
-        
         {/* NAV BAY */}
         <RibbonGroup title="Navigation">
           <CoursesDropdown />
@@ -367,6 +366,17 @@ function TopBar({
               <span className="text-xs font-semibold mt-1 transition-all duration-300 opacity-0 group-hover/nav:opacity-100 group-focus-within/nav:opacity-100 max-h-0 group-hover/nav:max-h-6 group-focus-within/nav:max-h-6 overflow-hidden">Docs</span>
             </NavLink>
           </div>
+        </RibbonGroup>
+
+        {/* HELP BAY */}
+        <RibbonGroup title="Help">
+          <button
+            onClick={onHelpToggle}
+            className="p-2 rounded-lg text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+            title="Help & Docs"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </button>
         </RibbonGroup>
 
         {/* ECOSYSTEM BAY */}
