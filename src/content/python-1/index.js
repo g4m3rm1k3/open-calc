@@ -28,6 +28,18 @@ import ch2_3 from './ch2-3.js'
 import ch2_4 from './ch2-4.js'
 import ch3_1 from './ch3-1.js'
 import ch3_2 from './ch3-2.js'
+import ch4_1 from './ch4-1.js'
+import ch4_2 from './ch4-2.js'
+import ch4_3 from './ch4-3.js'
+import ch4_4 from './ch4-4.js'
+import ch4_5 from './ch4-5.js'
+import ch4_6 from './ch4-6.js'
+import ch4_7 from './ch4-7.js'
+import ch4_8 from './ch4-8.js'
+import ch4_9 from './ch4-9.js'
+import ch4_10 from './ch4-10.js'
+import ch4_11 from './ch4-11.js'
+import ch4_12 from './ch4-12.js'
 
 export default [
   {
@@ -143,5 +155,11 @@ export default [
     title: 'Data Cleaning',
     course: 'python-1',
     lessons: [ch3_2]
+  },
+  {
+    number: 4.1,
+    title: 'Object-Oriented Programming',
+    course: 'python-1',
+    lessons: [ch4_1, ch4_2, ch4_3, ch4_4, ch4_5, ch4_6, ch4_7, ch4_8, ch4_9, ch4_10, ch4_11, ch4_12]
   }
 ]
