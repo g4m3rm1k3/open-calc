@@ -9,6 +9,7 @@ import Editor from "@monaco-editor/react";
 import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
+import PrismInlineCode from "./PrismInlineCode";
 
 // ── Theme hook ────────────────────────────────────────────────────────────────
 function useIsDark() {
@@ -201,20 +202,17 @@ function InstructionText({ text, T }) {
           ul: ({ node, ...p }) => <ul style={{ listStyleType: "disc", paddingLeft: "1.5rem", marginBottom: "1rem" }} {...p} />,
           ol: ({ node, ...p }) => <ol style={{ listStyleType: "decimal", paddingLeft: "1.5rem", marginBottom: "1rem" }} {...p} />,
           li: ({ node, ...p }) => <li style={{ marginBottom: "0.25rem" }} {...p} />,
-          code: ({ node, inline, ...p }) =>
-            inline ? (
-              <code style={{ fontFamily: "monospace", background: T.panel2, color: T.accent, padding: "2px 6px", borderRadius: 4, fontSize: 12 }} {...p} />
-            ) : (
-              <code style={{ display: "block", padding: "12px", background: T.panel2, borderRadius: 8, margin: "12px 0", fontSize: 12, fontFamily: "monospace" }} {...p} />
-            ),
-          strong: ({ node, ...p }) => <strong style={{ color: T.text, fontWeight: 700 }} {...p} />,
+          code: ({ node, inline, children, ...p }) => (
+            <PrismInlineCode>{children}</PrismInlineCode>
+          ),
+          strong: ({ node, ...p }) => <strong style={{ color: T.text, fontWeight: 700 }} {...p} />, 
           blockquote: ({ node, ...p }) => (
             <blockquote style={{ borderLeft: `3px solid ${T.accent}`, paddingLeft: 14, color: T.muted, margin: "12px 0" }} {...p} />
           ),
-          table: ({ node, ...p }) => <table style={{ borderCollapse: 'collapse', width: '100%', margin: '12px 0', fontSize: 13 }} {...p} />,
-          th: ({ node, ...p }) => <th style={{ padding: '6px 12px', borderBottom: `2px solid ${T.accent}`, textAlign: 'left', color: T.accent, fontWeight: 600 }} {...p} />,
-          td: ({ node, ...p }) => <td style={{ padding: '6px 12px', borderBottom: `1px solid rgba(255,255,255,0.08)`, color: T.text }} {...p} />,
-          tr: ({ node, ...p }) => <tr {...p} />,
+          table: ({ node, ...p }) => <table style={{ borderCollapse: 'collapse', width: '100%', margin: '12px 0', fontSize: 13 }} {...p} />, 
+          th: ({ node, ...p }) => <th style={{ padding: '6px 12px', borderBottom: `2px solid ${T.accent}`, textAlign: 'left', color: T.accent, fontWeight: 600 }} {...p} />, 
+          td: ({ node, ...p }) => <td style={{ padding: '6px 12px', borderBottom: `1px solid rgba(255,255,255,0.08)`, color: T.text }} {...p} />, 
+          tr: ({ node, ...p }) => <tr {...p} />, 
         }}
       >
         {text}
