@@ -53,13 +53,10 @@ function normalizeQuestion(q) {
   return { ...q, type, text, answer, hints }
 }
 
-function QuizQuestion({ q: rawQ, index, onAnswer }) {
+// state shape: { selected, inputVal, hintLevel, submitted, correct }
+function QuizQuestion({ q: rawQ, index, state, onChange, onAnswer }) {
   const q = normalizeQuestion(rawQ)
-  const [selected, setSelected] = useState(null)
-  const [inputVal, setInputVal] = useState('')
-  const [hintLevel, setHintLevel] = useState(-1)
-  const [submitted, setSubmitted] = useState(false)
-  const [correct, setCorrect] = useState(null)
+  const { selected = null, inputVal = '', hintLevel = -1, submitted = false, correct = null } = state ?? {}
 
   const hints = q.hints ?? []
   const allHints = q.type === 'input' ? [null, ...hints] : hints
@@ -67,12 +64,9 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
   const handleSubmit = () => {
     const userAnswer = q.type === 'choice' ? selected : inputVal
     const isCorrect = evaluateAnswer(userAnswer, String(q.answer))
-    setCorrect(isCorrect)
-    setSubmitted(true)
+    onChange(index, { selected, inputVal, hintLevel, submitted: true, correct: isCorrect })
     onAnswer(index, isCorrect)
   }
-
-  const showHint = () => setHintLevel((h) => Math.min(h + 1, allHints.length - 1))
 
   const borderColor = submitted
     ? correct ? 'border-emerald-400 dark:border-emerald-600' : 'border-red-400 dark:border-red-600'
@@ -101,7 +95,6 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
               {q.options.map((opt, i) => {
                 const letter = String.fromCharCode(65 + i)
                 const isSelected = selected === opt
-                const isCorrectOpt = opt === q.answer
                 let optStyle = 'border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 cursor-pointer'
                 if (submitted) {
                   if (isSelected && correct) optStyle = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-600'
@@ -114,7 +107,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                   <button
                     key={i}
                     disabled={submitted}
-                    onClick={() => !submitted && setSelected(opt)}
+                    onClick={() => !submitted && onChange(index, { selected: opt, inputVal, hintLevel, submitted: false, correct: null })}
                     className={`w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-lg border text-sm transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-400 ${optStyle}`}
                   >
                     <span className="flex-shrink-0 w-5 h-5 rounded-full border border-current flex items-center justify-center text-xs font-bold mt-0.5">
@@ -129,7 +122,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
             <input
               type="text"
               value={inputVal}
-              onChange={(e) => !submitted && setInputVal(e.target.value)}
+              onChange={(e) => !submitted && onChange(index, { selected, inputVal: e.target.value, hintLevel, submitted: false, correct: null })}
               onKeyDown={(e) => { if (e.key === 'Enter' && !submitted) handleSubmit() }}
               disabled={submitted}
               placeholder="Type your answer…"
@@ -153,7 +146,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                 </button>
                 {allHints.length > 0 && hintLevel < allHints.length - 1 && (
                   <button
-                    onClick={showHint}
+                    onClick={() => onChange(index, { selected, inputVal, hintLevel: Math.min(hintLevel + 1, allHints.length - 1), submitted, correct })}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                   >
                     💡 Hint {hintLevel + 2 <= allHints.length ? `(${hintLevel + 2}/${allHints.length})` : ''}
@@ -167,7 +160,7 @@ function QuizQuestion({ q: rawQ, index, onAnswer }) {
                 </span>
                 {!correct && (
                   <button
-                    onClick={() => { setSubmitted(false); setSelected(null); setInputVal(''); setCorrect(null) }}
+                    onClick={() => onChange(index, { selected: null, inputVal: '', hintLevel: -1, submitted: false, correct: null })}
                     className="text-xs text-brand-600 dark:text-brand-400 underline underline-offset-2 hover:text-brand-700"
                   >
                     Try again
@@ -199,26 +192,33 @@ export default function LessonQuizBlock({ lessonId, questions }) {
   const saved = getQuizScore(lessonId)
   const total = questions.length
 
-  // Local session state — reset whenever the lesson changes
-  const [answers, setAnswers] = useState({})
-  useEffect(() => { setAnswers({}) }, [lessonId])
+  // All question UI state lives here so it resets when lessonId changes
+  // shape: { [index]: { selected, inputVal, hintLevel, submitted, correct } }
+  const [questionStates, setQuestionStates] = useState({})
+  useEffect(() => { setQuestionStates({}) }, [lessonId])
 
+  const answers = Object.fromEntries(
+    Object.entries(questionStates)
+      .filter(([, s]) => s.submitted)
+      .map(([i, s]) => [i, s.correct])
+  )
   const liveCorrect = Object.values(answers).filter(Boolean).length
   const liveAttempted = Object.keys(answers).length
   const allAttempted = liveAttempted === total
 
+  const handleQuestionChange = useCallback((index, newState) => {
+    setQuestionStates(prev => ({ ...prev, [index]: newState }))
+  }, [])
+
   const handleAnswer = useCallback((index, isCorrect) => {
-    setAnswers((prev) => {
-      const next = { ...prev, [index]: isCorrect }
-      const attempted = Object.keys(next).length
-      const correct = Object.values(next).filter(Boolean).length
-      // Update persisted score immediately after every answer
-      setQuizScore(lessonId, correct, attempted, total)
-      // Mark quiz checkpoint when all questions answered with ≥ 80%
-      if (attempted === total && correct / total >= 0.8) {
+    setQuestionStates(prev => {
+      const allSubmitted = Object.entries(prev).filter(([, s]) => s.submitted).length + 1
+      const correct = Object.entries(prev).filter(([i, s]) => s.submitted && s.correct && Number(i) !== index).length + (isCorrect ? 1 : 0)
+      setQuizScore(lessonId, correct, allSubmitted, total)
+      if (allSubmitted === total && correct / total >= 0.8) {
         markCheckpoint(lessonId, 'quiz-passed')
       }
-      return next
+      return prev
     })
   }, [total, lessonId, setQuizScore, markCheckpoint])
 
@@ -283,6 +283,8 @@ export default function LessonQuizBlock({ lessonId, questions }) {
             key={`${lessonId}-${q.id ?? i}`}
             q={q}
             index={i}
+            state={questionStates[i]}
+            onChange={handleQuestionChange}
             onAnswer={handleAnswer}
           />
         ))}
