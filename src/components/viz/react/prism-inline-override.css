@@ -6,3 +6,16 @@
   text-shadow: none !important;
   box-shadow: none !important;
 }
+
+/* Remove PrismJS background, border-radius, and shadow from block code */
+pre[class*="language-"] {
+  background: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Remove PrismJS text-shadow from all code (block and inline) */
+code[class*="language-"], pre[class*="language-"] {
+  text-shadow: none !important;
+}
