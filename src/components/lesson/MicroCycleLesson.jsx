@@ -236,7 +236,7 @@ function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slat
 // ─── 📘 Semantic Layer ─────────────────────────────────────────────────────
 
 function SemanticsBlock({ semantics }) {
-  if (!semantics) return null
+  if (!semantics) return null;
   return (
     <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
       <div className="px-6 py-4 oc-header-gradient border-b border-sky-100 dark:border-sky-900/40">
@@ -245,15 +245,18 @@ function SemanticsBlock({ semantics }) {
       <div className="p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {semantics.core?.map((item, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="flex-shrink-0 min-w-[60px] p-1.5 rounded bg-white dark:bg-slate-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-sm font-bold text-sky-600 dark:text-sky-400 shadow-sm">
-                <KatexBlock expr={item.symbol} />
+            <div key={i} className="flex flex-col items-stretch gap-2 p-3 rounded-xl bg-sky-50/40 dark:bg-slate-900/40 border border-sky-100 dark:border-sky-800 shadow-sm min-h-[110px]">
+              <div className="flex-shrink-0 w-full flex justify-center mb-1">
+                <div className="p-1.5 rounded bg-white dark:bg-slate-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-sm font-bold text-sky-600 dark:text-sky-400 shadow-sm w-full">
+                  <KatexBlock expr={item.symbol} />
+                </div>
               </div>
-              <p className="text-sm text-slate-700 dark:text-slate-300 pt-1.5">{item.meaning}</p>
+              <div className="flex-1 min-h-[2.5rem] text-sm text-slate-700 dark:text-slate-300 leading-relaxed break-words">
+                <MarkdownProse text={item.meaning} />
+              </div>
             </div>
           ))}
         </div>
-        
         {semantics.rulesOfThumb?.length > 0 && (
           <div className="rounded-xl bg-white dark:bg-slate-900/50 border border-sky-100 dark:border-sky-800/50 p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-2">Rules of Thumb</p>
@@ -269,7 +272,7 @@ function SemanticsBlock({ semantics }) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 // ─── 🌉 Multi-Perspective Synchronization ──────────────────────────────────
