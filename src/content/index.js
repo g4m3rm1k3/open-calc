@@ -43,6 +43,7 @@ import aiEngineering0 from './ai-engineering-0/index.js'
 import aiEngineering11 from './ai-engineering-11/index.js'
 import threeJs2 from "./three-js-2/index.js"
 import canvas1 from './canvas-1/index.js'
+import gcodeParser1 from './gcode-parser-1/index.js'
 
 const CALC_CURRICULUM = [ch0, ch1, ch2, ch3, ch4, ch5, ch6].map(ch => ({ ...ch, course: 'calc' }))
 const DISCRETE_CURRICULUM = [discrete1].map(ch => ({ ...ch, course: 'discrete' }))
@@ -66,6 +67,7 @@ const DESIGN_CURRICULUM = design1.map(ch => ({ ...ch, course: 'design-1' }))
 const THREEJS_CURRICULUM = threejs1.map(ch => ({ ...ch, course: 'three-js-1' }))
 const THREEJS2 = threeJs2.map(ch => ({...ch, course: 'three-js-2'}))
 const CANVAS_CURRICULUM = canvas1.map(ch => ({ ...ch, course: 'canvas-1' }))
+const GCODE_PARSER_CURRICULUM = gcodeParser1.map(ch => ({ ...ch, course: 'gcode-parser-1' }))
 const AI_ENGINEERING_CURRICULUM = [...aiEngineering0, ...aiEngineering11].map(ch => ({ ...ch, course: 'ai-engineering' }))
 
 export const CURRICULUM = [
@@ -92,6 +94,7 @@ export const CURRICULUM = [
   ...AI_ENGINEERING_CURRICULUM,
   ...THREEJS2,
   ...CANVAS_CURRICULUM,
+  ...GCODE_PARSER_CURRICULUM,
 ]
 
 // Flat map for O(1) lookup by slug within chapter

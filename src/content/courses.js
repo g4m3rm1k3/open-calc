@@ -160,5 +160,12 @@ export const COURSES = [
     desc: '2D Graphics, Animation & CAD Foundations',
     color: 'orange'
   },
+  {
+    key: 'gcode-parser-1',
+    label: 'G-Code Interpreter',
+    path: '/course/gcode-parser-1',
+    desc: 'Build a G-Code Parser from First Principles',
+    color: 'teal'
+  },
 ];
 

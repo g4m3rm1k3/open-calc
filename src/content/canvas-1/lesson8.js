@@ -609,7 +609,7 @@ const lesson8 = {
       answer: 1,
     },
   ],
-  mentalModel: `The animation loop is a heartbeat: every pulse it clears the slate, advances the world by one time-step, and paints the new state. Delta time is how you make that time-step reflect real elapsed time rather than frame count. Input events are asynchronous messengers that update your state between beats — the loop itself doesn't handle input, it reads the state that input has already modified.`,
+  mentalModel: [`The animation loop is a heartbeat: every pulse it clears the slate, advances the world by one time-step, and paints the new state. Delta time is how you make that time-step reflect real elapsed time rather than frame count. Input events are asynchronous messengers that update your state between beats — the loop itself doesn't handle input, it reads the state that input has already modified.`],
 };
 
 export default lesson8;

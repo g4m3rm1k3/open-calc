@@ -674,7 +674,7 @@ const lesson7 = {
       answer: 1,
     },
   ],
-  mentalModel: `Think of the canvas as a stack of acetate sheets on an overhead projector. \`globalCompositeOperation\` is the instruction for what to do where two sheets overlap — copy one, punch through it, multiply the colors. \`clip()\` is a physical mask cut from one sheet — anything outside the cutout is blocked. \`shadowBlur\` is the projector lamp leaking light around the edge of a shape. None of these change pixels directly; they change the rules by which pixels are computed.`,
+  mentalModel: [`Think of the canvas as a stack of acetate sheets on an overhead projector. \`globalCompositeOperation\` is the instruction for what to do where two sheets overlap — copy one, punch through it, multiply the colors. \`clip()\` is a physical mask cut from one sheet — anything outside the cutout is blocked. \`shadowBlur\` is the projector lamp leaking light around the edge of a shape. None of these change pixels directly; they change the rules by which pixels are computed.`],
 };
 
 export default lesson7;

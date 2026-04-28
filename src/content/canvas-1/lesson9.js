@@ -635,7 +635,7 @@ const lesson9 = {
       answer: 1,
     },
   ],
-  mentalModel: `Hit detection is the inverse of drawing. Drawing maps your data (shapes, positions, sizes) to pixels. Hit detection maps a screen position back to data. Mathematical tests are just geometry: is this point inside this region? isPointInPath delegates that geometry to the browser's path engine. Color-buffer picking is the brute-force approach — paint the scene twice (once visible, once with ID colors) and read a single pixel. The right choice depends on how many objects you have and how complex their shapes are.`,
+  mentalModel: [`Hit detection is the inverse of drawing. Drawing maps your data (shapes, positions, sizes) to pixels. Hit detection maps a screen position back to data. Mathematical tests are just geometry: is this point inside this region? isPointInPath delegates that geometry to the browser's path engine. Color-buffer picking is the brute-force approach — paint the scene twice (once visible, once with ID colors) and read a single pixel. The right choice depends on how many objects you have and how complex their shapes are.`],
 };
 
 export default lesson9;
