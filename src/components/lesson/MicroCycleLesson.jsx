@@ -238,31 +238,36 @@ function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slat
 function SemanticsBlock({ semantics }) {
   if (!semantics) return null;
   return (
-    <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
-      <div className="px-6 py-4 oc-header-gradient border-b border-sky-100 dark:border-sky-900/40">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-800 dark:text-sky-300">Semantic Layer: Symbols & Meaning</h3>
+    <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-gradient-to-br from-sky-50/80 via-white/90 to-sky-100/80 dark:from-slate-900 dark:via-slate-950 dark:to-sky-900/40 overflow-hidden shadow-2xl shadow-sky-200/40 dark:shadow-sky-900/60">
+      <div className="px-6 py-4 bg-gradient-to-r from-sky-200/80 via-sky-100/80 to-white/80 dark:from-sky-900 dark:via-slate-900 dark:to-slate-800 border-b border-sky-100 dark:border-sky-900/40">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.22em] text-sky-800 dark:text-sky-200 drop-shadow-md">Semantic Layer: Symbols & Meaning</h3>
       </div>
       <div className="p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {semantics.core?.map((item, i) => (
-            <div key={i} className="flex flex-col items-stretch gap-2 p-3 rounded-xl bg-sky-50/40 dark:bg-slate-900/40 border border-sky-100 dark:border-sky-800 shadow-sm min-h-[110px]">
+            <div
+              key={i}
+              className="flex flex-col items-stretch gap-2 p-4 rounded-2xl bg-gradient-to-br from-white/90 via-sky-50/80 to-sky-100/80 dark:from-slate-900 dark:via-slate-950 dark:to-sky-900/60 border border-sky-200 dark:border-sky-800 shadow-xl shadow-sky-200/40 dark:shadow-sky-900/60 min-h-[120px] transition-all duration-200 hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-300/50 dark:hover:border-sky-400 dark:hover:shadow-sky-800/80 relative overflow-hidden"
+              style={{ boxShadow: '0 4px 32px 0 rgba(56,189,248,0.10), 0 1.5px 8px 0 rgba(56,189,248,0.10) inset' }}
+            >
               <div className="flex-shrink-0 w-full flex justify-center mb-1">
-                <div className="p-1.5 rounded bg-white dark:bg-slate-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-sm font-bold text-sky-600 dark:text-sky-400 shadow-sm w-full">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-900 dark:via-slate-800 dark:to-sky-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-base font-bold text-sky-600 dark:text-sky-300 shadow-inner w-full">
                   <KatexBlock expr={item.symbol} />
                 </div>
               </div>
-              <div className="flex-1 min-h-[2.5rem] text-sm text-slate-700 dark:text-slate-300 leading-relaxed break-words">
+              <div className="flex-1 min-h-[2.5rem] text-[15px] text-slate-700 dark:text-slate-200 leading-relaxed break-words drop-shadow-sm">
                 <MarkdownProse text={item.meaning} />
               </div>
+              <div className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-transparent hover:border-sky-300 dark:hover:border-sky-400 transition-all duration-200" />
             </div>
           ))}
         </div>
         {semantics.rulesOfThumb?.length > 0 && (
-          <div className="rounded-xl bg-white dark:bg-slate-900/50 border border-sky-100 dark:border-sky-800/50 p-4">
+          <div className="rounded-xl bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-900 dark:via-slate-800 dark:to-sky-900/60 border border-sky-100 dark:border-sky-800/50 p-4 shadow-md shadow-sky-100/30 dark:shadow-sky-900/40">
             <p className="text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-2">Rules of Thumb</p>
             <ul className="space-y-2">
               {semantics.rulesOfThumb.map((rule, i) => (
-                <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
+                <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
                   <span className="text-sky-500 mt-0.5">→</span>
                   {parseProse(rule)}
                 </li>
