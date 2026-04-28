@@ -190,8 +190,12 @@ ${escapedJs}
 // ── Markdown instruction text ─────────────────────────────────────────────────
 function InstructionText({ text, T }) {
   if (!text) return null;
+  // Use lighter blue for prose and darker blue bold in dark mode
+  const isDark = T.text === "#e2e8f0";
+  const proseColor = isDark ? "#7dd3fc" : T.text; // Tailwind sky-300
+  const boldColor = isDark ? "#0ea5e9" : T.text; // Tailwind sky-500
   return (
-    <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
+    <div style={{ fontSize: 14, lineHeight: 1.8, color: proseColor }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -205,7 +209,7 @@ function InstructionText({ text, T }) {
           code: ({ node, inline, children, ...p }) => (
             <PrismInlineCode>{children}</PrismInlineCode>
           ),
-          strong: ({ node, ...p }) => <strong style={{ color: T.text, fontWeight: 700 }} {...p} />, 
+          strong: ({ node, ...p }) => <strong style={{ color: boldColor, fontWeight: 700 }} {...p} />, 
           blockquote: ({ node, ...p }) => (
             <blockquote style={{ borderLeft: `3px solid ${T.accent}`, paddingLeft: 14, color: T.muted, margin: "12px 0" }} {...p} />
           ),

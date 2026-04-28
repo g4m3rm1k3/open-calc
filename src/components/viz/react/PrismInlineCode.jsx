@@ -13,7 +13,7 @@ export default function PrismInlineCode({ children, className = "language-js" })
   return (
     <code
       className={className}
-      style={{ fontFamily: "monospace", color: "#0284c7", padding: 0, borderRadius: 0, fontSize: 12, display: "inline", background: "none" }}
+      style={{ fontFamily: "monospace", color: "#0284c7", padding: 0, borderRadius: 0, fontSize: 14, display: "inline", background: "none" }}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
