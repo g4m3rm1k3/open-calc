@@ -118,6 +118,7 @@ Why this order works:
 
 - matrix algebra
 - vectorized numeric work
+- classroom linear algebra workflows
 - classroom and lab-style plotting
 - parameterized controls
 - simple animation and simulation templates
@@ -137,7 +138,7 @@ OpenMAT currently supports a growing subset of MATLAB-like behavior:
 
 - matrices and vectors: `[1 2; 3 4]`, transpose, `A \ b`
 - array creation: `linspace`, `logspace`, `zeros`, `ones`, `eye`, `rand`, `randn`
-- math and numerics: `eig`, `qr`, `svd`, `trapz`, `gradient`, `roots`, `interp1`
+- math and numerics: `eig`, `qr`, `svd`, `rref`, `rank`, `det`, `lu`, `null`, `orth`, `cond`, `trapz`, `gradient`, `roots`, `interp1`
 - plots: `plot`, `scatter`, `bar`, `stem`, `area`, `hist`, `subplot`
 - axes and figure commands: `grid`, `title`, `xlabel`, `ylabel`, `xlim`, `ylim`, `axis`
 - control flow: `if`, `elseif`, `else`, `for`, `while`, `break`, `continue`
@@ -176,9 +177,40 @@ These patterns are the best fit for OpenMAT right now:
 Good examples:
 
 - `A = [1 2; 3 4]; x = A \ b`
+- `R = rref(A); rank(A); det(A)`
+- `[L, U, P] = lu(A)`
+- `Q = orth(A); N = null(A)`
 - `t = 0:0.01:10; y = sin(t); plot(t, y)`
 - `function y = f(x); y = x.^2; end`
 - `slider('k', 10, 200, 5, 50)`
+
+## Linear algebra workflow
+
+If OpenMAT is being used for a linear algebra class, the strongest workflow is:
+
+1. paste the textbook MATLAB code
+2. press `Fix MATLAB` if it came from ZyBooks or lecture notes
+3. run the script
+4. select the resulting matrix in `Workspace`
+5. inspect rank, determinant, invertibility, conditioning, and the RREF panel
+
+The `Workspace` inspector is designed to answer the usual class questions quickly:
+
+- is this matrix full rank
+- is it invertible
+- what are the pivot columns
+- what does the row-reduced form look like
+- is the matrix symmetric or orthogonal
+
+Recommended OpenMAT examples for a linear algebra term:
+
+- `Matrix Quick Start`
+- `RREF / Rank`
+- `LU Factorization`
+- `Eigenvectors`
+- `Orthogonality`
+- `Least Squares`
+- `SVD Intuition`
 
 ## Works, but differently
 
@@ -250,6 +282,13 @@ The shortest successful migration path is usually:
 - keep the math
 - simplify the environment assumptions
 - use OpenMAT's plotting, sliders, and workbench UI instead of trying to mirror MATLAB exactly
+
+For classroom code, OpenMAT now also includes a `Fix MATLAB` action that normalizes common pasted syntax issues such as:
+
+- smart quotes
+- Unicode minus/dash characters
+- spaced elementwise operators like `X .^ 2`
+- other copy/paste artifacts that show up in browser courseware
 
 ## OpenMAT-specific features
 

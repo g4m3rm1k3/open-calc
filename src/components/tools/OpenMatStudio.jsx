@@ -146,6 +146,31 @@ A*x - b
 `,
   },
   {
+    id: "row-reduction-rref",
+    label: "RREF / Rank",
+    icon: Rows3,
+    description: "Reduce a matrix, read its pivots, and compare rank to the original system.",
+    matlabLike: true,
+    code: `A = [1 2 -1 3; 2 4 1 9; -1 -2 5 1];
+R = rref(A)
+rank(A)
+
+disp('Pivot columns reveal the independent directions in A.')
+`,
+  },
+  {
+    id: "lu-factorization",
+    label: "LU Factorization",
+    icon: Sigma,
+    description: "Factor a square matrix into L, U, and a permutation matrix P.",
+    matlabLike: true,
+    code: `A = [2 1 1; 4 -6 0; -2 7 2];
+[L, U, P] = lu(A)
+P * A
+L * U
+`,
+  },
+  {
     id: "signals",
     label: "Signals",
     icon: Waves,
@@ -170,6 +195,70 @@ ylabel('amplitude')
 [V, D] = eig(A)
 [Q, R] = qr(A)
 Q * R
+`,
+  },
+  {
+    id: "eigenvectors-diagonalization",
+    label: "Eigenvectors",
+    icon: Sigma,
+    description: "Inspect eigenvectors, eigenvalues, and the diagonalization check A = VDV^-1.",
+    featured: true,
+    matlabLike: true,
+    code: `A = [6 2; 2 3];
+[V, D] = eig(A)
+V * D * inv(V)
+
+disp('If V is invertible, the matrix is diagonalizable in this basis.')
+`,
+  },
+  {
+    id: "orthogonality-nullspace",
+    label: "Orthogonality",
+    icon: Rows3,
+    description: "Compare orth(A) and null(A) to see row/column space ideas from linear algebra.",
+    featured: true,
+    matlabLike: true,
+    code: `A = [1 1 0; 0 1 1; 1 2 1];
+Q = orth(A)
+N = null(A)
+
+Q' * Q
+disp('orth(A) returns an orthonormal basis for the column space.')
+`,
+  },
+  {
+    id: "least-squares",
+    label: "Least Squares",
+    icon: LineChart,
+    description: "Fit an overdetermined system with A \\\\ b and compare the measured data to the model.",
+    featured: true,
+    matlabLike: true,
+    code: `x = [0; 1; 2; 3; 4];
+y = [1.1; 2.0; 2.9; 3.95; 5.1];
+A = [1 0; 1 1; 1 2; 1 3; 1 4];
+c = A \\ y
+
+yhat = A * c;
+plot(x, y)
+hold on
+plot(x, yhat)
+legend('data', 'least squares fit')
+title('Least Squares Line Fit')
+`,
+  },
+  {
+    id: "svd-intuition",
+    label: "SVD Intuition",
+    icon: Sigma,
+    description: "Break a matrix into U, S, and V and inspect the singular values that set rank and conditioning.",
+    featured: true,
+    matlabLike: true,
+    code: `A = [3 1 1; -1 3 1];
+[U, S, V] = svd(A)
+rank(A)
+cond(A)
+
+disp('The diagonal of S shows how strongly the matrix stretches each direction.')
 `,
   },
   {
@@ -330,9 +419,9 @@ title('3D Helix')
     description: "Show a 3D point cloud with scatter3(x, y, z).",
     code: `t = linspace(0, 6*pi, 240);
 r = linspace(0.4, 2.2, 240);
-x = r .* cos(t);
-y = r .* sin(t);
-z = linspace(-2, 2, 240) + 0.3*sin(3*t);
+x = dotMultiply(r, cos(t));
+y = dotMultiply(r, sin(t));
+z = linspace(-2, 2, 240) + dotMultiply(0.3, sin(3*t));
 
 scatter3(x, y, z)
 title('3D Spiral Point Cloud')
@@ -401,20 +490,21 @@ dt = 0.01;
 x = 0.1;
 y = 0;
 z = 0;
-X = [];
-Y = [];
-Z = [];
+n = 1000;
+X = zeros(n, 1);
+Y = zeros(n, 1);
+Z = zeros(n, 1);
 
-for i = 1:1000
+for i = 1:n
   dx = 10 * (y - x);
   dy = x * (28 - z) - y;
   dz = x * y - (8/3) * z;
   x = x + dx * dt;
   y = y + dy * dt;
   z = z + dz * dt;
-  X = [X; x];
-  Y = [Y; y];
-  Z = [Z; z];
+  X(i) = x;
+  Y(i) = y;
+  Z(i) = z;
 end
 
 plot3(X, Y, Z)
@@ -1675,10 +1765,65 @@ function companionRoots(coefficients) {
   const eigen = math.eigs(companion);
   return toPlain(eigen.values ?? []);
 }
+function computeSvdFallback(A) {
+  const matrix = toNumericMatrix(A);
+  if (!matrix?.length) {
+    return { U: [], S: [], V: [] };
+  }
+  const m = matrix.length;
+  const n = Math.max(...matrix.map((row) => row.length), 0);
+  const padded = matrix.map((row) => [...row, ...Array(Math.max(0, n - row.length)).fill(0)]);
+  const AT = toPlain(math.transpose(padded));
+  const ATA = toPlain(math.multiply(AT, padded));
+  const eig = math.eigs(ATA);
+  const eigenPairs = (eig.eigenvectors || [])
+    .map((entry, index) => {
+      const value = Math.max(0, realValue(eig.values?.[index] ?? entry.value ?? 0));
+      const vector = normalizeVector(entry.vector ?? []);
+      return {
+        value,
+        sigma: Math.sqrt(value),
+        vector,
+      };
+    })
+    .sort((a, b) => b.sigma - a.sigma);
+
+  const Vcols = eigenPairs.map((pair) => {
+    const norm = Math.hypot(...pair.vector) || 1;
+    return pair.vector.map((entry) => entry / norm);
+  });
+  const singular = eigenPairs.map((pair) => pair.sigma);
+  const Ucols = Vcols.map((vCol, index) => {
+    const sigma = singular[index];
+    const Av = normalizeVector(toPlain(math.multiply(padded, vCol)));
+    if (sigma <= 1e-12) {
+      return Array.from({ length: m }, (_, row) => (row === index ? 1 : 0));
+    }
+    return Av.map((entry) => entry / sigma);
+  });
+
+  const U = Ucols.length ? toPlain(math.transpose(Ucols)) : Array.from({ length: m }, () => []);
+  const V = Vcols.length ? toPlain(math.transpose(Vcols)) : Array.from({ length: n }, () => []);
+  return {
+    U,
+    S: makeDiagonal(singular),
+    V,
+  };
+}
+function computeSvd(A) {
+  if (typeof math.svd === "function") {
+    const result = math.svd(A);
+    return {
+      U: toPlain(result.U),
+      S: Array.isArray(result.S?.[0]) ? toPlain(result.S) : makeDiagonal(toPlain(result.S)),
+      V: toPlain(result.V),
+    };
+  }
+  return computeSvdFallback(A);
+}
 function singularValues(A) {
-  const result = math.svd(A);
-  const raw = Array.isArray(result.S?.[0]) ? math.diag(result.S) : result.S;
-  return normalizeVector(raw).map((entry) => Math.abs(Number(entry)));
+  const result = computeSvd(A);
+  return normalizeVector(math.diag(result.S)).map((entry) => Math.abs(Number(entry)));
 }
 function matrixRank(A, tolerance = null) {
   const s = singularValues(A);
@@ -1691,9 +1836,211 @@ function conditionNumber(A) {
   if (!s.length) return Infinity;
   return Math.max(...s) / Math.min(...s);
 }
+function toNumericMatrix(value) {
+  const plain = toPlain(value);
+  if (!Array.isArray(plain) || !plain.length) return null;
+  if (!Array.isArray(plain[0])) {
+    return plain.map((entry) => [realValue(entry)]);
+  }
+  return plain.map((row) => row.map((entry) => realValue(entry)));
+}
+function isSquareMatrixValue(value) {
+  const matrix = toNumericMatrix(value);
+  return Boolean(matrix?.length && matrix.every((row) => row.length === matrix.length));
+}
+function isSymmetricMatrixValue(value, tolerance = 1e-9) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length || !matrix.every((row) => row.length === matrix.length)) return false;
+  for (let row = 0; row < matrix.length; row += 1) {
+    for (let col = row + 1; col < matrix.length; col += 1) {
+      if (Math.abs(matrix[row][col] - matrix[col][row]) > tolerance) return false;
+    }
+  }
+  return true;
+}
+function isOrthogonalMatrixValue(value, tolerance = 1e-8) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length || !matrix.every((row) => row.length === matrix.length)) return false;
+  const product = toPlain(math.multiply(math.transpose(matrix), matrix));
+  for (let row = 0; row < product.length; row += 1) {
+    for (let col = 0; col < product[row].length; col += 1) {
+      const expected = row === col ? 1 : 0;
+      if (Math.abs(realValue(product[row][col]) - expected) > tolerance) return false;
+    }
+  }
+  return true;
+}
+function determinantValue(value) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length || !matrix.every((row) => row.length === matrix.length)) return null;
+  try {
+    return realValue(toPlain(math.det(matrix)));
+  } catch {
+    return null;
+  }
+}
+function luFactorization(value, tolerance = 1e-12) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length || !matrix.every((row) => row.length === matrix.length)) {
+    throw new Error("lu(A) requires a square numeric matrix.");
+  }
+  const n = matrix.length;
+  const U = matrix.map((row) => [...row]);
+  const L = Array.from({ length: n }, (_, row) =>
+    Array.from({ length: n }, (_, col) => (row === col ? 1 : 0)),
+  );
+  const P = Array.from({ length: n }, (_, row) =>
+    Array.from({ length: n }, (_, col) => (row === col ? 1 : 0)),
+  );
+
+  for (let pivot = 0; pivot < n; pivot += 1) {
+    let pivotRow = pivot;
+    let maxEntry = Math.abs(U[pivot][pivot]);
+    for (let row = pivot + 1; row < n; row += 1) {
+      const entry = Math.abs(U[row][pivot]);
+      if (entry > maxEntry) {
+        maxEntry = entry;
+        pivotRow = row;
+      }
+    }
+    if (maxEntry <= tolerance) {
+      throw new Error("lu(A) failed because the matrix is singular or nearly singular.");
+    }
+    if (pivotRow !== pivot) {
+      [U[pivot], U[pivotRow]] = [U[pivotRow], U[pivot]];
+      [P[pivot], P[pivotRow]] = [P[pivotRow], P[pivot]];
+      for (let col = 0; col < pivot; col += 1) {
+        [L[pivot][col], L[pivotRow][col]] = [L[pivotRow][col], L[pivot][col]];
+      }
+    }
+    for (let row = pivot + 1; row < n; row += 1) {
+      const factor = U[row][pivot] / U[pivot][pivot];
+      L[row][pivot] = factor;
+      for (let col = pivot; col < n; col += 1) {
+        U[row][col] -= factor * U[pivot][col];
+      }
+    }
+  }
+
+  return {
+    __multi: [L, U, P],
+    L,
+    U,
+    P,
+  };
+}
+function rrefMatrix(value, tolerance = 1e-10) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length) return { matrix: [], pivots: [], steps: [] };
+  const out = matrix.map((row) => [...row]);
+  const rowCount = out.length;
+  const colCount = Math.max(...out.map((row) => row.length), 0);
+  out.forEach((row) => {
+    while (row.length < colCount) row.push(0);
+  });
+  const steps = [];
+  const pivots = [];
+  let lead = 0;
+
+  for (let row = 0; row < rowCount && lead < colCount; row += 1) {
+    let pivotRow = row;
+    while (pivotRow < rowCount && Math.abs(out[pivotRow][lead]) <= tolerance) {
+      pivotRow += 1;
+    }
+    while (pivotRow === rowCount) {
+      lead += 1;
+      if (lead >= colCount) {
+        return { matrix: out, pivots, steps };
+      }
+      pivotRow = row;
+      while (pivotRow < rowCount && Math.abs(out[pivotRow][lead]) <= tolerance) {
+        pivotRow += 1;
+      }
+    }
+    if (pivotRow !== row) {
+      [out[row], out[pivotRow]] = [out[pivotRow], out[row]];
+      steps.push({
+        type: "swap",
+        label: `Swap R${row + 1} and R${pivotRow + 1}`,
+        matrix: out.map((entry) => [...entry]),
+      });
+    }
+    const pivot = out[row][lead];
+    if (Math.abs(pivot - 1) > tolerance) {
+      for (let col = 0; col < colCount; col += 1) {
+        out[row][col] /= pivot;
+      }
+      steps.push({
+        type: "scale",
+        label: `Scale R${row + 1} by 1/${Number(pivot.toFixed(6))}`,
+        matrix: out.map((entry) => [...entry]),
+      });
+    }
+    for (let other = 0; other < rowCount; other += 1) {
+      if (other === row) continue;
+      const factor = out[other][lead];
+      if (Math.abs(factor) <= tolerance) continue;
+      for (let col = 0; col < colCount; col += 1) {
+        out[other][col] -= factor * out[row][col];
+        if (Math.abs(out[other][col]) <= tolerance) out[other][col] = 0;
+      }
+      steps.push({
+        type: "eliminate",
+        label: `R${other + 1} = R${other + 1} - (${Number(factor.toFixed(6))}) R${row + 1}`,
+        matrix: out.map((entry) => [...entry]),
+      });
+    }
+    pivots.push({ row, col: lead });
+    lead += 1;
+  }
+
+  return { matrix: out, pivots, steps };
+}
+function summarizeMatrix(value) {
+  const matrix = toNumericMatrix(value);
+  if (!matrix?.length) return null;
+  const rows = matrix.length;
+  const cols = Math.max(...matrix.map((row) => row.length), 0);
+  const square = rows === cols;
+  const determinant = square ? determinantValue(matrix) : null;
+  const rank = matrixRank(matrix);
+  const condition = square ? conditionNumber(matrix) : null;
+  const rref = rrefMatrix(matrix);
+  const nullBasis = (() => {
+    try {
+      return orthonormalBasis(matrix, "null");
+    } catch {
+      return [];
+    }
+  })();
+  const orthBasis = (() => {
+    try {
+      return orthonormalBasis(matrix, "orth");
+    } catch {
+      return [];
+    }
+  })();
+  return {
+    rows,
+    cols,
+    square,
+    rank,
+    determinant,
+    condition,
+    symmetric: square ? isSymmetricMatrixValue(matrix) : false,
+    orthogonal: square ? isOrthogonalMatrixValue(matrix) : false,
+    invertible: square ? determinant != null && Math.abs(determinant) > 1e-9 : false,
+    pivots: rref.pivots,
+    rrefMatrix: rref.matrix,
+    rrefSteps: rref.steps,
+    nullity: Math.max(0, cols - rank),
+    nullBasisColumns: Array.isArray(nullBasis?.[0]) ? Math.max(...nullBasis.map((row) => row.length), 0) : 0,
+    orthBasisColumns: Array.isArray(orthBasis?.[0]) ? Math.max(...orthBasis.map((row) => row.length), 0) : 0,
+  };
+}
 function orthonormalBasis(A, mode = "orth") {
-  const { U, V, S } = math.svd(A);
-  const singular = normalizeVector(Array.isArray(S?.[0]) ? math.diag(S) : S).map((entry) => Math.abs(Number(entry)));
+  const { U, V, S } = computeSvd(A);
+  const singular = normalizeVector(math.diag(S)).map((entry) => Math.abs(Number(entry)));
   const tol = Math.max(...singular, 0) * Math.max(inferSize(A)[0], inferSize(A)[1]) * 1e-10;
   const source = mode === "null" ? toPlain(V) : toPlain(U);
   const columns = math.transpose(source);
@@ -1769,6 +2116,8 @@ function convertPointSeries3DConfig(kind, args, plotState) {
   const ys = normalizeVector(args[1]).map(Number);
   const zs = normalizeVector(args[2]).map(Number);
   const count = Math.min(xs.length, ys.length, zs.length);
+  const extent = [...xs.slice(0, count), ...ys.slice(0, count), ...zs.slice(0, count)].filter((value) => Number.isFinite(value));
+  const maxAbs = extent.length ? Math.max(...extent.map((value) => Math.abs(value))) : 10;
   return {
     mode: "3d",
     title: plotState.title || `OpenMAT ${kind === "scatter3" ? "3D Scatter" : "3D Curve"}`,
@@ -1788,16 +2137,14 @@ function convertPointSeries3DConfig(kind, args, plotState) {
       },
     ],
     settings: {
-      range: 10,
+      range: Math.max(10, Math.ceil(maxAbs * 2.4)),
       resolution: 64,
     },
   };
 }
 function svdDecomp(A) {
-  const result = math.svd(A);
-  const U = toPlain(result.U), S = toPlain(result.S), V = toPlain(result.V);
-  const diagS = Array.isArray(S[0]) ? S : makeDiagonal(S);
-  return { __multi: [U, diagS, V], U, S: diagS, V };
+  const { U, S, V } = computeSvd(A);
+  return { __multi: [U, S, V], U, S, V };
 }
 function sprintfFormat(fmt, ...args) {
   let i = 0;
@@ -1813,6 +2160,50 @@ function sprintfFormat(fmt, ...args) {
   });
 }
 
+function detectMatlabCompatibilityWarnings(source) {
+  const text = String(source || "");
+  const checks = [
+    {
+      pattern: /\b(syms?|vpa|dsolve|simplify|factor|expand|collect|subs)\b/i,
+      message: "This script looks symbolic. OpenMAT is numeric-first, so Symbolic Math Toolbox style commands may need CAS mode or a rewrite.",
+    },
+    {
+      pattern: /\b(classdef|properties|methods|events)\b/i,
+      message: "MATLAB class-based code is not supported yet in OpenMAT. Flatten the lesson code into plain scripts and functions first.",
+    },
+    {
+      pattern: /\b(readtable|writetable|table|timetable|readmatrix|writematrix|xlsread|xlswrite)\b/i,
+      message: "This script uses MATLAB table/file I/O helpers. OpenMAT currently works best with imported CSV data and plain matrices.",
+    },
+    {
+      pattern: /\b(ode45|ode23|pdepe|fmincon|lsqnonlin|tf|ss|bode|lsim|fft2|imread|imshow)\b/i,
+      message: "This script calls a MATLAB toolbox/helper that OpenMAT does not fully match yet. Keep the numeric core and replace toolbox-specific calls.",
+    },
+    {
+      pattern: /\bspdiags|sparse|symamd|cholinc\b/i,
+      message: "Sparse and advanced matrix-structure helpers are only partially supported right now.",
+    },
+  ];
+  return checks.filter((check) => check.pattern.test(text)).map((check) => check.message);
+}
+
+function normalizeMatlabPaste(source) {
+  return String(source || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[−–—]/g, "-")
+    .replace(/\t/g, "  ")
+    .replace(/\s+\.\^/g, ".^")
+    .replace(/\s+\.\*/g, ".*")
+    .replace(/\s+\.\//g, "./")
+    .replace(/([A-Za-z0-9_\]\)])\s+\.\^/g, "$1.^")
+    .replace(/([A-Za-z0-9_\]\)])\s+\.\*/g, "$1.*")
+    .replace(/([A-Za-z0-9_\]\)])\s+\.\//g, "$1./")
+    .replace(/\bend\s*;/g, "end")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
 // ─── Block-aware script parser ────────────────────────────────────────────────
 // Parses MATLAB source into a tree of Statement nodes before execution.
 // Handles: if/elseif/else/end, for/end, while/end, function/end
@@ -1823,6 +2214,7 @@ function parseBlocks(lines) {
 
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
+    const lineNo = i + 1;
     const stripped = raw.replace(/%.*$/, '').trim();
     if (!stripped) continue;
 
@@ -1836,7 +2228,7 @@ function parseBlocks(lines) {
       const outs = outMulti || outSingle || [];
       const name = fnMatch[3];
       const ins = fnMatch[4].split(',').map(s => s.trim()).filter(Boolean);
-      const node = { type: 'function', name, ins, outs, body: [] };
+      const node = { type: 'function', name, ins, outs, body: [], lineNo };
       top().body.push(node);
       stack.push(node);
       continue;
@@ -1845,7 +2237,7 @@ function parseBlocks(lines) {
     // for loop
     const forMatch = stripped.match(/^for\s+([A-Za-z_]\w*)\s*=\s*(.+)$/i);
     if (forMatch) {
-      const node = { type: 'for', varName: forMatch[1], iterExpr: forMatch[2], body: [] };
+      const node = { type: 'for', varName: forMatch[1], iterExpr: forMatch[2], body: [], lineNo };
       top().body.push(node);
       stack.push(node);
       continue;
@@ -1854,7 +2246,7 @@ function parseBlocks(lines) {
     // while loop
     const whileMatch = stripped.match(/^while\s+(.+)$/i);
     if (whileMatch) {
-      const node = { type: 'while', condExpr: whileMatch[1], body: [] };
+      const node = { type: 'while', condExpr: whileMatch[1], body: [], lineNo };
       top().body.push(node);
       stack.push(node);
       continue;
@@ -1863,7 +2255,7 @@ function parseBlocks(lines) {
     // if
     const ifMatch = stripped.match(/^if\s+(.+)$/i);
     if (ifMatch) {
-      const node = { type: 'if', branches: [{ cond: ifMatch[1], body: [] }], elseBody: null };
+      const node = { type: 'if', branches: [{ cond: ifMatch[1], body: [], lineNo }], elseBody: null, lineNo };
       top().body.push(node);
       stack.push(node);
       continue;
@@ -1873,7 +2265,7 @@ function parseBlocks(lines) {
     const elseifMatch = stripped.match(/^elseif\s+(.+)$/i);
     if (elseifMatch) {
       const ifNode = top();
-      if (ifNode.type === 'if') ifNode.branches.push({ cond: elseifMatch[1], body: [] });
+      if (ifNode.type === 'if') ifNode.branches.push({ cond: elseifMatch[1], body: [], lineNo });
       continue;
     }
 
@@ -1902,12 +2294,12 @@ function parseBlocks(lines) {
     };
 
     // break / continue / return
-    if (lower === 'break') { getTargetBody(top()).push({ type: 'break' }); continue; }
-    if (lower === 'continue') { getTargetBody(top()).push({ type: 'continue' }); continue; }
-    if (lower === 'return') { getTargetBody(top()).push({ type: 'return' }); continue; }
+    if (lower === 'break') { getTargetBody(top()).push({ type: 'break', lineNo }); continue; }
+    if (lower === 'continue') { getTargetBody(top()).push({ type: 'continue', lineNo }); continue; }
+    if (lower === 'return') { getTargetBody(top()).push({ type: 'return', lineNo }); continue; }
 
     // plain statement
-    getTargetBody(top()).push({ type: 'line', raw: stripped });
+    getTargetBody(top()).push({ type: 'line', raw: stripped, lineNo });
   }
 
   return stack[0].body;
@@ -1933,15 +2325,105 @@ function registerElementwiseUnary(parser, names) {
   });
 }
 
+function splitTopLevel(text, separators) {
+  const rows = [];
+  let current = "";
+  let depthParen = 0;
+  let depthBracket = 0;
+  let depthBrace = 0;
+  let quote = null;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (quote) {
+      current += char;
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+      current += char;
+      continue;
+    }
+    if (char === "(") depthParen += 1;
+    else if (char === ")") depthParen = Math.max(0, depthParen - 1);
+    else if (char === "[") depthBracket += 1;
+    else if (char === "]") depthBracket = Math.max(0, depthBracket - 1);
+    else if (char === "{") depthBrace += 1;
+    else if (char === "}") depthBrace = Math.max(0, depthBrace - 1);
+
+    const topLevel =
+      depthParen === 0 && depthBracket === 0 && depthBrace === 0;
+    if (topLevel && separators.includes(char)) {
+      rows.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  rows.push(current.trim());
+  return rows.filter(Boolean);
+}
+
+function splitTopLevelCells(row) {
+  const cells = [];
+  let current = "";
+  let depthParen = 0;
+  let depthBracket = 0;
+  let depthBrace = 0;
+  let quote = null;
+
+  const pushCell = () => {
+    const trimmed = current.trim();
+    if (trimmed) cells.push(trimmed);
+    current = "";
+  };
+
+  for (let index = 0; index < row.length; index += 1) {
+    const char = row[index];
+    if (quote) {
+      current += char;
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+      current += char;
+      continue;
+    }
+    if (char === "(") depthParen += 1;
+    else if (char === ")") depthParen = Math.max(0, depthParen - 1);
+    else if (char === "[") depthBracket += 1;
+    else if (char === "]") depthBracket = Math.max(0, depthBracket - 1);
+    else if (char === "{") depthBrace += 1;
+    else if (char === "}") depthBrace = Math.max(0, depthBrace - 1);
+
+    const topLevel =
+      depthParen === 0 && depthBracket === 0 && depthBrace === 0;
+    if (topLevel && char === ",") {
+      pushCell();
+      continue;
+    }
+    if (topLevel && /\s/.test(char)) {
+      const next = row.slice(index).match(/^\s+/)?.[0] || "";
+      const nextChar = row[index + next.length];
+      if (current.trim() && nextChar && nextChar !== "," && nextChar !== ";") {
+        pushCell();
+      }
+      index += next.length - 1;
+      continue;
+    }
+    current += char;
+  }
+
+  pushCell();
+  return cells;
+}
+
 function normalizeMatrixSyntax(line) {
   return line.replace(/\[([^[\]]+)\]/g, (_, inner) => {
-    const rows = inner.split(";").map((row) =>
-      row
-        .trim()
-        .replace(/,/g, " ")
-        .split(/\s+/)
-        .filter(Boolean)
-        .join(", "),
+    const rows = splitTopLevel(inner, ";").map((row) =>
+      splitTopLevelCells(row).join(", "),
     );
     return `[${rows.join("; ")}]`;
   });
@@ -1952,6 +2434,121 @@ function normalizeElementwiseOperators(line) {
     .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\^\s*/g, "$1.^")
     .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\*\s*/g, "$1.*")
     .replace(/([A-Za-z0-9_\]\)])\s*\.\s*\/\s*/g, "$1./");
+}
+
+function replaceElementwiseBinaryOperators(line) {
+  const operatorMap = {
+    ".^": "dotPow",
+    ".*": "dotMultiply",
+    "./": "dotDivide",
+  };
+
+  const scanLeft = (text, from) => {
+    let index = from;
+    while (index >= 0 && /\s/.test(text[index])) index -= 1;
+    if (index < 0) return null;
+
+    const end = index + 1;
+    if (text[index] === ")" || text[index] === "]") {
+      const close = text[index];
+      const open = close === ")" ? "(" : "[";
+      let depth = 1;
+      index -= 1;
+      while (index >= 0 && depth > 0) {
+        if (text[index] === close) depth += 1;
+        else if (text[index] === open) depth -= 1;
+        index -= 1;
+      }
+      let start = index + 1;
+      while (start > 0 && /[\w.]/.test(text[start - 1])) start -= 1;
+      return { start, end };
+    }
+
+    while (index >= 0 && /[\w.\]]/.test(text[index])) index -= 1;
+    return { start: index + 1, end };
+  };
+
+  const scanRight = (text, from) => {
+    let index = from;
+    while (index < text.length && /\s/.test(text[index])) index += 1;
+    if (index >= text.length) return null;
+
+    const start = index;
+    if (/[A-Za-z_]/.test(text[index])) {
+      while (index < text.length && /[\w.]/.test(text[index])) index += 1;
+      if (text[index] === "(") {
+        let depth = 1;
+        index += 1;
+        while (index < text.length && depth > 0) {
+          if (text[index] === "(") depth += 1;
+          else if (text[index] === ")") depth -= 1;
+          index += 1;
+        }
+      } else {
+        while (index < text.length && text[index] === "[") {
+          let depth = 1;
+          index += 1;
+          while (index < text.length && depth > 0) {
+            if (text[index] === "[") depth += 1;
+            else if (text[index] === "]") depth -= 1;
+            index += 1;
+          }
+        }
+      }
+      return { start, end: index };
+    }
+
+    if (text[index] === "(" || text[index] === "[") {
+      const open = text[index];
+      const close = open === "(" ? ")" : "]";
+      let depth = 1;
+      index += 1;
+      while (index < text.length && depth > 0) {
+        if (text[index] === open) depth += 1;
+        else if (text[index] === close) depth -= 1;
+        index += 1;
+      }
+      return { start, end: index };
+    }
+
+    while (index < text.length && /[\w.]/.test(text[index])) index += 1;
+    return { start, end: index };
+  };
+
+  let output = line;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    let hitIndex = -1;
+    let hitToken = null;
+    for (const token of Object.keys(operatorMap)) {
+      const idx = output.indexOf(token);
+      if (idx !== -1 && (hitIndex === -1 || idx < hitIndex)) {
+        hitIndex = idx;
+        hitToken = token;
+      }
+    }
+    if (hitIndex === -1 || !hitToken) break;
+
+    const left = scanLeft(output, hitIndex - 1);
+    const right = scanRight(output, hitIndex + hitToken.length);
+    if (!left || !right || left.end <= left.start || right.end <= right.start) {
+      break;
+    }
+
+    const leftExpr = output.slice(left.start, left.end).trim();
+    const rightExpr = output.slice(right.start, right.end).trim();
+    output =
+      output.slice(0, left.start) +
+      `${operatorMap[hitToken]}(${leftExpr}, ${rightExpr})` +
+      output.slice(right.end);
+    changed = true;
+  }
+  return output;
+}
+
+function joinContinuationLines(source) {
+  return String(source || "").replace(/\.\.\.\s*\r?\n\s*/g, " ");
 }
 
 function replaceIndexing(line, variables, functionNames = new Set()) {
@@ -1988,6 +2585,7 @@ function preprocessLine(line, variables, functionNames = new Set()) {
   output = output.replace(/^axis\s+equal$/i, "axis('equal')");
   output = output.replace(/^axis\s+auto$/i, "axis('auto')");
   output = normalizeElementwiseOperators(output);
+  output = replaceElementwiseBinaryOperators(output);
   output = normalizeMatrixSyntax(output);
   output = replaceIndexing(output, variables, functionNames);
   output = replaceBackslash(output);
@@ -4686,6 +5284,9 @@ function createExecutionEngine(options = {}) {
   parser.set("cross", (a, b) => crossProduct(a, b));
   parser.set("polyfit", (x, y, degree) => polyfit(x, y, degree));
   parser.set("polyval", (coefficients, x) => polyval(coefficients, x));
+  parser.set("dotPow", (a, b) => toPlain(math.dotPow(a, b)));
+  parser.set("dotMultiply", (a, b) => toPlain(math.dotMultiply(a, b)));
+  parser.set("dotDivide", (a, b) => toPlain(math.dotDivide(a, b)));
   parser.set("size", (value, dim) => {
     const size = toPlain(math.size(value));
     return dim == null ? size : size[Number(dim) - 1];
@@ -4804,9 +5405,16 @@ function createExecutionEngine(options = {}) {
   parser.set("gradient", (value, spacing = 1) => gradientArray(value, spacing));
   parser.set("roots", (coefficients) => companionRoots(coefficients));
   parser.set("rank", (A, tolerance = null) => matrixRank(A, tolerance));
+  parser.set("rref", (A, tolerance = 1e-10) => rrefMatrix(A, tolerance).matrix);
+  parser.set("det", (A) => {
+    const determinant = determinantValue(A);
+    if (determinant == null) throw new Error("det(A) requires a square numeric matrix.");
+    return determinant;
+  });
   parser.set("cond", (A) => conditionNumber(A));
   parser.set("orth", (A) => orthonormalBasis(A, "orth"));
   parser.set("null", (A) => orthonormalBasis(A, "null"));
+  parser.set("lu", (A) => luFactorization(A));
   parser.set("surf", (...args) => {
     plot3DRequest = convertSurfaceTo3DConfig("surf", args, plotState);
     logs.push("3D surface ready in the OpenMAT viewport.");
@@ -4973,6 +5581,7 @@ const RETURN = Symbol('return');
 
 function executeScript(source, options = {}) {
   const extensions = options.extensions || [];
+  const compatibilityWarnings = detectMatlabCompatibilityWarnings(source);
   const engine = createExecutionEngine({
     extensions,
     controlValues: options.controlValues || {},
@@ -4991,7 +5600,18 @@ function executeScript(source, options = {}) {
     return Boolean(val);
   }
 
-  function executeLine(rawLine) {
+  function formatExecutionError(error, meta = {}) {
+    const pieces = [];
+    if (meta.lineNo != null) pieces.push(`Line ${meta.lineNo}`);
+    if (meta.rawLine) pieces.push(`Source: ${meta.rawLine}`);
+    if (meta.normalizedLine && meta.normalizedLine !== meta.rawLine) {
+      pieces.push(`Normalized: ${meta.normalizedLine}`);
+    }
+    pieces.push(error?.message || String(error));
+    return new Error(pieces.join("\n"));
+  }
+
+  function executeLine(rawLine, lineNo = null) {
     const trimmedRaw = rawLine.replace(/%.*$/, '').trim();
     if (!trimmedRaw) return null;
 
@@ -5007,75 +5627,84 @@ function executeScript(source, options = {}) {
     const line = preprocessLine(withoutSemicolon, variables, functionNames);
     if (!line) return null;
 
-    const anonymousAssign = withoutSemicolon.match(/^([A-Za-z_]\w*)\s*=\s*@\(([^)]*)\)\s*(.+)$/);
-    if (anonymousAssign) {
-      const [, name, paramsRaw, bodyRaw] = anonymousAssign;
-      const params = paramsRaw.split(",").map((entry) => entry.trim()).filter(Boolean);
-      const body = preprocessLine(bodyRaw, variables, functionNames);
-      const anonymousFn = (...args) => {
-        const saved = new Map();
-        params.forEach((param, index) => {
-          try {
-            saved.set(param, parser.get(param));
-          } catch {
-            saved.set(param, undefined);
-          }
-          parser.set(param, args[index] ?? null);
-        });
-        const result = toPlain(parser.evaluate(body));
-        params.forEach((param) => {
-          if (saved.get(param) === undefined) parser.remove(param);
-          else parser.set(param, saved.get(param));
-        });
-        return result;
-      };
-      parser.set(name, anonymousFn);
-      variables.add(name);
-      functionNames.add(name);
-      return hasSemicolon ? null : anonymousFn;
-    }
-
-    const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
-    if (multiAssign) {
-      const names = multiAssign[1].split(',').map((n) => n.trim()).filter(Boolean);
-      const result = toPlain(parser.evaluate(preprocessLine(multiAssign[2], variables, functionNames)));
-      const values = result?.__multi || [];
-      names.forEach((name, idx) => {
-        parser.set(name, values[idx]);
+    try {
+      const anonymousAssign = withoutSemicolon.match(/^([A-Za-z_]\w*)\s*=\s*@\(([^)]*)\)\s*(.+)$/);
+      if (anonymousAssign) {
+        const [, name, paramsRaw, bodyRaw] = anonymousAssign;
+        const params = paramsRaw.split(",").map((entry) => entry.trim()).filter(Boolean);
+        const body = preprocessLine(bodyRaw, variables, functionNames);
+        const anonymousFn = (...args) => {
+          const saved = new Map();
+          params.forEach((param, index) => {
+            try {
+              saved.set(param, parser.get(param));
+            } catch {
+              saved.set(param, undefined);
+            }
+            parser.set(param, args[index] ?? null);
+          });
+          const result = toPlain(parser.evaluate(body));
+          params.forEach((param) => {
+            if (saved.get(param) === undefined) parser.remove(param);
+            else parser.set(param, saved.get(param));
+          });
+          return result;
+        };
+        parser.set(name, anonymousFn);
         variables.add(name);
-      });
-      return hasSemicolon ? null : (values.length === 1 ? values[0] : values);
-    }
-
-    // Indexed assignment: name[i] = expr  (result of replaceIndexing on name(i) = expr)
-    const indexedAssign = line.match(/^([A-Za-z_]\w*)\[([^\]]+)\]\s*=\s*(.+)$/);
-    if (indexedAssign) {
-      const [, name, idxExpr, valExpr] = indexedAssign;
-      const arr = parser.get(name);
-      const idx = Number(toPlain(parser.evaluate(idxExpr)));
-      const val = toPlain(parser.evaluate(valExpr));
-      const updated = Array.isArray(arr) ? [...arr] : arr;
-      if (Array.isArray(updated)) {
-        updated[idx - 1] = val; // 1-based
+        functionNames.add(name);
+        return hasSemicolon ? null : anonymousFn;
       }
-      parser.set(name, updated);
-      variables.add(name);
-      return hasSemicolon ? null : updated;
-    }
 
-    const assign = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
-    if (assign) {
-      const [, name, expr] = assign;
-      const result = toPlain(parser.evaluate(expr));
-      parser.set(name, result);
+      const multiAssign = line.match(/^\[([^\]]+)\]\s*=\s*(.+)$/);
+      if (multiAssign) {
+        const names = multiAssign[1].split(',').map((n) => n.trim()).filter(Boolean);
+        const rhs = preprocessLine(multiAssign[2], variables, functionNames);
+        const result = toPlain(parser.evaluate(rhs));
+        const values = result?.__multi || [];
+        names.forEach((name, idx) => {
+          parser.set(name, values[idx]);
+          variables.add(name);
+        });
+        return hasSemicolon ? null : (values.length === 1 ? values[0] : values);
+      }
+
+      // Indexed assignment: name[i] = expr  (result of replaceIndexing on name(i) = expr)
+      const indexedAssign = line.match(/^([A-Za-z_]\w*)\[([^\]]+)\]\s*=\s*(.+)$/);
+      if (indexedAssign) {
+        const [, name, idxExpr, valExpr] = indexedAssign;
+        const arr = parser.get(name);
+        const idx = Number(toPlain(parser.evaluate(idxExpr)));
+        const val = toPlain(parser.evaluate(valExpr));
+        const updated = Array.isArray(arr) ? [...arr] : arr;
+        if (Array.isArray(updated)) {
+          updated[idx - 1] = val; // 1-based
+        }
+        parser.set(name, updated);
+        variables.add(name);
+        return hasSemicolon ? null : updated;
+      }
+
+      const assign = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/);
+      if (assign) {
+        const [, name, expr] = assign;
+        const result = toPlain(parser.evaluate(expr));
+        parser.set(name, result);
+        parser.set('ans', result);
+        variables.add(name);
+        return hasSemicolon ? null : result;
+      }
+
+      const result = toPlain(parser.evaluate(line));
       parser.set('ans', result);
-      variables.add(name);
-      return hasSemicolon ? null : result;
+      return (hasSemicolon || result == null || result === '') ? null : result;
+    } catch (error) {
+      throw formatExecutionError(error, {
+        lineNo,
+        rawLine: withoutSemicolon,
+        normalizedLine: line,
+      });
     }
-
-    const result = toPlain(parser.evaluate(line));
-    parser.set('ans', result);
-    return (hasSemicolon || result == null || result === '') ? null : result;
   }
 
   function executeBlock(nodes) {
@@ -5090,7 +5719,7 @@ function executeScript(source, options = {}) {
 
   function executeNode(node) {
     if (node.type === 'line') {
-      return executeLine(node.raw);
+      return executeLine(node.raw, node.lineNo ?? null);
     }
 
     if (node.type === 'if') {
@@ -5163,7 +5792,8 @@ function executeScript(source, options = {}) {
     return null;
   }
 
-  const lines = source.split(/\r?\n/);
+  const normalizedSource = joinContinuationLines(source);
+  const lines = normalizedSource.split(/\r?\n/);
   const tree = parseBlocks(lines);
   let lastVisibleResult = null;
 
@@ -5205,6 +5835,7 @@ function executeScript(source, options = {}) {
     workspace: buildWorkspaceSnapshot(parser, variables),
     plot3DRequest: engine.getPlot3DRequest(),
     controls: engine.getControls(),
+    compatibilityWarnings,
   };
   extensions.forEach((extension) => {
     if (typeof extension?.onRun === "function") {
@@ -6079,6 +6710,14 @@ export default function OpenMatStudio() {
       bytes,
     };
   }, [displayWorkspaceItems]);
+  const selectedVariableMatrixSummary = useMemo(() => {
+    if (!selectedVariable || !Array.isArray(selectedVariable.value)) return null;
+    try {
+      return summarizeMatrix(selectedVariable.value);
+    } catch {
+      return null;
+    }
+  }, [selectedVariable]);
   const benchmarkShowcases = useMemo(
     () =>
       SIMULATION_WORKSPACES
@@ -6295,6 +6934,7 @@ export default function OpenMatStudio() {
         controlCount: result.controls?.length || 0,
         figureKind: result.plot3DRequest ? "3d" : result.figureJson ? "2d" : "none",
         outputPreview: String(result.output || "No output.").slice(0, 240),
+        compatibilityWarnings: result.compatibilityWarnings || [],
       });
       setWorkspaceTab((current) => {
         const hasFigureOutput = Boolean(result.figureJson || result.plot3DRequest);
@@ -6324,6 +6964,7 @@ export default function OpenMatStudio() {
         controlCount: 0,
         figureKind: "none",
         outputPreview: String(error.message || "Unknown error"),
+        compatibilityWarnings: detectMatlabCompatibilityWarnings(code),
       });
       setFigureJson(null);
       setBaseFigureJson(null);
@@ -6525,6 +7166,7 @@ export default function OpenMatStudio() {
         controlCount: controlSpecs.length,
         figureKind: surfaceConfig ? "3d" : displayFigureJson ? "2d" : "none",
         outputPreview: String(error.message || "Unknown error"),
+        compatibilityWarnings: detectMatlabCompatibilityWarnings(command),
       });
       setWorkspaceTab("console");
     } finally {
@@ -6738,6 +7380,16 @@ export default function OpenMatStudio() {
     setOutput(`Exported workspace variable ${selectedVariable.name} to CSV.`);
     setWorkspaceTab("workspace");
   }, [selectedVariable, setWorkspaceTab]);
+  const applyMatlabClassroomFixes = useCallback(() => {
+    const fixed = normalizeMatlabPaste(code);
+    if (fixed === code) {
+      setOutput("No MATLAB/ZyBooks cleanup was needed for the active script.");
+      return;
+    }
+    setCode(fixed);
+    setOutput("Applied OpenMAT classroom cleanup for pasted MATLAB syntax.");
+    setWorkspaceTab("console");
+  }, [code, setCode, setWorkspaceTab]);
 
   const importScriptOrData = useCallback((event) => {
     const file = event.target.files?.[0];
@@ -7230,6 +7882,16 @@ export default function OpenMatStudio() {
           >
             <Upload className="h-3.5 w-3.5" />
             Import .m / CSV
+          </button>
+          <button
+            type="button"
+            onClick={applyMatlabClassroomFixes}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold"
+            style={{ borderColor: C.border, background: C.surface, color: C.text }}
+            title="Normalize common pasted MATLAB or ZyBooks syntax before running it in OpenMAT"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Fix MATLAB
           </button>
           {normalizeImportedDocuments(recoverySnapshot?.documents) && (
             <button
@@ -9925,6 +10587,18 @@ export default function OpenMatStudio() {
                         <div>Figure: {lastRunReport.figureKind}</div>
                         <div>Workspace vars: {lastRunReport.variableCount}</div>
                         <div>Interactive controls: {lastRunReport.controlCount}</div>
+                        {lastRunReport.compatibilityWarnings?.length > 0 && (
+                          <div className="rounded-lg border px-3 py-2 leading-5" style={{ borderColor: C.amber, background: "rgba(245, 158, 11, 0.12)", color: C.text }}>
+                            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.amber }}>
+                              MATLAB compatibility notes
+                            </div>
+                            <div className="grid gap-1">
+                              {lastRunReport.compatibilityWarnings.map((warning) => (
+                                <div key={warning}>{warning}</div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <div className="rounded-lg border px-3 py-2 leading-5" style={{ borderColor: C.border, background: C.surface, color: C.text }}>
                           {lastRunReport.outputPreview}
                         </div>
@@ -10067,12 +10741,83 @@ export default function OpenMatStudio() {
                     <div className="mb-2 text-[11px]" style={{ color: C.muted }}>
                       Size {selectedVariable.size.join(" x ")} • {selectedVariable.bytes} bytes
                     </div>
+                    {selectedVariableMatrixSummary && (
+                      <div className="mb-3 grid gap-2 sm:grid-cols-2">
+                        {[
+                          `rank = ${selectedVariableMatrixSummary.rank}`,
+                          selectedVariableMatrixSummary.square
+                            ? `det = ${selectedVariableMatrixSummary.determinant == null ? "n/a" : Number(selectedVariableMatrixSummary.determinant.toFixed(6))}`
+                            : "det = rectangular",
+                          selectedVariableMatrixSummary.square
+                            ? `invertible = ${selectedVariableMatrixSummary.invertible ? "yes" : "no"}`
+                            : `nullity = ${selectedVariableMatrixSummary.nullity}`,
+                          selectedVariableMatrixSummary.square
+                            ? `symmetric = ${selectedVariableMatrixSummary.symmetric ? "yes" : "no"}`
+                            : `orth cols = ${selectedVariableMatrixSummary.orthBasisColumns}`,
+                          selectedVariableMatrixSummary.square
+                            ? `orthogonal = ${selectedVariableMatrixSummary.orthogonal ? "yes" : "no"}`
+                            : `pivot cols = ${selectedVariableMatrixSummary.pivots.map((pivot) => pivot.col + 1).join(", ") || "none"}`,
+                          selectedVariableMatrixSummary.square
+                            ? `cond = ${Number.isFinite(selectedVariableMatrixSummary.condition) ? Number(selectedVariableMatrixSummary.condition.toFixed(4)) : "inf"}`
+                            : `null basis = ${selectedVariableMatrixSummary.nullBasisColumns}`,
+                        ].map((item) => (
+                          <div
+                            key={item}
+                            className="rounded-xl border px-3 py-2 text-xs"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                          >
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <pre
                       className="max-h-[240px] overflow-auto rounded-xl border p-3 text-xs leading-6"
                       style={{ borderColor: C.border, background: C.surface2, color: C.text }}
                     >
                       {formatValue(selectedVariable.value)}
                     </pre>
+                    {selectedVariableMatrixSummary?.rrefMatrix?.length > 0 && (
+                      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                        <div>
+                          <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                            RREF
+                          </div>
+                          <pre
+                            className="max-h-[220px] overflow-auto rounded-xl border p-3 text-xs leading-6"
+                            style={{ borderColor: C.border, background: C.surface2, color: C.text }}
+                          >
+                            {formatValue(selectedVariableMatrixSummary.rrefMatrix)}
+                          </pre>
+                        </div>
+                        <div>
+                          <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: C.hint }}>
+                            Row reduction steps
+                          </div>
+                          <div className="max-h-[220px] space-y-2 overflow-auto">
+                            {(selectedVariableMatrixSummary.rrefSteps.length ? selectedVariableMatrixSummary.rrefSteps : [{ label: "Matrix was already in reduced row echelon form." }])
+                              .slice(0, 8)
+                              .map((step, index) => (
+                                <div
+                                  key={`${step.label}-${index}`}
+                                  className="rounded-xl border px-3 py-2 text-xs leading-5"
+                                  style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
+                                >
+                                  <div className="font-semibold" style={{ color: C.text }}>
+                                    Step {index + 1}
+                                  </div>
+                                  <div>{step.label}</div>
+                                </div>
+                              ))}
+                            {selectedVariableMatrixSummary.rrefSteps.length > 8 && (
+                              <div className="rounded-xl border px-3 py-2 text-xs" style={{ borderColor: C.border, background: C.surface2, color: C.muted }}>
+                                {selectedVariableMatrixSummary.rrefSteps.length - 8} more elimination step(s) omitted for readability.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -10131,6 +10876,9 @@ export default function OpenMatStudio() {
                     {[
                       "A = [1 2; 3 4]",
                       "x = A \\\\ b",
+                      "rref(A) / rank(A) / det(A)",
+                      "[L, U, P] = lu(A)",
+                      "null(A) / orth(A) / cond(A)",
                       "A' transpose",
                       "x = 0:0.1:2*pi",
                       "x(1:5) indexing",
@@ -10143,11 +10891,34 @@ export default function OpenMatStudio() {
                       "polyfit / polyval / diff / cumsum",
                       "fft / ifft / norm / trace / diag",
                       "dot / cross / logspace",
+                      "Fix MATLAB button for pasted ZyBooks syntax",
                     ].map((item) => (
                       <div
                         key={item}
                         className="rounded-xl border px-3 py-2 font-mono text-xs"
                         style={{ borderColor: C.border, background: C.surface2 }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl border p-4 text-sm leading-6"
+                  style={{ borderColor: C.border, background: C.surface }}
+                >
+                  <div className="mb-2 font-semibold">Classroom MATLAB workflow</div>
+                  <div className="grid gap-2">
+                    {[
+                      "Use Fix MATLAB after pasting ZyBooks or lecture code. It normalizes smart quotes, odd dashes, and spaced elementwise operators like X .^ 2.",
+                      "If OpenMAT sees symbolic-toolbox or toolbox-heavy commands, Last Run will flag them instead of pretending the script should work unchanged.",
+                      "Select any matrix in Workspace to inspect rank, determinant, conditioning, invertibility, and a row-reduction summary.",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl border px-3 py-2 text-xs"
+                        style={{ borderColor: C.border, background: C.surface2, color: C.muted }}
                       >
                         {item}
                       </div>
