@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy UpSkillOS to GitHub Pages
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VITE_BASE_URL: /${{ github.event.repository.name }}/
+      VITE_BASE_URL: /
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - name: Checkout
