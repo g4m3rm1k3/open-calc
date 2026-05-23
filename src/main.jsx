@@ -20,7 +20,7 @@ if ("serviceWorker" in navigator) {
     const banner = document.createElement("div");
     banner.id = "oc-update-banner";
     banner.innerHTML = `
-      <span style="flex:1">A new version of OpenCalc is available.</span>
+      <span style="flex:1">A new version of UpSkillOS is available.</span>
       <button id="oc-reload-btn" style="background:#fff;color:#1d4ed8;border:none;border-radius:6px;padding:4px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">Reload</button>
       <button onclick="this.parentElement.remove()" style="background:transparent;color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;padding:0 4px">×</button>
     `;

@@ -994,8 +994,8 @@ out.innerHTML += \`<div class="banner \${ok?'ok':'bad'}">\${ok?'✓ All tests pa
       // ── Python hands-on coding ────────────────────────────────────────────────
       {
         id: 'PythonNotebook',
-        title: 'Build a Linked List in Python + Visualize with OpenCalc',
-        caption: 'Same implementation in Python. OpenCalc draws your linked list with real arrows as your code runs.',
+        title: 'Build a Linked List in Python + Visualize with UpSkillOS',
+        caption: 'Same implementation in Python. UpSkillOS draws your linked list with real arrows as your code runs.',
         props: {
           initialCells: [
             {

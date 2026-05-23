@@ -10,9 +10,9 @@ export default function ChapterPage() {
 
   useEffect(() => {
     if (chapter) {
-      document.title = `${chapter.title} — OpenCalc`
+      document.title = `${chapter.title} — UpSkillOS`
     }
-    return () => { document.title = 'OpenCalc' }
+    return () => { document.title = 'UpSkillOS' }
   }, [chapter?.id])
 
   if (!chapter) {

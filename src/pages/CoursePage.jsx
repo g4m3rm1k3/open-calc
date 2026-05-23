@@ -25,8 +25,8 @@ export default function CoursePage() {
   const chapters = CURRICULUM.filter(ch => ch.course === courseKey)
 
   useEffect(() => {
-    if (course) document.title = `${course.label} — OpenCalc`
-    return () => { document.title = 'OpenCalc' }
+    if (course) document.title = `${course.label} — UpSkillOS`
+    return () => { document.title = 'UpSkillOS' }
   }, [course?.key])
 
   if (!course || chapters.length === 0) {

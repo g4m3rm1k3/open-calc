@@ -55,7 +55,7 @@ export default function GlobalPythonNotebook({ isOpen, onClose }) {
           {/* Footer */}
           <footer className="p-3 px-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0 text-center">
             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Powered by Pyodide WebAssembly & open-calc Viz Engine
+              Powered by Pyodide WebAssembly & UpSkillOS Viz Engine
             </p>
           </footer>
         </motion.div>

@@ -39,7 +39,7 @@ export default function HomePage() {
             Intuition-first learning workspace
           </div>
           <h1 className="mb-4 text-4xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-5xl">
-            OpenCalc
+            UpSkillOS
           </h1>
           <p className="mx-auto mb-6 max-w-3xl text-lg leading-9 text-slate-600 dark:text-slate-300 sm:text-xl">
             An open-source interactive platform for math, science, engineering, and programming.
@@ -112,7 +112,7 @@ export default function HomePage() {
                 </span>
               </div>
               <div className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                OpenCalc-native reading, quizzes, and in-browser Python for the browser-safe parts
+                UpSkillOS-native reading, quizzes, and in-browser Python for the browser-safe parts
                 of the external course.
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function HomePage() {
 
       <footer className="mt-16 border-t border-slate-200 pt-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
         <p>
-          OpenCalc is free, open source, and runs entirely in your browser.{" "}
+          UpSkillOS is free, open source, and runs entirely in your browser.{" "}
           <Link to="/about" className="text-brand-600 hover:underline dark:text-brand-400">
             Learn more
           </Link>

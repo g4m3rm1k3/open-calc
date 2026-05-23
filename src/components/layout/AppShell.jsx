@@ -526,7 +526,7 @@ function WelcomeModal() {
             ∂
           </span>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            Welcome to OpenCalc!
+            Welcome to UpSkillOS!
           </h2>
         </div>
         <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">

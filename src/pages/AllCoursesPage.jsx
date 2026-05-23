@@ -64,8 +64,8 @@ export default function AllCoursesPage() {
   const { getLessonStatus } = useProgress()
 
   useEffect(() => {
-    document.title = 'All Courses — OpenCalc'
-    return () => { document.title = 'OpenCalc' }
+    document.title = 'All Courses — UpSkillOS'
+    return () => { document.title = 'UpSkillOS' }
   }, [])
 
   return (

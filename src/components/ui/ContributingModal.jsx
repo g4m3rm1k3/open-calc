@@ -44,7 +44,7 @@ export default function ContributingModal() {
                   </div>
                 )}
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                  {view === 'overview' ? 'About OpenCalc' : 'Contributor Playbook'}
+                  {view === 'overview' ? 'About UpSkillOS' : 'Contributor Playbook'}
                 </h2>
               </div>
               <button 
@@ -68,7 +68,7 @@ export default function ContributingModal() {
                     </div>
                     <div className="prose-content text-slate-600 dark:text-slate-400 text-sm space-y-3 leading-relaxed">
                       <p>
-                        OpenCalc is designed to be free to host and easy to update. Content is stored as plain JavaScript files, making it easy to contribute new lessons, fix errors, or add visualizations via pull request.
+                        UpSkillOS is designed to be free to host and easy to update. Content is stored as plain JavaScript files, making it easy to contribute new lessons, fix errors, or add visualizations via pull request.
                       </p>
                       <button 
                         onClick={() => setView('guide')}
@@ -78,13 +78,13 @@ export default function ContributingModal() {
                         Read the visual contributor playbook
                       </button>
                       <a
-                        href="https://github.com/g4m3rm1k3/open-calc"
+                        href="https://github.com/g4m3rm1k3/upskillos"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-2 flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors w-full sm:w-auto shadow-sm"
                       >
                         <Github size={18} />
-                        github.com/g4m3rm1k3/open-calc
+                        github.com/g4m3rm1k3/upskillos
                       </a>
                       <div className="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-xs text-slate-500 dark:text-slate-400">
                         <kbd className="font-mono text-xs bg-white dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600">Shift</kbd>
@@ -119,7 +119,7 @@ export default function ContributingModal() {
                     </div>
                     <div className="text-sm text-slate-600 dark:text-slate-400">
                       <p>
-                        OpenCalc was created by <strong>Michael McLean</strong>, combining a passion for rigorous mathematical pedagogy with interactive web technology.
+                        UpSkillOS was created by <strong>Michael McLean</strong>, combining a passion for rigorous mathematical pedagogy with interactive web technology.
                       </p>
                     </div>
                   </section>

@@ -81,7 +81,7 @@ export default function Sidebar({ onNavigate, isPinned, togglePin, isCollapsed, 
   const visibleChapters = activeCourse ? CURRICULUM.filter(c => c.course === activeCourse) : []
   const activeCourseObj = COURSES.find(c => c.key === activeCourse)
   
-  const courseName = !activeCourseObj ? 'OpenCalc' : activeCourseObj.label === 'Calculus' ? 'OpenCalc' : activeCourseObj.label === 'Physics' ? 'OpenPhysics' : `Open${activeCourseObj.label}`
+  const courseName = 'UpSkillOS'
   const courseDesc = activeCourseObj?.desc ?? 'All Courses'
   const courseHomePath = activeCourseObj?.path ?? '/courses'
 

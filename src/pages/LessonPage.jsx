@@ -43,10 +43,10 @@ export default function LessonPage() {
 
   useEffect(() => {
     if (lesson) {
-      document.title = `${lesson.title} - OpenCalc`;
+      document.title = `${lesson.title} - UpSkillOS`;
     }
     return () => {
-      document.title = "OpenCalc";
+      document.title = "UpSkillOS";
     };
   }, [lesson?.id, lesson]);
 

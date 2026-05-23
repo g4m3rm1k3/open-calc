@@ -1,7 +1,7 @@
 {
   "name": "open-calc",
   "version": "0.1.0",
-  "description": "An open-source interactive calculus textbook — intuition first, rigor always",
+  "description": "An open-source interactive STEM learning platform — intuition first, rigor always",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "main": "desktop/app/main.mjs",
@@ -75,6 +75,6 @@
   },
   "build": {
     "appId": "org.opencalc.desktop",
-    "productName": "open-calc"
+    "productName": "UpSkillOS"
   }
 }

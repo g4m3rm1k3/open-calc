@@ -649,7 +649,7 @@ export default function TICalc({ onClose }) {
         onMouseDown={startDrag}
       >
         <span className="text-indigo-400 text-base select-none">⊞</span>
-        <span className={`text-xs font-bold tracking-wide ${txt} flex-1`}>OpenCalc</span>
+        <span className={`text-xs font-bold tracking-wide ${txt} flex-1`}>UpSkillOS</span>
         <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold
           ${angleMode === 'DEG' ? 'bg-amber-500 text-white' : `${bg2} ${muted}`}`}>
           {angleMode}

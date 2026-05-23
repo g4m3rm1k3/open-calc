@@ -992,10 +992,10 @@ function SectionOverview() {
   return (
     <div>
       <SectionHeading sub="No coding experience required to get started.">
-        How OpenCalc works
+        How UpSkillOS works
       </SectionHeading>
       <Para>
-        OpenCalc is an open-source interactive STEM learning platform. Every topic is a{" "}
+        UpSkillOS is an open-source interactive STEM learning platform. Every topic is a{" "}
         <strong>lesson</strong>. Lessons are grouped into{" "}
         <strong>chapters</strong>. You write lessons as simple text files — the
         app reads them and renders them automatically.
@@ -1128,12 +1128,12 @@ function SectionOverview() {
             Source code on GitHub
           </div>
           <a
-            href="https://github.com/g4m3rm1k3/open-calc"
+            href="https://github.com/g4m3rm1k3/upskillos"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-brand-600 dark:text-brand-400 hover:underline truncate block"
           >
-            github.com/g4m3rm1k3/open-calc
+            github.com/g4m3rm1k3/upskillos
           </a>
         </div>
       </div>
@@ -3128,7 +3128,7 @@ function SectionAbout() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">About OpenCalc</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">About UpSkillOS</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400">Project info, license, and how to contribute</p>
       </div>
 
@@ -3140,7 +3140,7 @@ function SectionAbout() {
         <div>
           <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Created By</h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            OpenCalc was created by <strong>Michael McLean</strong>, combining a passion for
+            UpSkillOS was created by <strong>Michael McLean</strong>, combining a passion for
             rigorous mathematical pedagogy with interactive web technology. Built to be free
             for students everywhere.
           </p>
@@ -3177,13 +3177,13 @@ function SectionAbout() {
             </p>
           </div>
           <a
-            href="https://github.com/g4m3rm1k3/open-calc"
+            href="https://github.com/g4m3rm1k3/upskillos"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-300 hover:underline"
           >
             <Github className="w-4 h-4" />
-            github.com/g4m3rm1k3/open-calc
+            github.com/g4m3rm1k3/upskillos
           </a>
         </div>
       </section>
@@ -3300,7 +3300,7 @@ export default function HelpModal({ isOpen, onClose }) {
                 Contributor Docs
               </h1>
               <p className="text-[11px] text-white/70">
-                OpenCalc · For all skill levels
+                UpSkillOS · For all skill levels
               </p>
             </div>
           </div>

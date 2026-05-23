@@ -194,7 +194,7 @@ Timelines let you orchestrate complex multi-step animations declaratively. This 
       html: `<div style="background:#09111c;padding:24px;border-radius:12px;min-height:260px;display:flex;flex-direction:column;gap:16px;align-items:center;justify-content:center;">
   <script src="https://cdn.jsdelivr.net/npm/animejs@3/lib/anime.min.js"></script>
   <div id="logo" style="width:64px;height:64px;background:linear-gradient(135deg,#38bdf8,#a78bfa);border-radius:16px;opacity:0;"></div>
-  <div id="headline" style="color:#e2e8f0;font-family:monospace;font-size:20px;font-weight:bold;opacity:0;">OpenCalc</div>
+  <div id="headline" style="color:#e2e8f0;font-family:monospace;font-size:20px;font-weight:bold;opacity:0;">UpSkillOS</div>
   <div id="tagline" style="color:#64748b;font-family:monospace;font-size:13px;opacity:0;">Learn JavaScript interactively.</div>
   <div style="display:flex;gap:8px;margin-top:4px;">
     <button id="getStarted" style="background:#3b82f6;border:none;color:#fff;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:13px;opacity:0;">Get Started</button>
