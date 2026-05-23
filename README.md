@@ -1,131 +1,158 @@
-# OpenCalc — Free Education for Everyone AI Is About to Disrupt
+<div align="center">
 
-**[▶ Open the App](https://g4m3rm1k3.github.io/open-calc/) · [Download for Windows](https://github.com/g4m3rm1k3/open-calc/releases/latest) · [Contribute a Lesson](CONTRIBUTING.md) · [Support This Project](#support-this-project)**
+# UpSkillOS
+
+### The free, open-source learning OS for the AI age.
+
+**Math solvers. Interactive courses. Games. Labs. CNC simulators. AI tutor. No account. No cost. Forever.**
+
+[**▶ Open the App**](https://upskillos.io) · [**Download for Windows**](https://github.com/g4m3rm1k3/upskillos/releases/latest) · [**Contribute**](CONTRIBUTING.md) · [**Discussions**](https://github.com/g4m3rm1k3/upskillos/discussions)
 
 [![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://reactjs.org)
 [![D3](https://img.shields.io/badge/D3.js-7-f9a03c?logo=d3.js&logoColor=white)](https://d3js.org)
 [![Three.js](https://img.shields.io/badge/Three.js-0.168-black?logo=three.js)](https://threejs.org)
-[![KaTeX](https://img.shields.io/badge/KaTeX-0.16-2c3e50)](https://katex.org)
 [![Pyodide](https://img.shields.io/badge/Pyodide-0.26-37763b?logo=python&logoColor=white)](https://pyodide.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/g4m3rm1k3/upskillos?style=social)](https://github.com/g4m3rm1k3/upskillos)
+
+</div>
 
 ---
 
-## Why This Exists
+## Why UpSkillOS Exists
 
-AI is coming for jobs in manufacturing, logistics, trades, and services. When it does, millions of people will need to reskill — fast, affordably, and without going back into debt for a degree.
+AI is restructuring the economy faster than schools can respond. Manufacturing workers, tradespeople, and anyone whose job sits in automation's path needs a way to reskill — fast, free, and without going back into debt.
 
-OpenCalc is the platform they'll need. It's a free, open-source, interactive STEM learning environment that teaches the math, science, and programming skills that hold their value no matter how the economy shifts. No tuition. No account required. No ads. Just learning.
+UpSkillOS is the platform they need. It's a full learning environment — not just a course list — with interactive lessons, step-by-step math solvers, live coding environments, simulators, labs, games, and an AI tutor. Everything runs in the browser. No account. No cost. No ads. No backend.
 
-**Intuition first, rigour always** — every concept follows the same cycle:
+**Intuition first, rigour always.** Every concept earns its place.
 
-| Stage | What happens |
+---
+
+## What Makes This Different
+
+Most learning platforms give you a video and a quiz. UpSkillOS gives you a complete environment:
+
+| Feature | What it does |
 |---|---|
-| **Hook** | A real-world question that makes the concept feel necessary |
-| **Intuition** | Geometric or physical reasoning with interactive visualizations |
-| **Math** | Precise definitions, theorems, and worked examples |
-| **Rigor** | Step-by-step proof with a synchronized visualization |
+| **Step-by-step Math Solver** | Walks you through derivatives and integrals one step at a time. Professors can write and share notes directly inside it. |
+| **Live Code Environments** | Run Python, JavaScript, C++, and React directly in the browser — no installation, no account |
+| **OpenMAT** | A MATLAB-style matrix workspace built into the app for linear algebra and numerical work |
+| **Synchronized Proof Visualizations** | Every proof step advances the geometry in lockstep — you never guess what the animation means |
+| **CNC Simulator** | Full G-Code simulator for machinists learning CNC programming |
+| **Physics Lab** | Interactive physics experiments in the browser |
+| **Digital Electronics Lab** | Logic gates, circuits, and signals you can manipulate live |
+| **Drawing & Drafting Apps** | CAD-style tools built into the learning environment |
+| **AI Tutor** | Conversational STEM tutor with full lesson context, available inside every lesson |
+| **P2P Study Chat** | Global and per-lesson chat connecting students worldwide — no server, no account, powered by WebRTC over BitTorrent/Nostr DHT |
+| **Embedded Video Library** | Curated videos from top STEM YouTube channels, plus support for adding your own |
+| **Works Offline** | Full desktop app — learn anywhere, no internet required |
 
 ---
 
-## Who This Is For
+## 24 Courses. One Platform.
 
-**If you're reskilling** — whether you were laid off, looking to move up, or just hungry to learn — OpenCalc meets you where you are. Start with manufacturing fundamentals, move into programming, then math and data science. There's no wrong place to begin.
-
-**If you're a student** — this is the interactive textbook your university never gave you. Every proof has a visualization. Every worked example is interactive. You can run Python in the browser right alongside the lesson.
-
-**If you're a self-learner** — you'll find university-level STEM content that respects your intelligence and builds your intuition, not just your ability to pass a test.
-
----
-
-## What's Inside
-
-11 full courses, all free, all interactive:
-
-| Course | Description | Status |
+| Course | Topics | Audience |
 |---|---|---|
-| **Pre-Calculus** | Functions, graphs, transformations, trigonometry | ✅ Active |
-| **Geometry** | Proofs, constructions, similarity, circles, coordinates | ✅ Active |
-| **Calculus** | Limits, derivatives, applications, integration, series | ✅ Active |
-| **Physics** | Mechanics, kinematics, forces, waves | ✅ Active |
-| **Discrete Math** | Logic, sets, induction, combinatorics, graph theory | ✅ Active |
-| **Linear Algebra** | Vectors, matrices, transformations, eigenvalues | ✅ Active |
-| **Python Programming** | Core language, data structures, algorithms | ✅ Active |
-| **Data Science** | NumPy, Pandas, visualization, ML foundations | ✅ Active |
-| **JavaScript Core** | Language fundamentals and runtime mechanics | ✅ Active |
-| **Web Systems** | DOM, reactivity, APIs | ✅ Active |
-| **Build Tetris** | Build a complete game from scratch — project-driven | ✅ Active |
-
-> Manufacturing fundamentals, chemistry, and workforce transition tracks are actively being developed. See the [roadmap](#roadmap).
+| **Pre-Calculus** | Functions, graphs, transformations, trigonometry | Everyone |
+| **Geometry** | Proofs, constructions, similarity, circles | Everyone |
+| **Calculus** | Limits, derivatives, integration, series | STEM students |
+| **Physics** | Mechanics, kinematics, forces, waves | STEM students |
+| **Chemistry** | Elements, reactions, molecular structure | STEM students |
+| **Discrete Math** | Logic, sets, induction, combinatorics, graph theory | CS students |
+| **Linear Algebra** | Vectors, matrices, transformations, eigenvalues | CS / Engineering |
+| **Computer Science** | Logic, circuits, algorithms | Everyone |
+| **Digital Fundamentals** | Signals, binary, logic gates | Electronics / Trades |
+| **CNC Macro Systems** | G-Code, kinematics, logic | Machinists / Manufacturing |
+| **G-Code Interpreter** | Build a G-Code parser from first principles | Advanced / Manufacturing |
+| **Python Programming** | Core language, data structures, algorithms | Everyone |
+| **Data Science** | NumPy, Pandas, visualization, ML foundations | Data workers |
+| **AI Engineering** | LLMs, agents, production AI systems | Developers |
+| **JavaScript Core** | Language and runtime fundamentals | Developers |
+| **Web Systems** | DOM, reactivity, APIs | Developers |
+| **Data Structures & Algorithms** | Memory, structures, algorithmic thinking | CS students |
+| **Dynamic Programming** | Overlapping subproblems, classic patterns | CS students |
+| **3D Graphics & Three.js** | GPU pipeline, WebGL, Three.js | Developers |
+| **Three.js Part 2** | Three.js from first principles | Developers |
+| **HTML Canvas** | 2D graphics, animation, CAD foundations | Developers |
+| **Interface Design** | Visual hierarchy, spacing, design systems | Developers / Designers |
+| **Git Systems** | Content-addressable versions, branching logic | Everyone |
+| **Build Tetris** | Build a complete game from scratch | Everyone |
 
 ---
 
-## Features That Make This Different
+## Learn By Doing — Games & Simulations
 
-**In-browser code execution** — run Python and JavaScript directly in the lesson, no installation, no account, powered by [Pyodide](https://pyodide.org) and a sandboxed JS runtime.
+Learning lands differently when it's play. UpSkillOS has games built on the actual math and physics being taught:
 
-**OpenMAT** — a MATLAB-style matrix workspace built into the app. Linear algebra, numerical methods, and data work without leaving the lesson.
+- **Pool / Billiards** — learn physics through real ball collision simulation
+- **3D Basketball** — projectile motion and 3D space
+- **Mini Golf** — angles, trajectories, geometry
+- **Football Calculus** — real calculus applied to real throws
+- **Arkanoid** — vectors, collision detection, game loop
+- **Build Tetris** — a full guided project from empty file to shipped game
 
-**Synchronized proof visualizations** — every proof step advances the geometry in lockstep. You never have to guess what the animation is showing you — a `mathBridge` field on every visualization states it explicitly.
+---
 
-**AI Tutor** — built-in conversational AI tutor available inside lessons to answer questions in context.
+## For Displaced Workers & Career Changers
 
-**P2P Study Chat (no server, no cost)** — connect with other students worldwide studying the same lesson, powered by WebRTC over BitTorrent/Nostr DHT. No server. No account. No cost. Completely private.
+If AI is affecting your industry, UpSkillOS gives you a structured path into the skills that hold their value:
 
-**Works offline** — download the desktop app and learn anywhere, no internet required (P2P chat and AI tutor require a connection).
+**From manufacturing → CNC programming and G-Code** — your mechanical intuition already puts you ahead. The CNC courses and simulator bridge you to the software side of the machines you already know.
 
-**Dark mode** — because learning at 2am is real.
+**From any trade → data, math, programming** — the Digital Fundamentals, Python, and Math courses start from zero and build fast. The step-by-step math solver means you never get stuck alone.
+
+**From student → job-ready** — 24 courses, live coding, AI tutor, and P2P study chat give you everything a university course does, free, at your pace.
+
+---
+
+## For Educators & Professors
+
+UpSkillOS has a built-in professor tools layer:
+
+- Write notes and worked examples directly into the math solver
+- Share them with students via a simple link — no account required for students
+- The in-app lesson tutorial (click **?** in the nav) lets any educator contribute a lesson without prior knowledge of the codebase
+- Self-host on your institution's network with the optional local backend
+
+---
+
+## For Organizations & Grant Funders
+
+UpSkillOS is a free, permanently open-source platform (GPL-3.0) serving the exact population that workforce development funding is designed to reach — people displaced by automation who need accessible, rigorous reskilling.
+
+**What we're seeking support for:**
+
+- Full-time development and content expansion
+- Expanded manufacturing and trades tracks
+- Accessibility audit (WCAG 2.1 AA)
+- Multilingual content (Spanish first)
+- Mobile-first improvements
+
+If your organization funds open education, digital equity, or workforce development, please reach out via [Discussions](https://github.com/g4m3rm1k3/upskillos/discussions). The platform will remain free forever regardless of funding status.
 
 ---
 
 ## Download
 
-| Platform | File | Notes |
-|---|---|---|
-| **Web (any device)** | [Open in browser →](https://g4m3rm1k3.github.io/open-calc/) | No install required |
-| **Windows** (10/11, 64-bit) | `open-calc-X.X.X.exe` | See SmartScreen note below |
-| **macOS** | `open-calc-X.X.X.dmg` | Coming soon |
+| Platform | How |
+|---|---|
+| **Web (any device)** | [Open in browser →](https://upskillos.io) — nothing to install |
+| **Windows** (10/11 64-bit) | [Download latest release →](https://github.com/g4m3rm1k3/upskillos/releases/latest) |
+| **macOS** | Coming soon |
 
-👉 **[Download the latest release →](https://github.com/g4m3rm1k3/open-calc/releases/latest)**
-
-> **Windows SmartScreen:** Click "More info" → "Run anyway". The app is unsigned (code signing is expensive for an unfunded open source project) but safe.
-
----
-
-## For Organizations & Educators
-
-If you run a workforce development program, community college, union training program, or reentry organization, OpenCalc is free to use and can be self-hosted on your network. The optional local backend enables LAN deployment with no internet dependency.
-
-We're actively looking for pilot partners in manufacturing and trades retraining. If you're interested, open a [Discussion](https://github.com/g4m3rm1k3/open-calc/discussions) or reach out directly.
+> **Windows SmartScreen note:** Click "More info" → "Run anyway". The app is unsigned (code signing costs money this project doesn't have yet) but safe.
 
 ---
 
 ## Support This Project
 
-OpenCalc is entirely free, open source, and built by one developer. If it matters to you, here's how to help:
+UpSkillOS is free, ad-free, and built by one developer. If it matters to you:
 
-- ⭐ **Star this repo** — it helps other people find it
-- 🔀 **Contribute a lesson** — [CONTRIBUTING.md](CONTRIBUTING.md) has everything you need; the in-app tutorial makes it approachable for non-developers too
-- 📣 **Share it** — post it in a community, send it to someone who needs it, mention it to a teacher or workforce counselor
-- 💬 **Open a Discussion** — tell us who you are and what you'd need to use this seriously
-
-> **Grant funders and foundations:** OpenCalc is seeking funding to support full-time development, content expansion into workforce retraining tracks, and accessibility improvements. The platform is GPL-3.0 licensed and will remain permanently free. If your organization funds open education, digital equity, or workforce development, please reach out via [Discussions](https://github.com/g4m3rm1k3/open-calc/discussions).
-
----
-
-## Roadmap
-
-Near-term priorities driven by the workforce retraining mission:
-
-- [ ] Manufacturing fundamentals track (blueprint reading, tolerances, CNC basics)
-- [ ] Trades math track (electrical, HVAC, plumbing calculations)
-- [ ] Adaptive learning paths based on prior knowledge
-- [ ] Mobile-first responsive improvements
-- [ ] Accessibility audit (WCAG 2.1 AA)
-- [ ] macOS desktop app
-- [ ] Multilingual content (Spanish first)
-
-Have a specific need? Open a [Discussion](https://github.com/g4m3rm1k3/open-calc/discussions) — roadmap priorities are driven by real user needs.
+- ⭐ **Star this repo** — the single most effective thing you can do for visibility
+- 🔀 **Contribute a lesson** — the in-app tutorial makes it approachable for non-developers
+- 📣 **Share it** — send it to someone who needs it. A teacher, a coworker, a workforce counselor, a union
+- 💬 **Tell us who you are** — open a [Discussion](https://github.com/g4m3rm1k3/upskillos/discussions) and tell us how you're using it
 
 ---
 
@@ -134,37 +161,36 @@ Have a specific need? Open a [Discussion](https://github.com/g4m3rm1k3/open-calc
 **Requirements:** Node.js 18+, npm 9+
 
 ```bash
-git clone https://github.com/g4m3rm1k3/open-calc.git
-cd open-calc
+git clone https://github.com/g4m3rm1k3/upskillos.git
+cd upskillos
 npm install
-npm run dev        # starts dev server at http://localhost:5173
+npm run dev        # http://localhost:5173
 ```
 
 ```bash
-npm run build      # production build + generates search index
-npm run preview    # preview the production build locally
+npm run build      # production build + search index
+npm run preview    # preview production build
 ```
 
-The fastest way to contribute a lesson is the **interactive in-app tutorial** — click the **?** button in the top navigation bar. It walks you through the full lesson schema with live preview. No prior experience with the codebase required.
+The fastest way to contribute a lesson is the **interactive in-app tutorial** — click **?** in the top nav. Full lesson schema, live preview, downloadable templates. No prior codebase knowledge required.
 
-For the full technical reference — lesson schema, visualization API, quiz grading system, quality standards — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Full technical reference: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### Building the desktop app
+### Desktop app
 
 ```bash
-npm run desktop:build    # Windows .exe — run on Windows
-                         # macOS .dmg  — run on macOS
+npm run desktop:build    # Windows .exe (run on Windows) / macOS .dmg (run on Mac)
 # Output: desktop/staging/release/
 ```
 
 ### Optional local backend
 
 ```bash
-npm run backend        # LAN hosting + lesson overrides (127.0.0.1:4318)
+npm run backend        # LAN hosting (127.0.0.1:4318)
 npm run backend:lan    # exposes on local network
 ```
 
-Not required for the web or desktop app. Useful for self-hosted institutional deployments.
+Not required for web or desktop. Enables self-hosted institutional deployments.
 
 ---
 
@@ -174,14 +200,13 @@ Not required for the web or desktop app. Useful for self-hosted institutional de
 |---|---|
 | React 18 + Vite 5 | UI and build |
 | D3.js 7 | 2D interactive visualizations |
-| Three.js | 3D visualizations |
+| Three.js | 3D visualizations and graphics courses |
 | KaTeX | Math rendering |
-| Pyodide | Python runtime in the browser (no server) |
+| Pyodide | Python runtime in browser (no server) |
 | Tailwind CSS | Styling with full dark mode |
-| React Router | Client-side routing |
 | Fuse.js | Full-text search across all lessons |
 | Trystero + WebRTC | Serverless P2P study chat |
-| Electron | Desktop app wrapper |
+| Electron | Desktop app |
 
 ---
 
@@ -190,30 +215,17 @@ Not required for the web or desktop app. Useful for self-hosted institutional de
 ```
 src/
   content/          # lesson files — one JS object per lesson
-    chapter-0/      # Calculus prerequisites
-    chapter-1/      # Limits
-    chapter-2/      # Derivatives
-    ...chapter-6/
-    precalc/
-    geometry-1/ ... geometry-6/
-    python-1/
-    data-science/
-    javascript-1/
-    physics-1/
-    discrete-math/
-    linear-algebra/
-    web-1/
   components/
     chat/           # P2P study chat (global + lesson rooms)
     viz/
       d3/           # 2D D3 visualizations
       three/        # 3D Three.js visualizations
-      react/        # React visualizations (notebooks, games)
+      react/        # React visualizations, notebooks, games, labs
       VizFrame.jsx  # registry — maps string IDs to components
-    lesson/         # lesson layout components
+    lesson/         # lesson layout and math solver
     math/           # KaTeX wrappers
-  pages/            # route-level components
-  context/          # app-level state (progress, theme, chat)
+  pages/
+  context/          # progress, theme, chat state
 public/
   search-index.json # generated by npm run build
 desktop/
@@ -222,10 +234,31 @@ desktop/
 
 ---
 
-## License
+## Roadmap
 
-GPL-3.0 — free to use, modify, and distribute. Derivative works must remain open source.
+- [ ] upskillos.io domain and rebrand
+- [ ] Expanded manufacturing and trades tracks
+- [ ] Adaptive learning paths
+- [ ] Accessibility audit (WCAG 2.1 AA)
+- [ ] macOS desktop app
+- [ ] Multilingual content (Spanish first)
+- [ ] Mobile-first responsive pass
+- [ ] GitHub Sponsors setup
+
+Have a need? Open a [Discussion](https://github.com/g4m3rm1k3/upskillos/discussions) — roadmap priorities follow real user needs.
 
 ---
 
+## License
+
+GPL-3.0 — free to use, modify, distribute. Derivative works must remain open source.
+
+---
+
+<div align="center">
+
 *Built with the belief that access to a rigorous education should never depend on the size of your bank account.*
+
+*Especially not now.*
+
+</div>
