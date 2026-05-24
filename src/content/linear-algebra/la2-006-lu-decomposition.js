@@ -1,0 +1,583 @@
+export default {
+  // ── Identity ───────────────────────────────────────────────────
+  id: 'la2-006',
+  slug: 'lu-decomposition',
+  chapter: 'la2',
+  order: 6,
+  title: 'LU Decomposition',
+  subtitle: 'Factoring a matrix into a lower and upper triangle — so Gaussian elimination runs once and solves unlimited systems.',
+  tags: ['LU decomposition', 'LU factorization', 'forward substitution', 'back substitution', 'partial pivoting', 'PA=LU', 'Gaussian elimination'],
+  aliases: 'LU factorization lower upper triangular forward back substitution partial pivoting PA=LU Gaussian elimination matrix factorization',
+
+  // ── Pedagogical Meta ───────────────────────────────────────────
+  timeToComplete: 35,
+  coreConcept: 'LU decomposition factors A into A = LU (lower × upper triangular). The elimination work happens once. Then solving Ax = b for any number of different b vectors costs only O(n²) per solve instead of O(n³). It also computes det(A) as a free byproduct.',
+  prerequisites: ['la2-005'],
+  nextLesson: 'eigenvectors-and-eigenvalues',
+
+  // ── Hook ───────────────────────────────────────────────────────
+  hook: {
+    question: "You need to solve 1,000 different systems of equations — all with the same matrix A but different right-hand sides. Must you run Gaussian elimination 1,000 times?",
+    realWorldContext: "Every structural engineering simulation solves the same stiffness matrix $K$ (representing the physical structure) with thousands of different load vectors $\\mathbf{f}$ (different stress scenarios). The matrix does not change — only the forces do. Running full Gaussian elimination every time would be catastrophically slow. LU decomposition is the solution: factor $A$ once in $O(n^3)$ time, then solve each new system in $O(n^2)$ time by simple forward and backward substitution. This one-time factorization / many-time solve pattern appears everywhere: finite element analysis, neural network training, circuit simulation, and computer graphics.",
+    previewVisualizationId: 'GaussianEliminationStepper',
+  },
+
+  // ── Intuition ──────────────────────────────────────────────────
+  intuition: {
+    prose: [
+      '**Where you are in the story:** You have mastered Gaussian elimination — you can reduce any matrix to row echelon form. You have mastered determinants. Now you learn that Gaussian elimination itself can be packaged as a product of two triangular matrices. This packaging is LU decomposition.',
+      '**The core observation:** When you perform Gaussian elimination on $A$, you subtract multiples of rows from each other to create zeros below the diagonal. Each multiplier you use — the number you multiply the pivot row by before subtracting — gets recorded into a matrix called $L$ (Lower). The resulting upper triangular matrix is $U$ (Upper). Together, $A = L \\cdot U$.',
+      'Concretely: if you eliminate column 1 of $A$ by subtracting $m_{21}$ times row 1 from row 2, and $m_{31}$ times row 1 from row 3, those multipliers $m_{21}$ and $m_{31}$ go directly into $L$ at positions $(2,1)$ and $(3,1)$. The $L$ matrix has 1s on its diagonal and the elimination multipliers below the diagonal.',
+      '**Why this is useful: the two-phase solve**',
+      'Once you have $A = LU$, solving $A\\mathbf{x} = \\mathbf{b}$ splits into two easy steps:',
+      '1. **Forward substitution**: Solve $L\\mathbf{y} = \\mathbf{b}$ for $\\mathbf{y}$. Because $L$ is lower triangular, $y_1$ is immediate, then $y_2$, then $y_3$ — each using only previously computed values.',
+      '2. **Back substitution**: Solve $U\\mathbf{x} = \\mathbf{y}$ for $\\mathbf{x}$. Because $U$ is upper triangular, $x_n$ is immediate, then $x_{n-1}$, working backwards.',
+      'Each substitution phase is $O(n^2)$ operations. The factorization $A = LU$ costs $O(n^3)$ once. For 1,000 different right-hand sides, you pay $O(n^3)$ once instead of $O(n^3)$ a thousand times.',
+      '**The problem with zero pivots: Partial Pivoting**',
+      'LU decomposition fails if a pivot (diagonal entry during elimination) is zero — you cannot divide by zero. It also fails numerically if a pivot is very small — dividing by a near-zero number amplifies rounding errors. The fix is **partial pivoting**: before each elimination step, swap rows to bring the largest entry in the current column to the pivot position. This introduces a permutation matrix $P$ (recording the swaps), giving the formula $PA = LU$ instead of $A = LU$.',
+      'A **permutation matrix** $P$ is a matrix with exactly one 1 in each row and column and 0s everywhere else. Multiplying $PA$ reorders the rows of $A$ according to the swaps made.',
+      '**Determinant as a byproduct**',
+      'Once you have $PA = LU$, the determinant is immediate: $\\det(A) = \\det(P^{-1}) \\cdot \\det(U)$. Since $L$ has 1s on its diagonal, $\\det(L) = 1$. Since $P$ is a permutation, $\\det(P^{-1}) = \\pm 1$ (depending on the number of row swaps). And $\\det(U)$ is just the product of $U$\'s diagonal entries. This is exactly why NumPy computes determinants via LU — never via cofactor expansion.',
+      '**Where this is heading:** LU decomposition is foundational for numerical linear algebra. The QR decomposition (used in eigenvalue algorithms and least squares) and the SVD (the ultimate factorization) both rely on the same factorization-then-solve pattern.',
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 6 — Matrices & Transformations',
+        body: '**Previous:** Determinants — general computation and properties.\n**This lesson:** LU decomposition — Gaussian elimination packaged as a product of two triangular matrices.\n**Next (Chapter 3):** Eigenvalues and Eigenvectors — the invariant directions of a transformation.',
+      },
+      {
+        type: 'insight',
+        title: 'What L and U Look Like',
+        body: 'For any $n \\times n$ matrix $A$:\n\n$L = \\begin{bmatrix} 1 & 0 & 0 \\\\ m_{21} & 1 & 0 \\\\ m_{31} & m_{32} & 1 \\end{bmatrix} \\quad U = \\begin{bmatrix} u_{11} & u_{12} & u_{13} \\\\ 0 & u_{22} & u_{23} \\\\ 0 & 0 & u_{33} \\end{bmatrix}$\n\n$L$ has 1s on the diagonal and the Gaussian elimination multipliers below. $U$ is exactly the result of Gaussian elimination (upper triangular form). Neither has to be symmetric or square — but both are always triangular.',
+      },
+      {
+        type: 'insight',
+        title: 'Permutation Matrix — Definition',
+        body: 'A **permutation matrix** $P$ is an $n \\times n$ matrix with exactly one 1 in each row and column (and 0s everywhere else). $PA$ reorders the rows of $A$ according to those positions. $P^{-1} = P^T$ (permutation matrices are orthogonal). $\\det(P) = \\pm 1$.',
+      },
+      {
+        type: 'warning',
+        title: 'Career Signal — LU Decomposition',
+        body: 'LU decomposition is the backbone of scipy.linalg.solve, MATLAB\'s backslash operator, and virtually every scientific computing library. Interview questions include: "How does np.linalg.solve work internally?" (LU with pivoting), "When would you use np.linalg.inv vs np.linalg.solve?" (never invert — always solve), and "What is O(n³) vs O(n²) and why does it matter?" Knowing these separates someone who has used a library from someone who understands it.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'GaussianEliminationStepper',
+        title: 'Gaussian Elimination — Tracking the Multipliers',
+        mathBridge: 'Watch each elimination step. Every time a multiple of one row is subtracted from another, the multiplier used is the exact number that gets placed into matrix L. After all eliminations, the matrix that remains is U. Step through the full process and observe how L accumulates the multipliers bottom-up while U is built top-down.',
+        caption: 'LU decomposition is Gaussian elimination with the multipliers stored.',
+      },
+    ],
+  },
+
+  // ── Math ───────────────────────────────────────────────────────
+  math: {
+    prose: [
+      '**LU Decomposition — Formal Definition**',
+      'Given an $n \\times n$ matrix $A$, the LU decomposition (without pivoting) finds matrices $L$ and $U$ such that:\n\n$A = LU$\n\nwhere $L$ is **lower triangular** with 1s on the diagonal (called a unit lower triangular matrix) and $U$ is **upper triangular**.',
+      '**The Algorithm: Gaussian Elimination with Multiplier Recording**',
+      'For each column $k = 1, \\ldots, n-1$:\n\nFor each row $i = k+1, \\ldots, n$:\n\n$m_{ik} = a_{ik} / a_{kk}$ ← the elimination multiplier for position $(i,k)$\n\n$R_i \\leftarrow R_i - m_{ik} R_k$ ← standard row replacement\n\nAfter all eliminations: $L_{ij} = m_{ij}$ for $i > j$, $L_{ii} = 1$, $U$ = result of elimination.',
+      '**Solving $A\\mathbf{x} = \\mathbf{b}$ via LU**',
+      'Substitute $A = LU$:\n\n$LU\\mathbf{x} = \\mathbf{b}$\n\nLet $\\mathbf{y} = U\\mathbf{x}$. Solve in two phases:',
+      '**Phase 1 — Forward substitution** (solve $L\\mathbf{y} = \\mathbf{b}$):\n\n$y_1 = b_1$\n\n$y_i = b_i - \\sum_{j=1}^{i-1} L_{ij} y_j \\quad (i = 2, \\ldots, n)$',
+      '**Phase 2 — Back substitution** (solve $U\\mathbf{x} = \\mathbf{y}$):\n\n$x_n = y_n / U_{nn}$\n\n$x_i = \\left(y_i - \\sum_{j=i+1}^{n} U_{ij} x_j\\right) / U_{ii} \\quad (i = n-1, \\ldots, 1)$',
+      '**With Partial Pivoting: $PA = LU$**',
+      'Before eliminating column $k$, find the row $i \\geq k$ with the largest $|a_{ik}|$ (the "partial pivot") and swap it to position $k$. The permutation matrix $P$ records all these swaps. The factored form is:\n\n$PA = LU$\n\nTo solve $A\\mathbf{x} = \\mathbf{b}$: first apply $P$ to $\\mathbf{b}$ (reorder it), then forward substitute, then back substitute.',
+      '**Determinant from LU**',
+      '$\\det(A) = \\det(P^{-1}) \\cdot \\det(L) \\cdot \\det(U) = (\\pm 1) \\cdot 1 \\cdot (U_{11} \\cdot U_{22} \\cdots U_{nn})$\n\nThe sign is $(-1)^s$ where $s$ is the number of row swaps in $P$.',
+    ],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'LU Decomposition Existence',
+        body: 'If all leading submatrices of $A$ are invertible (all pivots are non-zero with no pivoting), then $A = LU$ exists and is unique. With partial pivoting, every non-singular $A$ has a factorization $PA = LU$.',
+      },
+      {
+        type: 'theorem',
+        title: 'Computational Complexity',
+        body: 'LU factorization: $O(n^3)$ — performed once.\nForward substitution: $O(n^2)$ — per right-hand side.\nBack substitution: $O(n^2)$ — per right-hand side.\n\nFor $k$ different right-hand sides:\n• Naïve (re-run elimination each time): $O(kn^3)$\n• LU factorization: $O(n^3 + kn^2)$ — far cheaper when $k$ is large.',
+      },
+      {
+        type: 'strategy',
+        title: 'Never Compute A⁻¹ Just to Solve Ax = b',
+        body: 'Computing $A^{-1}$ requires $O(n^3)$ work AND introduces numerical errors. Then multiplying $A^{-1}\\mathbf{b}$ adds another $O(n^2)$. Solving via LU is the same cost but more numerically stable. In NumPy: always use `np.linalg.solve(A, b)`, never `np.linalg.inv(A) @ b`.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: LU Decomposition',
+        mathBridge: 'scipy.linalg.lu(A) returns (P, L, U) such that A = P @ L @ U. np.linalg.solve(A, b) uses LU internally. The cells below: (1) manually compute LU for a 3×3, (2) verify via scipy, (3) solve two systems by forward/back substitution, (4) compute determinant from U.',
+        caption: 'Build intuition for LU by computing it step by step, then verify with scipy.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Manual LU decomposition of a 3×3 matrix',
+              prose: [
+                'We trace Gaussian elimination on A = [[2,1,1],[4,3,3],[8,7,9]] step by step, recording the multipliers into L.',
+                'Step 1: eliminate column 1. Multipliers: m21 = 4/2 = 2, m31 = 8/2 = 4. These go into L[1,0] and L[2,0].',
+                'Step 2: eliminate column 2. Multiplier: m32 = 3/1 = 3. This goes into L[2,1].',
+              ],
+              code: `import numpy as np
+
+A = np.array([[2., 1., 1.],
+              [4., 3., 3.],
+              [8., 7., 9.]])
+
+# --- Step 1: eliminate column 1 ---
+m21 = A[1,0] / A[0,0]   # = 4/2 = 2
+m31 = A[2,0] / A[0,0]   # = 8/2 = 4
+
+A[1] = A[1] - m21 * A[0]  # R2 = R2 - 2*R1
+A[2] = A[2] - m31 * A[0]  # R3 = R3 - 4*R1
+print("After step 1:")
+print(A)
+
+# --- Step 2: eliminate column 2 ---
+m32 = A[2,1] / A[1,1]   # = 3/1 = 3
+
+A[2] = A[2] - m32 * A[1]  # R3 = R3 - 3*R2
+print("After step 2 (this is U):")
+print(A)
+
+print()
+# Assemble L from multipliers
+L = np.array([[1.,   0., 0.],
+              [m21,  1., 0.],
+              [m31, m32, 1.]])
+U = A  # the result of elimination
+
+print("L =")
+print(L)
+print("U =")
+print(U)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Verify: L @ U equals the original A',
+              prose: [
+                'If our LU is correct, L @ U should exactly reproduce the original matrix A.',
+                'We also use scipy.linalg.lu to verify — it returns (P, L, U) where A = P @ L @ U.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import lu
+
+A_original = np.array([[2., 1., 1.],
+                        [4., 3., 3.],
+                        [8., 7., 9.]])
+
+# Our manual LU
+L_manual = np.array([[1.,  0., 0.],
+                      [2.,  1., 0.],
+                      [4.,  3., 1.]])
+U_manual = np.array([[2., 1., 1.],
+                      [0., 1., 1.],
+                      [0., 0., 2.]])
+
+print("Manual L @ U:")
+print((L_manual @ U_manual).round(10))
+print()
+print("Original A:")
+print(A_original)
+print()
+print("Match:", np.allclose(L_manual @ U_manual, A_original))
+
+# scipy verification
+P, L_sci, U_sci = lu(A_original)
+print()
+print("scipy: P @ L @ U matches A:", np.allclose(P @ L_sci @ U_sci, A_original))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Solving two systems with the same A (one factorization, two solves)',
+              prose: [
+                'The power of LU: factor A once, solve Ax = b for multiple b vectors.',
+                'We use scipy.linalg.lu_factor and lu_solve — the standard interface for multiple right-hand sides.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import lu_factor, lu_solve
+
+A = np.array([[2., 1., 1.],
+              [4., 3., 3.],
+              [8., 7., 9.]])
+
+# Factor once (O(n³))
+lu_factored = lu_factor(A)   # stores LU + pivot permutation
+
+# Solve for two different right-hand sides (each O(n²))
+b1 = np.array([1., 2., 4.])
+b2 = np.array([5., 3., 1.])
+
+x1 = lu_solve(lu_factored, b1)
+x2 = lu_solve(lu_factored, b2)
+
+print("Solution to Ax = b1:")
+print(x1.round(6))
+print("Verify A @ x1 = b1:", np.allclose(A @ x1, b1))
+
+print()
+print("Solution to Ax = b2:")
+print(x2.round(6))
+print("Verify A @ x2 = b2:", np.allclose(A @ x2, b2))`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Determinant from LU decomposition',
+              prose: [
+                'det(A) = product of diagonal of U, times (−1)^(number of row swaps).',
+                'scipy.linalg.lu tells us the pivot swaps via matrix P. Each swap flips the sign.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import lu
+
+A = np.array([[2., 1., 1.],
+              [4., 3., 3.],
+              [8., 7., 9.]])
+
+P, L, U = lu(A)
+
+# Product of diagonal of U
+diag_product = np.prod(np.diag(U))
+
+# Count row swaps: P is a permutation matrix.
+# det(P) = +1 if even number of swaps, -1 if odd.
+det_P = np.linalg.det(P)   # +1 or -1
+
+det_from_LU = det_P * diag_product
+
+print(f"Diagonal of U: {np.diag(U)}")
+print(f"Product of diagonal: {diag_product:.4f}")
+print(f"det(P) (swap sign): {det_P:.0f}")
+print(f"det(A) from LU: {det_from_LU:.4f}")
+print(f"np.linalg.det(A): {np.linalg.det(A):.4f}")
+print(f"Match: {np.isclose(det_from_LU, np.linalg.det(A))}")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Manual LU and forward/back substitution',
+              difficulty: 'hard',
+              prompt: 'For A = [[1,2,1],[2,3,3],[1,5,2]]: (1) compute L and U by hand (show the multipliers at each step), (2) verify A = L @ U in code, (3) solve Ax = [6,14,10] using forward substitution (Ly = b) then back substitution (Ux = y), (4) verify with np.linalg.solve.',
+              code: `import numpy as np
+
+A = np.array([[1., 2., 1.],
+              [2., 3., 3.],
+              [1., 5., 2.]])
+b = np.array([6., 14., 10.])
+
+# 1. LU by hand: record multipliers m21, m31, m32
+#    After eliminating col 1: m21 = A[1,0]/A[0,0], m31 = A[2,0]/A[0,0]
+#    After eliminating col 2: m32 = (new A[2,1])/(new A[1,1])
+#    Build L = [[1,0,0],[m21,1,0],[m31,m32,1]]
+#    U = result of elimination
+
+# 2. verify np.allclose(L @ U, A)
+
+# 3. Forward substitution: Ly = b
+#    y1 = b[0]
+#    y2 = b[1] - m21*y1
+#    y3 = b[2] - m31*y1 - m32*y2
+#
+#    Back substitution: Ux = y
+#    x3 = y3 / U[2,2]
+#    x2 = (y2 - U[1,2]*x3) / U[1,1]
+#    x1 = (y1 - U[0,1]*x2 - U[0,2]*x3) / U[0,0]
+
+# 4. verify with np.linalg.solve(A, b)
+`,
+              hint: 'Multipliers: m21 = 2/1 = 2, m31 = 1/1 = 1. After step 1: A becomes [[1,2,1],[0,-1,1],[0,3,1]]. Then m32 = 3/(−1) = −3. After step 2: U[2] becomes [0,0,4]. So U = [[1,2,1],[0,−1,1],[0,0,4]].',
+            },
+          ]
+        }
+      },
+    ],
+  },
+
+  // ── Rigor ──────────────────────────────────────────────────────
+  rigor: {
+    prose: [
+      'The LU decomposition exists and is unique when all the leading principal submatrices of $A$ (the $1 \\times 1$, $2 \\times 2$, ..., $(n-1) \\times (n-1)$ upper-left submatrices) are nonsingular. This is equivalent to saying Gaussian elimination can proceed without encountering a zero pivot.',
+      'When pivoting is required, the correct statement is: for any nonsingular $n \\times n$ matrix $A$, there exists a permutation matrix $P$ such that $PA = LU$ where $L$ is unit lower triangular and $U$ is upper triangular with nonzero diagonal. The permutation $P$ is unique given the choice of pivoting strategy.',
+      'The LU decomposition is not unique without the unit lower triangular constraint on $L$. If we allow $L$ to have arbitrary diagonal, any factorization $A = L\'U\'$ can be rescaled: let $D$ be the diagonal of $L\'$, then $A = (L\'D^{-1})(DU\')$, giving the $LDU$ decomposition where $L$ and $U$ are both unit triangular and $D$ is diagonal.',
+      'Numerical stability: partial pivoting guarantees that all entries of $L$ satisfy $|L_{ij}| \\leq 1$. This bounds the growth of rounding errors. Complete pivoting (choosing the globally largest entry, not just within a column) gives even better stability but requires more work. Partial pivoting is the standard industry choice — it handles all practical cases and is what scipy, LAPACK, and MATLAB implement.',
+    ],
+    callouts: [],
+    visualizations: [],
+  },
+
+  // ── Examples ───────────────────────────────────────────────────
+  examples: [
+    {
+      id: "ex-1",
+      title: "Computing LU Decomposition by Hand",
+      problem: "Find $L$ and $U$ such that $A = LU$ for $A = \\begin{bmatrix} 2 & 1 & 1 \\\\ 4 & 3 & 3 \\\\ 8 & 7 & 9 \\end{bmatrix}$.",
+      steps: [
+        {
+          expression: "m_{21} = \\frac{4}{2} = 2, \\quad R_2 \\leftarrow R_2 - 2R_1: \\quad \\begin{bmatrix} 2 & 1 & 1 \\\\ 0 & 1 & 1 \\\\ 8 & 7 & 9 \\end{bmatrix}",
+          annotation: "Eliminate entry (2,1). The multiplier $m_{21} = 4/2 = 2$ is stored into $L$ at position $(2,1)$. Row replacement: det of the matrix is unchanged.",
+          strategyTitle: "Eliminate (2,1) — record multiplier",
+          checkpoint: "Why do we divide 4 by 2 (not 2 by 4) to get the multiplier?",
+          hints: ["We want to subtract a multiple of row 1 from row 2 so that the (2,1) entry becomes exactly 0. That multiple is (entry to eliminate)/(pivot) = 4/2 = 2."],
+        },
+        {
+          expression: "m_{31} = \\frac{8}{2} = 4, \\quad R_3 \\leftarrow R_3 - 4R_1: \\quad \\begin{bmatrix} 2 & 1 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 3 & 5 \\end{bmatrix}",
+          annotation: "Eliminate entry (3,1). Multiplier $m_{31} = 8/2 = 4$ goes into $L$ at position $(3,1)$.",
+          strategyTitle: "Eliminate (3,1) — record multiplier",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "m_{32} = \\frac{3}{1} = 3, \\quad R_3 \\leftarrow R_3 - 3R_2: \\quad \\begin{bmatrix} 2 & 1 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 2 \\end{bmatrix}",
+          annotation: "Eliminate entry (3,2). The new pivot is 1 (from the previous step). Multiplier $m_{32} = 3/1 = 3$ goes into $L$ at position $(3,2)$. The matrix is now $U$.",
+          strategyTitle: "Eliminate (3,2) — record multiplier",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "L = \\begin{bmatrix} 1 & 0 & 0 \\\\ 2 & 1 & 0 \\\\ 4 & 3 & 1 \\end{bmatrix}, \\quad U = \\begin{bmatrix} 2 & 1 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 2 \\end{bmatrix}",
+          annotation: "Assemble $L$ from the recorded multipliers: 1s on the diagonal, multipliers below. $U$ is the result of the elimination. Verify: $LU = A$.",
+          strategyTitle: "Assemble L and U",
+          checkpoint: "What is det(A) from this factorization?",
+          hints: ["det(A) = det(U) = product of U's diagonal = 2 × 1 × 2 = 4. (L has det = 1 because its diagonal is all 1s.)"],
+        }
+      ],
+      conclusion: "L stores the elimination multipliers below a diagonal of 1s. U is the upper triangular result of elimination. Together: A = LU. det(A) = product of U's diagonal = 4.",
+    },
+    {
+      id: "ex-2",
+      title: "Solving Ax = b via Forward and Back Substitution",
+      problem: "Using the factorization $A = LU$ from Example 1, solve $A\\mathbf{x} = \\begin{bmatrix} 4 \\\\ 10 \\\\ 20 \\end{bmatrix}$.",
+      steps: [
+        {
+          expression: "L\\mathbf{y} = \\mathbf{b}: \\quad \\begin{bmatrix} 1 & 0 & 0 \\\\ 2 & 1 & 0 \\\\ 4 & 3 & 1 \\end{bmatrix} \\begin{bmatrix} y_1 \\\\ y_2 \\\\ y_3 \\end{bmatrix} = \\begin{bmatrix} 4 \\\\ 10 \\\\ 20 \\end{bmatrix}",
+          annotation: "Substitute $A = LU$ into $A\\mathbf{x} = \\mathbf{b}$ to get $LU\\mathbf{x} = \\mathbf{b}$. Let $\\mathbf{y} = U\\mathbf{x}$ and first solve $L\\mathbf{y} = \\mathbf{b}$. This is Phase 1: forward substitution.",
+          strategyTitle: "Phase 1 setup — forward substitution",
+          checkpoint: "Why can we solve Ly = b without inverting L?",
+          hints: ["L is lower triangular: y₁ is immediately known from the first row, then y₂ uses only y₁, then y₃ uses only y₁ and y₂. No matrix inversion needed."],
+        },
+        {
+          expression: "y_1 = 4, \\quad y_2 = 10 - 2(4) = 2, \\quad y_3 = 20 - 4(4) - 3(2) = 20 - 16 - 6 = -2",
+          annotation: "Row 1: $y_1 = 4$. Row 2: $2y_1 + y_2 = 10 \\Rightarrow y_2 = 10 - 8 = 2$. Row 3: $4y_1 + 3y_2 + y_3 = 20 \\Rightarrow y_3 = 20 - 16 - 6 = -2$. Each value uses only previously computed values — the defining property of forward substitution.",
+          strategyTitle: "Forward substitution — compute y",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "U\\mathbf{x} = \\mathbf{y}: \\quad \\begin{bmatrix} 2 & 1 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 2 \\end{bmatrix} \\begin{bmatrix} x_1 \\\\ x_2 \\\\ x_3 \\end{bmatrix} = \\begin{bmatrix} 4 \\\\ 2 \\\\ -2 \\end{bmatrix}",
+          annotation: "Phase 2: back substitution. Solve $U\\mathbf{x} = \\mathbf{y}$ working from the bottom row upward.",
+          strategyTitle: "Phase 2 setup — back substitution",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "x_3 = -2/2 = -1, \\quad x_2 = 2 - (-1) = 3, \\quad x_1 = (4 - 3 - (-1))/2 = 2/2 = 1",
+          annotation: "Row 3: $2x_3 = -2 \\Rightarrow x_3 = -1$. Row 2: $x_2 + x_3 = 2 \\Rightarrow x_2 = 3$. Row 1: $2x_1 + x_2 + x_3 = 4 \\Rightarrow 2x_1 = 4 - 3 + 1 = 2 \\Rightarrow x_1 = 1$. Solution: $\\mathbf{x} = [1, 3, -1]^T$.",
+          strategyTitle: "Back substitution — compute x",
+          checkpoint: "Verify: does A @ [1, 3, -1]^T equal [4, 10, 20]^T?",
+          hints: ["Row 1: 2(1)+1(3)+1(-1) = 2+3-1 = 4 ✓. Row 2: 4(1)+3(3)+3(-1) = 4+9-3 = 10 ✓. Row 3: 8(1)+7(3)+9(-1) = 8+21-9 = 20 ✓."],
+        }
+      ],
+      conclusion: "x = [1, 3, −1]. The two-phase approach (forward then back substitution) each takes O(n²) operations. Critically, the LU factorization from Example 1 can now be reused for any different b vector without redoing the elimination.",
+    }
+  ],
+
+  // ── Challenges ─────────────────────────────────────────────────
+  challenges: [
+    {
+      id: "ch-1",
+      difficulty: "easy",
+      problem: "For $A = \\begin{bmatrix} 3 & 6 \\\\ 1 & 4 \\end{bmatrix}$, find $L$ and $U$ such that $A = LU$. Then compute $\\det(A)$ directly from $U$.",
+      hint: "There is only one multiplier: $m_{21} = 1/3$. After the single row replacement, the result is $U$. $L$ has 1s on the diagonal and $m_{21}$ below.",
+      walkthrough: [
+        {
+          expression: "m_{21} = 1/3, \\quad R_2 \\leftarrow R_2 - \\tfrac{1}{3}R_1: \\quad U = \\begin{bmatrix} 3 & 6 \\\\ 0 & 2 \\end{bmatrix}",
+          annotation: "One row replacement creates U."
+        },
+        {
+          expression: "L = \\begin{bmatrix} 1 & 0 \\\\ 1/3 & 1 \\end{bmatrix}",
+          annotation: "L has 1s on diagonal and the multiplier 1/3 below."
+        },
+        {
+          expression: "\\det(A) = \\det(U) = 3 \\cdot 2 = 6",
+          annotation: "Product of diagonal of U."
+        }
+      ],
+      answer: "det(A) = 6"
+    },
+    {
+      id: "ch-2",
+      difficulty: "medium",
+      problem: "Using the LU decomposition $L = \\begin{bmatrix} 1 & 0 & 0 \\\\ 2 & 1 & 0 \\\\ 1 & 3 & 1 \\end{bmatrix}$, $U = \\begin{bmatrix} 2 & 4 & -2 \\\\ 0 & 1 & 5 \\\\ 0 & 0 & 3 \\end{bmatrix}$, solve $A\\mathbf{x} = \\begin{bmatrix} 0 \\\\ 1 \\\\ 8 \\end{bmatrix}$ via forward substitution then back substitution.",
+      hint: "Phase 1: Ly = b. y₁ = b₁ = 0, then y₂ = b₂ − 2y₁, then y₃ = b₃ − 1·y₁ − 3·y₂. Phase 2: Ux = y. x₃ = y₃/3, then x₂ = (y₂ − 5x₃)/1, then x₁ = (y₁ − 4x₂ − (−2)x₃)/2.",
+      walkthrough: [
+        {
+          expression: "y_1 = 0, \\quad y_2 = 1 - 2(0) = 1, \\quad y_3 = 8 - 1(0) - 3(1) = 5",
+          annotation: "Forward substitution: work down through L."
+        },
+        {
+          expression: "x_3 = 5/3, \\quad x_2 = (1 - 5 \\cdot 5/3)/1 = 1 - 25/3 = -22/3",
+          annotation: "Back substitution: work up through U."
+        },
+        {
+          expression: "x_1 = (0 - 4(-22/3) - (-2)(5/3))/2 = (88/3 + 10/3)/2 = (98/3)/2 = 49/3",
+          annotation: "Back substitution continued. Solution: x = [49/3, −22/3, 5/3]."
+        }
+      ],
+      answer: "x = [49/3, −22/3, 5/3]"
+    },
+    {
+      id: "ch-3",
+      difficulty: "hard",
+      problem: "The matrix $A = \\begin{bmatrix} 0 & 2 & 1 \\\\ 1 & 3 & 2 \\\\ 3 & 2 & 4 \\end{bmatrix}$ requires a row swap before LU decomposition can begin because $a_{11} = 0$. (1) Swap rows 1 and 2 to get $A'$. (2) Compute $L$ and $U$ for $A'$ by Gaussian elimination. (3) What is $\\det(A)$? Remember the row swap affected the sign.",
+      hint: "After swapping rows 1 and 2: A' = [[1,3,2],[0,2,1],[3,2,4]]. Then eliminate column 1 of A'. Multiplier m31 = 3/1 = 3. Then eliminate column 2. Record all multipliers into L. det(A) = −det(A') because of the one row swap.",
+      walkthrough: [
+        {
+          expression: "\\text{Swap } R_1 \\leftrightarrow R_2: \\quad A' = \\begin{bmatrix} 1 & 3 & 2 \\\\ 0 & 2 & 1 \\\\ 3 & 2 & 4 \\end{bmatrix}",
+          annotation: "One row swap. det(A) = −det(A')."
+        },
+        {
+          expression: "m_{31} = 3, \\quad R_3 \\leftarrow R_3 - 3R_1: \\quad \\begin{bmatrix} 1 & 3 & 2 \\\\ 0 & 2 & 1 \\\\ 0 & -7 & -2 \\end{bmatrix}",
+          annotation: "Eliminate (3,1). m21 = 0 (already zero, no operation needed)."
+        },
+        {
+          expression: "m_{32} = -7/2, \\quad R_3 \\leftarrow R_3 + \\tfrac{7}{2}R_2: \\quad U = \\begin{bmatrix} 1 & 3 & 2 \\\\ 0 & 2 & 1 \\\\ 0 & 0 & 3/2 \\end{bmatrix}",
+          annotation: "Eliminate (3,2). m32 = (−7)/(2) = −7/2."
+        },
+        {
+          expression: "\\det(A') = 1 \\cdot 2 \\cdot 3/2 = 3, \\quad \\det(A) = -3",
+          annotation: "Product of diagonal of U = 3. One row swap: det(A) = −det(A') = −3."
+        }
+      ],
+      answer: "det(A) = −3"
+    }
+  ],
+
+  // ── Semantic Layer ───────────────────────────────────────────────
+  semantics: {
+    core: [
+      {
+        symbol: "A = LU",
+        meaning: "LU decomposition: A factors into a unit lower triangular matrix L (1s on diagonal, multipliers below) and an upper triangular matrix U (result of Gaussian elimination)."
+      },
+      {
+        symbol: "PA = LU",
+        meaning: "LU with partial pivoting: P permutes the rows of A so that the largest entry in each column becomes the pivot, improving numerical stability."
+      },
+      {
+        symbol: "L\\mathbf{y} = \\mathbf{b}, \\quad U\\mathbf{x} = \\mathbf{y}",
+        meaning: "The two-phase solve: forward substitution (top-to-bottom through L) produces y, then back substitution (bottom-to-top through U) produces x."
+      }
+    ],
+    rulesOfThumb: [
+      "Factor A once (O(n³)), solve multiple right-hand sides in O(n²) each.",
+      "Never compute A⁻¹ just to multiply it by b — use np.linalg.solve (which uses LU internally).",
+      "If a pivot is zero (or very small), swap to the row with the largest entry in that column (partial pivoting).",
+      "det(A) from LU: product of U's diagonal, times (−1)^(number of row swaps)."
+    ]
+  },
+
+  // ── Spiral Learning ──────────────────────────────────────────────
+  spiral: {
+    recoveryPoints: [
+      {
+        lessonId: 'la1-004',
+        label: 'Gaussian Elimination',
+        note: 'LU decomposition is Gaussian elimination with one extra step: instead of discarding the multipliers, you save them into the matrix L. Everything else is identical.'
+      },
+      {
+        lessonId: 'la2-005',
+        label: 'Determinant Properties',
+        note: 'The row replacements in LU decomposition are exactly Property 4 (no det change). Row swaps in pivoting are Property 2 (each flips sign). The diagonal of U gives the triangular determinant formula.'
+      }
+    ],
+    futureLinks: [
+      {
+        lessonId: 'la4-002',
+        label: 'QR Decomposition',
+        note: 'QR decomposition factors A into an orthogonal matrix Q and upper triangular R. It is the backbone of eigenvalue algorithms (QR algorithm) and least squares, and follows the same factorize-once, solve-many pattern as LU.'
+      },
+      {
+        lessonId: 'la4-004',
+        label: 'SVD',
+        note: 'The SVD (A = UΣVᵀ) is the ultimate matrix factorization. Like LU, it is computed once and reused for multiple operations: solving, compressing, pseudoinverse, rank approximation.'
+      }
+    ]
+  },
+
+  // ── Assessment ───────────────────────────────────────────────────
+  assessment: {
+    questions: [
+      {
+        id: "assess-1",
+        type: "choice",
+        text: "You need to solve Ax = b for 500 different vectors b, all with the same matrix A. Which approach is computationally cheapest?",
+        options: [
+          "Compute A⁻¹ once, then multiply A⁻¹ b for each b",
+          "Run Gaussian elimination from scratch for each of the 500 systems",
+          "Compute the LU decomposition of A once, then apply forward/back substitution 500 times",
+          "Compute the determinant of A to check invertibility, then use Cramer's rule"
+        ],
+        answer: "Compute the LU decomposition of A once, then apply forward/back substitution 500 times",
+        hint: "LU factors once at O(n³), then each solve is O(n²). Computing A⁻¹ is also O(n³) but less numerically stable. Running full Gaussian elimination 500 times is 500 × O(n³)."
+      }
+    ]
+  },
+
+  // ── Mental Model ─────────────────────────────────────────────────
+  mentalModel: [
+    "LU decomposition = Gaussian elimination with the multipliers saved into L.",
+    "Two-phase solve: Ly = b (forward, top to bottom), then Ux = y (back, bottom to top).",
+    "Partial pivoting: before each elimination, swap to the row with the largest pivot entry — prevents division by zero and stabilizes numerical errors.",
+    "det(A) = product of U's diagonal × (−1)^(swap count) — free after LU.",
+    "Factor once (O(n³)), solve many times (O(n²) each) — the fundamental reuse pattern of numerical linear algebra."
+  ],
+
+  // ── Checkpoints ──────────────────────────────────────────────────
+  checkpoints: [
+    'read-intuition',
+    'read-math',
+    'read-rigor',
+    'completed-example-1',
+    'completed-example-2',
+    'attempted-challenge-easy',
+    'attempted-challenge-medium',
+    'attempted-challenge-hard',
+  ],
+
+  // ── Final Quiz ─────────────────────────────────────────────────
+  quiz: [
+    {
+      id: 'quiz-1',
+      type: 'choice',
+      text: "What is stored in the matrix $L$ during LU decomposition?",
+      options: [
+        "The eigenvalues of A",
+        "The diagonal entries of A",
+        "The Gaussian elimination multipliers used to create zeros below each pivot, with 1s on the diagonal",
+        "The transpose of U"
+      ],
+      answer: "The Gaussian elimination multipliers used to create zeros below each pivot, with 1s on the diagonal",
+      hints: ["Each multiplier m_ik = (entry to eliminate) / (pivot) is recorded at position (i,k) in L. The diagonal of L is always 1s."],
+      reviewSection: 'Intuition tab — The core observation'
+    },
+    {
+      id: 'quiz-2',
+      type: 'choice',
+      text: "Why does partial pivoting improve numerical stability?",
+      options: [
+        "It finds the exact solution faster by sorting the pivots",
+        "It prevents large multipliers (values greater than 1 in L) by ensuring the pivot is always the largest entry in its column",
+        "It changes the determinant to be positive",
+        "It makes U a symmetric matrix"
+      ],
+      answer: "It prevents large multipliers (values greater than 1 in L) by ensuring the pivot is always the largest entry in its column",
+      hints: ["If a pivot is small relative to the entries below it, the multiplier m_ik = entry/pivot can be very large. Large multipliers amplify rounding errors. Partial pivoting guarantees |L_ij| ≤ 1 by always choosing the largest available pivot."],
+      reviewSection: 'Intuition tab — Partial Pivoting'
+    }
+  ]
+};

@@ -7,6 +7,8 @@ import la2_001 from './la2-001-matrices-as-transformations.js';
 import la2_002 from './la2-002-matrix-multiplication.js';
 import la2_003 from './la2-003-inverse-matrices.js';
 import la2_004 from './la2-004-null-space-and-column-space.js';
+import la2_005 from './la2-005-determinants-general.js';
+import la2_006 from './la2-006-lu-decomposition.js';
 
 import la3_001 from './la3-001-eigenvectors-and-eigenvalues.js';
 import la3_002 from './la3-002-diagonalization.js';
@@ -41,6 +43,8 @@ const LA2 = {
     la2_002,
     la2_003,
     la2_004,
+    la2_005,
+    la2_006,
   ],
 };
 
