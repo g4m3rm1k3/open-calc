@@ -552,7 +552,7 @@ requestAnimationFrame(animate);`,
 const lesson8 = {
   id: 'canvas-1-8',
   slug: 'animation-loop-and-input',
-  chapter: 1,
+  chapter: 'canvas.1',
   order: 8,
   title: 'The Animation Loop & Input',
   subtitle: 'requestAnimationFrame, delta time, and handling mouse/pointer/keyboard input.',

@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-12-mega-challenge',
   slug: 'oop-mega-challenge',
-  chapter: 4.12,
+  chapter: 4.1,
   order: 12,
   title: 'Capstone: Library Management System',
   subtitle: 'Build a complete system using every OOP concept from this chapter',

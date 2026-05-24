@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-5-polymorphism-magic-methods',
   slug: 'oop-polymorphism',
-  chapter: 4.5,
+  chapter: 4.1,
   order: 5,
   title: 'Polymorphism, Magic Methods, and Protocols',
   subtitle: 'One interface, many forms — and making your classes feel like built-ins',

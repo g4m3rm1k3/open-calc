@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-8-metaclasses',
   slug: 'oop-metaclasses',
-  chapter: 4.8,
+  chapter: 4.1,
   order: 8,
   title: 'Metaclasses',
   subtitle: 'Classes that control how other classes are created',

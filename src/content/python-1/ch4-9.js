@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-9-design-patterns',
   slug: 'oop-design-patterns',
-  chapter: 4.9,
+  chapter: 4.1,
   order: 9,
   title: 'Design Patterns',
   subtitle: 'Proven blueprints for common software design problems',

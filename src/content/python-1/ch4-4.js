@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-4-encapsulation-properties',
   slug: 'oop-encapsulation',
-  chapter: 4.4,
+  chapter: 4.1,
   order: 4,
   title: 'Encapsulation and Properties',
   subtitle: 'Controlling access to data with Python\'s underscore conventions and @property',

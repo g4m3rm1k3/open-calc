@@ -622,7 +622,7 @@ ctx.fillText('destination-out • clip() • globalCompositeOperation', cx + 24,
 const lesson7 = {
   id: 'canvas-1-7',
   slug: 'compositing-clipping-shadows',
-  chapter: 1,
+  chapter: 'canvas.1',
   order: 7,
   title: 'Compositing, Clipping & Shadows',
   subtitle: 'Layer blend modes, clip masks, and glow effects.',

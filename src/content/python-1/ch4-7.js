@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-7-mixins-descriptors',
   slug: 'oop-mixins-descriptors',
-  chapter: 4.7,
+  chapter: 4.1,
   order: 7,
   title: 'Mixins and Descriptors',
   subtitle: 'Reusable behaviour slices and the engine behind @property',

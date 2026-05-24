@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-3-inheritance',
   slug: 'oop-inheritance',
-  chapter: 4.3,
+  chapter: 4.1,
   order: 3,
   title: 'Inheritance and super()',
   subtitle: 'Building specialised classes from general ones',

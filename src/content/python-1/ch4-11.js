@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-11-advanced-projects',
   slug: 'oop-advanced-projects',
-  chapter: 4.11,
+  chapter: 4.1,
   order: 11,
   title: 'Advanced Projects: ORM and Event Pipeline',
   subtitle: 'Putting metaclasses, descriptors, and patterns together in real systems',

@@ -578,7 +578,7 @@ draw();`,
 const lesson9 = {
   id: 'canvas-1-9',
   slug: 'hit-detection-and-picking',
-  chapter: 1,
+  chapter: 'canvas.1',
   order: 9,
   title: 'Hit Detection & Picking',
   subtitle: 'Click objects on canvas: mathematical tests, isPointInPath, and color-buffer picking.',

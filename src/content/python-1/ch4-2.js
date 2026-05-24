@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-2-methods-and-self',
   slug: 'oop-methods',
-  chapter: 4.2,
+  chapter: 4.1,
   order: 2,
   title: 'Methods, self, and String Representation',
   subtitle: 'How objects act, communicate, and display themselves',

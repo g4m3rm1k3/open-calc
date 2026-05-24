@@ -1,7 +1,7 @@
 export default {
   id: 'py-4-6-dataclasses-composition',
   slug: 'oop-dataclasses',
-  chapter: 4.6,
+  chapter: 4.1,
   order: 6,
   title: 'Dataclasses and Composition',
   subtitle: 'Eliminating boilerplate with @dataclass and building objects that have rather than are',
