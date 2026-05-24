@@ -191,7 +191,7 @@ export default function LessonPage() {
                   key={index}
                   className="mt-5 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800"
                 >
-                  <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
+                  <VizFrame id={viz.id} initialProps={viz.initialProps ?? viz.props ?? {}} title={viz.title} />
                 </div>
               ))
             : lesson.hook.previewVisualizationId && (

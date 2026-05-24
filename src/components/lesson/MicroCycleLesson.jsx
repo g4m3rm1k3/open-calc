@@ -158,7 +158,7 @@ function normalizeViz(v) {
   if (!v) return null
   const id = v.id ?? v.vizId
   if (!id) return null
-  return { id, props: v.props ?? v.visualizationProps ?? {}, title: v.title, caption: v.caption, mathBridge: v.mathBridge }
+  return { id, initialProps: v.initialProps, props: v.props ?? v.visualizationProps ?? {}, title: v.title, caption: v.caption, mathBridge: v.mathBridge }
 }
 
 function getSectionVizzes(section) {
@@ -174,7 +174,7 @@ function getSectionVizzes(section) {
   // De-duplicate by ID + props (allows multiple VideoEmbed with different URLs)
   const seen = new Set()
   return vizzes.filter(v => {
-    const key = `${v.id}:${JSON.stringify(v.props ?? {})}`
+    const key = `${v.id}:${JSON.stringify(v.initialProps ?? v.props ?? {})}`
     if (seen.has(key)) return false
     seen.add(key)
     return true
@@ -223,7 +223,7 @@ function VizCard({ viz, noteId, borderColor = 'border-slate-200 dark:border-slat
           <MarkdownProse text={viz.mathBridge} />
         </div>
       )}
-      <VizFrame id={viz.id} initialProps={viz.props ?? {}} title={viz.title} />
+      <VizFrame id={viz.id} initialProps={viz.initialProps ?? viz.props ?? {}} title={viz.title} />
       {viz.caption && (
         <p className="text-xs text-slate-400 dark:text-slate-500 px-0 md:px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-100 dark:border-slate-800">
           {parseProse(viz.caption)}
@@ -520,7 +520,7 @@ function RigorBlock({ data, lessonId }) {
   const extraVizzes = vizzes.filter((viz) => {
     if (!proofVizId) return true
     if (viz.id !== proofVizId) return true
-    return JSON.stringify(viz.props ?? {}) !== proofVizPropsKey
+    return JSON.stringify(viz.initialProps ?? viz.props ?? {}) !== proofVizPropsKey
   })
   const hasProse = data?.prose?.length > 0 || isBlocksFormat
   const hasCallouts = data?.callouts?.length > 0
