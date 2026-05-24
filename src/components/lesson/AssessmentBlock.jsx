@@ -191,7 +191,7 @@ export default function AssessmentBlock({ assessment }) {
 
   return (
     <section className="mt-12 pt-8">
-      <div className="max-w-4xl mx-auto rounded-3xl border border-teal-200/40 dark:border-teal-900/40 bg-white/30 dark:bg-slate-900/30 shadow-2xl backdrop-blur-2xl overflow-hidden">
+      <div className="rounded-3xl border border-teal-200/40 dark:border-teal-900/40 bg-white/30 dark:bg-slate-900/30 shadow-2xl backdrop-blur-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-4 px-8 py-6 bg-gradient-to-r from-teal-400/30 via-white/10 to-emerald-300/10 dark:from-teal-900/30 dark:via-slate-900/10 dark:to-emerald-900/10 border-b border-teal-200/20 dark:border-teal-900/20 backdrop-blur-xl">
           <div className="w-12 h-12 rounded-2xl bg-white/70 dark:bg-slate-900/70 flex items-center justify-center text-2xl shadow-lg border-2 border-teal-200/40 dark:border-teal-900/40 backdrop-blur-md">

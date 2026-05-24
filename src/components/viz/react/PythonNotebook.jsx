@@ -1121,8 +1121,6 @@ export default function PythonNotebook({ params, onParamChange }) {
       style={{
         width: "100%",
         fontFamily: "sans-serif",
-        maxWidth: 900,
-        margin: "0 auto",
       }}
     >
       {/* Header */}

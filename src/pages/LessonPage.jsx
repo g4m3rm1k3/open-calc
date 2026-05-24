@@ -92,7 +92,7 @@ export default function LessonPage() {
   const nextLesson = lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
 
   return (
-    <article className="mx-auto max-w-5xl pb-20 px-0 md:px-6">
+    <article className="mx-auto max-w-7xl pb-20 px-0 md:px-6">
       <TutorPanel lesson={lesson} />
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
