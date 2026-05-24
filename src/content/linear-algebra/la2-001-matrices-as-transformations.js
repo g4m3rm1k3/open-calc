@@ -54,6 +54,11 @@ export default {
         title: 'Affine vs. Linear — A Critical Distinction',
         body: 'CNC work offsets (G54, G55) **translate** the origin — they shift every coordinate by a constant amount. That is an **affine** transformation, not a linear one. G68 coordinate rotation **is** linear — it preserves the origin. In robotics and computer graphics, the standard workaround is homogeneous coordinates: embed the 2D plane in 3D and represent translations as matrix multiplications.',
       },
+      {
+        type: 'strategy',
+        title: 'When to Read a Matrix Geometrically',
+        body: '**Use the column-reading method when you want to understand WHAT a matrix does:** Is it a rotation? A stretch? A shear? Does it collapse the plane onto a line?\n\n**Use the row-dot-column formula when you just need the number:** computing $A\\mathbf{v}$ for a specific $\\mathbf{v}$, or running machine computations.\n\n**The test for linearity:** if a transformation preserves the origin AND satisfies $T(\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})+T(\\mathbf{v})$, it can be represented as a matrix. If it moves the origin or bends grid lines, it cannot.',
+      },
     ],
     visualizations: [
       {
@@ -364,77 +369,95 @@ v = np.array([4.0, 2.0])
   // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
-      title: "Applying a Matrix Transformation",
-      problem: "Let $A = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix}$. Find the transformed output of the vector $\\vec{v} = \\begin{bmatrix} 4 \\\\ 1 \\end{bmatrix}$.",
+      id: 'la2-001-ex1',
+      title: 'Apply a Matrix — Read the Output as a Linear Combination',
+      problem: `Let $A = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix}$. Where does the vector $\\mathbf{v} = \\begin{bmatrix} 4 \\\\ 1 \\end{bmatrix}$ land after the transformation?`,
       steps: [
         {
-          expression: "A\\vec{v} = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix} \\begin{bmatrix} 4 \\\\ 1 \\end{bmatrix}",
-          annotation: "Set up the multiplication.",
-          strategyTitle: "Setup",
-          checkpoint: "",
-          hints: [],
+          expression: 'A\\mathbf{v} = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix} \\begin{bmatrix} 4 \\\\ 1 \\end{bmatrix}',
+          annotation: 'Set up the matrix-vector product $A\\mathbf{v}$. The matrix $A$ is a $2 \\times 2$ transformation; $\\mathbf{v}$ is a $2 \\times 1$ column vector. The result will also be $2 \\times 1$.',
+          strategyTitle: 'Step 1: Set up $A\\mathbf{v}$',
         },
         {
-          expression: "= 4 \\begin{bmatrix} 2 \\\\ 0 \\end{bmatrix} + 1 \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}",
-          annotation: "Rewrite as a linear combination of the columns. The input vector's components act as the scalars.",
-          strategyTitle: "Linear combination form",
-          checkpoint: "What is 4 times the first column?",
-          hints: ["4 * [2, 0] = [8, 0]"],
+          expression: '= 4 \\begin{bmatrix} 2 \\\\ 0 \\end{bmatrix} + 1 \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
+          annotation: `Rewrite as a **linear combination of the columns** of $A$: the first component of $\\mathbf{v}$ (which is 4) scales column 1 $= [2,0]^T$, and the second component (which is 1) scales column 2 $= [-1,3]^T$. This is the geometric interpretation — $\\mathbf{v}$ says "go 4 steps along new $\\hat{i}$ and 1 step along new $\\hat{j}$."`,
+          strategyTitle: 'Step 2: Decompose as linear combination of columns',
+          hints: ['Column 1 of $A$ = $[2,0]^T$ = where $\\hat{i}=[1,0]$ lands. Column 2 = $[-1,3]^T$ = where $\\hat{j}=[0,1]$ lands.'],
         },
         {
-          expression: "= \\begin{bmatrix} 8 \\\\ 0 \\end{bmatrix} + \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}",
-          annotation: "Perform the scalar multiplication.",
-          strategyTitle: "Scale",
-          checkpoint: "Add the two resulting vectors together.",
-          hints: [],
+          expression: '= \\begin{bmatrix} 8 \\\\ 0 \\end{bmatrix} + \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
+          annotation: 'Scale: $4 \\cdot [2,0]^T = [8,0]^T$ and $1 \\cdot [-1,3]^T = [-1,3]^T$.',
+          strategyTitle: 'Step 3: Scale each column',
         },
         {
-          expression: "= \\begin{bmatrix} 7 \\\\ 3 \\end{bmatrix}",
-          annotation: "Add the vectors to find the final landing location.",
-          strategyTitle: "Vector addition",
-          checkpoint: "",
-          hints: [],
-        }
+          expression: '= \\begin{bmatrix} 7 \\\\ 3 \\end{bmatrix}',
+          annotation: 'Add the scaled columns: $[8,0]^T + [-1,3]^T = [7,3]^T$. The vector $\\mathbf{v} = [4,1]^T$ lands at $[7,3]^T$ after transformation $A$.',
+          strategyTitle: 'Step 4: Add → output vector',
+          hints: ['Verify via row formula: row 1 dot $\\mathbf{v}$ = $2(4)+(-1)(1)=7$. Row 2 dot $\\mathbf{v}$ = $0(4)+3(1)=3$. ✓'],
+        },
       ],
-      conclusion: "The output vector lands at [7, 3]. Notice that we just took 4 of the new 'i-hat' vectors and 1 of the new 'j-hat' vectors."
     },
     {
-      id: "ex-2",
-      title: "Building a Matrix from Geometry",
-      problem: "Construct a $2 \\times 2$ matrix that rotates the entire 2D plane $90^\\circ$ counter-clockwise.",
+      id: 'la2-001-ex2',
+      title: 'Build a Matrix from Geometry — 90° Rotation',
+      problem: 'Construct the $2 \\times 2$ matrix that rotates every vector in the 2D plane $90^\\circ$ counter-clockwise.',
       steps: [
         {
-          expression: "\\hat{i}_{new} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}",
-          annotation: "Figure out where the horizontal basis vector [1, 0] lands after a 90-degree counter-clockwise turn. It points straight up.",
-          strategyTitle: "Track i-hat",
-          checkpoint: "Where does the vertical vector [0, 1] go if you rotate it 90 degrees CCW?",
-          hints: ["It falls over to the left, landing on the negative x-axis."],
+          expression: '\\hat{i} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} \\xrightarrow{\\text{90° CCW}} \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}',
+          annotation: 'Strategy: track only the two basis vectors. $\\hat{i} = [1,0]^T$ points right. After rotating 90° counter-clockwise it points straight up: $[0,1]^T$. This will become column 1 of the matrix.',
+          strategyTitle: 'Step 1: Track $\\hat{i}$ under 90° CCW rotation',
+          hints: ['Picture a clock hand pointing 3 o\'clock (positive x). Rotate it 90° CCW — it now points 12 o\'clock (positive y).'],
         },
         {
-          expression: "\\hat{j}_{new} = \\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix}",
-          annotation: "Figure out where the vertical basis vector [0, 1] lands.",
-          strategyTitle: "Track j-hat",
-          checkpoint: "",
-          hints: [],
+          expression: '\\hat{j} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} \\xrightarrow{\\text{90° CCW}} \\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix}',
+          annotation: '$\\hat{j} = [0,1]^T$ points up. After 90° CCW it points left: $[-1,0]^T$. This becomes column 2 of the matrix.',
+          strategyTitle: 'Step 2: Track $\\hat{j}$ under 90° CCW rotation',
+          hints: ['A hand at 12 o\'clock, rotated 90° CCW, now points 9 o\'clock (negative x).'],
         },
         {
-          expression: "A = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}",
-          annotation: "Paste those two landing vectors in as the columns of the matrix.",
-          strategyTitle: "Construct Matrix",
-          checkpoint: "",
-          hints: [],
-        }
+          expression: 'R_{90} = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}',
+          annotation: 'Paste the two landing vectors in as columns: column 1 = destination of $\\hat{i}$ = $[0,1]^T$, column 2 = destination of $\\hat{j}$ = $[-1,0]^T$. Every vector in the plane is rotated 90° CCW by this matrix.',
+          strategyTitle: 'Step 3: Paste destinations → columns of the matrix',
+        },
+        {
+          expression: 'R_{90} \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix} = 3\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} + 1\\begin{bmatrix} -1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ 3 \\end{bmatrix}',
+          annotation: 'Verify: apply $R_{90}$ to a test vector $[3,1]^T$. The result $[-1,3]^T$ should be $[3,1]^T$ rotated 90° CCW. Length preserved: $\\sqrt{9+1} = \\sqrt{1+9}$ ✓. Direction rotated 90° ✓.',
+          strategyTitle: 'Step 4: Verify on a test vector',
+          hints: ['General rotation matrix by angle $\\theta$: $R_\\theta = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$. At $\\theta = 90°$: $\\cos 90° = 0$, $\\sin 90° = 1$. Matches our matrix.'],
+        },
       ],
-      conclusion: "This is the 90-degree rotation matrix. If you multiply ANY vector by this matrix, it will output a vector rotated perfectly by 90-degrees CCW."
-    }
+    },
+    {
+      id: 'la2-001-ex3',
+      title: 'Read a Matrix — Identify the Transformation Geometrically',
+      problem: `Given $A = \\begin{bmatrix} 1 & 3 \\\\ 0 & 1 \\end{bmatrix}$, describe geometrically what this transformation does to the plane. Then apply it to the square with corners at $(0,0)$, $(1,0)$, $(1,1)$, $(0,1)$.`,
+      steps: [
+        {
+          expression: '\\text{Column 1} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}, \\quad \\text{Column 2} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}',
+          annotation: 'Read the columns: $\\hat{i} = [1,0]^T$ stays at $[1,0]^T$ (unchanged). $\\hat{j} = [0,1]^T$ moves to $[3,1]^T$ — it slides 3 units to the right while staying at height 1. This is a **horizontal shear**.',
+          strategyTitle: 'Step 1: Read column destinations — identify the transformation type',
+          hints: ['When $\\hat{i}$ stays fixed but $\\hat{j}$ slides horizontally, it is a horizontal shear. The grid lines stay parallel and evenly spaced — just tilted.'],
+        },
+        {
+          expression: 'A\\begin{bmatrix}1\\\\0\\end{bmatrix} = \\begin{bmatrix}1\\\\0\\end{bmatrix}, \\quad A\\begin{bmatrix}1\\\\1\\end{bmatrix} = \\begin{bmatrix}4\\\\1\\end{bmatrix}, \\quad A\\begin{bmatrix}0\\\\1\\end{bmatrix} = \\begin{bmatrix}3\\\\1\\end{bmatrix}',
+          annotation: 'Apply $A$ to three corners of the unit square. The corner $(0,0)$ stays at $(0,0)$ (origin fixed). $(1,0) \\to (1,0)$ (on x-axis, unaffected). $(0,1) \\to (3,1)$. $(1,1) \\to (4,1)$.',
+          strategyTitle: 'Step 2: Transform the corners of the unit square',
+        },
+        {
+          expression: '\\text{Square} \\to \\text{Parallelogram with corners } (0,0),(1,0),(4,1),(3,1)',
+          annotation: 'The unit square shears into a parallelogram. The bottom edge stays on the x-axis (unaffected). The top edge slides 3 units right. **Key insight:** area is preserved in this shear — the parallelogram has the same area as the original square ($= |\\det(A)| = |1\\cdot1 - 3\\cdot0| = 1$).',
+          strategyTitle: 'Step 3: Describe the image — square becomes parallelogram',
+          hints: ['Area of output = $|\\det(A)|$ × area of input. For this shear, $\\det = 1$, so area is unchanged. This is NOT always true — a scale matrix $[2,0;0,2]$ doubles lengths and quadruples area.'],
+        },
+      ],
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
-      difficulty: "easy",
+      id: 'la2-001-ch1',
+      difficulty: 'easy',
       problem: "Calculate the output of $\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix} \\begin{bmatrix} 5 \\\\ -2 \\end{bmatrix}$.",
       hint: "Take 5 times the first column [1, 3], and add it to -2 times the second column [2, 4].",
       walkthrough: [
@@ -454,8 +477,8 @@ v = np.array([4.0, 2.0])
       answer: "\\begin{bmatrix} 1 \\\\ 7 \\end{bmatrix}"
     },
     {
-      id: "ch-2",
-      difficulty: "medium",
+      id: 'la2-001-ch2',
+      difficulty: 'medium',
       problem: "Construct a matrix that shrinks space by half horizontally, but leaves everything unchanged vertically.",
       hint: "Where does [1,0] go? Where does [0,1] go? Make those your columns.",
       walkthrough: [
@@ -517,13 +540,13 @@ v = np.array([4.0, 2.0])
   assessment: {
     questions: [
       {
-        id: "assess-1",
-        type: "input",
-        text: "What matrix does absolutely nothing to space? (The Identity Matrix). Provide the top row first, then bottom row.",
-        answer: "[[1, 0], [0, 1]]",
-        hint: "Where must i-hat and j-hat go if nothing changes? i-hat stays at [1, 0] and j-hat stays at [0, 1]."
-      }
-    ]
+        id: 'q-la2-001-assess-1',
+        type: 'input',
+        text: 'What matrix does absolutely nothing to space? (The Identity Matrix). Provide the top row first, then bottom row.',
+        answer: '[[1, 0], [0, 1]]',
+        hint: 'Where must i-hat and j-hat go if nothing changes? i-hat stays at [1, 0] and j-hat stays at [0, 1].',
+      },
+    ],
   },
 
   // ── Mental Model ─────────────────────────────────────────────────
@@ -536,44 +559,87 @@ v = np.array([4.0, 2.0])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
+    { id: 'cp-la2-001-1', label: 'Read intuition — understand the column secret', type: 'read' },
+    { id: 'cp-la2-001-2', label: 'Run OpenMAT cell 1 — verify where î and ĵ land', type: 'lab' },
+    { id: 'cp-la2-001-3', label: 'Complete example 2: build the 90° rotation matrix from geometry', type: 'example' },
+    { id: 'cp-la2-001-4', label: 'Complete example 3: read what a horizontal shear does geometrically', type: 'example' },
+    { id: 'cp-la2-001-5', label: 'Attempt challenge 2: construct a matrix purely from a geometric description', type: 'challenge' },
   ],
 
-  // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
-      type: 'choice',
-      text: "Geometrically, what do the columns of a 2x2 transformation matrix represent?",
+      id: 'q-la2-001-1',
+      question: 'Geometrically, what do the columns of a 2×2 transformation matrix represent?',
       options: [
-        "The coordinate destinations where the starting basis vectors (i-hat and j-hat) land.",
-        "The x and y components of the output vector.",
-        "The angle of rotation applied to the space.",
-        "The eigenvalues of the matrix."
+        'The coordinate destinations where the basis vectors î and ĵ land after the transformation',
+        'The x and y components of the output vector for a specific input',
+        'The angle of rotation applied to the space',
+        'The eigenvalues of the matrix',
       ],
-      answer: "The coordinate destinations where the starting basis vectors (i-hat and j-hat) land.",
-      hints: ["The entire transformation is defined uniquely by tracking the basis vectors."],
-      reviewSection: 'Intuition tab — The Secret of the Columns'
+      answer: 0,
+      explanation: 'Every vector is a linear combination of î and ĵ, so tracking only where those two basis vectors land is enough to determine where every vector lands. The columns store exactly those two destinations.',
     },
     {
-      id: 'quiz-2',
-      type: 'choice',
-      text: "Which of the following is NOT a requirement for a transformation to be considered 'Linear'?",
+      id: 'q-la2-001-2',
+      question: "Which of the following is NOT required for a transformation to be linear?",
       options: [
-        "The origin (0,0) must remain at (0,0).",
-        "Grid lines must remain parallel and evenly spaced.",
-        "The area of the space must remain unchanged.",
-        "If you scale an input vector by 2, the output vector will also be scaled by 2."
+        'The area of the space must remain unchanged',
+        'The origin (0,0) must stay at (0,0)',
+        'Grid lines must remain parallel and evenly spaced',
+        'Scaling the input by c scales the output by c',
       ],
-      answer: "The area of the space must remain unchanged.",
-      hints: ["A linear transformation can stretch or squish the area of the grid (we will measure this change in area later using Determinants). But it cannot bend the grid lines."],
-      reviewSection: 'Intuition tab — Linear Transformation Definition'
-    }
-  ]
+      answer: 0,
+      explanation: 'Area can change — a scale matrix doubles lengths and quadruples area, yet is still linear. What cannot change: the origin must be fixed, grid lines must stay parallel and evenly spaced (no bending), and scaling must carry through.',
+    },
+    {
+      id: 'q-la2-001-3',
+      question: 'Compute $\\begin{bmatrix}3&1\\\\2&-1\\end{bmatrix}\\begin{bmatrix}2\\\\4\\end{bmatrix}$.',
+      options: ['[10, 0]', '[6, -4]', '[7, 3]', '[10, 4]'],
+      answer: 0,
+      explanation: 'Linear combination: $2[3,2]^T + 4[1,-1]^T = [6,4]^T + [4,-4]^T = [10,0]^T$. Or row formula: row 1 dot [2,4] = 6+4=10; row 2 dot [2,4] = 4−4=0.',
+    },
+    {
+      id: 'q-la2-001-4',
+      question: 'The matrix $\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ sends î to $[1,0]^T$ and ĵ to $[0,-1]^T$. What geometric transformation does this represent?',
+      options: [
+        'Reflection over the x-axis — the y-coordinate flips sign',
+        'Rotation 90° clockwise',
+        'Horizontal shear',
+        'Projection onto the x-axis',
+      ],
+      answer: 0,
+      explanation: 'î stays on the x-axis (unchanged). ĵ flips from pointing up to pointing down — the y-coordinate of every point flips sign. This is reflection over the x-axis. (Compare with projection $[1,0;0,0]$ — that sends ĵ to zero, collapsing the plane onto the x-axis.)',
+    },
+    {
+      id: 'q-la2-001-5',
+      question: 'Can a linear transformation ever move the origin (0,0) to a different point?',
+      options: [
+        'No — by the homogeneity rule, T(0) = T(0·v) = 0·T(v) = 0 for any v',
+        'Yes — if the matrix has a nonzero entry on its diagonal',
+        'Yes — if the transformation is a translation',
+        'Only if the matrix is not square',
+      ],
+      answer: 0,
+      explanation: 'The origin is always a fixed point of any linear map. Proof: T(0) = T(0·v) = 0·T(v) = 0 (using homogeneity). A transformation that moves the origin (like a translation) is called affine, not linear.',
+    },
+    {
+      id: 'q-la2-001-6',
+      question: 'If $T$ is linear and $T(\\mathbf{v}) = \\mathbf{w}$, what is $T(3\\mathbf{v})$?',
+      options: ['$3\\mathbf{w}$', '$\\mathbf{w}^3$', '$\\mathbf{w} + 3$', '$3\\mathbf{v}$'],
+      answer: 0,
+      explanation: 'By homogeneity: $T(3\\mathbf{v}) = 3T(\\mathbf{v}) = 3\\mathbf{w}$. Scaling the input by 3 scales the output by 3 — that is exactly what homogeneity says.',
+    },
+    {
+      id: 'q-la2-001-7',
+      question: 'Which matrix represents a horizontal shear that leaves î fixed but sends ĵ to $[2, 1]^T$?',
+      options: [
+        '$\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$',
+        '$\\begin{bmatrix}2&0\\\\1&0\\end{bmatrix}$',
+        '$\\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}$',
+        '$\\begin{bmatrix}0&2\\\\0&1\\end{bmatrix}$',
+      ],
+      answer: 0,
+      explanation: 'Column 1 = destination of î = $[1,0]^T$ (unchanged). Column 2 = destination of ĵ = $[2,1]^T$. Paste into matrix: $\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$.',
+    },
+  ],
 };

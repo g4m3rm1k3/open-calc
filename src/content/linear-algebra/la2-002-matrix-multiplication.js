@@ -45,6 +45,11 @@ export default {
         body: 'The expression $CBA\\mathbf{v}$ applies transformations chronologically as $A$ first, then $B$, then $C$. The matrix physically closest to the vector acts first. This trips up students consistently — write it on a sticky note until it\'s automatic:\n\n$$CBA\\mathbf{v} = C\\bigl(B\\bigl(A(\\mathbf{v})\\bigr)\\bigr)$$',
       },
       {
+        type: 'strategy',
+        title: 'When to Multiply Matrices',
+        body: '**Multiply matrices when** you need one matrix that does what two (or more) matrices would do in sequence — e.g., a CNC post-processor pre-computing a compound transformation, or a graphics pipeline combining rotation + scale + shear into one draw call.\n\n**Do NOT multiply** if you only need to transform a single vector — just apply each matrix in sequence: `B @ (A @ v)` is the same work as `(B @ A) @ v` for one vector, but pre-computing `B @ A` pays off when you need to transform thousands of vectors.\n\n**Dimension check first:** $(m \\times k)(k \\times n) = (m \\times n)$. If inner dimensions do not match, the product is undefined.',
+      },
+      {
         type: 'insight',
         title: 'The Column-Chasing View of Matrix Multiply',
         body: 'Column $j$ of $AB$ equals $A$ applied to column $j$ of $B$:\n\n$$(AB)_{:,j} = A \\cdot B_{:,j}$$\n\nSo you can compute $AB$ by multiplying $A$ by each column of $B$ separately. This view makes explicit that the columns of $AB$ are the destinations of the basis vectors after first $B$ then $A$.',
@@ -324,94 +329,102 @@ v = np.array([1.0, 0.0])
     visualizations: [],
   },
 
-  // ── Examples ───────────────────────────────────────────────────
   examples: [
     {
-      id: "ex-1",
-      title: "Multiplying Two 2x2 Matrices",
-      problem: "Let $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$ and $B = \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}$. Find $AB$.",
+      id: 'la2-002-ex1',
+      title: 'Compute $AB$ — Row-Dot-Column Method',
+      problem: `Let $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$ and $B = \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}$. Compute $AB$ and interpret which transformation acts first.`,
       steps: [
         {
-          expression: "AB = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix} \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}",
-          annotation: "Set up the multiplication.",
-          strategyTitle: "Setup",
-          checkpoint: "",
-          hints: [],
+          expression: 'AB = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix} \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix}',
+          annotation: 'Set up $AB$. The product $AB$ means $B$ acts on a vector first, then $A$ acts on the result. Dimension check: $A$ is $2 \\times 2$, $B$ is $2 \\times 2$ — inner dimensions match (2 = 2), so the product is defined and $2 \\times 2$.',
+          strategyTitle: 'Step 1: Set up and dimension check',
         },
         {
-          expression: "\\text{Top-Left} = (1)(5) + (2)(7) = 5 + 14 = 19",
-          annotation: "Dot product of Row 1 of A and Column 1 of B.",
-          strategyTitle: "Row 1 * Col 1",
-          checkpoint: "What is the dot product of Row 1 of A and Col 2 of B?",
-          hints: ["(1)(6) + (2)(8) = 6 + 16 = 22"],
+          expression: '(AB)_{11} = \\text{row 1 of }A \\cdot \\text{col 1 of }B = (1)(5) + (2)(7) = 5 + 14 = 19',
+          annotation: 'Entry $(1,1)$ = row 1 of $A$ dotted with column 1 of $B$. Row 1 of $A$ = $[1, 2]$, column 1 of $B$ = $[5, 7]^T$. Dot product: sum of element-wise products.',
+          strategyTitle: 'Step 2: Compute entry (1,1)',
+          hints: ['Checklist: (row 1, col 1) = $A_{1,1}B_{1,1} + A_{1,2}B_{2,1}$ = $1 \\cdot 5 + 2 \\cdot 7 = 19$.'],
         },
         {
-          expression: "\\text{Top-Right} = 22",
-          annotation: "Result of Row 1 dot Col 2.",
-          strategyTitle: "Row 1 * Col 2",
-          checkpoint: "Now do the bottom row. Row 2 * Col 1?",
-          hints: ["(3)(5) + (4)(7) = 15 + 28 = 43"],
+          expression: '(AB)_{12} = (1)(6) + (2)(8) = 22, \\quad (AB)_{21} = (3)(5) + (4)(7) = 43, \\quad (AB)_{22} = (3)(6) + (4)(8) = 50',
+          annotation: 'Compute the remaining three entries: $(1,2)$, $(2,1)$, $(2,2)$. Each entry $(i,j)$ = row $i$ of $A$ $\\cdot$ column $j$ of $B$.',
+          strategyTitle: 'Step 3: Compute remaining entries',
+          hints: ['$(1,2)$: row 1 of $A$ dot col 2 of $B$ = $1 \\cdot 6 + 2 \\cdot 8 = 22$. $(2,1)$: row 2 of $A$ dot col 1 of $B$ = $3 \\cdot 5 + 4 \\cdot 7 = 43$.'],
         },
         {
-          expression: "\\text{Bottom-Left} = 43, \\quad \\text{Bottom-Right} = (3)(6) + (4)(8) = 18 + 32 = 50",
-          annotation: "Complete the remaining two dot products.",
-          strategyTitle: "Row 2 computations",
-          checkpoint: "",
-          hints: [],
+          expression: 'AB = \\begin{bmatrix} 19 & 22 \\\\ 43 & 50 \\end{bmatrix}',
+          annotation: 'Assemble. This single matrix is equivalent to first applying transformation $B$, then transformation $A$. One matrix — two sequential operations captured in one object.',
+          strategyTitle: 'Step 4: Assemble result',
+          hints: ['Verify column 1 = $A$ applied to column 1 of $B$: $A \\cdot [5,7]^T = [1 \\cdot 5 + 2 \\cdot 7, \\; 3 \\cdot 5 + 4 \\cdot 7]^T = [19, 43]^T$ ✓'],
         },
-        {
-          expression: "AB = \\begin{bmatrix} 19 & 22 \\\\ 43 & 50 \\end{bmatrix}",
-          annotation: "Assemble the final matrix.",
-          strategyTitle: "Final Assembly",
-          checkpoint: "",
-          hints: [],
-        }
       ],
-      conclusion: "The final matrix [19, 22; 43, 50] represents a single transformation equivalent to applying B, and then A."
     },
     {
-      id: "ex-2",
-      title: "Proving Non-Commutativity",
-      problem: "Using the same matrices from Example 1, calculate $BA$ and see if it equals $AB$.",
+      id: 'la2-002-ex2',
+      title: 'Non-Commutativity — Rotation Then Shear vs. Shear Then Rotation',
+      problem: `Let $R = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$ (90° CCW rotation) and $S = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$ (horizontal shear). Compute $SR$ (shear after rotation) and $RS$ (rotation after shear). Show they are different.`,
       steps: [
         {
-          expression: "BA = \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix} \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}",
-          annotation: "Set up the matrices in reverse order.",
-          strategyTitle: "Reverse setup",
-          checkpoint: "What is the new top-left element? (Row 1 of B dot Col 1 of A)",
-          hints: ["(5)(1) + (6)(3) = 5 + 18 = 23"],
+          expression: 'SR = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}',
+          annotation: '$SR$ means $R$ (rotation) acts first, then $S$ (shear). To apply two transformations: first rotate the plane 90° CCW, then shear it horizontally.',
+          strategyTitle: 'Step 1: Set up SR — rotation first, shear second',
         },
         {
-          expression: "\\text{Top-Left} = 23, \\quad \\text{Top-Right} = (5)(2) + (6)(4) = 10 + 24 = 34",
-          annotation: "Calculate the top row of the new matrix.",
-          strategyTitle: "Top Row",
-          checkpoint: "",
-          hints: [],
+          expression: 'SR = \\begin{bmatrix} (1)(0)+(1)(1) & (1)(-1)+(1)(0) \\\\ (0)(0)+(1)(1) & (0)(-1)+(1)(0) \\end{bmatrix} = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\end{bmatrix}',
+          annotation: 'Compute each entry via row-dot-column. Geometric meaning: where does $\\hat{i} = [1,0]^T$ end up? Under $R$: $[0,1]^T$. Under $S$ applied to $[0,1]^T$: $[1,1]^T$. That is column 1 of $SR$ ✓.',
+          strategyTitle: 'Step 2: Compute SR',
+          hints: ['Column 1 of $SR$ = $S \\cdot$ (col 1 of $R$) = $S \\cdot [0,1]^T = [0+1, 0+1]^T = [1,1]^T$ ✓'],
         },
         {
-          expression: "\\text{Bottom-Left} = (7)(1) + (8)(3) = 7 + 24 = 31, \\quad \\text{Bottom-Right} = (7)(2) + (8)(4) = 14 + 32 = 46",
-          annotation: "Calculate the bottom row.",
-          strategyTitle: "Bottom Row",
-          checkpoint: "",
-          hints: [],
+          expression: 'RS = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}\\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix} = \\begin{bmatrix} 0 & -1 \\\\ 1 & 1 \\end{bmatrix}',
+          annotation: '$RS$ means $S$ (shear) acts first, then $R$ (rotation). Entry $(1,1)$: $0 \\cdot 1 + (-1) \\cdot 0 = 0$. Entry $(1,2)$: $0 \\cdot 1 + (-1) \\cdot 1 = -1$. Etc.',
+          strategyTitle: 'Step 3: Compute RS — shear first, rotation second',
         },
         {
-          expression: "BA = \\begin{bmatrix} 23 & 34 \\\\ 31 & 46 \\end{bmatrix}",
-          annotation: "Assemble the new final matrix.",
-          strategyTitle: "Final Assembly",
-          checkpoint: "",
-          hints: [],
-        }
+          expression: 'SR = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\end{bmatrix} \\neq \\begin{bmatrix} 0 & -1 \\\\ 1 & 1 \\end{bmatrix} = RS',
+          annotation: 'The two products are different matrices — different transformations entirely. "Rotate the plane then shear it" leaves a different final configuration than "shear it then rotate." Order is not interchangeable.',
+          strategyTitle: 'Step 4: Compare — $SR \\neq RS$',
+          hints: ['Apply each to $\\hat{i} = [1,0]^T$: $SR \\cdot \\hat{i} = [1,1]^T$ (it moved to (1,1)). $RS \\cdot \\hat{i} = [0,1]^T$ (it moved to (0,1)). Different destinations — non-commutative.'],
+        },
       ],
-      conclusion: "BA = [23, 34; 31, 46]. As expected, $BA \\neq AB$ ([19, 22; 43, 50]). The order in which you apply transformations fundamentally alters where space ends up."
-    }
+    },
+    {
+      id: 'la2-002-ex3',
+      title: 'Dimension Compatibility — Multiplying Non-Square Matrices',
+      problem: `Can you compute $AB$? Let $A = \\begin{bmatrix} 1 & 0 & -1 \\\\ 2 & 1 & 3 \\end{bmatrix}$ ($2 \\times 3$) and $B = \\begin{bmatrix} 4 & 1 \\\\ -1 & 2 \\\\ 0 & 3 \\end{bmatrix}$ ($3 \\times 2$). If yes, compute it and state the output size.`,
+      steps: [
+        {
+          expression: 'A \\text{ is } 2 \\times 3, \\quad B \\text{ is } 3 \\times 2 \\quad \\Rightarrow \\quad (2 \\times \\underbrace{3)(3}_\\text{match} \\times 2) = 2 \\times 2',
+          annotation: 'Dimension check: the inner dimensions are both 3 — they match. The product $AB$ is defined and will be $2 \\times 2$. (Rule: $(m \\times k)(k \\times n) = (m \\times n)$. Outer dimensions give the output size.)',
+          strategyTitle: 'Step 1: Dimension check — inner dimensions must match',
+          hints: ['What about $BA$? $B$ is $3 \\times 2$ and $A$ is $2 \\times 3$: inner dimensions are both 2, so $BA$ is also defined and is $3 \\times 3$. $AB \\neq BA$ in size even!'],
+        },
+        {
+          expression: '(AB)_{11} = [1,0,-1] \\cdot [4,-1,0]^T = 4 + 0 + 0 = 4',
+          annotation: 'Entry $(1,1)$ = row 1 of $A$ = $[1, 0, -1]$ dotted with column 1 of $B$ = $[4, -1, 0]^T$. Three-element dot product: $1 \\cdot 4 + 0 \\cdot (-1) + (-1) \\cdot 0 = 4$.',
+          strategyTitle: 'Step 2: Compute entry (1,1)',
+        },
+        {
+          expression: '(AB)_{12} = [1,0,-1] \\cdot [1,2,3]^T = 1+0-3 = -2',
+          annotation: 'Entry $(1,2)$ = row 1 of $A$ dot column 2 of $B$ = $[1,2,3]^T$: $1 \\cdot 1 + 0 \\cdot 2 + (-1) \\cdot 3 = -2$.',
+          strategyTitle: 'Step 3: Compute entry (1,2)',
+        },
+        {
+          expression: 'AB = \\begin{bmatrix} 4 & -2 \\\\ 7 & 13 \\end{bmatrix}',
+          annotation: 'Complete the bottom row: $(2,1) = 2 \\cdot 4 + 1 \\cdot (-1) + 3 \\cdot 0 = 7$. $(2,2) = 2 \\cdot 1 + 1 \\cdot 2 + 3 \\cdot 3 = 13$. Result: a $2 \\times 2$ matrix. $A$ maps $\\mathbb{R}^3 \\to \\mathbb{R}^2$; $B$ maps $\\mathbb{R}^2 \\to \\mathbb{R}^3$; their composition $AB$ maps $\\mathbb{R}^2 \\to \\mathbb{R}^2$.',
+          strategyTitle: 'Step 4: Assemble the $2 \\times 2$ result',
+          hints: ['Verify: $(2,1)$ = row 2 of $A = [2,1,3]$ dot col 1 of $B = [4,-1,0]^T$ = $8-1+0=7$ ✓. $(2,2)$ = $[2,1,3] \\cdot [1,2,3]^T = 2+2+9=13$ ✓.'],
+        },
+      ],
+    },
   ],
 
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {
-      id: "ch-1",
-      difficulty: "easy",
+      id: 'la2-002-ch1',
+      difficulty: 'easy',
       problem: "Compute $AB$ where $A = \\begin{bmatrix} 2 & 0 \\\\ 0 & 2 \\end{bmatrix}$ and $B = \\begin{bmatrix} 1 & 4 \\\\ -3 & 5 \\end{bmatrix}$.",
       hint: "Matrix A is just scalar multiplication (it scales the x and y axes by 2). This means you can just double everything in B.",
       walkthrough: [
@@ -427,8 +440,8 @@ v = np.array([1.0, 0.0])
       answer: "\\begin{bmatrix} 2 & 8 \\\\ -6 & 10 \\end{bmatrix}"
     },
     {
-      id: "ch-2",
-      difficulty: "medium",
+      id: 'la2-002-ch2',
+      difficulty: 'medium',
       problem: "Multiply the Identity matrix $I = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ by $A = \\begin{bmatrix} 7 & -2 \\\\ 4 & 9 \\end{bmatrix}$. What is $IA$?",
       hint: "What happens when you apply a transformation that 'does nothing', followed by A?",
       walkthrough: [
@@ -486,13 +499,13 @@ v = np.array([1.0, 0.0])
   assessment: {
     questions: [
       {
-        id: "assess-1",
-        type: "input",
-        text: "If you have transformations A, B, and C, and you apply A first, B second, and C third to a vector v, how is this written algebraically? (Type the letters without spaces).",
-        answer: "CBAv",
-        hint: "Transformations are written as nested functions: C(B(A(v))). Right to left."
-      }
-    ]
+        id: 'q-la2-002-assess-1',
+        type: 'input',
+        text: 'If you apply transformation A first, B second, and C third to a vector v, how is this written algebraically? (Type the letters without spaces).',
+        answer: 'CBAv',
+        hint: 'Transformations compose right-to-left: C(B(A(v))). The matrix closest to v acts first.',
+      },
+    ],
   },
 
   // ── Mental Model ─────────────────────────────────────────────────
@@ -504,44 +517,82 @@ v = np.array([1.0, 0.0])
 
   // ── Checkpoints ──────────────────────────────────────────────────
   checkpoints: [
-    'read-intuition',
-    'read-math',
-    'read-rigor',
-    'completed-example-1',
-    'completed-example-2',
-    'attempted-challenge-easy',
-    'attempted-challenge-medium',
+    { id: 'cp-la2-002-1', label: 'Read intuition — understand why right-to-left', type: 'read' },
+    { id: 'cp-la2-002-2', label: 'Run OpenMAT cell 2 — verify rotate-then-shear ≠ shear-then-rotate', type: 'lab' },
+    { id: 'cp-la2-002-3', label: 'Complete example 1: trace each entry via row-dot-column', type: 'example' },
+    { id: 'cp-la2-002-4', label: 'Complete example 3: check dimension compatibility before computing', type: 'example' },
+    { id: 'cp-la2-002-5', label: 'Attempt challenge 2: show that IA = A for any matrix', type: 'challenge' },
   ],
 
-  // ── Final Quiz ─────────────────────────────────────────────────
   quiz: [
     {
-      id: 'quiz-1',
-      type: 'choice',
-      text: "Geometrically, what does it mean that matrix multiplication is non-commutative (AB ≠ BA)?",
+      id: 'q-la2-002-1',
+      question: 'Geometrically, what does it mean that matrix multiplication is non-commutative ($AB \\neq BA$)?',
       options: [
-        "The area of transformed space scales unpredictably depending on order.",
-        "A spatial transformation followed by another (like rotate then shear) yields a different physical shape than if you reversed the order (shear then rotate).",
-        "It is impossible to multiply rectangular matrices backwards.",
-        "The origin (0,0) moves to different places."
+        'The order matters — "rotate then shear" leaves the plane in a different final shape than "shear then rotate"',
+        'The area of transformed space scales unpredictably depending on order',
+        'It is impossible to multiply rectangular matrices in reverse order',
+        'The origin moves to different places depending on order',
       ],
-      answer: "A spatial transformation followed by another (like rotate then shear) yields a different physical shape than if you reversed the order (shear then rotate).",
-      hints: ["Think of putting on socks and shoes. The chronological order physically changes the outcome."],
-      reviewSection: 'Intuition tab — Non-Commutativity'
+      answer: 0,
+      explanation: 'Because matrices represent transformations, composing them in a different order applies the warps to an already-warped space. The final configuration depends entirely on which transformation was applied first.',
     },
     {
-      id: 'quiz-2',
-      type: 'choice',
-      text: "When you see the mathematical expression ABCv, in what chronological order do the transformations physically happen to the vector v?",
+      id: 'q-la2-002-2',
+      question: 'In the expression $ABC\\mathbf{v}$, which transformation acts on $\\mathbf{v}$ first?',
       options: [
-        "A happens first, then B, then C.",
-        "C happens first, then B, then A.",
-        "They all happen simultaneously, blending into one average transformation.",
-        "A and B happen first, C is ignored."
+        '$C$ acts first — the matrix closest to the vector acts first (right-to-left)',
+        '$A$ acts first — read left to right like text',
+        '$B$ acts first — it is in the middle',
+        'All three act simultaneously',
       ],
-      answer: "A happens first, then B, then C.",
-      hints: ["Transformations are applying functions. C(B(A(v))). The matrix closest to the vector hits it first."],
-      reviewSection: 'Intuition tab — Right-to-Left'
-    }
-  ]
+      answer: 0,
+      explanation: 'Matrix-vector multiplication is function composition: $ABC\\mathbf{v} = A(B(C(\\mathbf{v})))$. Functions evaluate inside-out: $C$ first, then $B$ on the result, then $A$. The matrix physically closest to $\\mathbf{v}$ acts first.',
+    },
+    {
+      id: 'q-la2-002-3',
+      question: 'Can you multiply a $3 \\times 4$ matrix by a $4 \\times 2$ matrix? If yes, what size is the result?',
+      options: [
+        'Yes — the result is $3 \\times 2$',
+        'No — the matrices must be square to multiply',
+        'Yes — the result is $4 \\times 4$',
+        'No — the number of rows must match',
+      ],
+      answer: 0,
+      explanation: 'Rule: $(m \\times k)(k \\times n) = (m \\times n)$. The inner dimensions must match. Here $k = 4$ matches. Outer dimensions give the result: $3 \\times 2$.',
+    },
+    {
+      id: 'q-la2-002-4',
+      question: 'You want to apply transformation $R$ first, then transformation $S$. Which product do you compute?',
+      options: ['$SR$', '$RS$', '$R + S$', '$R^T S$'],
+      answer: 0,
+      explanation: '$SR\\mathbf{v} = S(R(\\mathbf{v}))$: $R$ acts first (closest to $\\mathbf{v}$), then $S$ acts on the result. Writing $RS$ would apply $S$ first and $R$ second — the wrong order.',
+    },
+    {
+      id: 'q-la2-002-5',
+      question: 'Compute the top-left entry of $\\begin{bmatrix}2&3\\\\1&0\\end{bmatrix}\\begin{bmatrix}1&4\\\\2&-1\\end{bmatrix}$.',
+      options: ['8', '5', '2', '6'],
+      answer: 0,
+      explanation: 'Entry $(1,1)$ = row 1 of left matrix $\\cdot$ column 1 of right matrix = $[2,3] \\cdot [1,2]^T = 2 \\cdot 1 + 3 \\cdot 2 = 2 + 6 = 8$.',
+    },
+    {
+      id: 'q-la2-002-6',
+      question: 'What property does matrix multiplication share with function composition that addition does NOT have?',
+      options: [
+        'Non-commutativity — $AB \\neq BA$ just as $f \\circ g \\neq g \\circ f$ in general',
+        'Distributivity — $A(B+C) = AB + AC$',
+        'Associativity — $(AB)C = A(BC)$',
+        'Closure — the product of two $n \\times n$ matrices is always $n \\times n$',
+      ],
+      answer: 0,
+      explanation: 'Function composition is not commutative (putting on socks then shoes ≠ shoes then socks), and neither is matrix multiplication. Addition IS commutative ($A + B = B + A$). Associativity and distributivity are shared with addition.',
+    },
+    {
+      id: 'q-la2-002-7',
+      question: 'The identity matrix $I$ satisfies $IA = AI = A$ for any compatible $A$. This makes $I$ the matrix equivalent of which number in regular arithmetic?',
+      options: ['1 (the multiplicative identity)', '0 (the additive identity)', '−1 (the multiplicative inverse)', '∞'],
+      answer: 0,
+      explanation: 'Just as $1 \\times x = x \\times 1 = x$ for any number, $IA = AI = A$ for any matrix. The identity matrix does nothing to space — it is the transformation that leaves every vector exactly where it started.',
+    },
+  ],
 };

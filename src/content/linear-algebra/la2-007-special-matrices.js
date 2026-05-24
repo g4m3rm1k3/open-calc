@@ -29,6 +29,11 @@ export default {
       },
       {
         type: 'insight',
+        title: 'When to Use Which Matrix Type — Decision Guide',
+        body: '**Given a matrix $A$, ask these questions in order:**\n\n1. Is $A = A^\\top$? → **Symmetric.** Use `eigh()` not `eig()` (faster, guaranteed real eigenvalues).\n2. Does $A^\\top A = I$? → **Orthogonal.** Inverse is free: $A^{-1} = A^\\top$. Condition number = 1.\n3. Symmetric AND all eigenvalues positive? → **SPD.** Use Cholesky ($A = LL^\\top$) — twice as fast as LU, stable.\n4. Symmetric AND all eigenvalues ≥ 0? → **PSD.** Arises from covariance matrices; Cholesky may fail near zero eigenvalues.\n5. Zeros above diagonal? → **Lower triangular.** Solve by forward substitution in $O(n^2)$.\n6. Zeros below diagonal? → **Upper triangular.** Solve by back substitution in $O(n^2)$.\n\n**Rule of thumb:** Structure → algorithm. Never use general LU on a symmetric matrix; never invert an orthogonal matrix.',
+      },
+      {
+        type: 'insight',
         title: 'Why Orthogonal Matrices Are Numerically Perfect',
         body: 'The condition number of an orthogonal matrix is always exactly 1 — the best possible. This means solving $Qx = b$ (i.e., $x = Q^\\top b$) introduces zero amplification of errors. Algorithms like Gram-Schmidt and QR decomposition intentionally produce orthogonal matrices to keep computations stable.',
       },
@@ -251,14 +256,96 @@ for i, M in enumerate([M1, M2, M3], 1):
   examples: [
     {
       id: 'la2-007-ex1',
-      title: 'Is This Matrix SPD?',
-      problem: 'Test whether $A = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$ is positive definite.',
-      solution: '$\\det(A) = 4 - 4 = 0$. The second leading principal minor is zero. $A$ is positive SEMI-definite (has a zero eigenvalue), not SPD.',
+      title: 'Checking SPD via Sylvester\'s Criterion',
+      problem: 'Determine whether $A = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$ is positive definite, positive semidefinite, or indefinite.',
       steps: [
-        'Check symmetry: $A = A^\\top$? Yes.',
-        'Compute eigenvalues: $\\text{tr}(A) = 5$, $\\det(A) = 0$, so $\\lambda_1 = 5$, $\\lambda_2 = 0$.',
-        'Since one eigenvalue is zero, $A$ is PSD but NOT SPD.',
-        'Verify: $\\mathbf{x} = [1, -2]^\\top$ gives $\\mathbf{x}^\\top A \\mathbf{x} = 0$.',
+        {
+          expression: 'A = A^\\top \\;?\\quad \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix} \\;\\checkmark',
+          annotation: 'First check: is the matrix symmetric? Symmetry is required before asking about definiteness.',
+          strategyTitle: 'Step 1: Verify symmetry',
+        },
+        {
+          expression: 'M_1 = [4] \\Rightarrow \\det(M_1) = 4 > 0',
+          annotation: 'Sylvester\'s criterion: check leading principal minors. The 1×1 minor is just the top-left entry.',
+          strategyTitle: 'Step 2: First leading principal minor',
+        },
+        {
+          expression: 'M_2 = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix} \\Rightarrow \\det(M_2) = 4 \\cdot 1 - 2 \\cdot 2 = 4 - 4 = 0',
+          annotation: 'The 2×2 leading minor has determinant zero. Sylvester\'s criterion requires all leading minors to be strictly positive for SPD.',
+          strategyTitle: 'Step 3: Second leading principal minor',
+        },
+        {
+          expression: '\\lambda_1 + \\lambda_2 = \\text{tr}(A) = 5, \\quad \\lambda_1 \\lambda_2 = \\det(A) = 0 \\Rightarrow \\lambda_1 = 5,\\; \\lambda_2 = 0',
+          annotation: 'Confirm via eigenvalues: one eigenvalue is zero (not positive), so $A$ is not SPD.',
+          strategyTitle: 'Step 4: Find eigenvalues to confirm',
+        },
+        {
+          expression: '\\mathbf{x} = \\begin{bmatrix}1\\\\-2\\end{bmatrix}: \\quad \\mathbf{x}^\\top A \\mathbf{x} = \\begin{bmatrix}1&-2\\end{bmatrix}\\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}\\begin{bmatrix}1\\\\-2\\end{bmatrix} = \\begin{bmatrix}0&0\\end{bmatrix}\\begin{bmatrix}1\\\\-2\\end{bmatrix} = 0',
+          annotation: 'There exists a nonzero vector giving $\\mathbf{x}^\\top A\\mathbf{x} = 0$. Since all outputs are ≥ 0 (not negative), this is PSD.',
+          strategyTitle: 'Step 5: Conclusion — PSD not SPD',
+          hints: ['The vector $[1, -2]^\\top$ is the eigenvector for $\\lambda = 0$.  Any scalar multiple also gives zero.'],
+        },
+      ],
+    },
+    {
+      id: 'la2-007-ex2',
+      title: 'Verifying an Orthogonal Matrix',
+      problem: 'Show that $Q = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1&-1\\\\1&1\\end{bmatrix}$ is orthogonal, find its inverse, and state what geometric transformation it represents.',
+      steps: [
+        {
+          expression: 'Q^\\top Q = \\frac{1}{2}\\begin{bmatrix}1&1\\\\-1&1\\end{bmatrix}\\begin{bmatrix}1&-1\\\\1&1\\end{bmatrix} = \\frac{1}{2}\\begin{bmatrix}1+1 & -1+1 \\\\ -1+1 & 1+1\\end{bmatrix}',
+          annotation: 'Compute $Q^\\top Q$ by multiplying. Each row of $Q^\\top$ is a column of $Q$.',
+          strategyTitle: 'Step 1: Check $Q^\\top Q$',
+        },
+        {
+          expression: '= \\frac{1}{2}\\begin{bmatrix}2&0\\\\0&2\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I \\;\\checkmark',
+          annotation: '$Q^\\top Q = I$ confirms $Q$ is orthogonal. The columns are orthonormal.',
+          strategyTitle: 'Step 2: Confirm orthogonality',
+        },
+        {
+          expression: 'Q^{-1} = Q^\\top = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1&1\\\\-1&1\\end{bmatrix}',
+          annotation: 'For orthogonal matrices, the inverse is free: just transpose. No row reduction needed.',
+          strategyTitle: 'Step 3: Inverse = Transpose',
+        },
+        {
+          expression: '\\det(Q) = \\frac{1}{2}(1 \\cdot 1 - (-1) \\cdot 1) = \\frac{1}{2}(2) = 1',
+          annotation: '$\\det = +1$ means this is a pure rotation, not a reflection.',
+          strategyTitle: 'Step 4: Identify the geometric transformation',
+          hints: ['This is rotation by 45°. Verify: $\\cos(45°) = \\sin(45°) = 1/\\sqrt{2}$, matching the standard rotation matrix $\\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$.'],
+        },
+      ],
+    },
+    {
+      id: 'la2-007-ex3',
+      title: 'Constructing a Guaranteed SPD Matrix from Data',
+      problem: 'You have a data matrix $B = \\begin{bmatrix}1&0\\\\2&1\\\\0&3\\end{bmatrix}$. Construct a symmetric positive definite matrix from $B$, perform Cholesky factorization, and use it to solve $A\\mathbf{x} = \\mathbf{b}$ for $\\mathbf{b} = \\begin{bmatrix}5\\\\11\\end{bmatrix}$.',
+      steps: [
+        {
+          expression: 'A = B^\\top B = \\begin{bmatrix}1&2&0\\\\0&1&3\\end{bmatrix}\\begin{bmatrix}1&0\\\\2&1\\\\0&3\\end{bmatrix} = \\begin{bmatrix}5&2\\\\2&10\\end{bmatrix}',
+          annotation: 'Any Gram matrix $B^\\top B$ is symmetric PSD. It is SPD when $B$ has full column rank (here rank 2 ✓).',
+          strategyTitle: 'Step 1: Form the Gram matrix $A = B^\\top B$',
+        },
+        {
+          expression: 'l_{11} = \\sqrt{a_{11}} = \\sqrt{5}, \\quad l_{21} = \\frac{a_{21}}{l_{11}} = \\frac{2}{\\sqrt{5}}',
+          annotation: 'Cholesky builds $L$ column by column. First column: square root of diagonal, then divide off-diagonals.',
+          strategyTitle: 'Step 2: Cholesky — first column of $L$',
+        },
+        {
+          expression: 'l_{22} = \\sqrt{a_{22} - l_{21}^2} = \\sqrt{10 - \\frac{4}{5}} = \\sqrt{\\frac{46}{5}} \\approx 3.033',
+          annotation: 'Each diagonal entry uses the "remaining" variance after subtracting what prior columns explain.',
+          strategyTitle: 'Step 3: Cholesky — second diagonal entry',
+        },
+        {
+          expression: 'L = \\begin{bmatrix}\\sqrt{5}&0\\\\2/\\sqrt{5}&\\sqrt{46/5}\\end{bmatrix} \\approx \\begin{bmatrix}2.236&0\\\\0.894&3.033\\end{bmatrix}',
+          annotation: 'Cholesky factor $L$ is lower triangular. Check: $L L^\\top = A$.',
+          strategyTitle: 'Step 4: Assemble $L$',
+        },
+        {
+          expression: '\\text{Solve } L\\mathbf{y} = \\mathbf{b}: \\quad y_1 = \\frac{5}{\\sqrt{5}} = \\sqrt{5}, \\quad y_2 = \\frac{11 - \\frac{2}{\\sqrt{5}}\\sqrt{5}}{\\sqrt{46/5}} = \\frac{9}{\\sqrt{46/5}}',
+          annotation: 'Forward substitution on $L\\mathbf{y} = \\mathbf{b}$. Then back-substitute on $L^\\top\\mathbf{x} = \\mathbf{y}$.',
+          strategyTitle: 'Step 5: Forward then back substitution',
+          hints: ['Final answer: $\\mathbf{x} \\approx [0.652, 0.978]^\\top$. Verify: $A\\mathbf{x} = [5(0.652)+2(0.978),\\; 2(0.652)+10(0.978)] \\approx [5, 11]$ ✓'],
+        },
       ],
     },
   ],
@@ -269,16 +356,30 @@ for i, M in enumerate([M1, M2, M3], 1):
       title: 'Prove Q^T Q = I iff columns are orthonormal',
       difficulty: 'medium',
       challengeType: 'prove',
-      prompt: 'Show that the $ij$-th entry of $Q^\\top Q$ is $\\mathbf{q}_i \\cdot \\mathbf{q}_j$ (the dot product of columns $i$ and $j$). Conclude that $Q^\\top Q = I$ if and only if the columns of $Q$ are orthonormal.',
+      problem: 'Show that the $ij$-th entry of $Q^\\top Q$ is $\\mathbf{q}_i \\cdot \\mathbf{q}_j$ (the dot product of columns $i$ and $j$). Conclude that $Q^\\top Q = I$ if and only if the columns of $Q$ are orthonormal.',
       hint: 'Write $Q = [\\mathbf{q}_1 | \\cdots | \\mathbf{q}_n]$. Then $(Q^\\top Q)_{ij} = (i\\text{-th row of }Q^\\top) \\cdot (j\\text{-th column of }Q)$.',
+      walkthrough: [
+        '**Express $Q$ column-by-column:** Write $Q = [\\mathbf{q}_1 \\mid \\mathbf{q}_2 \\mid \\cdots \\mid \\mathbf{q}_n]$ where each $\\mathbf{q}_i \\in \\mathbb{R}^n$.',
+        '**The $i$-th row of $Q^\\top$ is $\\mathbf{q}_i^\\top$:** By definition of transpose, row $i$ of $Q^\\top$ equals column $i$ of $Q$, transposed.',
+        '**The $(i,j)$ entry of $Q^\\top Q$:** $(Q^\\top Q)_{ij} = (\\text{row } i \\text{ of } Q^\\top) \\cdot (\\text{col } j \\text{ of } Q) = \\mathbf{q}_i^\\top \\mathbf{q}_j = \\mathbf{q}_i \\cdot \\mathbf{q}_j$.',
+        '**Forward direction:** If columns are orthonormal, $\\mathbf{q}_i \\cdot \\mathbf{q}_j = \\delta_{ij}$ (1 if $i=j$, 0 otherwise). So every entry of $Q^\\top Q$ is $\\delta_{ij}$, which is exactly $I$.',
+        '**Reverse direction:** If $Q^\\top Q = I$, then $(Q^\\top Q)_{ij} = \\delta_{ij}$. By the formula above, $\\mathbf{q}_i \\cdot \\mathbf{q}_j = \\delta_{ij}$ for all $i, j$. This is precisely the definition of orthonormality.',
+      ],
     },
     {
       id: 'la2-007-ch2',
       title: 'Show every covariance matrix is PSD',
       difficulty: 'hard',
       challengeType: 'prove',
-      prompt: 'Let $X \\in \\mathbb{R}^{n \\times p}$ be a data matrix (rows = observations, columns = features). Define $\\Sigma = \\frac{1}{n} X^\\top X$. Prove that $\\Sigma$ is symmetric positive semidefinite.',
+      problem: 'Let $X \\in \\mathbb{R}^{n \\times p}$ be a data matrix (rows = observations, columns = features). Define $\\Sigma = \\frac{1}{n} X^\\top X$. Prove that $\\Sigma$ is symmetric positive semidefinite.',
       hint: 'Show $\\mathbf{v}^\\top \\Sigma \\mathbf{v} = \\frac{1}{n} \\|X\\mathbf{v}\\|^2 \\geq 0$.',
+      walkthrough: [
+        '**Symmetry:** $\\Sigma^\\top = (\\frac{1}{n} X^\\top X)^\\top = \\frac{1}{n} X^\\top (X^\\top)^\\top = \\frac{1}{n} X^\\top X = \\Sigma$. So $\\Sigma$ is symmetric.',
+        '**Set up the quadratic form:** Take any $\\mathbf{v} \\in \\mathbb{R}^p$. Compute $\\mathbf{v}^\\top \\Sigma \\mathbf{v} = \\mathbf{v}^\\top \\frac{1}{n} X^\\top X \\mathbf{v} = \\frac{1}{n} \\mathbf{v}^\\top X^\\top X \\mathbf{v}$.',
+        '**Regroup:** $\\frac{1}{n} \\mathbf{v}^\\top X^\\top X \\mathbf{v} = \\frac{1}{n} (X\\mathbf{v})^\\top (X\\mathbf{v}) = \\frac{1}{n} \\|X\\mathbf{v}\\|^2$.',
+        '**Conclude PSD:** Since $\\|X\\mathbf{v}\\|^2 \\geq 0$ for any real vector (norms are non-negative), we have $\\mathbf{v}^\\top \\Sigma \\mathbf{v} \\geq 0$ for all $\\mathbf{v}$. By definition, $\\Sigma$ is PSD.',
+        '**When is it SPD?** $\\mathbf{v}^\\top \\Sigma \\mathbf{v} = 0 \\iff X\\mathbf{v} = \\mathbf{0}$. If $X$ has full column rank (no multicollinear features), the only solution is $\\mathbf{v} = \\mathbf{0}$, so $\\Sigma$ is SPD.',
+      ],
     },
   ],
 
@@ -291,11 +392,15 @@ for i, M in enumerate([M1, M2, M3], 1):
   },
   mentalModel: [
     'Symmetric = mutual relationship = real eigenvalues = orthogonal eigenvectors.',
-    'Orthogonal = rigid motion (rotation/reflection) = perfect condition number.',
+    'Orthogonal = rigid motion (rotation/reflection) = perfect condition number = inverse is free.',
     'Positive definite = bowl shape = all positive eigenvalues = Cholesky exists.',
-    'Every Gram matrix B^T B is PSD.',
+    'Every Gram matrix B^T B is PSD; SPD when B has full column rank.',
+    'Structure tells you the algorithm: symmetric→eigh, orthogonal→transpose for inverse, SPD→Cholesky.',
   ],
-  checkpoints: ['read-intuition', 'run-cells'],
+  checkpoints: [
+    { id: 'cp-la2-007-1', question: 'What does $A^\\top A = I$ tell you about a matrix $A$?', answer: 'It is orthogonal: its columns are orthonormal, its inverse is $A^\\top$, and it preserves lengths and angles.' },
+    { id: 'cp-la2-007-2', question: 'You have a symmetric matrix with all positive eigenvalues. What factorization should you use to solve $A\\mathbf{x} = \\mathbf{b}$ efficiently?', answer: 'Cholesky factorization $A = LL^\\top$ — it is twice as fast as LU and exploits the symmetry and positive definiteness.' },
+  ],
   assessment: { questions: [] },
   quiz: [
     {
@@ -311,6 +416,61 @@ for i, M in enumerate([M1, M2, M3], 1):
       options: ['9', '15', '8', '1'],
       answer: 1,
       explanation: 'det(A) = product of eigenvalues = 5 × 3 × 1 = 15.',
+    },
+    {
+      id: 'la2-007-q3',
+      question: 'Which of these matrices is NOT symmetric?',
+      options: [
+        '[[3, 1], [1, 5]]',
+        '[[2, 0], [0, 7]]',
+        '[[1, 3], [2, 1]]',
+        '[[4, -2], [-2, 4]]',
+      ],
+      answer: 2,
+      explanation: 'A symmetric matrix requires a_{ij} = a_{ji}. The third option has a_{12} = 3 but a_{21} = 2, so it is not symmetric.',
+    },
+    {
+      id: 'la2-007-q4',
+      question: 'Why is Cholesky factorization preferred over LU for symmetric positive definite matrices?',
+      options: [
+        'Cholesky is more general — it works on any matrix',
+        'Cholesky exploits symmetry to require roughly half the operations of LU',
+        'Cholesky avoids pivoting, which LU always requires',
+        'Cholesky produces an orthogonal factor, which LU does not',
+      ],
+      answer: 1,
+      explanation: 'Cholesky computes A = L L^T using about n^3/6 operations vs n^3/3 for LU — roughly twice as fast. It only applies to SPD matrices, but that is the common case in applications.',
+    },
+    {
+      id: 'la2-007-q5',
+      question: 'The condition number of an orthogonal matrix Q is:',
+      options: ['0', '1', 'det(Q)', 'Depends on the specific Q'],
+      answer: 1,
+      explanation: 'Every orthogonal matrix has condition number exactly 1 — the best possible value. This is because Q preserves all vector lengths, so its largest and smallest singular values are both 1.',
+    },
+    {
+      id: 'la2-007-q6',
+      question: 'You form A = B^T B where B is 50×3 with full column rank. Which statement about A is TRUE?',
+      options: [
+        'A is 50×50 and symmetric',
+        'A is 3×3, symmetric, and positive definite',
+        'A is 3×3, symmetric, and positive semidefinite (but not necessarily definite)',
+        'A is 50×3 and lower triangular',
+      ],
+      answer: 1,
+      explanation: 'B^T B has shape (3×50)(50×3) = 3×3 and is always PSD. Since B has full column rank (rank 3), B^T B is SPD (positive definite, not just semidefinite). Full column rank means no nonzero vector maps to zero.',
+    },
+    {
+      id: 'la2-007-q7',
+      question: 'A matrix A is symmetric with eigenvalues −1, 3, 5. What is its classification?',
+      options: [
+        'Positive definite',
+        'Positive semidefinite',
+        'Indefinite',
+        'Negative definite',
+      ],
+      answer: 2,
+      explanation: 'The matrix has at least one positive (3, 5) and one negative (−1) eigenvalue. This means x^T A x can be positive or negative depending on x — the matrix is indefinite.',
     },
   ],
 };

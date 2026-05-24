@@ -660,9 +660,24 @@ function SpiralBlock({ spiral }) {
 
 // ─── ✅ Assessment block ──────────────────────────────────────────────────────
 
+// Notebook IDs that should render in the labs section (after examples), not inside Math/Rigor
+const LAB_VIZ_IDS = new Set(['PythonNotebook', 'OpenMatNotebook'])
+
+function extractLabVizzes(section) {
+  if (!section?.visualizations?.length) return { section, labs: [] }
+  const labs = section.visualizations.filter(v => LAB_VIZ_IDS.has(v.id ?? v.vizId))
+  const remaining = section.visualizations.filter(v => !LAB_VIZ_IDS.has(v.id ?? v.vizId))
+  return { section: { ...section, visualizations: remaining }, labs }
+}
+
 // ─── Main export ───────────────────────────────────────────────────────────
 
 export default function MicroCycleLesson({ lesson }) {
+  // Pull notebook vizzes out of math so they render after examples instead of mid-lesson
+  const { section: mathWithoutLabs, labs: mathLabs } = extractLabVizzes(lesson.math)
+  const openmatFromMath = mathLabs.filter(v => (v.id ?? v.vizId) === 'OpenMatNotebook')
+  const pythonFromMath = mathLabs.filter(v => (v.id ?? v.vizId) === 'PythonNotebook')
+
   return (
     <div className="w-full">
       <IntuitionBlock data={lesson.intuition} lesson={lesson} />
@@ -691,7 +706,7 @@ export default function MicroCycleLesson({ lesson }) {
           ))}
         </div>
       )}
-      <MathBlock data={lesson.math} lessonId={lesson.id} />
+      <MathBlock data={mathWithoutLabs} lessonId={lesson.id} />
       <RigorBlock data={lesson.rigor} lessonId={lesson.id} />
       {lesson.walkthroughs?.length > 0 && (
         <div className="mb-2">
@@ -699,28 +714,6 @@ export default function MicroCycleLesson({ lesson }) {
           <GuidedWalkthrough walkthroughs={lesson.walkthroughs} />
         </div>
       )}
-      {(() => {
-        // Normalize python section: support python.visualizations, python.cells, and pythonLab formats
-        const pythonRaw = lesson.python ?? lesson.pythonLab
-        if (!pythonRaw) return null
-        const cells = pythonRaw.cells ?? pythonRaw.initialCells
-        let visualizations = pythonRaw.visualizations
-        if ((!visualizations || visualizations.length === 0) && cells?.length > 0) {
-          visualizations = [{ id: 'PythonNotebook', props: { initialCells: cells }, title: pythonRaw.title ?? 'Python Lab' }]
-        }
-        if (!visualizations?.length) return null
-        return (
-          <div className="mb-8">
-            <SectionDivider icon="🐍" label={pythonRaw.title ?? 'Python Lab'} color="brand" noteId={lesson.id ? `${lesson.id}:python` : undefined} />
-            {(pythonRaw.description ?? pythonRaw.intro) && (
-              <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{pythonRaw.description ?? pythonRaw.intro}</p>
-            )}
-            {visualizations.map((v, i) => (
-              <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined} borderColor="border-brand-200 dark:border-brand-900/60" />
-            ))}
-          </div>
-        )
-      })()}
       <UnifiedLearningDock lesson={lesson} />
       {lesson.discovery && (Array.isArray(lesson.discovery)
         ? lesson.discovery.map((d, i) => <FirstPrinciplesLesson key={`${lesson.id}-discovery-${i}`} discovery={d} />)
@@ -731,6 +724,52 @@ export default function MicroCycleLesson({ lesson }) {
         : <NarrativeStory key={`${lesson.id}-story`} story={lesson.story} />
       )}
       <PracticeBlock examples={lesson.examples} challenges={lesson.challenges} triggers={lesson.triggers} lessonId={lesson.id} />
+      {(() => {
+        // OpenMAT / MATLAB lab — from top-level lesson.openmat field OR extracted from math.visualizations
+        const openmatRaw = lesson.openmat ?? lesson.openmatLab
+        const cells = openmatRaw?.cells ?? openmatRaw?.initialCells
+        let visualizations = openmatRaw?.visualizations ?? []
+        if (visualizations.length === 0 && cells?.length > 0) {
+          visualizations = [{ id: 'OpenMatNotebook', initialProps: { initialCells: cells }, title: openmatRaw.title ?? 'OpenMAT / MATLAB Lab' }]
+        }
+        // Append any notebooks extracted from math.visualizations
+        const allOpenmat = [...visualizations, ...openmatFromMath]
+        if (!allOpenmat.length) return null
+        return (
+          <div className="mb-8">
+            <SectionDivider icon="⚙️" label={(openmatRaw?.title) ?? 'OpenMAT / MATLAB Lab'} color="amber" noteId={lesson.id ? `${lesson.id}:openmat` : undefined} />
+            {(openmatRaw?.description ?? openmatRaw?.intro) && (
+              <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{openmatRaw.description ?? openmatRaw.intro}</p>
+            )}
+            {allOpenmat.map((v, i) => (
+              <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:openmat:${v.id ?? i}` : undefined} borderColor="border-amber-200 dark:border-amber-900/60" />
+            ))}
+          </div>
+        )
+      })()}
+      {(() => {
+        // Python lab — from top-level lesson.python field OR extracted from math.visualizations
+        const pythonRaw = lesson.python ?? lesson.pythonLab
+        const cells = pythonRaw?.cells ?? pythonRaw?.initialCells
+        let visualizations = pythonRaw?.visualizations ?? []
+        if (visualizations.length === 0 && cells?.length > 0) {
+          visualizations = [{ id: 'PythonNotebook', props: { initialCells: cells }, title: pythonRaw.title ?? 'Python Lab' }]
+        }
+        // Append any notebooks extracted from math.visualizations
+        const allPython = [...visualizations, ...pythonFromMath]
+        if (!allPython.length) return null
+        return (
+          <div className="mb-8">
+            <SectionDivider icon="🐍" label={(pythonRaw?.title) ?? 'Python Lab'} color="brand" noteId={lesson.id ? `${lesson.id}:python` : undefined} />
+            {(pythonRaw?.description ?? pythonRaw?.intro) && (
+              <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{pythonRaw.description ?? pythonRaw.intro}</p>
+            )}
+            {allPython.map((v, i) => (
+              <VizCard key={i} viz={v} noteId={lesson.id ? `${lesson.id}:python:${v.id ?? i}` : undefined} borderColor="border-brand-200 dark:border-brand-900/60" />
+            ))}
+          </div>
+        )
+      })()}
       <SpiralBlock spiral={lesson.spiral} />
       {lesson.assessment?.questions?.length > 0 && (
         <AssessmentBlock assessment={lesson.assessment} />
