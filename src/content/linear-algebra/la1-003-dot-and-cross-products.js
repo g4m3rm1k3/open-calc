@@ -42,6 +42,16 @@ export default {
         title: 'Dot vs Cross Output',
         body: 'A Dot Product returns a NUMBER (scalar). A Cross Product returns an ARROW (vector). Never mix them up!',
       },
+      {
+        type: 'insight',
+        title: 'WHY Does the Dot Product Equal |a||b|cosθ?',
+        body: 'Here is the geometric argument: project $\\vec{v}$ onto $\\vec{w}$. The projection (shadow) has length $\\|\\vec{v}\\|\\cos\\theta$. The dot product is defined as: (length of shadow) × (length of $\\vec{w}$) = $\\|\\vec{v}\\|\\cos\\theta \\cdot \\|\\vec{w}\\|$. So $\\vec{v}\\cdot\\vec{w} = \\|\\vec{v}\\|\\,\\|\\vec{w}\\|\\cos\\theta$. **The component formula $v_1w_1 + v_2w_2$ equals this**  — they are the same number, just computed two different ways. The algebraic formula is fast; the geometric formula reveals meaning.',
+      },
+      {
+        type: 'insight',
+        title: 'The Compass Needle Analogy for Dot Product Sign',
+        body: 'Imagine $\\vec{w}$ is a compass needle pointing North. The dot product $\\vec{v} \\cdot \\vec{w}$ tells you: **positive** if $\\vec{v}$ has any Northward component (angle < 90°), **zero** if $\\vec{v}$ points perfectly East or West (angle = 90°), **negative** if $\\vec{v}$ has any Southward component (angle > 90°). The dot product signs out alignment with a reference direction. This is exactly how machine learning uses dot products to measure similarity between data vectors.',
+      },
     ],
     visualizations: [
       {
@@ -231,6 +241,42 @@ b = np.array([3.0, 3.0])
         }
       ],
       conclusion: "Because the dot product is exactly 0, these two vectors are perfectly perpendicular (orthogonal). This test takes seconds and saves you from needing to use a protractor!"
+    },
+    {
+      id: "ex-3",
+      title: "Finding the Angle Between Two Vectors",
+      problem: "Find the angle between $\\vec{u} = \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ and $\\vec{v} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$.",
+      steps: [
+        {
+          expression: "\\vec{u} \\cdot \\vec{v} = (1)(1) + (1)(0) = 1",
+          annotation: "Compute the dot product using the component formula: multiply matching components and sum.",
+          strategyTitle: "Compute the dot product",
+          checkpoint: "Before going further, what angle do you expect? $[1,1]$ points at 45° and $[1,0]$ points at 0°. So the angle between them should be 45°.",
+          hints: ["The dot product is positive (= 1), confirming the vectors partially agree. If they were perpendicular we'd get 0; if identical direction we'd get $\\|u\\|\\|v\\|$."],
+        },
+        {
+          expression: "\\|\\vec{u}\\| = \\sqrt{1^2 + 1^2} = \\sqrt{2}, \\quad \\|\\vec{v}\\| = \\sqrt{1^2 + 0^2} = 1",
+          annotation: "Compute both magnitudes. $\\vec{v} = [1, 0]$ is already a unit vector (magnitude 1).",
+          strategyTitle: "Compute magnitudes",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "\\cos(\\theta) = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\|\\,\\|\\vec{v}\\|} = \\frac{1}{\\sqrt{2} \\cdot 1} = \\frac{1}{\\sqrt{2}}",
+          annotation: "Plug into the angle formula: $\\cos\\theta = \\frac{\\vec{u}\\cdot\\vec{v}}{\\|\\vec{u}\\|\\,\\|\\vec{v}\\|}$. This rearrangement of the geometric dot product formula directly gives $\\cos\\theta$.",
+          strategyTitle: "Apply the angle formula",
+          checkpoint: "What angle has $\\cos\\theta = \\frac{1}{\\sqrt{2}}$?",
+          hints: ["$\\cos(45°) = \\frac{1}{\\sqrt{2}}$. This confirms the geometric intuition from step 1."],
+        },
+        {
+          expression: "\\theta = \\arccos\\!\\left(\\frac{1}{\\sqrt{2}}\\right) = 45°",
+          annotation: "Take the arccosine to find the angle. The result matches the geometric picture: $[1,1]$ sits exactly halfway between the $x$ and $y$ axes.",
+          strategyTitle: "Arccosine to find $\\theta$",
+          checkpoint: "",
+          hints: [],
+        }
+      ],
+      conclusion: "The angle is 45°. The procedure always works: (1) compute the dot product, (2) compute both magnitudes, (3) divide: $\\cos\\theta = \\frac{\\vec{u}\\cdot\\vec{v}}{\\|\\vec{u}\\|\\,\\|\\vec{v}\\|}$, (4) take arccos. This formula works in any dimension, not just 2D."
     }
   ],
 
@@ -281,6 +327,35 @@ b = np.array([3.0, 3.0])
         }
       ],
       answer: "6"
+    },
+    {
+      id: "ch-3",
+      difficulty: "hard",
+      problem: "Compute $\\vec{u} \\times \\vec{v}$ for $\\vec{u} = \\begin{bmatrix} 2 \\\\ -1 \\\\ 3 \\end{bmatrix}$ and $\\vec{v} = \\begin{bmatrix} 1 \\\\ 4 \\\\ -1 \\end{bmatrix}$. Then verify that $\\vec{u} \\times \\vec{v}$ is perpendicular to both $\\vec{u}$ and $\\vec{v}$.",
+      hint: "Use the cross product formula: $(u_2v_3 - u_3v_2,\\; u_3v_1 - u_1v_3,\\; u_1v_2 - u_2v_1)$. The indices cycle: the first component uses rows 2 and 3, the second uses rows 3 and 1, the third uses rows 1 and 2.",
+      walkthrough: [
+        {
+          expression: "(\\vec{u}\\times\\vec{v})_x = u_2v_3 - u_3v_2 = (-1)(-1) - (3)(4) = 1 - 12 = -11",
+          annotation: "First component: rows 2 and 3 of each vector. Watch the sign: it is always (second row)(third of other) MINUS (third row)(second of other)."
+        },
+        {
+          expression: "(\\vec{u}\\times\\vec{v})_y = u_3v_1 - u_1v_3 = (3)(1) - (2)(-1) = 3 + 2 = 5",
+          annotation: "Second component: rows 3 and 1. Note the pattern: the index that is missing from the component number gives the two rows used (component $y$ is missing index 2, so use indices 3 and 1)."
+        },
+        {
+          expression: "(\\vec{u}\\times\\vec{v})_z = u_1v_2 - u_2v_1 = (2)(4) - (-1)(1) = 8 + 1 = 9",
+          annotation: "Third component: rows 1 and 2."
+        },
+        {
+          expression: "\\vec{u}\\times\\vec{v} = \\begin{bmatrix} -11 \\\\ 5 \\\\ 9 \\end{bmatrix}",
+          annotation: "Assembled result."
+        },
+        {
+          expression: "\\begin{bmatrix} -11 \\\\ 5 \\\\ 9 \\end{bmatrix} \\cdot \\begin{bmatrix} 2 \\\\ -1 \\\\ 3 \\end{bmatrix} = -22 - 5 + 27 = 0 \\;\\checkmark \\qquad \\begin{bmatrix} -11 \\\\ 5 \\\\ 9 \\end{bmatrix} \\cdot \\begin{bmatrix} 1 \\\\ 4 \\\\ -1 \\end{bmatrix} = -11 + 20 - 9 = 0 \\;\\checkmark",
+          annotation: "Perpendicularity verification: dot the result with BOTH original vectors. Both dot products must be zero. This always works for any valid cross product — it is a built-in self-check."
+        }
+      ],
+      answer: "[-11, 5, 9]"
     }
   ],
 
@@ -352,8 +427,10 @@ b = np.array([3.0, 3.0])
     'read-rigor',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
@@ -385,6 +462,48 @@ b = np.array([3.0, 3.0])
       answer: "Straight up towards the ceiling (or straight down into the floor).",
       hints: ["The cross product creates a new vector that is perfectly orthogonal (perpendicular) to both original vectors."],
       reviewSection: 'Intuition tab — Cross Product perpendicularity'
+    },
+    {
+      id: 'quiz-3',
+      type: 'choice',
+      text: "The dot product of a vector $\\vec{v}$ with itself, $\\vec{v} \\cdot \\vec{v}$, equals what?",
+      options: [
+        "The unit vector in the direction of $\\vec{v}$",
+        "The square of the magnitude: $\\|\\vec{v}\\|^2$",
+        "Zero",
+        "The cross product of $\\vec{v}$ with itself"
+      ],
+      answer: "The square of the magnitude: $\\|\\vec{v}\\|^2$",
+      hints: ["$\\vec{v}\\cdot\\vec{v} = v_1^2 + v_2^2 + \\cdots + v_n^2 = \\|\\vec{v}\\|^2$. The angle between a vector and itself is 0°, and $\\cos(0°) = 1$, so $\\vec{v}\\cdot\\vec{v} = \\|\\vec{v}\\|\\|\\vec{v}\\|\\cdot 1 = \\|\\vec{v}\\|^2$."],
+      reviewSection: 'Math tab — Dot Product'
+    },
+    {
+      id: 'quiz-4',
+      type: 'choice',
+      text: "If $\\vec{u} \\cdot \\vec{v} > 0$, then the angle $\\theta$ between them satisfies...",
+      options: [
+        "$\\theta = 90°$",
+        "$90° < \\theta \\leq 180°$ (obtuse or opposite)",
+        "$0° \\leq \\theta < 90°$ (acute)",
+        "$\\theta = 0°$ exactly"
+      ],
+      answer: "$0° \\leq \\theta < 90°$ (acute)",
+      hints: ["$\\vec{u}\\cdot\\vec{v} = \\|\\vec{u}\\|\\|\\vec{v}\\|\\cos\\theta > 0$. Since magnitudes are always positive, we need $\\cos\\theta > 0$, which happens exactly when $\\theta < 90°$."],
+      reviewSection: 'Intuition tab — WHY the formula'
+    },
+    {
+      id: 'quiz-5',
+      type: 'choice',
+      text: "Why is the cross product only defined in $\\mathbb{R}^3$ (and not in 2D)?",
+      options: [
+        "Because 2D computers cannot draw it",
+        "Because there is no perpendicular direction available inside a 2D plane; you need a third axis for the result to point along",
+        "Because the sine formula only works with three components",
+        "Because 2D vectors cannot be perpendicular to each other"
+      ],
+      answer: "Because there is no perpendicular direction available inside a 2D plane; you need a third axis for the result to point along",
+      hints: ["The cross product produces a vector perpendicular to BOTH inputs. If the inputs are in the $xy$-plane, the result must point in the $z$ direction. In 2D, there is no $z$ direction — nowhere for the result to go."],
+      reviewSection: 'Intuition tab — Cross Product'
     }
   ]
 };

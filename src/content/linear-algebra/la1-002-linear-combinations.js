@@ -77,6 +77,16 @@ export default {
         title: 'Checking Dependence',
         body: 'If you can find ANY way to make the vectors sum to 0 where the constants aren\'t all zero, there is a redundancy. One vector is "collapsing" backward on the path created by the others.',
       },
+      {
+        type: 'insight',
+        title: 'WHY the Zero-Sum Test is the Right Test',
+        body: 'Suppose $\\vec{v}_2 = 2\\vec{v}_1$ (one vector is double the other). Then $2\\vec{v}_1 - \\vec{v}_2 = \\mathbf{0}$ with non-zero coefficients $(2, -1)$. So the zero-sum test catches it. More generally: if one vector is a linear combination of the others, you can rearrange it into a sum-to-zero with non-trivial coefficients. The zero-sum test asks exactly the right question: **can any vector in the set be cancelled by combining the others?** If yes — it is redundant.',
+      },
+      {
+        type: 'insight',
+        title: 'Real-World Analogy: Paint Mixing',
+        body: 'Think of colors. Red, Green, Blue are **linearly independent** because no combination of two of them produces the third: there is no recipe for green using only red and blue paint (in the additive light model). The three together can produce any color — they span the space. Now imagine adding a fourth color, say Yellow = Red + Green. Yellow is **dependent** on Red and Green. Adding it to your palette adds nothing new; every color yellow can make, Red+Green already could. Dependent vectors are like redundant paint colors: they take up space on your palette without expanding your range.',
+      },
     ],
     visualizations: [
       {
@@ -251,6 +261,35 @@ target = np.array([5.0, 5.0])
         }
       ],
       conclusion: "Because there is a non-trivial solution (the constants are not both zero), the vectors are Linearly Dependent. Geometrically, they lie on the exact same line."
+    },
+    {
+      id: "ex-3",
+      title: "Expressing a Vector as a Linear Combination",
+      problem: "Express $\\vec{b} = \\begin{bmatrix} 7 \\\\ -3 \\end{bmatrix}$ as a linear combination of $\\vec{v}_1 = \\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix}$ and $\\vec{v}_2 = \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$. Find scalars $c_1$ and $c_2$ such that $c_1\\vec{v}_1 + c_2\\vec{v}_2 = \\vec{b}$.",
+      steps: [
+        {
+          expression: "c_1 \\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix} + c_2 \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix} = \\begin{bmatrix} 7 \\\\ -3 \\end{bmatrix}",
+          annotation: "Write the linear combination. Matching top components: $2c_1 + c_2 = 7$. Matching bottom components: $c_1 - c_2 = -3$. The span question 'is $\\vec{b}$ reachable?' is identical to the system question 'does this system have a solution?' This connection is the entire bridge between Chapter 1 and Chapter 2.",
+          strategyTitle: "Translate to a system of equations",
+          checkpoint: "What two equations does this vector equation produce?",
+          hints: ["Top: $2c_1 + 1 \\cdot c_2 = 7$. Bottom: $1 \\cdot c_1 + (-1) \\cdot c_2 = -3$."],
+        },
+        {
+          expression: "\\text{Add equations:} \\quad (2c_1 + c_2) + (c_1 - c_2) = 7 + (-3) \\quad \\Rightarrow \\quad 3c_1 = 4 \\quad \\Rightarrow \\quad c_1 = \\tfrac{4}{3}",
+          annotation: "Adding the two equations eliminates $c_2$. We chose to add (not subtract) because the $c_2$ terms have opposite signs: $+c_2$ and $-c_2$ cancel perfectly.",
+          strategyTitle: "Eliminate $c_2$ by adding",
+          checkpoint: "Why did adding the equations eliminate $c_2$?",
+          hints: ["$c_2 + (-c_2) = 0$. Whenever two equations have the same variable with opposite coefficients, adding them cancels that variable."],
+        },
+        {
+          expression: "c_2 = 7 - 2c_1 = 7 - \\tfrac{8}{3} = \\tfrac{13}{3}",
+          annotation: "Substitute $c_1 = 4/3$ back into the first equation: $c_2 = 7 - 2(4/3) = 7 - 8/3 = 13/3$.",
+          strategyTitle: "Back-substitute to find $c_2$",
+          checkpoint: "Verify: $\\frac{4}{3}\\begin{bmatrix}2\\\\1\\end{bmatrix} + \\frac{13}{3}\\begin{bmatrix}1\\\\-1\\end{bmatrix} = ?$",
+          hints: ["$\\frac{4}{3}[2,1]^T = [8/3, 4/3]^T$. $\\frac{13}{3}[1,-1]^T = [13/3, -13/3]^T$. Sum: $[8/3+13/3,\\; 4/3-13/3] = [21/3,\\; -9/3] = [7, -3]$. ✓"],
+        }
+      ],
+      conclusion: "$\\vec{b} = \\frac{4}{3}\\vec{v}_1 + \\frac{13}{3}\\vec{v}_2$. The key connection to remember: asking 'is $\\vec{b}$ in the span of these vectors?' is exactly the same question as 'does this linear system have a solution?' Span and systems are two lenses on the same mathematical reality."
     }
   ],
 
@@ -297,6 +336,27 @@ target = np.array([5.0, 5.0])
         }
       ],
       answer: "Yes, they are linearly independent."
+    },
+    {
+      id: "ch-3",
+      difficulty: "hard",
+      problem: "Are the vectors $\\begin{bmatrix} 1 \\\\ 2 \\\\ 3 \\end{bmatrix}$, $\\begin{bmatrix} 4 \\\\ 5 \\\\ 6 \\end{bmatrix}$, $\\begin{bmatrix} 7 \\\\ 8 \\\\ 9 \\end{bmatrix}$ linearly independent? Explain using the rank test.",
+      hint: "Stack the vectors as rows of a matrix and compute the rank. If rank = 3, they are independent. If rank < 3, they are dependent. Try subtracting rows to find a zero row.",
+      walkthrough: [
+        {
+          expression: "M = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix} \\xrightarrow{R_2 - 4R_1} \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & -3 & -6 \\\\ 7 & 8 & 9 \\end{bmatrix}",
+          annotation: "Subtract 4 times row 1 from row 2."
+        },
+        {
+          expression: "\\xrightarrow{R_3 - 7R_1} \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & -3 & -6 \\\\ 0 & -6 & -12 \\end{bmatrix} \\xrightarrow{R_3 - 2R_2} \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & -3 & -6 \\\\ 0 & 0 & 0 \\end{bmatrix}",
+          annotation: "Row 3 becomes all zeros. There are only 2 non-zero rows: rank = 2."
+        },
+        {
+          expression: "\\text{rank}(M) = 2 < 3 \\quad \\Rightarrow \\quad \\text{Linearly DEPENDENT}",
+          annotation: "With rank 2, one vector is a linear combination of the other two. In fact: $\\vec{v}_3 = 2\\vec{v}_2 - \\vec{v}_1$. These three vectors all lie on the same 2D plane — they cannot span all of $\\mathbb{R}^3$."
+        }
+      ],
+      answer: "Linearly dependent (rank = 2)."
     }
   ],
 
@@ -366,8 +426,10 @@ target = np.array([5.0, 5.0])
     'read-rigor',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
@@ -393,6 +455,43 @@ target = np.array([5.0, 5.0])
       answer: "Yes",
       hints: ["A 2D plane only has 2 dimensions of freedom. Any third vector can always be reached by a combination of the first two."],
       reviewSection: 'Rigor tab — Dimension'
+    },
+    {
+      id: 'quiz-3',
+      type: 'choice',
+      text: "What is the span of two linearly independent vectors in $\\mathbb{R}^2$?",
+      options: [
+        "A single line through the origin",
+        "Two separate lines",
+        "The entire 2D plane $\\mathbb{R}^2$",
+        "Only the two vectors themselves"
+      ],
+      answer: "The entire 2D plane $\\mathbb{R}^2$",
+      hints: ["Two independent vectors in a 2D space provide two degrees of freedom. With both $c_1$ and $c_2$ free to be any real number, $c_1\\vec{v}_1 + c_2\\vec{v}_2$ traces every point in the plane."],
+      reviewSection: 'Intuition tab — Span'
+    },
+    {
+      id: 'quiz-4',
+      type: 'choice',
+      text: "How many vectors must be in a basis for $\\mathbb{R}^3$?",
+      options: ["1", "2", "3", "4 or more"],
+      answer: "3",
+      hints: ["A basis for $\\mathbb{R}^n$ must have exactly $n$ vectors: independent (no redundancy) and spanning (reaches all of $\\mathbb{R}^n$). Three dimensions need exactly 3 independent directions."],
+      reviewSection: 'Math tab — Basis'
+    },
+    {
+      id: 'quiz-5',
+      type: 'choice',
+      text: "The vectors $[1, 0]$ and $[-3, 0]$ are linearly ________ because ________.",
+      options: [
+        "Independent, because they have different $x$-components",
+        "Dependent, because one is a scalar multiple of the other and they both lie on the $x$-axis",
+        "Independent, because neither is the zero vector",
+        "Dependent, because they have the same number of components"
+      ],
+      answer: "Dependent, because one is a scalar multiple of the other and they both lie on the $x$-axis",
+      hints: ["$[-3, 0] = -3 \\cdot [1, 0]$. Any vector that is a scalar multiple of another lies on the same line. Both point along the $x$-axis. Their span is only a line, not the whole 2D plane."],
+      reviewSection: 'Intuition tab — Linear Dependence'
     }
   ]
 };

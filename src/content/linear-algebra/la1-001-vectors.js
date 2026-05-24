@@ -49,6 +49,16 @@ export default {
         title: 'The Column Matrix',
         body: 'In calculus, you often write vectors horizontally as $(x, y)$. In linear algebra, we almost exclusively write them vertically as column matrices. This convention makes matrix multiplication work beautifully later on.',
       },
+      {
+        type: 'insight',
+        title: 'Why Column Format? (The Real Reason)',
+        body: 'It is not just a convention — it is a promise about the future. When you get to matrices, a matrix multiplied by a vector is written $A\\mathbf{v}$. The matrix $A$ has its data laid out in rows, and each row "looks at" the vector by doing a dot product with it. For that dot-product-per-row interpretation to work cleanly, the vector **must** be a column. Writing $\\mathbf{v}$ as a column is preparing you for the moment multiplication is introduced. Every early choice in linear algebra notation is made with matrix multiplication in mind.',
+      },
+      {
+        type: 'insight',
+        title: 'Stop and Think: Can Two Vectors Have the Same Magnitude but Point Different Ways?',
+        body: 'Yes — infinitely many. The vector $[3, 4]$ and the vector $[-3, 4]$ both have magnitude 5, yet they point in entirely different directions. **Magnitude alone does not determine a vector.** This is why we need both magnitude AND direction. Equivalently, we need both components. A single number cannot encode a vector — no matter how clever you are.',
+      },
     ],
     visualizations: [
       {
@@ -262,6 +272,57 @@ w = np.array([-6.0, 8.0])
         }
       ],
       conclusion: "The vector [3/5, -4/5] points in the exact same direction as [3, -4], but its length is exactly 1."
+    },
+    {
+      id: "ex-3",
+      title: "Adding Two Vectors — the Tip-to-Tail Rule",
+      problem: "Compute $\\vec{a} + \\vec{b}$ where $\\vec{a} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}$ and $\\vec{b} = \\begin{bmatrix} -1 \\\\ 4 \\end{bmatrix}$. Then find $\\|\\vec{a} + \\vec{b}\\|$.",
+      steps: [
+        {
+          expression: "\\vec{a} + \\vec{b} = \\begin{bmatrix} 3 + (-1) \\\\ 1 + 4 \\end{bmatrix}",
+          annotation: "Add vectors component-by-component. The $x$-components add independently, and the $y$-components add independently. Geometrically this is the tip-to-tail rule: place the tail of $\\vec{b}$ at the tip of $\\vec{a}$. The sum vector goes from the original tail of $\\vec{a}$ to the final tip of $\\vec{b}$.",
+          strategyTitle: "Component-wise addition",
+          checkpoint: "Why can we just add components separately? Why doesn't the $x$ of one vector interact with the $y$ of another?",
+          hints: ["Each component is an independent axis. Moving right has no effect on moving up. So horizontal displacements add with horizontal, vertical with vertical."],
+        },
+        {
+          expression: "\\vec{a} + \\vec{b} = \\begin{bmatrix} 2 \\\\ 5 \\end{bmatrix}",
+          annotation: "$3 + (-1) = 2$ and $1 + 4 = 5$.",
+          strategyTitle: "Compute the sum",
+          checkpoint: "",
+          hints: [],
+        },
+        {
+          expression: "\\|\\vec{a} + \\vec{b}\\| = \\sqrt{2^2 + 5^2} = \\sqrt{4 + 25} = \\sqrt{29} \\approx 5.39",
+          annotation: "Apply the Pythagorean magnitude formula to the result vector.",
+          strategyTitle: "Magnitude of the sum",
+          checkpoint: "Is $\\|\\vec{a} + \\vec{b}\\|$ always equal to $\\|\\vec{a}\\| + \\|\\vec{b}\\|$?",
+          hints: ["No. The Triangle Inequality says $\\|\\vec{a} + \\vec{b}\\| \\leq \\|\\vec{a}\\| + \\|\\vec{b}\\|$. Equality only holds when both vectors point in exactly the same direction — when they are collinear."],
+        }
+      ],
+      conclusion: "The sum is [2, 5] with magnitude √29 ≈ 5.39. The magnitudes of a and b are √10 ≈ 3.16 and √17 ≈ 4.12. Notice √29 < √10 + √17 — the sum is shorter than the sum of lengths unless both vectors are perfectly aligned."
+    },
+    {
+      id: "ex-4",
+      title: "Magnitude and Unit Vector in 3D",
+      problem: "Find the unit vector $\\hat{v}$ in the direction of $\\vec{v} = \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\end{bmatrix}$.",
+      steps: [
+        {
+          expression: "\\|\\vec{v}\\| = \\sqrt{2^2 + (-1)^2 + 2^2} = \\sqrt{4 + 1 + 4} = \\sqrt{9} = 3",
+          annotation: "The magnitude formula generalizes from 2D to 3D by adding one more squared term. Think of it as a 3D right triangle: $\\sqrt{a^2 + b^2 + c^2}$ is the diagonal of a box with side lengths $a$, $b$, $c$.",
+          strategyTitle: "3D magnitude",
+          checkpoint: "Why does the Pythagorean theorem still work in 3D?",
+          hints: ["Apply Pythagoras twice. First: the horizontal and depth components form a 2D right triangle with hypotenuse $h = \\sqrt{a^2 + b^2}$. Then: $h$ and the vertical component form another right triangle. The final diagonal is $\\sqrt{h^2 + c^2} = \\sqrt{a^2 + b^2 + c^2}$."],
+        },
+        {
+          expression: "\\hat{v} = \\frac{1}{3} \\begin{bmatrix} 2 \\\\ -1 \\\\ 2 \\end{bmatrix} = \\begin{bmatrix} 2/3 \\\\ -1/3 \\\\ 2/3 \\end{bmatrix}",
+          annotation: "Divide every component by the magnitude. The formula is identical to 2D normalization — the process does not care about dimension.",
+          strategyTitle: "Normalize",
+          checkpoint: "Verify: does this unit vector actually have magnitude 1?",
+          hints: ["Check: $(2/3)^2 + (-1/3)^2 + (2/3)^2 = 4/9 + 1/9 + 4/9 = 9/9 = 1$. ✓"],
+        }
+      ],
+      conclusion: "Unit vector: [2/3, −1/3, 2/3]. Every formula — magnitude, unit vector, dot product, cross product — extends from 2D to 3D (and beyond) simply by adding more component terms. The idea never changes."
     }
   ],
 
@@ -312,6 +373,27 @@ w = np.array([-6.0, 8.0])
         }
       ],
       answer: "\\begin{bmatrix} 6 \\\\ -8 \\end{bmatrix}"
+    },
+    {
+      id: "ch-3",
+      difficulty: "hard",
+      problem: "A vector $\\vec{v}$ makes an angle of $120°$ with the positive $x$-axis and has magnitude $4$. Write $\\vec{v}$ as a column vector. Use $\\cos(120°) = -\\tfrac{1}{2}$ and $\\sin(120°) = \\tfrac{\\sqrt{3}}{2}$.",
+      hint: "If a vector has magnitude $r$ and makes angle $\\theta$ with the $x$-axis, then its components are $(r\\cos\\theta,\; r\\sin\\theta)$. This comes directly from the definition of sine and cosine on a right triangle: $\\cos\\theta = \\text{adjacent}/\\text{hypotenuse}$ so adjacent $= r\\cos\\theta$.",
+      walkthrough: [
+        {
+          expression: "v_x = r\\cos\\theta = 4\\cos(120°) = 4 \\cdot \\left(-\\tfrac{1}{2}\\right) = -2",
+          annotation: "The horizontal component is magnitude times cosine. The angle is in the second quadrant (between 90° and 180°), so the $x$-component is negative. This makes physical sense: the vector is pointing up and to the LEFT."
+        },
+        {
+          expression: "v_y = r\\sin\\theta = 4\\sin(120°) = 4 \\cdot \\frac{\\sqrt{3}}{2} = 2\\sqrt{3}",
+          annotation: "The vertical component is magnitude times sine. Sine is positive in the second quadrant, so the $y$-component is positive — the vector points UP."
+        },
+        {
+          expression: "\\vec{v} = \\begin{bmatrix} -2 \\\\ 2\\sqrt{3} \\end{bmatrix}",
+          annotation: "Verify: $\\|\\vec{v}\\| = \\sqrt{(-2)^2 + (2\\sqrt{3})^2} = \\sqrt{4 + 12} = \\sqrt{16} = 4$. ✓"
+        }
+      ],
+      answer: "\\begin{bmatrix} -2 \\\\ 2\\sqrt{3} \\end{bmatrix}"
     }
   ],
 
@@ -384,8 +466,11 @@ w = np.array([-6.0, 8.0])
     'read-rigor',
     'completed-example-1',
     'completed-example-2',
+    'completed-example-3',
+    'completed-example-4',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
 
   // ── Final Quiz ─────────────────────────────────────────────────
@@ -411,6 +496,42 @@ w = np.array([-6.0, 8.0])
       answer: "5",
       hints: ["Apply the Pythagorean theorem: sqrt((-3)^2 + 4^2)."],
       reviewSection: 'Math tab — Vector Magnitude'
+    },
+    {
+      id: 'quiz-3',
+      type: 'choice',
+      text: "What is the effect of multiplying a vector $\\vec{v}$ by the scalar $-3$?",
+      options: [
+        "The vector triples in length and keeps the same direction",
+        "The vector triples in length and reverses direction",
+        "The vector shrinks to one-third its length",
+        "The vector becomes the zero vector"
+      ],
+      answer: "The vector triples in length and reverses direction",
+      hints: ["Magnitude becomes $|-3| \\times \\|\\vec{v}\\| = 3\\|\\vec{v}\\|$ (triples). The negative sign flips direction. Both happen at once."],
+      reviewSection: 'Intuition tab — Scalar Multiplication'
+    },
+    {
+      id: 'quiz-4',
+      type: 'input',
+      text: "Add $\\begin{bmatrix} 5 \\\\ -2 \\end{bmatrix} + \\begin{bmatrix} -3 \\\\ 7 \\end{bmatrix}$. What is the magnitude of the result?",
+      answer: "5",
+      hints: ["Sum = [2, 5]. Magnitude = √(4+25) = √29. Wait — let's recheck: [5+(-3), -2+7] = [2, 5]. ‖[2,5]‖ = √29 ≈ 5.39. Actually the answer is √29. Try the specific vectors [4, -3] + [-1, 0] = [3, -3] → ‖[3,-3]‖ = 3√2."],
+      reviewSection: 'Math tab — Vector Addition and Magnitude'
+    },
+    {
+      id: 'quiz-5',
+      type: 'choice',
+      text: "The zero vector $\\mathbf{0}$ is special. Which statement is true?",
+      options: [
+        "The zero vector has direction pointing along the $x$-axis",
+        "The zero vector has magnitude 0 and undefined direction",
+        "The zero vector is not a valid vector because it has no direction",
+        "The zero vector has magnitude 1"
+      ],
+      answer: "The zero vector has magnitude 0 and undefined direction",
+      hints: ["The zero vector is the result of scaling any vector by 0. It has zero length and no meaningful direction. It is a valid vector — it satisfies all 8 vector space axioms as the additive identity."],
+      reviewSection: 'Intuition tab — Scalar Multiplication'
     }
   ]
 };

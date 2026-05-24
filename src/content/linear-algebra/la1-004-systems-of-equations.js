@@ -522,5 +522,33 @@ b = np.array([9.0, 3.0, 1.0])
       hints: ['Multiplying by 0 destroys an equation entirely — it loses information and changes the solution set. The three valid operations all require non-zero scalars.'],
       reviewSection: 'Intuition tab — Three Elementary Row Operations',
     },
+    {
+      id: 'systems-of-linear-equations-q4',
+      type: 'choice',
+      text: 'The "column picture" of $A\\mathbf{x} = \\mathbf{b}$ asks which question?',
+      options: [
+        'Where do the hyperplanes defined by the rows of $A$ intersect?',
+        'What linear combination of the columns of $A$ equals $\\mathbf{b}$?',
+        'What is the determinant of $A$?',
+        'What is the angle between the rows?',
+      ],
+      answer: 'What linear combination of the columns of $A$ equals $\\mathbf{b}$?',
+      hints: ['The column picture rewrites $A\\mathbf{x} = \\mathbf{b}$ as $x_1\\mathbf{a}_1 + x_2\\mathbf{a}_2 + \\cdots = \\mathbf{b}$: can the columns span to reach $\\mathbf{b}$? This is a span question.'],
+      reviewSection: 'Intuition tab — Row vs Column Picture',
+    },
+    {
+      id: 'systems-of-linear-equations-q5',
+      type: 'choice',
+      text: 'A system $A\\mathbf{x}=\\mathbf{b}$ with RREF $\\left[\\begin{smallmatrix}1&0&2\\\\0&1&-1\\\\0&0&0\\end{smallmatrix}\\middle|\\begin{smallmatrix}3\\\\1\\\\0\\end{smallmatrix}\\right]$ has how many solutions?',
+      options: [
+        'Exactly one',
+        'Exactly two',
+        'None — the system is inconsistent',
+        'Infinitely many — one free variable',
+      ],
+      answer: 'Infinitely many — one free variable',
+      hints: ['Column 3 has no pivot (no leading 1 in that column) — so $x_3$ is a free variable. The bottom row reads $0 = 0$, so there is no contradiction. Free variable → infinitely many solutions.'],
+      reviewSection: 'Math tab — Free Variables',
+    },
   ],
 };
