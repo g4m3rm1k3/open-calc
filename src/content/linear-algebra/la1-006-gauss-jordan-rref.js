@@ -112,7 +112,167 @@ R = rref(A)
         body: '**E1 (Swap):** Interchange rows $i$ and $j$: $R_i \\leftrightarrow R_j$\n\n**E2 (Scale):** Multiply row $i$ by nonzero scalar $c$: $R_i \\leftarrow c R_i$\n\n**E3 (Replace):** Add $c$ times row $j$ to row $i$: $R_i \\leftarrow R_i + c R_j$\n\nEach operation is **reversible** and preserves the solution set of the system.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: RREF Three Ways — NumPy, SymPy, and Manual',
+        mathBridge: 'Two tools for RREF in Python: SymPy gives EXACT RREF with fractions (like working on paper). NumPy with np.linalg.matrix_rank() counts pivots. The manual step-by-step version shows you what the algorithm is ACTUALLY doing — each elementary row operation exposed.',
+        caption: 'Use SymPy when you need to see the math; use NumPy when you need to solve numerically.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'SymPy RREF — exact computation, like working on paper',
+              prose: [
+                '`sympy.Matrix.rref()` returns the RREF and the pivot column indices. SymPy uses exact arithmetic — you get fractions, not floating-point approximations.',
+                'Use SymPy when you want to see exactly what the RREF looks like on paper. Use NumPy when you need fast numerical computation.',
+              ],
+              code: `from sympy import Matrix, Rational
+
+# System: 2x + y - z = 8, -3x - y + 2z = -11, -2x + y + 2z = -3
+A_aug = Matrix([
+    [2,  1, -1,  8],
+    [-3, -1,  2, -11],
+    [-2,  1,  2, -3]
+])
+
+rref_matrix, pivot_cols = A_aug.rref()
+
+print("Augmented matrix:")
+print(A_aug)
+print("\\nRREF:")
+print(rref_matrix)
+print("\\nPivot columns:", pivot_cols)
+print("\\nSolution: x₁ =", rref_matrix[0,3],
+      "  x₂ =", rref_matrix[1,3],
+      "  x₃ =", rref_matrix[2,3])`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Three outcome cases — classify and solve',
+              prose: [
+                'One function to rule them all: feed it the augmented matrix, get back the case name and solution.',
+                'Understanding: compare rank(A) vs rank([A|b]) vs n. Those three numbers tell you everything.',
+              ],
+              code: `from sympy import Matrix
+import numpy as np
+
+def classify_system(A_arr, b_arr):
+    """Classify a linear system and return the result."""
+    A = Matrix(A_arr.tolist())
+    b = Matrix(b_arr.tolist())
+    Ab = A.row_join(b)
+
+    r_A  = A.rank()
+    r_Ab = Ab.rank()
+    n    = A.shape[1]
+
+    print(f"rank(A) = {r_A}, rank([A|b]) = {r_Ab}, unknowns = {n}")
+
+    if r_Ab > r_A:
+        print("→ INCONSISTENT: no solution (pivot in augmented column)")
+    elif r_A == n:
+        rref, _ = Ab.rref()
+        sol = list(rref.col(-1))
+        print(f"→ UNIQUE SOLUTION: {sol}")
+    else:
+        print(f"→ INFINITELY MANY: {n - r_A} free variable(s)")
+        rref, pivots = Ab.rref()
+        print("RREF:", rref)
+    return None
+
+print("=== Case 1: Unique solution ===")
+classify_system(np.array([[2,1,-1],[-3,-1,2],[-2,1,2]]),
+                np.array([[8],[-11],[-3]]))
+
+print("\\n=== Case 2: Inconsistent ===")
+classify_system(np.array([[1,2],[2,4]]), np.array([[3],[7]]))
+
+print("\\n=== Case 3: Infinite solutions ===")
+classify_system(np.array([[1,2,-1],[0,0,1]]), np.array([[4],[2]]))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Manual RREF — seeing each row operation',
+              prose: [
+                'This cell performs Gauss-Jordan elimination step-by-step, printing the matrix after each operation. You can see exactly what the algorithm does.',
+                'This is the best way to build intuition about WHY RREF works.',
+              ],
+              code: `import numpy as np
+
+def manual_rref(M):
+    """Step-by-step RREF with printed intermediate states."""
+    A = M.astype(float).copy()
+    rows, cols = A.shape
+    pivot_row = 0
+
+    for col in range(cols - 1):  # skip augmented column
+        # Find a nonzero entry in this column
+        nonzero = None
+        for r in range(pivot_row, rows):
+            if abs(A[r, col]) > 1e-10:
+                nonzero = r
+                break
+        if nonzero is None:
+            continue  # free variable column, skip
+
+        # Swap to bring pivot to current row
+        if nonzero != pivot_row:
+            A[[pivot_row, nonzero]] = A[[nonzero, pivot_row]]
+            print(f"Swap R{pivot_row+1} ↔ R{nonzero+1}:")
+            print(A.round(4), "\\n")
+
+        # Scale pivot row
+        A[pivot_row] /= A[pivot_row, col]
+        print(f"Scale R{pivot_row+1} (pivot = 1):")
+        print(A.round(4), "\\n")
+
+        # Eliminate all other rows
+        for r in range(rows):
+            if r != pivot_row and abs(A[r, col]) > 1e-10:
+                A[r] -= A[r, col] * A[pivot_row]
+                print(f"R{r+1} ← R{r+1} − {A[r,col]:.4g}·R{pivot_row+1}:")
+                print(A.round(4), "\\n")
+
+        pivot_row += 1
+    return A
+
+M = np.array([[2, 1, -1, 8],
+              [-3, -1, 2, -11],
+              [-2, 1, 2, -3]])
+print("Starting matrix:")
+print(M, "\\n")
+result = manual_rref(M)
+print("Final RREF:", result.round(4))`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Classify and solve a 4×4 system',
+              difficulty: 'hard',
+              prompt: 'Given the system: x + 2y + z - w = 3,  2x + 5y + 2z + w = 11,  x + 3y + 3z + 2w = 8,  3x + 7y + 3z + 0w = 14. Set it up as np.array matrices, use SymPy to find RREF, identify pivot columns, and print the solution.',
+              code: `from sympy import Matrix
+import numpy as np
+
+# Set up the augmented matrix [A | b]
+A = np.array([
+    [1, 2,  1, -1,  3],
+    [2, 5,  2,  1, 11],
+    [1, 3,  3,  2,  8],
+    [3, 7,  3,  0, 14]
+])
+
+# Use sympy for exact RREF
+# Identify solution type (unique, none, infinite)
+`,
+              hint: 'M = Matrix(A.tolist()). M.rref() returns (rref_matrix, pivot_cols). Check rank(A[:,:-1]) vs rank(A) vs number of unknowns (4).',
+            },
+          ],
+        },
+      },
+    ],
   },
 
   rigor: {

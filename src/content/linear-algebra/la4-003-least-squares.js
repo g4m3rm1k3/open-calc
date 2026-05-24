@@ -25,6 +25,7 @@ export default {
       'The error vector $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is the residual — the gap between your best approximation and the actual target. The least squares solution minimizes $\\|\\mathbf{e}\\|^2$ (the sum of squared errors), which is where the name comes from.',
       '**The key insight.** The residual $\\mathbf{e}$ is perpendicular to every column of $A$. This is not a coincidence — it is the defining property of orthogonal projection. The residual points in the direction you cannot reach, which is exactly perpendicular to the column space.',
       'Saying "$\\mathbf{e}$ is perpendicular to every column of $A$" is the same as saying $A^T\\mathbf{e} = \\mathbf{0}$. Substituting $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ gives the famous **normal equations**: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$.',
+      '**CNC workpiece probing — fitting a plane to touch-probe data.** A touch probe on a CNC machine measures the surface of a raw workpiece at multiple points before machining. Each probe touch gives one point $(x_i, y_i, z_i)$ on the surface. To establish the workpiece datum, the controller needs the equation of the best-fit plane: $z = ax + by + c$. With 5 or more probe touches, you have 5 equations in 3 unknowns ($a$, $b$, $c$) — an overdetermined system. Least squares finds the best-fit plane that minimizes the sum of squared deviations of probe points from the plane. This is exactly the normal equations with $A = [x_i, y_i, 1]$ rows and $\\mathbf{b} = [z_i]$. The result: a datum that best represents the actual workpiece surface despite measurement noise.',
       '**Where this is heading:** The least squares solution is the workhorse of data science. When you learn about the SVD in the next lesson, you will see an even deeper way to compute it — using the pseudoinverse — that works even when $A^TA$ is not invertible.',
     ],
     callouts: [
@@ -91,6 +92,102 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Least Squares — Normal Equations and CNC Plane Fitting',
+        mathBridge: 'MATLAB: `A \\ b` solves the least squares problem directly (backslash). Or: `(A\'*A) \\ (A\'*b)` via normal equations. `\\` is the recommended tool — it uses QR decomposition internally.',
+        caption: 'Three cells: overdetermined system, linear regression, and CNC probe plane fitting.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Solving overdetermined systems — normal equations vs backslash',
+              prose: [
+                'For A*x = b with more rows than columns (overdetermined), `x = A \\ b` gives the least squares solution automatically.',
+                'Manually: solve (A\'*A)*x_hat = A\'*b. Verify by checking A\'*(b - A*x_hat) ≈ 0 (residual perpendicular to col(A)).',
+              ],
+              code: `A = [1 1; 1 2; 1 3];
+b = [1; 2; 2];
+
+% Method 1: backslash (uses QR internally)
+x_hat_bs = A \\ b;
+
+% Method 2: normal equations explicitly
+x_hat_ne = (A'*A) \\ (A'*b);
+
+fprintf('Backslash solution:       [%.6f; %.6f]\\n', x_hat_bs(1), x_hat_bs(2))
+fprintf('Normal equations:         [%.6f; %.6f]\\n', x_hat_ne(1), x_hat_ne(2))
+fprintf('Same? %d\\n', norm(x_hat_bs - x_hat_ne) < 1e-10)
+
+% Residual
+e = b - A*x_hat_bs;
+fprintf('\\nResidual e: [%.4f; %.4f; %.4f]\\n', e(1), e(2), e(3))
+fprintf('A''*e (should be 0): [%.2e; %.2e]\\n', A'*e)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Linear regression — best-fit line via least squares',
+              prose: [
+                'Fitting y = ax + b to data: build A = [x, 1] and solve A \\ y.',
+                'The residual norm ‖e‖ measures fit quality. Smaller = better fit.',
+              ],
+              code: `% Study hours vs exam score
+x_data = [2; 4; 5; 7; 9; 10; 12];
+y_data = [51; 65; 68; 76; 82; 87; 92];
+
+A = [x_data, ones(size(x_data))];   % [x | 1]
+coeffs = A \\ y_data;
+a = coeffs(1); b = coeffs(2);
+
+fprintf('Best-fit line: y = %.3f*x + %.3f\\n', a, b)
+
+% Predict and compute residuals
+y_pred = A * coeffs;
+residuals = y_data - y_pred;
+fprintf('Residual norm: %.4f\\n', norm(residuals))
+fprintf('R^2: %.6f\\n', 1 - var(residuals)/var(y_data))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC workpiece plane fitting — least squares from probe data',
+              prose: [
+                'A touch probe measures surface points (x_i, y_i, z_i). Fit z = ax + by + c using least squares with A = [x, y, 1].',
+                'The residuals represent surface deviation from a perfect plane (waviness, tilt, etc.).',
+              ],
+              code: `% CNC probe measurements of workpiece surface (x, y, z in mm)
+probe_pts = [
+   10,  10,  0.012;    % probe point 1
+   50,  10,  0.018;
+   90,  10,  0.025;
+   10,  70,  0.031;
+   50,  70,  0.037;
+   90,  70,  0.044;
+   50,  40,  0.029;    % center
+];
+
+x = probe_pts(:,1); y = probe_pts(:,2); z = probe_pts(:,3);
+
+% Build design matrix for z = a*x + b*y + c
+A = [x, y, ones(size(x))];
+
+% Least squares: fit plane
+coeffs = A \\ z;
+a = coeffs(1); b = coeffs(2); c = coeffs(3);
+
+fprintf('Best-fit plane: z = %.6f*x + %.6f*y + %.6f\\n', a, b, c)
+
+% Residuals = deviation from perfect plane
+z_fit = A * coeffs;
+residuals = z - z_fit;
+fprintf('\\nProbe point deviations from plane (mm):\\n')
+for i = 1:length(z)
+    fprintf('  Point %d: %.6f mm\\n', i, residuals(i))
+end
+fprintf('RMS surface deviation: %.6f mm\\n', rms(residuals))`,
+            },
+          ]
+        }
+      },
       {
         id: 'LeastSquaresProjectionViz',
         title: 'Projection onto the Column Space',

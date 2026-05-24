@@ -86,6 +86,96 @@ export default {
     ],
     visualizations: [
       {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Diagonalization and Matrix Powers',
+        mathBridge: 'MATLAB: `[P, D] = eig(A)` gives eigenvectors P and diagonal D. Verify A = P*D*inv(P). Compute A^k = P * D.^k * inv(P) — just raise diagonal entries to the k-th power.',
+        caption: 'Three cells: building P and D, computing A^k via diagonalization, and CNC vibration mode superposition.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Diagonalization: A = P D P⁻¹',
+              prose: [
+                '`[P, D] = eig(A)` returns eigenvectors as columns of P, eigenvalues on diagonal of D.',
+                'Verify A = P * D * inv(P). The columns of P must be linearly independent for this to work.',
+              ],
+              code: `A = [4 1; 2 3];
+[P, D] = eig(A);
+
+P_inv = inv(P);
+A_reconstructed = P * D * P_inv;
+
+fprintf('Eigenvalues on diagonal of D:\\n'); disp(diag(D)')
+fprintf('\\nEigenvectors (columns of P):\\n'); disp(P)
+
+fprintf('A =\\n'); disp(A)
+fprintf('P*D*inv(P) =\\n'); disp(A_reconstructed)
+fprintf('Match: %d\\n', norm(A - A_reconstructed) < 1e-10)
+
+% Sanity check: AP = PD
+fprintf('\\nAP - PD (should be zero matrix):\\n')
+disp(A*P - P*D)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Matrix powers via diagonalization — A^k in O(n²) instead of O(n³·k)',
+              prose: [
+                'A^k = P * D^k * inv(P). For diagonal D, D^k just raises each diagonal entry to the k-th power — no matrix multiplication needed for that step.',
+                'Compare: directly computing A^100 requires 99 matrix multiplications. Via diagonalization: 3 multiplications regardless of k.',
+              ],
+              code: `A = [4 1; 2 3];
+[P, D] = eig(A);
+P_inv = inv(P);
+
+% Method 1: direct power (expensive for large k)
+A_direct = A^100;  % MATLAB does this efficiently, but conceptually 99 multiplications
+
+% Method 2: diagonal power (O(n^2) for any k)
+k = 100;
+D_k = diag(diag(D).^k);   % raise each diagonal entry to k
+A_k = P * D_k * P_inv;
+
+fprintf('A^100 via direct power:\\n'); disp(A_direct)
+fprintf('A^100 via diagonalization:\\n'); disp(A_k)
+fprintf('Max difference: %.2e\\n', max(max(abs(A_direct - A_k))))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: CNC vibration — modal superposition',
+              prose: [
+                'A CNC machine\'s vibration is a sum of its natural modes (eigenvectors). Each mode oscillates at its natural frequency (sqrt of eigenvalue). The total vibration at any time is a superposition of all modes.',
+                'Diagonalization separates these modes: in eigenvector coordinates, each mode is independent (decoupled). This is the foundation of modal analysis in structural dynamics.',
+              ],
+              code: `% 2-DOF CNC frame: mass-normalized stiffness matrix
+A = [2 -1; -1 3] * 1e4;  % stiffness in N/m
+
+[P, D] = eig(A);
+lambda = diag(D);
+omega = sqrt(lambda);    % natural frequencies (rad/s)
+freq_Hz = omega / (2*pi);
+
+fprintf('Mode 1: f = %.1f Hz, shape = [%.3f; %.3f]\\n', freq_Hz(1), P(1,1), P(2,1))
+fprintf('Mode 2: f = %.1f Hz, shape = [%.3f; %.3f]\\n', freq_Hz(2), P(1,2), P(2,2))
+
+% Time simulation: initial displacement x0 = [1; 0] mm
+x0 = [1e-3; 0];   % 1mm displacement at node 1
+q0 = P \\ x0;     % modal coordinates
+
+t = linspace(0, 0.01, 200);  % 10 ms
+x = zeros(2, length(t));
+for i = 1:length(t)
+    % Each mode oscillates at its frequency, decoupled
+    modal_response = q0 .* cos(omega * t(i));
+    x(:,i) = P * modal_response;  % back to physical coords
+end
+
+fprintf('\\nPeak displacement at node 1: %.4f mm\\n', max(abs(x(1,:)))*1e3)
+fprintf('Peak displacement at node 2: %.4f mm\\n', max(abs(x(2,:)))*1e3)`,
+            },
+          ]
+        }
+      },
+      {
         id: 'DiagonalizationStepperViz',
         title: 'Step-By-Step: Building P and D',
         mathBridge: 'Enter a 2×2 matrix. The stepper walks through: (1) finding eigenvalues from the characteristic equation, (2) finding eigenvectors for each eigenvalue, (3) assembling $P$ and $D$, (4) verifying $AP = PD$. At each step, the computation is shown in full. Change the matrix and repeat.',
@@ -194,14 +284,29 @@ A = np.array([[2., 1.],
     ],
     callouts: [
       {
+        type: 'theorem',
+        title: 'Diagonalizability Criterion',
+        body: 'An $n \\times n$ matrix $A$ is diagonalizable **if and only if** the sum of the geometric multiplicities of all distinct eigenvalues equals $n$.\n\n**Equivalent conditions:**\n- $A$ has $n$ linearly independent eigenvectors\n- The eigenvectors span $\\mathbb{R}^n$\n- For each eigenvalue: geo. multiplicity = alg. multiplicity\n\n**Sufficient (but not necessary):** $A$ has $n$ **distinct** eigenvalues.',
+      },
+      {
+        type: 'proof',
+        title: 'Proof that AP = PD Implies A = PDP⁻¹',
+        body: 'Let $\\mathbf{v}_1,\\ldots,\\mathbf{v}_n$ be linearly independent eigenvectors with eigenvalues $\\lambda_1,\\ldots,\\lambda_n$.\n\n**Step 1.** Write all $n$ eigenvalue equations at once as a matrix product:\n$A[\\mathbf{v}_1 \\cdots \\mathbf{v}_n] = [A\\mathbf{v}_1 \\cdots A\\mathbf{v}_n] = [\\lambda_1\\mathbf{v}_1 \\cdots \\lambda_n\\mathbf{v}_n]$\n\n**Step 2.** The right side factors as $PD$ (eigenvectors times their scaling factors):\n$AP = PD$\n\n**Step 3.** Since the columns of $P$ are linearly independent, $P$ is invertible. Right-multiply both sides by $P^{-1}$:\n$A = PDP^{-1}$ $\\blacksquare$',
+      },
+      {
         type: 'definition',
         title: 'Similar Matrices',
-        body: '$A$ and $B$ are similar if $B = P^{-1}AP$ for some invertible $P$.\n\nSimilar matrices represent the same transformation in different coordinate systems.',
+        body: '$A$ and $B$ are similar if $B = P^{-1}AP$ for some invertible $P$.\n\nSimilar matrices represent the same transformation in different coordinate systems.\n\n**Invariants under similarity:** eigenvalues, characteristic polynomial, trace ($= \\sum \\lambda_i$), determinant ($= \\prod \\lambda_i$), rank, and nullity. Only the coordinate representation changes.',
       },
       {
         type: 'insight',
-        title: 'Symmetric Matrices Are Always Diagonalizable',
-        body: 'The Spectral Theorem guarantees that every real symmetric matrix $A = A^T$ is diagonalizable with real eigenvalues and mutually orthogonal eigenvectors. This makes symmetric matrices especially well-behaved — and they appear constantly in applications (covariance matrices, Laplacians, Hessians).',
+        title: 'Jordan Normal Form — When Diagonalization Fails',
+        body: 'When $A$ is defective (geometric multiplicity < algebraic multiplicity for some eigenvalue), there are not enough eigenvectors to fill $P$. The closest available form is **Jordan Normal Form**:\n\n$A = PJP^{-1}$ where $J = \\begin{bmatrix}\\lambda_1 & \\epsilon & 0 \\\\ 0 & \\lambda_1 & 0 \\\\ 0 & 0 & \\lambda_2\\end{bmatrix}$\n\nThe 1s above the diagonal (in Jordan blocks) encode the "missing" eigenvectors as **generalized eigenvectors**. Diagonalization is the special case where all Jordan blocks are $1 \\times 1$.',
+      },
+      {
+        type: 'insight',
+        title: 'Spectral Theorem: Symmetric Matrices Always Diagonalize',
+        body: 'Every real symmetric matrix $A = A^T$ is **orthogonally diagonalizable**: $A = QDQ^T$ where $Q$ is orthogonal ($Q^T = Q^{-1}$) and $D$ is real and diagonal.\n\nThis means:\n- All eigenvalues are real\n- Eigenvectors from distinct eigenvalues are orthogonal\n- $P$ can always be chosen to be a rotation (no shear)\n\nSymmetric matrices appear constantly: covariance matrices, Hessians, graph Laplacians, FEM stiffness matrices — all are guaranteed to diagonalize cleanly.',
       },
     ],
     visualizations: [],

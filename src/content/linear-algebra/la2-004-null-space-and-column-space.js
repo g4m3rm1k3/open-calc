@@ -25,24 +25,29 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** We just saw that transformations with $\\det(A) = 0$ squish dimensions, destroying information irreparably. This lesson mathematically categorizes exactly *what* is destroyed and *what* survives.',
-      'Suppose a $3 \\times 3$ matrix turns 3D space into a 2D flat plane. That remaining 2D plane is called the **Column Space** (or Image). It is simply the span of the columns of the matrix. Think of it as the set of all possible outputs the matrix can produce. If a point doesn\'t live on that 2D plane, there is simply no vector you can multiply by the matrix to ever reach it.',
-      'The number of dimensions in the Column Space is called the **Rank**. In our example, the Rank is 2.',
-      'But what happened to the 3rd dimension? It didn\'t just disappear into magic. Every single point along one specific 1D line in that 3D space got crushed directly into the exact origin $(0,0,0)$. This line of crushed casualties is called the **Null Space** (or Kernel).',
-      'The **Null Space** is the set of all vectors $\\vec{v}$ that satisfy the equation $A\\vec{v} = \\vec{0}$.',
-      'This brings us to one of the most beautiful balancing acts in mathematics: The Rank-Nullity Theorem. It states that the dimensions must add up. If you start with a 3D space, and your Column Space (Rank) is 2D, your Null Space must be a 1D line. $2 + 1 = 3$.',
-      '**Where this is heading:** We now thoroughly understand how a matrix warps, stretches, and even destroys space. Our next chapter pivots from *what* the matrix does, to finding the special hidden vectors that are *immune* to the matrix\'s rotations—the Eigenvectors.',
+      '**Where you are in the story:** A singular matrix ($\\det = 0$) permanently destroys some information. This lesson gives that destruction a name and a structure. Meet the two fundamental subspaces of every matrix: the **column space** (what survives) and the **null space** (what gets annihilated).',
+      '**The column space — the range of the transformation.** When you apply matrix $A$ to every possible input vector $\\mathbf{x} \\in \\mathbb{R}^n$, the set of all resulting output vectors $A\\mathbf{x}$ is called the **column space** of $A$ (written $\\text{col}(A)$ or $C(A)$, or in abstract algebra, the **image** $\\text{im}(A)$). Geometrically, it is the subspace spanned by the columns of $A$. If $A$ maps $\\mathbb{R}^3$ to a 2D plane, that plane is the column space. Any point *not* on that plane is unreachable — no input exists that lands there.',
+      '**The null space — the graveyard.** The **null space** of $A$ (written $N(A)$, $\\ker(A)$, or the **kernel**) is the set of all vectors that $A$ sends to the zero vector: $N(A) = \\{\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\}$. If $A$ squishes a 3D space to a 2D plane, one entire direction (a line through the origin) collapses to the origin. Every vector along that line maps to $\\mathbf{0}$. That line is the null space.',
+      '**The Rank-Nullity theorem.** Dimensions balance perfectly:\n\n$$\\underbrace{\\text{rank}(A)}_{\\text{dim of column space}} + \\underbrace{\\text{nullity}(A)}_{\\text{dim of null space}} = \\underbrace{n}_{\\text{number of columns}}$$\n\nA $3 \\times 3$ matrix with rank 2 must have a 1D null space. $2 + 1 = 3$. Dimensions are conserved — they just get rerouted from "useful output" into "crushed directions."',
+      '**The MRI connection.** An MRI scanner captures 2D cross-sectional slices (the column space of the scan operator). Depth — the coordinate pointing into the scanner — is not recorded per-slice: it is in the null space. Reconstruction algorithms like filtered back-projection implicitly compute the pre-image of each slice, combining many slices to recover the 3D structure. They are inverting the operator over its column space while knowing that the null space is informationless.',
+      '**CNC probe calibration.** A CNC machine probes the workpiece at reference points to establish its coordinate frame. If you probe only collinear points (all on one line), the probe data matrix has rank 1 — its column space is 1D. You cannot recover the 2D plane of the part surface. The null space of the measurement matrix has dimension 1, meaning one direction of the surface is completely undetermined. Quality standards require probe points spread in 2D (non-collinear) so that rank = 2 and the full surface plane is uniquely determined.',
+      '**Where this is heading:** We understand the four fundamental subspaces of any matrix. The next chapter asks: which special vectors completely resist rotation — they only get scaled by a factor? Those are the eigenvectors, and they are built from the null space idea applied to shifted matrices.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 4 of 4 — Matrices & Transformations',
-        body: '**Previous:** Determinants and Inverse Matrices.\n**This lesson:** Where space lands (Column Space) and what gets crushed to zero (Null Space).\n**Next (Phase 3):** Vectors that resist rotation entirely (Eigenvectors).',
+        title: 'Lesson 4 of LA2 — Matrices & Transformations',
+        body: '**Previous:** Determinants and inverses — when is a transformation reversible?\n**This lesson:** Column space (what the transformation can reach) and null space (what it annihilates).\n**Next (LA3):** Eigenvectors — vectors immune to rotation, only scaled.',
       },
       {
         type: 'insight',
         title: 'Rank-Nullity Theorem',
-        body: '$\\text{Rank } + \\text{ Nullity} = \\text{Total Dimensions (Columns)}$. Dimensions can be crushed, but they are never truly lost; they just get moved from the Column Space into the Null Space.',
+        body: 'For an $m \\times n$ matrix $A$:\n\n$$\\text{rank}(A) + \\text{nullity}(A) = n$$\n\n**rank** = dim of column space = number of pivot columns.\n**nullity** = dim of null space = number of free variables = number of non-pivot columns.\n\nDimensions are conserved: they move between column space and null space, never disappear.',
+      },
+      {
+        type: 'definition',
+        title: 'Four Fundamental Subspaces',
+        body: 'Every $m \\times n$ matrix $A$ has four fundamental subspaces:\n\n1. **Column space** $C(A) \\subseteq \\mathbb{R}^m$ — span of columns, dim = rank\n2. **Null space** $N(A) \\subseteq \\mathbb{R}^n$ — kernel of $A$, dim = nullity\n3. **Row space** $C(A^T) \\subseteq \\mathbb{R}^n$ — span of rows, dim = rank\n4. **Left null space** $N(A^T) \\subseteq \\mathbb{R}^m$ — kernel of $A^T$, dim = $m$ − rank\n\nFundamental theorem: $N(A) \\perp C(A^T)$ and $N(A^T) \\perp C(A)$.',
       },
     ],
     visualizations: [
@@ -72,6 +77,98 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Null Space and Column Space',
+        mathBridge: 'MATLAB: `rank(A)` counts pivot columns; `null(A)` returns an orthonormal basis for the null space; `orth(A)` returns an orthonormal basis for the column space. Verify: A * null(A) ≈ 0.',
+        caption: 'Three cells: computing rank and null space, the four subspaces, and CNC probe geometry check.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'rank(), null(), orth() — the three essential commands',
+              prose: [
+                '`rank(A)` = number of pivot columns = dim(column space).',
+                '`null(A)` = orthonormal basis for the null space (columns of the result are basis vectors).',
+                '`orth(A)` = orthonormal basis for the column space.',
+              ],
+              code: `% Full rank matrix (invertible)
+A_full = [1 2; 3 4];
+fprintf('rank(A_full) = %d  (full rank, 2×2)\\n', rank(A_full))
+fprintf('null(A_full) has %d column(s)  (trivial null space)\\n', size(null(A_full),2))
+
+% Rank-deficient matrix (row 2 = 3 × row 1)
+B = [1 2; 3 6];
+fprintf('\\nrank(B) = %d  (rank deficient)\\n', rank(B))
+null_B = null(B);
+fprintf('null(B) has %d column(s):\\n', size(null_B,2))
+disp(null_B)
+
+% Verify: B * null_vec = 0
+fprintf('B * null(B) = ')
+disp(B * null_B)
+
+% Column space basis via orth()
+disp('Column space basis of B:'); disp(orth(B))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Rank-Nullity theorem — dimensions must balance',
+              prose: [
+                'For an m×n matrix: rank + nullity = n. You can verify this for any matrix — the dimensions always sum to the number of columns.',
+              ],
+              code: `% 3×4 matrix: maps R^4 → R^3
+A = [1 2 0 3;
+     2 4 1 5;
+     0 0 1 -1];
+
+[m, n] = size(A);
+r = rank(A);
+nullity = n - r;
+null_basis = null(A);
+
+fprintf('Matrix size: %d × %d\\n', m, n)
+fprintf('rank(A)    = %d\\n', r)
+fprintf('nullity(A) = %d\\n', nullity)
+fprintf('rank + nullity = %d = n  (rank-nullity theorem confirmed)\\n', r + nullity)
+
+fprintf('\\nNull space has %d basis vector(s):\\n', size(null_basis,2))
+disp(null_basis)
+
+% Verify all null space vectors satisfy A*v = 0
+residual = norm(A * null_basis);
+fprintf('||A * null_basis|| = %.2e  (should be ≈ 0)\\n', residual)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: CNC probe calibration — catching collinear probe points',
+              prose: [
+                'A CNC machine probes reference points to establish its work coordinate frame. If the probed points are collinear (all on a line), the measurement matrix has rank 1 — not enough to define a plane. The null space is 1D, meaning one surface direction is completely unknown.',
+                'This checks whether a set of probe points is geometrically adequate for surface calibration.',
+              ],
+              code: `% Good probe layout: 3 non-collinear points define a plane
+P1 = [0;   0  ];
+P2 = [100; 0  ];
+P3 = [50;  75 ];  % off-axis
+
+% Edge vectors from P1
+M_good = [P2-P1,  P3-P1];  % 2×2 matrix of direction vectors
+fprintf('Good probe layout:\\n')
+fprintf('  rank = %d  (full rank → plane well-defined)\\n', rank(M_good))
+fprintf('  nullity = %d  (no undetermined directions)\\n', 2 - rank(M_good))
+
+% Bad probe layout: all 3 points are collinear
+P3_bad = [50; 0];
+M_bad = [P2-P1, P3_bad-P1];
+fprintf('\\nBad probe layout (collinear):\\n')
+fprintf('  rank = %d  (rank-deficient!)\\n', rank(M_bad))
+fprintf('  nullity = %d  (one surface direction is UNKNOWN)\\n', 2 - rank(M_bad))
+null_dir = null(M_bad);
+fprintf('  Unknown direction: [%.3f; %.3f]\\n', null_dir(1), null_dir(2))`,
+            },
+          ]
+        }
+      },
       {
         id: 'PythonNotebook',
         title: 'Code: Null Space and Column Space',
@@ -158,11 +255,27 @@ A = np.array([[1., 2., 3.],
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'The Null Space and Column Space are formally defined as vector subspaces, meaning they are closed under addition and scalar multiplication.',
-      'The Fundamental Theorem of Linear Algebra establishes profound orthogonality relationships between the four fundamental subspaces of a matrix. Specifically, it proves that the Null Space of $A$ is precisely the orthogonal complement to the Row Space of $A$. ($N(A) = C(A^T)^\\perp$).',
-      'This guarantees that every vector $\\vec{x}$ in $n$-dimensional space can be perfectly split into two perpendicular parts: one part living in the row space (which gets mapped cleanly to the column space), and one part living in the null space (which gets destroyed).'
+      '**Subspace verification.** Both the null space and column space are genuine vector subspaces — they are closed under addition and scalar multiplication.\n\n*Null space:* If $A\\mathbf{u} = \\mathbf{0}$ and $A\\mathbf{v} = \\mathbf{0}$, then $A(\\mathbf{u}+\\mathbf{v}) = A\\mathbf{u} + A\\mathbf{v} = \\mathbf{0}+\\mathbf{0} = \\mathbf{0}$. Also $A(c\\mathbf{u}) = cA\\mathbf{u} = \\mathbf{0}$. Both conditions hold.\n\n*Column space:* If $\\mathbf{y}_1, \\mathbf{y}_2 \\in C(A)$ then $\\mathbf{y}_1 = A\\mathbf{x}_1$, $\\mathbf{y}_2 = A\\mathbf{x}_2$, so $\\mathbf{y}_1 + \\mathbf{y}_2 = A(\\mathbf{x}_1 + \\mathbf{x}_2) \\in C(A)$. Similarly $c\\mathbf{y}_1 = A(c\\mathbf{x}_1) \\in C(A)$.',
+      '**The Fundamental Theorem of Linear Algebra (Gilbert Strang).** For any $m \\times n$ matrix $A$:\n\n- $C(A) \\perp N(A^T)$ — column space and left null space are orthogonal complements in $\\mathbb{R}^m$\n- $C(A^T) \\perp N(A)$ — row space and null space are orthogonal complements in $\\mathbb{R}^n$\n\nConsequence: every vector $\\mathbf{x} \\in \\mathbb{R}^n$ decomposes uniquely as $\\mathbf{x} = \\mathbf{x}_{\\text{row}} + \\mathbf{x}_{\\text{null}}$ with $\\mathbf{x}_{\\text{row}} \\in C(A^T)$ and $\\mathbf{x}_{\\text{null}} \\in N(A)$. The matrix $A$ maps $\\mathbf{x}_{\\text{row}}$ injectively onto $C(A)$ and annihilates $\\mathbf{x}_{\\text{null}}$.',
+      '**Proof of the Rank-Nullity theorem.** Let $r = \\text{rank}(A)$. RREF of $A$ has $r$ pivot columns and $n - r$ free variable columns. The null space has dimension $n - r$ (one free parameter per free column). The column space has dimension $r$ (pivot columns of the original $A$ form a basis). Therefore $r + (n-r) = n$.',
     ],
-    callouts: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Rank-Nullity Theorem',
+        body: 'For any matrix $A \\in \\mathbb{R}^{m \\times n}$:\n\n$$\\text{rank}(A) + \\text{nullity}(A) = n$$\n\n**rank** = dim$\\,C(A)$ = number of pivots in RREF of $A$.\n**nullity** = dim$\\,N(A)$ = $n$ − rank.\n\nFor $A$ square ($m = n$): $A$ is invertible iff nullity = 0 iff rank = $n$.',
+      },
+      {
+        type: 'theorem',
+        title: 'Consistency of Ax = b',
+        body: 'The system $A\\mathbf{x} = \\mathbf{b}$ is **consistent** (has at least one solution) if and only if $\\mathbf{b} \\in C(A)$.\n\nIf consistent, the **general solution** is $\\mathbf{x} = \\mathbf{x}_p + \\mathbf{x}_h$ where:\n- $\\mathbf{x}_p$ is any particular solution\n- $\\mathbf{x}_h \\in N(A)$ is an arbitrary element of the null space\n\nThis is why the null space dimension equals the number of "free parameters" in the solution.',
+      },
+      {
+        type: 'insight',
+        title: 'Finding the Column Space Basis — Use Original Columns',
+        body: 'Trap: do NOT use the pivot columns from the RREF matrix as the column space basis. Row operations change columns but preserve pivot locations. The correct basis is formed by the **pivot columns of the ORIGINAL matrix** $A$ (before any row operations).\n\nThe row space basis CAN be read from the RREF — it uses the nonzero rows of RREF directly.',
+      },
+    ],
     visualizations: [],
   },
 

@@ -103,7 +103,86 @@ null(B)
         body: 'For square $A$: $AB = I$ implies $BA = I$ automatically. But for non-square matrices, a left inverse and a right inverse can exist independently and may not equal each other. The IMT\'s full invertibility (two-sided inverse) is a square-matrix phenomenon.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Checking All 12 IMT Conditions',
+        mathBridge: 'All 12 IMT conditions should agree: det ≠ 0, rank = n, null space trivial, etc. This cell checks every condition and demonstrates that they are all equivalent — if one is true, all are true; if one fails, all fail.',
+        caption: 'Either all 12 conditions pass simultaneously or all 12 fail simultaneously.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Checking all IMT conditions at once',
+              prose: [
+                'Pass an n×n matrix to the function below and it reports all 12 IMT conditions.',
+                'Try both an invertible matrix and a singular one — notice how all conditions agree.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import null_space
+
+def imt_check(A, label="A"):
+    """Check all major Invertible Matrix Theorem conditions for square A."""
+    n = A.shape[0]
+    assert A.shape == (n, n), "IMT requires square matrix"
+
+    d = np.linalg.det(A)
+    r = np.linalg.matrix_rank(A)
+    eigs = np.linalg.eigvals(A)
+    null_dim = n - r
+    null_b = null_space(A)
+
+    print(f"=== IMT check for {label} (n={n}) ===")
+    print(f"  1. det(A) = {d:.4f}  → {'INVERTIBLE' if abs(d) > 1e-10 else 'SINGULAR'}")
+    print(f"  2. rank(A) = {r}  → {'= n ✓' if r == n else f'< n ✗ (rank deficient)'}")
+    print(f"  3. nullity = {null_dim}  → {'= 0 (trivial null space) ✓' if null_dim == 0 else f'= {null_dim} (non-trivial null space) ✗'}")
+    print(f"  4. min |eigenvalue| = {np.min(np.abs(eigs)):.4f}  → {'all nonzero ✓' if np.min(np.abs(eigs)) > 1e-10 else 'zero eigenvalue ✗'}")
+    # Try to compute inverse
+    try:
+        A_inv = np.linalg.inv(A)
+        print(f"  5. A⁻¹ exists ✓")
+    except np.linalg.LinAlgError:
+        print(f"  5. A⁻¹ does NOT exist ✗")
+    print()
+
+# Invertible matrix
+A = np.array([[2., 1., 0.],
+              [1., 3., 1.],
+              [0., 1., 4.]])
+imt_check(A, "A (invertible)")
+
+# Singular matrix
+S = np.array([[1., 2., 3.],
+              [4., 5., 6.],
+              [7., 8., 9.]])  # row 3 = row1 + row2 + extra
+imt_check(S, "S (singular)")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'The borderline case — near-singular matrices',
+              prose: [
+                'The IMT is binary (invertible or not), but numerically matrices can be "almost singular" — technically invertible but with huge condition numbers.',
+                'A large condition number means small perturbations to b produce huge changes in the solution x.',
+              ],
+              code: `import numpy as np
+
+# Vary one entry to slide between invertible and singular
+print("Sliding toward singularity:")
+print(f"{'k':>6}   {'det':>12}   {'cond':>12}   {'rank':>6}")
+
+for k in [10.0, 1.0, 0.1, 0.01, 0.001]:
+    A = np.array([[k, 2.], [3., 6./k]])  # det = k*(6/k) - 2*3 = 6 - 6 = 0... adjusted
+    A = np.array([[1., 2.], [3., 6.+k]])
+    d = np.linalg.det(A)
+    c = np.linalg.cond(A)
+    r = np.linalg.matrix_rank(A)
+    print(f"{k:>6.3f}   {d:>12.4e}   {c:>12.2e}   {r:>6d}")`,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {

@@ -25,36 +25,42 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** You just saw that one Matrix acts as a single warp to the fabric of space. But what if you need to perform multiple actions? This lesson teaches the algebra of chaining spatial warps together.',
-      'Imagine dragging space with matrix $A$. All the grid lines warp. Then, you immediately drag *that already warped space* with a second matrix, $B$.',
-      'Because every line remains perfectly straight and evenly spaced throughout both warps, the final resting spot of the grid could have simply been reached in *one single warp*. That single, equivalent warp is the matrix product $BA$.',
-      'Wait, why $BA$ and not $AB$? In mathematics, we write transformations as functions, like $B(A(x))$. You evaluate from the inside out. You apply $A$ first, then $B$. So when you chain matrices, you read the multiplication **Right-to-Left**.',
-      'One of the most profound realizations in linear algebra is that order matters. If you rotate a book 90 degrees and then drop it on its face, it ends up in a completely different position than if you drop it on its face and *then* rotate it 90 degrees. In matrix math, $AB$ almost never equals $BA$. This is called being Non-Commutative.',
-      '**Where this is heading:** Once we know how to chain transformations forward, we will ask the natural next question: "Can we multiply by a matrix that perfectly undoes the transformation we just did?" That is the Inverse matrix.',
+      '**Where you are in the story:** You know that one matrix warps space. Now: what happens if you warp it, then warp it *again*? This lesson builds the algebra of chained transformations — the idea that unlocks 3D graphics, robotics, and every physics simulation running today.',
+      '**The shortcut insight.** Imagine applying matrix $A$ to every point in the plane. The plane warps into a new shape. Now apply matrix $B$ to the already-warped plane. The plane warps again. You have performed two transformations. But since both warps are linear, the *combined* effect is itself a linear transformation. That means a single matrix could have done both steps at once. That single matrix is the **product** $BA$ (B after A).',
+      '**Why right-to-left?** We write $B(A(\\mathbf{x}))$ because functions compose from inside to outside. The matrix closest to the vector $\\mathbf{x}$ acts first, like nested function calls in code: `B(A(x))`. Reading $BA\\mathbf{x}$ correctly means: A acts on $\\mathbf{x}$ first, then B acts on the result.',
+      '**The Pixar connection.** When animating a character\'s arm wave, the studio must account for: shoulder rotation, elbow rotation relative to shoulder, wrist rotation relative to elbow. Every frame, every polygon on the arm needs all three transformations applied. If you applied them one at a time to millions of polygons, the movie would take decades to render. Instead: multiply the three matrices together *first* to get one master matrix. Apply that single matrix to every polygon. One matrix product replaces three passes.',
+      '**CNC parallel.** A CNC machining center moving a 5-axis part from fixtured position to cutting position does the same thing. The post-processor (the software that converts CAD moves to G-code) computes a chain of transformation matrices: work coordinate offset → coordinate rotation (G68) → tool length compensation → machine kinematics. Each step is a matrix. The post-processor multiplies them together before outputting a single G-code block. The machine\'s controller never sees the individual steps — only the composite result.',
+      '**Order is everything.** "First rotate 90°, then shear horizontally" warps space to a completely different shape than "first shear horizontally, then rotate 90°." In matrix language: $BA \\neq AB$ in general. This is called **non-commutativity**, and it is not an accident — it reflects the physical reality that the order of physical operations matters.',
+      '**How to compute the product.** The $(i,j)$ entry of $AB$ is the dot product of row $i$ of $A$ with column $j$ of $B$. Geometrically: you are asking where the $j$-th basis vector goes under $B$, and then where *that* resulting vector goes under $A$. That landing coordinate is row $i$ of the result.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 2 of 4 — Matrices & Transformations',
-        body: '**Previous:** One matrix performs one transformation.\n**This lesson:** Multiplying matrices composes multiple transformations into one.\n**Next:** How to undo a transformation (Inverse matrices).',
+        title: 'Lesson 2 of LA2 — Matrices & Transformations',
+        body: '**Previous:** A matrix is a linear transformation — its columns are where $\\hat{i}$ and $\\hat{j}$ land.\n**This lesson:** Multiplying matrices = composing transformations. The product $BA$ applies $A$ first, then $B$.\n**Next:** Determinants — how much does the transformation scale area?',
       },
       {
         type: 'warning',
-        title: 'Read Right-to-Left!',
-        body: 'When you see the matrix math $CBA\\vec{v}$, it physically means: Take vector $v$, apply transformation $A$, then apply transformation $B$, then apply transformation $C$. The matrix physically closest to the vector hits it first.',
+        title: 'Read Right-to-Left — Always',
+        body: 'The expression $CBA\\mathbf{v}$ applies transformations chronologically as $A$ first, then $B$, then $C$. The matrix physically closest to the vector acts first. This trips up students consistently — write it on a sticky note until it\'s automatic:\n\n$$CBA\\mathbf{v} = C\\bigl(B\\bigl(A(\\mathbf{v})\\bigr)\\bigr)$$',
       },
       {
         type: 'insight',
-        title: 'Chaining Columns',
-        body: 'To figure out the columns of the final combined matrix $BA$, you just need to track where the original $\\hat{i}$ and $\\hat{j}$ land. Where does $\\hat{i}$ land after $A$? (The first column of A). Now, where does *that* new vector land when subjected to $B$? That final resting place is the first column of the combined matrix!',
+        title: 'The Column-Chasing View of Matrix Multiply',
+        body: 'Column $j$ of $AB$ equals $A$ applied to column $j$ of $B$:\n\n$$(AB)_{:,j} = A \\cdot B_{:,j}$$\n\nSo you can compute $AB$ by multiplying $A$ by each column of $B$ separately. This view makes explicit that the columns of $AB$ are the destinations of the basis vectors after first $B$ then $A$.',
+      },
+      {
+        type: 'definition',
+        title: 'Dimension Compatibility',
+        body: 'You can only multiply $A \\times B$ if the number of **columns** in $A$ equals the number of **rows** in $B$.\n\n$$(m \\times k)(k \\times n) = (m \\times n)$$\n\nThe inner dimension $k$ must match. The result has the outer dimensions. Violating this is one of the most common errors in scientific computing — NumPy will throw a shape mismatch error.',
       },
     ],
     visualizations: [
       {
         id: 'LALesson05_MatrixMult',
-        title: 'Composing Two Warps',
-        mathBridge: 'Step 1: Check the two individual matrices, A (a shear) and B (a rotation). Step 2: Use the playback slider. Watch the space undergo the shear A, and then undergo the rotation B. Step 3: Look at the final destination of the red $\\hat{i}$ and green $\\hat{j}$ basis vectors. Those coordinates exactly match the columns of the mathematically derived product matrix BA.',
-        caption: 'Applying matrix A, then matrix B, is physically equivalent to applying the single matrix BA.',
+        title: 'Composing Two Warps — Interactive',
+        mathBridge: 'Two transformation buttons (Shear A, Rotate B) apply in sequence. Use the playback slider to watch the plane undergo shear first, then rotation. Notice that the final positions of $\\hat{i}$ and $\\hat{j}$ match the columns of the algebraically computed product $BA$. Also try applying them in reverse order ($AB$) to see non-commutativity.',
+        caption: 'Applying A then B is the same as applying the single matrix BA. The product captures both transformations simultaneously.',
       },
     ],
   },
@@ -81,6 +87,106 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Matrix Multiplication as Composition',
+        mathBridge: 'In MATLAB, `A * B` is matrix multiplication (not element-wise — that would be `A .* B`). Composition: apply B first by writing `A * B` (right-to-left). Test commutativity directly.',
+        caption: 'Three cells: mechanics, non-commutativity proof, and CNC multi-step transformation chain.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Matrix multiplication mechanics — dot product view',
+              prose: [
+                'In MATLAB, `A * B` is matrix multiplication. Each entry (i,j) of the result is the dot product of row i of A with column j of B.',
+                'CRITICAL: `A .* B` is element-wise multiplication — completely different! Always use `*` for matrix products.',
+              ],
+              code: `A = [1 2; 3 4];
+B = [5 6; 7 8];
+
+AB = A * B;
+disp('A * B ='); disp(AB)
+
+% Verify (1,1) entry manually: row 1 of A dot col 1 of B
+entry_11 = dot(A(1,:), B(:,1));
+fprintf('Entry (1,1) = row1(A) · col1(B) = %g\\n', entry_11)
+
+% Column view: col j of AB = A * col j of B
+col1_of_AB = A * B(:,1);
+fprintf('Col 1 of AB via column view: [%g; %g]\\n', col1_of_AB(1), col1_of_AB(2))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Non-commutativity — order changes the result',
+              prose: [
+                '"Rotate then shear" is a physically different transformation than "shear then rotate." Verify this: compute both products and apply to the same vector.',
+                'The two results will differ — different final positions for the same starting point.',
+              ],
+              code: `% Rotation 90° CCW
+R = [0 -1; 1 0];
+% Horizontal shear (shears along x-axis)
+S = [1 1; 0 1];
+
+v = [1; 0];  % the unit vector i-hat
+
+% Rotate then shear (S after R = S*R)
+rotate_then_shear = S * R;
+result_1 = rotate_then_shear * v;
+fprintf('Rotate then shear: v goes to [%g; %g]\\n', result_1(1), result_1(2))
+
+% Shear then rotate (R after S = R*S)
+shear_then_rotate = R * S;
+result_2 = shear_then_rotate * v;
+fprintf('Shear then rotate: v goes to [%g; %g]\\n', result_2(1), result_2(2))
+
+% Are they equal?
+fprintf('AB == BA? %d  (0 = NO = non-commutative)\\n', isequal(rotate_then_shear, shear_then_rotate))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: CNC post-processor — chaining transformation matrices',
+              prose: [
+                'A 3-axis CNC program applies several coordinate transformations in sequence: work coordinate offset (G54), then coordinate rotation (G68), then cutting. The post-processor multiplies these matrices before outputting G-code — one product replaces three sequential operations.',
+                'This is exactly why machining companies invest in expensive post-processor software. Getting the matrix multiplication wrong produces crashes and scrapped parts.',
+              ],
+              code: `% Simulate CNC post-processor matrix chain
+% Each step: a 2×2 matrix acting on [X; Y] tool positions
+
+% Step 1: G54 work coordinate system is offset by [100; 50] mm
+% But offsets are NOT linear maps (they translate the origin).
+% We handle them separately — here we focus on the rotation chain.
+
+% Step 2: G68 coordinate rotation — part clamped 7° off-axis
+theta = 7 * pi / 180;
+R_G68 = [cos(theta) -sin(theta); sin(theta) cos(theta)];
+
+% Step 3: Mirror the X axis (the fixture is mirrored)
+M_mirror = [-1 0; 0 1];
+
+% Composite: first apply G68, then apply mirror
+% Reading right to left: M_mirror * R_G68 applies G68 first
+composite = M_mirror * R_G68;
+fprintf('Composite transformation matrix:\\n')
+disp(composite)
+
+% A programmed tool path (3 points, as columns)
+path_in = [20 20 0; 0 10 0]';  % [x; y] for each point
+path_out = composite * path_in;
+
+fprintf('\\nProgrammed points vs Machine coordinates:\\n')
+for k = 1:3
+    fprintf('  [%.2f, %.2f]  -->  [%.2f, %.2f]\\n', ...
+        path_in(1,k), path_in(2,k), path_out(1,k), path_out(2,k))
+end
+
+% Show that applying individually gives the same result
+step1 = R_G68 * path_in;
+step2 = M_mirror * step1;
+fprintf('\\nSame result via two steps? %d\\n', norm(step2 - path_out) < 1e-10)`,
+            },
+          ]
+        }
+      },
       {
         id: 'PythonNotebook',
         title: 'Code: Matrix Multiplication as Composition',
@@ -192,11 +298,29 @@ v = np.array([1.0, 0.0])
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'Formally, matrix multiplication corresponds exactly to the composition of linear transformations. Let $T_1: U \\to V$ and $T_2: V \\to W$ be linear transformations.',
-      'The composition $(T_2 \\circ T_1)(\\vec{u})$ applies $T_1$ to vector $\\vec{u}$, and then applies $T_2$ to the result: $T_2(T_1(\\vec{u}))$.',
-      'If $A$ is the matrix for $T_2$ and $B$ is the matrix for $T_1$, then the matrix product $AB$ represents the composition $T_2 \\circ T_1$. The formula for matrix multiplication (row dotted with column) is not an arbitrary invention; it is the inescapable algebraic result of expanding the nested functions $T_2(T_1(\\vec{x}))$ and grouping the terms.',
+      '**Composition of linear maps.** Let $T_1: U \\to V$ and $T_2: V \\to W$ be linear maps with matrix representations $B$ and $A$ respectively (so $T_1(\\mathbf{x}) = B\\mathbf{x}$, $T_2(\\mathbf{y}) = A\\mathbf{y}$). The composition $T_2 \\circ T_1: U \\to W$ defined by $(T_2 \\circ T_1)(\\mathbf{x}) = T_2(T_1(\\mathbf{x})) = A(B\\mathbf{x})$ is itself a linear map. Its matrix is $AB$.',
+      '**Why the formula is row-dot-column.** For any input $\\mathbf{x}$, $(AB)\\mathbf{x} = A(B\\mathbf{x})$. Writing out $B\\mathbf{x} = \\sum_k x_k \\mathbf{b}_k$ where $\\mathbf{b}_k$ are columns of $B$, then $A(B\\mathbf{x}) = \\sum_k x_k A\\mathbf{b}_k$. The $(i,j)$ entry of $AB$ is $(AB)_{ij} = (A(B\\mathbf{e}_j))_i = (A \\mathbf{b}_j)_i = \\sum_k A_{ik} B_{kj}$. This is the dot product of row $i$ of $A$ with column $j$ of $B$. The formula is derived, not defined.',
+      '**Associativity from function composition.** Function composition is always associative: $(h \\circ g) \\circ f = h \\circ (g \\circ f)$. Since matrix multiplication represents composition, matrix multiplication is also associative: $(AB)C = A(BC)$. This is not a coincidence — it is the algebraic shadow of associativity of function composition.',
+      '**Non-commutativity.** Function composition is not commutative in general. $f \\circ g \\neq g \\circ f$ even for linear functions. The classic counterexample: let $A$ rotate $90°$ CCW and $B$ reflect across the $x$-axis. Rotating then reflecting lands the point $(1,0)$ at $(0,-1)$. Reflecting then rotating lands it at $(0,1)$. Different results — non-commutative.',
+      '**When does $AB = BA$?** Scalar multiples of the identity ($cI$) commute with everything. Matrices $A$ and $B$ commute if they share the same eigenvectors (have the same eigenspaces). Powers of the same matrix commute: $A^m A^n = A^{m+n}$. Commutativity is the exception, not the rule.',
     ],
-    callouts: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Composition Law for Linear Maps',
+        body: '**Theorem:** If $T_1: U \\to V$ has matrix $B$ and $T_2: V \\to W$ has matrix $A$, then $T_2 \\circ T_1$ has matrix $AB$.\n\n**Proof:** $(T_2 \\circ T_1)(\\mathbf{x}) = A(B\\mathbf{x}) = (AB)\\mathbf{x}$.\n\nThe formula $(AB)_{ij} = \\sum_k A_{ik}B_{kj}$ follows from expanding the linear combination.',
+      },
+      {
+        type: 'theorem',
+        title: 'Ring Properties of Matrix Algebra',
+        body: 'For matrices of compatible sizes:\n\n- **Associativity:** $(AB)C = A(BC)$ ✓\n- **Left distributivity:** $A(B+C) = AB + AC$ ✓\n- **Right distributivity:** $(B+C)A = BA + CA$ ✓\n- **Scalar:** $(cA)B = c(AB) = A(cB)$ ✓\n- **Commutativity:** $AB = BA$ ✗ (in general)\n\nThe set of $n \\times n$ matrices forms a **non-commutative ring** under addition and multiplication.',
+      },
+      {
+        type: 'proof',
+        title: 'Associativity of Matrix Multiplication',
+        body: '$((AB)C)_{ij} = \\sum_l (AB)_{il} C_{lj} = \\sum_l \\left(\\sum_k A_{ik}B_{kl}\\right) C_{lj}$\n\n$= \\sum_k A_{ik} \\sum_l B_{kl} C_{lj} = \\sum_k A_{ik} (BC)_{kj} = (A(BC))_{ij}$\n\nThe interchange of summation order (Fubini for finite sums) is the key step.',
+      },
+    ],
     visualizations: [],
   },
 

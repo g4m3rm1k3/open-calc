@@ -25,6 +25,7 @@ export default {
       'Think of the complex eigenvalue $\\lambda = a + bi$ in polar form: its **magnitude** is $r = \\sqrt{a^2 + b^2}$ (the stretch factor) and its **angle** is $\\theta = \\arctan(b/a)$ (the rotation angle). Multiplying repeatedly by $\\lambda$ spirals outward if $r > 1$, spirals inward if $r < 1$, and circles if $r = 1$.',
       'For the 90° rotation matrix, $\\lambda = i = 0 + 1\\cdot i$. The real part is 0 (no stretching), the imaginary part is 1. Magnitude = $\\sqrt{0^2+1^2} = 1$ (no scaling), angle = 90° (pure rotation). Exactly what a rotation matrix should do.',
       '**Why this matters practically.** If you are analyzing a dynamical system — anything that evolves over time — the eigenvalues of its matrix tell you everything about long-term behavior: do things grow, shrink, or oscillate? Complex eigenvalues with $|\\lambda| > 1$ mean spiral growth. $|\\lambda| < 1$ means spiral decay toward equilibrium. $|\\lambda| = 1$ means perfect sustained oscillation. The eigenvalues are the system\'s fate, written in complex numbers.',
+      '**CNC spindle control — when complex eigenvalues cause chatter.** A CNC spindle speed controller has a transfer function with a characteristic equation — and its roots are eigenvalues. When all roots are real and negative (continuous-time) or inside the unit circle (discrete-time), the spindle holds stable speed. When a root crosses into the right half-plane (or outside the unit circle), the controller becomes unstable and the spindle oscillates — this is **chatter**, the ringing vibration that ruins surface finish and tool life. Complex eigenvalues near the stability boundary ($|\\lambda| \\approx 1$) produce lightly-damped oscillations: the spindle "rings" but eventually settles. The frequency of the chatter ring is exactly $\\omega = \\arctan(b/a)$ radians per sample — the imaginary part of the eigenvalue.',
       '**Where this is heading:** Phase 4 moves to non-square matrices and the most powerful factorization in linear algebra: the Singular Value Decomposition (SVD), which generalizes everything you have learned about eigenvalues.',
     ],
     callouts: [
@@ -85,6 +86,87 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Complex Eigenvalues and Stability',
+        mathBridge: 'MATLAB: `eig()` returns complex eigenvalues automatically. `abs(lambda)` gives magnitude. `angle(lambda)` gives angle in radians. Plot trajectories with `plot(real(traj), imag(traj))` in the complex plane.',
+        caption: 'Three cells: complex eigenvalues from eig(), rotation matrix analysis, and CNC spindle control stability check.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Complex eigenvalues with eig() — magnitude and angle',
+              prose: [
+                '`[V, D] = eig(A)` works for any matrix, even with complex eigenvalues. Extract real/imaginary parts with `real()` and `imag()`.',
+                '`abs(lambda)` gives magnitude r. `angle(lambda)` gives angle θ in radians. If |λ| < 1 → stable; > 1 → unstable; = 1 → neutral.',
+              ],
+              code: `% Matrix with complex eigenvalues (rotation + scaling)
+a = 0.8; b = 0.6;
+A = [a -b; b a];   % rotation by arctan(b/a) and scale by sqrt(a^2+b^2)
+
+[V, D] = eig(A);
+lambda = diag(D);
+
+fprintf('Eigenvalues:\\n');
+for k = 1:length(lambda)
+    lk = lambda(k);
+    fprintf('  λ%d = %.4f + %.4fi\\n', k, real(lk), imag(lk))
+    fprintf('     |λ| = %.4f   angle = %.2f°\\n', abs(lk), rad2deg(angle(lk)))
+end
+
+fprintf('\\n|λ| < 1 → stable? %d\\n', all(abs(lambda) < 1))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Rotation matrix: eigenvalues trace the unit circle',
+              prose: [
+                'For a pure rotation by θ, the eigenvalues are e^(±iθ) — points on the unit circle. |λ| = 1 always, so pure rotations are neither stable nor unstable.',
+                'Varying θ sweeps the eigenvalues around the unit circle. The trace = 2cosθ tracks the real part.',
+              ],
+              code: `% Sweep rotation angle and watch eigenvalues
+angles_deg = 0:30:330;
+
+fprintf('θ         eigenvalues                  |λ|     trace\\n')
+fprintf('--------------------------------------------------------\\n')
+for theta_deg = angles_deg
+    theta = deg2rad(theta_deg);
+    R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
+    lambda = eig(R);
+    fprintf('%3d°     %.3f ± %.3fi        %.4f   %.4f\\n', ...
+        theta_deg, real(lambda(1)), abs(imag(lambda(1))), abs(lambda(1)), trace(R))
+end`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC spindle control: stability via eigenvalue analysis',
+              prose: [
+                'A discrete-time spindle speed controller has a state matrix whose eigenvalues determine stability. Complex eigenvalues near the unit circle produce lightly-damped oscillation — this is chatter.',
+                'The frequency of chatter oscillation is ω = angle(λ) radians per sample. For a 1 kHz control loop and angle θ, the chatter frequency is θ/(2π) × 1000 Hz.',
+              ],
+              code: `% CNC spindle controller state matrix (2nd-order discrete model)
+% Gains tuned for 1 kHz sampling
+Kp = 0.9; Kd = 0.1;
+A_ctrl = [2 - Kp*0.001,  -1 + Kd*0.001;
+           1,               0           ];
+
+lambda = eig(A_ctrl);
+fprintf('Controller eigenvalues:\\n')
+for k = 1:length(lambda)
+    lk = lambda(k);
+    fprintf('  λ%d = %.4f + %.4fi\\n', k, real(lk), imag(lk))
+    fprintf('     |λ| = %.6f  (must be < 1 for stability)\\n', abs(lk))
+    if abs(imag(lk)) > 1e-6
+        freq_Hz = abs(angle(lk)) / (2*pi) * 1000;  % 1kHz loop
+        fprintf('     Chatter frequency if unstable: %.1f Hz\\n', freq_Hz)
+    end
+end
+
+stable = all(abs(lambda) < 1);
+fprintf('\\nController is %s\\n', ternary(stable, 'STABLE', 'UNSTABLE'))`,
+            },
+          ]
+        }
+      },
       {
         id: 'ComplexPlaneEigenvalueViz',
         title: 'Eigenvalues in the Complex Plane',
@@ -197,14 +279,24 @@ C = np.array([[0.5, 0.2],
     ],
     callouts: [
       {
+        type: 'proof',
+        title: 'Why Real Matrices Have Conjugate Pairs',
+        body: 'Let $A$ be real and $A\\mathbf{v} = \\lambda\\mathbf{v}$ with $\\lambda = a + bi$. Take the complex conjugate of both sides:\n\n$\\overline{A\\mathbf{v}} = \\overline{\\lambda\\mathbf{v}}$\n\nSince $A$ has real entries: $\\overline{A\\mathbf{v}} = A\\bar{\\mathbf{v}}$. So:\n\n$A\\bar{\\mathbf{v}} = \\bar{\\lambda}\\bar{\\mathbf{v}}$\n\nThus $\\bar{\\lambda} = a - bi$ is also an eigenvalue with eigenvector $\\bar{\\mathbf{v}}$. $\\blacksquare$\n\n**Consequence:** The characteristic polynomial of a real matrix has real coefficients, so complex roots always appear in conjugate pairs.',
+      },
+      {
         type: 'theorem',
         title: 'Real Canonical (Block Diagonal) Form',
-        body: 'Every real matrix with conjugate eigenvalue pair $a \\pm bi$ has a $2\\times 2$ block in its real canonical form:\n\n$\\begin{bmatrix}a & -b \\\\ b & a\\end{bmatrix} = r\\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$\n\nwhere $r = \\sqrt{a^2+b^2}$ and $\\theta = \\arctan(b/a)$.',
+        body: 'Every real matrix with conjugate eigenvalue pair $a \\pm bi$ has a $2\\times 2$ block in its real canonical form:\n\n$\\begin{bmatrix}a & -b \\\\ b & a\\end{bmatrix} = r\\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$\n\nwhere $r = \\sqrt{a^2+b^2}$ and $\\theta = \\arctan(b/a)$.\n\nThis is the real-number substitute for diagonalization when the eigenvalues are complex.',
       },
       {
         type: 'insight',
         title: 'Trace and Determinant Still Apply',
         body: 'For a 2×2 real matrix with complex eigenvalues $a \\pm bi$:\n\n$\\text{trace}(A) = 2a$ (sum of conjugates)\n\n$\\det(A) = a^2 + b^2 = r^2$ (product of conjugates)\n\nThese are real even though the eigenvalues are complex.',
+      },
+      {
+        type: 'insight',
+        title: 'Continuous-Time vs Discrete-Time Stability',
+        body: 'Stability criteria differ depending on whether the system evolves continuously or in discrete steps:\n\n**Discrete-time** ($\\mathbf{x}_{n+1} = A\\mathbf{x}_n$):\n- Stable: all $|\\lambda_i| < 1$ (inside unit circle)\n- Critical: $|\\lambda_i| = 1$ (on unit circle)\n\n**Continuous-time** ($\\dot{\\mathbf{x}} = A\\mathbf{x}$):\n- Stable: all $\\text{Re}(\\lambda_i) < 0$ (left half-plane)\n- Critical: $\\text{Re}(\\lambda_i) = 0$ (imaginary axis)\n\nFor a discrete controller (like a CNC servo loop), the stability boundary is the unit circle, not the imaginary axis.',
       },
     ],
     visualizations: [],

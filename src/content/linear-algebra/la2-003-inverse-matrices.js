@@ -25,24 +25,34 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** We built spaces, warped them with matrices, and even chained multiple warps together. But what if you need to reverse a warp? If matrix $A$ encrypts a vector into a new position, how do you decrypt it? You need an inverse matrix, $A^{-1}$.',
-      'If you multiply a vector by $A$, and then immediately multiply it by $A^{-1}$, the vector should land exactly back where it started. Mathematically: $A^{-1}A\\vec{v} = \\vec{v}$.',
-      'The matrix that "does nothing" to space is called the **Identity Matrix** ($I$). It has 1s on the diagonal and 0s elsewhere. So the definition of an inverse is a matrix that, when combined with the original, yields the Identity matrix: $A^{-1}A = I$.',
-      'But here is the catch: **Not every matrix has an inverse.**',
-      'To understand why, we need to talk about the **Determinant**, $\\det(A)$. The determinant is a single number that measures how much a transformation stretches or shrinks the area of space. If $\\det(A) = 2$, any shape drawn on the grid will perfectly double in area after the transformation. If $\\det(A) = -1$, the space was flipped over like a mirrored reflection.',
-      'But what if $\\det(A) = 0$? This means the entire 2D plane was squished completely flat onto a single 1D line (or a 0D point). The area of the space is now exactly 0. You cannot "un-squish" a line back into a plane because infinite different points from the 2D plane all landed on the exact same spot on the line. You can\'t run the machine backwards if you don\'t know which unique point to send them back to!',
-      '**Where this is heading:** If a matrix has a determinant of 0, it squishes everything into a lower-dimensional line. The next lesson explores exactly what that line is (the Column Space), and examines all the vectors that got destroyed in the process (the Null Space).',
+      '**Where you are in the story:** You can chain multiple transformations into one matrix product. Now the next question: can you run a transformation *backwards*? If $A$ encrypted a vector into a new position, is there a matrix that decrypts it?',
+      '**The inverse machine.** If you apply $A$ then immediately apply $A^{-1}$, the vector must return to where it started. So $A^{-1}A\\mathbf{v} = \\mathbf{v}$ for every vector — which means $A^{-1}A = I$, the identity matrix (the "do nothing" transformation). The inverse undoes the warp completely.',
+      '**Not every matrix has an inverse.** Here is where the **determinant** enters. The determinant, written $\\det(A)$ or $|A|$, is a single number measuring how much $A$ scales area. A $2 \\times 2$ matrix with $\\det = 3$ triples all areas. With $\\det = -2$ it doubles areas AND flips space like a mirror (the negative sign is the flip).',
+      '**The fatal case: $\\det(A) = 0$.** This means $A$ squishes the entire 2D plane flat onto a line (or a point). Once space collapses, information is destroyed permanently — infinitely many different input vectors land on the same output. You cannot reconstruct the input from the output. No inverse exists.',
+      '**The 3D projection example.** When a 3D video game is projected onto your 2D screen, depth information (the Z-coordinate) is permanently discarded. Short character far away = tall character close up — you cannot distinguish them from the flat image. This is a linear transformation with $\\det = 0$: the 3D space was collapsed to 2D. The projection matrix has no inverse.',
+      '**CNC application: workpiece coordinate frame.** When a CNC machine calibrates its work coordinate system, it measures 3 reference points on the workpiece. These 3 points define three vectors, and the machine computes their determinant. If the determinant is 0 (or near 0), the three points are collinear — they all lie on a single line, which is not enough to define a unique flat plane. The calibration fails. A well-set-up fixture keeps the three points spread wide apart, maximizing the determinant and ensuring a stable, invertible coordinate frame.',
+      '**Where this is heading:** When $\\det(A) = 0$, the transformation crushes space onto a line. The next lesson (Null Space and Column Space) names exactly what that line is and what input vectors got annihilated in the crush.',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 3 of 4 — Matrices & Transformations',
-        body: '**Previous:** Chaining transformations via Matrix Multiplication.\n**This lesson:** Determinants (area scaling) and Inverses (undoing warps).\n**Next:** When determinants = 0 (Null Space and Column Space).',
+        title: 'Lesson 3 of LA2 — Matrices & Transformations',
+        body: '**Previous:** Matrix multiplication = composing transformations.\n**This lesson:** Determinant = area scaling factor. If det ≠ 0, the inverse exists and undoes the transformation.\n**Next:** Null space and column space — what happens to vectors when det = 0.',
       },
       {
         type: 'insight',
-        title: 'Solving Systems of Equations',
-        body: 'In high school, you solved $3x = 12$ by multiplying both sides by $1/3$ (the inverse of 3). In linear algebra, you solve the massive system of equations $A\\vec{x} = \\vec{v}$ by multiplying both sides by $A^{-1}$. It is the exact same concept scaled up to multiple dimensions!',
+        title: 'Inverses Solve Systems of Equations',
+        body: 'In high school algebra: solve $3x = 12$ by multiplying by $1/3$ (the inverse of 3). In linear algebra: solve $A\\mathbf{x} = \\mathbf{b}$ by multiplying both sides on the left by $A^{-1}$:\n\n$$A^{-1}(A\\mathbf{x}) = A^{-1}\\mathbf{b} \\implies \\mathbf{x} = A^{-1}\\mathbf{b}$$\n\nSame concept, $n$ dimensions.',
+      },
+      {
+        type: 'warning',
+        title: 'Never invert a matrix just to solve Ax = b',
+        body: 'In software, NEVER write `x = inv(A) * b` or `x = np.linalg.inv(A) @ b`. It is slower and numerically less stable than `x = A \\ b` (MATLAB) or `x = np.linalg.solve(A, b)` (Python). The backslash operator uses LU factorization internally — it is the correct tool for solving systems. Reserve `inv()` only for situations where you genuinely need the entries of $A^{-1}$ for their own sake.',
+      },
+      {
+        type: 'definition',
+        title: 'Determinant — 2×2 Formula and Meaning',
+        body: 'For $A = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$:\n\n$$\\det(A) = ad - bc$$\n\nGeometrically: the signed area of the parallelogram formed by the two column vectors. Positive = not flipped. Negative = orientation reversed. Zero = degenerate (collapsed to a line).',
       },
     ],
     visualizations: [
@@ -78,6 +88,119 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Determinant and Inverse',
+        mathBridge: 'MATLAB: `det(A)` computes the determinant; `inv(A)` computes the inverse (use sparingly!); `A \\ b` solves Ax=b efficiently. Verify: A * inv(A) = eye(2).',
+        caption: 'Four cells: det formula, singularity threshold, solving Ax=b, and CNC coordinate frame calibration.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Determinant — area scaling, manual formula, and MATLAB',
+              prose: [
+                'The determinant tells you how much the transformation scales area. MATLAB computes it with `det(A)`. For 2×2, the formula is ad − bc.',
+              ],
+              code: `% Invertible matrix
+A = [3 1; 2 4];
+d = det(A);
+fprintf('det(A) = %g  (ad - bc = %g - %g = %g)\\n', d, 3*4, 1*2, 3*4 - 1*2)
+
+% Singular matrix (columns are proportional)
+S = [2 4; 1 2];
+fprintf('det(S) = %g  (columns are proportional -- singular)\\n', det(S))
+
+% Negative det = orientation flip
+F = [0 1; 1 0];  % reflection across y=x line
+fprintf('det(F) = %g  (negative = orientation flipped)\\n', det(F))
+
+% A * inv(A) should = identity
+A_inv = inv(A);
+disp('A * inv(A):'); disp(A * A_inv)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Watching det → 0 as a matrix becomes singular',
+              prose: [
+                'Slide the value of a single entry and watch the determinant approach zero. When det = 0, inv(A) explodes (the matrix is singular).',
+                'In practice, matrices with very small (but nonzero) determinants are near-singular — numerically unstable even if technically invertible.',
+              ],
+              code: `% Start with an invertible matrix and make it singular
+A_base = [2 3; 1 2];
+fprintf('Original: det = %g\\n', det(A_base))
+
+% Vary the (2,2) entry from 2 toward 1.5 (the critical value)
+fprintf('\\n(2,2) entry  det(A)\\n')
+for val = [2.0, 1.8, 1.6, 1.52, 1.501, 1.5001]
+    A = A_base;
+    A(2,2) = val;
+    fprintf('  %.4f       %.6f\\n', val, det(A))
+end
+
+% Critical value: det = 0 when a(2,2) = 1.5
+% 2*1.5 - 3*1 = 3 - 3 = 0
+A_sing = [2 3; 1 1.5];
+fprintf('\\nAt (2,2)=1.5: det = %g  (singular!)\\n', det(A_sing))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Solving Ax=b — backslash beats inv()',
+              prose: [
+                'To solve Ax = b, use the backslash operator `A \\ b`. It is faster and numerically stabler than `inv(A) * b` because it uses LU factorization internally.',
+                'Only use `inv(A)` when you genuinely need the matrix entries themselves.',
+              ],
+              code: `A = [3 1; 2 4];
+b = [10; 8];
+
+% Correct approach: A \ b (backslash = solve)
+x_solve = A \ b;
+fprintf('Solution via A\\b: x = [%.4f; %.4f]\\n', x_solve(1), x_solve(2))
+
+% Verify: A * x should equal b
+residual = norm(A * x_solve - b);
+fprintf('Residual |Ax - b| = %.2e  (should be near 0)\\n', residual)
+
+% The less-good approach (works but slower):
+x_inv = inv(A) * b;
+fprintf('Via inv(A)*b: x = [%.4f; %.4f]\\n', x_inv(1), x_inv(2))
+
+% Both give same answer — but for large systems the difference matters
+fprintf('Same result: %d\\n', norm(x_solve - x_inv) < 1e-10)`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC workpiece coordinate frame — is calibration stable?',
+              prose: [
+                'A CNC machine probes 3 reference points on the workpiece to establish the work coordinate system. These 3 points must NOT be collinear — if they are, the determinant of their position matrix is 0 and no unique plane (or coordinate frame) can be defined.',
+                'This is why fixturing specifications require probe points to be spread far apart in a triangular pattern.',
+              ],
+              code: `% Three probe points on the workpiece
+% Format: each column is [X; Y; Z]
+P1 = [0;   0;   0  ];
+P2 = [100; 0;   0  ];
+P3 = [50;  80;  0  ];   % good: off-axis
+
+% Two edge vectors from P1
+v1 = P2 - P1;  % [100; 0; 0]
+v2 = P3 - P1;  % [50; 80; 0]
+
+% Put them in a 2×2 matrix (XY plane)
+M_good = [v1(1:2) v2(1:2)];
+fprintf('Good fixture: det = %.1f  (stable frame)\\n', det(M_good))
+
+% Bad fixture: P3 is on the same line as P1-P2
+P3_bad = [50; 0; 0];
+v2_bad = P3_bad - P1;
+M_bad = [v1(1:2) v2_bad(1:2)];
+fprintf('Bad fixture:  det = %.1f  (degenerate -- collinear!)\\n', det(M_bad))
+
+% Condition number tells you how close to singular
+fprintf('\\nCondition number (good): %.2f\\n', cond(M_good))
+fprintf('Condition number (bad):  %.2e  (huge = near-singular)\\n', cond(M_bad))`,
+            },
+          ]
+        }
+      },
       {
         id: 'PythonNotebook',
         title: 'Code: Determinant and Inverse',
@@ -156,18 +279,36 @@ C = np.array([[2., -1.], [4., 3.]])
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'Formally, let $A$ be an $n \\times n$ square matrix. $A$ is invertible if and only if there exists an $n \\times n$ matrix $B$ such that $AB = BA = I_n$. If this $B$ exists, it is unique and denoted $A^{-1}$.',
-      'The "Invertible Matrix Theorem" is a central pillar of linear algebra. It proves that for any square matrix $A$, the following statements are all logically equivalent (if one is true, they are all true):',
-      '1. $A$ is an invertible matrix.',
-      '2. $A$ has $n$ pivot positions (row-echelon form).',
-      '3. The null space of $A$ contains only the zero vector.',
-      '4. The columns of $A$ form a linearly independent set.',
-      '5. The columns of $A$ perfectly span $\\mathbb{R}^n$.',
-      '6. The determinant of $A$ is not zero.',
-      'This theorem is the grand unification of everything you have learned so far.'
+      '**Formal definition.** An $n \\times n$ matrix $A$ is called **invertible** (or **non-singular**, or **regular**) if there exists an $n \\times n$ matrix $B$ such that $AB = BA = I_n$. When such $B$ exists, it is unique and written $A^{-1}$.',
+      '**Uniqueness of the inverse.** Suppose $AB = I$ and $AC = I$. Then $B = BI = B(AC) = (BA)C = IC = C$. So there is only one left-inverse and it equals the right-inverse.',
+      '**The determinant for $n \\times n$ matrices.** For $n > 2$, the determinant is defined recursively via cofactor expansion along row 1:\n\n$$\\det(A) = \\sum_{j=1}^{n} a_{1j} (-1)^{1+j} M_{1j}$$\n\nwhere $M_{1j}$ is the $(n-1) \\times (n-1)$ minor obtained by deleting row 1 and column $j$. For $n = 3$:\n\n$$\\det(A) = a_{11}(a_{22}a_{33} - a_{23}a_{32}) - a_{12}(a_{21}a_{33} - a_{23}a_{31}) + a_{13}(a_{21}a_{32} - a_{22}a_{31})$$\n\nThis is the "Sarrus rule" for $3 \\times 3$ determinants.',
+      '**Key properties of the determinant.** For square matrices $A$, $B$:\n- $\\det(AB) = \\det(A)\\det(B)$ — the determinant is multiplicative\n- $\\det(A^{-1}) = 1/\\det(A)$ — inverse scales area by the reciprocal\n- $\\det(A^T) = \\det(A)$ — transpose preserves the determinant\n- Row swap multiplies $\\det$ by $-1$; scaling a row by $c$ multiplies $\\det$ by $c$\n- Adding a multiple of one row to another leaves $\\det$ unchanged',
     ],
-    callouts: [],
-    visualizations: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Invertible Matrix Theorem (IMT)',
+        body: 'For an $n \\times n$ matrix $A$, ALL of the following are equivalent (true simultaneously or false simultaneously):\n\n1. $A$ is invertible\n2. $A$ has $n$ pivot positions\n3. RREF of $A$ is $I_n$\n4. $\\ker(A) = \\{\\mathbf{0}\\}$ (trivial null space)\n5. Columns of $A$ are linearly independent\n6. Columns of $A$ span $\\mathbb{R}^n$\n7. $\\det(A) \\neq 0$\n8. 0 is not an eigenvalue of $A$\n9. $A^T$ is invertible\n\nThis theorem is the grand unification of linear algebra — one concept, nine faces.',
+      },
+      {
+        type: 'proof',
+        title: 'det(AB) = det(A)·det(B)',
+        body: 'This follows from the Leibniz formula: $\\det(A) = \\sum_{\\sigma \\in S_n} \\text{sgn}(\\sigma) \\prod_{i=1}^n a_{i,\\sigma(i)}$, where the sum is over all permutations of $\\{1,\\ldots,n\\}$.\n\nThe key consequence: if $A$ is invertible, $\\det(A^{-1}) = 1/\\det(A)$ since $\\det(A)\\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$.',
+      },
+      {
+        type: 'insight',
+        title: 'The 2×2 Inverse Formula Is Cofactors',
+        body: 'The $2 \\times 2$ inverse formula $A^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$ is a special case of the **adjugate** formula:\n\n$$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$$\n\nwhere $\\text{adj}(A)$ is the transpose of the cofactor matrix. For $n > 2$, this formula is theoretically correct but computationally impractical. Use Gaussian elimination instead.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'LALesson06_Inverses',
+        title: 'Determinant as Area Scaling — Interactive',
+        mathBridge: 'The yellow unit square starts with area 1. As you adjust the matrix, watch the parallelogram the columns define. Its signed area equals the determinant at every moment. Push the slider until the two column vectors become parallel — watch the square flatten to area 0 and the determinant hit exactly 0. At that point, the matrix is singular and the Inverse button should fail.',
+        caption: 'Determinant = signed area of the parallelogram spanned by the column vectors.',
+      },
+    ],
   },
 
   // ── Examples ───────────────────────────────────────────────────

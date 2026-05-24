@@ -107,6 +107,98 @@ export default {
     ],
     visualizations: [
       {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: LU Decomposition',
+        mathBridge: 'MATLAB: `[L, U, P] = lu(A)` returns the LU factorization with partial pivoting such that `P*A = L*U`. `A \\ b` uses LU internally. `lu_factor` then `lu_solve` lets you re-use the factorization for multiple right-hand sides.',
+        caption: 'Three cells: manual LU, solving multiple systems, and CNC finite-element load analysis.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'LU decomposition in MATLAB — [L, U, P] = lu(A)',
+              prose: [
+                '`[L, U, P] = lu(A)` gives the factorization with pivoting: P*A = L*U.',
+                'L is unit lower triangular (1s on diagonal). U is upper triangular. P is a permutation matrix.',
+              ],
+              code: `A = [2 1 1; 4 3 3; 8 7 9];
+
+[L, U, P] = lu(A);
+fprintf('L = \\n'); disp(L)
+fprintf('U = \\n'); disp(U)
+fprintf('P = \\n'); disp(P)
+
+% Verify: P*A = L*U
+fprintf('P*A - L*U = (should be zeros)\\n'); disp(P*A - L*U)
+
+% Determinant from U's diagonal (times det(P))
+det_from_U = prod(diag(U)) * det(P);
+fprintf('det(A) from U diagonal = %g\\n', det_from_U)
+fprintf('det(A) from MATLAB     = %g\\n', det(A))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Solving multiple systems with the same A — one factorization',
+              prose: [
+                'Factor A once, then solve Ax = b for multiple right-hand sides using forward/back substitution.',
+                'In MATLAB: L \\ b is forward substitution; U \\ y is back substitution. Each is O(n²).',
+              ],
+              code: `A = [2 1 1; 4 3 3; 8 7 9];
+[L, U, P] = lu(A);
+
+% Solve for two different right-hand sides
+b1 = [4; 10; 20];
+b2 = [1; 0; 3];
+
+% For each b: forward substitution (Ly = Pb), then back (Ux = y)
+solve_LU = @(b) U \ (L \ (P * b));  % = A \ b
+
+x1 = solve_LU(b1);
+x2 = solve_LU(b2);
+
+fprintf('x1 (for b1): [%g; %g; %g]\\n', x1(1), x1(2), x1(3))
+fprintf('Verify A*x1 = b1: %d\\n', norm(A*x1 - b1) < 1e-10)
+
+fprintf('x2 (for b2): [%g; %g; %g]\\n', x2(1), x2(2), x2(3))
+fprintf('Verify A*x2 = b2: %d\\n', norm(A*x2 - b2) < 1e-10)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: CNC structural analysis — one stiffness matrix, many load cases',
+              prose: [
+                'A CNC machine\'s structural frame is modeled as a finite element stiffness matrix K. Engineers test many load scenarios (different cutting forces, different tool positions) — all use the same K but different force vectors.',
+                'LU-factoring K once lets you solve all scenarios with O(n²) each. This is the standard in structural FEM.',
+              ],
+              code: `% Simplified 4×4 FEM stiffness matrix (symmetric positive definite)
+% Represents spring-connected nodes in a CNC gantry frame
+K = [4 -1  0 -1;
+    -1  4 -1  0;
+     0 -1  4 -1;
+    -1  0 -1  4];
+
+% Factor K once
+[L, U, P] = lu(K);
+fprintf('Stiffness matrix K factored (one-time cost O(n^3))\\n')
+fprintf('Condition number: %.2f\\n', cond(K))
+
+% Three load cases: light cut, heavy cut, rapid traverse
+F_light  = [10; 0; 5; 0];   % N, light cutting forces
+F_heavy  = [50; 20; 40; 10]; % N, heavy milling
+F_rapid  = [0; 0; 0; 0];    % no forces during rapid
+
+solve_K = @(F) U \\ (L \\ (P * F));
+
+disp_light = solve_K(F_light);
+disp_heavy = solve_K(F_heavy);
+disp_rapid = solve_K(F_rapid);
+
+fprintf('\\nMax deflection (light cut): %.4f mm\\n', max(abs(disp_light)))
+fprintf('Max deflection (heavy cut): %.4f mm\\n', max(abs(disp_heavy)))
+fprintf('Max deflection (rapid):     %.4f mm\\n', max(abs(disp_rapid)))`,
+            },
+          ]
+        }
+      },
+      {
         id: 'PythonNotebook',
         title: 'Code: LU Decomposition',
         mathBridge: 'scipy.linalg.lu(A) returns (P, L, U) such that A = P @ L @ U. np.linalg.solve(A, b) uses LU internally. The cells below: (1) manually compute LU for a 3×3, (2) verify via scipy, (3) solve two systems by forward/back substitution, (4) compute determinant from U.',
@@ -306,7 +398,23 @@ b = np.array([6., 14., 10.])
       'The LU decomposition is not unique without the unit lower triangular constraint on $L$. If we allow $L$ to have arbitrary diagonal, any factorization $A = L\'U\'$ can be rescaled: let $D$ be the diagonal of $L\'$, then $A = (L\'D^{-1})(DU\')$, giving the $LDU$ decomposition where $L$ and $U$ are both unit triangular and $D$ is diagonal.',
       'Numerical stability: partial pivoting guarantees that all entries of $L$ satisfy $|L_{ij}| \\leq 1$. This bounds the growth of rounding errors. Complete pivoting (choosing the globally largest entry, not just within a column) gives even better stability but requires more work. Partial pivoting is the standard industry choice — it handles all practical cases and is what scipy, LAPACK, and MATLAB implement.',
     ],
-    callouts: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Existence and Uniqueness of LU',
+        body: '**Without pivoting:** $A = LU$ with $L$ unit lower triangular and $U$ upper triangular exists and is unique iff all leading principal submatrices $A_k$ (top-left $k \\times k$ corners) are nonsingular for $k = 1, \\ldots, n-1$.\n\n**With partial pivoting:** For any nonsingular $A$, there exists a permutation matrix $P$ such that $PA = LU$. The factorization $PA = LU$ always exists — pivoting guarantees no zero pivot.',
+      },
+      {
+        type: 'theorem',
+        title: 'The LDU Decomposition',
+        body: 'If $A$ has an LU decomposition, it can be further refined to $A = LDU$ where:\n- $L$ is unit lower triangular\n- $D$ is diagonal\n- $U$ is unit upper triangular\n\nThe diagonal $D$ contains the pivots. This form is unique. For symmetric $A$, $L = U^T$ and the decomposition becomes $A = LDL^T$ (LDLT), which is more efficient and numerically stable for symmetric systems.',
+      },
+      {
+        type: 'insight',
+        title: 'Why Partial Pivoting Keeps L Bounded',
+        body: 'Partial pivoting chooses the largest entry in the current column as the pivot before each elimination step. This guarantees that all multipliers satisfy $|m_{ij}| \\leq 1$ — so all entries of $L$ are at most 1 in absolute value.\n\nWithout pivoting, multipliers can be huge (if the pivot is tiny), causing $L$ to have enormous entries that amplify rounding errors catastrophically. Partial pivoting prevents this growth.',
+      },
+    ],
     visualizations: [],
   },
 

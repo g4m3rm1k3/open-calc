@@ -50,9 +50,21 @@ export default {
     visualizations: [
       {
         id: 'LALesson02_Combinations',
-        title: 'Linear Combinations sweeping the Plane',
-        mathBridge: 'Step 1: Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch how the resulting blue vector $\\vec{v}$ moves. By changing $c_1$ and $c_2$, you can place the blue vector anywhere on the plane. The key lesson: all reachable points form the span.',
-        caption: 'Building new vectors by scaling and adding basis vectors.',
+        title: 'Linear Combinations Sweeping the Plane',
+        mathBridge: 'Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch the result vector sweep across the plane. The key experiment: drag both scalars through every positive, negative, and zero value. Notice that when both vectors are independent, you can reach every point on the 2D plane — the span IS the full plane. This is the geometric meaning of "spanning $\\mathbb{R}^2$."',
+        caption: 'Every point you can reach with any $c_1, c_2$ is in the span of those two vectors.',
+      },
+      {
+        id: 'BasisVectorProof',
+        title: 'Standard Basis: Every Vector as a Linear Combination',
+        mathBridge: 'The standard basis for $\\mathbb{R}^2$ is $\\hat{\\mathbf{i}} = [1,0]^T$ and $\\hat{\\mathbf{j}} = [0,1]^T$. Any vector $[x,y]^T = x \\hat{\\mathbf{i}} + y \\hat{\\mathbf{j}}$. This is not a coincidence — it is the definition of coordinates. Your $x$-coordinate is literally "how many $\\hat{\\mathbf{i}}$ steps," and your $y$-coordinate is "how many $\\hat{\\mathbf{j}}$ steps." Drag a vector and confirm that the components are exactly the linear combination weights.',
+        caption: 'Coordinates ARE coefficients in a linear combination of the standard basis.',
+      },
+      {
+        id: 'CartesianGridLab',
+        title: 'The Grid As a Span',
+        mathBridge: 'The entire Cartesian grid you learned in school is just the span of two unit vectors: $\\hat{\\mathbf{i}}$ (one step right) and $\\hat{\\mathbf{j}}$ (one step up). Every grid point $(m, n)$ is the linear combination $m\\hat{\\mathbf{i}} + n\\hat{\\mathbf{j}}$. Change the basis vectors and the entire grid changes with them — the span stays complete, but the "shape" of the grid changes.',
+        caption: 'The standard grid = span of standard basis vectors. Change the basis, change the grid.',
       },
     ],
   },
@@ -195,18 +207,153 @@ target = np.array([5.0, 5.0])
           ]
         }
       },
+      {
+        id: 'OpenMatNotebook',
+        title: 'Linear Combinations in OpenMAT / MATLAB',
+        mathBridge: 'A linear combination c₁v₁ + c₂v₂ is just arithmetic in MATLAB. The deeper insight: stacking your vectors as columns of a matrix A, then computing A*c, gives the same result as c₁*v₁ + c₂*v₂. This equivalence — "matrix-vector product IS a linear combination of columns" — is the single most important idea connecting this lesson to all of matrix algebra.',
+        caption: 'The column picture of matrix multiplication starts here.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing linear combinations directly',
+              prose: [
+                'A linear combination is just scalar multiplication and addition — both trivial in MATLAB.',
+                'Key: any target vector `b` can be expressed as a linear combination of other vectors IF the scalars c₁, c₂ exist. The whole question of "does b live in the span?" reduces to "can I find those scalars?"',
+              ],
+              code: `% Two basis vectors
+v1 = [2; 1];
+v2 = [0; 1];
+
+% Linear combination: 1.5*v1 + 1.0*v2
+c1 = 1.5;  c2 = 1.0;
+combo = c1*v1 + c2*v2
+
+% Try different scalars — every result is in the span of v1, v2
+c1 = -1;  c2 = 3;
+c1*v1 + c2*v2
+
+% Two independent vectors span all of R^2 — you can reach any (x,y)
+% Let's reach [5; 3]
+target = [5; 3];
+% What c1, c2 give us [5;3]? → see cell 2`,
+            },
+            {
+              id: 2,
+              cellTitle: 'The column picture: A*c = linear combination of columns',
+              prose: [
+                'Stack v1 and v2 as **columns** of a matrix A. Then A*[c1; c2] computes c1*v1 + c2*v2 automatically.',
+                'This means: **matrix-vector multiplication is a linear combination of the matrix\'s columns, weighted by the vector\'s entries.** This is the most important single fact about matrix multiplication.',
+              ],
+              code: `v1 = [2; 1];
+v2 = [0; 1];
+
+% Stack as columns: [v1, v2] — comma separates COLUMNS
+A = [v1, v2]
+
+% A*c = c(1)*v1 + c(2)*v2
+c = [1.5; 1.0];
+A * c
+
+% Compare to doing it manually:
+1.5*v1 + 1.0*v2
+
+% To find c such that A*c = target: use backslash operator
+target = [5; 3];
+c_solution = A \ target
+% Verify:
+A * c_solution`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Checking linear independence with rank()',
+              prose: [
+                '`rank(A)` tells you how many truly independent columns A has. If rank equals the number of columns, every column is independent — each adds new direction. If rank is less, some columns are redundant (they are linear combinations of others).',
+              ],
+              code: `% Independent vectors: rank = 2 (both add new directions)
+A_ind = [[2; 1], [0; 1]]
+rank(A_ind)
+
+% Dependent vectors: one is a multiple of the other
+A_dep = [[2; 1], [4; 2]]   % 2nd column = 2 × 1st
+rank(A_dep)
+
+% rank = 1 → only spans a line, not the full plane
+% You can only reach [4;2] by scaling [2;1], not arbitrary targets
+
+% Three vectors in R^2: always rank ≤ 2 (can't exceed dimension of space)
+A_three = [[1;0], [0;1], [1;1]]
+rank(A_three)   % = 2, third vector is redundant`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC tool offsets as linear combinations',
+              prose: [
+                'In CNC machining, a Work Coordinate System (WCS) offset shifts the origin by a displacement vector. All subsequent tool positions are relative to that new origin.',
+                'A part position in the machine coordinate system = work offset vector + part-relative position vector. This is exactly vector addition — a linear combination with coefficients of 1.',
+              ],
+              code: `% CNC Work Coordinate System (WCS) example
+% Machine home (G53 origin) = [0; 0; 0]
+% Work offset G54 = where we zeroed our part on the table
+G54_offset = [150; 80; 0];   % part origin is at (150mm, 80mm) on the table
+
+% Part-relative positions from the G-code program:
+P1_part = [10; 5; -3];    % a hole drilled at X10, Y5, Z-3 in part coordinates
+P2_part = [50; 5; -3];    % another hole at X50, Y5
+
+% Absolute machine positions = offset + part position (linear combination!)
+P1_machine = G54_offset + P1_part
+P2_machine = G54_offset + P2_part
+
+% If we change the work offset (re-zero the part), ALL positions change together:
+% New offset (part moved to different pallet):
+G55_offset = [300; 80; 0];
+P1_new = G55_offset + P1_part
+P2_new = G55_offset + P2_part
+
+% The same part program runs correctly on ANY offset — vector addition handles it
+disp('Distance between holes (same in any coordinate system):')
+norm(P1_part - P2_part)    % = 40mm regardless of offset`,
+            },
+          ],
+        },
+      },
     ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'The concept of a basis extends far beyond arrows in 2D space. Let $P_2$ be the vector space of all polynomials of degree 2 or less: $p(t) = a + bt + ct^2$.',
-      'The standard basis for this space is the set of functions $S = \\{1, t, t^2\\}$. Every quadratic polynomial is exactly a linear combination of these three "vectors" (functions). By studying coordinates relative to a basis rather than studying the abstract objects themselves, mathematicians can convert problems about functions, differential equations, and signal processing into simple matrix algebra.',
-      'The Dimension of a vector space is defined formally as the number of vectors in a basis for the space. If a space is spanned by a set of $n$ vectors, then any independent set in that space has at most $n$ vectors. If you have 3 vectors in $\\mathbb{R}^2$, they MUST be linearly dependent. You only need 2 to span the plane; the third is guaranteed to be redundant.',
+      '**Span is always a subspace.** The span of any collection of vectors $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ is automatically a subspace. Why? Because any linear combination of linear combinations is still a linear combination: if $\\mathbf{u} = \\sum c_i \\mathbf{v}_i$ and $\\mathbf{w} = \\sum d_i \\mathbf{v}_i$, then $a\\mathbf{u} + b\\mathbf{w} = \\sum (ac_i + bd_i) \\mathbf{v}_i$ — still a linear combination. Span is the smallest subspace containing those vectors.',
+      '**Basis for abstract spaces.** The standard basis for $\\mathbb{R}^n$ is the set of unit vectors $\\hat{\\mathbf{e}}_1, \\ldots, \\hat{\\mathbf{e}}_n$. But bases exist for any vector space. The standard basis for $P_2$ (polynomials of degree $\\leq 2$) is $\\{1, t, t^2\\}$: every polynomial $a + bt + ct^2 = a \\cdot 1 + b \\cdot t + c \\cdot t^2$ is a linear combination with weights $(a, b, c)$. The coordinate vector of $3 - 2t + t^2$ relative to this basis is $[3, -2, 1]^T$. This coordinate assignment converts polynomial problems into matrix problems — it is the entire mechanism of linear algebra applied to functions.',
+      '**Dimension: a theorem, not a definition.** The dimension of a vector space is defined as the number of vectors in any basis for that space. But this definition requires a theorem: all bases for a vector space have the same size. This is non-trivial. The proof uses the Steinitz Exchange Lemma: if $\\mathbf{b}_1, \\ldots, \\mathbf{b}_n$ is a basis (spanning and independent), and $\\mathbf{v}_1, \\ldots, \\mathbf{v}_m$ is any linearly independent set, then $m \\leq n$. Applying this in both directions shows that two bases of the same space must have equal size. Therefore "dimension" is well-defined.',
+      '**The Dimension Inequality.** Three practical consequences: (1) Any set of more than $n$ vectors in $\\mathbb{R}^n$ is automatically dependent. (2) Any $n$ independent vectors in $\\mathbb{R}^n$ automatically span it. (3) You cannot have a spanning set smaller than the dimension. These three facts speed up every independence/spanning check.',
     ],
-    callouts: [],
-    visualizations: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'The Basis Theorem (for $\\mathbb{R}^n$)',
+        body: 'In $\\mathbb{R}^n$: any set of $n$ linearly independent vectors is a basis. Any set of $n$ vectors that spans $\\mathbb{R}^n$ is a basis. You only need to verify ONE of the two properties — independence or spanning — not both, if you already know you have exactly $n$ vectors.',
+      },
+      {
+        type: 'insight',
+        title: 'Coordinates Are Unique',
+        body: 'Once you fix a basis $\\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}$, every vector $\\mathbf{v}$ has a **unique** representation $\\mathbf{v} = c_1 \\mathbf{b}_1 + \\cdots + c_n \\mathbf{b}_n$. Uniqueness follows from independence: if two representations differed, their difference would be a non-trivial combination summing to zero, contradicting independence.',
+      },
+      {
+        type: 'warning',
+        title: 'Any $n+1$ Vectors in $\\mathbb{R}^n$ Are Dependent',
+        body: 'You cannot have 3 independent vectors in $\\mathbb{R}^2$. Period. If someone hands you three 2D vectors and claims they are independent, one of them is a linear combination of the others — no exceptions. The dimension is an absolute ceiling on the size of any independent set.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'LinearDependenceViz',
+        title: 'Why Three Vectors in $\\mathbb{R}^2$ Must Be Dependent',
+        mathBridge: 'Add a third vector to the visualization. No matter what direction you choose, it lands inside the span of the first two (which is the entire plane). Since the plane is already spanned, the third vector is automatically a linear combination of the first two — it carries no new directional information. This is the visual proof that dimension 2 means you can never have 3 independent vectors.',
+        caption: 'Three 2D vectors are always dependent. The third is always redundant.',
+      },
+    ],
   },
 
   // ── Examples ───────────────────────────────────────────────────

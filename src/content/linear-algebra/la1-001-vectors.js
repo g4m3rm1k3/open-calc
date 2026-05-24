@@ -21,12 +21,13 @@ export default {
     prose: [
       '**Where you are in the story:** You are at the very beginning of understanding spaces and transformations. Before we can stretch, squash, or rotate space, we need a way to describe the things *living* in that space. That fundamental building block is the vector.',
       'There are three major ways to think about vectors, and mastering linear algebra means learning to switch effortlessly between them.',
-      'Perspective 1: The Physics View. To a physicist, a vector is an arrow pointing in space. It has a specific length (magnitude) and a specific direction. Importantly, an arrow is defined *only* by its length and direction — not by where it starts. If you pick up an arrow and move it without rotating it or stretching it, it is still the exact same vector.',
-      'Perspective 2: The Computer Science View. To a computer scientist, a vector is just a list of numbers. An array like `[3, 4]` represents a vector. This perspective says nothing about arrows or geometry; it only cares about ordered data. For example, a house might be modeled as a vector: `[square_footage, bedrooms, bathrooms]`.',
-      'Perspective 3: The Mathematics View. To a mathematician, a vector is whatever you want it to be, as long as it follows two simple rules: you can add two of them together, and you can multiply them by a scalar (a regular number) to scale them up or down. As long as those operations behave predictably, the object is a vector.',
-      'In this course, we will constantly bridge the Physics (geometric) and Computer Science (algebraic) views. A list of numbers like `[3, 4]` algebraically defines an arrow that points 3 units to the right and 4 units up. The numbers are the DNA; the arrow is the physical manifestation.',
-      '**Scalars: the third ingredient.** Linear algebra is built from three objects: scalars, vectors, and matrices. A **scalar** is just a regular number — something from $\\mathbb{R}$ like $2$, $-0.5$, or $\\pi$. The word "scalar" comes from "scale." When you multiply a vector by a scalar, you scale it. Specifically: multiply by $2$ and the vector doubles in length. Multiply by $0.5$ and it shrinks to half. Multiply by $-1$ and it flips to point the opposite direction. Multiply by $0$ and it collapses completely to the zero vector $\\mathbf{0}$ — a vector with no length and no direction. Every one of these behaviors matters and will show up again throughout the course.',
-      '**Where this is heading:** Once we establish how to represent these arrows and scale them with scalars, we will learn how to combine them (Linear Combinations). The rest of linear algebra is the study of how spaces of these arrows transform into other spaces.',
+      '**Perspective 1: The Physics View.** To a physicist, a vector is an arrow pointing in space. It has a specific length (magnitude) and a specific direction. Importantly, an arrow is defined *only* by its length and direction — not by where it starts. If you pick up an arrow and move it without rotating it or stretching it, it is still the exact same vector. This is called **free vector** behavior. Two arrows are equal if and only if they have the same length and the same direction — no matter where they are drawn. A force of 50 N north applied at the front of a car and 50 N north applied at the rear are the same vector, even though physically they act at different locations.',
+      '**Perspective 2: The Computer Science View.** To a computer scientist, a vector is a list of numbers — an ordered array. `[3, 4]` is a 2D vector; `[1, 0, 0]` is a 3D vector. This perspective says nothing about arrows; it only cares about ordered data. A house can be a vector: `[square_footage, bedrooms, bathrooms, price]`. A song can be a vector: `[tempo, loudness, energy, danceability]`. A Netflix user is a vector of ratings. Everything in data science is ultimately a vector, because lists of numbers are how computers represent the world.',
+      '**Perspective 3: The Mathematics View.** To a mathematician, a vector is whatever you want it to be, as long as it satisfies two rules: you can add two of them and get another one (closure under addition), and you can multiply by a number and get another one (closure under scalar multiplication). Polynomials, functions, and even matrices are "vectors" under this definition. The axioms, not arrows in space, are the ultimate definition of what a vector is.',
+      '**The bridge between perspectives.** A list like `[3, 4]` algebraically defines an arrow that points 3 units right and 4 units up. The numbers are the DNA; the arrow is the physical manifestation. The physics view gives you geometric intuition; the CS view gives you computational tools; the math view gives you generality. The master at linear algebra flips between all three in a single sentence.',
+      '**Scalars: the third ingredient.** Linear algebra is built from three objects: scalars, vectors, and matrices. A **scalar** is just a regular number from $\\mathbb{R}$. The word "scalar" comes from "scale" — when you multiply a vector by a scalar, you scale it. Multiply by $2$ → doubles in length. Multiply by $0.5$ → shrinks to half. Multiply by $-1$ → flips to exact opposite direction. Multiply by $0$ → collapses to the zero vector $\\mathbf{0}$, which has no length and no direction. These four behaviors define everything about how scalars interact with vectors.',
+      '**CNC machines: vectors in your hands.** Every CNC machine (milling machine, lathe, router) operates on pure vector mathematics. The three axes — X, Y, Z — are the three basis vectors $\\hat{\\mathbf{i}}, \\hat{\\mathbf{j}}, \\hat{\\mathbf{k}}$. When a G-code program says `G00 X3.0 Y2.0 Z-1.5`, it is commanding the machine to move to the position described by the vector $\\begin{bmatrix}3.0\\\\2.0\\\\-1.5\\end{bmatrix}$. The coordinates ARE the components. Understanding vectors is not a prerequisite for CNC programming — understanding vectors IS CNC programming, expressed geometrically.',
+      '**Where this is heading:** Once we establish how to represent arrows and scale them, we will learn how to combine them (Linear Combinations), then how to measure alignment (Dot Product), then how to solve systems of equations with them. The rest of linear algebra is the study of how entire spaces of these arrows transform.',
     ],
     callouts: [
       {
@@ -62,16 +63,28 @@ export default {
     ],
     visualizations: [
       {
-        id: 'LALesson11_OrthogonalProjections',
-        title: 'The Geometric Engine of Linear Algebra',
-        mathBridge: 'Before we dive into what vectors are, see the absolute geometric pinnacle: the Orthogonal Projection. Every vector can be decomposed into a shadow and a perpendicular. This is the core engine of everything you are about to study.',
-        caption: 'A teaser of the projection mechanics you will master in Phase 4.',
+        id: 'LALesson01_Vectors',
+        title: 'Vector Components — Geometry meets Algebra',
+        mathBridge: 'Drag the vector tip to change its direction and length. Watch how the coordinate list $[x, y]^T$ updates in real-time. This is the core connection: every geometric arrow has exactly one algebraic representation, and every list of numbers has exactly one geometric arrow. They are two languages for the same object.',
+        caption: 'Moving the tip horizontally changes only the $x$ component. Moving vertically changes only $y$. They are independent.',
       },
       {
-        id: 'LALesson01_Vectors',
-        title: 'Vector Components',
-        mathBridge: 'Drag the vector tip to change its direction and length. Watch how the coordinate list $[x, y]^T$ updates in real-time. Moving the vector vertically changes only the $y$ component. The key lesson: The algebraic list of numbers is a perfect instruction manual for drawing the geometric arrow.',
-        caption: 'The connection between geometry (the arrow) and algebra (the list of numbers).',
+        id: 'VectorComponentDecomposer',
+        title: 'Decomposing a Vector into Components',
+        mathBridge: 'Any vector $\\mathbf{v} = [x, y]$ can be written as $x \\cdot \\hat{\\mathbf{i}} + y \\cdot \\hat{\\mathbf{j}}$ — the $x$-component of movement along the horizontal axis, plus the $y$-component along the vertical. The dashed lines show the "shadow" of the vector onto each axis. These shadows are the components. They are the two independent ingredients from which the vector is built.',
+        caption: 'Every 2D vector is a sum of a horizontal piece and a vertical piece.',
+      },
+      {
+        id: 'ForceVectorIntuition',
+        title: 'Application: Force Vectors in Physics',
+        mathBridge: 'A force has both a magnitude (how strong) and a direction (which way). That makes it a vector. Drag the sliders to change the magnitude and direction of each force. The green arrow shows the resultant — the single vector that represents the combined effect of all forces. If the resultant is zero, the object is in equilibrium (Newton\'s first law). This is vector addition in a real physical system.',
+        caption: 'Force, velocity, acceleration, magnetic field, electric field — all vectors in physics.',
+      },
+      {
+        id: 'LALesson11_OrthogonalProjections',
+        title: 'Where This Is All Heading: Orthogonal Projection',
+        mathBridge: 'This is a teaser from much later in the course (LA4). Every vector can be decomposed into two perpendicular pieces: the "shadow" onto a target direction, and the remainder perpendicular to it. This decomposition — called orthogonal projection — is the mathematical engine behind GPS, least-squares fitting, PCA in machine learning, and noise-canceling audio. You are building toward this.',
+        caption: 'The goal of LA4: decomposing vectors into orthogonal components. See how far we are going.',
       },
     ],
   },
@@ -100,9 +113,15 @@ export default {
     visualizations: [
       {
         id: 'MagnitudeAndDirectionViz',
-        title: 'Magnitude and Pythagoras',
-        mathBridge: 'The visualization shows the right triangle formed by the vector. Drag the vector to $[3, 4]$ and observe the resulting magnitude of exactly $5$. Notice how the Pythagorean theorem connects the orthogonal components to the direct path.',
-        caption: 'Calculating vector magnitude using perpendicular components.',
+        title: 'Magnitude and the Pythagorean Theorem',
+        mathBridge: 'The right triangle hidden inside every vector: the horizontal leg has length $|x|$, the vertical leg has length $|y|$, and the hypotenuse IS the vector. Its length is $\\sqrt{x^2 + y^2}$ by Pythagoras. Drag to $[3, 4]$ and confirm the hypotenuse = 5. Then try $[5, 12]$ (hypotenuse = 13). These are Pythagorean triples — the same ones from high school, now living inside linear algebra.',
+        caption: 'Every vector contains a right triangle. Magnitude is always the hypotenuse.',
+      },
+      {
+        id: 'UnitVectorBuilder',
+        title: 'Unit Vectors — Pure Direction, Length 1',
+        mathBridge: 'Drag the blue vector to any direction. The amber arrow is its unit vector — same direction, magnitude exactly 1. Watch the magnitude display update. The unit vector $\\hat{v} = \\mathbf{v}/\\|\\mathbf{v}\\|$ strips away the "how long" and keeps only the "which way." Standard basis vectors $\\hat{\\mathbf{i}} = [1,0]$ and $\\hat{\\mathbf{j}} = [0,1]$ are special unit vectors along the axes.',
+        caption: 'The unit vector is the direction ambassador — it carries direction information with no length bias.',
       },
       {
         id: 'PythonNotebook',
@@ -171,6 +190,50 @@ fig.vector(unit.tolist(), color=AMBER, label="unit v")
 fig.show()`,
             },
             {
+              id: 4,
+              cellTitle: 'Application: CNC tool path as vectors',
+              prose: [
+                'A CNC machine moves a cutting tool between waypoints. Each waypoint is a position vector. The move from one point to the next is a displacement vector — vector subtraction.',
+                'The total distance a tool travels is the sum of the magnitudes of all displacement vectors along the path.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN, RED
+
+# CNC waypoints (X, Y positions in mm)
+waypoints = [
+    np.array([0.0, 0.0]),   # start (machine home)
+    np.array([50.0, 0.0]),  # G00 X50.0 Y0
+    np.array([50.0, 30.0]), # G01 X50.0 Y30.0
+    np.array([0.0, 30.0]),  # G01 X0 Y30.0
+    np.array([0.0, 0.0]),   # return to home
+]
+
+# Displacement vectors between consecutive waypoints
+total_distance = 0
+print("CNC Tool Path Analysis:")
+print("=" * 40)
+for i in range(len(waypoints) - 1):
+    displacement = waypoints[i+1] - waypoints[i]
+    dist = np.linalg.norm(displacement)
+    direction = displacement / dist
+    total_distance += dist
+    print(f"Move {i+1}: {waypoints[i]} → {waypoints[i+1]}")
+    print(f"  Displacement: {displacement}, Distance: {dist:.2f} mm")
+    print(f"  Direction (unit): {direction.round(3)}")
+
+print(f"\\nTotal tool travel: {total_distance:.2f} mm")
+
+# Visualize the tool path
+fig = Figure(xmin=-5, xmax=60, ymin=-5, ymax=40, title="CNC Tool Path")
+fig.grid().axes()
+colors = [BLUE, AMBER, GREEN, RED]
+for i in range(len(waypoints) - 1):
+    p1 = waypoints[i].tolist()
+    p2 = waypoints[i+1].tolist()
+    fig.segment(p1, p2, color=colors[i % 4])
+fig.show()`,
+            },
+            {
               id: 'c1',
               challengeType: 'write',
               challengeNumber: 1,
@@ -191,26 +254,162 @@ w = np.array([-6.0, 8.0])
           ]
         }
       },
+      {
+        id: 'OpenMatNotebook',
+        title: 'Vectors in OpenMAT / MATLAB',
+        mathBridge: 'MATLAB was designed for matrix math. The single most important syntax rule: a semicolon inside brackets starts a new row, so [3; 4] is a 2×1 column vector. norm(v) computes ‖v‖. Dividing by norm gives the unit vector. These three operations — create, measure, normalize — are the entire vector toolkit you need for MATLAB assignments.',
+        caption: 'OpenMAT mirrors real MATLAB syntax. Master it here, use it in class.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Column vectors — the MATLAB syntax rule',
+              prose: [
+                'The key syntax: a **semicolon** inside `[]` starts a new row. So `[3; 4]` is a 2×1 column vector (2 rows, 1 column). A **comma** separates columns: `[3, 4]` is a 1×2 row vector.',
+                'Linear algebra almost always uses column vectors. Train yourself to write `[3; 4]` not `[3, 4]`.',
+              ],
+              code: `% Column vector: semicolons separate rows → 2 rows, 1 column
+v = [3; 4]
+
+% Row vector: commas separate columns → 1 row, 2 columns
+vT = [3, 4]
+
+% size(x) returns [rows, cols] — shows you the shape
+disp('Column v is shape:'), size(v)
+disp('Row vT is shape:'), size(vT)
+
+% Operations work component-wise, same as numpy
+a = [2; -1; 3];
+b = [1;  4;  0];
+disp('a + b ='), a + b
+disp('3 * a ='), 3 * a`,
+            },
+            {
+              id: 2,
+              cellTitle: 'norm() — computing magnitude',
+              prose: [
+                '`norm(v)` is MATLAB\'s implementation of the Pythagorean theorem: ‖v‖ = √(v₁² + v₂² + …). It works for any dimension.',
+                'To normalize (get a unit vector): divide v by `norm(v)`. MATLAB divides every component by the scalar automatically.',
+              ],
+              code: `v = [3; 4];
+
+% norm() = magnitude = ‖v‖
+magnitude = norm(v)
+
+% Unit vector: same direction, length 1
+unit_v = v / norm(v)
+
+% Verify: norm of a unit vector is always 1
+norm(unit_v)
+
+% The classic 3-4-5 right triangle
+% v=[3;4] → norm = 5, unit = [0.6; 0.8]
+% Confirm: 0.6^2 + 0.8^2 = 0.36 + 0.64 = 1 ✓
+
+% Works in 3D too
+w = [1; 2; 2];
+norm(w)   % should be 3: sqrt(1+4+4)=3`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Scalar multiplication — four behaviors to see',
+              prose: [
+                'MATLAB scalar multiplication `c * v` scales every component by c. The four behaviors below are what you should be able to predict before computing:',
+                'c > 1 stretches. 0 < c < 1 shrinks. c = -1 flips. c = 0 collapses to zero.',
+              ],
+              code: `v = [1; 2; 1];
+
+disp('c = 2.5 → stretches (‖2.5v‖ = 2.5·‖v‖)')
+2.5 * v, norm(2.5*v), 2.5*norm(v)
+
+disp('c = 0.4 → shrinks')
+0.4 * v
+
+disp('c = -1 → flips direction')
+-1 * v
+
+disp('c = 0 → zero vector')
+0 * v
+
+% Key rule: ‖c·v‖ = |c| · ‖v‖ — magnitude scales by |c|
+c = -3;
+disp('|-3| · ‖v‖ = ‖-3v‖:')
+abs(c)*norm(v)
+norm(c*v)`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC machine coordinates are vectors',
+              prose: [
+                'In CNC machining, a machine move like G00 X3.0 Y2.0 Z-1.5 moves the tool to position [3.0, 2.0, -1.5]. That IS a 3D vector. The X, Y, Z machine axes are the three standard basis vectors.',
+                'The displacement from the current position to the next waypoint is the difference of two position vectors — exactly vector subtraction. The distance traveled is the norm of that displacement.',
+              ],
+              code: `% CNC machine positions as 3D vectors
+% (X, Y, Z) coordinates — same as column vectors in linear algebra
+
+% Current tool position
+current = [1.0; 0.5; 0.0];   % at (1.0, 0.5, 0.0)
+
+% Next waypoint from G-code: G00 X3.5 Y2.0 Z-1.5
+next = [3.5; 2.0; -1.5];
+
+% Displacement vector (the "move" from current to next)
+displacement = next - current
+
+% Distance the tool must travel (magnitude of displacement)
+distance = norm(displacement)
+
+% Direction of travel (unit vector tells the "which way" without "how far")
+direction = displacement / distance
+
+% The three machine axes are the standard basis vectors
+X_axis = [1; 0; 0];   % î — right
+Y_axis = [0; 1; 0];   % ĵ — forward
+Z_axis = [0; 0; 1];   % k̂ — up
+
+% Any position can be written as a linear combination of these three:
+% next = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis
+check = 3.5*X_axis + 2.0*Y_axis + (-1.5)*Z_axis`,
+            },
+          ],
+        },
+      },
     ],
   },
 
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'A true "Vector Space" over a field (like the set of real numbers $\\mathbb{R}$) is formally defined as a set $V$ combined with two operations: vector addition and scalar multiplication.',
-      'To be a vector space, 8 axioms must be satisfied for all vectors $\\vec{u}, \\vec{v}, \\vec{w}$ in $V$ and all scalars $c, d$:',
-      '1. Commutativity of addition: $\\vec{u} + \\vec{v} = \\vec{v} + \\vec{u}$',
-      '2. Associativity of addition: $(\\vec{u} + \\vec{v}) + \\vec{w} = \\vec{u} + (\\vec{v} + \\vec{w})$',
-      '3. Identity element of addition: There exists a zero vector $\\vec{0}$ such that $\\vec{v} + \\vec{0} = \\vec{v}$',
-      '4. Inverse elements of addition: For every $\\vec{v}$, there exists $-\\vec{v}$ such that $\\vec{v} + (-\\vec{v}) = \\vec{0}$',
-      '5. Compatibility of scalar multiplication: $c(d\\vec{v}) = (cd)\\vec{v}$',
-      '6. Identity element of scalar multiplication: $1\\vec{v} = \\vec{v}$',
-      '7. Distributivity of scalar multiplication over vector addition: $c(\\vec{u} + \\vec{v}) = c\\vec{u} + c\\vec{v}$',
-      '8. Distributivity of scalar multiplication over field addition: $(c + d)\\vec{v} = c\\vec{v} + d\\vec{v}$',
-      'While columns of numbers in $\\mathbb{R}^n$ perfectly satisfy these axioms, other mathematical objects do as well. For example, the set of all polynomial functions up to degree $n$ forms a valid vector space. The axioms, not arrows in space, are the ultimate definition of what a vector is.',
+      '**Formal Definition of a Vector Space.** A vector space $V$ over a field $\\mathbb{F}$ (think $\\mathbb{F} = \\mathbb{R}$ for our purposes) is a set equipped with two operations — vector addition $(+)$ and scalar multiplication $( \\cdot )$ — satisfying ten axioms. We can group these into four natural families: closure (the operations stay inside the set), algebraic structure of addition (it behaves like ordinary addition), behavior of the zero and negatives, and the rules governing scalars.',
+      '**The ten axioms, with explanations:**\n\n1. **Closure under addition**: $\\mathbf{u} + \\mathbf{v} \\in V$ for all $\\mathbf{u}, \\mathbf{v} \\in V$. Adding two vectors gives a vector — it doesn\'t escape the space.\n\n2. **Closure under scalar multiplication**: $c\\mathbf{v} \\in V$ for all scalars $c$ and vectors $\\mathbf{v}$. Scaling a vector stays in the space.\n\n3. **Commutativity of addition**: $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$. Order doesn\'t matter: $[3,4] + [1,2] = [1,2] + [3,4]$.\n\n4. **Associativity of addition**: $(\\mathbf{u} + \\mathbf{v}) + \\mathbf{w} = \\mathbf{u} + (\\mathbf{v} + \\mathbf{w})$. Grouping doesn\'t matter.\n\n5. **Zero vector**: There exists $\\mathbf{0} \\in V$ such that $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$. Adding zero does nothing.\n\n6. **Additive inverse**: For every $\\mathbf{v}$, there exists $-\\mathbf{v}$ such that $\\mathbf{v} + (-\\mathbf{v}) = \\mathbf{0}$. Every vector has an opposite.\n\n7. **Scalar identity**: $1 \\cdot \\mathbf{v} = \\mathbf{v}$. Multiplying by 1 does nothing.\n\n8. **Scalar compatibility**: $c(d\\mathbf{v}) = (cd)\\mathbf{v}$. Sequential scaling = combined scaling.\n\n9. **Distributivity over vector addition**: $c(\\mathbf{u}+\\mathbf{v}) = c\\mathbf{u} + c\\mathbf{v}$.\n\n10. **Distributivity over scalar addition**: $(c+d)\\mathbf{v} = c\\mathbf{v} + d\\mathbf{v}$.',
+      '**Why do these axioms exist?** They exist to guarantee that the familiar algebra you learned in school still works. If addition is commutative (axiom 3), you can rearrange terms. If there is a zero (axiom 5), equations like $\\mathbf{x} + \\mathbf{v} = \\mathbf{v}$ have an obvious solution. Every theorem in linear algebra is proved from exactly these ten rules — no pictures, no coordinates, just logic. And because the axioms say nothing about what vectors "look like," every proof applies universally: to arrows, to polynomials, to functions, to matrices, to anything that satisfies the list.',
+      '**Counter-example: what fails to be a vector space.** Consider the first quadrant $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ with standard operations. Axiom 6 fails: $(-1) \\cdot (1, 1) = (-1, -1)$, which is outside the first quadrant. Not a vector space. Or consider $\\mathbb{R}^2$ with "twisted" addition $(x_1, y_1) \\oplus (x_2, y_2) = (x_1 + x_2, y_1 y_2)$ — the zero vector would need to satisfy $(0, z_0)$ with $y_1 \\cdot z_0 = y_1$, so $z_0 = 1$. But then $0 \\cdot (1,1) = (0, 1^0) = (0, 1)$, not $(0, 1)$... wait, axiom 8 fails because $(0+0)(1,1) \\neq 0(1,1) + 0(1,1)$ under the twisted rule. Checking axioms systematically is how mathematicians prove or disprove that something is a vector space.',
     ],
-    callouts: [],
-    visualizations: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'The Ten Axioms of a Vector Space (Grouped)',
+        body: '**Closure** (2): under $+$ and scalar $\\cdot$.\n**Addition structure** (4): commutativity, associativity, zero vector, additive inverse.\n**Scalar structure** (4): identity scalar, scalar compatibility, two distributivity rules.\n\nVerify all ten to prove something IS a vector space. Find one failure to prove it is NOT.',
+      },
+      {
+        type: 'insight',
+        title: 'The Power of Abstraction',
+        body: 'The set of all polynomials of degree $\\leq 2$ — $\\{a + bx + cx^2 : a, b, c \\in \\mathbb{R}\\}$ — is a vector space. Why? Because adding two such polynomials gives another, and multiplying by a scalar gives another, and all ten axioms hold. This means every theorem we prove about $\\mathbb{R}^n$ automatically applies to polynomial spaces — without any new proof. **Abstraction is a machine that multiplies your theorems.**',
+      },
+      {
+        type: 'warning',
+        title: 'The Usual Mistake: Checking Only Closure',
+        body: 'Students often check "is it closed under addition and scalar mult?" and declare victory. But there are 8 more axioms. The sneakiest failure points are: (1) Does a zero vector exist? (2) Does every element have an additive inverse? These fail in "almost vector spaces" like the positive reals or first-quadrant sets.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'VectorEqualityProof',
+        title: 'Vector Equality: Algebraic Proof vs. Geometric Proof',
+        mathBridge: 'Two vectors are equal if and only if all corresponding components are equal: $[a, b] = [c, d]$ iff $a = c$ and $b = d$. This visualization shows what it means for two arrows to be "equal" — same length, same direction, regardless of where they are drawn. The proof uses the axioms: if $\\mathbf{u} = \\mathbf{v}$, then adding $-\\mathbf{u}$ to both sides gives $\\mathbf{0} = \\mathbf{v} - \\mathbf{u}$.',
+        caption: 'Equal vectors have the same components — even when drawn at different positions.',
+      },
+    ],
   },
 
   // ── Examples ───────────────────────────────────────────────────

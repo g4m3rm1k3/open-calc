@@ -79,24 +79,313 @@ export default {
         body: 'If you know two edges of a triangle (vectors $\\mathbf{u}$ and $\\mathbf{v}$), then $\\mathbf{n} = \\mathbf{u} \\times \\mathbf{v}$ is immediately perpendicular to both — it IS the normal to the plane containing the triangle. No algebra required.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'Lines and Planes in OpenMAT / MATLAB',
+        mathBridge: 'In MATLAB, a parametric line is just arithmetic: r = P0 + t*d. A plane equation n·x = d is a dot product test. The line-plane intersection formula t = (d - dot(n,P0)) / dot(n,dir) is four lines of code. Learn these patterns once and they cover every lines-and-planes problem in your coursework.',
+        caption: 'Lines and planes in MATLAB — also exactly how CNC and robotics check for workspace violations.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Parametric line: generate and test points',
+              prose: [
+                'A parametric line r(t) = P0 + t*d is just a loop over t values. Each value of t gives one point on the line.',
+                'Test if a point lies on the line: solve for t from each component and check they are equal.',
+              ],
+              code: `% Parametric line: r(t) = P0 + t*d
+P0 = [1; 2; -1];      % base point
+d  = [3; -1; 2];      % direction vector
+
+% Sample points at t = -1, 0, 1, 2
+for t = -1:2
+    r = P0 + t*d;
+    fprintf('t=%2d → (%5.1f, %5.1f, %5.1f)\\n', t, r(1), r(2), r(3))
+end
+
+% Does the point (7, 0, 3) lie on this line?
+% If yes, all three t values from x,y,z components must be equal
+Q = [7; 0; 3];
+t_from_x = (Q(1) - P0(1)) / d(1)
+t_from_y = (Q(2) - P0(2)) / d(2)
+t_from_z = (Q(3) - P0(3)) / d(3)
+% All equal to 2 → Q is on the line at t=2`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Plane equation: test and distance',
+              prose: [
+                'The plane n·x = d is verified by: if a point x satisfies dot(n,x) == d, it is on the plane.',
+                'Distance from point Q to the plane: abs(dot(n,Q) - d) / norm(n). This is the most important formula in 3D geometry.',
+              ],
+              code: `n = [1; 2; -1];    % normal vector
+d = 4;             % right-hand side: n·x = 4
+
+% Test point on the plane: P = [2; 1; 0]
+P = [2; 1; 0];
+disp('Is P on the plane? (should be 4):')
+dot(n, P)          % = 1*2 + 2*1 + (-1)*0 = 4 ✓
+
+% Test point NOT on the plane: Q = [1; 2; 3]
+Q = [1; 2; 3];
+disp('n·Q = (should not be 4):')
+dot(n, Q)          % = 1+4-3 = 2 ≠ 4
+
+% Distance from Q to the plane
+distance = abs(dot(n, Q) - d) / norm(n)
+% = |2 - 4| / sqrt(1+4+1) = 2/sqrt(6) ≈ 0.816`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Line-plane intersection',
+              prose: [
+                'Substitute r(t) = P0 + t*d into n·x = d to find t. If n·d = 0, the line is parallel to the plane.',
+                'Application: ray tracing in 3D graphics fires millions of these per frame.',
+              ],
+              code: `% Line: r(t) = P0 + t*dir
+P0  = [2; 0; 1];
+dir = [1; -1; 3];
+
+% Plane: n·x = d_plane
+n       = [1; 2; -1];
+d_plane = 4;
+
+% Check if line is parallel to plane (n·dir = 0)
+n_dot_dir = dot(n, dir)
+if abs(n_dot_dir) < 1e-10
+    disp('Line is parallel to the plane — no intersection')
+else
+    t = (d_plane - dot(n, P0)) / n_dot_dir
+    intersection = P0 + t * dir
+
+    % Verify: does the intersection point satisfy the plane equation?
+    disp('Verify n·intersection = d_plane:')
+    dot(n, intersection)
+end`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC workspace limit as a plane',
+              prose: [
+                'CNC machines have hard workspace limits — physical boundaries beyond which the machine cannot travel without crashing. These limits ARE planes.',
+                'Before commanding a move, the controller checks: will the new tool position violate any limit plane? This is a distance-to-plane check.',
+              ],
+              code: `% CNC workspace planes (soft limits)
+% Machine has limits: 0 ≤ X ≤ 500, 0 ≤ Y ≤ 300, -200 ≤ Z ≤ 0
+% Each limit is a plane: e.g., X_max = 500 → normal [1;0;0], d = 500
+
+limits = struct();
+limits.Xmax = struct('n', [1;0;0], 'd', 500);
+limits.Xmin = struct('n', [-1;0;0], 'd', 0);
+limits.Ymax = struct('n', [0;1;0], 'd', 300);
+limits.Ymin = struct('n', [0;-1;0], 'd', 0);
+limits.Zmin = struct('n', [0;0;-1], 'd', 200);  % Z ≥ -200
+
+function check = inWorkspace(pos, limits)
+    fields = fieldnames(limits);
+    check = true;
+    for i = 1:length(fields)
+        L = limits.(fields{i});
+        % Point must satisfy n·x ≤ d
+        if dot(L.n, pos) > L.d
+            fprintf('  VIOLATION: %s limit!\\n', fields{i});
+            check = false;
+        end
+    end
+end
+
+disp('Test (100, 50, -5): ')
+inWorkspace([100;50;-5], limits)
+
+disp('Test (520, 50, -5): ')
+inWorkspace([520;50;-5], limits)`,
+            },
+          ],
+        },
+      },
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Lines, Planes, and 3D Geometry',
+        mathBridge: 'Parametric lines, plane equations, line-plane intersections, and distance formulas — all in NumPy. Visualize with opencalc.Figure for 3D perspective.',
+        caption: 'Use Python to build geometric intuition with interactive 3D visualizations.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Parametric lines: generate and visualize',
+              prose: [
+                'A line r(t) = P0 + t*d is just vectorized arithmetic in NumPy.',
+                'Evaluate at many t values to get a dense set of points for visualization.',
+              ],
+              code: `import numpy as np
+from opencalc import Figure, BLUE, AMBER, GREEN
+
+# Define the line
+P0 = np.array([1.0, 2.0])   # base point (2D for visualization)
+d  = np.array([3.0, -1.0])  # direction vector
+
+# Generate points along the line
+t_vals = np.linspace(-1, 2, 100)
+# r(t) = P0 + t*d  (NumPy broadcasts over all t values at once)
+points = P0 + np.outer(t_vals, d)   # shape: (100, 2)
+
+print("r(0) = P0:", points[t_vals==0.0].flatten() if any(t_vals==0.0) else P0)
+print("r(1) =", P0 + d)
+print("r(-1) =", P0 - d)
+
+# Sample specific points
+for t in [-1, 0, 1, 2]:
+    r = P0 + t*d
+    print(f"t={t}: r = {r}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Plane equation: the dot product test',
+              prose: [
+                'A point x is on the plane n·x = d if and only if np.dot(n, x) == d.',
+                'The distance formula from point Q to the plane is the most important geometric formula in 3D: |n·Q - d| / ‖n‖.',
+              ],
+              code: `import numpy as np
+
+n = np.array([1.0, 2.0, -1.0])   # normal vector
+d_val = 4.0                        # plane: n·x = 4
+
+# Test if P = [2, 1, 0] is on the plane
+P = np.array([2.0, 1.0, 0.0])
+print(f"n · P = {np.dot(n, P):.4f}  (plane value = {d_val})")
+print(f"P is on plane: {np.isclose(np.dot(n, P), d_val)}")
+
+# Distance from Q = [1, 2, 3] to the plane
+Q = np.array([1.0, 2.0, 3.0])
+dist = abs(np.dot(n, Q) - d_val) / np.linalg.norm(n)
+print(f"\\nDistance from Q to plane = {dist:.4f}")
+print(f"  |n·Q - d| = |{np.dot(n,Q):.1f} - {d_val}| = {abs(np.dot(n,Q)-d_val):.1f}")
+print(f"  ‖n‖ = {np.linalg.norm(n):.4f}")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Line-plane intersection and distance',
+              prose: [
+                'Combine the parametric line formula with the plane dot-product test.',
+                'Substitute r(t) = P0 + t*d into n·x = d, solve for t, then compute the intersection point.',
+              ],
+              code: `import numpy as np
+
+P0  = np.array([2.0, 0.0, 1.0])    # line base point
+direction = np.array([1.0, -1.0, 3.0])  # direction
+
+n       = np.array([1.0, 2.0, -1.0])
+d_plane = 4.0
+
+n_dot_d = np.dot(n, direction)
+print(f"n · direction = {n_dot_d}")
+
+if abs(n_dot_d) < 1e-10:
+    print("Line is parallel to the plane — no intersection")
+else:
+    t = (d_plane - np.dot(n, P0)) / n_dot_d
+    intersection = P0 + t * direction
+    print(f"t = {t:.4f}")
+    print(f"Intersection point = {intersection}")
+    print(f"Verify: n · intersection = {np.dot(n, intersection):.4f}  (should be {d_plane})")`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: 3D collision detection (ray tracing)',
+              prose: [
+                'Ray tracing renders photorealistic 3D graphics by firing rays from the camera through each pixel and checking which surfaces they hit.',
+                'Each "ray" is a parametric line. Each "surface" is a plane (or a collection of triangles approximated by planes). The core algorithm is what you just learned.',
+              ],
+              code: `import numpy as np
+
+def ray_plane_intersection(ray_origin, ray_dir, plane_normal, plane_d):
+    """Find where a ray hits a plane. Returns (t, point) or None if parallel."""
+    denom = np.dot(plane_normal, ray_dir)
+    if abs(denom) < 1e-6:
+        return None  # ray is parallel to plane
+    t = (plane_d - np.dot(plane_normal, ray_origin)) / denom
+    if t < 0:
+        return None  # intersection is behind the camera
+    return t, ray_origin + t * ray_dir
+
+# Camera shoots a ray
+camera_pos = np.array([0.0, 0.0, 10.0])
+ray_direction = np.array([0.2, -0.1, -1.0])
+ray_direction /= np.linalg.norm(ray_direction)  # normalize to unit length
+
+# Scene: a floor plane at y = -3
+floor_normal = np.array([0.0, 1.0, 0.0])
+floor_d = -3.0
+
+result = ray_plane_intersection(camera_pos, ray_direction, floor_normal, floor_d)
+if result:
+    t, hit_point = result
+    print(f"Ray hits the floor at t = {t:.3f}")
+    print(f"Hit point: {hit_point.round(3)}")
+    print(f"That's {t:.1f} units from the camera")
+else:
+    print("Ray misses the floor (parallel or going up)")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Find the plane through three points',
+              difficulty: 'medium',
+              prompt: 'Given three points A = [1, 0, 0], B = [0, 2, 0], C = [0, 0, 3]: (1) Find two vectors in the plane using B-A and C-A. (2) Compute the normal using np.cross(). (3) Find the plane constant d = np.dot(n, A). (4) Verify all three points satisfy n·x = d.',
+              code: `import numpy as np
+
+A = np.array([1.0, 0.0, 0.0])
+B = np.array([0.0, 2.0, 0.0])
+C = np.array([0.0, 0.0, 3.0])
+
+# 1. Two vectors in the plane
+# 2. Normal vector via cross product
+# 3. Plane constant d
+# 4. Verify all three points
+`,
+              hint: 'u = B - A, v = C - A. n = np.cross(u, v). d = np.dot(n, A). Check np.isclose(np.dot(n, A), d), same for B and C.',
+            },
+          ],
+        },
+      },
+    ],
   },
 
   rigor: {
     prose: [
-      'A **line** in $\\mathbb{R}^n$ is the set $\\{P_0 + t\\mathbf{d} : t \\in \\mathbb{R}\\}$ for a fixed point $P_0$ and nonzero direction $\\mathbf{d}$. This is a 1-dimensional affine subspace — a shifted span of a single vector.',
-      'A **plane** in $\\mathbb{R}^n$ is the set $\\{P_0 + s\\mathbf{u} + t\\mathbf{v} : s, t \\in \\mathbb{R}\\}$ for linearly independent $\\mathbf{u}, \\mathbf{v}$. This is a 2-dimensional affine subspace — a shifted span of two vectors.',
-      'The equation $\\mathbf{n} \\cdot \\mathbf{x} = d$ defines a hyperplane: a subspace of dimension $n - 1$ in $\\mathbb{R}^n$. In $\\mathbb{R}^3$ that is a plane (dimension 2). In $\\mathbb{R}^2$ that is a line (dimension 1). The normal vector $\\mathbf{n}$ spans the orthogonal complement of the hyperplane.',
-      'Two planes in $\\mathbb{R}^3$ intersect in a line (if not parallel), no points (if parallel but distinct), or the whole plane (if identical). The intersection of THREE planes is exactly a system of three linear equations — the content of Lesson LA1-004.',
+      '**Affine subspaces.** A **line** in $\\mathbb{R}^n$ is the set $\\{P_0 + t\\mathbf{d} : t \\in \\mathbb{R}\\}$ — a 1-dimensional affine subspace. A **plane** is $\\{P_0 + s\\mathbf{u} + t\\mathbf{v} : s, t \\in \\mathbb{R}\\}$ — a 2-dimensional affine subspace. "Affine" means a linear subspace shifted away from the origin. A subspace must contain the origin; an affine subspace need not. If $P_0 = \\mathbf{0}$, the affine subspace is a genuine linear subspace.',
+      '**Hyperplanes.** The equation $\\mathbf{n} \\cdot \\mathbf{x} = d$ defines a **hyperplane** — a subspace of codimension 1 in $\\mathbb{R}^n$. In $\\mathbb{R}^3$: a plane (dimension 2). In $\\mathbb{R}^2$: a line (dimension 1). In $\\mathbb{R}^n$: an $(n-1)$-dimensional flat. The kernel of the linear map $f(\\mathbf{x}) = \\mathbf{n} \\cdot \\mathbf{x}$ is a linear subspace; the level set $f(\\mathbf{x}) = d$ is the affine hyperplane. The normal vector $\\mathbf{n}$ spans the orthogonal complement of the hyperplane.',
+      '**Intersection of planes is a system.** Two planes $\\mathbf{n}_1 \\cdot \\mathbf{x} = d_1$ and $\\mathbf{n}_2 \\cdot \\mathbf{x} = d_2$ with linearly independent normals intersect in a line (codimension 2 in $\\mathbb{R}^3$). Three planes with linearly independent normals intersect in a point — which is exactly a $3 \\times 3$ linear system. This is the bridge between geometry (intersecting planes) and algebra (Gaussian elimination). Every intersection question in 3D is secretly a linear system.',
+      '**General position.** In $\\mathbb{R}^n$, a line is a 1-flat (parametric = one free parameter). A plane is a 2-flat. In general, a $k$-flat has $k$ free parameters and is defined by $n - k$ independent linear equations. The "dimension" of an intersection of two flats of dimensions $p$ and $q$ is at least $p + q - n$ (when they are not parallel). This is the dimension formula for affine subspaces.',
     ],
     callouts: [
       {
         type: 'definition',
-        title: 'Affine Subspace',
-        body: 'A **line** = 1-dimensional affine subspace = $P_0 + \\text{span}\\{\\mathbf{d}\\}$\nA **plane** = 2-dimensional affine subspace = $P_0 + \\text{span}\\{\\mathbf{u}, \\mathbf{v}\\}$\n\n"Affine" = subspace shifted away from the origin by $P_0$.',
+        title: 'Affine Subspace (Formal)',
+        body: 'An **affine subspace** of $\\mathbb{R}^n$ is a set of the form $P_0 + W$ where $W$ is a linear subspace.\n\n**Line** = $P_0 + \\text{span}\\{\\mathbf{d}\\}$ (1-dimensional)\n**Plane** = $P_0 + \\text{span}\\{\\mathbf{u}, \\mathbf{v}\\}$ (2-dimensional)\n\nDifference from a subspace: affine subspaces need not pass through the origin.',
+      },
+      {
+        type: 'theorem',
+        title: 'Codimension and Equations',
+        body: 'Every hyperplane in $\\mathbb{R}^n$ is defined by exactly ONE linear equation. A line in $\\mathbb{R}^3$ needs TWO equations (intersection of two planes). Generally: a $k$-dimensional affine subspace is the solution set of $n - k$ independent linear equations.',
+      },
+      {
+        type: 'insight',
+        title: 'The Normal Vector Is the "Perpendicular Coordinate"',
+        body: 'The normal vector $\\mathbf{n}$ is to a plane what the $z$-axis is to the $xy$-plane. It points in the one direction that has ZERO component within the plane. The distance from any point $Q$ to the plane is the magnitude of $Q$\'s component in the $\\mathbf{n}$ direction — literally a projection of $(Q - P_0)$ onto $\\hat{\\mathbf{n}}$.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'OrthogonalityIntuition',
+        title: 'The Normal Vector: Perpendicularity as a Constraint',
+        mathBridge: 'The plane equation $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$ is an orthogonality constraint: the vector from $P_0$ to any plane point must be perpendicular to $\\mathbf{n}$. This visualization shows the normal vector and the plane it defines. Drag $\\mathbf{n}$ to tilt the plane — the plane always stays perpendicular to $\\mathbf{n}$. This is orthogonality as geometry.',
+        caption: 'Normal vector = the unique direction perpendicular to every in-plane direction.',
+      },
+    ],
   },
 
   examples: [

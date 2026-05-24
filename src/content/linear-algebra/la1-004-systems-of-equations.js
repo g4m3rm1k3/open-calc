@@ -92,6 +92,88 @@ export default {
     ],
     visualizations: [
       {
+        id: 'OpenMatNotebook',
+        title: 'Systems of Equations in OpenMAT / MATLAB',
+        mathBridge: 'MATLAB has two main tools for linear systems. The backslash operator A\\b solves Ax=b numerically — it is the fastest, most stable option for unique solutions. rref([A b]) performs the full Gauss-Jordan elimination symbolically and shows you the augmented matrix in RREF — better for understanding the structure (pivots, free variables, inconsistency). Learn both: use \\ in practice, use rref to see what is actually happening.',
+        caption: 'The backslash operator is MATLAB\'s most important single character for linear algebra.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'The backslash operator A\\b — MATLAB\'s workhorse',
+              prose: [
+                '`A\\b` is how MATLAB solves Ax = b. It does NOT compute A⁻¹ directly — it uses LU factorization internally, which is faster and more numerically stable.',
+                'Think of `\\` as "solve from the left." If A is the transformation and b is the target, A\\b asks "what input x produces output b?"',
+              ],
+              code: `% System: 2x + y = 8,  x + 3y = 9
+A = [2 1; 1 3];
+b = [8; 9];
+
+% Solve with backslash — the standard MATLAB approach
+x = A \ b
+
+% Verify: A*x should equal b
+disp('Verification A*x (should equal b):')
+A * x
+
+% The backslash is NOT the same as inv(A)*b
+% Both give the same answer, but \ is more stable
+disp('Same answer, worse code:')
+inv(A) * b`,
+            },
+            {
+              id: 2,
+              cellTitle: 'rref() — seeing Gauss-Jordan elimination',
+              prose: [
+                '`rref(M)` applies Gauss-Jordan elimination to matrix M and returns the reduced row echelon form. Feed it the augmented matrix [A b] to see the full system reduction.',
+                'Reading the RREF: if the last column has a leading 1 in some row → inconsistent (no solution). If a column in A has no pivot → that variable is free → infinitely many solutions.',
+              ],
+              code: `% Unique solution: full rank
+A1 = [2 1; 1 3];  b1 = [8; 9];
+disp('=== Unique solution — RREF ===')
+rref([A1 b1])
+% Read: x = ..., y = ...
+
+% Inconsistent: row [0 0 | c≠0] appears
+A2 = [1 2; 2 4];  b2 = [3; 7];
+disp('=== No solution — RREF ===')
+rref([A2 b2])
+% Second row: [0 0 | 1] → 0 = 1 → contradiction
+
+% Infinite solutions: row [0 0 | 0] appears, free variable
+b3 = [3; 6];
+disp('=== Infinite solutions — RREF ===')
+rref([A2 b3])
+% Second row: [0 0 | 0] → one equation was redundant`,
+            },
+            {
+              id: 3,
+              cellTitle: 'rank() and the three-case detector',
+              prose: [
+                'A single check determines which case you are in. Compare rank(A) and rank([A b]):',
+                '- rank([A b]) > rank(A) → inconsistent (no solution)\n- rank(A) = number of unknowns → unique solution\n- rank(A) < number of unknowns AND equal to rank([A b]) → infinitely many solutions',
+              ],
+              code: `A_unique = [1 2; 3 1];
+b_unique = [5; 7];
+n = size(A_unique, 2);  % number of unknowns
+
+r_A = rank(A_unique)
+r_Ab = rank([A_unique b_unique])
+
+if r_Ab > r_A
+    disp('NO SOLUTION — inconsistent')
+elseif r_A == n
+    disp('UNIQUE SOLUTION')
+    A_unique \ b_unique
+else
+    disp('INFINITELY MANY SOLUTIONS')
+    fprintf('Number of free variables: %d\n', n - r_A)
+end`,
+            },
+          ],
+        },
+      },
+      {
         id: 'GaussianEliminationStepper',
         title: 'Step Through Gaussian Elimination',
         mathBridge: 'Enter a 3×3 system and press "Next Step". The visualization highlights the current pivot row in blue and the row being eliminated in red. Watch the augmented matrix transform row by row into echelon form, then RREF. At each step, confirm that the solution set has not changed — only our view of it.',

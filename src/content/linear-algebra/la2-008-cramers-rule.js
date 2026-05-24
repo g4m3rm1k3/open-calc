@@ -106,7 +106,92 @@ inv(A)`,
         body: 'For invertible $A$:\n$$A^{-1} = \\frac{\\text{adj}(A)}{\\det(A)}$$\n\nFor $2 \\times 2$: $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: "Code: Cramer's Rule and the Adjugate",
+        mathBridge: "Cramer's Rule: x_i = det(A_i) / det(A) where A_i is A with column i replaced by b. The adjugate gives the explicit inverse formula A^{-1} = adj(A) / det(A). Both are practical for 2×2 and 3×3; use np.linalg.solve for larger systems.",
+        caption: "Implement Cramer's Rule from scratch and verify against NumPy.",
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: "Cramer's Rule implementation — step by step",
+              prose: [
+                "For a system Ax = b, x_i = det(A_i) / det(A) where A_i is A with column i replaced by b.",
+                "This is exact for small systems. For large n, it is exponentially slower than np.linalg.solve.",
+              ],
+              code: `import numpy as np
+
+def cramers_rule(A, b):
+    """Solve Ax = b using Cramer's Rule. Only practical for small n."""
+    n = len(b)
+    det_A = np.linalg.det(A)
+    if abs(det_A) < 1e-12:
+        raise ValueError("Matrix is singular — no unique solution")
+
+    x = np.zeros(n)
+    for i in range(n):
+        Ai = A.copy()
+        Ai[:, i] = b        # replace column i with b
+        x[i] = np.linalg.det(Ai) / det_A
+    return x
+
+# 3×3 system: 2x₁ + x₂ - x₃ = 8,  -3x₁ - x₂ + 2x₃ = -11,  -2x₁ + x₂ + 2x₃ = -3
+A = np.array([[2., 1., -1.],
+              [-3., -1., 2.],
+              [-2., 1., 2.]])
+b = np.array([8., -11., -3.])
+
+x_cramer = cramers_rule(A, b)
+x_solve  = np.linalg.solve(A, b)
+
+print("Cramer's Rule:", x_cramer.round(6))
+print("np.linalg.solve:", x_solve.round(6))
+print("Match:", np.allclose(x_cramer, x_solve))`,
+            },
+            {
+              id: 2,
+              cellTitle: "Adjugate inverse formula — A⁻¹ = adj(A) / det(A)",
+              prose: [
+                "The adjugate is the transpose of the cofactor matrix. For 2×2: adj([[a,b],[c,d]]) = [[d,-b],[-c,a]].",
+                "For larger matrices, compute cofactors by omitting each row and column. NumPy's inv() is faster, but adjugate is useful for symbolic computation.",
+              ],
+              code: `import numpy as np
+
+def adjugate_2x2(A):
+    """Adjugate of a 2×2 matrix: swap diagonal, negate off-diagonal."""
+    return np.array([[A[1,1], -A[0,1]],
+                     [-A[1,0], A[0,0]]])
+
+def adjugate_nxn(A):
+    """Adjugate of an n×n matrix via cofactor expansion."""
+    n = A.shape[0]
+    adj = np.zeros_like(A, dtype=float)
+    for i in range(n):
+        for j in range(n):
+            # Minor: delete row i, column j
+            minor = np.delete(np.delete(A, i, axis=0), j, axis=1)
+            # Cofactor: (-1)^(i+j) * det(minor)
+            adj[j, i] = ((-1)**(i+j)) * np.linalg.det(minor)  # adj is transposed
+    return adj
+
+A = np.array([[3., 1.], [2., 4.]])
+adj = adjugate_2x2(A)
+det_A = np.linalg.det(A)
+inv_formula = adj / det_A
+
+print("adj(A) / det(A):")
+print(inv_formula.round(6))
+print("np.linalg.inv(A):")
+print(np.linalg.inv(A).round(6))
+print("Match:", np.allclose(inv_formula, np.linalg.inv(A)))`,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {

@@ -117,6 +117,97 @@ export default {
         caption: 'How each row operation affects (or preserves) the determinant.',
       },
       {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Determinants — Computing and Verifying Properties',
+        mathBridge: 'MATLAB: `det(A)` computes the determinant for any size matrix. Verify the seven properties: det(AB) = det(A)·det(B), det(A^T) = det(A), row swap flips sign, triangular matrix = product of diagonal.',
+        caption: 'Three cells: cofactor expansion, property verification, and CNC coplanarity check.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Cofactor expansion and MATLAB det() — 3×3 verification',
+              prose: [
+                '`det(A)` in MATLAB uses LU decomposition internally — never cofactor expansion for large matrices. Use cofactor expansion by hand to understand the formula; use `det()` in practice.',
+              ],
+              code: `A = [2 -1 0; 3 2 1; 0 1 4];
+
+% MATLAB det()
+d = det(A);
+fprintf('det(A) via MATLAB = %g\\n', d)
+
+% Manual cofactor expansion along row 1
+% C11 = (+1) * det([[2 1],[1 4]]) = (+1)(8-1) = 7
+C11 = +( 2*4 - 1*1 );
+% C12 = (-1) * det([[3 1],[0 4]]) = (-1)(12-0) = -12
+C12 = -( 3*4 - 1*0 );
+% C13 = (+1) * det([[3 2],[0 1]]) = (+1)(3-0) = 3
+C13 = +( 3*1 - 2*0 );
+
+det_manual = A(1,1)*C11 + A(1,2)*C12 + A(1,3)*C13;
+fprintf('Manual cofactor expansion = %g\\n', det_manual)
+fprintf('Match: %d\\n', abs(det_manual - d) < 1e-10)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Verifying the seven determinant properties',
+              prose: [
+                'Each property has a geometric meaning. det(AB) = det(A)·det(B) means "composing two transformations multiplies their area-scaling factors." Row swap flips orientation.',
+              ],
+              code: `A = [2 1; 5 3];
+B = [1 0; 2 4];
+
+fprintf('--- Property 6: det(AB) = det(A)·det(B) ---\\n')
+fprintf('det(A)    = %g\\n', det(A))
+fprintf('det(B)    = %g\\n', det(B))
+fprintf('det(A*B)  = %g\\n', det(A*B))
+fprintf('det(A)*det(B) = %g\\n', det(A)*det(B))
+
+fprintf('\\n--- Property 7: det(A^T) = det(A) ---\\n')
+fprintf('det(A)   = %g\\n', det(A))
+fprintf("det(A')  = %g\\n", det(A'))
+
+fprintf('\\n--- Property 2: row swap flips sign ---\\n')
+A_swap = A([2 1], :);  % swap rows
+fprintf('det(A)        = %g\\n', det(A))
+fprintf('det(A swapped) = %g\\n', det(A_swap))
+
+fprintf('\\n--- Triangular matrix: det = product of diagonal ---\\n')
+T = [3 1 5; 0 2 4; 0 0 7];
+fprintf('det(T) via MATLAB = %g\\n', det(T))
+fprintf('3*2*7 = %g\\n', 3*2*7)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Application: CNC — checking if three tool paths span a volume',
+              prose: [
+                'A 3-axis CNC router follows three independent axis vectors. If the vectors are coplanar (det = 0), the machine cannot reach all points in 3D — one direction of motion is impossible.',
+                'This is the determinant test for 3D linear independence: are three motion directions truly independent?',
+              ],
+              code: `% Three axis direction vectors of a CNC machine
+% Good: X, Y, Z axes are orthogonal
+X_axis = [1; 0; 0];
+Y_axis = [0; 1; 0];
+Z_axis = [0; 0; 1];
+
+M_good = [X_axis, Y_axis, Z_axis];  % put as columns
+fprintf('Standard 3-axis setup:\\n')
+fprintf('  det = %g  (nonzero → 3D motion fully possible)\\n', det(M_good))
+
+% Degenerate: if Z-axis is tilted into the XY plane
+Z_flat = [0.5; 0.866; 0];  % lies in XY plane!
+M_bad = [X_axis, Y_axis, Z_flat];
+fprintf('\\nDegenerate (Z in XY plane):\\n')
+fprintf('  det = %.4f  (zero → cannot reach off-plane points)\\n', det(M_bad))
+
+% 5-axis CNC: add rotary axes A (around X) and C (around Z)
+% The 5-axis capability matrix would be 5x5
+% But checking the 3D translation axes is the critical constraint
+fprintf('\\nConclusion: det tests whether 3 motion axes span full 3D.\\n')`,
+            },
+          ]
+        }
+      },
+      {
         id: 'PythonNotebook',
         title: 'Code: 3×3 Determinants and Properties',
         mathBridge: 'np.linalg.det(A) handles matrices of any size — it uses LU decomposition internally. The cells below compute a 3×3 determinant both by hand (cofactor expansion) and numerically, then verify the seven properties.',
@@ -256,7 +347,23 @@ A = np.array([[2., 0., 1.],
       'The **Leibniz formula** gives an explicit closed form:\n\n$\\det(A) = \\sum_{\\sigma \\in S_n} \\text{sgn}(\\sigma) \\prod_{i=1}^{n} a_{i,\\sigma(i)}$\n\nwhere $S_n$ is the set of all $n!$ permutations of $\\{1, \\ldots, n\\}$ and $\\text{sgn}(\\sigma) = +1$ for even permutations, $-1$ for odd. For $n = 3$, $S_3$ has $3! = 6$ permutations — exactly the six terms in Sarrus\'s rule.',
       'Computational complexity: cofactor expansion runs in $O(n!)$ time — for $n = 20$, that is $2.4 \\times 10^{18}$ operations (one calculation per nanosecond would take 76 years). LU decomposition computes the determinant in $O(n^3)$ time: reduce to upper triangular, multiply diagonal entries, apply sign corrections for row swaps. For $n = 20$: 8,000 operations instead of $2.4 \\times 10^{18}$. This is why no practical software uses cofactor expansion for matrices larger than 3×3.',
     ],
-    callouts: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Axiomatic Definition of the Determinant',
+        body: 'The determinant is the unique function $\\det: \\mathbb{R}^{n \\times n} \\to \\mathbb{R}$ satisfying:\n\n1. **Multilinearity in each row**: if row $i$ is $c\\mathbf{u} + \\mathbf{v}$, then $\\det$ splits as $c\\det(A_u) + \\det(A_v)$\n2. **Antisymmetry**: swapping any two rows multiplies $\\det$ by $-1$\n3. **Normalization**: $\\det(I_n) = 1$\n\nEvery other property (cofactor expansion, multiplicativity, triangular matrix formula) is a theorem derived from these three axioms.',
+      },
+      {
+        type: 'proof',
+        title: 'Why det(AB) = det(A)·det(B)',
+        body: 'The function $f(B) = \\det(AB)$ satisfies the three axioms of a determinant as a function of $B$\'s rows, scaled by $\\det(A)$. By uniqueness of the determinant, $f(B) = \\det(A) \\cdot \\det(B)$.\n\nConsequence: if $A$ is invertible, $\\det(A) \\cdot \\det(A^{-1}) = \\det(AA^{-1}) = \\det(I) = 1$, so $\\det(A^{-1}) = 1/\\det(A)$.',
+      },
+      {
+        type: 'insight',
+        title: 'Computational Complexity — Why Cofactor Expansion Is Only for 3×3',
+        body: 'Cofactor expansion runs in $O(n!)$ time. For $n = 20$: $20! = 2.4 \\times 10^{18}$ operations. At $10^9$ operations/second, that is 76 years.\n\nLU decomposition computes the determinant in $O(n^3)$ time. For $n = 20$: $8{,}000$ operations. Same answer, in microseconds.\n\nThis is why `np.linalg.det()` and MATLAB\'s `det()` both use LU internally — never cofactor expansion for $n \\geq 4$.',
+      },
+    ],
     visualizations: [],
   },
 

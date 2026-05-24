@@ -25,38 +25,48 @@ export default {
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
     prose: [
-      '**Where you are in the story:** We spent Chapter 1 understanding vectors as static arrows living in a static space. But mathematics is about verbs, not just nouns. We want to actively warp, stretch, and rotate those spaces. For that, we need a mathematical "verb": the Matrix.',
-      'Until now, you may have learned that a matrix is just a grid of data—like a spreadsheet. That is the Computer Science view. The Geometric view is much more powerful: a matrix is a *function* that transforms space.',
-      'Think of a matrix as a machine. You feed it an input vector, it runs a spatial transformation, and it spits out a new, warped output vector.',
-      'However, a **Linear Transformation** has strict visual rules to prevent the space from wrinkling or tearing. Exactly two things must remain true after the space is warped:',
-      '1. The origin $(0,0)$ must remain absolutely fixed in place.',
-      '2. All straight lines must remain straight and evenly spaced. The grid can be stretched, rotated, or sheared, but it must remain a uniform grid.',
-      'Because the grid remains uniform, you don\'t need to track where every point goes. If you know exactly where the basis vectors $\\hat{i} = [1, 0]$ and $\\hat{j} = [0, 1]$ land after the transformation, you know where *everything* lands. The matrix is just a cheat sheet that records the new coordinates of $\\hat{i}$ and $\\hat{j}$.',
-      '**Where this is heading:** Once we grasp what ONE matrix does to a space, we will see what happens when we chain multiple matrices together (Matrix Multiplication), and what happens when we try to reverse them (Matrix Inverses).',
+      '**Where you are in the story:** Chapter 1 gave you static arrows living in a static space. Now we add verbs. We want to actively warp, stretch, rotate, and project those spaces. The mathematical verb is called a **matrix** — and it is the engine behind computer graphics, robotics, quantum mechanics, and your CNC machine.',
+      'You may have seen matrices before as grids of data — like a spreadsheet. That is the database view. The **geometric view** is far more powerful: a matrix is a *function* that transforms every point in space simultaneously.',
+      'Picture a rubber sheet covered in a grid. A matrix transformation grabs that sheet and stretches it, rotates it, or shears it into a new shape. Every point on the sheet moves with it. The key constraint of a **linear** transformation: the rubber sheet cannot crinkle, tear, or move the origin. Grid lines stay parallel and evenly spaced — just scaled, rotated, or skewed.',
+      '**The basis vector shortcut.** Because the grid stays uniform, you do not need to track where every point goes. Track only two points: where $\\hat{i} = [1,0]$ and $\\hat{j} = [0,1]$ land. Once you know those, every other point is forced — because every vector is a linear combination of $\\hat{i}$ and $\\hat{j}$, and the combination rules do not change under a linear transformation.',
+      '**The matrix is the cheat sheet.** A $2 \\times 2$ matrix stores exactly two pieces of information: the new coordinates of $\\hat{i}$ (first column) and the new coordinates of $\\hat{j}$ (second column). That is the whole secret.',
+      '**CNC machine connection — G68 coordinate rotation.** On a CNC milling machine, parts are sometimes clamped at an angle. Rather than rewriting every coordinate in the G-code program, the operator uses `G68` (Coordinate Rotation). The CNC controller secretly multiplies every tool position by a rotation matrix:\n\n$$\\begin{bmatrix}X\' \\\\ Y\'\\end{bmatrix} = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}\\begin{bmatrix}X \\\\ Y\\end{bmatrix}$$\n\nIf the part is clamped 5° off — the controller applies this matrix to every single move, invisibly rotating the entire work coordinate system. You write the G-code as if the part were perfectly aligned; the transformation matrix handles the rest.',
+      '**Where this is heading:** Once we understand what ONE matrix does to space, we chain matrices together (Matrix Multiplication) and ask whether transformations can be undone (Matrix Inverses).',
     ],
     callouts: [
       {
         type: 'sequencing',
-        title: 'Lesson 1 of 4 — Matrices & Transformations',
-        body: '**Previous (Phase 1):** The properties of static vectors and spans.\n**This lesson:** Matrices as active functions that stretch and warp space.\n**Next:** Chaining transformations together via Matrix Multiplication.',
+        title: 'Lesson 1 of LA2 — Matrices & Transformations',
+        body: '**Previous (LA1):** Static vectors, dot products, systems of equations, RREF.\n**This lesson:** Matrices as active functions that warp space — the "verb" to LA1\'s "nouns."\n**Next:** Matrix Multiplication — chaining two transformations into one.',
       },
       {
         type: 'insight',
         title: 'The Secret of the Columns',
-        body: 'The columns of a matrix tell you EXACTLY where the basis vectors $\\hat{i}$ and $\\hat{j}$ land. The first column is the new home of $\\hat{i}$. The second column is the new home of $\\hat{j}$. This is the most crucial insight in all of linear algebra.',
+        body: 'The columns of a matrix tell you **exactly** where the basis vectors $\\hat{i}$ and $\\hat{j}$ land:\n\n$$A = \\begin{bmatrix} | & | \\\\ \\hat{i}_{new} & \\hat{j}_{new} \\\\ | & | \\end{bmatrix}$$\n\nThis is the most crucial insight in all of linear algebra. Read every matrix you encounter this way from now on.',
+      },
+      {
+        type: 'definition',
+        title: 'What Makes a Transformation "Linear"?',
+        body: 'Exactly two rules must hold for all vectors $\\mathbf{u}, \\mathbf{v}$ and scalars $c$:\n\n1. **Additivity:** $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$\n2. **Homogeneity:** $T(c\\mathbf{v}) = cT(\\mathbf{v})$\n\nTogether these imply $T(\\mathbf{0}) = \\mathbf{0}$ — the origin stays fixed. Any transformation that moves the origin (like "add 2 to every x-coordinate") is **not** linear (it is called affine).',
       },
       {
         type: 'warning',
-        title: 'Not all curves are linear',
-        body: 'A transformation that bends the axes into waves or shifts the origin (like adding +2 to all X coordinates) is NOT a linear transformation.',
+        title: 'Affine vs. Linear — A Critical Distinction',
+        body: 'CNC work offsets (G54, G55) **translate** the origin — they shift every coordinate by a constant amount. That is an **affine** transformation, not a linear one. G68 coordinate rotation **is** linear — it preserves the origin. In robotics and computer graphics, the standard workaround is homogeneous coordinates: embed the 2D plane in 3D and represent translations as matrix multiplications.',
       },
     ],
     visualizations: [
       {
         id: 'LALesson04_Matrices',
-        title: 'Warping the Grid',
-        mathBridge: 'Observe the standard grid. The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the matrix buttons below the visualization to apply different transformations (like Shear or Rotate). Watch how the entire pink grid morphs. Notice that the final coordinates of the red and green arrows perfectly match the columns of the matrix you applied.',
-        caption: 'A linear transformation morphs the entire plane uniformly, dictated entirely by where the basis vectors land.',
+        title: 'Warping the Grid — Interactive',
+        mathBridge: 'The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the transformation buttons (Shear, Rotate, Scale, Reflect) and watch the entire grid morph. At all times, the final coordinates of the red and green arrows equal the first and second columns of the matrix that was applied. The grid stays a uniform grid — no crinkles, no tears.',
+        caption: 'A linear transformation is completely determined by where it sends the two basis vectors.',
+      },
+      {
+        id: 'BasisVectorProof',
+        title: 'Why Columns Equal Basis Vector Destinations',
+        mathBridge: 'This visualization proves the column secret geometrically. Set $\\mathbf{v} = 1 \\cdot \\hat{i} + 0 \\cdot \\hat{j}$, then apply a transformation $A$. By linearity, $A\\hat{i} = 1 \\cdot (\\text{first column})$. Drag the sliders to see how any vector is just a scaled sum of the two column vectors.',
+        caption: 'The linear combination law forces column 1 = destination of î, column 2 = destination of ĵ.',
       },
     ],
   },
@@ -85,6 +95,134 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Matrices as Transformations',
+        mathBridge: 'MATLAB uses `*` for matrix multiplication and `[a b; c d]` syntax for 2×2 matrices. The columns of A tell you where î and ĵ go — verify this directly by multiplying A by [1;0] and [0;1].',
+        caption: 'Four cells: matrix-vector multiply, common transforms, rotation derivation, and CNC G68.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Matrix-vector multiply — columns are destination of basis vectors',
+              prose: [
+                'In MATLAB/Octave, `*` multiplies matrices and vectors. A column vector is `[x; y]` (semicolons separate rows).',
+                'The first column of A is where î = [1;0] goes. The second column is where ĵ = [0;1] goes. Verify this directly — multiply A by each basis vector.',
+              ],
+              code: `% 90° counter-clockwise rotation matrix
+A = [0 -1; 1 0];
+
+% Where does i-hat land?
+i_hat = [1; 0];
+disp('A * i-hat ='); disp(A * i_hat)   % should be [0; 1]
+
+% Where does j-hat land?
+j_hat = [0; 1];
+disp('A * j-hat ='); disp(A * j_hat)   % should be [-1; 0]
+
+% Apply to an arbitrary vector v = [3; 1]
+v = [3; 1];
+w = A * v;
+fprintf('v = [%g; %g]  -->  Av = [%g; %g]\\n', v(1),v(2), w(1),w(2))
+
+% Verify via linear combination: 3*(col1) + 1*(col2)
+verify = 3*A(:,1) + 1*A(:,2);
+disp('Linear combination check:'); disp(verify)`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Common 2D transformations — all defined by their columns',
+              prose: [
+                'Every possible 2×2 matrix is some transformation. These are the geometric classics. For each one, figure out where î and ĵ go — that tells you the columns.',
+              ],
+              code: `% The four famous 2D transformation types
+v = [2; 1];
+
+% Horizontal shear: i-hat stays, j-hat slides to [1;1]
+shear = [1 1; 0 1];
+fprintf('Shear [2;1] --> [%g;%g]\\n', shear*v)
+
+% Reflection over x-axis: i-hat stays, j-hat flips
+reflect_x = [1 0; 0 -1];
+fprintf('Reflect x-axis [2;1] --> [%g;%g]\\n', reflect_x*v)
+
+% Uniform scale 2x: both basis vectors double
+scale2 = [2 0; 0 2];
+fprintf('Scale 2x [2;1] --> [%g;%g]\\n', scale2*v)
+
+% Projection onto x-axis: j-hat goes to zero
+proj_x = [1 0; 0 0];
+fprintf('Project x-axis [2;1] --> [%g;%g]\\n', proj_x*v)
+
+% Squish: stretch x, compress y
+squish = [3 0; 0 0.5];
+fprintf('Squish [2;1] --> [%g;%g]\\n', squish*v)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Rotation matrix — derived from tracking basis vectors',
+              prose: [
+                'Where does î = [1,0] go after rotating by angle θ? To [cos θ, sin θ]. Where does ĵ = [0,1] go? To [−sin θ, cos θ]. Paste those into the columns and you have the rotation matrix.',
+                'The unit circle property: rotation is length-preserving. Every column has magnitude 1. The two columns are perpendicular.',
+              ],
+              code: `theta_deg = 45;
+theta = theta_deg * pi / 180;
+
+% Rotation matrix built from where i-hat and j-hat go
+R = [cos(theta)  -sin(theta);
+     sin(theta)   cos(theta)];
+
+fprintf('Rotation matrix for %g degrees:\\n', theta_deg)
+disp(R)
+
+% Apply to unit vectors
+i_new = R * [1; 0];
+j_new = R * [0; 1];
+fprintf('i-hat lands at [%.4f, %.4f]\\n', i_new(1), i_new(2))
+fprintf('j-hat lands at [%.4f, %.4f]\\n', j_new(1), j_new(2))
+
+% Verify rotation preserves lengths
+fprintf('|R*i| = %.6f  (should be 1)\\n', norm(i_new))
+fprintf('|R*j| = %.6f  (should be 1)\\n', norm(j_new))
+fprintf('Dot product of columns: %.6f  (should be 0)\\n', dot(R(:,1), R(:,2)))`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC G68 coordinate rotation',
+              prose: [
+                'A machinist clamps a part at 5° off-axis. Rather than rewriting hundreds of G-code coordinates, they use G68 (Coordinate Rotation). The CNC controller silently pre-multiplies every tool position by a rotation matrix.',
+                'Here we simulate that: original G-code coordinates → rotation matrix → corrected machine positions.',
+              ],
+              code: `% CNC part is clamped 5 degrees off-axis
+theta = 5 * pi / 180;
+
+% G68 rotation matrix (same formula as above)
+R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
+
+% G-code tool path (as if the part were perfectly aligned)
+% G01 X10 Y0, X10 Y5, X0 Y5, X0 Y0
+path_program = [10 0; 10 5; 0 5; 0 0]';  % columns are points
+
+% Apply rotation to each point
+path_machine = R * path_program;
+
+fprintf('%-20s %-20s\\n', 'Programmed (X,Y)', 'Machine actual (X,Y)')
+fprintf('%-20s %-20s\\n', '-------------------', '-------------------')
+for k = 1:size(path_program,2)
+    fprintf('[%.3f, %.3f]       --> [%.3f, %.3f]\\n', ...
+        path_program(1,k), path_program(2,k), ...
+        path_machine(1,k), path_machine(2,k))
+end
+
+% Maximum positional error if you DIDN'T apply the rotation
+raw_pt = path_program(:,2);  % [10; 5]
+corrected_pt = path_machine(:,2);
+error = norm(raw_pt - corrected_pt);
+fprintf('\\nMax positional error without G68: %.4f mm\\n', error)`,
+            },
+          ]
+        }
+      },
       {
         id: 'PythonNotebook',
         title: 'Code: Matrices as Transformations',
@@ -185,14 +323,42 @@ v = np.array([4.0, 2.0])
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'Formally, a transformation $T: V \\to W$ is defined as "Linear" if and only if it satisfies two specific properties for all vectors $\\vec{u}, \\vec{v}$ and all scalars $c$:',
-      '1. Additivity: $T(\\vec{u} + \\vec{v}) = T(\\vec{u}) + T(\\vec{v})$',
-      '2. Homogeneity: $T(c\\vec{v}) = cT(\\vec{v})$',
-      'These two rules mathematically guarantee that grid lines remain straight and evenly spaced, and that the origin stays at the origin (since $T(0\\vec{v}) = 0T(\\vec{v}) = \\vec{0}$).',
-      'Every single linear transformation between finite-dimensional vector spaces can be represented as a matrix multiplication, and every matrix multiplication represents a linear transformation. They are completely isomorphic concepts.',
+      '**Formal definition of a linear map.** A function $T: V \\to W$ between vector spaces is called a **linear transformation** (or linear map) if and only if for all $\\mathbf{u}, \\mathbf{v} \\in V$ and all scalars $c$:\n\n1. **Additivity:** $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$\n2. **Homogeneity:** $T(c\\mathbf{v}) = cT(\\mathbf{v})$\n\nCombining these: $T(c\\mathbf{u} + d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for all scalars $c, d$. By induction, $T$ preserves arbitrary linear combinations: $T\\bigl(\\sum_i c_i \\mathbf{v}_i\\bigr) = \\sum_i c_i T(\\mathbf{v}_i)$.',
+      '**Matrix representation theorem.** The critical fact: every linear transformation $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ is uniquely represented by an $m \\times n$ matrix $A$ such that $T(\\mathbf{x}) = A\\mathbf{x}$ for all $\\mathbf{x}$. How do we find $A$? Apply $T$ to each standard basis vector $\\mathbf{e}_j$ and make the results the columns of $A$:\n\n$$A = \\begin{bmatrix} T(\\mathbf{e}_1) & T(\\mathbf{e}_2) & \\cdots & T(\\mathbf{e}_n) \\end{bmatrix}$$\n\nThis is the deepest reason the columns of a matrix are the destinations of the basis vectors.',
+      '**Proof sketch.** For any $\\mathbf{x} = x_1 \\mathbf{e}_1 + \\cdots + x_n \\mathbf{e}_n$:\n\n$$T(\\mathbf{x}) = T(x_1 \\mathbf{e}_1 + \\cdots + x_n \\mathbf{e}_n) = x_1 T(\\mathbf{e}_1) + \\cdots + x_n T(\\mathbf{e}_n) = A\\mathbf{x}$$\n\nThe first equality uses the representation in the standard basis. The second uses linearity. The third uses the definition $A = [T(\\mathbf{e}_1) \\cdots T(\\mathbf{e}_n)]$.',
+      '**The space of linear maps.** The set of all linear maps $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ forms a vector space (called $\\mathcal{L}(\\mathbb{R}^n, \\mathbb{R}^m)$ or $\\text{Hom}(\\mathbb{R}^n, \\mathbb{R}^m)$), isomorphic to $\\mathbb{R}^{m \\times n}$. The identification $T \\leftrightarrow A$ is a linear isomorphism. This is the formal statement that matrices and linear maps are the same thing.',
+      '**Kernel and image.** For $T: V \\to W$, the **kernel** (null space) is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}\\}$. The **image** (column space) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\}$. Both are subspaces. The Rank-Nullity theorem (LA1-006 preview) states $\\dim(\\ker T) + \\dim(\\text{im}\\, T) = \\dim(V) = n$. The image of $A$ is exactly the span of $A$\'s columns — this is why column space matters.',
     ],
-    callouts: [],
-    visualizations: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Matrix Representation of Linear Maps',
+        body: '**Theorem:** Every linear map $T: \\mathbb{R}^n \\to \\mathbb{R}^m$ has a unique matrix representation $A \\in \\mathbb{R}^{m \\times n}$ with $A_{ij} = [T(\\mathbf{e}_j)]_i$ (the $i$-th component of where the $j$-th basis vector goes).\n\n**Corollary:** The set of $m \\times n$ matrices is in bijection with the set of linear maps $\\mathbb{R}^n \\to \\mathbb{R}^m$. Matrix multiplication corresponds to function composition.',
+      },
+      {
+        type: 'proof',
+        title: 'The Origin Must Be Fixed',
+        body: 'For any linear map $T$, $T(\\mathbf{0}) = T(0 \\cdot \\mathbf{0}) = 0 \\cdot T(\\mathbf{0}) = \\mathbf{0}$ by homogeneity. So $T(\\mathbf{0}) = \\mathbf{0}$ — the origin is always a fixed point of any linear transformation. A transformation that moves the origin (e.g., $f(\\mathbf{x}) = A\\mathbf{x} + \\mathbf{b}$ with $\\mathbf{b} \\neq \\mathbf{0}$) is called affine, not linear.',
+      },
+      {
+        type: 'insight',
+        title: 'Image = Column Space',
+        body: 'The image of $T(\\mathbf{x}) = A\\mathbf{x}$ is the set of all possible outputs: $\\{A\\mathbf{x} : \\mathbf{x} \\in \\mathbb{R}^n\\}$. Expanding: $A\\mathbf{x} = x_1\\mathbf{a}_1 + \\cdots + x_n\\mathbf{a}_n$ where $\\mathbf{a}_j$ are the columns of $A$. So the image is exactly $\\text{span}(\\mathbf{a}_1, \\ldots, \\mathbf{a}_n)$ — the **column space** of $A$.\n\nIn other words: the columns of the matrix span the entire set of possible outputs.',
+      },
+      {
+        type: 'warning',
+        title: 'Composition Order Matters — Matrices Do Not Commute',
+        body: 'Composing two linear maps corresponds to multiplying their matrices. But $AB \\neq BA$ in general — matrix multiplication is **not** commutative.\n\nGeometrically: "first rotate, then shear" gives a different result than "first shear, then rotate." Order matters because you are applying transformations to an already-warped space.',
+      },
+    ],
+    visualizations: [
+      {
+        id: 'ProjectionMatrixViz',
+        title: 'Projection — A Linear Map That Loses Information',
+        mathBridge: 'Projection onto a line is a linear transformation whose matrix has rank 1. Drag the input vector and see it collapse onto the projection axis. The kernel (null space) consists of all vectors perpendicular to the projection direction — they map to zero. This visualizes both kernel and image for a concrete linear map.',
+        caption: 'A rank-1 matrix collapses the plane onto a line. Many inputs share the same output — the kernel is all vectors perpendicular to the projection axis.',
+      },
+    ],
   },
 
   // ── Examples ───────────────────────────────────────────────────

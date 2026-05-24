@@ -24,6 +24,7 @@ export default {
       'Think about stretching a rubber sheet along two perpendicular axes — say, horizontally and vertically. Draw any diagonal line on the sheet. After the stretch, that diagonal gets rotated to a new angle. But the two lines you pulled along (horizontal and vertical) do not rotate at all — they only get longer or shorter. Those are the eigenvectors of the stretch.',
       'For a 3D rotation around an axis (like the Earth rotating around its polar axis), the rotation axis itself is an eigenvector — it does not move at all under the rotation. Its eigenvalue is $\\lambda = 1$, meaning it is scaled by a factor of 1 (not stretched or squished, just left alone).',
       'The equation that captures this is beautifully compact:\n\n$A\\mathbf{v} = \\lambda\\mathbf{v}$\n\nMatrix multiplication on the left equals scalar multiplication on the right. The vector $\\mathbf{v}$ is treated identically whether $A$ acts on it as a full transformation or $\\lambda$ scales it as a plain number. That equivalence is what makes eigenvectors special.',
+      '**CNC machine resonance — eigenvalues determine danger zones.** A CNC machine frame is a physical structure with mass and stiffness. The equation of motion for the frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$, where $M$ is the mass matrix and $K$ is the stiffness matrix. The natural vibration frequencies of the machine are $\\omega_i = \\sqrt{\\lambda_i}$, where $\\lambda_i$ are eigenvalues of $M^{-1}K$. The eigenvectors are the **mode shapes** — which parts of the machine shake in which direction for each frequency.\n\nWhy this matters: if the spindle rotation frequency matches a natural frequency (an eigenvalue), the machine enters resonance and you get **chatter** — violent vibration that destroys surface finish and can break tools. A machine shop engineer consults a Frequency Response Function (FRF) — essentially a plot of eigenvalues — to choose spindle speeds that stay away from the danger zones.',
       '**Where this is heading:** Eigenvectors are the natural axes of a transformation — the directions where everything is simplest. In the very next lesson, you will rebuild your entire coordinate system so the $x$- and $y$-axes align with the eigenvectors. When you do, the complicated matrix $A$ becomes a beautiful diagonal matrix where the only non-zero entries are the eigenvalues themselves.',
     ],
     callouts: [
@@ -84,6 +85,129 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Finding Eigenvalues and Eigenvectors',
+        mathBridge: 'MATLAB: `eig(A)` returns eigenvalues as a vector; `[V, D] = eig(A)` returns eigenvectors V (columns) and diagonal eigenvalue matrix D. `poly(A)` gives the characteristic polynomial coefficients. `trace(A)` and `det(A)` verify the eigenvalue sum and product.',
+        caption: 'Four cells: computing eigenpairs, verifying Av=λv, characteristic polynomial, and CNC resonance frequency analysis.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'eig() — computing and verifying eigenpairs',
+              prose: [
+                '`[V, D] = eig(A)` returns eigenvectors as columns of V, eigenvalues on the diagonal of D.',
+                'Verify the defining equation Av = λv for each pair. Also check: trace = sum of eigenvalues, det = product.',
+              ],
+              code: `A = [4 2; 1 3];  % 2×2 asymmetric matrix
+
+[V, D] = eig(A);
+lambda = diag(D);
+
+fprintf('Eigenvalues: [%g, %g]\\n', lambda(1), lambda(2))
+fprintf('Eigenvectors (columns of V):\\n'); disp(V)
+
+% Verify Av = λv for each eigenpair
+for k = 1:2
+    lam = lambda(k);
+    v = V(:,k);
+    Av = A * v;
+    lv = lam * v;
+    fprintf('λ=%g: A*v = [%.4f; %.4f],  λ*v = [%.4f; %.4f],  match=%d\\n', ...
+        lam, Av(1), Av(2), lv(1), lv(2), norm(Av-lv)<1e-10)
+end
+
+% Sanity checks
+fprintf('\\ntrace(A) = %g = sum of eigenvalues = %g\\n', trace(A), sum(lambda))
+fprintf('det(A)   = %g = product of eigenvalues = %g\\n', det(A), prod(lambda))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Characteristic polynomial — finding roots manually',
+              prose: [
+                'The characteristic polynomial is det(A - λI). For a 2×2 matrix: p(λ) = λ² - trace(A)·λ + det(A).',
+                'MATLAB\'s `poly(A)` returns the coefficients of the characteristic polynomial [1, -trace, det].',
+              ],
+              code: `A = [4 2; 1 3];
+
+% MATLAB poly() gives characteristic polynomial coefficients
+coeffs = poly(A);
+fprintf('Characteristic polynomial coefficients: [%g, %g, %g]\\n', coeffs(1), coeffs(2), coeffs(3))
+fprintf('p(λ) = λ² + (%g)λ + (%g)\\n', coeffs(2), coeffs(3))
+
+% Find roots (= eigenvalues) of the polynomial
+eigenvalues_from_poly = roots(coeffs);
+fprintf('Eigenvalues from polynomial roots: [%g, %g]\\n', eigenvalues_from_poly(1), eigenvalues_from_poly(2))
+
+% Direct computation
+eigs_direct = eig(A);
+fprintf('Eigenvalues from eig():           [%g, %g]\\n', eigs_direct(1), eigs_direct(2))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Power iteration — finding the dominant eigenvector',
+              prose: [
+                'The simplest eigenvector algorithm: start with a random vector and repeatedly multiply by A, normalizing each time. It converges to the eigenvector with the largest eigenvalue (the "dominant" eigenvector).',
+                'Google\'s PageRank was originally a power iteration on a web graph matrix.',
+              ],
+              code: `A = [4 2; 1 3];
+[V_true, D] = eig(A);
+
+% Which eigenvalue is dominant (largest magnitude)?
+[lambda_max, idx] = max(abs(diag(D)));
+v_true = V_true(:, idx);  % normalize
+v_true = v_true / norm(v_true);
+
+fprintf('True dominant eigenvector: [%.4f; %.4f]  (λ=%.4f)\\n', ...
+    v_true(1), v_true(2), lambda_max)
+
+% Power iteration
+x = rand(2,1);  x = x/norm(x);  % random start, normalized
+fprintf('\\nPower iteration:\\n')
+for iter = 1:10
+    x_new = A * x;
+    lambda_est = norm(x_new);   % eigenvalue estimate
+    x = x_new / lambda_est;     % normalize
+    if mod(iter, 2) == 0
+        fprintf('  iter %2d: x=[%.6f; %.6f], λ≈%.6f\\n', iter, x(1), x(2), lambda_est)
+    end
+end`,
+            },
+            {
+              id: 4,
+              cellTitle: 'Application: CNC frame resonance — eigenvalues as natural frequencies',
+              prose: [
+                'The natural vibration frequencies of a CNC machine frame are ω_i = sqrt(λ_i), where λ_i are eigenvalues of the mass-normalized stiffness matrix M⁻¹K.',
+                'Spindle speeds that match these frequencies cause resonance (chatter). Engineers plot these as "danger zones" and choose spindle RPM to stay between them.',
+              ],
+              code: `% Simplified 2-DOF CNC frame model
+% M = mass matrix (kg), K = stiffness matrix (N/m)
+M = [5 0; 0 3];       % diagonal mass (simplified: decoupled masses)
+K = [1e5  -2e4;       % stiffness: gantry coupling
+    -2e4   8e4];
+
+% Eigenvalue problem: K*v = λ*M*v  (generalized eigen problem)
+% Reduce to standard: M^{-0.5} * K * M^{-0.5}
+M_inv = inv(M);
+A_sys = M_inv * K;    % M^{-1} K for simplified case
+[V, D] = eig(A_sys);
+
+lambda = sort(diag(D));  % eigenvalues = ω² (rad/s)²
+omega = sqrt(lambda);    % natural frequencies (rad/s)
+freq_Hz = omega / (2*pi); % convert to Hz
+
+fprintf('Natural frequencies of CNC frame:\\n')
+for k = 1:length(freq_Hz)
+    rpm = freq_Hz(k) * 60;
+    fprintf('  Mode %d: %.1f Hz  (danger zone at %g RPM spindle speed)\\n', k, freq_Hz(k), rpm)
+end
+
+fprintf('\\nChatter avoidance: choose spindle speed NOT in [%.0f, %.0f] RPM\\n', ...
+    freq_Hz(1)*60*0.9, freq_Hz(end)*60*1.1)`,
+            },
+          ]
+        }
+      },
       {
         id: 'CharacteristicPolynomialViz',
         title: 'The Characteristic Polynomial',
@@ -212,12 +336,22 @@ A = np.array([[5., 2.],
       {
         type: 'definition',
         title: 'Algebraic vs. Geometric Multiplicity',
-        body: '**Algebraic multiplicity:** power of $(\\lambda - \\lambda_0)$ in characteristic polynomial.\n\n**Geometric multiplicity:** $\\dim(\\text{null}(A - \\lambda_0 I))$ — how many linearly independent eigenvectors exist for $\\lambda_0$.\n\nGeometric $\\leq$ Algebraic always.',
+        body: '**Algebraic multiplicity** of $\\lambda_0$: the power of $(\\lambda - \\lambda_0)$ as a factor of the characteristic polynomial $\\det(A - \\lambda I)$.\n\n**Geometric multiplicity** of $\\lambda_0$: $\\dim(\\text{null}(A - \\lambda_0 I))$ — the number of linearly independent eigenvectors.\n\nGeometric $\\leq$ Algebraic always. A matrix is **defective** if geometric < algebraic for any eigenvalue.',
       },
       {
         type: 'theorem',
-        title: 'Eigenvectors from Distinct Eigenvalues',
-        body: 'Eigenvectors corresponding to distinct (different) eigenvalues are always linearly independent.',
+        title: 'Eigenvectors from Distinct Eigenvalues Are Independent',
+        body: 'If $\\lambda_1, \\ldots, \\lambda_k$ are distinct eigenvalues of $A$ with corresponding eigenvectors $\\mathbf{v}_1, \\ldots, \\mathbf{v}_k$, then $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$ is linearly independent.\n\n**Proof sketch:** Suppose $\\sum c_i \\mathbf{v}_i = \\mathbf{0}$. Multiply by $\\prod_{j\\neq 1}(A - \\lambda_j I)$ on the left — this annihilates all terms except the first. Conclude $c_1 = 0$. Repeat for each $c_i$.',
+      },
+      {
+        type: 'theorem',
+        title: 'The Cayley-Hamilton Theorem',
+        body: 'Every square matrix satisfies its own characteristic equation. If $p(\\lambda) = \\det(A - \\lambda I)$ is the characteristic polynomial, then $p(A) = 0$ (the zero matrix).\n\nFor $2 \\times 2$: if $\\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = 0$ is the characteristic equation, then $A^2 - \\text{tr}(A)A + \\det(A)I = 0$.\n\nThis lets you express $A^2$ (and all higher powers) in terms of $A$ and $I$ — a powerful simplification.',
+      },
+      {
+        type: 'insight',
+        title: 'Similar Matrices Share Eigenvalues',
+        body: 'If $B = P^{-1}AP$, then:\n\n$\\det(B - \\lambda I) = \\det(P^{-1}AP - \\lambda I) = \\det(P^{-1}(A-\\lambda I)P) = \\det(A - \\lambda I)$\n\nSo $A$ and $B$ have identical characteristic polynomials and identical eigenvalues. **Change of basis does not change eigenvalues.** This is why eigenvalues are called "intrinsic" properties of a linear map.',
       },
     ],
     visualizations: [],

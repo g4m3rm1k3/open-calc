@@ -95,6 +95,101 @@ export default {
         caption: 'The cross product generates a vector whose length equals the swept area.',
       },
       {
+        id: 'OpenMatNotebook',
+        title: 'Dot and Cross Products in OpenMAT / MATLAB',
+        mathBridge: 'MATLAB\'s dot(u,v) computes the component-wise sum of products — it IS the dot product. For angle recovery: acos(dot(u,v)/(norm(u)*norm(v))) gives θ in radians; wrap in rad2deg() to convert. cross(u,v) only works for 3-element vectors in MATLAB. These three functions cover every dot/cross computation you will encounter in your coursework.',
+        caption: 'OpenMAT mirrors real MATLAB. Learn the functions here; they are identical in class.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'dot() — the alignment test',
+              prose: [
+                '`dot(u, v)` multiplies corresponding components and sums them: u₁v₁ + u₂v₂ + … It returns a single scalar.',
+                'The sign tells you the relationship immediately: positive = same half-space (angle < 90°), zero = perpendicular, negative = opposite half-space (angle > 90°). This is the fastest orthogonality test in linear algebra.',
+              ],
+              code: `u = [1; 0];   % points right (x-axis)
+v = [0; 1];   % points up (y-axis)
+w = [1; 1];   % points at 45 degrees
+
+disp('u · v (right dot up — should be 0, they are perpendicular):')
+dot(u, v)
+
+disp('u · w (right dot diagonal — should be positive, same half-space):')
+dot(u, w)
+
+disp('u · (-u) (vector dot its opposite — should be negative):')
+dot(u, -u)
+
+% Self-dot: v · v = ‖v‖²
+disp('w · w = ‖w‖² = 2:')
+dot(w, w)
+norm(w)^2`,
+            },
+            {
+              id: 2,
+              cellTitle: 'acos and rad2deg — finding the angle',
+              prose: [
+                'Rearranging the geometric formula gives cos(θ) = dot(u,v) / (norm(u)*norm(v)). Then θ = acos(…).',
+                '`acos()` returns radians in MATLAB. `rad2deg()` converts to degrees. Always check: a 90° angle should give dot product zero — use this as your sanity check.',
+              ],
+              code: `a = [4; 3];
+b = [1; 0];
+
+% Step 1: compute the dot product
+d = dot(a, b)
+
+% Step 2: compute both magnitudes
+na = norm(a)
+nb = norm(b)
+
+% Step 3: cos(theta) = dot / (norm * norm)
+cos_theta = d / (na * nb)
+
+% Step 4: take acos, convert to degrees
+theta_rad = acos(cos_theta)
+theta_deg = rad2deg(theta_rad)
+
+% Application: check two vectors for orthogonality
+p = [6; -3];  q = [1; 2];
+disp('p · q (should be 0 — they are perpendicular):')
+dot(p, q)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'cross() — perpendicular vector and area (3D)',
+              prose: [
+                '`cross(u, v)` is only defined for 3-element vectors in MATLAB. It returns a new 3D vector perpendicular to both inputs. Its magnitude equals the area of the parallelogram spanned by u and v.',
+                'The anti-commutativity rule: cross(v, u) = -cross(u, v). Order matters!',
+              ],
+              code: `% Two vectors in the XY plane
+u = [3; 0; 0];   % along x-axis
+v = [0; 4; 0];   % along y-axis
+
+% Cross product: should point straight up (z-direction)
+result = cross(u, v)
+
+% Its magnitude = area of the parallelogram = 3 * 4 = 12
+norm(result)
+
+% Perpendicularity check: result must be orthogonal to both u and v
+dot(result, u)
+dot(result, v)
+
+% Anti-commutativity: flip order, flip sign
+cross(v, u)
+
+% Application: find normal to a plane through three points
+% Points: P1=(1,0,0), P2=(0,1,0), P3=(0,0,1)
+P1 = [1;0;0];  P2 = [0;1;0];  P3 = [0;0;1];
+edge1 = P2 - P1;
+edge2 = P3 - P1;
+normal = cross(edge1, edge2)`,
+            },
+          ],
+        },
+      },
+      {
         id: 'PythonNotebook',
         title: 'Code: Dot Product, Angle, Cross Product',
         mathBridge: 'np.dot(a, b) = Σ aᵢbᵢ. Angle: θ = arccos(a·b / (‖a‖‖b‖)). Cross product (3D only): np.cross(a, b). Its magnitude = area of parallelogram = ‖a‖‖b‖ sin θ.',
@@ -182,10 +277,22 @@ b = np.array([3.0, 3.0])
   // ── Rigor ──────────────────────────────────────────────────────
   rigor: {
     prose: [
-      'In advanced mathematics, the "Dot Product" is just one specific example of a generalized concept called an **Inner Product**. An inner product space is a vector space equipped with an operation $\\langle u, v \\rangle$ that satisfies symmetry, linearity in the first argument, and positive-definiteness.',
-      'Believe it or not, you can define an inner product for functions instead of arrows. For two functions $f(x)$ and $g(x)$, you can define their inner product as the integral $\\int f(x)g(x)dx$. If this integral evaluates to 0, mathematicians say the two functions are "orthogonal" to each other! This mind-bending concept is the entire foundation of Fourier Series and quantum mechanics—treating continuous waves as if they were perpendicular arrows in an infinite-dimensional space.',
+      '**Inner Products: the generalization.** In advanced mathematics, the dot product is one instance of a broader structure called an **inner product**. Formally, an inner product on a vector space $V$ over $\\mathbb{R}$ is a function $\\langle \\cdot, \\cdot \\rangle : V \\times V \\to \\mathbb{R}$ satisfying three axioms: (1) **Symmetry**: $\\langle u, v \\rangle = \\langle v, u \\rangle$. (2) **Linearity in the first argument**: $\\langle c u + w, v \\rangle = c\\langle u, v \\rangle + \\langle w, v \\rangle$. (3) **Positive-definiteness**: $\\langle v, v \\rangle > 0$ for all $v \\neq \\mathbf{0}$, and $\\langle \\mathbf{0}, \\mathbf{0} \\rangle = 0$. Any operation satisfying these three rules defines a valid notion of "angle" and "perpendicularity" in that space.',
+      '**Orthogonal functions.** You can define an inner product for functions: for $f, g \\in C[a,b]$ (continuous functions on $[a,b]$), set $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. When this integral equals zero, $f$ and $g$ are called **orthogonal** — they carry zero shared information. The functions $\\sin(nx)$ and $\\cos(mx)$ are mutually orthogonal under this inner product, which is why Fourier series can decompose any periodic signal into a sum of sines and cosines without interference. Every frequency is a separate, independent "direction" in function space.',
+      '**The Cauchy-Schwarz inequality.** For any inner product space, $|\\langle u, v \\rangle| \\leq \\|u\\| \\cdot \\|v\\|$. This is equivalent to saying $|\\cos\\theta| \\leq 1$ always — the geometric claim that no projection can be longer than the original vector. The inequality is tight only when $u$ and $v$ are parallel ($\\theta = 0°$ or $180°$). In data science, this bound on the correlation coefficient $r = \\frac{\\langle u,v \\rangle}{\\|u\\|\\|v\\|}$ comes directly from Cauchy-Schwarz.',
     ],
-    callouts: [],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Cauchy-Schwarz Inequality',
+        body: 'For any vectors in an inner product space: $|\\langle u, v \\rangle| \\leq \\|u\\| \\cdot \\|v\\|$. Equivalently: $|u \\cdot v| \\leq \\|u\\| \\|v\\|$, or $|\\cos\\theta| \\leq 1$. Equality holds if and only if $u$ and $v$ are linearly dependent (one is a scalar multiple of the other).',
+      },
+      {
+        type: 'insight',
+        title: 'Why sin for the Cross Product?',
+        body: 'The dot product uses cosθ, measuring how much the vectors align. The cross product uses sinθ, measuring how much they *diverge*. When θ = 90°, sin is maximum (1) — completely perpendicular vectors form the largest parallelogram. When θ = 0° or 180°, sin = 0 — parallel vectors form a flat parallelogram with zero area. The two formulas are complementary: dot + cross together capture the full geometric relationship.',
+      },
+    ],
     visualizations: [],
   },
 

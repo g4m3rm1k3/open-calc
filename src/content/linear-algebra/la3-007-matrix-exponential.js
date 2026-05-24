@@ -20,6 +20,7 @@ export default {
       '**It solves the matrix ODE.** Check: if $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$, then $\\dot{\\mathbf{x}} = \\frac{d}{dt}e^{At}\\mathbf{x}_0 = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$. The matrix exponential is the unique solution.',
       '**Computing via diagonalization.** If $A = PDP^{-1}$ (diagonal $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$), then:\n\n$e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$\n\nThis works because $(PDP^{-1})^k = PD^kP^{-1}$, and $e^D$ of a diagonal matrix is just the exponential of each diagonal entry.',
       '**What the eigenvalues tell you about stability.** The behavior of $e^{At}$ as $t \\to \\infty$ is governed entirely by the eigenvalues of $A$. If all eigenvalues have negative real part (Re$(\\lambda) < 0$ for all $\\lambda$): all solutions decay to zero — the system is **stable**. If any eigenvalue has positive real part: solutions blow up — the system is **unstable**. If eigenvalues are purely imaginary: solutions oscillate — the system is **neutrally stable**.',
+      '**CNC servo drives — linear ODE control.** A CNC axis servo drive is a continuous-time system modeled by $\\dot{\\mathbf{x}} = A\\mathbf{x} + B\\mathbf{u}$, where $\\mathbf{x} = \\begin{bmatrix}\\text{position}\\\\\\text{velocity}\\end{bmatrix}$ and $\\mathbf{u}$ is the force/voltage command from the controller. The zero-input response (how the axis coasts with no command) is exactly $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. The eigenvalues of $A$ determine the **natural modes** of the axis: a CNC axis with complex eigenvalues $a \\pm bi$ rings at frequency $b/(2\\pi)$ Hz in the absence of damping — this is one source of machining vibration. Servo tuning adjusts gains to push eigenvalues far into the left half-plane (all Re$\\lambda < 0$), making the axis responsive and stable.',
     ],
     callouts: [
       {
@@ -115,6 +116,11 @@ end
     ],
     callouts: [
       {
+        type: 'insight',
+        title: 'ODE Solution Structure from Eigenvalues',
+        body: 'For $A = PDP^{-1}$ with eigenvalues $\\lambda_1, \\ldots, \\lambda_n$, the general solution is:\n\n$\\mathbf{x}(t) = c_1 e^{\\lambda_1 t}\\mathbf{v}_1 + \\cdots + c_n e^{\\lambda_n t}\\mathbf{v}_n$\n\nwhere $\\mathbf{v}_i$ are eigenvectors and $c_i$ are determined by initial conditions. For Jordan blocks, replace $e^{\\lambda t}$ with $t^k e^{\\lambda t}$ terms.',
+      },
+      {
         type: 'theorem',
         title: 'Liouville\'s Formula',
         body: '$\\det(e^{At}) = e^{\\text{tr}(A) \\cdot t}$\n\nProof sketch: for diagonal $A$, $\\det(e^{At}) = \\prod e^{\\lambda_i t} = e^{\\sum \\lambda_i t} = e^{\\text{tr}(A)t}$. By continuity and similarity invariance, it extends to all matrices.',
@@ -125,19 +131,139 @@ end
         body: 'MATLAB\'s `expm` and SciPy\'s `expm` use the Padé approximant + scaling and squaring, not the power series. The power series is unstable for large $\\|A\\|$. The scaling trick: $e^A = (e^{A/2^s})^{2^s}$. Scale down until $A/2^s$ is small, apply Padé, then square $s$ times.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Matrix Exponential, ODE Trajectories, and CNC Servo Stability',
+        mathBridge: 'scipy.linalg.expm(A) computes e^A. For e^(At): expm(A*t). ODE trajectory: x(t) = expm(A*t) @ x0. Eigenvalues via np.linalg.eig(A) — all Re(λ) < 0 means stable.',
+        caption: 'Three cells: compute e^A, trace ODE trajectories, and analyze CNC servo drive stability.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing e^A — power series vs scipy',
+              prose: [
+                'scipy.linalg.expm(A) uses Padé approximation + scaling-and-squaring — more accurate than summing the power series directly.',
+                'Verify: det(e^A) = e^trace(A). Also: e^A @ e^(-A) = I.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import expm
+
+A = np.array([[-1., 2.],
+              [-2., -1.]])
+
+eA = expm(A)
+print("e^A:")
+print(eA.round(6))
+print()
+
+# Verify det(e^A) = e^trace(A)
+det_eA = np.linalg.det(eA)
+expected = np.exp(np.trace(A))
+print(f"det(e^A) = {det_eA:.6f}")
+print(f"e^tr(A) = {expected:.6f}")
+print(f"Match: {np.isclose(det_eA, expected)}")
+print()
+
+# Verify inverse: e^A @ e^(-A) = I
+eA_inv = expm(-A)
+print("e^A @ e^(-A) (should be I):")
+print((eA @ eA_inv).round(10))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'ODE trajectory: x(t) = e^(At) x₀',
+              prose: [
+                'The exact solution to dx/dt = Ax with x(0) = x₀ is x(t) = e^(At) x₀.',
+                'Compare with numerical ODE solver (scipy.integrate.odeint) to verify.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import expm
+from scipy.integrate import odeint
+
+# Stable system: complex eigenvalues with negative real part → decaying spiral
+A = np.array([[-0.5, 2.0],
+              [-2.0, -0.5]])
+
+evals = np.linalg.eigvals(A)
+print(f"Eigenvalues: {evals}")
+print(f"Real parts: {evals.real} (all negative → stable)")
+print()
+
+x0 = np.array([2.0, 0.0])
+t = np.linspace(0, 5, 6)
+
+# Exact solution via matrix exponential
+print(f"{'t':>5}  {'x1(exact)':>12}  {'x2(exact)':>12}")
+for ti in t:
+    xt = expm(A * ti) @ x0
+    print(f"{ti:>5.1f}  {xt[0]:>12.6f}  {xt[1]:>12.6f}")
+
+# ODE solver for comparison
+def sys(x, t):
+    return A @ x
+t_fine = np.linspace(0, 5, 1000)
+x_ode = odeint(sys, x0, t_fine)
+print(f"\\nODE solver x(5): {x_ode[-1].round(6)}")
+print(f"Matrix exp x(5): {(expm(A*5) @ x0).round(6)}")`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC servo drive stability analysis',
+              prose: [
+                'A CNC axis servo: state = [position, velocity], A encodes the physics. Eigenvalues with negative real part → stable (position tracks command). Positive real part → runaway axis.',
+                'Servo tuning adjusts damping coefficient. Find the stability boundary.',
+              ],
+              code: `import numpy as np
+from scipy.linalg import expm
+
+# CNC servo: 2nd-order model x'' + 2*zeta*omega*x' + omega^2*x = omega^2*r
+# State: [e, e_dot] where e = position error
+omega = 100.0  # natural frequency (rad/s)
+
+print("Stability vs damping ratio ζ:")
+print(f"{'ζ':>6}  {'Re(λ)':>10}  {'Im(λ)':>10}  {'Stable':>8}  {'Settling ~2/|Re|':>18}")
+for zeta in [0.0, 0.3, 0.5, 0.7, 1.0, 1.5, 2.0]:
+    A = np.array([[0., 1.],
+                  [-omega**2, -2*zeta*omega]])
+    evals = np.linalg.eigvals(A)
+    re, im = evals[0].real, evals[0].imag
+    stable = all(np.real(evals) < 0)
+    settling = 2.0/abs(re) if abs(re) > 1e-6 else float('inf')
+    print(f"{zeta:>6.1f}  {re:>10.2f}  {im:>10.2f}  {str(stable):>8}  {settling:>18.4f}s")
+
+print("\\nζ=0: marginally stable (pure oscillation)")
+print("ζ>0: stable (decays to equilibrium)")
+print("Settling time ≈ 2/|Re(λ)| seconds")`,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {
     prose: [
       '**Spectral mapping theorem.** If $A = PDP^{-1}$ (diagonalizable), then $e^A = Pe^D P^{-1}$, and the eigenvalues of $e^A$ are exactly $\\{e^\\lambda : \\lambda \\in \\text{spec}(A)\\}$. More generally, for any analytic function $f$, $f(A)$ has eigenvalues $\\{f(\\lambda) : \\lambda \\in \\text{spec}(A)\\}$. This is the spectral mapping theorem.',
-      '**Matrix logarithm.** The inverse of the matrix exponential (when it exists) is the matrix logarithm. $\\log(e^A) = A$ for matrices near 0. The logarithm exists for all invertible matrices near $I$ (since invertible = $e^{\\text{tr}(A)} \\neq 0$), but may not be unique. Applications: computing rotations in robotics (Lie algebras), interpolating between matrices in animation.',
+      '**Matrix logarithm.** The inverse of the matrix exponential (when it exists) is the matrix logarithm. $\\log(e^A) = A$ for matrices near 0. The logarithm exists for all invertible matrices near $I$, but may not be unique (the complex logarithm is multi-valued). Applications: computing rotations in robotics (Lie algebras), interpolating between rotations in animation and computer vision.',
+      '**Fundamental matrix solutions.** For a system $\\dot{\\mathbf{x}} = A\\mathbf{x}$, the **fundamental matrix** $\\Phi(t) = e^{At}$ satisfies $\\dot{\\Phi} = A\\Phi$ and $\\Phi(0) = I$. The general solution is $\\mathbf{x}(t) = \\Phi(t)\\mathbf{x}_0$. For non-autonomous systems $\\dot{\\mathbf{x}} = A(t)\\mathbf{x}$, a fundamental matrix still exists but is not simply $e^{\\int A\\,dt}$ unless $A(t)$ commutes with itself at different times.',
     ],
     callouts: [
       {
+        type: 'theorem',
+        title: 'Spectral Mapping Theorem',
+        body: 'For any analytic function $f$ and matrix $A$:\n- If $A = PDP^{-1}$ (diagonalizable), then $f(A) = Pf(D)P^{-1}$\n- The eigenvalues of $f(A)$ are $\\{f(\\lambda) : \\lambda \\in \\sigma(A)\\}$\n\nSpecial cases:\n- Eigenvalues of $e^A$: $\\{e^\\lambda\\}$\n- Eigenvalues of $A^{-1}$: $\\{1/\\lambda\\}$ (for invertible $A$)\n- Eigenvalues of $e^{At}$: $\\{e^{\\lambda t}\\}$',
+      },
+      {
         type: 'insight',
         title: 'Lie Groups and Lie Algebras',
-        body: 'The matrix exponential maps the **Lie algebra** (a vector space of matrices) to the **Lie group** (a manifold of invertible matrices). For example: $\\mathfrak{so}(3)$ (skew-symmetric matrices) $\\xrightarrow{\\exp}$ $SO(3)$ (rotation matrices). This is the foundation of modern robotics, computer graphics, and differential geometry.',
+        body: 'The matrix exponential maps the **Lie algebra** (a vector space of matrices, closed under commutator $[A,B] = AB-BA$) to the **Lie group** (a manifold of invertible matrices):\n\n$\\mathfrak{so}(3) \\xrightarrow{\\exp} SO(3)$ (skew-symmetric → rotation matrices)\n\n$\\mathfrak{se}(3) \\xrightarrow{\\exp} SE(3)$ (rigid body motions → transformation matrices)\n\nThis is the mathematical foundation of modern robotics and computer graphics.',
+      },
+      {
+        type: 'insight',
+        title: 'Numerical Computation of e^A',
+        body: 'The power series $\\sum A^k/k!$ is accurate only for small $\\|A\\|$. MATLAB\'s `expm` and SciPy\'s `scipy.linalg.expm` use the **Padé approximant** + **scaling and squaring**:\n\n1. Scale: compute $B = A/2^s$ so $\\|B\\| \\approx 1$\n2. Compute $e^B \\approx$ Padé approximant (rational function approximation)\n3. Square: $e^A = (e^B)^{2^s}$\n\nThis is $O(n^3)$ and numerically stable. Never use the raw power series.',
       },
     ],
     visualizations: [],
@@ -147,25 +273,108 @@ end
     {
       id: 'ex-la3-007-1',
       title: 'Matrix exponential of a diagonal matrix',
-      problem: 'Compute $e^{At}$ for $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$.',
-      solution: '$e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$. Both components decay to zero — stable system.',
+      problem: 'Compute $e^{At}$ for $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$ and classify the stability.',
+      steps: [
+        {
+          expression: 'e^{Dt} = \\begin{bmatrix}e^{-2t} & 0 \\\\ 0 & e^{-3t}\\end{bmatrix}',
+          annotation: 'For a diagonal matrix, exponentiate each entry independently: $(e^{Dt})_{ii} = e^{d_{ii} t}$.',
+          strategyTitle: 'Exponentiate diagonal entries',
+          checkpoint: 'Why is e^(Dt) so simple for diagonal D?',
+          hints: ['Powers: D^k = diag(λ₁^k, λ₂^k). The power series becomes diag(Σλ₁^k/k!, Σλ₂^k/k!) = diag(e^(λ₁t), e^(λ₂t)).'],
+        },
+        {
+          expression: '\\text{Eigenvalues: } \\lambda_1 = -2, \\lambda_2 = -3 \\quad \\Rightarrow \\quad \\text{Re}(\\lambda_i) < 0',
+          annotation: 'Both eigenvalues are real and negative.',
+          strategyTitle: 'Check stability',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: 'e^{At}\\mathbf{x}_0 = \\begin{bmatrix}e^{-2t} & 0 \\\\ 0 & e^{-3t}\\end{bmatrix}\\begin{bmatrix}x_1(0) \\\\ x_2(0)\\end{bmatrix} = \\begin{bmatrix}x_1(0)e^{-2t} \\\\ x_2(0)e^{-3t}\\end{bmatrix} \\to \\begin{bmatrix}0\\\\0\\end{bmatrix} \\text{ as } t\\to\\infty',
+          annotation: 'Both components decay exponentially. The second decays faster ($e^{-3t}$ vs $e^{-2t}$).',
+          strategyTitle: 'Write solution',
+          checkpoint: '',
+          hints: [],
+        },
+      ],
+      conclusion: '$e^{At} = \\text{diag}(e^{-2t}, e^{-3t})$. The system is asymptotically stable — every initial condition decays to zero exponentially.',
     },
     {
       id: 'ex-la3-007-2',
-      title: 'ODE system solution',
-      problem: 'Solve $\\dot{x}_1 = -x_1 + 2x_2$, $\\dot{x}_2 = -3x_2$ with $\\mathbf{x}(0) = [1, 1]^\\top$.',
-      solution: 'Matrix $A = \\begin{bmatrix}-1&2\\\\0&-3\\end{bmatrix}$ is upper triangular with eigenvalues $-1, -3$. Find $e^{At}$ via eigenvector method: $\\mathbf{x}(t) = c_1 e^{-t}\\mathbf{v}_1 + c_2 e^{-3t}\\mathbf{v}_2$, match $\\mathbf{x}(0) = [1,1]^\\top$.',
+      title: 'ODE system solution via eigendecomposition',
+      problem: 'Solve $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}-1&2\\\\0&-3\\end{bmatrix}$ and $\\mathbf{x}(0) = [1,\\,1]^\\top$.',
+      steps: [
+        {
+          expression: '\\lambda_1 = -1 \\text{ (eigenvec: } \\mathbf{v}_1 = [1,0]^\\top), \\quad \\lambda_2 = -3 \\text{ (eigenvec: } \\mathbf{v}_2 = [1,-1]^\\top)',
+          annotation: 'Eigenvalues of upper-triangular = diagonal entries. Eigenvectors from $(A-\\lambda I)\\mathbf{v}=0$.',
+          strategyTitle: 'Find eigenvalues and eigenvectors',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{x}(t) = c_1 e^{-t}\\begin{bmatrix}1\\\\0\\end{bmatrix} + c_2 e^{-3t}\\begin{bmatrix}1\\\\-1\\end{bmatrix}',
+          annotation: 'General solution: linear combination of modes.',
+          strategyTitle: 'Write general solution',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{x}(0) = c_1\\begin{bmatrix}1\\\\0\\end{bmatrix} + c_2\\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}1\\\\1\\end{bmatrix} \\quad \\Rightarrow \\quad c_1 + c_2 = 1, \\; -c_2 = 1 \\quad \\Rightarrow \\quad c_2 = -1, \\; c_1 = 2',
+          annotation: 'Match initial condition to find constants.',
+          strategyTitle: 'Apply initial conditions',
+          checkpoint: '',
+          hints: [],
+        },
+        {
+          expression: '\\mathbf{x}(t) = 2e^{-t}\\begin{bmatrix}1\\\\0\\end{bmatrix} - e^{-3t}\\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}2e^{-t} - e^{-3t}\\\\e^{-3t}\\end{bmatrix}',
+          annotation: 'Explicit solution. Both components decay. As $t\\to\\infty$: $x_1 \\to 0$, $x_2 \\to 0$.',
+          strategyTitle: 'Final answer',
+          checkpoint: 'Verify x(0).',
+          hints: ['x₁(0) = 2-1 = 1 ✓. x₂(0) = 1 ✓.'],
+        },
+      ],
+      conclusion: '$\\mathbf{x}(t) = [2e^{-t} - e^{-3t},\\, e^{-3t}]^\\top$. The system is stable (both eigenvalues $< 0$). The $e^{-t}$ mode dominates at large $t$ since it decays more slowly.',
     },
   ],
 
   challenges: [
     {
       id: 'ch-la3-007-1',
-      title: 'Stability analysis',
+      difficulty: 'easy',
+      problem: 'For $A = \\begin{bmatrix}0&-\\omega\\\\\\omega&0\\end{bmatrix}$ (pure rotation at rate $\\omega$), compute $e^{At}$ and describe the motion.',
+      hint: 'Eigenvalues are $\\pm i\\omega$. The system neither grows nor decays. Look for sine/cosine in $e^{At}$.',
+      walkthrough: [
+        {
+          expression: '\\det(A - \\lambda I) = \\lambda^2 + \\omega^2 = 0 \\quad \\Rightarrow \\quad \\lambda = \\pm i\\omega',
+          annotation: 'Pure imaginary eigenvalues — neutral stability.',
+        },
+        {
+          expression: 'e^{At} = \\begin{bmatrix}\\cos(\\omega t) & -\\sin(\\omega t)\\\\ \\sin(\\omega t) & \\cos(\\omega t)\\end{bmatrix}',
+          annotation: 'The matrix exponential of a skew-symmetric rotation matrix is a rotation matrix! Euler\'s formula: $e^{\\pm i\\omega t} = \\cos(\\omega t) \\pm i\\sin(\\omega t)$.',
+        },
+        {
+          expression: '\\mathbf{x}(t) = \\begin{bmatrix}\\cos(\\omega t) & -\\sin(\\omega t)\\\\ \\sin(\\omega t) & \\cos(\\omega t)\\end{bmatrix}\\mathbf{x}_0',
+          annotation: 'Every solution traces a circle at angular speed $\\omega$. The system is neutrally stable: trajectories never decay.',
+        },
+      ],
+      answer: 'e^(At) = rotation matrix by angle ωt. All solutions are circles in phase space — neutrally stable (oscillates forever).',
+    },
+    {
+      id: 'ch-la3-007-2',
       difficulty: 'medium',
-      prompt: 'Classify the stability of the system with $A = \\begin{bmatrix}0&1\\\\-\\omega^2&-2\\zeta\\omega\\end{bmatrix}$ (damped harmonic oscillator) for $\\zeta > 0$.',
-      hint: 'Find the eigenvalues in terms of $\\zeta$ and $\\omega$.',
-      solution: 'Eigenvalues: $\\lambda = -\\zeta\\omega \\pm \\omega\\sqrt{\\zeta^2 - 1}$. Since $\\zeta > 0$, Re$(\\lambda) = -\\zeta\\omega < 0$. All solutions decay — the system is asymptotically stable for all $\\zeta > 0$.',
+      problem: 'Classify stability of the damped harmonic oscillator: $A = \\begin{bmatrix}0&1\\\\-\\omega^2&-2\\zeta\\omega\\end{bmatrix}$ for $\\zeta > 0, \\omega > 0$.',
+      hint: 'Compute the characteristic polynomial. Use the quadratic formula. What is the real part of the eigenvalues?',
+      walkthrough: [
+        {
+          expression: 'p(\\lambda) = \\lambda^2 + 2\\zeta\\omega\\lambda + \\omega^2 \\quad \\Rightarrow \\quad \\lambda = -\\zeta\\omega \\pm \\omega\\sqrt{\\zeta^2 - 1}',
+          annotation: 'Quadratic formula with trace $= -2\\zeta\\omega$, det $= \\omega^2$.',
+        },
+        {
+          expression: '\\text{Re}(\\lambda) = -\\zeta\\omega < 0 \\text{ for all } \\zeta > 0',
+          annotation: 'If $\\zeta < 1$ (underdamped): complex eigenvalues $-\\zeta\\omega \\pm i\\omega\\sqrt{1-\\zeta^2}$ — decaying oscillation. If $\\zeta \\geq 1$: real negative eigenvalues — pure exponential decay.',
+        },
+      ],
+      answer: 'Asymptotically stable for all ζ > 0, ω > 0. Underdamped (ζ<1): decaying oscillation. Critically/overdamped (ζ≥1): pure decay without oscillation.',
     },
   ],
 
@@ -182,11 +391,74 @@ end
     { id: 'cp-la3-007-3', question: 'What is $\\det(e^A)$?', answer: '$e^{\\text{tr}(A)}$.' },
   ],
 
-  assessment: 'For the system $\\dot{x}_1 = -2x_1 + x_2$, $\\dot{x}_2 = -x_2$ with $x(0) = [1, 2]^\\top$: find $e^{At}$, write the explicit solution, and classify stability.',
+  assessment: {
+    questions: [
+      {
+        id: 'la3-007-assess-1',
+        type: 'input',
+        text: 'For $A = \\begin{bmatrix}-2&0\\\\0&5\\end{bmatrix}$, is the system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ stable? Answer "stable" or "unstable".',
+        answer: 'unstable',
+        hint: 'One eigenvalue is $\\lambda = 5 > 0$ — that component grows without bound. Any positive real eigenvalue makes the system unstable.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la3-007-1', question: 'The solution to $\\dot{\\mathbf{x}} = A\\mathbf{x}$, $\\mathbf{x}(0) = \\mathbf{x}_0$ is:', options: ['$A\\mathbf{x}_0$', '$e^{At}\\mathbf{x}_0$', '$A^t \\mathbf{x}_0$', '$\\int A\\,dt \\cdot \\mathbf{x}_0$'], answer: '$e^{At}\\mathbf{x}_0$' },
-    { id: 'q-la3-007-2', question: 'For stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$, all eigenvalues must have:', options: ['positive imaginary parts', 'negative real parts', 'magnitude less than 1', 'non-zero determinant'], answer: 'negative real parts' },
-    { id: 'q-la3-007-3', question: 'If $A = PDP^{-1}$, then $e^A$ equals:', options: ['$Pe^D$', '$e^D P^{-1}$', '$Pe^D P^{-1}$', '$e^{PDP^{-1}}$ (different formula)'], answer: '$Pe^D P^{-1}$' },
+    {
+      id: 'q-la3-007-1',
+      type: 'choice',
+      text: 'The solution to $\\dot{\\mathbf{x}} = A\\mathbf{x}$, $\\mathbf{x}(0) = \\mathbf{x}_0$ is:',
+      options: [
+        '$A\\mathbf{x}_0$',
+        '$e^{At}\\mathbf{x}_0$',
+        '$A^t \\mathbf{x}_0$',
+        '$\\text{tr}(A)\\,\\mathbf{x}_0$',
+      ],
+      answer: '$e^{At}\\mathbf{x}_0$',
+      hints: ['This is the matrix analogue of x(t) = e^(at)x₀ for the scalar equation ẋ = ax. The matrix exponential e^(At) is the transition matrix.'],
+      reviewSection: 'Intuition — It solves the matrix ODE',
+    },
+    {
+      id: 'q-la3-007-2',
+      type: 'choice',
+      text: 'For asymptotic stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ (all solutions → 0 as t → ∞), the eigenvalues of $A$ must all satisfy:',
+      options: [
+        '$\\text{Re}(\\lambda) > 0$',
+        '$\\text{Im}(\\lambda) \\neq 0$',
+        '$\\text{Re}(\\lambda) < 0$',
+        '$|\\lambda| < 1$',
+      ],
+      answer: '$\\text{Re}(\\lambda) < 0$',
+      hints: ['e^(λt) → 0 iff Re(λ) < 0. For complex λ=a+bi: |e^(λt)| = e^(at). Decays iff a < 0. Note: |λ| < 1 is the discrete-time criterion, not continuous-time.'],
+      reviewSection: 'Math tab — Stability criterion',
+    },
+    {
+      id: 'q-la3-007-3',
+      type: 'choice',
+      text: 'If $A = PDP^{-1}$ with $D = \\text{diag}(\\lambda_1, \\lambda_2)$, then $e^{At} =$',
+      options: [
+        '$Pe^{Dt}$',
+        '$e^{Dt}P^{-1}$',
+        '$Pe^{Dt}P^{-1}$',
+        '$P^{-1}e^{Dt}P$',
+      ],
+      answer: '$Pe^{Dt}P^{-1}$',
+      hints: ['Same pattern as A^k = PD^kP^{-1}. The series e^(At) = Σ (At)^k/k! = P Σ D^kt^k/k! P^{-1} = Pe^(Dt)P^{-1}.'],
+      reviewSection: 'Intuition — Computing via diagonalization',
+    },
+    {
+      id: 'q-la3-007-4',
+      type: 'choice',
+      text: 'A system has matrix $A$ with eigenvalues $\\lambda = -1 \\pm 3i$. What is the long-term behavior of trajectories?',
+      options: [
+        'They blow up (unstable)',
+        'They oscillate with constant amplitude',
+        'They spiral inward toward the origin',
+        'They converge to a non-zero steady state',
+      ],
+      answer: 'They spiral inward toward the origin',
+      hints: ['Re(λ) = -1 < 0 → e^(Re(λ)t) = e^(-t) → 0. Im(λ) = ±3 → oscillation at frequency 3/(2π). Combined: decaying oscillation = inward spiral.'],
+      reviewSection: 'Intuition — Eigenvalue → Solution Behavior',
+    },
   ],
 };

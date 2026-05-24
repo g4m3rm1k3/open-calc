@@ -26,6 +26,7 @@ export default {
       '**Step 3: Repeat for every remaining vector.** For $\\mathbf{v}_3$: subtract its projection onto $\\mathbf{e}_1$ AND its projection onto $\\mathbf{e}_2$. What is left is perpendicular to both. Normalize. Repeat until done.',
       'The beautiful guarantee: at every step, what remains after subtracting all prior projections is perpendicular to every previously computed basis vector. You are peeling off contamination one direction at a time.',
       '**Why orthonormal bases are worth the effort.** When your basis is orthonormal, nearly everything becomes simpler. Coordinates are just dot products. The inverse of the basis matrix $Q$ is just its transpose $Q^T$ (no computation needed!). Projections are $QQ^T\\mathbf{b}$. The entire least squares algorithm simplifies. Orthonormal bases are the "clean room" of linear algebra.',
+      '**CNC machine axis calibration.** A CNC machine\'s $X$, $Y$, $Z$ axis directions are ideally perfectly orthogonal. In practice, a precision ball-bar probe measures the actual axis directions as unit vectors $\\mathbf{v}_X, \\mathbf{v}_Y, \\mathbf{v}_Z$ — and they are slightly non-orthogonal due to mechanical tolerances. Gram-Schmidt converts these measured directions into a perfectly orthonormal frame $\\{\\mathbf{e}_X, \\mathbf{e}_Y, \\mathbf{e}_Z\\}$ that the CNC controller uses as its reference. The "squareness" error of the machine is precisely the deviation of the original vectors from orthogonality — and Gram-Schmidt quantifies and removes it.',
       '**Where this is heading:** Gram-Schmidt is the constructive proof that every subspace has an orthonormal basis. It directly produces the QR decomposition ($A = QR$, where $Q$ has orthonormal columns and $R$ is upper triangular). The next lesson on Least Squares uses this heavily, and SVD generalizes it further.',
     ],
     callouts: [
@@ -93,6 +94,86 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Gram-Schmidt and CNC Axis Calibration',
+        mathBridge: 'MATLAB: `[Q, R] = qr(A)` computes the QR factorization (Gram-Schmidt result). Verify Q\'*Q = I. The off-diagonal entries of Q\'*Q measure orthogonality errors.',
+        caption: 'Three cells: manual Gram-Schmidt, QR decomposition, and CNC axis calibration via orthogonalization.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Gram-Schmidt step by step in MATLAB',
+              prose: [
+                '`orth(A)` computes an orthonormal basis for the column space of A. `[Q,R] = qr(A)` gives the full QR decomposition.',
+                'Manual Gram-Schmidt: normalize v1, subtract projection from v2, normalize. Verify e1·e2 = 0.',
+              ],
+              code: `v1 = [3; 4];
+v2 = [2; 0];
+
+% Step 1: normalize v1
+e1 = v1 / norm(v1);
+
+% Step 2: remove e1 component from v2, then normalize
+u2 = v2 - dot(v2, e1) * e1;
+e2 = u2 / norm(u2);
+
+fprintf('e1 = [%.4f; %.4f]\\n', e1(1), e1(2))
+fprintf('e2 = [%.4f; %.4f]\\n', e2(1), e2(2))
+fprintf('e1 · e2 = %.2e (should be 0)\\n', dot(e1, e2))
+fprintf('||e1|| = %.6f  ||e2|| = %.6f  (should be 1)\\n', norm(e1), norm(e2))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'QR decomposition — Gram-Schmidt as a matrix equation',
+              prose: [
+                '`[Q, R] = qr(A)` factorizes A into orthogonal Q and upper-triangular R. Q*R = A exactly.',
+                'Q*Q\' = I confirms the columns are orthonormal. R encodes the projection coefficients.',
+              ],
+              code: `A = [1 1 0; 1 0 1; 0 1 1];
+
+[Q, R] = qr(A);
+
+fprintf('Q (orthonormal columns):\\n'); disp(Q)
+fprintf('R (upper triangular):\\n'); disp(R)
+fprintf('Q*R = A?\\n'); disp(Q*R)
+
+fprintf('Q''*Q (should be identity):\\n')
+disp(Q'*Q)
+fprintf('Max off-diagonal error: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC axis calibration — orthogonalizing measured axis directions',
+              prose: [
+                'A probe measures slightly non-orthogonal axis directions due to machine geometry tolerances. Gram-Schmidt creates a perfect orthonormal reference frame.',
+                'The off-diagonal entries of V\'*V (before Gram-Schmidt) quantify the squareness error in radians.',
+              ],
+              code: `% Measured CNC axis directions (slightly non-orthogonal due to tolerance)
+v_X = [1.000; 0.0012; 0.0008];    % X-axis direction (measured)
+v_Y = [-0.0011; 1.000; 0.0015];   % Y-axis direction (measured)
+v_Z = [-0.0007; -0.0014; 1.000];  % Z-axis direction (measured)
+
+V = [v_X, v_Y, v_Z];
+
+% Squareness errors before calibration
+fprintf('Before Gram-Schmidt — V''*V (should be identity):\\n')
+VtV = V' * V;
+disp(VtV)
+fprintf('Off-diagonal elements (squareness errors in rad):\\n')
+fprintf('  X-Y: %.6f rad (%.4f arcsec)\\n', VtV(1,2), VtV(1,2)*206265)
+fprintf('  X-Z: %.6f rad (%.4f arcsec)\\n', VtV(1,3), VtV(1,3)*206265)
+fprintf('  Y-Z: %.6f rad (%.4f arcsec)\\n', VtV(2,3), VtV(2,3)*206265)
+
+% Gram-Schmidt orthogonalization
+[Q, ~] = qr(V);
+fprintf('\\nAfter Gram-Schmidt — Q''*Q (perfect identity):\\n')
+disp(Q'*Q)
+fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,
+            },
+          ]
+        }
+      },
       {
         id: 'QRDecompositionViz',
         title: 'From Gram-Schmidt to QR',

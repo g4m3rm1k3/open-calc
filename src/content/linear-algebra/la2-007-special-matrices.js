@@ -111,7 +111,127 @@ eig(A)              % both positive iff SPD`,
         body: '$A$ is **positive semidefinite** (PSD) if $\\mathbf{x}^\\top A \\mathbf{x} \\geq 0$ for all $\\mathbf{x}$ (allowing zero). PSD allows zero eigenvalues; SPD requires strictly positive eigenvalues. Covariance matrices are always PSD (SPD when invertible). The notation is $A \\succeq 0$ for PSD and $A \\succ 0$ for SPD.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Special Matrices — Verification and Cholesky',
+        mathBridge: 'np.linalg.eigh(A) computes eigenvalues of symmetric matrices efficiently. np.linalg.cholesky(A) factors SPD matrices into A = L @ L.T. np.linalg.cond(Q) should equal 1.0 for orthogonal matrices.',
+        caption: 'Verify structural properties and exploit them for efficient computation.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Symmetric matrix — verify real eigenvalues and orthogonal eigenvectors',
+              prose: [
+                'For real symmetric matrices, NumPy\'s `np.linalg.eigh()` is faster and more accurate than `np.linalg.eig()` because it exploits the symmetry.',
+                'The eigenvectors form an orthonormal set — their matrix Q satisfies Q.T @ Q = I.',
+              ],
+              code: `import numpy as np
+
+A = np.array([[4., 2., 1.],
+              [2., 3., 1.],
+              [1., 1., 5.]])
+
+# eigh is specialized for symmetric matrices (faster, more accurate)
+eigenvalues, Q = np.linalg.eigh(A)
+
+print("Eigenvalues (all real):", eigenvalues.round(6))
+print("All positive?", np.all(eigenvalues > 0), "→ SPD!")
+print()
+print("Eigenvectors (columns of Q):")
+print(Q.round(6))
+print()
+# Orthonormality: Q^T Q should = I
+print("Q^T @ Q (should = I):")
+print((Q.T @ Q).round(10))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Orthogonal matrix — condition number = 1, inverse = transpose',
+              prose: [
+                'A 3D rotation matrix is orthogonal. Verify Q^T @ Q = I, det = 1, and condition number = 1.',
+                'Condition number = 1 means the transformation introduces zero amplification of errors — numerically ideal.',
+              ],
+              code: `import numpy as np
+
+# Rotation by 45° around z-axis
+theta = np.radians(45)
+Q = np.array([
+    [np.cos(theta), -np.sin(theta), 0.],
+    [np.sin(theta),  np.cos(theta), 0.],
+    [0.,             0.,            1.]
+])
+
+print("Q^T @ Q (should = I):")
+print((Q.T @ Q).round(10))
+print()
+print(f"det(Q) = {np.linalg.det(Q):.6f}  (should be +1 for rotation)")
+print(f"Condition number = {np.linalg.cond(Q):.6f}  (should be 1.0)")
+print()
+# Inverse = transpose (free!)
+print("Q^{-1} - Q^T (should be zero):")
+print((np.linalg.inv(Q) - Q.T).round(10))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Cholesky decomposition — A = L @ L.T for SPD',
+              prose: [
+                'For symmetric positive definite matrices, Cholesky factorization A = L @ L.T is twice as fast as LU decomposition.',
+                'It only works when A is truly SPD — the algorithm will throw a LinAlgError if A is not positive definite.',
+              ],
+              code: `import numpy as np
+
+# SPD matrix (Gram matrix = B^T @ B)
+B = np.array([[1., 2.], [3., 4.], [5., 0.]])
+A = B.T @ B   # always SPD when B has full column rank
+
+print("A = B^T @ B:")
+print(A)
+print(f"Eigenvalues: {np.linalg.eigh(A)[0].round(4)}  (all positive ✓)")
+print()
+
+# Cholesky factorization: A = L @ L.T
+L = np.linalg.cholesky(A)
+print("L (Cholesky factor):")
+print(L.round(6))
+print()
+print("L @ L^T (should = A):")
+print((L @ L.T).round(10))
+print()
+# Solving Ax = b via Cholesky (same idea as LU but exploits symmetry)
+b = np.array([1., 2.])
+y = np.linalg.solve(L, b)         # forward sub
+x = np.linalg.solve(L.T, y)       # back sub
+print(f"Solution x: {x.round(6)}")
+print(f"Verify A@x = b: {np.allclose(A @ x, b)}")`,
+            },
+            {
+              id: 'c1',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Is this matrix SPD?',
+              difficulty: 'medium',
+              prompt: 'For each matrix below: (1) check if it is symmetric, (2) compute eigenvalues, (3) determine if it is SPD/PSD/indefinite, (4) try Cholesky — it should succeed for SPD only.',
+              code: `import numpy as np
+
+M1 = np.array([[2., 1.], [1., 3.]])           # candidate 1
+M2 = np.array([[1., 2.], [2., 1.]])           # candidate 2
+M3 = np.array([[4., 2.], [2., 1.]])           # candidate 3
+
+for i, M in enumerate([M1, M2, M3], 1):
+    sym = np.allclose(M, M.T)
+    eigs = np.linalg.eigvalsh(M) if sym else np.linalg.eigvals(M).real
+    print(f"M{i}: symmetric={sym}, eigenvalues={eigs.round(4)}")
+    # Try Cholesky
+    # np.linalg.cholesky(M) raises LinAlgError if not SPD
+`,
+              hint: 'np.linalg.eigvalsh(M) for symmetric matrices. Use try/except around np.linalg.cholesky(M) to catch LinAlgError for non-SPD matrices.',
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {

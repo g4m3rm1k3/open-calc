@@ -25,6 +25,7 @@ export default {
       '**From a line to a subspace.** When the target line is spanned by a single unit vector $\\hat{u}$, the projection is $(\\mathbf{b} \\cdot \\hat{u})\\hat{u}$ — the dot product picks off how much of $\\mathbf{b}$ points in the $\\hat{u}$ direction, and then we scale $\\hat{u}$ by that amount. For a non-unit vector $\\mathbf{a}$, we need to divide by the length: $\\text{proj} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
       'When the subspace is larger — a plane in 3D, or the column space of a matrix $A$ — we need the full **projection matrix** $P = A(A^TA)^{-1}A^T$. Multiplying any vector $\\mathbf{b}$ by $P$ gives its orthogonal projection onto the column space of $A$.',
       '**The orthogonal decomposition.** Every vector can be split uniquely into two perpendicular pieces: the part inside the subspace (the projection) and the part outside (the error/residual). These two pieces are always perpendicular to each other. $\\mathbf{b} = \\underbrace{P\\mathbf{b}}_{\\text{in subspace}} + \\underbrace{(\\mathbf{b} - P\\mathbf{b})}_{\\perp \\text{ subspace}}$.',
+      '**CNC application: closest point on a tool path.** In 5-axis CNC, the controller continuously checks whether the tool tip is on the programmed path. Given the current tool position $\\mathbf{b}$ and a programmed path segment spanned by direction $\\mathbf{a}$ (from the last waypoint), the closest point on the path to the tool tip is exactly the orthogonal projection $\\text{proj}_{\\mathbf{a}}\\mathbf{b}$. The error $\\mathbf{e} = \\mathbf{b} - \\text{proj}$ is the perpendicular deviation from the path — the **cross-track error** that the servo controller must correct. Minimizing cross-track error is projection in action at thousands of times per second.',
       '**Where this is heading:** The projection formula $P = A(A^TA)^{-1}A^T$ is exactly what Gram-Schmidt uses to subtract contamination in each step. It is also exactly what Least Squares uses to find the best approximate solution to $A\\mathbf{x}=\\mathbf{b}$. And SVD generalizes it to reveal the projection structure of any matrix. This lesson is the foundation for everything in Phase 4.',
     ],
     callouts: [
@@ -85,6 +86,89 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Orthogonal Projections and the CNC Cross-Track Error',
+        mathBridge: 'MATLAB: scalar projection = dot(a,b)/dot(a,a). Projection matrix P = a*a\' / (a\'*a). Subspace projection P = A*inv(A\'*A)*A\'. Verify P^2 = P and P\' = P.',
+        caption: 'Three cells: scalar and vector projection, projection matrix properties, and CNC cross-track error calculation.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Scalar and vector projection onto a line',
+              prose: [
+                '`dot(a,b)` computes the dot product. Scalar projection c = dot(a,b)/dot(a,a). Vector projection p = c*a.',
+                'The error e = b - p must satisfy dot(a,e) ≈ 0 (perpendicularity).',
+              ],
+              code: `a = [1; 1; 1];    % line direction
+b = [1; 2; 3];    % vector to project
+
+c = dot(a, b) / dot(a, a);
+p = c * a;
+e = b - p;
+
+fprintf('Scalar projection c = %.4f\\n', c)
+fprintf('Vector projection p = [%.4f; %.4f; %.4f]\\n', p(1), p(2), p(3))
+fprintf('Error e             = [%.4f; %.4f; %.4f]\\n', e(1), e(2), e(3))
+fprintf('Perpendicularity check: a·e = %.2e  (should be 0)\\n', dot(a, e))`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Projection matrix: build it, verify P² = P and P = Pᵀ',
+              prose: [
+                'P = a*a\' / (a\'*a) is the projection matrix onto the line spanned by a.',
+                'For subspace projection (column space of A): P = A*inv(A\'*A)*A\'.',
+              ],
+              code: `% Projection onto a line
+a = [1; 2];
+P_line = a * a' / (a' * a);
+fprintf('Projection matrix onto [1;2]:\\n'); disp(P_line)
+
+% Verify P^2 = P
+fprintf('P^2 - P (should be zero):\\n'); disp(P_line^2 - P_line)
+
+% Projection onto a subspace (plane in 3D)
+A = [1 0; 1 1; 0 1];   % two basis vectors for the plane
+P_sub = A * inv(A' * A) * A';
+fprintf('\\nProjection matrix onto plane in R^3 (3x3):\\n'); disp(P_sub)
+fprintf('P symmetric (Pt - P, should be 0):\\n'); disp(P_sub' - P_sub)
+fprintf('P idempotent (P^2 - P, should be 0):\\n'); disp(P_sub^2 - P_sub)`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC cross-track error: closest point on a tool path segment',
+              prose: [
+                'The cross-track error is the perpendicular distance from the current tool position to the programmed path direction.',
+                'Closest point on path = projection of tool position b onto path direction a. Cross-track error = ||b - proj||.',
+              ],
+              code: `% CNC: tool path from waypoint 1 to waypoint 2
+wp1 = [10; 0; 5];   % mm — path start
+wp2 = [50; 0; 5];   % mm — path end
+b   = [30; 2; 5];   % mm — actual tool position (slight y-deviation)
+
+% Path direction vector
+a = wp2 - wp1;
+
+% Current position relative to path start
+b_rel = b - wp1;
+
+% Projection (closest point on segment from wp1)
+c = dot(a, b_rel) / dot(a, a);
+c_clamped = max(0, min(1, c));  % keep within segment [0,1]
+closest_point = wp1 + c_clamped * a;
+
+% Cross-track error
+cross_track = b - closest_point;
+error_mag = norm(cross_track);
+
+fprintf('Tool position:       [%.1f, %.1f, %.1f] mm\\n', b(1), b(2), b(3))
+fprintf('Closest path point:  [%.1f, %.1f, %.1f] mm\\n', closest_point(1), closest_point(2), closest_point(3))
+fprintf('Cross-track error:   %.4f mm\\n', error_mag)
+fprintf('Direction of error:  [%.4f, %.4f, %.4f]\\n', cross_track(1)/error_mag, cross_track(2)/error_mag, cross_track(3)/error_mag)`,
+            },
+          ]
+        }
+      },
       {
         id: 'ProjectionMatrixViz',
         title: 'Projection Matrix: P² = P',

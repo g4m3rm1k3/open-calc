@@ -112,7 +112,110 @@ J_numerical = J_num
         body: 'Update rule: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - \\alpha \\nabla f(\\mathbf{x}_k)$\nFor $f = \\|A\\mathbf{x} - \\mathbf{b}\\|^2$: $\\mathbf{x}_{k+1} = \\mathbf{x}_k - 2\\alpha A^\\top(A\\mathbf{x}_k - \\mathbf{b})$\nThis is exactly what neural networks do — backprop computes $\\nabla f$, then the optimizer steps against it.',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Code: Gradients, Jacobians, and Hessians',
+        mathBridge: 'Compute gradients via finite differences and verify against analytic formulas. For f(x) = x^T A x, the gradient is 2Ax. The Jacobian of a vector-valued function is a matrix of partial derivatives. NumPy does not have a built-in automatic differentiation — use finite differences or JAX/PyTorch for production.',
+        caption: 'Numerical gradient verification and the quadratic form gradient formula.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Gradient via finite differences — verify analytic formula',
+              prose: [
+                'The finite difference approximation: ∂f/∂xᵢ ≈ [f(x + εeᵢ) - f(x)] / ε for small ε.',
+                'Compare numerical gradient with the analytic result ∇f = 2Ax for f(x) = x^T A x.',
+              ],
+              code: `import numpy as np
+
+def numerical_gradient(f, x, eps=1e-6):
+    """Compute gradient of f at x via central finite differences."""
+    grad = np.zeros_like(x, dtype=float)
+    for i in range(len(x)):
+        e = np.zeros_like(x, dtype=float)
+        e[i] = eps
+        grad[i] = (f(x + e) - f(x - e)) / (2 * eps)
+    return grad
+
+# Quadratic form f(x) = x^T A x
+A = np.array([[3., 1.], [1., 2.]])   # symmetric
+f = lambda x: x @ A @ x
+
+x0 = np.array([1.0, 2.0])
+grad_numerical = numerical_gradient(f, x0)
+grad_analytic  = 2 * A @ x0          # formula: ∇(x^T A x) = 2Ax for symmetric A
+
+print(f"x0 = {x0}")
+print(f"Numerical gradient:  {grad_numerical.round(8)}")
+print(f"Analytic  gradient:  {grad_analytic.round(8)}")
+print(f"Max error: {np.max(np.abs(grad_numerical - grad_analytic)):.2e}")`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Jacobian of a vector-valued function',
+              prose: [
+                'The Jacobian J is an m×n matrix where J[i,j] = ∂f_i/∂x_j.',
+                'For f(x) = Ax (linear), the Jacobian is just A itself — the "derivative" of a linear map is the map.',
+              ],
+              code: `import numpy as np
+
+def numerical_jacobian(f, x, eps=1e-6):
+    """Numerical Jacobian of f: R^n -> R^m at x."""
+    fx = f(x)
+    m, n = len(fx), len(x)
+    J = np.zeros((m, n))
+    for j in range(n):
+        e = np.zeros(n)
+        e[j] = eps
+        J[:, j] = (f(x + e) - f(x - e)) / (2 * eps)
+    return J
+
+# f(x) = A @ x: Jacobian should be A
+A = np.array([[1., 2., 0.],
+              [0., 3., 1.]])
+f_linear = lambda x: A @ x
+
+x0 = np.array([1., 0., -1.])
+J_num = numerical_jacobian(f_linear, x0)
+print("Numerical Jacobian of Ax:")
+print(J_num.round(8))
+print("\\nAnalytic Jacobian = A:")
+print(A)
+print("Match:", np.allclose(J_num, A))`,
+            },
+            {
+              id: 3,
+              cellTitle: 'Hessian and Newton\'s method for optimization',
+              prose: [
+                'Newton\'s method: x_new = x - H^{-1} @ grad. For quadratic f(x) = x^T A x - b^T x, H = 2A and the method converges in ONE step.',
+                'For non-quadratic f, Newton\'s method converges quadratically (extremely fast near the minimum).',
+              ],
+              code: `import numpy as np
+
+# Minimize f(x) = x^T A x - b^T x (quadratic)
+# Analytic minimum: x* = (2A)^{-1} b = A^{-1} b / 2... wait
+# Actually grad f = 2Ax - b = 0 → x* = A^{-1} b / 2
+A = np.array([[4., 1.], [1., 3.]])
+b = np.array([2., 1.])
+f = lambda x: x @ A @ x - b @ x
+grad_f = lambda x: 2 * A @ x - b
+H = 2 * A   # Hessian of quadratic form (constant)
+
+# Newton's method: one step because f is quadratic
+x0 = np.array([5.0, 5.0])
+x_star = x0 - np.linalg.solve(H, grad_f(x0))
+
+print(f"Starting point: {x0}")
+print(f"After 1 Newton step: {x_star.round(6)}")
+print(f"Gradient at x*: {grad_f(x_star).round(10)}  (should be ≈ 0)")
+print(f"f(x*) = {f(x_star):.6f}  (minimum value)")`,
+            },
+          ]
+        }
+      },
+    ],
   },
 
   rigor: {
