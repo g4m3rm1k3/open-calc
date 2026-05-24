@@ -135,20 +135,47 @@ diag(D_new)
   examples: [
     {
       id: 'ex-la6-006-1',
-      title: 'Find coordinates in a new basis',
+      title: 'Find coordinates in a non-standard basis',
       problem: 'Let $\\mathcal{B} = \\{(1,1), (1,-1)\\}$ be a basis for $\\mathbb{R}^2$. Find $[\\mathbf{v}]_{\\mathcal{B}}$ for $\\mathbf{v} = (3, 1)$.',
-      solution: '$P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$, $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}$. $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}(3,1)^\\top = (2, 1)^\\top$. Check: $2(1,1) + 1(1,-1) = (3,1)$. ✓',
+      steps: [
+        {
+          expression: 'P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}',
+          annotation: 'The change-of-basis matrix has the new basis vectors as columns. $P$ converts $\\mathcal{B}$-coordinates to standard coordinates: $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$.',
+          strategyTitle: 'Form $P$: columns are new basis vectors',
+        },
+        {
+          expression: 'P^{-1} = \\frac{1}{\\det(P)}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}',
+          annotation: '$\\det(P) = -1-1 = -2$. For $2\\times 2$: swap diagonal, negate off-diagonal, divide by determinant.',
+          strategyTitle: 'Compute $P^{-1}$',
+        },
+        {
+          expression: '[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}\\begin{bmatrix}3\\\\1\\end{bmatrix} = \\begin{bmatrix}2\\\\1\\end{bmatrix}',
+          annotation: 'The $\\mathcal{B}$-coordinates of $\\mathbf{v}$ are $(2, 1)$.',
+          strategyTitle: 'Multiply: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$',
+        },
+        {
+          expression: '\\text{Check: } 2\\begin{bmatrix}1\\\\1\\end{bmatrix} + 1\\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}3\\\\1\\end{bmatrix} = \\mathbf{v} \\checkmark',
+          annotation: 'Reconstruct $\\mathbf{v}$ from its $\\mathcal{B}$-coordinates to verify.',
+          strategyTitle: 'Verify: $P \\cdot [\\mathbf{v}]_{\\mathcal{B}} = \\mathbf{v}$',
+        },
+      ],
     },
   ],
 
   challenges: [
     {
       id: 'ch-la6-006-1',
-      title: 'Three-basis chain',
+      title: 'Three-basis chain and diagonalization connection',
       difficulty: 'medium',
-      prompt: 'Let $P_{A\\to B}$ and $P_{B\\to C}$ be two change-of-basis matrices. Express $[\\mathbf{v}]_C$ in terms of $[\\mathbf{v}]_A$.',
-      hint: 'Apply the change-of-basis formula twice.',
-      solution: '$[\\mathbf{v}]_B = P_{A\\to B}[\\mathbf{v}]_A$, then $[\\mathbf{v}]_C = P_{B\\to C}[\\mathbf{v}]_B = P_{B\\to C} P_{A\\to B} [\\mathbf{v}]_A$. So $P_{A\\to C} = P_{B\\to C} P_{A\\to B}$ — change-of-basis matrices compose by multiplication.',
+      problem: 'For $A = \\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}$, find the eigenvector basis $\\mathcal{B}$, form the change-of-basis matrix $P$, and verify $P^{-1}AP = D$ (diagonal).',
+      hint: 'Eigenvalues: $\\lambda_1 = 2, \\lambda_2 = 3$. Find eigenvectors, form $P = [\\mathbf{v}_1 | \\mathbf{v}_2]$, compute $P^{-1}AP$.',
+      walkthrough: [
+        '**Eigenvalues:** $A$ is upper triangular so eigenvalues are diagonal entries: $\\lambda_1 = 2, \\lambda_2 = 3$.',
+        '**Eigenvectors:** For $\\lambda_1 = 2$: $(A-2I)\\mathbf{v} = \\begin{bmatrix}0&1\\\\0&1\\end{bmatrix}\\mathbf{v} = 0 \\Rightarrow \\mathbf{v}_1 = (1,0)^\\top$. For $\\lambda_2 = 3$: $(A-3I)\\mathbf{v} = \\begin{bmatrix}-1&1\\\\0&0\\end{bmatrix}\\mathbf{v} = 0 \\Rightarrow \\mathbf{v}_2 = (1,1)^\\top$.',
+        '**Change-of-basis matrix:** $P = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$. $P^{-1} = \\begin{bmatrix}1&-1\\\\0&1\\end{bmatrix}$ ($\\det = 1$).',
+        '**Verify:** $P^{-1}AP = \\begin{bmatrix}1&-1\\\\0&1\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}\\begin{bmatrix}1&1\\\\0&1\\end{bmatrix} = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix} = D$ ✓.',
+        '**Interpretation:** In the eigenvector basis, $A$ acts as "multiply by 2 in the $\\mathbf{v}_1$ direction and by 3 in the $\\mathbf{v}_2$ direction." No mixing between the two directions.',
+      ],
     },
   ],
 
@@ -166,11 +193,54 @@ diag(D_new)
     { id: 'cp-la6-006-3', question: 'What does diagonalization $A = PDP^{-1}$ say in terms of change of basis?', answer: 'In the eigenvector basis (columns of $P$), the linear map is the diagonal matrix $D$.' },
   ],
 
-  assessment: 'Let $A = \\begin{bmatrix}2&1\\\\0&3\\end{bmatrix}$. Find a basis in which $A$ is diagonal. Write out the change-of-basis matrix $P$, verify $P^{-1}AP = D$, and interpret the columns of $P$.',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la6-006-1',
+        type: 'computation',
+        text: 'Let $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$. (a) Find the eigenvalues and eigenvectors. (b) Form the change-of-basis matrix $P$. (c) Verify $P^{-1}AP = D$. (d) What does $A$ look like in the eigenvector basis?',
+        answer: '(a) Char poly: $(4-\\lambda)(3-\\lambda)-2 = \\lambda^2-7\\lambda+10 = (\\lambda-2)(\\lambda-5)$. $\\lambda_1=2$: $\\mathbf{v}_1=(-2,1)^\\top$ (or $(2,-1)^\\top$). $\\lambda_2=5$: $\\mathbf{v}_2=(1,1)^\\top$. (b) $P=\\begin{bmatrix}-2&1\\\\1&1\\end{bmatrix}$. (c) $P^{-1}AP = \\begin{bmatrix}2&0\\\\0&5\\end{bmatrix}$ ✓. (d) In the eigenvector basis, $A$ scales the $\\mathbf{v}_1$ direction by 2 and the $\\mathbf{v}_2$ direction by 5 — pure stretching, no mixing.',
+        hint: 'Form $P = [\\mathbf{v}_1 | \\mathbf{v}_2]$ and compute $P^{-1} = \\frac{1}{\\det P}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la6-006-1', question: 'If $P$ has new basis vectors as its columns, then new coordinates are obtained by:', options: ['Multiplying $\\mathbf{v}$ by $P$', 'Multiplying $\\mathbf{v}$ by $P^{-1}$', 'Multiplying $\\mathbf{v}$ by $P^\\top$', 'Multiplying $\\mathbf{v}$ by $P^2$'], answer: 'Multiplying $\\mathbf{v}$ by $P^{-1}$' },
-    { id: 'q-la6-006-2', question: 'Which of these is NOT preserved under matrix similarity $A \\sim P^{-1}AP$?', options: ['Eigenvalues', 'Determinant', 'Entries of $A$', 'Rank'], answer: 'Entries of $A$' },
-    { id: 'q-la6-006-3', question: 'In the eigenvector basis, a diagonalizable matrix looks like:', options: ['A triangular matrix', 'A permutation matrix', 'A diagonal matrix', 'An identity matrix'], answer: 'A diagonal matrix' },
+    {
+      id: 'q-la6-006-1',
+      type: 'choice',
+      text: 'If $P$ has new basis vectors as columns, then coordinates in the new basis are obtained by:',
+      options: ['Multiplying $\\mathbf{v}$ by $P$', 'Multiplying $\\mathbf{v}$ by $P^{-1}$', 'Multiplying $\\mathbf{v}$ by $P^\\top$', 'Multiplying $\\mathbf{v}$ by $P^2$'],
+      answer: 'Multiplying $\\mathbf{v}$ by $P^{-1}$',
+      hints: ['$P$ converts new coordinates to old: $\\mathbf{v} = P[\\mathbf{v}]_{\\text{new}}$. To get new coordinates: $[\\mathbf{v}]_{\\text{new}} = P^{-1}\\mathbf{v}$.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-006-2',
+      type: 'choice',
+      text: 'Under matrix similarity $B = P^{-1}AP$, which quantity is NOT preserved?',
+      options: ['Eigenvalues', 'Determinant', 'Individual matrix entries', 'Rank'],
+      answer: 'Individual matrix entries',
+      hints: ['Similarity invariants include: eigenvalues, characteristic polynomial, trace, determinant, rank. The individual entries $A_{ij}$ are NOT invariants — they depend on the choice of basis. This is precisely the point: same map, different matrix representations.'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-006-3',
+      type: 'choice',
+      text: 'In the eigenvector basis, a diagonalizable matrix $A$ looks like:',
+      options: ['A triangular matrix', 'A permutation matrix', 'A diagonal matrix $D$ with eigenvalues on the diagonal', 'An identity matrix'],
+      answer: 'A diagonal matrix $D$ with eigenvalues on the diagonal',
+      hints: ['$P^{-1}AP = D$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. In the eigenvector basis, the map $T$ has the simplest possible matrix — a diagonal scaling.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-006-4',
+      type: 'choice',
+      text: 'The change-of-basis matrices satisfy which composition rule when going from basis $A$ to $B$ to $C$?',
+      options: ['$P_{A \\to C} = P_{A \\to B} + P_{B \\to C}$', '$P_{A \\to C} = P_{B \\to C} \\cdot P_{A \\to B}$', '$P_{A \\to C} = P_{A \\to B} \\cdot P_{B \\to C}$', '$P_{A \\to C} = P_{A \\to B}^{-1} + P_{B \\to C}^{-1}$'],
+      answer: '$P_{A \\to C} = P_{B \\to C} \\cdot P_{A \\to B}$',
+      hints: ['Apply in sequence: $[\\mathbf{v}]_B = P_{A\\to B}[\\mathbf{v}]_A$, then $[\\mathbf{v}]_C = P_{B\\to C}[\\mathbf{v}]_B = P_{B\\to C} P_{A\\to B} [\\mathbf{v}]_A$. Matrix multiplication is not commutative — order matters.'],
+      reviewSection: 'math',
+    },
   ],
 };

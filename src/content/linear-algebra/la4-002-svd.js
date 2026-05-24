@@ -25,6 +25,7 @@ export default {
       'The stretching amounts $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$ are the **singular values**. They are always non-negative real numbers, even if the original matrix has complex entries. The largest singular value tells you the maximum amount any unit vector gets stretched by $A$. The smallest tells you the minimum.',
       '**The low-rank approximation idea.** SVD can be written as a sum of rank-1 "slices": $A = \\sigma_1 \\mathbf{u}_1 \\mathbf{v}_1^T + \\sigma_2 \\mathbf{u}_2 \\mathbf{v}_2^T + \\cdots$. Each term $\\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$ is a rank-1 matrix — the simplest possible building block. The singular values measure how important each piece is. If $\\sigma_{50} = 0.001$ and $\\sigma_1 = 1000$, then the 50th piece contributes almost nothing to the full matrix, and you can discard it. Keep only the first $k$ terms and you get the best possible rank-$k$ approximation to $A$ (in a precise mathematical sense).',
       '**Where this is heading:** This is the end of the linear algebra curriculum. But SVD is really a beginning — it is the entry point to data science, machine learning, signal processing, and numerical analysis. Every major field of applied mathematics uses it.',
+      '**CNC machine intelligence via SVD.** (1) **Tool wear detection:** Record the $n$-dimensional cutting force vector over $m$ time steps. Stack these into an $m \\times n$ data matrix $X$. SVD $X = U\\Sigma V^T$ reveals the dominant cutting force pattern: $\\mathbf{v}_1$ is the direction of maximum force variance, $\\sigma_1$ its magnitude. As the tool wears, $\\sigma_1$ grows and the ratio $\\sigma_1/\\sigma_2$ increases — the cutting becomes more "one-dimensional" as chatter dominates. (2) **G-code path compression:** A 3D CNC toolpath with $m$ waypoints is a $3 \\times m$ matrix. Its SVD rank-$k$ approximation keeps the $k$ dominant shape components. For smooth paths, $k = 2$ or $3$ captures 99\\%+ of the path geometry while reducing data by 90\\% — the core idea behind spline fitting in CAM software. (3) **Probe calibration:** When calibrating a touch probe, you collect $m$ probe contact points as an $m \\times 3$ matrix. The singular values reveal probe eccentricity: if $\\sigma_3 \\ll \\sigma_1$, the contacts are nearly coplanar — a surface is being probed. The condition number $\\sigma_1/\\sigma_3$ measures how nearly parallel the probe axes are.',
     ],
     callouts: [
       {
@@ -90,6 +91,79 @@ export default {
       },
     ],
     visualizations: [
+      {
+        id: 'OpenMatNotebook',
+        title: 'SVD in OpenMat',
+        mathBridge: 'Compute SVD with the built-in svd() function, build low-rank approximations, and analyze CNC toolpath compression.',
+        caption: 'MATLAB/OpenMat uses [U,S,V] = svd(A) — note S is a full matrix, not a vector.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Computing SVD: [U,S,V] = svd(A)',
+              prose: ['MATLAB returns S as a full diagonal matrix. Use diag(S) to extract singular values.'],
+              code: `A = [3 1 1; 1 3 1]   % 2x3 matrix
+[U, S, V] = svd(A)
+disp('Singular values:')
+singular_values = diag(S)
+disp('U (left singular vectors):')
+U
+disp('V (right singular vectors):')
+V
+disp('Verify: U^T*U = I')
+U'*U
+disp('Verify: V^T*V = I')
+V'*V
+disp('Reconstruction error:')
+norm(A - U*S*V')
+`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Low-rank approximation',
+              prose: ['Keep only the k largest singular values to build the best rank-k approximation.'],
+              code: `A = magic(6)   % 6x6 magic square
+[U, S, V] = svd(A);
+sigma = diag(S);
+disp('Singular values of magic(6):')
+sigma'
+
+total_sq = sum(sigma.^2);
+fprintf('\\nLow-rank approximations:\\n')
+for k = 1:6
+  Ak = U(:,1:k) * diag(sigma(1:k)) * V(:,1:k)';
+  err = norm(A - Ak, 'fro');
+  pct = sum(sigma(1:k).^2) / total_sq * 100;
+  fprintf('k=%d: error=%.3f, info captured=%.1f%%\\n', k, err, pct);
+end
+`,
+            },
+            {
+              id: 3,
+              cellTitle: 'CNC toolpath compression',
+              prose: ['A 3D toolpath is a 3xm matrix. SVD reveals its dominant shape and enables compression.'],
+              code: `% Simulate a helical CNC toolpath (3 x m matrix)
+m = 200;
+t = linspace(0, 4*pi, m);
+% Helix: x=cos(t), y=sin(t), z=t/(4*pi) scaled
+X = [cos(t); sin(t); t/(4*pi)];
+
+[U, S, V] = svd(X, 'econ');
+sigma = diag(S);
+fprintf('Toolpath singular values: %.4f  %.4f  %.4f\\n', sigma(1), sigma(2), sigma(3))
+
+% Rank-2 approximation captures the helical structure
+X2 = U(:,1:2) * diag(sigma(1:2)) * V(:,1:2)';
+err2 = norm(X - X2, 'fro') / norm(X, 'fro');
+pct2 = sum(sigma(1:2).^2)/sum(sigma.^2)*100;
+fprintf('Rank-2 captures %.1f%% of path (relative error: %.4f)\\n', pct2, err2)
+fprintf('Storage: %d numbers vs original %d (%.0f%% compression)\\n', ...
+  2*(3+m), 3*m, (1-2*(3+m)/(3*m))*100)
+`,
+            },
+          ],
+        },
+      },
       {
         id: 'LowRankApproximationViz',
         title: 'Image Compression via Low-Rank Approximation',

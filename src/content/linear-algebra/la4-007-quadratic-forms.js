@@ -306,26 +306,95 @@ print(f"Min Ra = {result.fun:.4f} μm")
   examples: [
     {
       id: 'ex-la4-007-1',
-      title: 'Classifying a conic',
-      problem: 'Classify the conic $5x^2 - 4xy + 5y^2 = 36$.',
-      solution: '$A = \\begin{bmatrix}5&-2\\\\-2&5\\end{bmatrix}$. Eigenvalues: $\\lambda = 3, 7$ (both positive). The conic is an ellipse with semi-axes $\\sqrt{36/3} = \\sqrt{12}$ and $\\sqrt{36/7}$ in the principal axis directions.',
+      title: 'Classifying a conic and finding semi-axes',
+      problem: 'Classify the conic $5x^2 - 4xy + 5y^2 = 36$ and find the semi-axes lengths.',
+      steps: [
+        {
+          expression: 'A = \\begin{bmatrix}5 & -2 \\\\ -2 & 5\\end{bmatrix}',
+          annotation: 'Read off the symmetric matrix: diagonal entries from $x^2, y^2$ coefficients; off-diagonal = half the $xy$ coefficient ($-4/2 = -2$).',
+          strategyTitle: 'Write the matrix of the quadratic form',
+        },
+        {
+          expression: '\\det(A - \\lambda I) = (5-\\lambda)^2 - 4 = 0 \\implies \\lambda = 3, 7',
+          annotation: '$(5-\\lambda)^2 = 4 \\implies 5-\\lambda = \\pm 2$. Both eigenvalues are positive.',
+          strategyTitle: 'Find eigenvalues',
+        },
+        {
+          expression: '\\text{Both } \\lambda_1 = 3 > 0, \\; \\lambda_2 = 7 > 0 \\implies A \\text{ is positive definite} \\implies \\text{ellipse}',
+          annotation: 'A PD quadratic form has a compact (closed, bounded) level set — an ellipse in 2D.',
+          strategyTitle: 'Classify: all positive eigenvalues → ellipse',
+        },
+        {
+          expression: '\\text{In principal axis coordinates: } 3y_1^2 + 7y_2^2 = 36 \\iff \\frac{y_1^2}{36/3} + \\frac{y_2^2}{36/7} = 1',
+          annotation: 'Rewrite as standard ellipse form $y_1^2/a^2 + y_2^2/b^2 = 1$.',
+          strategyTitle: 'Convert to standard ellipse form',
+        },
+        {
+          expression: 'a_1 = \\sqrt{\\frac{36}{3}} = \\sqrt{12} = 2\\sqrt{3} \\approx 3.46, \\quad a_2 = \\sqrt{\\frac{36}{7}} \\approx 2.27',
+          annotation: 'Semi-axis along the $\\lambda_1 = 3$ eigenvector direction has length $2\\sqrt{3}$; along the $\\lambda_2 = 7$ direction it is shorter ($\\approx 2.27$). Smaller eigenvalue → longer axis.',
+          strategyTitle: 'Semi-axes lengths',
+          hints: ['The smaller eigenvalue gives the longer semi-axis: large $\\lambda$ means the form grows fast in that direction, so the level set is close to the origin (short semi-axis).'],
+        },
+      ],
     },
     {
       id: 'ex-la4-007-2',
-      title: 'Positive definiteness test',
-      problem: 'Is $A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}$ positive definite?',
-      solution: 'Leading minors: $2 > 0$ and $\\det(A) = 6 - 1 = 5 > 0$. By Sylvester\'s criterion, $A$ is positive definite.',
+      title: 'Positive definiteness via Sylvester\'s criterion',
+      problem: 'Test whether $A = \\begin{bmatrix}4&2&1\\\\2&5&2\\\\1&2&6\\end{bmatrix}$ is positive definite using Sylvester\'s criterion.',
+      steps: [
+        {
+          expression: 'M_1 = \\det([4]) = 4 > 0 \\checkmark',
+          annotation: 'First leading principal minor: the $(1,1)$ entry.',
+          strategyTitle: 'First minor',
+        },
+        {
+          expression: 'M_2 = \\det\\begin{bmatrix}4&2\\\\2&5\\end{bmatrix} = 20 - 4 = 16 > 0 \\checkmark',
+          annotation: 'Second leading principal minor: top-left $2\\times 2$ submatrix.',
+          strategyTitle: 'Second minor',
+        },
+        {
+          expression: 'M_3 = \\det(A) = 4(5\\cdot6 - 4) - 2(2\\cdot6 - 2) + 1(4 - 5) = 4(26) - 2(10) + (-1) = 104 - 20 - 1 = 83 > 0 \\checkmark',
+          annotation: 'Expand along the first row.',
+          strategyTitle: 'Third minor',
+        },
+        {
+          expression: 'M_1, M_2, M_3 > 0 \\implies A \\text{ is positive definite}',
+          annotation: 'All three leading principal minors are positive — Sylvester\'s criterion is satisfied. No need to compute eigenvalues.',
+          strategyTitle: 'Conclude: A is PD',
+          checkpoint: 'Verify: eigenvalues of this $A$ are approximately $2.87, 4.44, 8.69$ — all positive, confirming the criterion.',
+        },
+      ],
     },
   ],
 
   challenges: [
     {
       id: 'ch-la4-007-1',
-      title: 'Quadratic form classification',
+      title: 'Classify $Q$ in terms of parameter $k$',
       difficulty: 'medium',
-      prompt: 'For which values of $k$ is $Q(x,y) = x^2 + 4xy + ky^2$ positive definite?',
-      hint: 'Set up the matrix $A$ and apply Sylvester\'s criterion: both leading minors must be positive.',
-      solution: '$A = \\begin{bmatrix}1&2\\\\2&k\\end{bmatrix}$. Leading minors: $1 > 0$ always. $\\det(A) = k - 4 > 0 \\Rightarrow k > 4$.',
+      problem: 'For which values of $k$ is $Q(x,y) = x^2 + 4xy + ky^2$ (a) positive definite; (b) positive semidefinite; (c) indefinite?',
+      hint: 'Set up the matrix $A$ of the quadratic form. Apply Sylvester\'s criterion: both leading minors must be positive for PD. For PSD, allow the determinant to equal zero.',
+      walkthrough: [
+        '**Matrix of $Q$:** Off-diagonal entry = half of the $xy$ coefficient: $4/2 = 2$. So $A = \\begin{bmatrix}1&2\\\\2&k\\end{bmatrix}$.',
+        '**Leading principal minors:** $M_1 = 1 > 0$ always. $M_2 = \\det(A) = k - 4$.',
+        '**Positive definite:** $M_1 > 0$ AND $M_2 > 0 \\Rightarrow k - 4 > 0 \\Rightarrow k > 4$.',
+        '**Positive semidefinite:** $M_1 \\geq 0$ AND $M_2 \\geq 0 \\Rightarrow k \\geq 4$. At $k = 4$: $\\det(A) = 0$, so one eigenvalue is 0 — PSD but not PD.',
+        '**Indefinite:** $M_2 < 0 \\Rightarrow k < 4$. Mixed eigenvalue signs → $Q$ takes both positive and negative values.',
+        '**Verification at $k = 3$:** Eigenvalues of $\\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$: trace $= 4$, det $= -1$. By quadratic formula: $\\lambda = 2 \\pm \\sqrt{5}$, so $\\lambda_1 \\approx -0.24$ and $\\lambda_2 \\approx 4.24$ — confirmed indefinite.',
+      ],
+    },
+    {
+      id: 'ch-la4-007-2',
+      title: 'Principal axes of a tolerance ellipse',
+      difficulty: 'hard',
+      problem: 'A CNC machining process has dimensional errors with covariance $\\Sigma = \\begin{bmatrix}4&3\\\\3&9\\end{bmatrix}$ (mm²). The $95\\%$ tolerance zone satisfies $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} \\leq 5.99$ (the $\\chi^2_{0.05, 2}$ critical value). Find the principal axes of the tolerance ellipse and the lengths of its semi-axes.',
+      hint: 'The tolerance ellipse $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} = c$ has semi-axes $\\sqrt{c \\lambda_i}$ in the eigenvector directions of $\\Sigma$ (NOT $\\Sigma^{-1}$).',
+      walkthrough: [
+        '**Eigenvalues of $\\Sigma$:** $\\text{tr}(\\Sigma) = 13$, $\\det(\\Sigma) = 36 - 9 = 27$. $\\lambda^2 - 13\\lambda + 27 = 0$. $\\lambda = \\frac{13 \\pm \\sqrt{169 - 108}}{2} = \\frac{13 \\pm \\sqrt{61}}{2}$. So $\\lambda_1 \\approx 2.61$, $\\lambda_2 \\approx 10.39$.',
+        '**Principal directions:** For $\\lambda_1 \\approx 2.61$: $(\\Sigma - \\lambda_1 I)\\mathbf{v} = 0$, giving $\\mathbf{q}_1 \\propto (-3, \\lambda_1 - 4)^\\top \\approx (-3, -1.39)^\\top$. For $\\lambda_2 \\approx 10.39$: $\\mathbf{q}_2 \\propto (3, \\lambda_2 - 4)^\\top \\approx (3, 6.39)^\\top$.',
+        '**Semi-axes:** The tolerance ellipse $\\mathbf{e}^\\top \\Sigma^{-1} \\mathbf{e} = c$ in the eigenvector coordinates of $\\Sigma$ becomes $\\frac{y_1^2}{c\\lambda_1} + \\frac{y_2^2}{c\\lambda_2} = 1$. Semi-axes: $a_1 = \\sqrt{c\\lambda_1} = \\sqrt{5.99 \\times 2.61} \\approx 3.95$ mm, $a_2 = \\sqrt{c\\lambda_2} = \\sqrt{5.99 \\times 10.39} \\approx 7.89$ mm.',
+        '**Interpretation:** The larger semi-axis ($\\approx 7.89$ mm) points in the $\\mathbf{q}_2$ direction — the direction of maximum error spread. If the $y$-axis dimension has larger variance ($\\Sigma_{22} = 9 > \\Sigma_{11} = 4$), the principal axis tilts toward $y$.',
+      ],
     },
   ],
 
@@ -342,11 +411,66 @@ print(f"Min Ra = {result.fun:.4f} μm")
     { id: 'cp-la4-007-3', question: 'What kind of conic is $Q(\\mathbf{x}) = 1$ if $A$ has one positive and one negative eigenvalue?', answer: 'Hyperbola.' },
   ],
 
-  assessment: 'Classify and sketch the conic $Q(x,y) = 4x^2 - 4xy + 4y^2 = 6$. Find the semi-axes lengths and the orientation of the principal axes.',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la4-007-1',
+        type: 'computation',
+        text: 'Classify and analyze the conic $Q(x,y) = 4x^2 - 4xy + 4y^2 = 6$. (a) Write the matrix $A$. (b) Find the eigenvalues and classify the conic. (c) Find the semi-axes lengths. (d) Find the principal axis directions.',
+        answer: '(a) $A = \\begin{bmatrix}4&-2\\\\-2&4\\end{bmatrix}$. (b) $\\lambda = 2, 6$ (both positive → ellipse). (c) Semi-axes: $\\sqrt{6/2} = \\sqrt{3}$ and $\\sqrt{6/6} = 1$. (d) For $\\lambda=2$: $\\mathbf{q}_1 = (1,1)^\\top/\\sqrt{2}$ (at $45°$); for $\\lambda=6$: $\\mathbf{q}_2 = (1,-1)^\\top/\\sqrt{2}$ (at $-45°$).',
+        hint: 'Off-diagonal entry of $A$ is half the $xy$ coefficient: $-4/2 = -2$.',
+      },
+      {
+        id: 'assess-la4-007-2',
+        type: 'proof',
+        text: 'Prove that every Gram matrix $A = B^\\top B$ is positive semidefinite. Then state the additional condition on $B$ that makes $A$ positive definite (not just semidefinite).',
+        answer: 'For any $\\mathbf{x} \\neq 0$: $\\mathbf{x}^\\top A \\mathbf{x} = \\mathbf{x}^\\top B^\\top B \\mathbf{x} = (B\\mathbf{x})^\\top(B\\mathbf{x}) = \\|B\\mathbf{x}\\|^2 \\geq 0$. This proves PSD. For PD: need $\\|B\\mathbf{x}\\|^2 > 0$ for all $\\mathbf{x} \\neq 0$, which requires $\\ker(B) = \\{0\\}$, i.e., $B$ has full column rank (columns are linearly independent).',
+        hint: 'Use the identity $\\mathbf{x}^\\top B^\\top B \\mathbf{x} = \\|B\\mathbf{x}\\|^2$ and recall when a norm can be zero.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la4-007-1', question: 'A symmetric matrix with all positive eigenvalues is:', options: ['Indefinite', 'Positive semidefinite only', 'Positive definite', 'Negative definite'], answer: 'Positive definite' },
-    { id: 'q-la4-007-2', question: 'The matrix of the quadratic form $x^2 + 6xy + 2y^2$ is:', options: ['$\\begin{bmatrix}1&6\\\\6&2\\end{bmatrix}$', '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$', '$\\begin{bmatrix}1&0\\\\0&2\\end{bmatrix}$', '$\\begin{bmatrix}2&6\\\\6&1\\end{bmatrix}$'], answer: '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$' },
-    { id: 'q-la4-007-3', question: 'Sylvester\'s criterion tests positive definiteness using:', options: ['Eigenvalues', 'The trace', 'Leading principal minors', 'The rank'], answer: 'Leading principal minors' },
+    {
+      id: 'q-la4-007-1',
+      type: 'choice',
+      text: 'A symmetric matrix with all positive eigenvalues is:',
+      options: ['Indefinite', 'Positive semidefinite but not definite', 'Positive definite', 'Negative definite'],
+      answer: 'Positive definite',
+      hints: ['Positive definite means $\\mathbf{x}^\\top A \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq 0$. In the eigenvector basis, the quadratic form is $\\sum \\lambda_i y_i^2 > 0$ when all $\\lambda_i > 0$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la4-007-2',
+      type: 'choice',
+      text: 'The symmetric matrix of the quadratic form $Q(x,y) = x^2 + 6xy + 2y^2$ is:',
+      options: [
+        '$\\begin{bmatrix}1&6\\\\6&2\\end{bmatrix}$',
+        '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$',
+        '$\\begin{bmatrix}1&0\\\\0&2\\end{bmatrix}$',
+        '$\\begin{bmatrix}2&6\\\\6&1\\end{bmatrix}$',
+      ],
+      answer: '$\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}$',
+      hints: ['The rule: diagonal entries are the pure-square coefficients; off-diagonal entries are half the cross-term coefficient ($6/2 = 3$). Verify: $[x, y]\\begin{bmatrix}1&3\\\\3&2\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = x^2 + 3xy + 3xy + 2y^2 = x^2 + 6xy + 2y^2$ ✓'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la4-007-3',
+      type: 'choice',
+      text: 'Sylvester\'s criterion tests positive definiteness using:',
+      options: ['Eigenvalues (all must be positive)', 'The trace (must be positive)', 'All leading principal minors (must be positive)', 'The rank (must equal $n$)'],
+      answer: 'All leading principal minors (must be positive)',
+      hints: ['A leading principal minor is the determinant of a top-left $k\\times k$ submatrix. Sylvester says $A$ is PD iff all $n$ such minors are positive. This avoids solving the characteristic polynomial.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la4-007-4',
+      type: 'choice',
+      text: 'The conic defined by $\\mathbf{x}^\\top A \\mathbf{x} = 1$ where $A$ has eigenvalues $-3$ and $5$ is:',
+      options: ['An ellipse', 'A circle', 'A hyperbola', 'A parabola'],
+      answer: 'A hyperbola',
+      hints: ['In the principal axis coordinates: $-3y_1^2 + 5y_2^2 = 1$, or $\\frac{y_2^2}{1/5} - \\frac{y_1^2}{1/3} = 1$ — standard hyperbola form. Mixed eigenvalue signs (indefinite matrix) always give a hyperbola.'],
+      reviewSection: 'intuition',
+    },
   ],
 };

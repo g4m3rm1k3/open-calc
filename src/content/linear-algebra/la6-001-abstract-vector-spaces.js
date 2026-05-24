@@ -20,6 +20,7 @@ export default {
       '**Why the axioms matter.** The axioms say nothing about what vectors "look like." They only specify how vectors behave under the two operations. Anything that satisfies all ten axioms is a vector space, and every theorem proved from those axioms applies automatically. This is the power of abstraction: prove once, apply everywhere.',
       '**Key examples.** $\\mathbb{R}^n$ (columns of $n$ real numbers) — the prototype. $P_n$ (polynomials of degree $\\leq n$) — with $(p+q)(x) = p(x) + q(x)$ and $(cp)(x) = c \\cdot p(x)$. $M_{m \\times n}$ (all $m \\times n$ matrices) — with entry-wise addition and scalar multiplication. $C[a,b]$ (continuous functions on $[a,b]$) — with pointwise operations. All are vector spaces.',
       '**Subspaces.** A subset $W \\subseteq V$ is a subspace if (1) $\\mathbf{0} \\in W$, (2) closed under addition, and (3) closed under scalar multiplication. The three-condition check is all you need — the other axioms are inherited from $V$. Examples: any line through the origin in $\\mathbb{R}^2$; the set of polynomials with zero constant term; the set of all solutions to a homogeneous linear ODE.',
+      '**Abstract vector spaces in engineering.** The solution set of any homogeneous linear ODE $y\'\' + p(t)y\' + q(t)y = 0$ is a vector space (of functions!) — you can add solutions and scale them. In CNC motion control, the set of all possible velocity profiles satisfying $v(0) = v(T) = 0$ (zero start/end speed) forms a function space; finding the "smoothest" profile is a minimization in that space. The set of all $3\\times 3$ rotation matrices is NOT a vector space (you can\'t add two rotations and get a rotation), but the space of antisymmetric matrices $\\mathfrak{so}(3)$ (the Lie algebra) is — it is the tangent space to rotations at the identity, directly relevant to CNC axis interpolation and robot kinematics.',
     ],
     callouts: [
       {
@@ -111,8 +112,126 @@ disp('It is isomorphic to R^3')
         title: 'Span Is Always a Subspace',
         body: 'The span of any set of vectors in $V$ is a subspace of $V$. Proof: $\\mathbf{0} = 0\\mathbf{v}_1 + \\cdots + 0\\mathbf{v}_k \\in $ Span; and any linear combination of elements of Span is itself a linear combination of $\\mathbf{v}_i$ (combine coefficients).',
       },
+      {
+        type: 'insight',
+        title: 'Dimension of Concrete Spaces',
+        body: '$\\dim(\\mathbb{R}^n) = n$\n$\\dim(P_n) = n + 1$ (basis: $1, x, x^2, \\ldots, x^n$)\n$\\dim(M_{m\\times n}) = mn$ (basis: $n \\cdot m$ elementary matrices $E_{ij}$)\n$\\dim(C[a,b]) = \\infty$ (no finite basis)\nIsomorphic spaces have the same dimension — they are algebraically identical.',
+      },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Subspace Tests and Polynomial Spaces',
+        mathBridge: 'Verify subspace conditions computationally, explore polynomial vector spaces, and see solutions to homogeneous ODEs as a vector space.',
+        caption: 'Any structure satisfying the 10 axioms is a vector space — the axioms are everything.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cell_type: 'code',
+              source: `import numpy as np
+
+# Subspace test: W = {(x,y,z) : x + 2y - z = 0} in R^3
+# This is the null space of [1, 2, -1], so it IS a subspace
+
+def in_W(v):
+    return abs(v[0] + 2*v[1] - v[2]) < 1e-10
+
+# Check 1: zero vector
+print("Check 1 - zero in W:", in_W([0, 0, 0]))
+
+# Check 2: closure under addition
+u = np.array([1., 0., 1.])   # 1+0-1=0 ✓
+v = np.array([2., 1., 4.])   # 2+2-4=0 ✓
+print("u in W:", in_W(u))
+print("v in W:", in_W(v))
+print("u+v in W:", in_W(u + v))
+
+# Check 3: closure under scalar multiplication
+print("7*u in W:", in_W(7*u))
+
+print()
+print("All checks passed: W is a subspace (the null space of [1, 2, -1])")
+print()
+
+# Non-example: W2 = {(x,y,z) : x + y = 1} — NOT a subspace
+def in_W2(v):
+    return abs(v[0] + v[1] - 1) < 1e-10
+
+p = np.array([0.5, 0.5, 3.])
+q = np.array([0.3, 0.7, 1.])
+print("Non-example: W2 = {x+y=1}")
+print("p in W2:", in_W2(p))
+print("p+q in W2:", in_W2(p + q), " <- FAILS (sum has x+y=1.6, not 1)")
+print("Not a subspace: doesn't contain zero vector and not closed under addition")
+`,
+            },
+            {
+              id: 2,
+              cell_type: 'code',
+              source: `import numpy as np
+from numpy.polynomial import polynomial as P
+
+# Polynomials as vectors: P_2 is isomorphic to R^3
+# Represent p(x) = a0 + a1*x + a2*x^2 as coefficient array [a0, a1, a2]
+
+p = np.array([1., 2., 3.])   # p(x) = 1 + 2x + 3x^2
+q = np.array([4., 0., -1.])  # q(x) = 4 - x^2
+
+# Vector space operations on polynomials
+print("p + q =", p + q, "  means: (1+4) + (2+0)x + (3-1)x^2 =", P.Polynomial(p+q))
+print("3*p =",   3*p,    "  means: 3 + 6x + 9x^2")
+print("zero polynomial:", np.zeros(3))
+
+# Verify span: do {1+x, 1-x} span P_1?
+# We need to solve [1,1; 1,-1] @ [c1;c2] = [a0;a1] for any a0,a1
+A = np.array([[1., 1.], [1., -1.]])
+print()
+print("Spanning test for {1+x, 1-x} in P_1:")
+for target in [[2., 4.], [3., -1.], [0., 5.]]:
+    coeffs = np.linalg.solve(A, target)
+    print(f"  {target[0]} + {target[1]}x = {coeffs[0]:.2f}(1+x) + {coeffs[1]:.2f}(1-x)")
+
+print("=> {1+x, 1-x} spans P_1 ✓")
+`,
+            },
+            {
+              id: 3,
+              cell_type: 'code',
+              source: `import numpy as np
+from scipy.integrate import odeint
+
+# ODE solution space: y'' + y = 0 has solutions {sin(t), cos(t)} as basis
+# The solution space is a 2-dimensional vector space
+
+t = np.linspace(0, 2*np.pi, 200)
+
+def ode(y, t):
+    return [y[1], -y[0]]   # y'' = -y
+
+# Three solutions with different initial conditions
+y1 = odeint(ode, [0., 1.], t)[:, 0]   # sin(t): y(0)=0, y'(0)=1
+y2 = odeint(ode, [1., 0.], t)[:, 0]   # cos(t): y(0)=1, y'(0)=0
+y3 = odeint(ode, [2., 3.], t)[:, 0]   # 2cos+3sin: y(0)=2, y'(0)=3
+
+# Verify y3 = 2*y2 + 3*y1 (linear combination of basis solutions)
+combo = 2*y2 + 3*y1
+print("Solution space of y'' + y = 0:")
+print(f"Max error |y3 - (2*cos + 3*sin)|: {np.max(np.abs(y3 - combo)):.2e}")
+print()
+print("=> y3 is exactly a linear combination of y1 and y2")
+print("=> The solution space is a 2D vector space spanned by {sin, cos}")
+print()
+print("General solution: y(t) = c1*cos(t) + c2*sin(t)")
+print("  c1 = y(0), c2 = y'(0)")
+print("  (Each choice of c1,c2 gives a DIFFERENT solution — 2D space)")
+`,
+            },
+          ],
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -135,13 +254,50 @@ disp('It is isomorphic to R^3')
       id: 'ex-la6-001-1',
       title: 'Is the set of $2 \\times 2$ symmetric matrices a subspace?',
       problem: 'Is $W = \\{A \\in M_{2\\times 2} : A = A^\\top\\}$ a subspace of $M_{2\\times 2}$?',
-      solution: '(1) $0 = 0^\\top$. ✓ (2) If $A = A^\\top$ and $B = B^\\top$: $(A+B)^\\top = A^\\top + B^\\top = A + B$. ✓ (3) $(cA)^\\top = cA^\\top = cA$. ✓. Yes, $W$ is a subspace (dimension 3).',
+      steps: [
+        {
+          expression: 'A = \\mathbf{0} \\in W? \\quad \\mathbf{0}^\\top = \\mathbf{0} \\checkmark',
+          annotation: 'The zero matrix is symmetric.',
+          strategyTitle: 'Check condition 1: zero vector',
+        },
+        {
+          expression: 'A, B \\in W \\Rightarrow (A+B)^\\top = A^\\top + B^\\top = A + B \\Rightarrow A+B \\in W \\checkmark',
+          annotation: 'Transpose is linear: $(A+B)^\\top = A^\\top + B^\\top$. The sum of symmetric matrices is symmetric.',
+          strategyTitle: 'Check condition 2: closed under addition',
+        },
+        {
+          expression: 'A \\in W, c \\in \\mathbb{R} \\Rightarrow (cA)^\\top = cA^\\top = cA \\Rightarrow cA \\in W \\checkmark',
+          annotation: 'Scaling a symmetric matrix preserves symmetry.',
+          strategyTitle: 'Check condition 3: closed under scalar mult.',
+        },
+        {
+          expression: 'W \\text{ is a subspace of } M_{2\\times 2}, \\quad \\dim(W) = 3',
+          annotation: 'Basis for $W$: $\\{\\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}, \\begin{bmatrix}0&1\\\\1&0\\end{bmatrix}, \\begin{bmatrix}0&0\\\\0&1\\end{bmatrix}\\}$ — three parameters for the three free entries of a symmetric matrix.',
+          strategyTitle: 'Conclude and find dimension',
+        },
+      ],
     },
     {
       id: 'ex-la6-001-2',
       title: 'Span of polynomials',
-      problem: 'Show that $1 + x$ and $1 - x$ span all polynomials of degree $\\leq 1$.',
-      solution: '$a + bx = \\frac{a+b}{2}(1+x) + \\frac{a-b}{2}(1-x)$. Any linear polynomial is a linear combination of $1+x$ and $1-x$, so they span $P_1$.',
+      problem: 'Show that $\\{1 + x, 1 - x\\}$ spans all polynomials of degree $\\leq 1$.',
+      steps: [
+        {
+          expression: 'a + bx = c_1(1+x) + c_2(1-x) = (c_1+c_2) + (c_1-c_2)x',
+          annotation: 'We need to solve: $c_1 + c_2 = a$ and $c_1 - c_2 = b$.',
+          strategyTitle: 'Set up the spanning condition',
+        },
+        {
+          expression: 'c_1 = \\frac{a+b}{2}, \\quad c_2 = \\frac{a-b}{2}',
+          annotation: 'Unique solution for any $a, b \\in \\mathbb{R}$ — the system always has a solution.',
+          strategyTitle: 'Solve for coefficients',
+        },
+        {
+          expression: 'a + bx = \\frac{a+b}{2}(1+x) + \\frac{a-b}{2}(1-x) \\quad \\text{for all } a, b',
+          annotation: 'Every polynomial in $P_1$ is a linear combination of $\\{1+x, 1-x\\}$, so they span $P_1$. Since there are 2 vectors and $\\dim(P_1) = 2$, they are also a basis.',
+          strategyTitle: 'Conclude: spans $P_1$',
+        },
+      ],
     },
   ],
 
@@ -150,9 +306,27 @@ disp('It is isomorphic to R^3')
       id: 'ch-la6-001-1',
       title: 'Non-example of a vector space',
       difficulty: 'easy',
-      prompt: 'Let $V = \\mathbb{R}^2$ with addition defined by $(x_1, y_1) \\oplus (x_2, y_2) = (x_1 x_2, y_1 y_2)$ and standard scalar multiplication. Is this a vector space? If not, which axiom fails?',
-      hint: 'Try to find the zero vector, and check if negatives exist.',
-      solution: 'The "zero vector" would need $(x,y) \\oplus \\mathbf{0} = (x,y)$, which requires $x \\cdot 0_x = x$, so $0_x = 1$. But then scalars: $0 \\cdot (x,y) = (x^0, y^0) = (1,1) \\neq (0_x, 0_y)$. Axiom 8 fails. Not a vector space.',
+      problem: 'Let $V = \\mathbb{R}^2$ with addition defined by $(x_1, y_1) \\oplus (x_2, y_2) = (x_1 x_2, y_1 y_2)$ (coordinatewise multiplication) and standard scalar multiplication. Is this a vector space? If not, which axiom fails?',
+      hint: 'Try to find the zero vector first: what $(0_x, 0_y)$ satisfies $(x,y) \\oplus (0_x, 0_y) = (x,y)$ for all $(x,y)$?',
+      walkthrough: [
+        '**Find the proposed zero vector:** $(x,y) \\oplus (0_x, 0_y) = (x \\cdot 0_x, y \\cdot 0_y) = (x, y)$ requires $0_x = 1, 0_y = 1$. So the "zero vector" would be $(1, 1)$.',
+        '**Test scalar multiplication:** Axiom 8 says $(c+d)\\mathbf{v} = c\\mathbf{v} + d\\mathbf{v}$. But here scalar multiplication means $c \\cdot (x,y) = (cx, cy)$ (standard). So $(0+0)(x,y) = 0 \\cdot (x,y) = (0,0)$, but $0(x,y) \\oplus 0(x,y) = (0,0) \\oplus (0,0) = (0 \\cdot 0, 0 \\cdot 0) = (0,0)$. That checks out...',
+        '**Find the real failure:** Axiom 5 (additive inverse): need $\\mathbf{v} \\oplus (-\\mathbf{v}) = (1,1)$. So $(x,y) \\oplus (-x,-y) = (-x^2, -y^2) \\neq (1,1)$ unless $x = \\pm i$. The additive inverse of $(x,y)$ would need to be $(1/x, 1/y)$, which fails when $x = 0$ or $y = 0$.',
+        '**Conclusion:** Not a vector space — additive inverses fail for any vector with a zero component. Also, with $(0,0)$ present in $\\mathbb{R}^2$ but no valid zero vector $(1,1) \\notin \\{(x,y) : x = 0 \\text{ or } y = 0\\}$, the closure fails immediately.',
+      ],
+    },
+    {
+      id: 'ch-la6-001-2',
+      title: 'Solution space dimension',
+      difficulty: 'medium',
+      problem: 'The set of solutions to $y\'\'\' - y\' = 0$ forms a vector space. What is its dimension, and find a basis.',
+      hint: 'Try solutions of the form $y = e^{rt}$. The characteristic equation $r^3 - r = 0$ factors as $r(r-1)(r+1) = 0$.',
+      walkthrough: [
+        '**Characteristic equation:** Substitute $y = e^{rt}$ → $r^3 e^{rt} - r e^{rt} = 0$ → $r(r^2-1) = 0$ → $r = 0, 1, -1$.',
+        '**Three independent solutions:** $y_1 = 1$ (from $r=0$), $y_2 = e^t$ (from $r=1$), $y_3 = e^{-t}$ (from $r=-1$).',
+        '**Independence:** The Wronskian determinant at $t=0$ is non-zero: $\\det[y_i^{(j-1)}(0)] = \\det\\begin{bmatrix}1&1&1\\\\0&1&-1\\\\0&1&1\\end{bmatrix} = 2 \\neq 0$.',
+        '**Conclusion:** $\\dim = 3$. Basis: $\\{1, e^t, e^{-t}\\}$. General solution: $y = c_1 + c_2 e^t + c_3 e^{-t}$ for arbitrary $c_1, c_2, c_3 \\in \\mathbb{R}$.',
+      ],
     },
   ],
 
@@ -169,11 +343,71 @@ disp('It is isomorphic to R^3')
     { id: 'cp-la6-001-3', question: 'Is the span of any set of vectors always a subspace?', answer: 'Yes — it is the smallest subspace containing those vectors.' },
   ],
 
-  assessment: 'Verify that $M_{2\\times 2}$ (all $2\\times 2$ real matrices) with standard matrix addition and scalar multiplication is a vector space by checking all ten axioms.',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la6-001-1',
+        type: 'proof',
+        text: 'Prove that $W = \\{p \\in P_3 : p(1) = 0\\}$ (polynomials of degree $\\leq 3$ with root at $x=1$) is a subspace of $P_3$. Then find a basis for $W$ and state its dimension.',
+        answer: '(1) Zero poly: $p(x) = 0$ satisfies $p(1) = 0$ ✓. (2) Closure under addition: if $p(1) = q(1) = 0$, then $(p+q)(1) = p(1)+q(1) = 0$ ✓. (3) Closure under scalar mult: $(cp)(1) = c \\cdot p(1) = 0$ ✓. Basis: $\\{x-1, x^2-1, x^3-1\\}$ (each vanishes at 1, and any degree-$\\leq 3$ polynomial with root at 1 is a combination). $\\dim(W) = 3$.',
+        hint: 'For the basis, note that $\\{(x-1), (x-1)x, (x-1)x^2\\}$ also works — factor out $(x-1)$ from the general form.',
+      },
+      {
+        id: 'assess-la6-001-2',
+        type: 'computation',
+        text: 'Is the set $S = \\{(x,y,z) : x^2 + y^2 = z^2\\}$ a subspace of $\\mathbb{R}^3$? Check each of the three subspace conditions.',
+        answer: '$S$ is NOT a subspace. (1) Zero vector $(0,0,0)$: $0^2 + 0^2 = 0 = 0^2$ ✓. (2) Closure under addition FAILS: $(1,0,1) \\in S$ (since $1+0=1$) and $(0,1,1) \\in S$ (since $0+1=1$), but $(1,1,2) \\in S?$ checks $1+1=4$ — NO, $2 \\neq 4$. So $S$ is not closed under addition. The constraint $x^2+y^2=z^2$ is non-linear, so $S$ is not a subspace.',
+        hint: 'The key test is whether the constraint is a linear equation. Quadratic constraints cannot define subspaces (except for degenerate cases like the zero vector only).',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la6-001-1', question: 'Which of the following is a vector space?', options: ['$\\{(x,y): x+y=1\\}$ with standard operations', 'The set of polynomials of degree exactly 3', 'The set of all $2\\times 2$ matrices', 'The positive reals with standard addition'], answer: 'The set of all $2\\times 2$ matrices' },
-    { id: 'q-la6-001-2', question: 'The three-condition subspace test checks:', options: ['linear independence, span, orthogonality', 'zero vector, closed addition, closed scalar mult.', 'rank, nullity, determinant', 'commutativity, associativity, distributivity'], answer: 'zero vector, closed addition, closed scalar mult.' },
-    { id: 'q-la6-001-3', question: '$P_3$ (polynomials of degree ≤ 3) is isomorphic to:', options: ['$\\mathbb{R}^3$', '$\\mathbb{R}^4$', '$M_{2\\times 2}$', '$\\mathbb{R}^{3\\times 3}$'], answer: '$\\mathbb{R}^4$' },
+    {
+      id: 'q-la6-001-1',
+      type: 'choice',
+      text: 'Which of the following is a vector space with standard operations?',
+      options: [
+        '$\\{(x,y): x+y=1\\}$ in $\\mathbb{R}^2$',
+        'Polynomials of degree exactly 3 (not ≤ 3)',
+        'All $2\\times 2$ real matrices',
+        'The positive real numbers $\\mathbb{R}_{>0}$',
+      ],
+      answer: 'All $2\\times 2$ real matrices',
+      hints: ['The set $x+y=1$ does not contain the zero vector. Degree exactly 3 is not closed under addition (two degree-3 polys can sum to degree 2). Positive reals fail: $(-1) \\cdot 2 = -2 \\notin \\mathbb{R}_{>0}$. Only $M_{2\\times2}$ satisfies all axioms.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-001-2',
+      type: 'choice',
+      text: 'The three conditions for $W$ to be a subspace of $V$ are:',
+      options: [
+        'Linear independence, span, and orthogonality',
+        'Contains zero, closed under addition, closed under scalar multiplication',
+        'Rank equals dimension, nullity is zero, determinant is non-zero',
+        'Commutativity, associativity, and distributivity hold',
+      ],
+      answer: 'Contains zero, closed under addition, closed under scalar multiplication',
+      hints: ['The three-condition test is sufficient because the other axioms are inherited from $V$. Equivalently: $W$ is non-empty and closed under all linear combinations (which combines conditions 2 and 3).'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-001-3',
+      type: 'choice',
+      text: '$P_3$ (polynomials of degree $\\leq 3$) is isomorphic to:',
+      options: ['$\\mathbb{R}^3$', '$\\mathbb{R}^4$', '$M_{2\\times 2}$', '$\\mathbb{R}^{3\\times 3}$'],
+      answer: '$\\mathbb{R}^4$',
+      hints: ['$\\dim(P_3) = 4$ since the standard basis is $\\{1, x, x^2, x^3\\}$. Two vector spaces are isomorphic iff they have the same dimension. $\\dim(\\mathbb{R}^4) = 4$. Note: $M_{2\\times 2}$ also has dimension 4, so $P_3 \\cong M_{2\\times 2}$ is also true!'],
+      reviewSection: 'rigor',
+    },
+    {
+      id: 'q-la6-001-4',
+      type: 'choice',
+      text: 'The set of solutions to the homogeneous ODE $y\'\' + 4y = 0$ is a vector space. What is its dimension?',
+      options: ['1', '2', '4', 'Infinite'],
+      answer: '2',
+      hints: ['The characteristic equation $r^2 + 4 = 0$ has two roots $r = \\pm 2i$, giving solutions $\\{\\cos(2t), \\sin(2t)\\}$. A 2nd-order linear homogeneous ODE always has a 2-dimensional solution space — one dimension per order.'],
+      reviewSection: 'intuition',
+    },
   ],
 };

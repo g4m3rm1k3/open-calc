@@ -105,7 +105,82 @@ disp('Dimension of W: 2')
         body: 'If $V$ is spanned by $m$ vectors, then any linearly independent set has at most $m$ vectors.\n\nConsequence: in a space of dimension $n$:\n• Any $n+1$ vectors are linearly dependent\n• Any $n$ independent vectors form a basis\n• Any $n$ spanning vectors form a basis',
       },
     ],
-    visualizations: [],
+    visualizations: [
+      {
+        id: 'PythonNotebook',
+        title: 'Bases, Coordinates, and Dimension',
+        mathBridge: 'Find bases for abstract spaces numerically, compute coordinates in a non-standard basis, and verify the rank-nullity theorem.',
+        caption: 'Every vector has a unique coordinate representation in any basis.',
+        props: {
+          disableRunAll: true,
+          initialCells: [
+            {
+              id: 1,
+              cell_type: 'code',
+              source: `import numpy as np
+
+# Find a basis for the null space of A (subspace of R^n)
+A = np.array([[1., 2., 3., 4.],
+              [2., 4., 7., 10.],
+              [0., 0., 1., 2.]])
+
+# Null space basis via SVD (most numerically stable)
+U, S, Vt = np.linalg.svd(A)
+rank = np.sum(S > 1e-10)
+null_basis = Vt[rank:].T   # right singular vectors for zero singular values
+
+print(f"A is {A.shape[0]}x{A.shape[1]}")
+print(f"rank(A) = {rank}")
+print(f"nullity(A) = {A.shape[1] - rank}")
+print(f"rank + nullity = {rank + A.shape[1] - rank} = {A.shape[1]} (columns) ✓")
+print()
+print("Basis for null space:")
+print(null_basis.round(6))
+print()
+
+# Verify: A @ null_basis ≈ 0
+print("Verification A @ null_basis (should be ~0):")
+print((A @ null_basis).round(10))
+`,
+            },
+            {
+              id: 2,
+              cell_type: 'code',
+              source: `import numpy as np
+
+# Coordinates in a non-standard basis
+# Basis B = {b1, b2} for R^2, find coordinates of v
+
+b1 = np.array([1., 2.])
+b2 = np.array([3., 1.])
+v  = np.array([7., 5.])
+
+# [v]_B = B^{-1} v where B = [b1 | b2]
+B = np.column_stack([b1, b2])
+coords_B = np.linalg.solve(B, v)
+
+print("Standard coordinates of v:", v)
+print("B-coordinates of v:", coords_B.round(6))
+print(f"  v = {coords_B[0]:.4f}*b1 + {coords_B[1]:.4f}*b2")
+print()
+
+# Verify
+reconstructed = coords_B[0]*b1 + coords_B[1]*b2
+print("Reconstruction:", reconstructed, "== v?", np.allclose(reconstructed, v))
+print()
+
+# Standard basis: coordinates are just the components
+e1 = np.array([1., 0.])
+e2 = np.array([0., 1.])
+B_std = np.column_stack([e1, e2])
+coords_std = np.linalg.solve(B_std, v)
+print("Standard coordinates of v:", coords_std, "(same as v itself)")
+`,
+            },
+          ],
+        },
+      },
+    ],
   },
 
   rigor: {
@@ -125,9 +200,35 @@ disp('Dimension of W: 2')
   examples: [
     {
       id: 'ex-la6-002-1',
-      title: 'Basis for $P_2$',
-      problem: 'Is $\\{1+x, 1-x, x^2\\}$ a basis for $P_2$?',
-      solution: 'Three vectors in a 3-dimensional space. Check independence: $a(1+x) + b(1-x) + cx^2 = 0$ gives $a+b = 0$, $a-b = 0$, $c = 0$, so $a = b = c = 0$. Independent! Size = dim = 3 → it\'s a basis.',
+      title: 'Is $\\{1+x, 1-x, x^2\\}$ a basis for $P_2$?',
+      problem: 'Determine whether $\\{1+x, 1-x, x^2\\}$ is a basis for $P_2$ (polynomials of degree $\\leq 2$).',
+      steps: [
+        {
+          expression: '\\dim(P_2) = 3 \\quad \\text{and we have 3 vectors}',
+          annotation: 'In a 3-dimensional space, 3 vectors form a basis iff they are linearly independent (OR span). We only need to check one condition.',
+          strategyTitle: 'Count: same number as dimension',
+        },
+        {
+          expression: 'a(1+x) + b(1-x) + cx^2 = 0 \\implies (a+b) + (a-b)x + cx^2 = 0',
+          annotation: 'Set an arbitrary linear combination equal to zero and collect by powers of $x$.',
+          strategyTitle: 'Set up independence condition',
+        },
+        {
+          expression: 'a+b = 0, \\quad a-b = 0, \\quad c = 0',
+          annotation: 'Match coefficients of $1, x, x^2$ separately (since $1, x, x^2$ are independent).',
+          strategyTitle: 'Match coefficients',
+        },
+        {
+          expression: 'a = b = c = 0 \\implies \\text{linearly independent}',
+          annotation: 'Only the trivial solution — the set is independent.',
+          strategyTitle: 'Conclude independence',
+        },
+        {
+          expression: '\\text{3 independent vectors in a 3D space} \\implies \\text{basis for } P_2 \\checkmark',
+          annotation: 'By Steinitz: $n$ independent vectors in an $n$-dimensional space must span the whole space — so they form a basis.',
+          strategyTitle: 'Apply dimension theorem',
+        },
+      ],
     },
   ],
 
@@ -136,9 +237,14 @@ disp('Dimension of W: 2')
       id: 'ch-la6-002-1',
       title: 'Dimension of intersection',
       difficulty: 'medium',
-      prompt: 'Let $W_1 = \\text{Span}\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ and $W_2 = \\text{Span}\\{\\mathbf{v}_2, \\mathbf{v}_3\\}$ in $\\mathbb{R}^3$ where $\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3$ are linearly independent. Find $\\dim(W_1 + W_2)$ and $\\dim(W_1 \\cap W_2)$.',
-      hint: 'Use the dimension formula $\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$.',
-      solution: '$\\dim W_1 = 2$, $\\dim W_2 = 2$. $W_1 + W_2 = \\text{Span}\\{\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3\\} = \\mathbb{R}^3$, so $\\dim(W_1 + W_2) = 3$. Formula: $3 = 2 + 2 - \\dim(W_1 \\cap W_2)$, so $\\dim(W_1 \\cap W_2) = 1$. (Intersection is $\\text{Span}\\{\\mathbf{v}_2\\}$.)',
+      problem: 'Let $W_1 = \\text{Span}\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ and $W_2 = \\text{Span}\\{\\mathbf{v}_2, \\mathbf{v}_3\\}$ in $\\mathbb{R}^3$ where $\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3$ are linearly independent. Find $\\dim(W_1 + W_2)$ and $\\dim(W_1 \\cap W_2)$.',
+      hint: 'Use the dimension formula $\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$. First determine $W_1 + W_2$ directly.',
+      walkthrough: [
+        '**Individual dimensions:** $W_1 = \\text{Span}\\{\\mathbf{v}_1, \\mathbf{v}_2\\}$ has $\\dim W_1 = 2$ (two independent vectors). Similarly $\\dim W_2 = 2$.',
+        '**Sum $W_1 + W_2$:** This is $\\text{Span}\\{\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3\\}$ (all three vectors). Since $\\mathbf{v}_1, \\mathbf{v}_2, \\mathbf{v}_3$ are independent in $\\mathbb{R}^3$, they span all of $\\mathbb{R}^3$. So $\\dim(W_1 + W_2) = 3$.',
+        '**Apply the dimension formula:** $\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$. So $3 = 2 + 2 - \\dim(W_1 \\cap W_2)$, giving $\\dim(W_1 \\cap W_2) = 1$.',
+        '**What is $W_1 \\cap W_2$?** A vector $\\mathbf{w} \\in W_1 \\cap W_2$ must be in both spans. $\\mathbf{w} \\in W_1 \\Rightarrow \\mathbf{w} = a\\mathbf{v}_1 + b\\mathbf{v}_2$; $\\mathbf{w} \\in W_2 \\Rightarrow \\mathbf{w} = c\\mathbf{v}_2 + d\\mathbf{v}_3$. Setting equal and using independence: $a = 0$, $d = 0$, $b = c$. So $\\mathbf{w} = b\\mathbf{v}_2$ and $W_1 \\cap W_2 = \\text{Span}\\{\\mathbf{v}_2\\}$.',
+      ],
     },
   ],
 
@@ -155,11 +261,54 @@ disp('Dimension of W: 2')
     { id: 'cp-la6-002-3', question: 'If $V$ has dimension $n$ and a set of $n$ vectors is linearly independent, is it a basis?', answer: 'Yes — independent set of size = dim is automatically spanning, hence a basis.' },
   ],
 
-  assessment: 'Find a basis and the dimension of the subspace $W = \\{p \\in P_3 : p(0) = 0 \\text{ and } p\'(0) = 0\\}$ of polynomials with zero constant and linear terms.',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la6-002-1',
+        type: 'computation',
+        text: 'Find a basis and the dimension of $W = \\{p \\in P_3 : p(0) = 0 \\text{ and } p\'(0) = 0\\}$.',
+        answer: 'A polynomial $p(x) = a_0 + a_1x + a_2x^2 + a_3x^3$ satisfies $p(0) = a_0 = 0$ and $p\'(0) = a_1 = 0$. So $W = \\{a_2x^2 + a_3x^3 : a_2, a_3 \\in \\mathbb{R}\\}$. Basis: $\\{x^2, x^3\\}$. Dimension: 2.',
+        hint: 'Write $p(x) = a_0 + a_1x + a_2x^2 + a_3x^3$ and apply both conditions to constrain $a_0$ and $a_1$.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la6-002-1', question: 'The dimension of $M_{3\\times 2}$ (all $3\\times 2$ real matrices) is:', options: ['3', '2', '5', '6'], answer: '6' },
-    { id: 'q-la6-002-2', question: 'If $n$ vectors span an $n$-dimensional space, they:', options: ['May or may not be a basis', 'Are always a basis', 'Are always linearly dependent', 'Span a subspace'], answer: 'Are always a basis' },
-    { id: 'q-la6-002-3', question: 'The Rank-Nullity theorem says rank$(A)$ + nullity$(A)$ equals:', options: ['$m$ (rows)', '$n$ (columns)', '$\\min(m,n)$', '$\\det(A)$'], answer: '$n$ (columns)' },
+    {
+      id: 'q-la6-002-1',
+      type: 'choice',
+      text: 'The dimension of $M_{3\\times 2}$ (all $3\\times 2$ real matrices) is:',
+      options: ['3', '2', '5', '6'],
+      answer: '6',
+      hints: ['$M_{3\\times 2}$ has $3 \\times 2 = 6$ entries, each independently free. A basis consists of the 6 matrices $E_{ij}$ (1 in position $(i,j)$, zeros elsewhere). $\\dim(M_{m\\times n}) = mn$.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-2',
+      type: 'choice',
+      text: 'If $n$ vectors span an $n$-dimensional space $V$, they:',
+      options: ['May or may not be a basis', 'Are always a basis', 'Are always linearly dependent', 'Form a proper subspace'],
+      answer: 'Are always a basis',
+      hints: ['By the Steinitz exchange lemma: in dimension $n$, any spanning set of size $n$ is automatically independent (and vice versa). You only need to check one condition when the count matches the dimension.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-002-3',
+      type: 'choice',
+      text: 'The Rank-Nullity theorem states: $\\text{rank}(A) + \\text{nullity}(A) = ?$',
+      options: ['$m$ (number of rows)', '$n$ (number of columns)', '$\\min(m,n)$', '$\\det(A)$'],
+      answer: '$n$ (number of columns)',
+      hints: ['The rank counts pivot columns (dimension of column space); nullity counts free variables (dimension of null space). Together they account for all $n$ columns. The number of rows $m$ is irrelevant.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-002-4',
+      type: 'choice',
+      text: 'For subspaces $W_1, W_2 \\subseteq V$, the formula $\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$ is called:',
+      options: ['The Rank-Nullity theorem', 'The inclusion-exclusion formula for dimensions', 'The Steinitz exchange lemma', 'The spectral theorem'],
+      answer: 'The inclusion-exclusion formula for dimensions',
+      hints: ['This is the vector space analogue of the inclusion-exclusion principle for set cardinalities: $|A \\cup B| = |A| + |B| - |A \\cap B|$. Here union is replaced by sum and cardinality by dimension.'],
+      reviewSection: 'math',
+    },
   ],
 };

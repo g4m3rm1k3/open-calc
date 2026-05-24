@@ -144,18 +144,45 @@ Sigma
       id: 'ex-la7-002-1',
       title: 'Manual Cholesky of a 2×2 matrix',
       problem: 'Find the Cholesky factorization of $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$.',
-      solution: '$l_{11} = \\sqrt{4} = 2$. $l_{21} = a_{21}/l_{11} = 2/2 = 1$. $l_{22} = \\sqrt{a_{22} - l_{21}^2} = \\sqrt{3 - 1} = \\sqrt{2}$. So $L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}$ and $LL^\\top = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix} = A$. ✓',
+      steps: [
+        {
+          expression: 'l_{11} = \\sqrt{a_{11}} = \\sqrt{4} = 2',
+          annotation: 'First diagonal entry: square root of the top-left entry.',
+          strategyTitle: 'Entry (1,1)',
+        },
+        {
+          expression: 'l_{21} = a_{21}/l_{11} = 2/2 = 1',
+          annotation: 'First column below the diagonal: divide each entry by $l_{11}$.',
+          strategyTitle: 'Entry (2,1)',
+        },
+        {
+          expression: 'l_{22} = \\sqrt{a_{22} - l_{21}^2} = \\sqrt{3 - 1} = \\sqrt{2}',
+          annotation: 'Second diagonal: subtract the squared contribution of the first column.',
+          strategyTitle: 'Entry (2,2)',
+        },
+        {
+          expression: 'L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}, \\quad LL^\\top = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix} = A \\checkmark',
+          annotation: 'Verify by multiplying $L L^\\top$.',
+          strategyTitle: 'Verify',
+        },
+      ],
     },
   ],
 
   challenges: [
     {
       id: 'ch-la7-002-1',
-      title: 'Cholesky test for positive definiteness',
+      title: 'Cholesky as a PD test',
       difficulty: 'easy',
-      prompt: 'Without computing eigenvalues, determine if $A = \\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$ is positive definite by attempting Cholesky.',
-      hint: 'Try to compute $l_{11}$ and $l_{22}$.',
-      solution: '$l_{11} = \\sqrt{1} = 1$. $l_{21} = 2/1 = 2$. $l_{22} = \\sqrt{3 - 4} = \\sqrt{-1}$. Imaginary! Cholesky fails → $A$ is not positive definite. (Indeed $\\det A = 3 - 4 = -1 < 0$, eigenvalues are negative and positive.)',
+      problem: 'Without computing eigenvalues, determine if $A = \\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$ is positive definite by attempting Cholesky.',
+      hint: 'Try to compute $l_{11}$ and $l_{22}$. If you encounter a negative number under a square root, Cholesky fails.',
+      walkthrough: [
+        '**Step 1:** $l_{11} = \\sqrt{1} = 1$.',
+        '**Step 2:** $l_{21} = a_{21}/l_{11} = 2/1 = 2$.',
+        '**Step 3:** $l_{22} = \\sqrt{a_{22} - l_{21}^2} = \\sqrt{3 - 4} = \\sqrt{-1}$ — imaginary!',
+        '**Conclusion:** Cholesky fails → $A$ is NOT positive definite. Verification: $\\det(A) = 3-4 = -1 < 0$ confirms indefiniteness (mixed eigenvalue signs).',
+        '**Key insight:** Attempting Cholesky is equivalent to Sylvester\'s criterion — the pivots in Cholesky are exactly the leading principal minors divided by the previous pivot. A negative pivot means a negative leading minor, which means not PD.',
+      ],
     },
   ],
 

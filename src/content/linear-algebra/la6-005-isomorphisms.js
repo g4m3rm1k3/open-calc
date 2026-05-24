@@ -131,8 +131,34 @@ end
     {
       id: 'ex-la6-005-1',
       title: 'Isomorphism between $M_{2\\times 2}$ and $P_3$',
-      problem: 'Construct an isomorphism $T: M_{2\\times 2} \\to P_3$.',
-      solution: 'Use the standard bases: $E_{11} = \\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}, E_{12}, E_{21}, E_{22}$ for $M_{2\\times 2}$ and $\\{1, x, x^2, x^3\\}$ for $P_3$. Define $T(E_{11}) = 1, T(E_{12}) = x, T(E_{21}) = x^2, T(E_{22}) = x^3$ and extend linearly. Both have dimension 4, so $T$ is an isomorphism.',
+      problem: 'Construct an explicit isomorphism $T: M_{2\\times 2} \\to P_3$ and verify it is bijective.',
+      steps: [
+        {
+          expression: '\\dim(M_{2\\times 2}) = 4 = \\dim(P_3)',
+          annotation: '$M_{2\\times 2}$ has 4 entries; $P_3$ has basis $\\{1, x, x^2, x^3\\}$ of size 4. Isomorphism exists iff dimensions match.',
+          strategyTitle: 'Check dimensions',
+        },
+        {
+          expression: 'T\\left(\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}\\right) = a + bx + cx^2 + dx^3',
+          annotation: 'Map each matrix entry to a polynomial coefficient. This is the standard basis-to-basis mapping.',
+          strategyTitle: 'Define the map',
+        },
+        {
+          expression: 'T(A+B) = T(A)+T(B), \\quad T(cA) = cT(A) \\checkmark',
+          annotation: 'Linearity follows because addition and scalar multiplication are coordinatewise in both spaces.',
+          strategyTitle: 'Verify linearity',
+        },
+        {
+          expression: '\\ker(T) = \\{0\\}: \\quad T(A) = 0 \\implies a=b=c=d=0 \\implies A = 0 \\checkmark',
+          annotation: 'Injective: only the zero matrix maps to the zero polynomial.',
+          strategyTitle: 'Verify injectivity (trivial kernel)',
+        },
+        {
+          expression: '\\text{Injective} + \\dim(\\text{domain}) = \\dim(\\text{codomain}) \\implies \\text{bijective} \\implies T \\text{ is an isomorphism}',
+          annotation: 'By rank-nullity: injective + same-dimension domain/codomain → surjective → isomorphism.',
+          strategyTitle: 'Conclude isomorphism',
+        },
+      ],
     },
   ],
 
@@ -141,17 +167,25 @@ end
       id: 'ch-la6-005-1',
       title: 'Non-isomorphic spaces',
       difficulty: 'easy',
-      prompt: 'Explain why $P_2$ and $P_3$ are not isomorphic, even though both are spaces of polynomials.',
-      hint: 'What is the dimension of each?',
-      solution: '$\\dim P_2 = 3$ and $\\dim P_3 = 4$. Since the dimensions differ, they are not isomorphic. Any bijective linear map would have to preserve dimension (bijections map bases to bases), which is impossible.',
+      problem: 'Explain why $P_2$ and $P_3$ are not isomorphic, and why $M_{2\\times 3}$ and $P_5$ are isomorphic.',
+      hint: 'Compute the dimension of each space.',
+      walkthrough: [
+        '**$P_2$ vs $P_3$:** $\\dim(P_2) = 3$ (basis $\\{1,x,x^2\\}$) and $\\dim(P_3) = 4$ (basis $\\{1,x,x^2,x^3\\}$). Since $3 \\neq 4$, there is no bijective linear map. Any isomorphism must map bases to bases, which would require equal-size bases.',
+        '**$M_{2\\times 3}$ vs $P_5$:** $\\dim(M_{2\\times 3}) = 6$ and $\\dim(P_5) = 6$. Same dimension → isomorphic. Explicit isomorphism: map each matrix entry to a polynomial coefficient: $T\\begin{bmatrix}a_{11}&a_{12}&a_{13}\\\\a_{21}&a_{22}&a_{23}\\end{bmatrix} = a_{11} + a_{12}x + a_{13}x^2 + a_{21}x^3 + a_{22}x^4 + a_{23}x^5$.',
+        '**Key theorem:** Two finite-dimensional vector spaces over the same field are isomorphic if and only if they have the same dimension. Dimension is the complete invariant.',
+      ],
     },
     {
       id: 'ch-la6-005-2',
-      title: 'Constructing an isomorphism',
+      title: 'Isomorphism from evaluation',
       difficulty: 'medium',
-      prompt: 'Let $W = \\{A \\in M_{2\\times 2} : A^\\top = A\\}$ (symmetric $2 \\times 2$ matrices). Find an isomorphism $T: W \\to \\mathbb{R}^3$.',
-      hint: 'Find a basis for $W$ first, then map basis vectors to standard basis vectors of $\\mathbb{R}^3$.',
-      solution: 'Basis for $W$: $B_1 = \\begin{bmatrix}1&0\\\\0&0\\end{bmatrix}, B_2 = \\begin{bmatrix}0&1\\\\1&0\\end{bmatrix}, B_3 = \\begin{bmatrix}0&0\\\\0&1\\end{bmatrix}$. Define $T(aB_1 + bB_2 + cB_3) = (a,b,c)^\\top$. This is linear and bijective — an isomorphism.',
+      problem: 'Show that $T: P_2 \\to \\mathbb{R}^3$ defined by $T(p) = (p(0), p(1), p(-1))^\\top$ is an isomorphism.',
+      hint: 'Find the matrix of $T$ in the standard bases and check if it is invertible.',
+      walkthrough: [
+        '**Matrix of $T$:** Apply to basis $\\{1, x, x^2\\}$: $T(1) = (1,1,1)^\\top$, $T(x) = (0,1,-1)^\\top$, $T(x^2) = (0,1,1)^\\top$. Matrix: $A = \\begin{bmatrix}1&0&0\\\\1&1&1\\\\1&-1&1\\end{bmatrix}$.',
+        '**Determinant:** $\\det(A) = 1(1-(-1)) = 2 \\neq 0$.',
+        '**Conclusion:** $A$ is invertible → $T$ is bijective → $T$ is an isomorphism. Its inverse gives polynomial interpolation: given values at $0, 1, -1$, find the unique quadratic through those points.',
+      ],
     },
   ],
 
@@ -168,11 +202,54 @@ end
     { id: 'cp-la6-005-3', question: 'If $T: V \\to W$ is an isomorphism, is $T^{-1}$ linear?', answer: 'Yes — the inverse of a linear bijection is always linear.' },
   ],
 
-  assessment: 'Prove that the map $T: P_2 \\to \\mathbb{R}^3$ defined by $T(p) = (p(0), p(1), p(-1))^\\top$ is an isomorphism. (Hint: find its matrix and check invertibility.)',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la6-005-1',
+        type: 'proof',
+        text: 'Prove that any bijective linear map $T: V \\to W$ has a linear inverse. That is, if $T$ is an isomorphism, then $T^{-1}: W \\to V$ is also linear.',
+        answer: 'Let $T^{-1}: W \\to V$ be the set-theoretic inverse. For any $\\mathbf{w}_1, \\mathbf{w}_2 \\in W$ and scalar $c$: Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$, so $T(\\mathbf{v}_i) = \\mathbf{w}_i$. Then $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = cT(\\mathbf{v}_1) + T(\\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$ (by linearity of $T$). Applying $T^{-1}$: $c\\mathbf{v}_1 + \\mathbf{v}_2 = T^{-1}(c\\mathbf{w}_1 + \\mathbf{w}_2) = cT^{-1}(\\mathbf{w}_1) + T^{-1}(\\mathbf{w}_2)$. ✓',
+        hint: 'Let $\\mathbf{v}_i = T^{-1}(\\mathbf{w}_i)$ and use linearity of $T$ to show $T(c\\mathbf{v}_1 + \\mathbf{v}_2) = c\\mathbf{w}_1 + \\mathbf{w}_2$, then apply $T^{-1}$.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la6-005-1', question: 'Two finite-dimensional real vector spaces are isomorphic iff:', options: ['They contain the same vectors', 'They have the same dimension', 'They have the same basis', 'One is a subspace of the other'], answer: 'They have the same dimension' },
-    { id: 'q-la6-005-2', question: 'The coordinate map $T: V \\to \\mathbb{R}^n$ (sending $\\mathbf{v}$ to its coordinates in a fixed basis) is:', options: ['Always injective but not surjective', 'Always surjective but not injective', 'An isomorphism', 'Linear but not bijective'], answer: 'An isomorphism' },
-    { id: 'q-la6-005-3', question: 'Is $M_{2\\times 3} \\cong P_5$?', options: ['Yes, both have dimension 6', 'No, $M_{2\\times 3}$ is not a vector space', 'Yes, any two matrix spaces are isomorphic', 'No, their dimensions differ'], answer: 'Yes, both have dimension 6' },
+    {
+      id: 'q-la6-005-1',
+      type: 'choice',
+      text: 'Two finite-dimensional real vector spaces are isomorphic if and only if:',
+      options: ['They contain the same vectors', 'They have the same dimension', 'They have the same basis', 'One is a subspace of the other'],
+      answer: 'They have the same dimension',
+      hints: ['Dimension is the complete invariant: $\\dim V = \\dim W \\Leftrightarrow V \\cong W$ (over the same field). $P_3 \\cong M_{2\\times 2} \\cong \\mathbb{R}^4$ — all have dimension 4, all are isomorphic to each other.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-005-2',
+      type: 'choice',
+      text: 'The coordinate map $\\phi_{\\mathcal{B}}: V \\to \\mathbb{R}^n$ (sending $\\mathbf{v}$ to its $\\mathcal{B}$-coordinates) is:',
+      options: ['Always injective but not surjective', 'Always surjective but not injective', 'An isomorphism', 'Linear but not bijective'],
+      answer: 'An isomorphism',
+      hints: ['The coordinate map is injective (different vectors have different coordinate representations) and surjective (every tuple in $\\mathbb{R}^n$ corresponds to some vector). So it is bijective and linear — an isomorphism.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-005-3',
+      type: 'choice',
+      text: 'Is $M_{2\\times 3} \\cong P_5$?',
+      options: ['Yes — both have dimension 6', 'No — $M_{2\\times 3}$ is not a vector space', 'Yes — any two matrix spaces are isomorphic', 'No — their dimensions differ'],
+      answer: 'Yes — both have dimension 6',
+      hints: ['$\\dim(M_{2\\times 3}) = 2 \\times 3 = 6$. $\\dim(P_5) = 6$ (basis: $1,x,x^2,x^3,x^4,x^5$). Same dimension → isomorphic. An explicit isomorphism maps the 6 matrix entries to the 6 polynomial coefficients.'],
+      reviewSection: 'intuition',
+    },
+    {
+      id: 'q-la6-005-4',
+      type: 'choice',
+      text: 'If $T: V \\to W$ is an isomorphism and $\\{\\mathbf{b}_1,\\ldots,\\mathbf{b}_n\\}$ is a basis for $V$, then $\\{T(\\mathbf{b}_1),\\ldots,T(\\mathbf{b}_n)\\}$ is:',
+      options: ['A spanning set for $W$ but not necessarily independent', 'A basis for $W$', 'An independent set in $W$ but not necessarily spanning', 'Only a basis if $V = W$'],
+      answer: 'A basis for $W$',
+      hints: ['Isomorphisms preserve bases: bijective linear maps send independent sets to independent sets and spanning sets to spanning sets. So the image of a basis is a basis.'],
+      reviewSection: 'math',
+    },
   ],
 };

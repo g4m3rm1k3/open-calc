@@ -122,20 +122,48 @@ norm(A - A_check)
   examples: [
     {
       id: 'ex-la6-004-1',
-      title: 'Matrix of the evaluation map',
+      title: 'Matrix of the evaluation map $T(p) = (p(-1), p(0), p(1))$',
       problem: 'Let $T: P_2 \\to \\mathbb{R}^3$ be $T(p) = (p(-1), p(0), p(1))^\\top$. Find the matrix of $T$ using bases $\\{1, x, x^2\\}$ for $P_2$ and standard basis for $\\mathbb{R}^3$.',
-      solution: '$T(1) = (1,1,1)^\\top$, $T(x) = (-1,0,1)^\\top$, $T(x^2) = (1,0,1)^\\top$. Matrix $= \\begin{bmatrix}1&-1&1\\\\1&0&0\\\\1&1&1\\end{bmatrix}$.',
+      steps: [
+        {
+          expression: 'T(1) = (1(-1)^0, 1(0)^0, 1(1)^0)^\\top = (1, 1, 1)^\\top',
+          annotation: 'Apply $T$ to the first basis vector $1$ (constant polynomial).',
+          strategyTitle: 'Column 1: $T(1)$',
+        },
+        {
+          expression: 'T(x) = ((-1), 0, 1)^\\top',
+          annotation: 'Evaluate $x$ at $x = -1, 0, 1$.',
+          strategyTitle: 'Column 2: $T(x)$',
+        },
+        {
+          expression: 'T(x^2) = ((-1)^2, 0^2, 1^2)^\\top = (1, 0, 1)^\\top',
+          annotation: 'Evaluate $x^2$ at $x = -1, 0, 1$.',
+          strategyTitle: 'Column 3: $T(x^2)$',
+        },
+        {
+          expression: '[T] = \\begin{bmatrix}1&-1&1\\\\1&0&0\\\\1&1&1\\end{bmatrix}',
+          annotation: 'Columns are the output vectors (already in the standard basis of $\\mathbb{R}^3$). This is the Vandermonde matrix for nodes $-1, 0, 1$.',
+          strategyTitle: 'Assemble matrix',
+          hints: ['The Vandermonde matrix arises in polynomial interpolation: if $[T]\\mathbf{c} = \\mathbf{y}$, we are finding coefficients of the polynomial through points $(-1, y_1), (0, y_2), (1, y_3)$.'],
+        },
+      ],
     },
   ],
 
   challenges: [
     {
       id: 'ch-la6-004-1',
-      title: 'Finding P and computing P^{-1}AP',
+      title: 'Change of basis for a rotation',
       difficulty: 'medium',
-      prompt: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ have standard basis matrix $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ (90° rotation). Find the matrix of $T$ in the basis $\\mathcal{B} = \\left\\{\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\begin{bmatrix}1\\\\-1\\end{bmatrix}\\right\\}$.',
-      hint: 'Form $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$ and compute $P^{-1}AP$.',
-      solution: '$P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$, $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix}$. $P^{-1}AP = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ — a 90° rotation still, but in a different basis.',
+      problem: 'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ have standard matrix $A = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$ ($90°$ counterclockwise rotation). Find the matrix of $T$ in $\\mathcal{B} = \\left\\{\\begin{bmatrix}1\\\\1\\end{bmatrix}, \\begin{bmatrix}1\\\\-1\\end{bmatrix}\\right\\}$.',
+      hint: 'Form $P = [\\mathbf{b}_1 | \\mathbf{b}_2]$ (columns = new basis vectors) and compute $P^{-1}AP$.',
+      walkthrough: [
+        '**Change-of-basis matrix:** $P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$ (columns are the new basis vectors).',
+        '**Inverse of $P$:** $\\det(P) = -1 - 1 = -2$. $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}$.',
+        '**Compute $AP$:** $A\\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix} = \\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix}$.',
+        '**Compute $P^{-1}(AP)$:** $\\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix} = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$.',
+        '**Result:** $P^{-1}AP = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ — the same $90°$ rotation matrix! This makes sense: a rotation looks the same in any orthonormal-like basis. The representation changed, but the geometric content did not.',
+      ],
     },
   ],
 
@@ -153,11 +181,54 @@ norm(A - A_check)
     { id: 'cp-la6-004-3', question: 'Why is matrix multiplication not commutative?', answer: 'It represents function composition, which is not commutative: $S \\circ T \\neq T \\circ S$ in general.' },
   ],
 
-  assessment: 'Let $T: P_2 \\to P_2$ be defined by $T(a + bx + cx^2) = b + 2cx$. Find the matrix of $T$ in the standard basis $\\{1, x, x^2\\}$, identify the kernel and image, and verify rank-nullity.',
+  assessment: {
+    questions: [
+      {
+        id: 'assess-la6-004-1',
+        type: 'computation',
+        text: 'Let $T: P_2 \\to P_2$ be defined by $T(a + bx + cx^2) = b + 2cx$. Find the matrix of $T$ in the standard basis $\\{1, x, x^2\\}$, identify the kernel and image, and verify rank-nullity.',
+        answer: '$T(1)=0, T(x)=1, T(x^2)=2x$. Matrix: $\\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}$. Kernel: $T(a+bx+cx^2)=0$ iff $b=0,c=0$, so $\\ker T = \\{$constants$\\}$, $\\dim(\\ker T)=1$. Image: span of $T(x)=1$ and $T(x^2)=2x$, so $\\text{im}(T) = P_1$, $\\dim=2$. Rank-nullity: $1+2=3=\\dim P_2$ ✓.',
+        hint: 'Apply $T$ to each of $1, x, x^2$ and express each result in the basis $\\{1,x,x^2\\}$.',
+      },
+    ],
+  },
 
   quiz: [
-    { id: 'q-la6-004-1', question: 'The $j$-th column of the matrix of $T$ contains:', options: ['The $j$-th input basis vector', 'Coordinates of $T(\\mathbf{b}_j)$ in the output basis', 'Coordinates of $\\mathbf{b}_j$ in the input basis', 'The $j$-th eigenvalue'], answer: 'Coordinates of $T(\\mathbf{b}_j)$ in the output basis' },
-    { id: 'q-la6-004-2', question: 'Matrices $A$ and $B$ represent the same linear map in different bases iff:', options: ['$AB = BA$', '$\\det A = \\det B$', '$B = P^{-1}AP$ for some invertible $P$', '$A + B = 0$'], answer: '$B = P^{-1}AP$ for some invertible $P$' },
-    { id: 'q-la6-004-3', question: 'Why does composition $S \\circ T$ correspond to the product $[S][T]$?', options: ['Because matrix multiplication is commutative', 'By the fundamental formula applied twice', 'Because eigenvalues multiply', 'By the Spectral Theorem'], answer: 'By the fundamental formula applied twice' },
+    {
+      id: 'q-la6-004-1',
+      type: 'choice',
+      text: 'The $j$-th column of the matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ contains:',
+      options: ['The $j$-th input basis vector', 'Coordinates of $T(\\mathbf{b}_j)$ in the output basis $\\mathcal{C}$', 'Coordinates of $\\mathbf{b}_j$ in the input basis $\\mathcal{B}$', 'The $j$-th eigenvalue of $T$'],
+      answer: 'Coordinates of $T(\\mathbf{b}_j)$ in the output basis $\\mathcal{C}$',
+      hints: ['The fundamental construction: apply $T$ to each input basis vector, express the result in the output basis. The resulting coordinate vector becomes the $j$-th column.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-004-2',
+      type: 'choice',
+      text: 'Matrices $A$ and $B$ represent the same linear transformation $T: V \\to V$ in different bases iff:',
+      options: ['$AB = BA$', '$\\det A = \\det B$', '$B = P^{-1}AP$ for some invertible $P$', '$A + B = 0$'],
+      answer: '$B = P^{-1}AP$ for some invertible $P$',
+      hints: ['This is matrix similarity. The change-of-basis matrix $P$ converts coordinates between the old and new bases. Diagonalization is a special case: $P^{-1}AP = D$ where $P$ is the eigenvector matrix.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-004-3',
+      type: 'choice',
+      text: 'If $T: U \\to V$ has matrix $[T]$ and $S: V \\to W$ has matrix $[S]$, the matrix of $S \\circ T: U \\to W$ is:',
+      options: ['$[T][S]$', '$[S][T]$', '$[S]+[T]$', '$[T]^{-1}[S]$'],
+      answer: '$[S][T]$',
+      hints: ['Composition goes right-to-left: $(S \\circ T)(\\mathbf{v}) = S(T(\\mathbf{v}))$. In coordinates: $[S \\circ T] = [S][T]$. Note the order: $T$ acts first, so it is on the right. Matrix multiplication does NOT commute, and neither does composition.'],
+      reviewSection: 'math',
+    },
+    {
+      id: 'q-la6-004-4',
+      type: 'choice',
+      text: 'For $T: \\mathbb{R}^n \\to \\mathbb{R}^n$, which quantity is preserved under change of basis (i.e., same for all matrix representations of $T$)?',
+      options: ['The individual matrix entries', 'The determinant', 'The characteristic polynomial and eigenvalues', 'Both B and C'],
+      answer: 'Both B and C',
+      hints: ['Similarity invariants: $\\det(P^{-1}AP) = \\det(P^{-1})\\det(A)\\det(P) = \\det(A)$. Also $\\det(P^{-1}AP - \\lambda I) = \\det(P^{-1}(A-\\lambda I)P) = \\det(A-\\lambda I)$. So both determinant and characteristic polynomial are invariants.'],
+      reviewSection: 'rigor',
+    },
   ],
 };
