@@ -1,67 +1,300 @@
 export default {
-  id: 'la-sandbox',
-  slug: 'python-sandbox',
-  chapter: 'la5',
+  id: 'la8-001',
+  slug: 'numpy-scipy-intro',
+  chapter: 'la8',
   order: 1,
-  title: 'Python Lab: Linear Algebra',
-  subtitle: 'Experiment with vectors and matrices using Python in the browser',
-  tags: ['sandbox', 'python', 'numpy', 'coding'],
-  
+  title: 'Introduction to NumPy & SciPy for Linear Algebra',
+  subtitle: 'The same math you have learned — now automated with the tools used at NASA, Google, and every data science team.',
+  tags: ['numpy', 'scipy', 'python', 'coding', 'applied linear algebra', 'computational'],
+  aliases: 'numpy scipy python linalg solve eig svd qr rank determinant matrix array broadcasting',
+
   hook: {
-    question: "How can we use code to solve massive systems of equations that would take a human centuries to compute?",
-    realWorldContext: "In professional data science and engineering, we don't solve matrices by hand. We use libraries like NumPy and SciPy. This sandbox gives you the exact same tools used at NASA and Google, running right in your browser tab via WebAssembly.",
+    question: "You can now solve 3×3 systems by hand. But a real power grid has 100,000 unknowns. How do engineers solve it?",
+    realWorldContext: "NumPy (Numerical Python) and SciPy (Scientific Python) are the engines behind TensorFlow, PyTorch, scikit-learn, and virtually every modern scientific computation. They compile down to BLAS/LAPACK — the same Fortran libraries NASA used in the 1970s, now running at near-hardware speed. This lesson bridges your theoretical understanding to the professional tooling you will use every day.",
     previewVisualizationId: 'PythonNotebook',
   },
 
   intuition: {
     prose: [
-      '**Welcome to the Lab:** Throughout this module, you have learned the geometry and theory of linear algebra. Now it is time to use the engine that powers modern technology.',
-      'This sandbox uses **Pyodide**, a version of Python compiled to WebAssembly. It contains a full Python interpreter and supports powerful libraries like NumPy, SymPy, and Matplotlib.',
-      'Code in one cell persists to the next. You can define a transformation matrix in Cell 1 and apply it to a batch of vectors in Cell 2. Try it out by running the default code below!'
+      '**Why code matters here:** Every concept in this course — RREF, eigenvalues, SVD, least squares — is a single function call in NumPy. The point of this lesson is not to skip the math but to solidify it. When you type `np.linalg.svd(A)` you should know exactly what $U$, $\\Sigma$, and $V$ mean and why they exist.',
+      '**NumPy arrays vs. Python lists:** A Python list `[1, 2, 3]` is a general-purpose container. A NumPy `ndarray` is a typed, memory-contiguous block that supports SIMD vectorization. Operations like `A @ b` dispatch to BLAS, making even 1000×1000 matrix multiplications fast.',
+      '**Broadcasting:** NumPy\'s most powerful concept. When you write `A * 2`, it multiplies every element by 2 without a loop. When shapes are compatible, NumPy automatically expands dimensions to make operations work. This is the same concept as scalar-matrix multiplication in linear algebra — fully generalized.',
+      '**SciPy adds what NumPy leaves out:** `scipy.linalg` has routines like `lu_factor`, `lu_solve`, `cho_factor`, `cho_solve`, and `lstsq` that are optimized for specific matrix structures. You pick the right tool based on whether your matrix is symmetric, positive definite, banded, or sparse.',
     ],
     callouts: [
       {
         type: 'insight',
-        title: 'Why Python for Linear Algebra?',
-        body: 'Python has become the industry standard because of its clean syntax and standard libraries. What takes 20 lines of code in C++ takes 2 lines in Python with NumPy.',
-      }
+        title: 'The NumPy ↔ Theory Translation Table',
+        body: '| Theory | NumPy |\n|---|---|\n| $A\\mathbf{x}=\\mathbf{b}$ | `np.linalg.solve(A, b)` |\n| Eigenvalues $\\lambda$ | `np.linalg.eigvals(A)` |\n| Full eigen decomp | `np.linalg.eig(A)` |\n| SVD | `np.linalg.svd(A)` |\n| Rank | `np.linalg.matrix_rank(A)` |\n| Determinant | `np.linalg.det(A)` |\n| Inverse $A^{-1}$ | `np.linalg.inv(A)` |\n| Least squares | `np.linalg.lstsq(A, b)` |\n| QR | `np.linalg.qr(A)` |',
+      },
+      {
+        type: 'sequencing',
+        title: 'Chapter 8 — Computational Linear Algebra',
+        body: '**Previous chapters:** All the theory — vectors, matrices, eigen, SVD, projections.\n**This chapter:** Python & OpenMAT implementations of every algorithm.\n**Future:** Markov chains, PCA, linear ODEs, signal processing.',
+      },
     ],
     visualizations: [
       {
         id: 'PythonNotebook',
-        title: 'Interactive Python Environment',
-        mathBridge: 'Run Python code to perform matrix operations. The results are computed entirely on your device.',
-        caption: 'A fully functional Python 3 environment.',
+        title: 'NumPy & SciPy: Linear Algebra Toolkit',
+        mathBridge: 'Run each cell to see the Python equivalent of the theory. Every function name links back to a specific algorithm from earlier chapters.',
+        caption: 'Full Python 3 environment via Pyodide WebAssembly.',
         initialProps: {
           initialCells: [
             {
               id: 1,
-              code: `# ── NumPy Matrix Basics ─────────────────────────\nimport numpy as np\n\n# Define variables and matrices\nA = np.array([[1, 2], [3, 4]])\nv = np.array([5, 6])\n\n# Matrix multiplication (A @ v)\nresult = A @ v\nprint(f"Matrix A:\\n{A}")\nprint(f"Vector v: {v}")\nprint(f"A @ v = {result}")`,
-              output: '', status: 'idle', figureJson: null
+              cellTitle: 'NumPy array fundamentals',
+              prose: ['Create arrays, inspect shape, and perform element-wise vs. matrix operations. Note the difference between `*` (element-wise) and `@` (matrix product).'],
+              code: `import numpy as np
+
+# 1D vector and 2D matrix
+v = np.array([1, 2, 3])
+A = np.array([[4, -1, 0],
+              [-1, 4, -1],
+              [0, -1, 3]])
+
+print("v shape:", v.shape)
+print("A shape:", A.shape)
+print("A @ v  =", A @ v)        # matrix-vector product
+print("v * v  =", v * v)        # element-wise square
+print("v.T @ v =", v @ v)       # dot product (v is 1D)`,
+              status: 'idle',
             },
             {
               id: 2,
-              code: `# ── Geometry of Transformations ──────────────────\nfrom opencalc import Figure, quick_transform\n\n# Define a shear transformation matrix\nshear_matrix = [[1, 1], [0, 1]]\n\n# Visualize the transformation of the grid\nquick_transform(shear_matrix, vector=[1, 1])`,
-              output: '', status: 'idle', figureJson: null
-            }
+              cellTitle: 'Solving Ax = b (the workhorse)',
+              prose: ['`np.linalg.solve` uses LU factorization internally. It is faster and more numerically stable than computing $A^{-1}b$. Only use `inv(A)` when you truly need the inverse matrix itself.'],
+              code: `import numpy as np
+
+A = np.array([[4., -1., 0.],
+              [-1., 4., -1.],
+              [0., -1., 3.]])
+b = np.array([15., 10., 10.])
+
+x = np.linalg.solve(A, b)
+print("Solution x =", x)
+print("Residual A@x - b =", A @ x - b)   # should be ~0
+
+# NEVER do: x = np.linalg.inv(A) @ b  (slower, less stable)`,
+              status: 'idle',
+            },
+            {
+              id: 3,
+              cellTitle: 'Eigenvalues and eigenvectors',
+              prose: ['`eig` returns eigenvalues `vals` and a matrix `vecs` whose **columns** are the eigenvectors. Verify $Av = \\lambda v$ for the first pair.'],
+              code: `import numpy as np
+
+A = np.array([[6., 2.],
+              [2., 3.]])
+
+vals, vecs = np.linalg.eig(A)
+print("Eigenvalues:", vals)
+print("Eigenvectors (columns):\n", vecs)
+
+# Verify A v1 = lambda1 * v1
+v1 = vecs[:, 0]
+print("A @ v1     =", A @ v1)
+print("lambda1*v1 =", vals[0] * v1)`,
+              status: 'idle',
+            },
+            {
+              id: 4,
+              cellTitle: 'Singular Value Decomposition',
+              prose: ['SVD factors any matrix $A = U\\Sigma V^\\top$. The singular values on $\\Sigma$\'s diagonal tell you rank (how many are nonzero) and condition number (max/min ratio).'],
+              code: `import numpy as np
+
+A = np.array([[3., 1., 1.],
+              [-1., 3., 1.]])
+
+U, s, Vt = np.linalg.svd(A)
+print("U =\n", U)
+print("singular values =", s)
+print("Vt =\n", Vt)
+print("rank =", np.linalg.matrix_rank(A))
+print("cond =", np.linalg.cond(A))
+
+# Reconstruct A from its SVD
+Sigma = np.zeros_like(A, dtype=float)
+np.fill_diagonal(Sigma, s)
+print("Reconstruction error:", np.linalg.norm(A - U @ Sigma @ Vt))`,
+              status: 'idle',
+            },
+            {
+              id: 5,
+              cellTitle: 'QR and Least Squares',
+              prose: ['`linalg.qr` returns the QR factorization. `linalg.lstsq` finds the best-fit solution to an overdetermined system — this is what regression is under the hood.'],
+              code: `import numpy as np
+
+# QR factorization
+A = np.array([[1., 1.], [1., 2.], [1., 3.], [1., 4.]])
+Q, R = np.linalg.qr(A)
+print("Q =\n", Q)
+print("R =\n", R)
+print("Q.T @ Q (should be I):\n", np.round(Q.T @ Q, 6))
+
+# Least squares fit to y = c0 + c1*x
+y = np.array([1.1, 2.0, 2.9, 3.95])
+coeffs, res, rank, sv = np.linalg.lstsq(A, y, rcond=None)
+print("\nLeast squares coeffs:", coeffs)`,
+              status: 'idle',
+            },
           ]
         }
-      }
-    ]
+      },
+      {
+        id: 'OpenMatNotebook',
+        title: 'OpenMAT: Same Algorithms, MATLAB Syntax',
+        mathBridge: 'Run the same computations in OpenMAT\'s MATLAB-like syntax. Use the "Open in OpenMAT" button to explore further in the full studio.',
+        caption: 'MATLAB-like cells using the in-browser mathjs engine.',
+        initialProps: {
+          initialCells: [
+            {
+              id: 1,
+              cellTitle: 'Solve Ax = b',
+              prose: ['Backslash operator A\\b is the OpenMAT/MATLAB idiom for solving linear systems.'],
+              code: `A = [4 -1 0; -1 4 -1; 0 -1 3];
+b = [15; 10; 10];
+x = A \ b
+residual = A*x - b`,
+            },
+            {
+              id: 2,
+              cellTitle: 'Eigenvalues, SVD, Rank',
+              prose: ['OpenMAT uses the same function names as MATLAB: eig, svd, rank, cond.'],
+              code: `A = [3 1 1; -1 3 1];
+[U, S, V] = svd(A)
+rank(A)
+cond(A)
+
+% Verify reconstruction
+disp('Reconstruction error:')
+norm(A - U*S*V')`,
+            },
+          ]
+        }
+      },
+    ],
   },
-  
-  math: { prose: [], callouts: [], visualizations: [] },
-  rigor: { prose: [], callouts: [], visualizations: [] },
-  examples: [],
-  challenges: [],
-  semantics: { core: [] },
-  spiral: { recoveryPoints: [], futureLinks: [] },
-  assessment: { questions: [] },
-  mentalModel: [
-    'Python is a tool for automation.',
-    'Code cells share state.',
-    'Computation happens locally.'
+
+  math: {
+    prose: [
+      '**Array shapes and the broadcasting rules.** In NumPy, a vector `v` of shape `(n,)` is neither a row nor a column vector — it is a 1D array. When you write `A @ v` where `A` is `(m, n)` and `v` is `(n,)`, NumPy treats `v` as a column, producing shape `(m,)`. When you write `v @ A`, it treats `v` as a row. To make this explicit, use `v.reshape(-1, 1)` for a column or `v.reshape(1, -1)` for a row.',
+      '**LU vs. direct solve.** `np.linalg.solve(A, b)` computes the LU factorization once (with partial pivoting) and then solves two triangular systems. For the same matrix $A$ with many right-hand sides $b_1, b_2, \\ldots$, use `scipy.linalg.lu_factor(A)` once and `scipy.linalg.lu_solve(lu, bi)` for each $b_i$ — this reuses the factorization and is much faster.',
+      '**SVD and low-rank approximations.** The thin SVD returned by `np.linalg.svd(A, full_matrices=False)` gives $U \\in \\mathbb{R}^{m \\times r}$, $\\Sigma \\in \\mathbb{R}^r$, $V^\\top \\in \\mathbb{R}^{r \\times n}$ where $r = \\min(m, n)$. A rank-$k$ approximation is $A_k = U[:, :k] \\cdot \\text{diag}(\\Sigma[:k]) \\cdot V[:k, :]$. This is the mathematical foundation of image compression and PCA.',
+      '**Condition number and numerical stability.** `np.linalg.cond(A)` returns $\\kappa(A) = \\|A\\| \\|A^{-1}\\| = \\sigma_{\\max} / \\sigma_{\\min}$. If $\\kappa(A) \\approx 10^k$, you lose roughly $k$ digits of precision in the solution. $\\kappa > 10^{12}$ is typically too ill-conditioned to solve reliably in double precision.',
+    ],
+    callouts: [
+      {
+        type: 'warning',
+        title: 'Never Invert a Matrix to Solve a System',
+        body: 'Computing `np.linalg.inv(A) @ b` is both slower and less numerically stable than `np.linalg.solve(A, b)`. The `solve` function uses the same LU factorization but without explicitly forming $A^{-1}$. Only compute the inverse when you genuinely need the matrix $A^{-1}$ (e.g., to examine it or multiply by it multiple times with different vectors).',
+      },
+      {
+        type: 'insight',
+        title: 'scipy.linalg vs. numpy.linalg',
+        body: '`scipy.linalg` generally supersedes `numpy.linalg` for serious work:\n- More factorizations: Cholesky, Schur, polar\n- Structured solvers: banded, triangular, Toeplitz\n- Better error messages\n- `scipy.sparse.linalg` for large sparse systems\n\nUse `numpy.linalg` for quick experiments; use `scipy.linalg` in production code.',
+      },
+    ],
+    visualizations: [],
+  },
+
+  rigor: {
+    prose: [
+      '**Floating-point arithmetic.** All NumPy/SciPy computations use IEEE 754 double precision (64-bit floats). Machine epsilon is $\\varepsilon_{\\text{mach}} \\approx 2.2 \\times 10^{-16}$. This means `A @ np.linalg.inv(A)` will not be exactly the identity matrix — residuals on the order of $10^{-14}$ are normal and expected.',
+      '**BLAS levels.** Linear algebra routines are classified by the ratio of arithmetic operations to memory reads: Level 1 (vector-vector, $O(n)$ ops), Level 2 (matrix-vector, $O(n^2)$), Level 3 (matrix-matrix, $O(n^3)$). High-performance libraries like OpenBLAS and Intel MKL optimize Level 3 operations to approach the theoretical peak of the hardware. NumPy links to these libraries, so `A @ B` for large matrices runs at near-hardware speed.',
+    ],
+    callouts: [
+      {
+        type: 'proof',
+        title: 'Why solve is better than inv',
+        body: 'Solving $A\\mathbf{x} = \\mathbf{b}$ via LU requires $O(n^3/3)$ multiplications for the factorization and $O(n^2)$ for the triangular solves.\n\nComputing $A^{-1}$ also costs $O(n^3)$ but with a larger constant (roughly $3\\times$ more work) and introduces additional rounding error at each step of the inversion algorithm.\n\nCondition: $\\|\\mathbf{x} - \\hat{\\mathbf{x}}\\| / \\|\\mathbf{x}\\| \\leq \\kappa(A) \\cdot \\varepsilon_{\\text{mach}}$ for both methods, but the constant hidden in the $\\leq$ is smaller for `solve`.',
+      },
+    ],
+    visualizations: [],
+  },
+
+  examples: [
+    {
+      id: 'la8-001-ex1',
+      title: 'Solving the Power Grid',
+      problem: 'A 4-node DC power grid has the nodal admittance matrix $Y = \\begin{bmatrix} 3 & -1 & -1 & -1 \\\\ -1 & 3 & -1 & -1 \\\\ -1 & -1 & 3 & -1 \\\\ -1 & -1 & -1 & 3 \\end{bmatrix}$ and injection vector $\\mathbf{b} = [2, 0, -1, -1]^\\top$ (in per-unit). Solve for the voltage vector $\\mathbf{v}$.',
+      solution: '```python\nimport numpy as np\nY = np.array([[3,-1,-1,-1],[-1,3,-1,-1],[-1,-1,3,-1],[-1,-1,-1,3]], dtype=float)\nb = np.array([2.,0.,-1.,-1.])\nv = np.linalg.solve(Y, b)\nprint(v)  # → [0.75, 0.25, -0.25, -0.75]\n```',
+      steps: [
+        'Set up $Y$ and $\\mathbf{b}$ as NumPy arrays.',
+        'Call `np.linalg.solve(Y, b)` — LU factorization with partial pivoting runs in $O(n^3) = O(64)$ operations.',
+        'Verify: `Y @ v - b` should be near zero (machine epsilon level).',
+      ],
+    },
+    {
+      id: 'la8-001-ex2',
+      title: 'Image Compression via Rank-k SVD',
+      problem: 'Given a 4×4 grayscale image matrix $A$, compute its SVD and form the best rank-2 approximation. What fraction of the Frobenius norm is captured?',
+      solution: 'A rank-$k$ approximation $A_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ captures $(\\sum_{i=1}^k \\sigma_i^2) / (\\sum_{i=1}^r \\sigma_i^2)$ of the squared Frobenius norm (energy).',
+      steps: [
+        'Compute `U, s, Vt = np.linalg.svd(A, full_matrices=False)`.',
+        'Form `A2 = U[:,:2] @ np.diag(s[:2]) @ Vt[:2,:]`.',
+        'Compute `np.sum(s[:2]**2) / np.sum(s**2)` — the energy ratio.',
+      ],
+    },
   ],
-  checkpoints: ['read-intuition'],
-  quiz: []
+
+  challenges: [
+    {
+      id: 'la8-001-ch1',
+      title: 'Reuse LU for multiple RHS',
+      difficulty: 'medium',
+      challengeType: 'write',
+      prompt: 'Use `scipy.linalg.lu_factor` and `scipy.linalg.lu_solve` to solve the system $A\\mathbf{x}_i = \\mathbf{b}_i$ for three different right-hand sides $\\mathbf{b}_1, \\mathbf{b}_2, \\mathbf{b}_3$ with a single factorization of $A$. Then verify each residual.',
+      hint: 'Call `lu, piv = scipy.linalg.lu_factor(A)` once, then `scipy.linalg.lu_solve((lu, piv), b)` three times.',
+    },
+    {
+      id: 'la8-001-ch2',
+      title: 'Low-rank image approximation',
+      difficulty: 'hard',
+      challengeType: 'write',
+      prompt: 'For the matrix $A = \\begin{bmatrix} 4&3&2&1\\\\3&4&3&2\\\\2&3&4&3\\\\1&2&3&4 \\end{bmatrix}$: (a) Compute the thin SVD. (b) Form the rank-1 and rank-2 approximations. (c) Plot the relative energy captured vs. rank. (d) Report the condition number.',
+      hint: 'Use `np.linalg.svd(A, full_matrices=False)`. Energy captured = `np.cumsum(s**2) / np.sum(s**2)`.',
+    },
+  ],
+
+  semantics: {
+    core: ['numpy-array', 'np.linalg', 'solve', 'eig', 'svd', 'qr', 'rank', 'cond', 'broadcasting'],
+    bridges: ['lu-factorization', 'singular-value-decomposition', 'least-squares'],
+  },
+  spiral: {
+    recoveryPoints: ['la3-001-eigenvectors', 'la4-004-svd'],
+    futureLinks: ['la8-004-pca', 'la9-004-floating-point'],
+  },
+  mentalModel: [
+    'Every theoretical operation you learned has a one-line NumPy equivalent.',
+    'solve is faster and more stable than inv — use it for systems.',
+    'Condition number measures how much the solution amplifies errors in b.',
+    'SVD singular values measure the energy in each rank-1 direction.',
+    'SciPy adds structured solvers that exploit matrix properties.',
+  ],
+  checkpoints: ['read-intuition', 'run-numpy-cells', 'verify-residuals'],
+  assessment: { questions: [] },
+  quiz: [
+    {
+      id: 'la8-001-q1',
+      question: 'What does `np.linalg.solve(A, b)` do internally?',
+      options: ['Computes A⁻¹ and multiplies by b', 'Performs LU factorization with partial pivoting then solves triangular systems', 'Uses the Gram-Schmidt process', 'Computes the SVD and uses the pseudoinverse'],
+      answer: 1,
+      explanation: 'np.linalg.solve uses LAPACK\'s dgesv, which computes the LU factorization PA=LU and then solves Ly=Pb, Ux=y — two triangular solves.'
+    },
+    {
+      id: 'la8-001-q2',
+      question: 'If the condition number κ(A) ≈ 10⁸ in double precision (which has ~16 significant digits), about how many correct digits do you expect in the solution?',
+      options: ['16', '8', '24', '0'],
+      answer: 1,
+      explanation: 'You lose roughly log₁₀(κ) digits of precision. With κ≈10⁸ and 16 available digits, you expect roughly 16-8=8 reliable digits.'
+    },
+    {
+      id: 'la8-001-q3',
+      question: 'Which NumPy operation gives a matrix product (as opposed to element-wise multiplication)?',
+      options: ['A * B', 'A @ B', 'A ** B', 'A / B'],
+      answer: 1,
+      explanation: 'The @ operator (PEP 465, Python 3.5+) is the matrix multiplication operator. A * B gives element-wise multiplication.'
+    },
+  ]
 };

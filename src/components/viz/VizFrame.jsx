@@ -285,6 +285,7 @@ const VIZ_REGISTRY = {
     () => import("./react/LowRankApproximationViz.jsx"),
   ),
   PythonNotebook: lazy(() => import("./react/PythonNotebook.jsx")),
+  OpenMatNotebook: lazy(() => import("./react/OpenMatNotebook.jsx")),
   JSNotebook: lazy(() => import("./react/JSNotebook.jsx")),
   ScienceNotebook: lazy(() => import("./react/ScienceNotebook.jsx")),
   // Chemistry lessons
@@ -1095,6 +1096,7 @@ const VIZ_REGISTRY = {
 // Vizzes that work fine on a phone-sized screen
 const PHONE_OK = new Set([
   "PythonNotebook",
+  "OpenMatNotebook",
   "JSNotebook",
   "ScienceNotebook",
   "VideoEmbed",

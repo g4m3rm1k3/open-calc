@@ -74,6 +74,7 @@ export function ChatProvider({ children }) {
   const myGpuScoreRef = useRef(0)
   const peerScoresRef = useRef(new Map()) // peerId → score
   const [lovelaceHostId, setLovelaceHostId] = useState('local')
+  const lovelaceHostIdRef = useRef('local') // readable inside stale closures
   const [pendingLovelaceQueries, setPendingLovelaceQueries] = useState([])
   const sendLovelaceChannelRef = useRef(null)
 
@@ -83,6 +84,7 @@ export function ChatProvider({ children }) {
     for (const [pid, score] of peerScoresRef.current) {
       if (score > bestScore) { bestScore = score; bestId = pid }
     }
+    lovelaceHostIdRef.current = bestId
     setLovelaceHostId(bestId)
   }
 
@@ -156,32 +158,33 @@ export function ChatProvider({ children }) {
         setUnreadCount(n => n + 1)
       })
 
-      // Lovelace P2P channel — GPU announcements + query routing
-      const [sendLv, receiveLv] = room.makeAction('lovelace')
-      sendLovelaceChannelRef.current = sendLv
+      // Lovelace P2P channel — wrapped separately so a failure here never blocks setConnected
+      let sendLv = null
+      try {
+        const [lv, receiveLv] = room.makeAction('lovelace')
+        sendLv = lv
+        sendLovelaceChannelRef.current = lv
 
-      receiveLv((data, peerId) => {
-        if (data?.type === 'announce') {
-          peerScoresRef.current.set(peerId, data.score ?? 0)
-          reelectHost()
-        } else if (data?.type === 'query') {
-          // Only handle if we are the elected host
-          setLovelaceHostId(prev => {
-            if (prev === 'local') {
-              setPendingLovelaceQueries(q => [
+        receiveLv((data, peerId) => {
+          if (data?.type === 'announce') {
+            peerScoresRef.current.set(peerId, data.score ?? 0)
+            reelectHost()
+          } else if (data?.type === 'query' && lovelaceHostIdRef.current === 'local') {
+            setPendingLovelaceQueries(q =>
+              q.some(p => p.queryId === data.queryId) ? q : [
                 ...q,
                 { queryId: data.queryId, text: data.text, recentMessages: data.recentMessages ?? [], room: data.room ?? 'global' },
-              ])
-            }
-            return prev
-          })
-        }
-      })
+              ]
+            )
+          }
+        })
+      } catch (lvErr) {
+        console.warn('[Chat] Lovelace P2P channel setup failed:', lvErr)
+      }
 
       room.onPeerJoin(() => {
         setGlobalPeers(n => n + 1)
-        // Announce our GPU score to the new peer
-        sendLv({ type: 'announce', score: myGpuScoreRef.current })
+        sendLv?.({ type: 'announce', score: myGpuScoreRef.current })
       })
       room.onPeerLeave((peerId) => {
         setGlobalPeers(n => Math.max(0, n - 1))

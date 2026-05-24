@@ -290,7 +290,6 @@ export default function ChatPanel({ isOpen, onClose }) {
   const lovelaceStatus = isDownloading
     ? downloadProgress || 'Downloading Lovelace…'
     : isThinking ? 'Lovelace is thinking…'
-    : (!isLovelaceHost && totalPeers > 0) ? `Lovelace hosted by ${lovelaceHostId.slice(0, 8)}…`
     : null
 
   const handleSend = useCallback(async (text) => {
