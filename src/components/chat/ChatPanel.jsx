@@ -247,6 +247,8 @@ export default function ChatPanel({ isOpen, onClose }) {
     sendMessage, sendLovelaceResponse,
     markAllRead,
     globalHistoryLoaded, lessonHistoryLoaded,
+    isLovelaceHost, lovelaceHostId,
+    pendingLovelaceQueries, sendLovelaceQuery, resolveLovelaceQuery,
   } = useChat()
 
   const { ask, isThinking, isDownloading, downloadProgress } = useLovelaceAI()
@@ -263,9 +265,33 @@ export default function ChatPanel({ isOpen, onClose }) {
   useEffect(() => { if (currentLessonId && isOpen) setTab('lesson') }, [currentLessonId])
   useEffect(() => { if (editingName) nameRef.current?.focus() }, [editingName])
 
+  // Process incoming queries when we are the elected Lovelace host
+  const processingRef = useRef(new Set())
+  useEffect(() => {
+    if (!isLovelaceHost || pendingLovelaceQueries.length === 0) return
+    for (const query of pendingLovelaceQueries) {
+      if (processingRef.current.has(query.queryId)) continue
+      processingRef.current.add(query.queryId)
+      ask(query.text, query.recentMessages)
+        .then(answer => {
+          if (answer) sendLovelaceResponse(answer, query.room)
+        })
+        .catch(() => {
+          sendLovelaceResponse("Sorry, I ran into an error processing that.", query.room)
+        })
+        .finally(() => {
+          processingRef.current.delete(query.queryId)
+          resolveLovelaceQuery(query.queryId)
+        })
+    }
+  }, [pendingLovelaceQueries, isLovelaceHost, ask, sendLovelaceResponse, resolveLovelaceQuery])
+
+  const totalPeers = (globalPeers ?? 0) + (lessonPeers ?? 0)
   const lovelaceStatus = isDownloading
     ? downloadProgress || 'Downloading Lovelace…'
-    : isThinking ? 'Lovelace is thinking…' : null
+    : isThinking ? 'Lovelace is thinking…'
+    : (!isLovelaceHost && totalPeers > 0) ? `Lovelace hosted by ${lovelaceHostId.slice(0, 8)}…`
+    : null
 
   const handleSend = useCallback(async (text) => {
     sendMessage(text, tab)
@@ -273,15 +299,23 @@ export default function ChatPanel({ isOpen, onClose }) {
     if (isLovelaceMention(text)) {
       const question = extractQuestion(text) || text
       const recentMsgs = tab === 'global' ? globalMessages : lessonMessages
-      try {
-        const answer = await ask(question, recentMsgs)
-        if (answer) sendLovelaceResponse(answer, tab)
-      } catch (err) {
-        console.error('[Lovelace] ask failed:', err)
-        sendLovelaceResponse("Sorry, I ran into an error. Make sure your browser supports WebGPU (Chrome 113+).", tab)
+
+      // If we are the host (or alone), run inference locally
+      if (isLovelaceHost || totalPeers === 0) {
+        try {
+          const answer = await ask(question, recentMsgs)
+          if (answer) sendLovelaceResponse(answer, tab)
+        } catch (err) {
+          console.error('[Lovelace] ask failed:', err)
+          sendLovelaceResponse("Sorry, I ran into an error. Make sure your browser supports WebGPU (Chrome 113+).", tab)
+        }
+      } else {
+        // Delegate to the peer with the best GPU
+        const queryId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+        sendLovelaceQuery(queryId, question, recentMsgs, tab)
       }
     }
-  }, [sendMessage, sendLovelaceResponse, ask, tab, globalMessages, lessonMessages])
+  }, [sendMessage, sendLovelaceResponse, ask, tab, globalMessages, lessonMessages, isLovelaceHost, totalPeers, sendLovelaceQuery])
 
   const saveName = () => { setUsername(nameInput); setEditingName(false) }
 

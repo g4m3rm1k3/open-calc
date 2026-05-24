@@ -3,6 +3,7 @@ import { joinRoom } from '@trystero-p2p/nostr'
 import { useLocation } from 'react-router-dom'
 import { LESSON_MAP } from '../content/index.js'
 import { getOrCreateKeypair, createPool, publishMessage, subscribeHistory } from '../lib/nostrChat.js'
+import { getGpuScore } from '../utils/gpuScore.js'
 
 const ChatContext = createContext(null)
 
@@ -69,6 +70,22 @@ export function ChatProvider({ children }) {
   const nostrPool = useRef(null)
   const keypair = useRef(null)
 
+  // Lovelace P2P host election
+  const myGpuScoreRef = useRef(0)
+  const peerScoresRef = useRef(new Map()) // peerId → score
+  const [lovelaceHostId, setLovelaceHostId] = useState('local')
+  const [pendingLovelaceQueries, setPendingLovelaceQueries] = useState([])
+  const sendLovelaceChannelRef = useRef(null)
+
+  function reelectHost() {
+    let bestId = 'local'
+    let bestScore = myGpuScoreRef.current
+    for (const [pid, score] of peerScoresRef.current) {
+      if (score > bestScore) { bestScore = score; bestId = pid }
+    }
+    setLovelaceHostId(bestId)
+  }
+
   const markAllRead = useCallback(() => setUnreadCount(0), [])
 
   const setUsername = useCallback((name) => {
@@ -104,6 +121,14 @@ export function ChatProvider({ children }) {
     }
   }, [])
 
+  // Compute GPU score once on mount
+  useEffect(() => {
+    getGpuScore().then(score => {
+      myGpuScoreRef.current = score
+      reelectHost()
+    })
+  }, [])
+
   function makeIncomingMsg(data, peerId) {
     return {
       id: `${peerId}-${data.ts}`,
@@ -131,8 +156,38 @@ export function ChatProvider({ children }) {
         setUnreadCount(n => n + 1)
       })
 
-      room.onPeerJoin(() => setGlobalPeers(n => n + 1))
-      room.onPeerLeave(() => setGlobalPeers(n => Math.max(0, n - 1)))
+      // Lovelace P2P channel — GPU announcements + query routing
+      const [sendLv, receiveLv] = room.makeAction('lovelace')
+      sendLovelaceChannelRef.current = sendLv
+
+      receiveLv((data, peerId) => {
+        if (data?.type === 'announce') {
+          peerScoresRef.current.set(peerId, data.score ?? 0)
+          reelectHost()
+        } else if (data?.type === 'query') {
+          // Only handle if we are the elected host
+          setLovelaceHostId(prev => {
+            if (prev === 'local') {
+              setPendingLovelaceQueries(q => [
+                ...q,
+                { queryId: data.queryId, text: data.text, recentMessages: data.recentMessages ?? [], room: data.room ?? 'global' },
+              ])
+            }
+            return prev
+          })
+        }
+      })
+
+      room.onPeerJoin(() => {
+        setGlobalPeers(n => n + 1)
+        // Announce our GPU score to the new peer
+        sendLv({ type: 'announce', score: myGpuScoreRef.current })
+      })
+      room.onPeerLeave((peerId) => {
+        setGlobalPeers(n => Math.max(0, n - 1))
+        peerScoresRef.current.delete(peerId)
+        reelectHost()
+      })
       setConnected(true)
     } catch (e) {
       console.warn('[Chat] Global room failed:', e)
@@ -234,6 +289,22 @@ export function ChatProvider({ children }) {
     sendMessage(text, roomType, true)
   }, [sendMessage])
 
+  // Route a Lovelace query to the elected host (or run locally if we are the host)
+  const sendLovelaceQuery = useCallback((queryId, text, recentMessages, roomType) => {
+    sendLovelaceChannelRef.current?.({
+      type: 'query',
+      queryId,
+      text,
+      recentMessages: recentMessages.slice(-6).map(m => ({ username: m.username, text: m.text, isLovelace: m.isLovelace })),
+      room: roomType,
+    })
+  }, [])
+
+  // Called by ChatPanel (host) once it has finished inference for a pending query
+  const resolveLovelaceQuery = useCallback((queryId) => {
+    setPendingLovelaceQueries(q => q.filter(p => p.queryId !== queryId))
+  }, [])
+
   return (
     <ChatContext.Provider value={{
       username, setUsername,
@@ -244,6 +315,11 @@ export function ChatProvider({ children }) {
       sendMessage, sendLovelaceResponse,
       unreadCount, markAllRead,
       globalHistoryLoaded, lessonHistoryLoaded,
+      isLovelaceHost: lovelaceHostId === 'local',
+      lovelaceHostId,
+      pendingLovelaceQueries,
+      sendLovelaceQuery,
+      resolveLovelaceQuery,
     }}>
       {children}
     </ChatContext.Provider>
